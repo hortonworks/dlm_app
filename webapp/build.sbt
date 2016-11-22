@@ -13,6 +13,7 @@ libraryDependencies ++= {
 
     "org.reactivemongo" %% "play2-reactivemongo" % "0.12.0",
     "org.mindrot" % "jbcrypt" % "0.3m",
+    "io.jsonwebtoken" % "jjwt" % "0.7.0",
 
     //angular2 dependencies
     "org.webjars.npm" % "angular__common" % ngVersion,
