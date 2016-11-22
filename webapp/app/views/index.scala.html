@@ -1,0 +1,85 @@
+@()
+<!doctype html>
+<html lang="en" data-framework="angular2">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="description" content="Introducing Lollipop, a sweet new take on Android.">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+        <title></title>
+        <base href="/">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.min.css">
+        <link rel="stylesheet" href="assets/stylesheets/styles.css">
+        <script type='text/javascript' src='@routes.Assets.versioned("lib/systemjs/dist/system-polyfills.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.versioned("lib/core-js/client/shim.min.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.versioned("lib/zone.js/dist/zone.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.versioned("lib/reflect-metadata/Reflect.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.versioned("lib/systemjs/dist/system.src.js")'></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+        <script src="assets/javascripts/maps/datamaps.world.min.js"></script>
+        <script>
+            var map = {
+                'app': 'assets/app',
+                '@@angular':'assets/lib/@@angular',
+                'rxjs':'assets/lib/rxjs',
+                'symbol-observable': 'assets/lib/symbol-observable'
+
+            };
+
+
+        var packages = {
+                'app': {main: 'main.js', defaultExtension: 'js'},
+                'rxjs': {defaultExtension: 'js'},
+                'assets/lib': {defaultExtension: 'js'},
+                'symbol-observable': {defaultExtension: 'js', main: 'index.js'}
+            };
+        var ngPackageNames = [
+                'common',
+                'compiler',
+                'core',
+                'forms',
+                'http',
+                'platform-browser',
+                'platform-browser-dynamic',
+                'router'
+            ];
+
+        function packIndex(pkgName) {
+          packages['@@angular/'+pkgName] = { main: 'index.js', defaultExtension: 'js' };
+        }
+        function packUmd(pkgName) {
+          packages['@@angular/'+pkgName] = { main: '/bundles/' + pkgName + '.umd.js', defaultExtension: 'js' };
+        }
+          // Most environments should use UMD; some (Karma) need the individual index files
+        function addAngularModulesToMap(pkgName) {
+          map['@@angular/'+pkgName] = 'assets/lib/angular__' + pkgName;
+        }
+
+          // Add package entries for angular packages
+        var setPackageConfig = System.packageWithIndex ? packIndex : packUmd;
+        ngPackageNames.forEach(setPackageConfig)
+
+          // Add map entries for angular packages
+        ngPackageNames.forEach(function(pkgName){
+           addAngularModulesToMap(pkgName)
+        });
+
+        System.config({
+            map : map,
+            packages: packages,
+        });
+        @* SystemJs works out which other modules our app module depends on and will download and load them*@
+        System.import('app')
+            .catch(console.error.bind(console));
+
+		</script>
+    </head>
+    <body>
+        <data-plane></data-plane>
+        <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+
+    </body>
+</html>

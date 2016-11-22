@@ -1,0 +1,11 @@
+**/.idea
+*.iml
+**/build/*
+**/target/*
+**/logs/*
+**/.classpath
+**/.project
+**/.settings
+**/RUNNING_PID
+**/node_modules
+**/npm-debug.log
