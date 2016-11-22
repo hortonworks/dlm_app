@@ -8,6 +8,7 @@ import AppComponent from "./app"
 import DashboardComponent from "./components/dashboard"
 import LoginComponent  from "./components/login"
 import {AuthService} from "./services/authservice"
+import AddClusterComponent from "./components/add-cluster/add-cluster.component"
 
 @NgModule({
     imports: [
@@ -16,7 +17,7 @@ import {AuthService} from "./services/authservice"
         HttpModule,
         RouterModule.forRoot(routes)
     ],
-    declarations: [AppComponent, DashboardComponent, LoginComponent],
+    declarations: [AppComponent, DashboardComponent, LoginComponent, AddClusterComponent],
     bootstrap: [AppComponent],
     providers: [AuthService]
 })

@@ -78,6 +78,11 @@ a img{
     font-size: 14px;
   }
 
+  .dataplane-header .mdl-layout__header-row {
+    background: #EFEFEF;
+  }
+
+
   .dataplane-navigation-container {
     /* Simple hack to make the overflow happen to the left instead... */
     direction: rtl;
