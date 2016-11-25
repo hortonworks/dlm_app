@@ -25,7 +25,7 @@ class ClusterSync @Inject()(actorSystem: ActorSystem,
 
   val services  = Map[String,Class[_ <: ServiceActor]]("weather"-> classOf[WeatherService])
 
-  initialize
+//  initialize
 
   import play.api.libs.concurrent.Execution.Implicits.defaultContext
   private def initialize = {
