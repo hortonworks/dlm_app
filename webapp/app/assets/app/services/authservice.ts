@@ -23,7 +23,7 @@ export class AuthService {
             .toPromise()
             .then(res => {
                     this.loggedIn = true
-                    localStorage.setItem("auth_token", res.json().data.auth_token)
+                    localStorage.setItem("auth_token", res.json().auth_token)
                     return new LoginData(userName,password)
                 }
             )
