@@ -1,16 +1,17 @@
 package com.hw.dp.service.api
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
+import com.hw.dp.service.cluster.ServiceComponent
 
-abstract class ServiceActor(service: Service,persister:Option[ActorRef]) extends Actor with ActorLogging{
+abstract class ServiceActor(service: ServiceComponent, persister:Option[ActorRef]) extends Actor with ActorLogging{
 
-  def fetchData(service: Service,onComplete:Option[Snapshot] => Unit)
+  def fetchData(service: ServiceComponent,onComplete:Option[Snapshot] => Unit)
   def stopRunning
 
 
   override final def receive: Receive = {
     case Poll() =>
-      val underlying: Service = service
+      val underlying: ServiceComponent = service
        fetchData(underlying, { snap =>
         snap.map {
           persister.get ! SaveSnapshot(_)

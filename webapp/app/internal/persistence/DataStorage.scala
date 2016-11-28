@@ -1,16 +1,29 @@
 package internal.persistence
 
-import com.hw.dp.service.api.Service
+import com.hw.dp.service.cluster._
+import reactivemongo.api.commands.WriteResult
+
+import scala.concurrent.Future
 
 
 trait DataStorage {
 
-  def loadServices:Seq[Service]
+  def addComponent(componentToAdd: ServiceComponent): Future[Option[WriteResult]]
 
-  def loadService(service: Service):Option[Service]
+  def loadClusterInfos(): Future[Seq[AmbariClusters]]
 
-  def addService(service: Service):Boolean
+  def createOrUpdateHost(hosts: Host): Future[WriteResult]
 
-  def removeService(service: Service):Boolean
+  def createOrUpdateCluster(cluster: Cluster): Future[WriteResult]
+
+  def loadAmbari(): Future[Seq[Ambari]]
+
+  def loadServices: Seq[Service]
+
+  def loadService(service: Service): Option[Service]
+
+  def addService(service: Service): Future[Option[WriteResult]]
+
+  def removeService(service: Service): Boolean
 
 }

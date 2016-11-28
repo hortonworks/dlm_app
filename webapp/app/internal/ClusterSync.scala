@@ -1,11 +1,9 @@
 package internal
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import com.google.inject.{Inject, Singleton}
+import com.google.inject.Inject
 import com.hw.dp.service.api.{Poll, ServiceActor}
-import com.hw.dp.services.weather.WeatherService
 import internal.persistence.{DataStorage, Persister, SnapshotStorage}
-import play.api.inject.ApplicationLifecycle
 
 import scala.concurrent.duration._
 
@@ -21,9 +19,9 @@ import scala.concurrent.duration._
   *
   */
 class ClusterSync @Inject()(actorSystem: ActorSystem,
-                            storage:DataStorage,snapshotStorage: SnapshotStorage,lifecycle: ApplicationLifecycle) {
+                            storage:DataStorage,snapshotStorage: SnapshotStorage) {
 
-  val services  = Map[String,Class[_ <: ServiceActor]]("weather"-> classOf[WeatherService])
+  val services  = Map[String,Class[_ <: ServiceActor]]()
 
 //  initialize
 

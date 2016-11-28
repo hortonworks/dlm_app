@@ -43,7 +43,7 @@ libraryDependencies ++= {
     //  "org.webjars.npm" % "jasmine-core" % "2.4.1"
 
     //service dependencies
-    "com.hw.dataplane" %% "weatherservice" % "0.2"
+    "com.hw.dataplane" %% "dpservice" % "0.5"
 
 
   )
