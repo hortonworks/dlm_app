@@ -1,5 +1,7 @@
 package com.hw.dp.service.cluster
 
+import java.util.Date
+
 
 case class Ambari(protocol:String = "http",host: String, port: Int, credentials: Credentials,dataCenter: Option[String])
 

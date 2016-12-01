@@ -13,8 +13,6 @@ import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-import com.hw.dp.service.cluster.Formatters._
-
 class AmbariSynchroniser(val ambari:Ambari,val storage:DataStorage,ws: WSClient) extends Actor with ActorLogging {
 
   val clustersApi = "api/v1/clusters"
@@ -66,14 +64,12 @@ class AmbariSynchroniser(val ambari:Ambari,val storage:DataStorage,ws: WSClient)
                   val startTime = (nnr.json \ "ServiceComponentInfo" \ "StartTime").validate[Long].map(l => l).getOrElse(0L)
                   val nameNodeInfo = NameNode(clusterName.get, ambari.host, startTime)
                   //TODO:Get NameNodeInfo
-
                 }
-
               }
             }
           }
         }
-      }
+      }.recoverWith{case e:Throwable => Future.successful(log.error("Exception at fetching rest response",e))}
   }
 
   def getWs(api: String): WSRequest = {

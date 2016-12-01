@@ -39,7 +39,7 @@ class AmbariLoader(storage: DataStorage, ws: WSClient) extends Actor with ActorL
         // Clean up before next Poll
         map.keySet.map { key =>
           if (!buffer.contains(key)) {
-            //kill the actor
+            //terminate
             map.get(key).map(v => v ! PoisonPill)
             map.remove(key)
           }

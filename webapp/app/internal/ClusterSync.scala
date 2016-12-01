@@ -3,7 +3,7 @@ package internal
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.google.inject.Inject
 import com.hw.dp.service.api.{Poll, ServiceActor}
-import internal.persistence.{DataStorage, Persister, SnapshotStorage}
+import internal.persistence.{DataStorage, SnapshotPersister, SnapshotStorage}
 
 import scala.concurrent.duration._
 
@@ -29,7 +29,7 @@ class ClusterSync @Inject()(actorSystem: ActorSystem,
   private def initialize = {
     storage.loadServices.foreach{ service =>
       val clazz:Class[_ <: ServiceActor] = services(service.name)
-      val persister: ActorRef = actorSystem.actorOf(Props(classOf[Persister],snapshotStorage))
+      val persister: ActorRef = actorSystem.actorOf(Props(classOf[SnapshotPersister],snapshotStorage))
       val serviceActor: ActorRef = actorSystem.actorOf(Props(clazz,service,Some(persister)))
       actorSystem.scheduler.schedule(20 millis,5 seconds,serviceActor, Poll())
     }

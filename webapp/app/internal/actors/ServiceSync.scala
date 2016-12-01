@@ -3,17 +3,14 @@ package internal.actors
 import java.nio.charset.StandardCharsets
 import java.util.Base64
 
-import akka.actor.{Actor, ActorLogging}
+import akka.actor.{Actor, ActorLogging, ActorRef}
 import com.hw.dp.service.api.Poll
 import com.hw.dp.service.cluster.{Ambari, Service, ServiceComponent}
-import com.sun.xml.internal.ws.api.Component
-import internal.persistence.DataStorage
+import internal.persistence.{DataStorage, SaveService, SaveServiceComponent}
 import play.api.libs.ws.{WSClient, WSRequest}
 
-import scala.concurrent.Future
-
 import scala.concurrent.ExecutionContext.Implicits.global
-class ServiceSync(val storage: DataStorage, ws: WSClient) extends Actor with ActorLogging {
+class ServiceSync(val storage: DataStorage, ws: WSClient,dataPersister: ActorRef) extends Actor with ActorLogging {
 
   val componentApi = "components"
 
@@ -24,6 +21,7 @@ class ServiceSync(val storage: DataStorage, ws: WSClient) extends Actor with Act
 
     case Poll() =>
       //look up all clusters for all synced registered Ambari's
+
       storage.loadClusterInfos().map { ambariClusters =>
         ambariClusters.map { ac =>
           val baseUrl = s"${ac.ambari.protocol}://${ac.ambari.host}:${ac.ambari.port}/api/v1/clusters"
@@ -38,15 +36,15 @@ class ServiceSync(val storage: DataStorage, ws: WSClient) extends Actor with Act
                   // for each component , hit the component URL and get the component information
                   // component URL is the component API url followed by component name
                   val componentResult = getWs(s"${baseUrl}/${cl.name}/", ac.ambari, s"${componentApi}/${component("component_name")}").get()
+
                   componentResult.map { compRes =>
                     val hosts = (compRes.json \ "host_components" \\ "HostRoles").map(_.validate[Map[String, String]].map(m => m).getOrElse(Map[String, String]()))
                     val state = (compRes.json \ "ServiceComponentInfo" \ "status").validate[String].map(s => s).getOrElse("STARTED")
                     val hostList = hosts.map(m => m("host_name"))
                     val serviceToAdd = Service(component("service_name"), cl.name, cl.ambariHost)
                     val componentToAdd = ServiceComponent(component("component_name"), component("service_name"), cl.name, cl.ambariHost, state, hostList)
-                    Future.sequence(List(storage.addService(serviceToAdd),storage.addComponent(componentToAdd))).map{ wr =>
-                      log.info(s"Inserting service ${serviceToAdd} and component ${componentToAdd} - result ${wr}")
-                    }
+                    dataPersister ! SaveService(serviceToAdd)
+                    dataPersister ! SaveServiceComponent(componentToAdd)
                   }
                 }
               }

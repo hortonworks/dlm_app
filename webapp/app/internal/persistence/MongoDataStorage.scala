@@ -11,6 +11,7 @@ import reactivemongo.api.commands.WriteResult
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.Logger
 
 @Singleton
 class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: play.api.Configuration) extends DataStorage {
@@ -83,6 +84,7 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
   }
 
   override def loadClusterInfos(): Future[Seq[AmbariClusters]] = {
+    Logger.info("Loading cluster information")
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("clusterinfo"))
     loadAmbari().flatMap{ambaris =>
       val seqs = ambaris.map{ambari =>
@@ -90,12 +92,12 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
           Future.successful(AmbariClusters(ambari,Some(clusterList)))
         })
       }
-      println("ashwin")
       Future.sequence(seqs)
     }
   }
 
   override def addComponent(component: ServiceComponent): Future[Option[WriteResult]] = {
+    Logger.debug(s"Inserting component ${component}")
     val selector = Json.obj("name"->component.name,"clusterName"->component.clusterName,"ambariHost"->component.ambariHost)
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("components"))
     collection.flatMap(_.find(selector).one[ServiceComponent].flatMap{ opS =>
@@ -108,6 +110,7 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
 
 
   override def addService(service: Service): Future[Option[WriteResult]] = {
+    Logger.debug(s"Inserting service ${service}")
     val selector = Json.obj("name"->service.name,"clusterName"->service.clusterName,"ambariHost"->service.ambariHost)
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("services"))
     collection.flatMap(_.find(selector).one[Service].flatMap{ opS =>
