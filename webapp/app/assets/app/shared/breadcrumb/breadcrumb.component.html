@@ -1,0 +1,8 @@
+<div>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item" *ngFor="let crumbName of getCrumbNames()" [ngClass]="{'active': crumbMap[crumbName] === ''}">
+            <a href="#" *ngIf="crumbMap[crumbName] !== ''" (click)="navigate($event, crumbName)">{{ crumbName }} </a>
+            <span href="#" *ngIf="crumbMap[crumbName] === ''">{{ crumbName }} </span>
+        </li>
+    </ol>
+</div>

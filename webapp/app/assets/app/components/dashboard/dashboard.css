@@ -1,0 +1,70 @@
+.dotted
+{
+    background-image: -webkit-repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 1px, transparent 1px, transparent 100%);
+    background-image: -moz-repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 1px, transparent 1px, transparent 100%);
+    background-image: -ms-repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 1px, transparent 1px, transparent 100%);
+    background-image: repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 1px, transparent 1px, transparent 100%);
+    -webkit-background-size: 15px 15px;
+    -moz-background-size: 15px 15px;
+    background-size: 15px 15px;
+}
+
+.data-center-name {
+    color: #22B9EE;
+    font-weight: 600;
+}
+
+.mdl-data-table__cell--non-numeric {
+    line-height: 10px;
+}
+
+.data-center-location {
+    font-size: 10px;
+}
+
+.green-text {
+    color: #9FCE63;
+}
+
+.red-text {
+    color: #D21E28;
+}
+
+>>> .demo-card-wide.mdl-card {
+     width: 256px;
+     background: #D0D0D0;
+     display: table;
+     min-height: 100px;
+ }
+>>> .demo-card-wide > .mdl-card__title {
+    height: 176px;
+}
+>>> .demo-card-wide > .mdl-card__menu {
+    color: #fff;
+}
+
+>>> .card-table
+{
+    background: #FFFFFF;
+    font-size: 12px;
+    width: 100%;
+    border-radius: 4px;
+}
+
+>>> .card-table-cell {
+    border-bottom: 1px solid #D0D0D0;
+    padding: 4px 25px;
+}
+
+>>> .card-padding {
+    padding: 0.2em;
+}
+
+>>> .card-super-text {
+    font-size: 12px;
+}
+
+>>> .card-title-text {
+    font-size: 18px;
+    font-weight: 500;
+}

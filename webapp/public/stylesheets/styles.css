@@ -170,7 +170,7 @@ a img{
   position: relative;
   height: 600px;
   width: auto;
-  background-color: #f3f3f3;
+  background-color: #ffffff;
   background-size: cover;
 }
 
@@ -541,8 +541,4 @@ a img{
   .dataplane-footer .mdl-mega-footer--bottom-section {
     display: none;
   }
-
-
-
-
 }

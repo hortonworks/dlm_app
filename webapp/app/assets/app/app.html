@@ -11,7 +11,7 @@
             <!-- Navigation -->
 
             <button class="dataplane-more-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" id="more-button">
-                <i class="material-icons">more_vert</i>
+                <i class="fa fa-bars fa-lg" aria-hidden="true"></i>
             </button>
             <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right mdl-js-ripple-effect" for="more-button">
                 <li *ngIf="isLoggedIn()" class="mdl-menu__item">My account</li>
@@ -21,12 +21,12 @@
     </div>
 
     <div class="dataplane-drawer mdl-layout__drawer" reload>
-                <span *ngIf="isLoggedIn()" class="mdl-layout-title">
-                    <img class="vw-logo-image" src="assets/images/vw.png">
-                </span>
+        <span *ngIf="isLoggedIn()" class="mdl-layout-title">
+            <img class="vw-logo-image" src="assets/images/vw.png">
+        </span>
         <nav *ngIf="isLoggedIn()" class="mdl-navigation">
-            <a class="mdl-navigation__link" href="">Data Centers</a>
-            <a class="mdl-navigation__link" href="">Clusters</a>
+            <a class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/dashboard']">Dashboard</a>
+            <a class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/add-cluster']" >Clusters</a>
             <div class="dataplane-drawer-separator"></div>
             <span class="mdl-navigation__link" href="">Data</span>
             <a class="mdl-navigation__link" href="">Tables</a>

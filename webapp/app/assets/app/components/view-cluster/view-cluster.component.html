@@ -1,0 +1,215 @@
+<div class="mdl-grid">
+    <div class="mdl-layout-spacer"></div>
+    <div class="mdl-cell mdl-cell--10-col">
+        <bread-crumb [crumbMap]="breadCrumbMap"> </bread-crumb>
+
+        <div class="mdl-grid mdl-grid--no-spacing">
+            <div class="mdl-cell mdl-cell--2-col"><h4 class="thin"> {{ dataCenterName }} </h4></div>
+
+            <div class="mdl-layout-spacer"></div>
+
+            <div class="mdl-cell mdl-cell--5-col mdl-typography--text-right">
+                <button class="mdl-button mdl-js-button mdl-button--raised actions-button">Action</button>
+                <button class="mdl-button mdl-js-button mdl-button--raised create-cluster">Create Cluster</button>
+            </div>
+        </div>
+
+        <div class="mdl-grid mdl-grid--no-spacing info-panel">
+            <div class="mdl-cell mdl-cell--3-col m-0 ">
+                <label class="mdl-typography--caption"> UP TIME </label>
+                <p class="mdl-typography--body-2 "> 23 Days </p>
+            </div>
+            <div class="mdl-cell mdl-cell--3-col m-0">
+                <label class="mdl-typography--caption"> # of Clusters </label>
+                <p class="mdl-typography--body-2 "> 5 </p>
+            </div>
+            <div class="mdl-cell mdl-cell--3-col m-0">
+                <label class="mdl-typography--caption"> # of Nodes </label>
+                <p class="mdl-typography--body-2 "> 268 </p>
+            </div>
+            <div class="mdl-cell mdl-cell--3-col m-0">
+                <label class="mdl-typography--caption"> # of Users </label>
+                <p class="mdl-typography--body-2 "> 400 </p>
+            </div>
+        </div>
+
+        <div class="mdl-grid mdl-grid--no-spacing legend">
+            <div class="mdl-cell mdl-cell--2-col"><h4 class="thin"> Clusters </h4></div>
+
+            <div class="mdl-layout-spacer"></div>
+
+            <div class="mdl-cell mdl-cell--1-col mdl-typography--text-right"> <i class="fa fa-square" aria-hidden="true" style="color:#42A7C9"></i> Data Plane </div>
+            <div class="mdl-cell mdl-cell--2-col mdl-typography--text-right"> <i class="fa fa-square" aria-hidden="true" style="color:#FFBC0B"></i> Compute and Storage </div>
+            <div class="mdl-cell mdl-cell--1-col mdl-typography--text-right"> <i class="fa fa-square" aria-hidden="true" style="color:#676966"></i> Compute </div>
+        </div>
+
+        <div class="mdl-grid mdl-grid--no-spacing data-lake">
+            <div class="card-data-plane mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__title mdl-card--expand">
+                    <div class="mdl-typography--caption mdl-color-text--white">
+                        DATA PLANE <br>
+                        <div class="mdl-typography--caption mdl-color-text--white chip">2.5</div>
+                    </div>
+                </div>
+                <div class="mdl-card__supporting-text mdl-color-text--white">GOVERNANCE & SECURITY</div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <div class="mdl-grid mdl-grid--no-spacing">
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> NODES </label>
+                            <div class="mdl-typography--body-2 "> 2 </div>
+                        </div>
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> UP TIME </label>
+                            <div class="mdl-typography--body-2 "> 23 Days </div>
+                        </div>
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> COST </label>
+                            <div class="mdl-typography--body-2 "> $123 </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mdl-grid mdl-grid--no-spacing clusters">
+            <div class="mdl-cell mdl-cell--2-col">
+                <div class="card-clusters mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__title mdl-card--expand">
+                    <div class="mdl-typography--caption mdl-color-text--black">
+                        DATA PLANE <br>
+                        <div class="mdl-typography--caption mdl-color-text--white chip">2.5</div>
+                    </div>
+                </div>
+                <div class="mdl-card__supporting-text mdl-color-text--black">GOVERNANCE & SECURITY</div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <div class="mdl-grid mdl-grid--no-spacing">
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> NODES </label>
+                            <div class="mdl-typography--body-2 "> 2 </div>
+                        </div>
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> UP TIME </label>
+                            <div class="mdl-typography--body-2 "> 23 Days </div>
+                        </div>
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> COST </label>
+                            <div class="mdl-typography--body-2 "> $123 </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="mdl-cell mdl-cell--2-col">
+                <div class="card-clusters mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__title mdl-card--expand">
+                    <div class="mdl-typography--caption mdl-color-text--black">
+                        DATA PLANE <br>
+                        <div class="mdl-typography--caption mdl-color-text--white chip">2.5</div>
+                    </div>
+                </div>
+                <div class="mdl-card__supporting-text mdl-color-text--black">GOVERNANCE & SECURITY</div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <div class="mdl-grid mdl-grid--no-spacing">
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> NODES </label>
+                            <div class="mdl-typography--body-2 "> 2 </div>
+                        </div>
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> UP TIME </label>
+                            <div class="mdl-typography--body-2 "> 23 Days </div>
+                        </div>
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> COST </label>
+                            <div class="mdl-typography--body-2 "> $123 </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="mdl-cell mdl-cell--2-col">
+                <div class="card-clusters mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__title mdl-card--expand">
+                    <div class="mdl-typography--caption mdl-color-text--black">
+                        DATA PLANE <br>
+                        <div class="mdl-typography--caption mdl-color-text--white chip">2.5</div>
+                    </div>
+                </div>
+                <div class="mdl-card__supporting-text mdl-color-text--black">GOVERNANCE & SECURITY</div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <div class="mdl-grid mdl-grid--no-spacing">
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> NODES </label>
+                            <div class="mdl-typography--body-2 "> 2 </div>
+                        </div>
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> UP TIME </label>
+                            <div class="mdl-typography--body-2 "> 23 Days </div>
+                        </div>
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> COST </label>
+                            <div class="mdl-typography--body-2 "> $123 </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="mdl-cell mdl-cell--2-col">
+                <div class="card-clusters mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__title mdl-card--expand">
+                    <div class="mdl-typography--caption mdl-color-text--black">
+                        DATA PLANE <br>
+                        <div class="mdl-typography--caption mdl-color-text--white chip">2.5</div>
+                    </div>
+                </div>
+                <div class="mdl-card__supporting-text mdl-color-text--black">GOVERNANCE & SECURITY</div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <div class="mdl-grid mdl-grid--no-spacing">
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> NODES </label>
+                            <div class="mdl-typography--body-2 "> 2 </div>
+                        </div>
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> UP TIME </label>
+                            <div class="mdl-typography--body-2 "> 23 Days </div>
+                        </div>
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> COST </label>
+                            <div class="mdl-typography--body-2 "> $123 </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="mdl-cell mdl-cell--2-col">
+                <div class="card-clusters mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__title mdl-card--expand">
+                    <div class="mdl-typography--caption mdl-color-text--black">
+                        DATA PLANE <br>
+                        <div class="mdl-typography--caption mdl-color-text--white chip">2.5</div>
+                    </div>
+                </div>
+                <div class="mdl-card__supporting-text mdl-color-text--black">GOVERNANCE & SECURITY</div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <div class="mdl-grid mdl-grid--no-spacing">
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> NODES </label>
+                            <div class="mdl-typography--body-2 "> 2 </div>
+                        </div>
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> UP TIME </label>
+                            <div class="mdl-typography--body-2 "> 23 Days </div>
+                        </div>
+                        <div class="mdl-cell mdl-cell--4-col action-text">
+                            <label class="mdl-typography--caption"> COST </label>
+                            <div class="mdl-typography--body-2 "> $123 </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="mdl-layout-spacer"></div>
+</div>
+
