@@ -4,17 +4,17 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
-case class UserRequest(username:String,
-                       password:String)
+case class UserRequest(username: String,
+                       password: String)
 
-case class User(username:String,
-                password:String,
-                userType:String,
-                admin:Boolean,
-                created:String,
-                enabled:String)
+case class User(username: String,
+                password: String,
+                userType: String,
+                admin: Boolean,
+                created: String,
+                enabled: String)
 
-case class UserView(username:String,admin:Boolean)
+case class UserView(username: String, password: String, admin: Boolean)
 
 object JsonFormats {
 
@@ -36,8 +36,9 @@ object JsonFormats {
 
   implicit val userReads: Reads[UserView] = (
     (JsPath \ "username").read[String] and
-    (JsPath \ "admin").read[Boolean]
-    )(UserView.apply _)
+      (JsPath \ "password").read[String] and
+      (JsPath \ "admin").read[Boolean]
+    ) (UserView.apply _)
 
 
 }

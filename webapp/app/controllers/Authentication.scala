@@ -1,10 +1,11 @@
 package controllers
 
+
 import javax.inject.Inject
 
 import internal.Jwt
 import models.JsonFormats._
-import models.{JsonResponses, User, UserRequest, UserView}
+import models.{JsonResponses, UserRequest, UserView}
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc._
 import play.modules.reactivemongo.json._
@@ -21,19 +22,20 @@ class Authentication @Inject() (val reactiveMongoApi: ReactiveMongoApi)
 
   def collection = database.map(_.collection[JSONCollection]("users"))
 
-  def resolve(user: JsObject): Option[UserView] = {
+  def resolve(pw:String,user: JsObject): Option[UserView] = {
     user.validate[UserView].map { u =>
+//      val checkpw: Boolean = BCrypt.checkpw(pw,u.password)
+      //TODO:verify
       Some(u)
     }.getOrElse(None)
   }
 
   def login = Action.async(parse.json) { request =>
-
     request.body.validate[UserRequest].map { user =>
       // `user` is an instance of the case class `models.User`
       collection.flatMap(_.find(Json.obj("username"->user.username)).one[JsObject].map { u =>
         if(u.isDefined) {
-          resolve(u.get).map{ us =>
+          resolve(user.password,u.get).map{ us =>
             Ok(Json.obj("auth_token"->Jwt.makeJWT(us)))
           }.getOrElse{
             BadRequest(JsonResponses.statusError(s"Cannot generate token for request"))
