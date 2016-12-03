@@ -4,7 +4,7 @@
 import {Component, AfterViewInit, OnInit, ViewChild, ElementRef} from '@angular/core';
 import {CityNames} from '../../common/utils/city-names';
 import {ClusterService} from '../../services/cluster.service';
-import {Cluster} from '../models/cluster';
+import {Cluster} from '../../models/cluster';
 
 declare var Datamap:any;
 

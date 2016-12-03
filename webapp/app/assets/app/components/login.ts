@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {LoginData} from './models/userdata';
+import {LoginData} from '../models/userdata';
 import { AuthService } from '../services/authservice';
 import 'rxjs/add/operator/toPromise';
 import { Router } from '@angular/router';

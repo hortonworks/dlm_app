@@ -1,7 +1,7 @@
 import {Component,AfterViewInit, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {DataCenterService} from '../../services/data-center.service';
-import {DataCenter} from '../models/data-center';
+import {DataCenter} from '../../models/data-center';
 import {CityNames} from '../../common/utils/city-names';
 
 declare var Datamap:any;

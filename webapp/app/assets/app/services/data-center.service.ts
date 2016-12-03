@@ -4,7 +4,7 @@
 import {Injectable} from '@angular/core';
 import {Http, Headers, RequestOptions, Response, ResponseOptions} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
-import {DataCenter} from '../components/models/data-center';
+import {DataCenter} from '../models/data-center';
 
 @Injectable()
 export class DataCenterService {
