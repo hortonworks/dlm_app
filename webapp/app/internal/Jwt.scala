@@ -4,6 +4,7 @@ import java.util.Date
 import javax.crypto.spec.SecretKeySpec
 import javax.xml.bind.DatatypeConverter
 
+import io.jsonwebtoken.impl.crypto.MacProvider
 import io.jsonwebtoken.{Jwts, SignatureAlgorithm}
 import models.{User, UserView}
 import play.api.Logger
@@ -15,8 +16,7 @@ object Jwt {
 
   val algorithm = SignatureAlgorithm.HS256
   val key = "0<((A018l#%j&94dZiW7$4Gh9Pq!|["
-  val apiKeySecretBytes = DatatypeConverter.parseBase64Binary(key)
-  val signingKey = new SecretKeySpec(apiKeySecretBytes, algorithm.getJcaName())
+  val signingKey = MacProvider.generateKey()
   val issuer: String = "data_plane"
   val HOUR = 3600 * 1000
 
@@ -25,16 +25,14 @@ object Jwt {
     val nowMillis = System.currentTimeMillis()
     val now = new Date(nowMillis)
     val claims = new java.util.HashMap[String, Object]()
-    if (user.admin)
-      claims.put("admin", "true")
+
     val builder = Jwts.builder().setId(user.username)
       .setIssuedAt(now)
       .setSubject(user.username)
       .setIssuer(issuer)
+      .setSubject(if(user.admin) "admin" else "user")
       .setExpiration(new Date(now.getTime + 2 * HOUR))
       .signWith(algorithm, signingKey)
-      .setClaims(claims)
-
     builder.compact()
 
   }
@@ -53,8 +51,8 @@ object Jwt {
       val expiration: Date = c.getExpiration()
       if (expiration.before(new Date()))
         None
-      val userName = c.getSubject
-      val admin = Try(c.get("admin").toString.toBoolean) getOrElse false
+      val userName = c.getId
+      val admin = c.getSubject == "admin"
       Some(UserView(userName, "", admin))
     } getOrElse None
 

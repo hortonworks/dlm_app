@@ -11,7 +11,7 @@ export class HttpClient {
             btoa(localStorage.getItem('auth_token')));
     }
 
-    get(url) {
+    get(url:string) {
         let headers = new Headers();
         this.createAuthorizationHeader(headers);
         return this.http.get(url, {
@@ -19,7 +19,7 @@ export class HttpClient {
         });
     }
 
-    post(url, data) {
+    post(url:string, data:any) {
         let headers = new Headers();
         this.createAuthorizationHeader(headers);
         return this.http.post(url, data, {
@@ -27,7 +27,7 @@ export class HttpClient {
         });
     }
 
-    put(url, data) {
+    put(url:string, data:any) {
         let headers = new Headers();
         this.createAuthorizationHeader(headers);
         return this.http.put(url, data, {
@@ -36,10 +36,10 @@ export class HttpClient {
     }
 
 
-    delete(url, data) {
+    delete(url:string) {
         let headers = new Headers();
         this.createAuthorizationHeader(headers);
-        return this.http.delete(url, data, {
+        return this.http.delete(url, {
             headers: headers
         });
     }
