@@ -44,7 +44,6 @@ class AmbariLoader(storage: DataStorage, ws: WSClient) extends Actor with ActorL
             map.remove(key)
           }
         }
-        println(map)
         buffer.clear()
       }
   }

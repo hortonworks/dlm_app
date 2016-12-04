@@ -3,14 +3,16 @@ import {Headers, Http} from '@angular/http';
 import 'rxjs/add/operator/toPromise';
 import {LoginData} from '../models/userdata';
 
+/**
+ * Use common/utils/HttpClient for making authenticated calls
+ */
 @Injectable()
 export class AuthService {
     private loggedIn = false;
 
     constructor(private http: Http) {
-        this.loggedIn = !!localStorage.getItem('auth_token');
+        this.loggedIn = !!localStorage.getItem('dp_auth_token');
     }
-
 
     login(userName: string, password: string):Promise<LoginData> {
         let headers = new Headers();
@@ -23,7 +25,8 @@ export class AuthService {
             .toPromise()
             .then(res => {
                     this.loggedIn = true;
-                    localStorage.setItem('auth_token', res.json().auth_token);
+
+                    localStorage.setItem('dp_auth_token', res.json().auth_token);
                     return new LoginData(userName,password);
                 }
             )
@@ -40,11 +43,13 @@ export class AuthService {
 
 
     logout() {
-        localStorage.removeItem('auth_token');
+        localStorage.removeItem('dp_auth_token');
         this.loggedIn = false;
+
     }
 
     isLoggedIn() {
-        return this.loggedIn;
+        let state = !!localStorage.getItem('dp_auth_token');
+        return state;
     }
 }
