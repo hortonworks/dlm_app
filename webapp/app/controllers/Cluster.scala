@@ -2,8 +2,8 @@ package controllers
 
 import javax.inject.Inject
 
+import com.hw.dp.service.cluster.Ambari
 import com.hw.dp.service.cluster.Formatters._
-import com.hw.dp.service.cluster.{Ambari, AmbariDatacenter}
 import internal.auth.Authenticated
 import internal.persistence.DataStorage
 import internal.{DataPlaneError, MongoUtilities}
@@ -39,23 +39,17 @@ class Cluster @Inject()(val reactiveMongoApi: ReactiveMongoApi,val storage:DataS
 
   }
 
-  def addCluster = Authenticated.async(parse.json) { req =>
-    req.body.validate[AmbariDatacenter].map { adc =>
-      dataCenters.flatMap(_.find(Json.obj("name" -> adc.dataCenter.name)).one[JsObject].flatMap { dcJson =>
-        dcJson.map { json =>
-          insertAmbari(adc.ambari).map { b => Ok }
-        }.getOrElse {
-          dataCenters.flatMap(_.insert(adc.dataCenter).map(wr =>
-            if (wr.ok) {
-              insertAmbari(adc.ambari).map { b => Ok }
-            } else {
-              BadRequest(JsonResponses.statusError("Cannot save Ambari Information"))
-            }
-          ))
-          Future.successful(Ok)
-        }
-      }
-      ).recoverWith {
+  def get(host:String) = Authenticated.async { req =>
+    clusters.flatMap(_.find(Json.obj("host" -> host)).one[Ambari].map { cluster =>
+      cluster.map( c=> Ok(Json.toJson(c))).getOrElse(NotFound)
+    })
+  }
+
+  def create = Authenticated.async(parse.json) { req =>
+    req.body.validate[Ambari].map { ambari =>
+      insertAmbari(ambari).map{ b=>
+        Ok
+      }.recoverWith {
         case e: DataPlaneError =>
           Future.successful(InternalServerError(JsonResponses.statusError(e.getMessage)))
       }
@@ -64,7 +58,8 @@ class Cluster @Inject()(val reactiveMongoApi: ReactiveMongoApi,val storage:DataS
     }
   }
 
-  def allClusters = Authenticated.async { req =>
+
+  def list = Authenticated.async { req =>
     storage.loadAmbari().map{ list =>
       Ok(Json.toJson(list))
     }

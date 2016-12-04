@@ -3,12 +3,11 @@
     <div class="mdl-cell mdl-cell--10-col">
         <h1 class="mdl-typography--headline mdl-typography--font-light">Add Cluster</h1>
         <div class="mdl-layout-spacer"></div><div class="mdl-layout-spacer"></div>
-        <p> Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+
 
         <div class="mdl-color-text--green mt-1"> <i class="fa fa-server fa-2x" aria-hidden="true"></i> <span class="mdl-typography--title mdl-typography--font-light"> Cluster Information </span> </div>
 
         <div class="mdl-typography--body-2"> Data Center </div>
-        <p> Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s. </p>
 
         <span class="select-wrap">
             <select #dataCeneterName (change)="onDataCenterChange(dataCeneterName.value)" >
@@ -32,7 +31,6 @@
                         <option *ngFor="let city of cityNames" [value]="city[0]">{{ city[0] }}</option>
                     </select>
                 </span>
-                <input type="text" placeholder="Address" [(ngModel)]="cluster.address">
                 <div class="mdl-typography--body-2"> Data Center Name </div>
                 <input type="text" placeholder="Name" [(ngModel)]="cluster.name">
             </div>
@@ -42,8 +40,7 @@
             <div class="mdl-cell mdl-cell--4-col help-text">
 
                 <i class="fa fa-lightbulb-o" aria-hidden="true"></i><span class="mdl-typography--body-2 mdl-color-text--green"> Help </span>
-                <div class="mdl-typography--body-2"> Why Data Center ? </div>
-                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s. </p>
+                <p>Select the city and County from the drop down on the left</p>
 
             </div>
         </div>

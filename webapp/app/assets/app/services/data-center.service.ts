@@ -1,6 +1,3 @@
-/**
- * Created by rksv on 27/11/16.
- */
 import {Injectable} from '@angular/core';
 import {Http, Headers, RequestOptions, Response, ResponseOptions} from '@angular/http';
 import {Observable} from 'rxjs/Observable';

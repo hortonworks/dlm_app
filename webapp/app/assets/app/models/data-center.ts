@@ -1,6 +1,3 @@
-/**
- * Created by rksv on 27/11/16.
- */
 export class DataCenter {
     name: string;
     country: string;
@@ -150,3 +147,24 @@ export class DataCenter {
         return datacenters;
     }
 }
+
+export class LocationModel {
+    place:string;
+    country:string;
+
+    constructor(place,country) {
+        this.place = place;
+        this.country = country;
+    }
+}
+
+export class DataCenterRequest {
+    name:String;
+    location:LocationModel;
+
+    constructor(name: String, location: LocationModel) {
+        this.name = name;
+        this.location = location;
+    }
+}
+

@@ -1,11 +1,8 @@
-/**
- * Created by rksv on 27/11/16.
- */
+
 export class Cluster {
     name: string;
-    country: string;
     city: string;
-    address: string;
+    country: string;
     clusterIPOrURL: string;
     clusterAdminId: string;
     clusterAdminPassword: string;
@@ -13,13 +10,12 @@ export class Cluster {
     kerberosKeytab: string;
 
 
-    constructor(name?:string, country?:string, city?:string, address?:string,
+    constructor(name?:string, country?:string, city?:string,
                 clusterIPOrURL?:string, clusterAdminId?:string, clusterAdminPassword?:string,
                 kerberosPrincipal?:string, kerberosKeytab?:string) {
         this.name = name;
         this.country = country;
         this.city = city;
-        this.address = address;
         this.clusterIPOrURL = clusterIPOrURL;
         this.clusterAdminId = clusterAdminId;
         this.clusterAdminPassword = clusterAdminPassword;
@@ -27,3 +23,10 @@ export class Cluster {
         this.kerberosKeytab = kerberosKeytab;
     }
 }
+
+
+
+
+
+
+

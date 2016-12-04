@@ -3,20 +3,21 @@
 # ~~~~
 
 # Home page
-GET      /                            controllers.Default.redirect(to = "/ui")
+GET         /                      controllers.Default.redirect(to = "/ui")
 # Responds with 404 Not Found
-GET     /ui                           controllers.Application.index
-GET     /ui/*path                     controllers.Application.route(path)
-
-
+GET         /ui                    controllers.Application.index
+GET         /ui/*path              controllers.Application.route(path)
 
 #auth calls
-POST    /auth/login                   controllers.Authentication.login
+POST        /auth/login            controllers.Authentication.login
 
 #api
-PUT   /api/clusters               controllers.Cluster.addCluster
-GET   /api/clusters               controllers.Cluster.allClusters
+PUT         /api/clusters          controllers.Cluster.create
+GET         /api/clusters          controllers.Cluster.list
+
+PUT         /api/datacenter        controllers.Datacenter.create
+GET         /api/datacenter        controllers.Datacenter.list
 
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file          controllers.Assets.versioned(path="/public", file: Asset)

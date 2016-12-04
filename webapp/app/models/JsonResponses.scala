@@ -6,5 +6,4 @@ object JsonResponses {
 
   val statusOk = Json.obj("message"->"ok")
   def statusError(msg:String,trace:String="") = Json.obj("message"->msg,"trace"->trace)
-
 }
