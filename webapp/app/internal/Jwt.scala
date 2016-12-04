@@ -6,6 +6,10 @@ import javax.xml.bind.DatatypeConverter
 
 import io.jsonwebtoken.{Jwts, SignatureAlgorithm}
 import models.{User, UserView}
+import play.api.Logger
+
+import scala.util.Try
+
 
 object Jwt {
 
@@ -14,15 +18,15 @@ object Jwt {
   val apiKeySecretBytes = DatatypeConverter.parseBase64Binary(key)
   val signingKey = new SecretKeySpec(apiKeySecretBytes, algorithm.getJcaName())
   val issuer: String = "data_plane"
-  val HOUR = 3600*1000
+  val HOUR = 3600 * 1000
 
-  def makeJWT(user:UserView):String = {
+  def makeJWT(user: UserView): String = {
 
     val nowMillis = System.currentTimeMillis()
     val now = new Date(nowMillis)
-    val claims = new java.util.HashMap[String,Object]()
-    if(user.admin)
-      claims.put("admin","true")
+    val claims = new java.util.HashMap[String, Object]()
+    if (user.admin)
+      claims.put("admin", "true")
     val builder = Jwts.builder().setId(user.username)
       .setIssuedAt(now)
       .setSubject(user.username)
@@ -34,5 +38,27 @@ object Jwt {
     builder.compact()
 
   }
+
+
+  def parseJWT(jwt: String): Option[UserView] = {
+    Logger.info("Parsing user authorization token")
+
+    val claims = Try(Some(Jwts.parser()
+      .setSigningKey(signingKey)
+      .parseClaimsJws(jwt).getBody())) getOrElse None
+
+    Logger.info(s"Checking if token claims are defined -  ${claims.isDefined}")
+
+    claims.map { c =>
+      val expiration: Date = c.getExpiration()
+      if (expiration.before(new Date()))
+        None
+      val userName = c.getSubject
+      val admin = Try(c.get("admin").toString.toBoolean) getOrElse false
+      Some(UserView(userName, "", admin))
+    } getOrElse None
+
+  }
+
 
 }

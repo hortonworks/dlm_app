@@ -15,7 +15,7 @@
             </button>
             <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right mdl-js-ripple-effect" for="more-button">
                 <li *ngIf="isLoggedIn()" class="mdl-menu__item">My account</li>
-                <li *ngIf="isLoggedIn()" class="mdl-menu__item">Log out</li>
+                <li *ngIf="isLoggedIn()" class="mdl-menu__item"><a href="#" routerLink="/ui/logout">log out</a></li>
             </ul>
         </div>
     </div>

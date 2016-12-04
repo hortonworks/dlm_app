@@ -4,6 +4,7 @@ import javax.inject.Inject
 
 import com.hw.dp.service.cluster.Formatters._
 import com.hw.dp.service.cluster.{Ambari, AmbariDatacenter}
+import internal.auth.Authenticated
 import internal.persistence.DataStorage
 import internal.{DataPlaneError, MongoUtilities}
 import models.JsonResponses
@@ -38,7 +39,7 @@ class Cluster @Inject()(val reactiveMongoApi: ReactiveMongoApi,val storage:DataS
 
   }
 
-  def addCluster = Action.async(parse.json) { req =>
+  def addCluster = Authenticated.async(parse.json) { req =>
     req.body.validate[AmbariDatacenter].map { adc =>
       dataCenters.flatMap(_.find(Json.obj("name" -> adc.dataCenter.name)).one[JsObject].flatMap { dcJson =>
         dcJson.map { json =>
@@ -63,7 +64,7 @@ class Cluster @Inject()(val reactiveMongoApi: ReactiveMongoApi,val storage:DataS
     }
   }
 
-  def allClusters = Action.async { req =>
+  def allClusters = Authenticated.async { req =>
     storage.loadAmbari().map{ list =>
       Ok(Json.toJson(list))
     }

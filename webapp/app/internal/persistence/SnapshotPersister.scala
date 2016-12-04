@@ -10,7 +10,6 @@ class SnapshotPersister @Inject()(storage:SnapshotStorage) extends Actor{
   override def receive: Receive = {
 
     case SaveSnapshot(snapshot:Snapshot) => {
-      println(snapshot)
     }
 
   }
