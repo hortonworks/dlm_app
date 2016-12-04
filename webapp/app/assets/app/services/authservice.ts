@@ -25,7 +25,6 @@ export class AuthService {
             .toPromise()
             .then(res => {
                     this.loggedIn = true;
-
                     localStorage.setItem('dp_auth_token', res.json().auth_token);
                     return new LoginData(userName,password);
                 }

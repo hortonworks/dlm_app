@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import { AuthService } from '../services/authservice';
 import 'rxjs/add/operator/toPromise';
 import { Router } from '@angular/router';
-import {LoginData} from './models/userdata';
+import {LoginData} from '../models/userdata';
 
 
 @Component({
