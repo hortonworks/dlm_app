@@ -24,8 +24,8 @@ class AmbariSync @Inject()(actorSystem: ActorSystem,
     val dataPersister:ActorRef = actorSystem.actorOf(Props(classOf[DataPersister], storage))
     val serviceSync: ActorRef = actorSystem.actorOf(Props(classOf[ServiceSync], storage, ws,dataPersister))
 
-    actorSystem.scheduler.schedule(20 millis, 10 minutes, serviceActor, Poll())
-    actorSystem.scheduler.schedule(20 millis, 10 minutes, serviceSync, Poll())
+    actorSystem.scheduler.schedule(20 millis, 1 minutes, serviceActor, Poll())
+    actorSystem.scheduler.schedule(20 millis, 1 minutes, serviceSync, Poll())
   }
 
 
