@@ -50,13 +50,9 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
     collection.flatMap(_.find(selector).one[Cluster].flatMap { cOpt =>
       cOpt.map { c =>
         // exists // just update
-        collection.flatMap(_.update(selector, cluster).flatMap { wr =>
-          Future.successful(wr)
-        })
+        collection.flatMap(_.update(selector, cluster))
       }.getOrElse {
-        collection.flatMap(_.insert(cluster).flatMap { wr =>
-          Future.successful(wr)
-        })
+        collection.flatMap(_.insert(cluster))
       }
     })
   }
@@ -69,16 +65,11 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
     collection.flatMap(_.find(selector).one[Host].flatMap { hOpt =>
       hOpt.map { h =>
         //found - update
-        collection.flatMap(_.update(selector, host).flatMap { wr =>
-          Future.successful(wr)
-        })
+        collection.flatMap(_.update(selector, host))
       }.getOrElse {
         // insert
-        collection.flatMap(_.insert(host).flatMap { wr =>
-          Future.successful(wr)
-        })
+        collection.flatMap(_.insert(host))
       }
-
     })
 
   }
