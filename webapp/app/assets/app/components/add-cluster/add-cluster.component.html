@@ -10,27 +10,32 @@
         <div class="mdl-typography--body-2"> Data Center </div>
         <p> Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s. </p>
 
-        <span class="select-wrap">
+
+        <drop-down>
             <select #dataCeneterName (change)="onDataCenterChange(dataCeneterName.value)" >
                 <option value="" selected [value]="new">New Data Center</option>
                 <option *ngFor="let cluster of clusters" [value]="cluster.name"> {{ cluster.name }} </option>
             </select>
-        </span>
+        </drop-down>
 
         <div class="mdl-grid config-bgcolor">
             <div class="mdl-cell mdl-cell--4-col">
                 <div class="mdl-typography--body-2"> Data Center Location </div>
                 <span class="select-wrap">
-                    <select #select (change)="onCountryChange(select.value)" [(ngModel)]="cluster.country">
-                        <option value="" disabled selected>Country</option>
-                        <option *ngFor="let countries of countryNames"> {{ countries.properties.name }} </option>
-                    </select>
+                    <drop-down>
+                        <select #select (change)="onCountryChange(select.value)" [(ngModel)]="cluster.country">
+                            <option value="" disabled selected>Country</option>
+                            <option *ngFor="let countries of countryNames"> {{ countries.properties.name }} </option>
+                        </select>
+                    </drop-down>
                 </span>
                 <span class="select-wrap">
-                    <select (change)="onCityChange()" [(ngModel)]="cluster.city">
-                        <option value="" disabled selected>City</option>
-                        <option *ngFor="let city of cityNames" [value]="city[0]">{{ city[0] }}</option>
-                    </select>
+                    <drop-down>
+                        <select (change)="onCityChange()" [(ngModel)]="cluster.city">
+                            <option value="" disabled selected>City</option>
+                            <option *ngFor="let city of cityNames" [value]="city[0]">{{ city[0] }}</option>
+                        </select>
+                    </drop-down>
                 </span>
                 <input type="text" placeholder="Address" [(ngModel)]="cluster.address">
                 <div class="mdl-typography--body-2"> Data Center Name </div>

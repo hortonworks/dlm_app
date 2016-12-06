@@ -1,0 +1,38 @@
+.search-input div {
+    width: 100%;
+}
+.search-input input{
+    height: 37px;
+    line-height: 37px;
+    border: none;
+    width: 85%;
+    border-right: 1px solid #cccccc;
+    border-radius: 0px;
+    font-size: 1em;
+}
+.search-input input:focus {
+    outline: none;
+}
+.search-input .search-button {
+    display: inline-block;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    width: 100%;
+}
+.search-input .search-button:before {
+    content: "\f002";
+    font-family: FontAwesome;
+    padding: 0px 15px;
+}
+.search-input .browse-button:before {
+    content: "\f07b";
+    font-family: FontAwesome;
+    padding: 0px 15px;
+}
+.data-visualization {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #FAFAFA;
+    background: #F2F2F2;
+    min-height: 300px;
+}

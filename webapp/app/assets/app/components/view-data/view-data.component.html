@@ -1,0 +1,91 @@
+<div class="mdl-grid">
+    <div class="mdl-layout-spacer"></div>
+    <div class="mdl-cell mdl-cell--10-col">
+        <bread-crumb [crumbMap]="breadCrumbMap"> </bread-crumb>
+
+        <div class="mdl-grid mdl-grid--no-spacing">
+            <div class="mdl-cell mdl-cell--2-col"><h4 class="thin"> {{ clusterName }} </h4></div>
+
+            <div class="mdl-layout-spacer"></div>
+
+            <div class="mdl-cell mdl-cell--5-col mdl-typography--text-right">
+                <button class="mdl-button mdl-js-button mdl-button--raised actions-button">Action</button>
+                <button class="mdl-button mdl-js-button mdl-button--raised create-cluster">Log Download</button>
+            </div>
+        </div>
+
+        <div class="mdl-grid mdl-grid--no-spacing info-panel">
+            <div class="mdl-cell mdl-cell--2-col m-0 ">
+                <label class="mdl-typography--caption"> UP TIME </label>
+                <p class="mdl-typography--body-2 "> {{ cluster.upTime }} Days </p>
+            </div>
+            <div class="mdl-cell mdl-cell--2-col m-0">
+                <label class="mdl-typography--caption"> Cluster Type </label>
+                <p class="mdl-typography--body-2 "> {{ cluster.serviceName }} </p>
+            </div>
+            <div class="mdl-cell mdl-cell--2-col m-0">
+                <label class="mdl-typography--caption"> DATA </label>
+                <p class="mdl-typography--body-2 "> {{ cluster.diskUsed }} </p>
+            </div>
+            <div class="mdl-cell mdl-cell--2-col m-0">
+                <label class="mdl-typography--caption"> NO OF TABLES </label>
+                <p class="mdl-typography--body-2 "> {{ cluster.noOfTables }} </p>
+            </div>
+            <div class="mdl-cell mdl-cell--2-col m-0">
+                <label class="mdl-typography--caption"> NO OF FILES </label>
+                <p class="mdl-typography--body-2 "> {{ cluster.noOfFiles }} </p>
+            </div>
+            <div class="mdl-cell mdl-cell--2-col m-0">
+                <label class="mdl-typography--caption"> AVERAGE # USERS </label>
+                <p class="mdl-typography--body-2 "> {{ cluster.averageNoOfUsers }} </p>
+            </div>
+        </div>
+
+        <h5 class="thin"> Data Assets </h5>
+
+        <div class="search-input">
+            <form action="#">
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label ">
+                    <span class="search-button"><input placeholder="Search" [(ngModel)]="search" [ngModelOptions]="{standalone: true}"> <span class="browse-button"> Browse</span></span>
+                </div>
+            </form>
+        </div>
+
+        <hive-data [search]="search"> </hive-data>
+
+        <div class="data-visualization">
+            <h6> Lineage </h6>
+
+            <h6> Replication </h6>
+            <div id="mapcontainer-replication" class="dataplane-be-together-section mdl-typography--text-center dotted"> </div>
+
+            <h6> Policies </h6>
+            <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
+                <thead>
+                <tr>
+                    <th class="mdl-data-table__cell--non-numeric">POLICY ID</th>
+                    <th class="mdl-data-table__cell--non-numeric">POLICY NAME</th>
+                    <th class="mdl-data-table__cell--non-numeric">STATUS</th>
+                    <th class="mdl-data-table__cell--non-numeric">AUDIT LOGGING</th>
+                    <th class="mdl-data-table__cell--non-numeric">GROUPS</th>
+                    <th class="mdl-data-table__cell--non-numeric">USERS</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let schema of schemaData">
+                    <td class="mdl-data-table__cell--non-numeric">{{ schema.name }}</td>
+                    <td class="mdl-data-table__cell--non-numeric">{{ schema.owner }}</td>
+                    <td class="mdl-data-table__cell--non-numeric">{{ schema.name }}</td>
+                    <td class="mdl-data-table__cell--non-numeric">{{ schema.owner }}</td>
+                    <td class="mdl-data-table__cell--non-numeric">{{ schema.type }}</td>
+                    <td class="mdl-data-table__cell--non-numeric">{{ schema.tags }}</td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+
+    </div>
+    <div class="mdl-layout-spacer"></div>
+</div>

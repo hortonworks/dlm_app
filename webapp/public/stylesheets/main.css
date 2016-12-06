@@ -1,7 +1,64 @@
 body {
     font-family: "Roboto";
 }
-
 .m-0 {
     margin: 0px;
+}
+select,input{
+    min-width: 300px;
+    height: 24px;
+}
+input {
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+}
+
+/* Action Buttons */
+.actions-button:before {
+    content: "\f013";
+    font-family: "FontAwesome";
+    padding-right: 5px;
+}
+.actions-button:after {
+    content: "\f107";
+    padding-left: 5px;
+    font-family: "FontAwesome";
+}
+.create-cluster:before {
+    content: "\f019";
+    padding-right: 5px;
+    font-family: "FontAwesome";
+}
+
+/* Info Panel */
+.info-panel {
+    padding: 0px;
+    height: 6rem;
+    margin-top: 1em;
+}
+.info-panel div {
+    padding: 1rem;
+    border-top: 1px solid #EEEEEE;
+    border-right:  1px solid #EEEEEE;
+    border-bottom: 1px solid #EEEEEE;
+}
+
+.info-panel div:first-child {
+    border-left:  1px solid #EEEEEE;
+}
+
+/* Fonts */
+.thin {
+    font-weight: 200;
+}
+
+/* Maps */
+.dotted {
+    background-image: -webkit-repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 1px, transparent 1px, transparent 100%);
+    background-image: -moz-repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 1px, transparent 1px, transparent 100%);
+    background-image: -ms-repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 1px, transparent 1px, transparent 100%);
+    background-image: repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 1px, transparent 1px, transparent 100%);
+    -webkit-background-size: 15px 15px;
+    -moz-background-size: 15px 15px;
+    background-size: 15px 15px;
 }

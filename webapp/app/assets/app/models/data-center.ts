@@ -1,3 +1,4 @@
+import {Cluster} from './cluster';
 /**
  * Created by rksv on 27/11/16.
  */
@@ -12,9 +13,25 @@ export class DataCenter {
     cost: number;
     incomingData: number;
     outgoingData: number;
-    clusters: number;
     status: string;
     location: string;
+
+    upTime: number;
+    noOfClusters: number;
+    noOfNodes: number;
+    noOfUsers: number;
+
+    clusters: Cluster[] = [];
+
+    public static getDataByName(name: string): DataCenter {
+        for (let dataCenter of DataCenter.getData()) {
+            if (dataCenter.name === name) {
+                return dataCenter;
+            }
+        }
+
+        return new DataCenter();
+    }
 
     public static getData() {
         let datacenters: DataCenter[] = [];
@@ -30,9 +47,14 @@ export class DataCenter {
         dataCenter.cost = 500;
         dataCenter.incomingData = 55;
         dataCenter.outgoingData = 45;
-        dataCenter.clusters = 38;
         dataCenter.status = 'UP';
         dataCenter.location = 'ON PREM';
+
+        dataCenter.upTime = 23;
+        dataCenter.noOfClusters = 32;
+        dataCenter.noOfNodes = 40;
+        dataCenter.noOfUsers = 12;
+
         datacenters.push(dataCenter);
 
         let sf = new DataCenter();
@@ -46,9 +68,14 @@ export class DataCenter {
         sf.cost = 500;
         sf.incomingData = 60;
         sf.outgoingData = 40;
-        sf.clusters = 120;
         sf.status = 'DOWN';
         sf.location = 'AWS';
+
+        sf.upTime = 55;
+        sf.noOfClusters = 55;
+        sf.noOfNodes = 55;
+        sf.noOfUsers = 55;
+
         datacenters.push(sf);
 
         let mumbai = new DataCenter();
@@ -62,9 +89,14 @@ export class DataCenter {
         mumbai.cost = 500;
         mumbai.incomingData = 30;
         mumbai.outgoingData = 70;
-        mumbai.clusters = 45;
         mumbai.status = 'UP';
         mumbai.location = 'MS AZURE';
+
+        mumbai.upTime = 23;
+        mumbai.noOfClusters = 32;
+        mumbai.noOfNodes = 40;
+        mumbai.noOfUsers = 12;
+
         datacenters.push(mumbai);
 
         let dublin = new DataCenter();
@@ -78,9 +110,14 @@ export class DataCenter {
         dublin.cost = 500;
         dublin.incomingData = 35;
         dublin.outgoingData = 65;
-        dublin.clusters = 34;
         dublin.status = 'DOWN';
         dublin.location = 'ON PREM';
+
+        dublin.upTime = 23;
+        dublin.noOfClusters = 32;
+        dublin.noOfNodes = 40;
+        dublin.noOfUsers = 12;
+
         datacenters.push(dublin);
 
         let bangalore = new DataCenter();
@@ -94,9 +131,14 @@ export class DataCenter {
         bangalore.cost = 500;
         bangalore.incomingData = 55;
         bangalore.outgoingData = 45;
-        bangalore.clusters = 38;
         bangalore.status = 'UP';
         bangalore.location = 'AWS';
+
+        bangalore.upTime = 23;
+        bangalore.noOfClusters = 32;
+        bangalore.noOfNodes = 40;
+        bangalore.noOfUsers = 12;
+
         datacenters.push(bangalore);
 
         let tokyo = new DataCenter();
@@ -110,9 +152,14 @@ export class DataCenter {
         tokyo.cost = 500;
         tokyo.incomingData = 25;
         tokyo.outgoingData = 75;
-        tokyo.clusters = 21;
         tokyo.status = 'UP';
         tokyo.location = 'MS AZURE';
+
+        tokyo.upTime = 23;
+        tokyo.noOfClusters = 32;
+        tokyo.noOfNodes = 40;
+        tokyo.noOfUsers = 12;
+
         datacenters.push(tokyo);
 
         let seattle = new DataCenter();
@@ -126,9 +173,14 @@ export class DataCenter {
         seattle.cost = 500;
         seattle.incomingData = 30;
         seattle.outgoingData = 70;
-        seattle.clusters = 56;
         seattle.status = 'UP';
         seattle.location = 'ON PREM';
+
+        seattle.upTime = 23;
+        seattle.noOfClusters = 32;
+        seattle.noOfNodes = 40;
+        seattle.noOfUsers = 12;
+
         datacenters.push(seattle);
 
         let buenosAires = new DataCenter();
@@ -142,9 +194,14 @@ export class DataCenter {
         buenosAires.cost = 23;
         buenosAires.incomingData = 3;
         buenosAires.outgoingData = 20;
-        buenosAires.clusters = 56;
         buenosAires.status = 'UP';
         buenosAires.location = 'AWS';
+
+        buenosAires.upTime = 23;
+        buenosAires.noOfClusters = 32;
+        buenosAires.noOfNodes = 40;
+        buenosAires.noOfUsers = 12;
+
         datacenters.push(buenosAires);
 
         return datacenters;

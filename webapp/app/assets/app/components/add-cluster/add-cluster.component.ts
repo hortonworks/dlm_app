@@ -14,7 +14,7 @@ declare var Datamap:any;
     templateUrl: 'assets/app/components/add-cluster/add-cluster.component.html'
 })
 
-export default class AddClusterComponent implements AfterViewInit, OnInit {
+export class AddClusterComponent implements AfterViewInit, OnInit {
 
     map: any;
     clusters: Cluster[] = [];

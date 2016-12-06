@@ -11,15 +11,22 @@ import {Router} from '@angular/router';
 
 })
 export class BreadcrumbComponent {
-    @Input() crumbMap:{} = {};
+    // This can be referenced as view child instead of input map ?
+    @Input() crumbMap:{[key: string]: string} = {};
 
-    constructor(private router: Router) {}
+    constructor(private router: Router) {
+        router.events.subscribe(event => {
+            // if (event instanceof NavigationStart && event.url === '') {
+            //     this.onNavigationStart();
+            // }
+        });
+    }
 
     getCrumbNames(): string[] {
         return Object.keys(this.crumbMap);
     }
 
-    navigate($event:any, crumbName: string) {
+    navigate($event: any, crumbName: string) {
         this.router.navigate([this.crumbMap[crumbName]]);
         $event.preventDefault();
     }

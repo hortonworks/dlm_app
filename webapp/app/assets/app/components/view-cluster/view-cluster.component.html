@@ -17,19 +17,19 @@
         <div class="mdl-grid mdl-grid--no-spacing info-panel">
             <div class="mdl-cell mdl-cell--3-col m-0 ">
                 <label class="mdl-typography--caption"> UP TIME </label>
-                <p class="mdl-typography--body-2 "> 23 Days </p>
+                <p class="mdl-typography--body-2 "> {{ dataCenter.upTime }} Days </p>
             </div>
             <div class="mdl-cell mdl-cell--3-col m-0">
                 <label class="mdl-typography--caption"> # of Clusters </label>
-                <p class="mdl-typography--body-2 "> 5 </p>
+                <p class="mdl-typography--body-2 "> {{ dataCenter.noOfClusters }} </p>
             </div>
             <div class="mdl-cell mdl-cell--3-col m-0">
                 <label class="mdl-typography--caption"> # of Nodes </label>
-                <p class="mdl-typography--body-2 "> 268 </p>
+                <p class="mdl-typography--body-2 "> {{ dataCenter.noOfNodes }} </p>
             </div>
             <div class="mdl-cell mdl-cell--3-col m-0">
                 <label class="mdl-typography--caption"> # of Users </label>
-                <p class="mdl-typography--body-2 "> 400 </p>
+                <p class="mdl-typography--body-2 "> {{ dataCenter.noOfUsers }} </p>
             </div>
         </div>
 
@@ -76,7 +76,7 @@
                 <div class="card-clusters mdl-card mdl-shadow--2dp">
                 <div class="mdl-card__title mdl-card--expand">
                     <div class="mdl-typography--caption mdl-color-text--black">
-                        DATA PLANE <br>
+                        SALES DATA <br>
                         <div class="mdl-typography--caption mdl-color-text--white chip">2.5</div>
                     </div>
                 </div>
@@ -99,11 +99,11 @@
                 </div>
             </div>
             </div>
-            <div class="mdl-cell mdl-cell--2-col">
+            <div class="mdl-cell mdl-cell--2-col" (click)="showDataView('DEEP-LEARNING')">
                 <div class="card-clusters mdl-card mdl-shadow--2dp">
                 <div class="mdl-card__title mdl-card--expand">
                     <div class="mdl-typography--caption mdl-color-text--black">
-                        DATA PLANE <br>
+                        DEEP LEARNING <br>
                         <div class="mdl-typography--caption mdl-color-text--white chip">2.5</div>
                     </div>
                 </div>
@@ -126,11 +126,11 @@
                 </div>
             </div>
             </div>
-            <div class="mdl-cell mdl-cell--2-col">
+            <div class="mdl-cell mdl-cell--2-col" (click)="showDataView('SALES-HIVE')">
                 <div class="card-clusters mdl-card mdl-shadow--2dp">
                 <div class="mdl-card__title mdl-card--expand">
                     <div class="mdl-typography--caption mdl-color-text--black">
-                        DATA PLANE <br>
+                        SALES HIVE <br>
                         <div class="mdl-typography--caption mdl-color-text--white chip">2.5</div>
                     </div>
                 </div>
@@ -153,11 +153,11 @@
                 </div>
             </div>
             </div>
-            <div class="mdl-cell mdl-cell--2-col">
+            <div class="mdl-cell mdl-cell--2-col" (click)="showDataView('SALES-DATA')">
                 <div class="card-clusters mdl-card mdl-shadow--2dp">
                 <div class="mdl-card__title mdl-card--expand">
                     <div class="mdl-typography--caption mdl-color-text--black">
-                        DATA PLANE <br>
+                        SALES DATA <br>
                         <div class="mdl-typography--caption mdl-color-text--white chip">2.5</div>
                     </div>
                 </div>
@@ -180,11 +180,11 @@
                 </div>
             </div>
             </div>
-            <div class="mdl-cell mdl-cell--2-col">
+            <div class="mdl-cell mdl-cell--2-col" (click)="showDataView('FINANCIAL DATA')">
                 <div class="card-clusters mdl-card mdl-shadow--2dp">
                 <div class="mdl-card__title mdl-card--expand">
                     <div class="mdl-typography--caption mdl-color-text--black">
-                        DATA PLANE <br>
+                        FINANCIAL DATA <br>
                         <div class="mdl-typography--caption mdl-color-text--white chip">2.5</div>
                     </div>
                 </div>

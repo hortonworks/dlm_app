@@ -42,4 +42,11 @@ export class ClusterService {
            observer.complete();
         });
     }
+
+    public  getByName(name: string):Observable<Cluster> {
+        return Observable.create((observer: any) => {
+            observer.next(Cluster.createClusterForTest(name));
+            observer.complete();
+        });
+    }
 }

@@ -8,11 +8,12 @@ import AppComponent from './app';
 import DashboardComponent from './components/dashboard/dashboard';
 import LoginComponent  from './components/login';
 import {AuthService} from './services/authservice';
-import AddClusterComponent from './components/add-cluster/add-cluster.component';
 import {SidenavRouterLinkDirective} from './sidenav-router-link.directive';
 import {ClusterService} from './services/cluster.service';
 import {DataCenterService} from './services/data-center.service';
 import {ViewClusterModule} from './components/view-cluster/view-cluster.module';
+import {AddClusterModule} from './components/add-cluster/add-cluster.module';
+import {ViewDataModule} from './components/view-data/view-data.module';
 
 @NgModule({
     imports: [
@@ -20,10 +21,11 @@ import {ViewClusterModule} from './components/view-cluster/view-cluster.module';
         FormsModule,
         HttpModule,
         RouterModule.forRoot(routes),
-        ViewClusterModule
+        ViewClusterModule,
+        AddClusterModule,
+        ViewDataModule
     ],
-    declarations: [SidenavRouterLinkDirective, AppComponent, DashboardComponent, LoginComponent,
-                    AddClusterComponent],
+    declarations: [SidenavRouterLinkDirective, AppComponent, DashboardComponent, LoginComponent],
     bootstrap: [AppComponent],
     providers: [AuthService, ClusterService, DataCenterService]
 })

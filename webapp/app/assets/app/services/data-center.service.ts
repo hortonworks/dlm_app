@@ -31,4 +31,11 @@ export class DataCenterService {
             observer.complete();
         });
     }
+
+    public getByName(name: string):Observable<DataCenter> {
+        return Observable.create((observer: any) => {
+            observer.next(DataCenter.getDataByName(name));
+            observer.complete();
+        });
+    }
 }
