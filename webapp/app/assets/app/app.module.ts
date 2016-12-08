@@ -7,13 +7,15 @@ import {routes} from './app.routes';
 import AppComponent from './app';
 import DashboardComponent from './components/dashboard/dashboard';
 import LoginComponent  from './components/login';
+import LogoutComponent  from './components/logout';
 import {AuthService} from './services/authservice';
 import {SidenavRouterLinkDirective} from './sidenav-router-link.directive';
-import {ClusterService} from './services/cluster.service';
+import {AmbariService} from './services/ambari.service';
 import {DataCenterService} from './services/data-center.service';
 import {ViewClusterModule} from './components/view-cluster/view-cluster.module';
 import {AddClusterModule} from './components/add-cluster/add-cluster.module';
 import {ViewDataModule} from './components/view-data/view-data.module';
+import {LoggedInGuard, AlreadyLoggedInGuard} from './common/utils/login-gaurd';
 
 @NgModule({
     imports: [
@@ -25,9 +27,9 @@ import {ViewDataModule} from './components/view-data/view-data.module';
         AddClusterModule,
         ViewDataModule
     ],
-    declarations: [SidenavRouterLinkDirective, AppComponent, DashboardComponent, LoginComponent],
+    declarations: [SidenavRouterLinkDirective, AppComponent, DashboardComponent, LoginComponent, LogoutComponent],
     bootstrap: [AppComponent],
-    providers: [AuthService, ClusterService, DataCenterService]
+    providers: [AuthService, AmbariService, DataCenterService,LoggedInGuard,AlreadyLoggedInGuard]
 })
 
 export class AppModule {

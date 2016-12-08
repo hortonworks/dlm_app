@@ -50,6 +50,8 @@ a img{
   width: 140px;
 }
 
+a { color: inherit; }
+
 .vw-logo-image {
   padding-top: 10px;
   padding-left: 10px;

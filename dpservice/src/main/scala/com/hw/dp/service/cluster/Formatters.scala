@@ -25,13 +25,17 @@ object Formatters {
 
   // Attach a last updated field to the serialized JSON, this is used by the clean up job to remove stale entries
 
-  implicit val credentialsWrites = Json.writes[Credentials].withConstant("lastUpdated",new Date().getTime)
+  implicit val kerberosSettingsWrites = Json.writes[KerberosSettings]
+
+  implicit val kerberosSettingsReads = Json.reads[KerberosSettings]
+
+  implicit val credentialsWrites = Json.writes[Credentials]
 
   implicit val credentialsReads = Json.reads[Credentials]
 
   implicit val locationReads = Json.reads[Location]
 
-  implicit val locationWrites = Json.writes[Location].withConstant("lastUpdated",new Date().getTime)
+  implicit val locationWrites = Json.writes[Location]
 
   implicit val ambariReads = Json.reads[Ambari]
 
@@ -60,10 +64,5 @@ object Formatters {
   implicit val serviceComponentReads = Json.reads[ServiceComponent]
 
   implicit val serviceComponentWrites = Json.writes[ServiceComponent].withConstant("lastUpdated",new Date().getTime)
-
-  implicit val ambariDatacenterReads = Json.reads[AmbariDatacenter]
-
-  implicit val ambariDatacenterWrites = Json.writes[AmbariDatacenter].withConstant("lastUpdated",new Date().getTime)
-
 
 }
