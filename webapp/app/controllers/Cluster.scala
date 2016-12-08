@@ -36,6 +36,20 @@ class Cluster @Inject()(val reactiveMongoApi: ReactiveMongoApi,val storage:DataS
         })
       }
     })
+  }
+
+  def updateAmbari(ambari: Ambari): Future[Boolean] = {
+    clusters.flatMap(_.find(Json.obj("host" -> ambari.host)).one[JsObject].flatMap { cluster =>
+      cluster.map { exists =>
+        clusters.flatMap(_.update(Json.obj("host" -> ambari.host), ambari).flatMap { wr =>
+          if (wr.ok) Future.successful(true)
+          else
+            Future.failed(new DataPlaneError(extractWriteError(wr)))
+        })
+      }.getOrElse {
+        Future.failed(new DataPlaneError("Cluster doesn't exists"))
+      }
+    })
 
   }
 
@@ -48,7 +62,20 @@ class Cluster @Inject()(val reactiveMongoApi: ReactiveMongoApi,val storage:DataS
   def create = Authenticated.async(parse.json) { req =>
     req.body.validate[Ambari].map { ambari =>
       insertAmbari(ambari).map{ b=>
-        Ok
+        Ok(JsonResponses.statusOk)
+      }.recoverWith {
+        case e: DataPlaneError =>
+          Future.successful(InternalServerError(JsonResponses.statusError(e.getMessage)))
+      }
+    }.getOrElse {
+      Future.successful(BadRequest(JsonResponses.statusError("Cannot save Ambari Information")))
+    }
+  }
+
+  def update = Authenticated.async(parse.json) { req =>
+    req.body.validate[Ambari].map { ambari =>
+      updateAmbari(ambari).map{ b=>
+        Ok(JsonResponses.statusOk)
       }.recoverWith {
         case e: DataPlaneError =>
           Future.successful(InternalServerError(JsonResponses.statusError(e.getMessage)))

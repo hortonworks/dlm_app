@@ -52,15 +52,17 @@
         </div>
 
         <div class="mdl-typography--body-2"> Cluster IP Address/URL </div>
-        <input *ngIf="dataCeneterName.value === 'new'" type="text" placeholder="http://" style="width: 500px" [(ngModel)]="clusterIPOrURL">
-        <drop-down *ngIf="dataCeneterName.value !== 'new'">
+        <drop-down [hidden]="dataCeneterName.value === 'new'">
             <select #ambariSelected (change)="onAmbariSelect(ambariSelected.value)" >
-                <option value="" selected [disabled] [value]="'new'">Select</option>
+                <option value="" selected [disabled] [value]="'none'">Select</option>
+                <option value="" [value]="'new'"><< Add New Cluster >></option>
                 <option *ngFor="let ambari of ambarisInDatacenter" [value]="ambari.host">
                     {{ ambari.protocol + '://' + ambari.host + ':' +ambari.port }}
                 </option>
             </select>
         </drop-down>
+        <br>
+        <input [hidden]="(dataCeneterName.value !== 'new' && ambariSelected.value !== 'new')" type="text" placeholder="http://" style="width: 500px" [(ngModel)]="clusterIPOrURL">
 
         <hr />
 

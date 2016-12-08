@@ -22,6 +22,7 @@ export class AddClusterComponent implements AfterViewInit, OnInit {
     ambaris: Ambari[] = [];
     cityNames: string[] = [];
     clusterIPOrURL: string = '';
+    isNewAmbari: boolean = true;
     ambari: Ambari = new Ambari();
     dataCenters: DataCenter[] = [];
     ambarisInDatacenter: Ambari[] = [];
@@ -77,6 +78,7 @@ export class AddClusterComponent implements AfterViewInit, OnInit {
     onDataCenterChange(dataCenterName: string) {
         if (dataCenterName === 'new') {
             this.ambari = new Ambari();
+            this.isNewAmbari = true;
             this.dataCenter = new DataCenter();
             return;
         }
@@ -96,9 +98,15 @@ export class AddClusterComponent implements AfterViewInit, OnInit {
     }
 
     onAmbariSelect(ambariHost: string) {
+        this.ambari = new Ambari();
+        if (ambariHost === 'new') {
+            this.isNewAmbari = true;
+        }
         for (let ambari of this.ambarisInDatacenter) {
             if (ambari.host === ambariHost) {
                 this.ambari = ambari;
+                this.isNewAmbari = false;
+                break;
             }
         }
     }
@@ -106,9 +114,8 @@ export class AddClusterComponent implements AfterViewInit, OnInit {
     onDataCenterNameChange() {
         let dataCenterByName = this.getDataCenterByName(this.dataCenter.name);
         if (dataCenterByName !== null) {
+            this.onDataCenterChange(this.dataCenter.name);
             this.dataCenter = dataCenterByName;
-            this.onCityChange();
-            this.onCountryChange(this.dataCenter.location.country);
         }
     }
 
@@ -130,22 +137,31 @@ export class AddClusterComponent implements AfterViewInit, OnInit {
 
     onSave() {
         console.log(this.ambari);
-        let locationAnchor = this.getLocation();
-        this.ambari.host = locationAnchor.hostname;
-        this.ambari.port = parseInt(locationAnchor.port);
-        this.ambari.protocol = locationAnchor.protocol.replace(':','');
-        this.ambari.dataCenter = this.dataCenter.name;
+        if (this.isNewAmbari) {
+            let locationAnchor = this.getLocation();
+            this.ambari.host = locationAnchor.hostname;
+            this.ambari.port = parseInt(locationAnchor.port);
+            this.ambari.protocol = locationAnchor.protocol.replace(':','');
+            this.ambari.dataCenter = this.dataCenter.name;
+        }
 
         if (this.getDataCenterByName(this.dataCenter.name) === null) {
             this.dataCenterService.put(this.dataCenter).subscribe(message => {
-                this.ambariService.put(this.ambari).subscribe(message => {
+                this.ambariService.post(this.ambari).subscribe(message => {
                     window.history.back();
                 });
             });
         } else {
-            this.ambariService.put(this.ambari).subscribe(message => {
-                window.history.back();
-            });
+            if (this.isNewAmbari) {
+                this.ambariService.post(this.ambari).subscribe(message => {
+                    window.history.back();
+                });
+            } else {
+                this.ambariService.put(this.ambari).subscribe(message => {
+                    window.history.back();
+                });
+            }
+
         }
     }
 

@@ -21,12 +21,10 @@ export class DataCenterService {
     }
 
     public post(dataCenter: DataCenter):Observable<any> {
-        this.dataCenters.push(dataCenter);
-        return Observable.create((observer: any) => {
-            observer.next('{errorCode: 0: message: Success}');
-            observer.complete();
-        });
+        return this.http.post(this.url, dataCenter, new RequestOptions(HttpUtil.getHeaders()))
+            .map(HttpUtil.extractData).catch(HttpUtil.handleError);
     }
+
 
     public get():Observable<DataCenter[]> {
         return this.http.get(this.url , new RequestOptions(HttpUtil.getHeaders()))

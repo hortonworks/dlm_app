@@ -1,6 +1,7 @@
 import {Response, RequestOptionsArgs} from '@angular/http';
 import {Observable}     from 'rxjs/Observable';
 import {Headers} from '@angular/http';
+import {Alerts} from './alerts';
 export class HttpUtil {
 
   public static extractString(res: Response): string {
@@ -23,6 +24,9 @@ export class HttpUtil {
     let errMsg = (error.message) ? error.message :
       error.status ? `${error.status} - ${error.statusText}` : 'Server error';
     console.error(errMsg); // log to console instead
+    if (error._body) {
+      Alerts.showErrorMessage(JSON.parse(error._body).message);
+    }
     return Observable.throw(error);
   }
 

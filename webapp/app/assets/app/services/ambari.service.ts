@@ -19,11 +19,8 @@ export class AmbariService {
     }
 
     public post(cluster: Ambari):Observable<any> {
-        this.clusters.push(cluster);
-        return Observable.create((observer: any) => {
-           observer.next('{errorCode: 0: message: Success}');
-           observer.complete();
-        });
+        return this.http.post(this.url, cluster, new RequestOptions(HttpUtil.getHeaders()))
+            .map(HttpUtil.extractData).catch(HttpUtil.handleError);
     }
 
     public get():Observable<Ambari[]> {

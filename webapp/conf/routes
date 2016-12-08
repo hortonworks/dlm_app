@@ -12,8 +12,9 @@ GET         /ui/*path              controllers.Application.route(path)
 POST        /auth/login            controllers.Authentication.login
 
 #api
-PUT         /api/clusters          controllers.Cluster.create
-GET         /api/clusters          controllers.Cluster.list
+POST         /api/clusters           controllers.Cluster.create
+GET          /api/clusters           controllers.Cluster.list
+PUT          /api/clusters           controllers.Cluster.update
 
 PUT         /api/datacenters        controllers.Datacenter.create
 GET         /api/datacenters        controllers.Datacenter.list
