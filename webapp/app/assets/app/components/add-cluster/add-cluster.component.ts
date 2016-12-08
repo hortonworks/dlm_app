@@ -7,6 +7,7 @@ import {AmbariService} from '../../services/ambari.service';
 import {Ambari} from '../../models/ambari';
 import {DataCenter} from '../../models/data-center';
 import {DataCenterService} from '../../services/data-center.service';
+import {Alerts} from '../../shared/utils/alerts';
 
 declare var Datamap:any;
 
@@ -147,17 +148,21 @@ export class AddClusterComponent implements AfterViewInit, OnInit {
 
         if (this.getDataCenterByName(this.dataCenter.name) === null) {
             this.dataCenterService.put(this.dataCenter).subscribe(message => {
+                Alerts.showSuccessMessage('Saved data center configuration');
                 this.ambariService.post(this.ambari).subscribe(message => {
+                    Alerts.showSuccessMessage('Saved cluster configuration');
                     window.history.back();
                 });
             });
         } else {
             if (this.isNewAmbari) {
                 this.ambariService.post(this.ambari).subscribe(message => {
+                    Alerts.showSuccessMessage('Saved cluster configuration');
                     window.history.back();
                 });
             } else {
                 this.ambariService.put(this.ambari).subscribe(message => {
+                    Alerts.showSuccessMessage('Saved cluster configuration');
                     window.history.back();
                 });
             }
