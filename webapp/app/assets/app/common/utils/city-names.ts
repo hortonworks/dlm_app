@@ -181,7 +181,7 @@ export class CityNames {
             let cityCount = CityNames.countriesToCity[tCountryName].length;
             for (let i=0; i<cityCount; i++) {
                 let cityInfo: string[] = CityNames.countriesToCity[tCountryName][i];
-                if (cityInfo[0] === city) {
+                if (cityInfo[0].toLowerCase() === city.toLowerCase()) {
                     return cityInfo.slice(1,3);
                 }
             }

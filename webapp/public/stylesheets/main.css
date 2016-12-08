@@ -62,3 +62,9 @@ input {
     -moz-background-size: 15px 15px;
     background-size: 15px 15px;
 }
+
+
+.logged-in-user:before {
+    content: "\f2bd";
+    font-family: FontAwesome;
+}

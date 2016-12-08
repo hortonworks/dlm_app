@@ -2,16 +2,22 @@ import {Injectable} from '@angular/core';
 import {Http, Headers, RequestOptions, Response, ResponseOptions} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {DataCenter} from '../models/data-center';
+import {HttpUtil} from '../shared/utils/httpUtil';
+import '../rxjs-operators';
 
 @Injectable()
 export class DataCenterService {
-    url = '/datacenter';
-    defaultHeaders = {'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest'};
+    url = '/api/datacenters';
 
     private dataCenters: DataCenter[] = [];
 
     constructor(private http:Http) {
         this.dataCenters = DataCenter.getData();
+    }
+
+    public put(dataCenter: DataCenter):Observable<any> {
+        return this.http.put(this.url, dataCenter, new RequestOptions(HttpUtil.getHeaders()))
+            .map(HttpUtil.extractData).catch(HttpUtil.handleError);
     }
 
     public post(dataCenter: DataCenter):Observable<any> {
@@ -23,10 +29,8 @@ export class DataCenterService {
     }
 
     public get():Observable<DataCenter[]> {
-        return Observable.create((observer: any) => {
-            observer.next(this.dataCenters);
-            observer.complete();
-        });
+        return this.http.get(this.url , new RequestOptions(HttpUtil.getHeaders()))
+                .map(HttpUtil.extractData).catch(HttpUtil.handleError);
     }
 
     public getByName(name: string):Observable<DataCenter> {

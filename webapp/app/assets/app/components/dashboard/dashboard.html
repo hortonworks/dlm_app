@@ -35,11 +35,11 @@
         <tbody>
         <tr *ngFor="let dataCenter of dataCenters" (click)="onDataCenterSelect(dataCenter)">
             <td class="">
-                <i class="fa fa-circle" aria-hidden="true" [ngClass]="{'green-text': dataCenter.status === 'UP', 'red-text' : dataCenter.status === 'DOWN'}"></i>
+                <i class="fa fa-circle" aria-hidden="true" [ngClass]="{'green-text': dataCenter.status === 'UP', 'red-text' : dataCenter.status === 'DOWN', 'grey-text': dataCenter.status === undefined}"></i>
             </td>
             <td class="mdl-data-table__cell--non-numeric">
                 <div class="data-center-name"> {{ dataCenter.name }} </div>
-                <div class="data-center-location"> {{ dataCenter.location}} </div>
+                <div class="data-center-location"> {{ dataCenter.deployedAt}} </div>
             </td>
             <td class="mdl-data-table__cell--non-numeric">{{ dataCenter.nodes }}</td>
             <td class="mdl-data-table__cell--non-numeric">{{ dataCenter.capacityUtilization }}%</td>

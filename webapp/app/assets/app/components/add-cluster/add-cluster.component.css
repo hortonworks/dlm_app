@@ -7,7 +7,6 @@ i.fa-2x + span {
 }
 .map {
     border: 1px solid #cccccc;
-    margin-top: 26px;
     position: absolute;
 }
 .mt-1{

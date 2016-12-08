@@ -1,3 +1,5 @@
-/**
- * Created by rksv on 06/12/16.
- */
+export class Credentials {
+    userName: string;
+    password: string;
+    properties: {} = {};
+}

@@ -15,8 +15,8 @@ POST        /auth/login            controllers.Authentication.login
 PUT         /api/clusters          controllers.Cluster.create
 GET         /api/clusters          controllers.Cluster.list
 
-PUT         /api/datacenter        controllers.Datacenter.create
-GET         /api/datacenter        controllers.Datacenter.list
+PUT         /api/datacenters        controllers.Datacenter.create
+GET         /api/datacenters        controllers.Datacenter.list
 
 
 # Map static resources from the /public folder to the /assets URL path

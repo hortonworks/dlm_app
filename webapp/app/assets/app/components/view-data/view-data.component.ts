@@ -1,11 +1,8 @@
-/**
- * Created by rksv on 04/12/16.
- */
 import {Component, OnInit, ViewChild, AfterViewInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {BreadcrumbComponent} from '../../shared/breadcrumb/breadcrumb.component';
-import {ClusterService} from '../../services/cluster.service';
-import {Cluster} from '../../models/cluster';
+import {AmbariService} from '../../services/ambari.service';
+import {Ambari} from '../../models/ambari';
 
 declare var Datamap:any;
 
@@ -19,11 +16,11 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
     search: string = '';
     clusterName: string;
     breadCrumbMap: any = {};
-    cluster: Cluster = new Cluster();
+    cluster: Ambari = new Ambari();
 
     @ViewChild('bread-crumb') breadCrumb: BreadcrumbComponent;
 
-    constructor(private activatedRoute: ActivatedRoute, private clusterService: ClusterService) {}
+    constructor(private activatedRoute: ActivatedRoute, private clusterService: AmbariService) {}
 
     ngOnInit() {
         this.activatedRoute.params.subscribe(params => {

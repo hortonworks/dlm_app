@@ -44,7 +44,7 @@ class Datacenter @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage: 
           else {
             dataCenters.flatMap(_.insert(dc)).map { wr =>
               if (wr.ok)
-                Ok
+                Ok(Json.obj("status"->"success", "errorcode"->0))
               else
                 InternalServerError(JsonResponses.statusError("insert error", extractWriteError(wr)))
             }

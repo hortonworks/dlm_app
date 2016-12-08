@@ -3,8 +3,10 @@
  */
 import {Component, AfterViewInit, OnInit, ViewChild, ElementRef} from '@angular/core';
 import {CityNames} from '../../common/utils/city-names';
-import {ClusterService} from '../../services/cluster.service';
-import {Cluster} from '../../models/cluster';
+import {AmbariService} from '../../services/ambari.service';
+import {Ambari} from '../../models/ambari';
+import {DataCenter} from '../../models/data-center';
+import {DataCenterService} from '../../services/data-center.service';
 
 declare var Datamap:any;
 
@@ -17,18 +19,25 @@ declare var Datamap:any;
 export class AddClusterComponent implements AfterViewInit, OnInit {
 
     map: any;
-    clusters: Cluster[] = [];
+    ambaris: Ambari[] = [];
     cityNames: string[] = [];
-    cluster: Cluster = new Cluster();
+    clusterIPOrURL: string = '';
+    ambari: Ambari = new Ambari();
+    dataCenters: DataCenter[] = [];
+    ambarisInDatacenter: Ambari[] = [];
+    dataCenter: DataCenter = new DataCenter();
     countryNames = Datamap.prototype.worldTopo.objects.world.geometries;
 
     @ViewChild('selectCity') selectCity: ElementRef;
 
-    constructor(private clusterService: ClusterService) {}
+    constructor(private ambariService: AmbariService, private dataCenterService: DataCenterService) {}
 
     ngOnInit() {
-        this.clusterService.get().subscribe((cluster: Cluster[]) => {
-            this.clusters = cluster;
+        this.dataCenterService.get().subscribe((dataCenters: DataCenter[]) => {
+            this.dataCenters = dataCenters;
+        });
+        this.ambariService.get().subscribe((ambaris: Ambari[]) => {
+            this.ambaris = ambaris;
         });
     }
 
@@ -39,7 +48,7 @@ export class AddClusterComponent implements AfterViewInit, OnInit {
             },
             bubblesConfig: {
                 popupTemplate: function(geography: any, data: any) {
-                    return '<div class="hoverinfo">' + JSON.stringify(data) +'</div>';
+                    return '<div class="hoverinfo">' + data.location +'</div>';
                 },
                 borderWidth: '2',
                 borderColor: '#FFFFFF',
@@ -52,12 +61,13 @@ export class AddClusterComponent implements AfterViewInit, OnInit {
     }
 
     onCityChange() {
-        let coordinates = CityNames.getCityCoordinates(this.cluster.country, this.cluster.city);
+        let coordinates = CityNames.getCityCoordinates(this.dataCenter.location.country, this.dataCenter.location.place);
         let cityBubble = [{
             name: 'name',
             radius:5,
             yield: 400,
             borderColor: '#4C4C4C',
+            location: this.dataCenter.location.place + ' - ' + this.dataCenter.location.country,
             latitude: parseFloat(coordinates[0]),
             longitude: parseFloat(coordinates[1])
         }];
@@ -65,24 +75,78 @@ export class AddClusterComponent implements AfterViewInit, OnInit {
     }
 
     onDataCenterChange(dataCenterName: string) {
-        if (dataCenterName === 'undefined') {
-            this.cluster = new Cluster();
+        if (dataCenterName === 'new') {
+            this.ambari = new Ambari();
+            this.dataCenter = new DataCenter();
             return;
         }
-        for (let cluster of this.clusters) {
-            if (cluster.name === dataCenterName) {
-                this.cluster = cluster;
-                this.onCityChange();
-                this.onCountryChange(this.cluster.country);
+
+        this.ambarisInDatacenter = [];
+        for (let ambari of this.ambaris) {
+            if (ambari.dataCenter === dataCenterName) {
+                this.ambarisInDatacenter.push(ambari);
+            }
+        }
+        let dataCenterByName = this.getDataCenterByName(dataCenterName);
+        if (dataCenterByName !== null) {
+            this.dataCenter = dataCenterByName;
+            this.onCityChange();
+            this.onCountryChange(this.dataCenter.location.country);
+        }
+    }
+
+    onAmbariSelect(ambariHost: string) {
+        for (let ambari of this.ambarisInDatacenter) {
+            if (ambari.host === ambariHost) {
+                this.ambari = ambari;
             }
         }
     }
 
+    onDataCenterNameChange() {
+        let dataCenterByName = this.getDataCenterByName(this.dataCenter.name);
+        if (dataCenterByName !== null) {
+            this.dataCenter = dataCenterByName;
+            this.onCityChange();
+            this.onCountryChange(this.dataCenter.location.country);
+        }
+    }
+
+    getDataCenterByName(dataCenterName: string): DataCenter {
+        for (let dataCenter of this.dataCenters) {
+            if (dataCenter.name.toLocaleLowerCase() === dataCenterName.toLocaleLowerCase()) {
+                return dataCenter;
+            }
+        }
+
+        return null;
+    }
+
+    getLocation() {
+        let tmpAnchor = document.createElement('a');
+        tmpAnchor.href = this.clusterIPOrURL;
+        return tmpAnchor;
+    };
+
     onSave() {
-        console.log(this.cluster);
-        this.clusterService.post(this.cluster).subscribe(message => {
-            window.history.back();
-        });
+        console.log(this.ambari);
+        let locationAnchor = this.getLocation();
+        this.ambari.host = locationAnchor.hostname;
+        this.ambari.port = parseInt(locationAnchor.port);
+        this.ambari.protocol = locationAnchor.protocol.replace(':','');
+        this.ambari.dataCenter = this.dataCenter.name;
+
+        if (this.getDataCenterByName(this.dataCenter.name) === null) {
+            this.dataCenterService.put(this.dataCenter).subscribe(message => {
+                this.ambariService.put(this.ambari).subscribe(message => {
+                    window.history.back();
+                });
+            });
+        } else {
+            this.ambariService.put(this.ambari).subscribe(message => {
+                window.history.back();
+            });
+        }
     }
 
     back() {

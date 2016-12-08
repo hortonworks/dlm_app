@@ -1,6 +1,6 @@
 
 import {Credentials} from './credentials';
-export class Cluster {
+export class Ambari {
     protocol: string;
     host: string;
     port: number;
@@ -34,16 +34,16 @@ export class Cluster {
     // }
 
     public static createClusterForTest(name: string) {
-        let cluster = new Cluster();
-        // cluster.name = name;
-        // cluster.noOfNodes = parseInt((Math.random()* 100) + '');
-        // cluster.upTime = parseInt((Math.random()* 100) + '');
-        // cluster.diskUsed = parseInt((Math.random()* 100) + '');
-        // cluster.noOfJobs = parseInt((Math.random()* 100) + '');
-        // cluster.noOfTables = parseInt((Math.random()* 100) + '');
-        // cluster.noOfFiles = parseInt((Math.random()* 100) + '');
-        // cluster.averageNoOfUsers = parseInt((Math.random()* 100) + '');
-        // cluster.serviceName = ['EDW', 'SPARK', 'HIVE', 'SPARK', 'HIVE'][Math.floor((Math.random() * 4) + 1)];
+        let cluster = new Ambari();
+        // ambari.name = name;
+        // ambari.noOfNodes = parseInt((Math.random()* 100) + '');
+        // ambari.upTime = parseInt((Math.random()* 100) + '');
+        // ambari.diskUsed = parseInt((Math.random()* 100) + '');
+        // ambari.noOfJobs = parseInt((Math.random()* 100) + '');
+        // ambari.noOfTables = parseInt((Math.random()* 100) + '');
+        // ambari.noOfFiles = parseInt((Math.random()* 100) + '');
+        // ambari.averageNoOfUsers = parseInt((Math.random()* 100) + '');
+        // ambari.serviceName = ['EDW', 'SPARK', 'HIVE', 'SPARK', 'HIVE'][Math.floor((Math.random() * 4) + 1)];
 
         return cluster;
     }

@@ -1,6 +1,3 @@
-/**
- * Created by rksv on 04/12/16.
- */
 import {Component, OnInit, Input, AfterViewInit} from '@angular/core';
 import {HiveDataService} from '../../services/hive-data.service';
 import {Schema} from '../../models/schema';

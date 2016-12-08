@@ -1,6 +1,6 @@
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
 
-    <div class="dataplane-header mdl-layout__header mdl-layout__header--waterfall">
+    <div class="dataplane-header mdl-layout__header mdl-layout__header--waterfall" [hidden]="!isLoggedIn()">
         <div class="mdl-layout__header-row">
                     <span class="dataplane-title mdl-layout-title">
                         <img class="dataplane-logo-image" src="assets/images/ui_logo.svg">
@@ -11,7 +11,7 @@
             <!-- Navigation -->
 
             <button class="dataplane-more-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" id="more-button">
-                <i class="fa fa-bars fa-lg" aria-hidden="true"></i>
+                <span class="logged-in-user"> </span>
             </button>
             <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right mdl-js-ripple-effect" for="more-button">
                 <li *ngIf="isLoggedIn()" class="mdl-menu__item">My account</li>
@@ -41,18 +41,18 @@
 
         <router-outlet></router-outlet>
 
-        <footer class="dataplane-footer mdl-mega-footer">
+        <!--<footer class="dataplane-footer mdl-mega-footer">-->
 
-            <div class="mdl-mega-footer--middle-section">
-                <p class="mdl-typography--font-light">© 2016 Hortonworks Inc</p>
-            </div>
+            <!--<div class="mdl-mega-footer&#45;&#45;middle-section">-->
+                <!--<p class="mdl-typography&#45;&#45;font-light">© 2016 Hortonworks Inc</p>-->
+            <!--</div>-->
 
-            <div class="mdl-mega-footer--bottom-section">
+            <!--<div class="mdl-mega-footer&#45;&#45;bottom-section">-->
 
-                <a class="dataplane-link mdl-typography--font-light" href="">About</a>
-                <a class="dataplane-link mdl-typography--font-light" href="">Privacy Policy</a>
-            </div>
+                <!--<a class="dataplane-link mdl-typography&#45;&#45;font-light" href="">About</a>-->
+                <!--<a class="dataplane-link mdl-typography&#45;&#45;font-light" href="">Privacy Policy</a>-->
+            <!--</div>-->
 
-        </footer>
+        <!--</footer>-->
     </div>
 </div>

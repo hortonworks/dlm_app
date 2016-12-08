@@ -494,9 +494,9 @@ a { color: inherit; }
     opacity: 0;
   }
 
-  .dataplane-more-button {
-    display: none;
-  }
+  /*.dataplane-more-button {*/
+    /*display: none;*/
+  /*}*/
 
   .dataplane-search-box.is-focused {
     width: calc(100% - 48px);

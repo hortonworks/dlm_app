@@ -12,6 +12,8 @@ export const routes = [
     { path: 'ui/login', component: LoginComponent,canActivate:[AlreadyLoggedInGuard]},
     { path: 'ui/logout', component: LogoutComponent},
     { path: 'ui/dashboard', component: DashboardComponent, canActivate: [LoggedInGuard]},
+    { path: 'ui/view-cluster/:id', component: ViewClusterComponent},
     { path: 'ui/cluster/add', loadChildren: 'assets/app/components/add-cluster/add-cluster.module#AddClusterModule', canActivate: [LoggedInGuard]},
-    { path: 'ui/cluster/:id', component: ViewClusterComponent, canActivate: [LoggedInGuard]}
+    { path: 'ui/view-data', loadChildren: 'assets/app/components/view-data/view-data.module#ViewDataModule', canActivate: [LoggedInGuard]}
+
 ];

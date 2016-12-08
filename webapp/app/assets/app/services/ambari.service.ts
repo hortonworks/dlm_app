@@ -11,19 +11,7 @@ export class AmbariService {
     private cluster: Ambari;
     private clusters: Ambari[] = [];
 
-    constructor(private http:Http) {
-    //     this.cluster = new Ambari();
-    //     this.cluster.name = 'London';
-    //     this.cluster.country = 'United Kingdom';
-    //     this.cluster.city = 'London';
-    //     // this.cluster.address = '68 Upper Thames St';
-    //     this.cluster.clusterIPOrURL = 'http://192.168.1.1:9090';
-    //     this.cluster.clusterAdminId = 'admin';
-    //     this.cluster.clusterAdminPassword = 'password';
-    //     this.cluster.kerberosPrincipal = 'primary/instance@REALM';
-    //     this.cluster.kerberosKeytab = '/usr/kerberos/sbin';
-    //     this.clusters.push(this.cluster);
-    }
+    constructor(private http:Http) {}
 
     public put(cluster: Ambari):Observable<any> {
         return this.http.put(this.url, cluster, new RequestOptions(HttpUtil.getHeaders()))
@@ -39,10 +27,8 @@ export class AmbariService {
     }
 
     public get():Observable<Ambari[]> {
-        return Observable.create((observer: any) => {
-           observer.next(this.clusters);
-           observer.complete();
-        });
+        return this.http.get(this.url , new RequestOptions(HttpUtil.getHeaders()))
+            .map(HttpUtil.extractData).catch(HttpUtil.handleError);
     }
 
     public  getByName(name: string):Observable<Ambari> {
