@@ -1,4 +1,4 @@
-activator-akka-scala-seed
+Common libraries
 =========================
 
-A minimal seed template for an Akka with Scala build 
+This project has common libraries to be shared by the webapp and other components

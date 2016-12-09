@@ -1,15 +1,13 @@
 package com.hw.dp.service.api
 
+import com.hw.dp.service.cluster.{Ambari, ServiceComponent}
+
 import scala.concurrent.duration.Duration
 
 /**
   * A snapshot is data returned by the service, at a certain time
-  * The snapshots may be
-  * @param snapshotId
-  * @param snapshotTimeStamp
-  * @param data
   */
-case class Snapshot(snapshotId:String, snapshotTimeStamp:Long, data:SnapshotData,serviceName:String)
+case class Snapshot(snapshotId:String, snapshotTimeStamp:Long, data:SnapshotData,serviceComponent: ServiceComponent,ambari: Ambari)
 
 
 /**
