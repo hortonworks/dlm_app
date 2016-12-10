@@ -4,16 +4,19 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.{Actor, ActorRef, ActorSystem, PoisonPill, Props}
 import akka.stream.ActorMaterializer
+import com.google.common.base.Charsets
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
+import com.google.common.io.BaseEncoding
 import com.hw.dp.service.api.{Poll, ServiceException, ServiceNotFound}
 import com.hw.dp.service.cluster.{Ambari, ServiceComponent}
 import com.hw.dp.services.atlas.Hive.{Result, SearchResult}
+import org.springframework.http.{HttpEntity, HttpHeaders, HttpMethod}
 import org.springframework.security.kerberos.client.KerberosRestTemplate
 import org.springframework.web.client.RestTemplate
-import play.api.{Configuration, Logger}
 import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.ahc.AhcWSClient
 import play.api.libs.ws.{WSAuthScheme, WSRequest, WSResponse}
+import play.api.{Configuration, Logger}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -51,6 +54,7 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, service: Servic
   private var template: RestTemplate = _
   private var tableLoader: Option[ActorRef] = None
   private val cacheReloadTime: Int = Try(configuration.underlying.getInt("atlas.api.tableCache.reload.minutes")) getOrElse (15)
+  val headers = new HttpHeaders()
 
   /**
     * The initialze call sets up a table cache, which allows for faster entity look ups, should cache tables
@@ -60,8 +64,6 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, service: Servic
     .maximumSize(Try(configuration.underlying.getLong("atlas.api.tableCache.limit")) getOrElse (10000L))
     .expireAfterWrite(Try(configuration.underlying.getLong("atlas.api.tableCache.time.minutes")) getOrElse (60), TimeUnit.MINUTES)
     .build(new TableCacheLoader(this))
-
-
 
 
   /**
@@ -81,6 +83,7 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, service: Servic
         throw new ServiceNotFound("No properties found for Atlas")
       val properties = (atlasConfig.get \ "properties").as[JsObject]
       apiUrl = (properties \ "atlas.rest.address").as[String]
+
       val isKerberos = (properties \ "atlas.authentication.method.kerberos").as[String]
       if (isKerberos == "true") {
         Logger.info("using kerberos as Atlas needs it")
@@ -92,6 +95,10 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, service: Servic
         }
       } else {
         template = new RestTemplate()
+
+        val pass =  BaseEncoding.base64()
+          .encode("admin:admin".getBytes(Charsets.UTF_8))
+        headers.set("Authorization", "Basic "+pass)
       }
       // load all tables into the cache
       //clean up the cache
@@ -124,8 +131,9 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, service: Servic
 
     val searchUrl = s"${apiUrl}/api/atlas/discovery/search/dsl?query=hive_table where name='${tableName}'"
     Try {
-      val response = template.getForObject(searchUrl, classOf[String])
-      Json.parse(response).validate[SearchResult].map(r => r).getOrElse {
+      val entity = new HttpEntity[String](headers);
+      val response = template.exchange(searchUrl, HttpMethod.GET, entity, classOf[String])
+      Json.parse(response.getBody).validate[SearchResult].map(r => r).getOrElse {
         throw new ServiceException(s"Cannot parse result as Json ${response}")
       }
     }
@@ -134,8 +142,9 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, service: Servic
   override def allHiveTables: Try[SearchResult] = {
     val searchUrl = s"${apiUrl}/api/atlas/discovery/search/dsl?query=hive_table"
     Try {
-      val response = template.getForObject(searchUrl, classOf[String])
-      Json.parse(response).validate[SearchResult].map(r => r).getOrElse {
+      val entity = new HttpEntity[String](headers);
+      val response = template.exchange(searchUrl, HttpMethod.GET, entity, classOf[String])
+      Json.parse(response.getBody).validate[SearchResult].map(r => r).getOrElse {
         throw new ServiceException(s"Cannot parse result as Json ${response}")
       }
     }
@@ -196,5 +205,7 @@ sealed class CacheReloader(atlasApi: AtlasHiveApiImpl) extends Actor {
       )
   }
 }
+
+
 
 
