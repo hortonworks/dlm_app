@@ -6,12 +6,11 @@ import akka.actor.{Actor, ActorRef, ActorSystem, PoisonPill, Props}
 import akka.stream.ActorMaterializer
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.hw.dp.service.api.{Poll, ServiceException, ServiceNotFound}
-import com.hw.dp.service.cluster.{Ambari, Credentials, KerberosSettings, ServiceComponent}
+import com.hw.dp.service.cluster.{Ambari, ServiceComponent}
 import com.hw.dp.services.atlas.Hive.{Result, SearchResult}
-import com.typesafe.config.ConfigFactory
 import org.springframework.security.kerberos.client.KerberosRestTemplate
 import org.springframework.web.client.RestTemplate
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.ahc.AhcWSClient
 import play.api.libs.ws.{WSAuthScheme, WSRequest, WSResponse}
@@ -20,7 +19,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.Try
-import play.api.Logger
 
 /**
   * A cache backed client for loading hive related data from Atlas
@@ -40,10 +38,7 @@ import play.api.Logger
   * @param configuration
   */
 class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, service: ServiceComponent, configuration: Configuration) extends AtlasHiveApi {
-  /**
-    * initialize the API, this can be called multiple times in case
-    * a client would like to reset the context
-    */
+
 
   val ambariUrlPrefix = s"${ambari.protocol}://${ambari.host}:${ambari.port}/api/v1/clusters/${service.clusterName}"
   val configUrlSuffix = "/configurations/service_config_versions?service_name=ATLAS&is_current=true"
