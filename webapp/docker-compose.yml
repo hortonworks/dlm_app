@@ -1,0 +1,20 @@
+version: '2'
+services:
+  web:
+    image: data_plane:0.1-alpha
+    ports: 
+      - "8080:9000"
+    links:
+      - dp_db_init
+      - dp_db
+
+  dp_db_init:
+    build: ./dbinit
+    volumes:
+      - ./dbinit/:/code
+    links:
+      - dp_db
+    command: python dbinit.py
+
+  dp_db:
+    image: mongo

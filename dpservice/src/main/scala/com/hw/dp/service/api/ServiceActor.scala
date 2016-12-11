@@ -1,12 +1,13 @@
 package com.hw.dp.service.api
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
-import com.hw.dp.service.cluster.ServiceComponent
+import com.hw.dp.service.cluster.{Ambari, ServiceComponent}
 
-abstract class ServiceActor(service: ServiceComponent, persister:Option[ActorRef]) extends Actor with ActorLogging{
+abstract class ServiceActor(ambari: Ambari, service: ServiceComponent, persister:Option[ActorRef]) extends Actor with ActorLogging{
 
   def fetchData(service: ServiceComponent,onComplete:Option[Snapshot] => Unit)
-  def stopRunning
+
+  def stopRunning = ???
 
 
   override final def receive: Receive = {
@@ -20,6 +21,7 @@ abstract class ServiceActor(service: ServiceComponent, persister:Option[ActorRef
         }
       })
     case Stop() => stopRunning
+
     case Restart() => {
       //TODO:Restart logic
     }
