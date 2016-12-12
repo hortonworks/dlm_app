@@ -24,7 +24,6 @@ class Authentication @Inject() (val reactiveMongoApi: ReactiveMongoApi)
   def collection = database.map(_.collection[JSONCollection]("users"))
 
   def resolve(pw:String,user: User): Option[UserView] = {
-    println("test")
     val checkpw: Boolean = BCrypt.checkpw(pw,user.password)
     if(checkpw)
       Some(UserView(user.username,user.password,user.admin))

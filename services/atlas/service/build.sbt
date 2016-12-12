@@ -1,5 +1,5 @@
 name := """atlas"""
-organization := "com.hw.dp"
+organization := "com.hw.dataplane"
 version := "1.0"
 
 scalaVersion := "2.11.6"

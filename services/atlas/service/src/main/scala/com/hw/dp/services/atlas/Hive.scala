@@ -111,5 +111,15 @@ object Hive {
   implicit val resultsReads = Json.reads[Result]
   implicit val resultReads = Json.reads[SearchResult]
 
+  implicit val mutiplicityWrites = Json.writes[Multiplicity]
+  implicit val attributeDefinitionWrites = Json.writes[AttributeDefinitions]
+  implicit val dataTypeWrites = Json.writes[DataType]
+  implicit val systemAttributesWrites = Json.writes[SystemAttributes]
+  implicit val identifierWrites = Json.writes[Identifier]
+  implicit val columnWrites = Json.writes[Column]
+  implicit val parameterWrites = Json.writes[Parameters]
+  implicit val resultsWrites = Json.writes[Result]
+  implicit val resultWrites = Json.writes[SearchResult]
+
 
 }

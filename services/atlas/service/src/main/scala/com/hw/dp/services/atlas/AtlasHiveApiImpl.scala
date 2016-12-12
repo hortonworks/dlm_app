@@ -8,7 +8,7 @@ import com.google.common.base.Charsets
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.google.common.io.BaseEncoding
 import com.hw.dp.service.api.{Poll, ServiceException, ServiceNotFound}
-import com.hw.dp.service.cluster.{Ambari, ServiceComponent}
+import com.hw.dp.service.cluster.{Ambari, Cluster, ServiceComponent}
 import com.hw.dp.services.atlas.Hive.{Result, SearchResult}
 import org.springframework.http.{HttpEntity, HttpHeaders, HttpMethod}
 import org.springframework.security.kerberos.client.KerberosRestTemplate
@@ -37,13 +37,13 @@ import scala.util.Try
   *
   * @param actorSystem
   * @param ambari
-  * @param service
+  * @param cluster
   * @param configuration
   */
-class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, service: ServiceComponent, configuration: Configuration) extends AtlasHiveApi {
+class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluster, configuration: Configuration) extends AtlasHiveApi {
 
 
-  val ambariUrlPrefix = s"${ambari.protocol}://${ambari.host}:${ambari.port}/api/v1/clusters/${service.clusterName}"
+  val ambariUrlPrefix = s"${ambari.protocol}://${ambari.host}:${ambari.port}/api/v1/clusters/${cluster.name}"
   val configUrlSuffix = "/configurations/service_config_versions?service_name=ATLAS&is_current=true"
 
   implicit val system = actorSystem
@@ -76,7 +76,7 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, service: Servic
     configResponse.map { res =>
       val json = res.json
       val configurations = json \ "items" \\ "configurations"
-      val configs: JsValue = configurations(0)
+      val configs: JsValue = configurations.head
       val configsAsList = configs.as[List[JsObject]]
       val atlasConfig = configsAsList.find(obj => (obj \ "type").as[String] == "application-properties")
       if (!atlasConfig.isDefined)

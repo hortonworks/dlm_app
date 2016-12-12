@@ -38,7 +38,7 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
 
   override def createOrUpdateCluster(cluster: Cluster): Future[WriteResult] = {
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("clusterinfo"))
-    val selector = Json.obj("name" -> cluster.name, "ambariHost" -> cluster.ambariHost,"dataCenter"->cluster.dataCenter)
+    val selector = Json.obj("name" -> cluster.name, "ambariHost" -> cluster.ambariHost, "dataCenter" -> cluster.dataCenter)
     collection.flatMap(_.remove(selector).flatMap { dr =>
       Logger.info(s"Deleted cluster ${cluster} - status ${dr.ok}")
       collection.flatMap(_.insert(cluster))
@@ -48,7 +48,7 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
   override def updateAllHosts(host: Host): Future[WriteResult] = {
 
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("hostinfo"))
-    val selector = Json.obj("name" -> host.name, "clusterName" -> host.clusterName, "ambariHost" -> host.ambariHost,"dataCenter"->host.dataCenter)
+    val selector = Json.obj("name" -> host.name, "clusterName" -> host.clusterName, "ambariHost" -> host.ambariHost, "dataCenter" -> host.dataCenter)
 
     // delete existing host
     collection.flatMap(_.remove(selector).flatMap { dr =>
@@ -72,7 +72,7 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
 
   override def addComponent(component: ServiceComponent): Future[WriteResult] = {
     Logger.debug(s"Inserting component ${component}")
-    val selector = Json.obj("name" -> component.name, "clusterName" -> component.clusterName, "ambariHost" -> component.ambariHost,"dataCenter"->component.dataCenter)
+    val selector = Json.obj("name" -> component.name, "clusterName" -> component.clusterName, "ambariHost" -> component.ambariHost, "dataCenter" -> component.dataCenter)
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("components"))
 
     // Delete old service info and insert again
@@ -85,7 +85,7 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
   override def updateNameNodeInfo(nameNodeInfo: NameNode): Future[WriteResult] = {
     Logger.debug(s"Inserting name node information ${nameNodeInfo}")
 
-    val selector = Json.obj("clusterName" -> nameNodeInfo.clusterName, "ambariHost" -> nameNodeInfo.ambariHost,"dataCenter"->nameNodeInfo.dataCenter)
+    val selector = Json.obj("clusterName" -> nameNodeInfo.clusterName, "ambariHost" -> nameNodeInfo.ambariHost, "dataCenter" -> nameNodeInfo.dataCenter)
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("namenodeinfo"))
 
     // Delete old service info and insert again
@@ -100,7 +100,7 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
 
     Logger.debug(s"Inserting metric information ${metric}")
 
-    val selector = Json.obj("clusterName" -> metric.clusterName, "ambariHost" -> metric.ambariHost,"dataCenter"->metric.dataCenter)
+    val selector = Json.obj("clusterName" -> metric.clusterName, "ambariHost" -> metric.ambariHost, "dataCenter" -> metric.dataCenter)
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("clustermetrics"))
 
     // Delete old service info and insert again
@@ -110,26 +110,26 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
 
   }
 
-  private def getAllNodesHealth(clusters: List[Ambari]):Future[Seq[Host]] = {
+  private def getAllNodesHealth(clusters: List[Ambari]): Future[Seq[Host]] = {
     val hosts = clusters.map(_.host)
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("hostinfo"))
-    val selector = Json.obj("ambariHost" -> Json.obj("$in"-> hosts))
+    val selector = Json.obj("ambariHost" -> Json.obj("$in" -> hosts))
     collection.flatMap(_.find(selector).cursor[Host]().collect[List](maxDocs = 0, Cursor.FailOnError[List[Host]]()))
   }
 
   private def getNameNodeStats(clusters: List[Ambari]) = {
     val hosts = clusters.map(_.host)
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("namenodeinfo"))
-    val selector = Json.obj("ambariHost" -> Json.obj("$in"-> hosts))
+    val selector = Json.obj("ambariHost" -> Json.obj("$in" -> hosts))
     collection.flatMap(_.find(selector).cursor[NameNode]().collect[List](maxDocs = 0, Cursor.FailOnError[List[NameNode]]()))
   }
 
   private def getLoadAverage(clusters: List[Ambari]) = {
     val hosts = clusters.map(_.host)
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("clustermetrics"))
-    val selector = Json.obj("ambariHost" -> Json.obj("$in"-> hosts))
-    collection.flatMap(_.find(selector).cursor[ClusterMetric]().collect[List](maxDocs = 0, Cursor.FailOnError[List[ClusterMetric]]()).map{ metrics =>
-      ((metrics.map(_.loadAvg).sum)/metrics.size) * 100
+    val selector = Json.obj("ambariHost" -> Json.obj("$in" -> hosts))
+    collection.flatMap(_.find(selector).cursor[ClusterMetric]().collect[List](maxDocs = 0, Cursor.FailOnError[List[ClusterMetric]]()).map { metrics =>
+      ((metrics.map(_.loadAvg).sum) / metrics.size) * 100
     })
 
   }
@@ -138,13 +138,27 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
     Logger.info(s"Loading datacenter information for DC - ${datacenter}")
     val selector = Json.obj("dataCenter" -> datacenter)
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("clusters"))
-    for{
-      clusters <-  collection.flatMap(_.find(selector).cursor[Ambari]().collect[List](maxDocs = 0, Cursor.FailOnError[List[Ambari]]()))
+    for {
+      clusters <- collection.flatMap(_.find(selector).cursor[Ambari]().collect[List](maxDocs = 0, Cursor.FailOnError[List[Ambari]]()))
       nodeList <- getAllNodesHealth(clusters)
       nameNodes <- getNameNodeStats(clusters)
       loadAvg <- getLoadAverage(clusters)
-    } yield{
-      DataCenterDetail(nodeList,nameNodes,loadAvg,clusters.size)
+    } yield {
+      DataCenterDetail(nodeList, nameNodes, loadAvg, clusters.size)
     }
+  }
+
+  override def loadCluster(clusterHost: String, datacenter: String): Future[Option[Ambari]] = {
+    Logger.info(s"Loading Ambari information for DC - ${datacenter} and host - ${clusterHost}")
+    val selector = Json.obj("dataCenter" -> datacenter, "host" -> clusterHost)
+    val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("clusters"))
+    collection.flatMap(_.find(selector).one[Ambari])
+  }
+
+  override def loadClusterInformation(clusterHost: String, datacenter: String): Future[Option[Cluster]] = {
+    Logger.info(s"Loading Ambari information for DC - ${datacenter} and host - ${clusterHost}")
+    val selector = Json.obj("dataCenter" -> datacenter, "ambariHost" -> clusterHost)
+    val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("clusterinfo"))
+    collection.flatMap(_.find(selector).one[Cluster])
   }
 }
