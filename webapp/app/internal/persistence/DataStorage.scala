@@ -9,6 +9,9 @@ import scala.concurrent.Future
 
 trait DataStorage {
 
+  def loadCluster(clusterHost: String, datacenter: String) : Future[Option[Ambari]]
+
+  def loadClusterInformation(clusterHost: String, datacenter: String):Future[Option[Cluster]]
 
   def loadDataCenterInfo(datacenter: String): Future[DataCenterDetail]
 
