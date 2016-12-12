@@ -1,7 +1,7 @@
 package internal.actors
 
 import java.nio.charset.StandardCharsets
-import java.util.{Base64, Date}
+import java.util.Base64
 
 import akka.actor.{Actor, ActorLogging}
 import com.hw.dp.service.api.Poll
@@ -9,12 +9,10 @@ import com.hw.dp.service.cluster._
 import internal.DataPlaneError
 import internal.persistence.DataStorage
 import org.joda.time.DateTime
-import play.api.libs.json.{JsArray, JsObject}
-import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
+import play.api.Logger
+import play.api.libs.ws.{WSClient, WSRequest}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import play.api.Logger
 
 class ClusterHealthSync(val storage: DataStorage, ws: WSClient) extends Actor with ActorLogging {
 
@@ -46,7 +44,7 @@ class ClusterHealthSync(val storage: DataStorage, ws: WSClient) extends Actor wi
                 val flatList = metrics.flatten
                 val loads = flatList.zipWithIndex.collect{case (e,i)  if ((i+1)%2 != 0) => e}
                 val avgLoad = loads.map(v => v).sum / loads.size
-                val metric = ClusterMetric(cl.name,cl.ambariHost,avgLoad,0L,0,0L)
+                val metric = ClusterMetric(cl.name,cl.ambariHost,cl.dataCenter,0L,0,0,0L)
                 storage.saveMetrics(metric)
               }
             }

@@ -6,7 +6,7 @@ import com.hw.dp.service.cluster.Ambari
 import com.hw.dp.service.cluster.Formatters._
 import internal.auth.Authenticated
 import internal.persistence.DataStorage
-import internal.{DataPlaneError, MongoUtilities}
+import internal.{AmbariSync, DataPlaneError, MongoUtilities}
 import models.JsonResponses
 import play.api.libs.json.{JsObject, Json}
 import play.api.mvc._
@@ -17,7 +17,7 @@ import reactivemongo.play.json.collection.JSONCollection
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class Cluster @Inject()(val reactiveMongoApi: ReactiveMongoApi,val storage:DataStorage)
+class Cluster @Inject()(val reactiveMongoApi: ReactiveMongoApi,val storage:DataStorage,val ambariSync: AmbariSync)
   extends Controller with MongoController with ReactiveMongoComponents with MongoUtilities {
 
   def clusters = database.map(_.collection[JSONCollection]("clusters"))
@@ -25,7 +25,7 @@ class Cluster @Inject()(val reactiveMongoApi: ReactiveMongoApi,val storage:DataS
   def dataCenters = database.map(_.collection[JSONCollection]("datacenters"))
 
   def insertAmbari(ambari: Ambari): Future[Boolean] = {
-    clusters.flatMap(_.find(Json.obj("host" -> ambari.host)).one[JsObject].flatMap { cluster =>
+    clusters.flatMap(_.find(Json.obj("host" -> ambari.host,"dataCenter"->ambari.dataCenter)).one[JsObject].flatMap { cluster =>
       cluster.map { exists =>
         Future.failed(new DataPlaneError("Cluster exists"))
       }.getOrElse {
@@ -62,6 +62,8 @@ class Cluster @Inject()(val reactiveMongoApi: ReactiveMongoApi,val storage:DataS
   def create = Authenticated.async(parse.json) { req =>
     req.body.validate[Ambari].map { ambari =>
       insertAmbari(ambari).map{ b=>
+        //poll data
+        ambariSync.clusterAdded
         Ok(JsonResponses.statusOk)
       }.recoverWith {
         case e: DataPlaneError =>
