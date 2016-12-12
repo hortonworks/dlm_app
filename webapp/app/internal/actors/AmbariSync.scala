@@ -6,14 +6,16 @@ import java.util.Base64
 import akka.actor.{Actor, ActorLogging}
 import com.hw.dp.service.api.Poll
 import com.hw.dp.service.cluster._
+import internal.DataPlaneError
 import internal.persistence.DataStorage
+import play.api.Logger
 import play.api.libs.json.JsObject
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AmbariSynchroniser(val ambari:Ambari,val storage:DataStorage,ws: WSClient) extends Actor with ActorLogging {
+class AmbariSync(val ambari:Ambari, val storage:DataStorage, ws: WSClient) extends Actor with ActorLogging {
 
   val clustersApi = "api/v1/clusters"
   val prefix =  s"${ambari.protocol}://${ambari.host}:${ambari.port}/"
@@ -54,22 +56,31 @@ class AmbariSynchroniser(val ambari:Ambari,val storage:DataStorage,ws: WSClient)
                       val diskInfo = (hostNode \ "disk_info").validate[List[Map[String, String]]].map(s => s).getOrElse(List[Map[String, String]]())
                       val diskInfoes: List[DiskInfo] = diskInfo.map(di => DiskInfo(di.get("available"), di.get("device"), di.get("used"), di.get("percentage"), di.get("size"), di.get("mountpoint")))
                       val newHost = Host(host.get("host_name").get, clusterName.get, ambari.host, state, status, ip, cpus, Some(diskInfoes))
-                      storage.createOrUpdateHost(newHost).map(wrh => log.info(s"Writing host ${wrh}"))
+                      storage.updateAllHosts(newHost).map(wrh => log.info(s"Writing host ${wrh}"))
                     }
                   }
                 }
                 //  get Uptime from NameNode
                 val nameNodeResponse = getWs(s"${clustersApi}/${clusterName.get}/${nameNodeApi}").get()
                 nameNodeResponse.map { nnr =>
-                  val startTime = (nnr.json \ "ServiceComponentInfo" \ "StartTime").validate[Long].map(l => l).getOrElse(0L)
-                  val nameNodeInfo = NameNode(clusterName.get, ambari.host, startTime)
-                  //TODO:Get NameNodeInfo
+                  val serviceComponent = nnr.json \ "ServiceComponentInfo"
+                  val startTime = (serviceComponent \ "StartTime").validate[Long].map(l => l).getOrElse(0L)
+                  val capacityUsed = (serviceComponent \ "CapacityUsed").validate[Long].map(l => l).getOrElse(0L)
+                  val capacityRemaining = (serviceComponent \ "CapacityRemaining").validate[Long].map(l => l).getOrElse(0L)
+                  val usedPercentage = (serviceComponent \ "PercentUsed").validate[Double].map(l => l).getOrElse(0.0)
+                  val totalFiles = (serviceComponent \ "TotalFiles").validate[Long].map(l => l).getOrElse(0L)
+                  val nameNodeInfo = NameNode(clusterName.get, ambari.host, startTime,capacityUsed,capacityRemaining,usedPercentage,totalFiles)
+                  storage.updateNameNodeInfo(nameNodeInfo)
                 }
               }
             }
           }
         }
-      }.recoverWith{case e:Throwable => Future.successful(log.error("Exception at fetching rest response",e))}
+      }.recoverWith{
+        case e:Exception =>
+          Logger.error("Exception while synchronizing Ambari",e)
+          throw new DataPlaneError(e.getMessage)
+      }
   }
 
   def getWs(api: String): WSRequest = {
