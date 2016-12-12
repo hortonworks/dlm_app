@@ -23,6 +23,7 @@ class Datacenter @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage: 
   extends Controller with MongoController with ReactiveMongoComponents with MongoUtilities {
 
   def dataCenters = database.map(_.collection[JSONCollection]("datacenters"))
+  def clusters = database.map(_.collection[JSONCollection]("clusters"))
 
   def list = Authenticated.async { req =>
     Logger.info("Received request to get all data-centers")
@@ -38,43 +39,32 @@ class Datacenter @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage: 
     req.body.validate[DataCenter].map { dc =>
       val selector = Json.obj("name" -> dc.name)
       val dcenter = dataCenters.flatMap(_.find(selector).one[DataCenter])
-      dcenter.flatMap({ d=>
-          if (d.isDefined)
-            Future.successful(UnprocessableEntity(JsonResponses.statusError("Datacenter exists")))
-          else {
-            dataCenters.flatMap(_.insert(dc)).map { wr =>
-              if (wr.ok)
-                Ok(Json.obj("status"->"success", "errorcode"->0))
-              else
-                InternalServerError(JsonResponses.statusError("insert error", extractWriteError(wr)))
-            }
+      dcenter.flatMap({ d =>
+        if (d.isDefined)
+          Future.successful(UnprocessableEntity(JsonResponses.statusError("Datacenter exists")))
+        else {
+          dataCenters.flatMap(_.insert(dc)).map { wr =>
+            if (wr.ok)
+              Ok(Json.obj("status" -> "success", "errorcode" -> 0))
+            else
+              InternalServerError(JsonResponses.statusError("insert error", extractWriteError(wr)))
           }
+        }
       })
     }.getOrElse(Future.successful(BadRequest))
   }
 
 
-//  /**
-//    * Gets information for the datacenter
-//    * @param datacenter
-//    * @return
-//    */
-//  def getInformation(datacenter: String) = Authenticated.async { req =>
-//
-//
-//
-//  }
-//
+  import models.ResponseFormatters._
+  def getClusters(datacenter: String) = Authenticated.async {
+     Logger.info(s"Fetching clusters by datacenter - $datacenter")
+     storage.loadDataCenterInfo(datacenter).map{ dcd =>
+        Ok(Json.toJson(dcd))
+     }.recoverWith {
+       case e:Exception => Future.successful(InternalServerError(JsonResponses.statusError("fetch error",e.getMessage)))
+     }
 
-
-
-
-
-
-
-
-
-
+  }
 
 
 }

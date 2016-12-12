@@ -2,6 +2,7 @@ package internal.persistence
 
 import com.google.inject.{Inject, Singleton}
 import com.hw.dp.service.cluster._
+import models.DataCenterDetail
 import play.api.libs.json.Json
 import reactivemongo.api.{Cursor, MongoDriver}
 import reactivemongo.core.nodeset.Authenticate
@@ -111,5 +112,43 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
       collection.flatMap(_.insert(metric))
     })
 
+  }
+
+  private def getAllNodesHealth(clusters: List[Ambari]):Future[Seq[Host]] = {
+    val hosts = clusters.map(_.host)
+    val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("hostinfo"))
+    val selector = Json.obj("ambariHost" -> Json.obj("$in"-> hosts))
+    collection.flatMap(_.find(selector).cursor[Host]().collect[List](maxDocs = 0, Cursor.FailOnError[List[Host]]()))
+  }
+
+  private def getNameNodeStats(clusters: List[Ambari]) = {
+    val hosts = clusters.map(_.host)
+    val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("namenodeinfo"))
+    val selector = Json.obj("ambariHost" -> Json.obj("$in"-> hosts))
+    collection.flatMap(_.find(selector).cursor[NameNode]().collect[List](maxDocs = 0, Cursor.FailOnError[List[NameNode]]()))
+  }
+
+  private def getLoadAverage(clusters: List[Ambari]) = {
+    val hosts = clusters.map(_.host)
+    val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("clustermetrics"))
+    val selector = Json.obj("ambariHost" -> Json.obj("$in"-> hosts))
+    collection.flatMap(_.find(selector).cursor[ClusterMetric]().collect[List](maxDocs = 0, Cursor.FailOnError[List[ClusterMetric]]()).map{ metrics =>
+      ((metrics.map(_.loadAvg).sum)/metrics.size) * 100
+    })
+
+  }
+
+  override def loadDataCenterInfo(datacenter: String): Future[DataCenterDetail] = {
+    Logger.info(s"Loading datacenter information for DC - ${datacenter}")
+    val selector = Json.obj("dataCenter" -> datacenter)
+    val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("clusters"))
+    for{
+      clusters <-  collection.flatMap(_.find(selector).cursor[Ambari]().collect[List](maxDocs = 0, Cursor.FailOnError[List[Ambari]]()))
+      nodeList <- getAllNodesHealth(clusters)
+      nameNodes <- getNameNodeStats(clusters)
+      loadAvg <- getLoadAverage(clusters)
+    } yield{
+      DataCenterDetail(nodeList,nameNodes,loadAvg,clusters.size)
+    }
   }
 }
