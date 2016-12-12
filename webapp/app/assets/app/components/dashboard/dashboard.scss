@@ -23,41 +23,38 @@
     color: #898989;
 }
 
->>> .demo-card-wide.mdl-card {
-     width: 256px;
-     background: #D0D0D0;
-     display: table;
-     min-height: 100px;
- }
->>> .demo-card-wide > .mdl-card__title {
+>>> {
+  .demo-card-wide.mdl-card {
+    width: 256px;
+    background: #D0D0D0;
+    display: table;
+    min-height: 100px;
+  }
+  .demo-card-wide > .mdl-card__title {
     height: 176px;
-}
->>> .demo-card-wide > .mdl-card__menu {
+  }
+  .demo-card-wide > .mdl-card__menu {
     color: #fff;
-}
-
->>> .card-table
-{
+  }
+  .card-table
+  {
     background: #FFFFFF;
     font-size: 12px;
     width: 100%;
     border-radius: 4px;
-}
-
->>> .card-table-cell {
+  }
+  .card-table-cell {
     border-bottom: 1px solid #D0D0D0;
     padding: 4px 25px;
-}
-
->>> .card-padding {
+  }
+  .card-padding {
     padding: 0.2em;
-}
-
->>> .card-super-text {
+  }
+  .card-super-text {
     font-size: 12px;
-}
-
->>> .card-title-text {
+  }
+  .card-title-text {
     font-size: 18px;
     font-weight: 500;
+  }
 }

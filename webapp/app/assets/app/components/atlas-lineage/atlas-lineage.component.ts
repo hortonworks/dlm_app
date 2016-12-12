@@ -46,17 +46,17 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit {
             })
             .setDefaultEdgeLabel(function() {
                 return {};
-        });
+            });
 
-       this.atlasLineageService.getInputData().subscribe(atlasLineageData => {
-           this.inputData = atlasLineageData;
-           this.generateData(this.inputData, 'input');
-           this.atlasLineageService.getOutputData().subscribe(atlasLineageData => {
-               this.outputData = atlasLineageData;
-               this.generateData(this.outputData, 'output');
-               this.outputState = true;
-           });
-       });
+        this.atlasLineageService.getInputData().subscribe(atlasLineageData => {
+            this.inputData = atlasLineageData;
+            this.generateData(this.inputData, 'input');
+            this.atlasLineageService.getOutputData().subscribe(atlasLineageData => {
+                this.outputData = atlasLineageData;
+                this.generateData(this.outputData, 'output');
+                this.outputState = true;
+            });
+        });
     }
 
     generateData(inputData: AtlasLineage, type: string) {
@@ -209,14 +209,16 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit {
         }
     }
 
-    unique(a: []) {
+    unique(a: any[]) {
         let temp = {};
         let r = [];
 
         for (let i = 0; i < a.length; i++) {
             temp[a[i]] = true;
         }
-        for (let k of temp) {
+        for (let k of Object.keys(temp)
+
+            ) {
             r.push(k);
         }
         return r;
@@ -306,6 +308,9 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit {
                                 }
                             }
                         }
+                        else {
+                            return '';
+                        }
                     }).attr('x', '-12px')
                     .attr('y', '-12px')
                     .attr('width', '24px')
@@ -335,7 +340,6 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit {
             }
 
             function interpolateZoom(translate, scale) {
-                let self = this;
                 return d3.transition().duration(350).tween('zoom', function() {
                     let iTranslate = d3.interpolate(zoom.translate(), translate),
                         iScale = d3.interpolate(zoom.scale(), scale);
@@ -406,11 +410,11 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit {
                     tooltip.hide(d);
                     // let urlForTab = window.location.hash.split('/')[1];
 
-                    Utils.setUrl({
-                        url: '#!/detailPage/' + d,
-                        mergeBrowserUrl: false,
-                        trigger: true
-                    });
+                    // Utils.setUrl({
+                    //     url: '#!/detailPage/' + d,
+                    //     mergeBrowserUrl: false,
+                    //     trigger: true
+                    // });
                 })
                 .on('mouseout', function(d) {
                     tooltip.hide(d);

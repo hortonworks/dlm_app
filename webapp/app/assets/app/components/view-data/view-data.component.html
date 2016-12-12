@@ -61,28 +61,7 @@
             <div id="mapcontainer-replication" class="dataplane-be-together-section mdl-typography--text-center dotted"> </div>
 
             <h6> Policies </h6>
-            <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
-                <thead>
-                <tr>
-                    <th class="mdl-data-table__cell--non-numeric">POLICY ID</th>
-                    <th class="mdl-data-table__cell--non-numeric">POLICY NAME</th>
-                    <th class="mdl-data-table__cell--non-numeric">STATUS</th>
-                    <th class="mdl-data-table__cell--non-numeric">AUDIT LOGGING</th>
-                    <th class="mdl-data-table__cell--non-numeric">GROUPS</th>
-                    <th class="mdl-data-table__cell--non-numeric">USERS</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr *ngFor="let schema of schemaData">
-                    <td class="mdl-data-table__cell--non-numeric">{{ schema.name }}</td>
-                    <td class="mdl-data-table__cell--non-numeric">{{ schema.owner }}</td>
-                    <td class="mdl-data-table__cell--non-numeric">{{ schema.name }}</td>
-                    <td class="mdl-data-table__cell--non-numeric">{{ schema.owner }}</td>
-                    <td class="mdl-data-table__cell--non-numeric">{{ schema.type }}</td>
-                    <td class="mdl-data-table__cell--non-numeric">{{ schema.tags }}</td>
-                </tr>
-                </tbody>
-            </table>
+            <ranger-policies> </ranger-policies>
 
         </div>
 

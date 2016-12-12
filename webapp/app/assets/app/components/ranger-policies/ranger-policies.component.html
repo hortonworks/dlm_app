@@ -1,0 +1,22 @@
+<table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
+    <thead>
+    <tr>
+        <th class="mdl-data-table__cell--non-numeric">POLICY ID</th>
+        <th class="mdl-data-table__cell--non-numeric">POLICY NAME</th>
+        <th class="mdl-data-table__cell--non-numeric">STATUS</th>
+        <th class="mdl-data-table__cell--non-numeric">AUDIT LOGGING</th>
+        <th class="mdl-data-table__cell--non-numeric">GROUPS</th>
+        <th class="mdl-data-table__cell--non-numeric">USERS</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let policy of policesData">
+        <td class="mdl-data-table__cell--non-numeric">{{ policy.id }}</td>
+        <td class="mdl-data-table__cell--non-numeric">{{ policy.name }}</td>
+        <td class="mdl-data-table__cell--non-numeric">{{ policy.status }}</td>
+        <td class="mdl-data-table__cell--non-numeric">{{ policy.auditLogging }}</td>
+        <td class="mdl-data-table__cell--non-numeric">{{ policy.groups }}</td>
+        <td class="mdl-data-table__cell--non-numeric">{{ policy.users }}</td>
+    </tr>
+    </tbody>
+</table>
