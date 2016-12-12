@@ -22,7 +22,7 @@ export class DataCenter {
 
     constructor() {
         this.location = new Location();
-        this.deployedAt = 'ON PREM';
+        this.deployedAt = 'ON-PREMISE';
     }
 
     public static getDataByName(name: string): DataCenter {

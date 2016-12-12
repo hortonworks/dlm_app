@@ -16,13 +16,6 @@ class DataPersister @Inject()(storage:DataStorage) extends Actor{
 
   override def receive: Receive = {
 
-    case SaveService(service) => {
-      storage.addService(service).map { wr =>
-        Logger.debug(s"Added service ${service} with result ${wr}")
-      }
-    }
-
-
     case SaveServiceComponent(component) => {
       storage.addComponent(component).map { wr =>
         Logger.debug(s"Added component ${component} with result ${component}")

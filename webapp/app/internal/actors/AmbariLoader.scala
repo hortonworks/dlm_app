@@ -3,7 +3,9 @@ package internal.actors
 import akka.actor.{Actor, ActorLogging, ActorRef, PoisonPill, Props}
 import com.hw.dp.service.api.Poll
 import com.hw.dp.service.cluster.Ambari
+import internal.DataPlaneError
 import internal.persistence.DataStorage
+import play.api.Logger
 import play.api.libs.ws.WSClient
 
 import scala.collection.mutable
@@ -25,7 +27,7 @@ class AmbariLoader(storage: DataStorage, ws: WSClient) extends Actor with ActorL
       ambari.map { list =>
         list.foreach { ambari =>
           if (!map.contains(ambari.host)) {
-            val actorRef: ActorRef = context.actorOf(Props(classOf[AmbariSynchroniser], ambari, storage, ws))
+            val actorRef: ActorRef = context.actorOf(Props(classOf[AmbariSync], ambari, storage, ws))
             map.put(ambari.host, actorRef)
           }
           map.get(ambari.host).map { ref =>
@@ -45,6 +47,10 @@ class AmbariLoader(storage: DataStorage, ws: WSClient) extends Actor with ActorL
           }
         }
         buffer.clear()
+      }.recoverWith{
+        case e:Exception =>
+          Logger.error("Exception while synchronizing Ambari",e)
+          throw new DataPlaneError(e.getMessage)
       }
   }
 }

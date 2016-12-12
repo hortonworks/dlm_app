@@ -1,27 +1,11 @@
 package com.hw.dp.service.cluster
 
-import java.util.Date
-
-import play.api.libs.json.{JsObject, Json, OWrites, Writes}
+import play.api.libs.json.Json
 
 /**
   * Uses implicit marco formats which are resolved at compile time, the order of these lines needs to be maintained
   */
 object Formatters {
-
-  implicit class OWritesExt[A](owrites: OWrites[A]) {
-
-
-    def withConstant[B : Writes](key: String, value: B): OWrites[A] =
-    withValue(key, _ => value)
-
-    def withValue[B : Writes](key: String, value: A => B): OWrites[A] =
-
-    new OWrites[A] {
-      def writes(a: A): JsObject = owrites.writes(a) ++ Json.obj(key -> value(a))
-    }
-
-  }
 
   // Attach a last updated field to the serialized JSON, this is used by the clean up job to remove stale entries
 
@@ -39,30 +23,38 @@ object Formatters {
 
   implicit val ambariReads = Json.reads[Ambari]
 
-  implicit val ambariWrites = Json.writes[Ambari].withConstant("lastUpdated",new Date().getTime)
+  implicit val ambariWrites = Json.writes[Ambari]
 
   implicit val dataCenterReads = Json.reads[DataCenter]
 
-  implicit val dataCenterWrites = Json.writes[DataCenter].withConstant("lastUpdated",new Date().getTime)
+  implicit val dataCenterWrites = Json.writes[DataCenter]
 
   implicit val diskInfoReads = Json.reads[DiskInfo]
 
-  implicit val diskInfoReadsWrites = Json.writes[DiskInfo].withConstant("lastUpdated",new Date().getTime)
+  implicit val diskInfoReadsWrites = Json.writes[DiskInfo]
 
   implicit val clusterReads = Json.reads[Cluster]
 
-  implicit val clusterWrites = Json.writes[Cluster].withConstant("lastUpdated",new Date().getTime)
+  implicit val clusterWrites = Json.writes[Cluster]
+
+  implicit val nameNodeReads = Json.reads[NameNode]
+
+  implicit val nameNodeWrites = Json.writes[NameNode]
+
+  implicit val metricsReads = Json.reads[ClusterMetric]
+
+  implicit val metricsWrites = Json.writes[ClusterMetric]
 
   implicit val hostReads = Json.reads[Host]
 
-  implicit val HostWrites = Json.writes[Host].withConstant("lastUpdated",new Date().getTime)
+  implicit val HostWrites = Json.writes[Host]
 
   implicit val serviceReads = Json.reads[Service]
 
-  implicit val serviceWrites = Json.writes[Service].withConstant("lastUpdated",new Date().getTime)
+  implicit val serviceWrites = Json.writes[Service]
 
   implicit val serviceComponentReads = Json.reads[ServiceComponent]
 
-  implicit val serviceComponentWrites = Json.writes[ServiceComponent].withConstant("lastUpdated",new Date().getTime)
+  implicit val serviceComponentWrites = Json.writes[ServiceComponent]
 
 }

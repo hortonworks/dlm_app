@@ -15,13 +15,12 @@ class ServiceSync(val storage: DataStorage, ws: WSClient,dataPersister: ActorRef
   val componentApi = "components"
 
   override def receive: Receive = {
-    // load each cluster and start fetching the services
+    // load each cluster and start fetching components
     // There may be an initial delay in loading data till
     // the clusters have been synced into the system
 
     case Poll() =>
       //look up all clusters for all synced registered Ambari's
-
       storage.loadClusterInfos().map { ambariClusters =>
         ambariClusters.map { ac =>
           val baseUrl = s"${ac.ambari.protocol}://${ac.ambari.host}:${ac.ambari.port}/api/v1/clusters"
@@ -41,9 +40,7 @@ class ServiceSync(val storage: DataStorage, ws: WSClient,dataPersister: ActorRef
                     val hosts = (compRes.json \ "host_components" \\ "HostRoles").map(_.validate[Map[String, String]].map(m => m).getOrElse(Map[String, String]()))
                     val state = (compRes.json \ "ServiceComponentInfo" \ "status").validate[String].map(s => s).getOrElse("STARTED")
                     val hostList = hosts.map(m => m("host_name"))
-                    val serviceToAdd = Service(component("service_name"), cl.name, cl.ambariHost)
                     val componentToAdd = ServiceComponent(component("component_name"), component("service_name"), cl.name, cl.ambariHost, state, hostList)
-                    dataPersister ! SaveService(serviceToAdd)
                     dataPersister ! SaveServiceComponent(componentToAdd)
                   }
                 }

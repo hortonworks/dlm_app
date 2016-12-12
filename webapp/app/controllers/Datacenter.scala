@@ -52,4 +52,29 @@ class Datacenter @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage: 
       })
     }.getOrElse(Future.successful(BadRequest))
   }
+
+
+//  /**
+//    * Gets information for the datacenter
+//    * @param datacenter
+//    * @return
+//    */
+//  def getInformation(datacenter: String) = Authenticated.async { req =>
+//
+//
+//
+//  }
+//
+
+
+
+
+
+
+
+
+
+
+
+
 }
