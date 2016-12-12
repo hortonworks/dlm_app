@@ -34,7 +34,7 @@ class AmbariSync(val ambari:Ambari, val storage:DataStorage, ws: WSClient) exten
           item.map { map =>
             // get host information
             val clusterName = map.get("cluster_name")
-            val cluster: Cluster = Cluster(clusterName.get, map.get("version").get, ambari.host)
+            val cluster: Cluster = Cluster(clusterName.get, map.get("version").get, ambari.host,ambari.dataCenter)
             log.info(s"Discovered cluster ${cluster}")
             val hostsPath: String = s"${clustersApi}/${clusterName.get}/${hostsApi}"
             storage.createOrUpdateCluster(cluster).map { wr =>
@@ -55,7 +55,7 @@ class AmbariSync(val ambari:Ambari, val storage:DataStorage, ws: WSClient) exten
                       val ip = (hostNode \ "ip").validate[String].map(s => s).getOrElse("")
                       val diskInfo = (hostNode \ "disk_info").validate[List[Map[String, String]]].map(s => s).getOrElse(List[Map[String, String]]())
                       val diskInfoes: List[DiskInfo] = diskInfo.map(di => DiskInfo(di.get("available"), di.get("device"), di.get("used"), di.get("percentage"), di.get("size"), di.get("mountpoint")))
-                      val newHost = Host(host.get("host_name").get, clusterName.get, ambari.host, state, status, ip, cpus, Some(diskInfoes))
+                      val newHost = Host(host.get("host_name").get, clusterName.get, ambari.host, ambari.dataCenter,state, status, ip, cpus, Some(diskInfoes))
                       storage.updateAllHosts(newHost).map(wrh => log.info(s"Writing host ${wrh}"))
                     }
                   }
@@ -69,7 +69,7 @@ class AmbariSync(val ambari:Ambari, val storage:DataStorage, ws: WSClient) exten
                   val capacityRemaining = (serviceComponent \ "CapacityRemaining").validate[Long].map(l => l).getOrElse(0L)
                   val usedPercentage = (serviceComponent \ "PercentUsed").validate[Double].map(l => l).getOrElse(0.0)
                   val totalFiles = (serviceComponent \ "TotalFiles").validate[Long].map(l => l).getOrElse(0L)
-                  val nameNodeInfo = NameNode(clusterName.get, ambari.host, startTime,capacityUsed,capacityRemaining,usedPercentage,totalFiles)
+                  val nameNodeInfo = NameNode(clusterName.get, ambari.host, ambari.dataCenter,startTime,capacityUsed,capacityRemaining,usedPercentage,totalFiles)
                   storage.updateNameNodeInfo(nameNodeInfo)
                 }
               }

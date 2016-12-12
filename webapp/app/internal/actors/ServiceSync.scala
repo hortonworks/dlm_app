@@ -6,10 +6,12 @@ import java.util.Base64
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import com.hw.dp.service.api.Poll
 import com.hw.dp.service.cluster.{Ambari, Service, ServiceComponent}
+import internal.DataPlaneError
 import internal.persistence.{DataStorage, SaveService, SaveServiceComponent}
 import play.api.libs.ws.{WSClient, WSRequest}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 class ServiceSync(val storage: DataStorage, ws: WSClient,dataPersister: ActorRef) extends Actor with ActorLogging {
 
   val componentApi = "components"
@@ -40,7 +42,7 @@ class ServiceSync(val storage: DataStorage, ws: WSClient,dataPersister: ActorRef
                     val hosts = (compRes.json \ "host_components" \\ "HostRoles").map(_.validate[Map[String, String]].map(m => m).getOrElse(Map[String, String]()))
                     val state = (compRes.json \ "ServiceComponentInfo" \ "status").validate[String].map(s => s).getOrElse("STARTED")
                     val hostList = hosts.map(m => m("host_name"))
-                    val componentToAdd = ServiceComponent(component("component_name"), component("service_name"), cl.name, cl.ambariHost, state, hostList)
+                    val componentToAdd = ServiceComponent(component("component_name"), component("service_name"), cl.name, cl.ambariHost,cl.dataCenter, state, hostList)
                     dataPersister ! SaveServiceComponent(componentToAdd)
                   }
                 }
@@ -48,6 +50,8 @@ class ServiceSync(val storage: DataStorage, ws: WSClient,dataPersister: ActorRef
             }
           }
         }
+      }.recoverWith{
+        case e:Exception => throw e
       }
   }
 

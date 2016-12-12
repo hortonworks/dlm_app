@@ -30,7 +30,9 @@ class Datacenter @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage: 
     dataCenters.flatMap(_.find(Json.obj()).cursor[DataCenter]().collect[List](maxDocs = 0, Cursor.FailOnError[List[DataCenter]]()).flatMap { clusterList =>
       Logger.info(s"Fetched ${clusterList.size} data centers")
       Future.successful(Ok(Json.toJson(clusterList)))
-    })
+    }).recoverWith {
+      case e:Exception => Future.successful(InternalServerError(JsonResponses.statusError("fetch error",e.getMessage)))
+    }
   }
 
 
@@ -50,7 +52,9 @@ class Datacenter @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage: 
               InternalServerError(JsonResponses.statusError("insert error", extractWriteError(wr)))
           }
         }
-      })
+      }).recoverWith {
+        case e:Exception => Future.successful(InternalServerError(JsonResponses.statusError("create error",e.getMessage)))
+      }
     }.getOrElse(Future.successful(BadRequest))
   }
 

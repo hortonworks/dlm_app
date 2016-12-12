@@ -38,25 +38,21 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
 
   override def createOrUpdateCluster(cluster: Cluster): Future[WriteResult] = {
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("clusterinfo"))
-    val selector = Json.obj("name" -> cluster.name, "ambariHost" -> cluster.ambariHost)
-    collection.flatMap(_.find(selector).one[Cluster].flatMap { cOpt =>
-      cOpt.map { c =>
-        // exists // just update
-        collection.flatMap(_.update(selector, cluster))
-      }.getOrElse {
-        collection.flatMap(_.insert(cluster))
-      }
+    val selector = Json.obj("name" -> cluster.name, "ambariHost" -> cluster.ambariHost,"dataCenter"->cluster.dataCenter)
+    collection.flatMap(_.remove(selector).flatMap { dr =>
+      Logger.info(s"Deleted cluster ${cluster} - status ${dr.ok}")
+      collection.flatMap(_.insert(cluster))
     })
   }
 
   override def updateAllHosts(host: Host): Future[WriteResult] = {
 
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("hostinfo"))
-    val selector = Json.obj("name" -> host.name, "clusterName" -> host.clusterName, "ambariHost" -> host.ambariHost)
+    val selector = Json.obj("name" -> host.name, "clusterName" -> host.clusterName, "ambariHost" -> host.ambariHost,"dataCenter"->host.dataCenter)
 
     // delete existing host
     collection.flatMap(_.remove(selector).flatMap { dr =>
-      Logger.info(s"Deleted host {host} - status ${dr.ok}")
+      Logger.info(s"Deleted host ${host} - status ${dr.ok}")
       collection.flatMap(_.insert(host))
     })
   }
@@ -76,7 +72,7 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
 
   override def addComponent(component: ServiceComponent): Future[WriteResult] = {
     Logger.debug(s"Inserting component ${component}")
-    val selector = Json.obj("name" -> component.name, "clusterName" -> component.clusterName, "ambariHost" -> component.ambariHost)
+    val selector = Json.obj("name" -> component.name, "clusterName" -> component.clusterName, "ambariHost" -> component.ambariHost,"dataCenter"->component.dataCenter)
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("components"))
 
     // Delete old service info and insert again
@@ -89,7 +85,7 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
   override def updateNameNodeInfo(nameNodeInfo: NameNode): Future[WriteResult] = {
     Logger.debug(s"Inserting name node information ${nameNodeInfo}")
 
-    val selector = Json.obj("clusterName" -> nameNodeInfo.clusterName, "ambariHost" -> nameNodeInfo.ambariHost)
+    val selector = Json.obj("clusterName" -> nameNodeInfo.clusterName, "ambariHost" -> nameNodeInfo.ambariHost,"dataCenter"->nameNodeInfo.dataCenter)
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("namenodeinfo"))
 
     // Delete old service info and insert again
@@ -104,7 +100,7 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
 
     Logger.debug(s"Inserting metric information ${metric}")
 
-    val selector = Json.obj("clusterName" -> metric.clusterName, "ambariHost" -> metric.ambariHost)
+    val selector = Json.obj("clusterName" -> metric.clusterName, "ambariHost" -> metric.ambariHost,"dataCenter"->metric.dataCenter)
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("clustermetrics"))
 
     // Delete old service info and insert again
