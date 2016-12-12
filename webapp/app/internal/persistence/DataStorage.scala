@@ -1,12 +1,16 @@
 package internal.persistence
 
 import com.hw.dp.service.cluster._
+import models.DataCenterDetail
 import reactivemongo.api.commands.WriteResult
 
 import scala.concurrent.Future
 
 
 trait DataStorage {
+
+
+  def loadDataCenterInfo(datacenter: String): Future[DataCenterDetail]
 
   def saveMetrics(metric: ClusterMetric): Future[WriteResult]
 
