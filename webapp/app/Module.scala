@@ -1,8 +1,14 @@
-import com.google.inject.AbstractModule
-import internal.AmbariSync
+import akka.actor.{ActorRef, ActorSystem, Props}
+import com.google.inject.name.Named
+import com.google.inject.{AbstractModule, Provides}
+import com.hw.dp.services.atlas.AtlasHiveApi
+import internal.{AmbariSync, AtlasApiCache}
 import internal.auth.{MongoUserStorage, UserStorage}
 import internal.persistence._
+import play.api.Configuration
 import reactivemongo.api.MongoDriver
+
+import scala.concurrent.Future
 
 class Module extends AbstractModule {
   def configure() = {
@@ -11,6 +17,13 @@ class Module extends AbstractModule {
       bind(classOf[DataStorage]).to(classOf[MongoDataStorage]).asEagerSingleton()
       bind(classOf[MongoDriver]).toInstance(new MongoDriver())
       bind(classOf[UserStorage]).to(classOf[MongoUserStorage]).asEagerSingleton()
+  }
+
+
+  @Provides
+  @Named("atlasApiCache")
+  def provideApiCache(configuration: Configuration,actorSystem: ActorSystem):ActorRef = {
+    actorSystem.actorOf(Props(classOf[AtlasApiCache], configuration, actorSystem),"atlasApiCache")
   }
 
 
