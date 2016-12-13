@@ -110,24 +110,24 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
 
   }
 
-  private def getAllNodesHealth(clusters: List[Ambari]): Future[Seq[Host]] = {
+  private def getAllNodesHealth(clusters: List[Ambari],datacenter:String): Future[Seq[Host]] = {
     val hosts = clusters.map(_.host)
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("hostinfo"))
-    val selector = Json.obj("ambariHost" -> Json.obj("$in" -> hosts))
+    val selector = Json.obj("ambariHost" -> Json.obj("$in" -> hosts),"dataCenter" -> datacenter)
     collection.flatMap(_.find(selector).cursor[Host]().collect[List](maxDocs = 0, Cursor.FailOnError[List[Host]]()))
   }
 
-  private def getNameNodeStats(clusters: List[Ambari]) = {
+  private def getNameNodeStats(clusters: List[Ambari],datacenter:String) = {
     val hosts = clusters.map(_.host)
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("namenodeinfo"))
-    val selector = Json.obj("ambariHost" -> Json.obj("$in" -> hosts))
+    val selector = Json.obj("ambariHost" -> Json.obj("$in" -> hosts),"dataCenter" -> datacenter)
     collection.flatMap(_.find(selector).cursor[NameNode]().collect[List](maxDocs = 0, Cursor.FailOnError[List[NameNode]]()))
   }
 
-  private def getLoadAverage(clusters: List[Ambari]) = {
+  private def getLoadAverage(clusters: List[Ambari],datacenter:String) = {
     val hosts = clusters.map(_.host)
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("clustermetrics"))
-    val selector = Json.obj("ambariHost" -> Json.obj("$in" -> hosts))
+    val selector = Json.obj("ambariHost" -> Json.obj("$in" -> hosts),"dataCenter" -> datacenter)
     collection.flatMap(_.find(selector).cursor[ClusterMetric]().collect[List](maxDocs = 0, Cursor.FailOnError[List[ClusterMetric]]()).map { metrics =>
       ((metrics.map(_.loadAvg).sum) / metrics.size) * 100
     })
@@ -140,9 +140,9 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("clusters"))
     for {
       clusters <- collection.flatMap(_.find(selector).cursor[Ambari]().collect[List](maxDocs = 0, Cursor.FailOnError[List[Ambari]]()))
-      nodeList <- getAllNodesHealth(clusters)
-      nameNodes <- getNameNodeStats(clusters)
-      loadAvg <- getLoadAverage(clusters)
+      nodeList <- getAllNodesHealth(clusters,datacenter)
+      nameNodes <- getNameNodeStats(clusters,datacenter)
+      loadAvg <- getLoadAverage(clusters,datacenter)
     } yield {
       DataCenterDetail(nodeList, nameNodes, loadAvg, clusters.size)
     }
