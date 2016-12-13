@@ -1,11 +1,14 @@
 package com.hw.dp.services.atlas
 
 import com.hw.dp.services.atlas.Hive.{Result, SearchResult}
+import play.api.libs.json.JsValue
 
 import scala.concurrent.Future
 import scala.util.Try
 
-case class Atlas(restUrl:String)
+case class Atlas(restUrl: String)
+
+case class Lineage(inputs: String, outputs: String, schema: String)
 
 trait AtlasHiveApi {
 
@@ -21,13 +24,15 @@ trait AtlasHiveApi {
 
   /**
     * Clients can call this method to check the availability of the cache
+    *
     * @return True if cache ready
     */
-  def cacheWarmed:Boolean
+  def cacheWarmed: Boolean
 
 
   /**
     * Look up a hive table using the Atlas API
+    *
     * @param tableName
     * @return search result
     */
@@ -35,6 +40,7 @@ trait AtlasHiveApi {
 
   /**
     * Load all hive tables
+    *
     * @return Search result
     */
   def allHiveTables: Try[SearchResult]
@@ -43,16 +49,33 @@ trait AtlasHiveApi {
     * A quicker version of the table lookup which relies on the underlying
     * cache for getting the table information, clients should try to load
     * table information using this method first.
+    *
     * @param tableName
     * @return
     */
-  def fastFindHiveTable(tableName: String) : Option[Result]
+  def fastFindHiveTable(tableName: String): Option[Result]
 
   /**
     * Load all tables from the cache
+    *
     * @return
     */
-  def fastLoadAllTables:Seq[Result]
+  def fastLoadAllTables: Seq[Result]
+
+  /**
+    * Get raw Entity information
+    *
+    * @return
+    */
+  def getEntity(guid: String): JsValue
+
+
+  /**
+    * Get Lineage
+    * @param guid
+    * @return
+    */
+  def getLineage(guid: String): Future[Lineage]
 
 
 }
