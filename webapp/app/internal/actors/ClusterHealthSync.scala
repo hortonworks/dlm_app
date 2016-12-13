@@ -13,6 +13,7 @@ import play.api.Logger
 import play.api.libs.ws.{WSClient, WSRequest}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Try
 
 class ClusterHealthSync(val storage: DataStorage, ws: WSClient) extends Actor with ActorLogging {
 
@@ -40,11 +41,14 @@ class ClusterHealthSync(val storage: DataStorage, ws: WSClient) extends Actor wi
                 res <- getWs(prefix,ac.ambari,api).get()
               } yield {
                 val response = res.json
-                val metrics = (response \ "metrics" \ "load" \ "1-min").as[List[List[Double]]]
+                val metrics = Try((response \ "metrics" \ "load" \ "1-min").as[List[List[Double]]]) getOrElse{
+                  Logger.error(s"Cannot parse metrics data with response ${response}")
+                  List[List[Double]]()
+                }
                 val flatList = metrics.flatten
                 val loads = flatList.zipWithIndex.collect{case (e,i)  if ((i+1)%2 != 0) => e}
-                val avgLoad = loads.map(v => v).sum / loads.size
-                val metric = ClusterMetric(cl.name,cl.ambariHost,cl.dataCenter,0L,0,0,0L)
+                val avgLoad = Try(loads.map(v => v).sum / loads.size) getOrElse(- 1.0)
+                val metric = ClusterMetric(cl.name,cl.ambariHost,cl.dataCenter,avgLoad,0,0,0L)
                 storage.saveMetrics(metric)
               }
             }
@@ -52,7 +56,7 @@ class ClusterHealthSync(val storage: DataStorage, ws: WSClient) extends Actor wi
         }
       }.recoverWith{
         case e:Exception =>
-          Logger.error("Excption while pulling Metrics",e)
+          Logger.error("Exception while pulling Metrics",e)
           throw new DataPlaneError(e.getMessage)
       }
   }
