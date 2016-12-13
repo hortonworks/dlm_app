@@ -69,6 +69,13 @@ trait AtlasHiveApi {
     */
   def getEntity(guid: String): JsValue
 
+  /**
+    * Get Audit information
+    * @param guid
+    * @return
+    */
+  def getAudit(guid:String):JsValue
+
 
   /**
     * Get Lineage

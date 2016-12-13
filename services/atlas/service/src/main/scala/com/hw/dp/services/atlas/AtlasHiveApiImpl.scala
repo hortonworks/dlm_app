@@ -211,6 +211,21 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluste
       Lineage(inputsResponse,outputsResponse,schemaResponse)
     }
   }
+
+  /**
+    * Get Audit information
+    *
+    * @param guid
+    * @return
+    */
+  override def getAudit(guid: String): JsValue = {
+    val url = s"${apiUrl}/api/atlas/entities/${guid}/audit"
+    Try {
+      val entity = new HttpEntity[String](headers)
+      val response = template.exchange(url, HttpMethod.GET, entity, classOf[String])
+      Json.parse(response.getBody)
+    } getOrElse(Json.obj())
+  }
 }
 
 sealed class TableCacheLoader(atlasApi: AtlasHiveApi) extends CacheLoader[String, Result] {

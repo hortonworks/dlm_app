@@ -44,6 +44,15 @@ class Atlas @Inject() ( @Named("atlasApiCache") val atlasApiCache:ActorRef,stora
     }
   }
 
+  def getAudit(clusterHost:String,datacenter:String,guid:String) = Authenticated.async { req =>
+    getApi(clusterHost, datacenter).map { api =>
+      val entity = api.getAudit(guid)
+      Ok(entity)
+    }.recoverWith{
+      case e:Exception => fetchError(e)
+    }
+  }
+
 
   def getLineage(clusterHost:String,datacenter:String,guid:String) = Authenticated.async { req =>
     getApi(clusterHost, datacenter).flatMap { api =>

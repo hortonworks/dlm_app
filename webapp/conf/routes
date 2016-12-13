@@ -26,6 +26,7 @@ GET         /api/datacenters/atlas/tables          controllers.Atlas.getAllTable
 GET         /api/datacenters/atlas/table           controllers.Atlas.getTableDefinition(clusterHost,dc,table,cached)
 GET         /api/datacenters/atlas/entity          controllers.Atlas.getEntity(clusterHost,dc,guid)
 GET         /api/datacenters/atlas/lineage         controllers.Atlas.getLineage(clusterHost,dc,guid)
+GET         /api/datacenters/atlas/audit         controllers.Atlas.getAudit(clusterHost,dc,guid)
 
 
 
