@@ -17,26 +17,52 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import akka.pattern.ask
 import akka.util.Timeout
+import play.api.cache.Cached
+
+import scala.util.Try
 
 /**
   * Get settings to show in various parts of the APP
   */
 class Atlas @Inject() ( @Named("atlasApiCache") val atlasApiCache:ActorRef,storage: DataStorage) extends Controller {
 
-
   import com.hw.dp.services.atlas.Hive._
-  def getAllTables(clusterHost:String,datacenter:String) = Authenticated.async { req =>
+  implicit val timeout = Timeout(120 seconds)
+
+
+  def getAllTables(clusterHost:String,datacenter:String,cached: String) = Authenticated.async { req =>
     getApi(clusterHost, datacenter).map { api =>
+        if(shouldUseCache(cached))
         Ok(Json.toJson(api.fastLoadAllTables))
+      else {
+        val tables = api.allHiveTables
+        val results = tables.get.results
+        Ok(Json.toJson(results.getOrElse(Seq())))
+      }
     }.recoverWith{
       case e:Exception => Future.successful(InternalServerError(JsonResponses.statusError("fetch error",e.getMessage)))
     }
   }
 
+  private def shouldUseCache(cached: String) = {
+    Try(cached.toBoolean).getOrElse(false)
+  }
 
+  def getTableDefinition(clusterHost:String, datacenter:String, table:String, cached: String) = Authenticated.async { req =>
+    getApi(clusterHost, datacenter).map { api =>
+      if(shouldUseCache(cached))
+        Ok(Json.toJson(api.fastFindHiveTable(table)))
+      else {
+        val tables = api.findHiveTable(table)
+        val results = tables.get.results
+        Ok(Json.toJson(results.getOrElse(Seq())))
+      }
+    }.recoverWith{
+      case e:Exception => Future.successful(InternalServerError(JsonResponses.statusError("fetch error",e.getMessage)))
+    }
+  }
 
   private def getApi(clusterHost: String, datacenter: String): Future[AtlasHiveApi] = {
-    implicit val timeout = Timeout(120 seconds)
     for {
       ambari <- storage.loadCluster(clusterHost, datacenter)
       cluster <- storage.loadClusterInformation(clusterHost, datacenter)

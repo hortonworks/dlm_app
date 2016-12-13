@@ -21,7 +21,10 @@ GET         /api/datacenters                       controllers.Datacenter.list
 GET         /api/datacenters/:dcName/detail        controllers.Datacenter.getClusters(dcName)
 
 #Atlas
-GET         /api/datacenters/:dcName/atlas         controllers.Atlas.getAllTables(clusterHost,dcName)
+#TODO:fix endpoints
+GET         /api/datacenters/atlas/tables          controllers.Atlas.getAllTables(clusterHost,dc,cached)
+GET         /api/datacenters/atlas/table          controllers.Atlas.getTableDefinition(clusterHost,dc,table,cached)
+
 
 
 # Map static resources from the /public folder to the /assets URL path
