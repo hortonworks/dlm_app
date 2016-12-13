@@ -15,7 +15,6 @@ import scala.concurrent.Future
 
 case class GetApi(ambari: Ambari, cluster: Cluster)
 
-@Singleton
 class AtlasApiCache @Inject()(configuration: Configuration, actorSystem: ActorSystem) extends Actor {
 
   private val hiveApiCache = new ConcurrentHashMap[Ambari, AtlasHiveApi]()
