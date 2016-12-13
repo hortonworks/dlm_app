@@ -120,6 +120,7 @@ object Hive {
   implicit val parameterWrites = Json.writes[Parameters]
   implicit val resultsWrites = Json.writes[Result]
   implicit val resultWrites = Json.writes[SearchResult]
+  implicit val lineageWrites = Json.writes[Lineage]
 
 
 }
