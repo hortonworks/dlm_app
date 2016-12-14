@@ -4,6 +4,7 @@ import {Observable} from 'rxjs/Observable';
 import {DataCenter} from '../models/data-center';
 import {HttpUtil} from '../shared/utils/httpUtil';
 import '../rxjs-operators';
+import {DataCenterDetails} from '../models/data-center-details';
 
 @Injectable()
 export class DataCenterService {
@@ -29,6 +30,11 @@ export class DataCenterService {
     public get():Observable<DataCenter[]> {
         return this.http.get(this.url , new RequestOptions(HttpUtil.getHeaders()))
                 .map(HttpUtil.extractData).catch(HttpUtil.handleError);
+    }
+
+    public getDetails(name: string): Observable<DataCenterDetails> {
+        return this.http.get(this.url + '/' + name + '/detail', new RequestOptions(HttpUtil.getHeaders()))
+            .map(HttpUtil.extractData).catch(HttpUtil.handleError);
     }
 
     public getByName(name: string):Observable<DataCenter> {

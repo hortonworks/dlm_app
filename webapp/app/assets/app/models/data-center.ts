@@ -3,6 +3,7 @@ import {Location} from './location';
 export class DataCenter {
     name: string;
     location: Location;
+    deployedAt: string;
 
     nodes: number;
     capacityUtilization: number;
@@ -16,7 +17,6 @@ export class DataCenter {
     noOfClusters: number;
     noOfNodes: number;
     noOfUsers: number;
-    deployedAt: string;
 
     clusters: Ambari[] = [];
 

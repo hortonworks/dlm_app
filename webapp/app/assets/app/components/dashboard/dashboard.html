@@ -33,19 +33,19 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let dataCenter of dataCenters" (click)="onDataCenterSelect(dataCenter)">
+        <tr *ngFor="let dashboardRow of dashboardRows" (click)="onDataCenterSelect(dataCenter)">
             <td class="">
-                <i class="fa fa-circle" aria-hidden="true" [ngClass]="{'green-text': dataCenter.status === 'UP', 'red-text' : dataCenter.status === 'DOWN', 'grey-text': dataCenter.status === undefined}"></i>
+                <i class="fa fa-circle" aria-hidden="true" [ngClass]="{'green-text': dashboardRow.hostStatus === 'HEALTHY', 'red-text' : dashboardRow.hostStatus === 'UNHEALTHY', 'grey-text': dashboardRow.hostStatus === ''}"></i>
             </td>
             <td class="mdl-data-table__cell--non-numeric">
-                <div class="data-center-name"> {{ dataCenter.name }} </div>
-                <div class="data-center-location"> {{ dataCenter.deployedAt}} </div>
+                <div class="data-center-name"> {{ dashboardRow.dataCenter.name }} </div>
+                <div class="data-center-location"> {{ dashboardRow.dataCenter.deployedAt}} </div>
             </td>
-            <td class="mdl-data-table__cell--non-numeric">{{ dataCenter.nodes }}</td>
-            <td class="mdl-data-table__cell--non-numeric">{{ dataCenter.capacityUtilization }}%</td>
-            <td class="mdl-data-table__cell--non-numeric">{{ dataCenter.averageJobsPerDay }}</td>
-            <td class="mdl-data-table__cell--non-numeric">{{ dataCenter.dataSize }}GB</td>
-            <td class="mdl-data-table__cell--non-numeric">${{ dataCenter.cost }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ dashboardRow.nodes }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ dashboardRow.capacityUtilization }}%</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ dashboardRow.averageJobsPerDay }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ dashboardRow.dataSize }}</td>
+            <td class="mdl-data-table__cell--non-numeric">${{ dashboardRow.cost }}</td>
         </tr>
 
 

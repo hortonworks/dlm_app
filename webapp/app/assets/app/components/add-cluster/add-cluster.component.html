@@ -3,13 +3,13 @@
     <div class="mdl-cell mdl-cell--10-col">
         <h1 class="mdl-typography--headline mdl-typography--font-light">Add Cluster</h1>
         <div class="mdl-layout-spacer"></div><div class="mdl-layout-spacer"></div>
-        <p> Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+        <div [innerHTML]="welcomeText"> </div>
 
 
         <div class="mdl-color-text--green mt-1"> <i class="fa fa-server fa-2x" aria-hidden="true"></i> <span class="mdl-typography--title mdl-typography--font-light"> Cluster Information </span> </div>
 
         <div class="mdl-typography--body-2"> Data Center </div>
-
+        <p> {{ dataCenterHelp1 }}</p>
 
         <drop-down>
             <select #dataCeneterName (change)="onDataCenterChange(dataCeneterName.value)" >
@@ -46,18 +46,17 @@
             <div class="mdl-cell mdl-cell--4-col help-text">
 
                 <i class="fa fa-lightbulb-o" aria-hidden="true"></i><span class="mdl-typography--body-2 mdl-color-text--green"> Help </span>
-                <p>Select the city and County from the drop down on the left</p>
+                <p> {{ dataCenterHelp2 }}</p>
 
             </div>
         </div>
 
         <div class="mdl-typography--body-2"> Cluster IP Address/URL </div>
         <drop-down [hidden]="dataCeneterName.value === 'new'">
-            <select #ambariSelected (change)="onAmbariSelect(ambariSelected.value)" >
-                <option value="" selected [disabled] [value]="'none'">Select</option>
+            <select #ambariSelected (change)="onAmbariSelect(ambariSelected.value)" [ngModel]="selectedAmbariHost">
                 <option value="" [value]="'new'"><< Add New Cluster >></option>
                 <option *ngFor="let ambari of ambarisInDatacenter" [value]="ambari.host">
-                    {{ ambari.protocol + '://' + ambari.host + ':' +ambari.port }}
+                    {{ getAmbariHostName(ambari) }}
                 </option>
             </select>
         </drop-down>
@@ -67,7 +66,7 @@
         <hr />
 
         <div class="mdl-color-text--green"> <i class="fa fa-lock fa-2x"></i> <span class="mdl-typography--title mdl-typography--font-light"> Login Credentials </span> </div>
-        <p> Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s. </p>
+        <p> {{ ambariHelp }} </p>
         <div class="mdl-typography--body-1"> Cluster Admin ID </div>
         <input type="text" [(ngModel)]="ambari.credentials.userName">
         <div class="mdl-typography--body-1"> Password </div>
@@ -76,7 +75,7 @@
         <hr />
 
         <div class="mdl-color-text--green"> <i class="fa fa-key fa-2x"></i> <span class="mdl-typography--title mdl-typography--font-light"> Kerberos Settings </span> </div>
-        <p> Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s. </p>
+        <p> {{ kerbarosHelp }} </p>
         <div class="mdl-typography--body-1"> Principal </div>
         <input type="text" placeholder="ambari-server@hostname.com" style="width: 100px" [(ngModel)]="ambari.credentials.properties['kerberosPrincipal']">
         <div class="mdl-typography--body-1"> Keytab </div>
