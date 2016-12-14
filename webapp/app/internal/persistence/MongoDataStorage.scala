@@ -14,6 +14,8 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.Logger
 
+import scala.util.Try
+
 @Singleton
 class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: play.api.Configuration) extends DataStorage {
 
@@ -129,7 +131,7 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("clustermetrics"))
     val selector = Json.obj("ambariHost" -> Json.obj("$in" -> hosts),"dataCenter" -> datacenter)
     collection.flatMap(_.find(selector).cursor[ClusterMetric]().collect[List](maxDocs = 0, Cursor.FailOnError[List[ClusterMetric]]()).map { metrics =>
-      ((metrics.map(_.loadAvg).sum) / metrics.size) * 100
+      Try(((metrics.map(_.loadAvg).sum) / metrics.size) * 100) getOrElse(0.0)
     })
 
   }
@@ -144,7 +146,7 @@ class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
       nameNodes <- getNameNodeStats(clusters,datacenter)
       loadAvg <- getLoadAverage(clusters,datacenter)
     } yield {
-      DataCenterDetail(nodeList, nameNodes, loadAvg, clusters.size)
+      DataCenterDetail(nodeList, nameNodes, if(loadAvg.isNaN) 0d else loadAvg, clusters.size)
     }
   }
 

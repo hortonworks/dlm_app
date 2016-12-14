@@ -65,7 +65,8 @@ class Datacenter @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage: 
      storage.loadDataCenterInfo(datacenter).map{ dcd =>
         Ok(Json.toJson(dcd))
      }.recoverWith {
-       case e:Exception => Future.successful(InternalServerError(JsonResponses.statusError("fetch error",e.getMessage)))
+       case e:Exception =>
+         Future.successful(InternalServerError(JsonResponses.statusError("Server error",e.getMessage)))
      }
 
   }
