@@ -30,7 +30,39 @@ class Atlas @Inject() ( @Named("atlasApiCache") val atlasApiCache:ActorRef,stora
   implicit val timeout = Timeout(120 seconds)
 
 
-  def getAllTables(clusterHost:String,datacenter:String,cached: String) = Authenticated.async { req =>
+
+  private def fetchError(e: Exception) = {
+    Future.successful(InternalServerError(JsonResponses.statusError("fetch error", e.getMessage)))
+  }
+
+  def getEntity(clusterHost:String,datacenter:String,guid:String) = Authenticated.async { req =>
+    getApi(clusterHost, datacenter).map { api =>
+      val entity = api.getEntity(guid)
+      Ok(entity)
+    }.recoverWith{
+      case e:Exception => fetchError(e)
+    }
+  }
+
+  def getAudit(clusterHost:String,datacenter:String,guid:String) = Authenticated.async { req =>
+    getApi(clusterHost, datacenter).map { api =>
+      val entity = api.getAudit(guid)
+      Ok(entity)
+    }.recoverWith{
+      case e:Exception => fetchError(e)
+    }
+  }
+
+
+  def getLineage(clusterHost:String,datacenter:String,guid:String) = Authenticated.async { req =>
+    getApi(clusterHost, datacenter).flatMap { api =>
+      api.getLineage(guid).map(l => Ok(Json.toJson(l)))
+    }.recoverWith{
+      case e:Exception => fetchError(e)
+    }
+  }
+
+  def getAllTables(clusterHost:String, datacenter:String, cached: String) = Authenticated.async { req =>
     getApi(clusterHost, datacenter).map { api =>
         if(shouldUseCache(cached))
         Ok(Json.toJson(api.fastLoadAllTables))
@@ -40,7 +72,7 @@ class Atlas @Inject() ( @Named("atlasApiCache") val atlasApiCache:ActorRef,stora
         Ok(Json.toJson(results.getOrElse(Seq())))
       }
     }.recoverWith{
-      case e:Exception => Future.successful(InternalServerError(JsonResponses.statusError("fetch error",e.getMessage)))
+      case e:Exception => fetchError(e)
     }
   }
 
@@ -58,9 +90,12 @@ class Atlas @Inject() ( @Named("atlasApiCache") val atlasApiCache:ActorRef,stora
         Ok(Json.toJson(results.getOrElse(Seq())))
       }
     }.recoverWith{
-      case e:Exception => Future.successful(InternalServerError(JsonResponses.statusError("fetch error",e.getMessage)))
+      case e:Exception => fetchError(e)
     }
   }
+
+
+
 
   private def getApi(clusterHost: String, datacenter: String): Future[AtlasHiveApi] = {
     for {

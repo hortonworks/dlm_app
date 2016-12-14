@@ -10,7 +10,7 @@ import com.google.common.io.BaseEncoding
 import com.hw.dp.service.api.{Poll, ServiceException, ServiceNotFound}
 import com.hw.dp.service.cluster.{Ambari, Cluster, ServiceComponent}
 import com.hw.dp.services.atlas.Hive.{Result, SearchResult}
-import org.springframework.http.{HttpEntity, HttpHeaders, HttpMethod}
+import org.springframework.http.{HttpEntity, HttpHeaders, HttpMethod, ResponseEntity}
 import org.springframework.security.kerberos.client.KerberosRestTemplate
 import org.springframework.web.client.RestTemplate
 import play.api.libs.json.{JsObject, JsValue, Json}
@@ -171,6 +171,61 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluste
 
   override def fastLoadAllTables = tableCache.asMap().values().asScala.toSeq
 
+  /**
+    * Get raw Entity information
+    *
+    * @return
+    */
+  override def getEntity(guid: String): JsValue = {
+    val url = s"${apiUrl}/api/atlas/entities/${guid}"
+    Try {
+      val entity = new HttpEntity[String](headers)
+      val response = template.exchange(url, HttpMethod.GET, entity, classOf[String])
+      Json.parse(response.getBody)
+    } getOrElse(Json.obj())
+  }
+
+  private def getResponse(url: String): Future[String] = {
+    Future {
+      val entity = new HttpEntity[String](headers)
+      val response = template.exchange(url, HttpMethod.GET, entity, classOf[String])
+      response.getBody
+    }
+  }
+
+  /**
+    * Get Lineage
+    *
+    * @param guid
+    * @return
+    */
+  override def getLineage(guid: String): Future[Lineage] = {
+    val inputsUrl = s"${apiUrl}/api/atlas/lineage/${guid}/inputs/graph"
+    val outputsUrl = s"${apiUrl}/api/atlas/lineage/${guid}/outputs/graph"
+    val schemaUrl = s"${apiUrl}/api/atlas/lineage/${guid}/schema"
+    for{
+      inputsResponse <-  getResponse(inputsUrl)
+      outputsResponse <-  getResponse(outputsUrl)
+      schemaResponse <-  getResponse(schemaUrl)
+    } yield {
+      Lineage(inputsResponse,outputsResponse,schemaResponse)
+    }
+  }
+
+  /**
+    * Get Audit information
+    *
+    * @param guid
+    * @return
+    */
+  override def getAudit(guid: String): JsValue = {
+    val url = s"${apiUrl}/api/atlas/entities/${guid}/audit"
+    Try {
+      val entity = new HttpEntity[String](headers)
+      val response = template.exchange(url, HttpMethod.GET, entity, classOf[String])
+      Json.parse(response.getBody)
+    } getOrElse(Json.obj())
+  }
 }
 
 sealed class TableCacheLoader(atlasApi: AtlasHiveApi) extends CacheLoader[String, Result] {
