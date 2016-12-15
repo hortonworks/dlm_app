@@ -8,6 +8,7 @@ import com.google.inject.{Inject, Singleton}
 import com.hw.dp.service.cluster.{Ambari, Cluster}
 import com.hw.dp.services.atlas.{AtlasHiveApi, AtlasHiveApiImpl}
 import play.api.Configuration
+import play.api.libs.ws.WSClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -15,7 +16,7 @@ import scala.concurrent.Future
 
 case class GetApi(ambari: Ambari, cluster: Cluster)
 
-class AtlasApiCache @Inject()(configuration: Configuration, actorSystem: ActorSystem) extends Actor {
+class AtlasApiCache @Inject()(configuration: Configuration, actorSystem: ActorSystem,ws: WSClient) extends Actor {
 
   private val hiveApiCache = new ConcurrentHashMap[Ambari, AtlasHiveApi]()
 
@@ -24,7 +25,7 @@ class AtlasApiCache @Inject()(configuration: Configuration, actorSystem: ActorSy
     apiOpt match {
       case Some(api) => Future.successful(api)
       case None =>
-        val api = new AtlasHiveApiImpl(actorSystem, ambari, cluster, configuration)
+        val api = new AtlasHiveApiImpl(actorSystem, ambari, cluster, configuration,ws)
         api.initialize.map { atlas =>
           hiveApiCache.put(ambari, api)
           api

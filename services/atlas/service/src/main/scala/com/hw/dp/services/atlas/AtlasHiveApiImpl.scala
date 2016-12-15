@@ -8,14 +8,13 @@ import com.google.common.base.Charsets
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.google.common.io.BaseEncoding
 import com.hw.dp.service.api.{Poll, ServiceException, ServiceNotFound}
-import com.hw.dp.service.cluster.{Ambari, Cluster, ServiceComponent}
+import com.hw.dp.service.cluster.{Ambari, Cluster}
 import com.hw.dp.services.atlas.Hive.{Result, SearchResult}
-import org.springframework.http.{HttpEntity, HttpHeaders, HttpMethod, ResponseEntity}
+import org.springframework.http.{HttpEntity, HttpHeaders, HttpMethod}
 import org.springframework.security.kerberos.client.KerberosRestTemplate
 import org.springframework.web.client.RestTemplate
 import play.api.libs.json.{JsObject, JsValue, Json}
-import play.api.libs.ws.ahc.AhcWSClient
-import play.api.libs.ws.{WSAuthScheme, WSRequest, WSResponse}
+import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest, WSResponse}
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -40,7 +39,7 @@ import scala.util.Try
   * @param cluster
   * @param configuration
   */
-class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluster, configuration: Configuration) extends AtlasHiveApi {
+class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluster, configuration: Configuration,ws: WSClient) extends AtlasHiveApi {
 
 
   val ambariUrlPrefix = s"${ambari.protocol}://${ambari.host}:${ambari.port}/api/v1/clusters/${cluster.name}"
@@ -48,7 +47,7 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluste
 
   implicit val system = actorSystem
   implicit val materializer = ActorMaterializer()
-  val client: WSRequest = AhcWSClient().url(s"${ambariUrlPrefix}${configUrlSuffix}")
+  val client: WSRequest = ws.url(s"${ambariUrlPrefix}${configUrlSuffix}")
 
   private var apiUrl: String = _
   private var template: RestTemplate = _
