@@ -6,6 +6,7 @@ import internal.{AmbariSync, AtlasApiCache}
 import internal.auth.{MongoUserStorage, UserStorage}
 import internal.persistence._
 import play.api.Configuration
+import play.api.libs.ws.WSClient
 import reactivemongo.api.MongoDriver
 
 import scala.concurrent.Future
@@ -22,9 +23,8 @@ class Module extends AbstractModule {
 
   @Provides
   @Named("atlasApiCache")
-  def provideApiCache(configuration: Configuration,actorSystem: ActorSystem):ActorRef = {
-    actorSystem.actorOf(Props(classOf[AtlasApiCache], configuration, actorSystem),"atlasApiCache")
+  def provideApiCache(configuration: Configuration,actorSystem: ActorSystem,ws: WSClient):ActorRef = {
+    actorSystem.actorOf(Props(classOf[AtlasApiCache], configuration, actorSystem,ws),"atlasApiCache")
   }
-
 
 }
