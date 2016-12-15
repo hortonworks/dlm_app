@@ -21,4 +21,4 @@
 ## Run
 
 * In folder webapp, `sbt run`
-* Browse `http://<host>:9000/
+* Browse `http://host:9000/`
