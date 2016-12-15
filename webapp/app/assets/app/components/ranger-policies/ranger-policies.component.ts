@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Input} from '@angular/core';
 import {RangerPoliciesService} from '../../services/ranger-policies.service';
 import {RangerPolicies} from '../../models/ranger-policies';
 
@@ -8,6 +8,7 @@ import {RangerPolicies} from '../../models/ranger-policies';
     styleUrls: ['assets/app/components/ranger-policies/ranger-policies.component.css']
 })
 export class RangerPoliciesComponent implements OnInit {
+    @Input() search: string = '';
     policesData: RangerPolicies[] = [];
 
     constructor(private rangerPoliciesService: RangerPoliciesService) {

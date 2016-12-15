@@ -1,4 +1,4 @@
-import {Component, OnInit, AfterViewInit, ElementRef} from '@angular/core';
+import {Component, OnInit, AfterViewInit, ElementRef, Input, SimpleChanges, OnChanges} from '@angular/core';
 import {AtlasLineageService} from '../../services/atlas-lineage.service';
 import {AtlasLineage} from '../../models/altas-lineage';
 import {AtlasEntityService} from '../../services/atlas-entity.service';
@@ -14,7 +14,7 @@ declare var jQuery:any;
     templateUrl: 'assets/app/components/atlas-lineage/atlas-lineage.component.html',
     styleUrls: ['assets/app/components/atlas-lineage/atlas-lineage.component.css']
 })
-export class AtlasLineageComponent implements OnInit, AfterViewInit {
+export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
 
     guid: string = 'b43ebc85-f940-42be-81b1-e413e94b36aa';
     inputData: AtlasLineage;
@@ -27,9 +27,47 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit {
     outputState: boolean = false;
     jqueryNativeElement: any;
 
+    @Input() search: string = '';
+    @Input() dataSourceName: string;
+    @Input() hostName: string;
+
     constructor(private nativeElement: ElementRef, private atlasLineageService: AtlasLineageService,
                 private atlasEntityService: AtlasEntityService) {
         this.jqueryNativeElement = jQuery(this.nativeElement.nativeElement);
+    }
+
+    init(table: string) {
+        this.clearSVG();
+        this.startingPoint = [];
+        this.edgesAndvertices = {};
+        this.outputState = false;
+
+        this.atlasLineageService.getTable(this.hostName, this.dataSourceName, table).subscribe(table => {
+            console.log(table);
+            this.guid = table['$id$']['id'];
+            this.atlasLineageService.getLineage(this.hostName, this.dataSourceName , this.guid).subscribe(lineage => {
+                this.inputData = JSON.parse(lineage['inputs']);
+                this.generateData(this.inputData, 'input');
+
+                this.outputData = JSON.parse(lineage['outputs']);
+                this.generateData(this.outputData, 'output');
+                this.outputState = true;
+            });
+        });
+    }
+
+    clearSVG() {
+        let svg = this.jqueryNativeElement.find('svg')[0];
+        let parentElement = svg.parentElement;
+        let emptySvg = svg.cloneNode(false);
+        parentElement.removeChild(svg);
+        parentElement.appendChild(emptySvg);
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['search'] && changes['search'].currentValue) {
+            this.init(changes['search'].currentValue);
+        }
     }
 
     ngOnInit() {
@@ -47,20 +85,9 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit {
             .setDefaultEdgeLabel(function() {
                 return {};
             });
-
-        this.atlasLineageService.getInputData().subscribe(atlasLineageData => {
-            this.inputData = atlasLineageData;
-            this.generateData(this.inputData, 'input');
-            this.atlasLineageService.getOutputData().subscribe(atlasLineageData => {
-                this.outputData = atlasLineageData;
-                this.generateData(this.outputData, 'output');
-                this.outputState = true;
-            });
-        });
     }
 
     generateData(inputData: AtlasLineage, type: string) {
-        this.startingPoint = [];
         let edges = inputData.results.values.edges;
         let vertices = inputData.results.values.vertices;
 
@@ -155,7 +182,7 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit {
 
     fetchLoadProcess(id: string) {
         ++this.asyncFetchCounter;
-        this.atlasEntityService.getEntityByName(id).subscribe(data => {
+        this.atlasEntityService.getLineage(this.hostName, this.dataSourceName , id).subscribe(data => {
             this.addValueInObject(data);
         });
     }

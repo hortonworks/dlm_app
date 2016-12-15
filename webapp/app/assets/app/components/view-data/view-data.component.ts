@@ -13,8 +13,9 @@ declare var Datamap:any;
 })
 export class ViewDataComponent implements OnInit, AfterViewInit {
     map: any;
+    hostName: string;
     search: string = '';
-    clusterName: string;
+    dataSourceName: string;
     breadCrumbMap: any = {};
     cluster: Ambari = new Ambari();
 
@@ -24,15 +25,19 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
 
     ngOnInit() {
         this.activatedRoute.params.subscribe(params => {
-            this.clusterName = params['id'];
+            this.dataSourceName = params['id'];
+            this.hostName = window.location.search.replace('?host=', '');
             this.breadCrumbMap = {'Datacenter':'ui/dashboard'};
-            this.breadCrumbMap[this.clusterName] = '';
+            this.breadCrumbMap[this.dataSourceName] = '';
             this.getClusterData();
         });
     }
 
     ngAfterViewInit() {
-        this.map = new Datamap({element: document.getElementById('mapcontainer-replication'),projection: 'mercator',
+        this.map = new Datamap({element: document.getElementById('mapcontainer-replication'),
+            projection: 'mercator',
+            height: 600,
+            width: 1116,
             fills: {
                 defaultFill: '#ABE3F3',
                 UP: '#9FCE63',
@@ -53,29 +58,17 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
                 highlightFillColor: '#898989'
             }
         });
-
-        // if (this.bubbles.length > 0) {
-        //     this.map.bubbles(this.bubbles, {
-        //         popupTemplate: function (geo: any, data: any) {
-        //             return ['<div class="demo-card-wide mdl-card mdl-shadow--2dp"> ' +
-        //             '<div class = "mdl-card__actions mdl-card--border"> ' +
-        //             '<div> <div class = "card-super-text">'+ data.location +' </div> ' +
-        //             '<div class = "card-title-text">'+ data.name +'</div> </div>' +
-        //             '</div > <div class = "card-padding"> ' +
-        //             '<table  class="card-table" cellspacing="0" style="background:#FFFFFF;font-size:12px;width:100%;border-radius:4px;"> ' +
-        //             '<tr><td class="card-table-cell">JOBS </td>     <td class="card-table-cell">'+ data.jobs +'</td></tr> ' +
-        //             '<tr><td class="card-table-cell">USAGE </td>    <td class="card-table-cell">'+ data.usage +'</td></tr> ' +
-        //             '<tr><td class="card-table-cell">DATA </td>     <td class="card-table-cell">'+ data.data +'</td></tr> ' +
-        //             '<tr><td class="card-table-cell">CLUSTERS </td> <td class="card-table-cell">'+ data.noOfClusters +'</td></tr> ' +
-        //             '</table > </div > </div >'].join(' ');
-        //         }
-        //     });
-        // }
     }
 
     getClusterData() {
-        this.clusterService.getByName(this.clusterName).subscribe(cluster => {
+        this.clusterService.getByName(this.dataSourceName).subscribe(cluster => {
             this.cluster = cluster;
         });
+    }
+
+    eventHandler($event, search: string) {
+        if ($event.keyCode === 13) {
+            this.search = search;
+        }
     }
 }

@@ -1,4 +1,4 @@
-import {Component, OnInit, Input, AfterViewInit} from '@angular/core';
+import {Component, Input, AfterViewInit, OnChanges, SimpleChanges} from '@angular/core';
 import {HiveDataService} from '../../services/hive-data.service';
 import {Schema} from '../../models/schema';
 
@@ -11,9 +11,10 @@ export enum Tab { PROPERTIES, TAGS, AUDITS, SCHEMA}
     styleUrls: ['assets/app/components/hive-data/hive-data.component.css'],
     templateUrl: 'assets/app/components/hive-data/hive-data.component.html'
 })
-export class HiveDataComponent implements OnInit, AfterViewInit {
+export class HiveDataComponent implements AfterViewInit, OnChanges {
     map: any;
     tab = Tab;
+    showView: boolean= false;
     schemaData: Schema[] = [];
     activeTab: Tab = Tab.PROPERTIES;
 
@@ -21,14 +22,24 @@ export class HiveDataComponent implements OnInit, AfterViewInit {
 
     constructor(private hiveDataService: HiveDataService) {}
 
-    ngOnInit() {
+    init(search: string) {
+        this.showView = search.length > 0;
         this.hiveDataService.getSchemaData().subscribe((schemaData: Schema[]) => {
             this.schemaData = schemaData;
         });
     }
 
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['search'] && changes['search'].currentValue) {
+            this.init(changes['search'].currentValue);
+        }
+    }
+
     ngAfterViewInit() {
-        this.map = new Datamap({element: document.getElementById('mapcontainer'),projection: 'mercator',
+        this.map = new Datamap({element: document.getElementById('mapcontainer'),
+            height: 273,
+            width: 385,
+            projection: 'mercator',
             fills: {
                 defaultFill: '#676966'
             },

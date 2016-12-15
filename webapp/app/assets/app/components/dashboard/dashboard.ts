@@ -4,6 +4,7 @@ import {DataCenterService} from '../../services/data-center.service';
 import {DataCenter} from '../../models/data-center';
 import {CityNames} from '../../common/utils/city-names';
 import {DataCenterDetails} from '../../models/data-center-details';
+import {MathUtils} from '../../shared/utils/mathUtils';
 
 declare var Datamap:any;
 
@@ -16,15 +17,6 @@ export class DashboardRow {
     cost: number = 0;
     clusters: number = 0;
     hostStatus: string = '';
-
-    bytesToSize(bytes: number): string {
-        let sizes: string[] = ['KB', 'MB', 'GB', 'TB'];
-        if (bytes === 0) {
-            return 'n/a';
-        }
-        let i = parseInt( '' + Math.floor(Math.log(bytes) / Math.log(1024))  );
-        return Math.round(bytes / Math.pow(1024, i)) + ' ' + sizes[i];
-    }
 
     constructor(dataCenter: DataCenter, dataCenterDetails: DataCenterDetails) {
         let diskUsed: number = 0;
@@ -53,7 +45,7 @@ export class DashboardRow {
 
         this.cost = 0;
         this.averageJobsPerDay = 0;
-        this.dataSize = this.bytesToSize(diskUsed);
+        this.dataSize = MathUtils.bytesToSize(diskUsed);
         this.clusters += dataCenterDetails.numClusters;
         this.hostStatus = state ? 'HEALTHY' : 'UNHEALTHY';
         this.capacityUtilization = parseFloat( ((this.capacityUtilization/( 100* dataCenterDetails.nameNodeInfo.length)) * 100).toPrecision(3) );

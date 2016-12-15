@@ -17,27 +17,27 @@
         <div class="mdl-grid mdl-grid--no-spacing info-panel">
             <div class="mdl-cell mdl-cell--2-col m-0 ">
                 <label class="mdl-typography--caption"> UP TIME </label>
-                <p class="mdl-typography--body-2 "> {{ cluster.upTime }} Days </p>
+                <p class="mdl-typography--body-2 "> 10 Days </p>
             </div>
             <div class="mdl-cell mdl-cell--2-col m-0">
                 <label class="mdl-typography--caption"> Cluster Type </label>
-                <p class="mdl-typography--body-2 "> {{ cluster.serviceName }} </p>
+                <p class="mdl-typography--body-2 "> ON_PREM </p>
             </div>
             <div class="mdl-cell mdl-cell--2-col m-0">
                 <label class="mdl-typography--caption"> DATA </label>
-                <p class="mdl-typography--body-2 "> {{ cluster.diskUsed }} </p>
+                <p class="mdl-typography--body-2 "> 178 GB </p>
             </div>
             <div class="mdl-cell mdl-cell--2-col m-0">
                 <label class="mdl-typography--caption"> NO OF TABLES </label>
-                <p class="mdl-typography--body-2 "> {{ cluster.noOfTables }} </p>
+                <p class="mdl-typography--body-2 "> 221 </p>
             </div>
             <div class="mdl-cell mdl-cell--2-col m-0">
                 <label class="mdl-typography--caption"> NO OF FILES </label>
-                <p class="mdl-typography--body-2 "> {{ cluster.noOfFiles }} </p>
+                <p class="mdl-typography--body-2 "> 1986 </p>
             </div>
             <div class="mdl-cell mdl-cell--2-col m-0">
                 <label class="mdl-typography--caption"> AVERAGE # USERS </label>
-                <p class="mdl-typography--body-2 "> {{ cluster.averageNoOfUsers }} </p>
+                <p class="mdl-typography--body-2 ">  31 </p>
             </div>
         </div>
 
@@ -46,22 +46,22 @@
         <div class="search-input">
             <form action="#">
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label ">
-                    <span class="search-button"><input placeholder="Search" [(ngModel)]="search" [ngModelOptions]="{standalone: true}"> <span class="browse-button"> Browse</span></span>
+                    <span class="search-button"><input #searchInput placeholder="Search"   (keypress)="eventHandler($event, searchInput.value)"> <span class="browse-button"> Browse</span></span>
                 </div>
             </form>
         </div>
 
-        <hive-data [search]="search"> </hive-data>
+        <hive-data [search]="search" [hidden]="search.length === 0"> </hive-data>
 
-        <div class="data-visualization">
+        <div class="data-visualization" [hidden]="search.length === 0">
             <h6> Lineage </h6>
-            <atlas-lineage> </atlas-lineage>
+            <atlas-lineage [search]="search" [dataSourceName]="dataSourceName" [hostName]="hostName"> </atlas-lineage>
 
             <h6> Replication </h6>
             <div id="mapcontainer-replication" class="dataplane-be-together-section mdl-typography--text-center dotted"> </div>
 
             <h6> Policies </h6>
-            <ranger-policies> </ranger-policies>
+            <ranger-policies [search]="search"> </ranger-policies>
 
         </div>
 

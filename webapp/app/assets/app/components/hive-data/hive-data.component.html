@@ -11,15 +11,61 @@
                     </nav>
                 </div>
             </header>
-            <main class="mdl-layout__content">
+            <main class="mdl-layout__content" [hidden]="!showView">
                 <section *ngIf="(activeTab===tab.PROPERTIES)" class="mdl-layout__tab-panel is-active">
-                    <div class="page-content">Properties</div>
+                    <div class="page-content">
+                        <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
+                            <tbody>
+                                <tr> <td class="mdl-data-table__cell--non-numeric"> aliases	</td> <td class="mdl-data-table__cell--non-numeric">  null </td></tr>
+                                <tr> <td class="mdl-data-table__cell--non-numeric"> tableType </td> <td class="mdl-data-table__cell--non-numeric">  	MANAGED_TABLE </td></tr>
+                                <tr> <td class="mdl-data-table__cell--non-numeric"> name	</td> <td class="mdl-data-table__cell--non-numeric">   new_ctas </td></tr>
+                                <tr> <td class="mdl-data-table__cell--non-numeric"> viewExpandedText	</td> <td class="mdl-data-table__cell--non-numeric">  null </td></tr>
+                                <tr> <td class="mdl-data-table__cell--non-numeric"> createTime	</td> <td class="mdl-data-table__cell--non-numeric">   Wed Nov 30 2016 16:04:28 GMT+0530 (IST) </td></tr>
+                                <tr> <td class="mdl-data-table__cell--non-numeric"> description	</td> <td class="mdl-data-table__cell--non-numeric">   null </td></tr>
+                                <tr> <td class="mdl-data-table__cell--non-numeric"> temporary	</td> <td class="mdl-data-table__cell--non-numeric">  false</tr>
+                                <tr> <td class="mdl-data-table__cell--non-numeric"> db </td> <td class="mdl-data-table__cell--non-numeric">  default </td></tr>
+                                <tr> <td class="mdl-data-table__cell--non-numeric"> viewOriginalText	</td> <td class="mdl-data-table__cell--non-numeric">  null </td></tr>
+                                <tr> <td class="mdl-data-table__cell--non-numeric"> retention	</td> <td class="mdl-data-table__cell--non-numeric">   Thu Jan 01 1970 05:30:00 GMT+0530 (IST) </td></tr>
+                                <tr> <td class="mdl-data-table__cell--non-numeric"> qualifiedName	</td> <td class="mdl-data-table__cell--non-numeric">   default.new_ctas@Vimal_Fenton_New </td></tr>
+                                <tr> <td class="mdl-data-table__cell--non-numeric"> columns </td> <td class="mdl-data-table__cell--non-numeric">  id, name </td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
                 <section *ngIf="(activeTab===tab.TAGS)" class="mdl-layout__tab-panel is-active">
-                    <div class="page-content">tags</div>
+                    <div class="page-content">
+                        <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
+                            <thead>
+                            <tr>
+                                <th class="mdl-data-table__cell--non-numeric">TAGS</th>
+                                <th class="mdl-data-table__cell--non-numeric">ATTRIBUTES</th>
+                                <th class="mdl-data-table__cell--non-numeric">TOOL</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
                 <section *ngIf="(activeTab===tab.AUDITS)" class="mdl-layout__tab-panel is-active">
-                    <div class="page-content">audits</div>
+                    <div class="page-content">
+                        <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
+                            <thead>
+                            <tr>
+                                <th class="mdl-data-table__cell--non-numeric">Users</th>
+                                <th class="mdl-data-table__cell--non-numeric">Timestamp</th>
+                                <th class="mdl-data-table__cell--non-numeric">Actions</th>
+                                <th class="mdl-data-table__cell--non-numeric">Tools</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr> <td class="mdl-data-table__cell--non-numeric"> hive </td>	<td class="mdl-data-table__cell--non-numeric"> Wed Nov 30 2016 16:56:43 GMT+0530 (IST)</td>	<td class="mdl-data-table__cell--non-numeric">	Entity Updated</td>	<td class="mdl-data-table__cell--non-numeric">	Detail </td> </tr>
+                                <tr> <td class="mdl-data-table__cell--non-numeric"> hive </td>	<td class="mdl-data-table__cell--non-numeric"> Wed Nov 30 2016 16:56:42 GMT+0530 (IST)</td>	<td class="mdl-data-table__cell--non-numeric">	Entity Updated</td>	<td class="mdl-data-table__cell--non-numeric">	Detail </td> </tr>
+                                <tr> <td class="mdl-data-table__cell--non-numeric"> hive </td>	<td class="mdl-data-table__cell--non-numeric"> Wed Nov 30 2016 16:04:31 GMT+0530 (IST)</td>	<td class="mdl-data-table__cell--non-numeric">	Entity Updated</td>	<td class="mdl-data-table__cell--non-numeric">	Detail </td> </tr>
+                                <tr> <td class="mdl-data-table__cell--non-numeric"> hive </td>	<td class="mdl-data-table__cell--non-numeric"> Wed Nov 30 2016 16:04:31 GMT+0530 (IST)</td>	<td class="mdl-data-table__cell--non-numeric">	Entity Created</td>	<td class="mdl-data-table__cell--non-numeric">	Detail </td> </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
                 <section *ngIf="(activeTab===tab.SCHEMA)" class="mdl-layout__tab-panel is-active">
                     <div class="page-content">
