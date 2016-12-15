@@ -10,7 +10,7 @@ import internal.DataPlaneError
 import internal.persistence.DataStorage
 import play.api.Logger
 import play.api.libs.json.JsObject
-import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
+import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -27,6 +27,7 @@ class AmbariSync(val ambari:Ambari, val storage:DataStorage, ws: WSClient) exten
       // first get all clusters
       val clustersResponse: Future[WSResponse] = getWs(clustersApi).get()
       clustersResponse.map { res =>
+        Logger.info(s"Response from Ambari ${res}")
         val items = (res.json \ "items" \\ "Clusters").map(_.as[JsObject].validate[Map[String,String]].map(m => Some(m)).getOrElse(None))
          // each item is a Some(cluster)
         // start defining the cluster mapping
@@ -84,8 +85,6 @@ class AmbariSync(val ambari:Ambari, val storage:DataStorage, ws: WSClient) exten
   }
 
   def getWs(api: String): WSRequest = {
-    val creds: String = s"${ambari.credentials.userName}:${ambari.credentials.password}"
-    ws.url(s"${prefix}${api}").withHeaders("Content-Type" -> "application/json", "X-Requested-By" -> "ambari",
-      "Authorization" -> s"Basic ${Base64.getEncoder.encodeToString(creds.getBytes(StandardCharsets.UTF_8))}")
+    ws.url(s"${prefix}${api}").withAuth(ambari.credentials.userName,ambari.credentials.password,WSAuthScheme.BASIC).withHeaders("Content-Type" -> "application/json", "X-Requested-By" -> "ambari")
   }
 }

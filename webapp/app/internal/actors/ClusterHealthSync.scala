@@ -10,7 +10,7 @@ import internal.DataPlaneError
 import internal.persistence.DataStorage
 import org.joda.time.DateTime
 import play.api.Logger
-import play.api.libs.ws.{WSClient, WSRequest}
+import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
@@ -62,8 +62,7 @@ class ClusterHealthSync(val storage: DataStorage, ws: WSClient) extends Actor wi
   }
 
   def getWs(prefix:String,ambari:Ambari,api: String): WSRequest = {
-    val creds: String = s"${ambari.credentials.userName}:${ambari.credentials.password}"
-    ws.url(s"${prefix}${api}").withHeaders("Content-Type" -> "application/json", "X-Requested-By" -> "ambari",
-      "Authorization" -> s"Basic ${Base64.getEncoder.encodeToString(creds.getBytes(StandardCharsets.UTF_8))}")
+    ws.url(s"${prefix}${api}").withAuth(ambari.credentials.userName,ambari.credentials.password,WSAuthScheme.BASIC)
+      .withHeaders("Content-Type" -> "application/json", "X-Requested-By" -> "ambari")
   }
 }

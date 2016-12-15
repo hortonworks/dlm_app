@@ -8,7 +8,7 @@ import com.hw.dp.service.api.Poll
 import com.hw.dp.service.cluster.{Ambari, Service, ServiceComponent}
 import internal.DataPlaneError
 import internal.persistence.{DataStorage, SaveService, SaveServiceComponent}
-import play.api.libs.ws.{WSClient, WSRequest}
+import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -56,9 +56,8 @@ class ServiceSync(val storage: DataStorage, ws: WSClient,dataPersister: ActorRef
   }
 
   def getWs(prefix: String, ambari: Ambari, api: String): WSRequest = {
-    val creds: String = s"${ambari.credentials.userName}:${ambari.credentials.password}"
-    ws.url(s"${prefix}${api}").withHeaders("Content-Type" -> "application/json", "X-Requested-By" -> "ambari",
-      "Authorization" -> s"Basic ${Base64.getEncoder.encodeToString(creds.getBytes(StandardCharsets.UTF_8))}")
+    ws.url(s"${prefix}${api}").withAuth(ambari.credentials.userName,ambari.credentials.password,WSAuthScheme.BASIC).
+      withHeaders("Content-Type" -> "application/json", "X-Requested-By" -> "ambari")
   }
 
 }
