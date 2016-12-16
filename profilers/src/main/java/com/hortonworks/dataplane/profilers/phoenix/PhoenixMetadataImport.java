@@ -1,5 +1,6 @@
 package com.hortonworks.dataplane.profilers.phoenix;
 
+import com.hortonworks.dataplane.profilers.common.AtlasTypeRegistrar;
 import com.hortonworks.dataplane.profilers.phoenix.model.PhoenixMetadata;
 import static com.hortonworks.dataplane.profilers.common.AtlasTypeConstants.*;
 import org.apache.atlas.AtlasClient;
@@ -39,7 +40,13 @@ public class PhoenixMetadataImport {
         PhoenixMetadataProfiler phoenixMetadataProfiler = new PhoenixMetadataProfiler(
                 phoenixHostName, Integer.valueOf(phoenixPort));
         PhoenixMetadata phoenixMetadata = phoenixMetadataProfiler.getMetadata();
+        createTypes();
         addEntitiesToAtlas(phoenixMetadata);
+    }
+
+    private void createTypes() throws AtlasServiceException {
+        AtlasTypeRegistrar atlasTypeRegistrar = new AtlasTypeRegistrar(atlasClient);
+        atlasTypeRegistrar.registerTypes();
     }
 
     private void addEntitiesToAtlas(PhoenixMetadata phoenixMetadata) throws AtlasServiceException {
@@ -87,9 +94,9 @@ public class PhoenixMetadataImport {
     }
 
     private static void printUsage() {
-        System.out.println("Usage: java org.apache.atlas.demo.PhoenixMetadataImport " +
-                "<atlasUrl> <atlasUserName> <password> <clusterName> <phoenixHost> <phoenixPort>");
-        System.out.println("Example: java org.apache.atlas.demo.PhoenixMetadataImport " +
-                "http://localhost:21000/ admin PASSWORD cl1 localhost 8765");
+        System.out.println("Usage: java " + PhoenixMetadataImport.class.getCanonicalName() +
+                " <atlasUrl> <atlasUserName> <password> <clusterName> <phoenixHost> <phoenixPort>");
+        System.out.println("Example: java " + PhoenixMetadataImport.class.getCanonicalName() +
+                " http://localhost:21000/ admin PASSWORD cl1 localhost 8765");
     }
 }
