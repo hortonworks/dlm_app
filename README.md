@@ -56,10 +56,8 @@ CONTAINER ID        IMAGE                  COMMAND                  CREATED     
 2a15671be76c        data_plane:0.1-alpha   "bin/data_plane -Dcon"   About an hour ago   Up 4 minutes        0.0.0.0:8080->9000/tcp   webapp_web_1
 acb24854b46a        mongo                  "/entrypoint.sh mongo"   About an hour ago   Up 4 minutes        27017/tcp                webapp_dp_db_1
 ```
-* You need to setup 
 * Browse `http://host:8080/`
 * Note: For every cluster you add to dataplane, you need to make sure Ambari and Atlas services are reachable by host names from the data plane control plane container (called `webapp_web_1`). Also, unfortunately, for now, you need to re-add these everytime you bring down and bring up the containers.
-* Typically I do the above, by running the bash shell on the webapp container like this:
+  * Typically I do the above, by running the bash shell on the webapp container like this:
 `docker exec -u 0 -it 2a15671be76c bash`
-* Then add the lines to the /etc/hosts file: `echo "172.22.85.12    hyamijala-dp-fenton-dev-1.openstacklocal    hyamijala-dp-fenton-dev-1" >> /etc/hosts`
-
+  * Then add the lines to the /etc/hosts file: `echo "172.22.85.12    hyamijala-dp-fenton-dev-1.openstacklocal    hyamijala-dp-fenton-dev-1" >> /etc/hosts`
