@@ -50,13 +50,14 @@ public class HBaseMetadataProfiler {
     }
 
     public HBaseMetadata getHBaseMetadata() throws IOException {
+        System.out.println("Importing HBase Metadata");
         NamespaceDescriptor[] namespaceDescriptors = admin.listNamespaceDescriptors();
         HBaseMetadata hbaseMetadata = new HBaseMetadata();
         for (NamespaceDescriptor ns : namespaceDescriptors) {
+            System.out.println("Importing tables from " + ns.getName());
             Namespace namespace = new Namespace(ns.getName(), ns.getName());
             hbaseMetadata.add(namespace);
             buildTablesInNamespace(ns.getName(), namespace);
-            printSeparator();
         }
         admin.close();
         connection.close();
@@ -71,7 +72,6 @@ public class HBaseMetadataProfiler {
                     admin.isTableEnabled(tableName));
             namespace.addTable(table);
             buildColumnFamiliesInTable(tableDescriptor, table);
-            printSeparator();
         }
     }
 
@@ -82,9 +82,5 @@ public class HBaseMetadataProfiler {
                     cf.getMaxVersions(), cf.isInMemory(), cf.getCompression().getName(), cf.getBlocksize());
             table.addColumnFamily(columnFamily);
         }
-    }
-
-    private void printSeparator() {
-        System.out.println("==================================================");
     }
 }

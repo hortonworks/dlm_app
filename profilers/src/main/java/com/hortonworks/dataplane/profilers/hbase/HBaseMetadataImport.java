@@ -1,9 +1,12 @@
 package com.hortonworks.dataplane.profilers.hbase;
 
+import com.hortonworks.dataplane.profilers.common.AtlasTypeRegistrar;
 import com.hortonworks.dataplane.profilers.hbase.model.ColumnFamily;
 import com.hortonworks.dataplane.profilers.hbase.model.HBaseMetadata;
 import com.hortonworks.dataplane.profilers.hbase.model.Namespace;
 import static com.hortonworks.dataplane.profilers.common.AtlasTypeConstants.*;
+
+import com.sun.jersey.api.client.ClientResponse;
 import org.apache.atlas.AtlasClient;
 import org.apache.atlas.AtlasServiceException;
 import com.hortonworks.dataplane.profilers.common.AtlasReferenceableBuilder;
@@ -38,33 +41,57 @@ public class HBaseMetadataImport {
     }
 
     private static void printUsage() {
-        System.out.println("Usage: java org.apache.atlas.demo.HBaseMetadataImport " +
-                "<atlasURL> <atlasUserName> <password> <clusterName> <zkConnectString> <zkPort>");
-        System.out.println("Example: java org.apache.atlas.demo.HBaseMetadataImport " +
-                "http://localhost:21000/ admin admin cl1 localhost 3181");
+        System.out.println("Usage: java " + HBaseMetadataImport.class.getCanonicalName() +
+                " <atlasURL> <atlasUserName> <password> <clusterName> <zkConnectString> <zkPort>");
+        System.out.println("Example: java " + HBaseMetadataImport.class.getCanonicalName() +
+                " http://localhost:21000/ admin admin cl1 localhost 3181");
     }
 
     private void run(String zkConnectString, String zkClientPort) throws IOException, AtlasServiceException {
         HBaseMetadataProfiler hBaseMetadataProfiler = new HBaseMetadataProfiler(zkConnectString, zkClientPort);
         HBaseMetadata hBaseMetadata = hBaseMetadataProfiler.getHBaseMetadata();
-        mapToAtlasEntities(hBaseMetadata);
+        createTypes();
+        importIntoAtlas(hBaseMetadata);
     }
 
-    private void mapToAtlasEntities(HBaseMetadata hBaseMetadata) throws AtlasServiceException {
+    private void createTypes() throws AtlasServiceException {
+        AtlasTypeRegistrar atlasTypeRegistrar = new AtlasTypeRegistrar(atlasClient);
+        atlasTypeRegistrar.registerTypes();
+    }
+
+    private void importIntoAtlas(HBaseMetadata hBaseMetadata) throws AtlasServiceException {
         for (Namespace ns : hBaseMetadata.getNamespaces()) {
+            String namespaceId = importNamespace(ns);
+            for (Table t : ns.getTables()) {
+                List<Referenceable> tableEntities = createTableEntities(clusterName, ns.getName(), t, namespaceId);
+                atlasClient.updateEntities(tableEntities);
+                System.out.println("Created/Updated table: " + t.getName());
+            }
+        }
+    }
+
+    private String importNamespace(Namespace ns) throws AtlasServiceException {
+        Referenceable namespace = null;
+        try {
+            namespace = atlasClient.getEntity(
+                    HBASE_NAMESPACE_TYPE, AtlasClient.REFERENCEABLE_ATTRIBUTE_NAME, ns.getName() + "@" + clusterName);
+        } catch (AtlasServiceException ase) {
+            if (!ase.getStatus().equals(ClientResponse.Status.NOT_FOUND)) {
+                throw ase;
+            }
+        }
+        String guid;
+        if (namespace == null) {
             Referenceable namespaceReferenceable = createNamespace(clusterName, ns);
             String hbaseNamespaceJson = InstanceSerialization.toJson(namespaceReferenceable, true);
             List<String> createdEntities = atlasClient.createEntity(hbaseNamespaceJson);
-            String namespaceId = createdEntities.get(0);
-            System.out.println(String.format("Created namespace: %s with ID %s", ns.getName(), namespaceId));
-            for (Table t : ns.getTables()) {
-                List<Referenceable> tableEntities = createTableEntities(clusterName, ns.getName(), t, namespaceId);
-                List<String> entitiesCreated = atlasClient.createEntity(tableEntities);
-                System.out.println(String.format(
-                        "Create table %s with ID %s", t.getName(), entitiesCreated.get(entitiesCreated.size()-1)));
-            }
+            guid = createdEntities.get(0);
+            System.out.println(String.format("Created namespace: %s with ID %s", ns.getName(), guid));
+        } else {
+            guid = namespace.getId()._getId();
+            System.out.println("Namespace already exists with ID " + guid);
         }
-
+        return guid;
     }
 
     private Referenceable createNamespace(String clusterName, Namespace ns) {
