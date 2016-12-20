@@ -45,7 +45,7 @@ public class PhoenixMetadataImport {
     }
 
     private void createTypes() throws AtlasServiceException {
-        AtlasTypeRegistrar atlasTypeRegistrar = new AtlasTypeRegistrar(atlasClient);
+        AtlasTypeRegistrar atlasTypeRegistrar = new PhoenixTypeRegistrar(atlasClient);
         atlasTypeRegistrar.registerTypes();
     }
 
