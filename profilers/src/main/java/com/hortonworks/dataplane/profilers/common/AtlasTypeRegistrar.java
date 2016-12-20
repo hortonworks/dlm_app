@@ -32,6 +32,7 @@ public abstract class AtlasTypeRegistrar implements AtlasTypeConstants {
             System.out.println("New types are already registered... not registering again.");
         } else {
             addTypes(newTypesDef);
+            System.out.println("Registered types");
         }
     }
 
