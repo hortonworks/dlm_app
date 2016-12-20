@@ -1,6 +1,3 @@
-/**
- * Created by rksv on 03/12/16.
- */
 import {NgModule} from '@angular/core';
 import {AddClusterComponent}   from './add-cluster.component';
 import {DropDownModule} from '../../shared/dropdown/dropdown.module';

@@ -1,7 +1,7 @@
 import {ModuleWithProviders}  from '@angular/core';
 import {RouterModule} from '@angular/router';
-import {AddClusterComponent} from './add-cluster.component';
+import {AddBdrComponent} from './add-bdr.component';
 
 export const routing: ModuleWithProviders = RouterModule.forChild([
-  { path: '', component: AddClusterComponent}
+    { path: '', component: AddBdrComponent}
 ]);

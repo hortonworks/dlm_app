@@ -1,0 +1,118 @@
+<div class="mdl-grid">
+    <div class="mdl-layout-spacer"></div>
+    <div class="mdl-cell mdl-cell--10-col">
+
+        <h1 class="mdl-typography--headline mdl-typography--font-light" style="margin-bottom: 0">BDR Settings</h1>
+        <div [innerHTML]="welcomeText"> </div>
+
+        <div class="mdl-typography--font-light mt-1 mdl-grid mdl-grid--no-spacing">
+            <div class="mdl-cell mdl-cell--4-col">
+                <span [innerHTML]="entity"></span><span class="mdl-typography--title  mdl-color-text--green"> Cluster Information </span> <br>
+                <span [innerHTML]="entity" style="opacity: 0; display: inline-block;padding-left: 4px;"></span><span class="mdl-typography--caption"> On-Prem </span>
+            </div>
+            <div class="mdl-layout-spacer"></div>
+            <div class="mdl-cell mdl-cell--1-col mdl-typography--text-right">
+                <span class="mdl-typography--body-1">Active</span> <br> <span class="mdl-typography--caption">Past 2 Years</span>
+            </div>
+            <div class="mdl-cell mdl-cell--1-col">
+                <label class="switch">
+                    <input type="checkbox">
+                    <div class="slider round"></div>
+                </label>
+            </div>
+        </div>
+
+        <br>
+
+        <div>
+            <div class="mdl-typography--body-2-color-contrast"> Name </div>
+            <div class="mdl-typography--caption"> Give a descriptive name to your backup policy </div>
+            <input type="text">
+        </div>
+
+        <br>
+
+        <div class="mdl-color-text--green mt-1"> <i class="fa fa-server fa-2x" aria-hidden="true"></i> <span class="mdl-typography--title mdl-typography--font-light"> Select Cluster </span> </div>
+        <div class="mdl-typography--caption">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</div>
+        <br>
+        <div class="mdl-grid config-bgcolor">
+            <div class="mdl-cell mdl-cell--6-col">
+                <div class="mdl-typography--body-2"> Data Center </div>
+                <div class="mdl-typography--caption">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</div>
+                <div class="select-wrap">
+                    <drop-down>
+                        <select #select >
+                            <option value="" disabled selected>Data Center</option>
+                        </select>
+                    </drop-down>
+                </div>
+                <div class="mdl-typography--body-2"> Cluster </div>
+                <div class="mdl-typography--caption">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</div>
+                <div class="select-wrap">
+                    <drop-down>
+                        <select >
+                            <option value="" disabled selected>Cluster</option>
+                        </select>
+                    </drop-down>
+                </div>
+            </div>
+            <div class="mdl-cell mdl-cell--6-col">
+                <div id="map" class="map .dotted"> </div>
+            </div>
+        </div>
+
+        <div class="mdl-color-text--green mt-1"> <i class="fa fa-clock-o fa-2x" aria-hidden="true"></i> <span class="mdl-typography--title mdl-typography--font-light"> Schedule </span> </div>
+        <div class="mdl-typography--caption">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</div>
+        <br>
+        <div>
+            <div class="mdl-typography--body-2"> Type </div>
+            <div class="mdl-typography--caption">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</div>
+            <div class="select-wrap">
+                <drop-down>
+                    <select>
+                        <option value="recurring" >Recurring</option>
+                        <option value="one-time" >On Time</option>
+                    </select>
+                </drop-down>
+            </div>
+            <div class="mdl-typography--body-2"> Frequency </div>
+            <div class="select-wrap">
+                <drop-down>
+                    <select>
+                        <option value="" diabled selected></option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </drop-down>
+            </div>
+            <div class="mdl-typography--body-2"> Recurs Every </div>
+            <div class="select-wrap">
+                <drop-down>
+                    <select>
+
+                    </select>
+                </drop-down>
+            </div>
+            <div class="mdl-typography--body-2"> Duration </div>
+            <span class="date-picker">
+                <input type="date" name="startDate">
+            </span>
+            <span class="date-picker">
+                <input type="date" name="endDate">
+            </span>
+
+        </div>
+
+        <div class="mt-1">
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green" (click)="onSave()">
+                Save
+            </button>
+
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-color--grey-300" (click)="back()">
+                Cancel
+            </button>
+        </div>
+    </div>
+    <div class="mdl-layout-spacer"></div>
+</div>
