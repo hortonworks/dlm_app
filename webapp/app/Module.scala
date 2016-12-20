@@ -1,6 +1,6 @@
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.google.inject.name.Named
-import com.google.inject.{AbstractModule, Provides}
+import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.hw.dp.services.atlas.AtlasHiveApi
 import internal.{AmbariSync, AtlasApiCache}
 import internal.auth.{MongoUserStorage, UserStorage}
@@ -22,6 +22,7 @@ class Module extends AbstractModule {
 
 
   @Provides
+  @Singleton
   @Named("atlasApiCache")
   def provideApiCache(configuration: Configuration,actorSystem: ActorSystem,ws: WSClient):ActorRef = {
     actorSystem.actorOf(Props(classOf[AtlasApiCache], configuration, actorSystem,ws),"atlasApiCache")

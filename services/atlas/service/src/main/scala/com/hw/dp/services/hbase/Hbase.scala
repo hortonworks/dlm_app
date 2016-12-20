@@ -1,8 +1,8 @@
-package com.hw.dp.services.atlas
+package com.hw.dp.services.hbase
 
 import play.api.libs.json.Json
 
-object Hive {
+object HBase {
 
   case class Identifier(
       id: Option[String],
@@ -18,50 +18,27 @@ object Hive {
       modifiedTime: Option[String]
   )
 
-  case class Parameters(
-      rawDataSize: Option[String],
-      numFiles: Option[String],
-      transient_lastDdlTime: Option[String],
-      totalSize: Option[String],
-      COLUMN_STATS_ACCURATE: Option[String],
-      numRows: Option[String]
-  )
-
-  case class Column(
+  case class Columns(
       `$typeName$`: Option[String],
       `$id$`: Option[Identifier],
       `$systemAttributes$`: Option[SystemAttributes],
-      comment: Option[String],
       qualifiedName: Option[String],
-      `type`: Option[String],
-      position: Option[Double],
+      columnFamily: Option[String],
       owner: Option[String],
       description: Option[String],
       name: Option[String],
-      table: Option[Identifier]
+      dataType: Option[String]
   )
 
   case class Result(
       `$typeName$`: Option[String],
       `$id$`: Option[Identifier],
       `$systemAttributes$`: Option[SystemAttributes],
-      aliases: Option[String],
-      comment: Option[String],
-      retention: Option[Double],
-      parameters: Option[Parameters],
       qualifiedName: Option[String],
-      partitionKeys: Option[String],
-      columns: Option[List[Column]],
-      viewOriginalText: Option[String],
+      columns: Option[List[Columns]],
       owner: Option[String],
       description: Option[String],
-      db: Option[Identifier],
-      name: Option[String],
-      temporary: Option[Boolean],
-      createTime: Option[String],
-      lastAccessTime: Option[String],
-      tableType: Option[String],
-      viewExpandedText: Option[String]
+      name: Option[String]
   )
 
   case class Multiplicity(
@@ -89,13 +66,13 @@ object Hive {
       attributeDefinitions: Option[List[AttributeDefinitions]]
   )
 
-  case class SearchResult(
+  case class PhoenixSearchResult(
       requestId: String,
       query: String,
       queryType: String,
       count: Double,
       results: Option[List[Result]],
-      dataType: DataType
+      dataType: Option[DataType]
   )
 
   implicit val mutiplicityReads = Json.reads[Multiplicity]
@@ -103,20 +80,19 @@ object Hive {
   implicit val dataTypeReads = Json.reads[DataType]
   implicit val systemAttributesReads = Json.reads[SystemAttributes]
   implicit val identifierReads = Json.reads[Identifier]
-  implicit val columnReads = Json.reads[Column]
-  implicit val parameterReads = Json.reads[Parameters]
+  implicit val columnReads = Json.reads[Columns]
   implicit val resultsReads = Json.reads[Result]
-  implicit val resultReads = Json.reads[SearchResult]
+  implicit val resultReads = Json.reads[PhoenixSearchResult]
 
   implicit val mutiplicityWrites = Json.writes[Multiplicity]
   implicit val attributeDefinitionWrites = Json.writes[AttributeDefinitions]
   implicit val dataTypeWrites = Json.writes[DataType]
   implicit val systemAttributesWrites = Json.writes[SystemAttributes]
   implicit val identifierWrites = Json.writes[Identifier]
-  implicit val columnWrites = Json.writes[Column]
-  implicit val parameterWrites = Json.writes[Parameters]
+  implicit val columnWrites = Json.writes[Columns]
   implicit val resultsWrites = Json.writes[Result]
-  implicit val resultWrites = Json.writes[SearchResult]
-  implicit val lineageWrites = Json.writes[Lineage]
+  implicit val resultWrites = Json.writes[PhoenixSearchResult]
+
+
 
 }
