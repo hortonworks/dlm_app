@@ -1,6 +1,3 @@
-/**
- * Created by rksv on 22/11/16.
- */
 import {Component, AfterViewInit, OnInit, ViewChild, ElementRef} from '@angular/core';
 import {CityNames} from '../../common/utils/city-names';
 import {AmbariService} from '../../services/ambari.service';
