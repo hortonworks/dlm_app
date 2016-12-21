@@ -16,6 +16,7 @@ import {ViewClusterModule} from './components/view-cluster/view-cluster.module';
 import {AddClusterModule} from './components/add-cluster/add-cluster.module';
 import {ViewDataModule} from './components/view-data/view-data.module';
 import {LoggedInGuard, AlreadyLoggedInGuard} from './common/utils/login-gaurd';
+import {AddBdrModule} from './components/add-bdr/add-bdr.module';
 
 @NgModule({
     imports: [
@@ -25,6 +26,7 @@ import {LoggedInGuard, AlreadyLoggedInGuard} from './common/utils/login-gaurd';
         RouterModule.forRoot(routes),
         ViewClusterModule,
         AddClusterModule,
+        AddBdrModule,
         ViewDataModule
     ],
     declarations: [SidenavRouterLinkDirective, AppComponent, DashboardComponent, LoginComponent, LogoutComponent],

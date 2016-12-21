@@ -1,6 +1,3 @@
-/**
- * Created by rksv on 22/11/16.
- */
 import {Component, AfterViewInit, OnInit, ViewChild, ElementRef} from '@angular/core';
 import {CityNames} from '../../common/utils/city-names';
 import {AmbariService} from '../../services/ambari.service';
@@ -37,7 +34,7 @@ export class AddClusterComponent implements AfterViewInit, OnInit {
     welcomeText = `Add a cluster to the Data Plane by filling in the details below. Once a cluster is added,
     Data Plane will fetch all the details from the cluster and would allow you monitor/manage them from this interface`;
     dataCenterHelp1 = `Add a new datacenter or select an existing datacenter to see all the clusters present in the datacenter.`;
-    dataCenterHelp2 = `Data center groups the cluster's based on the location they are present. The grouping would help administrators to 
+    dataCenterHelp2 = `Data center groups the cluster's based on the location they are present. The grouping would help administrators to
     look at all the clusters present in a datacenter in a single view`;
     ambariHelp= `Login credentials for ambari the credentials are used tio fetch data from ambari`;
     kerbarosHelp = `Kerberos principle and key URL are used to fetch data securely from ambari and the services configured on ambari`;

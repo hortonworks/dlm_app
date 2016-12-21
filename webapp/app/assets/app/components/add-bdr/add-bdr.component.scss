@@ -1,0 +1,23 @@
+input {
+  margin-top: 8px;
+}
+
+.select-wrap {
+  margin-top: 8px;
+}
+
+.date-picker:after {
+  content: "\f073";
+  font-family: "FontAwesome";
+  margin-left: -30px;
+}
+
+.date-picker input::-webkit-inner-spin-button,
+.date-picker input::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+[name=endDate] {
+  margin-left: 30px;
+}
