@@ -31,6 +31,7 @@ public class HdfsTypeRegistrar extends AtlasTypeRegistrar {
     public static final String GROUP_ATTRIBUTE = "group";
     public static final String POSIX_ACLS_ATTRIBUTE = "posixAcls";
     public static final String FILE_SET_ELEMENTS_ATTRIBUTE = "fileSetElements";
+    public static final String COUNT_ATTRIBUTE = "count";
 
     public HdfsTypeRegistrar(AtlasClient atlasClient) {
         super(atlasClient);
@@ -56,7 +57,7 @@ public class HdfsTypeRegistrar extends AtlasTypeRegistrar {
             HierarchicalTypeDefinition<ClassType> hdfsFileSet =
                     TypesUtil.createClassTypeDef(HDFS_FILE_SET_TYPE, ImmutableSet.of(HDFS_FILE_ELEMENT_TYPE),
                             new AttributeDefinition(FILE_SET_ELEMENTS_ATTRIBUTE, DataTypes.arrayTypeName(HDFS_FILE_ELEMENT_TYPE), Multiplicity.COLLECTION, false, null),
-                            new AttributeDefinition("count", DataTypes.INT_TYPE.getName(), Multiplicity.OPTIONAL, false, null)
+                            new AttributeDefinition(COUNT_ATTRIBUTE, DataTypes.INT_TYPE.getName(), Multiplicity.OPTIONAL, false, null)
                     );
             hdfsTypes = TypesUtil.getTypesDef(ImmutableList.<EnumTypeDefinition>of(), ImmutableList.<StructTypeDefinition>of(),
                     ImmutableList.<HierarchicalTypeDefinition<TraitType>>of(),
