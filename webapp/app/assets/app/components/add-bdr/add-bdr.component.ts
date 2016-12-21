@@ -10,6 +10,7 @@ declare var Datamap:any;
 export class AddBdrComponent implements OnInit, AfterViewInit {
     map: any;
     entity = 'Table';
+    nowDate: string = new Date().toISOString().substring(0,10);
     welcomeText = `Configure Backup and Disaster Recovery for the selected Entity. You can select the target cluster to copy the data and the schedule for backup and recovery`;
 
     ngOnInit() {
@@ -17,7 +18,9 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit() {
-        this.map = new Datamap({element: document.getElementById('map'),projection: 'mercator',
+        this.map = new Datamap({
+            element: document.getElementById('map'),
+            projection: 'mercator',
             height: 295,
             width: 385,
             fills: {

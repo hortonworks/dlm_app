@@ -95,12 +95,10 @@
                 </drop-down>
             </div>
             <div class="mdl-typography--body-2"> Duration </div>
-            <span class="date-picker">
-                <input type="date" name="startDate">
-            </span>
-            <span class="date-picker">
+            <div class="select-wrap">
+                <input type="date" name="startDate" [attr.min]="nowDate">
                 <input type="date" name="endDate">
-            </span>
+            </div>
 
         </div>
 
