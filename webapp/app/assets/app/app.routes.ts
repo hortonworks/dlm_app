@@ -14,6 +14,6 @@ export const routes = [
     { path: 'ui/view-cluster/:id', component: ViewClusterComponent},
     { path: 'ui/cluster/add', loadChildren: 'assets/app/components/add-cluster/add-cluster.module#AddClusterModule', canActivate: [LoggedInGuard]},
     { path: 'ui/view-data', loadChildren: 'assets/app/components/view-data/view-data.module#ViewDataModule', canActivate: [LoggedInGuard]},
-    { path: 'ui/configure-bdr', loadChildren: 'assets/app/components/add-bdr/add-bdr.module#AddBdrModule', canActivate: [LoggedInGuard]}
+    { path: 'ui/backup-policy/:key', loadChildren: 'assets/app/components/add-bdr/add-bdr.module#AddBdrModule', canActivate: [LoggedInGuard]}
 
 ];

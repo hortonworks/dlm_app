@@ -12,6 +12,7 @@ import {AuthService} from './services/authservice';
 import {SidenavRouterLinkDirective} from './sidenav-router-link.directive';
 import {AmbariService} from './services/ambari.service';
 import {DataCenterService} from './services/data-center.service';
+import {BackupPolicyService} from './services/backup-policy.service';
 import {ViewClusterModule} from './components/view-cluster/view-cluster.module';
 import {AddClusterModule} from './components/add-cluster/add-cluster.module';
 import {ViewDataModule} from './components/view-data/view-data.module';
@@ -31,7 +32,7 @@ import {AddBdrModule} from './components/add-bdr/add-bdr.module';
     ],
     declarations: [SidenavRouterLinkDirective, AppComponent, DashboardComponent, LoginComponent, LogoutComponent],
     bootstrap: [AppComponent],
-    providers: [AuthService, AmbariService, DataCenterService,LoggedInGuard,AlreadyLoggedInGuard]
+    providers: [AuthService, AmbariService, DataCenterService, BackupPolicyService, LoggedInGuard,AlreadyLoggedInGuard]
 })
 
 export class AppModule {

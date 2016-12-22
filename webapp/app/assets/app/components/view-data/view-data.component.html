@@ -53,7 +53,7 @@
 
         <hive-data [search]="search" [hidden]="search.length === 0"> </hive-data>
 
-        <div class="data-visualization" [hidden]="search.length === 0 && false">
+        <div class="data-visualization" [hidden]="search.length === 0">
             <h6> Lineage </h6>
             <atlas-lineage [search]="search" [dataSourceName]="dataSourceName" [hostName]="hostName"> </atlas-lineage>
 

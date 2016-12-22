@@ -1,6 +1,18 @@
 import {Component, OnInit, AfterViewInit} from '@angular/core';
+import {Router, ActivatedRoute} from '@angular/router';
+import Rx from 'rxjs/Rx';
+import {DataCenter} from '../../models/data-center';
+import {CityNames} from '../../common/utils/city-names';
+import {DataCenterDetails} from '../../models/data-center-details';
+import {Ambari} from '../../models/ambari';
+import {BackupPolicy} from '../../models/backup-policy';
+import {Location} from '../../models/location';
+import {DataCenterService} from '../../services/data-center.service';
+import {AmbariService} from '../../services/ambari.service';
+import {BackupPolicyService} from '../../services/backup-policy.service';
 
 declare var Datamap:any;
+declare var d3:any;
 
 @Component({
     selector: 'add-bdr',
@@ -8,31 +20,320 @@ declare var Datamap:any;
     styleUrls: ['assets/app/components/add-bdr/add-bdr.component.scss']
 })
 export class AddBdrComponent implements OnInit, AfterViewInit {
+
+  state: {
+    isInProgress: boolean,
+    isSuccessful: boolean,
+    error?: any
+  } = {
+    isInProgress: true,
+    isSuccessful: false
+  };
+
+    rxReady: Rx.Observable<boolean>;
     map: any;
+    mapCities: {
+      source?: {
+        location: Location
+        template: string
+      },
+      target?: {
+        location: Location
+        template: string
+      }
+    } = {};
+
     entity = 'Table';
     nowDate: string = new Date().toISOString().substring(0,10);
     welcomeText = `Configure Backup and Disaster Recovery for the selected Entity. You can select the target cluster to copy the data and the schedule for backup and recovery`;
+    dataCenterOptions: Array<DataCenter> = [];
+    clusterOptions: Array<Ambari> = [];
+    mode: string = '';
+    policyId: string = '';
+    isAdvancedEnabled: boolean = false;
+
+    label: string = '';
+    source: {
+      dataCenter: DataCenter,
+      cluster: Ambari,
+      resourceId: string,
+      resourceType: string
+    };
+    target: {
+      dataCenter?: DataCenter,
+      cluster?: Ambari
+    } = {};
+    status: {
+      isEnabled: boolean,
+      since?: string,
+      tSince?: string
+    } = {
+      isEnabled: false
+    };
+    schedule: {
+      scheduleType?: string,
+      frequency?: string,
+      duration: {
+        start: string,
+        stop: string
+      }
+    } = {
+      duration: {
+        start: this.nowDate,
+        stop: ''
+      }
+    };
+
+    constructor(
+      private activatedRoute: ActivatedRoute,
+      private router: Router,
+      private dcService: DataCenterService,
+      private ambariService: AmbariService,
+      private policyService: BackupPolicyService
+    ) {}
 
     ngOnInit() {
-        console.log('here ....');
+      const rxInit = this.activatedRoute.params;
+
+      const [rxCreateInit, rxEditInit] = rxInit.partition(params => params['key'] === 'create');
+
+      const rxCreate =
+        rxCreateInit
+          .map(params => this.activatedRoute.snapshot.queryParams)
+          .map(queryParams => ({
+            dataCenterId: queryParams['dataCenter'] as string,
+            clusterId: queryParams['cluster'] as string,
+            resourceId: queryParams['resourceId'] as string,
+            resourceType: queryParams['resourceType'] as string,
+          }))
+          .flatMap(
+            ({dataCenterId, clusterId, resourceId, resourceType}) => Rx.Observable.forkJoin(
+              this.dcService.getById(dataCenterId),
+              this.ambariService.getById(clusterId),
+              Rx.Observable.of(resourceId),
+              Rx.Observable.of(resourceType),
+              (dataCenter, cluster, tableId) => ({
+                dataCenter,
+                cluster,
+                resourceId,
+                resourceType
+              })
+            )
+          )
+          .map(
+            source => {
+              this.mode = 'CREATE';
+              this.source = source;
+              console.log(source);
+
+            }
+          );
+
+      const rxEdit =
+        rxEditInit
+          .map(params => params['key'] as string)
+          .flatMap(policyId => this.policyService.getById(policyId))
+          .map(
+            policy => {
+              this.mode = 'EDIT';
+              // TODO
+            }
+          );
+
+      const rxPrepare = this.dcService.get();
+
+      this.rxReady =
+        Rx.Observable
+          .merge(rxCreate, rxEdit)
+          .map(obj => true);
+
+      this.rxReady
+        .subscribe(
+          policy => {
+            this.state = {
+              isInProgress: false,
+              isSuccessful: true
+            };
+          }
+        );
+
+      rxPrepare
+        .subscribe(dataCenters => {
+          this.dataCenterOptions = dataCenters;
+        });
     }
 
     ngAfterViewInit() {
-        this.map = new Datamap({
-            element: document.getElementById('map'),
-            projection: 'mercator',
-            height: 295,
-            width: 385,
-            fills: {
-                defaultFill: '#ABE3F3',
-            },
-            bubblesConfig: {
-                popupTemplate: function(geography: any, data: any) {
-                    return '<div class="hoverinfo">' + data.location +'</div>';
-                },
-                borderWidth: '2',
-                borderColor: '#FFFFFF',
+      this.rxReady
+        .subscribe(
+          () => {
+            this.mapRender();
+
+            this.mapRenderCitySource(this.source.dataCenter.location, `${this.source.dataCenter.location.place}`);
+
+            const target: Location = new Location();
+            target.country = 'Sri Lanka';
+            target.place = 'Colombo';
+            this.mapRenderCityTarget(target, 'Colombo');
+            this.mapRenderArc();
+
+            if(this.mode === 'EDIT') {
+              this.mapRenderCityTarget(this.target.dataCenter.location, `${this.target.dataCenter.location.place}`);
             }
+          }
+        );
+    }
+
+    toggleAdvanced() {
+      this.isAdvancedEnabled = !this.isAdvancedEnabled;
+    }
+
+    selectDataCenter() {
+      this.updateClusterOptions();
+    }
+
+    updateClusterOptions() {
+      const dataCenterId = this.target.dataCenter.name;
+
+      this.dcService.getClustersByDataCenterId(dataCenterId)
+        .subscribe(
+          clusters => {
+            this.clusterOptions = clusters;
+          }
+        );
+    }
+
+    mapRender() {
+      this.map = new Datamap({
+        element: document.getElementById('mapBackupPolicy'),
+        projection: 'mercator',
+        height: 295,
+        width: 385,
+        fills: {
+          defaultFill: '#ABE3F3',
+        },
+        geographyConfig: {
+          popupOnHover: false
+        },
+        bubblesConfig: {
+          popupOnHover: true,
+          popupTemplate: function(geography: any, data: any) {
+              return '<div class="hoverinfo">' + data.template +'</div>';
+          },
+          borderWidth: '2',
+          radius:5,
+          borderColor: '#4C4C4C',
+        },
+        arcConfig: {
+          strokeColor: '#DD1C77',
+          strokeWidth: 1,
+          arcSharpness: 1,
+        },
+        // setProjection: function(element) {
+        //   let projection = d3.geo.equirectangular()
+        //     .center([23, -3])
+        //     .rotate([4.4, 0])
+        //     .scale(400)
+        //     .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
+        //   let path = d3.geo.path()
+        //     .projection(projection);
+
+        //   return {path: path, projection: projection};
+        // }
+      });
+    }
+
+    mapRenderCitySource(location: Location, template: string) {
+      this.mapCities.source = {
+        location,
+        template
+      };
+      this.mapRenderCities();
+    }
+
+    mapRenderCityTarget(location: Location, template: string) {
+      this.mapCities.target = {
+        location,
+        template
+      };
+      this.mapRenderCities();
+    }
+
+    mapRenderCities() {
+      const bubbles =
+        Object.keys(this.mapCities)
+        .map(cKey => {
+          const city = this.mapCities[cKey];
+
+          const coordinates = CityNames.getCityCoordinates(city.location.country, city.location.place);
+          const template = '';
+
+
+          return ({
+            template,
+            latitude: parseFloat(coordinates[0]),
+            longitude: parseFloat(coordinates[1])
+          });
         });
+
+      this.map.bubbles(bubbles);
+    }
+
+    mapRenderArc() {
+      if(Object.keys(this.mapCities).length !== 2) {
+        return;
+      }
+
+      const points =
+        Object.keys(this.mapCities)
+        .map(cKey => {
+          const city = this.mapCities[cKey];
+
+          const coordinates = CityNames.getCityCoordinates(city.location.country, city.location.place);
+
+          return ({
+            latitude: parseFloat(coordinates[0]),
+            longitude: parseFloat(coordinates[1])
+          });
+        });
+
+      this.map.arc([{
+        origin: points[0],
+        destination: points[1]
+      }]);
+    }
+
+    doCancel() {
+      if(this.source && this.source.dataCenter.name && this.source.cluster) {
+        this.router.navigate([`/ui/view-data/${this.source.dataCenter.name}?host=${this.source.cluster.host}`]);
+        return;
+      }
+      if(this.source && this.source.dataCenter.name) {
+        this.router.navigate([`/ui/view-cluster/${this.source.dataCenter.name}`]);
+        return;
+      }
+      this.router.navigate(['/ui/dashboard']);
+    }
+
+    doSave() {
+      const policy = new BackupPolicy();
+      policy.label = this.label;
+      policy.source = {
+        dataCenterId: this.source.dataCenter.name,
+        clusterId: this.source.cluster.host,
+        resourceId: this.source.resourceId,
+        resourceType: this.source.resourceType
+      };
+      policy.target = {
+        dataCenterId: this.target.dataCenter.name,
+        clusterId: this.target.cluster.host
+      };
+      policy.schedule = this.schedule;
+      policy.status = this.status;
+
+      this.policyService.create(policy)
+        .subscribe(
+          () => this.router.navigate(['/ui/dashboard'])
+        );
     }
 }

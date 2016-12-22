@@ -16,7 +16,11 @@ case class Target(dataCenterId: String, clusterId: String)
 
 case class Status(isEnabled: Boolean, since: Instant)
 
-case class BackupPolicy(label: String, source: Source, target: Target, status: Status)
+case class Duration(start: String, stop: String)
+
+case class Schedule(scheduleType: String, frequency: String, duration: Duration)
+
+case class BackupPolicy(label: String, source: Source, target: Target, status: Status, schedule: Schedule)
 
 case class SourceInDetail(dataCenter: DataCenter, cluster: Cluster, resourceId: String, resourceType: String)
 
@@ -41,6 +45,16 @@ object BackupPolicyFormatters {
   implicit val statusReads = Json.reads[Status]
 
   implicit val statusWrites = Json.writes[Status]
+
+
+  implicit val durationReads = Json.reads[Duration]
+
+  implicit val durationWrites = Json.writes[Duration]
+
+
+  implicit val scheduleReads = Json.reads[Schedule]
+
+  implicit val scheduleWrites = Json.writes[Schedule]
 
 
   implicit val backupPolicyReads = Json.reads[BackupPolicy]

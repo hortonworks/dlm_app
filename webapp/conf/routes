@@ -21,6 +21,7 @@ PUT         /api/datacenters                       controllers.DataCenterControl
 GET         /api/datacenters                       controllers.DataCenterController.list
 GET         /api/datacenters/:dcName/detail        controllers.DataCenterController.getClusters(dcName)
 GET         /api/datacenters/:id                   controllers.DataCenterController.get(id)
+GET         /api/datacenters/:id/clusters          controllers.DataCenterController.getClustersByDataCenterId(id)
 
 GET         /api/backup-policies                   controllers.BackupPolicyController.list
 POST        /api/backup-policies                   controllers.BackupPolicyController.create

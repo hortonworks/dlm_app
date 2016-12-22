@@ -1,24 +1,33 @@
-<div class="mdl-grid">
+<div class="mdl-grid" *ngIf="state.isSuccessful">
     <div class="mdl-layout-spacer"></div>
     <div class="mdl-cell mdl-cell--10-col">
-
-        <h1 class="mdl-typography--headline mdl-typography--font-light" style="margin-bottom: 0">BDR Settings</h1>
+        <h1 class="mdl-typography--headline mdl-typography--font-light" style="margin-bottom: 0">Backup Policy</h1>
         <div [innerHTML]="welcomeText"> </div>
-
-        <div class="mdl-typography--font-light mt-1 mdl-grid mdl-grid--no-spacing">
-            <div class="mdl-cell mdl-cell--4-col">
-                <span [innerHTML]="entity"></span><span class="mdl-typography--title  mdl-color-text--green"> Cluster Information </span> <br>
-                <span [innerHTML]="entity" style="opacity: 0; display: inline-block;padding-left: 4px;"></span><span class="mdl-typography--caption"> On-Prem </span>
+        <div class="mdl-typography--font-light mt-1" style="display: flex">
+            <div style="display:flex;flex-grow: 1;">
+              <div class="mdl-typography--title mdl-typography--font-light">
+                <span [innerHTML]="entity"></span>:
+              </div>
+              <div style="flex: 1; margin-left: 5px;">
+                <span class="mdl-typography--title  mdl-color-text--green">{{source.resourceId}}</span> <br>
+                <span class="mdl-typography--caption mdl-typography--text-uppercase">On-Prem: {{source.dataCenter.name}} ({{source.cluster.host}})</span>
+              </div>
             </div>
-            <div class="mdl-layout-spacer"></div>
-            <div class="mdl-cell mdl-cell--1-col mdl-typography--text-right">
-                <span class="mdl-typography--body-1">Active</span> <br> <span class="mdl-typography--caption">Past 2 Years</span>
-            </div>
-            <div class="mdl-cell mdl-cell--1-col">
-                <label class="switch">
-                    <input type="checkbox">
+            <div class="">
+              <div style="display: table; text-align: right;">
+                <div style="display: table-row">
+                  <div class="mdl-typography--body-1" style="display: table-cell;vertical-align: middle;padding-right: 10px;">{{status.isEnabled ? 'Enabled' : 'Disabled'}}</div>
+                  <label class="switch" style="display: table-cell;vertical-align: middle;">
+                    <input type="checkbox" [(ngModel)]="status.isEnabled">
                     <div class="slider round"></div>
-                </label>
+                  </label>
+                </div>
+                <div style="display: table-row" *ngIf="status.since">
+                  <div class="mdl-typography--caption" style="display: table-cell;padding-right: 10px;">
+                    {{status.tSince}}
+                  </div>
+                </div>
+              </div>
             </div>
         </div>
 
@@ -27,70 +36,86 @@
         <div>
             <div class="mdl-typography--body-2-color-contrast"> Name </div>
             <div class="mdl-typography--caption"> Give a descriptive name to your backup policy </div>
-            <input type="text">
+            <input type="text" [(ngModel)]="label">
         </div>
 
         <br>
 
-        <div class="mdl-color-text--green mt-1"> <i class="fa fa-server fa-2x" aria-hidden="true"></i> <span class="mdl-typography--title mdl-typography--font-light"> Select Cluster </span> </div>
-        <div class="mdl-typography--caption">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</div>
+        <div class="mdl-color-text--green mt-1">
+          <i class="fa fa-server fa-2x" aria-hidden="true"></i>
+          <span class="mdl-typography--title mdl-typography--font-light"> Select Cluster </span>
+        </div>
+
+        <div class="mdl-typography--caption">Specify the target location where backups needs to be written to.</div>
+
         <br>
-        <div class="mdl-grid config-bgcolor">
-            <div class="mdl-cell mdl-cell--6-col">
+
+        <div class="mdl-grid mdl-grid--no-spacing config-bgcolor">
+            <div class="mdl-cell mdl-cell--6-col" style="padding:16px;">
                 <div class="mdl-typography--body-2"> Data Center </div>
-                <div class="mdl-typography--caption">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</div>
+                <div class="mdl-typography--caption">Select the data center your target cluster is located.</div>
                 <div class="select-wrap">
                     <drop-down>
-                        <select #select >
-                            <option value="" disabled selected>Data Center</option>
+                        <select [(ngModel)]="target.dataCenter" (change)="selectDataCenter()">
+                            <option disabled selected [ngValue]="">Data Center</option>
+                            <option *ngFor="let dc of dataCenterOptions" [ngValue]="dc">{{dc.name}}</option>
                         </select>
                     </drop-down>
                 </div>
                 <div class="mdl-typography--body-2"> Cluster </div>
-                <div class="mdl-typography--caption">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</div>
+                <div class="mdl-typography--caption">Select your target cluster.</div>
                 <div class="select-wrap">
                     <drop-down>
-                        <select >
-                            <option value="" disabled selected>Cluster</option>
+                        <select [(ngModel)]="target.cluster">
+                            <option disabled selected [ngValue]="">Cluster</option>
+                            <option *ngFor="let cluster of clusterOptions" [ngValue]="cluster">{{cluster.host}}</option>
                         </select>
                     </drop-down>
                 </div>
+                <div (click)="toggleAdvanced()" class="mdl-typography--body-2" style="cursor: pointer">
+                  <i class="fa fa-chevron-right" aria-hidden="true" [class.fa-rotate-90]="isAdvancedEnabled === true" style="transition: transform 0.2s linear"></i>
+                  Advanced Settings
+                </div>
+                <div [hidden]="isAdvancedEnabled === false">
+                  Advanced
+                </div>
             </div>
-            <div class="mdl-cell mdl-cell--6-col">
-                <div id="map" class="map .dotted"> </div>
+            <div class="mdl-cell mdl-cell--6-col" style="background-color: rgba(255,255,255,0.25)">
+                <div id="mapBackupPolicy" class="map dotted" style="text-align: center;position:relative;"> </div>
             </div>
         </div>
 
-        <div class="mdl-color-text--green mt-1"> <i class="fa fa-clock-o fa-2x" aria-hidden="true"></i> <span class="mdl-typography--title mdl-typography--font-light"> Schedule </span> </div>
-        <div class="mdl-typography--caption">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</div>
+        <div class="mdl-color-text--green mt-1">
+          <i class="fa fa-clock-o fa-2x" aria-hidden="true"></i>
+          <span class="mdl-typography--title mdl-typography--font-light"> Schedule </span>
+        </div>
+
+        <div class="mdl-typography--caption">Configure when you want the job run.</div>
+
         <br>
+{{schedule | json}}
         <div>
             <div class="mdl-typography--body-2"> Type </div>
-            <div class="mdl-typography--caption">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</div>
+            <div class="mdl-typography--caption">When should the job be run?</div>
             <div class="select-wrap">
                 <drop-down>
-                    <select>
-                        <option value="recurring" >Recurring</option>
-                        <option value="one-time" >On Time</option>
+                    <select [(ngModel)]="schedule.scheduleType">
+                        <option disabled selected></option>
+                        <option value="MANUAL">Manual</option>
+                        <option value="SCHEDULED">Scheduled</option>
+                        <option value="ON_CHANGE">On Change</option>
                     </select>
                 </drop-down>
             </div>
             <div class="mdl-typography--body-2"> Frequency </div>
             <div class="select-wrap">
                 <drop-down>
-                    <select>
-                        <option value="" diabled selected></option>
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
-                    </select>
-                </drop-down>
-            </div>
-            <div class="mdl-typography--body-2"> Recurs Every </div>
-            <div class="select-wrap">
-                <drop-down>
-                    <select>
-
+                    <select [(ngModel)]="schedule.frequency">
+                        <option disabled selected></option>
+                        <option value="HOURLY">Hourly</option>
+                        <option value="DAILY">Daily</option>
+                        <option value="WEEKLY">Weekly</option>
+                        <option value="MONTHLY">Monthly</option>
                     </select>
                 </drop-down>
             </div>
@@ -103,11 +128,11 @@
         </div>
 
         <div class="mt-1">
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green" (click)="onSave()">
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green" (click)="doSave()">
                 Save
             </button>
 
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-color--grey-300" (click)="back()">
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-color--grey-300" (click)="doCancel()">
                 Cancel
             </button>
         </div>
