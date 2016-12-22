@@ -7,7 +7,7 @@ import reactivemongo.api.commands.WriteResult
 import scala.concurrent.Future
 
 
-trait DataStorage {
+trait ClusterDataStorage {
 
   def loadCluster(clusterHost: String, datacenter: String) : Future[Option[Ambari]]
 

@@ -35,6 +35,11 @@ GET         /api/datacenters/hbase/entity          controllers.AtlasHBase.getEnt
 GET         /api/datacenters/Hbase/audit           controllers.AtlasHBase.getAudit(clusterHost,dc,guid)
 
 
+#Search
+
+POST      /api/search/hive                         controllers.AtlasHiveSearch.searchHiveTables
+POST      /api/search/hbase                        controllers.AtlasHbaseSearch.searchHbaseTables
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                          controllers.Assets.versioned(path="/public", file: Asset)

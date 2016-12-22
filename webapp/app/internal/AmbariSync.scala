@@ -4,7 +4,7 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import com.google.inject.{Inject, Singleton}
 import com.hw.dp.service.api.Poll
 import internal.actors.{AmbariLoader, ClusterHealthSync, ServiceSync}
-import internal.persistence.{DataPersister, DataStorage}
+import internal.persistence.{DataPersister, ClusterDataStorage}
 import play.api.libs.ws.WSClient
 
 import scala.collection.mutable.ListBuffer
@@ -18,7 +18,7 @@ import scala.util.Try
   */
 @Singleton
 class AmbariSync @Inject()(actorSystem: ActorSystem,
-                           storage: DataStorage, ws: WSClient,configuration: play.api.Configuration) {
+                           storage: ClusterDataStorage, ws: WSClient, configuration: play.api.Configuration) {
 
   val interval = Try(configuration.underlying.getInt("scheduler.cluster.sync.interval")).getOrElse(1)
   private val synchronizers = ListBuffer[ActorRef]()

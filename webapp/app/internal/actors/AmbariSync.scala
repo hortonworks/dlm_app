@@ -7,7 +7,7 @@ import akka.actor.{Actor, ActorLogging}
 import com.hw.dp.service.api.Poll
 import com.hw.dp.service.cluster._
 import internal.DataPlaneError
-import internal.persistence.DataStorage
+import internal.persistence.ClusterDataStorage
 import play.api.Logger
 import play.api.libs.json.JsObject
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest, WSResponse}
@@ -15,7 +15,7 @@ import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest, WSResponse}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AmbariSync(val ambari:Ambari, val storage:DataStorage, ws: WSClient) extends Actor with ActorLogging {
+class AmbariSync(val ambari:Ambari, val storage:ClusterDataStorage, ws: WSClient) extends Actor with ActorLogging {
 
   val clustersApi = "api/v1/clusters"
   val prefix =  s"${ambari.protocol}://${ambari.host}:${ambari.port}/"

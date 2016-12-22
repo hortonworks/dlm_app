@@ -7,7 +7,7 @@ import com.hw.dp.service.cluster.DataConstraints
 import com.hw.dp.services.atlas.AtlasHiveApi
 import internal.{AtlasApiCache, GetHiveApi}
 import internal.auth.Authenticated
-import internal.persistence.DataStorage
+import internal.persistence.ClusterDataStorage
 import models.JsonResponses
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -24,7 +24,7 @@ import scala.util.Try
 /**
   * Get settings to show in various parts of the APP
   */
-class AtlasHive @Inject()(@Named("atlasApiCache") val atlasApiCache:ActorRef, storage: DataStorage) extends Controller {
+class AtlasHive @Inject()(@Named("atlasApiCache") val atlasApiCache:ActorRef, storage: ClusterDataStorage) extends Controller {
 
   import com.hw.dp.services.atlas.Hive._
   implicit val timeout = Timeout(120 seconds)

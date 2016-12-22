@@ -7,7 +7,7 @@ import akka.actor.{Actor, ActorLogging}
 import com.hw.dp.service.api.Poll
 import com.hw.dp.service.cluster._
 import internal.DataPlaneError
-import internal.persistence.DataStorage
+import internal.persistence.ClusterDataStorage
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest}
@@ -15,7 +15,7 @@ import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
-class ClusterHealthSync(val storage: DataStorage, ws: WSClient) extends Actor with ActorLogging {
+class ClusterHealthSync(val storage: ClusterDataStorage, ws: WSClient) extends Actor with ActorLogging {
 
   val clustersApi = "api/v1/clusters"
 

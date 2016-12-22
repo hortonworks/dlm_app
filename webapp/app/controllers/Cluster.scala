@@ -5,7 +5,7 @@ import javax.inject.Inject
 import com.hw.dp.service.cluster.Ambari
 import com.hw.dp.service.cluster.Formatters._
 import internal.auth.Authenticated
-import internal.persistence.DataStorage
+import internal.persistence.ClusterDataStorage
 import internal.{AmbariSync, DataPlaneError, MongoUtilities}
 import models.JsonResponses
 import play.api.libs.json.{JsObject, Json}
@@ -17,7 +17,7 @@ import reactivemongo.play.json.collection.JSONCollection
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class Cluster @Inject()(val reactiveMongoApi: ReactiveMongoApi,val storage:DataStorage,val ambariSync: AmbariSync)
+class Cluster @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage:ClusterDataStorage, val ambariSync: AmbariSync)
   extends Controller with MongoController with ReactiveMongoComponents with MongoUtilities {
 
   def clusters = database.map(_.collection[JSONCollection]("clusters"))

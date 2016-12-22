@@ -9,7 +9,7 @@ import com.hw.dp.services.atlas.AtlasHiveApi
 import com.hw.dp.services.hbase.AtlasHBaseApi
 import internal.{GetHbaseApi, GetHiveApi}
 import internal.auth.Authenticated
-import internal.persistence.DataStorage
+import internal.persistence.ClusterDataStorage
 import models.JsonResponses
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -23,7 +23,7 @@ import scala.util.Try
   * Get settings to show in various parts of the APP
   */
 class AtlasHBase @Inject()(@Named("atlasApiCache") val atlasApiCache: ActorRef,
-                           storage: DataStorage)
+                           storage: ClusterDataStorage)
     extends Controller {
 
   import com.hw.dp.services.hbase.HBase._

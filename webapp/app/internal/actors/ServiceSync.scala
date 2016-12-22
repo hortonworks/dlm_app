@@ -7,12 +7,12 @@ import akka.actor.{Actor, ActorLogging, ActorRef}
 import com.hw.dp.service.api.Poll
 import com.hw.dp.service.cluster.{Ambari, Service, ServiceComponent}
 import internal.DataPlaneError
-import internal.persistence.{DataStorage, SaveService, SaveServiceComponent}
+import internal.persistence.{ClusterDataStorage, SaveService, SaveServiceComponent}
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-class ServiceSync(val storage: DataStorage, ws: WSClient,dataPersister: ActorRef) extends Actor with ActorLogging {
+class ServiceSync(val storage: ClusterDataStorage, ws: WSClient, dataPersister: ActorRef) extends Actor with ActorLogging {
 
   val componentApi = "components"
 
