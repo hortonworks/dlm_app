@@ -1,0 +1,54 @@
+<div class="mdl-layout__header">
+    <div class="mdl-layout__header-row">
+        <div>
+            <span class="mdl-chip mdl-chip--deletable" *ngFor="let chip of appliedSearchParams" [hidden]="chip.key === ''">
+                <span class="mdl-chip__text">{{ chip.key }} {{ chip.operator }} {{ chip.value }}</span>
+                <button type="button" class="mdl-chip__action" (click)="onRemove(chip)"></button>
+            </span>
+        </div>
+        <div class="mdl-layout-spacer"></div>
+        <nav class="mdl-navigation mdl-layout--large-screen-only">
+            <a class="mdl-navigation__link mdl-typography--body-1 search" (click)="expanded=!expanded">Search</a>
+        </nav>
+    </div>
+</div>
+<div *ngIf="expanded" class="search-params">
+
+    <div class="mdl-grid mdl-grid--no-spacing" *ngFor="let appliedSearchParam of appliedSearchParams; let isLast =last">
+        <div class="mdl-cell mdl-cell--2-col top-bottom-border left-border right-border">
+            <drop-down>
+                <select [(ngModel)]="appliedSearchParam.key">
+                    <option *ngFor="let key of getUnusedSearchKeys(appliedSearchParam.key)" [selected]="key === appliedSearchParam.key">{{ key }}</option>
+                </select>
+            </drop-down>
+        </div>
+        <div class="mdl-cell mdl-cell--1-col top-bottom-border right-border">
+            <drop-down>
+                <select [(ngModel)]="appliedSearchParam.operator">
+                    <option [disabled]></option>
+                    <option *ngFor="let operator of getOperators(appliedSearchParam.key)">{{ operator }}</option>
+                </select>
+            </drop-down>
+        </div>
+        <div class="mdl-cell mdl-cell--4-col top-bottom-border right-border">
+            <input type="text" class="no-border"[(ngModel)]="appliedSearchParam.value">
+        </div>
+        <div class="mdl-cell mdl-cell--2-col">
+            <i class="fa fa-minus" aria-hidden="true" (click)="onRemove(appliedSearchParam)" [hidden]="appliedSearchParams.length === 1 && appliedSearchParam.key === ''"></i>
+            <i class="fa fa-plus" aria-hidden="true" (click)="onAdd()" *ngIf="appliedSearchParams.length !== allSearchParamWrappers.length && isLast"></i>
+        </div>
+        <div class="mdl-layout-spacer"></div>
+    </div>
+
+    <div class="mt-1">
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green" (click)="createChips()">
+            Search
+        </button>
+
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-color--grey-300" (click)="expanded=false">
+            Close
+        </button>
+    </div>
+
+
+</div>

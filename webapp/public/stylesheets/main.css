@@ -11,9 +11,13 @@ select,input{
     min-width: 300px;
     height: 24px;
 }
-input {
+input, textarea {
     border: 1px solid #cccccc;
     border-radius: 4px;
+}
+textarea {
+    min-width: 300px;
+
 }
 
 /* Action Buttons */

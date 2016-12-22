@@ -17,6 +17,11 @@ import {AddClusterModule} from './components/add-cluster/add-cluster.module';
 import {ViewDataModule} from './components/view-data/view-data.module';
 import {LoggedInGuard, AlreadyLoggedInGuard} from './common/utils/login-gaurd';
 import {AddBdrModule} from './components/add-bdr/add-bdr.module';
+import {AnalystDashboardModule} from './components/data-analyst/analyst-dashboard/analyst-dashboard.module';
+import {Environment} from './environment';
+import {DataSetModule} from './components/data-analyst/data-set/data-set.module';
+import {AddDataSetModule} from './components/data-analyst/add-data-set/add-data-set.module';
+import {ViewDataSetModule} from './components/data-analyst/view-data-set/view-data-set.module';
 
 @NgModule({
     imports: [
@@ -27,11 +32,15 @@ import {AddBdrModule} from './components/add-bdr/add-bdr.module';
         ViewClusterModule,
         AddClusterModule,
         AddBdrModule,
-        ViewDataModule
+        ViewDataModule,
+        AnalystDashboardModule,
+        DataSetModule,
+        AddDataSetModule,
+        ViewDataSetModule
     ],
     declarations: [SidenavRouterLinkDirective, AppComponent, DashboardComponent, LoginComponent, LogoutComponent],
     bootstrap: [AppComponent],
-    providers: [AuthService, AmbariService, DataCenterService,LoggedInGuard,AlreadyLoggedInGuard]
+    providers: [Environment, AuthService, AmbariService, DataCenterService,LoggedInGuard,AlreadyLoggedInGuard]
 })
 
 export class AppModule {
