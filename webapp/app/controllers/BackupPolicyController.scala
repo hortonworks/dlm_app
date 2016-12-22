@@ -2,7 +2,6 @@ package controllers
 
 import javax.inject.Inject
 
-import com.hw.dp.service.cluster.{DataCenter, Cluster}
 import internal.auth.Authenticated
 import internal.MongoUtilities
 import internal.persistence.DataStorage
@@ -79,14 +78,14 @@ class BackupPolicyController @Inject()(
   }
 
   def get(id: String) = Authenticated.async {
-    getBackupPolicyById(id)
+    storage.getBackupPolicyById(id)
         .flatMap(
           cPolicy =>
             for {
-              sourceDataCenter <- getDataCenterById(cPolicy.source.dataCenterId)
-              sourceCluster <- getClusterById(cPolicy.source.clusterId)
-              targetDataCenter <- getDataCenterById(cPolicy.target.dataCenterId)
-              targetCluster <- getClusterById(cPolicy.target.clusterId)
+              sourceDataCenter <- storage.getDataCenterById(cPolicy.source.dataCenterId)
+              sourceCluster <- storage.getClusterById(cPolicy.source.clusterId)
+              targetDataCenter <- storage.getDataCenterById(cPolicy.target.dataCenterId)
+              targetCluster <- storage.getClusterById(cPolicy.target.clusterId)
             } yield {
               BackupPolicyInDetail(
                 cPolicy.label,
@@ -100,33 +99,5 @@ class BackupPolicyController @Inject()(
         .recoverWith {
           case e:Exception => Future.successful(InternalServerError(JsonResponses.statusError("fetch error",e.getMessage)))
         }
-  }
-
-  def getBackupPolicyById(id: String): Future[BackupPolicy] = {
-    policies.flatMap(
-      _
-        .find(Json.obj("label" -> id))
-        .requireOne[BackupPolicy]
-    )
-  }
-
-  def getDataCenterById(id: String): Future[DataCenter] = {
-    import com.hw.dp.service.cluster.Formatters._
-
-    dataCenters.flatMap(
-      _
-        .find(Json.obj("name" -> id))
-        .requireOne[DataCenter]
-    )
-  }
-
-  def getClusterById(id: String): Future[Cluster] = {
-    import com.hw.dp.service.cluster.Formatters._
-
-    clusters.flatMap(
-      _
-        .find(Json.obj("host" -> id))
-        .requireOne[Cluster]
-    )
   }
 }

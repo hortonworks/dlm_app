@@ -73,14 +73,7 @@ class DataCenterController @Inject()(val reactiveMongoApi: ReactiveMongoApi, val
 
   def get(id: String) = Authenticated.async {
 
-    import com.hw.dp.service.cluster.Formatters._
-
-    dataCenters
-      .flatMap(
-        _
-          .find(Json.obj("name" -> id))
-          .requireOne[DataCenter]
-      )
+    storage.getDataCenterById(id)
       .map(cDataCenter =>
         Ok(Json.toJson(cDataCenter))
       )
@@ -88,8 +81,17 @@ class DataCenterController @Inject()(val reactiveMongoApi: ReactiveMongoApi, val
         case e:Exception =>
           Future.successful(InternalServerError(JsonResponses.statusError("Server error",e.getMessage)))
       }
-
   }
 
-
+  def getClustersByDataCenterId(id: String) = Authenticated.async {
+    storage.getClustersByDataCenterId(id)
+      .map({
+        ambariClusters =>
+          Ok(Json.toJson(ambariClusters))
+      })
+      .recoverWith {
+        case e:Exception =>
+          Future.successful(InternalServerError(JsonResponses.statusError("Server error",e.getMessage)))
+      }
+  }
 }
