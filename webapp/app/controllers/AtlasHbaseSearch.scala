@@ -9,7 +9,7 @@ import com.hw.dp.services.hbase.{AtlasHBaseApi, HBase}
 import internal.GetHbaseApi
 import internal.auth.Authenticated
 import internal.filters.HbaseFilterChain
-import internal.persistence.{ClusterDataStorage, DataSetStorage}
+import internal.persistence.ClusterDataStorage
 import models.JsonResponses
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -20,7 +20,6 @@ import scala.concurrent.duration._
 
 class AtlasHbaseSearch @Inject()(
     @Named("atlasApiCache") val atlasApiCache: ActorRef,
-    storage: DataSetStorage,
     clusterStorage: ClusterDataStorage)
     extends Controller {
 
@@ -32,7 +31,7 @@ class AtlasHbaseSearch @Inject()(
   def searchHbaseTables = Authenticated.async(parse.json) { req =>
     val jsResult = req.body.validate[SearchQuery]
     if (jsResult.isError) {
-      Future.successful(
+       Future.successful(
         BadRequest(JsonResponses.statusError("Could not parse search query")))
     }
     val searchQuery = jsResult.get

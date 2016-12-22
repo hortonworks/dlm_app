@@ -9,7 +9,7 @@ import com.hw.dp.services.atlas.{AtlasHiveApi, Hive}
 import internal.GetHiveApi
 import internal.auth.Authenticated
 import internal.filters.HiveFilterChain
-import internal.persistence.{ClusterDataStorage, DataSetStorage}
+import internal.persistence.ClusterDataStorage
 import models.JsonResponses
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -20,7 +20,6 @@ import scala.concurrent.duration._
 
 class AtlasHiveSearch @Inject()(
     @Named("atlasApiCache") val atlasApiCache: ActorRef,
-    storage: DataSetStorage,
     clusterStorage: ClusterDataStorage)
     extends Controller {
 

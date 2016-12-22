@@ -9,10 +9,12 @@ trait DataSetStorage {
 
   def saveDataSet(dataSet: DataSet): Future[WriteResult]
 
-  def deleteDataSet(name: String,cluster:String,host:String,datacenter:String): Future[WriteResult]
+  def updateDataSet(dataSet: DataSet): Future[WriteResult]
 
-  def getDataSets(cluster:String,host:String,datacenter:String) : Future[Seq[DataSet]]
+  def deleteDataSet(name: String,host:String,datacenter:String): Future[WriteResult]
 
-  def getDataSet(name: String,cluster:String,host:String,datacenter:String) : Future[Option[DataSet]]
+  def getDataSets(host:String,datacenter:String) : Future[Seq[DataSet]]
+
+  def getDataSet(name: String,host:String,dataCenter:String) : Future[Option[DataSet]]
 
 }

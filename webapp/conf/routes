@@ -37,8 +37,16 @@ GET         /api/datacenters/Hbase/audit           controllers.AtlasHBase.getAud
 
 #Search
 
-POST      /api/search/hive                         controllers.AtlasHiveSearch.searchHiveTables
-POST      /api/search/hbase                        controllers.AtlasHbaseSearch.searchHbaseTables
+POST        /api/search/hive                       controllers.AtlasHiveSearch.searchHiveTables
+POST        /api/search/hbase                      controllers.AtlasHbaseSearch.searchHbaseTables
+
+
+#DataSet
+
+POST        /api/datasets                          controllers.DataSets.create
+PUT         /api/datasets                          controllers.DataSets.update
+GET         /api/datasets/:name                    controllers.DataSets.getByname(name,host,datacenter)
+GET         /api/datasets                          controllers.DataSets.getAll(host,datacenter)
 
 
 # Map static resources from the /public folder to the /assets URL path
