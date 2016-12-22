@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, PoisonPill, Props}
 import com.hw.dp.service.api.Poll
 import com.hw.dp.service.cluster.Ambari
 import internal.DataPlaneError
-import internal.persistence.DataStorage
+import internal.persistence.ClusterDataStorage
 import play.api.Logger
 import play.api.libs.ws.WSClient
 
@@ -15,7 +15,7 @@ import scala.concurrent.Future
 
 
 sealed case class Key(host:String,dc:String)
-class AmbariLoader(storage: DataStorage, ws: WSClient) extends Actor with ActorLogging {
+class AmbariLoader(storage: ClusterDataStorage, ws: WSClient) extends Actor with ActorLogging {
 
   //Map for holding cluster references
   val map = mutable.Map[Key, ActorRef]()

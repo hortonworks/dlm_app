@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 case class SaveService(service:Service)
 case class SaveServiceComponent(component: ServiceComponent)
 
-class DataPersister @Inject()(storage:DataStorage) extends Actor{
+class DataPersister @Inject()(storage:ClusterDataStorage) extends Actor{
 
   override def receive: Receive = {
 

@@ -1,4 +1,4 @@
-package com.hw.dp.services.atlas
+package com.hw.dp.services.hbase
 
 import java.util.concurrent.TimeUnit
 
@@ -9,7 +9,7 @@ import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.google.common.io.BaseEncoding
 import com.hw.dp.service.api.{Poll, ServiceException, ServiceNotFound}
 import com.hw.dp.service.cluster.{Ambari, Cluster}
-import com.hw.dp.services.atlas.Hive.{Result, SearchResult}
+import com.hw.dp.services.atlas.Atlas
 import org.springframework.http.{HttpEntity, HttpHeaders, HttpMethod}
 import org.springframework.security.kerberos.client.KerberosRestTemplate
 import org.springframework.web.client.RestTemplate
@@ -20,26 +20,27 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
+import HBase._
 import scala.util.Try
 
 /**
-  * A cache backed client for loading hive related data from Atlas
+  * A cache backed client for loading hbase related data from Atlas
   *
   * Clients should call and wait for the initialize call to complete
   *
   * api.initialize.map { atlas =>
-    println(api.fastFindHiveTable("test100"))
-    println(api.fastLoadAllTables)
-  }.recoverWith {
-    case e: Exception => Future.successful(e.printStackTrace())
-  }
+  * println(api.fastFindhbaseTable("test100"))
+  * println(api.fastLoadAllTables)
+  * }.recoverWith {
+  * case e: Exception => Future.successful(e.printStackTrace())
+  * }
   *
   * @param actorSystem
   * @param ambari
   * @param cluster
   * @param configuration
   */
-class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluster, configuration: Configuration,ws: WSClient) extends AtlasHiveApi {
+class AtlasHBaseApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluster, configuration: Configuration,ws: WSClient) extends AtlasHBaseApi {
 
 
   val ambariUrlPrefix = s"${ambari.protocol}://${ambari.host}:${ambari.port}/api/v1/clusters/${cluster.name}"
@@ -64,9 +65,8 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluste
     .expireAfterWrite(Try(configuration.underlying.getLong("atlas.api.tableCache.time.minutes")) getOrElse (60), TimeUnit.MINUTES)
     .build(new TableCacheLoader(this))
 
-
   /**
-    * re-initialize the API
+    * Initialize the API
     */
   override def initialize: Future[Atlas] = {
     Logger.info("Starting atlas API")
@@ -109,7 +109,7 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluste
       tableLoader = Some(actorSystem.actorOf(Props(classOf[CacheReloader], this)))
 
       // preload cache
-      allHiveTables.map(sr =>
+      allHBaseTables.map(sr =>
         sr.results.map { res =>
           res.foreach { tr =>
             Try(tableCache.put(tr.name.get, tr))
@@ -123,58 +123,80 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluste
       }
       Atlas(apiUrl)
     }
-  }
 
-
-  override def findHiveTable(tableName: String): Try[SearchResult] = {
-
-    val searchUrl = s"${apiUrl}/api/atlas/discovery/search/dsl?query=hive_table where name='${tableName}'"
-    Try {
-      val entity = new HttpEntity[String](headers);
-      val response = template.exchange(searchUrl, HttpMethod.GET, entity, classOf[String])
-      Json.parse(response.getBody).validate[SearchResult].map(r => r).getOrElse {
-        throw new ServiceException(s"Cannot parse result as Json ${response}")
-      }
-    }
-  }
-
-  override def allHiveTables: Try[SearchResult] = {
-    val searchUrl = s"${apiUrl}/api/atlas/discovery/search/dsl?query=hive_table"
-    Try {
-      val entity = new HttpEntity[String](headers);
-      val response = template.exchange(searchUrl, HttpMethod.GET, entity, classOf[String])
-      Json.parse(response.getBody).validate[SearchResult].map(r => r).getOrElse {
-        throw new ServiceException(s"Cannot parse result as Json ${response}")
-      }
-    }
-  }
-
-
-  override def fastFindHiveTable(tableName: String): Option[Result] = {
-    Try(Some(tableCache.get(tableName))) getOrElse None
   }
 
   /**
-    *
+    * clear caches and shutdown the API connection
     */
-  override def close = {
+  override def close: Unit = {
     tableCache.invalidateAll()
     tableLoader.map(_ ! PoisonPill)
   }
 
-
-  override def cacheWarmed: Boolean = tableCache.size() > 0
-
-
-  import collection.JavaConverters._
-
-  override def fastLoadAllTables = tableCache.asMap().values().asScala.toSeq
+  /**
+    * Clients can call this method to check the availability of the cache
+    *
+    * @return True if cache ready
+    */
+  override def cacheWarmed: Boolean = ???
 
   /**
-    * Get raw Entity information
+    * Look up a hbase table using the Atlas API
+    *
+    * @param tableName
+    * @return search result
+    */
+  override def findHBaseTable(tableName: String): Try[PhoenixSearchResult] = {
+    val searchUrl = s"${apiUrl}/api/atlas/discovery/search/dsl?query=PhoenixTable where name='${tableName}'"
+    Try {
+      val entity = new HttpEntity[String](headers)
+      val response = template.exchange(searchUrl, HttpMethod.GET, entity, classOf[String])
+      Json.parse(response.getBody).validate[PhoenixSearchResult].map(r => r).getOrElse {
+        throw new ServiceException(s"Cannot parse result as Json ${response}")
+      }
+    }
+
+  }
+
+  /**
+    * Load all hbase tables
+    *
+    * @return Search result
+    */
+  override def allHBaseTables: Try[PhoenixSearchResult] = {
+    val searchUrl = s"${apiUrl}/api/atlas/discovery/search/dsl?query=PhoenixTable"
+    Try {
+      val entity = new HttpEntity[String](headers)
+      val response = template.exchange(searchUrl, HttpMethod.GET, entity, classOf[String])
+      Json.parse(response.getBody).validate[PhoenixSearchResult].map(r => r).getOrElse {
+        throw new ServiceException(s"Cannot parse result as Json ${response}")
+      }
+    }
+
+  }
+
+  /**
+    * A quicker version of the table lookup which relies on the underlying
+    * cache for getting the table information, clients should try to load
+    * table information using this method first.
+    *
+    * @param tableName
+    * @return
+    */
+  override def fastFindHBaseTable(tableName: String): Option[Result] = {
+    Try(Some(tableCache.get(tableName))) getOrElse None
+  }
+
+  /**
+    * Load all tables from the cache
     *
     * @return
     */
+  import collection.JavaConverters._
+  override def fastLoadAllTables: Seq[Result] =  tableCache.asMap().values().asScala.toSeq
+
+
   override def getEntity(guid: String): JsValue = {
     val url = s"${apiUrl}/api/atlas/entities/${guid}"
     Try {
@@ -182,33 +204,6 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluste
       val response = template.exchange(url, HttpMethod.GET, entity, classOf[String])
       Json.parse(response.getBody)
     } getOrElse(Json.obj())
-  }
-
-  private def getResponse(url: String): Future[String] = {
-    Future {
-      val entity = new HttpEntity[String](headers)
-      val response = template.exchange(url, HttpMethod.GET, entity, classOf[String])
-      response.getBody
-    }
-  }
-
-  /**
-    * Get Lineage
-    *
-    * @param guid
-    * @return
-    */
-  override def getLineage(guid: String): Future[Lineage] = {
-    val inputsUrl = s"${apiUrl}/api/atlas/lineage/${guid}/inputs/graph"
-    val outputsUrl = s"${apiUrl}/api/atlas/lineage/${guid}/outputs/graph"
-    val schemaUrl = s"${apiUrl}/api/atlas/lineage/${guid}/schema"
-    for{
-      inputsResponse <-  getResponse(inputsUrl)
-      outputsResponse <-  getResponse(outputsUrl)
-      schemaResponse <-  getResponse(schemaUrl)
-    } yield {
-      Lineage(inputsResponse,outputsResponse,schemaResponse)
-    }
   }
 
   /**
@@ -227,12 +222,13 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluste
   }
 }
 
-sealed private class TableCacheLoader(atlasApi: AtlasHiveApi) extends CacheLoader[String, Result] {
+
+sealed private class TableCacheLoader(atlasApi: AtlasHBaseApi) extends CacheLoader[String, Result] {
   override def load(key: String): Result = {
     Logger.info(s"loading result for table ${key}")
-    val hiveTable = atlasApi.findHiveTable(key)
-    if (hiveTable.isSuccess) {
-      val results = hiveTable.get.results
+    val hbaseTable = atlasApi.findHBaseTable(key)
+    if (hbaseTable.isSuccess) {
+      val results = hbaseTable.get.results
       if (results.isDefined) {
         // check if there is one result
         if (results.get.size > 0) {
@@ -246,11 +242,11 @@ sealed private class TableCacheLoader(atlasApi: AtlasHiveApi) extends CacheLoade
 }
 
 
-sealed class CacheReloader(atlasApi: AtlasHiveApiImpl) extends Actor {
+sealed class CacheReloader(atlasApi: AtlasHBaseApiImpl) extends Actor {
   override def receive: Receive = {
     case Poll() =>
       Logger.info("Reloading the cache")
-      atlasApi.allHiveTables.map(sr =>
+      atlasApi.allHBaseTables.map(sr =>
         sr.results.map { res =>
           res.foreach { tr =>
             Try(atlasApi.tableCache.put(tr.name.get, tr))
@@ -261,5 +257,7 @@ sealed class CacheReloader(atlasApi: AtlasHiveApiImpl) extends Actor {
 }
 
 
+object Runner extends App{
 
+}
 

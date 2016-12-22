@@ -1,5 +1,6 @@
 package com.hw.dp.service.cluster
 
+import com.hw.dp.service.cluster.DataModel.{DataFilter, DataSet}
 import play.api.libs.json.Json
 
 /**
@@ -56,5 +57,19 @@ object Formatters {
   implicit val serviceComponentReads = Json.reads[ServiceComponent]
 
   implicit val serviceComponentWrites = Json.writes[ServiceComponent]
+
+  // Data models
+
+  implicit val dataFilterReads = Json.reads[DataFilter]
+
+  implicit val dataFilterWrites = Json.writes[DataFilter]
+
+  implicit val dataSetReads = Json.reads[DataSet]
+
+  implicit val dataSetWrites = Json.writes[DataSet]
+
+
+
+
 
 }
