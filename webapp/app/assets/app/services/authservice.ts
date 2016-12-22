@@ -26,7 +26,7 @@ export class AuthService {
             .then(res => {
                     this.loggedIn = true;
                     localStorage.setItem('dp_auth_token', res.json().auth_token);
-                    return new LoginData(userName,password);
+                    return new LoginData(userName,password, res.json().userType);
                 }
             )
             .catch(error=> {

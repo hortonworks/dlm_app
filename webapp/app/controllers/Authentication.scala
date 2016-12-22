@@ -37,7 +37,7 @@ class Authentication @Inject() (val reactiveMongoApi: ReactiveMongoApi)
       collection.flatMap(_.find(Json.obj("username"->user.username)).one[User].map { u =>
         if(u.isDefined) {
           resolve(user.password,u.get).map{ us =>
-            Ok(Json.obj("auth_token"->Jwt.makeJWT(us)))
+            Ok(Json.obj("auth_token"->Jwt.makeJWT(us), "userType"->u.get.userType))
           }.getOrElse{
             Unauthorized(JsonResponses.statusError(s"Cannot find user for request"))
           }

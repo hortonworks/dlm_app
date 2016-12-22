@@ -1,0 +1,51 @@
+<div class="mdl-grid">
+    <div class="mdl-layout-spacer"></div>
+    <div class="mdl-cell mdl-cell--10-col">
+        <div class="mdl-typography--headline mdl-typography--font-light mdl-color-text--green">Add Data Set</div>
+        <p> Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+
+        <div class="mdl-typography--body-1"> Name </div>
+        <input type="text">
+
+        <div class="mdl-typography--body-1"> Pemissions </div>
+        <input type="text">
+
+        <div class="mdl-typography--body-1"> Description </div>
+        <textarea rows="5"> </textarea>
+
+
+        <div class="mdl-grid mdl-grid--no-spacing vertical-tab-pane">
+            <div class="mdl-cell mdl-cell--2-col vertical-tab-navigation">
+                <div class="mdl-vertical-tabs__tab-bar">
+                    <ul class="demo-list-item mdl-list">
+                        <li class="mdl-list__item" [ngClass]="{'is-active': activeTab === tab.HIVE}" (click)="activeTab = tab.HIVE">
+                            <span class="mdl-list__item-primary-content">HIVE</span>
+                        </li>
+                        <li class="mdl-list__item" [ngClass]="{'is-active': activeTab === tab.HBASE}" (click)="activeTab = tab.HBASE">
+                            <span class="mdl-list__item-primary-content">HBASE</span>
+                        </li>
+                        <li class="mdl-list__item" [ngClass]="{'is-active': activeTab === tab.HDFS}" (click)="activeTab = tab.HDFS">
+                            <span class="mdl-list__item-primary-content">HDFS</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mdl-cell mdl-cell--10-col vertical-tab-content">
+                <div class="mdl-vertical-tabs__content-bar">
+                    <div *ngIf="activeTab === tab.HIVE">
+                        <data-plane-search> </data-plane-search>
+                    </div>
+                    <div *ngIf="activeTab === tab.HBASE">
+                        <data-plane-search> </data-plane-search>
+                    </div>
+                    <div *ngIf="activeTab === tab.HDFS">
+                        <data-plane-search> </data-plane-search>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="mdl-layout-spacer"></div>
+</div>
