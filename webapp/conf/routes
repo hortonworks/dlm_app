@@ -12,13 +12,20 @@ GET         /ui/*path                              controllers.Application.route
 POST        /auth/login                            controllers.Authentication.login
 
 #api
-POST        /api/clusters                          controllers.Cluster.create
-GET         /api/clusters                          controllers.Cluster.list
-PUT         /api/clusters                          controllers.Cluster.update
+POST        /api/clusters                          controllers.ClusterController.create
+GET         /api/clusters                          controllers.ClusterController.list
+PUT         /api/clusters                          controllers.ClusterController.update
+GET         /api/clusters/:id                      controllers.ClusterController.get(id)
 
-PUT         /api/datacenters                       controllers.Datacenter.create
-GET         /api/datacenters                       controllers.Datacenter.list
-GET         /api/datacenters/:dcName/detail        controllers.Datacenter.getClusters(dcName)
+PUT         /api/datacenters                       controllers.DataCenterController.create
+GET         /api/datacenters                       controllers.DataCenterController.list
+GET         /api/datacenters/:dcName/detail        controllers.DataCenterController.getClusters(dcName)
+GET         /api/datacenters/:id                   controllers.DataCenterController.get(id)
+
+GET         /api/backup-policies                   controllers.BackupPolicyController.list
+POST        /api/backup-policies                   controllers.BackupPolicyController.create
+# PUT         /api/backup-policies/:id               controllers.BackupPolicyController.update(id)
+GET         /api/backup-policies/:id               controllers.BackupPolicyController.get(id)
 
 #Atlas
 #TODO:fix endpoints

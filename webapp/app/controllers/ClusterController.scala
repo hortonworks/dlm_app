@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.Inject
 
-import com.hw.dp.service.cluster.Ambari
+import com.hw.dp.service.cluster.{Ambari, Cluster, DataCenter}
 import com.hw.dp.service.cluster.Formatters._
 import internal.auth.Authenticated
 import internal.persistence.DataStorage
@@ -17,7 +17,7 @@ import reactivemongo.play.json.collection.JSONCollection
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class Cluster @Inject()(val reactiveMongoApi: ReactiveMongoApi,val storage:DataStorage,val ambariSync: AmbariSync)
+class ClusterController @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage:DataStorage, val ambariSync: AmbariSync)
   extends Controller with MongoController with ReactiveMongoComponents with MongoUtilities {
 
   def clusters = database.map(_.collection[JSONCollection]("clusters"))
@@ -51,12 +51,6 @@ class Cluster @Inject()(val reactiveMongoApi: ReactiveMongoApi,val storage:DataS
       }
     })
 
-  }
-
-  def get(host:String) = Authenticated.async { req =>
-    clusters.flatMap(_.find(Json.obj("host" -> host)).one[Ambari].map { cluster =>
-      cluster.map( c=> Ok(Json.toJson(c))).getOrElse(NotFound)
-    })
   }
 
   def create = Authenticated.async(parse.json) { req =>
@@ -94,5 +88,24 @@ class Cluster @Inject()(val reactiveMongoApi: ReactiveMongoApi,val storage:DataS
     }
   }
 
+  def get(id: String) = Authenticated.async {
+
+    import com.hw.dp.service.cluster.Formatters._
+
+    clusters
+      .flatMap(
+          _
+            .find(Json.obj("host" -> id))
+            .requireOne[Ambari]
+      )
+      .map(cAmbari =>
+        Ok(Json.toJson(cAmbari))
+      )
+      .recoverWith {
+        case e:Exception =>
+          Future.successful(InternalServerError(JsonResponses.statusError("Server error",e.getMessage)))
+      }
+
+  }
 
 }

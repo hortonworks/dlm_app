@@ -19,7 +19,7 @@ import reactivemongo.play.json.collection.JSONCollection
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class Datacenter @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage: DataStorage)
+class DataCenterController @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage: DataStorage)
   extends Controller with MongoController with ReactiveMongoComponents with MongoUtilities {
 
   def dataCenters = database.map(_.collection[JSONCollection]("datacenters"))
@@ -68,6 +68,26 @@ class Datacenter @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage: 
        case e:Exception =>
          Future.successful(InternalServerError(JsonResponses.statusError("Server error",e.getMessage)))
      }
+
+  }
+
+  def get(id: String) = Authenticated.async {
+
+    import com.hw.dp.service.cluster.Formatters._
+
+    dataCenters
+      .flatMap(
+        _
+          .find(Json.obj("name" -> id))
+          .requireOne[DataCenter]
+      )
+      .map(cDataCenter =>
+        Ok(Json.toJson(cDataCenter))
+      )
+      .recoverWith {
+        case e:Exception =>
+          Future.successful(InternalServerError(JsonResponses.statusError("Server error",e.getMessage)))
+      }
 
   }
 
