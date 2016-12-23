@@ -17,7 +17,46 @@ public class HdfsProfiler {
         HdfsMetadata hdfsMetadata = new HdfsMetadata();
         constructAppLogFileSets(hdfsMetadata);
         constructHiveFileSets(hdfsMetadata);
+        constructClinicalNotesFileSet(hdfsMetadata);
+        constructRadiologyImagesFileSet(hdfsMetadata);
         return hdfsMetadata;
+    }
+
+    private void constructRadiologyImagesFileSet(HdfsMetadata hdfsMetadata) {
+        HdfsFile radiologyImagesFileGlob = buildHdfsFile("RadiologyImages/Public/Cases/*.jpg",
+                "/insurance/raw/RadiologyImages/Public/Cases/*.jpg",
+                13033660,
+                "root", "hdfs", "-rw-r--r--",
+                "2016-12-22 13:39",
+                new String[]{"jpeg", "image"});
+
+        HdfsFileSet hdfsFileSet = buildHdfsFileSet("Radiology Images",
+                "/insurance/raw/RadiologyImages",
+                "root", "hdfs", "drwxr-xr-x",
+                "2016-12-22 13:39",
+                new String[]{"image file container", "directory"},
+                new HdfsFileElement[]{radiologyImagesFileGlob});
+
+        hdfsMetadata.addFileSet(hdfsFileSet);
+    }
+
+    private void constructClinicalNotesFileSet(HdfsMetadata hdfsMetadata) {
+        HdfsFile clinicalNotesFileGlob = buildHdfsFile("ClinicalNotesAndReports/Public/Cases/*.txt",
+                "/insurance/raw/ClinicalNotesAndReports/Public/Cases/*.txt",
+                7892178,
+                "root", "hdfs", "-rw-r--r--",
+                "2016-12-22 13:38",
+                new String[] {"text"});
+
+        HdfsFileSet clinicalNotesFileSet = buildHdfsFileSet("Clinical Notes and Reports",
+                "/insurance/raw/ClinicalNotesAndReports",
+                "root", "hdfs", "drwxr-xr-x",
+                "2016-12-22 13:36",
+                new String[] {"text file container", "directory"},
+                new HdfsFileElement[] {clinicalNotesFileGlob}
+                );
+
+        hdfsMetadata.addFileSet(clinicalNotesFileSet);
     }
 
     private void constructHiveFileSets(HdfsMetadata hdfsMetadata) {
