@@ -33,9 +33,9 @@
                     <h2 class="mdl-card__title-text"> {{ dataSet.name }}</h2>
                 </div>
                 <div class="mdl-card__supporting-text">
-                    Object Count:   <b> <span class="chip-grey"> {{ dataSet.objectCount }} </span> </b> <br>
-                    Data Sources:   {{ dataSet.dataSources }} <br>
-                    Last Updated:   {{ dataSet.lastUpdated }} <br> <br>
+                    Object Count:   <b> <span class="chip-grey"> {{ getObjectCount(dataSet) }} </span> </b> <br>
+                    Data Sources:   {{ getDataSources(dataSet) }} <br>
+                    Last Updated:   {{ getLastUpdated(dataSet) }} <br> <br>
                 </div>
                 <div class="mdl-card__actions mdl-card--border">
                     <div> <i class="fa fa-pencil-square-o" aria-hidden="true" (click)="viewDataSet(dataSet)"></i> </div>

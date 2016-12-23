@@ -1,26 +1,29 @@
 import {Injectable} from '@angular/core';
-import {DataSet} from '../models/data-set';
+import {Http, Headers, RequestOptions, Response, ResponseOptions} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
+import {HttpUtil} from '../shared/utils/httpUtil';
+import {DataSet} from '../models/data-set';
+import '../rxjs-operators';
+
 
 @Injectable()
 export class DataSetService {
+    url = '/api/datasets';
 
-    getAll(): Observable<DataSet[]> {
-        return Observable.create(observer => {
-            observer.next(DataSet.getAll());
-            observer.complete();
-        });
+    constructor(private http:Http) {}
+
+    public post(dataSet: DataSet):Observable<any> {
+        return this.http.post(this.url, dataSet, new RequestOptions(HttpUtil.getHeaders()))
+            .map(HttpUtil.extractData).catch(HttpUtil.handleError);
     }
 
-    getByName(name: string): Observable<DataSet> {
-        return Observable.create(observer => {
-            for (let dataSet of DataSet.getAll()) {
-                if (dataSet.name === name) {
-                    observer.next(dataSet);
-                    observer.complete();
-                    break;
-                }
-            }
-        });
+    public getAll(host: string, datacenter: string):Observable<DataSet[]> {
+        return this.http.get(this.url + '?host=' + host + '&datacenter=' + datacenter , new RequestOptions(HttpUtil.getHeaders()))
+            .map(HttpUtil.extractData).catch(HttpUtil.handleError);
+    }
+
+    public getByName(name: string, host: string, datacenter: string): Observable<DataSet> {
+        return this.http.get(this.url + '/' + name + '?host=' + host + '&datacenter=' + datacenter , new RequestOptions(HttpUtil.getHeaders()))
+            .map(HttpUtil.extractData).catch(HttpUtil.handleError);
     }
 }
