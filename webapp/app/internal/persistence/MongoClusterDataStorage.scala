@@ -17,7 +17,7 @@ import play.api.Logger
 import scala.util.Try
 
 @Singleton
-class MongoDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: play.api.Configuration) extends DataStorage {
+class MongoClusterDataStorage @Inject()(val mongoDriver: MongoDriver, configuration: play.api.Configuration) extends ClusterDataStorage {
 
   def getConfig(key: String): String = {
     configuration.underlying.getString(key)

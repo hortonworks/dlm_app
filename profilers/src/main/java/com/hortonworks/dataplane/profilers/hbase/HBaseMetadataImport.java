@@ -55,7 +55,7 @@ public class HBaseMetadataImport {
     }
 
     private void createTypes() throws AtlasServiceException {
-        AtlasTypeRegistrar atlasTypeRegistrar = new AtlasTypeRegistrar(atlasClient);
+        AtlasTypeRegistrar atlasTypeRegistrar = new HBaseTypeRegistrar(atlasClient);
         atlasTypeRegistrar.registerTypes();
     }
 

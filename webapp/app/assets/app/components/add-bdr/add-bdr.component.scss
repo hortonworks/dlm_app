@@ -6,6 +6,7 @@ input {
   margin-top: 8px;
 }
 
+<<<<<<< HEAD
 input[type=date] {
   position: relative;
 }
@@ -29,3 +30,20 @@ input[type=date]::after{
 [name=endDate] {
   margin-left: 30px;
 }
+=======
+.date-picker:after {
+  content: "\f073";
+  font-family: "FontAwesome";
+  margin-left: -30px;
+}
+
+.date-picker input::-webkit-inner-spin-button,
+.date-picker input::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+[name=endDate] {
+  margin-left: 30px;
+}
+>>>>>>> ab797ef13afad2801f80f93f348cbd302cbcd1e6

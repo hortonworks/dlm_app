@@ -6,7 +6,7 @@ import com.hw.dp.service.cluster.DataCenter
 import com.hw.dp.service.cluster.Formatters._
 import internal.MongoUtilities
 import internal.auth.Authenticated
-import internal.persistence.DataStorage
+import internal.persistence.ClusterDataStorage
 import models.JsonResponses
 import play.api.Logger
 import play.api.libs.json.Json
@@ -19,7 +19,7 @@ import reactivemongo.play.json.collection.JSONCollection
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class DataCenters @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage: DataStorage)
+class DataCenters @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage: ClusterDataStorage)
   extends Controller with MongoController with ReactiveMongoComponents with MongoUtilities {
 
   def dataCenters = database.map(_.collection[JSONCollection]("datacenters"))

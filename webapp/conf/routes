@@ -30,12 +30,37 @@ GET         /api/backup-policies/:id               controllers.BackupPolicies.ge
 
 #Atlas
 #TODO:fix endpoints
-GET         /api/datacenters/atlas/tables          controllers.Atlas.getAllTables(clusterHost,dc,cached)
-GET         /api/datacenters/atlas/table           controllers.Atlas.getTableDefinition(clusterHost,dc,table,cached)
-GET         /api/datacenters/atlas/entity          controllers.Atlas.getEntity(clusterHost,dc,guid)
-GET         /api/datacenters/atlas/lineage         controllers.Atlas.getLineage(clusterHost,dc,guid)
-GET         /api/datacenters/atlas/audit         controllers.Atlas.getAudit(clusterHost,dc,guid)
+GET         /api/datacenters/atlas/tables          controllers.AtlasHive.getAllTables(clusterHost,dc,cached)
+GET         /api/datacenters/atlas/table           controllers.AtlasHive.getTableDefinition(clusterHost,dc,table,cached)
+GET         /api/datacenters/atlas/entity          controllers.AtlasHive.getEntity(clusterHost,dc,guid)
+GET         /api/datacenters/atlas/lineage         controllers.AtlasHive.getLineage(clusterHost,dc,guid)
+GET         /api/datacenters/atlas/audit           controllers.AtlasHive.getAudit(clusterHost,dc,guid)
 
+#Hbase
+GET         /api/datacenters/hbase/tables          controllers.AtlasHBase.getAllTables(clusterHost,dc,cached)
+GET         /api/datacenters/hbase/table           controllers.AtlasHBase.getTableDefinition(clusterHost,dc,table,cached)
+GET         /api/datacenters/hbase/entity          controllers.AtlasHBase.getEntity(clusterHost,dc,guid)
+GET         /api/datacenters/Hbase/audit           controllers.AtlasHBase.getAudit(clusterHost,dc,guid)
+
+#Files
+GET         /api/datacenters/hdfs/filesets         controllers.AtlasHdfs.getAllFiles(clusterHost,dc,cached)
+GET         /api/datacenters/hdfs/entity           controllers.AtlasHdfs.getEntity(clusterHost,dc,guid)
+GET         /api/datacenters/hdfs/audit            controllers.AtlasHdfs.getAudit(clusterHost,dc,guid)
+
+
+#Search
+
+POST        /api/search/hive                       controllers.AtlasHiveSearch.searchHiveTables
+POST        /api/search/hbase                      controllers.AtlasHbaseSearch.searchHbaseTables
+POST        /api/search/hdfs                       controllers.AtlasHdfsSearch.searchFileSets
+
+
+#DataSet
+
+POST        /api/datasets                          controllers.DataSets.create
+PUT         /api/datasets                          controllers.DataSets.update
+GET         /api/datasets/:name                    controllers.DataSets.getByname(name,host,datacenter)
+GET         /api/datasets                          controllers.DataSets.getAll(host,datacenter)
 
 
 # Map static resources from the /public folder to the /assets URL path

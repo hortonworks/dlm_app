@@ -1,5 +1,5 @@
 export class LoginData {
-    constructor(public name: string, public password: string) {
+    constructor(public name: string, public password: string, public userType: string) {
     }
 }
 

@@ -227,7 +227,7 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluste
   }
 }
 
-sealed class TableCacheLoader(atlasApi: AtlasHiveApi) extends CacheLoader[String, Result] {
+sealed private class TableCacheLoader(atlasApi: AtlasHiveApi) extends CacheLoader[String, Result] {
   override def load(key: String): Result = {
     Logger.info(s"loading result for table ${key}")
     val hiveTable = atlasApi.findHiveTable(key)
@@ -251,7 +251,7 @@ sealed class CacheReloader(atlasApi: AtlasHiveApiImpl) extends Actor {
     case Poll() =>
       Logger.info("Reloading the cache")
       atlasApi.allHiveTables.map(sr =>
-        sr.results.map { res =>
+        sr.results.foreach { res =>
           res.foreach { tr =>
             Try(atlasApi.tableCache.put(tr.name.get, tr))
           }

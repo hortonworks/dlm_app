@@ -69,38 +69,40 @@ class BackupPolicies @Inject()(
   }
 
   def list(dataCenter: Option[String], cluster: Option[String], resourceId: Option[String], resourceType: Option[String]) = Authenticated.async {
-    policies.flatMap(
-      _
-        .find(Json.obj())
-        .cursor[BackupPolicy]()
-        .collect[List](maxDocs = 0, Cursor.FailOnError[List[BackupPolicy]]())
-        .flatMap {
-          policyList =>
-            Logger.info(s"Fetched ${policyList.size} policies")
-            Future.successful(Ok(Json.toJson(policyList)))
-        }).recoverWith {
-          case e:Exception => Future.successful(InternalServerError(JsonResponses.statusError("fetch error",e.getMessage)))
-        }
+    policies
+      .flatMap(
+        _
+          .find(Json.obj())
+          .cursor[BackupPolicy]()
+          .collect[List](maxDocs = 0, Cursor.FailOnError[List[BackupPolicy]]())
+          .flatMap {
+            policyList =>
+              Logger.info(s"Fetched ${policyList.size} policies")
+              Future.successful(Ok(Json.toJson(policyList)))
+          }).recoverWith {
+            case e:Exception => Future.successful(InternalServerError(JsonResponses.statusError("fetch error",e.getMessage)))
+          }
   }
 
   def get(id: String) = Authenticated.async {
     storage.getBackupPolicyById(id)
-        .flatMap(
-          cPolicy =>
-            for {
-              sourceDataCenter <- storage.getDataCenterById(cPolicy.source.dataCenterId)
-              sourceCluster <- storage.getClusterById(cPolicy.source.clusterId)
-              targetDataCenter <- storage.getDataCenterById(cPolicy.target.dataCenterId)
-              targetCluster <- storage.getClusterById(cPolicy.target.clusterId)
-            } yield {
-              BackupPolicyInDetail(
-                cPolicy.label,
-                SourceInDetail(sourceDataCenter, sourceCluster, cPolicy.source.resourceId, cPolicy.source.resourceType),
-                TargetInDetail(targetDataCenter, targetCluster),
-                cPolicy.status
-              )
-            }
-        )
+//        .flatMap({
+//          cPolicy =>
+//            println("here too")
+//            for {
+//              sourceDataCenter <- storage.getDataCenterById(cPolicy.source.dataCenterId)
+//              sourceCluster <- storage.getClusterById(cPolicy.source.clusterId)
+//              targetDataCenter <- storage.getDataCenterById(cPolicy.target.dataCenterId)
+//              targetCluster <- storage.getClusterById(cPolicy.target.clusterId)
+//            } yield {
+//              BackupPolicyInDetail(
+//                cPolicy.label,
+//                SourceInDetail(sourceDataCenter, sourceCluster, cPolicy.source.resourceId, cPolicy.source.resourceType),
+//                TargetInDetail(targetDataCenter, targetCluster),
+//                cPolicy.status
+//              )
+//            }
+//        })
         .map(policyInDetail => Ok(Json.toJson(policyInDetail)))
         .recoverWith {
           case e:Exception => Future.successful(InternalServerError(JsonResponses.statusError("fetch error",e.getMessage)))

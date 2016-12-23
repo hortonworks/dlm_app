@@ -1,6 +1,8 @@
 import {Component,AfterViewInit} from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from './services/authservice';
+import {Environment} from './environment';
+import {Persona} from './shared/utils/persona';
 
 declare var Datamap:any;
 declare var componentHandler:any;
@@ -13,7 +15,9 @@ declare var componentHandler:any;
 
 export default class AppComponent implements AfterViewInit  {
 
-    constructor(public router: Router,private authService: AuthService) {
+    persona = Persona;
+
+    constructor(public router: Router,private authService: AuthService, private environment: Environment) {
 
     }
 
