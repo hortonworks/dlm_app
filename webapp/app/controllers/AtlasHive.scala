@@ -21,9 +21,7 @@ import play.api.cache.Cached
 
 import scala.util.Try
 
-/**
-  * Get settings to show in various parts of the APP
-  */
+
 class AtlasHive @Inject()(@Named("atlasApiCache") val atlasApiCache:ActorRef, storage: ClusterDataStorage) extends Controller {
 
   import com.hw.dp.services.atlas.Hive._

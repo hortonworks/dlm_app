@@ -5,8 +5,8 @@ import akka.pattern.ask
 import akka.util.Timeout
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import com.hw.dp.services.hbase.AtlasHBaseApi
-import internal.GetHbaseApi
+import com.hw.dp.services.hdfs.AtlasHdfsApi
+import internal.GetHdfsApi
 import internal.auth.Authenticated
 import internal.persistence.ClusterDataStorage
 import models.JsonResponses
@@ -19,11 +19,11 @@ import scala.concurrent.duration._
 import scala.util.Try
 
 
-class AtlasHBase @Inject()(@Named("atlasApiCache") val atlasApiCache: ActorRef,
-                           storage: ClusterDataStorage)
+class AtlasHdfs @Inject()(@Named("atlasApiCache") val atlasApiCache: ActorRef,
+                          storage: ClusterDataStorage)
     extends Controller {
 
-  import com.hw.dp.services.hbase.HBase._
+  import com.hw.dp.services.hdfs.Hdfs._
   implicit val timeout = Timeout(120 seconds)
 
   private def fetchError(e: Exception) = {
@@ -52,13 +52,13 @@ class AtlasHBase @Inject()(@Named("atlasApiCache") val atlasApiCache: ActorRef,
       }
     }
 
-  def getAllTables(clusterHost: String, datacenter: String, cached: String) =
+  def getAllFiles(clusterHost: String, datacenter: String, cached: String) =
     Authenticated.async { req =>
       getApi(clusterHost, datacenter).map { api =>
         if (shouldUseCache(cached))
-          Ok(Json.toJson(api.fastLoadAllTables))
+          Ok(Json.toJson(api.fastLoadAllFileSets))
         else {
-          val tables = api.allHBaseTables
+          val tables = api.loadAllFileSets
           val results = tables.get.results
           Ok(Json.toJson(results.getOrElse(Seq())))
         }
@@ -71,30 +71,14 @@ class AtlasHBase @Inject()(@Named("atlasApiCache") val atlasApiCache: ActorRef,
     Try(cached.toBoolean).getOrElse(false)
   }
 
-  def getTableDefinition(clusterHost: String,
-                         datacenter: String,
-                         table: String,
-                         cached: String) = Authenticated.async { req =>
-    getApi(clusterHost, datacenter).map { api =>
-      if (shouldUseCache(cached))
-        Ok(Json.toJson(api.fastFindHBaseTable(table)))
-      else {
-        val tables = api.findHBaseTable(table)
-        val results = tables.get.results
-        Ok(Json.toJson(results.getOrElse(Seq())))
-      }
-    }.recoverWith {
-      case e: Exception => fetchError(e)
-    }
-  }
 
   private def getApi(clusterHost: String,
-                     datacenter: String): Future[AtlasHBaseApi] = {
+                     datacenter: String): Future[AtlasHdfsApi] = {
     for {
       ambari <- storage.loadCluster(clusterHost, datacenter)
       cluster <- storage.loadClusterInformation(clusterHost, datacenter)
-      api <- (atlasApiCache ? GetHbaseApi(ambari.get, cluster.get))
-        .mapTo[Future[AtlasHBaseApi]]
+      api <- (atlasApiCache ? GetHdfsApi(ambari.get, cluster.get))
+        .mapTo[Future[AtlasHdfsApi]]
         .flatMap(f => f)
     } yield {
       api

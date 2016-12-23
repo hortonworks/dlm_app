@@ -34,11 +34,17 @@ GET         /api/datacenters/hbase/table           controllers.AtlasHBase.getTab
 GET         /api/datacenters/hbase/entity          controllers.AtlasHBase.getEntity(clusterHost,dc,guid)
 GET         /api/datacenters/Hbase/audit           controllers.AtlasHBase.getAudit(clusterHost,dc,guid)
 
+#Files
+GET         /api/datacenters/hdfs/filesets         controllers.AtlasHdfs.getAllFiles(clusterHost,dc,cached)
+GET         /api/datacenters/hdfs/entity           controllers.AtlasHdfs.getEntity(clusterHost,dc,guid)
+GET         /api/datacenters/hdfs/audit            controllers.AtlasHdfs.getAudit(clusterHost,dc,guid)
+
 
 #Search
 
 POST        /api/search/hive                       controllers.AtlasHiveSearch.searchHiveTables
 POST        /api/search/hbase                      controllers.AtlasHbaseSearch.searchHbaseTables
+POST        /api/search/hdfs                       controllers.AtlasHdfsSearch.searchFileSets
 
 
 #DataSet

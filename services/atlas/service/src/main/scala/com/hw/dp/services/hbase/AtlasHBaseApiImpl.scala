@@ -110,7 +110,7 @@ class AtlasHBaseApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Clust
 
       // preload cache
       allHBaseTables.map(sr =>
-        sr.results.map { res =>
+        sr.results.foreach { res =>
           res.foreach { tr =>
             Try(tableCache.put(tr.name.get, tr))
           }
@@ -139,7 +139,7 @@ class AtlasHBaseApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Clust
     *
     * @return True if cache ready
     */
-  override def cacheWarmed: Boolean = ???
+  override def cacheWarmed: Boolean = tableCache.size() > 0
 
   /**
     * Look up a hbase table using the Atlas API
@@ -247,7 +247,7 @@ sealed class CacheReloader(atlasApi: AtlasHBaseApiImpl) extends Actor {
     case Poll() =>
       Logger.info("Reloading the cache")
       atlasApi.allHBaseTables.map(sr =>
-        sr.results.map { res =>
+        sr.results.foreach { res =>
           res.foreach { tr =>
             Try(atlasApi.tableCache.put(tr.name.get, tr))
           }
@@ -257,7 +257,5 @@ sealed class CacheReloader(atlasApi: AtlasHBaseApiImpl) extends Actor {
 }
 
 
-object Runner extends App{
 
-}
 

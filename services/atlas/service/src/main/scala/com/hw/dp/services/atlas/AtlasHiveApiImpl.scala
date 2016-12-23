@@ -251,7 +251,7 @@ sealed class CacheReloader(atlasApi: AtlasHiveApiImpl) extends Actor {
     case Poll() =>
       Logger.info("Reloading the cache")
       atlasApi.allHiveTables.map(sr =>
-        sr.results.map { res =>
+        sr.results.foreach { res =>
           res.foreach { tr =>
             Try(atlasApi.tableCache.put(tr.name.get, tr))
           }
