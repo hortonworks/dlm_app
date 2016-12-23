@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 <div class="mdl-grid" *ngIf="state.isSuccessful">
     <div class="mdl-layout-spacer"></div>
     <div class="mdl-cell mdl-cell--10-col">
@@ -29,29 +29,6 @@
                   </div>
                 </div>
               </div>
-=======
-<div class="mdl-grid">
-    <div class="mdl-layout-spacer"></div>
-    <div class="mdl-cell mdl-cell--10-col">
-
-        <h1 class="mdl-typography--headline mdl-typography--font-light" style="margin-bottom: 0">BDR Settings</h1>
-        <div [innerHTML]="welcomeText"> </div>
-
-        <div class="mdl-typography--font-light mt-1 mdl-grid mdl-grid--no-spacing">
-            <div class="mdl-cell mdl-cell--4-col">
-                <span [innerHTML]="entity"></span><span class="mdl-typography--title  mdl-color-text--green"> Cluster Information </span> <br>
-                <span [innerHTML]="entity" style="opacity: 0; display: inline-block;padding-left: 4px;"></span><span class="mdl-typography--caption"> On-Prem </span>
-            </div>
-            <div class="mdl-layout-spacer"></div>
-            <div class="mdl-cell mdl-cell--1-col mdl-typography--text-right">
-                <span class="mdl-typography--body-1">Active</span> <br> <span class="mdl-typography--caption">Past 2 Years</span>
-            </div>
-            <div class="mdl-cell mdl-cell--1-col">
-                <label class="switch">
-                    <input type="checkbox">
-                    <div class="slider round"></div>
-                </label>
->>>>>>> ab797ef13afad2801f80f93f348cbd302cbcd1e6
             </div>
         </div>
 
@@ -60,16 +37,11 @@
         <div>
             <div class="mdl-typography--body-2-color-contrast"> Name </div>
             <div class="mdl-typography--caption"> Give a descriptive name to your backup policy </div>
-<<<<<<< HEAD
             <input type="text" [(ngModel)]="label">
-=======
-            <input type="text">
->>>>>>> ab797ef13afad2801f80f93f348cbd302cbcd1e6
         </div>
 
         <br>
 
-<<<<<<< HEAD
         <div class="mdl-color-text--green mt-1">
           <i class="fa fa-server fa-2x" aria-hidden="true"></i>
           <span class="mdl-typography--title mdl-typography--font-light"> Select Cluster </span>
@@ -88,24 +60,11 @@
                         <select [(ngModel)]="target.dataCenter" (change)="doRefreshMap()">
                             <option disabled selected [ngValue]="">Data Center</option>
                             <option *ngFor="let dc of dataCenterOptions" [ngValue]="dc">{{dc.name}}</option>
-=======
-        <div class="mdl-color-text--green mt-1"> <i class="fa fa-server fa-2x" aria-hidden="true"></i> <span class="mdl-typography--title mdl-typography--font-light"> Select Cluster </span> </div>
-        <div class="mdl-typography--caption">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</div>
-        <br>
-        <div class="mdl-grid config-bgcolor">
-            <div class="mdl-cell mdl-cell--6-col">
-                <div class="mdl-typography--body-2"> Data Center </div>
-                <div class="mdl-typography--caption">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</div>
-                <div class="select-wrap">
-                    <drop-down>
-                        <select #select >
-                            <option value="" disabled selected>Data Center</option>
->>>>>>> ab797ef13afad2801f80f93f348cbd302cbcd1e6
+
                         </select>
                     </drop-down>
                 </div>
                 <div class="mdl-typography--body-2"> Cluster </div>
-<<<<<<< HEAD
                 <div class="mdl-typography--caption">Select your target cluster.</div>
                 <div class="select-wrap">
                     <drop-down>
@@ -147,40 +106,12 @@
                         <option value="MANUAL">Manual</option>
                         <option value="SCHEDULED">Scheduled</option>
                         <option value="ON_CHANGE">On Change</option>
-=======
-                <div class="mdl-typography--caption">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</div>
-                <div class="select-wrap">
-                    <drop-down>
-                        <select >
-                            <option value="" disabled selected>Cluster</option>
-                        </select>
-                    </drop-down>
-                </div>
-            </div>
-            <div class="mdl-cell mdl-cell--6-col">
-                <div id="map" class="map .dotted"> </div>
-            </div>
-        </div>
-
-        <div class="mdl-color-text--green mt-1"> <i class="fa fa-clock-o fa-2x" aria-hidden="true"></i> <span class="mdl-typography--title mdl-typography--font-light"> Schedule </span> </div>
-        <div class="mdl-typography--caption">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</div>
-        <br>
-        <div>
-            <div class="mdl-typography--body-2"> Type </div>
-            <div class="mdl-typography--caption">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</div>
-            <div class="select-wrap">
-                <drop-down>
-                    <select>
-                        <option value="recurring" >Recurring</option>
-                        <option value="one-time" >On Time</option>
->>>>>>> ab797ef13afad2801f80f93f348cbd302cbcd1e6
                     </select>
                 </drop-down>
             </div>
             <div class="mdl-typography--body-2"> Frequency </div>
             <div class="select-wrap">
                 <drop-down>
-<<<<<<< HEAD
                     <select [(ngModel)]="schedule.frequency" (change)="doRefreshMap()" style="min-width: 150px;">
                         <option disabled selected></option>
                         <option value="HOURLY">Hourly</option>
@@ -199,55 +130,17 @@
                   <input style="" type="date" name="endDate" [value]="schedule.duration.stop | date:'yyyy-MM-dd'" (input)="schedule.duration.stop = doHandleInputDate($event.target.value)">
                 </div>
             </div>
-=======
-                    <select>
-                        <option value="" diabled selected></option>
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
-                    </select>
-                </drop-down>
-            </div>
-            <div class="mdl-typography--body-2"> Recurs Every </div>
-            <div class="select-wrap">
-                <drop-down>
-                    <select>
-
-                    </select>
-                </drop-down>
-            </div>
-            <div class="mdl-typography--body-2"> Duration </div>
-            <span class="date-picker">
-                <input type="date" name="startDate">
-            </span>
-            <span class="date-picker">
-                <input type="date" name="endDate">
-            </span>
->>>>>>> ab797ef13afad2801f80f93f348cbd302cbcd1e6
-
         </div>
 
         <div class="mt-1">
-<<<<<<< HEAD
             <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green" (click)="doSave()">
                 Save
             </button>
 
             <button class="mdl-button mdl-js-button mdl-button--raised mdl-color--grey-300" (click)="doCancel()">
-=======
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green" (click)="onSave()">
-                Save
-            </button>
-
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-color--grey-300" (click)="back()">
->>>>>>> ab797ef13afad2801f80f93f348cbd302cbcd1e6
                 Cancel
             </button>
         </div>
     </div>
     <div class="mdl-layout-spacer"></div>
-<<<<<<< HEAD
 </div>
-=======
-</div>
->>>>>>> ab797ef13afad2801f80f93f348cbd302cbcd1e6

@@ -1,5 +1,4 @@
 import {Component, OnInit, AfterViewInit} from '@angular/core';
-<<<<<<< HEAD
 import {Router, ActivatedRoute} from '@angular/router';
 import Rx from 'rxjs/Rx';
 import {DataCenter} from '../../models/data-center';
@@ -14,10 +13,6 @@ import {BackupPolicyService} from '../../services/backup-policy.service';
 
 declare var Datamap:any;
 declare var d3:any;
-=======
-
-declare var Datamap:any;
->>>>>>> ab797ef13afad2801f80f93f348cbd302cbcd1e6
 
 @Component({
     selector: 'add-bdr',
@@ -25,7 +20,6 @@ declare var Datamap:any;
     styleUrls: ['assets/app/components/add-bdr/add-bdr.component.scss']
 })
 export class AddBdrComponent implements OnInit, AfterViewInit {
-<<<<<<< HEAD
 
   state: {
     isInProgress: boolean,
@@ -358,30 +352,3 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
       }
     }
 }
-=======
-    map: any;
-    entity = 'Table';
-    welcomeText = `Configure Backup and Disaster Recovery for the selected Entity. You can select the target cluster to copy the data and the schedule for backup and recovery`;
-
-    ngOnInit() {
-        console.log('here ....');
-    }
-
-    ngAfterViewInit() {
-        this.map = new Datamap({element: document.getElementById('map'),projection: 'mercator',
-            height: 295,
-            width: 385,
-            fills: {
-                defaultFill: '#ABE3F3',
-            },
-            bubblesConfig: {
-                popupTemplate: function(geography: any, data: any) {
-                    return '<div class="hoverinfo">' + data.location +'</div>';
-                },
-                borderWidth: '2',
-                borderColor: '#FFFFFF',
-            }
-        });
-    }
-}
->>>>>>> ab797ef13afad2801f80f93f348cbd302cbcd1e6

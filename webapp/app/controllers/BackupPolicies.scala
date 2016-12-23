@@ -5,7 +5,7 @@ import java.time.Instant
 
 import internal.auth.Authenticated
 import internal.MongoUtilities
-import internal.persistence.DataStorage
+import internal.persistence.ClusterDataStorage
 import models._
 import models.BackupPolicyFormatters._
 import play.api.Logger
@@ -24,7 +24,7 @@ import scala.concurrent.Future
   */
 class BackupPolicies @Inject()(
     val reactiveMongoApi: ReactiveMongoApi,
-    val storage: DataStorage
+    val storage: ClusterDataStorage
   ) extends Controller with MongoController with ReactiveMongoComponents with MongoUtilities {
 
   def clusters = database.map(_.collection[JSONCollection]("clusters"))
