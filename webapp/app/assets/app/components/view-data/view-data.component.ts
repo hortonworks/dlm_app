@@ -30,7 +30,22 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
             this.breadCrumbMap = {'Datacenter':'ui/dashboard'};
             this.breadCrumbMap[this.dataSourceName] = '';
             this.getClusterData();
+
+            let parameterByName = this.getParameterByName('id');
+            if(parameterByName !== null) {
+                this.search = parameterByName;
+            }
         });
+    }
+
+    getParameterByName(name: string) {
+        let url = window.location.href;
+        name = name.replace(/[\[\]]/g, '\\$&');
+        let regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
     }
 
     ngAfterViewInit() {

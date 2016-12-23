@@ -4,15 +4,55 @@
         <div class="mdl-typography--headline mdl-typography--font-light mdl-color-text--green">Add Data Set</div>
         <p> Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
 
-        <div class="mdl-typography--body-1"> Name </div>
-        <input type="text">
+        <div class="mdl-grid">
+            <div class="mdl-cell mdl-cell--4-col">
+                <div class="mdl-typography--body-1"> Name </div>
+                <input type="text" [(ngModel)]="dataSet.name">
+                <div class="mdl-typography--body-1"> Pemissions </div>
+                <input type="text" [(ngModel)]="dataSet.permissions">
+                <div class="mdl-typography--body-1"> Category </div>
+                <input type="text" [(ngModel)]="dataSet.category">
+            </div>
+            <div class="mdl-cell mdl-cell--5-col">
+                <div class="mdl-typography--body-1"> Description </div>
+                <textarea rows="6" style="width:100%;" [(ngModel)]="dataSet.description"> </textarea>
+            </div>
+            <div class="mdl-layout-spacer"></div>
+        </div>
 
-        <div class="mdl-typography--body-1"> Pemissions </div>
-        <input type="text">
+        <br>
 
-        <div class="mdl-typography--body-1"> Description </div>
-        <textarea rows="5"> </textarea>
+        <div class="mdl-grid config-bgcolor">
+            <div class="mdl-cell mdl-cell--4-col">
+                <div class="mdl-typography--body-2">Location </div>
+                <span class="select-wrap">
+                    <drop-down>
+                        <select  #dataCeneterName (change)="onDataCenterChange(dataCeneterName.value)" [(ngModel)]="dataSet.dataCenter">
+                            <option value="" selected [value]="'new'">Select</option>
+                            <option *ngFor="let dataCenter of dataCenters" [value]="dataCenter.name"> {{ dataCenter.name }} </option>
+                        </select>
+                    </drop-down>
+                </span>
+                <div class="mdl-typography--body-2"> Cluster IP Address/URL </div>
+                <drop-down>
+                    <select [(ngModel)]="dataSet.ambariHost">
+                        <option value="" selected [value]="'new'">Select</option>
+                        <option *ngFor="let ambari of ambarisInDatacenter" [value]="ambari.host">
+                            {{ getAmbariHostName(ambari) }}
+                        </option>
+                    </select>
+                </drop-down>
+            </div>
+            <div class="mdl-cell mdl-cell--4-col">
+                <div id="map" class="map"> </div>
+            </div>
+            <div class="mdl-cell mdl-cell--4-col help-text">
 
+                <i class="fa fa-lightbulb-o" aria-hidden="true"></i><span class="mdl-typography--body-2 mdl-color-text--green"> Help </span>
+                <p> {{ dataCenterHelp2 }}</p>
+
+            </div>
+        </div>
 
         <div class="mdl-grid mdl-grid--no-spacing vertical-tab-pane">
             <div class="mdl-cell mdl-cell--2-col vertical-tab-navigation">
@@ -33,10 +73,32 @@
             <div class="mdl-cell mdl-cell--10-col vertical-tab-content">
                 <div class="mdl-vertical-tabs__content-bar">
                     <div *ngIf="activeTab === tab.HIVE">
-                        <data-plane-search> </data-plane-search>
+                        <data-plane-search [searchParamWrappers]="hiveSearchParamWrappers" (searchFilters)="fetchHiveData($event)"> </data-plane-search>
+                        <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="hiveTables.length > 0">
+                            <thead>
+                            <tr>
+                                <th class="mdl-data-table__cell--non-numeric">NAME</th>
+                                <th class="mdl-data-table__cell--non-numeric">COLUMNS</th>
+                                <th class="mdl-data-table__cell--non-numeric">OWNER</th>
+                                <th class="mdl-data-table__cell--non-numeric">CREATE TIME</th>
+                                <th class="mdl-data-table__cell--non-numeric">NUM OF ROWS</th>
+                                <th class="mdl-data-table__cell--non-numeric">TABLE TYPE</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let hiveTable of hiveTables">
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.name }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric"></td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.owner }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.createTime }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.parameters.numRows }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.tableType }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                     <div *ngIf="activeTab === tab.HBASE">
-                        <data-plane-search> </data-plane-search>
+                        <data-plane-search [searchParamWrappers]="hbaseSearchParamWrappers"> </data-plane-search>
                     </div>
                     <div *ngIf="activeTab === tab.HDFS">
                         <data-plane-search> </data-plane-search>
@@ -46,6 +108,15 @@
         </div>
 
 
+        <div class="mt-1">
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green" (click)="onSave()">
+                Save
+            </button>
+
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-color--grey-300" (click)="back()">
+                Cancel
+            </button>
+        </div>
     </div>
     <div class="mdl-layout-spacer"></div>
 </div>

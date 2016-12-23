@@ -16,19 +16,15 @@
 
     <div class="mdl-grid mdl-grid--no-spacing" *ngFor="let appliedSearchParam of appliedSearchParams; let isLast =last">
         <div class="mdl-cell mdl-cell--2-col top-bottom-border left-border right-border">
-            <drop-down>
-                <select [(ngModel)]="appliedSearchParam.key">
-                    <option *ngFor="let key of getUnusedSearchKeys(appliedSearchParam.key)" [selected]="key === appliedSearchParam.key">{{ key }}</option>
-                </select>
-            </drop-down>
+            <select [(ngModel)]="appliedSearchParam.key">
+                <option *ngFor="let key of getUnusedSearchKeys(appliedSearchParam.key)" [selected]="key === appliedSearchParam.key">{{ key }}</option>
+            </select>
         </div>
         <div class="mdl-cell mdl-cell--1-col top-bottom-border right-border">
-            <drop-down>
-                <select [(ngModel)]="appliedSearchParam.operator">
-                    <option [disabled]></option>
-                    <option *ngFor="let operator of getOperators(appliedSearchParam.key)">{{ operator }}</option>
-                </select>
-            </drop-down>
+            <select [(ngModel)]="appliedSearchParam.operator">
+                <option [disabled]></option>
+                <option *ngFor="let operator of getOperators(appliedSearchParam.key)">{{ operator }}</option>
+            </select>
         </div>
         <div class="mdl-cell mdl-cell--4-col top-bottom-border right-border">
             <input type="text" class="no-border"[(ngModel)]="appliedSearchParam.value">
@@ -41,7 +37,7 @@
     </div>
 
     <div class="mt-1">
-        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green" (click)="createChips()">
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green" (click)="search()">
             Search
         </button>
 

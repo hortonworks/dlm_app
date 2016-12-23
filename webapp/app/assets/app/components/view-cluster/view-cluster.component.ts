@@ -22,7 +22,7 @@ export default class ViewClusterComponent implements OnInit {
     dataCenter: DataCenter = new DataCenter();
     dataCenterDetails = new DataCenterDetails();
 
-    constructor(private activatedRoute: ActivatedRoute, private router: Router,private dataCenterService: DataCenterService) {}
+    constructor(private activatedRoute: ActivatedRoute, private router: Router, private dataCenterService: DataCenterService) {}
 
     ngOnInit() {
         this.activatedRoute.params.subscribe(params => {

@@ -1,6 +1,8 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
 import {SearchParamWrapper} from './search-param-wrapper';
 import {SearchParam} from './search-param';
+import {DataFilter} from '../../models/data-filter';
+import {Environment} from '../../environment';
 
 @Component({
     selector: 'data-plane-search',
@@ -13,14 +15,16 @@ export class DataPlaneSearchComponent implements  OnInit {
     allSearchParamWrappers: SearchParamWrapper[] = [];
     appliedSearchParams: SearchParam[] = [];
     newSearchOperators: string[] = [];
+    @Input() searchParamWrappers: SearchParamWrapper[];
+    @Output() searchFilters = new EventEmitter<DataFilter[]>();
+
+    constructor(private environment: Environment) {}
 
     ngOnInit() {
-        this.allSearchParamWrappers.push(new SearchParamWrapper(new SearchParam('Size', '',''), ['==', '<', '>', '!=']));
-        this.allSearchParamWrappers.push(new SearchParamWrapper(new SearchParam('Tags', '',''), ['==', '<', '>', '!=']));
-        this.allSearchParamWrappers.push(new SearchParamWrapper(new SearchParam('Location', '',''), ['==', '!=']));
-        this.appliedSearchParams.push(new SearchParam('Size', '>', '10GB'));
-        this.appliedSearchParams.push(new SearchParam('Tags', '>', '10GB'));
-        this.appliedSearchParams.push(new SearchParam('Location', '==', 'Bangalore'));
+        this.allSearchParamWrappers = this.searchParamWrappers;
+        this.appliedSearchParams.push(new SearchParam('', '', ''));
+        // this.appliedSearchParams.push(new SearchParam('Tags', '>', '10GB'));
+        // this.appliedSearchParams.push(new SearchParam('Location', '==', 'Bangalore'));
     }
 
     onNewSearchKeySeled(key: string) {
@@ -71,11 +75,33 @@ export class DataPlaneSearchComponent implements  OnInit {
         }
     }
 
+    private camelize(str: string) {
+        return str.replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => {
+            return index === 0 ? letter.toLowerCase() : letter.toUpperCase();
+        }).replace(/\s+/g, '');
+    }
+
     onAdd() {
         this.appliedSearchParams.push(new SearchParam('', '', ''));
     }
 
-    createChips() {
+    search() {
         this.expanded = false;
+        let dataFilters: DataFilter[] = [];
+
+        for (let appliedSearchParam of this.appliedSearchParams) {
+            let hivePredicate = this.environment.hivePredicates[this.camelize(appliedSearchParam.key)];
+            let predicate = hivePredicate.predicate;
+            predicate = predicate.replace('${operator}', appliedSearchParam.operator);
+            predicate = predicate.replace('${value}', appliedSearchParam.value);
+
+            let dataFilter = new DataFilter();
+            dataFilter.predicate = predicate;
+            dataFilter.qualifier = hivePredicate.qualifier;
+
+            dataFilters.push(dataFilter);
+        }
+
+        this.searchFilters.emit(dataFilters);
     }
 }

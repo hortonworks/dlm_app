@@ -40,8 +40,29 @@
                     <main class="mdl-layout__content">
                         <section *ngIf="(activeTab===tab.HIVE)" class="mdl-layout__tab-panel is-active">
                             <div class="page-content">
-                                HIVE
                                 <data-plane-search> </data-plane-search>
+                                <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="hiveTables.length > 0">
+                                    <thead>
+                                    <tr>
+                                        <th class="mdl-data-table__cell--non-numeric">NAME</th>
+                                        <th class="mdl-data-table__cell--non-numeric">COLUMNS</th>
+                                        <th class="mdl-data-table__cell--non-numeric">OWNER</th>
+                                        <th class="mdl-data-table__cell--non-numeric">CREATE TIME</th>
+                                        <th class="mdl-data-table__cell--non-numeric">NUM OF ROWS</th>
+                                        <th class="mdl-data-table__cell--non-numeric">TABLE TYPE</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr *ngFor="let hiveTable of hiveTables" (click)="showData(hiveTable.name)">
+                                        <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.name }}</td>
+                                        <td class="mdl-data-table__cell--non-numeric"></td>
+                                        <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.owner }}</td>
+                                        <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.createTime }}</td>
+                                        <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.parameters.numRows }}</td>
+                                        <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.tableType }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </section>
                         <section *ngIf="(activeTab===tab.HBASE)" class="mdl-layout__tab-panel is-active">
