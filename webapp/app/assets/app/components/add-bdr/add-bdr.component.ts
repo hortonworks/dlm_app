@@ -30,7 +30,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
     isSuccessful: false
   };
 
-    rxReady: Rx.Observable<boolean>;
+    rxReady: Rx.Observable<any>;
     map: any;
     mapCities: {
       source?: {
@@ -73,6 +73,18 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
     schedule: {
       scheduleType?: string,
       frequency?: string,
+
+      /*
+      recurs?: number,
+      recurrence?: {
+        type?: string,
+        magnitude?: number,
+        unit?: string,
+        time?: string,
+        at?: string
+      },
+      */
+
       duration: {
         start: string,
         stop: string
@@ -95,7 +107,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
     ngOnInit() {
       const rxInit = this.activatedRoute.params;
 
-      const [rxCreateInit, rxEditInit] = rxInit.partition(params => params['key'] === 'create');
+      const [rxCreateInit, rxEditInit] = rxInit.partition(() => this.activatedRoute.snapshot.queryParams.hasOwnProperty('create'));
 
       const rxCreate =
         rxCreateInit
@@ -120,12 +132,10 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
               })
             )
           )
-          .map(
+          .do(
             source => {
               this.mode = 'CREATE';
               this.source = source;
-              console.log(source);
-
             }
           );
 
@@ -133,7 +143,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
         rxEditInit
           .map(params => params['key'] as string)
           .flatMap(policyId => this.policyService.getById(policyId))
-          .map(
+          .do(
             policy => {
               this.mode = 'EDIT';
               // TODO
@@ -144,8 +154,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
 
       this.rxReady =
         Rx.Observable
-          .merge(rxCreate, rxEdit)
-          .map(obj => true);
+          .merge(rxCreate, rxEdit);
 
       this.rxReady
         .subscribe(
@@ -168,28 +177,42 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
         .subscribe(
           () => {
             this.mapRender();
-
-            this.mapRenderCitySource(this.source.dataCenter.location, `${this.source.dataCenter.location.place}`);
-
-            const target: Location = new Location();
-            target.country = 'Sri Lanka';
-            target.place = 'Colombo';
-            this.mapRenderCityTarget(target, 'Colombo');
-            this.mapRenderArc();
-
-            if(this.mode === 'EDIT') {
-              this.mapRenderCityTarget(this.target.dataCenter.location, `${this.target.dataCenter.location.place}`);
-            }
           }
         );
     }
 
-    toggleAdvanced() {
+    doToggleAdvanced() {
       this.isAdvancedEnabled = !this.isAdvancedEnabled;
     }
 
-    selectDataCenter() {
+    doRefreshMap() {
       this.updateClusterOptions();
+
+      this.mapCities.source = {
+        location: this.source.dataCenter.location,
+        template:
+          `<div>
+            <div>${this.source.dataCenter.deployedAt}</div>
+            <div>${this.source.dataCenter.name}</div>
+            <div>${this.source.resourceType}:${this.source.resourceId}</div>
+            <div>SOURCE</div>
+          </div>`
+      };
+      if(this.target.dataCenter) {
+        this.mapCities.target = {
+            location: this.target.dataCenter.location,
+            template:
+              `<div>
+                <div>${this.target.dataCenter.deployedAt}</div>
+                <div>${this.target.dataCenter.name}</div>
+                <div>${this.source.resourceType}:${this.source.resourceId}</div>
+                <div>${this.schedule.frequency ? this.schedule.frequency : ''}</div>
+              </div>`
+          };
+      }
+
+      this.mapRenderCities();
+      this.mapRenderArc();
     }
 
     updateClusterOptions() {
@@ -243,22 +266,6 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
       });
     }
 
-    mapRenderCitySource(location: Location, template: string) {
-      this.mapCities.source = {
-        location,
-        template
-      };
-      this.mapRenderCities();
-    }
-
-    mapRenderCityTarget(location: Location, template: string) {
-      this.mapCities.target = {
-        location,
-        template
-      };
-      this.mapRenderCities();
-    }
-
     mapRenderCities() {
       const bubbles =
         Object.keys(this.mapCities)
@@ -266,11 +273,10 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
           const city = this.mapCities[cKey];
 
           const coordinates = CityNames.getCityCoordinates(city.location.country, city.location.place);
-          const template = '';
 
 
           return ({
-            template,
+            template: city.template,
             latitude: parseFloat(coordinates[0]),
             longitude: parseFloat(coordinates[1])
           });
@@ -335,5 +341,14 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
         .subscribe(
           () => this.router.navigate(['/ui/dashboard'])
         );
+    }
+
+    // http://stackoverflow.com/a/39890184/640012
+    doHandleInputDate(dateString: string) {
+      if (dateString) {
+        return new Date(dateString);
+      } else {
+          return null;
+      }
     }
 }
