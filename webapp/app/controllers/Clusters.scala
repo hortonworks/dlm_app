@@ -89,17 +89,13 @@ class Clusters @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage:Clu
   }
 
   def get(id: String) = Authenticated.async {
-
     import com.hw.dp.service.cluster.Formatters._
 
-    clusters
-      .flatMap(
-          _
-            .find(Json.obj("host" -> id))
-            .requireOne[Ambari]
-      )
-      .map(cAmbari =>
-        Ok(Json.toJson(cAmbari))
+    storage.getClusterById(id)
+      .map(cAmbariOption =>
+        cAmbariOption
+          .map(cAmbari => Ok(Json.toJson(cAmbariOption)))
+          .getOrElse(NotFound)
       )
       .recoverWith {
         case e:Exception =>

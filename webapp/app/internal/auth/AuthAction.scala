@@ -14,16 +14,16 @@ import scala.concurrent.Future
 object Authenticated extends ActionBuilder[AuthenticatedRequest] {
   def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[Result]) = {
 //    debug
-    block(AuthenticatedRequest[A](new UserView("admin", "admin", true), request))
-//    if(request.headers.get("Authorization").isDefined && request.headers.get("Authorization").get.startsWith("Bearer ")){
-//      val header: String = request.headers.get("Authorization").get
-//      val token = header.replace("Bearer","").trim
-//      Jwt.parseJWT(token).map{ user =>
-//        block(AuthenticatedRequest[A](user, request))
-//      } getOrElse(Future.successful(Results.Status(Status.UNAUTHORIZED)))
-//    }
-//    else
-//      Future.successful(Results.Status(Status.UNAUTHORIZED))
+//    block(AuthenticatedRequest[A](new UserView("admin", "admin", true), request))
+    if(request.headers.get("Authorization").isDefined && request.headers.get("Authorization").get.startsWith("Bearer ")){
+      val header: String = request.headers.get("Authorization").get
+      val token = header.replace("Bearer","").trim
+      Jwt.parseJWT(token).map{ user =>
+        block(AuthenticatedRequest[A](user, request))
+      } getOrElse(Future.successful(Results.Status(Status.UNAUTHORIZED)))
+    }
+    else
+      Future.successful(Results.Status(Status.UNAUTHORIZED))
   }
 }
 

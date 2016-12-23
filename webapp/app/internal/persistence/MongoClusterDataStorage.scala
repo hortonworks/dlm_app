@@ -164,17 +164,17 @@ class MongoClusterDataStorage @Inject()(val mongoDriver: MongoDriver, configurat
     collection.flatMap(_.find(selector).one[Cluster])
   }
 
-  def getBackupPolicyById(id: String): Future[BackupPolicy] = {
+  override def getBackupPolicyById(id: String): Future[Option[BackupPolicy]] = {
     val policies = connection.database(dbName).map(_.collection[JSONCollection]("policies"))
 
     policies.flatMap(
       _
         .find(Json.obj("label" -> id))
-        .requireOne[BackupPolicy]
+        .one[BackupPolicy]
     )
   }
 
-  def getDataCenterById(id: String): Future[DataCenter] = {
+  override def getDataCenterById(id: String): Future[Option[DataCenter]] = {
     import com.hw.dp.service.cluster.Formatters._
 
     val dataCenters = connection.database(dbName).map(_.collection[JSONCollection]("datacenters"))
@@ -182,11 +182,11 @@ class MongoClusterDataStorage @Inject()(val mongoDriver: MongoDriver, configurat
     dataCenters.flatMap(
       _
         .find(Json.obj("name" -> id))
-        .requireOne[DataCenter]
+        .one[DataCenter]
     )
   }
 
-  def getClusterById(id: String): Future[Cluster] = {
+  override def getClusterById(id: String): Future[Option[Ambari]] = {
     import com.hw.dp.service.cluster.Formatters._
 
     val clusters = connection.database(dbName).map(_.collection[JSONCollection]("clusters"))
@@ -194,11 +194,11 @@ class MongoClusterDataStorage @Inject()(val mongoDriver: MongoDriver, configurat
     clusters.flatMap(
       _
         .find(Json.obj("host" -> id))
-        .requireOne[Cluster]
+        .one[Ambari]
     )
   }
 
-  def getClustersByDataCenterId(id: String): Future[Seq[Ambari]] = {
+  override def getClustersByDataCenterId(id: String): Future[Seq[Ambari]] = {
     import com.hw.dp.service.cluster.Formatters._
 
     val clusters = connection.database(dbName).map(_.collection[JSONCollection]("clusters"))

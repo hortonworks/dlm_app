@@ -86,6 +86,12 @@ class BackupPolicies @Inject()(
 
   def get(id: String) = Authenticated.async {
     storage.getBackupPolicyById(id)
+        .map(
+          cPolicyOption =>
+            cPolicyOption
+              .map(cPolicy => Ok(Json.toJson(cPolicy)))
+              .getOrElse(NotFound)
+        )
 //        .flatMap({
 //          cPolicy =>
 //            println("here too")
@@ -103,7 +109,7 @@ class BackupPolicies @Inject()(
 //              )
 //            }
 //        })
-        .map(policyInDetail => Ok(Json.toJson(policyInDetail)))
+//        .map(policyInDetail => Ok(Json.toJson(policyInDetail)))
         .recoverWith {
           case e:Exception => Future.successful(InternalServerError(JsonResponses.statusError("fetch error",e.getMessage)))
         }
