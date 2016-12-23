@@ -24,15 +24,15 @@ public class HdfsProfiler {
 
     private void constructRadiologyImagesFileSet(HdfsMetadata hdfsMetadata) {
         HdfsFile radiologyImagesFileGlob = buildHdfsFile("RadiologyImages/Public/Cases/*.jpg",
-                "/insurance/raw/RadiologyImages/Public/Cases/*.jpg",
+                "/sko_demo_data/unstructured/RadiologyImages/Public/Cases/*.jpg",
                 13033660,
-                "root", "hdfs", "-rw-r--r--",
+                "admin", "hdfs", "-rw-r--r--",
                 "2016-12-22 13:39",
                 new String[]{"jpeg", "image"});
 
         HdfsFileSet hdfsFileSet = buildHdfsFileSet("Radiology Images",
-                "/insurance/raw/RadiologyImages",
-                "root", "hdfs", "drwxr-xr-x",
+                "/sko_demo_data/unstructured/RadiologyImages",
+                "admin", "hdfs", "drwxr-xr-x",
                 "2016-12-22 13:39",
                 new String[]{"image file container", "directory"},
                 new HdfsFileElement[]{radiologyImagesFileGlob});
@@ -42,15 +42,15 @@ public class HdfsProfiler {
 
     private void constructClinicalNotesFileSet(HdfsMetadata hdfsMetadata) {
         HdfsFile clinicalNotesFileGlob = buildHdfsFile("ClinicalNotesAndReports/Public/Cases/*.txt",
-                "/insurance/raw/ClinicalNotesAndReports/Public/Cases/*.txt",
+                "/sko_demo_data/unstructured/ClinicalNotesAndReports/Public/Cases/*.txt",
                 7892178,
-                "root", "hdfs", "-rw-r--r--",
+                "admin", "hdfs", "-rw-r--r--",
                 "2016-12-22 13:38",
                 new String[] {"text"});
 
         HdfsFileSet clinicalNotesFileSet = buildHdfsFileSet("Clinical Notes and Reports",
-                "/insurance/raw/ClinicalNotesAndReports",
-                "root", "hdfs", "drwxr-xr-x",
+                "/sko_demo_data/unstructured/ClinicalNotesAndReports",
+                "admin", "hdfs", "drwxr-xr-x",
                 "2016-12-22 13:36",
                 new String[] {"text file container", "directory"},
                 new HdfsFileElement[] {clinicalNotesFileGlob}
