@@ -19,7 +19,7 @@ import reactivemongo.play.json.collection.JSONCollection
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class DataCenterController @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage: DataStorage)
+class DataCenters @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage: DataStorage)
   extends Controller with MongoController with ReactiveMongoComponents with MongoUtilities {
 
   def dataCenters = database.map(_.collection[JSONCollection]("datacenters"))

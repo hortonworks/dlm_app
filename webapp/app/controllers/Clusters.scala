@@ -17,7 +17,7 @@ import reactivemongo.play.json.collection.JSONCollection
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ClusterController @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage:DataStorage, val ambariSync: AmbariSync)
+class Clusters @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage:DataStorage, val ambariSync: AmbariSync)
   extends Controller with MongoController with ReactiveMongoComponents with MongoUtilities {
 
   def clusters = database.map(_.collection[JSONCollection]("clusters"))

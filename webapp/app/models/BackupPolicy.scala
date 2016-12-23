@@ -1,7 +1,5 @@
 package models
 
-import java.time.Instant
-
 import play.api.libs.json.Json
 import com.hw.dp.service.cluster.{DataCenter, Cluster}
 import com.hw.dp.service.cluster.Formatters._
@@ -14,7 +12,7 @@ case class Source(dataCenterId: String, clusterId: String, resourceId: String, r
 
 case class Target(dataCenterId: String, clusterId: String)
 
-case class Status(isEnabled: Boolean, since: Instant)
+case class Status(isEnabled: Boolean, since: Option[String])
 
 case class Duration(start: String, stop: String)
 

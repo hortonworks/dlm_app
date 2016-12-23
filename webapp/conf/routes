@@ -12,21 +12,21 @@ GET         /ui/*path                              controllers.Application.route
 POST        /auth/login                            controllers.Authentication.login
 
 #api
-POST        /api/clusters                          controllers.ClusterController.create
-GET         /api/clusters                          controllers.ClusterController.list
-PUT         /api/clusters                          controllers.ClusterController.update
-GET         /api/clusters/:id                      controllers.ClusterController.get(id)
+POST        /api/clusters                          controllers.Clusters.create
+GET         /api/clusters                          controllers.Clusters.list
+PUT         /api/clusters                          controllers.Clusters.update
+GET         /api/clusters/:id                      controllers.Clusters.get(id)
 
-PUT         /api/datacenters                       controllers.DataCenterController.create
-GET         /api/datacenters                       controllers.DataCenterController.list
-GET         /api/datacenters/:dcName/detail        controllers.DataCenterController.getClusters(dcName)
-GET         /api/datacenters/:id                   controllers.DataCenterController.get(id)
-GET         /api/datacenters/:id/clusters          controllers.DataCenterController.getClustersByDataCenterId(id)
+PUT         /api/datacenters                       controllers.DataCenters.create
+GET         /api/datacenters                       controllers.DataCenters.list
+GET         /api/datacenters/:dcName/detail        controllers.DataCenters.getClusters(dcName)
+GET         /api/datacenters/:id                   controllers.DataCenters.get(id)
+GET         /api/datacenters/:id/clusters          controllers.DataCenters.getClustersByDataCenterId(id)
 
-GET         /api/backup-policies                   controllers.BackupPolicyController.list
-POST        /api/backup-policies                   controllers.BackupPolicyController.create
-# PUT         /api/backup-policies/:id               controllers.BackupPolicyController.update(id)
-GET         /api/backup-policies/:id               controllers.BackupPolicyController.get(id)
+GET         /api/backup-policies                   controllers.BackupPolicies.list(dataCenter: Option[String], cluster: Option[String], resourceId: Option[String], resourceType: Option[String])
+POST        /api/backup-policies                   controllers.BackupPolicies.create
+# PUT         /api/backup-policies/:id               controllers.BackupPolicies.update(id)
+GET         /api/backup-policies/:id               controllers.BackupPolicies.get(id)
 
 #Atlas
 #TODO:fix endpoints

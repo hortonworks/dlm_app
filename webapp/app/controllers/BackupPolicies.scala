@@ -1,6 +1,7 @@
 package controllers
 
 import javax.inject.Inject
+import java.time.Instant
 
 import internal.auth.Authenticated
 import internal.MongoUtilities
@@ -21,7 +22,7 @@ import scala.concurrent.Future
 /**
   * Created by abkumar on 22/12/16.
   */
-class BackupPolicyController @Inject()(
+class BackupPolicies @Inject()(
     val reactiveMongoApi: ReactiveMongoApi,
     val storage: DataStorage
   ) extends Controller with MongoController with ReactiveMongoComponents with MongoUtilities {
@@ -49,7 +50,12 @@ class BackupPolicyController @Inject()(
             if (fPolicy.isDefined)
               Future.successful(UnprocessableEntity(JsonResponses.statusError("Policy exists")))
             else {
-              policies.flatMap(_.insert(cPolicy)).map { wr =>
+              val cPolicyStamped = cPolicy.copy(
+                status = cPolicy.status.copy(
+                  since = Option(Instant.now().toString())
+                )
+              )
+              policies.flatMap(_.insert(cPolicyStamped)).map { wr =>
                 if (wr.ok)
                   Ok(Json.obj("status" -> "success", "errorcode" -> 0))
                 else
@@ -62,7 +68,7 @@ class BackupPolicyController @Inject()(
     }.getOrElse(Future.successful(BadRequest))
   }
 
-  def list = Authenticated.async {
+  def list(dataCenter: Option[String], cluster: Option[String], resourceId: Option[String], resourceType: Option[String]) = Authenticated.async {
     policies.flatMap(
       _
         .find(Json.obj())
