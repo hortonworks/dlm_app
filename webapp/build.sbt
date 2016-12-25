@@ -34,6 +34,7 @@ libraryDependencies ++= {
     "org.webjars.npm" % "zone.js" % "0.6.25",
     "org.webjars.npm" % "core-js" % "2.4.1",
     "org.webjars.npm" % "symbol-observable" % "1.0.1",
+    "org.webjars.npm" % "ng2-datepicker" % "0.6.2",
     "org.webjars.npm" % "material-design-lite" % "1.2.1",
 
 

@@ -15,6 +15,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
     map: any;
     hostName: string;
     search: string = '';
+    isReplicationInitialized: boolean = false;
     dataSourceName: string;
     breadCrumbMap: any = {};
     cluster: Ambari = new Ambari();
@@ -49,12 +50,14 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit() {
-        this.map = new Datamap({element: document.getElementById('mapcontainer-replication'),
+        const isReplicationInitialized = this.isReplicationInitialized;
+        this.map = new Datamap({
+            element: document.getElementById('mapcontainer-replication__map'),
             projection: 'mercator',
             height: 600,
             width: 1116,
             fills: {
-                defaultFill: '#ABE3F3',
+                defaultFill: isReplicationInitialized ? '#ABE3F3' : 'rgb(236, 236, 236)',
                 UP: '#9FCE63',
                 DOWN: '#D21E28'
             },

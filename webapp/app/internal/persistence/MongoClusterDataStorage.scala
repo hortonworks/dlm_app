@@ -2,14 +2,14 @@ package internal.persistence
 
 import com.google.inject.{Inject, Singleton}
 import com.hw.dp.service.cluster._
-import models.DataCenterDetail
+import models.{BackupPolicy, DataCenterDetail}
 import play.api.libs.json.Json
 import reactivemongo.api.{Cursor, MongoDriver}
 import reactivemongo.core.nodeset.Authenticate
 import reactivemongo.play.json.collection.JSONCollection
 import play.modules.reactivemongo.json._
 import reactivemongo.api.commands.WriteResult
-
+import models.BackupPolicyFormatters._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.Logger
@@ -162,5 +162,52 @@ class MongoClusterDataStorage @Inject()(val mongoDriver: MongoDriver, configurat
     val selector = Json.obj("dataCenter" -> datacenter, "ambariHost" -> clusterHost)
     val collection: Future[JSONCollection] = connection.database(dbName).map(_.collection("clusterinfo"))
     collection.flatMap(_.find(selector).one[Cluster])
+  }
+
+  override def getBackupPolicyById(id: String): Future[Option[BackupPolicy]] = {
+    val policies = connection.database(dbName).map(_.collection[JSONCollection]("backupPolicies"))
+
+    policies.flatMap(
+      _
+        .find(Json.obj("label" -> id))
+        .one[BackupPolicy]
+    )
+  }
+
+  override def getDataCenterById(id: String): Future[Option[DataCenter]] = {
+    import com.hw.dp.service.cluster.Formatters._
+
+    val dataCenters = connection.database(dbName).map(_.collection[JSONCollection]("datacenters"))
+
+    dataCenters.flatMap(
+      _
+        .find(Json.obj("name" -> id))
+        .one[DataCenter]
+    )
+  }
+
+  override def getClusterById(id: String): Future[Option[Ambari]] = {
+    import com.hw.dp.service.cluster.Formatters._
+
+    val clusters = connection.database(dbName).map(_.collection[JSONCollection]("clusters"))
+
+    clusters.flatMap(
+      _
+        .find(Json.obj("host" -> id))
+        .one[Ambari]
+    )
+  }
+
+  override def getClustersByDataCenterId(id: String): Future[Seq[Ambari]] = {
+    import com.hw.dp.service.cluster.Formatters._
+
+    val clusters = connection.database(dbName).map(_.collection[JSONCollection]("clusters"))
+
+    clusters.flatMap(
+      _
+        .find(Json.obj("dataCenter" -> id))
+        .cursor[Ambari]()
+        .collect[List](maxDocs = 0, Cursor.FailOnError[List[Ambari]]())
+    )
   }
 }
