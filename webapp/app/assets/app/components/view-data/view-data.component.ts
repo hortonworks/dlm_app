@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewChild, AfterViewInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {Router, ActivatedRoute} from '@angular/router';
 import {BreadcrumbComponent} from '../../shared/breadcrumb/breadcrumb.component';
 import {AmbariService} from '../../services/ambari.service';
 import {Ambari} from '../../models/ambari';
@@ -22,7 +22,11 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
 
     @ViewChild('bread-crumb') breadCrumb: BreadcrumbComponent;
 
-    constructor(private activatedRoute: ActivatedRoute, private clusterService: AmbariService) {}
+    constructor(
+      private activatedRoute: ActivatedRoute,
+        private router: Router,
+        private clusterService: AmbariService
+      ) {}
 
     ngOnInit() {
         this.activatedRoute.params.subscribe(params => {
@@ -88,5 +92,19 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
         if ($event.keyCode === 13) {
             this.search = search;
         }
+    }
+
+    doCreateBackupPolicy() {
+        let navigationExtras = {
+            'queryParams' : {
+              create: '',
+              cluster: this.hostName,
+              dataCenter: this.dataSourceName,
+              resourceId: this.search,
+              resourceType: 'table',
+            }
+        };
+        this.router.navigate(['/ui/backup-policy'], navigationExtras);
+        return false;
     }
 }
