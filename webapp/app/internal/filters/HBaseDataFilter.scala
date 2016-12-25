@@ -33,7 +33,6 @@ class HbaseColumnParameterFilter(expression: String) extends HbaseDataFilter {
   override def apply(data: Seq[Result]): Seq[Result] = {
     data.filter { r =>
       r.columns.isDefined && r.columns.get.exists(c =>
-
         c.$systemAttributes$.isDefined && evaluate(
           Json.toJson(c.$systemAttributes$.get),
           expression))
