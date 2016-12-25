@@ -165,7 +165,7 @@ class MongoClusterDataStorage @Inject()(val mongoDriver: MongoDriver, configurat
   }
 
   override def getBackupPolicyById(id: String): Future[Option[BackupPolicy]] = {
-    val policies = connection.database(dbName).map(_.collection[JSONCollection]("policies"))
+    val policies = connection.database(dbName).map(_.collection[JSONCollection]("backupPolicies"))
 
     policies.flatMap(
       _

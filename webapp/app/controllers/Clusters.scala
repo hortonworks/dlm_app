@@ -92,9 +92,9 @@ class Clusters @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage:Clu
     import com.hw.dp.service.cluster.Formatters._
 
     storage.getClusterById(id)
-      .map(cAmbariOption =>
-        cAmbariOption
-          .map(cAmbari => Ok(Json.toJson(cAmbariOption)))
+      .map(
+        _
+          .map(cAmbari => Ok(Json.toJson(cAmbari)))
           .getOrElse(NotFound)
       )
       .recoverWith {

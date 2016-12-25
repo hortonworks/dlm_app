@@ -74,8 +74,10 @@ class DataCenters @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage:
   def get(id: String) = Authenticated.async {
 
     storage.getDataCenterById(id)
-      .map(cDataCenter =>
-        Ok(Json.toJson(cDataCenter))
+      .map(
+        _
+          .map(cDataCenter => Ok(Json.toJson(cDataCenter)))
+          .getOrElse(NotFound)
       )
       .recoverWith {
         case e:Exception =>
@@ -85,10 +87,10 @@ class DataCenters @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage:
 
   def getClustersByDataCenterId(id: String) = Authenticated.async {
     storage.getClustersByDataCenterId(id)
-      .map({
+      .map(
         ambariClusters =>
           Ok(Json.toJson(ambariClusters))
-      })
+      )
       .recoverWith {
         case e:Exception =>
           Future.successful(InternalServerError(JsonResponses.statusError("Server error",e.getMessage)))

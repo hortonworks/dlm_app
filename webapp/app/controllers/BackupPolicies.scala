@@ -15,8 +15,9 @@ import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMo
 import reactivemongo.api.Cursor
 import reactivemongo.play.json.collection.JSONCollection
 import play.modules.reactivemongo.json._
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**
@@ -86,32 +87,36 @@ class BackupPolicies @Inject()(
 
   def get(id: String) = Authenticated.async {
     storage.getBackupPolicyById(id)
-        .map(
-          cPolicyOption =>
-            cPolicyOption
-              .map(cPolicy => Ok(Json.toJson(cPolicy)))
-              .getOrElse(NotFound)
+      .flatMap(
+        _
+        .map(cPolicy =>
+          getBackupPolicyInDetail(cPolicy)
+          .flatMap(cPolicyInDetail => Future.successful(Ok(Json.toJson(cPolicyInDetail))))
+          .recoverWith{
+            case e:Exception => Future.successful(InternalServerError(JsonResponses.statusError("fetch error",e.getMessage)))
+
+          }
         )
-//        .flatMap({
-//          cPolicy =>
-//            println("here too")
-//            for {
-//              sourceDataCenter <- storage.getDataCenterById(cPolicy.source.dataCenterId)
-//              sourceCluster <- storage.getClusterById(cPolicy.source.clusterId)
-//              targetDataCenter <- storage.getDataCenterById(cPolicy.target.dataCenterId)
-//              targetCluster <- storage.getClusterById(cPolicy.target.clusterId)
-//            } yield {
-//              BackupPolicyInDetail(
-//                cPolicy.label,
-//                SourceInDetail(sourceDataCenter, sourceCluster, cPolicy.source.resourceId, cPolicy.source.resourceType),
-//                TargetInDetail(targetDataCenter, targetCluster),
-//                cPolicy.status
-//              )
-//            }
-//        })
-//        .map(policyInDetail => Ok(Json.toJson(policyInDetail)))
-        .recoverWith {
-          case e:Exception => Future.successful(InternalServerError(JsonResponses.statusError("fetch error",e.getMessage)))
-        }
+        .getOrElse(Future.successful(NotFound))
+      )
+      .recoverWith {
+        case e:Exception => Future.successful(InternalServerError(JsonResponses.statusError("fetch error",e.getMessage)))
+      }
+  }
+
+  def getBackupPolicyInDetail(policy: BackupPolicy): Future[BackupPolicyInDetail] = {
+    for {
+      sourceDataCenter <- storage.getDataCenterById(policy.source.dataCenterId)
+      sourceCluster <- storage.getClusterById(policy.source.clusterId)
+      targetDataCenter <- storage.getDataCenterById(policy.target.dataCenterId)
+      targetCluster <- storage.getClusterById(policy.target.clusterId)
+    } yield {
+      BackupPolicyInDetail(
+        policy.label,
+        SourceInDetail(sourceDataCenter.get, sourceCluster.get, policy.source.resourceId, policy.source.resourceType),
+        TargetInDetail(targetDataCenter.get, targetCluster.get),
+        policy.status
+      )
+    }
   }
 }
