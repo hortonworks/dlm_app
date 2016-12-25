@@ -1,5 +1,4 @@
-
-<div class="mdl-grid" *ngIf="state.isSuccessful">
+<div class="mdl-grid" *ngIf="source.dataCenter">
     <div class="mdl-layout-spacer"></div>
     <div class="mdl-cell mdl-cell--10-col">
         <h1 class="mdl-typography--headline mdl-typography--font-light" style="margin-bottom: 0">Backup Policy</h1>
@@ -10,8 +9,18 @@
                 <span [innerHTML]="entity"></span>:
               </div>
               <div style="flex: 1; margin-left: 5px;">
-                <span class="mdl-typography--title  mdl-color-text--green">{{source.resourceId}}</span> <br>
-                <span class="mdl-typography--caption mdl-typography--text-uppercase">On-Prem: {{source.dataCenter.name}} ({{source.cluster.host}})</span>
+                <span *ngIf="source.resourceId && source.resourceType" class="mdl-typography--title  mdl-color-text--green">{{source.resourceId}}</span>
+                <!--TODO: link to Raghu's component-->
+                <span *ngIf="!source.resourceId || !source.resourceType" class="mdl-typography--title  mdl-color-text--green">
+                  Please select a resource to replicate
+                </span>
+                <br>
+                <div class="mdl-typography--caption mdl-typography--text-uppercase">
+                  On-Prem: {{source.dataCenter.name}}
+                  <span *ngIf="source.cluster">({{source.cluster.host}})</span>
+                  <!--TODO: populate list of clusters for source.dataCenter-->
+                  <span *ngIf="!source.cluster">Please select a cluster</span>
+                </div>
               </div>
             </div>
             <div class="">

@@ -54,11 +54,11 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
 
     label: string = '';
     source: {
-      dataCenter: DataCenter,
-      cluster: Ambari,
-      resourceId: string,
-      resourceType: string
-    };
+      dataCenter?: DataCenter,
+      cluster?: Ambari,
+      resourceId?: string,
+      resourceType?: string
+    } = {};
     target: {
       dataCenter?: DataCenter,
       cluster?: Ambari
@@ -121,7 +121,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
           .flatMap(
             ({dataCenterId, clusterId, resourceId, resourceType}) => Rx.Observable.forkJoin(
               this.dcService.getById(dataCenterId),
-              this.ambariService.getById(clusterId),
+              clusterId ? this.ambariService.getById(clusterId) : Rx.Observable.of(undefined),
               Rx.Observable.of(resourceId),
               Rx.Observable.of(resourceType),
               (dataCenter, cluster, tableId) => ({
@@ -177,6 +177,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
         .subscribe(
           () => {
             this.mapRender();
+            this.mapRefresh();
           }
         );
     }
@@ -185,8 +186,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
       this.isAdvancedEnabled = !this.isAdvancedEnabled;
     }
 
-    doRefreshMap() {
-      this.updateClusterOptions();
+    mapRefresh() {
 
       this.mapCities.source = {
         location: this.source.dataCenter.location,
@@ -194,7 +194,13 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
           `<div>
             <div>${this.source.dataCenter.deployedAt}</div>
             <div>${this.source.dataCenter.name}</div>
-            <div>${this.source.resourceType}:${this.source.resourceId}</div>
+            <div>
+              ${
+                  this.source.resourceType && this.source.resourceId
+                  ? this.source.resourceType + ':' + this.source.resourceId
+                  : ''
+                }
+            </div>
             <div>SOURCE</div>
           </div>`
       };
@@ -205,7 +211,13 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
               `<div>
                 <div>${this.target.dataCenter.deployedAt}</div>
                 <div>${this.target.dataCenter.name}</div>
-                <div>${this.source.resourceType}:${this.source.resourceId}</div>
+                <div>
+                  ${
+                      this.source.resourceType && this.source.resourceId
+                      ? this.source.resourceType + ':' + this.source.resourceId
+                      : ''
+                    }
+                </div>
                 <div>${this.schedule.frequency ? this.schedule.frequency : ''}</div>
               </div>`
           };
@@ -213,6 +225,11 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
 
       this.mapRenderCities();
       this.mapRenderArc();
+    }
+
+    doRefreshMap() {
+      this.updateClusterOptions();
+      this.mapRefresh();
     }
 
     updateClusterOptions() {
