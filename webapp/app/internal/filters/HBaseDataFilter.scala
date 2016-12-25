@@ -24,9 +24,7 @@ trait HbaseDataFilter {
 class HbaseColumnFieldFilter(expression: String) extends HbaseDataFilter {
   override def apply(data: Seq[Result]): Seq[Result] = {
     data.filter { r =>
-      r.columns.isDefined && r.columns.get
-        .find(c => evaluate(Json.toJson(c), expression))
-        .isDefined
+      r.columns.isDefined && r.columns.get.exists(c => evaluate(Json.toJson(c), expression))
     }
   }
 }
@@ -34,13 +32,11 @@ class HbaseColumnFieldFilter(expression: String) extends HbaseDataFilter {
 class HbaseColumnParameterFilter(expression: String) extends HbaseDataFilter {
   override def apply(data: Seq[Result]): Seq[Result] = {
     data.filter { r =>
-      r.columns.isDefined && r.columns.get
-        .find(
-          c =>
-            c.$systemAttributes$.isDefined && evaluate(
-              Json.toJson(c.$systemAttributes$.get),
-              expression))
-        .isDefined
+      r.columns.isDefined && r.columns.get.exists(c =>
+
+        c.$systemAttributes$.isDefined && evaluate(
+          Json.toJson(c.$systemAttributes$.get),
+          expression))
 
     }
   }
