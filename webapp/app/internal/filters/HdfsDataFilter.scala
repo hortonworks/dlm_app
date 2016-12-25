@@ -14,8 +14,8 @@ trait HdfsDataFilter {
   def apply(data: Seq[Result]): Seq[Result]
 
   final def evaluate(r: JsValue, expression: String): Boolean = {
-    engine.eval(s"var result = ${Json.stringify(r)}")
-    val result = engine.eval(s"result.${expression}")
+    engine.eval(s"var r = ${Json.stringify(r)}")
+    val result = engine.eval(expression)
     Try(result.asInstanceOf[Boolean]) getOrElse false
   }
 
