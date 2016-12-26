@@ -36,6 +36,7 @@ libraryDependencies ++= {
     "org.webjars.npm" % "symbol-observable" % "1.0.1",
     "org.webjars.npm" % "ng2-datepicker" % "0.6.2",
     "org.webjars.npm" % "material-design-lite" % "1.2.1",
+    "org.webjars.npm" % "leaflet" % "1.0.2",
 
 
   "org.webjars.npm" % "typescript" % "2.0.3",

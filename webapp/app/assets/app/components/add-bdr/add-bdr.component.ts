@@ -48,6 +48,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
     welcomeText = `Configure Backup and Disaster Recovery for the selected Entity. You can select the target cluster to copy the data and the schedule for backup and recovery`;
     dataCenterOptions: Array<DataCenter> = [];
     clusterOptions: Array<Ambari> = [];
+    sourceClusterOptions: Array<Ambari> = [];
     mode: string = '';
     policyId: string = '';
     isAdvancedEnabled: boolean = false;
@@ -105,6 +106,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
     ) {}
 
     ngOnInit() {
+      const rxSourceClusterOptions = new Rx.Subject<string>();
       const rxInit = this.activatedRoute.params;
 
       const [rxCreateInit, rxEditInit] = rxInit.partition(() => this.activatedRoute.snapshot.queryParams.hasOwnProperty('create'));
@@ -132,6 +134,11 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
               })
             )
           )
+          .do(source => {
+            if(!source.cluster) {
+              rxSourceClusterOptions.next(source.dataCenter.name);
+            }
+          })
           .do(
             source => {
               this.mode = 'CREATE';
@@ -170,6 +177,10 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
         .subscribe(dataCenters => {
           this.dataCenterOptions = dataCenters;
         });
+
+      rxSourceClusterOptions
+        .flatMap(cDataCenterId => this.dcService.getClustersByDataCenterId(cDataCenterId))
+        .subscribe(ambariList => this.sourceClusterOptions = ambariList);
     }
 
     ngAfterViewInit() {

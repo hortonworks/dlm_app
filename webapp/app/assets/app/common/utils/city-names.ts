@@ -189,12 +189,9 @@ export class CityNames {
         return [0,0];
     }
 
-    public static getLocation(countryName: string, city: string): {latitude: number, longitude: number} {
+    public static getLocation(countryName: string, city: string): number[] {
       const coordinates = this.getCityCoordinates(countryName, city);
-      return ({
-        latitude: parseFloat(coordinates[0]),
-        longitude: parseFloat(coordinates[1])
-      });
+      return ([parseFloat(coordinates[0]),parseFloat(coordinates[1])]);
     }
 }
 

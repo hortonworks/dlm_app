@@ -15,11 +15,21 @@
                   Please select a resource to replicate
                 </span>
                 <br>
-                <div class="mdl-typography--caption mdl-typography--text-uppercase">
-                  On-Prem: {{source.dataCenter.name}}
-                  <span *ngIf="source.cluster">({{source.cluster.host}})</span>
+                <div class="mdl-typography--caption">
+                  <span class="mdl-typography--text-uppercase">On-Prem: {{source.dataCenter.name}}</span>
+                  <span class="mdl-typography--text-uppercase" *ngIf="source.cluster">({{source.cluster.host}})</span>
                   <!--TODO: populate list of clusters for source.dataCenter-->
-                  <span *ngIf="!source.cluster">Please select a cluster</span>
+                  <span *ngIf="!source.cluster" style="cursor: pointer">
+                    Please select a cluster below
+                  </span>
+                  <div class="select-wrap" *ngIf="!source.cluster">
+                    <drop-down>
+                        <select [(ngModel)]="source.cluster">
+                            <option disabled selected [ngValue]="">Cluster</option>
+                            <option *ngFor="let cluster of sourceClusterOptions" [ngValue]="cluster">{{cluster.host}}</option>
+                        </select>
+                    </drop-down>
+                  </div>
                 </div>
               </div>
             </div>

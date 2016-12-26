@@ -1,6 +1,8 @@
 import {Component, OnInit, ViewChild, AfterViewInit} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
+
 import {BreadcrumbComponent} from '../../shared/breadcrumb/breadcrumb.component';
+import {GeographyService} from '../../services/geography.service';
 import {AmbariService} from '../../services/ambari.service';
 import {BackupPolicyService} from '../../services/backup-policy.service';
 import {Ambari} from '../../models/ambari';
@@ -9,7 +11,7 @@ import {DataCenterService} from '../../services/data-center.service';
 import Rx from 'rxjs/Rx';
 import {CityNames} from '../../common/utils/city-names';
 
-
+declare const L:any;
 declare var Datamap:any;
 
 @Component({
@@ -35,6 +37,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
       private clusterService: AmbariService,
       private policyService: BackupPolicyService,
       private dcService: DataCenterService,
+      private geographyService: GeographyService
     ) {
 
       this.rxSearch
@@ -63,66 +66,71 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit() {
-//
+      this.map = new L.Map('mapcontainer-replication__map', {
+        center: [0, 0],
+        zoom: 1,
+        zoomControl:false,
+        maxZoom: 15
+      });
+
+
+      this.geographyService.getCountries()
+        .subscribe(countrySet => L.geoJSON(countrySet, {}).addTo(this.map));
     }
 
     drawMap(policies: BackupPolicyInDetail[]) {
       const edges =
         policies
           .map(cPolicy => ({
-            source: Object.assign(
-              {
-                template:
-                  `<div>
-                      <div>${cPolicy.source.dataCenter.deployedAt}</div>
-                      <div>${cPolicy.source.dataCenter.name}</div>
-                      <div>
-                        ${
-                            cPolicy.source.resourceType && cPolicy.source.resourceId
-                            ? cPolicy.source.resourceType + ':' + cPolicy.source.resourceId
-                            : ''
-                          }
-                      </div>
-                      <div>SOURCE</div>
-                    </div>`,
+            source: {
+              template:
+                `<div>
+                    <div>${cPolicy.source.dataCenter.deployedAt}</div>
+                    <div>${cPolicy.source.dataCenter.name}</div>
+                    <div>
+                      ${
+                          cPolicy.source.resourceType && cPolicy.source.resourceId
+                          ? cPolicy.source.resourceType + ':' + cPolicy.source.resourceId
+                          : ''
+                        }
+                    </div>
+                    <div>SOURCE</div>
+                  </div>`,
+                position: CityNames.getCityCoordinates(cPolicy.source.dataCenter.location.country, cPolicy.source.dataCenter.location.place)
               },
-              CityNames.getLocation(cPolicy.source.dataCenter.location.country, cPolicy.source.dataCenter.location.place)
-            ),
-            target: Object.assign(
-              {
-                template:
-                  `<div>
-                      <div>${cPolicy.target.dataCenter.deployedAt}</div>
-                      <div>${cPolicy.target.dataCenter.name}</div>
-                      <div>
-                        ${
-                            cPolicy.source.resourceType && cPolicy.source.resourceId
-                            ? cPolicy.source.resourceType + ':' + cPolicy.source.resourceId
-                            : ''
-                          }
-                      </div>
-                      <div>${cPolicy.schedule && cPolicy.schedule.frequency ? cPolicy.schedule.frequency : ''}</div>
-                    </div>`,
-              },
-              CityNames.getLocation(cPolicy.target.dataCenter.location.country, cPolicy.target.dataCenter.location.place)
-            )
+            target: {
+              template:
+                `<div>
+                    <div>${cPolicy.target.dataCenter.deployedAt}</div>
+                    <div>${cPolicy.target.dataCenter.name}</div>
+                    <div>
+                      ${
+                          cPolicy.source.resourceType && cPolicy.source.resourceId
+                          ? cPolicy.source.resourceType + ':' + cPolicy.source.resourceId
+                          : ''
+                        }
+                    </div>
+                    <div>${cPolicy.schedule && cPolicy.schedule.frequency ? cPolicy.schedule.frequency : ''}</div>
+                  </div>`,
+              position: CityNames.getCityCoordinates(cPolicy.target.dataCenter.location.country, cPolicy.target.dataCenter.location.place)
+              }
           }))
           .map(cLocation => {
             if(
-              cLocation.source.latitude === cLocation.target.latitude
-              && cLocation.source.longitude === cLocation.target.longitude
+              cLocation.source.position[0] === cLocation.target.position[0]
+              && cLocation.source.position[1] === cLocation.target.position[1]
             ) {
               // same source and target
               return ({
                 source: Object.assign({}, cLocation.source, {
                   radius: 5,
                   color: 'rgb(159, 206, 99)',
-                  fillOpacity: 0.75,
+                  fillOpacity: 0.75
                 }),
                 target: Object.assign({}, cLocation.source, {
                   radius: 10,
                   color: 'rgb(73, 111, 1)',
-                  fillOpacity: 0.75,
+                  fillOpacity: 0.75
                 }),
                 isArcDrawable: false
               });
@@ -143,50 +151,50 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
             }
           });
 
-        document.getElementById('mapcontainer-replication__map').innerHTML = '';
-        this.map = new Datamap({
-            element: document.getElementById('mapcontainer-replication__map'),
-            projection: 'mercator',
-            height: 600,
-            width: 1116,
-            fills: {
-                defaultFill: policies.length > 0 ? '#ABE3F3' : 'rgb(236, 236, 236)',
-                UP: '#9FCE63',
-                DOWN: '#D21E28'
-            },
-            data: {
-                'UP': {fillKey: 'UP'},
-                'DOWN': {fillKey: 'DOWN'}
-            },
-            geographyConfig: {
-                highlightFillColor: '#ADE4F3',
-                popupOnHover: false,
-                highlightOnHover: false,
-            },
-            bubblesConfig: {
-                popupOnHover: true,
-                popupTemplate: function(geography: any, data: any) {
-                  return '<div class="hoverinfo">' + data.template +'</div>';
-                },
-                borderWidth: 2,
-                borderColor: '#FFFFFF',
-                highlightBorderColor: '#898989',
-                highlightBorderWidth: 2,
-                highlightFillColor: '#898989'
-              },
-              arcConfig: {
-                strokeColor: '#DD1C77',
-                strokeWidth: 1,
-                arcSharpness: 1,
-              }
-        });
+
+        // this.map = new Datamap({
+        //     element: document.getElementById('mapcontainer-replication__map'),
+        //     projection: 'mercator',
+        //     height: 600,
+        //     width: 1116,
+        //     fills: {
+        //         defaultFill: policies.length > 0 ? '#ABE3F3' : 'rgb(236, 236, 236)',
+        //         UP: '#9FCE63',
+        //         DOWN: '#D21E28'
+        //     },
+        //     data: {
+        //         'UP': {fillKey: 'UP'},
+        //         'DOWN': {fillKey: 'DOWN'}
+        //     },
+        //     geographyConfig: {
+        //         highlightFillColor: '#ADE4F3',
+        //         popupOnHover: false,
+        //         highlightOnHover: false,
+        //     },
+        //     bubblesConfig: {
+        //         popupOnHover: true,
+        //         popupTemplate: function(geography: any, data: any) {
+        //           return '<div class="hoverinfo">' + data.template +'</div>';
+        //         },
+        //         borderWidth: 2,
+        //         borderColor: '#FFFFFF',
+        //         highlightBorderColor: '#898989',
+        //         highlightBorderWidth: 2,
+        //         highlightFillColor: '#898989'
+        //       },
+        //       arcConfig: {
+        //         strokeColor: '#DD1C77',
+        //         strokeWidth: 1,
+        //         arcSharpness: 1,
+        //       }
+        // });
 
         const bubbles =
           edges
             .reduce((accumulator, cPolicyLocation) => ([
               ...accumulator,
-              cPolicyLocation.target,
-              cPolicyLocation.source
+              L.circleMarker(cPolicyLocation.target.position).bindPopup(`<div class="hoverinfo">${cPolicyLocation.target.template}</div>`),
+              L.circleMarker(cPolicyLocation.source.position).bindPopup(`<div class="hoverinfo">${cPolicyLocation.source.template}</div>`)
             ]), []);
 
         const arcs =
@@ -197,8 +205,13 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
               destination: cEdge.target
             }));
 
-        this.map.bubbles(bubbles);
-        this.map.arc(arcs);
+          const group = new L.featureGroup(bubbles);
+
+          this.map.fitBounds(group.getBounds(), {padding: L.point(20, 20)});
+          group.addTo(this.map);
+
+        // this.map.bubbles(bubbles);
+        // this.map.arc(arcs);
     }
 
     getClusterData() {

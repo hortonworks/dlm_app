@@ -384,7 +384,7 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
                 });
             };
 
-            const zoomClick = function(){
+            const zoomClick = function(this: any){
                 let clicked = d3.event.target,
                     direction = 1,
                     factor = 0.2,
