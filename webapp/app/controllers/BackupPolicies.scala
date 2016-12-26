@@ -69,17 +69,45 @@ class BackupPolicies @Inject()(
     }.getOrElse(Future.successful(BadRequest))
   }
 
-  def list(dataCenter: Option[String], cluster: Option[String], resourceId: Option[String], resourceType: Option[String]) = Authenticated.async {
+  def list(dataCenterId: Option[String], clusterId: Option[String], resourceId: Option[String], resourceType: Option[String]) = Authenticated.async {
+    var query = Json.obj();
+    if(resourceId.isDefined && resourceType.isDefined) {
+      query = query.deepMerge(
+        Json.obj(
+          "source.resourceId" -> resourceId.get,
+          "source.resourceType" -> resourceType.get
+        )
+      );
+    }
+    if(clusterId.isDefined) {
+      query = query.deepMerge(
+        Json.obj(
+          "source.clusterId" -> clusterId.get
+        )
+      );
+    }
+    if(dataCenterId.isDefined) {
+      query = query.deepMerge(
+        Json.obj(
+          "source.dataCenterId" -> dataCenterId.get
+        )
+      );
+    }
+
     policies
       .flatMap(
         _
-          .find(Json.obj())
+          .find(query)
           .cursor[BackupPolicy]()
           .collect[List](maxDocs = 0, Cursor.FailOnError[List[BackupPolicy]]())
+          .flatMap(policyList => Future.sequence(
+            policyList.map(cPolicy => getBackupPolicyInDetail(cPolicy))
+          ))
           .flatMap {
-            policyList =>
-              Logger.info(s"Fetched ${policyList.size} policies")
-              Future.successful(Ok(Json.toJson(policyList)))
+            policyInDetailList =>
+
+              Logger.info(s"Fetched ${policyInDetailList.size} policies")
+              Future.successful(Ok(Json.toJson(policyInDetailList)))
           }).recoverWith {
             case e:Exception => Future.successful(InternalServerError(JsonResponses.statusError("fetch error",e.getMessage)))
           }

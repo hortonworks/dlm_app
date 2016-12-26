@@ -58,7 +58,7 @@
             <atlas-lineage [search]="search" [dataSourceName]="dataSourceName" [hostName]="hostName"> </atlas-lineage>
 
             <h6> Replication</h6>
-            <div class="mapcontainer-replication__wrapper" [class.mapcontainer-replication__wrapper--with-overlay]="isReplicationInitialized === false">
+            <div class="mapcontainer-replication__wrapper" [class.mapcontainer-replication__wrapper--with-overlay]="backupPolicies.length === 0">
               <div class="mapcontainer-replication__overlay">
                 <div class="mapcontainer-replication__setup">
                   <div class="mapcontainer-replication__icons">

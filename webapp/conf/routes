@@ -23,7 +23,7 @@ GET         /api/datacenters/:dcName/detail        controllers.DataCenters.getCl
 GET         /api/datacenters/:id                   controllers.DataCenters.get(id)
 GET         /api/datacenters/:id/clusters          controllers.DataCenters.getClustersByDataCenterId(id)
 
-GET         /api/backup-policies                   controllers.BackupPolicies.list(dataCenter: Option[String], cluster: Option[String], resourceId: Option[String], resourceType: Option[String])
+GET         /api/backup-policies                   controllers.BackupPolicies.list(dataCenterId: Option[String], clusterId: Option[String], resourceId: Option[String], resourceType: Option[String])
 POST        /api/backup-policies                   controllers.BackupPolicies.create
 # PUT         /api/backup-policies/:id               controllers.BackupPolicies.update(id)
 GET         /api/backup-policies/:id               controllers.BackupPolicies.get(id)
