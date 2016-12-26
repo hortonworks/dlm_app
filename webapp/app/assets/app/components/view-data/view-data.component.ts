@@ -143,6 +143,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
             }
           });
 
+        document.getElementById('mapcontainer-replication__map').innerHTML = '';
         this.map = new Datamap({
             element: document.getElementById('mapcontainer-replication__map'),
             projection: 'mercator',
