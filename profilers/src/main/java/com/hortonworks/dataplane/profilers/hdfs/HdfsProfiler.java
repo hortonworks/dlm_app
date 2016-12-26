@@ -21,7 +21,64 @@ public class HdfsProfiler {
         constructHiveFileSets(hdfsMetadata);
         constructClinicalNotesFileSet(hdfsMetadata);
         constructRadiologyImagesFileSet(hdfsMetadata);
+        constructMedicalJournalsFileSet(hdfsMetadata);
         return hdfsMetadata;
+    }
+
+    private void constructMedicalJournalsFileSet(HdfsMetadata hdfsMetadata) {
+
+        String[] fileNames = {
+                "pdf-1.pdf",
+                "pdf-2.pdf",
+                "pdf-3.pdf",
+                "pdf-4.pdf",
+                "pdf-5.pdf"
+        };
+
+        int[] fileSizes = {112890,  780898,  823536,  664324, 1283790};
+
+        HdfsFileElement[] fileElements = new HdfsFileElement[fileSizes.length];
+
+        Map<String, String> fileFormatDetails = new HashMap<>();
+        fileFormatDetails.put("Content-Type", "application/pdf");
+        fileFormatDetails.put("Creation-Date", "2016-05-24T03:46:30Z");
+        fileFormatDetails.put("Last-Modified", "2016-05-24T03:46:30Z");
+        fileFormatDetails.put("pdf:docinfo:creator_tool", "dvips(k) 5.94b Copyright 2004 Radical Eye Software");
+        fileFormatDetails.put("pdf:encrypted", "false");
+        fileFormatDetails.put("pdf:PDFVersion", "1.5");
+        fileFormatDetails.put("meta:author", "eccrk");
+
+        for (int i = 0; i < fileElements.length; i++) {
+            HdfsFile hdfsFile = buildHdfsFile(fileNames[i],
+                    "/sko_demo_data/unstructured/ResearchDocs/insurance/" + fileNames[i],
+                    fileSizes[i],
+                    "admin", "hdfs", "-rw-r--r--",
+                    "2016-12-26 13:39",
+                    "PDF Document", fileFormatDetails);
+            fileElements[i] = hdfsFile;
+        }
+
+        Map<String, String> fileSetTypeDetails = new HashMap<>();
+        fileSetTypeDetails.put("directory-uri-pattern", "/sko_demo_data/unstructured/ResearchDocs/insurance/FILE_NAME.pdf");
+        fileSetTypeDetails.put("clustering-algorithm", "Hierarchical clustering");
+        fileSetTypeDetails.put("clustered-date", "2016-12-22");
+        fileSetTypeDetails.put("Min PDF version", "1.5");
+        fileSetTypeDetails.put("Max PDF version", "1.5");
+        fileSetTypeDetails.put("Earliest creation date", "2016-05-24");
+        fileSetTypeDetails.put("Latest creation date", "2016-06-24");
+
+        Map<String, String> fileSetContentFeatures = new HashMap<>();
+        fileSetContentFeatures.put("keywords", "medical, insurance, health, private, death, variable");
+        fileSetContentFeatures.put("categories", "private health insurance, public health insurance");
+
+        HdfsFileSet hdfsFileSet = buildHdfsFileSet("Medical Journals",
+                "admin",
+                "2016-12-26 13:39",
+                fileElements, "Machine generated cluster of PDF documents", fileSetTypeDetails,
+                fileSetContentFeatures);
+
+        hdfsMetadata.addFileSet(hdfsFileSet);
+
     }
 
     private void constructRadiologyImagesFileSet(HdfsMetadata hdfsMetadata) {
@@ -43,7 +100,7 @@ public class HdfsProfiler {
 
         HdfsFileElement[] fileElements = new HdfsFileElement[fileSizes.length];
 
-        Map<String, String> fileFormatDetails = new HashMap<String, String>();
+        Map<String, String> fileFormatDetails = new HashMap<>();
         fileFormatDetails.put("Content-Type", "image/jpeg");
         fileFormatDetails.put("Compression Type", "Baseline");
         fileFormatDetails.put("Comments", "converted DICOM image");
