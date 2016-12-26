@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {AtlasEntity} from '../models/atlas- entity';
+import {AtlasEntity} from '../models/atlas-entity';
 import {Observable} from 'rxjs/Observable';
 import {Http, Headers, RequestOptions, Response, ResponseOptions} from '@angular/http';
 import {HttpUtil} from '../shared/utils/httpUtil';
