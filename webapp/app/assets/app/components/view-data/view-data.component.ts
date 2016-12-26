@@ -72,7 +72,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
           .map(cPolicy => ({
             source: Object.assign(
               {
-                tmpl:
+                template:
                   `<div>
                       <div>${cPolicy.source.dataCenter.deployedAt}</div>
                       <div>${cPolicy.source.dataCenter.name}</div>
@@ -90,7 +90,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
             ),
             target: Object.assign(
               {
-                tmpl:
+                template:
                   `<div>
                       <div>${cPolicy.target.dataCenter.deployedAt}</div>
                       <div>${cPolicy.target.dataCenter.name}</div>
@@ -165,11 +165,10 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
             bubblesConfig: {
                 popupOnHover: true,
                 popupTemplate: function(geography: any, data: any) {
-                  console.log(data);
-                    return '<div class="hoverinfo">hola</div>';
+                  return '<div class="hoverinfo">' + data.template +'</div>';
                 },
-                borderWidth: '2',
-                borderColor: '#4C4C4C',
+                // borderWidth: '2',
+                // borderColor: '#4C4C4C',
               },
               arcConfig: {
                 strokeColor: '#DD1C77',

@@ -36,21 +36,21 @@ export class HiveDataComponent implements AfterViewInit, OnChanges {
     }
 
     ngAfterViewInit() {
-        this.map = new Datamap({element: document.getElementById('mapcontainer'),
-            height: 273,
-            width: 385,
-            projection: 'mercator',
-            fills: {
-                defaultFill: '#676966'
-            },
-            bubblesConfig: {
-                popupTemplate: function(geography: any, data: any) {
-                    return '<div class="hoverinfo">' + JSON.stringify(data) +'</div>';
-                },
-                borderWidth: '2',
-                borderColor: '#FFFFFF',
-            }
-        });
+        // this.map = new Datamap({element: document.getElementById('mapcontainer'),
+        //     height: 273,
+        //     width: 385,
+        //     projection: 'mercator',
+        //     fills: {
+        //         defaultFill: '#676966'
+        //     },
+            // bubblesConfig: {
+            //     popupTemplate: function(geography: any, data: any) {
+            //         return '<div class="hoverinfo">' + JSON.stringify(data) +'</div>';
+            //     },
+            //     borderWidth: '2',
+            //     borderColor: '#FFFFFF',
+            // }
+        // });
     }
 
     setActiveTab($event: any, activeTab: Tab) {
