@@ -167,8 +167,11 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
                 popupTemplate: function(geography: any, data: any) {
                   return '<div class="hoverinfo">' + data.template +'</div>';
                 },
-                // borderWidth: '2',
-                // borderColor: '#4C4C4C',
+                borderWidth: 2,
+                borderColor: '#FFFFFF',
+                highlightBorderColor: '#898989',
+                highlightBorderWidth: 2,
+                highlightFillColor: '#898989'
               },
               arcConfig: {
                 strokeColor: '#DD1C77',
