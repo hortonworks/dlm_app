@@ -8,10 +8,6 @@ import play.api.libs.json.{JsValue, Json}
 
 import scala.util.Try
 
-
-
-
-
 trait HiveDataFilter {
 
   val engine = new ScriptEngineManager().getEngineByMimeType("text/javascript")

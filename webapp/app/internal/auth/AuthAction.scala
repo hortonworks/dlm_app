@@ -20,7 +20,7 @@ object Authenticated extends ActionBuilder[AuthenticatedRequest] {
       val token = header.replace("Bearer","").trim
       Jwt.parseJWT(token).map{ user =>
         block(AuthenticatedRequest[A](user, request))
-      } getOrElse(Future.successful(Results.Status(Status.UNAUTHORIZED)))
+      } getOrElse Future.successful(Results.Status(Status.UNAUTHORIZED))
     }
     else
       Future.successful(Results.Status(Status.UNAUTHORIZED))
