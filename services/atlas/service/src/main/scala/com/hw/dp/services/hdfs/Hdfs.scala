@@ -10,39 +10,38 @@ object Hdfs {
       version: Option[Double],
       state: Option[String]
   )
-
   case class SystemAttributes(
       createdBy: Option[String],
       modifiedBy: Option[String],
       createdTime: Option[String],
       modifiedTime: Option[String]
   )
-
+  case class FileSetTypeDetails(
+      compressed: Option[String],
+      `directory-uri-pattern`: Option[String]
+  )
   case class Result(
       `$typeName$`: Option[String],
       `$id$`: Option[Identifier],
       `$systemAttributes$`: Option[SystemAttributes],
+      fileSetTypeDetails: Option[FileSetTypeDetails],
       count: Option[Double],
       qualifiedName: Option[String],
-      `type`: Option[List[String]],
+      fileSetContentFeatues: Option[Map[String,String]],
       accessTimeStamp: Option[String],
+      fileSetType: Option[String],
       fileSetElements: Option[List[Identifier]],
-      uri: Option[String],
-      posixAcls: Option[String],
-      modificationTimeStamp: Option[String],
-      group: Option[String],
       owner: Option[String],
-      size: Option[Double],
+      modificationTimeStamp: Option[String],
       description: Option[String],
+      size: Option[Double],
       name: Option[String]
   )
-
   case class Multiplicity(
-      lower: Option[Double],
-      upper: Option[Double],
-      isUnique: Option[Boolean]
+      lower: Double,
+      upper: Double,
+      isUnique: Boolean
   )
-
   case class AttributeDefinitions(
       name: Option[String],
       dataTypeName: Option[String],
@@ -52,7 +51,6 @@ object Hdfs {
       isIndexable: Option[Boolean],
       reverseAttributeName: Option[String]
   )
-
   case class DataType(
       superTypes: Option[List[String]],
       hierarchicalMetaTypeName: Option[String],
@@ -61,7 +59,6 @@ object Hdfs {
       typeVersion: Option[String],
       attributeDefinitions: Option[List[AttributeDefinitions]]
   )
-
   case class FileSetResult(
       requestId: String,
       query: String,
@@ -72,6 +69,7 @@ object Hdfs {
   )
 
   implicit val mutiplicityReads = Json.reads[Multiplicity]
+  implicit val fileSetTypeReads = Json.reads[FileSetTypeDetails]
   implicit val attributeDefinitionReads = Json.reads[AttributeDefinitions]
   implicit val dataTypeReads = Json.reads[DataType]
   implicit val systemAttributesReads = Json.reads[SystemAttributes]
@@ -80,6 +78,7 @@ object Hdfs {
   implicit val resultReads = Json.reads[FileSetResult]
 
   implicit val mutiplicityWrites = Json.writes[Multiplicity]
+  implicit val fileSetTypeWrites = Json.writes[FileSetTypeDetails]
   implicit val attributeDefinitionWrites = Json.writes[AttributeDefinitions]
   implicit val dataTypeWrites = Json.writes[DataType]
   implicit val systemAttributesWrites = Json.writes[SystemAttributes]
