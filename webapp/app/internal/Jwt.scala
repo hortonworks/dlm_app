@@ -16,7 +16,7 @@ object Jwt {
 
   val algorithm = SignatureAlgorithm.HS256
   val key = "0<((A018l#%j&94dZiW7$4Gh9Pq!|["
-  val signingKey = "hello" //MacProvider.generateKey()
+  val signingKey = MacProvider.generateKey()
   val issuer: String = "data_plane"
   val HOUR = 3600 * 1000
 
@@ -49,8 +49,8 @@ object Jwt {
 
     claims.map { c =>
       val expiration: Date = c.getExpiration()
-//      if (expiration.before(new Date()))
-//        None
+      if (expiration.before(new Date()))
+        None
       val userName = c.getId
       val admin = c.getSubject == "admin"
       Some(UserView(userName, "", admin))
