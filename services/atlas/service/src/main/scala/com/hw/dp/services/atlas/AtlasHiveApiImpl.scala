@@ -13,7 +13,7 @@ import com.hw.dp.services.atlas.Hive.{Result, SearchResult}
 import org.springframework.http.{HttpEntity, HttpHeaders, HttpMethod}
 import org.springframework.security.kerberos.client.KerberosRestTemplate
 import org.springframework.web.client.RestTemplate
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json._
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest, WSResponse}
 import play.api.{Configuration, Logger}
 

@@ -19,7 +19,7 @@ import reactivemongo.play.json.collection.JSONCollection
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class Datacenter @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage: ClusterDataStorage)
+class DataCenters @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage: ClusterDataStorage)
   extends Controller with MongoController with ReactiveMongoComponents with MongoUtilities {
 
   def dataCenters = database.map(_.collection[JSONCollection]("datacenters"))
@@ -71,5 +71,29 @@ class Datacenter @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage: 
 
   }
 
+  def get(id: String) = Authenticated.async {
 
+    storage.getDataCenterById(id)
+      .map(
+        _
+          .map(cDataCenter => Ok(Json.toJson(cDataCenter)))
+          .getOrElse(NotFound)
+      )
+      .recoverWith {
+        case e:Exception =>
+          Future.successful(InternalServerError(JsonResponses.statusError("Server error",e.getMessage)))
+      }
+  }
+
+  def getClustersByDataCenterId(id: String) = Authenticated.async {
+    storage.getClustersByDataCenterId(id)
+      .map(
+        ambariClusters =>
+          Ok(Json.toJson(ambariClusters))
+      )
+      .recoverWith {
+        case e:Exception =>
+          Future.successful(InternalServerError(JsonResponses.statusError("Server error",e.getMessage)))
+      }
+  }
 }

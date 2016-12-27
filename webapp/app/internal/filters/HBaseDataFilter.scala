@@ -14,8 +14,8 @@ trait HbaseDataFilter {
   def apply(data: Seq[Result]): Seq[Result]
 
   final def evaluate(r: JsValue, expression: String): Boolean = {
-    engine.eval(s"var result = ${Json.stringify(r)}")
-    val result = engine.eval(s"result.${expression}")
+    engine.eval(s"var r = ${Json.stringify(r)}")
+    val result = engine.eval(expression)
     Try(result.asInstanceOf[Boolean]) getOrElse false
   }
 
@@ -24,9 +24,7 @@ trait HbaseDataFilter {
 class HbaseColumnFieldFilter(expression: String) extends HbaseDataFilter {
   override def apply(data: Seq[Result]): Seq[Result] = {
     data.filter { r =>
-      r.columns.isDefined && r.columns.get
-        .find(c => evaluate(Json.toJson(c), expression))
-        .isDefined
+      r.columns.isDefined && r.columns.get.exists(c => evaluate(Json.toJson(c), expression))
     }
   }
 }
@@ -34,13 +32,10 @@ class HbaseColumnFieldFilter(expression: String) extends HbaseDataFilter {
 class HbaseColumnParameterFilter(expression: String) extends HbaseDataFilter {
   override def apply(data: Seq[Result]): Seq[Result] = {
     data.filter { r =>
-      r.columns.isDefined && r.columns.get
-        .find(
-          c =>
-            c.$systemAttributes$.isDefined && evaluate(
-              Json.toJson(c.$systemAttributes$.get),
-              expression))
-        .isDefined
+      r.columns.isDefined && r.columns.get.exists(c =>
+        c.$systemAttributes$.isDefined && evaluate(
+          Json.toJson(c.$systemAttributes$.get),
+          expression))
 
     }
   }

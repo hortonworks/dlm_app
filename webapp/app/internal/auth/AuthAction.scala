@@ -9,16 +9,18 @@ import play.api.mvc.{ActionBuilder, Request, Result, Results}
 
 import scala.concurrent.Future
 
-
+// TODO: try http://stackoverflow.com/a/29505015/640012
 
 object Authenticated extends ActionBuilder[AuthenticatedRequest] {
   def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[Result]) = {
+//    debug
+//    block(AuthenticatedRequest[A](new UserView("admin", "admin", true), request))
     if(request.headers.get("Authorization").isDefined && request.headers.get("Authorization").get.startsWith("Bearer ")){
       val header: String = request.headers.get("Authorization").get
       val token = header.replace("Bearer","").trim
       Jwt.parseJWT(token).map{ user =>
         block(AuthenticatedRequest[A](user, request))
-      } getOrElse(Future.successful(Results.Status(Status.UNAUTHORIZED)))
+      } getOrElse Future.successful(Results.Status(Status.UNAUTHORIZED))
     }
     else
       Future.successful(Results.Status(Status.UNAUTHORIZED))

@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {Http, Headers, RequestOptions, Response, ResponseOptions} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {DataCenter} from '../models/data-center';
+import {Ambari} from '../models/ambari';
 import {HttpUtil} from '../shared/utils/httpUtil';
 import '../rxjs-operators';
 import {DataCenterDetails} from '../models/data-center-details';
@@ -34,7 +35,8 @@ export class DataCenterService {
 
     public getDetails(name: string): Observable<DataCenterDetails> {
         return this.http.get(this.url + '/' + name + '/detail', new RequestOptions(HttpUtil.getHeaders()))
-            .map(HttpUtil.extractData).catch(HttpUtil.handleError);
+            .map(HttpUtil.extractData)
+            .catch(HttpUtil.handleError);
     }
 
     public getByName(name: string):Observable<DataCenter> {
@@ -43,4 +45,18 @@ export class DataCenterService {
             observer.complete();
         });
     }
+
+    public getById(id: string): Observable<DataCenter> {
+        return this.http.get(`${this.url}/${id}`, new RequestOptions(HttpUtil.getHeaders()))
+            .map(HttpUtil.extractData)
+            .catch(HttpUtil.handleError);
+    }
+
+    public getClustersByDataCenterId(id: string): Observable<Ambari[]> {
+        return this.http.get(`${this.url}/${id}/clusters`, new RequestOptions(HttpUtil.getHeaders()))
+            .map(HttpUtil.extractData)
+            .catch(HttpUtil.handleError);
+    }
+
+
 }

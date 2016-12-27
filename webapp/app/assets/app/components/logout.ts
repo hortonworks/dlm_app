@@ -13,7 +13,7 @@ import {LoginData} from '../models/userdata';
 export default class LogoutComponent {
 
     submitted: boolean = false;
-    model: LoginData = new LoginData('','');
+    model: LoginData = new LoginData('','','');
 
 
     constructor(private userService: AuthService, private router: Router) {

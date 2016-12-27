@@ -1,6 +1,7 @@
 package com.hortonworks.dataplane.profilers.hdfs;
 
 import com.hortonworks.dataplane.profilers.common.AtlasReferenceableBuilder;
+import com.hortonworks.dataplane.profilers.hdfs.model.HdfsFile;
 import com.hortonworks.dataplane.profilers.hdfs.model.HdfsFileElement;
 import com.hortonworks.dataplane.profilers.hdfs.model.HdfsFileSet;
 import com.hortonworks.dataplane.profilers.hdfs.model.HdfsMetadata;
@@ -50,8 +51,10 @@ public class HdfsMetadataImport {
             List<HdfsFileElement> fileElements = fs.getFileElements();
             List<Id> ids = new ArrayList<>();
             for (HdfsFileElement fe : fileElements) {
-                String id = addHdfsFileElement(fe);
-                ids.add(getReferenceableId(id, getTypeName(fe)));
+                if (fe instanceof HdfsFile) {
+                    String id = addHdfsFile((HdfsFile)fe);
+                    ids.add(getReferenceableId(id, getTypeName(fe)));
+                }
             }
             Referenceable hdfsFileSet = createHdfsFileSetReferenceable(fs, ids);
 
@@ -64,27 +67,29 @@ public class HdfsMetadataImport {
     private Referenceable createHdfsFileSetReferenceable(HdfsFileSet fs, List<Id> ids) {
         AtlasReferenceableBuilder atlasReferenceableBuilder = AtlasReferenceableBuilder.newAtlasReferenceableBuilder();
         Map<String, Object> fileSetAttributes = new HashMap<>();
-        fileSetAttributes.put(HdfsTypeRegistrar.URI_ATTRIBUTE, fs.getUri());
         fileSetAttributes.put(HdfsTypeRegistrar.SIZE_ATTRIBUTE, fs.getSize());
-        fileSetAttributes.put(HdfsTypeRegistrar.GROUP_ATTRIBUTE, fs.getGroup());
-        fileSetAttributes.put(HdfsTypeRegistrar.POSIX_ACLS_ATTRIBUTE, fs.getPosixAcls());
         fileSetAttributes.put(HdfsTypeRegistrar.ACCESS_TIME_STAMP_ATTRIBUTE, fs.getAccessTime());
         fileSetAttributes.put(HdfsTypeRegistrar.MODIFICATION_TIME_STAMP_ATTRIBUTE, fs.getModificationTime());
-        fileSetAttributes.put(HdfsTypeRegistrar.TYPE_ATTRIBUTE, fs.getTypes());
         fileSetAttributes.put(HdfsTypeRegistrar.COUNT_ATTRIBUTE, fs.getCount());
         fileSetAttributes.put(HdfsTypeRegistrar.FILE_SET_ELEMENTS_ATTRIBUTE, ids);
+        fileSetAttributes.put(HdfsTypeRegistrar.FILE_SET_TYPE_ATTRIBUTE, fs.getFileSetType());
+        if (fs.getFileSetTypeDetails() != null) {
+            fileSetAttributes.put(HdfsTypeRegistrar.FILE_SET_TYPE_DETAILS_ATTRIBUTE, fs.getFileSetTypeDetails());
+        }
+        if (fs.getFileSetContentFeatures() != null) {
+            fileSetAttributes.put(HdfsTypeRegistrar.FILE_SET_CONTENT_FEATURES_ATTRIBUTE, fs.getFileSetContentFeatures());
+        }
 
         return atlasReferenceableBuilder.ofType(HdfsTypeRegistrar.HDFS_FILE_SET_TYPE).
-                withReferenceableName(String.format("%s@%s", fs.getUri(), clusterName)).
+                withReferenceableName(String.format("%s@%s", fs.getName(), clusterName)).
                 withAssetProperties(fs.getName(), fs.getDescription(), fs.getOwner()).
                 withAttributeProperties(fileSetAttributes).
                 build();
     }
 
-    private String addHdfsFileElement(HdfsFileElement fe) throws AtlasServiceException {
-        String atlasType = getTypeName(fe);
+    private String addHdfsFile(HdfsFile fe) throws AtlasServiceException {
         String referenceableName = String.format("%s@%s", fe.getUri(), clusterName);
-        String entityId = getEntityIdIfExists(atlasType, referenceableName);
+        String entityId = getEntityIdIfExists(HdfsTypeRegistrar.HDFS_FILE_TYPE, referenceableName);
         if (entityId != null) {
             System.out.println(String.format("%s already exists, ID: %s", referenceableName, entityId));
             return entityId;
@@ -97,11 +102,14 @@ public class HdfsMetadataImport {
         feAttributes.put(HdfsTypeRegistrar.POSIX_ACLS_ATTRIBUTE, fe.getPosixAcls());
         feAttributes.put(HdfsTypeRegistrar.ACCESS_TIME_STAMP_ATTRIBUTE, fe.getAccessTime());
         feAttributes.put(HdfsTypeRegistrar.MODIFICATION_TIME_STAMP_ATTRIBUTE, fe.getModificationTime());
-        feAttributes.put(HdfsTypeRegistrar.TYPE_ATTRIBUTE, fe.getTypes());
+        feAttributes.put(HdfsTypeRegistrar.FORMAT_ATTRIBUTE, fe.getFormat());
+        if (fe.getFormatDetails() != null) {
+            feAttributes.put(HdfsTypeRegistrar.FORMAT_DETAILS_ATTRIBUTE, fe.getFormatDetails());
+        }
         // TODO: Need to recursively call this if the FileElement is a FileSet.
 
         AtlasReferenceableBuilder atlasReferenceableBuilder = AtlasReferenceableBuilder.newAtlasReferenceableBuilder();
-        Referenceable feReferenceable = atlasReferenceableBuilder.ofType(atlasType).
+        Referenceable feReferenceable = atlasReferenceableBuilder.ofType(HdfsTypeRegistrar.HDFS_FILE_TYPE).
                 withReferenceableName(referenceableName).
                 withAssetProperties(fe.getName(), fe.getDescription(), fe.getOwner()).
                 withAttributeProperties(feAttributes).build();

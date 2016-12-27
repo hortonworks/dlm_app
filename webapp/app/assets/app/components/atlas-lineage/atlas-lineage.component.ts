@@ -39,7 +39,10 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
     init(table: string) {
         this.clearSVG();
         this.startingPoint = [];
-        this.edgesAndvertices = {};
+        this.edgesAndvertices = {
+          edges: {},
+          vertices: {}
+        };
         this.outputState = false;
 
         this.atlasLineageService.getTable(this.hostName, this.dataSourceName, table).subscribe(table => {
@@ -352,6 +355,15 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
                 };
                 return shapeSvg;
             };
+
+
+            const zoomed = function() {
+                svgGroup.attr('transform',
+                    'translate(' + zoom.translate() + ')' +
+                    'scale(' + zoom.scale() + ')'
+                );
+            };
+
             // Set up an SVG group so that we can translate the final graph.
             let svg = d3.select(this.jqueryNativeElement.find('svg')[0]),
                 svgGroup = svg.append('g');
@@ -359,14 +371,7 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
                 .scaleExtent([0.5, 6])
                 .on('zoom', zoomed);
 
-            function zoomed() {
-                svgGroup.attr('transform',
-                    'translate(' + zoom.translate() + ')' +
-                    'scale(' + zoom.scale() + ')'
-                );
-            }
-
-            function interpolateZoom(translate, scale) {
+            const interpolateZoom = function(translate, scale) {
                 return d3.transition().duration(350).tween('zoom', function() {
                     let iTranslate = d3.interpolate(zoom.translate(), translate),
                         iScale = d3.interpolate(zoom.scale(), scale);
@@ -377,9 +382,9 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
                         zoomed();
                     };
                 });
-            }
+            };
 
-            function zoomClick() {
+            const zoomClick = function(){
                 let clicked = d3.event.target,
                     direction = 1,
                     factor = 0.2,
@@ -396,7 +401,7 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
                 target_zoom = zoom.scale() * (1 + factor * direction);
 
                 if (target_zoom < extent[0] || target_zoom > extent[1]) {
-                    return false;
+                    return;
                 }
 
                 translate0 = [(center[0] - view.x) / view.k, (center[1] - view.y) / view.k];
@@ -407,7 +412,8 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
                 view.y += center[1] - l[1];
 
                 interpolateZoom([view.x, view.y], view.k);
-            }
+            };
+
             d3.selectAll('button.zoomButton').on('click', zoomClick);
             let tooltip = d3.tip()
                 .attr('class', 'd3-tip')

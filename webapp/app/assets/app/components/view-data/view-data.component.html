@@ -57,8 +57,27 @@
             <h6> Lineage </h6>
             <atlas-lineage [search]="search" [dataSourceName]="dataSourceName" [hostName]="hostName"> </atlas-lineage>
 
-            <h6> Replication </h6>
-            <div id="mapcontainer-replication" class="dataplane-be-together-section mdl-typography--text-center dotted"> </div>
+            <h6> Replication</h6>
+            <div class="mapcontainer-replication__wrapper" [class.mapcontainer-replication__wrapper--with-overlay]="backupPolicies.length === 0">
+              <div class="mapcontainer-replication__overlay">
+                <div class="mapcontainer-replication__setup">
+                  <div class="mapcontainer-replication__icons">
+                    <i class="fa fa-database" aria-hidden="true"></i>
+                    <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                    <i class="fa fa-database" aria-hidden="true"></i>
+                  </div>
+                  <div class="mdl-typography--font-light">
+                    <div class="mapcontainer-replication__label">
+                      Replication not setup for this table.
+                    </div>
+                    <div class="mapcontainer-replication__caption mdl-typography--caption" style="font-size: 10px;">
+                      To setup replication please <a href="#" (click)="doCreateBackupPolicy()">click here</a>.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div id="mapcontainer-replication__map" class="dataplane-be-together-section mdl-typography--text-center dotted"> </div>
+            </div>
 
             <h6> Policies </h6>
             <ranger-policies [search]="search"> </ranger-policies>

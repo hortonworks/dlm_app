@@ -1,7 +1,7 @@
 package internal.persistence
 
 import com.hw.dp.service.cluster._
-import models.DataCenterDetail
+import models.{BackupPolicy, DataCenterDetail}
 import reactivemongo.api.commands.WriteResult
 
 import scala.concurrent.Future
@@ -29,4 +29,11 @@ trait ClusterDataStorage {
 
   def loadAmbari(): Future[Seq[Ambari]]
 
+  def getBackupPolicyById(id: String): Future[Option[BackupPolicy]]
+
+  def getDataCenterById(id: String): Future[Option[DataCenter]]
+
+  def getClusterById(id: String): Future[Option[Ambari]]
+
+  def getClustersByDataCenterId(id: String): Future[Seq[Ambari]]
 }

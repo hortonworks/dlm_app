@@ -199,7 +199,7 @@ class AltasHdfsApiImpl(actorSystem: ActorSystem,
     */
   override def loadAllFileSets: Try[FileSetResult] = {
     val searchUrl =
-      s"${apiUrl}/api/atlas/discovery/search/dsl?query=HdfsFileSet_v1"
+      s"${apiUrl}/api/atlas/discovery/search/dsl?query=HdfsFileSet_v2"
     Try {
       val entity = new HttpEntity[String](headers)
       val response =
