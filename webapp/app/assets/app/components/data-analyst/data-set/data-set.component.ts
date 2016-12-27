@@ -3,6 +3,8 @@ import {Component, OnInit} from '@angular/core';
 import {DataSetService} from '../../../services/data-set.service';
 import {DataSet} from '../../../models/data-set';
 import {Environment} from '../../../environment';
+import {DataCenterService} from '../../../services/data-center.service';
+import {DataCenter} from '../../../models/data-center';
 
 @Component({
     selector: 'data-set',
@@ -14,18 +16,45 @@ export class DataSetComponent implements OnInit {
     dataSets: DataSet[] = [];
     dataSetsMap: {[key: string]: DataSet[]} = {};
 
-    constructor(private dataSetService: DataSetService, private router: Router, private environment: Environment) {}
+    constructor(private dataSetService: DataSetService, private router: Router, private dataCenterService: DataCenterService,
+                private environment: Environment) {}
 
     ngOnInit() {
-        this.dataSetService.getAll(this.environment.host, this.environment.dataCenterName).subscribe(results => {
-            this.dataSets = results;
 
-            for (let dataSet of this.dataSets) {
-                if (!this.dataSetsMap[dataSet.category]) {
-                    this.dataSetsMap[dataSet.category] = [];
-                }
-                this.dataSetsMap[dataSet.category].push(dataSet);
-            }
+        this.dataCenterService.get().subscribe((dataCenters: DataCenter[]) => {
+            this.getDataCenterDetails(dataCenters);
+        });
+    }
+
+    getDataCenterDetails(dataCenters: DataCenter[]) {
+        let dataCenterNamesToDataCenter = {};
+        for (let dataCenter of dataCenters) {
+            dataCenterNamesToDataCenter[dataCenter.name] = dataCenter;
+        }
+
+        let dataCenterNames = Object.keys(dataCenterNamesToDataCenter);
+
+        let name = dataCenterNames.pop();
+        while (name !== undefined) {
+            this.getDataCenterDetailsByName(name, dataCenterNamesToDataCenter);
+            name = dataCenterNames.pop();
+        }
+    }
+
+    private getDataCenterDetailsByName(name:string, dataCenterNamesToDataCenter:{}) {
+        this.dataCenterService.getDetails(name).subscribe((dataCenterDetail)=> {
+           for (let host of dataCenterDetail.hosts) {
+               this.dataSetService.getAll(host.ambariHost, name).subscribe(results => {
+                   this.dataSets = [...this.dataSets, ...results];
+
+                   for (let dataSet of results) {
+                       if (!this.dataSetsMap[dataSet.category]) {
+                           this.dataSetsMap[dataSet.category] = [];
+                       }
+                       this.dataSetsMap[dataSet.category].push(dataSet);
+                   }
+               });
+           }
         });
     }
 
