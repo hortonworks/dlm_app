@@ -76,6 +76,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
             // options
             center: [0, 0],
             zoom: 1,
+            // minZoom: 1,
             maxZoom: 5,
             // interaction options
             dragging: false,
@@ -87,6 +88,13 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
             attributionControl: false,
             zoomControl: false
           });
+
+      // L
+      //   .tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      //     maxZoom: 18
+      //   })
+      //   .addTo(this.map)
+      //   .bringToBack();
 
       this.geographyService.getCountries()
         .subscribe(countrySet => {
@@ -101,10 +109,24 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
                 }
               });
 
+          // added pseudo layer to prevent empty space when zoomed out
+          // https://github.com/Leaflet/Leaflet/blob/v1.0.2/src/layer/GeoJSON.js#L205
+          const pseudoBaseLayer =
             L
-              .featureGroup([baseLayer])
-              .addTo(this.map)
-              .bringToBack();
+              .geoJSON(countrySet, {
+                style: {
+                    fillColor: '#ABE3F3',
+                    fillOpacity: 1,
+                    weight: 1,
+                    color: '#FDFDFD'
+                },
+                coordsToLatLng: (coords: number[]) => new L.LatLng(coords[1], coords[0] - 360, coords[2])
+              });
+
+          L
+            .featureGroup([baseLayer, pseudoBaseLayer])
+            .addTo(this.map)
+            .bringToBack();
         });
     }
 
@@ -114,7 +136,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
 
     drawMap(policies: BackupPolicyInDetail[]) {
       // required to fix maps
-      this.map.invalidateSize(false);
+      this.map.invalidateSize(true);
 
       if(policies.length === 0) {
         // do nothing and return
@@ -169,9 +191,9 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
                   radius: 5,
                   fillColor: 'rgb(45, 205, 55)'
                 }),
-                target: Object.assign({}, cLocation.source, {
-                  radius: 10,
-                  fillColor: 'rgb(45, 205, 55)'
+                target: Object.assign({}, cLocation.target, {
+                  radius: 12,
+                  fillColor: 'rgb(52, 142, 60)'
                 }),
                 isArcDrawable: false
               });
@@ -181,11 +203,11 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
                   radius: 5,
                   fillColor: 'rgb(45, 205, 55)'
                 }),
-                target: Object.assign({}, cLocation.source, {
+                target: Object.assign({}, cLocation.target, {
                   radius: 5,
-                  fillColor: 'rgb(52, 142, 60)'
+                  fillColor: 'rgb(45, 205, 55)'
                 }),
-                isArcDrawable: false
+                isArcDrawable: true
               });
             }
           });
@@ -214,10 +236,35 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
                 .bindPopup(`hola2`)
             ]), []);
 
+        // const arcs =
+        //   edges
+        //     .filter(cEdge => cEdge.isArcDrawable)
+        //     .map(cEdge => L.Polyline.Arc(cEdge.source.position, cEdge.target.position, {
+        //       color: 'rgb(50, 50, 50)',
+        //       weight: 1,
+        //       dashArray: '5, 5',
+        //       offset: 10,
+        //       vertices: 500
+        //     }));
+
+       /*
+        * L.Polyline.Arc draws a big circle [GIS], which does not look good and hence might not be what we need. We are using an alternative which uses quadratic Bezier curves.
+        * As described in http://stackoverflow.com/questions/31804392/create-svg-arcs-between-two-points
+        */
+
         const arcs =
           edges
             .filter(cEdge => cEdge.isArcDrawable)
-            .map(cEdge => L.Polyline.Arc(cEdge.source.position, cEdge.target.position));
+            .map(cEdge => new L.Curve(
+              this.getCurveOffsetPoint(cEdge.source.position, cEdge.target.position),
+              {
+                color: 'rgb(50, 50, 50)',
+                weight: 1,
+                dashArray: '5, 5',
+                offset: 10,
+                vertices: 500
+              }
+            ));
 
         const pointsGroup =
           L
@@ -239,6 +286,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
           L
             .featureGroup(arcs)
             .addTo(this.map);
+console.log(pointsGroup.getBounds());
 
         this.map.fitBounds(pointsGroup.getBounds(), { padding: L.point(20, 20) });
     }
@@ -274,5 +322,27 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
         };
         this.router.navigate(['/ui/backup-policy'], navigationExtras);
         return false;
+    }
+
+    getCurveOffsetPoint(pointA, pointB) {
+      const cx = (pointA[0] + pointB[0]) / 2;
+      const cy = (pointA[1] + pointB[1]) / 2;
+      const dx = (pointB[0] - pointA[0]) / 2;
+      const dy = (pointB[1] - pointA[1]) / 2;
+
+      //
+      const k = 40;
+      const i = 2;
+      const n = 2;
+
+      const dd = Math.sqrt(dx * dx + dy * dy);
+      const ex = cx - dy / dd * k * 1 / 2;
+      const ey = cy + dx / dd * k * 1 / 2;
+
+      return ([
+        'M',[pointA[0], pointA[1]],
+        'Q',[ex, ey],
+            [pointB[0], pointB[1]]
+      ]);
     }
 }
