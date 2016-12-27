@@ -12,6 +12,7 @@ import {SearchParamWrapper} from '../../../shared/data-plane-search/search-param
 import {Alerts} from '../../../shared/utils/alerts';
 import {DataSetService} from '../../../services/data-set.service';
 import {DataFilter} from '../../../models/data-filter';
+import {DataFilterWrapper} from '../../../models/data-filter-wrapper';
 
 declare var Datamap:any;
 
@@ -36,13 +37,16 @@ export class AddDataSetComponent implements OnInit, AfterViewInit {
     ambarisInDatacenter: Ambari[] = [];
     hiveSearchParamWrappers: SearchParamWrapper[] = [];
     hbaseSearchParamWrappers: SearchParamWrapper[] = [];
-    hiveTables: any[] = [];
-    hiveFilters: DataFilter[] = [];
+    hdfsSearchParamWrappers: SearchParamWrapper[] = [];
+    hiveFiltersWrapper: DataFilterWrapper[] = [];
+    hbaseFiltersWrapper: DataFilterWrapper[] = [];
+    hdfsFiltersWrapper: DataFilterWrapper[] = [];
 
     constructor(private dataCenterService: DataCenterService, private ambariService: AmbariService,  private environment: Environment,
                 private searchQueryService: SearchQueryService, private dataSetService: DataSetService) {
         this.hiveSearchParamWrappers = environment.hiveSearchParamWrappers;
         this.hbaseSearchParamWrappers = environment.hbaseSearchParamWrappers;
+        this.hdfsSearchParamWrappers = environment.hdfsSearchParamWrappers;
     }
 
     ngOnInit() {
@@ -52,6 +56,9 @@ export class AddDataSetComponent implements OnInit, AfterViewInit {
         this.ambariService.get().subscribe((ambaris: Ambari[]) => {
             this.ambaris = ambaris;
         });
+        this.hiveFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
+        this.hbaseFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
+        this.hdfsFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
     }
 
     ngAfterViewInit() {
@@ -111,15 +118,14 @@ export class AddDataSetComponent implements OnInit, AfterViewInit {
         this.map.bubbles(cityBubble);
     }
 
-    fetchHiveData($event) {
-        console.log($event);
-        this.hiveFilters = $event;
+    addFilterAndSearch($event, hiveFilterWrapper: DataFilterWrapper, dataSource: string) {
+        hiveFilterWrapper.dataFilter = $event;
         let searchQuery = new SearchQuery();
         searchQuery.dataCenter = this.dataSet.dataCenter;
         searchQuery.clusterHost = this.dataSet.ambariHost;
         searchQuery.predicates = $event;
-        this.searchQueryService.getHiveData(searchQuery).subscribe(result => {
-            this.hiveTables = result;
+        this.searchQueryService.getHiveData(searchQuery, dataSource).subscribe(result => {
+            hiveFilterWrapper.data = result;
         });
     }
 
@@ -127,12 +133,27 @@ export class AddDataSetComponent implements OnInit, AfterViewInit {
         return table['columns'].map(column => column.name);
     }
 
+    addFilter($event, type: string) {
+
+        $event.preventDefault();
+
+        if (type === 'hive') {
+            this.hiveFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
+        }
+        if (type === 'hbase') {
+            this.hbaseFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
+        }
+        if (type === 'hdfs') {
+            this.hdfsFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
+        }
+    }
+
     onSave() {
-        this.dataSet.hiveFilters = this.hiveFilters;
-        this.dataSet.hBaseFilters = this.hiveFilters;
-        this.dataSet.fileFilters = this.hiveFilters;
-        this.dataSet.permissions =  'Random Permissions';
-        this.dataSet.description =  'Random Permissions';
+        this.dataSet.hiveFilters = DataFilterWrapper.getDataFilters(this.hiveFiltersWrapper);
+        this.dataSet.hBaseFilters = DataFilterWrapper.getDataFilters(this.hbaseFiltersWrapper);
+        this.dataSet.fileFilters = DataFilterWrapper.getDataFilters(this.hdfsFiltersWrapper);
+        this.dataSet.permissions =  (this.dataSet.permissions && this.dataSet.permissions.length === 0) ? 'Random Permissions': this.dataSet.permissions;
+        this.dataSet.description =  (this.dataSet.description && this.dataSet.description.length === 0) ? 'Random Permissions': this.dataSet.permissions;
         this.dataSetService.post(this.dataSet).subscribe(result => {
             Alerts.showSuccessMessage('Created data set '+ this.dataSet.name);
             window.history.back();
