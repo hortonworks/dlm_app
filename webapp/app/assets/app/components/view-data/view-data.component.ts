@@ -192,21 +192,21 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
 
         const points =
           edges
-            .reduce((accumulator, cPolicyLocation) => ([
+            .reduce((accumulator, cEdge) => ([
               ...accumulator,
               L
-                .circleMarker(cPolicyLocation.target.position, {
-                  radius: cPolicyLocation.target.radius,
-                  fillColor: cPolicyLocation.target.fillColor,
+                .circleMarker(cEdge.target.position, {
+                  radius: cEdge.target.radius,
+                  fillColor: cEdge.target.fillColor,
                   color: '#fff',
                   weight: 1,
                   fillOpacity: 0.8,
                 })
                 .bindPopup(`hola!`),
               L
-                .circleMarker(cPolicyLocation.source.position, {
-                  radius: cPolicyLocation.source.radius,
-                  fillColor: cPolicyLocation.source.fillColor,
+                .circleMarker(cEdge.source.position, {
+                  radius: cEdge.source.radius,
+                  fillColor: cEdge.source.fillColor,
                   color: '#fff',
                   weight: 1,
                   fillOpacity: 0.8,
@@ -217,29 +217,30 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
         const arcs =
           edges
             .filter(cEdge => cEdge.isArcDrawable)
-            .map(cEdge => ({
-              origin: cEdge.source,
-              destination: cEdge.target
-            }));
+            .map(cEdge => L.Polyline.Arc(cEdge.source.position, cEdge.target.position));
 
-          const featureGroup =
-            L
-              .featureGroup(points)
-              .addTo(this.map)
-              .on('mouseover', function (this: any, e) {
-                console.log(arguments);
-                this.openPopup();
-              })
-              .on('mouseout', function (this: any, e) {
-                console.log(arguments);
-                this.closePopup();
-              })
-              .off('click')
-              .on('click', () => console.log('click2'));
+        const pointsGroup =
+          L
+            .featureGroup(points)
+            .addTo(this.map)
+            .eachLayer(cLayer => {
+              cLayer
+                .on('mouseover', function (this: any, e) {
+                  console.log(arguments);
+                  this.openPopup();
+                })
+                .on('mouseout', function (this: any, e) {
+                  console.log(arguments);
+                  this.closePopup();
+                });
+            });
 
-          this.map.fitBounds(featureGroup.getBounds(), { padding: L.point(20, 20) });
-          // featureGroup.addTo(this.map).on('click', () => console.log('click2')).bindPopup('<b>Hello world!</b><br />I am a popup.').openPopup();
-        // this.map.arc(arcs);
+        const arcsGroup =
+          L
+            .featureGroup(arcs)
+            .addTo(this.map);
+
+        this.map.fitBounds(pointsGroup.getBounds(), { padding: L.point(20, 20) });
     }
 
     getClusterData() {
