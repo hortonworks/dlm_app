@@ -45,14 +45,15 @@
   height: 140px;
   overflow: hidden;
 }
-.mapcontainer-replication__wrapper--with-overlay .mapcontainer-replication__overlay{
+.mapcontainer-replication__wrapper--with-overlay .mapcontainer-replication__overlay {
   display: flex;
 }
 
-.mapcontainer-replication__wrapper--with-overlay /deep/ svg {
+.mapcontainer-replication__wrapper--with-overlay /deep/ .leaflet-map-pane {
   /* hack to fit background */
-  transform: scale(0.5) translate(-20%, -20%);
+  transform: translate(-30%, -27%) !important;
   transform-origin: top left;
+  filter: grayscale(85%) brightness(1.07);
 }
 .mapcontainer-replication__overlay {
   display: none;

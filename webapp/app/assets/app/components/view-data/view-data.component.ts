@@ -40,9 +40,15 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
       private geographyService: GeographyService
     ) {
 
-      this.rxSearch
-        .do(searchKey => this.search = searchKey)
-        .flatMap(searchKey => this.policyService.getByResource(searchKey, 'table'))
+      const rxSearchAction =
+        this.rxSearch
+          .do(searchKey => this.search = searchKey);
+
+      const rxBackupPolicies =
+        rxSearchAction
+          .flatMap(searchKey => this.policyService.getByResource(searchKey, 'table'));
+
+      rxBackupPolicies
         .do(policies => this.backupPolicies = policies)
         .do(policies => this.drawMap(policies))
         .subscribe(() => {/****/});
@@ -53,7 +59,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
 
       this.activatedRoute.params.subscribe(params => {
           this.dataSourceName = params['id'];
-          this.hostName = window.location.search.replace('?host=', '');
+          this.hostName = this.activatedRoute.snapshot.queryParams['host'];
           this.breadCrumbMap = {'Datacenter':'ui/dashboard'};
           this.breadCrumbMap[this.dataSourceName] = '';
           this.getClusterData();
@@ -63,22 +69,59 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
               this.rxSearch.next(searchKey);
           }
       });
+
+      this.map =
+        new L
+          .Map('mapcontainer-replication__map', {
+            // options
+            center: [0, 0],
+            zoom: 1,
+            maxZoom: 5,
+            // interaction options
+            dragging: false,
+            touchZoom: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            boxZoom: false,
+            // control options
+            attributionControl: false,
+            zoomControl: false
+          });
+
+      this.geographyService.getCountries()
+        .subscribe(countrySet => {
+          const baseLayer =
+            L
+              .geoJSON(countrySet, {
+                style: {
+                    fillColor: '#ABE3F3',
+                    fillOpacity: 1,
+                    weight: 1,
+                    color: '#FDFDFD'
+                }
+              });
+
+            L
+              .featureGroup([baseLayer])
+              .addTo(this.map)
+              .bringToBack();
+        });
     }
 
     ngAfterViewInit() {
-      this.map = new L.Map('mapcontainer-replication__map', {
-        center: [0, 0],
-        zoom: 1,
-        zoomControl:false,
-        maxZoom: 15
-      });
-
-
-      this.geographyService.getCountries()
-        .subscribe(countrySet => L.geoJSON(countrySet, {}).addTo(this.map));
+      //
     }
 
     drawMap(policies: BackupPolicyInDetail[]) {
+      // required to fix maps
+      this.map.invalidateSize(false);
+
+      if(policies.length === 0) {
+        // do nothing and return
+        this.map.panTo(new L.LatLng(0, 0));
+        return;
+      }
+
       const edges =
         policies
           .map(cPolicy => ({
@@ -113,7 +156,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
                     <div>${cPolicy.schedule && cPolicy.schedule.frequency ? cPolicy.schedule.frequency : ''}</div>
                   </div>`,
               position: CityNames.getCityCoordinates(cPolicy.target.dataCenter.location.country, cPolicy.target.dataCenter.location.place)
-              }
+            }
           }))
           .map(cLocation => {
             if(
@@ -124,13 +167,11 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
               return ({
                 source: Object.assign({}, cLocation.source, {
                   radius: 5,
-                  color: 'rgb(159, 206, 99)',
-                  fillOpacity: 0.75
+                  fillColor: 'rgb(45, 205, 55)'
                 }),
                 target: Object.assign({}, cLocation.source, {
                   radius: 10,
-                  color: 'rgb(73, 111, 1)',
-                  fillOpacity: 0.75
+                  fillColor: 'rgb(45, 205, 55)'
                 }),
                 isArcDrawable: false
               });
@@ -138,63 +179,39 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
               return ({
                 source: Object.assign({}, cLocation.source, {
                   radius: 5,
-                  color: 'rgb(159, 206, 99)',
-                  fillOpacity: 0.75,
+                  fillColor: 'rgb(45, 205, 55)'
                 }),
                 target: Object.assign({}, cLocation.source, {
-                  radius: 10,
-                  color: 'rgb(73, 111, 1)',
-                  fillOpacity: 0.75,
+                  radius: 5,
+                  fillColor: 'rgb(52, 142, 60)'
                 }),
                 isArcDrawable: false
               });
             }
           });
 
-
-        // this.map = new Datamap({
-        //     element: document.getElementById('mapcontainer-replication__map'),
-        //     projection: 'mercator',
-        //     height: 600,
-        //     width: 1116,
-        //     fills: {
-        //         defaultFill: policies.length > 0 ? '#ABE3F3' : 'rgb(236, 236, 236)',
-        //         UP: '#9FCE63',
-        //         DOWN: '#D21E28'
-        //     },
-        //     data: {
-        //         'UP': {fillKey: 'UP'},
-        //         'DOWN': {fillKey: 'DOWN'}
-        //     },
-        //     geographyConfig: {
-        //         highlightFillColor: '#ADE4F3',
-        //         popupOnHover: false,
-        //         highlightOnHover: false,
-        //     },
-        //     bubblesConfig: {
-        //         popupOnHover: true,
-        //         popupTemplate: function(geography: any, data: any) {
-        //           return '<div class="hoverinfo">' + data.template +'</div>';
-        //         },
-        //         borderWidth: 2,
-        //         borderColor: '#FFFFFF',
-        //         highlightBorderColor: '#898989',
-        //         highlightBorderWidth: 2,
-        //         highlightFillColor: '#898989'
-        //       },
-        //       arcConfig: {
-        //         strokeColor: '#DD1C77',
-        //         strokeWidth: 1,
-        //         arcSharpness: 1,
-        //       }
-        // });
-
-        const bubbles =
+        const points =
           edges
             .reduce((accumulator, cPolicyLocation) => ([
               ...accumulator,
-              L.circleMarker(cPolicyLocation.target.position).bindPopup(`<div class="hoverinfo">${cPolicyLocation.target.template}</div>`),
-              L.circleMarker(cPolicyLocation.source.position).bindPopup(`<div class="hoverinfo">${cPolicyLocation.source.template}</div>`)
+              L
+                .circleMarker(cPolicyLocation.target.position, {
+                  radius: cPolicyLocation.target.radius,
+                  fillColor: cPolicyLocation.target.fillColor,
+                  color: '#fff',
+                  weight: 1,
+                  fillOpacity: 0.8,
+                })
+                .bindPopup(`hola!`),
+              L
+                .circleMarker(cPolicyLocation.source.position, {
+                  radius: cPolicyLocation.source.radius,
+                  fillColor: cPolicyLocation.source.fillColor,
+                  color: '#fff',
+                  weight: 1,
+                  fillOpacity: 0.8,
+                })
+                .bindPopup(`hola2`)
             ]), []);
 
         const arcs =
@@ -205,12 +222,23 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
               destination: cEdge.target
             }));
 
-          const group = new L.featureGroup(bubbles);
+          const featureGroup =
+            L
+              .featureGroup(points)
+              .addTo(this.map)
+              .on('mouseover', function (this: any, e) {
+                console.log(arguments);
+                this.openPopup();
+              })
+              .on('mouseout', function (this: any, e) {
+                console.log(arguments);
+                this.closePopup();
+              })
+              .off('click')
+              .on('click', () => console.log('click2'));
 
-          this.map.fitBounds(group.getBounds(), {padding: L.point(20, 20)});
-          group.addTo(this.map);
-
-        // this.map.bubbles(bubbles);
+          this.map.fitBounds(featureGroup.getBounds(), { padding: L.point(20, 20) });
+          // featureGroup.addTo(this.map).on('click', () => console.log('click2')).bindPopup('<b>Hello world!</b><br />I am a popup.').openPopup();
         // this.map.arc(arcs);
     }
 
