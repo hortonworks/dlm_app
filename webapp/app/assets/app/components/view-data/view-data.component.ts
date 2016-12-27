@@ -221,7 +221,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
                   radius: cEdge.target.radius,
                   fillColor: cEdge.target.fillColor,
                   color: '#fff',
-                  weight: 1,
+                  weight: 3,
                   fillOpacity: 0.8,
                 })
                 .bindPopup(`hola!`),
@@ -230,7 +230,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
                   radius: cEdge.source.radius,
                   fillColor: cEdge.source.fillColor,
                   color: '#fff',
-                  weight: 1,
+                  weight: 3,
                   fillOpacity: 0.8,
                 })
                 .bindPopup(`hola2`)
