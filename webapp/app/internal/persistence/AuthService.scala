@@ -30,23 +30,28 @@ class AuthService @Inject()(private val userStorage: UserStorage, private val co
     */
   def initialize = {
 
+    import collection.JavaConversions._
+    val userList = configuration.underlying.getConfigList("auth.users.seed").toList
 
-    val username: String = getConfig("auth.super.user") getOrElse admin
-    val password: String = getConfig("auth.super.pass") getOrElse pass
-    val view: UserView = UserView(username, password, true)
+    val seedUsers  = userList.map { c =>
+      UserView(c.getString("user"),c.getString("pass"),c.getBoolean("admin"),c.getString("type"))
 
-    for {
-      user <- userStorage.getSuperUser(view)
-      wr <- user.map { u =>
-        userStorage.updateUser(u, view)
-      }.getOrElse {
-        userStorage.createUser(view)
+    }
+
+    seedUsers.foreach { view =>
+      for {
+        user <- userStorage.getSuperUser(view)
+        wr <- user.map { u =>
+          userStorage.updateUser(u, view)
+        }.getOrElse {
+          userStorage.createUser(view)
+        }
+      } yield {
+        if (wr.ok)
+          Logger.info(s"Seeded user ${view.username} as ${view.userType}")
+        else
+          Logger.error(s"Error seeding user ${wr.writeErrors}")
       }
-    } yield {
-      if (wr.ok)
-        Logger.info("Seeded super user")
-      else
-        Logger.error(s"Error seeding super user ${wr.writeErrors}")
     }
   }
 

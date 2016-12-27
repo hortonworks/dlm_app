@@ -24,7 +24,7 @@
 
         <div class="mdl-grid config-bgcolor">
             <div class="mdl-cell mdl-cell--4-col">
-                <div class="mdl-typography--body-2">Location </div>
+                <div class="mdl-typography--body-2">Data Lake</div>
                 <span class="select-wrap">
                     <drop-down>
                         <select  #dataCeneterName (change)="onDataCenterChange(dataCeneterName.value)" [(ngModel)]="dataSet.dataCenter">
@@ -60,12 +60,15 @@
                     <ul class="demo-list-item mdl-list">
                         <li class="mdl-list__item" [ngClass]="{'is-active': activeTab === tab.HIVE}" (click)="activeTab = tab.HIVE">
                             <span class="mdl-list__item-primary-content">HIVE</span>
+                            <a class="btn-default" href="#" (click)="addFilter($event, 'hive')"><i class="fa fa-filter"></i> ADD </a>
                         </li>
                         <li class="mdl-list__item" [ngClass]="{'is-active': activeTab === tab.HBASE}" (click)="activeTab = tab.HBASE">
                             <span class="mdl-list__item-primary-content">HBASE</span>
+                            <a class="btn-default" href="#" (click)="addFilter($event, 'hbase')"><i class="fa fa-filter"></i> ADD </a>
                         </li>
                         <li class="mdl-list__item" [ngClass]="{'is-active': activeTab === tab.HDFS}" (click)="activeTab = tab.HDFS">
                             <span class="mdl-list__item-primary-content">HDFS</span>
+                            <a class="btn-default" href="#" (click)="addFilter($event, 'hdfs')"><i class="fa fa-filter"></i> ADD </a>
                         </li>
                     </ul>
                 </div>
@@ -73,35 +76,73 @@
             <div class="mdl-cell mdl-cell--10-col vertical-tab-content">
                 <div class="mdl-vertical-tabs__content-bar">
                     <div *ngIf="activeTab === tab.HIVE">
-                        <data-plane-search [searchParamWrappers]="hiveSearchParamWrappers" (searchFilters)="fetchHiveData($event)"> </data-plane-search>
-                        <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="hiveTables.length > 0">
-                            <thead>
-                            <tr>
-                                <th class="mdl-data-table__cell--non-numeric">NAME</th>
-                                <th class="mdl-data-table__cell--non-numeric">COLUMNS</th>
-                                <th class="mdl-data-table__cell--non-numeric">OWNER</th>
-                                <th class="mdl-data-table__cell--non-numeric">CREATE TIME</th>
-                                <th class="mdl-data-table__cell--non-numeric">NUM OF ROWS</th>
-                                <th class="mdl-data-table__cell--non-numeric">TABLE TYPE</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let hiveTable of hiveTables">
+                        <div *ngFor="let hiveFilterWrapper of hiveFiltersWrapper" style="margin-bottom: 15px;">
+                            <data-plane-search [searchParamWrappers]="hiveSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, hiveFilterWrapper, 'hive')" [dataSource]="'hive'"> </data-plane-search>
+                            <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="hiveFilterWrapper.data.length > 0">
+                                <thead>
+                                <tr>
+                                    <th class="mdl-data-table__cell--non-numeric">NAME</th>
+                                    <th class="mdl-data-table__cell--non-numeric">OWNER</th>
+                                    <th class="mdl-data-table__cell--non-numeric">CREATE TIME</th>
+                                    <th class="mdl-data-table__cell--non-numeric">NUM OF ROWS</th>
+                                    <th class="mdl-data-table__cell--non-numeric">TABLE TYPE</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr *ngFor="let hiveTable of hiveFilterWrapper.data">
                                     <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.name }}</td>
-                                    <td class="mdl-data-table__cell--non-numeric"></td>
                                     <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.owner }}</td>
                                     <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.createTime }}</td>
                                     <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.parameters.numRows }}</td>
                                     <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.tableType }}</td>
                                 </tr>
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div *ngIf="activeTab === tab.HBASE">
-                        <data-plane-search [searchParamWrappers]="hbaseSearchParamWrappers"> </data-plane-search>
+                        <div *ngFor="let hbaseFilterWrapper of hbaseFiltersWrapper">
+                            <data-plane-search [searchParamWrappers]="hbaseSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, hbaseFilterWrapper, 'hbase')" [dataSource]="'hbase'"> </data-plane-search>
+                            <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="hbaseFilterWrapper.data.length > 0">
+                                <thead>
+                                <tr>
+                                    <th class="mdl-data-table__cell--non-numeric">NAME</th>
+                                    <th class="mdl-data-table__cell--non-numeric">OWNER</th>
+                                    <th class="mdl-data-table__cell--non-numeric">CREATE TIME</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr *ngFor="let hbaseTable of hbaseFilterWrapper.data">
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hbaseTable.name }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hbaseTable.owner }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hbaseTable.$systemAttributes$.createdTime }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div *ngIf="activeTab === tab.HDFS">
-                        <data-plane-search> </data-plane-search>
+                        <div *ngFor="let hdfsFilterWrapper of hdfsFiltersWrapper">
+                            <data-plane-search [searchParamWrappers]="hdfsSearchParamWrappers"  (searchFilters)="addFilterAndSearch($event, hdfsFilterWrapper, 'hdfs')" [dataSource]="'hdfs'"> </data-plane-search>
+                            <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="hdfsFilterWrapper.data.length > 0">
+                                <thead>
+                                <tr>
+                                    <th class="mdl-data-table__cell--non-numeric">NAME</th>
+                                    <th class="mdl-data-table__cell--non-numeric">OWNER</th>
+                                    <th class="mdl-data-table__cell--non-numeric">SIZE</th>
+                                    <th class="mdl-data-table__cell--non-numeric">URI</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr *ngFor="let hdfsTable of hdfsFilterWrapper.data">
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hdfsTable.name }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hdfsTable.owner }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hdfsTable.size }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hdfsTable.uri }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

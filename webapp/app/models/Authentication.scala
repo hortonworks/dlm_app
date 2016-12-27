@@ -20,12 +20,12 @@ case class User(username: String,
                 enabled: Boolean = true)
 
 object User {
-  val userTypes = Set("USER","ADMIN","SUPERUSER")
+  val userTypes = Set("USER","ADMIN","SUPERUSER","ANALYSTADMIN","INFRAADMIN")
   val authTypes= Set("LDAP","LOCAL")
 }
 
 
-case class UserView(username: String, password: String, admin: Boolean)
+case class UserView(username: String, password: String, admin: Boolean,userType:String="USER")
 
 object JsonFormats {
 

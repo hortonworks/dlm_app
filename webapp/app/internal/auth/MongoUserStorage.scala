@@ -41,13 +41,13 @@ class MongoUserStorage @Inject()(val mongoDriver: MongoDriver, configuration: pl
   }
 
   override def updateUser(user: User, view: UserView): Future[WriteResult] = {
-    val selector = Json.obj("userType" -> "SUPERUSER","username" -> view.username)
+    val selector = Json.obj("userType" -> view.userType,"username" -> view.username)
     val modifier = Json.obj("$set" -> Json.obj("username" -> view.username,"password" -> BCrypt.hashpw(view.password, BCrypt.gensalt())))
     collection.flatMap(_.update(selector,modifier))
   }
 
   override def createUser(view: UserView): Future[WriteResult] = {
-    val user = User(view.username, BCrypt.hashpw(view.password, BCrypt.gensalt()), "SUPERUSER", "LOCAL", true, new Date(), true)
+    val user = User(view.username, BCrypt.hashpw(view.password, BCrypt.gensalt()), view.userType, "LOCAL", view.admin, new Date(), true)
     collection.flatMap(_.insert(user))
   }
 }

@@ -20,37 +20,49 @@ export class Environment {
   ];
 
   hbaseSearchParamWrappers: SearchParamWrapper[] = [
-    new SearchParamWrapper(new SearchParam('Size', '',''), ['==', '<', '>', '!=']),
-    new SearchParamWrapper(new SearchParam('Number of Rows', '',''), ['==', '<', '>', '!=']),
-    new SearchParamWrapper(new SearchParam('Name', '',''), ['==', '!='])
+    new SearchParamWrapper(new SearchParam('Name', '',''), ['==', '!=']),
+    new SearchParamWrapper(new SearchParam('Owner', '',''), ['==', '!='])
   ];
+
+  hdfsSearchParamWrappers: SearchParamWrapper[] = [
+    new SearchParamWrapper(new SearchParam('Name', '',''), ['contains']),
+    new SearchParamWrapper(new SearchParam('Owner', '',''), ['==', '!='])
+  ];
+
 
   hivePredicates = {
     size: {
-      predicate: 'parameters.totalSize ${operator} parseInt(${value})',
+      predicate: 'r.parameters.totalSize ${operator} parseInt(${value})',
       qualifier: 'field'
     },
     numberOfRows: {
-      predicate: 'parameters.numRows ${operator} parseInt(${value})',
+      predicate: 'r.parameters.numRows ${operator} parseInt(${value})',
       qualifier: 'field'
     },
     name: {
-      predicate: 'name ${operator} ${value}',
+      predicate: 'r.name ${operator} \'${value}\'',
       qualifier: 'field'
     }
   };
 
   hbasePredicates = {
-    size: {
-      predicate: 'parameters.totalSize ${operator} parseInt(${value})',
-      qualifier: 'field'
-    },
-    numberOfRows: {
-      predicate: 'parameters.numRows ${operator} parseInt(${value})',
+    owner: {
+      predicate: 'r.owner ${operator} \'${value}\'',
       qualifier: 'field'
     },
     name: {
-      predicate: 'name ${operator} ${value}',
+      predicate: 'r.name ${operator} \'${value}\'',
+      qualifier: 'field'
+    }
+  };
+
+  hdfsPredicates = {
+    owner: {
+      predicate: 'r.owner ${operator} \'${value}\'',
+      qualifier: 'field'
+    },
+    name: {
+      predicate: 'r.name.indexOf(\'${value}\') !== -1',
       qualifier: 'field'
     }
   };

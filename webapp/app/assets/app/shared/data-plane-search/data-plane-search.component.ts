@@ -15,6 +15,7 @@ export class DataPlaneSearchComponent implements  OnInit {
     allSearchParamWrappers: SearchParamWrapper[] = [];
     appliedSearchParams: SearchParam[] = [];
     newSearchOperators: string[] = [];
+    @Input() dataSource: string;
     @Input() searchParamWrappers: SearchParamWrapper[];
     @Output() searchFilters = new EventEmitter<DataFilter[]>();
 
@@ -90,7 +91,7 @@ export class DataPlaneSearchComponent implements  OnInit {
         let dataFilters: DataFilter[] = [];
 
         for (let appliedSearchParam of this.appliedSearchParams) {
-            let hivePredicate = this.environment.hivePredicates[this.camelize(appliedSearchParam.key)];
+            let hivePredicate = this.getPredicatesForDataSource(appliedSearchParam);
             let predicate = hivePredicate.predicate;
             predicate = predicate.replace('${operator}', appliedSearchParam.operator);
             predicate = predicate.replace('${value}', appliedSearchParam.value);
@@ -103,5 +104,19 @@ export class DataPlaneSearchComponent implements  OnInit {
         }
 
         this.searchFilters.emit(dataFilters);
+    }
+
+    private getPredicatesForDataSource(appliedSearchParam): {predicate: string, qualifier: string} {
+        if (this.dataSource === 'hive') {
+            return this.environment.hivePredicates[this.camelize(appliedSearchParam.key)];
+        }
+        if (this.dataSource === 'hbase') {
+            return this.environment.hbasePredicates[this.camelize(appliedSearchParam.key)];
+        }
+        if (this.dataSource === 'hdfs') {
+            return  this.environment.hdfsPredicates[this.camelize(appliedSearchParam.key)];
+        }
+
+        return {predicate: '', qualifier: ''};
     }
 }

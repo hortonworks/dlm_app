@@ -1,4 +1,5 @@
 import {DataFilter} from './data-filter';
+
 export class DataSet {
     name: string;
     category: string;
