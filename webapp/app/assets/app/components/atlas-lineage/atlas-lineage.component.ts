@@ -384,7 +384,7 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
                 });
             };
 
-            const zoomClick = function(){
+            const zoomClick = function(this:any){
                 let clicked = d3.event.target,
                     direction = 1,
                     factor = 0.2,
@@ -399,7 +399,6 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
                 d3.event.preventDefault();
                 direction = (this.id === 'zoom_in') ? 1 : -1;
                 target_zoom = zoom.scale() * (1 + factor * direction);
-
                 if (target_zoom < extent[0] || target_zoom > extent[1]) {
                     return;
                 }
