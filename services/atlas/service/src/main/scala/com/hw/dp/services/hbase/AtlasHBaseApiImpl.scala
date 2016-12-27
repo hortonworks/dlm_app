@@ -109,13 +109,7 @@ class AtlasHBaseApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Clust
       tableLoader = Some(actorSystem.actorOf(Props(classOf[CacheReloader], this)))
 
       // preload cache
-      allHBaseTables.map(sr =>
-        sr.results.foreach { res =>
-          res.foreach { tr =>
-            Try(tableCache.put(tr.name.get, tr))
-          }
-        }
-      )
+      tryRefreshCache
 
       tableLoader.map { tl =>
         //initialize the cache
@@ -124,6 +118,16 @@ class AtlasHBaseApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Clust
       Atlas(apiUrl)
     }
 
+  }
+
+  private def tryRefreshCache = {
+    allHBaseTables.map(sr =>
+      sr.results.foreach { res =>
+        res.foreach { tr =>
+          Try(tableCache.put(tr.name.get, tr))
+        }
+      }
+    )
   }
 
   /**
@@ -185,6 +189,9 @@ class AtlasHBaseApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Clust
     * @return
     */
   override def fastFindHBaseTable(tableName: String): Option[Result] = {
+    if(tableCache.size() == 0 ){
+      tryRefreshCache
+    }
     Try(Some(tableCache.get(tableName))) getOrElse None
   }
 
@@ -194,7 +201,12 @@ class AtlasHBaseApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Clust
     * @return
     */
   import collection.JavaConverters._
-  override def fastLoadAllTables: Seq[Result] =  tableCache.asMap().values().asScala.toSeq
+  override def fastLoadAllTables: Seq[Result] =  {
+    if(tableCache.size() == 0 ){
+      tryRefreshCache
+    }
+    tableCache.asMap().values().asScala.toSeq
+  }
 
 
   override def getEntity(guid: String): JsValue = {

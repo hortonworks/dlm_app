@@ -109,13 +109,7 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluste
       tableLoader = Some(actorSystem.actorOf(Props(classOf[CacheReloader], this)))
 
       // preload cache
-      allHiveTables.map(sr =>
-        sr.results.map { res =>
-          res.foreach { tr =>
-            Try(tableCache.put(tr.name.get, tr))
-          }
-        }
-      )
+      tryLoadCache
 
       tableLoader.map { tl =>
         //initialize the cache
@@ -125,6 +119,16 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluste
     }
   }
 
+
+  private def tryLoadCache = {
+    allHiveTables.map(sr =>
+      sr.results.map { res =>
+        res.foreach { tr =>
+          Try(tableCache.put(tr.name.get, tr))
+        }
+      }
+    )
+  }
 
   override def findHiveTable(tableName: String): Try[SearchResult] = {
 
@@ -151,6 +155,9 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluste
 
 
   override def fastFindHiveTable(tableName: String): Option[Result] = {
+    if(tableCache.size() == 0 ){
+      tryLoadCache
+    }
     Try(Some(tableCache.get(tableName))) getOrElse None
   }
 
@@ -168,7 +175,12 @@ class AtlasHiveApiImpl(actorSystem: ActorSystem, ambari: Ambari, cluster: Cluste
 
   import collection.JavaConverters._
 
-  override def fastLoadAllTables = tableCache.asMap().values().asScala.toSeq
+  override def fastLoadAllTables =  {
+    if(tableCache.size() == 0 ){
+      tryLoadCache
+    }
+    tableCache.asMap().values().asScala.toSeq
+  }
 
   /**
     * Get raw Entity information
