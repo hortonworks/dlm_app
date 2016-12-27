@@ -91,6 +91,22 @@ export class ViewDataSetComponent implements OnInit {
         return decodeURIComponent(results[2].replace(/\+/g, ' '));
     }
 
+    getDataSources() {
+        let dataSources: string[] = [];
+
+        if (this.dataSet.hiveFilters.length > 0) {
+            dataSources.push('HIVE');
+        }
+        if (this.dataSet.hBaseFilters.length > 0) {
+            dataSources.push('HBASE');
+        }
+        if (this.dataSet.fileFilters.length > 0) {
+            dataSources.push('HDFS');
+        }
+
+        return dataSources;
+    }
+
     showData(id: string) {
         let navigationExtras = {
             'queryParams' : {'host': this.host, 'id': id}
