@@ -7,12 +7,12 @@ import {SearchQuery} from '../models/search-query';
 
 @Injectable()
 export class SearchQueryService {
-    url = '/api/search';
+    url = '/api/search/';
 
     constructor(private http:Http) {}
 
-    getHiveData(searchQuery: SearchQuery): Observable<any[]> {
-        return this.http.post(this.url + '/hive', searchQuery, new RequestOptions(HttpUtil.getHeaders()))
+    getHiveData(searchQuery: SearchQuery, datasource: string): Observable<any[]> {
+        return this.http.post(this.url + datasource , searchQuery, new RequestOptions(HttpUtil.getHeaders()))
             .map(HttpUtil.extractData).catch(HttpUtil.handleError);
     }
 }

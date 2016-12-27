@@ -4,6 +4,9 @@ import {DataSetService} from '../../../services/data-set.service';
 import {DataSet} from '../../../models/data-set';
 import {SearchQueryService} from '../../../services/search-query.service';
 import {SearchQuery} from '../../../models/search-query';
+import {DataFilterWrapper} from '../../../models/data-filter-wrapper';
+import {Environment} from '../../../environment';
+import {SearchParamWrapper} from '../../../shared/data-plane-search/search-param-wrapper';
 
 export enum Tab { HIVE, HBASE, HDFS}
 
@@ -21,9 +24,19 @@ export class ViewDataSetComponent implements OnInit {
     hiveTables: any[] = [];
     host: string;
     dataCenter: string;
+    hiveFiltersWrapper: DataFilterWrapper[] = [];
+    hbaseFiltersWrapper: DataFilterWrapper[] = [];
+    hdfsFiltersWrapper: DataFilterWrapper[] = [];
+    hiveSearchParamWrappers: SearchParamWrapper[] = [];
+    hbaseSearchParamWrappers: SearchParamWrapper[] = [];
+    hdfsSearchParamWrappers: SearchParamWrapper[] = [];
 
-    constructor(private activatedRoute: ActivatedRoute, private dataSetService: DataSetService,
-                private searchQueryService: SearchQueryService,  private router: Router) {}
+    constructor(private activatedRoute: ActivatedRoute, private dataSetService: DataSetService, private environment: Environment,
+                private searchQueryService: SearchQueryService,  private router: Router) {
+        this.hiveSearchParamWrappers = environment.hiveSearchParamWrappers;
+        this.hbaseSearchParamWrappers = environment.hbaseSearchParamWrappers;
+        this.hdfsSearchParamWrappers = environment.hdfsSearchParamWrappers;
+    }
 
     ngOnInit() {
         this.activatedRoute.params.subscribe(params => {
@@ -32,18 +45,40 @@ export class ViewDataSetComponent implements OnInit {
             this.dataCenter = this.getParameterByName('dataCenter');
 
             this.dataSetService.getByName(this.dataSetName, this.host, this.dataCenter).subscribe((result:DataSet)=> {
-                let searchQuery = new SearchQuery();
+                this.dataSet = result;
+                this.hiveFiltersWrapper = result.hiveFilters.map(filter =>  DataFilterWrapper.createDataFilters(filter));
+                this.hbaseFiltersWrapper = result.hBaseFilters.map(filter => DataFilterWrapper.createDataFilters(filter));
+                this.hdfsFiltersWrapper = result.fileFilters.map(filter => DataFilterWrapper.createDataFilters(filter));
 
-                searchQuery.clusterHost = this.host;
-                searchQuery.dataCenter = this.dataCenter;
-                searchQuery.predicates = result.hiveFilters;
-
-                this.searchQueryService.getHiveData(searchQuery).subscribe(tableResults => {
-                    this.hiveTables = tableResults;
-                });
+                this.fetchData(this.hiveFiltersWrapper, 'hive');
+                this.fetchData(this.hbaseFiltersWrapper, 'hbase');
+                this.fetchData(this.hdfsFiltersWrapper, 'hdfs');
             });
         });
 
+    }
+
+    private fetchData(datafiltersWrapper: DataFilterWrapper[], dataSource: string) {
+        for (let datafilterWrapper of datafiltersWrapper) {
+            let searchQuery = new SearchQuery();
+            searchQuery.clusterHost = this.host;
+            searchQuery.dataCenter = this.dataCenter;
+            searchQuery.predicates = [datafilterWrapper.dataFilter];
+
+            this.searchQueryService.getHiveData(searchQuery, dataSource).subscribe(tableResults => {
+                datafilterWrapper.data = tableResults;
+            });
+        }
+    }
+
+    addFilterAndSearch($event, hiveFilterWrapper: DataFilterWrapper, dataSource: string) {
+        let searchQuery = new SearchQuery();
+        searchQuery.dataCenter = this.dataSet.dataCenter;
+        searchQuery.clusterHost = this.dataSet.ambariHost;
+        searchQuery.predicates = [...[hiveFilterWrapper.dataFilter], ...$event];
+        this.searchQueryService.getHiveData(searchQuery, dataSource).subscribe(result => {
+            hiveFilterWrapper.data = result;
+        });
     }
 
     getParameterByName(name: string) {
@@ -54,6 +89,22 @@ export class ViewDataSetComponent implements OnInit {
         if (!results) return null;
         if (!results[2]) return '';
         return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+
+    getDataSources() {
+        let dataSources: string[] = [];
+
+        if (this.dataSet.hiveFilters.length > 0) {
+            dataSources.push('HIVE');
+        }
+        if (this.dataSet.hBaseFilters.length > 0) {
+            dataSources.push('HBASE');
+        }
+        if (this.dataSet.fileFilters.length > 0) {
+            dataSources.push('HDFS');
+        }
+
+        return dataSources;
     }
 
     showData(id: string) {
