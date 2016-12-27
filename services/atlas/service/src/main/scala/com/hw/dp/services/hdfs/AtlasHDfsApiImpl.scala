@@ -129,12 +129,7 @@ class AltasHdfsApiImpl(actorSystem: ActorSystem,
         Some(actorSystem.actorOf(Props(classOf[CacheReloader], this)))
 
       // preload cache
-      loadAllFileSets.map(sr =>
-        sr.results.foreach { res =>
-          res.foreach { tr =>
-            Try(tableCache.put(tr.name.get, tr))
-          }
-      })
+      tryLoadFiles
 
       tableLoader.map { tl =>
         //initialize the cache
@@ -144,6 +139,15 @@ class AltasHdfsApiImpl(actorSystem: ActorSystem,
       Atlas(apiUrl)
     }
 
+  }
+
+  private def tryLoadFiles = {
+    loadAllFileSets.map(sr =>
+      sr.results.foreach { res =>
+        res.foreach { tr =>
+          Try(tableCache.put(tr.name.get, tr))
+        }
+      })
   }
 
   /**
@@ -189,8 +193,12 @@ class AltasHdfsApiImpl(actorSystem: ActorSystem,
 
   import collection.JavaConverters._
 
-  override def fastLoadAllFileSets: Seq[Result] =
+  override def fastLoadAllFileSets: Seq[Result] = {
+    if(tableCache.size() == 0 ){
+      tryLoadFiles
+    }
     tableCache.asMap().values().asScala.toSeq
+  }
 
   /**
     * Load all file sets by connecting over Atlas
