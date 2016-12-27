@@ -32,37 +32,37 @@ export class Environment {
 
   hivePredicates = {
     size: {
-      predicate: 'parameters.totalSize ${operator} parseInt(${value})',
+      predicate: 'r.parameters.totalSize ${operator} parseInt(${value})',
       qualifier: 'field'
     },
     numberOfRows: {
-      predicate: 'parameters.numRows ${operator} parseInt(${value})',
+      predicate: 'r.parameters.numRows ${operator} parseInt(${value})',
       qualifier: 'field'
     },
     name: {
-      predicate: 'name ${operator} \'${value}\'',
+      predicate: 'r.name ${operator} \'${value}\'',
       qualifier: 'field'
     }
   };
 
   hbasePredicates = {
     owner: {
-      predicate: 'owner ${operator} \'${value}\'',
+      predicate: 'r.owner ${operator} \'${value}\'',
       qualifier: 'field'
     },
     name: {
-      predicate: 'name ${operator} \'${value}\'',
+      predicate: 'r.name ${operator} \'${value}\'',
       qualifier: 'field'
     }
   };
 
   hdfsPredicates = {
     owner: {
-      predicate: 'owner ${operator} \'${value}\'',
+      predicate: 'r.owner ${operator} \'${value}\'',
       qualifier: 'field'
     },
     name: {
-      predicate: 'name.indexOf(\'${value}\') !== -1',
+      predicate: 'r.name.indexOf(\'${value}\') !== -1',
       qualifier: 'field'
     }
   };
