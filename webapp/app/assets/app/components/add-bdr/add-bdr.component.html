@@ -72,12 +72,12 @@
 
         <div class="mdl-grid mdl-grid--no-spacing config-bgcolor">
             <div class="mdl-cell mdl-cell--6-col" style="padding:16px;">
-                <div class="mdl-typography--body-2"> Data Center </div>
-                <div class="mdl-typography--caption">Select the data center your target cluster is located.</div>
+                <div class="mdl-typography--body-2"> Data Lake </div>
+                <div class="mdl-typography--caption">Select the data lake your target cluster is located in.</div>
                 <div class="select-wrap">
                     <drop-down>
                         <select [(ngModel)]="target.dataCenter" (change)="doRefreshMap()">
-                            <option disabled selected [ngValue]="">Data Center</option>
+                            <option disabled selected [ngValue]="">Data Lake</option>
                             <option *ngFor="let dc of dataCenterOptions" [ngValue]="dc">{{dc.name}}</option>
 
                         </select>

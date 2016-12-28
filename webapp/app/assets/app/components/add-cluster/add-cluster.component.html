@@ -8,19 +8,19 @@
 
         <div class="mdl-color-text--green mt-1"> <i class="fa fa-server fa-2x" aria-hidden="true"></i> <span class="mdl-typography--title mdl-typography--font-light"> Cluster Information </span> </div>
 
-        <div class="mdl-typography--body-2"> Data Center </div>
+        <div class="mdl-typography--body-2"> Data Lake </div>
         <p> {{ dataCenterHelp1 }}</p>
 
         <drop-down>
             <select #dataCeneterName (change)="onDataCenterChange(dataCeneterName.value)" >
-                <option value="" selected [value]="'new'">New Data Center</option>
+                <option value="" selected [value]="'new'">New Data Lake</option>
                 <option *ngFor="let dataCenter of dataCenters" [value]="dataCenter.name"> {{ dataCenter.name }} </option>
             </select>
         </drop-down>
 
         <div class="mdl-grid config-bgcolor" [hidden]="dataCeneterName.value !== 'new'">
             <div class="mdl-cell mdl-cell--4-col">
-                <div class="mdl-typography--body-2"> Data Center Location </div>
+                <div class="mdl-typography--body-2"> Data Lake Location </div>
                 <span class="select-wrap">
                     <drop-down>
                         <select #select (change)="onCountryChange(select.value)" [(ngModel)]="dataCenter.location.country">
@@ -37,7 +37,7 @@
                         </select>
                     </drop-down>
                 </span>
-                <div class="mdl-typography--body-2"> Data Center Name </div>
+                <div class="mdl-typography--body-2"> Data Lake Name </div>
                 <input type="text" placeholder="Name" [(ngModel)]="dataCenter.name" (blur)="onDataCenterNameChange()">
             </div>
             <div class="mdl-cell mdl-cell--4-col">
