@@ -2,9 +2,9 @@
 
     <div class="dataplane-header mdl-layout__header mdl-layout__header--waterfall" [hidden]="!isLoggedIn()">
         <div class="mdl-layout__header-row">
-                    <span class="dataplane-title mdl-layout-title">
-                        <img class="dataplane-logo-image" src="assets/images/ui_logo.svg">
-                    </span>
+            <span class="dataplane-title mdl-layout-title">
+                <img class="dataplane-logo-image" src="assets/images/ui_logo.svg">
+            </span>
             <!-- Add spacer, to align navigation to the right in desktop -->
             <div class="dataplane-header-spacer mdl-layout-spacer"></div>
 
@@ -25,10 +25,10 @@
             <img class="vw-logo-image" src="assets/images/vw.png">
         </span>
         <nav *ngIf="isLoggedIn()" class="mdl-navigation">
-            <a *ngIf="environment.persona === persona.Infrastructure" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/dashboard']">Dashboard</a>
-            <a *ngIf="environment.persona === persona.Infrastructure" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/cluster/add']" >Clusters</a>
+            <a *ngIf="environment.persona === persona.Infrastructure || environment.persona === persona.Admin" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/dashboard']">Dashboard</a>
+            <a *ngIf="environment.persona === persona.Infrastructure || environment.persona === persona.Admin" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/cluster/add']" >Clusters</a>
 
-            <a *ngIf="environment.persona === persona.DataAnalyst" class="mdl-navigation__link" href="" [sidenavRouterLink]="['ui/data-analyst/analyst-dashboard']">Dataset</a>
+            <a *ngIf="environment.persona === persona.DataAnalyst || environment.persona === persona.Admin" class="mdl-navigation__link" href="" [sidenavRouterLink]="['ui/data-analyst/analyst-dashboard']">Dataset</a>
         </nav>
     </div>
 
