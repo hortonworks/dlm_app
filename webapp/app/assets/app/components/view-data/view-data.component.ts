@@ -10,6 +10,7 @@ import {BackupPolicyInDetail} from '../../models/backup-policy';
 import {DataCenterService} from '../../services/data-center.service';
 import Rx from 'rxjs/Rx';
 import {CityNames} from '../../common/utils/city-names';
+
 import {Environment} from '../../environment';
 
 import {DataFilter} from '../../models/data-filter';
@@ -82,6 +83,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
       private policyService: BackupPolicyService,
       private dcService: DataCenterService,
       private geographyService: GeographyService,
+
       private environment: Environment,
       private searchQueryService: SearchQueryService,
     ) {

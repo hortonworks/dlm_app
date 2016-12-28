@@ -11,6 +11,8 @@ import {DataCenterService} from '../../services/data-center.service';
 import {AmbariService} from '../../services/ambari.service';
 import {BackupPolicyService} from '../../services/backup-policy.service';
 
+import {Environment} from '../../environment';
+
 import {DataFilter} from '../../models/data-filter';
 import {DataFilterWrapper} from '../../models/data-filter-wrapper';
 import {SearchQueryService} from '../../services/search-query.service';
@@ -30,7 +32,7 @@ enum DataSourceType {
 @Component({
     selector: 'add-bdr',
     templateUrl: 'assets/app/components/add-bdr/add-bdr.component.html',
-    styleUrls: ['assets/app/components/add-bdr/add-bdr.component.scss']
+    styleUrls: ['assets/app/components/add-bdr/add-bdr.component.css']
 })
 export class AddBdrComponent implements OnInit, AfterViewInit {
 
@@ -56,6 +58,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
       }
     } = {};
 
+    // begin search
     DataSourceType = DataSourceType;
     activeDataSourceType: DataSourceType = DataSourceType.HIVE;
 
@@ -65,6 +68,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
     hiveFiltersWrapper: DataFilterWrapper[] = [new DataFilterWrapper(new DataFilter())];
     hbaseFiltersWrapper: DataFilterWrapper[] = [new DataFilterWrapper(new DataFilter())];
     hdfsFiltersWrapper: DataFilterWrapper[] = [new DataFilterWrapper(new DataFilter())];
+    // end search
 
     nowDate: string = new Date().toISOString().substring(0,10);
     welcomeText = `Configure Backup and Disaster Recovery for the selected Entity. You can select the target cluster to copy the data and the schedule for backup and recovery`;
@@ -124,8 +128,17 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
       private router: Router,
       private dcService: DataCenterService,
       private ambariService: AmbariService,
-      private policyService: BackupPolicyService
-    ) {}
+      private policyService: BackupPolicyService,
+
+      private environment: Environment,
+      private searchQueryService: SearchQueryService,
+    ) {
+
+      this.hiveSearchParamWrappers = environment.hiveSearchParamWrappers;
+      this.hbaseSearchParamWrappers = environment.hbaseSearchParamWrappers;
+      this.hdfsSearchParamWrappers = environment.hdfsSearchParamWrappers;
+
+    }
 
     ngOnInit() {
       const rxSourceClusterOptions = new Rx.Subject<string>();
@@ -401,4 +414,39 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
           return null;
       }
     }
+
+
+    doExecuteSearch($event, dataFilterWrapper: DataFilterWrapper, dataSourceType: string) {
+      let searchQuery = new SearchQuery();
+        searchQuery.dataCenter = this.source.dataCenter.name;
+        searchQuery.clusterHost = this.source.cluster.host;
+        searchQuery.predicates = $event;
+        this.searchQueryService.getData(searchQuery, dataSourceType)
+        .subscribe(result => {
+            dataFilterWrapper.data = result;
+
+        });
+    }
+
+    addFilter($event, type: string) {
+
+        $event.preventDefault();
+
+        if (type === 'hive') {
+            this.hiveFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
+        }
+        if (type === 'hbase') {
+            this.hbaseFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
+        }
+        if (type === 'hdfs') {
+            this.hdfsFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
+        }
+    }
+
+    doSelectResourceAndContinue(resourceId, resourceType) {
+      // TODO: confirm if policies need to be created on data sets or individual resources
+      this.source.resourceId = resourceId;
+      this.source.resourceType = resourceType;
+    }
+
 }
