@@ -23,18 +23,16 @@ L.TileLayer.GeoJSON = L.TileLayer.extend({
     },
     _loadTile: function (tile, tilePoint) {
         var layer = this;
-        this._requests.push($.ajax({
-            url: this.getTileUrl(tilePoint),
-            dataType: 'json',
-            success: function(geojson) {
+        this._requests.push(
+          fetch(this.getTileUrl(tilePoint))
+          .then(response => response.json())
+          .then((geojson) => {
                 tile.geojson = geojson;
                 layer._geojson.features = [];
                 layer._tileLoaded();
-            },
-            error: function() {
-                layer._tileLoaded();
-            }
-        }));
+          })
+          .catch(error => layer._tileLoaded())
+        );
     },
     _resetCallback: function() {
         this._geojson.features = [];
