@@ -334,9 +334,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
       const dy = (pointB[1] - pointA[1]) / 2;
 
       //
-      const k = 40;
-      const i = 2;
-      const n = 2;
+      const k = 60;
 
       const dd = Math.sqrt(dx * dx + dy * dy);
       const ex = cx - dy / dd * k * 1 / 2;
