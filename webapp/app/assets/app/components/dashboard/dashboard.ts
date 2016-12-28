@@ -1,5 +1,7 @@
 import {Component,AfterViewInit, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
+import Rx from 'rxjs/Rx';
+import {GeographyService} from '../../services/geography.service';
 import {DataCenterService} from '../../services/data-center.service';
 import {DataCenter} from '../../models/data-center';
 import {CityNames} from '../../common/utils/city-names';
@@ -7,6 +9,7 @@ import {DataCenterDetails} from '../../models/data-center-details';
 import {MathUtils} from '../../shared/utils/mathUtils';
 
 declare var Datamap:any;
+declare const L: any;
 
 export class DashboardRow {
     dataCenter: DataCenter;
@@ -52,120 +55,187 @@ export class DashboardRow {
     }
 }
 
+const FILL_CODES = {
+  HEALTHY: '#9FCE63',
+  UNHEALTHY: '#D21E28',
+  UNKNOWN: '#898989'
+};
+
 @Component({
     selector: 'dash-board',
     styleUrls: ['assets/app/components/dashboard/dashboard.css'],
     templateUrl: 'assets/app/components/dashboard/dashboard.html'
 })
-
-
 export default class DashboardComponent implements AfterViewInit, OnInit {
     map: any;
-    bubbles: any[] = [];
-    dataCenters: DataCenter[] = [];
-    dataCenterNames: string[] = [];
     dashboardRows: DashboardRow[] = [];
 
-    constructor(private router: Router, private dataCenterService: DataCenterService) {}
+    constructor(
+      private router: Router,
+      private dataCenterService: DataCenterService,
+      private geographyService: GeographyService
+    ) {}
 
     ngAfterViewInit() {
-        this.map = new Datamap({element: document.getElementById('mapcontainer'),projection: 'mercator',
-            fills: {
-                defaultFill: '#ABE3F3',
-                HEALTHY: '#9FCE63',
-                UNHEALTHY: '#D21E28',
-                UNKNOWN: '#898989'
-            },
-            data: {
-                'HEALTHY': {fillKey: 'HEALTHY'},
-                'UNHEALTHY': {fillKey: 'UNHEALTHY'},
-                'UNKNOWN': {fillKey: '#898989'}
-            },
-            geographyConfig: {
-                highlightFillColor: '#ADE4F3'
-            },
-            bubblesConfig: {
-                borderWidth: 2,
-                borderColor: '#FFFFFF',
-                highlightBorderColor: '#898989',
-                highlightBorderWidth: 2,
-                highlightFillColor: '#898989'
-            }
-        });
-    }
 
-    drawBubbles() {
-        if (this.bubbles.length > 0) {
-            this.map.bubbles(this.bubbles, {
-                popupTemplate: function (geo:any, data:any) {
-                    return ['<div class="demo-card-wide mdl-card mdl-shadow--2dp"> ' +
-                    '<div class = "mdl-card__actions mdl-card--border"> ' +
-                    '<div> <div class = "card-super-text">' + data.location + ' </div> ' +
-                    '<div class = "card-title-text">' + data.name + '</div> </div>' +
-                    '</div > <div class = "card-padding"> ' +
-                    '<table  class="card-table" cellspacing="0" style="background:#FFFFFF;font-size:12px;width:100%;border-radius:4px;"> ' +
-                    '<tr><td class="card-table-cell">JOBS </td>     <td class="card-table-cell">' + data.jobs + '</td></tr> ' +
-                    '<tr><td class="card-table-cell">USAGE </td>    <td class="card-table-cell">' + data.usage + '</td></tr> ' +
-                    '<tr><td class="card-table-cell">DATA </td>     <td class="card-table-cell">' + data.data + '</td></tr> ' +
-                    '<tr><td class="card-table-cell">CLUSTERS </td> <td class="card-table-cell">' + data.clusters + '</td></tr> ' +
-                    '</table > </div > </div >'].join(' ');
+      this.map =
+        new L
+          .Map('mapcontainer', {
+            // options
+            center: [0, 0],
+            zoom: 1,
+            // minZoom: 1,
+            maxZoom: 5,
+            // interaction options
+            dragging: false,
+            touchZoom: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            boxZoom: false,
+            // control options
+            attributionControl: false,
+            zoomControl: false
+          });
+
+      this.geographyService.getCountries()
+        .subscribe(countrySet => {
+          const baseLayer =
+            L
+              .geoJSON(countrySet, {
+                style: {
+                    fillColor: '#ABE3F3',
+                    fillOpacity: 1,
+                    weight: 1,
+                    color: '#FDFDFD'
                 }
-            });
-        }
+              });
+
+          // added pseudo layer to prevent empty space when zoomed out
+          // https://github.com/Leaflet/Leaflet/blob/v1.0.2/src/layer/GeoJSON.js#L205
+          const pseudoBaseLayer =
+            L
+              .geoJSON(countrySet, {
+                style: {
+                    fillColor: '#ABE3F3',
+                    fillOpacity: 1,
+                    weight: 1,
+                    color: '#FDFDFD'
+                },
+                coordsToLatLng: (coords: number[]) => new L.LatLng(coords[1], coords[0] - 360, coords[2])
+              });
+
+          L
+            .featureGroup([baseLayer, pseudoBaseLayer])
+            .addTo(this.map)
+            .bringToBack();
+        });
     }
 
     ngOnInit() {
-        this.dataCenterService.get().subscribe((dataCenters: DataCenter[]) => {
-            this.dataCenters = dataCenters;
-            this.getDataCenterDetails();
-        });
+      const rxDataCenters = this.dataCenterService.get();
+
+      const rxDashboardRows =
+        rxDataCenters
+          .flatMap(dataCenters => {
+            const dashboardRowsRx =
+              dataCenters
+                .map(cDataCenter => {
+                  const rxDashboardRow =
+                    this.dataCenterService.getDetails(cDataCenter.name)
+                      .map(cDetail => new DashboardRow(cDataCenter, cDetail));
+                  return rxDashboardRow;
+                });
+
+            return Rx.Observable.forkJoin(dashboardRowsRx);
+          });
+
+      rxDashboardRows
+        .subscribe(dashboardRows => this.dashboardRows = dashboardRows);
+
+      rxDashboardRows
+        .subscribe(dashboardRows => this.plotDataCenters(dashboardRows));
     }
 
-    getDataCenterDetails() {
-        let dataCenterNamesToDataCenter = {};
-        for (let dataCenter of this.dataCenters) {
-            dataCenterNamesToDataCenter[dataCenter.name] = dataCenter;
-        }
+    plotDataCenters(dashboardRows: DashboardRow[]) {
+      const points =
+        dashboardRows
+          .map(cDashboardRow => {
+            const position =
+              CityNames.getLocation(cDashboardRow.dataCenter.location.country, cDashboardRow.dataCenter.location.place);
 
-        this.dataCenterNames = Object.keys(dataCenterNamesToDataCenter);
+            const template =
+              `
+              <div class="demo-card-wide mdl-card mdl-shadow--2dp">
+                <div class = "mdl-card__actions mdl-card--border">
+                  <div> <div class = "card-super-text">${cDashboardRow.dataCenter.location.place}</div>
+                  <div class = "card-title-text">${cDashboardRow.dataCenter.name}</div> </div>
+                </div >
+                <div class = "card-padding">
+                  <table  class="card-table" cellspacing="0" style="background:#FFFFFF;font-size:12px;width:100%;border-radius:4px;">
+                    <tr>
+                      <td class="card-table-cell">JOBS</td>
+                      <td class="card-table-cell">${cDashboardRow.averageJobsPerDay}</td>
+                    </tr>
+                    <tr>
+                      <td class="card-table-cell">USAGE</td>
+                      <td class="card-table-cell">${cDashboardRow.capacityUtilization}</td>
+                    </tr>
+                    <tr>
+                      <td class="card-table-cell">DATA</td>
+                      <td class="card-table-cell">${cDashboardRow.dataSize}</td>
+                    </tr>
+                    <tr>
+                      <td class="card-table-cell">CLUSTERS</td>
+                      <td class="card-table-cell">${cDashboardRow.clusters}</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+              `;
 
-        let name = this.dataCenterNames.pop();
-        while (name !== undefined) {
-            this.getDataCenterDetailsByName(name, dataCenterNamesToDataCenter);
-            name = this.dataCenterNames.pop();
-        }
-    }
+              const fillColor = cDashboardRow.hostStatus ? FILL_CODES[cDashboardRow.hostStatus] : '#ABE3F3';
 
-    private getDataCenterDetailsByName(name:string, dataCenterNamesToDataCenter:{}) {
-        this.dataCenterService.getDetails(name).subscribe((dataCenterDetail)=> {
-            console.log(dataCenterDetail);
-            this.dashboardRows.push(new DashboardRow(dataCenterNamesToDataCenter[name], dataCenterDetail));
-            if (this.dataCenterNames.length === 0) {
-                this.createCityBubbles();
-            }
-        });
-    }
+              return ({
+                position,
+                template,
+                fillColor
+              });
 
-    createCityBubbles() {
-        for (let dashboardRow of this.dashboardRows) {
-            let coordinates = CityNames.getCityCoordinates(dashboardRow.dataCenter.location.country, dashboardRow.dataCenter.location.place);
-            this.bubbles.push({
-                name: dashboardRow.dataCenter.name,
-                country: dashboardRow.dataCenter.location.country,
-                jobs: dashboardRow.averageJobsPerDay,
-                usage: dashboardRow.capacityUtilization,
-                data: dashboardRow.dataSize,
-                clusters: dashboardRow.clusters,
-                location: dashboardRow.dataCenter.location.place,
-                radius:10,
-                yield: 400,
-                fillKey: dashboardRow.hostStatus,
-                latitude: parseFloat(coordinates[0]),
-                longitude: parseFloat(coordinates[1])
-            });
-        }
+          })
+          .map(cPoint => {
+            const marker =
+              L
+                .circleMarker(cPoint.position, {
+                  radius: 10,
+                  fillColor: cPoint.fillColor,
+                  color: '#fff',
+                  weight: 3,
+                  fillOpacity: 0.8,
+                })
+                .bindPopup(cPoint.template, {
+                  closeButton: false,
+                  className: 'map__popup--replication'
+                });
 
-        this.drawBubbles();
+              return marker;
+          });
+
+      const pointsGroup =
+        L
+          .featureGroup(points)
+          .addTo(this.map)
+          .eachLayer(cLayer => {
+            cLayer
+              .on('mouseover', function (this: any, e) {
+                this.openPopup();
+              })
+              .on('mouseout', function (this: any, e) {
+                this.closePopup();
+              });
+          });
+
+      this.map.fitBounds(pointsGroup.getBounds(), { padding: L.point(20, 20) });
+
     }
 
     onDataCenterSelect(dataCenter: DataCenter) {
