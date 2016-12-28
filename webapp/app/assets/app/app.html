@@ -25,10 +25,10 @@
             <img class="vw-logo-image" src="assets/images/vw.png">
         </span>
         <nav *ngIf="isLoggedIn()" class="mdl-navigation">
-            <a *ngIf="environment.persona === persona.Infrastructure || environment.persona === persona.Admin" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/dashboard']">Dashboard</a>
-            <a *ngIf="environment.persona === persona.Infrastructure || environment.persona === persona.Admin" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/cluster/add']" >Clusters</a>
+            <a *ngIf="[persona.INFRAADMIN, persona.ADMIN].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/dashboard']">Dashboard</a>
+            <a *ngIf="[persona.INFRAADMIN, persona.ADMIN].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/cluster/add']" >Clusters</a>
 
-            <a *ngIf="environment.persona === persona.DataAnalyst || environment.persona === persona.Admin" class="mdl-navigation__link" href="" [sidenavRouterLink]="['ui/data-analyst/analyst-dashboard']">Dataset</a>
+            <a *ngIf="[persona.ANALYSTADMIN, persona.ADMIN].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['ui/data-analyst/analyst-dashboard']">Dataset</a>
         </nav>
     </div>
 

@@ -26,6 +26,7 @@ export class AuthService {
             .then(res => {
                     this.loggedIn = true;
                     localStorage.setItem('dp_auth_token', res.json().auth_token);
+                    localStorage.setItem('dp_userType', res.json().userType);
                     return new LoginData(userName,password, res.json().userType);
                 }
             )
@@ -43,6 +44,7 @@ export class AuthService {
 
     logout() {
         localStorage.removeItem('dp_auth_token');
+        localStorage.removeItem('dp_userType');
         this.loggedIn = false;
 
     }

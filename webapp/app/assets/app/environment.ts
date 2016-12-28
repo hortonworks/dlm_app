@@ -67,4 +67,8 @@ export class Environment {
     }
   };
 
+  constructor() {
+    this.persona = Persona[localStorage.getItem('dp_userType') || 'USER'];
+  }
+
 }

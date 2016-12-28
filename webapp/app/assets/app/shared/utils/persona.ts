@@ -1,4 +1,7 @@
 export enum Persona {
-    Infrastructure,
-    DataAnalyst
+    USER,
+    ADMIN,
+    SUPERUSER,
+    ANALYSTADMIN,
+    INFRAADMIN
 }

@@ -28,11 +28,12 @@ export default class LoginComponent {
     onSubmit() {
         this.submitted = true;
         this.userService.login(this.model.name, this.model.password).then(res=> {
-            if (res.userType === 'ANALYSTADMIN') {
-                this.environment.persona = Persona.DataAnalyst;
+            const persona = Persona[res.userType];
+            this.environment.persona = persona;
+
+            if (persona === Persona.ANALYSTADMIN) {
                 this.router.navigate(['ui/data-analyst/analyst-dashboard']);
             } else {
-                this.environment.persona = Persona.Infrastructure;
                 this.router.navigate(['ui/dashboard']);
             }
         }).catch(error => this.router.navigate(['ui/login']));
