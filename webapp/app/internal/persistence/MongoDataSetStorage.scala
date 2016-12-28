@@ -33,11 +33,11 @@ class MongoDataSetStorage @Inject()(val mongoDriver: MongoDriver,
   override def saveDataSet(dataSet: DataSet): Future[WriteResult] = {
     val dataSets: Future[JSONCollection] =
       connection.database(dbName).map(_.collection("dataSets"))
-    getDataSet(dataSet.name, dataSet.ambariHost, dataSet.dataCenter).map { dsf =>
+    getDataSet(dataSet.name, dataSet.ambariHost, dataSet.dataCenter).flatMap { dsf =>
       if (dsf.isDefined) {
         throw new Exception("A data set with same name exists for this host and datacenter")
       } else {
-        return dataSets.flatMap(_.insert(dataSet))
+        dataSets.flatMap(_.insert(dataSet))
       }
     }
   }
