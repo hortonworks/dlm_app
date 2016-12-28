@@ -224,7 +224,10 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
                   weight: 3,
                   fillOpacity: 0.8,
                 })
-                .bindPopup(`hola!`),
+                .bindPopup(cEdge.target.template, {
+                  closeButton: false,
+                  className: 'map__popup--replication'
+                }),
               L
                 .circleMarker(cEdge.source.position, {
                   radius: cEdge.source.radius,
@@ -233,7 +236,10 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
                   weight: 3,
                   fillOpacity: 0.8,
                 })
-                .bindPopup(`hola2`)
+                .bindPopup(cEdge.source.template, {
+                  closeButton: false,
+                  className: 'map__popup--replication'
+                })
             ]), []);
 
         // const arcs =
@@ -273,11 +279,9 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
             .eachLayer(cLayer => {
               cLayer
                 .on('mouseover', function (this: any, e) {
-                  console.log(arguments);
                   this.openPopup();
                 })
                 .on('mouseout', function (this: any, e) {
-                  console.log(arguments);
                   this.closePopup();
                 });
             });
@@ -286,7 +290,6 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
           L
             .featureGroup(arcs)
             .addTo(this.map);
-console.log(pointsGroup.getBounds());
 
         this.map.fitBounds(pointsGroup.getBounds(), { padding: L.point(20, 20) });
     }
