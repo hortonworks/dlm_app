@@ -3,12 +3,14 @@ import {AddBdrComponent}   from './add-bdr.component';
 import {SharedModule} from '../../shared/shared.module';
 import {routing} from './add-bdr.routing';
 import {DropDownModule} from '../../shared/dropdown/dropdown.module';
+import {DataPlaneSearchModule} from '../../shared/data-plane-search/data-plane-search.modue';
+import {SearchQueryService} from '../../services/search-query.service';
 
 @NgModule({
-    imports: [routing, SharedModule, DropDownModule],
+    imports: [routing, SharedModule, DropDownModule, DataPlaneSearchModule],
     exports: [AddBdrComponent],
     declarations: [AddBdrComponent],
-    providers: [],
+    providers: [SearchQueryService],
 })
 export class AddBdrModule {
 }

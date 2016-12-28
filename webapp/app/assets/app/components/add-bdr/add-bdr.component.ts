@@ -11,8 +11,21 @@ import {DataCenterService} from '../../services/data-center.service';
 import {AmbariService} from '../../services/ambari.service';
 import {BackupPolicyService} from '../../services/backup-policy.service';
 
+import {DataFilter} from '../../models/data-filter';
+import {DataFilterWrapper} from '../../models/data-filter-wrapper';
+import {SearchQueryService} from '../../services/search-query.service';
+import {DataSet} from '../../models/data-set';
+import {SearchQuery} from '../../models/search-query';
+import {SearchParamWrapper} from '../../shared/data-plane-search/search-param-wrapper';
+
 declare var Datamap:any;
 declare var d3:any;
+
+enum DataSourceType {
+  HIVE,
+  HDFS,
+  HBASE
+}
 
 @Component({
     selector: 'add-bdr',
@@ -43,7 +56,16 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
       }
     } = {};
 
-    entity = 'Table';
+    DataSourceType = DataSourceType;
+    activeDataSourceType: DataSourceType = DataSourceType.HIVE;
+
+    hiveSearchParamWrappers: SearchParamWrapper[] = [];
+    hbaseSearchParamWrappers: SearchParamWrapper[] = [];
+    hdfsSearchParamWrappers: SearchParamWrapper[] = [];
+    hiveFiltersWrapper: DataFilterWrapper[] = [new DataFilterWrapper(new DataFilter())];
+    hbaseFiltersWrapper: DataFilterWrapper[] = [new DataFilterWrapper(new DataFilter())];
+    hdfsFiltersWrapper: DataFilterWrapper[] = [new DataFilterWrapper(new DataFilter())];
+
     nowDate: string = new Date().toISOString().substring(0,10);
     welcomeText = `Configure Backup and Disaster Recovery for the selected Entity. You can select the target cluster to copy the data and the schedule for backup and recovery`;
     dataCenterOptions: Array<DataCenter> = [];

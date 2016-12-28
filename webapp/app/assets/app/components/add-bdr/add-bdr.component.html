@@ -4,51 +4,55 @@
         <h1 class="mdl-typography--headline mdl-typography--font-light" style="margin-bottom: 0">Backup Policy</h1>
         <div [innerHTML]="welcomeText"> </div>
         <div class="mdl-typography--font-light mt-1" style="display: flex">
-            <div style="display:flex;flex-grow: 1;">
-              <div class="mdl-typography--title mdl-typography--font-light">
-                <span [innerHTML]="entity"></span>:
+          <div style="display:flex;flex-grow: 1;" *ngIf="source.resourceId && source.resourceType && source.cluster">
+            <div class="mdl-typography--title mdl-typography--font-light">
+              <span style="text-transform: capitalize;">{{source.resourceType}}</span>:
+            </div>
+            <div style="flex: 1; margin-left: 5px;">
+              <span class="mdl-typography--title  mdl-color-text--green">{{source.resourceId}}</span>
+              <br>
+              <div class="mdl-typography--caption">
+                <span class="mdl-typography--text-uppercase">On-Prem: {{source.dataCenter.name}}</span>
+                <span class="mdl-typography--text-uppercase">({{source.cluster.host}})</span>
               </div>
-              <div style="flex: 1; margin-left: 5px;">
-                <span *ngIf="source.resourceId && source.resourceType" class="mdl-typography--title  mdl-color-text--green">{{source.resourceId}}</span>
-                <!--TODO: link to Raghu's component-->
-                <span *ngIf="!source.resourceId || !source.resourceType" class="mdl-typography--title  mdl-color-text--green">
-                  Please select a resource to replicate
-                </span>
-                <br>
-                <div class="mdl-typography--caption">
-                  <span class="mdl-typography--text-uppercase">On-Prem: {{source.dataCenter.name}}</span>
-                  <span class="mdl-typography--text-uppercase" *ngIf="source.cluster">({{source.cluster.host}})</span>
-                  <!--TODO: populate list of clusters for source.dataCenter-->
-                  <span *ngIf="!source.cluster" style="cursor: pointer">
-                    Please select a cluster below
-                  </span>
-                  <div class="select-wrap" *ngIf="!source.cluster">
-                    <drop-down>
-                        <select [(ngModel)]="source.cluster">
-                            <option disabled selected [ngValue]="">Cluster</option>
-                            <option *ngFor="let cluster of sourceClusterOptions" [ngValue]="cluster">{{cluster.host}}</option>
-                        </select>
-                    </drop-down>
-                  </div>
+            </div>
+          </div>
+
+          <div class="" *ngIf="source.resourceId && source.resourceType && source.cluster">
+            <div style="display: table; text-align: right;">
+              <div style="display: table-row">
+                <div class="mdl-typography--body-1" style="display: table-cell;vertical-align: middle;padding-right: 10px;">{{status.isEnabled ? 'Enabled' : 'Disabled'}}</div>
+                <label class="switch" style="display: table-cell;vertical-align: middle;">
+                  <input type="checkbox" [(ngModel)]="status.isEnabled">
+                  <div class="slider round"></div>
+                </label>
+              </div>
+              <div style="display: table-row" *ngIf="status.since">
+                <div class="mdl-typography--caption" style="display: table-cell;padding-right: 10px;">
+                  {{status.tSince}}
                 </div>
               </div>
             </div>
-            <div class="">
-              <div style="display: table; text-align: right;">
-                <div style="display: table-row">
-                  <div class="mdl-typography--body-1" style="display: table-cell;vertical-align: middle;padding-right: 10px;">{{status.isEnabled ? 'Enabled' : 'Disabled'}}</div>
-                  <label class="switch" style="display: table-cell;vertical-align: middle;">
-                    <input type="checkbox" [(ngModel)]="status.isEnabled">
-                    <div class="slider round"></div>
-                  </label>
-                </div>
-                <div style="display: table-row" *ngIf="status.since">
-                  <div class="mdl-typography--caption" style="display: table-cell;padding-right: 10px;">
-                    {{status.tSince}}
-                  </div>
-                </div>
+          </div>
+
+          <div *ngIf="!source.resourceId || !source.resourceType || !source.cluster">
+            Select a cluster
+
+            <div *ngIf="!source.cluster">
+              <div>
+                Please select a cluster below
+              </div>
+              <div class="select-wrap">
+                <drop-down>
+                    <select [(ngModel)]="source.cluster">
+                        <option disabled selected [ngValue]="">Cluster</option>
+                        <option *ngFor="let cluster of sourceClusterOptions" [ngValue]="cluster">{{cluster.host}}</option>
+                    </select>
+                </drop-down>
               </div>
             </div>
+            Select a resource
+          </div>
         </div>
 
         <br>
