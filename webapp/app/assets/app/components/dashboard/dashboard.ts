@@ -210,6 +210,7 @@ export default class DashboardComponent implements AfterViewInit, OnInit {
               const fillColor = cDashboardRow.hostStatus ? FILL_CODES[cDashboardRow.hostStatus] : '#ABE3F3';
 
               return ({
+                dataCenterId: cDashboardRow.dataCenter.name,
                 position,
                 template,
                 fillColor
@@ -225,6 +226,7 @@ export default class DashboardComponent implements AfterViewInit, OnInit {
                   color: '#fff',
                   weight: 3,
                   fillOpacity: 0.8,
+                  dataCenterId: cPoint.dataCenterId
                 })
                 .bindPopup(cPoint.template, {
                   closeButton: false,
@@ -240,11 +242,16 @@ export default class DashboardComponent implements AfterViewInit, OnInit {
           .addTo(this.map)
           .eachLayer(cLayer => {
             cLayer
-              .on('mouseover', function (this: any, e) {
+              .on('mouseover', function(this: any, e) {
                 this.openPopup();
               })
-              .on('mouseout', function (this: any, e) {
+              .on('mouseout', function(this: any, e) {
                 this.closePopup();
+              })
+              .on('contextmenu', e => {
+
+                const popup = L.popup().setLatLng(e.latlng).setContent(`<a href="/ui/backup-policy?create&dataCenter=${cLayer.options.dataCenterId}">Create policy</a>`);
+                popup.openOn(this.map);
               });
           });
 
