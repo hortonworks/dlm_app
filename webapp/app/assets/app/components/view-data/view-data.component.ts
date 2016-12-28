@@ -387,8 +387,11 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
       const k = 60;
 
       const dd = Math.sqrt(dx * dx + dy * dy);
-      const ex = cx - dy / dd * k * 1 / 2;
-      const ey = cy + dx / dd * k * 1 / 2;
+      let ex = cx - dy / dd * k * 1 / 2;
+      let ey = cy + dx / dd * k * 1 / 2;
+
+      ex = Number.isNaN(ex) ? cx : ex;
+      ey = Number.isNaN(ey) ? cy : ey;
 
       return ([
         'M',[pointA[0], pointA[1]],

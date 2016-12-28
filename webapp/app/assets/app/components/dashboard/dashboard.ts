@@ -3,7 +3,9 @@ import {Router} from '@angular/router';
 import Rx from 'rxjs/Rx';
 import {GeographyService} from '../../services/geography.service';
 import {DataCenterService} from '../../services/data-center.service';
+import {BackupPolicyService} from '../../services/backup-policy.service';
 import {DataCenter} from '../../models/data-center';
+import {BackupPolicyInDetail} from '../../models/backup-policy';
 import {CityNames} from '../../common/utils/city-names';
 import {DataCenterDetails} from '../../models/data-center-details';
 import {MathUtils} from '../../shared/utils/mathUtils';
@@ -21,7 +23,10 @@ export class DashboardRow {
     clusters: number = 0;
     hostStatus: string = '';
 
-    constructor(dataCenter: DataCenter, dataCenterDetails: DataCenterDetails) {
+    constructor(
+      dataCenter: DataCenter,
+      dataCenterDetails: DataCenterDetails
+    ) {
         let diskUsed: number = 0;
         let state: boolean = null;
         this.dataCenter = dataCenter;
@@ -73,7 +78,8 @@ export default class DashboardComponent implements AfterViewInit, OnInit {
     constructor(
       private router: Router,
       private dataCenterService: DataCenterService,
-      private geographyService: GeographyService
+      private geographyService: GeographyService,
+      private bpService: BackupPolicyService
     ) {}
 
     ngAfterViewInit() {
@@ -149,11 +155,19 @@ export default class DashboardComponent implements AfterViewInit, OnInit {
             return Rx.Observable.forkJoin(dashboardRowsRx);
           });
 
+
+
+      const rxPolicies = this.bpService.list();
+
       rxDashboardRows
         .subscribe(dashboardRows => this.dashboardRows = dashboardRows);
 
       rxDashboardRows
         .subscribe(dashboardRows => this.plotDataCenters(dashboardRows));
+
+      rxPolicies
+        .subscribe(policies => this.plotBackupPolicies(policies));
+
     }
 
     plotDataCenters(dashboardRows: DashboardRow[]) {
@@ -240,5 +254,86 @@ export default class DashboardComponent implements AfterViewInit, OnInit {
 
     onDataCenterSelect(dataCenter: DataCenter) {
         this.router.navigate(['/ui/view-cluster/' + dataCenter.name]);
+    }
+
+    plotBackupPolicies(policies: BackupPolicyInDetail[]) {
+      const arcMap =
+        policies
+          .reduce((accumulator, cPolicy) => {
+            const arcKey = `${cPolicy.source.dataCenter.name}#${cPolicy.target.dataCenter.name}`;
+            if(!(arcKey in accumulator)) {
+              const start = CityNames.getLocation(cPolicy.source.dataCenter.location.country, cPolicy.source.dataCenter.location.place);
+              const stop =  CityNames.getLocation(cPolicy.target.dataCenter.location.country, cPolicy.target.dataCenter.location.place);
+              accumulator[arcKey] = {
+                start,
+                stop,
+                policies: []
+              };
+            }
+
+            accumulator[arcKey].policies.push(cPolicy);
+            return accumulator;
+          }, {});
+
+      const arcs =
+        Object
+          .keys(arcMap)
+          .map(cArcKey => arcMap[cArcKey])
+          .map(cArc => Object.assign({}, cArc, {
+            template: '<div>'
+              + cArc.policies.reduce((accumulator, cPolicy) => (
+                `<li>${cPolicy.source.cluster.host} -> ${cPolicy.target.cluster.host}: ${cPolicy.source.resourceType}: ${cPolicy.source.resourceId}</li>`
+                ), '')
+              + '</div>'
+          }))
+          .map(cArc => new L.Curve(
+              this.getCurvePointWithOffset(cArc.start, cArc.stop),
+              {
+                color: 'rgb(50, 50, 50)',
+                weight: 2,
+                dashArray: '5, 5',
+                offset: 10,
+                vertices: 500,
+                animate: {duration: 3000, iterations: Infinity}
+              }
+            ).bindPopup(cArc.template, {
+              closeButton: false
+            }));
+
+        const arcGroup =
+          L
+            .featureGroup(arcs)
+            .addTo(this.map)
+            .eachLayer(cLayer => {
+              cLayer
+                .on('click', function (this: any, e) {
+                  const position = e.latlng;
+                  this.openPopup();
+                  this._popup.setLatLng(position);
+                });
+            });
+    }
+
+    getCurvePointWithOffset(pointA, pointB) {
+      const cx = (pointA[0] + pointB[0]) / 2;
+      const cy = (pointA[1] + pointB[1]) / 2;
+      const dx = (pointB[0] - pointA[0]) / 2;
+      const dy = (pointB[1] - pointA[1]) / 2;
+
+      //
+      const k = 60;
+
+      const dd = Math.sqrt(dx * dx + dy * dy);
+      let ex = cx - dy / dd * k * 1 / 2;
+      let ey = cy + dx / dd * k * 1 / 2;
+
+      ex = Number.isNaN(ex) ? cx : ex;
+      ey = Number.isNaN(ey) ? cy : ey;
+
+      return ([
+        'M',[pointA[0], pointA[1]],
+        'Q',[ex, ey],
+            [pointB[0], pointB[1]]
+      ]);
     }
 }
