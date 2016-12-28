@@ -11,7 +11,7 @@ export class SearchQueryService {
 
     constructor(private http:Http) {}
 
-    getHiveData(searchQuery: SearchQuery, datasource: string): Observable<any[]> {
+    getData(searchQuery: SearchQuery, datasource: string): Observable<any[]> {
         return this.http.post(this.url + datasource , searchQuery, new RequestOptions(HttpUtil.getHeaders()))
             .map(HttpUtil.extractData).catch(HttpUtil.handleError);
     }

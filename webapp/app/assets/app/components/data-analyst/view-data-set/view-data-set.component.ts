@@ -65,7 +65,7 @@ export class ViewDataSetComponent implements OnInit {
             searchQuery.dataCenter = this.dataCenter;
             searchQuery.predicates = [datafilterWrapper.dataFilter];
 
-            this.searchQueryService.getHiveData(searchQuery, dataSource).subscribe(tableResults => {
+            this.searchQueryService.getData(searchQuery, dataSource).subscribe(tableResults => {
                 datafilterWrapper.data = tableResults;
             });
         }
@@ -76,7 +76,7 @@ export class ViewDataSetComponent implements OnInit {
         searchQuery.dataCenter = this.dataSet.dataCenter;
         searchQuery.clusterHost = this.dataSet.ambariHost;
         searchQuery.predicates = [...[hiveFilterWrapper.dataFilter], ...$event];
-        this.searchQueryService.getHiveData(searchQuery, dataSource).subscribe(result => {
+        this.searchQueryService.getData(searchQuery, dataSource).subscribe(result => {
             hiveFilterWrapper.data = result;
         });
     }

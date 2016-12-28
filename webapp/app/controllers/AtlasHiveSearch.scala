@@ -30,24 +30,28 @@ class AtlasHiveSearch @Inject()(
 
   def searchHiveTables = Authenticated.async(parse.json) { req =>
     val jsResult = req.body.validate[SearchQuery]
+
     if (jsResult.isError) {
       Future.successful(
         BadRequest(JsonResponses.statusError("Could not parse search query")))
-    }
-    val searchQuery = jsResult.get
 
-    val tables = for {
+    } else {
+
+      val searchQuery = jsResult.get
+
+      val tables = for {
       // first warm up cache
-      hiveApi <- getHiveApi(searchQuery.clusterHost, searchQuery.dataCenter)
-      allTables <- Future.successful(hiveApi.fastLoadAllTables)
-      selectedTables <- applySearchQuery(allTables, searchQuery)
-    } yield (selectedTables)
+        hiveApi <- getHiveApi(searchQuery.clusterHost, searchQuery.dataCenter)
+        allTables <- Future.successful(hiveApi.fastLoadAllTables)
+        selectedTables <- applySearchQuery(allTables, searchQuery)
+      } yield (selectedTables)
 
-    tables.map(ts => Ok(Json.toJson(ts))).recoverWith {
-      case e: Exception =>
-        Future.successful(
-          InternalServerError(
-            JsonResponses.statusError("Server error", e.getMessage)))
+      tables.map(ts => Ok(Json.toJson(ts))).recoverWith {
+        case e: Exception =>
+          Future.successful(
+            InternalServerError(
+              JsonResponses.statusError("Server error", e.getMessage)))
+      }
     }
   }
 

@@ -124,7 +124,7 @@ export class AddDataSetComponent implements OnInit, AfterViewInit {
         searchQuery.dataCenter = this.dataSet.dataCenter;
         searchQuery.clusterHost = this.dataSet.ambariHost;
         searchQuery.predicates = $event;
-        this.searchQueryService.getHiveData(searchQuery, dataSource).subscribe(result => {
+        this.searchQueryService.getData(searchQuery, dataSource).subscribe(result => {
             hiveFilterWrapper.data = result;
         });
     }
