@@ -10,27 +10,68 @@ import {BackupPolicyInDetail} from '../../models/backup-policy';
 import {DataCenterService} from '../../services/data-center.service';
 import Rx from 'rxjs/Rx';
 import {CityNames} from '../../common/utils/city-names';
+import {Environment} from '../../environment';
+
+import {DataFilter} from '../../models/data-filter';
+import {DataFilterWrapper} from '../../models/data-filter-wrapper';
+import {SearchQueryService} from '../../services/search-query.service';
+import {DataSet} from '../../models/data-set';
+import {SearchQuery} from '../../models/search-query';
+import {SearchParamWrapper} from '../../shared/data-plane-search/search-param-wrapper';
 
 declare const L:any;
 declare var Datamap:any;
 
+enum DataSourceType {
+  HIVE,
+  HDFS,
+  HBASE
+}
+
 @Component({
     selector: 'view-data',
     templateUrl: 'assets/app/components/view-data/view-data.component.html',
-    styleUrls: ['assets/app/components/view-data/view-data.component.css']
+    styleUrls: [
+      'assets/app/components/view-data/view-data.component.css',
+      'assets/app/components/view-data/view-data.search.component.css'
+    ]
 })
 export class ViewDataComponent implements OnInit, AfterViewInit {
     map: any;
     pointsGroup: any;
     arcsGroup: any;
 
-    hostName: string;
-    search: string = '';
-    dataSourceName: string;
+    search: {
+      resourceId: string,
+      resourceType: string
+    } = {
+      resourceId: '',
+      resourceType: 'hive'
+    };
+    DataSourceType = DataSourceType;
+    activeDataSourceType: DataSourceType = DataSourceType.HIVE;
+
+    hiveSearchParamWrappers: SearchParamWrapper[] = [];
+    hbaseSearchParamWrappers: SearchParamWrapper[] = [];
+    hdfsSearchParamWrappers: SearchParamWrapper[] = [];
+    hiveFiltersWrapper: DataFilterWrapper[] = [new DataFilterWrapper(new DataFilter())];
+    hbaseFiltersWrapper: DataFilterWrapper[] = [new DataFilterWrapper(new DataFilter())];
+    hdfsFiltersWrapper: DataFilterWrapper[] = [new DataFilterWrapper(new DataFilter())];
+
+
+    clusterHost: string;
+    dataLakeName: string;
+
     breadCrumbMap: any = {};
     cluster: Ambari = new Ambari();
     backupPolicies: BackupPolicyInDetail[] = [];
-    rxSearch: Rx.Subject<string> = new Rx.Subject<string>();
+    rxSearch: Rx.Subject<{
+      resourceId: string,
+      resourceType: string
+    }> = new Rx.Subject<{
+      resourceId: string,
+      resourceType: string
+    }>();
 
     @ViewChild('bread-crumb') breadCrumb: BreadcrumbComponent;
 
@@ -40,36 +81,46 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
       private clusterService: AmbariService,
       private policyService: BackupPolicyService,
       private dcService: DataCenterService,
-      private geographyService: GeographyService
+      private geographyService: GeographyService,
+      private environment: Environment,
+      private searchQueryService: SearchQueryService,
     ) {
 
       const rxSearchAction =
         this.rxSearch
-          .do(searchKey => this.search = searchKey);
+          .do(search => this.search = search);
 
       const rxBackupPolicies =
         rxSearchAction
-          .flatMap(searchKey => this.policyService.getByResource(searchKey, 'table'));
+          .flatMap(search => this.policyService.getByResource(search.resourceId, search.resourceType));
 
       rxBackupPolicies
         .do(policies => this.backupPolicies = policies)
         .do(policies => this.drawMap(policies))
         .subscribe(() => {/****/});
 
+      this.hiveSearchParamWrappers = environment.hiveSearchParamWrappers;
+      this.hbaseSearchParamWrappers = environment.hbaseSearchParamWrappers;
+      this.hdfsSearchParamWrappers = environment.hdfsSearchParamWrappers;
+
     }
 
     ngOnInit() {
 
       this.activatedRoute.params.subscribe(params => {
-          this.dataSourceName = params['id'];
-          this.hostName = this.activatedRoute.snapshot.queryParams['host'];
+          this.dataLakeName = params['id'];
+          this.clusterHost = this.activatedRoute.snapshot.queryParams['host'];
           this.breadCrumbMap = {'Datacenter':'ui/dashboard'};
-          this.breadCrumbMap[this.dataSourceName] = '';
+          this.breadCrumbMap[this.dataLakeName] = '';
           this.getClusterData();
 
-          const searchKey = this.activatedRoute.snapshot.queryParams['id'];
-          if(searchKey) {
-              this.rxSearch.next(searchKey);
+          const resourceId = this.activatedRoute.snapshot.queryParams['resourceId'];
+          const resourceType = this.activatedRoute.snapshot.queryParams['resourceType'];
+          if(resourceId && resourceType) {
+              this.rxSearch.next({
+                resourceId,
+                resourceType
+              });
           }
       });
 
@@ -293,18 +344,17 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
     }
 
     getClusterData() {
-        this.clusterService.getByName(this.dataSourceName).subscribe(cluster => {
+        this.clusterService.getByName(this.dataLakeName).subscribe(cluster => {
             this.cluster = cluster;
         });
     }
 
-    eventHandler($event, searchKey: string) {
-        if ($event.keyCode === 13 && searchKey) {
-            this.search = searchKey;
-
-            // trigger observable
-            this.rxSearch.next(searchKey);
-        }
+    doExecuteFetch(resourceId: string, resourceType: string) {
+        // trigger observable
+        this.rxSearch.next({
+          resourceId,
+          resourceType
+        });
     }
 
     doGetTableDetail() {
@@ -315,10 +365,10 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
         let navigationExtras = {
             'queryParams' : {
               create: '',
-              cluster: this.hostName,
-              dataCenter: this.dataSourceName,
-              resourceId: this.search,
-              resourceType: 'table',
+              cluster: this.clusterHost,
+              dataCenter: this.dataLakeName,
+              resourceId: this.search.resourceId,
+              resourceType: this.search.resourceType,
             }
         };
         this.router.navigate(['/ui/backup-policy'], navigationExtras);
@@ -343,5 +393,32 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
         'Q',[ex, ey],
             [pointB[0], pointB[1]]
       ]);
+    }
+
+    doExecuteSearch($event, dataFilterWrapper: DataFilterWrapper, dataSourceType: string) {
+      let searchQuery = new SearchQuery();
+        searchQuery.dataCenter = this.dataLakeName;
+        searchQuery.clusterHost = this.clusterHost;
+        searchQuery.predicates = $event;
+        this.searchQueryService.getData(searchQuery, dataSourceType)
+        .subscribe(result => {
+            dataFilterWrapper.data = result;
+
+        });
+    }
+
+    addFilter($event, type: string) {
+
+        $event.preventDefault();
+
+        if (type === 'hive') {
+            this.hiveFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
+        }
+        if (type === 'hbase') {
+            this.hbaseFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
+        }
+        if (type === 'hdfs') {
+            this.hdfsFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
+        }
     }
 }

@@ -43,17 +43,125 @@
 
         <h5 class="thin"> Data Assets </h5>
 
-        <div class="search-input">
-            <form action="#">
-                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label ">
-                    <span class="search-button"><input #searchInput placeholder="Search"   (keypress)="eventHandler($event, searchInput.value)"> <span class="browse-button"> Browse</span></span>
+        <div>
+          <div class="mdl-grid mdl-grid--no-spacing vertical-tab-pane">
+            <div class="mdl-cell mdl-cell--2-col vertical-tab-navigation">
+                <div class="mdl-vertical-tabs__tab-bar">
+                    <ul class="demo-list-item mdl-list">
+                        <li class="mdl-list__item" [ngClass]="{'is-active': activeDataSourceType === DataSourceType.HIVE}" (click)="activeDataSourceType = DataSourceType.HIVE">
+                            <span class="mdl-list__item-primary-content">HIVE</span>
+                            <a class="btn-default" href="#" (click)="addFilter($event, 'hive')"><i class="fa fa-filter"></i> ADD </a>
+                        </li>
+                        <li class="mdl-list__item" [ngClass]="{'is-active': activeDataSourceType === DataSourceType.HBASE}" (click)="activeDataSourceType = DataSourceType.HBASE">
+                            <span class="mdl-list__item-primary-content">HBASE</span>
+                            <a class="btn-default" href="#" (click)="addFilter($event, 'hbase')"><i class="fa fa-filter"></i> ADD </a>
+                        </li>
+                        <li class="mdl-list__item" [ngClass]="{'is-active': activeDataSourceType === DataSourceType.HDFS}" (click)="activeDataSourceType = DataSourceType.HDFS">
+                            <span class="mdl-list__item-primary-content">HDFS</span>
+                            <a class="btn-default" href="#" (click)="addFilter($event, 'hdfs')"><i class="fa fa-filter"></i> ADD </a>
+                        </li>
+                    </ul>
                 </div>
-            </form>
+            </div>
+            <div class="mdl-cell mdl-cell--10-col vertical-tab-content">
+                <div class="mdl-vertical-tabs__content-bar">
+                    <div *ngIf="activeDataSourceType === DataSourceType.HIVE">
+                        <div *ngFor="let hiveFilterWrapper of hiveFiltersWrapper" style="margin-bottom: 15px;">
+                            <data-plane-search [searchParamWrappers]="hiveSearchParamWrappers" (searchFilters)="doExecuteSearch($event, hiveFilterWrapper, 'hive')" [dataSource]="'hive'"> </data-plane-search>
+                            <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="hiveFilterWrapper.data.length > 0">
+                                <thead>
+                                <tr>
+                                    <th class="mdl-data-table__cell--non-numeric">NAME</th>
+                                    <th class="mdl-data-table__cell--non-numeric">OWNER</th>
+                                    <th class="mdl-data-table__cell--non-numeric">CREATE TIME</th>
+                                    <th class="mdl-data-table__cell--non-numeric">NUM OF ROWS</th>
+                                    <th class="mdl-data-table__cell--non-numeric">TABLE TYPE</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr *ngFor="let hiveTable of hiveFilterWrapper.data" (click)="doExecuteFetch(hiveTable.name, 'hive')" style="cursor:pointer;">
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.name }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.owner }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.createTime }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.parameters.numRows }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.tableType }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div *ngIf="activeDataSourceType === DataSourceType.HBASE">
+                        <div *ngFor="let hbaseFilterWrapper of hbaseFiltersWrapper">
+                            <data-plane-search [searchParamWrappers]="hbaseSearchParamWrappers" (searchFilters)="doExecuteSearch($event, hbaseFilterWrapper, 'hbase')" [dataSource]="'hbase'"> </data-plane-search>
+                            <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="hbaseFilterWrapper.data.length > 0">
+                                <thead>
+                                <tr>
+                                    <th class="mdl-data-table__cell--non-numeric">NAME</th>
+                                    <th class="mdl-data-table__cell--non-numeric">OWNER</th>
+                                    <th class="mdl-data-table__cell--non-numeric">CREATE TIME</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr *ngFor="let hbaseTable of hbaseFilterWrapper.data" (click)="doExecuteFetch(hbaseTable.name, 'hbase')" style="cursor:pointer;">
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hbaseTable.name }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hbaseTable.owner }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hbaseTable.$systemAttributes$.createdTime }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div *ngIf="activeDataSourceType === DataSourceType.HDFS">
+                        <div *ngFor="let hdfsFilterWrapper of hdfsFiltersWrapper">
+                            <data-plane-search [searchParamWrappers]="hdfsSearchParamWrappers"  (searchFilters)="doExecuteSearch($event, hdfsFilterWrapper, 'hdfs')" [dataSource]="'hdfs'"> </data-plane-search>
+                            <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="hdfsFilterWrapper.data.length > 0">
+                                <thead>
+                                <tr>
+                                    <th class="mdl-data-table__cell--non-numeric">NAME</th>
+                                    <th class="mdl-data-table__cell--non-numeric">OWNER</th>
+                                    <th class="mdl-data-table__cell--non-numeric">SIZE</th>
+                                    <th class="mdl-data-table__cell--non-numeric">URI</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr *ngFor="let hdfsTable of hdfsFilterWrapper.data" (click)="doExecuteFetch(hdfsTable.name, 'hdfs')" style="cursor:pointer;">
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hdfsTable.name }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hdfsTable.owner }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hdfsTable.size }}</td>
+                                    <td class="mdl-data-table__cell--non-numeric">{{ hdfsTable.uri }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
         </div>
 
-        <hive-data [search]="search" [hidden]="search.length === 0"> </hive-data>
+        <br/>
 
-        <div class="data-visualization" [hidden]="search.length === 0">
+        <div class="mdl-typography--font-light mt-1" style="display: flex" [hidden]="!search.resourceId">
+            <div style="display:flex;flex-grow: 1;">
+              <div class="mdl-typography--title mdl-typography--font-light" style="text-transform: capitalize;">
+                <span>{{search.resourceType}}</span>:
+              </div>
+              <div style="flex: 1; margin-left: 5px;">
+                <span class="mdl-typography--title  mdl-color-text--green">{{search.resourceId}}</span>
+                <br>
+                <div class="mdl-typography--caption">
+                  <span class="mdl-typography--text-uppercase">On-Prem: {{dataLakeName}}</span>
+                  <span class="mdl-typography--text-uppercase">({{clusterHost}})</span>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <br/>
+
+        <hive-data [search]="search" [hidden]="search.resourceType !== 'hive' || !search.resourceId" > </hive-data>
+
+        <div class="data-visualization" [hidden]="!search.resourceId">
             <h6> Lineage </h6>
             <atlas-lineage [search]="search" [dataSourceName]="dataSourceName" [hostName]="hostName"> </atlas-lineage>
 
