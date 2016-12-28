@@ -21,6 +21,9 @@ declare var Datamap:any;
 })
 export class ViewDataComponent implements OnInit, AfterViewInit {
     map: any;
+    pointsGroup: any;
+    arcsGroup: any;
+
     hostName: string;
     search: string = '';
     dataSourceName: string;
@@ -89,13 +92,6 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
             zoomControl: false
           });
 
-      // L
-      //   .tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      //     maxZoom: 18
-      //   })
-      //   .addTo(this.map)
-      //   .bringToBack();
-
       this.geographyService.getCountries()
         .subscribe(countrySet => {
           const baseLayer =
@@ -137,6 +133,8 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
     drawMap(policies: BackupPolicyInDetail[]) {
       // required to fix maps
       this.map.invalidateSize(true);
+      this.pointsGroup && this.map.removeLayer(this.pointsGroup);
+      this.arcsGroup && this.map.removeLayer(this.arcsGroup);
 
       if(policies.length === 0) {
         // do nothing and return
@@ -262,7 +260,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
           edges
             .filter(cEdge => cEdge.isArcDrawable)
             .map(cEdge => new L.Curve(
-              this.getCurveOffsetPoint(cEdge.source.position, cEdge.target.position),
+              this.getCurvePointWithOffset(cEdge.source.position, cEdge.target.position),
               {
                 color: 'rgb(50, 50, 50)',
                 weight: 1,
@@ -272,7 +270,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
               }
             ));
 
-        const pointsGroup =
+        this.pointsGroup =
           L
             .featureGroup(points)
             .addTo(this.map)
@@ -286,12 +284,12 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
                 });
             });
 
-        const arcsGroup =
+        this.arcsGroup =
           L
             .featureGroup(arcs)
             .addTo(this.map);
 
-        this.map.fitBounds(pointsGroup.getBounds(), { padding: L.point(20, 20) });
+        this.map.fitBounds(this.pointsGroup.getBounds(), { padding: L.point(20, 20) });
     }
 
     getClusterData() {
@@ -327,7 +325,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
         return false;
     }
 
-    getCurveOffsetPoint(pointA, pointB) {
+    getCurvePointWithOffset(pointA, pointB) {
       const cx = (pointA[0] + pointB[0]) / 2;
       const cy = (pointA[1] + pointB[1]) / 2;
       const dx = (pointB[0] - pointA[0]) / 2;
