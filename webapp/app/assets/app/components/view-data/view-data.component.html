@@ -159,11 +159,11 @@
 
         <br/>
 
-        <hive-data [search]="search" [hidden]="search.resourceType !== 'hive' || !search.resourceId" > </hive-data>
+        <hive-data [search]="search.resourceId" [hidden]="search.resourceType !== 'hive' || !search.resourceId" > </hive-data>
 
         <div class="data-visualization" [hidden]="!search.resourceId">
             <h6> Lineage </h6>
-            <atlas-lineage [search]="search" [dataSourceName]="dataSourceName" [hostName]="hostName"> </atlas-lineage>
+            <atlas-lineage [search]="search.resourceId" [dataSourceName]="dataSourceName" [hostName]="hostName"> </atlas-lineage>
 
             <h6> Replication</h6>
             <div class="mapcontainer-replication__wrapper" [class.mapcontainer-replication__wrapper--with-overlay]="backupPolicies.length === 0">
