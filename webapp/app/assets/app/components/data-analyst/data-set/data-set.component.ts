@@ -5,6 +5,7 @@ import {DataSet} from '../../../models/data-set';
 import {Environment} from '../../../environment';
 import {DataCenterService} from '../../../services/data-center.service';
 import {DataCenter} from '../../../models/data-center';
+import {Persona} from '../../../shared/utils/persona';
 
 @Component({
     selector: 'data-set',
@@ -12,6 +13,7 @@ import {DataCenter} from '../../../models/data-center';
     styleUrls: ['assets/app/components/data-analyst/data-set/data-set.component.css']
 })
 export class DataSetComponent implements OnInit {
+    persona = Persona;
 
     dataSets: DataSet[] = [];
     dataSetsMap: {[key: string]: DataSet[]} = {};

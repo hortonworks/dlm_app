@@ -39,9 +39,9 @@
                 </div>
                 <div class="mdl-card__actions mdl-card--border">
                     <div> <i class="fa fa-pencil-square-o" aria-hidden="true" (click)="viewDataSet(dataSet)"></i> </div>
-                    <div> <i class="fa fa-trash-o" aria-hidden="true"></i> </div>
-                    <div> <i class="fa fa-files-o" aria-hidden="true"></i> </div>
-                    <div> <i class="fa fa-cog" aria-hidden="true"></i> </div>
+                    <div> <i class="fa fa-trash-o" aria-hidden="true" *ngIf="[persona.INFRAADMIN].includes(environment.persona) === false"></i> </div>
+                    <div> <i class="fa fa-files-o" aria-hidden="true" *ngIf="[persona.INFRAADMIN].includes(environment.persona) === false"></i> </div>
+                    <div> <i class="fa fa-cog" aria-hidden="true" *ngIf="[persona.INFRAADMIN].includes(environment.persona) === false"></i> </div>
 
                 </div>
             </div>
