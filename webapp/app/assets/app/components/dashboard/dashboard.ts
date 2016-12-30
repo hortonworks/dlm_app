@@ -298,9 +298,9 @@ export default class DashboardComponent implements AfterViewInit, OnInit {
           .map(cArc => new L.Curve(
               this.getCurvePointWithOffset(cArc.start, cArc.stop),
               {
-                color: 'rgb(50, 50, 50)',
-                weight: 2,
-                dashArray: '5, 5',
+                color: '#ff4d04',
+                weight: 3,
+                dashArray: '5',
                 offset: 10,
                 vertices: 500,
                 animate: {duration: 3000, iterations: Infinity}
