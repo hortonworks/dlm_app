@@ -2,7 +2,7 @@
     <div class="mdl-layout-spacer"></div>
     <div class="mdl-cell mdl-cell--10-col">
         <div class="mdl-typography--headline mdl-typography--font-light mdl-color-text--green"> {{ dataSetName }} </div>
-        <p> Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+        <p> This page displays data related to dataset <strong>{{dataSetName}}</strong>.</p>
 
         <div class="mdl-grid mdl-grid--no-spacing info-panel">
             <div class="mdl-cell mdl-cell--3-col m-0 ">
@@ -61,6 +61,12 @@
                                     </tr>
                                     </tbody>
                                 </table>
+                                <div *ngIf="hiveFilterWrapper.data.length === 0" style="padding:15px;">
+                                  No results available yet.
+                                </div>
+                            </div>
+                            <div *ngIf="hiveFiltersWrapper.length === 0" style="padding:15px;">
+                              No results available yet.
                             </div>
                         </section>
                         <section *ngIf="(activeTab===tab.HBASE)" class="mdl-layout__tab-panel is-active">
@@ -82,6 +88,12 @@
                                     </tr>
                                     </tbody>
                                 </table>
+                                <div *ngIf="hbaseFilterWrapper.data.length === 0" style="padding:15px;">
+                                  No results available yet.
+                                </div>
+                            </div>
+                            <div *ngIf="hbaseFiltersWrapper.length === 0" style="padding:15px;">
+                              No results available yet.
                             </div>
                         </section>
                         <section *ngIf="(activeTab===tab.HDFS)" class="mdl-layout__tab-panel is-active">
@@ -105,6 +117,12 @@
                                     </tr>
                                     </tbody>
                                 </table>
+                                <div *ngIf="hdfsFilterWrapper.data.length === 0" style="padding:15px;">
+                                  No results available yet.
+                                </div>
+                            </div>
+                            <div *ngIf="hdfsFiltersWrapper.length === 0" style="padding:15px;">
+                              No results available yet.
                             </div>
                         </section>
                     </main>
