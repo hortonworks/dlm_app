@@ -16,7 +16,7 @@ declare var jQuery:any;
 })
 export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
 
-    guid: string = 'b43ebc85-f940-42be-81b1-e413e94b36aa';
+    guid: string;
     inputData: AtlasLineage;
     outputData: AtlasLineage;
     edgesAndvertices: {edges: {[key: string]: string[]}, vertices: {}};
@@ -46,7 +46,6 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
         this.outputState = false;
 
         this.atlasLineageService.getTable(this.hostName, this.dataSourceName, table).subscribe(table => {
-            console.log(table);
             this.guid = table['$id$']['id'];
             this.atlasLineageService.getLineage(this.hostName, this.dataSourceName , this.guid).subscribe(lineage => {
                 this.inputData = JSON.parse(lineage['inputs']);
@@ -65,15 +64,7 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
         let emptySvg = svg.cloneNode(false);
         parentElement.removeChild(svg);
         parentElement.appendChild(emptySvg);
-    }
 
-    ngOnChanges(changes: SimpleChanges) {
-        if (changes['search'] && changes['search'].currentValue) {
-            this.init(changes['search'].currentValue);
-        }
-    }
-
-    ngOnInit() {
         this.g = new dagreD3.graphlib.Graph()
             .setGraph({
                 nodesep: 50,
@@ -88,6 +79,16 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
             .setDefaultEdgeLabel(function() {
                 return {};
             });
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['search'] && changes['search'].currentValue) {
+          this.init(changes['search'].currentValue);
+        }
+    }
+
+    ngOnInit() {
+        //
     }
 
     generateData(inputData: AtlasLineage, type: string) {
