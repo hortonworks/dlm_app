@@ -1,7 +1,6 @@
 import {Component, OnInit, AfterViewInit, ElementRef, Input, SimpleChanges, OnChanges} from '@angular/core';
-import {AtlasLineageService} from '../../services/atlas-lineage.service';
 import {AtlasLineage} from '../../models/altas-lineage';
-import {AtlasEntityService} from '../../services/atlas-entity.service';
+import {AtlasService} from '../../services/atlas.service';
 import {Globals} from '../../shared/utils/globals';
 import {StringUtils} from '../../shared/utils/stringUtils';
 
@@ -31,8 +30,8 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
     @Input() dataSourceName: string;
     @Input() hostName: string;
 
-    constructor(private nativeElement: ElementRef, private atlasLineageService: AtlasLineageService,
-                private atlasEntityService: AtlasEntityService) {
+    constructor(private nativeElement: ElementRef,
+                private atlasService: AtlasService) {
         this.jqueryNativeElement = jQuery(this.nativeElement.nativeElement);
     }
 
@@ -45,9 +44,9 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
         };
         this.outputState = false;
 
-        this.atlasLineageService.getTable(this.hostName, this.dataSourceName, table).subscribe(table => {
+        this.atlasService.getTable(this.hostName, this.dataSourceName, table).subscribe(table => {
             this.guid = table['$id$']['id'];
-            this.atlasLineageService.getLineage(this.hostName, this.dataSourceName , this.guid).subscribe(lineage => {
+            this.atlasService.getLineage(this.hostName, this.dataSourceName , this.guid).subscribe(lineage => {
                 this.inputData = JSON.parse(lineage['inputs']);
                 this.generateData(this.inputData, 'input');
 
@@ -186,7 +185,7 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
 
     fetchLoadProcess(id: string) {
         ++this.asyncFetchCounter;
-        this.atlasEntityService.getLineage(this.hostName, this.dataSourceName , id).subscribe(data => {
+        this.atlasService.getEntity(this.hostName, this.dataSourceName , id).subscribe(data => {
             this.addValueInObject(data);
         });
     }

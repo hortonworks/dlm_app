@@ -1,14 +1,13 @@
 import {NgModule} from '@angular/core';
 
 import {AtlasLineageComponent}   from './atlas-lineage.component';
-import {AtlasLineageService} from '../../services/atlas-lineage.service';
-import {AtlasEntityService} from '../../services/atlas-entity.service';
+import {AtlasService} from '../../services/atlas.service';
 
 @NgModule({
     imports: [],
     exports: [AtlasLineageComponent],
     declarations: [AtlasLineageComponent],
-    providers: [AtlasLineageService, AtlasEntityService],
+    providers: [AtlasService],
 })
 export class AtlasLineageModule {
 }
