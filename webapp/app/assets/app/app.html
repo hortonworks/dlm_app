@@ -28,7 +28,7 @@
             <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/dashboard']">Dashboard</a>
             <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/cluster/add']" >Clusters</a>
 
-            <a *ngIf="[persona.ANALYSTADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['ui/data-analyst/analyst-dashboard']">Dataset</a>
+            <a *ngIf="[persona.ANALYSTADMIN, persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['ui/data-analyst/analyst-dashboard']">Dataset</a>
         </nav>
     </div>
 

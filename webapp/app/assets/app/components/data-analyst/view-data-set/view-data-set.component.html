@@ -1,9 +1,15 @@
 <div class="mdl-grid">
     <div class="mdl-layout-spacer"></div>
     <div class="mdl-cell mdl-cell--10-col">
+      <div style="position:relative">
         <div class="mdl-typography--headline mdl-typography--font-light mdl-color-text--green"> {{ dataSetName }} </div>
         <p> This page displays data related to dataset <strong>{{dataSetName}}</strong>.</p>
-
+        <div style="position: absolute;right:0;top:0;transform: translateY(-50%);height:0;display: flex;align-self: center;justify-content: center;" *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)">
+          <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green" (click)="doNavigateToBackupPolicySetup()">
+            <i class="fa fa-files-o" aria-hidden="true"></i> Setup Replication
+          </button>
+        </div>
+      </div>
         <div class="mdl-grid mdl-grid--no-spacing info-panel">
             <div class="mdl-cell mdl-cell--3-col m-0 ">
                 <label class="mdl-typography--caption"> Data Sources </label>
@@ -49,6 +55,8 @@
                                         <th class="mdl-data-table__cell--non-numeric">CREATE TIME</th>
                                         <th class="mdl-data-table__cell--non-numeric">NUM OF ROWS</th>
                                         <th class="mdl-data-table__cell--non-numeric">TABLE TYPE</th>
+                                        <th class="mdl-data-table__cell--non-numeric" *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)">REPLICATION</th>
+                                        <th class="mdl-data-table__cell--non-numeric" *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)">REPLICATION POLICIES</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -58,6 +66,13 @@
                                         <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.createTime }}</td>
                                         <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.parameters.numRows }}</td>
                                         <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.tableType }}</td>
+                                        <td class="mdl-data-table__cell--non-numeric" *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)">{{hiveTable.policies.length === 0 ? 'UNREPLICATED' : 'REPLICATED'}}</td>
+                                        <td class="mdl-data-table__cell--non-numeric" *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)">
+                                          <span *ngIf="hiveTable.policies.length === 0">-</span>
+                                          <div *ngFor="let cPolicy of hiveTable.policies">
+                                            {{cPolicy.label}}
+                                          </div>
+                                        </td>
                                     </tr>
                                     </tbody>
                                 </table>

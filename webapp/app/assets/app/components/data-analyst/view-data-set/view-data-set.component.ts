@@ -1,12 +1,15 @@
 import {Component, OnInit} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {DataSetService} from '../../../services/data-set.service';
+import {BackupPolicyService} from '../../../services/backup-policy.service';
 import {DataSet} from '../../../models/data-set';
 import {SearchQueryService} from '../../../services/search-query.service';
 import {SearchQuery} from '../../../models/search-query';
 import {DataFilterWrapper} from '../../../models/data-filter-wrapper';
 import {Environment} from '../../../environment';
 import {SearchParamWrapper} from '../../../shared/data-plane-search/search-param-wrapper';
+import {Persona} from '../../../shared/utils/persona';
+import Rx from 'rxjs/Rx';
 
 export enum Tab { HIVE, HBASE, HDFS}
 
@@ -17,6 +20,7 @@ export enum Tab { HIVE, HBASE, HDFS}
 })
 
 export class ViewDataSetComponent implements OnInit {
+    persona = Persona;
     tab = Tab;
     dataSetName: string;
     activeTab: Tab = Tab.HIVE;
@@ -32,6 +36,7 @@ export class ViewDataSetComponent implements OnInit {
     hdfsSearchParamWrappers: SearchParamWrapper[] = [];
 
     constructor(private activatedRoute: ActivatedRoute, private dataSetService: DataSetService, private environment: Environment,
+        private policyService: BackupPolicyService,
                 private searchQueryService: SearchQueryService,  private router: Router) {
         this.hiveSearchParamWrappers = environment.hiveSearchParamWrappers;
         this.hbaseSearchParamWrappers = environment.hbaseSearchParamWrappers;
@@ -44,7 +49,8 @@ export class ViewDataSetComponent implements OnInit {
             this.host = this.getParameterByName('host');
             this.dataCenter = this.getParameterByName('dataCenter');
 
-            this.dataSetService.getByName(this.dataSetName, this.host, this.dataCenter).subscribe((result:DataSet)=> {
+            this.dataSetService.getByName(this.dataSetName, this.host, this.dataCenter)
+            .subscribe((result:DataSet)=> {
                 this.dataSet = result;
                 this.hiveFiltersWrapper = result.hiveFilters.map(filter =>  DataFilterWrapper.createDataFilters(filter));
                 this.hbaseFiltersWrapper = result.hBaseFilters.map(filter => DataFilterWrapper.createDataFilters(filter));
@@ -65,9 +71,21 @@ export class ViewDataSetComponent implements OnInit {
             searchQuery.dataCenter = this.dataCenter;
             searchQuery.predicates = [datafilterWrapper.dataFilter];
 
-            this.searchQueryService.getData(searchQuery, dataSource).subscribe(tableResults => {
-                datafilterWrapper.data = tableResults;
-            });
+            this.searchQueryService.getData(searchQuery, dataSource)
+              .flatMap(tableResults => {
+                const rxTableResultsWithPolicies =
+                  tableResults
+                    .map(ctableResult => {
+                      return this.policyService.getByResource(ctableResult.name, 'hive')
+                        .map(policies => Object.assign({}, ctableResult, {
+                          policies
+                        }));
+                    });
+                return Rx.Observable.forkJoin(rxTableResultsWithPolicies);
+              })
+              .subscribe(tableResults => {
+                  datafilterWrapper.data = tableResults;
+              });
         }
     }
 
@@ -125,6 +143,18 @@ export class ViewDataSetComponent implements OnInit {
               host: this.host,
               resourceId: resourceId,
               resourceType: resourceType,
+            }
+        });
+    }
+
+    doNavigateToBackupPolicySetup() {
+      this.router.navigate(['/ui/backup-policy'], {
+            queryParams : {
+              create: '',
+              cluster: this.host,
+              dataCenter: this.dataCenter,
+              resourceId: this.dataSetName,
+              resourceType: 'DataSet'
             }
         });
     }
