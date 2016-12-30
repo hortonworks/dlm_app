@@ -22,6 +22,7 @@ import {SearchParamWrapper} from '../../shared/data-plane-search/search-param-wr
 
 declare var Datamap:any;
 declare var d3:any;
+declare var moment: any;
 
 enum DataSourceType {
   HIVE,
@@ -117,6 +118,8 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
         stop: string
       }
     } = {
+      scheduleType: '',
+      frequency: '',
       duration: {
         start: this.nowDate,
         stop: ''
@@ -188,7 +191,12 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
           .do(
             policy => {
               this.mode = 'EDIT';
-              // TODO
+
+              this.label = policy.label;
+              this.source = policy.source;
+              this.target = policy.target;
+              this.status = policy.status;
+              this.schedule = policy.schedule;
             }
           );
 
@@ -447,6 +455,10 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
       // TODO: confirm if policies need to be created on data sets or individual resources
       this.source.resourceId = resourceId;
       this.source.resourceType = resourceType;
+    }
+
+    doGetMoment(time: string) {
+      return moment(time).fromNow();
     }
 
 }

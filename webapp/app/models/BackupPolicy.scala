@@ -24,7 +24,7 @@ case class SourceInDetail(dataCenter: DataCenter, cluster: Ambari, resourceId: S
 
 case class TargetInDetail(dataCenter: DataCenter, cluster: Ambari)
 
-case class BackupPolicyInDetail(label: String, source: SourceInDetail, target: TargetInDetail, status: Status)
+case class BackupPolicyInDetail(label: String, source: SourceInDetail, target: TargetInDetail, status: Status, schedule: Schedule)
 
 
 object BackupPolicyFormatters {

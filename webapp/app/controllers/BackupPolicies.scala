@@ -143,7 +143,8 @@ class BackupPolicies @Inject()(
         policy.label,
         SourceInDetail(sourceDataCenter.get, sourceCluster.get, policy.source.resourceId, policy.source.resourceType),
         TargetInDetail(targetDataCenter.get, targetCluster.get),
-        policy.status
+        policy.status,
+        policy.schedule
       )
     }
   }
