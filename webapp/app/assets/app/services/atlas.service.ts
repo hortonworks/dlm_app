@@ -14,18 +14,23 @@ export class AtlasService {
     constructor(private http:Http) {
     }
 
-    public getEntity(host: string, dcName: string, guid: string):Observable<AtlasEntity> {
-        return this.http.get(this.url + '/entity?clusterHost='+host+'&dc='+dcName+'&guid='+guid , new RequestOptions(HttpUtil.getHeaders()))
-            .map(HttpUtil.extractData).catch(HttpUtil.handleError);
-    }
-
-    public getTable(host: string, dcName: string, tableName: string):Observable<{}> {
+    public getTable(host: string, dcName: string, tableName: string):Observable<any> {
         return this.http.get(this.url + '/table?clusterHost='+host+'&dc='+dcName+'&table='+tableName+'&cached=true', new RequestOptions(HttpUtil.getHeaders()))
             .map(HttpUtil.extractData).catch(HttpUtil.handleError);
     }
 
-    public getLineage(host: string, dcName: string, guid: string):Observable<DataCenter[]> {
+    public getEntity(host: string, dcName: string, guid: string):Observable<any> {
+        return this.http.get(this.url + '/entity?clusterHost='+host+'&dc='+dcName+'&guid='+guid , new RequestOptions(HttpUtil.getHeaders()))
+            .map(HttpUtil.extractData).catch(HttpUtil.handleError);
+    }
+
+    public getLineage(host: string, dcName: string, guid: string):Observable<any> {
         return this.http.get(this.url + '/lineage?clusterHost='+host+'&dc='+dcName+'&guid='+guid , new RequestOptions(HttpUtil.getHeaders()))
+            .map(HttpUtil.extractData).catch(HttpUtil.handleError);
+    }
+
+    public getAudit(host: string, dcName: string, guid: string):Observable<any> {
+        return this.http.get(this.url + '/audit?clusterHost='+host+'&dc='+dcName+'&guid='+guid , new RequestOptions(HttpUtil.getHeaders()))
             .map(HttpUtil.extractData).catch(HttpUtil.handleError);
     }
 }

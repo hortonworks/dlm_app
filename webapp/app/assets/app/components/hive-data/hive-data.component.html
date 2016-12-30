@@ -16,18 +16,10 @@
                     <div class="page-content">
                         <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
                             <tbody>
-                                <tr> <td class="mdl-data-table__cell--non-numeric"> aliases	</td> <td class="mdl-data-table__cell--non-numeric">  null </td></tr>
-                                <tr> <td class="mdl-data-table__cell--non-numeric"> tableType </td> <td class="mdl-data-table__cell--non-numeric">  	MANAGED_TABLE </td></tr>
-                                <tr> <td class="mdl-data-table__cell--non-numeric"> name	</td> <td class="mdl-data-table__cell--non-numeric">   new_ctas </td></tr>
-                                <tr> <td class="mdl-data-table__cell--non-numeric"> viewExpandedText	</td> <td class="mdl-data-table__cell--non-numeric">  null </td></tr>
-                                <tr> <td class="mdl-data-table__cell--non-numeric"> createTime	</td> <td class="mdl-data-table__cell--non-numeric">   Wed Nov 30 2016 16:04:28 GMT+0530 (IST) </td></tr>
-                                <tr> <td class="mdl-data-table__cell--non-numeric"> description	</td> <td class="mdl-data-table__cell--non-numeric">   null </td></tr>
-                                <tr> <td class="mdl-data-table__cell--non-numeric"> temporary	</td> <td class="mdl-data-table__cell--non-numeric">  false</tr>
-                                <tr> <td class="mdl-data-table__cell--non-numeric"> db </td> <td class="mdl-data-table__cell--non-numeric">  default </td></tr>
-                                <tr> <td class="mdl-data-table__cell--non-numeric"> viewOriginalText	</td> <td class="mdl-data-table__cell--non-numeric">  null </td></tr>
-                                <tr> <td class="mdl-data-table__cell--non-numeric"> retention	</td> <td class="mdl-data-table__cell--non-numeric">   Thu Jan 01 1970 05:30:00 GMT+0530 (IST) </td></tr>
-                                <tr> <td class="mdl-data-table__cell--non-numeric"> qualifiedName	</td> <td class="mdl-data-table__cell--non-numeric">   default.new_ctas@Vimal_Fenton_New </td></tr>
-                                <tr> <td class="mdl-data-table__cell--non-numeric"> columns </td> <td class="mdl-data-table__cell--non-numeric">  id, name </td></tr>
+                                <tr *ngFor="let cProperty of properties">
+                                  <td class="mdl-data-table__cell--non-numeric">{{cProperty.key}}</td>
+                                  <td class="mdl-data-table__cell--non-numeric">{{cProperty.value ? cProperty.value : '-'}}</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -43,6 +35,11 @@
                             </tr>
                             </thead>
                             <tbody>
+                              <tr *ngFor="let cTag of tags">
+                                <td class="mdl-data-table__cell--non-numeric">{{cTag.typeName}}</td>
+                                <td class="mdl-data-table__cell--non-numeric">{{cTag.attributes ? cTag.attributes : '-'}}</td>
+                                <td class="mdl-data-table__cell--non-numeric">{{cTag.tool ? cTag.tool : '-'}}</td>
+                              </tr>
                             </tbody>
                         </table>
                     </div>
@@ -51,18 +48,22 @@
                     <div class="page-content">
                         <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
                             <thead>
-                            <tr>
+                              <tr>
                                 <th class="mdl-data-table__cell--non-numeric">Users</th>
                                 <th class="mdl-data-table__cell--non-numeric">Timestamp</th>
                                 <th class="mdl-data-table__cell--non-numeric">Actions</th>
                                 <th class="mdl-data-table__cell--non-numeric">Tools</th>
-                            </tr>
+                              </tr>
                             </thead>
                             <tbody>
-                                <tr> <td class="mdl-data-table__cell--non-numeric"> hive </td>	<td class="mdl-data-table__cell--non-numeric"> Wed Nov 30 2016 16:56:43 GMT+0530 (IST)</td>	<td class="mdl-data-table__cell--non-numeric">	Entity Updated</td>	<td class="mdl-data-table__cell--non-numeric">	Detail </td> </tr>
-                                <tr> <td class="mdl-data-table__cell--non-numeric"> hive </td>	<td class="mdl-data-table__cell--non-numeric"> Wed Nov 30 2016 16:56:42 GMT+0530 (IST)</td>	<td class="mdl-data-table__cell--non-numeric">	Entity Updated</td>	<td class="mdl-data-table__cell--non-numeric">	Detail </td> </tr>
-                                <tr> <td class="mdl-data-table__cell--non-numeric"> hive </td>	<td class="mdl-data-table__cell--non-numeric"> Wed Nov 30 2016 16:04:31 GMT+0530 (IST)</td>	<td class="mdl-data-table__cell--non-numeric">	Entity Updated</td>	<td class="mdl-data-table__cell--non-numeric">	Detail </td> </tr>
-                                <tr> <td class="mdl-data-table__cell--non-numeric"> hive </td>	<td class="mdl-data-table__cell--non-numeric"> Wed Nov 30 2016 16:04:31 GMT+0530 (IST)</td>	<td class="mdl-data-table__cell--non-numeric">	Entity Created</td>	<td class="mdl-data-table__cell--non-numeric">	Detail </td> </tr>
+                              <tr *ngFor="let cAuditEntry of auditEvents">
+                                <td class="mdl-data-table__cell--non-numeric">{{cAuditEntry.user}}</td>
+                                <td class="mdl-data-table__cell--non-numeric">{{doGetMomentFromTimestamp(cAuditEntry.timestamp)}}</td>
+                                <td class="mdl-data-table__cell--non-numeric">{{cAuditEntry.action}}</td>
+                                <td class="mdl-data-table__cell--non-numeric">
+                                  <span [title]="cAuditEntry.details" style="text-decoration: underline; cursor: pointer;">Details</span>
+                                </td>
+                              </tr>
                             </tbody>
                         </table>
                     </div>
@@ -72,24 +73,20 @@
                         <div class="dataplane-screen-section mdl-typography--text-center">
                             <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
                                 <thead>
-                                <tr>
-                                    <th class="" style="width:5px" ></th>
-                                    <th class="mdl-data-table__cell--non-numeric">NAME</th>
-                                    <th class="mdl-data-table__cell--non-numeric">OWNER</th>
-                                    <th class="mdl-data-table__cell--non-numeric">TYPE</th>
-                                    <th class="mdl-data-table__cell--non-numeric">TAGS</th>
-                                </tr>
+                                  <tr>
+                                      <th class="mdl-data-table__cell--non-numeric">NAME</th>
+                                      <th class="mdl-data-table__cell--non-numeric">OWNER</th>
+                                      <th class="mdl-data-table__cell--non-numeric">TYPE</th>
+                                      <th class="mdl-data-table__cell--non-numeric">TAGS</th>
+                                  </tr>
                                 </thead>
                                 <tbody>
-                                <tr *ngFor="let schema of schemaData">
-                                    <td class="">
-                                        <input type="checkbox">
-                                    </td>
-                                    <td class="mdl-data-table__cell--non-numeric">{{ schema.name }}</td>
-                                    <td class="mdl-data-table__cell--non-numeric">{{ schema.owner }}</td>
-                                    <td class="mdl-data-table__cell--non-numeric">{{ schema.type }}</td>
-                                    <td class="mdl-data-table__cell--non-numeric">{{ schema.tags }}</td>
-                                </tr>
+                                  <tr *ngFor="let cColumn of schema">
+                                      <td class="mdl-data-table__cell--non-numeric">{{ cColumn.name }}</td>
+                                      <td class="mdl-data-table__cell--non-numeric">{{ cColumn.owner }}</td>
+                                      <td class="mdl-data-table__cell--non-numeric">{{ cColumn.type }}</td>
+                                      <td class="mdl-data-table__cell--non-numeric">{{ cColumn.tags }}</td>
+                                  </tr>
                                 </tbody>
                             </table>
                         </div>
