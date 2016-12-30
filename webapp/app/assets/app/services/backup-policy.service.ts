@@ -47,5 +47,11 @@ export class BackupPolicyService {
           .catch(HttpUtil.handleError);
     }
 
+    public  getByDataCenter(dataCenterId: string):Observable<BackupPolicyInDetail[]> {
+        return this.http
+          .get(`${this.url}?dataCenterId=${dataCenterId}` , new RequestOptions(HttpUtil.getHeaders()))
+          .map(HttpUtil.extractData)
+          .catch(HttpUtil.handleError);
+    }
 
 }

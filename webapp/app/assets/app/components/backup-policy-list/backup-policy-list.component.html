@@ -1,0 +1,41 @@
+<div>
+  <div class="mdl-grid mdl-grid--no-spacing cluster-title">
+      <div class="mdl-cell mdl-cell--2-col">
+        <h4 class="thin">Policies </h4>
+      </div>
+  </div>
+
+  <div class="mdl-grid mdl-grid--no-spacing table">
+    <div class="mdl-cell mdl-cell--12-col">
+      <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="policies.length > 0">
+        <thead>
+          <tr>
+            <th class="mdl-data-table__cell--non-numeric">NAME</th>
+            <th class="mdl-data-table__cell--non-numeric">SOURCE CLUSTER</th>
+            <th class="mdl-data-table__cell--non-numeric">TARGET DATALAKE</th>
+            <th class="mdl-data-table__cell--non-numeric">TARGET CLUSTER</th>
+            <th class="mdl-data-table__cell--non-numeric">RESOURCE</th>
+            <th class="mdl-data-table__cell--non-numeric">RESOURCE TYPE</th>
+            <th class="mdl-data-table__cell--non-numeric">STATUS</th>
+            <th class="mdl-data-table__cell--non-numeric">SINCE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cPolicy of policies" (click)="doEditPolicy(cPolicy.label)">
+            <td class="mdl-data-table__cell--non-numeric">{{cPolicy.label}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{cPolicy.source.cluster.host}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{cPolicy.target.dataCenter.name}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{cPolicy.target.cluster.host}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{cPolicy.source.resourceId}} </td>
+            <td class="mdl-data-table__cell--non-numeric">{{cPolicy.source.resourceType}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{cPolicy.status.isEnabled}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{cPolicy.status.since | date:'short'}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="policies.length === 0">
+        No policies available
+      </div>
+    </div>
+  </div>
+</div>

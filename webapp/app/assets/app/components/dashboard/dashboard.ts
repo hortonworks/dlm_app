@@ -267,14 +267,16 @@ export default class DashboardComponent implements AfterViewInit, OnInit {
       const arcMap =
         policies
           .reduce((accumulator, cPolicy) => {
-            const arcKey = `${cPolicy.source.dataCenter.name}#${cPolicy.target.dataCenter.name}`;
+            const arcKey = `${cPolicy.source.dataCenter.name}#DELIMITER#${cPolicy.target.dataCenter.name}`;
+
             if(!(arcKey in accumulator)) {
               const start = CityNames.getLocation(cPolicy.source.dataCenter.location.country, cPolicy.source.dataCenter.location.place);
               const stop =  CityNames.getLocation(cPolicy.target.dataCenter.location.country, cPolicy.target.dataCenter.location.place);
+
               accumulator[arcKey] = {
                 start,
                 stop,
-                policies: []
+                policies: [],
               };
             }
 
@@ -289,7 +291,7 @@ export default class DashboardComponent implements AfterViewInit, OnInit {
           .map(cArc => Object.assign({}, cArc, {
             template: '<div>'
               + cArc.policies.reduce((accumulator, cPolicy) => (
-                `<li>${cPolicy.source.cluster.host} -> ${cPolicy.target.cluster.host}: ${cPolicy.source.resourceType}: ${cPolicy.source.resourceId}</li>`
+                accumulator + `<li>${cPolicy.source.cluster.host} -> ${cPolicy.target.cluster.host}: ${cPolicy.source.resourceType}: ${cPolicy.source.resourceId}</li>`
                 ), '')
               + '</div>'
           }))
@@ -321,7 +323,7 @@ export default class DashboardComponent implements AfterViewInit, OnInit {
             });
     }
 
-    getCurvePointWithOffset(pointA, pointB) {
+    getCurvePointWithOffset(pointA: number, pointB: number) {
       const cx = (pointA[0] + pointB[0]) / 2;
       const cy = (pointA[1] + pointB[1]) / 2;
       const dx = (pointB[0] - pointA[0]) / 2;
