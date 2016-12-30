@@ -52,6 +52,7 @@ export class HiveDataComponent implements OnChanges {
 
       const rxTable =
         this.rxResource
+          .filter(resource => Boolean(resource.resourceId && resource.resourceType))
           .flatMap(resource => atlasService.getTable(this.clusterId, this.dataLakeId, resource.resourceId));
 
       rxTable
@@ -96,7 +97,6 @@ export class HiveDataComponent implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
-
       if(changes['dataLakeId'] && changes['dataLakeId'].currentValue) {
         this.dataLakeId = changes['dataLakeId'].currentValue;
 
@@ -109,11 +109,11 @@ export class HiveDataComponent implements OnChanges {
 
       if (
         changes['resourceId'] && changes['resourceId'].currentValue
-        && changes['resourceType'] && changes['resourceType'].currentValue
+        || changes['resourceType'] && changes['resourceType'].currentValue
       ) {
         this.rxResource.next({
-          resourceId: changes['resourceId'].currentValue,
-          resourceType: changes['resourceType'].currentValue,
+          resourceId: this.resourceId,
+          resourceType: this.resourceType,
         });
       }
     }

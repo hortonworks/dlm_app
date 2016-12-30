@@ -88,12 +88,11 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
       private searchQueryService: SearchQueryService,
     ) {
 
-      const rxSearchAction =
         this.rxSearch
-          .do(search => this.search = search);
+          .subscribe(search => this.search = search);
 
       const rxBackupPolicies =
-        rxSearchAction
+        this.rxSearch
           .flatMap(search => this.policyService.getByResource(search.resourceId, search.resourceType));
 
       rxBackupPolicies
@@ -125,6 +124,8 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
               });
           }
       });
+
+      this.map && this.map.remove();
 
       this.map =
         new L

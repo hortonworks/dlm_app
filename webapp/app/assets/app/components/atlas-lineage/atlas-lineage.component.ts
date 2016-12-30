@@ -461,6 +461,6 @@ export class AtlasLineageComponent implements OnInit, AfterViewInit, OnChanges {
     }
 
     ngAfterViewInit() {
-        this.createGraph(this.edgesAndvertices, this.startingPoint);
+        // this.createGraph(this.edgesAndvertices, this.startingPoint);
     }
 }
