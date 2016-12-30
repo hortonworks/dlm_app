@@ -382,7 +382,11 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
 
     doCancel() {
       if(this.source && this.source.dataCenter.name && this.source.cluster) {
-        this.router.navigate([`/ui/view-data/${this.source.dataCenter.name}?host=${this.source.cluster.host}`]);
+        this.router.navigate([`/ui/view-data/${this.source.dataCenter.name}`], {
+            queryParams : {
+              host: this.source.cluster.host
+            }
+        });
         return;
       }
       if(this.source && this.source.dataCenter.name) {

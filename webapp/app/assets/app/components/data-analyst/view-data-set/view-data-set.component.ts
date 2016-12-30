@@ -118,4 +118,14 @@ export class ViewDataSetComponent implements OnInit {
         this.activeTab = activeTab;
         $event.preventDefault();
     }
+
+    doNavigateToDetails(resourceId: string, resourceType: string) {
+      this.router.navigate([`/ui/view-data/${this.dataCenter}`], {
+            queryParams : {
+              host: this.host,
+              resourceId: resourceId,
+              resourceType: resourceType,
+            }
+        });
+    }
 }

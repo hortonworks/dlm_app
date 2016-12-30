@@ -52,7 +52,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr *ngFor="let hiveTable of hiveFilterWrapper.data">
+                                    <tr *ngFor="let hiveTable of hiveFilterWrapper.data" (click)="doNavigateToDetails(hiveTable.name, 'hive')" style="cursor:pointer">
                                         <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.name }}</td>
                                         <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.owner }}</td>
                                         <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.createTime }}</td>
