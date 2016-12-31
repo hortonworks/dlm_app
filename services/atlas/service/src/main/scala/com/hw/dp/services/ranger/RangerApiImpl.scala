@@ -90,8 +90,12 @@ class RangerApiImpl(actorSystem: ActorSystem,
     }
   }
 
-  override def getRangerAuditLogs: Future[JsValue] = {
-    makeGetRequest(configuration.underlying.getString("solr.audit.log.query"))
+  override def getRangerAuditLogs(resourceType:String,resourceId:String): Future[JsValue] = {
+    Logger.info(s"Requesting audit logs for ${resourceType} - ${resourceId}")
+    val query = configuration.underlying.getString("solr.audit.log.query")
+    val solrQuery = query.replace("#resource_name#",resourceId)
+    Logger.info(s"Requesting data from Solr - $solrQuery")
+    makeGetRequest(solrQuery)
   }
 
   override def getTopAccessTypes: Future[JsValue] = {

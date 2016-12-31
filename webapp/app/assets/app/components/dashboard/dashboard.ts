@@ -91,11 +91,11 @@ export default class DashboardComponent implements AfterViewInit, OnInit {
             center: [0, 0],
             zoom: 1,
             // minZoom: 1,
-            maxZoom: 5,
+            maxZoom: 4,
             // interaction options
             dragging: false,
             touchZoom: false,
-            scrollWheelZoom: false,
+            scrollWheelZoom: true,
             doubleClickZoom: false,
             boxZoom: false,
             // control options

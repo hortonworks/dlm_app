@@ -134,7 +134,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
             center: [0, 0],
             zoom: 1,
             // minZoom: 1,
-            maxZoom: 5,
+            maxZoom: 3,
             // interaction options
             dragging: false,
             touchZoom: false,

@@ -38,9 +38,9 @@ class RangerAudit @Inject()(@Named("atlasApiCache") val atlasApiCache: ActorRef,
    }.recoverWith(ise)
   }
 
-  def getAuditLog(clusterHost: String, datacenter: String) = Authenticated.async {
+  def getAuditLog(clusterHost: String, datacenter: String,resourceType:String,resourceId:String) = Authenticated.async {
     getApi(clusterHost,datacenter).flatMap{ api =>
-      api.getRangerAuditLogs.map { res =>
+      api.getRangerAuditLogs(resourceType,resourceId).map { res =>
         Ok(res)
       }
     }.recoverWith(ise)

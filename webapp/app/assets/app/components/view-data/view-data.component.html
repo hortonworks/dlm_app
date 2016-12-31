@@ -187,8 +187,8 @@
               <div id="mapcontainer-replication__map" class="dataplane-be-together-section mdl-typography--text-center dotted" style="overflow:hidden"> </div>
             </div>
 
-            <h6> Policies </h6>
-            <ranger-policies [search]="search"> </ranger-policies>
+            <h6> Audit </h6>
+            <ranger-policies [resourceId]="search.resourceId" [resourceType]="search.resourceType" [dataLakeId]="dataLakeName" [clusterId]="clusterHost" > </ranger-policies>
 
         </div>
 
