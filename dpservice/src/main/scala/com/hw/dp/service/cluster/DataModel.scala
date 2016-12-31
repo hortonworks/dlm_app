@@ -11,7 +11,8 @@ object DataModel {
                      hiveFilters: Seq[DataFilter],
                      hBaseFilters :Seq[DataFilter],
                      fileFilters:Seq[DataFilter],
-                     properties: Map[String, String])
+                     properties: Map[String, String],
+                     userName:Option[String] = None)
   // for Hive
   //path - field/column/column_attribute
   case class DataFilter(predicate: String, qualifier: String = "field")
