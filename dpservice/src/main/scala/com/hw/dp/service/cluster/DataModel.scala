@@ -15,7 +15,7 @@ object DataModel {
                      fileFilters:Seq[DataFilter],
                      properties: Map[String, String],
                      userName:Option[String] = None,
-                     lastModified:Date = new Date())
+                     lastModified:Option[Date] = Some(new Date()))
   // for Hive
   //path - field/column/column_attribute
   case class DataFilter(predicate: String, qualifier: String = "field")

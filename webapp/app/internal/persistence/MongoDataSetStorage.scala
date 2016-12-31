@@ -1,5 +1,7 @@
 package internal.persistence
 
+import java.util.Date
+
 import com.google.inject.{Inject, Singleton}
 import com.hw.dp.service.cluster.DataModel.DataSet
 import play.api.libs.json.Json
@@ -53,7 +55,10 @@ class MongoDataSetStorage @Inject()(val mongoDriver: MongoDriver,
         "fileFilters" -> dataSet.fileFilters,
         "hiveFilters" -> dataSet.hiveFilters,
         "hBaseFilters" -> dataSet.hBaseFilters,
-        "properties" -> dataSet.properties))
+        "properties" -> dataSet.properties,"userName"->{
+          if(dataSet.userName.isDefined)
+            dataSet.userName.get
+          else ""},"lastModified"->new Date()))
     val dataSets: Future[JSONCollection] =
       connection.database(dbName).map(_.collection("dataSets"))
     dataSets.flatMap(_.update(selector, modifier))
