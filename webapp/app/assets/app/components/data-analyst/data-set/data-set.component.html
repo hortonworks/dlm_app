@@ -1,52 +1,60 @@
-<div class="mdl-grid">
-    <div class="mdl-layout-spacer"></div>
-    <div class="mdl-cell mdl-cell--10-col">
-
-        <div class="mdl-grid mdl-grid--no-spacing">
-            <div class="mdl-cell mdl-cell--8-col">
-                <div class="mdl-color-text--green title">
-                    <span class="fa-stack fa-lg" aria-hidden="true">
-                        <i class="fa fa-database fa-stack-1x fa-2x" style="margin-left: 20px;margin-top: -26px;"></i>
-                        <i class="fa fa-database fa-stack-1x fa-2x"></i>
-                        <i class="fa fa-database fa-stack-1x fa-2x" style="margin-left: 34px;"></i>
-                    </span>
-                    <span class="mdl-typography--headline mdl-typography--font-light text mdl-color-text--black">Data Sets</span>
-                </div>
-            </div>
-            <div class="mdl-layout-spacer"></div>
-            <div class="mdl-cell mdl-cell--1-col">
-                <button class="mdl-button mdl-js-button mdl-button--raised pull-right add-button" (click)="onAddDataSet()">Add&nbsp;Data&nbsp;Set</button>
-            </div>
+<div class="mdl-grid mdl-grid--no-spacing">
+    <div class="mdl-cell mdl-cell--2-col nav">
+        <div class="title">
+            <span aria-hidden="true" class="fa-stack fa-lg">
+                <i class="fa fa-database fa-stack-1x fa-2x"></i>
+                <i class="fa fa-database fa-stack-1x fa-2x"></i>
+            </span>
+            <span class="mdl-typography--headline mdl-typography--font-light text"> DATA SET </span>
         </div>
 
-
-        <div class="search">
-            <input type="text" class="form-control" placeholder="Search" aria-describedby="basic-addon2">
-            <i class="fa fa-search" aria-hidden="true"></i>
-        </div>
-
-
-        <div class="card-pane" *ngFor="let category of getDataSetCategorys()">
-            <h2 class="mdl-typography--title mdl-typography--font-light mdl-color-text--green"> {{ category }} | {{ dataSetsMap[category].length }} </h2>
-            <div *ngFor="let dataSet of dataSetsMap[category]"  class="mdl-card mdl-shadow--4dp">
-                <div class="mdl-card__title">
-                    <h2 class="mdl-card__title-text"> {{ dataSet.name }}</h2>
-                </div>
-                <div class="mdl-card__supporting-text">
-                    Object Count:   <b> <span class="chip-grey"> {{ getObjectCount(dataSet) }} </span> </b> <br>
-                    Data Sources:   {{ getDataSources(dataSet) }} <br>
-                    Last Updated:   {{ getLastUpdated(dataSet) }} <br> <br>
-                </div>
-                <div class="mdl-card__actions mdl-card--border">
-                    <div> <i class="fa fa-pencil-square-o" aria-hidden="true" (click)="viewDataSet(dataSet)"></i> </div>
-                    <div> <i class="fa fa-trash-o" aria-hidden="true" *ngIf="[persona.INFRAADMIN].includes(environment.persona) === false"></i> </div>
-                    <div> <i class="fa fa-files-o" aria-hidden="true" *ngIf="[persona.INFRAADMIN].includes(environment.persona) === false"></i> </div>
-                    <div> <i class="fa fa-cog" aria-hidden="true" *ngIf="[persona.INFRAADMIN].includes(environment.persona) === false"></i> </div>
-
-                </div>
+        <div class="demo-list-action mdl-list">
+            <div class="mdl-list__item" *ngFor="let key of getDataSetCategorys()" (click)="setSelectedCategory(key)" [ngClass]="{'is-active': selectedCategory === key}">
+                <span class="mdl-list__item-primary-content">
+                  <span>{{ key }}</span>
+                </span>
+                <a class="mdl-list__item-secondary-action" href="#"> {{ dataSetsMap[key].length }} </a>
             </div>
         </div>
 
     </div>
-    <div class="mdl-layout-spacer"></div>
+    <div class="mdl-cell mdl-cell--10-col content">
+        <div class="actions">
+            <span> <input type="text" placeholder="Search"> </span>
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored pull-right" (click)="onAddDataSet()">
+                New Data Set
+            </button>
+        </div>
+        <div class="card-pane">
+            <h2 class="mdl-typography--title mdl-typography--font-light"> {{ selectedCategory }} | {{ dataSetsMap[selectedCategory].length }} </h2>
+            <div *ngFor="let dataSet of dataSetsMap[selectedCategory]"  class="mdl-card mdl-shadow--4dp" (click)="viewDataSet(dataSet)">
+                <div class="mdl-card__title">
+                    <div class="title-text"> {{ dataSet.name }}</div>
+                </div>
+                <div class="mdl-card__supporting-text">
+                    CREATED BY:  {{ dataSet.userName }} <br>
+                    LAST UPDATED: {{ dataSet.lastModified }} <br>
+                </div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <div>
+                        HIVE <br>
+                        {{ dataSet['hiveCount'] }}
+                    </div>
+                    <div>
+                        HBASE <br>
+                        {{ dataSet['hbaseCount'] }}
+                    </div>
+                    <div>
+                        FILES <br>
+                        {{ dataSet['hdfsCount'] }}
+                    </div>
+                </div>
+                <div class="mdl-card__menu">
+                    <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" data-upgraded=",MaterialButton,MaterialRipple">
+                        <i class="fa fa-cog" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -7,6 +7,8 @@ export class DataSet {
     dataCenter: string;
     description: string;
     permissions: string;
+    userName: string;
+    lastModified: string;
     hiveFilters: DataFilter[] = [];
     hBaseFilters: DataFilter[] = [];
     fileFilters: DataFilter[] = [];

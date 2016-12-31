@@ -52,6 +52,9 @@ export class ViewDataSetComponent implements OnInit {
             this.dataSetService.getByName(this.dataSetName, this.host, this.dataCenter)
             .subscribe((result:DataSet)=> {
                 this.dataSet = result;
+                this.dataSet['hiveCount'] = 0;
+                this.dataSet['hbaseCount'] = 0;
+                this.dataSet['hdfsCount'] = 0;
                 this.hiveFiltersWrapper = result.hiveFilters.map(filter =>  DataFilterWrapper.createDataFilters(filter));
                 this.hbaseFiltersWrapper = result.hBaseFilters.map(filter => DataFilterWrapper.createDataFilters(filter));
                 this.hdfsFiltersWrapper = result.fileFilters.map(filter => DataFilterWrapper.createDataFilters(filter));
@@ -85,6 +88,7 @@ export class ViewDataSetComponent implements OnInit {
               })
               .subscribe(tableResults => {
                   datafilterWrapper.data = tableResults;
+                  this.dataSet[dataSource+'Count'] += tableResults.length;
               });
         }
     }

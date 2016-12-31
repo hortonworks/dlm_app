@@ -9,24 +9,33 @@
 
 .mdl-layout__header-row .mdl-navigation__link {
   color: #858784;
-  font-weight: bold;
   font-size: 0.9em;
   cursor: pointer;
 }
 .hive-pane {
   border: 1px solid #cccccc;
   border-radius: 2px;
+  min-height: calc(100vh - 170px);
 }
 .hive-pane nav .is-active {
-  background: #EFEFEF;
+  background: #ffffff;
   margin-bottom: -1px;
-  border-top: 1px solid #cccccc;
   border-left: 1px solid #cccccc;
   border-right: 1px solid #cccccc;
+  border-bottom: 1px solid #ffffff;
+}
+.hive-pane nav .is-active:first-child {
+  border-left: none;
 }
 .hive-pane th {
   background: #EFEFEF;
 }
 .page-content {
   padding: 10px;
+}
+
+
+.title-text {
+  color: #F07273;
+  font-size: 24px;
 }

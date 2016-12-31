@@ -6,6 +6,9 @@ import {Environment} from '../../../environment';
 import {DataCenterService} from '../../../services/data-center.service';
 import {DataCenter} from '../../../models/data-center';
 import {Persona} from '../../../shared/utils/persona';
+import {SearchQueryService} from '../../../services/search-query.service';
+import {SearchQuery} from '../../../models/search-query';
+import {DataFilter} from '../../../models/data-filter';
 
 @Component({
     selector: 'data-set',
@@ -15,14 +18,17 @@ import {Persona} from '../../../shared/utils/persona';
 export class DataSetComponent implements OnInit {
     persona = Persona;
 
+    ALL = 'All';
     dataSets: DataSet[] = [];
-    dataSetsMap: {[key: string]: DataSet[]} = {};
+    dataSetsMapKeys: string[] = [];
+    dataSetsMap: {[key: string]: DataSet[]} = {'All': []};
+    selectedCategory = this.ALL;
 
     constructor(private dataSetService: DataSetService, private router: Router, private dataCenterService: DataCenterService,
-                private environment: Environment) {}
+                private searchQueryService: SearchQueryService, private environment: Environment) {}
 
     ngOnInit() {
-
+        // replace this with merge map
         this.dataCenterService.get().subscribe((dataCenters: DataCenter[]) => {
             this.getDataCenterDetails(dataCenters);
         });
@@ -53,47 +59,49 @@ export class DataSetComponent implements OnInit {
                        if (!this.dataSetsMap[dataSet.category]) {
                            this.dataSetsMap[dataSet.category] = [];
                        }
+                       if (!this.dataSetsMap[this.ALL]) {
+                           this.dataSetsMap[this.ALL] = [];
+                       }
                        this.dataSetsMap[dataSet.category].push(dataSet);
+                       this.dataSetsMap[this.ALL].push(dataSet);
+                       this.getDataCount(dataSet);
                    }
                });
            }
         });
     }
 
+    getDataCount(dataSet: DataSet) {
+        let searchQuery = new SearchQuery();
+        searchQuery.clusterHost = dataSet.ambariHost;
+        searchQuery.dataCenter = dataSet.dataCenter;
+        searchQuery.predicates = dataSet.hiveFilters;
+
+        this.searchQueryService.getData(searchQuery, 'hive').subscribe((result: any[]) => {
+            dataSet['hiveCount'] = result.length;
+        });
+
+        searchQuery.predicates = dataSet.hBaseFilters;
+        this.searchQueryService.getData(searchQuery, 'hbase').subscribe((result: any[]) => {
+            dataSet['hbaseCount'] = result.length;
+        });
+
+        searchQuery.predicates = dataSet.fileFilters;
+        this.searchQueryService.getData(searchQuery, 'hdfs').subscribe((result: any[]) => {
+            dataSet['hdfsCount'] = result.length;
+        });
+    }
+    setSelectedCategory(category: string) {
+        this.selectedCategory = category;
+    }
+
     getDataSetCategorys(): string[] {
-        return Object.keys(this.dataSetsMap);
-    }
-
-    getDataSources(dataSet: DataSet) {
-        let dataSources: string[] = [];
-
-        if (dataSet.hiveFilters.length > 0) {
-            dataSources.push('HIVE');
-        }
-        if (dataSet.hBaseFilters.length > 0) {
-            dataSources.push('HBASE');
-        }
-        if (dataSet.fileFilters.length > 0) {
-            dataSources.push('HDFS');
+        let keys = Object.keys(this.dataSetsMap).sort().filter(value=> value !== this.ALL);
+        if (keys.length > 0) {
+            keys.unshift(this.ALL);
         }
 
-        return dataSources;
-    }
-
-    // getText(dataSet: DataSet): string {
-    //     return 'Data Sources: ' + this.getDataSources(dataSet) + '<br>' +
-    //            'Last Updated: ' + this.getLastUpdated() + '<br>' +
-    //            'Object Count: ' + this.getObjectCount() + '<br>';
-    // }
-
-    getObjectCount() {
-        return '100';
-        // return Math.floor((Math.random() * 1000) + 1);
-    }
-
-    getLastUpdated() {
-        return 'date ... ';
-        // return new Date(new Date().getTime() - (Math.random() * 1000000)).toUTCString();
+        return keys;
     }
 
     onAddDataSet() {
