@@ -47,7 +47,8 @@ class DataSets @Inject()(dataSetStorage: DataSetStorage)
 
   def create = Authenticated.async(parse.json) { req =>
     req.body.validate[DataSet].map { ds =>
-      dataSetStorage.saveDataSet(ds).map { wr =>
+      val toSave = DataSet.withUser(ds,req.user.username)
+      dataSetStorage.saveDataSet(toSave).map { wr =>
         if (wr.ok)
           Ok(JsonResponses.statusOk)
         else
