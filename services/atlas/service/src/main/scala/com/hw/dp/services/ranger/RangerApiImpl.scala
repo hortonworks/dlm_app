@@ -78,8 +78,12 @@ class RangerApiImpl(actorSystem: ActorSystem,
 
   }
 
-  override def getTopUsers: Future[JsValue] = {
-    makeGetRequest(configuration.underlying.getString("solr.top.users.query"))
+  override def getTopUsers(resourceType:String,resourceId:String): Future[JsValue] = {
+    val userQueryTemplate = configuration.underlying.getString("solr.hive.top.users.query")
+    val solrQueryTemp = userQueryTemplate.replace("#resource_name#",resourceId)
+    val solrQuery = solrQueryTemp.replace("#cluster#",cluster.name)
+    Logger.info(s"Requesting data from Solr - $solrQuery")
+    makeGetRequest(solrQuery)
   }
 
   import scala.concurrent.duration._
@@ -92,13 +96,14 @@ class RangerApiImpl(actorSystem: ActorSystem,
 
   override def getRangerAuditLogs(resourceType:String,resourceId:String): Future[JsValue] = {
     Logger.info(s"Requesting audit logs for ${resourceType} - ${resourceId}")
-    val query = configuration.underlying.getString("solr.audit.log.query")
-    val solrQuery = query.replace("#resource_name#",resourceId)
+    val query = configuration.underlying.getString("solr.hive.audit.log.query")
+    val solrQueryTemp = query.replace("#resource_name#",resourceId)
+    val solrQuery = solrQueryTemp.replace("#cluster#",cluster.name)
     Logger.info(s"Requesting data from Solr - $solrQuery")
     makeGetRequest(solrQuery)
   }
 
   override def getTopAccessTypes: Future[JsValue] = {
-    makeGetRequest(configuration.underlying.getString("solr.access.types.query"))
+    makeGetRequest(configuration.underlying.getString("solr.hive.access.types.query"))
   }
 }

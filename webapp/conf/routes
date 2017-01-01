@@ -48,9 +48,8 @@ GET         /api/datacenters/hdfs/entity           controllers.AtlasHdfs.getEnti
 GET         /api/datacenters/hdfs/audit            controllers.AtlasHdfs.getAudit(clusterHost,dc,guid)
 
 #Ranger
-GET         /api/ranger/users                      controllers.RangerAudit.getTopUsers(clusterHost,dc)
+GET         /api/ranger/users                      controllers.RangerAudit.getTopUsers(clusterHost,dc,rt,r)
 GET         /api/ranger/audit                      controllers.RangerAudit.getAuditLog(clusterHost,dc,rt,r)
-GET         /api/ranger/access                     controllers.RangerAudit.getTopAccessTypes(clusterHost,dc)
 
 
 
