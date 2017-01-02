@@ -132,9 +132,8 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
       private dcService: DataCenterService,
       private ambariService: AmbariService,
       private policyService: BackupPolicyService,
-
       private environment: Environment,
-      private searchQueryService: SearchQueryService,
+      private searchQueryService: SearchQueryService
     ) {
 
       this.hiveSearchParamWrappers = environment.hiveSearchParamWrappers;

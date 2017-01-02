@@ -9,6 +9,7 @@ import {BackupPolicyInDetail} from '../../models/backup-policy';
 import {CityNames} from '../../common/utils/city-names';
 import {DataCenterDetails} from '../../models/data-center-details';
 import {MathUtils} from '../../shared/utils/mathUtils';
+import {BreadcrumbService} from '../../services/breadcrumb.service';
 
 declare var Datamap:any;
 declare const L: any;
@@ -71,7 +72,7 @@ const FILL_CODES = {
     styleUrls: ['assets/app/components/dashboard/dashboard.css'],
     templateUrl: 'assets/app/components/dashboard/dashboard.html'
 })
-export default class DashboardComponent implements AfterViewInit, OnInit {
+export class DashboardComponent implements AfterViewInit, OnInit {
     map: any;
     dashboardRows: DashboardRow[] = [];
 
@@ -79,7 +80,8 @@ export default class DashboardComponent implements AfterViewInit, OnInit {
       private router: Router,
       private dataCenterService: DataCenterService,
       private geographyService: GeographyService,
-      private bpService: BackupPolicyService
+      private bpService: BackupPolicyService,
+      private breadcrumbService: BreadcrumbService
     ) {}
 
     ngAfterViewInit() {

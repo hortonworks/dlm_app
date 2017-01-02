@@ -6,7 +6,7 @@ import {BackupPolicyListModule} from '../backup-policy-list/backup-policy-list.m
 
 @NgModule ({
     declarations: [ ViewClusterComponent ],
-    imports: [ SharedModule, BreadcrumbModule, BackupPolicyListModule ]
+    imports: [ SharedModule, BreadcrumbModule, BackupPolicyListModule ],
 })
 
 export class ViewClusterModule {

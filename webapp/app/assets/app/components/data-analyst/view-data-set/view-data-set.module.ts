@@ -6,9 +6,10 @@ import {routing} from './view-data-set.route';
 import {DataPlaneSearchModule} from '../../../shared/data-plane-search/data-plane-search.modue';
 import {SearchQueryService} from '../../../services/search-query.service';
 import {BackupPolicyService} from '../../../services/backup-policy.service';
+import {BreadcrumbModule} from '../../../shared/breadcrumb/breadcrumb.module';
 
 @NgModule({
-    imports: [SharedModule, routing, DataPlaneSearchModule],
+    imports: [SharedModule, routing, DataPlaneSearchModule, BreadcrumbModule],
     exports: [ViewDataSetComponent],
     declarations: [ViewDataSetComponent],
     providers: [SearchQueryService, BackupPolicyService],
