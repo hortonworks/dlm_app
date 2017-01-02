@@ -9,8 +9,15 @@
 
 .mdl-layout__header-row .mdl-navigation__link {
   color: #858784;
-  font-size: 0.9em;
+  font-size: 12px;
   cursor: pointer;
+}
+.mdl-navigation__link {
+  line-height: 1;
+  text-align: center;
+  vertical-align: middle;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 .hive-pane {
   border: 1px solid #cccccc;
