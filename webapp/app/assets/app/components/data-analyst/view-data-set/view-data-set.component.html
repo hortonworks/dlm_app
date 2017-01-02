@@ -19,7 +19,7 @@
                             <nav class="mdl-navigation">
                                 <div class="mdl-navigation__link" (click)="setActiveTab($event, tab.HIVE)" [ngClass]="{'is-active': (activeTab===tab.HIVE)}">HIVE <b> ({{ dataSet['hiveCount'] }}) </b> </div>
                                 <div class="mdl-navigation__link" (click)="setActiveTab($event, tab.HBASE)" [ngClass]="{'is-active': (activeTab===tab.HBASE)}">HBASE <b> ({{ dataSet['hbaseCount'] }}) </b> </div>
-                                <div class="mdl-navigation__link" (click)="setActiveTab($event, tab.HDFS)" [ngClass]="{'is-active': (activeTab===tab.HDFS)}">HDFS <b> ({{ dataSet['hdfsCount'] }}) </b> </div>
+                                <div class="mdl-navigation__link" (click)="setActiveTab($event, tab.HDFS)" [ngClass]="{'is-active': (activeTab===tab.HDFS)}">Files <b> ({{ dataSet['hdfsCount'] }}) </b> </div>
                             </nav>
                         </div>
                     </header>
