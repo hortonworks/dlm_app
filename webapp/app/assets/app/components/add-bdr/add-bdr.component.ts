@@ -389,7 +389,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
         return;
       }
       if(this.source && this.source.dataCenter.name) {
-        this.router.navigate([`/ui/view-cluster/${this.source.dataCenter.name}`]);
+        this.router.navigate([`/ui/data-lake/${this.source.dataCenter.name}`]);
         return;
       }
       this.router.navigate(['/ui/dashboard']);

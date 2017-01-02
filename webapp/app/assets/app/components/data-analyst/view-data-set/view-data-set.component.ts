@@ -39,6 +39,8 @@ export class ViewDataSetComponent implements OnInit {
     hbaseFilterResults: any[] = [];
     hdfsFilterResults: any[] = [];
 
+    showAutoConfigured= false;
+
 
     constructor(private activatedRoute: ActivatedRoute, private dataSetService: DataSetService, private environment: Environment,
         private policyService: BackupPolicyService,
@@ -50,24 +52,28 @@ export class ViewDataSetComponent implements OnInit {
 
     ngOnInit() {
         this.activatedRoute.params.subscribe(params => {
-            this.dataSetName = params['id'].split('?')[0];
+            this.dataSetName = decodeURIComponent(decodeURIComponent(params['id'].split('?')[0]));
             this.host = this.getParameterByName('host');
             this.dataCenter = this.getParameterByName('dataCenter');
 
-            this.dataSetService.getByName(this.dataSetName, this.host, this.dataCenter)
-            .subscribe((result:DataSet)=> {
-                this.dataSet = result;
-                this.dataSet['hiveCount'] = 0;
-                this.dataSet['hbaseCount'] = 0;
-                this.dataSet['hdfsCount'] = 0;
-                this.hiveFiltersWrapper = result.hiveFilters.map(filter =>  DataFilterWrapper.createDataFilters(filter));
-                this.hbaseFiltersWrapper = result.hBaseFilters.map(filter => DataFilterWrapper.createDataFilters(filter));
-                this.hdfsFiltersWrapper = result.fileFilters.map(filter => DataFilterWrapper.createDataFilters(filter));
+            this.showAutoConfigured = this.dataSetName === 'Storage Metrics' || this.dataSetName === 'Business Processes';
 
-                this.fetchData(this.hiveFiltersWrapper, 'hive');
-                this.fetchData(this.hbaseFiltersWrapper, 'hbase');
-                this.fetchData(this.hdfsFiltersWrapper, 'hdfs');
-            });
+            if (!this.showAutoConfigured) {
+                this.dataSetService.getByName(this.dataSetName, this.host, this.dataCenter)
+                .subscribe((result:DataSet)=> {
+                    this.dataSet = result;
+                    this.dataSet['hiveCount'] = 0;
+                    this.dataSet['hbaseCount'] = 0;
+                    this.dataSet['hdfsCount'] = 0;
+                    this.hiveFiltersWrapper = result.hiveFilters.map(filter =>  DataFilterWrapper.createDataFilters(filter));
+                    this.hbaseFiltersWrapper = result.hBaseFilters.map(filter => DataFilterWrapper.createDataFilters(filter));
+                    this.hdfsFiltersWrapper = result.fileFilters.map(filter => DataFilterWrapper.createDataFilters(filter));
+
+                    this.fetchData(this.hiveFiltersWrapper, 'hive');
+                    this.fetchData(this.hbaseFiltersWrapper, 'hbase');
+                    this.fetchData(this.hdfsFiltersWrapper, 'hdfs');
+                });
+            }
         });
 
     }
@@ -113,21 +119,20 @@ export class ViewDataSetComponent implements OnInit {
     addFilterAndSearch($event, dataSource: string) {
 
         let tFilterWrappers: DataFilterWrapper[] = [];
-        let newFilter = DataFilterWrapper.createDataFilters($event);
+        let newSearchParams = $event.map(filter =>  DataFilterWrapper.createDataFilters(filter));
+
         if (dataSource === 'hive') {
             tFilterWrappers = this.hiveFiltersWrapper.slice();
-            tFilterWrappers.push(newFilter);
         }
 
         if (dataSource === 'hbase') {
             tFilterWrappers = this.hbaseFiltersWrapper.slice();
-            tFilterWrappers.push(newFilter);
         }
 
         if (dataSource === 'hdfs') {
             tFilterWrappers = this.hdfsFiltersWrapper.slice();
-            tFilterWrappers.push(newFilter);
         }
+        tFilterWrappers = tFilterWrappers.concat(newSearchParams);
 
         this.fetchData(tFilterWrappers, dataSource);
     }
