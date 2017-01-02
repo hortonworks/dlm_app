@@ -409,4 +409,9 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
 
       return false;
     }
+
+    doSelectResourceAndContinue(resourceId, resourceType) {
+      this.rxSearch
+        .next({resourceId, resourceType});
+    }
 }
