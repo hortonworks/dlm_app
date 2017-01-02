@@ -316,10 +316,10 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
             .addTo(this.map)
             .eachLayer(cLayer => {
               cLayer
-                .on('mouseover', () => {
+                .on('mouseover', function(this:any) {
                   this.openPopup();
                 })
-                .on('mouseout', () => {
+                .on('mouseout', function(this:any) {
                   this.closePopup();
                 });
             });
@@ -394,7 +394,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
       searchQuery.dataCenter = this.dataLakeName;
       searchQuery.clusterHost = this.clusterHost;
       searchQuery.predicates = [{
-        'predicate': `r.name == '${searchKey}'`,
+        'predicate': `r.name.indexOf(\'${searchKey}\') !== -1`,
         'qualifier': 'field'
       }];
 
