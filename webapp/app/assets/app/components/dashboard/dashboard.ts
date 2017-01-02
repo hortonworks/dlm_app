@@ -97,7 +97,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
             // interaction options
             dragging: false,
             touchZoom: false,
-            scrollWheelZoom: true,
+            scrollWheelZoom: false,
             doubleClickZoom: false,
             boxZoom: false,
             // control options
@@ -250,8 +250,10 @@ export class DashboardComponent implements AfterViewInit, OnInit {
               .on('mouseout', function(this: any, e) {
                 this.closePopup();
               })
+              .on('click', e => {
+                this.doNavigateToDataCenter(cLayer.options.dataCenterId);
+              })
               .on('contextmenu', e => {
-
                 const popup = L.popup().setLatLng(e.latlng).setContent(`<a href="/ui/backup-policy?create&dataCenter=${cLayer.options.dataCenterId}">Create policy</a>`);
                 popup.openOn(this.map);
               });
@@ -261,8 +263,8 @@ export class DashboardComponent implements AfterViewInit, OnInit {
 
     }
 
-    onDataCenterSelect(dataCenter: DataCenter) {
-        this.router.navigate(['/ui/view-cluster/' + dataCenter.name]);
+    doNavigateToDataCenter(dataCenterId: string) {
+      this.router.navigate([`/ui/view-cluster/${dataCenterId}`]);
     }
 
     plotBackupPolicies(policies: BackupPolicyInDetail[]) {

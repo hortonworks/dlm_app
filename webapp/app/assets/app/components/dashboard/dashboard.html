@@ -33,7 +33,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let dashboardRow of dashboardRows" (click)="onDataCenterSelect(dashboardRow.dataCenter)">
+        <tr *ngFor="let dashboardRow of dashboardRows" (click)="doNavigateToDataCenter(dashboardRow.dataCenter.name)" style="cursor: pointer">
             <td class="">
                 <i class="fa fa-circle" aria-hidden="true" [ngClass]="{'green-text': dashboardRow.hostStatus === 'HEALTHY', 'red-text' : dashboardRow.hostStatus === 'UNHEALTHY', 'grey-text': dashboardRow.hostStatus === ''}"></i>
             </td>

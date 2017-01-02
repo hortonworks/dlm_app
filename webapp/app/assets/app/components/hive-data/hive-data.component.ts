@@ -129,7 +129,7 @@ export class HiveDataComponent implements OnChanges {
 
     drawMap(location) {
       this.map = new Datamap({
-        element: document.getElementById('mapcontainer'),
+        element: document.getElementById('mapcontainer-hive'),
         height: 273,
         width: 385,
         projection: 'mercator',
