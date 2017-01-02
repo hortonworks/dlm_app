@@ -23,12 +23,6 @@ import {SearchParamWrapper} from '../../shared/data-plane-search/search-param-wr
 declare const L:any;
 declare var Datamap:any;
 
-enum DataSourceType {
-  HIVE,
-  HDFS,
-  HBASE
-}
-
 @Component({
     selector: 'view-data',
     templateUrl: 'assets/app/components/view-data/view-data.component.html',
@@ -41,7 +35,11 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
     map: any;
     pointsGroup: any;
     arcsGroup: any;
+
     isSearchInProgress: boolean = false;
+    isSearchComplete: boolean = false;
+    searchResults: any[] = [];
+    searchKey: string = '';
 
     search: {
       resourceId: string,
@@ -50,16 +48,6 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
       resourceId: '',
       resourceType: 'hive'
     };
-    DataSourceType = DataSourceType;
-    activeDataSourceType: DataSourceType = DataSourceType.HIVE;
-
-    hiveSearchParamWrappers: SearchParamWrapper[] = [];
-    hbaseSearchParamWrappers: SearchParamWrapper[] = [];
-    hdfsSearchParamWrappers: SearchParamWrapper[] = [];
-    hiveFiltersWrapper: DataFilterWrapper[] = [new DataFilterWrapper(new DataFilter())];
-    hbaseFiltersWrapper: DataFilterWrapper[] = [new DataFilterWrapper(new DataFilter())];
-    hdfsFiltersWrapper: DataFilterWrapper[] = [new DataFilterWrapper(new DataFilter())];
-
 
     clusterHost: string;
     dataLakeName: string;
@@ -97,13 +85,10 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
           .flatMap(search => this.policyService.getByResource(search.resourceId, search.resourceType));
 
       rxBackupPolicies
-        .do(policies => this.backupPolicies = policies)
-        .do(policies => this.drawMap(policies))
-        .subscribe(() => {/****/});
-
-      this.hiveSearchParamWrappers = environment.hiveSearchParamWrappers;
-      this.hbaseSearchParamWrappers = environment.hbaseSearchParamWrappers;
-      this.hdfsSearchParamWrappers = environment.hdfsSearchParamWrappers;
+        .subscribe(policies => {
+          this.backupPolicies = policies;
+          this.drawMap(policies);
+        });
 
     }
 
@@ -348,9 +333,9 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
     }
 
     getClusterData() {
-        this.clusterService.getByName(this.dataLakeName).subscribe(cluster => {
-            this.cluster = cluster;
-        });
+      this.clusterService.getByName(this.dataLakeName).subscribe(cluster => {
+          this.cluster = cluster;
+      });
     }
 
     doExecuteFetch(resourceId: string, resourceType: string) {
@@ -402,33 +387,26 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
       ]);
     }
 
-    doExecuteSearch($event, dataFilterWrapper: DataFilterWrapper, dataSourceType: string) {
+    doExecuteSearch() {
+      const searchKey = this.searchKey;
+
       let searchQuery = new SearchQuery();
       searchQuery.dataCenter = this.dataLakeName;
       searchQuery.clusterHost = this.clusterHost;
-      searchQuery.predicates = $event;
+      searchQuery.predicates = [{
+        'predicate': `r.name == '${searchKey}'`,
+        'qualifier': 'field'
+      }];
 
       this.isSearchInProgress = true;
-      this.searchQueryService.getData(searchQuery, dataSourceType)
+      this.searchQueryService.getData(searchQuery, 'hive')
         .subscribe(result => {
           this.isSearchInProgress = false;
+          this.isSearchComplete = true;
 
-          dataFilterWrapper.data = result;
+          this.searchResults = result;
         });
-    }
 
-    addFilter($event, type: string) {
-
-        $event.preventDefault();
-
-        if (type === 'hive') {
-            this.hiveFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
-        }
-        if (type === 'hbase') {
-            this.hbaseFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
-        }
-        if (type === 'hdfs') {
-            this.hdfsFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
-        }
+      return false;
     }
 }
