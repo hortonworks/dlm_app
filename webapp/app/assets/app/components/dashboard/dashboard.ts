@@ -313,9 +313,41 @@ export class DashboardComponent implements AfterViewInit, OnInit {
               closeButton: false
             }));
 
+      const selfArcs =
+        Object
+          .keys(arcMap)
+          .filter(cArcKey => {
+            const dcs = cArcKey.split('#DELIMITER#');
+            return dcs[0] === dcs[1];
+          })
+          .map(cArcKey => arcMap[cArcKey])
+          .map(cArc => Object.assign({}, cArc, {
+            template: '<div>'
+              + cArc.policies.reduce((accumulator, cPolicy) => (
+                accumulator + `<li>${cPolicy.source.cluster.host} -> ${cPolicy.target.cluster.host}: ${cPolicy.source.resourceType}: ${cPolicy.source.resourceId}</li>`
+                ), '')
+              + '</div>'
+          }))
+          .map(cArc => {
+            const dcMarker =
+              L
+                .circleMarker(cArc.start, {
+                  radius: 15,
+                  fillColor: '#ff4d04',
+                  color: '#ff4d04',
+                  weight: 3,
+                  fillOpacity: 0.8,
+                  dataCenterId: cArc.dataCenterId
+                })
+                .bindPopup(cArc.template, {
+                  closeButton: false
+                });
+              return dcMarker;
+          });
+
         const arcGroup =
           L
-            .featureGroup(arcs)
+            .featureGroup([...arcs, ...selfArcs])
             .addTo(this.map)
             .eachLayer(cLayer => {
               cLayer
