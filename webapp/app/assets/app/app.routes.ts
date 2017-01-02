@@ -11,7 +11,7 @@ export const routes = [
     { path: 'ui', component: LoginComponent,canActivate:[AlreadyLoggedInGuard]},
     { path: 'ui/login', component: LoginComponent,canActivate:[AlreadyLoggedInGuard]},
     { path: 'ui/logout', component: LogoutComponent},
-    { path: 'ui/view-cluster/:id', component: ViewClusterComponent},
+    { path: 'ui/data-lake/:id', component: ViewClusterComponent},
     { path: 'ui/dashboard', loadChildren: 'assets/app/components/dashboard/dashboard.module#DashboardModule', canActivate: [LoggedInGuard]},
     { path: 'ui/cluster/add', loadChildren: 'assets/app/components/add-cluster/add-cluster.module#AddClusterModule', canActivate: [LoggedInGuard]},
     { path: 'ui/view-data', loadChildren: 'assets/app/components/view-data/view-data.module#ViewDataModule', canActivate: [LoggedInGuard]},

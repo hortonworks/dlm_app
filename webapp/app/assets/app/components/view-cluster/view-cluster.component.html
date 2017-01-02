@@ -1,16 +1,10 @@
 <div class="mdl-grid">
-    <div class="mdl-layout-spacer"></div>
-    <div class="mdl-cell mdl-cell--10-col">
+    <div class="mdl-cell mdl-cell--12-col">
         <bread-crumb [crumbMap]="breadCrumbMap"> </bread-crumb>
 
-        <div class="mdl-grid mdl-grid--no-spacing legend">
-            <div class="mdl-cell mdl-cell--2-col"><h4 class="thin"> {{ dataCenterName }} </h4></div>
-
-            <div class="mdl-layout-spacer"></div>
-
-            <div class="mdl-cell mdl-cell--1-col mdl-typography--text-right"> <i class="fa fa-square" aria-hidden="true" style="color:#42A7C9"></i> Data Plane </div>
-            <div class="mdl-cell mdl-cell--2-col mdl-typography--text-right"> <i class="fa fa-square" aria-hidden="true" style="color:#FFBC0B"></i> Compute and Storage </div>
-            <div class="mdl-cell mdl-cell--1-col mdl-typography--text-right"> <i class="fa fa-square" aria-hidden="true" style="color:#676966"></i> Compute </div>
+        <div class="mdl-grid mdl-grid--no-spacing data-title">
+            <div class="mdl-cell mdl-cell--3-col mdl-typography--text-left"> DATA PLANE <br> GOVERNANACE & SECURITY</div>
+            <div class="mdl-cell mdl-cell--9-col mdl-typography--text-left"> DATA LAKE <br> STORAGE </div>
         </div>
 
         <div class="mdl-grid mdl-grid--no-spacing cluster-title">
@@ -19,14 +13,8 @@
             <div class="mdl-layout-spacer"></div>
 
             <div class="mdl-cell mdl-cell--5-col mdl-typography--text-right">
-                <button class="mdl-button mdl-js-button mdl-button--raised actions-button">Action</button>
-                <button class="mdl-button mdl-js-button mdl-button--raised create-cluster">Create Cluster</button>
+                <button class="mdl-button mdl-js-button mdl-button--raised create-cluster" (click)="createCluster()">Create Cluster</button>
             </div>
-        </div>
-
-        <div class="mdl-grid mdl-grid--no-spacing data-title">
-            <div class="mdl-cell mdl-cell--3-col mdl-typography--text-left"> DATA PLANE <br> GOVERNANACE & SECURITY</div>
-            <div class="mdl-cell mdl-cell--9-col mdl-typography--text-left"> DATA LAKE <br> STORAGE </div>
         </div>
 
         <div class="mdl-grid mdl-grid--no-spacing table">
@@ -41,7 +29,6 @@
                         <th class="mdl-data-table__cell--non-numeric">JOBS</th>
                         <th class="mdl-data-table__cell--non-numeric">NODES</th>
                         <th class="mdl-data-table__cell--non-numeric">UP TIME</th>
-                        <th class="mdl-data-table__cell--non-numeric">COST</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -53,7 +40,6 @@
                             <td class="mdl-data-table__cell--non-numeric"> - </td>
                             <td class="mdl-data-table__cell--non-numeric"> {{ getNodes(nameNodeInfo.ambariHost) }} </td>
                             <td class="mdl-data-table__cell--non-numeric"> {{ getUpTime(nameNodeInfo) }} </td>
-                            <td class="mdl-data-table__cell--non-numeric"> - </td>
                         </tr>
                     </tbody>
                 </table>
@@ -63,6 +49,5 @@
         <backup-policy-list [dataCenterId]="dataCenterName"></backup-policy-list>
 
     </div>
-    <div class="mdl-layout-spacer"></div>
 </div>
 

@@ -74,4 +74,8 @@ export default class ViewClusterComponent implements OnInit {
         };
         this.router.navigate(['ui/view-data/' + this.dataCenterName], navigationExtras);
     }
+
+    createCluster() {
+        this.router.navigate(['ui/cluster/add']);
+    }
 }

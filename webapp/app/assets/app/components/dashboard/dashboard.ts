@@ -264,7 +264,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
     }
 
     doNavigateToDataCenter(dataCenterId: string) {
-      this.router.navigate([`/ui/view-cluster/${dataCenterId}`]);
+      this.router.navigate([`/ui/data-lake/${dataCenterId}`]);
     }
 
     plotBackupPolicies(policies: BackupPolicyInDetail[]) {

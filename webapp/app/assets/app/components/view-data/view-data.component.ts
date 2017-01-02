@@ -74,7 +74,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
       private geographyService: GeographyService,
 
       private environment: Environment,
-      private searchQueryService: SearchQueryService,
+      private searchQueryService: SearchQueryService
     ) {
 
         this.rxSearch
@@ -316,10 +316,10 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
             .addTo(this.map)
             .eachLayer(cLayer => {
               cLayer
-                .on('mouseover', function (this: any, e) {
+                .on('mouseover', () => {
                   this.openPopup();
                 })
-                .on('mouseout', function (this: any, e) {
+                .on('mouseout', () => {
                   this.closePopup();
                 });
             });

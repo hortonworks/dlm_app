@@ -43,13 +43,16 @@ export class BreadcrumbComponent {
             this.breadcrumbService.crumbMap.push({'url': url, 'name': 'Dashboard'});
         } else if (url.indexOf('/ui/view-data') === 0) {
             this.breadcrumbService.crumbMap.push({'url': url, 'name': 'Host: ' + url.split('/')[3].split('?')[0]});
-        } else if (url.indexOf('/ui/view-cluster') === 0) {
+        } else if (url.indexOf('/ui/data-lake') === 0) {
             this.breadcrumbService.crumbMap.push({'url': url, 'name': 'Data Lake: ' + url.split('/')[3].split('?')[0]});
         } else if (url.indexOf('/ui/data-analyst/dataset/add') === 0) {
             this.breadcrumbService.crumbMap.push({'url': url, 'name': 'Add Data Set'});
         } else if (url.indexOf('/ui/data-analyst/dataset/view/') === 0) {
             this.breadcrumbService.crumbMap.push({'url': url, 'name': 'Data Set: ' + url.split('/')[5].split('?')[0]});
+        } else if (url.indexOf('/ui/cluster/add') === 0) {
+            this.breadcrumbService.crumbMap.push({'url': url, 'name': 'Add Cluster'});
         }
+
     }
 
     decode(crumbName): string {
