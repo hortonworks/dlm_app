@@ -57,7 +57,7 @@
                             <a class="btn-default" href="#" (click)="addFilter($event, 'hbase')"><i class="fa fa-filter"></i> ADD </a>
                         </li>
                         <li class="mdl-list__item" [ngClass]="{'is-active': activeDataSourceType === DataSourceType.HDFS}" (click)="activeDataSourceType = DataSourceType.HDFS">
-                            <span class="mdl-list__item-primary-content">HDFS</span>
+                            <span class="mdl-list__item-primary-content">Files</span>
                             <a class="btn-default" href="#" (click)="addFilter($event, 'hdfs')"><i class="fa fa-filter"></i> ADD </a>
                         </li>
                     </ul>
@@ -188,7 +188,7 @@
             </div>
 
             <h6> Audit </h6>
-            <ranger-policies [resourceId]="search.resourceId" [resourceType]="search.resourceType" [dataLakeId]="dataLakeName" [clusterId]="clusterHost" > </ranger-policies>
+            <ranger-policies [resourceId]="search.resourceId" [resourceType]="search.resourceType" [dataLakeId]="dataLakeName" [clusterId]="clusterHost"  [hidden]="!search.resourceType || !search.resourceId"> </ranger-policies>
 
         </div>
 
