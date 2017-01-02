@@ -88,12 +88,10 @@
                                 </tr>
                                 </tbody>
                             </table>
+                            <div *ngIf="isSearchInProgress">loading 1</div>
                             <div *ngIf="hiveFilterWrapper.data.length === 0" style="padding:15px;">
                               No results available.
                             </div>
-                        </div>
-                        <div *ngIf="hiveFiltersWrapper.length === 0" style="padding:15px;">
-                          No results available.
                         </div>
                     </div>
                     <div *ngIf="activeDataSourceType === DataSourceType.HBASE">
@@ -118,9 +116,6 @@
                             <div *ngIf="hbaseFilterWrapper.data.length === 0" style="padding:15px;">
                               No results available.
                             </div>
-                        </div>
-                        <div *ngIf="hbaseFiltersWrapper.length === 0" style="padding:15px;">
-                          No results available.
                         </div>
                     </div>
                     <div *ngIf="activeDataSourceType === DataSourceType.HDFS">
@@ -147,9 +142,6 @@
                             <div *ngIf="hdfsFilterWrapper.data.length === 0" style="padding:15px;">
                               No results available.
                             </div>
-                        </div>
-                        <div *ngIf="hdfsFiltersWrapper.length === 0" style="padding:15px;">
-                          No results available.
                         </div>
                     </div>
                 </div>
