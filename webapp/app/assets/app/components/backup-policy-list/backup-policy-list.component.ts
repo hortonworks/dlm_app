@@ -1,4 +1,5 @@
 import {Component, Input, AfterViewInit, OnChanges, SimpleChanges} from '@angular/core';
+import {Router} from '@angular/router';
 import Rx from 'rxjs/Rx';
 
 import {BackupPolicyService} from '../../services/backup-policy.service';
@@ -17,6 +18,7 @@ export default class BackupPolicyListComponent implements OnChanges {
     @Input() dataCenterId: string = '';
 
     constructor(
+      private router: Router,
       private policyService: BackupPolicyService
     ) {
 
@@ -32,6 +34,11 @@ export default class BackupPolicyListComponent implements OnChanges {
     }
 
     doEditPolicy(cPolicyId: string) {
-//
+      let navigationExtras = {
+            queryParams : {
+            }
+        };
+        this.router.navigate([`/ui/backup-policy/${cPolicyId}`], navigationExtras);
+        return false;
     }
 }
