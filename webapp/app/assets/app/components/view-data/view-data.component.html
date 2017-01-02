@@ -88,8 +88,10 @@
                                 </tr>
                                 </tbody>
                             </table>
-                            <div *ngIf="isSearchInProgress">loading 1</div>
-                            <div *ngIf="hiveFilterWrapper.data.length === 0" style="padding:15px;">
+                            <div *ngIf="isSearchInProgress">
+                              <loader-spin></loader-spin>
+                            </div>
+                            <div *ngIf="hiveFilterWrapper.data.length === 0 && !isSearchInProgress" style="padding:15px;">
                               No results available.
                             </div>
                         </div>
@@ -113,7 +115,10 @@
                                 </tr>
                                 </tbody>
                             </table>
-                            <div *ngIf="hbaseFilterWrapper.data.length === 0" style="padding:15px;">
+                            <div *ngIf="isSearchInProgress">
+                              <loader-spin></loader-spin>
+                            </div>
+                            <div *ngIf="hbaseFilterWrapper.data.length === 0 && !isSearchInProgress" style="padding:15px;">
                               No results available.
                             </div>
                         </div>
@@ -139,7 +144,10 @@
                                 </tr>
                                 </tbody>
                             </table>
-                            <div *ngIf="hdfsFilterWrapper.data.length === 0" style="padding:15px;">
+                            <div *ngIf="isSearchInProgress">
+                              <loader-spin></loader-spin>
+                            </div>
+                            <div *ngIf="hdfsFilterWrapper.data.length === 0 && !isSearchInProgress" style="padding:15px;">
                               No results available.
                             </div>
                         </div>
