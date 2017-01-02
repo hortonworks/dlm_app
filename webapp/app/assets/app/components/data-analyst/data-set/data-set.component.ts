@@ -8,7 +8,7 @@ import {DataCenter} from '../../../models/data-center';
 import {Persona} from '../../../shared/utils/persona';
 import {SearchQueryService} from '../../../services/search-query.service';
 import {SearchQuery} from '../../../models/search-query';
-import {DataFilter} from '../../../models/data-filter';
+import {BreadcrumbService} from '../../../services/breadcrumb.service';
 
 @Component({
     selector: 'data-set',
@@ -25,7 +25,10 @@ export class DataSetComponent implements OnInit {
     selectedCategory = this.ALL;
 
     constructor(private dataSetService: DataSetService, private router: Router, private dataCenterService: DataCenterService,
-                private searchQueryService: SearchQueryService, private environment: Environment) {}
+                private searchQueryService: SearchQueryService, private environment: Environment,
+                private breadcrumbService: BreadcrumbService) {
+        this.breadcrumbService.crumbMap = [{'url': '/ui/data-analyst/analyst-dashboard', 'name': 'Data Set'}];
+    }
 
     ngOnInit() {
         // replace this with merge map
@@ -51,8 +54,13 @@ export class DataSetComponent implements OnInit {
 
     private getDataCenterDetailsByName(name:string, dataCenterNamesToDataCenter:{}) {
         this.dataCenterService.getDetails(name).subscribe((dataCenterDetail)=> {
+           let hosts = {};
            for (let host of dataCenterDetail.hosts) {
-               this.dataSetService.getAll(host.ambariHost, name).subscribe(results => {
+               hosts[host.ambariHost] = host.ambariHost;
+           }
+           let uniqueHosts = Object.keys(hosts);
+           for (let host of uniqueHosts) {
+               this.dataSetService.getAll(host, name).subscribe(results => {
                    this.dataSets = [...this.dataSets, ...results];
 
                    for (let dataSet of results) {
@@ -75,24 +83,40 @@ export class DataSetComponent implements OnInit {
         let searchQuery = new SearchQuery();
         searchQuery.clusterHost = dataSet.ambariHost;
         searchQuery.dataCenter = dataSet.dataCenter;
-        searchQuery.predicates = dataSet.hiveFilters;
 
-        this.searchQueryService.getData(searchQuery, 'hive').subscribe((result: any[]) => {
-            dataSet['hiveCount'] = result.length;
-        });
+        if (dataSet.hiveFilters.length > 0) {
+            searchQuery.predicates = dataSet.hiveFilters;
+            this.searchQueryService.getData(searchQuery, 'hive').subscribe((result: any[]) => {
+                dataSet['hiveCount'] = result.length;
+            });
+        }
 
-        searchQuery.predicates = dataSet.hBaseFilters;
-        this.searchQueryService.getData(searchQuery, 'hbase').subscribe((result: any[]) => {
-            dataSet['hbaseCount'] = result.length;
-        });
+        if (dataSet.hBaseFilters.length > 0) {
+            searchQuery.predicates = dataSet.hBaseFilters;
+            this.searchQueryService.getData(searchQuery, 'hbase').subscribe((result: any[]) => {
+                dataSet['hbaseCount'] = result.length;
+            });
+        }
 
-        searchQuery.predicates = dataSet.fileFilters;
-        this.searchQueryService.getData(searchQuery, 'hdfs').subscribe((result: any[]) => {
-            dataSet['hdfsCount'] = result.length;
-        });
+        if (dataSet.fileFilters.length > 0) {
+            searchQuery.predicates = dataSet.fileFilters;
+            this.searchQueryService.getData(searchQuery, 'hdfs').subscribe((result: any[]) => {
+                dataSet['hdfsCount'] = result.length;
+            });
+        }
+
     }
+
     setSelectedCategory(category: string) {
         this.selectedCategory = category;
+    }
+
+    getLastModified(millisec: number): string {
+        if (millisec) {
+            return new Date(millisec).toDateString();
+        }
+
+        return '-';
     }
 
     getDataSetCategorys(): string[] {

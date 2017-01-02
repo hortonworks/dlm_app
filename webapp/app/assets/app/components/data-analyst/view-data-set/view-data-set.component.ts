@@ -162,4 +162,12 @@ export class ViewDataSetComponent implements OnInit {
             }
         });
     }
+
+    getLastModified(millisec: number): string {
+        if (millisec) {
+            return new Date(millisec).toDateString();
+        }
+
+        return '-';
+    }
 }

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService } from './services/authservice';
 import {Environment} from './environment';
 import {Persona} from './shared/utils/persona';
+import {BreadcrumbService} from './services/breadcrumb.service';
 
 declare var Datamap:any;
 declare var componentHandler:any;
@@ -17,8 +18,9 @@ export default class AppComponent implements AfterViewInit  {
 
     persona = Persona;
 
-    constructor(public router: Router,private authService: AuthService, private environment: Environment) {
-
+    constructor(public router: Router,private authService: AuthService, private environment: Environment,
+                private breadcrumbService: BreadcrumbService) {
+        this.breadcrumbService.crumbMap = [];
     }
 
     isLoggedIn(): boolean {

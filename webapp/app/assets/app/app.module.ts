@@ -24,6 +24,8 @@ import {Environment} from './environment';
 import {DataSetModule} from './components/data-analyst/data-set/data-set.module';
 import {AddDataSetModule} from './components/data-analyst/add-data-set/add-data-set.module';
 import {ViewDataSetModule} from './components/data-analyst/view-data-set/view-data-set.module';
+import {DashboardModule} from './components/dashboard/dashboard.module';
+import {BreadcrumbService} from './services/breadcrumb.service';
 
 @NgModule({
     imports: [
@@ -31,6 +33,7 @@ import {ViewDataSetModule} from './components/data-analyst/view-data-set/view-da
         FormsModule,
         HttpModule,
         RouterModule.forRoot(routes),
+        DashboardModule,
         ViewClusterModule,
         AddClusterModule,
         AddBdrModule,
@@ -40,11 +43,10 @@ import {ViewDataSetModule} from './components/data-analyst/view-data-set/view-da
         AddDataSetModule,
         ViewDataSetModule
     ],
-    declarations: [SidenavRouterLinkDirective, AppComponent, DashboardComponent, LoginComponent, LogoutComponent],
+    declarations: [SidenavRouterLinkDirective, AppComponent, LoginComponent, LogoutComponent],
     bootstrap: [AppComponent],
-    providers: [Environment, AuthService, AmbariService, BackupPolicyService, DataCenterService, LoggedInGuard, AlreadyLoggedInGuard, GeographyService]
+    providers: [Environment, AuthService, AmbariService, BackupPolicyService, DataCenterService, LoggedInGuard, AlreadyLoggedInGuard, GeographyService, BreadcrumbService]
 })
 
-export class AppModule {
-}
+export class AppModule {}
 

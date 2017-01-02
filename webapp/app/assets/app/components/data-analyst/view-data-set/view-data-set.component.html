@@ -1,8 +1,9 @@
 <div class="mdl-grid">
     <div class="mdl-cell mdl-cell--12-col">
+      <bread-crumb></bread-crumb>
       <div style="position:relative">
         <div class="mdl-typography--headline mdl-typography--font-light title-text"> {{ dataSetName }} </div>
-        <p> Created on {{ dataSet.lastModified }} </p>
+        <p> Created on {{ getLastModified(dataSet.lastModified) }} </p>
         <div style="position: absolute;right:0;top:0;transform: translateY(-50%);height:0;display: flex;align-self: center;justify-content: center;" *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)">
           <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green" (click)="doNavigateToBackupPolicySetup()">
             <i class="fa fa-files-o" aria-hidden="true"></i> Setup Replication
