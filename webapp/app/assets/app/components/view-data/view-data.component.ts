@@ -41,6 +41,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
     map: any;
     pointsGroup: any;
     arcsGroup: any;
+    isSearchInProgress: boolean = false;
 
     search: {
       resourceId: string,
@@ -403,13 +404,16 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
 
     doExecuteSearch($event, dataFilterWrapper: DataFilterWrapper, dataSourceType: string) {
       let searchQuery = new SearchQuery();
-        searchQuery.dataCenter = this.dataLakeName;
-        searchQuery.clusterHost = this.clusterHost;
-        searchQuery.predicates = $event;
-        this.searchQueryService.getData(searchQuery, dataSourceType)
-        .subscribe(result => {
-            dataFilterWrapper.data = result;
+      searchQuery.dataCenter = this.dataLakeName;
+      searchQuery.clusterHost = this.clusterHost;
+      searchQuery.predicates = $event;
 
+      this.isSearchInProgress = true;
+      this.searchQueryService.getData(searchQuery, dataSourceType)
+        .subscribe(result => {
+          this.isSearchInProgress = false;
+
+          dataFilterWrapper.data = result;
         });
     }
 

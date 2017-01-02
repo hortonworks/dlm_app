@@ -102,15 +102,15 @@ export class ViewDataSetComponent implements OnInit {
                   this.dataSet[dataSource+'Count'] += tableResults.length;
 
                   if (dataSource === 'hive') {
-                      this.hiveFilterResults.push(tableResults);
+                      this.hiveFilterResults = this.hiveFilterResults.concat(tableResults);
                   }
 
                   if (dataSource === 'hbase') {
-                      this.hbaseFilterResults.push(tableResults);
+                      this.hbaseFilterResults = this.hbaseFilterResults.concat(tableResults);
                   }
 
                   if (dataSource === 'hdfs') {
-                      this.hdfsFilterResults.push(tableResults);
+                      this.hdfsFilterResults = this.hdfsFilterResults.concat(tableResults);
                   }
               });
         }
@@ -123,17 +123,23 @@ export class ViewDataSetComponent implements OnInit {
 
         if (dataSource === 'hive') {
             tFilterWrappers = this.hiveFiltersWrapper.slice();
+            this.hiveFilterResults = [];
+            this.dataSet['hiveCount'] = 0;
         }
 
         if (dataSource === 'hbase') {
             tFilterWrappers = this.hbaseFiltersWrapper.slice();
+            this.hbaseFilterResults = [];
+            this.dataSet['hbaseCount'] = 0;
         }
 
         if (dataSource === 'hdfs') {
             tFilterWrappers = this.hdfsFiltersWrapper.slice();
+            this.hdfsFilterResults = [];
+            this.dataSet['hdfsCount'] = 0;
         }
-        tFilterWrappers = tFilterWrappers.concat(newSearchParams);
 
+        tFilterWrappers = tFilterWrappers.concat(newSearchParams);
         this.fetchData(tFilterWrappers, dataSource);
     }
 

@@ -87,6 +87,12 @@
                                 </tr>
                                 </tbody>
                             </table>
+                            <div *ngIf="isSearchInProgress">
+                              <loader-spin></loader-spin>
+                            </div>
+                            <div *ngIf="hiveFilterWrapper.data.length === 0 && !isSearchInProgress" style="padding:15px;">
+                              No results available.
+                            </div>
                         </div>
                     </div>
                     <div *ngIf="activeDataSourceType === DataSourceType.HBASE">
@@ -108,6 +114,12 @@
                                 </tr>
                                 </tbody>
                             </table>
+                            <div *ngIf="isSearchInProgress">
+                              <loader-spin></loader-spin>
+                            </div>
+                            <div *ngIf="hbaseFilterWrapper.data.length === 0 && !isSearchInProgress" style="padding:15px;">
+                              No results available.
+                            </div>
                         </div>
                     </div>
                     <div *ngIf="activeDataSourceType === DataSourceType.HDFS">
@@ -131,6 +143,12 @@
                                 </tr>
                                 </tbody>
                             </table>
+                            <div *ngIf="isSearchInProgress">
+                              <loader-spin></loader-spin>
+                            </div>
+                            <div *ngIf="hdfsFilterWrapper.data.length === 0 && !isSearchInProgress" style="padding:15px;">
+                              No results available.
+                            </div>
                         </div>
                     </div>
                 </div>
