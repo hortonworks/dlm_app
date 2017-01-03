@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 
 import {RangerPoliciesComponent}   from './ranger-policies.component';
-import {RangerPoliciesService} from '../../services/ranger-policies.service';
+import {RangerPoliciesService} from '../../services/ranger.service';
 import {SharedModule} from '../../shared/shared.module';
 
 @NgModule({

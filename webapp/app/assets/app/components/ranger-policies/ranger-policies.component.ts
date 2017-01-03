@@ -1,5 +1,5 @@
 import {Component, OnInit, Input, OnChanges, SimpleChanges} from '@angular/core';
-import {RangerPoliciesService} from '../../services/ranger-policies.service';
+import {RangerPoliciesService} from '../../services/ranger.service';
 import {RangerPolicies} from '../../models/ranger-policies';
 import Rx from 'rxjs/Rx';
 
