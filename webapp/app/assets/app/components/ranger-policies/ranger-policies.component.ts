@@ -31,13 +31,13 @@ export class RangerPoliciesComponent implements OnInit, OnChanges {
     @Input()
     clusterId: string = '';
 
-    policesData: RangerPolicies[] = [];
+    policies: RangerPolicies[] = [];
 
     constructor(private rangerPoliciesService: RangerPoliciesService) {
 
       this.rxInputChange
         .flatMap(({resourceId, resourceType, dataLakeId, clusterId}) => this.rangerPoliciesService.get(resourceId, resourceType, dataLakeId, clusterId))
-        .subscribe(policies => this.policesData = RangerPolicies.getData(policies));
+        .subscribe(policies => this.policies = RangerPolicies.getData(policies));
 
     }
 

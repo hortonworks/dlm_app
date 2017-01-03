@@ -28,7 +28,7 @@
             <td class="mdl-data-table__cell--non-numeric">{{cPolicy.target.cluster.host}}</td>
             <td class="mdl-data-table__cell--non-numeric">{{cPolicy.source.resourceId}} </td>
             <td class="mdl-data-table__cell--non-numeric">{{cPolicy.source.resourceType}}</td>
-            <td class="mdl-data-table__cell--non-numeric">{{cPolicy.status.isEnabled}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{cPolicy.status.isEnabled ? 'Enabled' : 'Disabled'}}</td>
             <td class="mdl-data-table__cell--non-numeric">{{cPolicy.status.since | date:'short'}}</td>
           </tr>
         </tbody>
