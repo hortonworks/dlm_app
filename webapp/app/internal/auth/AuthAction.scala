@@ -15,7 +15,7 @@ object Authenticated extends ActionBuilder[AuthenticatedRequest] {
   def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[Result]) = {
 //    debug
 //    block(AuthenticatedRequest[A](new UserView("admin", "admin", true), request))
-//    if(request.headers.get("Authorization").isDefined && request.headers.get("Authorization").get.startsWith("Bearer ")){
+    if(request.headers.get("Authorization").isDefined && request.headers.get("Authorization").get.startsWith("Bearer ")){
       val header: String = request.headers.get("Authorization").get
       val token = header.replace("Bearer","").trim
       Jwt.parseJWT(token).map{ user =>
