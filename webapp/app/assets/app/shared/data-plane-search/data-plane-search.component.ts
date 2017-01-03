@@ -93,8 +93,12 @@ export class DataPlaneSearchComponent implements  OnInit {
         for (let appliedSearchParam of this.appliedSearchParams) {
             let hivePredicate = this.getPredicatesForDataSource(appliedSearchParam);
             let predicate = hivePredicate.predicate;
-            predicate = predicate.replace('${operator}', appliedSearchParam.operator);
-            predicate = predicate.replace('${value}', appliedSearchParam.value);
+            if (typeof predicate === 'string' || predicate instanceof String) {
+              predicate = predicate.replace('${operator}', appliedSearchParam.operator);
+              predicate = predicate.replace('${value}', appliedSearchParam.value);
+            } else if(typeof predicate === 'function') {
+              predicate = predicate(appliedSearchParam.value, appliedSearchParam.operator);
+            }
 
             let dataFilter = new DataFilter();
             dataFilter.predicate = predicate;
