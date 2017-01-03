@@ -1,5 +1,8 @@
 import {DataFilter} from './data-filter';
+import {SearchParam} from '../shared/data-plane-search/search-param';
 export class DataFilterWrapper {
+    searchParams: SearchParam[];
+    progress = false;
 
     constructor(public dataFilter: DataFilter, public data: any [] = []) {
     }

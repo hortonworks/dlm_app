@@ -1,33 +1,19 @@
-<div class="mdl-layout__header">
-    <div class="mdl-layout__header-row">
-        <div>
-            <span class="mdl-chip mdl-chip--deletable" *ngFor="let chip of appliedSearchParams" [hidden]="chip.key === ''">
-                <span class="mdl-chip__text">{{ chip.key }} {{ chip.operator }} {{ chip.value }}</span>
-                <button type="button" class="mdl-chip__action" (click)="onRemove(chip)"></button>
-            </span>
-        </div>
-        <div class="mdl-layout-spacer"></div>
-        <nav class="mdl-navigation mdl-layout--large-screen-only">
-            <a class="mdl-navigation__link mdl-typography--body-1 search" (click)="expanded=!expanded">Search</a>
-        </nav>
-    </div>
-</div>
-<div *ngIf="expanded" class="search-params">
+<div class="search-params">
 
-    <div class="mdl-grid mdl-grid--no-spacing" *ngFor="let appliedSearchParam of appliedSearchParams; let isLast =last">
-        <div class="mdl-cell mdl-cell--2-col top-bottom-border left-border right-border">
+    <div class="mdl-grid" *ngFor="let appliedSearchParam of appliedSearchParams; let isLast =last">
+        <div class="mdl-cell mdl-cell--2-col">
             <select [(ngModel)]="appliedSearchParam.key">
                 <option *ngFor="let key of getUnusedSearchKeys(appliedSearchParam.key)" [selected]="key === appliedSearchParam.key">{{ key }}</option>
             </select>
         </div>
-        <div class="mdl-cell mdl-cell--1-col top-bottom-border right-border">
+        <div class="mdl-cell mdl-cell--1-col">
             <select [(ngModel)]="appliedSearchParam.operator">
                 <option [disabled]></option>
                 <option *ngFor="let operator of getOperators(appliedSearchParam.key)">{{ operator }}</option>
             </select>
         </div>
-        <div class="mdl-cell mdl-cell--4-col top-bottom-border right-border">
-            <input type="text" class="no-border"[(ngModel)]="appliedSearchParam.value">
+        <div class="mdl-cell mdl-cell--4-col">
+            <input type="text" [(ngModel)]="appliedSearchParam.value">
         </div>
         <div class="mdl-cell mdl-cell--2-col">
             <i class="fa fa-minus" aria-hidden="true" (click)="onRemove(appliedSearchParam)" [hidden]="appliedSearchParams.length === 1 && appliedSearchParam.key === ''"></i>
@@ -36,13 +22,13 @@
         <div class="mdl-layout-spacer"></div>
     </div>
 
-    <div class="mt-1">
+    <div class="mt-1 ml-2">
         <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green" (click)="search()">
-            Search
+            Add Filter
         </button>
 
-        <button class="mdl-button mdl-js-button mdl-button--raised mdl-color--grey-300" (click)="expanded=false">
-            Close
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-color--grey-300" (click)="clear()">
+            Clear
         </button>
     </div>
 

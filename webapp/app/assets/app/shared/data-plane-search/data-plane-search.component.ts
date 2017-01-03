@@ -11,21 +11,18 @@ import {Environment} from '../../environment';
 })
 
 export class DataPlaneSearchComponent implements  OnInit {
-    expanded = false;
     allSearchParamWrappers: SearchParamWrapper[] = [];
     appliedSearchParams: SearchParam[] = [];
     newSearchOperators: string[] = [];
     @Input() dataSource: string;
     @Input() searchParamWrappers: SearchParamWrapper[];
-    @Output() searchFilters = new EventEmitter<DataFilter[]>();
+    @Output() searchFilters = new EventEmitter<{'dataFilter': DataFilter[], 'searchParam': SearchParam[]}>();
 
     constructor(private environment: Environment) {}
 
     ngOnInit() {
         this.allSearchParamWrappers = this.searchParamWrappers;
         this.appliedSearchParams.push(new SearchParam('', '', ''));
-        // this.appliedSearchParams.push(new SearchParam('Tags', '>', '10GB'));
-        // this.appliedSearchParams.push(new SearchParam('Location', '==', 'Bangalore'));
     }
 
     onNewSearchKeySeled(key: string) {
@@ -82,13 +79,18 @@ export class DataPlaneSearchComponent implements  OnInit {
         }).replace(/\s+/g, '');
     }
 
+    clear() {
+        this.appliedSearchParams = [new SearchParam('', '', '')];
+    }
+
     onAdd() {
         this.appliedSearchParams.push(new SearchParam('', '', ''));
     }
 
     search() {
-        this.expanded = false;
         let dataFilters: DataFilter[] = [];
+        let dataFilter = new DataFilter();
+        dataFilter.predicate = '';
 
         for (let appliedSearchParam of this.appliedSearchParams) {
             let hivePredicate = this.getPredicatesForDataSource(appliedSearchParam);
@@ -100,14 +102,17 @@ export class DataPlaneSearchComponent implements  OnInit {
               predicate = predicate(appliedSearchParam.value, appliedSearchParam.operator);
             }
 
-            let dataFilter = new DataFilter();
-            dataFilter.predicate = predicate;
+            dataFilter.predicate += (dataFilter.predicate && dataFilter.predicate.length > 0 ) ? ' || ' : '';
+            dataFilter.predicate += predicate;
             dataFilter.qualifier = hivePredicate.qualifier;
 
-            dataFilters.push(dataFilter);
+            if (dataFilters.length === 0) {
+                dataFilters.push(dataFilter);
+            }
         }
 
-        this.searchFilters.emit(dataFilters);
+        this.searchFilters.emit({'dataFilter': dataFilters, 'searchParam': this.appliedSearchParams});
+        this.clear();
     }
 
     private getPredicatesForDataSource(appliedSearchParam): {predicate: string, qualifier: string} {
