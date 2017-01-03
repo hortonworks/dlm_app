@@ -103,7 +103,11 @@ class RangerApiImpl(actorSystem: ActorSystem,
     makeGetRequest(solrQuery)
   }
 
-  override def getTopAccessTypes: Future[JsValue] = {
-    makeGetRequest(configuration.underlying.getString("solr.hive.access.types.query"))
+  override def getTopAccessTypes(resourceType:String,resourceId:String): Future[JsValue] = {
+    val query = configuration.underlying.getString("solr.hive.access.types.query")
+    val solrQueryTemp = query.replace("#resource_name#",resourceId)
+    val solrQuery = solrQueryTemp.replace("#cluster#",cluster.name)
+    Logger.info(s"Requesting data from Solr - $solrQuery")
+    makeGetRequest(solrQuery)
   }
 }

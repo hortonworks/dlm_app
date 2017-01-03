@@ -47,15 +47,6 @@
                             <option *ngFor="let dataCenter of dataCenters" [value]="dataCenter.name"> {{ dataCenter.name }} </option>
                         </select>
                     </drop-down>
-                    <div class="mdl-typography--body-1  "> Cluster IP Address/URL </div>
-                    <drop-down>
-                        <select [(ngModel)]="dataSet.ambariHost">
-                            <option value="" selected [value]="'new'">Select</option>
-                            <option *ngFor="let ambari of ambarisInDatacenter" [value]="ambari.host">
-                                {{ getAmbariHostName(ambari) }}
-                            </option>
-                        </select>
-                    </drop-down>
 
                     <br>
 

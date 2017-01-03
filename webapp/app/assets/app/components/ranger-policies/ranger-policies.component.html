@@ -1,26 +1,31 @@
-<table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
+<div>
+  <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="policies.length > 0">
     <thead>
-    <tr>
-        <th class="mdl-data-table__cell--non-numeric">POLICY ACCESS</th>
-        <th class="mdl-data-table__cell--non-numeric">POLICY ENFORCER</th>
-        <th class="mdl-data-table__cell--non-numeric">REPO</th>
-        <th class="mdl-data-table__cell--non-numeric">USER</th>
-        <th class="mdl-data-table__cell--non-numeric">RESOURCE</th>
-        <th class="mdl-data-table__cell--non-numeric">RESOURCE TYPE</th>
-        <th class="mdl-data-table__cell--non-numeric">ACTION</th>
-        <th class="mdl-data-table__cell--non-numeric">EVENT TIME</th>
-    </tr>
+      <tr>
+          <th class="mdl-data-table__cell--non-numeric">POLICY ACCESS</th>
+          <th class="mdl-data-table__cell--non-numeric">POLICY ENFORCER</th>
+          <th class="mdl-data-table__cell--non-numeric">REPO</th>
+          <th class="mdl-data-table__cell--non-numeric">USER</th>
+          <th class="mdl-data-table__cell--non-numeric">RESOURCE</th>
+          <th class="mdl-data-table__cell--non-numeric">RESOURCE TYPE</th>
+          <th class="mdl-data-table__cell--non-numeric">ACTION</th>
+          <th class="mdl-data-table__cell--non-numeric">EVENT TIME</th>
+      </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let policy of policesData">
-        <td class="mdl-data-table__cell--non-numeric">{{ policy.access }}</td>
-        <td class="mdl-data-table__cell--non-numeric">{{ policy.enforcer }}</td>
-        <td class="mdl-data-table__cell--non-numeric">{{ policy.repo }}</td>
-        <td class="mdl-data-table__cell--non-numeric">{{ policy.reqUser }}</td>
-        <td class="mdl-data-table__cell--non-numeric">{{ policy.resource }}</td>
-        <td class="mdl-data-table__cell--non-numeric">{{ policy.resType }}</td>
-        <td class="mdl-data-table__cell--non-numeric">{{ policy.action }}</td>
-        <td class="mdl-data-table__cell--non-numeric">{{ policy.time }}</td>
-    </tr>
+      <tr *ngFor="let policy of policies">
+          <td class="mdl-data-table__cell--non-numeric">{{ policy.access }}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{ policy.enforcer }}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{ policy.repo }}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{ policy.reqUser }}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{ policy.resource }}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{ policy.resType }}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{ policy.action }}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{ policy.time }}</td>
+      </tr>
     </tbody>
-</table>
+  </table>
+  <div style="padding: 15px; padding-left: 0;" *ngIf="policies.length === 0">
+    No ranger policies available for audit.
+  </div>
+</div>

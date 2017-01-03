@@ -105,6 +105,12 @@ export class DashboardComponent implements AfterViewInit, OnInit {
             zoomControl: false
           });
 
+      // L
+      //   .tileLayer('https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token={token}', {
+      //     token: 'pk.eyJ1IjoiYWJoaWsiLCJhIjoiY2lneGVtbWFtMHYxY3gxbTBnbHVtMWtlaSJ9.3g8qlmYIJG_4P-_B6GRt5w'
+      //   })
+      //   .addTo(this.map);
+
       this.geographyService.getCountries()
         .subscribe(countrySet => {
           const baseLayer =
@@ -223,7 +229,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
             const marker =
               L
                 .circleMarker(cPoint.position, {
-                  radius: 10,
+                  radius: 7,
                   fillColor: cPoint.fillColor,
                   color: '#fff',
                   weight: 3,
@@ -232,7 +238,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
                 })
                 .bindPopup(cPoint.template, {
                   closeButton: false,
-                  className: 'map__popup--replication'
+                  className: 'map__popup--DataCenter'
                 });
 
               return marker;
@@ -254,13 +260,19 @@ export class DashboardComponent implements AfterViewInit, OnInit {
                 this.doNavigateToDataCenter(cLayer.options.dataCenterId);
               })
               .on('contextmenu', e => {
-                const popup = L.popup().setLatLng(e.latlng).setContent(`<a href="/ui/backup-policy?create&dataCenter=${cLayer.options.dataCenterId}">Create policy</a>`);
+                const popup = L.popup({
+                  closeButton: false,
+                  className: 'map__popup--context',
+                }).setLatLng(e.latlng).setContent(`<a href="/ui/backup-policy?create&dataCenter=${cLayer.options.dataCenterId}">Create policy</a>`);
                 popup.openOn(this.map);
               });
           });
 
-      this.map.fitBounds(pointsGroup.getBounds(), { padding: L.point(20, 20) });
-
+      if(points.length > 0) {
+        this.map.fitBounds(pointsGroup.getBounds(), { padding: L.point(20, 20) });
+      } else {
+        this.map.setView([-10, -10], 3);
+      }
     }
 
     doNavigateToDataCenter(dataCenterId: string) {
@@ -310,7 +322,8 @@ export class DashboardComponent implements AfterViewInit, OnInit {
                 animate: {duration: 3000, iterations: Infinity}
               }
             ).bindPopup(cArc.template, {
-              closeButton: false
+                closeButton: false,
+                className: 'map__popup--Replication',
             }));
 
       const selfArcs =
@@ -332,7 +345,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
             const dcMarker =
               L
                 .circleMarker(cArc.start, {
-                  radius: 15,
+                  radius: 12,
                   fillColor: '#ff4d04',
                   color: '#ff4d04',
                   weight: 3,
@@ -340,7 +353,8 @@ export class DashboardComponent implements AfterViewInit, OnInit {
                   dataCenterId: cArc.dataCenterId
                 })
                 .bindPopup(cArc.template, {
-                  closeButton: false
+                  closeButton: false,
+                  className: 'map__popup--Replication',
                 });
               return dcMarker;
           });

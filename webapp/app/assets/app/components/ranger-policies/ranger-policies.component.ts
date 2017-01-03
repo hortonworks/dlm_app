@@ -1,5 +1,5 @@
 import {Component, OnInit, Input, OnChanges, SimpleChanges} from '@angular/core';
-import {RangerPoliciesService} from '../../services/ranger-policies.service';
+import {RangerService} from '../../services/ranger.service';
 import {RangerPolicies} from '../../models/ranger-policies';
 import Rx from 'rxjs/Rx';
 
@@ -31,13 +31,13 @@ export class RangerPoliciesComponent implements OnInit, OnChanges {
     @Input()
     clusterId: string = '';
 
-    policesData: RangerPolicies[] = [];
+    policies: RangerPolicies[] = [];
 
-    constructor(private rangerPoliciesService: RangerPoliciesService) {
+    constructor(private rangerPoliciesService: RangerService) {
 
       this.rxInputChange
-        .flatMap(({resourceId, resourceType, dataLakeId, clusterId}) => this.rangerPoliciesService.get(resourceId, resourceType, dataLakeId, clusterId))
-        .subscribe(policies => this.policesData = RangerPolicies.getData(policies));
+        .flatMap(({resourceId, resourceType, dataLakeId, clusterId}) => this.rangerPoliciesService.getPolicies(resourceId, resourceType, dataLakeId, clusterId))
+        .subscribe(policies => this.policies = RangerPolicies.getData(policies));
 
     }
 

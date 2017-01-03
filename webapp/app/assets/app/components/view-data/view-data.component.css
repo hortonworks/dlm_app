@@ -51,7 +51,7 @@
 
 .mapcontainer-replication__wrapper--with-overlay /deep/ .leaflet-map-pane {
   /* hack to fit background */
-  transform: translate(-30%, -27%) !important;
+  transform: translate(-450px, -185px) !important;
   transform-origin: top left;
   filter: grayscale(85%) brightness(1.07);
 }

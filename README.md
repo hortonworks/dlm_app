@@ -14,17 +14,17 @@
 ## Build and Setup
 
 * `git clone https://github.com/hortonworks/dataplane`
-* In folder dpservice `sbt publishLocal` (Not sure if this is required)
 * In folder webapp `sh ./build-deps.sh`
 * Setup Mongo:
   * `use data_plane`
-  * `db.createUser({user: "dp_admin", pwd: "dp_admin_password", roles: ["readWrite", "dbAdmin"]})
+  * `db.createUser({user: "dp_admin", pwd: "dp_admin_password", roles: ["readWrite", "dbAdmin"]})`
 
 ## Run
 
 * In folder webapp, `sbt run`
 * Browse `http://host:9000/`
 * Note: For every cluster you add to dataplane, you need to make sure Ambari and Atlas services are reachable by host names from the data plane control plane server.
+* Note: `http_proxy` environment variable should not be set. If set, unset with `unset http_proxy` on the shell from where you are running `sbt run`
 
 # Container setup
 

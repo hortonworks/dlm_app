@@ -42,7 +42,6 @@ export class AddDataSetComponent implements OnInit {
     ambaris: Ambari[]= [];
     dataCenters: DataCenter[] = [];
     dataSet: DataSet = new DataSet();
-    ambarisInDatacenter: Ambari[] = [];
     hiveSearchParamWrappers: SearchParamWrapper[] = [];
     hbaseSearchParamWrappers: SearchParamWrapper[] = [];
     hdfsSearchParamWrappers: SearchParamWrapper[] = [];
@@ -74,12 +73,9 @@ export class AddDataSetComponent implements OnInit {
     }
 
     onDataCenterChange(dataCenterName: string) {
-        this.ambarisInDatacenter = [];
-        for (let ambari of this.ambaris) {
-            if (ambari.dataCenter === dataCenterName) {
-                this.ambarisInDatacenter.push(ambari);
-            }
-        }
+        const ambarisOfDC = this.ambaris.filter(cAmbari => cAmbari.dataCenter === dataCenterName);
+
+        this.dataSet.ambariHost = ambarisOfDC[0].host;
     }
 
     addFilterAndSearch($event: {'dataFilter': DataFilter[], 'searchParam': SearchParam[]}, dataSource: string) {
