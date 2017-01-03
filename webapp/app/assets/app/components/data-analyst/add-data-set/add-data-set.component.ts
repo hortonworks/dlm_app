@@ -34,7 +34,6 @@ export class AddDataSetComponent implements OnInit, AfterViewInit {
     ambaris: Ambari[]= [];
     dataCenters: DataCenter[] = [];
     dataSet: DataSet = new DataSet();
-    ambarisInDatacenter: Ambari[] = [];
     hiveSearchParamWrappers: SearchParamWrapper[] = [];
     hbaseSearchParamWrappers: SearchParamWrapper[] = [];
     hdfsSearchParamWrappers: SearchParamWrapper[] = [];
@@ -86,12 +85,11 @@ export class AddDataSetComponent implements OnInit, AfterViewInit {
             this.onCityChange(dataCenterByName);
         }
 
-        this.ambarisInDatacenter = [];
-        for (let ambari of this.ambaris) {
-            if (ambari.dataCenter === dataCenterName) {
-                this.ambarisInDatacenter.push(ambari);
-            }
-        }
+        const ambarisOfDC =
+          this.ambaris
+            .filter(cAmbari => cAmbari.dataCenter === dataCenterName);
+
+        this.dataSet.ambariHost = ambarisOfDC[0].host;
     }
 
     getDataCenterByName(dataCenterName: string): DataCenter {

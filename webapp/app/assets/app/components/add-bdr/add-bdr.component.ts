@@ -74,8 +74,6 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
     nowDate: string = new Date().toISOString().substring(0,10);
     welcomeText = `Configure Backup and Disaster Recovery for the selected Entity. You can select the target cluster to copy the data and the schedule for backup and recovery`;
     dataCenterOptions: Array<DataCenter> = [];
-    clusterOptions: Array<Ambari> = [];
-    sourceClusterOptions: Array<Ambari> = [];
     mode: string = '';
     policyId: string = '';
     isAdvancedEnabled: boolean = false;
@@ -143,7 +141,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
-      const rxSourceClusterOptions = new Rx.Subject<string>();
+      const rxSourceDataCenter = new Rx.Subject<string>();
       const rxInit = this.activatedRoute.params;
 
       const [rxCreateInit, rxEditInit] = rxInit.partition(() => this.activatedRoute.snapshot.queryParams.hasOwnProperty('create'));
@@ -173,7 +171,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
           )
           .do(source => {
             if(!source.cluster) {
-              rxSourceClusterOptions.next(source.dataCenter.name);
+              rxSourceDataCenter.next(source.dataCenter.name);
             }
           })
           .do(
@@ -220,9 +218,11 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
           this.dataCenterOptions = dataCenters;
         });
 
-      rxSourceClusterOptions
+      rxSourceDataCenter
         .flatMap(cDataCenterId => this.dcService.getClustersByDataCenterId(cDataCenterId))
-        .subscribe(ambariList => this.sourceClusterOptions = ambariList);
+        .subscribe(ambariList => {
+          this.source.cluster = ambariList[0];
+        });
     }
 
     ngAfterViewInit() {
@@ -291,7 +291,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
       this.dcService.getClustersByDataCenterId(dataCenterId)
         .subscribe(
           clusters => {
-            this.clusterOptions = clusters;
+            this.target.cluster = clusters[0];
           }
         );
     }

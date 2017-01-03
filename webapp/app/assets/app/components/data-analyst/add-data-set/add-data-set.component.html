@@ -33,15 +33,6 @@
                         </select>
                     </drop-down>
                 </span>
-                <div class="mdl-typography--body-2"> Cluster IP Address/URL </div>
-                <drop-down>
-                    <select [(ngModel)]="dataSet.ambariHost">
-                        <option value="" selected [value]="'new'">Select</option>
-                        <option *ngFor="let ambari of ambarisInDatacenter" [value]="ambari.host">
-                            {{ getAmbariHostName(ambari) }}
-                        </option>
-                    </select>
-                </drop-down>
             </div>
             <div class="mdl-cell mdl-cell--4-col">
                 <div id="map" class="map"> </div>

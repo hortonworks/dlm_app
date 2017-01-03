@@ -37,25 +37,6 @@
           <div *ngIf="!source.resourceId || !source.resourceType || !source.cluster" style="position: fixed;left:0; top: 0; height: 100%; width: 100%;background: rgba(25,25,25,0.5);display: flex;align-items: center;justify-content: center">
             <div style="min-width: 960px;padding: 20px;border-radius: 5px; background: white">
               <h2 class="mdl-typography--headline mdl-typography--font-light">We need more details...</h2>
-              <div *ngIf="!source.cluster">
-                <div>
-                  Select a cluster
-                </div>
-                <div class="select-wrap">
-                  <drop-down>
-                      <select [(ngModel)]="source.cluster">
-                          <option disabled selected [ngValue]="">Cluster</option>
-                          <option *ngFor="let cluster of sourceClusterOptions" [ngValue]="cluster">{{cluster.host}}</option>
-                      </select>
-                  </drop-down>
-                </div>
-              </div>
-              <div *ngIf="source.cluster">
-                Data Lake {{source.dataCenter.name}}
-                <br/>
-                Cluster {{source.cluster.host}}
-                <br/>
-              </div>
               <div *ngIf="source.cluster">
                 <div>
                   Select a resource
@@ -172,7 +153,7 @@
 
         <div class="mdl-color-text--green mt-1">
           <i class="fa fa-server fa-2x" aria-hidden="true"></i>
-          <span class="mdl-typography--title mdl-typography--font-light"> Select Cluster </span>
+          <span class="mdl-typography--title mdl-typography--font-light"> Select Target </span>
         </div>
 
         <div class="mdl-typography--caption">Specify the target location where backups needs to be written to.</div>
@@ -189,16 +170,6 @@
                             <option disabled selected [ngValue]="">Data Lake</option>
                             <option *ngFor="let dc of dataCenterOptions" [ngValue]="dc">{{dc.name}}</option>
 
-                        </select>
-                    </drop-down>
-                </div>
-                <div class="mdl-typography--body-2"> Cluster </div>
-                <div class="mdl-typography--caption">Select your target cluster.</div>
-                <div class="select-wrap">
-                    <drop-down>
-                        <select [(ngModel)]="target.cluster">
-                            <option disabled selected [ngValue]="">Cluster</option>
-                            <option *ngFor="let cluster of clusterOptions" [ngValue]="cluster">{{cluster.host}}</option>
                         </select>
                     </drop-down>
                 </div>
