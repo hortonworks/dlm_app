@@ -15,7 +15,7 @@ trait HiveDataFilter {
 
   final def evaluate(r: JsValue, expression: String): Boolean = {
     engine.eval(s"var r = ${Json.stringify(r)}")
-    val result = engine.eval(expression)
+    val result = Try(engine.eval(expression)) getOrElse false
     Try(result.asInstanceOf[Boolean]) getOrElse false
   }
 
