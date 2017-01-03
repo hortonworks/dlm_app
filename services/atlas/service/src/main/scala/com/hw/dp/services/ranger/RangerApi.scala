@@ -14,6 +14,6 @@ trait RangerApi {
 
   def getRangerAuditLogs(resourceType:String,resourceId:String):Future[JsValue]
 
-  def getTopAccessTypes:Future[JsValue]
+  def getTopAccessTypes(resourceType:String,resourceId:String):Future[JsValue]
 
 }

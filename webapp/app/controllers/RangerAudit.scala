@@ -47,9 +47,9 @@ class RangerAudit @Inject()(@Named("atlasApiCache") val atlasApiCache: ActorRef,
   }
 
 
-  def getTopAccessTypes(clusterHost: String, datacenter: String) = Authenticated.async{
+  def getTopAccessTypes(clusterHost: String, datacenter: String,resourceType:String,resourceId:String) = Authenticated.async{
     getApi(clusterHost,datacenter).flatMap{ api =>
-      api.getTopAccessTypes.map { res =>
+      api.getTopAccessTypes(resourceType,resourceId).map { res =>
         Ok(res)
       }
     }.recoverWith(ise)
