@@ -1,0 +1,29 @@
+.mdl-layout__header{
+  background-color: #FAFAFA;
+  border-left: 1px solid #E3E3E3;
+  border-right: 1px solid #E3E3E3;
+  border-top: 1px solid #E3E3E3;
+}
+.mdl-layout__header-row {
+  padding-left: 10px;
+}
+.mdl-chip__action:after {
+  content: "\f00d";
+  padding-left: 5px;
+  font-family: "FontAwesome";
+}
+.or-condition {
+  height: 32px;
+  line-height: 32px;
+  padding: 0px 12px;
+  border-radius: 16px;
+  display: inline-block;
+  color: rgba(0,0,0,.87);
+  margin: 2px 0;
+
+  span {
+    font-size: 13px;
+    display: inline-block;
+    vertical-align: sub;
+  }
+}
