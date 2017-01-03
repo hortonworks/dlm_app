@@ -360,6 +360,13 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
         return;
       }
 
+      if(
+        this.mapCities.source.location.country === this.mapCities.target.location.country
+        && this.mapCities.source.location.place === this.mapCities.target.location.place
+      ) {
+        return;
+      }
+
       const points =
         Object.keys(this.mapCities)
         .map(cKey => {
