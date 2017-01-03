@@ -13,7 +13,7 @@ export const routes = [
     { path: 'ui/logout', component: LogoutComponent},
     { path: 'ui/data-lake/:id', component: ViewClusterComponent},
     { path: 'ui/dashboard', loadChildren: 'assets/app/components/dashboard/dashboard.module#DashboardModule', canActivate: [LoggedInGuard]},
-    { path: 'ui/data-lake/add', loadChildren: 'assets/app/components/add-cluster/add-cluster.module#AddClusterModule', canActivate: [LoggedInGuard]},
+    { path: 'ui/add-data-lake', loadChildren: 'assets/app/components/add-cluster/add-cluster.module#AddClusterModule', canActivate: [LoggedInGuard]},
     { path: 'ui/view-data', loadChildren: 'assets/app/components/view-data/view-data.module#ViewDataModule', canActivate: [LoggedInGuard]},
     { path: 'ui/backup-policy/:key', loadChildren: 'assets/app/components/add-bdr/add-bdr.module#AddBdrModule', canActivate: [LoggedInGuard]},
     { path: 'ui/backup-policy', loadChildren: 'assets/app/components/add-bdr/add-bdr.module#AddBdrModule', canActivate: [LoggedInGuard]},
