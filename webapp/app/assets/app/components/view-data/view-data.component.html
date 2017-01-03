@@ -3,9 +3,7 @@
         <bread-crumb [crumbMap]="breadCrumbMap"> </bread-crumb>
 
         <div class="mdl-grid mdl-grid--no-spacing">
-            <div class="mdl-cell mdl-cell--2-col"><h4 class="thin"> {{ clusterName }} </h4></div>
-
-            <div class="mdl-layout-spacer"></div>
+            <div class="mdl-cell mdl-cell--7-col"><h4 class="thin"> {{ clusterHost }} </h4></div>
 
             <div class="mdl-cell mdl-cell--5-col mdl-typography--text-right">
                 <button class="mdl-button mdl-js-button mdl-button--raised actions-button">Action</button>
@@ -13,37 +11,8 @@
             </div>
         </div>
 
-        <div class="mdl-grid mdl-grid--no-spacing info-panel" [hidden]="true">
-            <div class="mdl-cell mdl-cell--2-col m-0 ">
-                <label class="mdl-typography--caption"> UP TIME </label>
-                <p class="mdl-typography--body-2 "> 10 Days </p>
-            </div>
-            <div class="mdl-cell mdl-cell--2-col m-0">
-                <label class="mdl-typography--caption"> Cluster Type </label>
-                <p class="mdl-typography--body-2 "> ON_PREM </p>
-            </div>
-            <div class="mdl-cell mdl-cell--2-col m-0">
-                <label class="mdl-typography--caption"> DATA </label>
-                <p class="mdl-typography--body-2 "> 178 GB </p>
-            </div>
-            <div class="mdl-cell mdl-cell--2-col m-0">
-                <label class="mdl-typography--caption"> NO OF TABLES </label>
-                <p class="mdl-typography--body-2 "> 221 </p>
-            </div>
-            <div class="mdl-cell mdl-cell--2-col m-0">
-                <label class="mdl-typography--caption"> NO OF FILES </label>
-                <p class="mdl-typography--body-2 "> 1986 </p>
-            </div>
-            <div class="mdl-cell mdl-cell--2-col m-0">
-                <label class="mdl-typography--caption"> AVERAGE # USERS </label>
-                <p class="mdl-typography--body-2 ">  31 </p>
-            </div>
-        </div>
-
-        <h5 class="thin"> Data Assets </h5>
-
-        <div>
-            <form (ngSubmit)="doExecuteSearch()" style="display: flex;width: 100%;align-items: center;justify-content: center;">
+        <div *ngIf="!search.resourceType || !search.resourceId">
+            <form (ngSubmit)="doExecuteSearch()" style="display: flex;width: 100%;align-items: center;justify-content: center;margin-bottom: 5px;">
               <div style="flex:1;margin-right: 15px;">
                 <input type="text" name="searchKey" placeholder="Search" style="width:100%;padding: 5px;" [(ngModel)]="searchKey"/>
               </div>
