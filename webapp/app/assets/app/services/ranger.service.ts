@@ -8,21 +8,14 @@ import '../rxjs-operators';
 import {RangerPolicies} from '../models/ranger-policies';
 
 @Injectable()
-export class RangerPoliciesService {
+export class RangerService {
 
     url = '/api/ranger';
 
     constructor(private http: Http) {
     }
 
-
-    get(resourceId: string, resourceType: string,
-        dataLakeId: string, clusterId: string): Observable<any> {
-        return this.getPolicies(resourceId, resourceType, dataLakeId, clusterId);
-
-    }
-
-    private getPolicies(resourceId: string, resourceType: string,
+    public getPolicies(resourceId: string, resourceType: string,
                         dataLakeId: string, clusterId: string): Observable<any> {
         return this.http.get(this.url + '/audit?clusterHost=' + clusterId + '&dc=' + dataLakeId + '&rt=' + resourceType + '&r=' + resourceId, new RequestOptions(HttpUtil.getHeaders()))
             .map(HttpUtil.extractData).catch(HttpUtil.handleError);
