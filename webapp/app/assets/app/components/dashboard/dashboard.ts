@@ -238,7 +238,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
                 })
                 .bindPopup(cPoint.template, {
                   closeButton: false,
-                  className: 'map__popup--replication'
+                  className: 'map__popup--DataCenter'
                 });
 
               return marker;
@@ -261,7 +261,8 @@ export class DashboardComponent implements AfterViewInit, OnInit {
               })
               .on('contextmenu', e => {
                 const popup = L.popup({
-                  closeButton: false
+                  closeButton: false,
+                  className: 'map__popup--context',
                 }).setLatLng(e.latlng).setContent(`<a href="/ui/backup-policy?create&dataCenter=${cLayer.options.dataCenterId}">Create policy</a>`);
                 popup.openOn(this.map);
               });
@@ -321,7 +322,8 @@ export class DashboardComponent implements AfterViewInit, OnInit {
                 animate: {duration: 3000, iterations: Infinity}
               }
             ).bindPopup(cArc.template, {
-              closeButton: false
+                closeButton: false,
+                className: 'map__popup--Replication',
             }));
 
       const selfArcs =
@@ -351,7 +353,8 @@ export class DashboardComponent implements AfterViewInit, OnInit {
                   dataCenterId: cArc.dataCenterId
                 })
                 .bindPopup(cArc.template, {
-                  closeButton: false
+                  closeButton: false,
+                  className: 'map__popup--Replication',
                 });
               return dcMarker;
           });

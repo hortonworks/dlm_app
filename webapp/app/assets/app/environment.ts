@@ -29,14 +29,6 @@ export class Environment {
 
   /* These are hardcoded variables */
 
-
-// owner | ==, contains, != | Owner
-// createTime | <, >, ==, != | Created At
-// comment | ==, contains, != | Comment
-// tags | ==, != , contains| Tags
-// name | ==, contains, != | Name
-// parameters.dept | ==, contains, != | Parameters.Department
-
   hiveSearchParamWrappers: SearchParamWrapper[] = [
     new SearchParamWrapper(new SearchParam('Size', '',''), ['==', '<', '>', '!=']),
     new SearchParamWrapper(new SearchParam('Number Of Rows', '',''), ['==', '<', '>', '!=']),
@@ -57,8 +49,6 @@ export class Environment {
     new SearchParamWrapper(new SearchParam('Name', '',''), ['contains']),
     new SearchParamWrapper(new SearchParam('Owner', '',''), ['==', '!='])
   ];
-
-
 
 
   hivePredicates = {
