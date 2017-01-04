@@ -52,7 +52,7 @@ public class HdfsProfiler {
             HdfsFile hdfsFile = buildHdfsFile(fileNames[i],
                     "/sko_demo_data/unstructured/ResearchDocs/insurance/" + fileNames[i],
                     fileSizes[i],
-                    "admin", "hdfs", "-rw-r--r--",
+                    "insurance_admin", "hdfs", "-rw-r--r--",
                     "2016-12-26 13:39",
                     "PDF Document", fileFormatDetails);
             fileElements[i] = hdfsFile;
@@ -72,7 +72,7 @@ public class HdfsProfiler {
         fileSetContentFeatures.put("categories", "private health insurance, public health insurance");
 
         HdfsFileSet hdfsFileSet = buildHdfsFileSet("Medical Journals",
-                "admin",
+                "insurance_admin",
                 "2016-12-26 13:39",
                 fileElements, "Machine generated cluster of PDF documents", fileSetTypeDetails,
                 fileSetContentFeatures);
@@ -113,7 +113,7 @@ public class HdfsProfiler {
             HdfsFile file = buildHdfsFile(fileNames[i],
                     "/sko_demo_data/unstructured/RadiologyImages/Public/Cases/" + fileNames[i],
                     13033660,
-                    "admin", "hdfs", "-rw-r--r--",
+                    "insurance_admin", "hdfs", "-rw-r--r--",
                     "2016-12-22 13:39",
                     "Image file", fileFormatDetails);
             fileElements[i] = file;
@@ -131,7 +131,7 @@ public class HdfsProfiler {
         fileSetContentFeatures.put("Average Y Resolution", "72 dots");
 
         HdfsFileSet hdfsFileSet = buildHdfsFileSet("Radiology Images",
-                "admin",
+                "insurance_admin",
                 "2016-12-22 13:39",
                 fileElements, "Machine generated cluster of image documents", fileSetTypeDetails,
                 fileSetContentFeatures);
@@ -165,7 +165,7 @@ public class HdfsProfiler {
             HdfsFile file = buildHdfsFile(fileNames[i],
                     "/sko_demo_data/unstructured/ClinicalNotesAndReports/Public/Cases/" + fileNames[i],
                     fileSizes[i],
-                    "admin", "hdfs", "-rw-r--r--",
+                    "insurance_admin", "hdfs", "-rw-r--r--",
                     "2016-12-22 13:38",
                     "text", formatDetails);
             fileElements[i] = file;
@@ -181,7 +181,7 @@ public class HdfsProfiler {
         fileSetContentFeatures.put("categories", "Autopsy report, Claim report, Evaluation report");
 
         HdfsFileSet clinicalNotesFileSet = buildHdfsFileSet("Clinical Notes and Reports",
-                "admin",
+                "insurance_admin",
                 "2016-12-22 13:36",
                 fileElements,
                 "Machine generated cluster of text documents",
