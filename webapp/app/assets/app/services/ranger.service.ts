@@ -28,7 +28,7 @@ export class RangerService {
       clusterId: string
     ): Observable<any[]> {
       return this.http
-        .get(`${this.url}/access?clusterHost=${clusterId}&dc=${dataLakeId}&rt=${resourceType}&r=${resourceId}`)
+        .get(`${this.url}/access?clusterHost=${clusterId}&dc=${dataLakeId}&rt=${resourceType}&r=${resourceId}`, new RequestOptions(HttpUtil.getHeaders()))
         .map(HttpUtil.extractData)
         .map(data => data.facet_counts && data.facet_counts.facet_fields && data.facet_counts.facet_fields.access)
         .map(access => {
@@ -49,7 +49,7 @@ export class RangerService {
       clusterId: string
     ): Observable<any[]> {
       return this.http
-        .get(`${this.url}/users?clusterHost=${clusterId}&dc=${dataLakeId}&rt=${resourceType}&r=${resourceId}`)
+        .get(`${this.url}/users?clusterHost=${clusterId}&dc=${dataLakeId}&rt=${resourceType}&r=${resourceId}`, new RequestOptions(HttpUtil.getHeaders()))
         .map(HttpUtil.extractData)
         .map(data => data.facet_counts && data.facet_counts.facet_fields && data.facet_counts.facet_fields.reqUser)
         .map(reqUser => {
