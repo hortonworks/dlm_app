@@ -12,11 +12,8 @@ export class DataFilterWrapper {
     }
 
     public static getDataFilters(dataFilterWrappers: DataFilterWrapper[]): DataFilter[] {
-        let filters: DataFilter[] = [];
-        dataFilterWrappers.forEach(wrapper => {
-            if (wrapper.dataFilter[0] != null)
-                filters.push(wrapper.dataFilter[0]);
-        });
-        return filters.length === 0 ? [] : filters;
+      return dataFilterWrappers
+        .filter(cDataFilterWrapper => cDataFilterWrapper.dataFilter !== null)
+        .map(cDataFilterWrapper => cDataFilterWrapper.dataFilter);
     }
 }
