@@ -1,4 +1,5 @@
-<div>
+<div class="ranger-security">
+  <div style="margin-bottom: 5px;margin-top: 5px;"> Audit </div>
   <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="policies.length > 0">
     <thead>
       <tr>
@@ -27,5 +28,21 @@
   </table>
   <div style="padding: 15px; padding-left: 0;" *ngIf="policies.length === 0">
     No ranger policies available for audit.
+  </div>
+
+  <div style="margin-bottom: 5px;margin-top: 5px;"> Access Requests </div>
+  <div [hidden]="access.length === 0">
+    <svg width="500" height="300" id="ranger_barchart_access"></svg>
+  </div>
+  <div style="padding: 15px; padding-left: 0;" [hidden]="access.length > 0">
+    Ranger access list unavailable.
+  </div>
+
+  <div style="margin-bottom: 5px;margin-top: 5px;"> User Requests </div>
+  <div [hidden]="users.length === 0">
+    <svg width="960" height="300" id="ranger_barchart_users"></svg>
+  </div>
+  <div style="padding: 15px; padding-left: 0;" [hidden]="users.length > 0">
+    No users configured.
   </div>
 </div>
