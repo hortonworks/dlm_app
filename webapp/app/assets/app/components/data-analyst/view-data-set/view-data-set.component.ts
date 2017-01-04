@@ -6,8 +6,10 @@ import {DataSet} from '../../../models/data-set';
 import {SearchQueryService} from '../../../services/search-query.service';
 import {SearchQuery} from '../../../models/search-query';
 import {DataFilterWrapper} from '../../../models/data-filter-wrapper';
+import {DataFilter} from '../../../models/data-filter';
 import {Environment} from '../../../environment';
 import {SearchParamWrapper} from '../../../shared/data-plane-search/search-param-wrapper';
+import {SearchParam} from '../../../shared/data-plane-search/search-param';
 import {Persona} from '../../../shared/utils/persona';
 import Rx from 'rxjs/Rx';
 
@@ -116,29 +118,24 @@ export class ViewDataSetComponent implements OnInit {
         }
     }
 
-    addFilterAndSearch($event, dataSource: string) {
-
+    addFilterAndSearch($event: {'dataFilter': DataFilter[], 'searchParam': SearchParam[]}, dataSource: string) {
         let tFilterWrappers: DataFilterWrapper[] = [];
-        let newSearchParams = $event.map(filter =>  DataFilterWrapper.createDataFilters(filter));
-
+        let newSearchParams = $event.dataFilter.map(filter =>  DataFilterWrapper.createDataFilters(filter));
         if (dataSource === 'hive') {
             tFilterWrappers = this.hiveFiltersWrapper.slice();
             this.hiveFilterResults = [];
             this.dataSet['hiveCount'] = 0;
         }
-
         if (dataSource === 'hbase') {
             tFilterWrappers = this.hbaseFiltersWrapper.slice();
             this.hbaseFilterResults = [];
             this.dataSet['hbaseCount'] = 0;
         }
-
         if (dataSource === 'hdfs') {
             tFilterWrappers = this.hdfsFiltersWrapper.slice();
             this.hdfsFilterResults = [];
             this.dataSet['hdfsCount'] = 0;
         }
-
         tFilterWrappers = tFilterWrappers.concat(newSearchParams);
         this.fetchData(tFilterWrappers, dataSource);
     }

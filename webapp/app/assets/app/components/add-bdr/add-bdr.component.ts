@@ -16,6 +16,7 @@ import {Environment} from '../../environment';
 import {DataFilter} from '../../models/data-filter';
 import {DataFilterWrapper} from '../../models/data-filter-wrapper';
 import {SearchQueryService} from '../../services/search-query.service';
+import {SearchParam} from '../../shared/data-plane-search/search-param';
 import {DataSet} from '../../models/data-set';
 import {SearchQuery} from '../../models/search-query';
 import {SearchParamWrapper} from '../../shared/data-plane-search/search-param-wrapper';
@@ -434,11 +435,11 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
     }
 
 
-    doExecuteSearch($event, dataFilterWrapper: DataFilterWrapper, dataSourceType: string) {
+    doExecuteSearch($event: {'dataFilter': DataFilter[], 'searchParam': SearchParam[]}, dataFilterWrapper: DataFilterWrapper, dataSourceType: string) {
       let searchQuery = new SearchQuery();
         searchQuery.dataCenter = this.source.dataCenter.name;
         searchQuery.clusterHost = this.source.cluster.host;
-        searchQuery.predicates = $event;
+        searchQuery.predicates = $event.dataFilter;
         this.searchQueryService.getData(searchQuery, dataSourceType)
         .subscribe(result => {
             dataFilterWrapper.data = result;

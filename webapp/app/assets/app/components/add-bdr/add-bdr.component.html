@@ -65,7 +65,7 @@
                         <div class="mdl-vertical-tabs__content-bar">
                             <div *ngIf="activeDataSourceType === DataSourceType.HIVE">
                                 <div *ngFor="let hiveFilterWrapper of hiveFiltersWrapper" style="margin-bottom: 15px;">
-                                    <data-plane-search [searchParamWrappers]="hiveSearchParamWrappers" (searchFilters)="doExecuteSearch($event, hiveFilterWrapper, 'hive')" [dataSource]="'hive'"> </data-plane-search>
+                                    <data-plane-search [clearAfterSearch]="false" [searchParamWrappers]="hiveSearchParamWrappers" (searchFilters)="doExecuteSearch($event, hiveFilterWrapper, 'hive')" [dataSource]="'hive'"> </data-plane-search>
                                     <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="hiveFilterWrapper.data.length > 0">
                                         <thead>
                                         <tr>
@@ -90,7 +90,7 @@
                             </div>
                             <div *ngIf="activeDataSourceType === DataSourceType.HBASE">
                                 <div *ngFor="let hbaseFilterWrapper of hbaseFiltersWrapper">
-                                    <data-plane-search [searchParamWrappers]="hbaseSearchParamWrappers" (searchFilters)="doExecuteSearch($event, hbaseFilterWrapper, 'hbase')" [dataSource]="'hbase'"> </data-plane-search>
+                                    <data-plane-search [clearAfterSearch]="false" [searchParamWrappers]="hbaseSearchParamWrappers" (searchFilters)="doExecuteSearch($event, hbaseFilterWrapper, 'hbase')" [dataSource]="'hbase'"> </data-plane-search>
                                     <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="hbaseFilterWrapper.data.length > 0">
                                         <thead>
                                         <tr>
@@ -111,7 +111,7 @@
                             </div>
                             <div *ngIf="activeDataSourceType === DataSourceType.HDFS">
                                 <div *ngFor="let hdfsFilterWrapper of hdfsFiltersWrapper">
-                                    <data-plane-search [searchParamWrappers]="hdfsSearchParamWrappers"  (searchFilters)="doSelectResourceAndContinue($event, hdfsFilterWrapper, 'hdfs')" [dataSource]="'hdfs'"> </data-plane-search>
+                                    <data-plane-search [clearAfterSearch]="false" [searchParamWrappers]="hdfsSearchParamWrappers"  (searchFilters)="doSelectResourceAndContinue($event, hdfsFilterWrapper, 'hdfs')" [dataSource]="'hdfs'"> </data-plane-search>
                                     <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="hdfsFilterWrapper.data.length > 0">
                                         <thead>
                                         <tr>

@@ -38,7 +38,7 @@
                     <main class="mdl-layout__content">
                         <section *ngIf="(activeTab===tab.HIVE)" class="mdl-layout__tab-panel is-active">
                             <div >
-                                <data-plane-search [searchParamWrappers]="hiveSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, 'hive')" [dataSource]="'hive'"> </data-plane-search>
+                                <data-plane-search [clearAfterSearch]="true" [searchParamWrappers]="hiveSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, 'hive')" [dataSource]="'hive'"> </data-plane-search>
                                 <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
                                     <thead>
                                     <tr>
@@ -78,7 +78,7 @@
                         </section>
                         <section *ngIf="(activeTab===tab.HBASE)" class="mdl-layout__tab-panel is-active">
                             <div >
-                                <data-plane-search [searchParamWrappers]="hbaseSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, 'hbase')" [dataSource]="'hbase'"> </data-plane-search>
+                                <data-plane-search [clearAfterSearch]="true" [searchParamWrappers]="hbaseSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, 'hbase')" [dataSource]="'hbase'"> </data-plane-search>
                                 <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
                                     <thead>
                                     <tr>
@@ -105,7 +105,7 @@
                         </section>
                         <section *ngIf="(activeTab===tab.HDFS)" class="mdl-layout__tab-panel is-active">
                             <div>
-                                <data-plane-search [searchParamWrappers]="hdfsSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, 'hdfs')" [dataSource]="'hdfs'"> </data-plane-search>
+                                <data-plane-search [clearAfterSearch]="true" [searchParamWrappers]="hdfsSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, 'hdfs')" [dataSource]="'hdfs'"> </data-plane-search>
                                 <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
                                     <thead>
                                     <tr>
