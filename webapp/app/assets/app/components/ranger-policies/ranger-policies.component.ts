@@ -97,14 +97,14 @@ export class RangerPoliciesComponent implements OnInit, OnChanges, AfterViewInit
         d3
           .scaleBand()
           .rangeRound([0, width])
-          .padding(0.1);
-      x.domain(data.map(function(d) { return d.key; }));
+          .padding(0.1)
+          .domain(data.map(function(d) { return d.key; }));
 
       const y =
         d3
         .scaleLinear()
-        .range([height, 0]);
-      y.domain([0, d3.max(data, function(d) { return d.value; })]);
+        .range([height, 0])
+        .domain([0, d3.max(data, function(d) { return d.value; })]);
 
       const g = svg.append('g')
           .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
@@ -114,16 +114,15 @@ export class RangerPoliciesComponent implements OnInit, OnChanges, AfterViewInit
           .attr('transform', 'translate(0,' + height + ')')
           .call(d3.axisBottom(x));
 
-      const maxValueOfY = d3.max(data, function(d) { return d.value; });
-      const maxTicks = maxValueOfY < 5 ? maxValueOfY : maxValueOfY / 5;
+      const yAxis =
+        d3
+          .axisLeft(y);
+      if(d3.max(data, d => d.value) <= 1) {
+        yAxis.ticks(1);
+      }
       g.append('g')
           .attr('class', 'axis axis--y')
-          .call(
-            d3
-              .axisLeft(y)
-              .tickFormat(d3.format('.0f'))
-              .ticks(maxTicks)
-          );
+          .call(yAxis);
 
         g.selectAll('.bar')
           .data(data)
