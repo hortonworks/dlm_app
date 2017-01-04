@@ -1,9 +1,8 @@
-import {Component, OnInit, AfterViewInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AmbariService} from '../../../services/ambari.service';
 import {DataCenterService} from '../../../services/data-center.service';
 import {Ambari} from '../../../models/ambari';
 import {DataCenter} from '../../../models/data-center';
-import {CityNames} from '../../../common/utils/city-names';
 import {Environment} from '../../../environment';
 import {SearchQueryService} from '../../../services/search-query.service';
 import {DataSet} from '../../../models/data-set';
@@ -13,10 +12,17 @@ import {Alerts} from '../../../shared/utils/alerts';
 import {DataSetService} from '../../../services/data-set.service';
 import {DataFilter} from '../../../models/data-filter';
 import {DataFilterWrapper} from '../../../models/data-filter-wrapper';
+import {SearchParam} from '../../../shared/data-plane-search/search-param';
 
 declare var Datamap:any;
 
-export enum Tab {
+export enum MainTab {
+    INFORMATION,
+    DATA,
+    SUMMARY
+}
+
+export enum DataTab {
     HIVE,
     HBASE,
     HDFS
@@ -27,10 +33,12 @@ export enum Tab {
     templateUrl: 'assets/app/components/data-analyst/add-data-set/add-data-set.component.html',
     styleUrls: ['assets/app/components/data-analyst/add-data-set/add-data-set.component.css']
 })
-export class AddDataSetComponent implements OnInit, AfterViewInit {
+export class AddDataSetComponent implements OnInit {
     map: any;
-    tab = Tab;
-    activeTab: Tab = Tab.HIVE;
+    mainTab = MainTab;
+    mainActiveTab: MainTab = MainTab.INFORMATION;
+    dataTab = DataTab;
+    dataActiveTab: DataTab = DataTab.HIVE;
     ambaris: Ambari[]= [];
     dataCenters: DataCenter[] = [];
     dataSet: DataSet = new DataSet();
@@ -55,24 +63,9 @@ export class AddDataSetComponent implements OnInit, AfterViewInit {
         this.ambariService.get().subscribe((ambaris: Ambari[]) => {
             this.ambaris = ambaris;
         });
-        this.hiveFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
-        this.hbaseFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
-        this.hdfsFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
-    }
-
-    ngAfterViewInit() {
-        this.map = new Datamap({element: document.getElementById('map'),projection: 'mercator',
-            fills: {
-                defaultFill: '#E5E5E5'
-            },
-            bubblesConfig: {
-                popupTemplate: function(geography: any, data: any) {
-                    return '<div class="hoverinfo">' + data.location +'</div>';
-                },
-                borderWidth: '2',
-                borderColor: '#FFFFFF',
-            }
-        });
+        // this.hiveFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
+        // this.hbaseFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
+        // this.hdfsFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
     }
 
     getAmbariHostName(ambari: Ambari) {
@@ -80,50 +73,26 @@ export class AddDataSetComponent implements OnInit, AfterViewInit {
     }
 
     onDataCenterChange(dataCenterName: string) {
-        let dataCenterByName = this.getDataCenterByName(dataCenterName);
-        if (dataCenterByName !== null) {
-            this.onCityChange(dataCenterByName);
-        }
-
-        const ambarisOfDC =
-          this.ambaris
-            .filter(cAmbari => cAmbari.dataCenter === dataCenterName);
+        const ambarisOfDC = this.ambaris.filter(cAmbari => cAmbari.dataCenter === dataCenterName);
 
         this.dataSet.ambariHost = ambarisOfDC[0].host;
     }
 
-    getDataCenterByName(dataCenterName: string): DataCenter {
-        for (let dataCenter of this.dataCenters) {
-            if (dataCenter.name.toLocaleLowerCase() === dataCenterName.toLocaleLowerCase()) {
-                return dataCenter;
-            }
-        }
+    addFilterAndSearch($event: {'dataFilter': DataFilter[], 'searchParam': SearchParam[]}, dataSource: string) {
+        let dataFilterWrapper = this.createFilter($event.dataFilter[0], dataSource);
+        dataFilterWrapper.searchParams = $event.searchParam;
+        dataFilterWrapper.progress = true;
 
-        return null;
-    }
-
-    onCityChange(dataCenter: DataCenter) {
-        let coordinates = CityNames.getCityCoordinates(dataCenter.location.country, dataCenter.location.place);
-        let cityBubble = [{
-            name: 'name',
-            radius:5,
-            yield: 400,
-            borderColor: '#4C4C4C',
-            location: dataCenter.location.place + ' - ' + dataCenter.location.country,
-            latitude: parseFloat(coordinates[0]),
-            longitude: parseFloat(coordinates[1])
-        }];
-        this.map.bubbles(cityBubble);
-    }
-
-    addFilterAndSearch($event, hiveFilterWrapper: DataFilterWrapper, dataSource: string) {
-        hiveFilterWrapper.dataFilter = $event;
         let searchQuery = new SearchQuery();
         searchQuery.dataCenter = this.dataSet.dataCenter;
         searchQuery.clusterHost = this.dataSet.ambariHost;
-        searchQuery.predicates = $event;
+        searchQuery.predicates = $event.dataFilter;
         this.searchQueryService.getData(searchQuery, dataSource).subscribe(result => {
-            hiveFilterWrapper.data = result;
+            dataFilterWrapper.data = result;
+            dataFilterWrapper.progress = false;
+        },
+        error => {
+            dataFilterWrapper.progress = false;
         });
     }
 
@@ -131,19 +100,36 @@ export class AddDataSetComponent implements OnInit, AfterViewInit {
         return table['columns'].map(column => column.name);
     }
 
-    addFilter($event, type: string) {
-
-        $event.preventDefault();
+    createFilter(dataFilter: DataFilter, type: string) {
+        let dataFilterWrapper = new DataFilterWrapper(dataFilter);
 
         if (type === 'hive') {
-            this.hiveFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
+            this.hiveFiltersWrapper.unshift(dataFilterWrapper);
         }
         if (type === 'hbase') {
-            this.hbaseFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
+            this.hbaseFiltersWrapper.unshift(dataFilterWrapper);
         }
         if (type === 'hdfs') {
-            this.hdfsFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
+            this.hdfsFiltersWrapper.unshift(dataFilterWrapper);
         }
+
+        return dataFilterWrapper;
+    }
+
+    getFiltersWrapperSummary (dataFilterWrappers: DataFilterWrapper[]) {
+        let returnStr = '';
+        for (let dataFilterWrapper of dataFilterWrappers) {
+            returnStr += returnStr.length === 0 ? '' : ' && ';
+            returnStr += returnStr.length === 0 ? '' : '<br>';
+            let query = '';
+            for(let searchParam of dataFilterWrapper.searchParams) {
+                query += query.length === 0 ? '' : ' || ';
+                query += searchParam.key + searchParam.operator + searchParam.value;
+            }
+            returnStr += query;
+        }
+
+        return returnStr;
     }
 
     onSave() {
