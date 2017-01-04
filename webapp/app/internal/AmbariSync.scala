@@ -2,9 +2,9 @@ package internal
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.google.inject.{Inject, Singleton}
-import com.hw.dp.service.api.Poll
+import com.hw.dp.service.api.{GenRandom, Poll}
 import internal.actors.{AmbariLoader, ClusterHealthSync, ServiceSync}
-import internal.persistence.{DataPersister, ClusterDataStorage}
+import internal.persistence.{ClusterDataStorage, DataPersister}
 import play.api.libs.ws.WSClient
 
 import scala.collection.mutable.ListBuffer
@@ -31,10 +31,9 @@ class AmbariSync @Inject()(actorSystem: ActorSystem,
     val clusterHealth: ActorRef = actorSystem.actorOf(Props(classOf[ClusterHealthSync], storage, ws),"clusterMetrics")
     synchronizers += serviceActor
     synchronizers += serviceSync
-    synchronizers += clusterHealth
     actorSystem.scheduler.schedule(5 seconds, interval minutes, serviceActor, Poll())
     actorSystem.scheduler.schedule(5 seconds, interval minutes, serviceSync, Poll())
-    actorSystem.scheduler.schedule(5 seconds, interval minutes, clusterHealth, Poll())
+    actorSystem.scheduler.schedule(5 seconds, interval minutes, clusterHealth, GenRandom())
   }
 
 
