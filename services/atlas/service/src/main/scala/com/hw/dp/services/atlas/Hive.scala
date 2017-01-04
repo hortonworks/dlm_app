@@ -24,7 +24,8 @@ object Hive {
       transient_lastDdlTime: Option[String],
       totalSize: Option[String],
       COLUMN_STATS_ACCURATE: Option[String],
-      numRows: Option[String]
+      numRows: Option[String],
+      department: Option[String]
   )
 
   case class Column(
@@ -61,8 +62,14 @@ object Hive {
       createTime: Option[String],
       lastAccessTime: Option[String],
       tableType: Option[String],
-      viewExpandedText: Option[String]
+      viewExpandedText: Option[String],
+      `$traits$`: Option[Trait]
   )
+
+  case class Trait(
+         marketing:Option[Map[String,String]],
+         insurance:Option[Map[String,String]]
+      )
 
   case class Multiplicity(
       lower: Option[Double],
@@ -105,6 +112,8 @@ object Hive {
   implicit val identifierReads = Json.reads[Identifier]
   implicit val columnReads = Json.reads[Column]
   implicit val parameterReads = Json.reads[Parameters]
+  implicit val traitReads = Json.reads[Trait]
+
   implicit val resultsReads = Json.reads[Result]
   implicit val resultReads = Json.reads[SearchResult]
 
@@ -115,6 +124,7 @@ object Hive {
   implicit val identifierWrites = Json.writes[Identifier]
   implicit val columnWrites = Json.writes[Column]
   implicit val parameterWrites = Json.writes[Parameters]
+  implicit val traitWrites = Json.writes[Trait]
   implicit val resultsWrites = Json.writes[Result]
   implicit val resultWrites = Json.writes[SearchResult]
   implicit val lineageWrites = Json.writes[Lineage]
