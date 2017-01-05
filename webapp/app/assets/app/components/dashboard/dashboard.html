@@ -15,22 +15,25 @@
         <thead>
         <tr>
             <th class="" style="width:5px" ></th>
-            <th class="mdl-data-table__cell--non-numeric">DATA LAKE</th>
+            <th class="mdl-data-table__cell--non-numeric"> {{ environment.DATA_CENTER_DATA_LAKE }}</th>
+            <th class="mdl-data-table__cell--non-numeric">CLUSTER</th>
             <th class="mdl-data-table__cell--non-numeric">NODES</th>
-            <th class="mdl-data-table__cell--non-numeric">CAPACITY UTILIZATION</th>
-            <th class="mdl-data-table__cell--non-numeric"># OF JOBS</th>
-            <th class="mdl-data-table__cell--non-numeric">DATA SIZE</th>
-            <th class="mdl-data-table__cell--non-numeric">COST</th>
+            <th class="mdl-data-table__cell--non-numeric">STORAGE</th>
+            <th class="mdl-data-table__cell--non-numeric">MEMORY USED</th>
+            <th class="mdl-data-table__cell--non-numeric">CPU USED</th>
+            <th class="mdl-data-table__cell--non-numeric">NETWORK</th>
+            <th class="mdl-data-table__cell--non-numeric">UP TIME</th>
+            <th class="mdl-data-table__cell--non-numeric">HEALTH</th>
         </tr>
-        <tr style="background-color: lightgray">
-            <th class="" style="width:5px"></th>
-            <th class="mdl-data-table__cell--non-numeric">Location</th>
-            <th class="mdl-data-table__cell--non-numeric">Total</th>
-            <th class="mdl-data-table__cell--non-numeric">Average</th>
-            <th class="mdl-data-table__cell--non-numeric">Average per day</th>
-            <th class="mdl-data-table__cell--non-numeric">TB</th>
-            <th class="mdl-data-table__cell--non-numeric">USD per day</th>
-        </tr>
+        <!--<tr style="background-color: lightgray">-->
+            <!--<th class="" style="width:5px"></th>-->
+            <!--<th class="mdl-data-table__cell&#45;&#45;non-numeric">Location</th>-->
+            <!--<th class="mdl-data-table__cell&#45;&#45;non-numeric">Total</th>-->
+            <!--<th class="mdl-data-table__cell&#45;&#45;non-numeric">Average</th>-->
+            <!--<th class="mdl-data-table__cell&#45;&#45;non-numeric">Average per day</th>-->
+            <!--<th class="mdl-data-table__cell&#45;&#45;non-numeric">TB</th>-->
+            <!--<th class="mdl-data-table__cell&#45;&#45;non-numeric">USD per day</th>-->
+        <!--</tr>-->
         </thead>
         <tbody>
         <tr *ngFor="let dashboardRow of dashboardRows" (click)="doNavigateToDataCenter(dashboardRow.dataCenter.name)" style="cursor: pointer">
@@ -41,11 +44,15 @@
                 <div class="data-center-name"> {{ dashboardRow.dataCenter.name }} </div>
                 <div class="data-center-location"> {{ dashboardRow.dataCenter.deployedAt}} </div>
             </td>
+            <td class="mdl-data-table__cell--non-numeric">{{ dashboardRow.cluster }}</td>
             <td class="mdl-data-table__cell--non-numeric">{{ dashboardRow.nodes }}</td>
-            <td class="mdl-data-table__cell--non-numeric">{{ dashboardRow.capacityUtilization }}%</td>
-            <td class="mdl-data-table__cell--non-numeric">{{ dashboardRow.averageJobsPerDay }}</td>
             <td class="mdl-data-table__cell--non-numeric">{{ dashboardRow.dataSize }}</td>
-            <td class="mdl-data-table__cell--non-numeric">${{ dashboardRow.cost }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ dashboardRow.usedDisk }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ dashboardRow.cpuUsed }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ dashboardRow.network }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ dashboardRow.upTime }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ dashboardRow.hostStatus }}</td>
+
         </tr>
 
 

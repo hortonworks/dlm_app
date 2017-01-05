@@ -10,6 +10,7 @@ import {CityNames} from '../../common/utils/city-names';
 import {DataCenterDetails} from '../../models/data-center-details';
 import {MathUtils} from '../../shared/utils/mathUtils';
 import {BreadcrumbService} from '../../services/breadcrumb.service';
+import {Environment} from '../../environment';
 
 declare var Datamap:any;
 declare const L: any;
@@ -23,16 +24,21 @@ export class DashboardRow {
     cost: number = 0;
     clusters: number = 0;
     hostStatus: string = '';
+    cluster: string = '';
+    cpuUsed: string = '';
+    network: string = '';
+    usedDisk: string = '';
+    upTime: string = '';
 
-    constructor(
-      dataCenter: DataCenter,
-      dataCenterDetails: DataCenterDetails
-    ) {
+    constructor(dataCenter: DataCenter, dataCenterDetails: DataCenterDetails) {
         let diskUsed: number = 0;
         let state: boolean = null;
         this.dataCenter = dataCenter;
         this.nodes = dataCenterDetails.hosts.length;
-
+        this.cluster = dataCenterDetails.nameNodeInfo[0].clusterName;
+        this.cpuUsed = (Math.floor(Math.random() * 100) + 1) + '%';
+        this.network = (Math.floor(Math.random() * 100) + 1) + '%';
+        this.upTime = MathUtils.dateToHumanReadableForm(new Date().getTime() - dataCenterDetails.nameNodeInfo[0].startTime);
 
         for (let nameNodeInfo of dataCenterDetails.nameNodeInfo) {
             this.capacityUtilization += nameNodeInfo.usedPercentage;
@@ -55,6 +61,7 @@ export class DashboardRow {
         this.cost = 0;
         this.averageJobsPerDay = 0;
         this.dataSize = MathUtils.bytesToSize(diskUsed);
+        this.usedDisk = MathUtils.bytesToSize((Math.floor(Math.random() * diskUsed) + 1));
         this.clusters += dataCenterDetails.numClusters;
         this.hostStatus = state ? 'HEALTHY' : 'UNHEALTHY';
         this.capacityUtilization = parseFloat( ((this.capacityUtilization/( 100* dataCenterDetails.nameNodeInfo.length)) * 100).toPrecision(3) );
@@ -76,13 +83,9 @@ export class DashboardComponent implements AfterViewInit, OnInit {
     map: any;
     dashboardRows: DashboardRow[] = [];
 
-    constructor(
-      private router: Router,
-      private dataCenterService: DataCenterService,
-      private geographyService: GeographyService,
-      private bpService: BackupPolicyService,
-      private breadcrumbService: BreadcrumbService
-    ) {}
+    constructor(private router: Router, private dataCenterService: DataCenterService, private environment: Environment,
+                private bpService: BackupPolicyService, private breadcrumbService: BreadcrumbService,
+                private geographyService: GeographyService) {}
 
     ngAfterViewInit() {
 

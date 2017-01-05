@@ -1,6 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {Router, NavigationEnd} from '@angular/router';
 import {BreadcrumbService} from '../../services/breadcrumb.service';
+import {Environment} from '../../environment';
 
 @Component({
     selector: 'bread-crumb',
@@ -13,7 +14,7 @@ export class BreadcrumbComponent {
     @Input() crumbMap:{[key: string]: string} = {};
     crumbKeys:{[key: string]: string}[] = [];
 
-    constructor(private router: Router, private breadcrumbService: BreadcrumbService) {
+    constructor(private router: Router, private breadcrumbService: BreadcrumbService, private environment: Environment) {
         router.events.subscribe(event => {
             if (event instanceof NavigationEnd && event.url !== '') {
                 this.handleUrl(event.url);
@@ -44,7 +45,7 @@ export class BreadcrumbComponent {
         } else if (url.indexOf('/ui/view-data') === 0) {
             this.breadcrumbService.crumbMap.push({'url': url, 'name': 'Host: ' + url.split('/')[3].split('?')[0]});
         } else if (url.indexOf('/ui/data-lake') === 0) {
-            this.breadcrumbService.crumbMap.push({'url': url, 'name': 'Data Lake: ' + url.split('/')[3].split('?')[0]});
+            this.breadcrumbService.crumbMap.push({'url': url, 'name': this.environment.DATA_CENTER_DATA_LAKE + ': ' + url.split('/')[3].split('?')[0]});
         } else if (url.indexOf('/ui/data-analyst/dataset/add') === 0) {
             this.breadcrumbService.crumbMap.push({'url': url, 'name': 'Add Data Set'});
         } else if (url.indexOf('/ui/data-analyst/dataset/view/') === 0) {

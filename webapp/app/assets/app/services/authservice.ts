@@ -15,6 +15,7 @@ export class AuthService {
     }
 
     login(userName: string, password: string):Promise<LoginData> {
+        localStorage.setItem('user', userName);
         let headers = new Headers();
         headers.append('Content-Type', 'application/json');
         return this.http.post(
