@@ -113,33 +113,50 @@ export class DashboardComponent implements AfterViewInit, OnInit {
 
       this.geographyService.getCountries()
         .subscribe(countrySet => {
+          // removed Antartics
+          // assumption: no data centers in Antartica
+          const countrySetWithoutATA = Object.assign({}, countrySet, {
+            features: countrySet.features.filter(cFeature => cFeature.id !== 'ATA')
+          });
+
           const baseLayer =
             L
-              .geoJSON(countrySet, {
+              .geoJSON(countrySetWithoutATA, {
                 style: {
-                    fillColor: '#ABE3F3',
-                    fillOpacity: 1,
-                    weight: 1,
-                    color: '#FDFDFD'
+                  fillColor: '#ABE3F3',
+                  fillOpacity: 1,
+                  weight: 1,
+                  color: '#FDFDFD'
                 }
               });
 
           // added pseudo layer to prevent empty space when zoomed out
           // https://github.com/Leaflet/Leaflet/blob/v1.0.2/src/layer/GeoJSON.js#L205
-          const pseudoBaseLayer =
+          const pseudoLeft =
             L
-              .geoJSON(countrySet, {
+              .geoJSON(countrySetWithoutATA, {
                 style: {
-                    fillColor: '#ABE3F3',
-                    fillOpacity: 1,
-                    weight: 1,
-                    color: '#FDFDFD'
+                  fillColor: '#ABE3F3',
+                  fillOpacity: 1,
+                  weight: 1,
+                  color: '#FDFDFD'
                 },
                 coordsToLatLng: (coords: number[]) => new L.LatLng(coords[1], coords[0] - 360, coords[2])
               });
+          const pseudoRight =
+            L
+              .geoJSON(countrySetWithoutATA, {
+                style: {
+                  fillColor: '#ABE3F3',
+                  fillOpacity: 1,
+                  weight: 1,
+                  color: '#FDFDFD'
+                },
+                coordsToLatLng: (coords: number[]) => new L.LatLng(coords[1], coords[0] + 360, coords[2])
+              });
 
           L
-            .featureGroup([baseLayer, pseudoBaseLayer])
+            .featureGroup([baseLayer, pseudoLeft, pseudoRight])
             .addTo(this.map)
             .bringToBack();
         });
@@ -268,11 +285,21 @@ export class DashboardComponent implements AfterViewInit, OnInit {
               });
           });
 
-      if(points.length > 0) {
-        this.map.fitBounds(pointsGroup.getBounds(), { padding: L.point(20, 20) });
-      } else {
-        this.map.setView([-10, -10], 3);
-      }
+      // area that must be shown
+      const extremes = [
+        L.marker([75, 0]),
+        L.marker([-50, 0]),
+        L.marker([0, -179]),
+        L.marker([0, 180]),
+      ];
+      this.map.fitBounds(L.featureGroup(extremes).getBounds(), {});
+
+      // if(points.length > 0) {
+      //   this.map.fitBounds(pointsGroup.getBounds(), { padding: L.point(20, 20) });
+      //   this.map.fitWorld({ padding: L.point(20, 20) });
+      // } else {
+      //   this.map.fitBounds(L.featureGroup(extremes).getBounds(), {});
+      // }
     }
 
     doNavigateToDataCenter(dataCenterId: string) {
