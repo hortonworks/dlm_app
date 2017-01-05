@@ -8,6 +8,7 @@ import {BackupPolicyService} from '../../services/backup-policy.service';
 import {Ambari} from '../../models/ambari';
 import {BackupPolicyInDetail} from '../../models/backup-policy';
 import {DataCenterService} from '../../services/data-center.service';
+import {AtlasService} from '../../services/atlas.service';
 import Rx from 'rxjs/Rx';
 import {CityNames} from '../../common/utils/city-names';
 
@@ -49,6 +50,8 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
       resourceType: 'hive'
     };
 
+    dbName: string = '';
+
     clusterHost: string;
     dataLakeName: string;
 
@@ -72,13 +75,24 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
       private policyService: BackupPolicyService,
       private dcService: DataCenterService,
       private geographyService: GeographyService,
+      private atlasService: AtlasService,
 
       private environment: Environment,
       private searchQueryService: SearchQueryService
     ) {
 
         this.rxSearch
-          .subscribe(search => this.search = search);
+          .flatMap(search => {
+            return atlasService.getTable(this.clusterHost, this.dataLakeName, search.resourceId)
+              .map(tableData => ({
+                query: search,
+                dbName: tableData.qualifiedName.split('.')[0]
+              }));
+          })
+          .subscribe(searchObj => {
+            this.search = searchObj.query;
+            this.dbName = searchObj.dbName;
+          });
 
       const rxBackupPolicies =
         this.rxSearch

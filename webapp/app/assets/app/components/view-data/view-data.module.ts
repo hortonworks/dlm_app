@@ -9,12 +9,13 @@ import {AtlasLineageModule} from '../atlas-lineage/atlas-lineage.module';
 import {RangerPoliciesModule} from '../ranger-policies/ranger-policies.module';
 import {DataPlaneSearchModule} from '../../shared/data-plane-search/data-plane-search.modue';
 import {SearchQueryService} from '../../services/search-query.service';
+import {AtlasService} from '../../services/atlas.service';
 
 @NgModule({
     imports: [routing, SharedModule, BreadcrumbModule, HiveDataModule, AtlasLineageModule, RangerPoliciesModule, DataPlaneSearchModule, LoaderSpinModule],
     exports: [],
     declarations: [ViewDataComponent],
-    providers: [SearchQueryService],
+    providers: [SearchQueryService, AtlasService],
 })
 export class ViewDataModule {
 }
