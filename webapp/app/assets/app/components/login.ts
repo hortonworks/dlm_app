@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import {Environment} from '../environment';
 import {Persona} from '../shared/utils/persona';
 import 'rxjs/add/operator/toPromise';
+import {BreadcrumbService} from '../services/breadcrumb.service';
 
 
 @Component({
@@ -19,7 +20,7 @@ export default class LoginComponent {
     submitted: boolean = false;
     model: LoginData = new LoginData('','', '');
 
-    constructor(private userService: AuthService, private router: Router, private environment: Environment) {
+    constructor(private userService: AuthService, private router: Router, private environment: Environment, private breadcrumbService: BreadcrumbService) {
         if (window.location.hash.length > 0 && window.location.hash === '#SESSEXPIRED') {
             this.statusMessage = 'SESSIONEXPIRED';
         }
@@ -27,6 +28,7 @@ export default class LoginComponent {
 
     onSubmit() {
         this.submitted = true;
+        this.breadcrumbService.crumbMap = [];
         this.userService.login(this.model.name, this.model.password).then(res=> {
             const persona = Persona[res.userType];
             this.environment.persona = persona;

@@ -35,10 +35,10 @@ export class DashboardRow {
         let state: boolean = null;
         this.dataCenter = dataCenter;
         this.nodes = dataCenterDetails.hosts.length;
-        this.cluster = dataCenterDetails.nameNodeInfo[0].clusterName;
+        this.cluster = (dataCenterDetails.nameNodeInfo.length > 0) ? dataCenterDetails.nameNodeInfo[0].clusterName: '';
         this.cpuUsed = (Math.floor(Math.random() * 100) + 1) + '%';
         this.network = (Math.floor(Math.random() * 100) + 1) + '%';
-        this.upTime = MathUtils.dateToHumanReadableForm(new Date().getTime() - dataCenterDetails.nameNodeInfo[0].startTime);
+        this.upTime = (dataCenterDetails.nameNodeInfo.length > 0) ? MathUtils.dateToHumanReadableForm(new Date().getTime() - dataCenterDetails.nameNodeInfo[0].startTime) : '';
 
         for (let nameNodeInfo of dataCenterDetails.nameNodeInfo) {
             this.capacityUtilization += nameNodeInfo.usedPercentage;
@@ -85,7 +85,9 @@ export class DashboardComponent implements AfterViewInit, OnInit {
 
     constructor(private router: Router, private dataCenterService: DataCenterService, private environment: Environment,
                 private bpService: BackupPolicyService, private breadcrumbService: BreadcrumbService,
-                private geographyService: GeographyService) {}
+                private geographyService: GeographyService) {
+        this.breadcrumbService.crumbMap = [{'url': '/ui/dashboard', 'name': 'Dashboard'}];
+    }
 
     ngAfterViewInit() {
 

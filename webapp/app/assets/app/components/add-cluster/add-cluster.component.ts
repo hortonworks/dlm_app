@@ -5,6 +5,7 @@ import {Ambari} from '../../models/ambari';
 import {DataCenter} from '../../models/data-center';
 import {DataCenterService} from '../../services/data-center.service';
 import {Alerts} from '../../shared/utils/alerts';
+import {Environment} from '../../environment';
 
 declare var Datamap:any;
 
@@ -34,12 +35,14 @@ export class AddClusterComponent implements AfterViewInit, OnInit {
     welcomeText = `Add a cluster to the Data Plane by filling in the details below. Once a cluster is added,
     Data Plane will fetch all the details from the cluster and would allow you monitor/manage them from this interface`;
     dataCenterHelp1 = `Add a new datacenter or select an existing datacenter to see all the clusters present in the datacenter.`;
-    dataCenterHelp2 = `Data lake groups the cluster's based on the location they are present. The grouping would help administrators to
-    look at all the clusters present in a datacenter in a single view`;
+    dataCenterHelp2 = '';
     ambariHelp= `Login credentials for ambari the credentials are used tio fetch data from ambari`;
     kerbarosHelp = `Kerberos principle and key URL are used to fetch data securely from ambari and the services configured on ambari`;
 
-    constructor(private ambariService: AmbariService, private dataCenterService: DataCenterService) {}
+    constructor(private ambariService: AmbariService, private dataCenterService: DataCenterService, private environment: Environment) {
+        this.dataCenterHelp2 = this.environment.DATA_CENTER_DATA_LAKE + ` groups the cluster's based on the location they are present. The grouping would help administrators to
+            look at all the clusters present in a datacenter in a single view`;
+    }
 
     ngOnInit() {
         this.dataCenterService.get().subscribe((dataCenters: DataCenter[]) => {
@@ -167,7 +170,7 @@ export class AddClusterComponent implements AfterViewInit, OnInit {
 
         if (this.getDataCenterByName(this.dataCenter.name) === null) {
             this.dataCenterService.put(this.dataCenter).subscribe(message => {
-                Alerts.showSuccessMessage('Saved data lake configuration');
+                Alerts.showSuccessMessage('Saved '+ this.environment.DATA_CENTER_DATA_LAKE+' configuration');
                 this.ambariService.post(this.ambari).subscribe(message => {
                     Alerts.showSuccessMessage('Saved cluster configuration');
                     window.history.back();

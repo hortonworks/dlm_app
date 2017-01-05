@@ -55,9 +55,10 @@
                     <div class="title-text"> {{ dataSet.name }}</div>
                 </div>
                 <div class="mdl-card__supporting-text">
-                    {{ dataSet.description }} <br>
+                    DATA LAKE: {{ dataSet.dataCenter }} <br>
                     CREATED BY:  {{ dataSet.userName }} <br>
                     LAST UPDATED: {{ getLastModified(dataSet.lastModified) }} <br>
+                    {{ dataSet.description }} <br>
                 </div>
                 <div class="mdl-card__actions mdl-card--border">
                     <div>
