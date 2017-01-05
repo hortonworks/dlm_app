@@ -32,8 +32,10 @@ export default class LoginComponent {
             this.environment.persona = persona;
 
             if (persona === Persona.ANALYSTADMIN) {
+                this.environment.DATA_CENTER_DATA_LAKE = 'Data Lake';
                 this.router.navigate(['ui/data-analyst/analyst-dashboard']);
             } else {
+                this.environment.DATA_CENTER_DATA_LAKE = 'Data Center';
                 this.router.navigate(['ui/dashboard']);
             }
         }).catch(error => this.router.navigate(['ui/login']));

@@ -170,6 +170,10 @@ export class DataSetComponent implements OnInit {
     }
 
     viewDataSet(dataSet: DataSet) {
+
+        this.breadcrumbService.crumbMap.shift();
+        this.breadcrumbService.crumbMap.unshift({'url': '/ui/data-analyst/analyst-dashboard', 'name': dataSet.dataCenter});
+
         let navigationExtras = {
             'queryParams' : {'host': dataSet.ambariHost, 'dataCenter': dataSet.dataCenter}
         };
