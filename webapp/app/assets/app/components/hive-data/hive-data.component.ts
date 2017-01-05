@@ -80,12 +80,29 @@ export class HiveDataComponent implements OnChanges {
 
       rxEntity
         .map(entity => {
-          return Object.keys(entity.definition.values)
-            .filter(cValueKey => ['db', 'columns', 'sd', 'parameters'].indexOf(cValueKey) === -1)
-            .map(cValueKey => ({
-              key: cValueKey,
-              value: entity.definition.values[cValueKey]
-            }));
+          const paramsA =
+            Object.keys(entity.definition.values)
+              .filter(cValueKey => ['db', 'columns', 'sd', 'parameters'].indexOf(cValueKey) === -1)
+              .map(cValueKey => ({
+                key: cValueKey,
+                value: entity.definition.values[cValueKey]
+              }));
+
+          const paramsB =
+            Object.keys(entity.definition.values.parameters)
+              .map(cValueKey => ({
+                key: cValueKey,
+                value: entity.definition.values.parameters[cValueKey]
+              }));
+
+          return ([
+            ...paramsA,
+            ...paramsB,
+            {
+              key: 'numColumns',
+              value: entity.definition.values.columns.length
+            }
+          ]);
         })
         .subscribe(properties => this.properties = properties);
 
