@@ -79,11 +79,11 @@ export class Environment {
     tags: {
       predicate: (rhs, operator) => {
         if(FUNCTION_MAPPINGS.indexOf(operator) >= 0) {
-          return `r.$traits$ && r.$traits$.${rhs} && r.$traits$.${rhs}.$typeName$ && r.$traits$.<RHS_VALUE>.$typeName$.${operator}(${rhs})`;
+          return `r.$traits$ && r.$traits$.${rhs} && r.$traits$.${rhs}.$typeName$ && r.$traits$.<RHS_VALUE>.$typeName$.${operator}('${rhs}')`;
         } else if(Object.keys(OPERATOR_MAPPINGS).indexOf(operator) >= 0) {
-          return `r.$traits$ && r.$traits$.${rhs} && r.$traits$.${rhs}.$typeName$ ${OPERATOR_MAPPINGS[operator]} ${rhs}`;
+          return `r.$traits$ && r.$traits$.${rhs} && r.$traits$.${rhs}.$typeName$ ${OPERATOR_MAPPINGS[operator]} '${rhs}'`;
         } else {
-          return `r.$traits$ && r.$traits$.${rhs} && r.$traits$.${rhs}.$typeName$ ${operator} ${rhs}`;
+          return `r.$traits$ && r.$traits$.${rhs} && r.$traits$.${rhs}.$typeName$ ${operator} '${rhs}'`;
         };
       },
       qualifier: 'field'
