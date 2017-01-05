@@ -40,13 +40,6 @@
             </div>
 
         </div>
-
-        <div class="footer">
-            <div> Data Set </div>
-            <div> Hive </div>
-            <div> HBASE </div>
-            <div> Files </div>
-        </div>
     </div>
     <div class="mdl-cell mdl-cell--10-col content">
         <div class="actions">
@@ -62,6 +55,7 @@
                     <div class="title-text"> {{ dataSet.name }}</div>
                 </div>
                 <div class="mdl-card__supporting-text">
+                    {{ dataSet.description }} <br>
                     CREATED BY:  {{ dataSet.userName }} <br>
                     LAST UPDATED: {{ getLastModified(dataSet.lastModified) }} <br>
                 </div>

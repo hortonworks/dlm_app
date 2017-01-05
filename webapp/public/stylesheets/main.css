@@ -70,10 +70,25 @@ textarea {
     background-size: 15px 15px;
 }
 
-
-.logged-in-user:before {
-    content: "\f2bd";
-    font-family: FontAwesome;
+.admin-a {
+    background: url(../images/admin-a.jpg) no-repeat;
+    background-size: 35px 35px;
+}
+.admin-b {
+    background: url(../images/admin-b.jpg) no-repeat;
+    background-size: 35px 35px;
+}
+.admin-h {
+    background: url(../images/admin-h.jpg) no-repeat;
+    background-size: 35px 35px;
+}
+.admin-r {
+    background: url(../images/admin-r.jpg) no-repeat;
+    background-size: 35px 35px;
+}
+.user-name {
+    color: #506167 !important;
+    font-size: 12px;
 }
 
 /* Switch Button */

@@ -10,13 +10,16 @@
 
             <!-- Navigation -->
 
-            <button class="dataplane-more-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" id="more-button">
-                <span class="logged-in-user"> </span>
-            </button>
-            <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right mdl-js-ripple-effect" for="more-button">
-                <li *ngIf="isLoggedIn()" class="mdl-menu__item">My account</li>
-                <li *ngIf="isLoggedIn()" class="mdl-menu__item"><a href="#" routerLink="/ui/logout">log out</a></li>
-            </ul>
+            <div>
+                <button class="dataplane-more-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" id="more-button" [ngClass]="{'admin-a': who === 1, 'admin-b': who === 4,'admin-h': who === 3,'admin-r': who === 2}">
+                    <span class="logged-in-user"> </span>
+                </button>
+                <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right mdl-js-ripple-effect" for="more-button">
+                    <li *ngIf="isLoggedIn()" class="mdl-menu__item">My account</li>
+                    <li *ngIf="isLoggedIn()" class="mdl-menu__item"><a href="#" routerLink="/ui/logout">log out</a></li>
+                </ul>
+                <div class="user-name"> {{ getUserName() }} </div>
+            </div>
         </div>
     </div>
 
@@ -26,9 +29,7 @@
         </span>
         <nav *ngIf="isLoggedIn()" class="mdl-navigation">
             <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/dashboard']">Dashboard</a>
-            <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/add-data-lake']" >Data Lake</a>
-
-            <a *ngIf="[persona.ANALYSTADMIN, persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['ui/data-analyst/analyst-dashboard']">Dataset</a>
+            <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/add-data-lake']" > {{ environment.DATA_CENTER_DATA_LAKE }} </a>
         </nav>
     </div>
 
