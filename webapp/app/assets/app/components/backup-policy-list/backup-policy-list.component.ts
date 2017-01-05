@@ -5,6 +5,8 @@ import Rx from 'rxjs/Rx';
 import {BackupPolicyService} from '../../services/backup-policy.service';
 import {BackupPolicyInDetail} from '../../models/backup-policy';
 
+declare var moment: any;
+
 @Component({
     selector: 'backup-policy-list' ,
     styleUrls: ['assets/app/components/backup-policy-list/backup-policy-list.component.css'],
@@ -40,5 +42,9 @@ export default class BackupPolicyListComponent implements OnChanges {
         };
         this.router.navigate([`/ui/backup-policy/${cPolicyId}`], navigationExtras);
         return false;
+    }
+
+    doGetMoment(time: string) {
+      return moment(time).fromNow();
     }
 }

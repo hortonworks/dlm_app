@@ -8,6 +8,7 @@
                         <a class="mdl-navigation__link" (click)="setActiveTab($event, tab.TAGS)" [ngClass]="{'is-active': (activeTab===tab.TAGS)}">TAGS</a>
                         <a class="mdl-navigation__link" (click)="setActiveTab($event, tab.AUDITS)" [ngClass]="{'is-active': (activeTab===tab.AUDITS)}">AUDITS</a>
                         <a class="mdl-navigation__link" (click)="setActiveTab($event, tab.SCHEMA)" [ngClass]="{'is-active': (activeTab===tab.SCHEMA)}">SCHEMA</a>
+                        <a class="mdl-navigation__link" (click)="setActiveTab($event, tab.ACCESS_POLICIES)" [ngClass]="{'is-active': (activeTab===tab.ACCESS_POLICIES)}">ACCESS POLICIES</a>
                     </nav>
                 </div>
             </header>
@@ -89,6 +90,63 @@
                                   </tr>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                </section>
+                <section *ngIf="(activeTab===tab.ACCESS_POLICIES)" class="mdl-layout__tab-panel is-active">
+                    <div class="page-content">
+                        <div class="dataplane-screen-section mdl-typography--text-center">
+                            <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="['claim_savings', 'us_customers', 'ww_customers', 'provider_summary', 'clickstream', 'users', 'campaigns', 'sales'].includes(resourceId)">
+                                <thead>
+                                  <tr>
+                                    <th class="mdl-data-table__cell--non-numeric">Policy Name</th>
+                                    <th class="mdl-data-table__cell--non-numeric">User</th>
+                                    <th class="mdl-data-table__cell--non-numeric">Group</th>
+                                    <th class="mdl-data-table__cell--non-numeric">Permissions</th>
+                                    <th class="mdl-data-table__cell--non-numeric">Access Type</th>
+                                    <th class="mdl-data-table__cell--non-numeric">Delegate Admin</th>
+                                  </tr>
+                                </thead>
+                                <tbody *ngIf="['claim_savings', 'us_customers', 'ww_customers', 'provider_summary'].includes(resourceId)">
+                                  <tr>
+                                    <td class="mdl-data-table__cell--non-numeric">insurance_claims_access_policy</td>
+                                    <td class="mdl-data-table__cell--non-numeric">insurance_admin</td>
+                                    <td class="mdl-data-table__cell--non-numeric"></td>
+                                    <td class="mdl-data-table__cell--non-numeric">all</td>
+                                    <td class="mdl-data-table__cell--non-numeric">allow</td>
+                                    <td class="mdl-data-table__cell--non-numeric">false</td>
+                                  </tr>
+                                  <tr>
+                                    <td class="mdl-data-table__cell--non-numeric">insurance_claims_access_policy</td>
+                                    <td class="mdl-data-table__cell--non-numeric">insurance_user</td>
+                                    <td class="mdl-data-table__cell--non-numeric"></td>
+                                    <td class="mdl-data-table__cell--non-numeric">select</td>
+                                    <td class="mdl-data-table__cell--non-numeric">allow</td>
+                                    <td class="mdl-data-table__cell--non-numeric">false</td>
+                                  </tr>
+                                </tbody>
+                                <tbody *ngIf="['clickstream', 'users', 'campaigns', 'sales'].includes(resourceId)">
+                                  <tr>
+                                    <td class="mdl-data-table__cell--non-numeric">marketing_campaigns_access_policy</td>
+                                    <td class="mdl-data-table__cell--non-numeric">marketing_admin</td>
+                                    <td class="mdl-data-table__cell--non-numeric"></td>
+                                    <td class="mdl-data-table__cell--non-numeric">all</td>
+                                    <td class="mdl-data-table__cell--non-numeric">allow</td>
+                                    <td class="mdl-data-table__cell--non-numeric">false</td>
+                                  </tr>
+                                  <tr>
+                                    <td class="mdl-data-table__cell--non-numeric">marketing_campaigns_access_policy</td>
+                                    <td class="mdl-data-table__cell--non-numeric">marketing_user</td>
+                                    <td class="mdl-data-table__cell--non-numeric"></td>
+                                    <td class="mdl-data-table__cell--non-numeric">select</td>
+                                    <td class="mdl-data-table__cell--non-numeric">allow</td>
+                                    <td class="mdl-data-table__cell--non-numeric">false</td>
+                                  </tr>
+                                </tbody>
+                            </table>
+                            <div style="padding: 25px 0;" *ngIf="['claim_savings', 'us_customers', 'ww_customers', 'provider_summary', 'clickstream', 'users', 'campaigns', 'sales'].includes(resourceId) === false">
+                              No ranger policies found.
+                            </div>
                         </div>
                     </div>
                 </section>

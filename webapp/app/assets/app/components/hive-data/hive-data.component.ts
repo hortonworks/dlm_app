@@ -8,7 +8,7 @@ import Rx from 'rxjs/Rx';
 declare var Datamap:any;
 declare var moment:any;
 
-export enum Tab { PROPERTIES, TAGS, AUDITS, SCHEMA}
+export enum Tab { PROPERTIES, TAGS, AUDITS, SCHEMA, ACCESS_POLICIES}
 
 @Component({
     selector: 'hive-data',
