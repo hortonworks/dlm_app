@@ -116,10 +116,9 @@ export class RangerPoliciesComponent implements OnInit, OnChanges, AfterViewInit
 
       const yAxis =
         d3
-          .axisLeft(y);
-      if(d3.max(data, d => d.value) <= 1) {
-        yAxis.ticks(1);
-      }
+          .axisLeft(y)
+          .tickValues(data.map(cData => cData.value))
+          .tickFormat(d3.format(',.0f'));
       g.append('g')
           .attr('class', 'axis axis--y')
           .call(yAxis);
