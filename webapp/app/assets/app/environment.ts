@@ -36,7 +36,7 @@ export class Environment {
     new SearchParamWrapper(new SearchParam('Owner', '',''), ['==', '!=', 'contains']),
     new SearchParamWrapper(new SearchParam('Created', '',''), ['before', 'after', 'on', 'not on']),
     new SearchParamWrapper(new SearchParam('Comment', '',''), ['==', '!=', 'contains']),
-    new SearchParamWrapper(new SearchParam('Tags', '',''), ['==', '!=', 'contains']),
+    new SearchParamWrapper(new SearchParam('Tags', '',''), ['==']),
     new SearchParamWrapper(new SearchParam('Department', '',''), ['==', '!=', 'contains']),
   ];
 
@@ -77,11 +77,19 @@ export class Environment {
       qualifier: 'field'
     },
     tags: {
-      predicate: (rhs, operator) => buildPredicate('r.tags', `'${rhs}'`, operator),
+      predicate: (rhs, operator) => {
+        if(FUNCTION_MAPPINGS.indexOf(operator) >= 0) {
+          return `r.$traits$ && r.$traits$.${rhs} && r.$traits$.${rhs}.$typeName$ && r.$traits$.<RHS_VALUE>.$typeName$.${operator}(${rhs})`;
+        } else if(Object.keys(OPERATOR_MAPPINGS).indexOf(operator) >= 0) {
+          return `r.$traits$ && r.$traits$.${rhs} && r.$traits$.${rhs}.$typeName$ ${OPERATOR_MAPPINGS[operator]} ${rhs}`;
+        } else {
+          return `r.$traits$ && r.$traits$.${rhs} && r.$traits$.${rhs}.$typeName$ ${operator} ${rhs}`;
+        };
+      },
       qualifier: 'field'
     },
     department: {
-      predicate: (rhs, operator) => buildPredicate('r.parameters.dept', `'${rhs}'`, operator),
+      predicate: (rhs, operator) => buildPredicate('r.parameters.department', `'${rhs}'`, operator),
       qualifier: 'field'
     },
   };
