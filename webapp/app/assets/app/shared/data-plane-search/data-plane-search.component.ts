@@ -109,4 +109,8 @@ export class DataPlaneSearchComponent implements  OnInit {
         }
         return {predicate: '', qualifier: ''};
     }
+
+    getButtonLabel(): string {
+        return this.clearAfterSearch ? 'Search' : 'Add Filter';
+    }
 }

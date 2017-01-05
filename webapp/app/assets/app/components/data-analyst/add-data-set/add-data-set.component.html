@@ -87,7 +87,7 @@
                         </header>
                         <main class="mdl-layout__content">
                             <section *ngIf="dataActiveTab === dataTab.HIVE">
-                                <data-plane-search [clearAfterSearch]="false" [searchParamWrappers]="hiveSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, 'hive')" [dataSource]="'hive'"> </data-plane-search>
+                                <data-plane-search [clearAfterSearch]="true" [searchParamWrappers]="hiveSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, 'hive')" [dataSource]="'hive'"> </data-plane-search>
                                 <div *ngFor="let hiveFilterWrapper of hiveFiltersWrapper" style="margin-top: 15px;">
                                     <chips-bar [searchParams]="hiveFilterWrapper.searchParams" ></chips-bar>
                                     <div id="progactive" style="width:200px" class="mdl-js-progress mdl-progress--indeterminate" [hidden]="hiveFilterWrapper.progress"></div>
@@ -115,7 +115,7 @@
 
                             </section>
                             <section *ngIf="(dataActiveTab===dataTab.HBASE)">
-                                <data-plane-search [clearAfterSearch]="false" [searchParamWrappers]="hbaseSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, 'hbase')" [dataSource]="'hbase'"> </data-plane-search>
+                                <data-plane-search [clearAfterSearch]="true" [searchParamWrappers]="hbaseSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, 'hbase')" [dataSource]="'hbase'"> </data-plane-search>
                                 <div *ngFor="let hbaseFilterWrapper of hbaseFiltersWrapper" style="margin-top: 15px;">
                                     <chips-bar [searchParams]="hbaseFilterWrapper.searchParams" ></chips-bar>
                                     <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="hbaseFilterWrapper.data.length > 0">
@@ -138,7 +138,7 @@
 
                             </section>
                             <section *ngIf="(dataActiveTab===dataTab.HDFS)">
-                                <data-plane-search [clearAfterSearch]="false" [searchParamWrappers]="hdfsSearchParamWrappers"  (searchFilters)="addFilterAndSearch($event, 'hdfs')" [dataSource]="'hdfs'"> </data-plane-search>
+                                <data-plane-search [clearAfterSearch]="true" [searchParamWrappers]="hdfsSearchParamWrappers"  (searchFilters)="addFilterAndSearch($event, 'hdfs')" [dataSource]="'hdfs'"> </data-plane-search>
                                 <div *ngFor="let hdfsFilterWrapper of hdfsFiltersWrapper">
                                     <chips-bar [searchParams]="hdfsFilterWrapper.searchParams" ></chips-bar>
                                     <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" *ngIf="hdfsFilterWrapper.data.length > 0">
