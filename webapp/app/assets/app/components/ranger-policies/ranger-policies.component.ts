@@ -37,15 +37,32 @@ export class RangerPoliciesComponent implements OnInit, OnChanges, AfterViewInit
     access: any[] = [];
     users: any[] = [];
 
+    isPolicyRequestInProgress: boolean = false;
+    isAccessRequestInProgress: boolean = false;
+    isUsersRequestInProgress: boolean = false;
+
     constructor(private rangerPoliciesService: RangerService) {
 
       this.rxInputChange
+        .subscribe(() => {
+          // marking status as in progress
+
+          this.isPolicyRequestInProgress = true;
+          this.isAccessRequestInProgress = true;
+          this.isUsersRequestInProgress = true;
+        });
+
+      this.rxInputChange
         .flatMap(({resourceId, resourceType, dataLakeId, clusterId}) => this.rangerPoliciesService.getPolicies(resourceId, resourceType, dataLakeId, clusterId))
-        .subscribe(policies => this.policies = RangerPolicies.getData(policies));
+        .subscribe(policies => {
+          this.isPolicyRequestInProgress = false;
+          this.policies = RangerPolicies.getData(policies);
+        });
 
       this.rxInputChange
         .flatMap(({resourceId, resourceType, dataLakeId, clusterId}) => this.rangerPoliciesService.getAccess(resourceId, resourceType, dataLakeId, clusterId))
         .subscribe(access => {
+          this.isAccessRequestInProgress = false;
           this.access = access;
           this.drawChart('#ranger_barchart_access', access);
         });
@@ -53,6 +70,7 @@ export class RangerPoliciesComponent implements OnInit, OnChanges, AfterViewInit
       this.rxInputChange
         .flatMap(({resourceId, resourceType, dataLakeId, clusterId}) => this.rangerPoliciesService.getUsers(resourceId, resourceType, dataLakeId, clusterId))
         .subscribe(users => {
+          this.isUsersRequestInProgress = false;
           this.users = users;
           this.drawChart('#ranger_barchart_users', users);
         });
