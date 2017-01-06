@@ -8,9 +8,10 @@ import {DropDownModule} from '../../../shared/dropdown/dropdown.module';
 import {SearchQueryService} from '../../../services/search-query.service';
 import {BreadcrumbModule} from '../../../shared/breadcrumb/breadcrumb.module';
 import {ChipsBarModule} from '../../../shared/chips-bar/chips-bar.module';
+import {NVD3Module} from '../../../shared/nvd3/nvd3.module';
 
 @NgModule({
-    imports: [routing, SharedModule, DataPlaneSearchModule, DropDownModule, BreadcrumbModule, ChipsBarModule],
+    imports: [routing, SharedModule, DataPlaneSearchModule, DropDownModule, BreadcrumbModule, ChipsBarModule, NVD3Module],
     exports: [AddDataSetComponent],
     declarations: [AddDataSetComponent],
     providers: [DataSetService, SearchQueryService],

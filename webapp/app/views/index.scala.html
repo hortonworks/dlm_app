@@ -14,6 +14,7 @@
         <link rel="stylesheet" href="https://unpkg.com/font-awesome@@4.7.0/css/font-awesome.min.css" />
         <link rel="stylesheet" href="https://unpkg.com/nvd3@@1.8.5/build/nv.d3.css" />
         <link rel="stylesheet" href="https://unpkg.com/leaflet@@1.0.2/dist/leaflet.css" />
+        <link rel="stylesheet" href='@routes.Assets.versioned("lib/nvd3/build/nv.d3.css")'>
         <link rel="stylesheet" href="assets/stylesheets/styles.css">
         <link rel="stylesheet" href="assets/stylesheets/main.css">
 
@@ -32,14 +33,15 @@
         <script src="https://unpkg.com/leaflet@@1.0.2/dist/leaflet-src.js"></script>
         <script src="https://unpkg.com/leaflet-curve@@1.0.0/leaflet.curve.js"></script>
         <script src="https://unpkg.com/moment@@2.17.1/min/moment.min.js"></script>
+        <script type='text/javascript' src='@routes.Assets.versioned("lib/nvd3/build/nv.d3.js")'></script>
         <script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>
         <script>
             var map = {
                 'app': 'assets/app',
                 '@@angular':'assets/lib/@@angular',
                 'rxjs':'assets/lib/rxjs',
-                'symbol-observable': 'assets/lib/symbol-observable'
-
+                'symbol-observable': 'assets/lib/symbol-observable',
+                'ng2-nvd3': 'assets/lib/ng2-nvd3/build/lib'
             };
 
 
@@ -47,7 +49,8 @@
                 'app': {main: 'main.js', defaultExtension: 'js'},
                 'rxjs': {defaultExtension: 'js'},
                 'assets/lib': {defaultExtension: 'js'},
-                'symbol-observable': {defaultExtension: 'js', main: 'index.js'}
+                'symbol-observable': {defaultExtension: 'js', main: 'index.js'},
+                'ng2-nvd3': {defaultExtension: 'js', main: 'ng2-nvd3.js'}
             };
         var ngPackageNames = [
                 'common',

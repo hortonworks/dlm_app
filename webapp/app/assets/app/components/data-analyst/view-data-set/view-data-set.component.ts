@@ -12,6 +12,7 @@ import {SearchParamWrapper} from '../../../shared/data-plane-search/search-param
 import {SearchParam} from '../../../shared/data-plane-search/search-param';
 import {Persona} from '../../../shared/utils/persona';
 import Rx from 'rxjs/Rx';
+import {DataPlaneSearchComponent} from '../../../shared/data-plane-search/data-plane-search.component';
 
 export enum Tab { HIVE, HBASE, HDFS}
 
@@ -118,9 +119,40 @@ export class ViewDataSetComponent implements OnInit {
         }
     }
 
+    addBasicFilterAndSearch($event, value, dataSource: string) {
+        if ($event.keyCode === 13) {
+            let dataFilter = new DataFilter();
+            let tFilterWrappers: DataFilterWrapper[] = [];
+            dataFilter.qualifier = 'field';
+
+            if (dataSource === 'hive') {
+                tFilterWrappers = this.hiveFiltersWrapper.slice();
+                this.hiveFilterResults = [];
+                this.dataSet['hiveCount'] = 0;
+            }
+            if (dataSource === 'hbase') {
+                tFilterWrappers = this.hbaseFiltersWrapper.slice();
+                this.hbaseFilterResults = [];
+                this.dataSet['hbaseCount'] = 0;
+            }
+            if (dataSource === 'hdfs') {
+                tFilterWrappers = this.hdfsFiltersWrapper.slice();
+                this.hdfsFilterResults = [];
+                this.dataSet['hdfsCount'] = 0;
+            }
+
+            tFilterWrappers.map(filterWrapper => {
+                filterWrapper.dataFilter.predicate += ' && r.name.indexOf(\'' + value + '\') !== -1';
+            });
+
+            this.fetchData(tFilterWrappers, dataSource);
+        }
+    }
     addFilterAndSearch($event: {'dataFilter': DataFilter[], 'searchParam': SearchParam[]}, dataSource: string) {
+        let dataFilter = new DataFilter();
         let tFilterWrappers: DataFilterWrapper[] = [];
-        let newSearchParams = $event.dataFilter.map(filter =>  DataFilterWrapper.createDataFilters(filter));
+        dataFilter.qualifier = 'field';
+
         if (dataSource === 'hive') {
             tFilterWrappers = this.hiveFiltersWrapper.slice();
             this.hiveFilterResults = [];
@@ -136,7 +168,11 @@ export class ViewDataSetComponent implements OnInit {
             this.hdfsFilterResults = [];
             this.dataSet['hdfsCount'] = 0;
         }
-        tFilterWrappers = tFilterWrappers.concat(newSearchParams);
+
+        tFilterWrappers.map(filterWrapper => {
+            filterWrapper.dataFilter.predicate += ' && ' + $event.dataFilter[0].predicate;
+        });
+
         this.fetchData(tFilterWrappers, dataSource);
     }
 

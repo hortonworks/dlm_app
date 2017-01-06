@@ -24,7 +24,7 @@ export class ChipsBarComponent implements OnChanges {
             return;
         }
         for(let searchParam of this.searchParams) {
-            this.appliedSearchParams.push(searchParam.key + searchParam.operator + searchParam.value);
+            this.appliedSearchParams.push(searchParam.key + ' ' + searchParam.operator + ' ' + searchParam.value);
         }
     }
 
