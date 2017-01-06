@@ -61,3 +61,8 @@ acb24854b46a        mongo                  "/entrypoint.sh mongo"   About an hou
   * Typically I do the above, by running the bash shell on the webapp container like this:
 `docker exec -u 0 -it 2a15671be76c bash`
   * Then add the lines to the /etc/hosts file: `echo "172.22.85.12    hyamijala-dp-fenton-dev-1.openstacklocal    hyamijala-dp-fenton-dev-1" >> /etc/hosts`
+
+## BDR
+
+* Ambari cluster running BDR needs to be started with 'views.http.x-frame-options' in ambari.properties set to 'ALLOWALL'.
+* Presently it is hard coded to @Peeyush's server which is at http://172.22.120.184:8080/views/BEACON/1.0.0/BEACON/.
