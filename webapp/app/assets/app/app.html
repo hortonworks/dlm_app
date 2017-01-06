@@ -32,8 +32,17 @@
             <img class="vw-logo-image" src="assets/images/vw.png">
         </span>
         <nav *ngIf="isLoggedIn()" class="mdl-navigation">
-            <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/dashboard']">Dashboard</a>
-            <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/add-data-lake']" > {{ environment.DATA_CENTER_DATA_LAKE }} </a>
+            <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link mdl-typography--font-medium" href="" [sidenavRouterLink]="['/ui/dashboard']">DASHBOARD</a>
+            <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link mdl-typography--font-medium" href="" [sidenavRouterLink]="['/ui/add-data-lake']" > {{ environment.DATA_CENTER_DATA_LAKE }} </a>
+
+            <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/data-manager']" style="position: relative">
+              <div class="mdl-typography--font-medium">
+                DATA MANAGER
+              </div>
+              <div style="font-size: 10px;position: absolute;bottom: 0;">
+                Backup and Restore
+              </div>
+            </a>
         </nav>
     </div>
 

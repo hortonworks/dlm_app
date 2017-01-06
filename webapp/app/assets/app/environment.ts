@@ -26,7 +26,7 @@ const buildPredicate = (lhs, rhs, operator) => {
 export class Environment {
   persona: Persona;
   loginLink: string;
-  DATA_CENTER_DATA_LAKE = 'Data Center';
+  DATA_CENTER_DATA_LAKE = 'DATA CENTER';
 
   /* These are hardcoded variables */
 
