@@ -25,6 +25,7 @@ import {DataSetModule} from './components/data-analyst/data-set/data-set.module'
 import {AddDataSetModule} from './components/data-analyst/add-data-set/add-data-set.module';
 import {ViewDataSetModule} from './components/data-analyst/view-data-set/view-data-set.module';
 import {DashboardModule} from './components/dashboard/dashboard.module';
+import {DataManagerModule} from './components/data-manager/data-manager.module';
 import {BreadcrumbService} from './services/breadcrumb.service';
 
 @NgModule({
@@ -41,7 +42,8 @@ import {BreadcrumbService} from './services/breadcrumb.service';
         AnalystDashboardModule,
         DataSetModule,
         AddDataSetModule,
-        ViewDataSetModule
+        ViewDataSetModule,
+        DataManagerModule
     ],
     declarations: [SidenavRouterLinkDirective, AppComponent, LoginComponent, LogoutComponent],
     bootstrap: [AppComponent],
