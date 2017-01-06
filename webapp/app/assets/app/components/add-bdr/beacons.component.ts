@@ -36,6 +36,7 @@ export class BeaconsComponent implements OnInit, AfterViewInit {
   viewMode: string = 'create';
   isAdvanceEnabled: boolean = false;
   dcSuperOptions: any[] = [];
+  otherResourceId: string = '';
 
   label: string = '';
   source: {
@@ -109,6 +110,12 @@ export class BeaconsComponent implements OnInit, AfterViewInit {
           .subscribe(source => {
             this.pageMode = 'CREATE';
             this.source = source;
+
+            if(!this.source.resourceId) {
+              this.source.resourceId = 'all';
+            }
+
+            this.otherResourceId = this.source.resourceId;
           });
 
       const rxEdit =
@@ -123,6 +130,8 @@ export class BeaconsComponent implements OnInit, AfterViewInit {
               this.source = policy.source;
               this.target = policy.target;
               this.schedule = policy.schedule;
+
+              this.otherResourceId = policy.source.resourceId;
             }
           );
 

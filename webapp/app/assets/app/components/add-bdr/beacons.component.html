@@ -47,13 +47,13 @@
                 <label class="radio-inline">
 										<input type="radio" name="databaseSelectionType" value="all" style="transform: translateY(-25%)" [(ngModel)]="source.resourceId">All
                 </label>
-                <label class="radio-inline">
-										<input type="radio" name="databaseSelectionType" value="selected" style="transform: translateY(-25%)" [(ngModel)]="selectResource">Selection
+                <label class="radio-inline" [hidden]="otherResourceId === 'all'">
+										<input type="radio" name="databaseSelectionType" value="{{otherResourceId}}" style="transform: translateY(-25%)" [(ngModel)]="source.resourceId">Selection
                 </label>
               </div>
               <div class="panel panel-body" [hidden]="source.resourceId === 'all'">
                 <div class="" style="display: flex; align-items: center;">
-                  <input type="checkbox" name="db-name" value="default" [(ngModel)]="source.resourceId"> &nbsp; {{source.resourceId}}
+                  <input type="checkbox" name="db-name" value="default" checked disabled> &nbsp; {{otherResourceId}}
                 </div>
               </div>
             </div>
