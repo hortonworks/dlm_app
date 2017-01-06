@@ -126,36 +126,6 @@ export class AddDataSetComponent implements OnInit {
         // this.hiveFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
         // this.hbaseFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
         // this.hdfsFiltersWrapper.push(new DataFilterWrapper(new DataFilter()));
-        this.options = {
-            chart: {
-                type: 'scatterChart',
-                height: 450,
-                color: d3.scale.category10().range(),
-                scatter: {
-                    onlyCircles: false
-                },
-                showDistX: true,
-                showDistY: true,
-                duration: 350,
-                xAxis: {
-                    axisLabel: 'X Axis',
-                    tickFormat: function(d){
-                        return d3.format('.02f')(d);
-                    }
-                },
-                yAxis: {
-                    axisLabel: 'Y Axis',
-                    tickFormat: function(d){
-                        return d3.format('.02f')(d);
-                    },
-                    axisLabelDistance: -5
-                },
-                pointRange: [1000, 5000]
-            }
-        };
-
-        // this.data = this.sinAndCos();
-        this.data = this.generateDataScatter(1, 20);
     }
 
 
