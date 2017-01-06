@@ -26,7 +26,6 @@
 }
 .hive-pane nav .is-active {
   background: #ffffff;
-  margin-bottom: -1px;
   border-left: 1px solid #cccccc;
   border-right: 1px solid #cccccc;
   border-bottom: 1px solid #ffffff;
@@ -52,4 +51,31 @@
   height: 900px;
   zoom: 98%;
   background: url(assets/images/auto-generated-data-set.png) no-repeat
+}
+
+.search {
+  border-radius: 4px;
+  display: inline-block;
+  border: 1px solid #CBD0D2;
+  margin: 18px 0px 18px 18px;
+
+  span:before {
+    content: "\f002";
+    font-family: "FontAwesome";
+    padding-left: 8px;
+  }
+
+  input {
+    border: none;
+    width: 450px;
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.advanced-search {
+  color: #1790BB;
+  cursor: pointer;
+  margin-left: 20px;
 }
