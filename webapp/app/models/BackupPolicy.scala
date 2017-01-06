@@ -16,7 +16,7 @@ case class Status(isEnabled: Boolean, since: Option[String])
 
 case class Duration(start: String, stop: String)
 
-case class Schedule(scheduleType: String, frequency: String, duration: Duration)
+case class Schedule(scheduleType: String, frequency: String, duration: Option[Duration])
 
 case class BackupPolicy(label: String, source: Source, target: Target, status: Status, schedule: Schedule)
 

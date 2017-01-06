@@ -32,9 +32,10 @@ declare var moment: any;
 })
 export class BeaconsComponent implements OnInit, AfterViewInit {
 
+  pageMode: string = 'CREATE';
   viewMode: string = 'create';
-  runMode: string = 'hourly';
   isAdvanceEnabled: boolean = false;
+  dcSuperOptions: any[] = [];
 
   label: string = '';
   source: {
@@ -50,11 +51,18 @@ export class BeaconsComponent implements OnInit, AfterViewInit {
     dataCenter?: DataCenter,
     cluster?: Ambari
   } = {};
+  status: {
+    isEnabled: boolean,
+    since?: string,
+    tSince?: string
+  } = {
+    isEnabled: false
+  };
   schedule: {
     scheduleType?: string,
     frequency?: string,
   } = {
-    scheduleType: '',
+    scheduleType: 'hourly',
     frequency: '',
   };
 
@@ -71,7 +79,72 @@ export class BeaconsComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    //
+    const rxInit = this.activatedRoute.params;
+
+    const [rxCreateInit, rxEditInit] = rxInit.partition(() => this.activatedRoute.snapshot.queryParams.hasOwnProperty('create'));
+
+    const rxCreate =
+        rxCreateInit
+          .map(params => this.activatedRoute.snapshot.queryParams)
+          .map(queryParams => ({
+            dataCenterId: queryParams['dataCenter'] as string,
+            clusterId: queryParams['cluster'] as string,
+            resourceId: queryParams['resourceId'] as string,
+            resourceType: queryParams['resourceType'] as string,
+          }))
+          .flatMap(
+            ({dataCenterId, clusterId, resourceId, resourceType}) => Rx.Observable.forkJoin(
+              this.dcService.getById(dataCenterId),
+              clusterId ? this.ambariService.getById(clusterId) : Rx.Observable.of(undefined),
+              Rx.Observable.of(resourceId),
+              Rx.Observable.of(resourceType),
+              (dataCenter, cluster, tableId) => ({
+                dataCenter,
+                cluster,
+                resourceId,
+                resourceType
+              })
+            )
+          )
+          .subscribe(source => {
+            this.pageMode = 'CREATE';
+            this.source = source;
+          });
+
+      const rxEdit =
+        rxEditInit
+          .map(params => params['key'] as string)
+          .flatMap(policyId => this.policyService.getById(policyId))
+          .subscribe(
+            policy => {
+              this.pageMode = 'EDIT';
+
+              this.label = policy.label;
+              this.source = policy.source;
+              this.target = policy.target;
+              this.schedule = policy.schedule;
+            }
+          );
+
+      const rxDataCenters = this.dcService.get();
+
+      const rxClusters = this.ambariService.get();
+
+      Rx
+        .Observable
+        .forkJoin(rxDataCenters, rxClusters, (dcs, clusters) => dcs.map(cDC => ({
+          key: cDC.name,
+          dataCenter: cDC,
+          clusters: clusters.filter(cCluster => cCluster.dataCenter === cDC.name)
+        })))
+        .subscribe(superDCs => {
+          this.dcSuperOptions = superDCs;
+          if(!this.source.cluster) {
+            this.source.cluster = superDCs.find(cDC => cDC.key === this.source.dataCenter.name).clusters[0];
+          }
+        });
+
+
   }
 
   ngAfterViewInit() {
@@ -82,12 +155,17 @@ export class BeaconsComponent implements OnInit, AfterViewInit {
     this.viewMode = viewMode;
   }
 
-  doSetScheduleMode(runMode: string) {
-    this.runMode = runMode;
+  doSetScheduleMode(scheduleType: string) {
+    this.schedule.scheduleType = scheduleType;
   }
 
   doToggleAdvanced() {
     this.isAdvanceEnabled = !this.isAdvanceEnabled;
+  }
+
+  doUpdateTargetCluster() {
+    const clusterOptions = this.dcSuperOptions.find(cDC => cDC.key === this.target.dataCenter.name);
+    this.target.cluster = clusterOptions && clusterOptions.clusters[0];
   }
 
   doSave() {
@@ -103,11 +181,28 @@ export class BeaconsComponent implements OnInit, AfterViewInit {
       dataCenterId: this.target.dataCenter.name,
       clusterId: this.target.cluster.host
     };
+    policy.status = this.status;
     policy.schedule = this.schedule;
 
     this.policyService.create(policy)
       .subscribe(
         () => this.router.navigate(['/ui/dashboard'])
       );
+  }
+
+  doCancel() {
+    if(this.source && this.source.dataCenter.name && this.source.cluster) {
+      this.router.navigate([`/ui/view-data/${this.source.dataCenter.name}`], {
+          queryParams : {
+            host: this.source.cluster.host
+          }
+      });
+      return;
+    }
+    if(this.source && this.source.dataCenter.name) {
+      this.router.navigate([`/ui/data-lake/${this.source.dataCenter.name}`]);
+      return;
+    }
+    this.router.navigate(['/ui/dashboard']);
   }
 }

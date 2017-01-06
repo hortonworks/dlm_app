@@ -30,14 +30,13 @@
           <div class="row">
             <div class="col-xs-6">
               <label class="control-label smaller-font">SOURCE</label>
-              <span class="form-control smaller-font">beaconsource&gt;dc1</span>
+              <span class="form-control smaller-font">{{source.dataCenter && source.dataCenter.name}}</span>
             </div>
             <div class="col-xs-6">
               <label class="control-label smaller-font">DESTINATION</label>
-              <select class="form-control width-forty-percent">
-								<option value="">Select</option>
-								<option value="beacontarget">beacontarget</option>
-								<option value="beaconsrc">beaconsrc</option>
+              <select class="form-control width-forty-percent" [(ngModel)]="target.dataCenter" (change)="doUpdateTargetCluster()">
+								<option disabled selected [ngValue]="">Select</option>
+                <option *ngFor="let dc of dcSuperOptions" [ngValue]="dc.dataCenter">{{dc.key}}</option>
 							</select>
             </div>
           </div>
@@ -47,14 +46,14 @@
               <div>
                 <label class="radio-inline">
 										<input type="radio" name="databaseSelectionType" value="all" style="transform: translateY(-25%)" [(ngModel)]="source.resourceId">All
-									</label>
+                </label>
                 <label class="radio-inline">
-										<input type="radio" name="databaseSelectionType" value="selected" style="transform: translateY(-25%)" [(ngModel)]="source.resourceId">Selection
-									</label>
+										<input type="radio" name="databaseSelectionType" value="selected" style="transform: translateY(-25%)" [(ngModel)]="selectResource">Selection
+                </label>
               </div>
               <div class="panel panel-body" [hidden]="source.resourceId === 'all'">
                 <div class="" style="display: flex; align-items: center;">
-                  <input type="checkbox" name="db-name" value="default" checked> &nbsp; {{source.resourceId}}
+                  <input type="checkbox" name="db-name" value="default" [(ngModel)]="source.resourceId"> &nbsp; {{source.resourceId}}
                 </div>
               </div>
             </div>
@@ -91,27 +90,27 @@
           <div class="row">
             <div class="col-xs-12">
               <ul class="nav nav-tabs">
-                <li [class.active]="runMode === 'hourly'"><a data-target="#hourlyRun" data-toggle="tab" (click)="doSetScheduleMode('hourly')">Hourly</a></li>
-                <li [class.active]="runMode === 'daily'"><a data-target="#dailyRun" data-toggle="tab" (click)="doSetScheduleMode('daily')">Daily</a></li>
-                <li [class.active]="runMode === 'weekly'"><a data-target="#weeklyRun" data-toggle="tab" (click)="doSetScheduleMode('weekly')">Weekly</a></li>
-                <li [class.active]="runMode === 'monthly'"><a data-target="#monthlyRun" data-toggle="tab" (click)="doSetScheduleMode('monthly')">Monthly</a></li>
-                <li [class.active]="runMode === 'custom'"><a data-target="#minuteRun" data-toggle="tab" (click)="doSetScheduleMode('custom')">Custom</a></li>
+                <li [class.active]="schedule.scheduleType === 'hourly'"><a data-target="#hourlyRun" data-toggle="tab" (click)="doSetScheduleMode('hourly')">Hourly</a></li>
+                <li [class.active]="schedule.scheduleType === 'daily'"><a data-target="#dailyRun" data-toggle="tab" (click)="doSetScheduleMode('daily')">Daily</a></li>
+                <li [class.active]="schedule.scheduleType === 'weekly'"><a data-target="#weeklyRun" data-toggle="tab" (click)="doSetScheduleMode('weekly')">Weekly</a></li>
+                <li [class.active]="schedule.scheduleType === 'monthly'"><a data-target="#monthlyRun" data-toggle="tab" (click)="doSetScheduleMode('monthly')">Monthly</a></li>
+                <li [class.active]="schedule.scheduleType === 'custom'"><a data-target="#minuteRun" data-toggle="tab" (click)="doSetScheduleMode('custom')">Custom</a></li>
               </ul>
               <div class="tab-content">
-                <div role="tabpanel" class="tab-pane" id="hourlyRun" [class.active]="runMode === 'hourly'">
+                <div role="tabpanel" class="tab-pane" id="hourlyRun" [class.active]="schedule.scheduleType === 'hourly'">
                   Run Every Hour
                 </div>
-                <div role="tabpanel" class="tab-pane" id="dailyRun" [class.active]="runMode === 'daily'">
+                <div role="tabpanel" class="tab-pane" id="dailyRun" [class.active]="schedule.scheduleType === 'daily'">
                   Run Every Day
                 </div>
-                <div role="tabpanel" class="tab-pane" id="weeklyRun" [class.active]="runMode === 'weekly'">
+                <div role="tabpanel" class="tab-pane" id="weeklyRun" [class.active]="schedule.scheduleType === 'weekly'">
                   Run Every Week
                 </div>
-                <div role="tabpanel" class="tab-pane" id="monthlyRun" [class.active]="runMode === 'monthly'">
+                <div role="tabpanel" class="tab-pane" id="monthlyRun" [class.active]="schedule.scheduleType === 'monthly'">
                   Run Every Month
                 </div>
-                <div role="tabpanel" class="tab-pane" id="minuteRun" [class.active]="runMode === 'custom'">
-                  Run Every <input> Minute
+                <div role="tabpanel" class="tab-pane" id="minuteRun" [class.active]="schedule.scheduleType === 'custom'">
+                  Run Every <input [(ngModel)]="schedule.frequency"> Minute
                 </div>
               </div>
             </div>
@@ -146,28 +145,28 @@
         </div>
       </div>
       <div class="clearfix">
-        <button class="btn btn-default pull-right ml5 btn-action" role="button" >GO TO REVIEW</button>
-        <button class="btn btn-default pull-right" role="button" >CANCEL</button>
+        <button class="btn btn-default pull-right ml5 btn-action" role="button" (click)="doSelectViewMode('review')" *ngIf="pageMode === 'CREATE'">GO TO REVIEW</button>
+        <button class="btn btn-default pull-right" role="button" (click)="doCancel()">CANCEL</button>
       </div>
     </div>
     <div role="tabpanel" class="tab-pane review-tab" id="reviewTab" [class.active]="viewMode === 'review'">
       <div class="panel panel-default">
         <div class="panel-body">
-          Data replication process for data selected from cluster <b>beaconsource</b> will be started.<br><br>
+          Data replication process for data selected from <b>{{source.dataCenter && source.dataCenter.name}}</b> will be started.<br><br>
 
           <!-- Transfer Details:<br />
 					Total Data Volume:<br />
 					Transfer Time:<br /> -->
-          Databases:
-          <!----><br> Destination:
+          Databases: {{source.resourceId}}
+          <!----><br> Destination: {{target.dataCenter && target.dataCenter.name}}
           <!----><br>
 
           <i class="fa fa-exclamation-circle pr5"></i>The first run of the replication policy may take additional time.
         </div>
       </div>
       <div class="clearfix">
-        <button class="btn btn-success pull-right ml5" role="button" >SUBMIT</button>
-        <button class="btn btn-default pull-right" role="button" >CANCEL</button>
+        <button class="btn btn-success pull-right ml5" role="button" (click)="doSave()">SUBMIT</button>
+        <button class="btn btn-default pull-right" role="button" (click)="doCancel()">CANCEL</button>
       </div>
     </div>
   </div>
