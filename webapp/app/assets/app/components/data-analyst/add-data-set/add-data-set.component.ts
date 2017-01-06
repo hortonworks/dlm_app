@@ -198,7 +198,7 @@ export class AddDataSetComponent implements OnInit {
         this.dataSet.hBaseFilters = DataFilterWrapper.getDataFilters(this.hbaseFiltersWrapper);
         this.dataSet.fileFilters = DataFilterWrapper.getDataFilters(this.hdfsFiltersWrapper);
         this.dataSet.permissions =  (this.dataSet.permissions && this.dataSet.permissions.length === 0) ? 'Random Permissions': this.dataSet.permissions;
-        this.dataSet.description =  (this.dataSet.description && this.dataSet.description.length === 0) ? 'Random Permissions': this.dataSet.permissions;
+        this.dataSet.description =  (this.dataSet.description && this.dataSet.description.length === 0) ? 'Random Permissions': this.dataSet.description;
         this.dataSetService.post(this.dataSet).subscribe(result => {
             Alerts.showSuccessMessage('Created data set '+ this.dataSet.name);
             window.history.back();

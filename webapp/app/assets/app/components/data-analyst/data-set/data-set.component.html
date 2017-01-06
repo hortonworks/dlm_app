@@ -5,7 +5,7 @@
                 <i class="fa fa-database fa-stack-1x fa-2x"></i>
                 <i class="fa fa-database fa-stack-1x fa-2x"></i>
             </span>
-            <span class="mdl-typography--title mdl-typography--font-light text"> DATA SET </span>
+            <span class="mdl-typography--title mdl-typography--font-light text"> DATA SETS </span>
         </div>
 
         <div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
@@ -87,11 +87,11 @@
                 </div>
             </div>
         </div>
-        <div *ngIf="selectedUnclassifiedCategory == DASHBOARD" class="card-pane">
+        <div *ngIf="selectedUnclassifiedCategory == DASHBOARD" class="card-pane charts">
             <div class="mdl-grid">
                 <div class="dashboard-pane">
                     <div class="dashboard-card-title"> DATA INFLOW</div>
-                    <nvd3 [options]="dataInflowConfig" [data]="dataInflowData"></nvd3>
+                    <nvd3 #chart1 [options]="dataInflowConfig" [data]="dataInflowData"></nvd3>
                 </div>
                 <div class="dashboard-pane">
                     <div class="dashboard-card-title">USERS</div>

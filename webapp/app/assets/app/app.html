@@ -28,8 +28,8 @@
     </div>
 
     <div class="dataplane-drawer mdl-layout__drawer" reload>
-        <span *ngIf="isLoggedIn()" class="mdl-layout-title">
-            <img class="vw-logo-image" src="assets/images/vw.png">
+        <span *ngIf="isLoggedIn()" class="mdl-layout-title vw-logo-image">
+            <img src="assets/images/hortonia.png">
         </span>
         <nav *ngIf="isLoggedIn()" class="mdl-navigation">
             <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link mdl-typography--font-medium" href="" [sidenavRouterLink]="['/ui/dashboard']">DASHBOARD</a>

@@ -11,6 +11,7 @@
     color: #506167 !important;
     padding: 15px 0px 10px 0px;
     border-bottom: 1px solid #CFCFCF;
+    padding-left: 20px;
 
     i {
       font-size: 1.5em;
@@ -55,7 +56,7 @@
     color: #666666;
     cursor: pointer;
     min-height: 30px;
-    padding: 5px 16px 5px 16px;
+    padding: 5px 20px 5px 20px;
     margin: 12px 0px 12px 0px;
     border-right: 5px solid rgba(0, 0, 0, 0);
   }
@@ -184,6 +185,10 @@
   .mdl-card__supporting-text {
     font-size: 12px;
   }
+
+  i {
+    font-size: 13px;
+  }
 }
 
 .auto-generated {
@@ -203,6 +208,7 @@
   min-width: 285px;
   min-height: 235px;
   display: inline-block;
+  width: 32.7%
 }
 
 .dashboard-card-title {
@@ -214,4 +220,11 @@
 .unmanaged-bubble {
   margin: 8px;
   border: 1px solid #CCCCCC;
+}
+
+.charts {
+  .mdl-grid {
+    //width: 100%
+  }
+
 }
