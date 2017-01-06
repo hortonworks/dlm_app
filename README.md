@@ -66,3 +66,4 @@ acb24854b46a        mongo                  "/entrypoint.sh mongo"   About an hou
 
 * Ambari cluster running BDR needs to be started with 'views.http.x-frame-options' in ambari.properties set to 'ALLOWALL'.
 * Presently it is hard coded to @Peeyush's server which is at http://172.22.120.184:8080/views/BEACON/1.0.0/BEACON/.
+* To ensure that the user is logged in, before demo, users need to login at http://172.22.120.184:8080 using credentials admin:admin.
