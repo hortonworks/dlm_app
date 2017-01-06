@@ -144,6 +144,135 @@ export class HiveDataComponent implements OnChanges {
       return moment(timestamp).fromNow();
     }
 
+    doVisualizeData(columnName) {
+      const meta = {
+        'streetaddress': {
+          type: 'MAP',
+          getData: () => []
+        },
+        'city': {
+          type: 'MAP',
+          getData: () => []
+        },
+        'state': {
+          type: 'MAP',
+          // show states ?
+          getData: () => []
+        },
+        'statefull': {
+          type: 'MAP',
+          // show states ?
+          getData: () => []
+        },
+        'zipcode': {
+          type: 'MAP',
+          getData: () => []
+        },
+        'customer_city': {
+          type: 'MAP',
+          getData: () => []
+        },
+        'customer_state': {
+          type: 'MAP',
+          getData: () => []
+        },
+        'customer_zip': {
+          type: 'MAP',
+          getData: () => []
+        },
+        'eyecolor': {
+          type: 'PIE',
+          // use colors for chart
+          getData: () => []
+        },
+        'customer_gender': {
+          type: 'PIE',
+          getData: getGenderData
+        },
+        'gender': {
+          type: 'PIE',
+          getData: getGenderData
+        },
+        'title': {
+          type: 'PIE',
+          getData: () => {
+            const titles = ['Mr', 'Mrs', 'Miss'];
+            let remaining = 100;
+
+            return titles.map((cTitle, index) => {
+              const multiplier = index < titles.length ? Math.random() : 1;
+              const percent = Math.random() * remaining;
+              remaining = remaining - percent;
+              return ({
+                title: cTitle,
+                percent: percent
+              });
+            });
+          }
+        },
+        'bloodtype': {
+          type: 'PIE',
+          getData: () => {
+            const groups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'OTHERS'];
+            let remaining = 100;
+
+            return groups.map((cGroup, index) => {
+              const multiplier = index < groups.length ? Math.random() : 1;
+              const percent = Math.random() * remaining;
+              remaining = remaining - percent;
+              return ({
+                group: cGroup,
+                percent: percent
+              });
+            });
+          }
+        },
+        'birthday': {
+          type: 'BAR',
+          getData: () => {
+            const birthdays = [];
+            for(let i = 0; i < 100 ; i++) {
+              const year = 8 + Math.round(Math.random() * 85);
+              const timeOfYear = Math.round(Math.random() * 365 * 24 * 60 * 60 * 1000);
+
+              const instant = (new Date(year, 0, 0)).getTime() + timeOfYear;
+
+              birthdays.push(new Date(instant));
+            }
+
+            return birthdays;
+          }
+        },
+        'age': {
+          type: 'BAR',
+          getData: () => {
+            const ages = [];
+            for(let i = 0; i < 100 ; i++) {
+              const year = 8 + Math.round(Math.random() * 85);
+              ages.push(year);
+            }
+
+            return ages;
+          }
+        },
+        'occupation': {
+          type: 'BAR',
+          getData: () => []
+        },
+        'weight': {
+          type: 'BAR',
+          getData: () => []
+        },
+        'height': {
+          type: 'BAR',
+          getData: () => []
+        },
+      };
+
+      meta[columnName];
+
+    }
+
     drawMap(location) {
       this.map = new Datamap({
         element: document.getElementById('mapcontainer-hive'),
@@ -171,4 +300,19 @@ export class HiveDataComponent implements OnChanges {
         longitude: position[1]
       }], {});
     }
+}
+
+function getGenderData() {
+  const dataMale = Math.random() * 75;
+
+  return ([{
+    type: 'MALE',
+    percent: dataMale
+  },{
+    type: 'FEMALE',
+    percent: 100 - 0.62 - dataMale
+  }, {
+    type: 'OTHERS',
+    percent: 0.62
+  }]);
 }

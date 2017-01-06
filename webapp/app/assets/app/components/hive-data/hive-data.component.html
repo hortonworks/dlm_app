@@ -82,7 +82,7 @@
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  <tr *ngFor="let cColumn of schema">
+                                  <tr *ngFor="let cColumn of schema" style="cursor: pointer;" (click)="doVisualizeData(cColumn.name)">
                                       <td class="mdl-data-table__cell--non-numeric">{{ cColumn.name }}</td>
                                       <td class="mdl-data-table__cell--non-numeric">{{ cColumn.owner }}</td>
                                       <td class="mdl-data-table__cell--non-numeric">{{ cColumn.type }}</td>
@@ -162,7 +162,7 @@
                 </div>
             </header>
             <main>
-                <div id="mapcontainer-hive" class="map"></div>
+                <div id="mapcontainer-hive" class="map" style="display: flex; align-items: center; justify-content: center;"></div>
             </main>
          </div>
 
