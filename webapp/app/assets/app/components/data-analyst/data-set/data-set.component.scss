@@ -25,6 +25,32 @@
     }
   }
 
+  .mdl-tabs__tab-bar {
+    background: #E3E3E3;
+  }
+
+  .mdl-tabs__tab {
+    padding: 0px;
+    width: 50%;
+    cursor: pointer;
+
+    &:first-child {
+      box-shadow: -10px 0px 10px #D3D3D3 inset;
+    }
+
+    &:last-child {
+      box-shadow: 10px 0px 10px #D3D3D3 inset;
+    }
+  }
+
+  .is-active-tab {
+    background: #ffffff;
+    margin-bottom: -1px;
+    box-shadow: none !important;
+    border-bottom: 1px solid #ffffff;
+    border-right: 1px solid #CFCFCF;
+  }
+
   .mdl-list__item {
     color: #666666;
     cursor: pointer;
@@ -169,4 +195,23 @@
     margin-left: -15px;
     padding-right: 5px;
   }
+}
+
+.dashboard-pane {
+  border: 1px solid #CCCCCC;
+  margin-right: 5px !important;
+  min-width: 285px;
+  min-height: 235px;
+  display: inline-block;
+}
+
+.dashboard-card-title {
+  color: #3FAC28;
+  padding: 15px 10px;
+  font-size: 14px;
+}
+
+.unmanaged-bubble {
+  margin: 8px;
+  border: 1px solid #CCCCCC;
 }
