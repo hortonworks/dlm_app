@@ -35,7 +35,7 @@ export class RangerService {
           return access
             .filter((cAccessItem, index) => index % 2 === 0 && cAccessItem !== null)
             .map((cAccessKey, index) => ({
-              key: cAccessKey,
+              label: cAccessKey,
               value: access[index * 2 + 1]
             }));
         })
@@ -56,7 +56,7 @@ export class RangerService {
           return reqUser
             .filter((cUserItem, index) => index % 2 === 0 && cUserItem !== null)
             .map((cUserKey, index) => ({
-              key: cUserKey,
+              label: cUserKey,
               value: reqUser[index * 2 + 1]
             }));
         })

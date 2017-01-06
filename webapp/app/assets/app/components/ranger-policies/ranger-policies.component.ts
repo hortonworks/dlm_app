@@ -3,7 +3,8 @@ import {RangerService} from '../../services/ranger.service';
 import {RangerPolicies} from '../../models/ranger-policies';
 import Rx from 'rxjs/Rx';
 
-declare let dX:any;
+declare let d3: any;
+declare let nv: any;
 
 @Component({
     selector: 'ranger-policies',
@@ -103,51 +104,32 @@ export class RangerPoliciesComponent implements OnInit, OnChanges, AfterViewInit
       // }
     }
 
-    drawChart(domId: string, data: any[]) {
+    drawChart(domSelector: string, data: any[]) {
 
-      const d3 = dX;
-      const svg = d3.select(domId),
-        margin = {top: 20, right: 20, bottom: 30, left: 40},
-        width = +svg.attr('width') - margin.left - margin.right,
-        height = +svg.attr('height') - margin.top - margin.bottom;
+      nv.addGraph(() => {
+        const chart = nv.models.discreteBarChart()
+          .x(d => d.label)    // Specify the data accessors.
+          .y(d => d.value)
+          .height(300)
+          .staggerLabels(true)    // Too many bars and not enough room? Try staggering labels.
+          // .tooltips(false)        // Don't show tooltips
+          .showValues(true)       // ...instead, show the bar value right on top of each bar.
+          .duration(350);
 
-      const x =
-        d3
-          .scaleBand()
-          .rangeRound([0, width])
-          .padding(0.1)
-          .domain(data.map(function(d) { return d.key; }));
+        chart.yAxis.tickFormat(d3.format('d'));
 
-      const y =
-        d3
-        .scaleLinear()
-        .range([height, 0])
-        .domain([0, d3.max(data, function(d) { return d.value; })]);
+          d3
+            .select(domSelector)
+            .datum([{
+              key: 'Ranger Data',
+              values: data
+            }])
+            .call(chart);
 
-      const g = svg.append('g')
-          .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+          nv.utils.windowResize(chart.update);
 
-      g.append('g')
-          .attr('class', 'axis axis--x')
-          .attr('transform', 'translate(0,' + height + ')')
-          .call(d3.axisBottom(x));
+          return chart;
+      });
 
-      const yAxis =
-        d3
-          .axisLeft(y)
-          .tickValues(data.map(cData => cData.value))
-          .tickFormat(d3.format(',.0f'));
-      g.append('g')
-          .attr('class', 'axis axis--y')
-          .call(yAxis);
-
-        g.selectAll('.bar')
-          .data(data)
-          .enter().append('rect')
-            .attr('class', 'bar')
-            .attr('x', function(d) { return x(d.key); })
-            .attr('width', x.bandwidth())
-            .attr('y', function(d) { return y(d.value); })
-            .attr('height', function(d) { return height - y(d.value); });
     }
 }

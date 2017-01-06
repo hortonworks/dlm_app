@@ -35,7 +35,7 @@
 
   <div style="margin-bottom: 5px;margin-top: 10px;"> Access Requests </div>
   <div [hidden]="!isAccessRequestInProgress && access.length === 0">
-    <svg width="500" height="300" id="ranger_barchart_access"></svg>
+    <svg id="ranger_barchart_access" style="height: 325px;"></svg>
   </div>
   <div style="padding: 10px 15px;" [hidden]="!isAccessRequestInProgress && access.length > 0">
     Ranger access list unavailable.
@@ -46,7 +46,7 @@
 
   <div style="margin-bottom: 5px;margin-top: 10px;"> User Requests </div>
   <div [hidden]="!isUsersRequestInProgress && users.length === 0">
-    <svg width="960" height="300" id="ranger_barchart_users"></svg>
+    <svg id="ranger_barchart_users" style="height: 325px;"></svg>
   </div>
   <div style="padding: 10px 15px;" [hidden]="!isUsersRequestInProgress && users.length > 0">
     No users configured.
