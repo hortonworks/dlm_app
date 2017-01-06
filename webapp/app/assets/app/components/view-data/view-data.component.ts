@@ -81,18 +81,17 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
       private searchQueryService: SearchQueryService
     ) {
 
-        this.rxSearch
-          .flatMap(search => {
-            return atlasService.getTable(this.clusterHost, this.dataLakeName, search.resourceId)
-              .map(tableData => ({
-                query: search,
-                dbName: tableData.qualifiedName.split('.')[0]
-              }));
-          })
-          .subscribe(searchObj => {
-            this.search = searchObj.query;
-            this.dbName = searchObj.dbName;
-          });
+      this.rxSearch
+        .subscribe(search => {
+          this.search = search;
+        });
+
+      this.rxSearch
+        .filter(search => search.resourceType === 'hive')
+        .flatMap(search => atlasService.getTable(this.clusterHost, this.dataLakeName, search.resourceId))
+        .subscribe(tableData => {
+          this.dbName = tableData && tableData.qualifiedName ? tableData.qualifiedName.split('.')[0] : '';
+        });
 
       const rxBackupPolicies =
         this.rxSearch
