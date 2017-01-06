@@ -13,14 +13,14 @@ export class BackupPolicy {
     dataCenterId: string,
     clusterId: string
   };
-  status: {
+  status?: {
     isEnabled: boolean,
     since?: string
   };
   schedule: {
     scheduleType?: string,
     frequency?: string,
-    duration: {
+    duration?: {
       start: string,
       stop: string
     }
@@ -39,14 +39,14 @@ export class BackupPolicyInDetail {
     dataCenter?: DataCenter,
     cluster?: Ambari,
   };
-  status: {
+  status?: {
     isEnabled: boolean,
     since?: string
   };
   schedule: {
     scheduleType?: string,
     frequency?: string,
-    duration: {
+    duration?: {
       start: string,
       stop: string
     }
