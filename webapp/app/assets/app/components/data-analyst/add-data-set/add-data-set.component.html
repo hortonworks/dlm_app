@@ -1,5 +1,6 @@
 <div class="mdl-grid">
     <div class="mdl-cell mdl-cell--12-col">
+        <nvd3 [options]="options" [data]="data"></nvd3>
         <bread-crumb></bread-crumb>
         <div class="mdl-typography--headline mdl-typography--font-light">ADD DATA SET</div>
         <p> Add a data set by applying filters on data sources like Hive, HBase and File System. Multiple filter conditions can be used for each data source, the results from all the filters will form a data set </p>
@@ -62,6 +63,7 @@
                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-color--grey-300" (click)="onSave()">
                             SAVE
                         </button>
+
                     </div>
                 </section>
 
