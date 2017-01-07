@@ -34,6 +34,7 @@
         <nav *ngIf="isLoggedIn()" class="mdl-navigation">
             <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link mdl-typography--font-medium" href="" [sidenavRouterLink]="['/ui/dashboard']">DASHBOARD</a>
             <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link mdl-typography--font-medium" href="" [sidenavRouterLink]="['/ui/add-data-lake']" > {{ environment.DATA_CENTER_DATA_LAKE }} </a>
+            <a *ngIf="[persona.ANALYSTADMIN].includes(environment.persona)" class="mdl-navigation__link mdl-typography--font-medium" href="" [sidenavRouterLink]="['/ui/data-analyst/analyst-dashboard']" > DATA SETS </a>
 
             <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/ui/data-manager']" style="position: relative">
               <div class="mdl-typography--font-medium">

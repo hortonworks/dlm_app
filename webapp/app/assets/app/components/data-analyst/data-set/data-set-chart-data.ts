@@ -66,23 +66,23 @@ export class DataSetChartData {
                     key: 'Cumulative Return',
                     values: [
                         {
-                            'label' : 'MON' ,
+                            'label' : '10' ,
                             'value' : (Math.floor(Math.random() * 20) + 10)
                         } ,
                         {
-                            'label' : 'TUE' ,
+                            'label' : '20' ,
                             'value' : (Math.floor(Math.random() * 20) + 10)
                         } ,
                         {
-                            'label' : 'WED' ,
+                            'label' : '40' ,
                             'value' : (Math.floor(Math.random() * 20) + 10)
                         } ,
                         {
-                            'label' : 'THU' ,
+                            'label' : '75' ,
                             'value' : (Math.floor(Math.random() * 20) + 10)
                         } ,
                         {
-                            'label' : 'FRI' ,
+                            'label' : '90' ,
                             'value' : (Math.floor(Math.random() * 20) + 10)
                         }
                     ]
