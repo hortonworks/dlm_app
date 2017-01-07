@@ -72,6 +72,7 @@
                 <section *ngIf="(activeTab===tab.SCHEMA)" class="mdl-layout__tab-panel is-active">
                     <div class="page-content">
                         <div class="dataplane-screen-section mdl-typography--text-center">
+                          <button type="button" (click)="doVisualizeData('age')">Age</button>
                             <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
                                 <thead>
                                   <tr>
@@ -162,7 +163,13 @@
                 </div>
             </header>
             <main>
-                <div id="mapcontainer-hive" class="map" style="display: flex; align-items: center; justify-content: center;"></div>
+                <div id="mapcontainer-hive" class="map" style="display: flex; align-items: center; justify-content: center;" *ngIf="visType === 'MAP'"></div>
+                <div class="map" style="display: flex; align-items: center; justify-content: center;" *ngIf="['BAR', 'PIE'].includes(visType)">
+                  <svg id="atlas_vis" style="min-width: 450px; min-height: 250px;"></svg>
+                </div>
+                <div class="map" style="display: flex; align-items: center; justify-content: center;" *ngIf="['BAR', 'PIE', 'MAP'].includes(visType) === false">
+                  No visualization available.
+                </div>
             </main>
          </div>
 
