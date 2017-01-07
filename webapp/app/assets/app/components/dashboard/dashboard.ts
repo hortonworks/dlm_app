@@ -107,7 +107,10 @@ export class DashboardComponent implements AfterViewInit, OnInit {
             boxZoom: false,
             // control options
             attributionControl: false,
-            zoomControl: false
+            zoomControl: false,
+            // animation options
+            // zoomAnimation: false,
+            // markerZoomAnimation: false,
           });
 
       // L
@@ -290,21 +293,26 @@ export class DashboardComponent implements AfterViewInit, OnInit {
               });
           });
 
-      // area that must be shown
       const extremes = [
         L.marker([75, 0]),
         L.marker([-50, 0]),
         L.marker([0, -179]),
         L.marker([0, 180]),
       ];
-      this.map.fitBounds(L.featureGroup(extremes).getBounds(), {});
+      // use this if you need to display entire map
+      // this.map.fitBounds(L.featureGroup(extremes).getBounds(), {});
 
-      // if(points.length > 0) {
-      //   this.map.fitBounds(pointsGroup.getBounds(), { padding: L.point(20, 20) });
-      //   this.map.fitWorld({ padding: L.point(20, 20) });
-      // } else {
-      //   this.map.fitBounds(L.featureGroup(extremes).getBounds(), {});
-      // }
+      // use this if you want to zoom into the available points of interest
+      if(points.length > 0) {
+        this.map.fitBounds(pointsGroup.getBounds(), {
+          padding: L.point(20, 20),
+          animate: false,
+        });
+      } else {
+        this.map.fitBounds(L.featureGroup(extremes).getBounds(), {
+          animate: false,
+        });
+      }
     }
 
     doNavigateToDataCenter(dataCenterId: string) {
