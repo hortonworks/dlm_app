@@ -7,6 +7,11 @@ export class RangerPolicies {
     resType: string;
     action: string;
     time: Date;
+    result:string;
+    type:string = 'HIVE';
+    ip:string;
+    evCount:string;
+
 
 
     public static getData(json: Object): RangerPolicies[] {
@@ -21,6 +26,10 @@ export class RangerPolicies {
             policy.resType = doc['resType'];
             policy.action = doc['action'];
             policy.time = new Date(doc['evtTime']);
+            policy.result =  doc['result'];
+            policy.ip =  doc['cliIP'];
+            policy.evCount =  doc['event_count'];
+
             return policy;
         });
 
