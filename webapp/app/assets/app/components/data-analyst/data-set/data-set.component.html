@@ -10,7 +10,7 @@
 
         <div class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
             <div class="mdl-tabs__tab-bar">
-                <span class="mdl-tabs__tab" (click)="activeDataSetTab=dataSetTab.DATA_SET; selectedCategory=ALL" [ngClass]="{'is-active-tab': activeDataSetTab == dataSetTab.DATA_SET}">DATA SET</span>
+                <span class="mdl-tabs__tab" (click)="activeDataSetTab=dataSetTab.DATA_SET; selectedCategory=ALL; selectedUnclassifiedCategory=''" [ngClass]="{'is-active-tab': activeDataSetTab == dataSetTab.DATA_SET}">DATA SET</span>
                 <span class="mdl-tabs__tab" (click)="activeDataSetTab=dataSetTab.UNCLASSIFIED; selectedUnclassifiedCategory=DASHBOARD" [ngClass]="{'is-active-tab': activeDataSetTab == dataSetTab.UNCLASSIFIED}">UNCLASSIFIED</span>
 
             </div>
@@ -47,7 +47,7 @@
         </div>
 
     </div>
-    <div class="mdl-cell mdl-cell--10-col content">
+    <div #content class="mdl-cell mdl-cell--10-col content">
         <div class="actions">
             <span> <input type="text" placeholder="Search"> </span>
             <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored pull-right" (click)="onAddDataSet()">
@@ -91,21 +91,21 @@
             <div class="mdl-grid">
                 <div class="dashboard-pane">
                     <div class="dashboard-card-title"> DATA INFLOW</div>
-                    <nvd3 #chart1 [options]="dataInflowConfig" [data]="dataInflowData"></nvd3>
+                    <nvd3 #dataInflowEle [options]="dataInflowConfig" [data]="dataInflowData"></nvd3>
                 </div>
                 <div class="dashboard-pane">
                     <div class="dashboard-card-title">USERS</div>
-                    <nvd3 [options]="usersConfig" [data]="usersData"></nvd3>
+                    <nvd3 #usersDataEle [options]="usersConfig" [data]="usersData"></nvd3>
                 </div>
                 <div class= "dashboard-pane">
                     <div class="dashboard-card-title">USAGE</div>
-                    <nvd3 [options]="usageConfig" [data]="usageData"></nvd3>
+                    <nvd3 #usageDataEle [options]="usageConfig" [data]="usageData"></nvd3>
                 </div>
             </div>
             <div class="mdl-grid unmanaged-bubble">
                 <div class="mdl-cell mdl-cell--12-col">
                     <div class="dashboard-card-title">DATA SIZE</div>
-                    <nvd3 [options]="options" [data]="data"></nvd3>
+                    <nvd3 #bubbleChartEle [options]="options" [data]="data"></nvd3>
                 </div>
             </div>
         </div>
