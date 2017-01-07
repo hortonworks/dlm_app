@@ -33,3 +33,7 @@
 .map {
     min-height: 273px;
 }
+
+/deep/ .datamaps-bubble {
+  fill: rgb(61, 189, 235) !important;
+}
