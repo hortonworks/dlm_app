@@ -82,8 +82,8 @@ export class DataSetComponent implements OnInit {
         this.dataSetsMap = {'All': [],
             'File Size' : DataSetChartData.getUnclassifiedDataSet('File Size' , ['Tiny', 'Small', 'Medium', 'Large', 'Huge']),
             'File Type': DataSetChartData.getUnclassifiedDataSet('File Type', [ 'PDF', 'TXT', 'CSV', 'XLS', 'Audio', 'Video']),
-            'Usage': DataSetChartData.getUnclassifiedDataSet('Usage', [ 'Hot', 'Cold', 'Glacial'])
-            'Age': DataSetChartData.getUnclassifiedDataSet('Age', [ 'Today', 'This Week', 'Last Year'])
+            'Usage': DataSetChartData.getUnclassifiedDataSet('Usage', [ 'Hot', 'Cold', 'Glacial']),
+            'Age': DataSetChartData.getUnclassifiedDataSet('Age', [ 'Today', 'This Week', 'Last Year']),
             'Operations': DataSetChartData.getUnclassifiedDataSet('Operations', [ 'Create', 'Append', 'Overwrite', 'Delete']),
         };
     }
