@@ -1,16 +1,16 @@
 <div class="ranger-security">
   <div style="margin-bottom: 5px;margin-top: 10px;"> Audit </div>
   <div [hidden]="isPolicyRequestInProgress || policies.length === 0" style="overflow-y: scroll;">
-    <table style="width: 100%;" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
+    <table style="width: 100%;" class="mdl-data-table mdl-data-table--selectable mdl-shadow--2dp dp-data-table--no-hover">
       <thead>
         <tr>
             <!--<th class="mdl-data-table__cell--non-numeric">POLICY ID</th>-->
             <th class="mdl-data-table__cell--non-numeric">TIME</th>
             <th class="mdl-data-table__cell--non-numeric">USER</th>
-            <th class="mdl-data-table__cell--non-numeric">SERVICE</th>
-            <th class="mdl-data-table__cell--non-numeric">SERVICE TYPE</th>
-            <th class="mdl-data-table__cell--non-numeric">RESOURCE</th>
-            <th class="mdl-data-table__cell--non-numeric">RESOURCE TYPE</th>
+            <th class="mdl-data-table__cell--non-numeric">SERVICE (NAME / TYPE)</th>
+            <!--<th class="mdl-data-table__cell--non-numeric" rowspan="1">SERVICE TYPE</th>-->
+            <th class="mdl-data-table__cell--non-numeric">RESOURCE (NAME / TYPE)</th>
+            <!--<th class="mdl-data-table__cell--non-numeric" rowspan="1">RESOURCE TYPE</th>-->
             <th class="mdl-data-table__cell--non-numeric">ACCESS TYPE</th>
             <th class="mdl-data-table__cell--non-numeric">RESULT</th>
             <th class="mdl-data-table__cell--non-numeric">ACCESS ENFORCER</th>
@@ -21,22 +21,40 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let policy of policies">
-            <!---->
-            <td class="mdl-data-table__cell--non-numeric">{{ doGetMoment(policy.time) }}</td>
-            <td class="mdl-data-table__cell--non-numeric">{{ policy.reqUser }}</td>
-            <td class="mdl-data-table__cell--non-numeric">{{ policy.repo }}</td>
-            <td class="mdl-data-table__cell--non-numeric">{{ policy.type }}</td>
-            <td class="mdl-data-table__cell--non-numeric">{{ policy.resource }}</td>
-            <td class="mdl-data-table__cell--non-numeric">{{ policy.resType }}</td>
-            <td class="mdl-data-table__cell--non-numeric">{{ policy.access }}</td>
-            <td class="mdl-data-table__cell--non-numeric">{{ policy.result }}</td>
-            <td class="mdl-data-table__cell--non-numeric">{{ policy.enforcer }}</td>
-            <!--<td class="mdl-data-table__cell--non-numeric">{{ policy.action }}</td>-->
-            <td class="mdl-data-table__cell--non-numeric">{{ policy.ip }}</td>
-            <td class="mdl-data-table__cell--non-numeric">{{ policy.evCount }}</td>
-            <td class="mdl-data-table__cell--non-numeric">-</td>
-        </tr>
+        <template ngFor let-policy [ngForOf]="policies">
+          <tr>
+              <!--ID-->
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ doGetMoment(policy.time) }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.reqUser }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="1">{{ policy.repo }}</td>
+              <!--<td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.type }}</td>-->
+              <td class="mdl-data-table__cell--non-numeric" rowspan="1">{{ policy.resource }}</td>
+              <!--<td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.resType }}</td>-->
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.access }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.result }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.enforcer }}</td>
+              <!--<td class="mdl-data-table__cell--non-numeric">{{ policy.action }}</td>-->
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.ip }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.evCount }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">-</td>
+          </tr>
+          <tr>
+              <!--ID-->
+              <!--<td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ doGetMoment(policy.time) }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.reqUser }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.repo }}</td>-->
+              <td class="mdl-data-table__cell--non-numeric" rowspan="1">{{ policy.type }}</td>
+              <!--<td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.resource }}</td>-->
+              <td class="mdl-data-table__cell--non-numeric" rowspan="1">{{ policy.resType }}</td>
+              <!--<td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.access }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.result }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.enforcer }}</td>-->
+              <!--<td class="mdl-data-table__cell--non-numeric">{{ policy.action }}</td>-->
+              <!--<td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.ip }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.evCount }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">-</td>-->
+          </tr>
+        </template>
       </tbody>
     </table>
   </div>

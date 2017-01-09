@@ -5,3 +5,7 @@
 .ranger-security /deep/ svg .bar:hover {
   fill: brown;
 }
+
+.dp-data-table--no-hover.mdl-data-table tbody tr:hover {
+  background-color: #fff;
+}
