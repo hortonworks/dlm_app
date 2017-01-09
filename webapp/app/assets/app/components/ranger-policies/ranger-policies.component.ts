@@ -240,5 +240,9 @@ export class RangerPoliciesComponent implements OnInit, OnChanges, AfterViewInit
         return chart;
     });
 
-    }
+  }
+
+  doGetMoment(instant: Date) {
+    return moment(instant).fromNow();
+  }
 }
