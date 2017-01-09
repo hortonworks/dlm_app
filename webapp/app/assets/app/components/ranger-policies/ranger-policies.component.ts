@@ -115,6 +115,10 @@ export class RangerPoliciesComponent implements OnInit, OnChanges, AfterViewInit
           .showValues(true)
           .duration(350);
 
+        if(data.length <= 5) {
+          chart.width(600);
+        }
+
         chart.yAxis.tickFormat(d3.format('d'));
 
           d3
