@@ -5,6 +5,7 @@ import Rx from 'rxjs/Rx';
 
 declare let d3: any;
 declare let nv: any;
+declare let moment: any;
 
 @Component({
     selector: 'ranger-policies',
@@ -58,6 +59,33 @@ export class RangerPoliciesComponent implements OnInit, OnChanges, AfterViewInit
         .subscribe(policies => {
           this.isPolicyRequestInProgress = false;
           this.policies = RangerPolicies.getData(policies);
+
+          const countGroupedByDate =
+            this.policies
+              .reduce((accumulator, cPolicy) => {
+                const dateKey = moment(cPolicy.time).format('YYYY-MM-DD');
+                const countOnDate = accumulator[dateKey] || 0;
+                accumulator[dateKey] = countOnDate + 1;
+                return accumulator;
+              }, {});
+
+          const dateKeysSorted =
+            Object.keys(countGroupedByDate)
+              .sort();
+
+          const today = moment().format('YYYY-MM-DD');
+          let cDay = dateKeysSorted[0];
+
+          const dateKeysFilled = [];
+          while(cDay < today) {
+            dateKeysFilled.push(moment(cDay).format('YYYY-MM-DD'));
+            cDay = moment(cDay).add(1, 'days').format('YYYY-MM-DD');
+          }
+          const data = [{
+            values: dateKeysFilled.map(cDateKey => ({x: moment(cDateKey).toDate(), y: countGroupedByDate[cDateKey] ? countGroupedByDate[cDateKey] : 0}))
+          }];
+
+          this.drawTimeSeries('#ranger_barchart_policies', data);
         });
 
       this.rxInputChange
@@ -133,6 +161,84 @@ export class RangerPoliciesComponent implements OnInit, OnChanges, AfterViewInit
 
           return chart;
       });
+
+    }
+
+
+
+    drawTimeSeries(domSelector: string, data: any[]) {
+
+     nv.addGraph(function() {
+        const chart = nv.models.historicalBarChart();
+        chart
+            // .x(function(d) { return d[0]; })
+            // .y(function(d) { return d[1]; })
+            .xScale(d3.time.scale()) // use a time scale instead of plain numbers in order to get nice round default values in the axis
+            // .color(['#68c'])
+            .height(300)
+            .useInteractiveGuideline(true) // check out the css that turns the guideline into this nice thing
+            // .tooltips(true)
+            // .tooltipContent(function (key, x, y, graph) {
+            //     const content = '<h3 style='background-color: ' + y.color + ''>' + d3.time.format('%b %-d, %Y %I:%M%p')(new Date(graph.point.x)) + '</h3>';
+            //     content += '<p>' +  y + '</p>';
+            //     return content;
+            // })
+            // .margin({'left': 80, 'right': 50, 'top': 20, 'bottom': 30,})
+            .noData('There is no data to display.');
+
+        const tickMultiFormat = d3.time.format.multi([
+            ['%-I:%M%p', function(d) { return d.getMinutes(); }], // not the beginning of the hour
+            ['%-I%p', function(d) { return d.getHours(); }], // not midnight
+            ['%b %-d', function(d) { return d.getDate() !== 1; }], // not the first of the month
+            ['%b %-d', function(d) { return d.getMonth(); }], // not Jan 1st
+            ['%Y', function() { return true; }]
+        ]);
+        chart.xAxis
+            .showMaxMin(false)
+            // .rotateLabels(-45) // Want longer labels? Try rotating them to fit easier.
+            .tickPadding(10)
+            .tickFormat(function (d) { return tickMultiFormat(new Date(d)); })
+            ;
+
+        chart.yAxis
+            .showMaxMin(false)
+            // .highlightZero(true)
+            // .axisLabel('Some vertical value')
+            // .axisLabelDistance(15)
+            .tickFormat(d3.format('d'))
+            ;
+
+        const svgElem = d3.select(domSelector);
+        svgElem
+            .datum(data)
+            .transition()
+            .call(chart);
+
+        // make our own x-axis tick marks because NVD3 doesn't provide any
+        const tickY2 = chart.yAxis.scale().range()[1];
+        const lineElems = svgElem
+            .select('.nv-x.nv-axis.nvd3-svg')
+            .select('.nvd3.nv-wrap.nv-axis')
+            .select('g')
+            .selectAll('.tick')
+            .data(chart.xScale().ticks())
+                .append('line')
+                .attr('class', 'x-axis-tick-mark')
+                .attr('x2', 0)
+                .attr('y1', tickY2 + 4)
+                .attr('y2', tickY2)
+                .attr('stroke-width', 1)
+            ;
+
+        // set up the tooltip to display full dates
+        const tsFormat = d3.time.format('%b %-d, %Y %I:%M%p');
+        const contentGenerator = chart.interactiveLayer.tooltip.contentGenerator();
+        const tooltip = chart.interactiveLayer.tooltip;
+        tooltip.contentGenerator(function (d) { d.value = d.series[0].data.x; return contentGenerator(d); });
+        tooltip.headerFormatter(function (d) { return tsFormat(new Date(d)); });
+
+        return chart;
+    });
 
     }
 }

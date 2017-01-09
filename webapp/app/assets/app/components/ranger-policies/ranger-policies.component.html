@@ -1,39 +1,44 @@
 <div class="ranger-security">
   <div style="margin-bottom: 5px;margin-top: 10px;"> Audit </div>
-  <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" [hidden]="isPolicyRequestInProgress || policies.length === 0">
-    <thead>
-      <tr>
-          <th class="mdl-data-table__cell--non-numeric">POLICY ACCESS</th>
-          <th class="mdl-data-table__cell--non-numeric">POLICY ENFORCER</th>
-          <th class="mdl-data-table__cell--non-numeric">REPO</th>
-          <th class="mdl-data-table__cell--non-numeric">USER</th>
-          <th class="mdl-data-table__cell--non-numeric">RESOURCE</th>
-          <th class="mdl-data-table__cell--non-numeric">RESOURCE TYPE</th>
-          <th class="mdl-data-table__cell--non-numeric">ACTION</th>
-          <th class="mdl-data-table__cell--non-numeric">IP</th>
-          <th class="mdl-data-table__cell--non-numeric">RESULT</th>
-          <th class="mdl-data-table__cell--non-numeric">TYPE</th>
-          <th class="mdl-data-table__cell--non-numeric">EVENT COUNT</th>
-          <th class="mdl-data-table__cell--non-numeric">EVENT TIME</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let policy of policies">
-          <td class="mdl-data-table__cell--non-numeric">{{ policy.access }}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{ policy.enforcer }}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{ policy.repo }}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{ policy.reqUser }}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{ policy.resource }}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{ policy.resType }}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{ policy.action }}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{ policy.ip }}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{ policy.result }}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{ policy.type }}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{ policy.evCount }}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{ policy.time }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <div [hidden]="isPolicyRequestInProgress || policies.length === 0" style="overflow-y: scroll;">
+    <table style="width: 100%;" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
+      <thead>
+        <tr>
+            <th class="mdl-data-table__cell--non-numeric">POLICY ACCESS</th>
+            <th class="mdl-data-table__cell--non-numeric">POLICY ENFORCER</th>
+            <th class="mdl-data-table__cell--non-numeric">REPO</th>
+            <th class="mdl-data-table__cell--non-numeric">USER</th>
+            <th class="mdl-data-table__cell--non-numeric">RESOURCE</th>
+            <th class="mdl-data-table__cell--non-numeric">RESOURCE TYPE</th>
+            <th class="mdl-data-table__cell--non-numeric">ACTION</th>
+            <th class="mdl-data-table__cell--non-numeric">IP</th>
+            <th class="mdl-data-table__cell--non-numeric">RESULT</th>
+            <th class="mdl-data-table__cell--non-numeric">TYPE</th>
+            <th class="mdl-data-table__cell--non-numeric">EVENT COUNT</th>
+            <th class="mdl-data-table__cell--non-numeric">EVENT TIME</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let policy of policies">
+            <td class="mdl-data-table__cell--non-numeric">{{ policy.access }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ policy.enforcer }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ policy.repo }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ policy.reqUser }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ policy.resource }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ policy.resType }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ policy.action }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ policy.ip }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ policy.result }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ policy.type }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ policy.evCount }}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{ policy.time }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div [hidden]="isPolicyRequestInProgress || policies.length === 0">
+    <svg id="ranger_barchart_policies" style="height: 325px;"></svg>
+  </div>
   <div style="padding: 10px 15px;" [hidden]="isPolicyRequestInProgress || policies.length > 0">
     No ranger policies available for audit.
   </div>
