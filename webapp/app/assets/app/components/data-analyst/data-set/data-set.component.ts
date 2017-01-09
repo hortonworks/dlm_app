@@ -295,9 +295,9 @@ export class DataSetComponent implements OnInit {
 
       keys.splice(keys.indexOf('File Size'), 1);
       keys.splice(keys.indexOf('File Type'), 1);
-      keys.splice(keys.indexOf('Frequent Modifications'), 1);
-      keys.splice(keys.indexOf('Altered Permissions'), 1);
-      keys.splice(keys.indexOf('Frequent Usage'), 1);
+      keys.splice(keys.indexOf('Usage'), 1);
+      keys.splice(keys.indexOf('Age'), 1);
+      keys.splice(keys.indexOf('Operations'), 1);
 
         return keys;
     }

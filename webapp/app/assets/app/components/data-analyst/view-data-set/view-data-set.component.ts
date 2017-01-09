@@ -59,7 +59,7 @@ export class ViewDataSetComponent implements OnInit {
             this.host = this.getParameterByName('host');
             this.dataCenter = this.getParameterByName('dataCenter');
 
-            this.showAutoConfigured = ['File Size', 'File Type', 'Frequent Modifications', 'Altered Permissions', 'Frequent Usage'].indexOf(decodeURIComponent(decodeURIComponent(this.dataCenter))) !== -1;
+            this.showAutoConfigured = ['File Size', 'File Type', 'Usage', 'Age', 'Operations'].indexOf(decodeURIComponent(decodeURIComponent(this.dataCenter))) !== -1;
 
             if (!this.showAutoConfigured) {
                 this.dataSetService.getByName(this.dataSetName, this.host, this.dataCenter)
