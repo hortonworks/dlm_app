@@ -40,7 +40,7 @@
                     <main class="mdl-layout__content">
                         <section *ngIf="(activeTab===tab.HIVE)" class="mdl-layout__tab-panel is-active">
                             <div>
-                                <div *ngIf="!showHiveAdvanced" class="search-wrapper"> <div class="search"> <span> <input #hiveSearch placeholder="Search" (keydown)="addBasicFilterAndSearch($event, hiveSearch.value, 'hive')"> </span>  </div> <a class="advanced-search" (click)="showHiveAdvanced=true"> Advanced Settings </a> </div>
+                                <div *ngIf="!showHiveAdvanced" class="search-wrapper"> <div class="search"> <span> <input #hiveSearch placeholder="Search" (keyup)="addBasicFilterAndSearch(hiveSearch.value, 'hive')"> </span>  </div> <a class="advanced-search" (click)="showHiveAdvanced=true"> Advanced Settings </a> </div>
                                 <data-plane-search *ngIf="showHiveAdvanced"  [searchParamWrappers]="hiveSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, 'hive')" [dataSource]="'hive'"> </data-plane-search>
                                 <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
                                     <thead>
@@ -81,7 +81,7 @@
                         </section>
                         <section *ngIf="(activeTab===tab.HBASE)" class="mdl-layout__tab-panel is-active">
                             <div >
-                                <div *ngIf="!showHbaseAdvanced" class="search-wrapper"> <div class="search"> <span> <input #hbaseSearch placeholder="Search" (keydown)="addBasicFilterAndSearch($event, hbaseSearch.value, 'hbase')"> </span>  </div> <a class="advanced-search" (click)="showHbaseAdvanced=true"> Advanced Settings </a> </div>
+                                <div *ngIf="!showHbaseAdvanced" class="search-wrapper"> <div class="search"> <span> <input #hbaseSearch placeholder="Search" (keyup)="addBasicFilterAndSearch(hbaseSearch.value, 'hbase')"> </span>  </div> <a class="advanced-search" (click)="showHbaseAdvanced=true"> Advanced Settings </a> </div>
                                 <data-plane-search *ngIf="showHbaseAdvanced"  [searchParamWrappers]="hbaseSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, 'hbase')" [dataSource]="'hbase'"> </data-plane-search>
                                 <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
                                     <thead>
@@ -109,7 +109,7 @@
                         </section>
                         <section *ngIf="(activeTab===tab.HDFS)" class="mdl-layout__tab-panel is-active">
                             <div>
-                                <div *ngIf="!showHdfsAdvanced" class="search-wrapper"> <div class="search"> <span> <input #hdfsSearch placeholder="Search" (keydown)="addBasicFilterAndSearch($event, hdfsSearch.value, 'hdfs')"> </span>  </div> <a class="advanced-search" (click)="showHdfsAdvanced=true"> Advanced Settings </a> </div>
+                                <div *ngIf="!showHdfsAdvanced" class="search-wrapper"> <div class="search"> <span> <input #hdfsSearch placeholder="Search" (keyup)="addBasicFilterAndSearch(hdfsSearch.value, 'hdfs')"> </span>  </div> <a class="advanced-search" (click)="showHdfsAdvanced=true"> Advanced Settings </a> </div>
                                 <data-plane-search *ngIf="showHdfsAdvanced"  [searchParamWrappers]="hdfsSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, 'hdfs')" [dataSource]="'hdfs'"> </data-plane-search>
                                 <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
                                     <thead>

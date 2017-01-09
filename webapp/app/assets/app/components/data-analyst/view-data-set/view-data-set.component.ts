@@ -43,7 +43,7 @@ export class ViewDataSetComponent implements OnInit {
     hdfsFilterResults: any[] = [];
 
     showAutoConfigured= false;
-
+    searchTimer: number;
 
     constructor(private activatedRoute: ActivatedRoute, private dataSetService: DataSetService, private environment: Environment,
         private policyService: BackupPolicyService,
@@ -119,14 +119,16 @@ export class ViewDataSetComponent implements OnInit {
         }
     }
 
-    addBasicFilterAndSearch($event, value, dataSource: string) {
-        if ($event.keyCode === 13) {
+    addBasicFilterAndSearch(value, dataSource: string, ele: any) {
+        clearTimeout(this.searchTimer);
+
+        this.searchTimer = setTimeout(() => {
             let dataFilter = new DataFilter();
             let tFilterWrappers: DataFilterWrapper[] = [];
             dataFilter.qualifier = 'field';
 
             if (dataSource === 'hive') {
-                tFilterWrappers = this.hiveFiltersWrapper.slice();
+                tFilterWrappers = JSON.parse(JSON.stringify(this.hiveFiltersWrapper));
                 this.hiveFilterResults = [];
                 this.dataSet['hiveCount'] = 0;
             }
@@ -146,7 +148,7 @@ export class ViewDataSetComponent implements OnInit {
             });
 
             this.fetchData(tFilterWrappers, dataSource);
-        }
+        }, 1000);
     }
     addFilterAndSearch($event: {'dataFilter': DataFilter[], 'searchParam': SearchParam[]}, dataSource: string) {
         let dataFilter = new DataFilter();
