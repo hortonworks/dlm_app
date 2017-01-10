@@ -1,5 +1,42 @@
 <div class="ranger-security">
-  <div style="margin-bottom: 5px;margin-top: 10px;"> Audit </div>
+  <div [hidden]="isPolicyRequestInProgress || policies.length === 0">
+    <div style="margin-bottom: 5px;margin-top: 10px;"> Audit Timeline </div>
+
+    <svg id="ranger_barchart_policies" style="height: 325px;"></svg>
+  </div>
+  <div style="padding: 10px 15px;" [hidden]="isPolicyRequestInProgress || policies.length > 0">
+    No ranger policies available for audit.
+  </div>
+  <div [hidden]="!isPolicyRequestInProgress">
+    <loader-spin></loader-spin>
+  </div>
+
+  <!--
+  <div style="margin-bottom: 5px;margin-top: 10px;"> Access Requests </div>
+  <div [hidden]="isAccessRequestInProgress || access.length === 0">
+    <svg id="ranger_barchart_access" style="height: 325px;"></svg>
+  </div>
+  <div style="padding: 10px 15px;" [hidden]="isAccessRequestInProgress || access.length > 0">
+    Ranger access list unavailable.
+  </div>
+  <div [hidden]="!isAccessRequestInProgress">
+    <loader-spin></loader-spin>
+  </div>
+  -->
+
+  <div style="margin-bottom: 5px;margin-top: 10px;"> User Requests </div>
+  <div [hidden]="isUsersRequestInProgress || users.length === 0">
+    <svg id="ranger_barchart_users" style="height: 325px;"></svg>
+  </div>
+  <div style="padding: 10px 15px;" [hidden]="isUsersRequestInProgress || users.length > 0">
+    No users configured.
+  </div>
+  <div [hidden]="!isUsersRequestInProgress">
+    <loader-spin></loader-spin>
+  </div>
+
+
+  <div style="margin-bottom: 5px;margin-top: 10px;"> Audit Log </div>
   <div [hidden]="isPolicyRequestInProgress || policies.length === 0" style="overflow-y: scroll;">
     <table style="width: 100%;" class="mdl-data-table mdl-data-table--selectable mdl-shadow--2dp dp-data-table--no-hover">
       <thead>
@@ -58,37 +95,10 @@
       </tbody>
     </table>
   </div>
-  <div [hidden]="isPolicyRequestInProgress || policies.length === 0">
-    <div style="margin-bottom: 5px;margin-top: 10px;"> Audit Timeline </div>
-
-    <svg id="ranger_barchart_policies" style="height: 325px;"></svg>
-  </div>
   <div style="padding: 10px 15px;" [hidden]="isPolicyRequestInProgress || policies.length > 0">
     No ranger policies available for audit.
   </div>
   <div [hidden]="!isPolicyRequestInProgress">
-    <loader-spin></loader-spin>
-  </div>
-
-  <div style="margin-bottom: 5px;margin-top: 10px;"> Access Requests </div>
-  <div [hidden]="isAccessRequestInProgress || access.length === 0">
-    <svg id="ranger_barchart_access" style="height: 325px;"></svg>
-  </div>
-  <div style="padding: 10px 15px;" [hidden]="isAccessRequestInProgress || access.length > 0">
-    Ranger access list unavailable.
-  </div>
-  <div [hidden]="!isAccessRequestInProgress">
-    <loader-spin></loader-spin>
-  </div>
-
-  <div style="margin-bottom: 5px;margin-top: 10px;"> User Requests </div>
-  <div [hidden]="isUsersRequestInProgress || users.length === 0">
-    <svg id="ranger_barchart_users" style="height: 325px;"></svg>
-  </div>
-  <div style="padding: 10px 15px;" [hidden]="isUsersRequestInProgress || users.length > 0">
-    No users configured.
-  </div>
-  <div [hidden]="!isUsersRequestInProgress">
     <loader-spin></loader-spin>
   </div>
 </div>

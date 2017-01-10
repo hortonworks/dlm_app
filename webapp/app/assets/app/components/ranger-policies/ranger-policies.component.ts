@@ -88,13 +88,13 @@ export class RangerPoliciesComponent implements OnInit, OnChanges, AfterViewInit
           this.drawTimeSeries('#ranger_barchart_policies', data);
         });
 
-      this.rxInputChange
-        .flatMap(({resourceId, resourceType, dataLakeId, clusterId}) => this.rangerPoliciesService.getAccess(resourceId, resourceType, dataLakeId, clusterId))
-        .subscribe(access => {
-          this.isAccessRequestInProgress = false;
-          this.access = access;
-          this.drawChart('#ranger_barchart_access', access);
-        });
+      // this.rxInputChange
+      //   .flatMap(({resourceId, resourceType, dataLakeId, clusterId}) => this.rangerPoliciesService.getAccess(resourceId, resourceType, dataLakeId, clusterId))
+      //   .subscribe(access => {
+      //     this.isAccessRequestInProgress = false;
+      //     this.access = access;
+      //     this.drawChart('#ranger_barchart_access', access);
+      //   });
 
       this.rxInputChange
         .flatMap(({resourceId, resourceType, dataLakeId, clusterId}) => this.rangerPoliciesService.getUsers(resourceId, resourceType, dataLakeId, clusterId))
