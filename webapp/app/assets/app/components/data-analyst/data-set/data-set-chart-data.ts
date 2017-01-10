@@ -30,27 +30,27 @@ export class DataSetChartData {
         if (DataSetChartData.dataInflowData.length === 0) {
             DataSetChartData.dataInflowData = [
                 {
-                    key: 'Cumulative Return',
+                    key: 'Inflow',
                     values: [
                         {
-                            'label' : 'TXT' ,
-                            'value' : (Math.floor(Math.random() * 30) + 10)
-                        } ,
-                        {
-                            'label' : 'PDF' ,
-                            'value' : (Math.floor(Math.random() * 30) + 10)
-                        } ,
-                        {
-                            'label' : 'ORC' ,
-                            'value' : (Math.floor(Math.random() * 30) + 10)
-                        } ,
-                        {
-                            'label' : 'XML' ,
-                            'value' : (Math.floor(Math.random() * 30) + 10)
+                            'x' : 'TXT' ,
+                            'y' : (Math.floor(Math.random() * 30) + 10)
                         },
                         {
-                            'label' : 'JSON' ,
-                            'value' : (Math.floor(Math.random() * 30) + 10)
+                            'x' : 'PDF' ,
+                            'y' : (Math.floor(Math.random() * 30) + 10)
+                        } ,
+                        {
+                            'x' : 'ORC' ,
+                            'y' : (Math.floor(Math.random() * 30) + 10)
+                        } ,
+                        {
+                            'x' : 'XML' ,
+                            'y' : (Math.floor(Math.random() * 30) + 10)
+                        },
+                        {
+                            'x' : 'JSON' ,
+                            'y' : (Math.floor(Math.random() * 30) + 10)
                         }
                     ]
                 }
@@ -66,24 +66,24 @@ export class DataSetChartData {
                     key: 'Cumulative Return',
                     values: [
                         {
-                            'label' : '10' ,
-                            'value' : (Math.floor(Math.random() * 20) + 10)
+                            'x' : '10' ,
+                            'y' : (Math.floor(Math.random() * 20) + 10)
                         } ,
                         {
-                            'label' : '20' ,
-                            'value' : (Math.floor(Math.random() * 20) + 10)
+                            'x' : '20' ,
+                            'y' : (Math.floor(Math.random() * 20) + 10)
                         } ,
                         {
-                            'label' : '40' ,
-                            'value' : (Math.floor(Math.random() * 20) + 10)
+                            'x' : '40' ,
+                            'y' : (Math.floor(Math.random() * 20) + 10)
                         } ,
                         {
-                            'label' : '75' ,
-                            'value' : (Math.floor(Math.random() * 20) + 10)
+                            'x' : '75' ,
+                            'y' : (Math.floor(Math.random() * 20) + 10)
                         } ,
                         {
-                            'label' : '90' ,
-                            'value' : (Math.floor(Math.random() * 20) + 10)
+                            'x' : '90' ,
+                            'y' : (Math.floor(Math.random() * 20) + 10)
                         }
                     ]
                 }
