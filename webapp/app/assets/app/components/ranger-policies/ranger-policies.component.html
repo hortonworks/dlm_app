@@ -31,7 +31,7 @@
               <td class="mdl-data-table__cell--non-numeric" rowspan="1">{{ policy.resource }}</td>
               <!--<td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.resType }}</td>-->
               <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.access }}</td>
-              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.result }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.result == 1 ? 'Allowed' : 'Denied'}}</td>
               <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.enforcer }}</td>
               <!--<td class="mdl-data-table__cell--non-numeric">{{ policy.action }}</td>-->
               <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.ip }}</td>
@@ -59,6 +59,8 @@
     </table>
   </div>
   <div [hidden]="isPolicyRequestInProgress || policies.length === 0">
+    <div style="margin-bottom: 5px;margin-top: 10px;"> Audit Timeline </div>
+
     <svg id="ranger_barchart_policies" style="height: 325px;"></svg>
   </div>
   <div style="padding: 10px 15px;" [hidden]="isPolicyRequestInProgress || policies.length > 0">

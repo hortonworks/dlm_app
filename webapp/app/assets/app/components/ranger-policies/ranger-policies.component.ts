@@ -203,7 +203,7 @@ export class RangerPoliciesComponent implements OnInit, OnChanges, AfterViewInit
         chart.yAxis
             .showMaxMin(false)
             // .highlightZero(true)
-            // .axisLabel('Some vertical value')
+            .axisLabel('Access Requests audited per day')
             // .axisLabelDistance(15)
             .tickFormat(d3.format('d'))
             ;
