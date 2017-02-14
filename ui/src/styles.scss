@@ -1,0 +1,213 @@
+/* You can add global styles to this file, and also import other style files */
+@import "_fonts.scss";
+
+body {
+  font-family: "Roboto";
+}
+.m-0 {
+  margin: 0px;
+}
+.mt-1 {
+  margin-top: 24px;
+}
+select,input{
+  min-width: 300px;
+  height: 24px;
+}
+input, textarea {
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+}
+textarea {
+  min-width: 300px;
+
+}
+
+/* Action Buttons */
+.actions-button:before {
+  content: "\f013";
+  font-family: "FontAwesome";
+  padding-right: 5px;
+}
+.actions-button:after {
+  content: "\f107";
+  padding-left: 5px;
+  font-family: "FontAwesome";
+}
+.create-cluster:before {
+  content: "\f019";
+  padding-right: 5px;
+  font-family: "FontAwesome";
+}
+
+/* Info Panel */
+.info-panel {
+  padding: 0px;
+  height: 6rem;
+  margin-top: 1em;
+}
+.info-panel div {
+  padding: 1rem;
+  border-top: 1px solid #EEEEEE;
+  border-right:  1px solid #EEEEEE;
+  border-bottom: 1px solid #EEEEEE;
+}
+
+.info-panel div:first-child {
+  border-left:  1px solid #EEEEEE;
+}
+
+/* Fonts */
+.thin {
+  font-weight: 200;
+}
+
+/* Maps */
+.dotted {
+  background-image: -webkit-repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 1px, transparent 1px, transparent 100%);
+  background-image: -moz-repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 1px, transparent 1px, transparent 100%);
+  background-image: -ms-repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 1px, transparent 1px, transparent 100%);
+  background-image: repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 1px, transparent 1px, transparent 100%);
+  -webkit-background-size: 15px 15px;
+  -moz-background-size: 15px 15px;
+  background-size: 15px 15px;
+}
+
+.admin-a {
+  background: url(assets/images/admin-a.jpg) no-repeat;
+  background-size: 35px 35px;
+}
+.admin-b {
+  background: url(assets/images/admin-b.jpg) no-repeat;
+  background-size: 35px 35px;
+}
+.admin-h {
+  background: url(assets/images/admin-h.jpg) no-repeat;
+  background-size: 35px 35px;
+}
+.admin-r {
+  background: url(assets/images/admin-r.jpg) no-repeat;
+  background-size: 35px 35px;
+}
+.user-name {
+  color: #506167 !important;
+  font-size: 12px;
+}
+
+/* Switch Button */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {display:none;}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #4caf50;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #4caf50;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.switch-small {
+  position: relative;
+  display: inline-block;
+  width: 30px;
+  height: 17px;
+}
+
+.switch-small input {display:none;}
+
+.slider-small {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider-small:before {
+  position: absolute;
+  content: "";
+  height: 13px;
+  width: 13px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider-small {
+  background-color: #2196F3;
+}
+
+input:focus + .slider-small {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider-small:before {
+  -webkit-transform: translateX(13px);
+  -ms-transform: translateX(13px);
+  transform: translateX(13px);
+}
+
+/* Rounded sliders */
+.slider-small.round {
+  border-radius: 17px;
+}
+
+.slider-small.round:before {
+  border-radius: 50%;
+}
+
+/* Configure View */
+.config-bgcolor {
+  background: #F7F7F7;
+}

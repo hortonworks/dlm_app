@@ -1,0 +1,28 @@
+.table {
+    margin: 10px 20px;
+    tr {
+        cursor: pointer;
+    }
+}
+.data-title {
+    background: #54646A;
+    border-radius: 4px;
+    border: 1px solid #54646A;
+    color: #FFFFFF;
+    margin: 10px 20px;
+
+    div {
+        height: 65px;
+        padding: 12px;
+    }
+
+    div:last-child {
+        background: #FFFFFF;
+        border-radius: 4px;
+        color: #54646A;
+    }
+}
+
+.cluster-title {
+    padding: 10px 20px;
+}

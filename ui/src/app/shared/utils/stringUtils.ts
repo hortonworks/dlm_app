@@ -1,0 +1,5 @@
+export class StringUtils {
+    public static trunc(str: string, n: number) {
+        return (str.length > n) ? str.substr(0, n - 1) + '...' : str;
+    };
+}

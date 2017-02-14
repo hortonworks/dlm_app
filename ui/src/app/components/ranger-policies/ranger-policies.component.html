@@ -1,0 +1,104 @@
+<div class="ranger-security">
+  <div [hidden]="isPolicyRequestInProgress || policies.length === 0">
+    <div style="margin-bottom: 5px;margin-top: 10px;"> Audit Timeline </div>
+
+    <svg id="ranger_barchart_policies" style="height: 325px;"></svg>
+  </div>
+  <div style="padding: 10px 15px;" [hidden]="isPolicyRequestInProgress || policies.length > 0">
+    No ranger policies available for audit.
+  </div>
+  <div [hidden]="!isPolicyRequestInProgress">
+    <loader-spin></loader-spin>
+  </div>
+
+  <!--
+  <div style="margin-bottom: 5px;margin-top: 10px;"> Access Requests </div>
+  <div [hidden]="isAccessRequestInProgress || access.length === 0">
+    <svg id="ranger_barchart_access" style="height: 325px;"></svg>
+  </div>
+  <div style="padding: 10px 15px;" [hidden]="isAccessRequestInProgress || access.length > 0">
+    Ranger access list unavailable.
+  </div>
+  <div [hidden]="!isAccessRequestInProgress">
+    <loader-spin></loader-spin>
+  </div>
+  -->
+
+  <div style="margin-bottom: 5px;margin-top: 10px;"> User Requests </div>
+  <div [hidden]="isUsersRequestInProgress || users.length === 0">
+    <svg id="ranger_barchart_users" style="height: 325px;"></svg>
+  </div>
+  <div style="padding: 10px 15px;" [hidden]="isUsersRequestInProgress || users.length > 0">
+    No users configured.
+  </div>
+  <div [hidden]="!isUsersRequestInProgress">
+    <loader-spin></loader-spin>
+  </div>
+
+
+  <div style="margin-bottom: 5px;margin-top: 10px;"> Audit Log </div>
+  <div [hidden]="isPolicyRequestInProgress || policies.length === 0" style="overflow-y: scroll;">
+    <table style="width: 100%;" class="mdl-data-table mdl-shadow--2dp dp-data-table--no-hover">
+      <thead>
+        <tr>
+            <!--<th class="mdl-data-table__cell--non-numeric">POLICY ID</th>-->
+            <th class="mdl-data-table__cell--non-numeric">TIME</th>
+            <th class="mdl-data-table__cell--non-numeric">USER</th>
+            <th class="mdl-data-table__cell--non-numeric">SERVICE (NAME / TYPE)</th>
+            <!--<th class="mdl-data-table__cell--non-numeric" rowspan="1">SERVICE TYPE</th>-->
+            <th class="mdl-data-table__cell--non-numeric">RESOURCE (NAME / TYPE)</th>
+            <!--<th class="mdl-data-table__cell--non-numeric" rowspan="1">RESOURCE TYPE</th>-->
+            <th class="mdl-data-table__cell--non-numeric">ACCESS TYPE</th>
+            <th class="mdl-data-table__cell--non-numeric">RESULT</th>
+            <th class="mdl-data-table__cell--non-numeric">ACCESS ENFORCER</th>
+            <!--<th class="mdl-data-table__cell--non-numeric">ACTION</th>-->
+            <th class="mdl-data-table__cell--non-numeric">IP</th>
+            <th class="mdl-data-table__cell--non-numeric">EVENT COUNT</th>
+            <th class="mdl-data-table__cell--non-numeric">TAGS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template ngFor let-policy [ngForOf]="policies">
+          <tr>
+              <!--ID-->
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ doGetMoment(policy.time) }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.reqUser }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="1">{{ policy.repo }}</td>
+              <!--<td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.type }}</td>-->
+              <td class="mdl-data-table__cell--non-numeric" rowspan="1">{{ policy.resource }}</td>
+              <!--<td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.resType }}</td>-->
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.access }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.result == 1 ? 'Allowed' : 'Denied'}}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.enforcer }}</td>
+              <!--<td class="mdl-data-table__cell--non-numeric">{{ policy.action }}</td>-->
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.ip }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.evCount }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">-</td>
+          </tr>
+          <tr>
+              <!--ID-->
+              <!--<td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ doGetMoment(policy.time) }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.reqUser }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.repo }}</td>-->
+              <td class="mdl-data-table__cell--non-numeric" rowspan="1">{{ policy.type }}</td>
+              <!--<td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.resource }}</td>-->
+              <td class="mdl-data-table__cell--non-numeric" rowspan="1">{{ policy.resType }}</td>
+              <!--<td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.access }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.result }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.enforcer }}</td>-->
+              <!--<td class="mdl-data-table__cell--non-numeric">{{ policy.action }}</td>-->
+              <!--<td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.ip }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.evCount }}</td>
+              <td class="mdl-data-table__cell--non-numeric" rowspan="2">-</td>-->
+          </tr>
+        </template>
+      </tbody>
+    </table>
+  </div>
+  <div style="padding: 10px 15px;" [hidden]="isPolicyRequestInProgress || policies.length > 0">
+    No ranger policies available for audit.
+  </div>
+  <div [hidden]="!isPolicyRequestInProgress">
+    <loader-spin></loader-spin>
+  </div>
+</div>

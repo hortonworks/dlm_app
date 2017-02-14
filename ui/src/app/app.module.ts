@@ -1,0 +1,57 @@
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { HttpModule } from '@angular/http';
+
+import {WebappRoutingModule} from './app-routing.module';
+import {SidenavRouterLinkDirective} from './sidenav-router-link.directive';
+import { AppComponent } from './app.component';
+import { LoginComponent } from './login/login.component';
+import {Environment} from './environment';
+import {AuthService} from './services/authservice';
+import {AmbariService} from './services/ambari.service';
+import {BackupPolicyService} from './services/backup-policy.service';
+import {DataCenterService} from './services/data-center.service';
+import {LoggedInGuard, AlreadyLoggedInGuard} from './shared/utils/login-gaurd';
+import {GeographyService} from './services/geography.service';
+import {BreadcrumbService} from './services/breadcrumb.service';
+import {DashboardModule} from './components/dashboard/dashboard.module';
+import {ViewClusterModule} from './components/view-cluster/view-cluster.module';
+import {AddClusterModule} from './components/add-cluster/add-cluster.module';
+import {AddBdrModule} from './components/add-bdr/add-bdr.module';
+import {ViewDataModule} from './components/view-data/view-data.module';
+import {AnalystDashboardModule} from './components/data-analyst/analyst-dashboard/analyst-dashboard.module';
+import {DataSetModule} from './components/data-analyst/data-set/data-set.module';
+import {AddDataSetModule} from './components/data-analyst/add-data-set/add-data-set.module';
+import {ViewDataSetModule} from './components/data-analyst/view-data-set/view-data-set.module';
+import {DataManagerModule} from './components/data-manager/data-manager.module';
+import { LogoutComponent } from './logout/logout.component';
+
+@NgModule({
+  imports: [
+        BrowserModule,
+        FormsModule,
+        HttpModule,
+        WebappRoutingModule,
+        DashboardModule,
+        ViewClusterModule,
+        AddClusterModule,
+        AddBdrModule,
+        ViewDataModule,
+        AnalystDashboardModule,
+        DataSetModule,
+        AddDataSetModule,
+        ViewDataSetModule,
+        DataManagerModule
+  ],
+    declarations: [
+        SidenavRouterLinkDirective,
+        AppComponent,
+        LoginComponent,
+        LogoutComponent
+    ],
+  bootstrap: [AppComponent],
+  providers: [Environment, AuthService, AmbariService, BackupPolicyService, DataCenterService, LoggedInGuard,
+              AlreadyLoggedInGuard, GeographyService, BreadcrumbService]
+})
+export class AppModule { }

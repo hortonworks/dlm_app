@@ -1,0 +1,8 @@
+<div>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item" *ngFor="let crumb of crumbKeys; let isLast = last; let i = index">
+            <a href="#"  *ngIf="!isLast" (click)="navigate($event, crumb, i)">{{ decode(crumb.name) }}</a>
+            <span href="#" *ngIf="isLast" >{{ decode(crumb.name)  }}</span>
+        </li>
+    </ol>
+</div>
