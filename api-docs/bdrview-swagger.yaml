@@ -1,0 +1,402 @@
+# Example YAML to get you started quickly.
+# Be aware that YAML has indentation based scoping.
+# Code completion support is available so start typing for available options.
+swagger: '2.0'
+
+# This is your document metadata
+info:
+  version: "0.0.1"
+  title: BDR
+definitions:
+  Policy:
+    type: object
+    properties:
+      id:
+        type: string
+  PolicyInstance:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      type:
+        type: string
+      startTime:
+        type: string
+        format: dateTime
+      endTime:
+        type: string
+        format: dateTime
+      status:
+        type: string
+        
+  PolicyDefinition:
+    type: object
+    properties:
+      id:
+        type: string #hive/hdfs
+      sourceCluster:
+        type: string #custer+datacenter
+      targetCluster:
+        type: string #clustere+datacenter
+      dataset:
+        type: string #list of dbs or hdfs
+      
+  Cluster:
+    type: object
+    properties:
+      name:
+        type: string
+      datacenter:
+        type: string
+      beaconEndpoint:
+        type: string
+      hsEndpoint:
+        type: string
+      fsEndpoint:
+        type: string
+  RegisteredCluster:
+    type: object
+    properties:
+      name: 
+        type: string
+      datacenter:
+        type: string
+      peers:
+        type: array
+        items:
+          type: string
+# Describe your paths here
+paths:
+  /clusters:
+    get:
+      description: |
+        List of clusters available from data plane
+      responses:
+        200:
+          description: Successful Response
+          schema:
+            title: ArrayOfClusters
+            type: array
+            items:
+             $ref: '#/definitions/Cluster'
+  /registeredClusters:
+    get:
+     description:
+        List of Clusters registered with beacon. The cluster and datacenter required to talk to the beacon running on that cluster.
+     parameters:
+      -
+       name: currentCluster
+       in: query
+       required: true
+       type: string
+      - 
+       name: currentDatacenter
+       in: query
+       required: true
+       type: string
+     responses:
+        200:
+          description: array of registered clusters
+          schema:
+            title: ArrayOfClusters
+            type: array
+            items:
+             $ref: '#/definitions/RegisteredCluster'
+    post:
+      summary: register a cluster with beanon running on the specific cluster.
+      description: register a cluster with beanon running on the specific cluster.
+      parameters:
+      -
+       name: currentCluster
+       in: query
+       required: true
+       type: string
+      - 
+       name: currentDatacenter
+       in: query
+       required: true
+       type: string
+      -
+       name: cluster
+       in: body
+       required: true
+       schema:
+        $ref: '#/definitions/Cluster'
+      responses:
+        200:
+          description: OK
+          
+    delete:
+      summary: unregister a cluster from beacon.
+      description: unregister a cluster from beacon 
+      parameters:
+      -
+       name: currentCluster
+       in: query
+       required: true
+       type: string
+      - 
+       name: currentDatacenter
+       in: query
+       required: true
+       type: string
+      - 
+       name: cluster
+       in: query
+       required: true
+       type: string
+      - 
+       name: dataCenter
+       in: query
+       required: true
+       type: string
+      responses:
+        200:
+          description: OK
+    
+    
+  /incomingPolicies:
+    get:
+     description: all policies that has the current Custer as incoming Target
+     parameters:
+      -
+       name: currentCluster
+       in: query
+       required: true
+       type: string
+      - 
+       name: currentDatacenter
+       in: query
+       required: true
+       type: string
+     responses:
+      200:
+        description: OK
+        schema:
+          title: ArrayOfPoicies
+          type: array
+          items:
+           $ref: '#/definitions/Policy'
+  /policy:
+    get:
+      description: all policies defined on the cluster.
+      produces: 
+      - "applicaiton/json"
+      parameters:
+      -
+       name: currentCluster
+       in: query
+       required: true
+       type: string
+      - 
+       name: currentDatacenter
+       in: query
+       required: true
+       type: string
+      responses:
+        200:
+          description: array of policies defined for this current Cluster
+          schema:
+            title: ArrayOfPoicies
+            type: array
+            items:
+             $ref: '#/definitions/Policy'
+    delete:
+      summary: delete a policy 
+      description: delete a policy
+      parameters:
+      -
+       name: currentCluster
+       in: query
+       required: true
+       type: string
+      - 
+       name: currentDatacenter
+       in: query
+       required: true
+       type: string
+      - 
+       name: policyName
+       in: query
+       required: true
+       type: string 
+      responses:
+        200:
+          description: Delete a policy
+    post:
+      summary: Create a policy 
+      description: Create a policy 
+      parameters:
+      -
+       name: currentCluster
+       in: query
+       required: true
+       type: string
+      - 
+       name: currentDatacenter
+       in: query
+       required: true
+       type: string
+      - 
+       name: policyDefinition
+       in: body
+       required: true
+       schema:
+        $ref: '#/definitions/PolicyDefinition'
+      responses:
+        200:
+          description: OK
+    
+  /schedulePolicy:
+    post:
+     parameters:
+     -
+       name: currentCluster
+       in: query
+       required: true
+       type: string
+     - 
+       name: currentDatacenter
+       in: query
+       required: true
+       type: string
+     -
+       name: policyName
+       in: query
+       required: true
+       type: string
+     responses:
+        200:
+          description: schedule a policy
+  /suspendPolicy:
+    post:
+     parameters:
+     -
+       name: currentCluster
+       in: query
+       required: true
+       type: string
+     - 
+       name: currentDatacenter
+       in: query
+       required: true
+       type: string
+     -
+       name: policyName
+       in: query
+       required: true
+       type: string
+     responses:
+        200:
+          description: schedule a policy
+  /resumePolicy:
+    post:
+     parameters:
+     -
+       name: currentCluster
+       in: query
+       required: true
+       type: string
+     - 
+       name: currentDatacenter
+       in: query
+       required: true
+       type: string
+     -
+       name: policyName
+       in: query
+       required: true
+       type: string
+     responses:
+        200:
+          description: schedule a policy          
+  /clusterpair:
+    # This is a HTTP operation
+    get:
+      summary: get list of paired clusters
+      description: get list of paired clusters
+      parameters:
+      -
+       name: currentCluster
+       in: query
+       required: true
+       type: string
+      - 
+       name: currentDatacenter
+       in: query
+       required: true
+       type: string
+      responses:
+        200:
+          description: OK
+    post:
+      summary: pair cluster with current Cluster
+      description: pair cluster with current Cluster
+      parameters:
+      -
+       name: currentCluster
+       in: query
+       required: true
+       type: string
+      - 
+       name: currentDatacenter
+       in: query
+       required: true
+       type: string
+      -
+       name: cluster
+       in: query
+       required: true
+       type: string 
+      -
+       name: dataCenter
+       in: query
+       required: true
+       type: string 
+      responses:
+        200:
+          description: OK
+    
+    delete:
+      summary: unpair cluster from currentCluster
+      description: unpair 2 clusters
+      parameters:
+      -
+       name: currentCluster
+       in: query
+       required: true
+       type: string
+      - 
+       name: currentDatacenter
+       in: query
+       required: true
+       type: string
+      -
+       name: cluster
+       in: query
+       required: true
+       type: string 
+      -
+       name: dataCenter
+       in: query
+       required: true
+       type: string
+      responses:
+        200:
+          description: OK
+  /policyInstances:
+    get:
+      summary: get policy instances
+      description: get policy instances
+      responses:
+        200:
+          description: OK
+          schema:
+            title: ArrayOfPoiciyInstances
+            type: array
+            items:
+             $ref: '#/definitions/PolicyInstance'
+    
+      
