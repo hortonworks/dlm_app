@@ -6,5 +6,7 @@ public interface DataStoreDML {
 
   DBResult searchByKeyValue(String collection,String key,Object value);
 
+  DBResult findByKey(String collection,String key);
+
 }
 

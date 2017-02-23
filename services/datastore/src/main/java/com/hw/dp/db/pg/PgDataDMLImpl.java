@@ -2,14 +2,18 @@ package com.hw.dp.db.pg;
 
 import com.hw.dp.db.DBResult;
 import com.hw.dp.db.DataStoreDML;
+import org.skife.jdbi.v2.DBI;
+import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.IDBI;
 
 public class PgDataDMLImpl implements DataStoreDML {
 
   private final PgDML pgDao;
+  private final IDBI dbi;
 
   public PgDataDMLImpl(IDBI dbi) {
     pgDao = dbi.open(PgDML.class);
+    this.dbi = dbi;
   }
 
   @Override
@@ -32,5 +36,13 @@ public class PgDataDMLImpl implements DataStoreDML {
     } catch (Throwable e) {
       return DBResult.failure(e);
     }
+  }
+
+  @Override
+  public DBResult findByKey(String collection, String key) {
+    DBI db = (DBI) this.dbi;
+    Handle handle = db.open();
+    return null;
+
   }
 }

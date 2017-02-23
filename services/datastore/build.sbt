@@ -19,5 +19,8 @@ libraryDependencies ++= Seq(
   "postgresql" % "postgresql" % "9.4.1208-jdbc42-atlassian-hosted",
   "ru.yandex.qatools.embed" % "postgresql-embedded" % "1.20",
   "org.antlr" % "stringtemplate" % "3.2",
+  "com.wix" % "accord-core_2.11" % "0.6.1",
+  "com.typesafe.akka" %% "akka-http-spray-json" % "10.0.3",
+  "com.zaxxer" % "HikariCP" % "2.6.0",
 "org.scalatest" % "scalatest_2.11" % "3.0.1" % Test,
   "org.easymock" % "easymock" % "3.4" % Test)

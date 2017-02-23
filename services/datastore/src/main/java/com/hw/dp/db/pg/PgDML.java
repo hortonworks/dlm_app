@@ -22,5 +22,4 @@ public interface PgDML
   Collection<String> jsonByKeyStrValue(@Define("collection") String collection, @Define("key") String key,@Define("value") Object value) throws Exception;
 
 
-
 }
