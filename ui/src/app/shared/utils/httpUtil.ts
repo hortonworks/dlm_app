@@ -17,7 +17,7 @@ export class HttpUtil {
   public static handleError(error: any) {
     if (error.status === 401) {
       localStorage.removeItem('dp_auth_token');
-      window.location.replace(window.location.origin + '/ui/login#SESSEXPIRED');
+      window.location.replace(window.location.origin + '/login#SESSEXPIRED');
       return Observable.throw(error);
     }
 
@@ -31,10 +31,13 @@ export class HttpUtil {
   }
 
   public static getHeaders(): RequestOptionsArgs {
-    return {headers: new Headers({'Content-Type': 'application/json',
-                                  'X-Requested-With': 'XMLHttpRequest',
-                                  'Authorization': 'Bearer ' + localStorage.getItem('dp_auth_token')
-                                })
-    };
+    const headers =
+      new Headers({
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('dp_auth_token')}`
+      });
+    return ({
+      headers
+    });
   }
 }

@@ -7,7 +7,6 @@ import {DataCenterService} from '../../../services/data-center.service';
 import {SearchQueryService} from '../../../services/search-query.service';
 import {NVD3Module} from '../../../shared/nvd3/nvd3.module';
 
-
 @NgModule({
     imports: [routing, SharedModule, NVD3Module],
     exports: [DataSetComponent],

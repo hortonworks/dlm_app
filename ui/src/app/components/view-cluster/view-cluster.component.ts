@@ -15,7 +15,7 @@ declare var Datamap:any;
     templateUrl: './view-cluster.component.html'
 })
 
-export default class ViewClusterComponent implements OnInit {
+export class ViewClusterComponent implements OnInit {
 
     breadCrumbMap: any = {};
     dataCenterName: string = '';
@@ -27,7 +27,7 @@ export default class ViewClusterComponent implements OnInit {
     ngOnInit() {
         this.activatedRoute.params.subscribe(params => {
             this.dataCenterName = params['id'];
-            this.breadCrumbMap = {'Datacenter':'ui/dashboard'};
+            this.breadCrumbMap = {'Datacenter':'dashboard'};
             this.breadCrumbMap[this.dataCenterName] = '';
             this.getDataCenterData();
         });
@@ -72,10 +72,10 @@ export default class ViewClusterComponent implements OnInit {
         let navigationExtras = {
             'queryParams' : {'host': host.ambariHost}
         };
-        this.router.navigate(['ui/view-data/' + this.dataCenterName], navigationExtras);
+        this.router.navigate(['view-data/' + this.dataCenterName], navigationExtras);
     }
 
     createCluster() {
-        this.router.navigate(['ui/cluster/add']);
+        this.router.navigate(['cluster/add']);
     }
 }

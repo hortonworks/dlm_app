@@ -89,7 +89,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
     constructor(private router: Router, private dataCenterService: DataCenterService, private environment: Environment,
                 private bpService: BackupPolicyService, private breadcrumbService: BreadcrumbService,
                 private geographyService: GeographyService) {
-        this.breadcrumbService.crumbMap = [{'url': '/ui/dashboard', 'name': 'Dashboard'}];
+        this.breadcrumbService.crumbMap = [{'url': '/dashboard', 'name': 'Dashboard'}];
     }
 
     ngAfterViewInit() {
@@ -289,7 +289,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
                 const popup = L.popup({
                   closeButton: false,
                   className: 'map__popup--context',
-                }).setLatLng(e.latlng).setContent(`<a href="/ui/backup-policy?create&dataCenter=${cLayer.options.dataCenterId}">Create policy</a>`);
+                }).setLatLng(e.latlng).setContent(`<a href="/backup-policy?create&dataCenter=${cLayer.options.dataCenterId}">Create policy</a>`);
                 popup.openOn(this.map);
               });
           });
@@ -317,7 +317,7 @@ export class DashboardComponent implements AfterViewInit, OnInit {
     }
 
     doNavigateToDataCenter(dataCenterId: string) {
-      this.router.navigate([`/ui/data-lake/${dataCenterId}`]);
+      this.router.navigate([`/data-lake/${dataCenterId}`]);
     }
 
     plotBackupPolicies(policies: BackupPolicyInDetail[]) {

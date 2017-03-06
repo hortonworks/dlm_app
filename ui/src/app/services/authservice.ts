@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Headers, Http} from '@angular/http';
-import 'rxjs/add/operator/toPromise';
-import {LoginData} from '../models/userdata';
+
+import {Credential} from '../models/credential';
 
 /**
  * Use common/utils/HttpClient for making authenticated calls
@@ -14,7 +14,7 @@ export class AuthService {
         this.loggedIn = !!localStorage.getItem('dp_auth_token');
     }
 
-    login(userName: string, password: string):Promise<LoginData> {
+    login(userName: string, password: string):Promise<Credential> {
         localStorage.setItem('user', userName);
         let headers = new Headers();
         headers.append('Content-Type', 'application/json');
@@ -28,7 +28,7 @@ export class AuthService {
                     this.loggedIn = true;
                     localStorage.setItem('dp_auth_token', res.json().auth_token);
                     localStorage.setItem('dp_userType', res.json().userType);
-                    return new LoginData(userName,password, res.json().userType);
+                    return new Credential(userName,password, res.json().userType);
                 }
             )
             .catch(error=> {

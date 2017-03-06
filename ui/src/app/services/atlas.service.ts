@@ -5,7 +5,6 @@ import {Http, Headers, RequestOptions, Response, ResponseOptions} from '@angular
 import {HttpUtil} from '../shared/utils/httpUtil';
 import {DataCenter} from '../models/data-center';
 import {AtlasLineage} from '../models/altas-lineage';
-import '../rxjs-operators';
 
 @Injectable()
 export class AtlasService {

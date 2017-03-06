@@ -4,7 +4,6 @@ import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/mergeMap';
 import {Ambari} from '../models/ambari';
 import {HttpUtil} from '../shared/utils/httpUtil';
-import '../rxjs-operators';
 
 @Injectable()
 export class AmbariService {

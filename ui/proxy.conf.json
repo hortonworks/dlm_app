@@ -3,7 +3,7 @@
     "target": "http://localhost:9000",
     "secure": false
   },
-  "/auth/login": {
+  "/auth": {
     "target": "http://localhost:9000",
     "secure": false
   }

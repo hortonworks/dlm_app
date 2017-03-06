@@ -110,7 +110,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
       this.activatedRoute.params.subscribe(params => {
           this.dataLakeName = params['id'];
           this.clusterHost = this.activatedRoute.snapshot.queryParams['host'];
-          this.breadCrumbMap = {'Datacenter':'ui/dashboard'};
+          this.breadCrumbMap = {'Datacenter':'dashboard'};
           this.breadCrumbMap[this.dataLakeName] = '';
           this.getClusterData();
 
@@ -373,7 +373,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
               resourceType: this.search.resourceType,
             }
         };
-        this.router.navigate(['/ui/backup-policy'], navigationExtras);
+        this.router.navigate(['/backup-policy'], navigationExtras);
         return false;
     }
 

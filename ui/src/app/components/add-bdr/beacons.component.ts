@@ -195,13 +195,13 @@ export class BeaconsComponent implements OnInit, AfterViewInit {
 
     this.policyService.create(policy)
       .subscribe(
-        () => this.router.navigate(['/ui/dashboard'])
+        () => this.router.navigate(['/dashboard'])
       );
   }
 
   doCancel() {
     if(this.source && this.source.dataCenter.name && this.source.cluster) {
-      this.router.navigate([`/ui/view-data/${this.source.dataCenter.name}`], {
+      this.router.navigate([`/view-data/${this.source.dataCenter.name}`], {
           queryParams : {
             host: this.source.cluster.host
           }
@@ -209,9 +209,9 @@ export class BeaconsComponent implements OnInit, AfterViewInit {
       return;
     }
     if(this.source && this.source.dataCenter.name) {
-      this.router.navigate([`/ui/data-lake/${this.source.dataCenter.name}`]);
+      this.router.navigate([`/data-lake/${this.source.dataCenter.name}`]);
       return;
     }
-    this.router.navigate(['/ui/dashboard']);
+    this.router.navigate(['/dashboard']);
   }
 }

@@ -3,7 +3,6 @@ import {Http, Headers, RequestOptions, Response, ResponseOptions} from '@angular
 import {Observable} from 'rxjs/Observable';
 import {BackupPolicy, BackupPolicyInDetail} from '../models/backup-policy';
 import {HttpUtil} from '../shared/utils/httpUtil';
-import '../rxjs-operators';
 
 @Injectable()
 export class BackupPolicyService {

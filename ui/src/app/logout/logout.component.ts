@@ -1,8 +1,7 @@
 import {Component} from '@angular/core';
-import { AuthService } from '../services/authservice';
-import 'rxjs/add/operator/toPromise';
+import { AuthenticationService } from '../services/authentication.service';
 import { Router } from '@angular/router';
-import {LoginData} from '../models/userdata';
+import {Credential} from '../models/credential';
 
 
 @Component({
@@ -11,14 +10,12 @@ import {LoginData} from '../models/userdata';
 })
 
 export class LogoutComponent {
-
-  submitted: boolean = false;
-  model: LoginData = new LoginData('','','');
-
-
-  constructor(private userService: AuthService, private router: Router) {
-    this.userService.logout();
-    this.router.navigate(['ui/login']);
+  constructor(
+    private authenticationService: AuthenticationService,
+    private router: Router
+  ) {
+    this.authenticationService.signOut();
+    this.router.navigate(['login']);
   }
 
 }

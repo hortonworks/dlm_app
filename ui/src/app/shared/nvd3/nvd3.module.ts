@@ -1,5 +1,5 @@
 import {NgModule} from '@angular/core';
-import {nvD3} from 'ng2-nvd3';
+import {nvD3} from './nvd3.component';
 
 @NgModule({
     imports: [],

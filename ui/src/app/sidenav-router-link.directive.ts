@@ -10,16 +10,15 @@ import { Router } from '@angular/router';
 
 export class SidenavRouterLinkDirective {
 
-    constructor(private router: Router) {
-    }
+    constructor(private router: Router) {}
 
-    @Input() sidenavRouterLink: Array<string>;
+    @Input()
+    sidenavRouterLink: Array<string>;
 
     @HostListener('click', ['$event'])
     onClick($event: any) {
-        let layout: any;
-        layout = document.querySelector('.mdl-layout');
-        layout.MaterialLayout.toggleDrawer();
+        const  layout = document.querySelector('.mdl-layout');
+        (<any> layout).MaterialLayout.toggleDrawer();
         this.router.navigate(this.sidenavRouterLink);
         $event.preventDefault();
     }

@@ -3,7 +3,6 @@ import {Http, Headers, RequestOptions, Response, ResponseOptions} from '@angular
 import {Observable} from 'rxjs/Observable';
 import {HttpUtil} from '../shared/utils/httpUtil';
 import {DataSet} from '../models/data-set';
-import '../rxjs-operators';
 
 
 @Injectable()

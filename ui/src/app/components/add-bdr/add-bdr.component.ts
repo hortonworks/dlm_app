@@ -33,8 +33,8 @@ enum DataSourceType {
 
 @Component({
     selector: 'add-bdr',
-    templateUrl: 'assets/app/components/add-bdr/add-bdr.component.html',
-    styleUrls: ['assets/app/components/add-bdr/add-bdr.component.scss']
+    templateUrl: './add-bdr.component.html',
+    styleUrls: ['./add-bdr.component.scss']
 })
 export class AddBdrComponent implements OnInit, AfterViewInit {
 
@@ -112,7 +112,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
       },
       */
 
-      duration: {
+      duration?: {
         start: string,
         stop: string
       }
@@ -389,7 +389,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
 
     doCancel() {
       if(this.source && this.source.dataCenter.name && this.source.cluster) {
-        this.router.navigate([`/ui/view-data/${this.source.dataCenter.name}`], {
+        this.router.navigate([`/view-data/${this.source.dataCenter.name}`], {
             queryParams : {
               host: this.source.cluster.host
             }
@@ -397,10 +397,10 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
         return;
       }
       if(this.source && this.source.dataCenter.name) {
-        this.router.navigate([`/ui/data-lake/${this.source.dataCenter.name}`]);
+        this.router.navigate([`/data-lake/${this.source.dataCenter.name}`]);
         return;
       }
-      this.router.navigate(['/ui/dashboard']);
+      this.router.navigate(['/dashboard']);
     }
 
     doSave() {
@@ -421,7 +421,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
 
       this.policyService.create(policy)
         .subscribe(
-          () => this.router.navigate(['/ui/dashboard'])
+          () => this.router.navigate(['/dashboard'])
         );
     }
 

@@ -4,7 +4,6 @@ import {Observable} from 'rxjs/Observable';
 import {DataCenter} from '../models/data-center';
 import {Ambari} from '../models/ambari';
 import {HttpUtil} from '../shared/utils/httpUtil';
-import '../rxjs-operators';
 import {DataCenterDetails} from '../models/data-center-details';
 
 @Injectable()

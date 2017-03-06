@@ -9,3 +9,5 @@
 **/RUNNING_PID
 **/node_modules
 **/npm-debug.log
+**/.vscode/
+**/*.gz

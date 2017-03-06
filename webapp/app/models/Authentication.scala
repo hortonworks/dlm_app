@@ -9,6 +9,7 @@ import play.api.libs.functional.syntax._
 case class UserRequest(username: String,
                        password: String)
 
+case class Credential(id: String, password: String)
 
 
 case class User(username: String,
@@ -32,6 +33,8 @@ object JsonFormats {
   import play.api.libs.json.Json
 
   implicit val userReqFormat = Json.format[UserRequest]
+
+  implicit val credentialFormat = Json.format[Credential]
   implicit val userFormat = Json.format[User]
 
   implicit val userWrites = Json.writes[User]

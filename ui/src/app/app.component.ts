@@ -1,6 +1,6 @@
 import {Component,AfterViewInit} from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from './services/authservice';
+import { AuthenticationService } from './services/authentication.service';
 import {Environment} from './environment';
 import {Persona} from './shared/utils/persona';
 
@@ -18,12 +18,16 @@ export class AppComponent implements AfterViewInit  {
   persona = Persona;
   who: number = 1;
 
-  constructor(public router: Router,private authService: AuthService, private environment: Environment) {
+  constructor(
+    public router: Router,
+    private authService: AuthenticationService,
+    private environment: Environment
+  ) {
     this.who = Math.floor(Math.random() * 2) + 1;
   }
 
   isLoggedIn(): boolean {
-    return this.authService.isLoggedIn();
+    return this.authService.isAuthenticated();
   }
 
   getUserName(): string {

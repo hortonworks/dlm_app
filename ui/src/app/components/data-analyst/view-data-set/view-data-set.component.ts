@@ -208,7 +208,7 @@ export class ViewDataSetComponent implements OnInit {
         let navigationExtras = {
             'queryParams' : {'host': this.host, 'id': id}
         };
-        this.router.navigate(['ui/view-data/' + this.dataCenter], navigationExtras);
+        this.router.navigate(['view-data/' + this.dataCenter], navigationExtras);
     }
 
     setActiveTab($event: any, activeTab: Tab) {
@@ -217,7 +217,7 @@ export class ViewDataSetComponent implements OnInit {
     }
 
     doNavigateToDetails(resourceId: string, resourceType: string) {
-      this.router.navigate([`/ui/view-data/${this.dataCenter}`], {
+      this.router.navigate([`/view-data/${this.dataCenter}`], {
             queryParams : {
               host: this.host,
               resourceId: resourceId,
@@ -227,7 +227,7 @@ export class ViewDataSetComponent implements OnInit {
     }
 
     doNavigateToBackupPolicySetup() {
-      this.router.navigate(['/ui/backup-policy'], {
+      this.router.navigate(['/backup-policy'], {
             queryParams : {
               create: '',
               cluster: this.host,

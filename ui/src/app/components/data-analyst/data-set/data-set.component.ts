@@ -10,9 +10,6 @@ import {SearchQueryService} from '../../../services/search-query.service';
 import {SearchQuery} from '../../../models/search-query';
 import {BreadcrumbService} from '../../../services/breadcrumb.service';
 import {DataSetChartData} from './data-set-chart-data';
-// import * as nv from 'nvd3';
-import {nvD3} from 'ng2-nvd3';
-
 
 declare let d3: any;
 declare let nv: any;
@@ -53,15 +50,15 @@ export class DataSetComponent implements OnInit, AfterViewInit {
     chartMargins = 25;
 
     @ViewChild('content') content: ElementRef;
-    @ViewChild('dataInflowEle') dataInflowEle: nvD3;
-    @ViewChild('usersDataEle') usersDataEle: nvD3;
-    @ViewChild('usageDataEle') usageDataEle: nvD3;
-    @ViewChild('bubbleChartEle') bubbleChartEle: nvD3;
+    @ViewChild('dataInflowEle') dataInflowEle: any;
+    @ViewChild('usersDataEle') usersDataEle: any;
+    @ViewChild('usageDataEle') usageDataEle: any;
+    @ViewChild('bubbleChartEle') bubbleChartEle: any;
 
     constructor(private dataSetService: DataSetService, private router: Router, private dataCenterService: DataCenterService,
                 private searchQueryService: SearchQueryService, private environment: Environment,
                 private breadcrumbService: BreadcrumbService) {
-        this.breadcrumbService.crumbMap = [{'url': '/ui/data-analyst/analyst-dashboard', 'name': 'Data Set'}];
+        this.breadcrumbService.crumbMap = [{'url': '/data-analyst/analyst-dashboard', 'name': 'Data Set'}];
 
         this.dataSetsMap = {'All': [],
             'File Size' : DataSetChartData.getUnclassifiedDataSet('File Size' , ['Tiny', 'Small', 'Medium', 'Large', 'Huge']),
@@ -326,18 +323,18 @@ export class DataSetComponent implements OnInit, AfterViewInit {
     }
 
     onAddDataSet() {
-        this.router.navigate(['ui/data-analyst/dataset/add']);
+        this.router.navigate(['data-analyst/dataset/add']);
     }
 
     viewDataSet(dataSet: DataSet) {
 
         this.breadcrumbService.crumbMap.shift();
-        this.breadcrumbService.crumbMap.unshift({'url': '/ui/data-analyst/analyst-dashboard', 'name': dataSet.dataCenter});
+        this.breadcrumbService.crumbMap.unshift({'url': '/data-analyst/analyst-dashboard', 'name': dataSet.dataCenter});
 
         let navigationExtras = {
             'queryParams' : {'host': dataSet.ambariHost, 'dataCenter': dataSet.dataCenter}
         };
-        this.router.navigate(['ui/data-analyst/dataset/view/' + dataSet.name], navigationExtras);
+        this.router.navigate(['data-analyst/dataset/view/' + dataSet.name], navigationExtras);
     }
 
     doNothing() {

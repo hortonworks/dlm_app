@@ -40,17 +40,17 @@ export class BreadcrumbComponent {
     }
 
     private addToBreadCrumb(url:string) {
-        if (url.indexOf('/ui/dashboard') === 0) {
+        if (url.indexOf('/dashboard') === 0) {
             this.breadcrumbService.crumbMap.push({'url': url, 'name': 'Dashboard'});
-        } else if (url.indexOf('/ui/view-data') === 0) {
+        } else if (url.indexOf('/view-data') === 0) {
             this.breadcrumbService.crumbMap.push({'url': url, 'name': 'Host: ' + url.split('/')[3].split('?')[0]});
-        } else if (url.indexOf('/ui/data-lake') === 0) {
+        } else if (url.indexOf('/data-lake') === 0) {
             this.breadcrumbService.crumbMap.push({'url': url, 'name': this.environment.DATA_CENTER_DATA_LAKE + ': ' + url.split('/')[3].split('?')[0]});
-        } else if (url.indexOf('/ui/data-analyst/dataset/add') === 0) {
+        } else if (url.indexOf('/data-analyst/dataset/add') === 0) {
             this.breadcrumbService.crumbMap.push({'url': url, 'name': 'Add Data Set'});
-        } else if (url.indexOf('/ui/data-analyst/dataset/view/') === 0) {
+        } else if (url.indexOf('/data-analyst/dataset/view/') === 0) {
             this.breadcrumbService.crumbMap.push({'url': url, 'name': 'Data Set: ' + url.split('/')[5].split('?')[0]});
-        } else if (url.indexOf('/ui/cluster/add') === 0) {
+        } else if (url.indexOf('/cluster/add') === 0) {
             this.breadcrumbService.crumbMap.push({'url': url, 'name': 'Add Cluster'});
         }
 

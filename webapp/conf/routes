@@ -10,6 +10,7 @@ GET         /ui/*path                              controllers.Application.route
 
 #auth calls
 POST        /auth/login                            controllers.Authentication.login
+POST        /auth/in                               controllers.Authentication.signIn
 
 #api
 POST        /api/clusters                          controllers.Clusters.create

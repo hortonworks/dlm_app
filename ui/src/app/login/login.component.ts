@@ -1,11 +1,11 @@
-import {Component} from '@angular/core';
-import {LoginData} from '../models/userdata';
-import { AuthService } from '../services/authservice';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import {Environment} from '../environment';
-import {Persona} from '../shared/utils/persona';
-import 'rxjs/add/operator/toPromise';
-import {BreadcrumbService} from '../services/breadcrumb.service';
+
+import { Credential } from '../models/credential';
+import { AuthenticationService } from '../services/authentication.service';
+import { BreadcrumbService } from '../services/breadcrumb.service';
+import { Environment } from '../environment';
+import { Persona } from '../shared/utils/persona';
 
 
 @Component({
@@ -18,9 +18,9 @@ export class LoginComponent {
 
   statusMessage: string = '';
   submitted: boolean = false;
-  model: LoginData = new LoginData('','', '');
+  credential: Credential = new Credential('','');
 
-  constructor(private userService: AuthService, private router: Router, private environment: Environment, private breadcrumbService: BreadcrumbService) {
+  constructor(private authenticaionService: AuthenticationService, private router: Router, private environment: Environment, private breadcrumbService: BreadcrumbService) {
     if (window.location.hash.length > 0 && window.location.hash === '#SESSEXPIRED') {
       this.statusMessage = 'SESSIONEXPIRED';
     }
@@ -29,17 +29,21 @@ export class LoginComponent {
   onSubmit() {
     this.submitted = true;
     this.breadcrumbService.crumbMap = [];
-    this.userService.login(this.model.name, this.model.password).then(res=> {
-      const persona = Persona[res.userType];
-      this.environment.persona = persona;
+    this.authenticaionService.signIn(this.credential)
+      .subscribe(
+        user => {
+          const persona = Persona[user.roles[0]];
+          this.environment.persona = persona;
 
-      if (persona === Persona.ANALYSTADMIN) {
-        this.environment.DATA_CENTER_DATA_LAKE = 'DATA LAKE';
-        this.router.navigate(['ui/data-analyst/analyst-dashboard']);
-      } else {
-        this.environment.DATA_CENTER_DATA_LAKE = 'DATA CENTER';
-        this.router.navigate(['ui/dashboard']);
-      }
-    }).catch(error => this.router.navigate(['ui/login']));
+          if (persona === Persona.ANALYSTADMIN) {
+            this.environment.DATA_CENTER_DATA_LAKE = 'DATA LAKE';
+            this.router.navigate(['data-analyst/analyst-dashboard']);
+          } else {
+            this.environment.DATA_CENTER_DATA_LAKE = 'DATA CENTER';
+            this.router.navigate(['dashboard']);
+          }
+        },
+        error => this.router.navigate(['login'])
+      );
   }
 }

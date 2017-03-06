@@ -11,7 +11,7 @@ import {BackupPolicyInDetail} from '../../models/backup-policy';
     styleUrls: ['./backup-policy-list.component.scss'],
     templateUrl: './backup-policy-list.component.html'
 })
-export default class BackupPolicyListComponent implements OnChanges {
+export class BackupPolicyListComponent implements OnChanges {
 
     policies: BackupPolicyInDetail[] = [];
     rxPolicies: Rx.Subject<string> = new Rx.Subject<string>();
@@ -39,7 +39,7 @@ export default class BackupPolicyListComponent implements OnChanges {
             queryParams : {
             }
         };
-        this.router.navigate([`/ui/backup-policy/${cPolicyId}`], navigationExtras);
+        this.router.navigate([`/backup-policy/${cPolicyId}`], navigationExtras);
         return false;
     }
 
