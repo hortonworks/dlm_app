@@ -34,14 +34,7 @@ export class LoginComponent {
         user => {
           const persona = Persona[user.roles[0]];
           this.environment.persona = persona;
-
-          if (persona === Persona.ANALYSTADMIN) {
-            this.environment.DATA_CENTER_DATA_LAKE = 'DATA LAKE';
-            this.router.navigate(['data-analyst/analyst-dashboard']);
-          } else {
-            this.environment.DATA_CENTER_DATA_LAKE = 'DATA CENTER';
-            this.router.navigate(['dashboard']);
-          }
+          this.router.navigate(['dashboard']);
         },
         error => this.router.navigate(['login'])
       );

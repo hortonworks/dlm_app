@@ -1,19 +1,19 @@
-import {Component,AfterViewInit, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
+import { Component,AfterViewInit, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import * as Rx from 'rxjs';
 import 'leaflet';
 import 'leaflet-curve';
 
-import {GeographyService} from '../../services/geography.service';
-import {DataCenterService} from '../../services/data-center.service';
-import {BackupPolicyService} from '../../services/backup-policy.service';
-import {DataCenter} from '../../models/data-center';
-import {BackupPolicyInDetail} from '../../models/backup-policy';
-import {CityNames} from '../../shared/utils/city-names';
-import {DataCenterDetails} from '../../models/data-center-details';
-import {MathUtils} from '../../shared/utils/mathUtils';
-import {BreadcrumbService} from '../../services/breadcrumb.service';
-import {Environment} from '../../environment';
+import { GeographyService } from '../../services/geography.service';
+import { DataCenterService } from '../../services/data-center.service';
+import { BackupPolicyService } from '../../services/backup-policy.service';
+import { DataCenter } from '../../models/data-center';
+import { BackupPolicyInDetail } from '../../models/backup-policy';
+import { CityNames } from '../../shared/utils/city-names';
+import { DataCenterDetails } from '../../models/data-center-details';
+import { MathUtils } from '../../shared/utils/mathUtils';
+import { BreadcrumbService } from '../../services/breadcrumb.service';
+import { Environment } from '../../environment';
 
 declare var Datamap:any;
 declare var L: any;

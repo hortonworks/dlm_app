@@ -1,18 +1,19 @@
-import {Component, OnInit} from '@angular/core';
-import {Router, ActivatedRoute} from '@angular/router';
-import {DataSetService} from '../../../services/data-set.service';
-import {BackupPolicyService} from '../../../services/backup-policy.service';
-import {DataSet} from '../../../models/data-set';
-import {SearchQueryService} from '../../../services/search-query.service';
-import {SearchQuery} from '../../../models/search-query';
-import {DataFilterWrapper} from '../../../models/data-filter-wrapper';
-import {DataFilter} from '../../../models/data-filter';
-import {Environment} from '../../../environment';
-import {SearchParamWrapper} from '../../../shared/data-plane-search/search-param-wrapper';
-import {SearchParam} from '../../../shared/data-plane-search/search-param';
-import {Persona} from '../../../shared/utils/persona';
+import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import * as Rx from 'rxjs';
-import {DataPlaneSearchComponent} from '../../../shared/data-plane-search/data-plane-search.component';
+
+import { DataSetService } from '../../../services/data-set.service';
+import { BackupPolicyService } from '../../../services/backup-policy.service';
+import { DataSet } from '../../../models/data-set';
+import { SearchQueryService } from '../../../services/search-query.service';
+import { SearchQuery } from '../../../models/search-query';
+import { DataFilterWrapper } from '../../../models/data-filter-wrapper';
+import { DataFilter } from '../../../models/data-filter';
+import { Environment } from '../../../environment';
+import { SearchParamWrapper } from '../../../shared/data-plane-search/search-param-wrapper';
+import { SearchParam } from '../../../shared/data-plane-search/search-param';
+import { Persona } from '../../../shared/utils/persona';
+import { DataPlaneSearchComponent } from '../../../shared/data-plane-search/data-plane-search.component';
 
 export enum Tab { HIVE, HBASE, HDFS}
 

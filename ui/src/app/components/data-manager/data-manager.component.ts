@@ -1,8 +1,8 @@
-import {Component, OnInit, AfterViewInit} from '@angular/core';
-import {Router, ActivatedRoute} from '@angular/router';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import * as Rx from 'rxjs';
 
-import {Environment} from '../../environment';
+import { Environment } from '../../environment';
 
 
 @Component({

@@ -1,10 +1,11 @@
-import {NgModule} from '@angular/core';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
-import {ChipsBarComponent}   from './chips-bar.component';
-import {SharedModule} from '../shared.module';
+import { ChipsBarComponent }   from './chips-bar.component';
 
 @NgModule({
-    imports: [SharedModule],
+    imports: [CommonModule, FormsModule],
     exports: [ChipsBarComponent],
     declarations: [ChipsBarComponent],
     providers: [],

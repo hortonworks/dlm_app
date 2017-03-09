@@ -2,12 +2,6 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET         /                                      controllers.Default.redirect(to = "/ui")
-# Responds with 404 Not Found
-GET         /ui                                    controllers.Application.index
-GET         /ui/*path                              controllers.Application.route(path)
-
 #auth calls
 POST        /auth/login                            controllers.Authentication.login
 POST        /auth/in                               controllers.Authentication.signIn
@@ -68,7 +62,3 @@ POST        /api/datasets                          controllers.DataSets.create
 PUT         /api/datasets                          controllers.DataSets.update
 GET         /api/datasets/:name                    controllers.DataSets.getByname(name,host,datacenter)
 GET         /api/datasets                          controllers.DataSets.getAll(host,datacenter)
-
-
-# Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file                          controllers.Assets.versioned(path="/public", file: Asset)

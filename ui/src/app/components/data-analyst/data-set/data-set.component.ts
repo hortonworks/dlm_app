@@ -1,15 +1,16 @@
-import {Router} from '@angular/router';
-import {Component, OnInit, ElementRef, ViewChild, AfterViewInit} from '@angular/core';
-import {DataSetService} from '../../../services/data-set.service';
-import {DataSet} from '../../../models/data-set';
-import {Environment} from '../../../environment';
-import {DataCenterService} from '../../../services/data-center.service';
-import {DataCenter} from '../../../models/data-center';
-import {Persona} from '../../../shared/utils/persona';
-import {SearchQueryService} from '../../../services/search-query.service';
-import {SearchQuery} from '../../../models/search-query';
-import {BreadcrumbService} from '../../../services/breadcrumb.service';
-import {DataSetChartData} from './data-set-chart-data';
+import { Router } from '@angular/router';
+import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+
+import { DataSetService } from '../../../services/data-set.service';
+import { DataSet } from '../../../models/data-set';
+import { Environment } from '../../../environment';
+import { DataCenterService } from '../../../services/data-center.service';
+import { DataCenter } from '../../../models/data-center';
+import { Persona } from '../../../shared/utils/persona';
+import { SearchQueryService } from '../../../services/search-query.service';
+import { SearchQuery } from '../../../models/search-query';
+import { BreadcrumbService } from '../../../services/breadcrumb.service';
+import { DataSetChartData } from './data-set-chart-data';
 
 declare let d3: any;
 declare let nv: any;

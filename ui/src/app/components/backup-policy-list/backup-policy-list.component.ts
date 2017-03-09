@@ -1,10 +1,10 @@
-import {Component, Input, AfterViewInit, OnChanges, SimpleChanges} from '@angular/core';
-import {Router} from '@angular/router';
+import { Component, Input, AfterViewInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Router } from '@angular/router';
 import * as Rx from 'rxjs';
 import * as moment from 'moment';
 
-import {BackupPolicyService} from '../../services/backup-policy.service';
-import {BackupPolicyInDetail} from '../../models/backup-policy';
+import { BackupPolicyService } from '../../services/backup-policy.service';
+import { BackupPolicyInDetail } from '../../models/backup-policy';
 
 @Component({
     selector: 'backup-policy-list' ,

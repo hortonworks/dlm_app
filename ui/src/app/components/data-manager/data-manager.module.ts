@@ -1,9 +1,11 @@
-import {NgModule} from '@angular/core';
-import {DataManagerComponent}   from './data-manager.component';
-import {SharedModule} from '../../shared/shared.module';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+import { DataManagerComponent }   from './data-manager.component';
 
 @NgModule({
-    imports: [SharedModule],
+    imports: [CommonModule, FormsModule],
     exports: [DataManagerComponent],
     declarations: [DataManagerComponent],
     providers: [],

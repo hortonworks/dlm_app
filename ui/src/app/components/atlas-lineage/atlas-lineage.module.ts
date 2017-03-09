@@ -1,7 +1,7 @@
-import {NgModule} from '@angular/core';
+import { NgModule } from '@angular/core';
 
-import {AtlasLineageComponent}   from './atlas-lineage.component';
-import {AtlasService} from '../../services/atlas.service';
+import { AtlasLineageComponent }   from './atlas-lineage.component';
+import { AtlasService } from '../../services/atlas.service';
 
 @NgModule({
     imports: [],

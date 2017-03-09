@@ -25,7 +25,10 @@ export class LoggedInGuard implements CanActivate {
 
 @Injectable()
 export class AlreadyLoggedInGuard implements CanActivate {
-  constructor(private authenticationService: AuthenticationService,private router: Router) {}
+  constructor(
+    private authenticationService: AuthenticationService,
+    private router: Router
+  ) {}
 
   canActivate() {
     if(this.authenticationService.isAuthenticated()) {

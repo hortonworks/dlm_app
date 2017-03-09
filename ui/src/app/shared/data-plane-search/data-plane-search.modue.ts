@@ -1,11 +1,12 @@
-import {NgModule} from '@angular/core';
+import { NgModule } from '@angular/core';
+import { CommonModule }        from '@angular/common';
+import { FormsModule }         from '@angular/forms';
 
-import {DataPlaneSearchComponent}   from './data-plane-search.component';
-import {SharedModule} from '../shared.module';
-import {DropDownModule} from '../dropdown/dropdown.module';
+import { DataPlaneSearchComponent }   from './data-plane-search.component';
+import { DropDownModule } from '../dropdown/dropdown.module';
 
 @NgModule({
-    imports: [SharedModule, DropDownModule],
+    imports: [CommonModule, FormsModule, DropDownModule],
     exports: [DataPlaneSearchComponent],
     declarations: [DataPlaneSearchComponent],
     providers: [],

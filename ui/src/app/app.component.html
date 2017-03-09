@@ -34,7 +34,7 @@
         <nav *ngIf="isLoggedIn()" class="mdl-navigation">
             <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link mdl-typography--font-medium" href="" [sidenavRouterLink]="['/dashboard']">DASHBOARD</a>
             <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link mdl-typography--font-medium" href="" [sidenavRouterLink]="['/add-data-lake']" > {{ environment.DATA_CENTER_DATA_LAKE }} </a>
-            <a *ngIf="[persona.ANALYSTADMIN].includes(environment.persona)" class="mdl-navigation__link mdl-typography--font-medium" href="" [sidenavRouterLink]="['/data-analyst/analyst-dashboard']" > DATA SETS </a>
+            <a *ngIf="[persona.ANALYSTADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link mdl-typography--font-medium" href="" [sidenavRouterLink]="['/data-analyst/analyst-dashboard']" > DATA SETS </a>
 
             <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/data-manager']" style="position: relative">
                 <div class="mdl-typography--font-medium">
@@ -51,20 +51,6 @@
         <a name="top"></a>
 
         <router-outlet></router-outlet>
-
-        <!--<footer class="dataplane-footer mdl-mega-footer">-->
-
-        <!--<div class="mdl-mega-footer&#45;&#45;middle-section">-->
-        <!--<p class="mdl-typography&#45;&#45;font-light">© 2016 Hortonworks Inc</p>-->
-        <!--</div>-->
-
-        <!--<div class="mdl-mega-footer&#45;&#45;bottom-section">-->
-
-        <!--<a class="dataplane-link mdl-typography&#45;&#45;font-light" href="">About</a>-->
-        <!--<a class="dataplane-link mdl-typography&#45;&#45;font-light" href="">Privacy Policy</a>-->
-        <!--</div>-->
-
-        <!--</footer>-->
     </div>
 </div>
 

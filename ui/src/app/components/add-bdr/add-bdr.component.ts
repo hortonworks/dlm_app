@@ -1,25 +1,25 @@
-import {Component, OnInit, AfterViewInit} from '@angular/core';
-import {Router, ActivatedRoute} from '@angular/router';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import * as Rx from 'rxjs';
-import {DataCenter} from '../../models/data-center';
-import {CityNames} from '../../shared/utils/city-names';
-import {DataCenterDetails} from '../../models/data-center-details';
-import {Ambari} from '../../models/ambari';
-import {BackupPolicy} from '../../models/backup-policy';
-import {Location} from '../../models/location';
-import {DataCenterService} from '../../services/data-center.service';
-import {AmbariService} from '../../services/ambari.service';
-import {BackupPolicyService} from '../../services/backup-policy.service';
+import { DataCenter } from '../../models/data-center';
+import { CityNames } from '../../shared/utils/city-names';
+import { DataCenterDetails } from '../../models/data-center-details';
+import { Ambari } from '../../models/ambari';
+import { BackupPolicy } from '../../models/backup-policy';
+import { Location } from '../../models/location';
+import { DataCenterService } from '../../services/data-center.service';
+import { AmbariService } from '../../services/ambari.service';
+import { BackupPolicyService } from '../../services/backup-policy.service';
 
-import {Environment} from '../../environment';
+import { Environment} from '../../environment';
 
-import {DataFilter} from '../../models/data-filter';
-import {DataFilterWrapper} from '../../models/data-filter-wrapper';
-import {SearchQueryService} from '../../services/search-query.service';
-import {SearchParam} from '../../shared/data-plane-search/search-param';
-import {DataSet} from '../../models/data-set';
-import {SearchQuery} from '../../models/search-query';
-import {SearchParamWrapper} from '../../shared/data-plane-search/search-param-wrapper';
+import { DataFilter } from '../../models/data-filter';
+import { DataFilterWrapper } from '../../models/data-filter-wrapper';
+import { SearchQueryService } from '../../services/search-query.service';
+import { SearchParam } from '../../shared/data-plane-search/search-param';
+import { DataSet } from '../../models/data-set';
+import { SearchQuery } from '../../models/search-query';
+import { SearchParamWrapper } from '../../shared/data-plane-search/search-param-wrapper';
 
 declare var Datamap:any;
 declare var d3:any;

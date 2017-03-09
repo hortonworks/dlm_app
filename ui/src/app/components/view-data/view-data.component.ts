@@ -1,25 +1,25 @@
-import {Component, OnInit, ViewChild, AfterViewInit} from '@angular/core';
-import {Router, ActivatedRoute} from '@angular/router';
-
-import {BreadcrumbComponent} from '../../shared/breadcrumb/breadcrumb.component';
-import {GeographyService} from '../../services/geography.service';
-import {AmbariService} from '../../services/ambari.service';
-import {BackupPolicyService} from '../../services/backup-policy.service';
-import {Ambari} from '../../models/ambari';
-import {BackupPolicyInDetail} from '../../models/backup-policy';
-import {DataCenterService} from '../../services/data-center.service';
-import {AtlasService} from '../../services/atlas.service';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import * as Rx from 'rxjs';
-import {CityNames} from '../../shared/utils/city-names';
 
-import {Environment} from '../../environment';
+import { BreadcrumbComponent } from '../../shared/breadcrumb/breadcrumb.component';
+import { GeographyService } from '../../services/geography.service';
+import { AmbariService } from '../../services/ambari.service';
+import { BackupPolicyService } from '../../services/backup-policy.service';
+import { Ambari } from '../../models/ambari';
+import { BackupPolicyInDetail } from '../../models/backup-policy';
+import { DataCenterService } from '../../services/data-center.service';
+import { AtlasService } from '../../services/atlas.service';
+import { CityNames } from '../../shared/utils/city-names';
 
-import {DataFilter} from '../../models/data-filter';
-import {DataFilterWrapper} from '../../models/data-filter-wrapper';
-import {SearchQueryService} from '../../services/search-query.service';
-import {DataSet} from '../../models/data-set';
-import {SearchQuery} from '../../models/search-query';
-import {SearchParamWrapper} from '../../shared/data-plane-search/search-param-wrapper';
+import { Environment } from '../../environment';
+
+import { DataFilter } from '../../models/data-filter';
+import { DataFilterWrapper } from '../../models/data-filter-wrapper';
+import { SearchQueryService } from '../../services/search-query.service';
+import { DataSet } from '../../models/data-set';
+import { SearchQuery } from '../../models/search-query';
+import { SearchParamWrapper } from '../../shared/data-plane-search/search-param-wrapper';
 
 declare const L:any;
 declare var Datamap:any;
@@ -66,7 +66,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
       resourceType: string
     }>();
 
-    @ViewChild('bread-crumb') breadCrumb: BreadcrumbComponent;
+    @ViewChild('dp-breadcrumb') breadCrumb: BreadcrumbComponent;
 
     constructor(
       private activatedRoute: ActivatedRoute,

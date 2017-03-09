@@ -1,8 +1,8 @@
-import {Component,AfterViewInit} from '@angular/core';
+import { Component,AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthenticationService } from './services/authentication.service';
-import {Environment} from './environment';
-import {Persona} from './shared/utils/persona';
+import { Environment } from './environment';
+import { Persona } from './shared/utils/persona';
 
 declare var Datamap:any;
 declare var componentHandler:any;

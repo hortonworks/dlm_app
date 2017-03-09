@@ -1,11 +1,12 @@
-import {Component, AfterViewInit, OnInit, ViewChild, ElementRef} from '@angular/core';
-import {Router, ActivatedRoute} from '@angular/router';
-import {DataCenterService} from '../../services/data-center.service';
-import {DataCenter} from '../../models/data-center';
-import {DataCenterDetails} from '../../models/data-center-details';
-import {Host} from '../../models/host';
-import {MathUtils} from '../../shared/utils/mathUtils';
-import {NameNodeInfo} from '../../models/name-node-info';
+import { Component, AfterViewInit, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+
+import { DataCenterService } from '../../services/data-center.service';
+import { DataCenter } from '../../models/data-center';
+import { DataCenterDetails } from '../../models/data-center-details';
+import { Host } from '../../models/host';
+import { MathUtils } from '../../shared/utils/mathUtils';
+import { NameNodeInfo } from '../../models/name-node-info';
 
 declare var Datamap:any;
 
