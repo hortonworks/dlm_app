@@ -1,13 +1,33 @@
-**/.idea
+# IntelliJ
 *.iml
+**/.idea
+
+# Visual Studio Code
+**/.vscode/
+
+# Eclipse
+.classpath
+.project
+.settings
+
+# NPM
+**/node_modules
+**/npm-debug.log
+
+# Build
 **/build/*
 **/target/*
 **/logs/*
-**/.classpath
-**/.project
-**/.settings
+
+# Typesafe Activator
+**/project/*-shim.sbt
+**/project/project/
+
+# Binaries
+**/bin/
+**/libexec/
+*.jar
+*.gz
+
+# Generated
 **/RUNNING_PID
-**/node_modules
-**/npm-debug.log
-**/.vscode/
-**/*.gz
