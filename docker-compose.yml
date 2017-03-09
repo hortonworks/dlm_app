@@ -1,6 +1,7 @@
 version: '2'
 services:
   web:
+    build: ./webapp
     image: data_plane:0.1-alpha
     ports: 
       - "8080:9000"
@@ -9,9 +10,9 @@ services:
       - dp_db
 
   dp_db_init:
-    build: ./dbinit
+    build: ./dp-setup
     volumes:
-      - ./dbinit/:/code
+      - ./dp-setup/:/code
     links:
       - dp_db
     command: python dbinit.py
