@@ -1,21 +1,38 @@
 version: '2'
 services:
-  web:
-    build: ./webapp
-    image: data_plane:0.1-alpha
-    ports: 
-      - "8080:9000"
+  dp-web:
+    build:
+      context: ./ui
+    image: dataplane/dp-web
+    ports:
+      - "4200:4200"
+    depends_on:
+      - dp-services
     links:
-      - dp_db_init
-      - dp_db
+      - dp-services
 
-  dp_db_init:
-    build: ./dp-setup
+  dp-services:
+    image: dataplane/dp-services
+    build:
+      context: ./webapp
+    ports:
+      - "9000:9000"
+    depends_on:
+      - dp-database
+    links:
+      - dp-database
+
+  dp-setup:
+    build:
+      context: ./dp-setup
+    image: dataplane/dp-setup
     volumes:
       - ./dp-setup/:/code
+    depends_on:
+      - dp-database
     links:
-      - dp_db
+      - dp-database
     command: python dbinit.py
 
-  dp_db:
+  dp-database:
     image: mongo

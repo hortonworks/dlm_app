@@ -1,0 +1,24 @@
+FROM node:7.7.1-slim
+
+# Create app directory
+RUN mkdir -p /var/tmp/build
+WORKDIR /var/tmp/build
+
+# Install app dependencies
+COPY package.json /var/tmp/build
+RUN npm install
+
+# Copy and compile app source
+COPY . /var/tmp/build
+RUN npm run build
+
+# Create UI directory
+RUN mkdir -p /usr/dp-ui
+WORKDIR /usr/dp-ui
+
+# Copy compiled code
+COPY /var/tmp/build/dist /usr/dp-ui
+
+# Source
+# https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
+# Now this container can be destroyed after taking dp-ui folder into another container with httpd

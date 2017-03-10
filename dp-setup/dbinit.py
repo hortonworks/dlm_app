@@ -3,7 +3,7 @@ from pymongo import MongoClient
 def connect():
 	while True:
 		try:
-			connection = MongoClient("dp_db",27017)
+			connection = MongoClient("localhost", 27017)
 			print "Connected to Mongo"
 			break
 		except:
@@ -14,7 +14,7 @@ def connect():
 def setup_dpdb(conn):
 	dp_db_name = "data_plane"
 	db = conn[dp_db_name]
-	db.add_user("dp_admin", "dp_admin_password", roles=[{'role':'readWrite', 'db':dp_db_name}, {'role':'dbAdmin','db':dp_db_name}])
+	db.add_user("dp_admin", "dp_admin_password", roles=[{'role': 'readWrite', 'db': dp_db_name}, {'role': 'dbAdmin','db': dp_db_name}])
 
 def initialize():
 	conn = connect()
