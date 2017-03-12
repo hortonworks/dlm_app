@@ -6,7 +6,7 @@ This service provides a data store and an API for data plane.
 Data model
 =================================
 
-![Image of ERD](dataplane/services/db-service/db/erd.png)
+![Image of ERD](https://github.com/hortonworks/dataplane/blob/master/services/db-service/db/erd.png)
 
 
 Run the service
