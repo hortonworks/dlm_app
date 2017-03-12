@@ -17,10 +17,11 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_users (
   updated  TIMESTAMP DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.users_roles (
+CREATE TABLE IF NOT EXISTS dataplane.dp_users_roles (
   id      BIGSERIAL PRIMARY KEY,
   userid  BIGINT REFERENCES dataplane.dp_users (id) NOT NULL,
-  roleid  BIGINT REFERENCES dataplane.dp_roles (id) NOT NULL
+  roleid  BIGINT REFERENCES dataplane.dp_roles (id) NOT NULL,
+  UNIQUE (userid,roleid)
 
 );
 

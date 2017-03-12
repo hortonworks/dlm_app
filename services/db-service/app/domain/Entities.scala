@@ -21,6 +21,11 @@ object Entities {
                   created: Option[LocalDateTime] = Some(LocalDateTime.now()),
                   updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
+
+  case class UserRole(id:Option[Long] = None,userId:Option[Long],roleId:Option[Long])
+
+  case class UserRoles(username:String,roles:Seq[String])
+
   //Data lake
   case class Location(id:Option[Long] = None,country: String, city: String)
 
@@ -44,6 +49,13 @@ object JsonFormatters {
 
   implicit val roleWrites = Json.writes[Role]
   implicit val roleReads = Json.reads[Role]
+
+  implicit val userRoleWrites = Json.writes[UserRole]
+  implicit val userRoleReads = Json.reads[UserRole]
+
+  implicit val userRolesWrites = Json.writes[UserRoles]
+
+
 
   implicit val locationWrites = Json.writes[Location]
   implicit val locationReads = Json.reads[Location]
