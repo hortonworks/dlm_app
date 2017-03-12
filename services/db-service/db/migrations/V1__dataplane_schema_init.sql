@@ -1,4 +1,3 @@
-DROP SCHEMA dataplane CASCADE;
 CREATE SCHEMA IF NOT EXISTS dataplane;
 
 

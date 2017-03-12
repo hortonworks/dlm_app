@@ -1,49 +1,17 @@
-This is your new Play application
+Storage service
 =================================
 
-This file will be packaged with your application when using `activator dist`.
+This service provides a data store and an API for data plane.
+Clients should exclusively use this service for interacting with the data model=
 
-There are several demonstration files available in this template.
-
-Controllers
+Run the service
 ===========
 
-- HomeController.scala:
+Install flyway through homebrew - `brew install flyway`
 
-  Shows how to handle simple HTTP requests.
+Change the DB parameters in `db/flyway.onf` and then run `flyway clean migrate`
 
-- AsyncController.scala:
+Change DB connection parameters in `application.conf`
 
-  Shows how to do asynchronous programming when handling a request.
+`activator run` or `sbt ~run`
 
-- CountController.scala:
-
-  Shows how to inject a component into a controller and use the component when
-  handling requests.
-
-Components
-==========
-
-- Module.scala:
-
-  Shows how to use Guice to bind all the components needed by your application.
-
-- Counter.scala:
-
-  An example of a component that contains state, in this case a simple counter.
-
-- ApplicationTimer.scala:
-
-  An example of a component that starts when the application starts and stops
-  when the application stops.
-
-Filters
-=======
-
-- Filters.scala:
-
-  Creates the list of HTTP filters used by your application.
-
-- ExampleFilter.scala
-
-  A simple filter that adds a header to every response.
