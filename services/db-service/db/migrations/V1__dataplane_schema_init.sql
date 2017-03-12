@@ -2,8 +2,8 @@ CREATE SCHEMA IF NOT EXISTS dataplane;
 
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_roles (
-  id   BIGSERIAL PRIMARY KEY,
-  name VARCHAR(10) UNIQUE NOT NULL,
+  id      BIGSERIAL PRIMARY KEY,
+  name    VARCHAR(10) UNIQUE NOT NULL,
   created TIMESTAMP DEFAULT now(),
   updated TIMESTAMP DEFAULT now()
 );
@@ -18,16 +18,16 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_users (
 );
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_users_roles (
-  id      BIGSERIAL PRIMARY KEY,
-  userid  BIGINT REFERENCES dataplane.dp_users (id) NOT NULL,
-  roleid  BIGINT REFERENCES dataplane.dp_roles (id) NOT NULL,
-  UNIQUE (userid,roleid)
+  id     BIGSERIAL PRIMARY KEY,
+  userid BIGINT REFERENCES dataplane.dp_users (id) NOT NULL,
+  roleid BIGINT REFERENCES dataplane.dp_roles (id) NOT NULL,
+  UNIQUE (userid, roleid)
 
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.permissions (
+CREATE TABLE IF NOT EXISTS dataplane.dp_permissions (
   id         BIGSERIAL PRIMARY KEY,
-  permission VARCHAR(255)                              NOT NULL,
+  permission VARCHAR(255) UNIQUE                       NOT NULL,
   roleid     BIGINT REFERENCES dataplane.dp_roles (id) NOT NULL,
   created    TIMESTAMP DEFAULT now(),
   updated    TIMESTAMP DEFAULT now()

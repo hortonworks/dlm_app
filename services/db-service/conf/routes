@@ -18,7 +18,11 @@ POST          /api/v1/roles                           controllers.Roles.add
 POST          /api/v1/user-role                       controllers.Roles.addUserRole
 GET           /api/v1/user-role/user/:username        controllers.Roles.getRolesForUser(username)
 
+#Permissions API
 
+GET           /api/v1/permissions                     controllers.Permissions.all
+POST          /api/v1/permissions                     controllers.Permissions.add
+GET           /api/v1/permissions/user/:username      controllers.Permissions.userPermissions(username)
 
 
 
