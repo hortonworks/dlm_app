@@ -2,7 +2,8 @@ Storage service
 =================================
 
 This service provides a data store and an API for data plane.
-Clients should exclusively use this service for interacting with the data model=
+
+
 
 Run the service
 ===========
