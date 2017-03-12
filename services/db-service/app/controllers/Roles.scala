@@ -30,6 +30,16 @@ class Roles @Inject()(roleRepo: RoleRepo)(implicit exec: ExecutionContext)
       .getOrElse(Future.successful(BadRequest))
   }
 
+  def load(roleId:Long) = Action.async {
+    roleRepo.findById(roleId).map { ro =>
+      ro.map { r =>
+        success(r)
+      }
+        .getOrElse(NotFound)
+    }.recoverWith(apiError)
+  }
+
+
   def getRolesForUser(userName:String) = Action.async {
       roleRepo.getRolesForUser(userName).map(success(_))
   }

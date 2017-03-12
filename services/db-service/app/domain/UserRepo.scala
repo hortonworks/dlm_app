@@ -35,6 +35,8 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
       db.run(Users.filter(_.username === userName).result.headOption)
   }
 
+
+
   def findById(userId: Long):Future[Option[User]] = {
     db.run(Users.filter(_.id === userId).result.headOption)
   }

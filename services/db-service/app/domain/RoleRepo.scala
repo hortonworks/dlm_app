@@ -45,6 +45,10 @@ class RoleRepo @Inject()(protected val userRepo: UserRepo,protected val dbConfig
     }
   }
 
+  def findById(roleId: Long):Future[Option[Role]] = {
+    db.run(Roles.filter(_.id === roleId).result.headOption)
+  }
+
   private class RolesTable(tag: Tag) extends Table[Role](tag, Some("dataplane"), "dp_roles") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
