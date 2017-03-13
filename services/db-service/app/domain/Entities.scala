@@ -33,8 +33,8 @@ object Entities {
                       roleId: Option[Long])
 
   case class UserRoles(username: String, roles: Seq[String])
-  case class RolePermission(role:String,permissions:Seq[String])
-  case class UserPermission(username: String,rights:Seq[RolePermission])
+  case class RolePermission(role: String, permissions: Seq[String])
+  case class UserPermission(username: String, rights: Seq[RolePermission])
 
   //Data lake
   case class Location(id: Option[Long] = None, country: String, city: String)
@@ -48,6 +48,14 @@ object Entities {
       properties: Option[JsValue],
       created: Option[LocalDateTime] = Some(LocalDateTime.now()),
       updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+
+  case class Category(
+      id: Option[Long] = None,
+      name: String,
+      description: String,
+      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+      updated: Option[LocalDateTime] = Some(LocalDateTime.now())
+  )
 
 }
 
@@ -70,7 +78,8 @@ object JsonFormatters {
   implicit val permissionWrites = Json.writes[Permission]
   implicit val permissionReads = Json.reads[Permission]
 
-
+  implicit val categoryWrites = Json.writes[Category]
+  implicit val categoryReads = Json.reads[Category]
 
   implicit val locationWrites = Json.writes[Location]
   implicit val locationReads = Json.reads[Location]

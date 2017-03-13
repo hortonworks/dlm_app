@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS dataplane.cluster_properties (
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_categories (
   id          BIGSERIAL PRIMARY KEY,
-  name        VARCHAR(255) NOT NULL,
+  name        VARCHAR(255) NOT NULL UNIQUE ,
   description TEXT,
   created     TIMESTAMP DEFAULT now(),
   updated     TIMESTAMP DEFAULT now()

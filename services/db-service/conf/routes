@@ -38,7 +38,16 @@ GET           /api/v1/datalakes                         controllers.Datalakes.al
 POST          /api/v1/datalakes                         controllers.Datalakes.add
 
 
+#Categories
+GET           /api/v1/categories                        controllers.Categories.all
+POST          /api/v1/categories                        controllers.Categories.insert
+GET           /api/v1/categories/:categoryId            controllers.Categories.load(categoryId:Long)
+DELETE        /api/v1/categories/:categoryId            controllers.Categories.delete(categoryId:Long)
+
+
+
 
 
 # Map static resources from the /public folder to the /assets URL path
 GET           /assets/*file                             controllers.Assets.versioned(path="/public", file: Asset)
+

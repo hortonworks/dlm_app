@@ -2,9 +2,8 @@ package controllers
 
 import javax.inject._
 
-import domain.Entities.{Permission, Role, UserRole}
-import domain.{PermissionsRepo, RoleRepo}
-import play.api.libs.json.Json
+import domain.Entities.Permission
+import domain.PermissionsRepo
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
