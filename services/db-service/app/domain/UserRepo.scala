@@ -26,9 +26,8 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     }
   }
 
-  def deleteByUserName(userId: Long): Future[Int] = {
-    val user = db.run(Users.filter(_.id === userId).delete)
-    user
+  def deleteByUserId(userId: Long): Future[Int] = {
+    db.run(Users.filter(_.id === userId).delete)
   }
 
   def findByName(userName: String):Future[Option[User]] = {

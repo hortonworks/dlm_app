@@ -52,8 +52,8 @@ class Users @Inject()(userRepo: UserRepo)(implicit exec: ExecutionContext)
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def delete(userId: Long) = Action.async { req =>
-    val future = userRepo.deleteByUserName(userId)
+  def delete(userId: Long) = Action.async {
+    val future = userRepo.deleteByUserId(userId)
     future.map(i => success(i)).recoverWith(apiError)
   }
 

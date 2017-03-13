@@ -57,6 +57,13 @@ object Entities {
       updated: Option[LocalDateTime] = Some(LocalDateTime.now())
   )
 
+  case class Sku(
+      id: Option[Long] = None,
+      name: String,
+      description: String,
+      status: Option[Short] = Some(0),
+      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+      updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 }
 
 object JsonFormatters {
@@ -86,4 +93,6 @@ object JsonFormatters {
   implicit val dataLakeWrites = Json.writes[Datalake]
   implicit val dataLakeReads = Json.reads[Datalake]
 
+  implicit val skuWrites = Json.writes[Sku]
+  implicit val skuReads = Json.reads[Sku]
 }
