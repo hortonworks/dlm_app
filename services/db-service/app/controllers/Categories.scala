@@ -15,7 +15,7 @@ class Categories @Inject()(categoryRepo: CategoryRepo)(implicit exec: ExecutionC
   import domain.JsonFormatters._
 
   def all = Action.async {
-    categoryRepo.all.map(users => success(users)).recoverWith(apiError)
+    categoryRepo.all.map(categorys => success(categorys)).recoverWith(apiError)
   }
 
   def get(name: String) = Action.async {
@@ -27,8 +27,8 @@ class Categories @Inject()(categoryRepo: CategoryRepo)(implicit exec: ExecutionC
     }.recoverWith(apiError)
   }
 
-  def load(userId:Long) = Action.async {
-    categoryRepo.findById(userId).map { uo =>
+  def load(categoryId:Long) = Action.async {
+    categoryRepo.findById(categoryId).map { uo =>
       uo.map { u =>
         success(u)
       }
