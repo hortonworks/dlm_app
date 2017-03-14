@@ -64,6 +64,15 @@ object Entities {
       status: Option[Short] = Some(0),
       created: Option[LocalDateTime] = Some(LocalDateTime.now()),
       updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+
+  case class EnabledSku(
+      skuId: Long,
+      enabledBy: Long,
+      enabledOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
+      smartSenseId: String,
+      subscriptionId: String,
+      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+      updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 }
 
 object JsonFormatters {
@@ -95,4 +104,7 @@ object JsonFormatters {
 
   implicit val skuWrites = Json.writes[Sku]
   implicit val skuReads = Json.reads[Sku]
+  implicit val enabledSkuWrites = Json.writes[EnabledSku]
+  implicit val enabledSkuReads = Json.reads[EnabledSku]
+
 }
