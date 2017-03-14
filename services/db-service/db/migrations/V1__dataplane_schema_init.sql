@@ -84,14 +84,15 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_cloud_clusters (
 );
 
 
-CREATE TABLE IF NOT EXISTS dataplane.cluster_services (
+CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_services (
   id                BIGSERIAL PRIMARY KEY,
   servicename       VARCHAR(255)                                  NOT NULL,
   servicehost       VARCHAR(255)                                  NOT NULL,
-  serviceport       VARCHAR(255)                                  NOT NULL,
-  serviceproperties JSONB,
-  clusterid         BIGINT REFERENCES dataplane.dp_clusters (id)  NOT NULL,
-  datalakeid        BIGINT REFERENCES dataplane.dp_datalakes (id) NOT NULL
+  serviceport       INT                                           NOT NULL,
+  fullURL           TEXT,
+  properties JSONB,
+  clusterid         BIGINT REFERENCES dataplane.dp_clusters (id) ,
+  datalakeid        BIGINT REFERENCES dataplane.dp_datalakes (id)
 );
 
 

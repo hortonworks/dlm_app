@@ -75,18 +75,29 @@ object Entities {
   )
 
   case class CloudCluster(
-                      id: Option[Long] = None,
-                      name: String,
-                      description: String,
-                      fqdn: Option[String] = None,
-                      ipaddr: Option[String] = None,
-                      port: Option[Int] = None,
-                      ambariuser: Option[String] = None,
-                      ambaripass: Option[String] = None,
-                      datalakeid: Option[Long] = None,
-                      userid: Option[Long] = None,
-                      properties: Option[JsValue] = None
-                    )
+      id: Option[Long] = None,
+      name: String,
+      description: String,
+      fqdn: Option[String] = None,
+      ipaddr: Option[String] = None,
+      port: Option[Int] = None,
+      ambariuser: Option[String] = None,
+      ambaripass: Option[String] = None,
+      datalakeid: Option[Long] = None,
+      userid: Option[Long] = None,
+      properties: Option[JsValue] = None
+  )
+
+  case class ClusterService(
+      id: Option[Long] = None,
+      servicename: String,
+      servicehost: String,
+      serviceport: Int,
+      fullURL: Option[String] = None,
+      properties: Option[JsValue] = None,
+      clusterid: Option[Long] = None,
+      datalakeid: Option[Long] = None
+  )
 
   case class EnabledSku(
       skuId: Long,
@@ -141,6 +152,11 @@ object JsonFormatters {
 
   implicit val clusterWrites = Json.writes[Cluster]
   implicit val clusterReads = Json.reads[Cluster]
+
+  implicit val clusterServiceWrites = Json.writes[ClusterService]
+  implicit val clusterServiceReads = Json.reads[ClusterService]
+
+
 
   implicit val couldClusterWrites = Json.writes[CloudCluster]
   implicit val couldClusterReads = Json.reads[CloudCluster]
