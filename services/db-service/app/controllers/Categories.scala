@@ -27,15 +27,6 @@ class Categories @Inject()(categoryRepo: CategoryRepo)(implicit exec: ExecutionC
     }.recoverWith(apiError)
   }
 
-  def load(categoryId:Long) = Action.async {
-    categoryRepo.findById(categoryId).map { uo =>
-      uo.map { u =>
-        success(u)
-      }
-        .getOrElse(NotFound)
-    }.recoverWith(apiError)
-  }
-
   def insert = Action.async(parse.json) { req =>
     req.body
       .validate[Category]
@@ -47,6 +38,15 @@ class Categories @Inject()(categoryRepo: CategoryRepo)(implicit exec: ExecutionC
           }.recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))
+  }
+
+  def load(categoryId:Long) = Action.async {
+    categoryRepo.findById(categoryId).map { uo =>
+      uo.map { u =>
+        success(u)
+      }
+        .getOrElse(NotFound)
+    }.recoverWith(apiError)
   }
 
   def delete(categoryId: Long) = Action.async { req =>

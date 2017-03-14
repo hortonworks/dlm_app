@@ -34,6 +34,15 @@ class DataLakeRepo @Inject()(
     Datalakes.to[List].result
   }
 
+
+  def findById(datalakeId: Long): Future[Option[Datalake]] = {
+    db.run(Datalakes.filter(_.id === datalakeId).result.headOption)
+  }
+
+  def deleteById(datalakeId: Long): Future[Int] = {
+    db.run(Datalakes.filter(_.id === datalakeId).delete)
+  }
+
   def insert(datalake: Datalake): Future[Datalake] = db.run {
     val toPersist = Datalake(name = datalake.name,
                              description = datalake.description,

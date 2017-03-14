@@ -50,6 +50,21 @@ class Datalakes @Inject()(dataLakeRepo: DataLakeRepo)(
         "location" -> s"${locations}/${d.location.getOrElse(0)}")
   }
 
+  def load(datalakeId:Long) = Action.async {
+    dataLakeRepo.findById(datalakeId).map { dlo =>
+      dlo.map { dl =>
+        success(linkData(dl, makeLink(dl)))
+      }
+        .getOrElse(NotFound)
+    }.recoverWith(apiError)
+  }
+
+  def delete(datalakeId: Long) = Action.async { req =>
+    val future = dataLakeRepo.deleteById(datalakeId)
+    future.map(i => success(i)).recoverWith(apiError)
+  }
+
+
   def add = Action.async(parse.json) { req =>
     req.body
       .validate[Datalake]

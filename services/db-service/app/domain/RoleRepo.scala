@@ -68,9 +68,9 @@ class RoleRepo @Inject()(protected val userRepo: UserRepo, protected val dbConfi
 
     def roleId = column[Option[Long]]("roleid")
 
-    def user = foreignKey("user", userId, userRepo.Users)(_.id)
+    def user = foreignKey("user_userRole", userId, userRepo.Users)(_.id)
 
-    def role = foreignKey("user", userId, Roles)(_.id)
+    def role = foreignKey("role_userRole", roleId, Roles)(_.id)
 
     def * = (id, userId, roleId) <> ((UserRole.apply _).tupled, UserRole.unapply)
 

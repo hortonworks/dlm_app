@@ -57,13 +57,22 @@ object Entities {
       updated: Option[LocalDateTime] = Some(LocalDateTime.now())
   )
 
-  case class Sku(
+  case class Cluster(
       id: Option[Long] = None,
       name: String,
       description: String,
-      status: Option[Short] = Some(0),
-      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+      fqdn: Option[String] = None,
+      ipaddr: Option[String] = None,
+      port: Option[Int] = None,
+      ambariuser: Option[String] = None,
+      ambaripass: Option[String] = None,
+      secured: Option[Boolean] = Some(false),
+      kerberosuser: Option[String] = None,
+      kerberosticketLocation: Option[String] = None,
+      datalakeid: Option[Long] = None,
+      userid: Option[Long] = None,
+      properties: Option[JsValue] = None
+  )
 
   case class EnabledSku(
       skuId: Long,
@@ -73,6 +82,14 @@ object Entities {
       subscriptionId: String,
       created: Option[LocalDateTime] = Some(LocalDateTime.now()),
       updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+
+  case class Sku(id: Option[Long] = None,
+                 name: String,
+                 description: String,
+                 status: Option[Short] = Some(0),
+                 created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                 updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+
 }
 
 object JsonFormatters {
@@ -107,4 +124,6 @@ object JsonFormatters {
   implicit val enabledSkuWrites = Json.writes[EnabledSku]
   implicit val enabledSkuReads = Json.reads[EnabledSku]
 
+  implicit val clusterWrites = Json.writes[Cluster]
+  implicit val clusterReads = Json.reads[Cluster]
 }

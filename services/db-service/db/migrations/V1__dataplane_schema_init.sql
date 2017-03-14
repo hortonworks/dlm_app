@@ -55,15 +55,16 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_clusters (
   id                     BIGSERIAL PRIMARY KEY,
   name                   VARCHAR(255),
   description            TEXT,
-  fqdn                   VARCHAR(255)                                         NOT NULL,
-  ipaddr                 INET,
-  port                   INT                                                  NOT NULL,
-  ambariuser             VARCHAR(255)                                         NOT NULL,
-  ambaripass             VARCHAR(255)                                         NOT NULL,
-  secured                BOOLEAN                                              NOT NULL DEFAULT FALSE,
+  fqdn                   VARCHAR(255),
+  ipaddr                 VARCHAR(39),
+  port                   INT,
+  ambariuser             VARCHAR(255),
+  ambaripass             VARCHAR(255),
+  secured                BOOLEAN DEFAULT FALSE,
   kerberosuser           VARCHAR(255),
   kerberosticketLocation TEXT,
   datalakeid             BIGINT REFERENCES dataplane.dp_datalakes (id) UNIQUE NOT NULL, -- One cluster per DL
+  userid                 BIGINT REFERENCES dataplane.dp_users (id)            NOT NULL, -- The user who created the cluster
   properties             JSONB
 );
 
@@ -134,7 +135,7 @@ CREATE TABLE IF NOT EXISTS dataplane.cluster_properties (
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_categories (
   id          BIGSERIAL PRIMARY KEY,
-  name        VARCHAR(255) NOT NULL UNIQUE ,
+  name        VARCHAR(255) NOT NULL UNIQUE,
   description TEXT,
   created     TIMESTAMP DEFAULT now(),
   updated     TIMESTAMP DEFAULT now()

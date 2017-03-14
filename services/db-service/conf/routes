@@ -36,6 +36,14 @@ POST          /api/v1/locations                         controllers.Datalakes.ad
 #Datalakes API
 GET           /api/v1/datalakes                         controllers.Datalakes.all
 POST          /api/v1/datalakes                         controllers.Datalakes.add
+GET           /api/v1/datalakes/:datalakeId             controllers.Datalakes.load(datalakeId:Long)
+DELETE        /api/v1/datalakes/:datalakeId             controllers.Datalakes.delete(datalakeId:Long)
+
+#Clusters API
+GET           /api/v1/clusters                          controllers.Clusters.all
+POST          /api/v1/clusters                          controllers.Clusters.add
+GET           /api/v1/clusters/:clusterId               controllers.Clusters.load(clusterId:Long)
+DELETE        /api/v1/clusters/:clusterId               controllers.Clusters.delete(clusterId:Long)
 
 
 #Categories
