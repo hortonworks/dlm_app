@@ -1,22 +1,11 @@
 version: '2'
 services:
-  dp-web:
+  data-plane:
     build:
-      context: ./ui
-    image: dataplane/dp-web
+      context: .
+    image: hortonworks/data-plane
     ports:
-      - "4200:4200"
-    depends_on:
-      - dp-services
-    links:
-      - dp-services
-
-  dp-services:
-    image: dataplane/dp-services
-    build:
-      context: ./webapp
-    ports:
-      - "9000:9000"
+      - "80:80"
     depends_on:
       - dp-database
     links:
@@ -25,7 +14,7 @@ services:
   dp-setup:
     build:
       context: ./dp-setup
-    image: dataplane/dp-setup
+    image: hortonworks/data-plane-setup
     volumes:
       - ./dp-setup/:/code
     depends_on:
