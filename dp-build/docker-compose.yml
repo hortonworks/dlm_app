@@ -1,0 +1,41 @@
+version: '2'
+services:
+  dp-web:
+    build:
+      context: ../ui
+      dockerfile: ./ui.Dockerfile
+    image: dataplane/dp-web
+    ports:
+      - "4200:4200"
+    depends_on:
+      - dp-services
+    links:
+      - dp-services
+
+  dp-services:
+    image: dataplane/dp-services
+    build:
+      context: ..
+      dockerfile: webapp.Dockerfile
+    ports:
+      - "9000:9000"
+    depends_on:
+      - dp-database
+    links:
+      - dp-database
+
+  dp-setup:
+    build:
+      context: ../dp-setup
+      dockerfile: ./dp-setup.Dockerfile
+    image: dataplane/dp-setup
+    volumes:
+      - ../dp-setup/:/code
+    depends_on:
+      - dp-database
+    links:
+      - dp-database
+    command: python dbinit.py
+
+  dp-database:
+    image: mongo

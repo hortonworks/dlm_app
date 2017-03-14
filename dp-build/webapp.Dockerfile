@@ -18,14 +18,14 @@ ENV SBT_OPTS="-Xmx1200M -Xss512K -XX:MaxMetaspaceSize=512M -XX:MetaspaceSize=300
 # RUN cd /
 # RUN rm -r /setup
 
-ADD ../dpservice /var/tmp/deps/dpservice
+ADD ./dpservice /var/tmp/deps/dpservice
 #COPY  /var/tmp/deps/dpservice
 
-ADD ../services/atlas/service /var/tmp/deps/services/atlas/service
+ADD ./services/atlas/service /var/tmp/deps/services/atlas/service
 #COPY  /var/tmp/deps/services/atlas/service
 
-RUN mkdir -p /usr/dp-services
-COPY . /usr/dp-services
+#RUN mkdir -p /usr/dp-services
+ADD ./webapp /usr/dp-services
 
 WORKDIR /var/tmp/deps/dpservice
 RUN sbt publishLocal

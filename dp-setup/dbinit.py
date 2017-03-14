@@ -3,7 +3,7 @@ from pymongo import MongoClient
 def connect():
 	while True:
 		try:
-			connection = MongoClient("localhost", 27017)
+			connection = MongoClient("dp-database", 27017)
 			print "Connected to Mongo"
 			break
 		except:
