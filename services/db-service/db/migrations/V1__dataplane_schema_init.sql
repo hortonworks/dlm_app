@@ -1,3 +1,4 @@
+DROP SCHEMA dataplane CASCADE;
 CREATE SCHEMA IF NOT EXISTS dataplane;
 
 
@@ -85,14 +86,14 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_cloud_clusters (
 
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_services (
-  id                BIGSERIAL PRIMARY KEY,
-  servicename       VARCHAR(255)                                  NOT NULL,
-  servicehost       VARCHAR(255)                                  NOT NULL,
-  serviceport       INT                                           NOT NULL,
-  fullURL           TEXT,
-  properties JSONB,
-  clusterid         BIGINT REFERENCES dataplane.dp_clusters (id) ,
-  datalakeid        BIGINT REFERENCES dataplane.dp_datalakes (id)
+  id          BIGSERIAL PRIMARY KEY,
+  servicename VARCHAR(255) NOT NULL,
+  servicehost VARCHAR(255) NOT NULL,
+  serviceport INT          NOT NULL,
+  fullURL     TEXT,
+  properties  JSONB,
+  clusterid   BIGINT REFERENCES dataplane.dp_clusters (id),
+  datalakeid  BIGINT REFERENCES dataplane.dp_datalakes (id)
 );
 
 

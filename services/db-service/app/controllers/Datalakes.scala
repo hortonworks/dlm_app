@@ -38,7 +38,7 @@ class Datalakes @Inject()(dataLakeRepo: DataLakeRepo)(
   }
 
   def loadLocation(id:Long) = Action.async {
-    dataLakeRepo.getLocation(id).map(success(_)).recoverWith(apiError)
+    dataLakeRepo.getLocation(id).map(l => l.map(success(_)).getOrElse(NotFound)).recoverWith(apiError)
   }
 
   def deleteLocation(id:Long) = Action.async {
