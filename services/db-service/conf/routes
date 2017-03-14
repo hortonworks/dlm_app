@@ -50,5 +50,11 @@ POST          /api/v1/skus                              controllers.Skus.insert
 GET           /api/v1/skus/:skuId                       controllers.Skus.load(skuId: Long)
 DELETE        /api/v1/skus/:skuId                       controllers.Skus.delete(skuId: Long)
 
+#EnabledSkus API
+GET           /api/v1/enabledskus                       controllers.EnabledSkus.all
+POST          /api/v1/enabledskus                       controllers.EnabledSkus.insert
+GET           /api/v1/enabledskus/:skuId                controllers.EnabledSkus.load(skuId: Long)
+DELETE        /api/v1/enabledskus/:skuId                controllers.EnabledSkus.delete(skuId: Long)
+
 # Map static resources from the /public folder to the /assets URL path
 GET           /assets/*file                             controllers.Assets.versioned(path="/public", file: Asset)
