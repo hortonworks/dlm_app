@@ -74,6 +74,20 @@ object Entities {
       properties: Option[JsValue] = None
   )
 
+  case class CloudCluster(
+                      id: Option[Long] = None,
+                      name: String,
+                      description: String,
+                      fqdn: Option[String] = None,
+                      ipaddr: Option[String] = None,
+                      port: Option[Int] = None,
+                      ambariuser: Option[String] = None,
+                      ambaripass: Option[String] = None,
+                      datalakeid: Option[Long] = None,
+                      userid: Option[Long] = None,
+                      properties: Option[JsValue] = None
+                    )
+
   case class EnabledSku(
       skuId: Long,
       enabledBy: Long,
@@ -95,6 +109,7 @@ object Entities {
 object JsonFormatters {
 
   import domain.Entities._
+
   implicit val userWrites = Json.writes[User]
   implicit val userReads = Json.reads[User]
 
@@ -126,4 +141,7 @@ object JsonFormatters {
 
   implicit val clusterWrites = Json.writes[Cluster]
   implicit val clusterReads = Json.reads[Cluster]
+
+  implicit val couldClusterWrites = Json.writes[CloudCluster]
+  implicit val couldClusterReads = Json.reads[CloudCluster]
 }

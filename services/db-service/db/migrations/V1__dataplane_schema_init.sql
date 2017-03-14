@@ -73,12 +73,13 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_cloud_clusters (
   id          BIGSERIAL PRIMARY KEY,
   name        VARCHAR(255),
   description TEXT,
-  fqdn        VARCHAR(255) NOT NULL,
-  ipaddr      INET,
-  port        INT          NOT NULL,
-  ambariuser  VARCHAR(255) NOT NULL,
-  ambaripass  VARCHAR(255) NOT NULL,
+  fqdn        VARCHAR(255),
+  ipaddr      VARCHAR(39),
+  port        INT,
+  ambariuser  VARCHAR(255),
+  ambaripass  VARCHAR(255),
   datalakeid  BIGINT REFERENCES dataplane.dp_datalakes (id),
+  userid      BIGINT REFERENCES dataplane.dp_users (id)            NOT NULL, -- The user who created the cluster
   properties  JSONB
 );
 
