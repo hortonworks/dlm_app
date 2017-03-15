@@ -1,4 +1,6 @@
-# Docker Build
+# dp-build
+
+Build and configuration scripts for docker images
 
 ## mongo
 
