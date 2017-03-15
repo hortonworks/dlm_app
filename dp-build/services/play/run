@@ -1,3 +1,3 @@
 #!/bin/sh
 exec 2>&1
-cd /usr/dp-services/data_plane-0.1-alpha/bin && exec ./data_plane -Dconfig.resource=../conf/docker.conf
+cd /usr/dp-app/bin && exec ./dp-app -Dconfig.resource=../conf/docker.conf

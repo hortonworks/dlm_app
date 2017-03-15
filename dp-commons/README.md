@@ -1,4 +1,4 @@
 # dp-commons
 =========================
 
-This project has common libraries to be shared by the webapp and other components
+This project has common libraries to be shared by the dp-app and other components

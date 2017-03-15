@@ -11,7 +11,7 @@ popd
 pushd ../services/atlas/service
 sbt publishLocal
 popd
-cd ../webapp
+cd ../dp-app
 
 echo "All done"
 

@@ -14,7 +14,7 @@
 ## Build and Setup
 
 * `git clone https://github.com/hortonworks/dataplane`
-* In folder webapp `sh ./build-deps.sh`
+* In folder dp-app `sh ./build-deps.sh`
 * `sbt universal:packageZipTarball` - This will generate a tarball in the folder `target/universal/data_plane-0.1-alpha.tgz`
 * Setup Mongo:
   * `use data_plane`

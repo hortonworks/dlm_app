@@ -3,24 +3,24 @@
 echo "Current working directory is"
 echo `pwd`
 
-# 1. build webapp
+# 1. build dp-app
 pushd ./dp-commons
 sbt publishLocal
 popd
 pushd ./services/atlas/service
 sbt publishLocal
 popd
-pushd ./webapp
+pushd ./dp-app
 sbt dist
 popd
 
-# 2. build ui
+# 2. build dp-web
 pushd ./dp-web
 npm install
 npm run build
 popd
 
-# 3. build a container bundling webapp and ui
+# 3. build a container bundling dp-app and dp-web
 docker-compose build
 
 # 4
