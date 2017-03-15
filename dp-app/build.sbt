@@ -1,5 +1,7 @@
-name := """data_plane"""
+name := """dp-app"""
 version := "0.1-alpha"
+organization :="com.hortonworks.dataplane"
+
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.11.8"
