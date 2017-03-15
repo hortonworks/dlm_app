@@ -4,8 +4,8 @@ import java.nio.charset.StandardCharsets
 import java.util.Base64
 
 import akka.actor.{Actor, ActorLogging}
-import com.hw.dp.service.api.{GenRandom, Poll}
-import com.hw.dp.service.cluster._
+import com.hortonworks.dataplane.commons.service.api.{GenRandom, Poll}
+import com.hortonworks.dataplane.commons.service.cluster._
 import internal.DataPlaneError
 import internal.persistence.ClusterDataStorage
 import org.joda.time.DateTime

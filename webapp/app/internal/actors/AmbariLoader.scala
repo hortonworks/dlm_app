@@ -1,8 +1,8 @@
 package internal.actors
 
 import akka.actor.{Actor, ActorLogging, ActorRef, PoisonPill, Props}
-import com.hw.dp.service.api.Poll
-import com.hw.dp.service.cluster.Ambari
+import com.hortonworks.dataplane.commons.service.api.Poll
+import com.hortonworks.dataplane.commons.service.cluster.Ambari
 import internal.DataPlaneError
 import internal.persistence.ClusterDataStorage
 import play.api.Logger

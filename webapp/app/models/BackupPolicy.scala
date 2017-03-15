@@ -1,8 +1,8 @@
 package models
 
 import play.api.libs.json.Json
-import com.hw.dp.service.cluster.{Ambari, Cluster, DataCenter}
-import com.hw.dp.service.cluster.Formatters._
+import com.hortonworks.dataplane.commons.service.cluster.{Ambari, Cluster, DataCenter}
+import com.hortonworks.dataplane.commons.service.cluster.Formatters._
 
 /**
   * Created by abkumar on 22/12/16.

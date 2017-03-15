@@ -1,6 +1,6 @@
 package internal.persistence
 
-import com.hw.dp.service.cluster.DataModel.DataSet
+import com.hortonworks.dataplane.commons.service.cluster.DataModel.DataSet
 import reactivemongo.api.commands.WriteResult
 
 import scala.concurrent.Future

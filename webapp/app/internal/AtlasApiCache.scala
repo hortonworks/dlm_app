@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 import akka.actor.{Actor, ActorSystem}
 import com.google.inject.Inject
-import com.hw.dp.service.cluster.{Ambari, Cluster}
+import com.hortonworks.dataplane.commons.service.cluster.{Ambari, Cluster}
 import com.hw.dp.services.atlas.{AtlasHiveApi, AtlasHiveApiImpl}
 import com.hw.dp.services.hbase.{AtlasHBaseApi, AtlasHBaseApiImpl}
 import com.hw.dp.services.hdfs.{AltasHdfsApiImpl, AtlasHdfsApi}

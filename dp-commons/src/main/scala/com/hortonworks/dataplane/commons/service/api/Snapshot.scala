@@ -1,6 +1,7 @@
-package com.hw.dp.service.api
+package com.hortonworks.dataplane.commons.service.api
 
-import com.hw.dp.service.cluster.{Ambari, ServiceComponent}
+import com.hortonworks.dataplane.commons.service.cluster.{Ambari, ServiceComponent}
+import com.hortonworks.dataplane.commons.service.cluster.ServiceComponent
 
 import scala.concurrent.duration.Duration
 

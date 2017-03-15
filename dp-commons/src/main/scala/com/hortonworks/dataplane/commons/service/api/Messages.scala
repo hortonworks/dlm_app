@@ -1,4 +1,4 @@
-package com.hw.dp.service.api
+package com.hortonworks.dataplane.commons.service.api
 
 case class SaveSnapshot(snapshot: Snapshot)
 

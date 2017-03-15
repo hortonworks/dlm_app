@@ -2,7 +2,7 @@ package internal
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.google.inject.{Inject, Singleton}
-import com.hw.dp.service.api.{GenRandom, Poll}
+import com.hortonworks.dataplane.commons.service.api.{GenRandom, Poll}
 import internal.actors.{AmbariLoader, ClusterHealthSync, ServiceSync}
 import internal.persistence.{ClusterDataStorage, DataPersister}
 import play.api.libs.ws.WSClient

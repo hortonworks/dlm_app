@@ -1,7 +1,7 @@
 package internal.persistence
 
 import com.google.inject.{Inject, Singleton}
-import com.hw.dp.service.cluster._
+import com.hortonworks.dataplane.commons.service.cluster._
 import models.{BackupPolicy, DataCenterDetail}
 import play.api.libs.json.Json
 import reactivemongo.api.{Cursor, MongoDriver}
@@ -31,7 +31,7 @@ class MongoClusterDataStorage @Inject()(val mongoDriver: MongoDriver, configurat
   val credentials = List(Authenticate(dbName, userName, password))
   val connection = mongoDriver.connection(hosts, authentications = credentials)
 
-  import com.hw.dp.service.cluster.Formatters._
+  import com.hortonworks.dataplane.commons.service.cluster.Formatters._
 
   override def loadAmbari(): Future[Seq[Ambari]] = {
     val clusters: Future[JSONCollection] = connection.database(dbName).map(_.collection("clusters"))
@@ -175,7 +175,7 @@ class MongoClusterDataStorage @Inject()(val mongoDriver: MongoDriver, configurat
   }
 
   override def getDataCenterById(id: String): Future[Option[DataCenter]] = {
-    import com.hw.dp.service.cluster.Formatters._
+    import com.hortonworks.dataplane.commons.service.cluster.Formatters._
 
     val dataCenters = connection.database(dbName).map(_.collection[JSONCollection]("datacenters"))
 
@@ -187,7 +187,7 @@ class MongoClusterDataStorage @Inject()(val mongoDriver: MongoDriver, configurat
   }
 
   override def getClusterById(id: String): Future[Option[Ambari]] = {
-    import com.hw.dp.service.cluster.Formatters._
+    import com.hortonworks.dataplane.commons.service.cluster.Formatters._
 
     val clusters = connection.database(dbName).map(_.collection[JSONCollection]("clusters"))
 
@@ -199,7 +199,7 @@ class MongoClusterDataStorage @Inject()(val mongoDriver: MongoDriver, configurat
   }
 
   override def getClustersByDataCenterId(id: String): Future[Seq[Ambari]] = {
-    import com.hw.dp.service.cluster.Formatters._
+    import com.hortonworks.dataplane.commons.service.cluster.Formatters._
 
     val clusters = connection.database(dbName).map(_.collection[JSONCollection]("clusters"))
 

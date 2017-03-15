@@ -1,6 +1,6 @@
 package models
 
-import com.hw.dp.service.cluster.{Host, NameNode, Service}
+import com.hortonworks.dataplane.commons.service.cluster.{Host, NameNode, Service}
 import play.api.libs.json.Json
 
 /**
@@ -11,7 +11,7 @@ case class DataCenterDetail(hosts:Seq[Host], nameNodeInfo:List[NameNode], loadAv
 
 object ResponseFormatters {
 
-  import com.hw.dp.service.cluster.Formatters._
+  import com.hortonworks.dataplane.commons.service.cluster.Formatters._
 
   implicit val dataCenterDetailWrites = Json.writes[DataCenterDetail]
 

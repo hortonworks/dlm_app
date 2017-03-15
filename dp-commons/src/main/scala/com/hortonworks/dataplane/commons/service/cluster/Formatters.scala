@@ -1,6 +1,6 @@
-package com.hw.dp.service.cluster
+package com.hortonworks.dataplane.commons.service.cluster
 
-import com.hw.dp.service.cluster.DataModel.{DataFilter, DataSet}
+import com.hortonworks.dataplane.commons.service.cluster.DataModel.{DataFilter, DataSet}
 import play.api.libs.json.Json
 
 /**

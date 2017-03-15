@@ -2,8 +2,8 @@ package controllers
 
 import javax.inject.Inject
 
-import com.hw.dp.service.cluster.{Ambari, Cluster, DataCenter}
-import com.hw.dp.service.cluster.Formatters._
+import com.hortonworks.dataplane.commons.service.cluster.{Ambari, Cluster, DataCenter}
+import com.hortonworks.dataplane.commons.service.cluster.Formatters._
 import internal.auth.Authenticated
 import internal.persistence.ClusterDataStorage
 import internal.{AmbariSync, DataPlaneError, MongoUtilities}
@@ -89,7 +89,7 @@ class Clusters @Inject()(val reactiveMongoApi: ReactiveMongoApi, val storage:Clu
   }
 
   def get(id: String) = Authenticated.async {
-    import com.hw.dp.service.cluster.Formatters._
+    import com.hortonworks.dataplane.commons.service.cluster.Formatters._
 
     storage.getClusterById(id)
       .map(

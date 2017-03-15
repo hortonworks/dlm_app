@@ -4,8 +4,8 @@ import java.nio.charset.StandardCharsets
 import java.util.Base64
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
-import com.hw.dp.service.api.Poll
-import com.hw.dp.service.cluster.{Ambari, Service, ServiceComponent}
+import com.hortonworks.dataplane.commons.service.api.Poll
+import com.hortonworks.dataplane.commons.service.cluster.{Ambari, Service, ServiceComponent}
 import internal.DataPlaneError
 import internal.persistence.{ClusterDataStorage, SaveService, SaveServiceComponent}
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest}

@@ -4,7 +4,7 @@ echo "Current working directory is"
 echo `pwd`
 
 # 1. build webapp
-pushd ./dpservice
+pushd ./dp-commons
 sbt publishLocal
 popd
 pushd ./services/atlas/service

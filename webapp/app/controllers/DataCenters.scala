@@ -2,8 +2,8 @@ package controllers
 
 import javax.inject.Inject
 
-import com.hw.dp.service.cluster.DataCenter
-import com.hw.dp.service.cluster.Formatters._
+import com.hortonworks.dataplane.commons.service.cluster.DataCenter
+import com.hortonworks.dataplane.commons.service.cluster.Formatters._
 import internal.MongoUtilities
 import internal.auth.Authenticated
 import internal.persistence.ClusterDataStorage

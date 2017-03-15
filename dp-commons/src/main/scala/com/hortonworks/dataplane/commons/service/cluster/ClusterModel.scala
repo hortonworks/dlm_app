@@ -1,4 +1,4 @@
-package com.hw.dp.service.cluster
+package com.hortonworks.dataplane.commons.service.cluster
 
 object DataConstraints{
 

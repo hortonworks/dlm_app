@@ -2,8 +2,8 @@ package internal.persistence
 
 import akka.actor.{Actor, ActorLogging}
 import com.google.inject.Inject
-import com.hw.dp.service.api.{SaveSnapshot, Snapshot}
-import com.hw.dp.service.cluster.{Service, ServiceComponent}
+import com.hortonworks.dataplane.commons.service.api.{SaveSnapshot, Snapshot}
+import com.hortonworks.dataplane.commons.service.cluster.{Service, ServiceComponent}
 import play.api.Logger
 import scala.concurrent.ExecutionContext.Implicits.global
 

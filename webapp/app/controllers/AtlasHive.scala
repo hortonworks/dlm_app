@@ -3,7 +3,7 @@ package controllers
 import akka.actor.ActorRef
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import com.hw.dp.service.cluster.DataConstraints
+import com.hortonworks.dataplane.commons.service.cluster.DataConstraints
 import com.hw.dp.services.atlas.AtlasHiveApi
 import internal.{AtlasApiCache, GetHiveApi}
 import internal.auth.Authenticated

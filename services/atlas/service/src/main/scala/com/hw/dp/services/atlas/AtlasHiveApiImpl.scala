@@ -7,8 +7,8 @@ import akka.stream.ActorMaterializer
 import com.google.common.base.Charsets
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.google.common.io.BaseEncoding
-import com.hw.dp.service.api.{Poll, ServiceException, ServiceNotFound}
-import com.hw.dp.service.cluster.{Ambari, Cluster}
+import com.hortonworks.dataplane.commons.service.api.{Poll, ServiceException, ServiceNotFound}
+import com.hortonworks.dataplane.commons.service.cluster.{Ambari, Cluster}
 import com.hw.dp.services.atlas.Hive.{Result, SearchResult}
 import org.springframework.http.{HttpEntity, HttpHeaders, HttpMethod}
 import org.springframework.security.kerberos.client.KerberosRestTemplate

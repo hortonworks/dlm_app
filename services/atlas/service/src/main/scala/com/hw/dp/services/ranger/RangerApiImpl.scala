@@ -1,8 +1,8 @@
 package com.hw.dp.services.ranger
 
 import akka.actor.ActorSystem
-import com.hw.dp.service.api.{ServiceException, ServiceNotFound}
-import com.hw.dp.service.cluster.{Ambari, Cluster}
+import com.hortonworks.dataplane.commons.service.api.{ServiceException, ServiceNotFound}
+import com.hortonworks.dataplane.commons.service.cluster.{Ambari, Cluster}
 import org.springframework.http.{HttpEntity, HttpHeaders, HttpMethod, MediaType}
 import org.springframework.security.kerberos.client.KerberosRestTemplate
 import org.springframework.web.client.RestTemplate

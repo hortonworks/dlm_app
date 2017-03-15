@@ -3,7 +3,7 @@ package internal.persistence
 import java.util.Date
 
 import com.google.inject.{Inject, Singleton}
-import com.hw.dp.service.cluster.DataModel.DataSet
+import com.hortonworks.dataplane.commons.service.cluster.DataModel.DataSet
 import play.api.libs.json.Json
 import reactivemongo.api.commands.{DefaultWriteResult, WriteResult}
 import reactivemongo.api.{Cursor, MongoDriver}
@@ -13,7 +13,7 @@ import play.modules.reactivemongo.json._
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-import com.hw.dp.service.cluster.Formatters._
+import com.hortonworks.dataplane.commons.service.cluster.Formatters._
 
 @Singleton
 class MongoDataSetStorage @Inject()(val mongoDriver: MongoDriver,

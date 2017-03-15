@@ -1,7 +1,7 @@
 package controllers
 
 import com.google.inject.Inject
-import com.hw.dp.service.cluster.DataModel.DataSet
+import com.hortonworks.dataplane.commons.service.cluster.DataModel.DataSet
 import internal.MongoUtilities
 import internal.auth.Authenticated
 import internal.persistence.DataSetStorage
@@ -16,7 +16,7 @@ class DataSets @Inject()(dataSetStorage: DataSetStorage)
     extends Controller
     with MongoUtilities {
 
-  import com.hw.dp.service.cluster.Formatters._
+  import com.hortonworks.dataplane.commons.service.cluster.Formatters._
 
   def error(e: Exception) =
     InternalServerError(
