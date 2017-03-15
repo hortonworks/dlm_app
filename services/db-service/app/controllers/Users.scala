@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import domain.Entities.User
+import com.hortonworks.dataplane.commons.domain.Entities.User
 import domain.UserRepo
 import org.mindrot.jbcrypt.BCrypt
 import play.api.libs.json.Json
@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class Users @Inject()(userRepo: UserRepo)(implicit exec: ExecutionContext)
     extends JsonAPI {
 
-  import domain.JsonFormatters._
+  import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   def all = Action.async {
     userRepo.all.map(users => success(users)).recoverWith(apiError)

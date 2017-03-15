@@ -1,4 +1,4 @@
-package domain
+package com.hortonworks.dataplane.commons.domain
 
 import java.time.LocalDateTime
 
@@ -118,8 +118,7 @@ object Entities {
 }
 
 object JsonFormatters {
-
-  import domain.Entities._
+  import com.hortonworks.dataplane.commons.domain.Entities._
 
   implicit val userWrites = Json.writes[User]
   implicit val userReads = Json.reads[User]

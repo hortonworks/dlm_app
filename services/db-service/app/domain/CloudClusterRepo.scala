@@ -2,7 +2,7 @@ package domain
 
 import javax.inject._
 
-import domain.Entities.CloudCluster
+import com.hortonworks.dataplane.commons.domain.Entities.CloudCluster
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.libs.json.JsValue
 

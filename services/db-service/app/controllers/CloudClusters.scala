@@ -4,7 +4,7 @@ import javax.inject._
 
 import domain.API.{datalakes, users}
 import domain.CloudClusterRepo
-import domain.Entities.CloudCluster
+import com.hortonworks.dataplane.commons.domain.Entities.CloudCluster
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class CloudClusters @Inject()(clusterRepo: CloudClusterRepo)(implicit exec: ExecutionContext)
   extends JsonAPI {
 
-  import domain.JsonFormatters._
+  import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   def all = Action.async {
     clusterRepo.all.map(clusters => success(clusters.map(c=>linkData(c,makeLink(c))))).recoverWith(apiError)

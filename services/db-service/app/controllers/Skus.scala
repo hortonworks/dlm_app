@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import domain.Entities.Sku
+import com.hortonworks.dataplane.commons.domain.Entities.Sku
 import domain.SkuRepo
 import play.api.mvc.Action
 
@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class Skus @Inject()(skuRepo: SkuRepo)(implicit exec: ExecutionContext)
   extends JsonAPI {
 
-  import domain.JsonFormatters._
+  import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   def all = Action.async {
     skuRepo.all.map(skus => success(skus)).recoverWith(apiError)

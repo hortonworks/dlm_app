@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import domain.CategoryRepo
-import domain.Entities.Category
+import com.hortonworks.dataplane.commons.domain.Entities.Category
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class Categories @Inject()(categoryRepo: CategoryRepo)(implicit exec: ExecutionContext)
     extends JsonAPI {
 
-  import domain.JsonFormatters._
+  import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   def all = Action.async {
     categoryRepo.all.map(categorys => success(categorys)).recoverWith(apiError)

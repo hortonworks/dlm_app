@@ -3,7 +3,7 @@ package domain
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-import domain.Entities.EnabledSku
+import com.hortonworks.dataplane.commons.domain.Entities.EnabledSku
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 
 import scala.concurrent.Future

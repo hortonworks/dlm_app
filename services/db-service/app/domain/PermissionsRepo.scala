@@ -3,7 +3,7 @@ package domain
 import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
 
-import domain.Entities.{Permission, RolePermission, UserPermission}
+import com.hortonworks.dataplane.commons.domain.Entities.{Permission, RolePermission, UserPermission}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import scala.concurrent.ExecutionContext.Implicits.global
 

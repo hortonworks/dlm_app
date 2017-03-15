@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import domain.DataLakeRepo
-import domain.Entities.{Datalake, Location}
+import com.hortonworks.dataplane.commons.domain.Entities.{Datalake, Location}
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -14,7 +14,7 @@ class Datalakes @Inject()(dataLakeRepo: DataLakeRepo)(
     extends JsonAPI {
 
   import domain.API._
-  import domain.JsonFormatters._
+  import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   def all = Action.async {
     dataLakeRepo.all.map { dl =>

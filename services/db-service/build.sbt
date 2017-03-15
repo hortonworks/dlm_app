@@ -12,6 +12,7 @@ libraryDependencies ++= Seq(
   jdbc,
   cache,
   ws,
+  "com.hortonworks.dataplane" %% "dp-commons" % "0.5",
   "com.typesafe.play" %% "play-slick" % "2.1.0",
   "com.github.tminglei" %% "slick-pg" % "0.15.0-RC",
   "postgresql" % "postgresql" % "9.4.1208-jdbc42-atlassian-hosted",

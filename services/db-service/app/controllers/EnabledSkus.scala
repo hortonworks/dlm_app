@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import domain.EnabledSkuRepo
-import domain.Entities.EnabledSku
+import com.hortonworks.dataplane.commons.domain.Entities.EnabledSku
 import play.api.mvc.Action
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class EnabledSkus @Inject()(enabledSkuRepo: EnabledSkuRepo)(implicit exec: ExecutionContext)
   extends JsonAPI {
 
-  import domain.JsonFormatters._
+  import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   def all = Action.async {
     enabledSkuRepo.all.map(enabledSkus => success(enabledSkus)).recoverWith(apiError)

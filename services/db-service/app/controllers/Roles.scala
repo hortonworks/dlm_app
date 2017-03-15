@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import domain.Entities.{Role, UserRole, UserRoles}
+import com.hortonworks.dataplane.commons.domain.Entities.{Role, UserRole, UserRoles}
 import domain.RoleRepo
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class Roles @Inject()(roleRepo: RoleRepo)(implicit exec: ExecutionContext)
     extends JsonAPI {
 
-  import domain.JsonFormatters._
+  import com.hortonworks.dataplane.commons.domain.JsonFormatters._
   import domain.API._
 
   def all = Action.async {

@@ -3,7 +3,7 @@ package domain
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-import domain.Entities.{Role, UserRole, UserRoles}
+import com.hortonworks.dataplane.commons.domain.Entities.{Role, UserRole, UserRoles}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 
 import scala.concurrent.Future
@@ -35,7 +35,7 @@ class RoleRepo @Inject()(protected val userRepo: UserRepo, protected val dbConfi
     } yield (roles.roleName)
 
     val result = db.run(query.result)
-    result.map(r => domain.Entities.UserRoles(userName, r))
+    result.map(r => com.hortonworks.dataplane.commons.domain.Entities.UserRoles(userName, r))
   }
 
 

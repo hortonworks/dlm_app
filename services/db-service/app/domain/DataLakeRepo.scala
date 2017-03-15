@@ -3,7 +3,7 @@ package domain
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-import domain.Entities.{Datalake, Location}
+import com.hortonworks.dataplane.commons.domain.Entities.{Datalake, Location}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.JsValue
 

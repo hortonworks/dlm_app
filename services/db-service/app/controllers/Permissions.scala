@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import domain.Entities.Permission
+import com.hortonworks.dataplane.commons.domain.Entities.Permission
 import domain.PermissionsRepo
 import play.api.mvc._
 
@@ -14,7 +14,7 @@ class Permissions @Inject()(permissionsRepo: PermissionsRepo)(
     extends JsonAPI {
 
   import domain.API._
-  import domain.JsonFormatters._
+  import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   def all = Action.async {
     permissionsRepo.all.map(permissions =>
