@@ -1,5 +1,3 @@
-import com.typesafe.sbt.packager.docker._
-
 name := """data_plane"""
 version := "0.1-alpha"
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
@@ -25,11 +23,3 @@ libraryDependencies ++= {
 }
 
 routesGenerator := InjectedRoutesGenerator
-
-dockerCommands := dockerCommands.value.map {
-  case ExecCmd("ENTRYPOINT", args @ _*) => {
-    val args1 = args :+ "-Dconfig.resource=docker.conf"
-    ExecCmd("ENTRYPOINT", args1:_*)
-  }
-  case cmd => cmd
-}

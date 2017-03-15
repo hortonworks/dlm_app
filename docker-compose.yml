@@ -1,0 +1,27 @@
+version: '2'
+services:
+  data-plane:
+    build:
+      context: .
+    image: hortonworks/data-plane
+    ports:
+      - "80:80"
+    depends_on:
+      - dp-database
+    links:
+      - dp-database
+
+  dp-setup:
+    build:
+      context: ./dp-setup
+    image: hortonworks/data-plane-setup
+    volumes:
+      - ./dp-setup/:/code
+    depends_on:
+      - dp-database
+    links:
+      - dp-database
+    command: python dbinit.py
+
+  dp-database:
+    image: mongo

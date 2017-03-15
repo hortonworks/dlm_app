@@ -1,13 +1,16 @@
 {
-  "name": "dataplane",
+  "name": "dp-web",
   "version": "0.0.0",
   "license": "MIT",
+  "engines" : {
+    "node" : ">=7.0.0"
+  },
   "angular-cli": {},
   "scripts": {
     "start": "ng serve",
     "dev": "ng serve --proxy-config proxy.conf.json",
-    "prod": "ng serve -prod --proxy-config proxy.conf.json",
-    "build": "ng build -prod",
+    "prod": "ng serve --prod --host 0.0.0.0 --proxy-config proxy.conf.json",
+    "build": "ng build --prod",
     "lint": "tslint \"src/**/*.ts\"",
     "test": "ng test",
     "pree2e": "webdriver-manager update",
