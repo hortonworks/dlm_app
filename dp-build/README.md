@@ -2,9 +2,8 @@
 
 ## mongo
 
-* MongoDB
-* Prebuilt MongoDB distributed via Docker Hub.
-* This image is not modified.
+* prebuilt MongoDB distributed via Docker Hub.
+* this image is not modified.
 
 ## hortonworks/data-plane-setup
 
