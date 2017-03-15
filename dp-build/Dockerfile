@@ -11,7 +11,7 @@ COPY ./services /etc/sv
 
 RUN chmod +x /etc/sv/nginx/run && \
     chmod +x /etc/sv/play/run && \
-    chmod +x /usr/dp-app/bin/data_plane
+    chmod +x /usr/dp-app/bin/dp-app
 
 EXPOSE 80
 
