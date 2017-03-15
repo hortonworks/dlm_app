@@ -13,10 +13,10 @@ services:
 
   dp-setup:
     build:
-      context: ./dp-setup
+      context: ../dp-setup
     image: hortonworks/data-plane-setup
     volumes:
-      - ./dp-setup/:/code
+      - ../dp-setup/:/code
     depends_on:
       - dp-database
     links:

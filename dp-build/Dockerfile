@@ -5,13 +5,13 @@ FROM openjdk:8-jre
 RUN apt-get update && \
     apt-get install -y ntp nginx runit
 
-ADD ./dp-app/target/dp-app-0.0.1-SNAPSHOT.zip /usr/dp-app
-COPY ./dp-web/dist /usr/dp-web
-COPY ./dp-build/services /etc/sv
+COPY ./build/dp-app /usr/dp-app
+COPY ./build/dp-web /usr/dp-web
+COPY ./services /etc/sv
 
 RUN chmod +x /etc/sv/nginx/run && \
     chmod +x /etc/sv/play/run && \
-    chmod +x /usr/dp-app/data_plane-0.1-alpha/bin/data_plane
+    chmod +x /usr/dp-app/bin/data_plane
 
 EXPOSE 80
 
