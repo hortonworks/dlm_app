@@ -14,7 +14,7 @@
 
 ## hortonworks/data-plane
 
-* generated from `./services` and `./ui`
+* generated from `./services` and `./dp-web`
 * derieved from `openjdk:8-jre` which in turn is derieved from `debian:jessie` [because installing jdk8 on Debian is hard / broken]
 * installs and uses [`runit`](smarden.org/runit/) as process supervisor
 * installs and uses `nginx` as gateway / proxy for play app and to serve static assets, i.e. Web
