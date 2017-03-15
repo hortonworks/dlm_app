@@ -15,7 +15,7 @@ sbt dist
 popd
 
 # 2. build ui
-pushd ./ui
+pushd ./dp-web
 npm install
 npm run build
 popd

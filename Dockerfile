@@ -6,7 +6,7 @@ RUN apt-get update && \
     apt-get install -y ntp nginx runit
 
 COPY ./webapp/target/universal/data_plane-0.1-alpha /usr/dp-services/data_plane-0.1-alpha
-COPY ./ui/dist /usr/dp-web
+COPY ./dp-web/dist /usr/dp-web
 COPY ./dp-build/services /etc/sv
 
 RUN chmod +x /etc/sv/nginx/run && \
