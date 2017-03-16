@@ -44,10 +44,10 @@ class Users @Inject()(userRepo: UserRepo)(implicit exec: ExecutionContext)
       .map { user =>
         userRepo
           .insert(
-            user.username,
-            BCrypt.hashpw(user.password, BCrypt.gensalt()),
-            user.displayname,
-            user.avatar
+            username = user.username,
+            password = BCrypt.hashpw(user.password, BCrypt.gensalt()),
+            displayname = user.displayname,
+            avatar = user.avatar
           )
           .map { u =>
             success(u)

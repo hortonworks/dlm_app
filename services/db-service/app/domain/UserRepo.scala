@@ -19,7 +19,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     Users.to[List].result
   }
 
-  def insert(username: String, password: String, displayname: String, avatar: String): Future[User] = {
+  def insert(username: String, password: String, displayname: String, avatar: Option[String]): Future[User] = {
 //    TODO: generate avatar url from username > gravatar?
     val user = User(username = username, password = password, displayname = displayname, avatar = avatar)
     db.run {
@@ -50,7 +50,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
 
     def displayname = column[String]("displayname")
 
-    def avatar = column[String]("avatar")
+    def avatar = column[Option[String]]("avatar")
 
     def active = column[Option[Boolean]]("active")
 
