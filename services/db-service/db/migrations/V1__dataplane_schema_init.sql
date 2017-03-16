@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_data_asset_workspace (
 );
 
 
-CREATE TABLE IF NOT EXISTS dataplane.cluster_hosts (
+CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_hosts (
   id         BIGSERIAL PRIMARY KEY,
   host       VARCHAR(255)                                 NOT NULL,
   status     VARCHAR(10)                                  NOT NULL,
@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS dataplane.cluster_hosts (
 );
 
 
-CREATE TABLE IF NOT EXISTS dataplane.cluster_health (
+CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_health (
   id        BIGSERIAL PRIMARY KEY,
   status    VARCHAR(255)                                 NOT NULL,
   state     VARCHAR(10)                                  NOT NULL,
@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS dataplane.cluster_health (
   clusterid BIGINT REFERENCES dataplane.dp_clusters (id) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.cluster_properties (
+CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_properties (
   id         BIGSERIAL PRIMARY KEY,
   properties JSONB,
   clusterid  BIGINT REFERENCES dataplane.dp_clusters (id) NOT NULL
