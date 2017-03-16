@@ -12,6 +12,8 @@ object Entities {
   case class User(id: Option[Long] = None,
                   username: String,
                   password: String,
+                  displayname: String,
+                  avatar: String,
                   active: Option[Boolean] = Some(true),
                   created: Option[LocalDateTime] = Some(LocalDateTime.now()),
                   updated: Option[LocalDateTime] = Some(LocalDateTime.now()))

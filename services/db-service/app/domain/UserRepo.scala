@@ -19,8 +19,9 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     Users.to[List].result
   }
 
-  def insert(username: String, password: String): Future[User] = {
-    val user = User(username = username, password = password)
+  def insert(username: String, displayname: String, password: String): Future[User] = {
+//    TODO: generate avatar url from username > gravatar?
+    val user = User(username = username, displayname = displayname, avatar = "", password = password)
     db.run {
       Users returning Users += user
     }

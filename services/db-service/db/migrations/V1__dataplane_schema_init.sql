@@ -10,12 +10,14 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_roles (
 );
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_users (
-  id       BIGSERIAL PRIMARY KEY,
-  username VARCHAR(255) NOT NULL UNIQUE,
-  active   BOOLEAN   DEFAULT TRUE,
-  password VARCHAR(255),
-  created  TIMESTAMP DEFAULT now(),
-  updated  TIMESTAMP DEFAULT now()
+  id            BIGSERIAL PRIMARY KEY,
+  username      VARCHAR(255) NOT NULL UNIQUE,
+  displayname   VARCHAR(255),
+  avatar        VARCHAR(255),
+  active        BOOLEAN   DEFAULT TRUE,
+  password      VARCHAR(255),
+  created       TIMESTAMP DEFAULT now(),
+  updated       TIMESTAMP DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_users_roles (
@@ -225,4 +227,6 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_enabled_skus (
 );
 
 
+-- CREATE USER dp_admin WITH PASSWORD 'dp_admin';
 
+-- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA dataplane TO dp_admin;
