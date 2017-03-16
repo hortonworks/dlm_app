@@ -105,7 +105,9 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_workspace (
   id          BIGSERIAL PRIMARY KEY,
   name        VARCHAR(255)                              NOT NULL,
   description TEXT,
-  createdby   BIGINT REFERENCES dataplane.dp_users (id) NOT NULL
+  createdby   BIGINT REFERENCES dataplane.dp_users (id) NOT NULL,
+  created       TIMESTAMP DEFAULT now(),
+  updated       TIMESTAMP DEFAULT now()
 );
 
 

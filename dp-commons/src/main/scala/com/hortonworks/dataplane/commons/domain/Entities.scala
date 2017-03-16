@@ -101,6 +101,15 @@ object Entities {
       datalakeid: Option[Long] = None
   )
 
+  case class Workspace(
+                        id: Option[Long] = None,
+                        name :String,
+                        description:String,
+                        createdBy:Long,
+                        created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                        updated: Option[LocalDateTime] = Some(LocalDateTime.now())
+                      )
+
   case class EnabledSku(
       skuId: Long,
       enabledBy: Long,
@@ -158,6 +167,8 @@ object JsonFormatters {
   implicit val clusterServiceReads = Json.reads[ClusterService]
 
 
+  implicit val workspaceWrites = Json.writes[Workspace]
+  implicit val workspaceReads = Json.reads[Workspace]
 
   implicit val couldClusterWrites = Json.writes[CloudCluster]
   implicit val couldClusterReads = Json.reads[CloudCluster]
