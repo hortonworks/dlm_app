@@ -1,4 +1,4 @@
-name := """monitoring"""
+name := """dp-monitoring"""
 
 version := "1.0"
 
