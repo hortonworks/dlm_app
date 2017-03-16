@@ -228,5 +228,5 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_enabled_skus (
 
 
 -- CREATE USER dp_admin WITH PASSWORD 'dp_admin';
-
+-- GRANT ALL PRIVILEGES ON SCHEMA dataplane TO dp_admin;
 -- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA dataplane TO dp_admin;

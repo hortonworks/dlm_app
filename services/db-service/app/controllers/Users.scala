@@ -43,8 +43,12 @@ class Users @Inject()(userRepo: UserRepo)(implicit exec: ExecutionContext)
       .validate[User]
       .map { user =>
         userRepo
-          .insert(user.username,
-                  BCrypt.hashpw(user.password, BCrypt.gensalt()))
+          .insert(
+            user.username,
+            BCrypt.hashpw(user.password, BCrypt.gensalt()),
+            user.displayname,
+            user.avatar
+          )
           .map { u =>
             success(u)
           }.recoverWith(apiError)
