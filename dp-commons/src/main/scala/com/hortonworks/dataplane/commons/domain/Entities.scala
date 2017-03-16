@@ -110,6 +110,12 @@ object Entities {
                         updated: Option[LocalDateTime] = Some(LocalDateTime.now())
                       )
 
+  case class AssetWorkspace(
+                           assetType:String,
+                           assetId:Long,
+                           workspaceId:Long
+                           )
+
   case class EnabledSku(
       skuId: Long,
       enabledBy: Long,
@@ -172,4 +178,8 @@ object JsonFormatters {
 
   implicit val couldClusterWrites = Json.writes[CloudCluster]
   implicit val couldClusterReads = Json.reads[CloudCluster]
+
+  implicit val assetWorkspaceWrites = Json.writes[AssetWorkspace]
+  implicit val assetWorkspaceReads = Json.reads[AssetWorkspace]
+
 }

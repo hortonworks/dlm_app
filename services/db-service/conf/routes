@@ -69,6 +69,17 @@ GET           /clusters/:clusterId                             controllers.Clust
 DELETE        /clusters/:clusterId                             controllers.Clusters.delete(clusterId:Long)
 
 
+#Workspaces API
+GET           /workspaces                                        controllers.Workspaces.all
+POST          /workspaces                                        controllers.Workspaces.insert
+GET           /workspaces/:workspaceId                           controllers.Workspaces.load(workspaceId:Long)
+DELETE        /workspaces/:workspaceId                           controllers.Workspaces.delete(workspaceId:Long)
+
+
+#Asset workspace API
+#Get assets for workspace
+GET           /assets/workspace/:workspaceId                     controllers.AssetWorkspaces.assetsforWorkspace(workspaceId:Long)
+POST           /assets/workspace                                 controllers.AssetWorkspaces.add
 
 
 
