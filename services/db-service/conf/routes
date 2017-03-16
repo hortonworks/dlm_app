@@ -52,13 +52,14 @@ GET           /cloud/clusters/:clusterId                       controllers.Cloud
 DELETE        /cloud/clusters/:clusterId                       controllers.CloudClusters.delete(clusterId:Long)
 
 #Cluster services API
-#//TODO - Clean up service API's
-#GET           /clusters/:clusterId/services                    controllers.ClusterServices.all
-#POST          /datalakes/:datalakeId/services                  controllers.ClusterServices.add
-#POST          /cluster/:clusterId/services                     controllers.ClusterServices.add
-#GET           /clusters/:clusterId/service/:serviceId          controllers.ClusterServices.load(serviceId:Long)
-#GET           /datalakes/:datalakeId/service/:serviceId        controllers.ClusterServices.load(serviceId:Long)
-#DELETE        /services/:serviceId                             controllers.ClusterServices.delete(serviceId:Long)
+
+GET           /clusters/:clusterId/services                    controllers.ClusterServices.allWithCluster(clusterId:Long)
+GET           /clusters/:datalakeId/services                    controllers.ClusterServices.allWithDatalake(datalakeId:Long)
+POST          /datalakes/:clusterId/services                  controllers.ClusterServices.addWithCluster(clusterId:Long)
+POST          /cluster/:datalakeId/services                     controllers.ClusterServices.addWithDatalake(datalakeId:Long)
+GET           /clusters/:clusterId/service/:serviceId          controllers.ClusterServices.loadWithCluster(serviceId:Long,clusterId:Long)
+GET           /datalakes/:datalakeId/service/:serviceId        controllers.ClusterServices.loadWithDatalake(serviceId:Long,datalakeId:Long)
+DELETE        /services/:serviceId                             controllers.ClusterServices.delete(serviceId:Long)
 
 
 #Clusters API

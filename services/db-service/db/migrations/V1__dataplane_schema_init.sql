@@ -95,7 +95,9 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_services (
   fullURL     TEXT,
   properties  JSONB,
   clusterid   BIGINT REFERENCES dataplane.dp_clusters (id),
-  datalakeid  BIGINT REFERENCES dataplane.dp_datalakes (id)
+  datalakeid  BIGINT REFERENCES dataplane.dp_datalakes (id),
+  check (clusterid is not null and datalakeid is not null)
+
 );
 
 
