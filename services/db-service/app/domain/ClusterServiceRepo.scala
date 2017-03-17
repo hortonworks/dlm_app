@@ -13,6 +13,7 @@ class ClusterServiceRepo @Inject()(
     protected val dbConfigProvider: DatabaseConfigProvider)
     extends HasDatabaseConfigProvider[DpPgProfile] {
 
+
   import profile.api._
 
   val Services = TableQuery[ClusterServiceTable]
@@ -20,6 +21,27 @@ class ClusterServiceRepo @Inject()(
   def all(): Future[List[ClusterService]] = db.run {
     Services.to[List].result
   }
+
+
+  def allWithCluster(clusterId: Long) = {
+    db.run(Services.filter(_.clusterid === clusterId).to[List].result)
+  }
+
+  def allWithDatalake(datalakeId: Long) = {
+    db.run(Services.filter(_.datalakeid === datalakeId).to[List].result)
+  }
+
+
+
+  def findByIdAndDatalake(serviceId: Long, datalakeId: Long) = {
+    db.run(Services.filter(_.id === serviceId).filter(_.datalakeid === datalakeId).result.headOption)
+  }
+
+
+  def findByIdAndCluster(serviceId: Long, clusterId: Long) = {
+    db.run(Services.filter(_.id === serviceId).filter(_.clusterid === clusterId).result.headOption)
+  }
+
 
   def insert(cluster: ClusterService): Future[ClusterService] = {
     db.run {

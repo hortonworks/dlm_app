@@ -15,8 +15,12 @@ class ClusterServices @Inject()(csr: ClusterServiceRepo)(implicit exec: Executio
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  def all = Action.async {
-    csr.all.map(cs => success(cs.map(c=>linkData(c,makeLink(c))))).recoverWith(apiError)
+  def allWithCluster(clusterId: Long) = Action.async {
+    csr.allWithCluster(clusterId).map(cs => success(cs.map(c=>linkData(c,makeLink(c))))).recoverWith(apiError)
+  }
+
+  def allWithDatalake(datalakeId: Long) = Action.async {
+    csr.allWithDatalake(datalakeId).map(cs => success(cs.map(c=>linkData(c,makeLink(c))))).recoverWith(apiError)
   }
 
 
@@ -40,17 +44,53 @@ class ClusterServices @Inject()(csr: ClusterServiceRepo)(implicit exec: Executio
   }
 
 
-  def add = Action.async(parse.json) { req =>
+
+
+  def loadWithCluster(serviceId: Long, clusterId: Long) =  Action.async(parse.json) { req =>
+    csr.findByIdAndCluster(serviceId,clusterId).map(cs => success(cs.map(c=>linkData(c,makeLink(c))))).recoverWith(apiError)
+  }
+
+
+  def loadWithDatalake(serviceId: Long, datalakeId: Long) =  Action.async(parse.json) { req =>
+    csr.findByIdAndDatalake(serviceId,datalakeId).map(cs => success(cs.map(c=>linkData(c,makeLink(c))))).recoverWith(apiError)
+  }
+
+
+  def addWithCluster(clusterId: Long) =  Action.async(parse.json) { req =>
     req.body
       .validate[ClusterService]
       .map { cl =>
+        //        check if cluster is not null and datalake is null
+        if(cl.clusterid.isEmpty)
+          UnprocessableEntity
+        if(cl.datalakeid.isDefined)
+          UnprocessableEntity
         val created = csr.insert(cl)
         created
           .map(c => success(linkData(c, makeLink(c))))
           .recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))
+
   }
 
+
+  def addWithDatalake(clusterId: Long) =  Action.async(parse.json) { req =>
+    req.body
+      .validate[ClusterService]
+      .map { cl =>
+        //        check if cluster is not null and datalake is null
+        if(cl.clusterid.isDefined)
+          UnprocessableEntity
+        if(cl.datalakeid.isEmpty)
+          UnprocessableEntity
+        val created = csr.insert(cl)
+        created
+          .map(c => success(linkData(c, makeLink(c))))
+          .recoverWith(apiError)
+      }
+      .getOrElse(Future.successful(BadRequest))
+
+  }
 
 }

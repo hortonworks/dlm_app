@@ -95,7 +95,9 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_services (
   fullURL     TEXT,
   properties  JSONB,
   clusterid   BIGINT REFERENCES dataplane.dp_clusters (id),
-  datalakeid  BIGINT REFERENCES dataplane.dp_datalakes (id)
+  datalakeid  BIGINT REFERENCES dataplane.dp_datalakes (id),
+  check (clusterid is not null and datalakeid is not null)
+
 );
 
 
@@ -103,7 +105,9 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_workspace (
   id          BIGSERIAL PRIMARY KEY,
   name        VARCHAR(255)                              NOT NULL,
   description TEXT,
-  createdby   BIGINT REFERENCES dataplane.dp_users (id) NOT NULL
+  createdby   BIGINT REFERENCES dataplane.dp_users (id) NOT NULL,
+  created       TIMESTAMP DEFAULT now(),
+  updated       TIMESTAMP DEFAULT now()
 );
 
 
