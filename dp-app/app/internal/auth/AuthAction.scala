@@ -3,9 +3,9 @@ package internal.auth
 import java.security.cert.X509Certificate
 
 import internal.Jwt
-import models.UserView
 import play.api.http.Status
 import play.api.mvc.{ActionBuilder, Request, Result, Results}
+import com.hortonworks.dataplane.commons.domain.Entities._
 
 import scala.concurrent.Future
 
@@ -28,11 +28,11 @@ object Authenticated extends ActionBuilder[AuthenticatedRequest] {
 }
 
 trait AuthenticatedRequest[+A] extends Request[A] {
-  val user: UserView
+  val user: User
 }
 
 object AuthenticatedRequest {
-  def apply[A](u: UserView, r: Request[A]) = new AuthenticatedRequest[A] {
+  def apply[A](u: User, r: Request[A]) = new AuthenticatedRequest[A] {
     def id = r.id
     def tags = r.tags
     def uri = r.uri

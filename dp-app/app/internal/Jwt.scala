@@ -1,16 +1,16 @@
 package internal
 
 import java.util.Date
-import javax.crypto.spec.SecretKeySpec
-import javax.xml.bind.DatatypeConverter
 
 import io.jsonwebtoken.impl.crypto.MacProvider
 import io.jsonwebtoken.{Jwts, SignatureAlgorithm}
-import models.{User, UserView}
 import play.api.Logger
+import play.api.libs.json.{JsError, JsSuccess, Json}
 
 import scala.util.Try
 
+import com.hortonworks.dataplane.commons.domain.Entities._
+import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
 object Jwt {
 
@@ -20,17 +20,17 @@ object Jwt {
   val issuer: String = "data_plane"
   val HOUR = 3600 * 1000
 
-  def makeJWT(user: UserView): String = {
 
+  def makeJWT(user: User): String = {
     val nowMillis = System.currentTimeMillis()
     val now = new Date(nowMillis)
     val claims = new java.util.HashMap[String, Object]()
+    claims.put("user", Json.toJson(user).toString())
 
-    val builder = Jwts.builder().setId(user.username)
+    val builder = Jwts.builder()
       .setIssuedAt(now)
-      .setSubject(user.username)
       .setIssuer(issuer)
-      .setSubject(if(user.admin) "admin" else "user")
+      .setClaims(claims)
       .setExpiration(new Date(now.getTime + 2 * HOUR))
       .signWith(algorithm, signingKey)
     builder.compact()
@@ -38,7 +38,7 @@ object Jwt {
   }
 
 
-  def parseJWT(jwt: String): Option[UserView] = {
+  def parseJWT(jwt: String): Option[User] = {
     Logger.info("Parsing user authorization token")
 
     val claims = Try(Some(Jwts.parser()
@@ -51,9 +51,11 @@ object Jwt {
       val expiration: Date = c.getExpiration()
       if (expiration.before(new Date()))
         None
-      val userName = c.getId
-      val admin = c.getSubject == "admin"
-      Some(UserView(userName, "", admin))
+      val userJsonString = c.get("user").toString
+      Json.parse(userJsonString).validate[User] match {
+        case JsSuccess(user, _) => Some(user)
+        case JsError(error) => None
+      }
     } getOrElse None
 
   }

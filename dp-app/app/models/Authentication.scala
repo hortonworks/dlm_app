@@ -12,21 +12,15 @@ case class UserRequest(username: String,
 case class Credential(id: String, password: String)
 
 
-case class User(username: String,
-                password: String,
-                userType: String,
-                authType:String,
-                admin: Boolean,
-                created: Date,
-                enabled: Boolean = true)
-
-object User {
-  val userTypes = Set("USER","ADMIN","SUPERUSER","ANALYSTADMIN","INFRAADMIN")
-  val authTypes= Set("LDAP","LOCAL")
-}
 
 
-case class UserView(username: String, password: String, admin: Boolean,userType:String="USER")
+//object User {
+//  val userTypes = Set("USER","ADMIN","SUPERUSER","ANALYSTADMIN","INFRAADMIN")
+//  val authTypes= Set("LDAP","LOCAL")
+//}
+//
+//
+//case class UserView(username: String, password: String, admin: Boolean,userType:String="USER")
 
 object JsonFormats {
 
@@ -35,12 +29,6 @@ object JsonFormats {
   implicit val userReqFormat = Json.format[UserRequest]
 
   implicit val credentialFormat = Json.format[Credential]
-  implicit val userFormat = Json.format[User]
-
-  implicit val userWrites = Json.writes[User]
-  implicit val userReads = Json.reads[User]
-
-  implicit val userViewReads = Json.reads[UserView]
 
 }
 

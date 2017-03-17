@@ -3,7 +3,6 @@
 # ~~~~
 
 #auth calls
-POST        /auth/login                            controllers.Authentication.login
 POST        /auth/in                               controllers.Authentication.signIn
 
 #api

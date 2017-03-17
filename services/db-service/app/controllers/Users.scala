@@ -20,8 +20,8 @@ class Users @Inject()(userRepo: UserRepo)(implicit exec: ExecutionContext)
     userRepo.all.map(users => success(users)).recoverWith(apiError)
   }
 
-  def get(name: String) = Action.async {
-    userRepo.findByName(name).map { uo =>
+  def get(username: String) = Action.async {
+    userRepo.findByName(username).map { uo =>
       uo.map { u =>
           success(u)
         }

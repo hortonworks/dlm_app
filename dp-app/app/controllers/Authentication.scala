@@ -4,81 +4,54 @@ package controllers
 import javax.inject.Inject
 
 import internal.Jwt
+import models.{Credential, JsonResponses}
 import models.JsonFormats._
-import models._
 import org.mindrot.jbcrypt.BCrypt
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsSuccess, Json}
+import play.api.Configuration
 import play.api.mvc._
-import play.modules.reactivemongo.json._
-import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
-import reactivemongo.play.json.collection.JSONCollection
-
-import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.libs.ws.WSClient
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 
-class Authentication @Inject() (val reactiveMongoApi: ReactiveMongoApi)
-  extends Controller with MongoController with ReactiveMongoComponents {
-
-
-  def collection = database.map(_.collection[JSONCollection]("users"))
-
-  def resolve(pw:String,user: User): Option[UserView] = {
-    val checkpw: Boolean = BCrypt.checkpw(pw,user.password)
-    if(checkpw)
-      Some(UserView(user.username,user.password,user.admin))
-    else
-      None
-  }
+class Authentication @Inject() (val ws: WSClient, val config: Configuration)
+  extends Controller {
 
   def signIn = Action.async(parse.json) { request =>
+
     request.body.validate[Credential].map { credential =>
-      // `user` is an instance of the case class `models.User`
-      collection.flatMap(_.find(Json.obj("username"->credential.id)).one[User].map { u =>
-        if(u.isDefined) {
-          resolve(credential.password,u.get).map{ us => {
+      val username = credential.id;
+      val password = credential.password;
+      val roles = new Array[String](1);
+      roles(0) = "SUPERADMIN";
 
-              val roles = new Array[String](1);
-              roles(0) = u.get.userType;
+      ws
+        .url(config.getString("datasource.service.uri").get + "/user/" + username)
+        .withHeaders("Accept" -> "application/json")
+        .get()
+        .map {
+          response =>
+            if(response.status != 200) {
+              Unauthorized(JsonResponses.statusError(s"Cannot find user for request"))
+            }
 
-              Ok(
+            import com.hortonworks.dataplane.commons.domain.Entities._
+            import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+
+            (response.json \ "results").get.validate[User] match {
+              case JsSuccess(user, _)  if BCrypt.checkpw(password, user.password) => Ok(
                 Json.obj(
-                  "id" -> credential.id,
-                  "avatar" -> "",
-                  "display" -> "",
-                  "token" -> Jwt.makeJWT(us),
+                  "id" -> user.username,
+                  "avatar" -> user.avatar,
+                  "display" -> user.displayname,
+                  "token" -> Jwt.makeJWT(user),
                   "roles" -> roles
                 )
               )
+              case _ => Unauthorized(JsonResponses.statusError(s"Cannot find user for request"))
             }
-          }.getOrElse{
-            Unauthorized(JsonResponses.statusError(s"Cannot find user for request"))
-          }
         }
-        else
-        Unauthorized(JsonResponses.statusError(s"Cannot find user for request"))
-      })
-    }.getOrElse(Future.successful(BadRequest(JsonResponses.statusError("Cannot parse user request"))))
-  }
-
-  def login = Action.async(parse.json) { request =>
-    request.body.validate[UserRequest].map { user =>
-      // `user` is an instance of the case class `models.User`
-      collection.flatMap(_.find(Json.obj("username"->user.username)).one[User].map { u =>
-        if(u.isDefined) {
-          resolve(user.password,u.get).map{ us =>
-            Ok(
-              Json.obj(
-              "auth_token"->Jwt.makeJWT(us),
-              "userType"->u.get.userType)
-            )
-          }.getOrElse{
-            Unauthorized(JsonResponses.statusError(s"Cannot find user for request"))
-          }
-        }
-        else
-        Unauthorized(JsonResponses.statusError(s"Cannot find user for request"))
-      })
     }.getOrElse(Future.successful(BadRequest(JsonResponses.statusError("Cannot parse user request"))))
   }
 
