@@ -32,3 +32,5 @@
 # Generated
 **/RUNNING_PID
 
+# Mac OS Stuff
+**/.DS_Store
