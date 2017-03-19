@@ -39,7 +39,8 @@ class Authentication @Inject()(
         BadRequest(JsonResponses.statusError("Cannot parse user request"))))
   }
 
-  def getRoles(roles: Either[Errors, UserRoles]) = {
+
+  private def getRoles(roles: Either[Errors, UserRoles]) = {
     if (roles.isRight) {
       roles.right.get.roles
     } else

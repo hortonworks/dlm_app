@@ -1,10 +1,9 @@
-DROP SCHEMA dataplane CASCADE;
 CREATE SCHEMA IF NOT EXISTS dataplane;
 
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_roles (
   id      BIGSERIAL PRIMARY KEY,
-  name    VARCHAR(10) UNIQUE NOT NULL,
+  name    VARCHAR(32) UNIQUE NOT NULL,
   created TIMESTAMP DEFAULT now(),
   updated TIMESTAMP DEFAULT now()
 );
