@@ -22,7 +22,7 @@ class UserServiceImpl(config:Config)(implicit ws: WSClient) extends UserService{
     ws.url(s"$url/user/$username").withHeaders("Accept" -> "application/json").get().map{ res =>
       res.status match {
         case 200 => extractEntity[User](res,r => (r.json \ "results").validate[User])
-        case _ =>   Left(extractError(res,r=> (r.json \ "errors").validate[Errors]))
+        case _ =>   Left(extractError(res,r=> r.json.validate[Errors]))
       }
     }
   }
@@ -31,7 +31,7 @@ class UserServiceImpl(config:Config)(implicit ws: WSClient) extends UserService{
     ws.url(s"$url/user-role/user/$userName").withHeaders("Accept" -> "application/json").get().map{ res =>
       res.status match {
         case 200 => extractEntity[UserRoles](res,r => (r.json \ "results").validate[UserRoles])
-        case _ =>   Left(extractError(res,r=> (r.json \ "errors").validate[Errors]))
+        case _ =>   Left(extractError(res,r=> r.json.validate[Errors]))
       }
     }
   }
