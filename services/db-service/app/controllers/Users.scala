@@ -25,7 +25,7 @@ class Users @Inject()(userRepo: UserRepo)(implicit exec: ExecutionContext)
       uo.map { u =>
           success(u)
         }
-        .getOrElse(NotFound)
+        .getOrElse(notFound)
     }.recoverWith(apiError)
   }
 

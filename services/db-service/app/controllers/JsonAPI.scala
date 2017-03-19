@@ -2,6 +2,7 @@ package controllers
 
 import java.sql.SQLException
 
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
 import org.postgresql.util.PSQLException
 import play.api.libs.json.Json
 import play.api.libs.json.Json.JsValueWrapper
@@ -11,23 +12,33 @@ import scala.concurrent.Future
 
 trait JsonAPI extends Controller {
 
-  val pgErrors = Map("23503" -> Conflict,"23505" -> Conflict)
+  import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+  val pgErrors = Map("23503" -> Conflict, "23505" -> Conflict)
 
   def success(data: JsValueWrapper) = Ok(Json.obj("results" -> data))
+  val notFound = NotFound(Json.toJson(wrapErrors("404","Not found")))
 
-  def linkData(data: JsValueWrapper, links: Map[String, String]) = Json.obj("data" -> data, "links" -> links)
+  def linkData(data: JsValueWrapper, links: Map[String, String]) =
+    Json.obj("data" -> data, "links" -> links)
 
   val apiError: PartialFunction[Throwable, Future[Result]] = {
     case e: PSQLException =>
       Future.successful {
         val resultOption = pgErrors.get(e.getSQLState)
-        resultOption.map(r => r(Json.obj("code" -> e.getSQLState, "message" -> e.getMessage))).getOrElse {
-          InternalServerError(Json.obj("error" -> e.getMessage))
-        }
+        val errors = wrapErrors(e.getSQLState, e.getMessage)
+        resultOption
+          .map(r =>
+            r(Json.toJson(errors)))
+          .getOrElse {
+            InternalServerError(Json.toJson(errors))
+          }
       }
     case e: Exception =>
-      Future.successful(InternalServerError(Json.obj("error" -> e.getMessage)))
+      Future.successful(InternalServerError(Json.toJson(wrapErrors("500",e.getMessage))))
   }
 
+  private def wrapErrors(code: String, message: String): Errors = {
+    Errors(Seq(Error(code,message)))
+  }
 
 }

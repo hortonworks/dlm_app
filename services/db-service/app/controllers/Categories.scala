@@ -23,7 +23,7 @@ class Categories @Inject()(categoryRepo: CategoryRepo)(implicit exec: ExecutionC
       uo.map { u =>
           success(u)
         }
-        .getOrElse(NotFound)
+        .getOrElse(notFound)
     }.recoverWith(apiError)
   }
 

@@ -6,6 +6,9 @@ import play.api.libs.json.{JsValue, Json}
 
 object Entities {
 
+  case class Error(code:String,message:String)
+  case class Errors(errors:Seq[Error]= Seq())
+
   // Pagination
   case class Pagination(page: Int, offset: Long, limit: Long)
 
@@ -137,6 +140,13 @@ object Entities {
 object JsonFormatters {
   import com.hortonworks.dataplane.commons.domain.Entities._
 
+  implicit val errorWrites=Json.writes[Error]
+  implicit val errorReads=Json.reads[Error]
+
+
+  implicit val errorsWrites=Json.writes[Errors]
+  implicit val errorsReads=Json.reads[Errors]
+
   implicit val userWrites = Json.writes[User]
   implicit val userReads = Json.reads[User]
 
@@ -147,6 +157,7 @@ object JsonFormatters {
   implicit val userRoleReads = Json.reads[UserRole]
 
   implicit val userRolesWrites = Json.writes[UserRoles]
+  implicit val userRolesReads = Json.reads[UserRoles]
   implicit val rolePermissionWrites = Json.writes[RolePermission]
   implicit val userPermissionWrites = Json.writes[UserPermission]
 

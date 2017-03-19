@@ -1,6 +1,8 @@
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Provides, Singleton}
+import com.hortonworks.dataplane.db.UserServiceImpl
+import com.hortonworks.dataplane.db.Webserice.UserService
 import com.hw.dp.services.atlas.AtlasHiveApi
 import internal.{AmbariSync, AtlasApiCache}
 import internal.persistence._
@@ -16,6 +18,7 @@ class Module extends AbstractModule {
       bind(classOf[ClusterDataStorage]).to(classOf[MongoClusterDataStorage]).asEagerSingleton()
       bind(classOf[DataSetStorage]).to(classOf[MongoDataSetStorage]).asEagerSingleton()
       bind(classOf[MongoDriver]).toInstance(new MongoDriver())
+
   }
 
 
@@ -25,5 +28,15 @@ class Module extends AbstractModule {
   def provideApiCache(configuration: Configuration,actorSystem: ActorSystem,ws: WSClient):ActorRef = {
     actorSystem.actorOf(Props(classOf[AtlasApiCache], configuration, actorSystem,ws),"atlasApiCache")
   }
+
+
+  @Provides
+  @Singleton
+  @Named("userService")
+  def provideUserService(implicit ws: WSClient,configuration: Configuration):UserService = {
+    new UserServiceImpl(configuration.underlying)
+  }
+
+
 
 }

@@ -18,7 +18,7 @@ libraryDependencies ++= {
     "io.jsonwebtoken" % "jjwt" % "0.7.0",
 
     //service dependencies
-    "com.hortonworks.dataplane" %% "dp-commons" % "0.5",
+    "com.hortonworks.dataplane" %% "db-client" % "0.1",
     "com.hw.dataplane" %% "atlas" % "1.0"
 
   )

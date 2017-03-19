@@ -19,7 +19,7 @@ import scala.concurrent.duration._
 import scala.util.Try
 
 
-class AtlasHBase @Inject()(@Named("atlasApiCache") val atlasApiCache: ActorRef,
+class   AtlasHBase @Inject()(@Named("atlasApiCache") val atlasApiCache: ActorRef,
                            storage: ClusterDataStorage)
     extends Controller {
 
