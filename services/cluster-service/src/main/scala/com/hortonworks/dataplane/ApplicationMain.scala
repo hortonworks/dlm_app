@@ -1,4 +1,4 @@
-package com.example
+package com.hortonworks.dataplane
 
 import akka.actor.ActorSystem
 

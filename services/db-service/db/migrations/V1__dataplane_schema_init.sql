@@ -230,6 +230,18 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_enabled_skus (
 );
 
 
+-- Global DP configurations - could be exported to cluster ZK if needed
+CREATE TABLE IF NOT EXISTS dataplane.dp_configs (
+  id          BIGSERIAL PRIMARY KEY,
+  configkey  VARCHAR (255) NOT NULL  UNIQUE ,
+  configvalue TEXT NOT NULL,
+  active BOOLEAN DEFAULT TRUE NOT NULL,
+  export BOOLEAN DEFAULT FALSE NOT NULL
+);
+
+
+
+
 -- CREATE USER dp_admin WITH PASSWORD 'dp_admin';
 -- GRANT ALL PRIVILEGES ON SCHEMA dataplane TO dp_admin;
 -- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA dataplane TO dp_admin;
