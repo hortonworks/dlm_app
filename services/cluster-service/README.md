@@ -1,4 +1,7 @@
-activator-akka-scala-seed
+Cluster service 
 =========================
 
-A minimal seed template for an Akka with Scala build 
+This service maintains metadata for data-lakes/clusters registered in data plane
+
+
+
