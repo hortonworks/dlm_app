@@ -4,7 +4,9 @@ echo "Current working directory is"
 echo `pwd`
 
 # 0. Cleanup
-rm -rf ./build
+rm -rf ../services/db-service/build
+mkdir ../services/db-service/build
+rm -rf build
 mkdir build
 
 # 1. build dp-app
@@ -12,6 +14,15 @@ pushd ../dp-commons
 sbt publishLocal
 popd
 pushd ../services/atlas/service
+sbt publishLocal
+popd
+pushd ../services/db-service
+sbt publishLocal
+sbt dist
+unzip `find ./target/universal -maxdepth 1 -type f -name *.zip|head -1` -d build/tmp_dp-db-service
+cp -R `ls -d build/tmp_dp-db-service/*/|head -n 1` build/dp-db-service
+popd
+pushd ../clients/db-client
 sbt publishLocal
 popd
 pushd ../dp-app
@@ -28,7 +39,7 @@ cp -R ./dist ../dp-build/build/dp-web
 popd
 
 # 3. build a container bundling dp-app and dp-web
-docker-compose build
+#docker-compose build
 
 # 4
 echo "All done"
