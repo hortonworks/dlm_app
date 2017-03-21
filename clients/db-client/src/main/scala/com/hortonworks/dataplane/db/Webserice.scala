@@ -15,6 +15,15 @@ object Webserice {
     def addRole(role: Role):Future[Either[Errors,Role]]
     def addUserRole(userRole: UserRole):Future[Either[Errors,UserRole]]
 
+  }
+
+  trait LakeService {
+
+    def list(): Future[Either[Errors, Seq[Datalake]]]
+    def create(datalake: Datalake): Future[Either[Errors, Datalake]]
+    def retrieve(datalakeId: String): Future[Either[Errors, Datalake]]
+    def update(datalakeId: String, datalake: Datalake): Future[Either[Errors, Datalake]]
+    def delete(datalakeId: String): Future[Either[Errors, Datalake]]
 
   }
 

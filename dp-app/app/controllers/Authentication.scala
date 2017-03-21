@@ -10,16 +10,13 @@ import internal.Jwt
 import models.JsonFormats._
 import models.{Credential, JsonResponses}
 import org.mindrot.jbcrypt.BCrypt
-import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class Authentication @Inject()(
-    val config: Configuration,
-    @Named("userService") val userService: UserService)
+class Authentication @Inject()(@Named("userService") val userService: UserService)
     extends Controller {
 
   def signIn = Action.async(parse.json) { request =>

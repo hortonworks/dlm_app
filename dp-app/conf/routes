@@ -6,6 +6,13 @@
 POST        /auth/in                               controllers.Authentication.signIn
 
 #api
+
+GET         /api/lakes                             controllers.Lakes.list
+POST        /api/lakes                             controllers.Lakes.create
+GET         /api/lakes/:lakeId                     controllers.Lakes.retrieve(lakeId)
+DELETE      /api/lakes/:lakeId                     controllers.Lakes.delete(lakeId)
+PUT         /api/lakes/:lakeId                     controllers.Lakes.update(lakeId)
+
 POST        /api/clusters                          controllers.Clusters.create
 GET         /api/clusters                          controllers.Clusters.list
 PUT         /api/clusters                          controllers.Clusters.update

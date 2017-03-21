@@ -1,16 +1,13 @@
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Provides, Singleton}
-import com.hortonworks.dataplane.db.UserServiceImpl
-import com.hortonworks.dataplane.db.Webserice.UserService
-import com.hw.dp.services.atlas.AtlasHiveApi
+import com.hortonworks.dataplane.db.{LakeServiceImpl, UserServiceImpl}
+import com.hortonworks.dataplane.db.Webserice.{LakeService, UserService}
 import internal.{AmbariSync, AtlasApiCache}
 import internal.persistence._
 import play.api.Configuration
 import play.api.libs.ws.WSClient
 import reactivemongo.api.MongoDriver
-
-import scala.concurrent.Future
 
 class Module extends AbstractModule {
   def configure() = {
@@ -35,6 +32,14 @@ class Module extends AbstractModule {
   @Named("userService")
   def provideUserService(implicit ws: WSClient,configuration: Configuration):UserService = {
     new UserServiceImpl(configuration.underlying)
+  }
+
+
+  @Provides
+  @Singleton
+  @Named("lakeService")
+  def provideLakeService(implicit ws: WSClient,configuration: Configuration):LakeService = {
+    new LakeServiceImpl(configuration.underlying)
   }
 
 

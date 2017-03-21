@@ -30,6 +30,8 @@ import { DataManagerModule } from './components/data-manager/data-manager.module
 import { LogoutComponent } from './logout/logout.component';
 
 import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route.component';
+import { SignInComponent } from './routes/sign-in/sign-in.component';
+import { FirstRunComponent } from './routes/first-run/first-run.component';
 
 @NgModule({
   imports: [
@@ -57,6 +59,8 @@ import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route
 
     LogoutComponent,
     NotFoundRouteComponent,
+    SignInComponent,
+    FirstRunComponent,
   ],
   bootstrap: [AppComponent],
   providers: [
