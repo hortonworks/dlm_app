@@ -38,7 +38,8 @@ export class SignInComponent {
         user => {
           const persona = Persona[user.roles[0]];
           this.environment.persona = persona;
-          this.router.navigate(['dashboard']);
+          // TODO: check if is first run
+          this.router.navigate(['first-run']);
         },
         error => this.router.navigate(['sign-in'])
       );

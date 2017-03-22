@@ -8,7 +8,6 @@ import { routes } from './routes/routes.config';
 
 import { SidenavRouterLinkDirective } from './sidenav-router-link.directive';
 import { AppComponent } from './app.component';
-import { LoginComponent } from './login/login.component';
 import { Environment } from './environment';
 import { AuthenticationService } from './services/authentication.service';
 import { AmbariService } from './services/ambari.service';
@@ -55,7 +54,6 @@ import { FirstRunComponent } from './routes/first-run/first-run.component';
   declarations: [
     SidenavRouterLinkDirective,
     AppComponent,
-    LoginComponent,
 
     LogoutComponent,
     NotFoundRouteComponent,

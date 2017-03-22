@@ -13,7 +13,7 @@ export class LoggedInGuard implements CanActivate {
   canActivate() {
 
     if(this.authenticationService.isAuthenticated()) {
-        return true;
+      return true;
     }
 
     // not logged in so redirect to login page
@@ -32,8 +32,9 @@ export class AlreadyLoggedInGuard implements CanActivate {
 
   canActivate() {
     if(this.authenticationService.isAuthenticated()) {
-        this.router.navigate(['dashboard']);
-        return true;
+      // check if is first run
+      this.router.navigate(['first-run']);
+      return true;
     }
     return true;
   }

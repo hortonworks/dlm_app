@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { LoginComponent } from '../login/login.component';
+import { FirstRunComponent } from './first-run/first-run.component';
 import { SignInComponent } from './sign-in/sign-in.component';
 import { LogoutComponent } from '../logout/logout.component';
 
@@ -13,12 +13,16 @@ import { NotFoundRouteComponent } from './not-found-route/not-found-route.compon
 
 export const routes: Routes = [{
     path: '',
-    component: LoginComponent,
+    component: SignInComponent,
     canActivate:[ AlreadyLoggedInGuard ]
   },{
     path: 'sign-in',
     component: SignInComponent,
     canActivate:[ AlreadyLoggedInGuard ]
+  },{
+    path: 'first-run',
+    component: FirstRunComponent,
+    canActivate:[ LoggedInGuard ]
   },{
     path: 'logout',
     component: LogoutComponent
