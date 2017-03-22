@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { FirstRunComponent } from './first-run/first-run.component';
 import { SignInComponent } from './sign-in/sign-in.component';
+import { LakeAddComponent } from './lake-add/lake-add.component';
 import { LogoutComponent } from '../logout/logout.component';
 
 import { AlreadyLoggedInGuard, LoggedInGuard } from '../shared/utils/login-guard';
@@ -22,6 +23,10 @@ export const routes: Routes = [{
   },{
     path: 'first-run',
     component: FirstRunComponent,
+    canActivate:[ LoggedInGuard ]
+  },{
+    path: 'lake-add',
+    component: LakeAddComponent,
     canActivate:[ LoggedInGuard ]
   },{
     path: 'logout',

@@ -31,6 +31,7 @@ import { LogoutComponent } from './logout/logout.component';
 import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route.component';
 import { SignInComponent } from './routes/sign-in/sign-in.component';
 import { FirstRunComponent } from './routes/first-run/first-run.component';
+import { LakeAddComponent } from './routes/lake-add/lake-add.component';
 
 @NgModule({
   imports: [
@@ -59,6 +60,7 @@ import { FirstRunComponent } from './routes/first-run/first-run.component';
     NotFoundRouteComponent,
     SignInComponent,
     FirstRunComponent,
+    LakeAddComponent,
   ],
   bootstrap: [AppComponent],
   providers: [
