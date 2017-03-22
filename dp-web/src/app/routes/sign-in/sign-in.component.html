@@ -1,26 +1,25 @@
-<section class="dp-container dp-route dp-route--sign-in" style="height: 100%; width: 100%;display: flex;align-items: center;justify-content: center; background-color: rgb(247, 247, 247)">
+<section class="dp-container dp-route dp-route--sign-in" style="position: fixed;height: 100%; width: 100%;display: flex;align-items: center;justify-content: center; background-color: rgb(247, 247, 247);">
   <div style="display: flex;">
-    <div class="" style="width: 50%; border-right: 1px solid rgb(214, 214, 214)">
+    <div class="" style="width: 50%;min-width: 500px; border-right: 1px solid rgb(214, 214, 214); padding: 40px;display: flex;align-items: center;justify-content: center;">
       <img class="dataplane-logo-image" src="../../assets/images/ui_logo.svg"/>
     </div>
-    <div class="" style="width: 50%;">
+    <div class="" style="width: 50%;min-width: 500px; padding: 40px;">
       <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
-        <div class="mdl-card__supporting-text">
-
-          <div class="mdl-textfield mdl-js-textfield">
-            <input class="mdl-textfield__input" type="text" placeholder="Username" name="username" id="username" [(ngModel)]="credential.username" #username="ngModel" required/>
+        <div class="">
+          <div class="dp-input">
+            <label for="username" style="display: block;">Username</label>
+            <input class="" type="text" placeholder="Username" name="username" id="username" [(ngModel)]="credential.username" #username="ngModel" required/>
           </div>
-          <div class="mdl-textfield mdl-js-textfield">
-            <input class="mdl-textfield__input" type="password" placeholder="Password" name="userpass" id="userpass" [(ngModel)]="credential.password" #userpass="ngModel" required/>
+          <div class="dp-input">
+            <label for="password" style="display: block;">Password</label>
+            <input class="" type="password" placeholder="Password" name="password" id="password" [(ngModel)]="credential.password" #userpass="ngModel" required/>
           </div>
-
         </div>
-        <div class="mdl-card__actions mdl-card--border">
+        <footer class="" style="">
           <button type="submit" class="mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect">
-            Log in
+            Sign In
           </button>
-          <div *ngIf="statusMessage === 'SESSIONEXPIRED'" class="mdl-mega-footer__bottom-section mdl-color-text--red">Session expired please login again</div>
-        </div>
+        </footer>
       </form>
     </div>
   </div>
