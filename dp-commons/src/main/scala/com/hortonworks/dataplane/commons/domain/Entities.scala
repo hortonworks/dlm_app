@@ -42,7 +42,13 @@ object Entities {
   case class UserPermission(username: String, rights: Seq[RolePermission])
 
   //Data lake
-  case class Location(id: Option[Long] = None, country: String, city: String)
+  case class Location(
+     id: Option[Long] = None,
+     country: String,
+     city: String,
+     latitude: Float,
+     longitude: Float
+   )
 
   case class Datalake(
       id: Option[Long] = None,
