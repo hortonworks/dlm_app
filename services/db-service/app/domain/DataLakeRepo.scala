@@ -68,8 +68,12 @@ class DataLakeRepo @Inject()(
 
     def city = column[String]("city")
 
+    def latitude = column[Float]("latitude")
+
+    def longitude = column[Float]("longitude")
+
     def * =
-      (id, country, city) <> ((Location.apply _).tupled, Location.unapply)
+      (id, country, city, latitude, longitude) <> ((Location.apply _).tupled, Location.unapply)
   }
 
   private class DataLakesTable(tag: Tag)

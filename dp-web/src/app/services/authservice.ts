@@ -23,18 +23,18 @@ export class AuthService {
             JSON.stringify({'username': userName, 'password': password}),
             {headers}
         )
-            .toPromise()
-            .then(res => {
-                    this.loggedIn = true;
-                    localStorage.setItem('dp_auth_token', res.json().auth_token);
-                    localStorage.setItem('dp_userType', res.json().userType);
-                    return new Credential(userName,password, res.json().userType);
-                }
-            )
-            .catch(error=> {
-                this.loggedIn = false;
-                return this.handleError(error);
-            });
+        .toPromise()
+        .then(res => {
+                this.loggedIn = true;
+                localStorage.setItem('dp_auth_token', res.json().auth_token);
+                localStorage.setItem('dp_userType', res.json().userType);
+                return new Credential(userName, password);
+            }
+        )
+        .catch(error=> {
+            this.loggedIn = false;
+            return this.handleError(error);
+        });
 
     }
 

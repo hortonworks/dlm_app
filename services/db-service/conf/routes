@@ -9,7 +9,7 @@ POST          /users                                               controllers.U
 GET           /users/:userId                                       controllers.Users.load(userId:Long)
 DELETE        /users/:userId                                       controllers.Users.delete(userId:Long)
 
-GET           /users/:username                                     controllers.Users.get(username)
+GET           /user/:username                                     controllers.Users.get(username)
 
 
 #Roles API
