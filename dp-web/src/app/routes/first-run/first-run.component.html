@@ -1,18 +1,25 @@
-<section class="dp-container dp-route dp-route--first-run">
-  <aside class="dp-aside"></aside>
-  <div>
-    <header>Add lake</header>
-    <div>
-      Lake Name
-      Description
-      Location
-
-      Cluster
-      URL
-      Credential
-
-      Test Ping
-      Test Credentials
+<section class="dp-container dp-route dp-route--first-run" style="position: fixed;top:0;left:0;height: 100%; width: 100%; background-color: rgb(247, 247, 247);">
+  <div style="height:100%; display: flex;" >
+    <aside class="dp-aside"></aside>
+    <div style="padding: 40px;">
+      <header>
+        <div>Welcome to Hortonworks</div>
+        <h1>Data Plane</h1>
+      </header>
+      <div>
+        <p>
+          Welcome to dataplane, your one-stop solution to data management. To start, you need to help us find your data lakes. Please proceed by adding data lakes below.
+        </p>
+        <div>
+          <a [routerLink]="['/lake-add']" class="mdl-button" style="height: initial; text-transform:none; font-size: 1em; text-align: left; display: flex;padding: 10px;">
+            <div style="width: 50px;"><i class="fa fa-server" aria-hidden="true" style="font-size: 1.2em;"></i></div>
+            <div style="flex-grow: 1;">
+              <div style="text-transform: uppercase; font-size: 1.2em; font-weight: bold;">Add datalakes</div>
+              <p>desc.</p>
+            </div>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </section>

@@ -1,6 +1,6 @@
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
 
-    <div class="dataplane-header mdl-layout__header mdl-layout__header--waterfall" [hidden]="!isLoggedIn()">
+    <div class="dataplane-header mdl-layout__header mdl-layout__header--waterfall" [hidden]="!isLoggedIn()" style="display: none;">
         <div class="mdl-layout__header-row">
             <span class="dataplane-title mdl-layout-title">
                 <img class="dataplane-logo-image" src="../assets/images/ui_logo.svg">
@@ -27,7 +27,7 @@
         </div>
     </div>
 
-    <div class="dataplane-drawer mdl-layout__drawer" reload>
+    <div class="dataplane-drawer mdl-layout__drawer" reload style="display: none;">
         <span *ngIf="isLoggedIn()" class="mdl-layout-title vw-logo-image">
             <img src="/assets/images/hortonia.png">
         </span>
