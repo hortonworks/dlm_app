@@ -17,7 +17,6 @@ pushd ../services/atlas/service
 sbt publishLocal
 popd
 pushd ../services/db-service
-sbt publishLocal
 sbt dist
 unzip `find ./target/universal -maxdepth 1 -type f -name *.zip|head -1` -d build/tmp_dp-db-service
 cp -R `ls -d build/tmp_dp-db-service/*/|head -n 1` build/dp-db-service
