@@ -1,7 +1,6 @@
 import {Component} from '@angular/core';
 import { AuthenticationService } from '../services/authentication.service';
 import { Router } from '@angular/router';
-import {Credential} from '../models/credential';
 
 
 @Component({
@@ -15,7 +14,7 @@ export class LogoutComponent {
     private router: Router
   ) {
     this.authenticationService.signOut();
-    this.router.navigate(['login']);
+    this.router.navigate(['sign-in']);
   }
 
 }

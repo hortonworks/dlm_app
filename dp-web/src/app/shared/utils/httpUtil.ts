@@ -17,7 +17,7 @@ export class HttpUtil {
   public static handleError(error: any) {
     if (error.status === 401) {
       localStorage.removeItem('dp_auth_token');
-      window.location.replace(window.location.origin + '/login#SESSEXPIRED');
+      window.location.replace(window.location.origin + '/sign-in#SESSEXPIRED');
       return Observable.throw(error);
     }
 

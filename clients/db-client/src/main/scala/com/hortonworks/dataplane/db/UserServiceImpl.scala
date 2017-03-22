@@ -66,8 +66,7 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
-  override def getUserRoles(
-      userName: String): Future[Either[Errors, UserRoles]] = {
+  override def getUserRoles(userName: String): Future[Either[Errors, UserRoles]] = {
     ws.url(s"$url/user-role/user/$userName")
       .withHeaders("Accept" -> "application/json")
       .get()

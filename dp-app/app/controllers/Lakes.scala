@@ -32,7 +32,7 @@ class Lakes @Inject()(@Named("lakeService") val lakeService: LakeService)
   def create = Authenticated.async(parse.json) { request =>
     Logger.info("Received create data centre request")
     request.body.validate[Datalake].map { lake =>
-      lakeService.create(lake)
+      lakeService.create(lake.copy(createdBy = request.user.id))
         .map {
           lake => lake match {
             case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))

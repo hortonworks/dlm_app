@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { LoginComponent } from '../login/login.component';
+import { SignInComponent } from './sign-in/sign-in.component';
 import { LogoutComponent } from '../logout/logout.component';
 
 import { AlreadyLoggedInGuard, LoggedInGuard } from '../shared/utils/login-guard';
@@ -15,8 +16,8 @@ export const routes: Routes = [{
     component: LoginComponent,
     canActivate:[ AlreadyLoggedInGuard ]
   },{
-    path: 'login',
-    component: LoginComponent,
+    path: 'sign-in',
+    component: SignInComponent,
     canActivate:[ AlreadyLoggedInGuard ]
   },{
     path: 'logout',

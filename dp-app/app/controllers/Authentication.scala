@@ -23,7 +23,7 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
     request.body
       .validate[Credential]
       .map { credential =>
-        val username = credential.id
+        val username = credential.username
         val password = credential.password
         for {
           userOp <- userService.loadUser(username)

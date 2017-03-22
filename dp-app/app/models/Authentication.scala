@@ -1,6 +1,6 @@
 package models
 
-case class Credential(id: String, password: String)
+case class Credential(username: String, password: String)
 
 object JsonFormats {
 
