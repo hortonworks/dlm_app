@@ -6,8 +6,8 @@ import play.api.libs.json.{JsValue, Json}
 
 object Entities {
 
-  case class Error(code:String,message:String)
-  case class Errors(errors:Seq[Error]= Seq())
+  case class Error(code: String, message: String)
+  case class Errors(errors: Seq[Error] = Seq())
 
   // Pagination
   case class Pagination(page: Int, offset: Long, limit: Long)
@@ -72,9 +72,7 @@ object Entities {
       id: Option[Long] = None,
       name: String,
       description: String,
-      fqdn: Option[String] = None,
-      ipaddr: Option[String] = None,
-      port: Option[Int] = None,
+      ambariUrl: Option[String] = None,
       ambariuser: Option[String] = None,
       ambaripass: Option[String] = None,
       secured: Option[Boolean] = Some(false),
@@ -111,19 +109,19 @@ object Entities {
   )
 
   case class Workspace(
-                        id: Option[Long] = None,
-                        name :String,
-                        description:String,
-                        createdBy:Long,
-                        created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-                        updated: Option[LocalDateTime] = Some(LocalDateTime.now())
-                      )
+      id: Option[Long] = None,
+      name: String,
+      description: String,
+      createdBy: Long,
+      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+      updated: Option[LocalDateTime] = Some(LocalDateTime.now())
+  )
 
   case class AssetWorkspace(
-                           assetType:String,
-                           assetId:Long,
-                           workspaceId:Long
-                           )
+      assetType: String,
+      assetId: Long,
+      workspaceId: Long
+  )
 
   case class EnabledSku(
       skuId: Long,
@@ -165,12 +163,11 @@ object Entities {
 object JsonFormatters {
   import com.hortonworks.dataplane.commons.domain.Entities._
 
-  implicit val errorWrites=Json.writes[Error]
-  implicit val errorReads=Json.reads[Error]
+  implicit val errorWrites = Json.writes[Error]
+  implicit val errorReads = Json.reads[Error]
 
-
-  implicit val errorsWrites=Json.writes[Errors]
-  implicit val errorsReads=Json.reads[Errors]
+  implicit val errorsWrites = Json.writes[Errors]
+  implicit val errorsReads = Json.reads[Errors]
 
   implicit val userWrites = Json.writes[User]
   implicit val userReads = Json.reads[User]
@@ -207,7 +204,6 @@ object JsonFormatters {
 
   implicit val clusterServiceWrites = Json.writes[ClusterService]
   implicit val clusterServiceReads = Json.reads[ClusterService]
-
 
   implicit val workspaceWrites = Json.writes[Workspace]
   implicit val workspaceReads = Json.reads[Workspace]

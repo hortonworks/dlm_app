@@ -44,11 +44,7 @@ class ClusterRepo @Inject()(
 
     def description = column[String]("description")
 
-    def fqdn = column[Option[String]]("fqdn")
-
-    def ipaddr = column[Option[String]]("ipaddr")
-
-    def port = column[Option[Int]]("port")
+    def ambariurl = column[Option[String]]("ambariurl")
 
     def ambariuser = column[Option[String]]("ambariuser")
 
@@ -71,9 +67,7 @@ class ClusterRepo @Inject()(
       (id,
        name,
        description,
-       fqdn,
-       ipaddr,
-       port,
+       ambariurl,
        ambariuser,
        ambaripass,
        secured,
