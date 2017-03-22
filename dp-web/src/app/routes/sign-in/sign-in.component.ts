@@ -1,15 +1,47 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+
+import { Credential } from '../../models/credential';
+import { AuthenticationService } from '../../services/authentication.service';
+import { BreadcrumbService } from '../../services/breadcrumb.service';
+import { Environment } from '../../environment';
+import { Persona } from '../../shared/utils/persona';
 
 @Component({
   selector: 'dp-sign-in',
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.scss']
 })
-export class SignInComponent implements OnInit {
+export class SignInComponent {
 
-  constructor() { }
+  statusMessage: string = '';
+  submitted: boolean = false;
+  credential: Credential = new Credential('','');
 
-  ngOnInit() {
+  constructor(
+    private authenticaionService: AuthenticationService,
+    private router: Router,
+    private environment: Environment,
+    private breadcrumbService: BreadcrumbService
+  ) {
+    if (window.location.hash.length > 0 && window.location.hash === '#SESSEXPIRED') {
+      this.statusMessage = 'SESSIONEXPIRED';
+    }
+  }
+
+  onSubmit() {
+    this.submitted = true;
+    this.breadcrumbService.crumbMap = [];
+    this.authenticaionService
+      .signIn(this.credential)
+      .subscribe(
+        user => {
+          const persona = Persona[user.roles[0]];
+          this.environment.persona = persona;
+          this.router.navigate(['dashboard']);
+        },
+        error => this.router.navigate(['sign-in'])
+      );
   }
 
 }
