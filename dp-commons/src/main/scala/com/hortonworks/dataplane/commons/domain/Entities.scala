@@ -141,6 +141,25 @@ object Entities {
                  created: Option[LocalDateTime] = Some(LocalDateTime.now()),
                  updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
+  case class ClusterHost(id: Option[Long] = None,
+                          host:String,
+                          status:String,
+                          properties: Option[JsValue] = None,
+                          clusterId:Long
+                         )
+
+  case class ClusterHealth(id: Option[Long] = None,
+                           status:String,
+                           state:String,
+                           uptime:Option[Long],
+                           started:Option[LocalDateTime],
+                           clusterId:Long
+                          )
+
+  case class ClusterProperties(id: Option[Long] = None,
+                               properties: Option[JsValue] = None,
+                               clusterId:Long
+                              )
 }
 
 object JsonFormatters {
@@ -198,5 +217,12 @@ object JsonFormatters {
 
   implicit val assetWorkspaceWrites = Json.writes[AssetWorkspace]
   implicit val assetWorkspaceReads = Json.reads[AssetWorkspace]
+
+  implicit val clusterHostWrites = Json.writes[ClusterHost]
+  implicit val clusterHostReads = Json.reads[ClusterHost]
+  implicit val clusterHealthWrites = Json.writes[ClusterHealth]
+  implicit val clusterHealthReads = Json.reads[ClusterHealth]
+  implicit val clusterPropertiesWrites = Json.writes[ClusterProperties]
+  implicit val clusterPropertiesReads = Json.reads[ClusterProperties]
 
 }
