@@ -2,6 +2,6 @@ package com.hortonworks.dataplane
 
 import akka.actor.ActorSystem
 
-object ApplicationMain extends App {
+object ClusterService extends App {
   println("Hello cluster")
 }
