@@ -1,4 +1,4 @@
-# Dataplane (Proof of concept)
+# Dataplane
 
 # Standalone setup
 
@@ -6,68 +6,34 @@
 
 * git
 * JDK 8
-* SBT. To get SBT on Linux, you can do
+* SBT 0.13.1 or above. To get SBT on Linux, you can do
   * `curl https://bintray.com/sbt/rpm/rpm | sudo tee /etc/yum.repos.d/bintray-sbt-rpm.repo`
   * `sudo yum install sbt`
-* Mongo 3.x. To get Mongo on Linux, you can follow the instructions here: https://docs.mongodb.com/v3.2/tutorial/install-mongodb-on-red-hat/
+* Nodejs 6.10.0 or above. To get Nodejs on Linux, you can follow instructions here: https://nodejs.org/en/download/package-manager/#enterprise-linux-and-fedora
+* docker-machine (tested with 0.7.0), docker (tested with 1.8.0), docker-compose (tested with 1.7.1)
 
-## Build and Setup
-
-* `git clone https://github.com/hortonworks/dataplane`
-* In folder dp-app `sh ./build-deps.sh`
-* `sbt universal:packageZipTarball` - This will generate a tarball in the folder `target/universal/data_plane-0.1-alpha.tgz`
-* Setup Mongo:
-  * `use data_plane`
-  * `db.createUser({user: "dp_admin", pwd: "dp_admin_password", roles: ["readWrite", "dbAdmin"]})`
-
-## Run
-
-* Untar the tarball generated above into some directory
-* `cd bin`
-* `./dataplane`
-* Browse `http://host:9000/`
-* Note: For every cluster you add to dataplane, you need to make sure Ambari and Atlas services are reachable by host names from the data plane control plane server.
-* Note: `http_proxy` environment variable should not be set. If set, unset with `unset http_proxy` on the shell from where you are running `sbt run`
-
-# Docker Image Build
-
-## Requirements
-
-* System: Any
-* JDK 8
-* SBT >= 0.13.13. To get SBT on Linux, you can do
-  * `curl https://bintray.com/sbt/rpm/rpm | sudo tee /etc/yum.repos.d/bintray-sbt-rpm.repo`
-  * `sudo yum install sbt`
-* NodeJS >= 7.0.0
-* `docker` & `docker-compose`
-  * The easiest way to setup docker and docker-compose on Windows / Mac is to install docker-toolbox, which is available at https://www.docker.com/products/docker-toolbox.
-  * On GNU / Linux, you can use corresponding package managers to get and install them. Instruction for `yum` and `systemd` based distributions are as follows:
-    * `yum install docker`
-    * `systemctl start docker`
-  * Docker-compose. To get Docker-compose on Linux, you can follow the instructions here: https://gist.github.com/daspecster/f612a10f2efa3c53eee3a0cd275df5b6
-
-## Build and Setup
+## Build
 
 * `git clone https://github.com/hortonworks/dataplane`
-* In root, execute `sh build.sh`
+* In folder dp-build `sh ./build.sh`. First time build could take sometime as all Scala dependencies are downloaded and cached.
 
-## Run
+## Setup
 
-* In folder root, `docker-compose up`
-* Verify 2 docker containers are running, something like
-```
-CONTAINER ID        IMAGE                  COMMAND                  CREATED             STATUS              PORTS                    NAMES
-2a15671be76c        hortonworks/data-plane "runsvdir /etc/sv"       About an hour ago   Up 4 minutes        0.0.0.0:80->80/tcp       webapp_web_1
-acb24854b46a        mongo                  "/entrypoint.sh mongo"   About an hour ago   Up 4 minutes        27017/tcp                webapp_dp_db_1
-```
-* Browse `http://host:80/`
-* Note: For every cluster you add to dataplane, you need to make sure Ambari and Atlas services are reachable by host names from the data plane control plane container (called `webapp_web_1`). Also, unfortunately, for now, you need to re-add these everytime you bring down and bring up the containers.
-  * Typically I do the above, by running the bash shell on the webapp container like this:
-`docker exec -u 0 -it 2a15671be76c bash`
-  * Then add the lines to the /etc/hosts file: `echo "172.22.85.12    hyamijala-dp-fenton-dev-1.openstacklocal    hyamijala-dp-fenton-dev-1" >> /etc/hosts`
-
-## BDR
-
-* Ambari cluster running BDR needs to be started with 'views.http.x-frame-options' in ambari.properties set to 'ALLOWALL'.
-* Presently it is hard coded to @Peeyush's server which is at http://172.22.120.184:8080/views/BEACON/1.0.0/BEACON/.
-* To ensure that the user is logged in, before demo, users need to login at http://172.22.120.184:8080 using credentials admin:admin.
+* We can use docker to bring up the application without requiring to install other runtime dependencies like Postgres, NGinx etc. Follow these steps to bring up the docker containers.
+* A utility script has been provided in the dp-build folder called `dpdeploy.sh` to help with this. This wraps around docker-compose commands and aims to provide a simpler interface.
+* There is a certain sequence to follow to bring up the application, as detailed below. All commands need to be executed from the dp-build folder.
+* For a fresh setup:
+  * Initialize the Postgres database: `./dpdeploy.sh initdb`
+  * Then, run the DB migrations: `./dpdeploy.sh migrate`. This sets up the database schema using the Flyway migration tool (https://flywaydb.org/)
+  * You can wait until this is complete by checking the status using `./dpdeploy.sh ps`. The migrate container with a name like `dpbuild_dp-migrate_1` will go to exited state. 
+  * You can verify the status of migrations by executing the following steps:
+    * `docker exec -it dpbuild_dp-database_1 psql -U dp_admin -W -h dp-database dataplane`
+    * Enter `dp_admin` as the password
+    * `select * from schema_version;` This should show some migrations.
+  * Build the containers for the application: `./dpdeploy.sh build`
+  * Initialize the application: `./dpdeploy.sh up`
+* For an existing setup:
+  * Stop the application: `./dpdeploy.sh stop`
+  * Start the application: `./dpdeploy.sh start`
+* Anytime, you can check the status of the containers with: `./dpdeploy.sh ps`
+* To completely destroy and start over do: `./dpdeploy.sh destroy`
