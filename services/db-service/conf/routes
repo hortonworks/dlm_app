@@ -26,7 +26,7 @@ GET           /permissions/user/:username                          controllers.P
 
 
 #Locations
-GET           /locations                                           controllers.Datalakes.getLocations
+GET           /locations                                           controllers.Datalakes.getLocations(query: Option[String])
 GET           /locations/:locationId                               controllers.Datalakes.loadLocation(locationId:Long)
 DELETE        /locations/:locationId                               controllers.Datalakes.deleteLocation(locationId:Long)
 POST          /locations                                           controllers.Datalakes.addLocation

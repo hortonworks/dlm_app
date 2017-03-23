@@ -33,7 +33,7 @@ class Datalakes @Inject()(dataLakeRepo: DataLakeRepo)(
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def getLocations = Action.async {
+  def getLocations(query: Option[String]) = Action.async {
     dataLakeRepo.getLocations.map(success(_)).recoverWith(apiError)
   }
 
