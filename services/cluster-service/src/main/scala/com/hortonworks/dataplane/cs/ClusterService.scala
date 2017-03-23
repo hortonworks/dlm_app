@@ -1,6 +1,4 @@
-package com.hortonworks.dataplane
-
-import akka.actor.ActorSystem
+package com.hortonworks.dataplane.cs
 
 object ClusterService extends App {
   println("Hello cluster")
