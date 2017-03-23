@@ -4,12 +4,10 @@
 
 #Users API
 
-GET           /users                                               controllers.Users.all
+GET           /users                                               controllers.Users.all(usernameOption: Option[String])
 POST          /users                                               controllers.Users.insert
 GET           /users/:userId                                       controllers.Users.load(userId:Long)
 DELETE        /users/:userId                                       controllers.Users.delete(userId:Long)
-
-GET           /user/:username                                     controllers.Users.get(username)
 
 
 #Roles API

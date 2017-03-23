@@ -20,7 +20,7 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   override def loadUser(username: String): Future[Either[Errors, User]] = {
-    ws.url(s"$url/user/$username")
+    ws.url(s"$url/users?username=$username")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map { res =>
@@ -30,8 +30,7 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
 
   private def mapToUser(res: WSResponse) = {
     res.status match {
-      case 200 =>
-        extractEntity[User](res, r => (r.json \ "results").validate[User])
+      case 200 => extractEntity[User](res, r => (r.json \ "results")(0).validate[User])
       case _ => mapErrors(res)
     }
   }

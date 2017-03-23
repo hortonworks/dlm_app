@@ -16,17 +16,15 @@ class Users @Inject()(userRepo: UserRepo)(implicit exec: ExecutionContext)
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  def all = Action.async {
-    userRepo.all.map(users => success(users)).recoverWith(apiError)
-  }
+  def all(usernameOption: Option[String]) = Action.async {
+    usernameOption match {
+      case Some(username) =>
+        userRepo.findByName(username).map { uo =>
+          uo.map(u => success(u)).getOrElse(notFound)
+        }.recoverWith(apiError)
+      case None => userRepo.all.map(users => success(users)).recoverWith(apiError)
+    }
 
-  def get(username: String) = Action.async {
-    userRepo.findByName(username).map { uo =>
-      uo.map { u =>
-          success(u)
-        }
-        .getOrElse(notFound)
-    }.recoverWith(apiError)
   }
 
   def load(userId:Long) = Action.async {
