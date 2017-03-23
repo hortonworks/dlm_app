@@ -56,8 +56,11 @@ class DataLakeRepo @Inject()(
     Locations returning Locations += location
   }
 
-  def getLocations: Future[List[Location]] = db.run {
-    Locations.to[List].result
+  def getLocations(query: Option[String]): Future[List[Location]] = db.run {
+    query match {
+      case Some(query) => Locations.filter(_.city.toLowerCase.startsWith(query.toLowerCase)).take(20).to[List].result
+      case None => Locations.to[List].result
+    }
   }
 
   private class LocationsTable(tag: Tag)
