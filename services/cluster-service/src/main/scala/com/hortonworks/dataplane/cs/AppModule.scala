@@ -1,4 +1,4 @@
-package com.hortonworks.dataplane
+package com.hortonworks.dataplane.cs
 
 import com.google.inject.AbstractModule
 

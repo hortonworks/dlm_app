@@ -1,4 +1,5 @@
 name := """rest-mock"""
+organization :="com.hortonworks.dataplane"
 
 version := "1.0"
 

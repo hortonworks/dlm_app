@@ -4,109 +4,137 @@
 
 #Users API
 
-GET           /users                                               controllers.Users.all(usernameOption: Option[String])
-POST          /users                                               controllers.Users.insert
-GET           /users/:userId                                       controllers.Users.load(userId:Long)
-DELETE        /users/:userId                                       controllers.Users.delete(userId:Long)
-
+GET           /users                                                         controllers.Users.all(usernameOption: Option[String])
+POST          /users                                                         controllers.Users.insert
+GET           /users/:userId                                                 controllers.Users.load(userId:Long)
+DELETE        /users/:userId                                                 controllers.Users.delete(userId:Long)
 
 #Roles API
-GET           /roles                                               controllers.Roles.all
-GET           /roles/:roleId                                       controllers.Roles.load(roleId:Long)
-POST          /roles                                               controllers.Roles.add
-POST          /user-role                                           controllers.Roles.addUserRole
-GET           /user-role/user/:username                            controllers.Roles.getRolesForUser(username)
+GET           /roles                                                         controllers.Roles.all
+GET           /roles/:roleId                                                 controllers.Roles.load(roleId:Long)
+POST          /roles                                                         controllers.Roles.add
+POST          /user-role                                                     controllers.Roles.addUserRole
+GET           /user-role/user/:username                                      controllers.Roles.getRolesForUser(username)
 
 #Permissions API
-
-GET           /permissions                                         controllers.Permissions.all
-POST          /permissions                                         controllers.Permissions.add
-GET           /permissions/user/:username                          controllers.Permissions.userPermissions(username)
-
-
+GET           /permissions                                                   controllers.Permissions.all
+POST          /permissions                                                   controllers.Permissions.add
+GET           /permissions/user/:username                                    controllers.Permissions.userPermissions(username)
 
 #Locations
-GET           /locations                                           controllers.Datalakes.getLocations(query: Option[String])
-GET           /locations/:locationId                               controllers.Datalakes.loadLocation(locationId:Long)
-DELETE        /locations/:locationId                               controllers.Datalakes.deleteLocation(locationId:Long)
-POST          /locations                                           controllers.Datalakes.addLocation
-
+GET           /locations                                                     controllers.Datalakes.getLocations(query: Option[String])
+GET           /locations/:locationId                                         controllers.Datalakes.loadLocation(locationId:Long)
+DELETE        /locations/:locationId                                         controllers.Datalakes.deleteLocation(locationId:Long)
+POST          /locations                                                     controllers.Datalakes.addLocation
 
 #Datalakes API
-GET           /datalakes                                           controllers.Datalakes.all
-POST          /datalakes                                           controllers.Datalakes.add
-GET           /datalakes/:datalakeId                               controllers.Datalakes.load(datalakeId:Long)
-DELETE        /datalakes/:datalakeId                               controllers.Datalakes.delete(datalakeId:Long)
+GET           /datalakes                                                     controllers.Datalakes.all
+POST          /datalakes                                                     controllers.Datalakes.add
+GET           /datalakes/:datalakeId                                         controllers.Datalakes.load(datalakeId:Long)
+DELETE        /datalakes/:datalakeId                                         controllers.Datalakes.delete(datalakeId:Long)
 
 #Clusters API
-GET           /clusters                                            controllers.Clusters.all(datalakeIdOption: Option[String], userIdOption: Option[String])
-POST          /clusters                                            controllers.Clusters.add
-GET           /clusters/:clusterId                                 controllers.Clusters.load(clusterId:Long)
-DELETE        /clusters/:clusterId                                 controllers.Clusters.delete(clusterId:Long)
+GET           /clusters                                                      controllers.Clusters.all(datalakeIdOption: Option[String], userIdOption: Option[String])
+POST          /clusters                                                      controllers.Clusters.add
+GET           /clusters/:clusterId                                           controllers.Clusters.load(clusterId:Long)
+DELETE        /clusters/:clusterId                                           controllers.Clusters.delete(clusterId:Long)
 
 #Clusters API
-GET           /cloud/clusters                                      controllers.CloudClusters.all
-POST          /cloud/clusters                                      controllers.CloudClusters.add
-GET           /cloud/clusters/:clusterId                           controllers.CloudClusters.load(clusterId:Long)
-DELETE        /cloud/clusters/:clusterId                           controllers.CloudClusters.delete(clusterId:Long)
+GET           /cloud/clusters                                                controllers.CloudClusters.all
+POST          /cloud/clusters                                                controllers.CloudClusters.add
+GET           /cloud/clusters/:clusterId                                     controllers.CloudClusters.load(clusterId:Long)
+DELETE        /cloud/clusters/:clusterId                                     controllers.CloudClusters.delete(clusterId:Long)
 
 #Cluster services API
 
-GET           /clusters/:clusterId/services                        controllers.ClusterServices.allWithCluster(clusterId:Long)
-GET           /clusters/:datalakeId/services                       controllers.ClusterServices.allWithDatalake(datalakeId:Long)
-POST          /datalakes/services                                  controllers.ClusterServices.addWithCluster(clusterId:Long)
-POST          /cluster/services                                    controllers.ClusterServices.addWithDatalake(datalakeId:Long)
-GET           /clusters/:clusterId/service/:serviceId              controllers.ClusterServices.loadWithCluster(serviceId:Long,clusterId:Long)
-GET           /datalakes/:datalakeId/service/:serviceId            controllers.ClusterServices.loadWithDatalake(serviceId:Long,datalakeId:Long)
-DELETE        /services/:serviceId                                 controllers.ClusterServices.delete(serviceId:Long)
-
+GET           /clusters/:clusterId/services                                  controllers.ClusterServices.allWithCluster(clusterId:Long)
+GET           /clusters/:datalakeId/services                                 controllers.ClusterServices.allWithDatalake(datalakeId:Long)
+POST          /datalakes/services                                            controllers.ClusterServices.addWithCluster(clusterId:Long)
+POST          /cluster/services                                              controllers.ClusterServices.addWithDatalake(datalakeId:Long)
+GET           /clusters/:clusterId/service/:serviceId                        controllers.ClusterServices.loadWithCluster(serviceId:Long,clusterId:Long)
+GET           /datalakes/:datalakeId/service/:serviceId                      controllers.ClusterServices.loadWithDatalake(serviceId:Long,datalakeId:Long)
+DELETE        /services/:serviceId                                           controllers.ClusterServices.delete(serviceId:Long)
 
 #Workspaces API
-GET           /workspaces                                          controllers.Workspaces.all
-POST          /workspaces                                          controllers.Workspaces.insert
-GET           /workspaces/:workspaceId                             controllers.Workspaces.load(workspaceId:Long)
-DELETE        /workspaces/:workspaceId                             controllers.Workspaces.delete(workspaceId:Long)
+GET           /workspaces                                                    controllers.Workspaces.all
+POST          /workspaces                                                    controllers.Workspaces.insert
+GET           /workspaces/:workspaceId                                       controllers.Workspaces.load(workspaceId:Long)
+DELETE        /workspaces/:workspaceId                                       controllers.Workspaces.delete(workspaceId:Long)
 
 
 #Asset workspace API
 #Get assets for workspace
-GET           /assets/workspace/:workspaceId                       controllers.AssetWorkspaces.assetsforWorkspace(workspaceId:Long)
-POST          /assets/workspace                                    controllers.AssetWorkspaces.add
+GET           /assets/workspace/:workspaceId                                 controllers.AssetWorkspaces.assetsforWorkspace(workspaceId:Long)
+POST          /assets/workspace                                              controllers.AssetWorkspaces.add
 
 
 
 #Categories
-GET           /categories                                          controllers.Categories.all
-POST          /categories                                          controllers.Categories.insert
-GET           /categories/:categoryId                              controllers.Categories.load(categoryId:Long)
-DELETE        /categories/:categoryId                              controllers.Categories.delete(categoryId:Long)
+GET           /categories                                                    controllers.Categories.all
+POST          /categories                                                    controllers.Categories.insert
+GET           /categories/:categoryId                                        controllers.Categories.load(categoryId:Long)
+DELETE        /categories/:categoryId                                        controllers.Categories.delete(categoryId:Long)
 
 #Skus API
-GET           /skus                                                controllers.Skus.all
-POST          /skus                                                controllers.Skus.insert
-GET           /skus/:skuId                                         controllers.Skus.load(skuId: Long)
-DELETE        /skus/:skuId                                         controllers.Skus.delete(skuId: Long)
+GET           /skus                                                          controllers.Skus.all
+POST          /skus                                                          controllers.Skus.insert
+GET           /skus/:skuId                                                   controllers.Skus.load(skuId: Long)
+DELETE        /skus/:skuId                                                   controllers.Skus.delete(skuId: Long)
 
 #EnabledSkus API
-GET           /enabledskus                                         controllers.EnabledSkus.all
-POST          /enabledskus                                         controllers.EnabledSkus.insert
-GET           /enabledskus/:skuId                                  controllers.EnabledSkus.load(skuId: Long)
-DELETE        /enabledskus/:skuId                                  controllers.EnabledSkus.delete(skuId: Long)
+GET           /enabledskus                                                   controllers.EnabledSkus.all
+POST          /enabledskus                                                   controllers.EnabledSkus.insert
+GET           /enabledskus/:skuId                                            controllers.EnabledSkus.load(skuId: Long)
+DELETE        /enabledskus/:skuId                                            controllers.EnabledSkus.delete(skuId: Long)
 
 #ClusterHosts API
-GET           /clusters/:clusterId/hosts                           controllers.ClusterHosts.allWithCluster(clusterId:Long)
-POST          /clusters/hosts                                      controllers.ClusterHosts.add
-GET           /clusters/:clusterId/hosts/:hostId                   controllers.ClusterHosts.loadWithCluster(clusterId: Long, hostId:Long)
-DELETE        /clusters/:clusterId/hosts/:hostId                   controllers.ClusterHosts.delete(clusterId: Long, hostId:Long)
+GET           /clusters/:clusterId/hosts                                     controllers.ClusterHosts.allWithCluster(clusterId:Long)
+POST          /clusters/hosts                                                controllers.ClusterHosts.add
+GET           /clusters/:clusterId/hosts/:hostId                             controllers.ClusterHosts.loadWithCluster(clusterId: Long, hostId:Long)
+DELETE        /clusters/:clusterId/hosts/:hostId                             controllers.ClusterHosts.delete(clusterId: Long, hostId:Long)
 
 #ClusterHealths API
-GET           /clusters/:clusterId/health                          controllers.ClusterHealths.allWithCluster(clusterId:Long)
-POST          /clusters/health                                     controllers.ClusterHealths.add
-GET           /clusters/:clusterId/health/:healthId                controllers.ClusterHealths.loadWithCluster(clusterId: Long, healthId:Long)
-DELETE        /clusters/:clusterId/health/:healthId                controllers.ClusterHealths.delete(clusterId: Long, healthId:Long)
+GET           /clusters/:clusterId/health                                    controllers.ClusterHealths.allWithCluster(clusterId:Long)
+POST          /clusters/health                                               controllers.ClusterHealths.add
+GET           /clusters/:clusterId/health/:healthId                          controllers.ClusterHealths.loadWithCluster(clusterId: Long, healthId:Long)
+DELETE        /clusters/:clusterId/health/:healthId                          controllers.ClusterHealths.delete(clusterId: Long, healthId:Long)
 
 #ClusterProperties API
-GET           /clusters/:clusterId/properties                      controllers.ClusterProps.allWithCluster(clusterId:Long)
-POST          /clusters/properties                                 controllers.ClusterProps.add
-GET           /clusters/:clusterId/properties/:propertiesId        controllers.ClusterProps.loadWithCluster(clusterId: Long, propertiesId:Long)
-DELETE        /clusters/:clusterId/properties/:propertiesId        controllers.ClusterProps.delete(clusterId: Long, propertiesId:Long)
+GET           /clusters/:clusterId/properties                                controllers.ClusterProps.allWithCluster(clusterId:Long)
+POST          /clusters/properties                                           controllers.ClusterProps.add
+GET           /clusters/:clusterId/properties/:propertiesId                  controllers.ClusterProps.loadWithCluster(clusterId: Long, propertiesId:Long)
+DELETE        /clusters/:clusterId/properties/:propertiesId                  controllers.ClusterProps.delete(clusterId: Long, propertiesId:Long)
+
+#Dataset API
+GET           /datasets                                                      controllers.Datasets.all
+POST          /datasets                                                      controllers.Datasets.add
+GET           /datasets/:datasetId                                           controllers.Datasets.load(datasetId:Long)
+DELETE        /datasets/:datasetId                                           controllers.Datasets.delete(datasetId:Long)
+
+#DatasetCategory Api
+GET           /datasets/:datasetId/categories                                controllers.DatasetCategories.allWithDatasetId(datasetId:Long)
+GET           /categories/:categoryId/datasets                               controllers.DatasetCategories.allWithCategoryId(categoryId:Long)
+POST          /datasets/categories                                           controllers.DatasetCategories.add
+DELETE        /datasets/:datasetId/categories/:categoryId                    controllers.DatasetCategories.delete(datasetId:Long, categoryId:Long)
+
+#UnclassifiedDataset API
+GET           /datasets                                                      controllers.Datasets.all
+POST          /datasets                                                      controllers.Datasets.add
+GET           /datasets/:datasetId                                           controllers.Datasets.load(datasetId:Long)
+DELETE        /datasets/:datasetId                                           controllers.Datasets.delete(datasetId:Long)
+
+#UnclassifiedDatasetCategory Api
+GET           /unclassifieddatasets/:datasetId/categories                    controllers.UnclassifiedDatasetCategories.allWithDatasetId(datasetId:Long)
+GET           /categories/:categoryId/datasets                               controllers.UnclassifiedDatasetCategories.allWithCategoryId(categoryId:Long)
+POST          /unclassifieddatasets/categories                               controllers.UnclassifiedDatasetCategories.add
+DELETE        /unclassifieddatasets/:datasetId/categories/:categoryId        controllers.UnclassifiedDatasetCategories.delete(datasetId:Long, categoryId:Long)
+
+#Dataset Details API
+GET           /datasets/:datasetId/details                                   controllers.DatasetDetailsCtrl.allWithDatasetId(datasetId:Long)
+POST          /datasets/details                                              controllers.DatasetDetailsCtrl.add
+DELETE        /datasets/details/:id                                          controllers.DatasetDetailsCtrl.delete(id:Long)
+
+#Data Asset Api
+GET           /dataassets/:datasetId                                         controllers.DataAssets.allWithDatasetId(datasetId:Long)
+POST          /dataassets                                                    controllers.DataAssets.add
+DELETE        /dataassets/:id                                                controllers.DataAssets.delete(id:Long)
