@@ -15,8 +15,8 @@ class Clusters @Inject()(clusterRepo: ClusterRepo)(implicit exec: ExecutionConte
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  def all = Action.async {
-    clusterRepo.all.map(clusters => success(clusters.map(c=>linkData(c,makeLink(c))))).recoverWith(apiError)
+  def all(datalakeIdOption: Option[String], userIdOption: Option[String]) = Action.async {
+    clusterRepo.all(datalakeIdOption, userIdOption).map(clusters => success(clusters.map(c=>linkData(c,makeLink(c))))).recoverWith(apiError)
   }
 
 

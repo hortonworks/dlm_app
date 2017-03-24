@@ -17,7 +17,7 @@ class ClusterRepo @Inject()(
 
   val Clusters = TableQuery[ClustersTable]
 
-  def all(): Future[List[Cluster]] = db.run {
+  def all(datalakeIdOption: Option[String], userIdOption: Option[String]): Future[List[Cluster]] = db.run {
     Clusters.to[List].result
   }
 

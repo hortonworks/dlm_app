@@ -39,7 +39,7 @@ GET           /datalakes/:datalakeId                               controllers.D
 DELETE        /datalakes/:datalakeId                               controllers.Datalakes.delete(datalakeId:Long)
 
 #Clusters API
-GET           /clusters                                            controllers.Clusters.all
+GET           /clusters                                            controllers.Clusters.all(datalakeIdOption: Option[String], userIdOption: Option[String])
 POST          /clusters                                            controllers.Clusters.add
 GET           /clusters/:clusterId                                 controllers.Clusters.load(clusterId:Long)
 DELETE        /clusters/:clusterId                                 controllers.Clusters.delete(clusterId:Long)
@@ -59,13 +59,6 @@ POST          /cluster/services                                    controllers.C
 GET           /clusters/:clusterId/service/:serviceId              controllers.ClusterServices.loadWithCluster(serviceId:Long,clusterId:Long)
 GET           /datalakes/:datalakeId/service/:serviceId            controllers.ClusterServices.loadWithDatalake(serviceId:Long,datalakeId:Long)
 DELETE        /services/:serviceId                                 controllers.ClusterServices.delete(serviceId:Long)
-
-
-#Clusters API
-GET           /clusters                                            controllers.Clusters.all
-POST          /clusters                                            controllers.Clusters.add
-GET           /clusters/:clusterId                                 controllers.Clusters.load(clusterId:Long)
-DELETE        /clusters/:clusterId                                 controllers.Clusters.delete(clusterId:Long)
 
 
 #Workspaces API
