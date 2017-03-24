@@ -238,12 +238,3 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_configs (
   active BOOLEAN DEFAULT TRUE NOT NULL,
   export BOOLEAN DEFAULT FALSE NOT NULL
 );
-
-
-
-
--- CREATE USER dp_admin WITH PASSWORD 'dp_admin';
--- GRANT ALL PRIVILEGES ON SCHEMA dataplane TO dp_admin;
--- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA dataplane TO dp_admin;
--- GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA dataplane TO dp_admin;
--- ALTER DATABASE dataplane SET search_path = dataplane;
