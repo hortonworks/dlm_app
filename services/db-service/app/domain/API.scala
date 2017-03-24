@@ -8,5 +8,6 @@ object API {
   val locations = "/locations"
   val datalakes = "/datalakes"
   val clusters = "/clusters"
+  val datasets = "/datasets"
 
 }

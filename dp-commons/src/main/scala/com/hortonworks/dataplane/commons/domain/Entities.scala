@@ -158,6 +158,50 @@ object Entities {
                                properties: Option[JsValue] = None,
                                clusterId:Long
                               )
+
+  case class Dataset(id:Option[Long] = None,
+                     name:String,
+                     description:Option[String],
+                     datalakeId:Long,
+                     createdBy:Long,
+                     createdOn:Option[LocalDateTime] = Some(LocalDateTime.now()),
+                     lastmodified:Option[LocalDateTime] = Some(LocalDateTime.now()),
+                     version:Int = 1,
+                     customprops: Option[JsValue] = None
+                    )
+
+  case class DatasetCategory(categoryId:Long,
+                             datasetId:Long
+                            )
+
+  case class UnclassifiedDataset(id:Option[Long],
+                                 name:String,
+                                 description:Option[String],
+                                 datalakeId:Long,
+                                 createdBy:Long,
+                                 createdOn:Option[LocalDateTime] = Some(LocalDateTime.now()),
+                                 lastmodified:Option[LocalDateTime] = Some(LocalDateTime.now()),
+                                 customprops: Option[JsValue] = None
+                                 )
+
+  case class UnclassifiedDatasetCategory(categoryId:Long,
+                                         unclassifiedDatasetId:Long
+                                        )
+
+  case class DataAsset(id:Option[Long],
+                       assetType:String,
+                       assetName:String,
+                       assetDetails:String,
+                       assetUrl:String,
+                       assetProperties:JsValue,
+                       datasetId:Long
+                      )
+
+  case class DatasetDetails(id:Option[Long],
+                            details:Option[JsValue],
+                            datasetId:Long
+                           )
+
 }
 
 object JsonFormatters {
@@ -220,5 +264,23 @@ object JsonFormatters {
   implicit val clusterHealthReads = Json.reads[ClusterHealth]
   implicit val clusterPropertiesWrites = Json.writes[ClusterProperties]
   implicit val clusterPropertiesReads = Json.reads[ClusterProperties]
+
+  implicit val datasetWrites = Json.writes[Dataset]
+  implicit val datasetReads = Json.reads[Dataset]
+
+  implicit val datasetCategoryWrites = Json.writes[DatasetCategory]
+  implicit val datasetCategoryReads = Json.reads[DatasetCategory]
+
+  implicit val unclassifiedDatasetWrites = Json.writes[UnclassifiedDataset]
+  implicit val unclassifiedDatasetReads = Json.reads[UnclassifiedDataset]
+
+  implicit val unclassifiedDatasetCategoryWrites = Json.writes[UnclassifiedDatasetCategory]
+  implicit val unclassifiedDatasetCategoryReads = Json.reads[UnclassifiedDatasetCategory]
+
+  implicit val dataAssetWrites = Json.writes[DataAsset]
+  implicit val dataAssetReads = Json.reads[DataAsset]
+
+  implicit val datasetDetailsWrites = Json.writes[DatasetDetails]
+  implicit val datasetDetailsReads = Json.reads[DatasetDetails]
 
 }

@@ -166,7 +166,7 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_dataset_categories (
   dataset_id  BIGINT REFERENCES dataplane.dp_datasets (id)   NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_unclasified_datasets (
+CREATE TABLE IF NOT EXISTS dataplane.dp_unclassified_datasets (
   id           BIGSERIAL PRIMARY KEY,
   name         VARCHAR(255)                                       NOT NULL,
   description  TEXT,
@@ -177,9 +177,9 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_unclasified_datasets (
   customprops  JSONB
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_unclasified_datasets_categories (
+CREATE TABLE IF NOT EXISTS dataplane.dp_unclassified_datasets_categories (
   category_id             BIGINT REFERENCES dataplane.dp_categories (id)           NOT NULL,
-  unclassified_dataset_id BIGINT REFERENCES dataplane.dp_unclasified_datasets (id) NOT NULL
+  unclassified_dataset_id BIGINT REFERENCES dataplane.dp_unclassified_datasets (id) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_data_asset (
