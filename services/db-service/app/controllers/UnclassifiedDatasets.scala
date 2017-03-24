@@ -34,8 +34,8 @@ class UnclassifiedDatasets @Inject()(datasetRepo: UnclassifiedDatasetRepo)(impli
     }.recoverWith(apiError)
   }
 
-  def delete(clusterId: Long) = Action.async { req =>
-    val future = datasetRepo.deleteById(clusterId)
+  def delete(datasetId: Long) = Action.async { req =>
+    val future = datasetRepo.deleteById(datasetId)
     future.map(i => success(i)).recoverWith(apiError)
   }
 
