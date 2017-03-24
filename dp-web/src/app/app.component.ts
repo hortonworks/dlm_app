@@ -4,7 +4,6 @@ import { AuthenticationService } from './services/authentication.service';
 import { Environment } from './environment';
 import { Persona } from './shared/utils/persona';
 
-declare var Datamap:any;
 declare var componentHandler:any;
 
 @Component({
