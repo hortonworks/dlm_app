@@ -59,7 +59,7 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
       .recoverWith {
         case e: Exception =>
           logger.error("Could not connect to Ambari")
-          Future.successful(AmbariConnection(status = true, url.get, None, Some(e)))
+          Future.successful(AmbariConnection(status = false, url.get, None, Some(e)))
       }
 
   }
@@ -83,14 +83,15 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
         val configsAsList = configs.as[List[JsObject]]
         val atlasConfig = configsAsList.find(obj =>
           (obj \ "type").as[String] == "application-properties")
-        if (!atlasConfig.isDefined)
+        if (atlasConfig.isEmpty)
           Left(ServiceNotFound("No properties found for Atlas"))
         val properties = (atlasConfig.get \ "properties").as[JsObject]
         val apiUrl = (properties \ "atlas.rest.address").as[String]
         val restService = Try(new URL(apiUrl))
-        if (restService.isFailure)
-          Left(new MalformedURLException(s"Cannot parse $apiUrl"))
-        Right(Atlas(restService.get, Json.stringify(configs)))
+        restService.map(url =>
+          Right(Atlas(url, Json.stringify(configs)))).getOrElse(
+          Left(new MalformedURLException(s"Cannot parse $apiUrl")))
+
       }
       .recoverWith {
         case e: Exception =>
