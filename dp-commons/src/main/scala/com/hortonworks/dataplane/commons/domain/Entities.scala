@@ -100,8 +100,8 @@ object Entities {
   case class ClusterService(
       id: Option[Long] = None,
       servicename: String,
-      servicehost: String,
-      serviceport: Int,
+      servicehost: Option[String],
+      serviceport: Option[Int],
       fullURL: Option[String] = None,
       properties: Option[JsValue] = None,
       clusterid: Option[Long] = None,

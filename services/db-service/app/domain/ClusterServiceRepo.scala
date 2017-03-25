@@ -66,9 +66,9 @@ class ClusterServiceRepo @Inject()(
 
     def servicename = column[String]("servicename")
 
-    def servicehost = column[String]("servicehost")
+    def servicehost = column[Option[String]]("servicehost")
 
-    def serviceport = column[Int]("serviceport")
+    def serviceport = column[Option[Int]]("serviceport")
 
     def fullURL = column[Option[String]]("fullURL")
 
