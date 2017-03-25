@@ -119,6 +119,27 @@ class AmbariInterfaceSpec
 
   }
 
+  it should "discover the knox properties from the cluster" in {
+    val json  = Source.fromURL(getClass.getResource("/knox.json")).mkString
+    val url = "/api/v1/clusters/test/configurations/service_config_versions"
+    when get(url) withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") withParams ("service_name"->"KNOX","is_current" ->"true") thenRespond(200,json)
+
+    implicit val ws = AhcWSClient()
+    val ambariInterface = new SimpleAmbariInterfaceImpl(
+      Cluster(name = "test",
+        description = "somedescription",
+        ambariUrl = Some("http://localhost:9999"),
+        ambariuser = Some("admin"),
+        ambaripass = Some("admin")))
+
+    val atlas  = ambariInterface.getKnoxInfo(AmbariConnection(status = true,new URL("http://localhost:9999")))
+    atlas.map { either =>
+      assert(either.isRight)
+    }
+
+  }
+
+
 
   override def afterEach = {
     server.reset

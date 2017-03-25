@@ -236,4 +236,23 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
           Future.successful(Left(e))
       }
   }
+
+  override def getKnoxInfo(ambari: AmbariConnection): Future[Either[Throwable, KnoxInfo]] = {
+    // Dump knox properties
+    val knoxApi = s"${ambari.url}/api/v1/clusters/test/configurations/service_config_versions?service_name=KNOX&is_current=true"
+    ws.url(knoxApi).withAuth(cluster.ambariuser.get,
+        cluster.ambaripass.get,
+        WSAuthScheme.BASIC)
+      .get()
+        .map(res =>
+          res.json.validate[JsValue].map { js=>
+            Right(KnoxInfo(Some(js)))
+          }.getOrElse(Left(new Exception("Could not load Knox properties")))
+        ).recoverWith {
+      case e: Exception =>
+        logger.error("Cannot get Knox information")
+        Future.successful(Left(e))
+    }
+
+  }
 }

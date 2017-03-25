@@ -23,6 +23,7 @@ private[dataplane] case class HostInformation(hostState: String, hostStatus: Str
 
 private[dataplane] case class DiskInformation(available: Option[String], device: Option[String], used: Option[String], percentage: Option[String], size: Option[String], mountpoint: Option[String])
 
+private [dataplane] case class KnoxInfo(properties:Option[JsValue])
 
 trait AmbariInterface {
 
@@ -34,5 +35,6 @@ trait AmbariInterface {
 
   def getGetHostInfo(ambari: AmbariConnection):Future[Either[Throwable, Seq[HostInformation]]]
 
+  def getKnoxInfo(ambari: AmbariConnection):Future[Either[Throwable, KnoxInfo]]
 
 }
