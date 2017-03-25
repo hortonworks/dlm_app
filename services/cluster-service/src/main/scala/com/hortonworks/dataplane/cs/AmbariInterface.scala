@@ -2,6 +2,8 @@ package com.hortonworks.dataplane.cs
 
 import java.net.URL
 
+import play.api.libs.json.JsValue
+
 import scala.concurrent.Future
 
 
@@ -15,10 +17,22 @@ private[dataplane] case class AmbariConnection(
 
 private[dataplane] case class Atlas(restService: URL,properties:String)
 
+private[dataplane] case class NameNode(startTime:Long,capacityUsed:Long,capacityRemaining:Long,usedPercentage:Double,totalFiles:Long,props:Option[JsValue])
+
+private[dataplane] case class HostInformation(hostState: String, hostStatus: String, ip: String, cpu: Option[Int], diskStats: Option[List[DiskInformation]])
+
+private[dataplane] case class DiskInformation(available: Option[String], device: Option[String], used: Option[String], percentage: Option[String], size: Option[String], mountpoint: Option[String])
+
+
 trait AmbariInterface {
 
   def ambariConnectionCheck: Future[AmbariConnection]
 
   def getAtlas(ambari: AmbariConnection): Future[Either[Throwable, Atlas]]
+
+  def getNameNodeStats(ambari: AmbariConnection):Future[Either[Throwable, NameNode]]
+
+  def getGetHostInfo(ambari: AmbariConnection):Future[Either[Throwable, Seq[HostInformation]]]
+
 
 }
