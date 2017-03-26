@@ -66,7 +66,9 @@ class LakeServiceImpl(config: Config)(implicit ws: WSClient)
       case 200 =>
         extractEntity[Seq[Datalake]](
           res,
-          r => (r.json \ "results").validate[Seq[Datalake]])
+          r => (r.json \ "results" \\ "data").map { d =>
+            d.validate[Datalake].get
+          })
       case _ => mapErrors(res)
     }
   }
@@ -75,7 +77,7 @@ class LakeServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 =>
         extractEntity[Datalake](res,
-                                r => (r.json \ "results").validate[Datalake])
+                                r => (r.json \ "results" \\ "data")(0).validate[Datalake].get)
       case _ => mapErrors(res)
     }
   }

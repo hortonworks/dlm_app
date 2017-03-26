@@ -26,14 +26,17 @@ class ClusterServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToClusters(res: WSResponse) = {
     res.status match {
       case 200 =>
-        extractEntity[Seq[Cluster]](
-          res,
-          r => (r.json \ "results").validate[Seq[Cluster]])
+        extractEntity[Seq[Cluster]](res,
+                                    r =>
+                                      (r.json \ "results" \\ "data").map { d =>
+                                        d.validate[Cluster].get
+                                    })
       case _ => mapErrors(res)
     }
   }
 
-  override def getLinkedClusters(datalakeId: Long): Future[Either[Errors, Seq[Cluster]]] = {
+  override def getLinkedClusters(
+      datalakeId: Long): Future[Either[Errors, Seq[Cluster]]] = {
     ws.url(s"$url/datalakes/$datalakeId/clusters")
       .withHeaders("Accept" -> "application/json")
       .get()

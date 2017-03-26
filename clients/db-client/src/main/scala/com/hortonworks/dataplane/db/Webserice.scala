@@ -14,17 +14,8 @@ object Webserice {
 
     protected def extractEntity[T](
         res: WSResponse,
-        f: WSResponse => JsResult[T]): Either[Errors, T] = {
-      println(res)
-      f(res)
-        .map({ r =>
-          println(r)
-          Right(r)
-        })
-
-        .getOrElse(Left(Errors(Seq(Error(
-          "500",
-          s"sCould not parse response from DB - ${Json.stringify(res.json)}")))))
+        f: WSResponse => T): Either[Errors, T] = {
+        Right(f(res))
     }
 
     protected def extractError(res: WSResponse,

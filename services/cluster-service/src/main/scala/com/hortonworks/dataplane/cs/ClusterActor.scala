@@ -1,18 +1,22 @@
 package com.hortonworks.dataplane.cs
 
 import akka.actor.Actor
+import akka.actor.Status.Failure
 import com.hortonworks.dataplane.commons.domain.Entities.Cluster
 import com.hortonworks.dataplane.commons.service.api.Poll
 import com.typesafe.scalalogging.Logger
 import play.api.libs.ws.WSClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 private sealed case class SaveAtlas(atlas: Either[Throwable, Atlas])
 private sealed case class SaveNameNode(atlas: Either[Throwable, NameNode])
 private sealed case class SaveKnox(atlas: Either[Throwable, KnoxInfo])
 private sealed case class SaveHostInfo(
     atlas: Either[Throwable, Seq[HostInformation]])
+private sealed case class HandleError(exception: Exception)
+
 
 class ClusterActor(cluster: Cluster,
                    implicit val wSClient: WSClient,
@@ -57,5 +61,9 @@ class ClusterActor(cluster: Cluster,
 
     case SaveNameNode(nameNode) =>
       logger.info("Saving ambari name node information")
+
+    case Failure(f) =>
+      logger.error(s"One of the operations resulted in a failure - ${f}")
+
   }
 }
