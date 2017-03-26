@@ -40,4 +40,35 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
+  override def getServiceByName(clusterId: Long, serviceName: String): Future[Either[Errors, ClusterService]] = {
+    ws.url(s"$url/clusters/$clusterId/service/$serviceName")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      )
+      .get
+      .map(mapToService)
+      .recoverWith {
+        case e:Exception =>
+          Future.successful(Left(Errors(Seq(Error("500",e.getMessage)))))
+      }
+  }
+
+  override def updateServiceByName(clusterData: ClusterService): Future[Either[Errors, Boolean]] = {
+    ws.url(s"$url/clusters/services")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      )
+      .put(Json.toJson(clusterData))
+      .map { res =>
+        res.status match {
+          case 200 => Right(true)
+          case x => Left(Errors(Seq(Error(x.toString,"Cannot update service"))))
+        }
+      } .recoverWith {
+      case e:Exception =>
+        Future.successful(Left(Errors(Seq(Error("500",e.getMessage)))))
+    }
+  }
 }

@@ -1,6 +1,5 @@
 CREATE SCHEMA IF NOT EXISTS dataplane;
 
-
 CREATE TABLE IF NOT EXISTS dataplane.dp_roles (
   id      BIGSERIAL PRIMARY KEY,
   name    VARCHAR(32) UNIQUE NOT NULL,
@@ -91,7 +90,7 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_services (
   servicename VARCHAR(255) NOT NULL,
   servicehost VARCHAR(255),
   serviceport INT,
-  fullURL     TEXT,
+  fullurl     TEXT,
   properties  JSONB,
   clusterid   BIGINT REFERENCES dataplane.dp_clusters (id),
   datalakeid  BIGINT REFERENCES dataplane.dp_datalakes (id),

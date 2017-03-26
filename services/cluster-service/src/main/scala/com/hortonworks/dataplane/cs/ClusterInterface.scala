@@ -8,19 +8,25 @@ import com.hortonworks.dataplane.db.Webserice.{
   ClusterService,
   LakeService
 }
+import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData}
 import com.typesafe.scalalogging.Logger
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait ClusterInterface {
+  def updateServiceByName(toPersist: ClusterData) : Future[Boolean]
 
   def getDataLakes: Future[Seq[Datalake]]
 
   def getLinkedClusters(datalake: Datalake): Future[Seq[Cluster]]
 
-  def addService(service: com.hortonworks.dataplane.commons.domain.Entities.ClusterService)
-    : Future[Option[com.hortonworks.dataplane.commons.domain.Entities.ClusterService]]
+  def serviceRegistered(cluster: Cluster, serviceName: String): Future[Boolean]
+
+  def addService(
+      service: ClusterData)
+    : Future[
+      Option[ClusterData]]
 
 }
 
@@ -69,17 +75,20 @@ class ClusterInterfaceImpl @Inject()(
       }
       .recoverWith {
         case e: Exception =>
-          logger.error(s"No Clusters found - Reason: ${e}")
+          logger.error(s"No Clusters found - Reason: $e")
           Future.successful(Seq())
       }
   }
 
-  override def addService(service: com.hortonworks.dataplane.commons.domain.Entities.ClusterService)
-    : Future[Option[com.hortonworks.dataplane.commons.domain.Entities.ClusterService]] = {
+  override def addService(
+      service: com.hortonworks.dataplane.commons.domain.Entities.ClusterService)
+    : Future[Option[
+      com.hortonworks.dataplane.commons.domain.Entities.ClusterService]] = {
 
     clusterComponentService.create(service).map { cl =>
       if (cl.isLeft) {
-        logger.warn(s"Cannot create cluster - Reason: ${cl.left.get.errors}")
+        logger.warn(
+          s"Cannot create cluster service - Reason: ${cl.left.get.errors}")
         None
       } else {
         val clusterService = cl.right.get
@@ -88,5 +97,16 @@ class ClusterInterfaceImpl @Inject()(
       }
     }
 
+  }
+
+  override def serviceRegistered(cluster: Cluster,
+                                 serviceName: String): Future[Boolean] = {
+    clusterComponentService
+      .getServiceByName(cluster.id.get, serviceName)
+      .map(_.isRight)
+  }
+
+  override def updateServiceByName(toPersist: ClusterData): Future[Boolean]  = {
+      clusterComponentService.updateServiceByName(toPersist).map(_.isRight)
   }
 }

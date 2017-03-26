@@ -3,6 +3,9 @@ package com.hortonworks.dataplane.db
 import com.hortonworks.dataplane.commons.domain.Entities._
 import play.api.libs.json.{JsResult, Json}
 import play.api.libs.ws.WSResponse
+import com.hortonworks.dataplane.commons.domain.Entities.{
+  ClusterService => ClusterData
+}
 
 import scala.concurrent.Future
 
@@ -62,11 +65,11 @@ object Webserice {
 
   // Maps to ClusterService
   trait ClusterComponentService extends DbClientService {
-    def create(
-        clusterService: com.hortonworks.dataplane.commons.domain.Entities.ClusterService)
-      : Future[Either[
-        Errors,
-        com.hortonworks.dataplane.commons.domain.Entities.ClusterService]]
+
+    def create(clusterService: ClusterData): Future[Either[Errors, ClusterData]]
+    def getServiceByName(clusterId:Long,serviceName:String):Future[Either[Errors, ClusterData]]
+    def updateServiceByName(clusterData: ClusterData):Future[Either[Errors, Boolean]]
+
   }
 
 }

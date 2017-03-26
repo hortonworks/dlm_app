@@ -51,9 +51,8 @@ private sealed class Synchronizer(val clusterInterface: ClusterInterface,
 
     case GetDataLakes(dl) =>
       dl.foreach { lake =>
-        val dlActor = context.actorOf(
-          Props(classOf[DatalakeActor], lake, clusterInterface, wSClient,dbActor),s"Datalake_${lake.id.get}")
-        dataLakeWorkers.getOrElseUpdate(lake.id.get, dlActor)
+        dataLakeWorkers.getOrElseUpdate(lake.id.get, context.actorOf(
+          Props(classOf[DatalakeActor], lake, clusterInterface, wSClient,dbActor),s"Datalake_${lake.id.get}"))
       }
       // fire poll to children
       dataLakeWorkers.values.foreach(_ ! Poll())

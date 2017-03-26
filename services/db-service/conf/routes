@@ -52,9 +52,9 @@ GET           /clusters/:clusterId/services                                  con
 GET           /clusters/:datalakeId/services                                 controllers.ClusterServices.allWithDatalake(datalakeId:Long)
 POST          /cluster/services                                              controllers.ClusterServices.addWithCluster
 POST          /datalake/services                                             controllers.ClusterServices.addWithDatalake
-GET           /clusters/:clusterId/service/:serviceId                        controllers.ClusterServices.loadWithCluster(serviceId:Long,clusterId:Long)
-GET           /datalakes/:datalakeId/service/:serviceId                      controllers.ClusterServices.loadWithDatalake(serviceId:Long,datalakeId:Long)
+GET           /clusters/:clusterId/service/:serviceName                      controllers.ClusterServices.loadWithClusterAndName(clusterId:Long,serviceName:String)
 DELETE        /services/:serviceId                                           controllers.ClusterServices.delete(serviceId:Long)
+PUT           /clusters/services                                             controllers.ClusterServices.updateWithCluster
 
 #Workspaces API
 GET           /workspaces                                                    controllers.Workspaces.all

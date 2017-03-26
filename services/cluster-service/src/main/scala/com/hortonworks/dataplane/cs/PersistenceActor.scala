@@ -14,6 +14,8 @@ import scala.util.Try
 
 private[dataplane] case class PersistAtlas(cluster: Cluster, atlas: Either[Throwable, Atlas])
 private sealed case class PersistenceResult(option: Option[ClusterData])
+private sealed case class ServiceExists(clusterData: ClusterData,boolean: Boolean)
+private sealed case class UpdateResult(boolean: Boolean)
 
 class PersistenceActor(clusterInterface: ClusterInterface) extends Actor {
 
@@ -31,13 +33,24 @@ class PersistenceActor(clusterInterface: ClusterInterface) extends Actor {
           properties = props,
           clusterid = Some(cluster.id.get), datalakeid = None)
 
-        clusterInterface.addService(toPersist).pipeTo(self)
+        clusterInterface.serviceRegistered(cluster,toPersist.servicename).map(ServiceExists(toPersist,_)).pipeTo(self)
+
       } else
         logger.error(s"Error saving atlas info, Atlas data was not returned, error - ${atlas.left.get}")
 
-    case PersistenceResult(data) => logger.info(s"Added cluster service information $data")
+    case ServiceExists(toPersist,exists) =>
+      if(exists){
+        logger.info("Service exists, updating info")
+        clusterInterface.updateServiceByName(toPersist).map(UpdateResult).pipeTo(self)
+      } else {
+        logger.info("Inserting service information")
+        clusterInterface.addService(toPersist).map(PersistenceResult).pipeTo(self)
+      }
+    case PersistenceResult(data) => logger.info(s"Added cluster service information - $data")
 
-    case Failure(e) => logger.error(s"Persistence Error ${e}")
+    case UpdateResult(data) => logger.info(s"Updated cluster service info -  ${data}")
+
+    case Failure(e) => logger.error(s"Persistence Error $e")
 
   }
 
