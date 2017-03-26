@@ -29,12 +29,12 @@ trait AmbariInterface {
 
   def ambariConnectionCheck: Future[AmbariConnection]
 
-  def getAtlas(ambari: AmbariConnection): Future[Either[Throwable, Atlas]]
+  def getAtlas: Future[Either[Throwable, Atlas]]
 
-  def getNameNodeStats(ambari: AmbariConnection):Future[Either[Throwable, NameNode]]
+  def getNameNodeStats:Future[Either[Throwable, NameNode]]
 
-  def getGetHostInfo(ambari: AmbariConnection):Future[Either[Throwable, Seq[HostInformation]]]
+  def getGetHostInfo:Future[Either[Throwable, Seq[HostInformation]]]
 
-  def getKnoxInfo(ambari: AmbariConnection):Future[Either[Throwable, KnoxInfo]]
+  def getKnoxInfo:Future[Either[Throwable, KnoxInfo]]
 
 }

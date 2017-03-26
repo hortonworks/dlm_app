@@ -31,6 +31,7 @@ POST          /locations                                                     con
 GET           /datalakes                                                     controllers.Datalakes.all
 POST          /datalakes                                                     controllers.Datalakes.add
 GET           /datalakes/:datalakeId                                         controllers.Datalakes.load(datalakeId:Long)
+GET           /datalakes/:datalakeId/clusters                                controllers.Clusters.getByDatalakeId(datalakeId:Long)
 DELETE        /datalakes/:datalakeId                                         controllers.Datalakes.delete(datalakeId:Long)
 
 #Clusters API

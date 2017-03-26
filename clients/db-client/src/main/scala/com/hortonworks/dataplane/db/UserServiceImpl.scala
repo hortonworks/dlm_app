@@ -35,10 +35,6 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
-  private def mapErrors(res: WSResponse) = {
-    Left(extractError(res, r => r.json.validate[Errors]))
-  }
-
   def mapToRole(res: WSResponse) = {
     res.status match {
       case 200 =>
@@ -74,22 +70,6 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       }
   }
 
-  private def extractEntity[T](
-      res: WSResponse,
-      f: WSResponse => JsResult[T]): Either[Errors, T] = {
-    f(res)
-      .map(r => Right(r))
-      .getOrElse(Left(Errors(Seq(Error(
-        "500",
-        s"sCould not parse response from DB - ${Json.stringify(res.json)}")))))
-  }
-
-  private def extractError(res: WSResponse,
-                           f: WSResponse => JsResult[Errors]): Errors = {
-    if (res.body.isEmpty)
-      Errors()
-    f(res).map(r => r).getOrElse(Errors())
-  }
 
   override def addUser(user: User): Future[Either[Errors, User]] = {
     ws.url(s"$url/users")

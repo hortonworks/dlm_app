@@ -13,8 +13,8 @@ import scala.concurrent.Future
 import scala.util.Try
 
 class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
-  implicit ws: WSClient)
-  extends AmbariInterface {
+    implicit ws: WSClient)
+    extends AmbariInterface {
 
   val logger = Logger(classOf[SimpleAmbariInterfaceImpl])
 
@@ -37,8 +37,8 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
     //Hit ambari URL
     ws.url(s"${url.get.toString}/api/v1/clusters")
       .withAuth(cluster.ambariuser.get,
-        cluster.ambaripass.get,
-        WSAuthScheme.BASIC)
+                cluster.ambaripass.get,
+                WSAuthScheme.BASIC)
       .get()
       .map { res =>
         logger.info(s"Successfully connected to Ambari $res")
@@ -51,7 +51,7 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
           if (cluster.secured.get)
             Some(
               Kerberos(cluster.kerberosuser.get,
-                cluster.kerberosticketLocation.get))
+                       cluster.kerberosticketLocation.get))
           else None
 
         AmbariConnection(status = true, url.get, kerberos, None)
@@ -65,17 +65,15 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
 
   }
 
-  override def getAtlas(
-                         ambari: AmbariConnection): Future[Either[Throwable, Atlas]] = {
+  override def getAtlas: Future[Either[Throwable, Atlas]] = {
     logger.info("Trying to get data from Atlas")
-    require(ambari.status, "Ambari connection is invalid")
 
     val serviceSuffix =
       s"/api/v1/clusters/${cluster.name}/configurations/service_config_versions?service_name=ATLAS&is_current=true"
-    ws.url(s"${ambari.url.toString}$serviceSuffix")
+    ws.url(s"${cluster.ambariUrl.get}$serviceSuffix")
       .withAuth(cluster.ambariuser.get,
-        cluster.ambaripass.get,
-        WSAuthScheme.BASIC)
+                cluster.ambaripass.get,
+                WSAuthScheme.BASIC)
       .get()
       .map { res =>
         val json = res.json
@@ -101,15 +99,14 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
       }
   }
 
-  override def getNameNodeStats(
-                                 ambari: AmbariConnection): Future[Either[Throwable, NameNode]] = {
+  override def getNameNodeStats: Future[Either[Throwable, NameNode]] = {
 
     val nameNodeResponse = ws
       .url(
-        s"${ambari.url}/api/v1/clusters/${cluster.name}/components/NAMENODE")
+        s"${cluster.ambariUrl.get}/api/v1/clusters/${cluster.name}/components/NAMENODE")
       .withAuth(cluster.ambariuser.get,
-        cluster.ambaripass.get,
-        WSAuthScheme.BASIC)
+                cluster.ambaripass.get,
+                WSAuthScheme.BASIC)
       .get()
     nameNodeResponse
       .map { nnr =>
@@ -135,11 +132,11 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
           .map(l => l)
           .getOrElse(0L)
         val nameNodeInfo = NameNode(startTime,
-          capacityUsed,
-          capacityRemaining,
-          usedPercentage,
-          totalFiles,
-          props = serviceComponent.toOption)
+                                    capacityUsed,
+                                    capacityRemaining,
+                                    usedPercentage,
+                                    totalFiles,
+                                    props = serviceComponent.toOption)
         Right(nameNodeInfo)
       }
       .recoverWith {
@@ -149,19 +146,19 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
       }
   }
 
-  override def getGetHostInfo(ambari: AmbariConnection)
-  : Future[Either[Throwable, Seq[HostInformation]]] = {
+  override def getGetHostInfo: Future[Either[Throwable, Seq[HostInformation]]] = {
 
     val clustersApi = "/api/v1/clusters"
     val hostsApi = "/hosts"
 
-    val hostsPath = s"${ambari.url}${clustersApi}/${cluster.name}${hostsApi}"
+    val hostsPath =
+      s"${cluster.ambariUrl.get}${clustersApi}/${cluster.name}${hostsApi}"
 
     val hostsResponse: Future[WSResponse] = ws
       .url(hostsPath)
       .withAuth(cluster.ambariuser.get,
-        cluster.ambaripass.get,
-        WSAuthScheme.BASIC)
+                cluster.ambaripass.get,
+                WSAuthScheme.BASIC)
       .get()
     //Load Cluster Info
     hostsResponse
@@ -177,8 +174,8 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
             val hostInfoResponse: Future[WSResponse] = ws
               .url(s"${hostsPath}/${host.get("host_name").get}")
               .withAuth(cluster.ambariuser.get,
-                cluster.ambaripass.get,
-                WSAuthScheme.BASIC)
+                        cluster.ambaripass.get,
+                        WSAuthScheme.BASIC)
               .get()
 
             val futureHost: Future[HostInformation] = hostInfoResponse.map {
@@ -205,11 +202,11 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
                 val diskInfoes: List[DiskInformation] = diskInfo.map(
                   di =>
                     DiskInformation(di.get("available"),
-                      di.get("device"),
-                      di.get("used"),
-                      di.get("percentage"),
-                      di.get("size"),
-                      di.get("mountpoint")))
+                                    di.get("device"),
+                                    di.get("used"),
+                                    di.get("percentage"),
+                                    di.get("size"),
+                                    di.get("mountpoint")))
                 HostInformation(state, status, ip, cpus, Some(diskInfoes))
             }
             // the host info
@@ -237,22 +234,28 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
       }
   }
 
-  override def getKnoxInfo(ambari: AmbariConnection): Future[Either[Throwable, KnoxInfo]] = {
+  override def getKnoxInfo: Future[Either[Throwable, KnoxInfo]] = {
     // Dump knox properties
-    val knoxApi = s"${ambari.url}/api/v1/clusters/test/configurations/service_config_versions?service_name=KNOX&is_current=true"
-    ws.url(knoxApi).withAuth(cluster.ambariuser.get,
-        cluster.ambaripass.get,
-        WSAuthScheme.BASIC)
+    val knoxApi =
+      s"${cluster.ambariUrl.get}/api/v1/clusters/test/configurations/service_config_versions?service_name=KNOX&is_current=true"
+    ws.url(knoxApi)
+      .withAuth(cluster.ambariuser.get,
+                cluster.ambaripass.get,
+                WSAuthScheme.BASIC)
       .get()
-        .map(res =>
-          res.json.validate[JsValue].map { js=>
-            Right(KnoxInfo(Some(js)))
-          }.getOrElse(Left(new Exception("Could not load Knox properties")))
-        ).recoverWith {
-      case e: Exception =>
-        logger.error("Cannot get Knox information")
-        Future.successful(Left(e))
-    }
+      .map(
+        res =>
+          res.json
+            .validate[JsValue]
+            .map { js =>
+              Right(KnoxInfo(Some(js)))
+            }
+            .getOrElse(Left(new Exception("Could not load Knox properties"))))
+      .recoverWith {
+        case e: Exception =>
+          logger.error("Cannot get Knox information")
+          Future.successful(Left(e))
+      }
 
   }
 }

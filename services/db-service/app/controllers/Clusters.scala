@@ -10,35 +10,48 @@ import play.api.mvc._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class Clusters @Inject()(clusterRepo: ClusterRepo)(implicit exec: ExecutionContext)
-  extends JsonAPI {
+class Clusters @Inject()(clusterRepo: ClusterRepo)(
+    implicit exec: ExecutionContext)
+    extends JsonAPI {
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  def all(datalakeIdOption: Option[String], userIdOption: Option[String]) = Action.async {
-    clusterRepo.all(datalakeIdOption, userIdOption).map(clusters => success(clusters.map(c=>linkData(c,makeLink(c))))).recoverWith(apiError)
-  }
+  def all(datalakeIdOption: Option[String], userIdOption: Option[String]) =
+    Action.async {
+      clusterRepo
+        .all(datalakeIdOption, userIdOption)
+        .map(clusters => success(clusters.map(c => linkData(c, makeLink(c)))))
+        .recoverWith(apiError)
+    }
 
+  def getByDatalakeId(datalakeId: Long) = Action.async {
+    clusterRepo
+      .findByDatalakeId(datalakeId)
+      .map(clusters => success(clusters.map(c => linkData(c, makeLink(c)))))
+      .recoverWith(apiError)
+  }
 
   private def makeLink(c: Cluster) = {
     Map("datalake" -> s"${datalakes}/${c.datalakeid.get}",
-      "user" -> s"${users}/${c.userid.get}")
+        "user" -> s"${users}/${c.userid.get}")
   }
 
-  def load(clusterId:Long) = Action.async {
-    clusterRepo.findById(clusterId).map { co =>
-      co.map { c =>
-        success(linkData(c, makeLink(c)))
+  def load(clusterId: Long) = Action.async {
+    clusterRepo
+      .findById(clusterId)
+      .map { co =>
+        co.map { c =>
+            success(linkData(c, makeLink(c)))
+          }
+          .getOrElse(NotFound)
       }
-        .getOrElse(NotFound)
-    }.recoverWith(apiError)
+      .recoverWith(apiError)
   }
 
   def delete(clusterId: Long) = Action.async { req =>
     val future = clusterRepo.deleteById(clusterId)
     future.map(i => success(i)).recoverWith(apiError)
   }
-
 
   def add = Action.async(parse.json) { req =>
     req.body
@@ -51,6 +64,5 @@ class Clusters @Inject()(clusterRepo: ClusterRepo)(implicit exec: ExecutionConte
       }
       .getOrElse(Future.successful(BadRequest))
   }
-
 
 }

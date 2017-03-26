@@ -5,14 +5,14 @@ import javax.inject.Singleton
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.db.Webserice.LakeService
 import com.typesafe.config.Config
-import play.api.libs.json.{JsResult, Json}
+import play.api.libs.json.Json
 import play.api.libs.ws.{WSClient, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class LakeServiceImpl (config: Config)(implicit ws: WSClient)
+class LakeServiceImpl(config: Config)(implicit ws: WSClient)
     extends LakeService {
 
   private val url = config.getString("dp.services.db.service.uri")
@@ -43,7 +43,8 @@ class LakeServiceImpl (config: Config)(implicit ws: WSClient)
       .map(mapToLake)
   }
 
-  override def update(dataLakeId: String, datalake: Datalake): Future[Either[Errors, Datalake]] = {
+  override def update(dataLakeId: String,
+                      datalake: Datalake): Future[Either[Errors, Datalake]] = {
     ws.url(s"$url/datalakes/$dataLakeId")
       .withHeaders(
         "Content-Type" -> "application/json",
@@ -63,7 +64,9 @@ class LakeServiceImpl (config: Config)(implicit ws: WSClient)
   private def mapToLakes(res: WSResponse) = {
     res.status match {
       case 200 =>
-        extractEntity[Seq[Datalake]](res, r => (r.json \ "results").validate[Seq[Datalake]])
+        extractEntity[Seq[Datalake]](
+          res,
+          r => (r.json \ "results").validate[Seq[Datalake]])
       case _ => mapErrors(res)
     }
   }
@@ -71,32 +74,10 @@ class LakeServiceImpl (config: Config)(implicit ws: WSClient)
   private def mapToLake(res: WSResponse) = {
     res.status match {
       case 200 =>
-        extractEntity[Datalake](res, r => (r.json \ "results").validate[Datalake])
+        extractEntity[Datalake](res,
+                                r => (r.json \ "results").validate[Datalake])
       case _ => mapErrors(res)
     }
   }
 
-  private def mapErrors(res: WSResponse) = {
-    Left(extractError(res, r => r.json.validate[Errors]))
-  }
-
-  private def extractEntity[T](
-      res: WSResponse,
-      f: WSResponse => JsResult[T]): Either[Errors, T] = {
-    println(res)
-    f(res)
-      .map({r =>
-        println(r)
-        Right(r)})
-      .getOrElse(Left(Errors(Seq(Error(
-        "500",
-        s"sCould not parse response from DB - ${Json.stringify(res.json)}")))))
-  }
-
-  private def extractError(res: WSResponse,
-                           f: WSResponse => JsResult[Errors]): Errors = {
-    if (res.body.isEmpty)
-      Errors()
-    f(res).map(r => r).getOrElse(Errors())
-  }
 }

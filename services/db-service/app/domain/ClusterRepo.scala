@@ -31,6 +31,10 @@ class ClusterRepo @Inject()(
     db.run(Clusters.filter(_.id === clusterId).result.headOption)
   }
 
+  def findByDatalakeId(datalakeId:Long):Future[List[Cluster]] = {
+    db.run(Clusters.filter(_.datalakeid === datalakeId).to[List].result)
+  }
+
   def deleteById(clusterId: Long): Future[Int] = {
     db.run(Clusters.filter(_.id === clusterId).delete)
   }
