@@ -37,7 +37,6 @@ object AppModule extends AbstractModule{
   }
 
 
-
   @Provides
   @Singleton
   def provideClusterService(implicit ws: WSClient,configuration: Config):ClusterService = {
@@ -48,6 +47,13 @@ object AppModule extends AbstractModule{
   @Singleton
   def provideClusterInterface(lakeService: LakeService, clusterService: ClusterService):ClusterInterface = {
     new ClusterInterfaceImpl(clusterService,lakeService)
+  }
+
+
+  @Provides
+  @Singleton
+  def provideClusterSync(actorSystem: ActorSystem,config: Config,clusterInterface: ClusterInterface,wSClient: WSClient): ClusterSync = {
+    new ClusterSync(actorSystem,config,clusterInterface,wSClient)
   }
 
 

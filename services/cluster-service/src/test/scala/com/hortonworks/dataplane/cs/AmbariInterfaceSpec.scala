@@ -61,7 +61,7 @@ class AmbariInterfaceSpec
         ambariuser = Some("admin"),
         ambaripass = Some("admin")))
 
-    val atlas  = ambariInterface.getAtlas(AmbariConnection(status = true,new URL("http://localhost:9999")))
+    val atlas  = ambariInterface.getAtlas
     atlas.map { either =>
       assert(either.isRight)
       assert(either.right.get.restService.toString == "http://ashwin-dp-knox-test-1.novalocal:21000")
@@ -83,7 +83,7 @@ class AmbariInterfaceSpec
         ambariuser = Some("admin"),
         ambaripass = Some("admin")))
 
-    val atlas  = ambariInterface.getNameNodeStats(AmbariConnection(status = true,new URL("http://localhost:9999")))
+    val atlas  = ambariInterface.getNameNodeStats
     atlas.map { either =>
       assert(either.isRight)
       assert(either.right.get.startTime == 1489956956063L)
@@ -109,7 +109,7 @@ class AmbariInterfaceSpec
         ambariuser = Some("admin"),
         ambaripass = Some("admin")))
 
-    val atlas  = ambariInterface.getGetHostInfo(AmbariConnection(status = true,new URL("http://localhost:9999")))
+    val atlas  = ambariInterface.getGetHostInfo
     atlas.map { either =>
       assert(either.isRight)
       assert(either.right.get.size == 1)
@@ -132,7 +132,7 @@ class AmbariInterfaceSpec
         ambariuser = Some("admin"),
         ambaripass = Some("admin")))
 
-    val atlas  = ambariInterface.getKnoxInfo(AmbariConnection(status = true,new URL("http://localhost:9999")))
+    val atlas  = ambariInterface.getKnoxInfo
     atlas.map { either =>
       assert(either.isRight)
     }

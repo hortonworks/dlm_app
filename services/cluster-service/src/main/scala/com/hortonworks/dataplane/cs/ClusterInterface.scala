@@ -32,6 +32,10 @@ class ClusterInterfaceImpl @Inject()(val clusterService: ClusterService, val lak
       datalakes
     }
 
+  }.recoverWith {
+    case e:Exception =>
+      logger.error(s"No data lakes found - Reason: ${e}")
+      Future.successful(Seq())
   }
 
   override def getLinkedClusters(datalake: Datalake): Future[Seq[Cluster]] = {
@@ -45,6 +49,10 @@ class ClusterInterfaceImpl @Inject()(val clusterService: ClusterService, val lak
         clusters
       }
 
+    }.recoverWith {
+      case e:Exception =>
+        logger.error(s"No Clusters found - Reason: ${e}")
+        Future.successful(Seq())
     }
   }
 }

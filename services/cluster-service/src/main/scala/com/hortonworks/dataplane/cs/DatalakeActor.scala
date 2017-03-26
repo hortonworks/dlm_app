@@ -17,17 +17,22 @@ class DatalakeActor(private val dataLake: Datalake,
 
   import akka.pattern.pipe
 
-  clusterInterface.getLinkedClusters(dataLake).map(GetClusters).pipeTo(self)
-
   override def receive = {
     case Poll() =>
-      clusterMap.values.foreach(_ ! Poll())
+      clusterInterface
+        .getLinkedClusters(dataLake)
+        .map(GetClusters)
+        .pipeTo(self)
+
     case GetClusters(clusters) =>
       clusters.foreach { c =>
-        clusterMap.getOrElseUpdate(
-          c.name,
-          context.actorOf(
-            Props(classOf[ClusterActor], c, wSClient, clusterInterface)))
+        clusterMap.getOrElseUpdate(c.name,
+                                   context.actorOf(Props(classOf[ClusterActor],
+                                                         c,
+                                                         wSClient,
+                                                         clusterInterface),
+                                                   s"Cluster_${c.id.get}"))
       }
+      clusterMap.values.foreach(_ ! Poll())
   }
 }
