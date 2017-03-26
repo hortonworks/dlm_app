@@ -16,7 +16,7 @@ class ClusterServices @Inject()(csr: ClusterServiceRepo)(implicit exec: Executio
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   def allWithCluster(clusterId: Long) = Action.async {
-    csr.allWithCluster(clusterId).map(cs => success(cs.map(c=>linkData(c,makeLink(c))))).recoverWith(apiError)
+    csr.allWithCluster(clusterId).map(cs => success(cs.map(c=>linkData(c,makeClusterLink(c))))).recoverWith(apiError)
   }
 
   def allWithDatalake(datalakeId: Long) = Action.async {
@@ -25,8 +25,10 @@ class ClusterServices @Inject()(csr: ClusterServiceRepo)(implicit exec: Executio
 
 
   private def makeLink(c: ClusterService) = {
-    Map("datalake" -> s"${datalakes}/${c.datalakeid.get}",
-      "user" -> s"${clusters}/${c.clusterid.get}")
+    Map("datalake" -> s"${datalakes}/${c.datalakeid.get}")
+  }
+  private def makeClusterLink(c: ClusterService) = {
+    Map("cluster" -> s"${clusters}/${c.clusterid.get}")
   }
 
   def load(serviceId:Long) = Action.async {
@@ -56,7 +58,7 @@ class ClusterServices @Inject()(csr: ClusterServiceRepo)(implicit exec: Executio
   }
 
 
-  def addWithCluster(clusterId: Long) =  Action.async(parse.json) { req =>
+  def addWithCluster =  Action.async(parse.json) { req =>
     req.body
       .validate[ClusterService]
       .map { cl =>
@@ -75,7 +77,7 @@ class ClusterServices @Inject()(csr: ClusterServiceRepo)(implicit exec: Executio
   }
 
 
-  def addWithDatalake(clusterId: Long) =  Action.async(parse.json) { req =>
+  def addWithDatalake =  Action.async(parse.json) { req =>
     req.body
       .validate[ClusterService]
       .map { cl =>

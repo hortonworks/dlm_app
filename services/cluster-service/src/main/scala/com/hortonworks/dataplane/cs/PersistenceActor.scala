@@ -29,7 +29,7 @@ class PersistenceActor(clusterInterface: ClusterInterface) extends Actor {
           serviceport = None,
           fullURL = Some(at.restService.toString),
           properties = props,
-          clusterid = Some(cluster.id.get))
+          clusterid = Some(cluster.id.get), datalakeid = None)
 
         clusterInterface.addService(toPersist).pipeTo(self)
       } else

@@ -17,7 +17,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
 
   override def create(clusterService: ClusterService)
     : Future[Either[Errors, ClusterService]] = {
-    ws.url(s"$url//cluster/services")
+    ws.url(s"$url/cluster/services")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
@@ -26,7 +26,6 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToService)
       .recoverWith {
         case e:Exception =>
-
           Future.successful(Left(Errors(Seq(Error("500",e.getMessage)))))
       }
   }

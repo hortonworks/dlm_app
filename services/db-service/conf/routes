@@ -50,8 +50,8 @@ DELETE        /cloud/clusters/:clusterId                                     con
 
 GET           /clusters/:clusterId/services                                  controllers.ClusterServices.allWithCluster(clusterId:Long)
 GET           /clusters/:datalakeId/services                                 controllers.ClusterServices.allWithDatalake(datalakeId:Long)
-POST          /datalakes/services                                            controllers.ClusterServices.addWithCluster(clusterId:Long)
-POST          /cluster/services                                              controllers.ClusterServices.addWithDatalake(datalakeId:Long)
+POST          /cluster/services                                              controllers.ClusterServices.addWithCluster
+POST          /datalake/services                                             controllers.ClusterServices.addWithDatalake
 GET           /clusters/:clusterId/service/:serviceId                        controllers.ClusterServices.loadWithCluster(serviceId:Long,clusterId:Long)
 GET           /datalakes/:datalakeId/service/:serviceId                      controllers.ClusterServices.loadWithDatalake(serviceId:Long,datalakeId:Long)
 DELETE        /services/:serviceId                                           controllers.ClusterServices.delete(serviceId:Long)

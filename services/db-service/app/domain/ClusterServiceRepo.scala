@@ -70,7 +70,7 @@ class ClusterServiceRepo @Inject()(
 
     def serviceport = column[Option[Int]]("serviceport")
 
-    def fullURL = column[Option[String]]("fullURL")
+    def fullURL = column[Option[String]]("fullurl")
 
     def datalakeid = column[Option[Long]]("datalakeid")
 
@@ -85,8 +85,8 @@ class ClusterServiceRepo @Inject()(
        serviceport,
        fullURL,
        properties,
-       datalakeid,
-       clusterid) <> ((ClusterService.apply _).tupled, ClusterService.unapply)
+       clusterid,
+       datalakeid) <> ((ClusterService.apply _).tupled, ClusterService.unapply)
 
   }
 
