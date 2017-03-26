@@ -12,10 +12,9 @@ object Webserice {
 
     import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-    protected def extractEntity[T](
-        res: WSResponse,
-        f: WSResponse => T): Either[Errors, T] = {
-        Right(f(res))
+    protected def extractEntity[T](res: WSResponse,
+                                   f: WSResponse => T): Either[Errors, T] = {
+      Right(f(res))
     }
 
     protected def extractError(res: WSResponse,
@@ -31,7 +30,7 @@ object Webserice {
 
   }
 
-  trait UserService extends DbClientService{
+  trait UserService extends DbClientService {
 
     def loadUser(username: String): Future[Either[Errors, User]]
     def getUserRoles(userName: String): Future[Either[Errors, UserRoles]]
@@ -42,7 +41,7 @@ object Webserice {
 
   }
 
-  trait LakeService  extends DbClientService {
+  trait LakeService extends DbClientService {
 
     def list(): Future[Either[Errors, Seq[Datalake]]]
     def create(datalake: Datalake): Future[Either[Errors, Datalake]]
@@ -53,17 +52,21 @@ object Webserice {
 
   }
 
-  trait ClusterService  extends DbClientService {
+  trait ClusterService extends DbClientService {
 
     def list(): Future[Either[Errors, Seq[Cluster]]]
-    def getLinkedClusters(datalakeId:Long):Future[Either[Errors, Seq[Cluster]]]
+    def getLinkedClusters(
+        datalakeId: Long): Future[Either[Errors, Seq[Cluster]]]
 
   }
 
   // Maps to ClusterService
-  trait ClusterComponentService  extends DbClientService {
+  trait ClusterComponentService extends DbClientService {
     def create(
-        clusterService: ClusterService): Future[Either[Errors, ClusterService]]
+        clusterService: com.hortonworks.dataplane.commons.domain.Entities.ClusterService)
+      : Future[Either[
+        Errors,
+        com.hortonworks.dataplane.commons.domain.Entities.ClusterService]]
   }
 
 }

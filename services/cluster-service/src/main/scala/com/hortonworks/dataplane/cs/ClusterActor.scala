@@ -1,6 +1,6 @@
 package com.hortonworks.dataplane.cs
 
-import akka.actor.Actor
+import akka.actor.{Actor, ActorRef}
 import akka.actor.Status.Failure
 import com.hortonworks.dataplane.commons.domain.Entities.Cluster
 import com.hortonworks.dataplane.commons.service.api.Poll
@@ -20,7 +20,7 @@ private sealed case class HandleError(exception: Exception)
 
 class ClusterActor(cluster: Cluster,
                    implicit val wSClient: WSClient,
-                   clusterInterface: ClusterInterface)
+                   clusterInterface: ClusterInterface,val dbActor:ActorRef)
     extends Actor {
 
   val ambariInterface = new SimpleAmbariInterfaceImpl(cluster)
@@ -49,6 +49,7 @@ class ClusterActor(cluster: Cluster,
       }
     case SaveAtlas(atlas) =>
       logger.info("Saving ambari atlas information")
+      dbActor ! PersistAtlas(cluster,atlas)
       ambariInterface.getKnoxInfo.map(SaveKnox).pipeTo(self)
 
     case SaveKnox(knox) =>

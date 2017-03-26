@@ -43,6 +43,8 @@ private sealed class Synchronizer(val clusterInterface: ClusterInterface,
 
   val dataLakeWorkers = collection.mutable.Map[Long, ActorRef]()
 
+  val dbActor:ActorRef = context.actorOf(Props(classOf[PersistenceActor],clusterInterface))
+
   override def receive = {
     case Poll() =>
       clusterInterface.getDataLakes.map(GetDataLakes).pipeTo(self)
@@ -50,7 +52,7 @@ private sealed class Synchronizer(val clusterInterface: ClusterInterface,
     case GetDataLakes(dl) =>
       dl.foreach { lake =>
         val dlActor = context.actorOf(
-          Props(classOf[DatalakeActor], lake, clusterInterface, wSClient),s"Datalake_${lake.id.get}")
+          Props(classOf[DatalakeActor], lake, clusterInterface, wSClient,dbActor),s"Datalake_${lake.id.get}")
         dataLakeWorkers.getOrElseUpdate(lake.id.get, dlActor)
       }
       // fire poll to children

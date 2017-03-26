@@ -10,7 +10,7 @@ private[dataplane] case class GetClusters(clusters: Seq[Cluster])
 
 class DatalakeActor(private val dataLake: Datalake,
                     private val clusterInterface: ClusterInterface,
-                    private val wSClient: WSClient)
+                    private val wSClient: WSClient,private val dbActor:ActorRef)
     extends Actor {
 
   val clusterMap = collection.mutable.Map[String, ActorRef]()
@@ -30,7 +30,7 @@ class DatalakeActor(private val dataLake: Datalake,
                                    context.actorOf(Props(classOf[ClusterActor],
                                                          c,
                                                          wSClient,
-                                                         clusterInterface),
+                                                         clusterInterface,dbActor),
                                                    s"Cluster_${c.id.get}"))
       }
       clusterMap.values.foreach(_ ! Poll())
