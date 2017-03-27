@@ -31,16 +31,11 @@ class AmbariSync @Inject()(actorSystem: ActorSystem,
     val clusterHealth: ActorRef = actorSystem.actorOf(Props(classOf[ClusterHealthSync], storage, ws),"clusterMetrics")
     synchronizers += serviceActor
     synchronizers += serviceSync
-    actorSystem.scheduler.schedule(5 seconds, interval minutes, serviceActor, Poll())
-    actorSystem.scheduler.schedule(5 seconds, interval minutes, serviceSync, Poll())
-    actorSystem.scheduler.schedule(5 seconds, interval minutes, clusterHealth, GenRandom())
   }
 
 
   def clusterAdded  = {
-    synchronizers.foreach(
-      actorSystem.scheduler.scheduleOnce(5 seconds, _, Poll())
-    )
+
   }
 
 

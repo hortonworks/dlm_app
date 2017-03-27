@@ -6,7 +6,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.Cluster
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
 import com.typesafe.scalalogging.Logger
 import play.api.libs.json.{JsObject, JsValue, Json}
-import play.api.libs.ws.{WSAuthScheme, WSClient}
+import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -59,19 +59,18 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
       .recoverWith {
         case e: Exception =>
           logger.error("Could not connect to Ambari")
-          Future.successful(AmbariConnection(status = false, url.get, None, Some(e)))
+          Future.successful(
+            AmbariConnection(status = false, url.get, None, Some(e)))
       }
 
   }
 
-  override def getAtlas(
-      ambari: AmbariConnection): Future[Either[Throwable, Atlas]] = {
+  override def getAtlas: Future[Either[Throwable, Atlas]] = {
     logger.info("Trying to get data from Atlas")
-    require(ambari.status, "Ambari connection is invalid")
 
     val serviceSuffix =
       s"/api/v1/clusters/${cluster.name}/configurations/service_config_versions?service_name=ATLAS&is_current=true"
-    ws.url(s"${ambari.url.toString}$serviceSuffix")
+    ws.url(s"${cluster.ambariUrl.get}$serviceSuffix")
       .withAuth(cluster.ambariuser.get,
                 cluster.ambaripass.get,
                 WSAuthScheme.BASIC)
@@ -88,16 +87,175 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
         val properties = (atlasConfig.get \ "properties").as[JsObject]
         val apiUrl = (properties \ "atlas.rest.address").as[String]
         val restService = Try(new URL(apiUrl))
-        restService.map(url =>
-          Right(Atlas(url, Json.stringify(configs)))).getOrElse(
-          Left(new MalformedURLException(s"Cannot parse $apiUrl")))
+        restService
+          .map(url => Right(Atlas(url, Json.stringify(configs))))
+          .getOrElse(Left(new MalformedURLException(s"Cannot parse $apiUrl")))
 
       }
       .recoverWith {
         case e: Exception =>
           logger.error("Cannot get Atlas info")
-          Future.successful(
-            Left(e))
+          Future.successful(Left(e))
       }
+  }
+
+  override def getNameNodeStats: Future[Either[Throwable, NameNode]] = {
+
+    val nameNodeResponse = ws
+      .url(
+        s"${cluster.ambariUrl.get}/api/v1/clusters/${cluster.name}/components/NAMENODE")
+      .withAuth(cluster.ambariuser.get,
+                cluster.ambaripass.get,
+                WSAuthScheme.BASIC)
+      .get()
+    nameNodeResponse
+      .map { nnr =>
+        val serviceComponent = nnr.json \ "ServiceComponentInfo"
+        val startTime = (serviceComponent \ "StartTime")
+          .validate[Long]
+          .map(l => l)
+          .getOrElse(0L)
+        val capacityUsed = (serviceComponent \ "CapacityUsed")
+          .validate[Long]
+          .map(l => l)
+          .getOrElse(0L)
+        val capacityRemaining = (serviceComponent \ "CapacityRemaining")
+          .validate[Long]
+          .map(l => l)
+          .getOrElse(0L)
+        val usedPercentage = (serviceComponent \ "PercentUsed")
+          .validate[Double]
+          .map(l => l)
+          .getOrElse(0.0)
+        val totalFiles = (serviceComponent \ "TotalFiles")
+          .validate[Long]
+          .map(l => l)
+          .getOrElse(0L)
+        val nameNodeInfo = NameNode(startTime,
+                                    capacityUsed,
+                                    capacityRemaining,
+                                    usedPercentage,
+                                    totalFiles,
+                                    props = serviceComponent.toOption)
+        Right(nameNodeInfo)
+      }
+      .recoverWith {
+        case e: Exception =>
+          logger.error("Cannot get Name node info")
+          Future.successful(Left(e))
+      }
+  }
+
+  override def getGetHostInfo: Future[Either[Throwable, Seq[HostInformation]]] = {
+
+    val clustersApi = "/api/v1/clusters"
+    val hostsApi = "/hosts"
+
+    val hostsPath =
+      s"${cluster.ambariUrl.get}${clustersApi}/${cluster.name}${hostsApi}"
+
+    val hostsResponse: Future[WSResponse] = ws
+      .url(hostsPath)
+      .withAuth(cluster.ambariuser.get,
+                cluster.ambaripass.get,
+                WSAuthScheme.BASIC)
+      .get()
+    //Load Cluster Info
+    hostsResponse
+      .flatMap { hres =>
+        val hostsList = (hres.json \ "items" \\ "Hosts").map(
+          _.as[JsObject]
+            .validate[Map[String, String]]
+            .map(m => Some(m))
+            .getOrElse(None))
+        val listHosts = hostsList.map { hostOpt =>
+          val opt: Option[Future[HostInformation]] = hostOpt.map { host =>
+            // for each host get host and disk info
+            val hostInfoResponse: Future[WSResponse] = ws
+              .url(s"${hostsPath}/${host.get("host_name").get}")
+              .withAuth(cluster.ambariuser.get,
+                        cluster.ambaripass.get,
+                        WSAuthScheme.BASIC)
+              .get()
+
+            val futureHost: Future[HostInformation] = hostInfoResponse.map {
+              hir =>
+                val hostNode = hir.json \ "Hosts"
+                val cpus = (hostNode \ "cpu_count")
+                  .validate[Int]
+                  .map(s => Some(s))
+                  .getOrElse(None)
+                val state = (hostNode \ "host_state")
+                  .validate[String]
+                  .map(s => s)
+                  .getOrElse("")
+                val status = (hostNode \ "host_status")
+                  .validate[String]
+                  .map(s => s)
+                  .getOrElse("")
+                val ip =
+                  (hostNode \ "ip").validate[String].map(s => s).getOrElse("")
+                val diskInfo = (hostNode \ "disk_info")
+                  .validate[List[Map[String, String]]]
+                  .map(s => s)
+                  .getOrElse(List[Map[String, String]]())
+                val diskInfoes: List[DiskInformation] = diskInfo.map(
+                  di =>
+                    DiskInformation(di.get("available"),
+                                    di.get("device"),
+                                    di.get("used"),
+                                    di.get("percentage"),
+                                    di.get("size"),
+                                    di.get("mountpoint")))
+                HostInformation(state, status, ip, cpus, Some(diskInfoes))
+            }
+            // the host info
+            futureHost
+          }
+
+          // the optional wrap
+          opt
+        }
+        // get Rid of invalid cases
+        val toReturn = listHosts.collect {
+          case s: Some[Future[HostInformation]] => s.get
+        }
+
+        // Invert the futures
+        val sequenced = Future.sequence(toReturn)
+
+        // Build the response
+        sequenced.map(Right(_))
+      }
+      .recoverWith {
+        case e: Exception =>
+          logger.error("Cannot get host or disk info")
+          Future.successful(Left(e))
+      }
+  }
+
+  override def getKnoxInfo: Future[Either[Throwable, KnoxInfo]] = {
+    // Dump knox properties
+    val knoxApi =
+      s"${cluster.ambariUrl.get}/api/v1/clusters/test/configurations/service_config_versions?service_name=KNOX&is_current=true"
+    ws.url(knoxApi)
+      .withAuth(cluster.ambariuser.get,
+                cluster.ambaripass.get,
+                WSAuthScheme.BASIC)
+      .get()
+      .map(
+        res =>
+          res.json
+            .validate[JsValue]
+            .map { js =>
+              Right(KnoxInfo(Some(js)))
+            }
+            .getOrElse(Left(new Exception("Could not load Knox properties"))))
+      .recoverWith {
+        case e: Exception =>
+          logger.error("Cannot get Knox information")
+          Future.successful(Left(e))
+      }
+
   }
 }

@@ -10,8 +10,9 @@ import play.api.mvc._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ClusterProps @Inject()(clusterPropertiesRepo: ClusterPropertiesRepo)(implicit exec: ExecutionContext)
-  extends JsonAPI {
+class ClusterProps @Inject()(clusterPropertiesRepo: ClusterPropertiesRepo)(
+    implicit exec: ExecutionContext)
+    extends JsonAPI {
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
@@ -19,24 +20,29 @@ class ClusterProps @Inject()(clusterPropertiesRepo: ClusterPropertiesRepo)(impli
     Map("cluster" -> s"${clusters}/${c.clusterId}")
   }
 
-  def allWithCluster(clusterId:Long) = Action.async {
-    clusterPropertiesRepo.allWithCluster(clusterId).map(cs => success(cs.map(c=>linkData(c,makeLink(c))))).recoverWith(apiError)
+  def allWithCluster(clusterId: Long) = Action.async {
+    clusterPropertiesRepo
+      .allWithCluster(clusterId)
+      .map(cs => success(cs.map(c => linkData(c, makeLink(c)))))
+      .recoverWith(apiError)
   }
 
-  def loadWithCluster(clusterId:Long, propertiesId:Long) = Action.async {
-    clusterPropertiesRepo.findByClusterAndPropertiesId(clusterId,propertiesId).map { co =>
-      co.map { c =>
-        success(linkData(c, makeLink(c)))
+  def loadWithCluster(clusterId: Long, propertiesId: Long) = Action.async {
+    clusterPropertiesRepo
+      .findByClusterAndPropertiesId(clusterId, propertiesId)
+      .map { co =>
+        co.map { c =>
+            success(linkData(c, makeLink(c)))
+          }
+          .getOrElse(NotFound)
       }
-        .getOrElse(NotFound)
-    }.recoverWith(apiError)
+      .recoverWith(apiError)
   }
 
-  def delete(clusterId: Long, propertiesId:Long) = Action.async { req =>
+  def delete(clusterId: Long, propertiesId: Long) = Action.async { req =>
     val future = clusterPropertiesRepo.deleteById(clusterId, propertiesId)
     future.map(i => success(i)).recoverWith(apiError)
   }
-
 
   def add = Action.async(parse.json) { req =>
     req.body
@@ -49,6 +55,5 @@ class ClusterProps @Inject()(clusterPropertiesRepo: ClusterPropertiesRepo)(impli
       }
       .getOrElse(Future.successful(BadRequest))
   }
-
 
 }

@@ -2,18 +2,21 @@ package controllers
 
 import javax.inject._
 
-import com.hortonworks.dataplane.commons.domain.Entities.{AssetWorkspace, Category}
+import com.hortonworks.dataplane.commons.domain.Entities.{
+  AssetWorkspace,
+  Category
+}
 import domain.{AssetWorkspaceRepo, CategoryRepo}
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AssetWorkspaces @Inject()(aw: AssetWorkspaceRepo)(implicit exec: ExecutionContext)
+class AssetWorkspaces @Inject()(aw: AssetWorkspaceRepo)(
+    implicit exec: ExecutionContext)
     extends JsonAPI {
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-
 
   def assetsforWorkspace(workspaceId: Long) = Action.async {
 //      aw.getAssets(workspaceId)
@@ -27,7 +30,8 @@ class AssetWorkspaces @Inject()(aw: AssetWorkspaceRepo)(implicit exec: Execution
         aw.insert(w)
           .map { c =>
             success(c)
-          }.recoverWith(apiError)
+          }
+          .recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))
   }

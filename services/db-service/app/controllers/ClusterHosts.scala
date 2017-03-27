@@ -28,7 +28,7 @@ class ClusterHosts @Inject()(clusterHostRepo: ClusterHostRepo)(implicit exec: Ex
       co.map { c =>
         success(linkData(c, makeLink(c)))
       }
-        .getOrElse(NotFound)
+        .getOrElse(notFound)
     }.recoverWith(apiError)
   }
 

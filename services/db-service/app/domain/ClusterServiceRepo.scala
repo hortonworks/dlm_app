@@ -5,14 +5,13 @@ import javax.inject._
 import com.hortonworks.dataplane.commons.domain.Entities.ClusterService
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.libs.json.JsValue
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
 class ClusterServiceRepo @Inject()(
     protected val dbConfigProvider: DatabaseConfigProvider)
     extends HasDatabaseConfigProvider[DpPgProfile] {
-
 
   import profile.api._
 
@@ -31,6 +30,9 @@ class ClusterServiceRepo @Inject()(
     db.run(Services.filter(_.datalakeid === datalakeId).to[List].result)
   }
 
+  def findByNameAndCluster(serviceName: String, clusterId: Long) =  {
+    db.run(Services.filter(_.servicename === serviceName).filter(_.clusterid === clusterId).result.headOption)
+  }
 
 
   def findByIdAndDatalake(serviceId: Long, datalakeId: Long) = {
@@ -47,6 +49,12 @@ class ClusterServiceRepo @Inject()(
     db.run {
       Services returning Services += cluster
     }
+  }
+
+  def updateByName(cs: ClusterService):Future[Int] = {
+    db.run(Services.filter(_.servicename === cs.servicename).filter(_.clusterid === cs.clusterid)
+      .map(r => (r.fullURL,r.servicehost,r.serviceport,r.properties))
+        .update(cs.fullURL,cs.servicehost,cs.serviceport,cs.properties)).map( r => r)
   }
 
   def findById(clusterId: Long): Future[Option[ClusterService]] = {
@@ -66,11 +74,11 @@ class ClusterServiceRepo @Inject()(
 
     def servicename = column[String]("servicename")
 
-    def servicehost = column[String]("servicehost")
+    def servicehost = column[Option[String]]("servicehost")
 
-    def serviceport = column[Int]("serviceport")
+    def serviceport = column[Option[Int]]("serviceport")
 
-    def fullURL = column[Option[String]]("fullURL")
+    def fullURL = column[Option[String]]("fullurl")
 
     def datalakeid = column[Option[Long]]("datalakeid")
 
@@ -85,8 +93,8 @@ class ClusterServiceRepo @Inject()(
        serviceport,
        fullURL,
        properties,
-       datalakeid,
-       clusterid) <> ((ClusterService.apply _).tupled, ClusterService.unapply)
+       clusterid,
+       datalakeid) <> ((ClusterService.apply _).tupled, ClusterService.unapply)
 
   }
 
