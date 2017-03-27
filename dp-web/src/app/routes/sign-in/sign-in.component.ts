@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 
 import { Credential } from '../../models/credential';
 import { AuthenticationService } from '../../services/authentication.service';
-import { BreadcrumbService } from '../../services/breadcrumb.service';
 import { Environment } from '../../environment';
 import { Persona } from '../../shared/utils/persona';
 
@@ -22,16 +21,14 @@ export class SignInComponent {
     private authenticaionService: AuthenticationService,
     private router: Router,
     private environment: Environment,
-    private breadcrumbService: BreadcrumbService
   ) {
     if (window.location.hash.length > 0 && window.location.hash === '#SESSEXPIRED') {
       this.statusMessage = 'SESSIONEXPIRED';
     }
   }
 
-  onSubmit() {
+  onSubmit(event) {
     this.submitted = true;
-    this.breadcrumbService.crumbMap = [];
     this.authenticaionService
       .signIn(this.credential)
       .subscribe(
@@ -43,6 +40,8 @@ export class SignInComponent {
         },
         error => this.router.navigate(['sign-in'])
       );
+
+      event.preventDefault();
   }
 
 }

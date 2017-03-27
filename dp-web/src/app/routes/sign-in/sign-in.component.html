@@ -4,7 +4,7 @@
       <img class="dataplane-logo-image" src="../../assets/images/ui_logo.svg"/>
     </div>
     <div class="" style="width: 50%;min-width: 500px; padding: 40px;">
-      <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <form (submit)="onSubmit($event)" #loginForm="ngForm">
         <div class="">
           <div class="dp-input">
             <label for="username" style="display: block;">Username</label>

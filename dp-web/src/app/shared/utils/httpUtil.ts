@@ -31,13 +31,17 @@ export class HttpUtil {
   }
 
   public static getHeaders(): RequestOptionsArgs {
-    const headers =
-      new Headers({
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('dp_auth_token')}`
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    const token = localStorage.getItem('dp_auth_token');
+    if(token) {
+      Object.assign(headers, {
+        'Authorization': `Bearer ${token}`
       });
+    }
     return ({
-      headers
+      headers: new Headers(headers)
     });
   }
 }

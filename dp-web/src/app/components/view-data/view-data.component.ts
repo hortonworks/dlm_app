@@ -212,7 +212,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
                     </div>
                     <div>SOURCE</div>
                   </div>`,
-                position: CityNames.getCityCoordinates(cPolicy.source.dataCenter.location.country, cPolicy.source.dataCenter.location.place)
+                position: CityNames.getCityCoordinates(cPolicy.source.dataCenter.location.country, cPolicy.source.dataCenter.location.city)
               },
             target: {
               template:
@@ -228,7 +228,7 @@ export class ViewDataComponent implements OnInit, AfterViewInit {
                     </div>
                     <div>${cPolicy.schedule && cPolicy.schedule.frequency ? cPolicy.schedule.frequency : ''}</div>
                   </div>`,
-              position: CityNames.getCityCoordinates(cPolicy.target.dataCenter.location.country, cPolicy.target.dataCenter.location.place)
+              position: CityNames.getCityCoordinates(cPolicy.target.dataCenter.location.country, cPolicy.target.dataCenter.location.city)
             }
           }))
           .map(cLocation => {

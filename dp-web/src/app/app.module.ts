@@ -50,7 +50,7 @@ import { LocationService } from './services/location.service';
     LakeService,
     LocationService,
     LoggedInGuard,
-    AlreadyLoggedInGuard
+    AlreadyLoggedInGuard,
   ]
 })
 export class AppModule { }

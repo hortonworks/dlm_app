@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, RequestOptions, Response, ResponseOptions } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
+import { Http, RequestOptions } from '@angular/http';
+import { Observable } from 'rxjs/Rx';
+
 
 import { HttpUtil } from '../shared/utils/httpUtil';
 
@@ -22,14 +23,14 @@ export class AuthenticationService {
 
   signIn(credential: Credential): Observable<User> {
     return this.http
-      .post(`${this.URI}/in`, credential, new RequestOptions(HttpUtil.getHeaders()))
-      .map(HttpUtil.extractData)
-      .do((user: User) => {
-        this.isUserAuthenticated = true;
-        localStorage.setItem('dp_user', JSON.stringify(user))
-        localStorage.setItem('dp_auth_token', user.token);
-        localStorage.setItem('dp_userType', user.roles[0]);
-      });
+        .post(`${this.URI}/in`, credential, new RequestOptions(HttpUtil.getHeaders()))
+        .map(HttpUtil.extractData)
+        .do((user: User) => {
+          this.isUserAuthenticated = true;
+          localStorage.setItem('dp_user', JSON.stringify(user))
+          localStorage.setItem('dp_auth_token', user.token);
+          localStorage.setItem('dp_userType', user.roles[0]);
+        });
   }
 
   signOut() {

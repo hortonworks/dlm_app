@@ -1,50 +1,43 @@
-<section class="dp-container dp-route dp-route--lake-add" style="position: fixed;top:0;left:0;height: 100%; width: 100%; background-color: rgb(247, 247, 247);">
-  <div style="display: flex;height: 100%;" >
-    <aside class="dp-aside"></aside>
-    <div style="flex-grow: 1;overflow: auto;">
-      <div style="padding: 40px;">
-      <header>
-        <div [routerLink]="['/lake-add']" class="" style="height: initial; text-transform:none; font-size: 1em; text-align: left; display: flex;padding: 10px;">
-            <div style="width: 50px;"><i class="fa fa-server" aria-hidden="true" style="font-size: 1.2em;"></i></div>
-            <div style="flex-grow: 1;">
-              <div style="text-transform: uppercase; font-size: 1.2em; font-weight: bold;">Add datalakes</div>
-              <p>desc.</p>
-            </div>
-          </div>
-      </header>
-      <div>
-        <div class="dp-input">
-          <label for="location" style="display: block;">Name</label>
-          <input class="" type="text" placeholder="Name" name="name" id="name" [(ngModel)]="name" required/>
-        </div>
-        <div class="dp-input dp-input--typeahead">
-          <label for="location" style="display: block;">Location</label>
-          <input class="" type="text" placeholder="Location" name="location" id="location" [(ngModel)]="location" required/>
-          <ul class="dp-input__options" >
-            <li>ferefer</li>
-            <li>ferefer</li>
-            <li>ferefer</li>
-            <li>ferefer</li>
-          </ul>
-        </div>
-        <div class="dp-input">
-          <label for="description" style="display: block;">Description</label>
-          <input class="" type="text" placeholder="Description" name="description" id="description" [(ngModel)]="description" required/>
-        </div>
-        <div class="dp-input">
-          <label for="uri" style="display: block;">Cluster URI</label>
-          <input class="" type="text" placeholder="URI" name="uri" id="uri" [(ngModel)]="uri" required/>
+<section style="padding: 40px;">
+  <header>
+    <div [routerLink]="['/lake-add']" class="" style="height: initial; text-transform:none; font-size: 1em; text-align: left; display: flex;padding: 10px;">
+        <div style="width: 50px;"><i class="fa fa-server" aria-hidden="true" style="font-size: 1.2em;"></i></div>
+        <div style="flex-grow: 1;">
+          <div style="text-transform: uppercase; font-size: 1.2em; font-weight: bold;">Add datalakes</div>
+          <p>desc.</p>
         </div>
       </div>
-      <footer class="" style="">
-        <button type="submit" class="mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect">
-          Add
-        </button>
-        <button type="button" class="mdl-button mdl-button--colored mdl-color-text--white mdl-js-button mdl-js-ripple-effect">
-          Cancel
-        </button>
-      </footer>
-      </div>
+  </header>
+  <div>
+    <div class="dp-input">
+      <label for="location" style="display: block;">Name</label>
+      <input class="" type="text" placeholder="Name" name="name" id="name" [(ngModel)]="name" required/>
+    </div>
+    <div class="dp-input dp-input--typeahead">
+      <label for="location" style="display: block;">Location</label>
+      <input class="" type="text" placeholder="Location" name="location" id="location" [(ngModel)]="location" required/>
+      <ul class="dp-input__options" >
+        <li>ferefer</li>
+        <li>ferefer</li>
+        <li>ferefer</li>
+        <li>ferefer</li>
+      </ul>
+    </div>
+    <div class="dp-input">
+      <label for="description" style="display: block;">Description</label>
+      <input class="" type="text" placeholder="Description" name="description" id="description" [(ngModel)]="description" required/>
+    </div>
+    <div class="dp-input">
+      <label for="uri" style="display: block;">Cluster URI</label>
+      <input class="" type="text" placeholder="URI" name="uri" id="uri" [(ngModel)]="uri" required/>
     </div>
   </div>
+  <footer class="" style="">
+    <button type="submit" class="mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect">
+      Add
+    </button>
+    <button type="button" class="mdl-button mdl-button--colored mdl-color-text--white mdl-js-button mdl-js-ripple-effect">
+      Cancel
+    </button>
+  </footer>
 </section>

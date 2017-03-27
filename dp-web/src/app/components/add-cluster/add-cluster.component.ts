@@ -74,13 +74,13 @@ export class AddClusterComponent implements AfterViewInit, OnInit {
     }
 
     onCityChange() {
-        let coordinates = CityNames.getCityCoordinates(this.dataCenter.location.country, this.dataCenter.location.place);
+        let coordinates = CityNames.getCityCoordinates(this.dataCenter.location.country, this.dataCenter.location.city);
         let cityBubble = [{
             name: 'name',
             radius:5,
             yield: 400,
             borderColor: '#4C4C4C',
-            location: this.dataCenter.location.place + ' - ' + this.dataCenter.location.country,
+            location: this.dataCenter.location.city + ' - ' + this.dataCenter.location.country,
             latitude: parseFloat(coordinates[0]),
             longitude: parseFloat(coordinates[1])
         }];
