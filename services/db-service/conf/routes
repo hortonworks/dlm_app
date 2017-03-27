@@ -31,6 +31,7 @@ POST          /locations                                                     con
 GET           /datalakes                                                     controllers.Datalakes.all
 POST          /datalakes                                                     controllers.Datalakes.add
 GET           /datalakes/:datalakeId                                         controllers.Datalakes.load(datalakeId:Long)
+GET           /datalakes/:datalakeId/clusters                                controllers.Clusters.getByDatalakeId(datalakeId:Long)
 DELETE        /datalakes/:datalakeId                                         controllers.Datalakes.delete(datalakeId:Long)
 
 #Clusters API
@@ -49,11 +50,11 @@ DELETE        /cloud/clusters/:clusterId                                     con
 
 GET           /clusters/:clusterId/services                                  controllers.ClusterServices.allWithCluster(clusterId:Long)
 GET           /clusters/:datalakeId/services                                 controllers.ClusterServices.allWithDatalake(datalakeId:Long)
-POST          /datalakes/services                                            controllers.ClusterServices.addWithCluster(clusterId:Long)
-POST          /cluster/services                                              controllers.ClusterServices.addWithDatalake(datalakeId:Long)
-GET           /clusters/:clusterId/service/:serviceId                        controllers.ClusterServices.loadWithCluster(serviceId:Long,clusterId:Long)
-GET           /datalakes/:datalakeId/service/:serviceId                      controllers.ClusterServices.loadWithDatalake(serviceId:Long,datalakeId:Long)
+POST          /cluster/services                                              controllers.ClusterServices.addWithCluster
+POST          /datalake/services                                             controllers.ClusterServices.addWithDatalake
+GET           /clusters/:clusterId/service/:serviceName                      controllers.ClusterServices.loadWithClusterAndName(clusterId:Long,serviceName:String)
 DELETE        /services/:serviceId                                           controllers.ClusterServices.delete(serviceId:Long)
+PUT           /clusters/services                                             controllers.ClusterServices.updateWithCluster
 
 #Workspaces API
 GET           /workspaces                                                    controllers.Workspaces.all

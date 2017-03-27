@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { FirstRunComponent } from './first-run.component';
 
@@ -8,6 +9,7 @@ describe('FirstRunComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [RouterTestingModule],
       declarations: [ FirstRunComponent ]
     })
     .compileComponents();

@@ -16,6 +16,7 @@ trait JsonAPI extends Controller {
   val pgErrors = Map("23503" -> Conflict, "23505" -> Conflict)
 
   def success(data: JsValueWrapper) = Ok(Json.obj("results" -> data))
+
   val notFound = NotFound(Json.toJson(wrapErrors("404","Not found")))
 
   def linkData(data: JsValueWrapper, links: Map[String, String]) =

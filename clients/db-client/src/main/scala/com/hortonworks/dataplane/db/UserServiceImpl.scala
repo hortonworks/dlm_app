@@ -5,7 +5,7 @@ import javax.inject.Singleton
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.db.Webserice.UserService
 import com.typesafe.config.Config
-import play.api.libs.json.{JsResult, Json, Reads}
+import play.api.libs.json.Json
 import play.api.libs.ws.{WSClient, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -30,37 +30,28 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
 
   private def mapToUser(res: WSResponse) = {
     res.status match {
-      case 200 => extractEntity[User](res, r => (r.json \ "results")(0).validate[User])
+      case 200 => Right((res.json \ "results")(0).validate[User].get)
       case _ => mapErrors(res)
     }
   }
 
-  private def mapErrors(res: WSResponse) = {
-    Left(extractError(res, r => r.json.validate[Errors]))
-  }
-
   def mapToRole(res: WSResponse) = {
     res.status match {
-      case 200 =>
-        extractEntity[Role](res, r => (r.json \ "results").validate[Role])
+      case 200 => Right((res.json \ "results").validate[Role].get)
       case _ => mapErrors(res)
     }
   }
 
   private def mapToUserRoles(res: WSResponse) = {
     res.status match {
-      case 200 =>
-        extractEntity[UserRoles](res,
-                                 r => (r.json \ "results").validate[UserRoles])
+      case 200 =>Right((res.json \ "results").validate[UserRoles].get)
       case _ => mapErrors(res)
     }
   }
 
   private def mapToUserRole(res: WSResponse) = {
     res.status match {
-      case 200 =>
-        extractEntity[UserRole](res,
-                                r => (r.json \ "results").validate[UserRole])
+      case 200 =>Right((res.json \ "results").validate[UserRole].get)
       case _ => mapErrors(res)
     }
   }
@@ -74,22 +65,6 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       }
   }
 
-  private def extractEntity[T](
-      res: WSResponse,
-      f: WSResponse => JsResult[T]): Either[Errors, T] = {
-    f(res)
-      .map(r => Right(r))
-      .getOrElse(Left(Errors(Seq(Error(
-        "500",
-        s"sCould not parse response from DB - ${Json.stringify(res.json)}")))))
-  }
-
-  private def extractError(res: WSResponse,
-                           f: WSResponse => JsResult[Errors]): Errors = {
-    if (res.body.isEmpty)
-      Errors()
-    f(res).map(r => r).getOrElse(Errors())
-  }
 
   override def addUser(user: User): Future[Either[Errors, User]] = {
     ws.url(s"$url/users")

@@ -1,6 +1,5 @@
 CREATE SCHEMA IF NOT EXISTS dataplane;
 
-
 CREATE TABLE IF NOT EXISTS dataplane.dp_roles (
   id      BIGSERIAL PRIMARY KEY,
   name    VARCHAR(32) UNIQUE NOT NULL,
@@ -9,14 +8,14 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_roles (
 );
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_users (
-  id            BIGSERIAL PRIMARY KEY,
-  username      VARCHAR(255) NOT NULL UNIQUE,
-  displayname   VARCHAR(255),
-  avatar        VARCHAR(255),
-  active        BOOLEAN   DEFAULT TRUE,
-  password      VARCHAR(255),
-  created       TIMESTAMP DEFAULT now(),
-  updated       TIMESTAMP DEFAULT now()
+  id          BIGSERIAL PRIMARY KEY,
+  username    VARCHAR(255) NOT NULL UNIQUE,
+  displayname VARCHAR(255),
+  avatar      VARCHAR(255),
+  active      BOOLEAN   DEFAULT TRUE,
+  password    VARCHAR(255),
+  created     TIMESTAMP DEFAULT now(),
+  updated     TIMESTAMP DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_users_roles (
@@ -36,10 +35,10 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_permissions (
 );
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_locations (
-  id      BIGSERIAL PRIMARY KEY,
-  country VARCHAR(255) NOT NULL,
-  city    VARCHAR(255) NOT NULL,
-  latitude DECIMAL(10, 6) NOT NULL,
+  id        BIGSERIAL PRIMARY KEY,
+  country   VARCHAR(255)   NOT NULL,
+  city      VARCHAR(255)   NOT NULL,
+  latitude  DECIMAL(10, 6) NOT NULL,
   longitude DECIMAL(10, 6) NOT NULL,
   UNIQUE (country, city)
 );
@@ -59,7 +58,7 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_clusters (
   id                     BIGSERIAL PRIMARY KEY,
   name                   VARCHAR(255),
   description            TEXT,
-  ambariurl               VARCHAR(255),
+  ambariurl              VARCHAR(255),
   ambariuser             VARCHAR(255),
   ambaripass             VARCHAR(255),
   secured                BOOLEAN DEFAULT FALSE,
@@ -89,13 +88,13 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_cloud_clusters (
 CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_services (
   id          BIGSERIAL PRIMARY KEY,
   servicename VARCHAR(255) NOT NULL,
-  servicehost VARCHAR(255) NOT NULL,
-  serviceport INT          NOT NULL,
-  fullURL     TEXT,
+  servicehost VARCHAR(255),
+  serviceport INT,
+  fullurl     TEXT,
   properties  JSONB,
   clusterid   BIGINT REFERENCES dataplane.dp_clusters (id),
   datalakeid  BIGINT REFERENCES dataplane.dp_datalakes (id),
-  check (clusterid is not null and datalakeid is not null)
+  CHECK (clusterid IS NOT NULL OR datalakeid IS NOT NULL)
 
 );
 
@@ -105,8 +104,8 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_workspace (
   name        VARCHAR(255)                              NOT NULL,
   description TEXT,
   createdby   BIGINT REFERENCES dataplane.dp_users (id) NOT NULL,
-  created       TIMESTAMP DEFAULT now(),
-  updated       TIMESTAMP DEFAULT now()
+  created     TIMESTAMP DEFAULT now(),
+  updated     TIMESTAMP DEFAULT now()
 );
 
 
@@ -178,7 +177,7 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_unclassified_datasets (
 );
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_unclassified_datasets_categories (
-  category_id             BIGINT REFERENCES dataplane.dp_categories (id)           NOT NULL,
+  category_id             BIGINT REFERENCES dataplane.dp_categories (id)            NOT NULL,
   unclassified_dataset_id BIGINT REFERENCES dataplane.dp_unclassified_datasets (id) NOT NULL
 );
 
@@ -229,12 +228,11 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_enabled_skus (
   updated        TIMESTAMP DEFAULT now()
 );
 
-
 -- Global DP configurations - could be exported to cluster ZK if needed
 CREATE TABLE IF NOT EXISTS dataplane.dp_configs (
   id          BIGSERIAL PRIMARY KEY,
-  configkey  VARCHAR (255) NOT NULL  UNIQUE ,
-  configvalue TEXT NOT NULL,
-  active BOOLEAN DEFAULT TRUE NOT NULL,
-  export BOOLEAN DEFAULT FALSE NOT NULL
+  configkey   VARCHAR(255)          NOT NULL  UNIQUE,
+  configvalue TEXT                  NOT NULL,
+  active      BOOLEAN DEFAULT TRUE  NOT NULL,
+  export      BOOLEAN DEFAULT FALSE NOT NULL
 );
