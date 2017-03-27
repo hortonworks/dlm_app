@@ -54,6 +54,7 @@ class ClusterActor(cluster: Cluster,
 
     case SaveKnox(knox) =>
       logger.info("Saving ambari knox information")
+      dbActor ! PersistKnox(cluster,knox)
       ambariInterface.getNameNodeStats.map(SaveNameNode).pipeTo(self)
 
     case SaveHostInfo(hostInfo) =>
@@ -61,6 +62,7 @@ class ClusterActor(cluster: Cluster,
       ambariInterface.getAtlas.map(SaveAtlas).pipeTo(self)
 
     case SaveNameNode(nameNode) =>
+      dbActor ! PersistNameNode(cluster,nameNode)
       logger.info("Saving ambari name node information")
 
     case Failure(f) =>
