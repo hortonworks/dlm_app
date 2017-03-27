@@ -1,4 +1,4 @@
-[ ] `/first-run`
+[x] `/first-run`
 [ ] `/lake-add`
 [ ] Move `/first-run` to `/onboarding/landing`
 [ ] Move `/lake-add` to `/onboarding/lakes`

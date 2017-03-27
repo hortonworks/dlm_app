@@ -27,5 +27,11 @@ object Webserice {
 
   }
 
+  trait LocationService {
+
+    def list(query: Option[String]): Future[Either[Errors, Seq[Location]]]
+
+  }
+
 
 }

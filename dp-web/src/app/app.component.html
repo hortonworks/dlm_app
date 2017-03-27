@@ -27,25 +27,7 @@
         </div>
     </div>
 
-    <div class="dataplane-drawer mdl-layout__drawer" reload style="display: none;">
-        <span *ngIf="isLoggedIn()" class="mdl-layout-title vw-logo-image">
-            <img src="/assets/images/hortonia.png">
-        </span>
-        <nav *ngIf="isLoggedIn()" class="mdl-navigation">
-            <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link mdl-typography--font-medium" href="" [sidenavRouterLink]="['/dashboard']">DASHBOARD</a>
-            <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link mdl-typography--font-medium" href="" [sidenavRouterLink]="['/add-data-lake']" > {{ environment.DATA_CENTER_DATA_LAKE }} </a>
-            <a *ngIf="[persona.ANALYSTADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link mdl-typography--font-medium" href="" [sidenavRouterLink]="['/data-analyst/analyst-dashboard']" > DATA SETS </a>
 
-            <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/data-manager']" style="position: relative">
-                <div class="mdl-typography--font-medium">
-                    DATA MANAGER
-                </div>
-                <div style="font-size: 10px;position: absolute;bottom: 0;">
-                    Backup and Restore
-                </div>
-            </a>
-        </nav>
-    </div>
 
     <div class="dataplane-content mdl-layout__content">
       <router-outlet style=""></router-outlet>
