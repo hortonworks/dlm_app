@@ -40,8 +40,6 @@ export class SignInComponent {
         },
         error => this.router.navigate(['sign-in'])
       );
-
-      event.preventDefault();
   }
 
 }
