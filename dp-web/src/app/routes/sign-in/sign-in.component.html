@@ -4,7 +4,7 @@
       <img class="dataplane-logo-image" src="../../assets/images/ui_logo.svg"/>
     </div>
     <div class="" style="width: 50%;min-width: 500px; padding: 40px;">
-      <div style="margin: 5px 0;" *ngIf="_isAuthInProgress === false && _isAuthSuccessful === false">{{message}}</div>
+      <div style="margin: 5px 0;" *ngIf="_isAuthInProgress === false && _isAuthSuccessful === false && message">{{message}}</div>
       <form (submit)="onSubmit($event)" #loginForm="ngForm">
         <div class="">
           <div class="dp-input">
