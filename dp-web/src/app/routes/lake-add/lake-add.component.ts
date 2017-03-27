@@ -46,9 +46,12 @@ export class LakeAddComponent implements OnInit {
         this._isLocationFetchSuccessful = false;
       })
       .flatMap(query => this.locationService.retrieveOptions(query))
-      .finally(() => this._isLocationFetchInProgress = false)
+      .finally(() => {
+        this._isLocationFetchInProgress = false;
+      })
       .subscribe(
         locations => {
+          this._isLocationFetchInProgress = false;
           this._isLocationFetchSuccessful = true;
           this.locationOptions = locations;
         },

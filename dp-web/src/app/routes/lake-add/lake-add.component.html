@@ -17,9 +17,9 @@
       <label for="location" style="display: block;">Location</label>
       <input class="" type="text" placeholder="Location" name="location" id="location" required [value]="locationQueryString" (focus)="onFocusLocation($event)" (blur)="onBlurLocation($event)" (input)="onUpdateLocation($event)"/>
       <ul class="dp-input__options" *ngIf="_isLocationInFocus === true">
-        <li *ngIf="locationQueryString.length < 3">Start typing for options.</li>
+        <li *ngIf="locationQueryString.length < 3 && _isLocationFetchInProgress === false">Continue typing for options.</li>
         <li *ngIf="_isLocationFetchInProgress">Fetching options...</li>
-        <li *ngIf="_isLocationFetchInProgress === false && locationOptions.length === 0">No locations found.</li>
+        <li *ngIf="locationQueryString.length >= 3 && _isLocationFetchInProgress === false && locationOptions.length === 0">No locations found.</li>
         <li *ngFor="let cLocation of locationOptions" (mousedown)="onSelectLocation(cLocation)" class="dp-input__option">{{cLocation.city}}, {{cLocation.country}}</li>
       </ul>
     </div>
@@ -33,10 +33,10 @@
     </div>
   </div>
   <footer class="" style="">
-    <button type="submit" class="mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect">
+    <button type="button" class="mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect" (click)="onCreate()">
       Add
     </button>
-    <button type="button" class="mdl-button mdl-button--colored mdl-color-text--white mdl-js-button mdl-js-ripple-effect">
+    <button type="button" class="mdl-button mdl-button--colored mdl-color-text--white mdl-js-button mdl-js-ripple-effect" (click)="onCancel()">
       Cancel
     </button>
   </footer>
