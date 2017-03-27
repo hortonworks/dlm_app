@@ -12,7 +12,7 @@ export class LocationService {
 
   retrieveOptions(query: string) {
     return this.http
-      .post(`${this.url}?query=${query}`, new RequestOptions(HttpUtil.getHeaders()))
+      .get(`${this.url}?query=${query}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

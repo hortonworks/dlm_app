@@ -4,7 +4,7 @@ export class Lake {
   description: string;
   location: number;
   createdBy?: string;
-  properties?: object;
+  properties?: any;
   created?: string;
   updated?: string;
 }

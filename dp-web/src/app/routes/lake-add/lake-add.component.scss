@@ -13,6 +13,13 @@
   list-style: none;
   border: 1px solid rgb(221, 221, 221);
 }
+.dp-input__option {
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgb(221, 221, 221);
+  }
+}
 input {
   font-size: 1em;
 
