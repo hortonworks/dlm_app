@@ -21,6 +21,9 @@ private[dataplane] case class PersistKnox(cluster: Cluster,
 private[dataplane] case class PersistNameNode(cluster: Cluster,
                                           knox: Either[Throwable, NameNode])
 
+private [dataplane] case class PersistHostInfo(hostInfo:Either[Throwable, Seq[HostInformation]])
+
+
 private sealed case class PersistenceResult(option: Option[ClusterData])
 private sealed case class ServiceExists(clusterData: ClusterData,
                                         boolean: Boolean)

@@ -8,7 +8,6 @@ import com.typesafe.scalalogging.Logger
 import play.api.libs.ws.WSClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 private sealed case class SaveAtlas(atlas: Either[Throwable, Atlas])
 private sealed case class SaveNameNode(atlas: Either[Throwable, NameNode])
@@ -59,6 +58,7 @@ class ClusterActor(cluster: Cluster,
 
     case SaveHostInfo(hostInfo) =>
       logger.info("Saving ambari host information")
+      dbActor ! PersistHostInfo(hostInfo)
       ambariInterface.getAtlas.map(SaveAtlas).pipeTo(self)
 
     case SaveNameNode(nameNode) =>
