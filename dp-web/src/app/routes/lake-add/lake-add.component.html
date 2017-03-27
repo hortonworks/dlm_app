@@ -15,12 +15,11 @@
     </div>
     <div class="dp-input dp-input--typeahead">
       <label for="location" style="display: block;">Location</label>
-      <input class="" type="text" placeholder="Location" name="location" id="location" [(ngModel)]="location" required/>
-      <ul class="dp-input__options" >
-        <li>ferefer</li>
-        <li>ferefer</li>
-        <li>ferefer</li>
-        <li>ferefer</li>
+      <input class="" type="text" placeholder="Location" name="location" id="location" required [(ngModel)]="location" (focus)="_isLocationInFocus = true" (blur)="_isLocationInFocus = false"/>
+      <ul class="dp-input__options" *ngIf="_isLocationInFocus === true">
+        <li *ngIf="location.text.length === 0">Start typing to show options.</li>
+        <li *ngIf="locationOptions.length === 0">No locations found.</li>
+        <li *ngFor="let cLocation of locationOptions" (click)="onSelectLocation(cLocation)" style="cursor:pointer;">{{cLocation.city}}, {{cLocation.country}}</li>
       </ul>
     </div>
     <div class="dp-input">

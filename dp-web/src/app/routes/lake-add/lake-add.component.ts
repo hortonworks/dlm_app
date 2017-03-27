@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { Subject, Observable } from 'rxjs/Rx';
+
 import { Lake } from '../../models/lake';
 import { Location } from '../../models/location';
 import { LakeService } from '../../services/lake.service';
@@ -13,10 +15,17 @@ import { LocationService } from '../../services/location.service';
 })
 export class LakeAddComponent implements OnInit {
 
-  lake: Lake;
+  lake: Lake = new Lake();
+  location: Location = new Location();
   isClusterVerified: boolean = false;
-  locationInput: string = '';
+
+  _isLocationInFocus: boolean = false;
+  _isLocationFetchInProgress: boolean = false;
+  _isLocationFetchSuccessful: boolean = false;
   locationOptions: Location[] = [];
+
+  rxLocationOptions: Subject<string> = new Subject();
+
 
   constructor(
     private router: Router,
@@ -25,23 +34,28 @@ export class LakeAddComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.rxLocationOptions
+      .debounce(() => Observable.timer(250))
+      .filter(cLocationQuery => cLocationQuery.length >= 1)
+      .do(() => this._isLocationFetchInProgress = true)
+      .flatMap(query => this.locationService.retrieveOptions(query))
+      .finally(() => this._isLocationFetchInProgress = false)
+      .subscribe(
+        locations => {
+          this.locationOptions = locations;
+        }
+      );
+  }
+
+  onUpdateLocation(query) {
+    this.rxLocationOptions.next(query);
   }
 
   doVerifyCluster() {
 
   }
 
-  onUpdateLocation() {
-
-  }
-
   onUpdateCluster() {
-    this.locationService.retrieveOptions(this.locationInput)
-      .subscribe(
-        locations => {
-          this.locationOptions = locations;
-        }
-      );
 
   }
 
