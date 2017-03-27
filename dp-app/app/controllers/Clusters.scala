@@ -25,7 +25,7 @@ class Clusters @Inject()(
       .map { clusters =>
         clusters match {
           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-          case Right(lakes) => Ok(Json.toJson(clusters))
+          case Right(clusters) => Ok(Json.toJson(clusters))
         }
       }
   }
@@ -33,12 +33,12 @@ class Clusters @Inject()(
 
   def create = Authenticated.async(parse.json) { request =>
     Logger.info("Received create cluster request")
-    request.body.validate[Cluster].map { lake =>
-      clusterService.create(lake.copy(createdBy = request.user.id))
+    request.body.validate[Cluster].map { cluster =>
+      clusterService.create(cluster.copy(userid = request.user.id))
         .map {
-          lake => lake match {
+          cluster => cluster match {
             case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-            case Right(lake) => Ok(Json.toJson(lake))
+            case Right(cluster) => Ok(Json.toJson(cluster))
           }
         }
     }.getOrElse(Future.successful(BadRequest))

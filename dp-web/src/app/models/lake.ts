@@ -1,5 +1,5 @@
 export class Lake {
-  id: string;
+  id: number;
   name: string;
   description: string;
   location: number;

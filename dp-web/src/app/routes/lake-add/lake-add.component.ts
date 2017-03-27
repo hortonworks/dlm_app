@@ -117,8 +117,16 @@ export class LakeAddComponent implements OnInit {
 
   onCreate() {
     this.lakeService.insert(this.lake)
+      .flatMap(lake => {
+        this.cluster.name = `cluster of lake ${lake.name}`;
+        this.cluster.datalakeid = lake.id;
+        this.cluster.description = `Cluster of lake ${lake.id}`;
+        return this.clusterService.insert(this.cluster);
+      })
       .subscribe(
-        () => this.router.navigate(['dashboard']),
+        () => {
+          this.router.navigate(['dashboard']);
+        },
         error => {
 
         }
@@ -126,7 +134,7 @@ export class LakeAddComponent implements OnInit {
   }
 
   onCancel() {
-
+    this.router.navigate(['dashboard']);
   }
 
 }

@@ -10,7 +10,9 @@ export class ClusterService {
 
   constructor(private http:Http) { }
 
-  list(){}
+  list(){
+    // TODO
+  }
 
   insert(cluster: Cluster): Observable<Cluster> {
     return this.http

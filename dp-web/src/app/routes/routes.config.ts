@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { FirstRunComponent } from './first-run/first-run.component';
 import { SignInComponent } from './sign-in/sign-in.component';
 import { LakeAddComponent } from './lake-add/lake-add.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 import { LogoutComponent } from '../logout/logout.component';
 
 import { AlreadyLoggedInGuard, LoggedInGuard } from '../shared/utils/login-guard';
@@ -31,6 +32,9 @@ export const routes: Routes = [{
   },{
     path: 'logout',
     component: LogoutComponent
+  },{
+    path: 'dashboard',
+    component: DashboardComponent
   // },{
   //   path: 'data-lake/:id',
   //   component: ViewClusterComponent

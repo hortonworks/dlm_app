@@ -6,7 +6,7 @@ import {HttpUtil} from '../shared/utils/httpUtil';
 
 @Injectable()
 export class LakeService {
-  url = '/api/clusters';
+  url = '/api/lakes';
 
   constructor(private http:Http) {}
 
