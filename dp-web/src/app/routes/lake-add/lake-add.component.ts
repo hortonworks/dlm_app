@@ -7,6 +7,7 @@ import { Lake } from '../../models/lake';
 import { Location } from '../../models/location';
 import { Cluster } from '../../models/cluster';
 import { LakeService } from '../../services/lake.service';
+import { ClusterService } from '../../services/cluster.service';
 import { LocationService } from '../../services/location.service';
 
 @Component({
@@ -28,13 +29,18 @@ export class LakeAddComponent implements OnInit {
   _isLocationFetchSuccessful: boolean = false;
   locationOptions: Location[] = [];
 
+  _isClusterValidateInProgress: boolean = false;
+  _isClusterValidateSuccessful: boolean = false;
+
   rxLocationOptions: Subject<string> = new Subject();
+  rxClusterValidate: Subject<string> = new Subject();
 
 
   constructor(
     private router: Router,
     private lakeService: LakeService,
     private locationService: LocationService,
+    private clusterService: ClusterService,
   ) { }
 
   ngOnInit() {
@@ -59,10 +65,30 @@ export class LakeAddComponent implements OnInit {
           this._isLocationFetchSuccessful = false;
         }
       );
+
+    this.rxClusterValidate
+      .debounce(() => Observable.timer(250))
+      .filter(cClusterUrl => cClusterUrl.length >= 3)
+      .do(() => {
+        this._isClusterValidateInProgress = true;
+        this._isClusterValidateSuccessful = false;
+      })
+      .flatMap(clusterUrl => this.clusterService.validate(clusterUrl))
+      .subscribe(
+        isValid => {
+
+        console.log(isValid)
+          this._isClusterValidateInProgress = false;
+          this._isClusterValidateSuccessful = isValid;
+        },
+        () => {
+          this._isLocationFetchSuccessful = false;
+          this._isClusterValidateInProgress = false;
+        }
+      );
   }
 
   onUpdateLocation(event) {
-    console.log(event.target.value)
     this.rxLocationOptions.next(event.target.value);
   }
 
@@ -82,11 +108,11 @@ export class LakeAddComponent implements OnInit {
   }
 
   doVerifyCluster() {
-
+    this.rxClusterValidate.next(this.cluster.ambariUrl);
   }
 
   onUpdateCluster() {
-
+    this.doVerifyCluster();
   }
 
   onCreate() {

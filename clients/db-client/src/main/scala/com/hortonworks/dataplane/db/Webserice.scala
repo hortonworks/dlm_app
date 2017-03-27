@@ -69,6 +69,8 @@ object Webserice {
     def getLinkedClusters(
         datalakeId: Long): Future[Either[Errors, Seq[Cluster]]]
 
+    def create(cluster: Cluster): Future[Either[Errors, Cluster]]
+
   }
 
   // Maps to ClusterService

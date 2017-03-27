@@ -1,8 +1,8 @@
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Provides, Singleton}
-import com.hortonworks.dataplane.db.{LakeServiceImpl, LocationServiceImpl, UserServiceImpl}
-import com.hortonworks.dataplane.db.Webserice.{LakeService, LocationService, UserService}
+import com.hortonworks.dataplane.db.{LakeServiceImpl, LocationServiceImpl, UserServiceImpl, ClusterServiceImpl}
+import com.hortonworks.dataplane.db.Webserice.{LakeService, LocationService, UserService, ClusterService}
 import internal.{AmbariSync, AtlasApiCache}
 import internal.persistence._
 import play.api.Configuration
@@ -50,6 +50,13 @@ class Module extends AbstractModule {
     new LocationServiceImpl(configuration.underlying)
   }
 
+
+  @Provides
+  @Singleton
+  @Named("clusterService")
+  def provideClusterService(implicit ws: WSClient,configuration: Configuration):ClusterService = {
+    new ClusterServiceImpl(configuration.underlying)
+  }
 
 
 }

@@ -22,6 +22,7 @@ import { DashboardComponent } from './routes/dashboard/dashboard.component';
 import { AuthenticationService } from './services/authentication.service';
 import { LakeService } from './services/lake.service';
 import { LocationService } from './services/location.service';
+import { ClusterService } from './services/cluster.service';
 
 @NgModule({
   imports: [
@@ -49,6 +50,8 @@ import { LocationService } from './services/location.service';
     AuthenticationService,
     LakeService,
     LocationService,
+    ClusterService,
+
     LoggedInGuard,
     AlreadyLoggedInGuard,
   ]
