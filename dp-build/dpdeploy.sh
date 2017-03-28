@@ -9,7 +9,7 @@ ps() {
 }
 
 migrate_schema() {
-    docker-compose -f docker-compose.yml -f docker-compose-migrate.yml up -d
+    docker-compose -f docker-compose.yml -f docker-compose-migrate.yml up 
 }
 
 destroy() {
@@ -17,52 +17,60 @@ destroy() {
 }
 
 build_images() {
-    docker-compose -f docker-compose.yml -f docker-compose-apps.yml build
+    docker-compose -f docker-compose-apps.yml build
 }
 
 init_app() {
-    docker-compose -f docker-compose.yml -f docker-compose-apps.yml up
+    docker-compose -f docker-compose-apps.yml up -d
 }
 
 start_app() {
-    docker-compose -f docker-compose.yml -f docker-compose-apps.yml start
+    docker-compose -f docker-compose-apps.yml start
 }
 
 stop_app() {
-    docker-compose -f docker-compose.yml -f docker-compose-apps.yml stop
+    docker-compose -f docker-compose-apps.yml stop
 }
 
 usage() {
     echo "Usage: dpdeploy.sh <command> \\n \
-            Commands: initdb | migrate | build | up | ps | start | stop | down\\n \
-            initdb: Initialize postgres DB for first time\\n \
+            Commands: init [db|app] | migrate | build | up | ps | start | stop | destroy\\n \
+            init db: Initialize postgres DB for first time\\n \
+            init app: Start the application docker containers for the first time \\n \
             migrate: Run schema migrations on the DB \\n \
             build: Create images of Dataplane specific containers \\n \
-            initapp: Start the application docker containers for the first time \\n \
             start: Start the application docker containers \\n \
             stop: Stop the application docker containers \\n \
             ps: List the status of the docker containers \\n \
-            destroy: Kill all containers and remove them \\n
+            destroy: Kill all containers and remove them. Needs to start from init db again. \\n
             "
 }
 
-if [ $# != 1 ]
+if [ $# -lt 1 ]
 then
     usage;
     exit 0;
 else
     case "$1" in
-        initdb) 
-            init_db
+        init)
+            echo "Found $2"
+            case "$2" in
+                db)
+                    init_db
+                    ;;
+                app)
+                    init_app
+                    ;;
+                *)
+                    usage
+                    ;;
+            esac
             ;;
         migrate)
             migrate_schema
             ;;
         build)
             build_images
-            ;;
-        initapp)
-            init_app
             ;;
         start)
             start_app
@@ -76,7 +84,7 @@ else
         destroy)
             destroy
             ;;
-        *) 
+        *)
             usage
             ;;
     esac
