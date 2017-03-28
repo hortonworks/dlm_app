@@ -32,14 +32,12 @@ class ClusterHostRepo @Inject()(
 
     db.run(ClusterHosts.filter(_.clusterId === clusterHost.clusterId).filter(_.host === clusterHost.host)
       .map(r => (r.status, r.properties))
-      .update(clusterHost.status, clusterHost.properties)).map { o =>
-       o match {
-        case 0 =>
-          ClusterHosts += clusterHost
-          1
-        case 1 => 1
-        case n => throw new Exception("Too many rows updated")
-      }
+      .update(clusterHost.status, clusterHost.properties)).map {
+      case 0 =>
+        db.run(ClusterHosts += clusterHost)
+        1
+      case 1 => 1
+      case n => throw new Exception("Too many rows updated")
     }
   }
 
