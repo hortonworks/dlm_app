@@ -4,6 +4,10 @@ import java.time.LocalDateTime
 
 import play.api.libs.json.{JsValue, Json}
 
+/**
+  * Data plane main domain entities
+  * add objects here which should be persisted
+  */
 object Entities {
 
   case class Error(code: String, message: String)
@@ -201,6 +205,7 @@ object Entities {
                             details:Option[JsValue],
                             datasetId:Long
                            )
+
 
 }
 

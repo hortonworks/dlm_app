@@ -2,9 +2,10 @@ package controllers
 
 import javax.inject._
 
-import com.hortonworks.dataplane.commons.domain.Entities.{ClusterHost}
+import com.hortonworks.dataplane.commons.domain.Entities.ClusterHost
 import domain.API.clusters
 import domain.ClusterHostRepo
+import play.api.libs.json.Json
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -45,6 +46,18 @@ class ClusterHosts @Inject()(clusterHostRepo: ClusterHostRepo)(implicit exec: Ex
         val created = clusterHostRepo.insert(cl)
         created
           .map(c => success(linkData(c, makeLink(c))))
+          .recoverWith(apiError)
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
+
+  def addOrUpdate = Action.async(parse.json) { req =>
+    req.body
+      .validate[ClusterHost]
+      .map { cl =>
+        val created = clusterHostRepo.upsert(cl)
+        created
+          .map(c => success(Json.obj("updated" -> c)))
           .recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))

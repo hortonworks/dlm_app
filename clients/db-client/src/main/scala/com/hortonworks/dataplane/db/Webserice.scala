@@ -82,4 +82,11 @@ object Webserice {
 
   }
 
+  trait ClusterHostsService extends DbClientService {
+
+    def createOrUpdate(host:ClusterHost):Future[Option[Errors]]
+
+  }
+
+
 }

@@ -181,10 +181,6 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
             val futureHost: Future[HostInformation] = hostInfoResponse.map {
               hir =>
                 val hostNode = hir.json \ "Hosts"
-                val cpus = (hostNode \ "cpu_count")
-                  .validate[Int]
-                  .map(s => Some(s))
-                  .getOrElse(None)
                 val state = (hostNode \ "host_state")
                   .validate[String]
                   .map(s => s)
@@ -195,19 +191,7 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
                   .getOrElse("")
                 val ip =
                   (hostNode \ "ip").validate[String].map(s => s).getOrElse("")
-                val diskInfo = (hostNode \ "disk_info")
-                  .validate[List[Map[String, String]]]
-                  .map(s => s)
-                  .getOrElse(List[Map[String, String]]())
-                val diskInfoes: List[DiskInformation] = diskInfo.map(
-                  di =>
-                    DiskInformation(di.get("available"),
-                                    di.get("device"),
-                                    di.get("used"),
-                                    di.get("percentage"),
-                                    di.get("size"),
-                                    di.get("mountpoint")))
-                HostInformation(state, status, ip, cpus, Some(diskInfoes))
+                HostInformation(state, s"$status/$state", ip, hostNode.toOption)
             }
             // the host info
             futureHost

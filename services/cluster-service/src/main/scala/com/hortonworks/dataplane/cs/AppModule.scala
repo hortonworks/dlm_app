@@ -3,8 +3,8 @@ package com.hortonworks.dataplane.cs
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provides, Singleton}
-import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterService, LakeService}
-import com.hortonworks.dataplane.db.{ClusterComponentServiceImpl, ClusterServiceImpl, LakeServiceImpl}
+import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterHostsService, ClusterService, LakeService}
+import com.hortonworks.dataplane.db.{ClusterComponentServiceImpl, ClusterHostsServiceImpl, ClusterServiceImpl, LakeServiceImpl}
 import com.typesafe.config.{Config, ConfigFactory}
 import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcWSClient
@@ -52,8 +52,15 @@ object AppModule extends AbstractModule{
 
   @Provides
   @Singleton
-  def provideClusterInterface(lakeService: LakeService, clusterService: ClusterService,clusterComponentService: ClusterComponentService):ClusterInterface = {
-    new ClusterInterfaceImpl(clusterService,lakeService,clusterComponentService)
+  def provideClusterHostsService(implicit ws: WSClient,configuration: Config):ClusterHostsService = {
+    new ClusterHostsServiceImpl(configuration)
+  }
+
+  @Provides
+  @Singleton
+  def provideClusterInterface(lakeService: LakeService, clusterService: ClusterService,
+                              clusterComponentService: ClusterComponentService,clusterHostsServiceImpl: ClusterHostsService):ClusterInterface = {
+    new ClusterInterfaceImpl(clusterService,lakeService,clusterComponentService,clusterHostsServiceImpl)
   }
 
 

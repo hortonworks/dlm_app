@@ -91,6 +91,7 @@ DELETE        /enabledskus/:skuId                                            con
 #ClusterHosts API
 GET           /clusters/:clusterId/hosts                                     controllers.ClusterHosts.allWithCluster(clusterId:Long)
 POST          /clusters/hosts                                                controllers.ClusterHosts.add
+PUT           /clusters/hosts                                                controllers.ClusterHosts.addOrUpdate
 GET           /clusters/:clusterId/hosts/:hostId                             controllers.ClusterHosts.loadWithCluster(clusterId: Long, hostId:Long)
 DELETE        /clusters/:clusterId/hosts/:hostId                             controllers.ClusterHosts.delete(clusterId: Long, hostId:Long)
 
