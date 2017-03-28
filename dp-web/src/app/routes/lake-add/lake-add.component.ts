@@ -111,7 +111,7 @@ export class LakeAddComponent implements OnInit {
     this.rxClusterValidate.next(this.cluster.ambariUrl);
   }
 
-  onUpdateCluster() {
+  onUpdateCluster(event) {
     this.doVerifyCluster();
   }
 
