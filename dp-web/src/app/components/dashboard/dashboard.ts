@@ -211,13 +211,13 @@ export class DashboardComponent implements AfterViewInit, OnInit {
         dashboardRows
           .map(cDashboardRow => {
             const position =
-              CityNames.getLocation(cDashboardRow.dataCenter.location.country, cDashboardRow.dataCenter.location.place);
+              CityNames.getLocation(cDashboardRow.dataCenter.location.country, cDashboardRow.dataCenter.location.city);
 
             const template =
               `
               <div class="demo-card-wide mdl-card mdl-shadow--2dp">
                 <div class = "mdl-card__actions mdl-card--border">
-                  <div> <div class = "card-super-text">${cDashboardRow.dataCenter.location.place}</div>
+                  <div> <div class = "card-super-text">${cDashboardRow.dataCenter.location.city}</div>
                   <div class = "card-title-text">${cDashboardRow.dataCenter.name}</div> </div>
                 </div >
                 <div class = "card-padding">
@@ -327,8 +327,8 @@ export class DashboardComponent implements AfterViewInit, OnInit {
             const arcKey = `${cPolicy.source.dataCenter.name}#DELIMITER#${cPolicy.target.dataCenter.name}`;
 
             if(!(arcKey in accumulator)) {
-              const start = CityNames.getLocation(cPolicy.source.dataCenter.location.country, cPolicy.source.dataCenter.location.place);
-              const stop =  CityNames.getLocation(cPolicy.target.dataCenter.location.country, cPolicy.target.dataCenter.location.place);
+              const start = CityNames.getLocation(cPolicy.source.dataCenter.location.country, cPolicy.source.dataCenter.location.city);
+              const stop =  CityNames.getLocation(cPolicy.target.dataCenter.location.country, cPolicy.target.dataCenter.location.city);
 
               accumulator[arcKey] = {
                 start,
