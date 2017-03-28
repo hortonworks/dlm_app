@@ -18,7 +18,10 @@ GET         /api/locations                         controllers.Locations.list(qu
 POST        /api/clusters                          controllers.Clusters.create
 GET         /api/clusters                          controllers.Clusters.list
 PUT         /api/clusters                          controllers.Clusters.update
-GET         /api/clusters/:id                      controllers.Clusters.get(id)
+GET         /api/clusters/:clusterId               controllers.Clusters.get(clusterId: String)
+GET         /api/clusters/:clusterId/health        controllers.Clusters.getHealth(clusterId: String)
+
+#POST        /api/actions/register-lake             controllers.actions.LakeAction.register
 
 PUT         /api/datacenters                       controllers.DataCenters.create
 GET         /api/datacenters                       controllers.DataCenters.list

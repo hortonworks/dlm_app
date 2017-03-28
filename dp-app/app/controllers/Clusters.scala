@@ -48,8 +48,28 @@ class Clusters @Inject()(
     Future.successful(Ok(JsonResponses.statusOk))
   }
 
-  def get(id: String) = Authenticated.async {
-    Future.successful(Ok(JsonResponses.statusOk))
+  def get(clusterId: String) = Authenticated.async {
+    Logger.info("Received get cluster request")
+
+    clusterService.retrieve(clusterId)
+      .map {
+        cluster => cluster match {
+          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Right(cluster) => Ok(Json.toJson(cluster))
+        }
+      }
+  }
+
+  def getHealth(clusterId: String) = Authenticated.async {
+    Logger.info("Received get cluster health request")
+
+    clusterService.getHealth(clusterId)
+      .map {
+        clusterHealth => clusterHealth match {
+          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Right(clusterHealth) => Ok(Json.toJson(clusterHealth))
+        }
+      }
   }
 
 }

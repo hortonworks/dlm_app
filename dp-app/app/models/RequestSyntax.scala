@@ -1,6 +1,7 @@
 package models
 
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, Datalake}
+import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import play.api.libs.json.Json
 
 object RequestSyntax {

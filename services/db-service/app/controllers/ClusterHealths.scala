@@ -20,7 +20,15 @@ class ClusterHealths @Inject()(clusterHealthRepo: ClusterHealthRepo)(implicit ex
   }
 
   def allWithCluster(clusterId: Long) = Action.async {
-    clusterHealthRepo.allWithCluster(clusterId).map(cs => success(cs.map(c => linkData(c, makeLink(c))))).recoverWith(apiError)
+    clusterHealthRepo
+      .allWithCluster(clusterId)
+      .map { cluster =>
+        cluster.map { c =>
+          success(linkData(c, makeLink(c)))
+        }
+        .getOrElse(NotFound)
+      }
+      .recoverWith(apiError)
   }
 
   def loadWithCluster(clusterId: Long, healthId: Long) = Action.async {

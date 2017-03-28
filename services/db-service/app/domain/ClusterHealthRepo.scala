@@ -18,8 +18,8 @@ class ClusterHealthRepo @Inject()(
 
     val ClusterHealths = TableQuery[ClusterHealthTable]
 
-    def allWithCluster(clusterId : Long): Future[List[ClusterHealth]] = db.run {
-      ClusterHealths.filter( _.clusterId === clusterId).to[List].result
+    def allWithCluster(clusterId : Long): Future[Option[ClusterHealth]] = {
+      db.run(ClusterHealths.filter( _.clusterId === clusterId).result.headOption)
     }
 
     def insert(clusterHost: ClusterHealth): Future[ClusterHealth] = {

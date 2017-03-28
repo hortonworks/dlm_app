@@ -71,6 +71,10 @@ object Webserice {
 
     def create(cluster: Cluster): Future[Either[Errors, Cluster]]
 
+    def retrieve(clusterId: String): Future[Either[Errors, Cluster]]
+
+    def getHealth(clusterId: String): Future[Either[Errors, ClusterHealth]]
+
   }
 
   // Maps to ClusterService
