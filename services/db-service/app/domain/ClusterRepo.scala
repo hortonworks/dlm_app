@@ -17,8 +17,11 @@ class ClusterRepo @Inject()(
 
   val Clusters = TableQuery[ClustersTable]
 
-  def all(datalakeIdOption: Option[String], userIdOption: Option[String]): Future[List[Cluster]] = db.run {
-    Clusters.to[List].result
+  def all(datalakeId: Option[Long]): Future[List[Cluster]] = db.run {
+    datalakeId match {
+      case Some(datalakeId) => Clusters.filter(_.datalakeid === datalakeId).to[List].result
+      case None => Clusters.to[List].result
+    }
   }
 
   def insert(cluster: Cluster): Future[Cluster] = {

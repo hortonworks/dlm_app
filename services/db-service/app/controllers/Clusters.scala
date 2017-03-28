@@ -16,10 +16,10 @@ class Clusters @Inject()(clusterRepo: ClusterRepo)(
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  def all(datalakeIdOption: Option[String], userIdOption: Option[String]) =
+  def all(datalakeId: Option[Long]) =
     Action.async {
       clusterRepo
-        .all(datalakeIdOption, userIdOption)
+        .all(datalakeId)
         .map(clusters => success(clusters.map(c => linkData(c, makeLink(c)))))
         .recoverWith(apiError)
     }

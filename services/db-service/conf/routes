@@ -35,7 +35,7 @@ GET           /datalakes/:datalakeId/clusters                                con
 DELETE        /datalakes/:datalakeId                                         controllers.Datalakes.delete(datalakeId:Long)
 
 #Clusters API
-GET           /clusters                                                      controllers.Clusters.all(datalakeIdOption: Option[String], userIdOption: Option[String])
+GET           /clusters                                                      controllers.Clusters.all(datalakeId: Option[Long])
 POST          /clusters                                                      controllers.Clusters.add
 GET           /clusters/:clusterId                                           controllers.Clusters.load(clusterId:Long)
 DELETE        /clusters/:clusterId                                           controllers.Clusters.delete(clusterId:Long)
