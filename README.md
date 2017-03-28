@@ -23,15 +23,15 @@
 * A utility script has been provided in the dp-build folder called `dpdeploy.sh` to help with this. This wraps around docker-compose commands and aims to provide a simpler interface.
 * There is a certain sequence to follow to bring up the application, as detailed below. All commands need to be executed from the dp-build folder.
 * For a fresh setup:
-  * Initialize the Postgres database: `./dpdeploy.sh initdb`
+  * Initialize the Postgres database: `./dpdeploy.sh init db`
   * Then, run the DB migrations: `./dpdeploy.sh migrate`. This sets up the database schema using the Flyway migration tool (https://flywaydb.org/)
-  * You can wait until this is complete by checking the status using `./dpdeploy.sh ps`. The migrate container with a name like `dpbuild_dp-migrate_1` will go to exited state. 
+  * The migrate command takes a while to complete. After it is done, you can kill the containers with a Ctrl+c
   * You can verify the status of migrations by executing the following steps:
     * `docker exec -it dpbuild_dp-database_1 psql -U dp_admin -W -h dp-database dataplane`
     * Enter `dp_admin` as the password
     * `select * from schema_version;` This should show some migrations.
   * Build the containers for the application: `./dpdeploy.sh build`
-  * Initialize the application: `./dpdeploy.sh up`
+  * Initialize the application: `./dpdeploy.sh init app`
 * For an existing setup:
   * Stop the application: `./dpdeploy.sh stop`
   * Start the application: `./dpdeploy.sh start`
