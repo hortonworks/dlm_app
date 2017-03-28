@@ -32,7 +32,7 @@ export class BreadcrumbComponent implements OnInit {
       .subscribe(cEvent => {
         // this.handleUrl(cEvent.url);
         this.crumbs = [];
-        const url = cEvent.url;
+        const url = '';
         // do {
         //   let childrenRoutes = currentRoute.children;
         //   currentRoute = null;
