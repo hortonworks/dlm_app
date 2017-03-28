@@ -58,7 +58,7 @@
         </tr>
       </thead>
       <tbody>
-        <template ngFor let-policy [ngForOf]="policies">
+        <ng-template ngFor let-policy [ngForOf]="policies">
           <tr>
               <!--ID-->
               <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ doGetMoment(policy.time) }}</td>
@@ -91,7 +91,7 @@
               <td class="mdl-data-table__cell--non-numeric" rowspan="2">{{ policy.evCount }}</td>
               <td class="mdl-data-table__cell--non-numeric" rowspan="2">-</td>-->
           </tr>
-        </template>
+        </ng-template>
       </tbody>
     </table>
   </div>

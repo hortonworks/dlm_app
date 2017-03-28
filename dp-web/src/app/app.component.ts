@@ -19,7 +19,7 @@ export class AppComponent implements AfterViewInit  {
   constructor(
     public router: Router,
     private authService: AuthenticationService,
-    private environment: Environment
+    public environment: Environment
   ) {
     this.who = Math.floor(Math.random() * 2) + 1;
   }

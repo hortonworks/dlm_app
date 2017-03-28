@@ -46,7 +46,7 @@ export class ViewDataSetComponent implements OnInit {
     showAutoConfigured= false;
     searchTimer: any;
 
-    constructor(private activatedRoute: ActivatedRoute, private dataSetService: DataSetService, private environment: Environment,
+    constructor(private activatedRoute: ActivatedRoute, private dataSetService: DataSetService, public environment: Environment,
         private policyService: BackupPolicyService,
                 private searchQueryService: SearchQueryService,  private router: Router) {
         this.hiveSearchParamWrappers = environment.hiveSearchParamWrappers;
