@@ -17,3 +17,13 @@ import 'core-js/es6/reflect';
 
 import 'core-js/es7/reflect';
 import 'zone.js/dist/zone';
+
+// Observable class extensions
+import 'rxjs/add/observable/throw';
+
+// Observable operators
+import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/finally';
+import 'rxjs/add/operator/debounce';

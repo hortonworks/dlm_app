@@ -343,7 +343,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
         .map(cKey => {
           const city = this.mapCities[cKey];
 
-          const coordinates = CityNames.getCityCoordinates(city.location.country, city.location.place);
+          const coordinates = CityNames.getCityCoordinates(city.location.country, city.location.city);
 
 
           return ({
@@ -363,7 +363,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
 
       if(
         this.mapCities.source.location.country === this.mapCities.target.location.country
-        && this.mapCities.source.location.place === this.mapCities.target.location.place
+        && this.mapCities.source.location.city === this.mapCities.target.location.city
       ) {
         return;
       }
@@ -373,7 +373,7 @@ export class AddBdrComponent implements OnInit, AfterViewInit {
         .map(cKey => {
           const city = this.mapCities[cKey];
 
-          const coordinates = CityNames.getCityCoordinates(city.location.country, city.location.place);
+          const coordinates = CityNames.getCityCoordinates(city.location.country, city.location.city);
 
           return ({
             latitude: parseFloat(coordinates[0]),

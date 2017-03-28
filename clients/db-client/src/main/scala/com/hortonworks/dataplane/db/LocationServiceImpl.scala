@@ -1,0 +1,36 @@
+package com.hortonworks.dataplane.db
+
+import javax.inject.Singleton
+
+import com.hortonworks.dataplane.commons.domain.Entities._
+import com.hortonworks.dataplane.db.Webserice.LocationService
+import com.typesafe.config.Config
+import play.api.libs.ws.{WSClient, WSResponse}
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
+@Singleton
+class LocationServiceImpl(config: Config)(implicit ws: WSClient)
+    extends LocationService {
+
+  private val url = config.getString("dp.services.db.service.uri")
+
+  import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+
+  override def list(query: Option[String]): Future[Either[Errors, Seq[Location]]] = {
+    val uri = query match {case Some(query) => s"$url/locations?query=$query" case None => s"$url/locations"}
+    ws.url(uri)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToLocations)
+  }
+
+  private def mapToLocations(res: WSResponse) = {
+    res.status match {
+      case 200 =>
+        extractEntity[Seq[Location]](res, r => (r.json \ "results").validate[Seq[Location]].get)
+      case _ => mapErrors(res)
+    }
+  }
+}

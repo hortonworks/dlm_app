@@ -1,6 +1,7 @@
 package internal.auth
 
 import java.security.cert.X509Certificate
+import java.time.LocalDateTime
 
 import internal.Jwt
 import play.api.http.Status
@@ -13,8 +14,17 @@ import scala.concurrent.Future
 
 object Authenticated extends ActionBuilder[AuthenticatedRequest] {
   def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[Result]) = {
-//    debug
-//    block(AuthenticatedRequest[A](new UserView("admin", "admin", true), request))
+//  debug
+//    block(AuthenticatedRequest[A](new User(
+//      None,
+//      "admin",
+//      "admin",
+//      "Administrator",
+//      None,
+//      Some(true),
+//      Some(LocalDateTime.now()),
+//      Some(LocalDateTime.now())), request))
+
     if(request.headers.get("Authorization").isDefined && request.headers.get("Authorization").get.startsWith("Bearer ")){
       val header: String = request.headers.get("Authorization").get
       val token = header.replace("Bearer","").trim

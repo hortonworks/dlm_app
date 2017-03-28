@@ -55,11 +55,21 @@ object Webserice {
 
   }
 
+
+  trait LocationService extends DbClientService {
+
+    def list(query: Option[String]): Future[Either[Errors, Seq[Location]]]
+
+  }
+
+
   trait ClusterService extends DbClientService {
 
     def list(): Future[Either[Errors, Seq[Cluster]]]
     def getLinkedClusters(
         datalakeId: Long): Future[Either[Errors, Seq[Cluster]]]
+
+    def create(cluster: Cluster): Future[Either[Errors, Cluster]]
 
   }
 

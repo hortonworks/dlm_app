@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 
 import { Credential } from '../../models/credential';
 import { AuthenticationService } from '../../services/authentication.service';
-import { BreadcrumbService } from '../../services/breadcrumb.service';
 import { Environment } from '../../environment';
 import { Persona } from '../../shared/utils/persona';
 
@@ -14,34 +13,43 @@ import { Persona } from '../../shared/utils/persona';
 })
 export class SignInComponent {
 
-  statusMessage: string = '';
-  submitted: boolean = false;
+  _isAuthInProgress = false;
+  _isAuthSuccessful = false;
+  message = '';
+
   credential: Credential = new Credential('','');
 
   constructor(
     private authenticaionService: AuthenticationService,
     private router: Router,
     private environment: Environment,
-    private breadcrumbService: BreadcrumbService
   ) {
     if (window.location.hash.length > 0 && window.location.hash === '#SESSEXPIRED') {
-      this.statusMessage = 'SESSIONEXPIRED';
+      this.message = 'SESSIONEXPIRED';
     }
   }
 
-  onSubmit() {
-    this.submitted = true;
-    this.breadcrumbService.crumbMap = [];
+  onSubmit(event) {
+    this._isAuthInProgress = true;
+
     this.authenticaionService
       .signIn(this.credential)
+      .finally(() => {
+        this._isAuthInProgress = false;
+      })
       .subscribe(
         user => {
           const persona = Persona[user.roles[0]];
           this.environment.persona = persona;
+
+          this._isAuthSuccessful = true;
           // TODO: check if is first run
           this.router.navigate(['first-run']);
         },
-        error => this.router.navigate(['sign-in'])
+        error => {
+          this._isAuthSuccessful = false;
+          this.message = 'Credentials were incorrect. Please try again.';
+        }
       );
   }
 

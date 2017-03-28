@@ -4,15 +4,16 @@
       <img class="dataplane-logo-image" src="../../assets/images/ui_logo.svg"/>
     </div>
     <div class="" style="width: 50%;min-width: 500px; padding: 40px;">
-      <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div style="margin: 5px 0;" *ngIf="_isAuthInProgress === false && _isAuthSuccessful === false && message">{{message}}</div>
+      <form (submit)="onSubmit($event)" #loginForm="ngForm">
         <div class="">
           <div class="dp-input">
             <label for="username" style="display: block;">Username</label>
-            <input class="" type="text" placeholder="Username" name="username" id="username" [(ngModel)]="credential.username" #username="ngModel" required/>
+            <input class="" type="text" placeholder="Username" name="username" id="username" [(ngModel)]="credential.username" required/>
           </div>
           <div class="dp-input">
             <label for="password" style="display: block;">Password</label>
-            <input class="" type="password" placeholder="Password" name="password" id="password" [(ngModel)]="credential.password" #userpass="ngModel" required/>
+            <input class="" type="password" placeholder="Password" name="password" id="password" [(ngModel)]="credential.password" required/>
           </div>
         </div>
         <footer class="" style="">

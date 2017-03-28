@@ -3,6 +3,7 @@ package com.hortonworks.dataplane.db
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, Errors}
 import com.hortonworks.dataplane.db.Webserice.ClusterService
 import com.typesafe.config.Config
+import play.api.libs.json.Json
 import play.api.libs.ws.{WSClient, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -27,10 +28,17 @@ class ClusterServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 =>
         extractEntity[Seq[Cluster]](res,
-                                    r =>
-                                      (r.json \ "results" \\ "data").map { d =>
-                                        d.validate[Cluster].get
-                                    })
+          r =>
+            (r.json \ "results" \\ "data").map { d =>
+              d.validate[Cluster].get
+            })
+      case _ => mapErrors(res)
+    }
+  }
+
+  private def mapToCluster(res: WSResponse) = {
+    res.status match {
+      case 200 => extractEntity[Cluster](res, r =>(r.json \ "results" \\ "data")(0).validate[Cluster].get)
       case _ => mapErrors(res)
     }
   }
@@ -41,5 +49,15 @@ class ClusterServiceImpl(config: Config)(implicit ws: WSClient)
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToClusters)
+  }
+
+  override def create(cluster: Cluster): Future[Either[Errors, Cluster]] = {
+    ws.url(s"$url/clusters")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      )
+      .post(Json.toJson(cluster))
+      .map(mapToCluster)
   }
 }
