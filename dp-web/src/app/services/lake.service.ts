@@ -10,6 +10,13 @@ export class LakeService {
 
   constructor(private http:Http) {}
 
+  list(): Observable<Lake[]> {
+    return this.http
+      .get(this.url, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
   insert(lake: Lake): Observable<Lake> {
     return this.http
       .post(`${this.url}`, lake, new RequestOptions(HttpUtil.getHeaders()))
@@ -19,7 +26,7 @@ export class LakeService {
 
   retrieve(lakeId: string): Observable<Lake> {
     return this.http
-      .post(`${this.url}/${lakeId}`, new RequestOptions(HttpUtil.getHeaders()))
+      .get(`${this.url}/${lakeId}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

@@ -20,6 +20,7 @@ import 'zone.js/dist/zone';
 
 // Observable class extensions
 import 'rxjs/add/observable/throw';
+import 'rxjs/add/observable/zip';
 
 // Observable operators
 import 'rxjs/add/operator/do';

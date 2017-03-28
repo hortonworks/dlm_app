@@ -10,8 +10,12 @@ export class ClusterService {
 
   constructor(private http:Http) { }
 
-  list(){
-    // TODO
+  list({ lakeId }){
+    const uri = lakeId ? `${this.uri}/lakeId=${lakeId}` : this.uri;
+    return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
   }
 
   insert(cluster: Cluster): Observable<Cluster> {
