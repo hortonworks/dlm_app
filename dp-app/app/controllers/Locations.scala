@@ -24,4 +24,14 @@ class Locations @Inject()(@Named("locationService") val locationService: Locatio
         }
       }
   }
+
+  def retrieve(locationId: Long) = Authenticated.async {
+    locationService.retrieve(locationId)
+      .map { location =>
+        location match {
+          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Right(location) => Ok(Json.toJson(location))
+        }
+      }
+  }
 }

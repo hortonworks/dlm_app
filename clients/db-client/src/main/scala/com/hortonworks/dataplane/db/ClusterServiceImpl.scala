@@ -30,7 +30,7 @@ class ClusterServiceImpl(config: Config)(implicit ws: WSClient)
 
   private def mapToCluster(res: WSResponse) = {
     res.status match {
-      case 200 => val clusters = extractEntity[Cluster](res, r =>(r.json \ "results" \\ "data")(0).validate[Cluster].get)
+      case 200 => extractEntity[Cluster](res, r =>(r.json \ "results" \\ "data")(0).validate[Cluster].get)
       case _ => mapErrors(res)
     }
   }

@@ -10,7 +10,14 @@ export class LocationService {
 
   constructor(private http:Http) {}
 
-  retrieveOptions(query: string) {
+  retrieve(locationId: number): Observable<Location> {
+    return this.http
+      .get(`${this.url}/${locationId}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
+  retrieveOptions(query: string): Observable<Location[]> {
     return this.http
       .get(`${this.url}?query=${query}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)

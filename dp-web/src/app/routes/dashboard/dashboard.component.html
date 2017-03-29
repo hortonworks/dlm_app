@@ -10,7 +10,10 @@
       Lorem ipsum dolor amet.
     </p>
     <div>
-      {{lakes | json}}
+      <div *ngFor="let cLake of lakes">
+        <div>{{cLake.clustersWithHealth[0].health.status}}  {{cLake.lake.name}}</div>
+        {{cLake | json}}
+      </div>
     </div>
   </div>
 </section>

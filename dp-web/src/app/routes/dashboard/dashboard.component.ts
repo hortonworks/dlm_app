@@ -3,9 +3,11 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Rx';
 
 import { LakeService } from '../../services/lake.service';
+import { LocationService } from '../../services/location.service';
 import { ClusterService } from '../../services/cluster.service';
 
 import { Lake } from '../../models/lake';
+import { Location } from '../../models/location';
 import { Cluster, ClusterHealth } from '../../models/cluster';
 
 @Component({
@@ -17,6 +19,7 @@ export class DashboardComponent implements OnInit {
 
   lakes: {
     lake: Lake,
+    location: Location,
     clustersWithHealth: {
       cluster: Cluster,
       health: ClusterHealth
@@ -26,6 +29,7 @@ export class DashboardComponent implements OnInit {
   constructor(
     private router: Router,
     private lakeService: LakeService,
+    private locationService: LocationService,
     private clusterService: ClusterService,
   ) { }
 
@@ -39,6 +43,7 @@ export class DashboardComponent implements OnInit {
             .list({lakeId: cLake.id})
             .flatMap(clusters => Observable.zip(
               Observable.of(cLake),
+              this.locationService.retrieve(cLake.location),
               ...clusters.map(cCluster => {
                 return this.clusterService
                   .retrieveHealth(cCluster.id)
@@ -47,8 +52,9 @@ export class DashboardComponent implements OnInit {
                     health: cClusterHealth
                   }));
               }),
-              (lake, ...clustersWithHealth) => ({
+              (lake, location, ...clustersWithHealth) => ({
                 lake,
+                location,
                 clustersWithHealth
               })
             ));

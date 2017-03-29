@@ -26,10 +26,25 @@ class LocationServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToLocations)
   }
 
+  override def retrieve(locationId: Long): Future[Either[Errors, Location]] = {
+    ws.url(s"$url/locations/$locationId")
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToLocation)
+  }
+
   private def mapToLocations(res: WSResponse) = {
     res.status match {
       case 200 =>
         extractEntity[Seq[Location]](res, r => (r.json \ "results").validate[Seq[Location]].get)
+      case _ => mapErrors(res)
+    }
+  }
+
+  private def mapToLocation(res: WSResponse) = {
+    res.status match {
+      case 200 =>
+        extractEntity[Location](res, r => (r.json \ "results").validate[Location].get)
       case _ => mapErrors(res)
     }
   }

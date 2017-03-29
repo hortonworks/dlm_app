@@ -14,6 +14,7 @@ DELETE      /api/lakes/:lakeId                     controllers.Lakes.delete(lake
 PUT         /api/lakes/:lakeId                     controllers.Lakes.update(lakeId)
 
 GET         /api/locations                         controllers.Locations.list(query: Option[String])
+GET         /api/locations/:locationId             controllers.Locations.retrieve(locationId: Long)
 
 POST        /api/clusters                          controllers.Clusters.create
 GET         /api/clusters                          controllers.Clusters.list
