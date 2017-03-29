@@ -81,6 +81,10 @@ export const routes: Routes = [{
   //   loadChildren: './components/data-analyst/view-data-set/view-data-set.module#ViewDataSetModule',
   //   canActivate:[ LoggedInGuard ]
   },{
+    path: 'dlm',
+    loadChildren: './apps/dlm/dlm.module#DlmModule',
+    canActivate: [LoggedInGuard]
+  },{
     path: '**',
     component: NotFoundRouteComponent
   },
