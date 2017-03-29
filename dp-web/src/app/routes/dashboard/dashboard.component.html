@@ -10,9 +10,36 @@
       Lorem ipsum dolor amet.
     </p>
     <div>
-      <div *ngFor="let cLake of lakes">
-        <div>{{cLake.clustersWithHealth[0].health.status}}  {{cLake.lake.name}}</div>
-        {{cLake | json}}
+      <div *ngFor="let cLake of lakes" style="margin-top: 20px;">
+        <div style="display:flex; border: 1px solid rgb(204, 204, 204); padding: 15px;">
+          <div style="flex-grow: 1;">
+            <div>{{cLake.clustersWithHealth[0].health.status}}  {{cLake.lake.name}}</div>
+            <div>Description: {{cLake.lake.description}}</div>
+            <div>Ambari: {{cLake.clustersWithHealth[0].cluster.ambariUrl}}</div>
+          </div>
+          <div>
+            <div>ONPREM</div>
+            <div>{{cLake.location.city}}</div>
+          </div>
+        </div>
+        <div style="display: flex; border: 1px solid rgb(204, 204, 204)">
+          <div style="padding: 5px;text-align: center;border-right: 1px solid rgb(204, 204, 204);">
+            <div>NODE</div>
+            <div>12</div>
+          </div>
+          <div style="padding: 5px;text-align: center;border-right: 1px solid rgb(204, 204, 204);">
+            <div>UP TIME</div>
+            <div>{{doGetUptime(cLake.clustersWithHealth[0].health.uptime)}}</div>
+          </div>
+          <div style="padding: 5px;text-align: center;border-right: 1px solid rgb(204, 204, 204);">
+            <div>HDFS</div>
+            <div>400GB</div>
+          </div>
+          <div style="flex-grow: 1;"></div>
+          <div style="padding: 15px 5px;">
+            ACTION
+          </div>
+        </div>
       </div>
     </div>
   </div>

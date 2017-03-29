@@ -20,7 +20,26 @@ class Clusters @Inject()(
     val clusterService: ClusterService
 ) extends Controller {
 
-  def list = Authenticated.async {
+  def list(lakeId: Option[Long]) = Authenticated.async {
+    lakeId match {
+      case Some(lakeId) => listByLakeId(lakeId)
+      case None => listAll()
+    }
+  }
+
+  private def listByLakeId(lakeId: Long) =  {
+    clusterService
+      .getLinkedClusters(lakeId)
+      .map{
+        clusters =>
+          clusters match {
+            case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            case Right(clusters) => Ok(Json.toJson(clusters))
+          }
+      }
+  }
+
+  private def listAll() = {
     clusterService.list()
       .map { clusters =>
         clusters match {
@@ -29,6 +48,8 @@ class Clusters @Inject()(
         }
       }
   }
+
+
 
 
   def create = Authenticated.async(parse.json) { request =>

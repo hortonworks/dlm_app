@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Rx';
+import * as moment from 'moment';
 
 import { LakeService } from '../../services/lake.service';
 import { LocationService } from '../../services/location.service';
@@ -61,8 +62,12 @@ export class DashboardComponent implements OnInit {
         })
       ))
       .subscribe(data => {
-        this.lakes = data;
+        this.lakes = data.filter(cLake => cLake.clustersWithHealth.length === 1);
       })
+  }
+
+  doGetUptime(uptime: number) {
+    return moment.duration(uptime).humanize();
   }
 
 }

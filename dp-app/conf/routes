@@ -17,7 +17,7 @@ GET         /api/locations                         controllers.Locations.list(qu
 GET         /api/locations/:locationId             controllers.Locations.retrieve(locationId: Long)
 
 POST        /api/clusters                          controllers.Clusters.create
-GET         /api/clusters                          controllers.Clusters.list
+GET         /api/clusters                          controllers.Clusters.list(lakeId: Option[Long])
 PUT         /api/clusters                          controllers.Clusters.update
 GET         /api/clusters/:clusterId               controllers.Clusters.get(clusterId: String)
 GET         /api/clusters/:clusterId/health        controllers.Clusters.getHealth(clusterId: String)
