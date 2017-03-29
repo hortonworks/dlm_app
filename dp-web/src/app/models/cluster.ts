@@ -1,5 +1,5 @@
 export class Cluster {
-   id?: string;
+   id?: number;
    name: string;
    description: string = '';
    ambariUrl?: string;
@@ -11,4 +11,13 @@ export class Cluster {
    datalakeid?: number;
    userid?: number;
    properties?: any;
+}
+
+export class ClusterHealth {
+  id: number;
+  status: string;
+  state: string;
+  uptime: number;
+  started: string;
+  clusterId: number;
 }
