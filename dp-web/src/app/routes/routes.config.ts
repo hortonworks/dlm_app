@@ -33,7 +33,7 @@ export const routes: Routes = [{
     path: 'logout',
     component: LogoutComponent
   },{
-    path: 'dashboards',
+    path: 'dashboard',
     component: DashboardComponent
   // },{
   //   path: 'data-lake/:id',
