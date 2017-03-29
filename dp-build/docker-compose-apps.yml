@@ -1,5 +1,11 @@
 version: '2'
 services:
+  dp-database:
+    image: postgres
+    environment:
+        POSTGRES_PASSWORD: dp_admin
+        POSTGRES_USER: dp_admin
+        POSTGRES_DB: dataplane
   dp-db-service:
     build:
         context: ../services/db-service
