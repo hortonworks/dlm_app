@@ -19,9 +19,7 @@ private[dataplane] case class Atlas(restService: URL,properties:String)
 
 private[dataplane] case class NameNode(startTime:Long,capacityUsed:Long,capacityRemaining:Long,usedPercentage:Double,totalFiles:Long,props:Option[JsValue])
 
-private[dataplane] case class HostInformation(hostState: String, hostStatus: String, ip: String, cpu: Option[Int], diskStats: Option[List[DiskInformation]])
-
-private[dataplane] case class DiskInformation(available: Option[String], device: Option[String], used: Option[String], percentage: Option[String], size: Option[String], mountpoint: Option[String])
+private[dataplane] case class HostInformation(hostState: String, hostStatus: String, ip: String, properties: Option[JsValue])
 
 private [dataplane] case class KnoxInfo(properties:Option[JsValue])
 

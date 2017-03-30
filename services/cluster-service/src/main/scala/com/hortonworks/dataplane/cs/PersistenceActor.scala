@@ -3,12 +3,9 @@ package com.hortonworks.dataplane.cs
 import akka.actor.Actor
 import akka.actor.Status.Failure
 import akka.pattern.pipe
-import com.hortonworks.dataplane.commons.domain.Entities.Cluster
+import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, ClusterHost, Errors, ClusterService => ClusterData}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  ClusterService => ClusterData
-}
 import com.typesafe.scalalogging.Logger
 import play.api.libs.json.Json
 
@@ -18,11 +15,13 @@ private[dataplane] case class PersistAtlas(cluster: Cluster,
                                            atlas: Either[Throwable, Atlas])
 private[dataplane] case class PersistKnox(cluster: Cluster,
                                           knox: Either[Throwable, KnoxInfo])
-private[dataplane] case class PersistNameNode(cluster: Cluster,
-                                          knox: Either[Throwable, NameNode])
+private[dataplane] case class PersistNameNode(
+    cluster: Cluster,
+    knox: Either[Throwable, NameNode])
 
-private [dataplane] case class PersistHostInfo(hostInfo:Either[Throwable, Seq[HostInformation]])
-
+private[dataplane] case class PersistHostInfo(
+    cluster: Cluster,
+    hostInfo: Either[Throwable, Seq[HostInformation]])
 
 private sealed case class PersistenceResult(option: Option[ClusterData])
 private sealed case class ServiceExists(clusterData: ClusterData,
@@ -80,20 +79,38 @@ class PersistenceActor(clusterInterface: ClusterInterface) extends Actor {
       if (namenode.isRight) {
         val at = namenode.right.get
         val toPersist = ClusterData(servicename = "NAMENODE",
-          servicehost = None,
-          serviceport = None,
-          fullURL = None,
-          properties = at.props,
-          clusterid = Some(cluster.id.get),
-          datalakeid = None)
+                                    servicehost = None,
+                                    serviceport = None,
+                                    fullURL = None,
+                                    properties = at.props,
+                                    clusterid = Some(cluster.id.get),
+                                    datalakeid = None)
 
         clusterInterface
           .serviceRegistered(cluster, toPersist.servicename)
           .map(ServiceExists(toPersist, _))
           .pipeTo(self)
+
       } else
         logger.error(
           s"Error saving atlas info, Atlas data was not returned, error - ${namenode.left.get}")
+
+    case PersistHostInfo(cluster, hostInfo) =>
+      implicit val dikInfoWrites =
+        if (hostInfo.isRight) {
+          val hostInfos = hostInfo.right.get.map(
+            hi =>
+              ClusterHost(
+                host = hi.ip,
+                status = hi.hostStatus,
+                properties = hi.properties,
+                clusterId = cluster.id.get
+            ))
+          clusterInterface.addOrUpdateHostInformation(hostInfos).pipeTo(self)
+
+        } else
+          logger.error(
+            s"Error saving atlas info, Atlas data was not returned, error - ${hostInfo.left.get}")
 
     case ServiceExists(toPersist, exists) =>
       if (exists) {
@@ -116,6 +133,9 @@ class PersistenceActor(clusterInterface: ClusterInterface) extends Actor {
       logger.info(s"Updated cluster service info -  $data")
 
     case Failure(e) => logger.error(s"Persistence Error $e")
+
+    case Errors(errors) =>
+      logger.error(s"Error updating cluster info $errors")
 
   }
 

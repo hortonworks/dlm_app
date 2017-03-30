@@ -2,20 +2,29 @@ package com.hortonworks.dataplane.cs
 
 import javax.inject.{Inject, Singleton}
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, Datalake}
+import com.hortonworks.dataplane.commons.domain.Entities.{
+  Cluster,
+  ClusterHost,
+  Datalake,
+  Errors,
+  ClusterService => ClusterData
+}
 import com.hortonworks.dataplane.db.Webserice.{
   ClusterComponentService,
+  ClusterHostsService,
   ClusterService,
   LakeService
 }
-import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData}
 import com.typesafe.scalalogging.Logger
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait ClusterInterface {
-  def updateServiceByName(toPersist: ClusterData) : Future[Boolean]
+
+  def addOrUpdateHostInformation(hostInfos: Seq[ClusterHost]): Future[Errors]
+
+  def updateServiceByName(toPersist: ClusterData): Future[Boolean]
 
   def getDataLakes: Future[Seq[Datalake]]
 
@@ -23,10 +32,7 @@ trait ClusterInterface {
 
   def serviceRegistered(cluster: Cluster, serviceName: String): Future[Boolean]
 
-  def addService(
-      service: ClusterData)
-    : Future[
-      Option[ClusterData]]
+  def addService(service: ClusterData): Future[Option[ClusterData]]
 
 }
 
@@ -34,7 +40,8 @@ trait ClusterInterface {
 class ClusterInterfaceImpl @Inject()(
     val clusterService: ClusterService,
     val lakeService: LakeService,
-    val clusterComponentService: ClusterComponentService)
+    val clusterComponentService: ClusterComponentService,
+    clusterHostsService: ClusterHostsService)
     extends ClusterInterface {
 
   val logger = Logger(classOf[ClusterInterfaceImpl])
@@ -106,7 +113,18 @@ class ClusterInterfaceImpl @Inject()(
       .map(_.isRight)
   }
 
-  override def updateServiceByName(toPersist: ClusterData): Future[Boolean]  = {
-      clusterComponentService.updateServiceByName(toPersist).map(_.isRight)
+  override def updateServiceByName(toPersist: ClusterData): Future[Boolean] = {
+    clusterComponentService.updateServiceByName(toPersist).map(_.isRight)
+  }
+
+  override def addOrUpdateHostInformation(
+      hostInfos: Seq[ClusterHost]): Future[Errors] = {
+
+      val futures = hostInfos.map(clusterHostsService.createOrUpdate(_))
+      val errors = Future.sequence(futures)
+      errors.map(e =>
+      {
+        Errors(e.flatMap(_.get.errors))
+      })
   }
 }

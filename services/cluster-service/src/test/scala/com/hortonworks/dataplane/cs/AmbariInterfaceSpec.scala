@@ -1,7 +1,5 @@
 package com.hortonworks.dataplane.cs
 
-import java.net.URL
-
 import com.hortonworks.dataplane.commons.domain.Entities.Cluster
 import com.hortonworks.dataplane.restmock.httpmock.when
 import org.scalatest._
@@ -113,8 +111,7 @@ class AmbariInterfaceSpec
     atlas.map { either =>
       assert(either.isRight)
       assert(either.right.get.size == 1)
-      assert(either.right.get(0).diskStats.isDefined)
-      assert(either.right.get(0).diskStats.get.size ==2 )
+      assert(either.right.get(0).properties.isDefined)
     }
 
   }

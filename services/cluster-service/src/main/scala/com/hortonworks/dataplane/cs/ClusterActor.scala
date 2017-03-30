@@ -58,7 +58,7 @@ class ClusterActor(cluster: Cluster,
 
     case SaveHostInfo(hostInfo) =>
       logger.info("Saving ambari host information")
-      dbActor ! PersistHostInfo(hostInfo)
+      dbActor ! PersistHostInfo(cluster,hostInfo)
       ambariInterface.getAtlas.map(SaveAtlas).pipeTo(self)
 
     case SaveNameNode(nameNode) =>
