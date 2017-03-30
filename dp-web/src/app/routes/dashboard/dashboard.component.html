@@ -11,32 +11,45 @@
     </p>
     <div>
       <div *ngFor="let cLake of lakes" style="margin-top: 20px;">
-        <div style="display:flex; border: 1px solid rgb(204, 204, 204); padding: 15px;">
+        <div style="display:flex; border: 1px solid rgb(204, 204, 204); padding: 15px; background-color: rgb(255, 255, 255);">
           <div style="flex-grow: 1;">
-            <div>{{cLake.clustersWithHealth[0].health.status}}  {{cLake.lake.name}}</div>
-            <div>Description: {{cLake.lake.description}}</div>
-            <div>Ambari: {{cLake.clustersWithHealth[0].cluster.ambariUrl}}</div>
+            <div>
+              <i class="fa fa-circle" aria-hidden="true" [style.color]="cLake.clustersWithHealth[0].health.status === 'UP' ? 'green' : 'red' "></i>
+              {{cLake.lake.name}}
+            </div>
+            <div>
+              <span style="font-weight: lighter; text-transform: uppercase;">Description:</span>
+              <span style="font-weight: bold;">
+                {{cLake.lake.description}}
+              </span>
+              </div>
+            <div>
+              <span style="font-weight: lighter; text-transform: uppercase;">Ambari:</span>
+              <span style="font-weight: bold;">
+                {{cLake.clustersWithHealth[0].cluster.ambariUrl ? cLake.clustersWithHealth[0].cluster.ambariUrl : '-'}}
+              </span>
+              </div>
           </div>
-          <div>
+          <div style="text-align: right;">
             <div>ONPREM</div>
             <div>{{cLake.location.city}}</div>
           </div>
         </div>
-        <div style="display: flex; border: 1px solid rgb(204, 204, 204)">
-          <div style="padding: 5px;text-align: center;border-right: 1px solid rgb(204, 204, 204);">
+        <div style="display: flex; border: 1px solid rgb(204, 204, 204); background-color: rgb(250, 250, 250);">
+          <div style="padding: 5px 15px;text-align: center;border-right: 1px solid rgb(204, 204, 204);">
             <div>NODE</div>
-            <div>12</div>
+            <div style="font-weight: bold;">12</div>
           </div>
-          <div style="padding: 5px;text-align: center;border-right: 1px solid rgb(204, 204, 204);">
+          <div style="padding: 5px 15px;text-align: center;border-right: 1px solid rgb(204, 204, 204);">
             <div>UP TIME</div>
-            <div>{{doGetUptime(cLake.clustersWithHealth[0].health.uptime)}}</div>
+            <div style="font-weight: bold;">{{doGetUptime(cLake.clustersWithHealth[0].health.uptime)}}</div>
           </div>
-          <div style="padding: 5px;text-align: center;border-right: 1px solid rgb(204, 204, 204);">
+          <div style="padding: 5px 15px;text-align: center;border-right: 1px solid rgb(204, 204, 204);">
             <div>HDFS</div>
-            <div>400GB</div>
+            <div style="font-weight: bold;">400GB</div>
           </div>
-          <div style="flex-grow: 1;"></div>
-          <div style="padding: 15px 5px;">
+          <div style="flex-grow: 1; padding: 5px;text-align: center;border-right: 1px solid rgb(204, 204, 204);"></div>
+          <div style="padding: 15px;">
             ACTION
           </div>
         </div>
