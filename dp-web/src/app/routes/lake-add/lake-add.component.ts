@@ -125,7 +125,9 @@ export class LakeAddComponent implements OnInit {
       })
       .subscribe(
         () => {
-          this.router.navigate(['dashboard']);
+          this.router.navigate(['dashboard', {
+            message: 'Lake successfully added.'
+          }]);
         },
         error => {
 
