@@ -82,7 +82,7 @@ export const routes: Routes = [{
   //   canActivate:[ LoggedInGuard ]
   },{
     path: 'dlm',
-    loadChildren: '../apps/dlm/dlm.module#DlmModule',
+    loadChildren: './apps/dlm/dlm.module#DlmModule',
     canActivate: [LoggedInGuard]
   },{
     path: '**',
