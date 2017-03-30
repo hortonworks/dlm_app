@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 
+import { EntryComponent } from './entry/entry.component';
 import { FirstRunComponent } from './first-run/first-run.component';
 import { SignInComponent } from './sign-in/sign-in.component';
 import { LakeAddComponent } from './lake-add/lake-add.component';
@@ -12,19 +13,19 @@ import { DataManagerComponent } from '../components/data-manager/data-manager.co
 import { NotFoundRouteComponent } from './not-found-route/not-found-route.component';
 
 export const routes: Routes = [{
-    path: '',
-    component: SignInComponent,
-    canActivate:[ AlreadyLoggedInGuard ]
-  },{
     path: 'sign-in',
     component: SignInComponent,
     canActivate:[ AlreadyLoggedInGuard ]
   },{
-    path: 'first-run',
+    path: '',
+    component: EntryComponent,
+    canActivate:[ LoggedInGuard ]
+  },{
+    path: 'onboard',
     component: FirstRunComponent,
     canActivate:[ LoggedInGuard ]
   },{
-    path: 'lake-add',
+    path: 'onboard/lake-add',
     component: LakeAddComponent,
     canActivate:[ LoggedInGuard ]
   },{

@@ -18,11 +18,13 @@ import { FirstRunComponent } from './routes/first-run/first-run.component';
 import { LakeAddComponent } from './routes/lake-add/lake-add.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { DashboardComponent } from './routes/dashboard/dashboard.component';
+import { EntryComponent } from './routes/entry/entry.component';
 
 import { AuthenticationService } from './services/authentication.service';
 import { LakeService } from './services/lake.service';
 import { LocationService } from './services/location.service';
 import { ClusterService } from './services/cluster.service';
+import { IdentityService } from './services/identity.service';
 
 @NgModule({
   imports: [
@@ -43,6 +45,7 @@ import { ClusterService } from './services/cluster.service';
     LakeAddComponent,
     SidebarComponent,
     DashboardComponent,
+    EntryComponent,
   ],
   bootstrap: [AppComponent],
   providers: [
@@ -51,6 +54,7 @@ import { ClusterService } from './services/cluster.service';
     LakeService,
     LocationService,
     ClusterService,
+    IdentityService,
 
     LoggedInGuard,
     AlreadyLoggedInGuard,

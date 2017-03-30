@@ -14,14 +14,13 @@ declare var componentHandler: any;
 export class AppComponent implements AfterViewInit  {
 
   persona = Persona;
-  who: number = 1;
 
   constructor(
     public router: Router,
     private authService: AuthenticationService,
     public environment: Environment
   ) {
-    this.who = Math.floor(Math.random() * 2) + 1;
+
   }
 
   isLoggedIn(): boolean {
