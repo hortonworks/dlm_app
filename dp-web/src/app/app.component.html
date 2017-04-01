@@ -12,10 +12,10 @@
 
             <div>
                 <button class="dataplane-more-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" id="more-button"
-                        [ngClass]="{'admin-a': (who === 1 && [persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)),
-                                    'admin-b': (who === 2 && [persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)),
-                                    'admin-h': (who === 2 && [persona.ANALYSTADMIN].includes(environment.persona)),
-                                    'admin-r': (who === 1 && [persona.ANALYSTADMIN].includes(environment.persona))}">
+                        [ngClass]="{'admin-a': [persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona),
+                                    'admin-b': [persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona),
+                                    'admin-h': [persona.ANALYSTADMIN].includes(environment.persona),
+                                    'admin-r': [persona.ANALYSTADMIN].includes(environment.persona)}">
                     <span class="logged-in-user"> </span>
                 </button>
                 <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right mdl-js-ripple-effect" for="more-button">
