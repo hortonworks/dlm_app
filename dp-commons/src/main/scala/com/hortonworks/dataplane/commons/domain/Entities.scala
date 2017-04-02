@@ -76,7 +76,7 @@ object Entities {
       id: Option[Long] = None,
       name: String,
       description: String,
-      ambariUrl: Option[String] = None,
+      ambariurl: Option[String] = None,
       ambariuser: Option[String] = None,
       ambaripass: Option[String] = None,
       secured: Option[Boolean] = Some(false),
@@ -150,13 +150,6 @@ object Entities {
                           clusterId:Long
                          )
 
-  case class ClusterHealth(id: Option[Long] = None,
-                           status:String,
-                           state:String,
-                           uptime:Option[Long],
-                           started:Option[LocalDateTime],
-                           clusterId:Long
-                          )
 
   case class ClusterProperties(id: Option[Long] = None,
                                properties: Option[JsValue] = None,
@@ -265,8 +258,8 @@ object JsonFormatters {
 
   implicit val clusterHostWrites = Json.writes[ClusterHost]
   implicit val clusterHostReads = Json.reads[ClusterHost]
-  implicit val clusterHealthWrites = Json.writes[ClusterHealth]
-  implicit val clusterHealthReads = Json.reads[ClusterHealth]
+
+
   implicit val clusterPropertiesWrites = Json.writes[ClusterProperties]
   implicit val clusterPropertiesReads = Json.reads[ClusterProperties]
 

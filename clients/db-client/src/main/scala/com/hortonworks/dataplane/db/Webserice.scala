@@ -71,10 +71,7 @@ object Webserice {
         datalakeId: Long): Future[Either[Errors, Seq[Cluster]]]
 
     def create(cluster: Cluster): Future[Either[Errors, Cluster]]
-
     def retrieve(clusterId: String): Future[Either[Errors, Cluster]]
-
-    def getHealth(clusterId: String): Future[Either[Errors, ClusterHealth]]
 
   }
 
@@ -89,6 +86,7 @@ object Webserice {
 
   trait ClusterHostsService extends DbClientService {
 
+    def getHostsByCluster(clusterId:Long):Future[Either[Errors,Seq[ClusterHost]]]
     def createOrUpdate(host:ClusterHost):Future[Option[Errors]]
 
   }
