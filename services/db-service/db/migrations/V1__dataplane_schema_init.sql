@@ -125,15 +125,6 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_hosts (
 );
 
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_health (
-  id        BIGSERIAL PRIMARY KEY,
-  status    VARCHAR(255)                                 NOT NULL,
-  state     VARCHAR(10)                                  NOT NULL,
-  uptime    BIGINT,
-  started   TIMESTAMP,
-  clusterid BIGINT REFERENCES dataplane.dp_clusters (id) NOT NULL
-);
-
 CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_properties (
   id         BIGSERIAL PRIMARY KEY,
   properties JSONB,
