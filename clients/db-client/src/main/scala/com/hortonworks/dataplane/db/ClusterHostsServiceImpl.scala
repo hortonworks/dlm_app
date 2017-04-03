@@ -33,4 +33,27 @@ class ClusterHostsServiceImpl(config: Config)(implicit ws: WSClient)
     }
 
   }
+
+  override def getHostsByCluster(clusterId:Long): Future[Either[Errors, Seq[ClusterHost]]] = {
+    ws.url(s"$url/clusters/$clusterId/hosts")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      )
+      .get()
+      .map(mapToHosts)
+  }
+
+
+  private def mapToHosts(res: WSResponse) = {
+    res.status match {
+      case 200 =>
+        extractEntity[Seq[ClusterHost]](
+          res,
+          r => (r.json \ "results" \\ "data").map { d =>
+            d.validate[ClusterHost].get
+          })
+      case _ => mapErrors(res)
+    }
+  }
 }

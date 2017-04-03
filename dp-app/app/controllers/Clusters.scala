@@ -11,13 +11,15 @@ import models.JsonResponses
 import play.api.Logger
 import play.api.mvc._
 import play.api.libs.json.Json
+import services.ClusterHealthService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class Clusters @Inject()(
     @Named("clusterService")
-    val clusterService: ClusterService
+    val clusterService: ClusterService, val clusterHealthService: ClusterHealthService
+
 ) extends Controller {
 
   def list(lakeId: Option[Long]) = Authenticated.async {
@@ -81,10 +83,12 @@ class Clusters @Inject()(
       }
   }
 
-  def getHealth(clusterId: String) = Authenticated.async {
+  import models.ClusterHealthData._
+  import com.hortonworks.dataplane.commons.domain.Ambari._
+  def getHealth(clusterId: Long) = Action.async {
     Logger.info("Received get cluster health request")
 
-    clusterService.getHealth(clusterId)
+    clusterHealthService.getClusterHealthData(clusterId)
       .map {
         clusterHealth => clusterHealth match {
           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))

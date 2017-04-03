@@ -3,10 +3,11 @@ package domain
 import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Entities.ClusterHost
+import play.api.Logger
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.libs.json.JsValue
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
@@ -30,15 +31,26 @@ class ClusterHostRepo @Inject()(
 
   def upsert(clusterHost: ClusterHost): Future[Int] = {
 
-    db.run(ClusterHosts.filter(_.clusterId === clusterHost.clusterId).filter(_.host === clusterHost.host)
-      .map(r => (r.status, r.properties))
-      .update(clusterHost.status, clusterHost.properties)).map {
-      case 0 =>
-        db.run(ClusterHosts += clusterHost)
-        1
-      case 1 => 1
-      case n => throw new Exception("Too many rows updated")
-    }
+    db.run(
+        ClusterHosts
+          .filter(_.clusterId === clusterHost.clusterId)
+          .filter(_.host === clusterHost.host)
+          .map(r => (r.status, r.properties))
+          .update(clusterHost.status, clusterHost.properties))
+      .map { o =>
+        o match {
+          case 0 =>
+            db.run(ClusterHosts += clusterHost)
+            1
+          case 1 => 1
+          case n => throw new Exception("Too many rows updated")
+        }
+      }
+      .recoverWith {
+        case e: Exception =>
+          Logger.error("Could not insert host info")
+          Future.successful(0)
+      }
   }
 
   def findByClusterAndHostId(clusterId: Long,

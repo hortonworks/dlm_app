@@ -1,6 +1,6 @@
 package com.hortonworks.dataplane.db
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, ClusterHealth, Errors}
+import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, Errors}
 import com.hortonworks.dataplane.db.Webserice.ClusterService
 import com.typesafe.config.Config
 import play.api.libs.json.Json
@@ -31,13 +31,6 @@ class ClusterServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToCluster(res: WSResponse) = {
     res.status match {
       case 200 => extractEntity[Cluster](res, r =>(r.json \ "results" \\ "data")(0).validate[Cluster].get)
-      case _ => mapErrors(res)
-    }
-  }
-
-  private def mapToClusterHealth(res: WSResponse) = {
-    res.status match {
-      case 200 => extractEntity[ClusterHealth](res, r =>(r.json \ "results" \\ "data")(0).validate[ClusterHealth].get)
       case _ => mapErrors(res)
     }
   }
@@ -73,13 +66,6 @@ class ClusterServiceImpl(config: Config)(implicit ws: WSClient)
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToCluster)
-  }
-
-  override def getHealth(clusterId: String): Future[Either[Errors, ClusterHealth]] = {
-    ws.url(s"$url/clusters/$clusterId/health")
-      .withHeaders("Accept" -> "application/json")
-      .get()
-      .map(mapToClusterHealth)
   }
 
 

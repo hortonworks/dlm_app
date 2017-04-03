@@ -95,12 +95,6 @@ PUT           /clusters/hosts                                                con
 GET           /clusters/:clusterId/hosts/:hostId                             controllers.ClusterHosts.loadWithCluster(clusterId: Long, hostId:Long)
 DELETE        /clusters/:clusterId/hosts/:hostId                             controllers.ClusterHosts.delete(clusterId: Long, hostId:Long)
 
-#ClusterHealths API
-GET           /clusters/:clusterId/health                                    controllers.ClusterHealths.allWithCluster(clusterId:Long)
-POST          /clusters/health                                               controllers.ClusterHealths.add
-GET           /clusters/:clusterId/health/:healthId                          controllers.ClusterHealths.loadWithCluster(clusterId: Long, healthId:Long)
-DELETE        /clusters/:clusterId/health/:healthId                          controllers.ClusterHealths.delete(clusterId: Long, healthId:Long)
-
 #ClusterProperties API
 GET           /clusters/:clusterId/properties                                controllers.ClusterProps.allWithCluster(clusterId:Long)
 POST          /clusters/properties                                           controllers.ClusterProps.add
