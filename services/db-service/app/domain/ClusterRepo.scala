@@ -25,6 +25,10 @@ class ClusterRepo @Inject()(
   }
 
   def insert(cluster: Cluster): Future[Cluster] = {
+    val security = if(cluster.secured.isEmpty) {
+      Some(false)
+    } else cluster.secured
+    cluster.copy(secured = security)
     db.run {
       Clusters returning Clusters += cluster
     }
