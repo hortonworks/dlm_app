@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs/Observable';
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
 import { Http, Request, Response, RequestOptionsArgs, RequestOptions, XHRBackend } from '@angular/http';
 import { MockResolver } from '../mocks/mock-resolver';
 
@@ -12,6 +12,9 @@ export class HttpService extends Http {
   // todo: default error handler
   // todo: default data serializer
   request(url: string|Request, options?: RequestOptionsArgs): Observable<Response> {
+    if (!isDevMode()) {
+      return super.request(this.buildUrl(url), options);
+    }
     let request;
     let resolver = new MockResolver();
     let prefixed: string|Request = this.buildUrl(url);
@@ -23,7 +26,7 @@ export class HttpService extends Http {
     return super.request(resolver.resolveRequest(request) || prefixed, options);
   }
 
-  buildUrl(url: string|Request) {
+  buildUrl(url: string|Request): string|Request {
     if (typeof url === 'string') {
       return this.apiPrefix + url;
     }
