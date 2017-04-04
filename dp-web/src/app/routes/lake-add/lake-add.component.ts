@@ -108,7 +108,7 @@ export class LakeAddComponent implements OnInit {
   }
 
   doVerifyCluster() {
-    this.rxClusterValidate.next(this.cluster.ambariUrl);
+    this.rxClusterValidate.next(this.cluster.ambariurl);
   }
 
   onUpdateCluster(event) {
@@ -121,6 +121,8 @@ export class LakeAddComponent implements OnInit {
         this.cluster.name = `cluster of lake ${lake.name}`;
         this.cluster.datalakeid = lake.id;
         this.cluster.description = `Cluster of lake ${lake.id}`;
+        this.cluster.ambariuser = 'admin';
+        this.cluster.ambaripass = 'admin';
         return this.clusterService.insert(this.cluster);
       })
       .subscribe(

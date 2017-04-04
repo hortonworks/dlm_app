@@ -33,7 +33,7 @@ export class AlreadyLoggedInGuard implements CanActivate {
   canActivate() {
     if(this.authenticationService.isAuthenticated()) {
       // check if is first run
-      this.router.navigate(['first-run']);
+      this.router.navigate(['onboard']);
       return true;
     }
     return true;

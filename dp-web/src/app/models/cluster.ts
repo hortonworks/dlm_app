@@ -2,7 +2,7 @@ export class Cluster {
    id?: number;
    name: string;
    description: string = '';
-   ambariUrl?: string;
+   ambariurl?: string;
    ambariuser?: string;
    ambaripass?: string;
    secured?: boolean;
