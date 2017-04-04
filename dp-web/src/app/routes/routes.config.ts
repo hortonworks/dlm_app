@@ -27,7 +27,8 @@ export const routes: Routes = [{
     canActivate:[ LoggedInGuard ]
   },{
     path: 'dashboard',
-    component: DashboardComponent
+    component: DashboardComponent,
+    canActivate:[ LoggedInGuard ]
   },{
     path: 'dlm',
     loadChildren: './apps/dlm/dlm.module#DlmModule',
