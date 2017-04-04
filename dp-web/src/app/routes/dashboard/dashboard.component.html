@@ -14,7 +14,7 @@
         <div style="display:flex; border: 1px solid rgb(204, 204, 204); padding: 15px; background-color: rgb(255, 255, 255);">
           <div style="flex-grow: 1;">
             <div>
-              <i class="fa fa-circle" aria-hidden="true" [style.color]="cLake.clustersWithHealth[0].health.status === 'UP' ? 'green' : 'red' "></i>
+              <i class="fa fa-circle" aria-hidden="true" [style.color]="cLake.clustersWithHealth[0].health.status.state === 'STARTED' ? 'green' : 'red' "></i>
               {{cLake.lake.name}}
             </div>
             <div>
@@ -38,15 +38,15 @@
         <div style="display: flex; border: 1px solid rgb(204, 204, 204); background-color: rgb(250, 250, 250);">
           <div style="padding: 5px 15px;text-align: center;border-right: 1px solid rgb(204, 204, 204);">
             <div>NODE</div>
-            <div style="font-weight: bold;">12</div>
+            <div style="font-weight: bold;">{{cLake.clustersWithHealth[0].health.nodes}}</div>
           </div>
           <div style="padding: 5px 15px;text-align: center;border-right: 1px solid rgb(204, 204, 204);">
             <div>UP TIME</div>
-            <div style="font-weight: bold;">{{doGetUptime(cLake.clustersWithHealth[0].health.uptime)}}</div>
+            <div style="font-weight: bold;">{{doGetUptime(cLake.clustersWithHealth[0].health.status.since)}}</div>
           </div>
           <div style="padding: 5px 15px;text-align: center;border-right: 1px solid rgb(204, 204, 204);">
             <div>HDFS</div>
-            <div style="font-weight: bold;">400GB</div>
+            <div style="font-weight: bold;">{{cLake.clustersWithHealth[0].health.size}}</div>
           </div>
           <div style="flex-grow: 1; padding: 5px;text-align: center;border-right: 1px solid rgb(204, 204, 204);"></div>
           <div style="padding: 15px;">
