@@ -7,8 +7,6 @@ import { LakeAddComponent } from './lake-add/lake-add.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
 import { AlreadyLoggedInGuard, LoggedInGuard } from '../shared/utils/login-guard';
-import { ViewClusterComponent } from '../components/view-cluster/view-cluster.component';
-import { DataManagerComponent } from '../components/data-manager/data-manager.component';
 import { NotFoundRouteComponent } from './not-found-route/not-found-route.component';
 
 export const routes: Routes = [{
