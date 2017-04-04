@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { SecurityComponent } from './routes/security/security.component';
-import { LakesComponent } from './routes/lakes/lakes.component';
+import { SecurityComponent } from './views/security/security.component';
+import { LakesComponent } from './views/lakes/lakes.component';
 
 @NgModule({
   imports: [
