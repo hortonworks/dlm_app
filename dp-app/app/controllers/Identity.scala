@@ -9,7 +9,7 @@ import scala.concurrent.Future
 class Identity ()
   extends Controller {
 
-  def list = Authenticated.async { request =>
+  def retrieve = Authenticated.async { request =>
     Future.successful(Ok(Json.toJson(request.user)))
   }
 }
