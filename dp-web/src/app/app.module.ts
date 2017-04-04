@@ -10,7 +10,6 @@ import { SidenavRouterLinkDirective } from './sidenav-router-link.directive';
 import { AppComponent } from './app.component';
 import { Environment } from './environment';
 import { LoggedInGuard , AlreadyLoggedInGuard} from './shared/utils/login-guard';
-import { LogoutComponent } from './logout/logout.component';
 
 import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route.component';
 import { SignInComponent } from './routes/sign-in/sign-in.component';
@@ -38,7 +37,6 @@ import { IdentityService } from './services/identity.service';
     SidenavRouterLinkDirective,
     AppComponent,
 
-    LogoutComponent,
     NotFoundRouteComponent,
     SignInComponent,
     FirstRunComponent,

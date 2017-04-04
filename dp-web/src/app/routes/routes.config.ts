@@ -5,7 +5,6 @@ import { FirstRunComponent } from './first-run/first-run.component';
 import { SignInComponent } from './sign-in/sign-in.component';
 import { LakeAddComponent } from './lake-add/lake-add.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { LogoutComponent } from '../logout/logout.component';
 
 import { AlreadyLoggedInGuard, LoggedInGuard } from '../shared/utils/login-guard';
 import { ViewClusterComponent } from '../components/view-cluster/view-cluster.component';
@@ -28,9 +27,6 @@ export const routes: Routes = [{
     path: 'onboard/lake-add',
     component: LakeAddComponent,
     canActivate:[ LoggedInGuard ]
-  },{
-    path: 'logout',
-    component: LogoutComponent
   },{
     path: 'dashboard',
     component: DashboardComponent
