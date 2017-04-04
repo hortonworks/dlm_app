@@ -13,11 +13,11 @@ export class Cluster {
    properties?: any;
 }
 
-export class ClusterHealth {
-  id: number;
-  status: string;
-  state: string;
-  uptime: number;
-  started: string;
-  clusterId: number;
+export class ClusterHealthSummary {
+  nodes: number;
+  size: string;
+  status: {
+    state: string,
+    since: number
+  };
 }

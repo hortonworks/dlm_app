@@ -15,7 +15,7 @@ import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route
 import { SignInComponent } from './routes/sign-in/sign-in.component';
 import { FirstRunComponent } from './routes/first-run/first-run.component';
 import { LakeAddComponent } from './routes/lake-add/lake-add.component';
-import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { SidebarComponent } from './widgets/sidebar/sidebar.component';
 import { DashboardComponent } from './routes/dashboard/dashboard.component';
 import { EntryComponent } from './routes/entry/entry.component';
 

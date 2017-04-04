@@ -9,7 +9,7 @@ import { ClusterService } from '../../services/cluster.service';
 
 import { Lake } from '../../models/lake';
 import { Location } from '../../models/location';
-import { Cluster, ClusterHealth } from '../../models/cluster';
+import { Cluster, ClusterHealthSummary } from '../../models/cluster';
 
 @Component({
   selector: 'dp-dashboard',
@@ -23,7 +23,7 @@ export class DashboardComponent implements OnInit {
     location: Location,
     clustersWithHealth: {
       cluster: Cluster,
-      health: ClusterHealth
+      health: ClusterHealthSummary
     }[]
   }[];
 
@@ -66,8 +66,8 @@ export class DashboardComponent implements OnInit {
       })
   }
 
-  doGetUptime(uptime: number) {
-    return moment.duration(uptime).humanize();
+  doGetUptime(since: number) {
+    return moment.duration(since).humanize();
   }
 
 }

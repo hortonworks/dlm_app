@@ -22,7 +22,7 @@ POST        /api/clusters                          controllers.Clusters.create
 GET         /api/clusters                          controllers.Clusters.list(lakeId: Option[Long])
 PUT         /api/clusters                          controllers.Clusters.update
 GET         /api/clusters/:clusterId               controllers.Clusters.get(clusterId: String)
-GET         /api/clusters/:clusterId/health        controllers.Clusters.getHealth(clusterId: Long)
+GET         /api/clusters/:clusterId/health        controllers.Clusters.getHealth(clusterId: Long, summary: Option[Boolean])
 
 #POST        /api/actions/register-lake             controllers.actions.LakeAction.register
 

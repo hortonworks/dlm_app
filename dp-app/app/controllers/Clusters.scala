@@ -85,16 +85,40 @@ class Clusters @Inject()(
 
   import models.ClusterHealthData._
   import com.hortonworks.dataplane.commons.domain.Ambari._
-  def getHealth(clusterId: Long) = Action.async {
+  def getHealth(clusterId: Long, summary: Option[Boolean]) = Action.async {
     Logger.info("Received get cluster health request")
 
     clusterHealthService.getClusterHealthData(clusterId)
       .map {
         clusterHealth => clusterHealth match {
           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-          case Right(clusterHealth) => Ok(Json.toJson(clusterHealth))
+          case Right(clusterHealth) => Ok(summary match {
+            case Some(summary) => Json.obj(
+              "nodes" -> clusterHealth.hosts.length,
+              "size" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityTotal),
+              "status" -> Json.obj(
+                "state" -> clusterHealth.nameNodeInfo.get.state,
+                "since" -> 34567890 /* up since time in ms | tz? */
+              )
+            )
+            case None => Json.toJson(clusterHealth)
+          })
         }
       }
+  }
+
+  private def humanizeBytes(bytes: Option[Double]): String = {
+    bytes match {
+      case Some(bytes) => {
+        if (bytes == 0) return "0 Bytes";
+        val k = 1000;
+        val sizes = Array("Bytes ", "KB ", "MB ", "GB ", "TB ", "PB ", "EB ", "ZB ", "YB ");
+        val i = Math.floor(Math.log(bytes) / Math.log(k)).toInt;
+
+        Math.round(bytes / Math.pow(k, i)) + " " + sizes(i);
+      }
+      case None => return "NA";
+    }
   }
 
 }
