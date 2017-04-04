@@ -40,11 +40,12 @@ export class SignInComponent {
       .subscribe(
         user => {
           const persona = Persona[user.roles[0]];
-          this.environment.persona = persona;
+          // this.environment.persona = persona;
 
           this._isAuthSuccessful = true;
           // TODO: check if is first run
-          this.router.navigate(['first-run']);
+          // this.lakeService.list()
+          this.router.navigate(['onboard']);
         },
         error => {
           this._isAuthSuccessful = false;
