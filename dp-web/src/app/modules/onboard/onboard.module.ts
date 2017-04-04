@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { SecurityComponent } from './security/security.component';
+import { SecurityComponent } from './routes/security/security.component';
+import { LakesComponent } from './routes/lakes/lakes.component';
 
 @NgModule({
   imports: [
@@ -9,6 +10,7 @@ import { SecurityComponent } from './security/security.component';
   ],
   declarations: [
     SecurityComponent,
+    LakesComponent,
   ]
 })
 export class OnboardModule { }
