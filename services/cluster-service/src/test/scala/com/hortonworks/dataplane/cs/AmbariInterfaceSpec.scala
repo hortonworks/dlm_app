@@ -33,7 +33,7 @@ class AmbariInterfaceSpec
     val ambariInterface = new SimpleAmbariInterfaceImpl(
       Cluster(name = "somecluster",
         description = "somedescription",
-        ambariUrl = Some("http://localhost:9999"),
+        ambariurl = Some("http://localhost:9999"),
         ambariuser = Some("admin"),
         ambaripass = Some("admin")))
 
@@ -55,7 +55,7 @@ class AmbariInterfaceSpec
     val ambariInterface = new SimpleAmbariInterfaceImpl(
       Cluster(name = "test",
         description = "somedescription",
-        ambariUrl = Some("http://localhost:9999"),
+        ambariurl = Some("http://localhost:9999"),
         ambariuser = Some("admin"),
         ambaripass = Some("admin")))
 
@@ -77,7 +77,7 @@ class AmbariInterfaceSpec
     val ambariInterface = new SimpleAmbariInterfaceImpl(
       Cluster(name = "test",
         description = "somedescription",
-        ambariUrl = Some("http://localhost:9999"),
+        ambariurl = Some("http://localhost:9999"),
         ambariuser = Some("admin"),
         ambaripass = Some("admin")))
 
@@ -103,7 +103,7 @@ class AmbariInterfaceSpec
     val ambariInterface = new SimpleAmbariInterfaceImpl(
       Cluster(name = "test",
         description = "somedescription",
-        ambariUrl = Some("http://localhost:9999"),
+        ambariurl = Some("http://localhost:9999"),
         ambariuser = Some("admin"),
         ambaripass = Some("admin")))
 
@@ -125,7 +125,7 @@ class AmbariInterfaceSpec
     val ambariInterface = new SimpleAmbariInterfaceImpl(
       Cluster(name = "test",
         description = "somedescription",
-        ambariUrl = Some("http://localhost:9999"),
+        ambariurl = Some("http://localhost:9999"),
         ambariuser = Some("admin"),
         ambaripass = Some("admin")))
 
