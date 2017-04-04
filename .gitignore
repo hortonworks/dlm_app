@@ -18,6 +18,7 @@
 **/build/*
 **/target/*
 **/logs/*
+**/scala-logging.log
 
 # Typesafe Activator
 **/project/*-shim.sbt
