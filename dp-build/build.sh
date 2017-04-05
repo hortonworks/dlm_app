@@ -37,8 +37,13 @@ npm run build
 cp -R ./dist ../dp-build/build/dp-web
 popd
 
-# 3. build a container bundling dp-app and dp-web
-#docker-compose build
+# 3. build cluster services
+pushd ../services/rest-mock
+sbt publishLocal
+popd
+pushd ../services/cluster-service
+sbt assembly
+popd
 
 # 4
 echo "All done"
