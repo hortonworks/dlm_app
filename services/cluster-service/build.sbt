@@ -27,9 +27,11 @@ assemblyMergeStrategy in assembly := {
         MergeStrategy.last
       case "services" :: xs =>
         MergeStrategy.filterDistinctLines
-      case ("manifest.mf" :: Nil) | ("index.list" :: Nil) | ("dependencies" :: Nil) =>
+      case ("manifest.mf" :: Nil) | ("index.list" :: Nil) | ("dependencies" :: Nil) | ("license" :: Nil)
+           | ("license.txt" :: Nil) | ("notice" :: Nil) | ("notice.txt" :: Nil) =>
         MergeStrategy.discard
-      case ("MANIFEST.MF" :: Nil) | ("INDEX.LIST" :: Nil) | ("DEPENDENCIES" :: Nil) =>
+      case ("MANIFEST.MF" :: Nil) | ("INDEX.LIST" :: Nil) | ("DEPENDENCIES" :: Nil) | ("LICENSE" :: Nil)
+           | ("LICENSE.TXT" :: Nil) | ("NOTICE" :: Nil) | ("NOTICE.TXT" :: Nil) =>
         MergeStrategy.discard
       case _ => MergeStrategy.deduplicate
     }
