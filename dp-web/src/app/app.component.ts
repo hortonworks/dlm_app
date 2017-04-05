@@ -34,4 +34,11 @@ export class AppComponent implements AfterViewInit  {
   ngAfterViewInit() {
     componentHandler.upgradeAllRegistered();
   }
+
+  // todo: this a workaround to hide unnecessary elements for sub apps from app.component template
+  // fix: need to get general solution to avoid this
+  isSubAppRoute(): boolean {
+    const subAppsPrefixes = ['/dlm'];
+    return subAppsPrefixes.some(prefix => this.router.url.startsWith(prefix));
+  }
 }

@@ -32,7 +32,7 @@ export const routes: Routes = [{
   },{
     path: 'dlm',
     loadChildren: './apps/dlm/dlm.module#DlmModule',
-    canActivate: [LoggedInGuard]
+    canActivate:[ LoggedInGuard ]
   },{
     path: '**',
     component: NotFoundRouteComponent

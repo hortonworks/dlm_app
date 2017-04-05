@@ -18,7 +18,6 @@ import { LakeAddComponent } from './routes/lake-add/lake-add.component';
 import { SidebarComponent } from './widgets/sidebar/sidebar.component';
 import { DashboardComponent } from './routes/dashboard/dashboard.component';
 import { EntryComponent } from './routes/entry/entry.component';
-
 import { AuthenticationService } from './services/authentication.service';
 import { LakeService } from './services/lake.service';
 import { LocationService } from './services/location.service';
@@ -30,7 +29,6 @@ import { IdentityService } from './services/identity.service';
     BrowserModule,
     FormsModule,
     HttpModule,
-
     RouterModule.forRoot(routes),
   ],
   declarations: [
