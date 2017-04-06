@@ -62,7 +62,7 @@ class ClusterInterfaceImpl @Inject()(
       }
       .recoverWith {
         case e: Exception =>
-          logger.error(s"No data lakes found - Reason: ${e}")
+          logger.error(s"Exception: No data lakes found - Reason: ${e}", e)
           Future.successful(Seq())
       }
 

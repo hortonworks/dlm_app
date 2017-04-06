@@ -27,7 +27,7 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
     require(cluster.ambariuser.isDefined, "No Ambari user defined")
     require(cluster.ambaripass.isDefined, "No Ambari password defined")
     require(
-      if (cluster.secured.isDefined && cluster.secured.get == true)
+      if (isClusterKerberized)
         cluster.kerberosuser.isDefined && cluster.kerberosticketLocation.isDefined
       else true,
       "Secure cluster added but Kerberos user/ticket not defined"
@@ -48,7 +48,7 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
               s"This may cause future operations to fail")
 
         val kerberos =
-          if (cluster.secured.get)
+          if (isClusterKerberized)
             Some(
               Kerberos(cluster.kerberosuser.get,
                        cluster.kerberosticketLocation.get))
@@ -58,11 +58,15 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
       }
       .recoverWith {
         case e: Exception =>
-          logger.error("Could not connect to Ambari")
+          logger.error(s"Could not connect to Ambari, reason: ${e}", e)
           Future.successful(
             AmbariConnection(status = false, url.get, None, Some(e)))
       }
 
+  }
+
+  private def isClusterKerberized = {
+    cluster.secured.isDefined && cluster.secured.get == true
   }
 
   override def getAtlas: Future[Either[Throwable, Atlas]] = {
