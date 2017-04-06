@@ -28,3 +28,11 @@ services:
     links:
         - dp-db-service
         - dp-database
+  dp-cluster-service:
+    build:
+        context: ../services/cluster-service
+    image: hortonworks/dp-cluster-service
+    depends_on:
+        - dp-database
+    links:
+        - dp-database
