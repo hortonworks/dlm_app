@@ -19,6 +19,7 @@ import { PoliciesComponent } from './pages/policies/policies.component';
 import { JobsComponent } from './pages/jobs/jobs.component';
 import { HelpComponent } from './pages/help/help.component';
 import { DlmRoutingModule } from './dlm.routing';
+import { NavbarComponent } from './common/navbar/navbar.component';
 
 import { httpServiceProvider } from './services/http.service';
 import { CommonComponentsModule } from './components/common-components.module';
@@ -42,7 +43,8 @@ import { ClustersModule } from './pages/clusters/clusters.module';
     PairingsComponent,
     PoliciesComponent,
     JobsComponent,
-    HelpComponent
+    HelpComponent,
+    NavbarComponent
   ],
   providers: [
     ClusterService,
