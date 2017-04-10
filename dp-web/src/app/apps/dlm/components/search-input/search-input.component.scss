@@ -1,0 +1,28 @@
+$input-color: #efedef;
+$icon-color: #38809c;
+
+.glyphicon {
+  color: $icon-color;
+}
+
+.form-control {
+  padding-left: 25px;
+  background: transparent;
+  border: none;
+  outline: none;
+  border-bottom: 1px solid $input-color;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.glyphicon {
+  position: absolute;
+  left: 0;
+  padding: 9px 17px;
+}
+
+.form-control + .glyphicon {
+  right: 0;
+  left: auto;
+  padding: 8px 27px;
+}

@@ -1,0 +1,13 @@
+<div class="btn-group" dropdown [ngSwitch]="type">
+  <a *ngSwitchCase="'link'" dropdownToggle>
+    {{text}} <span class="glyphicon glyphicon-chevron-down"></span>
+  </a>
+  <button *ngSwitchDefault type="button" class="btn dropdown-toggle" [ngClass]="buttonClass" dropdownToggle>
+    {{text}} <span class="glyphicon glyphicon-chevron-down"></span>
+  </button>
+  <ul *dropdownMenu class="dropdown-menu">
+    <li *ngFor="let item of items" (click)="selectItem(item)">
+      <a>{{item.label}}</a>
+    </li>
+  </ul>
+</div>

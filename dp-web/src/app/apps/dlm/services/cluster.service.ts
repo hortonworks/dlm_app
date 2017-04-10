@@ -7,7 +7,7 @@ export class ClusterService {
 
   constructor(private http: Http) { }
 
-  getClusters(): Observable<any> {
+  fetchClusters(): Observable<any> {
     return this.http.get('clusters').map(r => r.json());
   }
 

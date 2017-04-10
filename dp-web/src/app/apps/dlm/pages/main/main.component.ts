@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { ClusterService } from '../../services/cluster.service';
 
 @Component({
   selector: 'dp-main',
@@ -8,10 +7,8 @@ import { ClusterService } from '../../services/cluster.service';
 })
 export class MainComponent implements OnInit {
 
-  constructor(private cluster: ClusterService) { }
+  constructor() { }
 
-  ngOnInit() {
-    this.cluster.getClusters().subscribe(r => console.debug('response', r));
-  }
+  ngOnInit() {}
 
 }

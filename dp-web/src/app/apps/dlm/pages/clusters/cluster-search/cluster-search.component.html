@@ -1,0 +1,13 @@
+<div class="search">
+  <dp-search-input></dp-search-input>
+</div>
+<div class="sort pull-left">
+  <span class="text-muted pull-left">Sort By:&nbsp;</span>
+  <dp-dropdown [text]="'Registered'" [type]="'link'" [items]="sortOptions"
+  (onSelectItem)="handleSelectedSort($event)">
+  </dp-dropdown>
+</div>
+<dp-dropdown [items]="addOptions" [text]="'Add'" [buttonClass]="'btn-secondary'"
+  (onSelectItem)="handleSelectedAdd($event)"
+  class="pull-left">
+</dp-dropdown>

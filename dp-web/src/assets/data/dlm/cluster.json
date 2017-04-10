@@ -1,8 +1,11 @@
 {
+  "id": "primaryCluster",
   "ambariUrl": "http://localhost:8080",
   "userName": "admin",
   "clusterType": "DATACENTER",
   "createdAt": 1490689061725,
+  "volumeGB": 320,
+  "nodesCount": 20,
   "clusterStatus": {
     "requestId": "qtp2026718042-1933333",
     "message": "Submitted",

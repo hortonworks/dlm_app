@@ -1,0 +1,59 @@
+<dp-card>
+  <div class="row flex-center cluster-row">
+    <div class="hex-wrap">
+      <div class="hex-icon">
+        <i class="glyphicon glyphicon-cog"></i>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="row flex-center">
+        <div class="col-md-5 cluster-cell">
+          <p class="h2">
+            {{cluster.clusterDetails.name}}
+          </p>
+          <p>
+            {{cluster.type}} {{cluster.clusterDetails.dataCenter}}
+          </p>
+        </div>
+        <div class="col-md-7 cluster-cell">
+          <p class="cell-title">Registered</p>
+          <p>{{cluster.createdAt | date:'medium'}}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="row flex-center">
+        <div class="col-md-7">
+          <div class="row">
+            <div class="col-md-4 cluster-cell">
+              <p class="cell-title">Volume</p>
+              <p>{{cluster.volumeGB}} GB</p>
+            </div>
+            <div class="col-md-4 cluster-cell">
+              <p class="cell-title">Nodes</p>
+              <p>{{cluster.nodesCount}}</p>
+            </div>
+            <div class="col-md-4 cluster-cell">
+              <p class="cell-title">Pairs <a>+add</a></p>
+              <p>-</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div class="row flex-center">
+            <div class="col-md-9 cluster-cell">
+              <div class="add-actions">
+                <i class="glyphicon glyphicon-plus text-success"></i>
+              </div>
+            </div>
+            <div class="col-md-3 cluster-cell">
+              <div class="more">
+                <p>...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</dp-card>

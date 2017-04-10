@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs/Observable';
 import { Request, RequestMethod } from '@angular/http';
 
 const MOCK_FILES_PREFIX = '/assets/data/dlm/';
@@ -13,17 +12,13 @@ const MOCK_FILES_PREFIX = '/assets/data/dlm/';
  * @param  {RequestMethod} [method]   request method
  */
 export class MockRoute {
-  apiPrefix: string = '/api/dlm/'
+  apiPrefix: string = '/api/dlm/';
 
   constructor(private url: string, private jsonFile: string, private method?: RequestMethod) {
     this.url = this.apiPrefix + url;
     if (!method) {
       this.method = RequestMethod.Get;
     }
-  }
-
-  private compile(url: string) {
-    const pathName: string = url.split('?')[0];
   }
 
   private tokens(url: string) {

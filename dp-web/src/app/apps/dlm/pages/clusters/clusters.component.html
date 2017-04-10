@@ -1,3 +1,4 @@
-<p>
-  DLM Clusters Page!
-</p>
+<div class="col-md-12">
+  <dp-cluster-search></dp-cluster-search>
+  <dp-cluster-list [clusters]="clusters$ | async"></dp-cluster-list>
+</div>
