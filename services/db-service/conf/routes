@@ -104,6 +104,7 @@ DELETE        /clusters/:clusterId/properties/:propertiesId                  con
 #Dataset API
 GET           /datasets                                                      controllers.Datasets.all
 POST          /datasets                                                      controllers.Datasets.add
+PUT           /datasets                                                      controllers.Datasets.update
 GET           /datasets/:datasetId                                           controllers.Datasets.load(datasetId:Long)
 DELETE        /datasets/:datasetId                                           controllers.Datasets.delete(datasetId:Long)
 
@@ -114,10 +115,10 @@ POST          /datasets/categories                                           con
 DELETE        /datasets/:datasetId/categories/:categoryId                    controllers.DatasetCategories.delete(datasetId:Long, categoryId:Long)
 
 #UnclassifiedDataset API
-GET           /datasets                                                      controllers.Datasets.all
-POST          /datasets                                                      controllers.Datasets.add
-GET           /datasets/:datasetId                                           controllers.Datasets.load(datasetId:Long)
-DELETE        /datasets/:datasetId                                           controllers.Datasets.delete(datasetId:Long)
+GET           /unclassifieddatasets                                          controllers.UnclassifiedDatasets.all
+POST          /unclassifieddatasets                                          controllers.UnclassifiedDatasets.add
+GET           /unclassifieddatasets/:datasetId                               controllers.UnclassifiedDatasets.load(datasetId:Long)
+DELETE        /unclassifieddatasets/:datasetId                               controllers.UnclassifiedDatasets.delete(datasetId:Long)
 
 #UnclassifiedDatasetCategory Api
 GET           /unclassifieddatasets/:datasetId/categories                    controllers.UnclassifiedDatasetCategories.allWithDatasetId(datasetId:Long)
