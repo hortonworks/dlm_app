@@ -161,8 +161,8 @@ object Entities {
                      description:Option[String],
                      datalakeId:Long,
                      createdBy:Long,
-                     createdOn:Option[LocalDateTime] = Some(LocalDateTime.now()),
-                     lastmodified:Option[LocalDateTime] = Some(LocalDateTime.now()),
+                     createdOn:LocalDateTime = LocalDateTime.now(),
+                     lastmodified:LocalDateTime = LocalDateTime.now(),
                      version:Int = 1,
                      customprops: Option[JsValue] = None
                     )
@@ -200,10 +200,17 @@ object Entities {
                            )
 
 
+  // classes as data conatiner for Rest Api
+
+  case class DatasetAndCategories(dataset:Dataset, categories:Seq[Category])
+  case class DatasetAndCategoryIds(dataset: Dataset, categories: Seq[Long])
+
 }
 
 object JsonFormatters {
   import com.hortonworks.dataplane.commons.domain.Entities._
+
+  val defaultJson = Json.using[Json.WithDefaultValues]
 
   implicit val errorWrites = Json.writes[Error]
   implicit val errorReads = Json.reads[Error]
@@ -264,7 +271,7 @@ object JsonFormatters {
   implicit val clusterPropertiesReads = Json.reads[ClusterProperties]
 
   implicit val datasetWrites = Json.writes[Dataset]
-  implicit val datasetReads = Json.reads[Dataset]
+  implicit val datasetReads = defaultJson.reads[Dataset]
 
   implicit val datasetCategoryWrites = Json.writes[DatasetCategory]
   implicit val datasetCategoryReads = Json.reads[DatasetCategory]
@@ -281,4 +288,11 @@ object JsonFormatters {
   implicit val datasetDetailsWrites = Json.writes[DatasetDetails]
   implicit val datasetDetailsReads = Json.reads[DatasetDetails]
 
+  // classes as data conatiner for Rest Api
+
+  implicit val datasetResponseReads= Json.reads[DatasetAndCategories]
+  implicit val datasetResponseWrites= Json.writes[DatasetAndCategories]
+
+  implicit val datasetRequestReads= Json.reads[DatasetAndCategoryIds]
+  implicit val datasetRequestWrites= Json.writes[DatasetAndCategoryIds]
 }
