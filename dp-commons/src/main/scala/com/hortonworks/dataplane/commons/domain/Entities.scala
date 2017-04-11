@@ -202,8 +202,8 @@ object Entities {
 
   // classes as data conatiner for Rest Api
 
-  case class DatasetResponse(dataset:Dataset, categories:Seq[Category])
-  case class DatasetRequest(dataset: Dataset, categories: Seq[Long])
+  case class DatasetAndCategories(dataset:Dataset, categories:Seq[Category])
+  case class DatasetAndCategoryIds(dataset: Dataset, categories: Seq[Long])
 
 }
 
@@ -290,9 +290,9 @@ object JsonFormatters {
 
   // classes as data conatiner for Rest Api
 
-  implicit val datasetResponseReads= Json.reads[DatasetResponse]
-  implicit val datasetResponseWrites= Json.writes[DatasetResponse]
+  implicit val datasetResponseReads= Json.reads[DatasetAndCategories]
+  implicit val datasetResponseWrites= Json.writes[DatasetAndCategories]
 
-  implicit val datasetRequestReads= Json.reads[DatasetRequest]
-  implicit val datasetRequestWrites= Json.writes[DatasetRequest]
+  implicit val datasetRequestReads= Json.reads[DatasetAndCategoryIds]
+  implicit val datasetRequestWrites= Json.writes[DatasetAndCategoryIds]
 }

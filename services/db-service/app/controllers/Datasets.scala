@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Dataset, DatasetRequest}
+import com.hortonworks.dataplane.commons.domain.Entities.{Dataset, DatasetAndCategoryIds}
 import domain.API.{datalakes, users}
 import domain.DatasetRepo
 import play.api.mvc._
@@ -41,7 +41,7 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
 
   def add = Action.async(parse.json) { req =>
     req.body
-      .validate[DatasetRequest]
+      .validate[DatasetAndCategoryIds]
       .map { cl =>
         val created = datasetRepo.insertWithCategories(cl)
         created.map(c => success(linkData(c, makeLink(c.dataset))))
@@ -52,7 +52,7 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
 
   def update = Action.async(parse.json) { req =>
     req.body
-      .validate[DatasetRequest]
+      .validate[DatasetAndCategoryIds]
       .map { cl =>
         val created = datasetRepo.updateWithCategories(cl)
         created.map(c => success(linkData(c, makeLink(c.dataset))))
