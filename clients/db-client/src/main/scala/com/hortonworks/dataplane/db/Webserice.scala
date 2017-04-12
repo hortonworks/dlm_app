@@ -9,7 +9,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.{
 
 import scala.concurrent.Future
 
-object Webserice {
+object   Webserice {
 
   trait DbClientService {
 
