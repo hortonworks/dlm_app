@@ -1,0 +1,55 @@
+{
+  "totalResults": 3,
+  "policy": [
+    {
+      "type": "HIVE",
+      "name": "hive2Policy",
+      "status": "SUBMITTED",
+      "frequency": 3600,
+      "startTime": "2016-11-26T23:54:50",
+      "endTime": "2019-09-26T23:54:45",
+      "tags": [
+        "owner=producer@xyz.com",
+        "component=sales"
+      ],
+      "sourceclusters": [
+        "primaryCluster"
+      ],
+      "targetclusters": [
+        "thirdCluster"
+      ]
+    },
+    {
+      "type": "HIVE",
+      "name": "hivePolicy",
+      "status": "SUBMITTED",
+      "frequency": 3600,
+      "tags": [
+        "owner=producer@xyz.com",
+        "component=sales"
+      ],
+      "sourceclusters": [
+        "primaryCluster"
+      ],
+      "targetclusters": [
+        "backupCluster"
+      ]
+    },
+    {
+      "type": "HDFS",
+      "name": "hdfsPrimaryPolicy",
+      "status": "SUBMITTED",
+      "frequency": 3600,
+      "tags": [
+        "owner=producer@xyz.com",
+        "component=sales"
+      ],
+      "sourceclusters": [
+        "primaryCluster"
+      ],
+      "targetclusters": [
+        "backupCluster"
+      ]
+    }
+  ]
+}

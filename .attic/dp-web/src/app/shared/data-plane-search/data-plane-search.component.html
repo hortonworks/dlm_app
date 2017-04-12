@@ -1,0 +1,36 @@
+<div class="search-params">
+
+    <div class="mdl-grid" *ngFor="let appliedSearchParam of appliedSearchParams; let isLast =last">
+        <div class="mdl-cell mdl-cell--2-col">
+            <select [(ngModel)]="appliedSearchParam.key">
+                <option *ngFor="let key of getUnusedSearchKeys(appliedSearchParam.key)" [selected]="key === appliedSearchParam.key">{{ key }}</option>
+            </select>
+        </div>
+        <div class="mdl-cell mdl-cell--1-col">
+            <select [(ngModel)]="appliedSearchParam.operator">
+                <option [disabled]></option>
+                <option *ngFor="let operator of getOperators(appliedSearchParam.key)">{{ operator }}</option>
+            </select>
+        </div>
+        <div class="mdl-cell mdl-cell--4-col">
+            <input type="text" [(ngModel)]="appliedSearchParam.value">
+        </div>
+        <div class="mdl-cell mdl-cell--2-col">
+            <i class="fa fa-minus" aria-hidden="true" (click)="onRemove(appliedSearchParam)" [hidden]="appliedSearchParams.length === 1 && appliedSearchParam.key === ''"></i>
+            <i class="fa fa-plus" aria-hidden="true" (click)="onAdd()" *ngIf="appliedSearchParams.length !== allSearchParamWrappers.length && isLast"></i>
+        </div>
+        <div class="mdl-layout-spacer"></div>
+    </div>
+
+    <div class="mt-1 ml-2">
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green" (click)="search()">
+            {{ getButtonLabel() }}
+        </button>
+
+        <button class="mdl-button mdl-js-button mdl-button--raised mdl-color--grey-300" (click)="clear()">
+            Clear
+        </button>
+    </div>
+
+
+</div>

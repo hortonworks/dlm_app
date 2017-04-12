@@ -1,0 +1,146 @@
+<div class="mdl-grid">
+    <div class="mdl-cell mdl-cell--12-col">
+      <dp-breadcrumb></dp-breadcrumb>
+
+        <div style="position:relative">
+            <div class="mdl-typography--headline mdl-typography--font-light title-text"> {{ dataSetName }} </div>
+            <div *ngIf="!showAutoConfigured"> Category: {{ dataSet.category }} </div>
+            <p *ngIf="!showAutoConfigured"> {{ dataSet.description }} </p>
+
+            <div style="position: absolute;right:0;top:0;transform: translateY(-50%);height:0;display: flex;align-self: center;justify-content: center;" *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)">
+              <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green" (click)="doNavigateToBackupPolicySetup()">
+                <i class="fa fa-files-o" aria-hidden="true"></i> Setup Replication
+              </button>
+            </div>
+        </div>
+
+        <div *ngIf="showAutoConfigured" class="autogen"> </div>
+
+        <div *ngIf="!showAutoConfigured" class="mdl-grid mdl-grid--no-spacing hive-pane">
+            <div class="mdl-cell mdl-cell--12-col">
+                <div class="mdl-layout mdl-js-layout">
+                    <header class="mdl-layout__header mdl-layout__header--scroll">
+                        <div class="mdl-layout__header-row">
+                            <nav class="mdl-navigation">
+                                <div class="mdl-navigation__link" (click)="setActiveTab($event, tab.HIVE)" [ngClass]="{'is-active': (activeTab===tab.HIVE)}">
+                                    HIVE <br>
+                                    <span class="mdl-typography--font-black"> {{ dataSet['hiveCount'] }} </span>
+                                </div>
+                                <div class="mdl-navigation__link" (click)="setActiveTab($event, tab.HBASE)" [ngClass]="{'is-active': (activeTab===tab.HBASE)}">
+                                    HBASE <br>
+                                    <span class="mdl-typography--font-black"> {{ dataSet['hbaseCount'] }} </span>
+                                </div>
+                                <div class="mdl-navigation__link" (click)="setActiveTab($event, tab.HDFS)" [ngClass]="{'is-active': (activeTab===tab.HDFS)}">
+                                    FILES <br>
+                                    <span class="mdl-typography--font-black"> {{ dataSet['hdfsCount'] }} </span>
+                                </div>
+                            </nav>
+                        </div>
+                    </header>
+                    <main class="mdl-layout__content">
+                        <section *ngIf="(activeTab===tab.HIVE)" class="mdl-layout__tab-panel is-active">
+                            <div>
+                                <div *ngIf="!showHiveAdvanced" class="search-wrapper"> <div class="search"> <span> <input #hiveSearch placeholder="Search" (keyup)="addBasicFilterAndSearch(hiveSearch.value, 'hive')"> </span>  </div> <a class="advanced-search" (click)="showHiveAdvanced=true"> Advanced Settings </a> </div>
+                                <data-plane-search *ngIf="showHiveAdvanced"  [searchParamWrappers]="hiveSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, 'hive')" [dataSource]="'hive'"> </data-plane-search>
+                                <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+                                    <thead>
+                                    <tr>
+                                        <th class="mdl-data-table__cell--non-numeric">NAME</th>
+                                        <th class="mdl-data-table__cell--non-numeric">OWNER</th>
+                                        <th class="mdl-data-table__cell--non-numeric">CREATE TIME</th>
+                                        <th class="mdl-data-table__cell--non-numeric">NUM OF ROWS</th>
+                                        <th class="mdl-data-table__cell--non-numeric">TABLE TYPE</th>
+                                        <th class="mdl-data-table__cell--non-numeric" *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)">REPLICATION</th>
+                                        <th class="mdl-data-table__cell--non-numeric" *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)">REPLICATION POLICIES</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr *ngFor="let hiveTable of hiveFilterResults" (click)="doNavigateToDetails(hiveTable.name, 'hive')" style="cursor:pointer">
+                                        <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.name }}</td>
+                                        <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.owner }}</td>
+                                        <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.createTime }}</td>
+                                        <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.parameters.numRows }}</td>
+                                        <td class="mdl-data-table__cell--non-numeric">{{ hiveTable.tableType }}</td>
+                                        <td class="mdl-data-table__cell--non-numeric" *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)">{{hiveTable.policies.length === 0 ? 'UNREPLICATED' : 'REPLICATED'}}</td>
+                                        <td class="mdl-data-table__cell--non-numeric" *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)">
+                                          <span *ngIf="hiveTable.policies.length === 0">-</span>
+                                          <div *ngFor="let cPolicy of hiveTable.policies">
+                                            {{cPolicy.label}}
+                                          </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div *ngIf="hiveFiltersWrapper.length === 0" style="padding:15px;">
+                                    No filter rules configured for hive.
+                                </div>
+                                <div *ngIf="hiveFiltersWrapper.length !== 0 && hiveFilterResults.length === 0" style="padding:15px;">
+                                  No results available yet.
+                                </div>
+                            </div>
+                        </section>
+                        <section *ngIf="(activeTab===tab.HBASE)" class="mdl-layout__tab-panel is-active">
+                            <div >
+                                <div *ngIf="!showHbaseAdvanced" class="search-wrapper"> <div class="search"> <span> <input #hbaseSearch placeholder="Search" (keyup)="addBasicFilterAndSearch(hbaseSearch.value, 'hbase')"> </span>  </div> <a class="advanced-search" (click)="showHbaseAdvanced=true"> Advanced Settings </a> </div>
+                                <data-plane-search *ngIf="showHbaseAdvanced"  [searchParamWrappers]="hbaseSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, 'hbase')" [dataSource]="'hbase'"> </data-plane-search>
+                                <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+                                    <thead>
+                                    <tr>
+                                        <th class="mdl-data-table__cell--non-numeric">NAME</th>
+                                        <th class="mdl-data-table__cell--non-numeric">OWNER</th>
+                                        <th class="mdl-data-table__cell--non-numeric">CREATE TIME</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr *ngFor="let hbaseTable of hbaseFilterResults">
+                                        <td class="mdl-data-table__cell--non-numeric">{{ hbaseTable.name }}</td>
+                                        <td class="mdl-data-table__cell--non-numeric">{{ hbaseTable.owner }}</td>
+                                        <td class="mdl-data-table__cell--non-numeric">{{ hbaseTable.$systemAttributes$.createdTime }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div *ngIf="hbaseFiltersWrapper.length === 0" style="padding:15px;">
+                                    No filter rules configured for hbase.
+                                </div>
+                                <div *ngIf="hbaseFiltersWrapper.length !== 0 && hbaseFilterResults.length === 0" style="padding:15px;">
+                                  No results available yet.
+                                </div>
+                            </div>
+                        </section>
+                        <section *ngIf="(activeTab===tab.HDFS)" class="mdl-layout__tab-panel is-active">
+                            <div>
+                                <div *ngIf="!showHdfsAdvanced" class="search-wrapper"> <div class="search"> <span> <input #hdfsSearch placeholder="Search" (keyup)="addBasicFilterAndSearch(hdfsSearch.value, 'hdfs')"> </span>  </div> <a class="advanced-search" (click)="showHdfsAdvanced=true"> Advanced Settings </a> </div>
+                                <data-plane-search *ngIf="showHdfsAdvanced"  [searchParamWrappers]="hdfsSearchParamWrappers" (searchFilters)="addFilterAndSearch($event, 'hdfs')" [dataSource]="'hdfs'"> </data-plane-search>
+                                <table style="width: 100%" class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+                                    <thead>
+                                    <tr>
+                                        <th class="mdl-data-table__cell--non-numeric">NAME</th>
+                                        <th class="mdl-data-table__cell--non-numeric">OWNER</th>
+                                        <th class="mdl-data-table__cell--non-numeric">SIZE</th>
+                                        <th class="mdl-data-table__cell--non-numeric">URI</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr *ngFor="let hdfsTable of hdfsFilterResults">
+                                        <td class="mdl-data-table__cell--non-numeric">{{ hdfsTable.name }}</td>
+                                        <td class="mdl-data-table__cell--non-numeric">{{ hdfsTable.owner }}</td>
+                                        <td class="mdl-data-table__cell--non-numeric">{{ hdfsTable.size }}</td>
+                                        <td class="mdl-data-table__cell--non-numeric">{{ hdfsTable.uri }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div *ngIf="hdfsFiltersWrapper.length === 0" style="padding:15px;">
+                                    No filter rules configured for files.
+                                </div>
+                                <div *ngIf="hdfsFiltersWrapper.length !== 0 && hdfsFilterResults.length === 0" style="padding:15px;">
+                                  No results available yet.
+                                </div>
+                            </div>
+                        </section>
+                    </main>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

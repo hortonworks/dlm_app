@@ -1,0 +1,23 @@
+input {
+  font-size: 1em;
+
+  height: 32px;
+  min-width: 250px;
+
+  padding: 0 8px;
+
+  border: 1px solid rgb(221, 221, 221);
+  border-radius: 5px;
+}
+
+label + input {
+  margin-top: 5px;
+}
+
+.dp-input + .dp-input {
+  margin-top: 15px;
+}
+
+footer {
+  margin-top: 15px;
+}
