@@ -5,6 +5,8 @@ import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterHostsService, ClusterService, LakeService}
 import com.hortonworks.dataplane.db.{ClusterComponentServiceImpl, ClusterHostsServiceImpl, ClusterServiceImpl, LakeServiceImpl}
+import com.hortonworks.dataplane.http.Webserver
+import com.hortonworks.dataplane.http.routes.AtlasRoute
 import com.typesafe.config.{Config, ConfigFactory}
 import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcWSClient
@@ -55,6 +57,20 @@ object AppModule extends AbstractModule{
   def provideClusterHostsService(implicit ws: WSClient,configuration: Config):ClusterHostsService = {
     new ClusterHostsServiceImpl(configuration)
   }
+
+
+  @Provides
+  @Singleton
+  def provideAtlasRoute(clusterComponentService: ClusterComponentService):AtlasRoute = {
+    AtlasRoute(clusterComponentService)
+  }
+
+  @Provides
+  @Singleton
+  def provideWebservice(actorSystem:ActorSystem,materializer: ActorMaterializer,configuration: Config,atlasRoute: AtlasRoute):Webserver = {
+     new Webserver(actorSystem,materializer,configuration,atlasRoute.route)
+  }
+
 
   @Provides
   @Singleton
