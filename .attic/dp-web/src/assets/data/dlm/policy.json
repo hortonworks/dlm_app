@@ -1,0 +1,27 @@
+{
+  "name": "hivePolicy",
+  "type": "HIVE",
+  "dataset": "sales",
+  "sourceCluster": "primaryCluster",
+  "targetCluster": "backupCluster",
+  "frequencyInSec": 3600,
+  "tags": "owner=producer@xyz.com,component=sales",
+  "customProperties": {
+    "queue": "default",
+    "maxEvents": "-1"
+  },
+  "retry": {
+    "attempts": 3,
+    "delay": 1800
+  },
+  "acl": {
+    "owner": "ambari-qa",
+    "group": "users",
+    "permission": "0x755"
+  },
+  "notification": {
+    "type": null,
+    "to": null
+  },
+  "entityType": "REPLICATIONPOLICY"
+}

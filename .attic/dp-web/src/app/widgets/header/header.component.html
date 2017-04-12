@@ -1,0 +1,18 @@
+<div class="mdl-layout__header-row">
+  <span class="dataplane-title mdl-layout-title">
+    <img class="dataplane-logo-image" src="../assets/images/ui_logo.svg">
+  </span>
+  <div class="dataplane-header-spacer mdl-layout-spacer"></div>
+
+
+  <div>
+    <button class="dataplane-more-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect">
+      <span class="logged-in-user"> </span>
+    </button>
+    <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right mdl-js-ripple-effect" for="more-button">
+      <li ngIf="isLoggedIn()" class="mdl-menu__item">My account</li>
+      <li ngIf="isLoggedIn()" class="mdl-menu__item"><a href="#" routerLink="/logout">log out</a></li>
+    </ul>
+    <div class="user-name">getUserName()</div>
+  </div>
+</div>
