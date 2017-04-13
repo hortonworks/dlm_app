@@ -44,6 +44,31 @@ object Webserice {
 
   }
 
+  trait DataSetService extends DbClientService {
+
+    def list(): Future[Either[Errors, Seq[Dataset]]]
+    def create(dataSetAndCatIds: DatasetAndCategoryIds): Future[Either[Errors, DatasetAndCategories]]
+    def retrieve(dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
+    def update(dataSetId: String, dataSetAndCatIds: DatasetAndCategoryIds): Future[Either[Errors, DatasetAndCategories]]
+    def delete(dataSetId: String): Future[Either[Errors, Dataset]]
+  }
+
+  trait CategoryService extends DbClientService {
+
+    def list(): Future[Either[Errors, Seq[Category]]]
+    def create(category: Category): Future[Either[Errors, Category]]
+    def retrieve(categoryId: String): Future[Either[Errors, Category]]
+    def delete(categoryId: String): Future[Either[Errors, Category]]
+  }
+
+  trait DataSetCategoryService extends DbClientService {
+
+    def getListWithDataSetId(dataSetId: String): Future[Either[Errors, Seq[DatasetCategory]]]
+    def getListWithCategoryId(categoryId: String): Future[Either[Errors, Seq[DatasetCategory]]]
+    def create(dataSetCategory: DatasetCategory): Future[Either[Errors, DatasetCategory]]
+    def delete(dataSetId: String, categoryId: String): Future[Either[Errors, DatasetCategory]]
+  }
+
   trait LakeService extends DbClientService {
 
     def list(): Future[Either[Errors, Seq[Datalake]]]
