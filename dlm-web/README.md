@@ -5,6 +5,9 @@ This project was generated with [angular-cli](https://github.com/angular/angular
 ## Development server
 Run `npm run dev` for a dev server. Navigate to `http://localhost:4444/`. The app will automatically reload if you change any of the source files. Ensure play app is already running and bound to port `9000`.
 
+## Development server with Hot Module Reload
+Run `npm run dev:hmr` for a dev server with hot module reload. Navigate to `http://localhost:4444`.
+
 ## Build
 
 Run `npm run build` to build the project. The build artifacts will be stored in the `dist/` directory.
@@ -15,4 +18,4 @@ Run `npm run test` to execute the unit tests via [Karma](https://karma-runner.gi
 
 ## Running end-to-end tests
 
-Run `npm run e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/). 
+Run `npm run e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).

@@ -14,7 +14,8 @@
     "lint": "tslint \"src/**/*.ts\"",
     "test": "ng test",
     "pree2e": "webdriver-manager update",
-    "e2e": "protractor"
+    "e2e": "protractor",
+    "dev:hmr": "ng serve --hmr -e=dev-hmr --host 0.0.0.0 --proxy-config proxy.conf.json"
   },
   "private": true,
   "dependencies": {
@@ -47,6 +48,7 @@
   },
   "devDependencies": {
     "@angular/cli": "^1.0.0",
+    "@angularclass/hmr": "^1.2.2",
     "@types/d3-tip": "^3.5.3",
     "@types/jasmine": "2.5.41",
     "@types/jquery": "^2.0.40",
