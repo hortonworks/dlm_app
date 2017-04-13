@@ -1,6 +1,15 @@
 export class MenuItem {
-  label = '';
-  iconHtml = '';
+  label: string = '';
+  iconHtml: any = '';
   linkURL: any = '';
-  subMenu: MenuItem[] = [];
+  subMenu?: MenuItem[] = [];
+
+  constructor(label:string, linkURL:any, iconHtml:any, subMenu?: MenuItem[]) {
+    this.label = label;
+    this.iconHtml = iconHtml;
+    this.linkURL = linkURL;
+    if(subMenu) {
+      this.subMenu = subMenu;
+    }
+  }
 }

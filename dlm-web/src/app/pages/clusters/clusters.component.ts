@@ -6,6 +6,7 @@ import { Cluster } from '../../models/cluster.model';
 import { getAllClusters } from '../../selectors/cluster';
 import * as fromRoot from '../../reducers';
 import { DropdownItem } from '../../components/dropdown/dropdown-item';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'dp-main',
@@ -15,13 +16,14 @@ import { DropdownItem } from '../../components/dropdown/dropdown-item';
 export class ClustersComponent implements OnInit {
   clusters$: Observable<Cluster[]>;
 
-  addOptions: DropdownItem[] = [
-    { label: 'Cluster' },
-    { label: 'Policy' }
-  ];
+  addOptions: DropdownItem[]; 
 
-  constructor(private store: Store<fromRoot.State>) {
+  constructor(private store: Store<fromRoot.State>, t: TranslateService) {
     this.clusters$ = store.select(getAllClusters);
+    this.addOptions = [
+      { label: t.instant("page.clusters.dropdown.cluster") },
+      { label: t.instant("page.clusters.dropdown.policy") }
+    ];
   }
 
   ngOnInit() {

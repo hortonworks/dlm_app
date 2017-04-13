@@ -141,6 +141,10 @@
     magic-string "^0.19.0"
     source-map "^0.5.6"
 
+"@ngx-translate/core@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@ngx-translate/core/-/core-6.0.1.tgz#7c7a80077feb994fc815b67a72065af04d394efe"
+
 "@swimlane/ngx-datatable@^7.3.0":
   version "7.3.0"
   resolved "https://registry.yarnpkg.com/@swimlane/ngx-datatable/-/ngx-datatable-7.3.0.tgz#5f13f0867371001fd7d4c8a96be9222bf8f023d5"
