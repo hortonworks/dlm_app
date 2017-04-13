@@ -7,8 +7,8 @@ describe('webapp App', function() {
     page = new WebappPage();
   });
 
-  it('should display message saying app works', () => {
+  it('should have correct nav title', () => {
     page.navigateTo();
-    expect(page.getParagraphText()).toEqual('app works!');
+    expect(page.getNavTitle()).toEqual('DATA LIFECYCLE MANAGER');
   });
 });

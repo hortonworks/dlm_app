@@ -2,6 +2,16 @@
 
 This project was generated with [angular-cli](https://github.com/angular/angular-cli).
 
+## Installing NPM packages
+If you don't have `yarn` package manager already, install it via `npm -g install yarn`
+
+Run `yarn` to install NPM packages.
+
+When changing package versions, use `yarn upgrade` command (e.g., `yarn upgrade mypackage@1.2.0`.
+This updates the package as well as `package.json` and `yarn.lock`.
+Both files should be included in your commit if modified.
+
+
 ## Development server
 Run `npm run dev` for a dev server. Navigate to `http://localhost:4444/`. The app will automatically reload if you change any of the source files. Ensure play app is already running and bound to port `9000`.
 
