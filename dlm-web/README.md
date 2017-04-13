@@ -5,7 +5,7 @@ This project was generated with [angular-cli](https://github.com/angular/angular
 ## Installing NPM packages
 If you don't have `yarn` package manager already, install it via `npm -g install yarn`
 
-Use `yarn install` to install NPM packages.
+Run `yarn` to install NPM packages.
 
 When changing package versions, use `yarn upgrade` command (e.g., `yarn upgrade mypackage@1.2.0`.
 This updates the package as well as `package.json` and `yarn.lock`.
