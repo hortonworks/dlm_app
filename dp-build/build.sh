@@ -10,22 +10,16 @@ rm -rf build
 mkdir build
 
 # 1. build dp-app
-pushd ../dp-commons
-sbt publishLocal
-popd
-pushd ../services/atlas/service
-sbt publishLocal
-popd
-pushd ../services/db-service
+pushd ..
 sbt dist
+popd
+
+pushd ../services/db-service
 unzip `find ./target/universal -maxdepth 1 -type f -name *.zip|head -1` -d build/tmp_dp-db-service
 cp -R `ls -d build/tmp_dp-db-service/*/|head -n 1` build/dp-db-service
 popd
-pushd ../clients/db-client
-sbt publishLocal
-popd
+
 pushd ../dp-app
-sbt dist
 unzip `find ./target/universal -maxdepth 1 -type f -name *.zip|head -1` -d ../dp-build/build/tmp_dp-app
 cp -R `ls -d ../dp-build/build/tmp_dp-app/*/|head -n 1` ../dp-build/build/dp-app
 popd
@@ -45,11 +39,8 @@ cp -R ./dist ../dp-build/build/dlm-web
 popd
 
 # 4. build cluster services
-pushd ../services/rest-mock
-sbt publishLocal
-popd
-pushd ../services/cluster-service
-sbt assembly
+pushd ..
+sbt ";project clusterService ;assembly"
 popd
 
 # 5
