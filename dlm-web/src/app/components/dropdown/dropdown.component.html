@@ -3,7 +3,8 @@
     {{text}} <span class="glyphicon glyphicon-chevron-down"></span>
   </a>
   <button *ngSwitchDefault type="button" class="btn dropdown-toggle" [ngClass]="buttonClass" dropdownToggle>
-    {{text}} <span class="glyphicon glyphicon-chevron-down"></span>
+    <span class="pull-left">{{text}}&nbsp;</span>
+    <span class="glyphicon glyphicon-chevron-down pull-right"></span>
   </button>
   <ul *dropdownMenu class="dropdown-menu">
     <li *ngFor="let item of items" (click)="selectItem(item)">

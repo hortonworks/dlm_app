@@ -1,6 +1,6 @@
 export class MenuItem {
-  label: string = '';
-  iconHtml: string = '';
+  label = '';
+  iconHtml = '';
   linkURL: any = '';
   subMenu: MenuItem[] = [];
 }

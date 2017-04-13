@@ -11,11 +11,11 @@ export class PolicyService {
     return this.http.post('policies', policy).map(r => r.json());
   }
 
-  getPolicies(): Observable<any> {
+  fetchPolicies(): Observable<any> {
     return this.http.get('policies').map(r => r.json());
   }
 
-  getPolicy(id: string): Observable<any> {
+  fetchPolicy(id: string): Observable<any> {
     return this.http.get(`policies/${id}`).map(r => r.json());
   }
 

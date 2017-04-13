@@ -14,7 +14,7 @@ export const routes: Routes = [{
     path: '',
     redirectTo: '/overview',
     pathMatch: 'full'
-  },{
+  }, {
     path: 'overview',
     component: OverviewComponent
   },
@@ -37,7 +37,7 @@ export const routes: Routes = [{
   {
     path: 'help',
     component: HelpComponent
-  },{
+  }, {
     path: '**',
     component: NotFoundRouteComponent
   },

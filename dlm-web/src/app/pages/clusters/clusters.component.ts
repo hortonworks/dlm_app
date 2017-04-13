@@ -3,7 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 import { LoadClusters } from '../../actions/cluster';
 import { Cluster } from '../../models/cluster.model';
-import { getAll } from '../../selectors/cluster';
+import { getAllClusters } from '../../selectors/cluster';
 import * as fromRoot from '../../reducers';
 import { DropdownItem } from '../../components/dropdown/dropdown-item';
 
@@ -15,17 +15,13 @@ import { DropdownItem } from '../../components/dropdown/dropdown-item';
 export class ClustersComponent implements OnInit {
   clusters$: Observable<Cluster[]>;
 
-  addOptions = [
-    <DropdownItem>{
-      label: 'Cluster'
-    },
-    <DropdownItem>{
-      label: 'Policy'
-    }
+  addOptions: DropdownItem[] = [
+    { label: 'Cluster' },
+    { label: 'Policy' }
   ];
 
   constructor(private store: Store<fromRoot.State>) {
-    this.clusters$ = store.select(getAll);
+    this.clusters$ = store.select(getAllClusters);
   }
 
   ngOnInit() {

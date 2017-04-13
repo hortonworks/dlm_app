@@ -3,11 +3,11 @@
 </div>
 <div class="sort pull-left">
   <span class="text-muted pull-left">Sort By:&nbsp;</span>
-  <dp-dropdown [text]="'Registered'" [type]="'link'" [items]="sortOptions"
+  <dlm-dropdown [text]="'Registered'" [type]="'link'" [items]="sortOptions"
   (onSelectItem)="handleSelectedSort($event)">
-  </dp-dropdown>
+  </dlm-dropdown>
 </div>
-<dp-dropdown [items]="addOptions" [text]="'Add'" [buttonClass]="'btn-secondary'"
+<dlm-dropdown [items]="addOptions" [text]="'Add'" [buttonClass]="'btn-secondary'"
   (onSelectItem)="handleSelectedAdd($event)"
   class="pull-left">
-</dp-dropdown>
+</dlm-dropdown>

@@ -12,7 +12,7 @@ const MOCK_FILES_PREFIX = '/assets/data/dlm/';
  * @param  {RequestMethod} [method]   request method
  */
 export class MockRoute {
-  apiPrefix: string = '/api/dlm/';
+  apiPrefix = '/api/dlm/';
 
   constructor(private url: string, private jsonFile: string, private method?: RequestMethod) {
     this.url = this.apiPrefix + url;
@@ -39,7 +39,7 @@ export class MockRoute {
   }
 
   toRequest(originalRequest: Request): Request {
-    let r: Request = originalRequest;
+    const r: Request = originalRequest;
     r.url = MOCK_FILES_PREFIX + this.jsonFile;
     r.method = RequestMethod.Get;
     return r;

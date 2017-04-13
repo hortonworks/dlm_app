@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { MenuItem } from './common/navbar/menu-item';
 
 const MENUITEMS: MenuItem[] = [
@@ -51,7 +51,8 @@ const HEADER: MenuItem = {
 @Component({
   selector: 'dlm',
   templateUrl: './dlm.component.html',
-  styleUrls: ['./dlm.component.scss']
+  styleUrls: ['./dlm.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 
 export class DlmComponent {

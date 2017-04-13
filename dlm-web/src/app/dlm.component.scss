@@ -1,4 +1,7 @@
-.vcenter {
-  display: flex;
-  align-items: center;
+@import './styles/ngx-table-theme.scss';
+
+.caret {
+  &.caret-up {
+    transform: rotate(180deg);
+  }
 }

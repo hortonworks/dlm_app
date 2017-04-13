@@ -11,7 +11,7 @@ export class ClusterService {
     return this.http.get('clusters').map(r => r.json());
   }
 
-  getCluster(id: string): Observable<any> {
+  fetchCluster(id: string): Observable<any> {
     return this.http.get(`cluster/${id}`).map(r => r.json());
   }
 

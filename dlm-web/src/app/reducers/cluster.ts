@@ -1,9 +1,8 @@
 import { Cluster } from '../models/cluster.model';
+import { BaseState } from '../models/base-resource-state';
 import * as fromCluster from '../actions/cluster';
 
-export interface State {
-  entities: { [id: string]: Cluster};
-};
+export type State = BaseState<Cluster>;
 
 export const initialState: State = {
   entities: {}
@@ -22,9 +21,8 @@ export function reducer(state = initialState, action: fromCluster.Actions): Stat
         entities: Object.assign({}, state.entities, clusterEntities)
       };
     }
-
     case fromCluster.ActionTypes.LOAD_CLUSTERS_FAILURE: {
-
+      return state;
     }
     default: {
       return state;

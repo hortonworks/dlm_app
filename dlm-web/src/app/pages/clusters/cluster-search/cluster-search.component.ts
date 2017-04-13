@@ -21,17 +21,13 @@ export class ClusterSearchComponent implements OnInit {
     {
       label: 'Registered'
     }
-  ]
+  ];
 
   constructor() { }
 
-  handleSelectedAdd(option: DropdownItem) {
-    console.debug('add', option);
-  }
+  handleSelectedAdd(option: DropdownItem) { }
 
-  handleSelectedSort(option: DropdownItem) {
-    console.debug('sort by', option);
-  }
+  handleSelectedSort(option: DropdownItem) { }
 
   ngOnInit() {
   }

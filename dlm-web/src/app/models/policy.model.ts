@@ -1,6 +1,7 @@
 import { RequestStatus } from './request-status.model';
 
 export interface Policy {
+  id: string;
   name: string;
   type: string;
   dataset: string;

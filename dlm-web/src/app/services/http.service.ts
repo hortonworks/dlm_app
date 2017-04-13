@@ -6,7 +6,7 @@ import { MockResolver } from '../mocks/mock-resolver';
 
 @Injectable()
 export class HttpService extends Http {
-  apiPrefix: string = '/api/dlm/';
+  apiPrefix = '/api/dlm/';
 
   // todo: add auth token to headers
   // todo: default error handler
@@ -16,8 +16,8 @@ export class HttpService extends Http {
       return super.request(this.buildUrl(url), options);
     }
     let request;
-    let resolver = new MockResolver();
-    let prefixed: string|Request = this.buildUrl(url);
+    const resolver = new MockResolver();
+    const prefixed: string|Request = this.buildUrl(url);
     if (typeof prefixed === 'string') {
       request = new Request(new RequestOptions({url: prefixed}));
     } else {
@@ -30,7 +30,7 @@ export class HttpService extends Http {
     if (typeof url === 'string') {
       return this.apiPrefix + url;
     }
-    let r: Request = url;
+    const r: Request = url;
     r.url = this.apiPrefix + r.url;
     return r;
   }
@@ -44,4 +44,4 @@ export const httpServiceProvider = {
   provide: Http,
   useFactory: httpFactory,
   deps: [XHRBackend, RequestOptions]
-}
+};

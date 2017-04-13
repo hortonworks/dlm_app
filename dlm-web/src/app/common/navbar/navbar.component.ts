@@ -1,4 +1,4 @@
-import { Component, Input, ElementRef } from '@angular/core';
+import { Component, Input, ElementRef, OnInit, AfterViewInit } from '@angular/core';
 
 import { MenuItem } from './menu-item';
 
@@ -8,23 +8,23 @@ import { MenuItem } from './menu-item';
   styleUrls: ['./navbar.component.scss']
 })
 
-export class NavbarComponent {
+export class NavbarComponent implements OnInit, AfterViewInit {
 
   @Input() menuItems: MenuItem[] = [];
   @Input() header: MenuItem;
-  @Input() mainContentSelector: string = '#main';
-  @Input() handlePopState: boolean = true;
-  @Input() fitHeight: boolean = false;
-  @Input() footer: string = 'footer';
-  @Input() moveLeftContent: boolean = true;
-  @Input() moveLeftFooter: boolean = true;
-  @Input() menuLeftClass: string = 'glyphicon-menu-right';
-  @Input() menuDownClass: string ='glyphicon-menu-down';
-  @Input() collapseNavBarClass: string = 'fa-angle-double-left';
-  @Input() expandNavBarClass: string = 'fa-angle-double-right';
-  @Input() activeClass: string = 'active';
-  @Input() navBarToggleDataAttr: string = 'collapse-side-nav';
-  @Input() subMenuNavToggleDataAttr: string = 'collapse-sub-menu';
+  @Input() mainContentSelector = '#main';
+  @Input() handlePopState = true;
+  @Input() fitHeight = false;
+  @Input() footer = 'footer';
+  @Input() moveLeftContent = true;
+  @Input() moveLeftFooter = true;
+  @Input() menuLeftClass = 'glyphicon-menu-right';
+  @Input() menuDownClass = 'glyphicon-menu-down';
+  @Input() collapseNavBarClass = 'fa-angle-double-left';
+  @Input() expandNavBarClass = 'fa-angle-double-right';
+  @Input() activeClass = 'active';
+  @Input() navBarToggleDataAttr = 'collapse-side-nav';
+  @Input() subMenuNavToggleDataAttr = 'collapse-sub-menu';
 
   navbar: any;
   options: any = {};

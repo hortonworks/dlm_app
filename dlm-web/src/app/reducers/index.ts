@@ -7,13 +7,16 @@ import { storeLogger } from 'ngrx-store-logger';
 import { compose } from '@ngrx/core/compose';
 
 import * as fromCluster from './cluster';
+import * as fromPolicy from './policy';
 
 export interface State {
   clusters: fromCluster.State;
+  policies: fromPolicy.State;
 };
 
 const reducers = {
-  clusters: fromCluster.reducer
+  clusters: fromCluster.reducer,
+  policies: fromPolicy.reducer
 };
 
 const devReducer: ActionReducer<State> = compose(storeLogger(), combineReducers)(reducers);

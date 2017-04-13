@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpModule, Http } from '@angular/http';
 import { BsDropdownModule } from 'ng2-bootstrap';
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { StoreModule } from '@ngrx/store';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
@@ -11,6 +12,8 @@ import { RouterModule } from '@angular/router';
 import { EffectsModule } from '@ngrx/effects';
 import { ClusterEffects } from './effects/cluster';
 import { routes } from './routes/routes.config';
+import { PolicyEffects } from './effects/policy';
+
 import { ClusterService } from './services/cluster.service';
 import { PolicyService } from './services/policy.service';
 import { JobService } from './services/job.service';
@@ -26,28 +29,44 @@ import { NavbarComponent } from './common/navbar/navbar.component';
 import { httpServiceProvider } from './services/http.service';
 import { CommonComponentsModule } from './components/common-components.module';
 import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route.component';
-import { ClustersModule } from './pages/clusters/clusters.module';
+
+import { ClustersComponent } from './pages/clusters/clusters.component';
+import { ClusterCardComponent } from './pages/clusters/cluster-card/cluster-card.component';
+import { ClusterListComponent } from './pages/clusters/cluster-list/cluster-list.component';
+import { ClusterSearchComponent } from './pages/clusters/cluster-search/cluster-search.component';
+
+import { PolicyTableComponent } from './pages/policies/policy-table/policy-table.component';
+import { CreatePolicyComponent } from './pages/policies/subpages/create-policy/create-policy.component';
 
 @NgModule({
   imports: [
     CommonModule,
     HttpModule,
+    NgxDatatableModule,
     StoreModule.provideStore(reducer),
     EffectsModule.run(ClusterEffects),
+    EffectsModule.run(PolicyEffects),
 
     BrowserModule,
     FormsModule,
 
     RouterModule.forRoot(routes),
-    CommonComponentsModule,
-    ClustersModule
+    CommonComponentsModule
   ],
   declarations: [
     DlmComponent,
     MainComponent,
     OverviewComponent,
+    ClustersComponent,
+    ClusterCardComponent,
+    ClusterListComponent,
+    ClusterSearchComponent,
     PairingsComponent,
+
     PoliciesComponent,
+    PolicyTableComponent,
+    CreatePolicyComponent,
+
     JobsComponent,
     HelpComponent,
     NavbarComponent,

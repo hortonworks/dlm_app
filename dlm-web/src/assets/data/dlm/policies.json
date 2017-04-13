@@ -2,6 +2,7 @@
   "totalResults": 3,
   "policy": [
     {
+      "id": "hive2Policy",
       "type": "HIVE",
       "name": "hive2Policy",
       "status": "SUBMITTED",
@@ -20,6 +21,7 @@
       ]
     },
     {
+      "id": "hivePolicy",
       "type": "HIVE",
       "name": "hivePolicy",
       "status": "SUBMITTED",
@@ -36,6 +38,7 @@
       ]
     },
     {
+      "id": "hdfsPrimaryPolicy",
       "type": "HDFS",
       "name": "hdfsPrimaryPolicy",
       "status": "SUBMITTED",
