@@ -16,7 +16,7 @@
           </p>
         </div>
         <div class="col-md-7 cluster-cell">
-          <p class="cell-title">Registered</p>
+          <p class="cell-title">{{ "page.clusters.card.registered" | translate}}</p>
           <p>{{cluster.createdAt | date:'medium'}}</p>
         </div>
       </div>
@@ -26,15 +26,15 @@
         <div class="col-md-7">
           <div class="row">
             <div class="col-md-4 cluster-cell">
-              <p class="cell-title">Volume</p>
+              <p class="cell-title">{{ "page.clusters.card.volume" | translate}}</p>
               <p>{{cluster.volumeGB}} GB</p>
             </div>
             <div class="col-md-4 cluster-cell">
-              <p class="cell-title">Nodes</p>
+              <p class="cell-title">{{ "page.clusters.card.nodes" | translate}}</p>
               <p>{{cluster.nodesCount}}</p>
             </div>
             <div class="col-md-4 cluster-cell">
-              <p class="cell-title">Pairs <a>+add</a></p>
+              <p class="cell-title">{{ "page.clusters.card.pairs" | translate}} <a>+add</a></p>
               <p>-</p>
             </div>
           </div>

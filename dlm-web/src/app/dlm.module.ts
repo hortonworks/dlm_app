@@ -38,6 +38,8 @@ import { ClusterSearchComponent } from './pages/clusters/cluster-search/cluster-
 import { PolicyTableComponent } from './pages/policies/policy-table/policy-table.component';
 import { CreatePolicyComponent } from './pages/policies/subpages/create-policy/create-policy.component';
 
+import { TranslateModule } from '@ngx-translate/core';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -51,7 +53,8 @@ import { CreatePolicyComponent } from './pages/policies/subpages/create-policy/c
     FormsModule,
 
     RouterModule.forRoot(routes),
-    CommonComponentsModule
+    CommonComponentsModule,
+    TranslateModule.forRoot()
   ],
   declarations: [
     DlmComponent,

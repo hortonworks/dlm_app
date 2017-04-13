@@ -21,7 +21,7 @@
               </ng-template>
               <ul class="dropdown-menu" [hidden]="!hasSubMenu(header)">
                 <li *ngFor="let item of header.subMenu">
-                  <a href="item.linkURL">item.label</a>
+                  <a [routerLink]="item.linkURL">{{item.label}}</a>
                 </li>
               </ul>
             </div>

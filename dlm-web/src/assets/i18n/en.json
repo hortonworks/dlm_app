@@ -1,0 +1,31 @@
+{
+  "sidenav": {
+    "menuItem": {
+      "overview": "Overview",
+      "clusters": "My Clusters",
+      "policies": "Policies",
+      "pairings": "Pairings",
+      "jobs": "Jobs",
+      "help": "Help",
+      "header": "DATA LIFECYCLE MANAGER"
+    }
+  },
+  "page": {
+    "clusters": {
+      "dropdown": {
+        "cluster": "Cluster",
+        "policy": "Policy"
+      },
+      "card": {
+        "registered": "Registered",
+        "nodes": "Nodes",
+        "volume": "Volume",
+        "pairs": "Pairs"
+      }
+    },
+    "policies": {
+      "header": "Replication Policies",
+      "header_note": "Note: Pairings are bi-directional"
+    }
+  }
+}
