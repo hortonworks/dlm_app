@@ -79,8 +79,6 @@ class ClusterRepo @Inject()(
        name,
        description,
        ambariurl,
-       ambariuser,
-       ambaripass,
        secured,
        kerberosuser,
        kerberosticketLocation,
