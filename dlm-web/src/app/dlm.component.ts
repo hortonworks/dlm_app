@@ -1,8 +1,5 @@
 import { Component } from '@angular/core';
-
 import { MenuItem } from './common/navbar/menu-item';
-
-declare var componentHandler: any;
 
 const MENUITEMS: MenuItem[] = [
   {
@@ -52,6 +49,7 @@ const HEADER: MenuItem = {
 };
 
 @Component({
+  selector: 'dlm',
   templateUrl: './dlm.component.html',
   styleUrls: ['./dlm.component.scss']
 })

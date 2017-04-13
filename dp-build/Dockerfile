@@ -3,10 +3,11 @@ FROM openjdk:8-jre
 # ONBUILD RUN sh ./build.sh
 
 RUN apt-get update && \
-    apt-get install -y ntp nginx runit
+    apt-get install -y ntp nginx runit net-tools vim
 
 COPY ./build/dp-app /usr/dp-app
 COPY ./build/dp-web /usr/dp-web
+COPY ./build/dlm-web /usr/dlm-web
 COPY ./services /etc/sv
 
 RUN chmod +x /etc/sv/nginx/run && \

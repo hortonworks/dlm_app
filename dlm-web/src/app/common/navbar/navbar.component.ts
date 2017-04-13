@@ -52,7 +52,6 @@ export class NavbarComponent {
 
   ngAfterViewInit() {
     $(this.navbar).navigationBar(this.options);
-    console.log(this.options);
   }
 
   hasSubMenu(item: MenuItem): boolean {

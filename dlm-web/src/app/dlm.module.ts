@@ -3,11 +3,14 @@ import { CommonModule } from '@angular/common';
 import { HttpModule, Http } from '@angular/http';
 import { BsDropdownModule } from 'ng2-bootstrap';
 import { StoreModule } from '@ngrx/store';
+import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
 import { reducer } from './reducers';
+import { RouterModule } from '@angular/router';
 
 import { EffectsModule } from '@ngrx/effects';
 import { ClusterEffects } from './effects/cluster';
-
+import { routes } from './routes/routes.config';
 import { ClusterService } from './services/cluster.service';
 import { PolicyService } from './services/policy.service';
 import { JobService } from './services/job.service';
@@ -18,11 +21,11 @@ import { PairingsComponent } from './pages/pairings/pairings.component';
 import { PoliciesComponent } from './pages/policies/policies.component';
 import { JobsComponent } from './pages/jobs/jobs.component';
 import { HelpComponent } from './pages/help/help.component';
-import { DlmRoutingModule } from './dlm.routing';
 import { NavbarComponent } from './common/navbar/navbar.component';
 
 import { httpServiceProvider } from './services/http.service';
 import { CommonComponentsModule } from './components/common-components.module';
+import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route.component';
 import { ClustersModule } from './pages/clusters/clusters.module';
 
 @NgModule({
@@ -32,7 +35,10 @@ import { ClustersModule } from './pages/clusters/clusters.module';
     StoreModule.provideStore(reducer),
     EffectsModule.run(ClusterEffects),
 
-    DlmRoutingModule,
+    BrowserModule,
+    FormsModule,
+
+    RouterModule.forRoot(routes),
     CommonComponentsModule,
     ClustersModule
   ],
@@ -44,8 +50,10 @@ import { ClustersModule } from './pages/clusters/clusters.module';
     PoliciesComponent,
     JobsComponent,
     HelpComponent,
-    NavbarComponent
+    NavbarComponent,
+    NotFoundRouteComponent
   ],
+  bootstrap: [DlmComponent],
   providers: [
     ClusterService,
     JobService,

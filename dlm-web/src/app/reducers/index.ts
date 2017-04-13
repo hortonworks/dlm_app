@@ -1,7 +1,7 @@
 import { isDevMode } from '@angular/core';
 import { ActionReducer } from '@ngrx/store';
 import { combineReducers } from '@ngrx/store';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../../environments/environment';
 import { storeLogger } from 'ngrx-store-logger';
 
 import { compose } from '@ngrx/core/compose';

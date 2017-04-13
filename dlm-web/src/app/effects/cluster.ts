@@ -3,6 +3,9 @@ import { Observable } from 'rxjs/Observable';
 import { Store, Action } from '@ngrx/store';
 import { Effect, Actions } from '@ngrx/effects';
 import { ClusterService } from '../services/cluster.service';
+import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/of';
 
 import * as cluster from '../actions/cluster';
 

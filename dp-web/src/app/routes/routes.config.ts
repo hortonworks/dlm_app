@@ -30,10 +30,6 @@ export const routes: Routes = [{
     component: DashboardComponent,
     canActivate:[ LoggedInGuard ]
   },{
-    path: 'dlm',
-    loadChildren: './apps/dlm/dlm.module#DlmModule',
-    canActivate:[ LoggedInGuard ]
-  },{
     path: '**',
     component: NotFoundRouteComponent
   },

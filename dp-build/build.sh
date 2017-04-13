@@ -37,7 +37,14 @@ npm run build
 cp -R ./dist ../dp-build/build/dp-web
 popd
 
-# 3. build cluster services
+# 3. build dlm-web
+pushd ../dlm-web
+yarn
+npm run build
+cp -R ./dist ../dp-build/build/dlm-web
+popd
+
+# 4. build cluster services
 pushd ../services/rest-mock
 sbt publishLocal
 popd
@@ -45,5 +52,5 @@ pushd ../services/cluster-service
 sbt assembly
 popd
 
-# 4
+# 5
 echo "All done"

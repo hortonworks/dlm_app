@@ -2,9 +2,8 @@
   ul.nav.side-nav-header {
     li.navigation-header {
       padding: 10px;
-      height: 70px;
       #header_icon {
-        padding-top:15px;
+        padding-top: 5px;
         font-size: 28px;
         .ambari-logo {
           color: #b8bec4;
@@ -18,7 +17,4 @@
 }
 .navigation-bar-fit-height {
   left: 0;
-  .side-nav-menu {
-    top: 70px;
-  }
 }
