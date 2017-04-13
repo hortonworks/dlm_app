@@ -5,7 +5,7 @@ export class WebappPage {
     return browser.get('/');
   }
 
-  getParagraphText() {
-    return element(by.css('app-root h1')).getText();
+  getNavTitle() {
+    return element(by.className('ambari-header')).getText();
   }
 }
