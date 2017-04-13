@@ -1,44 +1,37 @@
-import { Component, AfterViewInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthenticationService } from './services/authentication.service';
-import { Environment } from './environment';
-import { Persona } from './shared/utils/persona';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Router, NavigationStart } from '@angular/router';
 
-declare var componentHandler: any;
+import { IdentityService } from './services/identity.service';
+import { MdlService } from './services/mdl.service';
+
+import { User } from './models/user';
 
 @Component({
   selector: 'data-plane',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements AfterViewInit  {
+export class AppComponent implements OnInit {
 
-  persona = Persona;
+  @ViewChild('layout') layout: ElementRef;
 
   constructor(
-    public router: Router,
-    private authService: AuthenticationService,
-    public environment: Environment
-  ) {
+    private router: Router,
+    private mdlService: MdlService,
+    private identityService: IdentityService,
+  ) {}
 
+  ngOnInit() {
+    this.router.events
+      .filter(event => event instanceof NavigationStart)
+      .subscribe(() => this.mdlService.closeDrawer(this.layout));
   }
 
-  isLoggedIn(): boolean {
-    return this.authService.isAuthenticated();
+  isUserSignedIn(): boolean {
+    return this.identityService.isUserAuthenticated();
   }
 
-  getUserName(): string {
-    return localStorage.getItem('user');
-  }
-
-  ngAfterViewInit() {
-    componentHandler.upgradeAllRegistered();
-  }
-
-  // todo: this a workaround to hide unnecessary elements for sub apps from app.component template
-  // fix: need to get general solution to avoid this
-  isSubAppRoute(): boolean {
-    const subAppsPrefixes = ['/dlm'];
-    return subAppsPrefixes.some(prefix => this.router.url.startsWith(prefix));
+  getUser(): User {
+    return this.identityService.getUser();
   }
 }

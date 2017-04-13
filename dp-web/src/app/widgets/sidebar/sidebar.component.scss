@@ -1,0 +1,24 @@
+.dp-navigation__link {
+  color: #757575;
+  transition: 0.2s linear color, background-color;
+
+  &.is-active {
+    position: relative;
+    color: white;
+    background-color: rgb(84, 100, 106);
+
+    &:hover {
+      color: #757575;
+    }
+
+    &::before {
+      content: '';
+      background-color: rgb(68, 172, 52);
+      height: 100%;
+      width: 10px;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
+}

@@ -1,19 +1,27 @@
-<div class="dataplane-drawer mdl-layout__drawer" reload style="display: none;">
-  <span *ngIf="isLoggedIn()" class="mdl-layout-title vw-logo-image">
-    <img src="/assets/images/hortonia.png">
+<div>
+  <span class="mdl-layout-title">
+    <img src="../../../assets/images/hortonia.png">
   </span>
-  <nav *ngIf="isLoggedIn()" class="mdl-navigation">
-    <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link mdl-typography--font-medium" href="" [sidenavRouterLink]="['/dashboard']">DASHBOARD</a>
-    <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link mdl-typography--font-medium" href="" [sidenavRouterLink]="['/add-data-lake']" > {{ environment.DATA_CENTER_DATA_LAKE }} </a>
-    <a *ngIf="[persona.ANALYSTADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link mdl-typography--font-medium" href="" [sidenavRouterLink]="['/data-analyst/analyst-dashboard']" > DATA SETS </a>
-
-    <a *ngIf="[persona.INFRAADMIN, persona.ADMIN, persona.SUPERUSER].includes(environment.persona)" class="mdl-navigation__link" href="" [sidenavRouterLink]="['/data-manager']" style="position: relative">
-      <div class="mdl-typography--font-medium">
-          DATA MANAGER
-      </div>
-      <div style="font-size: 10px;position: absolute;bottom: 0;">
-          Backup and Restore
-      </div>
+  <nav class="mdl-navigation dp-navigation">
+    <a class="mdl-navigation__link mdl-typography--font-bold dp-navigation__link" routerLink="/dashboard" routerLinkActive="is-active">
+      <i class="fa fa-signal" aria-hidden="true"></i>
+      Dashboard
+    </a>
+    <a class="mdl-navigation__link mdl-typography--font-bold dp-navigation__link" routerLink="/infra" routerLinkActive="is-active">
+      <i class="fa fa-wrench" aria-hidden="true"></i>
+      Manage
+    </a>
+    <a class="mdl-navigation__link mdl-typography--font-bold dp-navigation__link" routerLink="/curate" routerLinkActive="is-active">
+      <i class="fa fa-paint-brush" aria-hidden="true"></i>
+      Curate
+    </a>
+    <a class="mdl-navigation__link mdl-typography--font-bold dp-navigation__link" routerLink="/consume" routerLinkActive="is-active">
+      <i class="fa fa-filter" aria-hidden="true"></i>
+      Consume
+    </a>
+    <a class="mdl-navigation__link mdl-typography--font-bold dp-navigation__link" routerLink="/dlm" routerLinkActive="is-active">
+      <i class="fa fa-refresh" aria-hidden="true"></i>
+      Lifecycle
     </a>
   </nav>
 </div>

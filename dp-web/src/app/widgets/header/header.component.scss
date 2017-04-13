@@ -1,0 +1,12 @@
+.dp-header__logo {
+  height: 24px;
+  margin-right: 15px;
+  > img {
+    max-height: 100%;
+    max-width: 100%;
+  }
+}
+.dp-header__user {
+  display:flex;
+  align-items: center;
+}

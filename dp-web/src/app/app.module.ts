@@ -4,25 +4,22 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 
-import { routes } from './routes/routes.config';
+import { routes } from './app.routes';
 
-import { SidenavRouterLinkDirective } from './sidenav-router-link.directive';
 import { AppComponent } from './app.component';
-import { Environment } from './environment';
-import { LoggedInGuard , AlreadyLoggedInGuard} from './shared/utils/login-guard';
+import { SignedInForSecureGuard , NotSignedInForUnsecureGuard, DoCleanUpAndRedirectGuard } from './shared/utils/auth-guard';
 
-import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route.component';
-import { SignInComponent } from './routes/sign-in/sign-in.component';
-import { FirstRunComponent } from './routes/first-run/first-run.component';
-import { LakeAddComponent } from './routes/lake-add/lake-add.component';
+import { NotFoundRouteComponent } from './views/not-found-route/not-found-route.component';
+import { SignInComponent } from './views/sign-in/sign-in.component';
 import { SidebarComponent } from './widgets/sidebar/sidebar.component';
-import { DashboardComponent } from './routes/dashboard/dashboard.component';
-import { EntryComponent } from './routes/entry/entry.component';
 import { AuthenticationService } from './services/authentication.service';
 import { LakeService } from './services/lake.service';
 import { LocationService } from './services/location.service';
 import { ClusterService } from './services/cluster.service';
 import { IdentityService } from './services/identity.service';
+import { MdlService } from './services/mdl.service';
+import { HeaderComponent } from './widgets/header/header.component';
+import { MdlDirective } from './directives/mdl.directive';
 
 @NgModule({
   imports: [
@@ -32,28 +29,29 @@ import { IdentityService } from './services/identity.service';
     RouterModule.forRoot(routes),
   ],
   declarations: [
-    SidenavRouterLinkDirective,
     AppComponent,
 
     NotFoundRouteComponent,
     SignInComponent,
-    FirstRunComponent,
-    LakeAddComponent,
     SidebarComponent,
-    DashboardComponent,
-    EntryComponent,
+    HeaderComponent,
+
+    MdlDirective,
   ],
   bootstrap: [AppComponent],
   providers: [
-    Environment,
     AuthenticationService,
     LakeService,
     LocationService,
     ClusterService,
     IdentityService,
 
-    LoggedInGuard,
-    AlreadyLoggedInGuard,
+    MdlService,
+
+    SignedInForSecureGuard,
+    NotSignedInForUnsecureGuard,
+    DoCleanUpAndRedirectGuard,
+
   ]
 })
 export class AppModule { }

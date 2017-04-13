@@ -1,0 +1,16 @@
+<section style="padding: 40px;">
+  <header style="display: flex;align-items: center">
+    <h1 style="flex-grow: 1">Data Lakes</h1>
+    <a [routerLink]="['/onboard/lakes']" class="mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect">
+      Add
+    </a>
+  </header>
+  <div>
+    <p>
+      Lorem ipsum dolor amet.
+    </p>
+    <div>
+      <dp-lake-stats *ngFor="let cLake of lakes" [lake]="cLake.data" [clusters]="cLake.clusters"></dp-lake-stats>
+    </div>
+  </div>
+</section>

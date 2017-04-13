@@ -26,18 +26,18 @@ class LakeServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToLakes)
   }
 
-  override def create(dataLake: Datalake): Future[Either[Errors, Datalake]] = {
+  override def create(datalake: Datalake): Future[Either[Errors, Datalake]] = {
     ws.url(s"$url/datalakes")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
       )
-      .post(Json.toJson(dataLake))
+      .post(Json.toJson(datalake))
       .map(mapToLake)
   }
 
-  override def retrieve(dataLakeId: String): Future[Either[Errors, Datalake]] = {
-    ws.url(s"$url/datalakes/$dataLakeId")
+  override def retrieve(datalakeId: String): Future[Either[Errors, Datalake]] = {
+    ws.url(s"$url/datalakes/$datalakeId")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToLake)
@@ -50,7 +50,7 @@ class LakeServiceImpl(config: Config)(implicit ws: WSClient)
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
       )
-      .get()
+      .put(Json.toJson(datalake))
       .map(mapToLake)
   }
 

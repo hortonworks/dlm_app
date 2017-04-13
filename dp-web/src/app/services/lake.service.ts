@@ -1,14 +1,20 @@
-import {Injectable} from '@angular/core';
-import {Http, Headers, RequestOptions, Response, ResponseOptions} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
-import {Lake} from '../models/lake';
-import {HttpUtil} from '../shared/utils/httpUtil';
+import { Injectable } from '@angular/core';
+import { Http, RequestOptions } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
+
+import { Lake } from '../models/lake';
+import { Cluster } from '../models/cluster';
+
+import { HttpUtil } from '../shared/utils/httpUtil';
+
 
 @Injectable()
 export class LakeService {
   url = '/api/lakes';
 
-  constructor(private http:Http) {}
+  constructor(
+    private http:Http
+  ) {}
 
   list(): Observable<Lake[]> {
     return this.http
@@ -41,5 +47,15 @@ export class LakeService {
   // remove(lakeId: string): Observable<Lake> {
   //   // TODO
   // }
+
+  listWithClusters(): Observable<{
+    data: Lake,
+    clusters: Cluster[]
+  }[]> {
+    return this.http
+      .get('/api/actions/lakes-list-with-clusters', new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
 
 }

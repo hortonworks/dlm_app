@@ -1,0 +1,62 @@
+<div class="lake-stats">
+  <div class="lake-stats__meta">
+    <div class="lake-stats__info">
+      <div class="lake-stats__title" [style.color]="cHealth && cHealth.status.state === 'STARTED' ? 'green' : 'red' ">
+        <i class="fa fa-circle" aria-hidden="true"></i>
+        {{lake.name}}
+      </div>
+      <div class="lake-stats__item">
+        <span class="lake-stats__item-label">Description:</span>
+        <span class="lake-stats__item-detail">
+          {{lake.description}}
+        </span>
+        </div>
+      <div class="lake-stats__item">
+        <span class="lake-stats__item-label">Ambari:</span>
+        <span class="lake-stats__item-detail">
+          {{cCluster.ambariurl}}
+        </span>
+      </div>
+    </div>
+    <div class="lake-stats__location-wrapper">
+      <div class="lake-stats__location">
+        <div class="lake-stats__location-item">ONPREM</div>
+        <div class="lake-stats__location-item" *ngIf="!!location">{{location.city}}</div>
+      </div>
+    </div>
+  </div>
+  <div class="lake-stats__health">
+    <div class="lake-stats__health-item" *ngIf="!!cHealth">
+      <div>
+        <div class="lake-stats__health-label">NODES</div>
+        <div class="lake-stats__health-detail">{{cHealth.nodes}}</div>
+      </div>
+    </div>
+    <div class="lake-stats__health-item" *ngIf="!!cHealth">
+      <div>
+        <div class="lake-stats__health-label">UP TIME</div>
+        <div class="lake-stats__health-detail">{{doGetUptime(cHealth.status.since)}}</div>
+      </div>
+    </div>
+    <div class="lake-stats__health-item" *ngIf="!!cHealth">
+      <div>
+        <div class="lake-stats__health-label">HDFS</div>
+        <div class="lake-stats__health-detail">{{cHealth.size}}</div>
+      </div>
+    </div>
+    <div class="lake-stats__health-item lake-stats__health-spacer"></div>
+    <div class="lake-stats__health-item lake-stats__health-action">
+      <span>ACTION</span>
+      <button [attr.id]="'lake_stats_action_' + lake.id" class="mdl-button mdl-js-button mdl-button--icon">
+        <i class="fa fa-angle-down" aria-hidden="true"></i>
+      </button>
+
+      <ul mdl class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'lake_stats_action_' + lake.id">
+        <li class="mdl-menu__item">Some Action</li>
+        <li class="mdl-menu__item">Another Action</li>
+        <li disabled class="mdl-menu__item">Disabled Action</li>
+        <li class="mdl-menu__item">Yet Another Action</li>
+      </ul>
+    </div>
+  </div>
+</div>

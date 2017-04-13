@@ -14,7 +14,7 @@ export class AuthenticationService {
   private isUserAuthenticated: boolean = false;
 
   constructor(private http: Http) {
-    this.isUserAuthenticated = !!localStorage.getItem('dp_auth_token');
+    this.isUserAuthenticated = !!localStorage.getItem('dp_user');
   }
 
   isAuthenticated() {
@@ -28,15 +28,11 @@ export class AuthenticationService {
         .do((user: User) => {
           this.isUserAuthenticated = true;
           localStorage.setItem('dp_user', JSON.stringify(user))
-          localStorage.setItem('dp_auth_token', user.token);
-          localStorage.setItem('dp_userType', user.roles[0]);
         });
   }
 
   signOut() {
     localStorage.removeItem('dp_user');
-    localStorage.removeItem('dp_auth_token');
-    localStorage.removeItem('dp_userType');
     this.isUserAuthenticated = false;
   }
 

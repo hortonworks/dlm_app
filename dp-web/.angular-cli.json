@@ -20,6 +20,7 @@
       "mobile": false,
       "styles": [
         "../node_modules/material-design-lite/dist/material.min.css",
+        "../node_modules/material-design-icons/iconfont/material-icons.css",
         "../node_modules/font-awesome/css/font-awesome.css",
         "../node_modules/nvd3/build/nv.d3.css"
       ],
@@ -33,6 +34,11 @@
         "../node_modules/dagre-d3/dist/dagre-d3.js",
         "../node_modules/material-design-lite/dist/material.min.js"
       ],
+      "stylePreprocessorOptions": {
+        "includePaths": [
+          "../node_modules"
+        ]
+      },
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",

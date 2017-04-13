@@ -1,0 +1,73 @@
+.lake-stats {
+  margin-top: 20px;
+}
+
+.lake-stats__meta {
+  display:flex;
+  padding: 30px;
+  border: 1px solid rgb(204, 204, 204);
+  background-color: rgb(255, 255, 255);
+}
+
+.lake-stats__health {
+  display: flex;
+  border: 1px solid rgb(204, 204, 204);
+  background-color: rgb(250, 250, 250);
+}
+.lake-stats__info {
+  flex-grow: 1;
+}
+.lake-stats__title {
+  margin-bottom: 30px;
+}
+.lake-stats__item + .lake-stats__item {
+  margin-top: 10px;
+}
+.lake-stats__item-label {
+  font-weight: lighter; text-transform: uppercase;
+}
+.lake-stats__item-detail {
+  font-weight: bold;
+}
+.lake-stats__location-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: right;
+}
+.lake-stats__location-item + .lake-stats__location-item {
+  margin-top: 10px;
+}
+.lake-stats__health {
+  margin-top: -1px;
+}
+.lake-stats__health-item {
+  padding: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  & + .lake-stats__health-item {
+    border-left: 1px solid rgb(204, 204, 204);
+  }
+}
+.lake-stats__health-spacer {
+  flex-grow: 1;
+  padding: 5px;
+  text-align: center;
+}
+.lake-stats__health-label {
+  font-weight: lighter;
+  text-transform: uppercase;
+}
+.lake-stats__health-detail {
+  font-weight: bolder;
+  font-size: 16px;
+}
+.lake-stats__health-action {
+  min-width: 225px;
+}
+.lake-stats__health-action div + .lake-stats__health-action i {
+  margin-left: 10px;
+}

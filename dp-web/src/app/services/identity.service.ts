@@ -11,11 +11,24 @@ export class IdentityService {
 
   constructor(private http:Http) {}
 
-  retrieve(): Observable<User> {
+  retrieve(): Observable<{
+    user: User,
+    lake: boolean,
+    auth: boolean,
+    rbac: boolean
+  }> {
     return this.http
       .get(`${this.url}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
+  }
+
+  isUserAuthenticated() {
+    return !!localStorage.getItem('dp_user');
+  }
+
+  getUser() {
+    return <User> JSON.parse(localStorage.getItem('dp_user'));
   }
 
 }

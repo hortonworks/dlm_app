@@ -10,6 +10,15 @@ class Identity ()
   extends Controller {
 
   def retrieve = Authenticated.async { request =>
-    Future.successful(Ok(Json.toJson(request.user)))
+    Future.successful(
+      Ok(
+        Json.obj(
+          "user" -> request.user,
+          "lake" -> false,
+          "auth" -> true,
+          "rbac" -> false
+        )
+      )
+    )
   }
 }
