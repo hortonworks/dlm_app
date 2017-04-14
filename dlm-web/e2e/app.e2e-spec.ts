@@ -1,14 +1,34 @@
-import { WebappPage } from './app.po';
+import { browser } from 'protractor';
+import { SideNav, OverviewPage, PolicyPage } from './app.po';
 
-describe('webapp App', function() {
-  let page: WebappPage;
+// TODO: Integrate with ngx-translate
+
+describe('DLM', function() {
+
+  let sideNav = null;
 
   beforeEach(() => {
-    page = new WebappPage();
+    sideNav = new SideNav();
+  });
+
+  // This is needed because clicking the side nav items before this
+  // causes:
+  // Failed: Error while waiting for Protractor to sync with the page: "window.angular is undefined
+  it('should load the home page', () => {
+    browser.get('/');
   });
 
   it('should have correct nav title', () => {
-    page.navigateTo();
+    const page = new OverviewPage();
+
     expect(page.getNavTitle()).toEqual('DATA LIFECYCLE MANAGER');
   });
+
+  it('should navigate to create policy page', () => {
+    const page = new PolicyPage();
+
+    page.clickAddPolicy();
+
+    expect(page.getUrl()).toContain('/policies/create');
+  })
 });
