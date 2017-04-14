@@ -16,13 +16,13 @@ import { TranslateService } from '@ngx-translate/core';
 export class ClustersComponent implements OnInit {
   clusters$: Observable<Cluster[]>;
 
-  addOptions: DropdownItem[]; 
+  addOptions: DropdownItem[];
 
   constructor(private store: Store<fromRoot.State>, t: TranslateService) {
     this.clusters$ = store.select(getAllClusters);
     this.addOptions = [
-      { label: t.instant("page.clusters.dropdown.cluster") },
-      { label: t.instant("page.clusters.dropdown.policy") }
+      { label: t.instant('page.clusters.dropdown.cluster') },
+      { label: t.instant('page.clusters.dropdown.policy') }
     ];
   }
 

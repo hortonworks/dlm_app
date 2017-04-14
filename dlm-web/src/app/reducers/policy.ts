@@ -8,7 +8,7 @@ export const initialState: State = {
   entities: {}
 };
 
-export function reducer(state = initialState, action: fromPolicy.Actions): State {
+export function reducer(state = initialState, action): State {
   switch (action.type) {
     case fromPolicy.ActionTypes.LOAD_POLICIES_SUCCESS: {
       const policies = action.payload.policy;

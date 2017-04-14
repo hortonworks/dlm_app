@@ -15,7 +15,7 @@ export class DlmComponent {
   mainContentSelector = '#dlm_content';
   fitHeight = true;
   constructor( t: TranslateService) {
-    t.setTranslation('en', require("../assets/i18n/en.json"));
+    t.setTranslation('en', require('../assets/i18n/en.json'));
     t.setDefaultLang('en');
     t.use('en');
     this.header = new MenuItem(

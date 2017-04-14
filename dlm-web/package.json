@@ -30,6 +30,7 @@
     "@angular/router": "^4.0.0",
     "@ngrx/core": "^1.2.0",
     "@ngrx/effects": "^2.0.2",
+    "@ngrx/router-store": "^1.2.5",
     "@ngrx/store": "^2.2.1",
     "@ngx-translate/core": "^6.0.1",
     "@swimlane/ngx-datatable": "^7.3.0",

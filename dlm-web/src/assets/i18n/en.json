@@ -1,4 +1,15 @@
 {
+  "common": {
+    "all": "All",
+    "cancel": "Cancel",
+    "review": "Review",
+    "time": {
+      "hourly": "Hourly",
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly"
+    }
+  },
   "sidenav": {
     "menuItem": {
       "overview": "Overview",
@@ -25,7 +36,24 @@
     },
     "policies": {
       "header": "Replication Policies",
-      "header_note": "Note: Pairings are bi-directional"
+      "header_note": "Note: Pairings are bi-directional",
+      "header_create": "Create Replication Policy",
+      "form": {
+        "selected": "Selected",
+        "sections": {
+          "general": "General",
+          "database": "Select Database",
+          "job": "Run Job"
+        },
+        "fields": {
+          "policy_name": "Policy Name",
+          "service": "Service"
+        },
+        "schedule": {
+          "immediate": "One Time",
+          "schedule": "On Schedule"
+        }
+      }
     }
   }
 }

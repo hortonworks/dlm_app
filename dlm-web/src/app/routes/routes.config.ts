@@ -7,6 +7,7 @@ import { PairingsComponent } from '../pages/pairings/pairings.component';
 import { PoliciesComponent } from '../pages/policies/policies.component';
 import { JobsComponent } from '../pages/jobs/jobs.component';
 import { HelpComponent } from '../pages/help/help.component';
+import { CreatePolicyComponent } from '../pages/policies/subpages/create-policy/create-policy.component';
 
 import { NotFoundRouteComponent } from './not-found-route/not-found-route.component';
 
@@ -29,6 +30,10 @@ export const routes: Routes = [{
   {
     path: 'policies',
     component: PoliciesComponent
+  },
+  {
+    path: 'policies/create',
+    component: CreatePolicyComponent
   },
   {
     path: 'jobs',

@@ -21,6 +21,8 @@ import 'zone.js/dist/zone';
 // Observable class extensions
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/zip';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/concat';
 
 // Observable operators
 import 'rxjs/add/operator/do';
@@ -30,4 +32,4 @@ import 'rxjs/add/operator/finally';
 import 'rxjs/add/operator/debounce';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/catch';
-import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/concat';

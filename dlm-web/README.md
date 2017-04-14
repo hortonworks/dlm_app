@@ -22,6 +22,9 @@ Run `npm run dev:hmr` for a dev server with hot module reload. Navigate to `http
 
 Run `npm run build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
+## Lint
+Run `npm run lint` before committing changes. You may also configure your editor/IDE to make lint checks using project lint configuration.
+
 ## Running unit tests
 
 Run `npm run test` to execute the unit tests via [Karma](https://karma-runner.github.io).

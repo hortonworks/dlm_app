@@ -55,7 +55,7 @@ export class NavbarComponent implements OnInit, AfterViewInit {
   }
 
   hasSubMenu(item: MenuItem): boolean {
-    if(item.subMenu) {
+    if (item.subMenu) {
       return item.subMenu.length > 0;
     }
     return false;

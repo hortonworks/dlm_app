@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpModule, Http } from '@angular/http';
-import { BsDropdownModule } from 'ng2-bootstrap';
+import { BsDropdownModule, CollapseModule, TabsModule } from 'ng2-bootstrap';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { StoreModule } from '@ngrx/store';
+import { RouterStoreModule } from '@ngrx/router-store';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { reducer } from './reducers';
 import { RouterModule } from '@angular/router';
 
@@ -37,6 +38,10 @@ import { ClusterSearchComponent } from './pages/clusters/cluster-search/cluster-
 
 import { PolicyTableComponent } from './pages/policies/policy-table/policy-table.component';
 import { CreatePolicyComponent } from './pages/policies/subpages/create-policy/create-policy.component';
+import { PolicyFormComponent } from './pages/policies/components/policy-form/policy-form.component';
+import { RadioButtonComponent } from './common/radio-button/radio-button.component';
+import { CheckboxComponent } from './common/checkbox/checkbox.component';
+import { CheckboxListComponent } from './common/checkbox-list/checkbox-list.component';
 
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -46,11 +51,15 @@ import { TranslateModule } from '@ngx-translate/core';
     HttpModule,
     NgxDatatableModule,
     StoreModule.provideStore(reducer),
+    RouterStoreModule.connectRouter(),
     EffectsModule.run(ClusterEffects),
     EffectsModule.run(PolicyEffects),
+    CollapseModule.forRoot(),
+    TabsModule.forRoot(),
 
     BrowserModule,
     FormsModule,
+    ReactiveFormsModule,
 
     RouterModule.forRoot(routes),
     CommonComponentsModule,
@@ -69,11 +78,15 @@ import { TranslateModule } from '@ngx-translate/core';
     PoliciesComponent,
     PolicyTableComponent,
     CreatePolicyComponent,
+    PolicyFormComponent,
 
     JobsComponent,
     HelpComponent,
     NavbarComponent,
-    NotFoundRouteComponent
+    NotFoundRouteComponent,
+    RadioButtonComponent,
+    CheckboxComponent,
+    CheckboxListComponent
   ],
   bootstrap: [DlmComponent],
   providers: [

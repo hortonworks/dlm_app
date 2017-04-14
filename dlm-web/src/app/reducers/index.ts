@@ -1,6 +1,6 @@
-import { isDevMode } from '@angular/core';
 import { ActionReducer } from '@ngrx/store';
 import { combineReducers } from '@ngrx/store';
+import { routerReducer, RouterState } from '@ngrx/router-store';
 import { environment } from '../../environments/environment';
 import { storeLogger } from 'ngrx-store-logger';
 
@@ -12,11 +12,13 @@ import * as fromPolicy from './policy';
 export interface State {
   clusters: fromCluster.State;
   policies: fromPolicy.State;
+  router: RouterState;
 };
 
 const reducers = {
   clusters: fromCluster.reducer,
-  policies: fromPolicy.reducer
+  policies: fromPolicy.reducer,
+  router: routerReducer
 };
 
 const devReducer: ActionReducer<State> = compose(storeLogger(), combineReducers)(reducers);

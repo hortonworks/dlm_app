@@ -1,4 +1,12 @@
 @import './styles/ngx-table-theme.scss';
+@import './styles/forms.scss';
+@import './styles/variables.scss';
+@import './styles/utils.scss';
+
+html, body {
+  height: 100%;
+  background-color: $body-background;
+}
 
 .caret {
   &.caret-up {
