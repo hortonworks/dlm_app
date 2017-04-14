@@ -1,56 +1,102 @@
 #!/usr/bin/env bash
+set -e
 
-echo "Current working directory is"
-echo `pwd`
+log() {
+	echo $@
+}
 
-# 0. Cleanup
-rm -rf ../services/db-service/build
-mkdir ../services/db-service/build
-rm -rf build
-mkdir build
+clean_build() {
+	rm -rf build
+	mkdir build
+}
 
-# 1. build dp-app
-pushd ../dp-commons
-sbt publishLocal
-popd
-pushd ../services/atlas/service
-sbt publishLocal
-popd
-pushd ../services/db-service
-sbt dist
-unzip `find ./target/universal -maxdepth 1 -type f -name *.zip|head -1` -d build/tmp_dp-db-service
-cp -R `ls -d build/tmp_dp-db-service/*/|head -n 1` build/dp-db-service
-popd
-pushd ../clients/db-client
-sbt publishLocal
-popd
-pushd ../dp-app
-sbt dist
-unzip `find ./target/universal -maxdepth 1 -type f -name *.zip|head -1` -d ../dp-build/build/tmp_dp-app
-cp -R `ls -d ../dp-build/build/tmp_dp-app/*/|head -n 1` ../dp-build/build/dp-app
-popd
+build_dp_commons() {
+	log "Building dp-commons"
+	pushd ../dp-commons
+	sbt publishLocal
+	popd
+}
 
-# 2. build dp-web
-pushd ../dp-web
-npm install
-npm run build
-cp -R ./dist ../dp-build/build/dp-web
-popd
+build_atlas_service() {
+	log "Building atlas service"
+	pushd ../services/atlas/service
+	sbt publishLocal
+	popd
+}
 
-# 3. build dlm-web
-pushd ../dlm-web
-yarn
-npm run build
-cp -R ./dist ../dp-build/build/dlm-web
-popd
+unpack_for_docker_deploy() {
+	log "Unzip to " $1
+	log "Copy to " $2
+	unzip `find ./target/universal -maxdepth 1 -type f -name *.zip|head -1` -d $1
+	cp -R `ls -d $1/*/ | head -n 1` $2
+}
 
-# 4. build cluster services
-pushd ../services/rest-mock
-sbt publishLocal
-popd
-pushd ../services/cluster-service
-sbt assembly
-popd
+build_db_service() {
+	log "Building db-service"
+	rm -rf ../services/db-service/build
+	mkdir ../services/db-service/build
+	pushd ../services/db-service
+	sbt dist
+	unpack_for_docker_deploy build/tmp_dp-db-service build/dp-db-service
+	popd
+}
 
-# 5
-echo "All done"
+build_db_client() {
+	log "Building db-client"
+	pushd ../clients/db-client
+	sbt publishLocal
+	popd
+}
+
+build_dp_app() {
+	log "Building dp-app"
+	pushd ../dp-app
+	sbt dist
+	unpack_for_docker_deploy ../dp-build/build/tmp_dp-app ../dp-build/build/dp-app
+	popd
+}
+
+build_dp_web() {
+	log "Building dp-web"
+	pushd ../dp-web
+	npm install
+	npm run build
+	cp -R ./dist ../dp-build/build/dp-web
+	popd
+}
+
+build_dlm_web() {
+	log "Building dlm-web"
+	pushd ../dlm-web
+	yarn
+	npm run build
+	cp -R ./dist ../dp-build/build/dlm-web
+	popd
+}
+
+build_rest_mock() {
+	log "Building rest-mock"
+	pushd ../services/rest-mock
+	sbt publishLocal
+	popd
+}
+
+build_cluster_service() {
+	log "Building cluster-service"
+	pushd ../services/cluster-service
+	sbt assembly
+	popd
+}
+
+log "Current working directory is: " `pwd`
+clean_build
+build_dp_commons
+build_atlas_service
+build_db_service
+build_db_client
+build_dp_app
+build_dp_web
+build_dlm_web
+build_rest_mock
+build_cluster_service
+log "All done"
