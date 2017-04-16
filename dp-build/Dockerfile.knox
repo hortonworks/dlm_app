@@ -1,0 +1,16 @@
+FROM nimmis/java-centos:openjdk-8-jre
+
+COPY knox-scripts/HDP.repo /etc/yum.repos.d/
+
+RUN yum update -y && \
+yum install -y knox && \
+yum clean all
+
+ADD knox-scripts/launch-knox.sh /usr/hdp/current/knox-server/bin/
+RUN chown -R knox /usr/hdp/current/knox-server/bin/launch-knox.sh
+
+ADD knox-scripts/setup-master-password.sh /usr/hdp/current/knox-server/bin/
+RUN chown -R knox /usr/hdp/current/knox-server/bin/setup-master-password.sh
+
+USER knox
+WORKDIR /usr/hdp/current/knox-server/bin
