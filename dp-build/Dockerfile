@@ -1,7 +1,5 @@
 FROM openjdk:8-jre
 
-# ONBUILD RUN sh ./build.sh
-
 RUN apt-get update && \
     apt-get install -y ntp nginx runit net-tools vim
 
@@ -14,12 +12,8 @@ RUN chmod +x /etc/sv/nginx/run && \
     chmod +x /etc/sv/play/run && \
     chmod +x /usr/dp-app/bin/dp-app
 
+RUN rm -rf /etc/sv/getty-5
+
 EXPOSE 80
 
-# TODO >> read VOLUME
-# VOLUME /usr/share/nginx/html
-# VOLUME /etc/nginx
-# VOLUME /var/log/nginx/log
-
-# ENTRYPOINT ["echo", "$PATH"]
 ENTRYPOINT ["runsvdir", "/etc/sv"]
