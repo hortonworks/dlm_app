@@ -10,6 +10,7 @@
   * `curl https://bintray.com/sbt/rpm/rpm | sudo tee /etc/yum.repos.d/bintray-sbt-rpm.repo`
   * `sudo yum install sbt`
 * Nodejs 6.10.0 or above. To get Nodejs on Linux, you can follow instructions here: https://nodejs.org/en/download/package-manager/#enterprise-linux-and-fedora
+* [Yarn](https://yarnpkg.com) package manager (`npm install --global yarn`)
 * docker-machine (tested with 0.7.0), docker (tested with 1.8.0), docker-compose (tested with 1.7.1)
 
 ## Build
