@@ -49,6 +49,8 @@ import { PairingProgressCardComponent } from './pages/pairings/pairing-progress-
 import { PairingCardListComponent } from './pages/pairings/pairing-card-list/pairing-card-list.component';
 
 import { TranslateModule } from '@ngx-translate/core';
+import { TableComponent } from './common/table/table.component';
+import { CheckboxColumnComponent, ActionColumnComponent } from './components';
 
 @NgModule({
   imports: [
@@ -65,6 +67,7 @@ import { TranslateModule } from '@ngx-translate/core';
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
+
 
     RouterModule.forRoot(routes),
     CommonComponentsModule,
@@ -95,7 +98,10 @@ import { TranslateModule } from '@ngx-translate/core';
     CheckboxListComponent,
     PairingCardComponent,
     PairingCardListComponent,
-    PairingProgressCardComponent
+    PairingProgressCardComponent,
+    TableComponent,
+    CheckboxColumnComponent,
+    ActionColumnComponent
   ],
   bootstrap: [DlmComponent],
   providers: [

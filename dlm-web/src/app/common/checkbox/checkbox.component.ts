@@ -8,8 +8,15 @@ export const CUSTOM_CHECKBOX_CONTROL_VALUE_ACCESSOR: any = {
 };
 @Component({
   selector: 'dlm-checkbox',
-  templateUrl: './checkbox.component.html',
   styleUrls: ['./checkbox.component.scss'],
+  template: `
+    <div class="checkbox-item">
+      <input type="checkbox" [checked]="checked" />
+      <label class="checkbox" (click)="toggleChecked()">
+        <ng-content></ng-content>
+      </label>
+    </div>
+  `,
   providers: [CUSTOM_CHECKBOX_CONTROL_VALUE_ACCESSOR],
 })
 export class CheckboxComponent implements OnInit, ControlValueAccessor {

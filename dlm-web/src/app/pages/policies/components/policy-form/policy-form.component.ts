@@ -77,7 +77,12 @@ export class PolicyFormComponent implements OnInit {
   }
 
   handleSearchChange(value: string) {
-    const reg = new RegExp(value);
+    let reg: RegExp;
+    try {
+      reg = new RegExp(value);
+    } catch (e) {
+      reg = new RegExp('');
+    }
     this.visibleDbList = this.dbList.filter(name => reg.test(name));
   }
 
