@@ -1,5 +1,5 @@
 import { browser } from 'protractor';
-import { SideNav, OverviewPage, PolicyPage } from './app.po';
+import { SideNav, OverviewPage, PoliciesPage, PairingsPage } from './app.po';
 
 // TODO: Integrate with ngx-translate
 
@@ -25,10 +25,19 @@ describe('DLM', function() {
   });
 
   it('should navigate to create policy page', () => {
-    const page = new PolicyPage();
+    const page = new PoliciesPage();
 
     page.clickAddPolicy();
 
     expect(page.getUrl()).toContain('/policies/create');
+  })
+
+  it('should navigate to create pairing page', () => {
+    const page = new PairingsPage();
+
+    page.clickAddPairing();
+
+    expect(page.getUrl()).toContain('/pairings/create');
+
   })
 });
