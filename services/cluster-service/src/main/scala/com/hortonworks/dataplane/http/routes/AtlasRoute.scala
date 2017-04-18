@@ -12,7 +12,7 @@ class AtlasRoute @Inject()(private val clusterService: ClusterComponentService) 
   import com.hortonworks.dataplane.http.JsonSupport._
 
   val route =
-    path("cluster" / IntNumber / "atlas" ) { id =>
+    path("cluster" / IntNumber / "atlas") { id =>
       // use the cluster id to get atlas endpoint
       val service = clusterService.getServiceByName(id, "ATLAS")
       onSuccess(service) {

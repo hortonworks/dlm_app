@@ -28,7 +28,7 @@ private sealed case class ServiceExists(clusterData: ClusterData,
                                         boolean: Boolean)
 private sealed case class UpdateResult(boolean: Boolean)
 
-class PersistenceActor(clusterInterface: ClusterInterface) extends Actor {
+class PersistenceActor(clusterInterface: StorageInterface) extends Actor {
 
   val logger = Logger(classOf[PersistenceActor])
 

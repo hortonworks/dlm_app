@@ -30,16 +30,14 @@ class AmbariInterfaceSpec
                                                                                                           |  ]
                                                                                                           |}""")
     implicit val ws = AhcWSClient()
-    val ambariInterface = new SimpleAmbariInterfaceImpl(
+    val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "somecluster",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999"),
-        ambariuser = Some("admin"),
-        ambaripass = Some("admin")))
+        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),Credentials(Some("admin"),Some("admin")))
 
     ambariInterface.ambariConnectionCheck.map { ac =>
       assert(ac.status)
-      assert(ac.url.toString == "http://localhost:9999")
+      assert(ac.url.toString == "http://localhost:9999/api/v1/clusters/test")
     }
 
   }
@@ -52,12 +50,10 @@ class AmbariInterfaceSpec
     when get(atlasConfig) withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") withParams ("service_name"->"ATLAS","is_current" ->"true") thenRespond(200,json)
 
     implicit val ws = AhcWSClient()
-    val ambariInterface = new SimpleAmbariInterfaceImpl(
+    val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999"),
-        ambariuser = Some("admin"),
-        ambaripass = Some("admin")))
+        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),Credentials(Some("admin"),Some("admin")))
 
     val atlas  = ambariInterface.getAtlas
     atlas.map { either =>
@@ -74,12 +70,10 @@ class AmbariInterfaceSpec
     when get(nameNodeConfig) withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") thenRespond(200,json)
 
     implicit val ws = AhcWSClient()
-    val ambariInterface = new SimpleAmbariInterfaceImpl(
+    val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999"),
-        ambariuser = Some("admin"),
-        ambaripass = Some("admin")))
+        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),Credentials(Some("admin"),Some("admin")))
 
     val atlas  = ambariInterface.getNameNodeStats
     atlas.map { either =>
@@ -100,12 +94,10 @@ class AmbariInterfaceSpec
     when get(hostConfig) withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") thenRespond(200,detailjson)
 
     implicit val ws = AhcWSClient()
-    val ambariInterface = new SimpleAmbariInterfaceImpl(
+    val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999"),
-        ambariuser = Some("admin"),
-        ambaripass = Some("admin")))
+        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),Credentials(Some("admin"),Some("admin")))
 
     val atlas  = ambariInterface.getGetHostInfo
     atlas.map { either =>
@@ -116,18 +108,16 @@ class AmbariInterfaceSpec
 
   }
 
-  it should "discover the knox properties from the cluster" in {
+   it should "discover the knox properties from the cluster" in {
     val json  = Source.fromURL(getClass.getResource("/knox.json")).mkString
     val url = "/api/v1/clusters/test/configurations/service_config_versions"
-    when get(url) withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") withParams ("service_name"->"KNOX","is_current" ->"true") thenRespond(200,json)
+    when get url withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") withParams ("service_name"->"KNOX","is_current" ->"true") thenRespond(200,json)
 
     implicit val ws = AhcWSClient()
-    val ambariInterface = new SimpleAmbariInterfaceImpl(
+    val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999"),
-        ambariuser = Some("admin"),
-        ambaripass = Some("admin")))
+        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),Credentials(Some("admin"),Some("admin")))
 
     val atlas  = ambariInterface.getKnoxInfo
     atlas.map { either =>

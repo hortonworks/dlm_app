@@ -23,6 +23,8 @@ private[dataplane] case class HostInformation(hostState: String, hostStatus: Str
 
 private [dataplane] case class KnoxInfo(properties:Option[JsValue])
 
+private [dataplane] case class Credentials(user:Option[String],pass:Option[String])
+
 trait AmbariInterface {
 
   def ambariConnectionCheck: Future[AmbariConnection]
@@ -36,3 +38,5 @@ trait AmbariInterface {
   def getKnoxInfo:Future[Either[Throwable, KnoxInfo]]
 
 }
+
+

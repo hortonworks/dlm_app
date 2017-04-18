@@ -13,6 +13,7 @@ import com.hortonworks.dataplane.db.Webserice.{
   ClusterComponentService,
   ClusterHostsService,
   ClusterService,
+  ConfigService,
   LakeService
 }
 import com.typesafe.scalalogging.Logger
@@ -20,7 +21,9 @@ import com.typesafe.scalalogging.Logger
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait ClusterInterface {
+trait StorageInterface {
+
+  def addClusters(clusters: Seq[Cluster]): Future[Seq[Cluster]]
 
   def addOrUpdateHostInformation(hostInfos: Seq[ClusterHost]): Future[Errors]
 
@@ -34,17 +37,20 @@ trait ClusterInterface {
 
   def addService(service: ClusterData): Future[Option[ClusterData]]
 
+  def getConfiguration(key: String): Future[Option[String]]
+
 }
 
 @Singleton
-class ClusterInterfaceImpl @Inject()(
+class StorageInterfaceImpl @Inject()(
     val clusterService: ClusterService,
     val lakeService: LakeService,
     val clusterComponentService: ClusterComponentService,
-    clusterHostsService: ClusterHostsService)
-    extends ClusterInterface {
+    clusterHostsService: ClusterHostsService,
+    configService: ConfigService)
+    extends StorageInterface {
 
-  val logger = Logger(classOf[ClusterInterfaceImpl])
+  val logger = Logger(classOf[StorageInterfaceImpl])
 
   override def getDataLakes: Future[Seq[Datalake]] =
     lakeService.list
@@ -120,11 +126,28 @@ class ClusterInterfaceImpl @Inject()(
   override def addOrUpdateHostInformation(
       hostInfos: Seq[ClusterHost]): Future[Errors] = {
 
-      val futures = hostInfos.map(clusterHostsService.createOrUpdate(_))
-      val errors = Future.sequence(futures)
-      errors.map(e =>
-      {
-        Errors(e.flatMap(_.get.errors))
-      })
+    val futures = hostInfos.map(clusterHostsService.createOrUpdate)
+    val errors = Future.sequence(futures)
+    errors.map(e => {
+      Errors(e.flatMap(_.get.errors))
+    })
+  }
+
+  override def getConfiguration(key: String): Future[Option[String]] = {
+    configService.getConfig(key).map(v => v.map(o => o.configValue))
+  }
+
+  override def addClusters(clusters: Seq[Cluster]): Future[Seq[Cluster]] = {
+    val c = clusters.map { c =>
+      clusterService.create(c)
+    }
+
+    val sequence = Future.sequence(c)
+    sequence.map { list =>
+      logger.warn(s"Cluster created status $list")
+      list.collect {
+        case Right(cluster) => cluster
+      }
+    }
   }
 }

@@ -92,4 +92,9 @@ object Webserice {
   }
 
 
+  trait ConfigService extends DbClientService {
+    def getConfig(key:String):Future[Option[DpConfig]]
+  }
+
+
 }

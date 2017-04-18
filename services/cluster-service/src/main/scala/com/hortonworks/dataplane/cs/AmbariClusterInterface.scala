@@ -12,11 +12,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
-class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
+class AmbariClusterInterface(private val cluster: Cluster,credentials: Credentials)(
     implicit ws: WSClient)
     extends AmbariInterface {
 
-  val logger = Logger(classOf[SimpleAmbariInterfaceImpl])
+  val logger = Logger(classOf[AmbariClusterInterface])
 
   override def ambariConnectionCheck: Future[AmbariConnection] = {
     // use the cluster definition to get Ambari
@@ -24,8 +24,8 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
     logger.info("Starting Ambari connection check")
     // preconditions
     require(cluster.ambariurl.isDefined, "No Ambari URL defined")
-    require(cluster.ambariuser.isDefined, "No Ambari user defined")
-    require(cluster.ambaripass.isDefined, "No Ambari password defined")
+    require(credentials.user.isDefined, "No Ambari user defined")
+    require(credentials.user.isDefined, "No Ambari password defined")
     require(
       if (isClusterKerberized)
         cluster.kerberosuser.isDefined && cluster.kerberosticketLocation.isDefined
@@ -35,9 +35,9 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
     val url = Try(new URL(cluster.ambariurl.get))
     require(url.isSuccess, "registered Ambari url is invalid")
     //Hit ambari URL
-    ws.url(s"${url.get.toString}/api/v1/clusters")
-      .withAuth(cluster.ambariuser.get,
-                cluster.ambaripass.get,
+    ws.url(s"${url.get.toString}")
+      .withAuth(credentials.user.get,
+                credentials.pass.get,
                 WSAuthScheme.BASIC)
       .get()
       .map { res =>
@@ -65,18 +65,16 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
 
   }
 
-  private def isClusterKerberized = {
-    cluster.secured.isDefined && cluster.secured.get == true
-  }
+  private def isClusterKerberized = cluster.secured.isDefined && cluster.secured.get
 
   override def getAtlas: Future[Either[Throwable, Atlas]] = {
     logger.info("Trying to get data from Atlas")
 
     val serviceSuffix =
-      s"/api/v1/clusters/${cluster.name}/configurations/service_config_versions?service_name=ATLAS&is_current=true"
+      "/configurations/service_config_versions?service_name=ATLAS&is_current=true"
     ws.url(s"${cluster.ambariurl.get}$serviceSuffix")
-      .withAuth(cluster.ambariuser.get,
-                cluster.ambaripass.get,
+      .withAuth(credentials.user.get,
+                credentials.pass.get,
                 WSAuthScheme.BASIC)
       .get()
       .map { res =>
@@ -107,9 +105,9 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
 
     val nameNodeResponse = ws
       .url(
-        s"${cluster.ambariurl.get}/api/v1/clusters/${cluster.name}/components/NAMENODE")
-      .withAuth(cluster.ambariuser.get,
-                cluster.ambaripass.get,
+        s"${cluster.ambariurl.get}/components/NAMENODE")
+      .withAuth(credentials.user.get,
+                credentials.pass.get,
                 WSAuthScheme.BASIC)
       .get()
     nameNodeResponse
@@ -152,16 +150,15 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
 
   override def getGetHostInfo: Future[Either[Throwable, Seq[HostInformation]]] = {
 
-    val clustersApi = "/api/v1/clusters"
     val hostsApi = "/hosts"
 
     val hostsPath =
-      s"${cluster.ambariurl.get}${clustersApi}/${cluster.name}${hostsApi}"
+      s"${cluster.ambariurl.get}${hostsApi}"
 
     val hostsResponse: Future[WSResponse] = ws
       .url(hostsPath)
-      .withAuth(cluster.ambariuser.get,
-                cluster.ambaripass.get,
+      .withAuth(credentials.user.get,
+                credentials.pass.get,
                 WSAuthScheme.BASIC)
       .get()
     //Load Cluster Info
@@ -177,8 +174,8 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
             // for each host get host and disk info
             val hostInfoResponse: Future[WSResponse] = ws
               .url(s"${hostsPath}/${host.get("host_name").get}")
-              .withAuth(cluster.ambariuser.get,
-                        cluster.ambaripass.get,
+              .withAuth(credentials.user.get,
+                        credentials.pass.get,
                         WSAuthScheme.BASIC)
               .get()
 
@@ -225,10 +222,10 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
   override def getKnoxInfo: Future[Either[Throwable, KnoxInfo]] = {
     // Dump knox properties
     val knoxApi =
-      s"${cluster.ambariurl.get}/api/v1/clusters/test/configurations/service_config_versions?service_name=KNOX&is_current=true"
+      s"${cluster.ambariurl.get}/configurations/service_config_versions?service_name=KNOX&is_current=true"
     ws.url(knoxApi)
-      .withAuth(cluster.ambariuser.get,
-                cluster.ambaripass.get,
+      .withAuth(credentials.user.get,
+                credentials.pass.get,
                 WSAuthScheme.BASIC)
       .get()
       .map(
@@ -246,4 +243,6 @@ class SimpleAmbariInterfaceImpl(private val cluster: Cluster)(
       }
 
   }
+
+
 }

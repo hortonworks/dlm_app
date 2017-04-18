@@ -3,8 +3,8 @@ package com.hortonworks.dataplane.cs
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provides, Singleton}
-import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterHostsService, ClusterService, LakeService}
-import com.hortonworks.dataplane.db.{ClusterComponentServiceImpl, ClusterHostsServiceImpl, ClusterServiceImpl, LakeServiceImpl}
+import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, LakeService}
+import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.http.Webserver
 import com.hortonworks.dataplane.http.routes.AtlasRoute
 import com.typesafe.config.{Config, ConfigFactory}
@@ -54,6 +54,12 @@ object AppModule extends AbstractModule{
 
   @Provides
   @Singleton
+  def provideConfigService(implicit ws: WSClient,configuration: Config):ConfigService = {
+    new ConfigServiceImpl(configuration)
+  }
+
+  @Provides
+  @Singleton
   def provideClusterHostsService(implicit ws: WSClient,configuration: Config):ClusterHostsService = {
     new ClusterHostsServiceImpl(configuration)
   }
@@ -75,14 +81,14 @@ object AppModule extends AbstractModule{
   @Provides
   @Singleton
   def provideClusterInterface(lakeService: LakeService, clusterService: ClusterService,
-                              clusterComponentService: ClusterComponentService,clusterHostsServiceImpl: ClusterHostsService):ClusterInterface = {
-    new ClusterInterfaceImpl(clusterService,lakeService,clusterComponentService,clusterHostsServiceImpl)
+                              clusterComponentService: ClusterComponentService,clusterHostsServiceImpl: ClusterHostsService,configService: ConfigService):StorageInterface = {
+    new StorageInterfaceImpl(clusterService,lakeService,clusterComponentService,clusterHostsServiceImpl,configService)
   }
 
 
   @Provides
   @Singleton
-  def provideClusterSync(actorSystem: ActorSystem,config: Config,clusterInterface: ClusterInterface,wSClient: WSClient): ClusterSync = {
+  def provideClusterSync(actorSystem: ActorSystem, config: Config, clusterInterface: StorageInterface, wSClient: WSClient): ClusterSync = {
     new ClusterSync(actorSystem,config,clusterInterface,wSClient)
   }
 
