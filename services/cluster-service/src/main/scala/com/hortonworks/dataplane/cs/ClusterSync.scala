@@ -105,9 +105,10 @@ private sealed class Synchronizer(val storageInterface: StorageInterface,
                                 dbActor),
                           s"Datalake_${lake.id.get}"))
       }
-      // clean up
 
+      // clean up
       val toClear = dataLakeWorkers.keySet -- currentLakes
+      log.info(s"cleaning up workers for datalakes $toClear")
       toClear.foreach { tc =>
         dataLakeWorkers.get(tc).map(c => c ! PoisonPill)
         dataLakeWorkers.remove(tc)

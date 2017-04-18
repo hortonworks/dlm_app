@@ -1,6 +1,6 @@
 package com.hortonworks.dataplane.cs
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, PoisonPill, Props}
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, Datalake}
 import com.hortonworks.dataplane.commons.service.api.Poll
 import com.typesafe.config.Config
@@ -23,7 +23,7 @@ class DatalakeActor(private val dataLake: Datalake,
                     private val dbActor: ActorRef)
     extends Actor with ActorLogging{
 
-  val clusterMap = collection.mutable.Map[String, ActorRef]()
+  val clusterMap = collection.mutable.Map[Long, ActorRef]()
   val dataLakeInterface = AmbariDatalakeInterfaceImpl(dataLake,wSClient,config,credentials)
 
   val prefix = Try(config.getString("dp.service.ambari.cluster.api.prefix"))
@@ -79,8 +79,10 @@ class DatalakeActor(private val dataLake: Datalake,
         .pipeTo(self)
 
     case StoredClusters(clusters) =>
+      val current = collection.mutable.Set[Long]()
       clusters.foreach { c =>
-        clusterMap.getOrElseUpdate(c.name,
+        current += c.id.get
+        clusterMap.getOrElseUpdate(c.id.get,
                                    context.actorOf(Props(classOf[ClusterActor],
                                                          c,
                                                          wSClient,
@@ -89,6 +91,14 @@ class DatalakeActor(private val dataLake: Datalake,
                                                          dbActor),
                                                    s"Cluster_${c.id.get}"))
       }
+      val toClear = clusterMap.keySet -- current
+      log.info(s"cleaning up workers for clusters $toClear")
+      toClear.foreach { tc =>
+        clusterMap.get(tc).map(c => c ! PoisonPill)
+        clusterMap.remove(tc)
+      }
+      current.clear
+
       clusterMap.values.foreach(_ ! Poll())
   }
 }
