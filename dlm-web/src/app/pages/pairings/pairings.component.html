@@ -1,3 +1,15 @@
-<p>
-  DLM Pairings Page!
-</p>
+<div class="page-header">
+  <div class="pull-left">
+    <p>
+      <i class="glyphicon glyphicon-resize-horizontal"></i>
+      <span class="h2">{{ "page.pairings.header" | translate }}</span>
+    </p>
+    <div>
+      <span class="text-muted">{{ "page.pairings.header_note" | translate }}</span>
+    </div>
+  </div>
+  <div class="pull-right">
+    <button type="button" class="btn btn-primary" (click)="createPairingHandler()">{{ "page.pairings.create_button_text" | translate }}</button>
+  </div>
+  <div class="clearfix"></div>
+</div>

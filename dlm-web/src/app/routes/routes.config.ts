@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 
-import { DlmComponent } from '../dlm.component';
 import { OverviewComponent } from '../pages/overview/overview.component';
 import { ClustersComponent } from '../pages/clusters/clusters.component';
 import { PairingsComponent } from '../pages/pairings/pairings.component';
@@ -8,6 +7,7 @@ import { PoliciesComponent } from '../pages/policies/policies.component';
 import { JobsComponent } from '../pages/jobs/jobs.component';
 import { HelpComponent } from '../pages/help/help.component';
 import { CreatePolicyComponent } from '../pages/policies/subpages/create-policy/create-policy.component';
+import { CreatePairingComponent } from '../pages/pairings/create-pairing/create-pairing.component';
 
 import { NotFoundRouteComponent } from './not-found-route/not-found-route.component';
 
@@ -26,6 +26,10 @@ export const routes: Routes = [{
   {
     path: 'pairings',
     component: PairingsComponent
+  },
+  {
+    path: 'pairings/create',
+    component: CreatePairingComponent
   },
   {
     path: 'policies',
