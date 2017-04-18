@@ -1,12 +1,28 @@
 #!/bin/sh
 set -e
 
+ALL_DOCKER_COMPOSE_APP_FILES="-f docker-compose-apps.yml -f docker-compose-knox.yml"
+ALL_DOCKER_COMPOSE_DB_FILES="-f docker-compose.yml -f docker-compose-migrate.yml"
+ALL_DOCKER_COMPOSE_FILES=${ALL_DOCKER_COMPOSE_DB_FILES}" "${ALL_DOCKER_COMPOSE_APP_FILES} 
+
 init_db() {
     docker-compose up -d
 }
 
 ps() {
-    docker-compose -f docker-compose.yml -f docker-compose-migrate.yml -f docker-compose-apps.yml -f docker-compose-knox.yml ps
+    docker-compose ${ALL_DOCKER_COMPOSE_FILES} ps
+}
+
+list_logs() {
+    DOCKER_FILES=${ALL_DOCKER_COMPOSE_APP_FILES}
+    if [ "$1" == "all" ]; then
+        DOCKER_FILES=${ALL_DOCKER_COMPOSE_FILES}
+        shift
+    elif [ "$1" == "db" ]; then
+        DOCKER_FILES=${ALL_DOCKER_COMPOSE_DB_FILES}
+        shift
+    fi
+    docker-compose ${DOCKER_FILES} logs "$@"
 }
 
 migrate_schema() {
@@ -57,7 +73,7 @@ stop_knox() {
 
 usage() {
     echo "Usage: dpdeploy.sh <command> \\n \
-            Commands: init [db|knox|app] | migrate | build [knox] | ps | start | stop [knox] | destroy [knox]\\n \
+            Commands: init [db|knox|app] | migrate | build [knox] | ps | logs [db|all] | start | stop [knox] | destroy [knox]\\n \
             init db: Initialize postgres DB for first time\\n \
             init knox: Initialize the Knox container\\n \
             init app: Start the application docker containers for the first time \\n \
@@ -68,6 +84,9 @@ usage() {
             stop: Stop the application docker containers \\n \
             stop knox: Stop the Knox docker container \\n \
             ps: List the status of the docker containers \\n \
+            logs: List logs of the docker containers \\n \
+                  No options: app containers, db: all DB containers, all: all containers. \\n \
+                  All \"docker-compose logs\" options are supported. \\n \
             destroy: Kill all containers and remove them. Needs to start from init db again. \\n \
             destroy knox: Kill Knox container and remove it. Needs to start from init knox again.
             "
@@ -100,7 +119,7 @@ else
             migrate_schema
             ;;
         build)
-            if [ x"$2" == "xknox" ]
+            if [ "$2" == "knox" ]
             then
                 build_knox
             else
@@ -108,7 +127,7 @@ else
             fi
             ;;
         start)
-            if [ x"$2" == "xknox" ]
+            if [ "$2" == "knox" ]
             then
                 start_knox
             else
@@ -116,7 +135,7 @@ else
             fi
             ;;
         stop)
-            if [ x"$2" == "xknox" ]
+            if [ "$2" == "knox" ]
             then
                 stop_knox
             else
@@ -126,8 +145,12 @@ else
         ps)
             ps
             ;;
+        logs)
+            shift
+            list_logs "$@"
+            ;;
         destroy)
-            if [ x"$2" == "xknox" ]
+            if [ "$2" == "knox" ]
             then
                 destroy_knox
             else
