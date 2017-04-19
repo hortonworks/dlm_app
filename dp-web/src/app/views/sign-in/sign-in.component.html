@@ -17,7 +17,8 @@
           </div>
         </div>
         <footer class="" style="">
-          <button type="submit" class="mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect">
+          <div *ngIf="_isAuthInProgress">Auth is in progresss...</div>
+          <button type="submit" class="mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect" [disabled]="_isAuthInProgress">
             Sign In
           </button>
         </footer>
