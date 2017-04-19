@@ -1,0 +1,27 @@
+@import '../styles/variables.scss';
+
+$form-background: #fff;
+
+.basic-form {
+  background: $form-background;
+  padding: 20px;
+}
+
+.form-section {
+  padding: 15px;
+}
+
+.form-footer {
+  width: 100%;
+  border: 1px solid $light-grey;
+  padding: 20px;
+}
+
+.form-section-title {
+  font-size: 14px;
+  text-transform: uppercase;
+  color: $grey-color;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid $light-grey;
+}

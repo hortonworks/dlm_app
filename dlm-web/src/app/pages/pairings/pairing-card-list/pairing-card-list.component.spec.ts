@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PolicyTableComponent } from './policy-table.component';
+import { PairingCardListComponent } from './pairing-card-list.component';
 
-describe('PolicyTableComponent', () => {
-  let component: PolicyTableComponent;
-  let fixture: ComponentFixture<PolicyTableComponent>;
+describe('PairingCardListComponent', () => {
+  let component: PairingCardListComponent;
+  let fixture: ComponentFixture<PairingCardListComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PolicyTableComponent ]
+      declarations: [ PairingCardListComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PolicyTableComponent);
+    fixture = TestBed.createComponent(PairingCardListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,28 +1,27 @@
 import { Component, OnInit, Input, ViewChild, AfterViewInit } from '@angular/core';
 import { Policy } from '../../../models/policy.model';
+import { ActionItemType, ActionColumnType } from '../../../components';
 
 @Component({
   selector: 'dp-policy-table',
-  templateUrl: './policy-table.component.html',
+  template: `
+    <dlm-table
+      [columns]="columns"
+      [rows]="policies"
+      (selectAction)="handleSelectedAction($event)"
+      selectionType="checkbox">
+    </dlm-table>
+  `,
   styleUrls: ['./policy-table.component.scss']
 })
-export class PolicyTableComponent implements OnInit, AfterViewInit {
+export class PolicyTableComponent implements AfterViewInit {
   columns: any[];
-
-  // todo: DRY table component figure out how to extend it
-  tableCssClasses = {
-    sortAscending: 'caret',
-    sortDescending: 'caret caret-up',
-    pagerLeftArrow: 'fa fa-chevron-left',
-    pagerRightArrow: 'fa fa-chevron-right',
-  };
-
   @Input() policies: Policy[];
-
-  constructor() { }
-
-  ngOnInit() {
-  }
+  // todo: labels and actions are subject to change
+  rowActions = <ActionItemType[]>[
+    { label: 'Remove', name: 'REMOVE'},
+    { label: 'Rerun', name: 'RERUN'}
+  ];
 
   ngAfterViewInit() {
     this.columns = [
@@ -33,8 +32,13 @@ export class PolicyTableComponent implements OnInit, AfterViewInit {
       {prop: 'type'},
       {prop: 'startTime'},
       {prop: 'endTime'},
-      {name: 'Actions'},
+      <ActionColumnType>{
+        name: 'Actions',
+        actionable: true,
+        actions: this.rowActions
+      }
     ];
   }
 
+  handleSelectedAction({ row, action}) { }
 }

@@ -1,0 +1,68 @@
+{
+  "common": {
+    "all": "All",
+    "cancel": "Cancel",
+    "review": "Review",
+    "time": {
+      "hourly": "Hourly",
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly"
+    }
+  },
+  "sidenav": {
+    "menuItem": {
+      "overview": "Overview",
+      "clusters": "My Clusters",
+      "policies": "Policies",
+      "pairings": "Pairings",
+      "jobs": "Jobs",
+      "help": "Help",
+      "header": "DATA LIFECYCLE MANAGER"
+    }
+  },
+  "page": {
+    "clusters": {
+      "dropdown": {
+        "cluster": "Cluster",
+        "policy": "Policy"
+      },
+      "card": {
+        "registered": "Registered",
+        "nodes": "Nodes",
+        "volume": "Volume",
+        "pairs": "Pairs"
+      }
+    },
+    "policies": {
+      "header": "Replication Policies",
+      "header_note": "Note: Pairings are bi-directional",
+      "header_create": "Create Replication Policy",
+      "form": {
+        "selected": "Selected",
+        "sections": {
+          "general": "General",
+          "database": "Select Database",
+          "job": "Run Job"
+        },
+        "fields": {
+          "policy_name": "Policy Name",
+          "service": "Service"
+        },
+        "schedule": {
+          "immediate": "One Time",
+          "schedule": "On Schedule"
+        }
+      }
+    },
+    "pairings": {
+      "header": "Pairings",
+      "header_note": "Note: Pairings are bi-directional",
+      "create_button_text": "+ Pairing",
+      "create": {
+        "header": "Create Pairing",
+        "header_note": "Note: Pairings are bi-directional"
+      }
+    }
+  }
+}

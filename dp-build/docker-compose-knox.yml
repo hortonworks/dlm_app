@@ -1,0 +1,9 @@
+version: '2'
+services:
+  knox:
+    image: hortonworks/dataplane-knox
+    ports:
+    - "8443:8443"
+    environment:
+    - MASTER_PASSWORD
+    command: sh ./launch-knox.sh

@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpModule, Http } from '@angular/http';
-import { BsDropdownModule } from 'ng2-bootstrap';
+import { BsDropdownModule, CollapseModule, TabsModule } from 'ng2-bootstrap';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { StoreModule } from '@ngrx/store';
+import { RouterStoreModule } from '@ngrx/router-store';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { reducer } from './reducers';
 import { RouterModule } from '@angular/router';
 
@@ -21,6 +22,7 @@ import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
 import { OverviewComponent } from './pages/overview/overview.component';
 import { PairingsComponent } from './pages/pairings/pairings.component';
+import { CreatePairingComponent } from './pages/pairings/create-pairing/create-pairing.component';
 import { PoliciesComponent } from './pages/policies/policies.component';
 import { JobsComponent } from './pages/jobs/jobs.component';
 import { HelpComponent } from './pages/help/help.component';
@@ -37,6 +39,18 @@ import { ClusterSearchComponent } from './pages/clusters/cluster-search/cluster-
 
 import { PolicyTableComponent } from './pages/policies/policy-table/policy-table.component';
 import { CreatePolicyComponent } from './pages/policies/subpages/create-policy/create-policy.component';
+import { PolicyFormComponent } from './pages/policies/components/policy-form/policy-form.component';
+import { RadioButtonComponent } from './common/radio-button/radio-button.component';
+import { CheckboxComponent } from './common/checkbox/checkbox.component';
+import { CheckboxListComponent } from './common/checkbox-list/checkbox-list.component';
+
+import { PairingCardComponent } from './pages/pairings/pairing-card/pairing-card.component';
+import { PairingProgressCardComponent } from './pages/pairings/pairing-progress-card/pairing-progress-card.component';
+import { PairingCardListComponent } from './pages/pairings/pairing-card-list/pairing-card-list.component';
+
+import { TranslateModule } from '@ngx-translate/core';
+import { TableComponent } from './common/table/table.component';
+import { CheckboxColumnComponent, ActionColumnComponent } from './components';
 
 @NgModule({
   imports: [
@@ -44,14 +58,20 @@ import { CreatePolicyComponent } from './pages/policies/subpages/create-policy/c
     HttpModule,
     NgxDatatableModule,
     StoreModule.provideStore(reducer),
+    RouterStoreModule.connectRouter(),
     EffectsModule.run(ClusterEffects),
     EffectsModule.run(PolicyEffects),
+    CollapseModule.forRoot(),
+    TabsModule.forRoot(),
 
     BrowserModule,
     FormsModule,
+    ReactiveFormsModule,
+
 
     RouterModule.forRoot(routes),
-    CommonComponentsModule
+    CommonComponentsModule,
+    TranslateModule.forRoot()
   ],
   declarations: [
     DlmComponent,
@@ -62,15 +82,26 @@ import { CreatePolicyComponent } from './pages/policies/subpages/create-policy/c
     ClusterListComponent,
     ClusterSearchComponent,
     PairingsComponent,
+    CreatePairingComponent,
 
     PoliciesComponent,
     PolicyTableComponent,
     CreatePolicyComponent,
+    PolicyFormComponent,
 
     JobsComponent,
     HelpComponent,
     NavbarComponent,
-    NotFoundRouteComponent
+    NotFoundRouteComponent,
+    RadioButtonComponent,
+    CheckboxComponent,
+    CheckboxListComponent,
+    PairingCardComponent,
+    PairingCardListComponent,
+    PairingProgressCardComponent,
+    TableComponent,
+    CheckboxColumnComponent,
+    ActionColumnComponent
   ],
   bootstrap: [DlmComponent],
   providers: [

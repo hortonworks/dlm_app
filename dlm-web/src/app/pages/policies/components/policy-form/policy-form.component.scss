@@ -1,0 +1,16 @@
+@import '../../../../styles/variables';
+
+.dlm-radio-group {
+  .dlm-radio-item {
+    float: left;
+
+    &:not(:first-child) {
+      padding-left: 15px;
+    }
+  }
+}
+
+.schedule-group {
+  padding: 10px;
+  border: 1px solid $light-grey;
+}

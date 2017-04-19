@@ -30,7 +30,7 @@ export class HttpService extends Http {
     if (typeof url === 'string') {
       return this.apiPrefix + url;
     }
-    const r: Request = url;
+    const r: Request = <Request>url;
     r.url = this.apiPrefix + r.url;
     return r;
   }
@@ -38,7 +38,7 @@ export class HttpService extends Http {
 
 export function httpFactory(backend: XHRBackend, options: RequestOptions) {
   return new HttpService(backend, options);
-};
+}
 
 export const httpServiceProvider = {
   provide: Http,

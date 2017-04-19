@@ -1,0 +1,11 @@
+<cluster-card [isSelected]="isSelected">
+  <div class="row">
+    <div class="col-md-8">
+      <div [ngClass]="{'text-muted': !isSelected, 'cluster-name': true}">{{cluster.clusterDetails.name}}</div>
+      <div [ngClass]="{'text-muted': !isSelected}">{{cluster.clusterDetails.dataCenter}}</div>
+    </div>
+    <div class="col-md-4 cluster-volume-col">
+      <div [ngClass]="{'text-muted': !isSelected, 'cluster-volume': true, 'selected': isSelected}">{{cluster.volumeGB}} GB</div>
+    </div>
+  </div>
+</cluster-card>

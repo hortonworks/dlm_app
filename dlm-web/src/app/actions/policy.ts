@@ -1,32 +1,19 @@
 import { type } from '../utils/type-action';
 import { Action } from '@ngrx/store';
-import { Policy } from '../models/policy.model';
 
 export const ActionTypes = {
   LOAD_POLICIES: type('LOAD_POLICIES'),
   LOAD_POLICIES_SUCCESS: type('LOAD_POLICIES_SUCCESS'),
-  LOAD_POLICIES_FAILURE: type('LOAD_POLICIES_FAILURE')
+  LOAD_POLICIES_FAIL: type('LOAD_POLICIES_FAIL'),
+  CREATE_POLICY: type('CREATE_POLICY'),
+  CREATE_POLICY_SUCCESS: type('CREATE_POLICY_SUCCESS'),
+  CREATE_POLICY_FAIL: type('CREATE_POLICY_FAIL')
 };
 
-export class LoadPolicies implements Action {
-  type = ActionTypes.LOAD_POLICIES;
+export const loadPolicies = (): Action => ({type: ActionTypes.LOAD_POLICIES});
+export const loadPoliciesSuccess = (policies): Action => ({type: ActionTypes.LOAD_POLICIES_SUCCESS, payload: policies});
+export const loadPoliciesFail = (error): Action => ({type: ActionTypes.LOAD_POLICIES_FAIL});
 
-  constructor(public payload?: string) {}
-};
-
-export class LoadPoliciesSuccess implements Action {
-  type = ActionTypes.LOAD_POLICIES_SUCCESS;
-
-  constructor(public payload: any) {}
-};
-
-export class LoadPoliciesFailure implements Action {
-  type = ActionTypes.LOAD_POLICIES_FAILURE;
-
-  constructor(public payload: string) {}
-};
-
-export type Actions
-  = LoadPolicies
-  | LoadPoliciesSuccess
-  | LoadPoliciesFailure;
+export const createPolicy = (policy): Action => ({type: ActionTypes.CREATE_POLICY, payload: policy});
+export const createPolicySuccess = (payload): Action => ({type: ActionTypes.CREATE_POLICY_SUCCESS, payload});
+export const createPolicyFail = (error): Action => ({type: ActionTypes.CREATE_POLICY_FAIL, payload: error});
