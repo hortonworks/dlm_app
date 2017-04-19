@@ -7,7 +7,7 @@ POST        /auth/in                               controllers.Authentication.si
 
 #api
 
-GET         /api/identity                          controllers.Identity.retrieve
+GET         /api/init                              controllers.Configuration.init
 
 GET         /api/lakes                             controllers.Lakes.list
 POST        /api/lakes                             controllers.Lakes.create
