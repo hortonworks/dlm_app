@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_datalakes (
   locationid  BIGINT REFERENCES dataplane.dp_locations (id) NOT NULL,
   createdby   BIGINT REFERENCES dataplane.dp_users (id)     NOT NULL,
   properties  JSONB,
-  state       VARCHAR(10) NOT NULL DEFAULT 'TO_SYNC',
+  state       VARCHAR(32) NOT NULL DEFAULT 'TO_SYNC',
   created     TIMESTAMP DEFAULT now(),
   updated     TIMESTAMP DEFAULT now(),
   CHECK (state IN ('TO_SYNC', 'SYNC_IN_PROGRESS', 'SYNCED', 'SYNC_ERROR'))

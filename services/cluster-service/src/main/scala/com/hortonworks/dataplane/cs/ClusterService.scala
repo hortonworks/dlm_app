@@ -9,6 +9,7 @@ object ClusterService extends App {
 
   val logger = Logger("Cluster service")
 
+
   logger.info("Setting up Guice injector")
   private val injector = Guice.createInjector(AppModule)
   private val clusterSync = injector.getInstance(classOf[ClusterSync])

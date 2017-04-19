@@ -15,7 +15,6 @@ import com.hortonworks.dataplane.commons.service.api.Poll
 import com.typesafe.config.Config
 import play.api.libs.ws.WSClient
 
-import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
@@ -111,7 +110,7 @@ private sealed class Synchronizer(val storageInterface: StorageInterface,
       val toClear = dataLakeWorkers.keySet -- currentLakes
       log.info(s"cleaning up workers for datalakes $toClear")
       toClear.foreach { tc =>
-        dataLakeWorkers.get(tc).map(c => c ! PoisonPill)
+        dataLakeWorkers.get(tc).foreach(c => c ! PoisonPill)
         dataLakeWorkers.remove(tc)
       }
       currentLakes.clear

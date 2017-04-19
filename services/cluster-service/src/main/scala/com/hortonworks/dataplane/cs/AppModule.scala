@@ -8,7 +8,6 @@ import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.http.Webserver
 import com.hortonworks.dataplane.http.routes.AtlasRoute
 import com.typesafe.config.{Config, ConfigFactory}
-import play.api.cache.{CacheApi, EhCacheModule}
 import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcWSClient
 

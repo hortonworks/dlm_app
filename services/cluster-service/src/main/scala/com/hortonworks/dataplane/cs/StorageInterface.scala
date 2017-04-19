@@ -39,6 +39,8 @@ trait StorageInterface {
 
   def getConfiguration(key: String): Future[Option[String]]
 
+  def updateDatalakeStatus(datalake: Datalake): Future[Boolean]
+
 }
 
 @Singleton
@@ -148,6 +150,19 @@ class StorageInterfaceImpl @Inject()(
       list.collect {
         case Right(cluster) => cluster
       }
+    }
+  }
+
+  override def updateDatalakeStatus(datalake: Datalake): Future[Boolean] = {
+    lakeService.updateStatus(datalake).map {
+      case Right(status) =>
+        if (!status)
+          logger.error(
+            s"Cannot update data lake status - request possibly returned a 400")
+        status
+      case Left(errors) =>
+        logger.error(s"Cannot update data lake status ${errors}")
+        false
     }
   }
 }
