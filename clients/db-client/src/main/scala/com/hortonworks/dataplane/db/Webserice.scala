@@ -51,6 +51,8 @@ object Webserice {
     def retrieve(datalakeId: String): Future[Either[Errors, Datalake]]
     def update(datalakeId: String,
                datalake: Datalake): Future[Either[Errors, Datalake]]
+    def updateStatus(datalake: Datalake):Future[Either[Errors, Boolean]]
+
     def delete(datalakeId: String): Future[Either[Errors, Datalake]]
 
   }

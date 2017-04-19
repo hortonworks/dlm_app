@@ -13,7 +13,7 @@ import scala.concurrent.Future
 
 @Singleton
 class LakeServiceImpl(config: Config)(implicit ws: WSClient)
-    extends LakeService {
+  extends LakeService {
 
   private val url = config.getString("dp.services.db.service.uri")
 
@@ -64,11 +64,12 @@ class LakeServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToLakes(res: WSResponse) = {
     res.status match {
       case 200 =>
-        extractEntity[Seq[Datalake]](
-          res,
-          r => (r.json \ "results" \\ "data").map { d =>
-            d.validate[Datalake].get
-          })
+        extractEntity[Seq[Datalake]](res,
+          r =>
+            (r.json \ "results" \\ "data").map {
+              d =>
+                d.validate[Datalake].get
+            })
       case _ => mapErrors(res)
     }
   }
@@ -76,10 +77,30 @@ class LakeServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToLake(res: WSResponse) = {
     res.status match {
       case 200 =>
-        extractEntity[Datalake](res,
-                                r => (r.json \ "results" \\ "data")(0).validate[Datalake].get)
+        extractEntity[Datalake](
+          res,
+          r => (r.json \ "results" \\ "data") (0).validate[Datalake].get)
       case _ => mapErrors(res)
     }
   }
 
+  private def mapStatus(res: WSResponse) = {
+    res.status match {
+      case 200 =>
+        Right(true)
+      case 400 => Right(false)
+      case _ => mapErrors(res)
+    }
+  }
+
+  override def updateStatus(
+                             datalake: Datalake): Future[Either[Errors, Boolean]] = {
+    ws.url(s"$url/datalakes/status")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      )
+      .patch(Json.toJson(datalake))
+      .map(mapStatus)
+  }
 }
