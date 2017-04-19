@@ -79,6 +79,6 @@ GET         /api/datasets                          controllers.DataSets.list
 POST        /api/datasets                          controllers.DataSets.create
 GET         /api/datasets/:datasetId               controllers.DataSets.retrieve(datasetId)
 DELETE      /api/datasets/:datasetId               controllers.DataSets.delete(datasetId)
-PUT         /api/datasets/:datasetId               controllers.DataSets.update(datasetId)
+PUT         /api/datasets                          controllers.DataSets.update()
 #GET         /api/datasets/:name                    controllers.DataSets.getByname(name,host,datacenter)
 

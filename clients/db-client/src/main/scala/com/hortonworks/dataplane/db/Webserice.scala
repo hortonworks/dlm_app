@@ -49,7 +49,7 @@ object Webserice {
     def list(): Future[Either[Errors, Seq[Dataset]]]
     def create(dataSetAndCatIds: DatasetAndCategoryIds): Future[Either[Errors, DatasetAndCategories]]
     def retrieve(dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
-    def update(dataSetId: String, dataSetAndCatIds: DatasetAndCategoryIds): Future[Either[Errors, DatasetAndCategories]]
+    def update(dataSetAndCatIds: DatasetAndCategoryIds): Future[Either[Errors, DatasetAndCategories]]
     def delete(dataSetId: String): Future[Either[Errors, Dataset]]
   }
 

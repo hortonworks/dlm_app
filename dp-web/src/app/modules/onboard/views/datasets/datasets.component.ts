@@ -28,12 +28,12 @@ export class DataSetComponent implements OnInit {
     private categoryService : CategoryService, // for list of available categories
     private datasetService : DataSetService,
     private router: Router,
-    private route: ActivatedRoute
+    private activeRoute: ActivatedRoute
   ) { }
 
   ngOnInit () {
     //find datasetId in case of edit flow
-    this.route.params.subscribe(params => {this.datasetId = +params['id'];});
+    this.activeRoute.params.subscribe(params => {this.datasetId = +params['id'];});
     // if no id redirect to add flow
     if(isNaN(this.datasetId))this.router.navigate(['onboard/dataset-add']);
     else { // load editor with datasets and categories
@@ -50,8 +50,8 @@ export class DataSetComponent implements OnInit {
     if(!this.categories.length || !this.selectedCategoryIds.length) return;
     this.categories=this.categories.map(ctgry => {(<any>ctgry).checked=(this.selectedCategoryIds.indexOf(ctgry.id)>-1); return ctgry});
   }
-  updateSelectedCategories (selections: any[]) {
-    this.selectedCategoryIds = selections.filter(ctgry => ctgry.checked).map(ctgry => ctgry.id)               //(new Category).copy(optn));//Object.assign(new Category, optn))
+  onSelectedCategoriesChange (selections: any[]) {
+    this.selectedCategoryIds = selections.filter(ctgry => ctgry.checked).map(ctgry => ctgry.id);
   }
 
   onDataLakeIdChange () {this.dataSet.datalakeId = +this.dataSet.datalakeId}
@@ -71,9 +71,9 @@ export class DataSetComponent implements OnInit {
   _validate() {
     return this.dataSet.name && this.dataSet.description && this.dataSet.datalakeId && this.selectedCategoryIds.length
   }
-  onSave () {
+  onSave (calback) {
     if(!this._validate()) return console.log("Invalid Dataset Definition")
-    this.datasetService.post({dataset:this.dataSet, categories:this.selectedCategoryIds})
+    this.datasetService[(isNaN(this.datasetId))?"post":"put"]({dataset:this.dataSet, categories:this.selectedCategoryIds})
       .subscribe(
         res => {console.log(res);this.router.navigate(['onboard/dataset-edit/'+res.dataset.id]);},
         error => {console.log(error)}

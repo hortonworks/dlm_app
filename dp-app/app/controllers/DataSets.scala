@@ -58,10 +58,10 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
   }
 
 
-  def update(dataSetId: String) = Authenticated.async(parse.json) { request =>
+  def update() = Authenticated.async(parse.json) { request =>
     Logger.info("Received update dataSet request")
     request.body.validate[DatasetAndCategoryIds].map { dSetNCtgryIds =>
-      dataSetService.update(dataSetId, dSetNCtgryIds)
+      dataSetService.update(dSetNCtgryIds)
         .map {
           dataSetNCategories => dataSetNCategories match {
             case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
