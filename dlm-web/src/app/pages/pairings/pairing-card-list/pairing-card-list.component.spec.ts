@@ -1,6 +1,7 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { PairingCardListComponent } from './pairing-card-list.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {PairingCardComponent} from '../pairing-card/pairing-card.component';
+import {PairingCardListComponent} from './pairing-card-list.component';
+import {ClusterCardComponent} from '../../../components/cluster-card/cluster-card.component';
 
 describe('PairingCardListComponent', () => {
   let component: PairingCardListComponent;
@@ -8,9 +9,9 @@ describe('PairingCardListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PairingCardListComponent ]
+      declarations: [PairingCardListComponent, PairingCardComponent, ClusterCardComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

@@ -1,6 +1,8 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { ClusterListComponent } from './cluster-list.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ClusterCardComponent} from '../cluster-card/cluster-card.component';
+import {ClusterListComponent} from './cluster-list.component';
+import {CardComponent} from '../../../components/card/card.component';
+import {TranslateModule} from '@ngx-translate/core';
 
 describe('ClusterListComponent', () => {
   let component: ClusterListComponent;
@@ -8,9 +10,10 @@ describe('ClusterListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ClusterListComponent ]
+      imports: [TranslateModule],
+      declarations: [ClusterListComponent, ClusterCardComponent, CardComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

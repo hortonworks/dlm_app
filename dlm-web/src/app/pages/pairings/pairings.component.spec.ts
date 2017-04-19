@@ -1,6 +1,8 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { PairingsComponent } from './pairings.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {TranslateModule, TranslateLoader} from '@ngx-translate/core';
+import {PairingsComponent} from './pairings.component';
+import {RouterTestingModule} from '@angular/router/testing';
+import {MockTranslateLoader} from '../../mocks/mock-translate-loader';
 
 describe('PairingsComponent', () => {
   let component: PairingsComponent;
@@ -8,9 +10,12 @@ describe('PairingsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PairingsComponent ]
+      imports: [TranslateModule.forRoot({
+        loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
+      }), RouterTestingModule],
+      declarations: [PairingsComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

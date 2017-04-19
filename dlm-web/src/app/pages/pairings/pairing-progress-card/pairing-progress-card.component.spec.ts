@@ -1,6 +1,7 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { PairingProgressCardComponent } from './pairing-progress-card.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ClusterCardComponent} from '../../../components/cluster-card/cluster-card.component';
+import {PairingProgressCardComponent} from './pairing-progress-card.component';
+import {Cluster} from '../../../models/cluster.model';
 
 describe('PairingProgressCardComponent', () => {
   let component: PairingProgressCardComponent;
@@ -8,14 +9,16 @@ describe('PairingProgressCardComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PairingProgressCardComponent ]
+      declarations: [PairingProgressCardComponent, ClusterCardComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(PairingProgressCardComponent);
     component = fixture.componentInstance;
+    component.firstCluster = <Cluster>{clusterDetails: {}};
+    component.secondCluster = <Cluster>{clusterDetails: {}};
     fixture.detectChanges();
   });
 

@@ -14,7 +14,7 @@ import { ActionItemType, ActionColumnType } from '../../../components';
   `,
   styleUrls: ['./policy-table.component.scss']
 })
-export class PolicyTableComponent implements AfterViewInit {
+export class PolicyTableComponent implements OnInit {
   columns: any[];
   @Input() policies: Policy[];
   // todo: labels and actions are subject to change
@@ -23,7 +23,7 @@ export class PolicyTableComponent implements AfterViewInit {
     { label: 'Rerun', name: 'RERUN'}
   ];
 
-  ngAfterViewInit() {
+  ngOnInit() {
     this.columns = [
       {prop: 'status'},
       {prop: 'name'},
