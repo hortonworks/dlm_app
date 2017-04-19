@@ -1,9 +1,6 @@
 name := """rest-mock"""
-organization :="com.hortonworks.dataplane"
 
-version := "1.0"
-
-scalaVersion := "2.11.6"
+Common.settings
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.3.11",
