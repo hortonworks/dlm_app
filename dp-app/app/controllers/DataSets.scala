@@ -51,6 +51,7 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     dataSetService.retrieve(dataSetId)
       .map {
         dataSetNCategories => dataSetNCategories match {
+          case Left(errors) if(errors.errors.size > 0 && errors.errors.head.code == "404") => NotFound
           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
           case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
         }

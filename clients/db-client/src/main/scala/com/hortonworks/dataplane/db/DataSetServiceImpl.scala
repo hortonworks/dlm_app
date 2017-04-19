@@ -1,6 +1,6 @@
 package com.hortonworks.dataplane.db
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Dataset, DatasetAndCategories, DatasetAndCategoryIds, Errors}
+import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.db.Webserice.DataSetService
 import com.typesafe.config.Config
 import play.api.libs.json.Json
@@ -76,6 +76,7 @@ class DataSetServiceImpl (config: Config)(implicit ws: WSClient)
   private def mapToDataSetAndCategories(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results" \ "data").validate[DatasetAndCategories].get)
+      case 404 => Left(Errors(Seq(Error("404","Resource not found"))))
       case _ => mapErrors(res)
     }
   }
