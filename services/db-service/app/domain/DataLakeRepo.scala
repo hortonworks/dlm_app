@@ -6,6 +6,7 @@ import javax.inject.Inject
 import com.hortonworks.dataplane.commons.domain.Entities.{Datalake, Location}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.JsValue
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
@@ -49,6 +50,12 @@ class DataLakeRepo @Inject()(
 
   def addLocation(location: Location): Future[Location] = db.run {
     Locations returning Locations += location
+  }
+
+  def updateStatus(datalake: Datalake):Future[Int] = {
+    db.run(Datalakes.filter(_.id === datalake.id)
+      .map(r => (r.state, r.updated))
+      .update(datalake.state, Some(LocalDateTime.now()))).map(r => r)
   }
 
   def getLocations(query: Option[String]): Future[List[Location]] = db.run {

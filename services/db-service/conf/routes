@@ -33,6 +33,7 @@ POST          /datalakes                                                     con
 GET           /datalakes/:datalakeId                                         controllers.Datalakes.load(datalakeId:Long)
 GET           /datalakes/:datalakeId/clusters                                controllers.Clusters.getByDatalakeId(datalakeId:Long)
 DELETE        /datalakes/:datalakeId                                         controllers.Datalakes.delete(datalakeId:Long)
+PATCH         /datalakes/status                                              controllers.Datalakes.updateStatus
 
 #Clusters API
 GET           /clusters                                                      controllers.Clusters.all(datalakeId: Option[Long])
