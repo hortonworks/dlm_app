@@ -25,7 +25,7 @@ class AmbariClusterInterface(private val cluster: Cluster,credentials: Credentia
     // preconditions
     require(cluster.ambariurl.isDefined, "No Ambari URL defined")
     require(credentials.user.isDefined, "No Ambari user defined")
-    require(credentials.user.isDefined, "No Ambari password defined")
+    require(credentials.pass.isDefined, "No Ambari password defined")
     require(
       if (isClusterKerberized)
         cluster.kerberosuser.isDefined && cluster.kerberosticketLocation.isDefined

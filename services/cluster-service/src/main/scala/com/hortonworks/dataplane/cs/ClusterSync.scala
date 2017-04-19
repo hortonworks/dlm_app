@@ -33,12 +33,13 @@ class ClusterSync @Inject()(val actorSystem: ActorSystem,
 
   import scala.concurrent.duration._
 
+
   def initialize = {
     // Start sync Scheduler
     val start =
-      Try(config.getInt("dp.services.cluster.sync.start")).getOrElse(10)
+      Try(config.getInt("dp.services.cluster.sync.start.secs")).getOrElse(10)
     val interval =
-      Try(config.getInt("dp.services.cluster.sync.interval")).getOrElse(5)
+      Try(config.getInt("dp.services.cluster.sync.interval.mins")).getOrElse(5)
     val serviceActor: ActorRef = actorSystem.actorOf(
       Props(classOf[Synchronizer], clusterInterface, wSClient, config),
       "ambari_Synchronizer")

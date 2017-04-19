@@ -8,6 +8,7 @@ import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.http.Webserver
 import com.hortonworks.dataplane.http.routes.AtlasRoute
 import com.typesafe.config.{Config, ConfigFactory}
+import play.api.cache.{CacheApi, EhCacheModule}
 import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcWSClient
 
@@ -17,6 +18,7 @@ object AppModule extends AbstractModule{
   override def configure() = {
     bind(classOf[Config]).toInstance(ConfigFactory.load())
     bind(classOf[ActorSystem]).toInstance(ActorSystem("cluster-service"))
+
   }
 
   @Provides
@@ -80,8 +82,8 @@ object AppModule extends AbstractModule{
 
   @Provides
   @Singleton
-  def provideClusterInterface(lakeService: LakeService, clusterService: ClusterService,
-                              clusterComponentService: ClusterComponentService,clusterHostsServiceImpl: ClusterHostsService,configService: ConfigService):StorageInterface = {
+  def provideStorageInterface(lakeService: LakeService, clusterService: ClusterService,
+                              clusterComponentService: ClusterComponentService, clusterHostsServiceImpl: ClusterHostsService, configService: ConfigService):StorageInterface = {
     new StorageInterfaceImpl(clusterService,lakeService,clusterComponentService,clusterHostsServiceImpl,configService)
   }
 
