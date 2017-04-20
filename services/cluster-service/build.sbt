@@ -4,8 +4,9 @@ version := "1.0"
 
 scalaVersion := "2.11.6"
 
+enablePlugins(JavaAppPackaging)
 
-mainClass in assembly := Some("com.hortonworks.dataplane.cs.ClusterService")
+mainClass in Compile := Some("com.hortonworks.dataplane.cs.ClusterService")
 
 libraryDependencies ++= Seq(
   "com.hortonworks.dataplane" %% "db-client" % "0.1",
@@ -20,24 +21,6 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-testkit" % "2.3.11" % "test",
   "com.hortonworks.dataplane" %% "rest-mock" % "1.0" % "test",
   "org.apache.atlas" % "atlas-client" % "0.8-incubating",
+  "org.apache.atlas" % "atlas-typesystem" % "0.8-incubating",
   "org.scalatest" % "scalatest_2.11" % "3.0.1")
 
-assemblyMergeStrategy in assembly := {
-  case PathList("META-INF", xs @ _*) =>
-    (xs map {_.toLowerCase}) match {
-      case ("io.netty.versions.properties" :: Nil) =>
-        MergeStrategy.last
-      case "services" :: xs =>
-        MergeStrategy.filterDistinctLines
-      case ("manifest.mf" :: Nil) | ("index.list" :: Nil) | ("dependencies" :: Nil) | ("license" :: Nil)
-           | ("license.txt" :: Nil) | ("notice" :: Nil) | ("notice.txt" :: Nil) =>
-        MergeStrategy.discard
-      case ("MANIFEST.MF" :: Nil) | ("INDEX.LIST" :: Nil) | ("DEPENDENCIES" :: Nil) | ("LICENSE" :: Nil)
-           | ("LICENSE.TXT" :: Nil) | ("NOTICE" :: Nil) | ("NOTICE.TXT" :: Nil) =>
-        MergeStrategy.discard
-      case _ => MergeStrategy.deduplicate
-    }
-  case x =>
-    val oldStrategy = (assemblyMergeStrategy in assembly).value
-    oldStrategy(x)
-}
