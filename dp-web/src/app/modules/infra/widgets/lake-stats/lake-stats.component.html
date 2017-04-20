@@ -6,42 +6,42 @@
         {{lake.name}}
       </div>
       <div class="lake-stats__item">
-        <span class="lake-stats__item-label">Description:</span>
-        <span class="lake-stats__item-detail">
+        <span class="lake-stats__item-label mdl-color-text--grey-500">Description:</span>
+        <span class="lake-stats__item-detail mdl-color-text--grey-600">
           {{lake.description}}
         </span>
         </div>
       <div class="lake-stats__item">
-        <span class="lake-stats__item-label">Ambari:</span>
-        <span class="lake-stats__item-detail">
+        <span class="lake-stats__item-label mdl-color-text--grey-500">Ambari:</span>
+        <span class="lake-stats__item-detail mdl-color-text--grey-600">
           {{cCluster.ambariurl}}
         </span>
       </div>
     </div>
     <div class="lake-stats__location-wrapper">
       <div class="lake-stats__location">
-        <div class="lake-stats__location-item">ONPREM</div>
-        <div class="lake-stats__location-item" *ngIf="!!location">{{location.city}}</div>
+        <div class="lake-stats__location-item mdl-color-text--grey-600">ONPREM</div>
+        <div class="lake-stats__location-item mdl-color-text--grey-600" *ngIf="!!location">{{location.city}}</div>
       </div>
     </div>
   </div>
   <div class="lake-stats__health">
     <div class="lake-stats__health-item" *ngIf="!!cHealth">
       <div>
-        <div class="lake-stats__health-label">NODES</div>
-        <div class="lake-stats__health-detail">{{cHealth.nodes}}</div>
+        <div class="lake-stats__health-label mdl-color-text--grey-500">NODES</div>
+        <div class="lake-stats__health-detail mdl-color-text--grey-600">{{cHealth.nodes}}</div>
       </div>
     </div>
     <div class="lake-stats__health-item" *ngIf="!!cHealth">
       <div>
-        <div class="lake-stats__health-label">UP TIME</div>
-        <div class="lake-stats__health-detail">{{doGetUptime(cHealth.status.since)}}</div>
+        <div class="lake-stats__health-label mdl-color-text--grey-500">UP TIME</div>
+        <div class="lake-stats__health-detail mdl-color-text--grey-600">{{doGetUptime(cHealth.status.since)}}</div>
       </div>
     </div>
     <div class="lake-stats__health-item" *ngIf="!!cHealth">
       <div>
-        <div class="lake-stats__health-label">HDFS</div>
-        <div class="lake-stats__health-detail">{{cHealth.size}}</div>
+        <div class="lake-stats__health-label mdl-color-text--grey-500">HDFS</div>
+        <div class="lake-stats__health-detail mdl-color-text--grey-600">{{cHealth.size}}</div>
       </div>
     </div>
     <div class="lake-stats__health-item lake-stats__health-spacer"></div>
