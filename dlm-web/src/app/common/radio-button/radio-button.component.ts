@@ -10,7 +10,14 @@ export const CUSTOM_RADIO_BUTTON_CONTROL_VALUE_ACCESSOR: any = {
 
 @Component({
   selector: 'dlm-radio-button',
-  templateUrl: './radio-button.component.html',
+  template: `
+    <div class="dlm-radio-group">
+      <div *ngFor="let radio of items" class="dlm-radio-item">
+        <input type="radio" [value]="radio.value" [checked]="radio.value === selectedValue">
+        <label class="radio" (click)="selectValue(radio)">{{radio.label}}</label>
+      </div>
+    </div>
+  `,
   styleUrls: ['./radio-button.component.scss'],
   providers: [CUSTOM_RADIO_BUTTON_CONTROL_VALUE_ACCESSOR],
   encapsulation: ViewEncapsulation.None

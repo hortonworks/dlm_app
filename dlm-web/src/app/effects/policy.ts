@@ -9,7 +9,6 @@ import {
   loadPoliciesSuccess, loadPoliciesFail, createPolicyFail, createPolicySuccess, ActionTypes as policyActions
 } from '../actions/policy';
 
-
 @Injectable()
 export class PolicyEffects {
 

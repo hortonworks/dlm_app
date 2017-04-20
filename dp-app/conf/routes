@@ -7,7 +7,7 @@ POST        /auth/in                               controllers.Authentication.si
 
 #api
 
-GET         /api/identity                          controllers.Identity.retrieve
+GET         /api/init                              controllers.Configuration.init
 
 GET         /api/lakes                             controllers.Lakes.list
 POST        /api/lakes                             controllers.Lakes.create
@@ -70,10 +70,15 @@ POST        /api/search/hive                       controllers.AtlasHiveSearch.s
 POST        /api/search/hbase                      controllers.AtlasHbaseSearch.searchHbaseTables
 POST        /api/search/hdfs                       controllers.AtlasHdfsSearch.searchFileSets
 
+#DTSet-Category
+GET         /api/datasets/categories               controllers.DataSets.listAllCategories
+POST        /api/datasets/categories               controllers.DataSets.createCategory
 
 #DataSet
-
+GET         /api/datasets                          controllers.DataSets.list
 POST        /api/datasets                          controllers.DataSets.create
-PUT         /api/datasets                          controllers.DataSets.update
-GET         /api/datasets/:name                    controllers.DataSets.getByname(name,host,datacenter)
-GET         /api/datasets                          controllers.DataSets.getAll(host,datacenter)
+GET         /api/datasets/:datasetId               controllers.DataSets.retrieve(datasetId)
+DELETE      /api/datasets/:datasetId               controllers.DataSets.delete(datasetId)
+PUT         /api/datasets                          controllers.DataSets.update()
+#GET         /api/datasets/:name                    controllers.DataSets.getByname(name,host,datacenter)
+

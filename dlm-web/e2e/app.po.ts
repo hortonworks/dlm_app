@@ -39,7 +39,7 @@ export class OverviewPage extends Page {
 
 }
 
-export class PolicyPage extends Page {
+export class PoliciesPage extends Page {
 
   constructor() {
     super()
@@ -51,5 +51,21 @@ export class PolicyPage extends Page {
     actionButton.click();
 
     this.getMainActionDropDownItem('Policy').click();
+  }
+}
+
+export class PairingsPage extends Page {
+  constructor() {
+    super()
+    new SideNav().navigateTo('Pairings');
+  }
+
+  getAddPairingButton() {
+    return element(by.buttonText('+ Pairing'));
+  }
+
+  clickAddPairing() {
+    const actionButton = this.getAddPairingButton();
+    actionButton.click();
   }
 }

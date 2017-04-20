@@ -4,7 +4,7 @@
       <img class="dataplane-logo-image" src="../../assets/images/ui_logo.svg"/>
     </div>
     <div class="" style="width: 50%;min-width: 500px; padding: 40px;">
-      <div style="margin: 5px 0;" *ngIf="_isAuthInProgress === false && _isAuthSuccessful === false && message">{{message}}</div>
+      <div class="error-message" *ngIf="_isAuthInProgress === false && _isAuthSuccessful === false && message">{{message}}</div>
       <form (submit)="onSubmit($event)" #loginForm="ngForm">
         <div class="">
           <div class="dp-input">
@@ -17,7 +17,8 @@
           </div>
         </div>
         <footer class="" style="">
-          <button type="submit" class="mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect">
+          <div *ngIf="_isAuthInProgress">Auth is in progresss...</div>
+          <button type="submit" class="mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect" [disabled]="_isAuthInProgress">
             Sign In
           </button>
         </footer>

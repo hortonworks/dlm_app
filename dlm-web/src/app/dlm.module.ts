@@ -22,6 +22,7 @@ import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
 import { OverviewComponent } from './pages/overview/overview.component';
 import { PairingsComponent } from './pages/pairings/pairings.component';
+import { CreatePairingComponent } from './pages/pairings/create-pairing/create-pairing.component';
 import { PoliciesComponent } from './pages/policies/policies.component';
 import { JobsComponent } from './pages/jobs/jobs.component';
 import { HelpComponent } from './pages/help/help.component';
@@ -43,7 +44,13 @@ import { RadioButtonComponent } from './common/radio-button/radio-button.compone
 import { CheckboxComponent } from './common/checkbox/checkbox.component';
 import { CheckboxListComponent } from './common/checkbox-list/checkbox-list.component';
 
+import { PairingCardComponent } from './pages/pairings/pairing-card/pairing-card.component';
+import { PairingProgressCardComponent } from './pages/pairings/pairing-progress-card/pairing-progress-card.component';
+import { PairingCardListComponent } from './pages/pairings/pairing-card-list/pairing-card-list.component';
+
 import { TranslateModule } from '@ngx-translate/core';
+import { TableComponent } from './common/table/table.component';
+import { CheckboxColumnComponent, ActionColumnComponent } from './components';
 
 @NgModule({
   imports: [
@@ -61,6 +68,7 @@ import { TranslateModule } from '@ngx-translate/core';
     FormsModule,
     ReactiveFormsModule,
 
+
     RouterModule.forRoot(routes),
     CommonComponentsModule,
     TranslateModule.forRoot()
@@ -74,6 +82,7 @@ import { TranslateModule } from '@ngx-translate/core';
     ClusterListComponent,
     ClusterSearchComponent,
     PairingsComponent,
+    CreatePairingComponent,
 
     PoliciesComponent,
     PolicyTableComponent,
@@ -86,7 +95,13 @@ import { TranslateModule } from '@ngx-translate/core';
     NotFoundRouteComponent,
     RadioButtonComponent,
     CheckboxComponent,
-    CheckboxListComponent
+    CheckboxListComponent,
+    PairingCardComponent,
+    PairingCardListComponent,
+    PairingProgressCardComponent,
+    TableComponent,
+    CheckboxColumnComponent,
+    ActionColumnComponent
   ],
   bootstrap: [DlmComponent],
   providers: [

@@ -13,7 +13,7 @@ export interface State {
   clusters: fromCluster.State;
   policies: fromPolicy.State;
   router: RouterState;
-};
+}
 
 const reducers = {
   clusters: fromCluster.reducer,
@@ -29,4 +29,4 @@ export function reducer(state: any, action: any) {
     return prodReducer(state, action);
   }
   return devReducer(state, action);
-};
+}

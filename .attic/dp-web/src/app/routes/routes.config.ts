@@ -4,6 +4,7 @@ import { SignInComponent } from './sign-in/sign-in.component';
 
 import { AlreadyLoggedInGuard, LoggedInGuard } from '../shared/utils/login-guard';
 import { NotFoundRouteComponent } from './not-found-route/not-found-route.component';
+import {DataSetEditorComponent} from "./dataSet-editor/dataSet-editor.component";
 
 export const routes: Routes = [{
     path: 'sign-in',

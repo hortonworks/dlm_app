@@ -9,8 +9,15 @@ export const SEARCH_INPUT_CONTROL_VALUE_ACCESSOR: any = {
 
 @Component({
   selector: 'dlm-search-input',
-  templateUrl: './search-input.component.html',
   styleUrls: ['./search-input.component.scss'],
+  template: `
+    <div class="row">
+      <div class="col-md-12">
+        <span class="glyphicon glyphicon-search"></span>
+        <input class="form-control" (keyup)="onKeyup($event)" type="search" [value]="value"/>
+      </div>
+    </div>
+  `,
   providers: [SEARCH_INPUT_CONTROL_VALUE_ACCESSOR]
 
 })

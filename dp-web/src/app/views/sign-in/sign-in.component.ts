@@ -4,7 +4,7 @@ import { Subject } from 'rxjs/Rx';
 
 import { Credential } from '../../models/credential';
 import { AuthenticationService } from '../../services/authentication.service';
-import { LakeService } from '../../services/lake.service';
+import { ConfigurationService } from '../../services/configuration.service';
 
 @Component({
   selector: 'dp-sign-in',
@@ -23,7 +23,7 @@ export class SignInComponent {
   constructor(
     private authenticaionService: AuthenticationService,
     private router: Router,
-    private lakeService: LakeService
+    private configService: ConfigurationService,
   ) {
     if (window.location.hash.length > 0 && window.location.hash === '#SESSEXPIRED') {
       this.message = 'SESSIONEXPIRED';
@@ -42,14 +42,18 @@ export class SignInComponent {
       .finally(() => {
         this._isAuthInProgress = false;
       })
+      .flatMap(user => this.configService.retrieve())
       .subscribe(
-        user => {
+        ({lakeWasInitialized}) => {
           // const persona = Persona[user.roles[0]];
 
           this._isAuthSuccessful = true;
-          // TODO: check if is first run
-          // this.lakeService.list()
-          this.router.navigate(['onboard']);
+
+          if(lakeWasInitialized) {
+            this.router.navigate(['/infra']);
+          } else {
+            this.router.navigate(['/onboard']);
+          }
         },
         error => {
           this._isAuthSuccessful = false;

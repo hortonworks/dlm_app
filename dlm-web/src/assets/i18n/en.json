@@ -54,6 +54,15 @@
           "schedule": "On Schedule"
         }
       }
+    },
+    "pairings": {
+      "header": "Pairings",
+      "header_note": "Note: Pairings are bi-directional",
+      "create_button_text": "+ Pairing",
+      "create": {
+        "header": "Create Pairing",
+        "header_note": "Note: Pairings are bi-directional"
+      }
     }
   }
 }

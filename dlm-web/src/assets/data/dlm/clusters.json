@@ -15,9 +15,9 @@
         "status": "SUCCEEDED"
       },
       "clusterDetails": {
-        "name": "primaryCluster",
+        "name": "Primary Cluster",
         "description": "primary",
-        "dataCenter": "virginia",
+        "dataCenter": "Texas",
         "fsEndpoint": "hdfs://localhost:8020",
         "hsEndpoint": "http://localhost:10000",
         "tags": "consumer=consumer@xyz.com,owner=producer@xyz.com",
@@ -47,9 +47,41 @@
         "status": "SUCCEEDED"
       },
       "clusterDetails": {
-        "name": "anotherCluster",
-        "description": "primary",
-        "dataCenter": "virginia",
+        "name": "Secondary Cluster",
+        "description": "Secondary",
+        "dataCenter": "Virginia",
+        "fsEndpoint": "hdfs://localhost:8020",
+        "hsEndpoint": "http://localhost:10000",
+        "tags": "consumer=consumer@xyz.com,owner=producer@xyz.com",
+        "peers":"c1, c2,...",
+        "customProperties": {
+          "dfs.namenode.kerberos.principal": "hdfs/_HOST@YOUR-REALM.COM"
+        },
+        "acl": {
+          "owner": "ambari-qa",
+          "group": "users",
+          "permission": "0x755"
+        },
+        "entityType": "CLUSTER"
+      }
+    },
+    {
+      "id": "devCluster",
+      "ambariUrl": "http://localhost:8082",
+      "userName": "devadmin",
+      "clusterType": "DATA_LAKE",
+      "createdAt": 1490689061725,
+      "volumeGB": 500,
+      "nodesCount": 75,
+      "clusterStatus": {
+        "requestId": "qtp2026718042-1933333",
+        "message": "Submitted",
+        "status": "SUCCEEDED"
+      },
+      "clusterDetails": {
+        "name": "Development Cluster",
+        "description": "For Development",
+        "dataCenter": "California",
         "fsEndpoint": "hdfs://localhost:8020",
         "hsEndpoint": "http://localhost:10000",
         "tags": "consumer=consumer@xyz.com,owner=producer@xyz.com",

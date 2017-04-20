@@ -9,7 +9,18 @@ export const CHECKBOX_LIST_VALUE_ACCESSOR: any = {
 
 @Component({
   selector: 'dlm-checkbox-list',
-  templateUrl: './checkbox-list.component.html',
+  template: `
+    <div class="checkbox-list">
+      <div class="selectAll">
+        <dlm-checkbox (onSelect)="handleSelectAll($event)">
+          {{'common.all' | translate}}
+        </dlm-checkbox>
+      </div>
+      <div *ngFor="let checkbox of items" class="checkbox-list-item" [formGroup]="checkboxGroup">
+        <dlm-checkbox [formControlName]="checkbox">{{checkbox}}</dlm-checkbox>
+      </div>
+    </div>
+  `,
   styleUrls: ['./checkbox-list.component.scss'],
   providers: [CHECKBOX_LIST_VALUE_ACCESSOR],
   encapsulation: ViewEncapsulation.None
