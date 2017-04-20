@@ -5,7 +5,7 @@ object Common {
 
   val settings: Seq[Setting[_]] = Seq(
     organization :="com.hortonworks.dataplane",
-    version := "0.5",
+    version := "1.0",
     scalaVersion := "2.11.8"
   )
 

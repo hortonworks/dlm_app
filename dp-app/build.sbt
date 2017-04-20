@@ -15,10 +15,6 @@ libraryDependencies ++= {
     "io.jsonwebtoken" % "jjwt" % "0.7.0",
     "com.typesafe.play" % "play-json_2.11" % "2.6.0-M3"
 
-    //service dependencies
-//    "com.hortonworks.dataplane" %% "db-client" % "0.1",
-//    "com.hw.dataplane" %% "atlas" % "1.0"
-
   )
 }
 
