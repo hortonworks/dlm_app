@@ -2,5 +2,6 @@ name := """db-client"""
 
 Common.settings
 
-// Change this to another test framework if you prefer
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % "test"
+libraryDependencies +=  "com.hortonworks.dataplane" %% "dp-commons" % "0.5"
+libraryDependencies +=  "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0"

@@ -41,6 +41,14 @@ class Datalakes @Inject()(dataLakeRepo: DataLakeRepo)(
     dataLakeRepo.getLocation(id).map(l => l.map(success(_)).getOrElse(NotFound)).recoverWith(apiError)
   }
 
+  def updateStatus = Action.async(parse.json) { req =>
+    req.body.validate[Datalake].map{ dl =>
+      dataLakeRepo.updateStatus(dl)
+        .map(c => success(Map("updated" -> c)))
+        .recoverWith(apiError)
+    }.getOrElse(Future.successful(BadRequest))
+  }
+
   def deleteLocation(id:Long) = Action.async {
     dataLakeRepo.deleteLocation(id).map(success(_)).recoverWith(apiError)
   }

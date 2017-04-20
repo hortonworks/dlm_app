@@ -33,6 +33,7 @@ POST          /datalakes                                                     con
 GET           /datalakes/:datalakeId                                         controllers.Datalakes.load(datalakeId:Long)
 GET           /datalakes/:datalakeId/clusters                                controllers.Clusters.getByDatalakeId(datalakeId:Long)
 DELETE        /datalakes/:datalakeId                                         controllers.Datalakes.delete(datalakeId:Long)
+PATCH         /datalakes/status                                              controllers.Datalakes.updateStatus
 
 #Clusters API
 GET           /clusters                                                      controllers.Clusters.all(datalakeId: Option[Long])
@@ -40,11 +41,6 @@ POST          /clusters                                                      con
 GET           /clusters/:clusterId                                           controllers.Clusters.load(clusterId:Long)
 DELETE        /clusters/:clusterId                                           controllers.Clusters.delete(clusterId:Long)
 
-#Clusters API
-GET           /cloud/clusters                                                controllers.CloudClusters.all
-POST          /cloud/clusters                                                controllers.CloudClusters.add
-GET           /cloud/clusters/:clusterId                                     controllers.CloudClusters.load(clusterId:Long)
-DELETE        /cloud/clusters/:clusterId                                     controllers.CloudClusters.delete(clusterId:Long)
 
 #Cluster services API
 
@@ -135,3 +131,7 @@ DELETE        /datasets/details/:id                                          con
 GET           /dataassets/:datasetId                                         controllers.DataAssets.allWithDatasetId(datasetId:Long)
 POST          /dataassets                                                    controllers.DataAssets.add
 DELETE        /dataassets/:id                                                controllers.DataAssets.delete(id:Long)
+
+
+#Config
+GET           /configurations/:key                                           controllers.Configs.get(key)

@@ -47,20 +47,24 @@ object Entities {
 
   //Data lake
   case class Location(
-     id: Option[Long] = None,
-     country: String,
-     city: String,
-     latitude: Float,
-     longitude: Float
-   )
+      id: Option[Long] = None,
+      country: String,
+      city: String,
+      latitude: Float,
+      longitude: Float
+  )
+
 
   case class Datalake(
       id: Option[Long] = None,
       name: String,
       description: String,
+      ambariUrl:String,
       location: Option[Long],
       createdBy: Option[Long],
       properties: Option[JsValue],
+      // state should be used to figure out the status of the cluster
+      state:Option[String] = Some("TO_SYNC"),
       created: Option[LocalDateTime] = Some(LocalDateTime.now()),
       updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
@@ -77,8 +81,6 @@ object Entities {
       name: String,
       description: String,
       ambariurl: Option[String] = None,
-      ambariuser: Option[String] = None,
-      ambaripass: Option[String] = None,
       secured: Option[Boolean] = Some(false),
       kerberosuser: Option[String] = None,
       kerberosticketLocation: Option[String] = None,
@@ -87,19 +89,6 @@ object Entities {
       properties: Option[JsValue] = None
   )
 
-  case class CloudCluster(
-      id: Option[Long] = None,
-      name: String,
-      description: String,
-      fqdn: Option[String] = None,
-      ipaddr: Option[String] = None,
-      port: Option[Int] = None,
-      ambariuser: Option[String] = None,
-      ambaripass: Option[String] = None,
-      datalakeid: Option[Long] = None,
-      userid: Option[Long] = None,
-      properties: Option[JsValue] = None
-  )
 
   case class ClusterService(
       id: Option[Long] = None,
@@ -144,65 +133,63 @@ object Entities {
                  updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
   case class ClusterHost(id: Option[Long] = None,
-                          host:String,
-                          status:String,
-                          properties: Option[JsValue] = None,
-                          clusterId:Long
-                         )
-
+                         host: String,
+                         status: String,
+                         properties: Option[JsValue] = None,
+                         clusterId: Long)
 
   case class ClusterProperties(id: Option[Long] = None,
                                properties: Option[JsValue] = None,
-                               clusterId:Long
-                              )
+                               clusterId: Long)
 
-  case class Dataset(id:Option[Long] = None,
-                     name:String,
-                     description:Option[String],
-                     datalakeId:Long,
-                     createdBy:Long,
-                     createdOn:LocalDateTime = LocalDateTime.now(),
-                     lastmodified:LocalDateTime = LocalDateTime.now(),
-                     version:Int = 1,
-                     customprops: Option[JsValue] = None
-                    )
+  case class Dataset(id: Option[Long] = None,
+                     name: String,
+                     description: Option[String],
+                     datalakeId: Long,
+                     createdBy: Long,
+                     createdOn: LocalDateTime = LocalDateTime.now(),
+                     lastmodified: LocalDateTime = LocalDateTime.now(),
+                     version: Int = 1,
+                     customprops: Option[JsValue] = None)
 
-  case class DatasetCategory(categoryId:Long,
-                             datasetId:Long
-                            )
+  case class DatasetCategory(categoryId: Long, datasetId: Long)
 
-  case class UnclassifiedDataset(id:Option[Long],
-                                 name:String,
-                                 description:Option[String],
-                                 datalakeId:Long,
-                                 createdBy:Long,
-                                 createdOn:Option[LocalDateTime] = Some(LocalDateTime.now()),
-                                 lastmodified:Option[LocalDateTime] = Some(LocalDateTime.now()),
-                                 customprops: Option[JsValue] = None
-                                 )
+  case class UnclassifiedDataset(
+      id: Option[Long],
+      name: String,
+      description: Option[String],
+      datalakeId: Long,
+      createdBy: Long,
+      createdOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
+      lastmodified: Option[LocalDateTime] = Some(LocalDateTime.now()),
+      customprops: Option[JsValue] = None)
 
-  case class UnclassifiedDatasetCategory(categoryId:Long,
-                                         unclassifiedDatasetId:Long
-                                        )
+  case class UnclassifiedDatasetCategory(categoryId: Long,
+                                         unclassifiedDatasetId: Long)
 
-  case class DataAsset(id:Option[Long],
-                       assetType:String,
-                       assetName:String,
-                       assetDetails:String,
-                       assetUrl:String,
-                       assetProperties:JsValue,
-                       datasetId:Long
-                      )
+  case class DataAsset(id: Option[Long],
+                       assetType: String,
+                       assetName: String,
+                       assetDetails: String,
+                       assetUrl: String,
+                       assetProperties: JsValue,
+                       datasetId: Long)
 
-  case class DatasetDetails(id:Option[Long],
-                            details:Option[JsValue],
-                            datasetId:Long
-                           )
+  case class DatasetDetails(id: Option[Long],
+                            details: Option[JsValue],
+                            datasetId: Long)
 
+  case class DpConfig(id: Option[Long],
+                      configKey: String,
+                      configValue: String,
+                      active: Option[Boolean] = Some(true),
+                      // Special flag to allow exporting this key into ZK, or another
+                     // should be implemented as a job to export all keys with this flag set
+                       export: Option[Boolean] = Some(true))
 
   // classes as data conatiner for Rest Api
 
-  case class DatasetAndCategories(dataset:Dataset, categories:Seq[Category])
+  case class DatasetAndCategories(dataset: Dataset, categories: Seq[Category])
   case class DatasetAndCategoryIds(dataset: Dataset, categories: Seq[Long])
 
 }
@@ -257,15 +244,11 @@ object JsonFormatters {
   implicit val workspaceWrites = Json.writes[Workspace]
   implicit val workspaceReads = Json.reads[Workspace]
 
-  implicit val couldClusterWrites = Json.writes[CloudCluster]
-  implicit val couldClusterReads = Json.reads[CloudCluster]
-
   implicit val assetWorkspaceWrites = Json.writes[AssetWorkspace]
   implicit val assetWorkspaceReads = Json.reads[AssetWorkspace]
 
   implicit val clusterHostWrites = Json.writes[ClusterHost]
   implicit val clusterHostReads = Json.reads[ClusterHost]
-
 
   implicit val clusterPropertiesWrites = Json.writes[ClusterProperties]
   implicit val clusterPropertiesReads = Json.reads[ClusterProperties]
@@ -279,8 +262,10 @@ object JsonFormatters {
   implicit val unclassifiedDatasetWrites = Json.writes[UnclassifiedDataset]
   implicit val unclassifiedDatasetReads = Json.reads[UnclassifiedDataset]
 
-  implicit val unclassifiedDatasetCategoryWrites = Json.writes[UnclassifiedDatasetCategory]
-  implicit val unclassifiedDatasetCategoryReads = Json.reads[UnclassifiedDatasetCategory]
+  implicit val unclassifiedDatasetCategoryWrites =
+    Json.writes[UnclassifiedDatasetCategory]
+  implicit val unclassifiedDatasetCategoryReads =
+    Json.reads[UnclassifiedDatasetCategory]
 
   implicit val dataAssetWrites = Json.writes[DataAsset]
   implicit val dataAssetReads = Json.reads[DataAsset]
@@ -290,9 +275,13 @@ object JsonFormatters {
 
   // classes as data conatiner for Rest Api
 
-  implicit val datasetResponseReads= Json.reads[DatasetAndCategories]
-  implicit val datasetResponseWrites= Json.writes[DatasetAndCategories]
+  implicit val datasetResponseReads = Json.reads[DatasetAndCategories]
+  implicit val datasetResponseWrites = Json.writes[DatasetAndCategories]
 
-  implicit val datasetRequestReads= Json.reads[DatasetAndCategoryIds]
-  implicit val datasetRequestWrites= Json.writes[DatasetAndCategoryIds]
+  implicit val datasetRequestReads = Json.reads[DatasetAndCategoryIds]
+  implicit val datasetRequestWrites = Json.writes[DatasetAndCategoryIds]
+
+  implicit val configReads = Json.reads[DpConfig]
+  implicit val configWrites = Json.writes[DpConfig]
+
 }

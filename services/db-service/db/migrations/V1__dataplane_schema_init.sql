@@ -47,11 +47,14 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_datalakes (
   id          BIGSERIAL PRIMARY KEY,
   name        VARCHAR(255)                                  NOT NULL UNIQUE,
   description TEXT,
+  ambariurl   VARCHAR(255) NOT NULL ,
   locationid  BIGINT REFERENCES dataplane.dp_locations (id) NOT NULL,
   createdby   BIGINT REFERENCES dataplane.dp_users (id)     NOT NULL,
   properties  JSONB,
+  state       VARCHAR(32) NOT NULL DEFAULT 'TO_SYNC',
   created     TIMESTAMP DEFAULT now(),
-  updated     TIMESTAMP DEFAULT now()
+  updated     TIMESTAMP DEFAULT now(),
+  CHECK (state IN ('TO_SYNC', 'SYNC_IN_PROGRESS', 'SYNCED', 'SYNC_ERROR'))
 );
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_clusters (
@@ -59,8 +62,6 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_clusters (
   name                   VARCHAR(255),
   description            TEXT,
   ambariurl              VARCHAR(255),
-  ambariuser             VARCHAR(255),
-  ambaripass             VARCHAR(255),
   secured                BOOLEAN DEFAULT FALSE,
   kerberosuser           VARCHAR(255),
   kerberosticketLocation TEXT,
@@ -69,20 +70,6 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_clusters (
   properties             JSONB
 );
 
-
-CREATE TABLE IF NOT EXISTS dataplane.dp_cloud_clusters (
-  id          BIGSERIAL PRIMARY KEY,
-  name        VARCHAR(255),
-  description TEXT,
-  fqdn        VARCHAR(255),
-  ipaddr      VARCHAR(39),
-  port        INT,
-  ambariuser  VARCHAR(255),
-  ambaripass  VARCHAR(255),
-  datalakeid  BIGINT REFERENCES dataplane.dp_datalakes (id),
-  userid      BIGINT REFERENCES dataplane.dp_users (id)            NOT NULL, -- The user who created the cluster
-  properties  JSONB
-);
 
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_services (
@@ -225,5 +212,5 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_configs (
   configkey   VARCHAR(255)          NOT NULL  UNIQUE,
   configvalue TEXT                  NOT NULL,
   active      BOOLEAN DEFAULT TRUE  NOT NULL,
-  export      BOOLEAN DEFAULT FALSE NOT NULL
-);
+  export      BOOLEAN DEFAULT TRUE  NOT NULL
+)

@@ -76,6 +76,8 @@ object   Webserice {
     def retrieve(datalakeId: String): Future[Either[Errors, Datalake]]
     def update(datalakeId: String,
                datalake: Datalake): Future[Either[Errors, Datalake]]
+    def updateStatus(datalake: Datalake):Future[Either[Errors, Boolean]]
+
     def delete(datalakeId: String): Future[Either[Errors, Datalake]]
 
   }
@@ -114,6 +116,11 @@ object   Webserice {
     def getHostsByCluster(clusterId:Long):Future[Either[Errors,Seq[ClusterHost]]]
     def createOrUpdate(host:ClusterHost):Future[Option[Errors]]
 
+  }
+
+
+  trait ConfigService extends DbClientService {
+    def getConfig(key:String):Future[Option[DpConfig]]
   }
 
 

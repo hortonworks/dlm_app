@@ -5,7 +5,6 @@ import javax.inject._
 import com.hortonworks.dataplane.commons.domain.Entities.User
 import domain.UserRepo
 import org.mindrot.jbcrypt.BCrypt
-import play.api.libs.json.Json
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}

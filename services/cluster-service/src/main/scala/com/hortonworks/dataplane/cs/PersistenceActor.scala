@@ -28,7 +28,7 @@ private sealed case class ServiceExists(clusterData: ClusterData,
                                         boolean: Boolean)
 private sealed case class UpdateResult(boolean: Boolean)
 
-class PersistenceActor(clusterInterface: ClusterInterface) extends Actor {
+class PersistenceActor(clusterInterface: StorageInterface) extends Actor {
 
   val logger = Logger(classOf[PersistenceActor])
 
@@ -132,7 +132,9 @@ class PersistenceActor(clusterInterface: ClusterInterface) extends Actor {
     case UpdateResult(data) =>
       logger.info(s"Updated cluster service info -  $data")
 
-    case Failure(e) => logger.error(s"Persistence Error $e")
+    case Failure(e) =>
+      logger.error(s"Persistence Error $e")
+
 
     case Errors(errors) =>
       logger.error(s"Error updating cluster info $errors")

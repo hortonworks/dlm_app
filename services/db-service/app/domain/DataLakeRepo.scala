@@ -6,6 +6,7 @@ import javax.inject.Inject
 import com.hortonworks.dataplane.commons.domain.Entities.{Datalake, Location}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.JsValue
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
@@ -44,16 +45,17 @@ class DataLakeRepo @Inject()(
   }
 
   def insert(datalake: Datalake): Future[Datalake] = db.run {
-    val toPersist = Datalake(name = datalake.name,
-                             description = datalake.description,
-                             location = datalake.location,
-                             createdBy = datalake.createdBy,
-                             properties = datalake.properties)
-    Datalakes returning Datalakes += toPersist
+    Datalakes returning Datalakes += datalake
   }
 
   def addLocation(location: Location): Future[Location] = db.run {
     Locations returning Locations += location
+  }
+
+  def updateStatus(datalake: Datalake):Future[Int] = {
+    db.run(Datalakes.filter(_.id === datalake.id)
+      .map(r => (r.state, r.updated))
+      .update(datalake.state, Some(LocalDateTime.now()))).map(r => r)
   }
 
   def getLocations(query: Option[String]): Future[List[Location]] = db.run {
@@ -87,6 +89,8 @@ class DataLakeRepo @Inject()(
 
     def description = column[String]("description")
 
+    def ambariUrl = column[String]("ambariurl")
+
     def locationId = column[Option[Long]]("locationid")
 
     def userId = column[Option[Long]]("createdby")
@@ -97,12 +101,14 @@ class DataLakeRepo @Inject()(
 
     def properties = column[Option[JsValue]]("properties")
 
+    def state = column[Option[String]]("state")
+
     def location = foreignKey("location", locationId, Locations)(_.id)
 
     def createdBy = foreignKey("user", userId, userRepo.Users)(_.id)
 
     def * =
-      (id, name, description, locationId, userId, properties, created, updated) <> ((Datalake.apply _).tupled, Datalake.unapply)
+      (id, name, description,ambariUrl, locationId, userId, properties,state, created, updated) <> ((Datalake.apply _).tupled, Datalake.unapply)
   }
 
 }
