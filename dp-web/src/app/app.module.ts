@@ -17,6 +17,7 @@ import { LakeService } from './services/lake.service';
 import { LocationService } from './services/location.service';
 import { ClusterService } from './services/cluster.service';
 import { IdentityService } from './services/identity.service';
+import { ConfigurationService } from './services/configuration.service';
 import { MdlService } from './services/mdl.service';
 import { HeaderComponent } from './widgets/header/header.component';
 import { MdlDirective } from './directives/mdl.directive';
@@ -50,6 +51,7 @@ import {DataSetService} from "./services/dataset.service";
     LocationService,
     ClusterService,
     IdentityService,
+    ConfigurationService,
 
     MdlService,
 

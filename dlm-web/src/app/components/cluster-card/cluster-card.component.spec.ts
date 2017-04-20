@@ -1,6 +1,7 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { ClusterCardComponent } from './cluster-card.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
+import {ClusterCardComponent} from './cluster-card.component';
+import {MockTranslateLoader} from '../../mocks/mock-translate-loader';
 
 describe('ClusterCardComponent', () => {
   let component: ClusterCardComponent;
@@ -8,9 +9,12 @@ describe('ClusterCardComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ClusterCardComponent ]
+      imports: [TranslateModule.forRoot({
+        loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
+      })],
+      declarations: [ClusterCardComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

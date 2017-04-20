@@ -1,6 +1,7 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { PairingCardComponent } from './pairing-card.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ClusterCardComponent} from '../../../components/cluster-card/cluster-card.component';
+import {PairingCardComponent} from './pairing-card.component';
+import {Cluster} from '../../../models/cluster.model';
 
 describe('PairingCardComponent', () => {
   let component: PairingCardComponent;
@@ -8,14 +9,15 @@ describe('PairingCardComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PairingCardComponent ]
+      declarations: [PairingCardComponent, ClusterCardComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(PairingCardComponent);
     component = fixture.componentInstance;
+    component.cluster = <Cluster>{clusterDetails: {}};
     fixture.detectChanges();
   });
 

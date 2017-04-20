@@ -73,11 +73,11 @@ export class LakesComponent implements OnInit {
         this._isClusterValidateInProgress = true;
         this._isClusterValidateSuccessful = false;
       })
+      .map(this.doCleanClusterUri)
       .flatMap(clusterUrl => this.clusterService.validate(clusterUrl))
       .subscribe(
         isValid => {
 
-        console.log(isValid)
           this._isClusterValidateInProgress = false;
           this._isClusterValidateSuccessful = isValid;
         },
@@ -115,9 +115,25 @@ export class LakesComponent implements OnInit {
     this.doVerifyCluster();
   }
 
+  doCleanClusterUri(clusterUri: string): string {
+    // http://stackoverflow.com/a/26434126/640012
+    //  create an anchor element (note: no need to append this element to the document)
+    let link = document.createElement('a');
+    //  set href to any path
+    link.setAttribute('href', clusterUri);
+
+    const cleanedUri = `${link.protocol || 'http:'}//${link.hostname}:${link.port || '80'}`;
+    // cleanup for garbage collection
+    // prevent leaks
+    link = null;
+
+    return cleanedUri;
+  }
+
   onCreate() {
     this.lakeService.insert(this.lake)
       .flatMap(lake => {
+        this.cluster.ambariurl = this.doCleanClusterUri(this.cluster.ambariurl);
         this.cluster.name = `cluster of lake ${lake.name}`;
         this.cluster.datalakeid = lake.id;
         this.cluster.description = `Cluster of lake ${lake.id}`;

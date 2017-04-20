@@ -1,6 +1,7 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { ClusterSearchComponent } from './cluster-search.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {SearchInputComponent} from '../../../components/search-input/search-input.component';
+import {DropdownComponent} from '../../../components/dropdown/dropdown.component';
+import {ClusterSearchComponent} from './cluster-search.component';
 
 describe('ClusterSearchComponent', () => {
   let component: ClusterSearchComponent;
@@ -8,9 +9,9 @@ describe('ClusterSearchComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ClusterSearchComponent ]
+      declarations: [ClusterSearchComponent, SearchInputComponent, DropdownComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
