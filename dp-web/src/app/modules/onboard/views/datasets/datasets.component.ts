@@ -71,7 +71,7 @@ export class DataSetComponent implements OnInit {
   _validate() {
     return this.dataSet.name && this.dataSet.description && this.dataSet.datalakeId && this.selectedCategoryIds.length
   }
-  onSave (calback) {
+  onSave () {
     if(!this._validate()) return console.log("Invalid Dataset Definition")
     this.datasetService[(isNaN(this.datasetId))?"post":"put"]({dataset:this.dataSet, categories:this.selectedCategoryIds})
       .subscribe(
