@@ -107,6 +107,7 @@ object   Webserice {
 
     def create(clusterService: ClusterData): Future[Either[Errors, ClusterData]]
     def getServiceByName(clusterId:Long,serviceName:String):Future[Either[Errors, ClusterData]]
+    def getServicesByName(serviceName:String):Future[Either[Errors, Seq[ClusterData]]]
     def updateServiceByName(clusterData: ClusterData):Future[Either[Errors, Boolean]]
 
   }

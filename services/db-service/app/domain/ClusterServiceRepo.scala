@@ -34,6 +34,9 @@ class ClusterServiceRepo @Inject()(
     db.run(Services.filter(_.servicename === serviceName).filter(_.clusterid === clusterId).result.headOption)
   }
 
+  def findByServiceName(serviceName: String) =  {
+    db.run(Services.filter(_.servicename === serviceName).to[List].result)
+  }
 
   def findByIdAndDatalake(serviceId: Long, datalakeId: Long) = {
     db.run(Services.filter(_.id === serviceId).filter(_.datalakeid === datalakeId).result.headOption)
