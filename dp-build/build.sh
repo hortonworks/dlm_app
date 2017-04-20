@@ -60,9 +60,11 @@ build_dlm_web() {
 
 
 build_cluster_service() {
-	log "Building cluster-service"
-	pushd ..
-	sbt ";project clusterService ;assembly"
+	log "Building cluster service"
+	rm -rf ../services/cluster-service/build
+	mkdir ../services/cluster-service/build
+	pushd ../services/cluster-service
+	unpack_for_docker_deploy build/tmp_dp-cluster-service build/dp-cluster-service
 	popd
 }
 

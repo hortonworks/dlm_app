@@ -1,4 +1,6 @@
 FROM openjdk:8-jre
 
-COPY target/scala-2.11/cluster-service-assembly-1.0.jar /usr/dp-cluster-service/
-CMD ["java", "-Ddp.services.db.service.uri=http://dp-db-service:9000", "-jar", "/usr/dp-cluster-service/cluster-service-assembly-1.0.jar"]
+COPY build/dp-cluster-service /usr/dp-cluster-service
+EXPOSE 9009
+
+ENTRYPOINT ["/usr/dp-cluster-service/bin/cluster-service"]
