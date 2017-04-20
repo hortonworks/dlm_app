@@ -5,7 +5,6 @@ import { Subject, Observable } from 'rxjs/Rx';
 
 import { Lake } from '../../../../models/lake';
 import { Location } from '../../../../models/location';
-import { Cluster } from '../../../../models/cluster';
 import { LakeService } from '../../../../services/lake.service';
 import { ClusterService } from '../../../../services/cluster.service';
 import { LocationService } from '../../../../services/location.service';
@@ -18,7 +17,6 @@ import { LocationService } from '../../../../services/location.service';
 export class LakesComponent implements OnInit {
 
   lake: Lake = new Lake();
-  cluster: Cluster = new Cluster();
   location: Location = new Location();
   isClusterVerified: boolean = false;
 
@@ -39,8 +37,8 @@ export class LakesComponent implements OnInit {
   constructor(
     private router: Router,
     private lakeService: LakeService,
-    private locationService: LocationService,
     private clusterService: ClusterService,
+    private locationService: LocationService,
   ) { }
 
   ngOnInit() {
@@ -108,7 +106,7 @@ export class LakesComponent implements OnInit {
   }
 
   doVerifyCluster() {
-    this.rxClusterValidate.next(this.cluster.ambariurl);
+    this.rxClusterValidate.next(this.lake.ambariurl);
   }
 
   onUpdateCluster(event) {
@@ -131,16 +129,11 @@ export class LakesComponent implements OnInit {
   }
 
   onCreate() {
-    this.lakeService.insert(this.lake)
-      .flatMap(lake => {
-        this.cluster.ambariurl = this.doCleanClusterUri(this.cluster.ambariurl);
-        this.cluster.name = `cluster of lake ${lake.name}`;
-        this.cluster.datalakeid = lake.id;
-        this.cluster.description = `Cluster of lake ${lake.id}`;
-        this.cluster.ambariuser = 'admin';
-        this.cluster.ambaripass = 'admin';
-        return this.clusterService.insert(this.cluster);
-      })
+    const lake = Object.assign({}, this.lake, {
+      state: 'TO_SYNC',
+      ambariurl: this.doCleanClusterUri(this.lake.ambariurl)
+    });
+    this.lakeService.insert(lake)
       .subscribe(
         () => {
           this.router.navigate(['infra', {

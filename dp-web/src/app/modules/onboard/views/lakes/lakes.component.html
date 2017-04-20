@@ -29,7 +29,7 @@
     </div>
     <div class="dp-input">
       <label for="uri" style="display: block;">Cluster URI</label>
-      <input class="" type="text" placeholder="URI" name="uri" id="uri" [(ngModel)]="cluster.ambariurl" required (input)="onUpdateCluster($event)"/>
+      <input class="" type="text" placeholder="URI" name="uri" id="uri" [(ngModel)]="lake.ambariurl" required (input)="onUpdateCluster($event)"/>
       <i class="fa fa-times dp-input__icon" aria-hidden="true" *ngIf="_isClusterValidateSuccessful === false && _isClusterValidateInProgress === false"></i>
       <i class="fa fa-check dp-input__icon" aria-hidden="true" *ngIf="_isClusterValidateSuccessful && _isClusterValidateInProgress === false"></i>
       <i class="fa fa-spinner dp-input__icon" aria-hidden="true" *ngIf="_isClusterValidateInProgress"></i>

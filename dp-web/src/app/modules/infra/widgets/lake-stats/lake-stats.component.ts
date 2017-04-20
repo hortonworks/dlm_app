@@ -32,9 +32,15 @@ export class LakeStatsComponent implements OnInit {
 
   ngOnInit() {
     this.cCluster = this.clusters[0];
+    if(!this.cCluster) {
+      this.cCluster = new Cluster();
+      this.cCluster.ambariurl = this.lake.ambariurl;
+    }
 
-    this.clusterService.retrieveHealth(this.cCluster.id)
-      .subscribe(health => this.cHealth = health);
+    if(this.cCluster && this.cCluster.id) {
+      this.clusterService.retrieveHealth(this.cCluster.id)
+        .subscribe(health => this.cHealth = health);
+    }
 
     this.locationService.retrieve(this.lake.location)
       .subscribe(location => this.location = location);
