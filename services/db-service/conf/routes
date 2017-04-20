@@ -53,6 +53,7 @@ GET           /clusters/:datalakeId/services                                 con
 POST          /cluster/services                                              controllers.ClusterServices.addWithCluster
 POST          /datalake/services                                             controllers.ClusterServices.addWithDatalake
 GET           /clusters/:clusterId/service/:serviceName                      controllers.ClusterServices.loadWithClusterAndName(clusterId:Long,serviceName:String)
+GET           /services/:serviceName                                         controllers.ClusterServices.loadWithServiceName(serviceName:String)
 DELETE        /services/:serviceId                                           controllers.ClusterServices.delete(serviceId:Long)
 PUT           /clusters/services                                             controllers.ClusterServices.updateWithCluster
 

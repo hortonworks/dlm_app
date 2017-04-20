@@ -63,6 +63,11 @@ class ClusterServices @Inject()(csr: ClusterServiceRepo)(
         ).recoverWith(apiError)
     }
 
+  def loadWithServiceName(serviceName: String) = Action.async {
+      val future = csr.findByServiceName(serviceName)
+      future.map(cs => success(cs.map(c => linkData(c, makeClusterLink(c))))).recoverWith(apiError)
+    }
+
   def loadWithCluster(serviceId: Long, clusterId: Long) =
     Action.async(parse.json) { req =>
       csr
