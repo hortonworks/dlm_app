@@ -22,6 +22,9 @@ import { MdlService } from './services/mdl.service';
 import { HeaderComponent } from './widgets/header/header.component';
 import { MdlDirective } from './directives/mdl.directive';
 
+import {CategoryService} from "./services/category.service";
+import {DataSetService} from "./services/dataset.service";
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -42,6 +45,8 @@ import { MdlDirective } from './directives/mdl.directive';
   bootstrap: [AppComponent],
   providers: [
     AuthenticationService,
+    CategoryService,
+    DataSetService,
     LakeService,
     LocationService,
     ClusterService,
