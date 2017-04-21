@@ -34,7 +34,7 @@ export class LakeStatsComponent implements OnInit {
     this.cCluster = this.clusters[0];
     if(!this.cCluster) {
       this.cCluster = new Cluster();
-      this.cCluster.ambariurl = this.lake.ambariurl;
+      this.cCluster.ambariurl = this.lake.ambariUrl;
     }
 
     if(this.cCluster && this.cCluster.id) {

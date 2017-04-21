@@ -8,6 +8,6 @@ export class Lake {
   created?: string;
   updated?: string;
 
-  ambariurl: string;
+  ambariUrl: string;
   state?: string;
 }

@@ -106,7 +106,7 @@ export class LakesComponent implements OnInit {
   }
 
   doVerifyCluster() {
-    this.rxClusterValidate.next(this.lake.ambariurl);
+    this.rxClusterValidate.next(this.lake.ambariUrl);
   }
 
   onUpdateCluster(event) {
@@ -131,7 +131,7 @@ export class LakesComponent implements OnInit {
   onCreate() {
     const lake = Object.assign({}, this.lake, {
       state: 'TO_SYNC',
-      ambariurl: this.doCleanClusterUri(this.lake.ambariurl)
+      ambariurl: this.doCleanClusterUri(this.lake.ambariUrl)
     });
     this.lakeService.insert(lake)
       .subscribe(
