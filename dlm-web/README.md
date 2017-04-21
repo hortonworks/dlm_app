@@ -2,6 +2,9 @@
 
 This project was generated with [angular-cli](https://github.com/angular/angular-cli).
 
+## NodeJS Requirement
+You need NodeJS to build and run dlm-web (tested against NodeJS 6.10.2: https://nodejs.org/en/download/)
+
 ## Installing NPM packages
 If you don't have `yarn` package manager already, install it via `npm -g install yarn`
 
