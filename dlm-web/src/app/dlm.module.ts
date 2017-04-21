@@ -30,6 +30,7 @@ import { NavbarComponent } from './common/navbar/navbar.component';
 
 import { httpServiceProvider } from './services/http.service';
 import { CommonComponentsModule } from './components/common-components.module';
+import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.component';
 import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route.component';
 
 import { ClustersComponent } from './pages/clusters/clusters.component';
@@ -83,6 +84,7 @@ import { CheckboxColumnComponent, ActionColumnComponent } from './components';
     ClusterSearchComponent,
     PairingsComponent,
     CreatePairingComponent,
+    BreadcrumbComponent,
 
     PoliciesComponent,
     PolicyTableComponent,

@@ -11,6 +11,14 @@ import { CreatePairingComponent } from '../pages/pairings/create-pairing/create-
 
 import { NotFoundRouteComponent } from './not-found-route/not-found-route.component';
 
+/**
+ * Parent-child routes should be defined in such way:
+ * - parent should have only `path` and no `component`
+ * - first child should have path `''` and pathMatch `'full'`. This route should contain `component` with list of all models
+ * - other child routes may be any you need
+ *
+ * As example see routes 'Policies' and 'Pairings'
+ */
 export const routes: Routes = [{
     path: '',
     redirectTo: '/overview',
@@ -25,19 +33,31 @@ export const routes: Routes = [{
   },
   {
     path: 'pairings',
-    component: PairingsComponent
-  },
-  {
-    path: 'pairings/create',
-    component: CreatePairingComponent
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: PairingsComponent
+      },
+      {
+        path: 'create',
+        component: CreatePairingComponent
+      }
+    ]
   },
   {
     path: 'policies',
-    component: PoliciesComponent
-  },
-  {
-    path: 'policies/create',
-    component: CreatePolicyComponent
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        component: PoliciesComponent
+      },
+      {
+        path: 'create',
+        component: CreatePolicyComponent
+      }
+    ]
   },
   {
     path: 'jobs',
