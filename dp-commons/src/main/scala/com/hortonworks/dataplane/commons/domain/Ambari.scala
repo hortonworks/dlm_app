@@ -4,10 +4,12 @@ import play.api.libs.json.Json
 
 /**
   * Ambari Specific Data models
-  * The names of properties is mapped to those returned from
+  * The names of properties are mapped to those returned from
   * Ambari API's
   */
 object Ambari {
+
+  case class AmbariEndpoint(url:String)
 
   case class DiskInfo(
       available: Option[String],
@@ -68,5 +70,7 @@ object Ambari {
   implicit val clusterHealthReads = Json.reads[ClusterHost]
   implicit val nameNodeWrites = Json.writes[NameNodeInfo]
   implicit val nameNodeReads = Json.reads[NameNodeInfo]
+  implicit val endPointWrites = Json.writes[AmbariEndpoint]
+  implicit val endPointReads = Json.reads[AmbariEndpoint]
 
 }

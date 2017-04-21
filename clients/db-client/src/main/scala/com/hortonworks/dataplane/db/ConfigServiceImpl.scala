@@ -25,7 +25,7 @@ class ConfigServiceImpl(config: Config)(implicit ws: WSClient)
       .recoverWith {
         case e: Exception =>
           logger.error(
-            s"Error while loading config key ${key}, will return none")
+            s"Error while loading config key ${key}, will return none",e)
           Future.successful(None)
       }
   }

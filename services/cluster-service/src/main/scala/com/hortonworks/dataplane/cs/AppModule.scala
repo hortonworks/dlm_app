@@ -6,7 +6,7 @@ import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, LakeService}
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.http.Webserver
-import com.hortonworks.dataplane.http.routes.AtlasRoute
+import com.hortonworks.dataplane.http.routes.{AtlasRoute, StatusRoute}
 import com.typesafe.config.{Config, ConfigFactory}
 import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcWSClient
@@ -74,8 +74,15 @@ object AppModule extends AbstractModule{
 
   @Provides
   @Singleton
-  def provideWebservice(actorSystem:ActorSystem,materializer: ActorMaterializer,configuration: Config,atlasRoute: AtlasRoute):Webserver = {
-     new Webserver(actorSystem,materializer,configuration,atlasRoute.route)
+  def provideStatusRoute(storageInterface: StorageInterface,config: Config,wSClient: WSClient):StatusRoute = {
+    new StatusRoute(wSClient,storageInterface,config)
+  }
+
+  @Provides
+  @Singleton
+  def provideWebservice(actorSystem:ActorSystem,materializer: ActorMaterializer,configuration: Config,atlasRoute: AtlasRoute,statusRoute: StatusRoute):Webserver = {
+     import akka.http.scaladsl.server.Directives._
+     new Webserver(actorSystem,materializer,configuration,atlasRoute.route ~ statusRoute.route)
   }
 
 

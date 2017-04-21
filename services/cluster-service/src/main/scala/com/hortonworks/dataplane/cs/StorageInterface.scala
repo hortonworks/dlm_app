@@ -136,7 +136,11 @@ class StorageInterfaceImpl @Inject()(
   }
 
   override def getConfiguration(key: String): Future[Option[String]] = {
-    configService.getConfig(key).map(v => v.map(o => o.configValue))
+    configService.getConfig(key).map(v => v.map(o => o.configValue)).recoverWith {
+      case e: Exception =>
+      logger.error("Error when getting configuration",e)
+      Future.successful(None)
+    }
   }
 
   override def addClusters(clusters: Seq[Cluster]): Future[Seq[Cluster]] = {
