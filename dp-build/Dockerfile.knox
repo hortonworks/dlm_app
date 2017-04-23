@@ -12,5 +12,8 @@ RUN chown -R knox /usr/hdp/current/knox-server/bin/launch-knox.sh
 ADD knox-scripts/setup-master-password.sh /usr/hdp/current/knox-server/bin/
 RUN chown -R knox /usr/hdp/current/knox-server/bin/setup-master-password.sh
 
+ADD knox-scripts/wait_for_keystore_file.sh /usr/hdp/current/knox-server/bin/
+RUN chown -R knox /usr/hdp/current/knox-server/bin/wait_for_keystore_file.sh
+
 USER knox
 WORKDIR /usr/hdp/current/knox-server/bin

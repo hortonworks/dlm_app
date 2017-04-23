@@ -22,6 +22,8 @@ services:
     image: hortonworks/dp-app
     ports:
         - "80:80"
+    volumes:
+        - ./certs:/usr/dp-app/conf/certs
     depends_on:
         - dp-db-service
         - dp-database
