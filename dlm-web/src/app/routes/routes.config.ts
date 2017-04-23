@@ -7,7 +7,7 @@ import { PoliciesComponent } from '../pages/policies/policies.component';
 import { JobsComponent } from '../pages/jobs/jobs.component';
 import { HelpComponent } from '../pages/help/help.component';
 import { CreatePolicyComponent } from '../pages/policies/subpages/create-policy/create-policy.component';
-import { CreatePairingComponent } from '../pages/pairings/create-pairing/create-pairing.component';
+import { CreatePairingComponent } from '../pages/pairings/subpages/create-pairing/create-pairing.component';
 
 import { NotFoundRouteComponent } from './not-found-route/not-found-route.component';
 

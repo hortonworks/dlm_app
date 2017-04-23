@@ -1,0 +1,3 @@
+<div *ngFor="let pairing of pairings" class="pairing-item">
+  <dlm-pairing-card [pairing]="pairing" (onListUnpair)="onListUnpair($event)"></dlm-pairing-card>
+</div>

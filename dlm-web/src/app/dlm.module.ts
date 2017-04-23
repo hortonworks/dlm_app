@@ -11,18 +11,20 @@ import { reducer } from './reducers';
 import { RouterModule } from '@angular/router';
 
 import { EffectsModule } from '@ngrx/effects';
-import { ClusterEffects } from './effects/cluster';
+import { ClusterEffects } from './effects/cluster.effect';
 import { routes } from './routes/routes.config';
-import { PolicyEffects } from './effects/policy';
+import { PolicyEffects } from './effects/policy.effect';
+import { PairingEffects } from './effects/pairing.effect';
 
 import { ClusterService } from './services/cluster.service';
 import { PolicyService } from './services/policy.service';
+import { PairingService } from './services/pairing.service';
 import { JobService } from './services/job.service';
 import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
 import { OverviewComponent } from './pages/overview/overview.component';
 import { PairingsComponent } from './pages/pairings/pairings.component';
-import { CreatePairingComponent } from './pages/pairings/create-pairing/create-pairing.component';
+import { CreatePairingComponent } from './pages/pairings/subpages/create-pairing/create-pairing.component';
 import { PoliciesComponent } from './pages/policies/policies.component';
 import { JobsComponent } from './pages/jobs/jobs.component';
 import { HelpComponent } from './pages/help/help.component';
@@ -45,9 +47,11 @@ import { RadioButtonComponent } from './common/radio-button/radio-button.compone
 import { CheckboxComponent } from './common/checkbox/checkbox.component';
 import { CheckboxListComponent } from './common/checkbox-list/checkbox-list.component';
 
-import { PairingCardComponent } from './pages/pairings/pairing-card/pairing-card.component';
-import { PairingProgressCardComponent } from './pages/pairings/pairing-progress-card/pairing-progress-card.component';
-import { PairingCardListComponent } from './pages/pairings/pairing-card-list/pairing-card-list.component';
+import { PairingCardComponent } from './pages/pairings/components/pairing-card/pairing-card.component';
+import { PairingCardListComponent } from './pages/pairings/components/pairing-card-list/pairing-card-list.component';
+import { CreatePairingCardComponent } from './pages/pairings/components/create-pairing-card/create-pairing-card.component';
+import { PairingProgressCardComponent } from './pages/pairings/components/pairing-progress-card/pairing-progress-card.component';
+import { CreatePairingCardListComponent } from './pages/pairings/components/create-pairing-card-list/create-pairing-card-list.component';
 
 import { TranslateModule } from '@ngx-translate/core';
 import { TableComponent } from './common/table/table.component';
@@ -62,13 +66,13 @@ import { CheckboxColumnComponent, ActionColumnComponent } from './components';
     RouterStoreModule.connectRouter(),
     EffectsModule.run(ClusterEffects),
     EffectsModule.run(PolicyEffects),
+    EffectsModule.run(PairingEffects),
     CollapseModule.forRoot(),
     TabsModule.forRoot(),
 
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
-
 
     RouterModule.forRoot(routes),
     CommonComponentsModule,
@@ -98,9 +102,11 @@ import { CheckboxColumnComponent, ActionColumnComponent } from './components';
     RadioButtonComponent,
     CheckboxComponent,
     CheckboxListComponent,
+    CreatePairingCardComponent,
+    CreatePairingCardListComponent,
+    PairingProgressCardComponent,
     PairingCardComponent,
     PairingCardListComponent,
-    PairingProgressCardComponent,
     TableComponent,
     CheckboxColumnComponent,
     ActionColumnComponent
@@ -110,6 +116,7 @@ import { CheckboxColumnComponent, ActionColumnComponent } from './components';
     ClusterService,
     JobService,
     PolicyService,
+    PairingService,
     httpServiceProvider
   ]
 })

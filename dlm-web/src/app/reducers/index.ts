@@ -6,18 +6,21 @@ import { storeLogger } from 'ngrx-store-logger';
 
 import { compose } from '@ngrx/core/compose';
 
-import * as fromCluster from './cluster';
-import * as fromPolicy from './policy';
+import * as fromCluster from './cluster.reducer';
+import * as fromPolicy from './policy.reducer';
+import * as fromPairing from './pairing.reducer';
 
 export interface State {
   clusters: fromCluster.State;
   policies: fromPolicy.State;
+  pairings: fromPairing.State;
   router: RouterState;
 }
 
 const reducers = {
   clusters: fromCluster.reducer,
   policies: fromPolicy.reducer,
+  pairings: fromPairing.reducer,
   router: routerReducer
 };
 

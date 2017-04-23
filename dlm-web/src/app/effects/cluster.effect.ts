@@ -1,0 +1,23 @@
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { Action } from '@ngrx/store';
+import { Effect, Actions } from '@ngrx/effects';
+import { ClusterService } from '../services/cluster.service';
+
+import * as cluster from '../actions/cluster.action';
+
+@Injectable()
+export class ClusterEffects {
+
+  @Effect()
+  loadClusters$: Observable<any> = this.actions$
+    .ofType(cluster.ActionTypes.LOAD_CLUSTERS)
+    .switchMap(() => {
+        return this.clusterService.fetchClusters()
+          .map(clusters => new cluster.LoadClustersSuccess(clusters))
+          .catch((err) => Observable.of(new cluster.LoadClustersFailure(err)));
+      }
+    );
+
+  constructor(private actions$: Actions, private clusterService: ClusterService) { }
+}

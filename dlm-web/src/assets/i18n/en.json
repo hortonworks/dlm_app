@@ -59,9 +59,24 @@
       "header": "Pairings",
       "header_note": "Note: Pairings are bi-directional",
       "create_button_text": "+ Pairing",
+      "content": {
+        "header": {
+          "first_cluster": "FIRST CLUSTER",
+          "status": "STATUS",
+          "second_cluster": "SECOND CLUSTER",
+          "unpair": "UNPAIR"
+        }
+      },
       "create": {
         "header": "Create Pairing",
-        "header_note": "Note: Pairings are bi-directional"
+        "header_note": "Note: Pairings are bi-directional",
+        "content": {
+          "header": {
+            "step_one": "STEP 1: SELECT FIRST CLUSTER",
+            "step_two": "STEP 2: SELECT CLUSTER TO BE PAIRED",
+            "in_progress": "IN PROGRESS"
+          }
+        }
       }
     }
   }

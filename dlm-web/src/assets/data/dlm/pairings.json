@@ -1,0 +1,42 @@
+{
+  "pairings": [
+    {
+      "id": "primaryCluster-anotherCluster",
+      "firstCluster": {
+        "id": "primaryCluster",
+        "clusterDetails": {
+          "name": "Primary Cluster",
+          "description": "primary",
+          "dataCenter": "Texas"
+        }
+      },
+      "secondCluster": {
+        "id": "anotherCluster",
+        "clusterDetails": {
+          "name": "Secondary Cluster",
+          "description": "Secondary",
+          "dataCenter": "Virginia"
+        }
+      }
+    },
+    {
+      "id": "devCluster-primaryCluster",
+      "firstCluster": {
+        "id": "devCluster",
+        "clusterDetails": {
+          "name": "Development Cluster",
+          "description": "For Development",
+          "dataCenter": "California"
+        }
+      },
+      "secondCluster": {
+        "id": "primaryCluster",
+        "clusterDetails": {
+          "name": "Primary Cluster",
+          "description": "primary",
+          "dataCenter": "Texas"
+        }
+      }
+    }
+  ]
+}

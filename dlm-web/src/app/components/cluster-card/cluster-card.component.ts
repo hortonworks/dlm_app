@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
-  selector: 'cluster-card',
+  selector: 'dlm-cluster-card',
   templateUrl: './cluster-card.component.html',
   styleUrls: ['./cluster-card.component.scss']
 })

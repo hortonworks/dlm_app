@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
-import { loadPolicies } from '../../actions/policy';
+import { loadPolicies } from '../../actions/policy.action';
 import { Policy } from '../../models/policy.model';
 import { DropdownItem } from '../../components/dropdown/dropdown-item';
-import { getAllPolicies } from '../../selectors/policy';
+import { getAllPolicies } from '../../selectors/policy.selector';
 import * as fromRoot from '../../reducers';
 
 @Component({

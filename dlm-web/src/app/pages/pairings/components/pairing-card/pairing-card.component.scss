@@ -1,0 +1,44 @@
+@import '../../../../styles/variables';
+.cluster-name {
+  font-size: 17px;
+  padding-bottom: 7px;
+}
+.cluster-datacenter {
+  font-size: 13px;
+}
+.pairing-icon {
+  font-size: 24px;
+  color: $primary-color;
+  text-align: center;
+}
+
+.pairing-card {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+  margin: 0;
+  .col {
+    padding: 0 15px;
+    float: none;
+    display: table-cell;
+    vertical-align: top;
+    &.pairing-icon, &.cross {
+      vertical-align: middle;
+      text-align: center;
+      font-size: 24px;
+    }
+    &.pairing-icon {
+      color: $primary-color;
+    }
+    &.cross {
+      .close {
+        &:focus {
+          outline: 0;
+        }
+        span {
+          font-size: 30px;
+        }
+      }
+    }
+  }
+}

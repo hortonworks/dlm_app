@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
-import { LoadClusters } from '../../actions/cluster';
+import { LoadClusters } from '../../actions/cluster.action';
 import { Cluster } from '../../models/cluster.model';
-import { getAllClusters } from '../../selectors/cluster';
+import { getAllClusters } from '../../selectors/cluster.selector';
 import * as fromRoot from '../../reducers';
 import { DropdownItem } from '../../components/dropdown/dropdown-item';
 import { TranslateService } from '@ngx-translate/core';

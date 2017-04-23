@@ -1,0 +1,6 @@
+<div class="pairing-cards-radio-group">
+  <div *ngFor="let cluster of clusters" class="pairing-radio-item">
+    <input type="radio" [value]="cluster.id" [checked]="cluster.id === selectedClusterId">
+    <dlm-create-pairing-card [cluster]="cluster" [isSelected]="cluster.id === selectedClusterId" (click)="selectCluster(cluster)"></dlm-create-pairing-card>
+  </div>
+</div>
