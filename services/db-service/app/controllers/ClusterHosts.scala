@@ -33,6 +33,16 @@ class ClusterHosts @Inject()(clusterHostRepo: ClusterHostRepo)(implicit exec: Ex
     }.recoverWith(apiError)
   }
 
+  def find(clusterId:Long,host:String) = Action.async {
+    clusterHostRepo.findByHostAndCluster(clusterId,host).map { co =>
+      co.map { c =>
+        success(linkData(c, makeLink(c)))
+      }
+        .getOrElse(notFound)
+    }.recoverWith(apiError)
+  }
+
+
   def delete(clusterId: Long, hostId:Long) = Action.async { req =>
     val future = clusterHostRepo.deleteById(clusterId, hostId)
     future.map(i => success(i)).recoverWith(apiError)

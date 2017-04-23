@@ -5,6 +5,7 @@ import com.hortonworks.dataplane.http.Webserver
 import com.typesafe.config.Config
 import play.api.Logger
 
+
 object ClusterService extends App {
 
   val logger = Logger("Cluster service")

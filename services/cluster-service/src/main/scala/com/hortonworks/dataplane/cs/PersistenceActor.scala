@@ -101,7 +101,8 @@ class PersistenceActor(clusterInterface: StorageInterface) extends Actor {
           val hostInfos = hostInfo.right.get.map(
             hi =>
               ClusterHost(
-                host = hi.ip,
+                host = hi.name,
+                ipaddr= hi.ip,
                 status = hi.hostStatus,
                 properties = hi.properties,
                 clusterId = cluster.id.get

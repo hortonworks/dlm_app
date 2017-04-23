@@ -134,6 +134,7 @@ object Entities {
 
   case class ClusterHost(id: Option[Long] = None,
                          host: String,
+                         ipaddr:String,
                          status: String,
                          properties: Option[JsValue] = None,
                          clusterId: Long)

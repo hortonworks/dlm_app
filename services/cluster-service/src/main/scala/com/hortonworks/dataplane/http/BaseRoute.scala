@@ -10,6 +10,6 @@ trait BaseRoute {
 
   def success(data: JsValueWrapper) = Json.obj("results" -> Json.obj("data" -> data))
 
-  def errors(e: Throwable) = Json.obj("result" -> Json.obj("error" -> e.getMessage, "trace" -> ExceptionUtils.getStackTrace(e)))
+  def errors(e: Throwable) = Json.obj("error" -> Json.obj("message" -> e.getMessage, "trace" -> ExceptionUtils.getStackTrace(e)))
 
 }

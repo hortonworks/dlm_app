@@ -89,6 +89,7 @@ GET           /clusters/:clusterId/hosts                                     con
 POST          /clusters/hosts                                                controllers.ClusterHosts.add
 PUT           /clusters/hosts                                                controllers.ClusterHosts.addOrUpdate
 GET           /clusters/:clusterId/hosts/:hostId                             controllers.ClusterHosts.loadWithCluster(clusterId: Long, hostId:Long)
+GET           /clusters/:clusterId/host/:hostName                            controllers.ClusterHosts.find(clusterId: Long, hostName)
 DELETE        /clusters/:clusterId/hosts/:hostId                             controllers.ClusterHosts.delete(clusterId: Long, hostId:Long)
 
 #ClusterProperties API
