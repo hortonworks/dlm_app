@@ -27,10 +27,10 @@ class AtlasInterfaceSpec
   "AtlasInterface" should "list attributes for hive" in {
     val storageInterface = mock[StorageInterface]
     (storageInterface.getConfiguration _)
-      .expects("dp.ambari.atlas.user")
+      .expects("dp.atlas.user")
       .returns(Future.successful(Some("admin")))
     (storageInterface.getConfiguration _)
-      .expects("dp.ambari.atlas.password")
+      .expects("dp.atlas.password")
       .returns(Future.successful(Some("admin")))
     val json =
       Source.fromURL(getClass.getResource("/hiveattributes.json")).mkString

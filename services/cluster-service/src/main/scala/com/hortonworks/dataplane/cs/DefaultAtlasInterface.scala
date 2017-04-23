@@ -58,8 +58,8 @@ sealed class AtlasApiSupplier(clusterId: Long,
     for {
       atlas <- getUrlOrThrowException
       baseUrl <- extract(atlas, clusterId)
-      user <- storageInterface.getConfiguration("dp.ambari.atlas.user")
-      pass <- storageInterface.getConfiguration("dp.ambari.atlas.password")
+      user <- storageInterface.getConfiguration("dp.atlas.user")
+      pass <- storageInterface.getConfiguration("dp.atlas.password")
     } yield {
       new AtlasClientV2(List(baseUrl).toArray, Array(user.get, pass.get))
     }
