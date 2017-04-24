@@ -17,6 +17,7 @@ import { LocationService } from '../../../../services/location.service';
 export class LakesComponent implements OnInit {
 
   lake: Lake = new Lake();
+  location: Location;
   isClusterVerified: boolean = false;
 
   _isClusterValidateInProgress: boolean = false;
