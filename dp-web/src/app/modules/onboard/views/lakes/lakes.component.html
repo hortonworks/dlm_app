@@ -15,13 +15,15 @@
     </div>
     <div class="dp-input dp-input--typeahead">
       <label for="location" style="display: block;">Location</label>
-      <input class="" type="text" placeholder="Location" name="location" id="location" required [value]="locationQueryString" (focus)="onFocusLocation($event)" (blur)="onBlurLocation($event)" (input)="onUpdateLocation($event)"/>
-      <ul class="dp-input__options" *ngIf="_isLocationInFocus === true">
-        <li *ngIf="locationQueryString.length < 3 && _isLocationFetchInProgress === false">Continue typing for options.</li>
-        <li *ngIf="_isLocationFetchInProgress">Fetching options...</li>
-        <li *ngIf="locationQueryString.length >= 3 && _isLocationFetchInProgress === false && locationOptions.length === 0">No locations found.</li>
-        <li *ngFor="let cLocation of locationOptions" (mousedown)="onSelectLocation(cLocation)" class="dp-input__option">{{cLocation.city}}, {{cLocation.country}}</li>
-      </ul>
+      <input ngui-auto-complete
+        [min-chars]=3
+        [(ngModel)]="location" 
+        [source]="getLocations.bind(this)"
+        [value-formatter]="locationFormatter"
+        [list-formatter]="locationFormatter"
+        [no-match-found-text]="'No locations found'"
+        placeholder="Location"
+        (valueChanged)="onSelectLocation(location)"/>
     </div>
     <div class="dp-input">
       <label for="description" style="display: block;">Description</label>

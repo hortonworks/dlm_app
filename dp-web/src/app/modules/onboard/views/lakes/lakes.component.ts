@@ -17,22 +17,12 @@ import { LocationService } from '../../../../services/location.service';
 export class LakesComponent implements OnInit {
 
   lake: Lake = new Lake();
-  location: Location = new Location();
   isClusterVerified: boolean = false;
-
-  _isLocationInFocus: boolean = false;
-  locationQueryString: string = '';
-
-  _isLocationFetchInProgress: boolean = false;
-  _isLocationFetchSuccessful: boolean = false;
-  locationOptions: Location[] = [];
 
   _isClusterValidateInProgress: boolean = false;
   _isClusterValidateSuccessful: boolean = false;
 
-  rxLocationOptions: Subject<string> = new Subject();
   rxClusterValidate: Subject<string> = new Subject();
-
 
   constructor(
     private router: Router,
@@ -42,28 +32,6 @@ export class LakesComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.rxLocationOptions
-      .debounce(() => Observable.timer(250))
-      .filter(cLocationQuery => cLocationQuery.length >= 3)
-      .do(() => {
-        this._isLocationFetchInProgress = true;
-        this._isLocationFetchSuccessful = false;
-      })
-      .flatMap(query => this.locationService.retrieveOptions(query))
-      .finally(() => {
-        this._isLocationFetchInProgress = false;
-      })
-      .subscribe(
-        locations => {
-          this._isLocationFetchInProgress = false;
-          this._isLocationFetchSuccessful = true;
-          this.locationOptions = locations;
-        },
-        () => {
-          this._isLocationFetchSuccessful = false;
-        }
-      );
-
     this.rxClusterValidate
       .debounce(() => Observable.timer(250))
       .filter(cClusterUrl => cClusterUrl.length >= 3)
@@ -80,29 +48,22 @@ export class LakesComponent implements OnInit {
           this._isClusterValidateSuccessful = isValid;
         },
         () => {
-          this._isLocationFetchSuccessful = false;
+          this._isClusterValidateSuccessful = false;
           this._isClusterValidateInProgress = false;
         }
       );
   }
 
-  onUpdateLocation(event) {
-    this.rxLocationOptions.next(event.target.value);
+  locationFormatter(location:Location) : string{
+    return `${location.city}, ${location.country}`;
   }
 
-  onFocusLocation(event) {
-    this._isLocationInFocus = true;
-    this.rxLocationOptions.next(event.target.value);
-  }
-
-  onBlurLocation(event) {
-      this._isLocationInFocus = false;
+  getLocations(searchTerm){
+      return this.locationService.retrieveOptions(searchTerm);
   }
 
   onSelectLocation(location: Location) {
-    this.location = location;
     this.lake.location = location.id;
-    this.locationQueryString = `${location.city}, ${location.country}`;
   }
 
   doVerifyCluster() {

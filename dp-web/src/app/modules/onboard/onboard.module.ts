@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 import { routes } from './onboard.routes';
-
+import { NguiAutoCompleteModule } from '@ngui/auto-complete';
 import { FirstRunComponent } from './views/first-run/first-run.component';
 import { LakesComponent } from './views/lakes/lakes.component';
 import { SecurityComponent } from './views/security/security.component';
@@ -15,7 +15,7 @@ import {MultiSelect} from "../../shared/multi-select/multi-select.component";
   imports: [
     FormsModule,
     CommonModule,
-
+    NguiAutoCompleteModule,
     RouterModule.forChild(routes),
   ],
   declarations: [
