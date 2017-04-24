@@ -3,14 +3,25 @@ package com.hortonworks.dataplane.cs
 import java.net.URL
 
 import com.google.common.base.Supplier
-import com.hortonworks.dataplane.commons.domain.Atlas.AtlasAttribute
-import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterHostsService}
+import com.hortonworks.dataplane.commons.domain.Atlas.{
+  AtlasAttribute,
+  AtlasEntities,
+  AtlasFilters,
+  Entity
+}
+import com.hortonworks.dataplane.cs.atlas.Filters
+import com.hortonworks.dataplane.db.Webserice.{
+  ClusterComponentService,
+  ClusterHostsService
+}
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import org.apache.atlas.AtlasClientV2
+import org.apache.atlas.model.instance.AtlasEntityHeader
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.Try
 
 class DefaultAtlasInterface(clusterId: Long,
                             storageInterface: StorageInterface,
@@ -24,19 +35,25 @@ class DefaultAtlasInterface(clusterId: Long,
   private val log = Logger(classOf[DefaultAtlasInterface])
 
   private val defaultAttributes = {
-    val list = config.getObjectList("dp.services.atlas.atlas.common.attributes").asScala
+    val list =
+      config.getObjectList("dp.services.atlas.atlas.common.attributes").asScala
     list.map { it =>
-      AtlasAttribute(it.toConfig.getString("name"),it.toConfig.getString("dataType"))
+      AtlasAttribute(it.toConfig.getString("name"),
+                     it.toConfig.getString("dataType"))
     }
   }
+
+  val hiveBaseQuery =
+    Try(config.getString("dp.services.atlas.hive.search.query.base"))
+      .getOrElse("hive_table")
 
   val includedTypes =
     config.getStringList("dp.services.atlas.hive.accepted.types").asScala.toSet
 
   private val atlasApi = new AtlasApiSupplier(clusterId,
-                         storageInterface,
-                         clusterComponentService,
-                         clusterHostsService).get()
+                                              storageInterface,
+                                              clusterComponentService,
+                                              clusterHostsService).get()
 
   override def getHiveAttributes: Future[Seq[AtlasAttribute]] = {
     atlasApi.map { api =>
@@ -47,6 +64,40 @@ class DefaultAtlasInterface(clusterId: Long,
           AtlasAttribute(ad.getName, ad.getTypeName)
       }.toList ++ defaultAttributes
     }
+  }
+
+  override def findHiveTables(filters: AtlasFilters): Future[AtlasEntities] = {
+    // Get the query
+    val query = s"$hiveBaseQuery ${Filters.query(filters)}"
+    atlasApi.map { api =>
+      val searchResult = api.dslSearch(query)
+      val entityHeaders = searchResult.getEntities
+      if (entityHeaders == null) {
+        AtlasEntities(None)
+      } else {
+        val entities = entityHeaders.asScala.map { e =>
+          createEntityRep(e)
+        }
+        AtlasEntities(Option(entities.toList))
+      }
+    }
+
+  }
+
+  private def createEntityRep(e: AtlasEntityHeader) = {
+    Entity(Option(e.getTypeName),
+           Option(attributeAsString(e)),
+           Option(e.getGuid),
+           Option(e.getStatus.toString),
+           Option(e.getDisplayText))
+  }
+
+  private def attributeAsString(e: AtlasEntityHeader) = {
+    e.getAttributes.asScala.collect {
+      case (k, v) if Option(v).isDefined =>
+        (k, v.toString)
+    }.toMap
+
   }
 }
 

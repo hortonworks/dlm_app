@@ -82,7 +82,7 @@ object AppModule extends AbstractModule{
   @Singleton
   def provideWebservice(actorSystem:ActorSystem,materializer: ActorMaterializer,configuration: Config,atlasRoute: AtlasRoute,statusRoute: StatusRoute):Webserver = {
      import akka.http.scaladsl.server.Directives._
-     new Webserver(actorSystem,materializer,configuration,atlasRoute.hiveAttributes ~ statusRoute.route)
+     new Webserver(actorSystem,materializer,configuration,atlasRoute.hiveAttributes ~ atlasRoute.hiveTables ~ statusRoute.route)
   }
 
 

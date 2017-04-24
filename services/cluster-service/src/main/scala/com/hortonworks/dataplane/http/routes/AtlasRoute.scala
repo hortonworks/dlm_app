@@ -6,8 +6,15 @@ import javax.inject.{Inject, Singleton}
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import com.google.common.base.{Supplier, Suppliers}
-import com.hortonworks.dataplane.cs.{AtlasInterface, DefaultAtlasInterface, StorageInterface}
-import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterHostsService}
+import com.hortonworks.dataplane.cs.{
+  AtlasInterface,
+  DefaultAtlasInterface,
+  StorageInterface
+}
+import com.hortonworks.dataplane.db.Webserice.{
+  ClusterComponentService,
+  ClusterHostsService
+}
 import com.hortonworks.dataplane.http.BaseRoute
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
@@ -40,14 +47,19 @@ class AtlasRoute @Inject()(
     Try(config.getLong("dp.services.cluster.http.atlas.endpoint.cache.secs"))
       .getOrElse(60L)
 
+  private def getInterface(id: Long): AtlasInterface = {
+    atlasInterfaceCache
+      .getOrElseUpdate(
+        id,
+        supplyApi(id)
+      )
+      .get()
+  }
+
   val hiveAttributes =
     path("cluster" / LongNumber / "atlas" / "hive" / "attributes") { id =>
       get {
-        val interface = atlasInterfaceCache.getOrElseUpdate(
-          id,
-          supplyApi(id)
-        )
-        val attributes = interface.get().getHiveAttributes
+        val attributes = getInterface(id).getHiveAttributes
         onComplete(attributes) {
           case Success(attributes) => complete(success(attributes))
           case Failure(th) =>
@@ -56,19 +68,33 @@ class AtlasRoute @Inject()(
       }
     }
 
+  val hiveTables = {
+    path("cluster" / LongNumber / "atlas" / "hive" / "search") { id =>
+      post {
+        entity(as[AtlasFilters]) { filters =>
+          val atlasEntities = getInterface(id).findHiveTables(filters)
+          onComplete(atlasEntities) {
+            case Success(entities) => complete(success(entities))
+            case Failure(th) =>
+              complete(StatusCodes.InternalServerError, errors(th))
+          }
+        }
+      }
+    }
+  }
+
   private def supplyApi(id: Long) = {
-    Suppliers.memoizeWithExpiration(
-      newInterface(id),
-      atlasApiCacheTime,
-      TimeUnit.SECONDS)
+    Suppliers.memoizeWithExpiration(newInterface(id),
+                                    atlasApiCacheTime,
+                                    TimeUnit.SECONDS)
   }
 
   private def newInterface(id: Long) = {
     new AtlasInterfaceSupplier(storageInterface,
-      clusterComponentService,
-      clusterHostsService,
-      id,
-      config)
+                               clusterComponentService,
+                               clusterHostsService,
+                               id,
+                               config)
   }
 }
 

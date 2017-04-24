@@ -1,5 +1,8 @@
 package com.hortonworks.dataplane.cs
 
+import java.net.URLEncoder
+
+import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasFilter, AtlasFilters}
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterHost, ClusterService => AtlasService}
 import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterHostsService}
 import com.hortonworks.dataplane.restmock.httpmock.when
@@ -24,7 +27,7 @@ class AtlasInterfaceSpec
   logger.info("started local server at 9998")
   protected val stop = server.startOnPort(9998)
 
-  "AtlasInterface" should "list attributes for hive" in {
+  private def setupMock = {
     val storageInterface = mock[StorageInterface]
     (storageInterface.getConfiguration _)
       .expects("dp.atlas.user")
@@ -32,8 +35,7 @@ class AtlasInterfaceSpec
     (storageInterface.getConfiguration _)
       .expects("dp.atlas.password")
       .returns(Future.successful(Some("admin")))
-    val json =
-      Source.fromURL(getClass.getResource("/hiveattributes.json")).mkString
+
     val clusterComponentService = mock[ClusterComponentService]
     val clusterHostsService = mock[ClusterHostsService]
     (clusterComponentService.getServiceByName _)
@@ -54,11 +56,21 @@ class AtlasInterfaceSpec
         Future.successful(
           Right(
             ClusterHost(Some(1),
-                        "ashwin-dp-knox-test-1.novalocal",
-                        "localhost",
-                        "A1",
-                        None,
-                        1))))
+              "ashwin-dp-knox-test-1.novalocal",
+              "localhost",
+              "A1",
+              None,
+              1))))
+    (storageInterface, clusterComponentService, clusterHostsService)
+  }
+
+
+
+  "AtlasInterface" should "list attributes for hive" in {
+    val (storageInterface: StorageInterface, clusterComponentService: ClusterComponentService, clusterHostsService: ClusterHostsService) = setupMock
+
+    val json =
+      Source.fromURL(getClass.getResource("/hiveattributes.json")).mkString
 
     when get ("/api/atlas/v2/types/entitydef/name/hive_table") withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") thenRespond (200, json)
 
@@ -76,7 +88,9 @@ class AtlasInterfaceSpec
     interface.getHiveAttributes.map { ha =>
       assert(ha.size == 10)
       assert(
-        Set("name","owner","temporary",
+        Set("name",
+            "owner",
+            "temporary",
             "tableType",
             "viewExpandedText",
             "viewOriginalText",
@@ -84,6 +98,32 @@ class AtlasInterfaceSpec
             "comment",
             "lastAccessTime",
             "createTime") == ha.map(_.name).toSet)
+    }
+
+  }
+
+  it should "search for hive tables" in {
+    val (storageInterface: StorageInterface, clusterComponentService: ClusterComponentService, clusterHostsService: ClusterHostsService) = setupMock
+
+    val json =
+      Source.fromURL(getClass.getResource("/atlassearch.json")).mkString
+
+    when get ("/api/atlas/v2/search/dsl") withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=")  thenRespond (200, json)
+
+    val interface = new DefaultAtlasInterface(
+      1L,
+      storageInterface,
+      clusterComponentService,
+      clusterHostsService,
+      ConfigFactory.parseString(
+        """dp.services.atlas.hive.accepted.types=["string","int","long","boolean","date"]
+          |dp.services.atlas.atlas.common.attributes=[{"name":"owner","dataType":"string"},{"name":"name","dataType":"string"}]
+        """.stripMargin)
+    )
+
+    interface.findHiveTables(AtlasFilters(
+      Seq(AtlasFilter(AtlasAttribute("owner", "string"), "equals", "admin")))).map { s =>
+      assert(true)
     }
 
   }

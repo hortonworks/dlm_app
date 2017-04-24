@@ -21,9 +21,6 @@ object Filters {
   )
 
   def query(atlasFilters: AtlasFilters) = {
-    // create a collection of 'where and ands'
-    val fillers = "WHERE" :: List.fill(atlasFilters.atlasFilters.size - 1)(
-        "AND")
 
     val filters = atlasFilters.atlasFilters.map { af =>
       val toApply = predicates.find(p => p.isApplicable(af))
@@ -35,6 +32,10 @@ object Filters {
     val filterList = filters.collect {
       case Some(str) => str
     }.toList
+
+    // create a collection of 'where and ands'
+    val fillers = "where" :: List.fill(filterList.size - 1)(
+      "and")
     // zip them together
     val zipped  = intersperse(fillers,filterList)
     zipped.mkString(" ")
@@ -132,7 +133,7 @@ object Filters {
 
   private class NotEqualsStringPredicate extends Predicate {
     override def apply(atlasFilter: AtlasFilter): Query = {
-      Query(s"${atlasFilter.atlasAttribute.name}<>'${atlasFilter.operand}'")
+      Query(s"${atlasFilter.atlasAttribute.name}!='${atlasFilter.operand}'")
     }
 
     override def isApplicable(atlasFilter: AtlasFilter): Boolean = {
