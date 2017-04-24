@@ -68,13 +68,15 @@ class AtlasInterfaceSpec
       clusterComponentService,
       clusterHostsService,
       ConfigFactory.parseString(
-        "dp.services.atlas.hive.accepted.types=[\"string\",\"int\",\"long\",\"boolean\",\"date\"]")
+        """dp.services.atlas.hive.accepted.types=["string","int","long","boolean","date"]
+          |dp.services.atlas.atlas.common.attributes=[{"name":"owner","dataType":"string"},{"name":"name","dataType":"string"}]
+        """.stripMargin)
     )
 
     interface.getHiveAttributes.map { ha =>
-      assert(ha.size == 8)
+      assert(ha.size == 10)
       assert(
-        Set("temporary",
+        Set("name","owner","temporary",
             "tableType",
             "viewExpandedText",
             "viewOriginalText",

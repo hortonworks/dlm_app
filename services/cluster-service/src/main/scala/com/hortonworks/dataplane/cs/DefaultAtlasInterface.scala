@@ -2,12 +2,9 @@ package com.hortonworks.dataplane.cs
 
 import java.net.URL
 
-import com.google.common.base.{Supplier, Suppliers}
+import com.google.common.base.Supplier
 import com.hortonworks.dataplane.commons.domain.Atlas.AtlasAttribute
-import com.hortonworks.dataplane.db.Webserice.{
-  ClusterComponentService,
-  ClusterHostsService
-}
+import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterHostsService}
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import org.apache.atlas.AtlasClientV2
@@ -26,22 +23,29 @@ class DefaultAtlasInterface(clusterId: Long,
 
   private val log = Logger(classOf[DefaultAtlasInterface])
 
+  private val defaultAttributes = {
+    val list = config.getObjectList("dp.services.atlas.atlas.common.attributes").asScala
+    list.map { it =>
+      AtlasAttribute(it.toConfig.getString("name"),it.toConfig.getString("dataType"))
+    }
+  }
+
   val includedTypes =
     config.getStringList("dp.services.atlas.hive.accepted.types").asScala.toSet
 
-  private val atlasApiSupplier = new AtlasApiSupplier(clusterId,
+  private val atlasApi = new AtlasApiSupplier(clusterId,
                          storageInterface,
                          clusterComponentService,
                          clusterHostsService).get()
 
   override def getHiveAttributes: Future[Seq[AtlasAttribute]] = {
-    atlasApiSupplier.map { api =>
+    atlasApi.map { api =>
       val entityDef = api.getEntityDefByName("hive_table")
       val attributeDefs = entityDef.getAttributeDefs
       attributeDefs.asScala.collect {
         case ad if includedTypes.contains(ad.getTypeName) =>
           AtlasAttribute(ad.getName, ad.getTypeName)
-      }.toList
+      }.toList ++ defaultAttributes
     }
   }
 }
