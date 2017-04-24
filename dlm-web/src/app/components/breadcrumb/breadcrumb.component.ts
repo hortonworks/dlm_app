@@ -7,6 +7,7 @@ const ROUTE_DATA_BREADCRUMB = 'breadcrumb';
 
 @Component({
   selector: 'breadcrumb',
+  styleUrls: ['./breadcrumb.component.scss'],
   template: `
     <ol class="breadcrumb">
       <li><a routerLink="" class="breadcrumb"><i class="fa fa-gg"></i></a></li>
