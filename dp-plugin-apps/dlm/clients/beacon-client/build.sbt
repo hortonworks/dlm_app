@@ -1,12 +1,6 @@
-
 name := """beacon-client"""
-version := "0.1"
 
-organization :="com.hortonworks.dlm"
-
-scalaVersion := "2.11.8"
-
-
+Common.settings
 
 libraryDependencies ++= Seq(
   // Uncomment to use Akka

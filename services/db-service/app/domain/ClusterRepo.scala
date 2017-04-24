@@ -37,11 +37,7 @@ class ClusterRepo @Inject()(
   def findById(clusterId: Long): Future[Option[Cluster]] = {
     db.run(Clusters.filter(_.id === clusterId).result.headOption)
   }
-
-  def findByName(clusterName: String): Future[Option[Cluster]] = {
-    db.run(Clusters.filter(_.name === clusterName).result.headOption)
-  }
-
+  
   def findByDatalakeId(datalakeId:Long):Future[List[Cluster]] = {
     db.run(Clusters.filter(_.datalakeid === datalakeId).to[List].result)
   }
