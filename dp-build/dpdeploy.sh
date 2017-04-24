@@ -5,6 +5,8 @@ ALL_DOCKER_COMPOSE_APP_FILES="-f docker-compose-apps.yml -f docker-compose-knox.
 ALL_DOCKER_COMPOSE_DB_FILES="-f docker-compose.yml -f docker-compose-migrate.yml"
 ALL_DOCKER_COMPOSE_FILES=${ALL_DOCKER_COMPOSE_DB_FILES}" "${ALL_DOCKER_COMPOSE_APP_FILES} 
 
+CERTS_DIR=`dirname $0`/certs
+
 init_db() {
     docker-compose up -d
 }
@@ -35,6 +37,7 @@ destroy() {
 
 destroy_knox() {
     docker-compose -f docker-compose-knox.yml down
+    rm -rf ${CERTS_DIR}
 }
 
 build_images() {
@@ -50,9 +53,29 @@ init_app() {
 }
 
 init_knox() {
-    echo "Enter master password for Knox: "
+    echo "Enter Knox master password: "
     read MASTER_PASSWD
     MASTER_PASSWORD=${MASTER_PASSWD} docker-compose -f docker-compose-knox.yml up -d
+    KNOX_CONTAINER_ID=$(get_knox_container_id)
+    if [ -z ${KNOX_CONTAINER_ID} ]; then
+        echo "Knox container not found. Ensure it is running..."
+        return -1
+    fi
+    docker exec -it ${KNOX_CONTAINER_ID} ./wait_for_keystore_file.sh
+    mkdir ${CERTS_DIR}
+    export_knox_cert $MASTER_PASSWD $KNOX_CONTAINER_ID > ${CERTS_DIR}/knox_public.cert
+}
+
+export_knox_cert() {
+    MASTER_PASSWD=$1
+    KNOX_CONTAINER_ID=$2
+    docker exec -it ${KNOX_CONTAINER_ID} \
+        keytool -export -alias gateway-identity -storepass ${MASTER_PASSWD} -keystore /var/lib/knox/data-2.6.0.3-8/security/keystores/gateway.jks -rfc
+}
+
+get_knox_container_id() {
+    KNOX_CONTAINER_ID=`docker-compose -f docker-compose-knox.yml ps -q knox`
+    echo ${KNOX_CONTAINER_ID}
 }
 
 start_app() {
