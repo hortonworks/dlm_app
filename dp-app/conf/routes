@@ -19,57 +19,11 @@ GET         /api/lakes/ambari/status               controllers.Lakes.ambariCheck
 GET         /api/locations                         controllers.Locations.list(query: Option[String])
 GET         /api/locations/:locationId             controllers.Locations.retrieve(locationId: Long)
 
-POST        /api/clusters                          controllers.Clusters.create
 GET         /api/clusters                          controllers.Clusters.list(lakeId: Option[Long])
-PUT         /api/clusters                          controllers.Clusters.update
-GET         /api/clusters/:clusterId               controllers.Clusters.get(clusterId: String)
 GET         /api/clusters/:clusterId/health        controllers.Clusters.getHealth(clusterId: Long, summary: Option[Boolean])
 
-#POST        /api/actions/lake-add-with-cluster       controllers.actions.LakeActions.addWithCluster
 GET         /api/actions/lakes-list-with-clusters    controllers.actions.LakeActions.listWithClusters
 
-PUT         /api/datacenters                       controllers.DataCenters.create
-GET         /api/datacenters                       controllers.DataCenters.list
-GET         /api/datacenters/:dcName/detail        controllers.DataCenters.getClusters(dcName)
-GET         /api/datacenters/:id                   controllers.DataCenters.get(id)
-GET         /api/datacenters/:id/clusters          controllers.DataCenters.getClustersByDataCenterId(id)
-
-GET         /api/backup-policies                   controllers.BackupPolicies.list(dataCenterId: Option[String], clusterId: Option[String], resourceId: Option[String], resourceType: Option[String])
-POST        /api/backup-policies                   controllers.BackupPolicies.create
-# PUT         /api/backup-policies/:id               controllers.BackupPolicies.update(id)
-GET         /api/backup-policies/:id               controllers.BackupPolicies.get(id)
-
-#Atlas
-#TODO:fix endpoints
-GET         /api/datacenters/atlas/tables          controllers.AtlasHive.getAllTables(clusterHost,dc,cached)
-GET         /api/datacenters/atlas/table           controllers.AtlasHive.getTableDefinition(clusterHost,dc,table,cached)
-GET         /api/datacenters/atlas/entity          controllers.AtlasHive.getEntity(clusterHost,dc,guid)
-GET         /api/datacenters/atlas/lineage         controllers.AtlasHive.getLineage(clusterHost,dc,guid)
-GET         /api/datacenters/atlas/audit           controllers.AtlasHive.getAudit(clusterHost,dc,guid)
-
-#Hbase
-GET         /api/datacenters/hbase/tables          controllers.AtlasHBase.getAllTables(clusterHost,dc,cached)
-GET         /api/datacenters/hbase/table           controllers.AtlasHBase.getTableDefinition(clusterHost,dc,table,cached)
-GET         /api/datacenters/hbase/entity          controllers.AtlasHBase.getEntity(clusterHost,dc,guid)
-GET         /api/datacenters/Hbase/audit           controllers.AtlasHBase.getAudit(clusterHost,dc,guid)
-
-#Files
-GET         /api/datacenters/hdfs/filesets         controllers.AtlasHdfs.getAllFiles(clusterHost,dc,cached)
-GET         /api/datacenters/hdfs/entity           controllers.AtlasHdfs.getEntity(clusterHost,dc,guid)
-GET         /api/datacenters/hdfs/audit            controllers.AtlasHdfs.getAudit(clusterHost,dc,guid)
-
-#Ranger
-GET         /api/ranger/users                      controllers.RangerAudit.getTopUsers(clusterHost,dc,rt,r)
-GET         /api/ranger/audit                      controllers.RangerAudit.getAuditLog(clusterHost,dc,rt,r)
-GET         /api/ranger/access                      controllers.RangerAudit.getTopAccessTypes(clusterHost,dc,rt,r)
-
-
-
-#Search
-
-POST        /api/search/hive                       controllers.AtlasHiveSearch.searchHiveTables
-POST        /api/search/hbase                      controllers.AtlasHbaseSearch.searchHbaseTables
-POST        /api/search/hdfs                       controllers.AtlasHdfsSearch.searchFileSets
 
 #DTSet-Category
 GET         /api/datasets/categories               controllers.DataSets.listAllCategories
