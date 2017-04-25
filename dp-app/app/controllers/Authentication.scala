@@ -64,10 +64,8 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
   }
   def signOutThrougKnox = Action.async { request =>
     //TODO: domain, path and https to be done
-    //Future.successful(Ok("ok").discardingCookies(DiscardingCookie(knoxSso.getSsoCookieName())))
     Future.successful(Ok("ok").discardingCookies(DiscardingCookie(knoxSso.getSsoCookieName()))
       .discardingCookies(DiscardingCookie(ssoCheckCookieName)))
-
   }
   private def getRoles(roles: Either[Errors, UserRoles]) = {
     if (roles.isRight) {
