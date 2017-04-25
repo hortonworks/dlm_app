@@ -21,9 +21,15 @@ export function reducer(state = initialState, action): State {
         entities: Object.assign({}, state.entities, pairingEntities)
       };
     }
-    case fromPairing.ActionTypes.LOAD_PAIRINGS_FAILURE: {
-      return state;
+    case fromPairing.ActionTypes.DELETE_PAIRING_SUCCESS: {
+      const entities = Object.assign({}, state.entities);
+      delete entities[action.payload.pairingId];
+      return {
+        entities: Object.assign({}, entities)
+      };
     }
+    case fromPairing.ActionTypes.LOAD_PAIRINGS_FAILURE:
+    case fromPairing.ActionTypes.DELETE_PAIRING_FAILURE:
     default: {
       return state;
     }

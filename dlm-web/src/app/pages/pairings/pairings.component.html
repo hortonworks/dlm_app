@@ -9,7 +9,7 @@
     </div>
   </div>
   <div class="pull-right">
-    <button type="button" class="btn btn-primary" (click)="createPairingHandler()">{{ "page.pairings.create_button_text" | translate }}</button>
+    <button type="button" class="btn btn-primary" (click)="createPairingClickHandler()">{{ "page.pairings.create_button_text" | translate }}</button>
   </div>
   <div class="clearfix"></div>
 </div>
@@ -28,7 +28,7 @@
             <div class="h6">{{ "page.pairings.content.header.second_cluster" | translate }}</div>
           </div>
           <div class="col-md-1 col-sm-1 col-lg-1 col-xs-1 col unpair text-center">
-            <div class="h6 border-bottom">{{ "page.pairings.content.header.unpair" | translate }}</div>
+            <div class="h6">{{ "page.pairings.content.header.unpair" | translate }}</div>
           </div>
         </div>
       </div>
@@ -38,3 +38,9 @@
     </div>
   </div>
 </div>
+<dlm-modal-dialog #confirmationModal
+                  title="{{ 'page.pairings.unpair.confirmation.title' | translate }}"
+                  body="{{ 'page.pairings.unpair.confirmation.body' | translate }}"
+                  okText="{{ 'page.pairings.unpair.confirmation.primaryButton' | translate }}"
+                  (onOk)="onConfirmation($event)">
+</dlm-modal-dialog>

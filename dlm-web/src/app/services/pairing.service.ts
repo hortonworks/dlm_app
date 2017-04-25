@@ -15,8 +15,8 @@ export class PairingService {
     return this.http.get('pairings').map(r => r.json());
   }
 
-  removePairing(id: string): Observable<any> {
-    return this.http.delete(`pairings/${id}`);
+  deletePairing(pairingId: string): Observable<any> {
+    return this.http.delete(`pairings/${pairingId}`).map(r => r.json());
   }
 
 }

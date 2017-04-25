@@ -5,7 +5,8 @@ import { Effect, Actions, toPayload } from '@ngrx/effects';
 import { PairingService } from '../services/pairing.service';
 
 import {
-  loadPairingsSuccess, loadPairingsFail, createPairingSuccess, createPairingFail, ActionTypes as pairingActions
+  loadPairingsSuccess, loadPairingsFail, createPairingSuccess, createPairingFail,
+  deletePairingSuccess, deletePairingFail, ActionTypes as pairingActions
 } from '../actions/pairing.action';
 
 @Injectable()
@@ -24,13 +25,26 @@ export class PairingEffects {
   createPairing$: Observable<any> = this.actions$
     .ofType(pairingActions.CREATE_PAIRING)
     .map(toPayload)
-    .switchMap((payload) => {
+    .switchMap(payload => {
       return this.pairingService.createPairing(payload)
         .mergeMap(response => [
           createPairingSuccess(response),
-          go(['/policies'])
+          go(['/pairings'])
         ])
         .catch(err => Observable.of(createPairingFail(err)));
+    });
+
+  @Effect()
+  deletePairing$: Observable<any> = this.actions$
+    .ofType(pairingActions.DELETE_PAIRING)
+    .map(toPayload)
+    .switchMap(payload => {
+      return this.pairingService.deletePairing(payload)
+        .map(response => {
+          response['pairingId'] = payload;
+          return deletePairingSuccess(response);
+        })
+        .catch(err => Observable.of(deletePairingFail(err)));
     });
 
   constructor(private actions$: Actions, private pairingService: PairingService) { }

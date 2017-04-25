@@ -84,6 +84,13 @@
           "unpair": "UNPAIR"
         }
       },
+      "unpair": {
+        "confirmation": {
+          "title": "Unpair confirmation",
+          "body": "Are you sure you want to unpair {{firstCluster}} and {{secondCluster}} ?",
+          "primaryButton": "Unpair"
+        }
+      },
       "create": {
         "header": "Create Pairing",
         "header_note": "Note: Pairings are bi-directional",

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpModule, Http } from '@angular/http';
-import { BsDropdownModule, CollapseModule, TabsModule } from 'ng2-bootstrap';
+import { BsDropdownModule, CollapseModule, TabsModule, ModalModule } from 'ng2-bootstrap';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { StoreModule } from '@ngrx/store';
 import { RouterStoreModule } from '@ngrx/router-store';
@@ -15,6 +15,7 @@ import { ClusterEffects } from './effects/cluster.effect';
 import { routes } from './routes/routes.config';
 import { PolicyEffects } from './effects/policy.effect';
 import { PairingEffects } from './effects/pairing.effect';
+
 import { FormEffects } from './effects/form.effect';
 
 import { ClusterService } from './services/cluster.service';
@@ -33,7 +34,7 @@ import { PoliciesComponent } from './pages/policies/policies.component';
 import { JobsComponent } from './pages/jobs/jobs.component';
 import { HelpComponent } from './pages/help/help.component';
 import { NavbarComponent } from './common/navbar/navbar.component';
-
+import { ModalDialogComponent } from './common/modal-dialog/modal-dialog.component';
 import { httpServiceProvider } from './services/http.service';
 import { CommonComponentsModule } from './components/common-components.module';
 import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.component';
@@ -76,7 +77,7 @@ import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/rev
 
     CollapseModule.forRoot(),
     TabsModule.forRoot(),
-
+    ModalModule.forRoot(),
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
@@ -117,7 +118,8 @@ import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/rev
     PairingCardListComponent,
     TableComponent,
     CheckboxColumnComponent,
-    ActionColumnComponent
+    ActionColumnComponent,
+    ModalDialogComponent
   ],
   bootstrap: [DlmComponent],
   providers: [
