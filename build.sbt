@@ -20,4 +20,3 @@ lazy val dpApp = (project in file("dp-app")).enablePlugins(PlayScala).
 
 lazy val clusterService = (project in file("services/cluster-service")).
   dependsOn(restMock, dbClient)
-
