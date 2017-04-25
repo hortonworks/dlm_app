@@ -1,34 +1,60 @@
 package internal.auth
 
 import java.security.cert.X509Certificate
-import java.time.LocalDateTime
 
 import internal.Jwt
 import play.api.http.Status
-import play.api.mvc.{ActionBuilder, Request, Result, Results}
+import play.api.mvc._
 import com.hortonworks.dataplane.commons.domain.Entities._
+import com.hortonworks.dataplane.db.Webserice.UserService
 
 import scala.concurrent.Future
+import internal.KnoxSso
+import com.google.inject.Inject
+import com.google.inject.name.Named
+import play.api.Configuration
+import play.api.Logger
 
+import scala.concurrent.Await
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
 // TODO: try http://stackoverflow.com/a/29505015/640012
 
-object Authenticated extends ActionBuilder[AuthenticatedRequest] {
-  def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[Result]) = {
-//  debug
-//    block(AuthenticatedRequest[A](new User(
-//      None,
-//      "admin",
-//      "admin",
-//      "Administrator",
-//      None,
-//      Some(true),
-//      Some(LocalDateTime.now()),
-//      Some(LocalDateTime.now())), request))
 
-    if(request.headers.get("Authorization").isDefined && request.headers.get("Authorization").get.startsWith("Bearer ")){
+class Authenticated  @Inject()(@Named("userService") userService: UserService,
+                               configuration: Configuration,
+                               knoxSso:KnoxSso) extends ActionBuilder[AuthenticatedRequest] {
+
+  private val apiCallTimeout = configuration.underlying.getLong("apicall.timeout").millis
+  private val ssoLoginValidCookieName="sso_login_valid"
+  def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[Result]) = {
+    if (knoxSso.isSsoConfigured && request.cookies.get(knoxSso.getSsoCookieName).isDefined) {
+      Logger.info("sso cookie is found")
+      val serializedJWT: String = request.cookies.get(knoxSso.getSsoCookieName).get.value
+      val jwtValidation: Either[Exception, (String, Long)] = knoxSso.validateJwt(serializedJWT)
+      jwtValidation match {
+        case Left(errors) =>
+          Future.successful(Results.Unauthorized.discardingCookies(DiscardingCookie(ssoLoginValidCookieName)))
+        case Right(jwtResp) =>
+          val (subject,tokenExpiry)=jwtResp
+          val userFuture: Future[Either[Errors, User]] = userService.loadUser(subject)
+          val userOp: Either[Errors, User] = Await.result(userFuture, apiCallTimeout)
+          userOp.fold(
+            error => {
+              //TODO: domain and https to be done for proper deletiong of cookie.
+              Future.successful(Results.Unauthorized.discardingCookies(DiscardingCookie(ssoLoginValidCookieName)))
+            },
+            user => {
+              val respFuture = block(AuthenticatedRequest[A](user, request))
+              val cookie = Cookie(ssoLoginValidCookieName, "true", None, "/", None, false, false) //Todo set the expiration time got from token if required.
+              respFuture.map(_.withCookies(cookie))
+            }
+          )
+      }
+    } else if (request.headers.get("Authorization").isDefined && request.headers.get("Authorization").get.startsWith("Bearer ")) {
       val header: String = request.headers.get("Authorization").get
-      val token = header.replace("Bearer","").trim
-      Jwt.parseJWT(token).map{ user =>
+      val token = header.replace("Bearer", "").trim
+      Jwt.parseJWT(token).map { user =>
         block(AuthenticatedRequest[A](user, request))
       } getOrElse Future.successful(Results.Status(Status.UNAUTHORIZED))
     }

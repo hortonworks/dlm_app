@@ -18,11 +18,12 @@ import scala.concurrent.Future
 
 class Clusters @Inject()(
     @Named("clusterService")
-    val clusterService: ClusterService, val clusterHealthService: ClusterHealthService
+    val clusterService: ClusterService, val clusterHealthService: ClusterHealthService,
+    authenticated:Authenticated
 
 ) extends Controller {
 
-  def list(lakeId: Option[Long]) = Authenticated.async {
+  def list(lakeId: Option[Long]) = authenticated.async {
     lakeId match {
       case Some(lakeId) => listByLakeId(lakeId)
       case None => listAll()
@@ -54,7 +55,7 @@ class Clusters @Inject()(
 
 
 
-  def create = Authenticated.async(parse.json) { request =>
+  def create = authenticated.async(parse.json) { request =>
     Logger.info("Received create cluster request")
     request.body.validate[Cluster].map { cluster =>
       clusterService.create(cluster.copy(userid = request.user.id))
@@ -67,11 +68,11 @@ class Clusters @Inject()(
     }.getOrElse(Future.successful(BadRequest))
   }
 
-  def update = Authenticated.async(parse.json) { req =>
+  def update = authenticated.async(parse.json) { req =>
     Future.successful(Ok(JsonResponses.statusOk))
   }
 
-  def get(clusterId: String) = Authenticated.async {
+  def get(clusterId: String) = authenticated.async {
     Logger.info("Received get cluster request")
 
     clusterService.retrieve(clusterId)
