@@ -1,3 +1,13 @@
-<p>
-  DLM Jobs Page!
-</p>
+<div class="page-header clearfix">
+  <div class="pull-left">
+    <p>
+      <i class="glyphicon glyphicon-hourglass"></i>
+      <span class="h2">{{ "page.jobs.header" | translate }}</span>
+    </p>
+    <div>
+      <span class="text-muted">{{ "page.jobs.header_note" | translate }}</span>
+    </div>
+  </div>
+</div>
+
+<dp-jobs-table [jobs]="jobs$ | async"></dp-jobs-table>

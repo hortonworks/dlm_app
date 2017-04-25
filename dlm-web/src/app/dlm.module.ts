@@ -15,6 +15,7 @@ import { ClusterEffects } from './effects/cluster.effect';
 import { routes } from './routes/routes.config';
 import { PolicyEffects } from './effects/policy.effect';
 import { PairingEffects } from './effects/pairing.effect';
+import { JobEffects } from './effects/job.effect';
 
 import { FormEffects } from './effects/form.effect';
 
@@ -45,6 +46,10 @@ import { ClusterCardComponent } from './pages/clusters/cluster-card/cluster-card
 import { ClusterListComponent } from './pages/clusters/cluster-list/cluster-list.component';
 import { ClusterSearchComponent } from './pages/clusters/cluster-search/cluster-search.component';
 
+import { JobsTableComponent } from './pages/jobs/jobs-table/jobs-table.component';
+import { JobStatusComponent } from './pages/jobs/job-status/job-status.component';
+import { JobTransferredGraphComponent } from './pages/jobs/jobs-transferred-graph/job-transferred-graph.component';
+
 import { PolicyTableComponent } from './pages/policies/policy-table/policy-table.component';
 import { CreatePolicyComponent } from './pages/policies/subpages/create-policy/create-policy.component';
 import { PolicyFormComponent } from './pages/policies/components/policy-form/policy-form.component';
@@ -59,12 +64,19 @@ import { PairingProgressCardComponent } from './pages/pairings/components/pairin
 import { CreatePairingCardListComponent } from './pages/pairings/components/create-pairing-card-list/create-pairing-card-list.component';
 
 import { TranslateModule } from '@ngx-translate/core';
+import {MomentModule} from 'angular2-moment';
+import {ChartsModule} from 'ng2-charts/ng2-charts';
+
 import { TableComponent } from './common/table/table.component';
 import { CheckboxColumnComponent, ActionColumnComponent } from './components';
 import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/review-policy.component';
 
+import {BytesSizePipe} from './pipes/bytes-size.pipe';
+
 @NgModule({
   imports: [
+    MomentModule,
+    ChartsModule,
     CommonModule,
     HttpModule,
     NgxDatatableModule,
@@ -73,8 +85,8 @@ import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/rev
     EffectsModule.run(ClusterEffects),
     EffectsModule.run(PolicyEffects),
     EffectsModule.run(PairingEffects),
+    EffectsModule.run(JobEffects),
     EffectsModule.run(FormEffects),
-
     CollapseModule.forRoot(),
     TabsModule.forRoot(),
     ModalModule.forRoot(),
@@ -104,6 +116,10 @@ import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/rev
     PolicyFormComponent,
     ReviewPolicyComponent,
 
+    JobsTableComponent,
+    JobStatusComponent,
+    JobTransferredGraphComponent,
+
     JobsComponent,
     HelpComponent,
     NavbarComponent,
@@ -119,7 +135,8 @@ import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/rev
     TableComponent,
     CheckboxColumnComponent,
     ActionColumnComponent,
-    ModalDialogComponent
+    ModalDialogComponent,
+    BytesSizePipe
   ],
   bootstrap: [DlmComponent],
   providers: [
