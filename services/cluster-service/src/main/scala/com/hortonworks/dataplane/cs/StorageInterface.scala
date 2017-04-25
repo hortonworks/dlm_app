@@ -139,7 +139,7 @@ class StorageInterfaceImpl @Inject()(
     configService.getConfig(key).map(v => v.map(o => o.configValue)).recoverWith {
       case e: Exception =>
       logger.error("Error when getting configuration",e)
-      Future.successful(None)
+      throw e
     }
   }
 

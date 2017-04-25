@@ -112,7 +112,7 @@ object   Webserice {
   }
 
   trait ClusterHostsService extends DbClientService {
-
+    def getHostByClusterAndName(clusterId:Long,hostName:String):Future[Either[Errors,ClusterHost]]
     def getHostsByCluster(clusterId:Long):Future[Either[Errors,Seq[ClusterHost]]]
     def createOrUpdate(host:ClusterHost):Future[Option[Errors]]
 

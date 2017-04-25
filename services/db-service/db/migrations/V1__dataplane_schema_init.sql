@@ -106,6 +106,7 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_data_asset_workspace (
 CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_hosts (
   id         BIGSERIAL PRIMARY KEY,
   host       VARCHAR(255)                                 NOT NULL,
+  ipaddr     VARCHAR(39)                                  NOT NULL,
   status     VARCHAR(32)                                  NOT NULL,
   properties JSONB,
   clusterid  BIGINT REFERENCES dataplane.dp_clusters (id) NOT NULL

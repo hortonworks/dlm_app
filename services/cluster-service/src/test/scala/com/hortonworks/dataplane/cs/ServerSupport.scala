@@ -6,7 +6,10 @@ import com.hortonworks.dataplane.restmock.{Mockserver, RequestHandler}
 import org.scalatest.Suite
 import play.api.Logger
 
-
+/**
+  * Since tests may run at the same time, try to randomise ports in each test
+  * Tests may otherwise fail
+  */
 trait ServerSupport {
 
   this: Suite =>
@@ -17,7 +20,5 @@ trait ServerSupport {
   protected implicit val materializer = ActorMaterializer()
   protected implicit val myActor = system.actorOf(Props[RequestHandler], name = "handler")
   protected val server = Mockserver()
-  logger.info("started local server at 9999")
-  protected val stop = server.startOnPort(9999)
 
 }

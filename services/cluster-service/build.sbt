@@ -21,5 +21,7 @@ libraryDependencies ++= Seq(
   "com.hortonworks.dataplane" %% "rest-mock" % "1.0" % "test",
   "org.apache.atlas" % "atlas-client" % "0.8-incubating",
   "org.apache.atlas" % "atlas-typesystem" % "0.8-incubating",
-  "org.scalatest" % "scalatest_2.11" % "3.0.1")
-
+  "org.apache.atlas" % "atlas-intg" % "0.8-incubating",
+  "org.codehaus.jackson" % "jackson-xc" % "1.9.13",
+  "org.scalatest" % "scalatest_2.11" % "3.0.1" % Test,
+  "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test)

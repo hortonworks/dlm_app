@@ -37,20 +37,26 @@ class ClusterHostRepo @Inject()(
           .filter(_.host === clusterHost.host)
           .map(r => (r.status, r.properties))
           .update(clusterHost.status, clusterHost.properties))
-      .map { o =>
-        o match {
-          case 0 =>
-            db.run(ClusterHosts += clusterHost)
-            1
-          case 1 => 1
-          case n => throw new Exception("Too many rows updated")
-        }
+      .map {
+        case 0 =>
+          db.run(ClusterHosts += clusterHost)
+          1
+        case 1 => 1
+        case _ => throw new Exception("Too many rows updated")
       }
       .recoverWith {
         case e: Exception =>
           Logger.error("Could not insert host info")
           Future.successful(0)
       }
+  }
+
+  def findByHostAndCluster(clusterId:Long,hostName:String) = {
+    db.run(
+      ClusterHosts
+        .filter(c => c.clusterId === clusterId && c.host === hostName)
+        .result
+        .headOption)
   }
 
   def findByClusterAndHostId(clusterId: Long,
@@ -65,7 +71,7 @@ class ClusterHostRepo @Inject()(
   def deleteById(clusterId: Long, id: Long): Future[Int] = {
     db.run(
       ClusterHosts
-        .filter(c => (c.clusterId === clusterId && c.id === id))
+        .filter(c => c.clusterId === clusterId && c.id === id)
         .delete)
   }
 
@@ -76,6 +82,8 @@ class ClusterHostRepo @Inject()(
 
     def host = column[String]("host")
 
+    def ipaddr = column[String]("ipaddr")
+
     def status = column[String]("status")
 
     def properties = column[Option[JsValue]]("properties")
@@ -83,7 +91,7 @@ class ClusterHostRepo @Inject()(
     def clusterId = column[Long]("clusterid")
 
     def * =
-      (id, host, status, properties, clusterId) <> ((ClusterHost.apply _).tupled, ClusterHost.unapply)
+      (id, host,ipaddr,status, properties, clusterId) <> ((ClusterHost.apply _).tupled, ClusterHost.unapply)
   }
 
 }

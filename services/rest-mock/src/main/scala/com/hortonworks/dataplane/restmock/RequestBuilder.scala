@@ -74,7 +74,7 @@ case class RequestBuilder(pathVerifier: RequestAssertion)(
               ok.header
             }
             .to[collection.immutable.Seq],
-          HttpEntity(Option(responseBody).getOrElse(""))
+          HttpEntity(ContentType(MediaTypes.`application/json`),Option(responseBody).getOrElse(""))
         )
       }
     )

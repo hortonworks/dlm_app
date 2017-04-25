@@ -16,6 +16,9 @@ class AmbariInterfaceSpec
     with BeforeAndAfterEach
     with BeforeAndAfterAll with ScalaFutures {
 
+  logger.info("started local server at 9999")
+  protected val stop = server.startOnPort(9999)
+
   "AmbariInterface" should "call the default cluster endpoint" in {
     when get ("/api/v1/clusters") withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") thenRespond (200, """{
                                                                                                           |  "href" : "http://172.22.72.9:8080/api/v1/clusters",

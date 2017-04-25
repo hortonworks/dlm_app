@@ -190,9 +190,11 @@ class AmbariClusterInterface(private val cluster: Cluster,credentials: Credentia
                   .validate[String]
                   .map(s => s)
                   .getOrElse("")
+                val hostName =
+                  (hostNode \ "host_name").validate[String].map(s => s).getOrElse("")
                 val ip =
                   (hostNode \ "ip").validate[String].map(s => s).getOrElse("")
-                HostInformation(state, s"$status/$state", ip, hostNode.toOption)
+                HostInformation(state, s"$status/$state", hostName,ip, hostNode.toOption)
             }
             // the host info
             futureHost

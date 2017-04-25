@@ -68,8 +68,8 @@ object AppModule extends AbstractModule{
 
   @Provides
   @Singleton
-  def provideAtlasRoute(clusterComponentService: ClusterComponentService):AtlasRoute = {
-    AtlasRoute(clusterComponentService)
+  def provideAtlasRoute(storageInterface: StorageInterface,clusterComponentService: ClusterComponentService,clusterHostsService: ClusterHostsService,config: Config):AtlasRoute = {
+    AtlasRoute(storageInterface,clusterComponentService,clusterHostsService,config)
   }
 
   @Provides
@@ -82,7 +82,7 @@ object AppModule extends AbstractModule{
   @Singleton
   def provideWebservice(actorSystem:ActorSystem,materializer: ActorMaterializer,configuration: Config,atlasRoute: AtlasRoute,statusRoute: StatusRoute):Webserver = {
      import akka.http.scaladsl.server.Directives._
-     new Webserver(actorSystem,materializer,configuration,atlasRoute.route ~ statusRoute.route)
+     new Webserver(actorSystem,materializer,configuration,atlasRoute.hiveAttributes ~ atlasRoute.hiveTables ~ statusRoute.route)
   }
 
 
