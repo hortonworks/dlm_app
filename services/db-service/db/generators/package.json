@@ -1,0 +1,16 @@
+{
+  "name": "db-gen",
+  "version": "1.0.0",
+  "description": "Sourced from [CC]: http://download.geonames.org/export/dump/",
+  "main": "migrate.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "csv-parse": "^1.2.0",
+    "d3-dsv": "^1.0.5",
+    "stream-transform": "^0.1.2"
+  }
+}
