@@ -1,9 +1,13 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Output, OnInit, ViewEncapsulation, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { RadioItem } from '../../../../common/radio-button/radio-button';
 import { createPolicy } from '../../../../actions/policy.action';
 import { State } from '../../../../reducers/index';
+import { Observable } from 'rxjs/Observable';
+import { SessionStorageService } from 'services/session-storage.service';
+
+export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 
 // todo: validation
 // todo: error reporting. Figure out the way to consolidate field + error with single component
@@ -16,6 +20,8 @@ import { State } from '../../../../reducers/index';
   encapsulation: ViewEncapsulation.None
 })
 export class PolicyFormComponent implements OnInit {
+  @Output() formSubmit = new EventEmitter<any>();
+
   policyForm: FormGroup;
   databaseListGroup: FormGroup;
   // todo: this mock and should be removed!
@@ -49,18 +55,30 @@ export class PolicyFormComponent implements OnInit {
     }
   ];
 
+  // todo: this is mock. Instead should load pairings. `value` coma format is keeped from beacon api format
+  pairs = [
+    {
+      value: 'primaryCluster,destinationCluster',
+      label: 'Cluster 1 -> Cluster 2'
+    },
+    {
+      value: 'primaryCluster,destinationCluster',
+      label: 'Cluster 3 -> Cluster 4'
+    }
+  ];
+
   selectedJobType: string = this.jobTypes[0].value;
 
-  constructor(private formBuilder: FormBuilder, private store: Store<State>) { }
+  constructor(private formBuilder: FormBuilder) { }
 
   ngOnInit() {
     this.policyForm = this.formBuilder.group({
       general: this.formBuilder.group({
         name: '',
         type: [this.storageTypes[0].value],
-        pair: '',
+        pair: this.pairs[0].value
       }),
-      databases: [],
+      databases: [[]],
       job: this.formBuilder.group({
         schedule: 'IMMEDIATE',
         time: ''
@@ -69,7 +87,7 @@ export class PolicyFormComponent implements OnInit {
   }
 
   handleSubmit({ value }) {
-    this.store.dispatch(createPolicy(value));
+    this.formSubmit.emit(value);
   }
 
   handleJobChange(radio: RadioItem) {

@@ -1,6 +1,9 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { MenuItem } from './common/navbar/menu-item';
+import { Store } from '@ngrx/store';
+import { State } from 'reducers/index';
 import { TranslateService } from '@ngx-translate/core';
+import { initApp } from 'actions/app.action';
 
 @Component({
   selector: 'dlm',
@@ -14,7 +17,7 @@ export class DlmComponent {
   menuItems: MenuItem[];
   mainContentSelector = '#dlm_content';
   fitHeight = true;
-  constructor( t: TranslateService) {
+  constructor(t: TranslateService, private store: Store<State>) {
     t.setTranslation('en', require('../assets/i18n/en.json'));
     t.setDefaultLang('en');
     t.use('en');
@@ -55,5 +58,6 @@ export class DlmComponent {
           '<span class="navigation-icon glyphicon glyphicon-info-sign"></span>'
       )
     ];
+    this.store.dispatch(initApp());
   }
 }

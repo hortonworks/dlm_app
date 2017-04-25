@@ -1,100 +1,125 @@
 <div class="form-container">
   <form class="basic-form" [formGroup]="policyForm" (ngSubmit)="handleSubmit(policyForm)">
-    <div class="row">
-      <div class="form-section col-md-12">
-        <div class="form-section-title">
-          {{'page.policies.form.sections.general' | translate}}
-          <div class="pull-right">
-            <i class="fa text-primary"
-              [ngClass]="{'fa-chevron-down': sectionCollapsedMap.general, 'fa-chevron-up': !sectionCollapsedMap.general}"
-              (click)="toggleSection('general')"></i>
-          </div>
-          <div class="clearfix"></div>
-        </div>
-        <fieldset formGroupName="general" [collapse]="sectionCollapsedMap.general">
-          <div class="form-group row">
-            <label class="col-md-6">
-              {{'page.policies.form.fields.policy_name' | translate}}
-            </label>
-            <div class="clearfix"></div>
-            <div class="col-md-6">
-              <input type="text" class="form-control" formControlName="name"/>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="form-section col-md-12">
+          <div class="form-section-title">
+            {{'page.policies.form.sections.general' | translate}}
+            <div class="pull-right">
+              <i class="fa text-primary"
+                [ngClass]="{'fa-chevron-down': sectionCollapsedMap.general, 'fa-chevron-up': !sectionCollapsedMap.general}"
+                (click)="toggleSection('general')"></i>
             </div>
-          </div>
-          <div class="form-group">
-            <label>
-              {{'page.policies.form.fields.service' | translate}}
-            </label>
-            <div class="clearfix"></div>
-            <dlm-radio-button [items]="storageTypes" formControlName="type"></dlm-radio-button>
             <div class="clearfix"></div>
           </div>
-        </fieldset>
+          <fieldset formGroupName="general" [collapse]="sectionCollapsedMap.general">
+            <div class="form-group">
+              <div class="row">
+                <label class="col-md-6">
+                  {{'page.policies.form.fields.policy_name' | translate}}
+                </label>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <input type="text" class="form-control" formControlName="name"/>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="row">
+                <label class="col-md-6">
+                  {{'page.policies.form.fields.service' | translate}}
+                </label>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <dlm-radio-button [items]="storageTypes" formControlName="type"></dlm-radio-button>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="row">
+                <label class="col-md-6">
+                  {{'page.policies.form.fields.pairs' | translate}}
+                </label>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <select class="form-control" formControlName="pair">
+                    <option *ngFor="let pair of pairs" [value]="pair.value">{{pair.label}}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+        </div>
       </div>
-      <div class="form-section col-md-6">
-        <div class="form-section-title">
-          {{'page.policies.form.sections.database' | translate}}
-          <div class="pull-right">
-            <i class="fa text-primary"
-              [ngClass]="{'fa-chevron-down': sectionCollapsedMap.database, 'fa-chevron-up': !sectionCollapsedMap.database}"
-              (click)="toggleSection('database')"></i>
-          </div>
-          <div class="clearfix"></div>
-        </div>
-        <div class="form-group" [collapse]="sectionCollapsedMap.database">
-          <div class="row flex-center">
-            <div class="col-md-8">
-              <span class="text-muted">
-                {{'page.policies.form.selected' | translate}}: {{policyForm.value.databases}}
-              </span>
+      <div class="row">
+        <div class="form-section col-md-6">
+          <div class="form-section-title">
+            {{'page.policies.form.sections.database' | translate}}
+            <div class="pull-right">
+              <i class="fa text-primary"
+                [ngClass]="{'fa-chevron-down': sectionCollapsedMap.database, 'fa-chevron-up': !sectionCollapsedMap.database}"
+                (click)="toggleSection('database')"></i>
             </div>
-            <div class="col-md-4">
-              <dlm-search-input (change)="handleSearchChange($event)"></dlm-search-input>
-            </div>
+            <div class="clearfix"></div>
           </div>
-          <dlm-checkbox-list [items]="visibleDbList" formControlName="databases"></dlm-checkbox-list>
+          <div class="form-group" [collapse]="sectionCollapsedMap.database">
+            <div class="row flex-center">
+              <div class="col-md-8">
+                <span class="text-muted">
+                  {{'page.policies.form.selected' | translate}}: {{policyForm.value.databases?.length}}
+                </span>
+              </div>
+              <div class="col-md-4">
+                <dlm-search-input (change)="handleSearchChange($event)"></dlm-search-input>
+              </div>
+            </div>
+            <dlm-checkbox-list [items]="visibleDbList" formControlName="databases"></dlm-checkbox-list>
+          </div>
         </div>
       </div>
-      <div class="clearfix"></div>
-      <div class="form-section col-md-6">
-        <div class="form-section-title">
-          {{'page.policies.form.sections.job' | translate}}
-          <div class="pull-right">
-            <i class="fa text-primary"
-              [ngClass]="{'fa-chevron-down': sectionCollapsedMap.job, 'fa-chevron-up': !sectionCollapsedMap.job}"
-              (click)="toggleSection('database')"></i>
-          </div>
-          <div class="clearfix"></div>
-        </div>
-        <div [collapse]="sectionCollapsedMap.job" formGroupName="job">
-          <dlm-radio-button
-            formControlName="schedule"
-            [items]="jobTypes"
-            [selectedValue]="selectedJobType"
-            (change)="handleJobChange($event)">
-          </dlm-radio-button>
-          <div class="clearfix"></div>
-          <div class="form-group" *ngIf="selectedJobType === 'SCHEDULE'">
-            <div class="schedule-group">
-              <tabset>
-                <tab [heading]="'common.time.hourly' | translate">{{'common.time.hourly' | translate}}</tab>
-                <tab [heading]="'common.time.daily' | translate">{{'common.time.daily' | translate}}</tab>
-                <tab [heading]="'common.time.weekly' | translate">{{'common.time.weekly' | translate}}</tab>
-                <tab [heading]="'common.time.monthly' | translate">{{'common.time.monthly' | translate}}</tab>
-              </tabset>
+      <div class="row">
+        <div class="form-section col-md-6">
+          <div class="form-section-title">
+            {{'page.policies.form.sections.job' | translate}}
+            <div class="pull-right">
+              <i class="fa text-primary"
+                [ngClass]="{'fa-chevron-down': sectionCollapsedMap.job, 'fa-chevron-up': !sectionCollapsedMap.job}"
+                (click)="toggleSection('database')"></i>
             </div>
+            <div class="clearfix"></div>
+          </div>
+          <div [collapse]="sectionCollapsedMap.job" formGroupName="job">
+            <dlm-radio-button
+              formControlName="schedule"
+              [items]="jobTypes"
+              [selectedValue]="selectedJobType"
+              (change)="handleJobChange($event)">
+            </dlm-radio-button>
+            <div class="clearfix"></div>
+            <div class="form-group" *ngIf="selectedJobType === 'SCHEDULE'">
+              <div class="schedule-group">
+                <tabset>
+                  <tab [heading]="'common.time.hourly' | translate">{{'common.time.hourly' | translate}}</tab>
+                  <tab [heading]="'common.time.daily' | translate">{{'common.time.daily' | translate}}</tab>
+                  <tab [heading]="'common.time.weekly' | translate">{{'common.time.weekly' | translate}}</tab>
+                  <tab [heading]="'common.time.monthly' | translate">{{'common.time.monthly' | translate}}</tab>
+                </tabset>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-footer col-md-12">
+          <div class="footer-controls pull-right">
+            <button class="btn btn-default">{{'common.cancel' | translate}}</button>
+            <button class="btn btn-success" type="submit">{{'common.review' | translate}}</button>
           </div>
         </div>
       </div>
     </div>
-    <div class="clearfix"></div>
-    <div class="form-footer col-md-12">
-      <div class="footer-controls pull-right">
-        <button class="btn btn-default">{{'common.cancel' | translate}}</button>
-        <button class="btn btn-success" type="submit">{{'common.review' | translate}}</button>
-      </div>
-      <div class="clearfix"></div>
-    </div>
-    <div class="clearfix"></div>
   </form>
 </div>

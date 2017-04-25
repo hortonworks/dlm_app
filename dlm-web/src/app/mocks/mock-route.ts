@@ -31,11 +31,14 @@ export class MockRoute {
     if (this.method !== request.method || sourceTokens.length !== selfTokens.length) {
       return false;
     }
-    const unmatchedTokens = sourceTokens.filter((token, id) => {
-      return token !== selfTokens[id];
+    const matchedTokens = selfTokens.filter((token, id) => {
+      return token === sourceTokens[id];
     });
+    const isFullMatch = matchedTokens.length === sourceTokens.length;
+    const isDynamicMatch = matchedTokens.length === sourceTokens.length - 1
+      && selfTokens[selfTokens.length - 1].startsWith(':');
     // todo: maybe do some stuff with :id, e.g. pattern file name like cluster_:id.json
-    return !unmatchedTokens.length || unmatchedTokens[0].startsWith(':');
+    return isFullMatch || isDynamicMatch;
   }
 
   toRequest(originalRequest: Request): Request {

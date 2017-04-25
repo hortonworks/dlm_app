@@ -25,7 +25,7 @@ export class PolicyEffects {
   createPolicy$: Observable<any> = this.actions$
     .ofType(policyActions.CREATE_POLICY)
     .map(toPayload)
-    .switchMap((payload) => {
+    .switchMap(payload => {
       return this.policyService.createPolicy(payload)
         .mergeMap(response => [
           createPolicySuccess(response),

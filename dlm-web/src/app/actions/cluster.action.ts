@@ -5,7 +5,9 @@ import { Cluster } from '../models/cluster.model';
 export const ActionTypes = {
   LOAD_CLUSTERS: type('LOAD_CLUSTERS'),
   LOAD_CLUSTERS_SUCCESS: type('LOAD_CLUSTERS_SUCCESS'),
-  LOAD_CLUSTERS_FAILURE: type('LOAD_CLUSTERS_FAILURE')
+  LOAD_CLUSTERS_FAILURE: type('LOAD_CLUSTERS_FAILURE'),
+  LOAD_CLUSTER: type('LOAD_CLUSTER'),
+  LOAD_CLUSTER_SUCCESS: type('LOAD_CLUSTER_SUCCESS')
 };
 
 export class LoadClusters implements Action {
@@ -26,7 +28,21 @@ export class LoadClustersFailure implements Action {
   constructor(public payload: string) {}
 };
 
+export class LoadCluster implements Action {
+  type = ActionTypes.LOAD_CLUSTER;
+
+  constructor(public entityId: string, public payload?: any) {}
+};
+
+export class LoadClusterSuccess implements Action {
+  type = ActionTypes.LOAD_CLUSTER_SUCCESS;
+
+  constructor(public payload: any) {}
+};
+
 export type Actions
   = LoadClusters
   | LoadClustersSuccess
-  | LoadClustersFailure;
+  | LoadClustersFailure
+  | LoadCluster
+  | LoadClusterSuccess;

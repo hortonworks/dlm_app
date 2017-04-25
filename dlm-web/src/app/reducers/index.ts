@@ -9,19 +9,22 @@ import { compose } from '@ngrx/core/compose';
 import * as fromCluster from './cluster.reducer';
 import * as fromPolicy from './policy.reducer';
 import * as fromPairing from './pairing.reducer';
+import * as fromForm from './form.reducer';
 
 export interface State {
+  router: RouterState;
   clusters: fromCluster.State;
   policies: fromPolicy.State;
   pairings: fromPairing.State;
-  router: RouterState;
+  forms: fromForm.State;
 }
 
 const reducers = {
+  router: routerReducer,
   clusters: fromCluster.reducer,
   policies: fromPolicy.reducer,
   pairings: fromPairing.reducer,
-  router: routerReducer
+  forms: fromForm.reducer
 };
 
 const devReducer: ActionReducer<State> = compose(storeLogger(), combineReducers)(reducers);

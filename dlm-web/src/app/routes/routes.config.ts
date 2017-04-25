@@ -8,6 +8,7 @@ import { JobsComponent } from '../pages/jobs/jobs.component';
 import { HelpComponent } from '../pages/help/help.component';
 import { CreatePolicyComponent } from '../pages/policies/subpages/create-policy/create-policy.component';
 import { CreatePairingComponent } from '../pages/pairings/subpages/create-pairing/create-pairing.component';
+import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/review-policy.component';
 
 import { NotFoundRouteComponent } from './not-found-route/not-found-route.component';
 
@@ -55,7 +56,18 @@ export const routes: Routes = [{
       },
       {
         path: 'create',
-        component: CreatePolicyComponent
+        component: CreatePolicyComponent,
+        data: {
+          // todo: How to achieve translate here? Should we move breadcrumb label change to service?
+          breadcrumb: 'Create Replication Policy'
+        }
+      },
+      {
+        path: 'review',
+        component: ReviewPolicyComponent,
+        data: {
+          breadcrumb: 'Create Replication Policy'
+        }
       }
     ]
   },

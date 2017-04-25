@@ -15,11 +15,15 @@ import { ClusterEffects } from './effects/cluster.effect';
 import { routes } from './routes/routes.config';
 import { PolicyEffects } from './effects/policy.effect';
 import { PairingEffects } from './effects/pairing.effect';
+import { FormEffects } from './effects/form.effect';
 
 import { ClusterService } from './services/cluster.service';
 import { PolicyService } from './services/policy.service';
 import { PairingService } from './services/pairing.service';
 import { JobService } from './services/job.service';
+import { SessionStorageService } from './services/session-storage.service';
+import { FormService } from 'services/form.service';
+
 import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
 import { OverviewComponent } from './pages/overview/overview.component';
@@ -56,6 +60,7 @@ import { CreatePairingCardListComponent } from './pages/pairings/components/crea
 import { TranslateModule } from '@ngx-translate/core';
 import { TableComponent } from './common/table/table.component';
 import { CheckboxColumnComponent, ActionColumnComponent } from './components';
+import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/review-policy.component';
 
 @NgModule({
   imports: [
@@ -67,6 +72,8 @@ import { CheckboxColumnComponent, ActionColumnComponent } from './components';
     EffectsModule.run(ClusterEffects),
     EffectsModule.run(PolicyEffects),
     EffectsModule.run(PairingEffects),
+    EffectsModule.run(FormEffects),
+
     CollapseModule.forRoot(),
     TabsModule.forRoot(),
 
@@ -94,6 +101,7 @@ import { CheckboxColumnComponent, ActionColumnComponent } from './components';
     PolicyTableComponent,
     CreatePolicyComponent,
     PolicyFormComponent,
+    ReviewPolicyComponent,
 
     JobsComponent,
     HelpComponent,
@@ -117,6 +125,8 @@ import { CheckboxColumnComponent, ActionColumnComponent } from './components';
     JobService,
     PolicyService,
     PairingService,
+    SessionStorageService,
+    FormService,
     httpServiceProvider
   ]
 })

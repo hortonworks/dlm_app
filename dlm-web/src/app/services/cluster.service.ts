@@ -12,7 +12,7 @@ export class ClusterService {
   }
 
   fetchCluster(id: string): Observable<any> {
-    return this.http.get(`cluster/${id}`).map(r => r.json());
+    return this.http.get(`clusters/${id}`).map(r => r.json());
   }
 
   pairWith(cluster: any, pair: any): Observable<any> {
