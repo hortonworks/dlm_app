@@ -10,4 +10,7 @@ CREATE INDEX IF NOT EXISTS idx_dp_roles_name on dataplane.dp_roles(name);
 -- Configs
 CREATE INDEX IF NOT EXISTS idx_dp_configs on dataplane.dp_configs(configkey);
 
+-- Locations
+CREATE INDEX IF NOT EXISTS idx_dp_locations on dataplane.dataplane.dp_locations(city);
+
 
