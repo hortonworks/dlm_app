@@ -20,10 +20,3 @@ lazy val dpApp = (project in file("dp-app")).enablePlugins(PlayScala).
 
 lazy val clusterService = (project in file("services/cluster-service")).
   dependsOn(restMock, dbClient)
-
-lazy val beaconClient = (project in file("dp-plugin-apps/dlm/clients/beacon-client")).
-  dependsOn(dbClient)
-
-lazy val dlmApp = (project in file("dp-plugin-apps/dlm/dlm-app")).enablePlugins(PlayScala).
-  dependsOn(dbClient,beaconClient)
-
