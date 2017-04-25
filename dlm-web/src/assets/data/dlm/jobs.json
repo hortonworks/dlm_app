@@ -1,27 +1,72 @@
 {
-  "totalResults": 2,
-  "instance": [
-	{
-  	"id": "hdfspolicy@7",
-  	"name": "hdfspolicy",
-  	"type": "fs",
-  	"executionType": "fs",
-  	"status": "SUCCESS",
-  	"startTime": "2017-02-28T21:25:05",
-  	"endTime": "2017-02-28T21:25:28",
-  	"duration": 22578,
-  	"message": "Copy Successful"
-	},
-	{
-  	"id": "hdfspolicy@6",
-  	"name": "hdfspolicy",
-  	"type": "fs",
-  	"executionType": "fs",
-  	"status": "SUCCESS",
-  	"startTime": "2017-02-28T21:24:05",
-  	"endTime": "2017-02-28T21:24:25",
-  	"duration": 20171,
-  	"message": "Copy Successful"
-	}
+  "totalResults": 3,
+  "job": [
+    {
+      "id": "hdfspolicy@7",
+      "name": "hdfspolicy",
+      "status": "In Progress",
+      "policy": "hive2Policy",
+      "startTime": 1488309905000,
+      "endTime": -1,
+      "nextRun": 1551381865000,
+      "duration": 22578,
+      "source": "Sales-Analysis",
+      "target": "Sales-Aus",
+      "latestRun": 1488309905000,
+      "service": "HIVE",
+      "transferred": 70866960384,
+      "progress": 60,
+      "previousRuns": [
+        {"status": "Failed"},
+        {"status": ""},
+        {"status": "Failed"}
+      ]
+    },
+    {
+      "id": "hdfspolicy@6",
+      "name": "hdfspolicy",
+      "status": "Warnings",
+      "policy": "hivePolicy",
+      "startTime": 1488309845000,
+      "endTime": 1488309928000,
+      "nextRun": 1551381865000,
+      "duration": 20171,
+      "source": "Sales-Analysis",
+      "target": "Test Cluster",
+      "latestRun": 1488309845000,
+      "service": "HDFS",
+      "transferred": 36507222016,
+      "graphData": [
+        1,2,2,3,5,4,7
+      ],
+      "previousRuns": [
+        {"status": ""},
+        {"status": "Failed"},
+        {"status": "In Progress"}
+      ]
+    },
+    {
+      "id": "hdfspolicy@5",
+      "name": "hdfspolicy",
+      "status": "Failed",
+      "policy": "hdfsPrimaryPolicy",
+      "startTime": 1488309845000,
+      "endTime": 1488309865000,
+      "nextRun": 1551381865000,
+      "duration": 21483,
+      "source": "Sales-Analysis",
+      "target": "Test Cluster",
+      "latestRun": 1488309845000,
+      "service": "HDFS",
+      "transferred": 12884901888,
+      "graphData": [
+        10,2,2,4,5,7,9,11
+      ],
+      "previousRuns": [
+        {"status": "Failed"},
+        {"status": "In Progress"},
+        {"status": ""}
+      ]
+    }
   ]
 }

@@ -9,6 +9,7 @@ import { compose } from '@ngrx/core/compose';
 import * as fromCluster from './cluster.reducer';
 import * as fromPolicy from './policy.reducer';
 import * as fromPairing from './pairing.reducer';
+import * as fromJob from './job.reducer';
 import * as fromForm from './form.reducer';
 
 export interface State {
@@ -16,6 +17,7 @@ export interface State {
   clusters: fromCluster.State;
   policies: fromPolicy.State;
   pairings: fromPairing.State;
+  jobs: fromJob.State;
   forms: fromForm.State;
 }
 
@@ -24,6 +26,7 @@ const reducers = {
   clusters: fromCluster.reducer,
   policies: fromPolicy.reducer,
   pairings: fromPairing.reducer,
+  jobs: fromJob.reducer,
   forms: fromForm.reducer
 };
 

@@ -1,4 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {Store} from '@ngrx/store';
+import {getAllJobs} from '../../selectors/job.selector';
+import * as fromRoot from '../../reducers';
+import {Job} from '../../models/job.model';
+import {Observable} from 'rxjs/Observable';
+import {loadJobs} from '../../actions/job.action';
 
 @Component({
   selector: 'dp-main',
@@ -7,9 +13,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class JobsComponent implements OnInit {
 
-  constructor() { }
+  jobs$: Observable<Job[]>;
+
+  constructor(private store: Store<fromRoot.State>) {
+    this.jobs$ = store.select(getAllJobs);
+  }
 
   ngOnInit() {
+    this.store.dispatch(loadJobs());
   }
 
 }
