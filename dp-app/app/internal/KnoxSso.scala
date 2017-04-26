@@ -25,7 +25,10 @@ class KnoxSso @Inject()(configuration: Configuration) {
 
   def isSsoConfigured(): Boolean = {
     //TODO store this in db or elsewhere . user can setup sso or disable at will.
-    return !DP_APP_HOME.isEmpty && Files.exists(Paths.get(pubFilePath))
+    val ssoConfigured= !DP_APP_HOME.isEmpty && Files.exists(Paths.get(pubFilePath))
+    Logger.info(s"SSO Configured :${ssoConfigured}")
+    Logger.info(s"SSO Cookie Name :${ssoCookieName}")
+    ssoConfigured
   }
 
   def getSsoCookieName(): String = ssoCookieName
@@ -40,10 +43,11 @@ class KnoxSso @Inject()(configuration: Configuration) {
         Right((parsed.getBody.getSubject), if (expiration != null) expiration.getTime else -1)
       } catch {
         case e: ExpiredJwtException =>
+          Logger.error("token expired",e)
           Left(new Exception("token-expired"))
       }
     } else {
-      Logger.info("sso signig key not found")
+      Logger.error("sso signing key not found")
       Left(new Exception("sso-not-configured"))
     }
   }
@@ -51,18 +55,22 @@ class KnoxSso @Inject()(configuration: Configuration) {
   private def pubFilePath: String = s"${publicKeyPath}"
 
   private def getSigningPublicKey(): Option[PublicKey] = {
-    try {
-      val source: Source = Source.fromFile(publicKeyPath)
-      val certificateString: String = source.mkString
-      val fact: CertificateFactory = CertificateFactory.getInstance("X.509")
-      val is: ByteArrayInputStream = new ByteArrayInputStream(certificateString.getBytes("UTF8"))
-      val cer: Certificate = fact.generateCertificate(is)
-      Some(cer.getPublicKey)
-    } catch {
-      case e: Exception => {
-        None
+    if (!isSsoConfigured)
+      None
+    else{
+      try {
+        val source: Source = Source.fromFile(publicKeyPath)
+        val certificateString: String = source.mkString
+        val fact: CertificateFactory = CertificateFactory.getInstance("X.509")
+        val is: ByteArrayInputStream = new ByteArrayInputStream(certificateString.getBytes("UTF8"))
+        val cer: Certificate = fact.generateCertificate(is)
+        Some(cer.getPublicKey)
+      } catch {
+        case e: Exception => {
+          Logger.error("signing key read error",e)
+          None
+        }
       }
     }
   }
-
 }

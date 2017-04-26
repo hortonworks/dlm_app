@@ -59,8 +59,7 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
     }
   }
   def signInThrougKnox = Action.async { request =>
-    val requestProcol:String=if (request.secure)"https" else "http"
-    Future.successful(Redirect(knoxSso.getLoginUrl(s"${requestProcol}://${request.host}/onboard"),302))
+    Future.successful(Redirect(knoxSso.getLoginUrl(request.getQueryString("landingUrl").get),302))
   }
   def signOutThrougKnox = Action.async { request =>
     //TODO: domain, path and https to be done
