@@ -16,6 +16,8 @@ import {Store} from '@ngrx/store';
 import {MomentModule} from 'angular2-moment';
 import {BytesSizePipe} from '../../pipes/bytes-size.pipe';
 import {ChartsModule} from 'ng2-charts';
+import {RouterTestingModule} from '@angular/router/testing';
+import {TableFooterComponent} from '../../common/table/table-footer/table-footer.component';
 
 describe('JobsComponent', () => {
   let component: JobsComponent;
@@ -25,13 +27,14 @@ describe('JobsComponent', () => {
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot({
         loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-      }), NgxDatatableModule, FormsModule, MomentModule, ChartsModule],
+      }), NgxDatatableModule, FormsModule, MomentModule, ChartsModule, RouterTestingModule],
       declarations: [
         JobsComponent,
         JobsTableComponent,
         JobStatusComponent,
         JobTransferredGraphComponent,
         TableComponent,
+        TableFooterComponent,
         CheckboxComponent,
         CheckboxColumnComponent,
         ActionColumnComponent,

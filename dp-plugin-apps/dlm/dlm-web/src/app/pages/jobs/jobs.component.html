@@ -8,6 +8,15 @@
       <span class="text-muted">{{ "page.jobs.header_note" | translate }}</span>
     </div>
   </div>
+  <div class="pull-right">
+    <dlm-dropdown
+      [text]="'Add'"
+      [items]="addOptions"
+      [alignRight]="true"
+      [buttonClass]="'btn-secondary'"
+      (onSelectItem)="handleAddSelected($event)">
+    </dlm-dropdown>
+  </div>
 </div>
 
 <dp-jobs-table [jobs]="jobs$ | async"></dp-jobs-table>

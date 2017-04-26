@@ -68,6 +68,7 @@ import {MomentModule} from 'angular2-moment';
 import {ChartsModule} from 'ng2-charts/ng2-charts';
 
 import { TableComponent } from './common/table/table.component';
+import { TableFooterComponent } from './common/table/table-footer/table-footer.component';
 import { CheckboxColumnComponent, ActionColumnComponent } from './components';
 import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/review-policy.component';
 
@@ -133,6 +134,7 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     PairingCardComponent,
     PairingCardListComponent,
     TableComponent,
+    TableFooterComponent,
     CheckboxColumnComponent,
     ActionColumnComponent,
     ModalDialogComponent,
