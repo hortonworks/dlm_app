@@ -8,6 +8,7 @@ import { routes } from './app.routes';
 
 import { AppComponent } from './app.component';
 import { SignedInForSecureGuard , NotSignedInForUnsecureGuard, DoCleanUpAndRedirectGuard } from './shared/utils/auth-guard';
+import { LandingPageGuard } from './shared/utils/landing-page-guard';
 
 import { NotFoundRouteComponent } from './views/not-found-route/not-found-route.component';
 import { SignInComponent } from './views/sign-in/sign-in.component';
@@ -58,7 +59,7 @@ import {DataSetService} from "./services/dataset.service";
     SignedInForSecureGuard,
     NotSignedInForUnsecureGuard,
     DoCleanUpAndRedirectGuard,
-
+    LandingPageGuard
   ]
 })
 export class AppModule { }
