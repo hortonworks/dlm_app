@@ -14,7 +14,7 @@ POST        /api/lakes                             controllers.Lakes.create
 GET         /api/lakes/:lakeId                     controllers.Lakes.retrieve(lakeId)
 DELETE      /api/lakes/:lakeId                     controllers.Lakes.delete(lakeId)
 PUT         /api/lakes/:lakeId                     controllers.Lakes.update(lakeId)
-GET         /api/lakes/ambari/status               controllers.Lakes.ambariCheck(url:String)
+GET         /api/lakes/ambari/status               controllers.Lakes.ambariCheck
 
 GET         /api/locations                         controllers.Locations.list(query: Option[String])
 GET         /api/locations/:locationId             controllers.Locations.retrieve(locationId: Long)

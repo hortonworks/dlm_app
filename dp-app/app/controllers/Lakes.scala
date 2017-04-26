@@ -91,12 +91,11 @@ class Lakes @Inject()(@Named("lakeService") val lakeService: LakeService,
       }
   }
 
-  def ambariCheck(url: String) = Authenticated.async {
+  def ambariCheck = Authenticated.async {request =>
     ambariService
-      .statusCheck(AmbariEndpoint(url))
+      .statusCheck(AmbariEndpoint(request.getQueryString("url").get))
       .map {
-        case 200 => Ok(Json.toJson(Map("ambariStatus" -> 200)))
-        case status => ServiceUnavailable(Json.toJson(Map("ambariStatus" -> status)))
+        case status =>  Ok(Json.toJson(Map("ambariStatus" -> status)))
       }
       .recoverWith {
         case e: Exception =>

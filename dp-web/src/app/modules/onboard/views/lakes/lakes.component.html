@@ -30,10 +30,11 @@
       <input class="" type="text" placeholder="Description" name="description" id="description" [(ngModel)]="lake.description" required/>
     </div>
     <div class="dp-input">
-      <label for="uri" style="display: block;">Cluster URI</label>
-      <input class="" type="text" placeholder="URI" name="uri" id="uri" [(ngModel)]="lake.ambariUrl" required (input)="onUpdateCluster($event)"/>
-      <i class="fa fa-times dp-input__icon" aria-hidden="true" *ngIf="_isClusterValidateSuccessful === false && _isClusterValidateInProgress === false"></i>
-      <i class="fa fa-check dp-input__icon" aria-hidden="true" *ngIf="_isClusterValidateSuccessful && _isClusterValidateInProgress === false"></i>
+      <label for="uri">Cluster URI</label>
+      <span for="uri" style="float:right;cursor:pointer;text-decoration:underline;color:#5bc0de" (click)="onUpdateCluster($event)">Test Connection</span>
+      <input class="" type="text" placeholder="URI" name="uri" id="uri" [(ngModel)]="lake.ambariUrl" (focusout)="onUpdateCluster($event)" required/>
+      <i class="fa fa-times dp-input__icon" style="color:red" aria-hidden="true" *ngIf="_isClusterValidateSuccessful === false && _isClusterValidateInProgress === false"></i>
+      <i class="fa fa-check dp-input__icon" style="color:green" aria-hidden="true" *ngIf="_isClusterValidateSuccessful && _isClusterValidateInProgress === false"></i>
       <i class="fa fa-spinner dp-input__icon" aria-hidden="true" *ngIf="_isClusterValidateInProgress"></i>
     </div>
   </div>

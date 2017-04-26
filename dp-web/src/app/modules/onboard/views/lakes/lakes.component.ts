@@ -9,6 +9,8 @@ import { LakeService } from '../../../../services/lake.service';
 import { ClusterService } from '../../../../services/cluster.service';
 import { LocationService } from '../../../../services/location.service';
 
+import {Alerts} from '../../../../shared/utils/alerts';
+
 @Component({
   selector: 'dp-onboard-lakes',
   templateUrl: './lakes.component.html',
@@ -34,19 +36,20 @@ export class LakesComponent implements OnInit {
 
   ngOnInit() {
     this.rxClusterValidate
-      .debounce(() => Observable.timer(250))
-      .filter(cClusterUrl => cClusterUrl.length >= 3)
       .do(() => {
         this._isClusterValidateInProgress = true;
         this._isClusterValidateSuccessful = false;
       })
       .map(this.doCleanClusterUri)
-      .flatMap(clusterUrl => this.clusterService.validate(clusterUrl))
+      .flatMap(clusterUrl => this.lakeService.validate(clusterUrl))
       .subscribe(
-        isValid => {
-
+        response => {
           this._isClusterValidateInProgress = false;
-          this._isClusterValidateSuccessful = isValid;
+          if(response.ambariStatus === 200){
+            this._isClusterValidateSuccessful = true;
+          }else{
+            this._isClusterValidateSuccessful = false;
+          }
         },
         () => {
           this._isClusterValidateSuccessful = false;
@@ -76,6 +79,7 @@ export class LakesComponent implements OnInit {
   }
 
   doCleanClusterUri(clusterUri: string): string {
+    console.log("cluster uri in cleanup -->", clusterUri);
     // http://stackoverflow.com/a/26434126/640012
     //  create an anchor element (note: no need to append this element to the document)
     let link = document.createElement('a');
@@ -87,7 +91,7 @@ export class LakesComponent implements OnInit {
     // prevent leaks
     link = null;
 
-    return cleanedUri;
+    return clusterUri;
   }
 
   onCreate() {
@@ -95,6 +99,13 @@ export class LakesComponent implements OnInit {
       state: 'TO_SYNC',
       ambariurl: this.doCleanClusterUri(this.lake.ambariUrl)
     });
+    if(!this._isClusterValidateSuccessful && !this._isClusterValidateInProgress){
+      Alerts.showErrorMessage("Cluster url is invalid");
+      return;
+    }else if(!this._isClusterValidateSuccessful && this._isClusterValidateInProgress){
+      Alerts.showErrorMessage("Cluster Validation is in progress");
+      return;
+    }
     this.lakeService.insert(lake)
       .subscribe(
         () => {
