@@ -7,8 +7,8 @@ import com.hortonworks.dataplane.db.Webserice._
 import play.api.Configuration
 import play.api.libs.ws.WSClient
 
-import com.hortonworks.dlm.beacon.BeaconClusterServiceImpl
-import com.hortonworks.dlm.beacon.WebService.BeaconClusterService
+import com.hortonworks.dlm.beacon.{BeaconClusterServiceImpl,BeaconClusterPairServiceImpl}
+import com.hortonworks.dlm.beacon.WebService.{BeaconClusterService,BeaconClusterPairService}
 
 
 /**
@@ -44,9 +44,30 @@ class Module extends AbstractModule {
 
   @Provides
   @Singleton
+  @Named("lakeService")
+  def provideLakeService(implicit ws: WSClient,configuration: Configuration):LakeService = {
+    new LakeServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("locationService")
+  def provideLocationService(implicit ws: WSClient,configuration: Configuration):LocationService = {
+    new LocationServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
   @Named("beaconClusterService")
   def provideBeaconClusterService(implicit ws: WSClient,configuration: Configuration):BeaconClusterService = {
     new BeaconClusterServiceImpl()
+  }
+
+  @Provides
+  @Singleton
+  @Named("beaconClusterPairService")
+  def provideBeaconClusterPairService(implicit ws: WSClient,configuration: Configuration):BeaconClusterPairService = {
+    new BeaconClusterPairServiceImpl()
   }
 
 }
