@@ -12,10 +12,10 @@ import play.api.mvc._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class Locations @Inject()(@Named("locationService") val locationService: LocationService)
+class Locations @Inject()(@Named("locationService") val locationService: LocationService,authenticated:Authenticated)
   extends Controller {
 
-  def list(query: Option[String]) = Authenticated.async {
+  def list(query: Option[String]) = authenticated.async {
     locationService.list(query)
       .map { locations =>
         locations match {
@@ -25,7 +25,7 @@ class Locations @Inject()(@Named("locationService") val locationService: Locatio
       }
   }
 
-  def retrieve(locationId: Long) = Authenticated.async {
+  def retrieve(locationId: Long) = authenticated.async {
     locationService.retrieve(locationId)
       .map { location =>
         location match {

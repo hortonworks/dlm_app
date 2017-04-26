@@ -1,2 +1,2 @@
 #!/bin/sh
-sbt ";project dpApp;run"
+sbt ";project dpApp;run -DDP_APP_HOME=$pwd/dp-app"

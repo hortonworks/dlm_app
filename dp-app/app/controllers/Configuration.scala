@@ -5,6 +5,7 @@ import javax.inject.Inject
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webserice.LakeService
+import internal.KnoxSso
 import internal.auth.Authenticated
 import models.{JsonResponses, WrappedErrorsException}
 import play.api.libs.json.Json
@@ -13,10 +14,14 @@ import play.api.mvc._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class Configuration @Inject()(@Named("lakeService") val lakeService: LakeService)
+class Configuration @Inject()(@Named("lakeService") val lakeService:
+                              LakeService,authenticated:Authenticated,
+                              appConfiguration: play.api.Configuration,
+                              knoxSso: KnoxSso)
   extends Controller {
 
-  def init = Authenticated.async { request =>
+
+  def init = authenticated.async { request =>
     for {
       user <- Future.successful(request.user)
       lake <- isLakeSetup()
@@ -31,6 +36,15 @@ class Configuration @Inject()(@Named("lakeService") val lakeService: LakeService
       )
     )
   }
+  def appConfig = Action.async{ request =>
+    val requestProcol:String=if (request.secure)"https" else "http"
+    Future.successful(Ok(
+      Json.obj(
+        "isSsoConfigured"->knoxSso.isSsoConfigured
+      )
+    ))
+  }
+
 
 //  code to check if at least one lake has been setup
   private def isLakeSetup(): Future[Boolean] = {
