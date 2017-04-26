@@ -28,8 +28,12 @@ class Authenticated  @Inject()(@Named("userService") userService: UserService,
   private val apiCallTimeout = configuration.underlying.getLong("apicall.timeout").millis
   private val ssoLoginValidCookieName="sso_login_valid"
   def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[Result]) = {
+    if (knoxSso.isSsoConfigured() && !request.cookies.get(knoxSso.getSsoCookieName).isDefined){
+      Logger.info(s"Sso is configured but ssocookie ${knoxSso.getSsoCookieName} is not found. " +
+        s"Please check the domain name or sub domain of knox and dp app")
+    }
     if (knoxSso.isSsoConfigured && request.cookies.get(knoxSso.getSsoCookieName).isDefined) {
-      Logger.info("sso cookie is found")
+      Logger.debug("sso cookie is found")
       val serializedJWT: String = request.cookies.get(knoxSso.getSsoCookieName).get.value
       val jwtValidation: Either[Exception, (String, Long)] = knoxSso.validateJwt(serializedJWT)
       jwtValidation match {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component,OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs/Rx';
 
@@ -11,11 +11,12 @@ import { ConfigurationService } from '../../services/configuration.service';
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.scss']
 })
-export class SignInComponent {
+export class SignInComponent implements OnInit{
 
   _isAuthInProgress = false;
   _isAuthSuccessful = false;
   message = '';
+  landingPage:String;
 
   credential: Credential = new Credential('','');
   authenticate: Subject<Credential>;
@@ -32,6 +33,10 @@ export class SignInComponent {
     // this.authenticate
     //   .flatMap(credential => this.authenticaionService.signIn(credential))
     //   .subscribe()
+  }
+  ngOnInit() {
+    let currentLocation = window.location.href.split("/");
+    this.landingPage = `${currentLocation[0]}//${currentLocation[2]}/onboard`;
   }
 
   onSubmit(event) {
