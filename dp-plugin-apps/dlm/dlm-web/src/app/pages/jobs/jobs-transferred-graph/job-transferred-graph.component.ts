@@ -4,7 +4,7 @@ import {Job} from '../../../models/job.model';
 @Component({
   selector: 'job-transferred-graph',
   template: `
-    <canvas baseChart [style.display]="block"
+    <canvas baseChart [style.display]="'block'"
             width="100"
             height="30"
             [datasets]="graphData"
