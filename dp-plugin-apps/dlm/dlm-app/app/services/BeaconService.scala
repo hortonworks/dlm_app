@@ -11,7 +11,7 @@ import com.hortonworks.dlm.beacon.domain.RequestEntities.ClusterDefinitionReques
 import com.hortonworks.dlm.beacon.domain.ResponseEntities.{PairedCluster, PostActionResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import models.Entities.{ClusterDefinition, PairClusterRequest, PairedClustersResponse, ClusterDefinitionDetails}
+import models.Entities.{ClusterDefinition, PairClusterRequest, PairedClustersResponse, ClusterDefinitionDetails, BeaconCluster}
 
 import scala.collection.immutable.Set.Set2
 import scala.concurrent.Future
@@ -31,28 +31,33 @@ class BeaconService @Inject()(
   /**
     * Get list of all paired clusters
     *
-    * @return  @return Seq[Seq[[PairedCluster]]
+    * @return  PairedClustersResponse
     */
   def getAllPairedClusters: Future[Either[BeaconApiErrors,PairedClustersResponse]] = {
     val p: Promise[Either[BeaconApiErrors,PairedClustersResponse]] = Promise()
-    dataplaneService.getBeaconUrls.map(beaconUrls=>beaconUrls match {
-      case Left(msg) =>  {
-        p.success(Left(BeaconApiErrors(Seq(BeaconApiError("500", msg, None)))))
+    dataplaneService.getBeaconClusters.map(beaconClusters=>beaconClusters match {
+      case Left(errors) =>  {
+        p.success(Left(BeaconApiErrors(errors.errors.map(x=>BeaconApiError(x.code,x.message,None)))))
       }
-      case Right(beaconUrls) => {
+      case Right(beaconClusters) => {
         val allPairedClusterFuture:Future[Seq[Either[BeaconApiErrors, Seq[PairedCluster]]]] =
-          Future.sequence(beaconUrls.map((x) => beaconClusterPairService.listPairedClusters(x)))
+          Future.sequence(beaconClusters.map((x) => beaconClusterPairService.listPairedClusters(
+            x.services.find(x => x.servicename == "BEACON_SERVER").get.fullURL.get)))
         for {
           allPairedClustersOption <- allPairedClusterFuture
         } yield {
           val allPairedClusters:Seq[PairedCluster] = allPairedClustersOption.filter(_.isRight).flatMap(_.right.get)
-          val setOfPairedClusters: Set[Set2[String]] = allPairedClusters.foldLeft(Set():Set[Set2[String]]) {
+          val setOfPairedClusters: Set[Set2[BeaconCluster]] = allPairedClusters.foldLeft(Set():Set[Set2[String]]) {
             (acc, next) => {
               if (next.peers.isEmpty) acc else {
                 next.peers.map(x=>Set(next.name,x).asInstanceOf[Set2[String]]).toSet ++ acc
               }
             }
-          }
+          }.filter((x) => {  // filter cluster sets that are known to dataplane
+             x.forall(clustername => beaconClusters.exists(x=>x.name == clustername))
+          }).map(clusterNamePair=>{
+            clusterNamePair.map(clusterName=>beaconClusters.find(x=>x.name==clusterName).get).asInstanceOf[Set2[BeaconCluster]]
+          })
 
           val unreachableBeaconClusters:Seq[String] = allPairedClustersOption.filter(_.isLeft).
             flatMap(_.left.get.errors).map(_.beaconUrl.get)

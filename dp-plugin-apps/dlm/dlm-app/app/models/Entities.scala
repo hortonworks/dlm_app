@@ -28,7 +28,7 @@ object Entities {
   case class PairClusterRequest(clusterId: Long, beaconUrl: String)
 
   // Response schema for Pair cluster request
-  case class PairedClustersResponse(unreachableBeacon: Seq[String] = Seq(), pairedClusters: Set[Set2[String]] = Set())
+  case class PairedClustersResponse(unreachableBeacon: Seq[String] = Seq(), pairedClusters: Set[Set2[BeaconCluster]] = Set())
 
 }
 
