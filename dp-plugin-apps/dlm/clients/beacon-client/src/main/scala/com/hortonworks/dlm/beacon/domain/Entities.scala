@@ -1,14 +1,13 @@
 package com.hortonworks.dlm.beacon.domain
 
+import java.lang.reflect.Field
 import play.api.libs.json.Json
 
 object ResponseEntities {
-  case class BeaconApiError(code: String, message: String)
+  case class BeaconApiError(code: String, message: String, beaconUrl: Option[String])
   case class BeaconApiErrors(errors: Seq[BeaconApiError] = Seq())
 
-  case class BeaconCluster(name:String, peers: Seq[String], tags: Seq[String])
-
-  case class BeaconClusterResponse(totalResults:Int, cluster: Seq[BeaconCluster])
+  case class PairedCluster(name:String, dataCenter:Option[String], peers: Seq[String])
 
   case class AclObject(owner:Option[String], group:Option[String], permission:Option[String])
 
@@ -19,10 +18,17 @@ object ResponseEntities {
                                    customProperties: CustomProperties, acl: AclObject, entityType: String)
 
   case class BeaconClusterStatusResponse(status:String, message: String, requestId: String)
+
+  case class PostActionResponse(requestId: String, message: String, status: String)
+}
+
+object RequestEntities {
+  case class ClusterDefinitionRequest( fsEndpoint: String, beaconEndpoint: String, name: String, description: String)
 }
 
 object JsonFormatters {
   import com.hortonworks.dlm.beacon.domain.ResponseEntities._
+  import com.hortonworks.dlm.beacon.domain.RequestEntities._
 
   val defaultJson = Json.using[Json.WithDefaultValues]
 
@@ -32,12 +38,9 @@ object JsonFormatters {
   implicit val beaconApiErrorsWrites = Json.writes[BeaconApiErrors]
   implicit val beaconApiErrorsReads = Json.reads[BeaconApiErrors]
 
-  implicit val beaconClusterWrites = Json.writes[BeaconCluster]
-  implicit val beaconClusterReads = Json.reads[BeaconCluster]
-
-  implicit val beaconClusterResponseWrites = Json.writes[BeaconClusterResponse]
-  implicit val beaconClusterResponseReads = Json.reads[BeaconClusterResponse]
-
+  implicit val pairedClusterWrites = Json.writes[PairedCluster]
+  implicit val pairedClusterReads = Json.reads[PairedCluster]
+  
   implicit val aclObjectWrites = Json.writes[AclObject]
   implicit val aclObjectReads = Json.reads[AclObject]
 
@@ -49,6 +52,14 @@ object JsonFormatters {
 
   implicit val beaconClusterStatusResponseWrites = Json.writes[BeaconClusterStatusResponse]
   implicit val beaconClusterStatusResponseReads = Json.reads[BeaconClusterStatusResponse]
+
+  implicit val postActionResponseWrites = Json.writes[PostActionResponse]
+  implicit val postActionResponseReads = Json.reads[PostActionResponse]
+
+  //-- RequestEntities
+
+  implicit val clusterDefinitionRequestWrites = Json.writes[ClusterDefinitionRequest]
+  implicit val clusterDefinitionRequestReads = Json.reads[ClusterDefinitionRequest]
 }
 
 
