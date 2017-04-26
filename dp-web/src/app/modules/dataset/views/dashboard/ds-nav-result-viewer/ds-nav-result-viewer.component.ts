@@ -13,7 +13,7 @@ import {DatasetTag} from "../../../../../models/dataset-tag";
 export class DsNavResultViewer implements OnInit {
 
   @Input() currentDsTag : DatasetTag;
-  private datasetModels : RichDatasetModel[] = null
+  public datasetModels : RichDatasetModel[] = null
   private currentPage : number = 1;
 
   constructor(

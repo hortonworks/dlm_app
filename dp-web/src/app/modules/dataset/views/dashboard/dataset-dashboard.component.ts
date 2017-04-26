@@ -8,7 +8,7 @@ import {DatasetTag} from "../../../../models/dataset-tag";
 })
 export class DatasetDashboardComponent implements OnInit {
 
-  private currentDsTag :DatasetTag = null;
+  public currentDsTag :DatasetTag = null;
   // constructor(){}
 
   ngOnInit () {

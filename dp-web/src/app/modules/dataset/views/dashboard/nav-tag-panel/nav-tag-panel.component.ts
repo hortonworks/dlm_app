@@ -10,7 +10,7 @@ import {DatasetTag} from "../../../../../models/dataset-tag";
 export class NavTagPanel implements OnInit {
 
   @Output ('updateSelection') updateSelectionEmitter: EventEmitter<DatasetTag> = new EventEmitter<DatasetTag>();
-  private dsTags :DatasetTag[] = null;
+  public dsTags :DatasetTag[] = null;
   private currentDsTag :DatasetTag = null;
   constructor(
     private tagService :DatasetTagService
