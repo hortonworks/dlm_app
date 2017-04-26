@@ -41,28 +41,3 @@ export class LandingPageGuard implements CanActivate {
     }
   }
 }
-
-
-//     });
-//     return new Promise((resolve,reject)=>{
-//       if(!this.authenticationService.isUserLoggedIn()) {
-//         resolve(true);
-//         this.router.navigate(['/sign-in']);
-//       } else {
-//         this.configService.retrieve().subscribe(
-//           ({lakeWasInitialized}) => {
-//             if(lakeWasInitialized) {
-//               resolve(true);
-//               this.router.navigate(['/infra']);
-//             } else {
-//               resolve(true);
-//               this.router.navigate(['/onboard']);
-//             }
-//           },
-//           error => {
-//             resolve(false);
-//         });
-//       }
-//     });    
-//   }
-// }
