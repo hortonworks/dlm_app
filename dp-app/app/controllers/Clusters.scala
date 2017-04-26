@@ -95,13 +95,14 @@ class Clusters @Inject()(
           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
           case Right(clusterHealth) => Ok(summary match {
             case Some(summary) => Json.obj(
-              "nodes" -> clusterHealth.hosts.length,
-              "size" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityTotal),
-              "status" -> Json.obj(
-                "state" -> clusterHealth.nameNodeInfo.get.state,
-                "since" -> 34567890 /* up since time in ms | tz? */
+                "nodes" -> clusterHealth.hosts.length,
+                "totalSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityTotal),
+                "usedSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityUsed),
+                "status" -> Json.obj(
+                  "state" -> clusterHealth.nameNodeInfo.get.state,
+                  "since" -> (if (clusterHealth.nameNodeInfo.get.StartTime.isDefined) (clusterHealth.nameNodeInfo.get.StartTime.get - System.currentTimeMillis()) else 0)
+                )
               )
-            )
             case None => Json.toJson(clusterHealth)
           })
         }
@@ -112,7 +113,7 @@ class Clusters @Inject()(
     bytes match {
       case Some(bytes) => {
         if (bytes == 0) return "0 Bytes";
-        val k = 1000;
+        val k = 1024;
         val sizes = Array("Bytes ", "KB ", "MB ", "GB ", "TB ", "PB ", "EB ", "ZB ", "YB ");
         val i = Math.floor(Math.log(bytes) / Math.log(k)).toInt;
 

@@ -40,8 +40,14 @@
     </div>
     <div class="lake-stats__health-item" *ngIf="!!cHealth">
       <div>
-        <div class="lake-stats__health-label mdl-color-text--grey-500">HDFS</div>
-        <div class="lake-stats__health-detail mdl-color-text--grey-600">{{cHealth.size}}</div>
+        <div class="lake-stats__health-label mdl-color-text--grey-500">HDFS USAGE</div>
+        <div class="lake-stats__health-detail mdl-color-text--grey-600">{{cHealth.usedSize}}</div>
+      </div>
+    </div>
+    <div class="lake-stats__health-item" *ngIf="!!cHealth">
+      <div>
+        <div class="lake-stats__health-label mdl-color-text--grey-500">HDFS TOTAL</div>
+        <div class="lake-stats__health-detail mdl-color-text--grey-600">{{cHealth.totalSize}}</div>
       </div>
     </div>
     <div class="lake-stats__health-item lake-stats__health-spacer"></div>
