@@ -4,11 +4,16 @@
     "cancel": "Cancel",
     "review": "Review",
     "submit": "Submit",
+    "show": "Show",
     "time": {
       "hourly": "Hourly",
       "daily": "Daily",
       "weekly": "Weekly",
       "monthly": "Monthly"
+    },
+    "table": {
+      "summary": "{{shown}} of {{count}} showing",
+      "paging": "{{start}} - {{end}} of {{count}}"
     }
   },
   "sidenav": {

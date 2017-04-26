@@ -1,33 +1,14 @@
-import { Component, OnInit, Input, Output, ViewEncapsulation, ViewChild, TemplateRef, EventEmitter } from '@angular/core';
-import { ColumnMode, SelectionType } from '@swimlane/ngx-datatable';
-import { CheckboxColumnComponent } from '../../components/table-columns/checkbox-column/checkbox-column.component';
-import { ActionColumnType, ActionItemType, ActionColumnComponent } from '../../components';
+import {Component, Input, Output, ViewEncapsulation, ViewChild, TemplateRef, EventEmitter} from '@angular/core';
+import {ColumnMode, DatatableComponent} from '@swimlane/ngx-datatable';
+import {CheckboxColumnComponent} from '../../components/table-columns/checkbox-column/checkbox-column.component';
+import {ActionColumnType, ActionItemType, ActionColumnComponent} from '../../components';
 
 export const TABLE_ROW_HEIGHT = 36;
 export const SELECTED_KEY_NAME = '__selected';
 
 @Component({
   selector: 'dlm-table',
-  template: `
-   <ngx-datatable
-     [rows]="rows"
-     [columns]="columns"
-     [headerHeight]="headerHeight"
-     [rowHeight]="rowHeight"
-     [footerHeight]="footerHeight"
-     [columnMode]="columnMode"
-     [selectionType]="selectionType"
-     [cssClasses]="cssClasses"
-     >
-   </ngx-datatable>
-   <dlm-checkbox-column
-     (selectCell)="handleSelectedCell($event)"
-     (selectHeader)="handleAllChecked($event)">
-   </dlm-checkbox-column>
-   <dlm-action-column [actions]="actions"
-     (selectAction)="selectAction.emit($event)">
-   </dlm-action-column>
-  `,
+  templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
@@ -38,6 +19,7 @@ export class TableComponent {
   actions: ActionItemType[];
   @ViewChild(CheckboxColumnComponent) checkboxColumn: CheckboxColumnComponent;
   @ViewChild(ActionColumnComponent) actionsColumn: ActionColumnComponent;
+  @ViewChild('table') table: DatatableComponent;
 
   @Output() selectAction = new EventEmitter<ActionItemType>();
 
@@ -61,6 +43,7 @@ export class TableComponent {
     if (actionableColumn) {
       this.actions = actionableColumn.actions;
       actionableColumn.cellTemplate = this.actionsColumn.cellRef;
+      actionableColumn.sortable = false;
     }
     if (this.selectionType === 'checkbox') {
       this._columns = val.concat({
@@ -93,11 +76,25 @@ export class TableComponent {
     return this._rows;
   }
 
+  limit = 10;
+
   handleSelectedCell({row, column, checked}) {
     row[SELECTED_KEY_NAME] = !checked;
   }
 
   handleAllChecked(checked) {
     this._rows = this._rows.map(row => Object.assign({}, row, {[SELECTED_KEY_NAME]: checked}));
+  }
+
+  changePageSize(newLimit) {
+    /* TODO currently ngx-datatable doesn't supports bound `limit` changes.
+     * TODO Replace this code after ngx-datatable is updated with dynamic page size selection
+     */
+    this.table.limit = newLimit;
+    this.table.recalculate();
+  }
+
+  changePage(page) {
+    this.table.onFooterPage({page});
   }
 }

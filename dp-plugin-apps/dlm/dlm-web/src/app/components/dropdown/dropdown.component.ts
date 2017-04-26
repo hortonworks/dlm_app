@@ -11,8 +11,10 @@ export class DropdownComponent implements OnInit {
   @Input() text: string;
   @Input() items: DropdownItem[];
   @Input() buttonClass = 'btn-primary';
-  @Output() onSelectItem = new EventEmitter<DropdownItem>();
+  @Input() alignRight = false;
   @Input() type: string;
+  @Input() showChevron = true;
+  @Output() onSelectItem = new EventEmitter<DropdownItem>();
 
   constructor() { }
 

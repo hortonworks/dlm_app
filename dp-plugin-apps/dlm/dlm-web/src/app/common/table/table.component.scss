@@ -3,11 +3,15 @@
 $cell-padding: 8px;
 $table-border-color: #eee;
 
-.ngx-datatable {
+.ngx-datatable-wrapper {
   background: $white-color;
+  padding: 15px 8px;
+}
+
+.ngx-datatable {
+  overflow: visible !important;
   color: $grey-color;
   font-size: 13px;
-  padding: 15px 8px;
 
   .checkbox {
     margin-top: 5px;

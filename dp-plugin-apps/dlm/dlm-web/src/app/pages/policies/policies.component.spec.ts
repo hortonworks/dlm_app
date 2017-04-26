@@ -13,6 +13,7 @@ import {FormsModule} from '@angular/forms';
 import {MockStore} from '../../mocks/mock-store';
 import {Store} from '@ngrx/store';
 import {RouterTestingModule} from '@angular/router/testing';
+import {TableFooterComponent} from '../../common/table/table-footer/table-footer.component';
 
 describe('PoliciesComponent', () => {
   let component: PoliciesComponent;
@@ -28,6 +29,7 @@ describe('PoliciesComponent', () => {
         DropdownComponent,
         PolicyTableComponent,
         TableComponent,
+        TableFooterComponent,
         CheckboxComponent,
         CheckboxColumnComponent,
         ActionColumnComponent

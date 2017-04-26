@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {Job} from '../../../models/job.model';
 
 @Component({
@@ -16,7 +16,7 @@ import {Job} from '../../../models/job.model';
     <ng-content></ng-content>
   `
 })
-export class JobTransferredGraphComponent implements OnChanges, OnInit {
+export class JobTransferredGraphComponent {
 
   private colorStatusMap = {
     'Warnings': '#E98A40',
@@ -25,9 +25,30 @@ export class JobTransferredGraphComponent implements OnChanges, OnInit {
 
   @Input() job: Job;
 
-  graphLabels: Array<any> = [];
-  graphColors: Array<any> = [];
-  graphData: Array<any> = [];
+  get graphLabels(): Array<any> {
+    return this.job.graphData.map(() => '');
+  };
+
+  get graphColors(): Array<any> {
+    const color = this.colorStatusMap[this.job.status];
+    return [
+      {
+        backgroundColor: 'none',
+        borderColor: color,
+        pointBackgroundColor: color,
+        pointBorderColor: color,
+        pointHoverBackgroundColor: color,
+        pointHoverBorderColor: color
+      }
+    ];
+  };
+
+  get graphData(): Array<any> {
+    return [
+      {data: this.job.graphData, fill: false, label: ''}
+    ];
+  };
+
   graphOptions = {
     animation: false,
     elements: {
@@ -56,44 +77,6 @@ export class JobTransferredGraphComponent implements OnChanges, OnInit {
   };
 
   constructor() {
-  }
-
-  ngOnInit() {
-    this.calculateAll();
-  }
-
-  ngOnChanges() {
-    this.calculateAll();
-  }
-
-  calculateAll() {
-    this.calculateColors();
-    this.calculateData();
-    this.calculateLabels();
-  }
-
-  calculateData() {
-    this.graphData = [
-      {data: this.job.graphData, fill: false, label: ''}
-    ];
-  }
-
-  calculateColors() {
-    const color = this.colorStatusMap[this.job.status];
-    this.graphColors = [
-      {
-        backgroundColor: 'none',
-        borderColor: color,
-        pointBackgroundColor: color,
-        pointBorderColor: color,
-        pointHoverBackgroundColor: color,
-        pointHoverBorderColor: color
-      }
-    ];
-  }
-
-  calculateLabels() {
-    this.graphLabels = this.job.graphData.map(() => '');
   }
 
 }

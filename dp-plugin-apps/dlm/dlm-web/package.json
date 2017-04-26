@@ -33,7 +33,7 @@
     "@ngrx/router-store": "^1.2.5",
     "@ngrx/store": "^2.2.1",
     "@ngx-translate/core": "^6.0.1",
-    "@swimlane/ngx-datatable": "^7.3.0",
+    "@swimlane/ngx-datatable": "8.2.1",
     "angular2-moment": "^1.3.3",
     "bootstrap": "^3.3.7",
     "chart": "^0.1.2",

@@ -1,19 +1,21 @@
-<div class="btn-group" dropdown [ngSwitch]="type">
+<div class="btn-group" dropdown [ngSwitch]="type" placement="bottom right" [attr.placement.right]="alignRight">
   <div dropdownToggle>
-    <div #content><ng-content></ng-content></div>
-    <div *ngIf="!content.children.length">
+    <div #content>
+      <ng-content></ng-content>
+    </div>
+    <div *ngIf="!content.children.length" class="pull-left">
       <a *ngSwitchCase="'link'">
-        {{text}} <span class="glyphicon glyphicon-chevron-down"></span>
+        {{text}} <span *ngIf="showChevron" class="glyphicon glyphicon-chevron-down"></span>
       </a>
       <button *ngSwitchDefault type="button" class="btn dropdown-toggle" [ngClass]="buttonClass">
         <span class="pull-left">{{text}}&nbsp;</span>
-        <span class="glyphicon glyphicon-chevron-down pull-right"></span>
+        <span *ngIf="showChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>
       </button>
     </div>
   </div>
-  <ul *dropdownMenu class="dropdown-menu">
+  <ul *dropdownMenu class="dropdown-menu" [class.dropdown-menu-right]="alignRight">
     <li *ngFor="let item of items" (click)="selectItem(item)">
-      <a>{{item.label}}</a>
+      <a href="javascript:void(0);" class="dropdown-item">{{item.label}}</a>
     </li>
   </ul>
 </div>

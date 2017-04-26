@@ -149,9 +149,9 @@
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/@ngx-translate/core/-/core-6.0.1.tgz#7c7a80077feb994fc815b67a72065af04d394efe"
 
-"@swimlane/ngx-datatable@^7.3.0":
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/@swimlane/ngx-datatable/-/ngx-datatable-7.3.0.tgz#5f13f0867371001fd7d4c8a96be9222bf8f023d5"
+"@swimlane/ngx-datatable@8.2.1":
+  version "8.2.1"
+  resolved "https://registry.yarnpkg.com/@swimlane/ngx-datatable/-/ngx-datatable-8.2.1.tgz#b310ac7522312e301dbea3be7cf2a4b9bf172818"
 
 "@types/d3-tip@^3.5.3":
   version "3.5.4"
