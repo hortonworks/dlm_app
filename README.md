@@ -44,6 +44,7 @@
      * `./dpdeploy.sh build knox`: This builds the Knox container based on HDP 2.6 repo images.
      * `./dpdeploy.sh init knox`: This initializes the Knox container, by setting up necessary configuration, including things like the Knox master password, which are taken from the end user.
      * Ignore any warnings you get at this moment: these will be fixed in coming builds.
+     * *Note*: If the app was started before Knox, you would need to restart the app with `./dpdeploy.sh stop` and `./dpdeploy.sh start`.
      * Add an entry to your `/etc/hosts` file as follows: `<ip> dataplane`, where <ip> is the IP Address of the docker VM. For e.g. if you are using docker-machine, this can be obtained using `docker-machine env`
      * From your browser, hit `http://dataplane/sign-in`. This will bring up the login screen with an option to login via Knox-SSO.
      * Click the Knox-SSO link. You should be redirected to the KnoxSSO login page.
