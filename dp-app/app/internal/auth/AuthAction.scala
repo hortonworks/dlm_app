@@ -44,7 +44,12 @@ class Authenticated  @Inject()(@Named("userService") userService: UserService,
           val userFuture: Future[Either[Errors, User]] = userService.loadUser(subject)
           val userOp: Either[Errors, User] = Await.result(userFuture, apiCallTimeout)
           userOp.fold(
-            error => {
+            errors => {
+              if (errors.errors.size>0 && errors.errors(0).code.equals("404")){
+                Logger.info( s"User with name[${subject}] not found in dataplane db. users authroized from external system" +
+                  s" need to be synced to db.")
+              }
+              Logger.error(s"Error while retrieving user ${errors}")
               //TODO: domain and https to be done for proper deletiong of cookie.
               Future.successful(Results.Unauthorized.discardingCookies(DiscardingCookie(ssoLoginValidCookieName)))
             },
