@@ -37,7 +37,7 @@ export class SignInComponent implements OnInit{
   }
   ngOnInit() {
     let currentLocation = window.location.href.split("/");
-    this.landingPage = `${currentLocation[0]}//${currentLocation[2]}/onboard`;
+    this.landingPage = `${currentLocation[0]}//${currentLocation[2]}`;
   }
 
   onSubmit(event) {
