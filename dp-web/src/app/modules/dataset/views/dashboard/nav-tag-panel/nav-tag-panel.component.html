@@ -1,0 +1,6 @@
+
+
+<div *ngFor="let tagObj of dsTags;" class="panelRow {{currentDsTag==tagObj?'selected':''}}" (click)="onPanelRowSelectionChange(tagObj)">
+  <span class="displayName">{{tagObj.name}}</span>
+  <span class="displaycount">{{tagObj.count}}</span>
+</div>

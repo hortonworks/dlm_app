@@ -24,6 +24,7 @@ import { MdlDirective } from './directives/mdl.directive';
 
 import {CategoryService} from "./services/category.service";
 import {DataSetService} from "./services/dataset.service";
+import {DatasetTagService} from "./services/tag.service";
 
 @NgModule({
   imports: [
@@ -45,6 +46,7 @@ import {DataSetService} from "./services/dataset.service";
   bootstrap: [AppComponent],
   providers: [
     AuthenticationService,
+    DatasetTagService,
     CategoryService,
     DataSetService,
     LakeService,
