@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Subject, Observable } from 'rxjs/Rx';
@@ -10,13 +10,14 @@ import { ClusterService } from '../../../../services/cluster.service';
 import { LocationService } from '../../../../services/location.service';
 
 import {Alerts} from '../../../../shared/utils/alerts';
+import {StringUtils} from '../../../../shared/utils/stringUtils';
 
 @Component({
   selector: 'dp-onboard-lakes',
   templateUrl: './lakes.component.html',
   styleUrls: ['./lakes.component.scss']
 })
-export class LakesComponent implements OnInit {
+export class LakesComponent {
 
   lake: Lake = new Lake();
   location: Location;
@@ -34,15 +35,21 @@ export class LakesComponent implements OnInit {
     private locationService: LocationService,
   ) { }
 
-  ngOnInit() {
-    this.rxClusterValidate
-      .do(() => {
-        this._isClusterValidateInProgress = true;
-        this._isClusterValidateSuccessful = false;
-      })
-      .map(this.doCleanClusterUri)
-      .flatMap(clusterUrl => this.lakeService.validate(clusterUrl))
-      .subscribe(
+  locationFormatter(location:Location) : string{
+    return `${location.city}, ${location.country}`;
+  }
+
+  getLocations(searchTerm){
+      return this.locationService.retrieveOptions(searchTerm);
+  }
+
+  onSelectLocation(location: Location) {
+    this.lake.location = location.id;
+  }
+
+  doVerifyCluster(event) {
+    this._isClusterValidateInProgress = true;
+    this.lakeService.validate(StringUtils.cleanupUri(this.lake.ambariUrl)).subscribe(
         response => {
           this._isClusterValidateInProgress = false;
           if(response.ambariStatus === 200){
@@ -58,46 +65,10 @@ export class LakesComponent implements OnInit {
       );
   }
 
-  locationFormatter(location:Location) : string{
-    return `${location.city}, ${location.country}`;
-  }
-
-  getLocations(searchTerm){
-      return this.locationService.retrieveOptions(searchTerm);
-  }
-
-  onSelectLocation(location: Location) {
-    this.lake.location = location.id;
-  }
-
-  doVerifyCluster() {
-    this.rxClusterValidate.next(this.lake.ambariUrl);
-  }
-
-  onUpdateCluster(event) {
-    this.doVerifyCluster();
-  }
-
-  doCleanClusterUri(clusterUri: string): string {
-    console.log("cluster uri in cleanup -->", clusterUri);
-    // http://stackoverflow.com/a/26434126/640012
-    //  create an anchor element (note: no need to append this element to the document)
-    let link = document.createElement('a');
-    //  set href to any path
-    link.setAttribute('href', clusterUri);
-
-    const cleanedUri = `${link.protocol || 'http:'}//${link.hostname}:${link.port || '80'}`;
-    // cleanup for garbage collection
-    // prevent leaks
-    link = null;
-
-    return clusterUri;
-  }
-
   onCreate() {
     const lake = Object.assign({}, this.lake, {
       state: 'TO_SYNC',
-      ambariurl: this.doCleanClusterUri(this.lake.ambariUrl)
+      ambariurl: StringUtils.cleanupUri(this.lake.ambariUrl)
     });
     if(!this._isClusterValidateSuccessful && !this._isClusterValidateInProgress){
       Alerts.showErrorMessage("Cluster url is invalid");
