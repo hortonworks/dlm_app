@@ -2,7 +2,7 @@
   "totalResults": 2,
   "cluster": [
     {
-      "id": "primaryCluster",
+      "id": "Primary Cluster",
       "ambariUrl": "http://localhost:8080",
       "userName": "admin",
       "clusterType": "DATACENTER",
@@ -34,7 +34,7 @@
       }
     },
     {
-      "id": "anotherCluster",
+      "id": "Secondary Cluster",
       "ambariUrl": "http://localhost:8080",
       "userName": "admin2",
       "clusterType": "DATA_LAKE",
@@ -66,7 +66,7 @@
       }
     },
     {
-      "id": "devCluster",
+      "id": "Development Cluster",
       "ambariUrl": "http://localhost:8082",
       "userName": "devadmin",
       "clusterType": "DATA_LAKE",

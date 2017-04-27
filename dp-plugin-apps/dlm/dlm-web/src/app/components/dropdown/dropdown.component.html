@@ -4,14 +4,15 @@
       <ng-content></ng-content>
     </div>
     <div *ngIf="!content.children.length" class="pull-left">
-      <a *ngSwitchCase="'link'">
+      <span class="text-primary actionable" *ngSwitchCase="'link'">
         {{text}} <span *ngIf="showChevron" class="glyphicon glyphicon-chevron-down"></span>
-      </a>
+      </span>
       <button *ngSwitchDefault type="button" class="btn dropdown-toggle" [ngClass]="buttonClass">
         <span class="pull-left">{{text}}&nbsp;</span>
         <span *ngIf="showChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>
       </button>
     </div>
+    <div class="clearfix"></div>
   </div>
   <ul *dropdownMenu class="dropdown-menu" [class.dropdown-menu-right]="alignRight">
     <li *ngFor="let item of items" (click)="selectItem(item)">

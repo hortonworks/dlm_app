@@ -51,6 +51,8 @@ import { JobStatusComponent } from './pages/jobs/job-status/job-status.component
 import { JobTransferredGraphComponent } from './pages/jobs/jobs-transferred-graph/job-transferred-graph.component';
 
 import { PolicyTableComponent } from './pages/policies/policy-table/policy-table.component';
+import { FlowStatusComponent } from './pages/policies/policy-table/flow-status/flow-status.component';
+import { PolicyInfoComponent } from './pages/policies/policy-table/policy-info/policy-info.component';
 import { CreatePolicyComponent } from './pages/policies/subpages/create-policy/create-policy.component';
 import { PolicyFormComponent } from './pages/policies/components/policy-form/policy-form.component';
 import { RadioButtonComponent } from './common/radio-button/radio-button.component';
@@ -113,6 +115,8 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
 
     PoliciesComponent,
     PolicyTableComponent,
+    FlowStatusComponent,
+    PolicyInfoComponent,
     CreatePolicyComponent,
     PolicyFormComponent,
     ReviewPolicyComponent,

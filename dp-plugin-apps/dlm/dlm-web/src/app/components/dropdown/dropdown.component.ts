@@ -14,15 +14,22 @@ export class DropdownComponent implements OnInit {
   @Input() alignRight = false;
   @Input() type: string;
   @Input() showChevron = true;
+  @Input() selectable = false;
   @Output() onSelectItem = new EventEmitter<DropdownItem>();
 
   constructor() { }
 
 
   ngOnInit() {
+    if (this.selectable && !this.text) {
+      this.text = this.items[0].label;
+    }
   }
 
   selectItem(item: DropdownItem) {
+    if (this.selectable) {
+      this.text = item.label;
+    }
     this.onSelectItem.emit(item);
   }
 

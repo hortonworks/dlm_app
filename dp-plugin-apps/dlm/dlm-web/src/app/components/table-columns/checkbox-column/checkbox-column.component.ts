@@ -1,5 +1,8 @@
 import { Component, Output, Input, TemplateRef, ViewChild, EventEmitter } from '@angular/core';
 
+import { TableHeader } from 'common/table/table-header.type';
+import { TableColumn } from 'common/table/table-column.type';
+
 @Component({
   selector: 'dlm-checkbox-column',
   template: `
@@ -18,7 +21,7 @@ import { Component, Output, Input, TemplateRef, ViewChild, EventEmitter } from '
   `,
   styleUrls: ['./checkbox-column.component.scss']
 })
-export class CheckboxColumnComponent {
+export class CheckboxColumnComponent implements TableHeader, TableColumn {
   @Input() allSelected = false;
   @Output() selectCell = new EventEmitter<any>();
   @Output() selectHeader = new EventEmitter<boolean>();

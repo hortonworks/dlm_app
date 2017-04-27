@@ -10,6 +10,10 @@
     [selectionType]="selectionType"
     [cssClasses]="cssClasses"
     [limit]="limit">
+    <ngx-datatable-row-detail [rowHeight]="rowDetailHeight">
+      <ng-template let-row="row" ngx-datatable-row-detail-template>
+      </ng-template>
+    </ngx-datatable-row-detail>
     <ngx-datatable-footer>
       <ng-template
         ngx-datatable-footer-template

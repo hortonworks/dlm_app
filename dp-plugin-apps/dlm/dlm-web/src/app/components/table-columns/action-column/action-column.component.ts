@@ -1,6 +1,7 @@
 import { Component, Input, Output, ViewChild, TemplateRef, EventEmitter } from '@angular/core';
 import { ActionItemType } from './action-item.type';
 import { ActionColumnType } from './action-column.type';
+import { TableColumn } from 'common/table/table-column.type';
 
 @Component({
   selector: 'dlm-action-column',
@@ -15,7 +16,7 @@ import { ActionColumnType } from './action-column.type';
   `,
   styleUrls: ['./action-column.component.scss']
 })
-export class ActionColumnComponent {
+export class ActionColumnComponent implements TableColumn {
   @Output() selectAction = new EventEmitter<any>();
   @ViewChild('actionCell') cellRef: TemplateRef<any>;
   @Input() actions: ActionItemType[];

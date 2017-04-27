@@ -1,10 +1,15 @@
 {
   "common": {
     "all": "All",
+    "add": "Add",
     "cancel": "Cancel",
     "review": "Review",
     "submit": "Submit",
     "show": "Show",
+    "duration": "Duration",
+    "source": "Source",
+    "destination": "Destination",
+    "data": "Data",
     "time": {
       "hourly": "Hourly",
       "daily": "Daily",
@@ -44,6 +49,8 @@
       "header": "Replication Policies",
       "header_note": "Note: Pairings are bi-directional",
       "header_create": "Create Replication Policy",
+      "tags": "Tags",
+      "groups": "Groups",
       "form": {
         "selected": "Selected",
         "sections": {

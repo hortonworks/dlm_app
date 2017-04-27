@@ -1,0 +1,65 @@
+@import '../../../../styles/mixins';
+@import '../../../../styles/variables';
+
+$hex-size: 20px;
+
+.flow-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .flow-status-chart {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    width: 90%;
+
+    .flow-line {
+      flex-grow: 1;
+      height: 1px;
+      background: $light-grey;
+      position: relative;
+      display: flex;
+      z-index: 1;
+      justify-content: center;
+
+      .caret {
+        color: $link-color;
+        transform: rotate(-90deg);
+        top: -1px;
+        position: relative;
+      }
+    }
+    .flow-current-state,
+    .flow-desired-state {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      font-size: 10px;
+      line-height: 13px;
+      font-weight: bold;
+
+      &.active {
+        @include hexagon($hex-size, $link-color);
+        color: white;
+      }
+      &:not(.active) {
+        @include hexagon($hex-size, transparent, 1px solid $light-grey);
+        color: $grey-color;
+        width: 21px; // hacky but fix hexagon with border
+      }
+    }
+  }
+
+  .flow-status-text {
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 10px;
+    color: $grey-color;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+}
