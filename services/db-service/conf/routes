@@ -45,12 +45,17 @@ DELETE        /clusters/:clusterId                                           con
 #Cluster services API
 
 GET           /clusters/:clusterId/services                                  controllers.ClusterServices.allWithCluster(clusterId:Long)
-GET           /clusters/:datalakeId/services                                 controllers.ClusterServices.allWithDatalake(datalakeId:Long)
+GET           /datalakes/:datalakeId/services                                controllers.ClusterServices.allWithDatalake(datalakeId:Long)
 POST          /cluster/services                                              controllers.ClusterServices.addWithCluster
 POST          /datalake/services                                             controllers.ClusterServices.addWithDatalake
 GET           /clusters/:clusterId/service/:serviceName                      controllers.ClusterServices.loadWithClusterAndName(clusterId:Long,serviceName:String)
 DELETE        /services/:serviceId                                           controllers.ClusterServices.delete(serviceId:Long)
 PUT           /clusters/services                                             controllers.ClusterServices.updateWithCluster
+GET           /clusters/:clusterId/services/:serviceId/endpoint              controllers.ClusterServices.getEndpoints(clusterId:Long,serviceId:Long)
+POST          /services/endpoints                                            controllers.ClusterServices.addServiceEndpoint
+
+
+
 
 #Workspaces API
 GET           /workspaces                                                    controllers.Workspaces.all

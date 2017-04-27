@@ -53,8 +53,8 @@ class ClusterServiceRepo @Inject()(
 
   def updateByName(cs: ClusterService):Future[Int] = {
     db.run(Services.filter(_.servicename === cs.servicename).filter(_.clusterid === cs.clusterid)
-      .map(r => (r.fullURL,r.servicehost,r.serviceport,r.properties))
-        .update(cs.fullURL,cs.servicehost,cs.serviceport,cs.properties)).map( r => r)
+      .map(r => (r.properties))
+        .update(cs.properties)).map( r => r)
   }
 
   def findById(clusterId: Long): Future[Option[ClusterService]] = {
@@ -74,12 +74,6 @@ class ClusterServiceRepo @Inject()(
 
     def servicename = column[String]("servicename")
 
-    def servicehost = column[Option[String]]("servicehost")
-
-    def serviceport = column[Option[Int]]("serviceport")
-
-    def fullURL = column[Option[String]]("fullurl")
-
     def datalakeid = column[Option[Long]]("datalakeid")
 
     def clusterid = column[Option[Long]]("clusterid")
@@ -89,9 +83,6 @@ class ClusterServiceRepo @Inject()(
     def * =
       (id,
        servicename,
-       servicehost,
-       serviceport,
-       fullURL,
        properties,
        clusterid,
        datalakeid) <> ((ClusterService.apply _).tupled, ClusterService.unapply)

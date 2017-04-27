@@ -54,17 +54,16 @@ object Entities {
       longitude: Float
   )
 
-
   case class Datalake(
       id: Option[Long] = None,
       name: String,
       description: String,
-      ambariUrl:String,
+      ambariUrl: String,
       location: Option[Long],
       createdBy: Option[Long],
       properties: Option[JsValue],
       // state should be used to figure out the status of the cluster
-      state:Option[String] = Some("TO_SYNC"),
+      state: Option[String] = Some("TO_SYNC"),
       created: Option[LocalDateTime] = Some(LocalDateTime.now()),
       updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
@@ -89,16 +88,22 @@ object Entities {
       properties: Option[JsValue] = None
   )
 
-
   case class ClusterService(
       id: Option[Long] = None,
       servicename: String,
-      servicehost: Option[String],
-      serviceport: Option[Int],
-      fullURL: Option[String] = None,
       properties: Option[JsValue] = None,
       clusterid: Option[Long] = None,
       datalakeid: Option[Long] = None
+  )
+
+  case class ClusterServiceEndpoint(
+      id: Option[Long] = None,
+      name: String,
+      protocol: String = "TCP",
+      host: String,
+      port: Option[Int],
+      pathSegment: Option[String] = None,
+      serviceid: Option[Long] = None
   )
 
   case class Workspace(
@@ -134,7 +139,7 @@ object Entities {
 
   case class ClusterHost(id: Option[Long] = None,
                          host: String,
-                         ipaddr:String,
+                         ipaddr: String,
                          status: String,
                          properties: Option[JsValue] = None,
                          clusterId: Long)
@@ -185,8 +190,8 @@ object Entities {
                       configValue: String,
                       active: Option[Boolean] = Some(true),
                       // Special flag to allow exporting this key into ZK, or another
-                     // should be implemented as a job to export all keys with this flag set
-                       export: Option[Boolean] = Some(true))
+                      // should be implemented as a job to export all keys with this flag set
+                      export: Option[Boolean] = Some(true))
 
   // classes as data conatiner for Rest Api
 
@@ -241,6 +246,9 @@ object JsonFormatters {
 
   implicit val clusterServiceWrites = Json.writes[ClusterService]
   implicit val clusterServiceReads = Json.reads[ClusterService]
+
+  implicit val endpointWrites = Json.writes[ClusterServiceEndpoint]
+  implicit val endpointWReads = Json.reads[ClusterServiceEndpoint]
 
   implicit val workspaceWrites = Json.writes[Workspace]
   implicit val workspaceReads = Json.reads[Workspace]

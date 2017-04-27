@@ -87,7 +87,7 @@ COMMENT ON TABLE dataplane.dp_cluster_services  IS 'Services required for DP dis
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_service_endpoint (
   id          BIGSERIAL PRIMARY KEY,
-  name        VARCHAR(255),
+  name        VARCHAR(255) UNIQUE,
   protocol    VARCHAR(8) NOT NULL DEFAULT 'TCP',
   host        VARCHAR(255) NOT NULL ,
   port        INT,
