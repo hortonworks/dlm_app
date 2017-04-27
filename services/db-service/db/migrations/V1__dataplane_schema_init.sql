@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_clusters (
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_services (
   id          BIGSERIAL PRIMARY KEY,
+  servicename VARCHAR(255) NOT NULL,
   properties  JSONB,
   clusterid   BIGINT REFERENCES dataplane.dp_clusters (id),
   datalakeid  BIGINT REFERENCES dataplane.dp_datalakes (id),
