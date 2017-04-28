@@ -1,0 +1,53 @@
+<div class="tabCont">
+  <div class="tab {{(activeTab == tab.ALL)?'active':''}}" (click)="activeTab = tab.ALL;fetchAssets()">
+    <div class="tabName">Total</div>
+    <div class="tabCount">{{dsModel.hiveCount + dsModel.filesCount}}</div>
+  </div>
+  <div class="tab {{(activeTab == tab.HIVE)?'active':''}}" (click)="activeTab = tab.HIVE;fetchAssets()">
+    <div class="tabName">Hive</div>
+    <div class="tabCount">{{dsModel.hiveCount}}</div>
+  </div>
+  <div class="tab {{(activeTab == tab.HDFS)?'active':''}}" (click)="activeTab = tab.HDFS;fetchAssets()">
+    <div class="tabName">Files</div>
+    <div class="tabCount">{{dsModel.filesCount}}</div>
+  </div>
+  <div style="clear: both;"></div>
+</div>
+<div class="listCont">
+  <div class="searchCont">
+    <span><i class="fa fa-search"></i></span>
+    <input #searchBox type="text" placeholder="Search" (keyup.enter)="searchText=searchBox.value; fetchAssets()"/>
+  </div>
+  <div class="list">
+    <div class="listRow listHead">
+      <div class="checkboxCont"><input type="checkbox"/></div>
+      <div class="sourceCol">Source</div>
+      <div class="nameCol">Name</div>
+      <div class="ownerCol">Owner</div>
+      <div class="createdTimeCol">Created Time</div>
+      <div class="noRowsCol">Number of Rows</div>
+      <div class="dataTypeCol">Data Type</div>
+    </div>
+    <div class="justList" #table>
+      <div *ngIf="dsAssets.length">
+        <div class="listRow"  *ngFor="let asset of dsAssets;">
+          <div class="checkboxCont"><input type="checkbox"/></div>
+          <div class="sourceCol {{(asset.source.toUpperCase() == 'HIVE')?'hiveCol':'filesCol'}}">
+            <span><i class="fa {{(asset.source.toUpperCase() == 'HIVE')?'fa-table':'fa-file-o'}}"></i> {{asset.source}}</span>
+          </div>
+          <div class="nameCol">{{asset.name}}</div>
+          <div class="ownerCol">{{asset.owner}}</div>
+          <div class="createdTimeCol">{{asset.creationTime}}</div>
+          <div class="noRowsCol">{{asset.rowCount}}</div>
+          <div class="dataTypeCol">{{asset.type}}</div>
+        </div>
+      </div>
+    </div>
+    <div class="paginationRow">
+      <span>Rows Per Page</span>&nbsp;<span class="pageSizeSpan">{{pageSize}}</span>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span>{{getPaginationText ()}}</span>
+      &nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-chevron-left" (click)="showPrevious()"></i>&nbsp;&nbsp;<i class="fa fa-chevron-right" (click)="showNext()"></i>
+    </div>
+  </div>
+</div>
+

@@ -4,7 +4,8 @@ import {Observable} from "rxjs";
 import {RichDatasetModel} from "../models/richDatasetModel";
 @Injectable()
 export class RichDatasetService {
-  url = '/api/datasets-by-tag';
+  url1 = '/api/datasets-by-tag';
+  url2 = '/api/datasets-by-id';
 
   constructor(private http: Http) {
   }
@@ -12,6 +13,13 @@ export class RichDatasetService {
   public listByTag(tagName:string): Observable<RichDatasetModel[]> {
     return Observable.create(observer => {
       setTimeout(()=>observer.next(data), 300);
+    });
+
+  }
+
+  public getById(id:number): Observable<RichDatasetModel> {
+    return Observable.create(observer => {
+      setTimeout(()=>observer.next(data[id-1]), 300);
     });
 
   }
