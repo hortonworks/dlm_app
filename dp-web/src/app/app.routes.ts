@@ -36,7 +36,7 @@ export const routes: Routes = [{
     path: '',
     pathMatch: 'full',
     component: SignInComponent,
-    canActivate: [ LandingPageGuard ]
+    canActivate: [SignedInForSecureGuard, LandingPageGuard ]
   }, {
     path: '**',
     component: NotFoundRouteComponent
