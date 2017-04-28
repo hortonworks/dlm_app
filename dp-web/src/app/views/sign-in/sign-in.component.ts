@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component,OnInit } from '@angular/core';
+
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs/Rx';
 
@@ -11,11 +12,12 @@ import { ConfigurationService } from '../../services/configuration.service';
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.scss']
 })
-export class SignInComponent {
+export class SignInComponent implements OnInit{
 
   _isAuthInProgress = false;
   _isAuthSuccessful = false;
   message = '';
+  landingPage:String;
 
   credential: Credential = new Credential('','');
   authenticate: Subject<Credential>;
@@ -33,33 +35,25 @@ export class SignInComponent {
     //   .flatMap(credential => this.authenticaionService.signIn(credential))
     //   .subscribe()
   }
+  ngOnInit() {
+    let currentLocation = window.location.href.split("/");
+    this.landingPage = `${currentLocation[0]}//${currentLocation[2]}`;
+  }
 
   onSubmit(event) {
     this._isAuthInProgress = true;
-
     this.authenticaionService
       .signIn(this.credential)
       .finally(() => {
         this._isAuthInProgress = false;
-      })
-      .flatMap(user => this.configService.retrieve())
-      .subscribe(
-        ({lakeWasInitialized}) => {
-          // const persona = Persona[user.roles[0]];
-
-          this._isAuthSuccessful = true;
-
-          if(lakeWasInitialized) {
-            this.router.navigate(['/infra']);
-          } else {
-            this.router.navigate(['/onboard']);
-          }
-        },
+      }).subscribe(
+        (() => {
+          this.router.navigate(['']);
+        }),
         error => {
           this._isAuthSuccessful = false;
           this.message = 'Credentials were incorrect. Please try again.';
         }
       );
-  }
-
+    }
 }

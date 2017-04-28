@@ -1,0 +1,39 @@
+<h2>
+  {{'page.policies.header_create' | translate}}
+</h2>
+<div class="content">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="review-description">
+        <p>{{'page.policies.subpage.review.description.title' | translate:descriptionTranslateParam}}</p>
+        <br>
+        <p class="h4">{{'page.policies.subpage.review.details.title' | translate}}:</p>
+        <p *ngFor="let detail of detailsInfo">
+          <span class="text-muted">{{detail.label}}:&nbsp;</span>
+          <span>{{detail.value}}</span>
+        </p>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="alert alert-warning alert-small">
+              <i class="fa fa-warning text-warning"></i>
+              <span class="text-warning">{{'page.policies.subpage.review.details.warning' | translate}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="form-footer-wrap">
+        <div class="form-footer">
+          <div class="footer-controls pull-right">
+            <button (click)="cancelReview()" class="btn btn-default">{{'common.cancel' | translate}}</button>
+            <button (click)="submitReview()" class="btn btn-success">{{'common.submit' | translate}}</button>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

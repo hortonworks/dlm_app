@@ -1,0 +1,67 @@
+.tileProxy{
+  height:100%;
+  border:1px solid rgb(204,204,204);
+  border-radius: 3px;
+  position: relative;
+  cursor: pointer;
+}
+.tileProxy:hover {
+  background-color: rgb(247, 247, 247);
+}
+
+.tileProxy .header {
+  color:rgb(86,100,105);
+  padding: 7px 15px;
+}
+
+.tileProxy .title {
+  text-transform: uppercase;
+  font-size: 14px;
+}
+.tileProxy .header .options {
+  float: right;
+}
+
+.tileProxy .header .options .fa {
+  padding: 0 8px;
+}
+
+.tileProxy .metaInfo {
+  position: absolute;
+  bottom: 50px;
+  width:100%;
+  font-size: 10px;
+  line-height: 1.3;
+  padding: 15px;
+}
+.tileProxy .metaInfo .label {
+  width:60px;
+  float: left;
+}
+.tileProxy .footer {
+  position: absolute;
+  height:50px;
+  width:100%;
+  bottom: 0;
+  border-top:1px solid rgb(204,204,204);
+  background-color: rgb(250,250,250);
+  color:rgb(86,100,105);
+}
+
+.tileProxy .footer .division {
+  width:49%;
+  height:100%;
+  float: left;
+  display:table;
+}
+
+.tileProxy .footer .division > span {
+  display:table-cell;
+  vertical-align:middle;
+  text-align: center;
+  width:50%;
+}
+
+.tileProxy .footer .border-left {
+  border-left:1px solid rgb(204,204,204);
+}

@@ -1,0 +1,37 @@
+<div class="row row-nopad">
+  <div class="col-sm-3 col-md-2 col-lg-2">
+    {{summary}}
+  </div>
+  <div class="col-sm-2 col-md-6 col-lg-6">
+    <ng-content></ng-content>
+  </div>
+  <div class="col-sm-3 col-md-2 col-lg-2">
+    <div class="pull-right">
+      {{"common.show" | translate}}:
+      <dlm-dropdown
+        class="page-size-menu"
+        type="link"
+        [text]="pageSize"
+        [items]="pageSizeOptions"
+        [buttonClass]="'btn-default'"
+        [alignRight]="true"
+        [showChevron]="false"
+        (onSelectItem)="handleChangeLimit($event)"></dlm-dropdown>
+    </div>
+  </div>
+  <div class="col-sm-2 col-md-1 col-lg-1">
+    <div class="pull-right">
+      {{paging}}
+    </div>
+  </div>
+  <div class="col-sm-2 col-md-1 col-lg-1">
+    <div class="pull-right">
+      <button class="btn btn-link" (click)="handleGoToPrev()" [disabled]="prevDisabled">
+        <span class="fa fa-arrow-left" aria-hidden="true"></span>
+      </button>
+      <button class="btn btn-link" (click)="handleGoToNext()" [disabled]="nextDisabled">
+        <span class="fa fa-arrow-right" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+</div>

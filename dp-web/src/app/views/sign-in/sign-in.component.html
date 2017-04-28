@@ -4,6 +4,8 @@
       <img class="dataplane-logo-image" src="../../assets/images/ui_logo.svg"/>
     </div>
     <div class="" style="width: 50%;min-width: 500px; padding: 40px;">
+
+      <a href="/auth/signInThrougKnox?landingUrl={{landingPage}}">Signin through SSO</a>
       <div class="error-message" *ngIf="_isAuthInProgress === false && _isAuthSuccessful === false && message">{{message}}</div>
       <form (submit)="onSubmit($event)" #loginForm="ngForm">
         <div class="">

@@ -4,10 +4,14 @@
 
 #auth calls
 POST        /auth/in                               controllers.Authentication.signIn
+GET         /auth/userDetail                       controllers.Authentication.userDetail
+GET         /auth/signInThrougKnox                controllers.Authentication.signInThrougKnox
+GET         /auth/signOutThrougKnox                controllers.Authentication.signOutThrougKnox
 
 #api
 
 GET         /api/init                              controllers.Configuration.init
+GET         /api/appConfig                         controllers.Configuration.appConfig
 
 GET         /api/lakes                             controllers.Lakes.list
 POST        /api/lakes                             controllers.Lakes.create

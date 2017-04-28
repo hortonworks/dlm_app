@@ -6,18 +6,23 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.{Errors, User, UserRoles}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webserice.UserService
-import internal.Jwt
+import internal.{Jwt, KnoxSso}
 import models.JsonFormats._
 import models.{Credential, JsonResponses}
 import org.mindrot.jbcrypt.BCrypt
 import play.api.libs.json.Json
 import play.api.mvc._
+import internal.auth.Authenticated
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class Authentication @Inject()(@Named("userService") val userService: UserService)
+class Authentication @Inject()(@Named("userService") val userService: UserService,
+                               authenticated:Authenticated,
+                               knoxSso:KnoxSso,
+                               configuration: play.api.Configuration)
     extends Controller {
+  private val ssoCheckCookieName:String="sso_login_valid"
 
   def signIn = Action.async(parse.json) { request =>
     request.body
@@ -35,8 +40,32 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
       .getOrElse(Future.successful(
         BadRequest(JsonResponses.statusError("Cannot parse user request"))))
   }
-
-
+  def userDetail = authenticated.async { request =>
+    val username = request.user.username
+    for {
+      userOp: Either[Errors, User] <- userService.loadUser(username)
+      rolesOp: Either[Errors, UserRoles] <- userService.getUserRoles(username)
+    } yield {
+      userOp match {
+        case Left(errors) =>
+          Ok(Json.obj("user"->"error"))
+        case Right(user) =>
+          val orElse = getRoles(rolesOp)
+         Ok(Json.obj( "id" -> user.username,
+           "avatar" -> user.avatar,
+           "display" -> user.displayname)
+         )
+      }
+    }
+  }
+  def signInThrougKnox = Action.async { request =>
+    Future.successful(Redirect(knoxSso.getLoginUrl(request.getQueryString("landingUrl").get),302))
+  }
+  def signOutThrougKnox = Action.async { request =>
+    //TODO: domain, path and https to be done
+    Future.successful(Ok("ok").discardingCookies(DiscardingCookie(knoxSso.getSsoCookieName()))
+      .discardingCookies(DiscardingCookie(ssoCheckCookieName)))
+  }
   private def getRoles(roles: Either[Errors, UserRoles]) = {
     if (roles.isRight) {
       roles.right.get.roles
@@ -62,8 +91,8 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
                 "id" -> user.username,
                 "avatar" -> user.avatar,
                 "display" -> user.displayname,
-                "token" -> Jwt.makeJWT(user),
-                "roles" -> orElse
+                "token" -> Jwt.makeJWT(user)
+
               ))
           case false =>
             Unauthorized(

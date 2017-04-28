@@ -1,0 +1,21 @@
+<div class="search">
+  <dlm-search-input></dlm-search-input>
+</div>
+<div class="sort pull-left">
+  <span class="text-muted pull-left">Sort By:&nbsp;</span>
+  <dlm-dropdown
+    [text]="'Registered'"
+    [type]="'link'"
+    [items]="sortOptions"
+    (onSelectItem)="handleSelectedSort($event)"
+    [alignRight]="true">
+  </dlm-dropdown>
+</div>
+<dlm-dropdown
+  [items]="addOptions"
+  [text]="'Add'"
+  [buttonClass]="'btn-secondary'"
+  (onSelectItem)="handleSelectedAdd($event)"
+  [alignRight]="true"
+  class="pull-left">
+</dlm-dropdown>

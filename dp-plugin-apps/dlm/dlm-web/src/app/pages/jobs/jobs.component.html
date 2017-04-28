@@ -1,0 +1,22 @@
+<div class="page-header clearfix">
+  <div class="pull-left">
+    <p>
+      <i class="glyphicon glyphicon-hourglass"></i>
+      <span class="h2">{{ "page.jobs.header" | translate }}</span>
+    </p>
+    <div>
+      <span class="text-muted">{{ "page.jobs.header_note" | translate }}</span>
+    </div>
+  </div>
+  <div class="pull-right">
+    <dlm-dropdown
+      [text]="'Add'"
+      [items]="addOptions"
+      [alignRight]="true"
+      [buttonClass]="'btn-secondary'"
+      (onSelectItem)="handleAddSelected($event)">
+    </dlm-dropdown>
+  </div>
+</div>
+
+<dp-jobs-table [jobs]="jobs$ | async"></dp-jobs-table>

@@ -62,8 +62,8 @@ init_knox() {
         return -1
     fi
     docker exec -it ${KNOX_CONTAINER_ID} ./wait_for_keystore_file.sh
-    mkdir ${CERTS_DIR}
-    export_knox_cert $MASTER_PASSWD $KNOX_CONTAINER_ID > ${CERTS_DIR}/knox_public.cert
+    mkdir -p ${CERTS_DIR}
+    export_knox_cert $MASTER_PASSWD $KNOX_CONTAINER_ID > ${CERTS_DIR}/knox-signing.pem
 }
 
 export_knox_cert() {

@@ -20,7 +20,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class LakeActions @Inject()(
     @Named("lakeService") val lakeService: LakeService,
-    @Named("clusterService") val clusterService: ClusterService
+    @Named("clusterService") val clusterService: ClusterService,
+    authenticated:Authenticated
   ) extends Controller {
 
 //  def addWithCluster =  Authenticated.async(parse.json) { request =>
@@ -38,7 +39,7 @@ class LakeActions @Inject()(
 //    }.getOrElse(Future.successful(BadRequest))
 //  }
 
-  def listWithClusters = Authenticated.async {
+  def listWithClusters = authenticated.async {
     Logger.info("list lakes with clusters")
 
     retrieveLakes()

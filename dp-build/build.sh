@@ -51,10 +51,10 @@ build_dp_web() {
 
 build_dlm_web() {
 	log "Building dlm-web"
-	pushd ../dlm-web
+	pushd ../dp-plugin-apps/dlm/dlm-web
 	yarn
 	npm run build
-	cp -R ./dist ../dp-build/build/dlm-web
+	cp -R ./dist ../../../dp-build/build/dlm-web
 	popd
 }
 

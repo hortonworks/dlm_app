@@ -47,6 +47,9 @@ export class LakeStatsComponent implements OnInit {
   }
 
   doGetUptime(since: number) {
+    if(since === 0){
+      return 'NA';
+    }
     return moment.duration(since).humanize();
   }
 

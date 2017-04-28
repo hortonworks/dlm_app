@@ -23,7 +23,9 @@ services:
     ports:
         - "80:80"
     volumes:
-        - ./certs:/usr/dp-app/conf/certs
+        - ./certs:/usr/dp-app/conf/cert
+    environment:
+        DP_APP_HOME: "/usr/dp-app"
     depends_on:
         - dp-db-service
         - dp-database

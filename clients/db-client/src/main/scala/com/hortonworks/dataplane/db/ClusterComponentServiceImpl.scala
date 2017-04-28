@@ -40,6 +40,18 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
+  private def mapToServices(res: WSResponse) = {
+    res.status match {
+      case 200 =>
+        extractEntity[Seq[ClusterService]](res,
+          r =>
+            (r.json \ "results" \\ "data").map { d =>
+              d.validate[ClusterService].get
+            })
+      case _ => mapErrors(res)
+    }
+  }
+
   override def getServiceByName(clusterId: Long, serviceName: String): Future[Either[Errors, ClusterService]] = {
     ws.url(s"$url/clusters/$clusterId/service/$serviceName")
       .withHeaders(
@@ -52,6 +64,16 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
         case e:Exception =>
           Future.successful(Left(Errors(Seq(Error("500",e.getMessage)))))
       }
+  }
+
+  override def getServicesByName(serviceName: String): Future[Either[Errors, Seq[ClusterService]]] = {
+    ws.url(s"$url/services/$serviceName")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      )
+      .get
+      .map(mapToServices)
   }
 
   override def updateServiceByName(clusterData: ClusterService): Future[Either[Errors, Boolean]] = {

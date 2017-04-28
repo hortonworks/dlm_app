@@ -1,0 +1,20 @@
+@import '../../../styles/variables';
+
+dlm-table.cards-theme {
+  .ngx-datatable {
+    .datatable-scroll,
+    .datatable-header-inner {
+      padding: 0 $row-padding;
+    }
+  }
+}
+
+.flow-status-cell {
+  .flow-status {
+    padding: 0 10px;
+  }
+
+  .datatable-body-cell-label {
+    width: 100%;
+  }
+}

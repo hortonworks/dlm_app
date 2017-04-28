@@ -4,13 +4,14 @@ import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.db.Webserice._
 import internal.AtlasApiCache
+import internal.auth.Authenticated
 import play.api.Configuration
 import play.api.libs.ws.WSClient
 
 class Module extends AbstractModule {
   def configure() = {
+    bind(classOf[Authenticated]).asEagerSingleton()
   }
-
 
   @Provides
   @Singleton
