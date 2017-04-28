@@ -13,6 +13,7 @@ import org.mindrot.jbcrypt.BCrypt
 import play.api.libs.json.Json
 import play.api.mvc._
 import internal.auth.Authenticated
+import play.api.Logger
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -47,8 +48,10 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
       rolesOp: Either[Errors, UserRoles] <- userService.getUserRoles(username)
     } yield {
       userOp match {
-        case Left(errors) =>
+        case Left(errors) =>{
+          Logger.error(s"user fetch issue while retrieving details for '${username}': {${errors}")
           Ok(Json.obj("user"->"error"))
+        }
         case Right(user) =>
           val orElse = getRoles(rolesOp)
          Ok(Json.obj( "id" -> user.username,
