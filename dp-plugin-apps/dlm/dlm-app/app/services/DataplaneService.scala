@@ -5,7 +5,7 @@ import javax.inject.{Inject, Singleton}
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, Datalake, Location, Error, Errors, ClusterService => ClusterData}
 import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterService, LakeService, LocationService}
-import models.Entities.BeaconCluster
+import models.Entities.{BeaconCluster,BeaconClusters}
 import models.JsonResponses
 import play.api.libs.json.Json
 
@@ -28,8 +28,8 @@ class DataplaneService @Inject()(
     * Get details of the clusters that has Beacon server installed
     * @return [[models.Entities.BeaconCluster]]
     */
-  def getBeaconClusters : Future[Either[Errors, Seq[BeaconCluster]]] = {
-    val p: Promise[Either[Errors, Seq[BeaconCluster]]] = Promise()
+  def getBeaconClusters : Future[Either[Errors, BeaconClusters]] = {
+    val p: Promise[Either[Errors, BeaconClusters]] = Promise()
     val serviceName = "BEACON_SERVER"
     val beaconClusters = for {
       clusters <- clusterService.list()
@@ -63,7 +63,7 @@ class DataplaneService @Inject()(
             Seq(clusterData)
           )
         })
-        p.success(Right(allBeaconClusters))                                   
+        p.success(Right(BeaconClusters(allBeaconClusters)))
       }
 
       allLocations.onFailure {
@@ -107,6 +107,15 @@ class DataplaneService @Inject()(
     */
   def getCluster(clusterId: Long): Future[Either[Errors, Cluster]] = {
     clusterService.retrieve(clusterId.toString)
+  }
+
+  /**
+    *  Get future for service details from dataplane db client
+    * @param clusterId cluster id
+    * @return
+    */
+  def getServiceByName(clusterId: Long, serviceName: String): Future[Either[Errors, ClusterData]] = {
+    clusterComponentService.getServiceByName(clusterId, serviceName)
   }
 
   /**
