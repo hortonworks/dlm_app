@@ -3,9 +3,13 @@
 # ~~~~
 
 # clusters
-GET     /api/clusters                         controllers.Clusters.list
+GET     /api/clusters                             controllers.Clusters.list
 
 #Pairs
-GET     /api/pairs                            controllers.Pairs.list
-POST    /api/pair                             controllers.Pairs.create
-POST    /api/unpair                           controllers.Pairs.unpair
+GET     /api/pairs                                controllers.Pairs.list
+POST    /api/pair                                 controllers.Pairs.create
+POST    /api/unpair                               controllers.Pairs.unpair
+
+#Policies
+GET     /api/policies                             controllers.Policies.list
+GET     /api/clusters/:clusterId/policy/:name     controllers.Policies.retrieve(clusterId : Long, name : String)
