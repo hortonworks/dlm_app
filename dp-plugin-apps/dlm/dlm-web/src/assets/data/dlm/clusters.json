@@ -31,7 +31,19 @@
           "permission": "0x755"
         },
         "entityType": "CLUSTER"
-      }
+      },
+      "services": [
+        {
+          "id": 1,
+          "servicename": "BEACON_SERVER",
+          "servicehost": "104.196.90.96",
+          "serviceport": 25968,
+          "fullURL": "http://104.196.90.96:25968",
+          "properties": {},
+          "clusterid": 1,
+          "datalakeid": 1
+        }
+      ]
     },
     {
       "id": "Secondary Cluster",
@@ -63,7 +75,19 @@
           "permission": "0x755"
         },
         "entityType": "CLUSTER"
-      }
+      },
+      "services": [
+        {
+          "id": 1,
+          "servicename": "BEACON_SERVER",
+          "servicehost": "104.196.90.96",
+          "serviceport": 25968,
+          "fullURL": "http://104.196.90.96:25968",
+          "properties": {},
+          "clusterid": 1,
+          "datalakeid": 1
+        }
+      ]
     },
     {
       "id": "Development Cluster",
@@ -95,7 +119,63 @@
           "permission": "0x755"
         },
         "entityType": "CLUSTER"
-      }
+      },
+      "services": [
+        {
+          "id": 1,
+          "servicename": "BEACON_SERVER",
+          "servicehost": "104.196.90.96",
+          "serviceport": 25968,
+          "fullURL": "http://104.196.90.96:25968",
+          "properties": {},
+          "clusterid": 1,
+          "datalakeid": 1
+        }
+      ]
+    },
+    {
+      "id": "Standby Cluster",
+      "ambariUrl": "http://localhost:8082",
+      "userName": "devadmin",
+      "clusterType": "DATA_LAKE",
+      "createdAt": 1490689061725,
+      "volumeGB": 240,
+      "nodesCount": 54,
+      "clusterStatus": {
+        "requestId": "qtp2026718042-1933333",
+        "message": "Submitted",
+        "status": "SUCCEEDED"
+      },
+      "clusterDetails": {
+        "name": "Standby Cluster",
+        "description": "For supporting the primary cluster",
+        "dataCenter": "Columbus",
+        "fsEndpoint": "hdfs://localhost:8020",
+        "hsEndpoint": "http://localhost:10000",
+        "tags": "consumer=consumer@xyz.com,owner=producer@xyz.com",
+        "peers":"",
+        "customProperties": {
+          "dfs.namenode.kerberos.principal": "hdfs/_HOST@YOUR-REALM.COM"
+        },
+        "acl": {
+          "owner": "ambari-qa",
+          "group": "users",
+          "permission": "0x755"
+        },
+        "entityType": "CLUSTER"
+      },
+      "services": [
+        {
+          "id": 1,
+          "servicename": "BEACON_SERVER",
+          "servicehost": "104.196.90.96",
+          "serviceport": 25968,
+          "fullURL": "http://104.196.90.96:25968",
+          "properties": {},
+          "clusterid": 1,
+          "datalakeid": 1
+        }
+      ]
     }
   ]
 }

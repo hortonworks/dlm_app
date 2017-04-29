@@ -112,6 +112,10 @@
             "step_two": "STEP 2: SELECT CLUSTER TO BE PAIRED",
             "in_progress": "IN PROGRESS"
           }
+        },
+        "confirmation": {
+          "title": "Pairing Successful",
+          "body": "Pairing completed successfully"
         }
       }
     },

@@ -10,6 +10,7 @@ export class PairingProgressCardComponent implements OnInit {
 
   @Input() firstCluster: Cluster;
   @Input() secondCluster: Cluster;
+  @Input() isCompleted = false;
 
   constructor() { }
 

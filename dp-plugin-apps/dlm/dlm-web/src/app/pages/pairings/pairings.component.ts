@@ -43,10 +43,10 @@ export class PairingsComponent implements OnInit {
   onUnpair(pairingId: string) {
     console.log('Unpair ' + pairingId);
     this.pairingId = pairingId;
-    const pairing: any = this.pairings.filter(pair => pair.id === pairingId)[0];
+    const pairing: Pairing = this.pairings.filter(pair => pair.id === pairingId)[0];
     const params = {
-      firstCluster: pairing.firstCluster.clusterDetails.name,
-      secondCluster: pairing.secondCluster.clusterDetails.name
+      firstCluster: pairing.pair[0].clusterDetails.name,
+      secondCluster: pairing.pair[1].clusterDetails.name
     };
     this.confirmationModel.body = this.translate.instant(
       'page.pairings.unpair.confirmation.body', params);

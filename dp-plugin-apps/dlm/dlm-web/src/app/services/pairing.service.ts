@@ -8,6 +8,17 @@ export class PairingService {
   constructor(private http: Http) { }
 
   createPairing(pairing: any): Observable<any> {
+    // Expected structure:
+    // [
+    //   {
+    //     clusterId: 1,
+    //     beaconUrl: “http//:hostname1:port”
+    //   },
+    //   {
+    //     clusterId: 2,
+    //     beaconUrl: “http//:hostname2:port”
+    //   }
+    // ]
     return this.http.post('pairings', pairing).map(r => r.json());
   }
 

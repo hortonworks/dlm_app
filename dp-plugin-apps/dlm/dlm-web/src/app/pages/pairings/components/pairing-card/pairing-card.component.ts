@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Pairing } from '../../../../models/pairing.model';
+import { Pairing } from 'models/pairing.model';
 
 @Component({
   selector: 'dlm-pairing-card',

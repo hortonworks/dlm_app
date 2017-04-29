@@ -16,7 +16,7 @@ export class Page {
   }
 
   getMainActionButton() {
-    return element(by.tagName('dlm-dropdown'))
+    return element(by.tagName('dlm-dropdown'));
   }
 
   getMainActionDropDownItem(item) {
@@ -33,7 +33,7 @@ export class Page {
 export class OverviewPage extends Page {
 
   constructor() {
-    super()
+    super();
     new SideNav().navigateTo('Overview');
   }
 
@@ -42,21 +42,32 @@ export class OverviewPage extends Page {
 export class PoliciesPage extends Page {
 
   constructor() {
-    super()
+    super();
     new SideNav().navigateTo('Policies');
   }
 
-  clickAddPolicy() {
-    const actionButton = this.getMainActionButton();
-    actionButton.click();
+  getAddButton() {
+    return element(by.partialButtonText('Add'));
+  }
 
-    this.getMainActionDropDownItem('Policy').click();
+  getDropDownItem(item) {
+    return element.all(by.css('.dropdown-menu .dropdown-item')).filter(function(elem) {
+      return elem.getText().then( function(text) {
+        return text === item;
+      });
+    }).first();
+  }
+
+  clickAddPolicy() {
+    const actionButton = this.getAddButton();
+    actionButton.click();
+    this.getDropDownItem('Policy').click();
   }
 }
 
 export class PairingsPage extends Page {
   constructor() {
-    super()
+    super();
     new SideNav().navigateTo('Pairings');
   }
 

@@ -1,5 +1,6 @@
 import { RequestStatus } from './request-status.model';
 import { ClusterDetails } from './cluster-details.model';
+import { Service } from './service.model';
 
 export interface Cluster {
   id: string;
@@ -12,4 +13,5 @@ export interface Cluster {
   nodesCount: number;
   clusterStatus: RequestStatus;
   clusterDetails: ClusterDetails;
+  services: Array<Service>;
 }

@@ -8,7 +8,7 @@ import { Component, OnInit, Input } from '@angular/core';
 export class ClusterCardComponent implements OnInit {
 
   @Input() isSelected = false;
-
+  @Input() isDisabled = false;
   constructor() { }
 
   ngOnInit() {

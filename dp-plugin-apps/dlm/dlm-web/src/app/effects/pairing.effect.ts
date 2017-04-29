@@ -27,10 +27,10 @@ export class PairingEffects {
     .map(toPayload)
     .switchMap(payload => {
       return this.pairingService.createPairing(payload)
-        .mergeMap(response => [
-          createPairingSuccess(response),
-          go(['/pairings'])
-        ])
+        .map(response => {
+          response['payload'] = payload;
+          return createPairingSuccess(response);
+        })
         .catch(err => Observable.of(createPairingFail(err)));
     });
 

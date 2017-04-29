@@ -4,8 +4,9 @@
       <div class="cluster-name">{{firstCluster.clusterDetails.name}}</div>
       <div>{{firstCluster.clusterDetails.dataCenter}}</div>
     </div>
-    <div class="col-md-2 spinner col">
-      <i class="fa fa-spin fa-spinner"></i>
+    <div class="col-md-2 icon col">
+      <i *ngIf="!isCompleted" class="fa fa-spin fa-spinner spinner"></i>
+      <i *ngIf="isCompleted" class="glyphicon glyphicon-resize-horizontal pairing-icon"></i>
     </div>
     <div class="col-md-5 col right">
       <div class="cluster-name">{{secondCluster.clusterDetails.name}}</div>
