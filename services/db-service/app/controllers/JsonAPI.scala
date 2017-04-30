@@ -19,7 +19,7 @@ trait JsonAPI extends Controller {
 
   val notFound = NotFound(Json.toJson(wrapErrors("404","Not found")))
 
-  def linkData(data: JsValueWrapper, links: Map[String, String]) =
+  def linkData(data: JsValueWrapper, links: Map[String, String] = Map()) =
     Json.obj("data" -> data, "links" -> links)
 
   val apiError: PartialFunction[Throwable, Future[Result]] = {

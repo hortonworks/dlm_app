@@ -123,7 +123,8 @@ sealed class AtlasApiSupplier(clusterId: Long,
   private def getUrlOrThrowException = {
     clusterComponentService.getServiceByName(clusterId, "ATLAS").map {
       case Right(service) =>
-        service.fullURL.get
+        //service.fullURL.get
+        ""
       case Left(errors) =>
         throw new Exception(
           s"Could not get the service Url from storage - $errors")

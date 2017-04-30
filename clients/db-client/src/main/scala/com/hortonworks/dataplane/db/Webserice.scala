@@ -9,7 +9,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.{
 
 import scala.concurrent.Future
 
-object   Webserice {
+object Webserice {
 
   trait DbClientService {
 
@@ -47,9 +47,12 @@ object   Webserice {
   trait DataSetService extends DbClientService {
 
     def list(): Future[Either[Errors, Seq[Dataset]]]
-    def create(dataSetAndCatIds: DatasetAndCategoryIds): Future[Either[Errors, DatasetAndCategories]]
-    def retrieve(dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
-    def update(dataSetAndCatIds: DatasetAndCategoryIds): Future[Either[Errors, DatasetAndCategories]]
+    def create(dataSetAndCatIds: DatasetAndCategoryIds)
+      : Future[Either[Errors, DatasetAndCategories]]
+    def retrieve(
+        dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
+    def update(dataSetAndCatIds: DatasetAndCategoryIds)
+      : Future[Either[Errors, DatasetAndCategories]]
     def delete(dataSetId: String): Future[Either[Errors, Dataset]]
   }
 
@@ -63,10 +66,14 @@ object   Webserice {
 
   trait DataSetCategoryService extends DbClientService {
 
-    def getListWithDataSetId(dataSetId: String): Future[Either[Errors, Seq[DatasetCategory]]]
-    def getListWithCategoryId(categoryId: String): Future[Either[Errors, Seq[DatasetCategory]]]
-    def create(dataSetCategory: DatasetCategory): Future[Either[Errors, DatasetCategory]]
-    def delete(dataSetId: String, categoryId: String): Future[Either[Errors, DatasetCategory]]
+    def getListWithDataSetId(
+        dataSetId: String): Future[Either[Errors, Seq[DatasetCategory]]]
+    def getListWithCategoryId(
+        categoryId: String): Future[Either[Errors, Seq[DatasetCategory]]]
+    def create(dataSetCategory: DatasetCategory)
+      : Future[Either[Errors, DatasetCategory]]
+    def delete(dataSetId: String,
+               categoryId: String): Future[Either[Errors, DatasetCategory]]
   }
 
   trait LakeService extends DbClientService {
@@ -76,12 +83,11 @@ object   Webserice {
     def retrieve(datalakeId: String): Future[Either[Errors, Datalake]]
     def update(datalakeId: String,
                datalake: Datalake): Future[Either[Errors, Datalake]]
-    def updateStatus(datalake: Datalake):Future[Either[Errors, Boolean]]
+    def updateStatus(datalake: Datalake): Future[Either[Errors, Boolean]]
 
     def delete(datalakeId: String): Future[Either[Errors, Datalake]]
 
   }
-
 
   trait LocationService extends DbClientService {
 
@@ -89,7 +95,6 @@ object   Webserice {
     def retrieve(locationId: Long): Future[Either[Errors, Location]]
 
   }
-
 
   trait ClusterService extends DbClientService {
 
@@ -105,23 +110,34 @@ object   Webserice {
   // Maps to ClusterService
   trait ClusterComponentService extends DbClientService {
 
-    def create(clusterService: ClusterData): Future[Either[Errors, ClusterData]]
-    def getServiceByName(clusterId:Long,serviceName:String):Future[Either[Errors, ClusterData]]
-    def updateServiceByName(clusterData: ClusterData):Future[Either[Errors, Boolean]]
+    def create(
+        clusterService: ClusterData): Future[Either[Errors, ClusterData]]
+    def getServiceByName(
+        clusterId: Long,
+        serviceName: String): Future[Either[Errors, ClusterData]]
+    def updateServiceByName(
+        clusterData: ClusterData): Future[Either[Errors, Boolean]]
+    def addClusterEndpoints(
+        clusterServiceEndpoints: Seq[ClusterServiceEndpoint] = Seq())
+      : Future[Seq[Either[Errors, ClusterServiceEndpoint]]]
+    def updateClusterEndpoints(
+        clusterServiceEndpoints: Seq[ClusterServiceEndpoint] = Seq())
+      : Future[Seq[Either[Errors, Boolean]]]
 
   }
 
   trait ClusterHostsService extends DbClientService {
-    def getHostByClusterAndName(clusterId:Long,hostName:String):Future[Either[Errors,ClusterHost]]
-    def getHostsByCluster(clusterId:Long):Future[Either[Errors,Seq[ClusterHost]]]
-    def createOrUpdate(host:ClusterHost):Future[Option[Errors]]
+    def getHostByClusterAndName(
+        clusterId: Long,
+        hostName: String): Future[Either[Errors, ClusterHost]]
+    def getHostsByCluster(
+        clusterId: Long): Future[Either[Errors, Seq[ClusterHost]]]
+    def createOrUpdate(host: ClusterHost): Future[Option[Errors]]
 
   }
-
 
   trait ConfigService extends DbClientService {
-    def getConfig(key:String):Future[Option[DpConfig]]
+    def getConfig(key: String): Future[Option[DpConfig]]
   }
-
 
 }

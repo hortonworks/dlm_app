@@ -59,7 +59,7 @@ class ClusterHostsServiceImpl(config: Config)(implicit ws: WSClient)
       case 200 =>
         extractEntity[ClusterHost](
           res,
-          r => (r.json \ "results" \\ "data")(0).validate[ClusterHost].get)
+          r => (r.json \ "results" \\ "data").head.validate[ClusterHost].get)
       case _ => mapErrors(res)
     }
   }

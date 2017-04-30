@@ -35,14 +35,14 @@ class ClusterServices @Inject()(
   }
 
   private def makeLink(c: ClusterService) = {
-    Map("datalake" -> s"${datalakes}/${c.datalakeid.get}")
+    Map("datalake" -> s"$datalakes/${c.datalakeid.get}")
   }
   private def makeClusterLink(c: ClusterService) = {
-    Map("cluster" -> s"${clusters}/${c.clusterid.get}")
+    Map("cluster" -> s"$clusters/${c.clusterid.get}")
   }
 
   private def makServiceLink(e: ClusterServiceEndpoint, clusterId: Long) = {
-    Map("cluster" -> s"${clusters}/$clusterId")
+    Map("cluster" -> s"$clusters/$clusterId")
   }
 
   def load(serviceId: Long) = Action.async {
@@ -95,13 +95,15 @@ class ClusterServices @Inject()(
       .map { cl =>
         //        check if cluster is not null and datalake is null
         if (cl.clusterid.isEmpty)
-          UnprocessableEntity
-        if (cl.datalakeid.isDefined)
-          UnprocessableEntity
-        val created = csr.insert(cl)
-        created
-          .map(c => success(linkData(c, makeClusterLink(c))))
-          .recoverWith(apiError)
+          Future.successful(UnprocessableEntity)
+        else if (cl.datalakeid.isDefined)
+          Future.successful(UnprocessableEntity)
+        else {
+          val created = csr.insert(cl)
+          created
+            .map(c => success(linkData(c, makeClusterLink(c))))
+            .recoverWith(apiError)
+        }
       }
       .getOrElse(Future.successful(BadRequest))
 
@@ -165,7 +167,24 @@ class ClusterServices @Inject()(
         } else {
           val created = cse.insert(ce)
           created
-            .map(c => success(c))
+            .map(c => success(linkData(c)))
+            .recoverWith(apiError)
+        }
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
+
+  def updateServiceEndpoint = Action.async(parse.json) { req =>
+    req.body
+      .validate[ClusterServiceEndpoint]
+      .map { ce =>
+        // check if cluster is not null and datalake is null
+        if (ce.serviceid.isEmpty) {
+          Future.successful(UnprocessableEntity)
+        } else {
+          val created = cse.updateOrInsert(ce)
+          created
+            .map(c => success(linkData(c)))
             .recoverWith(apiError)
         }
       }

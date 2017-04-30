@@ -117,5 +117,14 @@ private sealed class Synchronizer(val storageInterface: StorageInterface,
       // fire poll to children
       dataLakeWorkers.values.foreach(_ ! Poll())
 
+
+    case ServiceSaved(clusterData,cluster)=>
+      log.info(s"Cluster state saved for - ${clusterData.servicename}")
+      dataLakeWorkers(cluster.datalakeid.get) ! ServiceSaved(clusterData,cluster)
+
+    case HostInfoSaved(cluster)=>
+      dataLakeWorkers(cluster.datalakeid.get) ! HostInfoSaved(cluster)
+
+
   }
 }

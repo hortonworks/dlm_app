@@ -83,6 +83,15 @@ class AtlasRoute @Inject()(
     }
   }
 
+//  val atlasEntity = {
+//    path("cluster" / LongNumber / "atlas" / "guid" / JavaUUID){ guid =>
+//      get{
+//
+//      }
+//    }
+//  }
+
+
   private def supplyApi(id: Long) = {
     Suppliers.memoizeWithExpiration(newInterface(id),
                                     atlasApiCacheTime,

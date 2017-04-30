@@ -17,8 +17,8 @@ object ClusterService extends App {
   private val configuration = injector.getInstance(classOf[Config])
 
   logger.info(s"Starting a server on ${configuration.getInt("dp.services.cluster.http.port")}")
-  private val server = injector.getInstance(classOf[Webserver])
-  server.init
+//  private val server = injector.getInstance(classOf[Webserver])
+//  server.init
 
 
   logger.info("Starting cluster sync")

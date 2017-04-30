@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_service_endpoint (
   serviceid   BIGINT REFERENCES dataplane.dp_cluster_services(id)
 );
 
-COMMENT ON COLUMN dataplane.dp_cluster_service_endpoint.urlsuffix  IS 'An additional path segment if required';
+COMMENT ON COLUMN dataplane.dp_cluster_service_endpoint.pathsegment  IS 'An additional path segment if required';
 COMMENT ON COLUMN dataplane.dp_cluster_service_endpoint.name  IS 'The property key to identify this endpoint';
 COMMENT ON TABLE dataplane.dp_cluster_service_endpoint  IS 'Service endpoints for services listed in dp_cluster_services';
 

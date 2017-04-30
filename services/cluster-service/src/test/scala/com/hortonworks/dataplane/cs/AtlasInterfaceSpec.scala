@@ -45,10 +45,8 @@ class AtlasInterfaceSpec
           Right(
             AtlasService(
               Some(1),
-              "ATLAS",
-              None,
-              None,
-              Some("http://ashwin-dp-knox-test-1.novalocal:9998")))))
+              "ATLAS"
+              ))))
 
     (clusterHostsService.getHostByClusterAndName _)
       .expects(1, "ashwin-dp-knox-test-1.novalocal")

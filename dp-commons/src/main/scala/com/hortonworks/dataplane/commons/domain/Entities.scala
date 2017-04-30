@@ -11,7 +11,9 @@ import play.api.libs.json.{JsValue, Json}
 object Entities {
 
   case class Error(code: String, message: String)
-  case class Errors(errors: Seq[Error] = Seq())
+  case class Errors(errors: Seq[Error] = Seq()) {
+    def combine(newErrors: Errors) = Errors(errors ++ newErrors.errors)
+  }
 
   // Pagination
   case class Pagination(page: Int, offset: Long, limit: Long)

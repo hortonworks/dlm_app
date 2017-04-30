@@ -4,33 +4,57 @@ import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Entities.ClusterServiceEndpoint
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
 @Singleton
 class ClusterServiceEndpointRepo @Inject()(
-    protected val dbConfigProvider: DatabaseConfigProvider,private val csr: ClusterServiceRepo)
+    protected val dbConfigProvider: DatabaseConfigProvider,
+    private val csr: ClusterServiceRepo)
     extends HasDatabaseConfigProvider[DpPgProfile] {
 
   import profile.api._
 
   val Endpoints = TableQuery[ClusterServiceEndpointTable]
 
-  def allByClusterAndService(clusterId:Long,serviceId: Long): Future[List[ClusterServiceEndpoint]] = {
+  def allByClusterAndService(
+      clusterId: Long,
+      serviceId: Long): Future[List[ClusterServiceEndpoint]] = {
     val query = for {
       services <- csr.Services if services.clusterid === clusterId
-      endpoints <- Endpoints if endpoints.serviceid === serviceId if endpoints.serviceid === services.id
+      endpoints <- Endpoints if endpoints.serviceid === serviceId
+      if endpoints.serviceid === services.id
     } yield (endpoints)
 
     db.run(query.to[List].result)
   }
 
-
-
-  def insert(endPoint: ClusterServiceEndpoint): Future[ClusterServiceEndpoint] = {
+  def insert(
+      endPoint: ClusterServiceEndpoint): Future[ClusterServiceEndpoint] = {
     db.run {
       Endpoints returning Endpoints += endPoint
     }
+  }
+
+  def updateOrInsert(endPoint: ClusterServiceEndpoint): Future[Boolean] = {
+    db.run(
+      Endpoints
+        .filter(r =>
+          r.serviceid === endPoint.serviceid && r.name === endPoint.name)
+        .map(o => (o.host, o.port, o.protocol, o.pathsegment))
+        .update(
+          (endPoint.host,
+            endPoint.port,
+            endPoint.protocol,
+            endPoint.pathSegment)))
+      .map {
+        case 0 =>
+          db.run(Endpoints += endPoint)
+          true
+        case 1 => true
+        case n => throw new Exception(s"Too many rows updated for $endPoint")
+      }
   }
 
 
@@ -44,8 +68,8 @@ class ClusterServiceEndpointRepo @Inject()(
 
   final class ClusterServiceEndpointTable(tag: Tag)
       extends Table[ClusterServiceEndpoint](tag,
-                                    Some("dataplane"),
-                                    "dp_cluster_service_endpoint") {
+                                            Some("dataplane"),
+                                            "dp_cluster_service_endpoint") {
 
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
@@ -62,11 +86,7 @@ class ClusterServiceEndpointRepo @Inject()(
     def serviceid = column[Option[Long]]("serviceid")
 
     def * =
-      (id,
-       name,
-       protocol,
-       host,
-       port,pathsegment,serviceid) <> ((ClusterServiceEndpoint.apply _).tupled, ClusterServiceEndpoint.unapply)
+      (id, name, protocol, host, port, pathsegment, serviceid) <> ((ClusterServiceEndpoint.apply _).tupled, ClusterServiceEndpoint.unapply)
 
   }
 

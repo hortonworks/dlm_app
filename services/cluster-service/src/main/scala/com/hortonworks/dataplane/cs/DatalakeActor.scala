@@ -89,7 +89,7 @@ class DatalakeActor(private val dataLake: Datalake,
                                                          wSClient,
                                                          storageInterface,
                                                          credentials,
-                                                         dbActor),
+                                                         dbActor,config),
                                                    s"Cluster_${c.id.get}"))
       }
       val toClear = clusterMap.keySet -- current
@@ -101,5 +101,13 @@ class DatalakeActor(private val dataLake: Datalake,
       current.clear
 
       clusterMap.values.foreach(_ ! Poll())
+
+    case ServiceSaved(clusterData,cluster)=>
+      log.info(s"Cluster state saved for - ${clusterData.servicename}")
+      clusterMap(cluster.id.get) ! ServiceSaved(clusterData,cluster)
+
+    case HostInfoSaved(cluster)=>
+      clusterMap(cluster.id.get) ! HostInfoSaved(cluster)
+
   }
 }

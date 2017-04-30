@@ -53,6 +53,7 @@ DELETE        /services/:serviceId                                           con
 PUT           /clusters/services                                             controllers.ClusterServices.updateWithCluster
 GET           /clusters/:clusterId/services/:serviceId/endpoint              controllers.ClusterServices.getEndpoints(clusterId:Long,serviceId:Long)
 POST          /services/endpoints                                            controllers.ClusterServices.addServiceEndpoint
+PUT           /services/endpoints                                            controllers.ClusterServices.updateServiceEndpoint
 
 
 
@@ -124,7 +125,7 @@ DELETE        /unclassifieddatasets/:datasetId                               con
 
 #UnclassifiedDatasetCategory Api
 GET           /unclassifieddatasets/:datasetId/categories                    controllers.UnclassifiedDatasetCategories.allWithDatasetId(datasetId:Long)
-GET           /categories/:categoryId/datasets                               controllers.UnclassifiedDatasetCategories.allWithCategoryId(categoryId:Long)
+GET           /unclassifieddatasets/categories/:categoryId/datasets                               controllers.UnclassifiedDatasetCategories.allWithCategoryId(categoryId:Long)
 POST          /unclassifieddatasets/categories                               controllers.UnclassifiedDatasetCategories.add
 DELETE        /unclassifieddatasets/:datasetId/categories/:categoryId        controllers.UnclassifiedDatasetCategories.delete(datasetId:Long, categoryId:Long)
 

@@ -1,8 +1,14 @@
 package com.hortonworks.dataplane.db
 
-import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService, Error, Errors}
+import com.hortonworks.dataplane.commons.domain.Entities.{
+  ClusterService,
+  ClusterServiceEndpoint,
+  Error,
+  Errors
+}
 import com.hortonworks.dataplane.db.Webserice.ClusterComponentService
 import com.typesafe.config.Config
+import com.typesafe.scalalogging.Logger
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSClient, WSResponse}
 
@@ -14,6 +20,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
 
   private val url = config.getString("dp.services.db.service.uri")
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+  val logger = Logger(classOf[ClusterComponentServiceImpl])
 
   override def create(clusterService: ClusterService)
     : Future[Either[Errors, ClusterService]] = {
@@ -25,8 +32,8 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
       .post(Json.toJson(clusterService))
       .map(mapToService)
       .recoverWith {
-        case e:Exception =>
-          Future.successful(Left(Errors(Seq(Error("500",e.getMessage)))))
+        case e: Exception =>
+          Future.successful(Left(Errors(Seq(Error("500", e.getMessage)))))
       }
   }
 
@@ -35,12 +42,27 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
       case 200 =>
         extractEntity[ClusterService](
           res,
-          r => (r.json \ "results" \\ "data")(0).validate[ClusterService].get)
+          r => (r.json \ "results" \\ "data").head.validate[ClusterService].get)
       case _ => mapErrors(res)
     }
   }
 
-  override def getServiceByName(clusterId: Long, serviceName: String): Future[Either[Errors, ClusterService]] = {
+  private def mapToEndpoint(res: WSResponse) = {
+    res.status match {
+      case 200 =>
+        extractEntity[ClusterServiceEndpoint](
+          res,
+          r =>
+            (r.json \ "results" \\ "data").head
+              .validate[ClusterServiceEndpoint]
+              .get)
+      case _ => mapErrors(res)
+    }
+  }
+
+  override def getServiceByName(
+      clusterId: Long,
+      serviceName: String): Future[Either[Errors, ClusterService]] = {
     ws.url(s"$url/clusters/$clusterId/service/$serviceName")
       .withHeaders(
         "Content-Type" -> "application/json",
@@ -49,12 +71,13 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
       .get
       .map(mapToService)
       .recoverWith {
-        case e:Exception =>
-          Future.successful(Left(Errors(Seq(Error("500",e.getMessage)))))
+        case e: Exception =>
+          Future.successful(Left(Errors(Seq(Error("500", e.getMessage)))))
       }
   }
 
-  override def updateServiceByName(clusterData: ClusterService): Future[Either[Errors, Boolean]] = {
+  override def updateServiceByName(
+      clusterData: ClusterService): Future[Either[Errors, Boolean]] = {
     ws.url(s"$url/clusters/services")
       .withHeaders(
         "Content-Type" -> "application/json",
@@ -64,11 +87,59 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
       .map { res =>
         res.status match {
           case 200 => Right(true)
-          case x => Left(Errors(Seq(Error(x.toString,"Cannot update service"))))
+          case x =>
+            Left(Errors(Seq(Error(x.toString, "Cannot update service"))))
         }
-      } .recoverWith {
-      case e:Exception =>
-        Future.successful(Left(Errors(Seq(Error("500",e.getMessage)))))
+      }
+      .recoverWith {
+        case e: Exception =>
+          Future.successful(Left(Errors(Seq(Error("500", e.getMessage)))))
+      }
+  }
+
+  override def addClusterEndpoints(
+      clusterServiceEndpoints: Seq[ClusterServiceEndpoint])
+    : Future[Seq[Either[Errors, ClusterServiceEndpoint]]] = {
+
+    val requests = clusterServiceEndpoints.map { cse =>
+      ws.url(s"$url/services/endpoints")
+        .withHeaders(
+          "Content-Type" -> "application/json",
+          "Accept" -> "application/json"
+        )
+        .post(Json.toJson(cse))
+        .map(mapToEndpoint)
+        .recoverWith {
+          case e: Exception =>
+            logger.error(s"Cannot add cluster endpoint $cse", e)
+            Future.successful(Left(Errors(Seq(Error("500", e.getMessage)))))
+        }
+
     }
+
+    Future.sequence(requests)
+  }
+
+  override def updateClusterEndpoints(
+      clusterServiceEndpoints: Seq[ClusterServiceEndpoint])
+    : Future[Seq[Either[Errors, Boolean]]] = {
+
+    val requests = clusterServiceEndpoints.map { cse =>
+      ws.url(s"$url/services/endpoints")
+        .withHeaders(
+          "Content-Type" -> "application/json",
+          "Accept" -> "application/json"
+        )
+        .put(Json.toJson(cse))
+        .map(res => res.status match {
+          case 200 => Right(true)
+          case x => Left(Errors(Seq(Error(x.toString, "Cannot update service endpoint"))))
+        })
+        .recoverWith {
+          case e: Exception =>
+            Future.successful(Left(Errors(Seq(Error("500", e.getMessage)))))
+        }
+    }
+    Future.sequence(requests)
   }
 }
