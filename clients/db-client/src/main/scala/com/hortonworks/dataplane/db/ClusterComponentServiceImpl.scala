@@ -42,7 +42,8 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
       case 200 =>
         extractEntity[ClusterService](
           res,
-          r => (r.json \ "results" \\ "data").head.validate[ClusterService].get)
+          r =>
+            (r.json \ "results" \\ "data").head.validate[ClusterService].get)
       case _ => mapErrors(res)
     }
   }
@@ -56,6 +57,19 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
             (r.json \ "results" \\ "data").head
               .validate[ClusterServiceEndpoint]
               .get)
+      case _ => mapErrors(res)
+    }
+  }
+
+  private def mapToEndpoints(res: WSResponse) = {
+    res.status match {
+      case 200 =>
+        extractEntity[Seq[ClusterServiceEndpoint]](
+          res,
+          r =>
+            (r.json \ "results" \\ "data").map {
+              _.validate[ClusterServiceEndpoint].get
+          })
       case _ => mapErrors(res)
     }
   }
@@ -131,9 +145,13 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
           "Accept" -> "application/json"
         )
         .put(Json.toJson(cse))
-        .map(res => res.status match {
-          case 200 => Right(true)
-          case x => Left(Errors(Seq(Error(x.toString, "Cannot update service endpoint"))))
+        .map(res =>
+          res.status match {
+            case 200 => Right(true)
+            case x =>
+              Left(
+                Errors(
+                  Seq(Error(x.toString, "Cannot update service endpoint"))))
         })
         .recoverWith {
           case e: Exception =>
@@ -141,5 +159,33 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
         }
     }
     Future.sequence(requests)
+  }
+
+  def resolve(result: Either[Errors, ClusterService],
+              clusterId: Long,
+              service: String) = Future.successful {
+    if (result.isLeft) {
+      throw new Exception(
+        s"Could not load the service for cluster $clusterId and service $service ${result.left.get}")
+    }
+    result.right.get
+  }
+
+  override def getEndpointsForCluster(
+      clusterId: Long,
+      service: String): Future[Either[Errors, Seq[ClusterServiceEndpoint]]] = {
+    for {
+      f1 <- getServiceByName(clusterId, service)
+      f2 <- resolve(f1, clusterId, service)
+      errorsOrEndpoints <- ws
+        .url(s"$url/services/${f2.id}/endpoints")
+        .withHeaders(
+          "Content-Type" -> "application/json",
+          "Accept" -> "application/json"
+        )
+        .get
+        .map(mapToEndpoints)
+    } yield errorsOrEndpoints
+
   }
 }

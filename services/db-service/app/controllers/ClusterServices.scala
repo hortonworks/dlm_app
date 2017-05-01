@@ -157,6 +157,14 @@ class ClusterServices @Inject()(
       .recoverWith(apiError)
   }
 
+  def getServiceEndpoints(serviceId: Long) = Action.async {
+    cse
+      .allByService(serviceId)
+      .map(cs =>
+        success(cs.map(c => linkData(c, Map()))))
+      .recoverWith(apiError)
+  }
+
   def addServiceEndpoint = Action.async(parse.json) { req =>
     req.body
       .validate[ClusterServiceEndpoint]

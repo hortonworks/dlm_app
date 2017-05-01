@@ -53,6 +53,7 @@ DELETE        /services/:serviceId                                           con
 PUT           /clusters/services                                             controllers.ClusterServices.updateWithCluster
 GET           /clusters/:clusterId/services/:serviceId/endpoint              controllers.ClusterServices.getEndpoints(clusterId:Long,serviceId:Long)
 POST          /services/endpoints                                            controllers.ClusterServices.addServiceEndpoint
+GET           /services/:serviceId/endpoints                                 controllers.ClusterServices.getServiceEndpoints(serviceId:Long)
 PUT           /services/endpoints                                            controllers.ClusterServices.updateServiceEndpoint
 
 

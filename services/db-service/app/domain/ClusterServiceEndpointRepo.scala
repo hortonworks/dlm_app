@@ -30,6 +30,10 @@ class ClusterServiceEndpointRepo @Inject()(
     db.run(query.to[List].result)
   }
 
+  def allByService(serviceId: Long): Future[List[ClusterServiceEndpoint]] = {
+    db.run(Endpoints.filter(_.serviceid === serviceId).to[List].result)
+  }
+
   def insert(
       endPoint: ClusterServiceEndpoint): Future[ClusterServiceEndpoint] = {
     db.run {
