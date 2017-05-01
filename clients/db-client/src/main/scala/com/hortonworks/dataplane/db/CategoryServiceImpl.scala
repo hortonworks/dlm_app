@@ -10,9 +10,6 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-/**
-  * Created by dsingh on 4/9/17.
-  */
 class CategoryServiceImpl (config: Config)(implicit ws: WSClient)
   extends CategoryService{
 

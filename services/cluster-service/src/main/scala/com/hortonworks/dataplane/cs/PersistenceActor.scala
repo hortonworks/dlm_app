@@ -205,8 +205,8 @@ class PersistenceActor(clusterInterface: StorageInterface)
     case HostsUpdated(errors, cluster) =>
       if (errors.errors.isEmpty) {
         context.parent ! HostInfoSaved(cluster)
-      }
-      log.error(s"Error updating cluster info $errors")
+      } else
+        log.error(s"Error updating cluster info $errors")
 
   }
 

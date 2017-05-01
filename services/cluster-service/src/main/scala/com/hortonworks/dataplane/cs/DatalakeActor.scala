@@ -21,22 +21,26 @@ class DatalakeActor(private val dataLake: Datalake,
                     private val storageInterface: StorageInterface,
                     private val wSClient: WSClient,
                     private val dbActor: ActorRef)
-    extends Actor with ActorLogging{
+    extends Actor
+    with ActorLogging {
 
   val clusterMap = collection.mutable.Map[Long, ActorRef]()
-  val dataLakeInterface = AmbariDatalakeInterfaceImpl(dataLake,wSClient,config,credentials)
+  val dataLakeInterface =
+    AmbariDatalakeInterfaceImpl(dataLake, wSClient, config, credentials)
 
   val prefix = Try(config.getString("dp.service.ambari.cluster.api.prefix"))
     .getOrElse("/api/v1/clusters")
-
 
   import akka.pattern.pipe
 
   def extractSecurity(props: Option[JsValue]) = {
     props.map { json =>
-      (json \ "security_type").validate[String].map { s =>
-        s.toLowerCase == "kerberos"
-      }.getOrElse(false)
+      (json \ "security_type")
+        .validate[String]
+        .map { s =>
+          s.toLowerCase == "kerberos"
+        }
+        .getOrElse(false)
     }
   }
 
@@ -51,7 +55,6 @@ class DatalakeActor(private val dataLake: Datalake,
         properties = props,
         datalakeid = dataLake.id,
         userid = dataLake.createdBy
-
       )
     }
   }
@@ -62,17 +65,18 @@ class DatalakeActor(private val dataLake: Datalake,
       val fClusters = dataLakeInterface.discoverClusters
       // Register all clusters in storage
 
-       val clustersToCreate = fClusters.map(clusters => clusters.map ( c => makeCluster(c)))
-       val fm = clustersToCreate.flatMap{ cc => Future.sequence(cc)}
-       fm.map(GetClusters).pipeTo(self)
-
-
+      val clustersToCreate =
+        fClusters.map(clusters => clusters.map(c => makeCluster(c)))
+      val fm = clustersToCreate.flatMap { cc =>
+        Future.sequence(cc)
+      }
+      fm.map(GetClusters).pipeTo(self)
 
     case GetClusters(clusters) =>
       storageInterface.addClusters(clusters).map(AddedClusters).pipeTo(self)
 
     case AddedClusters(clusters) =>
-      log.info(s"Starting sync for $clusters")
+      log.info(s"Starting sync for datalake ${dataLake.name}")
       storageInterface
         .getLinkedClusters(dataLake)
         .map(StoredClusters)
@@ -89,7 +93,8 @@ class DatalakeActor(private val dataLake: Datalake,
                                                          wSClient,
                                                          storageInterface,
                                                          credentials,
-                                                         dbActor,config),
+                                                         dbActor,
+                                                         config),
                                                    s"Cluster_${c.id.get}"))
       }
       val toClear = clusterMap.keySet -- current
@@ -102,11 +107,11 @@ class DatalakeActor(private val dataLake: Datalake,
 
       clusterMap.values.foreach(_ ! Poll())
 
-    case ServiceSaved(clusterData,cluster)=>
+    case ServiceSaved(clusterData, cluster) =>
       log.info(s"Cluster state saved for - ${clusterData.servicename}")
-      clusterMap(cluster.id.get) ! ServiceSaved(clusterData,cluster)
+      clusterMap(cluster.id.get) ! ServiceSaved(clusterData, cluster)
 
-    case HostInfoSaved(cluster)=>
+    case HostInfoSaved(cluster) =>
       clusterMap(cluster.id.get) ! HostInfoSaved(cluster)
 
   }
