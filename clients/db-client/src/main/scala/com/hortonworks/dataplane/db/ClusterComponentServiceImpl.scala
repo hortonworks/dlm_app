@@ -178,7 +178,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
       f1 <- getServiceByName(clusterId, service)
       f2 <- resolve(f1, clusterId, service)
       errorsOrEndpoints <- ws
-        .url(s"$url/services/${f2.id}/endpoints")
+        .url(s"$url/services/${f2.id.get}/endpoints")
         .withHeaders(
           "Content-Type" -> "application/json",
           "Accept" -> "application/json"

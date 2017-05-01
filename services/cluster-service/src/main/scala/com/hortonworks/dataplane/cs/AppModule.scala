@@ -109,7 +109,7 @@ object AppModule extends AbstractModule {
       actorSystem,
       materializer,
       configuration,
-      atlasRoute.hiveAttributes ~ atlasRoute.hiveTables ~ statusRoute.route ~ statusRoute.sync)
+      atlasRoute.hiveAttributes ~ atlasRoute.hiveTables ~ atlasRoute.atlasEntity ~ statusRoute.route ~ statusRoute.sync)
   }
 
   @Provides
