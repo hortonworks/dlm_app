@@ -10,5 +10,6 @@ trait AtlasInterface {
   def findHiveTables(filters:AtlasFilters):Future[AtlasEntities]
   def getHiveAttributes:Future[Seq[AtlasAttribute]]
   def getAtlasEntity(uuid:String):Future[JsValue]
+  def getAtlasEntities(uuids:Iterable[String]):Future[JsValue]
 
 }

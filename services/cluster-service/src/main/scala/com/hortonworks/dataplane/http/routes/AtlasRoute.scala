@@ -6,8 +6,15 @@ import javax.inject.{Inject, Singleton}
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import com.google.common.base.{Supplier, Suppliers}
-import com.hortonworks.dataplane.cs.{AtlasInterface, DefaultAtlasInterface, StorageInterface}
-import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterHostsService}
+import com.hortonworks.dataplane.cs.{
+  AtlasInterface,
+  DefaultAtlasInterface,
+  StorageInterface
+}
+import com.hortonworks.dataplane.db.Webserice.{
+  ClusterComponentService,
+  ClusterHostsService
+}
 import com.hortonworks.dataplane.http.BaseRoute
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
@@ -77,9 +84,9 @@ class AtlasRoute @Inject()(
     }
   }
 
-  val atlasEntity = {
-    path("cluster" / LongNumber / "atlas" / "guid" / Segment){ (id,uuid) =>
-      get{
+  val atlasEntity = path("cluster" / LongNumber / "atlas" / "guid" / Segment) {
+    (id, uuid) =>
+      get {
         val eventualValue = getInterface(id).getAtlasEntity(uuid)
         onComplete(eventualValue) {
           case Success(entities) => complete(success(entities))
@@ -91,9 +98,26 @@ class AtlasRoute @Inject()(
             }
         }
       }
-    }
   }
 
+  val atlasEntities = path("cluster" / LongNumber / "atlas" / "guid") { id =>
+    pathEndOrSingleSlash {
+      parameters('query.*) { uuids =>
+        get {
+          val eventualValue = getInterface(id).getAtlasEntities(uuids)
+          onComplete(eventualValue) {
+            case Success(entities) => complete(success(entities))
+            case Failure(th) =>
+              th match {
+                case exception: AtlasServiceException =>
+                  complete(exception.getStatus.getStatusCode, errors(th))
+                case _ => complete(StatusCodes.InternalServerError, errors(th))
+              }
+          }
+        }
+      }
+    }
+  }
 
   private def supplyApi(id: Long) = {
     Suppliers.memoizeWithExpiration(newInterface(id),

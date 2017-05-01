@@ -102,6 +102,14 @@ class DefaultAtlasInterface(clusterId: Long,
       Json.parse(jsonString)
     }
   }
+
+  override def getAtlasEntities(uuids: Iterable[String]): Future[JsValue] = {
+    atlasApi.map { api =>
+      val entityWithExtInfo = api.getEntitiesByGuids(uuids.toList.asJava)
+      val jsonString = new ObjectMapper().writeValueAsString(entityWithExtInfo)
+      Json.parse(jsonString)
+    }
+  }
 }
 
 sealed class AtlasApiSupplier(clusterId: Long,
