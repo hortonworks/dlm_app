@@ -10,6 +10,8 @@ import com.hortonworks.dlm.beacon.domain.RequestEntities.ClusterDefinitionReques
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import models.Entities._
+import models.PolicyAction
+import models.{SCHEDULE,SUSPEND,RESUME,DELETE}
 
 import scala.collection.immutable.Set.Set2
 import scala.concurrent.Future
@@ -279,6 +281,67 @@ class BeaconService @Inject()(
             val errorMsg : String =  "Error occurred while getting policy details from Beacon server"
             p.success(Left(Errors(Seq(Error("500", errorMsg)))))
           }
+        }
+      }
+    }
+    p.future
+  }
+
+  /**
+    * Create policy between paired clusters
+    * @param policySubmitRequest [[PolicySubmitRequest]]
+    * @return
+    */
+  def createPolicy(clusterId: Long, policyName: String, policySubmitRequest: PolicySubmitRequest) : Future[Either[Errors, PostActionResponse]] = {
+    val p: Promise[Either[Errors, PostActionResponse]] = Promise()
+    dataplaneService.getServiceByName(clusterId, "BEACON_SERVER").map {
+      case Left(errors) =>  p.success(Left(errors))
+      case Right(beaconService) => {
+
+        val policyResponseFuture : Option[() => Future[Either[BeaconApiErrors, PostActionResponse]]] = Map(
+          "SUBMIT"  -> {() => beaconPolicyService.submitPolicy(beaconService.fullURL.get, policyName, policySubmitRequest.policyDefinition)},
+          "SUBMIT_AND_SCHEDULE"  -> {() => beaconPolicyService.submitAndSchedulePolicy(beaconService.fullURL.get, policyName, policySubmitRequest.policyDefinition)}
+        ).get(policySubmitRequest.submitType)
+
+        policyResponseFuture match {
+          case Some(policyFuture) => {
+            policyFuture().map {
+              case Left(errors) =>  p.success(Left(Errors(errors.errors.map(x=>Error(x.code,x.message)))))
+              case Right(createPolicyResponse) => p.success(Right(createPolicyResponse))
+            }
+          }
+          case None => {
+            val errorMsg : String =  "Value passed submitType=" +  policySubmitRequest.submitType + " is invalid. Valid values for submitType are SUBMIT | SUBMIT_AND_SCHEDULE"
+            p.success(Left(Errors(Seq(Error("500", errorMsg)))))
+          }
+        }
+      }
+    }
+    p.future
+  }
+
+  /**
+    * Execute actions on policy
+    * @param clusterId    name of the cluster
+    * @param policyName   name of the policy
+    * @param policyAction [[PolicyAction]] to be executed on the policy
+    * @return
+    */
+  def updatePolicy(clusterId: Long, policyName: String, policyAction: PolicyAction) : Future[Either[Errors, PostActionResponse]] = {
+    val p: Promise[Either[Errors, PostActionResponse]] = Promise()
+    dataplaneService.getServiceByName(clusterId, "BEACON_SERVER").map {
+      case Left(errors) =>  p.success(Left(errors))
+      case Right(beaconService) => {
+        val policyActionResponseFuture : Future[Either[BeaconApiErrors, PostActionResponse]] = policyAction match {
+          case SCHEDULE => beaconPolicyService.schedulePolicy(beaconService.fullURL.get, policyName)
+          case SUSPEND  => beaconPolicyService.suspendPolicy(beaconService.fullURL.get, policyName)
+          case RESUME   => beaconPolicyService.resumePolicy(beaconService.fullURL.get, policyName)
+          case DELETE   => beaconPolicyService.deletePolicy(beaconService.fullURL.get, policyName)
+        }
+
+        policyActionResponseFuture.map {
+          case Left(errors) =>  p.success(Left(Errors(errors.errors.map(x=>Error(x.code,x.message)))))
+          case Right(policyActionResponse) => p.success(Right(policyActionResponse))
         }
       }
     }

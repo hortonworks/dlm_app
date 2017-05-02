@@ -3,13 +3,18 @@
 # ~~~~
 
 # clusters
-GET     /api/clusters                             controllers.Clusters.list
+GET     /api/clusters                                   controllers.Clusters.list
 
 #Pairs
-GET     /api/pairs                                controllers.Pairs.list
-POST    /api/pair                                 controllers.Pairs.create
-POST    /api/unpair                               controllers.Pairs.unpair
+GET     /api/pairs                                      controllers.Pairs.list
+POST    /api/pair                                       controllers.Pairs.create
+POST    /api/unpair                                     controllers.Pairs.unpair
 
 #Policies
-GET     /api/policies                             controllers.Policies.list
-GET     /api/clusters/:clusterId/policy/:name     controllers.Policies.retrieve(clusterId : Long, name : String)
+GET     /api/policies                                    controllers.Policies.list
+GET     /api/clusters/:clusterId/policy/:name            controllers.Policies.retrieve(clusterId : Long, name : String)
+POST    /api/clusters/:clusterId/policy/:name/submit     controllers.Policies.submit(clusterId: Long, name: String)
+POST    /api/clusters/:clusterId/policy/:name/schedule   controllers.Policies.schedule(clusterId: Long, name: String)
+POST    /api/clusters/:clusterId/policy/:name/suspend    controllers.Policies.suspend(clusterId: Long, name: String)
+POST    /api/clusters/:clusterId/policy/:name/resume     controllers.Policies.resume(clusterId: Long, name: String)
+DELETE  /api/clusters/:clusterId/policy/:name            controllers.Policies.delete(clusterId: Long, name: String)
