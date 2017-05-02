@@ -90,6 +90,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
       }
   }
 
+
   override def updateServiceByName(
       clusterData: ClusterService): Future[Either[Errors, Boolean]] = {
     ws.url(s"$url/clusters/services")

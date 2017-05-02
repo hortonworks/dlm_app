@@ -18,11 +18,12 @@ import scala.concurrent.Future
 
 class Clusters @Inject()(
     @Named("clusterService")
-    val clusterService: ClusterService, val clusterHealthService: ClusterHealthService
+    val clusterService: ClusterService, val clusterHealthService: ClusterHealthService,
+    authenticated:Authenticated
 
 ) extends Controller {
 
-  def list(lakeId: Option[Long]) = Authenticated.async {
+  def list(lakeId: Option[Long]) = authenticated.async {
     lakeId match {
       case Some(lakeId) => listByLakeId(lakeId)
       case None => listAll()
@@ -54,7 +55,7 @@ class Clusters @Inject()(
 
 
 
-  def create = Authenticated.async(parse.json) { request =>
+  def create = authenticated.async(parse.json) { request =>
     Logger.info("Received create cluster request")
     request.body.validate[Cluster].map { cluster =>
       clusterService.create(cluster.copy(userid = request.user.id))
@@ -67,11 +68,11 @@ class Clusters @Inject()(
     }.getOrElse(Future.successful(BadRequest))
   }
 
-  def update = Authenticated.async(parse.json) { req =>
+  def update = authenticated.async(parse.json) { req =>
     Future.successful(Ok(JsonResponses.statusOk))
   }
 
-  def get(clusterId: String) = Authenticated.async {
+  def get(clusterId: String) = authenticated.async {
     Logger.info("Received get cluster request")
 
     clusterService.retrieve(clusterId)
@@ -94,13 +95,14 @@ class Clusters @Inject()(
           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
           case Right(clusterHealth) => Ok(summary match {
             case Some(summary) => Json.obj(
-              "nodes" -> clusterHealth.hosts.length,
-              "size" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityTotal),
-              "status" -> Json.obj(
-                "state" -> clusterHealth.nameNodeInfo.get.state,
-                "since" -> 34567890 /* up since time in ms | tz? */
+                "nodes" -> clusterHealth.hosts.length,
+                "totalSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityTotal),
+                "usedSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityUsed),
+                "status" -> Json.obj(
+                  "state" -> clusterHealth.nameNodeInfo.get.state,
+                  "since" -> (if (clusterHealth.nameNodeInfo.get.StartTime.isDefined) (clusterHealth.nameNodeInfo.get.StartTime.get - System.currentTimeMillis()) else 0)
+                )
               )
-            )
             case None => Json.toJson(clusterHealth)
           })
         }
@@ -111,7 +113,7 @@ class Clusters @Inject()(
     bytes match {
       case Some(bytes) => {
         if (bytes == 0) return "0 Bytes";
-        val k = 1000;
+        val k = 1024;
         val sizes = Array("Bytes ", "KB ", "MB ", "GB ", "TB ", "PB ", "EB ", "ZB ", "YB ");
         val i = Math.floor(Math.log(bytes) / Math.log(k)).toInt;
 

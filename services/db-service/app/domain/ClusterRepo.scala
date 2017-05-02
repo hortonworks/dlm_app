@@ -40,6 +40,7 @@ class ClusterRepo @Inject()(
   }
 
   def findByDatalakeId(datalakeId: Long): Future[List[Cluster]] = {
+
     db.run(Clusters.filter(_.datalakeid === datalakeId).to[List].result)
   }
 

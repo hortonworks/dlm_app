@@ -1,0 +1,44 @@
+<div class="ngx-datatable-wrapper">
+  <ngx-datatable
+    #table
+    [rows]="rows"
+    [columns]="columns"
+    [headerHeight]="headerHeight"
+    [rowHeight]="rowHeight"
+    [footerHeight]="footerHeight"
+    [columnMode]="columnMode"
+    [selectionType]="selectionType"
+    [cssClasses]="cssClasses"
+    [limit]="limit">
+    <ngx-datatable-row-detail [rowHeight]="rowDetailHeight">
+      <ng-template let-row="row" ngx-datatable-row-detail-template>
+      </ng-template>
+    </ngx-datatable-row-detail>
+    <ngx-datatable-footer>
+      <ng-template
+        ngx-datatable-footer-template
+        let-rowCount="rowCount"
+        let-pageSize="pageSize"
+        let-selectedCount="selectedCount"
+        let-curPage="curPage"
+        let-offset="offset">
+        <dlm-table-footer
+          [rowCount]="rowCount"
+          [pageSize]="pageSize"
+          [selectedCount]="selectedCount"
+          [curPage]="curPage"
+          [offset]="offset"
+          (changePage)="changePage($event)"
+          (changePageSize)="changePageSize($event)"></dlm-table-footer>
+      </ng-template>
+    </ngx-datatable-footer>
+  </ngx-datatable>
+  <dlm-checkbox-column
+    (selectCell)="handleSelectedCell($event)"
+    (selectHeader)="handleAllChecked($event)">
+  </dlm-checkbox-column>
+  <dlm-action-column
+    [actions]="actions"
+    (selectAction)="selectAction.emit($event)">
+  </dlm-action-column>
+</div>

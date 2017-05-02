@@ -1,20 +1,24 @@
-var fs = require('fs');
-var obj = JSON.parse(fs.readFileSync('./cities.json', 'utf8'));
+const fs = require('fs');
+const parse = require('csv-parse');
+const transform = require('stream-transform');
 
-var stream = fs.createWriteStream("./locations.sql");
-stream.once('open', function(fd) {
-  const deduped =
-    obj
-    .filter(cLocation =>  /^[\x00-\xFF]*$/.test(cLocation.name) && cLocation.country.length > 0 && !isNaN(cLocation.lat) && !isNaN(cLocation.lng))
-    .reduce((accumulator, cLocation) => {
-      accumulator[`${cLocation.country}-${cLocation.name}`] = cLocation;
-      return accumulator;
-    }, {});
-  Object.keys(deduped)
-    .forEach(cLocationKey => {
-      const cLocation = deduped[cLocationKey];
-      stream.write(`INSERT INTO dataplane.dp_locations (country, city, latitude, longitude) VALUES ('${cLocation.country}', '${cLocation.name.replace(/'/g, "''")}', ${cLocation.lat}, ${cLocation.lng});\n`);
-    });
-  stream.end();
+const parser = parse({
+  delimiter: '\t',
+  // relax: true,
+  // relax_column_count: true,
+  // skip_empty_lines: true,
+  // escape: false,
+  quote: false,
+  trim: true,
 });
-// fails for cLocation = { country: 'AF', name: 'شرن', lat: '33.175678', lng: '68.730449' } and hence filtered out.
+let i = 0;
+const transformer = transform(function(record, callback){
+  // setTimeout(function(){
+    i++;
+    callback(null, `,(${record[0]}, '${record[2].replace(/'/g, "''")}', '${record[8]}', ${record[4]}, ${record[5]})`+'\n');
+  // }, 500);
+}, {parallel: 10});
+
+const input = fs.createReadStream('cities1000-2017-04-24.txt', {'encoding': 'utf8'});
+const output = fs.createWriteStream('../migrations/locations.sql', {'encoding': 'utf8'});
+input.pipe(parser).pipe(transformer).pipe(output);

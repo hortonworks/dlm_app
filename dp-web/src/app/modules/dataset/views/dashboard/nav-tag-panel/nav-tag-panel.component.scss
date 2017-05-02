@@ -1,0 +1,13 @@
+.panelRow{
+  padding:7px 20px;
+  cursor: pointer;
+}
+
+.panelRow .displaycount {
+  float: right;
+}
+
+.panelRow.selected{
+  background-color: rgb(64,66,79);
+  border-left: 5px solid rgb(96,170,89);
+}

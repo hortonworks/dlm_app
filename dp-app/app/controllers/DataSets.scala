@@ -19,10 +19,11 @@ import scala.concurrent.Future
 
 class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetService,
                          @Named("categoryService") val categoryService: CategoryService,
-                         @Named("dataSetCategoryService") val dataSetCategoryService: DataSetCategoryService)
+                         @Named("dataSetCategoryService") val dataSetCategoryService: DataSetCategoryService,
+                         authenticated:Authenticated)
   extends Controller {
 
-  def list = Authenticated.async {
+  def list = authenticated.async {
     Logger.info("Received list dataSet request")
     dataSetService.list()
       .map { dataSets =>
@@ -33,7 +34,7 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
       }
   }
 
-  def create = Authenticated.async(parse.json) { request =>
+  def create = authenticated.async(parse.json) { request =>
     Logger.info("Received create dataSet request")
     request.body.validate[DatasetAndCategoryIds].map { dSetNCtgryIds =>
       dataSetService.create(dSetNCtgryIds.copy(dataset = dSetNCtgryIds.dataset.copy(createdBy = request.user.id.get)))
@@ -46,7 +47,7 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     }.getOrElse(Future.successful(BadRequest))
   }
 
-  def retrieve(dataSetId: String) = Authenticated.async {
+  def retrieve(dataSetId: String) = authenticated.async {
     Logger.info("Received retrieve dataSet request")
     dataSetService.retrieve(dataSetId)
       .map {
@@ -59,7 +60,7 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
   }
 
 
-  def update() = Authenticated.async(parse.json) { request =>
+  def update() = authenticated.async(parse.json) { request =>
     Logger.info("Received update dataSet request")
     request.body.validate[DatasetAndCategoryIds].map { dSetNCtgryIds =>
       dataSetService.update(dSetNCtgryIds)
@@ -73,7 +74,7 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
   }
 
 
-  def delete(dataSetId: String) = Authenticated.async {
+  def delete(dataSetId: String) = authenticated.async {
     Logger.info("Received delete dataSet request")
     dataSetService.delete(dataSetId)
       .map {
@@ -84,7 +85,7 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
       }
   }
 
-  def listAllCategories = Authenticated.async {
+  def listAllCategories = authenticated.async {
     Logger.info("Received list dataSet-categories request")
     categoryService.list()
       .map { categories =>
@@ -95,7 +96,7 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
       }
   }
 
-  def createCategory = Authenticated.async(parse.json) { request =>
+  def createCategory = authenticated.async(parse.json) { request =>
     Logger.info("Received create dataSet-category request")
     request.body.validate[Category].map { category =>
       categoryService.create(category)
@@ -158,7 +159,7 @@ import play.api.mvc._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class DataSets @Inject()(dataSetStorage: DataSetStorage)
+class DataSets @Inject()(dataSetStorage: DataSetStorage,Authenticated:Authenticated)
     extends Controller
     with MongoUtilities {
 

@@ -1,0 +1,23 @@
+@import '../../../styles/mixins.scss';
+$hex-size: 24px;
+
+.icon-cell {
+  overflow: visible !important;
+}
+
+.icon-column {
+  position: relative;
+  left: -$hex-size / 2;
+}
+
+.hexagon {
+  @include hexagon($hex-size, transparent);
+  text-align: center;
+  font-size: $hex-size / 2.5;
+
+  i {
+    position: relative;
+    z-index: 1;
+    color: white;
+  }
+}

@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { SignInComponent } from './views/sign-in/sign-in.component';
 
 import { NotSignedInForUnsecureGuard, SignedInForSecureGuard, DoCleanUpAndRedirectGuard } from './shared/utils/auth-guard';
+import { LandingPageGuard } from './shared/utils/landing-page-guard';
 import { NotFoundRouteComponent } from './views/not-found-route/not-found-route.component';
 
 export const routes: Routes = [{
@@ -16,6 +17,10 @@ export const routes: Routes = [{
       DoCleanUpAndRedirectGuard,
     ]
   }, {
+    path: 'dataset',
+    loadChildren: './modules/dataset/dataset.module#DatasetModule',
+    canActivate:[ SignedInForSecureGuard ]
+  }, {
     path: 'onboard',
     loadChildren: './modules/onboard/onboard.module#OnboardModule',
     canActivate:[ SignedInForSecureGuard ]
@@ -27,6 +32,11 @@ export const routes: Routes = [{
     path: 'dashboard',
     loadChildren: './modules/dashboard/dashboard.module#DashboardModule',
     canActivate:[ SignedInForSecureGuard ]
+  }, {
+    path: '',
+    pathMatch: 'full',
+    component: SignInComponent,
+    canActivate: [SignedInForSecureGuard, LandingPageGuard ]
   }, {
     path: '**',
     component: NotFoundRouteComponent

@@ -1,0 +1,37 @@
+@import './variables';
+@import './mixins';
+
+.flex-center {
+  display: flex;
+  align-items: center;
+}
+
+.hexagon {
+  &.hexagon-success {
+    background-color: $success-color;
+
+    &:after {
+      border-top-color: $success-color;
+    }
+
+    &:before {
+      border-bottom-color: $success-color;
+    }
+  }
+
+  &.hexagon-warning {
+    background-color: $warning-color;
+
+    &:after {
+      border-top-color: $warning-color;
+    }
+
+    &:before {
+      border-bottom-color: $warning-color;
+    }
+  }
+}
+
+.actionable {
+  cursor: pointer;
+}

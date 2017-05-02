@@ -1,0 +1,31 @@
+@import '../../../../styles/variables';
+.cluster-name {
+  font-size: 17px;
+  padding-bottom: 7px;
+}
+.cluster-datacenter {
+  font-size: 13px;
+}
+.row {
+  display: table;
+  table-layout: fixed;
+  .col {
+    float: none;
+    display: table-cell;
+    vertical-align: top;
+    padding: 0 15px;
+    &.icon {
+      font-size: 24px;
+      vertical-align: middle;
+      .spinner {
+        color: #999;
+      }
+      .pairing-icon {
+        color: $primary-color;
+      }
+    }
+    &.right {
+      text-align: right;
+    }
+  }
+}

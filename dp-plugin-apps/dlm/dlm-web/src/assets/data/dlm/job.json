@@ -1,0 +1,25 @@
+{
+  "totalResults": 2,
+  "job": [
+	{
+  	"id": "hdfspolicy@2",
+  	"name": "hdfspolicy",
+  	"type": "fs",
+  	"status": "SUCCESS",
+  	"startTime": "2017-01-10T08:13:59",
+  	"endTime": "2017-01-10T08:14:00",
+  	"duration": 1213,
+  	"message": ""
+	},
+	{
+  	"id": "hdfspolicy@1",
+  	"name": "hdfspolicy",
+  	"type": "fs",
+  	"status": "SUCCESS",
+  	"startTime": "2017-01-10T08:13:29",
+  	"endTime": "2017-01-10T08:13:29",
+  	"duration": 63,
+  	"message": ""
+	}
+  ]
+}

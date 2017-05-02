@@ -2,6 +2,7 @@
 if [ ! -d ../data/security/master ]
 then
     ./setup-master-password.sh
+    ./setup_knox_sso_conf.sh
 fi    
 echo "Starting services ..."
 ls -lR ../data/security/

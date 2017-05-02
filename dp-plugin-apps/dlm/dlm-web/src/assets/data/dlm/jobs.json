@@ -1,0 +1,279 @@
+{
+  "totalResults": 3,
+  "job": [
+    {
+      "id": "hdfspolicy@7",
+      "name": "hdfspolicy",
+      "status": "In Progress",
+      "policy": "hive2Policy",
+      "startTime": 1488309905000,
+      "endTime": -1,
+      "nextRun": 1591311865000,
+      "duration": 22578,
+      "source": "Sales-Analysis",
+      "target": "Sales-Aus",
+      "latestRun": 1488309905000,
+      "service": "HIVE",
+      "transferred": 70866960384,
+      "progress": 60,
+      "previousRuns": [
+        {"status": "Failed"},
+        {"status": ""},
+        {"status": "Failed"}
+      ]
+    },
+    {
+      "id": "hdfspolicy@6",
+      "name": "hdfspolicy",
+      "status": "Warnings",
+      "policy": "hivePolicy",
+      "startTime": 1488309845000,
+      "endTime": 1488309928000,
+      "nextRun": 1601311865000,
+      "duration": 20171,
+      "source": "Sales-Analysis",
+      "target": "Test Cluster",
+      "latestRun": 1488309845000,
+      "service": "HDFS",
+      "transferred": 36507222016,
+      "graphData": [
+        1,2,2,3,5,4,7
+      ],
+      "previousRuns": [
+        {"status": ""},
+        {"status": "Failed"},
+        {"status": "In Progress"}
+      ]
+    },
+    {
+      "id": "hdfspolicy@5",
+      "name": "hdfspolicy",
+      "status": "Failed",
+      "policy": "hdfsPrimaryPolicy",
+      "startTime": 1488309845000,
+      "endTime": 1488309865000,
+      "nextRun": 1611311865000,
+      "duration": 21483,
+      "source": "Sales-Analysis",
+      "target": "Test Cluster",
+      "latestRun": 1488309845000,
+      "service": "HDFS",
+      "transferred": 12884901888,
+      "graphData": [
+        10,2,2,4,5,7,9,11
+      ],
+      "previousRuns": [
+        {"status": "Failed"},
+        {"status": "In Progress"},
+        {"status": ""}
+      ]
+    },
+    {
+      "id": "hdfspolicy@1",
+      "name": "hdfspolicy",
+      "status": "Failed",
+      "policy": "hdfsPrimaryPolicy",
+      "startTime": 1488309845000,
+      "endTime": 1488309865000,
+      "nextRun": 1621311865000,
+      "duration": 21483,
+      "source": "Sales-Analysis",
+      "target": "Test Cluster",
+      "latestRun": 1488309845000,
+      "service": "HDFS",
+      "transferred": 12884901888,
+      "graphData": [
+        7,6,1,3,5,9,6,2
+      ],
+      "previousRuns": [
+        {"status": "In Progress"},
+        {"status": "In Progress"},
+        {"status": "In Progress"}
+      ]
+    },
+    {
+      "id": "hdfspolicy@2",
+      "name": "hdfspolicy",
+      "status": "Warnings",
+      "policy": "hdfsPrimaryPolicy",
+      "startTime": 1488309845000,
+      "endTime": 1488309865000,
+      "nextRun": 1551381865000,
+      "duration": 21483,
+      "source": "Sales-Analysis",
+      "target": "Test Cluster",
+      "latestRun": 1488309845000,
+      "service": "HDFS",
+      "transferred": 12884901888,
+      "graphData": [
+        1,5,2,4,4,4,1
+      ],
+      "previousRuns": [
+        {"status": "Failed"},
+        {"status": "In Progress"},
+        {"status": "Failed"}
+      ]
+    },
+    {
+      "id": "hdfspolicy@3",
+      "name": "hdfspolicy",
+      "status": "Failed",
+      "policy": "hdfsPrimaryPolicy",
+      "startTime": 1488309845000,
+      "endTime": 1488309865000,
+      "nextRun": 1551351865000,
+      "duration": 21483,
+      "source": "Sales-Analysis",
+      "target": "Test Cluster",
+      "latestRun": 1488309845000,
+      "service": "HDFS",
+      "transferred": 12884901888,
+      "graphData": [
+        8,7,6,5,6,8,2,1
+      ],
+      "previousRuns": [
+        {"status": ""},
+        {"status": ""},
+        {"status": ""}
+      ]
+    },
+    {
+      "id": "hdfspolicy@4",
+      "name": "hdfspolicy",
+      "status": "Warnings",
+      "policy": "hdfsPrimaryPolicy",
+      "startTime": 1488309845000,
+      "endTime": 1488309865000,
+      "nextRun": 1551311865000,
+      "duration": 21483,
+      "source": "Sales-Analysis",
+      "target": "Test Cluster",
+      "latestRun": 1488309845000,
+      "service": "HIVE",
+      "transferred": 12884901888,
+      "graphData": [
+        4,1,3,4,5,2,7,8
+      ],
+      "previousRuns": [
+        {"status": "Failed"},
+        {"status": "In Progress"},
+        {"status": "Failed"}
+      ]
+    },
+    {
+      "id": "hdfspolicy@8",
+      "name": "hdfspolicy",
+      "status": "Failed",
+      "policy": "hdfsPrimaryPolicy",
+      "startTime": 1488309845000,
+      "endTime": 1488309865000,
+      "nextRun": 1541311865000,
+      "duration": 21483,
+      "source": "Sales-Analysis",
+      "target": "Test Cluster",
+      "latestRun": 1488309845000,
+      "service": "HDFS",
+      "transferred": 12884901888,
+      "graphData": [
+        1,8,1,1,8,1
+      ],
+      "previousRuns": [
+        {"status": "Failed"},
+        {"status": "In Progress"},
+        {"status": "Warnings"}
+      ]
+    },
+    {
+      "id": "hdfspolicy@9",
+      "name": "hdfspolicy",
+      "status": "Warnings",
+      "policy": "hdfsPrimaryPolicy",
+      "startTime": 1488309845000,
+      "endTime": 1488309865000,
+      "nextRun": 1511311865000,
+      "duration": 21483,
+      "source": "Sales-Analysis",
+      "target": "Test Cluster",
+      "latestRun": 1488309845000,
+      "service": "HIVE",
+      "transferred": 12884901888,
+      "graphData": [
+        8,1,1,8,1,1,8
+      ],
+      "previousRuns": [
+        {"status": "Failed"},
+        {"status": "In Progress"},
+        {"status": "In Progress"}
+      ]
+    },
+    {
+      "id": "hdfspolicy@10",
+      "name": "hdfspolicy",
+      "status": "Failed",
+      "policy": "hdfsPrimaryPolicy",
+      "startTime": 1488309845000,
+      "endTime": 1488309865000,
+      "nextRun": 1561311865000,
+      "duration": 21483,
+      "source": "Sales-Analysis",
+      "target": "Test Cluster",
+      "latestRun": 1488309845000,
+      "service": "HDFS",
+      "transferred": 12884901888,
+      "graphData": [
+        1,3,2,1,3,2,1,3,2
+      ],
+      "previousRuns": [
+        {"status": "Failed"},
+        {"status": "Failed"},
+        {"status": ""}
+      ]
+    },
+    {
+      "id": "hdfspolicy@11",
+      "name": "hdfspolicy",
+      "status": "Warnings",
+      "policy": "hdfsPrimaryPolicy",
+      "startTime": 1488309845000,
+      "endTime": 1488309865000,
+      "nextRun": 1571311865000,
+      "duration": 21483,
+      "source": "Sales-Analysis",
+      "target": "Test Cluster",
+      "latestRun": 1488309845000,
+      "service": "HDFS",
+      "transferred": 12884901888,
+      "graphData": [
+        6,1,3,5,6,2,2
+      ],
+      "previousRuns": [
+        {"status": ""},
+        {"status": ""},
+        {"status": ""}
+      ]
+    },
+    {
+      "id": "hdfspolicy@12",
+      "name": "hdfspolicy",
+      "status": "Failed",
+      "policy": "hdfsPrimaryPolicy",
+      "startTime": 1488309845000,
+      "endTime": 1488309865000,
+      "nextRun": 1581311865000,
+      "duration": 21483,
+      "source": "Sales-Analysis",
+      "target": "Test Cluster",
+      "latestRun": 1488309845000,
+      "service": "HIVE",
+      "transferred": 12884901888,
+      "graphData": [
+        1,4,2,5,6,1,2
+      ],
+      "previousRuns": [
+        {"status": "Failed"},
+        {"status": ""},
+        {"status": "In Progress"}
+      ]
+    }
+  ]
+}

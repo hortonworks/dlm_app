@@ -1,0 +1,43 @@
+<div class="page-header">
+  <div class="pull-left">
+    <p>
+      <i class="glyphicon glyphicon-list-alt"></i>
+      <span class="h2">{{ "page.policies.header" | translate }}</span>
+    </p>
+  </div>
+  <div class="pull-right filters-block">
+    <!-- <dlm-dropdown>
+      text="">
+    </dlm-dropdown> -->
+    <dlm-search-input (change)="handleSearchChange($event)"></dlm-search-input>
+    <div class="pull-left filter-item">
+      <span class="text-muted">{{'page.policies.groups' | translate}}:</span>
+      <dlm-dropdown
+        selectable="true"
+        type="link"
+        [alignRight]="true"
+        [items]="groupItems"
+      ></dlm-dropdown>
+    </div>
+    <div class="pull-left filter-item">
+      <span class="text-muted">{{'page.policies.tags' | translate}}:</span>
+      <dlm-dropdown
+        selectable="true"
+        type="link"
+        [items]="tagItems"
+        [alignRight]="true"
+        (onSelectItem)="handleSelectFilter('tags', $event)"
+      ></dlm-dropdown>
+    </div>
+    <dlm-dropdown
+      buttonClass="btn-secondary"
+      [text]="'common.add' | translate"
+      [items]="addOptions"
+      [alignRight]="true"
+      (onSelectItem)="handleAddSelected($event)">
+    </dlm-dropdown>
+  </div>
+  <div class="clearfix"></div>
+</div>
+
+<dp-policy-table [policies]="filteredPolicies$ | async"></dp-policy-table>

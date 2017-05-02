@@ -1,0 +1,127 @@
+{
+  "common": {
+    "all": "All",
+    "add": "Add",
+    "cancel": "Cancel",
+    "review": "Review",
+    "submit": "Submit",
+    "show": "Show",
+    "duration": "Duration",
+    "source": "Source",
+    "destination": "Destination",
+    "data": "Data",
+    "time": {
+      "hourly": "Hourly",
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly"
+    },
+    "table": {
+      "summary": "{{shown}} of {{count}} showing",
+      "paging": "{{start}} - {{end}} of {{count}}"
+    }
+  },
+  "sidenav": {
+    "menuItem": {
+      "overview": "Overview",
+      "clusters": "My Clusters",
+      "policies": "Policies",
+      "pairings": "Pairings",
+      "jobs": "Jobs",
+      "help": "Help",
+      "header": "DATA LIFECYCLE MANAGER"
+    }
+  },
+  "page": {
+    "clusters": {
+      "dropdown": {
+        "cluster": "Cluster",
+        "policy": "Policy"
+      },
+      "card": {
+        "registered": "Registered",
+        "nodes": "Nodes",
+        "volume": "Volume",
+        "pairs": "Pairs"
+      }
+    },
+    "policies": {
+      "header": "Replication Policies",
+      "header_note": "Note: Pairings are bi-directional",
+      "header_create": "Create Replication Policy",
+      "tags": "Tags",
+      "groups": "Groups",
+      "form": {
+        "selected": "Selected",
+        "sections": {
+          "general": "General",
+          "database": "Select Database",
+          "job": "Run Job"
+        },
+        "fields": {
+          "policy_name": "Policy Name",
+          "pairs": "Select Pair",
+          "service": "Service"
+        },
+        "schedule": {
+          "immediate": "One Time",
+          "schedule": "On Schedule"
+        }
+      },
+      "subpage": {
+        "review": {
+          "description": {
+            "title": "Data replication process for data selected from cluster {{targetCluster}} using replication policy {{policyName}} will be started."
+          },
+          "details": {
+            "title": "Transfer Details",
+            "volume": "Total Data Volume",
+            "time": "Transfer Time",
+            "files": "Files",
+            "destination": "Destination",
+            "warning": "The first run of the policy will take some time."
+          }
+        }
+      }
+    },
+    "pairings": {
+      "header": "Pairings",
+      "header_note": "Note: Pairings are bi-directional",
+      "create_button_text": "+ Pairing",
+      "content": {
+        "header": {
+          "first_cluster": "FIRST CLUSTER",
+          "status": "STATUS",
+          "second_cluster": "SECOND CLUSTER",
+          "unpair": "UNPAIR"
+        }
+      },
+      "unpair": {
+        "confirmation": {
+          "title": "Unpair confirmation",
+          "body": "Are you sure you want to unpair {{firstCluster}} and {{secondCluster}} ?",
+          "primaryButton": "Unpair"
+        }
+      },
+      "create": {
+        "header": "Create Pairing",
+        "header_note": "Note: Pairings are bi-directional",
+        "content": {
+          "header": {
+            "step_one": "STEP 1: SELECT FIRST CLUSTER",
+            "step_two": "STEP 2: SELECT CLUSTER TO BE PAIRED",
+            "in_progress": "IN PROGRESS"
+          }
+        },
+        "confirmation": {
+          "title": "Pairing Successful",
+          "body": "Pairing completed successfully"
+        }
+      }
+    },
+    "jobs": {
+      "header": "Jobs",
+      "header_note": ""
+    }
+  }
+}

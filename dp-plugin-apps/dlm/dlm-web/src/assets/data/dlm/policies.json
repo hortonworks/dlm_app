@@ -1,0 +1,82 @@
+{
+  "totalResults": 4,
+  "policy": [
+    {
+      "id": "hive2Policy",
+      "type": "HIVE",
+      "name": "hive2Policy",
+      "status": "SUBMITTED",
+      "frequency": 3600,
+      "startTime": "2016-11-26T23:54:50",
+      "endTime": "2019-09-26T23:54:45",
+      "tags": [
+        "owner=producer@xyz.com",
+        "component=sales",
+        "some=tag1"
+      ],
+      "sourceclusters": [
+        "Primary Cluster"
+      ],
+      "targetclusters": [
+        "Secondary Cluster"
+      ]
+    },
+    {
+      "id": "hivePolicy",
+      "type": "HIVE",
+      "name": "hivePolicy",
+      "status": "SUBMITTED",
+      "frequency": 3600,
+      "startTime": "2016-11-26T23:54:50",
+      "endTime": "2019-09-26T23:54:45",
+      "tags": [
+        "component=sales",
+        "some=tag2"
+      ],
+      "sourceclusters": [
+        "Primary Cluster"
+      ],
+      "targetclusters": [
+        "Development Cluster"
+      ]
+    },
+    {
+      "id": "hdfsPrimaryPolicy",
+      "type": "HDFS",
+      "name": "hdfsPrimaryPolicy",
+      "status": "SUBMITTED",
+      "frequency": 3600,
+      "startTime": "2016-11-26T23:54:50",
+      "endTime": "2019-09-26T23:54:45",
+      "tags": [
+        "owner=producer@xyz.com",
+        "component=sales",
+        "some=tag1"
+      ],
+      "sourceclusters": [
+        "Development Cluster"
+      ],
+      "targetclusters": [
+        "Secondary Cluster"
+      ]
+    },
+    {
+      "id": "hdfsPrimaryPolicy2",
+      "type": "HDFS",
+      "name": "hdfsPrimaryPolicy",
+      "status": "FAILED",
+      "frequency": 3600,
+      "startTime": "2016-11-26T23:54:50",
+      "endTime": "2019-09-26T23:54:45",
+      "tags": [
+        "component=sales"
+      ],
+      "sourceclusters": [
+        "Secondary Cluster"
+      ],
+      "targetclusters": [
+        "Development Cluster"
+      ]
+    }
+  ]
+}

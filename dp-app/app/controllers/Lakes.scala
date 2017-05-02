@@ -7,7 +7,6 @@ import com.hortonworks.dataplane.commons.domain.Ambari.AmbariEndpoint
 import com.hortonworks.dataplane.commons.domain.Entities.Datalake
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webserice.LakeService
-import internal.auth.Authenticated
 import models.JsonResponses
 import org.apache.commons.lang3.exception.ExceptionUtils
 import play.api.Logger
@@ -17,12 +16,12 @@ import services.AmbariService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
+import internal.auth.Authenticated
 class Lakes @Inject()(@Named("lakeService") val lakeService: LakeService,
-                      ambariService: AmbariService)
+                      ambariService: AmbariService,authenticated:Authenticated)
     extends Controller {
 
-  def list = Authenticated.async {
+  def list = authenticated.async {
     lakeService
       .list()
       .map {
@@ -33,7 +32,7 @@ class Lakes @Inject()(@Named("lakeService") val lakeService: LakeService,
       }
   }
 
-  def create = Authenticated.async(parse.json) { request =>
+  def create = authenticated.async(parse.json) { request =>
     Logger.info("Received create data centre request")
     request.body
       .validate[Datalake]
@@ -50,7 +49,7 @@ class Lakes @Inject()(@Named("lakeService") val lakeService: LakeService,
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def retrieve(datalakeId: String) = Authenticated.async {
+  def retrieve(datalakeId: String) = authenticated.async {
     Logger.info("Received retrieve data centre request")
     lakeService
       .retrieve(datalakeId)
@@ -62,7 +61,7 @@ class Lakes @Inject()(@Named("lakeService") val lakeService: LakeService,
       }
   }
 
-  def update(datalakeId: String) = Authenticated.async(parse.json) { request =>
+  def update(datalakeId: String) = authenticated.async(parse.json) { request =>
     Logger.info("Received update data centre request")
     request.body
       .validate[Datalake]
@@ -79,7 +78,7 @@ class Lakes @Inject()(@Named("lakeService") val lakeService: LakeService,
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def delete(datalakeId: String) = Authenticated.async {
+  def delete(datalakeId: String) = authenticated.async {
     Logger.info("Received delete data centre request")
     lakeService
       .delete(datalakeId)
@@ -91,12 +90,11 @@ class Lakes @Inject()(@Named("lakeService") val lakeService: LakeService,
       }
   }
 
-  def ambariCheck(url: String) = Authenticated.async {
+  def ambariCheck = authenticated.async {request =>
     ambariService
-      .statusCheck(AmbariEndpoint(url))
+      .statusCheck(AmbariEndpoint(request.getQueryString("url").get))
       .map {
-        case 200 => Ok(Json.toJson(Map("ambariStatus" -> 200)))
-        case status => ServiceUnavailable(Json.toJson(Map("ambariStatus" -> status)))
+        case status =>  Ok(Json.toJson(Map("ambariStatus" -> status)))
       }
       .recoverWith {
         case e: Exception =>
