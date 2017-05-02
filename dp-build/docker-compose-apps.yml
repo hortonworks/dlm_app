@@ -16,6 +16,16 @@ services:
         - dp-database
     links:
         - dp-database
+  dp-cluster-service:
+    build:
+        context: ../services/cluster-service
+    image: hortonworks/dp-cluster-service
+    ports:
+        - "9009:9009"
+    depends_on:
+        - dp-database
+    links:
+        - dp-database
   dp-app:
     build:
         context: .
@@ -27,16 +37,10 @@ services:
     environment:
         DP_APP_HOME: "/usr/dp-app"
     depends_on:
+        - dp-cluster-service
         - dp-db-service
         - dp-database
     links:
+        - dp-cluster-service
         - dp-db-service
-        - dp-database
-  dp-cluster-service:
-    build:
-        context: ../services/cluster-service
-    image: hortonworks/dp-cluster-service
-    depends_on:
-        - dp-database
-    links:
         - dp-database
