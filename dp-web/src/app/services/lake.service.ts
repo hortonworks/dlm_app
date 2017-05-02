@@ -58,4 +58,11 @@ export class LakeService {
       .catch(HttpUtil.handleError);
   }
 
+  validate(ambariUrl: string): Observable<any> {
+  return this.http
+    .get(`${this.url}/ambari/status?url=${ambariUrl}`, new RequestOptions(HttpUtil.getHeaders()))
+    .map(HttpUtil.extractData)
+    .catch(HttpUtil.handleError);
+  }
+
 }
