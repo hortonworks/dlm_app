@@ -1,12 +1,79 @@
-.dp-header__logo {
-  height: 24px;
-  margin-right: 15px;
-  > img {
-    max-height: 100%;
-    max-width: 100%;
+@import "../../../variables";
+
+:host{
+  height: $header-height;
+}
+
+:host /deep/ {
+  .mdl-layout__drawer-button {
+    line-height: 46px;
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+  i {
+    font-size: 18px;
   }
 }
-.dp-header__user {
-  display:flex;
-  align-items: center;
+
+.mdl-layout__header {
+  border-bottom: 1px solid $concrete;
 }
+
+.mdl-navigation__link {
+  cursor: pointer;
+  padding: 0px 15px;
+  position: relative;
+}
+
+.is_active:after {
+  height: 5px;
+  width: 100%;
+  display: block;
+  content: " ";
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  background: $fruit-salad;
+}
+
+.mdl-navigation__link.is_active {
+  color: $mine-shaft !important;
+}
+
+.mdl-navigation {
+  padding: 0px 15px;
+}
+
+.mdl-button {
+  height: 40px;
+  padding: 5px;
+  min-width: 40px;
+
+  .fa-user-circle {
+    font-size: 28px;
+    color: #dedede;
+  }
+  .fa-chevron-down {
+    font-size: 10px;
+    position: relative;
+    color: #dedede;
+    bottom: 5px;
+  }
+}
+
+.mdl-layout__drawer {
+  border-right: none;
+}
+
+.dp-header-logo {
+  width: 121px;
+  padding-left: 54px;
+  height: $header-height;
+  line-height: $header-height;
+  background: $logo-background;
+}
+
+img {
+  height: 30px;
+}
+
