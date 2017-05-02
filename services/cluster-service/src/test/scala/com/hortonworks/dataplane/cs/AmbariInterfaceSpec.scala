@@ -2,6 +2,7 @@ package com.hortonworks.dataplane.cs
 
 import com.hortonworks.dataplane.commons.domain.Entities.Cluster
 import com.hortonworks.dataplane.restmock.httpmock.when
+import com.typesafe.config.ConfigFactory
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.ws.ahc.AhcWSClient
@@ -18,6 +19,8 @@ class AmbariInterfaceSpec
 
   logger.info("started local server at 9999")
   protected val stop = server.startOnPort(9999)
+
+  val appConfig = ConfigFactory.parseString("""dp.services.endpoints.namenode = [{"name":"hdfs-site","properties":[{"protocol":"http","name":"dfs.namenode.http-address"},{"protocol":"https","name":"dfs.namenode.https-address"},{"protocol":"rpc","name":"dfs.namenode.rpc-address"}]}]""")
 
   "AmbariInterface" should "call the default cluster endpoint" in {
     when get ("/api/v1/clusters") withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") thenRespond (200, """{
@@ -36,7 +39,8 @@ class AmbariInterfaceSpec
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "somecluster",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),Credentials(Some("admin"),Some("admin")))
+        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+      Credentials(Some("admin"),Some("admin")),appConfig)
 
     ambariInterface.ambariConnectionCheck.map { ac =>
       assert(ac.status)
@@ -56,7 +60,8 @@ class AmbariInterfaceSpec
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),Credentials(Some("admin"),Some("admin")))
+        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+      Credentials(Some("admin"),Some("admin")),appConfig)
 
     val atlas  = ambariInterface.getAtlas
     atlas.map { either =>
@@ -69,21 +74,28 @@ class AmbariInterfaceSpec
   it should "discover the namenode and its properties" in {
 
     val json  = Source.fromURL(getClass.getResource("/namenode.json")).mkString
+    val hdfsJson  = Source.fromURL(getClass.getResource("/hdfs.json")).mkString
     val nameNodeConfig = "/api/v1/clusters/test/components/NAMENODE"
-    when get(nameNodeConfig) withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") thenRespond(200,json)
+    when get nameNodeConfig withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") thenRespond(200,json)
+    when get "/api/v1/clusters/test/configurations/service_config_versions" withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") withParams ("service_name"->"HDFS","is_current"->"true") thenRespond(200,hdfsJson)
 
     implicit val ws = AhcWSClient()
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),Credentials(Some("admin"),Some("admin")))
+        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+      Credentials(Some("admin"),Some("admin")),appConfig)
 
     val atlas  = ambariInterface.getNameNodeStats
     atlas.map { either =>
       assert(either.isRight)
-      assert(either.right.get.startTime == 1489956956063L)
-      assert(either.right.get.totalFiles == 181)
-
+      assert(either.right.get.serviceEndpoint.size == 3)
+      assert(either.right.get.props.isDefined == true)
+      //verify the first one
+      assert(either.right.get.serviceEndpoint(0).protocol == "http")
+      assert(either.right.get.serviceEndpoint(0).host == "yusaku-beacon-1.c.pramod-thangali.internal")
+      assert(either.right.get.serviceEndpoint(0).port == 50070)
+      assert(either.right.get.serviceEndpoint(0).name == "dfs.namenode.http-address")
     }
   }
 
@@ -100,7 +112,8 @@ class AmbariInterfaceSpec
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),Credentials(Some("admin"),Some("admin")))
+        ambariurl = Some("http://localhost:9999/api/v1/clusters/test"))
+      ,Credentials(Some("admin"),Some("admin")),appConfig)
 
     val atlas  = ambariInterface.getGetHostInfo
     atlas.map { either =>
@@ -111,7 +124,7 @@ class AmbariInterfaceSpec
 
   }
 
-   it should "discover the knox properties from the cluster" in {
+   it should "discover knox properties from the cluster" in {
     val json  = Source.fromURL(getClass.getResource("/knox.json")).mkString
     val url = "/api/v1/clusters/test/configurations/service_config_versions"
     when get url withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") withParams ("service_name"->"KNOX","is_current" ->"true") thenRespond(200,json)
@@ -120,13 +133,34 @@ class AmbariInterfaceSpec
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),Credentials(Some("admin"),Some("admin")))
+        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+      Credentials(Some("admin"),Some("admin")),appConfig)
 
     val atlas  = ambariInterface.getKnoxInfo
     atlas.map { either =>
       assert(either.isRight)
     }
 
+  }
+
+  it should "discover beacon endpoints from the cluster" in {
+    val beaconprops  = Source.fromURL(getClass.getResource("/beaconconfig.json")).mkString
+    val beaconHosts  = Source.fromURL(getClass.getResource("/beaconhost.json")).mkString
+    val url = "/api/v1/clusters/test/configurations/service_config_versions"
+    when get url withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") withParams ("service_name"->"BEACON","is_current" ->"true") thenRespond(200,beaconprops)
+    when get "/api/v1/clusters/test/host_components" withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") thenRespond(200,beaconHosts)
+
+    implicit val ws = AhcWSClient()
+    val ambariInterface = new AmbariClusterInterface(
+      Cluster(name = "test",
+        description = "somedescription",
+        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+      Credentials(Some("admin"),Some("admin")),appConfig)
+
+    val beacon  = ambariInterface.getBeacon
+    beacon.map { either =>
+      assert(either.isRight)
+    }
   }
 
 

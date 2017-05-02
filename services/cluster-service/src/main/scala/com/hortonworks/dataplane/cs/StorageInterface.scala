@@ -5,6 +5,7 @@ import javax.inject.{Inject, Singleton}
 import com.hortonworks.dataplane.commons.domain.Entities.{
   Cluster,
   ClusterHost,
+  ClusterServiceEndpoint,
   Datalake,
   Errors,
   ClusterService => ClusterData
@@ -20,6 +21,7 @@ import com.typesafe.scalalogging.Logger
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.Success
 
 trait StorageInterface {
 
@@ -27,7 +29,9 @@ trait StorageInterface {
 
   def addOrUpdateHostInformation(hostInfos: Seq[ClusterHost]): Future[Errors]
 
-  def updateServiceByName(toPersist: ClusterData): Future[Boolean]
+  def updateServiceByName(
+      toPersist: ClusterData,
+      endpoints: Seq[ClusterServiceEndpoint]): Future[Boolean]
 
   def getDataLakes: Future[Seq[Datalake]]
 
@@ -35,7 +39,9 @@ trait StorageInterface {
 
   def serviceRegistered(cluster: Cluster, serviceName: String): Future[Boolean]
 
-  def addService(service: ClusterData): Future[Option[ClusterData]]
+  def addService(
+      service: ClusterData,
+      endpoints: Seq[ClusterServiceEndpoint]): Future[Option[ClusterData]]
 
   def getConfiguration(key: String): Future[Option[String]]
 
@@ -95,12 +101,39 @@ class StorageInterfaceImpl @Inject()(
       }
   }
 
-  override def addService(
-      service: com.hortonworks.dataplane.commons.domain.Entities.ClusterService)
-    : Future[Option[
-      com.hortonworks.dataplane.commons.domain.Entities.ClusterService]] = {
+  def mapEndpointsToCluster(s: Either[Errors, ClusterData],
+                            endPoints: Seq[ClusterServiceEndpoint]) =
+    Future.successful {
+      if (s.isLeft) {
+        throw new Exception(
+          s"Could not create the service entry ${s.left.get}")
+      } else {
+        endPoints.map(_.copy(serviceid = s.right.get.id))
+      }
+    }
 
-    clusterComponentService.create(service).map { cl =>
+  override def addService(
+      service: com.hortonworks.dataplane.commons.domain.Entities.ClusterService,
+      endPoints: Seq[ClusterServiceEndpoint]): Future[Option[
+    com.hortonworks.dataplane.commons.domain.Entities.ClusterService]] = {
+
+    val future = for {
+      newService <- clusterComponentService.create(service)
+      // map the endpoints to the newly created service
+      eps <- mapEndpointsToCluster(newService, endPoints)
+      // Save service endpoints
+      result <- clusterComponentService.addClusterEndpoints(eps)
+    } yield {
+      result.foreach { r =>
+        if (r.isLeft) {
+          logger.error(
+            s"Endpoint creation failed, probable reason is ${r.left.get}")
+        }
+      }
+      newService
+    }
+
+    future.map { cl =>
       if (cl.isLeft) {
         logger.warn(
           s"Cannot create cluster service - Reason: ${cl.left.get.errors}")
@@ -121,8 +154,31 @@ class StorageInterfaceImpl @Inject()(
       .map(_.isRight)
   }
 
-  override def updateServiceByName(toPersist: ClusterData): Future[Boolean] = {
-    clusterComponentService.updateServiceByName(toPersist).map(_.isRight)
+  override def updateServiceByName(
+      toPersist: ClusterData,
+      endpoints: Seq[ClusterServiceEndpoint]): Future[Boolean] = {
+    for {
+      serviceUpdate <- clusterComponentService.updateServiceByName(toPersist)
+      cs <- clusterComponentService.getServiceByName(toPersist.clusterid.get,
+                                                     toPersist.servicename)
+      eps <- mapEndpointsToCluster(Right(cs.right.get), endpoints)
+      endpointUpdate <- clusterComponentService.updateClusterEndpoints(eps)
+    } yield {
+      val updateResult = serviceUpdate.isRight && endpointUpdate.foldRight(
+          true)((a, b) => a.isRight && b)
+      serviceUpdate match {
+        case Left(errors) => logger.error(s"Service update errors $errors")
+        case Right(result) => logger.info(s"Service update result - $result")
+      }
+
+      endpointUpdate.foreach {
+        case Left(errors) =>
+          logger.error(s"Service endpoint update errors $errors")
+        case Right(result) =>
+          logger.info(s"Service endpoint update result - $result")
+      }
+      updateResult
+    }
   }
 
   override def addOrUpdateHostInformation(
@@ -130,17 +186,24 @@ class StorageInterfaceImpl @Inject()(
 
     val futures = hostInfos.map(clusterHostsService.createOrUpdate)
     val errors = Future.sequence(futures)
-    errors.map(e => {
-      Errors(e.flatMap(_.get.errors))
+    val toRet = errors.map(e => {
+      Errors(e.collect {
+        case er if er.isDefined => er.get.errors
+      }.flatten)
     })
+
+    toRet
   }
 
   override def getConfiguration(key: String): Future[Option[String]] = {
-    configService.getConfig(key).map(v => v.map(o => o.configValue)).recoverWith {
-      case e: Exception =>
-      logger.error("Error when getting configuration",e)
-      throw e
-    }
+    configService
+      .getConfig(key)
+      .map(v => v.map(o => o.configValue))
+      .recoverWith {
+        case e: Exception =>
+          logger.error("Error when getting configuration", e)
+          throw e
+      }
   }
 
   override def addClusters(clusters: Seq[Cluster]): Future[Seq[Cluster]] = {

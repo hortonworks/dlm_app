@@ -22,7 +22,7 @@ object ClusterService extends App {
 
 
   logger.info("Starting cluster sync")
-  clusterSync.initialize
+//  clusterSync.initialize
 
 
 }

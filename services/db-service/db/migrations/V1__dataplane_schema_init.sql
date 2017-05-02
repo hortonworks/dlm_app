@@ -74,15 +74,30 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_clusters (
 CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_services (
   id          BIGSERIAL PRIMARY KEY,
   servicename VARCHAR(255) NOT NULL,
-  servicehost VARCHAR(255),
-  serviceport INT,
-  fullurl     TEXT,
   properties  JSONB,
   clusterid   BIGINT REFERENCES dataplane.dp_clusters (id),
   datalakeid  BIGINT REFERENCES dataplane.dp_datalakes (id),
   CHECK (clusterid IS NOT NULL OR datalakeid IS NOT NULL)
 
 );
+
+COMMENT ON TABLE dataplane.dp_cluster_services  IS 'Services required for DP discovered from the cluster';
+
+
+CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_service_endpoint (
+  id          BIGSERIAL PRIMARY KEY,
+  name        VARCHAR(255),
+  protocol    VARCHAR(8) NOT NULL DEFAULT 'TCP',
+  host        VARCHAR(255) NOT NULL ,
+  port        INT,
+  pathsegment   TEXT,
+  serviceid   BIGINT REFERENCES dataplane.dp_cluster_services(id)
+);
+
+COMMENT ON COLUMN dataplane.dp_cluster_service_endpoint.pathsegment  IS 'An additional path segment if required';
+COMMENT ON COLUMN dataplane.dp_cluster_service_endpoint.name  IS 'The property key to identify this endpoint';
+COMMENT ON TABLE dataplane.dp_cluster_service_endpoint  IS 'Service endpoints for services listed in dp_cluster_services';
+
 
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_workspace (
