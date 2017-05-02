@@ -5,9 +5,21 @@
     <div class="result-viewer">
       <div class="result-header">
         <span class="resultsTitle" *ngIf="currentDsTag">{{currentDsTag.name}}</span>
-        <span class="result-header-buttonCont"><span class="mdl-button mdl-button--colored mdl-color--green mdl-color-text--white"><i class="fa fa-plus"></i> NEW</span></span>
+        <div class="mdl-button-group">
+          <button class="mdl-color--green mdl-color-text--white mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+              <i class="fa fa-plus"></i> NEW
+          </button>
+        </div>
+        <div class="mdl-button-group">
+          <button (click)="onViewChange('grid')" [ngClass]="{'mdl-color--green': currentView === 'grid' }" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+            <i class="fa fa-th"></i>
+          </button>
+           <button (click)="onViewChange('list')" [ngClass]="{'mdl-color--green': currentView === 'list' }" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+            <i class="fa fa-list-ul"></i>
+          </button>
+        </div>
       </div>
-      <div class="result-container"><ds-nav-result-viewer [currentDsTag]="currentDsTag"></ds-nav-result-viewer></div>
+      <div class="result-container"><ds-nav-result-viewer [view]="currentView" [currentDsTag]="currentDsTag"></ds-nav-result-viewer></div>
     </div>
     <div style="clear: both;"></div>
   </div>

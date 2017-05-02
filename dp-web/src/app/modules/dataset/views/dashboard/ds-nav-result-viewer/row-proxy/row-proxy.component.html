@@ -1,0 +1,49 @@
+<table class="mdl-data-table mdl-js-data-table" on-mouseleave="hoveredIndex=null">
+  <thead>
+    <tr>
+      <th class="mdl-data-table__cell--non-numeric">NAME</th>
+      <th class="mdl-data-table__cell--non-numeric">DATALAKE</th>
+      <th class="mdl-data-table__cell--non-numeric">CREATED BY</th>
+      <th class="mdl-data-table__cell--non-numeric">HIVE TABLES</th>
+      <th class="mdl-data-table__cell--non-numeric">HDFS FILES</th>
+      <th class="mdl-data-table__cell--non-numeric"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let dsModel of paginatedDatasetModels; let index=index" on-mouseover="hoveredIndex=index">
+      <td class="mdl-data-table__cell--non-numeric">{{dsModel.name}}<span *ngIf="dsModel.favourite"><i class="fa__fa-star--icon fa fa-star"></i></span></td>
+      <td class="mdl-data-table__cell--non-numeric">{{dsModel.datalakeName}}</td>
+      <td class="mdl-data-table__cell--non-numeric">{{dsModel.creatorName}}</td>
+      <td class="mdl-data-table__cell--non-numeric">{{dsModel.hiveCount}}</td>
+      <td class="mdl-data-table__cell--non-numeric">{{dsModel.filesCount}}</td>
+      <td class="mdl-data-table__cell--non-numeric">
+          <div *ngIf="index==hoveredIndex">
+               <button id="dropDownIcon_{{ dsModel.id }}" class="mdl-button mdl-js-button mdl-button--icon"><i class="fa fa-ellipsis-v"></i></button>
+                <label class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
+                        for="dropDownIcon_{{ dsModel.id }}">
+                    <li class="mdl-menu__item"><i class="fa__fa-edit--icon fa fa-edit"></i>Edit</li>
+                    <li class="mdl-menu__item"><i class="fa__fa-close--icon fa fa-close"></i>Delete</li>
+                    <li class="mdl-menu__item">
+                    <i class="fa__fa-star--icon fa fa-star"></i>
+                    <span *ngIf="dsModel.favourite">Remove from Favourites</span>
+                    <span *ngIf="!dsModel.favourite">Add to Favourites</span>
+                    </li>
+                </label>
+          </div>
+      </td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="6">Row Per Page 
+        <button id="dropDownIcon_" class="mdl-button mdl-js-button">{{size}} <i class="fa fa-caret-down"></i></button>
+        <label class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
+                for="dropDownIcon_">
+            <li (click)="onSizeChange(pge)" *ngFor="let pge of sizes" class="mdl-menu__item">{{pge.size}}</li>
+        </label>
+        <button id="prev" [disabled]="isFirst()" (click)="previous()" class="mdl-button mdl-js-button"><i class="fa fa-chevron-left"></i></button>
+        <button id="next" [disabled]="isLast()" (click)="next()" class="mdl-button mdl-js-button"><i class="fa fa-chevron-right"></i></button>
+      </td>
+    </tr>
+  </tfoot>
+</table>

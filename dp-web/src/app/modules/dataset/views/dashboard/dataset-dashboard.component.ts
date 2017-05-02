@@ -9,13 +9,20 @@ import {DatasetTag} from "../../../../models/dataset-tag";
 export class DatasetDashboardComponent implements OnInit {
 
   public currentDsTag :DatasetTag = null;
+  public static GRID_VIEW : string = "grid";
+  public static LIST_VIEW : string = "list"
+  currentView : string;
   // constructor(){}
 
   ngOnInit () {
-
+    this.currentView = DatasetDashboardComponent.GRID_VIEW;
   }
 
   onTagChange (tagObj:DatasetTag){
     this.currentDsTag = tagObj;
+  }
+
+  onViewChange(view){
+    this.currentView = view;
   }
 }

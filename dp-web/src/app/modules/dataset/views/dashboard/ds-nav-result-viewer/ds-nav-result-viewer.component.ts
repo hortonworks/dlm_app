@@ -15,6 +15,7 @@ export class DsNavResultViewer implements OnInit {
   @Input() currentDsTag : DatasetTag;
   public datasetModels : RichDatasetModel[] = null
   private currentPage : number = 1;
+  @Input() view : String;
 
   constructor(
     private richDatasetService :RichDatasetService

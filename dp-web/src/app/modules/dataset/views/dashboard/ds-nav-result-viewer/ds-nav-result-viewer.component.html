@@ -1,4 +1,7 @@
 <div *ngIf="!datasetModels">Loading...</div>
-<div *ngIf="datasetModels">
+<div *ngIf="datasetModels && view=== 'grid'">
   <ds-tile-proxy *ngFor="let dsMdl of datasetModels" [dsModel]="dsMdl"></ds-tile-proxy>
+</div>
+<div *ngIf="datasetModels && view=== 'list'">
+  <ds-row-proxy [datasetModels]="datasetModels"></ds-row-proxy>
 </div>

@@ -64,4 +64,24 @@ nav-tag-panel {
   overflow-y: auto;
 }
 
+.mdl-button-group{
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  float: right;
+  margin-right: 1%;
+  margin-top : 1%;
+  button{
+    background-color: #eee;
+    display: inline-block;
+    float: left;
+    margin: 0px;
+    box-shadow: none;
+    border-radius: 0px;
+  }
+  
+  button:hover {
+  color: green;
+  }
+}
 

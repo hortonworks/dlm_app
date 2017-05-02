@@ -12,7 +12,7 @@ import {DsTileProxy} from "./views/dashboard/ds-nav-result-viewer/tile-proxy/til
 import {DsFullView} from "./views/ds-full-view/ds-full-view.component";
 import {DsAssetList} from "./views/ds-assets-list/ds-assets-list.component";
 import {DsAssetsService} from "./services/dsAssetsService";
-
+import {DsRowProxy} from "./views/dashboard/ds-nav-result-viewer/row-proxy/row-proxy.component";
 
 @NgModule({
   imports: [
@@ -26,6 +26,7 @@ import {DsAssetsService} from "./services/dsAssetsService";
       DsTileProxy,
       DsFullView,
       DsAssetList,
+      DsRowProxy,
       DatasetDashboardComponent
   ],
   providers: [
