@@ -36,6 +36,9 @@ object ResponseEntities {
 
 object RequestEntities {
   case class ClusterDefinitionRequest( fsEndpoint: String, beaconEndpoint: String, name: String, description: String)
+  case class PolicyDefinitionRequest( name: String, `type`: String, sourceDataset: String,
+                                      sourceCluster: String, targetCluster: String, frequencyInSec: Long,
+                                      startTime: Option[String], endTime: Option[String])
 }
 
 object JsonFormatters {
@@ -84,6 +87,9 @@ object JsonFormatters {
 
   implicit val clusterDefinitionRequestWrites = Json.writes[ClusterDefinitionRequest]
   implicit val clusterDefinitionRequestReads = Json.reads[ClusterDefinitionRequest]
+
+  implicit val policyDefinitionRequestWrites = Json.writes[PolicyDefinitionRequest]
+  implicit val policyDefinitionRequestReads = Json.reads[PolicyDefinitionRequest]
 }
 
 

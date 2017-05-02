@@ -1,7 +1,7 @@
 package models
 
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, ClusterService, Datalake, Location}
-import com.hortonworks.dlm.beacon.domain.RequestEntities.ClusterDefinitionRequest
+import com.hortonworks.dlm.beacon.domain.RequestEntities._
 import com.hortonworks.dlm.beacon.domain.ResponseEntities.{PairedCluster, PoliciesDetailResponse, PolicyDataResponse, PolicyStatusResponse}
 import play.api.libs.json.Json
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
@@ -38,6 +38,8 @@ object Entities {
 
   case class PoliciesDetailsResponse(unreachableBeacon: Seq[String] = Seq(), policies: Seq[PoliciesDetails])
 
+  case class PolicySubmitRequest(policyDefinition: PolicyDefinitionRequest, submitType: String)
+
 }
 
 object JsonFormatters {
@@ -61,6 +63,9 @@ object JsonFormatters {
 
   implicit val policiesDetailsResponseReads = Json.reads[PoliciesDetailsResponse]
   implicit val policiesDetailsResponseWrites = Json.writes[PoliciesDetailsResponse]
+
+  implicit val policySubmitRequestReads = Json.reads[PolicySubmitRequest]
+  implicit val policySubmitRequestWrites = Json.writes[PolicySubmitRequest]
 
 }
 

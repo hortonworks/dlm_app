@@ -62,11 +62,12 @@ object WebService {
     def listPolicies(beaconUrl : String): Future[Either[BeaconApiErrors, Seq[PoliciesDetailResponse]]]
     def listPolicy(beaconUrl : String, policyName : String): Future[Either[BeaconApiErrors, PolicyDataResponse]]
     def listPolicyStatus(beaconUrl : String, policyName : String): Future[Either[BeaconApiErrors, PolicyStatusResponse]]
-   // def deletePolicy(beaconUrl : String): Future[Either[BeaconApiErrors, Seq[PairedCluster]]]
-   // def updatePolicy(beaconUrl : String): Future[Either[BeaconApiErrors, Seq[PairedCluster]]]
-   // def submitPolicy(beaconUrl : String, remoteClusterName : String, remoteBeaconEndpoint: String): Future[Either[BeaconApiErrors, PostActionResponse]]
-   // def schedulePolicy(beaconUrl : String, remoteClusterName : String, remoteBeaconEndpoint: String): Future[Either[BeaconApiErrors, PostActionResponse]]
-   // def submitAndSchedulePolicy(beaconUrl : String, remoteClusterName : String, remoteBeaconEndpoint: String): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def submitAndSchedulePolicy(beaconUrl : String, policyName : String, policyDefinitionRequest : PolicyDefinitionRequest): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def submitPolicy(beaconUrl : String, policyName : String, policyDefinitionRequest : PolicyDefinitionRequest): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def schedulePolicy(beaconUrl : String, policyName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def suspendPolicy(beaconUrl : String, policyName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def resumePolicy(beaconUrl : String, policyName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def deletePolicy(beaconUrl : String, policyName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
   }
 
 }
