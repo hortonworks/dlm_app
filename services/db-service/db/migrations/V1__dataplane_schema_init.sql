@@ -36,11 +36,10 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_permissions (
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_locations (
   id        BIGSERIAL PRIMARY KEY,
-  country   VARCHAR(255)   NOT NULL,
   city      VARCHAR(255)   NOT NULL,
+  country   VARCHAR(255)   NOT NULL,
   latitude  DECIMAL(10, 6) NOT NULL,
-  longitude DECIMAL(10, 6) NOT NULL,
-  UNIQUE (country, city)
+  longitude DECIMAL(10, 6) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_datalakes (
