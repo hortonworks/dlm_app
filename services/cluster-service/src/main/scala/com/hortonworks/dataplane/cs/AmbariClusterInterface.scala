@@ -108,6 +108,15 @@ class AmbariClusterInterface(
       .url(s"${cluster.ambariurl.get}/components/NAMENODE")
       .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
+
+    val nameNodeHostsApi =
+      s"${cluster.ambariurl.get}/host_components?HostRoles/component_name=NAMENODE"
+
+    val hostInfo = ws
+      .url(nameNodeHostsApi)
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
+      .get()
+
     val nameNodePropertiesResponse = ws
       .url(
         s"${cluster.ambariurl.get}/configurations/service_config_versions?service_name=HDFS&is_current=true")
@@ -115,37 +124,28 @@ class AmbariClusterInterface(
       .get()
 
     val nameNodeInfo = for {
+      hi <- hostInfo
       nnr <- nameNodeResponse
       nnpr <- nameNodePropertiesResponse
     } yield {
+
       val serviceComponent = nnr.json \ "ServiceComponentInfo"
+      val hostItems =
+        (hi.json \ "items").as[JsArray].validate[List[JsObject]].get
+
+      val hosts = hostItems.map { h =>
+        val host = (h \ "HostRoles" \ "host_name").validate[String]
+        host.get
+      }
 
       val items = (nnpr.json \ "items").as[JsArray]
       val configs =
-        (items(0) \ "configurations").as[JsArray].validate[List[JsObject]].get
+        (items(0) \ "configurations").as[JsArray]
 
-      // get the properties configured in configuration
-
-      import collection.JavaConverters._
-      val configList =
-        Try(appConfig.getConfigList("dp.services.endpoints.namenode").asScala)
-          .getOrElse(Seq())
-      val endpoints = configList.flatMap { c =>
-        val propName = c.getString("name")
-        val propList = c.getConfigList("properties").asScala
-        val config = configs.find(p => (p \ "type").as[String] == propName).get
-        propList.map { pl =>
-          val value =
-            (config \ "properties" \ s"${pl.getString("name")}").as[String]
-          val strings = value.split(":")
-          ServiceEndpoint(pl.getString("name"),
-                          pl.getString("protocol"),
-                          strings(0),
-                          strings(1).toInt)
-        }
-      }
-
-      NameNode(endpoints, props = serviceComponent.toOption)
+      NameNode(
+        hosts.map(ServiceHost),
+        Some(
+          Json.obj("stats" -> serviceComponent.get, "properties" -> configs)))
     }
 
     nameNodeInfo.map(Right(_)).recoverWith {
@@ -260,35 +260,13 @@ class AmbariClusterInterface(
       val hosts = hostItems.map { h =>
         val host = (h \ "HostRoles" \ "host_name").validate[String]
         host.get
-      }.zipWithIndex
+      }
 
       val items = (cr.json \ "items").as[JsArray]
       val configs =
-        (items(0) \ "configurations").as[JsArray].validate[List[JsObject]].get
+        (items(0) \ "configurations").as[JsArray]
 
-      // get the properties configured in configuration
-
-      import collection.JavaConverters._
-      val configList =
-        Try(appConfig.getConfigList("dp.services.endpoints.hive").asScala)
-          .getOrElse(Seq())
-      val eps = configList.flatMap { c =>
-        val propName = c.getString("name")
-        val propList = c.getConfigList("properties").asScala
-        val config = configs.find(p => (p \ "type").as[String] == propName).get
-        propList.map { pl =>
-          (config \ "properties" \ s"${pl.getString("name")}").as[String]
-
-        }
-      }
-
-      val endpoints = hosts.map { h =>
-        ServiceEndpoint(s"hive.thrift.server.${h._2}",
-                        "TCP",
-                        h._1,
-                        eps.head.toInt)
-      }
-      HiveServer(endpoints, None)
+      HiveServer(hosts.map(ServiceHost), Some(configs))
     }
 
     hiveInfo.map(Right(_)).recoverWith {
@@ -344,11 +322,7 @@ class AmbariClusterInterface(
 
       val items = (cr.json \ "items").as[JsArray]
       val configs =
-        (items(0) \ "configurations").as[JsArray].validate[List[JsObject]].get
-      val config =
-        configs.find(p => (p \ "type").as[String] == "beacon-env").get
-      val props = (config \ "properties").toOption
-      val port = (config \ "properties" \ "beacon_port").as[String]
+        (items(0) \ "configurations").as[JsArray]
 
       val hostItems =
         (hi.json \ "items").as[JsArray].validate[List[JsObject]].get
@@ -356,12 +330,9 @@ class AmbariClusterInterface(
       val hosts = hostItems.map { h =>
         val host = (h \ "HostRoles" \ "host_name").validate[String]
         host.get
-      }.zipWithIndex
-
-      val endpoints = hosts.map { h =>
-        ServiceEndpoint(s"beacon.host.name.${h._2}", "TCP", h._1, port.toInt)
       }
-      BeaconInfo(props, endpoints)
+
+      BeaconInfo(Some(items), hosts.map(ServiceHost))
     }
 
     beaconInfo.map(Right(_)).recoverWith {
@@ -369,7 +340,6 @@ class AmbariClusterInterface(
         logger.error("Cannot get Beacon information")
         Future.successful(Left(e))
     }
-
   }
 
   override def getHdfsInfo: Future[Either[Throwable, Hdfs]] = {
@@ -385,30 +355,9 @@ class AmbariClusterInterface(
     } yield {
       val items = (nnpr.json \ "items").as[JsArray]
       val configs =
-        (items(0) \ "configurations").as[JsArray].validate[List[JsObject]].get
+        (items(0) \ "configurations").as[JsArray]
 
-      // get the properties configured in configuration
-
-      import collection.JavaConverters._
-      val configList =
-        Try(appConfig.getConfigList("dp.services.endpoints.hdfs").asScala)
-          .getOrElse(Seq())
-      val endpoints = configList.flatMap { c =>
-        val propName = c.getString("name")
-        val propList = c.getConfigList("properties").asScala
-        val config = configs.find(p => (p \ "type").as[String] == propName).get
-        propList.map { pl =>
-          val value =
-            (config \ "properties" \ s"${pl.getString("name")}").as[String]
-          val strings = value.split(":")
-          ServiceEndpoint(pl.getString("name"),
-                          pl.getString("protocol"),
-                          strings(1).replaceAll("//", "").trim,
-                          strings(2).toInt)
-        }
-      }
-
-      Hdfs(endpoints, props = None)
+      Hdfs(Seq(), Some(configs))
     }
 
     hdfsInfo.map(Right(_)).recoverWith {

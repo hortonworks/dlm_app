@@ -1,22 +1,18 @@
 package com.hortonworks.dataplane.cs
 
-import java.net.URL
-
-import akka.actor.{Actor, ActorLogging}
 import akka.actor.Status.Failure
+import akka.actor.{Actor, ActorLogging}
 import akka.pattern.pipe
 import com.hortonworks.dataplane.commons.domain.Entities.{
   Cluster,
   ClusterHost,
-  ClusterServiceEndpoint,
+  ClusterServiceHost,
   Errors,
   ClusterService => ClusterData
 }
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import com.typesafe.scalalogging.Logger
 import play.api.libs.json.Json
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
 private[dataplane] case class PersistAtlas(cluster: Cluster,
@@ -42,7 +38,7 @@ private[dataplane] case class PersistHostInfo(
 
 private sealed case class ServiceExists(cluster: Cluster,
                                         clusterData: ClusterData,
-                                        endpoints: Seq[ClusterServiceEndpoint],
+                                        endpoints: Seq[ClusterServiceHost],
                                         boolean: Boolean)
 
 private sealed case class PersistenceResult(option: Option[ClusterData],
@@ -68,16 +64,9 @@ class PersistenceActor(clusterInterface: StorageInterface)
           datalakeid = None
         )
 
-        val endpoints = Seq(
-          ClusterServiceEndpoint(name = "atlas.rest.service.url",
-                                 protocol = at.restService.getProtocol,
-                                 host = at.restService.getHost,
-                                 port = Some(at.restService.getPort),
-                                 pathSegment = None))
-
         clusterInterface
           .serviceRegistered(cluster, toPersist.servicename)
-          .map(ServiceExists(cluster, toPersist, endpoints, _))
+          .map(ServiceExists(cluster, toPersist, Seq(), _))
           .pipeTo(self)
 
       } else
@@ -100,12 +89,8 @@ class PersistenceActor(clusterInterface: StorageInterface)
           .map(
             ServiceExists(cluster,
                           toPersist,
-                          beaconInfo.endpoints.map(
-                            se =>
-                              ClusterServiceEndpoint(name = se.name,
-                                                     host = se.host,
-                                                     port = Some(se.port),
-                                                     protocol = se.protocol)),
+                          beaconInfo.endpoints.map(e =>
+                            ClusterServiceHost(host = e.host)),
                           _))
           .pipeTo(self)
 
@@ -126,16 +111,7 @@ class PersistenceActor(clusterInterface: StorageInterface)
 
         clusterInterface
           .serviceRegistered(cluster, toPersist.servicename)
-          .map(
-            ServiceExists(cluster,
-                          toPersist,
-                          hdfsInfo.serviceEndpoint.map(
-                            se =>
-                              ClusterServiceEndpoint(name = se.name,
-                                                     host = se.host,
-                                                     port = Some(se.port),
-                                                     protocol = se.protocol)),
-                          _))
+          .map(ServiceExists(cluster, toPersist, Seq(), _))
           .pipeTo(self)
 
       } else
@@ -144,8 +120,8 @@ class PersistenceActor(clusterInterface: StorageInterface)
 
     case PersistHive(cluster, hive) =>
       if (hive.isRight) {
-        val hdfsInfo = hive.right.get
-        val props = Try(hdfsInfo.props).getOrElse(None)
+        val hiveInfo = hive.right.get
+        val props = Try(hiveInfo.props).getOrElse(None)
         val toPersist = ClusterData(
           servicename = "HIVE",
           properties = props,
@@ -158,12 +134,8 @@ class PersistenceActor(clusterInterface: StorageInterface)
           .map(
             ServiceExists(cluster,
                           toPersist,
-                          hdfsInfo.serviceEndpoint.map(
-                            se =>
-                              ClusterServiceEndpoint(name = se.name,
-                                                     host = se.host,
-                                                     port = Some(se.port),
-                                                     protocol = se.protocol)),
+                          hiveInfo.serviceHost.map(e =>
+                            ClusterServiceHost(host = e.host)),
                           _))
           .pipeTo(self)
 
@@ -189,9 +161,9 @@ class PersistenceActor(clusterInterface: StorageInterface)
 
     case PersistNameNode(cluster, namenode) =>
       if (namenode.isRight) {
-        val at = namenode.right.get
+        val nn = namenode.right.get
         val toPersist = ClusterData(servicename = "NAMENODE",
-                                    properties = at.props,
+                                    properties = nn.props,
                                     clusterid = Some(cluster.id.get),
                                     datalakeid = None)
 
@@ -200,12 +172,8 @@ class PersistenceActor(clusterInterface: StorageInterface)
           .map(
             ServiceExists(cluster,
                           toPersist,
-                          at.serviceEndpoint.map(
-                            se =>
-                              ClusterServiceEndpoint(name = se.name,
-                                                     host = se.host,
-                                                     port = Some(se.port),
-                                                     protocol = se.protocol)),
+                          nn.serviceHost.map(e =>
+                            ClusterServiceHost(host = e.host)),
                           _))
           .pipeTo(self)
 

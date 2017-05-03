@@ -119,14 +119,14 @@ object Webserice {
     def updateServiceByName(
         clusterData: ClusterData): Future[Either[Errors, Boolean]]
     def addClusterEndpoints(
-        clusterServiceEndpoints: Seq[ClusterServiceEndpoint] = Seq())
-      : Future[Seq[Either[Errors, ClusterServiceEndpoint]]]
+        ClusterServiceHosts: Seq[ClusterServiceHost] = Seq())
+      : Future[Seq[Either[Errors, ClusterServiceHost]]]
     def updateClusterEndpoints(
-        clusterServiceEndpoints: Seq[ClusterServiceEndpoint] = Seq())
+        ClusterServiceHosts: Seq[ClusterServiceHost] = Seq())
       : Future[Seq[Either[Errors, Boolean]]]
     def getEndpointsForCluster(
         clusterId: Long,
-        service: String): Future[Either[Errors, Seq[ClusterServiceEndpoint]]]
+        service: String): Future[Either[Errors, Seq[ClusterServiceHost]]]
 
 
   }

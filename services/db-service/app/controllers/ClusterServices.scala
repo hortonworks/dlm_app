@@ -3,10 +3,10 @@ package controllers
 import javax.inject._
 
 import domain.API.{clusters, datalakes}
-import domain.{ClusterServiceEndpointRepo, ClusterServiceRepo}
+import domain.{ClusterServiceHostsRepo, ClusterServiceRepo}
 import com.hortonworks.dataplane.commons.domain.Entities.{
   ClusterService,
-  ClusterServiceEndpoint
+  ClusterServiceHost
 }
 import play.api.mvc._
 
@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class ClusterServices @Inject()(
     csr: ClusterServiceRepo,
-    cse: ClusterServiceEndpointRepo)(implicit exec: ExecutionContext)
+    cse: ClusterServiceHostsRepo)(implicit exec: ExecutionContext)
     extends JsonAPI {
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
@@ -41,7 +41,7 @@ class ClusterServices @Inject()(
     Map("cluster" -> s"$clusters/${c.clusterid.get}")
   }
 
-  private def makServiceLink(e: ClusterServiceEndpoint, clusterId: Long) = {
+  private def makServiceLink(e: ClusterServiceHost, clusterId: Long) = {
     Map("cluster" -> s"$clusters/$clusterId")
   }
 
@@ -168,7 +168,7 @@ class ClusterServices @Inject()(
 
   def addServiceEndpoint = Action.async(parse.json) { req =>
     req.body
-      .validate[ClusterServiceEndpoint]
+      .validate[ClusterServiceHost]
       .map { ce =>
         // check if cluster is not null and datalake is null
         if (ce.serviceid.isEmpty) {
@@ -185,7 +185,7 @@ class ClusterServices @Inject()(
 
   def updateServiceEndpoint = Action.async(parse.json) { req =>
     req.body
-      .validate[ClusterServiceEndpoint]
+      .validate[ClusterServiceHost]
       .map { ce =>
         // check if cluster is not null and datalake is null
         if (ce.serviceid.isEmpty) {

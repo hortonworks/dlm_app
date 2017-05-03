@@ -98,13 +98,10 @@ class AmbariInterfaceSpec
     val atlas  = ambariInterface.getNameNodeStats
     atlas.map { either =>
       assert(either.isRight)
-      assert(either.right.get.serviceEndpoint.size == 3)
+      assert(either.right.get.serviceHost.size == 3)
       assert(either.right.get.props.isDefined == true)
       //verify the first one
-      assert(either.right.get.serviceEndpoint(0).protocol == "http")
-      assert(either.right.get.serviceEndpoint(0).host == "yusaku-beacon-1.c.pramod-thangali.internal")
-      assert(either.right.get.serviceEndpoint(0).port == 50070)
-      assert(either.right.get.serviceEndpoint(0).name == "dfs.namenode.http-address")
+      assert(either.right.get.serviceHost(0).host == "yusaku-beacon-1.c.pramod-thangali.internal")
     }
   }
 
@@ -124,13 +121,10 @@ class AmbariInterfaceSpec
     val atlas  = ambariInterface.getHdfsInfo
     atlas.map { either =>
       assert(either.isRight)
-      assert(either.right.get.serviceEndpoint.size == 1)
+      assert(either.right.get.serviceHost.size == 1)
       assert(either.right.get.props.isEmpty)
       //verify the first one
-      assert(either.right.get.serviceEndpoint(0).protocol == "hdfs")
-      assert(either.right.get.serviceEndpoint(0).host == "yusaku-beacon-1.c.pramod-thangali.internal")
-      assert(either.right.get.serviceEndpoint(0).port == 8020)
-      assert(either.right.get.serviceEndpoint(0).name == "fs.defaultFS")
+      assert(either.right.get.serviceHost(0).host == "yusaku-beacon-1.c.pramod-thangali.internal")
     }
   }
 
@@ -217,7 +211,7 @@ class AmbariInterfaceSpec
     beacon.map { either =>
       assert(either.isRight)
       assert(either.right.get.props.isEmpty)
-      assert(either.right.get.serviceEndpoint.size == 1)
+      assert(either.right.get.serviceHost.size == 1)
     }
   }
 

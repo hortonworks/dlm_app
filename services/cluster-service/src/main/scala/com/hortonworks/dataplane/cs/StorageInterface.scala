@@ -5,7 +5,7 @@ import javax.inject.{Inject, Singleton}
 import com.hortonworks.dataplane.commons.domain.Entities.{
   Cluster,
   ClusterHost,
-  ClusterServiceEndpoint,
+  ClusterServiceHost,
   Datalake,
   Errors,
   ClusterService => ClusterData
@@ -31,7 +31,7 @@ trait StorageInterface {
 
   def updateServiceByName(
       toPersist: ClusterData,
-      endpoints: Seq[ClusterServiceEndpoint]): Future[Boolean]
+      endpoints: Seq[ClusterServiceHost]): Future[Boolean]
 
   def getDataLakes: Future[Seq[Datalake]]
 
@@ -41,7 +41,7 @@ trait StorageInterface {
 
   def addService(
       service: ClusterData,
-      endpoints: Seq[ClusterServiceEndpoint]): Future[Option[ClusterData]]
+      endpoints: Seq[ClusterServiceHost]): Future[Option[ClusterData]]
 
   def getConfiguration(key: String): Future[Option[String]]
 
@@ -102,7 +102,7 @@ class StorageInterfaceImpl @Inject()(
   }
 
   def mapEndpointsToCluster(s: Either[Errors, ClusterData],
-                            endPoints: Seq[ClusterServiceEndpoint]) =
+                            endPoints: Seq[ClusterServiceHost]) =
     Future.successful {
       if (s.isLeft) {
         throw new Exception(
@@ -114,7 +114,7 @@ class StorageInterfaceImpl @Inject()(
 
   override def addService(
       service: com.hortonworks.dataplane.commons.domain.Entities.ClusterService,
-      endPoints: Seq[ClusterServiceEndpoint]): Future[Option[
+      endPoints: Seq[ClusterServiceHost]): Future[Option[
     com.hortonworks.dataplane.commons.domain.Entities.ClusterService]] = {
 
     val future = for {
@@ -156,7 +156,7 @@ class StorageInterfaceImpl @Inject()(
 
   override def updateServiceByName(
       toPersist: ClusterData,
-      endpoints: Seq[ClusterServiceEndpoint]): Future[Boolean] = {
+      endpoints: Seq[ClusterServiceHost]): Future[Boolean] = {
     for {
       serviceUpdate <- clusterComponentService.updateServiceByName(toPersist)
       cs <- clusterComponentService.getServiceByName(toPersist.clusterid.get,

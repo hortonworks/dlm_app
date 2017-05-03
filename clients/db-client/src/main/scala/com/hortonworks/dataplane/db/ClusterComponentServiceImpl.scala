@@ -2,7 +2,7 @@ package com.hortonworks.dataplane.db
 
 import com.hortonworks.dataplane.commons.domain.Entities.{
   ClusterService,
-  ClusterServiceEndpoint,
+  ClusterServiceHost,
   Error,
   Errors
 }
@@ -51,11 +51,11 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToEndpoint(res: WSResponse) = {
     res.status match {
       case 200 =>
-        extractEntity[ClusterServiceEndpoint](
+        extractEntity[ClusterServiceHost](
           res,
           r =>
             (r.json \ "results" \\ "data").head
-              .validate[ClusterServiceEndpoint]
+              .validate[ClusterServiceHost]
               .get)
       case _ => mapErrors(res)
     }
@@ -64,11 +64,11 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToEndpoints(res: WSResponse) = {
     res.status match {
       case 200 =>
-        extractEntity[Seq[ClusterServiceEndpoint]](
+        extractEntity[Seq[ClusterServiceHost]](
           res,
           r =>
             (r.json \ "results" \\ "data").map {
-              _.validate[ClusterServiceEndpoint].get
+              _.validate[ClusterServiceHost].get
           })
       case _ => mapErrors(res)
     }
@@ -113,10 +113,10 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
   override def addClusterEndpoints(
-      clusterServiceEndpoints: Seq[ClusterServiceEndpoint])
-    : Future[Seq[Either[Errors, ClusterServiceEndpoint]]] = {
+      ClusterServiceHosts: Seq[ClusterServiceHost])
+    : Future[Seq[Either[Errors, ClusterServiceHost]]] = {
 
-    val requests = clusterServiceEndpoints.map { cse =>
+    val requests = ClusterServiceHosts.map { cse =>
       ws.url(s"$url/services/endpoints")
         .withHeaders(
           "Content-Type" -> "application/json",
@@ -136,10 +136,10 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
   override def updateClusterEndpoints(
-      clusterServiceEndpoints: Seq[ClusterServiceEndpoint])
+      ClusterServiceHosts: Seq[ClusterServiceHost])
     : Future[Seq[Either[Errors, Boolean]]] = {
 
-    val requests = clusterServiceEndpoints.map { cse =>
+    val requests = ClusterServiceHosts.map { cse =>
       ws.url(s"$url/services/endpoints")
         .withHeaders(
           "Content-Type" -> "application/json",
@@ -174,7 +174,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
 
   override def getEndpointsForCluster(
       clusterId: Long,
-      service: String): Future[Either[Errors, Seq[ClusterServiceEndpoint]]] = {
+      service: String): Future[Either[Errors, Seq[ClusterServiceHost]]] = {
     for {
       f1 <- getServiceByName(clusterId, service)
       f2 <- resolve(f1, clusterId, service)

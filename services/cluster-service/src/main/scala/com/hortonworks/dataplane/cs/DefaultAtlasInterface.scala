@@ -4,7 +4,7 @@ import java.net.URL
 
 import com.google.common.base.Supplier
 import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasFilters, Entity}
-import com.hortonworks.dataplane.commons.domain.Entities.ClusterServiceEndpoint
+import com.hortonworks.dataplane.commons.domain.Entities.ClusterServiceHost
 import com.hortonworks.dataplane.cs.atlas.Filters
 import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterHostsService}
 import com.typesafe.config.Config
@@ -142,7 +142,7 @@ sealed class AtlasApiSupplier(clusterId: Long,
     }
   }
 
-  def extractUrls(endpoints: Seq[ClusterServiceEndpoint],
+  def extractUrls(endpoints: Seq[ClusterServiceHost],
                   clusterId: Long): Future[Seq[String]] = {
 
     val urls = endpoints.map { ep =>
@@ -150,7 +150,7 @@ sealed class AtlasApiSupplier(clusterId: Long,
         .getHostByClusterAndName(clusterId, ep.host)
         .map {
           case Right(host) =>
-            s"${ep.protocol}://${host.ipaddr}:${ep.port.get}"
+            ""
           case Left(errors) =>
             throw new Exception(
               s"Cannot translate the hostname into an IP address $errors")
