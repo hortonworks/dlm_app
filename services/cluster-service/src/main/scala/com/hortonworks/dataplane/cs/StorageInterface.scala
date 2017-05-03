@@ -29,9 +29,8 @@ trait StorageInterface {
 
   def addOrUpdateHostInformation(hostInfos: Seq[ClusterHost]): Future[Errors]
 
-  def updateServiceByName(
-      toPersist: ClusterData,
-      endpoints: Seq[ClusterServiceHost]): Future[Boolean]
+  def updateServiceByName(toPersist: ClusterData,
+                          hosts: Seq[ClusterServiceHost]): Future[Boolean]
 
   def getDataLakes: Future[Seq[Datalake]]
 
@@ -39,9 +38,8 @@ trait StorageInterface {
 
   def serviceRegistered(cluster: Cluster, serviceName: String): Future[Boolean]
 
-  def addService(
-      service: ClusterData,
-      endpoints: Seq[ClusterServiceHost]): Future[Option[ClusterData]]
+  def addService(service: ClusterData,
+                 hosts: Seq[ClusterServiceHost]): Future[Option[ClusterData]]
 
   def getConfiguration(key: String): Future[Option[String]]
 
@@ -101,8 +99,8 @@ class StorageInterfaceImpl @Inject()(
       }
   }
 
-  def mapEndpointsToCluster(s: Either[Errors, ClusterData],
-                            endPoints: Seq[ClusterServiceHost]) =
+  def mapHostsToCluster(s: Either[Errors, ClusterData],
+                        endPoints: Seq[ClusterServiceHost]) =
     Future.successful {
       if (s.isLeft) {
         throw new Exception(
@@ -120,9 +118,9 @@ class StorageInterfaceImpl @Inject()(
     val future = for {
       newService <- clusterComponentService.create(service)
       // map the endpoints to the newly created service
-      eps <- mapEndpointsToCluster(newService, endPoints)
+      eps <- mapHostsToCluster(newService, endPoints)
       // Save service endpoints
-      result <- clusterComponentService.addClusterEndpoints(eps)
+      result <- clusterComponentService.addClusterHosts(eps)
     } yield {
       result.foreach { r =>
         if (r.isLeft) {
@@ -161,8 +159,8 @@ class StorageInterfaceImpl @Inject()(
       serviceUpdate <- clusterComponentService.updateServiceByName(toPersist)
       cs <- clusterComponentService.getServiceByName(toPersist.clusterid.get,
                                                      toPersist.servicename)
-      eps <- mapEndpointsToCluster(Right(cs.right.get), endpoints)
-      endpointUpdate <- clusterComponentService.updateClusterEndpoints(eps)
+      eps <- mapHostsToCluster(Right(cs.right.get), endpoints)
+      endpointUpdate <- clusterComponentService.updateClusterHosts(eps)
     } yield {
       val updateResult = serviceUpdate.isRight && endpointUpdate.foldRight(
           true)((a, b) => a.isRight && b)

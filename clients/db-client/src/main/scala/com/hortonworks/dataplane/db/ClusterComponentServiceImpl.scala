@@ -48,7 +48,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
-  private def mapToEndpoint(res: WSResponse) = {
+  private def mapToHost(res: WSResponse) = {
     res.status match {
       case 200 =>
         extractEntity[ClusterServiceHost](
@@ -61,7 +61,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
-  private def mapToEndpoints(res: WSResponse) = {
+  private def maoToHosts(res: WSResponse) = {
     res.status match {
       case 200 =>
         extractEntity[Seq[ClusterServiceHost]](
@@ -112,7 +112,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
       }
   }
 
-  override def addClusterEndpoints(
+  override def addClusterHosts(
       ClusterServiceHosts: Seq[ClusterServiceHost])
     : Future[Seq[Either[Errors, ClusterServiceHost]]] = {
 
@@ -123,7 +123,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
           "Accept" -> "application/json"
         )
         .post(Json.toJson(cse))
-        .map(mapToEndpoint)
+        .map(mapToHost)
         .recoverWith {
           case e: Exception =>
             logger.error(s"Cannot add cluster endpoint $cse", e)
@@ -135,7 +135,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
     Future.sequence(requests)
   }
 
-  override def updateClusterEndpoints(
+  override def updateClusterHosts(
       ClusterServiceHosts: Seq[ClusterServiceHost])
     : Future[Seq[Either[Errors, Boolean]]] = {
 
@@ -185,7 +185,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
           "Accept" -> "application/json"
         )
         .get
-        .map(mapToEndpoints)
+        .map(maoToHosts)
     } yield errorsOrEndpoints
 
   }
