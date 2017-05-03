@@ -1,7 +1,7 @@
 version: '2'
 services:
   knox:
-    image: hortonworks/dataplane-knox
+    image: hortonworks/dp-knox
     ports:
     - "8443:8443"
     environment:

@@ -45,7 +45,7 @@ build_images() {
 }
 
 build_knox() {
-    docker build -f Dockerfile.knox -t hortonworks/dataplane-knox .
+    docker build -f Dockerfile.knox -t hortonworks/dp-knox .
 }
 
 init_app() {
