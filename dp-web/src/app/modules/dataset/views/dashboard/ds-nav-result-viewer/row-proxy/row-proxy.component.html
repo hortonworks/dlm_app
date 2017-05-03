@@ -37,6 +37,7 @@
     <tr>
       <td colspan="6">Row Per Page 
         <button id="dropDownIcon_" class="mdl-button mdl-js-button">{{size}} <i class="fa fa-caret-down"></i></button>
+        <span>{{start}}-{{end}} of {{datasetModels.length}}</span>
         <label class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
                 for="dropDownIcon_">
             <li (click)="onSizeChange(pge)" *ngFor="let pge of sizes" class="mdl-menu__item">{{pge.size}}</li>
