@@ -17,6 +17,8 @@ private[cs] sealed case class SaveAtlas(atlas: Either[Throwable, Atlas])
 private[cs] sealed case class SaveNameNode(
     nameNode: Either[Throwable, NameNode])
 private[cs] sealed case class SaveBeacon(beacon: Either[Throwable, BeaconInfo])
+private[cs] sealed case class SaveHdfs(hdfs: Either[Throwable, Hdfs])
+private[cs] sealed case class SaveHive(hive: Either[Throwable, HiveServer])
 private[cs] sealed case class SaveKnox(knox: Either[Throwable, KnoxInfo])
 private[cs] sealed case class SaveHostInfo(
     atlas: Either[Throwable, Seq[HostInformation]])
@@ -58,7 +60,7 @@ class ClusterActor(cluster: Cluster,
         .updateDatalakeStatus(datalake.copy(state = Some("SYNC_IN_PROGRESS")))
         .map { res =>
           log.info(
-            s"updated datalake status to SYNC_IN_PROGRESS for datalake ${datalake.id.get} - ${res}")
+            s"updated datalake status to SYNC_IN_PROGRESS for datalake ${datalake.id.get} - $res")
         }
 
       // Make sure we can connect to Ambari
@@ -95,6 +97,17 @@ class ClusterActor(cluster: Cluster,
     case SaveBeacon(beacon) =>
       log.info("Saving Beacon information")
       dbActor ! PersistBeacon(cluster, beacon)
+      ambariInterface.getHdfsInfo.map(SaveHdfs).pipeTo(self)
+
+    case SaveHdfs(hdfs) =>
+      log.info("Saving Hdfs information")
+      dbActor ! PersistHdfs(cluster, hdfs)
+      ambariInterface.getHs2Info.map(SaveHive).pipeTo(self)
+
+    case SaveHive(hive) =>
+      log.info("Saving hive information")
+      dbActor ! PersistHive(cluster, hive)
+
 
     case ServiceSaved(service,cluster) =>
       log.info(s"Cluster state saved - $service")

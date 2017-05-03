@@ -23,6 +23,12 @@ private[dataplane] case class Atlas(restService: URL, properties: String)
 private[dataplane] case class NameNode(serviceEndpoint: Seq[ServiceEndpoint] = Seq(),
                                        props: Option[JsValue])
 
+private[dataplane] case class Hdfs(serviceEndpoint: Seq[ServiceEndpoint] = Seq(),
+                                       props: Option[JsValue])
+
+private[dataplane] case class HiveServer(serviceEndpoint: Seq[ServiceEndpoint] = Seq(),
+                                   props: Option[JsValue])
+
 private[dataplane] case class HostInformation(hostState: String,
                                               hostStatus: String,
                                               name: String,
@@ -46,6 +52,10 @@ trait AmbariInterface {
   def getBeacon: Future[Either[Throwable, BeaconInfo]]
 
   def getNameNodeStats: Future[Either[Throwable, NameNode]]
+
+  def getHdfsInfo : Future[Either[Throwable, Hdfs]]
+
+  def getHs2Info : Future[Either[Throwable, HiveServer]]
 
   def getGetHostInfo: Future[Either[Throwable, Seq[HostInformation]]]
 
