@@ -72,9 +72,11 @@ export class CreatePairingComponent implements OnInit {
 
   getBeaconUrl(cluster: ClusterPairing): string {
     let beaconUrl = '';
-    const beaconService = cluster.services.filter( service => service.servicename === 'BEACON_SERVER' );
-    if (beaconService.length) {
-      beaconUrl = beaconService[0].fullURL;
+    if (cluster.services && cluster.services.length) {
+      const beaconService = cluster.services.filter(service => service.servicename === 'BEACON_SERVER');
+      if (beaconService.length) {
+        beaconUrl = beaconService[0].fullURL;
+      }
     }
     return beaconUrl;
   }
