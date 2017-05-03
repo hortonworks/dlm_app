@@ -75,7 +75,7 @@ class AmbariInterfaceSpec
     val atlas  = ambariInterface.getAtlas
     atlas.map { either =>
       assert(either.isRight)
-      assert(either.right.get.restService.toString == "http://ashwin-dp-knox-test-1.novalocal:21000")
+      assert(Option(either.right.get.properties.toString).isDefined)
     }
 
   }

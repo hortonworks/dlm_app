@@ -82,18 +82,7 @@ class AmbariClusterInterface(
         val json = res.json
         val configurations = json \ "items" \\ "configurations"
         val configs: JsValue = configurations.head
-        val configsAsList = configs.as[List[JsObject]]
-        val atlasConfig = configsAsList.find(obj =>
-          (obj \ "type").as[String] == "application-properties")
-        if (atlasConfig.isEmpty)
-          Left(ServiceNotFound("No properties found for Atlas"))
-        val properties = (atlasConfig.get \ "properties").as[JsObject]
-        val apiUrl = (properties \ "atlas.rest.address").as[String]
-        val restService = Try(new URL(apiUrl))
-        restService
-          .map(url => Right(Atlas(url, Json.stringify(configs))))
-          .getOrElse(Left(new MalformedURLException(s"Cannot parse $apiUrl")))
-
+        Right(Atlas(Json.stringify(configs)))
       }
       .recoverWith {
         case e: Exception =>

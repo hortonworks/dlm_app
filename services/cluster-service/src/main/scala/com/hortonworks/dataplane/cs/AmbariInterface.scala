@@ -16,7 +16,7 @@ private[dataplane] case class AmbariConnection(
 
 private[dataplane] case class ServiceHost(host: String)
 
-private[dataplane] case class Atlas(restService: URL, properties: String)
+private[dataplane] case class Atlas(properties: String)
 
 private[dataplane] case class NameNode(serviceHost: Seq[ServiceHost] = Seq(),
                                        props: Option[JsValue])
