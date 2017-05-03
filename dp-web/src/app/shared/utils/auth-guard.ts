@@ -38,7 +38,7 @@ export class NotSignedInForUnsecureGuard implements CanActivate {
     if(this.authenticationService.isUserLoggedIn()) {
       // check if is first run
       // where to go
-      this.router.navigate(['onboard']);
+      this.router.navigate(['']);
       return true;
     }
     return true;

@@ -17,10 +17,6 @@ export class LandingPageGuard implements CanActivate {
 
   canActivate() {
     return Observable.create(observer => {
-      if(!this.authenticationService.isUserLoggedIn()) {
-        this.redirect(observer, true, '/sign-in');
-        return;
-      }
       this.configService.retrieve().subscribe(({lakeWasInitialized}) => {
         if(lakeWasInitialized) {
           this.redirect(observer, true, '/infra');
