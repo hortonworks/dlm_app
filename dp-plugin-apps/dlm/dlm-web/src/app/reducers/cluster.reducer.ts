@@ -20,7 +20,7 @@ export function reducer(state = initialState, action: fromCluster.Actions): Stat
       };
     }
     case fromCluster.ActionTypes.LOAD_CLUSTERS_SUCCESS: {
-      const clusters = action.payload.cluster;
+      const clusters = action.payload;
       const clusterEntities = clusters.reduce((entities: { [id: string]: Cluster}, entity: Cluster) => {
         return Object.assign({}, entities, {
           [entity.id]: entity
@@ -37,4 +37,4 @@ export function reducer(state = initialState, action: fromCluster.Actions): Stat
       return state;
     }
   }
-};
+}

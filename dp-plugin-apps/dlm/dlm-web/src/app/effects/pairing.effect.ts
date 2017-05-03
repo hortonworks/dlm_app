@@ -41,7 +41,7 @@ export class PairingEffects {
     .switchMap(payload => {
       return this.pairingService.deletePairing(payload)
         .map(response => {
-          response['pairingId'] = payload;
+          response['payload'] = payload;
           return deletePairingSuccess(response);
         })
         .catch(err => Observable.of(deletePairingFail(err)));

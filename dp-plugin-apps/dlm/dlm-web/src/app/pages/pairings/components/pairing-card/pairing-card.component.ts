@@ -9,15 +9,15 @@ import { Pairing } from 'models/pairing.model';
 export class PairingCardComponent implements OnInit {
 
   @Input() pairing: Pairing;
-  @Output() onListUnpair: EventEmitter<string> = new EventEmitter<string>();
+  @Output() onListUnpair: EventEmitter<Pairing> = new EventEmitter<Pairing>();
 
   constructor() { }
 
   ngOnInit() {
   }
 
-  onClickUnpair(pairingId: string) {
-    this.onListUnpair.emit(pairingId);
+  onClickUnpair(pairing: Pairing) {
+    this.onListUnpair.emit(pairing);
   }
 
 }

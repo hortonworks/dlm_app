@@ -17,7 +17,7 @@ describe('PairingCardComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(PairingCardComponent);
     component = fixture.componentInstance;
-    component.pairing = <Pairing>{id: '1', pair: [{ clusterDetails: {} }, { clusterDetails: {} }]};
+    component.pairing = <Pairing>{id: '1', pair: [{ location: {} }, { location: {} }]};
     fixture.detectChanges();
   });
 

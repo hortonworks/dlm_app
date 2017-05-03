@@ -1,13 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
-import { loadPairings, deletePairing } from '../../actions/pairing.action';
+import { loadPairings, deletePairing } from 'actions/pairing.action';
 import { Store } from '@ngrx/store';
-import * as fromRoot from '../../reducers';
-import { Pairing } from '../../models/pairing.model';
+import * as fromRoot from 'reducers';
+import { Pairing } from 'models/pairing.model';
+import { Cluster } from 'models/cluster.model';
 import { Observable } from 'rxjs/Observable';
-import { getAllPairings } from '../../selectors/pairing.selector';
-import { ModalDialogComponent } from '../../common/modal-dialog/modal-dialog.component';
+import { getAllPairings } from 'selectors/pairing.selector';
+import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -20,7 +21,7 @@ export class PairingsComponent implements OnInit {
   @ViewChild('confirmationModal') public confirmationModel: ModalDialogComponent;
   pairings$: Observable<Pairing[]>;
   private pairings: Pairing[];
-  private pairingId: string;
+  private unpairParams: Array<Object>;
 
   constructor(
     private store: Store<fromRoot.State>,
@@ -40,20 +41,36 @@ export class PairingsComponent implements OnInit {
     this.router.navigate(['create'], {relativeTo: this.route});
   };
 
-  onUnpair(pairingId: string) {
-    console.log('Unpair ' + pairingId);
-    this.pairingId = pairingId;
-    const pairing: Pairing = this.pairings.filter(pair => pair.id === pairingId)[0];
+  onUnpair(pair: Pairing) {
+    this.unpairParams = [{
+      clusterId: pair.pair[0].id,
+      beaconUrl: this.getBeaconUrl(pair.pair[0])
+    },
+    {
+      clusterId: pair.pair[1].id,
+      beaconUrl: this.getBeaconUrl(pair.pair[1])
+    }];
     const params = {
-      firstCluster: pairing.pair[0].clusterDetails.name,
-      secondCluster: pairing.pair[1].clusterDetails.name
+      firstCluster: pair.pair[0].name,
+      secondCluster: pair.pair[1].name
     };
     this.confirmationModel.body = this.translate.instant(
       'page.pairings.unpair.confirmation.body', params);
     this.confirmationModel.show();
   }
 
+  getBeaconUrl(cluster: Cluster): string {
+    let beaconUrl = '';
+    if (cluster.services && cluster.services.length) {
+      const beaconService = cluster.services.filter(service => service.servicename === 'BEACON_SERVER');
+      if (beaconService.length) {
+        beaconUrl = beaconService[0].fullURL;
+      }
+    }
+    return beaconUrl;
+  }
+
   onConfirmation() {
-    this.store.dispatch(deletePairing(this.pairingId));
+    this.store.dispatch(deletePairing(this.unpairParams));
   }
 }

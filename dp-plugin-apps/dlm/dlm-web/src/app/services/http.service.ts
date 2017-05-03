@@ -6,13 +6,14 @@ import { MockResolver } from '../mocks/mock-resolver';
 
 @Injectable()
 export class HttpService extends Http {
-  apiPrefix = '/api/dlm/';
+  apiPrefix = '/api/';
+  prodFlag = false;
 
   // todo: add auth token to headers
   // todo: default error handler
   // todo: default data serializer
   request(url: string|Request, options?: RequestOptionsArgs): Observable<Response> {
-    if (!isDevMode()) {
+    if (!isDevMode() || this.prodFlag) {
       return super.request(this.buildUrl(url), options);
     }
     let request;

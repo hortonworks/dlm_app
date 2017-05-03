@@ -19,7 +19,7 @@ export const initialState: State = {
 export function reducer(state = initialState, action): State {
   switch (action.type) {
     case fromPairing.ActionTypes.LOAD_PAIRINGS_SUCCESS: {
-      const pairings = action.payload.pairings;
+      const pairings = action.payload.pairedClusters;
       const pairingEntities = pairings.reduce((entities: {[id: string]: Pairing}, entity: [Cluster, Cluster]) => {
         const id = entity[0]['id'] + '-' + entity[1]['id'];
         return Object.assign({}, entities, {
@@ -45,7 +45,8 @@ export function reducer(state = initialState, action): State {
     }
     case fromPairing.ActionTypes.DELETE_PAIRING_SUCCESS: {
       const entities = Object.assign({}, state.entities);
-      delete entities[action.payload.pairingId];
+      const key = action.payload.payload[0].clusterId + '-' + action.payload.payload[1].clusterId;
+      delete entities[key];
       return {
         entities: Object.assign({}, entities),
         progress: Object.assign({}, state.progress)

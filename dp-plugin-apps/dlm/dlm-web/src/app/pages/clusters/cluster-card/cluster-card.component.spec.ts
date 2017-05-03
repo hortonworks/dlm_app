@@ -22,7 +22,7 @@ describe('ClusterCardComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ClusterCardComponent);
     component = fixture.componentInstance;
-    component.cluster = <Cluster>{clusterDetails: {}};
+    component.cluster = <Cluster>{location: {}};
     fixture.detectChanges();
   });
 
