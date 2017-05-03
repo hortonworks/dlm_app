@@ -43,10 +43,16 @@ class Lakes @Inject()(@Named("lakeService") val lakeService: LakeService,
             case Left(errors) =>
               InternalServerError(JsonResponses.statusError(
                 s"Failed with ${Json.toJson(errors)}"))
-            case Right(lake) => Ok(Json.toJson(lake))
+            case Right(lake) => {
+              syncDatalake(lake)
+              Ok(Json.toJson(lake))
+            }
           }
       }
       .getOrElse(Future.successful(BadRequest))
+  }
+  private def syncDatalake(datalake: Datalake): Future[Boolean] = {
+    ambariService.syncCluster(datalake)
   }
 
   def retrieve(datalakeId: String) = authenticated.async {
