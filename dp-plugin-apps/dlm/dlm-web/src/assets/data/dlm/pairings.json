@@ -1,33 +1,42 @@
 {
-  "pairings": [
+  "unreachableBeacon": [],
+  "pairedClusters": [
     [{
       "id": "Primary Cluster",
-      "clusterDetails": {
-        "name": "Primary Cluster",
-        "description": "primary",
-        "dataCenter": "Texas"
+      "description": "primary",
+      "name": "Primary Cluster",
+      "ambariurl": "http://localhost:8080",
+      "location": {
+        "city": "Pur Chaman",
+        "country": "AF"
       }
     }, {
       "id": "Secondary Cluster",
-      "clusterDetails": {
-        "name": "Secondary Cluster",
-        "description": "Secondary",
-        "dataCenter": "Virginia"
+      "description": "secondary",
+      "name": "Secondary Cluster",
+      "ambariurl": "http://localhost:8080",
+      "location": {
+        "city": "Santa Clara",
+        "country": "US"
       }
     }],
     [{
       "id": "Development Cluster",
-      "clusterDetails": {
-        "name": "Development Cluster",
-        "description": "For Development",
-        "dataCenter": "California"
+      "description": "development",
+      "name": "Development Cluster",
+      "ambariurl": "http://localhost:8080",
+      "location": {
+        "city": "Columbus",
+        "country": "US"
       }
     }, {
       "id": "Primary Cluster",
-      "clusterDetails": {
-        "name": "Primary Cluster",
-        "description": "primary",
-        "dataCenter": "Texas"
+      "description": "primary",
+      "name": "Primary Cluster",
+      "ambariurl": "http://localhost:8080",
+      "location": {
+        "city": "Pur Chaman",
+        "country": "AF"
       }
     }]
   ]

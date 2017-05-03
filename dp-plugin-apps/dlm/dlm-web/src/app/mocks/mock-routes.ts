@@ -19,9 +19,9 @@ export const routes: MockRoute[] = [
   new MockRoute('policies/:id', 'policies.json', RequestMethod.Delete),
 
   // Pairing
-  new MockRoute('pairings', 'pairings.json'),
-  new MockRoute('pairings', 'create_pairing.json', RequestMethod.Post),
-  new MockRoute('pairings/:id', 'unpair.json', RequestMethod.Delete),
+  new MockRoute('pairs', 'pairings.json'),
+  new MockRoute('pair', 'create_pairing.json', RequestMethod.Post),
+  new MockRoute('pair', 'unpair.json', RequestMethod.Delete),
 
   // Jobs
   new MockRoute('jobs', 'jobs.json'),

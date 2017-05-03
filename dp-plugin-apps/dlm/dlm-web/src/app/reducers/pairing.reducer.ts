@@ -19,7 +19,7 @@ export const initialState: State = {
 export function reducer(state = initialState, action): State {
   switch (action.type) {
     case fromPairing.ActionTypes.LOAD_PAIRINGS_SUCCESS: {
-      const pairings = action.payload.pairings;
+      const pairings = action.payload.pairedClusters;
       const pairingEntities = pairings.reduce((entities: {[id: string]: Pairing}, entity: [Cluster, Cluster]) => {
         const id = entity[0]['id'] + '-' + entity[1]['id'];
         return Object.assign({}, entities, {

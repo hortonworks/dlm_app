@@ -1,16 +1,16 @@
 <dlm-cluster-card>
   <div class="row">
     <div class="col-md-5 col">
-      <div class="cluster-name">{{firstCluster.clusterDetails.name}}</div>
-      <div>{{firstCluster.clusterDetails.dataCenter}}</div>
+      <div class="cluster-name">{{firstCluster.name}}</div>
+      <div>{{ firstCluster.location.city }}, {{ firstCluster.location.country }}</div>
     </div>
     <div class="col-md-2 icon col">
       <i *ngIf="!isCompleted" class="fa fa-spin fa-spinner spinner"></i>
       <i *ngIf="isCompleted" class="glyphicon glyphicon-resize-horizontal pairing-icon"></i>
     </div>
     <div class="col-md-5 col right">
-      <div class="cluster-name">{{secondCluster.clusterDetails.name}}</div>
-      <div>{{secondCluster.clusterDetails.dataCenter}}</div>
+      <div class="cluster-name">{{secondCluster.name}}</div>
+      <div>{{ secondCluster.location.city }}, {{ secondCluster.location.country }}</div>
     </div>
   </div>
 </dlm-cluster-card>
