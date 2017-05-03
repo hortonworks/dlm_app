@@ -5,7 +5,7 @@ import { loadPairings, deletePairing } from 'actions/pairing.action';
 import { Store } from '@ngrx/store';
 import * as fromRoot from 'reducers';
 import { Pairing } from 'models/pairing.model';
-import { Cluster } from 'models/Cluster.model';
+import { Cluster } from 'models/cluster.model';
 import { Observable } from 'rxjs/Observable';
 import { getAllPairings } from 'selectors/pairing.selector';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
