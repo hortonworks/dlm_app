@@ -28,6 +28,7 @@ class AmbariService @Inject()(private val wSClient: WSClient,private val configu
         response.status
      }
   }
+
   def syncCluster(datalake: Datalake): Future[Boolean] = {
     wSClient
       .url(s"$clusterService/datalake/sync")

@@ -51,6 +51,7 @@ class Lakes @Inject()(@Named("lakeService") val lakeService: LakeService,
       }
       .getOrElse(Future.successful(BadRequest))
   }
+
   private def syncDatalake(datalake: Datalake): Future[Boolean] = {
     ambariService.syncCluster(datalake)
   }
