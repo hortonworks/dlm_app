@@ -60,7 +60,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
-  private def maoToHosts(res: WSResponse) = {
+  private def mapToHosts(res: WSResponse) = {
     res.status match {
       case 200 =>
         extractEntity[Seq[ClusterServiceHost]](
@@ -181,7 +181,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
           "Accept" -> "application/json"
         )
         .get
-        .map(maoToHosts)
+        .map(mapToHosts)
     } yield errorsOrEndpoints
 
   }
