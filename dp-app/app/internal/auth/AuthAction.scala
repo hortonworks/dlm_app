@@ -27,6 +27,7 @@ class Authenticated  @Inject()(@Named("userService") userService: UserService,
 
   private val apiCallTimeout = configuration.underlying.getLong("apicall.timeout").millis
   private val ssoLoginValidCookieName="sso_login_valid"
+
   def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[Result]) = {
     if (knoxSso.isSsoConfigured() && !request.cookies.get(knoxSso.getSsoCookieName).isDefined){
       Logger.info(s"Sso is configured but ssocookie ${knoxSso.getSsoCookieName} is not found. " +
@@ -41,34 +42,53 @@ class Authenticated  @Inject()(@Named("userService") userService: UserService,
           Future.successful(Results.Unauthorized.discardingCookies(DiscardingCookie(ssoLoginValidCookieName)))
         case Right(jwtResp) =>
           val (subject,tokenExpiry)=jwtResp
-          val userFuture: Future[Either[Errors, User]] = userService.loadUser(subject)
-          val userOp: Either[Errors, User] = Await.result(userFuture, apiCallTimeout)
-          userOp.fold(
-            errors => {
-              if (errors.errors.size>0 && errors.errors(0).code.equals("404")){
-                Logger.info( s"User with name[${subject}] not found in dataplane db. users authroized from external system" +
-                  s" need to be synced to db.")
-              }
-              Logger.error(s"Error while retrieving user ${errors}")
-              //TODO: domain and https to be done for proper deletiong of cookie.
-              Future.successful(Results.Unauthorized.discardingCookies(DiscardingCookie(ssoLoginValidCookieName)))
-            },
-            user => {
-              val respFuture = block(AuthenticatedRequest[A](user, request))
-              val cookie = Cookie(ssoLoginValidCookieName, "true", None, "/", None, false, false) //Todo set the expiration time got from token if required.
-              respFuture.map(_.withCookies(cookie))
-            }
-          )
+          val userOption:Option[User]=getUser(subject)
+          if (userOption.isDefined){
+            val respFuture = block(AuthenticatedRequest[A](userOption.get, request))
+            val cookie = Cookie(ssoLoginValidCookieName, "true", None, "/", None, false, false) //Todo set the expiration time got from token if required.
+            respFuture.map(_.withCookies(cookie))
+          }else{
+            Future.successful(Results.Unauthorized.discardingCookies(DiscardingCookie(ssoLoginValidCookieName)))
+          }
       }
-    } else if (request.headers.get("Authorization").isDefined && request.headers.get("Authorization").get.startsWith("Bearer ")) {
-      val header: String = request.headers.get("Authorization").get
-      val token = header.replace("Bearer", "").trim
-      Jwt.parseJWT(token).map { user =>
-        block(AuthenticatedRequest[A](user, request))
-      } getOrElse Future.successful(Results.Status(Status.UNAUTHORIZED))
+    } else {
+      val userOption:Option[User] =getUserFromBearerToken(request)
+      if (userOption.isDefined)
+        block(AuthenticatedRequest[A](userOption.get, request))
+      else
+        Future.successful(Results.Status(Status.UNAUTHORIZED))
     }
+  }
+
+  private def getUser(userName:String):Option[User]={
+    val userFuture: Future[Either[Errors, User]] = userService.loadUser(userName)
+    val userOp: Either[Errors, User] = Await.result(userFuture, apiCallTimeout)
+    userOp.fold(
+      errors => {
+        if (errors.errors.size>0 && errors.errors(0).code.equals("404")){
+          Logger.info( s"User with name[${userName}] not found in dataplane db. users authroized from external system" +
+            s" need to be synced to db.")
+        }
+        Logger.error(s"Error while retrieving user ${errors}")
+        //TODO: domain and https to be done for proper deletiong of cookie.
+        None
+      },
+      user => Some(user))
+  }
+
+  private def getUserFromBearerToken[A](request: Request[A]):Option[User]={
+    val token: Option[String] = getBearerToken(request)
+    if (token.isDefined)
+      Jwt.parseJWT(token.get)
     else
-      Future.successful(Results.Status(Status.UNAUTHORIZED))
+      None
+  }
+
+  private def getBearerToken[A](request: Request[A]) :Option[String]= {
+    if (!request.headers.get("Authorization").isDefined || request.headers.get("Authorization").get.startsWith("Bearer "))
+      None
+    val header: String = request.headers.get("Authorization").get
+    Some(header.replace("Bearer", "").trim)
   }
 }
 
