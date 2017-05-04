@@ -98,13 +98,9 @@ object Entities {
       datalakeid: Option[Long] = None
   )
 
-  case class ClusterServiceEndpoint(
+  case class ClusterServiceHost(
       id: Option[Long] = None,
-      name: String,
-      protocol: String = "TCP",
       host: String,
-      port: Option[Int],
-      pathSegment: Option[String] = None,
       serviceid: Option[Long] = None
   )
 
@@ -249,8 +245,8 @@ object JsonFormatters {
   implicit val clusterServiceWrites = Json.writes[ClusterService]
   implicit val clusterServiceReads = Json.reads[ClusterService]
 
-  implicit val endpointWrites = Json.writes[ClusterServiceEndpoint]
-  implicit val endpointWReads = Json.reads[ClusterServiceEndpoint]
+  implicit val hostWrites = Json.writes[ClusterServiceHost]
+  implicit val hostReads = Json.reads[ClusterServiceHost]
 
   implicit val workspaceWrites = Json.writes[Workspace]
   implicit val workspaceReads = Json.reads[Workspace]

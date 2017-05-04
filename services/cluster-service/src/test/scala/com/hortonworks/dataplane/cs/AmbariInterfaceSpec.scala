@@ -20,7 +20,16 @@ class AmbariInterfaceSpec
   logger.info("started local server at 9999")
   protected val stop = server.startOnPort(9999)
 
-  val appConfig = ConfigFactory.parseString("""dp.services.endpoints.namenode = [{"name":"hdfs-site","properties":[{"protocol":"http","name":"dfs.namenode.http-address"},{"protocol":"https","name":"dfs.namenode.https-address"},{"protocol":"rpc","name":"dfs.namenode.rpc-address"}]}]""")
+  val appConfig = ConfigFactory.parseString("""dp.services.endpoints {
+                                              |
+                                              |  #Very specific to namenode since there is no way of knowing the protocol with the endpoint value
+                                              |  namenode = [{"name":"hdfs-site","properties":[{"protocol":"http","name":"dfs.namenode.http-address"},{"protocol":"https","name":"dfs.namenode.https-address"},{"protocol":"rpc","name":"dfs.namenode.rpc-address"}]}]
+                                              |
+                                              |  hdfs = [{"name":"core-site","properties":[{"protocol":"hdfs","name":"fs.defaultFS"}]}]
+                                              |
+                                              |  hive = [{"name":"hive-interactive-site","properties":[{"protocol":"TCP","name":"hive.server2.thrift.port"}]}]
+                                              |
+                                              |}""".stripMargin)
 
   "AmbariInterface" should "call the default cluster endpoint" in {
     when get ("/api/v1/clusters") withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") thenRespond (200, """{
@@ -66,7 +75,7 @@ class AmbariInterfaceSpec
     val atlas  = ambariInterface.getAtlas
     atlas.map { either =>
       assert(either.isRight)
-      assert(either.right.get.restService.toString == "http://ashwin-dp-knox-test-1.novalocal:21000")
+      assert(Option(either.right.get.properties.toString).isDefined)
     }
 
   }
@@ -89,13 +98,33 @@ class AmbariInterfaceSpec
     val atlas  = ambariInterface.getNameNodeStats
     atlas.map { either =>
       assert(either.isRight)
-      assert(either.right.get.serviceEndpoint.size == 3)
+      assert(either.right.get.serviceHost.size == 3)
       assert(either.right.get.props.isDefined == true)
       //verify the first one
-      assert(either.right.get.serviceEndpoint(0).protocol == "http")
-      assert(either.right.get.serviceEndpoint(0).host == "yusaku-beacon-1.c.pramod-thangali.internal")
-      assert(either.right.get.serviceEndpoint(0).port == 50070)
-      assert(either.right.get.serviceEndpoint(0).name == "dfs.namenode.http-address")
+      assert(either.right.get.serviceHost(0).host == "yusaku-beacon-1.c.pramod-thangali.internal")
+    }
+  }
+
+
+  it should "discover HDFS and its properties" in {
+
+    val hdfsJson  = Source.fromURL(getClass.getResource("/hdfs.json")).mkString
+    when get "/api/v1/clusters/test/configurations/service_config_versions" withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") withParams ("service_name"->"HDFS","is_current"->"true") thenRespond(200,hdfsJson)
+
+    implicit val ws = AhcWSClient()
+    val ambariInterface = new AmbariClusterInterface(
+      Cluster(name = "test",
+        description = "somedescription",
+        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+      Credentials(Some("admin"),Some("admin")),appConfig)
+
+    val atlas  = ambariInterface.getHdfsInfo
+    atlas.map { either =>
+      assert(either.isRight)
+      assert(either.right.get.serviceHost.size == 1)
+      assert(either.right.get.props.isEmpty)
+      //verify the first one
+      assert(either.right.get.serviceHost(0).host == "yusaku-beacon-1.c.pramod-thangali.internal")
     }
   }
 
@@ -160,6 +189,29 @@ class AmbariInterfaceSpec
     val beacon  = ambariInterface.getBeacon
     beacon.map { either =>
       assert(either.isRight)
+    }
+  }
+
+
+  it should "discover hiveserver thrift endpoints from the cluster" in {
+    val hiveconfig  = Source.fromURL(getClass.getResource("/hiveconfig.json")).mkString
+    val hivehost  = Source.fromURL(getClass.getResource("/hivehosts.json")).mkString
+    val url = "/api/v1/clusters/test/configurations/service_config_versions"
+    when get url withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") withParams ("service_name"->"HIVE","is_current" ->"true") thenRespond(200,hiveconfig)
+    when get "/api/v1/clusters/test/host_components" withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") thenRespond(200,hivehost)
+
+    implicit val ws = AhcWSClient()
+    val ambariInterface = new AmbariClusterInterface(
+      Cluster(name = "test",
+        description = "somedescription",
+        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+      Credentials(Some("admin"),Some("admin")),appConfig)
+
+    val beacon  = ambariInterface.getHs2Info
+    beacon.map { either =>
+      assert(either.isRight)
+      assert(either.right.get.props.isEmpty)
+      assert(either.right.get.serviceHost.size == 1)
     }
   }
 

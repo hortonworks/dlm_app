@@ -14,14 +14,18 @@ private[dataplane] case class AmbariConnection(
     kerberos: Option[Kerberos] = None,
     connectionError: Option[Throwable] = None)
 
-private[dataplane] case class ServiceEndpoint(name:String,protocol: String,
-                                              host: String,
-                                              port: Int)
+private[dataplane] case class ServiceHost(host: String)
 
-private[dataplane] case class Atlas(restService: URL, properties: String)
+private[dataplane] case class Atlas(properties: String)
 
-private[dataplane] case class NameNode(serviceEndpoint: Seq[ServiceEndpoint] = Seq(),
+private[dataplane] case class NameNode(serviceHost: Seq[ServiceHost] = Seq(),
                                        props: Option[JsValue])
+
+private[dataplane] case class Hdfs(serviceHost: Seq[ServiceHost] = Seq(),
+                                   props: Option[JsValue])
+
+private[dataplane] case class HiveServer(serviceHost: Seq[ServiceHost] = Seq(),
+                                         props: Option[JsValue])
 
 private[dataplane] case class HostInformation(hostState: String,
                                               hostStatus: String,
@@ -32,7 +36,7 @@ private[dataplane] case class HostInformation(hostState: String,
 private[dataplane] case class KnoxInfo(properties: Option[JsValue])
 
 private[dataplane] case class BeaconInfo(properties: Option[JsValue],
-                                         endpoints: Seq[ServiceEndpoint])
+                                         endpoints: Seq[ServiceHost])
 
 private[dataplane] case class Credentials(user: Option[String],
                                           pass: Option[String])
@@ -46,6 +50,10 @@ trait AmbariInterface {
   def getBeacon: Future[Either[Throwable, BeaconInfo]]
 
   def getNameNodeStats: Future[Either[Throwable, NameNode]]
+
+  def getHdfsInfo: Future[Either[Throwable, Hdfs]]
+
+  def getHs2Info: Future[Either[Throwable, HiveServer]]
 
   def getGetHostInfo: Future[Either[Throwable, Seq[HostInformation]]]
 

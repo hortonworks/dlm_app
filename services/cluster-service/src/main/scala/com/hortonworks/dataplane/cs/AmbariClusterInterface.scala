@@ -82,18 +82,7 @@ class AmbariClusterInterface(
         val json = res.json
         val configurations = json \ "items" \\ "configurations"
         val configs: JsValue = configurations.head
-        val configsAsList = configs.as[List[JsObject]]
-        val atlasConfig = configsAsList.find(obj =>
-          (obj \ "type").as[String] == "application-properties")
-        if (atlasConfig.isEmpty)
-          Left(ServiceNotFound("No properties found for Atlas"))
-        val properties = (atlasConfig.get \ "properties").as[JsObject]
-        val apiUrl = (properties \ "atlas.rest.address").as[String]
-        val restService = Try(new URL(apiUrl))
-        restService
-          .map(url => Right(Atlas(url, Json.stringify(configs))))
-          .getOrElse(Left(new MalformedURLException(s"Cannot parse $apiUrl")))
-
+        Right(Atlas(Json.stringify(configs)))
       }
       .recoverWith {
         case e: Exception =>
@@ -108,6 +97,15 @@ class AmbariClusterInterface(
       .url(s"${cluster.ambariurl.get}/components/NAMENODE")
       .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
+
+    val nameNodeHostsApi =
+      s"${cluster.ambariurl.get}/host_components?HostRoles/component_name=NAMENODE"
+
+    val hostInfo = ws
+      .url(nameNodeHostsApi)
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
+      .get()
+
     val nameNodePropertiesResponse = ws
       .url(
         s"${cluster.ambariurl.get}/configurations/service_config_versions?service_name=HDFS&is_current=true")
@@ -115,40 +113,31 @@ class AmbariClusterInterface(
       .get()
 
     val nameNodeInfo = for {
+      hi <- hostInfo
       nnr <- nameNodeResponse
       nnpr <- nameNodePropertiesResponse
     } yield {
+
       val serviceComponent = nnr.json \ "ServiceComponentInfo"
+      val hostItems =
+        (hi.json \ "items").as[JsArray].validate[List[JsObject]].get
+
+      val hosts = hostItems.map { h =>
+        val host = (h \ "HostRoles" \ "host_name").validate[String]
+        host.get
+      }
 
       val items = (nnpr.json \ "items").as[JsArray]
       val configs =
-        (items(0) \ "configurations").as[JsArray].validate[List[JsObject]].get
+        (items(0) \ "configurations").as[JsArray]
 
-      // get the properties configured in configuration
-
-      import collection.JavaConverters._
-      val configList =
-        Try(appConfig.getConfigList("dp.services.endpoints.namenode").asScala)
-          .getOrElse(Seq())
-      val endpoints = configList.flatMap { c =>
-        val propName = c.getString("name")
-        val propList = c.getConfigList("properties").asScala
-        val config = configs.find(p => (p \ "type").as[String] == propName).get
-        propList.map { pl =>
-          val value =
-            (config \ "properties" \ s"${pl.getString("name")}").as[String]
-          val strings = value.split(":")
-          ServiceEndpoint(pl.getString("name"),
-                          pl.getString("protocol"),
-                          strings(0),
-                          strings(1).toInt)
-        }
-      }
-
-      NameNode(endpoints, props = serviceComponent.toOption)
+      NameNode(
+        hosts.map(ServiceHost),
+        Some(
+          Json.obj("stats" -> serviceComponent.get, "properties" -> configs)))
     }
 
-    nameNodeInfo.map(Right(_)) .recoverWith {
+    nameNodeInfo.map(Right(_)).recoverWith {
       case e: Exception =>
         logger.error("Cannot get Namenode info")
         Future.successful(Left(e))
@@ -233,6 +222,49 @@ class AmbariClusterInterface(
       }
   }
 
+  override def getHs2Info: Future[Either[Throwable, HiveServer]] = {
+    // Get HS2 properties first
+    val hiveAPI =
+      s"${cluster.ambariurl.get}/configurations/service_config_versions?service_name=HIVE&is_current=true"
+    val hiveHostApi =
+      s"${cluster.ambariurl.get}/host_components?HostRoles/component_name=HIVE_SERVER"
+
+    val configResponse = ws
+      .url(hiveAPI)
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
+      .get()
+    val hostInfo = ws
+      .url(hiveHostApi)
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
+      .get()
+
+    val hiveInfo = for {
+      cr <- configResponse
+      hi <- hostInfo
+    } yield {
+
+      val hostItems =
+        (hi.json \ "items").as[JsArray].validate[List[JsObject]].get
+
+      val hosts = hostItems.map { h =>
+        val host = (h \ "HostRoles" \ "host_name").validate[String]
+        host.get
+      }
+
+      val items = (cr.json \ "items").as[JsArray]
+      val configs =
+        (items(0) \ "configurations").as[JsArray]
+
+      HiveServer(hosts.map(ServiceHost), Some(configs))
+    }
+
+    hiveInfo.map(Right(_)).recoverWith {
+      case e: Exception =>
+        logger.error("Cannot get Hive information")
+        Future.successful(Left(e))
+    }
+  }
+
   override def getKnoxInfo: Future[Either[Throwable, KnoxInfo]] = {
     // Dump knox properties
     val knoxApi =
@@ -258,12 +290,18 @@ class AmbariClusterInterface(
 
   override def getBeacon: Future[Either[Throwable, BeaconInfo]] = {
     // Get Beaon properties first
-    val beaconApi = s"${cluster.ambariurl.get}/configurations/service_config_versions?service_name=BEACON&is_current=true"
-    val beaconHostApi=s"${cluster.ambariurl.get}/host_components?HostRoles/component_name=BEACON_SERVER"
+    val beaconApi =
+      s"${cluster.ambariurl.get}/configurations/service_config_versions?service_name=BEACON&is_current=true"
+    val beaconHostApi =
+      s"${cluster.ambariurl.get}/host_components?HostRoles/component_name=BEACON_SERVER"
 
-     val configResponse = ws.url(beaconApi).withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
-       .get()
-    val hostInfo = ws.url(beaconHostApi).withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
+    val configResponse = ws
+      .url(beaconApi)
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
+      .get()
+    val hostInfo = ws
+      .url(beaconHostApi)
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
 
     val beaconInfo = for {
@@ -273,20 +311,17 @@ class AmbariClusterInterface(
 
       val items = (cr.json \ "items").as[JsArray]
       val configs =
-        (items(0) \ "configurations").as[JsArray].validate[List[JsObject]].get
-      val config = configs.find(p => (p \ "type").as[String] == "beacon-env").get
-      val props = (config \ "properties").toOption
-      val port = (config \ "properties" \ "beacon_port").as[String]
+        (items(0) \ "configurations").as[JsArray]
 
-      val hostItems = (hi.json \ "items").as[JsArray].validate[List[JsObject]].get
+      val hostItems =
+        (hi.json \ "items").as[JsArray].validate[List[JsObject]].get
 
       val hosts = hostItems.map { h =>
         val host = (h \ "HostRoles" \ "host_name").validate[String]
         host.get
-      }.zipWithIndex
+      }
 
-      val endpoints = hosts.map{h  => ServiceEndpoint(s"beacon.host.name.${h._2}","TCP",h._1,port.toInt)}
-      BeaconInfo(props,endpoints)
+      BeaconInfo(Some(items), hosts.map(ServiceHost))
     }
 
     beaconInfo.map(Right(_)).recoverWith {
@@ -294,8 +329,31 @@ class AmbariClusterInterface(
         logger.error("Cannot get Beacon information")
         Future.successful(Left(e))
     }
+  }
 
+  override def getHdfsInfo: Future[Either[Throwable, Hdfs]] = {
 
+    val hdfsResponse = ws
+      .url(
+        s"${cluster.ambariurl.get}/configurations/service_config_versions?service_name=HDFS&is_current=true")
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
+      .get()
+
+    val hdfsInfo = for {
+      nnpr <- hdfsResponse
+    } yield {
+      val items = (nnpr.json \ "items").as[JsArray]
+      val configs =
+        (items(0) \ "configurations").as[JsArray]
+
+      Hdfs(Seq(), Some(configs))
+    }
+
+    hdfsInfo.map(Right(_)).recoverWith {
+      case e: Exception =>
+        logger.error("Cannot get Namenode info")
+        Future.successful(Left(e))
+    }
 
   }
 }

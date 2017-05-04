@@ -26,7 +26,7 @@ class ClusterHealthService @Inject()(
       hosts <- clusterHostsService.getHostsByCluster(clusterId)
     } yield {
       val nn =
-        namenode.right.get.properties.get.validate[NameNodeInfo].asOpt
+        (namenode.right.get.properties.get \ "stats").validate[NameNodeInfo].asOpt
       val hostsList =
         hosts.right.get.map(h => h.properties.get.validate[ClusterHost].get)
       ClusterHealthData(nn, hostsList)

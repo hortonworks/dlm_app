@@ -1,22 +1,18 @@
 package com.hortonworks.dataplane.cs
 
-import java.net.URL
-
-import akka.actor.{Actor, ActorLogging}
 import akka.actor.Status.Failure
+import akka.actor.{Actor, ActorLogging}
 import akka.pattern.pipe
 import com.hortonworks.dataplane.commons.domain.Entities.{
   Cluster,
   ClusterHost,
-  ClusterServiceEndpoint,
+  ClusterServiceHost,
   Errors,
   ClusterService => ClusterData
 }
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import com.typesafe.scalalogging.Logger
 import play.api.libs.json.Json
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
 private[dataplane] case class PersistAtlas(cluster: Cluster,
@@ -26,6 +22,11 @@ private[dataplane] case class PersistKnox(cluster: Cluster,
 private[dataplane] case class PersistBeacon(
     cluster: Cluster,
     knox: Either[Throwable, BeaconInfo])
+
+private[dataplane] case class PersistHdfs(cluster: Cluster,
+                                          knox: Either[Throwable, Hdfs])
+private[dataplane] case class PersistHive(cluster: Cluster,
+                                          knox: Either[Throwable, HiveServer])
 
 private[dataplane] case class PersistNameNode(
     cluster: Cluster,
@@ -37,7 +38,7 @@ private[dataplane] case class PersistHostInfo(
 
 private sealed case class ServiceExists(cluster: Cluster,
                                         clusterData: ClusterData,
-                                        endpoints: Seq[ClusterServiceEndpoint],
+                                        endpoints: Seq[ClusterServiceHost],
                                         boolean: Boolean)
 
 private sealed case class PersistenceResult(option: Option[ClusterData],
@@ -63,16 +64,9 @@ class PersistenceActor(clusterInterface: StorageInterface)
           datalakeid = None
         )
 
-        val endpoints = Seq(
-          ClusterServiceEndpoint(name = "atlas.rest.service.url",
-                                 protocol = at.restService.getProtocol,
-                                 host = at.restService.getHost,
-                                 port = Some(at.restService.getPort),
-                                 pathSegment = None))
-
         clusterInterface
           .serviceRegistered(cluster, toPersist.servicename)
-          .map(ServiceExists(cluster, toPersist, endpoints, _))
+          .map(ServiceExists(cluster, toPersist, Seq(), _))
           .pipeTo(self)
 
       } else
@@ -95,18 +89,59 @@ class PersistenceActor(clusterInterface: StorageInterface)
           .map(
             ServiceExists(cluster,
                           toPersist,
-                          beaconInfo.endpoints.map(
-                            se =>
-                              ClusterServiceEndpoint(name = se.name,
-                                                     host = se.host,
-                                                     port = Some(se.port),
-                                                     protocol = se.protocol)),
+                          beaconInfo.endpoints.map(e =>
+                            ClusterServiceHost(host = e.host)),
                           _))
           .pipeTo(self)
 
       } else
-        log.error(s"Error saving atlas info, Atlas data was not returned",
+        log.error(s"Error saving Beacon info, Beacon data was not returned",
                   beacon.left.get)
+
+    case PersistHdfs(cluster, hdfs) =>
+      if (hdfs.isRight) {
+        val hdfsInfo = hdfs.right.get
+        val props = Try(hdfsInfo.props).getOrElse(None)
+        val toPersist = ClusterData(
+          servicename = "HDFS",
+          properties = props,
+          clusterid = Some(cluster.id.get),
+          datalakeid = None
+        )
+
+        clusterInterface
+          .serviceRegistered(cluster, toPersist.servicename)
+          .map(ServiceExists(cluster, toPersist, Seq(), _))
+          .pipeTo(self)
+
+      } else
+        log.error(s"Error saving HDFS info, HDFS data was not returned",
+                  hdfs.left.get)
+
+    case PersistHive(cluster, hive) =>
+      if (hive.isRight) {
+        val hiveInfo = hive.right.get
+        val props = Try(hiveInfo.props).getOrElse(None)
+        val toPersist = ClusterData(
+          servicename = "HIVE",
+          properties = props,
+          clusterid = Some(cluster.id.get),
+          datalakeid = None
+        )
+
+        clusterInterface
+          .serviceRegistered(cluster, toPersist.servicename)
+          .map(
+            ServiceExists(cluster,
+                          toPersist,
+                          hiveInfo.serviceHost.map(e =>
+                            ClusterServiceHost(host = e.host)),
+                          _))
+          .pipeTo(self)
+
+      } else
+        log.error(s"Error saving HIVE info, HIVE data was not returned",
+                  hive.left.get)
 
     case PersistKnox(cluster, knox) =>
       if (knox.isRight) {
@@ -121,14 +156,14 @@ class PersistenceActor(clusterInterface: StorageInterface)
           .map(ServiceExists(cluster, toPersist, Seq(), _))
           .pipeTo(self)
       } else
-        log.error(s"Error saving atlas info, Atlas data was not returned",
+        log.error(s"Error saving KNOX info, KNOX data was not returned",
                   knox.left.get)
 
     case PersistNameNode(cluster, namenode) =>
       if (namenode.isRight) {
-        val at = namenode.right.get
+        val nn = namenode.right.get
         val toPersist = ClusterData(servicename = "NAMENODE",
-                                    properties = at.props,
+                                    properties = nn.props,
                                     clusterid = Some(cluster.id.get),
                                     datalakeid = None)
 
@@ -137,18 +172,15 @@ class PersistenceActor(clusterInterface: StorageInterface)
           .map(
             ServiceExists(cluster,
                           toPersist,
-                          at.serviceEndpoint.map(
-                            se =>
-                              ClusterServiceEndpoint(name = se.name,
-                                                     host = se.host,
-                                                     port = Some(se.port),
-                                                     protocol = se.protocol)),
+                          nn.serviceHost.map(e =>
+                            ClusterServiceHost(host = e.host)),
                           _))
           .pipeTo(self)
 
       } else
-        log.error(s"Error saving atlas info, Atlas data was not returned",
-                  namenode.left.get)
+        log.error(
+          s"Error saving NAMENODE info, NAMENODE data was not returned",
+          namenode.left.get)
 
     case PersistHostInfo(cluster, hostInfo) =>
       if (hostInfo.isRight) {
@@ -168,9 +200,8 @@ class PersistenceActor(clusterInterface: StorageInterface)
           .pipeTo(self)
 
       } else
-        log.error(
-          s"Error saving atlas info, Atlas data was not returned, error",
-          hostInfo.left.get)
+        log.error(s"Error saving Host info, Host data was not returned, error",
+                  hostInfo.left.get)
 
     case ServiceExists(cluster, toPersist, endpoints, exists) =>
       if (exists) {
