@@ -110,7 +110,6 @@ object Webserice {
   // Maps to ClusterService
   trait ClusterComponentService extends DbClientService {
 
-
     def create(
         clusterService: ClusterData): Future[Either[Errors, ClusterData]]
     def getServiceByName(
@@ -118,16 +117,14 @@ object Webserice {
         serviceName: String): Future[Either[Errors, ClusterData]]
     def updateServiceByName(
         clusterData: ClusterData): Future[Either[Errors, Boolean]]
-    def addClusterHosts(
-        ClusterServiceHosts: Seq[ClusterServiceHost] = Seq())
+    def addClusterHosts(clusterServiceHosts: Seq[ClusterServiceHost] = Seq())
       : Future[Seq[Either[Errors, ClusterServiceHost]]]
     def updateClusterHosts(
-        ClusterServiceHosts: Seq[ClusterServiceHost] = Seq())
+        clusterServiceHosts: Seq[ClusterServiceHost] = Seq())
       : Future[Seq[Either[Errors, Boolean]]]
     def getEndpointsForCluster(
         clusterId: Long,
         service: String): Future[Either[Errors, Seq[ClusterServiceHost]]]
-
 
   }
 

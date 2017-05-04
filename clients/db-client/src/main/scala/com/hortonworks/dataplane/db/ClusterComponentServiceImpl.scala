@@ -51,12 +51,11 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToHost(res: WSResponse) = {
     res.status match {
       case 200 =>
-        extractEntity[ClusterServiceHost](
-          res,
-          r =>
-            (r.json \ "results" \\ "data").head
-              .validate[ClusterServiceHost]
-              .get)
+        extractEntity[ClusterServiceHost](res,
+                                          r =>
+                                            (r.json \ "results" \\ "data").head
+                                              .validate[ClusterServiceHost]
+                                              .get)
       case _ => mapErrors(res)
     }
   }
@@ -90,7 +89,6 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
       }
   }
 
-
   override def updateServiceByName(
       clusterData: ClusterService): Future[Either[Errors, Boolean]] = {
     ws.url(s"$url/clusters/services")
@@ -112,11 +110,10 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
       }
   }
 
-  override def addClusterHosts(
-      ClusterServiceHosts: Seq[ClusterServiceHost])
+  override def addClusterHosts(clusterServiceHosts: Seq[ClusterServiceHost])
     : Future[Seq[Either[Errors, ClusterServiceHost]]] = {
 
-    val requests = ClusterServiceHosts.map { cse =>
+    val requests = clusterServiceHosts.map { cse =>
       ws.url(s"$url/services/endpoints")
         .withHeaders(
           "Content-Type" -> "application/json",
@@ -135,11 +132,10 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
     Future.sequence(requests)
   }
 
-  override def updateClusterHosts(
-      ClusterServiceHosts: Seq[ClusterServiceHost])
+  override def updateClusterHosts(clusterServiceHosts: Seq[ClusterServiceHost])
     : Future[Seq[Either[Errors, Boolean]]] = {
 
-    val requests = ClusterServiceHosts.map { cse =>
+    val requests = clusterServiceHosts.map { cse =>
       ws.url(s"$url/services/endpoints")
         .withHeaders(
           "Content-Type" -> "application/json",
