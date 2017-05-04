@@ -1,0 +1,25 @@
+.pagination {
+    position: relative;
+    span {
+        font-weight: bold;
+    }
+    button {
+        color: #2192bf;
+        min-width: 30px;
+    }
+    .fa{
+        color: black;
+    }
+    .mdl-menu__container div{
+        width : 75px !important;
+    }
+    .button-disabled {
+        opacity: 0.4;
+    }
+    .button-previous {
+        padding-right:0px;
+    }
+    .button-next {
+        padding-left:0px;
+    }
+}

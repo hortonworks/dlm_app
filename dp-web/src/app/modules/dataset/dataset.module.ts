@@ -14,6 +14,8 @@ import {DsAssetList} from "./views/ds-assets-list/ds-assets-list.component";
 import {DsAssetsService} from "./services/dsAssetsService";
 import {DsRowProxy} from "./views/dashboard/ds-nav-result-viewer/row-proxy/row-proxy.component";
 
+import {PaginationComponent} from "../../widgets/pagination/pagination.component";
+
 @NgModule({
   imports: [
     CommonModule,
@@ -27,7 +29,8 @@ import {DsRowProxy} from "./views/dashboard/ds-nav-result-viewer/row-proxy/row-p
       DsFullView,
       DsAssetList,
       DsRowProxy,
-      DatasetDashboardComponent
+      DatasetDashboardComponent,
+      PaginationComponent
   ],
   providers: [
     RichDatasetService,

@@ -10,9 +10,14 @@ export class RichDatasetService {
   constructor(private http: Http) {
   }
 
-  public listByTag(tagName:string): Observable<RichDatasetModel[]> {
+  public listByTag(tagName:string, start:number, limit:number): Observable<any> {
     return Observable.create(observer => {
-      setTimeout(()=>observer.next(data), 300);
+      setTimeout(()=>observer.next({
+        data : data.slice(start - 1, start + limit),
+        start : start,
+        limit : limit,
+        total : data.length
+      }), 300);
     });
 
   }
