@@ -52,9 +52,9 @@ export class PaginationComponent implements OnInit {
     this.pageChangeEmitter.emit(this.start);
   }
 
-  onPageSizeChange(pageSizeObj){
+  onPageSizeChange(pageSize){
     this.start = 1;
-    this.pageSize = pageSizeObj.size;
+    this.pageSize = pageSize;
     this.sizeChangeEmitter.emit(this.pageSize);
   }
 
