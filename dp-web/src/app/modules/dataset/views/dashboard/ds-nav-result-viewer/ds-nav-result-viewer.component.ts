@@ -2,7 +2,7 @@ import {Component, Input, OnInit, SimpleChange} from "@angular/core";
 import {RichDatasetService} from "../../../services/RichDatasetService";
 import {RichDatasetModel} from "../../../models/richDatasetModel";
 import {DatasetTag} from "../../../../../models/dataset-tag";
-
+import {ViewsEnum} from "../../../../../shared/utils/views";
 
 
 @Component({
@@ -15,7 +15,8 @@ export class DsNavResultViewer implements OnInit {
   @Input() currentDsTag : DatasetTag;
   public datasetModels : RichDatasetModel[] = null
   private currentPage : number = 1;
-  @Input() view : String;
+  public views = ViewsEnum;
+  @Input() view : number;
 
   constructor(
     private richDatasetService :RichDatasetService

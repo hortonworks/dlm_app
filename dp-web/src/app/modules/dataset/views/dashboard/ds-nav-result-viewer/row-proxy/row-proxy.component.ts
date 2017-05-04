@@ -1,7 +1,6 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {RichDatasetModel} from "../../../../models/richDatasetModel";
 
-
 @Component({
   selector: 'ds-row-proxy',
   templateUrl: './row-proxy.component.html',

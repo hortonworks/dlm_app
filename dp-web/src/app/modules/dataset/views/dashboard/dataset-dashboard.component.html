@@ -5,17 +5,15 @@
     <div class="result-viewer">
       <div class="result-header">
         <span class="resultsTitle" *ngIf="currentDsTag">{{currentDsTag.name}}</span>
+        <button class="mdl-button--new mdl-color--green mdl-color-text--white mdl-button">
+            <i class="fa fa-plus"></i> NEW
+        </button>
         <div class="mdl-button-group">
-          <button class="mdl-color--green mdl-color-text--white mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
-              <i class="fa fa-plus"></i> NEW
-          </button>
-        </div>
-        <div class="mdl-button-group">
-          <button (click)="onViewChange('grid')" [ngClass]="{'mdl-color--green': currentView === 'grid' }" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
-            <i class="fa fa-th"></i>
-          </button>
-           <button (click)="onViewChange('list')" [ngClass]="{'mdl-color--green': currentView === 'list' }" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+           <button (click)="onViewChange(views.list)" [ngClass]="{'button-color--dark-grey': currentView === views.list }" class="mdl-button">
             <i class="fa fa-list-ul"></i>
+          </button>
+          <button (click)="onViewChange(views.grid)" [ngClass]="{'button-color--dark-grey': currentView === views.grid }" class="mdl-button">
+            <i class="fa fa-th"></i>
           </button>
         </div>
       </div>

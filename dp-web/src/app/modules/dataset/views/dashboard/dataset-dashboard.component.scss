@@ -64,24 +64,35 @@ nav-tag-panel {
   overflow-y: auto;
 }
 
-.mdl-button-group{
+.mdl-button-group {
   position: relative;
-  display: inline-block;
   vertical-align: middle;
   float: right;
   margin-right: 1%;
   margin-top : 1%;
-  button{
-    background-color: #eee;
-    display: inline-block;
+  border : 1px ridge;
+  .mdl-button {
+    background-color: #ffffff;
     float: left;
-    margin: 0px;
+    padding : 0px;
     box-shadow: none;
     border-radius: 0px;
+    height: 34px;
+    min-width: 42px;
   }
-  
-  button:hover {
-  color: green;
-  }
+}
+
+.mdl-button--new {
+  float: right;
+  border-radius: 0px;
+  box-shadow: none;
+  height: 34px;
+  margin-top : 1%;
+}
+
+.button-color--dark-grey {
+  background-color: #666666 !important;
+  color: white;
+  border-left: none;
 }
 
