@@ -31,12 +31,10 @@ class ClusterSync @Inject()(val actorSystem: ActorSystem,
 
   import scala.concurrent.duration._
 
-  val actorSupplier = new Supplier[ActorRef] {
-    override def get(): ActorRef = {
-      actorSystem.actorOf(
-        Props(classOf[Synchronizer], clusterInterface, wSClient, config),
-        "ambari_Synchronizer")
-    }
+  lazy val actorSupplier: ActorRef = {
+    actorSystem.actorOf(
+      Props(classOf[Synchronizer], clusterInterface, wSClient, config),
+      "ambari_Synchronizer")
   }
 
   /**
@@ -52,7 +50,7 @@ class ClusterSync @Inject()(val actorSystem: ActorSystem,
         .getOrElse(5)
     actorSystem.scheduler.schedule(start seconds,
                                    interval minutes,
-                                   actorSupplier.get(),
+                                   actorSupplier,
                                    Poll())
   }
 
@@ -62,7 +60,7 @@ class ClusterSync @Inject()(val actorSystem: ActorSystem,
     */
   def trigger(dataLakeId: Long) = {
     actorSystem.scheduler.scheduleOnce(100 milliseconds,
-                                       actorSupplier.get(),
+                                       actorSupplier,
                                        DataLakeAdded(dataLakeId))
   }
 
