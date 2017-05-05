@@ -1,18 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BsDropdownModule, ButtonsModule } from 'ng2-bootstrap';
+import {ChartsModule} from 'ng2-charts/ng2-charts';
+
 import { CardComponent } from './card/card.component';
 import { SearchInputComponent } from './search-input/search-input.component';
 import { DropdownComponent } from './dropdown/dropdown.component';
 import { ClusterCardComponent } from './cluster-card/cluster-card.component';
 import { StatusColumnComponent } from './table-columns/status-column/status-column.component';
 import { IconColumnComponent } from './table-columns/icon-column/icon-column.component';
+import { DoughnutChartComponent } from './doughnut-chart/doughnut-chart.component';
 
 @NgModule({
   imports: [
     CommonModule,
     BsDropdownModule.forRoot(),
-    ButtonsModule.forRoot()
+    ButtonsModule.forRoot(),
+    ChartsModule
   ],
   declarations: [
     CardComponent,
@@ -20,7 +24,8 @@ import { IconColumnComponent } from './table-columns/icon-column/icon-column.com
     DropdownComponent,
     ClusterCardComponent,
     StatusColumnComponent,
-    IconColumnComponent
+    IconColumnComponent,
+    DoughnutChartComponent
   ],
   exports: [
     CardComponent,
@@ -28,7 +33,8 @@ import { IconColumnComponent } from './table-columns/icon-column/icon-column.com
     DropdownComponent,
     ClusterCardComponent,
     StatusColumnComponent,
-    IconColumnComponent
+    IconColumnComponent,
+    DoughnutChartComponent
   ]
 })
 export class CommonComponentsModule {}

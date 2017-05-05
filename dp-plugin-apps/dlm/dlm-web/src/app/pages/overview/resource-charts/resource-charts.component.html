@@ -1,0 +1,15 @@
+<div class="row">
+  <div class="col-md-8 col-md-offset-2">
+    <div class="row">
+      <div class="col-md-4" *ngFor="let chartData of charts">
+        <div class="chart-container">
+          <div class="chart-title">
+            <div>{{chartData.title}}</div>
+            <div>{{chartData.total}}</div>
+          </div>
+          <dlm-doughnut-chart [chartData]="chartData"></dlm-doughnut-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

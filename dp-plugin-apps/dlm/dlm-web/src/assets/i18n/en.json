@@ -19,6 +19,10 @@
     "table": {
       "summary": "{{shown}} of {{count}} showing",
       "paging": "{{start}} - {{end}} of {{count}}"
+    },
+    "status": {
+      "failed": "Failed",
+      "in_progress": "In Progress"
     }
   },
   "sidenav": {
@@ -33,6 +37,25 @@
     }
   },
   "page": {
+    "overview": {
+      "charts": {
+        "clusters": "Clusters",
+        "policies": "Policies",
+        "jobs": "Jobs"
+      },
+      "issues": {
+        "updates": "Issues & Updates",
+        "recent": "Recent Issues",
+        "list": {
+          "view_all": "view all",
+          "status": {
+            "in_progress": "is in progress",
+            "failed": "failed",
+            "warning": "completed with warnings"
+          }
+        }
+      }
+    },
     "clusters": {
       "dropdown": {
         "cluster": "Cluster",
