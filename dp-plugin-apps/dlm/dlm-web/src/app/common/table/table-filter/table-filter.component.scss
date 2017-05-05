@@ -1,0 +1,19 @@
+.filter-item {
+  margin: 2px;
+  font-size: 100%;
+  font-weight: 400;
+  display: inline-block;
+}
+.applied-filters-wrapper {
+  width: 300px;
+}
+input {
+  width: 200px;
+}
+
+.label.label-default a {
+  color: #fff;
+  &:hover {
+    text-decoration: none;
+  }
+}

@@ -1,4 +1,4 @@
-import { Component, ViewChild, TemplateRef, ViewEncapsulation } from '@angular/core';
+import { Component, ViewChild, TemplateRef, ViewEncapsulation, Input } from '@angular/core';
 import { TableColumn } from 'common/table/table-column.type';
 
 export const HIVE = 'HIVE';
@@ -9,11 +9,12 @@ export const ICON_SIZE = 24;
   selector: 'dlm-icon-column',
   template: `
     <ng-template #iconCell let-value="value">
-      <div class="icon-column">
+      <div class="icon-column" [class.shifted]="showHexagon">
         <div class="icon-column-wrapper">
-          <div [class]="getHexClassName(value)">
+          <div *ngIf="showHexagon" [class]="getHexClassName(value)">
             <i [class]="getIconClassName(value)"></i>
           </div>
+          <i *ngIf="!showHexagon" [class]="getIconClasses(value)"></i> <span *ngIf="showValue">{{value}}</span>
         </div>
       </div>
     </ng-template>
@@ -22,6 +23,8 @@ export const ICON_SIZE = 24;
   encapsulation: ViewEncapsulation.None
 })
 export class IconColumnComponent implements TableColumn {
+  @Input() showHexagon = true;
+  @Input() showValue = false;
   @ViewChild('iconCell') cellRef: TemplateRef<any>;
   cellSettings = {
     width: ICON_SIZE,
@@ -38,6 +41,18 @@ export class IconColumnComponent implements TableColumn {
       [HDFS]: 'fa fa-file-o'
     };
     return iconSourceMap[sourceType];
+  }
+
+  getIconClasses(sourceType) {
+    return `${this.getTextClassName(sourceType)} ${this.getIconClassName(sourceType)}`;
+  }
+
+  getTextClassName(sourceType) {
+    const map = {
+      [HIVE]: 'text-success',
+      [HDFS]: 'text-warning'
+    };
+    return map[sourceType];
   }
 
   getHexClassName(sourceType) {

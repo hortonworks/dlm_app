@@ -19,8 +19,8 @@ import {Job} from '../../../models/job.model';
 export class JobTransferredGraphComponent {
 
   private colorStatusMap = {
-    'Warnings': '#E98A40',
-    'Failed': '#EF6162'
+    'WARNINGS': '#E98A40',
+    'FAILED': '#EF6162'
   };
 
   @Input() job: Job;

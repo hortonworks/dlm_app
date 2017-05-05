@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpModule, Http } from '@angular/http';
-import { BsDropdownModule, CollapseModule, TabsModule, ModalModule } from 'ng2-bootstrap';
+import { BsDropdownModule, CollapseModule, TabsModule, ModalModule, TypeaheadModule } from 'ng2-bootstrap';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { StoreModule } from '@ngrx/store';
 import { RouterStoreModule } from '@ngrx/router-store';
@@ -49,6 +49,7 @@ import { ClusterSearchComponent } from './pages/clusters/cluster-search/cluster-
 import { JobsTableComponent } from './pages/jobs/jobs-table/jobs-table.component';
 import { JobStatusComponent } from './pages/jobs/job-status/job-status.component';
 import { JobTransferredGraphComponent } from './pages/jobs/jobs-transferred-graph/job-transferred-graph.component';
+import { JobsStatusFilterComponent } from './pages/jobs/jobs-status-filter/jobs-status-filter.component';
 
 import { PolicyTableComponent } from './pages/policies/policy-table/policy-table.component';
 import { FlowStatusComponent } from './pages/policies/policy-table/flow-status/flow-status.component';
@@ -71,6 +72,7 @@ import {ChartsModule} from 'ng2-charts/ng2-charts';
 
 import { TableComponent } from './common/table/table.component';
 import { TableFooterComponent } from './common/table/table-footer/table-footer.component';
+import { TableFilterComponent } from './common/table/table-filter/table-filter.component';
 import { CheckboxColumnComponent, ActionColumnComponent } from './components';
 import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/review-policy.component';
 
@@ -93,6 +95,7 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     CollapseModule.forRoot(),
     TabsModule.forRoot(),
     ModalModule.forRoot(),
+    TypeaheadModule.forRoot(),
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
@@ -124,6 +127,7 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     JobsTableComponent,
     JobStatusComponent,
     JobTransferredGraphComponent,
+    JobsStatusFilterComponent,
 
     JobsComponent,
     HelpComponent,
@@ -139,6 +143,7 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     PairingCardListComponent,
     TableComponent,
     TableFooterComponent,
+    TableFilterComponent,
     CheckboxColumnComponent,
     ActionColumnComponent,
     ModalDialogComponent,

@@ -1,4 +1,7 @@
-import {Component, Input, Output, ViewEncapsulation, ViewChild, TemplateRef, EventEmitter, HostBinding} from '@angular/core';
+import {
+  Component, Input, Output, ViewEncapsulation, ViewChild, TemplateRef, EventEmitter, HostBinding,
+  OnChanges
+} from '@angular/core';
 import {ColumnMode, DatatableComponent, DatatableRowDetailDirective} from '@swimlane/ngx-datatable';
 import {CheckboxColumnComponent} from '../../components/table-columns/checkbox-column/checkbox-column.component';
 import {ActionColumnType, ActionItemType, ActionColumnComponent} from '../../components';
@@ -12,7 +15,7 @@ export const SELECTED_KEY_NAME = '__selected';
   styleUrls: ['./table.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class TableComponent {
+export class TableComponent implements OnChanges {
   private _columns: any[];
   private _rows: any[];
   private _headerHeight: string|number;
@@ -139,6 +142,15 @@ export class TableComponent {
 
   toggleRowDetail(row) {
     this.table.rowDetail.toggleExpandRow(row);
+  }
+
+  ngOnChanges(changes) {
+    if (changes.rows) {
+      const {firstChange, currentValue, previousValue} = changes.rows;
+      if (!firstChange && currentValue && previousValue && currentValue.length < previousValue.length) {
+        this.table.offset = 0;
+      }
+    }
   }
 
 }
