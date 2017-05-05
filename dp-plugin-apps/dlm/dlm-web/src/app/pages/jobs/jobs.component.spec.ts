@@ -18,6 +18,10 @@ import {BytesSizePipe} from '../../pipes/bytes-size.pipe';
 import {ChartsModule} from 'ng2-charts';
 import {RouterTestingModule} from '@angular/router/testing';
 import {TableFooterComponent} from '../../common/table/table-footer/table-footer.component';
+import { IconColumnComponent } from '../../components/table-columns/icon-column/icon-column.component';
+import { TableFilterComponent } from '../../common/table/table-filter/table-filter.component';
+import { TypeaheadModule } from 'ng2-bootstrap';
+import { JobsStatusFilterComponent } from './jobs-status-filter/jobs-status-filter.component';
 
 describe('JobsComponent', () => {
   let component: JobsComponent;
@@ -27,19 +31,22 @@ describe('JobsComponent', () => {
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot({
         loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-      }), NgxDatatableModule, FormsModule, MomentModule, ChartsModule, RouterTestingModule],
+      }), TypeaheadModule.forRoot(), NgxDatatableModule, FormsModule, MomentModule, ChartsModule, RouterTestingModule],
       declarations: [
         JobsComponent,
         JobsTableComponent,
         JobStatusComponent,
         JobTransferredGraphComponent,
+        JobsStatusFilterComponent,
         TableComponent,
+        TableFilterComponent,
         TableFooterComponent,
         CheckboxComponent,
         CheckboxColumnComponent,
         ActionColumnComponent,
         DropdownComponent,
-        BytesSizePipe
+        BytesSizePipe,
+        IconColumnComponent
       ],
       providers: [
         {provide: Store, useClass: MockStore}

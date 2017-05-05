@@ -9,6 +9,7 @@
     "duration": "Duration",
     "source": "Source",
     "destination": "Destination",
+    "status": "Status",
     "data": "Data",
     "time": {
       "hourly": "Hourly",
@@ -34,6 +35,14 @@
       "jobs": "Jobs",
       "help": "Help",
       "header": "DATA LIFECYCLE MANAGER"
+    }
+  },
+  "jobs": {
+    "status": {
+      "completed": "Completed",
+      "in_progress": "In Progress",
+      "warnings": "Warnings",
+      "failed": "Failed"
     }
   },
   "page": {

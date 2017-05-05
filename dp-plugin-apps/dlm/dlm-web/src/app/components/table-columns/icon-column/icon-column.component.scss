@@ -7,7 +7,9 @@ $hex-size: 24px;
 
 .icon-column {
   position: relative;
-  left: -$hex-size / 2;
+  &.shifted {
+    left: -$hex-size / 2;
+  }
 }
 
 .hexagon {

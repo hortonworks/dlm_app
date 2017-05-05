@@ -14,5 +14,6 @@ export interface Job {
   target: string;
   isCompleted: boolean;
   graphData: number[];
+  transferred: number;
   previousRuns: Object[];
 }
