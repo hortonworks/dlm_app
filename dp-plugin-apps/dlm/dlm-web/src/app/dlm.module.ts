@@ -41,6 +41,10 @@ import { CommonComponentsModule } from './components/common-components.module';
 import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.component';
 import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route.component';
 
+import { ResourceChartsComponent } from './pages/overview/resource-charts/resource-charts.component';
+import { IssuesListComponent } from './pages/overview/issues-list/issues-list.component';
+import { IssuesListItemComponent } from './pages/overview/issues-list-item/issues-list-item.component';
+
 import { ClustersComponent } from './pages/clusters/clusters.component';
 import { ClusterCardComponent } from './pages/clusters/cluster-card/cluster-card.component';
 import { ClusterListComponent } from './pages/clusters/cluster-list/cluster-list.component';
@@ -123,6 +127,10 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     CreatePolicyComponent,
     PolicyFormComponent,
     ReviewPolicyComponent,
+
+    ResourceChartsComponent,
+    IssuesListComponent,
+    IssuesListItemComponent,
 
     JobsTableComponent,
     JobStatusComponent,
