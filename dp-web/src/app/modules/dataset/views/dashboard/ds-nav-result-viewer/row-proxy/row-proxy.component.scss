@@ -1,9 +1,9 @@
 .mdl-data-table {
-    width: 98%;
+    width: 97%;
     margin-left : 1%;
     border: none;
     margin-top: 40px;
-    padding : 40px 30px 0px 15px;
+    margin-right: 30px;
 }
 
 .mdl-data-table {
@@ -46,6 +46,14 @@
 .mdl-data-table__cell--clickable {
     color: #2192bf;
     cursor: pointer;
+}
+
+.mdl-data-table__cell--non-clickable{
+    color : #7e898d
+}
+
+.mdl-data-table__cell--placeholder{
+    width:1%
 }
 
 .fa__fa-ellipsis-v--icon {
