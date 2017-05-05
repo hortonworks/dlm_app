@@ -26,6 +26,12 @@ $table-border-color: #eee;
 
       .datatable-header-cell {
         padding: $cell-padding;
+        &.text-header {
+          text-align: left;
+        }
+        &.date-header, &.bytes-header {
+          text-align: right;
+        }
       }
     }
 
@@ -45,6 +51,13 @@ $table-border-color: #eee;
     .datatable-body-cell {
       padding: $cell-padding;
       text-align: center;
+
+      &.text-cell {
+        text-align: left;
+      }
+      &.date-cell, &.bytes-cell {
+        text-align: right;
+      }
     }
 
     .datatable-footer {

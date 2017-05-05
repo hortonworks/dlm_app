@@ -18,6 +18,6 @@ export const loadJobsFail = (error): Action => ({type: ActionTypes.LOAD_JOBS_FAI
 
 function prepareJob(job) {
   job.runTime = job.endTime > 0 ? job.endTime - job.startTime : -1;
-  job.isCompleted = job.status !== 'In Progress';
+  job.isCompleted = job.status !== 'IN_PROGRESS';
   return job;
 }
