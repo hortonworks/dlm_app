@@ -40,14 +40,6 @@ destroy_knox() {
     rm -rf ${CERTS_DIR}
 }
 
-build_images() {
-    docker-compose -f docker-compose-apps.yml build
-}
-
-build_knox() {
-    docker build -f Dockerfile.knox -t hortonworks/dp-knox .
-}
-
 init_app() {
     docker-compose -f docker-compose-apps.yml up -d
 }
@@ -96,13 +88,11 @@ stop_knox() {
 
 usage() {
     echo "Usage: dpdeploy.sh <command> \\n \
-            Commands: init [db|knox|app] | migrate | build [knox] | ps | logs [db|all] | start | stop [knox] | destroy [knox]\\n \
+            Commands: init [db|knox|app] | migrate | ps | logs [db|all] | start | stop [knox] | destroy [knox]\\n \
             init db: Initialize postgres DB for first time\\n \
             init knox: Initialize the Knox container\\n \
             init app: Start the application docker containers for the first time \\n \
             migrate: Run schema migrations on the DB \\n \
-            build: Create images of Dataplane specific containers \\n \
-            build knox: Create Knox image for Dataplane \\n \
             start knox: Start the application docker containers \\n \
             stop: Stop the application docker containers \\n \
             stop knox: Stop the Knox docker container \\n \
@@ -140,14 +130,6 @@ else
             ;;
         migrate)
             migrate_schema
-            ;;
-        build)
-            if [ "$2" == "knox" ]
-            then
-                build_knox
-            else
-                build_images
-            fi
             ;;
         start)
             if [ "$2" == "knox" ]
