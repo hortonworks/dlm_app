@@ -64,4 +64,35 @@ nav-tag-panel {
   overflow-y: auto;
 }
 
+.mdl-button-group {
+  position: relative;
+  vertical-align: middle;
+  float: right;
+  margin-right: 1%;
+  margin-top : 1%;
+  border : 1px ridge;
+  .mdl-button {
+    background-color: #ffffff;
+    float: left;
+    padding : 0px;
+    box-shadow: none;
+    border-radius: 0px;
+    height: 34px;
+    min-width: 42px;
+  }
+}
+
+.mdl-button--new {
+  float: right;
+  border-radius: 0px;
+  box-shadow: none;
+  height: 34px;
+  margin-top : 1%;
+}
+
+.button-color--dark-grey {
+  background-color: #666666 !important;
+  color: white;
+  border-left: none;
+}
 

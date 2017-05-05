@@ -1,0 +1,11 @@
+<div class="pagination"> 
+    <span>{{ label }}</span>    
+    <button id="page-size-dropdown" class="mdl-button mdl-js-button page-size-button">{{pageSize}} <i class="fa fa fa-angle-down"></i></button>
+    <span>{{start}}-{{end}} of {{total}}</span>
+    <label class="mdl-menu mdl-menu--bottom-right mdl-js-menu"
+            for="page-size-dropdown">
+        <li (click)="onPageSizeChange(pgSize)" *ngFor="let pgSize of pageSizes" class="mdl-menu__item">{{pgSize}}</li>
+    </label>
+    <button [disabled]="isFirst()" [ngClass]="{'button-disabled':isFirst()}" (click)="previous()" class="mdl-button mdl-js-button button-previous"><i class="fa fa-angle-left"></i></button>
+    <button [disabled]="isLast()" [ngClass]="{'button-disabled':isLast()}" (click)="next()" class="mdl-button mdl-js-button button-next"><i class="fa fa-angle-right"></i></button>
+</div>
