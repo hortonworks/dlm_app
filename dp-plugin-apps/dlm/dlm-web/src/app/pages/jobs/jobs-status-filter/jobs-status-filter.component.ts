@@ -8,10 +8,10 @@ import { Job } from '../../../models/job.model';
 })
 export class JobsStatusFilterComponent implements OnInit, OnChanges {
 
-  private failedJobMock = {status: 'FAILED'};
-  private inProgressJobMock = {status: 'IN_PROGRESS'};
-  private warningsJobMock = {status: 'WARNINGS'};
-  private groupedByStatusJobs = {};
+  failedJobMock = {status: 'FAILED'};
+  inProgressJobMock = {status: 'IN_PROGRESS'};
+  warningsJobMock = {status: 'WARNINGS'};
+  groupedByStatusJobs: { [id: string]: Job[] } = {};
 
   @Input() jobs: Job[] = [];
   @Output() onFilter: EventEmitter<any> = new EventEmitter();
