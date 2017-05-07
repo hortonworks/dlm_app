@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 IMAGE_PREFIX="hortonworks"
 ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service"
@@ -9,7 +10,12 @@ build_knox() {
 }
 
 build_images() {
-    docker-compose -f docker-compose-apps.yml build
+    echo "Building dp-db-service"
+    docker build -t hortonworks/dp-db-service ../services/db-service
+    echo "Building dp-cluster-service"
+    docker build -t hortonworks/dp-cluster-service ../services/cluster-service
+    echo "Building dp-app"
+    docker build -t hortonworks/dp-app .
 }
 
 push_images() {
