@@ -68,6 +68,16 @@ build_cluster_service() {
 	popd
 }
 
+build_installer() {
+	log "Building installer"
+	mkdir -p build/installer/dbscripts/
+	cp -R install/* build/installer/
+	cp -R ../services/db-service/db/* build/installer/dbscripts/
+	pushd build
+	tar -czf dp-installer.tar.gz installer/*
+	popd
+}
+
 log "Current working directory is: " `pwd`
 clean_build
 build_dp
@@ -76,4 +86,5 @@ build_dp_app
 build_dp_web
 build_dlm_web
 build_cluster_service
+build_installer
 log "All done"

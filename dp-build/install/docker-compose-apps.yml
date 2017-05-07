@@ -7,8 +7,6 @@ services:
         POSTGRES_USER: dp_admin
         POSTGRES_DB: dataplane
   dp-db-service:
-    build:
-        context: ../services/db-service
     image: hortonworks/dp-db-service
     ports:
         - "9000:9000"
@@ -17,8 +15,6 @@ services:
     links:
         - dp-database
   dp-cluster-service:
-    build:
-        context: ../services/cluster-service
     image: hortonworks/dp-cluster-service
     ports:
         - "9009:9009"
@@ -27,8 +23,6 @@ services:
     links:
         - dp-database
   dp-app:
-    build:
-        context: .
     image: hortonworks/dp-app
     ports:
         - "80:80"
