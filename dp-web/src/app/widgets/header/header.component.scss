@@ -2,6 +2,7 @@
 
 :host{
   height: $header-height;
+  min-height: $header-height;
 }
 
 :host /deep/ {
@@ -17,6 +18,7 @@
 
 .mdl-layout__header {
   border-bottom: 1px solid $concrete;
+  box-shadow: none;
 }
 
 .mdl-navigation__link {
