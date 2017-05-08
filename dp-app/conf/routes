@@ -2,6 +2,11 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
+
+GET            /Status                                                       controllers.Status.status
+GET            /health                                                  controllers.Status.health
+
+
 #auth calls
 POST        /auth/in                               controllers.Authentication.signIn
 GET         /auth/userDetail                       controllers.Authentication.userDetail

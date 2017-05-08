@@ -1,22 +1,45 @@
-import com.google.inject.AbstractModule
 import java.time.Clock
+import java.util.Optional
+import javax.inject.Inject
+
+import com.google.inject.AbstractModule
+import com.hortonworks.datapalane.consul.{ApplicationRegistrar, ConsulHook, DpService, ZuulServer}
+import play.api.{Configuration, Logger}
 
 
-/**
- * This class is a Guice module that tells Guice how to bind several
- * different types. This Guice module is created when the Play
- * application starts.
-
- * Play will automatically use any class called `Module` that is in
- * the root package. You can create modules in other locations by
- * adding `play.modules.enabled` settings to the `application.conf`
- * configuration file.
- */
 class Module extends AbstractModule {
 
   override def configure() = {
     // Use the system clock as the default implementation of Clock
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone)
+    bind(classOf[ConsulInitializer]).asEagerSingleton()
   }
 
 }
+
+class ConsulInitializer @Inject()(config:Configuration){
+
+  private val registrar = new ApplicationRegistrar(config.underlying,Optional.of(getHook))
+  registrar.initialize()
+
+
+  private def getHook = {
+    new ConsulHook {
+
+      override def onServiceRegistration(dpService: DpService) = Logger.info(s"Registered service $dpService")
+
+      override def serviceRegistrationFailure(serviceId: String, th: Throwable) = Logger.warn(s"Service registration failed for $serviceId",th)
+
+      override def onServiceDeRegister(serviceId: String): Unit = Logger.info(s"Service removed from consul $serviceId")
+
+      override def onRecoverableException(reason: String, th: Throwable): Unit = Logger.warn(reason,th)
+
+      override def gatewayDiscovered(zuulServer: ZuulServer): Unit = ???
+
+      override def gatewayDiscoverFailure(message: String, th: Throwable): Unit = ???
+    }
+  }
+
+
+}
+

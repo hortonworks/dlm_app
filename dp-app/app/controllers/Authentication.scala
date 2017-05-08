@@ -41,6 +41,9 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
       .getOrElse(Future.successful(
         BadRequest(JsonResponses.statusError("Cannot parse user request"))))
   }
+
+
+
   def userDetail = authenticated.async { request =>
     val username = request.user.username
     for {

@@ -1,16 +1,24 @@
+import java.util
+import java.util.Optional
+
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.google.inject.name.Named
-import com.google.inject.{AbstractModule, Provides, Singleton}
+import com.google.inject.{AbstractModule, Inject, Provides, Singleton}
+import com.hortonworks.datapalane.consul._
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.db.Webserice._
 import internal.AtlasApiCache
 import internal.auth.Authenticated
-import play.api.Configuration
+import play.api.{Configuration, Logger}
+import play.api.inject.ApplicationLifecycle
 import play.api.libs.ws.WSClient
+
+import scala.concurrent.Future
 
 class Module extends AbstractModule {
   def configure() = {
     bind(classOf[Authenticated]).asEagerSingleton()
+    bind(classOf[ConsulInitializer]).asEagerSingleton()
   }
 
   @Provides
@@ -88,5 +96,35 @@ class Module extends AbstractModule {
     new ClusterComponentServiceImpl(configuration.underlying)
   }
 
+
+}
+
+@Singleton
+class ConsulInitializer @Inject()(config:Configuration){
+
+  private val registrar = new ApplicationRegistrar(config.underlying,Optional.of(new AppConsulHook))
+  registrar.initialize()
+
+  private class AppConsulHook extends ConsulHook{
+    override def onServiceRegistration(dpService: DpService) = {
+      Logger.info(s"Registered service $dpService")
+      // Service registered now, override the db service endpoints
+      val map = new util.HashMap[String,String]()
+      map.put("dp.services.db.service.uri",config.getString("dp.services.db.service.path").get)
+      map.put("dp.services.cluster.service.uri",config.getString("dp.services.cluster.service.path").get)
+      val gateway = new Gateway(config.underlying,map,Optional.of(this))
+      gateway.initialize()
+    }
+
+    override def serviceRegistrationFailure(serviceId: String, th: Throwable):Unit = Logger.warn(s"Service registration failed for $serviceId",th)
+
+    override def onServiceDeRegister(serviceId: String): Unit = Logger.info(s"Service removed from consul $serviceId")
+
+    override def onRecoverableException(reason: String, th: Throwable): Unit = Logger.warn(reason,th)
+
+    override def gatewayDiscovered(zuulServer: ZuulServer): Unit = Logger.info(s"Gateway dicovered $zuulServer")
+
+    override def gatewayDiscoverFailure(message: String, th: Throwable): Unit = Logger.warn("Gateway discovery failed, endpoints configured in config will be used")
+  }
 
 }

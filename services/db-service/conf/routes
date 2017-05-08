@@ -4,6 +4,9 @@
 
 #Users API
 
+GET            /Status                                                       controllers.Status.status
+GET            /health                                                  controllers.Status.health
+
 GET           /users                                                         controllers.Users.all(username: Option[String])
 POST          /users                                                         controllers.Users.insert
 GET           /users/:userId                                                 controllers.Users.load(userId:Long)

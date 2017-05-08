@@ -2,7 +2,7 @@ package com.hortonworks.dataplane.cs
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import com.google.inject.{AbstractModule, Provides, Singleton}
+import com.google.inject.{AbstractModule, Provides, Scopes, Singleton}
 import com.hortonworks.dataplane.db.Webserice.{
   ClusterComponentService,
   ClusterHostsService,
@@ -13,6 +13,7 @@ import com.hortonworks.dataplane.db.Webserice.{
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.http.Webserver
 import com.hortonworks.dataplane.http.routes.{AtlasRoute, StatusRoute}
+import com.sun.jersey.api.client.filter.ClientFilter
 import com.typesafe.config.{Config, ConfigFactory}
 import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcWSClient
@@ -43,6 +44,7 @@ object AppModule extends AbstractModule {
   @Singleton
   def provideLakeService(implicit ws: WSClient,
                          configuration: Config): LakeService = {
+
     new LakeServiceImpl(configuration)
   }
 
@@ -109,7 +111,14 @@ object AppModule extends AbstractModule {
       actorSystem,
       materializer,
       configuration,
-      atlasRoute.hiveAttributes ~ atlasRoute.hiveTables ~ atlasRoute.atlasEntities ~ atlasRoute.atlasEntity ~ statusRoute.route ~ statusRoute.sync)
+      atlasRoute.hiveAttributes ~
+        atlasRoute.hiveTables ~
+        atlasRoute.atlasEntities ~
+        atlasRoute.atlasEntity ~
+        statusRoute.route ~
+        statusRoute.sync ~
+        statusRoute.health
+    )
   }
 
   @Provides
@@ -135,5 +144,6 @@ object AppModule extends AbstractModule {
                          wSClient: WSClient): ClusterSync = {
     new ClusterSync(actorSystem, config, clusterInterface, wSClient)
   }
+
 
 }

@@ -17,7 +17,9 @@ class AmbariService @Inject()(private val wSClient: WSClient,private val configu
 
   import com.hortonworks.dataplane.commons.domain.Ambari._
 
-  private val clusterService = configuration.underlying.getString("dp.services.cluster.service.uri")
+  private def clusterService =
+    Option(System.getProperty("dp.services.cluster.service.uri"))
+      .getOrElse(configuration.underlying.getString("dp.services.cluster.service.uri"))
 
   def statusCheck(ambariEndpoint: AmbariEndpoint):Future[Int] = {
      wSClient.url(s"$clusterService/ambari/status")

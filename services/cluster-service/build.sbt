@@ -9,7 +9,6 @@ enablePlugins(JavaAppPackaging)
 mainClass in Compile := Some("com.hortonworks.dataplane.cs.ClusterService")
 
 libraryDependencies ++= Seq(
-  "com.hortonworks.dataplane" %% "db-client" % "0.1",
   "com.google.inject" % "guice" % "4.1.0",
   "com.typesafe.play" % "play-ws_2.11" % "2.5.13",
   "com.typesafe.play" % "play-json_2.11" % "2.6.0-M3",
