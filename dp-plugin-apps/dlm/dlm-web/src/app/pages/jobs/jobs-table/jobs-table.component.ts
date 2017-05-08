@@ -38,7 +38,8 @@ export class JobsTableComponent implements OnInit {
       {prop: 'target', name: 'Destination', cellClass: 'text-cell', headerClass: 'text-header'},
       {
         ...this.iconColumn.cellSettings, width: 90, minWidth: 90, maxWidth: 90, prop: 'service',
-        cellTemplate: this.iconColumn.cellRef, name: 'Service', cellClass: 'text-cell', headerClass: 'text-header'
+        cellTemplate: this.iconColumn.cellRef, name: 'Service', cellClass: 'text-cell', headerClass: 'text-header',
+        sortable: true
       },
       {prop: 'path', cellClass: 'text-cell', headerClass: 'text-header'},
       {prop: 'policy', cellClass: 'text-cell', headerClass: 'text-header', minWidth: 120},
