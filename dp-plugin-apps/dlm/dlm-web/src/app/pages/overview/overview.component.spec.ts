@@ -21,6 +21,7 @@ import { CheckboxColumnComponent, ActionColumnComponent } from 'components';
 import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { TableFooterComponent } from 'common/table/table-footer/table-footer.component';
 import { CheckboxComponent } from 'common/checkbox/checkbox.component';
+import { NavbarService } from 'services/navbar.service';
 
 describe('OverviewComponent', () => {
   let component: OverviewComponent;
@@ -55,7 +56,8 @@ describe('OverviewComponent', () => {
         CheckboxComponent
       ],
       providers: [
-        {provide: Store, useClass: MockStore}
+        {provide: Store, useClass: MockStore},
+        NavbarService
       ]
     })
     .compileComponents();

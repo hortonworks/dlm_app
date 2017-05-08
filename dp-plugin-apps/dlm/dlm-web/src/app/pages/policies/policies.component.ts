@@ -1,18 +1,18 @@
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { Store } from '@ngrx/store';
 import { loadPolicies } from 'actions/policy.action';
 import { loadClusters } from 'actions/cluster.action';
 import { loadJobs } from 'actions/job.action';
-import { Policy } from '../../models/policy.model';
+import { Policy } from 'models/policy.model';
 import { DropdownItem } from 'components/dropdown/dropdown-item';
-import { getPolicyClusterJob, getAllPolicies } from '../../selectors/policy.selector';
+import { getPolicyClusterJob, getAllPolicies } from 'selectors/policy.selector';
 import { TranslateService } from '@ngx-translate/core';
 import { flatten, unique } from 'utils/array-util';
-import * as fromRoot from '../../reducers';
+import * as fromRoot from 'reducers/';
 
 export const ALL = 'all';
 
@@ -21,18 +21,18 @@ export const ALL = 'all';
   templateUrl: './policies.component.html',
   styleUrls: ['./policies.component.scss']
 })
-export class PoliciesComponent implements OnInit, AfterViewInit, OnDestroy {
+export class PoliciesComponent implements OnInit, OnDestroy {
   policies$: Observable<Policy[]>;
-  filterConditionUpdate$ = new Subject();
   filterSubscription: Subscription;
-  searchUpdate$ = new Subject();
   searchSubscripiton: Subscription;
   filteredPolicies$: Observable<Policy[]>;
   initialFilterValue = {
     tags: 'all',
     groups: 'all'
   };
+  filterConditionUpdate$ = new BehaviorSubject(this.initialFilterValue);
   initialSearchValue = '';
+  searchUpdate$ = new BehaviorSubject(this.initialSearchValue);
   tagItems: DropdownItem[] = [
     {label: this.t.instant('common.all'), name: ALL}
   ];
@@ -68,15 +68,6 @@ export class PoliciesComponent implements OnInit, AfterViewInit, OnDestroy {
       loadClusters,
       loadJobs
     ].map(action => this.store.dispatch(action()));
-  }
-
-  ngAfterViewInit() {
-    // ugly but pass tests
-    // see https://github.com/angular/angular/issues/6005 for more info
-    setTimeout(() => {
-      this.filterConditionUpdate$.next(this.initialFilterValue);
-      this.searchUpdate$.next(this.initialSearchValue);
-    });
   }
 
   ngOnDestroy() {

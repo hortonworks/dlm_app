@@ -22,6 +22,7 @@ import { IconColumnComponent } from '../../components/table-columns/icon-column/
 import { TableFilterComponent } from '../../common/table/table-filter/table-filter.component';
 import { TypeaheadModule } from 'ng2-bootstrap';
 import { JobsStatusFilterComponent } from './jobs-status-filter/jobs-status-filter.component';
+import { NavbarService } from 'services/navbar.service';
 
 describe('JobsComponent', () => {
   let component: JobsComponent;
@@ -49,7 +50,8 @@ describe('JobsComponent', () => {
         IconColumnComponent
       ],
       providers: [
-        {provide: Store, useClass: MockStore}
+        {provide: Store, useClass: MockStore},
+        NavbarService
       ]
     })
       .compileComponents();

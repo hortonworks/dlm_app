@@ -25,6 +25,7 @@ import { PairingService } from './services/pairing.service';
 import { JobService } from './services/job.service';
 import { SessionStorageService } from './services/session-storage.service';
 import { FormService } from 'services/form.service';
+import { NavbarService } from 'services/navbar.service';
 
 import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
@@ -165,6 +166,7 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     PairingService,
     SessionStorageService,
     FormService,
+    NavbarService,
     httpServiceProvider
   ]
 })

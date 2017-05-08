@@ -1,5 +1,5 @@
 export interface DoughnutChartData {
-  data: number|string[];
+  data: number[];
   labels: string[];
   options?: Object;
 };

@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
-import { Job } from '../../../models/job.model';
+import { Job } from 'models/job.model';
+import { JOB_STATUS } from 'constants/status.constant';
 
 @Component({
   selector: 'jobs-status-filter',
@@ -7,10 +8,10 @@ import { Job } from '../../../models/job.model';
   styleUrls: ['./jobs-status-filter.component.scss']
 })
 export class JobsStatusFilterComponent implements OnInit, OnChanges {
-
-  failedJobMock = {status: 'FAILED'};
-  inProgressJobMock = {status: 'IN_PROGRESS'};
-  warningsJobMock = {status: 'WARNINGS'};
+  JOB_STATUS = JOB_STATUS;
+  failedJobMock = {status: JOB_STATUS.FAILED};
+  inProgressJobMock = {status: JOB_STATUS.IN_PROGRESS};
+  warningsJobMock = {status: JOB_STATUS.WARNINGS};
   groupedByStatusJobs: { [id: string]: Job[] } = {};
 
   @Input() jobs: Job[] = [];
@@ -25,11 +26,12 @@ export class JobsStatusFilterComponent implements OnInit, OnChanges {
   }
 
   groupByStatus() {
+    const { SUCCESS, FAILED, IN_PROGRESS, WARNINGS } = JOB_STATUS;
     this.groupedByStatusJobs = {
-      SUCCESS: [],
-      FAILED: [],
-      IN_PROGRESS: [],
-      WARNINGS: []
+      [SUCCESS]: [],
+      [FAILED]: [],
+      [IN_PROGRESS]: [],
+      [WARNINGS]: []
     };
     this.jobs.forEach(job => {
       if (this.groupedByStatusJobs[job.status]) {
