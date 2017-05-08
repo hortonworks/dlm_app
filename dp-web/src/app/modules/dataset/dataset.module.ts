@@ -12,14 +12,20 @@ import {DsTileProxy} from "./views/dashboard/ds-nav-result-viewer/tile-proxy/til
 import {DsFullView} from "./views/ds-full-view/ds-full-view.component";
 import {DsAssetList} from "./views/ds-assets-list/ds-assets-list.component";
 import {DsAssetsService} from "./services/dsAssetsService";
+
 import {DsRowProxy} from "./views/dashboard/ds-nav-result-viewer/row-proxy/row-proxy.component";
 
+import {DsEditor} from "./views/ds-editor/ds-editor.component";
+import {DsInfoHolder} from "./views/ds-editor/ds-info-holder/ds-info-holder.component";
+import {DsAssetsHolder} from "./views/ds-editor/ds-assets-holder/ds-assets-holder.component";
+
 import {PaginationComponent} from "../../widgets/pagination/pagination.component";
+import {DsSummaryHolder} from "./views/ds-editor/ds-summary-holder/ds-summary-holder.component";
 
 @NgModule({
   imports: [
     CommonModule,
-
+    FormsModule,
     RouterModule.forChild(routes),
   ],
   declarations: [
@@ -27,6 +33,10 @@ import {PaginationComponent} from "../../widgets/pagination/pagination.component
       DsNavResultViewer,
       DsTileProxy,
       DsFullView,
+      DsEditor,
+      DsInfoHolder,
+      DsAssetsHolder,
+      DsSummaryHolder,
       DsAssetList,
       DsRowProxy,
       DatasetDashboardComponent,

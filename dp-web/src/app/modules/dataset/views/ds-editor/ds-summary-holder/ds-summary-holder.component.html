@@ -1,0 +1,33 @@
+<div class="dsSummaryHolder">
+  <div class="title">Summary</div>
+  <br/><br/>
+  <span><b>Name</b>:</span>&nbsp;<span>{{dsModel.name}}</span>
+  <br/><br/>
+  <span><b>Description</b>:</span>&nbsp;<span>{{dsModel.description}}</span>
+  <br/><br/>
+  <span><b>Datalake</b>:</span>&nbsp;<span>{{dsModel.datalakeName}}</span>
+  <br/><br/>
+  <span><b>Tags</b>:</span>&nbsp;<span></span>
+  <br/><br/>
+  <span><b>Assets</b>:</span>
+  <br/>
+
+  <div class="tabCont">
+    <div class="tab active">
+      <div class="tabName">Total</div>
+      <div class="tabCount">{{dsModel.hiveCount + dsModel.filesCount}}</div>
+    </div>
+    <div class="tab">
+      <div class="tabName">Hive</div>
+      <div class="tabCount">{{dsModel.hiveCount}}</div>
+    </div>
+    <div class="tab">
+      <div class="tabName">Files</div>
+      <div class="tabCount">{{dsModel.filesCount}}</div>
+    </div>
+    <div style="clear: both;"></div>
+  </div>
+  <br/>
+
+
+</div>

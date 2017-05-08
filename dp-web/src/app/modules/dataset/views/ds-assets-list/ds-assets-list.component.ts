@@ -1,9 +1,10 @@
-import {Component, ElementRef, Input, OnInit, SimpleChange, ViewChild} from "@angular/core";
+import {Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChange, ViewChild} from "@angular/core";
 import {RichDatasetModel} from "../../models/richDatasetModel";
 import {DsAssetsService} from "../../services/dsAssetsService";
 import {DsAssetModel} from "../../models/dsAssetModel";
 
 export enum Tab { ALL, HIVE, HDFS}
+export enum AssetListActionsEnum {EDIT, REMOVE, ADD}
 
 @Component({
   selector: 'ds-assets-list',
@@ -13,7 +14,11 @@ export enum Tab { ALL, HIVE, HDFS}
 export class DsAssetList implements OnInit {
 
   @Input() dsModel : RichDatasetModel;
+  @Input() applicableActions : AssetListActionsEnum[];
   @ViewChild('table') table: ElementRef;
+
+  @Output('onAction')
+  actionEmitter: EventEmitter<AssetListActionsEnum> = new EventEmitter<AssetListActionsEnum>();
 
   public pageSize : number = 8;
   private currentPageNo : number = 1;
@@ -23,12 +28,18 @@ export class DsAssetList implements OnInit {
   public searchText:string = "";
   public tab = Tab;
   public activeTab: Tab = Tab.ALL;
+  public actionEnum = AssetListActionsEnum;
   constructor(
     private dsAssetsService :DsAssetsService,
   ){}
   ngOnInit () {}
   ngOnChanges(changes: {[propertyName: string]: SimpleChange}) { changes['dsModel'] && this.dsModel && this.fetchAssets()}
+  setFirstPage () {
+    this.currentPageNo = 1;
+  }
   fetchAssets () {
+    console.log("fetchAssets called for dataset with id", this.dsModel.id);
+    if(!this.dsModel.id) return;
     this.dsAssets.length >= this.pageSize && this.setTableHeight();
     this.dsAssets = [];
     var source:string = this.getAssetSourceAsString ();
@@ -49,4 +60,7 @@ export class DsAssetList implements OnInit {
   }
   showPrevious(){(this.currentPageNo != 1) && --this.currentPageNo && this.fetchAssets()}
   showNext() {this.currentPageNo < Math.ceil(this.assetsCount/this.pageSize) && ++this.currentPageNo && this.fetchAssets()}
+  actionAddMore () {console.log("add-more called")}
+  actionRemove () {console.log("remove called")}
+  actionEdit () {this.actionEmitter.emit(this.actionEnum.EDIT);}
 }

@@ -1,6 +1,7 @@
 .tabCont {
   border-left:1px solid rgb(208,211,215);
   border-radius: 3px;
+  height:56px;
   color:rgb(103,105,102);
 }
 
@@ -27,6 +28,10 @@
 
 .tabCont .tab .tabCount {
   font-weight: bold;
+}
+
+.tabCont .actionButtonCont {
+  float: right;
 }
 
 .listCont {

@@ -11,9 +11,12 @@ export class DsAssetsService {
   }
 
   public count(dsId:number, searchText:string, source:string) : Observable<number> {
-    return Observable.create(observer => {
-      setTimeout(()=>observer.next(data.filter(obj=>(source=='all')?true:obj.source==source).filter(obj=>obj.name.toLowerCase().indexOf(searchText.toLowerCase()) != -1).length), 200);
-    });
+    return Observable.create(observer => {setTimeout(()=>observer.next(
+        data
+          .filter(obj=>(source=='all')?true:obj.source==source)
+          .filter(obj=>obj.name.toLowerCase().indexOf(searchText.toLowerCase()) != -1)
+          .length
+    ), 200);});
   }
 
   public list(dsId:number, searchText:string, source:string, pageNo:number, pageSize:number): Observable<DsAssetModel[]> {

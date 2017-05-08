@@ -1,0 +1,11 @@
+$color_text_blue: rgb(102,164,200);
+$color_text_gray: rgb(103,115,120);
+$color_green: rgb(96,170,90);
+$font_size_title: 22px;
+
+.dsAssetsHolder {
+ color: $color_text_gray;
+}
+.dsAssetsHolder .title {
+  font-size: $font_size_title;
+}

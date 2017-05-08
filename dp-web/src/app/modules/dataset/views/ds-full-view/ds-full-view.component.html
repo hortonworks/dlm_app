@@ -13,6 +13,6 @@
   <div class="div50Percent">
   </div>
   <div style="clear: both;"></div>
-  <ds-assets-list [dsModel]="dsModel"></ds-assets-list>
+  <ds-assets-list [dsModel]="dsModel" [applicableActions]="applicableListActions" (onAction)="onEdit($event)"></ds-assets-list>
 
 </div>

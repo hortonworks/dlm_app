@@ -1,0 +1,31 @@
+<div class="borderBox">
+  <div class="nav_trail">
+    <i class="fa fa-arrow-circle-left" aria-hidden="true"></i>
+    <span class="textBlue">Dataset</span>
+    <i class="fa fa-angle-right" aria-hidden="true"></i>
+    <span>Add</span>
+  </div>
+  <div class="ds-description-head">
+    <div class="title">{{dsModel.name || "Untitled"}}</div>
+    <p class="description">{{dsModel.description || "Dataset description."}}</p>
+  </div>
+  <div class="ds-editor-cont">
+    <div class="nav-panel" [attr.stage]="currentStage">
+      <div class="nav-stage stage_1" [class.done]="1 < currentStage"><div class="circle">1</div><i class="fa fa-check-circle"></i><span>Information</span><div class="triangle"></div></div>
+      <div class="nav-stage stage_2" [class.done]="2 < currentStage"><div class="circle">2</div><i class="fa fa-check-circle"></i><span>Assets</span><div class="triangle"></div></div>
+      <div class="nav-stage stage_3" [class.done]="3 < currentStage"><div class="circle">3</div><i class="fa fa-check-circle"></i><span>Summary</span><div class="triangle"></div></div>
+      <div style="clear:both;"></div>
+    </div>
+    <div class="nav-result-panel">
+      <ds-info-holder  *ngIf="currentStage == 1" [dsModel]="dsModel"></ds-info-holder>
+      <ds-assets-holder  *ngIf="currentStage == 2" [dsModel]="dsModel"></ds-assets-holder>
+      <ds-summary-holder  *ngIf="currentStage == 3" [dsModel]="dsModel"></ds-summary-holder>
+      <div class="navButtons">
+        <div *ngIf="nextIsVisible" class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionNext()">Next</div>
+        <div *ngIf="currentStage == 3" class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionSave()">Save</div>
+        <div *ngIf="currentStage == 3" class="mdl-color--blue mdl-color-text--white mdl-button" (click)="actionCancle()">Cancle</div>
+      </div>
+    </div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
