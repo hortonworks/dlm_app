@@ -46,8 +46,20 @@ init_app() {
 
 init_knox() {
     echo "Enter Knox master password: "
-    read MASTER_PASSWD
-    MASTER_PASSWORD=${MASTER_PASSWD} docker-compose -f docker-compose-knox.yml up -d
+    read -s MASTER_PASSWD
+    echo "Reenter password: "
+    read -s MASTER_PASSWD_VERIFY
+    if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
+    then
+       echo "Password did not match. Reenter password:"
+       read -s MASTER_PASSWD_VERIFY
+       if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
+       then
+        echo "Password did not match"
+        return 1
+       fi
+    fi
+	MASTER_PASSWORD=${MASTER_PASSWD} docker-compose -f docker-compose-knox.yml up -d
     KNOX_CONTAINER_ID=$(get_knox_container_id)
     if [ -z ${KNOX_CONTAINER_ID} ]; then
         echo "Knox container not found. Ensure it is running..."
@@ -56,6 +68,7 @@ init_knox() {
     docker exec -it ${KNOX_CONTAINER_ID} ./wait_for_keystore_file.sh
     mkdir -p ${CERTS_DIR}
     export_knox_cert $MASTER_PASSWD $KNOX_CONTAINER_ID > ${CERTS_DIR}/knox-signing.pem
+	echo "Knox Initialized"
 }
 
 export_knox_cert() {
@@ -87,22 +100,23 @@ stop_knox() {
 }
 
 usage() {
-    echo "Usage: dpdeploy.sh <command> \\n \
-            Commands: init [db|knox|app] | migrate | ps | logs [db|all] | start | stop [knox] | destroy [knox]\\n \
-            init db: Initialize postgres DB for first time\\n \
-            init knox: Initialize the Knox container\\n \
-            init app: Start the application docker containers for the first time \\n \
-            migrate: Run schema migrations on the DB \\n \
-            start knox: Start the application docker containers \\n \
-            stop: Stop the application docker containers \\n \
-            stop knox: Stop the Knox docker container \\n \
-            ps: List the status of the docker containers \\n \
-            logs: List logs of the docker containers \\n \
-                  No options: app containers, db: all DB containers, all: all containers. \\n \
-                  All \"docker-compose logs\" options are supported. \\n \
-            destroy: Kill all containers and remove them. Needs to start from init db again. \\n \
-            destroy knox: Kill Knox container and remove it. Needs to start from init knox again.
-            "
+    local tabspace=20
+    echo "Usage: dpdeploy.sh <command>"
+    printf "%-${tabspace}s:%s\n" "Commands" "init [db|knox|app] | migrate | ps | logs [db|all] | start | stop [knox] | destroy [knox]"
+    printf "%-${tabspace}s:%s\n" "init db" "Initialize postgres DB for first time"
+    printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox container"
+    printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
+    printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
+    printf "%-${tabspace}s:%s\n" "start knox" "Start the  docker container for knox"
+    printf "%-${tabspace}s:%s\n" "stop" "Stop the application docker containers"
+    printf "%-${tabspace}s:%s\n" "stop knox" "Stop the Knox docker container"
+    printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
+    local logman='List of the docker containers
+        No options: app containers, db: all DB containers, all: all containers.
+        All \"docker-compose logs\" options are supported'
+    printf "%-${tabspace}s:%s\n" "logs" "$logman"
+    printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them. Needs to start from init db again"
+    printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox container and remove it. Needs to start from init knox again"
 }
 
 if [ $# -lt 1 ]
