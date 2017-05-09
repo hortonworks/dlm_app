@@ -56,7 +56,8 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
           val orElse = getRoles(rolesOp)
          Ok(Json.obj( "id" -> user.username,
            "avatar" -> user.avatar,
-           "display" -> user.displayname)
+           "display" -> user.displayname,
+           "token" -> Jwt.makeJWT(user))
          )
       }
     }
