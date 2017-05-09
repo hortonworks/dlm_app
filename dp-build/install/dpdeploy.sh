@@ -51,17 +51,24 @@ init_knox() {
     read -s MASTER_PASSWD_VERIFY
     if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
     then
+       echo "Password did not match. Reenter password:"
+       read -s MASTER_PASSWD_VERIFY
+       if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
+       then
         echo "Password did not match"
-        echo "Reenter password: "
-        read -s MASTER_PASSWD_VERIFY
-        if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
-        then
-          return 1
-        fi
+        return 1
+       fi
+    fi
+	MASTER_PASSWORD=${MASTER_PASSWD} docker-compose -f docker-compose-knox.yml up -d
+    KNOX_CONTAINER_ID=$(get_knox_container_id)
+    if [ -z ${KNOX_CONTAINER_ID} ]; then
+        echo "Knox container not found. Ensure it is running..."
+        return -1
     fi
     docker exec -it ${KNOX_CONTAINER_ID} ./wait_for_keystore_file.sh
     mkdir -p ${CERTS_DIR}
     export_knox_cert $MASTER_PASSWD $KNOX_CONTAINER_ID > ${CERTS_DIR}/knox-signing.pem
+	echo "Knox Initialized"
 }
 
 export_knox_cert() {
