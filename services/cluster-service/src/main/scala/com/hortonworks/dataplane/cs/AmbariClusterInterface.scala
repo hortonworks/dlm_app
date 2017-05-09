@@ -277,7 +277,7 @@ class AmbariClusterInterface(
           res.json
             .validate[JsValue]
             .map { js =>
-              Right(KnoxInfo(Some(js)))
+              Right(KnoxInfo(None))
             }
             .getOrElse(Left(new Exception("Could not load Knox properties"))))
       .recoverWith {
