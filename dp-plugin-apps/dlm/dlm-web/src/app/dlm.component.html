@@ -1,7 +1,15 @@
 <div class="dlm-content container-fluid" id="dlm_content">
   <navbar [menuItems]="menuItems" [header]="header" [mainContentSelector]="mainContentSelector" [fitHeight]="fitHeight"></navbar>
   <header class="row">
-    <breadcrumb></breadcrumb>
+      <div class="navbar-header navbar-nav">
+        <breadcrumb></breadcrumb>
+      </div>
+      <div class="user navbar-footer navbar-nav navbar-right">
+        <span class="glyphicon glyphicon-user"></span>
+      </div>
+      <div class="notifications navbar-nav navbar-right">
+        <notifications [events]="events$ | async" [newEventsCount]="newEventsCount$ | async"></notifications>
+      </div>
   </header>
   <router-outlet style=""></router-outlet>
 </div>

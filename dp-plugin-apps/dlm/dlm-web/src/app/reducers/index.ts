@@ -11,6 +11,7 @@ import * as fromPolicy from './policy.reducer';
 import * as fromPairing from './pairing.reducer';
 import * as fromJob from './job.reducer';
 import * as fromForm from './form.reducer';
+import * as fromEvent from './event.reducer';
 
 export interface State {
   router: RouterState;
@@ -19,6 +20,7 @@ export interface State {
   pairings: fromPairing.State;
   jobs: fromJob.State;
   forms: fromForm.State;
+  events: fromEvent.State;
 }
 
 const reducers = {
@@ -27,7 +29,8 @@ const reducers = {
   policies: fromPolicy.reducer,
   pairings: fromPairing.reducer,
   jobs: fromJob.reducer,
-  forms: fromForm.reducer
+  forms: fromForm.reducer,
+  events: fromEvent.reducer
 };
 
 const devReducer: ActionReducer<State> = compose(storeLogger(), combineReducers)(reducers);

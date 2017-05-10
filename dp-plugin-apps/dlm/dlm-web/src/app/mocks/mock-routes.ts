@@ -25,5 +25,9 @@ export const routes: MockRoute[] = [
 
   // Jobs
   new MockRoute('jobs', 'jobs.json'),
-  new MockRoute('jobs/:id', 'job.json')
+  new MockRoute('jobs/:id', 'job.json'),
+
+  // Events
+  new MockRoute('events', 'events.json'),
+  new MockRoute('new_events', 'new_events.json')
 ];

@@ -1,0 +1,33 @@
+<span class="notifications-group pull-right">
+  <span class="alerts-label dropdown-toggle" data-toggle="dropdown">
+    <span class="glyphicon glyphicon-bell" style="color: #999;"></span>
+    <span class="numberCircle alert-crit-count">{{ newEventsCount }}</span>
+  </span>
+  <div id="notifications-dropdown" class="dropdown-menu row">
+    <div class="popup-arrow-up"></div>
+    <div class="notifications-header col-sm-12">
+      <div class="notifications-title">Notifications</div>
+    </div>
+    <div class="notifications-body col-sm-12">
+      <table class="alerts-table table table-hover">
+        <tbody>
+          <tr *ngFor="let event of events">
+            <td *ngIf="event.state !== ''" class="status">
+              <span [ngClass]="{'fa': true, 'fa-circle': true, 'alert-state-CRITICAL': event.state === 'critical', 'alert-state-WARNING': event.state === 'warning'}">
+              </span>
+            </td>
+            <td class="content">
+              <div class="name">{{ event.event }}</div>
+              <div class="description">{{ event.message }}</div>
+              <div class="timestamp">{{ event.timestamp | amTimeAgo }}</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="notifications-footer col-sm-12">
+      <button type="button" class="btn btn-primary pull-right">View All</button>
+    </div>
+  </div>
+</span>
+

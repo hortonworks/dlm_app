@@ -16,6 +16,7 @@ import { routes } from './routes/routes.config';
 import { PolicyEffects } from './effects/policy.effect';
 import { PairingEffects } from './effects/pairing.effect';
 import { JobEffects } from './effects/job.effect';
+import { EventEffects } from './effects/event.effect';
 
 import { FormEffects } from './effects/form.effect';
 
@@ -26,6 +27,7 @@ import { JobService } from './services/job.service';
 import { SessionStorageService } from './services/session-storage.service';
 import { FormService } from 'services/form.service';
 import { NavbarService } from 'services/navbar.service';
+import { EventService } from 'services/event.service';
 
 import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
@@ -36,6 +38,7 @@ import { PoliciesComponent } from './pages/policies/policies.component';
 import { JobsComponent } from './pages/jobs/jobs.component';
 import { HelpComponent } from './pages/help/help.component';
 import { NavbarComponent } from './common/navbar/navbar.component';
+import { NotificationsComponent } from './common/notifications/notifications.component';
 import { ModalDialogComponent } from './common/modal-dialog/modal-dialog.component';
 import { httpServiceProvider } from './services/http.service';
 import { CommonComponentsModule } from './components/common-components.module';
@@ -97,6 +100,7 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     EffectsModule.run(PairingEffects),
     EffectsModule.run(JobEffects),
     EffectsModule.run(FormEffects),
+    EffectsModule.run(EventEffects),
     CollapseModule.forRoot(),
     TabsModule.forRoot(),
     ModalModule.forRoot(),
@@ -156,6 +160,7 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     CheckboxColumnComponent,
     ActionColumnComponent,
     ModalDialogComponent,
+    NotificationsComponent,
     BytesSizePipe
   ],
   bootstrap: [DlmComponent],
@@ -167,6 +172,7 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     SessionStorageService,
     FormService,
     NavbarService,
+    EventService,
     httpServiceProvider
   ]
 })

@@ -1,0 +1,25 @@
+.alerts-label {
+  cursor: pointer;
+  margin: 0 15px 0 5px;
+  .numberCircle {
+    border-radius: 50%;
+    min-width: 20px;
+    height: 20px;
+    padding: 4px 4px;
+    color: #ffffff;
+    background-color: #ef6162;
+    text-align: center;
+    font-size: 12px;
+    display: inline-block;
+    position: relative;
+    line-height: 12px;
+    top: -5px;
+  }
+}
+
+#notifications-dropdown {
+  &.dropdown-menu {
+    top: 125%;
+    right: -25px;
+  }
+}
