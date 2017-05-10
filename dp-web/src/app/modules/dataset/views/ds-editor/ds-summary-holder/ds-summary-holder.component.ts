@@ -10,6 +10,7 @@ import {RichDatasetModel} from "../../../models/richDatasetModel";
 export class DsSummaryHolder implements OnInit {
 
   @Input() dsModel: RichDatasetModel;
+  @Input() tags:string[] = [];
 
   constructor () {}
   ngOnInit() {}

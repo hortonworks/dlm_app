@@ -13,7 +13,7 @@ import {DsTagsService} from "../../../services/dsTagsService";
 export class DsInfoHolder implements OnInit {
 
   @Input() dsModel: RichDatasetModel;
-  tags:string[] = ['tag1', 'tag2'];
+  @Input() tags:string[] = [];
   availableTags = [];
   private lakes:Lake[];
 
@@ -31,10 +31,9 @@ export class DsInfoHolder implements OnInit {
     this.tags.push(text);
   }
 
-  ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
-    if (changes['dsModel'] && this.dsModel) {
-      this.tagService.listDatasetTags(this.dsModel.id).subscribe(tags=> this.tags=tags);
-    }
-  }
+  // ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
+  //   if (changes['dsModel'] && this.dsModel) {
+  //   }
+  // }
 
 }

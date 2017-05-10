@@ -82,7 +82,7 @@ export class TaggingWidget {
     this.parent.nativeElement.classList.add('focus')
   }
   onInputBlur(){
-    (function(thisObj){setTimeout(function(){thisObj.parent.nativeElement.classList.remove('focus')}, 10)})(this);
+    (function(thisObj){setTimeout(function(){thisObj.parent.nativeElement.classList.remove('focus')}, 300)})(this);
     // this.parent.nativeElement.classList.remove('focus')
   }
   focusOnSticker(i) {

@@ -21,8 +21,11 @@ export class DsAssetsHolder implements OnInit {
   constructor () {}
   ngOnInit() {}
   actionDone () {
-    this.dsModel.hiveCount = 14
-    this.dsModel.filesCount = 16
+    this.dsModel.hiveCount = 14;
+    this.dsModel.filesCount = 16;
     this.actionEmitter.emit()
+  }
+  actionCancel() {
+    this.showPopup = false;
   }
 }

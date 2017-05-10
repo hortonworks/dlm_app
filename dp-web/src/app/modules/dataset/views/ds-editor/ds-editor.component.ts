@@ -2,6 +2,7 @@ import {Component, OnInit} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import {RichDatasetModel} from "../../models/richDatasetModel";
 import {RichDatasetService} from "../../services/RichDatasetService";
+import {DsTagsService} from "../../services/dsTagsService";
 
 @Component({
   selector: 'ds-editor',
@@ -14,9 +15,12 @@ export class DsEditor implements OnInit {
   public currentStage:number = 1;
   private datasetId:number = null;
   public nextIsVisible:boolean = true;
+  public tags:string[] = [];
+
   constructor(
     public dsModel: RichDatasetModel,
     private richDatasetService :RichDatasetService,
+    private tagService: DsTagsService,
     private router: Router,
     private activeRoute: ActivatedRoute
   ){}
@@ -25,7 +29,10 @@ export class DsEditor implements OnInit {
     this.activeRoute.params.subscribe(params => {this.datasetId = +params['id'];});
     if(isNaN(this.datasetId))this.router.navigate(['dataset/add']);
     else
-      this.richDatasetService.getById(this.datasetId).subscribe(dsModel => this.dsModel=dsModel);
+      this.richDatasetService.getById(this.datasetId).subscribe(dsModel => {
+        this.dsModel = dsModel
+        this.tagService.listDatasetTags(this.dsModel.id).subscribe(tags=> this.tags=tags);
+      });
   }
   setVisibilityOfNext() {
     this.nextIsVisible = (this.currentStage == 1 || this.currentStage == 2  && this.dsModel.id != undefined);
@@ -35,6 +42,6 @@ export class DsEditor implements OnInit {
     this.setVisibilityOfNext()
   }
   actionSave(){console.log("ds editor save clicked")}
-  actionCancle(){this.router.navigate(['dataset']);}
+  actionCancel(){this.router.navigate(['dataset']);}
 
 }

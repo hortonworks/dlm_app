@@ -14,4 +14,9 @@
   <div class="queryResultCont">
     <ds-assets-list [hideTabs]="true" [hideSearch]="true" [searchText]="assetName" [typeFilter]="queryObj.type"></ds-assets-list>
   </div>
+  <div class="actionButtonCont">
+    <div class="mdl-color--blue mdl-color-text--white mdl-button" (click)="actionCancel()">Cancel</div>
+    <div class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionDone()">Done</div>
+    <div style="clear: both"></div>
+  </div>
 </div>

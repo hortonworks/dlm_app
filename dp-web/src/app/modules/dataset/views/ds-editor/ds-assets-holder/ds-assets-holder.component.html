@@ -8,7 +8,6 @@
 </div>
 <div *ngIf="showPopup" class="popup borderBox">
   <div class="opaque">
-    <div class="mdl-color--green mdl-color-text--white mdl-button doneButton" (click)="actionDone()">Done</div>
-    <asset-search></asset-search>
+    <asset-search (doneNotification)="actionDone()" (cancelNotification)="actionCancel()"></asset-search>
   </div>
 </div>

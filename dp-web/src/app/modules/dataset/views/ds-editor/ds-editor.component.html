@@ -17,13 +17,13 @@
       <div style="clear:both;"></div>
     </div>
     <div class="nav-result-panel">
-      <ds-info-holder  *ngIf="currentStage == 1" [dsModel]="dsModel"></ds-info-holder>
-      <ds-assets-holder  *ngIf="currentStage == 2" [dsModel]="dsModel" (onDoneAction)="currentStage=currentStage+1"></ds-assets-holder>
-      <ds-summary-holder  *ngIf="currentStage == 3" [dsModel]="dsModel"></ds-summary-holder>
+      <ds-info-holder  *ngIf="currentStage == 1" [dsModel]="dsModel" [tags]="tags"></ds-info-holder>
+      <ds-assets-holder  *ngIf="currentStage == 2" [dsModel]="dsModel" (onDoneAction)="actionNext()"></ds-assets-holder>
+      <ds-summary-holder  *ngIf="currentStage == 3" [dsModel]="dsModel"  [tags]="tags"></ds-summary-holder>
       <div class="navButtons">
         <div *ngIf="nextIsVisible" class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionNext()">Next</div>
         <div *ngIf="currentStage == 3" class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionSave()">Save</div>
-        <div *ngIf="currentStage == 3" class="mdl-color--blue mdl-color-text--white mdl-button" (click)="actionCancle()">Cancle</div>
+        <div *ngIf="currentStage == 3" class="mdl-color--blue mdl-color-text--white mdl-button" (click)="actionCancel()">Cancel</div>
       </div>
     </div>
     <div style="clear:both;"></div>
