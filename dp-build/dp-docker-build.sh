@@ -59,14 +59,14 @@ push_one_image() {
 }
 
 usage() {
-    echo "Usage: dp-docker-build.sh <command> \\n \
-            Commands: build [knox] | push all|<image-name> [tag] \\n \
-            build: Create images of Dataplane specific containers \\n \
-            build knox: Create Knox image for Dataplane \\n \
-            push: Push images to Hortonworks docker-hub account. Needs login to happen separately. \\n \
-                    all [tag]: Pushes all images with an optionally specified tag. \\n \
-                    <image-name> [tag]: Pushes a specific image with an optionally specified tag.
-            "
+    local tabspace=20
+    echo "Usage: dp-docker-build.sh <command>"
+    printf "%-${tabspace}s:%s\n" "Commands" "build [knox] | push all|<image-name> [tag]"
+    printf "%-${tabspace}s:%s\n" "build" "Create images of Dataplane specific containers"
+    printf "%-${tabspace}s:%s\n" "build knox" "Create Knox image for Dataplane"
+    printf "%-${tabspace}s:%s\n" "push" "Push images to Hortonworks docker-hub account. Needs login to happen separately.
+        all [tag]: Pushes all images with an optionally specified tag
+        <image-name> [tag]: Pushes a specific image with an optionally specified tag"
 }
 
 if [ $# -lt 1 ]
