@@ -82,7 +82,7 @@ class AmbariClusterInterface(
         val json = res.json
         val configurations = json \ "items" \\ "configurations"
         val configs: JsValue = configurations.head
-        Right(Atlas(Json.stringify(configs)))
+        Right(Atlas(Json.stringify(Json.obj("stats" -> Json.obj(), "properties" -> configs))))
       }
       .recoverWith {
         case e: Exception =>
@@ -255,7 +255,7 @@ class AmbariClusterInterface(
       val configs =
         (items(0) \ "configurations").as[JsArray]
 
-      HiveServer(hosts.map(ServiceHost), Some(configs))
+      HiveServer(hosts.map(ServiceHost), Some(Json.obj("stats" -> Json.obj(), "properties" -> configs)))
     }
 
     hiveInfo.map(Right(_)).recoverWith {
@@ -277,7 +277,7 @@ class AmbariClusterInterface(
           res.json
             .validate[JsValue]
             .map { js =>
-              Right(KnoxInfo(Some(js)))
+              Right(KnoxInfo(None))
             }
             .getOrElse(Left(new Exception("Could not load Knox properties"))))
       .recoverWith {
@@ -321,7 +321,9 @@ class AmbariClusterInterface(
         host.get
       }
 
-      BeaconInfo(Some(items), hosts.map(ServiceHost))
+      BeaconInfo(
+        Some(Json.obj("stats" -> Json.obj(), "properties" -> configs)),
+        hosts.map(ServiceHost))
     }
 
     beaconInfo.map(Right(_)).recoverWith {
@@ -346,7 +348,7 @@ class AmbariClusterInterface(
       val configs =
         (items(0) \ "configurations").as[JsArray]
 
-      Hdfs(Seq(), Some(configs))
+      Hdfs(Seq(), Some(Json.obj("stats" -> Json.obj(), "properties" -> configs)))
     }
 
     hdfsInfo.map(Right(_)).recoverWith {

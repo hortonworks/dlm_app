@@ -60,7 +60,8 @@
           "status": {
             "in_progress": "is in progress",
             "failed": "failed",
-            "warning": "completed with warnings"
+            "warning": "completed with warnings",
+            "success": "completed"
           }
         }
       }

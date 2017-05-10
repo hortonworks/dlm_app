@@ -133,7 +133,7 @@ sealed class AtlasApiSupplier(clusterId: Long,
 
   def getAtlasUrlFromConfig(service: CS): Future[URL] = Future.successful {
 
-    val configsAsList = service.properties.get.as[List[JsObject]]
+    val configsAsList = (service.properties.get \ "properties").as[List[JsObject]]
     val atlasConfig = configsAsList.find(obj =>
       (obj \ "type").as[String] == "application-properties")
     if (atlasConfig.isEmpty)

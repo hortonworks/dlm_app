@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 
 import * as fromRoot from 'reducers/';
 import { Job } from 'models/job.model';
+import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
 import { getAllJobs } from 'selectors/job.selector';
 import { getAllPolicies } from 'selectors/policy.selector';
 import { getAllClusters } from 'selectors/cluster.selector';
@@ -20,8 +21,8 @@ import { ResourceChartData } from './resource-charts/';
 export class OverviewComponent implements OnInit {
   private resourceStatusMap = {
     // TODO where to get statuses for clusters?
-    policies: ['SUBMITTED', 'WARNING', 'FAILED'],
-    jobs: ['In Progress', 'Warnings', 'Failed']
+    policies: [POLICY_STATUS.SUBMITTED, POLICY_STATUS.WARNING, POLICY_STATUS.FAILED],
+    jobs: [JOB_STATUS.IN_PROGRESS, JOB_STATUS.WARNINGS, JOB_STATUS.FAILED]
   };
   jobs$: Observable<Job[]>;
   resourceChartData$: Observable<ResourceChartData>;

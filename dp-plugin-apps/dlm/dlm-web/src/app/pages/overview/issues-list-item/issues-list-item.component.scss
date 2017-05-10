@@ -3,4 +3,16 @@
   border-bottom: 1px solid #eee;
   display: block;
   padding: 5px 15px 5px 0;
+
+  .issue-list-item-container {
+    display: flex;
+  }
+
+  .issue-status {
+    flex-basis: 30px;
+  }
+
+  .issue-info {
+    flex-grow: 1;
+  }
 }
