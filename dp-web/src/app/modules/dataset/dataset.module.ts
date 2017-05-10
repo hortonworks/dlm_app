@@ -21,6 +21,11 @@ import {DsAssetsHolder} from "./views/ds-editor/ds-assets-holder/ds-assets-holde
 
 import {PaginationComponent} from "../../widgets/pagination/pagination.component";
 import {DsSummaryHolder} from "./views/ds-editor/ds-summary-holder/ds-summary-holder.component";
+import {TaggingWidget} from "../../shared/tagging-widget/tagging-widget.component";
+import {DsTagsService} from "./services/dsTagsService";
+import {DsAssetSearch} from "./views/ds-asset-search/ds-assest-search.component";
+import {NormalQueryEditor} from "./views/ds-asset-search/queryEditors/normal/normal-query-editor.component";
+import {SearchWidget} from "./views/ds-asset-search/queryEditors/normal/search-widget/search-widget.component";
 
 @NgModule({
   imports: [
@@ -40,11 +45,16 @@ import {DsSummaryHolder} from "./views/ds-editor/ds-summary-holder/ds-summary-ho
       DsAssetList,
       DsRowProxy,
       DatasetDashboardComponent,
-      PaginationComponent
+      PaginationComponent,
+      TaggingWidget,
+      DsAssetSearch,
+      NormalQueryEditor,
+      SearchWidget
   ],
   providers: [
     RichDatasetService,
-    DsAssetsService
+    DsAssetsService,
+    DsTagsService
   ]
 })
 export class DatasetModule { }

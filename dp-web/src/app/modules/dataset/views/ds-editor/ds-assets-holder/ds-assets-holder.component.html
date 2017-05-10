@@ -3,6 +3,12 @@
   <br/>
   <div class="">Some text Babu would provide, probably which describes what are assets, how can one add them or remove them etc. Some text Babu would provide, probably which describes what are assets, how can one add them or remove them etc. Some text Babu would provide, probably which describes what are assets, how can one add them or remove them etc.</div>
   <br/>
-  <ds-assets-list *ngIf="dsModel.id" [dsModel]="dsModel" [applicableActions]="applicableListActions"></ds-assets-list>
-  <div *ngIf="!dsModel.id" class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionAddAssets()">Add Assets</div>
+  <ds-assets-list *ngIf="dsModel.id" [dsModel]="dsModel" [applicableActions]="applicableListActions" (onAction)="showPopup=!showPopup"></ds-assets-list>
+  <div *ngIf="!dsModel.id" class="mdl-color--green mdl-color-text--white mdl-button" (click)="showPopup=!showPopup">Add Assets</div>
+</div>
+<div *ngIf="showPopup" class="popup borderBox">
+  <div class="opaque">
+    <div class="mdl-color--green mdl-color-text--white mdl-button doneButton" (click)="actionDone()">Done</div>
+    <asset-search></asset-search>
+  </div>
 </div>

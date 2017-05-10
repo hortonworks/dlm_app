@@ -35,6 +35,6 @@ export class DsEditor implements OnInit {
     this.setVisibilityOfNext()
   }
   actionSave(){console.log("ds editor save clicked")}
-  actionCancle(){console.log("ds editor cancle clicked")}
+  actionCancle(){this.router.navigate(['dataset']);}
 
 }

@@ -18,7 +18,7 @@
     </div>
     <div class="nav-result-panel">
       <ds-info-holder  *ngIf="currentStage == 1" [dsModel]="dsModel"></ds-info-holder>
-      <ds-assets-holder  *ngIf="currentStage == 2" [dsModel]="dsModel"></ds-assets-holder>
+      <ds-assets-holder  *ngIf="currentStage == 2" [dsModel]="dsModel" (onDoneAction)="currentStage=currentStage+1"></ds-assets-holder>
       <ds-summary-holder  *ngIf="currentStage == 3" [dsModel]="dsModel"></ds-summary-holder>
       <div class="navButtons">
         <div *ngIf="nextIsVisible" class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionNext()">Next</div>
