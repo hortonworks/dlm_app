@@ -26,6 +26,9 @@ header {
   }
   .navbar-right {
     margin: 8px 15px;
+    &.user {
+      margin: 8px 40px 0 0;
+    }
   }
   .navbar-footer {
     margin-right: 40px;

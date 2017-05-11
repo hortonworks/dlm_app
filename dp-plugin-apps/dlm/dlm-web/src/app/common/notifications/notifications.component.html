@@ -13,7 +13,8 @@
         <tbody>
           <tr *ngFor="let event of events">
             <td *ngIf="event.state !== ''" class="status">
-              <span [ngClass]="{'fa': true, 'fa-circle': true, 'alert-state-CRITICAL': event.state === 'critical', 'alert-state-WARNING': event.state === 'warning'}">
+              <span [ngClass]="{'fa': true, 'fa-circle': true, 'alert-state-CRITICAL': event.eventStatus === 'critical',
+               'alert-state-WARNING': event.eventStatus === 'warning'}">
               </span>
             </td>
             <td class="content">

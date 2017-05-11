@@ -1,12 +1,12 @@
 import { Component, Input, HostBinding } from '@angular/core';
-import { Job } from 'models/job.model';
+import { Event } from 'models/event.model';
 
 @Component({
   selector: 'dlm-issues-list',
   template: `
-    <div class="row" *ngFor="let job of jobs | slice:0:visibleItems">
+    <div class="row" *ngFor="let event of events | slice:0:visibleItems">
       <div class="col-md-12">
-        <dlm-issues-list-item [job]="job">
+        <dlm-issues-list-item [event]="event">
         </dlm-issues-list-item>
       </div>
     </div>
@@ -22,15 +22,14 @@ import { Job } from 'models/job.model';
 })
 export class IssuesListComponent {
   visibleItems = 3;
-  @Input() jobs: Job[];
+  @Input() events: Event[];
   @HostBinding('class.all-visible') get isVisible() { return this.isAllVisible; };
 
   get isAllVisible(): boolean {
-    return this.jobs && this.visibleItems === this.jobs.length;
+    return this.events && this.visibleItems === this.events.length;
   }
 
-
   showAll() {
-    this.visibleItems = this.jobs.length;
+    this.visibleItems = this.events.length;
   }
 }
