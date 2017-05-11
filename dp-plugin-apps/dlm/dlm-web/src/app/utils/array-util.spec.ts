@@ -66,4 +66,35 @@ describe('ArrayUtil', () => {
 
   });
 
+  describe('#groupByKey', () => {
+
+    beforeEach(() => {
+      this.collection = [
+        {a: '1', b: '3'},
+        {a: '2', b: '2'},
+        {a: '1', b: '1'}
+      ];
+      this.groupedByA = {
+        '1': [{a: '1', b: '3'}, {a: '1', b: '1'}],
+        '2': [{a: '2', b: '2'}]
+      };
+      this.groupedByB = {
+        '1': [{a: '1', b: '1'}],
+        '2': [{a: '2', b: '2'}],
+        '3': [{a: '1', b: '3'}]
+      };
+    });
+
+    it('should group by `a`', () => {
+      const result = ArrayUtil.groupByKey(this.collection, 'a');
+      expect(result).toEqual(this.groupedByA);
+    });
+
+    it('should group by `b`', () => {
+      const result = ArrayUtil.groupByKey(this.collection, 'b');
+      expect(result).toEqual(this.groupedByB);
+    });
+
+  });
+
 });

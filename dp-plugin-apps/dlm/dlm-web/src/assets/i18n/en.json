@@ -9,7 +9,6 @@
     "duration": "Duration",
     "source": "Source",
     "destination": "Destination",
-    "status": "Status",
     "data": "Data",
     "time": {
       "hourly": "Hourly",
@@ -22,9 +21,13 @@
       "paging": "{{start}} - {{end}} of {{count}}"
     },
     "status": {
+      "self": "Status",
       "failed": "Failed",
       "in_progress": "In Progress"
     }
+  },
+  "topnav": {
+    "timezone": "Current Timezone"
   },
   "sidenav": {
     "menuItem": {

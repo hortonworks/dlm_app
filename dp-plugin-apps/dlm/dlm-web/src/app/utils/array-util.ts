@@ -22,3 +22,16 @@ export const filterCollection = (collection, filters) => {
     return true;
   });
 };
+
+export const groupByKey = (collection, keyName) => {
+  const group = {};
+  collection.forEach(item => {
+    const value = item[keyName];
+    if (group[value] == null) {
+      group[value] = [item];
+    } else {
+      group[value].push(item);
+    }
+  });
+  return group;
+};
