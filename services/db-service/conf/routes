@@ -54,6 +54,7 @@ PUT           /clusters/services                                             con
 GET           /clusters/:clusterId/services/:serviceId/endpoint              controllers.ClusterServices.getEndpoints(clusterId:Long,serviceId:Long)
 POST          /services/endpoints                                            controllers.ClusterServices.addServiceEndpoint
 GET           /services/:serviceId/endpoints                                 controllers.ClusterServices.getServiceEndpoints(serviceId:Long)
+GET           /services/endpoints/:serviceName                               controllers.ClusterServices.getAllServiceEndpoints(serviceName: String)
 PUT           /services/endpoints                                            controllers.ClusterServices.updateServiceEndpoint
 
 

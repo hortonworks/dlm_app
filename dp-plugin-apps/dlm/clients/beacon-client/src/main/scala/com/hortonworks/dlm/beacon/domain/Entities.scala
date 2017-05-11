@@ -21,17 +21,22 @@ object ResponseEntities {
 
   case class Notification(`type`: Option[String], to: Option[String])
 
-  case class PolicyDataResponse(name: String, `type`: String, sourceDataset: String, targetDataset: String,
-                                   sourceCluster: String, targetCluster: String, startTime: Option[String], endTime: String,
-                                   frequencyInSec: Long, tags: Option[String], customProperties: Map[String, String], retry: Retry,
-                                   acl: Option[AclObject], notification: Notification, entityType: String)
+  case class PolicyDataResponse(policyId: String, name: String, `type`: String, status : String, executionType: Option[String],
+                                sourceDataset: String, targetDataset: String, sourceCluster: String, targetCluster: String,
+                                startTime: Option[String], endTime: String, frequencyInSec: Long, tags: Option[String],
+                                customProperties: Map[String, String], retry: Retry, acl: Option[AclObject],
+                                user: String, notification: Notification, entityType: String)
 
-  case class PoliciesDetailResponse(name: String, `type`: String, status: String, frequency: Long,
+  case class PoliciesDetailResponse(name: String, `type`: String, status: String, frequencyInSec: Long,
                                     sourceclusters: Seq[String], targetclusters: Seq[String], startTime: Option[String], endTime: String)
 
   case class PolicyStatusResponse(status: String, message: String, requestId: String)
 
   case class PostActionResponse(requestId: String, message: String, status: String)
+
+  case class PolicyInstanceResponse(id: String, policyId: String, name: String, `type`: String, executionType: String,
+                                    user: String, status: String, startTime: String, endTime: Option[String],
+                                    trackingInfo: String, message: String)
 }
 
 object RequestEntities {
@@ -82,6 +87,9 @@ object JsonFormatters {
 
   implicit val postActionResponseWrites = Json.writes[PostActionResponse]
   implicit val postActionResponseReads = Json.reads[PostActionResponse]
+
+  implicit val policyInstanceResponseWrites = Json.writes[PolicyInstanceResponse]
+  implicit val policyInstanceResponseReads = Json.reads[PolicyInstanceResponse]
 
   //-- RequestEntities
 

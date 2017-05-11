@@ -32,8 +32,8 @@ class BeaconPairServiceImpl(implicit ws: WSClient) extends BeaconPairService {
     }
   }
 
-  override def createClusterPair(beaconUrl : String, remoteClusterName : String, remoteBeaconEndpoint: String): Future[Either[BeaconApiErrors, PostActionResponse]] = {
-    ws.url(s"$beaconUrl/api/beacon/cluster/pair?remoteClusterName=$remoteClusterName&remoteBeaconEndpoint=$remoteBeaconEndpoint")
+  override def createClusterPair(beaconUrl : String, remoteClusterName : String): Future[Either[BeaconApiErrors, PostActionResponse]] = {
+    ws.url(s"$beaconUrl/api/beacon/cluster/pair?remoteClusterName=$remoteClusterName")
       .withHeaders(
         "Content-Type" -> "text/plain",
         "Accept" -> "application/json"
@@ -45,8 +45,8 @@ class BeaconPairServiceImpl(implicit ws: WSClient) extends BeaconPairService {
       }
   }
 
-  override def createClusterUnpair(beaconUrl : String, remoteClusterName : String, remoteBeaconEndpoint: String): Future[Either[BeaconApiErrors, PostActionResponse]] = {
-    ws.url(s"$beaconUrl/api/beacon/cluster/unpair?remoteClusterName=$remoteClusterName&remoteBeaconEndpoint=$remoteBeaconEndpoint")
+  override def createClusterUnpair(beaconUrl : String, remoteClusterName : String): Future[Either[BeaconApiErrors, PostActionResponse]] = {
+    ws.url(s"$beaconUrl/api/beacon/cluster/unpair?remoteClusterName=$remoteClusterName")
       .withHeaders(
         "Content-Type" -> "text/plain",
         "Accept" -> "application/json"

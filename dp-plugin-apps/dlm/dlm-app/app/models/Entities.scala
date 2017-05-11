@@ -1,9 +1,9 @@
 package models
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, ClusterService, Datalake, Location}
+import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dlm.beacon.domain.RequestEntities._
-import com.hortonworks.dlm.beacon.domain.ResponseEntities.{PairedCluster, PoliciesDetailResponse, PolicyDataResponse, PolicyStatusResponse}
-import play.api.libs.json.Json
+import com.hortonworks.dlm.beacon.domain.ResponseEntities._
+import play.api.libs.json.{JsValue, Json}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._
 
@@ -13,13 +13,20 @@ import scala.collection.immutable.Set.Set2
 object Entities {
 
   // Response schema received from Dataplane for the DLM enabled clusters
+
+  case class ClusterServiceEndpointDetails(id: Option[Long], servicename: String, clusterid: Option[Long] = None,
+                                           servicehost: String, fullURL: String)
+
+
+  case class ClusterStats(CapacityTotal: Option[Double], CapacityUsed: Option[Double], CapacityRemaining: Option[Double])
+
   case class BeaconCluster(id: Long, name: String, description: String, ambariurl: Option[String] = None,
-                            datalake: Datalake, location: Location, services: Seq[ClusterService] = Seq())
+                          stats: Option[ClusterStats], location: Location, services: Seq[ClusterServiceEndpointDetails] = Seq())
 
   case class BeaconClusters(clusters: Seq[BeaconCluster])
 
 
-  case class ClusterDefinitionDetails (cluster:Cluster, nnClusterService : ClusterService,
+  case class ClusterDefinitionDetails (cluster:Cluster, nnClusterService : ClusterServiceEndpointDetails,
                                        pairedClusters: Seq[PairedCluster], pairedClusterRequest:PairClusterRequest)
 
   // Request schema submitted to Beacon for cluster definition
@@ -31,8 +38,6 @@ object Entities {
   // Response schema for Pair cluster request
   case class PairedClustersResponse(unreachableBeacon: Seq[String] = Seq(), pairedClusters: Set[Set2[BeaconCluster]] = Set())
 
-  case class PolicyDetailsResponse(policyDetails: PolicyDataResponse, policyStatus: PolicyStatusResponse)
-
   case class PoliciesDetails(name: String, `type`: String, status: String, frequency: Long, startTime: Option[String], endTime: String,
                              sourceCluster:String, targetCluster:String)
 
@@ -40,10 +45,19 @@ object Entities {
 
   case class PolicySubmitRequest(policyDefinition: PolicyDefinitionRequest, submitType: String)
 
+  case class PolicyInstancesResponse(policies: Seq[PolicyInstanceResponse])
+
 }
 
 object JsonFormatters {
   import models.Entities._
+
+  implicit val clusterServiceEndpointDetailsWrites = Json.writes[ClusterServiceEndpointDetails]
+  implicit val clusterServiceEndpointDetailsReads = Json.reads[ClusterServiceEndpointDetails]
+
+  implicit val clusterStatsWrites = Json.writes[ClusterStats]
+  implicit val clusterStatsReads = Json.reads[ClusterStats]
+
   implicit val beaconClusterWrites = Json.writes[BeaconCluster]
   implicit val beaconClusterReads = Json.reads[BeaconCluster]
 
@@ -55,9 +69,6 @@ object JsonFormatters {
 
   implicit val pairedClustersResponseWrites = Json.writes[PairedClustersResponse]
 
-  implicit val policyDetailsResponseReads = Json.reads[PolicyDetailsResponse]
-  implicit val policyDetailsResponseWrites = Json.writes[PolicyDetailsResponse]
-
   implicit val policiesDetailsReads = Json.reads[PoliciesDetails]
   implicit val policiesDetailsWrites = Json.writes[PoliciesDetails]
 
@@ -66,6 +77,9 @@ object JsonFormatters {
 
   implicit val policySubmitRequestReads = Json.reads[PolicySubmitRequest]
   implicit val policySubmitRequestWrites = Json.writes[PolicySubmitRequest]
+
+  implicit val policyInstancesResponseReads = Json.reads[PolicyInstancesResponse]
+  implicit val policyInstancesResponseWrites = Json.writes[PolicyInstancesResponse]
 
 }
 
