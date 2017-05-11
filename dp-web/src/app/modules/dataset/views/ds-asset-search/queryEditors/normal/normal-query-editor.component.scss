@@ -8,10 +8,20 @@
   background-color:white;
 }
 .inputWidgetCont {
-  padding-right:110px;
+  padding:0 110px 0 40px;
   border:1px solid #AAAAAA;
   border-radius: 2px;
   height:35px;
+}
+
+.inputWidgetCont .searchIconCont {
+  float: left;
+  width: 40px;
+  font-size: 18px;
+  margin-left: -40px;
+  height:34px;
+  line-height: 34px;
+  text-align: center;
 }
 
 .inputWidgetCont .showFiltersButton {
@@ -19,8 +29,8 @@
   width:110px;
   margin-right: -110px;
   text-align: center;
-  height:35px;
-  line-height: 35px;
+  height:34px;
+  line-height: 34px;
   border-left:1px solid #AAAAAA;
   cursor: pointer;
 }
@@ -40,3 +50,13 @@
   width: 20%;
   float: left;
 }
+
+select {
+  font-size: 1em;
+  height: 32px;
+  width: 100%;
+  padding: 0 8px;
+  border: 1px solid rgb(221, 221, 221);
+  border-radius: 5px;
+}
+select {background-color: inherit}

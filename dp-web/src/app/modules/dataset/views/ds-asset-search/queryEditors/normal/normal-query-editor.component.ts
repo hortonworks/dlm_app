@@ -1,11 +1,13 @@
 import {Component, EventEmitter, Input, Output} from "@angular/core";
 import {AssetTypeEnum} from "../../../ds-assets-list/ds-assets-list.component";
+import {TaggingWidgetTagModel} from "../../../../../../shared/tagging-widget/tagging-widget.component";
 
 export class QueryObjectModel {
   searchText:string;
   type: AssetTypeEnum;
 }
 
+let TagModel=TaggingWidgetTagModel;
 
 @Component({
   selector : "normlal-query-editor",
@@ -25,7 +27,7 @@ export class NormalQueryEditor {
   public dLakeIndx : number = 0;
   public ownerIndx : number = 0;
 
-  public filterTags:string[] = [];
+  public filterTags:TaggingWidgetTagModel[] = [];
   public filterStateVisible:boolean = false;
 
   @Input() queryObj:QueryObjectModel;
@@ -38,13 +40,17 @@ export class NormalQueryEditor {
   }
   onFilterOptionChange(){
     this.filterTags.splice(0, this.filterTags.length);
-    if(this.createdValueIndx > 0) this.filterTags.push('Created: '+this.createdFilOptns[this.createdValueIndx]);
-    if(this.typeValueIndx > 0) this.filterTags.push('Type: '+this.typeFilOptns[this.typeValueIndx]);
-    if(this.sizeValueIndx > 0) this.filterTags.push('Size: '+this.sizeFilOptns[this.sizeValueIndx]);
-    if(this.dLakeIndx > 0) this.filterTags.push('Datalake: '+this.dlFilOptns[this.dLakeIndx]);
-    if(this.ownerIndx > 0) this.filterTags.push('Owner: '+this.ownerFilOptn[this.ownerIndx]);
+    if(this.createdValueIndx > 0) this.filterTags.push(new TagModel('Created: '+this.createdFilOptns[this.createdValueIndx], "createdValueIndx"));
+    if(this.typeValueIndx > 0) this.filterTags.push(new TagModel('Type: '+this.typeFilOptns[this.typeValueIndx], "typeValueIndx"));
+    if(this.sizeValueIndx > 0) this.filterTags.push(new TagModel('Size: '+this.sizeFilOptns[this.sizeValueIndx], "sizeValueIndx"));
+    if(this.dLakeIndx > 0) this.filterTags.push(new TagModel('Datalake: '+this.dlFilOptns[this.dLakeIndx], "dLakeIndx"));
+    if(this.ownerIndx > 0) this.filterTags.push(new TagModel('Owner: '+this.ownerFilOptn[this.ownerIndx], "ownerIndx"));
 
     var tmp = this.typeValueIndx, enm = AssetTypeEnum;
     this.queryObj.type = (tmp==0)?enm.ALL:((tmp==1)?enm.HIVE:((tmp==2)?enm.HDFS:enm.ALL))
+  }
+  removeFilter (deletedTagObj:TaggingWidgetTagModel) {
+    this[deletedTagObj.data] = 0;
+    this.onFilterOptionChange();
   }
 }

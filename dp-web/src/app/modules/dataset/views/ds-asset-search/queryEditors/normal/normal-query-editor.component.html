@@ -1,7 +1,13 @@
 <div class="queryEditor borderBox">
   <div class="inputWidgetCont">
+    <div class="searchIconCont"><i class="fa fa-search"></i></div>
     <div class="searchWidgetCont">
-      <search-widget [allowTagDismissal]="false" [tags]="filterTags" (onNewSearch)="onNewSearch($event)">
+      <search-widget
+        [allowTagDismissal]="true"
+        [tags]="filterTags"
+        (onNewSearch)="onNewSearch($event)"
+        (onTagDelete)="removeFilter($event)"
+      >
       </search-widget>
     </div>
     <div class="showFiltersButton" (click)="filterStateVisible=!filterStateVisible"><i class="fa fa-filter"></i>&nbsp;&nbsp;Filter&nbsp;&nbsp;<i class="fa fa-angle-down"></i></div>
