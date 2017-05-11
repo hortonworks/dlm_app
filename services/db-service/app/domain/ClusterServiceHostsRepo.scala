@@ -2,10 +2,10 @@ package domain
 
 import javax.inject._
 
-import com.hortonworks.dataplane.commons.domain.Entities.ClusterServiceHost
+import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService, ClusterServiceHost}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
@@ -30,8 +30,18 @@ class ClusterServiceHostsRepo @Inject()(
     db.run(query.to[List].result)
   }
 
-  def allByService(serviceId: Long): Future[List[ClusterServiceHost]] = {
-    db.run(Hosts.filter(_.serviceid === serviceId).to[List].result)
+  def allByServiceName(serviceName: String): Future[List[(ClusterService, ClusterServiceHost)]] = {
+    val query = for {
+      (service, endpoint) <- csr.Services.filter(_.servicename === serviceName) join Hosts on(_.id === _.serviceid)
+    } yield (service, endpoint)
+    db.run(query.to[List].result)
+  }
+
+  def allByService(serviceId: Long): Future[Option[(ClusterService, ClusterServiceHost)]] = {
+    val query = for {
+      (service, endpoint) <- csr.Services.filter(_.id === serviceId) join Hosts on(_.id === _.serviceid)
+    } yield (service, endpoint)
+    db.run(query.to[List].result.headOption)
   }
 
   def insert(endPoint: ClusterServiceHost): Future[ClusterServiceHost] = {

@@ -8,6 +8,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.{
   ClusterService,
   ClusterServiceHost
 }
+import com.hortonworks.dataplane.commons.domain.Ambari.{ConfigurationInfo,ClusterServiceWithConfigs}
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -161,9 +162,30 @@ class ClusterServices @Inject()(
   def getServiceEndpoints(serviceId: Long) = Action.async {
     cse
       .allByService(serviceId)
-      .map(cs =>
-        success(cs.map(c => linkData(c, Map()))))
+      .map(cs => cs match {
+          case Some(c) => {
+            val properties : Option[ConfigurationInfo] =  c._1.properties match {
+              case Some(value) => Some(value.validate[ConfigurationInfo].get)
+              case None => None
+            }
+            success(linkData(ClusterServiceWithConfigs(c._1.id, c._1.servicename, c._1.clusterid, c._2.host, properties), Map()))
+          }
+          case None => NotFound
+        })
       .recoverWith(apiError)
+  }
+
+
+  def getAllServiceEndpoints(serviceName: String) = Action.async {
+    cse
+      .allByServiceName(serviceName)
+      .map(cs => success(cs.map(c => {
+          val properties : Option[ConfigurationInfo] =  c._1.properties match {
+            case Some(value) => Some(value.validate[ConfigurationInfo].get)
+            case None => None
+          }
+          linkData(ClusterServiceWithConfigs(c._1.id, c._1.servicename, c._1.clusterid, c._2.host, properties), Map())
+      }))).recoverWith(apiError)
   }
 
   def addServiceEndpoint = Action.async(parse.json) { req =>

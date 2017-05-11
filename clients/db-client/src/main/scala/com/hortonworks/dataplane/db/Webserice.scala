@@ -1,11 +1,10 @@
 package com.hortonworks.dataplane.db
 
 import com.hortonworks.dataplane.commons.domain.Entities._
+import com.hortonworks.dataplane.commons.domain.Ambari.ClusterServiceWithConfigs
 import play.api.libs.json.{JsResult, Json}
 import play.api.libs.ws.WSResponse
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  ClusterService => ClusterData
-}
+import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData}
 
 import scala.concurrent.Future
 
@@ -124,8 +123,8 @@ object Webserice {
       : Future[Seq[Either[Errors, Boolean]]]
     def getEndpointsForCluster(
         clusterId: Long,
-        service: String): Future[Either[Errors, Seq[ClusterServiceHost]]]
-
+        service: String): Future[Either[Errors, ClusterServiceWithConfigs]]
+    def getAllServiceEndpoints(serviceName: String): Future[Either[Errors, Seq[ClusterServiceWithConfigs]]]
   }
 
   trait ClusterHostsService extends DbClientService {

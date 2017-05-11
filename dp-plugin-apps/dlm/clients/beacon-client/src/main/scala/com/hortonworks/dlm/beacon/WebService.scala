@@ -53,8 +53,8 @@ object WebService {
   trait BeaconPairService extends ClientService {
 
     def listPairedClusters(beaconUrl : String): Future[Either[BeaconApiErrors, Seq[PairedCluster]]]
-    def createClusterPair(beaconUrl : String, remoteClusterName : String, remoteBeaconEndpoint: String): Future[Either[BeaconApiErrors, PostActionResponse]]
-    def createClusterUnpair(beaconUrl : String, remoteClusterName : String, remoteBeaconEndpoint: String): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def createClusterPair(beaconUrl : String, remoteClusterName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def createClusterUnpair(beaconUrl : String, remoteClusterName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
   }
 
   trait BeaconPolicyService extends ClientService {
@@ -68,6 +68,12 @@ object WebService {
     def suspendPolicy(beaconUrl : String, policyName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
     def resumePolicy(beaconUrl : String, policyName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
     def deletePolicy(beaconUrl : String, policyName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
+  }
+
+  trait BeaconPolicyInstanceService extends ClientService {
+    def listPolicyInstances(beaconUrl : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, Seq[PolicyInstanceResponse]]]
+    def listPolicyInstance(beaconUrl : String, policyName : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, Seq[PolicyInstanceResponse]]]
+    def abortPolicyInstances(beaconUrl : String, policyName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
   }
 
 }

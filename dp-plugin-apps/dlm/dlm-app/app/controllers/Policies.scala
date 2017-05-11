@@ -85,7 +85,7 @@ class Policies @Inject() (val beaconService: BeaconService) extends Controller {
     * @return
     */
   def suspend(clusterId: Long, policyName: String) = Action.async {
-    Logger.info("Received schedule policy request")
+    Logger.info("Received suspend policy request")
     beaconService.updatePolicy(clusterId, policyName, SUSPEND).map {
       case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
       case Right(postSuccessResponse) => Ok(Json.toJson(postSuccessResponse))
@@ -99,7 +99,7 @@ class Policies @Inject() (val beaconService: BeaconService) extends Controller {
     * @return
     */
   def resume(clusterId: Long, policyName: String) = Action.async {
-    Logger.info("Received schedule policy request")
+    Logger.info("Received resume policy request")
     beaconService.updatePolicy(clusterId, policyName, RESUME).map {
       case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
       case Right(postSuccessResponse) => Ok(Json.toJson(postSuccessResponse))
@@ -113,7 +113,7 @@ class Policies @Inject() (val beaconService: BeaconService) extends Controller {
     * @return
     */
   def delete(clusterId: Long, policyName: String) = Action.async {
-    Logger.info("Received schedule policy request")
+    Logger.info("Received delete policy request")
     beaconService.updatePolicy(clusterId, policyName, DELETE).map {
       case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
       case Right(postSuccessResponse) => Ok(Json.toJson(postSuccessResponse))
