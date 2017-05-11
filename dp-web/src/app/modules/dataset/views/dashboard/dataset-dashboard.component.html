@@ -5,7 +5,7 @@
     <div class="result-viewer">
       <div class="result-header">
         <span class="resultsTitle" *ngIf="currentDsTag">{{currentDsTag.name}}</span>
-        <button class="mdl-button--new mdl-color--green mdl-color-text--white mdl-button">
+        <button class="mdl-button--new mdl-color--green mdl-color-text--white mdl-button" (click)="actionAddNewDataset()">
             <i class="fa fa-plus"></i> NEW
         </button>
         <div class="mdl-button-group">

@@ -1,22 +1,27 @@
-<div class="tabCont">
-  <div class="tab {{(activeTab == tab.ALL)?'active':''}}" (click)="activeTab = tab.ALL;fetchAssets()">
+<div *ngIf="!hideTabs" class="tabCont">
+  <div class="tab {{(typeFilter == tab.ALL)?'active':''}}" (click)="typeFilter = tab.ALL;setFirstPage();fetchAssets()">
     <div class="tabName">Total</div>
     <div class="tabCount">{{dsModel.hiveCount + dsModel.filesCount}}</div>
   </div>
-  <div class="tab {{(activeTab == tab.HIVE)?'active':''}}" (click)="activeTab = tab.HIVE;fetchAssets()">
+  <div class="tab {{(typeFilter == tab.HIVE)?'active':''}}" (click)="typeFilter = tab.HIVE;setFirstPage();fetchAssets()">
     <div class="tabName">Hive</div>
     <div class="tabCount">{{dsModel.hiveCount}}</div>
   </div>
-  <div class="tab {{(activeTab == tab.HDFS)?'active':''}}" (click)="activeTab = tab.HDFS;fetchAssets()">
+  <div class="tab {{(typeFilter == tab.HDFS)?'active':''}}" (click)="typeFilter = tab.HDFS;setFirstPage();fetchAssets()">
     <div class="tabName">Files</div>
     <div class="tabCount">{{dsModel.filesCount}}</div>
   </div>
+  <span class="actionButtonCont">
+    <div *ngIf="applicableActions.indexOf(actionEnum.REMOVE) != -1" class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionRemove()">Remove</div>
+    <div *ngIf="applicableActions.indexOf(actionEnum.ADD) != -1" class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionAddMore()">Add more</div>
+    <div *ngIf="applicableActions.indexOf(actionEnum.EDIT) != -1" class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionEdit()">Edit</div>
+  </span>
   <div style="clear: both;"></div>
 </div>
 <div class="listCont">
-  <div class="searchCont">
+  <div *ngIf="!hideSearch" class="searchCont">
     <span><i class="fa fa-search"></i></span>
-    <input #searchBox type="text" placeholder="Search" (keyup.enter)="searchText=searchBox.value; fetchAssets()"/>
+    <input #searchBox type="text" placeholder="Search" (keyup.enter)="searchText=searchBox.value;setFirstPage(); fetchAssets()"/>
   </div>
   <div class="list">
     <div class="listRow listHead">
@@ -33,7 +38,7 @@
         <div class="listRow"  *ngFor="let asset of dsAssets;">
           <div class="checkboxCont"><input type="checkbox"/></div>
           <div class="sourceCol {{(asset.source.toUpperCase() == 'HIVE')?'hiveCol':'filesCol'}}">
-            <span><i class="fa {{(asset.source.toUpperCase() == 'HIVE')?'fa-table':'fa-file-o'}}"></i> {{asset.source}}</span>
+            <span><i class="fa {{(asset.source.toUpperCase() == 'HIVE')?'fa-table':'fa-file-o'}}"></i>&nbsp;&nbsp;{{asset.source}}</span>
           </div>
           <div class="nameCol">{{asset.name}}</div>
           <div class="ownerCol">{{asset.owner}}</div>
@@ -50,4 +55,5 @@
     </div>
   </div>
 </div>
+<br/>
 

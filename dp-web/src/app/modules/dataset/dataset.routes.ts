@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 
 import {DatasetDashboardComponent} from "./views/dashboard/dataset-dashboard.component";
 import {DsFullView} from "./views/ds-full-view/ds-full-view.component";
+import {DsEditor} from "./views/ds-editor/ds-editor.component";
+import {DsAssetSearch} from "./views/ds-asset-search/ds-assest-search.component";
 
 export const routes: Routes = [
   {
@@ -10,5 +12,19 @@ export const routes: Routes = [
   },{
     path: 'full-view/:id',
     component: DsFullView
+  },{
+    path: 'add',
+    component: DsEditor
+  },{
+    path: 'edit/:id',
+    component: DsEditor
+  },{
+    path: 'edit',
+    component: DsEditor
+  },{
+    path: 'asset-search',
+    component: DsAssetSearch
   }
+
+
 ];

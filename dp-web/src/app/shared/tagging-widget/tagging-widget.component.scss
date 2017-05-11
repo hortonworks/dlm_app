@@ -1,0 +1,65 @@
+.taggingWidget{
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid rgb(221, 221, 221);
+  border-radius: 5px;
+}
+.taggingWidget > .tagSticker.focus,
+.taggingWidget.focus {
+  border-color: rgb(133,191,253);
+  //outline:auto 5px -webkit-focus-ring-color
+}
+.taggingWidget > .tagSticker:focus {
+  outline: none;
+}
+.taggingWidget input{
+  width: 100%;
+  font-size: 1em;
+  height: 32px;
+  min-width: 250px;
+  border-width: 0px;
+  margin-top: -1px;
+  padding: 0 5px;
+}
+.taggingWidget input:focus{
+  outline: none;
+}
+.taggingWidget > .tagSticker{
+  float: left;
+  padding:2px 8px;
+  background-color: rgb(221, 221, 221);
+  border-radius: 5px;
+  margin:2px;
+  border: 2px solid rgb(221, 221, 221);
+}
+.taggingWidget > .inputSpan {
+  display: block;
+  overflow: hidden;
+  padding-right:10px;
+}
+
+.inputSpan .dropDown {
+  position: absolute;
+  width:120px;
+  font-size: 12px;
+  background-color: rgb(80, 100, 105);
+  color:white;
+  border-radius: 3px;
+  left:0px;
+  z-index: 5;
+  display: none;
+}
+.taggingWidget.focus .dropDown {
+  display: block;
+}
+
+.dropDown .row{
+  padding:3px 8px;
+  border-top:1px solid white;
+}
+
+.dropDown .row.focus,
+.dropDown .row:hover {
+  background-color: rgb(133,191,253);
+}
+

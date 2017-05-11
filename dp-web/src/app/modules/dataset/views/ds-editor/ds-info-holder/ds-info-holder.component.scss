@@ -1,0 +1,62 @@
+.borderBox, .borderBox * {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.dp-input {
+  position: relative;
+}
+.dp-input .helpText {
+  font-size: 12px;
+  color:#677378
+}
+.dp-input__options {
+  position: absolute;
+  top: 100%;
+  z-index: 5;
+  background: white;
+
+  width: 100%;
+  margin: 0;
+  padding: 5px;
+  list-style: none;
+  border: 1px solid rgb(221, 221, 221);
+}
+.dp-input__icon {
+  position: absolute;
+  right: 0px;
+  bottom: 10px;
+}
+.dp-input__option {
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgb(221, 221, 221);
+  }
+}
+input, textarea {
+  font-size: 1em;
+
+  height: 32px;
+  width: 100%;
+  min-width: 250px;
+
+  padding: 0 8px;
+
+  border: 1px solid rgb(221, 221, 221);
+  border-radius: 5px;
+}
+textarea {height:100px;}
+
+label + input, label + textarea {
+  margin-top: 5px;
+}
+
+.dp-input + .dp-input {
+  margin-top: 15px;
+}
+
+footer {
+  margin-top: 15px;
+}
