@@ -32,7 +32,7 @@ export class UserDropdownComponent implements OnInit {
 
   ngOnInit() {
     const tz = this.user.timezone;
-    this.timezoneValue = [{id: tz, text: this.timeZoneService.mappedByValueTimezones[tz].label}];
+    this.timezoneValue = tz ? [{id: tz, text: this.timeZoneService.mappedByValueTimezones[tz].label}] : [{id: '', text: ''}];
   }
 
   doLogout() {
