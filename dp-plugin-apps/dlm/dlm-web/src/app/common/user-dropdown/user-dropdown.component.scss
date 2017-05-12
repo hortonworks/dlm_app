@@ -5,16 +5,13 @@
   margin: 0 15px 0 5px;
 }
 
-#notifications-dropdown {
-  &.dropdown-menu {
-    top: 125%;
-    right: -25px;
-    min-width: inherit;
-    max-width: inherit;
-  }
-}
-
 .user-settings-dropdown {
+  &.dropdown-menu {
+    top: 125% !important;
+    right: -25px !important;
+    min-width: inherit !important;
+    max-width: inherit !important;
+  }
   .notifications-body {
     overflow: inherit !important;
   }
@@ -26,13 +23,12 @@
     min-width: 450px;
     border: none !important;
   }
-}
-
-.ui-select-container {
-  width: 450px;
-  .ui-select-match-text {
-    width: 400px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .ui-select-container {
+    width: 450px;
+    .ui-select-match-text {
+      width: 400px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 }
