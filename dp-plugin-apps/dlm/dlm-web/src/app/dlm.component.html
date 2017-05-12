@@ -8,7 +8,7 @@
         <span class="glyphicon glyphicon-user"></span>
       </div>
       <div class="notifications navbar-nav navbar-right">
-        <notifications [events]="events$ | async" [newEventsCount]="newEventsCount$ | async"></notifications>
+        <dlm-notifications [events]="events$ | async" [newEventsCount]="newEventsCount$ | async"></dlm-notifications>
       </div>
   </header>
   <router-outlet style=""></router-outlet>

@@ -9,7 +9,6 @@
     "duration": "Duration",
     "source": "Source",
     "destination": "Destination",
-    "status": "Status",
     "data": "Data",
     "time": {
       "hourly": "Hourly",
@@ -22,6 +21,7 @@
       "paging": "{{start}} - {{end}} of {{count}}"
     },
     "status": {
+      "text": "Status",
       "failed": "Failed",
       "in_progress": "In Progress"
     }
@@ -155,6 +155,9 @@
     "jobs": {
       "header": "Jobs",
       "header_note": ""
+    },
+    "notifications": {
+      "header": "Notifications"
     }
   }
 }

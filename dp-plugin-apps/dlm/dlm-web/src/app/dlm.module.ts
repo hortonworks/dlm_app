@@ -39,6 +39,8 @@ import { JobsComponent } from './pages/jobs/jobs.component';
 import { HelpComponent } from './pages/help/help.component';
 import { NavbarComponent } from './common/navbar/navbar.component';
 import { NotificationsComponent } from './common/notifications/notifications.component';
+import { NotificationsPageComponent } from './pages/notifications/notifications.component';
+import { NotificationsTableComponent } from './pages/notifications/notifications-table/notifications-table.component';
 import { ModalDialogComponent } from './common/modal-dialog/modal-dialog.component';
 import { httpServiceProvider } from './services/http.service';
 import { CommonComponentsModule } from './components/common-components.module';
@@ -117,6 +119,8 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     DlmComponent,
     MainComponent,
     OverviewComponent,
+    NotificationsPageComponent,
+    NotificationsTableComponent,
     ClustersComponent,
     ClusterCardComponent,
     ClusterListComponent,
