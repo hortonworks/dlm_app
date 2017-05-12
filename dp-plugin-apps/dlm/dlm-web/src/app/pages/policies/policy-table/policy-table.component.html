@@ -21,7 +21,7 @@
 </ng-template>
 
 <ng-template #dataCell let-size="value" let-row="row">
-  <span class="text-primary actionable" (click)="toggleRowDetail(row)">{{size}}GB</span>
+  <span class="text-primary actionable" (click)="toggleRowDetail(row)">{{size|bytesSize}}</span>
 </ng-template>
 
 <ng-template #expandActionCell let-row="row">

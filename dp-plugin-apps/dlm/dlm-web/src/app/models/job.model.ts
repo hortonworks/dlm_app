@@ -1,19 +1,21 @@
 export interface Job {
-  id: string;
-  name: string;
-  status: string;
-  policy: string;
-  startTime: number;
-  endTime: number;
   runTime: number;
   nextRun: number;
-  latestRun: number;
-  service: string;
   duration: number;
-  source: string;
-  target: string;
   isCompleted: boolean;
   graphData: number[];
   transferred: number;
   previousRuns: Object[];
+
+  id: string;
+  policyId: string;
+  name: string;
+  type: string;
+  executionType: string;
+  user: string;
+  status: string;
+  startTime: string;
+  endTime: string;
+  trackingInfo: string;
+  message: string;
 }

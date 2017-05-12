@@ -1,82 +1,32 @@
 {
-  "totalResults": 4,
-  "policy": [
+  "unreachableBeacon": [],
+  "policies": [
     {
-      "id": "hive2Policy",
-      "type": "HIVE",
-      "name": "hive2Policy",
-      "status": "SUBMITTED",
-      "frequency": 3600,
-      "startTime": "2016-11-26T23:54:50",
-      "endTime": "2019-09-26T23:54:45",
-      "tags": [
-        "owner=producer@xyz.com",
-        "component=sales",
-        "some=tag1"
-      ],
-      "sourceclusters": [
-        "Primary Cluster"
-      ],
-      "targetclusters": [
-        "Secondary Cluster"
-      ]
+      "name": "hdfs1policy",
+      "type": "FS",
+      "status": "RUNNING",
+      "frequency": 7200,
+      "endTime": "9999-12-31T00:00:00",
+      "sourceCluster": "c1",
+      "targetCluster": "c2"
     },
     {
-      "id": "hivePolicy",
-      "type": "HIVE",
-      "name": "hivePolicy",
-      "status": "SUBMITTED",
+      "name": "hdfs2policy",
+      "type": "FS",
+      "status": "RUNNING",
       "frequency": 3600,
-      "startTime": "2016-11-26T23:54:50",
-      "endTime": "2019-09-26T23:54:45",
-      "tags": [
-        "component=sales",
-        "some=tag2"
-      ],
-      "sourceclusters": [
-        "Primary Cluster"
-      ],
-      "targetclusters": [
-        "Development Cluster"
-      ]
+      "endTime": "9999-12-31T00:00:00",
+      "sourceCluster": "c1",
+      "targetCluster": "c2"
     },
     {
-      "id": "hdfsPrimaryPolicy",
-      "type": "HDFS",
-      "name": "hdfsPrimaryPolicy",
+      "name": "hdfspolicy",
+      "type": "FS",
       "status": "SUBMITTED",
-      "frequency": 3600,
-      "startTime": "2016-11-26T23:54:50",
-      "endTime": "2019-09-26T23:54:45",
-      "tags": [
-        "owner=producer@xyz.com",
-        "component=sales",
-        "some=tag1"
-      ],
-      "sourceclusters": [
-        "Development Cluster"
-      ],
-      "targetclusters": [
-        "Secondary Cluster"
-      ]
-    },
-    {
-      "id": "hdfsPrimaryPolicy2",
-      "type": "HDFS",
-      "name": "hdfsPrimaryPolicy",
-      "status": "FAILED",
-      "frequency": 3600,
-      "startTime": "2016-11-26T23:54:50",
-      "endTime": "2019-09-26T23:54:45",
-      "tags": [
-        "component=sales"
-      ],
-      "sourceclusters": [
-        "Secondary Cluster"
-      ],
-      "targetclusters": [
-        "Development Cluster"
-      ]
+      "frequency": 7200,
+      "endTime": "9999-12-31T00:00:00",
+      "sourceCluster": "c1",
+      "targetCluster": "c2"
     }
   ]
 }

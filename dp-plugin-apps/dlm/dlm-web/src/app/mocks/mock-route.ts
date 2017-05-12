@@ -5,7 +5,7 @@ const MOCK_FILES_PREFIX = '/assets/data/dlm/';
 /**
  * Generates route to mock request's response by url and method with predefined
  * json file.
- * Note that all request method will be overriden to Get.
+ * Note that all request method will be overridden to Get.
  *
  * @param  {string}        url      path to mock prefix /api/dlm will be added
  * @param  {string}        jsonFile json file to respond with, root dir is assets/data/dlm
@@ -31,12 +31,9 @@ export class MockRoute {
     if (this.method !== request.method || sourceTokens.length !== selfTokens.length) {
       return false;
     }
-    const matchedTokens = selfTokens.filter((token, id) => {
-      return token === sourceTokens[id];
-    });
+    const matchedTokens = selfTokens.filter((token, id) => token === sourceTokens[id]);
     const isFullMatch = matchedTokens.length === sourceTokens.length;
-    const isDynamicMatch = matchedTokens.length === sourceTokens.length - 1
-      && selfTokens[selfTokens.length - 1].startsWith(':');
+    const isDynamicMatch = matchedTokens.length === sourceTokens.length - selfTokens.filter(token => token.startsWith(':')).length;
     // todo: maybe do some stuff with :id, e.g. pattern file name like cluster_:id.json
     return isFullMatch || isDynamicMatch;
   }

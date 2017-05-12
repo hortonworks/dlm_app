@@ -1,91 +1,58 @@
-[
-  {
-    "id": "Primary Cluster",
-    "description": "primary",
-    "ambariurl": "http://localhost:8080",
-    "name": "Primary Cluster",
-    "location": {
-      "city": "Pur Chaman",
-      "country": "AF"
+{
+  "clusters": [
+    {
+      "id": 2,
+      "name": "c2",
+      "description": "Cluster c2",
+      "ambariurl": "http://104.196.80.178:8080/api/v1/clusters/c2",
+      "stats": {
+        "CapacityTotal": 9129444352,
+        "CapacityUsed": 564879360,
+        "CapacityRemaining": 3856367616
+      },
+      "location": {
+        "id": 3431161,
+        "country": "AR",
+        "city": "Los Helechos",
+        "latitude": -27.557600021362305,
+        "longitude": -55.07683181762695
+      },
+      "services": [
+        {
+          "id": 8,
+          "servicename": "BEACON",
+          "clusterid": 2,
+          "servicehost": "jaimin-beacon-5.c.pramod-thangali.internal",
+          "fullURL": "http://jaimin-beacon-5.c.pramod-thangali.internal:25968"
+        }
+      ]
     },
-    "services": [
-      {
-        "id": 1,
-        "servicename": "BEACON_SERVER",
-        "servicehost": "104.196.90.96",
-        "serviceport": 25968,
-        "fullURL": "http://104.196.90.96:25968",
-        "properties": {},
-        "clusterid": 1,
-        "datalakeid": 1
-      }
-    ]
-  },
-  {
-    "id": "Secondary Cluster",
-    "description": "secondary",
-    "name": "Secondary Cluster",
-    "ambariurl": "http://localhost:8080",
-    "location": {
-      "city": "Santa Clara",
-      "country": "US"
-    },
-    "services": [
-      {
-        "id": 1,
-        "servicename": "BEACON_SERVER",
-        "servicehost": "104.196.90.96",
-        "serviceport": 25968,
-        "fullURL": "http://104.196.90.96:25968",
-        "properties": {},
-        "clusterid": 1,
-        "datalakeid": 1
-      }
-    ]
-  },
-  {
-    "id": "Development Cluster",
-    "description": "development",
-    "name": "Development Cluster",
-    "ambariurl": "http://localhost:8080",
-    "location": {
-      "city": "Columbus",
-      "country": "US"
-    },
-    "services": [
-      {
-        "id": 1,
-        "servicename": "BEACON_SERVER",
-        "servicehost": "104.196.90.96",
-        "serviceport": 25968,
-        "fullURL": "http://104.196.90.96:25968",
-        "properties": {},
-        "clusterid": 1,
-        "datalakeid": 1
-      }
-    ]
-  },
-  {
-    "id": "Standby Cluster",
-    "description": "standby",
-    "name": "Standby Cluster",
-    "ambariurl": "http://localhost:8082",
-    "location": {
-      "city": "Dallas",
-      "country": "US"
-    },
-    "services": [
-      {
-        "id": 1,
-        "servicename": "BEACON_SERVER",
-        "servicehost": "104.196.90.96",
-        "serviceport": 25968,
-        "fullURL": "http://104.196.90.96:25968",
-        "properties": {},
-        "clusterid": 1,
-        "datalakeid": 1
-      }
-    ]
-  }
-]
-
+    {
+      "id": 1,
+      "name": "c1",
+      "description": "Cluster c1",
+      "ambariurl": "http://104.196.85.207:8080/api/v1/clusters/c1",
+      "stats": {
+        "CapacityTotal": 9129444352,
+        "CapacityUsed": 564883456,
+        "CapacityRemaining": 3849543680
+      },
+      "location": {
+        "id": 3431161,
+        "country": "AR",
+        "city": "Los Helechos",
+        "latitude": -27.557600021362305,
+        "longitude": -55.07683181762695
+      },
+      "services": [
+        {
+          "id": 3,
+          "servicename": "BEACON",
+          "clusterid": 1,
+          "servicehost": "jaimin-beacon-3.c.pramod-thangali.internal",
+          "fullURL": "http://jaimin-beacon-3.c.pramod-thangali.internal:25968"
+        }
+      ]
+    }
+  ]
+}
