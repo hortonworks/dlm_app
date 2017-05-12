@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, OnInit } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { MenuItem } from './common/navbar/menu-item';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers/index';
@@ -8,6 +8,10 @@ import { Observable } from 'rxjs/Observable';
 import { getAllEvents, getNewEventsCount } from 'selectors/event.selector';
 import { initApp } from 'actions/app.action';
 import { loadEvents, loadNewEventsCount } from 'actions/event.action';
+import { NAVIGATION } from 'constants/navigation.constant';
+import { User } from './models/user.model';
+import { SessionStorageService } from './services/session-storage.service';
+import { TimeZoneService } from './services/time-zone.service';
 
 @Component({
   selector: 'dlm',
@@ -23,46 +27,60 @@ export class DlmComponent {
   fitHeight = true;
   events$: Observable<Event[]>;
   newEventsCount$: Observable<number>;
+  navigationColumns = NAVIGATION;
 
-  constructor(t: TranslateService, private store: Store<State>) {
+  // mock current user
+  user: User = <User>{fullName: 'Jim Raynor', timezone: ''};
+
+  constructor(t: TranslateService,
+              private store: Store<State>,
+              private sessionStorageService: SessionStorageService,
+              private timeZoneService: TimeZoneService) {
     t.setTranslation('en', require('../assets/i18n/en.json'));
     t.setDefaultLang('en');
     t.use('en');
+    // Provide selected by user timezone to the TimezoneService instance
+    // It allows to convert dates using this timezone
+    // @see Pipe `fmt-tz`
+    const tz = this.sessionStorageService.get('tz');
+    this.timeZoneService.userTimezoneIndex$.next(tz);
+    this.user.timezone = tz;
+
     this.header = new MenuItem(
-        t.instant('sidenav.menuItem.header'),
-        './overview',
-        '<i class="fa fa-gg" aria-hidden="true"></i>'
+      t.instant('sidenav.menuItem.header'),
+      './overview',
+      '<i class="fa fa-gg" aria-hidden="true"></i>'
     );
     this.menuItems = [
       new MenuItem(
-          t.instant('sidenav.menuItem.overview'),
-          './overview',
-          '<span class="navigation-icon glyphicon glyphicon-home"></span>'
+        t.instant('sidenav.menuItem.overview'),
+        './overview',
+        '<span class="navigation-icon glyphicon glyphicon-home"></span>'
       ),
       new MenuItem(
-          t.instant('sidenav.menuItem.clusters'),
-          './clusters',
-          '<span class="navigation-icon glyphicon glyphicon-globe"></span>'
+        t.instant('sidenav.menuItem.clusters'),
+        './clusters',
+        '<span class="navigation-icon glyphicon glyphicon-globe"></span>'
       ),
       new MenuItem(
-          t.instant('sidenav.menuItem.pairings'),
-          './pairings',
-          '<span class="navigation-icon glyphicon glyphicon-resize-horizontal"></span>'
+        t.instant('sidenav.menuItem.pairings'),
+        './pairings',
+        '<span class="navigation-icon glyphicon glyphicon-resize-horizontal"></span>'
       ),
       new MenuItem(
-          t.instant('sidenav.menuItem.policies'),
-          './policies',
-          '<span class="navigation-icon glyphicon glyphicon-list-alt"></span>'
+        t.instant('sidenav.menuItem.policies'),
+        './policies',
+        '<span class="navigation-icon glyphicon glyphicon-list-alt"></span>'
       ),
       new MenuItem(
-          t.instant('sidenav.menuItem.jobs'),
-          './jobs',
-          '<span class="navigation-icon glyphicon glyphicon-hourglass"></span>'
+        t.instant('sidenav.menuItem.jobs'),
+        './jobs',
+        '<span class="navigation-icon glyphicon glyphicon-hourglass"></span>'
       ),
       new MenuItem(
-          t.instant('sidenav.menuItem.help'),
-          './help',
-          '<span class="navigation-icon glyphicon glyphicon-info-sign"></span>'
+        t.instant('sidenav.menuItem.help'),
+        './help',
+        '<span class="navigation-icon glyphicon glyphicon-info-sign"></span>'
       )
     ];
     this.events$ = store.select(getAllEvents);
@@ -71,4 +89,15 @@ export class DlmComponent {
     this.store.dispatch(loadNewEventsCount());
     this.store.dispatch(loadEvents());
   }
+
+  saveUserTimezone(timezoneIndex) {
+    // todo save not only in the local storage
+    this.sessionStorageService.set('tz', timezoneIndex);
+    this.timeZoneService.userTimezoneIndex$.next(timezoneIndex);
+  }
+
+  logout() {
+    // do logout
+  }
+
 }
