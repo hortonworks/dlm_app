@@ -1,5 +1,6 @@
 import { type } from '../utils/type-action';
 import { Action } from '@ngrx/store';
+import { JOB_STATUS } from 'constants/status.constant';
 
 export const ActionTypes = {
   LOAD_JOBS: type('LOAD_JOBS'),
@@ -18,6 +19,6 @@ export const loadJobsFail = (error): Action => ({type: ActionTypes.LOAD_JOBS_FAI
 
 function prepareJob(job) {
   job.runTime = job.endTime > 0 ? job.endTime - job.startTime : -1;
-  job.isCompleted = job.status !== 'In Progress';
+  job.isCompleted = job.status !== JOB_STATUS.IN_PROGRESS;
   return job;
 }

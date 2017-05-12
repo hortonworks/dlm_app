@@ -1,0 +1,30 @@
+<div class="notifications-group pull-right">
+  <div class="alerts-label dropdown-toggle" data-toggle="dropdown">
+    <span class="glyphicon glyphicon-th"></span>
+  </div>
+  <div id="notifications-dropdown" class="navigation-dropdown dropdown-menu row">
+    <div class="popup-arrow-up"></div>
+    <div class="notifications-header col-sm-12">
+      <div class="notifications-title">HDP</div>
+    </div>
+    <div class="notifications-body col-sm-12">
+      <table class="alerts-table table">
+        <tbody>
+        <tr>
+          <td *ngFor="let column of linksColumns">
+            <div *ngFor="let category of column.linksCategories">
+              <p><strong>{{category.title}}</strong></p>
+              <ul>
+                <li *ngFor="let link of category.links">
+                  <a [href]="link.url" target="_blank">{{link.title}}</a> <span *ngIf="link.hint" class="hint"> - {{link.hint}}</span>
+                </li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+

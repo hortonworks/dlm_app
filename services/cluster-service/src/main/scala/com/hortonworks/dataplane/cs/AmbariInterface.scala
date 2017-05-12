@@ -6,24 +6,40 @@ import play.api.libs.json.JsValue
 
 import scala.concurrent.Future
 
-
 private[dataplane] case class Kerberos(user: String, ticket: String)
 
 private[dataplane] case class AmbariConnection(
-                                                status: Boolean,
-                                                url: URL,
-                                                kerberos: Option[Kerberos] = None,
-                                                connectionError: Option[Throwable] = None)
+    status: Boolean,
+    url: URL,
+    kerberos: Option[Kerberos] = None,
+    connectionError: Option[Throwable] = None)
 
-private[dataplane] case class Atlas(restService: URL,properties:String)
+private[dataplane] case class ServiceHost(host: String)
 
-private[dataplane] case class NameNode(startTime:Long,capacityUsed:Long,capacityRemaining:Long,usedPercentage:Double,totalFiles:Long,props:Option[JsValue])
+private[dataplane] case class Atlas(properties: String)
 
-private[dataplane] case class HostInformation(hostState: String, hostStatus: String, name:String,ip:String, properties: Option[JsValue])
+private[dataplane] case class NameNode(serviceHost: Seq[ServiceHost] = Seq(),
+                                       props: Option[JsValue])
 
-private [dataplane] case class KnoxInfo(properties:Option[JsValue])
+private[dataplane] case class Hdfs(serviceHost: Seq[ServiceHost] = Seq(),
+                                   props: Option[JsValue])
 
-private [dataplane] case class Credentials(user:Option[String],pass:Option[String])
+private[dataplane] case class HiveServer(serviceHost: Seq[ServiceHost] = Seq(),
+                                         props: Option[JsValue])
+
+private[dataplane] case class HostInformation(hostState: String,
+                                              hostStatus: String,
+                                              name: String,
+                                              ip: String,
+                                              properties: Option[JsValue])
+
+private[dataplane] case class KnoxInfo(properties: Option[JsValue])
+
+private[dataplane] case class BeaconInfo(properties: Option[JsValue],
+                                         endpoints: Seq[ServiceHost])
+
+private[dataplane] case class Credentials(user: Option[String],
+                                          pass: Option[String])
 
 trait AmbariInterface {
 
@@ -31,12 +47,16 @@ trait AmbariInterface {
 
   def getAtlas: Future[Either[Throwable, Atlas]]
 
-  def getNameNodeStats:Future[Either[Throwable, NameNode]]
+  def getBeacon: Future[Either[Throwable, BeaconInfo]]
 
-  def getGetHostInfo:Future[Either[Throwable, Seq[HostInformation]]]
+  def getNameNodeStats: Future[Either[Throwable, NameNode]]
 
-  def getKnoxInfo:Future[Either[Throwable, KnoxInfo]]
+  def getHdfsInfo: Future[Either[Throwable, Hdfs]]
+
+  def getHs2Info: Future[Either[Throwable, HiveServer]]
+
+  def getGetHostInfo: Future[Either[Throwable, Seq[HostInformation]]]
+
+  def getKnoxInfo: Future[Either[Throwable, KnoxInfo]]
 
 }
-
-

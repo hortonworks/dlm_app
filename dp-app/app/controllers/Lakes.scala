@@ -43,10 +43,17 @@ class Lakes @Inject()(@Named("lakeService") val lakeService: LakeService,
             case Left(errors) =>
               InternalServerError(JsonResponses.statusError(
                 s"Failed with ${Json.toJson(errors)}"))
-            case Right(lake) => Ok(Json.toJson(lake))
+            case Right(lake) => {
+              syncDatalake(lake)
+              Ok(Json.toJson(lake))
+            }
           }
       }
       .getOrElse(Future.successful(BadRequest))
+  }
+
+  private def syncDatalake(datalake: Datalake): Future[Boolean] = {
+    ambariService.syncCluster(datalake)
   }
 
   def retrieve(datalakeId: String) = authenticated.async {
@@ -90,12 +97,11 @@ class Lakes @Inject()(@Named("lakeService") val lakeService: LakeService,
       }
   }
 
-  def ambariCheck(url: String) = authenticated.async {
+  def ambariCheck = authenticated.async {request =>
     ambariService
-      .statusCheck(AmbariEndpoint(url))
+      .statusCheck(AmbariEndpoint(request.getQueryString("url").get))
       .map {
-        case 200 => Ok(Json.toJson(Map("ambariStatus" -> 200)))
-        case status => ServiceUnavailable(Json.toJson(Map("ambariStatus" -> status)))
+        case status =>  Ok(Json.toJson(Map("ambariStatus" -> status)))
       }
       .recoverWith {
         case e: Exception =>

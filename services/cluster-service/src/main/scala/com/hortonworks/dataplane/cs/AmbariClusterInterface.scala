@@ -4,16 +4,19 @@ import java.net.{MalformedURLException, URL}
 
 import com.hortonworks.dataplane.commons.domain.Entities.Cluster
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
+import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
-class AmbariClusterInterface(private val cluster: Cluster,credentials: Credentials)(
-    implicit ws: WSClient)
+class AmbariClusterInterface(
+    private val cluster: Cluster,
+    private val credentials: Credentials,
+    private val appConfig: Config)(implicit ws: WSClient)
     extends AmbariInterface {
 
   val logger = Logger(classOf[AmbariClusterInterface])
@@ -36,9 +39,7 @@ class AmbariClusterInterface(private val cluster: Cluster,credentials: Credentia
     require(url.isSuccess, "registered Ambari url is invalid")
     //Hit ambari URL
     ws.url(s"${url.get.toString}")
-      .withAuth(credentials.user.get,
-                credentials.pass.get,
-                WSAuthScheme.BASIC)
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
       .map { res =>
         logger.info(s"Successfully connected to Ambari $res")
@@ -58,14 +59,16 @@ class AmbariClusterInterface(private val cluster: Cluster,credentials: Credentia
       }
       .recoverWith {
         case e: Exception =>
-          logger.error(s"Could not connect to Ambari, reason: ${e}", e)
+          logger.error(s"Could not connect to Ambari, reason: ${e.getMessage}",
+                       e)
           Future.successful(
             AmbariConnection(status = false, url.get, None, Some(e)))
       }
 
   }
 
-  private def isClusterKerberized = cluster.secured.isDefined && cluster.secured.get
+  private def isClusterKerberized =
+    cluster.secured.isDefined && cluster.secured.get
 
   override def getAtlas: Future[Either[Throwable, Atlas]] = {
     logger.info("Trying to get data from Atlas")
@@ -73,26 +76,13 @@ class AmbariClusterInterface(private val cluster: Cluster,credentials: Credentia
     val serviceSuffix =
       "/configurations/service_config_versions?service_name=ATLAS&is_current=true"
     ws.url(s"${cluster.ambariurl.get}$serviceSuffix")
-      .withAuth(credentials.user.get,
-                credentials.pass.get,
-                WSAuthScheme.BASIC)
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
       .map { res =>
         val json = res.json
         val configurations = json \ "items" \\ "configurations"
         val configs: JsValue = configurations.head
-        val configsAsList = configs.as[List[JsObject]]
-        val atlasConfig = configsAsList.find(obj =>
-          (obj \ "type").as[String] == "application-properties")
-        if (atlasConfig.isEmpty)
-          Left(ServiceNotFound("No properties found for Atlas"))
-        val properties = (atlasConfig.get \ "properties").as[JsObject]
-        val apiUrl = (properties \ "atlas.rest.address").as[String]
-        val restService = Try(new URL(apiUrl))
-        restService
-          .map(url => Right(Atlas(url, Json.stringify(configs))))
-          .getOrElse(Left(new MalformedURLException(s"Cannot parse $apiUrl")))
-
+        Right(Atlas(Json.stringify(Json.obj("stats" -> Json.obj(), "properties" -> configs))))
       }
       .recoverWith {
         case e: Exception =>
@@ -104,48 +94,54 @@ class AmbariClusterInterface(private val cluster: Cluster,credentials: Credentia
   override def getNameNodeStats: Future[Either[Throwable, NameNode]] = {
 
     val nameNodeResponse = ws
-      .url(
-        s"${cluster.ambariurl.get}/components/NAMENODE")
-      .withAuth(credentials.user.get,
-                credentials.pass.get,
-                WSAuthScheme.BASIC)
+      .url(s"${cluster.ambariurl.get}/components/NAMENODE")
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
-    nameNodeResponse
-      .map { nnr =>
-        val serviceComponent = nnr.json \ "ServiceComponentInfo"
-        val startTime = (serviceComponent \ "StartTime")
-          .validate[Long]
-          .map(l => l)
-          .getOrElse(0L)
-        val capacityUsed = (serviceComponent \ "CapacityUsed")
-          .validate[Long]
-          .map(l => l)
-          .getOrElse(0L)
-        val capacityRemaining = (serviceComponent \ "CapacityRemaining")
-          .validate[Long]
-          .map(l => l)
-          .getOrElse(0L)
-        val usedPercentage = (serviceComponent \ "PercentUsed")
-          .validate[Double]
-          .map(l => l)
-          .getOrElse(0.0)
-        val totalFiles = (serviceComponent \ "TotalFiles")
-          .validate[Long]
-          .map(l => l)
-          .getOrElse(0L)
-        val nameNodeInfo = NameNode(startTime,
-                                    capacityUsed,
-                                    capacityRemaining,
-                                    usedPercentage,
-                                    totalFiles,
-                                    props = serviceComponent.toOption)
-        Right(nameNodeInfo)
+
+    val nameNodeHostsApi =
+      s"${cluster.ambariurl.get}/host_components?HostRoles/component_name=NAMENODE"
+
+    val hostInfo = ws
+      .url(nameNodeHostsApi)
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
+      .get()
+
+    val nameNodePropertiesResponse = ws
+      .url(
+        s"${cluster.ambariurl.get}/configurations/service_config_versions?service_name=HDFS&is_current=true")
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
+      .get()
+
+    val nameNodeInfo = for {
+      hi <- hostInfo
+      nnr <- nameNodeResponse
+      nnpr <- nameNodePropertiesResponse
+    } yield {
+
+      val serviceComponent = nnr.json \ "ServiceComponentInfo"
+      val hostItems =
+        (hi.json \ "items").as[JsArray].validate[List[JsObject]].get
+
+      val hosts = hostItems.map { h =>
+        val host = (h \ "HostRoles" \ "host_name").validate[String]
+        host.get
       }
-      .recoverWith {
-        case e: Exception =>
-          logger.error("Cannot get Name node info")
-          Future.successful(Left(e))
-      }
+
+      val items = (nnpr.json \ "items").as[JsArray]
+      val configs =
+        (items(0) \ "configurations").as[JsArray]
+
+      NameNode(
+        hosts.map(ServiceHost),
+        Some(
+          Json.obj("stats" -> serviceComponent.get, "properties" -> configs)))
+    }
+
+    nameNodeInfo.map(Right(_)).recoverWith {
+      case e: Exception =>
+        logger.error("Cannot get Namenode info")
+        Future.successful(Left(e))
+    }
   }
 
   override def getGetHostInfo: Future[Either[Throwable, Seq[HostInformation]]] = {
@@ -157,9 +153,7 @@ class AmbariClusterInterface(private val cluster: Cluster,credentials: Credentia
 
     val hostsResponse: Future[WSResponse] = ws
       .url(hostsPath)
-      .withAuth(credentials.user.get,
-                credentials.pass.get,
-                WSAuthScheme.BASIC)
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
     //Load Cluster Info
     hostsResponse
@@ -191,10 +185,17 @@ class AmbariClusterInterface(private val cluster: Cluster,credentials: Credentia
                   .map(s => s)
                   .getOrElse("")
                 val hostName =
-                  (hostNode \ "host_name").validate[String].map(s => s).getOrElse("")
+                  (hostNode \ "host_name")
+                    .validate[String]
+                    .map(s => s)
+                    .getOrElse("")
                 val ip =
                   (hostNode \ "ip").validate[String].map(s => s).getOrElse("")
-                HostInformation(state, s"$status/$state", hostName,ip, hostNode.toOption)
+                HostInformation(state,
+                                s"$status/$state",
+                                hostName,
+                                ip,
+                                hostNode.toOption)
             }
             // the host info
             futureHost
@@ -221,21 +222,62 @@ class AmbariClusterInterface(private val cluster: Cluster,credentials: Credentia
       }
   }
 
+  override def getHs2Info: Future[Either[Throwable, HiveServer]] = {
+    // Get HS2 properties first
+    val hiveAPI =
+      s"${cluster.ambariurl.get}/configurations/service_config_versions?service_name=HIVE&is_current=true"
+    val hiveHostApi =
+      s"${cluster.ambariurl.get}/host_components?HostRoles/component_name=HIVE_SERVER"
+
+    val configResponse = ws
+      .url(hiveAPI)
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
+      .get()
+    val hostInfo = ws
+      .url(hiveHostApi)
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
+      .get()
+
+    val hiveInfo = for {
+      cr <- configResponse
+      hi <- hostInfo
+    } yield {
+
+      val hostItems =
+        (hi.json \ "items").as[JsArray].validate[List[JsObject]].get
+
+      val hosts = hostItems.map { h =>
+        val host = (h \ "HostRoles" \ "host_name").validate[String]
+        host.get
+      }
+
+      val items = (cr.json \ "items").as[JsArray]
+      val configs =
+        (items(0) \ "configurations").as[JsArray]
+
+      HiveServer(hosts.map(ServiceHost), Some(Json.obj("stats" -> Json.obj(), "properties" -> configs)))
+    }
+
+    hiveInfo.map(Right(_)).recoverWith {
+      case e: Exception =>
+        logger.error("Cannot get Hive information")
+        Future.successful(Left(e))
+    }
+  }
+
   override def getKnoxInfo: Future[Either[Throwable, KnoxInfo]] = {
     // Dump knox properties
     val knoxApi =
       s"${cluster.ambariurl.get}/configurations/service_config_versions?service_name=KNOX&is_current=true"
     ws.url(knoxApi)
-      .withAuth(credentials.user.get,
-                credentials.pass.get,
-                WSAuthScheme.BASIC)
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
       .map(
         res =>
           res.json
             .validate[JsValue]
             .map { js =>
-              Right(KnoxInfo(Some(js)))
+              Right(KnoxInfo(None))
             }
             .getOrElse(Left(new Exception("Could not load Knox properties"))))
       .recoverWith {
@@ -246,5 +288,74 @@ class AmbariClusterInterface(private val cluster: Cluster,credentials: Credentia
 
   }
 
+  override def getBeacon: Future[Either[Throwable, BeaconInfo]] = {
+    // Get Beaon properties first
+    val beaconApi =
+      s"${cluster.ambariurl.get}/configurations/service_config_versions?service_name=BEACON&is_current=true"
+    val beaconHostApi =
+      s"${cluster.ambariurl.get}/host_components?HostRoles/component_name=BEACON_SERVER"
 
+    val configResponse = ws
+      .url(beaconApi)
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
+      .get()
+    val hostInfo = ws
+      .url(beaconHostApi)
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
+      .get()
+
+    val beaconInfo = for {
+      cr <- configResponse
+      hi <- hostInfo
+    } yield {
+
+      val items = (cr.json \ "items").as[JsArray]
+      val configs =
+        (items(0) \ "configurations").as[JsArray]
+
+      val hostItems =
+        (hi.json \ "items").as[JsArray].validate[List[JsObject]].get
+
+      val hosts = hostItems.map { h =>
+        val host = (h \ "HostRoles" \ "host_name").validate[String]
+        host.get
+      }
+
+      BeaconInfo(
+        Some(Json.obj("stats" -> Json.obj(), "properties" -> configs)),
+        hosts.map(ServiceHost))
+    }
+
+    beaconInfo.map(Right(_)).recoverWith {
+      case e: Exception =>
+        logger.error("Cannot get Beacon information")
+        Future.successful(Left(e))
+    }
+  }
+
+  override def getHdfsInfo: Future[Either[Throwable, Hdfs]] = {
+
+    val hdfsResponse = ws
+      .url(
+        s"${cluster.ambariurl.get}/configurations/service_config_versions?service_name=HDFS&is_current=true")
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
+      .get()
+
+    val hdfsInfo = for {
+      nnpr <- hdfsResponse
+    } yield {
+      val items = (nnpr.json \ "items").as[JsArray]
+      val configs =
+        (items(0) \ "configurations").as[JsArray]
+
+      Hdfs(Seq(), Some(Json.obj("stats" -> Json.obj(), "properties" -> configs)))
+    }
+
+    hdfsInfo.map(Right(_)).recoverWith {
+      case e: Exception =>
+        logger.error("Cannot get Namenode info")
+        Future.successful(Left(e))
+    }
+
+  }
 }

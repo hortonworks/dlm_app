@@ -1,0 +1,21 @@
+{{"common.status.self" | translate}}
+<div class="btn-group" role="group">
+  <button type="button" class="btn btn-xs btn-default" (click)="filterJobsByStatus('')">
+    {{jobs.length}} {{"common.all" | translate}}
+  </button>
+  <button type="button" class="btn btn-xs btn-default" (click)="filterJobsByStatus(JOB_STATUS.SUCCESS)">
+    {{groupedByStatusJobs[JOB_STATUS.SUCCESS].length}} {{"jobs.status.completed" | translate}}
+  </button>
+  <button type="button" class="btn btn-xs btn-default" (click)="filterJobsByStatus(JOB_STATUS.IN_PROGRESS)">
+    <dlm-job-status [job]="inProgressJobMock"></dlm-job-status>
+    {{groupedByStatusJobs[JOB_STATUS.IN_PROGRESS].length}} {{"jobs.status.in_progress" | translate}}
+  </button>
+  <button type="button" class="btn btn-xs btn-default" (click)="filterJobsByStatus(JOB_STATUS.WARNINGS)">
+    <dlm-job-status [job]="warningsJobMock"></dlm-job-status>
+    {{groupedByStatusJobs[JOB_STATUS.WARNINGS].length}} {{"jobs.status.warnings" | translate}}
+  </button>
+  <button type="button" class="btn btn-xs btn-default" (click)="filterJobsByStatus(JOB_STATUS.FAILED)">
+    <dlm-job-status [job]="failedJobMock"></dlm-job-status>
+    {{groupedByStatusJobs[JOB_STATUS.FAILED].length}} {{"jobs.status.failed" | translate}}
+  </button>
+</div>

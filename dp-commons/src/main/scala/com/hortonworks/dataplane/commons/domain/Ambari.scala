@@ -1,6 +1,6 @@
 package com.hortonworks.dataplane.commons.domain
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 
 /**
   * Ambari Specific Data models
@@ -64,6 +64,32 @@ object Ambari {
       state: Option[String]
   )
 
+  case class ClusterServiceWithConfigs(
+      serviceid: Option[Long],
+      servicename: String,
+      clusterid: Option[Long] = None,
+      servicehost: String,
+      configProperties: Option[ConfigurationInfo] = None
+  )
+
+  case class ConfigurationInfo(
+      stats: JsValue,
+      properties: Seq[ConfigType]
+
+  )
+
+  case class ConfigType(
+      tag: String,
+      `type`: String,
+      Config: JsValue,
+      version: Long,
+      properties: Map[String,String],
+      properties_attributes: JsValue
+  )
+
+
+
+
   implicit val diskInfoReads = Json.reads[DiskInfo]
   implicit val diskInfoWrites = Json.writes[DiskInfo]
   implicit val clusterHealthWrites = Json.writes[ClusterHost]
@@ -72,5 +98,11 @@ object Ambari {
   implicit val nameNodeReads = Json.reads[NameNodeInfo]
   implicit val endPointWrites = Json.writes[AmbariEndpoint]
   implicit val endPointReads = Json.reads[AmbariEndpoint]
+  implicit val configTypeReads = Json.reads[ConfigType]
+  implicit val configTypeWrites = Json.writes[ConfigType]
+  implicit val configurationInfoReads = Json.reads[ConfigurationInfo]
+  implicit val configurationInfoWrites = Json.writes[ConfigurationInfo]
+  implicit val serviceWithEndpointWrites = Json.writes[ClusterServiceWithConfigs]
+  implicit val serviceWithEndpointReads = Json.reads[ClusterServiceWithConfigs]
 
 }

@@ -18,6 +18,7 @@ import {MockStore} from '../../mocks/mock-store';
 import {Store} from '@ngrx/store';
 import {RouterTestingModule} from '@angular/router/testing';
 import {TableFooterComponent} from '../../common/table/table-footer/table-footer.component';
+import { NavbarService } from 'services/navbar.service';
 
 describe('PoliciesComponent', () => {
   let component: PoliciesComponent;
@@ -40,7 +41,8 @@ describe('PoliciesComponent', () => {
         CheckboxColumnComponent
       ],
       providers: [
-        {provide: Store, useClass: MockStore}
+        {provide: Store, useClass: MockStore},
+        NavbarService
       ]
     })
       .compileComponents();

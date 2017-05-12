@@ -17,11 +17,14 @@
 
 * `git clone https://github.com/hortonworks/dataplane`
 * In folder dp-build `sh ./build.sh`. First time build could take sometime as all Scala dependencies are downloaded and cached.
+* In folder dp-build/build, an install tarball is created called `dp-installer.tar.gz`. This can be used to deploy Dataplane components on any machine with docker support.
 
-## Setup
 
+## Setup (from source)
+
+* Ensure the steps in Build section above are followed.
 * We can use docker to bring up the application without requiring to install other runtime dependencies like Postgres, NGinx etc. Follow these steps to bring up the docker containers.
-* A utility script has been provided in the dp-build folder called `dpdeploy.sh` to help with this. This wraps around docker-compose commands and aims to provide a simpler interface.
+* A utility script has been provided in the `dp-build/build/installer` folder called `dpdeploy.sh` to help with this. This wraps around docker-compose commands and aims to provide a simpler interface.
 * There is a certain sequence to follow to bring up the application, as detailed below. All commands need to be executed from the dp-build folder.
 * For a fresh setup:
   * Initialize the Postgres database: `./dpdeploy.sh init db`
@@ -31,7 +34,7 @@
     * `docker exec -it dpbuild_dp-database_1 psql -U dp_admin -W -h dp-database dataplane`
     * Enter `dp_admin` as the password
     * `select * from schema_version;` This should show some migrations.
-  * Build the containers for the application: `./dpdeploy.sh build`
+  * Build the containers for the application: `./dp-docker-build.sh build`
   * Initialize the application: `./dpdeploy.sh init app`
 * For an existing setup:
   * Stop the application: `./dpdeploy.sh stop`
@@ -41,7 +44,7 @@
 * Knox integration:
   * In addition to local users, you can also authenticate via Knox-SSO.
   * To do this:
-     * `./dpdeploy.sh build knox`: This builds the Knox container based on HDP 2.6 repo images.
+     * `./dp-docker-build.sh build knox`: This builds the Knox container based on HDP 2.6 repo images.
      * `./dpdeploy.sh init knox`: This initializes the Knox container, by setting up necessary configuration, including things like the Knox master password, which are taken from the end user.
      * Ignore any warnings you get at this moment: these will be fixed in coming builds.
      * *Note*: If the app was started before Knox, you would need to restart the app with `./dpdeploy.sh stop` and `./dpdeploy.sh start`.

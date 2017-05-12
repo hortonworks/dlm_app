@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChange, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { ModalDirective } from 'ng2-bootstrap';
 
 @Component({
@@ -26,7 +26,7 @@ import { ModalDirective } from 'ng2-bootstrap';
     </div>
   `
 })
-export class ModalDialogComponent implements OnInit {
+export class ModalDialogComponent implements OnInit, OnChanges {
   @ViewChild('childModal') public childModal: ModalDirective;
 
   // Ok and Cancel buttons are shown by default
@@ -41,6 +41,7 @@ export class ModalDialogComponent implements OnInit {
   @Input() showCancel = true;
   @Input() showIgnore = false;
   @Input() showDelete = false;
+  @Input() showDialog = false;
   @Output() onOk = new EventEmitter<boolean>();
   @Output() onDelete = new EventEmitter<boolean>();
   @Output() onIgnore = new EventEmitter<boolean>();
@@ -49,6 +50,16 @@ export class ModalDialogComponent implements OnInit {
   constructor() { }
 
   ngOnInit() { }
+
+  ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
+    if (changes['showDialog']) {
+      if (this.showDialog === true) {
+        this.show();
+      } else {
+        this.hide();
+      }
+    }
+  }
 
   public show(): void {
     this.childModal.show();

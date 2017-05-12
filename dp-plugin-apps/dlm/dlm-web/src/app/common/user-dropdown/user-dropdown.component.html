@@ -1,0 +1,28 @@
+<div class="notifications-group pull-right">
+  <div class="alerts-label dropdown-toggle" data-toggle="dropdown">
+    <span class="glyphicon glyphicon-user"></span>
+  </div>
+  <div id="notifications-dropdown" class="user-settings-dropdown dropdown-menu row">
+    <div class="notifications-header col-sm-12">
+      <div class="notifications-title">{{user.fullName}}</div>
+    </div>
+    <div class="notifications-body col-sm-12">
+      <table class="alerts-table table">
+        <tbody>
+        <tr>
+          <td>
+            {{"topnav.timezone" | translate}}:
+            <ng-select
+              [active]="timezoneValue"
+              [items]="timeZoneOptions"
+              (selected)="onTimezoneSelect($event)"></ng-select>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="notifications-footer col-sm-12">
+      <button class="btn btn-secondary pull-right" (click)="doLogout()">Logout</button>
+    </div>
+  </div>
+</div>

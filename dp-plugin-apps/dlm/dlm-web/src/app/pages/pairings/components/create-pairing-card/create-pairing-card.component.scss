@@ -22,3 +22,13 @@
 .pointer {
   cursor: pointer;
 }
+.disabled {
+  cursor: not-allowed;
+  .text-muted {
+    color: #999999;
+  }
+}
+
+.frozen {
+  cursor: not-allowed;
+}

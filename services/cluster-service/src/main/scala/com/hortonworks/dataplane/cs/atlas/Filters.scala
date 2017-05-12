@@ -78,7 +78,7 @@ object Filters {
 
   private class LessThanPredicate extends Predicate {
     override def apply(atlasFilter: AtlasFilter): Query = {
-      Query(s"${atlasFilter.atlasAttribute.name}<${atlasFilter.operand}")
+      Query(s"${atlasFilter.atlasAttribute.name}<${atlasFilter.operand}" )
     }
 
     override def isApplicable(atlasFilter: AtlasFilter): Boolean = {
@@ -122,7 +122,7 @@ object Filters {
 
   private class NotEqualsPredicate extends Predicate {
     override def apply(atlasFilter: AtlasFilter): Query = {
-      Query(s"${atlasFilter.atlasAttribute.name}<>${atlasFilter.operand}")
+      Query(s"${atlasFilter.atlasAttribute.name}!=${atlasFilter.operand}")
     }
 
     override def isApplicable(atlasFilter: AtlasFilter): Boolean = {

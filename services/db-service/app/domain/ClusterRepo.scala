@@ -19,13 +19,14 @@ class ClusterRepo @Inject()(
 
   def all(datalakeId: Option[Long]): Future[List[Cluster]] = db.run {
     datalakeId match {
-      case Some(datalakeId) => Clusters.filter(_.datalakeid === datalakeId).to[List].result
+      case Some(datalakeId) =>
+        Clusters.filter(_.datalakeid === datalakeId).to[List].result
       case None => Clusters.to[List].result
     }
   }
 
   def insert(cluster: Cluster): Future[Cluster] = {
-    val security = if(cluster.secured.isEmpty) {
+    val security = if (cluster.secured.isEmpty) {
       Some(false)
     } else cluster.secured
     cluster.copy(secured = security)
@@ -37,8 +38,9 @@ class ClusterRepo @Inject()(
   def findById(clusterId: Long): Future[Option[Cluster]] = {
     db.run(Clusters.filter(_.id === clusterId).result.headOption)
   }
-  
-  def findByDatalakeId(datalakeId:Long):Future[List[Cluster]] = {
+
+  def findByDatalakeId(datalakeId: Long): Future[List[Cluster]] = {
+
     db.run(Clusters.filter(_.datalakeid === datalakeId).to[List].result)
   }
 

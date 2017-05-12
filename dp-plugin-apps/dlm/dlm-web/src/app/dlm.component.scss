@@ -18,4 +18,19 @@ html, body {
 header {
   background-color: #fff;
   height: 55px;
+  .navbar-nav {
+    font-size: 20px;
+    margin-top: 12px;
+    color: #999999;
+    line-height: 40px;
+  }
+  .navbar-right {
+    margin: 8px 15px;
+    &.user {
+      margin: 8px 40px 0 0;
+    }
+  }
+  .navbar-footer {
+    margin-right: 40px;
+  }
 }

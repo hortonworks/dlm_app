@@ -36,11 +36,10 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_permissions (
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_locations (
   id        BIGSERIAL PRIMARY KEY,
-  country   VARCHAR(255)   NOT NULL,
   city      VARCHAR(255)   NOT NULL,
+  country   VARCHAR(255)   NOT NULL,
   latitude  DECIMAL(10, 6) NOT NULL,
-  longitude DECIMAL(10, 6) NOT NULL,
-  UNIQUE (country, city)
+  longitude DECIMAL(10, 6) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_datalakes (
@@ -75,15 +74,24 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_clusters (
 CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_services (
   id          BIGSERIAL PRIMARY KEY,
   servicename VARCHAR(255) NOT NULL,
-  servicehost VARCHAR(255),
-  serviceport INT,
-  fullurl     TEXT,
   properties  JSONB,
   clusterid   BIGINT REFERENCES dataplane.dp_clusters (id),
   datalakeid  BIGINT REFERENCES dataplane.dp_datalakes (id),
   CHECK (clusterid IS NOT NULL OR datalakeid IS NOT NULL)
 
 );
+
+COMMENT ON TABLE dataplane.dp_cluster_services  IS 'Services required for DP discovered from the cluster';
+
+
+CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_service_hosts (
+  id          BIGSERIAL PRIMARY KEY,
+  host        VARCHAR(255) NOT NULL,
+  serviceid   BIGINT REFERENCES dataplane.dp_cluster_services(id)
+);
+
+COMMENT ON TABLE dataplane.dp_cluster_service_hosts  IS 'Service hosts for services listed in dp_cluster_services';
+
 
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_workspace (

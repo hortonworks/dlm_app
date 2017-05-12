@@ -8,7 +8,10 @@ import {CreatePairingCardComponent} from '../../components/create-pairing-card/c
 import {ClusterCardComponent} from '../../../../components/cluster-card/cluster-card.component';
 import {MockStore} from '../../../../mocks/mock-store';
 import {Store} from '@ngrx/store';
+import {ModalDialogComponent} from '../../../../common/modal-dialog/modal-dialog.component';
+import {ModalModule} from 'ng2-bootstrap';
 import {MockTranslateLoader} from '../../../../mocks/mock-translate-loader';
+import {RouterTestingModule} from '@angular/router/testing';
 
 describe('CreatePairingComponent', () => {
   let component: CreatePairingComponent;
@@ -18,13 +21,18 @@ describe('CreatePairingComponent', () => {
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot({
         loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-      }), ReactiveFormsModule],
+      }),
+        ReactiveFormsModule,
+        ModalModule.forRoot(),
+        RouterTestingModule
+      ],
       declarations: [
         CreatePairingComponent,
         CreatePairingCardListComponent,
         PairingProgressCardComponent,
         CreatePairingCardComponent,
-        ClusterCardComponent
+        ClusterCardComponent,
+        ModalDialogComponent
       ],
       providers: [
         {provide: Store, useClass: MockStore}

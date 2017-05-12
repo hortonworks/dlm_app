@@ -1,42 +1,43 @@
 {
-  "pairings": [
-    {
-      "id": "primaryCluster-anotherCluster",
-      "firstCluster": {
-        "id": "primaryCluster",
-        "clusterDetails": {
-          "name": "Primary Cluster",
-          "description": "primary",
-          "dataCenter": "Texas"
-        }
-      },
-      "secondCluster": {
-        "id": "anotherCluster",
-        "clusterDetails": {
-          "name": "Secondary Cluster",
-          "description": "Secondary",
-          "dataCenter": "Virginia"
-        }
+  "unreachableBeacon": [],
+  "pairedClusters": [
+    [{
+      "id": "Primary Cluster",
+      "description": "primary",
+      "name": "Primary Cluster",
+      "ambariurl": "http://localhost:8080",
+      "location": {
+        "city": "Pur Chaman",
+        "country": "AF"
       }
-    },
-    {
-      "id": "devCluster-primaryCluster",
-      "firstCluster": {
-        "id": "devCluster",
-        "clusterDetails": {
-          "name": "Development Cluster",
-          "description": "For Development",
-          "dataCenter": "California"
-        }
-      },
-      "secondCluster": {
-        "id": "primaryCluster",
-        "clusterDetails": {
-          "name": "Primary Cluster",
-          "description": "primary",
-          "dataCenter": "Texas"
-        }
+    }, {
+      "id": "Secondary Cluster",
+      "description": "secondary",
+      "name": "Secondary Cluster",
+      "ambariurl": "http://localhost:8080",
+      "location": {
+        "city": "Santa Clara",
+        "country": "US"
       }
-    }
+    }],
+    [{
+      "id": "Development Cluster",
+      "description": "development",
+      "name": "Development Cluster",
+      "ambariurl": "http://localhost:8080",
+      "location": {
+        "city": "Columbus",
+        "country": "US"
+      }
+    }, {
+      "id": "Primary Cluster",
+      "description": "primary",
+      "name": "Primary Cluster",
+      "ambariurl": "http://localhost:8080",
+      "location": {
+        "city": "Pur Chaman",
+        "country": "AF"
+      }
+    }]
   ]
 }

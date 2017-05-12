@@ -37,7 +37,7 @@ export class TableFooterComponent {
   }
 
   get paging(): string {
-    const start = this.offset * this.pageSize + 1;
+    const start = this.rowCount ? this.offset * this.pageSize + 1 : 0;
     let end = start - 1 + this.pageSize;
     end = Math.min(end, this.rowCount);
     return this.translate.instant('common.table.paging', {start, end, count: this.rowCount});

@@ -3,11 +3,14 @@ package services
 import javax.inject.Inject
 
 import com.google.inject.Singleton
-import play.api.libs.json._
+import com.hortonworks.dataplane.commons.domain.Entities.Datalake
+import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
+import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
+import play.api.Logger
 
 @Singleton
 class AmbariService @Inject()(private val wSClient: WSClient,private val configuration: play.api.Configuration) {
@@ -25,4 +28,21 @@ class AmbariService @Inject()(private val wSClient: WSClient,private val configu
         response.status
      }
   }
+
+  def syncCluster(datalake: Datalake): Future[Boolean] = {
+    wSClient
+      .url(s"$clusterService/datalake/sync")
+      .post(Json.toJson(datalake))
+      .map { response =>
+        if (response.status == 200) {
+          Logger.info(s"Successuly synced datalake with ${datalake.id}")
+          true
+        } else {
+          Logger.info(
+            s"Sync failure datalake with id ${datalake.id} Details: ${response}")
+          false
+        }
+      }
+  }
+
 }

@@ -1,0 +1,36 @@
+:host {
+  margin-top: 5px;
+  border-bottom: 1px solid #eee;
+  display: block;
+  padding: 5px 15px 5px 0;
+
+  .issue-list-item-container {
+    display: flex;
+  }
+
+  .issue-status {
+    flex-basis: 40px;
+    color: #666;
+    text-align: center;
+    padding-top: 3px;
+  }
+
+  .issue-info {
+    flex-grow: 1;
+    div {
+      font-weight: normal;
+      font-style: normal;
+      color: #333;
+      line-height: 1.3;
+    }
+    .name {
+      margin-bottom: 5px;
+    }
+    .description {
+      color: #666;
+    }
+    .timestamp {
+      color: #999;
+    }
+  }
+}

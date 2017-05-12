@@ -17,7 +17,7 @@ class Webserver @Inject()(private val actorSystem: ActorSystem,
 
   private implicit val dispatcher = actorSystem.dispatcher
   private val port = Try(config.getInt("dp.services.cluster.http.port")).getOrElse(9009)
-  private val host = Try(config.getString("dp.services.cluster.http.host")).getOrElse("localhost")
+  private val host = Try(config.getString("dp.services.cluster.http.host")).getOrElse("0.0.0.0")
 
   def init = {
     implicit val system = actorSystem

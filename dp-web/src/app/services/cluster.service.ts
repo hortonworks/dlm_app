@@ -25,11 +25,6 @@ export class ClusterService {
       .catch(HttpUtil.handleError);
   }
 
-  validate(clusterUrl: string): Observable<boolean> {
-    // TODO: implement
-    return Observable.of(true);
-  }
-
   retrieveHealth(clusterId: number): Observable<ClusterHealthSummary>  {
     const uri = `${this.uri}/${clusterId}/health?summary=true`;
 
