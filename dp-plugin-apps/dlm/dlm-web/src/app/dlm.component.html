@@ -8,7 +8,7 @@
       <user-dropdown [user]="user" (timezoneChanged)="saveUserTimezone($event)" (logout)="logout()"></user-dropdown>
     </div>
     <div class="notifications navbar-nav navbar-right">
-      <notifications [events]="events$ | async" [newEventsCount]="newEventsCount$ | async"></notifications>
+      <dlm-notifications [events]="events$ | async" [newEventsCount]="newEventsCount$ | async"></dlm-notifications>
     </div>
     <div class="notifications navbar-nav navbar-right">
       <navigation-dropdown [linksColumns]="navigationColumns"></navigation-dropdown>

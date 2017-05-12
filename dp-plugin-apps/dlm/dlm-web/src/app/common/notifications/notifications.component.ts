@@ -1,9 +1,9 @@
-import { Component, Input, ElementRef, OnInit, SimpleChange, OnChanges } from '@angular/core';
-
+import { Component, Input, OnInit, SimpleChange, OnChanges } from '@angular/core';
+import { Router } from '@angular/router';
 import { Event } from 'models/event.model';
 
 @Component({
-  selector: 'notifications',
+  selector: 'dlm-notifications',
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.scss']
 })
@@ -13,7 +13,7 @@ export class NotificationsComponent implements OnInit, OnChanges {
   @Input() events: Event[];
   @Input() newEventsCount: number;
 
-  constructor() {
+  constructor(private router: Router) {
   }
 
   ngOnInit() {
@@ -25,5 +25,9 @@ export class NotificationsComponent implements OnInit, OnChanges {
     if (changes['events']) {
       this.events.sort( (a, b) => { return (a.timestamp > b.timestamp) ? -1 : ( (b.timestamp > a.timestamp) ? 1 : 0); } );
     }
+  }
+
+  viewAllClickHandler() {
+    this.router.navigate(['/notifications']);
   }
 }
