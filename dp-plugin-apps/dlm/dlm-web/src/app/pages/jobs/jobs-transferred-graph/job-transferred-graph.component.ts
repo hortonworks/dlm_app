@@ -1,5 +1,6 @@
-import {Component, Input} from '@angular/core';
-import {Job} from '../../../models/job.model';
+import { Component, Input } from '@angular/core';
+import { Job } from 'models/job.model';
+import { JOB_STATUS } from 'constants/status.constant';
 
 @Component({
   selector: 'job-transferred-graph',
@@ -19,8 +20,8 @@ import {Job} from '../../../models/job.model';
 export class JobTransferredGraphComponent {
 
   private colorStatusMap = {
-    'Warnings': '#E98A40',
-    'Failed': '#EF6162'
+    [JOB_STATUS.WARNINGS]: '#E98A40',
+    [JOB_STATUS.FAILED]: '#EF6162'
   };
 
   @Input() job: Job;

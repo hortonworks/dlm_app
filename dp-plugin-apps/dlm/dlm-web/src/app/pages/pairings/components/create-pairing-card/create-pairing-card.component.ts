@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Cluster } from '../../../../models/cluster.model';
+import { ClusterPairing } from 'models/cluster-pairing.model';
 
 @Component({
   selector: 'dlm-create-pairing-card',
@@ -8,8 +8,9 @@ import { Cluster } from '../../../../models/cluster.model';
 })
 export class CreatePairingCardComponent implements OnInit {
 
-  @Input() cluster: Cluster;
+  @Input() cluster: ClusterPairing;
   @Input() isSelected = false;
+  @Input() isFrozen = false;
 
   constructor() { }
 

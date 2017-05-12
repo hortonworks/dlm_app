@@ -1,6 +1,12 @@
 <div class="pairing-cards-radio-group">
   <div *ngFor="let cluster of clusters" class="pairing-radio-item">
     <input type="radio" [value]="cluster.id" [checked]="cluster.id === selectedClusterId">
-    <dlm-create-pairing-card [cluster]="cluster" [isSelected]="cluster.id === selectedClusterId" (click)="selectCluster(cluster)"></dlm-create-pairing-card>
+    <dlm-create-pairing-card [cluster]="cluster" [isSelected]="cluster.id === selectedClusterId" [isFrozen]="isFrozen" (click)="selectCluster(cluster)"></dlm-create-pairing-card>
+  </div>
+  <div *ngIf="showDivider" class="divider">
+    <hr>
+  </div>
+  <div *ngFor="let cluster of disabledClusters">
+    <dlm-create-pairing-card [cluster]="cluster"></dlm-create-pairing-card>
   </div>
 </div>

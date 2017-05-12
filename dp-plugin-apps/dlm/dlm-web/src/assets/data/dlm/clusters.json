@@ -1,101 +1,91 @@
-{
-  "totalResults": 2,
-  "cluster": [
-    {
-      "id": "Primary Cluster",
-      "ambariUrl": "http://localhost:8080",
-      "userName": "admin",
-      "clusterType": "DATACENTER",
-      "createdAt": 1490689061725,
-      "volumeGB": 320,
-      "nodesCount": 20,
-      "clusterStatus": {
-        "requestId": "qtp2026718042-1933333",
-        "message": "Submitted",
-        "status": "SUCCEEDED"
-      },
-      "clusterDetails": {
-        "name": "Primary Cluster",
-        "description": "primary",
-        "dataCenter": "Texas",
-        "fsEndpoint": "hdfs://localhost:8020",
-        "hsEndpoint": "http://localhost:10000",
-        "tags": "consumer=consumer@xyz.com,owner=producer@xyz.com",
-        "peers": "c1, c2",
-        "customProperties": {
-          "dfs.namenode.kerberos.principal": "hdfs/_HOST@YOUR-REALM.COM"
-        },
-        "acl": {
-          "owner": "ambari-qa",
-          "group": "users",
-          "permission": "0x755"
-        },
-        "entityType": "CLUSTER"
-      }
+[
+  {
+    "id": "Primary Cluster",
+    "description": "primary",
+    "ambariurl": "http://localhost:8080",
+    "name": "Primary Cluster",
+    "location": {
+      "city": "Pur Chaman",
+      "country": "AF"
     },
-    {
-      "id": "Secondary Cluster",
-      "ambariUrl": "http://localhost:8080",
-      "userName": "admin2",
-      "clusterType": "DATA_LAKE",
-      "createdAt": 1490689061725,
-      "volumeGB": 200,
-      "nodesCount": 12,
-      "clusterStatus": {
-        "requestId": "qtp2026718042-1933333",
-        "message": "Submitted",
-        "status": "SUCCEEDED"
-      },
-      "clusterDetails": {
-        "name": "Secondary Cluster",
-        "description": "Secondary",
-        "dataCenter": "Virginia",
-        "fsEndpoint": "hdfs://localhost:8020",
-        "hsEndpoint": "http://localhost:10000",
-        "tags": "consumer=consumer@xyz.com,owner=producer@xyz.com",
-        "peers":"c1, c2,...",
-        "customProperties": {
-          "dfs.namenode.kerberos.principal": "hdfs/_HOST@YOUR-REALM.COM"
-        },
-        "acl": {
-          "owner": "ambari-qa",
-          "group": "users",
-          "permission": "0x755"
-        },
-        "entityType": "CLUSTER"
+    "services": [
+      {
+        "id": 1,
+        "servicename": "BEACON_SERVER",
+        "servicehost": "104.196.90.96",
+        "serviceport": 25968,
+        "fullURL": "http://104.196.90.96:25968",
+        "properties": {},
+        "clusterid": 1,
+        "datalakeid": 1
       }
+    ]
+  },
+  {
+    "id": "Secondary Cluster",
+    "description": "secondary",
+    "name": "Secondary Cluster",
+    "ambariurl": "http://localhost:8080",
+    "location": {
+      "city": "Santa Clara",
+      "country": "US"
     },
-    {
-      "id": "Development Cluster",
-      "ambariUrl": "http://localhost:8082",
-      "userName": "devadmin",
-      "clusterType": "DATA_LAKE",
-      "createdAt": 1490689061725,
-      "volumeGB": 500,
-      "nodesCount": 75,
-      "clusterStatus": {
-        "requestId": "qtp2026718042-1933333",
-        "message": "Submitted",
-        "status": "SUCCEEDED"
-      },
-      "clusterDetails": {
-        "name": "Development Cluster",
-        "description": "For Development",
-        "dataCenter": "California",
-        "fsEndpoint": "hdfs://localhost:8020",
-        "hsEndpoint": "http://localhost:10000",
-        "tags": "consumer=consumer@xyz.com,owner=producer@xyz.com",
-        "peers":"c1, c2,...",
-        "customProperties": {
-          "dfs.namenode.kerberos.principal": "hdfs/_HOST@YOUR-REALM.COM"
-        },
-        "acl": {
-          "owner": "ambari-qa",
-          "group": "users",
-          "permission": "0x755"
-        },
-        "entityType": "CLUSTER"
+    "services": [
+      {
+        "id": 1,
+        "servicename": "BEACON_SERVER",
+        "servicehost": "104.196.90.96",
+        "serviceport": 25968,
+        "fullURL": "http://104.196.90.96:25968",
+        "properties": {},
+        "clusterid": 1,
+        "datalakeid": 1
       }
-    }
-  ]
-}
+    ]
+  },
+  {
+    "id": "Development Cluster",
+    "description": "development",
+    "name": "Development Cluster",
+    "ambariurl": "http://localhost:8080",
+    "location": {
+      "city": "Columbus",
+      "country": "US"
+    },
+    "services": [
+      {
+        "id": 1,
+        "servicename": "BEACON_SERVER",
+        "servicehost": "104.196.90.96",
+        "serviceport": 25968,
+        "fullURL": "http://104.196.90.96:25968",
+        "properties": {},
+        "clusterid": 1,
+        "datalakeid": 1
+      }
+    ]
+  },
+  {
+    "id": "Standby Cluster",
+    "description": "standby",
+    "name": "Standby Cluster",
+    "ambariurl": "http://localhost:8082",
+    "location": {
+      "city": "Dallas",
+      "country": "US"
+    },
+    "services": [
+      {
+        "id": 1,
+        "servicename": "BEACON_SERVER",
+        "servicehost": "104.196.90.96",
+        "serviceport": 25968,
+        "fullURL": "http://104.196.90.96:25968",
+        "properties": {},
+        "clusterid": 1,
+        "datalakeid": 1
+      }
+    ]
+  }
+]
+

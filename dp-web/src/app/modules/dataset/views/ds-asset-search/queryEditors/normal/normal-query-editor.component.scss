@@ -1,0 +1,42 @@
+.borderBox, .borderBox * {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.queryEditor {
+  background-color:white;
+}
+.inputWidgetCont {
+  padding-right:110px;
+  border:1px solid #AAAAAA;
+  border-radius: 2px;
+  height:35px;
+}
+
+.inputWidgetCont .showFiltersButton {
+  float: right;
+  width:110px;
+  margin-right: -110px;
+  text-align: center;
+  height:35px;
+  line-height: 35px;
+  border-left:1px solid #AAAAAA;
+  cursor: pointer;
+}
+.searchWidgetCont{
+  float: left;
+  width:100%;
+}
+
+.filterCont {
+  border:1px solid #AAAAAA;
+  border-top-width: 0px ;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+.filterCont .singleFilterCont {
+  padding:20px;
+  width: 20%;
+  float: left;
+}

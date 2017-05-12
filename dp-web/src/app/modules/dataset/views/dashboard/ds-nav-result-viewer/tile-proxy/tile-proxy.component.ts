@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {RichDatasetModel} from "../../../../models/richDatasetModel";
+import {Router} from "@angular/router";
 
 
 @Component({
@@ -10,9 +11,18 @@ import {RichDatasetModel} from "../../../../models/richDatasetModel";
 export class DsTileProxy implements OnInit {
 
   @Input() dsModel : RichDatasetModel;
+
+  constructor (
+    private router: Router,
+  ) {}
   ngOnInit () {}
 
   getID() {
     return 'dropDownIcon_' + this.dsModel.id;
+  }
+  showFullView ($event) {
+    if ($event.target.tagName != 'I') {
+      this.router.navigate(['dataset/full-view/' + this.dsModel.id]);
+    }
   }
 }

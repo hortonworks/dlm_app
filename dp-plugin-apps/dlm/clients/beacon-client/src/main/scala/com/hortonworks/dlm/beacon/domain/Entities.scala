@@ -11,19 +11,39 @@ object ResponseEntities {
 
   case class AclObject(owner:Option[String], group:Option[String], permission:Option[String])
 
-  case class CustomProperties(properties: String*)
-
   case class BeaconEntityResponse(name: String, description: String, dataCenter: Option[String], fsEndpoint: String,
                                   hsEndpoint: Option[String], beaconEndpoint: String, tags: Option[String], peers: Option[String],
-                                   customProperties: CustomProperties, acl: AclObject, entityType: String)
+                                  customProperties: Map[String, String], acl: AclObject, entityType: String)
 
   case class BeaconClusterStatusResponse(status:String, message: String, requestId: String)
 
+  case class Retry(attempts: Long, delay: Long)
+
+  case class Notification(`type`: Option[String], to: Option[String])
+
+  case class PolicyDataResponse(policyId: String, name: String, `type`: String, status : String, executionType: Option[String],
+                                sourceDataset: String, targetDataset: String, sourceCluster: String, targetCluster: String,
+                                startTime: Option[String], endTime: String, frequencyInSec: Long, tags: Option[String],
+                                customProperties: Map[String, String], retry: Retry, acl: Option[AclObject],
+                                user: String, notification: Notification, entityType: String)
+
+  case class PoliciesDetailResponse(name: String, `type`: String, status: String, frequencyInSec: Long,
+                                    sourceclusters: Seq[String], targetclusters: Seq[String], startTime: Option[String], endTime: String)
+
+  case class PolicyStatusResponse(status: String, message: String, requestId: String)
+
   case class PostActionResponse(requestId: String, message: String, status: String)
+
+  case class PolicyInstanceResponse(id: String, policyId: String, name: String, `type`: String, executionType: String,
+                                    user: String, status: String, startTime: String, endTime: Option[String],
+                                    trackingInfo: String, message: String)
 }
 
 object RequestEntities {
   case class ClusterDefinitionRequest( fsEndpoint: String, beaconEndpoint: String, name: String, description: String)
+  case class PolicyDefinitionRequest( name: String, `type`: String, sourceDataset: String,
+                                      sourceCluster: String, targetCluster: String, frequencyInSec: Long,
+                                      startTime: Option[String], endTime: Option[String])
 }
 
 object JsonFormatters {
@@ -44,22 +64,40 @@ object JsonFormatters {
   implicit val aclObjectWrites = Json.writes[AclObject]
   implicit val aclObjectReads = Json.reads[AclObject]
 
-  implicit val customPropertiesWrites = Json.writes[CustomProperties]
-  implicit val customPropertiesReads = Json.reads[CustomProperties]
-
   implicit val beaconEntityResponseWrites = Json.writes[BeaconEntityResponse]
   implicit val beaconEntityResponseReads = Json.reads[BeaconEntityResponse]
 
   implicit val beaconClusterStatusResponseWrites = Json.writes[BeaconClusterStatusResponse]
   implicit val beaconClusterStatusResponseReads = Json.reads[BeaconClusterStatusResponse]
 
+  implicit val retryWrites = Json.writes[Retry]
+  implicit val retryReads = Json.reads[Retry]
+
+  implicit val notificationWrites = Json.writes[Notification]
+  implicit val notificationReads = Json.reads[Notification]
+
+  implicit val policyDataResponseWrites = Json.writes[PolicyDataResponse]
+  implicit val policyDataResponseReads = Json.reads[PolicyDataResponse]
+
+  implicit val policiesDetailResponseWrites = Json.writes[PoliciesDetailResponse]
+  implicit val policiesDetailResponseReads = Json.reads[PoliciesDetailResponse]
+
+  implicit val policyStatusResponseWrites = Json.writes[PolicyStatusResponse]
+  implicit val policyStatusResponseReads = Json.reads[PolicyStatusResponse]
+
   implicit val postActionResponseWrites = Json.writes[PostActionResponse]
   implicit val postActionResponseReads = Json.reads[PostActionResponse]
+
+  implicit val policyInstanceResponseWrites = Json.writes[PolicyInstanceResponse]
+  implicit val policyInstanceResponseReads = Json.reads[PolicyInstanceResponse]
 
   //-- RequestEntities
 
   implicit val clusterDefinitionRequestWrites = Json.writes[ClusterDefinitionRequest]
   implicit val clusterDefinitionRequestReads = Json.reads[ClusterDefinitionRequest]
+
+  implicit val policyDefinitionRequestWrites = Json.writes[PolicyDefinitionRequest]
+  implicit val policyDefinitionRequestReads = Json.reads[PolicyDefinitionRequest]
 }
 
 

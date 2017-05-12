@@ -1,0 +1,36 @@
+@import '../../styles/variables';
+
+.alerts-label {
+  cursor: pointer;
+  margin: 0 15px 0 5px;
+}
+
+.navigation-dropdown {
+  &.dropdown-menu {
+    top: 125% !important;
+    right: -25px !important;
+    min-width: inherit !important;
+    max-width: inherit !important;
+  }
+  .notifications-header {
+    border-bottom: none;
+  }
+  td {
+    min-width: 200px;
+    border-left: 1px solid $table-row-active;
+    border-top: none;
+    &:first-child {
+      border-left: none;
+    }
+  }
+}
+ul {
+  list-style-type: none;
+  padding-left: 10px;
+  li {
+    padding: 2px;
+    &:hover {
+      background: $table-row-hover;
+    }
+  }
+}

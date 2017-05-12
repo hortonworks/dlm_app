@@ -1,4 +1,5 @@
 import { Component, Input, ElementRef, OnInit, AfterViewInit } from '@angular/core';
+import { NavbarService } from 'services/navbar.service';
 
 import { MenuItem } from './menu-item';
 
@@ -28,7 +29,7 @@ export class NavbarComponent implements OnInit, AfterViewInit {
 
   navbar: any;
   options: any = {};
-  constructor(navbar: ElementRef) {
+  constructor(navbar: ElementRef, private navbarService: NavbarService) {
     this.navbar = navbar.nativeElement;
   }
 
@@ -59,5 +60,9 @@ export class NavbarComponent implements OnInit, AfterViewInit {
       return item.subMenu.length > 0;
     }
     return false;
+  }
+
+  toggleNavbar() {
+    this.navbarService.toggleNavbar();
   }
 }

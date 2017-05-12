@@ -1,5 +1,5 @@
-<span class="fa fa-circle"
-  [class.text-danger]="job.status==='Failed'"
-  [class.text-warning]="job.status==='Warnings'"
-  [class.text-info]="job.status==='In Progress'"></span>
+<span *ngIf="showStatusIndicator" class="fa fa-circle"
+  [class.text-danger]="job.status === JOB_STATUS.FAILED"
+  [class.text-warning]="job.status === JOB_STATUS.WARNINGS"
+  [class.text-info]="job.status === JOB_STATUS.IN_PROGRESS"></span>
 <ng-content></ng-content>

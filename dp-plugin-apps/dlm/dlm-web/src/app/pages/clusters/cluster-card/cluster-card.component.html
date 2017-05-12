@@ -9,10 +9,10 @@
       <div class="row flex-center">
         <div class="col-md-5 cluster-cell">
           <p class="h2">
-            {{cluster.clusterDetails.name}}
+            {{cluster.name}}
           </p>
           <p>
-            {{cluster.type}} {{cluster.clusterDetails.dataCenter}}
+            {{cluster.type}} {{ cluster.location.city }}, {{ cluster.location.country }}
           </p>
         </div>
         <div class="col-md-7 cluster-cell">

@@ -10,6 +10,7 @@ import com.typesafe.config.ConfigFactory
 import org.scalamock.scalatest.AsyncMockFactory
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{AsyncFlatSpec, BeforeAndAfterAll, BeforeAndAfterEach, Matchers}
+import play.api.libs.json.Json
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -28,6 +29,10 @@ class AtlasInterfaceSpec
   protected val stop = server.startOnPort(9998)
 
   private def setupMock = {
+
+    val json =
+      Source.fromURL(getClass.getResource("/atlasproperties.json")).mkString
+
     val storageInterface = mock[StorageInterface]
     (storageInterface.getConfiguration _)
       .expects("dp.atlas.user")
@@ -46,9 +51,8 @@ class AtlasInterfaceSpec
             AtlasService(
               Some(1),
               "ATLAS",
-              None,
-              None,
-              Some("http://ashwin-dp-knox-test-1.novalocal:9998")))))
+              Some(Json.parse(json))
+              ))))
 
     (clusterHostsService.getHostByClusterAndName _)
       .expects(1, "ashwin-dp-knox-test-1.novalocal")

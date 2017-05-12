@@ -1,0 +1,21 @@
+$chart-size: 180px;
+
+.chart-container {
+  display: flex;
+  justify-content: center;
+
+  .chart-title {
+    position: absolute;
+    align-self: center;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 20px;
+  }
+
+  .chart-view {
+    height: $chart-size;
+    max-height: $chart-size;
+    width: $chart-size;
+    display: block;
+  }
+}

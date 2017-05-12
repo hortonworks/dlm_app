@@ -19,7 +19,15 @@
     "table": {
       "summary": "{{shown}} of {{count}} showing",
       "paging": "{{start}} - {{end}} of {{count}}"
+    },
+    "status": {
+      "self": "Status",
+      "failed": "Failed",
+      "in_progress": "In Progress"
     }
+  },
+  "topnav": {
+    "timezone": "Current Timezone"
   },
   "sidenav": {
     "menuItem": {
@@ -32,7 +40,35 @@
       "header": "DATA LIFECYCLE MANAGER"
     }
   },
+  "jobs": {
+    "status": {
+      "completed": "Completed",
+      "in_progress": "In Progress",
+      "warnings": "Warnings",
+      "failed": "Failed"
+    }
+  },
   "page": {
+    "overview": {
+      "charts": {
+        "clusters": "Clusters",
+        "policies": "Policies",
+        "jobs": "Jobs"
+      },
+      "issues": {
+        "updates": "Issues & Updates",
+        "recent": "Recent Issues",
+        "list": {
+          "view_all": "view all",
+          "status": {
+            "in_progress": "is in progress",
+            "failed": "failed",
+            "warning": "completed with warnings",
+            "success": "completed"
+          }
+        }
+      }
+    },
     "clusters": {
       "dropdown": {
         "cluster": "Cluster",
@@ -112,6 +148,10 @@
             "step_two": "STEP 2: SELECT CLUSTER TO BE PAIRED",
             "in_progress": "IN PROGRESS"
           }
+        },
+        "confirmation": {
+          "title": "Pairing Successful",
+          "body": "Pairing completed successfully"
         }
       }
     },

@@ -26,3 +26,18 @@
     }
   }
 }
+
+input.form-control.input-xs {
+  height: 20px;
+  padding: 5px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+  width: 47px;
+  display: inline-block;
+}
+
+.btn.btn-xs {
+  font-size: small;
+  text-transform: none;
+}

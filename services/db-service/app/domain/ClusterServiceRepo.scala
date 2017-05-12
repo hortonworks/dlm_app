@@ -21,7 +21,6 @@ class ClusterServiceRepo @Inject()(
     Services.to[List].result
   }
 
-
   def allWithCluster(clusterId: Long) = {
     db.run(Services.filter(_.clusterid === clusterId).to[List].result)
   }
@@ -30,23 +29,32 @@ class ClusterServiceRepo @Inject()(
     db.run(Services.filter(_.datalakeid === datalakeId).to[List].result)
   }
 
-  def findByNameAndCluster(serviceName: String, clusterId: Long) =  {
-    db.run(Services.filter(_.servicename === serviceName).filter(_.clusterid === clusterId).result.headOption)
-  }
-
-  def findByServiceName(serviceName: String) =  {
-    db.run(Services.filter(_.servicename === serviceName).to[List].result)
+  def findByNameAndCluster(serviceName: String, clusterId: Long) = {
+    db.run(
+      Services
+        .filter(_.servicename === serviceName)
+        .filter(_.clusterid === clusterId)
+        .result
+        .headOption)
   }
 
   def findByIdAndDatalake(serviceId: Long, datalakeId: Long) = {
-    db.run(Services.filter(_.id === serviceId).filter(_.datalakeid === datalakeId).result.headOption)
+    db.run(
+      Services
+        .filter(_.id === serviceId)
+        .filter(_.datalakeid === datalakeId)
+        .result
+        .headOption)
   }
-
 
   def findByIdAndCluster(serviceId: Long, clusterId: Long) = {
-    db.run(Services.filter(_.id === serviceId).filter(_.clusterid === clusterId).result.headOption)
+    db.run(
+      Services
+        .filter(_.id === serviceId)
+        .filter(_.clusterid === clusterId)
+        .result
+        .headOption)
   }
-
 
   def insert(cluster: ClusterService): Future[ClusterService] = {
     db.run {
@@ -54,15 +62,17 @@ class ClusterServiceRepo @Inject()(
     }
   }
 
-  def updateByName(cs: ClusterService):Future[Int] = {
-    db.run(Services.filter(_.servicename === cs.servicename).filter(_.clusterid === cs.clusterid)
-      .map(r => (r.fullURL,r.servicehost,r.serviceport,r.properties))
-        .update(cs.fullURL,cs.servicehost,cs.serviceport,cs.properties)).map( r => r)
-  }
+  def updateByName(cs: ClusterService): Future[Int] =
+    db.run(
+        Services
+          .filter(_.servicename === cs.servicename)
+          .filter(_.clusterid === cs.clusterid)
+          .map(r => r.properties)
+          .update(cs.properties))
+      .map(r => r)
 
-  def findById(clusterId: Long): Future[Option[ClusterService]] = {
+  def findById(clusterId: Long): Future[Option[ClusterService]] =
     db.run(Services.filter(_.id === clusterId).result.headOption)
-  }
 
   def deleteById(clusterId: Long): Future[Int] = {
     db.run(Services.filter(_.id === clusterId).delete)
@@ -77,12 +87,6 @@ class ClusterServiceRepo @Inject()(
 
     def servicename = column[String]("servicename")
 
-    def servicehost = column[Option[String]]("servicehost")
-
-    def serviceport = column[Option[Int]]("serviceport")
-
-    def fullURL = column[Option[String]]("fullurl")
-
     def datalakeid = column[Option[Long]]("datalakeid")
 
     def clusterid = column[Option[Long]]("clusterid")
@@ -90,14 +94,7 @@ class ClusterServiceRepo @Inject()(
     def properties = column[Option[JsValue]]("properties")
 
     def * =
-      (id,
-       servicename,
-       servicehost,
-       serviceport,
-       fullURL,
-       properties,
-       clusterid,
-       datalakeid) <> ((ClusterService.apply _).tupled, ClusterService.unapply)
+      (id, servicename, properties, clusterid, datalakeid) <> ((ClusterService.apply _).tupled, ClusterService.unapply)
 
   }
 

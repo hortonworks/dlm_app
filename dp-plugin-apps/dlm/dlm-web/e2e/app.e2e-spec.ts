@@ -30,7 +30,7 @@ describe('DLM', function() {
     page.clickAddPolicy();
 
     expect(page.getUrl()).toContain('/policies/create');
-  })
+  });
 
   it('should navigate to create pairing page', () => {
     const page = new PairingsPage();
@@ -39,5 +39,5 @@ describe('DLM', function() {
 
     expect(page.getUrl()).toContain('/pairings/create');
 
-  })
+  });
 });

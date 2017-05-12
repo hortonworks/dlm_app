@@ -1,10 +1,11 @@
 {
-  "totalResults": 3,
+  "totalResults": 12,
   "job": [
     {
       "id": "hdfspolicy@7",
       "name": "hdfspolicy",
-      "status": "In Progress",
+      "status": "IN_PROGRESS",
+      "path": "/home/one",
       "policy": "hive2Policy",
       "startTime": 1488309905000,
       "endTime": -1,
@@ -17,15 +18,16 @@
       "transferred": 70866960384,
       "progress": 60,
       "previousRuns": [
-        {"status": "Failed"},
+        {"status": "FAILED"},
         {"status": ""},
-        {"status": "Failed"}
+        {"status": "FAILED"}
       ]
     },
     {
       "id": "hdfspolicy@6",
       "name": "hdfspolicy",
-      "status": "Warnings",
+      "status": "WARNINGS",
+      "path": "/home/two",
       "policy": "hivePolicy",
       "startTime": 1488309845000,
       "endTime": 1488309928000,
@@ -41,14 +43,15 @@
       ],
       "previousRuns": [
         {"status": ""},
-        {"status": "Failed"},
-        {"status": "In Progress"}
+        {"status": "FAILED"},
+        {"status": "IN_PROGRESS"}
       ]
     },
     {
       "id": "hdfspolicy@5",
       "name": "hdfspolicy",
-      "status": "Failed",
+      "status": "SUCCESS",
+      "path": "/home/three",
       "policy": "hdfsPrimaryPolicy",
       "startTime": 1488309845000,
       "endTime": 1488309865000,
@@ -58,20 +61,21 @@
       "target": "Test Cluster",
       "latestRun": 1488309845000,
       "service": "HDFS",
-      "transferred": 12884901888,
+      "transferred": 19884901888,
       "graphData": [
         10,2,2,4,5,7,9,11
       ],
       "previousRuns": [
-        {"status": "Failed"},
-        {"status": "In Progress"},
+        {"status": "FAILED"},
+        {"status": "IN_PROGRESS"},
         {"status": ""}
       ]
     },
     {
       "id": "hdfspolicy@1",
       "name": "hdfspolicy",
-      "status": "Failed",
+      "status": "FAILED",
+      "path": "/home/four",
       "policy": "hdfsPrimaryPolicy",
       "startTime": 1488309845000,
       "endTime": 1488309865000,
@@ -81,20 +85,21 @@
       "target": "Test Cluster",
       "latestRun": 1488309845000,
       "service": "HDFS",
-      "transferred": 12884901888,
+      "transferred": 14884901888,
       "graphData": [
         7,6,1,3,5,9,6,2
       ],
       "previousRuns": [
-        {"status": "In Progress"},
-        {"status": "In Progress"},
-        {"status": "In Progress"}
+        {"status": "IN_PROGRESS"},
+        {"status": "IN_PROGRESS"},
+        {"status": "IN_PROGRESS"}
       ]
     },
     {
       "id": "hdfspolicy@2",
       "name": "hdfspolicy",
-      "status": "Warnings",
+      "status": "WARNINGS",
+      "path": "/home/five",
       "policy": "hdfsPrimaryPolicy",
       "startTime": 1488309845000,
       "endTime": 1488309865000,
@@ -104,20 +109,21 @@
       "target": "Test Cluster",
       "latestRun": 1488309845000,
       "service": "HDFS",
-      "transferred": 12884901888,
+      "transferred": 15884901888,
       "graphData": [
         1,5,2,4,4,4,1
       ],
       "previousRuns": [
-        {"status": "Failed"},
-        {"status": "In Progress"},
-        {"status": "Failed"}
+        {"status": "FAILED"},
+        {"status": "IN_PROGRESS"},
+        {"status": "FAILED"}
       ]
     },
     {
       "id": "hdfspolicy@3",
       "name": "hdfspolicy",
-      "status": "Failed",
+      "status": "FAILED",
+      "path": "/home/six",
       "policy": "hdfsPrimaryPolicy",
       "startTime": 1488309845000,
       "endTime": 1488309865000,
@@ -127,7 +133,7 @@
       "target": "Test Cluster",
       "latestRun": 1488309845000,
       "service": "HDFS",
-      "transferred": 12884901888,
+      "transferred": 17884901888,
       "graphData": [
         8,7,6,5,6,8,2,1
       ],
@@ -140,7 +146,8 @@
     {
       "id": "hdfspolicy@4",
       "name": "hdfspolicy",
-      "status": "Warnings",
+      "status": "WARNINGS",
+      "path": "/home/seven",
       "policy": "hdfsPrimaryPolicy",
       "startTime": 1488309845000,
       "endTime": 1488309865000,
@@ -150,20 +157,21 @@
       "target": "Test Cluster",
       "latestRun": 1488309845000,
       "service": "HIVE",
-      "transferred": 12884901888,
+      "transferred": 1284901888,
       "graphData": [
         4,1,3,4,5,2,7,8
       ],
       "previousRuns": [
-        {"status": "Failed"},
-        {"status": "In Progress"},
-        {"status": "Failed"}
+        {"status": "FAILED"},
+        {"status": "IN_PROGRESS"},
+        {"status": "FAILED"}
       ]
     },
     {
       "id": "hdfspolicy@8",
       "name": "hdfspolicy",
-      "status": "Failed",
+      "status": "FAILED",
+      "path": "/home/eight",
       "policy": "hdfsPrimaryPolicy",
       "startTime": 1488309845000,
       "endTime": 1488309865000,
@@ -178,15 +186,16 @@
         1,8,1,1,8,1
       ],
       "previousRuns": [
-        {"status": "Failed"},
-        {"status": "In Progress"},
-        {"status": "Warnings"}
+        {"status": "FAILED"},
+        {"status": "IN_PROGRESS"},
+        {"status": "WARNINGS"}
       ]
     },
     {
       "id": "hdfspolicy@9",
       "name": "hdfspolicy",
-      "status": "Warnings",
+      "status": "WARNINGS",
+      "path": "/home/nine",
       "policy": "hdfsPrimaryPolicy",
       "startTime": 1488309845000,
       "endTime": 1488309865000,
@@ -201,15 +210,16 @@
         8,1,1,8,1,1,8
       ],
       "previousRuns": [
-        {"status": "Failed"},
-        {"status": "In Progress"},
-        {"status": "In Progress"}
+        {"status": "FAILED"},
+        {"status": "IN_PROGRESS"},
+        {"status": "IN_PROGRESS"}
       ]
     },
     {
       "id": "hdfspolicy@10",
       "name": "hdfspolicy",
-      "status": "Failed",
+      "status": "FAILED",
+      "path": "/home/ten",
       "policy": "hdfsPrimaryPolicy",
       "startTime": 1488309845000,
       "endTime": 1488309865000,
@@ -224,15 +234,16 @@
         1,3,2,1,3,2,1,3,2
       ],
       "previousRuns": [
-        {"status": "Failed"},
-        {"status": "Failed"},
+        {"status": "FAILED"},
+        {"status": "FAILED"},
         {"status": ""}
       ]
     },
     {
       "id": "hdfspolicy@11",
       "name": "hdfspolicy",
-      "status": "Warnings",
+      "status": "WARNINGS",
+      "path": "/home/eleven",
       "policy": "hdfsPrimaryPolicy",
       "startTime": 1488309845000,
       "endTime": 1488309865000,
@@ -255,7 +266,8 @@
     {
       "id": "hdfspolicy@12",
       "name": "hdfspolicy",
-      "status": "Failed",
+      "status": "FAILED",
+      "path": "/home/twelve",
       "policy": "hdfsPrimaryPolicy",
       "startTime": 1488309845000,
       "endTime": 1488309865000,
@@ -270,9 +282,9 @@
         1,4,2,5,6,1,2
       ],
       "previousRuns": [
-        {"status": "Failed"},
+        {"status": "FAILED"},
         {"status": ""},
-        {"status": "In Progress"}
+        {"status": "IN_PROGRESS"}
       ]
     }
   ]

@@ -17,8 +17,8 @@ describe('PairingProgressCardComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(PairingProgressCardComponent);
     component = fixture.componentInstance;
-    component.firstCluster = <Cluster>{clusterDetails: {}};
-    component.secondCluster = <Cluster>{clusterDetails: {}};
+    component.firstCluster = <Cluster>{location: {}};
+    component.secondCluster = <Cluster>{location: {}};
     fixture.detectChanges();
   });
 

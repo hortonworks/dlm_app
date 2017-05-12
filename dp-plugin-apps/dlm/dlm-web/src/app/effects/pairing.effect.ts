@@ -27,10 +27,10 @@ export class PairingEffects {
     .map(toPayload)
     .switchMap(payload => {
       return this.pairingService.createPairing(payload)
-        .mergeMap(response => [
-          createPairingSuccess(response),
-          go(['/pairings'])
-        ])
+        .map(response => {
+          response['payload'] = payload;
+          return createPairingSuccess(response);
+        })
         .catch(err => Observable.of(createPairingFail(err)));
     });
 
@@ -41,7 +41,7 @@ export class PairingEffects {
     .switchMap(payload => {
       return this.pairingService.deletePairing(payload)
         .map(response => {
-          response['pairingId'] = payload;
+          response['payload'] = payload;
           return deletePairingSuccess(response);
         })
         .catch(err => Observable.of(deletePairingFail(err)));

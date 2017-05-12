@@ -20,7 +20,7 @@ $hex-color: $primary-color;
       padding: 0 15px;
       float: none;
       display: table-cell;
-      vertical-align: bottom;
+      vertical-align: top;
       &.pairing-icon-col {
         vertical-align: middle;
         text-align: center;
@@ -42,6 +42,13 @@ $hex-color: $primary-color;
         }
         &:focus {
           outline: none;
+        }
+        &.disabled {
+          .hex-wrap {
+            .hex-icon {
+              opacity: 0.6;
+            }
+          }
         }
       }
     }

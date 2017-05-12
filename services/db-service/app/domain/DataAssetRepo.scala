@@ -10,8 +10,8 @@ import scala.concurrent.Future
 
 @Singleton
 class DataAssetRepo @Inject()(
-                               protected val dbConfigProvider: DatabaseConfigProvider)
-  extends HasDatabaseConfigProvider[DpPgProfile] {
+    protected val dbConfigProvider: DatabaseConfigProvider)
+    extends HasDatabaseConfigProvider[DpPgProfile] {
 
   import profile.api._
 
@@ -36,7 +36,7 @@ class DataAssetRepo @Inject()(
   }
 
   final class DatasetAssetTable(tag: Tag)
-    extends Table[DataAsset](tag, Some("dataplane"), "dp_data_asset") {
+      extends Table[DataAsset](tag, Some("dataplane"), "dp_data_asset") {
 
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
@@ -54,13 +54,12 @@ class DataAssetRepo @Inject()(
 
     def * =
       (id,
-        assetType,
-        assetName,
-        assetDetails,
-        asserUrl,
-        assetProperties,
-        datasetId
-      ) <> ((DataAsset.apply _).tupled, DataAsset.unapply)
+       assetType,
+       assetName,
+       assetDetails,
+       asserUrl,
+       assetProperties,
+       datasetId) <> ((DataAsset.apply _).tupled, DataAsset.unapply)
 
   }
 

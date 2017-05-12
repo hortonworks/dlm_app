@@ -9,6 +9,11 @@ import com.hortonworks.dataplane.commons.domain.Atlas.{
   AtlasFilters,
   Entity
 }
+import com.hortonworks.dataplane.commons.domain.Entities.{
+  ClusterServiceHost,
+  ClusterService => CS
+}
+import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
 import com.hortonworks.dataplane.cs.atlas.Filters
 import com.hortonworks.dataplane.db.Webserice.{
   ClusterComponentService,
@@ -18,6 +23,8 @@ import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import org.apache.atlas.AtlasClientV2
 import org.apache.atlas.model.instance.AtlasEntityHeader
+import org.codehaus.jackson.map.ObjectMapper
+import play.api.libs.json.{JsObject, JsValue, Json}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -99,6 +106,22 @@ class DefaultAtlasInterface(clusterId: Long,
     }.toMap
 
   }
+
+  override def getAtlasEntity(uuid: String): Future[JsValue] = {
+    atlasApi.map { api =>
+      val entityWithExtInfo = api.getEntityByGuid(uuid)
+      val jsonString = new ObjectMapper().writeValueAsString(entityWithExtInfo)
+      Json.parse(jsonString)
+    }
+  }
+
+  override def getAtlasEntities(uuids: Iterable[String]): Future[JsValue] = {
+    atlasApi.map { api =>
+      val entityWithExtInfo = api.getEntitiesByGuids(uuids.toList.asJava)
+      val jsonString = new ObjectMapper().writeValueAsString(entityWithExtInfo)
+      Json.parse(jsonString)
+    }
+  }
 }
 
 sealed class AtlasApiSupplier(clusterId: Long,
@@ -107,40 +130,54 @@ sealed class AtlasApiSupplier(clusterId: Long,
                               clusterHostsService: ClusterHostsService)
     extends Supplier[Future[AtlasClientV2]] {
   private val log = Logger(classOf[AtlasApiSupplier])
+
+  def getAtlasUrlFromConfig(service: CS): Future[URL] = Future.successful {
+
+    val configsAsList = (service.properties.get \ "properties").as[List[JsObject]]
+    val atlasConfig = configsAsList.find(obj =>
+      (obj \ "type").as[String] == "application-properties")
+    if (atlasConfig.isEmpty)
+      throw ServiceNotFound("No properties found for Atlas")
+    val properties = (atlasConfig.get \ "properties").as[JsObject]
+    val apiUrl = (properties \ "atlas.rest.address").as[String]
+    new URL(apiUrl)
+  }
+
   override def get(): Future[AtlasClientV2] = {
 
     log.info("Loading Atlas client from Supplier")
     for {
-      atlas <- getUrlOrThrowException
-      baseUrl <- extract(atlas, clusterId)
+      service <- getUrlOrThrowException
+      url <- getAtlasUrlFromConfig(service)
+      baseUrls <- extractUrls(url, clusterId)
       user <- storageInterface.getConfiguration("dp.atlas.user")
       pass <- storageInterface.getConfiguration("dp.atlas.password")
     } yield {
-      new AtlasClientV2(List(baseUrl).toArray, Array(user.get, pass.get))
+      new AtlasClientV2(baseUrls.toArray, Array(user.get, pass.get))
     }
   }
 
   private def getUrlOrThrowException = {
     clusterComponentService.getServiceByName(clusterId, "ATLAS").map {
-      case Right(service) =>
-        service.fullURL.get
+      case Right(endpoints) => endpoints
       case Left(errors) =>
         throw new Exception(
           s"Could not get the service Url from storage - $errors")
     }
   }
 
-  private def extract(url: String, clusterId: Long): Future[String] = {
-    val fullUrl = new URL(url)
+  def extractUrls(service: URL, clusterId: Long): Future[Seq[String]] = {
+
     clusterHostsService
-      .getHostByClusterAndName(clusterId, fullUrl.getHost)
+      .getHostByClusterAndName(clusterId, service.getHost)
       .map {
         case Right(host) =>
-          s"${fullUrl.getProtocol}://${host.ipaddr}:${fullUrl.getPort}"
+         Seq(s"${service.getProtocol}://${host.ipaddr}:${service.getPort}")
         case Left(errors) =>
           throw new Exception(
             s"Cannot translate the hostname into an IP address $errors")
       }
+
   }
 
 }

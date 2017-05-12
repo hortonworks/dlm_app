@@ -1,7 +1,14 @@
-import {Component, Input, Output, ViewEncapsulation, ViewChild, TemplateRef, EventEmitter, HostBinding} from '@angular/core';
+import {
+  Component, Input, Output, ViewEncapsulation, ViewChild, TemplateRef, EventEmitter, HostBinding,
+  OnChanges, OnDestroy
+} from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
+
+import { NavbarService } from 'services/navbar.service';
 import {ColumnMode, DatatableComponent, DatatableRowDetailDirective} from '@swimlane/ngx-datatable';
-import {CheckboxColumnComponent} from '../../components/table-columns/checkbox-column/checkbox-column.component';
-import {ActionColumnType, ActionItemType, ActionColumnComponent} from '../../components';
+import {CheckboxColumnComponent} from 'components/table-columns/checkbox-column/checkbox-column.component';
+import {ActionColumnType, ActionItemType, ActionColumnComponent} from 'components/';
 import {TableTheme, TableThemeSettings} from './table-theme.type';
 
 export const SELECTED_KEY_NAME = '__selected';
@@ -12,12 +19,14 @@ export const SELECTED_KEY_NAME = '__selected';
   styleUrls: ['./table.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class TableComponent {
+export class TableComponent implements OnChanges, OnDestroy {
   private _columns: any[];
   private _rows: any[];
   private _headerHeight: string|number;
   private _rowHeight: string|number;
   private _footerHeight: string|number;
+  private navbarCollapse$: Observable<boolean>;
+  private navbarCollapseSubscription: Subscription;
 
   actions: ActionItemType[];
   @ViewChild(CheckboxColumnComponent) checkboxColumn: CheckboxColumnComponent;
@@ -117,6 +126,13 @@ export class TableComponent {
 
   limit = 10;
 
+  constructor(private navbar: NavbarService) {
+    this.navbarCollapse$ = this.navbar.isCollapsed;
+    this.navbarCollapseSubscription = this.navbarCollapse$
+      .debounceTime(500)
+      .subscribe(() => this.table.recalculate());
+  }
+
   handleSelectedCell({row, column, checked}) {
     row[SELECTED_KEY_NAME] = !checked;
   }
@@ -141,4 +157,16 @@ export class TableComponent {
     this.table.rowDetail.toggleExpandRow(row);
   }
 
+  ngOnChanges(changes) {
+    if (changes.rows) {
+      const {firstChange, currentValue, previousValue} = changes.rows;
+      if (!firstChange && currentValue && previousValue && currentValue.length < previousValue.length) {
+        this.table.offset = 0;
+      }
+    }
+  }
+
+  ngOnDestroy() {
+    this.navbarCollapseSubscription.unsubscribe();
+  }
 }

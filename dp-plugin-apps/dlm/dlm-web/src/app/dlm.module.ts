@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpModule, Http } from '@angular/http';
-import { BsDropdownModule, CollapseModule, TabsModule, ModalModule } from 'ng2-bootstrap';
+import { HttpModule } from '@angular/http';
+import { CollapseModule, TabsModule, ModalModule, TypeaheadModule } from 'ng2-bootstrap';
+import { SelectModule } from 'ng2-select';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { StoreModule } from '@ngrx/store';
 import { RouterStoreModule } from '@ngrx/router-store';
@@ -16,6 +17,7 @@ import { routes } from './routes/routes.config';
 import { PolicyEffects } from './effects/policy.effect';
 import { PairingEffects } from './effects/pairing.effect';
 import { JobEffects } from './effects/job.effect';
+import { EventEffects } from './effects/event.effect';
 
 import { FormEffects } from './effects/form.effect';
 
@@ -25,6 +27,9 @@ import { PairingService } from './services/pairing.service';
 import { JobService } from './services/job.service';
 import { SessionStorageService } from './services/session-storage.service';
 import { FormService } from 'services/form.service';
+import { NavbarService } from 'services/navbar.service';
+import { EventService } from 'services/event.service';
+import { TimeZoneService } from 'services/time-zone.service';
 
 import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
@@ -35,11 +40,18 @@ import { PoliciesComponent } from './pages/policies/policies.component';
 import { JobsComponent } from './pages/jobs/jobs.component';
 import { HelpComponent } from './pages/help/help.component';
 import { NavbarComponent } from './common/navbar/navbar.component';
+import { NavigationDropdownComponent } from './common/navigation-dropdown/navigation-dropdown.component';
+import { NotificationsComponent } from './common/notifications/notifications.component';
 import { ModalDialogComponent } from './common/modal-dialog/modal-dialog.component';
 import { httpServiceProvider } from './services/http.service';
 import { CommonComponentsModule } from './components/common-components.module';
+import { UserDropdownComponent } from './common/user-dropdown/user-dropdown.component';
 import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.component';
 import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route.component';
+
+import { ResourceChartsComponent } from './pages/overview/resource-charts/resource-charts.component';
+import { IssuesListComponent } from './pages/overview/issues-list/issues-list.component';
+import { IssuesListItemComponent } from './pages/overview/issues-list-item/issues-list-item.component';
 
 import { ClustersComponent } from './pages/clusters/clusters.component';
 import { ClusterCardComponent } from './pages/clusters/cluster-card/cluster-card.component';
@@ -49,6 +61,7 @@ import { ClusterSearchComponent } from './pages/clusters/cluster-search/cluster-
 import { JobsTableComponent } from './pages/jobs/jobs-table/jobs-table.component';
 import { JobStatusComponent } from './pages/jobs/job-status/job-status.component';
 import { JobTransferredGraphComponent } from './pages/jobs/jobs-transferred-graph/job-transferred-graph.component';
+import { JobsStatusFilterComponent } from './pages/jobs/jobs-status-filter/jobs-status-filter.component';
 
 import { PolicyTableComponent } from './pages/policies/policy-table/policy-table.component';
 import { FlowStatusComponent } from './pages/policies/policy-table/flow-status/flow-status.component';
@@ -71,10 +84,12 @@ import {ChartsModule} from 'ng2-charts/ng2-charts';
 
 import { TableComponent } from './common/table/table.component';
 import { TableFooterComponent } from './common/table/table-footer/table-footer.component';
+import { TableFilterComponent } from './common/table/table-filter/table-filter.component';
 import { CheckboxColumnComponent, ActionColumnComponent } from './components';
 import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/review-policy.component';
 
-import {BytesSizePipe} from './pipes/bytes-size.pipe';
+import { BytesSizePipe } from './pipes/bytes-size.pipe';
+import { FmtTzPipe } from './pipes/fmt-tz.pipe';
 
 @NgModule({
   imports: [
@@ -90,12 +105,15 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     EffectsModule.run(PairingEffects),
     EffectsModule.run(JobEffects),
     EffectsModule.run(FormEffects),
+    EffectsModule.run(EventEffects),
     CollapseModule.forRoot(),
     TabsModule.forRoot(),
     ModalModule.forRoot(),
+    TypeaheadModule.forRoot(),
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
+    SelectModule,
 
     RouterModule.forRoot(routes),
     CommonComponentsModule,
@@ -121,13 +139,20 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     PolicyFormComponent,
     ReviewPolicyComponent,
 
+    ResourceChartsComponent,
+    IssuesListComponent,
+    IssuesListItemComponent,
+
     JobsTableComponent,
     JobStatusComponent,
     JobTransferredGraphComponent,
+    JobsStatusFilterComponent,
 
     JobsComponent,
     HelpComponent,
     NavbarComponent,
+    NavigationDropdownComponent,
+    UserDropdownComponent,
     NotFoundRouteComponent,
     RadioButtonComponent,
     CheckboxComponent,
@@ -139,10 +164,13 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     PairingCardListComponent,
     TableComponent,
     TableFooterComponent,
+    TableFilterComponent,
     CheckboxColumnComponent,
     ActionColumnComponent,
     ModalDialogComponent,
-    BytesSizePipe
+    NotificationsComponent,
+    BytesSizePipe,
+    FmtTzPipe
   ],
   bootstrap: [DlmComponent],
   providers: [
@@ -152,6 +180,9 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     PairingService,
     SessionStorageService,
     FormService,
+    NavbarService,
+    EventService,
+    TimeZoneService,
     httpServiceProvider
   ]
 })

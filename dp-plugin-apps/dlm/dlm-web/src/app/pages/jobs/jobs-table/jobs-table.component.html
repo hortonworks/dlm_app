@@ -1,8 +1,12 @@
-<dlm-table [columns]="columns"
-           [rows]="jobs"
-           (selectAction)="handleSelectedAction($event)"
-           selectionType="checkbox">
+<dlm-table
+  #jobsTable
+  [columns]="columns"
+  [rows]="jobs"
+  (selectAction)="handleSelectedAction($event)"
+  selectionType="checkbox">
 </dlm-table>
+
+<dlm-icon-column [showHexagon]="false" [showValue]="true"></dlm-icon-column>
 
 <ng-template #statusCellTemplate let-row="row">
   <dlm-job-status [job]="row"></dlm-job-status>
@@ -10,10 +14,6 @@
 
 <ng-template #iconCellTemplate>
   <span class="fa fa-arrow-right" aria-hidden="true"></span>
-</ng-template>
-
-<ng-template #prevRunsTemplate let-row="row" let-column="column">
-  <dlm-job-status *ngFor="let job of row.previousRuns" [job]="job">&nbsp;</dlm-job-status>
 </ng-template>
 
 <ng-template #agoTemplate let-value="value">

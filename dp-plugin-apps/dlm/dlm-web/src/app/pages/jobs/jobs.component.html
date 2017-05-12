@@ -9,6 +9,9 @@
     </div>
   </div>
   <div class="pull-right">
+    <jobs-status-filter
+      [jobs]="jobs$ | async"
+      (onFilter)="filterJobsByStatus($event)"></jobs-status-filter>
     <dlm-dropdown
       [text]="'Add'"
       [items]="addOptions"
@@ -17,6 +20,12 @@
       (onSelectItem)="handleAddSelected($event)">
     </dlm-dropdown>
   </div>
+  <div class="pull-right filter-wrapper">
+    <dlm-table-filter
+      [filterBy]="filterBy"
+      [data]="jobs$ | async"
+      (onFilter)="onFilter($event)"></dlm-table-filter>
+  </div>
 </div>
 
-<dp-jobs-table [jobs]="jobs$ | async"></dp-jobs-table>
+<dp-jobs-table [jobs]="filteredJobs$ | async"></dp-jobs-table>

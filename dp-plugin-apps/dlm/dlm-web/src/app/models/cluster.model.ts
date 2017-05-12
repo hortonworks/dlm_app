@@ -1,15 +1,19 @@
-import { RequestStatus } from './request-status.model';
-import { ClusterDetails } from './cluster-details.model';
+import { Location } from './location.model';
+import { Service } from './service.model';
 
 export interface Cluster {
   id: string;
+  name: string;
+  ambariurl: string;
+  description: string;
+  location: Location;
+  services: Array<Service>;
+  /*
+    The following properties need to be removed eventually
+    since the API response doesn't align with these properties
+   */
   type: string;
-  ambariUrl: string;
-  userName: string;
-  clusterType: string;
   createdAt: number;
   volumeGB: number;
   nodesCount: number;
-  clusterStatus: RequestStatus;
-  clusterDetails: ClusterDetails;
 }
