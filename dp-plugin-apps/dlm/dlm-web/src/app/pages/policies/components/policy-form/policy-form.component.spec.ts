@@ -10,6 +10,7 @@ import {CheckboxListComponent} from '../../../../common/checkbox-list/checkbox-l
 import {CheckboxComponent} from '../../../../common/checkbox/checkbox.component';
 import {MockStore} from '../../../../mocks/mock-store';
 import {Store} from '@ngrx/store';
+import { MyDatePickerModule } from 'mydatepicker';
 import {CheckboxColumnComponent} from '../../../../components/table-columns/checkbox-column/checkbox-column.component';
 
 describe('PolicyFormComponent', () => {
@@ -20,7 +21,7 @@ describe('PolicyFormComponent', () => {
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot({
         loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-      }), ReactiveFormsModule, FormsModule, CollapseModule, TabsModule],
+      }), ReactiveFormsModule, FormsModule, CollapseModule, TabsModule, MyDatePickerModule],
       declarations: [
         PolicyFormComponent,
         RadioButtonComponent,

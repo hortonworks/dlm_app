@@ -1,4 +1,5 @@
 import {Pipe, PipeTransform} from '@angular/core';
+import { bytesToSize } from 'utils/size-util';
 
 /**
  * https://gist.github.com/JonCatmull/ecdf9441aaa37336d9ae2c7f9cb7289a
@@ -13,25 +14,8 @@ import {Pipe, PipeTransform} from '@angular/core';
 @Pipe({name: 'bytesSize'})
 export class BytesSizePipe implements PipeTransform {
 
-  private units = [
-    'bytes',
-    'KB',
-    'MB',
-    'GB',
-    'TB',
-    'PB'
-  ];
 
   transform(bytes: number = 0, precision: number = 2): string {
-    if (isNaN(parseFloat(String(bytes))) || !isFinite(bytes)) {
-      return '?';
-    }
-
-    let unit = 0;
-    while (bytes >= 1024) {
-      bytes /= 1024;
-      unit++;
-    }
-    return bytes.toFixed(+precision) + ' ' + this.units[unit];
+    return bytesToSize(bytes, precision);
   }
 }

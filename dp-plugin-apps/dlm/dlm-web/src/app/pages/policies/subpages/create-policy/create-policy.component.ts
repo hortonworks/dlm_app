@@ -1,9 +1,13 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 import { go } from '@ngrx/router-store';
 import { createPolicy } from 'actions/policy.action';
 import { State } from 'reducers';
 import { initApp } from 'actions/app.action';
+import { Pairing } from 'models/pairing.model';
+import { getAllPairings } from 'selectors/pairing.selector';
+import { loadPairings } from 'actions/pairing.action';
 import { saveFormValue } from 'actions/form.action';
 
 import { POLICY_FORM_ID } from '../../components/policy-form/policy-form.component';
@@ -14,16 +18,23 @@ import { POLICY_FORM_ID } from '../../components/policy-form/policy-form.compone
     <h2>
       {{'page.policies.header_create' | translate}}
     </h2>
-    <dlm-policy-form (formSubmit)="handleFormSubmit($event)">
+    <dlm-policy-form
+      [pairings]="pairings$ | async"
+      (formSubmit)="handleFormSubmit($event)"
+      >
     </dlm-policy-form>
   `,
   styleUrls: ['./create-policy.component.scss']
 })
 export class CreatePolicyComponent implements OnInit {
+  pairings$: Observable<Pairing[]>;
 
-  constructor(private store: Store<State>) { }
+  constructor(private store: Store<State>) {
+    this.pairings$ = this.store.select(getAllPairings);
+  }
 
   ngOnInit() {
+    this.store.dispatch(loadPairings());
   }
 
   handleFormSubmit(values) {
