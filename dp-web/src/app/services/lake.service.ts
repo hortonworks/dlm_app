@@ -63,6 +63,22 @@ export class LakeService {
     .get(`${this.url}/ambari/status?url=${ambariUrl}`, new RequestOptions(HttpUtil.getHeaders()))
     .map(HttpUtil.extractData)
     .catch(HttpUtil.handleError);
-  }
+  }  
+
+  getPairsMock(lakes, id:number) : Observable<{
+      data: Lake,
+      clusters: Cluster[],
+      status : number
+    }>{
+      if(lakes.length === 1){
+        return null;
+      }
+      let index = lakes.findIndex((lake)=>{return id === lake.data.id})
+      if(index === lakes.length - 1){
+        return Observable.of(lakes[index - 1]);
+      }else{
+        return Observable.of(lakes[index + 1]);
+      }
+    }
 
 }

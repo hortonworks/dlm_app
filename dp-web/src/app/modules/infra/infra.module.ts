@@ -5,6 +5,8 @@ import { RouterModule } from '@angular/router';
 import { routes } from './infra.routes';
 import { LakesComponent } from './views/lakes/lakes.component';
 import { LakeStatsComponent } from './widgets/lake-stats/lake-stats.component';
+import { MapComponent } from './widgets/map/map.component';
+
 
 @NgModule({
   imports: [
@@ -15,6 +17,7 @@ import { LakeStatsComponent } from './widgets/lake-stats/lake-stats.component';
   declarations: [
     LakesComponent,
     LakeStatsComponent,
+    MapComponent
   ]
 })
 export class InfraModule { }
