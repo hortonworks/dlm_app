@@ -158,6 +158,9 @@
     "jobs": {
       "header": "Jobs",
       "header_note": ""
+    },
+    "notifications": {
+      "header": "Notifications"
     }
   }
 }
