@@ -11,6 +11,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { reducer } from './reducers';
 import { RouterModule } from '@angular/router';
 
+import { MyDatePickerModule } from 'mydatepicker';
+
 import { EffectsModule } from '@ngrx/effects';
 import { ClusterEffects } from './effects/cluster.effect';
 import { routes } from './routes/routes.config';
@@ -42,6 +44,8 @@ import { HelpComponent } from './pages/help/help.component';
 import { NavbarComponent } from './common/navbar/navbar.component';
 import { NavigationDropdownComponent } from './common/navigation-dropdown/navigation-dropdown.component';
 import { NotificationsComponent } from './common/notifications/notifications.component';
+import { NotificationsPageComponent } from './pages/notifications/notifications.component';
+import { NotificationsTableComponent } from './pages/notifications/notifications-table/notifications-table.component';
 import { ModalDialogComponent } from './common/modal-dialog/modal-dialog.component';
 import { httpServiceProvider } from './services/http.service';
 import { CommonComponentsModule } from './components/common-components.module';
@@ -114,6 +118,7 @@ import { FmtTzPipe } from './pipes/fmt-tz.pipe';
     FormsModule,
     ReactiveFormsModule,
     SelectModule,
+    MyDatePickerModule,
 
     RouterModule.forRoot(routes),
     CommonComponentsModule,
@@ -123,6 +128,8 @@ import { FmtTzPipe } from './pipes/fmt-tz.pipe';
     DlmComponent,
     MainComponent,
     OverviewComponent,
+    NotificationsPageComponent,
+    NotificationsTableComponent,
     ClustersComponent,
     ClusterCardComponent,
     ClusterListComponent,

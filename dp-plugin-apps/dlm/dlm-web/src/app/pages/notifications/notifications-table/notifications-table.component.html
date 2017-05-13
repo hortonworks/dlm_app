@@ -1,0 +1,9 @@
+<dlm-table
+  #notificationsTable
+  [columns]="columns"
+  [rows]="events">
+</dlm-table>
+
+<ng-template #agoTemplate let-value="value">
+  <span>{{value | amTimeAgo}}</span>
+</ng-template>

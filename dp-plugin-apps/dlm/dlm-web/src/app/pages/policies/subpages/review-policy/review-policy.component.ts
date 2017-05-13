@@ -6,11 +6,18 @@ import { TranslateService } from '@ngx-translate/core';
 
 import { createPolicy } from 'actions/policy.action';
 import { State } from 'reducers';
-import { PolicyService } from 'services/policy.service';
+import { PolicyPayload, PolicyDefinition } from 'models/policy.model';
 import { resetFormValue } from 'actions/form.action';
 import { getFormValues } from 'selectors/form.selector';
 import { POLICY_FORM_ID } from '../../components/policy-form/policy-form.component';
+import { Pairing } from 'models/pairing.model';
+import { loadPairings } from 'actions/pairing.action';
+import { getPairing } from 'selectors/pairing.selector';
+import { Cluster } from 'models/cluster.model';
+import { bytesToSize } from 'utils/size-util';
+import { POLICY_TYPES } from 'constants/policy.constant';
 import { LoadCluster } from 'actions/cluster.action';
+import { omitEmpty } from 'utils/object-utils';
 
 @Component({
   selector: 'dlm-review-policy',
@@ -23,39 +30,81 @@ export class ReviewPolicyComponent implements OnInit {
   // todo: this is mock. Not sure where we can get this info
   detailsInfo = [
     // this one probably can be get from cluster info
-    {name: 'volume', label: this.t.instant(`${this.tDetails}.volume`), value: '234GB'},
-    {name: 'transferTime', label: this.t.instant(`${this.tDetails}.transfer`), value: '11hrs 10mins'},
+    {name: 'volume', label: this.t.instant(`${this.tDetails}.volume`), value: ''},
+    {name: 'transferTime', label: this.t.instant(`${this.tDetails}.time`), value: '11hrs 10mins'},
     {name: 'files', label: this.t.instant(`${this.tDetails}.files`), value: '121'},
     {name: 'destination', label: this.t.instant(`${this.tDetails}.destination`), value: '' }
   ];
   policyForm$: Observable<any>;
+  pairing$: Observable<Pairing>;
+  sourceCluster: Cluster;
+  targetCluster: Cluster;
+
   private policyFormValue: any;
 
   constructor(private store: Store<State>, private t: TranslateService) {
     this.policyForm$ = store.select(getFormValues(POLICY_FORM_ID));
+    this.pairing$ = this.policyForm$
+      .switchMap(policyForm => store.select(getPairing(policyForm.general.pair)));
   }
 
   ngOnInit() {
-    this.policyForm$.subscribe(policyForm => {
-      const [targetCluster, destinationCluster] = policyForm.general.pair.split(',');
+    Observable.combineLatest(this.policyForm$, this.pairing$)
+    .subscribe(([policyForm, pairing]) => {
+      if (!pairing) {
+        return;
+      }
+      const [sourceCluster, targetCluster] = pairing.pair;
+      this.sourceCluster = sourceCluster;
+      this.targetCluster = targetCluster;
+      this.policyFormValue = policyForm;
 
       this.descriptionTranslateParam = {
         ...this.descriptionTranslateParam,
         policyName: policyForm.general.name,
-        targetCluster: targetCluster
+        sourceCluster: sourceCluster.name
       };
-      this.detailsInfo.find(detail => detail.name === 'destination').value = destinationCluster;
+
+      this.getDetailsField('destination').value = targetCluster.name;
+      this.getDetailsField('volume').value = bytesToSize(targetCluster.stats.CapacityTotal, 0);
     });
-    this.store.dispatch(new LoadCluster('cluster1'));
+    this.store.dispatch(loadPairings());
+  }
+
+  serializeFormValues(values): PolicyPayload {
+    let sourceDataset;
+    if (values.general.type === POLICY_TYPES.HDFS) {
+      sourceDataset = values.directories;
+    } else if (values.general.type === POLICY_TYPES.HIVE) {
+      sourceDataset = values.databases.join(',');
+    }
+    const policyDefinition = <PolicyDefinition>omitEmpty({
+      name: values.general.name,
+      type: values.general.type,
+      sourceCluster: this.sourceCluster.name,
+      targetCluster: this.targetCluster.name,
+      frequencyInSec: values.job.frequencyInSec,
+      startTime: values.job.endTime,
+      endTime: values.job.endTime,
+      sourceDataset
+    });
+    return {
+      policyDefinition,
+      submitType: values.job.schedule
+    };
   }
 
   submitReview() {
-    this.store.dispatch(createPolicy(this.policyFormValue));
+    this.store.dispatch(createPolicy(this.serializeFormValues(this.policyFormValue), this.targetCluster.id));
   }
 
   cancelReview() {
     this.store.dispatch(resetFormValue(POLICY_FORM_ID));
     this.store.dispatch(go(['policies/create']));
+  }
+
+  getDetailsField(name: string) {
+    return this.detailsInfo.find(detail => detail.name === name);
   }
 
 }

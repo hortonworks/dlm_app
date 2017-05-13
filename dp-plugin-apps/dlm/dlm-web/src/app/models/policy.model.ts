@@ -15,3 +15,19 @@ export interface Policy {
   customProperties: Object;
   retry: Object;
 }
+
+export interface PolicyDefinition {
+  type: string;
+  name: string;
+  sourceCluster: string;
+  targetCluster: string;
+  sourceDataset: string;
+  frequencyInSec: number;
+  startTime?: string;
+  endTime?: string;
+};
+
+export interface PolicyPayload {
+  policyDefinition: PolicyDefinition;
+  submitType: string;
+};

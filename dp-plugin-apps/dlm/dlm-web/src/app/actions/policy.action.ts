@@ -1,5 +1,6 @@
 import { type } from 'utils/type-action';
 import { Action } from '@ngrx/store';
+import { PolicyPayload } from 'models/policy.model';
 
 export const ActionTypes = {
   LOAD_POLICIES: type('LOAD_POLICIES'),
@@ -17,7 +18,9 @@ export const loadPoliciesSuccess = (policies): Action => {
 };
 export const loadPoliciesFail = (error): Action => ({type: ActionTypes.LOAD_POLICIES_FAIL});
 
-export const createPolicy = (policy): Action => ({type: ActionTypes.CREATE_POLICY, payload: policy});
+export const createPolicy = (policy: PolicyPayload, targetClusterId: string|number): Action => ({
+  type: ActionTypes.CREATE_POLICY, payload: { policy, targetClusterId }
+});
 export const createPolicySuccess = (payload): Action => ({type: ActionTypes.CREATE_POLICY_SUCCESS, payload});
 export const createPolicyFail = (error): Action => ({type: ActionTypes.CREATE_POLICY_FAIL, payload: error});
 

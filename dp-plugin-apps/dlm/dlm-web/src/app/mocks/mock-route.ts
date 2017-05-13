@@ -31,9 +31,27 @@ export class MockRoute {
     if (this.method !== request.method || sourceTokens.length !== selfTokens.length) {
       return false;
     }
-    const matchedTokens = selfTokens.filter((token, id) => token === sourceTokens[id]);
-    const isFullMatch = matchedTokens.length === sourceTokens.length;
-    const isDynamicMatch = matchedTokens.length === sourceTokens.length - selfTokens.filter(token => token.startsWith(':')).length;
+    const matchedTokens = selfTokens.reduce((matchedMap, token, tokenIndex) => {
+      const sourceToken = sourceTokens[tokenIndex];
+      if (sourceToken === undefined) {
+        return matchedMap;
+      }
+      if (token === sourceToken) {
+        return {
+          fullMatch: matchedMap.fullMatch.concat(token),
+          dynamicMatch: matchedMap.dynamicMatch.concat(token)
+        };
+      }
+      if (token.startsWith(':')) {
+        return {
+          ...matchedMap,
+          dynamicMatch: matchedMap.dynamicMatch.concat(sourceToken)
+        };
+      }
+      return matchedMap;
+    }, { fullMatch: [], dynamicMatch: []});
+    const isFullMatch = matchedTokens.fullMatch.length === sourceTokens.length;
+    const isDynamicMatch = matchedTokens.dynamicMatch.length === sourceTokens.length;
     // todo: maybe do some stuff with :id, e.g. pattern file name like cluster_:id.json
     return isFullMatch || isDynamicMatch;
   }
