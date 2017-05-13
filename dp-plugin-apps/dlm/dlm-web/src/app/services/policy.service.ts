@@ -11,14 +11,8 @@ export class PolicyService {
 
   createPolicy(payload: { policy: PolicyPayload, targetClusterId: string }): Observable<any> {
     const { policy, targetClusterId } = payload;
-    const requestUrl = `clusters/${targetClusterId}/policy/${policy.policyDefinition.name}`;
-    let request$;
-    if (policy.submitType === POLICY_SUBMIT_TYPES.SUBMIT) {
-      request$ = this.http.post(`${requestUrl}/submit`, policy);
-    } else {
-      request$ = this.http.put(`${requestUrl}/schedule`, policy);
-    }
-    return request$.map(r => r.json());
+    return this.http.post(`clusters/${targetClusterId}/policy/${policy.policyDefinition.name}/submit`, policy)
+      .map(r => r.json());
   }
 
   fetchPolicies(): Observable<any> {
@@ -31,6 +25,11 @@ export class PolicyService {
 
   removePolicy(id: string): Observable<any> {
     return this.http.delete(`policies/${id}`);
+  }
+
+  schedulePolicy(payload: { policyName: string, targetClusterId: string|number}) {
+    return this.http.put(`clusters/${payload.targetClusterId}/policy/${payload.policyName}/schedule`, {})
+      .map(r => r.json());
   }
 
 }

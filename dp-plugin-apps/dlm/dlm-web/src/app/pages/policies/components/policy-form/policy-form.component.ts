@@ -148,6 +148,6 @@ export class PolicyFormComponent implements OnInit {
   }
 
   handleDateChange(date: IMyDateModel, dateType: string) {
-    this.policyForm.patchValue({ job: {[dateType]: `${date.formatted}'T':00:00:00`}});
+    this.policyForm.patchValue({ job: {[dateType]: `${date.formatted}T00:00:00`}});
   }
 }
