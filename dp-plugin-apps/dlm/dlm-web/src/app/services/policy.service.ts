@@ -9,9 +9,9 @@ export class PolicyService {
 
   constructor(private http: Http) { }
 
-  createPolicy(payload: { policy: PolicyPayload, sourceClusterId: string }): Observable<any> {
-    const { policy, sourceClusterId } = payload;
-    const requestUrl = `clusters/${sourceClusterId}/policy/${policy.policyDefinition.name}`;
+  createPolicy(payload: { policy: PolicyPayload, targetClusterId: string }): Observable<any> {
+    const { policy, targetClusterId } = payload;
+    const requestUrl = `clusters/${targetClusterId}/policy/${policy.policyDefinition.name}`;
     let request$;
     if (policy.submitType === POLICY_SUBMIT_TYPES.SUBMIT) {
       request$ = this.http.post(`${requestUrl}/submit`, policy);

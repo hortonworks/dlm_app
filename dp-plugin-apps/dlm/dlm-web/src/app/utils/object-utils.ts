@@ -7,3 +7,17 @@ export const toKeyValueArray = (obj: string) => {
   });
   return result;
 };
+
+export const omit = (obj, ...keys) => Object.keys(obj).reduce((result, key) => {
+  if (keys.indexOf(key) === -1) {
+    result[key] = obj[key];
+  }
+  return result;
+}, {});
+
+export const omitEmpty = (obj) => Object.keys(obj).reduce((result, key) => {
+  if (!(obj[key] === '' || obj[key] === undefined || obj[key] === null)) {
+    result[key] = obj[key];
+  }
+  return result;
+}, {});

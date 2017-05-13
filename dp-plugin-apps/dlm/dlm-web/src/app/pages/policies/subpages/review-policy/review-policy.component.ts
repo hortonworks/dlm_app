@@ -6,7 +6,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 import { createPolicy } from 'actions/policy.action';
 import { State } from 'reducers';
-import { PolicyPayload } from 'models/policy.model';
+import { PolicyPayload, PolicyDefinition } from 'models/policy.model';
 import { resetFormValue } from 'actions/form.action';
 import { getFormValues } from 'selectors/form.selector';
 import { POLICY_FORM_ID } from '../../components/policy-form/policy-form.component';
@@ -17,6 +17,7 @@ import { Cluster } from 'models/cluster.model';
 import { bytesToSize } from 'utils/size-util';
 import { POLICY_TYPES } from 'constants/policy.constant';
 import { LoadCluster } from 'actions/cluster.action';
+import { omitEmpty } from 'utils/object-utils';
 
 @Component({
   selector: 'dlm-review-policy',
@@ -77,23 +78,24 @@ export class ReviewPolicyComponent implements OnInit {
     } else if (values.general.type === POLICY_TYPES.HIVE) {
       sourceDataset = values.databases.join(',');
     }
+    const policyDefinition = <PolicyDefinition>omitEmpty({
+      name: values.general.name,
+      type: values.general.type,
+      sourceCluster: this.sourceCluster.name,
+      targetCluster: this.targetCluster.name,
+      frequencyInSec: values.job.frequencyInSec,
+      startTime: values.job.endTime,
+      endTime: values.job.endTime,
+      sourceDataset
+    });
     return {
-      policyDefinition: {
-        name: values.general.name,
-        type: values.general.type,
-        sourceCluster: this.sourceCluster.name,
-        targetCluster: this.targetCluster.name,
-        frequencyInSec: values.job.frequencyInSec,
-        startTime: values.job.endTime,
-        endTime: values.job.endTime,
-        sourceDataset
-      },
+      policyDefinition,
       submitType: values.job.schedule
     };
   }
 
   submitReview() {
-    this.store.dispatch(createPolicy(this.serializeFormValues(this.policyFormValue), this.sourceCluster.id));
+    this.store.dispatch(createPolicy(this.serializeFormValues(this.policyFormValue), this.targetCluster.id));
   }
 
   cancelReview() {
