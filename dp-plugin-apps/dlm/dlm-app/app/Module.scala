@@ -7,8 +7,8 @@ import com.hortonworks.dataplane.db.Webserice._
 import play.api.Configuration
 import play.api.libs.ws.WSClient
 
-import com.hortonworks.dlm.beacon.{BeaconClusterServiceImpl, BeaconPairServiceImpl, BeaconPolicyServiceImpl, BeaconPolicyInstanceServiceImpl}
-import com.hortonworks.dlm.beacon.WebService.{BeaconClusterService, BeaconPairService, BeaconPolicyService, BeaconPolicyInstanceService}
+import com.hortonworks.dlm.beacon.{BeaconClusterServiceImpl, BeaconPairServiceImpl, BeaconPolicyServiceImpl, BeaconPolicyInstanceServiceImpl, BeaconEventServiceImpl}
+import com.hortonworks.dlm.beacon.WebService.{BeaconClusterService, BeaconPairService, BeaconPolicyService, BeaconPolicyInstanceService, BeaconEventService}
 
 
 /**
@@ -82,6 +82,13 @@ class Module extends AbstractModule {
   @Named("beaconPolicyInstanceService")
   def provideBeaconPolicyInstanceService(implicit ws: WSClient,configuration: Configuration):BeaconPolicyInstanceService = {
     new BeaconPolicyInstanceServiceImpl()
+  }
+
+  @Provides
+  @Singleton
+  @Named("beaconEventService")
+  def provideBeaconEventService(implicit ws: WSClient,configuration: Configuration):BeaconEventService = {
+    new BeaconEventServiceImpl()
   }
 
 }

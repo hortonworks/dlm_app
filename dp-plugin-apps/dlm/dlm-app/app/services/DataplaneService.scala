@@ -162,6 +162,19 @@ class DataplaneService @Inject()(
     }
   }
 
+  def getHiveServerEndpointDetails(endpointData: ClusterServiceWithConfigs) : Either[Errors, ClusterServiceEndpointDetails] = {
+    val hiveServerPort : Either[Errors, String] = getPropertyValue(endpointData, "hive-site", "hive.server2.thrift.port")
+    hiveServerPort match {
+      case Right(hiveServerPort) => {
+        val hiveServerHostName = endpointData.servicehost
+        val fullurl = s"http://$hiveServerHostName:$hiveServerPort"
+        Right(ClusterServiceEndpointDetails(endpointData.serviceid, endpointData.servicename, endpointData.clusterid, hiveServerHostName, fullurl))
+      }
+      case Left(errors) => Left(errors)
+    }
+  }
+
+
 
   def getPropertyValue(endpointData: ClusterServiceWithConfigs, configType: String, configName: String) : Either[Errors, String] = {
     val serviceName = endpointData.servicename
@@ -212,20 +225,7 @@ class DataplaneService @Inject()(
     * @return
     */
   def getBeaconService(clusterId: Long): Future[Either[Errors, ClusterServiceEndpointDetails]] = {
-    val p: Promise[Either[Errors, ClusterServiceEndpointDetails]] = Promise()
-    clusterComponentService.getEndpointsForCluster(clusterId, DataplaneService.BEACON_SERVER).map({
-      clusterServiceWithConfigs => clusterServiceWithConfigs match {
-        case Right(clusterServiceWithConfigs) => {
-          val beaconServiceDetails : Either[Errors, ClusterServiceEndpointDetails] = getBeaconEndpointDetails(clusterServiceWithConfigs)
-          beaconServiceDetails match {
-            case Right(beaconServiceDetails) => p.success(Right(beaconServiceDetails))
-            case Left(errors) =>  p.success(Left(errors))
-          }
-        }
-        case Left(errors) => p.success(Left(errors))
-      }
-    })
-    p.future
+    getServiceEndpointDetails(clusterId, DataplaneService.BEACON_SERVER, getBeaconEndpointDetails)
   }
 
   /**
@@ -234,18 +234,37 @@ class DataplaneService @Inject()(
     * @return
     */
   def getNameNodeService(clusterId: Long): Future[Either[Errors, ClusterServiceEndpointDetails]] = {
+    getServiceEndpointDetails(clusterId, DataplaneService.NAMENODE, getNameNodeEndpointDetails)
+  }
+
+  /**
+    *  Get future for Hive Server details from dataplane
+    * @param clusterId cluster id
+    * @return
+    */
+  def getHiveServerService(clusterId: Long): Future[Either[Errors, ClusterServiceEndpointDetails]] = {
+    getServiceEndpointDetails(clusterId, DataplaneService.HIVE_SERVER, getHiveServerEndpointDetails)
+  }
+
+
+  /**
+    *  Get future for service details from dataplane
+    * @param clusterId cluster id
+    * @return
+    */
+  def getServiceEndpointDetails(clusterId: Long, serviceName: String,
+                                f: ClusterServiceWithConfigs => Either[Errors, ClusterServiceEndpointDetails]) :
+                                Future[Either[Errors, ClusterServiceEndpointDetails]] = {
     val p: Promise[Either[Errors, ClusterServiceEndpointDetails]] = Promise()
-    clusterComponentService.getEndpointsForCluster(clusterId, DataplaneService.NAMENODE).map({
-      clusterServiceWithConfigs => clusterServiceWithConfigs match {
-        case Right(clusterServiceWithConfigs) => {
-          val nnServiceDetails : Either[Errors, ClusterServiceEndpointDetails] = getNameNodeEndpointDetails(clusterServiceWithConfigs)
-          nnServiceDetails match {
-            case Right(nnServiceDetails) => p.success(Right(nnServiceDetails))
-            case Left(errors) =>  p.success(Left(errors))
-          }
+    clusterComponentService.getEndpointsForCluster(clusterId, serviceName).map({
+      case Right(clusterServiceWithConfigs) => {
+        val serviceDetails : Either[Errors, ClusterServiceEndpointDetails] = f(clusterServiceWithConfigs)
+        serviceDetails match {
+          case Right(serviceDetails) => p.success(Right(serviceDetails))
+          case Left(errors) =>  p.success(Left(errors))
         }
-        case Left(errors) => p.success(Left(errors))
       }
+      case Left(errors) => p.success(Left(errors))
     })
     p.future
   }
@@ -254,4 +273,5 @@ class DataplaneService @Inject()(
 object DataplaneService {
   val BEACON_SERVER = "BEACON"
   val NAMENODE = "NAMENODE"
+  val HIVE_SERVER = "HIVE"
 }

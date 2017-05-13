@@ -4,15 +4,16 @@ import java.lang.reflect.Field
 import play.api.libs.json.Json
 
 object ResponseEntities {
-  case class BeaconApiError(code: String, message: String, beaconUrl: Option[String])
-  case class BeaconApiErrors(errors: Seq[BeaconApiError] = Seq())
+  case class BeaconApiError(message: String, status: String = "FAILED", requestId: Option[String] = None)
+  case class BeaconApiErrors(code: Int, beaconUrl: Option[String], error: Option[BeaconApiError] = None)
 
   case class PairedCluster(name:String, dataCenter:Option[String], peers: Seq[String])
 
   case class AclObject(owner:Option[String], group:Option[String], permission:Option[String])
 
   case class BeaconEntityResponse(name: String, description: String, dataCenter: Option[String], fsEndpoint: String,
-                                  hsEndpoint: Option[String], beaconEndpoint: String, tags: Option[String], peers: Option[String],
+                                  hsEndpoint: Option[String], beaconEndpoint: String, atlasEndpoint: Option[String],
+                                  rangerEndpoint: Option[String], tags: Option[String], peers: Option[String],
                                   customProperties: Map[String, String], acl: AclObject, entityType: String)
 
   case class BeaconClusterStatusResponse(status:String, message: String, requestId: String)
@@ -37,10 +38,12 @@ object ResponseEntities {
   case class PolicyInstanceResponse(id: String, policyId: String, name: String, `type`: String, executionType: String,
                                     user: String, status: String, startTime: String, endTime: Option[String],
                                     trackingInfo: String, message: String)
+
+  case class BeaconEventResponse(policyId: String, instanceId: String, event: String, timestamp: String, eventStatus: String, message: String)
 }
 
 object RequestEntities {
-  case class ClusterDefinitionRequest( fsEndpoint: String, beaconEndpoint: String, name: String, description: String)
+  case class ClusterDefinitionRequest( fsEndpoint: String, hsEndpoint: Option[String], beaconEndpoint: String, name: String, description: String)
   case class PolicyDefinitionRequest( name: String, `type`: String, sourceDataset: String,
                                       sourceCluster: String, targetCluster: String, frequencyInSec: Long,
                                       startTime: Option[String], endTime: Option[String])
@@ -90,6 +93,9 @@ object JsonFormatters {
 
   implicit val policyInstanceResponseWrites = Json.writes[PolicyInstanceResponse]
   implicit val policyInstanceResponseReads = Json.reads[PolicyInstanceResponse]
+
+  implicit val eventResponseWrites = Json.writes[BeaconEventResponse]
+  implicit val eventResponseReads = Json.reads[BeaconEventResponse]
 
   //-- RequestEntities
 
