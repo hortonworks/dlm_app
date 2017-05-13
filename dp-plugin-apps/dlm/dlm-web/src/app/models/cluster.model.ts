@@ -1,12 +1,11 @@
 import { Location } from './location.model';
 import { Service } from './service.model';
-import { ClusterStats } from './cluster-stats.model';
 
 export interface ClusterStats {
   CapacityTotal: number;
   CapacityUsed:  number;
   CapacityRemaining: number;
-};
+}
 
 export interface Cluster {
   id: string;
