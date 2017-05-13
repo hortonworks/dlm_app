@@ -115,6 +115,9 @@ export class PolicyFormComponent implements OnInit {
 
   handleJobChange(radio: RadioItem) {
     this.selectedJobType = radio.value;
+    if (radio.value === this.policySubmitTypes.SUBMIT) {
+      this.updateFrequency(0);
+    }
   }
 
   handleSearchChange(value: string) {
