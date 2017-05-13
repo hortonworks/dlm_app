@@ -3,7 +3,7 @@ import {HttpService} from './http.service';
 import {BaseRequestOptions, ConnectionBackend, Http, RequestMethod, RequestOptions} from '@angular/http';
 import {MockBackend} from '@angular/http/testing';
 import {ReflectiveInjector} from '@angular/core';
-import {Policy} from '../models/policy.model';
+import {PolicyPayload} from '../models/policy.model';
 
 describe('PolicyService', () => {
   beforeEach(() => {
@@ -41,8 +41,11 @@ describe('PolicyService', () => {
 
   describe('#createPolicy', () => {
     beforeEach(() => {
-      this.policy = <Policy>{id: '1'};
-      this.policyService.createPolicy(this.policy);
+      this.policy = <PolicyPayload>{
+        policyDefinition: { },
+        submitType: 'SUBMIT'
+      };
+      this.policyService.createPolicy({policy: this.policy, sourceClusterId: 'clusterId'});
     });
     it('should do POST request', () => {
       expect(this.lastConnection.request.method).toBe(RequestMethod.Post);

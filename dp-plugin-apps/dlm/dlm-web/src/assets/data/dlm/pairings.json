@@ -6,6 +6,11 @@
       "description": "primary",
       "name": "Primary Cluster",
       "ambariurl": "http://localhost:8080",
+      "stats": {
+        "CapacityTotal": 9129444352,
+        "CapacityUsed": 564879360,
+        "CapacityRemaining": 3856367616
+      },
       "location": {
         "city": "Pur Chaman",
         "country": "AF"
@@ -15,6 +20,11 @@
       "description": "secondary",
       "name": "Secondary Cluster",
       "ambariurl": "http://localhost:8080",
+      "stats": {
+        "CapacityTotal": 9129444352,
+        "CapacityUsed": 564879360,
+        "CapacityRemaining": 3856367616
+      },
       "location": {
         "city": "Santa Clara",
         "country": "US"
@@ -25,6 +35,11 @@
       "description": "development",
       "name": "Development Cluster",
       "ambariurl": "http://localhost:8080",
+      "stats": {
+        "CapacityTotal": 9129444352,
+        "CapacityUsed": 564879360,
+        "CapacityRemaining": 3856367616
+      },
       "location": {
         "city": "Columbus",
         "country": "US"
@@ -34,6 +49,11 @@
       "description": "primary",
       "name": "Primary Cluster",
       "ambariurl": "http://localhost:8080",
+      "stats": {
+        "CapacityTotal": 9129444352,
+        "CapacityUsed": 564879360,
+        "CapacityRemaining": 3856367616
+      },
       "location": {
         "city": "Pur Chaman",
         "country": "AF"

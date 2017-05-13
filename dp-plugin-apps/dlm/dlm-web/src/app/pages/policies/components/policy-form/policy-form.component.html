@@ -54,7 +54,27 @@
           </fieldset>
         </div>
       </div>
-      <div class="row">
+
+      <div class="row" *ngIf="isHDFSPolicy()">
+        <div class="form-section col-md-6">
+          <div class="form-section-title">
+            {{'page.policies.form.sections.directories' | translate}}
+            <div class="pull-right">
+              <i class="fa text-primary"
+                [ngClass]="{'fa-chevron-down': sectionCollapsedMap.directories, 'fa-chevron-up': !sectionCollapsedMap.directories}"
+                (click)="toggleSection('directories')"></i>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+          <div class="row" [collapse]="sectionCollapsedMap.directories">
+            <div class="col-md-6">
+              <input type="text" class="form-control" formControlName="directories"/>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="isHivePolicy()">
         <div class="form-section col-md-6">
           <div class="form-section-title">
             {{'page.policies.form.sections.database' | translate}}
@@ -80,6 +100,7 @@
           </div>
         </div>
       </div>
+
       <div class="row">
         <div class="form-section col-md-6">
           <div class="form-section-title">
@@ -87,7 +108,7 @@
             <div class="pull-right">
               <i class="fa text-primary"
                 [ngClass]="{'fa-chevron-down': sectionCollapsedMap.job, 'fa-chevron-up': !sectionCollapsedMap.job}"
-                (click)="toggleSection('database')"></i>
+                (click)="toggleSection('job')"></i>
             </div>
             <div class="clearfix"></div>
           </div>
@@ -99,13 +120,27 @@
               (change)="handleJobChange($event)">
             </dlm-radio-button>
             <div class="clearfix"></div>
-            <div class="form-group" *ngIf="selectedJobType === 'SCHEDULE'">
+            <div class="form-group" *ngIf="isScheduled()">
               <div class="schedule-group">
                 <tabset>
-                  <tab [heading]="'common.time.hourly' | translate">{{'common.time.hourly' | translate}}</tab>
-                  <tab [heading]="'common.time.daily' | translate">{{'common.time.daily' | translate}}</tab>
-                  <tab [heading]="'common.time.weekly' | translate">{{'common.time.weekly' | translate}}</tab>
-                  <tab [heading]="'common.time.monthly' | translate">{{'common.time.monthly' | translate}}</tab>
+                  <tab *ngFor="let tab of scheduleTabs" (select)="updateFrequency(tab.value)" [heading]="tab.title | translate">
+                    <div class="row">
+                      <div class="col-md-5 col-md-offset-1">
+                        <my-date-picker
+                          [placeholder]="'page.policies.form.fields.start_time' | translate"
+                          [options]="datePickerOptions"
+                          (dateChanged)="handleDateChange($event, 'startTime')">
+                        </my-date-picker>
+                      </div>
+                      <div class="col-md-5">
+                        <my-date-picker
+                          [placeholder]="'page.policies.form.fields.end_time' | translate"
+                          (dateChanged)="handleDateChange($event, 'endTime')"
+                          [options]="datePickerOptions">
+                        </my-date-picker>
+                      </div>
+                    </div>
+                  </tab>
                 </tabset>
               </div>
             </div>
@@ -115,7 +150,7 @@
       <div class="row">
         <div class="form-footer col-md-12">
           <div class="footer-controls pull-right">
-            <button class="btn btn-default">{{'common.cancel' | translate}}</button>
+            <button type="button" class="btn btn-default">{{'common.cancel' | translate}}</button>
             <button class="btn btn-success" type="submit">{{'common.review' | translate}}</button>
           </div>
         </div>

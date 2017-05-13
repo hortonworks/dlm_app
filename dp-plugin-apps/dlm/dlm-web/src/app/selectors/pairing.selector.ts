@@ -6,3 +6,4 @@ import { mapToList } from '../utils/store-util';
 export const getEntities = createSelector(getPairings, (state) => state.entities);
 export const getProgress = createSelector(getPairings, (state) => state.progress);
 export const getAllPairings = createSelector(getEntities, mapToList);
+export const getPairing = (entityId: string) => createSelector(getEntities, (entities) => entities[entityId]);

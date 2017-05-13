@@ -11,6 +11,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { reducer } from './reducers';
 import { RouterModule } from '@angular/router';
 
+import { MyDatePickerModule } from 'mydatepicker';
+
 import { EffectsModule } from '@ngrx/effects';
 import { ClusterEffects } from './effects/cluster.effect';
 import { routes } from './routes/routes.config';
@@ -116,6 +118,7 @@ import { FmtTzPipe } from './pipes/fmt-tz.pipe';
     FormsModule,
     ReactiveFormsModule,
     SelectModule,
+    MyDatePickerModule,
 
     RouterModule.forRoot(routes),
     CommonComponentsModule,
