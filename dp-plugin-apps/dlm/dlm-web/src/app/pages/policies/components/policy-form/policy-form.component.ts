@@ -93,7 +93,7 @@ export class PolicyFormComponent implements OnInit {
       directories: '',
       job: this.formBuilder.group({
         schedule: this.policySubmitTypes.SUBMIT,
-        frequencyInSec: 3600,
+        frequencyInSec: 0,
         endTime: '',
         startTime: ''
       })
