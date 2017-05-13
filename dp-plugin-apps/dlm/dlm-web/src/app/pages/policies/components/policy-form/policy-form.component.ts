@@ -64,10 +64,11 @@ export class PolicyFormComponent implements OnInit {
     }
   ];
   jobTypes = <RadioItem[]>[
-    {
-      label: 'One Time',
-      value: this.policySubmitTypes.SUBMIT
-    },
+    // todo: enable this when API will support
+    // {
+    //   label: 'One Time',
+    //   value: this.policySubmitTypes.SUBMIT
+    // },
     {
       label: 'On Schedule',
       value: this.policySubmitTypes.SCHEDULE
@@ -92,7 +93,7 @@ export class PolicyFormComponent implements OnInit {
       databases: [[]],
       directories: '',
       job: this.formBuilder.group({
-        schedule: this.policySubmitTypes.SUBMIT,
+        schedule: this.policySubmitTypes.SCHEDULE,
         frequencyInSec: 0,
         endTime: '',
         startTime: ''

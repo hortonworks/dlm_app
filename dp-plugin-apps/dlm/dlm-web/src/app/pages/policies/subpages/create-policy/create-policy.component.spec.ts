@@ -21,7 +21,7 @@ describe('CreatePolicyComponent', () => {
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot({
         loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-      }), ReactiveFormsModule, CollapseModule, TabsModule, MyDatePickerModule],
+      }), ReactiveFormsModule, CollapseModule, TabsModule.forRoot(), MyDatePickerModule],
       declarations: [
         CreatePolicyComponent,
         PolicyFormComponent,
