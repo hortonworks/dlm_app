@@ -1,11 +1,11 @@
-<div class="mdl-js-layout">
+<div class="mdl-js-layout" #layout>
   <header class="mdl-layout__header mdl-layout__header--scroll">
     <div class="mdl-layout__header-row">
       <div  class="dp-header-logo">
         <img src="../../../assets/images/hw.logo.png">
       </div>
-      <nav class="mdl-navigation">
-          <span *ngFor="let tabEntry of headerData.tabs; let i = index" class="mdl-navigation__link" (click)="navigateTo(tabEntry)"
+      <nav *ngIf="activeTabName" class="mdl-navigation">
+          <span *ngFor="let tabEntry of activePersona.tabs; let i = index" class="mdl-navigation__link" (click)="navigateToURL(tabEntry.URL)"
                 [ngClass]="{'is_active': activeTabName === tabEntry.tabName}">
             {{ tabEntry.tabName }}
           </span>
@@ -20,12 +20,12 @@
       </ul>
     </div>
   </header>
-  <div class="mdl-layout__drawer">
+  <div class="mdl-layout__drawer" [ngClass]="{'hidden': !activePersona}">
     <div  class="dp-header-logo">
       <img src="../../../assets/images/hw.logo.png">
     </div>
     <ul class="demo-list-item mdl-list">
-      <li class="mdl-list__item" *ngFor="let persona of headerData.personas; let i = index" (click)="navigateToPersona(persona)">
+      <li class="mdl-list__item" [ngClass]="{'active': activePersonaName === persona.name}" *ngFor="let persona of headerData.personas; let i = index" (click)="navigateToPersona(persona, layout)">
         <span class="mdl-list__item-primary-content"> {{ persona.name }} </span>
       </li>
     </ul>

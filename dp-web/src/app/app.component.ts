@@ -5,7 +5,7 @@ import { IdentityService } from './services/identity.service';
 import { MdlService } from './services/mdl.service';
 
 import { User } from './models/user';
-import {HeaderData} from './models/header-data';
+import {HeaderData, Persona, PersonaTabs} from './models/header-data';
 
 @Component({
   selector: 'data-plane',
@@ -39,18 +39,18 @@ export class AppComponent implements OnInit {
   }
 
   setHeaderData() {
-    this.headerData.tabs = [
-      { 'tabName': 'DATASETS', 'URL': ''},
-      { 'tabName': 'UNCLASSIFIED', 'URL': ''},
-      { 'tabName': 'ASSETS', 'URL': ''},
-      { 'tabName': 'AUDITS', 'URL': ''},
-    ];
-
     this.headerData.personas = [
-      { 'name': 'Infra Admin', 'URL': ''},
-      { 'name': 'Analyst ', 'URL': ''},
-      { 'name': 'DLM', 'URL': ''},
+      new Persona('Analyst', [
+        new PersonaTabs('DATASETS', 'dataset'),
+        new PersonaTabs('UNCLASSIFIED', 'unclassified'),
+        new PersonaTabs('ASSETS', 'assets'),
+        new PersonaTabs('AUDITS', 'audits')
+      ]),
+      new Persona('Infra Admin', [
+        new PersonaTabs('DATA LAKES', 'infra')
+      ]),
+      new Persona('DLM', [
+      ])
     ];
-
   }
 }
