@@ -20,7 +20,7 @@ export class LoadClusters implements Action {
 export class LoadClustersSuccess implements Action {
   type = ActionTypes.LOAD_CLUSTERS_SUCCESS;
 
-  constructor(public payload: any) { }
+  constructor(public payload: {clusters: Cluster[]}) { }
 };
 
 export class LoadClustersFailure implements Action {

@@ -5,10 +5,13 @@ export interface Policy {
   name: string;
   type: string;
   dataset: string;
+  status: string;
   sourceCluster: string;
   targetCluster: string;
-  frequencyInSec: number;
+  endTime: string;
+  frequency: number;
   policyStatus: RequestStatus;
+  tags: string[];
   customProperties: Object;
   retry: Object;
 }

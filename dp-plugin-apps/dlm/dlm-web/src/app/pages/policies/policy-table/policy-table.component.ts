@@ -47,7 +47,7 @@ export class PolicyTableComponent implements OnInit {
       {...this.iconColumn.cellSettings, prop: 'type', cellTemplate: this.iconColumn.cellRef},
       {...this.statusColumn.cellSettings, prop: 'status', cellTemplate: this.statusColumn.cellRef},
       {name: ' ', cellTemplate: this.policyInfoColumn.cellRef, sortable: false},
-      {prop: 'sourceclusters', name: this.t.instant('common.source')},
+      {prop: 'sourceCluster', name: this.t.instant('common.source')},
       {
         prop: 'status',
         name: ' ',
@@ -56,10 +56,10 @@ export class PolicyTableComponent implements OnInit {
         cellClass: 'flow-status-cell',
         sortable: false
       },
-      {prop: 'targetclusters', name: this.t.instant('common.destination')},
+      {prop: 'targetCluster', name: this.t.instant('common.destination')},
       {prop: 'lastJobResource.duration', name: this.t.instant('common.duration'), cellTemplate: this.durationCellRef},
       {prop: 'lastJobResource.startTime', name: 'Last Good', cellTemplate: this.lastGoodCellRef},
-      {prop: 'targetClusterResource.volumeGB', name: this.t.instant('common.data'), cellTemplate: this.dataCellRef},
+      {prop: 'targetClusterResource.stats.CapacityUsed', name: this.t.instant('common.data'), cellTemplate: this.dataCellRef},
       {name: ' ', sortable: false, cellTemplate: this.expandActionCellRef}
     ];
   }

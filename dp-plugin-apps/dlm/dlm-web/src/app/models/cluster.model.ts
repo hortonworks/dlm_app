@@ -5,7 +5,7 @@ export interface ClusterStats {
   CapacityTotal: number;
   CapacityUsed:  number;
   CapacityRemaining: number;
-};
+}
 
 export interface Cluster {
   id: string;
