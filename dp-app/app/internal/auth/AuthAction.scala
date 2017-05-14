@@ -31,9 +31,8 @@ class Authenticated @Inject()(@Named("userService") userService: UserService,
 
   def invokeBlock[A](request: Request[A],
                      block: (AuthenticatedRequest[A]) => Future[Result]) = {
-    if (knoxSso.isSsoConfigured() && !request.cookies
-          .get(knoxSso.getSsoCookieName)
-          .isDefined) {
+    if (knoxSso.isSsoConfigured() && request.cookies
+      .get(knoxSso.getSsoCookieName()).isEmpty) {
       Logger.info(
         s"Sso is configured but ssocookie ${knoxSso.getSsoCookieName} is not found. " +
           s"Please check the domain name or sub domain of knox and dp app")

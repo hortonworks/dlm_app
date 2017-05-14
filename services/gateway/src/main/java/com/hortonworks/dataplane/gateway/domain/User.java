@@ -1,4 +1,4 @@
-package com.hortonworks.dataplane.gateway.filters;
+package com.hortonworks.dataplane.gateway.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,14 +1,16 @@
-package com.hortonworks.dataplane.gateway.filters;
+package com.hortonworks.dataplane.gateway.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class UserRef implements Serializable {
 
   private String id;
   private String avatar;
+  private List<String> roles;
   private String display;
   private String token;
 
@@ -51,4 +53,12 @@ public class UserRef implements Serializable {
     this.token = token;
   }
 
+  @JsonProperty
+  public List<String> getRoles() {
+    return roles;
+  }
+
+  public void setRoles(List<String> roles) {
+    this.roles = roles;
+  }
 }

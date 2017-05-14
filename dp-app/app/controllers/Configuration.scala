@@ -36,6 +36,7 @@ class Configuration @Inject()(@Named("lakeService") val lakeService:
       )
     )
   }
+
   def appConfig = Action.async{ request =>
     val requestProcol:String=if (request.secure)"https" else "http"
     Future.successful(Ok(

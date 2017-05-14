@@ -1,11 +1,11 @@
-package com.hortonworks.dataplane.gateway.filters;
+package com.hortonworks.dataplane.gateway.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 import java.util.List;
 
-public class Result implements Serializable {
+public class UserList implements Serializable {
 
   private List<User> results;
 

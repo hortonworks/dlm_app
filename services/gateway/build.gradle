@@ -32,6 +32,8 @@ dependencyManagement {
     }
 }
 dependencies {
+    compile 'org.mindrot:jbcrypt:0.3m'
+    compile 'io.jsonwebtoken:jjwt:0.7.0'
     compile 'org.springframework.cloud:spring-cloud-starter-zuul'
     compile 'org.springframework.cloud:spring-cloud-starter-consul-discovery'
     compile 'org.springframework.cloud:spring-cloud-starter-ribbon'
