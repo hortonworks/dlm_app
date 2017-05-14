@@ -6,6 +6,8 @@ ALL_DOCKER_COMPOSE_DB_FILES="-f docker-compose.yml -f docker-compose-migrate.yml
 ALL_DOCKER_COMPOSE_FILES=${ALL_DOCKER_COMPOSE_DB_FILES}" "${ALL_DOCKER_COMPOSE_APP_FILES} 
 
 CERTS_DIR=`dirname $0`/certs
+DEFAULT_VERSION=0.0.1
+DEFAULT_TAG="latest"
 
 init_db() {
     docker-compose up -d
@@ -99,6 +101,14 @@ stop_knox() {
     docker-compose -f docker-compose-knox.yml stop
 }
 
+print_version() {
+    if [ -f VERSION ]; then
+        cat VERSION
+    else
+        cat ${DEFAULT_VERSION}:${DEFAULT_TAG}
+    fi
+}
+
 usage() {
     local tabspace=20
     echo "Usage: dpdeploy.sh <command>"
@@ -117,6 +127,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "logs" "$logman"
     printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them. Needs to start from init db again"
     printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox container and remove it. Needs to start from init knox again"
+    printf "%-${tabspace}s:%s\n" "version" "Print the version of dataplane"
 }
 
 if [ $# -lt 1 ]
@@ -175,6 +186,9 @@ else
             else
                 destroy
             fi
+            ;;
+        version)
+            print_version
             ;;
         *)
             usage
