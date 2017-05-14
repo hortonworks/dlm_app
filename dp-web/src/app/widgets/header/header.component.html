@@ -1,23 +1,32 @@
-<div class="mdl-layout__header-row">
-  <span class="dp-header__logo">
-    <img src="../../../assets/images/hw-logo.png" />
-  </span>
-  <span class="mdl-layout-title">Data Plane</span>
-  <div class="mdl-layout-spacer"></div>
-  <div class="dp-header__user">
-    <div>{{user?.display}}</div>
-    <button id="header_user_menu" class="mdl-button mdl-js-button mdl-button--icon">
-      <i class="fa fa-user-circle" aria-hidden="true"></i>
-    </button>
-    <ul mdl class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="header_user_menu">
-      <li class="mdl-menu__item">
-        <a class="" routerLink="/profile">Profile</a>
-      </li>
-      <li class="mdl-menu__item">
-        <a class="" routerLink="/account">My Account</a>
-      </li>
-      <li class="mdl-menu__item">
-        <a class="" routerLink="/sign-out">SignOut</a>
+<div class="mdl-js-layout" #layout>
+  <header class="mdl-layout__header mdl-layout__header--scroll">
+    <div class="mdl-layout__header-row">
+      <div  class="dp-header-logo">
+        <img src="../../../assets/images/hw.logo.png">
+      </div>
+      <nav *ngIf="activeTabName" class="mdl-navigation">
+          <span *ngFor="let tabEntry of activePersona.tabs; let i = index" class="mdl-navigation__link" (click)="navigateToURL(tabEntry.URL)"
+                [ngClass]="{'is_active': activeTabName === tabEntry.tabName}">
+            {{ tabEntry.tabName }}
+          </span>
+      </nav>
+      <div class="mdl-layout-spacer"></div>
+      <button id="demo-menu-lower-right" class="mdl-button mdl-js-button">
+        <i class="fa fa-user-circle" aria-hidden="true"></i> <i class="fa fa-chevron-down" aria-hidden="true"></i>
+      </button>
+      <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="demo-menu-lower-right">
+        <li class="mdl-menu__item mdl-menu__item--full-bleed-divider" disabled> <b> {{user?.display}} </b> </li>
+        <li class="mdl-menu__item" routerLink="/sign-out">Sign out</li>
+      </ul>
+    </div>
+  </header>
+  <div class="mdl-layout__drawer" [ngClass]="{'hidden': !activePersona}">
+    <div  class="dp-header-logo">
+      <img src="../../../assets/images/hw.logo.png">
+    </div>
+    <ul class="demo-list-item mdl-list">
+      <li class="mdl-list__item" [ngClass]="{'active': activePersonaName === persona.name}" *ngFor="let persona of headerData.personas; let i = index" (click)="navigateToPersona(persona, layout)">
+        <span class="mdl-list__item-primary-content"> {{ persona.name }} </span>
       </li>
     </ul>
   </div>
