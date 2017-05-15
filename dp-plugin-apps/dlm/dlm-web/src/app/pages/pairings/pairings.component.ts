@@ -55,7 +55,7 @@ export class PairingsComponent implements OnInit {
       secondCluster: pair.pair[1].name
     };
     this.confirmationModel.body = this.translate.instant(
-      'page.pairings.unpair.confirmation.body', params);
+      'page.pairings.unpair.confirmation.description', params);
     this.confirmationModel.show();
   }
 

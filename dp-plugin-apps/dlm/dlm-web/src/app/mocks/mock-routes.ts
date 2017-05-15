@@ -15,7 +15,8 @@ export const routes: MockRoute[] = [
   // policy mocks
   new MockRoute('policies', 'policies.json'),
   new MockRoute('policies/:id', 'policy.json'),
-  new MockRoute('policies', 'create_policy.json', RequestMethod.Post),
+  new MockRoute('clusters/:clusterId/policy/:policyName/submit', 'create_policy.json', RequestMethod.Post),
+  new MockRoute('clusters/:clusterId/policy/:policyName/schedule', 'create_policy.json', RequestMethod.Put),
   new MockRoute('policies/:id', 'policies.json', RequestMethod.Delete),
 
   // Pairing
@@ -25,5 +26,10 @@ export const routes: MockRoute[] = [
 
   // Jobs
   new MockRoute('jobs', 'jobs.json'),
-  new MockRoute('jobs/:id', 'job.json')
+  new MockRoute('jobs/:id', 'job.json'),
+  new MockRoute('clusters/:id/jobs', 'jobs.json'),
+
+  // Events
+  new MockRoute('events', 'events.json'),
+  new MockRoute('new_events', 'new_events.json')
 ];

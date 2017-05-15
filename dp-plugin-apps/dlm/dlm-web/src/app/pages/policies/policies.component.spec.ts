@@ -2,23 +2,24 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {MomentModule} from 'angular2-moment';
 
-import {MockTranslateLoader} from '../../mocks/mock-translate-loader';
+import {MockTranslateLoader} from 'mocks/mock-translate-loader';
 import {PoliciesComponent} from './policies.component';
 import {PolicyTableComponent} from './policy-table/policy-table.component';
-import {TableComponent} from '../../common/table/table.component';
+import {TableComponent} from 'common/table/table.component';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
-import {ActionColumnComponent} from '../../components/table-columns/action-column/action-column.component';
-import {CheckboxComponent} from '../../common/checkbox/checkbox.component';
+import {ActionColumnComponent} from 'components/table-columns/action-column/action-column.component';
+import {CheckboxComponent} from 'common/checkbox/checkbox.component';
 import {CheckboxColumnComponent} from 'components/table-columns/checkbox-column/checkbox-column.component';
 import {CommonComponentsModule} from 'components/common-components.module';
 import {PolicyInfoComponent} from './policy-table/policy-info/policy-info.component';
 import {FlowStatusComponent} from './policy-table/flow-status/flow-status.component';
 import {FormsModule} from '@angular/forms';
-import {MockStore} from '../../mocks/mock-store';
+import {MockStore} from 'mocks/mock-store';
 import {Store} from '@ngrx/store';
 import {RouterTestingModule} from '@angular/router/testing';
-import {TableFooterComponent} from '../../common/table/table-footer/table-footer.component';
+import {TableFooterComponent} from 'common/table/table-footer/table-footer.component';
 import { NavbarService } from 'services/navbar.service';
+import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 
 describe('PoliciesComponent', () => {
   let component: PoliciesComponent;
@@ -38,7 +39,8 @@ describe('PoliciesComponent', () => {
         CheckboxComponent,
         ActionColumnComponent,
         FlowStatusComponent,
-        CheckboxColumnComponent
+        CheckboxColumnComponent,
+        BytesSizePipe
       ],
       providers: [
         {provide: Store, useClass: MockStore},

@@ -1,7 +1,18 @@
 <div class="dlm-content container-fluid" id="dlm_content">
   <navbar [menuItems]="menuItems" [header]="header" [mainContentSelector]="mainContentSelector" [fitHeight]="fitHeight"></navbar>
   <header class="row">
-    <breadcrumb></breadcrumb>
+    <div class="navbar-header navbar-nav">
+      <breadcrumb></breadcrumb>
+    </div>
+    <div class="user navbar-footer navbar-nav navbar-right">
+      <user-dropdown [user]="user" (timezoneChanged)="saveUserTimezone($event)" (logout)="logout()"></user-dropdown>
+    </div>
+    <div class="notifications navbar-nav navbar-right">
+      <dlm-notifications [events]="events$ | async" [newEventsCount]="newEventsCount$ | async"></dlm-notifications>
+    </div>
+    <div class="notifications navbar-nav navbar-right">
+      <navigation-dropdown [linksColumns]="navigationColumns"></navigation-dropdown>
+    </div>
   </header>
   <router-outlet style=""></router-outlet>
 </div>

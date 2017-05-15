@@ -1,0 +1,25 @@
+{
+  "status": "SUCCEEDED",
+  "message": "success",
+  "requestId": "262315164@qtp-1028472807-2",
+  "size": 2,
+  "totalCount": 2,
+  "events": [
+    {
+      "policyId": "ID",
+      "instanceId": "vivek-beacon-1.c.pramod-thangali.internal",
+      "event": "beacon-started",
+      "timestamp": "2017-04-05 22:03:11.984",
+      "eventStatus": "started",
+      "message": "beacon server started successfully"
+    },
+    {
+      "policyId": "ID",
+      "instanceId": "vivek-beacon-1.c.pramod-thangali.internal",
+      "event": "policy-created",
+      "timestamp": "2017-04-12 22:03:11.984",
+      "eventStatus": "created",
+      "message": "policy hivePolicy1 created successfully"
+    }
+  ]
+}

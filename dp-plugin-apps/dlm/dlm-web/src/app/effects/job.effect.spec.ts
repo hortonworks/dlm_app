@@ -17,7 +17,7 @@ describe('JobEffects', () => {
       JobEffects,
       {
         provide: JobService,
-        useValue: jasmine.createSpyObj('jobService', ['getJobs'])
+        useValue: jasmine.createSpyObj('jobService', ['getJobs', 'getJobsForClusters'])
       }
     ]
   }));
@@ -33,7 +33,7 @@ describe('JobEffects', () => {
   beforeEach(() => {
     this.job1 = <Job>{id: '1'};
     this.job2 = <Job>{id: '2'};
-    this.jobs = {job: [this.job1, this.job2]};
+    this.jobs = {policies: [this.job1, this.job2]};
     this.error = new Error('msg'); });
 
   describe('#loadJobs$', () => {
@@ -56,6 +56,31 @@ describe('JobEffects', () => {
       runner.queue(jobActions.loadJobs());
       let result = null;
       jobEffects.loadJobs$.subscribe(_result => result = _result);
+      expect(result).toEqual(expectedResult);
+    });
+
+  });
+
+  describe('#loadJobsForClusters$', () => {
+
+    it('should return a new loadJobsSuccess, with the jobs, on success', () => {
+      const {jobService, runner, jobEffects} = setup();
+      jobService.getJobsForClusters.and.returnValue(Observable.of(this.jobs));
+      const expectedResult = jobActions.loadJobsSuccess(this.jobs);
+      runner.queue(jobActions.loadJobsForClusters(['1', '2']));
+
+      let result = null;
+      jobEffects.loadJobsForClusters$.subscribe(_result => result = _result);
+      expect(result).toEqual(expectedResult);
+    });
+
+    it('should return a loadJobsFail, on fail', () => {
+      const {jobService, runner, jobEffects} = setup();
+      jobService.getJobsForClusters.and.returnValue(Observable.throw(this.error));
+      const expectedResult = jobActions.loadJobsFail(this.error);
+      runner.queue(jobActions.loadJobsForClusters(['1', '2']));
+      let result = null;
+      jobEffects.loadJobsForClusters$.subscribe(_result => result = _result);
       expect(result).toEqual(expectedResult);
     });
 

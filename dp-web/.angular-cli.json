@@ -19,7 +19,7 @@
       "prefix": "dp",
       "mobile": false,
       "styles": [
-        "../node_modules/material-design-lite/dist/material.min.css",
+        "vendor.scss",
         "../node_modules/material-design-icons/iconfont/material-icons.css",
         "../node_modules/font-awesome/css/font-awesome.css",
         "../node_modules/nvd3/build/nv.d3.css"

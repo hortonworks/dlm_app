@@ -1,6 +1,6 @@
-import { Policy } from '../models/policy.model';
-import { BaseState } from '../models/base-resource-state';
-import * as fromPolicy from '../actions/policy.action';
+import { Policy } from 'models/policy.model';
+import { BaseState } from 'models/base-resource-state';
+import * as fromPolicy from 'actions/policy.action';
 
 export type State = BaseState<Policy>;
 
@@ -11,7 +11,7 @@ export const initialState: State = {
 export function reducer(state = initialState, action): State {
   switch (action.type) {
     case fromPolicy.ActionTypes.LOAD_POLICIES_SUCCESS: {
-      const policies = action.payload.policy;
+      const policies = action.payload.policies;
       const policyEntities = policies.reduce((entities: { [id: string]: Policy}, entity: Policy) => {
         return Object.assign({}, entities, {
           [entity.id]: entity

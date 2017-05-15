@@ -9,7 +9,6 @@
     "duration": "Duration",
     "source": "Source",
     "destination": "Destination",
-    "status": "Status",
     "data": "Data",
     "time": {
       "hourly": "Hourly",
@@ -22,9 +21,13 @@
       "paging": "{{start}} - {{end}} of {{count}}"
     },
     "status": {
+      "self": "Status",
       "failed": "Failed",
       "in_progress": "In Progress"
     }
+  },
+  "topnav": {
+    "timezone": "Current Timezone"
   },
   "sidenav": {
     "menuItem": {
@@ -89,12 +92,16 @@
         "sections": {
           "general": "General",
           "database": "Select Database",
+          "directories": "Select Directories",
           "job": "Run Job"
         },
         "fields": {
           "policy_name": "Policy Name",
           "pairs": "Select Pair",
-          "service": "Service"
+          "service": "Service",
+          "directories": "Directories",
+          "start_time": "Start Time",
+          "end_time": "End Time"
         },
         "schedule": {
           "immediate": "One Time",
@@ -104,7 +111,7 @@
       "subpage": {
         "review": {
           "description": {
-            "title": "Data replication process for data selected from cluster {{targetCluster}} using replication policy {{policyName}} will be started."
+            "title": "Data replication process for data selected from cluster {{sourceCluster}} using replication policy {{policyName}} will be started."
           },
           "details": {
             "title": "Transfer Details",
@@ -155,6 +162,9 @@
     "jobs": {
       "header": "Jobs",
       "header_note": ""
+    },
+    "notifications": {
+      "header": "Notifications"
     }
   }
 }

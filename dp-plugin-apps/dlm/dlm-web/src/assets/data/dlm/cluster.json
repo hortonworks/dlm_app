@@ -1,32 +1,27 @@
 {
-  "id": "primaryCluster",
-  "ambariUrl": "http://localhost:8080",
-  "userName": "admin",
-  "clusterType": "DATACENTER",
-  "createdAt": 1490689061725,
-  "volumeGB": 320,
-  "nodesCount": 20,
-  "clusterStatus": {
-    "requestId": "qtp2026718042-1933333",
-    "message": "Submitted",
-    "status": "SUCCEEDED"
+  "id": 2,
+  "name": "c2",
+  "description": "Cluster c2",
+  "ambariurl": "http://104.196.80.178:8080/api/v1/clusters/c2",
+  "stats": {
+    "CapacityTotal": 9129444352,
+    "CapacityUsed": 564879360,
+    "CapacityRemaining": 3856367616
   },
-  "clusterDetails": {
-    "name": "primaryCluster",
-    "description": "primary",
-    "dataCenter": "virginia",
-    "fsEndpoint": "hdfs://localhost:8020",
-    "hsEndpoint": "http://localhost:10000",
-    "tags": "consumer=consumer@xyz.com,owner=producer@xyz.com",
-    "peers":"c1, c2,...",
-    "customProperties": {
-      "dfs.namenode.kerberos.principal": "hdfs/_HOST@YOUR-REALM.COM"
-    },
-    "acl": {
-      "owner": "ambari-qa",
-      "group": "users",
-      "permission": "0x755"
-    },
-    "entityType": "CLUSTER"
-  }
+  "location": {
+    "id": 3431161,
+    "country": "AR",
+    "city": "Los Helechos",
+    "latitude": -27.557600021362305,
+    "longitude": -55.07683181762695
+  },
+  "services": [
+    {
+      "id": 8,
+      "servicename": "BEACON",
+      "clusterid": 2,
+      "servicehost": "jaimin-beacon-5.c.pramod-thangali.internal",
+      "fullURL": "http://jaimin-beacon-5.c.pramod-thangali.internal:25968"
+    }
+  ]
 }

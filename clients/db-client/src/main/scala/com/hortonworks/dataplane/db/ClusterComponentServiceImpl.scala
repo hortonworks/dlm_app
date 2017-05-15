@@ -6,6 +6,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.{
   Error,
   Errors
 }
+import com.hortonworks.dataplane.commons.domain.Ambari.ClusterServiceWithConfigs
 import com.hortonworks.dataplane.db.Webserice.ClusterComponentService
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
@@ -60,18 +61,30 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
-  private def mapToHosts(res: WSResponse) = {
+  private def mapToServiceEndpoint(res: WSResponse) = {
     res.status match {
       case 200 =>
-        extractEntity[Seq[ClusterServiceHost]](
+        extractEntity[ClusterServiceWithConfigs](
           res,
           r =>
-            (r.json \ "results" \\ "data").map {
-              _.validate[ClusterServiceHost].get
-          })
+            (r.json \ "results" \\ "data").head.validate[ClusterServiceWithConfigs].get)
       case _ => mapErrors(res)
     }
   }
+
+  private def mapToServiceEndpoints(res: WSResponse) = {
+    res.status match {
+      case 200 =>
+        extractEntity[Seq[ClusterServiceWithConfigs]](
+          res,
+          r =>
+            (r.json \ "results" \\ "data").map {
+              _.validate[ClusterServiceWithConfigs].get
+            })
+      case _ => mapErrors(res)
+    }
+  }
+
 
   override def getServiceByName(
       clusterId: Long,
@@ -170,7 +183,7 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
 
   override def getEndpointsForCluster(
       clusterId: Long,
-      service: String): Future[Either[Errors, Seq[ClusterServiceHost]]] = {
+      service: String): Future[Either[Errors, ClusterServiceWithConfigs]] = {
     for {
       f1 <- getServiceByName(clusterId, service)
       f2 <- resolve(f1, clusterId, service)
@@ -181,8 +194,19 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
           "Accept" -> "application/json"
         )
         .get
-        .map(mapToHosts)
+        .map(mapToServiceEndpoint)
     } yield errorsOrEndpoints
 
   }
+
+  override def getAllServiceEndpoints(serviceName: String): Future[Either[Errors, Seq[ClusterServiceWithConfigs]]] = {
+    ws.url(s"$url/services/endpoints/$serviceName")
+    .withHeaders(
+      "Content-Type" -> "application/json",
+      "Accept" -> "application/json"
+    ).get.map(mapToServiceEndpoints).recoverWith {
+        case e: Exception => Future.successful(Left(Errors(Seq(Error("500", e.getMessage)))))
+      }
+  }
+  
 }

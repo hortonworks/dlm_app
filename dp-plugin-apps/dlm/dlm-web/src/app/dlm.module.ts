@@ -1,7 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpModule, Http } from '@angular/http';
-import { BsDropdownModule, CollapseModule, TabsModule, ModalModule, TypeaheadModule } from 'ng2-bootstrap';
+import { HttpModule } from '@angular/http';
+import { CollapseModule, TabsModule, ModalModule, TypeaheadModule } from 'ng2-bootstrap';
+import { SelectModule } from 'ng2-select';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { StoreModule } from '@ngrx/store';
 import { RouterStoreModule } from '@ngrx/router-store';
@@ -10,12 +11,15 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { reducer } from './reducers';
 import { RouterModule } from '@angular/router';
 
+import { MyDatePickerModule } from 'mydatepicker';
+
 import { EffectsModule } from '@ngrx/effects';
 import { ClusterEffects } from './effects/cluster.effect';
 import { routes } from './routes/routes.config';
 import { PolicyEffects } from './effects/policy.effect';
 import { PairingEffects } from './effects/pairing.effect';
 import { JobEffects } from './effects/job.effect';
+import { EventEffects } from './effects/event.effect';
 
 import { FormEffects } from './effects/form.effect';
 
@@ -26,6 +30,8 @@ import { JobService } from './services/job.service';
 import { SessionStorageService } from './services/session-storage.service';
 import { FormService } from 'services/form.service';
 import { NavbarService } from 'services/navbar.service';
+import { EventService } from 'services/event.service';
+import { TimeZoneService } from 'services/time-zone.service';
 
 import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
@@ -36,9 +42,14 @@ import { PoliciesComponent } from './pages/policies/policies.component';
 import { JobsComponent } from './pages/jobs/jobs.component';
 import { HelpComponent } from './pages/help/help.component';
 import { NavbarComponent } from './common/navbar/navbar.component';
+import { NavigationDropdownComponent } from './common/navigation-dropdown/navigation-dropdown.component';
+import { NotificationsComponent } from './common/notifications/notifications.component';
+import { NotificationsPageComponent } from './pages/notifications/notifications.component';
+import { NotificationsTableComponent } from './pages/notifications/notifications-table/notifications-table.component';
 import { ModalDialogComponent } from './common/modal-dialog/modal-dialog.component';
 import { httpServiceProvider } from './services/http.service';
 import { CommonComponentsModule } from './components/common-components.module';
+import { UserDropdownComponent } from './common/user-dropdown/user-dropdown.component';
 import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.component';
 import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route.component';
 
@@ -81,7 +92,8 @@ import { TableFilterComponent } from './common/table/table-filter/table-filter.c
 import { CheckboxColumnComponent, ActionColumnComponent } from './components';
 import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/review-policy.component';
 
-import {BytesSizePipe} from './pipes/bytes-size.pipe';
+import { BytesSizePipe } from './pipes/bytes-size.pipe';
+import { FmtTzPipe } from './pipes/fmt-tz.pipe';
 
 @NgModule({
   imports: [
@@ -97,6 +109,7 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     EffectsModule.run(PairingEffects),
     EffectsModule.run(JobEffects),
     EffectsModule.run(FormEffects),
+    EffectsModule.run(EventEffects),
     CollapseModule.forRoot(),
     TabsModule.forRoot(),
     ModalModule.forRoot(),
@@ -104,6 +117,8 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
+    SelectModule,
+    MyDatePickerModule,
 
     RouterModule.forRoot(routes),
     CommonComponentsModule,
@@ -113,6 +128,8 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     DlmComponent,
     MainComponent,
     OverviewComponent,
+    NotificationsPageComponent,
+    NotificationsTableComponent,
     ClustersComponent,
     ClusterCardComponent,
     ClusterListComponent,
@@ -141,6 +158,8 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     JobsComponent,
     HelpComponent,
     NavbarComponent,
+    NavigationDropdownComponent,
+    UserDropdownComponent,
     NotFoundRouteComponent,
     RadioButtonComponent,
     CheckboxComponent,
@@ -156,7 +175,9 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     CheckboxColumnComponent,
     ActionColumnComponent,
     ModalDialogComponent,
-    BytesSizePipe
+    NotificationsComponent,
+    BytesSizePipe,
+    FmtTzPipe
   ],
   bootstrap: [DlmComponent],
   providers: [
@@ -167,6 +188,8 @@ import {BytesSizePipe} from './pipes/bytes-size.pipe';
     SessionStorageService,
     FormService,
     NavbarService,
+    EventService,
+    TimeZoneService,
     httpServiceProvider
   ]
 })

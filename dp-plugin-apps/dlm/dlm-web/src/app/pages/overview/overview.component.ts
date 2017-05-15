@@ -4,10 +4,12 @@ import { Observable } from 'rxjs/Observable';
 
 import * as fromRoot from 'reducers/';
 import { Job } from 'models/job.model';
+import { Event } from 'models/event.model';
 import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
 import { getAllJobs } from 'selectors/job.selector';
 import { getAllPolicies } from 'selectors/policy.selector';
 import { getAllClusters } from 'selectors/cluster.selector';
+import { getAllEvents } from 'selectors/event.selector';
 import { loadJobs } from 'actions/job.action';
 import { loadClusters } from 'actions/cluster.action';
 import { loadPolicies } from 'actions/policy.action';
@@ -25,10 +27,12 @@ export class OverviewComponent implements OnInit {
     jobs: [JOB_STATUS.IN_PROGRESS, JOB_STATUS.WARNINGS, JOB_STATUS.FAILED]
   };
   jobs$: Observable<Job[]>;
+  events$: Observable<Event[]>;
   resourceChartData$: Observable<ResourceChartData>;
 
   constructor(private store: Store<fromRoot.State>) {
     this.jobs$ = store.select(getAllJobs);
+    this.events$ = store.select(getAllEvents);
     const policies$ = store.select(getAllPolicies);
     const clusters$ = store.select(getAllClusters);
     this.resourceChartData$ = Observable.combineLatest(this.jobs$, policies$, clusters$)

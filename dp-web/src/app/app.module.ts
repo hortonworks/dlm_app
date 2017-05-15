@@ -42,7 +42,7 @@ import {DatasetTagService} from "./services/tag.service";
     SidebarComponent,
     HeaderComponent,
 
-    MdlDirective,
+    MdlDirective
   ],
   bootstrap: [AppComponent],
   providers: [
