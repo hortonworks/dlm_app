@@ -95,7 +95,7 @@ build_installer() {
 	append_docker_image_version "hortonworks\/dp-knox" ${DP_DOCKER_ROOT_FOLDER}/installer/docker-compose-knox.yml
 	cp -R ../services/db-service/db/* ${DP_DOCKER_ROOT_FOLDER}/installer/dbscripts/
 	VERSION_STRING=$(get_version)
-	echo ${VERSION_STRING} > ${DP_DOCKER_ROOT_FOLDER}/installer/VERSION
+	echo ${VERSION_STRING} > ${DP_DOCKER_ROOT_FOLDER}/installer/VERSION	
 }
 
 append_docker_image_version() {
@@ -118,6 +118,10 @@ zip_dp_binaries() {
 	pushd build
 	VERSION_STRING=$(get_version)
 	tar -czf dp-docker-${VERSION_STRING}.tar.gz dp-docker
+	popd
+	pushd ${DP_DOCKER_ROOT_FOLDER}
+	tar -czf dp-installer-${VERSION_STRING}.tar.gz installer/*
+	popd
 }
 
 log "Current working directory is: " `pwd`
