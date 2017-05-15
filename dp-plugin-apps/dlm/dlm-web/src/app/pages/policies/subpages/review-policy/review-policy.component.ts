@@ -99,7 +99,7 @@ export class ReviewPolicyComponent implements OnInit {
     if (!timeField.date) {
       return null;
     }
-    return `${timeField.date}T${moment(timeField.time).format('H:mm:ss')}`;
+    return `${timeField.date}T${moment(timeField.time).format('HH:mm:ss')}`;
   }
 
   submitReview() {
