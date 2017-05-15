@@ -10,12 +10,11 @@ log() {
 
 clean_build() {
 	rm -rf build
-	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-db-service/dp-db-service
-	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-app/dp-app
+	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-db-service
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-app/dp-web
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-app/dlm-web
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-knox
-	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-cluster-service/dp-cluster-service
+	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-cluster-service
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/installer
 }
 
@@ -103,7 +102,7 @@ append_docker_image_version() {
 	IMAGE_NAME=$1
 	DOCKER_COMPOSE_FILE_NAME=$2
 	VERSION=$(get_version)
-	sed -i ".bak" -e "s/${IMAGE_NAME}/${IMAGE_NAME}:${VERSION}/g" ${DOCKER_COMPOSE_FILE_NAME}
+	sed -i".bak" -e "s/${IMAGE_NAME}/${IMAGE_NAME}:${VERSION}/g" ${DOCKER_COMPOSE_FILE_NAME}
 }
 
 get_version() {
