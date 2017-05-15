@@ -1,8 +1,8 @@
 export class MapData {
  start : Point
  end? : Point
- connectionStatus : Status
- constructor(start:Point, end?:Point, connectionStatus?:Status){
+ connectionStatus : MapConnectionStatus
+ constructor(start:Point, end?:Point, connectionStatus?:MapConnectionStatus){
     this.start = start;
     this.end = end;
     this.connectionStatus = connectionStatus;
@@ -12,15 +12,15 @@ export class MapData {
 export class Point {
     latitude : number;
     longitude : number;
-    status?:Status
-    constructor(latitude:number, longitude:number, status:Status){
+    status?:MapConnectionStatus
+    constructor(latitude:number, longitude:number, status:MapConnectionStatus){
         this.latitude = latitude;
         this.longitude = longitude;
         this.status = status;
     }
 }
 
-export enum Status {
+export enum MapConnectionStatus {
     UP,
     DOWN,
     NA

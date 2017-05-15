@@ -7,7 +7,7 @@ import {GeoJsonObject, } from 'geojson';
 
 @Injectable()
 export class GeographyService {
-    urlCountries = '/assets/geojson/custom.geo.json';
+    urlCountries = '/assets/geojson/geo-no-antarctica.json';
 
     constructor(private http:Http) {}
 

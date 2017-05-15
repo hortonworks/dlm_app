@@ -10,7 +10,7 @@ import { Lake } from '../../../../models/lake';
 import { Cluster } from '../../../../models/cluster';
 import { Location } from '../../../../models/location';
 import { MapData } from '../../../../models/map-data';
-import { Status } from '../../../../models/map-data';
+import { MapConnectionStatus } from '../../../../models/map-data';
 import { Point } from '../../../../models/map-data';
 
 @Component({
@@ -73,17 +73,17 @@ export class LakesComponent implements OnInit {
   getLocationInfoWithStatus(locationId, clusterId){
      return Observable.forkJoin(
               this.locationService.retrieve(locationId).map((res) => res),
-              this.clusterService.retrieveHealth(clusterId).map((res) => res),
+              this.clusterService.retrieveHealth(clusterId).map((res) => res)
           ).map(response => {
             let location = response[0];
             let health = response[1];
             let status;
             if(health.status.state ==='STARTED'){
-              status = Status.UP;
+              status = MapConnectionStatus.UP;
             }else if(health.status.state ==='NOT STARTED'){
-              status = Status.DOWN;
+              status = MapConnectionStatus.DOWN;
             }else{
-              status = Status.NA;
+              status = MapConnectionStatus.NA;
             }
             return new Point(location.latitude, location.longitude, status);
       });
@@ -91,7 +91,7 @@ export class LakesComponent implements OnInit {
 
   getLocationInfo(locationId){
      return this.locationService.retrieve(locationId).map(location => {
-            return new Point(location.latitude, location.longitude, Status.NA);
+            return new Point(location.latitude, location.longitude, MapConnectionStatus.NA);
       });
   }
 }
