@@ -15,15 +15,16 @@ export class NotificationsTableComponent implements OnInit {
 
   ngOnInit() {
     this.columns = [
-      {prop: 'eventStatus', name: 'Status', cellClass: 'text-cell', headerClass: 'text-header'},
+      {prop: 'eventStatus', name: 'Status', cellClass: 'text-cell', headerClass: 'text-header', maxWidth: 100},
       {prop: 'message', name: 'Notification', cellClass: 'text-cell', headerClass: 'text-header'},
-      {prop: 'instanceId', name: 'Host Name', cellClass: 'text-cell', headerClass: 'text-header'},
+      {prop: 'instanceId', name: 'Instance Id', cellClass: 'text-cell', headerClass: 'text-header'},
       {
         prop: 'timestamp',
         cellTemplate: this.agoTemplate,
         name: 'Created',
-        cellClass: 'date-cell',
-        headerClass: 'date-header'
+        cellClass: 'text-cell',
+        headerClass: 'text-header',
+        maxWidth: 200
       }
     ];
   }
