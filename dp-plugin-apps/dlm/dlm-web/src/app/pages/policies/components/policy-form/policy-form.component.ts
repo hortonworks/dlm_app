@@ -1,6 +1,7 @@
 import { Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { go } from '@ngrx/router-store';
 import { IMyOptions, IMyDateModel } from 'mydatepicker';
 
 import { RadioItem } from 'common/radio-button/radio-button';
@@ -10,6 +11,7 @@ import { Observable } from 'rxjs/Observable';
 import { Pairing } from 'models/pairing.model';
 import { SessionStorageService } from 'services/session-storage.service';
 import { POLICY_TYPES, POLICY_SUBMIT_TYPES } from 'constants/policy.constant';
+import { markAllTouched } from 'utils/form-util';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 
@@ -75,28 +77,40 @@ export class PolicyFormComponent implements OnInit {
     }
   ];
   selectedJobType: string = this.jobTypes[0].value;
+  selectedPolicyType = POLICY_TYPES.HDFS;
+  get defaultTime(): Date {
+    const date = new Date();
+    date.setHours(0);
+    date.setMinutes(0);
+    return date;
+  }
 
   get pairs() {
     return this.generatePairs(this.pairings);
   }
 
-
-  constructor(private formBuilder: FormBuilder) { }
+  constructor(private formBuilder: FormBuilder, private store: Store<State>) { }
 
   ngOnInit() {
     this.policyForm = this.formBuilder.group({
       general: this.formBuilder.group({
-        name: '',
-        type: [this.storageTypes[0].value],
-        pair: this.pairs.length && this.pairs[0].value
+        name: ['', Validators.required],
+        type: [this.selectedPolicyType],
+        pair: [this.pairs.length && this.pairs[0].value || null, Validators.required]
       }),
       databases: [[]],
-      directories: '',
+      directories: ['', Validators.required],
       job: this.formBuilder.group({
         schedule: this.policySubmitTypes.SCHEDULE,
-        frequencyInSec: 0,
-        endTime: '',
-        startTime: ''
+        frequencyInSec: 3600,
+        endTime: this.formBuilder.group({
+          date: [''],
+          time: [this.defaultTime]
+        }),
+        startTime: this.formBuilder.group({
+          date: [''],
+          time: [this.defaultTime]
+        })
       })
     });
   }
@@ -111,7 +125,10 @@ export class PolicyFormComponent implements OnInit {
   }
 
   handleSubmit({ value }) {
-    this.formSubmit.emit(value);
+    if (this.policyForm.valid) {
+      this.formSubmit.emit(value);
+    }
+    markAllTouched(this.policyForm);
   }
 
   handleJobChange(radio: RadioItem) {
@@ -152,6 +169,35 @@ export class PolicyFormComponent implements OnInit {
   }
 
   handleDateChange(date: IMyDateModel, dateType: string) {
-    this.policyForm.patchValue({ job: {[dateType]: `${date.formatted}T00:00:00`}});
+    this.policyForm.patchValue({ job: {[dateType]: { date: date.formatted }}});
+  }
+
+  handlePolicyTypeChange(radioItem: RadioItem) {
+    const { value } = radioItem;
+    let disableField,
+        enableField;
+    if (value === POLICY_TYPES.HDFS) {
+      disableField = 'databases';
+      enableField  = 'directories';
+    } else if (value === POLICY_TYPES.HIVE) {
+      disableField = 'directories';
+      enableField = 'databases';
+    }
+    this.policyForm.get(enableField).enable();
+    this.policyForm.get(disableField).disable();
+  }
+
+  handleJobTabChange(tab) {
+    this.updateFrequency(tab.value);
+    this.policyForm.patchValue({
+      job: {
+        endTime: { date: '', time: this.defaultTime },
+        startTime: { date: '', time: this.defaultTime }
+      }
+    });
+  }
+
+  cancel() {
+    this.store.dispatch(go(['policies']));
   }
 }

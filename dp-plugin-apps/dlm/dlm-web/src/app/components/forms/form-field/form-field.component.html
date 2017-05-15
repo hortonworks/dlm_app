@@ -1,0 +1,22 @@
+<div class="form-group" [ngClass]="{'has-error': !fieldControl.valid && fieldControl.touched}">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="row">
+        <label class="col-md-6">
+          {{label}}
+        </label>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <ng-content></ng-content>
+        </div>
+        <div class="col-md-6">
+          <dlm-field-error *ngIf="fieldControl.touched && fieldControl.hasError('required')">
+            {{'forms.validation_errors.required' | translate:labelTranslate}}
+          </dlm-field-error>
+          <ng-content select="dlm-field-error"></ng-content>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

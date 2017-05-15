@@ -3,6 +3,7 @@ import { go } from '@ngrx/router-store';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { TranslateService } from '@ngx-translate/core';
+import * as moment from 'moment';
 
 import { createPolicy } from 'actions/policy.action';
 import { State } from 'reducers';
@@ -84,14 +85,21 @@ export class ReviewPolicyComponent implements OnInit {
       sourceCluster: this.sourceCluster.name,
       targetCluster: this.targetCluster.name,
       frequencyInSec: values.job.frequencyInSec,
-      startTime: values.job.endTime,
-      endTime: values.job.endTime,
+      startTime: this.formatDateValue(values.job.startTime),
+      endTime: this.formatDateValue(values.job.endTime),
       sourceDataset
     });
     return {
       policyDefinition,
       submitType: values.job.schedule
     };
+  }
+
+  formatDateValue(timeField) {
+    if (!timeField.date) {
+      return null;
+    }
+    return `${timeField.date}T${moment(timeField.time).format('H:mm:ss')}`;
   }
 
   submitReview() {
