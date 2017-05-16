@@ -9,11 +9,12 @@ export class JobEffects {
 
   @Effect()
   loadJobs$: Observable<any> = this.actions$
-    .ofType(jobActions.LOAD_JOBS)
-    .switchMap(() => {
+    .ofType(jobActions.LOAD_JOBS.START)
+    .map(toPayload)
+    .switchMap(payload => {
       return this.jobService.getJobs()
-        .map(jobs => loadJobsSuccess(jobs))
-        .catch(err => Observable.of(loadJobsFail(err)));
+        .map(jobs => loadJobsSuccess(jobs, payload.meta))
+        .catch(err => Observable.of(loadJobsFail(err, payload.meta)));
     });
 
   @Effect()
@@ -21,9 +22,9 @@ export class JobEffects {
     .ofType(jobActions.LOAD_JOBS_FOR_CLUSTERS)
     .map(toPayload)
     .switchMap(payload => {
-      return this.jobService.getJobsForClusters(payload)
-        .map(jobs => loadJobsSuccess(jobs))
-        .catch(err => Observable.of(loadJobsFail(err)));
+      return this.jobService.getJobsForClusters(payload.clusterIds)
+        .map(jobs => loadJobsSuccess(jobs, payload.meta))
+        .catch(err => Observable.of(loadJobsFail(err, payload.meta)));
     });
 
   constructor(private actions$: Actions, private jobService: JobService) { }

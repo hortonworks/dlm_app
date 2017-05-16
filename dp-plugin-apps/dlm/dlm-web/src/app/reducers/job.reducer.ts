@@ -10,7 +10,7 @@ export const initialState: State = {
 
 export function reducer(state = initialState, action): State {
   switch (action.type) {
-    case fromJob.ActionTypes.LOAD_JOBS_SUCCESS:
+    case fromJob.ActionTypes.LOAD_JOBS.SUCCESS:
       return loadJobsSuccess(state, action);
 
     default:
@@ -19,7 +19,7 @@ export function reducer(state = initialState, action): State {
 }
 
 function loadJobsSuccess(state = initialState, action): State {
-  const jobs = action.payload.policies;
+  const jobs = action.payload.response.jobs;
   const jobEntities = jobs.reduce((entities: { [id: string]: Job }, entity: Job) => {
     return Object.assign({}, entities, {
       [entity.id]: entity

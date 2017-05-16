@@ -10,8 +10,8 @@ export const initialState: State = {
 
 export function reducer(state = initialState, action): State {
   switch (action.type) {
-    case fromPolicy.ActionTypes.LOAD_POLICIES_SUCCESS: {
-      const policies = action.payload.policies;
+    case fromPolicy.ActionTypes.LOAD_POLICIES.SUCCESS: {
+      const policies = action.payload.response.policies;
       const policyEntities = policies.reduce((entities: { [id: string]: Policy}, entity: Policy) => {
         return Object.assign({}, entities, {
           [entity.id]: entity

@@ -14,6 +14,7 @@ import { DoughnutChartComponent } from './doughnut-chart/doughnut-chart.componen
 import { FormFieldComponent } from './forms/form-field/form-field.component';
 import { FormFieldDirective } from './forms/form-field/form-field.directive';
 import { FieldErrorComponent } from './forms/field-error/field-error.component';
+import { ProgressContainerComponent } from './progress-container/progress-container.component';
 
 @NgModule({
   imports: [
@@ -33,7 +34,8 @@ import { FieldErrorComponent } from './forms/field-error/field-error.component';
     DoughnutChartComponent,
     FormFieldComponent,
     FormFieldDirective,
-    FieldErrorComponent
+    FieldErrorComponent,
+    ProgressContainerComponent
   ],
   exports: [
     CardComponent,
@@ -45,7 +47,8 @@ import { FieldErrorComponent } from './forms/field-error/field-error.component';
     DoughnutChartComponent,
     FormFieldComponent,
     FormFieldDirective,
-    FieldErrorComponent
+    FieldErrorComponent,
+    ProgressContainerComponent
   ]
 })
 export class CommonComponentsModule {}

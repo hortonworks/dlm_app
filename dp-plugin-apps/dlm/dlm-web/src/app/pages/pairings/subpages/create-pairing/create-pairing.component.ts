@@ -2,7 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
-import { LoadClusters } from 'actions/cluster.action';
+import { loadClusters } from 'actions/cluster.action';
 import { loadPairings, createPairing } from 'actions/pairing.action';
 import { ClusterPairing } from 'models/cluster-pairing.model';
 import { Pairing } from 'models/pairing.model';
@@ -48,7 +48,7 @@ export class CreatePairingComponent implements OnInit {
       firstCluster: '',
       secondCluster: ''
     });
-    this.store.dispatch(new LoadClusters());
+    this.store.dispatch(loadClusters());
     this.store.dispatch(loadPairings());
     this.pairings$.subscribe(pairings => this.pairings = pairings);
     this.firstSetClusters$.subscribe(clusters => this.firstSetClusters = clusters);

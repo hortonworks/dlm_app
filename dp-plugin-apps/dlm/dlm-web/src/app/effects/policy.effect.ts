@@ -14,11 +14,12 @@ export class PolicyEffects {
 
   @Effect()
   loadPolicies$: Observable<any> = this.actions$
-    .ofType(policyActions.LOAD_POLICIES)
-    .switchMap(() => {
+    .ofType(policyActions.LOAD_POLICIES.START)
+    .map(toPayload)
+    .switchMap(payload => {
       return this.policyService.fetchPolicies()
-        .map(policies => loadPoliciesSuccess(policies))
-        .catch(err => Observable.of(loadPoliciesFail(err)));
+        .map(policies => loadPoliciesSuccess(policies, payload.meta))
+        .catch(err => Observable.of(loadPoliciesFail(err, payload.meta)));
     });
 
   @Effect()
