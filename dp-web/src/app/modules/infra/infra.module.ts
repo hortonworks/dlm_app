@@ -11,7 +11,7 @@ import { MapComponent } from './widgets/map/map.component';
 @NgModule({
   imports: [
     CommonModule,
-    RouterModule.forChild(routes),
+    RouterModule.forChild(routes)
   ],
 
   declarations: [

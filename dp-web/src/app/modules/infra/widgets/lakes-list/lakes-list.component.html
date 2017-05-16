@@ -1,6 +1,6 @@
 <div class="dashboard-title">
     <span>Datalakes</span>
-    <a [routerLink]="['/onboard/lakes']" class="mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect">
+    <a [routerLink]="['/onboard/lakes']" class="mdl-button--add mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect">
        Add Datalake
     </a>
     <div class="dp-input">
@@ -13,7 +13,6 @@
   <thead>
     <tr>
       <th class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder">STATUS</th>
-      <!--<th class="mdl-data-table__cell--non-numeric">TYPE</th>-->
       <th class="mdl-data-table__cell--non-numeric">NAME</th>
       <th class="mdl-data-table__cell--non-numeric">NODES</th>
       <th class="mdl-data-table__cell--non-numeric">UPTIME</th>
@@ -26,8 +25,8 @@
   <tbody>
     <tr *ngFor="let lakeHealth of lakesHealth; let index=index" on-mouseover="hoveredIndex=index">
       <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder">
-          <i class="fa fa-circle" aria-hidden="true" [ngClass]="{'fa-circle--color-up':isUp(lakeHealth.status), 'fa-circle--color-down':isDown(lakeHealth.status), 'fa-circle--color-na':isNotAvailable(lakeHealth.status)}"></i></td>
-      <!--<td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeHealth.lake.data.type ? lakeHealth.lake.data.type : 'NA'}}</td>-->
+          <i class="fa fa-circle" aria-hidden="true" [ngClass]="{'fa-circle--color-up':isUp(lakeHealth.status), 'fa-circle--color-down':isDown(lakeHealth.status), 'fa-circle--color-na':isNotAvailable(lakeHealth.status)}"></i>
+      </td>
       <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--clickable mdl-data-table__cell--width15">{{lakeHealth.lake.data.name}}</td>
       <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable "><span *ngIf="lakeHealth.health">{{lakeHealth.health.nodes? lakeHealth.health.nodes : 'NA'}}</span></td>
       <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"><span *ngIf="lakeHealth.health && lakeHealth.health.status">{{lakeHealth.health.status.since ? doGetUptime(lakeHealth.health.status.since): 'NA'}}</span></td>

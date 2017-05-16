@@ -133,24 +133,16 @@ export class MapComponent implements  OnChanges, OnInit{
   }
 
   markerExists(latLng){
-    for(let i=0;i<this.markerLookup.length;i++){
-      let marker = this.markerLookup[i];
-      if(marker.lat === latLng.lat && marker.lng === latLng.lng){
-        return true;
-      }
-    }
-    return false;
+    return this.markerLookup.find(marker => {
+        return marker.lat === latLng.lat && marker.lng === latLng.lng;
+    });
   }
 
   pathExists(curve){
-    for(let i=0;i<this.pathLookup.length;i++){
-      let path = this.pathLookup[i];
-      if(path.start.latitude === curve.start.latitude && path.start.longitude === curve.start.longitude
-              && path.end.latitude === curve.end.latitude && path.end.longitude === curve.end.longitude){
-        return true;
-      }
-    }
-    return false;
+    return this.pathLookup.find(path => {
+        return path.start.latitude === curve.start.latitude && path.start.longitude === curve.start.longitude
+              && path.end.latitude === curve.end.latitude && path.end.longitude === curve.end.longitude
+    });
   }
 
   drawConnection(start, end){

@@ -8,20 +8,18 @@
         font-weight: bold;
         display: inline-block;
     }
-    a {
-        display: inline-block;
+    .mdl-button--add{
         float: right;
         padding: 0px;
-        min-height: 32px;
+        min-height: 30px;
         min-width: 130px;
     }
 }
 .dp-input {
-    display: inline-block;
     position: relative;
     float: right;
     padding: 0px;
-    min-height: 33px;
+    min-height: 30px;
     margin-right : 5px;
     min-width: 412px;
     border: 1px solid rgb(221, 221, 221);
@@ -30,12 +28,10 @@
 
 input {
   font-size: 1em;
-
   height: 32px;
   width: 412px;
   min-width: 250px;
-  margin-left : 20px;
- // padding: 0 8px;
+  margin-left : 30px;
   border : none;
 }
 

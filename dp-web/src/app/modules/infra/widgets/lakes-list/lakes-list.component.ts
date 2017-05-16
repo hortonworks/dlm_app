@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input} from "@angular/core";
 
 import * as moment from 'moment';
 
@@ -8,7 +8,7 @@ import * as moment from 'moment';
   styleUrls: ['./lakes-list.component.scss'],
 })
 
-export class LakesListComponent implements OnInit {
+export class LakesListComponent {
     hoveredIndex;
     _lakes = [];
     _healths = [];
@@ -43,9 +43,7 @@ export class LakesListComponent implements OnInit {
         }
         return moment.duration(since).humanize();
     }
-    ngOnInit(){
-    
-    }
+
     private getStatus(health){
         if(health && health.status && health.status.state === 'STARTED'){
             return LakeStatus.UP;
