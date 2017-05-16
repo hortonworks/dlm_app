@@ -7,6 +7,7 @@ import {
 import { MockBackend } from '@angular/http/testing';
 import { ReflectiveInjector } from '@angular/core';
 import { Job } from 'models/job.model';
+import { Policy } from '../models/policy.model';
 
 function getMockResponse(body) {
   return new Response(new ResponseOptions({
@@ -57,7 +58,7 @@ describe('JobService', () => {
       this.responseJobs = [<Job>{id: 'j1'}, <Job>{id: 'j2'}];
       this.backend.connections.subscribe((connection: any) => {
         const mockResponse = this.responseJobs[this.connections.length];
-        connection.mockRespond(getMockResponse({policies: [mockResponse]}));
+        connection.mockRespond(getMockResponse({jobs: [mockResponse]}));
         this.connections.push(connection);
       });
       this.clusterIds = ['1', '2'];
@@ -79,7 +80,20 @@ describe('JobService', () => {
     });
 
     it('should return loaded jobs', () => {
-      this.result.map(r => expect(r).toEqual({policies: this.responseJobs}));
+      this.result.map(r => expect(r).toEqual({jobs: this.responseJobs}));
+    });
+  });
+
+  describe('#getJobsForPolicy', () => {
+    beforeEach(() => {
+      this.policy = <Policy>{name: 'policyId1', targetClusterResource: {id: 'c1'}};
+      this.jobService.getJobsForPolicy(this.policy);
+    });
+    it('should do GET request', () => {
+      expect(this.lastConnection.request.method).toBe(RequestMethod.Get);
+    });
+    it('should use valid URL', () => {
+      expect(this.lastConnection.request.url).toContain('clusters/c1/policy/policyId1/jobs');
     });
   });
 

@@ -27,6 +27,7 @@ export class TableComponent implements OnChanges, OnDestroy {
   private _footerHeight: string|number;
   private navbarCollapse$: Observable<boolean>;
   private navbarCollapseSubscription: Subscription;
+  private expandedRows = {};
 
   actions: ActionItemType[];
   @ViewChild(CheckboxColumnComponent) checkboxColumn: CheckboxColumnComponent;
@@ -126,6 +127,9 @@ export class TableComponent implements OnChanges, OnDestroy {
 
   limit = 10;
 
+  @Input() showPageSizeMenu = true;
+  @Input() multiExpand = false;
+
   constructor(private navbar: NavbarService) {
     this.navbarCollapse$ = this.navbar.isCollapsed;
     this.navbarCollapseSubscription = this.navbarCollapse$
@@ -153,8 +157,18 @@ export class TableComponent implements OnChanges, OnDestroy {
     this.table.onFooterPage({page});
   }
 
+  toggleSelection(id) {
+    this.expandedRows[id] = !this.expandedRows[id];
+  }
+
   toggleRowDetail(row) {
+    const expandedRows = Object.keys(this.expandedRows).filter(k => !!this.expandedRows[k]);
+    if (!this.multiExpand && !this.expandedRows[row.id] && expandedRows.length) {
+      this.table.rowDetail.collapseAllRows();
+      this.expandedRows = {};
+    }
     this.table.rowDetail.toggleExpandRow(row);
+    this.toggleSelection(row.id);
   }
 
   ngOnChanges(changes) {
@@ -163,6 +177,14 @@ export class TableComponent implements OnChanges, OnDestroy {
       if (!firstChange && currentValue && previousValue && currentValue.length < previousValue.length) {
         this.table.offset = 0;
       }
+      Object.keys(this.expandedRows).forEach(id => {
+        if (this.expandedRows[id]) {
+          const policy = this.rows.find(p => p.id === id);
+          if (policy) {
+            this.table.rowDetail.toggleExpandRow(policy);
+          }
+        }
+      });
     }
   }
 

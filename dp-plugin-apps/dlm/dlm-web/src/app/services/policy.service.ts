@@ -1,7 +1,6 @@
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
-import { POLICY_SUBMIT_TYPES } from 'constants/policy.constant';
 import { PolicyPayload } from 'models/policy.model';
 
 @Injectable()

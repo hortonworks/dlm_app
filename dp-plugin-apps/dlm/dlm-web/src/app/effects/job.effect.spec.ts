@@ -7,6 +7,7 @@ import {JobService} from '../services/job.service';
 import {Observable} from 'rxjs/Observable';
 import * as jobActions from '../actions/job.action';
 import {Job} from '../models/job.model';
+import { Policy } from '../models/policy.model';
 
 describe('JobEffects', () => {
   beforeEach(() => TestBed.configureTestingModule({
@@ -17,7 +18,7 @@ describe('JobEffects', () => {
       JobEffects,
       {
         provide: JobService,
-        useValue: jasmine.createSpyObj('jobService', ['getJobs', 'getJobsForClusters'])
+        useValue: jasmine.createSpyObj('jobService', ['getJobs', 'getJobsForClusters', 'getJobsForPolicy'])
       }
     ]
   }));
@@ -33,6 +34,7 @@ describe('JobEffects', () => {
   beforeEach(() => {
     this.job1 = <Job>{id: '1'};
     this.job2 = <Job>{id: '2'};
+    this.policy = <Policy>{name: 'n1', targetClusterResource: {id: 'cl1'}};
     this.jobs = {jobs: [this.job1, this.job2]};
     this.error = new Error('msg'); });
 
@@ -81,6 +83,31 @@ describe('JobEffects', () => {
       runner.queue(jobActions.loadJobsForClusters(['1', '2'], 'JOBS_CLUSTER'));
       let result = null;
       jobEffects.loadJobsForClusters$.subscribe(_result => result = _result);
+      expect(result).toEqual(expectedResult);
+    });
+
+  });
+
+  describe('#loadJobsForPolicy$', () => {
+
+    it('should return a new loadJobsSuccess, with the jobs, on success', () => {
+      const {jobService, runner, jobEffects} = setup();
+      jobService.getJobsForPolicy.and.returnValue(Observable.of(this.jobs));
+      const expectedResult = jobActions.loadJobsSuccess(this.jobs);
+      runner.queue(jobActions.loadJobsForPolicy(this.policy));
+
+      let result = null;
+      jobEffects.loadJobsForPolicy$.subscribe(_result => result = _result);
+      expect(result).toEqual(expectedResult);
+    });
+
+    it('should return a loadJobsFail, on fail', () => {
+      const {jobService, runner, jobEffects} = setup();
+      jobService.getJobsForPolicy.and.returnValue(Observable.throw(this.error));
+      const expectedResult = jobActions.loadJobsFail(this.error);
+      runner.queue(jobActions.loadJobsForPolicy(this.policy));
+      let result = null;
+      jobEffects.loadJobsForPolicy$.subscribe(_result => result = _result);
       expect(result).toEqual(expectedResult);
     });
 

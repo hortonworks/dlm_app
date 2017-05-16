@@ -16,6 +16,7 @@ export class TableFooterComponent {
   @Input() curPage: number;
   @Input() offset: number;
   @Input() limits: number[] = [10, 25, 50];
+  @Input() showPageSizeMenu = true;
   @Output() changePageSize: EventEmitter<any> = new EventEmitter();
   @Output() changePage: EventEmitter<any> = new EventEmitter();
 

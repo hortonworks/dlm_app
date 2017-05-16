@@ -75,6 +75,7 @@ import { PolicyFormComponent } from './pages/policies/components/policy-form/pol
 import { RadioButtonComponent } from './common/radio-button/radio-button.component';
 import { CheckboxComponent } from './common/checkbox/checkbox.component';
 import { CheckboxListComponent } from './common/checkbox-list/checkbox-list.component';
+import { PolicyDetailsComponent } from './pages/policies/policy-details/policy-details.component';
 
 import { PairingCardComponent } from './pages/pairings/components/pairing-card/pairing-card.component';
 import { PairingCardListComponent } from './pages/pairings/components/pairing-card-list/pairing-card-list.component';
@@ -94,6 +95,7 @@ import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/rev
 
 import { BytesSizePipe } from './pipes/bytes-size.pipe';
 import { FmtTzPipe } from './pipes/fmt-tz.pipe';
+import { FrequencyPipe } from './pipes/frequency.pipe';
 
 @NgModule({
   imports: [
@@ -146,6 +148,7 @@ import { FmtTzPipe } from './pipes/fmt-tz.pipe';
     CreatePolicyComponent,
     PolicyFormComponent,
     ReviewPolicyComponent,
+    PolicyDetailsComponent,
 
     ResourceChartsComponent,
     IssuesListComponent,
@@ -178,7 +181,8 @@ import { FmtTzPipe } from './pipes/fmt-tz.pipe';
     ModalDialogComponent,
     NotificationsComponent,
     BytesSizePipe,
-    FmtTzPipe
+    FmtTzPipe,
+    FrequencyPipe
   ],
   bootstrap: [DlmComponent],
   providers: [

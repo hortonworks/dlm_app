@@ -1,10 +1,10 @@
 <dlm-table
+  [rowDetailHeight]="550"
   [rowDetailTemplate]="rowDetailRef"
   [theme]="tableTheme"
   [columns]="columns"
   [rows]="policies"
-  (selectAction)="handleSelectedAction($event)"
->
+  (selectAction)="handleSelectedAction($event)">
 </dlm-table>
 
 <dlm-icon-column></dlm-icon-column>
@@ -14,6 +14,14 @@
 
 <ng-template #durationCell let-seconds="value">
   {{seconds ? (seconds | amDateFormat:'hh:mm:ss') : 'Running'}}
+</ng-template>
+
+<ng-template #iconCellTemplate>
+  <span class="fa fa-arrow-right" aria-hidden="true"></span>
+</ng-template>
+
+<ng-template #scheduleCellTemplate let-value="value">
+  <span>{{value | frequency}}</span>
 </ng-template>
 
 <ng-template #lastGoodCell let-time="value">
@@ -28,9 +36,7 @@
   <i class="text-primary fa fa-ellipsis-v actionable" (click)="toggleRowDetail(row)"></i>
 </ng-template>
 
-<ng-template #rowDetailRef let-row="row">
+<ng-template let-row="row" ngx-datatable-row-detail-template #rowDetailRef>
   <!-- File and Hive browser component goes here -->
-  <pre>
-    {{row | json}}
-  </pre>
+  <dlm-policy-details [policy]="row" [jobs]="filteredJobs"></dlm-policy-details>
 </ng-template>

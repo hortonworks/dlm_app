@@ -3,20 +3,26 @@
 $status-circle-size: 12px;
 $status-circle-margin: 5px;
 
-.status-failed {
-  color: $alert-color;
-  position: relative;
-  margin-left: $status-circle-size + $status-circle-margin;
+.status {
+
+  &.status-failed:before {
+    background: $alert-color;
+  }
+
+  &.status-submitted:before {
+    background: $link-color;
+  }
+
+  &.status-running:before {
+    background: $success-color;
+  }
 
   &:before {
     content: '';
-    display: block;
-    position: absolute;
+    display: inline-block;
     width: $status-circle-size;
     height: $status-circle-size;
-    background: $alert-color;
     border-radius: $status-circle-size;
-    top: 3px;
-    left: -$status-circle-size - $status-circle-margin;
+    margin-right: 5px;
   }
 }

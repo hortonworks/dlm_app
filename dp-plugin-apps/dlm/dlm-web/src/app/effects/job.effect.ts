@@ -27,5 +27,16 @@ export class JobEffects {
         .catch(err => Observable.of(loadJobsFail(err, payload.meta)));
     });
 
-  constructor(private actions$: Actions, private jobService: JobService) { }
+  @Effect()
+  loadJobsForPolicy$: Observable<any> = this.actions$
+    .ofType(jobActions.LOAD_JOBS_FOR_POLICY)
+    .map(toPayload)
+    .switchMap(payload => {
+      return this.jobService.getJobsForPolicy(payload)
+        .map(jobs => loadJobsSuccess(jobs, payload.meta))
+        .catch(err => Observable.of(loadJobsFail(err, payload.meta)));
+    });
+
+  constructor(private actions$: Actions, private jobService: JobService) {
+  }
 }

@@ -10,11 +10,43 @@
     "source": "Source",
     "destination": "Destination",
     "data": "Data",
+    "path": "Path",
+    "schedule": "Schedule",
     "time": {
       "hourly": "Hourly",
       "daily": "Daily",
       "weekly": "Weekly",
       "monthly": "Monthly"
+    },
+    "frequency": {
+      "yearly": {
+        "plural": "Every {{num}} years",
+        "singular": "Every year"
+      },
+      "monthly": {
+        "plural": "Every {{num}} months",
+        "singular": "Every month"
+      },
+      "weekly": {
+        "plural": "Every {{num}} weeks",
+        "singular": "Every week"
+      },
+      "daily": {
+        "plural": "Every {{num}} days",
+        "singular": "Every day"
+      },
+      "hourly": {
+        "plural": "Every {{num}} hours",
+        "singular": "Every hour"
+      },
+      "minutely": {
+        "plural": "Every {{num}} minutes",
+        "singular": "Every minute"
+      },
+      "secondly": {
+        "plural": "Every {{num}} seconds",
+        "singular": "Every second"
+      }
     },
     "table": {
       "summary": "{{shown}} of {{count}} showing",
