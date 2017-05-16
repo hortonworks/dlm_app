@@ -12,10 +12,44 @@
         display: inline-block;
         float: right;
         padding: 0px;
-        min-height: 35px;
+        min-height: 32px;
         min-width: 130px;
     }
 }
+.dp-input {
+    display: inline-block;
+    position: relative;
+    float: right;
+    padding: 0px;
+    min-height: 33px;
+    margin-right : 5px;
+    min-width: 412px;
+    border: 1px solid rgb(221, 221, 221);
+
+}
+
+input {
+  font-size: 1em;
+
+  height: 32px;
+  width: 412px;
+  min-width: 250px;
+  margin-left : 20px;
+ // padding: 0 8px;
+  border : none;
+}
+
+input:focus{
+    outline: none;
+}
+
+.dp-input__icon {
+  position: absolute;
+  left: 5px;
+  bottom: 10px;
+  color: #53646A;
+}
+
 .mdl-data-table {
     width: 95%;
     border: none;
@@ -75,6 +109,11 @@
 .mdl-data-table__cell--placeholder{
     width:7%;
     text-align: center;
+}
+
+.mdl-data-table__cell--no-reults {
+    text-align: center;
+    color : #7e898d;
 }
 
 .fa__fa-ellipsis-v--icon {

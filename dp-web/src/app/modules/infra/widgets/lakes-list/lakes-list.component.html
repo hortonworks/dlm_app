@@ -3,6 +3,11 @@
     <a [routerLink]="['/onboard/lakes']" class="mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect">
        Add Datalake
     </a>
+    <div class="dp-input">
+    <input type="text" placeholder="Search" name="name" id="search" (keyup)="filter($event)" />
+    <i class="fa fa-search dp-input__icon" aria-hidden="true"></i>
+    </div>
+
 </div>
 <table class="mdl-data-table mdl-js-data-table" on-mouseleave="hoveredIndex=null">
   <thead>
@@ -38,6 +43,9 @@
           </ul>
         </div>
       </td>
+    </tr>
+    <tr *ngIf="lakesHealth.length === 0">
+        <td colspan="7" class="mdl-data-table__cell--no-reults">There are no data lakes that match your search.</td>
     </tr>
   </tbody>
 </table>

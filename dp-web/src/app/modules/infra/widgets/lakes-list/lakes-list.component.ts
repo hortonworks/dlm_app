@@ -12,6 +12,7 @@ export class LakesListComponent implements OnInit {
     hoveredIndex;
     _lakes = [];
     _healths = [];
+    searchTerm:string = '';
     @Input() set lakes(lakes){
         this._lakes = lakes;
     }
@@ -24,6 +25,9 @@ export class LakesListComponent implements OnInit {
             return lakesHealth;                
         }
         this._lakes.forEach((lake, index)=>{
+            if(this.searchTerm.length && lake.data.name.toLowerCase().indexOf(this.searchTerm) === -1){
+                return;
+            };
             if(index < this._healths.length){
                 lakesHealth.push({lake:lake, health:this._healths[index], status: this.getStatus(this._healths[index])})
             }else{
@@ -51,7 +55,7 @@ export class LakesListComponent implements OnInit {
             return LakeStatus.NA;
         }
     }
-    isUp(status){
+    private isUp(status){
         return status === LakeStatus.UP;
     }
     private isDown(status){
@@ -59,6 +63,11 @@ export class LakesListComponent implements OnInit {
     }
     private isNotAvailable(status){
          return status === LakeStatus.NA;
+    }
+
+    filter(event){
+        let term = event.target.value.trim();
+        this.searchTerm = term;
     }
 }
 
