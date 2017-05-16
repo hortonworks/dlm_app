@@ -1,0 +1,52 @@
+<div class="dp-view-pane">
+    <div class="mdl-grid mdl-grid--no-spacing">
+        <div class="mdl-cell--10-col">
+            <div class="mdl-typography--headline"> Sales_2016</div>
+            <span class="mdl-chip hive-table-chip">
+                <span class="mdl-chip__text">HIVE</span>
+            </span>
+        </div>
+        <div class="mdl-cell--2-col">
+            <dp-dropdown class="pull-right" [list]="['abc', 'def']"></dp-dropdown>
+        </div>
+    </div>
+
+    <div class="spacer-34"> </div>
+
+    <div class="summary-pane-5">
+        <ul>
+            <li>
+                <div> <span class="title">Datalake</span> <br> <span class="value"> Newyork_data </span></div>
+            </li>
+            <li>
+                <div> <span class="title"> Last Used </span> <br> <span class="value"> 2 min ago </span></div>
+            </li>
+            <li>
+                <div> <span class="title"> Users </span> <br> <span class="value"> 43 </span></div>
+            </li>
+            <li>
+                <div> <span class="title"># of Rows</span> <br> <span class="value"> 3002 </span></div>
+            </li>
+            <li>
+                <div> <span class="title"> Table Health</span> <br> <span class="value"> Good </span></div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="spacer-34"> </div>
+
+    <dp-tabs [tabEnum]="topLevelTabs" [tabType]="tabType.UNDERLINE" (selected)="selectedTopLevelTabs=$event"> </dp-tabs>
+
+    <div class="spacer-34"> </div>
+
+    <section *ngIf="selectedTopLevelTabs === topLevelTabs.DETAILS">
+        <dp-tabs [tabEnum]="detailsTabs" [tabType]="tabType.BUTTON" (selected)="selectedDetailsTabs=$event"> </dp-tabs>
+        <div style="min-height: 500px; border: 4px solid #CFD3D7">
+            <section>
+
+            </section>
+        </div>
+    </section>
+
+
+</div>

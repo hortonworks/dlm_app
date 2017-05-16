@@ -33,7 +33,7 @@
         "../node_modules/topojson/dist/topojson.js",
         "../node_modules/datamaps/dist/datamaps.world.js",
         "../node_modules/dagre-d3/dist/dagre-d3.js",
-        "../node_modules/material-design-lite/dist/material.min.js"
+        "../node_modules/material-design-lite/dist/material.js"
       ],
       "stylePreprocessorOptions": {
         "includePaths": [

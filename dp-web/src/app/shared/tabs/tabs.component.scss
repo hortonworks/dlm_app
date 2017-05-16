@@ -1,0 +1,52 @@
+@import "../../../variables";
+
+.underline {
+  .mdl-navigation__link {
+    cursor: pointer;
+    padding: 0px 9px;
+    margin: 0px 6px;
+    position: relative;
+  }
+
+  .is_active:after {
+    height: 5px;
+    width: 100%;
+    display: block;
+    content: " ";
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    background: $fruit-salad;
+  }
+
+  .mdl-navigation__link.is_active {
+    color: $mine-shaft !important;
+  }
+}
+
+.buttons {
+  .mdl-navigation__link {
+    cursor: pointer;
+    padding: 0px 20px;
+    position: relative;
+    background: #F1F2F3;
+    border-right: 1px solid #CFD3D7;
+  }
+
+  .mdl-navigation {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-top: 1px solid #CFD3D7;
+    border-left: 1px solid #CFD3D7;
+    border-right: 1px solid #CFD3D7;
+
+    span:last-child {
+      border-right: none;
+    }
+  }
+
+  .mdl-navigation__link.is_active {
+    color: $mine-shaft !important;
+    background: #CFD3D7;
+  }
+}

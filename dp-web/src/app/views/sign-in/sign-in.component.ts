@@ -25,7 +25,7 @@ export class SignInComponent implements OnInit{
   constructor(
     private authenticaionService: AuthenticationService,
     private router: Router,
-    private configService: ConfigurationService,
+    private configService: ConfigurationService
   ) {
     if (window.location.hash.length > 0 && window.location.hash === '#SESSEXPIRED') {
       this.message = 'SESSIONEXPIRED';

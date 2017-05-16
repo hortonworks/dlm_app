@@ -1,0 +1,41 @@
+@import "vendor";
+@import "variables";
+
+$left-spacing: 55px;
+$right-spacing: 30px;
+
+.left-spacing {
+  @extend .mdl-layout-spacer;
+
+  width: $left-spacing;
+  max-width: $left-spacing;
+}
+
+.right-spacing {
+  @extend .mdl-layout-spacer;
+
+  width: $right-spacing;
+  max-width: $right-spacing;
+}
+
+.mdl-chip.hive-table-chip {
+  height: 20px;
+  border-radius: 3px;
+  background: $dhuttle-gray;
+  padding: 0px 8px;
+
+  .mdl-chip__text {
+    height: 20px;
+    line-height: 10px;
+    font-weight: 600;
+    color: $white;
+
+    &:before {
+      font-family: "FontAwesome";
+      font-style: normal;
+      font-size: 12px;
+      content: '\f0ce';
+      padding-right: 8px;
+    }
+  }
+}

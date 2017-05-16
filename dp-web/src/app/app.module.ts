@@ -26,6 +26,7 @@ import { MdlDirective } from './directives/mdl.directive';
 import {CategoryService} from "./services/category.service";
 import {DataSetService} from "./services/dataset.service";
 import {DatasetTagService} from "./services/tag.service";
+import { DropdownComponent } from './shared/dropdown/dropdown.component';
 
 @NgModule({
   imports: [

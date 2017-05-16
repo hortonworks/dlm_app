@@ -1,8 +1,23 @@
 /* You can add global styles to this file, and also import other style files */
 @import "_fonts.scss";
 @import "variables";
+@import "mdl-extend";
 @import "buttons";
+@import "mixins";
 
 body {
   font-family: "Roboto";
 }
+
+.dp-view-pane {
+  padding: 0px 20px;
+  border: 1px solid $concrete;
+  min-height: calc(100vh - 85px);
+}
+
+div.spacer-34 {
+  height: 34px;
+}
+
+@include summary-pane("summary-pane-5", "20%");
+
