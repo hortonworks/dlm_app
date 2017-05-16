@@ -103,6 +103,7 @@ build_installer() {
 	log "Building installer"
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/installer/dbscripts/
 	cp -R install/* ${DP_DOCKER_ROOT_FOLDER}/installer
+	cp dp-docker-build.sh ${DP_DOCKER_ROOT_FOLDER}/installer/
 	append_docker_image_version "hortonworks\/dp-db-service" ${DP_DOCKER_ROOT_FOLDER}/installer/docker-compose-apps.yml
 	append_docker_image_version "hortonworks\/dp-cluster-service" ${DP_DOCKER_ROOT_FOLDER}/installer/docker-compose-apps.yml
 	append_docker_image_version "hortonworks\/dp-app" ${DP_DOCKER_ROOT_FOLDER}/installer/docker-compose-apps.yml
