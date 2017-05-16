@@ -1,9 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
-@import "_fonts.scss";
-@import "variables";
-@import "mdl-extend";
-@import "buttons";
-@import "mixins";
+@import "fonts";
+@import "styles/variables";
+@import "styles/mdl-extend";
+@import "styles/buttons";
+@import "styles/mixins";
 
 body {
   font-family: "Roboto";

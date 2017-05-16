@@ -6,6 +6,7 @@ import { routes } from './asset.routes';
 import {AssetViewComponent} from './asset-view/asset-view.component';
 import {DropdownModule} from '../../shared/dropdown/dropdown.module';
 import {TabsModule} from '../../shared/tabs/tabs.module';
+import { AssetDetailsViewComponent } from './asset-view/asset-details-view/asset-details-view.component';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import {TabsModule} from '../../shared/tabs/tabs.module';
     TabsModule
   ],
   declarations: [
-    AssetViewComponent
+    AssetViewComponent,
+    AssetDetailsViewComponent
   ]
 })
 export class AssetModule { }
