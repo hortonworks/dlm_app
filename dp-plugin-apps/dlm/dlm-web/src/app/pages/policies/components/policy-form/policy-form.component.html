@@ -13,18 +13,10 @@
             <div class="clearfix"></div>
           </div>
           <fieldset formGroupName="general" [collapse]="sectionCollapsedMap.general">
-            <div class="form-group">
-              <div class="row">
-                <label class="col-md-6">
-                  {{'page.policies.form.fields.policy_name' | translate}}
-                </label>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <input type="text" class="form-control" formControlName="name"/>
-                </div>
-              </div>
-            </div>
+            <dlm-form-field
+              [label]="'page.policies.form.fields.policy_name' | translate">
+              <input type="text" class="form-control" formField formControlName="name"/>
+            </dlm-form-field>
             <div class="form-group">
               <div class="row">
                 <label class="col-md-6">
@@ -33,24 +25,15 @@
               </div>
               <div class="row">
                 <div class="col-md-6">
-                  <dlm-radio-button [items]="storageTypes" formControlName="type"></dlm-radio-button>
+                  <dlm-radio-button [items]="storageTypes" formControlName="type" (change)="handlePolicyTypeChange($event)"></dlm-radio-button>
                 </div>
               </div>
             </div>
-            <div class="form-group">
-              <div class="row">
-                <label class="col-md-6">
-                  {{'page.policies.form.fields.pairs' | translate}}
-                </label>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <select class="form-control" formControlName="pair">
-                    <option *ngFor="let pair of pairs" [value]="pair.value">{{pair.label}}</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+            <dlm-form-field [label]="'page.policies.form.fields.pairs' | translate">
+              <select class="form-control" formField formControlName="pair">
+                <option *ngFor="let pair of pairs" [value]="pair.value">{{pair.label}}</option>
+              </select>
+            </dlm-form-field>
           </fieldset>
         </div>
       </div>
@@ -67,8 +50,10 @@
             <div class="clearfix"></div>
           </div>
           <div class="row" [collapse]="sectionCollapsedMap.directories">
-            <div class="col-md-6">
-              <input type="text" class="form-control" formControlName="directories"/>
+            <div class="col-md-12">
+              <dlm-form-field [label]="'page.policies.form.fields.directories' | translate">
+                <input type="text" formField class="form-control" formControlName="directories"/>
+              </dlm-form-field>
             </div>
           </div>
         </div>
@@ -123,21 +108,38 @@
             <div class="form-group" *ngIf="isScheduled()">
               <div class="schedule-group">
                 <tabset>
-                  <tab *ngFor="let tab of scheduleTabs" (select)="updateFrequency(tab.value)" [heading]="tab.title | translate">
+                  <tab *ngFor="let tab of scheduleTabs" (select)="handleJobTabChange(tab)" [heading]="tab.title | translate">
                     <div class="row">
-                      <div class="col-md-5 col-md-offset-1">
-                        <my-date-picker
-                          [placeholder]="'page.policies.form.fields.start_time' | translate"
-                          [options]="datePickerOptions"
-                          (dateChanged)="handleDateChange($event, 'startTime')">
-                        </my-date-picker>
+                      <div class="col-md-6" formGroupName="startTime">
+                        <div class="date-time-group">
+                          <div class="date-control">
+                            <my-date-picker
+                              selectionTxtFontSize="12"
+                              [selDate]="policyForm.value.job.startTime.date"
+                              [placeholder]="'page.policies.form.fields.start_time' | translate"
+                              [options]="datePickerOptions"
+                              (dateChanged)="handleDateChange($event, 'startTime')">
+                            </my-date-picker>
+                          </div>
+                          <div class="time-control">
+                            <timepicker formControlName="time" [showMeridian]="false"></timepicker>
+                          </div>
+                        </div>
                       </div>
-                      <div class="col-md-5">
-                        <my-date-picker
-                          [placeholder]="'page.policies.form.fields.end_time' | translate"
-                          (dateChanged)="handleDateChange($event, 'endTime')"
-                          [options]="datePickerOptions">
-                        </my-date-picker>
+                      <div class="col-md-6" formGroupName="endTime">
+                        <div class="date-time-group">
+                          <div class="date-control">
+                            <my-date-picker
+                              [selDate]="policyForm.value.job.endTime.date"
+                              [placeholder]="'page.policies.form.fields.end_time' | translate"
+                              (dateChanged)="handleDateChange($event, 'endTime')"
+                              [options]="datePickerOptions">
+                            </my-date-picker>
+                          </div>
+                          <div class="time-control">
+                            <timepicker formControlName="time" [showMeridian]="false"></timepicker>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </tab>
@@ -150,8 +152,12 @@
       <div class="row">
         <div class="form-footer col-md-12">
           <div class="footer-controls pull-right">
-            <button type="button" class="btn btn-default">{{'common.cancel' | translate}}</button>
-            <button class="btn btn-success" type="submit">{{'common.review' | translate}}</button>
+            <button type="button" class="btn btn-default" (click)="cancel()">
+              {{'common.cancel' | translate}}
+            </button>
+            <button class="btn btn-success" type="submit" [disabled]="policyForm.touched && !policyForm.valid">
+              {{'common.review' | translate}}
+            </button>
           </div>
         </div>
       </div>

@@ -19,7 +19,7 @@ export function reducer(state = initialState, action): State {
 }
 
 function loadJobsSuccess(state = initialState, action): State {
-  const jobs = action.payload.job;
+  const jobs = action.payload.policies;
   const jobEntities = jobs.reduce((entities: { [id: string]: Job }, entity: Job) => {
     return Object.assign({}, entities, {
       [entity.id]: entity

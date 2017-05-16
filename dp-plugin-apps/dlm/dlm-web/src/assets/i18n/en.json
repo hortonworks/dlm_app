@@ -48,6 +48,11 @@
       "failed": "Failed"
     }
   },
+  "forms": {
+    "validation_errors": {
+      "required": "\"{{fieldLabel}}\" is required"
+    }
+  },
   "page": {
     "overview": {
       "charts": {

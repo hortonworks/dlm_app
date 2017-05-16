@@ -5,7 +5,7 @@ const MOCK_FILES_PREFIX = '/assets/data/dlm/';
 /**
  * Generates route to mock request's response by url and method with predefined
  * json file.
- * Note that all request method will be overriden to Get.
+ * Note that all request method will be overridden to Get.
  *
  * @param  {string}        url      path to mock prefix /api/dlm will be added
  * @param  {string}        jsonFile json file to respond with, root dir is assets/data/dlm

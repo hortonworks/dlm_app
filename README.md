@@ -17,14 +17,14 @@
 
 * `git clone https://github.com/hortonworks/dataplane`
 * In folder dp-build `sh ./build.sh`. First time build could take sometime as all Scala dependencies are downloaded and cached.
-* In folder dp-build/build, an install tarball is created called `dp-installer.tar.gz`. This can be used to deploy Dataplane components on any machine with docker support.
+* In folder dp-build/build/dp-docker, an install tarball is created called `dp-installer.tar.gz`. This can be used to deploy Dataplane components on any machine with docker support.
 
 
 ## Setup (from source)
 
 * Ensure the steps in Build section above are followed.
 * We can use docker to bring up the application without requiring to install other runtime dependencies like Postgres, NGinx etc. Follow these steps to bring up the docker containers.
-* A utility script has been provided in the `dp-build/build/installer` folder called `dpdeploy.sh` to help with this. This wraps around docker-compose commands and aims to provide a simpler interface.
+* A utility script has been provided in the `dp-build/build/dp-docker/installer` folder called `dpdeploy.sh` to help with this. This wraps around docker-compose commands and aims to provide a simpler interface.
 * There is a certain sequence to follow to bring up the application, as detailed below. All commands need to be executed from the dp-build folder.
 * For a fresh setup:
   * Initialize the Postgres database: `./dpdeploy.sh init db`

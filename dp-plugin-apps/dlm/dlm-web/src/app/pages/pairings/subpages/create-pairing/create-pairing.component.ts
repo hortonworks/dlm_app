@@ -13,6 +13,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Progress } from 'models/progress.model';
 import { fromJS } from 'immutable';
+import { PairingsComponent } from '../../pairings.component';
 
 @Component({
   selector: 'dlm-create-pairing',
@@ -60,25 +61,14 @@ export class CreatePairingComponent implements OnInit {
     const requestPayload = [
       {
         clusterId: this.selectedFirstCluster.id,
-        beaconUrl: this.getBeaconUrl(this.selectedFirstCluster)
+        beaconUrl: PairingsComponent.getBeaconUrl(this.selectedFirstCluster)
       },
       {
         clusterId: this.selectedSecondCluster.id,
-        beaconUrl: this.getBeaconUrl(this.selectedSecondCluster)
+        beaconUrl: PairingsComponent.getBeaconUrl(this.selectedSecondCluster)
       }
     ];
     this.store.dispatch(createPairing(requestPayload));
-  }
-
-  getBeaconUrl(cluster: ClusterPairing): string {
-    let beaconUrl = '';
-    if (cluster.services && cluster.services.length) {
-      const beaconService = cluster.services.filter(service => service.servicename === 'BEACON_SERVER');
-      if (beaconService.length) {
-        beaconUrl = beaconService[0].fullURL;
-      }
-    }
-    return beaconUrl;
   }
 
   selectFirstCluster(cluster: ClusterPairing) {

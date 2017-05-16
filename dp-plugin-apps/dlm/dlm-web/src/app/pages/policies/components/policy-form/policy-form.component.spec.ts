@@ -1,17 +1,18 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {ReactiveFormsModule, FormsModule} from '@angular/forms';
-import {PolicyFormComponent} from './policy-form.component';
-import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
-import {MockTranslateLoader} from '../../../../mocks/mock-translate-loader';
-import {CollapseModule, TabsModule} from 'ng2-bootstrap';
-import {RadioButtonComponent} from '../../../../common/radio-button/radio-button.component';
-import {SearchInputComponent} from '../../../../components/search-input/search-input.component';
-import {CheckboxListComponent} from '../../../../common/checkbox-list/checkbox-list.component';
-import {CheckboxComponent} from '../../../../common/checkbox/checkbox.component';
-import {MockStore} from '../../../../mocks/mock-store';
 import {Store} from '@ngrx/store';
+import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
+import {CollapseModule, TabsModule, TimepickerModule} from 'ng2-bootstrap';
 import { MyDatePickerModule } from 'mydatepicker';
-import {CheckboxColumnComponent} from '../../../../components/table-columns/checkbox-column/checkbox-column.component';
+
+import { CommonComponentsModule } from 'components/common-components.module';
+import {MockTranslateLoader} from 'mocks/mock-translate-loader';
+import {RadioButtonComponent} from 'common/radio-button/radio-button.component';
+import {CheckboxListComponent} from 'common/checkbox-list/checkbox-list.component';
+import {CheckboxComponent} from 'common/checkbox/checkbox.component';
+import {MockStore} from 'mocks/mock-store';
+import {CheckboxColumnComponent} from 'components/table-columns/checkbox-column/checkbox-column.component';
+import {PolicyFormComponent} from './policy-form.component';
 
 describe('PolicyFormComponent', () => {
   let component: PolicyFormComponent;
@@ -19,13 +20,16 @@ describe('PolicyFormComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [TranslateModule.forRoot({
-        loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-      }), ReactiveFormsModule, FormsModule, CollapseModule, TabsModule.forRoot(), MyDatePickerModule],
+      imports: [
+        TranslateModule.forRoot({
+          loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
+        }),
+        TimepickerModule.forRoot(),
+        ReactiveFormsModule, FormsModule, CollapseModule, TabsModule.forRoot(), MyDatePickerModule, CommonComponentsModule
+      ],
       declarations: [
         PolicyFormComponent,
         RadioButtonComponent,
-        SearchInputComponent,
         CheckboxComponent,
         CheckboxListComponent,
         CheckboxColumnComponent

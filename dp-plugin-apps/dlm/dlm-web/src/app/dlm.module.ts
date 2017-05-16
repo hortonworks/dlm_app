@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpModule } from '@angular/http';
-import { CollapseModule, TabsModule, ModalModule, TypeaheadModule } from 'ng2-bootstrap';
+import { CollapseModule, TabsModule, ModalModule, TypeaheadModule, TimepickerModule } from 'ng2-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { StoreModule } from '@ngrx/store';
@@ -114,6 +114,7 @@ import { FmtTzPipe } from './pipes/fmt-tz.pipe';
     TabsModule.forRoot(),
     ModalModule.forRoot(),
     TypeaheadModule.forRoot(),
+    TimepickerModule.forRoot(),
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,

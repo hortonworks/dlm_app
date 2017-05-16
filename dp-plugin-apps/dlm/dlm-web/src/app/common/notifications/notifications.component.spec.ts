@@ -5,6 +5,7 @@ import {NotificationsComponent} from './notifications.component';
 import {MockStore} from '../../mocks/mock-store';
 import {Store} from '@ngrx/store';
 import {MomentModule} from 'angular2-moment';
+import {FmtTzPipe} from 'pipes/fmt-tz.pipe';
 import {MockTranslateLoader} from '../../mocks/mock-translate-loader';
 import {RouterTestingModule} from '@angular/router/testing';
 import {NavbarService} from 'services/navbar.service';
@@ -20,10 +21,11 @@ describe('NotificationsComponent', () => {
       }),
         ReactiveFormsModule,
         RouterTestingModule,
-        MomentModule,
+        MomentModule
       ],
       declarations: [
-        NotificationsComponent
+        NotificationsComponent,
+        FmtTzPipe
       ],
       providers: [
         {provide: Store, useClass: MockStore},

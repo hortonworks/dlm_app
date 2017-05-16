@@ -1,25 +1,13 @@
 {
-  "totalResults": 2,
-  "job": [
-	{
-  	"id": "hdfspolicy@2",
-  	"name": "hdfspolicy",
-  	"type": "fs",
-  	"status": "SUCCESS",
-  	"startTime": "2017-01-10T08:13:59",
-  	"endTime": "2017-01-10T08:14:00",
-  	"duration": 1213,
-  	"message": ""
-	},
-	{
-  	"id": "hdfspolicy@1",
-  	"name": "hdfspolicy",
-  	"type": "fs",
-  	"status": "SUCCESS",
-  	"startTime": "2017-01-10T08:13:29",
-  	"endTime": "2017-01-10T08:13:29",
-  	"duration": 63,
-  	"message": ""
-	}
-  ]
+  "id": "/c1/c1/hdfs2policy/0/1494275689257/000000004@1",
+  "policyId": "/c1/c1/hdfs2policy/0/1494275689257/000000004",
+  "name": "hdfs2policy",
+  "type": "FS",
+  "executionType": "FS",
+  "user": "beacon",
+  "status": "SUCCESS",
+  "startTime": "2017-05-10T23:31:08",
+  "endTime": "2017-05-10T23:31:14",
+  "trackingInfo": "job_local888139679_0001",
+  "message": "SUCCESS"
 }
