@@ -4,7 +4,7 @@
   <div class="">Some text Babu would provide, probably which describes what are assets, how can one add them or remove them etc. Some text Babu would provide, probably which describes what are assets, how can one add them or remove them etc. Some text Babu would provide, probably which describes what are assets, how can one add them or remove them etc.</div>
   <br/>
   <ds-assets-list *ngIf="dsModel.id" [dsModel]="dsModel" [applicableActions]="applicableListActions" (onAction)="showPopup=!showPopup"></ds-assets-list>
-  <div *ngIf="!dsModel.id" class="mdl-color--green mdl-color-text--white mdl-button" (click)="showPopup=!showPopup">Add Assets</div>
+  <button *ngIf="!dsModel.id" class="mdl-button btn-hwx-primary" (click)="showPopup=!showPopup">Add Assets</button>
 </div>
 <div *ngIf="showPopup" class="popup borderBox">
   <div class="opaque">
