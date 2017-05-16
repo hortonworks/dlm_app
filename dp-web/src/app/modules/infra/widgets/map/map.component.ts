@@ -3,6 +3,7 @@ import * as L from 'leaflet';
 import 'leaflet-curve';
 
 import {MapData} from '../../../../models/map-data';
+import {MapSize} from '../../../../models/map-data';
 import {MapConnectionStatus} from '../../../../models/map-data';
 
 import { GeographyService } from '../../../../services/geography.service';
@@ -18,6 +19,7 @@ export class MapComponent implements  OnChanges, OnInit{
   map: L.Map;
   @ViewChild('mapcontainer') mapcontainer: ElementRef;
   @Input('mapData') mapData: MapData[] = [];
+  @Input('mapSize') mapSize: string = 'extraLarge';
   markerLookup:L.LatLng[] = [];
   pathLookup=[];
 
@@ -35,8 +37,32 @@ export class MapComponent implements  OnChanges, OnInit{
       zoomControl : false,
       dragging : false,
       boxZoom : false,
-      doubleClickZoom : false
+      doubleClickZoom : false,
+      zoomSnap : 0.1
    };
+
+   defaultMapSizes = [
+       {
+           height : '240px',
+           width : '420px',
+           zoom : 0.5
+       },
+       {
+           height : '360px',
+           width : '540px',
+           zoom : 1
+       },
+       {
+           height : '480px',
+           width : '680px',
+           zoom : 1.3
+       },
+       {
+           height : '680px',
+           width : '100%',
+           zoom : 2
+       }
+   ]
 
   constructor(
     private geographyService: GeographyService
@@ -50,7 +76,10 @@ export class MapComponent implements  OnChanges, OnInit{
   }
 
   drawMap(countries){
-    const map = L.map(this.mapcontainer.nativeElement, this.mapOptions).fitWorld().zoomIn();
+    let mapDimensions = this.defaultMapSizes[this.mapSize] || this.defaultMapSizes[MapSize.EXTRALARGE];
+    this.mapcontainer.nativeElement.style.height = mapDimensions.height;
+    this.mapcontainer.nativeElement.style.width = mapDimensions.width;
+    const map = L.map(this.mapcontainer.nativeElement, this.mapOptions);
     let countriesLayer = L.geoJSON(countries, {
     style: feature => ({
       fillColor: this.mapColor,
@@ -60,7 +89,9 @@ export class MapComponent implements  OnChanges, OnInit{
       })
     }).addTo(map);
     map.fitBounds(countriesLayer.getBounds());
-    this.map = map;
+    this.map = map;    
+    this.map.setZoom(mapDimensions.zoom);
+    this.mapcontainer.nativeElement.querySelector('.leaflet-map-pane').style.height = `${parseInt(mapDimensions.height)-20}px`;
   }
 
   ngOnChanges(changes : SimpleChanges) {

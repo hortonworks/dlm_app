@@ -43,9 +43,7 @@ export class LakesListComponent implements OnInit {
     
     }
     private getStatus(health){
-        console.log(health);
         if(health && health.status && health.status.state === 'STARTED'){
-            console.log('up')
             return LakeStatus.UP;
         }else if(health && health.status && health.status.state === 'NOT STARTED'){
             return LakeStatus.DOWN;
@@ -54,7 +52,6 @@ export class LakesListComponent implements OnInit {
         }
     }
     isUp(status){
-        console.log(status)
         return status === LakeStatus.UP;
     }
     private isDown(status){

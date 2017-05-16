@@ -25,3 +25,10 @@ export enum MapConnectionStatus {
     DOWN,
     NA
 }
+
+export enum MapSize {
+    SMALL,
+    MEDIUM,
+    LARGE,
+    EXTRALARGE
+}

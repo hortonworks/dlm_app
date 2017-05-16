@@ -12,6 +12,8 @@ import { Location } from '../../../../models/location';
 import { MapData } from '../../../../models/map-data';
 import { MapConnectionStatus } from '../../../../models/map-data';
 import { Point } from '../../../../models/map-data';
+import { MapSize } from '../../../../models/map-data';
+
 
 @Component({
   selector: 'dp-infra-lakes',
@@ -28,6 +30,7 @@ export class LakesComponent implements OnInit {
   private locations : any[] = [];
   mapData : MapData[] = [];
   health = [];
+  mapSize: MapSize;
 
   constructor(
     private router: Router,
@@ -37,6 +40,7 @@ export class LakesComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.mapSize = MapSize.EXTRALARGE;
     this.lakeService.listWithClusters()
       .subscribe(lakes => {
         this.lakes = lakes;
