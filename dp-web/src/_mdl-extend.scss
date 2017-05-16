@@ -1,8 +1,7 @@
 @import "vendor";
-@import "variables";
 
-$left-spacing: 55px;
-$right-spacing: 30px;
+$left-spacing: 10px;
+$right-spacing: 10px;
 
 .left-spacing {
   @extend .mdl-layout-spacer;
