@@ -1,0 +1,107 @@
+.dashboard-title{
+    height:45px;
+    margin: 20px 30px 18px 30px;
+    span {
+        color : #53646A;
+        padding: 10px 0px;
+        font-size: 16px;
+        font-weight: bold;
+        display: inline-block;
+    }
+    a {
+        display: inline-block;
+        float: right;
+        padding: 0px;
+        min-height: 35px;
+        min-width: 130px;
+    }
+}
+.mdl-data-table {
+    width: 95%;
+    border: none;
+    margin: 0px 30px 0px 30px;
+}
+
+.mdl-data-table {
+    thead {
+        .actions {
+            width: 75px;
+        } 
+
+        th {
+            height: 30px;
+            padding: 6px 18px 6px 6px;
+        }
+    }
+    tbody {
+        tr {
+            height: 30px;
+
+            &:hover {
+                background-color:#E7F4F9;
+            }
+        }
+        td {
+            height: 30px;
+            padding: 6px 18px 6px 6px;
+        }
+
+        .actions {
+            padding-top: 0px;
+            padding-bottom: 0px;
+        }
+    }
+}
+
+.mdl-data-table th {
+    color: #ABABAB;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.mdl-data-table__cell--clickable {
+    color: #2192BF;
+    cursor: pointer;
+}
+
+.mdl-data-table__cell--width15 {
+    width:15%
+}
+
+.mdl-data-table__cell--non-clickable{
+    color : #7e898d
+}
+
+.mdl-data-table__cell--placeholder{
+    width:7%;
+    text-align: center;
+}
+
+.fa__fa-ellipsis-v--icon {
+    font-size: 14px;
+}
+
+.fa__fa-edit--icon {
+    padding: 0 8px;
+}
+
+.fa__fa-close--icon {
+   padding: 0 8px;
+}
+
+.fa-circle--color-up {
+    color: #3FAE2A;
+}
+
+.fa-circle--color-down {
+    color : #EF6162;
+}
+
+.fa-circle--color-na {
+    color : #53646A;
+}
+.action-container {
+    height: 14px;
+    width: 14px;
+}
+

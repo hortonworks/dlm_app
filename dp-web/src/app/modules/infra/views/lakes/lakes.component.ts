@@ -23,10 +23,11 @@ export class LakesComponent implements OnInit {
   lakes: {
     data: Lake,
     clusters: Cluster[]
-  }[];
+    }[];
 
   private locations : any[] = [];
   mapData : MapData[] = [];
+  health = [];
 
   constructor(
     private router: Router,
@@ -39,29 +40,32 @@ export class LakesComponent implements OnInit {
     this.lakeService.listWithClusters()
       .subscribe(lakes => {
         this.lakes = lakes;
-        let locations = []
+        let locations = [];
+        let health = [];
         this.lakes.forEach((lake) => {
           let locationObserver = Observable.create();
-         if(lake.data.location && lake.clusters && lake.clusters.length > 0){
-            locationObserver = this.getLocationInfoWithStatus(lake.data.location, lake.clusters[0].id);
-         }else{
-           locationObserver = this.getLocationInfo(lake.data.location);
-         }
-         locationObserver.subscribe(lakeLocation=> {
-           locations.push(new MapData(lakeLocation));
+          if(lake.data.location && lake.clusters && lake.clusters.length > 0){
+              locationObserver = this.getLocationInfoWithStatus(lake.data.location, lake.clusters[0].id);
+          }else{
+            locationObserver = this.getLocationInfo(lake.data.location);
+          }
+         locationObserver.subscribe(locationInfo=> {
+           health.push(locationInfo.health);
+           this.health = health.slice();
+           locations.push(new MapData(this.extractMapPoints(locationInfo)));
            this.mapData = locations.slice();
          });
          /***** MOCK CONNECTIONS ****/
 
-        //  locationObserver.subscribe(lakeLocation=> {
+        //  locationObserver.subscribe(locationInfo=> {
         //    this.lakeService.getPairsMock(lakes, lake.data.id).subscribe((pairedLake)=>{
         //      if(pairedLake !== null){
-        //         this.getLocationInfoWithStatus(pairedLake.data.location, pairedLake.clusters[0].id).subscribe((pairedLakeLocation=>{
-        //           locations.push({start:lakeLocation, end:pairedLakeLocation});
+        //         this.getLocationInfoWithStatus(pairedLake.data.location, pairedLake.clusters[0].id).subscribe((pairedLocationInfo=>{
+        //           locations.push({start:this.extractMapPoints(locationInfo), end:this.extractMapPoints(pairedLocationInfo)});
         //           this.mapData = locations.slice();
         //         }));
         //      }else{
-        //         locations.push({start:lakeLocation});
+        //         locations.push({start:this.extractMapPoints(locationInfo)});
         //         this.mapData = locations.slice();
         //      }
         //    });                      
@@ -70,28 +74,42 @@ export class LakesComponent implements OnInit {
       });
   }
 
-  getLocationInfoWithStatus(locationId, clusterId){
+  private getLocationInfoWithStatus(locationId, clusterId){
      return Observable.forkJoin(
               this.locationService.retrieve(locationId).map((res) => res),
               this.clusterService.retrieveHealth(clusterId).map((res) => res)
           ).map(response => {
-            let location = response[0];
-            let health = response[1];
-            let status;
-            if(health.status.state ==='STARTED'){
-              status = MapConnectionStatus.UP;
-            }else if(health.status.state ==='NOT STARTED'){
-              status = MapConnectionStatus.DOWN;
-            }else{
-              status = MapConnectionStatus.NA;
+            return {
+              location :  response[0],
+              health :  response[1]
             }
-            return new Point(location.latitude, location.longitude, status);
+            
       });
   }
 
-  getLocationInfo(locationId){
+  private getLocationInfo(locationId){
      return this.locationService.retrieve(locationId).map(location => {
-            return new Point(location.latitude, location.longitude, MapConnectionStatus.NA);
-      });
+       return {
+         location : location
+       }
+    });
+  }
+
+  private extractMapPoints(locationInfo){   
+    if(!locationInfo.health){
+      return new Point(locationInfo.latitude, locationInfo.longitude, MapConnectionStatus.NA)
+    } else {
+      let health = locationInfo.health;
+      let location = locationInfo.location;
+      let status;
+        if(health.status.state ==='STARTED'){
+          status = MapConnectionStatus.UP;
+        }else if(health.status.state ==='NOT STARTED'){
+          status = MapConnectionStatus.DOWN;
+        }else{
+          status = MapConnectionStatus.NA;
+        }        
+       return new Point(location.latitude, location.longitude, status);
+    }
   }
 }

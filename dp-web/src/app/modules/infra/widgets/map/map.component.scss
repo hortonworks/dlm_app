@@ -1,3 +1,19 @@
 .leaflet-container{
     background: #BCD6EE;
 }
+
+.map-container {
+    height: 680px; 
+    outline: none; 
+    margin: 0 auto;
+}
+
+:host /deep/ .leaflet-map-pane {
+  height: 660px;
+}
+
+:host /deep/ .leaflet-control {
+    a {
+        color : #2192BF
+    }
+}
