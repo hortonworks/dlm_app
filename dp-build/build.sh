@@ -3,6 +3,7 @@ set -e
 
 DP_DOCKER_ROOT_FOLDER=build/dp-docker
 RELEASE_NUMBER=0.0.1
+IS_JENKINS=false
 
 log() {
 	echo $@
@@ -26,10 +27,15 @@ unpack_for_docker_deploy() {
 }
 
 build_dp() {
-    log "Building dp"
-	pushd ..
-    sbt dist
-    popd
+    if [ ${IS_JENKINS} == false ]; then
+        log "Building dp"
+        pushd ..
+        sbt dist
+        popd
+    else
+        echo "Not building DP again in Jenkins"
+    fi
+
 }
 
 build_db_service() {
@@ -54,19 +60,27 @@ build_dp_app() {
 build_dp_web() {
 	log "Building dp-web"
 	pushd ../dp-web
-	npm install
-	npm run build
+	if [ ${IS_JENKINS} == false ]; then
+		npm install
+		npm run build
+	else
+		echo "Not running dp-web NPM again"
+	fi
 	cp -R ./dist/* ../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-app/dp-web
 	popd
 }
 
 build_dlm_web() {
-	log "Building dlm-web"
-	pushd ../dp-plugin-apps/dlm/dlm-web
-	yarn
-	npm run build
-	cp -R ./dist/* ../../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-app/dlm-web
-	popd
+	if [ ${IS_JENKINS} == false ]; then
+		log "Building dlm-web"
+		pushd ../dp-plugin-apps/dlm/dlm-web
+		yarn
+		npm run build
+		cp -R ./dist/* ../../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-app/dlm-web
+		popd
+	else
+		echo "Not running DLM build"
+	fi
 }
 
 build_dp_knox() {
@@ -125,6 +139,12 @@ zip_dp_binaries() {
 }
 
 log "Current working directory is: " `pwd`
+if [ "$1" == "Jenkins" ]; then
+	IS_JENKINS=true
+	echo "Running in Jenkins, IS_JENKINS=${IS_JENKINS}"
+else
+	echo "Running regular build, IS_JENKINS=${IS_JENKINS}"
+fi
 clean_build
 build_dp
 build_db_service
