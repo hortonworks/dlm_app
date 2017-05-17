@@ -38,10 +38,14 @@ export class DsEditor implements OnInit {
     this.nextIsVisible = (this.currentStage == 1 || this.currentStage == 2  && this.dsModel.id != undefined);
   }
   actionNext(){
+    if(!this['validateStage'+this.currentStage]()) return;
     ++ this.currentStage;
     this.setVisibilityOfNext()
   }
   actionSave(){console.log("ds editor save clicked")}
   actionCancel(){this.router.navigate(['dataset']);}
+  validateStage1 () {return this.dsModel.name && this.dsModel.description && this.dsModel.datalakeId}
+  validateStage2 () {return true}
+  validateStage3 () {return true}
 
 }

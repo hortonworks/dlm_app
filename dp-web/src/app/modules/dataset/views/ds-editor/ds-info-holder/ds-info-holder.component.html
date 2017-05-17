@@ -10,6 +10,14 @@
   </div>
   <br/><br/>
 
+  <div class="dp-input">
+    <label style="display: block;">Datalake</label>
+    <select [(ngModel)]="dsModel.datalakeId" (change)="onLakeSelectionChange()">
+      <option value="0">Select Datalake</option>
+      <option *ngFor="let lake of lakes" value="{{lake.id}}">{{lake.name}}</option>
+    </select>
+  </div>
+  <br/><br/>
 
 
 

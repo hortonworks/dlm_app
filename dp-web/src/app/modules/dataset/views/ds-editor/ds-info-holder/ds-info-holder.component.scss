@@ -35,7 +35,7 @@
     background-color: rgb(221, 221, 221);
   }
 }
-input, textarea {
+input, textarea, select {
   font-size: 1em;
 
   height: 32px;
@@ -48,6 +48,7 @@ input, textarea {
   border-radius: 5px;
 }
 textarea {height:100px;}
+select {background-color: inherit}
 
 label + input, label + textarea {
   margin-top: 5px;
