@@ -11,7 +11,7 @@ import * as moment from 'moment';
 export class LakesListComponent {
     hoveredIndex;
     _lakes = [];
-    _healths = [];
+    _healths = new Map();
     searchTerm:string = '';
     @Input() set lakes(lakes){
         this._lakes = lakes;
@@ -22,23 +22,23 @@ export class LakesListComponent {
     get lakesHealth(){
         let lakesHealth = [];
         if(!this._lakes){
-            return lakesHealth;                
+            return lakesHealth;
         }
-        this._lakes.forEach((lake, index)=>{
+        this._lakes.forEach((lake)=>{
             if(this.searchTerm.length && lake.data.name.toLowerCase().indexOf(this.searchTerm) === -1){
                 return;
-            };
-            if(index < this._healths.length){
-                lakesHealth.push({lake:lake, health:this._healths[index], status: this.getStatus(this._healths[index])})
-            }else{
-                lakesHealth.push({lake:lake, health:{}, status:LakeStatus.NA})
             }
-        })
+            if(this._healths.get(lake.data.id)){
+              lakesHealth.push({lake:lake, health:this._healths.get(lake.data.id), status: this.getStatus(this._healths.get(lake.data.id))});
+            }else {
+              lakesHealth.push({lake: lake, health: {}, status: LakeStatus.NA});
+            }
+        });
         return lakesHealth;
     }
-            
+
     doGetUptime(since: number) {
-        if(since === 0){
+        if(!since || since === 0){
             return 'NA';
         }
         return moment.duration(since).humanize();
