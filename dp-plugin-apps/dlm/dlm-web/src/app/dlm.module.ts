@@ -47,6 +47,7 @@ import { NotificationsComponent } from './common/notifications/notifications.com
 import { NotificationsPageComponent } from './pages/notifications/notifications.component';
 import { NotificationsTableComponent } from './pages/notifications/notifications-table/notifications-table.component';
 import { ModalDialogComponent } from './common/modal-dialog/modal-dialog.component';
+import { ModalDialogBodyComponent } from './common/modal-dialog/modal-dialog-body.component';
 import { httpServiceProvider } from './services/http.service';
 import { CommonComponentsModule } from './components/common-components.module';
 import { UserDropdownComponent } from './common/user-dropdown/user-dropdown.component';
@@ -179,6 +180,7 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
     CheckboxColumnComponent,
     ActionColumnComponent,
     ModalDialogComponent,
+    ModalDialogBodyComponent,
     NotificationsComponent,
     BytesSizePipe,
     FmtTzPipe,

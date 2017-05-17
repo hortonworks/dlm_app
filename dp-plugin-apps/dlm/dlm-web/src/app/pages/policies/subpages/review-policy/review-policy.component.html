@@ -13,8 +13,8 @@
           <span>{{detail.value}}</span>
         </p>
         <div class="row">
-          <div class="col-md-4">
-            <div class="alert alert-warning alert-small">
+          <div class="col-md-12">
+            <div class="alert alert-warning alert-small inline-block">
               <i class="fa fa-warning text-warning"></i>
               <span class="text-warning">{{'page.policies.subpage.review.details.warning' | translate}}</span>
             </div>
@@ -27,9 +27,19 @@
     <div class="col-md-12">
       <div class="form-footer-wrap">
         <div class="form-footer">
+          <div class="pull-left" *ngIf="creationState?.error">
+            <div class="alert alert-danger alert-small">
+              <i class="fa fa-exclamation-circle"></i>
+              <span>{{'page.policies.subpage.review.error.create_policy' | translate}}.</span>
+              <span class="text-primary actionable" (click)="showErrorDetails()">Check error details</span>
+            </div>
+          </div>
           <div class="footer-controls pull-right">
             <button (click)="cancelReview()" class="btn btn-default">{{'common.cancel' | translate}}</button>
-            <button (click)="submitReview()" class="btn btn-success">{{'common.submit' | translate}}</button>
+            <button (click)="submitReview()" class="btn btn-success" [disabled]="creationState?.isInProgress">
+              {{'common.submit' | translate}}
+              <i class="fa fa-spinner fa-spin" *ngIf="creationState?.isInProgress"></i>
+            </button>
           </div>
           <div class="clearfix"></div>
         </div>
@@ -37,3 +47,13 @@
     </div>
   </div>
 </div>
+
+<dlm-modal-dialog #errorDetailsDialog
+  [title]="'page.policies.subpage.review.error.create_policy'"
+  [showCancel]="false">
+  <dlm-modal-dialog-body>
+    <code class="inline-block">
+      {{creationState?.errorMessage?.message}}
+    </code>
+  </dlm-modal-dialog-body>
+</dlm-modal-dialog>

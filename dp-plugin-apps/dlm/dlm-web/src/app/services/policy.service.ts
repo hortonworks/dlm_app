@@ -2,6 +2,7 @@ import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { PolicyPayload } from 'models/policy.model';
+import { mapResponse } from 'utils/http-util';
 
 @Injectable()
 export class PolicyService {
@@ -10,16 +11,15 @@ export class PolicyService {
 
   createPolicy(payload: { policy: PolicyPayload, targetClusterId: string }): Observable<any> {
     const { policy, targetClusterId } = payload;
-    return this.http.post(`clusters/${targetClusterId}/policy/${policy.policyDefinition.name}/submit`, policy)
-      .map(r => r.json());
+    return mapResponse(this.http.post(`clusters/${targetClusterId}/policy/${policy.policyDefinition.name}/submit`, policy));
   }
 
   fetchPolicies(): Observable<any> {
-    return this.http.get('policies').map(r => r.json());
+    return mapResponse(this.http.get('policies'));
   }
 
   fetchPolicy(id: string): Observable<any> {
-    return this.http.get(`policies/${id}`).map(r => r.json());
+    return mapResponse(this.http.get(`policies/${id}`));
   }
 
   removePolicy(id: string): Observable<any> {
@@ -27,8 +27,7 @@ export class PolicyService {
   }
 
   schedulePolicy(payload: { policyName: string, targetClusterId: string|number}) {
-    return this.http.put(`clusters/${payload.targetClusterId}/policy/${payload.policyName}/schedule`, {})
-      .map(r => r.json());
+    return mapResponse(this.http.put(`clusters/${payload.targetClusterId}/policy/${payload.policyName}/schedule`, {}));
   }
 
 }

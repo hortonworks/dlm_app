@@ -24,15 +24,15 @@ export class PolicyEffects {
 
   @Effect()
   createPolicy$: Observable<any> = this.actions$
-    .ofType(policyActions.CREATE_POLICY)
+    .ofType(policyActions.CREATE_POLICY.START)
     .map(toPayload)
     .switchMap(payload => {
       return this.policyService.createPolicy(payload)
         .mergeMap(response => [
-          createPolicySuccess(response),
+          createPolicySuccess(response, payload.meta),
           go(['/policies'])
         ])
-        .catch(err => Observable.of(createPolicyFail(err)));
+        .catch(err => Observable.of(createPolicyFail(err.json(), payload.meta)));
     });
 
   constructor(private actions$: Actions, private policyService: PolicyService) { }

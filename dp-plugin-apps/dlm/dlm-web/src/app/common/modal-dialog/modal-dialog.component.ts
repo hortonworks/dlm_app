@@ -14,7 +14,10 @@ import { ModalDirective } from 'ng2-bootstrap';
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">{{ body | translate}}</div>
+          <div class="modal-body">
+            {{ body | translate}}
+            <ng-content select="dlm-modal-dialog-body"></ng-content>
+          </div>
           <div class="modal-footer">
             <button *ngIf="showCancel" class="btn btn-default" (click)="onClickCancel()">{{ cancelText | translate }}</button>
             <button *ngIf="showIgnore" class="btn btn-warning" (click)="onClickIgnore()">{{ ignoreText | translate }}</button>

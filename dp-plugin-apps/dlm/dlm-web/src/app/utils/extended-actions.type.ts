@@ -4,6 +4,7 @@ export interface ActionSuccess extends Action {
   payload: {
     response: any;
     meta?: any;
+    [propName: string]: any;
   };
 };
 
