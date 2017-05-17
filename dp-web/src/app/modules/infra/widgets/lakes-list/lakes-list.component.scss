@@ -8,12 +8,6 @@
         font-weight: bold;
         display: inline-block;
     }
-    .mdl-button--add{
-        float: right;
-        padding: 0px;
-        min-height: 30px;
-        min-width: 130px;
-    }
 }
 .dp-input {
     position: relative;
@@ -23,7 +17,6 @@
     margin-right : 5px;
     min-width: 412px;
     border: 1px solid rgb(221, 221, 221);
-
 }
 
 input {
@@ -33,6 +26,7 @@ input {
   min-width: 250px;
   margin-left : 30px;
   border : none;
+  padding: 0px;
 }
 
 input:focus{
@@ -56,7 +50,7 @@ input:focus{
     thead {
         .actions {
             width: 75px;
-        } 
+        }
 
         th {
             height: 30px;

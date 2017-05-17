@@ -29,7 +29,7 @@ export class LakesComponent implements OnInit {
 
   private locations : any[] = [];
   mapData : MapData[] = [];
-  health = [];
+  health = new Map();
   mapSize: MapSize;
 
   constructor(
@@ -45,7 +45,7 @@ export class LakesComponent implements OnInit {
       .subscribe(lakes => {
         this.lakes = lakes;
         let locations = [];
-        let health = [];
+        let health = new Map();
         this.lakes.forEach((lake) => {
           let locationObserver = Observable.create();
           if(lake.data.location && lake.clusters && lake.clusters.length > 0){
@@ -54,8 +54,8 @@ export class LakesComponent implements OnInit {
             locationObserver = this.getLocationInfo(lake.data.location);
           }
          locationObserver.subscribe(locationInfo=> {
-           health.push(locationInfo.health);
-           this.health = health.slice();
+           health.set(lake.data.id, locationInfo.health);
+           this.health = new Map(health.entries());
            locations.push(new MapData(this.extractMapPoints(locationInfo)));
            this.mapData = locations.slice();
          });
@@ -72,7 +72,7 @@ export class LakesComponent implements OnInit {
         //         locations.push({start:this.extractMapPoints(locationInfo)});
         //         this.mapData = locations.slice();
         //      }
-        //    });                      
+        //    });
         //  });
         });
       });
@@ -87,7 +87,7 @@ export class LakesComponent implements OnInit {
               location :  response[0],
               health :  response[1]
             }
-            
+
       });
   }
 
@@ -99,9 +99,9 @@ export class LakesComponent implements OnInit {
     });
   }
 
-  private extractMapPoints(locationInfo){   
+  private extractMapPoints(locationInfo){
     if(!locationInfo.health){
-      return new Point(locationInfo.latitude, locationInfo.longitude, MapConnectionStatus.NA)
+      return new Point(locationInfo.location.latitude, locationInfo.location.longitude, MapConnectionStatus.NA)
     } else {
       let health = locationInfo.health;
       let location = locationInfo.location;
@@ -112,7 +112,7 @@ export class LakesComponent implements OnInit {
           status = MapConnectionStatus.DOWN;
         }else{
           status = MapConnectionStatus.NA;
-        }        
+        }
        return new Point(location.latitude, location.longitude, status);
     }
   }
