@@ -71,16 +71,16 @@ build_dp_web() {
 }
 
 build_dlm_web() {
+	log "Building dlm-web"
+	pushd ../dp-plugin-apps/dlm/dlm-web
 	if [ ${IS_JENKINS} == false ]; then
-		log "Building dlm-web"
-		pushd ../dp-plugin-apps/dlm/dlm-web
 		yarn
 		npm run build
-		cp -R ./dist/* ../../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-app/dlm-web
-		popd
 	else
-		echo "Not running DLM build"
+		echo "Not running dlm-web build again"
 	fi
+	cp -R ./dist/* ../../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-app/dlm-web
+	popd
 }
 
 build_dp_knox() {
