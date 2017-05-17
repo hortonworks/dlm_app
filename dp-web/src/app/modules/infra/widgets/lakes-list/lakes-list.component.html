@@ -1,0 +1,50 @@
+<div class="dashboard-title">
+    <span>Datalakes</span>
+    <a [routerLink]="['/onboard/lakes']" class="mdl-button--add mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect">
+       Add Datalake
+    </a>
+    <div class="dp-input">
+    <input type="text" placeholder="Search" name="name" id="search" (keyup)="filter($event)" />
+    <i class="fa fa-search dp-input__icon" aria-hidden="true"></i>
+    </div>
+
+</div>
+<table class="mdl-data-table mdl-js-data-table" on-mouseleave="hoveredIndex=null">
+  <thead>
+    <tr>
+      <th class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder">STATUS</th>
+      <th class="mdl-data-table__cell--non-numeric">NAME</th>
+      <th class="mdl-data-table__cell--non-numeric">NODES</th>
+      <th class="mdl-data-table__cell--non-numeric">UPTIME</th>
+      <th class="mdl-data-table__cell--non-numeric">SERVICES</th>
+      <th class="mdl-data-table__cell--non-numeric">HDFS USED</th>
+      <th class="mdl-data-table__cell--non-numeric">HDFS TOTAL</th>
+      <th class="mdl-data-table__cell--non-numeric actions"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let lakeHealth of lakesHealth; let index=index" on-mouseover="hoveredIndex=index">
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder">
+          <i class="fa fa-circle" aria-hidden="true" [ngClass]="{'fa-circle--color-up':isUp(lakeHealth.status), 'fa-circle--color-down':isDown(lakeHealth.status), 'fa-circle--color-na':isNotAvailable(lakeHealth.status)}"></i>
+      </td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--clickable mdl-data-table__cell--width15">{{lakeHealth.lake.data.name}}</td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable "><span *ngIf="lakeHealth.health">{{lakeHealth.health.nodes? lakeHealth.health.nodes : 'NA'}}</span></td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"><span *ngIf="lakeHealth.health && lakeHealth.health.status">{{lakeHealth.health.status.since ? doGetUptime(lakeHealth.health.status.since): 'NA'}}</span></td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"><span *ngIf="lakeHealth.health">{{lakeHealth.lake.data.services ? lakeHealth.lake.data.services : 'NA'}}</span></td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"><span *ngIf="lakeHealth.health">{{lakeHealth.health.usedSize ? lakeHealth.health.usedSize : 'NA'}}</span></td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"><span *ngIf="lakeHealth.health">{{lakeHealth.health.totalSize ? lakeHealth.health.totalSize : 'NA'}}</span></td>
+      <td class="mdl-data-table__cell--non-numeric actions">
+        <div *ngIf="index === hoveredIndex">
+          <button [attr.id]="'dropDown_'+lakeHealth.lake.data.id" class="mdl-button mdl-js-button mdl-button--icon"><i class="fa fa-ellipsis-v fa__fa-ellipsis-v--icon"></i></button>
+          <ul mdl class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+lakeHealth.lake.data.id">
+              <li class="mdl-menu__item"><i class="fa__fa-edit--icon fa fa-edit"></i>Edit</li>
+              <li class="mdl-menu__item"><i class="fa__fa-close--icon fa fa-close"></i>Delete</li>
+          </ul>
+        </div>
+      </td>
+    </tr>
+    <tr *ngIf="lakesHealth.length === 0">
+        <td colspan="7" class="mdl-data-table__cell--no-reults">There are no data lakes that match your search.</td>
+    </tr>
+  </tbody>
+</table>

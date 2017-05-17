@@ -1,0 +1,14 @@
+.leaflet-container{
+    background: #BCD6EE;
+}
+
+.map-container {
+    outline: none; 
+    margin: 0 auto;
+}
+
+:host /deep/ .leaflet-control {
+    a {
+        color : #2192BF
+    }
+}
