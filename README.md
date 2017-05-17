@@ -54,4 +54,20 @@
      * Enter `admin` and `admin-password` as username and password respectively.
      * You will be logged in and can proceed with rest of the functionality.
      * To stop/start/destroy Knox, you can do `./dpdeploy.sh [stop|start|destroy] knox`
+
+## Setup (from binaries)
+
+Dataplane docker images are published to docker-hub as a private repository in the `hortonworks` organization. If you need access to these images, please contact the Dataplane team for providing access with your docker-hub ID.
+
+In order to make it easy to work with these images, an installation tarball containing the `dpdeploy.sh` build script and other runtime files is published as a CI artifact. Each push of the docker images results in a new installation tarball to be created.
+
+The images are tagged with a {product-version}-{build-number} tag, for e.g 0.0.1-184. This is also the version of the installation tarball, and can be queried using the command `./dpdeploy.sh version`.
+
+So, to get a version of dataplane on a docker supported machine, do the following:
+
+* Download the last successful artifact of the installation tarball named `dp-installer-VERSION-BUILD.tar.gz` from [this location](http://172.22.85.155:8080/job/dp-docker-build/) 
+  * *Hint*: You can automatically fetch this from a script using the following URL: `wget http://172.22.85.155:8080/job/dp-docker-build/lastSuccessfulBuild/artifact/archive/dp-build/build/dp-docker/*zip*/dp-docker.zip` and extract the contents of the zip, which will contain the installation tarball within it.
+* Untar it.
+* `cd installer`
+* Execute the usual `dpdeploy.sh` commands described above. These will pull the correspondingly tagged images from docker-hub. The first pull from the docker-hub repo might take a while, but once the layers are cached, it should be faster.
   
