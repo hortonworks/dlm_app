@@ -29,7 +29,6 @@
 * For a fresh setup:
   * Initialize the Postgres database: `./dpdeploy.sh init db`
   * Then, run the DB migrations: `./dpdeploy.sh migrate`. This sets up the database schema using the Flyway migration tool (https://flywaydb.org/)
-  * The migrate command takes a while to complete. After it is done, you can kill the containers with a Ctrl+c
   * You can verify the status of migrations by executing the following steps:
     * `docker exec -it dpbuild_dp-database_1 psql -U dp_admin -W -h dp-database dataplane`
     * Enter `dp_admin` as the password

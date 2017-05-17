@@ -30,7 +30,7 @@ list_logs() {
 }
 
 migrate_schema() {
-    docker-compose -f docker-compose.yml -f docker-compose-migrate.yml up 
+    docker-compose -f docker-compose.yml -f docker-compose-migrate.yml run dp-migrate
 }
 
 destroy() {
