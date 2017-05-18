@@ -10,7 +10,9 @@ $button-height: 34px;
 
 /* DP Variables */
 $disabled-opacity: 0.6;
+$page-margins: 10px;
 
+$alto: #D3D3D3;
 $concrete: #F2F2F2;
 $oxford-blue: #333F54;
 $mine-shaft: #333333;
@@ -22,7 +24,7 @@ $forest-green-2: #429929;
 $iron: #CFD3D7;
 $oslo-gray: #808793;
 $dove-gray: #666666;
-$text-grey: rgba(255,255,255,0.6) !important;
+$text-grey: rgba(255,255,255,0.6);
 
 $header-height: $layout-header-desktop-row-height;
 $logo-background: $oxford-blue;

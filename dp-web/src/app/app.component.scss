@@ -1,3 +1,10 @@
+@import "../styles/variables";
+
 .dp-layout__drawer {
   background-color: rgb(213, 213, 213);
+}
+
+.page-content {
+  min-height: calc(100vh - #{$layout-header-desktop-row-height + $page-margins});
+  margin: $page-margins $page-margins 0px $page-margins;
 }
