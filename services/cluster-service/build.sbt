@@ -22,5 +22,6 @@ libraryDependencies ++= Seq(
   "org.apache.atlas" % "atlas-typesystem" % "0.8-incubating",
   "org.apache.atlas" % "atlas-intg" % "0.8-incubating",
   "org.codehaus.jackson" % "jackson-xc" % "1.9.13",
+  "org.slf4j" % "log4j-over-slf4j" % "1.7.25",
   "org.scalatest" % "scalatest_2.11" % "3.0.1" % Test,
   "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test)

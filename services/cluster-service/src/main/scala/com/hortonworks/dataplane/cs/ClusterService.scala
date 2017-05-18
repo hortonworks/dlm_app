@@ -40,7 +40,7 @@ object ClusterService extends App {
 
   // This hook takes care of setting up the application correctly
   // when consul and ZUUL services are available
-  // without them, the fallback configurations will be used
+  // without them fallback configurations will be used
   private def getHook = {
     new ConsulHook {
 
@@ -82,6 +82,8 @@ object ClusterService extends App {
       override def onServiceDeRegister(serviceId: String): Unit = logger.info(s"Service removed from consul $serviceId")
 
       override def onRecoverableException(reason: String, th: Throwable): Unit = logger.warn(reason,th)
+
+      override def onServiceCheck(serviceId: String): Unit = logger.info("Running a service check for serviceId "+serviceId)
     }
   }
 }

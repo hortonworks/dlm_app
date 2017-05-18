@@ -4,6 +4,8 @@ public interface ConsulHook {
 
   void onServiceRegistration(DpService dpService);
 
+  void onServiceCheck(String serviceId);
+
   void serviceRegistrationFailure(String serviceId,Throwable th);
 
   void onRecoverableException(String reason, Throwable th);

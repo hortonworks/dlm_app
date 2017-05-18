@@ -37,6 +37,8 @@ class ConsulInitializer @Inject()(config:Configuration){
       override def gatewayDiscovered(zuulServer: ZuulServer): Unit = ???
 
       override def gatewayDiscoverFailure(message: String, th: Throwable): Unit = ???
+
+      override def onServiceCheck(serviceId: String): Unit = Logger.info("Running a service check for serviceId "+serviceId)
     }
   }
 

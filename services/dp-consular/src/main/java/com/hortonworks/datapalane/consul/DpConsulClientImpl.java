@@ -5,9 +5,11 @@ import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.NewCheck;
 import com.ecwid.consul.v1.agent.model.NewService;
+import com.ecwid.consul.v1.agent.model.Service;
 import com.ecwid.consul.v1.health.model.HealthService;
 
 import java.util.List;
+import java.util.Map;
 
 public class DpConsulClientImpl implements DpConsulClient {
 
@@ -59,6 +61,12 @@ public class DpConsulClientImpl implements DpConsulClient {
   public ConsulResponse<List<HealthService>> getService() {
     Response<List<HealthService>> healthServices = consulClient.getHealthServices("zuul", true, QueryParams.DEFAULT);
     return ConsulResponse.from(healthServices);
+  }
+
+  @Override
+  public boolean checkServiceAvailability(String serviceId) {
+    Response<Map<String, Service>> agentServices = consulClient.getAgentServices();
+    return agentServices.getValue().keySet().contains(serviceId);
   }
 
 }
