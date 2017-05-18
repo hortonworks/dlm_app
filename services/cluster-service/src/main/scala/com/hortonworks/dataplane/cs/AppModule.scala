@@ -116,6 +116,7 @@ object AppModule extends AbstractModule {
         atlasRoute.hiveTables ~
         atlasRoute.atlasEntities ~
         atlasRoute.atlasEntity ~
+        atlasRoute.atlasLineage ~
         statusRoute.route ~
         statusRoute.sync ~
         ambariRoute.route

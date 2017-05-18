@@ -19,7 +19,9 @@ import com.hortonworks.dataplane.http.BaseRoute
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import org.apache.atlas.AtlasServiceException
+import play.api.libs.json.JsValue
 
+import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
 @Singleton
@@ -88,16 +90,20 @@ class AtlasRoute @Inject()(
     (id, uuid) =>
       get {
         val eventualValue = getInterface(id).getAtlasEntity(uuid)
-        onComplete(eventualValue) {
-          case Success(entities) => complete(success(entities))
-          case Failure(th) =>
-            th match {
-              case exception: AtlasServiceException =>
-                complete(exception.getStatus.getStatusCode, errors(th))
-              case _ => complete(StatusCodes.InternalServerError, errors(th))
-            }
-        }
+        handleResponse(eventualValue)
       }
+  }
+
+  private def handleResponse(eventualValue: Future[JsValue]) = {
+    onComplete(eventualValue) {
+      case Success(entities) => complete(success(entities))
+      case Failure(th) =>
+        th match {
+          case exception: AtlasServiceException =>
+            complete(exception.getStatus.getStatusCode, errors(th))
+          case _ => complete(StatusCodes.InternalServerError, errors(th))
+        }
+    }
   }
 
   val atlasEntities = path("cluster" / LongNumber / "atlas" / "guid") { id =>
@@ -105,19 +111,27 @@ class AtlasRoute @Inject()(
       parameters('query.*) { uuids =>
         get {
           val eventualValue = getInterface(id).getAtlasEntities(uuids)
-          onComplete(eventualValue) {
-            case Success(entities) => complete(success(entities))
-            case Failure(th) =>
-              th match {
-                case exception: AtlasServiceException =>
-                  complete(exception.getStatus.getStatusCode, errors(th))
-                case _ => complete(StatusCodes.InternalServerError, errors(th))
-              }
-          }
+          handleResponse(eventualValue)
         }
       }
     }
   }
+
+  val atlasLineage =
+    path("cluster" / LongNumber / "atlas" / Segment / "lineage") {
+      (cluster, guid) =>
+        pathEndOrSingleSlash {
+          parameters("depth".?) { depth =>
+            get {
+              val eventualValue =
+                getInterface(cluster).getAtlasLineage(guid, depth)
+              handleResponse(eventualValue)
+
+            }
+          }
+        }
+
+    }
 
   private def supplyApi(id: Long) = {
     Suppliers.memoizeWithExpiration(newInterface(id),
