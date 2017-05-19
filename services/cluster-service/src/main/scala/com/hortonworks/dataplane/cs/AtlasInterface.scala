@@ -11,5 +11,6 @@ trait AtlasInterface {
   def getHiveAttributes:Future[Seq[AtlasAttribute]]
   def getAtlasEntity(uuid:String):Future[JsValue]
   def getAtlasEntities(uuids:Iterable[String]):Future[JsValue]
+  def getAtlasLineage(uuid:String,depth:Option[String]):Future[JsValue]
 
 }
