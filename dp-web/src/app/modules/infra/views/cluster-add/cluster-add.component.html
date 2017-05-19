@@ -1,0 +1,99 @@
+  <div class="dashboard-title"><span>Dashboard</span></div>
+  <div class="page-container">
+    <div class="mdl-grid">
+      <div class="mdl-cell mdl-cell--12-col main">
+        <i class="fa fa-list-ul"></i>
+        <div class="form-container">
+          <span class="title-text">Add Your Cluster</span>
+          <span class="title-description-text">Add your ambari managed cluster to dataplane. This enables Dataplane to gather information about the cluster such as the name of the cluser, services running in the cluster etc. </span>
+          <div #ambariInput>
+            <span class="label-text">Ambari URL</span>
+            <span class="label-description-text">Ambari Server Url</span>
+            <input class="dp-input-url" name="url" type="text" [(ngModel)]="cluster.ambariurl" />
+            <button class="mdl-button btn-hwx-primary" (click)="doVerifyCluster($event)">
+              <span *ngIf="_isClusterValidateInProgress"><i class="fa fa-spinner"></i></span>
+              <span *ngIf="!_isClusterValidateInProgress">GO</span>
+            </button>
+          </div>
+          <div *ngIf="_isClusterValidateSuccessful && !_isClusterValid" class="error-section validation-error">
+            <i class="fa fa-times-circle"></i>
+            <div class="">
+              <span class="label-text">Not able to connect</span>
+              <span class="label-description-text">Dataplane could not retreive cluster information.</span>
+              <ul>
+                <li *ngFor="let reason of reasons">{{reason}}</li>
+              </ul>
+            </div>
+          </div>
+          <div *ngIf="showClusterDetails">
+            <div  class="cluster-details">
+              <div>
+                <span class="label-text">Cluster Name</span>
+                <span class="label-description-text">{{cluster.name}}</span>
+              </div>
+              <div>
+                <span class="label-text">Ip Address</span>
+                <span class="label-description-text">{{cluster.ipAddress}}</span>
+              </div>
+              <div>
+                <span class="label-text">Services</span>
+                <span *ngFor="let service of cluster.services" class="label-description-text"><i class="fa fa-check-circle"></i> {{service}}</span>
+              </div>
+            </div>
+              <div *ngIf="isDataLake" class="datalake-indicator">
+                <i class="fa fa-info-circle"></i>
+                <div class="datalake-notification">
+                <span class="label-text">Datalake</span>
+                <span class="label-description-text">This cluster has been indentified as a Datalake since it has data management services, ATLAS and RANGER running.  </span>
+                <span class="label-description-text"><a target="_blank" href="https://en.wikipedia.org/wiki/Data_lake">Learn More</a> </span>
+                </div>
+              </div>
+
+              <div  class="mdl-grid mdl-grid--no-spacing">
+                <div class="mdl-cell mdl-cell--12-col datalake-input">
+                  <div style="display: inline-block;padding: 30px">
+                    <div>
+                      <span class="label-text">Cluster Location</span>
+                      <span class="label-description-text">Geographical location of the cluster</span>
+                      <input class="dp-input" name="url" type="text" ngui-auto-complete
+                      [min-chars]=3
+                      [(ngModel)]="location"
+                      [source]="getLocations.bind(this)"
+                      [value-formatter]="locationFormatter"
+                      [list-formatter]="locationFormatter"
+                      [no-match-found-text]="'No locations found'"
+                      placeholder="Location"
+                      (valueChanged)="onSelectLocation(location)" [(ngModel)]="clusterName" />
+                    </div>
+                    <div>
+                      <span class="label-text">Tags</span>
+                      <span class="label-description-text">Tags for the cluster</span>
+                      <tagging-widget id="tags" [tags]="cluster.tags"
+                      [clearOnSearch]="true"
+                      (onNewSearch)="onNewTagAddition($event)"
+                      ></tagging-widget>
+                    </div>
+                    <div>
+                      <span class="label-text">Description</span>
+                      <span class="label-description-text">Description of the cluster</span>
+                      <textarea class="dp-textarea" [(ngModel)]="cluster.description"></textarea>
+                    </div>
+                  </div>
+                  <div style="display: inline-block; float: right">
+                    <div class="">
+                      <dp-map [mapData]="mapData" class="pull-right"  style="padding: 0px;margin-top:0px;margin-right: 0px" [mapSize]="1"></dp-map>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="button-container">
+                <button class="mdl-button btn-hwx-primary" (click)="onCreate($event)">Add</button>
+                <button class="mdl-button btn-hwx-primary" (click)="onCreateAndAdd($event)">Add & New</button>
+                <button class="mdl-button btn-hwx-secondary" (click)="onCancel($event)">Cancel</button>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+

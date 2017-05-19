@@ -34,4 +34,8 @@ export class ClusterService {
       .catch(HttpUtil.handleError);
   }
 
+  getClusterInfo(ambariUrl:string) :Observable<Cluster> {
+    return Observable.of(Cluster.getClusterInfo(ambariUrl));
+  }
+
 }
