@@ -8,7 +8,7 @@ import { TableColumn } from 'common/table/table-column.type';
   template: `
     <ng-template #actionCell let-row="row">
       <div class="table-actions">
-        <dlm-dropdown [items]="actions" [alignRight]="true" (onSelectItem)="handleSelectedAction(row, cell, $event)">
+        <dlm-dropdown [items]="actions" [alignRight]="true" (onSelectItem)="handleSelectedAction(row, $event)">
           <i class="fa fa-ellipsis-v text-primary"></i>
         </dlm-dropdown>
       </div>

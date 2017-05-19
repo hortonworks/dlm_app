@@ -9,9 +9,12 @@
     "duration": "Duration",
     "source": "Source",
     "destination": "Destination",
+    "description": "Description",
     "data": "Data",
     "path": "Path",
     "schedule": "Schedule",
+    "files": "Files",
+    "folders": "Folders",
     "time": {
       "hourly": "Hourly",
       "daily": "Daily",
@@ -124,6 +127,13 @@
       "header_create": "Create Replication Policy",
       "tags": "Tags",
       "groups": "Groups",
+      "data_summary": "Data Summary",
+      "perform_action": {
+        "confirmation": {
+          "title": "Confirm",
+          "body": "Are you sure?"
+        }
+      },
       "form": {
         "selected": "Selected",
         "sections": {
@@ -201,7 +211,8 @@
     },
     "jobs": {
       "header": "Jobs",
-      "header_note": ""
+      "header_note": "",
+      "prev_jobs": "prev jobs"
     },
     "notifications": {
       "header": "Notifications"

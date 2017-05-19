@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { MomentModule } from 'angular2-moment';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
+import { ModalModule } from 'ng2-bootstrap';
 
 import { MockTranslateLoader } from 'mocks/mock-translate-loader';
 import { PoliciesComponent } from './policies.component';
@@ -26,6 +27,7 @@ import { JobsTableComponent } from '../jobs/jobs-table/jobs-table.component';
 import { JobStatusComponent } from '../jobs/job-status/job-status.component';
 import { JobTransferredGraphComponent } from '../jobs/jobs-transferred-graph/job-transferred-graph.component';
 import { FrequencyPipe } from 'pipes/frequency.pipe';
+import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 
 describe('PoliciesComponent', () => {
   let component: PoliciesComponent;
@@ -35,7 +37,7 @@ describe('PoliciesComponent', () => {
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot({
         loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-      }), NgxDatatableModule, FormsModule, RouterTestingModule, CommonComponentsModule, MomentModule, ChartsModule],
+      }), NgxDatatableModule, FormsModule, RouterTestingModule, CommonComponentsModule, MomentModule, ChartsModule, ModalModule.forRoot()],
       declarations: [
         PoliciesComponent,
         PolicyTableComponent,
@@ -51,7 +53,8 @@ describe('PoliciesComponent', () => {
         FrequencyPipe,
         JobsTableComponent,
         JobStatusComponent,
-        JobTransferredGraphComponent
+        JobTransferredGraphComponent,
+        ModalDialogComponent
       ],
       providers: [
         {provide: Store, useClass: MockStore},
