@@ -1,19 +1,35 @@
 <dlm-table
+  [rowDetailHeight]="550"
   [rowDetailTemplate]="rowDetailRef"
   [theme]="tableTheme"
   [columns]="columns"
   [rows]="policies"
-  (selectAction)="handleSelectedAction($event)"
->
+  (selectAction)="handleSelectedAction($event)">
 </dlm-table>
 
 <dlm-icon-column></dlm-icon-column>
 <dlm-status-column></dlm-status-column>
-<dlm-policy-info (nameClick)="toggleRowDetail($event)"></dlm-policy-info>
+<dlm-policy-info (nameClick)="toggleRowDetail($event, policyContent.Files)"></dlm-policy-info>
 <dlm-flow-status></dlm-flow-status>
 
 <ng-template #durationCell let-seconds="value">
   {{seconds ? (seconds | amDateFormat:'hh:mm:ss') : 'Running'}}
+</ng-template>
+
+<ng-template #iconCellTemplate>
+  <span class="fa fa-arrow-right" aria-hidden="true"></span>
+</ng-template>
+
+<ng-template #scheduleCellTemplate let-value="value">
+  <span>{{value | frequency}}</span>
+</ng-template>
+
+<ng-template #prevJobs let-row="row">
+  <span class="actionable text-primary" (click)="toggleRowDetail(row, policyContent.Jobs)">
+    <i class="fa fa-circle"></i>
+    <i class="fa fa-circle"></i>
+    <i class="fa fa-circle"></i>
+  </span>
 </ng-template>
 
 <ng-template #lastGoodCell let-time="value">
@@ -21,16 +37,25 @@
 </ng-template>
 
 <ng-template #dataCell let-size="value" let-row="row">
-  <span class="text-primary actionable" (click)="toggleRowDetail(row)">{{size|bytesSize}}</span>
+  <span class="text-primary">{{size|bytesSize}}</span>
 </ng-template>
 
-<ng-template #expandActionCell let-row="row">
-  <i class="text-primary fa fa-ellipsis-v actionable" (click)="toggleRowDetail(row)"></i>
+<ng-template let-row="row" ngx-datatable-row-detail-template #rowDetailRef>
+  <dlm-policy-details [contentType]="activeContentType" [policy]="row" [jobs]="filteredJobs"></dlm-policy-details>
 </ng-template>
 
-<ng-template #rowDetailRef let-row="row">
-  <!-- File and Hive browser component goes here -->
-  <pre>
-    {{row | json}}
-  </pre>
-</ng-template>
+<dlm-modal-dialog
+  [title]="'page.policies.perform_action.confirmation.title'"
+  [body]="'page.policies.perform_action.confirmation.body'"
+  [showDialog]="showActionConfirmationModal"
+  (onClose)="onCloseActionConfirmationModal()"
+  (onOk)="onActionConfirmation()">
+</dlm-modal-dialog>
+
+<dlm-modal-dialog
+  [title]="lastOperationResponse.status"
+  [body]="lastOperationResponse.message"
+  [showDialog]="showOperationResponseModal"
+  [showCancel]="false"
+  (onClose)="onCloseOperationResponseModal()">
+</dlm-modal-dialog>

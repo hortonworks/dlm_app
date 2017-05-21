@@ -1,6 +1,7 @@
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
+import { Policy } from 'models/policy.model';
 
 @Injectable()
 export class JobService {
@@ -18,7 +19,12 @@ export class JobService {
   getJobsForClusters(clusterIds: string[]): Observable<any> {
     const requests = clusterIds.map(id => this.http.get(`clusters/${id}/jobs?filterBy=type:fs`).map(response => response.json()));
     return Observable.forkJoin(requests).map(responses =>
-      responses.reduce((response, combined) => ({policies: [...combined.policies, ...response.policies]}), {policies: []}));
+      responses.reduce((response, combined) => ({jobs: [...combined.jobs, ...response.jobs]}), {jobs: []}));
+  }
+
+  getJobsForPolicy(policy: Policy): Observable<any> {
+    const url = `clusters/${policy.targetClusterResource.id}/policy/${policy.name}/jobs`;
+    return this.http.get(url).map(r => r.json());
   }
 
 }

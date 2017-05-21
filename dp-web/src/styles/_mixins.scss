@@ -1,0 +1,40 @@
+@mixin summary-pane($class-name, $width) {
+  .#{$class-name} {
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      overflow: hidden;
+      color: $dhuttle-gray;
+      border: 1px solid $alto;
+    }
+
+    li {
+      float: left;
+      width: calc(#{$width} - 1px);
+      border-right: 1px solid $alto;
+    }
+
+    li:last-child {
+      border-right: 0px;
+    }
+
+    li div {
+      display: block;
+      text-align: left;
+      text-decoration: none;
+      padding: 20px;
+      line-height: 1.3;
+    }
+
+    .title {
+      font-size: 12px;
+    }
+
+    .value {
+      font-size: 13px;
+      font-weight: bold;
+    }
+  }
+}

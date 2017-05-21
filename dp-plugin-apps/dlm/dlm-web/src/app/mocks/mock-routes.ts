@@ -30,6 +30,5 @@ export const routes: MockRoute[] = [
   new MockRoute('clusters/:id/jobs', 'jobs.json'),
 
   // Events
-  new MockRoute('events', 'events.json'),
-  new MockRoute('new_events', 'new_events.json')
+  new MockRoute('events', 'events.json')
 ];

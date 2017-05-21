@@ -1,8 +1,25 @@
 /* You can add global styles to this file, and also import other style files */
-@import "_fonts.scss";
-@import "_variables.scss";
+    @import "fonts";
+@import "styles/variables";
+@import "styles/mdl-extend";
+@import "styles/buttons";
+@import "styles/mixins";
 
+body {
+  font-family: "Roboto";
+}
 
+.dp-view-pane {
+  padding: 20px 20px;
+  border: 1px solid $concrete;
+  min-height: calc(100vh - 85px);
+}
+
+div.spacer-34 {
+  height: 34px;
+}
 .mdl-button--green {
   background: $apple-green;
 }
+
+@include summary-pane("summary-pane-5", "20%");

@@ -22,6 +22,7 @@ import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { TableFooterComponent } from 'common/table/table-footer/table-footer.component';
 import { CheckboxComponent } from 'common/checkbox/checkbox.component';
 import { NavbarService } from 'services/navbar.service';
+import {FmtTzPipe} from 'pipes/fmt-tz.pipe';
 
 describe('OverviewComponent', () => {
   let component: OverviewComponent;
@@ -53,7 +54,8 @@ describe('OverviewComponent', () => {
         TableFooterComponent,
         CheckboxColumnComponent,
         ActionColumnComponent,
-        CheckboxComponent
+        CheckboxComponent,
+        FmtTzPipe
       ],
       providers: [
         {provide: Store, useClass: MockStore},

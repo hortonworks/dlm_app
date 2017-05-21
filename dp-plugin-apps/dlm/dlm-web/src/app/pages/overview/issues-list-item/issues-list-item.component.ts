@@ -18,7 +18,7 @@ import { Event } from 'models/event.model';
         <div class="description">{{ event.message }}</div>
         <div class="text-right text-muted timestamp">
           <small>
-            {{ event.timestamp | amTimeAgo }}
+            {{ event.timestamp | fmtTz | amTimeAgo }}
           </small>
         </div>
       </div>

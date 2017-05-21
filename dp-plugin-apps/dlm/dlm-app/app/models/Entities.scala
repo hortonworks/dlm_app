@@ -3,7 +3,7 @@ package models
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dlm.beacon.domain.RequestEntities._
 import com.hortonworks.dlm.beacon.domain.ResponseEntities._
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._
 

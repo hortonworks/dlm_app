@@ -26,9 +26,9 @@
       <ds-summary-holder  *ngIf="currentStage == 3" [dsModel]="dsModel"  [tags]="tags"></ds-summary-holder>
       <div class="navButtons">
         <br/>
-        <div *ngIf="nextIsVisible" class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionNext()">Next</div>
-        <div *ngIf="currentStage == 3" class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionSave()">Save</div>
-        <div *ngIf="nextIsVisible || currentStage == 3" class="mdl-color--blue mdl-color-text--white mdl-button" (click)="actionCancel()">Cancel</div>
+        <div *ngIf="nextIsVisible" class="mdl-button btn-hwx-primary" (click)="actionNext()">Next</div>
+        <div *ngIf="currentStage == 3" class="mdl-button btn-hwx-primary" (click)="actionSave()">Save</div>
+        <div *ngIf="nextIsVisible || currentStage == 3" class="mdl-button btn-hwx-secondary" (click)="actionCancel()">Cancel</div>
       </div>
     </div>
     <div style="clear:both;"></div>

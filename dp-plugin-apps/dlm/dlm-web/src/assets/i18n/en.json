@@ -9,12 +9,47 @@
     "duration": "Duration",
     "source": "Source",
     "destination": "Destination",
+    "description": "Description",
     "data": "Data",
+    "path": "Path",
+    "schedule": "Schedule",
+    "files": "Files",
+    "folders": "Folders",
     "time": {
       "hourly": "Hourly",
       "daily": "Daily",
       "weekly": "Weekly",
       "monthly": "Monthly"
+    },
+    "frequency": {
+      "yearly": {
+        "plural": "Every {{num}} years",
+        "singular": "Every year"
+      },
+      "monthly": {
+        "plural": "Every {{num}} months",
+        "singular": "Every month"
+      },
+      "weekly": {
+        "plural": "Every {{num}} weeks",
+        "singular": "Every week"
+      },
+      "daily": {
+        "plural": "Every {{num}} days",
+        "singular": "Every day"
+      },
+      "hourly": {
+        "plural": "Every {{num}} hours",
+        "singular": "Every hour"
+      },
+      "minutely": {
+        "plural": "Every {{num}} minutes",
+        "singular": "Every minute"
+      },
+      "secondly": {
+        "plural": "Every {{num}} seconds",
+        "singular": "Every second"
+      }
     },
     "table": {
       "summary": "{{shown}} of {{count}} showing",
@@ -46,6 +81,11 @@
       "in_progress": "In Progress",
       "warnings": "Warnings",
       "failed": "Failed"
+    }
+  },
+  "forms": {
+    "validation_errors": {
+      "required": "\"{{fieldLabel}}\" is required"
     }
   },
   "page": {
@@ -87,6 +127,13 @@
       "header_create": "Create Replication Policy",
       "tags": "Tags",
       "groups": "Groups",
+      "data_summary": "Data Summary",
+      "perform_action": {
+        "confirmation": {
+          "title": "Confirm",
+          "body": "Are you sure?"
+        }
+      },
       "form": {
         "selected": "Selected",
         "sections": {
@@ -120,6 +167,9 @@
             "files": "Files",
             "destination": "Destination",
             "warning": "The first run of the policy will take some time."
+          },
+          "error": {
+            "create_policy": "Create policy failed"
           }
         }
       }
@@ -161,7 +211,8 @@
     },
     "jobs": {
       "header": "Jobs",
-      "header_note": ""
+      "header_note": "",
+      "prev_jobs": "prev jobs"
     },
     "notifications": {
       "header": "Notifications"

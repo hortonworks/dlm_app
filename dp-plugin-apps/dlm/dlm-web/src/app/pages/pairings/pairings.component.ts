@@ -10,6 +10,7 @@ import { Observable } from 'rxjs/Observable';
 import { getAllPairings } from 'selectors/pairing.selector';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
+import { ClusterPairing } from 'models/cluster-pairing.model';
 
 @Component({
   selector: 'dlm-pairings',
@@ -20,8 +21,19 @@ export class PairingsComponent implements OnInit {
 
   @ViewChild('confirmationModal') public confirmationModel: ModalDialogComponent;
   pairings$: Observable<Pairing[]>;
-  private pairings: Pairing[];
   private unpairParams: Array<Object>;
+
+  static getBeaconUrl(cluster: Cluster | ClusterPairing): string {
+    let beaconUrl = '';
+    if (cluster.services && cluster.services.length) {
+      // todo: change servicename to BEACON_SERVER once dataplane fixes the service name
+      const beaconService = cluster.services.filter(service => service.servicename === 'BEACON');
+      if (beaconService.length) {
+        beaconUrl = beaconService[0].fullURL;
+      }
+    }
+    return beaconUrl;
+  }
 
   constructor(
     private store: Store<fromRoot.State>,
@@ -34,7 +46,6 @@ export class PairingsComponent implements OnInit {
 
   ngOnInit() {
     this.store.dispatch(loadPairings());
-    this.pairings$.subscribe(pairings => this.pairings = pairings);
   }
 
   createPairingClickHandler() {
@@ -44,30 +55,19 @@ export class PairingsComponent implements OnInit {
   onUnpair(pair: Pairing) {
     this.unpairParams = [{
       clusterId: pair.pair[0].id,
-      beaconUrl: this.getBeaconUrl(pair.pair[0])
+      beaconUrl: PairingsComponent.getBeaconUrl(pair.pair[0])
     },
     {
       clusterId: pair.pair[1].id,
-      beaconUrl: this.getBeaconUrl(pair.pair[1])
+      beaconUrl: PairingsComponent.getBeaconUrl(pair.pair[1])
     }];
     const params = {
       firstCluster: pair.pair[0].name,
       secondCluster: pair.pair[1].name
     };
     this.confirmationModel.body = this.translate.instant(
-      'page.pairings.unpair.confirmation.description', params);
+      'page.pairings.unpair.confirmation.body', params);
     this.confirmationModel.show();
-  }
-
-  getBeaconUrl(cluster: Cluster): string {
-    let beaconUrl = '';
-    if (cluster.services && cluster.services.length) {
-      const beaconService = cluster.services.filter(service => service.servicename === 'BEACON_SERVER');
-      if (beaconService.length) {
-        beaconUrl = beaconService[0].fullURL;
-      }
-    }
-    return beaconUrl;
   }
 
   onConfirmation() {

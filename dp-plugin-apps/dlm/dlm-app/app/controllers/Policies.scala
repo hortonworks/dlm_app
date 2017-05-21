@@ -12,6 +12,7 @@ import services.BeaconService
 
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._
+import com.hortonworks.dlm.webhdfs.domain.JsonFormatters._
 import models.JsonFormatters._
 
 
@@ -24,9 +25,10 @@ class Policies @Inject() (val beaconService: BeaconService) extends Controller {
   /**
     * Get all policies across all DLM enabled clusters
     */
-  def list() = Action.async {
+  def list() = Action.async { request =>
     Logger.info("Received list all policies request")
-    beaconService.getAllPolicies.map {
+    val queryString : Map[String,String] = request.queryString.map { case (k,v) => k -> v.mkString }
+    beaconService.getAllPolicies(queryString).map {
       case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
       case Right(policiesDetailsResponse) => Ok(Json.toJson(policiesDetailsResponse))
 

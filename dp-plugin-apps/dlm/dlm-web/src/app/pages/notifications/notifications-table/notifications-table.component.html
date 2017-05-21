@@ -5,5 +5,5 @@
 </dlm-table>
 
 <ng-template #agoTemplate let-value="value">
-  <span>{{value | amTimeAgo}}</span>
+  <span>{{value | fmtTz | amTimeAgo}}</span>
 </ng-template>

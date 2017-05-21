@@ -32,6 +32,10 @@ export const routes: Routes = [{
     path: 'dashboard',
     loadChildren: './modules/dashboard/dashboard.module#DashboardModule',
     canActivate:[ SignedInForSecureGuard ]
+  },{
+    path: 'assets',
+    loadChildren: './modules/assets/asset.module#AssetModule',
+    canActivate:[ SignedInForSecureGuard ]
   }, {
     path: '',
     pathMatch: 'full',

@@ -6,10 +6,10 @@ import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
 import { NavbarService } from 'services/navbar.service';
-import {ColumnMode, DatatableComponent, DatatableRowDetailDirective} from '@swimlane/ngx-datatable';
-import {CheckboxColumnComponent} from 'components/table-columns/checkbox-column/checkbox-column.component';
-import {ActionColumnType, ActionItemType, ActionColumnComponent} from 'components/';
-import {TableTheme, TableThemeSettings} from './table-theme.type';
+import { ColumnMode, DatatableComponent, DatatableRowDetailDirective } from '@swimlane/ngx-datatable';
+import { CheckboxColumnComponent } from 'components/table-columns/checkbox-column/checkbox-column.component';
+import { ActionColumnType, ActionItemType, ActionColumnComponent } from 'components/';
+import { TableTheme, TableThemeSettings } from './table-theme.type';
 
 export const SELECTED_KEY_NAME = '__selected';
 
@@ -22,11 +22,21 @@ export const SELECTED_KEY_NAME = '__selected';
 export class TableComponent implements OnChanges, OnDestroy {
   private _columns: any[];
   private _rows: any[];
-  private _headerHeight: string|number;
-  private _rowHeight: string|number;
-  private _footerHeight: string|number;
+  private _headerHeight: string | number;
+  private _rowHeight: string | number;
+  private _footerHeight: string | number;
   private navbarCollapse$: Observable<boolean>;
   private navbarCollapseSubscription: Subscription;
+
+  /**
+   * Map for expanded rows
+   * Keys - model's ids
+   * Values - true for expanded, false for collapsed
+   *
+   * This map is need because ngx-datatable stores info about expanded rows in the rows itself (`$$expanded`-property)
+   * After table data is updated from store all `$$expanded` markers are removed and rows becomes collapsed
+   */
+  expandedRows = {};
 
   actions: ActionItemType[];
   @ViewChild(CheckboxColumnComponent) checkboxColumn: CheckboxColumnComponent;
@@ -57,27 +67,27 @@ export class TableComponent implements OnChanges, OnDestroy {
     }
   };
 
-  @Input() set headerHeight(value: string|number) {
+  @Input() set headerHeight(value: string | number) {
     this._headerHeight = value;
   }
 
-  get headerHeight(): string|number {
+  get headerHeight(): string | number {
     return this._headerHeight || TableThemeSettings[this.theme].headerHeight;
   }
 
-  @Input() set rowHeight(value: string|number) {
+  @Input() set rowHeight(value: string | number) {
     this._rowHeight = value;
   }
 
-  get rowHeight(): string|number {
+  get rowHeight(): string | number {
     return this._rowHeight || TableThemeSettings[this.theme].rowHeight;
   }
 
-  @Input() set footerHeight(value: string|number) {
+  @Input() set footerHeight(value: string | number) {
     this._footerHeight = value;
   }
 
-  get footerHeight(): string|number {
+  get footerHeight(): string | number {
     return this._footerHeight || TableThemeSettings[this.theme].footerHeight;
   }
 
@@ -118,13 +128,18 @@ export class TableComponent implements OnChanges, OnDestroy {
     }
   }
 
-  @HostBinding('class') get className() { return TableThemeSettings[this.theme].className; };
+  @HostBinding('class') get className() {
+    return TableThemeSettings[this.theme].className;
+  };
 
   get rows(): any[] {
     return this._rows;
   }
 
   limit = 10;
+
+  @Input() showPageSizeMenu = true;
+  @Input() multiExpand = false;
 
   constructor(private navbar: NavbarService) {
     this.navbarCollapse$ = this.navbar.isCollapsed;
@@ -153,8 +168,18 @@ export class TableComponent implements OnChanges, OnDestroy {
     this.table.onFooterPage({page});
   }
 
+  /**
+   * Expand or collapse selected row
+   * If `multiExpand` is false, previously expanded row will be collapsed
+   */
   toggleRowDetail(row) {
+    const expandedRows = Object.keys(this.expandedRows).filter(k => !!this.expandedRows[k]);
+    if (!this.multiExpand && !this.expandedRows[row.id] && expandedRows.length) {
+      this.table.rowDetail.collapseAllRows();
+      this.expandedRows = {};
+    }
     this.table.rowDetail.toggleExpandRow(row);
+    this.expandedRows[row.id] = !this.expandedRows[row.id];
   }
 
   ngOnChanges(changes) {
@@ -163,6 +188,15 @@ export class TableComponent implements OnChanges, OnDestroy {
       if (!firstChange && currentValue && previousValue && currentValue.length < previousValue.length) {
         this.table.offset = 0;
       }
+      // restore expanded rows after data update
+      Object.keys(this.expandedRows).forEach(id => {
+        if (this.expandedRows[id]) {
+          const policy = this.rows.find(p => p.id === id);
+          if (policy) {
+            this.table.rowDetail.toggleExpandRow(policy);
+          }
+        }
+      });
     }
   }
 

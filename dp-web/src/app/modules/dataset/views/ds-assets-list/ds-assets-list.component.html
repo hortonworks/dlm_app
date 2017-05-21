@@ -13,9 +13,9 @@
     <div class="tabCount"><span *ngIf="dsModel.counts">{{dsModel.counts.filesCount}}</span></div>
   </div>
   <span class="actionButtonCont">
-    <div *ngIf="applicableActions.indexOf(actionEnum.REMOVE) != -1" class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionRemove()">Remove</div>
-    <div *ngIf="applicableActions.indexOf(actionEnum.ADD) != -1" class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionAddMore()">Add more</div>
-    <div *ngIf="applicableActions.indexOf(actionEnum.EDIT) != -1" class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionEdit()">Edit</div>
+    <button *ngIf="applicableActions.indexOf(actionEnum.REMOVE) != -1" class="mdl-button btn-hwx-secondary" (click)="actionRemove()">Remove</button>
+    <button *ngIf="applicableActions.indexOf(actionEnum.ADD) != -1" class="mdl-button btn-hwx-secondary" (click)="actionAddMore()">Add Assets</button>
+    <button *ngIf="applicableActions.indexOf(actionEnum.EDIT) != -1" class="mdl-button btn-hwx-primary" (click)="actionEdit()">Edit</button>
   </span>
   <div style="clear: both;"></div>
 </div>

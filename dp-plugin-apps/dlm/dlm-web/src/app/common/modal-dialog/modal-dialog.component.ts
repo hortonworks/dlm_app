@@ -1,4 +1,7 @@
-import { Component, OnInit, OnChanges, SimpleChange, Input, Output, EventEmitter, ViewChild } from '@angular/core';
+import {
+  Component, OnInit, OnChanges, SimpleChange, Input, Output, EventEmitter, ViewChild,
+  HostListener
+} from '@angular/core';
 import { ModalDirective } from 'ng2-bootstrap';
 
 @Component({
@@ -14,7 +17,10 @@ import { ModalDirective } from 'ng2-bootstrap';
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">{{ body | translate}}</div>
+          <div class="modal-body">
+            {{ body | translate}}
+            <ng-content select="dlm-modal-dialog-body"></ng-content>
+          </div>
           <div class="modal-footer">
             <button *ngIf="showCancel" class="btn btn-default" (click)="onClickCancel()">{{ cancelText | translate }}</button>
             <button *ngIf="showIgnore" class="btn btn-warning" (click)="onClickIgnore()">{{ ignoreText | translate }}</button>
@@ -46,6 +52,14 @@ export class ModalDialogComponent implements OnInit, OnChanges {
   @Output() onDelete = new EventEmitter<boolean>();
   @Output() onIgnore = new EventEmitter<boolean>();
   @Output() onCancel = new EventEmitter<boolean>();
+  @Output() onClose = new EventEmitter<boolean>();
+
+  @HostListener('keydown', ['$event']) handleKeyboardEvents(event: KeyboardEvent) {
+    const code = event.which || event.keyCode;
+    if (code === 27) {
+      this.hide();
+    }
+  }
 
   constructor() { }
 
@@ -66,6 +80,7 @@ export class ModalDialogComponent implements OnInit, OnChanges {
   }
 
   public hide(): void {
+    this.onClose.emit();
     this.childModal.hide();
   }
 

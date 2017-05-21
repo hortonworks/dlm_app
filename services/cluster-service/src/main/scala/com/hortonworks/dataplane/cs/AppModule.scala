@@ -3,16 +3,10 @@ package com.hortonworks.dataplane.cs
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provides, Singleton}
-import com.hortonworks.dataplane.db.Webserice.{
-  ClusterComponentService,
-  ClusterHostsService,
-  ClusterService,
-  ConfigService,
-  LakeService
-}
+import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, LakeService}
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.http.Webserver
-import com.hortonworks.dataplane.http.routes.{AtlasRoute, StatusRoute}
+import com.hortonworks.dataplane.http.routes.{AmbariRoute, AtlasRoute, StatusRoute}
 import com.typesafe.config.{Config, ConfigFactory}
 import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcWSClient
@@ -99,17 +93,35 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
+  def provideAmbariRoute(storageInterface: StorageInterface,
+                         config: Config,
+                         wSClient: WSClient): AmbariRoute = {
+    new AmbariRoute(wSClient, storageInterface, config)
+  }
+
+  @Provides
+  @Singleton
   def provideWebservice(actorSystem: ActorSystem,
                         materializer: ActorMaterializer,
                         configuration: Config,
                         atlasRoute: AtlasRoute,
-                        statusRoute: StatusRoute): Webserver = {
+                        statusRoute: StatusRoute,ambariRoute: AmbariRoute): Webserver = {
     import akka.http.scaladsl.server.Directives._
     new Webserver(
       actorSystem,
       materializer,
       configuration,
-      atlasRoute.hiveAttributes ~ atlasRoute.hiveTables ~ atlasRoute.atlasEntities ~ atlasRoute.atlasEntity ~ statusRoute.route ~ statusRoute.sync)
+
+      atlasRoute.hiveAttributes ~
+        atlasRoute.hiveTables ~
+        atlasRoute.atlasEntities ~
+        atlasRoute.atlasEntity ~
+        atlasRoute.atlasLineage ~
+        statusRoute.route ~
+        statusRoute.sync ~
+        ambariRoute.route
+    )
+
   }
 
   @Provides

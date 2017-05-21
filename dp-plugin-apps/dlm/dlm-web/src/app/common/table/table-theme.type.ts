@@ -1,7 +1,7 @@
 export enum TableTheme {
   Plain,
   Cards
-};
+}
 
 export const PLAIN_TABLE_ROW_HEIGHT = 36;
 
@@ -10,7 +10,7 @@ export interface ThemeSetting {
   rowHeight: string|number;
   headerHeight: string|number;
   footerHeight: string|number;
-};
+}
 
 export const TableThemeSettings = {
   [TableTheme.Plain]: <ThemeSetting>{

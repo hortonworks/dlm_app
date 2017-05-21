@@ -3,17 +3,15 @@ package services
 import javax.inject.{Inject, Singleton}
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
-import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconApiError, BeaconApiErrors, BeaconEventResponse, PairedCluster, PolicyDataResponse, PolicyInstanceResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
-import com.hortonworks.dlm.beacon.WebService.{BeaconClusterService, BeaconPairService, BeaconPolicyInstanceService, BeaconPolicyService, BeaconEventService}
+import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconApiError, BeaconApiErrors, BeaconEventResponse, PairedCluster, PolicyDataResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
+import com.hortonworks.dlm.beacon.WebService.{BeaconClusterService, BeaconEventService, BeaconPairService, BeaconPolicyInstanceService, BeaconPolicyService}
 import com.hortonworks.dlm.beacon.domain.RequestEntities.ClusterDefinitionRequest
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import models.Entities._
 import models.PolicyAction
-import models.{DELETE, RESUME, SCHEDULE, SUSPEND}
-
-import play.api.http.Status.{BAD_GATEWAY, SERVICE_UNAVAILABLE, INTERNAL_SERVER_ERROR}
+import models.{DELETE, RESUME, SCHEDULE, SUSPEND, DESCEND}
+import play.api.http.Status.INTERNAL_SERVER_ERROR
 
 import scala.collection.immutable.Set.Set2
 import scala.concurrent.Future
@@ -25,6 +23,7 @@ import scala.concurrent.Promise
   * @param beaconPairService beacon service to communicate with beacon pair endpoints
   * @param beaconPolicyService   beacon service to communicate with beacon policy endpoints
   * @param dataplaneService      dataplane service to interact with dataplane db service
+  * @param webhdfsService        webhdfs client service
   */
 @Singleton
 class BeaconService @Inject()(
@@ -33,7 +32,8 @@ class BeaconService @Inject()(
    @Named("beaconPolicyService") val beaconPolicyService: BeaconPolicyService,
    @Named("beaconPolicyInstanceService") val beaconPolicyInstanceService: BeaconPolicyInstanceService,
    @Named("beaconEventService") val beaconEventService: BeaconEventService,
-          val dataplaneService: DataplaneService) {
+   val dataplaneService: DataplaneService,
+   val webhdfsService: WebhdfsService) {
 
   /**
     * Get list of all paired clusters
@@ -89,8 +89,8 @@ class BeaconService @Inject()(
   def pairClusters(clustersToBePaired: Set[PairClusterRequest]): Future[Either[BeaconApiErrors, PostActionResponse]] = {
     val p: Promise[Either[BeaconApiErrors, PostActionResponse]] = Promise()
 
-    if (clustersToBePaired.size != 2) {
-      val errorMsg: String = "Request payload should be a set of two objects"
+    if (clustersToBePaired.size != BeaconService.PAIR_CLUSTER_SIZE) {
+      val errorMsg: String = BeaconService.clusterPairPaylodError
       p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(BeaconApiError(errorMsg)))))
     } else {
       val clustersToBePairedSeq = clustersToBePaired.toSeq
@@ -119,14 +119,13 @@ class BeaconService @Inject()(
                 if (!x.exists(_.isLeft)) {
                   createPair(listOfClusters, p)
                 } else {
-                  val errorMsg: String = "Error occurred while submitting cluster definition to Beacon service"
-                  p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(BeaconApiError(errorMsg)))))
+                  p.success(Left(x.find(_.isLeft).get.left.get))
                 }
               }
             })
           }
         } else {
-          val errorMsg: String = "Error occurred while getting API response from DB service or/and Beacon service"
+          val errorMsg: String = BeaconService.pairClusterError
           p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(BeaconApiError(errorMsg)))))
         }
       }
@@ -196,8 +195,8 @@ class BeaconService @Inject()(
     */
   def unPairClusters(clustersToBeUnpaired: Set[PairClusterRequest]): Future[Either[BeaconApiErrors, PostActionResponse]] = {
     val p: Promise[Either[BeaconApiErrors, PostActionResponse]] = Promise()
-    if (clustersToBeUnpaired.size != 2) {
-      val errorMsg: String = "Request payload should be a set of two objects"
+    if (clustersToBeUnpaired.size != BeaconService.PAIR_CLUSTER_SIZE) {
+      val errorMsg: String = BeaconService.clusterPairPaylodError
       p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(BeaconApiError(errorMsg)))))
     } else {
       val clustersToBeUnpairedSeq = clustersToBeUnpaired.toSeq
@@ -212,8 +211,9 @@ class BeaconService @Inject()(
             case Right(clusterUnpairResponse) => p.success(Right(clusterUnpairResponse))
           })
         } else {
-          val errorMsg: String = "Error occurred while getting response for cluster API from DB service"
-          p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(BeaconApiError(errorMsg)))))
+          val failedErrorMsg = futureFailedList.head.left.get.errors.head.message
+          val errorCode = futureFailedList.head.left.get.errors.head.code
+          p.success(Left(BeaconApiErrors(errorCode.toInt, None, None, Some(failedErrorMsg))))
         }
       }
     }
@@ -221,18 +221,91 @@ class BeaconService @Inject()(
   }
 
   /**
+    * Get transformed query string to be made against each beacon server
+    * @param queryString querystring made ahgainst dlm-app
+    * @return
+    */
+  def getQueryStringForResources(queryString : Map[String, String], pageLenth: Option[String], offset: Int) : Map[String, String] = {
+    pageLenth  match {
+      case None => queryString
+      case Some(pageLength) =>
+        val totalPageLength = (offset+ pageLength.toInt).toString
+        queryString + (BeaconService.API_OFFSET_KEY -> BeaconService.API_OFFSET_DEFAULT_VALUE) + (BeaconService.API_PAGE_SIZE_KEY -> totalPageLength)
+    }
+  }
+
+  /**
+    * Gets ordered and paginated single response for the query made to DLM
+    * @param resources                resources as responded and aggregated from all beacon servers
+    * @param queryStringPaginated     API query  made against all beacon server
+    * @param pageLenth                page size
+    * @param offset                   offset of the page
+    * @tparam T                       resource
+    * @return
+    */
+  def getProcessedResponse[T <: AnyRef](resources: Seq[T], queryStringPaginated : Map[String, String],
+                                        pageLenth: Option[String], offset: Int) : Seq[T] = {
+    getPaginatedResponse(getOrderedResponse(resources, queryStringPaginated), pageLenth, offset)
+  }
+
+  /**
+    * Gets paginated esponse for the query made to DLM
+    * @param resources              resources as responded and aggregated from all beacon servers
+    * @param pageLenth              page size
+    * @param offset                 offset of the page
+    * @tparam T                     resource
+    * @return
+    */
+  def getPaginatedResponse[T <: AnyRef](resources: Seq[T], pageLenth: Option[String], offset: Int) : Seq[T] = {
+    pageLenth match {
+      case None => resources
+      case Some(pageLength) => resources.slice(offset, offset + pageLength.toInt)
+    }
+  }
+
+  /**
+    * Gets ordered response for the query made to DLM
+    * @param resources              resources as responded and aggregated from all beacon servers
+    * @param queryStringPaginated   API query  made against all beacon server
+    * @tparam T                     resource
+    * @return
+    */
+  def getOrderedResponse[T <: AnyRef](resources: Seq[T], queryStringPaginated : Map[String, String]) : Seq[T] = {
+    val sortOrder = queryStringPaginated.get(BeaconService.API_SORTORDER_KEY)
+    val orderBy = queryStringPaginated.get(BeaconService.API_ORDERBY_KEY)
+
+    orderBy match {
+      case None => resources
+      case Some(orderBy) => {
+        val field = resources.head.getClass.getDeclaredField(orderBy)
+        field.setAccessible(true)
+        sortOrder match {
+          case None => resources.sortWith(field.get(_).asInstanceOf[String] < field.get(_).asInstanceOf[String])
+          case Some(sortOrder) => if (sortOrder == DESCEND.name) {
+            resources.sortWith(field.get(_).asInstanceOf[String] > field.get(_).asInstanceOf[String])
+          } else {
+            resources.sortWith(field.get(_).asInstanceOf[String] < field.get(_).asInstanceOf[String])
+          }
+        }
+      }
+    }
+  }
+
+  /**
     * Get all policies for DLM enabled clusters
-    *
+    * @param  queryString query parameters made with the `Get all policies api`
     * @return [[PoliciesDetailsResponse]]
     */
-  def getAllPolicies: Future[Either[DlmApiErrors, PoliciesDetailsResponse]] = {
+  def getAllPolicies(queryString : Map[String, String]): Future[Either[DlmApiErrors, PoliciesDetailsResponse]] = {
     val p: Promise[Either[DlmApiErrors, PoliciesDetailsResponse]] = Promise()
     dataplaneService.getBeaconClusters.map {
-
-      case Left(errors) => {
-        p.success(Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))))
-      }
+      case Left(errors) => p.success(Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None,
+                                     Some(errors.errors.map(x => BeaconApiError(x.message)).head))))))
       case Right(beaconCluster) => {
+        val originalPageLenth : Option[String] = queryString.get(BeaconService.API_PAGE_SIZE_KEY)
+        val originalOffset : Int = queryString.getOrElse(BeaconService.API_OFFSET_KEY, BeaconService.API_OFFSET_DEFAULT_VALUE).toInt
+        val queryStringPaginated = getQueryStringForResources(queryString, originalPageLenth, originalOffset)
+
         val beaconClusters = beaconCluster.clusters
         val allPoliciesFuture: Future[Seq[Either[BeaconApiErrors, Seq[PolicyDetailsData]]]] =
           Future.sequence(beaconClusters.map((x) => beaconPolicyService.listPolicies(
@@ -244,17 +317,18 @@ class BeaconService @Inject()(
           val allPolicies: Seq[PolicyDetailsData] = allPoliciesOption.filter(_.isRight).flatMap(_.right.get)
           val allPoliciesData: List[PolicyDetailsData] = allPolicies.foldLeft(List(): List[PolicyDetailsData]) {
             (acc, next) => {
-              if (acc.exists(x => x.name == next.name && x.sourceclusters.head == next.sourceclusters.head && x.targetclusters.head == next.targetclusters.head)) acc
+              if (acc.exists(x => x.name == next.name && x.sourceCluster== next.sourceCluster && x.sourceCluster == next.sourceCluster)) acc
               else {
                 next :: acc
               }
             }
           }.reverse.filter((policy) => { // filter policies on cluster set that are registered to dataplane
-            beaconClusters.exists(x => x.name == policy.sourceclusters.head) && beaconClusters.exists(x => x.name == policy.targetclusters.head)
+            beaconClusters.exists(x => x.name == policy.sourceCluster) && beaconClusters.exists(x => x.name == policy.targetCluster)
           })
 
-          val policiesDetails: Seq[PoliciesDetails] = allPoliciesData.map(policy => {
-            PoliciesDetails(policy.name, policy.`type`, policy.status, policy.frequencyInSec, policy.startTime, policy.endTime, policy.sourceclusters.head, policy.targetclusters.head)
+          val policies : Seq[PolicyDetailsData] = getProcessedResponse(allPoliciesData, queryStringPaginated, originalPageLenth, originalOffset)
+          val policiesDetails: Seq[PoliciesDetails] = policies.map(policy => {
+            PoliciesDetails(policy.name, policy.`type`, policy.status, policy.frequencyInSec, policy.startTime, policy.endTime, policy.sourceCluster, policy.targetCluster)
           })
 
           val failedResponses: Seq[BeaconApiErrors] = allPoliciesOption.filter(_.isLeft).map(_.left.get)
@@ -272,8 +346,8 @@ class BeaconService @Inject()(
   /**
     * Get policy details
     *
-    * @param clusterId
-    * @param policyName
+    * @param clusterId    cluster id
+    * @param policyName   policy name
     * @return
     */
   def getPolicy(clusterId: Long, policyName: String): Future[Either[BeaconApiErrors, PolicyDataResponse]] = {
@@ -303,8 +377,8 @@ class BeaconService @Inject()(
       case Right(beaconService) => {
         val fullUrl = beaconService.fullURL
         val policyResponseFuture: Option[() => Future[Either[BeaconApiErrors, PostActionResponse]]] = Map(
-          "SUBMIT" -> { () => beaconPolicyService.submitPolicy(fullUrl, policyName, policySubmitRequest.policyDefinition) },
-          "SUBMIT_AND_SCHEDULE" -> { () => beaconPolicyService.submitAndSchedulePolicy(fullUrl, policyName, policySubmitRequest.policyDefinition) }
+          BeaconService.POLICY_SUBMIT -> { () => beaconPolicyService.submitPolicy(fullUrl, policyName, policySubmitRequest.policyDefinition) },
+          BeaconService.POLICY_SUBMIT_SCHEDULE -> { () => beaconPolicyService.submitAndSchedulePolicy(fullUrl, policyName, policySubmitRequest.policyDefinition) }
         ).get(policySubmitRequest.submitType)
 
         policyResponseFuture match {
@@ -315,7 +389,7 @@ class BeaconService @Inject()(
             }
           }
           case None => {
-            val errorMsg: String = "Value passed submitType=" + policySubmitRequest.submitType + " is invalid. Valid values for submitType are SUBMIT | SUBMIT_AND_SCHEDULE"
+            val errorMsg: String =  BeaconService.submitTypeError(policySubmitRequest.submitType)
             p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(BeaconApiError(errorMsg)))))
           }
         }
@@ -399,14 +473,20 @@ class BeaconService @Inject()(
     dataplaneService.getBeaconUrls.map ({
       case Left(errors) => p.success(Left(DlmApiErrors(errors.errors.map(x => BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(BeaconApiError(x.message)))))))
       case Right(beaconUrls) =>
-        Future.sequence(beaconUrls.map(beaconEventService.listEvents(_, queryString))).map({
+        val originalPageLenth : Option[String] = queryString.get(BeaconService.API_PAGE_SIZE_KEY)
+        val originalOffset : Int = queryString.getOrElse(BeaconService.API_OFFSET_KEY,BeaconService.API_OFFSET_DEFAULT_VALUE).toInt
+        val queryStringPaginated = getQueryStringForResources(queryString, originalPageLenth, originalOffset)
+
+        Future.sequence(beaconUrls.map(beaconEventService.listEvents(_, queryStringPaginated))).map({
           eventListFromAllClusters => {
             val allEvents: Seq[BeaconEventResponse] = eventListFromAllClusters.filter(_.isRight).flatMap(_.right.get)
             val failedResponses: Seq[BeaconApiErrors] = eventListFromAllClusters.filter(_.isLeft).map(_.left.get)
             if (failedResponses.length == beaconUrls.length) {
               p.success(Left(DlmApiErrors(failedResponses)))
             } else {
-              p.success(Right(EventsDetailResponse(failedResponses, allEvents)))
+
+              val events : Seq[BeaconEventResponse] = getProcessedResponse(allEvents, queryStringPaginated, originalPageLenth, originalOffset)
+              p.success(Right(EventsDetailResponse(failedResponses, events)))
             }
           }
         })
@@ -414,3 +494,23 @@ class BeaconService @Inject()(
     p.future
   }
 }
+
+object BeaconService {
+  lazy val API_PAGE_SIZE_KEY = "numResults"
+  lazy val API_OFFSET_KEY = "offset"
+  lazy val API_OFFSET_DEFAULT_VALUE = "0"
+  lazy val API_SORTORDER_KEY = "sortOrder"
+  lazy val API_ORDERBY_KEY = "orderBy"
+  lazy val API_SORTORDER_DEFAULT_VALUE = "desc"
+  lazy val POLICY_SUBMIT = "SUBMIT"
+  lazy val POLICY_SUBMIT_SCHEDULE = "SUBMIT_AND_SCHEDULE"
+
+  lazy val PAIR_CLUSTER_SIZE = 2
+  
+  
+  def submitTypeError(submitType: String) : String = "Value passed submitType = " + submitType + " is invalid. Valid values for submitType are SUBMIT | SUBMIT_AND_SCHEDULE"
+  def clusterPairPaylodError = "Request payload should be a set of two objects"
+  def pairClusterError = "Error occurred while getting API response from DB service or/and Beacon service"
+
+}
+

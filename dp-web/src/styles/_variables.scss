@@ -6,13 +6,26 @@ $layout-header-desktop-baseline: 0px;
 $layout-header-bg-color: #FFFFFF;
 $layout-text-color: #848484 !important;
 $layout-header-desktop-indent: 10px;
+$button-height: 34px;
 
 /* DP Variables */
+$disabled-opacity: 0.6;
+$page-margins: 10px;
+
+$alto: #D3D3D3;
 $concrete: #F2F2F2;
 $oxford-blue: #333F54;
 $mine-shaft: #333333;
 $fruit-salad: #4AAB52;
 $apple-green: #60A947;
+$dhuttle-gray: #54646A;
+$white: #FFFFFF;
+$forest-green-1: #3FAE2A;
+$forest-green-2: #429929;
+$iron: #CFD3D7;
+$oslo-gray: #808793;
+$dove-gray: #666666;
+$text-grey: rgba(255,255,255,0.6);
 
 $header-height: $layout-header-desktop-row-height;
 $logo-background: $oxford-blue;

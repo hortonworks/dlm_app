@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
-import { LoadClusters } from '../../actions/cluster.action';
+import { loadClusters } from '../../actions/cluster.action';
 import { Cluster } from '../../models/cluster.model';
 import { getAllClusters } from '../../selectors/cluster.selector';
 import * as fromRoot from '../../reducers';
 import { DropdownItem } from '../../components/dropdown/dropdown-item';
 import { TranslateService } from '@ngx-translate/core';
+
+const REQUEST_ID = 'CLUSTERS_PAGE';
 
 @Component({
   selector: 'dp-main',
@@ -27,7 +29,7 @@ export class ClustersComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.store.dispatch(new LoadClusters());
+    this.store.dispatch(loadClusters(REQUEST_ID));
   }
 
 }

@@ -1,0 +1,17 @@
+div {
+  position: relative;
+}
+
+i {
+  margin-right: 5px;
+}
+
+span {
+  &:after {
+    font-family: "FontAwesome";
+    font-style: normal;
+    font-size: 12px;
+    content: '\f0d7';
+    margin-left: 8px;
+  }
+}

@@ -2,7 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
-import { LoadClusters } from 'actions/cluster.action';
+import { loadClusters } from 'actions/cluster.action';
 import { loadPairings, createPairing } from 'actions/pairing.action';
 import { ClusterPairing } from 'models/cluster-pairing.model';
 import { Pairing } from 'models/pairing.model';
@@ -13,6 +13,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Progress } from 'models/progress.model';
 import { fromJS } from 'immutable';
+import { PairingsComponent } from '../../pairings.component';
 
 @Component({
   selector: 'dlm-create-pairing',
@@ -47,7 +48,7 @@ export class CreatePairingComponent implements OnInit {
       firstCluster: '',
       secondCluster: ''
     });
-    this.store.dispatch(new LoadClusters());
+    this.store.dispatch(loadClusters());
     this.store.dispatch(loadPairings());
     this.pairings$.subscribe(pairings => this.pairings = pairings);
     this.firstSetClusters$.subscribe(clusters => this.firstSetClusters = clusters);
@@ -60,25 +61,14 @@ export class CreatePairingComponent implements OnInit {
     const requestPayload = [
       {
         clusterId: this.selectedFirstCluster.id,
-        beaconUrl: this.getBeaconUrl(this.selectedFirstCluster)
+        beaconUrl: PairingsComponent.getBeaconUrl(this.selectedFirstCluster)
       },
       {
         clusterId: this.selectedSecondCluster.id,
-        beaconUrl: this.getBeaconUrl(this.selectedSecondCluster)
+        beaconUrl: PairingsComponent.getBeaconUrl(this.selectedSecondCluster)
       }
     ];
     this.store.dispatch(createPairing(requestPayload));
-  }
-
-  getBeaconUrl(cluster: ClusterPairing): string {
-    let beaconUrl = '';
-    if (cluster.services && cluster.services.length) {
-      const beaconService = cluster.services.filter(service => service.servicename === 'BEACON_SERVER');
-      if (beaconService.length) {
-        beaconUrl = beaconService[0].fullURL;
-      }
-    }
-    return beaconUrl;
   }
 
   selectFirstCluster(cluster: ClusterPairing) {

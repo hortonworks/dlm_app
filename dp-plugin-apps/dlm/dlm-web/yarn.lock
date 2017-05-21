@@ -149,6 +149,10 @@
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/@ngx-translate/core/-/core-6.0.1.tgz#7c7a80077feb994fc815b67a72065af04d394efe"
 
+"@ngx-translate/http-loader@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@ngx-translate/http-loader/-/http-loader-0.0.3.tgz#8346c8d2d6f630254601029668f17abe2afe8a9b"
+
 "@swimlane/ngx-datatable@8.2.1":
   version "8.2.1"
   resolved "https://registry.yarnpkg.com/@swimlane/ngx-datatable/-/ngx-datatable-8.2.1.tgz#b310ac7522312e301dbea3be7cf2a4b9bf172818"

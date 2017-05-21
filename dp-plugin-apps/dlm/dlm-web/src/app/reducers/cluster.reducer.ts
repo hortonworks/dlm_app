@@ -19,8 +19,8 @@ export function reducer(state = initialState, action: fromCluster.Actions): Stat
         }
       };
     }
-    case fromCluster.ActionTypes.LOAD_CLUSTERS_SUCCESS: {
-      const clusters = action.payload.clusters;
+    case fromCluster.ActionTypes.LOAD_CLUSTERS.SUCCESS: {
+      const clusters = action.payload.response.clusters;
       const clusterEntities = clusters.reduce((entities: { [id: string]: Cluster}, entity: Cluster) => {
         return Object.assign({}, entities, {
           [entity.id]: entity
@@ -30,7 +30,7 @@ export function reducer(state = initialState, action: fromCluster.Actions): Stat
         entities: Object.assign({}, state.entities, clusterEntities)
       };
     }
-    case fromCluster.ActionTypes.LOAD_CLUSTERS_FAILURE: {
+    case fromCluster.ActionTypes.LOAD_CLUSTERS.FAILURE: {
       return state;
     }
     default: {

@@ -9,7 +9,7 @@
                   [queryModels]="assetSetQueryModelsForAddition"
                   (onAction)="onListAction($event)"
   ></ds-assets-list>
-  <div *ngIf="!showList" class="mdl-color--green mdl-color-text--white mdl-button" (click)="showPopup=true;">Add Assets</div>
+  <div *ngIf="!showList" class="mdl-button btn-hwx-primary" (click)="showPopup=true;">Add Assets</div>
 </div>
 <div *ngIf="showPopup" class="popup borderBox">
   <div class="opaque">

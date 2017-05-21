@@ -16,6 +16,7 @@ import {CheckboxComponent} from '../../common/checkbox/checkbox.component';
 import {DropdownComponent} from '../../components/dropdown/dropdown.component';
 import {FormsModule} from '@angular/forms';
 import {NavbarService} from 'services/navbar.service';
+import {FmtTzPipe} from 'pipes/fmt-tz.pipe';
 
 describe('NotificationsPageComponent', () => {
   let component: NotificationsPageComponent;
@@ -40,7 +41,8 @@ describe('NotificationsPageComponent', () => {
         CheckboxColumnComponent,
         CheckboxComponent,
         ActionColumnComponent,
-        DropdownComponent
+        DropdownComponent,
+        FmtTzPipe
       ],
       providers: [
         {provide: Store, useClass: MockStore},

@@ -1,0 +1,8 @@
+<div class="mdl-layout__header-row" [ngClass]="{'underline' : tabType === tabTypes.UNDERLINE, 'buttons' : tabType === tabTypes.BUTTON}">
+  <nav class="mdl-navigation">
+    <span *ngFor="let tab of tabNames; let i = index" class="mdl-navigation__link" (click)="onTabSelect(tab)"
+          [ngClass]="{'is_active': activeTabName === tab || (activeTabName.length === 0 && i ===0)}">
+      {{ tab }}
+    </span>
+  </nav>
+</div>

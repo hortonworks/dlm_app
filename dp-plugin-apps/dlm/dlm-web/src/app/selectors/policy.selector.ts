@@ -7,13 +7,21 @@ import { getAllJobs } from './job.selector';
 export const getEntities = createSelector(getPolicies, state => state.entities);
 export const getAllPolicies = createSelector(getEntities, mapToList);
 
-export const getPolicyClusterJob = createSelector(getAllPolicies, getAllClusters, getAllJobs, (policies, clusters, jobs) => {
+export const getAllPoliciesWithClusters = createSelector(getAllPolicies, getAllClusters, (policies, clusters) => {
   return policies.map(policy => {
     return {
       ...policy,
-      jobsResource: jobs.filter(job => job.name === policy.id) || [],
       targetClusterResource: clusters.find(cluster => cluster.name === policy.targetCluster) || {},
-      destinationClusterResource: clusters.find(cluster => cluster.name === policy.sourceCluster) || {}
+      sourceClusterResource: clusters.find(cluster => cluster.name === policy.sourceCluster) || {}
+    };
+  });
+});
+
+export const getPolicyClusterJob = createSelector(getAllPoliciesWithClusters, getAllJobs, (policies, jobs) => {
+  return policies.map(policy => {
+    return {
+      ...policy,
+      jobsResource: jobs.filter(job => job.name === policy.id) || []
     };
   });
 });

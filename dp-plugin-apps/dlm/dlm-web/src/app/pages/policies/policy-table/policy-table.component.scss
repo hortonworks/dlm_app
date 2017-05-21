@@ -2,9 +2,17 @@
 
 dlm-table.cards-theme {
   .ngx-datatable {
-    .datatable-scroll,
-    .datatable-header-inner {
-      padding: 0 $row-padding;
+    .datatable-scroll, .datatable-header-inner {
+      padding: 0 2px;
+    }
+    datatable-scroller {
+      width:100% !important;
+    }
+
+    .ngx-datatable {
+      .datatable-scroll, .datatable-header-inner {
+        padding: 0;
+      }
     }
   }
 }
@@ -17,4 +25,10 @@ dlm-table.cards-theme {
   .datatable-body-cell-label {
     width: 100%;
   }
+}
+
+.datatable-row-detail {
+  padding: 35px;
+  background: $table-row-active;
+  height: auto;
 }

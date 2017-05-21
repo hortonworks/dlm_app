@@ -12,6 +12,8 @@ export class TimeZoneService {
 
   public userTimezoneIndex$: BehaviorSubject<any> = new BehaviorSubject('');
 
+  defaultServerTimezone = 'Atlantic/Reykjavik';
+
   get parsedTimezones(): ShownTimeZone[] {
     if (!this._parsedTimezones) {
       this._parsedTimezones = this._parseTimezones();
@@ -36,11 +38,14 @@ export class TimeZoneService {
    * @param {number} [timestamp]
    * @returns {number}
    */
-  public dateTimeWithTimeZone(timestamp?: number): number {
+  public dateTimeWithTimeZone(timestamp?: any, serverTimezone?: string): any {
     const timezone = this.userTimezone;
+    if (serverTimezone === '') {
+      serverTimezone = this.defaultServerTimezone;
+    }
     if (timezone) {
       const tz = timezone.zones[0].value;
-      return moment(moment.tz(timestamp ? new Date(timestamp) : new Date(), tz).toArray()).toDate().getTime();
+      return moment(moment.tz(timestamp ? moment.tz(timestamp, serverTimezone) : new Date(), tz).toArray()).toDate().getTime();
     }
     return timestamp || new Date().getTime();
   };
@@ -51,8 +56,8 @@ export class TimeZoneService {
    * @param {string} format moment.js-compatible date format
    * @returns {string}
    */
-  public formatDateTimeWithTimeZone(timestamp: number, format: string): string {
-    const time = this.dateTimeWithTimeZone(timestamp);
+  public formatDateTimeWithTimeZone(timestamp: number, format: string, serverTimezone?: string): string {
+    const time = this.dateTimeWithTimeZone(timestamp, serverTimezone);
     return moment(time).format(format);
   };
 
