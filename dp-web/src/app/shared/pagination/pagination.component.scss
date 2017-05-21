@@ -1,0 +1,25 @@
+.paginationRow {
+  height: 45px;
+  line-height: 45px;
+  color:rgb(103,105,102);
+  text-align: right;
+  float: right;
+}
+.paginationRow .pageSizeSpan {
+  color: rgb(64,144,189);
+}
+.paginationRow .fa-chevron-left,
+.paginationRow .fa-chevron-right {
+  padding:0 10px;
+  cursor:pointer;
+}
+
+select {
+  color: inherit;
+  font-size: 1em;
+  height: 32px;
+  padding: 0 8px;
+  border-width: 0px;
+  outline: none;
+}
+select {background-color: inherit}

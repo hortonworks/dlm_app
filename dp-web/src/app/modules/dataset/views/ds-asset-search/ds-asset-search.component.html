@@ -17,8 +17,8 @@
     <div style="clear: both"></div>
   </div>
   <div class="filterActionCont">
-    <div class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionSearch()">Search</div>
-    <div class="mdl-color--blue mdl-color-text--white mdl-button" (click)="actionReset()" *ngIf="showQueryResults">Reset</div>
+    <button class="mdl-button btn-hwx-primary" (click)="actionSearch()">Search</button>
+    <button class="mdl-button btn-hwx-secondary" (click)="actionReset()" *ngIf="showQueryResults">Reset</button>
     <div style="clear: both"></div>
   </div>
   <div class="queryResultCont" #queryResultCont>

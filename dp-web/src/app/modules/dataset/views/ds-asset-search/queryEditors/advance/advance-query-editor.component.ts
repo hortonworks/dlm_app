@@ -13,7 +13,7 @@ import {AssetSetQueryFilterModel, AssetSetQueryModel} from "../../../ds-assets-l
   template : `
     <div>
       <span #filterCont></span>
-      <div class="mdl-color--blue mdl-color-text--white mdl-button" (click)="addNewFilter()"><i class="fa fa-plus"></i></div>
+      <button class="mdl-button btn-hwx-secondary" (click)="addNewFilter()"><i class="fa fa-plus"></i></button>
     </div>  
   `,
   styles : [`.mdl-button{min-width:0px;} `]

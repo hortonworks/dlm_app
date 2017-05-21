@@ -46,8 +46,8 @@ export class DsAssetList implements OnInit {
   actionEmitter: EventEmitter<AssetListActionsEnum> = new EventEmitter<AssetListActionsEnum>();
 
   public pageSizeOptions:number[] = [10,15,20,50,100,150,200];
-  public pageSize : number = 10;
-  private currentPageNo : number = 1;
+  public pageSize : number = 20;
+  private pageStartIndex : number = 1;
   private assetsCount : number = 0;
   private totalPages : number = 1;
   public dsAssets: DsAssetModel[] = [];
@@ -68,7 +68,7 @@ export class DsAssetList implements OnInit {
     this.initDone && (changes['dsModel'] || changes['searchText']|| changes['queryModels'] || changes['pageSize']) &&  this.fetchAssets()
   }
   setFirstPage () {
-    this.currentPageNo = 1;
+    this.pageStartIndex = 1;
   }
   clearResults() {
     this.dsAssets = [];
@@ -97,20 +97,11 @@ export class DsAssetList implements OnInit {
         this.totalPages=Math.ceil(this.assetsCount/this.pageSize)
       });
     asqms=this.getQueryModelsForAssetService(false)
-    this.dsAssetsService.list(asqms, this.currentPageNo, this.pageSize)
+    this.dsAssetsService.list(asqms, Math.ceil(this.pageStartIndex/this.pageSize), this.pageSize)
       .subscribe(assets=>{
         this.dsAssets=assets;
         ((thisObj)=>setTimeout(()=>{/*thisObj.dsAssets.length >= thisObj.pageSize && */thisObj.setTableHeight()},0))(this);
       });
-  }
-  getAssetSourceAsString (type:AssetTypeEnum):string {
-    if(type == this.tab.ALL) return "all";
-    if(type == this.tab.HIVE) return "hive";
-    if(type == this.tab.HDFS) return "file";
-    return "all";
-  }
-  getPaginationText ():string  {
-    return (this.pageSize * (this.currentPageNo-1) + 1) + "-" + Math.min(this.pageSize * this.currentPageNo, this.assetsCount) +" of " + this.assetsCount;
   }
   calcTableHeight() {
     if(this.tableHeight) return this.tableHeight
@@ -127,10 +118,9 @@ export class DsAssetList implements OnInit {
       this.tableHeight=0;
       this.setTableHeight();
   }
-  onPageSizeChange() {this.fetchAssets();}
-  showPrevious(){(this.currentPageNo != 1) && --this.currentPageNo && this.fetchAssets()}
-  showNext() {this.currentPageNo < Math.ceil(this.assetsCount/this.pageSize) && ++this.currentPageNo && this.fetchAssets()}
-  actionAddMore () {console.log("add-more called"); this.actionEmitter.emit(this.actionEnum.ADD);}
-  actionRemove () {console.log("remove called");this.actionEmitter.emit(this.actionEnum.REMOVE);}
+  onPageSizeChange(size:number){this.setFirstPage();this.pageSize=size;this.fetchAssets();}
+  onPageChange(index:number){this.pageStartIndex=index;this.fetchAssets();}
+  actionAddMore () {this.actionEmitter.emit(this.actionEnum.ADD);}
+  actionRemove () {this.actionEmitter.emit(this.actionEnum.REMOVE);}
   actionEdit () {this.actionEmitter.emit(this.actionEnum.EDIT);}
 }

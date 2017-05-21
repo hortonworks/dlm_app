@@ -7,8 +7,8 @@ import {ViewsEnum} from "../../../../../shared/utils/views";
 
 @Component({
   selector: 'ds-nav-result-viewer',
-  templateUrl: './ds-nav-result-viewer.component.html',
-  styleUrls: ['./ds-nav-result-viewer.component.scss'],
+  templateUrl: './ds-result-viewer.component.html',
+  styleUrls: ['./ds-result-viewer.component.scss'],
 })
 export class DsNavResultViewer implements OnInit {
 
@@ -20,14 +20,13 @@ export class DsNavResultViewer implements OnInit {
 
   start : number = 1;
   limit : number = 10;
-  total : number;
 
   constructor(
     private richDatasetService :RichDatasetService
   ){}
 
   ngOnInit () {
-   
+
   }
 
   ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
@@ -47,15 +46,9 @@ export class DsNavResultViewer implements OnInit {
   getDataset(){
      this.datasetModels=null;
       this.richDatasetService.listByTag(this.currentDsTag.name, this.start, this.limit)
-      .subscribe(result => {
-        console.log(result);
-        
-        this.datasetModels = result.data
-        this.start = result.start;
-        this.limit = result.limit;
-        this.total = result.total;
-      });
+        .subscribe(result => this.datasetModels = result);
   }
+
 
   onPageChange(start){
     this.start = start;
