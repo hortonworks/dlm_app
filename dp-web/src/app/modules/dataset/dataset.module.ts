@@ -23,9 +23,12 @@ import {PaginationComponent} from "../../widgets/pagination/pagination.component
 import {DsSummaryHolder} from "./views/ds-editor/ds-summary-holder/ds-summary-holder.component";
 import {TaggingWidget} from "../../shared/tagging-widget/tagging-widget.component";
 import {DsTagsService} from "./services/dsTagsService";
-import {DsAssetSearch} from "./views/ds-asset-search/ds-assest-search.component";
-import {NormalQueryEditor} from "./views/ds-asset-search/queryEditors/normal/normal-query-editor.component";
-import {SearchWidget} from "./views/ds-asset-search/queryEditors/normal/search-widget/search-widget.component";
+import {DsAssetSearch} from "./views/ds-asset-search/ds-asset-search.component";
+import {BasicQueryEditor} from "./views/ds-asset-search/queryEditors/basic/basic-query-editor.component";
+import {SearchWidget} from "./views/ds-asset-search/queryEditors/basic/search-widget/search-widget.component";
+import {AdvanceQueryEditor} from "./views/ds-asset-search/queryEditors/advance/advance-query-editor.component";
+import {AssetOwnerService} from "./services/assetOwnerService";
+import {QueryFilter} from "./views/ds-asset-search/queryEditors/advance/filter/filter.component";
 
 @NgModule({
   imports: [
@@ -48,13 +51,17 @@ import {SearchWidget} from "./views/ds-asset-search/queryEditors/normal/search-w
       PaginationComponent,
       TaggingWidget,
       DsAssetSearch,
-      NormalQueryEditor,
+      BasicQueryEditor,
+      AdvanceQueryEditor,
+      QueryFilter,
       SearchWidget
   ],
   providers: [
     RichDatasetService,
     DsAssetsService,
-    DsTagsService
-  ]
+    DsTagsService,
+    AssetOwnerService
+  ],
+  entryComponents: [QueryFilter]
 })
 export class DatasetModule { }

@@ -1,18 +1,28 @@
+.borderBox, .borderBox * {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.componentCont.innerListScrollable {
+  height:100%;
+}
 .tabCont {
   border-left:1px solid rgb(208,211,215);
-  border-radius: 3px;
-  height:56px;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+  height:55px;
   color:rgb(103,105,102);
 }
 
 .tabCont .tab{
   width:80px;
-  height:45px;
+  height:55px;
   padding: 5px 10px;
   background-color: rgb(250,250,250);
   border-top:1px solid rgb(208,211,215);
   border-right:1px solid rgb(208,211,215);
-  border-radius: 3px;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
   float: left;
   cursor: pointer;
 }
@@ -37,6 +47,7 @@
 .listCont {
   border:12px solid rgb(208,211,215);
   border-radius: 3px;
+  border-top-left-radius: 0px;
   background-color: rgb(208,211,215);
 }
 .listCont .searchCont {
@@ -46,6 +57,7 @@
   background-color: white;
   border-radius: 3px;
   position: relative;
+  margin-bottom: 12px;
 }
 .listCont .searchCont > span {
   position: absolute;
@@ -69,10 +81,10 @@
 }
 
 .listCont .list {
-  margin-top:12px;
   background-color: white;
   border-radius: 3px;
   padding:15px;
+  height:100%;
 }
 
 .listCont .list .listRow .nameCol {
@@ -129,6 +141,11 @@
   border-radius: 3px;
 }
 
+.componentCont.innerListScrollable .justList {
+  overflow-y: auto;
+  height:100%;
+}
+
 .listCont .paginationRow {
   height: 45px;
   line-height: 45px;
@@ -145,3 +162,14 @@
   padding:0 10px;
   cursor:pointer;
 }
+
+select {
+  color: inherit;
+  font-size: 1em;
+  height: 32px;
+  padding: 0 8px;
+  border-width: 0px;
+  outline: none;
+}
+select {background-color: inherit}
+

@@ -1,0 +1,16 @@
+<div *ngIf="!avoidNewLine" style="clear: both"></div>
+<div class="queryFilter">
+  <select (change)="onFilterTypeChange($event)">
+    <option *ngFor="let obj of availableFilters; let i=index;" [value]="i">{{obj.display}}</option>
+  </select>
+  <select *ngIf="filterObject" [(ngModel)]="filterObject.selectedOperator" (change)="validate($event)">
+    <option [value]="-1">Select Operator</option>
+    <option *ngFor="let opt of filterObject.operators" [value]="opt">{{filterObject.getOperatorDisplay(opt)}}</option>
+  </select>
+  <select *ngIf="filterObject && filterObject.valueOptions" [(ngModel)]="filterObject._value" (change)="validate($event)">
+    <option [value]="-1">{{filterObject.helpText}}</option>
+    <option *ngFor="let opt of filterObject.valueOptions;let i=index;" [value]="i" (change)="validate($event)" >{{opt.display||opt.name||opt}}</option>
+  </select>
+  <input *ngIf="filterObject && !filterObject.valueOptions" [(ngModel)]="filterObject._value" [placeholder]="filterObject.helpText" (change)="validate($event)"/>
+  <div class="mdl-color--blue mdl-color-text--white mdl-button" (click)="onCloseClick()"><i class="fa fa-close"></i></div>
+</div>

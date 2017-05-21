@@ -11,15 +11,12 @@
 * }
 *
 * */
-
-
 import {Component, Input, Output, EventEmitter} from "@angular/core";
 
 @Component({
   selector: 'multi-select',
   template: `
     <div *ngFor="let optn of options; let i = index">
-      <!--<input #checkboxInput type="checkbox" checked="{{optn.checked}}" [(ngModel)]="optn.checked"/>-->
       <input #checkboxInput type="checkbox" [checked]="optn.checked" (click)="updateChecked(i, checkboxInput.checked)"/>
       <label (click)="updateChecked(i, checkboxInput.checked = !checkboxInput.checked);">{{optn.name}}</label>
     </div>

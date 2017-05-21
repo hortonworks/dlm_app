@@ -25,6 +25,7 @@ export class TaggingWidget {
   @Input() availableTags:(string|TaggingWidgetTagModel)[] = [];
   @Input() allowTagDismissal:boolean = true;
   @Input() clearOnSearch:boolean = false;
+  @Input() searchText:string="";
 
   @Output('textChange') searchTextEmitter: EventEmitter<string> = new EventEmitter<string>();
   @Output('onNewSearch') newTagEmitter: EventEmitter<string|TaggingWidgetTagModel> = new EventEmitter<string|TaggingWidgetTagModel>();
@@ -32,15 +33,10 @@ export class TaggingWidget {
 
   @ViewChild('parent') parent:ElementRef;
 
-  public searchText:string="";
-
-
   private focusStickerIndex:number = -1;//this.tags.length;
   public focusRowIndex:number = -1;
-  onSearchTextChange (newValue) {
-    this.searchText = newValue;
-    this.searchTextEmitter.emit(this.searchText);
-  }
+  onSearchTextChange (newValue) {this.searchText=newValue;this.searchTextEmitter.emit(this.searchText);}
+  emitSearchText(){this.newTagEmitter.emit(this.searchText);}
   onKeyDown(event){
     if([13,38,40].indexOf(event.keyCode) == -1 && this.focusStickerIndex==this.tags.length && event.target.selectionStart) return;
     // console.log(event.key, event.keyCode, event.target.selectionStart);
@@ -81,14 +77,14 @@ export class TaggingWidget {
   }
   removeFocusTag () {
     this.deleteTagEmitter.emit(this.tags.splice(this.focusStickerIndex,1)[0]);
-    (function(thisObj){setTimeout(function(){thisObj._SetCursorAtEnd()}, 0)})(this);
+    ((thisObj)=>setTimeout(()=>thisObj._SetCursorAtEnd(), 0))(this);
   }
   onInputFocus(){
     this.focusStickerIndex=this.tags.length;
     this.parent.nativeElement.classList.add('focus')
   }
   onInputBlur(){
-    (function(thisObj){setTimeout(function(){thisObj.parent.nativeElement.classList.remove('focus')}, 300)})(this);
+    ((thisObj)=>setTimeout(()=>thisObj.parent.nativeElement.classList.remove('focus'), 300))(this);
     // this.parent.nativeElement.classList.remove('focus')
   }
   focusOnSticker(i) {

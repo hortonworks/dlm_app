@@ -1,19 +1,20 @@
-<div class="queryEditor borderBox">
+<div class="queryEditor borderBox" #outerCont>
   <div class="inputWidgetCont">
     <div class="searchIconCont"><i class="fa fa-search"></i></div>
     <div class="searchWidgetCont">
-      <search-widget
+      <search-widget #searchWidget
         [allowTagDismissal]="true"
         [tags]="filterTags"
+        [searchText]="queryObj.searchText"
         (onNewSearch)="onNewSearch($event)"
         (onTagDelete)="removeFilter($event)"
       >
       </search-widget>
     </div>
-    <div class="showFiltersButton" (click)="filterStateVisible=!filterStateVisible"><i class="fa fa-filter"></i>&nbsp;&nbsp;Filter&nbsp;&nbsp;<i class="fa fa-angle-down"></i></div>
+    <div class="showFiltersButton" (click)="toggleFilterCont()"><i class="fa fa-filter"></i>&nbsp;&nbsp;Filter&nbsp;&nbsp;<i class="fa fa-angle-down"></i></div>
     <div style="clear: both"></div>
   </div>
-  <div *ngIf="filterStateVisible" class="filterCont">
+  <div *ngIf="filterStateFlag" class="filterCont">
     <div class="singleFilterCont">
       <div>Source</div>
       <select (change)="onFilterOptionChange()" [(ngModel)]="typeValueIndx"><option *ngFor="let optn of typeFilOptns let i=index;" [value]="i">{{optn}}</option></select>

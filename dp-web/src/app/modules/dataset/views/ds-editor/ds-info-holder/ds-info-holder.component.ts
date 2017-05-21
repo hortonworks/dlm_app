@@ -34,10 +34,6 @@ export class DsInfoHolder implements OnInit {
   onLakeSelectionChange () {
     this.dsModel.datalakeName = this.lakes.filter(lake => lake.id == this.dsModel.datalakeId)[0].name;
   }
-  // ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
-  //   if (changes['dsModel'] && this.dsModel) {
-  //   }
-  // }
 
 }
 

@@ -17,8 +17,8 @@
       <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--clickable" (click)="showFullView(dsModel)">{{dsModel.name}}<span *ngIf="dsModel.favourite"><i class="fa__fa-star--favourite-icon fa fa-star"></i></span></td>
       <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{dsModel.datalakeName}}</td>
       <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{dsModel.creatorName}}</td>
-      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{dsModel.hiveCount}}</td>
-      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{dsModel.filesCount}}</td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{dsModel.counts.hiveCount}}</td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{dsModel.counts.filesCount}}</td>
       <td class="mdl-data-table__cell--non-numeric actions">
         <div *ngIf="index === hoveredIndex">
           <button  id="dropDownIcon_{{ dsModel.id }}" class="mdl-button mdl-js-button mdl-button--icon"><i class="fa fa-ellipsis-v fa__fa-ellipsis-v--icon"></i></button>

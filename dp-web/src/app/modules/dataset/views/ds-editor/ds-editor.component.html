@@ -11,19 +11,24 @@
   </div>
   <div class="ds-editor-cont">
     <div class="nav-panel" [attr.stage]="currentStage">
-      <div class="nav-stage stage_1" [class.done]="1 < currentStage"><div class="circle">1</div><i class="fa fa-check-circle"></i><span>Information</span><div class="triangle"></div></div>
-      <div class="nav-stage stage_2" [class.done]="2 < currentStage"><div class="circle">2</div><i class="fa fa-check-circle"></i><span>Assets</span><div class="triangle"></div></div>
-      <div class="nav-stage stage_3" [class.done]="3 < currentStage"><div class="circle">3</div><i class="fa fa-check-circle"></i><span>Summary</span><div class="triangle"></div></div>
+      <div class="nav-stage stage_1" [class.done]="1 < currentStage" (click)="moveToStage(1)"><div class="circle">1</div><i class="fa fa-check-circle"></i><span>Information</span><div class="triangle"></div></div>
+      <div class="nav-stage stage_2" [class.done]="2 < currentStage" (click)="moveToStage(2)"><div class="circle">2</div><i class="fa fa-check-circle"></i><span>Assets</span><div class="triangle"></div></div>
+      <div class="nav-stage stage_3" [class.done]="3 < currentStage" (click)="moveToStage(3)"><div class="circle">3</div><i class="fa fa-check-circle"></i><span>Summary</span><div class="triangle"></div></div>
       <div style="clear:both;"></div>
     </div>
     <div class="nav-result-panel">
       <ds-info-holder  *ngIf="currentStage == 1" [dsModel]="dsModel" [tags]="tags"></ds-info-holder>
-      <ds-assets-holder  *ngIf="currentStage == 2" [dsModel]="dsModel" (onDoneAction)="actionNext()"></ds-assets-holder>
+      <ds-assets-holder  *ngIf="currentStage == 2"
+                         [dsModel]="dsModel"
+                         [assetSetQueryModelsForAddition]="assetSetQueryModelsForAddition"
+                         (onDoneAction)="setVisibilityOfNext()"
+      ></ds-assets-holder>
       <ds-summary-holder  *ngIf="currentStage == 3" [dsModel]="dsModel"  [tags]="tags"></ds-summary-holder>
       <div class="navButtons">
+        <br/>
         <div *ngIf="nextIsVisible" class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionNext()">Next</div>
         <div *ngIf="currentStage == 3" class="mdl-color--green mdl-color-text--white mdl-button" (click)="actionSave()">Save</div>
-        <div *ngIf="currentStage == 3" class="mdl-color--blue mdl-color-text--white mdl-button" (click)="actionCancel()">Cancel</div>
+        <div *ngIf="nextIsVisible || currentStage == 3" class="mdl-color--blue mdl-color-text--white mdl-button" (click)="actionCancel()">Cancel</div>
       </div>
     </div>
     <div style="clear:both;"></div>
