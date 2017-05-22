@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 import { loadClusters } from 'actions/cluster.action';
@@ -22,10 +22,11 @@ const REQUEST_ID = 'CLUSTERS_PAGE';
   templateUrl: './clusters.component.html',
   styleUrls: ['./clusters.component.scss']
 })
-export class ClustersComponent implements OnInit {
+export class ClustersComponent implements OnInit, OnDestroy {
   clusters$: Observable<Cluster[]>;
   policiesCount$: Observable<PoliciesCountEntity>;
   pairsCount$: Observable<PairsCountEntity>;
+  clustersSubscription$;
   clusters: Cluster[];
   addOptions: DropdownItem[];
   mapSize: MapSize;
@@ -46,7 +47,7 @@ export class ClustersComponent implements OnInit {
     this.store.dispatch(loadPairings());
     this.store.dispatch(loadPolicies(REQUEST_ID));
     this.mapSize = MapSize.FULLWIDTH;
-    this.clusters$.subscribe(clusters => {
+    this.clustersSubscription$ = this.clusters$.subscribe(clusters => {
       this.clusters = clusters;
       this.locations = [];
       clusters.forEach( cluster => {
@@ -64,4 +65,7 @@ export class ClustersComponent implements OnInit {
     });
   }
 
+  ngOnDestroy() {
+    this.clustersSubscription$.unsubscribe();
+  }
 }

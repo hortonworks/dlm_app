@@ -6,19 +6,12 @@ import { MockResolver } from 'mocks/mock-resolver';
 
 @Injectable()
 export class HttpService extends Http {
-  apiPrefix = '/api/';
   prodFlag = false;
 
   // todo: add auth token to headers
   // todo: default error handler
   // todo: default data serializer
   request(url: string|Request, options?: RequestOptionsArgs): Observable<Response> {
-    this.apiPrefix = '/api/';
-    // Proccess static assets without the api prefix
-    const urlString: string = (typeof url === 'string') ? url : (<Request><any>url).url;
-    if (urlString.indexOf('assets/') > -1) {
-      this.apiPrefix = '';
-    }
     if (!isDevMode() || this.prodFlag) {
       return super.request(this.buildUrl(url), options);
     }
@@ -34,11 +27,17 @@ export class HttpService extends Http {
   }
 
   buildUrl(url: string|Request): string|Request {
+    let apiPrefix = '/api/';
+    // Proccess static assets without the api prefix
+    const urlString: string = (typeof url === 'string') ? url : (<Request><any>url).url;
+    if (urlString.indexOf('assets/') > -1) {
+      apiPrefix = '';
+    }
     if (typeof url === 'string') {
-      return this.apiPrefix + url;
+      return apiPrefix + url;
     }
     const r: Request = <Request>url;
-    r.url = this.apiPrefix + r.url;
+    r.url = apiPrefix + r.url;
     return r;
   }
 }

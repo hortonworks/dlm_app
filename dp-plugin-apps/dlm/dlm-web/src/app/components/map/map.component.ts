@@ -115,36 +115,9 @@ export class MapComponent implements  OnChanges, OnInit {
               })
             }).addTo(map);
             myLayer.bindPopup(props.name);
-            // console.log(props.name);
             return myLayer;
           }
         });
-    // added pseudo layer to prevent empty space when zoomed out
-    // https://github.com/Leaflet/Leaflet/blob/v1.0.2/src/layer/GeoJSON.js#L205
-    /*const pseudoBaseLayer =
-      L
-        .geoJSON(countries, {
-          style: feature => ({
-            fillColor: this.mapColor,
-            fillOpacity: 1,
-            weight: 1,
-            color: '#FDFDFD'
-          }),
-          coordsToLatLng: (coords: number[]) => new L.LatLng(coords[1], coords[0] - 360, coords[2])
-        });
-
-    L
-      .featureGroup([baseLayer, pseudoBaseLayer])
-      .addTo(map)
-      .bringToBack();*/
-    /*const countriesLayer = L.geoJSON(countries, {
-      style: feature => ({
-        fillColor: this.mapColor,
-        fillOpacity: 1,
-        weight: 1,
-        color: this.mapColor
-      })
-    }).addTo(map);*/
     baseLayer.addTo(map);
     map.fitBounds(baseLayer.getBounds());
     this.map = map;
@@ -157,7 +130,6 @@ export class MapComponent implements  OnChanges, OnInit {
       const start = data.start;
       const end = data.end;
       if (start) {
-        // console.log('Plotting point');
         this.plotPoint(start);
       }
       if (start && end) {
@@ -225,10 +197,10 @@ export class MapComponent implements  OnChanges, OnInit {
       }
     );
 
-    if (this.pathExists({start: start, end: end}) || this.pathExists({start: end, end: start})) {
+    if (this.pathExists({start, end}) || this.pathExists({start, end})) {
       return;
     }
-    this.pathLookup.push({start: start, end: end});
+    this.pathLookup.push({start, end});
     path.addTo(this.map);
   }
 }
