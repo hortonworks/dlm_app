@@ -12,6 +12,7 @@ import { Pairing } from 'models/pairing.model';
 import { SessionStorageService } from 'services/session-storage.service';
 import { POLICY_TYPES, POLICY_SUBMIT_TYPES } from 'constants/policy.constant';
 import { markAllTouched } from 'utils/form-util';
+import { getDatePickerDate } from 'utils/date-util';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 
@@ -34,8 +35,19 @@ export class PolicyFormComponent implements OnInit {
   // todo: this mock and should be removed!
   dbList = Array(6).fill(null).map((i, id) => `db_${id}`);
   visibleDbList = this.dbList;
-  datePickerOptions: IMyOptions = {
-    dateFormat: 'yyyy-mm-dd'
+  get datePickerOptions(): IMyOptions {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const today = new Date();
+    return {
+      dateFormat: 'yyyy-mm-dd',
+      markCurrentDay: true,
+      disableUntil: getDatePickerDate(yesterday),
+      markDates: [{
+        dates: [getDatePickerDate(today)],
+        color: '#ff0000'
+      }]
+    };
   };
   sectionCollapsedMap = {
     general: false,
@@ -106,11 +118,11 @@ export class PolicyFormComponent implements OnInit {
         endTime: this.formBuilder.group({
           date: [''],
           time: [this.defaultTime]
-        }),
+        }, { validator: this.validateTime}),
         startTime: this.formBuilder.group({
           date: [''],
           time: [this.defaultTime]
-        })
+        }, { validator: this.validateTime})
       })
     });
   }
@@ -199,5 +211,32 @@ export class PolicyFormComponent implements OnInit {
 
   cancel() {
     this.store.dispatch(go(['policies']));
+  }
+
+  validateTime = (formGroup: FormGroup) => {
+    if (!(formGroup && formGroup.controls)) {
+      return null;
+    }
+    const timeControl = formGroup.controls.time;
+    const dateFieldValue = formGroup.controls.date.value;
+    const timeFieldValue = timeControl.value;
+    timeControl.setErrors(null);
+    if (dateFieldValue) {
+      const dateWithTime = this.setTimeForDate(dateFieldValue, timeFieldValue);
+      if (dateWithTime.getTime() < Date.now()) {
+        timeControl.setErrors({ lessThanCurrent: true });
+        return null;
+      }
+    }
+    return null;
+  }
+
+  private setTimeForDate(date: string, time: string): Date {
+    const dateValue = new Date(date);
+    const timeValue = new Date(time);
+    dateValue.setHours(timeValue.getHours());
+    dateValue.setMinutes(timeValue.getMinutes());
+    dateValue.setSeconds(0);
+    return dateValue;
   }
 }

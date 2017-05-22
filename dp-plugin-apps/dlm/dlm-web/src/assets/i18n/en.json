@@ -89,7 +89,8 @@
   },
   "forms": {
     "validation_errors": {
-      "required": "\"{{fieldLabel}}\" is required"
+      "required": "\"{{fieldLabel}}\" is required",
+      "time_less_than_current": "Selected time is less than current"
     }
   },
   "page": {
