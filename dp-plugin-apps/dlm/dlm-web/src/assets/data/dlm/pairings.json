@@ -2,7 +2,7 @@
   "unreachableBeacon": [],
   "pairedClusters": [
     [{
-      "id": "Primary Cluster",
+      "id": 1,
       "description": "primary",
       "name": "Primary Cluster",
       "ambariurl": "http://localhost:8080",
@@ -16,7 +16,7 @@
         "country": "AF"
       }
     }, {
-      "id": "Secondary Cluster",
+      "id": 2,
       "description": "secondary",
       "name": "Secondary Cluster",
       "ambariurl": "http://localhost:8080",
