@@ -197,7 +197,7 @@ export class MapComponent implements  OnChanges, OnInit {
       }
     );
 
-    if (this.pathExists({start, end}) || this.pathExists({start, end})) {
+    if (this.pathExists({start, end}) || this.pathExists({start: end, end: start})) {
       return;
     }
     this.pathLookup.push({start, end});
