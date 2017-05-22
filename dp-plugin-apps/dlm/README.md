@@ -27,11 +27,3 @@
 ## Compile and Start DLM web server
 
 * Run `yarn; npm run prod` for server to run in prod mode. Navigate to `http://localhost:4444`.
-
-
-
-
-
-
-
-
