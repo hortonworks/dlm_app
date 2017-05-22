@@ -136,7 +136,7 @@ class DataplaneService @Inject()(
 
   /**
     * Get beacon server endpoint
-    * @param endpointData [[ClusterServiceWithConfigs]] service host and properties details
+    * @param endpointData service host and properties details
     * @return
     */
   def getBeaconEndpointDetails(endpointData: ClusterServiceWithConfigs) : Either[Errors, ClusterServiceEndpointDetails] = {
@@ -153,7 +153,7 @@ class DataplaneService @Inject()(
 
   /**
     * Get namenode node endpoint details for rpc connection
-    * @param endpointData [[ClusterServiceWithConfigs]] configuration blob for namenode
+    * @param endpointData configuration blob for namenode
     * @return
     */
   def getNameNodeRpcEndpointDetails(endpointData: ClusterServiceWithConfigs) : Either[Errors, ClusterServiceEndpointDetails] = {
@@ -169,7 +169,7 @@ class DataplaneService @Inject()(
 
   /**
     * Get namenode node endpoint details for http connection
-    * @param endpointData [[ClusterServiceWithConfigs]] configuration blob for namenode
+    * @param endpointData configuration blob for namenode
     * @return
     */
   def getNameNodeHttpEndpointDetails(endpointData: ClusterServiceWithConfigs) : Either[Errors, ClusterServiceEndpointDetails] = {
@@ -187,7 +187,7 @@ class DataplaneService @Inject()(
 
   /**
     * Get hive server2 endpoint details for http thrift connection
-    * @param endpointData [[ClusterServiceWithConfigs]] configuration blob for hive server2
+    * @param endpointData  configuration blob for hive server2
     * @return
     */
   def getHiveServerEndpointDetails(endpointData: ClusterServiceWithConfigs) : Either[Errors, ClusterServiceEndpointDetails] = {
@@ -205,7 +205,7 @@ class DataplaneService @Inject()(
 
   /**
     *
-    * @param endpointData  [[ClusterServiceWithConfigs]] configuration blob
+    * @param endpointData  configuration blob
     * @param configType    config type
     * @param configName    config property name
     * @return
