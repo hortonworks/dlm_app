@@ -19,5 +19,7 @@ ADD knox-scripts/setup_knox_sso_conf.sh /usr/hdp/current/knox-server/bin/
 RUN chmod a+w /usr/hdp/current/knox-server/conf/topologies
 RUN chmod a+w /usr/hdp/current/knox-server/conf/topologies/knoxsso.xml
 
+ADD dp-configurator-1.0-SNAPSHOT.jar /usr/hdp/current/knox-server/lib/
+
 USER knox
 WORKDIR /usr/hdp/current/knox-server/bin

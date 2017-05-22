@@ -2,7 +2,10 @@
 if [ ! -d ../data/security/master ]
 then
     ./setup-master-password.sh
-    ./setup_knox_sso_conf.sh
+    if [ ${USE_TEST_LDAP} == "yes" ]
+    then
+        USE_TEST_LDAP=yes ./setup_knox_sso_conf.sh 
+    fi    
 fi    
 echo "Starting services ..."
 ls -lR ../data/security/

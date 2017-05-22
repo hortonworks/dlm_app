@@ -38,6 +38,13 @@ build_dp() {
 
 }
 
+build_dp_configurator() {
+    log "Building DP Configurator"
+    pushd ../dp-configurator
+    mvn clean package
+    popd
+}
+
 build_db_service() {
 	log "Building db-service"
 	rm -rf ../services/db-service/build
@@ -87,6 +94,7 @@ build_dp_knox() {
 	log "Building dp-knox"
 	cp -R knox-scripts ${DP_DOCKER_ROOT_FOLDER}/dp-knox/
 	cp Dockerfile.knox ${DP_DOCKER_ROOT_FOLDER}/dp-knox/Dockerfile
+    cp ../dp-configurator/target/dp-configurator-1.0-SNAPSHOT.jar ${DP_DOCKER_ROOT_FOLDER}/dp-knox/
 }
 
 build_cluster_service() {
@@ -148,6 +156,7 @@ else
 fi
 clean_build
 build_dp
+build_dp_configurator
 build_db_service
 build_dp_app
 build_dp_web
