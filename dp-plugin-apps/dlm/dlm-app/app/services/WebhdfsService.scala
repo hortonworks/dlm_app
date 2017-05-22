@@ -4,7 +4,7 @@ import javax.inject.{Inject, Singleton}
 
 import com.google.inject.name.Named
 import com.hortonworks.dlm.webhdfs.WebService.FileService
-import com.hortonworks.dlm.webhdfs.domain.Entities.{ContentSummary, WebHdfsApiError}
+import com.hortonworks.dlm.webhdfs.domain.Entities.WebHdfsApiError
 import play.api.libs.json.JsValue
 import play.api.http.Status._
 
