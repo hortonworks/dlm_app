@@ -37,7 +37,7 @@
 </ng-template>
 
 <ng-template #dataCell let-size="value" let-row="row">
-  <span class="text-primary">{{size|bytesSize}}</span>
+  <span class="text-primary"><span [innerHTML]="size|bytesSize"></span></span>
 </ng-template>
 
 <ng-template let-row="row" ngx-datatable-row-detail-template #rowDetailRef>
