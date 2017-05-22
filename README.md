@@ -12,6 +12,7 @@
 * Nodejs 6.10.0 or above. To get Nodejs on Linux, you can follow instructions here: https://nodejs.org/en/download/package-manager/#enterprise-linux-and-fedora
 * [Yarn](https://yarnpkg.com) package manager (`npm install --global yarn`)
 * docker-machine (tested with 0.7.0), docker (tested with 1.8.0), docker-compose (tested with 1.7.1)
+* Centos 7 or Mac OSX are tested platforms
 
 ## Build
 
@@ -69,4 +70,8 @@ So, to get a version of dataplane on a docker supported machine, do the followin
 * Untar it.
 * `cd installer`
 * Execute the usual `dpdeploy.sh` commands described above. These will pull the correspondingly tagged images from docker-hub. The first pull from the docker-hub repo might take a while, but once the layers are cached, it should be faster.
-  
+
+## Known Issues
+
+* When trying with Centos 7, SE Linux needs to be disabled for now. This is a workaround to a bug that causes external volume mounts to fail. We will try and resolve this issue going forward.
+  * The precise steps to disable are to run this command as root: `su -c "setenforce 0"`. The issue are workaround are documented [here](http://stackoverflow.com/questions/24288616/permission-denied-on-accessing-host-directory-in-docker)
