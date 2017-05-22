@@ -6,4 +6,5 @@ services:
     - "8443:8443"
     environment:
     - MASTER_PASSWORD
+    - USE_TEST_LDAP
     command: sh ./launch-knox.sh
