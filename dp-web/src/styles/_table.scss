@@ -6,13 +6,13 @@ table.mdl-data-table {
 
   thead th {
     font-size: 12px;
-    color: #999999;
+    color: $dusty-gray;
     font-weight: normal;
     line-height: 1;
     padding: 10px;
 
     &.mdl-data-table__header--sorted-ascending {
-      color: #999999;
+      color: $dusty-gray;
       &::before{
         content: '';
       }
@@ -26,7 +26,7 @@ table.mdl-data-table {
     }
 
     &.mdl-data-table__header--sorted-descending {
-      color: #999999;
+      color: $dusty-gray;
       &:before {
         content: '';
       }
@@ -43,36 +43,36 @@ table.mdl-data-table {
   tbody tr {
     &:last-child{
       td {
-        border-bottom: 1px solid #EDECED;
+        border-bottom: 1px solid $bon-jour
       }
       &:hover td {
-        border-color: #A7DFF2;
+        border-color: $blizzard-blue;
       }
     }
 
     &:first-child{
       td {
-        border-top: 1px solid #CDCDCD;
+        border-top: 1px solid $silver;
       }
     }
 
     &:hover {
       td{
-        border-color: #A7DFF2;
+        border-color: $blizzard-blue;
       }
       & + tr td {
-        border-top-color: #A7DFF2;
+        border-top-color: $blizzard-blue;
       }
     }
   }
 
   tbody td {
     font-size: 12px;
-    color: #666666;
+    color: $dove-gray;
     line-height: 1;
     padding: 10px;
     border-bottom: none;
-    border-color: #EDECED;
+    border-color: $bon-jour;
 
     &:first-child {
       border-left: 1px solid transparent;
@@ -83,7 +83,7 @@ table.mdl-data-table {
     }
 
     &.key-column {
-      color: #1491C1;
+      color: $eastern-blue;
       font-size: 14px;
       cursor: pointer;
     }
