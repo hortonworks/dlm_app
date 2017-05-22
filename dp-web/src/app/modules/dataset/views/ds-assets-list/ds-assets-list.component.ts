@@ -47,8 +47,8 @@ export class DsAssetList implements OnInit {
 
   public pageSizeOptions:number[] = [10,15,20,50,100,150,200];
   public pageSize : number = 20;
-  private pageStartIndex : number = 1;
-  private assetsCount : number = 0;
+  public pageStartIndex : number = 1;
+  public assetsCount : number = 0;
   private totalPages : number = 1;
   public dsAssets: DsAssetModel[] = [];
   public tab = AssetTypeEnum;

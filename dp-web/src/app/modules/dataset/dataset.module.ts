@@ -29,6 +29,7 @@ import {AdvanceQueryEditor} from "./views/ds-asset-search/queryEditors/advance/a
 import {AssetOwnerService} from "./services/assetOwnerService";
 import {QueryFilter} from "./views/ds-asset-search/queryEditors/advance/filter/filter.component";
 import {SimplePaginationWidget} from "../../shared/pagination/pagination.component";
+import {PaginationComponent} from "../../widgets/pagination/pagination.component";
 
 @NgModule({
   imports: [
@@ -49,6 +50,7 @@ import {SimplePaginationWidget} from "../../shared/pagination/pagination.compone
       DsRowProxy,
       DatasetDashboardComponent,
       SimplePaginationWidget,
+      PaginationComponent,
       TaggingWidget,
       DsAssetSearch,
       BasicQueryEditor,
