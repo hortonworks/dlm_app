@@ -29,5 +29,5 @@
 </ng-template>
 
 <ng-template #transferredFormattedTemplate let-value="value">
-  {{value | bytesSize}}
+  <span [innerHTML]="value | bytesSize"></span>
 </ng-template>

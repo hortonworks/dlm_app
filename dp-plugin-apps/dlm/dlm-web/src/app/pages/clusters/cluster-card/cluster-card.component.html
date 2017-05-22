@@ -1,59 +1,65 @@
-<dp-card>
-  <div class="row flex-center cluster-row">
-    <div class="hex-wrap">
-      <div class="hex-icon">
-        <i class="glyphicon glyphicon-cog"></i>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="row flex-center">
-        <div class="col-md-5 cluster-cell">
-          <p class="h2">
-            {{cluster.name}}
-          </p>
-          <p>
-            {{cluster.type}} {{ cluster.location.city }}, {{ cluster.location.country }}
-          </p>
-        </div>
-        <div class="col-md-7 cluster-cell">
-          <p class="cell-title">{{ "page.clusters.card.registered" | translate}}</p>
-          <p>{{cluster.createdAt | date:'medium'}}</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-8">
-      <div class="row flex-center">
-        <div class="col-md-7">
-          <div class="row">
-            <div class="col-md-4 cluster-cell">
-              <p class="cell-title">{{ "page.clusters.card.volume" | translate}}</p>
-              <p>{{cluster.volumeGB}} GB</p>
-            </div>
-            <div class="col-md-4 cluster-cell">
-              <p class="cell-title">{{ "page.clusters.card.nodes" | translate}}</p>
-              <p>{{cluster.nodesCount}}</p>
-            </div>
-            <div class="col-md-4 cluster-cell">
-              <p class="cell-title">{{ "page.clusters.card.pairs" | translate}} <a>+add</a></p>
-              <p>-</p>
-            </div>
-          </div>
-        </div>
+<dlm-card class="card">
+  <div class="row flex-center">
+    <div class="col-md-10">
+      <div class="row flex-center cluster-row">
         <div class="col-md-5">
           <div class="row flex-center">
-            <div class="col-md-9 cluster-cell">
-              <div class="add-actions">
-                <i class="glyphicon glyphicon-plus text-success"></i>
-              </div>
+            <div class="col-md-5 cluster-cell">
+              <p class="h2">
+                {{cluster.name}}
+              </p>
             </div>
-            <div class="col-md-3 cluster-cell">
-              <div class="more">
-                <p><i class="fa fa-ellipsis-v text-primary"></i></p>
+            <div class="col-md-7 cluster-cell text-center">
+              <p class="cell-title">{{ "page.clusters.card.usage" | translate}}</p>
+              <p class="cell-content">
+                <span [innerHTML]="cluster.stats.CapacityUsed | bytesSize"></span> / <span [innerHTML]="cluster.stats.CapacityTotal | bytesSize"></span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-7">
+          <div class="row flex-center">
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-4 cluster-cell text-center">
+                  <p class="cell-title">{{ "common.pairs" | translate}}</p>
+                  <p>{{pairsCount[cluster.id].pairs}}</p>
+                </div>
+                <div class="col-md-4 cluster-cell text-center">
+                  <p class="cell-title">{{ "common.policies" | translate}}</p>
+                  <p>{{policiesCount[cluster.id].policies}}</p>
+                </div>
+                <div class="col-md-4 cluster-cell text-center">
+                  <p class="cell-title">{{ "page.clusters.card.location" | translate}}</p>
+                  <p>{{cluster.location.city}}, {{cluster.location.country}}</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <div class="col-md-2">
+        <div class="row flex-center">
+          <div class="col-md-9 cluster-cell text-center" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
+            <div class="add-actions">
+              <i *ngIf="!showButtons" class="glyphicon glyphicon-plus text-success"></i>
+              <div *ngIf="showButtons">
+                <div class="pull-left">
+                  <button type="button" class="btn-sm btn-secondary" (click)="createPairingClickHandler()">{{ "page.clusters.card.create_pair_text" | translate }}</button>
+                </div>
+                <div class="pull-right">
+                  <button type="button" [disabled]="pairsCount[cluster.id].pairs <= 0" class="btn-sm btn-secondary" (click)="createPolicyClickHandler()">{{ "page.clusters.card.create_policy_text" | translate }}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 cluster-cell text-center">
+            <div class="more">
+              <p><i class="fa fa-ellipsis-v text-primary"></i></p>
+            </div>
+          </div>
+        </div>
+    </div>
   </div>
-</dp-card>
+</dlm-card>

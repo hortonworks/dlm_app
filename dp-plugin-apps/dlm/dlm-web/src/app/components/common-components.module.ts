@@ -15,6 +15,7 @@ import { FormFieldComponent } from './forms/form-field/form-field.component';
 import { FormFieldDirective } from './forms/form-field/form-field.directive';
 import { FieldErrorComponent } from './forms/field-error/field-error.component';
 import { ProgressContainerComponent } from './progress-container/progress-container.component';
+import { MapComponent } from './map/map.component';
 
 @NgModule({
   imports: [
@@ -35,7 +36,8 @@ import { ProgressContainerComponent } from './progress-container/progress-contai
     FormFieldComponent,
     FormFieldDirective,
     FieldErrorComponent,
-    ProgressContainerComponent
+    ProgressContainerComponent,
+    MapComponent
   ],
   exports: [
     CardComponent,
@@ -48,7 +50,8 @@ import { ProgressContainerComponent } from './progress-container/progress-contai
     FormFieldComponent,
     FormFieldDirective,
     FieldErrorComponent,
-    ProgressContainerComponent
+    ProgressContainerComponent,
+    MapComponent
   ]
 })
 export class CommonComponentsModule {}

@@ -3,6 +3,7 @@ import {ClusterCardComponent} from '../cluster-card/cluster-card.component';
 import {ClusterListComponent} from './cluster-list.component';
 import {CardComponent} from '../../../components/card/card.component';
 import {TranslateModule} from '@ngx-translate/core';
+import {BytesSizePipe} from '../../../pipes/bytes-size.pipe';
 
 describe('ClusterListComponent', () => {
   let component: ClusterListComponent;
@@ -11,7 +12,7 @@ describe('ClusterListComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [TranslateModule],
-      declarations: [ClusterListComponent, ClusterCardComponent, CardComponent]
+      declarations: [ClusterListComponent, ClusterCardComponent, CardComponent, BytesSizePipe]
     })
       .compileComponents();
   }));
