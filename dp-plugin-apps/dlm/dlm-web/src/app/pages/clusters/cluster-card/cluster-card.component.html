@@ -46,7 +46,7 @@
               <i *ngIf="!showButtons" class="glyphicon glyphicon-plus text-success"></i>
               <div *ngIf="showButtons">
                 <div class="pull-left">
-                  <button type="button" class="btn-sm btn-secondary" (click)="createPairingClickHandler()">{{ "page.clusters.card.create_pair_text" | translate }}</button>
+                  <button type="button" [disabled]="clustersCount - pairsCount[cluster.id].pairs - 1 === 0" class="btn-sm btn-secondary" (click)="createPairingClickHandler()">{{ "page.clusters.card.create_pair_text" | translate }}</button>
                 </div>
                 <div class="pull-right">
                   <button type="button" [disabled]="pairsCount[cluster.id].pairs <= 0" class="btn-sm btn-secondary" (click)="createPolicyClickHandler()">{{ "page.clusters.card.create_policy_text" | translate }}</button>

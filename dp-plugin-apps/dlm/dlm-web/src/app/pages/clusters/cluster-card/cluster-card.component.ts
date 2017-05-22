@@ -16,6 +16,7 @@ export class ClusterCardComponent implements OnInit {
   @Input() cluster: Cluster;
   @Input() policiesCount: PoliciesCountEntity;
   @Input() pairsCount: PairsCountEntity;
+  @Input() clustersCount: number;
 
   showButtons = false;
 
