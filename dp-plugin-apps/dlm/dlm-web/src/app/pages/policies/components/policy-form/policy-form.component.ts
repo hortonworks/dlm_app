@@ -131,7 +131,7 @@ export class PolicyFormComponent implements OnInit {
     return pairings.reduce((pairs, pairing) => {
       return pairs.concat({
         value: pairing.id,
-        label: `${pairing.pair[0].name} <--> ${pairing.pair[1].name}`
+        label: [pairing.pair[0].name, pairing.pair[1].name]
       });
     }, []);
   }

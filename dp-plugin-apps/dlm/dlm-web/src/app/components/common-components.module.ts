@@ -15,6 +15,7 @@ import { FormFieldComponent } from './forms/form-field/form-field.component';
 import { FormFieldDirective } from './forms/form-field/form-field.directive';
 import { FieldErrorComponent } from './forms/field-error/field-error.component';
 import { ProgressContainerComponent } from './progress-container/progress-container.component';
+import { SelectFieldComponent, SelectFieldOptionDirective, SelectFieldValueDirective } from './forms/select-field/';
 import { MapComponent } from './map/map.component';
 
 @NgModule({
@@ -37,6 +38,9 @@ import { MapComponent } from './map/map.component';
     FormFieldDirective,
     FieldErrorComponent,
     ProgressContainerComponent,
+    SelectFieldComponent,
+    SelectFieldOptionDirective,
+    SelectFieldValueDirective,
     MapComponent
   ],
   exports: [
@@ -51,6 +55,9 @@ import { MapComponent } from './map/map.component';
     FormFieldDirective,
     FieldErrorComponent,
     ProgressContainerComponent,
+    SelectFieldComponent,
+    SelectFieldOptionDirective,
+    SelectFieldValueDirective,
     MapComponent
   ]
 })

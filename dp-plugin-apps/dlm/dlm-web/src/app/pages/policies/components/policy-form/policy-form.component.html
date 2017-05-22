@@ -30,9 +30,16 @@
               </div>
             </div>
             <dlm-form-field [label]="'page.policies.form.fields.pairs' | translate">
-              <select class="form-control" formField formControlName="pair">
-                <option *ngFor="let pair of pairs" [value]="pair.value">{{pair.label}}</option>
-              </select>
+              <dlm-select-field formField formControlName="pair" [options]="pairs">
+                <ng-template selectFieldValue selectFieldOption let-value="value" let-label="label">
+                  <div *ngIf="!value">{{label}}</div>
+                  <div *ngIf="value" class="actionable">
+                    {{label[0]}}
+                    <i class="glyphicon glyphicon-resize-horizontal"></i>
+                    {{label[1]}}
+                   </div>
+                </ng-template>
+              </dlm-select-field>
             </dlm-form-field>
           </fieldset>
         </div>
