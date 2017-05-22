@@ -10,6 +10,34 @@ table.mdl-data-table {
     font-weight: normal;
     line-height: 1;
     padding: 10px;
+
+    &.mdl-data-table__header--sorted-ascending {
+      color: #999999;
+      &::before{
+        content: '';
+      }
+      &::after{
+        font-family: "FontAwesome";
+        content: '\f0d8';
+        font-size: 12px;
+        vertical-align: baseline;
+        margin-left: 5px;
+      }
+    }
+
+    &.mdl-data-table__header--sorted-descending {
+      color: #999999;
+      &:before {
+        content: '';
+      }
+      &:after {
+        font-family: "FontAwesome";
+        content: '\f0d7';
+        font-size: 12px;
+        vertical-align: baseline;
+        margin-left: 5px;
+      }
+    }
   }
 
   tbody tr {
@@ -58,34 +86,6 @@ table.mdl-data-table {
       color: #1491C1;
       font-size: 14px;
       cursor: pointer;
-    }
-  }
-
-  th.mdl-data-table__header--sorted-ascending {
-    color: #999999;
-    &::before{
-      content: '';
-    }
-    &::after{
-      font-family: "FontAwesome";
-      content: '\f0d8';
-      font-size: 12px;
-      vertical-align: baseline;
-      margin-left: 5px;
-    }
-  }
-
-  th.mdl-data-table__header--sorted-descending {
-    color: #999999;
-    &:before {
-      content: '';
-    }
-    &:after {
-      font-family: "FontAwesome";
-      content: '\f0d7';
-      font-size: 12px;
-      vertical-align: baseline;
-      margin-left: 5px;
     }
   }
 }
