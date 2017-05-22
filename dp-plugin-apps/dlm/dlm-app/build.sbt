@@ -16,6 +16,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" % "play-json_2.11" % "2.6.0-M3",
   "com.hortonworks.dataplane" %% "db-client" % "1.0",
   "com.hortonworks.dlm" %% "beacon-client" % "1.0",
+  "com.hortonworks.dlm" %% "webhdfs-client" % "1.0",
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test
 
 )
