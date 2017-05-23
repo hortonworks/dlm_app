@@ -40,8 +40,8 @@ object Entities {
   // Response schema for Pair cluster request
   case class PairedClustersResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), pairedClusters: Set[Set2[BeaconCluster]] = Set())
 
-  case class PoliciesDetails(name: String, `type`: String, status: String, frequency: Long, startTime: Option[String], endTime: String,
-                             sourceCluster:String, targetCluster:String)
+  case class PoliciesDetails(name: String, `type`: String, status: String, sourceDataset: String, targetDataset: String,
+                             frequency: Long, startTime: Option[String], endTime: String, sourceCluster:String, targetCluster:String)
 
   case class PoliciesDetailsResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), policies: Seq[PoliciesDetails])
 

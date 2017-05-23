@@ -27,8 +27,9 @@ object ResponseEntities {
                                 customProperties: Map[String, String], retry: Retry, acl: Option[AclObject],
                                 user: String, notification: Notification, entityType: String)
 
-  case class PoliciesDetailResponse(name: String, `type`: String, status: String, frequencyInSec: Long,
-                                    sourceCluster: String, targetCluster: String, startTime: Option[String], endTime: String)
+  case class PoliciesDetailResponse(name: String, `type`: String, status: String, sourceDataset: String,
+                                    targetDataset: String, frequencyInSec: Long, sourceCluster: String,
+                                    targetCluster: String, startTime: Option[String], endTime: String)
 
   case class PolicyStatusResponse(status: String, message: String, requestId: String)
 
