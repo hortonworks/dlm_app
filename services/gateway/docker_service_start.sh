@@ -4,4 +4,4 @@ if [ -z "$CONSUL_HOST" ]; then
     exit 1
 fi
 
-java -jar ./gateway-1.0.jar --spring.cloud.consul.host=$CONSUL_HOST
+java -jar /usr/gateway-service/gateway-1.0.jar --spring.cloud.consul.host=$CONSUL_HOST

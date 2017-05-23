@@ -54,11 +54,12 @@ build_dp_gateway() {
 	if [ -d ../services/gateway/build ]; then
 		rm -rf ../services/gateway/build
 	fi
-	mkdir ../services/gateway/build
+	mkdir ../services/gateway/build/
 	pushd ../services/gateway
 	gradle build
-#	unpack_for_docker_deploy build/tmp_dp-gateway ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-gateway/gateway
-	cp build/libs/gateway-1.0.jar ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-gateway/
+	log "Copying gateway build artifacts"
+	mkdir -p ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-gateway/build/ 
+	cp -rf build/**  ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-gateway/build/ 
 	cp Dockerfile ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-gateway/
 	cp docker_service_start.sh ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-gateway/docker_service_start.sh
 	popd
@@ -165,8 +166,8 @@ else
 fi
 clean_build
 build_dp
-build_db_service
 build_dp_gateway
+build_db_service
 build_dp_app
 build_dp_web
 build_dlm_web
