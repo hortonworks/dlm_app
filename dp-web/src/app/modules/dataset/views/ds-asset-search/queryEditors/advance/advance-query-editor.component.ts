@@ -16,7 +16,7 @@ import {AssetSetQueryFilterModel, AssetSetQueryModel} from "../../../ds-assets-l
       <button class="mdl-button btn-hwx-secondary" (click)="addNewFilter()"><i class="fa fa-plus"></i></button>
     </div>  
   `,
-  styles : [`.mdl-button{min-width:0px;} `]
+  styles : [`.mdl-button{min-width:0px;margin-bottom: 4px;}`]
 })
 export class AdvanceQueryEditor implements OnInit {
 
