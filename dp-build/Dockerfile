@@ -16,5 +16,5 @@ RUN rm -rf /etc/sv/getty-5
 RUN mkdir -p /usr/dp-app/bin/logs/ && touch /usr/dp-app/bin/logs/application.log
 RUN ln -sf /dev/stdout /usr/dp-app/bin/logs/application.log
 EXPOSE 80
-
+EXPOSE 9000
 ENTRYPOINT ["runsvdir", "/etc/sv"]
