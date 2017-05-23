@@ -26,6 +26,7 @@ export class TaggingWidget {
   @Input() allowTagDismissal:boolean = true;
   @Input() clearOnSearch:boolean = false;
   @Input() searchText:string="";
+  @Input() placeHolderText:string="";
 
   @Output('textChange') searchTextEmitter: EventEmitter<string> = new EventEmitter<string>();
   @Output('onNewSearch') newTagEmitter: EventEmitter<string|TaggingWidgetTagModel> = new EventEmitter<string|TaggingWidgetTagModel>();

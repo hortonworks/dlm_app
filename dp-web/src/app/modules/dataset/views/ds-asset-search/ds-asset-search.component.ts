@@ -33,6 +33,8 @@ export class DsAssetSearch {
 
   onSimpleQueryObjUpdate (flag:any) {
     console.log("Noticed event!!! ", this.queryObj.searchText );
+    if(!this.showQueryResults)
+      ((thisObj)=>setTimeout(()=>thisObj._actionSearch(),0))(this);
     this.showQueryResults = true;
   //  this.assetName = this.queryObj.searchText;
     this.queryModel=new AssetSetQueryModel([
@@ -65,10 +67,9 @@ export class DsAssetSearch {
     this.showQueryResults=false;
   }
   onQueryEditorResize () {
-    if(this.showQueryResults==false) return;
     var padding = this.queryResultCont.nativeElement.offsetTop - this.outerCont.nativeElement.offsetTop;
     this.tabCont.nativeElement.style.marginTop = "-" + (padding - 10) + "px"; // -10 for padding from border
     this.outerCont.nativeElement.style.paddingTop = padding + "px";
-    this.dsAssetList.resize();
+    this.dsAssetList && this.dsAssetList.resize();
   }
 }

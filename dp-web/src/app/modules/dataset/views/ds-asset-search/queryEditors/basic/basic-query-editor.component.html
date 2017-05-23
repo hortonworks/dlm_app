@@ -6,6 +6,7 @@
         [allowTagDismissal]="true"
         [tags]="filterTags"
         [searchText]="queryObj.searchText"
+        [placeHolderText]="'Search'"
         (onNewSearch)="onNewSearch($event)"
         (onTagDelete)="removeFilter($event)"
       >

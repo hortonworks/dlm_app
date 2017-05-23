@@ -47,6 +47,10 @@ export class BasicQueryEditor implements OnInit {
   copyQryObjToWidget () {
     var enm = AssetTypeEnum, type=this.queryObj.type;
     this.typeValueIndx = (type==enm.ALL)?0:((type==enm.HIVE)?1:((type==enm.HDFS)?2:0))
+    this.ownerIndx=0;
+    this.createdValueIndx=0;
+    this.sizeValueIndx=0;
+    this.dLakeIndx=0;
     this._fillFilterTags();
   }
   onNewSearch(text:string) {
