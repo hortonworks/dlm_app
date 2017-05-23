@@ -6,6 +6,7 @@
   <ds-assets-list *ngIf="showList && !showPopup"
                   [dsModel]="dsModel"
                   [applicableActions]="applicableListActions"
+                  [selectionAllowed]="false"
                   [queryModels]="assetSetQueryModelsForAddition"
                   (onAction)="onListAction($event)"
   ></ds-assets-list>

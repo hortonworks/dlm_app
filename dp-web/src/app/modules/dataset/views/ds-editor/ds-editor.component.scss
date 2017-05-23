@@ -21,7 +21,7 @@ $font_size_title: 22px;
 }
 
 .ds-description-head{
-  height: 80px;
+  min-height: 80px;
   padding:10px 15px;
   color: $color_text_gray
 }
