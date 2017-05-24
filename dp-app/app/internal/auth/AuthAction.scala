@@ -12,6 +12,7 @@ import scala.concurrent.Future
 import internal.KnoxSso
 import com.google.inject.Inject
 import com.google.inject.name.Named
+import org.apache.commons.codec.binary.Base64
 import play.api.Configuration
 import play.api.Logger
 
@@ -31,23 +32,33 @@ class Authenticated @Inject()(@Named("userService") userService: UserService,
 
   def invokeBlock[A](request: Request[A],
                      block: (AuthenticatedRequest[A]) => Future[Result]) = {
-    if (knoxSso.isSsoConfigured() && request.cookies
-      .get(knoxSso.getSsoCookieName()).isEmpty) {
-      Logger.info(
-        s"Sso is configured but ssocookie ${knoxSso.getSsoCookieName} is not found. " +
-          s"Please check the domain name or sub domain of knox and dp app")
-    }
-    if (knoxSso.isSsoConfigured && request.cookies
-          .get(knoxSso.getSsoCookieName)
-          .isDefined) {
-      Logger.debug("sso cookie is found")
-      authenticateViaKnoxSso(request, block)
-    }else{
-      val userOption: Option[User] = getUserFromBearerToken(request)
-      if (userOption.isDefined)
-        block(AuthenticatedRequest[A](userOption.get, request))
-      else
+
+    if (request.headers.get("gatewayUser").isDefined){
+      val userOpt:Option[User] =Jwt.parseJWT(request.headers.get("gatewayUser").get);
+      if (userOpt.isDefined){
+        block(AuthenticatedRequest[A](userOpt.get, request))
+      }else{
         Future.successful(Results.Status(Status.UNAUTHORIZED))
+      }
+    }else{
+      if (knoxSso.isSsoConfigured() && request.cookies
+        .get(knoxSso.getSsoCookieName()).isEmpty) {
+        Logger.info(
+          s"Sso is configured but ssocookie ${knoxSso.getSsoCookieName} is not found. " +
+            s"Please check the domain name or sub domain of knox and dp app")
+      }
+      if (knoxSso.isSsoConfigured && request.cookies
+        .get(knoxSso.getSsoCookieName)
+        .isDefined) {
+        Logger.debug("sso cookie is found")
+        authenticateViaKnoxSso(request, block)
+      }else{
+        val userOption: Option[User] = getUserFromBearerToken(request)
+        if (userOption.isDefined)
+          block(AuthenticatedRequest[A](userOption.get, request))
+        else
+          Future.successful(Results.Status(Status.UNAUTHORIZED))
+      }
     }
   }
 
