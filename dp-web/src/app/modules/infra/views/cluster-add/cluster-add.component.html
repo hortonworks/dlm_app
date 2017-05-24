@@ -22,7 +22,7 @@
   <div class="segment-left-30" #ambariInput>
       <span class="text-dark-small-1">Ambari URL <sup><i class="fa fa-asterisk mandatory-field"></i></sup></span>
       <input class="dp-input-url pull-left" placeholder="eg. http://10.10.10.10:8080" name="url" type="text" [(ngModel)]="cluster.ambariurl" (keypress)="onKeyPress($event)"/>
-      <button class="mdl-button btn-hwx-primary pull-left" (click)="doVerifyCluster($event)">
+      <button class="mdl-button btn-hwx-primary pull-left" (click)="getClusterInfo($event)">
         <span *ngIf="_isClusterValidateInProgress"><i class="fa fa-spinner fa-spin"></i></span>
         <span *ngIf="!_isClusterValidateInProgress">GO</span>
       </button>

@@ -59,15 +59,17 @@ export class ClusterAddComponent implements OnInit{
       }
     });
   }
+
   closeNotification(){
     this.showNotification = false;
   }
-  doVerifyCluster(event) {
+
+  getClusterInfo(event) {
     this._isClusterValidateInProgress = true;
     let cleanedUri = StringUtils.cleanupUri(this.cluster.ambariurl);
-    this.clusterService.getClusterInfo(cleanedUri).subscribe(
+    this.lakeService.validate(cleanedUri).subscribe(
       response => {
-        if(this.cluster.ambariurl){
+        if(response.status === 200){
           this.clusterService.getClusterInfo(cleanedUri).subscribe(clusterInfo =>{
             this._isClusterValidateInProgress = false;
             this._isClusterValidateSuccessful = true;
@@ -157,7 +159,7 @@ export class ClusterAddComponent implements OnInit{
 
   onKeyPress(event){
     if(event.keyCode === 13){
-      this.doVerifyCluster(event);
+      this.getClusterInfo(event);
     }
   }
 
