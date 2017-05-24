@@ -4,30 +4,20 @@ package com.hortonworks.dataplane.gateway.filters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
-import com.hortonworks.dataplane.gateway.domain.Credential;
-import com.hortonworks.dataplane.gateway.domain.Error;
 import com.hortonworks.dataplane.gateway.domain.User;
 import com.hortonworks.dataplane.gateway.domain.UserList;
-import com.hortonworks.dataplane.gateway.domain.UserRef;
-import com.hortonworks.dataplane.gateway.domain.UserRoleResponse;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import feign.FeignException;
 import io.jsonwebtoken.JwtException;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
-import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
 
@@ -39,6 +29,7 @@ public class TokenCheckFilter extends ZuulFilter {
   public static final int BEARER_TOK_LEN = "Bearer ".length();
   public static final String AUTHORIZATION_HEADER = "Authorization";
   public static final String BEARER_TOKEN_KEY = "Bearer ";
+  public static final String GATEWAY_TOKEN = "gateway-token";
 
   @Autowired
   UserServiceInterface userServiceInterface;
@@ -101,7 +92,7 @@ public class TokenCheckFilter extends ZuulFilter {
   private void setUpstreamUserContext(User user) {
     RequestContext ctx = RequestContext.getCurrentContext();
     try {
-      ctx.addZuulRequestHeader("gatewayUser",Jwt.makeJWT(user));
+      ctx.addZuulRequestHeader(GATEWAY_TOKEN,Jwt.makeJWT(user));
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }

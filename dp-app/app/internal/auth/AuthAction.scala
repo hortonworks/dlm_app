@@ -30,11 +30,13 @@ class Authenticated @Inject()(@Named("userService") userService: UserService,
     configuration.underlying.getLong("apicall.timeout").millis
   private val ssoLoginValidCookieName = "sso_login_valid"
 
+  val gatewayTokenKey = "gateway-token"
+
   def invokeBlock[A](request: Request[A],
                      block: (AuthenticatedRequest[A]) => Future[Result]) = {
 
-    if (request.headers.get("gatewayUser").isDefined){
-      val userOpt:Option[User] =Jwt.parseJWT(request.headers.get("gatewayUser").get);
+    if (request.headers.get(gatewayTokenKey).isDefined){
+      val userOpt:Option[User] =Jwt.parseJWT(request.headers.get(gatewayTokenKey).get);
       if (userOpt.isDefined){
         block(AuthenticatedRequest[A](userOpt.get, request))
       }else{
