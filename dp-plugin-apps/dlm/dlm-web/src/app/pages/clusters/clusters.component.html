@@ -1,4 +1,5 @@
 <div class="col-md-12">
+  <dp-map [mapSize]="mapSize" [mapData]="locations"></dp-map>
   <dp-cluster-search></dp-cluster-search>
-  <dp-cluster-list [clusters]="clusters$ | async"></dp-cluster-list>
+  <dlm-cluster-list [clusters]="clusters$ | async" [policiesCount]="policiesCount$ | async" [pairsCount]="pairsCount$ | async"></dlm-cluster-list>
 </div>

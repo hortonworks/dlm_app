@@ -294,7 +294,7 @@ class BeaconService @Inject()(
   /**
     * Get all policies for DLM enabled clusters
     * @param  queryString query parameters made with the `Get all policies api`
-    * @return [[PoliciesDetailsResponse]]
+    * @return all policies across all dlm enabled clusters
     */
   def getAllPolicies(queryString : Map[String, String]): Future[Either[DlmApiErrors, PoliciesDetailsResponse]] = {
     val p: Promise[Either[DlmApiErrors, PoliciesDetailsResponse]] = Promise()
@@ -367,7 +367,7 @@ class BeaconService @Inject()(
   /**
     * Create policy between paired clusters
     *
-    * @param policySubmitRequest [[PolicySubmitRequest]]
+    * @param policySubmitRequest posted data when submitting policy
     * @return
     */
   def createPolicy(clusterId: Long, policyName: String, policySubmitRequest: PolicySubmitRequest): Future[Either[BeaconApiErrors, PostActionResponse]] = {
@@ -403,7 +403,7 @@ class BeaconService @Inject()(
     *
     * @param clusterId    name of the cluster
     * @param policyName   name of the policy
-    * @param policyAction [[PolicyAction]] to be executed on the policy
+    * @param policyAction action to be executed on the policy
     * @return
     */
   def updatePolicy(clusterId: Long, policyName: String, policyAction: PolicyAction): Future[Either[BeaconApiErrors, PostActionResponse]] = {

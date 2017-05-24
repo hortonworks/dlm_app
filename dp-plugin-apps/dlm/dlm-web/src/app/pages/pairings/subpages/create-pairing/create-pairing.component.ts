@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
 import { loadClusters } from 'actions/cluster.action';
@@ -21,13 +21,18 @@ import { PairingsComponent } from '../../pairings.component';
   styleUrls: ['./create-pairing.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class CreatePairingComponent implements OnInit {
+export class CreatePairingComponent implements OnInit, OnDestroy {
   firstSetClusters$: Observable<ClusterPairing[]>;
   pairings$: Observable<Pairing[]>;
   progress$: Observable<Progress>;
   private firstSetClusters: ClusterPairing[];
   private secondSetClusters: ClusterPairing[];
   private pairings: Pairing[];
+  private firstSetClustersPromise;
+  private firstSetClustersSubscription$;
+  private loadParamsSubscription$;
+  private pairingsSubscription$;
+  private progressSubscription$;
   progress: Progress;
   isPairingProgress = false;
   createPairingForm: FormGroup;
@@ -37,7 +42,8 @@ export class CreatePairingComponent implements OnInit {
   constructor(private store: Store<fromRoot.State>,
               t: TranslateService,
               private formBuilder: FormBuilder,
-              private router: Router) {
+              private router: Router,
+              private route: ActivatedRoute) {
     this.firstSetClusters$ = store.select(getAllClusters);
     this.pairings$ = store.select(getAllPairings);
     this.progress$ = store.select(getProgress);
@@ -50,13 +56,41 @@ export class CreatePairingComponent implements OnInit {
     });
     this.store.dispatch(loadClusters());
     this.store.dispatch(loadPairings());
-    this.pairings$.subscribe(pairings => this.pairings = pairings);
-    this.firstSetClusters$.subscribe(clusters => this.firstSetClusters = clusters);
-    this.progress$.subscribe( progress => this.progress = progress);
+    this.pairingsSubscription$ = this.pairings$.subscribe(pairings => {
+      this.pairings = pairings;
+      // Select the first cluster again incase pairs did not load while selecting the first cluster from route params
+      if (pairings.length && this.selectedFirstCluster) {
+        this.onFirstClusterChange(this.selectedFirstCluster);
+      }
+    });
+    this.progressSubscription$ = this.progress$.subscribe( progress => this.progress = progress);
+    this.firstSetClustersPromise = new Promise( (resolve, reject) => {
+      this.firstSetClustersSubscription$ = this.firstSetClusters$.subscribe(clusters => {
+        this.firstSetClusters = clusters;
+        if (clusters.length) {
+          resolve(clusters);
+        }
+      });
+    });
+    this.loadRouteParams();
+  }
+
+  loadRouteParams() {
+    this.loadParamsSubscription$ = this.route.params
+      .subscribe( params => {
+        const clusterId = params['firstClusterId'];
+        if (clusterId) {
+          const clusters$ = this.firstSetClustersPromise.then(firstClusters => {
+            const clusters = firstClusters.filter(cluster => +cluster.id === +clusterId);
+            if (clusters.length) {
+              this.onFirstClusterChange(clusters[0]);
+            }
+          });
+        }
+      });
   }
 
   handleSubmit(createPairingForm: FormGroup) {
-    console.log(createPairingForm);
     this.isPairingProgress = true;
     const requestPayload = [
       {
@@ -129,5 +163,12 @@ export class CreatePairingComponent implements OnInit {
 
   onConfirmation() {
     this.router.navigate(['pairings']);
+  }
+
+  ngOnDestroy() {
+    this.loadParamsSubscription$.unsubscribe();
+    this.pairingsSubscription$.unsubscribe();
+    this.firstSetClustersSubscription$.unsubscribe();
+    this.progressSubscription$.unsubscribe();
   }
 }

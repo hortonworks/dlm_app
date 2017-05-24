@@ -1,6 +1,8 @@
 import { createSelector } from 'reselect';
 import { getPolicies } from './root.selector';
 import { mapToList } from 'utils/store-util';
+import { PoliciesCount } from 'models/policies-count.model';
+import { Cluster } from 'models/cluster.model';
 import { getAllClusters } from './cluster.selector';
 import { getAllJobs } from './job.selector';
 
@@ -24,4 +26,16 @@ export const getPolicyClusterJob = createSelector(getAllPoliciesWithClusters, ge
       jobsResource: jobs.filter(job => job.name === policy.id) || []
     };
   });
+});
+
+export const getCountPoliciesForSourceClusters = createSelector(getAllPoliciesWithClusters, getAllClusters, (policies, clusters) => {
+  return clusters.reduce((entities: { [id: number]: PoliciesCount }, entity: Cluster) => {
+    return Object.assign({}, entities, {
+      [entity.id]: {
+        clusterId: entity.id,
+        clusterName: entity.name,
+        policies: policies.filter(policy => policy.sourceClusterResource.id === entity.id).length
+      }
+    });
+  }, {});
 });

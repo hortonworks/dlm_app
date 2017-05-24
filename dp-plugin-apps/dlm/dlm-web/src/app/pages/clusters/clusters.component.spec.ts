@@ -8,8 +8,13 @@ import {ClusterCardComponent} from './cluster-card/cluster-card.component';
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {MockTranslateLoader} from '../../mocks/mock-translate-loader';
 import {CardComponent} from '../../components/card/card.component';
+import {MapComponent} from '../../components/map/map.component';
+import {BytesSizePipe} from '../../pipes/bytes-size.pipe';
 import {MockStore} from '../../mocks/mock-store';
 import {Store} from '@ngrx/store';
+import {MockBackend} from '@angular/http/testing';
+import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions} from '@angular/http';
+import {HttpService} from '../../services/http.service';
 
 describe('ClustersComponent', () => {
   let component: ClustersComponent;
@@ -27,10 +32,17 @@ describe('ClustersComponent', () => {
         SearchInputComponent,
         DropdownComponent,
         ClusterCardComponent,
-        CardComponent
+        CardComponent,
+        MapComponent,
+        BytesSizePipe
       ],
       providers: [
-        {provide: Store, useClass: MockStore}
+        {provide: Store, useClass: MockStore},
+        {provide: ConnectionBackend, useClass: MockBackend},
+        {provide: RequestOptions, useClass: BaseRequestOptions},
+        {provide: Http, useClass: HttpService},
+        Http,
+        HttpService,
       ]
     })
       .compileComponents();

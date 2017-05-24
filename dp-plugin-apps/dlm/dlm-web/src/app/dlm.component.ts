@@ -73,11 +73,6 @@ export class DlmComponent {
         '<span class="navigation-icon glyphicon glyphicon-list-alt"></span>'
       ),
       new MenuItem(
-        t.instant('sidenav.menuItem.jobs'),
-        './jobs',
-        '<span class="navigation-icon glyphicon glyphicon-hourglass"></span>'
-      ),
-      new MenuItem(
         t.instant('sidenav.menuItem.help'),
         './help',
         '<span class="navigation-icon glyphicon glyphicon-info-sign"></span>'

@@ -75,8 +75,8 @@ describe('JobService', () => {
     });
 
     it('each request should use valid URL', () => {
-      expect(this.connections[0].request.url).toContain('clusters/1/jobs?filterBy=type:fs');
-      expect(this.connections[1].request.url).toContain('clusters/2/jobs?filterBy=type:fs');
+      expect(this.connections[0].request.url).toContain('clusters/1/jobs?numResults=1000');
+      expect(this.connections[1].request.url).toContain('clusters/2/jobs?numResults=1000');
     });
 
     it('should return loaded jobs', () => {
@@ -93,7 +93,7 @@ describe('JobService', () => {
       expect(this.lastConnection.request.method).toBe(RequestMethod.Get);
     });
     it('should use valid URL', () => {
-      expect(this.lastConnection.request.url).toContain('clusters/c1/policy/policyId1/jobs');
+      expect(this.lastConnection.request.url).toContain('clusters/c1/policy/policyId1/jobs?numResults=1000');
     });
   });
 
