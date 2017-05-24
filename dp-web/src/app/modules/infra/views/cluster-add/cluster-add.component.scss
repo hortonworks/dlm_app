@@ -1,0 +1,255 @@
+@import "../../../../../styles/variables";
+
+
+.dashboard-title{
+  height:45px;
+  background-color: $albaster-gray;
+  span {
+    color : $shuttle-gray;
+    padding: 15px 0px 15px 20px;
+    display: inline-block;
+  }
+}
+
+.segment-left-30 {
+  margin-left: 30px;
+  padding: 0px 0px 15px 0px;
+}
+
+.segment-left-20 {
+  margin-left: 20px;
+  padding: 0px 0px 15px 0px;
+}
+
+.text-large {
+  display: block;
+  color: $dove-gray;
+  font-size: 20px;
+  font-weight: 500;
+  margin: 6px 0px;
+  line-height: 20px;
+}
+
+.fa-server {
+  color: $forest-green-1;
+  display: inline-block;
+  float: left;
+  font-size: 20px;
+}
+
+.text-dark-small-1 {
+  display: block;
+  color: $dove-gray;
+  font-size: 13px;
+}
+
+.text-medium {
+  display: block;
+  color: $dusty-gray;
+  font-size: 15px;
+  line-height: 15px;
+}
+
+.text-small-1 {
+  display: block;
+  color: $dusty-gray;
+  font-size: 13px;
+}
+
+.text-small-2 {
+  display: block;
+  color: $dusty-gray;
+  font-size: 12px;
+  line-height: 13px;
+  margin: 6px 0;
+}
+
+input, textarea{
+  font-size: 13px !important;
+}
+
+.page-container {
+  font-family: "Roboto";
+  background-color: $gallery-gray;
+  height:auto;
+  padding: 30px 45px;
+}
+
+.page-title {
+  margin-bottom: 10px;
+}
+
+.dp-input-url {
+  width: 550px;
+  padding: 0px;
+  outline: none;
+  border: 1px solid $gallery-gray;
+  float: left;
+  height: 33px;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+.dp-input {
+  width: 350px;
+  height: 32px;
+  padding: 0px;
+  outline: none;
+  border: 1px solid $gallery-gray;
+}
+.dp-textarea {
+  width: 350px;
+  height: 68px;
+  padding: 0px;
+  border: 1px solid $gallery-gray;
+  outline: none;
+}
+.btn-hwx-primary{
+  margin-left: 0px;
+  width: 110px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
+a {
+  color: $eastern-blue;
+  text-decoration-line: none;
+}
+
+:host /deep/ .taggingWidget{
+  width: 350px !important;
+  height: 34px !important;
+  padding: 0px;
+  border-radius: 0px !important;
+  input {
+    font-size: 12px !important;
+  }
+}
+
+.placeholder {
+  clear: both;
+  height: 20px;
+}
+
+.cluster-details{
+  margin-top: 10px;
+  background-color: $iron-gray;
+  padding: 10px 0px;
+}
+.fa-check-circle{
+  color: $forest-green-1;
+  margin-right: 10px;
+}
+.datalake-indicator{
+  margin: 0px;
+  padding:10px 25px;
+  border: 1px solid $eastern-blue;
+  background-color: $polar-blue;
+  min-height: 80px;
+  color: $eastern-blue;
+  .fa-info-circle {
+    margin: 14px 10px 10px 10px;
+    float: left;
+    color: $eastern-blue;
+    display: inline-block;
+    font-size: 16px;
+  }
+  .datalake-notification{
+    margin: 14px 10px 10px 28px;
+  }
+  .text-dark-small-1 {
+    margin: 5px 10px 0px 5px !important;
+    color: $eastern-blue;
+  }
+  .text-small-2 {
+    margin: 5px 10px 5px 5px;
+  }
+}
+.datalake-input{
+  background-color: $white;
+  padding: 0px 0px 0px 10px;
+  margin:0px;
+  .left-panel {
+    display: inline-block;
+    padding-top: 25px
+  }
+  .right-panel {
+    display: inline-block;
+    float: right;
+  }
+}
+.button-container{
+  padding-top: 30px;
+  float: none;
+  .mdl-button {
+    margin-right: 10px;
+  }
+}
+.error-section{
+  padding-top: 25px;
+  .fa-times-circle {
+    font-size: 15px;
+    display: inline-block;
+    float: left;
+    color: $roman-red;
+  }
+  div{
+    padding-left: 20px;
+  }
+  .text-medium {
+    margin-top: 0px;
+    color: $roman-red;
+  }
+
+  .text-small-1 {
+    color: $roman-red;
+    margin: 6px 0px;
+  }
+  .text-small-2 {
+    color: $roman-red;
+  }
+  ul {
+    padding-left: 20px;
+  }
+  li{
+    color: $roman-red;
+    font-size: 12px;
+  }
+}
+
+.validation-error {
+  input {
+    color: $roman-red;
+    border: 1px solid $roman-red;
+    outline: none;
+    height: 32px;
+  }
+  button {
+    background-color: $roman-red;
+    border-color: $roman-red;
+  }
+
+}
+.notification-bar {
+  padding: 15px;
+  background: #F5F5F5;
+  height: 34px;
+  margin-bottom: 20px;
+  .fa-check-circle {
+    font-size: 24px;
+  }
+  .fa-remove{
+    color: $dusty-gray;
+    cursor: pointer;
+  }
+  .text-medium{
+    font-weight: 500;
+    color: $forest-green-1;
+  }
+}
+
+.mandatory-field {
+  font-size: 8px;
+  color: $roman-red;
+}
+
+

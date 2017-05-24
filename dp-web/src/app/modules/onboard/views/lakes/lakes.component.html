@@ -3,7 +3,7 @@
     <div class="" style="height: initial; text-transform:none; font-size: 1em; text-align: left; display: flex;padding: 10px;">
         <div style="width: 50px;"><i class="fa fa-server" aria-hidden="true" style="font-size: 1.2em;"></i></div>
         <div style="flex-grow: 1;">
-          <div style="text-transform: uppercase; font-size: 1.2em; font-weight: bold;">Add datalakes</div>
+          <div style="text-transform: uppercase; font-size: 1.2em; font-weight: bold;">Add clusters</div>
           <p>desc.</p>
         </div>
       </div>
@@ -17,7 +17,7 @@
       <label for="location" style="display: block;">Location</label>
       <input ngui-auto-complete
         [min-chars]=3
-        [(ngModel)]="location" 
+        [(ngModel)]="location"
         [source]="getLocations.bind(this)"
         [value-formatter]="locationFormatter"
         [list-formatter]="locationFormatter"
