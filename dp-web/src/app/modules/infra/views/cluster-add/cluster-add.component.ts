@@ -69,7 +69,7 @@ export class ClusterAddComponent implements OnInit{
     let cleanedUri = StringUtils.cleanupUri(this.cluster.ambariurl);
     this.lakeService.validate(cleanedUri).subscribe(
       response => {
-        if(response.status === 200){
+        if(response.ambariStatus === 200){
           this.clusterService.getClusterInfo(cleanedUri).subscribe(clusterInfo =>{
             this._isClusterValidateInProgress = false;
             this._isClusterValidateSuccessful = true;
