@@ -1,6 +1,5 @@
-import {Component, ElementRef, ViewChild} from "@angular/core";
-import { Router } from '@angular/router';
-import { Subject, Observable } from 'rxjs/Rx';
+import {Component, ElementRef, ViewChild, OnInit} from '@angular/core';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 
 import { Cluster } from '../../../../models/cluster';
 import { Lake } from '../../../../models/lake';
@@ -23,10 +22,11 @@ import {StringUtils} from '../../../../shared/utils/stringUtils';
   templateUrl: './cluster-add.component.html',
   styleUrls: ['./cluster-add.component.scss']
 })
-export class ClusterAddComponent {
+export class ClusterAddComponent implements OnInit{
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private lakeService: LakeService,
     private clusterService: ClusterService,
     private locationService: LocationService,
@@ -42,38 +42,66 @@ export class ClusterAddComponent {
 
   mapData: MapData[] = [];
   cluster:Cluster = new Cluster();
+  searchTerm: string;
 
-  altasServiceName:string = "ATLAS";
-  rangerServiceName:string = "RANGER";
+  dpRequiredServices = ['ATLAS'];
+  dLFoundMessage = `This cluster has been indentified as a Datalake since it has data management services,  ${' ' + this.dpRequiredServices.join(', ')} running.`;
+
+  showNotification = false;
 
   reasons:string[] = ['Check if the Ambari server is up and running in the given url',
-             'Make sure that you have right access rights to the mbari server']
+             'Make sure that you have right access rights to the mbari server'];
 
-
+  ngOnInit(){
+    this.route.params.subscribe(params =>{
+      if(params.status && params.status === 'success'){
+        this.showNotification = true;
+      }
+    });
+  }
+  closeNotification(){
+    this.showNotification = false;
+  }
   doVerifyCluster(event) {
     this._isClusterValidateInProgress = true;
-    this.lakeService.validate(StringUtils.cleanupUri(this.cluster.ambariurl)).subscribe(
+    let cleanedUri = StringUtils.cleanupUri(this.cluster.ambariurl);
+    this.clusterService.getClusterInfo(cleanedUri).subscribe(
       response => {
-        this._isClusterValidateInProgress = false;
-        if(response.ambariStatus === 200){
-          this._isClusterValidateSuccessful = true;
-          this._isClusterValid = true;
-          this.clusterService.getClusterInfo(this.cluster.ambariurl).subscribe(clusterInfo =>{
-            this.cluster = clusterInfo;
+        if(this.cluster.ambariurl){
+          this.clusterService.getClusterInfo(cleanedUri).subscribe(clusterInfo =>{
+            this._isClusterValidateInProgress = false;
+            this._isClusterValidateSuccessful = true;
+            this._isClusterValid = true;
+            this.extractClusterInfo(clusterInfo)
+          },() => {
+            this.onError();
           });
-          let classes = this.ambariInputContainer.nativeElement.className.replace("validation-error",'');
+          let classes = this.ambariInputContainer.nativeElement.className.replace('validation-error','');
           this.ambariInputContainer.nativeElement.className = classes;
         }else{
+          this._isClusterValidateInProgress = false;
           this._isClusterValidateSuccessful = true;
           this._isClusterValid = false;
-          this.ambariInputContainer.nativeElement.className += " validation-error";
+          this.ambariInputContainer.nativeElement.className += ' validation-error';
         }
       },
       () => {
-        this._isClusterValidateSuccessful = false;
-        this._isClusterValidateInProgress = false;
+        this.onError();
       }
     );
+  }
+
+  private onError(){
+    this._isClusterValidateSuccessful = false;
+    this._isClusterValidateInProgress = false;
+  }
+
+  private extractClusterInfo(clusterInfo){
+    this.cluster.name = clusterInfo[0].clusterName;
+    this.cluster.services = clusterInfo[0].services;
+    // TEMP FIX : Should come from backend
+    let urlParts = this.cluster.ambariurl.split('/');
+    this.cluster.ipAddress = urlParts.length ? urlParts[2].substr(0, urlParts[2].indexOf(':')) : '';
   }
 
   get showClusterDetails(){
@@ -81,7 +109,12 @@ export class ClusterAddComponent {
   }
 
   get isDataLake(){
-    return this.cluster.services.indexOf(this.altasServiceName) > 0 && this.cluster.services.indexOf(this.rangerServiceName) > 0;
+    for (let name of this.dpRequiredServices) {
+      if (this.cluster.services.indexOf(name) === -1) {
+        return false;
+      }
+    }
+    return true;
   }
 
   locationFormatter(location:Location) : string{
@@ -90,6 +123,12 @@ export class ClusterAddComponent {
 
   getLocations(searchTerm){
     return this.locationService.retrieveOptions(searchTerm);
+  }
+
+  checkLocation(){
+    if(this.searchTerm.length === 0){
+      this.mapData = [];
+    }
   }
 
   onSelectLocation(location: Location) {
@@ -108,12 +147,18 @@ export class ClusterAddComponent {
       .subscribe(
         () => {
           this.router.navigate(['infra', {
-            message: 'Lake successfully added.'
+            status: 'success'
           }]);
         },
         error => {
         }
       );
+  }
+
+  onKeyPress(event){
+    if(event.keyCode === 13){
+      this.doVerifyCluster(event);
+    }
   }
 
   createCluster(){
@@ -137,7 +182,7 @@ export class ClusterAddComponent {
         this._isClusterValid = false;
         this._isClusterValidateSuccessful = false;
         this.router.navigate(['infra/add', {
-          message: 'Lake successfully added.'
+          status: 'success'
         }]);
       },
       error => {

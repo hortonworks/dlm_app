@@ -47,7 +47,7 @@ export class AppComponent implements OnInit {
         new PersonaTabs('AUDITS', 'audits')
       ]),
       new Persona('Infra Admin', [
-        new PersonaTabs('DATA LAKES', 'infra')
+        new PersonaTabs('CLUSTERS', 'infra')
       ]),
       new Persona('DLM', [
       ])

@@ -35,7 +35,10 @@ export class ClusterService {
   }
 
   getClusterInfo(ambariUrl:string) :Observable<Cluster> {
-    return Observable.of(Cluster.getClusterInfo(ambariUrl));
+    return this.http
+      .get(`api/clusters/details?url=${ambariUrl}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
   }
 
 }
