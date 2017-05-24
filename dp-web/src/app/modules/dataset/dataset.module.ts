@@ -26,12 +26,14 @@ import {DsTagsService} from "./services/dsTagsService";
 import {DsAssetSearch} from "./views/ds-asset-search/ds-assest-search.component";
 import {NormalQueryEditor} from "./views/ds-asset-search/queryEditors/normal/normal-query-editor.component";
 import {SearchWidget} from "./views/ds-asset-search/queryEditors/normal/search-widget/search-widget.component";
+import {TaggingWidgetModule} from "../../shared/tagging-widget/tagging-widget.module";
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     RouterModule.forChild(routes),
+    TaggingWidgetModule
   ],
   declarations: [
       NavTagPanel,
@@ -46,7 +48,6 @@ import {SearchWidget} from "./views/ds-asset-search/queryEditors/normal/search-w
       DsRowProxy,
       DatasetDashboardComponent,
       PaginationComponent,
-      TaggingWidget,
       DsAssetSearch,
       NormalQueryEditor,
       SearchWidget
