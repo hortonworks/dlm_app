@@ -3,6 +3,7 @@
 @import "styles/variables";
 @import "styles/mdl-extend";
 @import "styles/buttons";
+@import "styles/table";
 @import "styles/mixins";
 
 body {
@@ -17,6 +18,14 @@ body {
 
 div.spacer-34 {
   height: 34px;
+}
+
+.visibility-visible {
+  visibility: visible;
+}
+
+.visibility-hidden {
+  visibility: hidden;
 }
 
 @include summary-pane("summary-pane-5", "20%");
