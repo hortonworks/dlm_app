@@ -18,7 +18,6 @@ export class NavTagPanel implements OnInit {
     private tagService :DatasetTagService
   ){}
   ngOnInit () {
-    console.log("ngOnInit called");
     this.tagService.list().subscribe(tags => (this.displayTags=this.allTags=tags) && tags.length && this.onPanelRowSelectionChange(tags[0]));
   }
   onPanelRowSelectionChange (tagObj:DatasetTag) {

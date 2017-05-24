@@ -11,8 +11,9 @@ export class RichDatasetService {
   }
 
   public listByTag(tagName:string, start:number, limit:number): Observable<any> {
+    start -= 1;
     return Observable.create(observer => {
-      setTimeout(()=>observer.next(data.slice(start - 1, start + limit)), 300);
+      setTimeout(()=>observer.next(data.slice(start, start + limit)), 300);
     });
 
   }

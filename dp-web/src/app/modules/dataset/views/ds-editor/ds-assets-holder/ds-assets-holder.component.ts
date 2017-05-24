@@ -31,20 +31,16 @@ export class DsAssetsHolder implements OnInit {
     this.showList = (this.assetSetQueryModelsForAddition.length > 0);
   }
   actionDone (asqm:AssetSetQueryModel) {
-    console.log("actionDone");
     this.assetSetQueryModelsForAddition.push(asqm);
-    console.log(this.assetSetQueryModelsForAddition);
     this.actionEmitter.emit()
     this.showPopup = false;
     this.setShowListFlag();
   }
   onListAction(action:AssetListActionsEnum) {
-    console.log(action);
     if(action == AssetListActionsEnum.ADD) this.showPopup=true;
     if(action == AssetListActionsEnum.REMOVE) this.actionRemoveAll();
   }
   actionRemoveAll() {
-    console.log("actionRemoveAll");
     this.assetSetQueryModelsForAddition.splice(0);
     this.setShowListFlag ();
     this.actionEmitter.emit();

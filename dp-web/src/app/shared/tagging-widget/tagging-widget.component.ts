@@ -40,7 +40,6 @@ export class TaggingWidget {
   emitSearchText(){this.newTagEmitter.emit(this.searchText);}
   onKeyDown(event){
     if([13,38,40].indexOf(event.keyCode) == -1 && this.focusStickerIndex==this.tags.length && event.target.selectionStart) return;
-    // console.log(event.key, event.keyCode, event.target.selectionStart);
     switch(event.keyCode) {
       case 8  :
       case 46 :  if (this.allowTagDismissal && this.focusStickerIndex < this.tags.length) this.removeFocusTag();

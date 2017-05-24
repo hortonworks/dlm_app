@@ -89,6 +89,6 @@ export class QueryFilter  implements OnInit {
       default                 : this.filterObject = new QueryFilterObject();            break;
     }
   }
-  validate(){console.log(this.filterObject.validate());}
+  validate(){this.filterObject.validate();}
   onCloseClick(){this.closeEmitter.emit()}
 }

@@ -32,11 +32,10 @@ export class DsAssetSearch {
   @Output("cancelNotification") cancelNotificationEmitter: EventEmitter<null> = new EventEmitter<null>();
 
   onSimpleQueryObjUpdate (flag:any) {
-    console.log("Noticed event!!! ", this.queryObj.searchText );
     if(!this.showQueryResults)
       ((thisObj)=>setTimeout(()=>thisObj._actionSearch(),0))(this);
     this.showQueryResults = true;
-  //  this.assetName = this.queryObj.searchText;
+    //  this.assetName = this.queryObj.searchText;
     this.queryModel=new AssetSetQueryModel([
       {column:"asset.name", operator:"contains", value:this.queryObj.searchText},
       {column:"asset.source", operator:"==", value:AssetTypeEnumString[this.queryObj.type]}

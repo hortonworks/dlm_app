@@ -15,6 +15,6 @@ export class SimplePaginationWidget {
   pageSizeChange() {this.pageSizeEmitter.emit(this.pageSize=+this.pageSize);}
   previous() {(this.pageStartIndex > 1) && this.indexEmitter.emit(this.pageStartIndex -= this.pageSize);}
   next() {(this.pageStartIndex + this.pageSize  <= this.count) && this.indexEmitter.emit(this.pageStartIndex += this.pageSize);}
-  Math:any
+  Math:any;
   constructor(){this.Math=Math;}
 }

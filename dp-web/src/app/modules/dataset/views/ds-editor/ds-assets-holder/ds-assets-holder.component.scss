@@ -1,16 +1,4 @@
-$color_text_blue: rgb(102,164,200);
-$color_text_gray: rgb(103,115,120);
-$color_green: rgb(96,170,90);
-$font_size_title: 22px;
-
-
-.borderBox, .borderBox * {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-
+@import "../../../../../../styles/variables";
 
 
 .dsAssetsHolder {
