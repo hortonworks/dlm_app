@@ -14,21 +14,6 @@ import scala.concurrent.Future
 
 class FileServiceImpl()(implicit ws: WSClient) extends FileService {
 
-
-  private def mapToContentSummaryResponse(res: WSResponse) = {
-    res.status match {
-      case 200 =>
-        res.json.validate[ContentSummary] match {
-          case JsSuccess(result, _) => Right(result)
-          case JsError(error) => {
-            val url = Some(res.asInstanceOf[AhcWSResponse].ahcResponse.getUri.toUrl)
-            Left(WebHdfsApiError(BAD_GATEWAY, url, None,Some(error.toString())))
-          }
-        }
-      case _ => mapErrors(res)
-    }
-  }
-
   private def mapToFileStatus(res: WSResponse) = {
     res.status match {
       case 200 => Right(res.json)

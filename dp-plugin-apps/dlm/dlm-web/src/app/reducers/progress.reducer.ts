@@ -2,6 +2,7 @@ import { Action } from '@ngrx/store';
 import { BaseState } from 'models/base-resource-state';
 import { ProgressState } from 'models/progress-state.model';
 import { isSuccessAction, isStartAction, isFailureAction } from 'utils/type-action';
+import { ActionTypes } from 'actions/progress.action';
 
 export type State = BaseState<ProgressState>;
 
@@ -44,6 +45,17 @@ export const updateLoadingProgress = (request: ProgressState, action): ProgressS
 };
 
 export function reducer(state = initialState, action: Action): State {
+  switch (action.type) {
+    case ActionTypes.RESET_PROGRESS_STATE: {
+      const { requestId } = action.payload;
+      return {
+        entities: {
+          ...state.entities,
+          [requestId]: makeProgressInstance(requestId)
+        }
+      };
+    }
+  }
   if (!(action.payload && action.payload.meta && action.payload.meta.requestId)) {
     return state;
   }

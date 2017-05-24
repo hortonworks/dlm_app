@@ -6,10 +6,8 @@ import { bytesToSize } from 'utils/size-util';
  * Convert bytes into largest possible unit.
  * Takes an precision argument that defaults to 2.
  * Usage:
- *   bytes | fileSize:precision
- * Example:
- *   {{ 1024 |  fileSize}}
- *   formats to: 1 KB
+ *   <span [innerHTML]="bytes | fileSize:precision"></span>
+ *
  */
 @Pipe({name: 'bytesSize'})
 export class BytesSizePipe implements PipeTransform {

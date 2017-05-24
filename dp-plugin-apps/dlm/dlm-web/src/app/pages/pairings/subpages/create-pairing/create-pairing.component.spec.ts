@@ -12,6 +12,7 @@ import {ModalDialogComponent} from '../../../../common/modal-dialog/modal-dialog
 import {ModalModule} from 'ng2-bootstrap';
 import {MockTranslateLoader} from '../../../../mocks/mock-translate-loader';
 import {RouterTestingModule} from '@angular/router/testing';
+import {BytesSizePipe} from '../../../../pipes/bytes-size.pipe';
 
 describe('CreatePairingComponent', () => {
   let component: CreatePairingComponent;
@@ -32,7 +33,8 @@ describe('CreatePairingComponent', () => {
         PairingProgressCardComponent,
         CreatePairingCardComponent,
         ClusterCardComponent,
-        ModalDialogComponent
+        ModalDialogComponent,
+        BytesSizePipe
       ],
       providers: [
         {provide: Store, useClass: MockStore}

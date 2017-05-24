@@ -73,10 +73,6 @@ export const routes: Routes = [{
     ]
   },
   {
-    path: 'jobs',
-    component: JobsComponent
-  },
-  {
     path: 'notifications',
     component: NotificationsPageComponent
   },

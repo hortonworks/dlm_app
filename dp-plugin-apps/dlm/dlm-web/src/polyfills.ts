@@ -39,3 +39,5 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/concat';
 import 'rxjs/add/operator/withLatestFrom';
 import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/operator/toPromise';
+import 'rxjs/add/operator/first';

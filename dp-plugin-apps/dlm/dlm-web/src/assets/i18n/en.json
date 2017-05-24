@@ -15,6 +15,11 @@
     "schedule": "Schedule",
     "files": "Files",
     "folders": "Folders",
+    "none": "None",
+    "policies": "Policies",
+    "pair": "Pair",
+    "pairs": "Pairs",
+    "policy": "Policy",
     "time": {
       "hourly": "Hourly",
       "daily": "Daily",
@@ -85,7 +90,8 @@
   },
   "forms": {
     "validation_errors": {
-      "required": "\"{{fieldLabel}}\" is required"
+      "required": "\"{{fieldLabel}}\" is required",
+      "time_less_than_current": "Selected time is less than current"
     }
   },
   "page": {
@@ -115,10 +121,12 @@
         "policy": "Policy"
       },
       "card": {
-        "registered": "Registered",
+        "usage": "Usage",
         "nodes": "Nodes",
         "volume": "Volume",
-        "pairs": "Pairs"
+        "location": "Location",
+        "create_pair_text": "+ Pair",
+        "create_policy_text": "+ Policy"
       }
     },
     "policies": {
