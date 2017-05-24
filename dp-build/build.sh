@@ -70,6 +70,7 @@ build_dp_app() {
 	unpack_for_docker_deploy ../dp-build/build/tmp_dp-app ../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-app/dp-app
 	cp -R ../dp-build/services ../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-app/
 	cp ../dp-build/Dockerfile ../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-app/
+	cp ../dp-build/nginx.ctmpl ../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-app/
 	popd
 }
 

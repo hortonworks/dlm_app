@@ -4,4 +4,4 @@ if [ -z "$CONSUL_HOST" ]; then
     exit 1
 fi
 exec 2>&1
-rm -f /usr/dp-app/RUNNING_PID && cd /usr/dp-app/bin && exec ./dp-app -DDP_APP_HOME=${DP_APP_HOME} -Dconfig.resource=../conf/docker.conf -Dplay.crypto.secret="129921029812" -Dconsul.host=${CONSUL_HOST} -Dconsul.service.port=8080
+rm -f /usr/dp-app/RUNNING_PID && cd /usr/dp-app/bin && exec ./dp-app -DDP_APP_HOME=${DP_APP_HOME} -Dconfig.resource=../conf/docker.conf -Dplay.crypto.secret="129921029812" -Dconsul.host=${CONSUL_HOST} -Dconsul.service.port=8000

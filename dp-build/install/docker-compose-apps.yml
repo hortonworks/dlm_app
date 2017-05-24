@@ -41,7 +41,7 @@ services:
     image: hortonworks/dp-app
     ports:
         - "80:80"
-        - "8080:9000"
+        - "8000:9000"
     volumes:
         - ./certs:/usr/dp-app/conf/cert
     environment:
