@@ -1,36 +1,13 @@
-import * as d3 from "d3";
-import zoom = d3.behavior.zoom;
 export class MapData {
- start : Point;
- end? : Point;
- connectionStatus : MapConnectionStatus;
- constructor(start:Point, end?:Point, connectionStatus?:MapConnectionStatus){
-    this.start = start;
-    this.end = end;
-    this.connectionStatus = connectionStatus;
- }
+ constructor(public start:Point, public end?:Point, public connectionStatus?:MapConnectionStatus){};
 }
 
 export class Point {
-    latitude : number;
-    longitude : number;
-    status?:MapConnectionStatus;
-    constructor(latitude:number, longitude:number, status:MapConnectionStatus){
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.status = status;
-    }
+    constructor(public latitude:number, public longitude:number, public status?:MapConnectionStatus){};
 }
 
 export class MapDimensions {
-  height : string;
-  width : string;
-  zoom : number;
-  constructor(height:string, width:string, zoom:number){
-    this.height = height;
-    this.width = width;
-    this.zoom = zoom;
-  }
+  constructor(public height:string, public width:string, public zoom:number){};
 }
 
 export enum MapConnectionStatus {
