@@ -1,11 +1,22 @@
-version: '2'
+version: '2'  
 services:
-  dp-database:
-    image: postgres
+  dp-consul-server:
+    image: consul
+    network_mode: "host"
+    command: agent -server -bootstrap -bind=${CONSUL_HOST} -client=${CONSUL_HOST} -ui
+  dp-gateway:
+    image: hortonworks/dp-gateway
+    ports:
+      - "8762:8762"
     environment:
+      CONSUL_HOST: ${CONSUL_HOST}
+  dp-database:
+     image: postgres
+     environment:
         POSTGRES_PASSWORD: dp_admin
         POSTGRES_USER: dp_admin
         POSTGRES_DB: dataplane
+        CONSUL_HOST: ${CONSUL_HOST}
   dp-db-service:
     image: hortonworks/dp-db-service
     ports:
@@ -14,6 +25,8 @@ services:
         - dp-database
     links:
         - dp-database
+    environment:
+      CONSUL_HOST: ${CONSUL_HOST}
   dp-cluster-service:
     image: hortonworks/dp-cluster-service
     ports:
@@ -22,14 +35,18 @@ services:
         - dp-database
     links:
         - dp-database
+    environment:
+      CONSUL_HOST: ${CONSUL_HOST}
   dp-app:
     image: hortonworks/dp-app
     ports:
         - "80:80"
+        - "8080:9000"
     volumes:
         - ./certs:/usr/dp-app/conf/cert
     environment:
         DP_APP_HOME: "/usr/dp-app"
+        CONSUL_HOST: ${CONSUL_HOST}
     depends_on:
         - dp-cluster-service
         - dp-db-service

@@ -16,6 +16,7 @@ clean_build() {
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-app/dlm-web
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-knox
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-cluster-service
+ 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-gateway
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/installer
 }
 
@@ -45,9 +46,24 @@ build_db_service() {
 	pushd ../services/db-service
 	unpack_for_docker_deploy build/tmp_dp-db-service ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-db-service/dp-db-service
 	cp Dockerfile ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-db-service/
+	cp docker_service_start.sh ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-db-service/docker_service_start.sh
 	popd
 }
-
+build_dp_gateway() {
+	log "Building gateway"
+	if [ -d ../services/gateway/build ]; then
+		rm -rf ../services/gateway/build
+	fi
+	mkdir ../services/gateway/build/
+	pushd ../services/gateway
+	gradle build
+	log "Copying gateway build artifacts"
+	mkdir -p ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-gateway/build/ 
+	cp -rf build/**  ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-gateway/build/ 
+	cp Dockerfile ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-gateway/
+	cp docker_service_start.sh ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-gateway/docker_service_start.sh
+	popd
+}
 build_dp_app() {
 	log "Building dp-app"
 	pushd ../dp-app
@@ -92,10 +108,11 @@ build_dp_knox() {
 build_cluster_service() {
 	log "Building cluster service"
 	rm -rf ../services/cluster-service/build
-    mkdir ../services/cluster-service/build
+        mkdir ../services/cluster-service/build
 	pushd ../services/cluster-service
 	unpack_for_docker_deploy build/tmp_dp-cluster-service ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-cluster-service/dp-cluster-service
 	cp Dockerfile ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-cluster-service
+        cp docker_service_start.sh ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-cluster-service
 	popd
 }
 
@@ -106,6 +123,7 @@ build_installer() {
 	cp dp-docker-build.sh ${DP_DOCKER_ROOT_FOLDER}/installer/
 	append_docker_image_version "hortonworks\/dp-db-service" ${DP_DOCKER_ROOT_FOLDER}/installer/docker-compose-apps.yml
 	append_docker_image_version "hortonworks\/dp-cluster-service" ${DP_DOCKER_ROOT_FOLDER}/installer/docker-compose-apps.yml
+	append_docker_image_version "hortonworks\/dp-gateway" ${DP_DOCKER_ROOT_FOLDER}/installer/docker-compose-apps.yml
 	append_docker_image_version "hortonworks\/dp-app" ${DP_DOCKER_ROOT_FOLDER}/installer/docker-compose-apps.yml
 	append_docker_image_version "hortonworks\/dp-knox" ${DP_DOCKER_ROOT_FOLDER}/installer/docker-compose-knox.yml
 	cp -R ../services/db-service/db/* ${DP_DOCKER_ROOT_FOLDER}/installer/dbscripts/
@@ -148,6 +166,7 @@ else
 fi
 clean_build
 build_dp
+build_dp_gateway
 build_db_service
 build_dp_app
 build_dp_web
