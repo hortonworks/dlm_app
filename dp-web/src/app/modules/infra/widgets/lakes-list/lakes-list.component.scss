@@ -1,8 +1,10 @@
+@import "../../../../../styles/variables";
+
 .dashboard-title{
     height:45px;
     margin: 20px 30px 18px 30px;
     span {
-        color : #53646A;
+        color : $shuttle-gray;
         padding: 10px 0px;
         font-size: 16px;
         font-weight: bold;
@@ -37,7 +39,7 @@ input:focus{
   position: absolute;
   left: 5px;
   bottom: 10px;
-  color: #53646A;
+  color: $shuttle-gray;
 }
 
 .mdl-data-table {
@@ -62,7 +64,7 @@ input:focus{
             height: 30px;
 
             &:hover {
-                background-color:#E7F4F9;
+                background-color:$polar-blue-1;
             }
         }
         td {
@@ -78,13 +80,13 @@ input:focus{
 }
 
 .mdl-data-table th {
-    color: #ABABAB;
+    color: $silver-chalice-gray;
     font-weight: bold;
     text-transform: uppercase;
 }
 
 .mdl-data-table__cell--clickable {
-    color: #2192BF;
+    color: $eastern-blue;
     cursor: pointer;
 }
 
@@ -93,7 +95,7 @@ input:focus{
 }
 
 .mdl-data-table__cell--non-clickable{
-    color : #7e898d
+    color : $oslo-gray
 }
 
 .mdl-data-table__cell--placeholder{
@@ -103,7 +105,7 @@ input:focus{
 
 .mdl-data-table__cell--no-reults {
     text-align: center;
-    color : #7e898d;
+    color : $oslo-gray;
 }
 
 .fa__fa-ellipsis-v--icon {
@@ -119,15 +121,15 @@ input:focus{
 }
 
 .fa-circle--color-up {
-    color: #3FAE2A;
+    color: $forest-green-1;
 }
 
 .fa-circle--color-down {
-    color : #EF6162;
+    color : $burnt-cienna-red;
 }
 
 .fa-circle--color-na {
-    color : #53646A;
+    color : $shuttle-gray;
 }
 .action-container {
     height: 14px;

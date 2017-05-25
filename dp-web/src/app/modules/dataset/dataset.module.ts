@@ -30,11 +30,14 @@ import {AssetOwnerService} from "./services/assetOwnerService";
 import {QueryFilter} from "./views/ds-asset-search/queryEditors/advance/filter/filter.component";
 import {SimplePaginationWidget} from "../../shared/pagination/pagination.component";
 
+import {TaggingWidgetModule} from "../../shared/tagging-widget/tagging-widget.module";
+
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     RouterModule.forChild(routes),
+    TaggingWidgetModule
   ],
   declarations: [
       NavTagPanel,

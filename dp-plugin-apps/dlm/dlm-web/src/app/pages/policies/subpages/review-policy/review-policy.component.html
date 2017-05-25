@@ -10,7 +10,7 @@
         <p class="h4">{{'page.policies.subpage.review.details.title' | translate}}:</p>
         <p *ngFor="let detail of detailsInfo">
           <span class="text-muted">{{detail.label}}:&nbsp;</span>
-          <span>{{detail.value}}</span>
+          <span [innerHTML]="detail.value"></span>
         </p>
         <div class="row">
           <div class="col-md-12">
@@ -31,7 +31,7 @@
             <div class="alert alert-danger alert-small">
               <i class="fa fa-exclamation-circle"></i>
               <span>{{'page.policies.subpage.review.error.create_policy' | translate}}.</span>
-              <span class="text-primary actionable" (click)="showErrorDetails()">Check error details</span>
+              <span class="text-primary actionable" (click)="showErrorDetails()">{{ "page.policies.subpage.review.error.check_error_details" | translate}}</span>
             </div>
           </div>
           <div class="footer-controls pull-right">

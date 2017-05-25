@@ -68,12 +68,6 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   ];
 
   constructor(private t: TranslateService, private store: Store<fromRoot.State>) {
-    this.operationResponseSubscription = this.store.select(getLastOperationResponse).subscribe(op => {
-      if (op && op.status) {
-        this.showOperationResponseModal = true;
-        this.lastOperationResponse = op;
-      }
-    });
     this.jobs$ = this.store.select(getAllJobs);
     this.jobsSubscription = this.jobs$.subscribe(jobs => {
       if (jobs && this.selectedPolicy) {
@@ -115,8 +109,23 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     ];
   }
 
+  /**
+   * Subscription to the last operation result should be done only some operation initiated
+   * It SHOULD NOT be added in the constructor or ngOnInit
+   */
+  subscribeToOperation() {
+    this.operationResponseSubscription = this.store.select(getLastOperationResponse).subscribe(op => {
+      if (op && op.status) {
+        this.showOperationResponseModal = true;
+        this.lastOperationResponse = op;
+      }
+    });
+  }
+
   ngOnDestroy() {
-    this.operationResponseSubscription.unsubscribe();
+    if (this.operationResponseSubscription) {
+      this.operationResponseSubscription.unsubscribe();
+    }
     this.jobsSubscription.unsubscribe();
   }
 
@@ -133,6 +142,9 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   }
 
   onActionConfirmation() {
+    if (!this.operationResponseSubscription) {
+      this.subscribeToOperation();
+    }
     switch (this.selectedAction.name) {
       case 'DELETE':
         return this.store.dispatch(deletePolicy(this.selectedForActionRow));

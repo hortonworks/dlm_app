@@ -7,7 +7,8 @@ $layout-header-bg-color: #FFFFFF;
 $layout-text-color: #848484 !important;
 $layout-header-desktop-indent: 10px;
 $button-height: 34px;
-
+$data-table-row-height: auto;
+$data-table-hover-color: #E7f6FC;
 /* DP Variables */
 $disabled-opacity: 0.6;
 $page-margins: 10px;
@@ -25,12 +26,27 @@ $forest-green-2: #429929;
 $iron: #CFD3D7;
 $oslo-gray: #808793;
 $dove-gray: #666666;
+$dusty-gray : #999999;
 $text-grey: rgba(255,255,255,0.6);
+$dusty-gray: #999999;
+$bon-jour: #EDECED;
+$eastern-blue: #1491C1;
+$blizzard-blue: #A7DFF2;
+$silver: #CDCDCD;
 
 $header-height: $layout-header-desktop-row-height;
 $logo-background: $oxford-blue;
 
-
+$gallery-gray : #EEEEEE;
+$iron-gray : #dcdee1;
+$albaster-gray : #F9F9F9;
+$eastern-blue : #2192bf;
+$polar-blue: #f2f7fc;
+$polar-blue-1: #E7F4F9;
+$roman-red : #d65758;
+$spindle-blue: #BCD6EE;
+$burnt-cienna-red : #EF6162;
+$silver-chalice-gray: #ABABAB;
 
 /* Dataset-flow Variables */
 $bgGray : #d0d3d7;
@@ -40,5 +56,3 @@ $color_text_gray: #677378;
 $color_green: #60AA5A;
 $color-border: #D0D3D7;
 $font_size_title: 22px;
-
-

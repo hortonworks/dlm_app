@@ -177,7 +177,8 @@
             "warning": "The first run of the policy will take some time."
           },
           "error": {
-            "create_policy": "Create policy failed"
+            "create_policy": "Create policy failed",
+            "check_error_details": "Check error details"
           }
         }
       }
