@@ -2,32 +2,23 @@ package internal.auth
 
 import java.security.cert.X509Certificate
 
-import internal.Jwt
-import play.api.http.Status
-import play.api.mvc._
-import com.hortonworks.dataplane.commons.domain.Entities._
-import com.hortonworks.dataplane.db.Webservice.UserService
-
-import scala.concurrent.Future
-import internal.KnoxSso
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import org.apache.commons.codec.binary.Base64
-import play.api.Configuration
-import play.api.Logger
+import com.hortonworks.dataplane.commons.domain.Entities._
+import com.hortonworks.dataplane.db.Webservice.UserService
+import internal.{Jwt, KnoxSso}
+import play.api.{Configuration, Logger}
+import play.api.http.Status
+import play.api.mvc._
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
-// TODO: try http://stackoverflow.com/a/29505015/640012
+import scala.concurrent.Future
 
 class Authenticated @Inject()(@Named("userService") userService: UserService,
                               configuration: Configuration,
                               knoxSso: KnoxSso)
     extends ActionBuilder[AuthenticatedRequest] {
 
-  private val apiCallTimeout =
-    configuration.underlying.getLong("apicall.timeout").millis
   private val ssoLoginValidCookieName = "sso_login_valid"
 
   val gatewayTokenKey = "gateway-token"
@@ -109,20 +100,18 @@ class Authenticated @Inject()(@Named("userService") userService: UserService,
   }
 
   private def getUserFromDb(userName: String): Future[Option[User]] = {
-    userService.loadUser(userName).map { userOp =>
-      userOp match {
-        case Left(errors) => {
-          if (errors.errors.size > 0 && errors.errors(0).code.equals("404")) {
-            Logger.info(
-              s"User with name[${userName}] not found in dataplane db. users authroized from external system" +
-                s" need to be synced to db.")
-          }
-          Logger.error(s"Error while retrieving user ${errors}")
-          //TODO: domain and https to be done for proper deletiong of cookie.
-          None
+    userService.loadUser(userName).map {
+      case Left(errors) => {
+        if (errors.errors.nonEmpty && errors.errors.head.code.equals("404")) {
+          Logger.info(
+            s"User with name[$userName] not found in dataplane db. users authroized from external system" +
+              s" need to be synced to db.")
         }
-        case Right(user) => Some(user)
+        Logger.error(s"Error while retrieving user $errors")
+        //TODO: domain and https to be done for proper deletiong of cookie.
+        None
       }
+      case Right(user) => Some(user)
     }
   }
 
@@ -135,7 +124,7 @@ class Authenticated @Inject()(@Named("userService") userService: UserService,
   }
 
   private def getBearerToken[A](request: Request[A]): Option[String] = {
-    if (!request.headers.get("Authorization").isDefined || !request.headers.get("Authorization").get.startsWith("Bearer "))
+    if (request.headers.get("Authorization").isEmpty || !request.headers.get("Authorization").get.startsWith("Bearer "))
       None
     else{
       val header: String = request.headers.get("Authorization").get
