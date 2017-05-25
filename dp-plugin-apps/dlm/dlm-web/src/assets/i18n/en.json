@@ -210,7 +210,8 @@
             "step_one": "STEP 1: SELECT FIRST CLUSTER",
             "step_two": "STEP 2: SELECT CLUSTER TO BE PAIRED",
             "in_progress": "IN PROGRESS"
-          }
+          },
+          "cluster_disabled": "Cluster is already paired with the selected cluster"
         },
         "confirmation": {
           "title": "Pairing Successful",
