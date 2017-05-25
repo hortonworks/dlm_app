@@ -9,6 +9,7 @@ export class StringUtils {
         if(!url || url.length === 0){
             return "";
         }
+        url = url.replace(/\/$/, "");
         let link = document.createElement('a');
         //  set href to any path
         link.setAttribute('href', url);

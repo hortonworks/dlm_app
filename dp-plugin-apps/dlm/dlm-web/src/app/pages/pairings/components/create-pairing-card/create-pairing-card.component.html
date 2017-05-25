@@ -6,7 +6,7 @@
         <div [ngClass]="{'text-muted': !isSelected}">{{ cluster.location.city }}, {{ cluster.location.country }}</div>
       </div>
       <div class="col-md-4 cluster-volume-col">
-        <div [ngClass]="{'text-muted': !isSelected, 'cluster-volume': true, 'selected': isSelected}"> GB</div>
+        <div [ngClass]="{'text-muted': !isSelected, 'cluster-volume': true, 'selected': isSelected}"><span [innerHTML]="cluster.stats.CapacityRemaining | bytesSize"></span></div>
       </div>
     </div>
   </div>

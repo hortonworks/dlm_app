@@ -11,6 +11,8 @@ export interface Policy {
   targetCluster: string;
   sourceClusterResource?: Cluster;
   targetClusterResource?: Cluster;
+  sourceDataset: string;
+  targetDataset: string;
   endTime: string;
   frequency: number;
   policyStatus: RequestStatus;

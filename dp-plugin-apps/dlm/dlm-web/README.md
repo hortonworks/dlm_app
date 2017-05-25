@@ -16,10 +16,14 @@ Both files should be included in your commit if modified.
 
 
 ## Development server
-Run `npm run dev` for a dev server. Navigate to `http://localhost:4444/`. The app will automatically reload if you change any of the source files. Ensure play app is already running and bound to port `9000`.
+Run `npm run dev` for a dev server. Navigate to `http://localhost:4444/`. The app will automatically reload if you change any of the source files. Note that API responses are mocked in dev mode
+ 
 
 ## Development server with Hot Module Reload
 Run `npm run dev:hmr` for a dev server with hot module reload. Navigate to `http://localhost:4444`.
+
+## Production server
+Run `npm run prod` for server to run in prod mode. Navigate to `http://localhost:4444`. Ensure play app is already running on port `9005`.
 
 ## Build
 

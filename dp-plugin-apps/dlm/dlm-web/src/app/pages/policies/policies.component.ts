@@ -28,6 +28,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   clusters$: Observable<Cluster[]>;
   filterSubscription: Subscription;
   searchSubscripiton: Subscription;
+  clustersSubscription: Subscription;
   filteredPolicies$: Observable<Policy[]>;
   initialFilterValue = {
     tags: 'all',
@@ -55,7 +56,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
       .map(this.prepareTableData);
     this.clusters$ = store.select(getAllClusters);
 
-    this.clusters$.subscribe(clusters => {
+    this.clustersSubscription = this.clusters$.subscribe(clusters => {
       const clusterIds = clusters.map(c => c.id);
       store.dispatch(loadJobsForClusters(clusterIds));
     });
@@ -76,6 +77,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.filterSubscription.unsubscribe();
     this.searchSubscripiton.unsubscribe();
+    this.clustersSubscription.unsubscribe();
   }
 
   prepareTableData(policies) {

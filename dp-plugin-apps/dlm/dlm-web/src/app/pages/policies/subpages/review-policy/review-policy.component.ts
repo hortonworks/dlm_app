@@ -9,6 +9,7 @@ import * as moment from 'moment';
 import { createPolicy } from 'actions/policy.action';
 import { State } from 'reducers';
 import { PolicyPayload, PolicyDefinition } from 'models/policy.model';
+import { resetProgressState } from 'actions/progress.action';
 import { resetFormValue } from 'actions/form.action';
 import { getFormValues } from 'selectors/form.selector';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
@@ -33,6 +34,7 @@ const CREATE_POLICY_REQUEST = 'CREATE_POLICY';
 })
 export class ReviewPolicyComponent implements OnInit, OnDestroy {
   @ViewChild('errorDetailsDialog') errorDetailsDialog: ModalDialogComponent;
+  private subscriptions: Subscription[] = [];
   tDetails = 'page.policies.subpage.review.details';
   descriptionTranslateParam = {};
   // todo: this is mock. Not sure where we can get this info
@@ -48,7 +50,6 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
   sourceCluster: Cluster;
   targetCluster: Cluster;
   creationState: ProgressState;
-  creationStateSubscription: Subscription;
 
   private policyFormValue: any;
 
@@ -56,35 +57,40 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     this.policyForm$ = store.select(getFormValues(POLICY_FORM_ID));
     this.pairing$ = this.policyForm$
       .switchMap(policyForm => store.select(getPairing(policyForm.general.pair)));
-    this.creationStateSubscription = store.select(getProgressState(CREATE_POLICY_REQUEST))
-      .subscribe((progressState: ProgressState) => this.creationState = progressState);
+    this.subscriptions.push(
+      store.select(getProgressState(CREATE_POLICY_REQUEST))
+      .subscribe((progressState: ProgressState) => this.creationState = progressState)
+    );
   }
 
   ngOnInit() {
-    Observable.combineLatest(this.policyForm$, this.pairing$)
-    .subscribe(([policyForm, pairing]) => {
-      if (!pairing) {
-        return;
-      }
-      const [sourceCluster, targetCluster] = pairing.pair;
-      this.sourceCluster = sourceCluster;
-      this.targetCluster = targetCluster;
-      this.policyFormValue = policyForm;
+    this.subscriptions.push(
+      Observable.combineLatest(this.policyForm$, this.pairing$)
+        .subscribe(([policyForm, pairing]) => {
+          if (!pairing) {
+            return;
+          }
+          const [sourceCluster, targetCluster] = pairing.pair;
+          this.sourceCluster = sourceCluster;
+          this.targetCluster = targetCluster;
+          this.policyFormValue = policyForm;
 
-      this.descriptionTranslateParam = {
-        ...this.descriptionTranslateParam,
-        policyName: policyForm.general.name,
-        sourceCluster: sourceCluster.name
-      };
+          this.descriptionTranslateParam = {
+            ...this.descriptionTranslateParam,
+            policyName: policyForm.general.name,
+            sourceCluster: sourceCluster.name
+          };
 
-      this.getDetailsField('destination').value = targetCluster.name;
-      this.getDetailsField('volume').value = bytesToSize(targetCluster.stats.CapacityTotal, 0);
-    });
+          this.getDetailsField('destination').value = targetCluster.name;
+          this.getDetailsField('volume').value = bytesToSize(targetCluster.stats.CapacityTotal, 0);
+        })
+    );
+    this.store.dispatch(resetProgressState(CREATE_POLICY_REQUEST));
     this.store.dispatch(loadPairings());
   }
 
   ngOnDestroy() {
-    this.creationStateSubscription.unsubscribe();
+    this.subscriptions.forEach(subscrition => subscrition.unsubscribe());
   }
 
   serializeFormValues(values): PolicyPayload {

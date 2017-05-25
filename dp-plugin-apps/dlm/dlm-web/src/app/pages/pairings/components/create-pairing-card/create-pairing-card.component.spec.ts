@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ClusterCardComponent } from '../../../../components/cluster-card/cluster-card.component';
 import { CreatePairingCardComponent } from './create-pairing-card.component';
 import { Cluster } from '../../../../models/cluster.model';
+import {BytesSizePipe} from '../../../../pipes/bytes-size.pipe';
 
 describe('CreatePairingCardComponent', () => {
   let component: CreatePairingCardComponent;
@@ -9,7 +10,7 @@ describe('CreatePairingCardComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CreatePairingCardComponent, ClusterCardComponent ]
+      declarations: [ CreatePairingCardComponent, ClusterCardComponent, BytesSizePipe ]
     })
     .compileComponents();
   }));
@@ -17,7 +18,7 @@ describe('CreatePairingCardComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CreatePairingCardComponent);
     component = fixture.componentInstance;
-    component.cluster = <Cluster>{location: {}};
+    component.cluster = <Cluster>{id: '1', location: {}, stats: { CapacityUsed: 1, CapacityRemaining: 4, CapacityTotal: 5 }};
     fixture.detectChanges();
   });
 

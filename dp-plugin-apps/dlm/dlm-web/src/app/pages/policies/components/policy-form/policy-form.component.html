@@ -30,9 +30,16 @@
               </div>
             </div>
             <dlm-form-field [label]="'page.policies.form.fields.pairs' | translate">
-              <select class="form-control" formField formControlName="pair">
-                <option *ngFor="let pair of pairs" [value]="pair.value">{{pair.label}}</option>
-              </select>
+              <dlm-select-field formField formControlName="pair" [options]="pairs">
+                <ng-template selectFieldValue selectFieldOption let-value="value" let-label="label">
+                  <div *ngIf="!value">{{label}}</div>
+                  <div *ngIf="value" class="actionable">
+                    {{label[0]}}
+                    <i class="glyphicon glyphicon-resize-horizontal"></i>
+                    {{label[1]}}
+                   </div>
+                </ng-template>
+              </dlm-select-field>
             </dlm-form-field>
           </fieldset>
         </div>
@@ -121,12 +128,17 @@
                               (dateChanged)="handleDateChange($event, 'startTime')">
                             </my-date-picker>
                           </div>
-                          <div class="time-control">
-                            <div class="clock-icon">
-                              <i class="fa fa-clock-o"></i>
+                          <dlm-form-field fieldClass="col-md-12" errorClass="col-md-12">
+                            <div class="time-control">
+                              <div class="clock-icon">
+                                <i class="fa fa-clock-o"></i>
+                              </div>
+                              <timepicker formField formControlName="time" [showMeridian]="false"></timepicker>
                             </div>
-                            <timepicker formControlName="time" [showMeridian]="false"></timepicker>
-                          </div>
+                            <dlm-field-error *ngIf="policyForm.controls.job.controls.startTime.controls.time.hasError('lessThanCurrent')">
+                              {{'forms.validation_errors.time_less_than_current' | translate}}
+                            </dlm-field-error>
+                          </dlm-form-field>
                         </div>
                       </div>
                       <div class="col-md-6" formGroupName="endTime">
@@ -139,12 +151,17 @@
                               [options]="datePickerOptions">
                             </my-date-picker>
                           </div>
-                          <div class="time-control">
-                            <div class="clock-icon">
-                              <i class="fa fa-clock-o"></i>
+                          <dlm-form-field fieldClass="col-md-12" errorClass="col-md-12">
+                            <div class="time-control">
+                              <div class="clock-icon">
+                                <i class="fa fa-clock-o"></i>
+                              </div>
+                              <timepicker formField formControlName="time" [showMeridian]="false"></timepicker>
                             </div>
-                            <timepicker formControlName="time" [showMeridian]="false"></timepicker>
-                          </div>
+                            <dlm-field-error *ngIf="policyForm.controls.job.controls.endTime.controls.time.hasError('lessThanCurrent')">
+                              {{'forms.validation_errors.time_less_than_current' | translate}}
+                            </dlm-field-error>
+                          </dlm-form-field>
                         </div>
                       </div>
                     </div>

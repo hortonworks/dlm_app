@@ -9,9 +9,17 @@
     "duration": "Duration",
     "source": "Source",
     "destination": "Destination",
+    "description": "Description",
     "data": "Data",
     "path": "Path",
     "schedule": "Schedule",
+    "files": "Files",
+    "folders": "Folders",
+    "none": "None",
+    "policies": "Policies",
+    "pair": "Pair",
+    "pairs": "Pairs",
+    "policy": "Policy",
     "time": {
       "hourly": "Hourly",
       "daily": "Daily",
@@ -82,7 +90,8 @@
   },
   "forms": {
     "validation_errors": {
-      "required": "\"{{fieldLabel}}\" is required"
+      "required": "\"{{fieldLabel}}\" is required",
+      "time_less_than_current": "Selected time is less than current"
     }
   },
   "page": {
@@ -112,10 +121,12 @@
         "policy": "Policy"
       },
       "card": {
-        "registered": "Registered",
+        "usage": "Usage",
         "nodes": "Nodes",
         "volume": "Volume",
-        "pairs": "Pairs"
+        "location": "Location",
+        "create_pair_text": "+ Pair",
+        "create_policy_text": "+ Policy"
       }
     },
     "policies": {
@@ -124,6 +135,13 @@
       "header_create": "Create Replication Policy",
       "tags": "Tags",
       "groups": "Groups",
+      "data_summary": "Data Summary",
+      "perform_action": {
+        "confirmation": {
+          "title": "Confirm",
+          "body": "Are you sure?"
+        }
+      },
       "form": {
         "selected": "Selected",
         "sections": {
@@ -159,7 +177,8 @@
             "warning": "The first run of the policy will take some time."
           },
           "error": {
-            "create_policy": "Create policy failed"
+            "create_policy": "Create policy failed",
+            "check_error_details": "Check error details"
           }
         }
       }
@@ -201,7 +220,8 @@
     },
     "jobs": {
       "header": "Jobs",
-      "header_note": ""
+      "header_note": "",
+      "prev_jobs": "prev jobs"
     },
     "notifications": {
       "header": "Notifications"

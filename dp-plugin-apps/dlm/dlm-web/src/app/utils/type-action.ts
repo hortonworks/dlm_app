@@ -8,7 +8,7 @@ export interface RequestAction {
   START: string;
   SUCCESS: string;
   FAILURE: string;
-};
+}
 
 const actionsCache: { [actionName: string]: boolean} = {};
 export function type<T>(actionName: T | ''): T {

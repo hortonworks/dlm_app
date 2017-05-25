@@ -31,12 +31,12 @@ const JOBS_REQUEST = 'JOBS_REQUEST';
 export class OverviewComponent implements OnInit, OnDestroy {
   private resourceStatusMap = {
     // TODO where to get statuses for clusters?
-    policies: [POLICY_STATUS.SUBMITTED, POLICY_STATUS.WARNING, POLICY_STATUS.FAILED],
+    policies: [POLICY_STATUS.RUNNING, POLICY_STATUS.SUBMITTED, POLICY_STATUS.SUSPENDED],
     jobs: [JOB_STATUS.SUCCESS, JOB_STATUS.IN_PROGRESS, JOB_STATUS.WARNINGS, JOB_STATUS.FAILED]
   };
   jobs$: Observable<Job[]>;
   events$: Observable<Event[]>;
-  clustersSubscrition: Subscription;
+  clustersSubscription: Subscription;
   overallProgress$: Observable<ProgressState>;
   resourceChartData$: Observable<ResourceChartData>;
 
@@ -46,7 +46,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     const policies$ = store.select(getAllPolicies);
     const clusters$ = store.select(getAllClusters);
     this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, JOBS_REQUEST));
-    this.clustersSubscrition = clusters$
+    this.clustersSubscription = clusters$
       .filter(clusters => !!clusters.length)
       .distinctUntilChanged(null, clusters => {
         return clusters.map(cluster => cluster.id).join('@') + '_LENGTH' + clusters.length;
@@ -83,6 +83,6 @@ export class OverviewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.clustersSubscrition.unsubscribe();
+    this.clustersSubscription.unsubscribe();
   }
 }

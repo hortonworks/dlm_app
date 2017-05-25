@@ -3,10 +3,14 @@ import * as L from 'leaflet';
 import 'leaflet-curve';
 
 import {MapData} from '../../../../models/map-data';
+import {MapDimensions} from '../../../../models/map-data';
 import {MapSize} from '../../../../models/map-data';
 import {MapConnectionStatus} from '../../../../models/map-data';
 
 import { GeographyService } from '../../../../services/geography.service';
+import Layer = L.Layer;
+import LayerGroup = L.LayerGroup;
+import layerGroup = L.layerGroup;
 
 @Component({
   selector: 'dp-map',
@@ -19,7 +23,8 @@ export class MapComponent implements  OnChanges, OnInit{
   map: L.Map;
   @ViewChild('mapcontainer') mapcontainer: ElementRef;
   @Input('mapData') mapData: MapData[] = [];
-  @Input('mapSize') mapSize: string = 'extraLarge';
+  @Input('mapSize') mapSize: MapSize = MapSize.EXTRALARGE;
+
   markerLookup:L.LatLng[] = [];
   pathLookup=[];
 
@@ -41,28 +46,15 @@ export class MapComponent implements  OnChanges, OnInit{
       zoomSnap : 0.1
    };
 
-   defaultMapSizes = [
-       {
-           height : '240px',
-           width : '420px',
-           zoom : 0.5
-       },
-       {
-           height : '360px',
-           width : '540px',
-           zoom : 1
-       },
-       {
-           height : '480px',
-           width : '680px',
-           zoom : 1.3
-       },
-       {
-           height : '680px',
-           width : '100%',
-           zoom : 2
-       }
-   ]
+   markerAndCurveLayer : Layer[] = [];
+   layerGroup : LayerGroup;
+
+   defaultMapSizes : MapDimensions[] = [
+     new MapDimensions('240px','420px', 0.5),
+     new MapDimensions('360px','540px', 1),
+     new MapDimensions('480px','680px', 1.3),
+     new MapDimensions('680px','100%', 2)
+   ];
 
   constructor(
     private geographyService: GeographyService
@@ -89,7 +81,7 @@ export class MapComponent implements  OnChanges, OnInit{
       })
     }).addTo(map);
     map.fitBounds(countriesLayer.getBounds());
-    this.map = map;    
+    this.map = map;
     this.map.setZoom(mapDimensions.zoom);
     this.mapcontainer.nativeElement.querySelector('.leaflet-map-pane').style.height = `${parseInt(mapDimensions.height)-20}px`;
   }
@@ -98,6 +90,7 @@ export class MapComponent implements  OnChanges, OnInit{
       if(!changes['mapData'] || !this.map){
           return;
       }
+      this.removeExistingMarker();
       this.mapData.forEach((data)=>{
         let start = data.start;
         let end = data.end;
@@ -108,8 +101,8 @@ export class MapComponent implements  OnChanges, OnInit{
             this.plotPoint(end);
             this.drawConnection(start, end);
         }
-
       });
+      this.layerGroup = new L.LayerGroup(this.markerAndCurveLayer);
   }
 
   plotPoint(position){
@@ -127,9 +120,19 @@ export class MapComponent implements  OnChanges, OnInit{
     }
   }
 
+  removeExistingMarker(){
+    if(this.layerGroup){
+      this.layerGroup.eachLayer(layer => {this.map.removeLayer(layer)});
+    }
+    this.markerLookup = [];
+    this.pathLookup = [];
+  }
+
   createMarker(latLng, color){
-    L.circleMarker(latLng,{radius: 14, color: this.markerColorOuterBorder, weight:2, fillColor: color, fillOpacity:0.25}).addTo(this.map);
-    L.circleMarker(latLng,{radius: 5, color: this.markerColorInnerBorder, weight:2, fillColor: color, fillOpacity:0.8}).addTo(this.map);
+    let outerMarker = L.circleMarker(latLng,{radius: 14, color: this.markerColorOuterBorder, weight:2, fillColor: color, fillOpacity:0.25}).addTo(this.map);
+    let innerMarker = L.circleMarker(latLng,{radius: 5, color: this.markerColorInnerBorder, weight:2, fillColor: color, fillOpacity:0.8}).addTo(this.map);
+    this.markerAndCurveLayer.push(outerMarker);
+    this.markerAndCurveLayer.push(innerMarker);
   }
 
   markerExists(latLng){
@@ -154,5 +157,6 @@ export class MapComponent implements  OnChanges, OnInit{
     }
     this.pathLookup.push({start:start, end:end});
     path.addTo(this.map);
+    this.markerAndCurveLayer.push(path);
   }
 }

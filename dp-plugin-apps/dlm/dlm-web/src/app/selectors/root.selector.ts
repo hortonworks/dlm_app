@@ -7,3 +7,4 @@ export const getJobs = (state: State) => state.jobs;
 export const getForms = (state: State) => state.forms;
 export const getEvents = (state: State) => state.events;
 export const getProgresses = (state: State) => state.progress;
+export const getOperations = (state: State) => state.operations;

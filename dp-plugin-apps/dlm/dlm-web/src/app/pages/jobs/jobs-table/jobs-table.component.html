@@ -3,6 +3,7 @@
   [showPageSizeMenu]="showPageSizeMenu"
   [columns]="columns"
   [rows]="jobs"
+  [selectionType]="selectionType"
   (selectAction)="handleSelectedAction($event)"
   selectionType="checkbox">
 </dlm-table>
@@ -28,5 +29,5 @@
 </ng-template>
 
 <ng-template #transferredFormattedTemplate let-value="value">
-  {{value | bytesSize}}
+  <span [innerHTML]="value | bytesSize"></span>
 </ng-template>

@@ -21,6 +21,7 @@ export class JobsTableComponent implements OnInit {
   @ViewChild('jobsTable') jobsTable: TableComponent;
   @Input() jobs: Job[];
   @Input() showPageSizeMenu = true;
+  @Input() selectionType = 'any';
 
   // todo: labels and actions are subject to change
   rowActions = <ActionItemType[]>[

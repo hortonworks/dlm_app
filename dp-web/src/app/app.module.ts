@@ -33,7 +33,7 @@ import { DropdownComponent } from './shared/dropdown/dropdown.component';
     BrowserModule,
     FormsModule,
     HttpModule,
-    RouterModule.forRoot(routes),
+    RouterModule.forRoot(routes)
   ],
   declarations: [
     AppComponent,

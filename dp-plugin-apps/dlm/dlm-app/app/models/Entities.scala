@@ -3,7 +3,7 @@ package models
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dlm.beacon.domain.RequestEntities._
 import com.hortonworks.dlm.beacon.domain.ResponseEntities._
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._
 
@@ -40,8 +40,8 @@ object Entities {
   // Response schema for Pair cluster request
   case class PairedClustersResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), pairedClusters: Set[Set2[BeaconCluster]] = Set())
 
-  case class PoliciesDetails(name: String, `type`: String, status: String, frequency: Long, startTime: Option[String], endTime: String,
-                             sourceCluster:String, targetCluster:String)
+  case class PoliciesDetails(name: String, `type`: String, status: String, sourceDataset: String, targetDataset: String,
+                             frequency: Long, startTime: Option[String], endTime: String, sourceCluster:String, targetCluster:String)
 
   case class PoliciesDetailsResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), policies: Seq[PoliciesDetails])
 
