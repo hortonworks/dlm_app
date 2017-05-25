@@ -1,31 +1,32 @@
+<div class="componentCont borderBox" #outerCont >
 <div *ngIf="!hideTabs" class="tabCont">
   <div class="tab {{(typeFilter == tab.ALL)?'active':''}}" (click)="typeFilter = tab.ALL;setFirstPage();fetchAssets()">
     <div class="tabName">Total</div>
-    <div class="tabCount">{{dsModel.hiveCount + dsModel.filesCount}}</div>
+    <div class="tabCount"><span *ngIf="dsModel.counts">{{dsModel.counts.hiveCount + dsModel.counts.filesCount}}</span></div>
   </div>
   <div class="tab {{(typeFilter == tab.HIVE)?'active':''}}" (click)="typeFilter = tab.HIVE;setFirstPage();fetchAssets()">
     <div class="tabName">Hive</div>
-    <div class="tabCount">{{dsModel.hiveCount}}</div>
+    <div class="tabCount"><span *ngIf="dsModel.counts">{{dsModel.counts.hiveCount}}</span></div>
   </div>
   <div class="tab {{(typeFilter == tab.HDFS)?'active':''}}" (click)="typeFilter = tab.HDFS;setFirstPage();fetchAssets()">
     <div class="tabName">Files</div>
-    <div class="tabCount">{{dsModel.filesCount}}</div>
+    <div class="tabCount"><span *ngIf="dsModel.counts">{{dsModel.counts.filesCount}}</span></div>
   </div>
   <span class="actionButtonCont">
-    <button *ngIf="applicableActions.indexOf(actionEnum.REMOVE) != -1" class="mdl-button btn-hwx-secondary" (click)="actionRemove()">Remove</button>
+    <button *ngIf="applicableActions.indexOf(actionEnum.REMOVE) != -1" class="mdl-button btn-hwx-secondary" (click)="actionRemove()">Remove All</button>
     <button *ngIf="applicableActions.indexOf(actionEnum.ADD) != -1" class="mdl-button btn-hwx-secondary" (click)="actionAddMore()">Add Assets</button>
     <button *ngIf="applicableActions.indexOf(actionEnum.EDIT) != -1" class="mdl-button btn-hwx-primary" (click)="actionEdit()">Edit</button>
   </span>
   <div style="clear: both;"></div>
 </div>
-<div class="listCont">
+<div class="listCont" #listCont>
   <div *ngIf="!hideSearch" class="searchCont">
     <span><i class="fa fa-search"></i></span>
     <input #searchBox type="text" placeholder="Search" (keyup.enter)="searchText=searchBox.value;setFirstPage(); fetchAssets()"/>
   </div>
   <div class="list">
     <div class="listRow listHead">
-      <div class="checkboxCont"><input type="checkbox"/></div>
+      <div class="checkboxCont" *ngIf="selectionAllowed"><input type="checkbox"/></div>
       <div class="sourceCol">Source</div>
       <div class="nameCol">Name</div>
       <div class="ownerCol">Owner</div>
@@ -36,7 +37,7 @@
     <div class="justList" #table>
       <div *ngIf="dsAssets.length">
         <div class="listRow"  *ngFor="let asset of dsAssets;">
-          <div class="checkboxCont"><input type="checkbox"/></div>
+          <div class="checkboxCont" *ngIf="selectionAllowed"><input type="checkbox"/></div>
           <div class="sourceCol {{(asset.source.toUpperCase() == 'HIVE')?'hiveCol':'filesCol'}}">
             <span><i class="fa {{(asset.source.toUpperCase() == 'HIVE')?'fa-table':'fa-file-o'}}"></i>&nbsp;&nbsp;{{asset.source}}</span>
           </div>
@@ -48,12 +49,14 @@
         </div>
       </div>
     </div>
-    <div class="paginationRow">
-      <span>Rows Per Page</span>&nbsp;<span class="pageSizeSpan">{{pageSize}}</span>
-      &nbsp;&nbsp;&nbsp;&nbsp;<span>{{getPaginationText ()}}</span>
-      &nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-chevron-left" (click)="showPrevious()"></i>&nbsp;&nbsp;<i class="fa fa-chevron-right" (click)="showNext()"></i>
-    </div>
+    <simple-pagination
+      [pageSize]="pageSize"
+      [pageStartIndex]="pageStartIndex"
+      [count]="assetsCount"
+      (onPageSizeChange)="onPageSizeChange($event)"
+      (onPageChange)="onPageChange($event)"
+    ></simple-pagination>
+
   </div>
 </div>
-<br/>
-
+</div>

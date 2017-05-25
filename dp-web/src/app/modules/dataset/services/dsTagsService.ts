@@ -9,7 +9,6 @@ export class DsTagsService {
   constructor(private http: Http) {
   }
   public list(searchText:string, size:number): Observable<string[]> {
-    //console.log("DsAssetService List", dsId, pageNo, pageSize);
     return Observable.create(observer => {
       setTimeout(()=>observer.next(data.filter(str=>searchText && str.toLowerCase().indexOf(searchText.toLowerCase()) != -1).slice(0,size)), 300);
     });

@@ -1,12 +1,11 @@
 <div class="dataset-dashboard borderBox">
-  <div class="dataset-search"></div>
-  <div class="main-container">
     <nav-tag-panel (updateSelection)="onTagChange($event)"></nav-tag-panel>
     <div class="result-viewer">
+      <div class="dataset-search"></div>
       <div class="result-header">
         <span class="resultsTitle" *ngIf="currentDsTag">{{currentDsTag.name}}</span>
         <button class="mdl-button mdl-button--new btn-hwx-primary" (click)="actionAddNewDataset()">
-            <i class="fa fa-plus"></i> NEW
+            <i class="fa fa-plus"></i> NEW DATASET
         </button>
         <div class="mdl-button-group">
            <button (click)="onViewChange(views.list)" [ngClass]="{'button-color--dark-grey': currentView === views.list }" class="mdl-button">
@@ -20,5 +19,4 @@
       <div class="result-container"><ds-nav-result-viewer [view]="currentView" [currentDsTag]="currentDsTag"></ds-nav-result-viewer></div>
     </div>
     <div style="clear: both;"></div>
-  </div>
 </div>
