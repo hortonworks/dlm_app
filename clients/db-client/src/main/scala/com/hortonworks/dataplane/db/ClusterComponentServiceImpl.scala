@@ -7,7 +7,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.{
   Errors
 }
 import com.hortonworks.dataplane.commons.domain.Ambari.ClusterServiceWithConfigs
-import com.hortonworks.dataplane.db.Webserice.ClusterComponentService
+import com.hortonworks.dataplane.db.Webservice.ClusterComponentService
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import play.api.libs.json.Json
@@ -210,5 +210,5 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
         case e: Exception => Future.successful(Left(Errors(Seq(Error("500", e.getMessage)))))
       }
   }
-  
+
 }

@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webserice.LakeService
+import com.hortonworks.dataplane.db.Webservice.LakeService
 import internal.KnoxSso
 import internal.auth.Authenticated
 import models.{JsonResponses, WrappedErrorsException}

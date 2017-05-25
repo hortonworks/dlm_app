@@ -3,7 +3,7 @@ package com.hortonworks.dataplane.db
 import javax.inject.Singleton
 
 import com.hortonworks.dataplane.commons.domain.Entities._
-import com.hortonworks.dataplane.db.Webserice.LocationService
+import com.hortonworks.dataplane.db.Webservice.LocationService
 import com.typesafe.config.Config
 import play.api.libs.ws.{WSClient, WSResponse}
 

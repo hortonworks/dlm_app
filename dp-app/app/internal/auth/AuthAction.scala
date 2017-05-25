@@ -6,7 +6,7 @@ import internal.Jwt
 import play.api.http.Status
 import play.api.mvc._
 import com.hortonworks.dataplane.commons.domain.Entities._
-import com.hortonworks.dataplane.db.Webserice.UserService
+import com.hortonworks.dataplane.db.Webservice.UserService
 
 import scala.concurrent.Future
 import internal.KnoxSso

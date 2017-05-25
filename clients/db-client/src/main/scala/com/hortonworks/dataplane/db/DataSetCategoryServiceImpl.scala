@@ -1,7 +1,7 @@
 package com.hortonworks.dataplane.db
 
 import com.hortonworks.dataplane.commons.domain.Entities.{DatasetCategory, Errors}
-import com.hortonworks.dataplane.db.Webserice.DataSetCategoryService
+import com.hortonworks.dataplane.db.Webservice.DataSetCategoryService
 import com.typesafe.config.Config
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSClient, WSResponse}

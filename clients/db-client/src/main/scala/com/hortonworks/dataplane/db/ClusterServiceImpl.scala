@@ -1,7 +1,7 @@
 package com.hortonworks.dataplane.db
 
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, Errors}
-import com.hortonworks.dataplane.db.Webserice.ClusterService
+import com.hortonworks.dataplane.db.Webservice.ClusterService
 import com.typesafe.config.Config
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSClient, WSResponse}

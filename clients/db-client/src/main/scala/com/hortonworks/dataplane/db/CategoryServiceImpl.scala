@@ -1,7 +1,7 @@
 package com.hortonworks.dataplane.db
 
 import com.hortonworks.dataplane.commons.domain.Entities.{Category, Errors}
-import com.hortonworks.dataplane.db.Webserice.CategoryService
+import com.hortonworks.dataplane.db.Webservice.CategoryService
 import com.typesafe.config.Config
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json}

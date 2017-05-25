@@ -6,7 +6,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.{
   Error,
   Errors
 }
-import com.hortonworks.dataplane.db.Webserice.{
+import com.hortonworks.dataplane.db.Webservice.{
   ClusterComponentService,
   ClusterHostsService
 }

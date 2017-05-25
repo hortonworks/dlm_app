@@ -5,7 +5,7 @@ import javax.inject.Inject
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.{Errors, User, UserRoles}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webserice.UserService
+import com.hortonworks.dataplane.db.Webservice.UserService
 import internal.{Jwt, KnoxSso}
 import models.JsonFormats._
 import models.{Credential, JsonResponses}
