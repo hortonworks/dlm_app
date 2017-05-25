@@ -30,7 +30,7 @@ public class ApplicationRegistrar {
     clientStartTask.setExecutionHandler(Optional.of(executionHandler));
     clientStatusTask.setExecutionHandler(Optional.of(executionHandler));
     scheduledExecutorService.schedule(clientStartTask, 2, TimeUnit.SECONDS);
-    Runtime.getRuntime().addShutdownHook(new ShutdownHook(dpConsulClient, config, hook));
+    Runtime.getRuntime().addShutdownHook(new ShutdownHook(dpConsulClient, config, hook,scheduledExecutorService));
   }
 
 
@@ -162,11 +162,13 @@ public class ApplicationRegistrar {
     private final DpConsulClient dpConsulClient;
     private final Config config;
     private final Optional<ConsulHook> consulHook;
+    private final ScheduledExecutorService scheduledExecutorService;
 
-    public ShutdownHook(DpConsulClient dpConsulClient, Config config, Optional<ConsulHook> consulHook) {
+    public ShutdownHook(DpConsulClient dpConsulClient, Config config, Optional<ConsulHook> consulHook, ScheduledExecutorService scheduledExecutorService) {
       this.dpConsulClient = dpConsulClient;
       this.config = config;
       this.consulHook = consulHook;
+      this.scheduledExecutorService = scheduledExecutorService;
     }
 
     @Override
@@ -175,6 +177,7 @@ public class ApplicationRegistrar {
         String serviceId = config.getString("consul.serviceId");
         dpConsulClient.unRegisterService(serviceId);
         dpConsulClient.unRegisterCheck(serviceId);
+        scheduledExecutorService.shutdown();
         consulHook.ifPresent(consulHook -> consulHook.onServiceDeRegister(serviceId));
       } catch (Throwable th) {
         consulHook.ifPresent(consulHook -> consulHook.onRecoverableException("ShutDown hook failed", th));
