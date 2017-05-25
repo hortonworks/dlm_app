@@ -8,6 +8,8 @@ services:
     image: hortonworks/dp-gateway
     ports:
       - "8762:8762"
+    volumes:
+      - ./certs:/usr/dp-app/conf/cert
     environment:
       CONSUL_HOST: ${CONSUL_HOST}
   dp-database:
