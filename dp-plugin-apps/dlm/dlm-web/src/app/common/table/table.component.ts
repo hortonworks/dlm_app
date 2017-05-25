@@ -1,6 +1,6 @@
 import {
   Component, Input, Output, ViewEncapsulation, ViewChild, TemplateRef, EventEmitter, HostBinding,
-  OnChanges, OnDestroy
+  OnChanges, OnDestroy, AfterViewInit, HostListener
 } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -19,7 +19,7 @@ export const SELECTED_KEY_NAME = '__selected';
   styleUrls: ['./table.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class TableComponent implements OnChanges, OnDestroy {
+export class TableComponent implements OnChanges, OnDestroy, AfterViewInit {
   private _columns: any[];
   private _rows: any[];
   private _headerHeight: string | number;
@@ -39,13 +39,16 @@ export class TableComponent implements OnChanges, OnDestroy {
   expandedRows = {};
 
   actions: ActionItemType[];
+  limit = 10;
+
   @ViewChild(CheckboxColumnComponent) checkboxColumn: CheckboxColumnComponent;
   @ViewChild(ActionColumnComponent) actionsColumn: ActionColumnComponent;
   @ViewChild('table') table: DatatableComponent;
-  @ViewChild('detailRow') detailRow: TemplateRef<any>;
 
   @Output() selectAction = new EventEmitter<ActionItemType>();
 
+  @Input() showPageSizeMenu = true;
+  @Input() multiExpand = false;
   @Input() rowDetailHeight = 200;
   /**
    * Table theme one of 'plain', 'cards'. 'plain' by default
@@ -66,6 +69,10 @@ export class TableComponent implements OnChanges, OnDestroy {
       this.table.rowDetail.template = template;
     }
   };
+
+  static makeFixedWith(size: number) {
+    return { width: size, maxWidth: size, minWidth: size};
+  }
 
   @Input() set headerHeight(value: string | number) {
     this._headerHeight = value;
@@ -132,14 +139,13 @@ export class TableComponent implements OnChanges, OnDestroy {
     return TableThemeSettings[this.theme].className;
   };
 
+  @HostListener('window:resize') onWindowResize() {
+    this.table.recalculate();
+  }
+
   get rows(): any[] {
     return this._rows;
   }
-
-  limit = 10;
-
-  @Input() showPageSizeMenu = true;
-  @Input() multiExpand = false;
 
   constructor(private navbar: NavbarService) {
     this.navbarCollapse$ = this.navbar.isCollapsed;
@@ -198,6 +204,11 @@ export class TableComponent implements OnChanges, OnDestroy {
         }
       });
     }
+  }
+
+  ngAfterViewInit() {
+    // this will avoid issue on initial calculation when parent for this component is not properly rendered
+    this.table.recalculate();
   }
 
   ngOnDestroy() {

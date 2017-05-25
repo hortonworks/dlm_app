@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BsDropdownModule, ButtonsModule } from 'ng2-bootstrap';
+import { BsDropdownModule, ButtonsModule, TooltipModule } from 'ng2-bootstrap';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -17,12 +17,14 @@ import { FieldErrorComponent } from './forms/field-error/field-error.component';
 import { ProgressContainerComponent } from './progress-container/progress-container.component';
 import { SelectFieldComponent, SelectFieldOptionDirective, SelectFieldValueDirective } from './forms/select-field/';
 import { MapComponent } from './map/map.component';
+import { PageHeaderComponent } from './page-header/page-header.component';
 
 @NgModule({
   imports: [
     CommonModule,
     BsDropdownModule.forRoot(),
     ButtonsModule.forRoot(),
+    TooltipModule.forRoot(),
     ChartsModule,
     TranslateModule
   ],
@@ -41,7 +43,8 @@ import { MapComponent } from './map/map.component';
     SelectFieldComponent,
     SelectFieldOptionDirective,
     SelectFieldValueDirective,
-    MapComponent
+    MapComponent,
+    PageHeaderComponent
   ],
   exports: [
     CardComponent,
@@ -58,7 +61,8 @@ import { MapComponent } from './map/map.component';
     SelectFieldComponent,
     SelectFieldOptionDirective,
     SelectFieldValueDirective,
-    MapComponent
+    MapComponent,
+    PageHeaderComponent
   ]
 })
 export class CommonComponentsModule {}

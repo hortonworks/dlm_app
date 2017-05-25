@@ -1,5 +1,16 @@
-<div class="col-md-12">
-  <dp-map [mapSize]="mapSize" [mapData]="locations"></dp-map>
-  <dp-cluster-search></dp-cluster-search>
-  <dlm-cluster-list [clusters]="clusters$ | async" [policiesCount]="policiesCount$ | async" [pairsCount]="pairsCount$ | async"></dlm-cluster-list>
+<dlm-page-header [title]="'common.clusters'"></dlm-page-header>
+<div class="row page-section">
+  <div class="col-md-12">
+    <dp-map [mapSize]="mapSize" [mapData]="mapData$ | async"></dp-map>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <dp-cluster-search></dp-cluster-search>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <dlm-cluster-list [clusters]="tableData$ | async"></dlm-cluster-list>
+  </div>
 </div>

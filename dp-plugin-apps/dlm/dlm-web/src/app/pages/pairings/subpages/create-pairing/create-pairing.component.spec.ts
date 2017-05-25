@@ -5,7 +5,6 @@ import { CreatePairingComponent } from './create-pairing.component';
 import { CreatePairingCardListComponent } from 'pages/pairings/components/create-pairing-card-list/create-pairing-card-list.component';
 import { PairingProgressCardComponent } from 'pages/pairings/components/pairing-progress-card/pairing-progress-card.component';
 import { CreatePairingCardComponent } from 'pages/pairings/components/create-pairing-card/create-pairing-card.component';
-import { ClusterCardComponent } from 'components/cluster-card/cluster-card.component';
 import { MockStore } from 'mocks/mock-store';
 import { Store } from '@ngrx/store';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
@@ -14,6 +13,7 @@ import { MockTranslateLoader } from 'mocks/mock-translate-loader';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { TooltipModule } from 'ng2-bootstrap';
+import { CommonComponentsModule } from 'components/common-components.module';
 
 describe('CreatePairingComponent', () => {
   let component: CreatePairingComponent;
@@ -27,14 +27,14 @@ describe('CreatePairingComponent', () => {
         ReactiveFormsModule,
         ModalModule.forRoot(),
         RouterTestingModule,
-        TooltipModule.forRoot()
+        TooltipModule.forRoot(),
+        CommonComponentsModule
       ],
       declarations: [
         CreatePairingComponent,
         CreatePairingCardListComponent,
         PairingProgressCardComponent,
         CreatePairingCardComponent,
-        ClusterCardComponent,
         ModalDialogComponent,
         BytesSizePipe
       ],
