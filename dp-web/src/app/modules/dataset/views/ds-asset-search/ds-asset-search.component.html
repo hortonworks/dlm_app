@@ -1,18 +1,35 @@
-<div class="assetSearch borderBox">
-  <div class="tabCont">
+<div class="assetSearch borderBox" #outerCont>
+  <div class="tabCont" #tabCont>
     <div class="tab" [class.active]="activeTab == tabEnum.NORMAL"  (click)="activeTab=tabEnum.NORMAL">Search</div>
-    <div class="tab" [class.active]="activeTab == tabEnum.ADVANCE" (click)="activeTab=tabEnum.ADVANCE">Advance</div>
+    <div class="tab" [class.active]="activeTab == tabEnum.ADVANCE" (click)="activeTab=tabEnum.ADVANCE">Advanced</div>
     <div style="clear: both"></div>
   </div>
-  <div class="queryEditorCont">
+  <div class="queryEditorCont" #queryEditorCont>
     <normlal-query-editor *ngIf="activeTab == tabEnum.NORMAL"
                           [queryObj]="queryObj"
-                          (onQueryObjUpdate)="fireNewQuery($event)"
-    ></normlal-query-editor>
-    <div class="advanceEditor" *ngIf="activeTab == tabEnum.ADVANCE">advanceEditor</div>
+                          (onQueryObjUpdate)="onSimpleQueryObjUpdate($event)"
+                          (onHeightChange)="onQueryEditorResize($event)"
+    #basicQueryEditor ></normlal-query-editor>
+    <advance-query-editor *ngIf="activeTab == tabEnum.ADVANCE"
+                          [queryModel]="queryModel"
+                          (onHeightChange)="onQueryEditorResize($event)"
+    #advanceQueryEditor ></advance-query-editor>
+    <div style="clear: both"></div>
   </div>
-  <div class="queryResultCont">
-    <ds-assets-list [hideTabs]="true" [hideSearch]="true" [searchText]="assetName" [typeFilter]="queryObj.type"></ds-assets-list>
+  <div class="filterActionCont">
+    <button class="mdl-button btn-hwx-primary" (click)="actionSearch()">Search</button>
+    <button class="mdl-button btn-hwx-secondary" (click)="actionReset()" *ngIf="showQueryResults">Reset</button>
+    <div style="clear: both"></div>
+  </div>
+  <div class="queryResultCont" #queryResultCont>
+    <ds-assets-list [hideTabs]="true"
+                    [hideSearch]="true"
+                    [queryModels]="queryModel"
+                    [innerListScrollable]="true"
+                    [selectionAllowed]="false"
+                    [avoidLoadingOnInit]="true"
+      *ngIf="showQueryResults"                    #dsAssetList></ds-assets-list>
+    <div *ngIf="!showQueryResults" class="noSearchMessage"><span>Some Message</span></div>
   </div>
   <div class="actionButtonCont">
     <button class="mdl-button btn-hwx-secondary" (click)="actionCancel()">Cancel</button>

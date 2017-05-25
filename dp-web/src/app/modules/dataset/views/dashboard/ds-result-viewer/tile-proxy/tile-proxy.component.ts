@@ -8,19 +8,18 @@ import {Router} from "@angular/router";
   templateUrl: './tile-proxy.component.html',
   styleUrls: ['./tile-proxy.component.scss'],
 })
-export class DsTileProxy implements OnInit {
+export class DsTileProxy{
 
-  @Input() dsModel : RichDatasetModel;
+  @Input() dsModel: RichDatasetModel;
 
-  constructor (
-    private router: Router,
-  ) {}
-  ngOnInit () {}
+  constructor(private router: Router,) {
+  }
 
   getID() {
     return 'dropDownIcon_' + this.dsModel.id;
   }
-  showFullView ($event) {
+
+  showFullView($event) {
     if ($event.target.tagName != 'I') {
       this.router.navigate(['dataset/full-view/' + this.dsModel.id]);
     }

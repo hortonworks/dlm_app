@@ -3,11 +3,17 @@
   <br/>
   <div class="">Some text Babu would provide, probably which describes what are assets, how can one add them or remove them etc. Some text Babu would provide, probably which describes what are assets, how can one add them or remove them etc. Some text Babu would provide, probably which describes what are assets, how can one add them or remove them etc.</div>
   <br/>
-  <ds-assets-list *ngIf="dsModel.id" [dsModel]="dsModel" [applicableActions]="applicableListActions" (onAction)="showPopup=!showPopup"></ds-assets-list>
-  <button *ngIf="!dsModel.id" class="mdl-button btn-hwx-primary" (click)="showPopup=!showPopup">Add Assets</button>
+  <ds-assets-list *ngIf="showList && !showPopup"
+                  [dsModel]="dsModel"
+                  [applicableActions]="applicableListActions"
+                  [selectionAllowed]="false"
+                  [queryModels]="assetSetQueryModelsForAddition"
+                  (onAction)="onListAction($event)"
+  ></ds-assets-list>
+  <button *ngIf="!showList" class="mdl-button btn-hwx-primary" (click)="showPopup=true;">Add Assets</button>
 </div>
 <div *ngIf="showPopup" class="popup borderBox">
   <div class="opaque">
-    <asset-search (doneNotification)="actionDone()" (cancelNotification)="actionCancel()"></asset-search>
+    <asset-search (doneNotification)="actionDone($event)" (cancelNotification)="actionCancel()"></asset-search>
   </div>
 </div>

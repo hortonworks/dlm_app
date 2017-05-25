@@ -1,13 +1,4 @@
-$color_text_blue: rgb(102,164,200);
-$color_text_gray: rgb(103,115,120);
-$color_green: rgb(96,170,90);
-$font_size_title: 22px;
-
-.borderBox, .borderBox * {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
+@import "../../../../../styles/variables";
 
 .nav_trail{
   padding:10px;
@@ -20,7 +11,7 @@ $font_size_title: 22px;
 }
 
 .ds-description-head{
-  height: 80px;
+  min-height: 80px;
   padding:10px 15px;
   color: $color_text_gray
 }
@@ -34,12 +25,12 @@ $font_size_title: 22px;
 }
 
 .ds-editor-cont {
-  padding: 20px 0 20px 150px;
+  padding: 20px 0 20px $layout-drawer-width;
 }
 
 .ds-editor-cont .nav-panel {
-  margin-left: -150px;
-  width:150px;
+  margin-left: -$layout-drawer-width;
+  width:$layout-drawer-width;
   float: left;
   padding:15px;
   border-right: 1px solid $color_text_gray;
@@ -84,6 +75,7 @@ $font_size_title: 22px;
 
 .ds-editor-cont .nav-panel .nav-stage.done {
   color:$color_green;
+  cursor: pointer;
   .circle {display: none;}
   .fa-check-circle {display: block;}
 }

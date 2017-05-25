@@ -10,17 +10,22 @@ import {DatasetTag} from "../../../../../models/dataset-tag";
 export class NavTagPanel implements OnInit {
 
   @Output ('updateSelection') updateSelectionEmitter: EventEmitter<DatasetTag> = new EventEmitter<DatasetTag>();
-  public dsTags :DatasetTag[] = null;
+  public allTags :DatasetTag[] = null;
+  public displayTags :DatasetTag[] = null;
   private currentDsTag :DatasetTag = null;
+  public tagSearchText:string="";
   constructor(
     private tagService :DatasetTagService
   ){}
   ngOnInit () {
-    console.log("ngOnInit called");
-    this.tagService.list().subscribe(tags => (this.dsTags=tags) && tags.length && this.onPanelRowSelectionChange(tags[0]));
+    this.tagService.list().subscribe(tags => (this.displayTags=this.allTags=tags) && tags.length && this.onPanelRowSelectionChange(tags[0]));
   }
   onPanelRowSelectionChange (tagObj:DatasetTag) {
       this.currentDsTag = tagObj;
       this.updateSelectionEmitter.emit(tagObj);
+  }
+
+  searchTag(){
+    this.displayTags=this.allTags.filter(tag=>tag.name.toLowerCase().indexOf(this.tagSearchText.toLowerCase()) != -1);
   }
 }

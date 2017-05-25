@@ -1,5 +1,5 @@
 <div class="tileProxy" (click)="showFullView($event)">
-  <div class="header">
+  <div class="header overFlowEllipsis">
     <span class="title">{{dsModel.name}}</span>
     <span class="options">
       <i *ngIf="dsModel.favourite" class="fa fa-star"></i>
@@ -22,8 +22,8 @@
   </div>
 
   <div class="footer">
-    <div class="division"><span>HIVE:</span><span>{{dsModel.hiveCount}}</span></div>
-    <div class="division border-left"><span>FILES:</span><span>{{dsModel.filesCount}}</span></div>
+    <div class="division"><span>HIVE:</span><span>{{dsModel.counts.hiveCount}}</span></div>
+    <div class="division border-left"><span>FILES:</span><span>{{dsModel.counts.filesCount}}</span></div>
   </div>
 </div>
 
