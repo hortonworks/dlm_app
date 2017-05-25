@@ -38,7 +38,10 @@
 </ng-template>
 
 <ng-template #dataCell let-size="value" let-row="row">
-  <span class="text-primary"><span [innerHTML]="size|bytesSize"></span></span>
+  <span class="actionable text-primary" (click)="toggleRowDetail(row, policyContent.Files)">
+    <span [innerHTML]="size|bytesSize"></span>
+    <span class="caret"></span>
+  </span>
 </ng-template>
 
 <ng-template let-row="row" ngx-datatable-row-detail-template #rowDetailRef>

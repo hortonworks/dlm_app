@@ -12,7 +12,7 @@ const ROUTE_DATA_BREADCRUMB = 'breadcrumb';
   styleUrls: ['./breadcrumb.component.scss'],
   template: `
     <ol class="breadcrumb">
-      <li><a routerLink="" class="breadcrumb"><i class="fa fa-gg"></i></a></li>
+      <li><a routerLink="" class="breadcrumb">{{"topnav.disaster_recovery" | translate}}</a></li>
       <li *ngFor="let breadcrumb of breadcrumbs; let isLast = last" [class.active]="isLast">
         <a *ngIf="!isLast" [routerLink]="[breadcrumb.url, breadcrumb.params]">{{breadcrumb.label}}</a>
         <span *ngIf="isLast">{{breadcrumb.label}}</span>

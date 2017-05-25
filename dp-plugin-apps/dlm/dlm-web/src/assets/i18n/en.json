@@ -67,7 +67,8 @@
     }
   },
   "topnav": {
-    "timezone": "Current Timezone"
+    "timezone": "Current Timezone",
+    "disaster_recovery": "Disaster Recovery"
   },
   "sidenav": {
     "menuItem": {
