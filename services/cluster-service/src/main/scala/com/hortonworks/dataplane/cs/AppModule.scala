@@ -121,6 +121,7 @@ object AppModule extends AbstractModule {
         statusRoute.sync ~
         statusRoute.health ~
         ambariRoute.route
+    )
   }
 
   @Provides
