@@ -29,7 +29,7 @@ export class ClusterAddComponent implements OnInit{
     private route: ActivatedRoute,
     private lakeService: LakeService,
     private clusterService: ClusterService,
-    private locationService: LocationService,
+    private locationService: LocationService
   ) { }
 
   @ViewChild('ambariInput') ambariInputContainer: ElementRef;

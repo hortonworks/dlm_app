@@ -8,7 +8,7 @@
 :host /deep/ {
   .mdl-layout__drawer-button {
     line-height: 46px;
-    margin-left: 0px;
+    margin-left: 10px;
     margin-right: 0px;
   }
   i {
@@ -42,7 +42,7 @@
 }
 
 .is_active:after {
-  height: 5px;
+  height: 2px;
   width: 100%;
   display: block;
   content: " ";
@@ -52,8 +52,12 @@
   background: $fruit-salad;
 }
 
-.mdl-navigation__link.is_active {
-  color: $mine-shaft !important;
+.mdl-navigation__link {
+  color: #666666;
+
+  &.is_active {
+    color: $mine-shaft !important;
+  }
 }
 
 .mdl-navigation {
@@ -95,5 +99,12 @@ img {
 
 .mdl-list__item-primary-content {
   cursor: pointer;
+}
+
+.user-name {
+  vertical-align: super;
+  font-size: 13px;
+  color: #666666;
+  margin: 0px 4px;
 }
 

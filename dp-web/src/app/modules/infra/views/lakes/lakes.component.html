@@ -1,7 +1,10 @@
 <section>
-  <div class="dashboard-title"><span>Dashboard</span></div>
+  <div class="breadcrumb-container"> <span>Dashboard</span> </div>
   <dp-map [mapSize]="mapSize" [mapData]="mapData"></dp-map>
 </section>
-<section>
-  <dp-lakes-list [lakes]="lakes" [healths]="health"></dp-lakes-list>
-</section>
+
+<div class="page-container">
+  <section>
+    <dp-lakes-list [lakes]="lakes" [healths]="health"></dp-lakes-list>
+  </section>
+</div>

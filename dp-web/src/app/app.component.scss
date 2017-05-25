@@ -1,9 +1,10 @@
 @import "../styles/variables";
 
-.dp-layout__drawer {
-  background-color: rgb(213, 213, 213);
+main {
+  padding-bottom: 20px;
+  //height: calc(100% - #{$layout-header-desktop-row-height + $page-margins});
 }
 
-.page-content {
-  min-height: calc(100vh - #{$layout-header-desktop-row-height + $page-margins});
+.dp-layout__drawer {
+  background-color: rgb(213, 213, 213);
 }
