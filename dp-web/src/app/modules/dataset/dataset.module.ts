@@ -20,7 +20,6 @@ import {DsInfoHolder} from "./views/ds-editor/ds-info-holder/ds-info-holder.comp
 import {DsAssetsHolder} from "./views/ds-editor/ds-assets-holder/ds-assets-holder.component";
 
 import {DsSummaryHolder} from "./views/ds-editor/ds-summary-holder/ds-summary-holder.component";
-import {TaggingWidget} from "../../shared/tagging-widget/tagging-widget.component";
 import {DsTagsService} from "./services/dsTagsService";
 import {DsAssetSearch} from "./views/ds-asset-search/ds-asset-search.component";
 import {BasicQueryEditor} from "./views/ds-asset-search/queryEditors/basic/basic-query-editor.component";
@@ -52,7 +51,6 @@ import {TaggingWidgetModule} from "../../shared/tagging-widget/tagging-widget.mo
       DsRowProxy,
       DatasetDashboardComponent,
       SimplePaginationWidget,
-      TaggingWidget,
       DsAssetSearch,
       BasicQueryEditor,
       AdvanceQueryEditor,
