@@ -2,15 +2,19 @@ package com.hortonworks.datapalane.consul;
 
 import com.ecwid.consul.v1.health.model.HealthService;
 import com.google.common.base.Supplier;
+import com.google.common.collect.Sets;
 import com.typesafe.config.Config;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
@@ -19,11 +23,11 @@ import java.util.stream.Collectors;
  * By convention all service URL's
  * should be first picked up from System.properties and then from
  * the underlying configuration
- *
+ * <p>
  * Clients should construct a Gateway with
  * the configuration and a map of service endpoints to
  * be written into System properties
- *
+ * <p>
  * This component will periodically check for zuul
  * to be available and use of the servers to construct the
  * target url and write it into system properties
@@ -35,6 +39,7 @@ public class Gateway {
   private final Map<String, String> serviceConfigs;
   private final Optional<ConsulHook> consulHook;
   private final DpConsulClientImpl dpConsulClient;
+  private final AtomicReference<Set<ZuulServer>> serverSet;
   private Supplier<List<ZuulServer>> supplier;
   private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
@@ -47,6 +52,7 @@ public class Gateway {
     int port = config.getInt("consul.port");
     dpConsulClient = new DpConsulClientImpl(new ConsulEndpoint(host, port));
     supplier = new ServerListSupplier(dpConsulClient);
+    serverSet = new AtomicReference<>(Sets.newHashSet());
   }
 
   /**
@@ -60,13 +66,26 @@ public class Gateway {
     }
     Runnable runnable = () -> {
       try {
+
+        // Simple change detection to avoid overwriting properties on every run
+        // Memoize every run so we can just check id any new servers were added
+        // if server lists were updated, pick one randomly
         List<ZuulServer> zuulServers = supplier.get();
+        HashSet<ZuulServer> currentSet = Sets.newHashSet(zuulServers);
+        // IF current set is same as old set do not update properties
+        if (!serverSet.get().isEmpty() && currentSet.containsAll(serverSet.get())) {
+          consulHook.ifPresent(consulHook -> consulHook.onRecoverableException("Server list not updated since there was no change in Consul", new Exception("Server list not updated")));
+          return;
+        }
+
         if (zuulServers.size() == 0)
           throw new Exception("No Zuul servers found");
         ZuulServer zuulServer = zuulServers.get(randomizer.nextInt(zuulServers.size()));
         serviceConfigs.forEach((k, v) -> {
           System.setProperty(k, zuulServer.makeUrl(config.getBoolean("gateway.ssl.enabled")) + v);
         });
+        // remember the old server list for next run
+        serverSet.set(currentSet);
         if (consulHook.isPresent() && zuulServers.size() > 0) {
           consulHook.get().gatewayDiscovered(zuulServer);
         }
@@ -74,9 +93,7 @@ public class Gateway {
         serviceConfigs.forEach((k, v) -> {
           System.clearProperty(k);
         });
-        if (consulHook.isPresent()) {
-          consulHook.get().gatewayDiscoverFailure("Error getting gateway URL, removing service configs from System, fallback will proceed", th);
-        }
+        consulHook.ifPresent(consulHook -> consulHook.gatewayDiscoverFailure("Error getting gateway URL, removing service configs from System, fallback will proceed", th));
 
       }
     };

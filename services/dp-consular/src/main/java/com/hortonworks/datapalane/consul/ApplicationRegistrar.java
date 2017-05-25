@@ -25,10 +25,10 @@ public class ApplicationRegistrar {
     int port = config.getInt("consul.port");
     DpConsulClientImpl dpConsulClient = new DpConsulClientImpl(new ConsulEndpoint(host, port));
     ClientStart clientStartTask = new ClientStart(dpConsulClient, config, hook);
-    ClientStatus clientstatusTask = new ClientStatus(dpConsulClient, config, hook);
-    ExecutionHandler executionHandler = new ExecutionHandler(scheduledExecutorService, () -> clientStartTask, () -> clientstatusTask, config, hook);
+    ClientStatus clientStatusTask = new ClientStatus(dpConsulClient, config, hook);
+    ExecutionHandler executionHandler = new ExecutionHandler(scheduledExecutorService, () -> clientStartTask, () -> clientStatusTask, config, hook);
     clientStartTask.setExecutionHandler(Optional.of(executionHandler));
-    clientstatusTask.setExecutionHandler(Optional.of(executionHandler));
+    clientStatusTask.setExecutionHandler(Optional.of(executionHandler));
     scheduledExecutorService.schedule(clientStartTask, 2, TimeUnit.SECONDS);
     Runtime.getRuntime().addShutdownHook(new ShutdownHook(dpConsulClient, config, hook));
   }
