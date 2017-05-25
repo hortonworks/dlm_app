@@ -7,16 +7,16 @@ import {Router} from "@angular/router";
   templateUrl: './row-proxy.component.html',
   styleUrls: ['./row-proxy.component.scss'],
 })
-export class DsRowProxy implements OnInit {
+export class DsRowProxy{
 
-  @Input() datasetModels : RichDatasetModel[];
-  constructor (private router: Router) {}
+  @Input() datasetModels: RichDatasetModel[];
 
-  ngOnInit () {}
-  
-  hoveredIndex:number;
+  constructor(private router: Router) {
+  }
 
-  showFullView (dsModel) {
+  hoveredIndex: number;
+
+  showFullView(dsModel) {
     this.router.navigate(['dataset/full-view/' + dsModel.id]);
   }
 }

@@ -1,6 +1,6 @@
 <div class="nav-tag-panel borderBox">
   <div class="tag-search">
-    <input placeholder="Tags" [(ngModel)]="tagSearchText" (change)="searchTag()"/>
+    <input placeholder="Tags" [(ngModel)]="tagSearchText" (keyup)="searchTag()"/>
     <i class="fa fa-search" (click)="searchTag()"></i>
   </div>
   <div class="tag-list">

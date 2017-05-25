@@ -10,62 +10,77 @@ import {AdvanceQueryEditor} from "./queryEditors/advance/advance-query-editor.co
 export enum DsAssetSearchTabEnum { NORMAL, ADVANCE}
 
 @Component({
-  selector:'asset-search',
-  templateUrl:'./ds-asset-search.component.html',
-  styleUrls:['./ds-asset-search.component.scss']
+  selector: 'asset-search',
+  templateUrl: './ds-asset-search.component.html',
+  styleUrls: ['./ds-asset-search.component.scss']
 })
 export class DsAssetSearch {
   public tabEnum = DsAssetSearchTabEnum;
   public activeTab = this.tabEnum.NORMAL;
-  public queryObj:SimpleQueryObjectModel = new SimpleQueryObjectModel("");
-  public queryModel:AssetSetQueryModel = new AssetSetQueryModel([]);
-  public showQueryResults:boolean=false;
+  public queryObj: SimpleQueryObjectModel = new SimpleQueryObjectModel("");
+  public queryModel: AssetSetQueryModel = new AssetSetQueryModel([]);
+  public showQueryResults: boolean = false;
 
-  @ViewChild('outerCont') outerCont:ElementRef;
-  @ViewChild('tabCont') tabCont:ElementRef;
-  @ViewChild('queryResultCont') queryResultCont:ElementRef;
-  @ViewChild('dsAssetList') dsAssetList:DsAssetList;
-  @ViewChild('basicQueryEditor') basicQueryEditor:BasicQueryEditor;
-  @ViewChild('advanceQueryEditor') advanceQueryEditor:AdvanceQueryEditor;
+  @ViewChild('outerCont') outerCont: ElementRef;
+  @ViewChild('tabCont') tabCont: ElementRef;
+  @ViewChild('queryResultCont') queryResultCont: ElementRef;
+  @ViewChild('dsAssetList') dsAssetList: DsAssetList;
+  @ViewChild('basicQueryEditor') basicQueryEditor: BasicQueryEditor;
+  @ViewChild('advanceQueryEditor') advanceQueryEditor: AdvanceQueryEditor;
 
   @Output("doneNotification") doneNotificationEmitter: EventEmitter<AssetSetQueryModel> = new EventEmitter<AssetSetQueryModel>();
   @Output("cancelNotification") cancelNotificationEmitter: EventEmitter<null> = new EventEmitter<null>();
 
-  onSimpleQueryObjUpdate (flag:any) {
-    if(!this.showQueryResults)
-      ((thisObj)=>setTimeout(()=>thisObj._actionSearch(),0))(this);
+  onSimpleQueryObjUpdate(flag: any) {
+    if (!this.showQueryResults)
+      ((thisObj) => setTimeout(() => thisObj._actionSearch(), 0))(this);
     this.showQueryResults = true;
     //  this.assetName = this.queryObj.searchText;
-    this.queryModel=new AssetSetQueryModel([
-      {column:"asset.name", operator:"contains", value:this.queryObj.searchText},
-      {column:"asset.source", operator:"==", value:AssetTypeEnumString[this.queryObj.type]}
+    this.queryModel = new AssetSetQueryModel([
+      {column: "asset.name", operator: "contains", value: this.queryObj.searchText},
+      {column: "asset.source", operator: "==", value: AssetTypeEnumString[this.queryObj.type]}
     ]);
   }
+
   actionCancel() {
     this.cancelNotificationEmitter.emit();
   }
-  actionDone () {
+
+  actionDone() {
     this.doneNotificationEmitter.emit(this.queryModel);
   }
+
   actionSearch() {
     this.showQueryResults = true;
-    ((thisObj)=>setTimeout(()=>thisObj._actionSearch(),0))(this);
+    ((thisObj) => setTimeout(() => thisObj._actionSearch(), 0))(this);
   }
-  _actionSearch(){
+
+  _actionSearch() {
     switch (this.activeTab) {
-      case this.tabEnum.NORMAL :  this.basicQueryEditor.searchWidget.emitSearchText();    break;
-      case this.tabEnum.ADVANCE:  this.advanceQueryEditor.updateQueryModel();  this.dsAssetList.fetchAssets();   break;
+      case this.tabEnum.NORMAL :
+        this.basicQueryEditor.searchWidget.emitSearchText();
+        break;
+      case this.tabEnum.ADVANCE:
+        this.advanceQueryEditor.updateQueryModel();
+        this.dsAssetList.fetchAssets();
+        break;
     }
   }
-  actionReset(){
+
+  actionReset() {
     switch (this.activeTab) {
-      case this.tabEnum.NORMAL :  this.queryObj = new SimpleQueryObjectModel("");    break;
-      case this.tabEnum.ADVANCE:  this.advanceQueryEditor.reset();                 break;
+      case this.tabEnum.NORMAL :
+        this.queryObj = new SimpleQueryObjectModel("");
+        break;
+      case this.tabEnum.ADVANCE:
+        this.advanceQueryEditor.reset();
+        break;
     }
     this.dsAssetList.clearResults()
-    this.showQueryResults=false;
+    this.showQueryResults = false;
   }
-  onQueryEditorResize () {
+
+  onQueryEditorResize() {
     var padding = this.queryResultCont.nativeElement.offsetTop - this.outerCont.nativeElement.offsetTop;
     this.tabCont.nativeElement.style.marginTop = "-" + (padding - 10) + "px"; // -10 for padding from border
     this.outerCont.nativeElement.style.paddingTop = padding + "px";

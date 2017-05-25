@@ -15,27 +15,29 @@ import {
 })
 export class DsFullView implements OnInit {
 
-  public dsModel :RichDatasetModel = null;
-  public applicableListActions:AssetListActionsEnum[] = [AssetListActionsEnum.EDIT];
-  public dsAssetQueryModel:AssetSetQueryModel;
+  public dsModel: RichDatasetModel = null;
+  public applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.EDIT];
+  public dsAssetQueryModel: AssetSetQueryModel;
 
-  constructor(
-    private richDatasetService :RichDatasetService,
-    private router: Router,
-    private activeRoute: ActivatedRoute
-  ){}
+  constructor(private richDatasetService: RichDatasetService,
+              private router: Router,
+              private activeRoute: ActivatedRoute) {
+  }
 
-  ngOnInit () {
+  ngOnInit() {
     this.activeRoute.params
       .subscribe(params => {
-          this.richDatasetService
-            .getById(+params['id'])
-            .subscribe(dsObj => this.dsModel = dsObj);
-          this.dsAssetQueryModel = new AssetSetQueryModel([<AssetSetQueryFilterModel>{column:"dataset.id", operator:"=", value:+params['id']}]);
+        this.richDatasetService
+          .getById(+params['id'])
+          .subscribe(dsObj => this.dsModel = dsObj);
+        this.dsAssetQueryModel = new AssetSetQueryModel([<AssetSetQueryFilterModel>{
+          column: "dataset.id", operator: "=", value: +params['id']
+        }]);
       });
   }
-  onEdit(action:AssetListActionsEnum) {
-    this.router.navigate(['dataset/edit/'+this.dsModel.id]);
+
+  onEdit(action: AssetListActionsEnum) {
+    this.router.navigate(['dataset/edit/' + this.dsModel.id]);
   }
 
 }

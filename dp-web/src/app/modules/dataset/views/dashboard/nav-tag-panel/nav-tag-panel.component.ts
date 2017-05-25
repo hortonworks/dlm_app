@@ -24,6 +24,7 @@ export class NavTagPanel implements OnInit {
       this.currentDsTag = tagObj;
       this.updateSelectionEmitter.emit(tagObj);
   }
+
   searchTag(){
     this.displayTags=this.allTags.filter(tag=>tag.name.toLowerCase().indexOf(this.tagSearchText.toLowerCase()) != -1);
   }

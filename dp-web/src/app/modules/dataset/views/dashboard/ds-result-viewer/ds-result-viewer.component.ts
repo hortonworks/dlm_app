@@ -10,52 +10,47 @@ import {ViewsEnum} from "../../../../../shared/utils/views";
   templateUrl: './ds-result-viewer.component.html',
   styleUrls: ['./ds-result-viewer.component.scss'],
 })
-export class DsNavResultViewer implements OnInit {
+export class DsNavResultViewer {
 
-  @Input() currentDsTag : DatasetTag;
-  public datasetModels : RichDatasetModel[] = null
-  private currentPage : number = 1;
+  @Input() currentDsTag: DatasetTag;
+  public datasetModels: RichDatasetModel[] = null
+  private currentPage: number = 1;
   public views = ViewsEnum;
   @Input() view;
 
-  start : number = 1;
-  limit : number = 10;
+  start: number = 1;
+  limit: number = 10;
 
-  constructor(
-    private richDatasetService :RichDatasetService
-  ){}
-
-  ngOnInit () {
-
+  constructor(private richDatasetService: RichDatasetService) {
   }
 
-  ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
+  ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
     if (changes['currentDsTag'] && this.currentDsTag) {
       this.getDataset();
     }
   }
 
-  get paginationLabel(){
-    if(this.view === ViewsEnum.grid){
-        return 'Results Per Page';
-    }else{
-        return 'Rows Per Page';
-     }
+  get paginationLabel() {
+    if (this.view === ViewsEnum.grid) {
+      return 'Results Per Page';
+    } else {
+      return 'Rows Per Page';
+    }
   }
 
-  getDataset(){
-     this.datasetModels=null;
-      this.richDatasetService.listByTag(this.currentDsTag.name, this.start, this.limit)
-        .subscribe(result => this.datasetModels = result);
+  getDataset() {
+    this.datasetModels = null;
+    this.richDatasetService.listByTag(this.currentDsTag.name, this.start, this.limit)
+      .subscribe(result => this.datasetModels = result);
   }
 
 
-  onPageChange(start){
+  onPageChange(start) {
     this.start = start;
     this.getDataset();
   }
 
-  onSizeChange(limit){
+  onSizeChange(limit) {
     this.start = 1;
     this.limit = limit;
     this.getDataset();

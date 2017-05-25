@@ -18,9 +18,6 @@ body {
 div.spacer-34 {
   height: 34px;
 }
-.mdl-button--green {
-  background: $apple-green;
-}
 
 @include summary-pane("summary-pane-5", "20%");
 
@@ -28,4 +25,11 @@ div.spacer-34 {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+}
+
+.overFlowEllipsis{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap
+
 }

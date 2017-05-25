@@ -12,25 +12,26 @@ import {Router} from "@angular/router";
 
 export class DatasetDashboardComponent implements OnInit {
 
-  public currentDsTag :DatasetTag = null;
+  public currentDsTag: DatasetTag = null;
   public views = ViewsEnum;
-  currentView : ViewsEnum;
-  constructor(
-    private router: Router,
-  ){}
+  currentView: ViewsEnum;
 
-  ngOnInit () {
+  constructor(private router: Router,) {
+  }
+
+  ngOnInit() {
     this.currentView = this.views.list;
   }
 
-  onTagChange (tagObj:DatasetTag){
+  onTagChange(tagObj: DatasetTag) {
     this.currentDsTag = tagObj;
   }
 
-  onViewChange(view){
+  onViewChange(view) {
     this.currentView = view;
   }
-  actionAddNewDataset () {
+
+  actionAddNewDataset() {
     this.router.navigate(['dataset/add']);
   }
 }
