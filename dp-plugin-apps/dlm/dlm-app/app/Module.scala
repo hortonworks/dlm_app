@@ -3,7 +3,7 @@ import java.time.Clock
 import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.hortonworks.dataplane.db._
-import com.hortonworks.dataplane.db.Webserice._
+import com.hortonworks.dataplane.db.Webservice._
 import play.api.Configuration
 import play.api.libs.ws.WSClient
 
