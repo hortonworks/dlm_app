@@ -3,7 +3,7 @@ set -e
 
 RELEASE_NUMBER=0.0.1
 IMAGE_PREFIX="hortonworks"
-ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service"
+ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service dp-gateway"
 ALL_IMAGES_OPT="all"
 
 build_knox() {
