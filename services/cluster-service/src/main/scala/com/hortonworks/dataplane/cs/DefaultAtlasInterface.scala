@@ -7,7 +7,7 @@ import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEnti
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterServiceHost, ClusterService => CS}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
 import com.hortonworks.dataplane.cs.atlas.Filters
-import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterHostsService}
+import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService}
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import org.apache.atlas.AtlasClientV2

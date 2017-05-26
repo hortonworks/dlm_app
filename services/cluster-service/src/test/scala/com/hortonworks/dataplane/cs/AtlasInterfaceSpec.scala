@@ -4,7 +4,7 @@ import java.net.URLEncoder
 
 import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasFilter, AtlasFilters}
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterHost, ClusterService => AtlasService}
-import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterHostsService}
+import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService}
 import com.hortonworks.dataplane.restmock.httpmock.when
 import com.typesafe.config.ConfigFactory
 import org.scalamock.scalatest.AsyncMockFactory

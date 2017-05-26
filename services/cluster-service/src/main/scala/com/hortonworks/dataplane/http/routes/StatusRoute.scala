@@ -77,4 +77,15 @@ class StatusRoute @Inject()(val ws: WSClient,
       }
     }
 
+  val health = path("health") {
+    pathEndOrSingleSlash{
+      get{
+        complete(success(Map("status" -> 200)))
+      }
+    }
+  }
+
+
+
+
 }

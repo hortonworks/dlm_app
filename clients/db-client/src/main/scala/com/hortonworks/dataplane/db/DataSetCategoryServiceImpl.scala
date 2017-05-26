@@ -1,7 +1,7 @@
 package com.hortonworks.dataplane.db
 
 import com.hortonworks.dataplane.commons.domain.Entities.{DatasetCategory, Errors}
-import com.hortonworks.dataplane.db.Webserice.DataSetCategoryService
+import com.hortonworks.dataplane.db.Webservice.DataSetCategoryService
 import com.typesafe.config.Config
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSClient, WSResponse}
@@ -15,7 +15,9 @@ import scala.concurrent.Future
 class DataSetCategoryServiceImpl  (config: Config)(implicit ws: WSClient)
   extends DataSetCategoryService{
 
-  private val url = config.getString("dp.services.db.service.uri")
+  private def url =
+    Option(System.getProperty("dp.services.db.service.uri"))
+      .getOrElse(config.getString("dp.services.db.service.uri"))
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   override def getListWithDataSetId(dataSetId: String): Future[Either[Errors, Seq[DatasetCategory]]] = {

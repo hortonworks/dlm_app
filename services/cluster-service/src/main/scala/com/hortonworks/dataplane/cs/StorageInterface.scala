@@ -10,7 +10,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.{
   Errors,
   ClusterService => ClusterData
 }
-import com.hortonworks.dataplane.db.Webserice.{
+import com.hortonworks.dataplane.db.Webservice.{
   ClusterComponentService,
   ClusterHostsService,
   ClusterService,

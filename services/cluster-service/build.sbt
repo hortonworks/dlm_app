@@ -9,7 +9,6 @@ enablePlugins(JavaAppPackaging)
 mainClass in Compile := Some("com.hortonworks.dataplane.cs.ClusterService")
 
 libraryDependencies ++= Seq(
-  "com.hortonworks.dataplane" %% "db-client" % "0.1",
   "com.google.inject" % "guice" % "4.1.0",
   "com.typesafe.play" % "play-ws_2.11" % "2.5.13",
   "com.typesafe.play" % "play-json_2.11" % "2.6.0-M3",
@@ -23,5 +22,6 @@ libraryDependencies ++= Seq(
   "org.apache.atlas" % "atlas-typesystem" % "0.8-incubating",
   "org.apache.atlas" % "atlas-intg" % "0.8-incubating",
   "org.codehaus.jackson" % "jackson-xc" % "1.9.13",
+  "org.slf4j" % "log4j-over-slf4j" % "1.7.25",
   "org.scalatest" % "scalatest_2.11" % "3.0.1" % Test,
   "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test)

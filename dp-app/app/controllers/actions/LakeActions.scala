@@ -5,7 +5,7 @@ import javax.inject.Inject
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, Datalake}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webserice.{ClusterService, LakeService}
+import com.hortonworks.dataplane.db.Webservice.{ClusterService, LakeService}
 import internal.auth.Authenticated
 import models.{JsonResponses, WrappedErrorsException}
 import models.JsonFormatters._
