@@ -73,6 +73,7 @@ import { FlowStatusComponent } from './pages/policies/policy-table/flow-status/f
 import { PolicyInfoComponent } from './pages/policies/policy-table/policy-info/policy-info.component';
 import { CreatePolicyComponent } from './pages/policies/subpages/create-policy/create-policy.component';
 import { PolicyFormComponent } from './pages/policies/components/policy-form/policy-form.component';
+import { PolicyServiceFilterComponent } from './pages/policies/components/policy-service-filter/policy-service-filter.component';
 import { RadioButtonComponent } from './common/radio-button/radio-button.component';
 import { CheckboxComponent } from './common/checkbox/checkbox.component';
 import { CheckboxListComponent } from './common/checkbox-list/checkbox-list.component';
@@ -151,6 +152,7 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
     PolicyFormComponent,
     ReviewPolicyComponent,
     PolicyDetailsComponent,
+    PolicyServiceFilterComponent,
 
     ResourceChartsComponent,
     IssuesListComponent,
