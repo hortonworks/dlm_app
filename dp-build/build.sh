@@ -60,16 +60,13 @@ build_db_service() {
 	cp docker_service_start.sh ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-db-service/docker_service_start.sh
 	popd
 }
+
 build_dp_gateway() {
 	log "Building gateway"
-	if [ -d ../services/gateway/build ]; then
-		rm -rf ../services/gateway/build
-	fi
-	mkdir ../services/gateway/build/
 	pushd ../services/gateway
     if [ ${IS_JENKINS} == false ]; then
         log "Running gradle build"
-	    gradle build
+	    gradle clean build
     else
         log "Not building DP Gateway again in Jenkins"
     fi 
@@ -80,6 +77,7 @@ build_dp_gateway() {
 	cp docker_service_start.sh ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-gateway/docker_service_start.sh
 	popd
 }
+
 build_dp_app() {
 	log "Building dp-app"
 	pushd ../dp-app
