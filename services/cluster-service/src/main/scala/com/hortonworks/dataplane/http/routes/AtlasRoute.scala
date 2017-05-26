@@ -11,7 +11,7 @@ import com.hortonworks.dataplane.cs.{
   DefaultAtlasInterface,
   StorageInterface
 }
-import com.hortonworks.dataplane.db.Webserice.{
+import com.hortonworks.dataplane.db.Webservice.{
   ClusterComponentService,
   ClusterHostsService
 }

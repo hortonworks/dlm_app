@@ -2,5 +2,8 @@ FROM openjdk:8-jre
 
 COPY ./dp-db-service /usr/dp-db-service
 EXPOSE 9000
+COPY docker_service_start.sh docker_service_start.sh
+RUN chmod +x docker_service_start.sh
 
-ENTRYPOINT ["/usr/dp-db-service/bin/db-service", "-Dconfig.resource=application.docker.conf", "-Dplay.crypto.secret=20390398"]
+EXPOSE 9000
+ENTRYPOINT ["./docker_service_start.sh"]

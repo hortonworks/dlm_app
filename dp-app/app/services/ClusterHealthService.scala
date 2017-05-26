@@ -6,7 +6,7 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari.{ClusterHost, NameNodeInfo}
 import com.hortonworks.dataplane.commons.domain.Constants._
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
-import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterHostsService, ClusterService}
+import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService}
 import models.ClusterHealthData
 
 import scala.concurrent.ExecutionContext.Implicits.global

@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ClusterPairing } from 'models/cluster-pairing.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'dlm-create-pairing-card',
@@ -12,7 +13,11 @@ export class CreatePairingCardComponent implements OnInit {
   @Input() isSelected = false;
   @Input() isFrozen = false;
 
-  constructor() { }
+  get tooltip() {
+    return this.cluster.disabled ? this.t.instant('page.pairings.create.content.cluster_disabled') : '';
+  }
+
+  constructor(private t: TranslateService) { }
 
   ngOnInit() {
   }

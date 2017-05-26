@@ -3,7 +3,7 @@ set -e
 
 RELEASE_NUMBER=0.0.1
 IMAGE_PREFIX="hortonworks"
-ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service"
+ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service dp-gateway"
 ALL_IMAGES_OPT="all"
 
 build_knox() {
@@ -14,6 +14,8 @@ build_knox() {
 build_images() {
     VERSION=$(get_version)
     echo "Using version ${VERSION}"
+    echo "Building gateway"
+    docker build -t hortonworks/dp-gateway:${VERSION} build/dp-docker/dp-gateway/
     echo "Building dp-db-service"
     docker build -t hortonworks/dp-db-service:${VERSION} build/dp-docker/dp-db-service/
     echo "Building dp-cluster-service"

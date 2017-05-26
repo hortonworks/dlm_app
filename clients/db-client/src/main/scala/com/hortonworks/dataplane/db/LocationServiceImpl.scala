@@ -3,7 +3,7 @@ package com.hortonworks.dataplane.db
 import javax.inject.Singleton
 
 import com.hortonworks.dataplane.commons.domain.Entities._
-import com.hortonworks.dataplane.db.Webserice.LocationService
+import com.hortonworks.dataplane.db.Webservice.LocationService
 import com.typesafe.config.Config
 import play.api.libs.ws.{WSClient, WSResponse}
 
@@ -14,7 +14,9 @@ import scala.concurrent.Future
 class LocationServiceImpl(config: Config)(implicit ws: WSClient)
     extends LocationService {
 
-  private val url = config.getString("dp.services.db.service.uri")
+  private def url =
+    Option(System.getProperty("dp.services.db.service.uri"))
+      .getOrElse(config.getString("dp.services.db.service.uri"))
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 

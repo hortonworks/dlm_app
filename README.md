@@ -35,7 +35,7 @@
     * Enter `dp_admin` as the password
     * `select * from schema_version;` This should show some migrations.
   * Build the containers for the application: `./dp-docker-build.sh build`
-  * Initialize the application: `./dpdeploy.sh init app`
+  * Initialize the application: `./dpdeploy.sh init app`. This will prompt you to enter an IP Address. Please enter the routable IP of the host where the docker containers are running. In future iterations, we will work to auto-detect this.
 * For an existing setup:
   * Stop the application: `./dpdeploy.sh stop`
   * Start the application: `./dpdeploy.sh start`
