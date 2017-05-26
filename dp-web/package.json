@@ -65,6 +65,7 @@
     "karma-jasmine-html-reporter": "^0.2.2",
     "karma-remap-istanbul": "^0.2.1",
     "protractor": "4.0.9",
+    "roboto-npm-webfont": "0.0.4",
     "ts-node": "1.2.1",
     "tslint": "^4.0.0",
     "typescript": "~2.2.2"
