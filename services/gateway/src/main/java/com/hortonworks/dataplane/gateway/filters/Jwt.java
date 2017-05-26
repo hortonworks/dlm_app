@@ -11,12 +11,16 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 
 public class Jwt {
+
+  private static final Logger logger = LoggerFactory.getLogger(Jwt.class);
 
   static ObjectMapper objectMapper = new ObjectMapper();
   static SignatureAlgorithm sa = SignatureAlgorithm.HS256;
@@ -50,8 +54,11 @@ public class Jwt {
       .parseClaimsJws(jwt).getBody();
 
     Date expiration = claims.getExpiration();
-    if (expiration.before(new Date()))
-      Optional.absent();
+    if (expiration.before(new Date())) {
+      logger.debug("Token expired: " + claims.get("user"));
+      return Optional.absent();
+    }
+
     String userJsonString = claims.get("user").toString();
 
     User user = objectMapper.readValue(userJsonString, User.class);

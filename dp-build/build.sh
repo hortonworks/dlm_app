@@ -67,7 +67,12 @@ build_dp_gateway() {
 	fi
 	mkdir ../services/gateway/build/
 	pushd ../services/gateway
-	gradle build
+    if [ ${IS_JENKINS} == false ]; then
+        log "Running gradle build"
+	    gradle build
+    else
+        log "Not building DP Gateway again in Jenkins"
+    fi 
 	log "Copying gateway build artifacts"
 	mkdir -p ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-gateway/build/ 
 	cp -rf build/**  ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-gateway/build/ 
