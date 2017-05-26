@@ -8,7 +8,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => Clus
 
 import scala.concurrent.Future
 
-object Webserice {
+object Webservice {
 
   trait DbClientService {
 

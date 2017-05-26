@@ -43,6 +43,9 @@ destroy_knox() {
 }
 
 init_app() {
+    echo "Enter host ip:"
+    read HOST_IP;	
+    export CONSUL_HOST=$HOST_IP;
     docker-compose -f docker-compose-apps.yml up -d
 }
 

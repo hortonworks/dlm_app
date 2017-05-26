@@ -3,7 +3,7 @@ package com.hortonworks.dataplane.db
 import javax.inject.Singleton
 
 import com.hortonworks.dataplane.commons.domain.Entities._
-import com.hortonworks.dataplane.db.Webserice.UserService
+import com.hortonworks.dataplane.db.Webservice.UserService
 import com.typesafe.config.Config
 import play.api.libs.json.Json
 import play.api.libs.ws.{WSClient, WSResponse}
@@ -15,7 +15,9 @@ import scala.concurrent.Future
 class UserServiceImpl(config: Config)(implicit ws: WSClient)
     extends UserService {
 
-  private val url = config.getString("dp.services.db.service.uri")
+  private def url =
+    Option(System.getProperty("dp.services.db.service.uri"))
+      .getOrElse(config.getString("dp.services.db.service.uri"))
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 

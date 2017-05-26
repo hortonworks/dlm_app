@@ -14,6 +14,8 @@ build_knox() {
 build_images() {
     VERSION=$(get_version)
     echo "Using version ${VERSION}"
+    echo "Building gateway"
+    docker build -t hortonworks/dp-gateway:${VERSION} build/dp-docker/dp-gateway/
     echo "Building dp-db-service"
     docker build -t hortonworks/dp-db-service:${VERSION} build/dp-docker/dp-db-service/
     echo "Building dp-cluster-service"

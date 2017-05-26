@@ -1,7 +1,7 @@
 package com.hortonworks.dataplane.db
 
 import com.hortonworks.dataplane.commons.domain.Entities.DpConfig
-import com.hortonworks.dataplane.db.Webserice.ConfigService
+import com.hortonworks.dataplane.db.Webservice.ConfigService
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import play.api.libs.ws.{WSClient, WSResponse}
@@ -12,7 +12,9 @@ import scala.concurrent.Future
 class ConfigServiceImpl(config: Config)(implicit ws: WSClient)
     extends ConfigService {
 
-  private val url = config.getString("dp.services.db.service.uri")
+  private def url =
+    Option(System.getProperty("dp.services.db.service.uri"))
+      .getOrElse(config.getString("dp.services.db.service.uri"))
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   val logger = Logger(classOf[ConfigServiceImpl])

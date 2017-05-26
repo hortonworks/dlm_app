@@ -3,7 +3,7 @@ package com.hortonworks.dataplane.cs
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provides, Singleton}
-import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, LakeService}
+import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, LakeService}
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.http.Webserver
 import com.hortonworks.dataplane.http.routes.{AmbariRoute, AtlasRoute, StatusRoute}
@@ -37,6 +37,7 @@ object AppModule extends AbstractModule {
   @Singleton
   def provideLakeService(implicit ws: WSClient,
                          configuration: Config): LakeService = {
+
     new LakeServiceImpl(configuration)
   }
 
@@ -111,7 +112,6 @@ object AppModule extends AbstractModule {
       actorSystem,
       materializer,
       configuration,
-
       atlasRoute.hiveAttributes ~
         atlasRoute.hiveTables ~
         atlasRoute.atlasEntities ~
@@ -119,9 +119,9 @@ object AppModule extends AbstractModule {
         atlasRoute.atlasLineage ~
         statusRoute.route ~
         statusRoute.sync ~
+        statusRoute.health ~
         ambariRoute.route
     )
-
   }
 
   @Provides
@@ -147,5 +147,6 @@ object AppModule extends AbstractModule {
                          wSClient: WSClient): ClusterSync = {
     new ClusterSync(actorSystem, config, clusterInterface, wSClient)
   }
+
 
 }
