@@ -14,12 +14,15 @@ export class NavTagPanel implements OnInit {
   public displayTags :DatasetTag[] = null;
   private currentDsTag :DatasetTag = null;
   public tagSearchText:string="";
+
   constructor(
     private tagService :DatasetTagService
   ){}
+
   ngOnInit () {
     this.tagService.list().subscribe(tags => (this.displayTags=this.allTags=tags) && tags.length && this.onPanelRowSelectionChange(tags[0]));
   }
+
   onPanelRowSelectionChange (tagObj:DatasetTag) {
       this.currentDsTag = tagObj;
       this.updateSelectionEmitter.emit(tagObj);
