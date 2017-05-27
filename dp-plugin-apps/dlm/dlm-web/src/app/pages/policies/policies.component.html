@@ -16,13 +16,10 @@
         <policy-service-filter (onFilter)="filterPoliciesByService($event)"></policy-service-filter>
       </div>
 
-      <dlm-dropdown
-        buttonClass="btn-secondary"
-        [text]="'common.add' | translate"
-        [items]="addOptions"
-        [alignRight]="true"
-        (onSelectItem)="handleAddSelected($event)">
-      </dlm-dropdown>
+      <dlm-add-entity-button
+        [canAddPairing]="(clusters$ | async)?.length"
+        [canAddPolicy]="(pairings$ | async)?.length">
+      </dlm-add-entity-button>
     </div>
   </div>
 </div>

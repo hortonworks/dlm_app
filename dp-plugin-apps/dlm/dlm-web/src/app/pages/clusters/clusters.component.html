@@ -4,9 +4,12 @@
     <dp-map [mapSize]="mapSize" [mapData]="mapData$ | async"></dp-map>
   </div>
 </div>
-<div class="row">
+<div class="row page-section">
   <div class="col-md-12">
-    <dp-cluster-search></dp-cluster-search>
+    <div class="pull-right">
+      <dlm-add-entity-button [canAddPolicy]="canAddPolicy" [canAddPairing]="canAddPairing">
+      </dlm-add-entity-button>
+    </div>
   </div>
 </div>
 <div class="row">

@@ -61,7 +61,6 @@ import { JobsOverviewTableComponent } from './pages/overview/jobs-overview-table
 
 import { ClustersComponent } from './pages/clusters/clusters.component';
 import { ClusterListComponent } from './pages/clusters/cluster-list/cluster-list.component';
-import { ClusterSearchComponent } from './pages/clusters/cluster-search/cluster-search.component';
 
 import { JobsTableComponent } from './pages/jobs/jobs-table/jobs-table.component';
 import { JobStatusComponent } from './pages/jobs/job-status/job-status.component';
@@ -138,7 +137,6 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
     NotificationsTableComponent,
     ClustersComponent,
     ClusterListComponent,
-    ClusterSearchComponent,
     PairingsComponent,
     CreatePairingComponent,
     BreadcrumbComponent,

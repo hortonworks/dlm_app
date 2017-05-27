@@ -32,6 +32,8 @@ export class ClustersComponent implements OnInit {
   clusters: Cluster[];
   addOptions: DropdownItem[];
   mapSize: MapSize = MapSize.FULLWIDTH;
+  canAddPairing = true;
+  canAddPolicy = true;
 
   constructor(private store: Store<fromRoot.State>, t: TranslateService) {
     const clusters$: Observable<Cluster[]> = store.select(getAllClusters);
@@ -57,6 +59,8 @@ export class ClustersComponent implements OnInit {
     ];
     this.tableData$ = Observable.combineLatest(clusters$, this.pairsCount$, this.policiesCount$)
       .map(([clusters, pairsCount, policiesCount]) => {
+        this.canAddPairing = clusters.length > 1;
+        this.canAddPolicy = Object.keys(pairsCount).length > 0;
         return clusters.map(cluster => {
           const pairsCounter = (pairsCount[cluster.id] || {}).pairs || 0;
           const policiesCounter = (policiesCount[cluster.id] || {}).policies || 0;

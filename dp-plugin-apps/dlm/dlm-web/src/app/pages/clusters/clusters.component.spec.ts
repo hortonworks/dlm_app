@@ -1,7 +1,6 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import { CommonComponentsModule } from 'components/common-components.module';
 import {ClustersComponent} from './clusters.component';
-import {ClusterSearchComponent} from './cluster-search/cluster-search.component';
 import {ClusterListComponent} from './cluster-list/cluster-list.component';
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {MockTranslateLoader} from '../../mocks/mock-translate-loader';
@@ -27,7 +26,6 @@ xdescribe('ClustersComponent', () => {
       ],
       declarations: [
         ClustersComponent,
-        ClusterSearchComponent,
         ClusterListComponent,
         MapComponent,
         BytesSizePipe

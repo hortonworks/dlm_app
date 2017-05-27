@@ -18,9 +18,11 @@
     "none": "None",
     "policies": "Policies",
     "pair": "Pair",
+    "pairing": "Pairing",
     "pairs": "Pairs",
     "policy": "Policy",
     "clusters": "Clusters",
+    "cluster": "Cluster",
     "service": "Service",
     "time": {
       "hourly": "Hourly",

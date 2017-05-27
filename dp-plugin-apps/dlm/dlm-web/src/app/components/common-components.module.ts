@@ -18,6 +18,7 @@ import { ProgressContainerComponent } from './progress-container/progress-contai
 import { SelectFieldComponent, SelectFieldOptionDirective, SelectFieldValueDirective } from './forms/select-field/';
 import { MapComponent } from './map/map.component';
 import { PageHeaderComponent } from './page-header/page-header.component';
+import { AddEntityButtonComponent } from './add-entity-button/add-entity-button.component';
 
 @NgModule({
   imports: [
@@ -44,7 +45,8 @@ import { PageHeaderComponent } from './page-header/page-header.component';
     SelectFieldOptionDirective,
     SelectFieldValueDirective,
     MapComponent,
-    PageHeaderComponent
+    PageHeaderComponent,
+    AddEntityButtonComponent
   ],
   exports: [
     CardComponent,
@@ -62,7 +64,8 @@ import { PageHeaderComponent } from './page-header/page-header.component';
     SelectFieldOptionDirective,
     SelectFieldValueDirective,
     MapComponent,
-    PageHeaderComponent
+    PageHeaderComponent,
+    AddEntityButtonComponent
   ]
 })
 export class CommonComponentsModule {}
