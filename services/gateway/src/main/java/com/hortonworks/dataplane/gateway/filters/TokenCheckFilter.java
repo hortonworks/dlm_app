@@ -83,8 +83,8 @@ public class TokenCheckFilter extends ZuulFilter {
 
   private Object doLogout() {
     //TODO call knox gateway to invalidate token in knox gateway server.
-    utils.deleteCookie(knoxSso.getSsoCookieName());
-    utils.deleteCookie(SSO_CHECK_COOKIE_NAME);
+    utils.deleteCookie(knoxSso.getSsoCookieName(),knoxSso.getCookieDomain());
+    utils.deleteCookie(SSO_CHECK_COOKIE_NAME,null);
     //Note. UI should handle redirect.
     return null;
   }
@@ -102,8 +102,18 @@ public class TokenCheckFilter extends ZuulFilter {
     if (userList == null || userList.getResults() == null || userList.getResults().size() < 1) {
       return utils.sendForbidden(null);
     }
+    setSsoValidCookie();
     setUpstreamUserContext(userList.getResults().get(0));
     return null;
+  }
+
+  private void setSsoValidCookie() {
+    RequestContext ctx = RequestContext.getCurrentContext();
+    Cookie cookie = new Cookie(Constants.SSO_CHECK_COOKIE_NAME,Boolean.toString(true));
+    cookie.setPath("/");
+    cookie.setMaxAge(-1);
+    cookie.setHttpOnly(false);
+    ctx.getResponse().addCookie(cookie);
   }
 
   private boolean isSsoLogin() {

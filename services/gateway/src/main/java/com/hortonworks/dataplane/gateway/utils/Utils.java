@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @Component
 public class Utils {
@@ -37,7 +39,6 @@ public class Utils {
     }
     return Optional.absent();
   }
-
   public Object sendUnauthorized() {
     RequestContext ctx = RequestContext.getCurrentContext();
     ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
@@ -52,10 +53,27 @@ public class Utils {
     throw new RuntimeException("Request not allowed");
   }
 
-  public void deleteCookie(String cookieName) {
+  public void deleteCookie(String cookieName,String domain) {
+    if (domain==null){
+      domain=getDomainFromRequest();
+    }
     Optional<Cookie> cookieOpt = getCookie(cookieName);
     if (cookieOpt.isPresent()) {
+      Cookie cookie = cookieOpt.get();
+      cookie.setDomain(domain);
+      cookie.setPath("/");
       deleteCookie(cookieOpt.get());
+    }
+  }
+
+  private String getDomainFromRequest()  {
+    RequestContext ctx = RequestContext.getCurrentContext();
+    String requestURLStr = ctx.getRequest().getRequestURL().toString();
+    try {
+      URI uri = new URI(requestURLStr);
+      return uri.getHost();
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
     }
   }
 
