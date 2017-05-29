@@ -19,6 +19,7 @@ import { SelectFieldComponent, SelectFieldOptionDirective, SelectFieldValueDirec
 import { MapComponent } from './map/map.component';
 import { PageHeaderComponent } from './page-header/page-header.component';
 import { AddEntityButtonComponent } from './add-entity-button/add-entity-button.component';
+import { EventStatusComponent } from './event-status/event-status.component';
 
 @NgModule({
   imports: [
@@ -46,7 +47,8 @@ import { AddEntityButtonComponent } from './add-entity-button/add-entity-button.
     SelectFieldValueDirective,
     MapComponent,
     PageHeaderComponent,
-    AddEntityButtonComponent
+    AddEntityButtonComponent,
+    EventStatusComponent
   ],
   exports: [
     CardComponent,
@@ -65,7 +67,8 @@ import { AddEntityButtonComponent } from './add-entity-button/add-entity-button.
     SelectFieldValueDirective,
     MapComponent,
     PageHeaderComponent,
-    AddEntityButtonComponent
+    AddEntityButtonComponent,
+    EventStatusComponent
   ]
 })
 export class CommonComponentsModule {}

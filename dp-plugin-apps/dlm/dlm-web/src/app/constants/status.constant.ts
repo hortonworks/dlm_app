@@ -21,3 +21,10 @@ export const POLICY_STATUS = {
   [RUNNING]: RUNNING,
   [SUSPENDED]: SUSPENDED
 };
+
+export const EVENT_SEVERITY = {
+  INFO: 'info',
+  WARN: 'warn',
+  ERROR: 'error',
+  CRITICAL: 'critical'
+};
