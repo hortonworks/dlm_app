@@ -127,14 +127,6 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_properties (
   clusterid  BIGINT REFERENCES dataplane.dp_clusters (id) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_categories (
-  id          BIGSERIAL PRIMARY KEY,
-  name        VARCHAR(255) NOT NULL UNIQUE,
-  description TEXT,
-  created     TIMESTAMP DEFAULT now(),
-  updated     TIMESTAMP DEFAULT now()
-);
-
 CREATE TABLE IF NOT EXISTS dataplane.dp_datasets (
   id           BIGSERIAL PRIMARY KEY,
   name         VARCHAR(255)                                       NOT NULL,
@@ -147,8 +139,15 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_datasets (
   customprops  JSONB
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_dataset_categories (
-  category_id BIGINT REFERENCES dataplane.dp_categories (id) NOT NULL,
+CREATE TABLE IF NOT EXISTS dataplane.dp_dataset_tags (
+  id          BIGSERIAL PRIMARY KEY,
+  name        VARCHAR(255) NOT NULL UNIQUE,
+  created     TIMESTAMP DEFAULT now(),
+  updated     TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS dataplane.dp_dataset_with_tags (
+  tag_id BIGINT REFERENCES dataplane.dp_dataset_tags (id) NOT NULL,
   dataset_id  BIGINT REFERENCES dataplane.dp_datasets (id)   NOT NULL
 );
 
