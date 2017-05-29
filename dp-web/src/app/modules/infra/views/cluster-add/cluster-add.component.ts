@@ -1,5 +1,6 @@
 import {Component, ElementRef, ViewChild, OnInit} from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
+import {TranslateService} from '@ngx-translate/core';
 
 import { Cluster } from '../../../../models/cluster';
 import { Lake } from '../../../../models/lake';
@@ -30,6 +31,7 @@ export class ClusterAddComponent implements OnInit{
     private lakeService: LakeService,
     private clusterService: ClusterService,
     private locationService: LocationService,
+    private  translateService : TranslateService
   ) { }
 
   @ViewChild('ambariInput') ambariInputContainer: ElementRef;
@@ -45,12 +47,22 @@ export class ClusterAddComponent implements OnInit{
   searchTerm: string;
 
   dpRequiredServices = ['ATLAS'];
-  dLFoundMessage = `This cluster has been indentified as a Datalake since it has data management services,  ${' ' + this.dpRequiredServices.join(', ')} running.`;
 
   showNotification = false;
 
-  reasons:string[] = ['Check if the Ambari server is up and running in the given url',
-             'Make sure that you have right access rights to the mbari server'];
+  get dLFoundMessage(){
+    let services = `${' ' + this.dpRequiredServices.join(', ')}`;
+    return this.translateService.instant('pages.infra.description.datalake', {serviceNames : services});
+  }
+
+  get reasons(){
+    let reasons: string[] = [];
+    let reasonsTranslation = this.translateService.instant('pages.infra.description.connectionFailureReasons');
+    Object.keys(reasonsTranslation).forEach(key=> {
+      reasons.push(reasonsTranslation[key]);
+    })
+    return reasons;
+  }
 
   ngOnInit(){
     this.route.params.subscribe(params =>{
