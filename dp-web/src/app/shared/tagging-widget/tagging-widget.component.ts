@@ -51,7 +51,9 @@ export class TaggingWidget {
       case 40  :  this.focusRowIndex = Math.min(this.availableTags.length-1, this.focusRowIndex+1);event.stopPropagation(); break;
       case 13  :  this._manageSelection();
     }
-    (function(thisObj){setTimeout(function(){thisObj._manageFocus()}, 0)})(this);
+    if(event.keyCode !== 9){
+      (function(thisObj){setTimeout(function(){thisObj._manageFocus()}, 0)})(this);
+    }
   }
   _SetCursorAtEnd () {
     var input = this.parent.nativeElement.querySelector('span.inputSpan input');
