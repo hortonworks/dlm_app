@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { IdentityService } from './services/identity.service';
 import { MdlService } from './services/mdl.service';
@@ -15,7 +15,7 @@ export enum ViewPaneState {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit, OnChanges {
+export class AppComponent implements OnInit {
 
   marginLeft = 0;
   persona: Persona;
@@ -36,12 +36,6 @@ export class AppComponent implements OnInit, OnChanges {
     return this.identityService.isUserAuthenticated();
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes && changes['viewPaneState']) {
-      this.setMainPaneLeftMargin();
-    }
-  }
-
   ngOnInit() {
     this.setHeaderData();
   }
@@ -60,15 +54,5 @@ export class AppComponent implements OnInit, OnChanges {
       new Persona('DLM', [
       ], false)
     ];
-  }
-
-  setMainPaneLeftMargin() {
-    if (this.viewPaneState === ViewPaneState.DEFAULT) {
-      this.marginLeft = 0;
-    } else if(this.viewPaneState === ViewPaneState.MAXIMISE) {
-      this.marginLeft = 200;
-    } else if(this.viewPaneState === ViewPaneState.MINIMISE) {
-      this.marginLeft = 50;
-    }
   }
 }

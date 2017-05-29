@@ -3,8 +3,6 @@
 <main [ngClass]="{'maximised': viewPaneStates.MAXIMISE  === viewPaneState,
                     'minimized': viewPaneStates.MINIMISE === viewPaneState,
                     'default' : viewPaneStates.DEFAULT === viewPaneState}">
-<!--<main [ngStyle]="{'margin-left.px': marginLeft}">-->
-
 
   <div class="page-content"> <router-outlet></router-outlet></div>
 
