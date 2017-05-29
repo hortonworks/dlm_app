@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
+import {TranslateModule} from '@ngx-translate/core';
+
 import { NguiAutoCompleteModule } from '@ngui/auto-complete';
 
 import { routes } from './infra.routes';
@@ -12,7 +14,6 @@ import { ClusterAddComponent } from './views/cluster-add/cluster-add.component';
 import { LakeStatsComponent } from './widgets/lake-stats/lake-stats.component';
 import { LakesListComponent } from './widgets/lakes-list/lakes-list.component';
 import { MapComponent } from './widgets/map/map.component';
-import {TaggingWidget} from '../../shared/tagging-widget/tagging-widget.component'
 import {TaggingWidgetModule} from "../../shared/tagging-widget/tagging-widget.module";
 
 @NgModule({
@@ -21,7 +22,8 @@ import {TaggingWidgetModule} from "../../shared/tagging-widget/tagging-widget.mo
     RouterModule.forChild(routes),
     FormsModule,
     NguiAutoCompleteModule,
-    TaggingWidgetModule
+    TaggingWidgetModule,
+    TranslateModule
   ],
 
   declarations: [

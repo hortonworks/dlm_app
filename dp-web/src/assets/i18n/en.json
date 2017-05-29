@@ -1,0 +1,110 @@
+{
+  "common" : {
+    "dashboard" : "Dashboard",
+    "dataplane" : "Dataplane",
+    "clusters" : "Clusters",
+    "datasets" : "Datasets",
+    "datalake" : "Datalake",
+    "services" : "Services",
+    "tags" : "Tags",
+    "description" : "Description",
+    "new" : "New",
+    "add": "Add",
+    "edit" : "Edit",
+    "delete" : "Delete",
+    "addAndNew" : "Add & New",
+    "cancel": "Cancel",
+    "go" :"Go",
+    "reset" : "Reset",
+    "search" : "Search",
+    "done" : "Done",
+    "removeAll" : "Remove All",
+    "advanced" : "Advanced",
+    "status" : "Status",
+    "loading" : "Loading",
+    "name" : "Name",
+    "moreLink" : "Learn More",
+    "sidenav" : {
+      "analyst" : "Analyst",
+      "infra" : "Infra Admin",
+      "dlm":"DLM"
+    }
+  },
+  "pages" : {
+    "onboard" : {
+      "labels" : {
+        "welcomeText" : "Welcome to Hortonworks",
+        "startButton" : "Get Started",
+        "addCluster" : "Add Clusters",
+        "addDataset" : "Add Datasets",
+        "setService" : "Setup Services"
+      },
+      "description" : {
+        "dataplane": "Welcome to dataplane, your one-stop solution to data management. To start, you need to help us find your data lakes. Please proceed by adding data lakes below.",
+        "addCluster" : "Add your cluster to Dataplane",
+        "setService" : "Set up services to enable Dataplane to manage your data",
+        "addDataset" : "Add your datasets to Dataplane"
+      }
+    },
+    "infra" : {
+      "topnav" : {
+        "cluster-link" : "CLUSTERS"
+      },
+      "labels" : {
+        "nodes" : "Nodes",
+        "uptime":"Uptime",
+        "services" :"Services",
+        "hdfsUsed" : "HDFS Used",
+        "hdfsTotal" : "HDFS Total",
+        "addButton" : "Add Cluster",
+        "addCluster" : "Add Your Cluster",
+        "ambariUrl":"Ambari URL",
+        "clusterName" : "Cluster Name",
+        "ipAddress" : "IP Address",
+        "clusterLocation" : "Cluster Location",
+        "clusterAddSuccess" : "Cluster Added successfully",
+        "connectionFailed" : "Not able to connect",
+        "emptySearchResult" : "There are no data lakes that match your search."
+      },
+      "description" :{
+        "addCluster" : "Add your Ambari managed cluster to Dataplane. This enables Dataplane to gather information about the cluster such as the name of the cluster, services running in the cluster etc.",
+        "datalake" : "This cluster has been indentified as a Datalake since it has data management services,  {{serviceNames}} running.",
+        "clusterLocation":"Geographical location of the cluster",
+        "tags" : "Tags for the cluster",
+        "description" :"Description of the cluster",
+        "clusterAddSuccess" : "Your cluster has been added to dataplane.",
+        "connectionFailed" :" Dataplane could not retreive cluster information.",
+        "connectionFailureReasons" : {
+          "ambariServerDown": "Check if the Ambari server is up and running in the given url",
+          "insufficientAccessRights": "Make sure that you have right access rights to the ambari server"
+        }
+      }
+    },
+    "dataset" : {
+      "topnav" : {
+        "unclassified" : "Unclassified",
+        "assets" : "Assets",
+        "audits":"Audits"
+      },
+      "labels" : {
+        "newDataset" : "New Dataset",
+        "addFavourites" : "Add to Favourites",
+        "removeFavourites" : "Remove from Favourites",
+        "creator" : "Creator",
+        "hive" : "Hive",
+        "files" : "Files",
+        "createdBy" : "Created By",
+        "hdfsFiles" : "HDFS Files",
+        "hiveTables" : "Hive Tables",
+        "emptySearchResult" : "There are no data sets that match your search.",
+        "source" : "Source",
+        "owner" : "Owner",
+        "createdTime": "Created Time",
+        "noOfRows" : "Number Of Rows",
+        "datatype" : "Data Type",
+        "selectOperator" : "Select Operator",
+        "addAssets" : "Add Assets"
+      }
+    }
+  }
+}

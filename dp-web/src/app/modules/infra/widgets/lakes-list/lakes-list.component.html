@@ -1,11 +1,11 @@
 <div class="content-pane">
-    <span class="hwx-title">Clusters</span>
+    <span class="hwx-title">{{"common.clusters" | translate}}</span>
     <div class="pull-right">
         <div class="dp-input">
-            <input type="text" placeholder="Search" name="name" id="search" (keyup)="filter($event)" />
+            <input type="text" placeholder="{{'common.search' | translate}}" name="name" id="search" (keyup)="filter($event)" />
             <i class="fa fa-search dp-input__icon" aria-hidden="true"></i>
         </div>
-        <button class="mdl-button btn-hwx-primary" [routerLink]="['/infra/add']"> Add Cluster </button>
+        <button class="mdl-button btn-hwx-primary" [routerLink]="['/infra/add']"> {{"pages.infra.labels.addButton" | translate}} </button>
     </div>
 
     <div style="clear:both;"></div>
@@ -13,14 +13,14 @@
     <table class="mdl-data-table mdl-js-data-table" on-mouseleave="hoveredIndex=null">
         <thead>
         <tr>
-            <th class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder">STATUS</th>
-            <th class="mdl-data-table__cell--non-numeric">NAME</th>
-            <th class="mdl-data-table__cell--non-numeric">NODES</th>
-            <th class="mdl-data-table__cell--non-numeric">UPTIME</th>
-            <th class="mdl-data-table__cell--non-numeric">SERVICES</th>
-            <th class="mdl-data-table__cell--non-numeric">HDFS USED</th>
-            <th class="mdl-data-table__cell--non-numeric">HDFS TOTAL</th>
-            <th class="mdl-data-table__cell--non-numeric actions"></th>
+          <th class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder">{{"common.status" | translate}}</th>
+          <th class="mdl-data-table__cell--non-numeric">{{"common.name" | translate}}</th>
+          <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.nodes" | translate}}</th>
+          <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.uptime" | translate}}</th>
+          <th class="mdl-data-table__cell--non-numeric">{{"common.services" | translate}}</th>
+          <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.hdfsUsed" | translate}}</th>
+          <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.hdfsTotal" | translate}}</th>
+          <th class="mdl-data-table__cell--non-numeric actions"></th>
         </tr>
         </thead>
         <tbody>
@@ -45,9 +45,8 @@
             </td>
         </tr>
         <tr *ngIf="lakesHealth.length === 0">
-            <td class="mdl-typography--text-center" colspan="8" >There are no data lakes that match your search.</td>
+            <td class="mdl-typography--text-center" colspan="8" >{{"pages.infra.labels.emptySearchResult" | translate}}</td>
         </tr>
         </tbody>
     </table>
 </div>
-
