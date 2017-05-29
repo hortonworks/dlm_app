@@ -1,3 +1,9 @@
+export class AssetCountModel {
+  allCount:number;
+  hiveCount:number;
+  filesCount:number;
+}
+
 export class RichDatasetModel {
   id:number;
   name: string;
@@ -7,6 +13,5 @@ export class RichDatasetModel {
   creatorId: number;
   creatorName: string;
   favourite:boolean;
-  hiveCount : number;
-  filesCount : number;
+  counts:AssetCountModel;
 }

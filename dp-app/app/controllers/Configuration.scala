@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webserice.LakeService
+import com.hortonworks.dataplane.db.Webservice.LakeService
 import internal.KnoxSso
 import internal.auth.Authenticated
 import models.{JsonResponses, WrappedErrorsException}
@@ -36,6 +36,7 @@ class Configuration @Inject()(@Named("lakeService") val lakeService:
       )
     )
   }
+
   def appConfig = Action.async{ request =>
     val requestProcol:String=if (request.secure)"https" else "http"
     Future.successful(Ok(

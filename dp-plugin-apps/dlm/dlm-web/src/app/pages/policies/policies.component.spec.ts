@@ -28,6 +28,9 @@ import { JobStatusComponent } from '../jobs/job-status/job-status.component';
 import { JobTransferredGraphComponent } from '../jobs/jobs-transferred-graph/job-transferred-graph.component';
 import { FrequencyPipe } from 'pipes/frequency.pipe';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
+import { TableFilterComponent } from 'common/table/table-filter/table-filter.component';
+import { PolicyServiceFilterComponent } from './components/policy-service-filter/policy-service-filter.component';
+import { TypeaheadModule } from 'ng2-bootstrap';
 
 describe('PoliciesComponent', () => {
   let component: PoliciesComponent;
@@ -35,9 +38,19 @@ describe('PoliciesComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [TranslateModule.forRoot({
-        loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-      }), NgxDatatableModule, FormsModule, RouterTestingModule, CommonComponentsModule, MomentModule, ChartsModule, ModalModule.forRoot()],
+      imports: [
+        TranslateModule.forRoot({
+          loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
+        }),
+        NgxDatatableModule,
+        FormsModule,
+        RouterTestingModule,
+        CommonComponentsModule,
+        MomentModule,
+        ChartsModule,
+        ModalModule.forRoot(),
+        TypeaheadModule
+      ],
       declarations: [
         PoliciesComponent,
         PolicyTableComponent,
@@ -54,7 +67,9 @@ describe('PoliciesComponent', () => {
         JobsTableComponent,
         JobStatusComponent,
         JobTransferredGraphComponent,
-        ModalDialogComponent
+        ModalDialogComponent,
+        TableFilterComponent,
+        PolicyServiceFilterComponent
       ],
       providers: [
         {provide: Store, useClass: MockStore},

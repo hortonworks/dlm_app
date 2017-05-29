@@ -1,7 +1,9 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {Router, ActivatedRoute, NavigationEnd, PRIMARY_OUTLET} from '@angular/router';
 import {capitalize} from '../../utils/string-utils';
 import {Breadcrumb} from './breadcrumb.type';
+import { Subscription } from 'rxjs/Subscription';
+import { TranslateService } from '@ngx-translate/core';
 
 const ROUTE_DATA_BREADCRUMB = 'breadcrumb';
 
@@ -10,7 +12,7 @@ const ROUTE_DATA_BREADCRUMB = 'breadcrumb';
   styleUrls: ['./breadcrumb.component.scss'],
   template: `
     <ol class="breadcrumb">
-      <li><a routerLink="" class="breadcrumb"><i class="fa fa-gg"></i></a></li>
+      <li><a routerLink="" class="breadcrumb">{{"topnav.disaster_recovery" | translate}}</a></li>
       <li *ngFor="let breadcrumb of breadcrumbs; let isLast = last" [class.active]="isLast">
         <a *ngIf="!isLast" [routerLink]="[breadcrumb.url, breadcrumb.params]">{{breadcrumb.label}}</a>
         <span *ngIf="isLast">{{breadcrumb.label}}</span>
@@ -18,20 +20,27 @@ const ROUTE_DATA_BREADCRUMB = 'breadcrumb';
     </ol>
   `
 })
-export class BreadcrumbComponent implements OnInit {
+export class BreadcrumbComponent implements OnInit, OnDestroy {
 
   public breadcrumbs: Breadcrumb[];
 
+  public navigationSubscription: Subscription;
+
   constructor(private activatedRoute: ActivatedRoute,
-              private router: Router) {
+              private router: Router,
+              private t: TranslateService) {
     this.breadcrumbs = [];
   }
 
   ngOnInit() {
-    this.router.events.filter(event => event instanceof NavigationEnd).subscribe(event => {
+    this.navigationSubscription = this.router.events.filter(event => event instanceof NavigationEnd).subscribe(event => {
       const root: ActivatedRoute = this.activatedRoute.root;
       this.breadcrumbs = this.getBreadcrumbs(root);
     });
+  }
+
+  ngOnDestroy() {
+    this.navigationSubscription.unsubscribe();
   }
 
   private getBreadcrumbs(route: ActivatedRoute, url: string = '', breadcrumbs: Breadcrumb[] = []): Breadcrumb[] {
@@ -51,7 +60,7 @@ export class BreadcrumbComponent implements OnInit {
           // data.breadcrumb is not null
           url += `/${routeURL}`;
           const breadcrumb: Breadcrumb = {
-            label: data[ROUTE_DATA_BREADCRUMB],
+            label: this.t.instant(data[ROUTE_DATA_BREADCRUMB]),
             params,
             url
           };

@@ -1,5 +1,6 @@
 import { RequestStatus } from './request-status.model';
 import { Cluster } from './cluster.model';
+import { Job } from './job.model';
 
 export interface Policy {
   id: string;
@@ -11,6 +12,7 @@ export interface Policy {
   targetCluster: string;
   sourceClusterResource?: Cluster;
   targetClusterResource?: Cluster;
+  jobsResource?: Job[];
   sourceDataset: string;
   targetDataset: string;
   endTime: string;

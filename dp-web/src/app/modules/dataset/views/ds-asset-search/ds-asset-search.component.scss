@@ -1,14 +1,38 @@
-.borderBox, .borderBox * {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
+@import "../../../../../styles/variables";
 
 .assetSearch{
-  padding:10px;
+  padding:136px 10px 56px 10px;
+  height: 100%;
+  position: relative;
   color: #676966;
 }
 
+.tabCont{
+  margin-top: -126px;
+}
+
+//.queryEditorCont {
+//  float: left;
+//  width: 100%;
+//}
+.queryResultCont, ds-assets-list{
+  height: 100%;
+  overflow: hidden;
+}
+
+.queryResultCont .noSearchMessage {
+  display: table;
+  text-align: center;
+  width:100%;
+  height: 100%;
+  border:12px solid $bgGray;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+.queryResultCont .noSearchMessage > span {
+  display: table-cell;
+  vertical-align: middle;
+}
 
 .tabCont .tab {
   width: 80px;
@@ -22,14 +46,27 @@
 }
 
 .tabCont .tab.active {
-  background-color: #d0d3d7;
+  background-color: $bgGray;
+}
+
+.filterActionCont{
+  background-color: $bgGray;
+  padding:0 10px;
+}
+.filterActionCont > .mdl-button {
+  margin-right: 10px;
 }
 
 .queryEditorCont {
   padding: 10px;
-  background-color: #d0d3d7;
+  background-color: $bgGray;
 }
 
+.actionButtonCont{
+  position: absolute;
+  bottom: 10px;
+  left: 0px;
+}
 .actionButtonCont > .mdl-button {
   float: right;
   margin-left: 10px;

@@ -20,7 +20,7 @@ $right-spacing: 10px;
 .mdl-chip.hive-table-chip {
   height: 20px;
   border-radius: 3px;
-  background: $dhuttle-gray;
+  background: $shuttle-gray;
   padding: 0px 8px;
 
   .mdl-chip__text {
@@ -37,4 +37,20 @@ $right-spacing: 10px;
       padding-right: 8px;
     }
   }
+}
+
+.mdl-menu__item {
+  height: 24px;
+  line-height: 24px;
+  display: block;
+  padding: 2px 20px;
+  font-weight: 400;
+  line-height: 1.432;
+  color: #666;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mdl-menu {
+  padding: 0px;
 }

@@ -5,7 +5,7 @@ import javax.inject.{Inject, Singleton}
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, Datalake, Error, Errors, Location}
 import com.hortonworks.dataplane.commons.domain.Ambari.{ClusterServiceWithConfigs, ConfigurationInfo, NameNodeInfo}
-import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterService, LakeService, LocationService}
+import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterService, LakeService, LocationService}
 import models.Entities.{ClusterStats, BeaconCluster, BeaconClusters, ClusterServiceEndpointDetails}
 import play.api.Logger
 

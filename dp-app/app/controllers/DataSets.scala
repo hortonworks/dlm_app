@@ -5,7 +5,7 @@ import javax.inject.Inject
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.{Category, Dataset, DatasetAndCategoryIds}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webserice.{CategoryService, DataSetCategoryService, DataSetService}
+import com.hortonworks.dataplane.db.Webservice.{CategoryService, DataSetCategoryService, DataSetService}
 import internal.auth.Authenticated
 import models.JsonResponses
 import play.api.Logger

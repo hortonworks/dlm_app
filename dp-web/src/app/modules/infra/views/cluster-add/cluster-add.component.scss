@@ -1,0 +1,163 @@
+@import "../../../../../styles/variables";
+
+input[type="text"].dp-input-url {
+  width: 550px;
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+
+}
+
+input[type="text"].dp-input-url:focus {
+  border-color: #cfd3d7;
+}
+
+.btn-hwx-primary {
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
+.cluster-details {
+  margin-top: 10px;
+  background-color: $iron-gray;
+  padding: 30px 30px;
+
+  .label {
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .value {
+    color: $dusty-gray;
+  }
+
+  .services {
+    line-height: 1.5;
+  }
+
+  .fa-check-circle {
+    color: $forest-green-1;
+    margin-right: 10px;
+  }
+}
+
+.datalake-indicator {
+  padding: 20px 30px;
+  border: 1px solid $eastern-blue;
+  background-color: $polar-blue;
+  color: $eastern-blue;
+
+  .icon-container {
+    &:before {
+      content: '\f05a';
+      color: $eastern-blue;
+    }
+  }
+
+  .title {
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  .message {
+    color: $dusty-gray;
+    line-height: 1.5;
+    padding: 10px 0px;
+  }
+
+  .anchor a {
+    color: $eastern-blue;
+    text-decoration-line: none;
+  }
+}
+
+.mdl-grid {
+  background-color: $white;
+  .datalake-input {
+    padding: 20px 30px;
+  }
+
+  textarea {
+    width: 350px;
+    box-sizing: border-box;
+  }
+}
+
+:host /deep/ .ngui-auto-complete-wrapper input {
+  width: 350px;
+  box-sizing: border-box;
+}
+
+:host /deep/ .taggingWidget {
+  width: 350px !important;
+  height: 34px !important;
+  padding: 0px;
+  border-radius: 0px !important;
+  input {
+    font-size: 12px !important;
+  }
+}
+
+.error-section {
+  .fa-times-circle {
+    font-size: 20px;
+    display: inline-block;
+    float: left;
+    color: $roman-red;
+  }
+  div {
+    padding-left: 27px;
+    padding-top: 3px;
+  }
+  .text-medium {
+    margin-top: 0px;
+    color: $roman-red;
+  }
+
+  .text-small-1 {
+    color: $roman-red;
+    margin: 6px 0px;
+  }
+  .text-small-2 {
+    color: $roman-red;
+  }
+  ul {
+    padding-left: 20px;
+  }
+  li {
+    color: $roman-red;
+    font-size: 12px;
+  }
+}
+
+.validation-error {
+  input {
+    color: $roman-red;
+    border: 1px solid $roman-red;
+    outline: none;
+  }
+  button {
+    background-color: $roman-red;
+    border-color: $roman-red;
+  }
+
+}
+
+.notification-bar {
+  padding: 15px;
+  background: #F5F5F5;
+  height: 34px;
+  margin-bottom: 20px;
+  .fa-check-circle {
+    font-size: 24px;
+  }
+  .fa-remove {
+    color: $dusty-gray;
+    cursor: pointer;
+  }
+  .text-medium {
+    font-weight: 500;
+    color: $forest-green-1;
+  }
+}
+
+

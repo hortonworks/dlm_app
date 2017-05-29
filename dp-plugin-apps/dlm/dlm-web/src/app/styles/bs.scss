@@ -1,5 +1,9 @@
 @import "variables";
 
+h2, .h2 {
+  font-size: 20px;
+}
+
 .text-danger {
   color: $alert-color;
 }

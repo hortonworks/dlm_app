@@ -1,6 +1,8 @@
 import {Injectable} from "@angular/core";
 import {Http} from "@angular/http";
 import {Observable} from "rxjs";
+import {AssetSetQueryModel} from "../views/ds-assets-list/ds-assets-list.component";
+import {AssetCountModel} from "../models/richDatasetModel";
 import {DsAssetModel} from "../models/dsAssetModel";
 
 @Injectable()
@@ -10,24 +12,62 @@ export class DsAssetsService {
   constructor(private http: Http) {
   }
 
-  public count(dsId:number, searchText:string, source:string) : Observable<number> {
-    return Observable.create(observer => {setTimeout(()=>observer.next(
-        data
-          .filter(obj=>(source=='all')?true:obj.source==source)
-          .filter(obj=>obj.name.toLowerCase().indexOf(searchText.toLowerCase()) != -1)
-          .length
-    ), 200);});
+  public count(asqms:AssetSetQueryModel[]) : Observable<AssetCountModel> {
+    return Observable.create(observer => {
+      var newData=[];
+      asqms.forEach((asqm)=>{
+        var cloneData = data.filter(obj=>true); //cloning
+        asqm.filters.forEach(filObj=>cloneData=cloneData.filter(getFilterFunftion(filObj)));
+        newData.push.apply(newData, cloneData);
+      })
+      setTimeout(()=>observer.next({
+        allCount:newData.length,
+        hiveCount:newData.filter(obj=>obj.source=="hive").length,
+        filesCount:newData.filter(obj=>obj.source=="file").length
+      }),200)
+    });
   }
 
-  public list(dsId:number, searchText:string, source:string, pageNo:number, pageSize:number): Observable<DsAssetModel[]> {
-    //console.log("DsAssetService List", dsId, pageNo, pageSize);
+  public list(asqms:AssetSetQueryModel[], pageNo:number, pageSize:number): Observable<DsAssetModel[]> {
     return Observable.create(observer => {
-      setTimeout(()=>observer.next(data.filter(obj=>(source=='all')?true:obj.source==source).filter(obj=>obj.name.toLowerCase().indexOf(searchText.toLowerCase()) != -1).slice((pageNo-1)*pageSize, pageNo*pageSize)), 300);
+      var newData=[];
+      asqms.forEach((asqm)=>{
+        var cloneData = data.filter(obj=>true); //cloning
+        asqm.filters.forEach(filObj=>cloneData=cloneData.filter(getFilterFunftion(filObj)));
+        newData.push.apply(newData, cloneData);
+      })
+      setTimeout(()=>observer.next(newData.slice((pageNo-1)*pageSize, pageNo*pageSize)),300)
     });
-
   }
 
 }
+
+var getFilterFunftion = function(filObj){
+  if(filObj.column=="dataset.id")
+    return (obj)=>obj.id <= 5 + filObj.value;
+
+  if(filObj.column=="asset.source")
+    return (obj)=>(filObj.value=='all')?true:obj.source==filObj.value;
+
+  if(filObj.column=="asset.name")
+    return (obj) => {
+      if(filObj.operator=="==") return obj.name.toLowerCase() == filObj.value.toLowerCase()
+      else return obj.name.toLowerCase().indexOf(filObj.value.toLowerCase()) != -1
+    }
+
+  if(filObj.column=="asset.owner.id"){
+    var ownerName = ownersData.filter(obj=>obj.id==filObj.value)[0].name;
+    return (obj) =>{
+      if(filObj.operator=="==") return obj.owner.toLowerCase() == ownerName.toLowerCase();
+      else return obj.owner.toLowerCase() != ownerName.toLowerCase();
+    }
+  }
+  return function(){return true}
+}
+
+var ownersData = [
+  {id:0, name:"root"},{id:1, name:"Deep"},{id:2, name:"Jack"},{id:3, name:"Bob"}
+]
 
 var data =
   [

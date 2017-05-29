@@ -1,6 +1,12 @@
-
-
-<div *ngFor="let tagObj of dsTags;" class="panelRow {{currentDsTag==tagObj?'selected':''}}" (click)="onPanelRowSelectionChange(tagObj)">
-  <span class="displayName">{{tagObj.name}}</span>
-  <span class="displaycount">{{tagObj.count}}</span>
+<div class="nav-tag-panel borderBox">
+  <div class="tag-search">
+    <input placeholder="Tags" [(ngModel)]="tagSearchText" (keyup)="searchTag()"/>
+    <i class="fa fa-search" (click)="searchTag()"></i>
+  </div>
+  <div class="tag-list">
+    <div *ngFor="let tagObj of displayTags;" class="panelRow {{currentDsTag==tagObj?'selected':''}}" (click)="onPanelRowSelectionChange(tagObj)">
+      <span class="displayName">{{tagObj.name}}</span>
+      <span class="displaycount">{{tagObj.count}}</span>
+    </div>
+  </div>
 </div>
