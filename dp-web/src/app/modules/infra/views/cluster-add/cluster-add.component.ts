@@ -164,12 +164,15 @@ export class ClusterAddComponent implements OnInit{
   }
 
   createCluster(){
-    let lake = new Lake()
+    let lake = new Lake();
     lake.ambariUrl = this.cluster.ambariurl;
     lake.location = this.cluster.location.id;
     lake.name = this.cluster.name;
     lake.description = this.cluster.description;
     lake.state = 'TO_SYNC';
+    let properties = {tags : []};
+    this.cluster.tags.forEach(tag => properties.tags.push({'name':tag}));
+    lake.properties = properties;
     return this.lakeService.insert(lake);
   }
 
