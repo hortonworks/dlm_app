@@ -10,16 +10,28 @@
 
     <div style="clear:both;"></div>
 
-    <table class="mdl-data-table mdl-js-data-table" on-mouseleave="hoveredIndex=null">
+    <table class="mdl-data-table mdl-js-data-table" dp-config-table  on-mouseleave="hoveredIndex=null" (onSort)="onSort($event)">
         <thead>
         <tr>
-          <th class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder">{{"common.status" | translate}}</th>
-          <th class="mdl-data-table__cell--non-numeric">{{"common.name" | translate}}</th>
-          <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.nodes" | translate}}</th>
-          <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.uptime" | translate}}</th>
-          <th class="mdl-data-table__cell--non-numeric">{{"common.services" | translate}}</th>
-          <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.hdfsUsed" | translate}}</th>
-          <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.hdfsTotal" | translate}}</th>
+          <th class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder"> {{"common.status" | translate}}</th>
+            <th class="mdl-data-table__cell--non-numeric">
+              <dp-config-sorter [sortBy]="'name'">  {{"common.name" | translate}} </dp-config-sorter>
+          </th>
+          <th class="mdl-data-table__cell--non-numeric">
+              <dp-config-sorter [sortBy]="'nodes'"> {{"pages.infra.labels.nodes" | translate}} </dp-config-sorter>
+          </th>
+          <th class="mdl-data-table__cell--non-numeric">
+              <dp-config-sorter [sortBy]="'uptime'"> {{"pages.infra.labels.uptime" | translate}} </dp-config-sorter>
+          </th>
+          <th class="mdl-data-table__cell--non-numeric">
+              <dp-config-sorter [sortBy]="'services'"> {{"common.services" | translate}} </dp-config-sorter>
+          </th>
+          <th class="mdl-data-table__cell--non-numeric">
+              <dp-config-sorter [sortBy]="'hdfsUsed'"> {{"pages.infra.labels.hdfsUsed" | translate}} </dp-config-sorter>
+          </th>
+          <th class="mdl-data-table__cell--non-numeric">
+              <dp-config-sorter [sortBy]="'hdfsTotal'"> {{"pages.infra.labels.hdfsTotal" | translate}} </dp-config-sorter>
+          </th>
           <th class="mdl-data-table__cell--non-numeric actions"></th>
         </tr>
         </thead>

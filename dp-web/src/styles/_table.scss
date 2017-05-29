@@ -11,7 +11,7 @@ table.mdl-data-table {
     line-height: 1;
     padding: 10px;
 
-    &.mdl-data-table__header--sorted-ascending {
+    .mdl-data-table__header--sorted-ascending {
       color: $dusty-gray;
       &::before{
         content: '';
@@ -25,7 +25,7 @@ table.mdl-data-table {
       }
     }
 
-    &.mdl-data-table__header--sorted-descending {
+    .mdl-data-table__header--sorted-descending {
       color: $dusty-gray;
       &:before {
         content: '';

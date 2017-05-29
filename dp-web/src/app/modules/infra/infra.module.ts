@@ -15,12 +15,14 @@ import { LakeStatsComponent } from './widgets/lake-stats/lake-stats.component';
 import { LakesListComponent } from './widgets/lakes-list/lakes-list.component';
 import { MapComponent } from './widgets/map/map.component';
 import {TaggingWidgetModule} from "../../shared/tagging-widget/tagging-widget.module";
+import {SharedModule} from '../../shared/shared.module';
+import {DpSorterModule} from '../../shared/dp-table/dp-sorter/dp-sorter.module';
 
 @NgModule({
   imports: [
-    CommonModule,
     RouterModule.forChild(routes),
-    FormsModule,
+    SharedModule,
+    DpSorterModule,
     NguiAutoCompleteModule,
     TaggingWidgetModule,
     TranslateModule
