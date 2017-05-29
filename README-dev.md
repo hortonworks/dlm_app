@@ -29,11 +29,15 @@
   * `createdb dataplane`
   * Navigate to `<project_parent>/dataplane/services/db-service/db`
   * Run `flyway migrate`
-3. Start Play BE
+4. Start Play BE
   * sh runDbService.sh for db service
   * sh runDpApp.sh for app
-4. Start UI
+5. Start UI
   * `yarn install`
   * `yarn run dev`
 
+## Troubleshooting
+
+1. Zuul forward errors in response instead of proper response from targeted systems
+  * Check in Consul console if all systems are up and registered.
 
