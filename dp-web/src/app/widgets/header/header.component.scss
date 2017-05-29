@@ -1,37 +1,45 @@
 @import "../../../styles/variables";
+@import "../../../styles/side-nav";
 
 :host{
   height: $header-height;
   min-height: $header-height;
+  display: block;
+  z-index: 1;
 }
 
-:host /deep/ {
-  .mdl-layout__drawer-button {
-    line-height: 46px;
-    margin-left: 10px;
-    margin-right: 0px;
-  }
-  i {
-    font-size: 18px;
-  }
-  div.mdl-layout__drawer.hidden + div.mdl-layout__drawer-button {
-    display: none;
-  }
-
-  li.active {
-    &:before {
-      height: 25px;
-      content: " ";
-      position: absolute;
-      border-left: 5px solid $fruit-salad;
-      margin-left: -16px;
-    }
-  }
-}
-
-.mdl-layout__header {
+.mdl-navigation  {
+  @extend .borderBox;
   border-bottom: 1px solid $concrete;
-  box-shadow: none;
+}
+
+.navbar {
+  @extend .borderBox;
+
+  top: 0;
+  z-index: 1;
+  width: 100%;
+  overflow: hidden;
+  position: fixed;
+  background: $white;
+  height: $header-height;
+  max-height: $header-height;
+  line-height: $header-height;
+}
+
+.navbar a {
+  float: left;
+  display: block;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.mdl-cell--10-col {
+  div {
+    display: inline-block;
+  }
 }
 
 .mdl-navigation__link {
@@ -39,6 +47,8 @@
   padding: 0px 9px;
   margin-right: 10px;
   position: relative;
+  height: 39px;
+  display: inline-block;
 }
 
 .is_active:after {
@@ -46,14 +56,14 @@
   width: 100%;
   display: block;
   content: " ";
-  bottom: 0;
+  bottom: 0px;
   left: 0;
   position: absolute;
   background: $fruit-salad;
 }
 
 .mdl-navigation__link {
-  color: #666666;
+  color: $dove-gray !important;
 
   &.is_active {
     color: $mine-shaft !important;
@@ -64,51 +74,12 @@
   padding: 0px 20px;
 }
 
+:host /deep/ .mdl-menu__container{
+  position: fixed;
+}
+
 .mdl-button {
-  height: 40px;
-  padding: 5px;
-  min-width: 40px;
-
-  .fa-user-circle {
-    font-size: 28px;
-    color: #dedede;
-  }
-  .fa-chevron-down {
-    font-size: 10px;
-    position: relative;
-    color: #dedede;
-    bottom: 5px;
-  }
-}
-
-.mdl-layout__drawer {
-  border-right: none;
-}
-
-.dp-header-logo {
-  width: $layout-drawer-width;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-
-  padding-left: 54px;
-  height: $header-height;
-  line-height: $header-height;
-  background: $logo-background;
-}
-
-img {
-  height: 30px;
-}
-
-.mdl-list__item-primary-content {
-  cursor: pointer;
-}
-
-.user-name {
-  vertical-align: super;
+  color: $dove-gray;
   font-size: 13px;
-  color: #666666;
-  margin: 0px 4px;
 }
 

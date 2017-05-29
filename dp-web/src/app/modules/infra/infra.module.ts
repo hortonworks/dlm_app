@@ -12,8 +12,8 @@ import { ClusterAddComponent } from './views/cluster-add/cluster-add.component';
 import { LakeStatsComponent } from './widgets/lake-stats/lake-stats.component';
 import { LakesListComponent } from './widgets/lakes-list/lakes-list.component';
 import { MapComponent } from './widgets/map/map.component';
-import {TaggingWidget} from '../../shared/tagging-widget/tagging-widget.component'
 import {TaggingWidgetModule} from "../../shared/tagging-widget/tagging-widget.module";
+import {CollapsibleNavModule} from '../../shared/collapsible-nav/collapsible-nav.modue';
 
 @NgModule({
   imports: [
@@ -21,7 +21,8 @@ import {TaggingWidgetModule} from "../../shared/tagging-widget/tagging-widget.mo
     RouterModule.forChild(routes),
     FormsModule,
     NguiAutoCompleteModule,
-    TaggingWidgetModule
+    TaggingWidgetModule,
+    CollapsibleNavModule
   ],
 
   declarations: [

@@ -1,0 +1,10 @@
+<div #sideNav class="sidenav"  *ngIf="persona && !persona.topNav" [ngClass]="{'collpased': collpased}">
+  <span class="sidenav-item" *ngFor="let tabEntry of persona.tabs; let i = index" [ngClass]="{'active': activeTabName === tabEntry.tabName}">
+    <i class="fa fa-globe" aria-hidden="true"></i>  <span class="sidenav-item-name"> {{ tabEntry.tabName }} </span>
+  </span>
+
+  <div class="expander" style="bottom:55px" (click)="toggleNav()">
+    <i *ngIf="!collpased" class="fa fa-angle-double-left"></i>
+    <i *ngIf="collpased" class="fa fa-angle-double-right"></i>
+  </div>
+</div>

@@ -1,0 +1,75 @@
+@import "variables";
+
+.dp-header-logo {
+  @extend .borderBox;
+
+  width: $side-nav-width;
+  transition: 0.5s;
+  height: $header-height;
+  line-height: $header-height;
+  background: $logo-background;
+  border: 1px solid $logo-background;
+
+  i {
+    padding: 10px 10px 10px 25px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  img {
+    height: 30px;
+  }
+
+  &.minimised {
+    width: 50px;
+    transition: 0.5s;
+    i {
+      display: none;
+    }
+    img {
+      transform: scale(.5) translate(-30px,0)
+    }
+  }
+}
+
+.sidenav {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background: $tuna;
+  overflow-x: hidden;
+  transition: 0.5s;
+
+  .dp-header-logo {
+    padding-left: 25px;
+  }
+}
+
+.sidenav .sidenav-item {
+  padding: 15px 5px 15px 25px;
+  font-size: 16px;
+  text-decoration: none;
+  font-weight: normal;
+  display: block;
+  transition: 0.3s;
+  color: $submarine;
+  cursor: pointer;
+}
+
+.sidenav .sidenav-item:hover, .sidenav .sidenav-item.active {
+  color: $white;
+  background: $bright-gray;
+}
+
+.sidenav .sidenav-item.active {
+  &:before {
+    font-family: FontAwesome;
+    content: "\F0DA";
+    color: $fruit-salad;
+    margin-left: -25px;
+    position: absolute;
+  }
+}
