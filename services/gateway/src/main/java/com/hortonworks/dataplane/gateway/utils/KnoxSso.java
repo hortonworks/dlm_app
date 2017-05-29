@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -30,6 +32,9 @@ public class KnoxSso {
 
   @Value("${sso.cookie.name}")
   private String ssoCookieName;
+
+  @Value("${sso.cookie.domain}")
+  private String ssoCookieDomain;
 
   @Value("${signing.pub.key.path}")
   private String publicKeyPath;
@@ -53,6 +58,23 @@ public class KnoxSso {
 
   public String getSsoCookieName() {
     return ssoCookieName;
+  }
+
+  public String getCookieDomain(){
+    if (StringUtils.isBlank(ssoCookieDomain)){
+      return inferDomainFromKnoxUrl();
+    }else{
+      return ssoCookieDomain;
+    }
+  }
+
+  private String inferDomainFromKnoxUrl() {
+    try {
+      URL url=new URL(knoxUrl);
+      return url.getHost();
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public String getLoginUrl(String appRedirectUrl) {
