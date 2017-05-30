@@ -72,7 +72,10 @@
   },
   "topnav": {
     "timezone": "Current Timezone",
-    "disaster_recovery": "Disaster Recovery"
+    "disaster_recovery": "Disaster Recovery",
+    "notifications": {
+      "empty_list": "No notifications to show"
+    }
   },
   "sidenav": {
     "menuItem": {
@@ -126,7 +129,7 @@
           "destination_cluster": "Destination Cluster"
         },
         "actions": {
-          "abort_job": "Abobrt Job",
+          "abort_job": "Abort Job",
           "delete_policy": "Delete Policy",
           "suspend_policy": "Suspend Policy",
           "activate_policy": "Activate Policy"

@@ -11,7 +11,7 @@ import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
 import { getAllJobs } from 'selectors/job.selector';
 import { getAllPolicies } from 'selectors/policy.selector';
 import { getAllClusters } from 'selectors/cluster.selector';
-import { getAllEvents } from 'selectors/event.selector';
+import { getDisplayedEvents } from 'selectors/event.selector';
 import { loadJobsForClusters } from 'actions/job.action';
 import { loadClusters } from 'actions/cluster.action';
 import { loadPolicies } from 'actions/policy.action';
@@ -42,7 +42,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   resourceChartData$: Observable<ResourceChartData>;
 
   constructor(private store: Store<fromRoot.State>) {
-    this.events$ = store.select(getAllEvents);
+    this.events$ = store.select(getDisplayedEvents);
     const jobs$ = store.select(getAllJobs);
     const policies$ = store.select(getAllPolicies);
     const clusters$ = store.select(getAllClusters);
