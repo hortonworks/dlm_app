@@ -1,10 +1,9 @@
-<div class="page-header clearfix">
-  <div class="pull-left">
-    <p>
-      <i class="glyphicon glyphicon-bell"></i>
-      <span class="h2">{{ "page.notifications.header" | translate }}</span>
-    </p>
+<dlm-page-header
+  iconClass="glyphicon glyphicon-bell"
+  [title]="'page.notifications.header'">
+</dlm-page-header>
+<div class="row page-section">
+  <div class="col-md-12">
+    <dlm-notifications-table [events]="events$ | async"></dlm-notifications-table>
   </div>
 </div>
-
-<dlm-notifications-table [events]="events$ | async"></dlm-notifications-table>
