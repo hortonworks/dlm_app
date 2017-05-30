@@ -1,6 +1,6 @@
 package com.hortonworks.dataplane.cs
 
-object Errors {
+object ClusterErrors {
 
   class ClusterNotFound extends Exception
 
