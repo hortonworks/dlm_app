@@ -7,7 +7,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.{
   Errors
 }
 import com.hortonworks.dataplane.commons.domain.Ambari.ClusterServiceWithConfigs
-import com.hortonworks.dataplane.db.Webserice.ClusterComponentService
+import com.hortonworks.dataplane.db.Webservice.ClusterComponentService
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import play.api.libs.json.Json
@@ -19,7 +19,9 @@ import scala.concurrent.Future
 class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
     extends ClusterComponentService {
 
-  private val url = config.getString("dp.services.db.service.uri")
+  private def url =
+    Option(System.getProperty("dp.services.db.service.uri"))
+      .getOrElse(config.getString("dp.services.db.service.uri"))
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
   val logger = Logger(classOf[ClusterComponentServiceImpl])
 
@@ -208,5 +210,5 @@ class ClusterComponentServiceImpl(config: Config)(implicit ws: WSClient)
         case e: Exception => Future.successful(Left(Errors(Seq(Error("500", e.getMessage)))))
       }
   }
-  
+
 }

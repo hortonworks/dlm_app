@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Router, NavigationStart } from '@angular/router';
+import {TranslateService} from '@ngx-translate/core';
 
 import { IdentityService } from './services/identity.service';
 import { MdlService } from './services/mdl.service';
@@ -20,8 +21,13 @@ export class AppComponent implements OnInit {
   constructor(
     private router: Router,
     private mdlService: MdlService,
-    private identityService: IdentityService
-  ) {}
+    private identityService: IdentityService,
+    private translateService: TranslateService
+  ) {
+    translateService.setTranslation('en', require('../assets/i18n/en.json'));
+    translateService.setDefaultLang('en');
+    translateService.use('en');
+  }
 
   getUser(): User {
     return this.identityService.getUser();

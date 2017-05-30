@@ -8,15 +8,14 @@ import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, Json}
 
 import scala.util.Try
-
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+import org.apache.commons.codec.binary.Base64
 
 object Jwt {
 
   val algorithm = SignatureAlgorithm.HS256
-  val key = "0<((A018l#%j&94dZiW7$4Gh9Pq!|["
-  val signingKey = MacProvider.generateKey()
+  val signingKey = "aPdSgVkYp3s6v9y$B&E)H@McQeThWmZq4t7w!z%C*F-JaNdRgUjXn2r5u8x/A?D("
   val issuer: String = "data_plane"
   val HOUR = 3600 * 1000
 
@@ -32,7 +31,7 @@ object Jwt {
       .setIssuer(issuer)
       .setClaims(claims)
       .setExpiration(new Date(now.getTime + 2 * HOUR))
-      .signWith(algorithm, signingKey)
+      .signWith(algorithm, Base64.encodeBase64String(signingKey.getBytes()))
     builder.compact()
 
   }
@@ -42,7 +41,7 @@ object Jwt {
     Logger.info("Parsing user authorization token")
 
     val claims = Try(Some(Jwts.parser()
-      .setSigningKey(signingKey)
+      .setSigningKey(Base64.encodeBase64String(signingKey.getBytes()))
       .parseClaimsJws(jwt).getBody())) getOrElse None
 
     Logger.info(s"Checking if token claims are defined -  ${claims.isDefined}")
