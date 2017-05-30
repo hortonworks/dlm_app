@@ -10,11 +10,14 @@ import { loadJobsForClusters } from 'actions/job.action';
 import { Policy } from 'models/policy.model';
 import { DropdownItem } from 'components/dropdown/dropdown-item';
 import { getPolicyClusterJob } from 'selectors/policy.selector';
-import { TranslateService } from '@ngx-translate/core';
-import { flatten, unique } from 'utils/array-util';
+import { Pairing } from 'models/pairing.model';
+import { getAllPairings } from 'selectors/pairing.selector';
+import { loadPairings } from 'actions/pairing.action';
+import { filterCollection } from 'utils/array-util';
 import * as fromRoot from 'reducers/';
 import { Cluster } from 'models/cluster.model';
 import { getAllClusters } from 'selectors/cluster.selector';
+import { TableFilterItem } from 'common/table/table-filter/table-filter-item.type';
 
 export const ALL = 'all';
 
@@ -26,48 +29,32 @@ export const ALL = 'all';
 export class PoliciesComponent implements OnInit, OnDestroy {
   policies$: Observable<Policy[]>;
   clusters$: Observable<Cluster[]>;
-  filterSubscription: Subscription;
-  searchSubscripiton: Subscription;
+  pairings$: Observable<Pairing[]>;
   clustersSubscription: Subscription;
   filteredPolicies$: Observable<Policy[]>;
-  initialFilterValue = {
-    tags: 'all',
-    groups: 'all'
-  };
-  filterConditionUpdate$ = new BehaviorSubject(this.initialFilterValue);
-  initialSearchValue = '';
-  searchUpdate$ = new BehaviorSubject(this.initialSearchValue);
-  tagItems: DropdownItem[] = [
-    {label: this.t.instant('common.all'), name: ALL}
-  ];
-  groupItems = [
-    {label: this.t.instant('common.all'), name: ALL}
-  ];
-  addOptions: DropdownItem[] = [
-    {label: 'Cluster', path: '../clusters/create'},
-    {label: 'Policy', path: 'create'}
+  filters$: BehaviorSubject<any> = new BehaviorSubject({});
+  filterByService$: BehaviorSubject<any> = new BehaviorSubject('');
+  filterBy: TableFilterItem[] = [
+    {multiple: true, propertyName: 'sourceCluster'},
+    {multiple: false, propertyName: 'targetCluster'},
+    {multiple: true, propertyName: 'status'},
+    {multiple: true, propertyName: 'name'}
   ];
 
   constructor(private store: Store<fromRoot.State>,
               private router: Router,
-              private route: ActivatedRoute,
-              private t: TranslateService) {
-    this.policies$ = this.store.select(getPolicyClusterJob)
-      .map(this.prepareTableData);
+              private route: ActivatedRoute) {
+    this.policies$ = this.store.select(getPolicyClusterJob);
     this.clusters$ = store.select(getAllClusters);
+    this.pairings$ = store.select(getAllPairings);
 
     this.clustersSubscription = this.clusters$.subscribe(clusters => {
       const clusterIds = clusters.map(c => c.id);
+      store.dispatch(loadPairings());
       store.dispatch(loadJobsForClusters(clusterIds));
     });
-    this.filteredPolicies$ = Observable.combineLatest(
-      this.policies$, this.filterConditionUpdate$, this.searchUpdate$
-    ).map(([policies, filterCondition, searchValue]) => {
-      const filtered = this.filterPoliciesWithCondition(policies, filterCondition);
-      return this.searchPolicies(filtered, searchValue);
-    });
-    this.filterSubscription = this.policies$.map(this.fillFilterValues).subscribe();
-    this.searchSubscripiton = this.searchUpdate$.subscribe();
+    this.filteredPolicies$ = Observable.combineLatest(this.policies$, this.filters$, this.filterByService$)
+      .map(([policies, filters, filterByService]) => this.filterPoliciesWithCondition(policies, filters, filterByService));
   }
 
   ngOnInit() {
@@ -75,72 +62,19 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.filterSubscription.unsubscribe();
-    this.searchSubscripiton.unsubscribe();
     this.clustersSubscription.unsubscribe();
   }
 
-  prepareTableData(policies) {
-    return policies.map(policy => {
-      const lastJob = policy.jobsResource.length ? policy.jobsResource.sort((a, b) => a.startTime > b.startTime)[0] : null;
-      return {
-        ...policy,
-        lastJobResource: lastJob
-      };
-    });
+  filterPoliciesWithCondition(policies, filters, filterByService) {
+    const filtered = filterCollection(policies, filters);
+    return filterByService ? filtered.filter(policy => policy.type === filterByService) : filtered;
   }
 
-  isContainsTag(policy, tag) {
-    return tag === ALL ? true : policy.tags.indexOf(tag) > -1;
+  onFilter(filters) {
+    this.filters$.next(filters);
   }
 
-  // todo: implement this when groups will be available
-  isContainsGroup(policy, group) {
-    if (group === ALL) {
-      return true;
-    }
-  }
-
-  filterPoliciesWithCondition(policies, filterCondition) {
-    return policies.filter(policy => {
-      return this.isContainsTag(policy, filterCondition.tags) &&
-        this.isContainsGroup(policy, filterCondition.groups);
-    });
-  }
-
-  searchPolicies(policies, value) {
-    const fields = ['name', 'targetCluster', 'sourceCluster'];
-    let reg;
-    try {
-      reg = new RegExp(value, 'i');
-    } catch (e) {
-      reg = new RegExp('');
-    }
-    return policies.filter(policy => fields.some(field => reg.test(JSON.stringify(policy[field]))));
-  }
-
-  fillFilterValues = (policies) => {
-    if (this.tagItems.length > 1) {
-      return;
-    }
-    const tagItems = unique(flatten(policies.map(policy => policy.tags)))
-      .filter(tag => !!tag)
-      .map(tag => ({label: tag, name: tag}));
-    this.tagItems = [...this.tagItems, ...tagItems];
-  }
-
-  handleAddSelected(option: DropdownItem) {
-    this.router.navigate([option.path], {relativeTo: this.route});
-  }
-
-  handleSelectFilter(filterType, filterValue) {
-    this.filterConditionUpdate$.next({
-      ...this.initialFilterValue,
-      [filterType]: filterValue.name
-    });
-  }
-
-  handleSearchChange(value) {
-    this.searchUpdate$.next(value);
+  filterPoliciesByService(type) {
+    this.filterByService$.next(type);
   }
 }

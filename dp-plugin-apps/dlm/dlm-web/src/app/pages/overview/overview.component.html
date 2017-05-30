@@ -1,10 +1,8 @@
-<div class="container-fluid">
-  <dlm-progress-container [progressState]="overallProgress$ | async">
-    <div class="row">
-      <div class="col-md-12">
-        <h4>{{'page.overview.issues.recent' | translate}}</h4>
-      </div>
-    </div>
+<dlm-page-header
+  title="page.overview.issues.recent">
+</dlm-page-header>
+<dlm-progress-container [progressState]="overallProgress$ | async">
+  <div class="page-section">
     <div class="row">
       <div class="col-md-4">
         <dlm-issues-list [events]="events$ | async">
@@ -16,6 +14,8 @@
         </dlm-resource-charts>
       </div>
     </div>
+  </div>
+  <div class="page-section">
     <div class="row">
       <div class="col-md-3">
         <h4>{{'page.overview.issues.updates' | translate}}</h4>
@@ -23,8 +23,8 @@
     </div>
     <div class="row">
       <div class="col-md-12">
-        <dp-jobs-table [jobs]="jobs$ | async"></dp-jobs-table>
+        <dlm-jobs-overview-table [jobs]="tableData$ | async"></dlm-jobs-overview-table>
       </div>
     </div>
-  </dlm-progress-container>
-</div>
+  </div>
+</dlm-progress-container>

@@ -15,3 +15,9 @@ export const POLICY_SUBMIT_TYPES = {
   SCHEDULE,
   SUBMIT
 };
+
+export const POLICY_TYPES_LABELS = {
+  [HDFS]: 'HDFS',
+  [HIVE]: 'Hive',
+  [HBASE]: 'HBase'
+};

@@ -12,10 +12,11 @@
       </nav>
       <div class="mdl-layout-spacer"></div>
       <button id="demo-menu-lower-right" class="mdl-button mdl-js-button">
-        <i class="fa fa-user-circle" aria-hidden="true"></i> <i class="fa fa-chevron-down" aria-hidden="true"></i>
+        <i class="fa fa-user-circle" aria-hidden="true"></i>
+        <span class="user-name"> {{user?.display}} </span>
+        <i class="fa fa-chevron-down" aria-hidden="true"></i>
       </button>
       <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="demo-menu-lower-right">
-        <li class="mdl-menu__item mdl-menu__item--full-bleed-divider" disabled> <b> {{user?.display}} </b> </li>
         <li class="mdl-menu__item" routerLink="/sign-out">Sign out</li>
       </ul>
     </div>

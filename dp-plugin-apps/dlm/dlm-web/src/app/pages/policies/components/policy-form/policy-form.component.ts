@@ -1,4 +1,4 @@
-import { Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter } from '@angular/core';
+import { Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter, HostBinding } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { go } from '@ngrx/router-store';
@@ -29,6 +29,7 @@ export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 export class PolicyFormComponent implements OnInit {
   @Input() pairings: Pairing[] = [];
   @Output() formSubmit = new EventEmitter<any>();
+  @HostBinding('class') className = 'dlm-policy-form';
   policySubmitTypes = POLICY_SUBMIT_TYPES;
   policyForm: FormGroup;
   databaseListGroup: FormGroup;

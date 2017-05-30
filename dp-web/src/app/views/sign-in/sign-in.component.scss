@@ -1,27 +1,110 @@
-input {
-  font-size: 1em;
+@import "../../../styles/variables";
 
-  height: 32px;
-  min-width: 250px;
-
-  padding: 0 8px;
-
-  border: 1px solid rgb(221, 221, 221);
-  border-radius: 5px;
+.page-wrapper {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  position: absolute;
+  background: $white
 }
 
-label + input {
-  margin-top: 5px;
+.login-wrapper {
+  margin: auto;
+  width: 100%;
+
+  .login-pane-wrapper {
+    display: flex;
+
+    div {
+      flex: 1;
+    }
+  }
 }
 
-.dp-input + .dp-input {
-  margin-top: 15px;
+.dp-login-img {
+  height: 334px;
+  text-align: right;
+  position: relative;
+  background: #3fae2a url(../../../assets/images/login-bg-pattern.png);
+
+  .hwx-logo {
+    width: 205px;
+    height: 82px;
+    display: inline-block;
+    background: url(../../../assets/images/login-logo.png) no-repeat;
+  }
+
+  .dp-logo {
+    color: $white;
+    display: inline-block;
+    border-left: 1px solid $white;
+    margin: 82px 100px 0px 20px;
+    padding: 54px 0px 54px 20px;
+
+    .text-large {
+      font-size: 42px;
+      line-height: 1;
+    }
+
+    .text-small {
+      font-size: 14px;
+      line-height: 1;
+    }
+  }
 }
 
-footer {
-  margin-top: 15px;
+.dp-login-controls {
+  background: $dove-gray;
+  color: $white;
+
+  form {
+    padding: 49px 90px 0px 90px;
+  }
+
+  .group-title {
+    margin-bottom: 15px;
+  }
+
+  .field-group {
+    width: 300px;
+    margin: 15px 0;
+  }
+
+  .action-group {
+    margin-top: 40px;
+    margin-bottom: 7px;
+  }
+
+  a, a:focus, a:visited {
+    color: $eastern-blue;
+    text-decoration: none;
+  }
+
+  input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  label {
+    font-weight: 100;
+    max-width: 100%;
+    margin-bottom: 3px;
+    display: inline-block;
+  }
 }
 
 .error-message {
-  margin: 5px 0;
+  max-width: 540px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
 }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    transition: background-color 5000s ease-in-out 0s;
+  }

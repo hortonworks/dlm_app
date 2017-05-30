@@ -13,10 +13,10 @@ import {MockTranslateLoader} from '../../mocks/mock-translate-loader';
 import {RouterTestingModule} from '@angular/router/testing';
 import {CheckboxColumnComponent, ActionColumnComponent} from '../../components/table-columns';
 import {CheckboxComponent} from '../../common/checkbox/checkbox.component';
-import {DropdownComponent} from '../../components/dropdown/dropdown.component';
 import {FormsModule} from '@angular/forms';
 import {NavbarService} from 'services/navbar.service';
 import {FmtTzPipe} from 'pipes/fmt-tz.pipe';
+import { CommonComponentsModule } from 'components/common-components.module';
 
 describe('NotificationsPageComponent', () => {
   let component: NotificationsPageComponent;
@@ -31,7 +31,8 @@ describe('NotificationsPageComponent', () => {
         RouterTestingModule,
         NgxDatatableModule,
         MomentModule,
-        FormsModule
+        FormsModule,
+        CommonComponentsModule
       ],
       declarations: [
         NotificationsPageComponent,
@@ -41,7 +42,6 @@ describe('NotificationsPageComponent', () => {
         CheckboxColumnComponent,
         CheckboxComponent,
         ActionColumnComponent,
-        DropdownComponent,
         FmtTzPipe
       ],
       providers: [
@@ -62,4 +62,3 @@ describe('NotificationsPageComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-

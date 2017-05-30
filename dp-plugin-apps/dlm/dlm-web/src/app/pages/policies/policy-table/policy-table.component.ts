@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ViewEncapsulation, TemplateRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ViewEncapsulation, TemplateRef, OnDestroy, HostBinding } from '@angular/core';
 import { Policy } from 'models/policy.model';
 import { ActionItemType, ActionColumnType } from 'components';
 import { TableTheme } from 'common/table/table-theme.type';

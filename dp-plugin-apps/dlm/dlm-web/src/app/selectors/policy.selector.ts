@@ -7,6 +7,7 @@ import { getAllClusters } from './cluster.selector';
 import { getAllJobs } from './job.selector';
 
 export const getEntities = createSelector(getPolicies, state => state.entities);
+
 export const getAllPolicies = createSelector(getEntities, mapToList);
 
 export const getAllPoliciesWithClusters = createSelector(getAllPolicies, getAllClusters, (policies, clusters) => {
@@ -21,9 +22,12 @@ export const getAllPoliciesWithClusters = createSelector(getAllPolicies, getAllC
 
 export const getPolicyClusterJob = createSelector(getAllPoliciesWithClusters, getAllJobs, (policies, jobs) => {
   return policies.map(policy => {
+    const jobsResource = jobs.filter(job => job.name === policy.id) || [];
+    const lastJobResource = jobsResource.length ? jobsResource.sort((a, b) => a.startTime > b.startTime ? -1 : 1)[0] : null;
     return {
       ...policy,
-      jobsResource: jobs.filter(job => job.name === policy.id) || []
+      jobsResource,
+      lastJobResource
     };
   });
 });

@@ -1,54 +1,31 @@
-<div class="page-header">
-  <div class="pull-left">
-    <p>
-      <i class="glyphicon glyphicon-list-alt"></i>
-      <span class="h2">{{ "page.policies.header" | translate }}</span>
-    </p>
+<div class="row">
+  <div class="col-md-3">
+    <dlm-page-header [title]="'page.policies.header'"></dlm-page-header>
   </div>
-  <div class="pull-right filters-block">
+  <div class="col-md-9">
+    <div class="pull-right filters-block page-section">
 
-    <div class="service-legend">
-      <div class="hexagon hexagon-warning pull-left">
-        <i class="fa fa-file-o"></i>
+      <div class="filter-item">
+        <dlm-table-filter
+        [filterBy]="filterBy"
+        [data]="filteredPolicies$ | async"
+        (onFilter)="onFilter($event)"></dlm-table-filter>
       </div>
-      <div class="service-name pull-left">HDFS</div>
-    </div>
 
-    <div class="service-legend">
-      <div class="hexagon hexagon-success pull-left">
-        <i class="fa fa-database"></i>
+      <div class="pull-left filter-item">
+        <policy-service-filter (onFilter)="filterPoliciesByService($event)"></policy-service-filter>
       </div>
-      <div class="service-name pull-left">Hive</div>
-    </div>
 
-    <div class="pull-left filter-item">
-      <span class="text-muted">{{'page.policies.groups' | translate}}:</span>
-      <dlm-dropdown
-        selectable="true"
-        type="link"
-        [alignRight]="true"
-        [items]="groupItems"
-      ></dlm-dropdown>
+      <dlm-add-entity-button
+        [canAddPairing]="(clusters$ | async)?.length"
+        [canAddPolicy]="(pairings$ | async)?.length">
+      </dlm-add-entity-button>
     </div>
-    <div class="pull-left filter-item">
-      <span class="text-muted">{{'page.policies.tags' | translate}}:</span>
-      <dlm-dropdown
-        selectable="true"
-        type="link"
-        [items]="tagItems"
-        [alignRight]="true"
-        (onSelectItem)="handleSelectFilter('tags', $event)"
-      ></dlm-dropdown>
-    </div>
-    <dlm-dropdown
-      buttonClass="btn-secondary"
-      [text]="'common.add' | translate"
-      [items]="addOptions"
-      [alignRight]="true"
-      (onSelectItem)="handleAddSelected($event)">
-    </dlm-dropdown>
   </div>
-  <div class="clearfix"></div>
 </div>
 
-<dp-policy-table [policies]="filteredPolicies$ | async"></dp-policy-table>
+<div class="row page-section">
+  <div class="col-md-12">
+    <dp-policy-table  [policies]="filteredPolicies$ | async"></dp-policy-table>
+  </div>
+</div>

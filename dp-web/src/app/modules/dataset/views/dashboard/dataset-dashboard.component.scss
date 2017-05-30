@@ -2,83 +2,74 @@
 
 .dataset-dashboard{
   width:100%;
-  height:100%;
-  padding-left:$layout-drawer-width;
 }
+
 .dataset-search {
   width:100%;
-  height:40px;
-  margin-top:-100px;
-  background-color: #fafafa;
-  border-top: 1px solid RGB(242,242,242);
-  border-bottom: 1px solid RGB(242,242,242);
-}
+  background-color: $alabaster;
+  padding-right: 15px;
+  border-top: 1px solid $concrete;
+  border-bottom: 1px solid $concrete;
 
+  input {
+    width: 100%;
+    background: transparent;
+    padding-left: 40px;
+    border:none;
+  }
 
-nav-tag-panel {
-  float: left;
-  width:$layout-drawer-width;
-  height:100%;
-  margin-left:-$layout-drawer-width;
-  padding: 0px;
-  background-color: rgb(50,53,66);
-  color: white;
+  .mdl-button {
+    padding-right: 15px;
+  }
+
+  .dp-input {
+    &:before {
+      font-family: FontAwesome;
+      content: '\f002';
+      position: absolute;
+      top: 10px;
+      padding-left: 20px;
+    }
+  }
 }
 
 .result-viewer {
-  padding-top:100px;
-  width:100%;
-  height:100%;
+  margin-left: 175px;
 }
 
 .result-header {
   width:100%;
-  height:60px;
-  line-height: 60px;
-  padding:0 20px;
-}
 
-.result-header .resultsTitle {
-  text-transform: uppercase;
-  font-size: 24px;
-  font-weight: lighter;
-  color:rgb(86,100,105);
+  .hwx-title {
+    margin: auto;
+  }
+
+  .mdl-button-group {
+    border : 1px solid $dove-gray;
+    .mdl-button {
+      background-color: $white;
+      color: $dove-gray;
+      float: left;
+      padding : 0px;
+      box-shadow: none;
+      border-radius: 0px;
+      height: 34px;
+      min-width: 42px;
+    }
+
+    .button-color--dark-grey {
+      background-color: $dove-gray !important;
+      color: white;
+      border-left: none;
+    }
+  }
 }
 
 .result-header  .result-header-buttonCont {
   float: right;
 }
+
 .result-container {
   width:100%;
   height:100%;
-  border-bottom: 1px solid black;
 }
-
-.mdl-button-group {
-  position: relative;
-  vertical-align: middle;
-  float: right;
-  margin-top : 1%;
-  border : 1px ridge;
-  .mdl-button {
-    background-color: #ffffff;
-    float: left;
-    padding : 0px;
-    box-shadow: none;
-    border-radius: 0px;
-    height: 34px;
-    min-width: 42px;
-  }
-}
-
-.mdl-button--new {
-  float: right;
-  margin-top : -37px;
-}
-
-.button-color--dark-grey {
-  background-color: #666666 !important;
-  color: white;
-  border-left: none;
-}
-
