@@ -11,10 +11,12 @@ import com.hortonworks.dataplane.gateway.domain.User;
 import com.hortonworks.dataplane.gateway.domain.UserList;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
+import feign.FeignException;
 import io.jsonwebtoken.JwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
@@ -98,7 +100,16 @@ public class TokenCheckFilter extends ZuulFilter {
     if (!subjectOptional.isPresent()) {
       return utils.sendUnauthorized();
     }
-    UserList userList = userServiceInterface.getUser(subjectOptional.get());
+    UserList userList=null;
+    try{
+      userList = userServiceInterface.getUser(subjectOptional.get());
+    }catch (FeignException e){
+      if (e.status()== HttpStatus.NOT_FOUND.value()){
+        return utils.sendForbidden(String.format("User %s not found in the system", subjectOptional.get()));
+      }else{
+        throw new RuntimeException(e);
+      }
+    }
     if (userList == null || userList.getResults() == null || userList.getResults().size() < 1) {
       return utils.sendForbidden(null);
     }
