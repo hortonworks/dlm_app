@@ -5,6 +5,5 @@
 }
 
 .page-content {
-  min-height: calc(100vh - #{$layout-header-desktop-row-height + $page-margins});
-  margin: $page-margins $page-margins 0px $page-margins;
+  height: 100%;
 }

@@ -35,13 +35,20 @@
 
     <div class="spacer-34"> </div>
 
-    <dp-tabs [tabEnum]="topLevelTabs" [tabType]="tabType.UNDERLINE" (selected)="selectedTopLevelTabs=$event"> </dp-tabs>
+    <div class="box">
+        <div class="row header">
+            <dp-tabs [tabEnum]="topLevelTabs" [tabType]="tabType.UNDERLINE" (selected)="selectedTopLevelTabs=$event"> </dp-tabs>
+            <div class="spacer-34"> </div>
+        </div>
+        <div class="row content">
+            <section *ngIf="selectedTopLevelTabs === topLevelTabs.DETAILS">
+                <dp-asset-details-view> </dp-asset-details-view>
+            </section>
 
-    <div class="spacer-34"> </div>
-
-    <section *ngIf="selectedTopLevelTabs === topLevelTabs.DETAILS">
-        <dp-asset-details-view> </dp-asset-details-view>
-    </section>
-
+            <section >
+                <dp-lineage *ngIf="selectedTopLevelTabs === topLevelTabs.LINEAGE"[guid]="'e99416c1-0f91-4eb1-ad70-01777cbd68a8'"> </dp-lineage>
+            </section>
+        </div>
+    </div>
 
 </div>
