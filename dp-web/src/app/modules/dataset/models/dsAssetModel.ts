@@ -1,9 +1,9 @@
 export class DsAssetModel {
-  id:number;
+  creationTime: string;
+  id: number;
   name: string;
-  source: string;
   owner: string;
   rowCount: number;
+  source: string;
   type: string;
-  creationTime:string;
 }
