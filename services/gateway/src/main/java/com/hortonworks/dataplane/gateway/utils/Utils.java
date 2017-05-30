@@ -43,14 +43,17 @@ public class Utils {
     RequestContext ctx = RequestContext.getCurrentContext();
     ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
     ctx.setSendZuulResponse(false);
-    throw new RuntimeException("Request not allowed");
+    return null;
   }
 
   public Object sendForbidden(String message) {
     RequestContext ctx = RequestContext.getCurrentContext();
     ctx.setResponseStatusCode(HttpStatus.FORBIDDEN.value());
+    if (message!=null){
+      ctx.setResponseBody(message);
+    }
     ctx.setSendZuulResponse(false);
-    throw new RuntimeException("Request not allowed");
+    return null;
   }
 
   public void deleteCookie(String cookieName,String domain) {
