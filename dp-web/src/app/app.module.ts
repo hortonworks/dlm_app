@@ -1,8 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { HttpModule, Http } from '@angular/http';
 import { RouterModule } from '@angular/router';
+import {TranslateModule, TranslateLoader} from '@ngx-translate/core';
+import {TranslateHttpLoader} from '@ngx-translate/http-loader';
+
 
 import { routes } from './app.routes';
 
@@ -28,12 +31,23 @@ import {DataSetService} from "./services/dataset.service";
 import {DatasetTagService} from "./services/tag.service";
 import { DropdownComponent } from './shared/dropdown/dropdown.component';
 
+export function HttpLoaderFactory(http: Http) {
+  return new TranslateHttpLoader(http);
+}
+
 @NgModule({
   imports: [
     BrowserModule,
     FormsModule,
     HttpModule,
-    RouterModule.forRoot(routes)
+    RouterModule.forRoot(routes),
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [Http]
+      }
+    })
   ],
   declarations: [
     AppComponent,
