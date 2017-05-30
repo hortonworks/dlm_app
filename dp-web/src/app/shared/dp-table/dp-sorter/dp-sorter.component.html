@@ -1,0 +1,4 @@
+<span style="cursor: pointer"  class="text-nowrap" (click)="sort()" [ngClass]="{'mdl-data-table__header--sorted-ascending': sortAsc, 'mdl-data-table__header--sorted-descending': sortDesc}">
+  <ng-content></ng-content>
+  <i class="fa fa-sort" aria-hidden="true" *ngIf="!sortAsc && !sortDesc"></i>
+</span>
