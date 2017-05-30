@@ -5,11 +5,11 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {MockTranslateLoader} from '../../mocks/mock-translate-loader';
 import {PairingCardListComponent} from './components/pairing-card-list/pairing-card-list.component';
 import {PairingCardComponent} from './components/pairing-card/pairing-card.component';
-import {ClusterCardComponent} from '../../components/cluster-card/cluster-card.component';
 import {ModalDialogComponent} from '../../common/modal-dialog/modal-dialog.component';
 import {MockStore} from '../../mocks/mock-store';
 import {ModalModule} from 'ng2-bootstrap';
 import {Store} from '@ngrx/store';
+import { CommonComponentsModule } from 'components/common-components.module';
 
 describe('PairingsComponent', () => {
   let component: PairingsComponent;
@@ -22,13 +22,13 @@ describe('PairingsComponent', () => {
           loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
         }),
         RouterTestingModule,
-        ModalModule.forRoot()
+        ModalModule.forRoot(),
+        CommonComponentsModule
       ],
       declarations: [
         PairingsComponent,
         PairingCardComponent,
         PairingCardListComponent,
-        ClusterCardComponent,
         ModalDialogComponent
       ],
       providers: [

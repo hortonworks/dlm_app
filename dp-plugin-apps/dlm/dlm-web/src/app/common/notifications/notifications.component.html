@@ -13,9 +13,7 @@
         <tbody>
           <tr *ngFor="let event of events | slice:0:5">
             <td *ngIf="event.state !== ''" class="status">
-              <span [ngClass]="{'fa': true, 'fa-circle': true, 'alert-state-CRITICAL': event.eventStatus === 'critical',
-               'alert-state-WARNING': event.eventStatus === 'warning'}">
-              </span>
+              <dlm-event-status [event]="event"></dlm-event-status>
             </td>
             <td class="content">
               <div class="name">{{ event.event }}</div>
@@ -31,4 +29,3 @@
     </div>
   </div>
 </span>
-

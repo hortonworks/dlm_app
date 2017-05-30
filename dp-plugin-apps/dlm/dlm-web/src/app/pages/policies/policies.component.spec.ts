@@ -32,7 +32,7 @@ import { TableFilterComponent } from 'common/table/table-filter/table-filter.com
 import { PolicyServiceFilterComponent } from './components/policy-service-filter/policy-service-filter.component';
 import { TypeaheadModule } from 'ng2-bootstrap';
 
-describe('PoliciesComponent', () => {
+xdescribe('PoliciesComponent', () => {
   let component: PoliciesComponent;
   let fixture: ComponentFixture<PoliciesComponent>;
 
