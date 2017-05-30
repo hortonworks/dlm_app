@@ -1,19 +1,18 @@
 import {Component, OnInit} from "@angular/core";
+import {Router} from "@angular/router";
 import {DatasetTag} from "../../../../models/dataset-tag";
 import {ViewsEnum} from "../../../../shared/utils/views";
-import {Router} from "@angular/router";
-
 
 @Component({
-  selector: 'dp-dataset-dashboard',
-  templateUrl: './dataset-dashboard.component.html',
-  styleUrls: ['./dataset-dashboard.component.scss'],
+  selector: "dp-dataset-dashboard",
+  styleUrls: ["./dataset-dashboard.component.scss"],
+  templateUrl: "./dataset-dashboard.component.html",
 })
 
 export class DatasetDashboardComponent implements OnInit {
 
-  public currentDsTag: DatasetTag = null;
-  public views = ViewsEnum;
+  currentDsTag: DatasetTag = null;
+  views = ViewsEnum;
   currentView: ViewsEnum;
 
   constructor(private router: Router,) {
@@ -32,6 +31,6 @@ export class DatasetDashboardComponent implements OnInit {
   }
 
   actionAddNewDataset() {
-    this.router.navigate(['dataset/add']);
+    this.router.navigate(["dataset/add"]);
   }
 }

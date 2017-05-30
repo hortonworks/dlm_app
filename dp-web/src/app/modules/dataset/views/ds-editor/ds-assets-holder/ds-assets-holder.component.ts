@@ -5,29 +5,25 @@ import {
   AssetSetQueryModel
 } from "../../ds-assets-list/ds-assets-list.component";
 
-
 @Component({
-  selector: 'ds-assets-holder',
-  templateUrl: './ds-assets-holder.component.html',
-  styleUrls: ['./ds-assets-holder.component.scss'],
-  providers: [RichDatasetModel]
+  providers: [RichDatasetModel],
+  selector: "ds-assets-holder",
+  styleUrls: ["./ds-assets-holder.component.scss"],
+  templateUrl: "./ds-assets-holder.component.html"
 })
 
 export class DsAssetsHolder implements OnInit {
 
   @Input() assetSetQueryModelsForAddition: AssetSetQueryModel[] = null;
   @Input() assetSetQueryModelsForSubtraction: AssetSetQueryModel[] = null;
-
   @Input() dsModel: RichDatasetModel = null;
-  public applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.ADD, AssetListActionsEnum.REMOVE];
-
-  @Output('onDoneAction') actionEmitter: EventEmitter<AssetListActionsEnum> = new EventEmitter<AssetListActionsEnum>();
-
-  public showPopup: boolean = false;
-  public showList: boolean = false;
+  applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.ADD, AssetListActionsEnum.REMOVE];
+  showPopup: boolean = false;
+  showList: boolean = false;
+  @Output("onDoneAction") actionEmitter: EventEmitter<AssetListActionsEnum> = new EventEmitter<AssetListActionsEnum>();
 
   ngOnInit() {
-    this.setShowListFlag()
+    this.setShowListFlag();
   }
 
   setShowListFlag() {
@@ -36,7 +32,7 @@ export class DsAssetsHolder implements OnInit {
 
   actionDone(asqm: AssetSetQueryModel) {
     this.assetSetQueryModelsForAddition.push(asqm);
-    this.actionEmitter.emit()
+    this.actionEmitter.emit();
     this.showPopup = false;
     this.setShowListFlag();
   }

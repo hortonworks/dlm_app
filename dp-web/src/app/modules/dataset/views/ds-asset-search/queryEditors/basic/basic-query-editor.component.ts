@@ -1,83 +1,93 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChange, ViewChild} from "@angular/core";
-import {AssetTypeEnum} from "../../../ds-assets-list/ds-assets-list.component";
 import {TaggingWidgetTagModel} from "../../../../../../shared/tagging-widget/tagging-widget.component";
+import {AssetTypeEnum} from "../../../ds-assets-list/ds-assets-list.component";
 import {SearchWidget} from "./search-widget/search-widget.component";
 
 export class SimpleQueryObjectModel {
-  searchText:string;
   type: AssetTypeEnum = AssetTypeEnum.ALL;
-  constructor(text:string){this.searchText=text;}
+  constructor(public searchText: string) {}
 }
 
-let TagModel=TaggingWidgetTagModel;
+const TagModel = TaggingWidgetTagModel;
 
 @Component({
-  selector : "normlal-query-editor",
-  templateUrl : "basic-query-editor.component.html",
-  styleUrls: ["basic-query-editor.component.scss"]
+  selector: "normlal-query-editor",
+  styleUrls: ["basic-query-editor.component.scss"],
+  templateUrl: "basic-query-editor.component.html"
 })
 export class BasicQueryEditor implements OnInit {
-  public createdFilOptns:string[] = ['Whenever','Last 30 days', 'Last 60 days', 'Last 90 days'];
-  public typeFilOptns : string[] = ['Any', 'HIVE', 'HDFS'];
-  public sizeFilOptns : string[] = ['Any', '> 100 rows', '> 1000 rows', '> 10000 rows'];
-  public dlFilOptns : string[] = ['Any', 'Lake-1', 'Lake-2'];
-  public ownerFilOptn : string[] = ['Whoever', 'root', 'Amit', 'Vivek', 'Kishore'];
+  createdFilOptns: string[] = ["Whenever", "Last 30 days", "Last 60 days", "Last 90 days"];
+  typeFilOptns: string[] = ["Any", "HIVE", "HDFS"];
+  sizeFilOptns: string[] = ["Any", "> 100 rows", "> 1000 rows", "> 10000 rows"];
+  dlFilOptns: string[] = ["Any", "Lake-1", "Lake-2"];
+  ownerFilOptn: string[] = ["Whoever", "root", "Amit", "Vivek", "Kishore"];
 
-  public createdValueIndx:number = 0;
-  public typeValueIndx : number = 0;
-  public sizeValueIndx : number = 0;
-  public dLakeIndx : number = 0;
-  public ownerIndx : number = 0;
+  createdValueIndx: number = 0;
+  typeValueIndx: number = 0;
+  sizeValueIndx: number = 0;
+  dLakeIndx: number = 0;
+  ownerIndx: number = 0;
 
-  public filterTags:TaggingWidgetTagModel[] = [];
-  public filterStateFlag:boolean = false;
+  filterTags: TaggingWidgetTagModel[] = [];
+  filterStateFlag: boolean = false;
 
-  @ViewChild('outerCont') outerCont:ElementRef;
-  @ViewChild('searchWidget') searchWidget:SearchWidget;
+  @ViewChild("outerCont") outerCont: ElementRef;
+  @ViewChild("searchWidget") searchWidget: SearchWidget;
 
-  @Input() queryObj:SimpleQueryObjectModel;
+  @Input() queryObj: SimpleQueryObjectModel;
 
-  @Output('onQueryObjUpdate') notificationEmitter: EventEmitter<any> = new EventEmitter<any>();
-  @Output('onHeightChange') heightEmitter: EventEmitter<number> = new EventEmitter<number>();
+  @Output("onQueryObjUpdate") notificationEmitter: EventEmitter<any> = new EventEmitter<any>();
+  @Output("onHeightChange") heightEmitter: EventEmitter<number> = new EventEmitter<number>();
 
-  ngOnInit () {this.copyQryObjToWidget();}
-  ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
-    (changes['queryObj']) &&  this.copyQryObjToWidget();
+  ngOnInit() {
+    this.copyQryObjToWidget();
   }
-  copyQryObjToWidget () {
-    var enm = AssetTypeEnum, type=this.queryObj.type;
-    this.typeValueIndx = (type==enm.ALL)?0:((type==enm.HIVE)?1:((type==enm.HDFS)?2:0))
-    this.ownerIndx=0;
-    this.createdValueIndx=0;
-    this.sizeValueIndx=0;
-    this.dLakeIndx=0;
+
+  ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
+    (changes["queryObj"]) && this.copyQryObjToWidget();
+  }
+
+  copyQryObjToWidget() {
+    const enm = AssetTypeEnum, type = this.queryObj.type;
+    this.typeValueIndx = (type == enm.ALL) ? 0 : ((type == enm.HIVE) ? 1 : ((type == enm.HDFS) ? 2 : 0));
+    this.ownerIndx = 0;
+    this.createdValueIndx = 0;
+    this.sizeValueIndx = 0;
+    this.dLakeIndx = 0;
     this._fillFilterTags();
   }
-  onNewSearch(text:string) {
+
+  onNewSearch(text: string) {
     this.queryObj.searchText = text;
     this.notificationEmitter.emit("");
   }
+
   _fillFilterTags() {
     this.filterTags.splice(0, this.filterTags.length);
-    if(this.createdValueIndx > 0) this.filterTags.push(new TagModel('Created: '+this.createdFilOptns[this.createdValueIndx], "createdValueIndx"));
-    if(this.typeValueIndx > 0) this.filterTags.push(new TagModel('Type: '+this.typeFilOptns[this.typeValueIndx], "typeValueIndx"));
-    if(this.sizeValueIndx > 0) this.filterTags.push(new TagModel('Size: '+this.sizeFilOptns[this.sizeValueIndx], "sizeValueIndx"));
-    if(this.dLakeIndx > 0) this.filterTags.push(new TagModel('Datalake: '+this.dlFilOptns[this.dLakeIndx], "dLakeIndx"));
-    if(this.ownerIndx > 0) this.filterTags.push(new TagModel('Owner: '+this.ownerFilOptn[this.ownerIndx], "ownerIndx"));
+    if (this.createdValueIndx > 0) {
+      this.filterTags.push(new TagModel(`Created: ${this.createdFilOptns[this.createdValueIndx]}`, "createdValueIndx"));
+    }
+    if (this.typeValueIndx > 0) this.filterTags.push(new TagModel(`Type: ${this.typeFilOptns[this.typeValueIndx]}`, "typeValueIndx"));
+    if (this.sizeValueIndx > 0) this.filterTags.push(new TagModel(`Size: ${this.sizeFilOptns[this.sizeValueIndx]}`, "sizeValueIndx"));
+    if (this.dLakeIndx > 0) this.filterTags.push(new TagModel(`Datalake: ${this.dlFilOptns[this.dLakeIndx]}`, "dLakeIndx"));
+    if (this.ownerIndx > 0) this.filterTags.push(new TagModel(`Owner: ${this.ownerFilOptn[this.ownerIndx]}`, "ownerIndx"));
   }
-  onFilterOptionChange(){
+
+  onFilterOptionChange() {
     this._fillFilterTags();
-    var tmp = this.typeValueIndx, enm = AssetTypeEnum;
-    this.queryObj.type = (tmp==0)?enm.ALL:((tmp==1)?enm.HIVE:((tmp==2)?enm.HDFS:enm.ALL))
+    const tmp = this.typeValueIndx, enm = AssetTypeEnum;
+    this.queryObj.type = (tmp == 0) ? enm.ALL : ((tmp == 1) ? enm.HIVE : ((tmp == 2) ? enm.HDFS : enm.ALL));
     // this.notificationEmitter.emit("");
   }
-  removeFilter (deletedTagObj:TaggingWidgetTagModel) {
+
+  removeFilter(deletedTagObj: TaggingWidgetTagModel) {
     this[deletedTagObj.data] = 0;
     this.onFilterOptionChange();
   }
-  toggleFilterCont(){
+
+  toggleFilterCont() {
     this.filterStateFlag = !this.filterStateFlag;
-    ((thisObj)=>setTimeout(()=>thisObj.heightEmitter.emit(thisObj.outerCont.nativeElement.offsetHeight), 0))(this)
+    (thisObj => setTimeout(() => thisObj.heightEmitter.emit(thisObj.outerCont.nativeElement.offsetHeight), 0))(this);
 
   }
 }
