@@ -30,6 +30,7 @@
 *.jar
 *.gz
 
+**/.gradle/**
 # Generated
 **/RUNNING_PID
 

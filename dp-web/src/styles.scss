@@ -3,10 +3,16 @@
 @import "styles/variables";
 @import "styles/mdl-extend";
 @import "styles/buttons";
+@import "styles/table";
 @import "styles/mixins";
+@import "styles/html-controls";
 
 body {
-  font-family: "Roboto";
+  font-size: 13px;
+  font-family: 'Roboto', sans-serif;
+  background: $gallery;
+  color: $dove-gray;
+  line-height: 1;
 }
 
 .dp-view-pane {
@@ -19,4 +25,85 @@ div.spacer-34 {
   height: 34px;
 }
 
+div.spacer-15 {
+  height: 15px;
+}
+
+.visibility-visible {
+  visibility: visible;
+}
+
+.visibility-hidden {
+  visibility: hidden;
+}
+
+.hwx-title {
+  font-size: 20px;
+  color: $mine-shaft;
+}
+
+.hwx-desc {
+  font-size: 12px;
+  color: $dusty-gray;
+  line-height: 1.5;
+  margin-bottom: 3px;
+}
+
+.hwx-body {
+  font-size: inherit;
+  color: inherit;
+}
+
+.page-container {
+  padding: 30px 20px 20px 20px;
+}
+
+.icon-container {
+  padding-left: 30px;
+
+  &:before {
+    font-family: "FontAwesome";
+    font-style: normal;
+    font-size: 20px;
+    content: '\f233';
+    position: absolute;
+    margin-left: -30px;
+    display: inline-block;
+    color: $fruit-salad;
+  }
+}
+
+.breadcrumb-container {
+  padding-left: 25px;
+  height:45px;
+  background-color: $albaster-gray;
+    span {
+      color : $shuttle-gray;
+      padding: 15px 0px;
+      display: inline-block;
+    }
+}
+
+
+
+.button-container{
+  padding-top: 30px;
+  .mdl-button {
+    margin-right: 10px;
+  }
+}
+
 @include summary-pane("summary-pane-5", "20%");
+
+.borderBox, .borderBox * {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.overFlowEllipsis{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap
+
+}

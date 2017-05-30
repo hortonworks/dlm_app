@@ -12,6 +12,7 @@
 * Nodejs 6.10.0 or above. To get Nodejs on Linux, you can follow instructions here: https://nodejs.org/en/download/package-manager/#enterprise-linux-and-fedora
 * [Yarn](https://yarnpkg.com) package manager (`npm install --global yarn`)
 * docker-machine (tested with 0.7.0), docker (tested with 1.8.0), docker-compose (tested with 1.7.1)
+* Centos 7 or Mac OSX are tested platforms
 
 ## Build
 
@@ -29,13 +30,12 @@
 * For a fresh setup:
   * Initialize the Postgres database: `./dpdeploy.sh init db`
   * Then, run the DB migrations: `./dpdeploy.sh migrate`. This sets up the database schema using the Flyway migration tool (https://flywaydb.org/)
-  * The migrate command takes a while to complete. After it is done, you can kill the containers with a Ctrl+c
   * You can verify the status of migrations by executing the following steps:
     * `docker exec -it dpbuild_dp-database_1 psql -U dp_admin -W -h dp-database dataplane`
     * Enter `dp_admin` as the password
     * `select * from schema_version;` This should show some migrations.
   * Build the containers for the application: `./dp-docker-build.sh build`
-  * Initialize the application: `./dpdeploy.sh init app`
+  * Initialize the application: `./dpdeploy.sh init app`. This will prompt you to enter an IP Address. Please enter the routable IP of the host where the docker containers are running. In future iterations, we will work to auto-detect this.
 * For an existing setup:
   * Stop the application: `./dpdeploy.sh stop`
   * Start the application: `./dpdeploy.sh start`
@@ -54,4 +54,24 @@
      * Enter `admin` and `admin-password` as username and password respectively.
      * You will be logged in and can proceed with rest of the functionality.
      * To stop/start/destroy Knox, you can do `./dpdeploy.sh [stop|start|destroy] knox`
-  
+
+## Setup (from binaries)
+
+Dataplane docker images are published to docker-hub as a private repository in the `hortonworks` organization. If you need access to these images, please contact the Dataplane team for providing access with your docker-hub ID.
+
+In order to make it easy to work with these images, an installation tarball containing the `dpdeploy.sh` build script and other runtime files is published as a CI artifact. Each push of the docker images results in a new installation tarball to be created.
+
+The images are tagged with a {product-version}-{build-number} tag, for e.g 0.0.1-184. This is also the version of the installation tarball, and can be queried using the command `./dpdeploy.sh version`.
+
+So, to get a version of dataplane on a docker supported machine, do the following:
+
+* Download the last successful artifact of the installation tarball named `dp-installer-VERSION-BUILD.tar.gz` from [this location](http://172.22.85.155:8080/job/dp-docker-build/) 
+  * *Hint*: You can automatically fetch this from a script using the following URL: `wget http://172.22.85.155:8080/job/dp-docker-build/lastSuccessfulBuild/artifact/archive/dp-build/build/dp-docker/*zip*/dp-docker.zip` and extract the contents of the zip, which will contain the installation tarball within it.
+* Untar it.
+* `cd installer`
+* Execute the usual `dpdeploy.sh` commands described above. These will pull the correspondingly tagged images from docker-hub. The first pull from the docker-hub repo might take a while, but once the layers are cached, it should be faster.
+
+## Known Issues
+
+* When trying with Centos 7, SE Linux needs to be disabled for now. This is a workaround to a bug that causes external volume mounts to fail. We will try and resolve this issue going forward.
+  * The precise steps to disable are to run this command as root: `su -c "setenforce 0"`. The issue are workaround are documented [here](http://stackoverflow.com/questions/24288616/permission-denied-on-accessing-host-directory-in-docker)

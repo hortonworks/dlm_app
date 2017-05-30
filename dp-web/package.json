@@ -28,6 +28,8 @@
     "@angular/platform-browser-dynamic": "^4.0.0",
     "@angular/router": "^4.0.0",
     "@ngui/auto-complete": "^0.13.2",
+    "@ngx-translate/core": "^6.0.1",
+    "@ngx-translate/http-loader": "0.0.3",
     "core-js": "^2.4.1",
     "d3": "~3.5.3",
     "d3-tip": "^0.7.1",
@@ -54,7 +56,7 @@
     "@types/leaflet": "^1.0.53",
     "@types/leaflet-curve": "0.0.29",
     "@types/nvd3": "^1.8.34",
-    "codelyzer": "~0.0.26",
+    "codelyzer": "~2.0.0",
     "jasmine-core": "2.4.1",
     "jasmine-spec-reporter": "2.5.0",
     "karma": "1.2.0",
@@ -65,8 +67,9 @@
     "karma-jasmine-html-reporter": "^0.2.2",
     "karma-remap-istanbul": "^0.2.1",
     "protractor": "4.0.9",
+    "roboto-npm-webfont": "0.0.4",
     "ts-node": "1.2.1",
-    "tslint": "^3.13.0",
+    "tslint": "^4.0.0",
     "typescript": "~2.2.2"
   }
 }

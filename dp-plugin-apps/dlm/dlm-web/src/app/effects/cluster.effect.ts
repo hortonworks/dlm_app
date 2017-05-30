@@ -6,7 +6,7 @@ import { Effect, Actions, toPayload } from '@ngrx/effects';
 import { ClusterService } from 'services/cluster.service';
 
 import {
-   LoadClustersSuccess, LoadClustersFailure, LoadClusterSuccess, LoadClusterFailure, ActionTypes
+   loadClustersSuccess, loadClustersFailure, LoadClusterSuccess, LoadClusterFailure, ActionTypes
  } from 'actions/cluster.action';
 
 @Injectable()
@@ -14,11 +14,12 @@ export class ClusterEffects {
 
   @Effect()
   loadClusters$: Observable<any> = this.actions$
-    .ofType(ActionTypes.LOAD_CLUSTERS)
-    .switchMap(() => {
+    .ofType(ActionTypes.LOAD_CLUSTERS.START)
+    .map(toPayload)
+    .switchMap(payload => {
       return this.clusterService.fetchClusters()
-        .map(clusters => new LoadClustersSuccess(clusters))
-        .catch(err => Observable.of(new LoadClustersFailure(err)));
+        .map(clusters => loadClustersSuccess(clusters, payload.meta))
+        .catch(err => Observable.of(loadClustersFailure(err, payload.meta)));
     });
 
   @Effect() loadCluster$: Observable<any> = this.actions$

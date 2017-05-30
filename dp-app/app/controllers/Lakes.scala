@@ -6,7 +6,7 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari.AmbariEndpoint
 import com.hortonworks.dataplane.commons.domain.Entities.Datalake
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webserice.LakeService
+import com.hortonworks.dataplane.db.Webservice.LakeService
 import models.JsonResponses
 import org.apache.commons.lang3.exception.ExceptionUtils
 import play.api.Logger

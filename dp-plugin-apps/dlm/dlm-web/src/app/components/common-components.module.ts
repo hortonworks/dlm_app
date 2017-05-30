@@ -14,6 +14,9 @@ import { DoughnutChartComponent } from './doughnut-chart/doughnut-chart.componen
 import { FormFieldComponent } from './forms/form-field/form-field.component';
 import { FormFieldDirective } from './forms/form-field/form-field.directive';
 import { FieldErrorComponent } from './forms/field-error/field-error.component';
+import { ProgressContainerComponent } from './progress-container/progress-container.component';
+import { SelectFieldComponent, SelectFieldOptionDirective, SelectFieldValueDirective } from './forms/select-field/';
+import { MapComponent } from './map/map.component';
 
 @NgModule({
   imports: [
@@ -33,7 +36,12 @@ import { FieldErrorComponent } from './forms/field-error/field-error.component';
     DoughnutChartComponent,
     FormFieldComponent,
     FormFieldDirective,
-    FieldErrorComponent
+    FieldErrorComponent,
+    ProgressContainerComponent,
+    SelectFieldComponent,
+    SelectFieldOptionDirective,
+    SelectFieldValueDirective,
+    MapComponent
   ],
   exports: [
     CardComponent,
@@ -45,7 +53,12 @@ import { FieldErrorComponent } from './forms/field-error/field-error.component';
     DoughnutChartComponent,
     FormFieldComponent,
     FormFieldDirective,
-    FieldErrorComponent
+    FieldErrorComponent,
+    ProgressContainerComponent,
+    SelectFieldComponent,
+    SelectFieldOptionDirective,
+    SelectFieldValueDirective,
+    MapComponent
   ]
 })
 export class CommonComponentsModule {}

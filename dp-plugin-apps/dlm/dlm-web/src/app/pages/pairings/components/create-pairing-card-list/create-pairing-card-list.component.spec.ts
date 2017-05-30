@@ -1,7 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import {ClusterCardComponent} from '../../../../components/cluster-card/cluster-card.component';
+import { ClusterCardComponent } from 'components/cluster-card/cluster-card.component';
 import { CreatePairingCardComponent } from '../create-pairing-card/create-pairing-card.component';
 import { CreatePairingCardListComponent } from './create-pairing-card-list.component';
+import { BytesSizePipe } from 'pipes/bytes-size.pipe';
+import { TooltipModule } from 'ng2-bootstrap';
 
 describe('CreatePairingCardListComponent', () => {
   let component: CreatePairingCardListComponent;
@@ -9,9 +11,15 @@ describe('CreatePairingCardListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CreatePairingCardListComponent, CreatePairingCardComponent, ClusterCardComponent ]
+      imports: [TooltipModule.forRoot()],
+      declarations: [
+        CreatePairingCardListComponent,
+        CreatePairingCardComponent,
+        ClusterCardComponent,
+        BytesSizePipe
+      ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

@@ -5,13 +5,9 @@ import {RichDatasetModel} from "../../../models/richDatasetModel";
   selector: 'ds-summary-holder',
   templateUrl: './ds-summary-holder.component.html',
   styleUrls: ['./ds-summary-holder.component.scss'],
-  providers:[RichDatasetModel]
+  providers: [RichDatasetModel]
 })
-export class DsSummaryHolder implements OnInit {
-
+export class DsSummaryHolder {
   @Input() dsModel: RichDatasetModel;
-  @Input() tags:string[] = [];
-
-  constructor () {}
-  ngOnInit() {}
+  @Input() tags: string[] = [];
 }

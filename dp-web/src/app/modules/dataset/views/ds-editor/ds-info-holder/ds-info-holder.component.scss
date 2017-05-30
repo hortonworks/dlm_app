@@ -1,9 +1,7 @@
-.borderBox, .borderBox * {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
 
+.infoHolder{
+  width:500px;
+}
 .dp-input {
   position: relative;
 }
@@ -35,7 +33,7 @@
     background-color: rgb(221, 221, 221);
   }
 }
-input, textarea {
+input, textarea, select {
   font-size: 1em;
 
   height: 32px;
@@ -48,6 +46,7 @@ input, textarea {
   border-radius: 5px;
 }
 textarea {height:100px;}
+select {background-color: inherit}
 
 label + input, label + textarea {
   margin-top: 5px;

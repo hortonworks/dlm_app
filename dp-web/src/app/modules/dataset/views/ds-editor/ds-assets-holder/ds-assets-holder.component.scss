@@ -1,16 +1,4 @@
-$color_text_blue: rgb(102,164,200);
-$color_text_gray: rgb(103,115,120);
-$color_green: rgb(96,170,90);
-$font_size_title: 22px;
-
-
-.borderBox, .borderBox * {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-
+@import "../../../../../../styles/variables";
 
 
 .dsAssetsHolder {
@@ -26,13 +14,17 @@ $font_size_title: 22px;
   width:100%;
   height:100%;
   background:rgba(0, 0, 0, 0.5);
-  padding:100px 30px 0px 30px;
+  padding:30px;
   overflow: auto;
+  z-index: 1;
 }
 
 .popup > .opaque {
   background-color: white;
   border-radius: 3px;
   position: relative;
+  height:100%;
+  width:100%;
+  overflow-y: hidden;
 }
 

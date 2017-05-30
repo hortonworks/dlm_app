@@ -1,28 +1,30 @@
 <div class="container-fluid">
-  <div class="row">
-    <div class="col-md-12">
-      <h4>{{'page.overview.issues.recent' | translate}}</h4>
+  <dlm-progress-container [progressState]="overallProgress$ | async">
+    <div class="row">
+      <div class="col-md-12">
+        <h4>{{'page.overview.issues.recent' | translate}}</h4>
+      </div>
     </div>
-  </div>
-  <div class="row">
-    <div class="col-md-4">
-      <dlm-issues-list [events]="events$ | async">
-      </dlm-issues-list>
+    <div class="row">
+      <div class="col-md-4">
+        <dlm-issues-list [events]="events$ | async">
+        </dlm-issues-list>
+      </div>
+      <div class="col-md-8">
+        <h4></h4>
+        <dlm-resource-charts [resourceData]="resourceChartData$ | async">
+        </dlm-resource-charts>
+      </div>
     </div>
-    <div class="col-md-8">
-      <h4></h4>
-      <dlm-resource-charts [resourceData]="resourceChartData$ | async">
-      </dlm-resource-charts>
+    <div class="row">
+      <div class="col-md-3">
+        <h4>{{'page.overview.issues.updates' | translate}}</h4>
+      </div>
     </div>
-  </div>
-  <div class="row">
-    <div class="col-md-3">
-      <h4>{{'page.overview.issues.updates' | translate}}</h4>
+    <div class="row">
+      <div class="col-md-12">
+        <dp-jobs-table [jobs]="jobs$ | async"></dp-jobs-table>
+      </div>
     </div>
-  </div>
-  <div class="row">
-    <div class="col-md-12">
-      <dp-jobs-table [jobs]="jobs$ | async"></dp-jobs-table>
-    </div>
-  </div>
+  </dlm-progress-container>
 </div>

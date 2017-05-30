@@ -1,8 +1,4 @@
-$color_text_blue: rgb(102,164,200);
-$color_text_gray: rgb(103,115,120);
-$color_green: rgb(96,170,90);
-$color-border: rgb(208,211,215);
-$font_size_title: 22px;
+@import "../../../../../../styles/variables";
 
 .dsSummaryHolder {
   color: $color_text_gray;

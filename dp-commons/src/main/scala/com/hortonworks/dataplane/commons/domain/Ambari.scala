@@ -9,6 +9,10 @@ import play.api.libs.json.{JsValue, Json}
   */
 object Ambari {
 
+  case class AmbariCluster(security:String = "NONE",
+                          clusterName:String,
+                          services:Seq[String])
+
   case class AmbariEndpoint(url:String)
 
   case class DiskInfo(
@@ -104,5 +108,7 @@ object Ambari {
   implicit val configurationInfoWrites = Json.writes[ConfigurationInfo]
   implicit val serviceWithEndpointWrites = Json.writes[ClusterServiceWithConfigs]
   implicit val serviceWithEndpointReads = Json.reads[ClusterServiceWithConfigs]
+  implicit val ambariClusterReads = Json.reads[AmbariCluster]
+  implicit val ambariClusterWrites = Json.writes[AmbariCluster]
 
 }

@@ -19,7 +19,7 @@ export class ResourceChartsComponent {
   get charts(): DoughnutChartData[] {
     return Object.keys(this.resourceData).map(resourceName => {
       const data = this.resourceData[resourceName].data;
-      return {
+      return <DoughnutChartData>{
         ...this.resourceData[resourceName],
         title: this.t.instant(`page.overview.charts.${resourceName}`),
         total: sum(data)
@@ -27,5 +27,6 @@ export class ResourceChartsComponent {
     });
   }
 
-  constructor(private t: TranslateService) { }
+  constructor(private t: TranslateService) {
+  }
 }

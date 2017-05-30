@@ -56,13 +56,12 @@ export class DoCleanUpAndRedirectGuard implements CanActivate {
   ) {}
 
   canActivate() {
-      this.authenticationService.signOut()
+      return this.authenticationService.signOut()
        .then(()=>{ this.router.navigate(['sign-in', {
           cause: 'sign-out'
 
         }]);
         return true;
        });
-      return true;
-  }
+    }
 }

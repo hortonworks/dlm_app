@@ -3,15 +3,18 @@ package controllers
 import javax.inject.Inject
 
 import com.google.inject.name.Named
+
+import com.hortonworks.dataplane.commons.domain.Ambari.AmbariEndpoint
 import com.hortonworks.dataplane.commons.domain.Entities.Cluster
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webserice.ClusterService
+import com.hortonworks.dataplane.db.Webservice.ClusterService
 import internal.auth.Authenticated
 import models.JsonResponses
 import play.api.Logger
 import play.api.mvc._
 import play.api.libs.json.Json
 import services.ClusterHealthService
+import services.AmbariService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -19,7 +22,7 @@ import scala.concurrent.Future
 class Clusters @Inject()(
     @Named("clusterService")
     val clusterService: ClusterService, val clusterHealthService: ClusterHealthService,
-    authenticated:Authenticated
+    authenticated:Authenticated, ambariService: AmbariService
 
 ) extends Controller {
 
@@ -81,6 +84,19 @@ class Clusters @Inject()(
           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
           case Right(cluster) => Ok(Json.toJson(cluster))
         }
+      }
+  }
+
+
+  def getDetails = authenticated.async {request =>
+    Logger.info(s"Ambari URL => ${request.getQueryString("url").get}");
+    ambariService
+      .getClusterDetails(AmbariEndpoint(request.getQueryString("url").get))
+      .map {
+         clusterDetails =>  clusterDetails match {
+           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+           case Right(clusterDetails) => Ok(Json.toJson(clusterDetails))
+         }
       }
   }
 

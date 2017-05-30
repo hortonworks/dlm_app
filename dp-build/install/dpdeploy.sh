@@ -30,7 +30,7 @@ list_logs() {
 }
 
 migrate_schema() {
-    docker-compose -f docker-compose.yml -f docker-compose-migrate.yml up 
+    docker-compose -f docker-compose.yml -f docker-compose-migrate.yml run dp-migrate
 }
 
 destroy() {
@@ -43,6 +43,9 @@ destroy_knox() {
 }
 
 init_app() {
+    echo "Enter the Host IP Address (Consul will bind to this host):"
+    read HOST_IP;	
+    export CONSUL_HOST=$HOST_IP;
     docker-compose -f docker-compose-apps.yml up -d
 }
 
@@ -61,7 +64,9 @@ init_knox() {
         return 1
        fi
     fi
-	MASTER_PASSWORD=${MASTER_PASSWD} docker-compose -f docker-compose-knox.yml up -d
+    echo "Use pre-packaged LDAP instance (suitable only for testing) [yes/no]: "
+    read USE_TEST_LDAP
+	MASTER_PASSWORD=${MASTER_PASSWD} USE_TEST_LDAP=${USE_TEST_LDAP} docker-compose -f docker-compose-knox.yml up -d
     KNOX_CONTAINER_ID=$(get_knox_container_id)
     if [ -z ${KNOX_CONTAINER_ID} ]; then
         echo "Knox container not found. Ensure it is running..."
@@ -70,6 +75,10 @@ init_knox() {
     docker exec -it ${KNOX_CONTAINER_ID} ./wait_for_keystore_file.sh
     mkdir -p ${CERTS_DIR}
     export_knox_cert $MASTER_PASSWD $KNOX_CONTAINER_ID > ${CERTS_DIR}/knox-signing.pem
+    if [ ${USE_TEST_LDAP} == "no" ]
+    then
+        docker exec -it ${KNOX_CONTAINER_ID} ./setup_knox_sso_conf.sh
+    fi
 	echo "Knox Initialized"
 }
 

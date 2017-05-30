@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'dp-card',
+  selector: 'dlm-card',
   template: `
     <div class="dlm-card">
       <ng-content></ng-content>

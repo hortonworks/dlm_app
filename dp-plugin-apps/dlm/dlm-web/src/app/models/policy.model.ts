@@ -1,4 +1,6 @@
 import { RequestStatus } from './request-status.model';
+import { Cluster } from './cluster.model';
+import { Job } from './job.model';
 
 export interface Policy {
   id: string;
@@ -8,6 +10,11 @@ export interface Policy {
   status: string;
   sourceCluster: string;
   targetCluster: string;
+  sourceClusterResource?: Cluster;
+  targetClusterResource?: Cluster;
+  jobsResource?: Job[];
+  sourceDataset: string;
+  targetDataset: string;
   endTime: string;
   frequency: number;
   policyStatus: RequestStatus;
@@ -25,9 +32,9 @@ export interface PolicyDefinition {
   frequencyInSec: number;
   startTime?: string;
   endTime?: string;
-};
+}
 
 export interface PolicyPayload {
   policyDefinition: PolicyDefinition;
   submitType: string;
-};
+}

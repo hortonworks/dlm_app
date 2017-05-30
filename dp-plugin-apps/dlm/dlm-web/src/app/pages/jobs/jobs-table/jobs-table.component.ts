@@ -1,8 +1,7 @@
 import { Component, OnInit, Input, ViewChild, TemplateRef } from '@angular/core';
-import { Job } from '../../../models/job.model';
-import { ActionItemType, ActionColumnType } from '../../../components';
-import { IconColumnComponent } from '../../../components/table-columns/icon-column/icon-column.component';
-import { TableComponent } from '../../../common/table/table.component';
+import { Job } from 'models/job.model';
+import { ActionItemType, ActionColumnType } from 'components';
+import { TableComponent } from 'common/table/table.component';
 
 @Component({
   selector: 'dp-jobs-table',
@@ -19,9 +18,10 @@ export class JobsTableComponent implements OnInit {
   @ViewChild('transferredTemplate') transferredTemplate: TemplateRef<any>;
   @ViewChild('transferredFormattedTemplate') transferredFormattedTemplate: TemplateRef<any>;
   @ViewChild('serviceTemplate') serviceTemplate: TemplateRef<any>;
-  @ViewChild(IconColumnComponent) iconColumn: IconColumnComponent;
   @ViewChild('jobsTable') jobsTable: TableComponent;
   @Input() jobs: Job[];
+  @Input() showPageSizeMenu = true;
+  @Input() selectionType = 'any';
 
   // todo: labels and actions are subject to change
   rowActions = <ActionItemType[]>[
@@ -33,16 +33,6 @@ export class JobsTableComponent implements OnInit {
     this.columns = [
       {cellTemplate: this.statusCellTemplate, maxWidth: 25, minWidth: 25},
       {prop: 'status', cellClass: 'text-cell', headerClass: 'text-header'},
-      {prop: 'source', name: 'Source', cellClass: 'text-cell', headerClass: 'text-header'},
-      {cellTemplate: this.iconCellTemplate, maxWidth: 25, minWidth: 25},
-      {prop: 'target', name: 'Destination', cellClass: 'text-cell', headerClass: 'text-header'},
-      {
-        ...this.iconColumn.cellSettings, width: 90, minWidth: 90, maxWidth: 90, prop: 'service',
-        cellTemplate: this.iconColumn.cellRef, name: 'Service', cellClass: 'text-cell', headerClass: 'text-header',
-        sortable: true
-      },
-      {prop: 'path', cellClass: 'text-cell', headerClass: 'text-header'},
-      {prop: 'policy', cellClass: 'text-cell', headerClass: 'text-header', minWidth: 120},
       {
         prop: 'startTime',
         cellTemplate: this.agoTemplate,
@@ -58,9 +48,16 @@ export class JobsTableComponent implements OnInit {
         headerClass: 'date-header'
       },
       {
-        prop: 'runTime',
+        prop: 'duration',
         cellTemplate: this.runTimeTemplate,
         name: 'Runtime',
+        cellClass: 'date-cell',
+        headerClass: 'date-header'
+      },
+      {
+        prop: 'transferred',
+        cellTemplate: this.transferredFormattedTemplate,
+        name: 'Transferred',
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },

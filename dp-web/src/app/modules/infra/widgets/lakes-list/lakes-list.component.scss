@@ -1,0 +1,48 @@
+@import "../../../../../styles/variables";
+
+.dashboard-title{
+    padding: 30px;
+}
+.dp-input {
+    position: relative;
+    display: inline-block;
+    margin-right: 10px;
+    width: 412px;
+    box-sizing: border-box;
+}
+
+input {
+    width: 100%;
+    padding-left: 30px;
+    box-sizing: border-box;
+}
+
+.btn-hwx-primary {
+    float: right;
+}
+
+.dp-input__icon {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  color: $shuttle-gray;
+}
+
+.mdl-data-table {
+    margin-top: 20px;
+}
+
+.mdl-typography--text-center {
+  text-align: center;
+}
+
+.fa__fa-ellipsis--h-icon {
+  font-size: 14px;
+}
+
+.mdl-button--icon{
+  font-size: 14px;
+  height: 14px;
+  width: 14px;
+  min-width: 14px;
+}

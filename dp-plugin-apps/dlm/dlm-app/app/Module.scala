@@ -3,12 +3,14 @@ import java.time.Clock
 import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.hortonworks.dataplane.db._
-import com.hortonworks.dataplane.db.Webserice._
+import com.hortonworks.dataplane.db.Webservice._
 import play.api.Configuration
 import play.api.libs.ws.WSClient
 
 import com.hortonworks.dlm.beacon.{BeaconClusterServiceImpl, BeaconPairServiceImpl, BeaconPolicyServiceImpl, BeaconPolicyInstanceServiceImpl, BeaconEventServiceImpl}
 import com.hortonworks.dlm.beacon.WebService.{BeaconClusterService, BeaconPairService, BeaconPolicyService, BeaconPolicyInstanceService, BeaconEventService}
+import com.hortonworks.dlm.webhdfs.WebService.FileService
+import com.hortonworks.dlm.webhdfs.FileServiceImpl
 
 
 /**
@@ -89,6 +91,13 @@ class Module extends AbstractModule {
   @Named("beaconEventService")
   def provideBeaconEventService(implicit ws: WSClient,configuration: Configuration):BeaconEventService = {
     new BeaconEventServiceImpl()
+  }
+
+  @Provides
+  @Singleton
+  @Named("fileService")
+  def provideFileService(implicit ws: WSClient,configuration: Configuration):FileService = {
+    new FileServiceImpl()
   }
 
 }

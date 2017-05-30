@@ -1,16 +1,9 @@
-<section style="padding: 40px">
-  <header style=" display: flex; align-items: center">
-    <h4 style="flex-grow: 1" class="mdl-color-text--grey-600">DATALAKES</h4>
-    <a [routerLink]="['/onboard/lakes']" class="mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect">
-      Add Datalake
-    </a>
-  </header>
-  <div>
-    <p class="mdl-color-text--grey-600">
-      A data lake is a data management platform comprising one or more clusters used principally to process and store non-relational data such as log files , Internet clickstream records, sensor data, JSON objects, images and social media posts. 
-    </p>
-    <div>
-      <dp-lake-stats *ngFor="let cLake of lakes" [lake]="cLake.data" [clusters]="cLake.clusters"></dp-lake-stats>
-    </div>
-  </div>
+<section>
+  <div class="breadcrumb-container"> <span>{{"common.dashboard" | translate}}</span> </div>
+  <dp-map [mapSize]="mapSize" [mapData]="mapData"></dp-map>
 </section>
+<div class="page-container">
+  <section>
+    <dp-lakes-list [lakes]="lakes" [healths]="health"></dp-lakes-list>
+  </section>
+</div>

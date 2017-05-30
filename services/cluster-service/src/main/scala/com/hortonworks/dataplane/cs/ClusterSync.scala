@@ -1,5 +1,6 @@
 package com.hortonworks.dataplane.cs
 
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.{Inject, Singleton}
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, PoisonPill, Props}
@@ -30,7 +31,8 @@ class ClusterSync @Inject()(val actorSystem: ActorSystem,
                             val wSClient: WSClient) {
 
   import scala.concurrent.duration._
-
+  // Not really used for thread safety
+  val initialized:AtomicBoolean = new AtomicBoolean(false)
   lazy val actorSupplier: ActorRef = {
     actorSystem.actorOf(
       Props(classOf[Synchronizer], clusterInterface, wSClient, config),
@@ -48,10 +50,15 @@ class ClusterSync @Inject()(val actorSystem: ActorSystem,
     val interval =
       Try(config.getInt("dp.services.cluster.sync.interval.mins"))
         .getOrElse(5)
-    actorSystem.scheduler.schedule(start seconds,
-                                   interval minutes,
-                                   actorSupplier,
-                                   Poll())
+    if(!initialized.get()) {
+      actorSystem.scheduler.schedule(start seconds,
+        interval minutes,
+        actorSupplier,
+        Poll())
+      initialized.compareAndSet(false,true)
+    }
+
+
   }
 
   /**

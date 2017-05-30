@@ -10,19 +10,51 @@ export const initialState: State = {
 
 export function reducer(state = initialState, action): State {
   switch (action.type) {
-    case fromPolicy.ActionTypes.LOAD_POLICIES_SUCCESS: {
-      const policies = action.payload.policies;
-      const policyEntities = policies.reduce((entities: { [id: string]: Policy}, entity: Policy) => {
-        return Object.assign({}, entities, {
-          [entity.id]: entity
-        });
-      }, {});
-      return {
-        entities: Object.assign({}, state.entities, policyEntities)
-      };
-    }
-    default: {
+    case fromPolicy.ActionTypes.LOAD_POLICIES.SUCCESS:
+      return loadPoliciesSuccess(state, action);
+
+    case fromPolicy.ActionTypes.DELETE_POLICY.SUCCESS:
+      return deletePolicySuccess(state, action);
+
+    case fromPolicy.ActionTypes.SUSPEND_POLICY.SUCCESS:
+      return suspendPolicySuccess(state, action);
+
+    case fromPolicy.ActionTypes.RESUME_POLICY.SUCCESS:
+      return resumePolicySuccess(state, action);
+
+    default:
       return state;
-    }
   }
+}
+
+function loadPoliciesSuccess(state: State, action): State {
+  const policies = action.payload.response.policies;
+  const policyEntities = policies.reduce((entities: { [id: string]: Policy }, entity: Policy) => {
+    return Object.assign({}, entities, {
+      [entity.id]: entity
+    });
+  }, {});
+  return {
+    entities: Object.assign({}, state.entities, policyEntities)
+  };
+}
+
+function deletePolicySuccess(state: State, action): State {
+  const {[action.payload]: removedEntity, ...entities} = state.entities;
+  return Object.assign({}, state, {entities});
+}
+
+function suspendPolicySuccess(state: State, action): State {
+  return updateEntityField(state, action, 'status', 'SUSPENDED');
+}
+
+function resumePolicySuccess(state: State, action): State {
+  return updateEntityField(state, action, 'status', 'RUNNING');
+}
+
+function updateEntityField(state: State, action, fieldName: string, newValue): State {
+  const id = action.payload;
+  const updatedEntity = {...state.entities[id], [fieldName]: newValue};
+  const newEntities = Object.assign({}, state.entities, {[id]: updatedEntity});
+  return Object.assign({}, state, {entities: newEntities});
 }

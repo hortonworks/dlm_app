@@ -7,23 +7,28 @@
   </div>
   <div class="ds-description-head">
     <div class="title">{{dsModel.name || "Untitled"}}</div>
-    <p class="description">{{dsModel.description || "Dataset description."}}</p>
+    <p class="description">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum</p>
   </div>
   <div class="ds-editor-cont">
     <div class="nav-panel" [attr.stage]="currentStage">
-      <div class="nav-stage stage_1" [class.done]="1 < currentStage"><div class="circle">1</div><i class="fa fa-check-circle"></i><span>Information</span><div class="triangle"></div></div>
-      <div class="nav-stage stage_2" [class.done]="2 < currentStage"><div class="circle">2</div><i class="fa fa-check-circle"></i><span>Assets</span><div class="triangle"></div></div>
-      <div class="nav-stage stage_3" [class.done]="3 < currentStage"><div class="circle">3</div><i class="fa fa-check-circle"></i><span>Summary</span><div class="triangle"></div></div>
+      <div class="nav-stage stage_1" [class.done]="1 < currentStage" (click)="moveToStage(1)"><div class="circle">1</div><i class="fa fa-check-circle"></i><span>Information</span><div class="triangle"></div></div>
+      <div class="nav-stage stage_2" [class.done]="2 < currentStage" (click)="moveToStage(2)"><div class="circle">2</div><i class="fa fa-check-circle"></i><span>Assets</span><div class="triangle"></div></div>
+      <div class="nav-stage stage_3" [class.done]="3 < currentStage" (click)="moveToStage(3)"><div class="circle">3</div><i class="fa fa-check-circle"></i><span>Summary</span><div class="triangle"></div></div>
       <div style="clear:both;"></div>
     </div>
     <div class="nav-result-panel">
       <ds-info-holder  *ngIf="currentStage == 1" [dsModel]="dsModel" [tags]="tags"></ds-info-holder>
-      <ds-assets-holder  *ngIf="currentStage == 2" [dsModel]="dsModel" (onDoneAction)="actionNext()"></ds-assets-holder>
+      <ds-assets-holder  *ngIf="currentStage == 2"
+                         [dsModel]="dsModel"
+                         [assetSetQueryModelsForAddition]="assetSetQueryModelsForAddition"
+                         (onDoneAction)="setVisibilityOfNext()"
+      ></ds-assets-holder>
       <ds-summary-holder  *ngIf="currentStage == 3" [dsModel]="dsModel"  [tags]="tags"></ds-summary-holder>
       <div class="navButtons">
-        <button *ngIf="nextIsVisible" class="mdl-button btn-hwx-primary" (click)="actionNext()">Next</button>
-        <button *ngIf="currentStage == 3" class="mdl-button btn-hwx-primary" (click)="actionSave()">Save</button>
-        <button *ngIf="currentStage == 3" class="mdl-button btn-hwx-secondary" (click)="actionCancel()">Cancel</button>
+        <br/>
+        <div *ngIf="nextIsVisible" class="mdl-button btn-hwx-primary" (click)="actionNext()">Next</div>
+        <div *ngIf="currentStage == 3" class="mdl-button btn-hwx-primary" (click)="actionSave()">Save</div>
+        <div *ngIf="nextIsVisible || currentStage == 3" class="mdl-button btn-hwx-secondary" (click)="actionCancel()">Cancel</div>
       </div>
     </div>
     <div style="clear:both;"></div>

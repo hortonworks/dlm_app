@@ -5,7 +5,7 @@ import javax.inject.{Inject, Singleton}
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, Datalake, Error, Errors, Location}
 import com.hortonworks.dataplane.commons.domain.Ambari.{ClusterServiceWithConfigs, ConfigurationInfo, NameNodeInfo}
-import com.hortonworks.dataplane.db.Webserice.{ClusterComponentService, ClusterService, LakeService, LocationService}
+import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterService, LakeService, LocationService}
 import models.Entities.{ClusterStats, BeaconCluster, BeaconClusters, ClusterServiceEndpointDetails}
 import play.api.Logger
 
@@ -136,7 +136,7 @@ class DataplaneService @Inject()(
 
   /**
     * Get beacon server endpoint
-    * @param endpointData [[ClusterServiceWithConfigs]] service host and properties details
+    * @param endpointData service host and properties details
     * @return
     */
   def getBeaconEndpointDetails(endpointData: ClusterServiceWithConfigs) : Either[Errors, ClusterServiceEndpointDetails] = {
@@ -151,7 +151,12 @@ class DataplaneService @Inject()(
     }
   }
 
-  def getNameNodeEndpointDetails(endpointData: ClusterServiceWithConfigs) : Either[Errors, ClusterServiceEndpointDetails] = {
+  /**
+    * Get namenode node endpoint details for rpc connection
+    * @param endpointData configuration blob for namenode
+    * @return
+    */
+  def getNameNodeRpcEndpointDetails(endpointData: ClusterServiceWithConfigs) : Either[Errors, ClusterServiceEndpointDetails] = {
     val fullurl : Either[Errors, String] = getPropertyValue(endpointData, "core-site", "fs.defaultFS")
     fullurl match {
       case Right(fullurl) => {
@@ -162,6 +167,29 @@ class DataplaneService @Inject()(
     }
   }
 
+  /**
+    * Get namenode node endpoint details for http connection
+    * @param endpointData configuration blob for namenode
+    * @return
+    */
+  def getNameNodeHttpEndpointDetails(endpointData: ClusterServiceWithConfigs) : Either[Errors, ClusterServiceEndpointDetails] = {
+    val endpoint : Either[Errors, String] = getPropertyValue(endpointData, "hdfs-site", "dfs.namenode.http-address")
+    endpoint match {
+      case Right(endpoint) => {
+        val namenodeHostName = endpointData.servicehost
+        val namenodePort :Int = new java.net.URI(s"http://$endpoint").getPort
+        val fullurl = s"http://$namenodeHostName:$namenodePort"
+        Right(ClusterServiceEndpointDetails(endpointData.serviceid, endpointData.servicename, endpointData.clusterid, namenodeHostName, fullurl))
+      }
+      case Left(errors) => Left(errors)
+    }
+  }
+
+  /**
+    * Get hive server2 endpoint details for http thrift connection
+    * @param endpointData  configuration blob for hive server2
+    * @return
+    */
   def getHiveServerEndpointDetails(endpointData: ClusterServiceWithConfigs) : Either[Errors, ClusterServiceEndpointDetails] = {
     val hiveServerPort : Either[Errors, String] = getPropertyValue(endpointData, "hive-site", "hive.server2.thrift.port")
     hiveServerPort match {
@@ -175,7 +203,13 @@ class DataplaneService @Inject()(
   }
 
 
-
+  /**
+    *
+    * @param endpointData  configuration blob
+    * @param configType    config type
+    * @param configName    config property name
+    * @return
+    */
   def getPropertyValue(endpointData: ClusterServiceWithConfigs, configType: String, configName: String) : Either[Errors, String] = {
     val serviceName = endpointData.servicename
     val configProperties : Option[ConfigurationInfo] = endpointData.configProperties
@@ -234,8 +268,18 @@ class DataplaneService @Inject()(
     * @return
     */
   def getNameNodeService(clusterId: Long): Future[Either[Errors, ClusterServiceEndpointDetails]] = {
-    getServiceEndpointDetails(clusterId, DataplaneService.NAMENODE, getNameNodeEndpointDetails)
+    getServiceEndpointDetails(clusterId, DataplaneService.NAMENODE, getNameNodeRpcEndpointDetails)
   }
+
+  /**
+    * Get future for namenode details from dataplane db client
+    * @param clusterId cluster id
+    * @return
+    */
+  def getNameNodeHttpService(clusterId: Long): Future[Either[Errors, ClusterServiceEndpointDetails]] = {
+    getServiceEndpointDetails(clusterId, DataplaneService.NAMENODE, getNameNodeHttpEndpointDetails)
+  }
+
 
   /**
     *  Get future for Hive Server details from dataplane
@@ -248,7 +292,7 @@ class DataplaneService @Inject()(
 
 
   /**
-    *  Get future for service details from dataplane
+    * Get future for service details from dataplane
     * @param clusterId cluster id
     * @return
     */

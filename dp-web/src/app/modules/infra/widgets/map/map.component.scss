@@ -1,0 +1,17 @@
+@import "../../../../../styles/variables";
+
+.leaflet-container{
+    background: $spindle-blue;
+}
+
+.map-container {
+    outline: none;
+    margin: 0 auto;
+}
+
+:host /deep/ .leaflet-control {
+    a {
+        color: $white;
+        text-decoration: none;
+    }
+}

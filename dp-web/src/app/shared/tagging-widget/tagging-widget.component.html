@@ -1,15 +1,15 @@
 <div class="taggingWidget"  (keydown)="onKeyDown($event)" #parent>
       <span *ngFor="let tag of tags;let i=index;" tabindex="0" (click)="focusOnSticker(i)"  class="tagSticker" [class.focus]="i==focusStickerIndex">
-        {{tag}}
+        {{tag.display || tag}}
         <span  *ngIf="allowTagDismissal">&nbsp;&nbsp;<i class="fa fa-times" (click)="focusOnSticker(i);removeFocusTag();"></i></span>
       </span>
   <span class="inputSpan">
-        <input #input (focus)="onInputFocus()" (blur)="onInputBlur()" [ngModel]="searchText" (ngModelChange)="onSearchTextChange($event)"/>
+        <input #input (focus)="onInputFocus()" (blur)="onInputBlur()" [(ngModel)]="searchText" (ngModelChange)="onSearchTextChange($event)" placeholder="{{placeHolderText}}"/>
         <div class="dropDown" [style.left.px]="input.offsetLeft">
           <div *ngFor="let tag of availableTags;let i=index;"
                [class.focus]="i==focusRowIndex"
                (click)="focusRowIndex = i; _manageSelection();"
-               class="row"  >{{tag}}</div>
+               class="row"  >{{tag.display || tag}}</div>
         </div>
       </span>
 </div>

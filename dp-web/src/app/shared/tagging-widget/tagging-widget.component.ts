@@ -9,6 +9,11 @@ export var TaggingWidgetInjection = {
 
 }
 
+export class TaggingWidgetTagModel {
+  constructor(public display: string, public data?: any) {}
+}
+
+
 @Component({
   selector: 'tagging-widget',
   templateUrl:'./tagging-widget.component.html',
@@ -16,28 +21,25 @@ export var TaggingWidgetInjection = {
 
 })
 export class TaggingWidget {
-  @Input() tags:string[];
-  @Input() availableTags:string[] = [];
+  @Input() tags:(string|TaggingWidgetTagModel)[];
+  @Input() availableTags:(string|TaggingWidgetTagModel)[] = [];
   @Input() allowTagDismissal:boolean = true;
   @Input() clearOnSearch:boolean = false;
+  @Input() searchText:string="";
+  @Input() placeHolderText:string="";
 
   @Output('textChange') searchTextEmitter: EventEmitter<string> = new EventEmitter<string>();
-  @Output('onNewSearch') newTagEmitter: EventEmitter<string> = new EventEmitter<string>();
+  @Output('onNewSearch') newTagEmitter: EventEmitter<string|TaggingWidgetTagModel> = new EventEmitter<string|TaggingWidgetTagModel>();
+  @Output('onTagDelete') deleteTagEmitter: EventEmitter<string|TaggingWidgetTagModel> = new EventEmitter<string|TaggingWidgetTagModel>();
 
   @ViewChild('parent') parent:ElementRef;
 
-  public searchText:string="";
-
-
   private focusStickerIndex:number = -1;//this.tags.length;
   public focusRowIndex:number = -1;
-  onSearchTextChange (newValue) {
-    this.searchText = newValue;
-    this.searchTextEmitter.emit(this.searchText);
-  }
+  onSearchTextChange (newValue) {this.searchText=newValue;this.searchTextEmitter.emit(this.searchText);}
+  emitSearchText(){this.newTagEmitter.emit(this.searchText);}
   onKeyDown(event){
     if([13,38,40].indexOf(event.keyCode) == -1 && this.focusStickerIndex==this.tags.length && event.target.selectionStart) return;
-    // console.log(event.key, event.keyCode, event.target.selectionStart);
     switch(event.keyCode) {
       case 8  :
       case 46 :  if (this.allowTagDismissal && this.focusStickerIndex < this.tags.length) this.removeFocusTag();
@@ -74,15 +76,15 @@ export class TaggingWidget {
       this.parent.nativeElement.querySelector('span.inputSpan input').focus();
   }
   removeFocusTag () {
-    this.tags.splice(this.focusStickerIndex,1);
-    (function(thisObj){setTimeout(function(){thisObj._SetCursorAtEnd()}, 0)})(this);
+    this.deleteTagEmitter.emit(this.tags.splice(this.focusStickerIndex,1)[0]);
+    ((thisObj)=>setTimeout(()=>thisObj._SetCursorAtEnd(), 0))(this);
   }
   onInputFocus(){
     this.focusStickerIndex=this.tags.length;
     this.parent.nativeElement.classList.add('focus')
   }
   onInputBlur(){
-    (function(thisObj){setTimeout(function(){thisObj.parent.nativeElement.classList.remove('focus')}, 300)})(this);
+    ((thisObj)=>setTimeout(()=>thisObj.parent.nativeElement.classList.remove('focus'), 300))(this);
     // this.parent.nativeElement.classList.remove('focus')
   }
   focusOnSticker(i) {

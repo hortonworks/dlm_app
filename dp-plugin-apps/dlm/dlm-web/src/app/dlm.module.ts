@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpModule } from '@angular/http';
-import { CollapseModule, TabsModule, ModalModule, TypeaheadModule, TimepickerModule } from 'ng2-bootstrap';
+import { CollapseModule, TabsModule, ModalModule, TypeaheadModule, TimepickerModule, TooltipModule } from 'ng2-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { StoreModule } from '@ngrx/store';
@@ -47,6 +47,7 @@ import { NotificationsComponent } from './common/notifications/notifications.com
 import { NotificationsPageComponent } from './pages/notifications/notifications.component';
 import { NotificationsTableComponent } from './pages/notifications/notifications-table/notifications-table.component';
 import { ModalDialogComponent } from './common/modal-dialog/modal-dialog.component';
+import { ModalDialogBodyComponent } from './common/modal-dialog/modal-dialog-body.component';
 import { httpServiceProvider } from './services/http.service';
 import { CommonComponentsModule } from './components/common-components.module';
 import { UserDropdownComponent } from './common/user-dropdown/user-dropdown.component';
@@ -72,9 +73,11 @@ import { FlowStatusComponent } from './pages/policies/policy-table/flow-status/f
 import { PolicyInfoComponent } from './pages/policies/policy-table/policy-info/policy-info.component';
 import { CreatePolicyComponent } from './pages/policies/subpages/create-policy/create-policy.component';
 import { PolicyFormComponent } from './pages/policies/components/policy-form/policy-form.component';
+import { PolicyServiceFilterComponent } from './pages/policies/components/policy-service-filter/policy-service-filter.component';
 import { RadioButtonComponent } from './common/radio-button/radio-button.component';
 import { CheckboxComponent } from './common/checkbox/checkbox.component';
 import { CheckboxListComponent } from './common/checkbox-list/checkbox-list.component';
+import { PolicyDetailsComponent } from './pages/policies/policy-details/policy-details.component';
 
 import { PairingCardComponent } from './pages/pairings/components/pairing-card/pairing-card.component';
 import { PairingCardListComponent } from './pages/pairings/components/pairing-card-list/pairing-card-list.component';
@@ -94,6 +97,7 @@ import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/rev
 
 import { BytesSizePipe } from './pipes/bytes-size.pipe';
 import { FmtTzPipe } from './pipes/fmt-tz.pipe';
+import { FrequencyPipe } from './pipes/frequency.pipe';
 
 @NgModule({
   imports: [
@@ -115,6 +119,7 @@ import { FmtTzPipe } from './pipes/fmt-tz.pipe';
     ModalModule.forRoot(),
     TypeaheadModule.forRoot(),
     TimepickerModule.forRoot(),
+    TooltipModule.forRoot(),
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
@@ -146,6 +151,8 @@ import { FmtTzPipe } from './pipes/fmt-tz.pipe';
     CreatePolicyComponent,
     PolicyFormComponent,
     ReviewPolicyComponent,
+    PolicyDetailsComponent,
+    PolicyServiceFilterComponent,
 
     ResourceChartsComponent,
     IssuesListComponent,
@@ -176,9 +183,11 @@ import { FmtTzPipe } from './pipes/fmt-tz.pipe';
     CheckboxColumnComponent,
     ActionColumnComponent,
     ModalDialogComponent,
+    ModalDialogBodyComponent,
     NotificationsComponent,
     BytesSizePipe,
-    FmtTzPipe
+    FmtTzPipe,
+    FrequencyPipe
   ],
   bootstrap: [DlmComponent],
   providers: [

@@ -1,11 +1,10 @@
 package com.hortonworks.dlm.beacon.domain
 
-import java.lang.reflect.Field
 import play.api.libs.json.Json
 
 object ResponseEntities {
   case class BeaconApiError(message: String, status: String = "FAILED", requestId: Option[String] = None)
-  case class BeaconApiErrors(code: Int, beaconUrl: Option[String], error: Option[BeaconApiError] = None)
+  case class BeaconApiErrors(code: Int, beaconUrl: Option[String], error: Option[BeaconApiError] = None, message: Option[String] = None)
 
   case class PairedCluster(name:String, dataCenter:Option[String], peers: Seq[String])
 
@@ -28,8 +27,9 @@ object ResponseEntities {
                                 customProperties: Map[String, String], retry: Retry, acl: Option[AclObject],
                                 user: String, notification: Notification, entityType: String)
 
-  case class PoliciesDetailResponse(name: String, `type`: String, status: String, frequencyInSec: Long,
-                                    sourceclusters: Seq[String], targetclusters: Seq[String], startTime: Option[String], endTime: String)
+  case class PoliciesDetailResponse(name: String, `type`: String, status: String, sourceDataset: String,
+                                    targetDataset: String, frequencyInSec: Long, sourceCluster: String,
+                                    targetCluster: String, startTime: Option[String], endTime: String)
 
   case class PolicyStatusResponse(status: String, message: String, requestId: String)
 
@@ -39,7 +39,7 @@ object ResponseEntities {
                                     user: String, status: String, startTime: String, endTime: Option[String],
                                     trackingInfo: String, message: String)
 
-  case class BeaconEventResponse(policyId: String, instanceId: String, event: String, timestamp: String, eventStatus: String, message: String)
+  case class BeaconEventResponse(policyId: Option[String], instanceId: Option[String], eventType: String, severity: String, timestamp: String, message: String)
 }
 
 object RequestEntities {

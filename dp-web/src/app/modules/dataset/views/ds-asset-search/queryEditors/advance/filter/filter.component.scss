@@ -1,0 +1,31 @@
+.queryFilter{
+  float: left;
+  margin-right: 5px;
+  margin-bottom:4px;
+}
+
+select {
+  font-size: 1em;
+  height: 33px;
+  padding: 0 8px;
+  border: 1px solid rgb(221, 221, 221);
+  border-radius: 5px;
+  outline: none;
+}
+
+input, textarea {
+  font-size: 1em;
+
+  height: 32px;
+  min-width: 150px;
+
+  padding: 0 8px;
+
+  border: 1px solid rgb(221, 221, 221);
+  border-radius: 5px;
+}
+
+input, select {
+  margin-right: 5px;
+}
+.mdl-button{min-width:0px;}

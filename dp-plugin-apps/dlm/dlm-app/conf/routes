@@ -27,3 +27,7 @@ PUT     /api/clusters/:clusterId/policy/:name/jobs/abort      controllers.Policy
 
 #Events
 GET     /api/events                                           controllers.Events.list
+
+
+#HdfsFiles
+GET     /api/clusters/:clusterId/webhdfs/file                 controllers.HdfsFiles.retrieve(clusterId: Long)

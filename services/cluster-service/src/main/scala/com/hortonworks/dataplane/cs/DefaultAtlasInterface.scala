@@ -3,26 +3,16 @@ package com.hortonworks.dataplane.cs
 import java.net.URL
 
 import com.google.common.base.Supplier
-import com.hortonworks.dataplane.commons.domain.Atlas.{
-  AtlasAttribute,
-  AtlasEntities,
-  AtlasFilters,
-  Entity
-}
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  ClusterServiceHost,
-  ClusterService => CS
-}
+import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasFilters, Entity}
+import com.hortonworks.dataplane.commons.domain.Entities.{ClusterServiceHost, ClusterService => CS}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
 import com.hortonworks.dataplane.cs.atlas.Filters
-import com.hortonworks.dataplane.db.Webserice.{
-  ClusterComponentService,
-  ClusterHostsService
-}
+import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService}
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import org.apache.atlas.AtlasClientV2
 import org.apache.atlas.model.instance.AtlasEntityHeader
+import org.apache.atlas.model.lineage.AtlasLineageInfo.LineageDirection
 import org.codehaus.jackson.map.ObjectMapper
 import play.api.libs.json.{JsObject, JsValue, Json}
 
@@ -107,10 +97,12 @@ class DefaultAtlasInterface(clusterId: Long,
 
   }
 
+  private val mapper = new ObjectMapper()
+
   override def getAtlasEntity(uuid: String): Future[JsValue] = {
     atlasApi.map { api =>
       val entityWithExtInfo = api.getEntityByGuid(uuid)
-      val jsonString = new ObjectMapper().writeValueAsString(entityWithExtInfo)
+      val jsonString = mapper.writeValueAsString(entityWithExtInfo)
       Json.parse(jsonString)
     }
   }
@@ -118,8 +110,20 @@ class DefaultAtlasInterface(clusterId: Long,
   override def getAtlasEntities(uuids: Iterable[String]): Future[JsValue] = {
     atlasApi.map { api =>
       val entityWithExtInfo = api.getEntitiesByGuids(uuids.toList.asJava)
-      val jsonString = new ObjectMapper().writeValueAsString(entityWithExtInfo)
+      val jsonString = mapper.writeValueAsString(entityWithExtInfo)
       Json.parse(jsonString)
+    }
+  }
+
+  override def getAtlasLineage(uuid:String,depth:Option[String]):Future[JsValue] =  {
+    for {
+      api <- atlasApi
+      depth <- Future.successful(depth.map(i => i.toInt).getOrElse(3))
+      lineageInfo <- Future {
+        api.getLineageInfo(uuid,LineageDirection.BOTH,depth)
+      }
+    } yield {
+      Json.parse(mapper.writeValueAsString(lineageInfo))
     }
   }
 }

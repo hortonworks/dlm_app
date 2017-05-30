@@ -1,4 +1,4 @@
-<div class="borderBox">
+<div class="borderBox infoHolder">
   <div class="dp-input">
     <label for="name" style="display: block;">Name</label>
     <input class="" type="text" placeholder="Name" name="name" id="name" [(ngModel)]="dsModel.name" required/>
@@ -10,6 +10,14 @@
   </div>
   <br/><br/>
 
+  <div class="dp-input">
+    <label style="display: block;">Datalake</label>
+    <select [(ngModel)]="dsModel.datalakeId" (change)="onLakeSelectionChange()">
+      <option value="0">Select Datalake</option>
+      <option *ngFor="let lake of lakes" value="{{lake.id}}">{{lake.name}}</option>
+    </select>
+  </div>
+  <br/><br/>
 
 
 

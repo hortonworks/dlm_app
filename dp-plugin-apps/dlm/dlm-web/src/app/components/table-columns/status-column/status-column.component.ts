@@ -22,9 +22,9 @@ export class StatusColumnComponent implements TableColumn {
   };
   // todo: move statuses to constant enum? when all possible values will be known
   statusClassMap = {
-    RUNNING: 'status-running',
-    SUBMITTED: 'status-submitted',
-    FAILED: 'status-failed'
+    RUNNING: 'status status-running',
+    SUBMITTED: 'status status-submitted',
+    FAILED: 'status status-failed'
   };
 
   getStatusClassNames(status: string) {

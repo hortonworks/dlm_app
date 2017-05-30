@@ -15,7 +15,7 @@ import { TableColumn } from 'common/table/table-column.type';
         </div>
         <div class="flow-status-text">
           <div class="flow-current-state">Active</div>
-          <div class="flow-desired-state">Unavailable</div>
+          <div class="flow-desired-state">Standby</div>
         </div>
       </div>
     </ng-template>

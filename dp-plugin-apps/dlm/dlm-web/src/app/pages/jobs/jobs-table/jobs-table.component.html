@@ -1,7 +1,9 @@
 <dlm-table
   #jobsTable
+  [showPageSizeMenu]="showPageSizeMenu"
   [columns]="columns"
   [rows]="jobs"
+  [selectionType]="selectionType"
   (selectAction)="handleSelectedAction($event)"
   selectionType="checkbox">
 </dlm-table>
@@ -10,10 +12,6 @@
 
 <ng-template #statusCellTemplate let-row="row">
   <dlm-job-status [job]="row"></dlm-job-status>
-</ng-template>
-
-<ng-template #iconCellTemplate>
-  <span class="fa fa-arrow-right" aria-hidden="true"></span>
 </ng-template>
 
 <ng-template #agoTemplate let-value="value">
@@ -26,25 +24,10 @@
 </ng-template>
 
 <ng-template #runTimeTemplate let-value="value" let-row="row">
-  <span *ngIf="row.runTime > 0">{{value | amDateFormat: 'hh:mm:ss'}}</span>
-  <span *ngIf="row.runTime <= 0">Running</span>
-</ng-template>
-
-<ng-template #transferredTemplate let-value="value" let-row="row">
-  <div *ngIf="!row.isCompleted" class="progress">
-    <div
-      class="progress-bar progress-bar-info progress-bar-striped active"
-      aria-valuemin="0"
-      aria-valuemax="100"
-      [style.width]="row.progress + '%'">
-      {{row.progress}}%
-    </div>
-  </div>
-  <div *ngIf="row.isCompleted" class="graph-wrapper">
-    <job-transferred-graph [job]="row"></job-transferred-graph>
-  </div>
+  <span *ngIf="row.duration > 0">{{value | amDateFormat: 'hh:mm:ss'}}</span>
+  <span *ngIf="row.duration <= 0">Running</span>
 </ng-template>
 
 <ng-template #transferredFormattedTemplate let-value="value">
-  {{value | bytesSize}}
+  <span [innerHTML]="value | bytesSize"></span>
 </ng-template>
