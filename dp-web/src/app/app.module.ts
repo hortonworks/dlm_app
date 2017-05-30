@@ -29,6 +29,7 @@ import {DataSetService} from "./services/dataset.service";
 import {DatasetTagService} from "./services/tag.service";
 import {HeaderModule} from './widgets/header/header.module';
 import {CollapsibleNavModule} from './shared/collapsible-nav/collapsible-nav.modue';
+import {SidebarComponent} from './widgets/sidebar/sidebar.component';
 
 export function HttpLoaderFactory(http: Http) {
   return new TranslateHttpLoader(http);
@@ -55,6 +56,7 @@ export function HttpLoaderFactory(http: Http) {
 
     NotFoundRouteComponent,
     SignInComponent,
+    SidebarComponent,
 
     MdlDirective
   ],
