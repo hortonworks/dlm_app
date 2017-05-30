@@ -7,7 +7,7 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari.AmbariEndpoint
 import com.hortonworks.dataplane.commons.domain.Entities.Cluster
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webserice.ClusterService
+import com.hortonworks.dataplane.db.Webservice.ClusterService
 import internal.auth.Authenticated
 import models.JsonResponses
 import play.api.Logger

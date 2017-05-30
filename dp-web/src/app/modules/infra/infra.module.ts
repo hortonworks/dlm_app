@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
+import {TranslateModule} from '@ngx-translate/core';
+
 import { NguiAutoCompleteModule } from '@ngui/auto-complete';
 
 import { routes } from './infra.routes';
@@ -22,7 +24,8 @@ import {CollapsibleNavModule} from '../../shared/collapsible-nav/collapsible-nav
     FormsModule,
     NguiAutoCompleteModule,
     TaggingWidgetModule,
-    CollapsibleNavModule
+    CollapsibleNavModule,
+    TranslateModule
   ],
 
   declarations: [

@@ -1,8 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { HttpModule, Http } from '@angular/http';
 import { RouterModule } from '@angular/router';
+import {TranslateModule, TranslateLoader} from '@ngx-translate/core';
+import {TranslateHttpLoader} from '@ngx-translate/http-loader';
+
 
 import { routes } from './app.routes';
 
@@ -27,6 +30,10 @@ import {DatasetTagService} from "./services/tag.service";
 import {HeaderModule} from './widgets/header/header.module';
 import {CollapsibleNavModule} from './shared/collapsible-nav/collapsible-nav.modue';
 
+export function HttpLoaderFactory(http: Http) {
+  return new TranslateHttpLoader(http);
+}
+
 @NgModule({
   imports: [
     BrowserModule,
@@ -34,7 +41,14 @@ import {CollapsibleNavModule} from './shared/collapsible-nav/collapsible-nav.mod
     HttpModule,
     HeaderModule,
     CollapsibleNavModule,
-    RouterModule.forRoot(routes)
+    RouterModule.forRoot(routes),
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [Http]
+      }
+    })
   ],
   declarations: [
     AppComponent,

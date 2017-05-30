@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpModule } from '@angular/http';
-import { CollapseModule, TabsModule, ModalModule, TypeaheadModule, TimepickerModule } from 'ng2-bootstrap';
+import { CollapseModule, TabsModule, ModalModule, TypeaheadModule, TimepickerModule, TooltipModule } from 'ng2-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { StoreModule } from '@ngrx/store';
@@ -73,6 +73,7 @@ import { FlowStatusComponent } from './pages/policies/policy-table/flow-status/f
 import { PolicyInfoComponent } from './pages/policies/policy-table/policy-info/policy-info.component';
 import { CreatePolicyComponent } from './pages/policies/subpages/create-policy/create-policy.component';
 import { PolicyFormComponent } from './pages/policies/components/policy-form/policy-form.component';
+import { PolicyServiceFilterComponent } from './pages/policies/components/policy-service-filter/policy-service-filter.component';
 import { RadioButtonComponent } from './common/radio-button/radio-button.component';
 import { CheckboxComponent } from './common/checkbox/checkbox.component';
 import { CheckboxListComponent } from './common/checkbox-list/checkbox-list.component';
@@ -118,6 +119,7 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
     ModalModule.forRoot(),
     TypeaheadModule.forRoot(),
     TimepickerModule.forRoot(),
+    TooltipModule.forRoot(),
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
@@ -150,6 +152,7 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
     PolicyFormComponent,
     ReviewPolicyComponent,
     PolicyDetailsComponent,
+    PolicyServiceFilterComponent,
 
     ResourceChartsComponent,
     IssuesListComponent,

@@ -20,6 +20,7 @@
     "pair": "Pair",
     "pairs": "Pairs",
     "policy": "Policy",
+    "service": "Service",
     "time": {
       "hourly": "Hourly",
       "daily": "Daily",
@@ -67,7 +68,8 @@
     }
   },
   "topnav": {
-    "timezone": "Current Timezone"
+    "timezone": "Current Timezone",
+    "disaster_recovery": "Disaster Recovery"
   },
   "sidenav": {
     "menuItem": {
@@ -210,7 +212,8 @@
             "step_one": "STEP 1: SELECT FIRST CLUSTER",
             "step_two": "STEP 2: SELECT CLUSTER TO BE PAIRED",
             "in_progress": "IN PROGRESS"
-          }
+          },
+          "cluster_disabled": "Cluster is already paired with the selected cluster"
         },
         "confirmation": {
           "title": "Pairing Successful",
