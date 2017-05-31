@@ -25,6 +25,22 @@ class AssetWorkspaceRepo @Inject()(protected val dbConfigProvider: DatabaseConfi
     }
   }
 
+  def insertAll(assetWorkspace: Seq[AssetWorkspace]): Future[Seq[AssetWorkspace]] = {
+    db.run {
+      AssetWorkspaces ++= assetWorkspace
+      AssetWorkspaces.filter(_.workspaceId === assetWorkspace.head.workspaceId).to[List].result
+    }
+  }
+
+  def updateAll(assetWorkspace: Seq[AssetWorkspace]): Future[Seq[AssetWorkspace]] = {
+    val query = (for {
+      _ <- AssetWorkspaces.filter(_.workspaceId === assetWorkspace.head.workspaceId).delete
+      assets <- AssetWorkspaces.filter(_.workspaceId === assetWorkspace.head.workspaceId).to[List].result
+    } yield assets).transactionally
+
+    db.run(query)
+  }
+
   def deleteById(assetWorkspaceId: Long): Future[Int] = {
     val AssetWorkspace = db.run(AssetWorkspaces.filter(_.workspaceId === assetWorkspaceId).delete)
     AssetWorkspace
@@ -32,12 +48,14 @@ class AssetWorkspaceRepo @Inject()(protected val dbConfigProvider: DatabaseConfi
 
 
   final class AssetWorkspacesTable(tag: Tag) extends Table[AssetWorkspace](tag, Some("dataplane"), "dp_categories") {
-    
+
     def assetType = column[String]("assetType")
+
     def assetId = column[Long]("assetid")
+
     def workspaceId = column[Long]("workspaceid")
 
-    def * = (assetType,assetId, workspaceId) <> ((AssetWorkspace.apply _).tupled, AssetWorkspace.unapply)
+    def * = (assetType, assetId, workspaceId) <> ((AssetWorkspace.apply _).tupled, AssetWorkspace.unapply)
   }
 
 }

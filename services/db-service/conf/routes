@@ -4,8 +4,8 @@
 
 #Users API
 
-GET            /Status                                                       controllers.Status.status
-GET            /health                                                  controllers.Status.health
+GET           /Status                                                        controllers.Status.status
+GET           /health                                                        controllers.Status.health
 
 GET           /users                                                         controllers.Users.all(username: Option[String])
 POST          /users                                                         controllers.Users.insert
@@ -69,6 +69,7 @@ POST          /workspaces                                                    con
 GET           /workspaces/:workspaceId                                       controllers.Workspaces.load(workspaceId:Long)
 DELETE        /workspaces/:workspaceId                                       controllers.Workspaces.delete(workspaceId:Long)
 
+GET           /workspaces/users/:userId                                      controllers.Workspaces.loadByUser(userId:Long)
 
 #Asset workspace API
 #Get assets for workspace
@@ -130,7 +131,7 @@ DELETE        /unclassifieddatasets/:datasetId                               con
 
 #UnclassifiedDatasetCategory Api
 GET           /unclassifieddatasets/:datasetId/categories                    controllers.UnclassifiedDatasetCategories.allWithDatasetId(datasetId:Long)
-GET           /unclassifieddatasets/categories/:categoryId/datasets                               controllers.UnclassifiedDatasetCategories.allWithCategoryId(categoryId:Long)
+GET           /unclassifieddatasets/categories/:categoryId/datasets          controllers.UnclassifiedDatasetCategories.allWithCategoryId(categoryId:Long)
 POST          /unclassifieddatasets/categories                               controllers.UnclassifiedDatasetCategories.add
 DELETE        /unclassifieddatasets/:datasetId/categories/:categoryId        controllers.UnclassifiedDatasetCategories.delete(datasetId:Long, categoryId:Long)
 

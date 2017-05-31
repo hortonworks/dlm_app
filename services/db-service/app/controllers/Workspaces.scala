@@ -3,7 +3,8 @@ package controllers
 import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Entities.Workspace
-import domain.{CategoryRepo, WorkspaceRepo}
+import domain.WorkspaceRepo
+import play.api.libs.json.Json
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,6 +39,12 @@ class Workspaces @Inject()(wr: WorkspaceRepo)(implicit exec: ExecutionContext)
         success(u)
       }
         .getOrElse(NotFound)
+    }.recoverWith(apiError)
+  }
+
+  def loadByUser(userId:Long) = Action.async {
+    wr.findByUserId(userId).map { uo =>
+        success(Json.toJson(uo))
     }.recoverWith(apiError)
   }
 
