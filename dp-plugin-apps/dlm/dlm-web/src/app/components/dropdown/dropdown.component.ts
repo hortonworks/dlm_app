@@ -30,7 +30,9 @@ export class DropdownComponent implements OnInit {
     if (this.selectable) {
       this.text = item.label;
     }
-    this.onSelectItem.emit(item);
+    if (!item.disabled) {
+      this.onSelectItem.emit(item);
+    }
   }
 
 }

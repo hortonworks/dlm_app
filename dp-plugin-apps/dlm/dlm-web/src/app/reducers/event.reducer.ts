@@ -39,4 +39,3 @@ function loadNewEventsCountSuccess(state = initialState, action): State {
     newEventsCount: count
   };
 }
-

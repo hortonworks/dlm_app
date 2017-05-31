@@ -7,11 +7,15 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.db.Webservice.UserService
 import internal.{Jwt, KnoxSso}
+import org.apache.commons.codec.binary.Base64
 import play.api.{Configuration, Logger}
 import play.api.http.Status
+import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import com.hortonworks.dataplane.commons.domain.Entities._
+import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import scala.concurrent.Future
 
 class Authenticated @Inject()(@Named("userService") userService: UserService,
@@ -21,17 +25,21 @@ class Authenticated @Inject()(@Named("userService") userService: UserService,
 
   private val ssoLoginValidCookieName = "sso_login_valid"
 
-  val gatewayTokenKey = "gateway-token"
+  val gatewayTokenKey = "X-DP-User-Info"
 
   def invokeBlock[A](request: Request[A],
                      block: (AuthenticatedRequest[A]) => Future[Result]) = {
 
     if (request.headers.get(gatewayTokenKey).isDefined){
-      val userOpt:Option[User] =Jwt.parseJWT(request.headers.get(gatewayTokenKey).get);
-      if (userOpt.isDefined){
-        block(AuthenticatedRequest[A](userOpt.get, request))
-      }else{
-        Future.successful(Results.Status(Status.UNAUTHORIZED))
+      val encodedGatewayToken:String=request.headers.get(gatewayTokenKey).get
+      val userJsonString:String=new String(Base64.decodeBase64(encodedGatewayToken))
+      Json.parse(userJsonString).validate[User] match {
+        case JsSuccess(user, _) => block(AuthenticatedRequest[A](user, request))
+        case JsError(error) =>  {
+          Logger.error("eror while parsing Gateway token.")
+          //TODO could this be a system error.
+          Future.successful(Results.Status(Status.UNAUTHORIZED))
+        }
       }
     }else{
       if (knoxSso.isSsoConfigured() && request.cookies
@@ -104,7 +112,7 @@ class Authenticated @Inject()(@Named("userService") userService: UserService,
       case Left(errors) => {
         if (errors.errors.nonEmpty && errors.errors.head.code.equals("404")) {
           Logger.info(
-            s"User with name[$userName] not found in dataplane db. users authroized from external system" +
+            s"User with name[$userName] not found in dataplane db. users authorized from external system" +
               s" need to be synced to db.")
         }
         Logger.error(s"Error while retrieving user $errors")

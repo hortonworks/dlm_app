@@ -13,6 +13,7 @@ import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import feign.FeignException;
 import io.jsonwebtoken.JwtException;
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ public class TokenCheckFilter extends ZuulFilter {
 
   @Autowired
   private Utils utils;
+
+  @Autowired
+  private Jwt jwt;
 
   private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -74,6 +78,7 @@ public class TokenCheckFilter extends ZuulFilter {
     } else {
       Optional<String> bearerToken = utils.getBearerToken();
       if (bearerToken.isPresent()) {
+        utils.deleteAuthorizationHeaderToUpstream();
         return authorizeThroughBearerToken(bearerToken);
       } else if (knoxSso.isSsoConfigured()) {
         return authorizeThroughSso();
@@ -82,6 +87,7 @@ public class TokenCheckFilter extends ZuulFilter {
       }
     }
   }
+
 
   private Object doLogout() {
     //TODO call knox gateway to invalidate token in knox gateway server.
@@ -150,7 +156,9 @@ public class TokenCheckFilter extends ZuulFilter {
   private void setUpstreamUserContext(User user) {
     RequestContext ctx = RequestContext.getCurrentContext();
     try {
-      ctx.addZuulRequestHeader(GATEWAY_TOKEN, Jwt.makeJWT(user));
+      user.setPassword("");
+      String userJson = objectMapper.writeValueAsString(user);
+      ctx.addZuulRequestHeader(DP_USER_INFO_HEADER_KEY,Base64.encodeBase64String( userJson.getBytes()));
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
@@ -162,7 +170,7 @@ public class TokenCheckFilter extends ZuulFilter {
 
   private Object authorizeThroughBearerToken(Optional<String> bearerToken) {
     try {
-      Optional<User> userOptional = Jwt.parseJWT(bearerToken.get());
+      Optional<User> userOptional = jwt.parseJWT(bearerToken.get());
       if (!userOptional.isPresent()) {
         return utils.sendForbidden("User is not present in system");
       } else {

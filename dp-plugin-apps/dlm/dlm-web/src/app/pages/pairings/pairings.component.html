@@ -1,19 +1,18 @@
-<div class="page-header">
-  <div class="pull-left">
-    <p>
-      <i class="glyphicon glyphicon-resize-horizontal"></i>
-      <span class="h2">{{ "page.pairings.header" | translate }}</span>
-    </p>
-    <div>
-      <span class="text-muted">{{ "page.pairings.header_note" | translate }}</span>
+<div class="row">
+  <div class="col-md-8">
+    <dlm-page-header
+      [title]="'page.pairings.header'"
+      description="page.pairings.header_note"
+      contextMessage="Create Pairings">
+    </dlm-page-header>
+  </div>
+  <div class="col-md-4">
+    <div class="pull-right page-section">
+      <button type="button" class="btn btn-primary" (click)="createPairingClickHandler()">{{ "page.pairings.create_button_text" | translate }}</button>
     </div>
   </div>
-  <div class="pull-right">
-    <button type="button" class="btn btn-primary" (click)="createPairingClickHandler()">{{ "page.pairings.create_button_text" | translate }}</button>
-  </div>
-  <div class="clearfix"></div>
 </div>
-<div class="content">
+<div class="content page-section">
   <div class="row">
     <div class="col-md-8 col-sm-11 col-lg-6">
       <div class="header-container">
