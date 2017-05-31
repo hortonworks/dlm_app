@@ -25,15 +25,15 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 @Service
 public class SimpleSignInFilter extends ZuulFilter {
 
-  public static final String AUTH_ENTRY_POINT = "/api/app/auth/in";
+  private static final String AUTH_ENTRY_POINT = Constants.DPAPP_BASE_PATH+"/auth/in";
 
   @Autowired
-  UserServiceInterface userServiceInterface;
+  private UserServiceInterface userServiceInterface;
 
   @Autowired
   private Jwt jwt;
 
-  ObjectMapper objectMapper = new ObjectMapper();
+  private ObjectMapper objectMapper = new ObjectMapper();
 
   @Override
   public String filterType() {
