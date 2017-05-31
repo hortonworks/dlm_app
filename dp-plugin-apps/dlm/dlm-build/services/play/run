@@ -1,0 +1,3 @@
+#!/bin/sh
+exec 2>&1
+rm -f /usr/dlm-app/RUNNING_PID && cd /usr/dlm-app/bin && exec ./dlm-app -DDLM_APP_HOME=${DLM_APP_HOME} -Dconfig.resource=../conf/docker.conf -Dplay.crypto.secret="129921029812"

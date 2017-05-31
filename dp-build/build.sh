@@ -101,19 +101,6 @@ build_dp_web() {
 	popd
 }
 
-build_dlm_web() {
-	log "Building dlm-web"
-	pushd ../dp-plugin-apps/dlm/dlm-web
-	if [ ${IS_JENKINS} == false ]; then
-		yarn
-		npm run build
-	else
-		echo "Not running dlm-web build again"
-	fi
-	cp -R ./dist/* ../../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-app/dlm-web
-	popd
-}
-
 build_dp_knox() {
 	log "Building dp-knox"
 	cp -R knox-scripts ${DP_DOCKER_ROOT_FOLDER}/dp-knox/
@@ -187,7 +174,6 @@ build_dp_configurator
 build_db_service
 build_dp_app
 build_dp_web
-build_dlm_web
 build_dp_knox
 build_cluster_service
 build_installer

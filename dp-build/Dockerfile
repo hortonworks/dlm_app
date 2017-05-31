@@ -12,7 +12,6 @@ RUN unzip /tmp/consul-template.zip -d /usr/bin && \
 
 COPY ./dp-app /usr/dp-app
 COPY ./dp-web /usr/dp-web
-COPY ./dlm-web /usr/dlm-web
 COPY ./services /etc/sv
 COPY nginx.ctmpl /etc/ctmpl
 
