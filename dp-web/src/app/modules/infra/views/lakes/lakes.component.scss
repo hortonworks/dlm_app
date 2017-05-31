@@ -1,9 +1,5 @@
-.dashboard-title{
-    height:45px;
-    background-color: #F9F9F9;
-    span {
-        color : #53646A;
-        padding: 15px 0px 15px 20px;
-        display: inline-block;
-    }
+@import "../../../../../styles/variables";
+
+.map-wrapper {
+  background: $spindle-blue;
 }
