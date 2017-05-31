@@ -97,6 +97,7 @@ import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/rev
 import { BytesSizePipe } from './pipes/bytes-size.pipe';
 import { FmtTzPipe } from './pipes/fmt-tz.pipe';
 import { FrequencyPipe } from './pipes/frequency.pipe';
+import { TruncatePipe } from './pipes/truncate.pipe';
 
 @NgModule({
   imports: [
@@ -185,7 +186,8 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
     NotificationsComponent,
     BytesSizePipe,
     FmtTzPipe,
-    FrequencyPipe
+    FrequencyPipe,
+    TruncatePipe
   ],
   bootstrap: [DlmComponent],
   providers: [
