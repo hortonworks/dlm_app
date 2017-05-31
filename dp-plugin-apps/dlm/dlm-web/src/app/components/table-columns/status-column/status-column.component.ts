@@ -1,4 +1,5 @@
 import { Component, ViewChild, TemplateRef } from '@angular/core';
+import { RUNNING, SUBMITTED, FAILED, SUCCESS } from 'constants/status.constant';
 
 import { TableColumn } from 'common/table/table-column.type';
 
@@ -22,9 +23,10 @@ export class StatusColumnComponent implements TableColumn {
   };
   // todo: move statuses to constant enum? when all possible values will be known
   statusClassMap = {
-    RUNNING: 'status status-running',
-    SUBMITTED: 'status status-submitted',
-    FAILED: 'status status-failed'
+    [RUNNING]: 'status status-running',
+    [SUBMITTED]: 'status status-submitted',
+    [FAILED]: 'status status-failed',
+    [SUCCESS]: 'status status-success'
   };
 
   getStatusClassNames(status: string) {

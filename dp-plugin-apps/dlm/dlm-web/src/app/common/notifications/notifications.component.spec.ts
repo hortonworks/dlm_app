@@ -9,6 +9,7 @@ import {FmtTzPipe} from 'pipes/fmt-tz.pipe';
 import {MockTranslateLoader} from '../../mocks/mock-translate-loader';
 import {RouterTestingModule} from '@angular/router/testing';
 import {NavbarService} from 'services/navbar.service';
+import { CommonComponentsModule } from 'components/common-components.module';
 
 describe('NotificationsComponent', () => {
   let component: NotificationsComponent;
@@ -21,7 +22,8 @@ describe('NotificationsComponent', () => {
       }),
         ReactiveFormsModule,
         RouterTestingModule,
-        MomentModule
+        MomentModule,
+        CommonComponentsModule
       ],
       declarations: [
         NotificationsComponent,
@@ -45,4 +47,3 @@ describe('NotificationsComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-

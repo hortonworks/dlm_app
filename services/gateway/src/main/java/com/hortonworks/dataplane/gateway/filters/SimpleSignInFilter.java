@@ -30,6 +30,9 @@ public class SimpleSignInFilter extends ZuulFilter {
   @Autowired
   UserServiceInterface userServiceInterface;
 
+  @Autowired
+  private Jwt jwt;
+
   ObjectMapper objectMapper = new ObjectMapper();
 
   @Override
@@ -70,7 +73,7 @@ public class SimpleSignInFilter extends ZuulFilter {
       if (passwordCheck(ctx, checkpw)) return null;
 
       // Construct a JWT token
-      String token = Jwt.makeJWT(toSignIn);
+      String token = jwt.makeJWT(toSignIn);
       UserRef userRef = getUserRef(credential, toSignIn, token);
 
       ctx.setResponseStatusCode(200);

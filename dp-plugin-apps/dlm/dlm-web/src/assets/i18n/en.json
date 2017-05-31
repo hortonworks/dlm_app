@@ -18,8 +18,11 @@
     "none": "None",
     "policies": "Policies",
     "pair": "Pair",
+    "pairing": "Pairing",
     "pairs": "Pairs",
     "policy": "Policy",
+    "clusters": "Clusters",
+    "cluster": "Cluster",
     "service": "Service",
     "time": {
       "hourly": "Hourly",
@@ -69,7 +72,10 @@
   },
   "topnav": {
     "timezone": "Current Timezone",
-    "disaster_recovery": "Disaster Recovery"
+    "disaster_recovery": "Disaster Recovery",
+    "notifications": {
+      "empty_list": "No notifications to show"
+    }
   },
   "sidenav": {
     "menuItem": {
@@ -108,12 +114,25 @@
         "recent": "Recent Issues",
         "list": {
           "view_all": "view all",
+          "empty_list": "No issues to show",
           "status": {
             "in_progress": "is in progress",
             "failed": "failed",
             "warning": "completed with warnings",
             "success": "completed"
           }
+        }
+      },
+      "table": {
+        "column": {
+          "source_cluster": "Source Cluster",
+          "destination_cluster": "Destination Cluster"
+        },
+        "actions": {
+          "abort_job": "Abort Job",
+          "delete_policy": "Delete Policy",
+          "suspend_policy": "Suspend Policy",
+          "activate_policy": "Activate Policy"
         }
       }
     },

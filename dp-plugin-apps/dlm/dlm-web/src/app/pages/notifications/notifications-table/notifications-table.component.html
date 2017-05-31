@@ -4,6 +4,11 @@
   [rows]="events">
 </dlm-table>
 
+<ng-template let-event="row" #statusTemplate>
+  <dlm-event-status [event]="event"></dlm-event-status>
+  <span>{{event.eventStatus}}</span>
+</ng-template>
+
 <ng-template #agoTemplate let-value="value">
   <span>{{value | fmtTz | amTimeAgo}}</span>
 </ng-template>

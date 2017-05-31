@@ -5,4 +5,5 @@ export interface Event {
   timestamp: string;
   eventStatus: string;
   message: string;
+  severity: string;
 }

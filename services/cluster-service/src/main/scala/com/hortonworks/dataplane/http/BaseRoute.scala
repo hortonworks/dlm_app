@@ -12,6 +12,6 @@ trait BaseRoute {
 
   def errors(e: Throwable) = Json.obj("error" -> Json.obj("message" -> e.getMessage, "trace" -> ExceptionUtils.getStackTrace(e)))
 
-  def notFound = Json.obj("error" -> Json.obj("message" -> "No cluster found", "trace" -> ""))
+  def notFound = Json.obj("error" -> Json.obj("message" -> "Not found", "trace" -> ""))
 
 }
