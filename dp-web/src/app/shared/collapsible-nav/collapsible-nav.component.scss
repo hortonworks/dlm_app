@@ -1,0 +1,46 @@
+@import "../../../styles/variables";
+@import "../../../styles/side-nav";
+
+.sidenav {
+  width: $side-nav-width;
+  top: $layout-header-desktop-row-height;
+}
+
+.sidenav-item {
+  i {
+    margin-right: 8px;
+  }
+}
+
+.collpased {
+  .sidenav-item {
+    padding:15px;
+    &.active:before {
+      margin-left: -15px;
+      margin-top: 5px;
+    }
+
+    i {
+      font-size: 24px;
+      margin-right: 8px;
+    }
+  }
+  .sidenav-item-name {
+    display: none;
+  }
+}
+
+.expander {
+  width: 100%;
+  background: $pickled-bluewood;
+  height: 42px;
+  line-height: 42px;
+  text-align: center;
+  color: $forest-green-1;
+  font-size: 16px;
+  cursor: pointer;
+  position: absolute;
+  left: 0;
+  bottom: $layout-header-desktop-row-height;
+}
+

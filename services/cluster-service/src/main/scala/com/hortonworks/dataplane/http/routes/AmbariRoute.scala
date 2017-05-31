@@ -3,7 +3,7 @@ package com.hortonworks.dataplane.http.routes
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{as, entity, path, post, _}
 import com.google.inject.Inject
-import com.hortonworks.dataplane.cs.Errors.ClusterNotFound
+import com.hortonworks.dataplane.cs.ClusterErrors.ClusterNotFound
 import com.hortonworks.dataplane.cs.{
   AmbariDatalakeInterface,
   AmbariDatalakeInterfaceImpl,

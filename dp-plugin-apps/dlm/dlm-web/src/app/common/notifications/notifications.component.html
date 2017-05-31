@@ -8,9 +8,9 @@
     <div class="notifications-header col-sm-12">
       <div class="notifications-title">Notifications</div>
     </div>
-    <div class="notifications-body col-sm-12">
+    <div class="notifications-body col-sm-12" *ngIf="events?.length; else noEventsTemplate">
       <table class="alerts-table table table-hover">
-        <tbody>
+        <tbody *ngIf="events?.length; else noEventsTemplate">
           <tr *ngFor="let event of events | slice:0:5">
             <td *ngIf="event.state !== ''" class="status">
               <dlm-event-status [event]="event"></dlm-event-status>
@@ -24,7 +24,14 @@
         </tbody>
       </table>
     </div>
-    <div class="notifications-footer col-sm-12">
+    <ng-template #noEventsTemplate>
+      <div class="col-md-12">
+        <span class="text-muted">
+          {{'topnav.notifications.empty_list' | translate}}
+        </span>
+      </div>
+    </ng-template>
+    <div class="notifications-footer col-sm-12" *ngIf="events?.length">
       <button type="button" class="btn btn-primary pull-right" (click)="viewAllClickHandler()">View All</button>
     </div>
   </div>

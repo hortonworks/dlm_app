@@ -1,5 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Router, NavigationStart } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
 import { IdentityService } from './services/identity.service';
@@ -8,6 +7,10 @@ import { MdlService } from './services/mdl.service';
 import { User } from './models/user';
 import {HeaderData, Persona, PersonaTabs} from './models/header-data';
 
+export enum ViewPaneState {
+  DEFAULT, MAXIMISE, MINIMISE
+}
+
 @Component({
   selector: 'data-plane',
   templateUrl: './app.component.html',
@@ -15,11 +18,13 @@ import {HeaderData, Persona, PersonaTabs} from './models/header-data';
 })
 export class AppComponent implements OnInit {
 
-  @ViewChild('layout') layout: ElementRef;
+  marginLeft = 0;
+  persona: Persona;
+  viewPaneStates = ViewPaneState;
+  viewPaneState = ViewPaneState.DEFAULT;
   headerData: HeaderData = new HeaderData();
 
   constructor(
-    private router: Router,
     private mdlService: MdlService,
     private identityService: IdentityService,
     private translateService: TranslateService
@@ -39,9 +44,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.setHeaderData();
-    this.router.events
-      .filter(event => event instanceof NavigationStart)
-      .subscribe(() => this.mdlService.closeDrawer(this.layout));
   }
 
   setHeaderData() {
@@ -54,9 +56,9 @@ export class AppComponent implements OnInit {
       ]),
       new Persona('Infra Admin', [
         new PersonaTabs('CLUSTERS', 'infra')
-      ]),
+      ], false),
       new Persona('DLM', [
-      ])
+      ], false)
     ];
   }
 }

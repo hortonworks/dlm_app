@@ -24,4 +24,8 @@
     top: 125%;
     right: -25px;
   }
+
+  table > tbody > tr:last-child {
+    border-bottom: none;
+  }
 }

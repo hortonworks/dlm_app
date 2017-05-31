@@ -10,6 +10,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.apache.commons.codec.binary.Base64;
 import io.jsonwebtoken.impl.crypto.MacProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +29,11 @@ public class Jwt {
 
   private ObjectMapper objectMapper = new ObjectMapper();
   private static SignatureAlgorithm sa = SignatureAlgorithm.HS256;
+  static String signingKey = "aPdSgVkYp3s6v9y$B&E)H@McQeThWmZq4t7w!z%C*F-JaNdRgUjXn2r5u8x/A?D(";
   private static String issuer = "data_plane";
   private static int MINUTE = 60 * 1000;
+  private static String encodedSecretKey = Base64.encodeBase64String(signingKey.getBytes());
+  private static String decoded = Base64.encodeBase64String(signingKey.getBytes());
 
   @Value("${jwt.validity.minutes}")
   private Long jwtValidity;
@@ -46,7 +50,7 @@ public class Jwt {
       .setIssuer(issuer)
       .setClaims(claims)
       .setExpiration(new Date(now.getTime() + jwtValidity *MINUTE))
-      .signWith(sa, signingkey);
+      .signWith(sa, encodedSecretKey);
 
     return builder.compact();
 
@@ -55,7 +59,7 @@ public class Jwt {
 
   public Optional<User> parseJWT(String jwt) throws IOException {
     Claims claims = Jwts.parser()
-      .setSigningKey(signingkey)
+      .setSigningKey(decoded)
       .parseClaimsJws(jwt).getBody();
 
     Date expiration = claims.getExpiration();

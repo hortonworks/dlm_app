@@ -7,6 +7,7 @@ import com.google.inject.{AbstractModule, Inject, Provides, Singleton}
 import com.hortonworks.datapalane.consul._
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.db.Webservice._
+import com.hortonworks.dataplane.cs._
 import internal.AtlasApiCache
 import internal.auth.Authenticated
 import play.api.{Configuration, Logger}
@@ -79,6 +80,14 @@ class Module extends AbstractModule {
   @Named("clusterService")
   def provideClusterService(implicit ws: WSClient,configuration: Configuration):ClusterService = {
     new ClusterServiceImpl(configuration.underlying)
+  }
+
+
+  @Provides
+  @Singleton
+  @Named("atlasService")
+  def provideAtlasService(implicit ws: WSClient,configuration: Configuration):com.hortonworks.dataplane.cs.Webservice.AtlasService = {
+    new AtlasServiceImpl(configuration.underlying)
   }
 
   @Provides
