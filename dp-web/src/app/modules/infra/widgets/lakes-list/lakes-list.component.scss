@@ -46,3 +46,26 @@ input {
   width: 14px;
   min-width: 14px;
 }
+
+.status-up {
+  color: $forest-green-1;
+}
+
+.status-down {
+  color: $roman-red;
+}
+
+.status-na {
+  color: $shuttle-gray;
+}
+
+.mdl-menu__item {
+  a{
+    color: $dove-gray;
+    text-decoration: none;
+    font-weight: normal;
+  }
+  .fa {
+    padding: 0 8px;
+  }
+}

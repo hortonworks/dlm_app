@@ -47,3 +47,7 @@ DELETE      /api/datasets/:datasetId               controllers.DataSets.delete(d
 PUT         /api/datasets                          controllers.DataSets.update()
 #GET         /api/datasets/:name                    controllers.DataSets.getByname(name,host,datacenter)
 
+# Atlas API Search
+POST        /api/query-assets                         controllers.QueryAssets.search(clusterId: String)
+
+GET         /api/query-attributes                     controllers.QueryAttributes.list(clusterId: String)

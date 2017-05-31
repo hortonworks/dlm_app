@@ -11,7 +11,7 @@ export interface SortEvent {
   selector: '[dp-config-table]'
 })
 
-export class DpTableDirective implements AfterViewInit {
+export class DpTableDirective {
 
   @Output() onSort = new EventEmitter<SortEvent>();
   @Input() data: any[] = [];
@@ -23,50 +23,6 @@ export class DpTableDirective implements AfterViewInit {
   onSortColumnChange = new EventEmitter<SortEvent>();
 
   constructor(private element: ElementRef) { }
-
-  private getParentTR(parent: any) {
-    while (true) {
-      if (parent == null) {
-        return;
-      }
-      if (parent.nodeName === 'TR') {
-        return parent;
-      }
-      parent = parent.parentNode;
-    }
-  }
-
-  mouseover($event) {
-    if ($event.target.nodeName === 'TH') {
-      return;
-    }
-
-    if (this.cellSelectable && $event.target.nodeName === 'A') {
-        $event.target.style.backgroundColor = this.highlightColor;
-        $event.target.style.border = this.border;
-
-    } else {
-        let parent = this.getParentTR($event.target);
-        parent.style.backgroundColor = this.rowhighlightColor;
-    }
-  }
-
-  mouseleave($event) {
-    if ($event.target.nodeName === 'TH') {
-      return;
-    }
-
-    $event.target.style.border = '';
-    $event.target.style.backgroundColor = '';
-
-    let parent = this.getParentTR($event.target);
-    parent.style.backgroundColor = '';
-  }
-
-  ngAfterViewInit() {
-    this.element.nativeElement.querySelector('tbody').addEventListener('mouseover', this.mouseover.bind(this));
-    this.element.nativeElement.querySelector('tbody').addEventListener('mouseout', this.mouseleave.bind(this));
-  }
 
 
   public setSort(sortEvent: SortEvent): void {

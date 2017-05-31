@@ -57,11 +57,10 @@ import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route
 import { ResourceChartsComponent } from './pages/overview/resource-charts/resource-charts.component';
 import { IssuesListComponent } from './pages/overview/issues-list/issues-list.component';
 import { IssuesListItemComponent } from './pages/overview/issues-list-item/issues-list-item.component';
+import { JobsOverviewTableComponent } from './pages/overview/jobs-overview-table/jobs-overview-table.component';
 
 import { ClustersComponent } from './pages/clusters/clusters.component';
-import { ClusterCardComponent } from './pages/clusters/cluster-card/cluster-card.component';
 import { ClusterListComponent } from './pages/clusters/cluster-list/cluster-list.component';
-import { ClusterSearchComponent } from './pages/clusters/cluster-search/cluster-search.component';
 
 import { JobsTableComponent } from './pages/jobs/jobs-table/jobs-table.component';
 import { JobStatusComponent } from './pages/jobs/job-status/job-status.component';
@@ -137,9 +136,7 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
     NotificationsPageComponent,
     NotificationsTableComponent,
     ClustersComponent,
-    ClusterCardComponent,
     ClusterListComponent,
-    ClusterSearchComponent,
     PairingsComponent,
     CreatePairingComponent,
     BreadcrumbComponent,
@@ -157,6 +154,7 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
     ResourceChartsComponent,
     IssuesListComponent,
     IssuesListItemComponent,
+    JobsOverviewTableComponent,
 
     JobsTableComponent,
     JobStatusComponent,

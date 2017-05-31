@@ -10,12 +10,20 @@ import { TableComponent } from 'common/table/table.component';
 export class NotificationsTableComponent implements OnInit {
   columns: any[];
   @ViewChild('agoTemplate') agoTemplate: TemplateRef<any>;
+  @ViewChild('statusTemplate') statusTemplate: TemplateRef<any>;
   @ViewChild('notificationsTable') notificationsTable: TableComponent;
   @Input() events: Event[];
 
   ngOnInit() {
     this.columns = [
-      {prop: 'eventStatus', name: 'Status', cellClass: 'text-cell', headerClass: 'text-header', maxWidth: 100},
+      {
+        prop: 'eventStatus',
+        name: 'Status',
+        cellClass: 'text-cell',
+        headerClass: 'text-header',
+        maxWidth: 100,
+        cellTemplate: this.statusTemplate
+      },
       {prop: 'message', name: 'Notification', cellClass: 'text-cell', headerClass: 'text-header'},
       {prop: 'instanceId', name: 'Instance Id', cellClass: 'text-cell', headerClass: 'text-header'},
       {

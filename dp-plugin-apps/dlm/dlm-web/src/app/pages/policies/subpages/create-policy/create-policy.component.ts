@@ -15,14 +15,14 @@ import { POLICY_FORM_ID } from '../../components/policy-form/policy-form.compone
 @Component({
   selector: 'dp-create-policy',
   template: `
-    <h2>
-      {{'page.policies.header_create' | translate}}
-    </h2>
-    <dlm-policy-form
-      [pairings]="pairings$ | async"
-      (formSubmit)="handleFormSubmit($event)"
-      >
-    </dlm-policy-form>
+    <dlm-page-header [title]="'page.policies.header_create'"></dlm-page-header>
+    <div class="page-section">
+      <dlm-policy-form
+        [pairings]="pairings$ | async"
+        (formSubmit)="handleFormSubmit($event)"
+        >
+      </dlm-policy-form>
+    </div>
   `,
   styleUrls: ['./create-policy.component.scss']
 })

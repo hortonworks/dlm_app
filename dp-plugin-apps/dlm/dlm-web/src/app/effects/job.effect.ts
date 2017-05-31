@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Effect, Actions, toPayload } from '@ngrx/effects';
 import { JobService } from 'services/job.service';
-import { loadJobsSuccess, loadJobsFail, ActionTypes as jobActions } from 'actions/job.action';
+import { loadJobsSuccess, loadJobsFail, abortJobSuccess, abortJobFailure, ActionTypes as jobActions } from 'actions/job.action';
+import { operationComplete, operationFail } from 'actions/operation.action';
 
 @Injectable()
 export class JobEffects {
@@ -35,6 +36,19 @@ export class JobEffects {
       return this.jobService.getJobsForPolicy(payload)
         .map(jobs => loadJobsSuccess(jobs, payload.meta))
         .catch(err => Observable.of(loadJobsFail(err, payload.meta)));
+    });
+
+  @Effect()
+  abortJob$: Observable<any> = this.actions$
+    .ofType(jobActions.ABORT_JOB.START)
+    .map(toPayload)
+    .switchMap(payload => {
+      return this.jobService.abortJob(payload.policy)
+        .mergeMap(result => [
+          abortJobSuccess(payload),
+          operationComplete(result)
+        ])
+        .catch(err => Observable.from([operationFail(err.json()), abortJobFailure(err)]));
     });
 
   constructor(private actions$: Actions, private jobService: JobService) {
