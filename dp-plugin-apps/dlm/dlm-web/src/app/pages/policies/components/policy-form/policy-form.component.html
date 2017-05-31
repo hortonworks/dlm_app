@@ -30,7 +30,7 @@
               </div>
             </div>
             <dlm-form-field [label]="'page.policies.form.fields.pairs' | translate">
-              <dlm-select-field formField formControlName="pair" [options]="pairs">
+              <dlm-select-field formField formControlName="pair" [options]="pairs" (onSelect)="handlePairChange($event)">
                 <ng-template selectFieldValue selectFieldOption let-value="value" let-label="label">
                   <div *ngIf="!value">{{label}}</div>
                   <div *ngIf="value" class="actionable">
@@ -41,12 +41,16 @@
                 </ng-template>
               </dlm-select-field>
             </dlm-form-field>
+            <dlm-form-field *ngIf="clustersFromPair.length > 0" [label]="'page.policies.form.fields.sourceCluster.self' | translate">
+              <dlm-select-field formField formControlName="sourceCluster" [options]="clustersFromPair" (onSelect)="handleSourceClusterChange($event)">
+              </dlm-select-field>
+            </dlm-form-field>
           </fieldset>
         </div>
       </div>
 
-      <div class="row" *ngIf="isHDFSPolicy()">
-        <div class="form-section col-md-6">
+      <div class="row" *ngIf="isHDFSPolicy() && sourceCluster">
+        <div class="form-section col-md-10">
           <div class="form-section-title">
             {{'page.policies.form.sections.directories' | translate}}
             <div class="pull-right">
@@ -59,15 +63,16 @@
           <div class="row" [collapse]="sectionCollapsedMap.directories">
             <div class="col-md-12">
               <dlm-form-field [label]="'page.policies.form.fields.directories' | translate">
-                <input type="text" formField class="form-control" formControlName="directories"/>
+                <input type="text" formField class="form-control" formControlName="directories" [(ngModel)]="selectedHdfsPath"/>
               </dlm-form-field>
+              <dlm-hdfs-browser [rootPath]="hdfsRootPath" [clusterId]="sourceCluster" (select)="handleHdfsPathChange($event)"></dlm-hdfs-browser>
             </div>
           </div>
         </div>
       </div>
 
       <div class="row" *ngIf="isHivePolicy()">
-        <div class="form-section col-md-6">
+        <div class="form-section col-md-10">
           <div class="form-section-title">
             {{'page.policies.form.sections.database' | translate}}
             <div class="pull-right">

@@ -61,7 +61,7 @@ describe('JobService', () => {
         connection.mockRespond(getMockResponse({jobs: [mockResponse]}));
         this.connections.push(connection);
       });
-      this.clusterIds = ['1', '2'];
+      this.clusterIds = [1, 2];
       this.result = this.jobService.getJobsForClusters(this.clusterIds);
     });
 
@@ -86,14 +86,14 @@ describe('JobService', () => {
 
   describe('#getJobsForPolicy', () => {
     beforeEach(() => {
-      this.policy = <Policy>{name: 'policyId1', targetClusterResource: {id: 'c1'}};
+      this.policy = <Policy>{name: 'policyId1', targetClusterResource: {id: 1}};
       this.jobService.getJobsForPolicy(this.policy);
     });
     it('should do GET request', () => {
       expect(this.lastConnection.request.method).toBe(RequestMethod.Get);
     });
     it('should use valid URL', () => {
-      expect(this.lastConnection.request.url).toContain('clusters/c1/policy/policyId1/jobs?numResults=1000');
+      expect(this.lastConnection.request.url).toContain('clusters/1/policy/policyId1/jobs?numResults=1000');
     });
   });
 

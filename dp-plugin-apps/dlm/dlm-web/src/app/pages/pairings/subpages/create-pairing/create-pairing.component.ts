@@ -145,15 +145,15 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
    * @returns {Pairing[]}
    */
   getClusterPairings(cluster: ClusterPairing): Pairing[] {
-    return this.pairings.filter( pairing => pairing.pair.filter(pair => pair.id === cluster.id).length );
+    return this.pairings.filter( pairing => pairing.pair.filter(pair => +pair.id === +cluster.id).length );
   }
 
   /**
    * Returns an array of paired cluster ids of the given cluster
    * @param cluster: ClusterPairing
-   * @returns {string[]}
+   * @returns {number[]}
    */
-  getClusterPairIds(cluster: ClusterPairing): string[] {
+  getClusterPairIds(cluster: ClusterPairing): number[] {
     const pairings = this.getClusterPairings(cluster);
     const pairs = pairings.map( pairing => pairing.pair );
     const flattened = [].concat.apply([], pairs);
