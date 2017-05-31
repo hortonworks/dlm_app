@@ -2,6 +2,7 @@ package com.hortonworks.dataplane.db
 
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.Ambari.ClusterServiceWithConfigs
+import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasFilters}
 import play.api.libs.json.{JsResult, Json}
 import play.api.libs.ws.WSResponse
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData}
@@ -99,7 +100,7 @@ object Webservice {
 
     def list(): Future[Either[Errors, Seq[Cluster]]]
     def getLinkedClusters(
-        datalakeId: Long): Future[Either[Errors, Seq[Cluster]]]
+                           datalakeId: Long): Future[Either[Errors, Seq[Cluster]]]
 
     def create(cluster: Cluster): Future[Either[Errors, Cluster]]
     def retrieve(clusterId: String): Future[Either[Errors, Cluster]]
