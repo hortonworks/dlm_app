@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ViewEncapsulation, TemplateRef, OnDestroy, HostBinding } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ViewEncapsulation, TemplateRef, OnDestroy } from '@angular/core';
 import { Policy } from 'models/policy.model';
 import { ActionItemType, ActionColumnType } from 'components';
 import { TableTheme } from 'common/table/table-theme.type';
@@ -19,6 +19,7 @@ import { getLastOperationResponse } from 'selectors/operation.selector';
 import { FlowStatusComponent } from './flow-status/flow-status.component';
 import { PolicyContent } from '../policy-details/policy-content.type';
 import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
   selector: 'dp-policy-table',
@@ -30,8 +31,8 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   columns: any[];
   tableTheme = TableTheme.Cards;
   jobs$: Observable<Job[]>;
-  filteredJobs: Job[] = [];
-  selectedPolicy: Policy;
+  filteredJobs$: Observable<Job[]>;
+  selectedPolicy$: BehaviorSubject<Policy> = new BehaviorSubject(<Policy>{});
   policyContent = PolicyContent;
 
   private selectedAction: ActionItemType;
@@ -41,7 +42,6 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   lastOperationResponse: OperationResponse = <OperationResponse>{};
   showOperationResponseModal = false;
   operationResponseSubscription: Subscription;
-  jobsSubscription: Subscription;
 
   activeContentType = 'jobs';
 
@@ -56,6 +56,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @ViewChild('scheduleCellTemplate') scheduleCellTemplateRef: TemplateRef<any>;
   @ViewChild('rowDetail') rowDetailRef: TemplateRef<any>;
   @ViewChild('iconCellTemplate') iconCellTemplate: TemplateRef<any>;
+  @ViewChild('pathCell') pathCellRef: TemplateRef<any>;
 
   @ViewChild(TableComponent) tableComponent: TableComponent;
 
@@ -69,10 +70,8 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
 
   constructor(private t: TranslateService, private store: Store<fromRoot.State>) {
     this.jobs$ = this.store.select(getAllJobs);
-    this.jobsSubscription = this.jobs$.subscribe(jobs => {
-      if (jobs && this.selectedPolicy) {
-        this.filteredJobs = jobs.filter(job => job.name === this.selectedPolicy.id);
-      }
+    this.filteredJobs$ = Observable.combineLatest(this.jobs$, this.selectedPolicy$).map(([jobs, selectedPolicy]) => {
+      return selectedPolicy ? jobs.filter(job => job.name === selectedPolicy.id) : [];
     });
   }
 
@@ -91,7 +90,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         sortable: false
       },
       {prop: 'targetCluster', name: this.t.instant('common.destination')},
-      {prop: 'lastJobResource.sourceDataset', name: this.t.instant('common.path')},
+      {prop: 'sourceDataset', name: this.t.instant('common.path'), cellTemplate: this.pathCellRef},
       {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs')},
       {prop: 'frequency', name: this.t.instant('common.schedule'), cellTemplate: this.scheduleCellTemplateRef},
       {prop: 'lastJobResource.duration', name: this.t.instant('common.duration'), cellTemplate: this.durationCellRef},
@@ -102,6 +101,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         cellTemplate: this.dataCellRef
       },
       <ActionColumnType>{
+        maxWidth: 55,
         name: 'Actions',
         actionable: true,
         actions: this.rowActions
@@ -126,7 +126,6 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     if (this.operationResponseSubscription) {
       this.operationResponseSubscription.unsubscribe();
     }
-    this.jobsSubscription.unsubscribe();
   }
 
   /**
@@ -171,7 +170,8 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
    * @param {PolicyContent} contentType
    */
   toggleRowDetail(policy, contentType) {
-    if (this.selectedPolicy && this.selectedPolicy.id === policy.id) {
+    const selectedPolicy = this.selectedPolicy$.getValue();
+    if (selectedPolicy && selectedPolicy.id === policy.id) {
       if (this.activeContentType === contentType) {
         this.tableComponent.toggleRowDetail(policy);
       } else {
@@ -182,7 +182,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       }
     } else {
       this.activeContentType = contentType;
-      this.selectedPolicy = policy;
+      this.selectedPolicy$.next(policy);
       this.store.dispatch(loadJobsForPolicy(policy));
       this.tableComponent.toggleRowDetail(policy);
     }
