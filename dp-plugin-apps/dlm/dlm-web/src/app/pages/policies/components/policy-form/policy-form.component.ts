@@ -225,7 +225,8 @@ export class PolicyFormComponent implements OnInit {
     if (dateFieldValue) {
       const dateWithTime = this.setTimeForDate(dateFieldValue, timeFieldValue);
       if (dateWithTime.getTime() < Date.now()) {
-        timeControl.setErrors({ lessThanCurrent: true });
+        // TODO: figure out if it depends on time zone
+        // timeControl.setErrors({ lessThanCurrent: true });
         return null;
       }
     }
