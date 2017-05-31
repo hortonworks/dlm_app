@@ -13,6 +13,9 @@ class AssetWorkspaceRepo @Inject()(protected val dbConfigProvider: DatabaseConfi
 
   import profile.api._
 
+  import scala.concurrent.ExecutionContext.Implicits.global
+
+
   val AssetWorkspaces = TableQuery[AssetWorkspacesTable]
 
   def all(): Future[List[AssetWorkspace]] = db.run {

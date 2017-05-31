@@ -97,6 +97,7 @@ COMMENT ON TABLE dataplane.dp_cluster_service_hosts  IS 'Service hosts for servi
 CREATE TABLE IF NOT EXISTS dataplane.dp_workspace (
   id          BIGSERIAL PRIMARY KEY,
   name        VARCHAR(255)                              NOT NULL,
+  source      BIGINT REFERENCES dataplane.dp_clusters(id) NOT NULL,
   description TEXT,
   createdby   BIGINT REFERENCES dataplane.dp_users (id) NOT NULL,
   created     TIMESTAMP DEFAULT now(),
@@ -107,6 +108,14 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_workspace (
 CREATE TABLE IF NOT EXISTS dataplane.dp_data_asset_workspace (
   assetType   VARCHAR(10)                                    NOT NULL,
   assetid     BIGINT                                         NOT NULL,
+  workspaceid BIGINT REFERENCES dataplane.dp_workspace (id)  NOT NULL
+);
+
+-- appType can be Notebook or App. If Apptype = Notebook, Notebook should exist in Zeppelin
+-- If appType = App || Job, Job content/App Content should be stored separately
+CREATE TABLE IF NOT EXISTS dataplane.dp_workspace_apps (
+  appType   VARCHAR(10)                                    NOT NULL,
+  appId     BIGINT                                         NOT NULL,
   workspaceid BIGINT REFERENCES dataplane.dp_workspace (id)  NOT NULL
 );
 

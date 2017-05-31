@@ -44,15 +44,17 @@ class WorkspaceRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProv
 
     def name = column[String]("name")
 
+    def source = column[Long]("source")
+
     def description = column[String]("description")
 
-    def createdBy = column[Long]("createdBy")
+    def createdBy = column[Long]("createdby")
 
     def created = column[Option[LocalDateTime]]("created")
 
     def updated = column[Option[LocalDateTime]]("updated")
 
-    def * = (id, name, description, createdBy, created, updated) <> ((Workspace.apply _).tupled, Workspace.unapply)
+    def * = (id, name, source, description, createdBy, created, updated) <> ((Workspace.apply _).tupled, Workspace.unapply)
   }
 
 }

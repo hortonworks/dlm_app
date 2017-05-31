@@ -107,6 +107,7 @@ object Entities {
   case class Workspace(
       id: Option[Long] = None,
       name: String,
+      source : Long,
       description: String,
       createdBy: Long,
       created: Option[LocalDateTime] = Some(LocalDateTime.now()),

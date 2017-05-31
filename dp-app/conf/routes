@@ -51,3 +51,8 @@ PUT         /api/datasets                          controllers.DataSets.update()
 POST        /api/query-assets                         controllers.QueryAssets.search(clusterId: String)
 
 GET         /api/query-attributes                     controllers.QueryAttributes.list(clusterId: String)
+
+# Workspace Api
+GET           /api/workspaces                                                    controllers.Workspaces.list
+POST          /api/workspaces                                                    controllers.Workspaces.create
+
