@@ -21,6 +21,12 @@ export enum MapConnectionStatus {
   NA
 }
 
+export interface MapSizeSettings {
+  height: string;
+  width: string;
+  zoom: number;
+}
+
 export enum MapSize {
   SMALL,
   MEDIUM,
