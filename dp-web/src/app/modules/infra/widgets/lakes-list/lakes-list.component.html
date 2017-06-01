@@ -21,7 +21,7 @@
             <dp-config-sorter [sortBy]="'city'">  {{"common.location" | translate}} </dp-config-sorter>
           </th>
           <th class="mdl-data-table__cell--non-numeric">
-              <dp-config-sorter [type]="'number' "[sortBy]="'nodes'"> {{"pages.infra.labels.nodes" | translate}} </dp-config-sorter>
+              <dp-config-sorter [type]="'number'" [sortBy]="'nodes'"> {{"pages.infra.labels.nodes" | translate}} </dp-config-sorter>
           </th>
           <th class="mdl-data-table__cell--non-numeric">
               <dp-config-sorter [type]="'number'" [sortBy]="'uptime'"> {{"pages.infra.labels.uptime" | translate}} </dp-config-sorter>
@@ -30,7 +30,7 @@
               <dp-config-sorter [sortBy]="'services'"> {{"common.services" | translate}} </dp-config-sorter>
           </th>
           <th class="mdl-data-table__cell--non-numeric">
-              <dp-config-sorter [sortBy]="'hdfsUsed'"> {{"pages.infra.labels.hdfsUsed" | translate}} </dp-config-sorter>
+              <dp-config-sorter [type]="'number'" [sortBy]="'hdfsUsedInBytes'"> {{"pages.infra.labels.hdfsUsed" | translate}} </dp-config-sorter>
           </th>
           <th class="mdl-data-table__cell--non-numeric actions"></th>
         </tr>
