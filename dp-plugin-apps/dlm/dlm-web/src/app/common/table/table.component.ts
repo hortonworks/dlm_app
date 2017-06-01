@@ -45,7 +45,8 @@ export class TableComponent implements OnChanges, OnDestroy, AfterViewInit {
   @ViewChild(ActionColumnComponent) actionsColumn: ActionColumnComponent;
   @ViewChild('table') table: DatatableComponent;
 
-  @Output() selectAction = new EventEmitter<{}>();
+  @Output() selectColumnAction = new EventEmitter<{}>();
+  @Output() selectRowAction = new EventEmitter<{}>();
   @Output() doubleClickAction = new EventEmitter<{}>();
 
   @Input() showPageSizeMenu = true;
@@ -177,7 +178,7 @@ export class TableComponent implements OnChanges, OnDestroy, AfterViewInit {
   }
 
   onSelectAction({ selected }) {
-    this.selectAction.emit(selected);
+    this.selectRowAction.emit(selected);
   }
 
   onActivate({type, row}) {

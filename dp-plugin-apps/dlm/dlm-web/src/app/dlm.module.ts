@@ -34,6 +34,7 @@ import { NavbarService } from 'services/navbar.service';
 import { EventService } from 'services/event.service';
 import { TimeZoneService } from 'services/time-zone.service';
 import { HdfsService } from 'services/hdfs.service';
+import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
 
 import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
@@ -58,6 +59,7 @@ import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route
 import { HdfsBrowserComponent } from './components/hdfs-browser/hdfs-browser.component';
 
 import { ResourceChartsComponent } from './pages/overview/resource-charts/resource-charts.component';
+import { OverviewFilterComponent } from './pages/overview/overview-filter/overview-filter.component';
 import { IssuesListComponent } from './pages/overview/issues-list/issues-list.component';
 import { IssuesListItemComponent } from './pages/overview/issues-list-item/issues-list-item.component';
 import { JobsOverviewTableComponent } from './pages/overview/jobs-overview-table/jobs-overview-table.component';
@@ -158,6 +160,7 @@ import { TruncatePipe } from './pipes/truncate.pipe';
     PolicyServiceFilterComponent,
 
     ResourceChartsComponent,
+    OverviewFilterComponent,
     IssuesListComponent,
     IssuesListItemComponent,
     JobsOverviewTableComponent,
@@ -206,6 +209,7 @@ import { TruncatePipe } from './pipes/truncate.pipe';
     EventService,
     TimeZoneService,
     HdfsService,
+    OverviewJobsExternalFiltersService,
     httpServiceProvider
   ]
 })
