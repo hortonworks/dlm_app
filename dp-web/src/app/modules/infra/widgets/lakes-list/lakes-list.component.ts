@@ -158,4 +158,21 @@ export class LakeInfo {
   hdfsTotal?: string;
   uptime?: string;
   uptimeStr?: string;
+
+  get hdfsUsedInBytes(){
+    return this.toBytes(this.hdfsUsed);
+  }
+
+  private toBytes(byteWithSize){
+    if(byteWithSize === 'NA'){
+      return 'NA';
+    }else{
+      let values = byteWithSize.trim().split(" ");
+      let size = values[1];
+      let k = 1024;
+      let sizes = Array("Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB");
+      let i = sizes.indexOf(size);
+      return parseInt(values[0], 10) * Math.pow(k, i);
+    }
+  }
 }
