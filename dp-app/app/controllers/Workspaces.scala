@@ -29,6 +29,15 @@ class Workspaces @Inject()(@Named("workspaceService") val workspaceService: Work
       }
   }
 
+  def listWithCounts = authenticated.async {
+    Logger.info("Received list workspaces request")
+    workspaceService.listWithCounts()
+      .map {
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(workspaces) => Ok(Json.toJson(workspaces))
+      }
+  }
+
   def create = authenticated.async(parse.json) { request =>
     request.body.validate[Workspace].map { workspace =>
       workspaceService.create(workspace.copy(createdBy = Some(request.user.id.get)))

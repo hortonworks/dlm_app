@@ -3,7 +3,7 @@ package domain
 import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Workspace, WorkspacesAndCount}
+import com.hortonworks.dataplane.commons.domain.Entities.{Workspace, WorkspacesAndCounts}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 
 import scala.concurrent.Future
@@ -24,7 +24,7 @@ class WorkspaceRepo @Inject()(protected val assetWorkspaceRepo: AssetWorkspaceRe
     Workspaces.to[List].result
   }
 
-  def allWithCount(): Future[List[WorkspacesAndCount]] = {
+  def allWithCounts(): Future[List[WorkspacesAndCounts]] = {
     val assetCountQuery = assetWorkspaceRepo.AssetWorkspaces.groupBy(_.workspaceId).map {
       case (s, results) => (s -> results.length)
     }
@@ -34,13 +34,13 @@ class WorkspaceRepo @Inject()(protected val assetWorkspaceRepo: AssetWorkspaceRe
     }
 
     val query = (for {
-      (w, c) <- (Workspaces.joinLeft(assetCountQuery).on(_.id === _._1))
-//        .joinLeft(appCountQuery).on(_._1.id === _._1)
-    } yield (w, c, 0))
+      ((w, c),a) <- (Workspaces.joinLeft(assetCountQuery).on(_.id === _._1))
+        .joinLeft(appCountQuery).on(_._1.id === _._1)
+    } yield (w, c, a))
 
     db.run(query.to[List].result).map {
       rows =>
-        rows.map(r => WorkspacesAndCount(r._1, r._2.getOrElse((0, 0))._2, r._3))
+        rows.map(r => WorkspacesAndCounts(r._1, r._2.getOrElse((0, 0))._2, r._3.getOrElse((0, 0))._2))
     }
   }
 

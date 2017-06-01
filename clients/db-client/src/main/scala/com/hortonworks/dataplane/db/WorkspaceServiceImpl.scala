@@ -26,8 +26,8 @@ class WorkspaceServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToWorkspaces)
   }
 
-  override def listWithCount(): Future[Either[Errors, Seq[WorkspacesAndCount]]] = {
-    ws.url(s"$url/workspacesWithCount")
+  override def listWithCounts(): Future[Either[Errors, Seq[WorkspacesAndCounts]]] = {
+    ws.url(s"$url/workspaceswithcounts")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToWorkspacesAndCount)
@@ -52,7 +52,7 @@ class WorkspaceServiceImpl(config: Config)(implicit ws: WSClient)
 
   private def mapToWorkspacesAndCount(res: WSResponse) = {
     res.status match {
-      case 200 => extractEntity[Seq[WorkspacesAndCount]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[WorkspacesAndCount].get })
+      case 200 => extractEntity[Seq[WorkspacesAndCounts]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[WorkspacesAndCounts].get })
       case _ => mapErrors(res)
     }
   }

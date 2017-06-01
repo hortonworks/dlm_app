@@ -54,5 +54,6 @@ GET         /api/query-attributes                     controllers.QueryAttribute
 
 # Workspace Api
 GET           /api/workspaces                                                    controllers.Workspaces.list
+GET           /api/workspaceswithcounts                                          controllers.Workspaces.listWithCounts
 POST          /api/workspaces                                                    controllers.Workspaces.create
 

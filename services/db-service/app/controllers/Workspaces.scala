@@ -32,8 +32,8 @@ class Workspaces @Inject()(wr: WorkspaceRepo)(implicit exec: ExecutionContext)
 
   }
 
-  def allWithCount = Action.async {
-    wr.allWithCount().map {
+  def allWithCounts = Action.async {
+    wr.allWithCounts().map {
       workspaces =>
         success(workspaces.map(
           workspace => (linkData(workspace, makeLink(workspace.workspace)))

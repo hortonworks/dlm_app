@@ -65,7 +65,7 @@ PUT           /services/endpoints                                            con
 
 #Workspaces API
 GET           /workspaces                                                    controllers.Workspaces.all
-GET           /workspacesWithCount                                           controllers.Workspaces.allWithCount
+GET           /workspaceswithcounts                                          controllers.Workspaces.allWithCounts
 POST          /workspaces                                                    controllers.Workspaces.insert
 GET           /workspaces/:workspaceId                                       controllers.Workspaces.load(workspaceId:Long)
 DELETE        /workspaces/:workspaceId                                       controllers.Workspaces.delete(workspaceId:Long)
