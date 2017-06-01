@@ -36,7 +36,7 @@ class WorkspaceRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProv
   }
 
   def findByUserId(userId: Long): Future[Seq[Workspace]] = {
-    db.run(Workspaces.filter(_.createdBy === userId).to[List].result)
+    db.run(Workspaces.filter(_.createdBy === Option(userId)).to[List].result)
   }
 
   final class WorkspacesTable(tag: Tag) extends Table[Workspace](tag, Some("dataplane"), "dp_workspace") {
@@ -48,7 +48,7 @@ class WorkspaceRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProv
 
     def description = column[String]("description")
 
-    def createdBy = column[Long]("createdby")
+    def createdBy = column[Option[Long]]("createdby")
 
     def created = column[Option[LocalDateTime]]("created")
 

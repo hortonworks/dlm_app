@@ -109,7 +109,7 @@ object Entities {
       name: String,
       source : Long,
       description: String,
-      createdBy: Long,
+      createdBy: Option[Long],
       created: Option[LocalDateTime] = Some(LocalDateTime.now()),
       updated: Option[LocalDateTime] = Some(LocalDateTime.now())
   )

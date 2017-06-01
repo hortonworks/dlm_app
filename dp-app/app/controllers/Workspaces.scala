@@ -31,7 +31,7 @@ class Workspaces @Inject()(@Named("workspaceService") val workspaceService: Work
 
   def create = authenticated.async(parse.json) { request =>
     request.body.validate[Workspace].map { workspace =>
-      workspaceService.create(workspace.copy(createdBy = request.user.id.get))
+      workspaceService.create(workspace.copy(createdBy = Some(request.user.id.get)))
         .map {
           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
           case Right(workspace) => Ok(Json.toJson(workspace))
