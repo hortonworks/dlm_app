@@ -49,7 +49,7 @@ class BeaconClusterServiceImpl()(implicit ws: WSClient) extends BeaconClusterSer
       "\nbeaconEndpoint = " + clusterDefinitionRequest.beaconEndpoint +
       "\nname = " +  clusterDefinitionRequest.name +
       "\ndescription = " + clusterDefinitionRequest.description +
-        (if (clusterDefinitionRequest.hsEndpoint.isDefined) "\nhsEndpoint = " + clusterDefinitionRequest.hsEndpoint.get)
+      (if (clusterDefinitionRequest.hsEndpoint.isDefined) "\nhsEndpoint = " + clusterDefinitionRequest.hsEndpoint.get else "")
   }
 
 
