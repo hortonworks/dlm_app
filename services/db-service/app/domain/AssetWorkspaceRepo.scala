@@ -52,7 +52,7 @@ class AssetWorkspaceRepo @Inject()(protected val dbConfigProvider: DatabaseConfi
 
   final class AssetWorkspacesTable(tag: Tag) extends Table[AssetWorkspace](tag, Some("dataplane"), "dp_categories") {
 
-    def assetType = column[String]("assetType")
+    def assetType = column[String]("assettype")
 
     def assetId = column[Long]("assetid")
 

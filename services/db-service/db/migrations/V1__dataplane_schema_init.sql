@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_workspace (
 
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_data_asset_workspace (
-  assetType   VARCHAR(10)                                    NOT NULL,
+  assettype   VARCHAR(10)                                    NOT NULL,
   assetid     BIGINT                                         NOT NULL,
   workspaceid BIGINT REFERENCES dataplane.dp_workspace (id)  NOT NULL
 );
@@ -114,8 +114,8 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_data_asset_workspace (
 -- appType can be Notebook or App. If Apptype = Notebook, Notebook should exist in Zeppelin
 -- If appType = App || Job, Job content/App Content should be stored separately
 CREATE TABLE IF NOT EXISTS dataplane.dp_workspace_apps (
-  appType   VARCHAR(10)                                    NOT NULL,
-  appId     BIGINT                                         NOT NULL,
+  apptype   VARCHAR(10)                                    NOT NULL,
+  appid     BIGINT                                         NOT NULL,
   workspaceid BIGINT REFERENCES dataplane.dp_workspace (id)  NOT NULL
 );
 

@@ -2,8 +2,8 @@ package controllers
 
 import javax.inject._
 
-import com.hortonworks.dataplane.commons.domain.Entities.Workspace
-import domain.WorkspaceRepo
+import com.hortonworks.dataplane.commons.domain.Entities.{DataAsset, Workspace}
+import domain.{API, WorkspaceRepo}
 import play.api.libs.json.Json
 import play.api.mvc._
 
@@ -11,12 +11,35 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class Workspaces @Inject()(wr: WorkspaceRepo)(implicit exec: ExecutionContext)
-    extends JsonAPI {
+  extends JsonAPI {
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
+  private def makeLink(w: Workspace) = {
+    Map(
+      "user" -> s"${API.users}/${w.createdBy}",
+      "cluster" -> s"${API.clusters}/${w.source}"
+    )
+  }
+
   def all = Action.async {
-    wr.all.map(categorys => success(categorys)).recoverWith(apiError)
+    wr.all.map {
+      workspaces =>
+        success(workspaces.map(
+          workspace => (linkData(workspace, makeLink(workspace)))
+        ))
+    }.recoverWith(apiError)
+
+  }
+
+  def allWithCount = Action.async {
+    wr.allWithCount().map {
+      workspaces =>
+        success(workspaces.map(
+          workspace => (linkData(workspace, makeLink(workspace.workspace)))
+        ))
+    }.recoverWith(apiError)
+
   }
 
 
@@ -27,13 +50,13 @@ class Workspaces @Inject()(wr: WorkspaceRepo)(implicit exec: ExecutionContext)
         wr
           .insert(workspace)
           .map { c =>
-            success(c)
+            success(linkData(c, makeLink(c)))
           }.recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def load(workspaceId:Long) = Action.async {
+  def load(workspaceId: Long) = Action.async {
     wr.findById(workspaceId).map { uo =>
       uo.map { u =>
         success(u)
@@ -42,9 +65,9 @@ class Workspaces @Inject()(wr: WorkspaceRepo)(implicit exec: ExecutionContext)
     }.recoverWith(apiError)
   }
 
-  def loadByUser(userId:Long) = Action.async {
+  def loadByUser(userId: Long) = Action.async {
     wr.findByUserId(userId).map { uo =>
-        success(Json.toJson(uo))
+      success(Json.toJson(uo))
     }.recoverWith(apiError)
   }
 

@@ -11,6 +11,7 @@ import play.api.libs.json.{JsValue, Json}
 object Entities {
 
   case class Error(code: String, message: String)
+
   case class Errors(errors: Seq[Error] = Seq()) {
     def combine(newErrors: Errors) = Errors(errors ++ newErrors.errors)
   }
@@ -33,101 +34,109 @@ object Entities {
                   updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
   case class Permission(
-      id: Option[Long] = None,
-      permission: String,
-      roleId: Option[Long],
-      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+                         id: Option[Long] = None,
+                         permission: String,
+                         roleId: Option[Long],
+                         created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                         updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
   case class UserRole(id: Option[Long] = None,
                       userId: Option[Long],
                       roleId: Option[Long])
 
   case class UserRoles(username: String, roles: Seq[String])
+
   case class RolePermission(role: String, permissions: Seq[String])
+
   case class UserPermission(username: String, rights: Seq[RolePermission])
 
   //Data lake
   case class Location(
-      id: Option[Long] = None,
-      country: String,
-      city: String,
-      latitude: Float,
-      longitude: Float
-  )
+                       id: Option[Long] = None,
+                       country: String,
+                       city: String,
+                       latitude: Float,
+                       longitude: Float
+                     )
 
   case class Datalake(
-      id: Option[Long] = None,
-      name: String,
-      description: String,
-      ambariUrl: String,
-      location: Option[Long],
-      createdBy: Option[Long],
-      properties: Option[JsValue],
-      // state should be used to figure out the status of the cluster
-      state: Option[String] = Some("TO_SYNC"),
-      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+                       id: Option[Long] = None,
+                       name: String,
+                       description: String,
+                       ambariUrl: String,
+                       location: Option[Long],
+                       createdBy: Option[Long],
+                       properties: Option[JsValue],
+                       // state should be used to figure out the status of the cluster
+                       state: Option[String] = Some("TO_SYNC"),
+                       created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                       updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
   case class Category(
-      id: Option[Long] = None,
-      name: String,
-      description: String,
-      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      updated: Option[LocalDateTime] = Some(LocalDateTime.now())
-  )
+                       id: Option[Long] = None,
+                       name: String,
+                       description: String,
+                       created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                       updated: Option[LocalDateTime] = Some(LocalDateTime.now())
+                     )
 
   case class Cluster(
-      id: Option[Long] = None,
-      name: String,
-      description: String,
-      ambariurl: Option[String] = None,
-      secured: Option[Boolean] = Some(false),
-      kerberosuser: Option[String] = None,
-      kerberosticketLocation: Option[String] = None,
-      datalakeid: Option[Long] = None,
-      userid: Option[Long] = None,
-      properties: Option[JsValue] = None
-  )
+                      id: Option[Long] = None,
+                      name: String,
+                      description: String,
+                      ambariurl: Option[String] = None,
+                      secured: Option[Boolean] = Some(false),
+                      kerberosuser: Option[String] = None,
+                      kerberosticketLocation: Option[String] = None,
+                      datalakeid: Option[Long] = None,
+                      userid: Option[Long] = None,
+                      properties: Option[JsValue] = None
+                    )
 
   case class ClusterService(
-      id: Option[Long] = None,
-      servicename: String,
-      properties: Option[JsValue] = None,
-      clusterid: Option[Long] = None,
-      datalakeid: Option[Long] = None
-  )
+                             id: Option[Long] = None,
+                             servicename: String,
+                             properties: Option[JsValue] = None,
+                             clusterid: Option[Long] = None,
+                             datalakeid: Option[Long] = None
+                           )
 
   case class ClusterServiceHost(
-      id: Option[Long] = None,
-      host: String,
-      serviceid: Option[Long] = None
-  )
+                                 id: Option[Long] = None,
+                                 host: String,
+                                 serviceid: Option[Long] = None
+                               )
 
   case class Workspace(
-      id: Option[Long] = None,
-      name: String,
-      source : Long,
-      description: String,
-      createdBy: Option[Long],
-      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      updated: Option[LocalDateTime] = Some(LocalDateTime.now())
-  )
+                        id: Option[Long] = None,
+                        name: String,
+                        source: Long,
+                        description: String,
+                        createdBy: Option[Long],
+                        created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                        updated: Option[LocalDateTime] = Some(LocalDateTime.now())
+                      )
 
   case class AssetWorkspace(
-      assetType: String,
-      assetId: Long,
-      workspaceId: Long
-  )
+                             assetType: String,
+                             assetId: Long,
+                             workspaceId: Long
+                           )
+
+  case class WorkspaceApp(
+                           appType: String,
+                           appId: Long,
+                           workspaceId: Long
+                         )
 
   case class EnabledSku(
-      skuId: Long,
-      enabledBy: Long,
-      enabledOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      smartSenseId: String,
-      subscriptionId: String,
-      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+                         skuId: Long,
+                         enabledBy: Long,
+                         enabledOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                         smartSenseId: String,
+                         subscriptionId: String,
+                         created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                         updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
   case class Sku(id: Option[Long] = None,
                  name: String,
@@ -160,14 +169,14 @@ object Entities {
   case class DatasetCategory(categoryId: Long, datasetId: Long)
 
   case class UnclassifiedDataset(
-      id: Option[Long],
-      name: String,
-      description: Option[String],
-      datalakeId: Long,
-      createdBy: Long,
-      createdOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      lastmodified: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      customprops: Option[JsValue] = None)
+                                  id: Option[Long],
+                                  name: String,
+                                  description: Option[String],
+                                  datalakeId: Long,
+                                  createdBy: Long,
+                                  createdOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                                  lastmodified: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                                  customprops: Option[JsValue] = None)
 
   case class UnclassifiedDatasetCategory(categoryId: Long,
                                          unclassifiedDatasetId: Long)
@@ -195,11 +204,15 @@ object Entities {
   // classes as data conatiner for Rest Api
 
   case class DatasetAndCategories(dataset: Dataset, categories: Seq[Category])
+
   case class DatasetAndCategoryIds(dataset: Dataset, categories: Seq[Long])
+
+  case class WorkspacesAndCount(workspace: Workspace, assets: Int, apps: Int)
 
 }
 
 object JsonFormatters {
+
   import com.hortonworks.dataplane.commons.domain.Entities._
 
   val defaultJson = Json.using[Json.WithDefaultValues]
@@ -291,5 +304,8 @@ object JsonFormatters {
 
   implicit val configReads = Json.reads[DpConfig]
   implicit val configWrites = Json.writes[DpConfig]
+
+  implicit val workspacesAndCountReads = Json.reads[WorkspacesAndCount]
+  implicit val workspacesAndCountWrites = Json.writes[WorkspacesAndCount]
 
 }
