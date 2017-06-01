@@ -20,7 +20,7 @@ import { FILE_TYPES } from 'constants/hdfs.constant';
       [columns]="columns"
       [rows]="rows$ | async"
       [selectionType]="selectionType"
-      (selectAction)="handleSelectedAction($event)"
+      (selectRowAction)="handleSelectedAction($event)"
       (doubleClickAction)="handleDoubleClickAction($event)"
     >
     </dlm-table>
