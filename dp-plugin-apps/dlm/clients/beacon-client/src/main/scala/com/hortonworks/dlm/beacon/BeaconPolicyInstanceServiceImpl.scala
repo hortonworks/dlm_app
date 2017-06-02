@@ -19,7 +19,7 @@ class BeaconPolicyInstanceServiceImpl()(implicit ws: WSClient) extends BeaconPol
   private def mapToPolicyInstanceResponse(res: WSResponse) = {
     res.status match {
       case 200 =>
-        (res.json \ "instance").get.validate[Seq[PolicyInstanceResponse]] match {
+        res.json.validate[PolicyInstancesDetails] match {
           case JsSuccess(result, _) => Right(result)
           case JsError(error) => {
             val url = Some(res.asInstanceOf[AhcWSResponse].ahcResponse.getUri.toUrl)
@@ -31,7 +31,7 @@ class BeaconPolicyInstanceServiceImpl()(implicit ws: WSClient) extends BeaconPol
   }
 
 
-  override def listPolicyInstances(beaconEndpoint : String, queryString: Map[String,String]) : Future[Either[BeaconApiErrors, Seq[PolicyInstanceResponse]]] = {
+  override def listPolicyInstances(beaconEndpoint : String, queryString: Map[String,String]) : Future[Either[BeaconApiErrors, PolicyInstancesDetails]] = {
     ws.url(s"${urlPrefix(beaconEndpoint)}/instance/list").withQueryString(queryString.toList: _*)
       .withHeaders(httpHeaders.toList: _*)
       .get.map(mapToPolicyInstanceResponse).recoverWith {
@@ -39,7 +39,7 @@ class BeaconPolicyInstanceServiceImpl()(implicit ws: WSClient) extends BeaconPol
     }
   }
 
-  override def listPolicyInstance(beaconEndpoint : String, policyName : String, queryString: Map[String,String]) : Future[Either[BeaconApiErrors, Seq[PolicyInstanceResponse]]] = {
+  override def listPolicyInstance(beaconEndpoint : String, policyName : String, queryString: Map[String,String]) : Future[Either[BeaconApiErrors, PolicyInstancesDetails]] = {
     ws.url(s"${urlPrefix(beaconEndpoint)}/policy/instance/list/$policyName").withQueryString(queryString.toList: _*)
       .withHeaders(httpHeaders.toList: _*)
       .get.map(mapToPolicyInstanceResponse).recoverWith {

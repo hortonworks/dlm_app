@@ -25,12 +25,12 @@
 }
 
 .ds-editor-cont {
-  padding: 20px 0 20px $layout-drawer-width;
+  padding: 20px 0 20px $side-nav-width;
 }
 
 .ds-editor-cont .nav-panel {
-  margin-left: -$layout-drawer-width;
-  width:$layout-drawer-width;
+  margin-left: -$side-nav-width;
+  width:$side-nav-width;
   float: left;
   padding:15px;
   border-right: 1px solid $color_text_gray;

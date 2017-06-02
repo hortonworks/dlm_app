@@ -50,3 +50,27 @@
     background: #CFD3D7;
   }
 }
+
+.layout {
+  &.mdl-layout__header-row {
+    height: 34px;
+  }
+
+  .mdl-navigation {
+    border: 1px solid $dove-gray;
+    height: 34px;
+  }
+
+  .mdl-navigation__link {
+    cursor: pointer;
+    padding: 0px 15px;
+    line-height: 32px;
+    color: $dove-gray !important;
+    background: $white;
+  }
+
+  .mdl-navigation__link.is_active {
+    background: $dove-gray;
+    color: $white !important;
+  }
+}

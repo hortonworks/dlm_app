@@ -14,6 +14,7 @@ import * as fromForm from './form.reducer';
 import * as fromEvent from './event.reducer';
 import * as fromProgress from './progress.reducer';
 import * as fromOperation from './operation.reducer';
+import * as fromHdfs from './hdfs.reducer';
 
 export interface State {
   router: RouterState;
@@ -25,6 +26,7 @@ export interface State {
   events: fromEvent.State;
   progress: fromProgress.State;
   operations: fromOperation.State;
+  hdfsFiles: fromHdfs.State;
 }
 
 const reducers = {
@@ -36,7 +38,8 @@ const reducers = {
   forms: fromForm.reducer,
   events: fromEvent.reducer,
   progress: fromProgress.reducer,
-  operations: fromOperation.reducer
+  operations: fromOperation.reducer,
+  hdfsFiles: fromHdfs.reducer
 };
 
 const devReducer: ActionReducer<State> = compose(storeLogger(), combineReducers)(reducers);

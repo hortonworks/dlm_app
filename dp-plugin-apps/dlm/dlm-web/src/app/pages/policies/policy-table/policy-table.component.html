@@ -4,7 +4,7 @@
   [theme]="tableTheme"
   [columns]="columns"
   [rows]="policies"
-  (selectAction)="handleSelectedAction($event)">
+  (selectColumnAction)="handleSelectedAction($event)">
 </dlm-table>
 
 <dlm-icon-column></dlm-icon-column>
@@ -45,7 +45,11 @@
 </ng-template>
 
 <ng-template let-row="row" ngx-datatable-row-detail-template #rowDetailRef>
-  <dlm-policy-details [contentType]="activeContentType" [policy]="row" [jobs]="filteredJobs"></dlm-policy-details>
+  <dlm-policy-details [contentType]="activeContentType" [policy]="row" [jobs]="filteredJobs$ | async"></dlm-policy-details>
+</ng-template>
+
+<ng-template let-row="row" let-value="value" #pathCell>
+  <span [tooltip]="value">{{value | truncate:15}}</span>
 </ng-template>
 
 <dlm-modal-dialog

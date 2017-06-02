@@ -6,6 +6,7 @@
     "datasets" : "Datasets",
     "datalake" : "Datalake",
     "services" : "Services",
+    "location" : "Location",
     "tags" : "Tags",
     "description" : "Description",
     "new" : "New",
@@ -64,7 +65,7 @@
         "clusterLocation" : "Cluster Location",
         "clusterAddSuccess" : "Cluster Added successfully",
         "connectionFailed" : "Not able to connect",
-        "emptySearchResult" : "There are no data lakes that match your search."
+        "emptySearchResult" : "There are no clusters that match your search."
       },
       "description" :{
         "addCluster" : "Add your Ambari managed cluster to Dataplane. This enables Dataplane to gather information about the cluster such as the name of the cluster, services running in the cluster etc.",

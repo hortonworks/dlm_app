@@ -34,7 +34,7 @@ describe('JobEffects', () => {
   beforeEach(() => {
     this.job1 = <Job>{id: '1'};
     this.job2 = <Job>{id: '2'};
-    this.policy = <Policy>{name: 'n1', targetClusterResource: {id: 'cl1'}};
+    this.policy = <Policy>{name: 'n1', targetClusterResource: {id: 1}};
     this.jobs = {jobs: [this.job1, this.job2]};
     this.error = new Error('msg'); });
 
@@ -69,7 +69,7 @@ describe('JobEffects', () => {
       const {jobService, runner, jobEffects} = setup();
       jobService.getJobsForClusters.and.returnValue(Observable.of(this.jobs));
       const expectedResult = jobActions.loadJobsSuccess(this.jobs, {requestId: 'JOBS_CLUSTER'});
-      runner.queue(jobActions.loadJobsForClusters(['1', '2'], 'JOBS_CLUSTER'));
+      runner.queue(jobActions.loadJobsForClusters([1, 2], 'JOBS_CLUSTER'));
 
       let result = null;
       jobEffects.loadJobsForClusters$.subscribe(_result => result = _result);
@@ -80,7 +80,7 @@ describe('JobEffects', () => {
       const {jobService, runner, jobEffects} = setup();
       jobService.getJobsForClusters.and.returnValue(Observable.throw(this.error));
       const expectedResult = jobActions.loadJobsFail(this.error, {requestId: 'JOBS_CLUSTER'});
-      runner.queue(jobActions.loadJobsForClusters(['1', '2'], 'JOBS_CLUSTER'));
+      runner.queue(jobActions.loadJobsForClusters([1, 2], 'JOBS_CLUSTER'));
       let result = null;
       jobEffects.loadJobsForClusters$.subscribe(_result => result = _result);
       expect(result).toEqual(expectedResult);

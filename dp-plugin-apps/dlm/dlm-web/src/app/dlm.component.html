@@ -13,6 +13,9 @@
     <div class="notifications navbar-nav navbar-right">
       <navigation-dropdown [linksColumns]="navigationColumns"></navigation-dropdown>
     </div>
+    <div class="navbar-nav navbar-right" [class.hidden]="!onOverviewPage">
+      <dlm-overview-filter></dlm-overview-filter>
+    </div>
   </header>
-  <router-outlet style=""></router-outlet>
+  <router-outlet></router-outlet>
 </div>
