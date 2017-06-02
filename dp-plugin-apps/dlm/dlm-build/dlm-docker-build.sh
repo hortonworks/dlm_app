@@ -15,11 +15,7 @@ build_images() {
 
 push_image() {
     VERSION=$(get_version)
-    IMAGE_NAME=${IMAGE_PREFIX}/${IMG}
-    if [ ! -z VERSION ]
-    then
-        IMAGE_NAME=$1:VERSION
-    fi
+    IMAGE_NAME=${IMAGE_PREFIX}/${IMG}:${VERSION}
     echo "Pushing ${IMAGE_NAME}"
     docker push ${IMAGE_NAME}
     if [ $? -ne 0 ]
