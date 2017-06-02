@@ -96,7 +96,7 @@ COMMENT ON TABLE dataplane.dp_cluster_service_hosts  IS 'Service hosts for servi
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_workspace (
   id          BIGSERIAL PRIMARY KEY,
-  name        VARCHAR(255)                              NOT NULL,
+  name        VARCHAR(255)                        NOT NULL UNIQUE,
   source      BIGINT REFERENCES dataplane.dp_clusters(id) NOT NULL,
   description TEXT,
   createdby   BIGINT REFERENCES dataplane.dp_users (id) NOT NULL,

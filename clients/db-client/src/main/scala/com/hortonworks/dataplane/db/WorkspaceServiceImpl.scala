@@ -43,6 +43,16 @@ class WorkspaceServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToWorkspace)
   }
 
+  override def retrieve(name: String): Future[Either[Errors, Workspace]] = {
+    ws.url(s"$url/workspaces/name/$name")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      )
+      .get()
+      .map(mapToWorkspace)
+  }
+
   private def mapToWorkspaces(res: WSResponse) = {
     res.status match {
       case 200 => extractEntity[Seq[Workspace]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[Workspace].get })
@@ -59,7 +69,7 @@ class WorkspaceServiceImpl(config: Config)(implicit ws: WSClient)
 
   private def mapToWorkspace(res: WSResponse) = {
     res.status match {
-      case 200 => Right((res.json \ "results" \\ "data") (0).validate[Workspace].get)
+      case 200 => Right((res.json \ "results" \ "data").validate[Workspace].get)
       case _ => mapErrors(res)
     }
   }

@@ -21,7 +21,6 @@ class Workspaces @Inject()(@Named("workspaceService") val workspaceService: Work
   import scala.concurrent.ExecutionContext.Implicits.global
 
   def list = authenticated.async {
-    Logger.info("Received list workspaces request")
     workspaceService.list()
       .map {
         case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
@@ -29,8 +28,15 @@ class Workspaces @Inject()(@Named("workspaceService") val workspaceService: Work
       }
   }
 
+  def retrieve(name : String) = authenticated.async {
+    workspaceService.retrieve(name)
+      .map {
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(workspaces) => Ok(Json.toJson(workspaces))
+      }
+  }
+
   def listWithCounts = authenticated.async {
-    Logger.info("Received list workspaces request")
     workspaceService.listWithCounts()
       .map {
         case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))

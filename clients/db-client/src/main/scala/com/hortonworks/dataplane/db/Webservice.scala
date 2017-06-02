@@ -173,6 +173,8 @@ object Webservice {
   trait WorkspaceService extends DbClientService {
     def list(): Future[Either[Errors, Seq[Workspace]]]
 
+    def retrieve(name: String): Future[Either[Errors, Workspace]]
+
     def listWithCounts(): Future[Either[Errors, Seq[WorkspacesAndCounts]]]
 
     def create(workspace: Workspace): Future[Either[Errors, Workspace]]

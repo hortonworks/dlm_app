@@ -17,7 +17,7 @@ class Workspaces @Inject()(wr: WorkspaceRepo)(implicit exec: ExecutionContext)
 
   private def makeLink(w: Workspace) = {
     Map(
-      "user" -> s"${API.users}/${w.createdBy}",
+      "user" -> s"${API.users}/${w.createdBy.get}",
       "cluster" -> s"${API.clusters}/${w.source}"
     )
   }
@@ -58,8 +58,17 @@ class Workspaces @Inject()(wr: WorkspaceRepo)(implicit exec: ExecutionContext)
 
   def load(workspaceId: Long) = Action.async {
     wr.findById(workspaceId).map { uo =>
-      uo.map { u =>
-        success(u)
+      uo.map { c =>
+        success(linkData(c, makeLink(c)))
+      }
+        .getOrElse(NotFound)
+    }.recoverWith(apiError)
+  }
+
+  def loadByName(name: String) = Action.async {
+    wr.findByName(name).map { uo =>
+      uo.map { c =>
+        success(linkData(c, makeLink(c)))
       }
         .getOrElse(NotFound)
     }.recoverWith(apiError)

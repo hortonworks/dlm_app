@@ -34,7 +34,7 @@ class WorkspaceRepo @Inject()(protected val assetWorkspaceRepo: AssetWorkspaceRe
     }
 
     val query = (for {
-      ((w, c),a) <- (Workspaces.joinLeft(assetCountQuery).on(_.id === _._1))
+      ((w, c), a) <- (Workspaces.joinLeft(assetCountQuery).on(_.id === _._1))
         .joinLeft(appCountQuery).on(_._1.id === _._1)
     } yield (w, c, a))
 
@@ -58,6 +58,10 @@ class WorkspaceRepo @Inject()(protected val assetWorkspaceRepo: AssetWorkspaceRe
 
   def findById(workspaceId: Long): Future[Option[Workspace]] = {
     db.run(Workspaces.filter(_.id === workspaceId).result.headOption)
+  }
+
+  def findByName(name: String): Future[Option[Workspace]] = {
+    db.run(Workspaces.filter(_.name === name).result.headOption)
   }
 
   def findByUserId(userId: Long): Future[Seq[Workspace]] = {

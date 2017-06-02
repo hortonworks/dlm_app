@@ -68,6 +68,7 @@ GET           /workspaces                                                    con
 GET           /workspaceswithcounts                                          controllers.Workspaces.allWithCounts
 POST          /workspaces                                                    controllers.Workspaces.insert
 GET           /workspaces/:workspaceId                                       controllers.Workspaces.load(workspaceId:Long)
+GET           /workspaces/name/:name                                              controllers.Workspaces.loadByName(name:String)
 DELETE        /workspaces/:workspaceId                                       controllers.Workspaces.delete(workspaceId:Long)
 
 GET           /workspaces/users/:userId                                      controllers.Workspaces.loadByUser(userId:Long)
