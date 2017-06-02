@@ -30,7 +30,7 @@ public class DpConsulClientImpl implements DpConsulClient {
     newService.setTags(service.getServiceTags());
     newService.setPort(service.getPort());
     newService.setName(service.getServiceName());
-    newService.setAddress(inetUtils.findFirstNonLoopbackAddress().getHostAddress());
+    newService.setAddress(getServiceAddress());
     Response<Void> voidResponse = consulClient.agentServiceRegister(newService);
     return ConsulResponse.from(voidResponse);
   }
@@ -41,12 +41,17 @@ public class DpConsulClientImpl implements DpConsulClient {
     newCheck.setId(service.getServiceId() + "-healthCheck");
     newCheck.setServiceId(service.getServiceId());
     newCheck.setName(service.getServiceId() + "-healthCheck");
-    newCheck.setHttp("http://localhost:" + service.getPort() + "/health");
+    //newCheck.setHttp("http://localhost:" + service.getPort() + "/health");
+    newCheck.setHttp("http://"+ getServiceAddress() +":" + service.getPort() + "/health");
     newCheck.setInterval(service.getHealthCheckIntervalInSecs() + "s");
     //Set a default timeout to 1s
     newCheck.setTimeout("10s");
     Response<Void> voidResponse = consulClient.agentCheckRegister(newCheck);
     return ConsulResponse.from(voidResponse);
+  }
+
+  private String getServiceAddress() {
+    return inetUtils.findFirstNonLoopbackAddress().getHostAddress();
   }
 
   @Override
