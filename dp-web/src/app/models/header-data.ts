@@ -11,9 +11,12 @@ export class PersonaTabs {
 export class Persona {
   name: string;
   tabs: PersonaTabs[] = [];
-  constructor(name: string, tabs: PersonaTabs[]){
+  topNav = true;
+
+  constructor(name: string, tabs: PersonaTabs[], topNav = true){
     this.name = name;
     this.tabs = tabs ? tabs : [];
+    this.topNav = topNav;
   }
 }
 

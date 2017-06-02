@@ -66,8 +66,14 @@ class BeaconPolicyServiceImpl()(implicit ws: WSClient) extends BeaconPolicyServi
     "\nsourceCluster = " + policyDefinitionRequest.sourceCluster +
     "\ntargetCluster = " + policyDefinitionRequest.targetCluster +
     "\nfrequencyInSec = " + policyDefinitionRequest.frequencyInSec +
-    (if (policyDefinitionRequest.endTime.isDefined) "\nendTime = " + policyDefinitionRequest.endTime.get) +
-    (if (policyDefinitionRequest.startTime.isDefined) "\nstartTime = " + policyDefinitionRequest.startTime.get)
+      (policyDefinitionRequest.endTime match {
+      case Some(endTime) => "\nendTime = " + endTime
+      case None => ""
+      }) +
+      (policyDefinitionRequest.startTime match {
+        case Some(startTime) => "\nstartTime = " + startTime
+        case None => ""
+      })
   }
 
 

@@ -7,8 +7,9 @@
   position: fixed;
   color: $submarine;
   background-color: $tuna;
-  width:$layout-drawer-width;
+  width: $side-nav-width;
   height: calc(100% - 55px);
+  overflow-y: hidden;
 }
 
 .nav-tag-panel .tag-search {

@@ -8,7 +8,7 @@ export interface ClusterStats {
 }
 
 export interface Cluster {
-  id: string;
+  id: number;
   name: string;
   ambariurl: string;
   description: string;
@@ -21,6 +21,5 @@ export interface Cluster {
    */
   type: string;
   createdAt: number;
-  volumeGB: number;
   nodesCount: number;
 }

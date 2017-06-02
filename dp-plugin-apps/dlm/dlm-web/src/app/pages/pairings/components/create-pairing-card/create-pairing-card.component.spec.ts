@@ -25,7 +25,7 @@ describe('CreatePairingCardComponent', () => {
     fixture = TestBed.createComponent(CreatePairingCardComponent);
     component = fixture.componentInstance;
     component.cluster = <Cluster>{
-      id: '1',
+      id: 1,
       location: {},
       stats: {CapacityUsed: 1, CapacityRemaining: 4, CapacityTotal: 5}
     };

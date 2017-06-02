@@ -1,34 +1,40 @@
-<div class="mdl-js-layout" #layout>
-  <header class="mdl-layout__header mdl-layout__header--scroll">
-    <div class="mdl-layout__header-row">
-      <div  class="dp-header-logo">
-        <img src="../../../assets/images/hw.logo.png">
-      </div>
-      <nav *ngIf="activeTabName" class="mdl-navigation">
-          <span *ngFor="let tabEntry of activePersona.tabs; let i = index" class="mdl-navigation__link" (click)="navigateToURL(tabEntry.URL)"
+<div class="navbar mdl-grid mdl-grid--no-spacing">
+    <div class="mdl-cell--10-col">
+        <div class="dp-header-logo borderBox" [ngClass]="{'minimised': viewPaneState === viewPaneStates.MINIMISE}">
+            <i #sideNavIcon class="fa fa-bars" aria-hidden="true" (click)="openNav()"></i>
+            <img src="../../../assets/images/hw.logo.png">
+        </div>
+
+        <div class="mdl-navigation" *ngIf="activeTabName && activePersona.topNav">
+          <span *ngFor="let tabEntry of activePersona.tabs; let i = index" class="mdl-navigation__link"
+                (click)="navigateToURL(tabEntry.URL)"
                 [ngClass]="{'is_active': activeTabName === tabEntry.tabName}">
             {{ tabEntry.tabName }}
           </span>
-      </nav>
-      <div class="mdl-layout-spacer"></div>
-      <button id="demo-menu-lower-right" class="mdl-button mdl-js-button">
-        <i class="fa fa-user-circle" aria-hidden="true"></i>
-        <span class="user-name"> {{user?.display}} </span>
-        <i class="fa fa-chevron-down" aria-hidden="true"></i>
-      </button>
-      <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="demo-menu-lower-right">
-        <li class="mdl-menu__item" routerLink="/sign-out">Sign out</li>
-      </ul>
+        </div>
     </div>
-  </header>
-  <div class="mdl-layout__drawer" [ngClass]="{'hidden': !activePersona}">
-    <div  class="dp-header-logo">
-      <img src="../../../assets/images/hw.logo.png">
+
+    <div class="mdl-layout-spacer"></div>
+
+    <div class="actions">
+        <button id="logout" class="mdl-button mdl-js-button">
+            <i class="fa fa-user-circle" aria-hidden="true"></i>
+            <span class="user-name"> {{user?.display}} </span>
+            <i class="fa fa-chevron-down" aria-hidden="true"></i>
+        </button>
+        <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="logout">
+            <li class="mdl-menu__item" (click)="logout()">Sign out</li>
+        </ul>
     </div>
-    <ul class="demo-list-item mdl-list">
-      <li class="mdl-list__item" [ngClass]="{'active': activePersonaName === persona.name}" *ngFor="let persona of headerData.personas; let i = index" (click)="navigateToPersona(persona, layout)">
-        <span class="mdl-list__item-primary-content"> {{ persona.name }} </span>
-      </li>
-    </ul>
-  </div>
+</div>
+
+<div #sidenav class="sidenav" style="z-index: 3;">
+    <div class="dp-header-logo">
+        <img src="../../../assets/images/hw.logo.png">
+    </div>
+
+  <span class="sidenav-item" [ngClass]="{'active': activePersonaName === persona.name}"
+        *ngFor="let persona of headerData.personas; let i = index" (click)="navigateToPersona(persona, layout)">
+    <span class="sidenav-item-name">  {{ persona.name }} </span>
+  </span>
 </div>

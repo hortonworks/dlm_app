@@ -45,7 +45,9 @@ export class TableComponent implements OnChanges, OnDestroy, AfterViewInit {
   @ViewChild(ActionColumnComponent) actionsColumn: ActionColumnComponent;
   @ViewChild('table') table: DatatableComponent;
 
-  @Output() selectAction = new EventEmitter<ActionItemType>();
+  @Output() selectColumnAction = new EventEmitter<{}>();
+  @Output() selectRowAction = new EventEmitter<{}>();
+  @Output() doubleClickAction = new EventEmitter<{}>();
 
   @Input() showPageSizeMenu = true;
   @Input() multiExpand = false;
@@ -57,6 +59,7 @@ export class TableComponent implements OnChanges, OnDestroy, AfterViewInit {
   @Input() theme = TableTheme.Plain;
   @Input() columnMode = ColumnMode.force;
   @Input() selectionType: any;
+  @Input() loadingIndicator = true;
   @Input() cssClasses = {
     sortAscending: 'caret',
     sortDescending: 'caret caret-up',
@@ -172,6 +175,16 @@ export class TableComponent implements OnChanges, OnDestroy, AfterViewInit {
 
   changePage(page) {
     this.table.onFooterPage({page});
+  }
+
+  onSelectAction({ selected }) {
+    this.selectRowAction.emit(selected);
+  }
+
+  onActivate({type, row}) {
+    if (type === 'dblclick') {
+      this.doubleClickAction.emit(row);
+    }
   }
 
   /**

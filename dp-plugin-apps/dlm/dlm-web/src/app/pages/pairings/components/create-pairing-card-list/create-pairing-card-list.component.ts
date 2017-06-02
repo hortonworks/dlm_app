@@ -22,7 +22,7 @@ export class CreatePairingCardListComponent implements OnInit, OnChanges, Contro
   @Input() isFrozen = false;
   @Output() change = new EventEmitter<ClusterPairing>();
   disabledClusters: ClusterPairing[];
-  selectedClusterId = '';
+  selectedClusterId: number;
   showDivider = false;
 
   onChange = (_: any) => {};
@@ -41,12 +41,12 @@ export class CreatePairingCardListComponent implements OnInit, OnChanges, Contro
       if (this.selectedCluster) {
         this.selectedClusterId = this.selectedCluster.id;
       } else {
-        this.selectedClusterId = '';
+        this.selectedClusterId = null;
       }
     }
   }
 
-  writeValue(clusterId: string) {
+  writeValue(clusterId: number) {
     this.selectedClusterId = clusterId;
   }
 

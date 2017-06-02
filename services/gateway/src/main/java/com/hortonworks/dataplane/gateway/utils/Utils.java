@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SERVICE_ID_KEY;
+
 @Component
 public class Utils {
   private static final int BEARER_TOK_LEN = "Bearer ".length();
@@ -91,5 +93,13 @@ public class Utils {
     RequestContext ctx = RequestContext.getCurrentContext();
     cookie.setMaxAge(0);
     ctx.getResponse().addCookie(cookie);
+  }
+  public String getServiceId(){
+    RequestContext ctx = RequestContext.getCurrentContext();
+    return  ctx.get(SERVICE_ID_KEY).toString();
+  }
+  public boolean serlvetPathMatches(String path){
+    RequestContext ctx = RequestContext.getCurrentContext();
+    return ctx.getRequest().getServletPath().equals(path);
   }
 }

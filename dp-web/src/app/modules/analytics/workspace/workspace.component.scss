@@ -1,0 +1,114 @@
+@import "../../../../styles/variables";
+
+.dp-input {
+  position: relative;
+  display: inline-block;
+  margin-right: 10px;
+  width: 200px;
+  box-sizing: border-box;
+
+  input {
+    width: 100%;
+    padding-left: 30px;
+    box-sizing: border-box;
+  }
+
+  .dp-input__icon{
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    color: #54646A;
+  }
+}
+
+.actions {
+  display: flex;
+
+  .buttons-bar {
+    display: inline;
+    ul {
+      list-style: none;
+    }
+
+    ul li {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      display: inline;
+    }
+
+    .btn-hwx-default {
+      padding-left: 10px;
+      padding-right: 10px;
+      min-width: 45px;
+      float: left;
+    }
+  }
+
+  dp-tabs {
+    display: inline-block;
+  }
+}
+
+.card-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  .mdl-card {
+    display: inline-block;
+    max-height: 150px;
+    min-height: 150px;
+    max-width: 275px;
+    margin: 0px 10px 10px 0px;
+    border: 1px solid #cccccc;
+  }
+
+  .mdl-card__supporting-text {
+    padding-bottom: 5px;
+    color: $dove-gray;
+  }
+
+  .mdl-card__title {
+    flex-direction: column;
+    align-items: flex-start;
+    color: $dove-gray;
+  }
+
+  .mdl-card__actions {
+    padding: 0px;
+  }
+
+  .mdl-grid {
+    text-align: center;
+  }
+
+  .card-title {
+    font-size: 15px;
+    color: $dove-gray;
+  }
+
+  .card-title-sub {
+    font-size: 12px;
+  }
+
+  .card-owner {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .card-icons {
+    display: inline-block;
+  }
+
+  .card-count {
+    font-size: 11px;
+    padding: 10px;
+    background: $alabaster;
+  }
+
+  .border {
+    border-right: 1px solid #cccccc;
+  }
+}

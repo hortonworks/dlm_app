@@ -7,8 +7,8 @@
     <div class="notification-bar">
       <i class="fa fa-check-circle pull-left"></i>
       <i class="fa fa-remove pull-right" (click)="closeNotification()"></i>
-      <span class="text-medium">{{"pages.infra.labels.clusterAddSuccess" | translate}}</span>
-      <span class="text-small-1">{{"pages.infra.description.clusterAddSuccess" | translate}} </span>
+      <div class="text-medium">{{"pages.infra.labels.clusterAddSuccess" | translate}}</div>
+      <div class="text-small-1">{{"pages.infra.description.clusterAddSuccess" | translate}} </div>
     </div>
   </div>
 
@@ -43,8 +43,8 @@
     <div *ngIf="showClusterDetails">
       <div class="cluster-details">
         <div>
-          <label class="label">Cluster Name</label>
-          <div class="value">{{"pages.infra.labels.clusterName" | translate}}</div>
+          <label class="label">{{"pages.infra.labels.clusterName" | translate}}</label>
+          <div class="value">{{cluster.name}}</div>
         </div>
         <div class="spacer-15"> </div>
         <div>

@@ -2,7 +2,7 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {ReactiveFormsModule, FormsModule} from '@angular/forms';
 import {Store} from '@ngrx/store';
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
-import {CollapseModule, TabsModule, TimepickerModule} from 'ng2-bootstrap';
+import {CollapseModule, TabsModule, TypeaheadModule, TimepickerModule} from 'ng2-bootstrap';
 import { MyDatePickerModule } from 'mydatepicker';
 
 import { CommonComponentsModule } from 'components/common-components.module';
@@ -13,6 +13,15 @@ import {CheckboxComponent} from 'common/checkbox/checkbox.component';
 import {MockStore} from 'mocks/mock-store';
 import {CheckboxColumnComponent} from 'components/table-columns/checkbox-column/checkbox-column.component';
 import {PolicyFormComponent} from './policy-form.component';
+import {HdfsBrowserComponent} from 'components/hdfs-browser/hdfs-browser.component';
+import {TableComponent} from 'common/table/table.component';
+import {TableFooterComponent} from 'common/table/table-footer/table-footer.component';
+import {TableFilterComponent} from 'common/table/table-filter/table-filter.component';
+import {ActionColumnComponent} from 'components/table-columns/action-column/action-column.component';
+import {BytesSizePipe} from 'pipes/bytes-size.pipe';
+import {MomentModule} from 'angular2-moment';
+import {NgxDatatableModule} from '@swimlane/ngx-datatable';
+import {NavbarService} from 'services/navbar.service';
 
 describe('PolicyFormComponent', () => {
   let component: PolicyFormComponent;
@@ -25,17 +34,28 @@ describe('PolicyFormComponent', () => {
           loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
         }),
         TimepickerModule.forRoot(),
-        ReactiveFormsModule, FormsModule, CollapseModule, TabsModule.forRoot(), MyDatePickerModule, CommonComponentsModule
+        ReactiveFormsModule, FormsModule, CollapseModule, TabsModule.forRoot(), MyDatePickerModule,
+        CommonComponentsModule,
+        MomentModule,
+        NgxDatatableModule,
+        TypeaheadModule
       ],
       declarations: [
         PolicyFormComponent,
         RadioButtonComponent,
         CheckboxComponent,
         CheckboxListComponent,
-        CheckboxColumnComponent
+        CheckboxColumnComponent,
+        HdfsBrowserComponent,
+        TableComponent,
+        TableFooterComponent,
+        BytesSizePipe,
+        TableFilterComponent,
+        ActionColumnComponent
       ],
       providers: [
-        {provide: Store, useClass: MockStore}
+        {provide: Store, useClass: MockStore},
+        NavbarService
       ]
     })
       .compileComponents();

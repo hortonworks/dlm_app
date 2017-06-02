@@ -62,8 +62,10 @@ export class ClustersComponent implements OnInit {
         this.canAddPairing = clusters.length > 1;
         this.canAddPolicy = Object.keys(pairsCount).length > 0;
         return clusters.map(cluster => {
-          const pairsCounter = (pairsCount[cluster.id] || {}).pairs || 0;
-          const policiesCounter = (policiesCount[cluster.id] || {}).policies || 0;
+          const pairsCounter = cluster.id in pairsCount &&
+          'pairs' in pairsCount[cluster.id] ? pairsCount[cluster.id].pairs : 0;
+          const policiesCounter = cluster.id in policiesCount &&
+          'policies' in policiesCount[cluster.id] ? policiesCount[cluster.id].policies : 0;
           return {
             ...cluster,
             pairsCounter,

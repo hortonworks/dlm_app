@@ -1,8 +1,9 @@
-<div  mdl #layout class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-  <dp-header [headerData]="headerData" [user]="getUser()" [hidden]="!isUserSignedIn()"> </dp-header>
-  <main class="mdl-layout__content">
-    <div class="page-content">
-      <router-outlet></router-outlet>
-    </div>
-  </main>
-</div>
+<dp-header mdl [headerData]="headerData" [user]="getUser()" *ngIf="isUserSignedIn()" [(persona)]="persona" [(viewPaneState)]="viewPaneState"> </dp-header>
+<dp-collapsible-nav mdl [headerData]="headerData" *ngIf="isUserSignedIn()" [(persona)]="persona" [(viewPaneState)]="viewPaneState"> </dp-collapsible-nav>
+<main [ngClass]="{'maximised': viewPaneStates.MAXIMISE  === viewPaneState,
+                    'minimized': viewPaneStates.MINIMISE === viewPaneState,
+                    'default' : viewPaneStates.DEFAULT === viewPaneState}">
+
+  <div mdl class="page-content"> <router-outlet></router-outlet></div>
+
+</main>
