@@ -69,7 +69,7 @@ object Entities {
       created: Option[LocalDateTime] = Some(LocalDateTime.now()),
       updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
-  case class Category(
+  case class DatasetTag(
       id: Option[Long] = None,
       name: String,
       description: String,
@@ -193,7 +193,7 @@ object Entities {
 
   // classes as data conatiner for Rest Api
 
-  case class DatasetAndCategories(dataset: Dataset, categories: Seq[Category])
+  case class DatasetAndCategories(dataset: Dataset, categories: Seq[DatasetTag])
   case class DatasetAndCategoryIds(dataset: Dataset, categories: Seq[Long])
 
 }
@@ -226,8 +226,8 @@ object JsonFormatters {
   implicit val permissionWrites = Json.writes[Permission]
   implicit val permissionReads = Json.reads[Permission]
 
-  implicit val categoryWrites = Json.writes[Category]
-  implicit val categoryReads = Json.reads[Category]
+  implicit val categoryWrites = Json.writes[DatasetTag]
+  implicit val categoryReads = Json.reads[DatasetTag]
 
   implicit val locationWrites = Json.writes[Location]
   implicit val locationReads = Json.reads[Location]

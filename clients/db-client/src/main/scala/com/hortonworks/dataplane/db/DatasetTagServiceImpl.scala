@@ -1,17 +1,16 @@
 package com.hortonworks.dataplane.db
 
 import com.hortonworks.dataplane.commons.domain.Entities.{DatasetTag, Errors}
-import com.hortonworks.dataplane.db.Webservice.CategoryService
+import com.hortonworks.dataplane.db.Webservice.DatasetTagService
 import com.typesafe.config.Config
-import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class CategoryServiceImpl(config: Config)(implicit ws: WSClient)
-    extends CategoryService {
+class DatasetTagServiceImpl(config: Config)(implicit ws: WSClient)
+    extends DatasetTagService {
 
   private def url =
     Option(System.getProperty("dp.services.db.service.uri"))
@@ -19,39 +18,25 @@ class CategoryServiceImpl(config: Config)(implicit ws: WSClient)
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  override def list(): Future[Either[Errors, Seq[DatasetTag]]] = {
+  override def query(tags: Seq[DatasetTag]): Future[Either[Errors, Seq[DatasetTag]]] = {
     ws.url(s"$url/categories")
       .withHeaders("Accept" -> "application/json")
-      .get()
-      .map(mapToCategories)
+      .post(tags)
+      .map(mapToDatasetTags)
   }
 
-  override def create(category: DatasetTag): Future[Either[Errors, DatasetTag]] = {
-    ws.url(s"$url/categories")
+  override def create(tag: DatasetTag): Future[Either[Errors, DatasetTag]] = {
+    ws.url(s"$url/dataset-tags")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
       )
-      .post(Json.toJson(category))
-      .map(mapToCategory)
+      .post(Json.toJson(tag))
+      .map(mapToDatasetTag)
 
   }
 
-  override def retrieve(categoryId: String): Future[Either[Errors, DatasetTag]] = {
-    ws.url(s"$url/categories/$categoryId")
-      .withHeaders("Accept" -> "application/json")
-      .get()
-      .map(mapToCategory)
-  }
-
-  override def delete(categoryId: String): Future[Either[Errors, DatasetTag]] = {
-    ws.url(s"$url/categories/$categoryId")
-      .withHeaders("Accept" -> "application/json")
-      .delete()
-      .map(mapToCategory) // TODO fix the return type for delete
-  }
-
-  private def mapToCategories(res: WSResponse) = {
+  private def mapToDatasetTags(res: WSResponse) = {
     res.status match {
       case 200 =>
         Right(((res.json \ "results").as[Seq[JsValue]].map { d =>
@@ -61,7 +46,7 @@ class CategoryServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
-  private def mapToCategory(res: WSResponse) = {
+  private def mapToDatasetTag(res: WSResponse) = {
     res.status match {
       case 200 =>
         extractEntity[DatasetTag](

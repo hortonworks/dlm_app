@@ -3,11 +3,14 @@ package controllers
 import javax.inject.Inject
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{Category, Dataset, DatasetAndCategoryIds}
+import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasFilter}
+import com.hortonworks.dataplane.commons.domain.Entities.{Dataset, DatasetAndCategoryIds, DatasetTag}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webservice.{CategoryService, DataSetCategoryService, DataSetService}
+import com.hortonworks.dataplane.cs.Webservice.AtlasService
+import com.hortonworks.dataplane.db.Webservice.{CategoryService, DataSetCategoryService, DataSetService, DatasetTagService}
 import internal.auth.Authenticated
 import models.JsonResponses
+import models.RequestSyntax.{CreateDataset, DataAssetQueryFilter}
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.Controller
@@ -19,6 +22,9 @@ import scala.concurrent.Future
 
 class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetService,
                          @Named("categoryService") val categoryService: CategoryService,
+                         @Named("datasetTagService") val tagService: DatasetTagService,
+                         @Named("atlasService") val atlasService: AtlasService,
+                         @Named("dataAssetService") val dataAssetService: dataAssetService,
                          @Named("dataSetCategoryService") val dataSetCategoryService: DataSetCategoryService,
                          authenticated:Authenticated)
   extends Controller {
@@ -36,8 +42,49 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
 
   def create = authenticated.async(parse.json) { request =>
     Logger.info("Received create dataSet request")
-    request.body.validate[DatasetAndCategoryIds].map { dSetNCtgryIds =>
-      dataSetService.create(dSetNCtgryIds.copy(dataset = dSetNCtgryIds.dataset.copy(createdBy = request.user.id.get)))
+//    1. read request
+    request.body.validate[CreateDataset].map { datasetRequest =>
+//      2. retrieve all tags (for ids)
+      val tagsAsStrings: Seq[String] = datasetRequest.tags.getOrElse(/* empty array */)
+      val tags: Seq[DatasetTag] = tagsAsStrings.map(cTagString => DatasetTag(name = cTagString))
+      tagService.query(tags)
+          .map {
+            tags => tags match {
+              case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case Right(tags) => // goto 3
+            }
+
+          }
+//      3. if a tag is not found, create it and retrieve id
+      val tagsToCreate = tags.filter(cTag => cTag.id == None)
+      val tagCreateFutures = Future.sequence(tagsToCreate.map(cTag => tagService.create(cTag)))
+      tagCreateFutures
+        .onSuccess(/* goto 4 */)
+      tagCreateFutures
+          .onFailure(InternalServerError(JsonResponses.statusError(s"Unable to create tags")))
+//      4. get cluster id from lake id
+      val clusterId = datasetRequest.lakeId
+//      5. make request to atlas to find data assets by filters
+      val filtersAsFlattened: Seq[DataAssetQueryFilter] = datasetRequest.query.filters.getOrElse(/* empty array */)
+      val filters: Seq[AtlasFilter] = filtersAsFlattened.map(cFilter => AtlasFilter(
+        atlasAttribute = AtlasAttribute(name = cFilter.attribute, dataType = cFilter.attributeType),
+        operation = cFilter.operator,
+        operand = cFilter.operand
+      ))
+
+      atlasService.searchQueryAssets(clusterId, filters)
+          .map {
+            entities => entities match {
+              case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case Right(entities) => entities.entities.getOrElse(/* empty array */)// goto 6
+            }
+
+          }
+//      6. insert assets into assets table
+
+//      insert dataset
+
+      dataSetService.create(datasetRequest.copy(dataset = datasetRequest.dataset.copy(createdBy = request.user.id.get)))
         .map {
           dataSetNCategories => dataSetNCategories match {
             case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
@@ -96,9 +143,13 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
       }
   }
 
+  def listTags(query: Option[String]) = authenticated.async {
+
+  }
+
   def createCategory = authenticated.async(parse.json) { request =>
     Logger.info("Received create dataSet-category request")
-    request.body.validate[Category].map { category =>
+    request.body.validate[DatasetTag].map { category =>
       categoryService.create(category)
         .map {
           category => category match {

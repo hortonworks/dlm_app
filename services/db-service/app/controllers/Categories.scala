@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import domain.CategoryRepo
-import com.hortonworks.dataplane.commons.domain.Entities.Category
+import com.hortonworks.dataplane.commons.domain.Entities.DatasetTag
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,7 +29,7 @@ class Categories @Inject()(categoryRepo: CategoryRepo)(implicit exec: ExecutionC
 
   def insert = Action.async(parse.json) { req =>
     req.body
-      .validate[Category]
+      .validate[DatasetTag]
       .map { category =>
         categoryRepo
           .insert(category)

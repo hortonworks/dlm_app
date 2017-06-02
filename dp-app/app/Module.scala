@@ -61,6 +61,20 @@ class Module extends AbstractModule {
 
   @Provides
   @Singleton
+  @Named("datasetTagService")
+  def provideDatasetTagService(implicit ws: WSClient,configuration: Configuration):DatasetTagService = {
+    new DatasetTagServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("dataAssetService")
+  def provideDataAssetService(implicit ws: WSClient,configuration: Configuration):DataAssetService = {
+    new DataAssetServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
   @Named("lakeService")
   def provideLakeService(implicit ws: WSClient,configuration: Configuration):LakeService = {
     new LakeServiceImpl(configuration.underlying)

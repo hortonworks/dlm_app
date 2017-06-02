@@ -4,7 +4,7 @@ import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Entities.{
   AssetWorkspace,
-  Category
+  DatasetTag
 }
 import domain.{AssetWorkspaceRepo, CategoryRepo}
 import play.api.mvc._

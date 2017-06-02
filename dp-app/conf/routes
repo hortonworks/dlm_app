@@ -48,6 +48,8 @@ PUT         /api/datasets                          controllers.DataSets.update()
 #GET         /api/datasets/:name                    controllers.DataSets.getByname(name,host,datacenter)
 
 # Atlas API Search
-POST        /api/query-assets                         controllers.QueryAssets.search(clusterId: String)
+POST        /api/query-assets                         controllers.QueryAssets.search(clusterId: String, pageId: Number, pageSize: Number)
 
 GET         /api/query-attributes                     controllers.QueryAttributes.list(clusterId: String)
+
+#GET         /api/dataset-tags                         controllers.DataSets.listTags(query: Option[String])

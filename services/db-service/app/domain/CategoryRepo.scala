@@ -3,7 +3,7 @@ package domain
 import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Category}
+import com.hortonworks.dataplane.commons.domain.Entities.{DatasetTag}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 
 import scala.concurrent.Future
@@ -15,11 +15,11 @@ class CategoryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvi
 
   val Categories = TableQuery[CategoriesTable]
 
-  def all(): Future[List[Category]] = db.run {
+  def all(): Future[List[DatasetTag]] = db.run {
     Categories.to[List].result
   }
 
-  def insert(category: Category): Future[Category] = {
+  def insert(category: DatasetTag): Future[DatasetTag] = {
     db.run {
       Categories returning Categories += category
     }
@@ -30,24 +30,23 @@ class CategoryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvi
     Category
   }
 
-  def findByName(name: String):Future[Option[Category]] = {
+  def findByName(name: String):Future[Option[DatasetTag]] = {
       db.run(Categories.filter(_.name === name).result.headOption)
   }
 
-  def findById(categoryId: Long):Future[Option[Category]] = {
+  def findById(categoryId: Long):Future[Option[DatasetTag]] = {
     db.run(Categories.filter(_.id === categoryId).result.headOption)
   }
 
-  final class CategoriesTable(tag: Tag) extends Table[Category](tag, Some("dataplane"), "dp_categories") {
+  final class CategoriesTable(tag: Tag) extends Table[DatasetTag](tag, Some("dataplane"), "dp_categories") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
     def name = column[String]("name")
-    def description = column[String]("description")
 
     def created = column[Option[LocalDateTime]]("created")
     def updated = column[Option[LocalDateTime]]("updated")
 
-    def * = (id,name, description,created,updated) <> ((Category.apply _).tupled, Category.unapply)
+    def * = (id,name,created,updated) <> ((DatasetTag.apply _).tupled, DatasetTag.unapply)
   }
 
 }

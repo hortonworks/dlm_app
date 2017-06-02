@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import com.hortonworks.dataplane.commons.domain.Entities.Category
+import com.hortonworks.dataplane.commons.domain.Entities.DatasetTag
 import domain.CategoryRepo
 import play.api.mvc._
 

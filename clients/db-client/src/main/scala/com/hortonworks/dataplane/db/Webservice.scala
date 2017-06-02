@@ -58,22 +58,32 @@ object Webservice {
 
   trait CategoryService extends DbClientService {
 
-    def list(): Future[Either[Errors, Seq[Category]]]
-    def create(category: Category): Future[Either[Errors, Category]]
-    def retrieve(categoryId: String): Future[Either[Errors, Category]]
-    def delete(categoryId: String): Future[Either[Errors, Category]]
+    def list(): Future[Either[Errors, Seq[DatasetTag]]]
+    def create(category: DatasetTag): Future[Either[Errors, DatasetTag]]
+    def retrieve(categoryId: String): Future[Either[Errors, DatasetTag]]
+    def delete(categoryId: String): Future[Either[Errors, DatasetTag]]
   }
 
   trait DataSetCategoryService extends DbClientService {
 
     def getListWithDataSetId(
-        dataSetId: String): Future[Either[Errors, Seq[DatasetCategory]]]
+                              dataSetId: String): Future[Either[Errors, Seq[DatasetCategory]]]
     def getListWithCategoryId(
-        categoryId: String): Future[Either[Errors, Seq[DatasetCategory]]]
+                               categoryId: String): Future[Either[Errors, Seq[DatasetCategory]]]
     def create(dataSetCategory: DatasetCategory)
-      : Future[Either[Errors, DatasetCategory]]
+    : Future[Either[Errors, DatasetCategory]]
     def delete(dataSetId: String,
                categoryId: String): Future[Either[Errors, DatasetCategory]]
+  }
+
+  trait DatasetTagService extends DbClientService {
+    def create(datasetTag: DatasetTag): Future[Either[Errors, DatasetTag]]
+    def query(tags: Seq[String]): Future[Either[Errors, Seq[DatasetTag]]]
+  }
+
+  trait DataAssetService extends DbClientService {
+    def create(datAsset: DataAsset): Future[Either[Errors, DataAsset]]
+    def list(): Future[Either[Errors, Seq[DataAsset]]]
   }
 
   trait LakeService extends DbClientService {
