@@ -47,7 +47,7 @@ class WorkspaceRepo @Inject()(protected val assetWorkspaceRepo: AssetWorkspaceRe
       (((workspace, username, clustername), asset), notebook)
       <- (getWorkspaceWithNameQuery(inputQuery).joinLeft(assetCountQuery).on(_._1.id === _._1))
         .joinLeft(appCountQuery).on(_._1._1.id === _._1)
-    } yield (workspace, username, clustername, 1, 1)
+    } yield (workspace, username, clustername, asset.map(_._2).getOrElse(0), notebook.map(_._2).getOrElse(0))
 
     db.run(query.to[List].result).map {
       rows =>
