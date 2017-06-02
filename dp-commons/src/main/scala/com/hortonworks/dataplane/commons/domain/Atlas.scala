@@ -36,7 +36,7 @@ object Atlas {
                               limit: Option[Int] = None,
                               offset: Option[Int] = None) {
     def isPaged =
-      limit.isDefined && offset.isDefined && offset.get > 0 && limit.get > 0
+      limit.isDefined && offset.isDefined && offset.get >= 0 && limit.get > 0
   }
 
   implicit val atlasAttributeReads = Json.reads[AtlasAttribute]
