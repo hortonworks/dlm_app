@@ -5,7 +5,9 @@ import {SearchWidget} from "./search-widget/search-widget.component";
 
 export class SimpleQueryObjectModel {
   type: AssetTypeEnum = AssetTypeEnum.ALL;
-  constructor(public searchText: string) {}
+
+  constructor(public searchText: string) {
+  }
 }
 
 const TagModel = TaggingWidgetTagModel;
@@ -44,7 +46,9 @@ export class BasicQueryEditor implements OnInit {
   }
 
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-    (changes["queryObj"]) && this.copyQryObjToWidget();
+    if (changes["queryObj"]) {
+      this.copyQryObjToWidget();
+    }
   }
 
   copyQryObjToWidget() {
@@ -67,10 +71,18 @@ export class BasicQueryEditor implements OnInit {
     if (this.createdValueIndx > 0) {
       this.filterTags.push(new TagModel(`Created: ${this.createdFilOptns[this.createdValueIndx]}`, "createdValueIndx"));
     }
-    if (this.typeValueIndx > 0) this.filterTags.push(new TagModel(`Type: ${this.typeFilOptns[this.typeValueIndx]}`, "typeValueIndx"));
-    if (this.sizeValueIndx > 0) this.filterTags.push(new TagModel(`Size: ${this.sizeFilOptns[this.sizeValueIndx]}`, "sizeValueIndx"));
-    if (this.dLakeIndx > 0) this.filterTags.push(new TagModel(`Datalake: ${this.dlFilOptns[this.dLakeIndx]}`, "dLakeIndx"));
-    if (this.ownerIndx > 0) this.filterTags.push(new TagModel(`Owner: ${this.ownerFilOptn[this.ownerIndx]}`, "ownerIndx"));
+    if (this.typeValueIndx > 0) {
+      this.filterTags.push(new TagModel(`Type: ${this.typeFilOptns[this.typeValueIndx]}`, "typeValueIndx"));
+    }
+    if (this.sizeValueIndx > 0) {
+      this.filterTags.push(new TagModel(`Size: ${this.sizeFilOptns[this.sizeValueIndx]}`, "sizeValueIndx"));
+    }
+    if (this.dLakeIndx > 0) {
+      this.filterTags.push(new TagModel(`Datalake: ${this.dlFilOptns[this.dLakeIndx]}`, "dLakeIndx"));
+    }
+    if (this.ownerIndx > 0) {
+      this.filterTags.push(new TagModel(`Owner: ${this.ownerFilOptn[this.ownerIndx]}`, "ownerIndx"));
+    }
   }
 
   onFilterOptionChange() {

@@ -80,10 +80,10 @@
     ],
     "quotemark": [true, "double", "jsx-double"],
     "no-inferrable-types": [true, "ignore-params", "ignore-properties"],
-    "no-unused-expression": [true, "allow-fast-null-checks"],
-    "curly": [true, "ignore-same-line"],
+  //  "no-unused-expression": [true, "allow-fast-null-checks"],
+  //  "curly": [true, "ignore-same-line"],
     "file-header":false,
-    "trailing-comma": [false, {"multiline": "always", "singleline": "never"}],
+    "trailing-comma": false,
     "arrow-parens": [true, "ban-single-arg-parens"],
     "one-variable-per-declaration": false,
     "member-access": [true, "no-public"]

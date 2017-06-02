@@ -34,8 +34,8 @@ export class DsAssetSearch {
     if (!this.showQueryResults) (thisObj => setTimeout(() => thisObj._actionSearch(), 0))(this);
     this.showQueryResults = true;
     this.queryModel = new AssetSetQueryModel([
-      {column: "asset.name", operator: "contains", value: this.queryObj.searchText},
-      {column: "asset.source", operator: "==", value: AssetTypeEnumString[this.queryObj.type]}
+      {column: "asset.name", operator: "contains", value: this.queryObj.searchText, dataType:"-"},
+      {column: "asset.source", operator: "==", value: AssetTypeEnumString[this.queryObj.type], dataType:"-"}
     ]);
   }
 

@@ -17,7 +17,7 @@ export const loadJobs = (requestId?): Action => ({
   type: ActionTypes.LOAD_JOBS.START, payload: { meta: {requestId} }
 });
 
-export const loadJobsForClusters = (clusterIds: string[], requestId?): Action => ({
+export const loadJobsForClusters = (clusterIds: number[], requestId?): Action => ({
   type: ActionTypes.LOAD_JOBS_FOR_CLUSTERS, payload: {clusterIds, meta: {requestId}}
 });
 

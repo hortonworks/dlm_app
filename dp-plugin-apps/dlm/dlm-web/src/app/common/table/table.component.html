@@ -9,7 +9,10 @@
     [columnMode]="columnMode"
     [selectionType]="selectionType"
     [cssClasses]="cssClasses"
-    [limit]="limit">
+    [limit]="limit"
+    [loadingIndicator]="loadingIndicator"
+    (select)="onSelectAction($event)"
+    (activate)="onActivate($event)">
     <ngx-datatable-row-detail [rowHeight]="rowDetailHeight">
       <ng-template let-row="row" ngx-datatable-row-detail-template>
       </ng-template>

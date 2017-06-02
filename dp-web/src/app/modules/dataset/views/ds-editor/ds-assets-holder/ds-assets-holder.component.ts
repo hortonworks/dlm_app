@@ -38,8 +38,12 @@ export class DsAssetsHolder implements OnInit {
   }
 
   onListAction(action: AssetListActionsEnum) {
-    if (action == AssetListActionsEnum.ADD) this.showPopup = true;
-    if (action == AssetListActionsEnum.REMOVE) this.actionRemoveAll();
+    if (action == AssetListActionsEnum.ADD) {
+      this.showPopup = true;
+    }
+    if (action == AssetListActionsEnum.REMOVE) {
+      this.actionRemoveAll();
+    }
   }
 
   actionRemoveAll() {

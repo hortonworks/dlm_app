@@ -8,3 +8,4 @@ export const getForms = (state: State) => state.forms;
 export const getEvents = (state: State) => state.events;
 export const getProgresses = (state: State) => state.progress;
 export const getOperations = (state: State) => state.operations;
+export const getFilesList = (state: State) => state.hdfsFiles;

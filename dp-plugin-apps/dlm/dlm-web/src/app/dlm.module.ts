@@ -20,6 +20,7 @@ import { PolicyEffects } from './effects/policy.effect';
 import { PairingEffects } from './effects/pairing.effect';
 import { JobEffects } from './effects/job.effect';
 import { EventEffects } from './effects/event.effect';
+import { HdfsListEffects } from './effects/hdfslist.effect';
 
 import { FormEffects } from './effects/form.effect';
 
@@ -32,6 +33,7 @@ import { FormService } from 'services/form.service';
 import { NavbarService } from 'services/navbar.service';
 import { EventService } from 'services/event.service';
 import { TimeZoneService } from 'services/time-zone.service';
+import { HdfsService } from 'services/hdfs.service';
 
 import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
@@ -53,6 +55,7 @@ import { CommonComponentsModule } from './components/common-components.module';
 import { UserDropdownComponent } from './common/user-dropdown/user-dropdown.component';
 import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.component';
 import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route.component';
+import { HdfsBrowserComponent } from './components/hdfs-browser/hdfs-browser.component';
 
 import { ResourceChartsComponent } from './pages/overview/resource-charts/resource-charts.component';
 import { IssuesListComponent } from './pages/overview/issues-list/issues-list.component';
@@ -97,6 +100,7 @@ import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/rev
 import { BytesSizePipe } from './pipes/bytes-size.pipe';
 import { FmtTzPipe } from './pipes/fmt-tz.pipe';
 import { FrequencyPipe } from './pipes/frequency.pipe';
+import { TruncatePipe } from './pipes/truncate.pipe';
 
 @NgModule({
   imports: [
@@ -113,6 +117,7 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
     EffectsModule.run(JobEffects),
     EffectsModule.run(FormEffects),
     EffectsModule.run(EventEffects),
+    EffectsModule.run(HdfsListEffects),
     CollapseModule.forRoot(),
     TabsModule.forRoot(),
     ModalModule.forRoot(),
@@ -140,6 +145,7 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
     PairingsComponent,
     CreatePairingComponent,
     BreadcrumbComponent,
+    HdfsBrowserComponent,
 
     PoliciesComponent,
     PolicyTableComponent,
@@ -185,7 +191,8 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
     NotificationsComponent,
     BytesSizePipe,
     FmtTzPipe,
-    FrequencyPipe
+    FrequencyPipe,
+    TruncatePipe
   ],
   bootstrap: [DlmComponent],
   providers: [
@@ -198,6 +205,7 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
     NavbarService,
     EventService,
     TimeZoneService,
+    HdfsService,
     httpServiceProvider
   ]
 })

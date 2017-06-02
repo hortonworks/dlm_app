@@ -5,18 +5,21 @@ import {
   AssetSetQueryFilterModel, AssetTypeEnum,
   AssetTypeEnumString
 } from "../../../../ds-assets-list/ds-assets-list.component";
+import {DsAssetsService} from "../../../../../services/dsAssetsService";
 
 export enum FilterOperatorEnum {LT, LTEQ, EQ, NOTEQ, GTEQ, GT, LIKE} // LIKE is contains
 export const FilterOperatorSymbols = ["<", "<=", "==", "!=", "=>", ">", "Contains"];
+export const FilterOperatorForQuery = ["lt", "lte", "equals", "nte", "gte", "gt", "Contains"];
 
 const FOEnum = FilterOperatorEnum;
 
 export class QueryFilterObject {
   propertyName: string = "";
+  dataType : string = "string";
   operators: FilterOperatorEnum[] = [];
   selectedOperator: FilterOperatorEnum = -1;
   helpText: string = "";
-  _value: (string | number) = "";
+  _value: (string | number | boolean) = "";
   valueOptions: any[] = null;
   validationRegEx = /[^$|\s+]/; // not empty or just whitespace
   validity: boolean = false;
@@ -28,6 +31,9 @@ export class QueryFilterObject {
   getOperatorDisplay(enmVal: FilterOperatorEnum) {
     return FilterOperatorSymbols[enmVal];
   }
+  getOperatorForQuery(enmVal: FilterOperatorEnum) {
+    return FilterOperatorForQuery[enmVal];
+  }
 
   validate() {
     return this.validity = (this.selectedOperator == -1) ? false : (
@@ -36,20 +42,7 @@ export class QueryFilterObject {
   }
 
   getFilterData() {
-    return new AssetSetQueryFilterModel(this.propertyName, this.getOperatorDisplay(this.selectedOperator), this.getValue());
-  }
-}
-
-export class QueryFilterOwner extends QueryFilterObject {
-  propertyName: string = "asset.owner.id";
-  operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.NOTEQ];
-  helpText: string = "Select Owner";
-  _value: number = -1;
-
-  constructor(public valueOptions: AssetOwnerModel[]) {super();}
-
-  getValue() {
-    return this.valueOptions[this._value].id;
+    return new AssetSetQueryFilterModel(this.propertyName, this.getOperatorForQuery(this.selectedOperator), this.getValue(), this.dataType);
   }
 }
 
@@ -65,11 +58,39 @@ export class QueryFilterSource extends QueryFilterObject {
   }
 }
 
-export class QueryFilterName extends QueryFilterObject {
-  propertyName: string = "asset.name";
-  operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.LIKE];
-  helpText: string = "Enter Name";
+export class QueryFilterTypeString extends QueryFilterObject {
+  operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.NOTEQ];
+  helpText: string = "Enter Text";
   _value: string;
+
+  constructor(public propertyName: string, public dataType: string) {
+    super();
+  }
+}
+
+export class QueryFilterTypeBoolean extends QueryFilterObject {
+  operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.NOTEQ];
+  helpText: string = "Select";
+  _value: number = -1;
+  valueOptions: boolean[] = [false, true];
+
+  constructor(public propertyName: string, public dataType: string) {
+    super();
+  }
+
+  getValue() {
+    return this.valueOptions[this._value];
+  }
+}
+
+export class QueryFilterTypeDate extends QueryFilterObject {
+  operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.NOTEQ, FOEnum.LT, FOEnum.GT];
+  helpText: string = "YYYY-MM-DD";
+  _value: string;
+
+  constructor(public propertyName: string, public dataType: string) {
+    super();
+  }
 }
 
 @Component({
@@ -82,26 +103,34 @@ export class QueryFilter implements OnInit {
   @Output("onClose") closeEmitter: EventEmitter<null> = new EventEmitter<null>();
   filterObject: QueryFilterObject = null;
   availableFilters: any[] = [
-    {display: "Select Filter Type", className: "QueryFilterObject"},
-    {display: "Owner", className: "QueryFilterOwner"},
-    {display: "Name", className: "QueryFilterName"}
+    {display: "Select Filter Type", dataType: "QueryFilterObject"}
   ];
   owners: AssetOwnerModel[] = [];
 
-  constructor(private ownerService: AssetOwnerService) {
+  constructor(private ownerService: AssetOwnerService,
+              private assetService: DsAssetsService) {
   }
 
   ngOnInit() {
-    this.ownerService.list().subscribe(owners => this.owners = owners);
+    // this.ownerService.list().subscribe(owners => this.owners = owners);
+    this.assetService.getQueryAttribute().subscribe(qryAtrs => {
+      qryAtrs.forEach(qryAtr=>this.availableFilters.push(
+        {display: qryAtr.name, dataType: qryAtr.dataType, propertyName: qryAtr.name}
+      ));
+    });
   }
 
   onFilterTypeChange(e) {
-    switch (this.availableFilters[e.target.value].className) {
-      case "QueryFilterOwner" :
-        this.filterObject = new QueryFilterOwner(this.owners);
+    const fltr = this.availableFilters[e.target.value];
+    switch (fltr.dataType) {
+      case "string" :
+        this.filterObject = new QueryFilterTypeString(fltr.propertyName, fltr.dataType);
         break;
-      case "QueryFilterName"  :
-        this.filterObject = new QueryFilterName();
+      case "boolean"  :
+        this.filterObject = new QueryFilterTypeBoolean(fltr.propertyName, fltr.dataType);
+        break;
+      case "date"  :
+        this.filterObject = new QueryFilterTypeDate(fltr.propertyName, fltr.dataType);
         break;
       default                 :
         this.filterObject = new QueryFilterObject();

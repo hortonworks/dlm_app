@@ -15,7 +15,7 @@ export class DatasetDashboardComponent implements OnInit {
   views = ViewsEnum;
   currentView: ViewsEnum;
 
-  constructor(private router: Router,) {
+  constructor(private router: Router) {
   }
 
   ngOnInit() {

@@ -29,10 +29,12 @@ export class DsEditor implements OnInit {
 
   ngOnInit() {
     this.activeRoute.params.subscribe(params => this.datasetId = +params["id"]);
-    if (isNaN(this.datasetId)) this.router.navigate(["dataset/add"]);
+    if (isNaN(this.datasetId)) {
+      this.router.navigate(["dataset/add"]);
+    }
     else {
       this.assetSetQueryModelsForAddition.push(
-        new AssetSetQueryModel([new AssetSetQueryFilterModel("dataset.id", "=",this.datasetId)])
+        new AssetSetQueryModel([new AssetSetQueryFilterModel("dataset.id", "=", this.datasetId, "-")])
       );
       this.richDatasetService.getById(this.datasetId)
         .subscribe(dsModel => {
@@ -47,13 +49,17 @@ export class DsEditor implements OnInit {
   }
 
   actionNext() {
-    if (!this[`validateStage${this.currentStage}`]()) return;
+    if (!this[`validateStage${this.currentStage}`]()) {
+      return;
+    }
     ++this.currentStage;
     this.setVisibilityOfNext();
   }
 
   moveToStage(newStage: number) {
-    (newStage < this.currentStage) && (this.currentStage = newStage) && this.setVisibilityOfNext();
+    if ((newStage < this.currentStage) && (this.currentStage = newStage)) {
+      this.setVisibilityOfNext();
+    }
   }
 
   actionSave() {

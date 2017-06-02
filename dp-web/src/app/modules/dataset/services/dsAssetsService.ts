@@ -1,15 +1,38 @@
 import {Injectable} from "@angular/core";
-import {Http} from "@angular/http";
+import {Http, RequestOptions} from "@angular/http";
 import {Observable} from "rxjs";
 import {DsAssetModel} from "../models/dsAssetModel";
 import {AssetCountModel} from "../models/richDatasetModel";
 import {AssetSetQueryModel} from "../views/ds-assets-list/ds-assets-list.component";
+import {HttpUtil} from "../../../shared/utils/httpUtil";
 
 @Injectable()
 export class DsAssetsService {
-  url1 = "/api/assets/dataset";
+  url1 = "/api/query-assets";
+  url2 = "/api/query-attributes";
 
   constructor(private http: Http) {
+  }
+
+  getQueryAttribute():Observable<any[]> {
+    // return this.http
+    //   .get(this.url2, new RequestOptions(HttpUtil.getHeaders()))
+    //   .map(HttpUtil.extractData)
+    //   .catch(HttpUtil.handleError);
+    return Observable.create(observer => {
+      observer.next([
+        {"name": "createTime", "dataType": "date"},
+        {"name": "lastAccessTime", "dataType": "date"},
+        {"name": "comment", "dataType": "string"},
+        {"name": "retention", "dataType": "int"},
+        {"name": "viewOriginalText", "dataType": "string"},
+        {"name": "viewExpandedText", "dataType": "string"},
+        {"name": "tableType", "dataType": "string"},
+        {"name": "temporary", "dataType": "boolean"},
+        {"name": "owner", "dataType": "string"},
+        {"name": "name", "dataType": "string"}
+      ])
+    })
   }
 
   count(asqms: AssetSetQueryModel[]): Observable<AssetCountModel> {
@@ -29,6 +52,7 @@ export class DsAssetsService {
   }
 
   list(asqms: AssetSetQueryModel[], pageNo: number, pageSize: number): Observable<DsAssetModel[]> {
+    console.log(asqms)
     return Observable.create(observer => {
       const newData = [];
       asqms.forEach(asqm => {
@@ -38,6 +62,30 @@ export class DsAssetsService {
       });
       setTimeout(() => observer.next(newData.slice((pageNo - 1) * pageSize, pageNo * pageSize)), 300);
     });
+  }
+
+  atlasQuery(asqms: AssetSetQueryModel[]) : Observable<DsAssetModel[]> {
+    let obs=null, retArr=[];
+    this.http
+      .get(this.url2, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError)
+      .subscribe(rsp => {
+        rsp.entities.forEach(ent=>{
+          retArr.push({
+            creationTime: "-",
+            id: ent.guid,
+            name: ent.displayText,
+            owner: ent.attributes.owner,
+            rowCount: 0,
+            source: "hive",
+            type: ent.typeName
+          })
+        })
+        obs.next(retArr)
+      });
+    return Observable.create(observer => obs = observer);
+
   }
 
 }

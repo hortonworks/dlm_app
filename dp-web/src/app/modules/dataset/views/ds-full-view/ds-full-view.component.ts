@@ -31,7 +31,7 @@ export class DsFullView implements OnInit {
           .getById(+params["id"])
           .subscribe(dsObj => this.dsModel = dsObj);
         this.dsAssetQueryModel = new AssetSetQueryModel([
-          new AssetSetQueryFilterModel("dataset.id", "=", +params["id"])
+          new AssetSetQueryFilterModel("dataset.id", "=", +params["id"], "-")
         ]);
       });
   }
