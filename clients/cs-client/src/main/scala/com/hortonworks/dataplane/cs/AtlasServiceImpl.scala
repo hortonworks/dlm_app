@@ -1,6 +1,6 @@
 package com.hortonworks.dataplane.cs
 
-import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasFilters}
+import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery}
 import com.hortonworks.dataplane.commons.domain.Entities.{Errors}
 import com.hortonworks.dataplane.cs.Webservice.AtlasService
 import com.typesafe.config.Config
@@ -42,7 +42,7 @@ class AtlasServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToAttributes)
   }
 
-  override def searchQueryAssets(clusterId: String, filters: AtlasFilters): Future[Either[Errors, AtlasEntities]] = {
+  override def searchQueryAssets(clusterId: String, filters: AtlasSearchQuery): Future[Either[Errors, AtlasEntities]] = {
     ws.url(s"$url/cluster/$clusterId/atlas/hive/search")
       .withHeaders(
         "Content-Type" -> "application/json",
