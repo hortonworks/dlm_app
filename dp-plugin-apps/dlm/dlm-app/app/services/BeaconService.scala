@@ -437,7 +437,7 @@ class BeaconService @Inject()(
         val fullUrl = beaconService.fullURL
         beaconPolicyInstanceService.listPolicyInstance(fullUrl, policyName, queryString).map {
           case Left(errors) => p.success(Left(errors))
-          case Right(policyInstanceService) => p.success(Right(PolicyInstancesResponse(policyInstanceService)))
+          case Right(policyInstanceService) => p.success(Right(PolicyInstancesResponse(policyInstanceService.totalResults, policyInstanceService.results, policyInstanceService.instance)))
         }
     }
     p.future
@@ -450,7 +450,7 @@ class BeaconService @Inject()(
       case Right(beaconService) =>
         beaconPolicyInstanceService.listPolicyInstances(beaconService.fullURL, queryString).map {
           case Left(errors) => p.success(Left(errors))
-          case Right(policyInstanceService) => p.success(Right(PolicyInstancesResponse(policyInstanceService)))
+          case Right(policyInstanceService) => p.success(Right(PolicyInstancesResponse(policyInstanceService.totalResults, policyInstanceService.results, policyInstanceService.instance)))
         }
     }
     p.future

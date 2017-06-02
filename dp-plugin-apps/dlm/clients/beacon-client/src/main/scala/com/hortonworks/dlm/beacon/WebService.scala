@@ -84,8 +84,8 @@ object WebService {
   }
 
   trait BeaconPolicyInstanceService extends ClientService {
-    def listPolicyInstances(beaconEndpoint : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, Seq[PolicyInstanceResponse]]]
-    def listPolicyInstance(beaconEndpoint : String, policyName : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, Seq[PolicyInstanceResponse]]]
+    def listPolicyInstances(beaconEndpoint : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, PolicyInstancesDetails]]
+    def listPolicyInstance(beaconEndpoint : String, policyName : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, PolicyInstancesDetails]]
     def abortPolicyInstances(beaconEndpoint : String, policyName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
   }
 

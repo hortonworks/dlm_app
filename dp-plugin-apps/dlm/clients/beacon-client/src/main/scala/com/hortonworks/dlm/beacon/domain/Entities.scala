@@ -36,8 +36,9 @@ object ResponseEntities {
   case class PostActionResponse(requestId: String, message: String, status: String)
 
   case class PolicyInstanceResponse(id: String, policyId: String, name: String, `type`: String, executionType: String,
-                                    user: String, status: String, startTime: String, endTime: Option[String],
-                                    trackingInfo: String, message: String)
+                                    user: String, status: String, startTime: String, endTime: Option[String], message: String)
+
+  case class PolicyInstancesDetails(totalResults: Long, results: Long, instance: Seq[PolicyInstanceResponse])
 
   case class BeaconEventResponse(policyId: Option[String], instanceId: Option[String], eventType: String, severity: String, timestamp: String, message: String)
 }
@@ -93,6 +94,9 @@ object JsonFormatters {
 
   implicit val policyInstanceResponseWrites = Json.writes[PolicyInstanceResponse]
   implicit val policyInstanceResponseReads = Json.reads[PolicyInstanceResponse]
+
+  implicit val policyInstancesDetailsWrites = Json.writes[PolicyInstancesDetails]
+  implicit val policyInstancesDetailsReads = Json.reads[PolicyInstancesDetails]
 
   implicit val eventResponseWrites = Json.writes[BeaconEventResponse]
   implicit val eventResponseReads = Json.reads[BeaconEventResponse]

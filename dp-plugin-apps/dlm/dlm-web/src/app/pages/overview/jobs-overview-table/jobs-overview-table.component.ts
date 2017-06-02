@@ -32,7 +32,7 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   }
 
   ngOnInit() {
-    const actionLabel = (name) => this.t.instant(`page.overview.table.actions.${name}`);
+    const actionLabel = name => this.t.instant(`page.overview.table.actions.${name}`);
     this.rowActions = <ActionItemType[]>[
       {label: actionLabel('abort_job'), name: 'ABORT_JOB'},
       {label: actionLabel('delete_policy'), name: 'DELETE_POLICY'},
@@ -42,26 +42,27 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
     this.columns = [
       {cellTemplate: this.statusCellTemplate, maxWidth: 25, minWidth: 25},
       {prop: 'status', cellClass: 'text-cell', headerClass: 'text-header'},
+      {prop: 'name', cellClass: 'text-cell', headerClass: 'text-header'},
       {prop: 'sourceCluster', name: this.t.instant('page.overview.table.column.source_cluster')},
       {...TableComponent.makeFixedWith(20), name: '', cellTemplate: this.destinationIconCellRef},
       {prop: 'targetCluster', name: this.t.instant('page.overview.table.column.destination_cluster')},
       {prop: 'service', name: this.t.instant('common.service')},
       {
-        prop: 'startTime',
+        prop: 'lastJobResource.startTime',
         cellTemplate: this.agoTemplate,
         name: 'Started',
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
       {
-        prop: 'endTime',
+        prop: 'lastJobResource.endTime',
         cellTemplate: this.agoTemplate,
         name: 'Ended',
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
       {
-        prop: 'duration',
+        prop: 'lastJobResource.duration',
         cellTemplate: this.runTimeTemplate,
         name: 'Runtime',
         cellClass: 'date-cell',
@@ -97,7 +98,7 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
 
   handleSelectedAction({row, action}) {
     this.selectedAction = action;
-    this.selectedForActionRow = row.policyEntity;
+    this.selectedForActionRow = row;
     this.showActionConfirmationModal = true;
   }
 

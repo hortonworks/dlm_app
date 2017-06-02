@@ -109,6 +109,14 @@
         "policies": "Policies",
         "jobs": "Jobs"
       },
+      "filter": {
+        "title": "Time Range",
+        "options": {
+          "day": "24 Hours",
+          "week": "1 Week",
+          "month": "1 Month"
+        }
+      },
       "issues": {
         "updates": "Issues & Updates",
         "recent": "Recent Issues",

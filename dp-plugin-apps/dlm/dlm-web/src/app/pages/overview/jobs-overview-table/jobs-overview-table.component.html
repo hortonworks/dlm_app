@@ -3,9 +3,7 @@
   [showPageSizeMenu]="showPageSizeMenu"
   [columns]="columns"
   [rows]="jobs"
-  [selectionType]="selectionType"
-  (selectAction)="handleSelectedAction($event)"
-  selectionType="checkbox">
+  (selectColumnAction)="handleSelectedAction($event)">
 </dlm-table>
 
 <dlm-icon-column [showHexagon]="false" [showValue]="true"></dlm-icon-column>
@@ -14,18 +12,22 @@
   <dlm-job-status [job]="row"></dlm-job-status>
 </ng-template>
 
-<ng-template #agoTemplate let-value="value">
-  <span *ngIf="value > 0">{{value | amTimeAgo}}</span>
-  <span *ngIf="value <= 0">In Progress</span>
+<ng-template #agoTemplate let-value="value" let-policy="row">
+  <span *ngIf="policy.lastJobResource">
+    <span *ngIf="value > 0">{{value | amTimeAgo}}</span>
+    <span *ngIf="value <= 0">In Progress</span>
+  </span>
 </ng-template>
 
 <ng-template #nextRunTemplate let-row="row">
   {{row.nextRun | amDateFormat:'MMM DD, YYYY'}}
 </ng-template>
 
-<ng-template #runTimeTemplate let-value="value" let-row="row">
-  <span *ngIf="row.duration > 0">{{value | amDateFormat: 'hh:mm:ss'}}</span>
-  <span *ngIf="row.duration <= 0">Running</span>
+<ng-template #runTimeTemplate let-value="value" let-policy="row">
+  <span *ngIf="policy.lastJobResource">
+    <span *ngIf="value > 0">{{value | amDateFormat: 'hh:mm:ss'}}</span>
+    <span *ngIf="value <= 0">Running</span>
+  </span>
 </ng-template>
 
 <ng-template #transferredFormattedTemplate let-value="value">
