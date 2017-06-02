@@ -1,11 +1,9 @@
 package com.hortonworks.dataplane.db
 
-import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.Ambari.ClusterServiceWithConfigs
-import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasFilters}
-import play.api.libs.json.{JsResult, Json}
+import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData, _}
+import play.api.libs.json.JsResult
 import play.api.libs.ws.WSResponse
-import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData}
 
 import scala.concurrent.Future
 
@@ -171,13 +169,13 @@ object Webservice {
   }
 
   trait WorkspaceService extends DbClientService {
-    def list(): Future[Either[Errors, Seq[Workspace]]]
+    def list(): Future[Either[Errors, Seq[WorkspaceDetails]]]
 
-    def retrieve(name: String): Future[Either[Errors, Workspace]]
-
-    def listWithCounts(): Future[Either[Errors, Seq[WorkspacesAndCounts]]]
+    def retrieve(name: String): Future[Either[Errors, WorkspaceDetails]]
 
     def create(workspace: Workspace): Future[Either[Errors, Workspace]]
+
+    def delete(name: String): Future[Either[Errors, Int]]
 
   }
 

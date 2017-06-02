@@ -28,16 +28,8 @@ class Workspaces @Inject()(@Named("workspaceService") val workspaceService: Work
       }
   }
 
-  def retrieve(name : String) = authenticated.async {
+  def retrieve(name: String) = authenticated.async {
     workspaceService.retrieve(name)
-      .map {
-        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-        case Right(workspaces) => Ok(Json.toJson(workspaces))
-      }
-  }
-
-  def listWithCounts = authenticated.async {
-    workspaceService.listWithCounts()
       .map {
         case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
         case Right(workspaces) => Ok(Json.toJson(workspaces))
@@ -52,6 +44,14 @@ class Workspaces @Inject()(@Named("workspaceService") val workspaceService: Work
           case Right(workspace) => Ok(Json.toJson(workspace))
         }
     }.getOrElse(Future.successful(BadRequest))
+  }
+
+  def delete(name: String) = authenticated.async {
+    workspaceService.delete(name)
+      .map {
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(i) => Ok(Json.obj("deleted" -> i))
+      }
   }
 
 }

@@ -3,58 +3,58 @@
 # ~~~~
 
 
-GET            /Status                                                       controllers.Status.status
-GET            /health                                                  controllers.Status.health
+GET           /Status                                      controllers.Status.status
+GET           /health                                      controllers.Status.health
 
 
 #auth calls
-POST        /auth/in                               controllers.Authentication.signIn
-GET         /auth/userDetail                       controllers.Authentication.userDetail
-GET         /auth/signInThrougKnox                controllers.Authentication.signInThrougKnox
-GET         /auth/signOutThrougKnox                controllers.Authentication.signOutThrougKnox
+POST          /auth/in                                     controllers.Authentication.signIn
+GET           /auth/userDetail                             controllers.Authentication.userDetail
+GET           /auth/signInThrougKnox                       controllers.Authentication.signInThrougKnox
+GET           /auth/signOutThrougKnox                      controllers.Authentication.signOutThrougKnox
 
 #api
 
-GET         /api/init                              controllers.Configuration.init
-GET         /api/appConfig                         controllers.Configuration.appConfig
+GET           /api/init                                    controllers.Configuration.init
+GET           /api/appConfig                               controllers.Configuration.appConfig
 
-GET         /api/lakes                             controllers.Lakes.list
-POST        /api/lakes                             controllers.Lakes.create
-GET         /api/lakes/:lakeId                     controllers.Lakes.retrieve(lakeId)
-DELETE      /api/lakes/:lakeId                     controllers.Lakes.delete(lakeId)
-PUT         /api/lakes/:lakeId                     controllers.Lakes.update(lakeId)
-GET         /api/lakes/ambari/status               controllers.Lakes.ambariCheck
+GET           /api/lakes                                   controllers.Lakes.list
+POST          /api/lakes                                   controllers.Lakes.create
+GET           /api/lakes/:lakeId                           controllers.Lakes.retrieve(lakeId)
+DELETE        /api/lakes/:lakeId                           controllers.Lakes.delete(lakeId)
+PUT           /api/lakes/:lakeId                           controllers.Lakes.update(lakeId)
+GET           /api/lakes/ambari/status                     controllers.Lakes.ambariCheck
 
-GET         /api/locations                         controllers.Locations.list(query: Option[String])
-GET         /api/locations/:locationId             controllers.Locations.retrieve(locationId: Long)
+GET           /api/locations                               controllers.Locations.list(query: Option[String])
+GET           /api/locations/:locationId                   controllers.Locations.retrieve(locationId: Long)
 
-GET         /api/clusters                          controllers.Clusters.list(lakeId: Option[Long])
-GET         /api/clusters/details                  controllers.Clusters.getDetails
-GET         /api/clusters/:clusterId/health        controllers.Clusters.getHealth(clusterId: Long, summary: Option[Boolean])
+GET           /api/clusters                                controllers.Clusters.list(lakeId: Option[Long])
+GET           /api/clusters/details                        controllers.Clusters.getDetails
+GET           /api/clusters/:clusterId/health              controllers.Clusters.getHealth(clusterId: Long, summary: Option[Boolean])
 
-GET         /api/actions/lakes-list-with-clusters    controllers.actions.LakeActions.listWithClusters
+GET           /api/actions/lakes-list-with-clusters        controllers.actions.LakeActions.listWithClusters
 
 
 #DTSet-Category
-GET         /api/datasets/categories               controllers.DataSets.listAllCategories
-POST        /api/datasets/categories               controllers.DataSets.createCategory
+GET           /api/datasets/categories                     controllers.DataSets.listAllCategories
+POST          /api/datasets/categories                     controllers.DataSets.createCategory
 
 #DataSet
-GET         /api/datasets                          controllers.DataSets.list
-POST        /api/datasets                          controllers.DataSets.create
-GET         /api/datasets/:datasetId               controllers.DataSets.retrieve(datasetId)
-DELETE      /api/datasets/:datasetId               controllers.DataSets.delete(datasetId)
-PUT         /api/datasets                          controllers.DataSets.update()
+GET           /api/datasets                                controllers.DataSets.list
+POST          /api/datasets                                controllers.DataSets.create
+GET           /api/datasets/:datasetId                     controllers.DataSets.retrieve(datasetId)
+DELETE        /api/datasets/:datasetId                     controllers.DataSets.delete(datasetId)
+PUT           /api/datasets                                controllers.DataSets.update()
 #GET         /api/datasets/:name                    controllers.DataSets.getByname(name,host,datacenter)
 
 # Atlas API Search
-POST        /api/query-assets                         controllers.QueryAssets.search(clusterId: String)
+POST          /api/query-assets                            controllers.QueryAssets.search(clusterId: String)
 
-GET         /api/query-attributes                     controllers.QueryAttributes.list(clusterId: String)
+GET           /api/query-attributes                        controllers.QueryAttributes.list(clusterId: String)
 
 # Workspace Api
-GET           /api/workspaces                                                    controllers.Workspaces.list
-GET           /api/workspaceswithcounts                                          controllers.Workspaces.listWithCounts
-GET           /api/workspaces/:name                                              controllers.Workspaces.retrieve(name)
-POST          /api/workspaces                                                    controllers.Workspaces.create
+GET           /api/workspaces                              controllers.Workspaces.list
+GET           /api/workspaces/name/:name                   controllers.Workspaces.retrieve(name)
+POST          /api/workspaces                              controllers.Workspaces.create
+DELETE        /api/workspaces/name/:name                   controllers.Workspaces.delete(name)
 

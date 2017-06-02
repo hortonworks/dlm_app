@@ -19,18 +19,11 @@ class WorkspaceServiceImpl(config: Config)(implicit ws: WSClient)
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  override def list(): Future[Either[Errors, Seq[Workspace]]] = {
-    ws.url(s"$url/workspaces")
+  override def list(): Future[Either[Errors, Seq[WorkspaceDetails]]] = {
+    ws.url(s"$url/workspacedetails")
       .withHeaders("Accept" -> "application/json")
       .get()
-      .map(mapToWorkspaces)
-  }
-
-  override def listWithCounts(): Future[Either[Errors, Seq[WorkspacesAndCounts]]] = {
-    ws.url(s"$url/workspaceswithcounts")
-      .withHeaders("Accept" -> "application/json")
-      .get()
-      .map(mapToWorkspacesAndCount)
+      .map(mapToWorkspaceDetails)
   }
 
   override def create(workspace: Workspace): Future[Either[Errors, Workspace]] = {
@@ -43,14 +36,24 @@ class WorkspaceServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToWorkspace)
   }
 
-  override def retrieve(name: String): Future[Either[Errors, Workspace]] = {
-    ws.url(s"$url/workspaces/name/$name")
+  override def retrieve(name: String): Future[Either[Errors, WorkspaceDetails]] = {
+    ws.url(s"$url/workspacedetails/name/$name")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
       )
       .get()
-      .map(mapToWorkspace)
+      .map(mapToWorkspaceDetail)
+  }
+
+  override def delete(name:String) : Future[Either[Errors, Int]] = {
+    ws.url(s"$url/workspacedetails/name/$name")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      )
+      .delete()
+      .map(mapToInt)
   }
 
   private def mapToWorkspaces(res: WSResponse) = {
@@ -60,9 +63,16 @@ class WorkspaceServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
-  private def mapToWorkspacesAndCount(res: WSResponse) = {
+  private def mapToWorkspaceDetails(res: WSResponse) = {
     res.status match {
-      case 200 => extractEntity[Seq[WorkspacesAndCounts]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[WorkspacesAndCounts].get })
+      case 200 => extractEntity[Seq[WorkspaceDetails]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[WorkspaceDetails].get })
+      case _ => mapErrors(res)
+    }
+  }
+
+  private def mapToWorkspaceDetail(res: WSResponse) = {
+    res.status match {
+      case 200 => Right((res.json \ "results" \ "data").validate[WorkspaceDetails].get)
       case _ => mapErrors(res)
     }
   }
@@ -70,6 +80,13 @@ class WorkspaceServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToWorkspace(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results" \ "data").validate[Workspace].get)
+      case _ => mapErrors(res)
+    }
+  }
+
+  private def mapToInt(res: WSResponse) = {
+    res.status match {
+      case 200 => Right((res.json \ "results").as[Int])
       case _ => mapErrors(res)
     }
   }

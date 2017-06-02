@@ -207,7 +207,14 @@ object Entities {
 
   case class DatasetAndCategoryIds(dataset: Dataset, categories: Seq[Long])
 
-  case class WorkspacesAndCounts(workspace: Workspace, assets: Int, apps: Int)
+  case class WorkspaceDataCount(asset: Int, notebook: Int)
+
+  case class WorkspaceDetails(
+                              workspace: Workspace,
+                              username: String,
+                              clustername: String,
+                              counts: Option[WorkspaceDataCount]
+                            )
 
 }
 
@@ -305,7 +312,10 @@ object JsonFormatters {
   implicit val configReads = Json.reads[DpConfig]
   implicit val configWrites = Json.writes[DpConfig]
 
-  implicit val workspacesAndCountReads = Json.reads[WorkspacesAndCounts]
-  implicit val workspacesAndCountWrites = Json.writes[WorkspacesAndCounts]
+  implicit val workspacesAndCountReads = Json.reads[WorkspaceDataCount]
+  implicit val workspacesAndCountWrites = Json.writes[WorkspaceDataCount]
+
+  implicit val workspaceDetailsReads = Json.reads[WorkspaceDetails]
+  implicit val workspaceDetailsWrites = Json.writes[WorkspaceDetails]
 
 }
