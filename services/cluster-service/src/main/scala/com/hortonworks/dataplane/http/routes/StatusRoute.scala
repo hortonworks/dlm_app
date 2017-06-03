@@ -64,7 +64,7 @@ class StatusRoute @Inject()(val ws: WSClient,
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   val sync =
-    path("datalake" / "sync") {
+    path("cluster" / "sync") {
       post {
         entity(as[DataplaneCluster]) { dl =>
           if (dl.id.isEmpty)

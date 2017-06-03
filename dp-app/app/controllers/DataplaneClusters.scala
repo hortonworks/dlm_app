@@ -45,17 +45,20 @@ class DataplaneClusters @Inject()(
             case Left(errors) =>
               InternalServerError(JsonResponses.statusError(
                 s"Failed with ${Json.toJson(errors)}"))
-            case Right(lake) => {
-              syncDatalake(lake)
-              Ok(Json.toJson(lake))
-            }
+            case Right(dpCluster) =>
+              syncCluster(dpCluster)
+              Ok(Json.toJson(dpCluster))
           }
       }
       .getOrElse(Future.successful(BadRequest))
   }
 
-  private def syncDatalake(datalake: DataplaneCluster): Future[Boolean] = {
-    ambariService.syncCluster(datalake)
+  private def syncCluster(datalake: DataplaneCluster): Future[Boolean] = {
+    ambariService.syncCluster(datalake).map { result =>
+      Logger.info(s"Asking Cluster service to discover ${datalake.ambariUrl}")
+      result
+    }
+
   }
 
   def retrieve(datalakeId: String) = authenticated.async {

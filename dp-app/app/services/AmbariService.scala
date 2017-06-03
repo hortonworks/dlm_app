@@ -32,7 +32,7 @@ class AmbariService @Inject()(private val wSClient: WSClient,private val configu
      }
   }
 
-  def getClusterDetails(ambariEndpoint: AmbariEndpoint) = {//: Future[Either[Errors, AmbariCluster]] = {
+  def getClusterDetails(ambariEndpoint: AmbariEndpoint) = {
     wSClient.url(s"$clusterService/ambari/details")
       .post(Json.toJson(ambariEndpoint)).map { response =>
         Logger.info(s"Got cluster information. ${response.json}")
@@ -46,7 +46,7 @@ class AmbariService @Inject()(private val wSClient: WSClient,private val configu
 
   def syncCluster(datalake: DataplaneCluster): Future[Boolean] = {
     wSClient
-      .url(s"$clusterService/datalake/sync")
+      .url(s"$clusterService/cluster/sync")
       .post(Json.toJson(datalake))
       .map { response =>
         if (response.status == 200) {
