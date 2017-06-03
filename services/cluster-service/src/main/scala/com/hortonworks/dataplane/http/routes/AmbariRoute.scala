@@ -30,8 +30,8 @@ class AmbariRoute @Inject()(val ws: WSClient,
   import com.hortonworks.dataplane.commons.domain.Entities._
   import com.hortonworks.dataplane.http.JsonSupport._
 
-  private[dataplane] class TempDatalake(url: String)
-      extends Datalake(id = None,
+  private[dataplane] class TempDataplaneCluster(url: String)
+      extends DataplaneCluster(id = None,
                        name = "",
                        description = "",
                        ambariUrl = url,
@@ -71,7 +71,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
   def getAmbariDetails(ep: AmbariEndpoint): Future[Seq[AmbariCluster]] = {
 
     val finalList = for {
-      datalake <- Future.successful(new TempDatalake(url = ep.url))
+      datalake <- Future.successful(new TempDataplaneCluster(url = ep.url))
       creds <- loadCredentials
       dli <- Future.successful(
         AmbariDatalakeInterfaceImpl(datalake, ws, config, creds))
@@ -105,7 +105,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
   }
 
   def callAmbariApi(credentials: Credentials, cluster: Cluster, req: String) = {
-    ws.url(s"${cluster.ambariurl.get}/$req")
+    ws.url(s"${cluster.clusterUrl.get}/$req")
       .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
       .map(_.json)

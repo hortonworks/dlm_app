@@ -34,7 +34,7 @@ class SkuRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) 
     db.run(Skus.filter(_.id === skuId).delete)
   }
 
-  final class SkusTable(tag: Tag) extends Table[Sku](tag, Some("dataplane"), "dp_skus") {
+  final class SkusTable(tag: Tag) extends Table[Sku](tag, Some("dataplane"), "skus") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
     def name = column[String]("name")

@@ -56,7 +56,7 @@ object Entities {
       longitude: Float
   )
 
-  case class Datalake(
+  case class DataplaneCluster(
       id: Option[Long] = None,
       name: String,
       description: String,
@@ -66,6 +66,7 @@ object Entities {
       properties: Option[JsValue],
       // state should be used to figure out the status of the cluster
       state: Option[String] = Some("TO_SYNC"),
+      isDatalake: Option[Boolean] = Some(false),
       created: Option[LocalDateTime] = Some(LocalDateTime.now()),
       updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
@@ -81,12 +82,13 @@ object Entities {
       id: Option[Long] = None,
       name: String,
       description: String,
-      ambariurl: Option[String] = None,
+      clusterUrl: Option[String] = None,
       secured: Option[Boolean] = Some(false),
       kerberosuser: Option[String] = None,
       kerberosticketLocation: Option[String] = None,
-      datalakeid: Option[Long] = None,
+      dataplaneClusterId: Option[Long] = None,
       userid: Option[Long] = None,
+      datacenter: Option[String] = None,
       properties: Option[JsValue] = None
   )
 
@@ -94,8 +96,8 @@ object Entities {
       id: Option[Long] = None,
       servicename: String,
       properties: Option[JsValue] = None,
-      clusterid: Option[Long] = None,
-      datalakeid: Option[Long] = None
+      clusterId: Option[Long] = None,
+      dpClusterId: Option[Long] = None
   )
 
   case class ClusterServiceHost(
@@ -149,12 +151,12 @@ object Entities {
   case class Dataset(id: Option[Long] = None,
                      name: String,
                      description: Option[String],
-                     datalakeId: Long,
+                     dpClusterId: Long,
                      createdBy: Long,
                      createdOn: LocalDateTime = LocalDateTime.now(),
-                     lastmodified: LocalDateTime = LocalDateTime.now(),
+                     lastModified: LocalDateTime = LocalDateTime.now(),
                      version: Int = 1,
-                     customprops: Option[JsValue] = None)
+                     customProps: Option[JsValue] = None)
 
   case class DatasetCategory(categoryId: Long, datasetId: Long)
 
@@ -162,11 +164,11 @@ object Entities {
       id: Option[Long],
       name: String,
       description: Option[String],
-      datalakeId: Long,
+      dpClusterId: Long,
       createdBy: Long,
       createdOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      lastmodified: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      customprops: Option[JsValue] = None)
+      lastModified: Option[LocalDateTime] = Some(LocalDateTime.now()),
+      customProps: Option[JsValue] = None)
 
   case class UnclassifiedDatasetCategory(categoryId: Long,
                                          unclassifiedDatasetId: Long)
@@ -231,8 +233,8 @@ object JsonFormatters {
 
   implicit val locationWrites = Json.writes[Location]
   implicit val locationReads = Json.reads[Location]
-  implicit val dataLakeWrites = Json.writes[Datalake]
-  implicit val dataLakeReads = Json.reads[Datalake]
+  implicit val dpClusterWrites = Json.writes[DataplaneCluster]
+  implicit val dpClusterReads = Json.reads[DataplaneCluster]
 
   implicit val skuWrites = Json.writes[Sku]
   implicit val skuReads = Json.reads[Sku]

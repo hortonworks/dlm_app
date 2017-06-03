@@ -48,7 +48,7 @@ class AmbariInterfaceSpec
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "somecluster",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+        clusterUrl = Some("http://localhost:9999/api/v1/clusters/test")),
       Credentials(Some("admin"),Some("admin")),appConfig)
 
     ambariInterface.ambariConnectionCheck.map { ac =>
@@ -69,7 +69,7 @@ class AmbariInterfaceSpec
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+        clusterUrl = Some("http://localhost:9999/api/v1/clusters/test")),
       Credentials(Some("admin"),Some("admin")),appConfig)
 
     val atlas  = ambariInterface.getAtlas
@@ -95,7 +95,7 @@ class AmbariInterfaceSpec
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+        clusterUrl = Some("http://localhost:9999/api/v1/clusters/test")),
       Credentials(Some("admin"),Some("admin")),appConfig)
 
     val atlas  = ambariInterface.getNameNodeStats
@@ -118,7 +118,7 @@ class AmbariInterfaceSpec
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+        clusterUrl = Some("http://localhost:9999/api/v1/clusters/test")),
       Credentials(Some("admin"),Some("admin")),appConfig)
 
     val atlas  = ambariInterface.getHdfsInfo
@@ -142,7 +142,7 @@ class AmbariInterfaceSpec
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test"))
+        clusterUrl = Some("http://localhost:9999/api/v1/clusters/test"))
       ,Credentials(Some("admin"),Some("admin")),appConfig)
 
     val atlas  = ambariInterface.getGetHostInfo
@@ -163,7 +163,7 @@ class AmbariInterfaceSpec
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+        clusterUrl = Some("http://localhost:9999/api/v1/clusters/test")),
       Credentials(Some("admin"),Some("admin")),appConfig)
 
     val atlas  = ambariInterface.getKnoxInfo
@@ -184,7 +184,7 @@ class AmbariInterfaceSpec
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+        clusterUrl = Some("http://localhost:9999/api/v1/clusters/test")),
       Credentials(Some("admin"),Some("admin")),appConfig)
 
     val beacon  = ambariInterface.getBeacon
@@ -205,7 +205,7 @@ class AmbariInterfaceSpec
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
         description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+        clusterUrl = Some("http://localhost:9999/api/v1/clusters/test")),
       Credentials(Some("admin"),Some("admin")),appConfig)
 
     val beacon  = ambariInterface.getHs2Info

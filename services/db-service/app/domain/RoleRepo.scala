@@ -49,7 +49,7 @@ class RoleRepo @Inject()(protected val userRepo: UserRepo, protected val dbConfi
     db.run(Roles.filter(_.id === roleId).result.headOption)
   }
 
-  final class RolesTable(tag: Tag) extends Table[Role](tag, Some("dataplane"), "dp_roles") {
+  final class RolesTable(tag: Tag) extends Table[Role](tag, Some("dataplane"), "roles") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
     def roleName = column[String]("name")
@@ -61,12 +61,12 @@ class RoleRepo @Inject()(protected val userRepo: UserRepo, protected val dbConfi
     def * = (id, roleName, created, updated) <> ((Role.apply _).tupled, Role.unapply)
   }
 
-   final class UserRolesTable(tag: Tag) extends Table[(UserRole)](tag, Some("dataplane"), "dp_users_roles") {
+   final class UserRolesTable(tag: Tag) extends Table[(UserRole)](tag, Some("dataplane"), "users_roles") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
-    def userId = column[Option[Long]]("userid")
+    def userId = column[Option[Long]]("user_id")
 
-    def roleId = column[Option[Long]]("roleid")
+    def roleId = column[Option[Long]]("role_id")
 
     def user = foreignKey("user_userRole", userId, userRepo.Users)(_.id)
 

@@ -60,8 +60,8 @@ class PersistenceActor(clusterInterface: StorageInterface)
         val toPersist = ClusterData(
           servicename = "ATLAS",
           properties = props,
-          clusterid = Some(cluster.id.get),
-          datalakeid = None
+          clusterId = Some(cluster.id.get),
+          dpClusterId = None
         )
 
         clusterInterface
@@ -80,8 +80,8 @@ class PersistenceActor(clusterInterface: StorageInterface)
         val toPersist = ClusterData(
           servicename = "BEACON",
           properties = props,
-          clusterid = Some(cluster.id.get),
-          datalakeid = None
+          clusterId = Some(cluster.id.get),
+          dpClusterId = None
         )
 
         clusterInterface
@@ -105,8 +105,8 @@ class PersistenceActor(clusterInterface: StorageInterface)
         val toPersist = ClusterData(
           servicename = "HDFS",
           properties = props,
-          clusterid = Some(cluster.id.get),
-          datalakeid = None
+          clusterId = Some(cluster.id.get),
+          dpClusterId = None
         )
 
         clusterInterface
@@ -125,8 +125,8 @@ class PersistenceActor(clusterInterface: StorageInterface)
         val toPersist = ClusterData(
           servicename = "HIVE",
           properties = props,
-          clusterid = Some(cluster.id.get),
-          datalakeid = None
+          clusterId = Some(cluster.id.get),
+          dpClusterId = None
         )
 
         clusterInterface
@@ -149,8 +149,8 @@ class PersistenceActor(clusterInterface: StorageInterface)
         val props = at.properties
         val toPersist = ClusterData(servicename = "KNOX",
                                     properties = props,
-                                    clusterid = Some(cluster.id.get),
-                                    datalakeid = None)
+                                    clusterId = Some(cluster.id.get),
+                                    dpClusterId = None)
         clusterInterface
           .serviceRegistered(cluster, toPersist.servicename)
           .map(ServiceExists(cluster, toPersist, Seq(), _))
@@ -164,8 +164,8 @@ class PersistenceActor(clusterInterface: StorageInterface)
         val nn = namenode.right.get
         val toPersist = ClusterData(servicename = "NAMENODE",
                                     properties = nn.props,
-                                    clusterid = Some(cluster.id.get),
-                                    datalakeid = None)
+                                    clusterId = Some(cluster.id.get),
+                                    dpClusterId = None)
 
         clusterInterface
           .serviceRegistered(cluster, toPersist.servicename)

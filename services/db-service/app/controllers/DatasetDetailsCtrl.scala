@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Entities.{Dataset, DatasetDetails}
-import domain.API.{datalakes, users}
+import domain.API.{dpClusters, users}
 import domain.{API, DatasetDetailsRepo, DatasetRepo}
 import play.api.mvc._
 

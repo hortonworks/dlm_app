@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Entities.{Dataset, DatasetAndCategoryIds}
-import domain.API.{datalakes, users}
+import domain.API.{dpClusters, users}
 import domain.DatasetRepo
 import play.api.mvc._
 
@@ -20,7 +20,7 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
   }
 
   private def makeLink(c: Dataset) = {
-    Map("datalake" -> s"${datalakes}/${c.datalakeId}",
+    Map("datalake" -> s"${dpClusters}/${c.dpClusterId}",
       "users" -> s"${users}/${c.createdBy}")
   }
 

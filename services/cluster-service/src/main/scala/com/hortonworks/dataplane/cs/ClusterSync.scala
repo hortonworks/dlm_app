@@ -5,7 +5,7 @@ import javax.inject.{Inject, Singleton}
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, PoisonPill, Props}
 import com.google.common.base.Supplier
-import com.hortonworks.dataplane.commons.domain.Entities.Datalake
+import com.hortonworks.dataplane.commons.domain.Entities.DataplaneCluster
 import com.hortonworks.dataplane.commons.service.api.Poll
 import com.typesafe.config.Config
 import play.api.libs.ws.WSClient
@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
-private[cs] sealed case class GetDataLakes(lakes: Seq[Datalake],
+private[cs] sealed case class GetDataLakes(lakes: Seq[DataplaneCluster],
                                            credentials: Credentials)
 
 private[cs] sealed case class CredentialsLoaded(credentials: Credentials,
@@ -119,7 +119,7 @@ private sealed class Synchronizer(val storageInterface: StorageInterface,
         currentLakes += lake.id.get
         dataLakeWorkers.getOrElseUpdate(
           lake.id.get,
-          context.actorOf(Props(classOf[DatalakeActor],
+          context.actorOf(Props(classOf[DpClusterActor],
                                 lake,
                                 credentials,
                                 config,
@@ -142,11 +142,11 @@ private sealed class Synchronizer(val storageInterface: StorageInterface,
 
     case ServiceSaved(clusterData, cluster) =>
       log.info(s"Cluster state saved for - ${clusterData.servicename}")
-      dataLakeWorkers(cluster.datalakeid.get) ! ServiceSaved(clusterData,
+      dataLakeWorkers(cluster.dataplaneClusterId.get) ! ServiceSaved(clusterData,
                                                              cluster)
 
     case HostInfoSaved(cluster) =>
-      dataLakeWorkers(cluster.datalakeid.get) ! HostInfoSaved(cluster)
+      dataLakeWorkers(cluster.dataplaneClusterId.get) ! HostInfoSaved(cluster)
 
     case DataLakeAdded(dataLakeId) =>
     // Perform the same steps but for a single data lake
