@@ -47,8 +47,14 @@ class DpClusterRepo @Inject()(
   }
 
   def insert(dpCluster: DataplaneCluster): Future[DataplaneCluster] = {
+    def trimTrailingSlash = {
+      if (dpCluster.ambariUrl.endsWith("/")) dpCluster.ambariUrl.stripSuffix("/") else dpCluster.ambariUrl
+    }
+
     val dataplaneCluster = dpCluster.copy(
-      isDatalake = dpCluster.isDatalake.map(Some(_)).getOrElse(Some(false)))
+      isDatalake = dpCluster.isDatalake.map(Some(_)).getOrElse(Some(false)),
+      ambariUrl = trimTrailingSlash
+      )
     db.run {
       DataplaneClusters returning DataplaneClusters += dataplaneCluster
     }
