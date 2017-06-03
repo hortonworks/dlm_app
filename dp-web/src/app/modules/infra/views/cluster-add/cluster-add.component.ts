@@ -178,6 +178,7 @@ export class ClusterAddComponent implements OnInit {
     let lake = new Lake();
     lake.ambariUrl = this.cluster.ambariurl;
     lake.location = this.cluster.location.id;
+    lake.isDatalake = this.isDataLake;
     lake.name = this.cluster.name;
     lake.description = this.cluster.description;
     lake.state = 'TO_SYNC';
