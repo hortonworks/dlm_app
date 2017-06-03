@@ -3,7 +3,7 @@ package com.hortonworks.dataplane.cs
 import java.net.URL
 
 import com.google.common.base.Supplier
-import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasFilters, Entity}
+import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery, Entity}
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterServiceHost, ClusterService => CS}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
 import com.hortonworks.dataplane.cs.atlas.Filters
@@ -63,11 +63,11 @@ class DefaultAtlasInterface(clusterId: Long,
     }
   }
 
-  override def findHiveTables(filters: AtlasFilters): Future[AtlasEntities] = {
+  override def findHiveTables(filters: AtlasSearchQuery): Future[AtlasEntities] = {
     // Get the query
     val query = s"$hiveBaseQuery ${Filters.query(filters)}"
     atlasApi.map { api =>
-      val searchResult = api.dslSearch(query)
+      val searchResult = if(filters.isPaged) api.dslSearchWithParams(query,filters.limit.get,filters.offset.get) else api.dslSearch(query)
       val entityHeaders = searchResult.getEntities
       if (entityHeaders == null) {
         AtlasEntities(None)

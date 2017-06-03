@@ -2,7 +2,7 @@ package com.hortonworks.dataplane.cs
 
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.Ambari.ClusterServiceWithConfigs
-import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasFilters}
+import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery}
 import play.api.libs.json.{JsResult, Json}
 import play.api.libs.ws.WSResponse
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData}
@@ -36,7 +36,7 @@ object Webservice {
   trait AtlasService extends CSClientService {
 
     def listQueryAttributes(clusterId: String): Future[Either[Errors, Seq[AtlasAttribute]]]
-    def searchQueryAssets(clusterId: String, filters: AtlasFilters): Future[Either[Errors, AtlasEntities]]
+    def searchQueryAssets(clusterId: String, filters: AtlasSearchQuery): Future[Either[Errors, AtlasEntities]]
 
   }
 
