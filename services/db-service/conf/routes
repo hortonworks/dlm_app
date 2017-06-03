@@ -32,9 +32,9 @@ POST          /locations                                                     con
 #DpClusters API
 GET           /dp/clusters                                                   controllers.DpClusters.all
 POST          /dp/clusters                                                   controllers.DpClusters.add
-GET           /dp/clusters/:clusterId                                        controllers.DpClusters.load(dpClusterId:Long)
-GET           /dp/clusters/:clusterId/clusters                               controllers.DiscoveredClusters.getByDpClusterId(dpClusterId:Long)
-DELETE        /dp/clusters/:clusterId                                        controllers.DpClusters.delete(dpClusterId:Long)
+GET           /dp/clusters/:dpClusterId                                        controllers.DpClusters.load(dpClusterId:Long)
+GET           /dp/clusters/:dpClusterId/clusters                               controllers.DiscoveredClusters.getByDpClusterId(dpClusterId:Long)
+DELETE        /dp/clusters/:dpClusterId                                        controllers.DpClusters.delete(dpClusterId:Long)
 PATCH         /dp/clusters/status                                            controllers.DpClusters.updateStatus
 
 #Clusters API
