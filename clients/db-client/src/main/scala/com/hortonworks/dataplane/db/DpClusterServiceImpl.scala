@@ -25,7 +25,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
     ws.url(s"$url/dp/clusters")
       .withHeaders("Accept" -> "application/json")
       .get()
-      .map(mapToLakes)
+      .map(mapToDpClusters)
   }
 
   override def create(dpCluster: DataplaneCluster)
@@ -36,7 +36,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
         "Accept" -> "application/json"
       )
       .post(Json.toJson(dpCluster))
-      .map(mapToLake)
+      .map(mapToDpCluster)
   }
 
   override def retrieve(
@@ -44,7 +44,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
     ws.url(s"$url/dp/clusters/$dpClusterId")
       .withHeaders("Accept" -> "application/json")
       .get()
-      .map(mapToLake)
+      .map(mapToDpCluster)
   }
 
   override def update(dpClusterId: String, dpCluster: DataplaneCluster)
@@ -55,7 +55,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
         "Accept" -> "application/json"
       )
       .put(Json.toJson(dpCluster))
-      .map(mapToLake)
+      .map(mapToDpCluster)
   }
 
   override def delete(
@@ -63,10 +63,10 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
     ws.url(s"$url/dp/clusters/$dpClusterId")
       .withHeaders("Accept" -> "application/json")
       .delete()
-      .map(mapToLake)
+      .map(mapToDpCluster)
   }
 
-  private def mapToLakes(res: WSResponse) = {
+  private def mapToDpClusters(res: WSResponse) = {
     res.status match {
       case 200 =>
         extractEntity[Seq[DataplaneCluster]](
@@ -79,7 +79,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
-  private def mapToLake(res: WSResponse) = {
+  private def mapToDpCluster(res: WSResponse) = {
     res.status match {
       case 200 =>
         extractEntity[DataplaneCluster](
