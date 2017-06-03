@@ -1,11 +1,11 @@
 package models
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, Datalake}
+import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster}
 import play.api.libs.json.Json
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
 object RequestSyntax {
-  case class RegisterLake(lake: Datalake, cluster: Cluster)
+  case class RegisterLake(lake: DataplaneCluster, cluster: Cluster)
 }
 
 object Formatters {

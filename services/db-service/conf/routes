@@ -4,8 +4,7 @@
 
 #Users API
 
-GET            /Status                                                       controllers.Status.status
-GET            /health                                                  controllers.Status.health
+GET           /health                                                        controllers.Status.health
 
 GET           /users                                                         controllers.Users.all(username: Option[String])
 POST          /users                                                         controllers.Users.insert
@@ -25,32 +24,32 @@ POST          /permissions                                                   con
 GET           /permissions/user/:username                                    controllers.Permissions.userPermissions(username)
 
 #Locations
-GET           /locations                                                     controllers.Datalakes.getLocations(query: Option[String])
-GET           /locations/:locationId                                         controllers.Datalakes.loadLocation(locationId:Long)
-DELETE        /locations/:locationId                                         controllers.Datalakes.deleteLocation(locationId:Long)
-POST          /locations                                                     controllers.Datalakes.addLocation
+GET           /locations                                                     controllers.DpClusters.getLocations(query: Option[String])
+GET           /locations/:locationId                                         controllers.DpClusters.loadLocation(locationId:Long)
+DELETE        /locations/:locationId                                         controllers.DpClusters.deleteLocation(locationId:Long)
+POST          /locations                                                     controllers.DpClusters.addLocation
 
-#Datalakes API
-GET           /datalakes                                                     controllers.Datalakes.all
-POST          /datalakes                                                     controllers.Datalakes.add
-GET           /datalakes/:datalakeId                                         controllers.Datalakes.load(datalakeId:Long)
-GET           /datalakes/:datalakeId/clusters                                controllers.Clusters.getByDatalakeId(datalakeId:Long)
-DELETE        /datalakes/:datalakeId                                         controllers.Datalakes.delete(datalakeId:Long)
-PATCH         /datalakes/status                                              controllers.Datalakes.updateStatus
+#DpClusters API
+GET           /dp/clusters                                                   controllers.DpClusters.all
+POST          /dp/clusters                                                   controllers.DpClusters.add
+GET           /dp/clusters/:clusterId                                        controllers.DpClusters.load(dpClusterId:Long)
+GET           /dp/clusters/:clusterId/clusters                               controllers.DiscoveredClusters.getByDpClusterId(dpClusterId:Long)
+DELETE        /dp/clusters/:clusterId                                        controllers.DpClusters.delete(dpClusterId:Long)
+PATCH         /dp/clusters/status                                            controllers.DpClusters.updateStatus
 
 #Clusters API
-GET           /clusters                                                      controllers.Clusters.all(datalakeId: Option[Long])
-POST          /clusters                                                      controllers.Clusters.add
-GET           /clusters/:clusterId                                           controllers.Clusters.load(clusterId:Long)
-DELETE        /clusters/:clusterId                                           controllers.Clusters.delete(clusterId:Long)
+GET           /clusters                                                      controllers.DiscoveredClusters.all(dpClusterId: Option[Long])
+POST          /clusters                                                      controllers.DiscoveredClusters.add
+GET           /clusters/:clusterId                                           controllers.DiscoveredClusters.load(clusterId:Long)
+DELETE        /clusters/:clusterId                                           controllers.DiscoveredClusters.delete(clusterId:Long)
 
 
 #Cluster services API
 
 GET           /clusters/:clusterId/services                                  controllers.ClusterServices.allWithCluster(clusterId:Long)
-GET           /datalakes/:datalakeId/services                                controllers.ClusterServices.allWithDatalake(datalakeId:Long)
+GET           /dp/clusters/:dpClusterId/services                                controllers.ClusterServices.allWithDpCluster(dpClusterId:Long)
 POST          /cluster/services                                              controllers.ClusterServices.addWithCluster
-POST          /datalake/services                                             controllers.ClusterServices.addWithDatalake
+POST          /dp/clusters/services                                             controllers.ClusterServices.addWithDpCluster
 GET           /clusters/:clusterId/service/:serviceName                      controllers.ClusterServices.loadWithClusterAndName(clusterId:Long,serviceName:String)
 DELETE        /services/:serviceId                                           controllers.ClusterServices.delete(serviceId:Long)
 PUT           /clusters/services                                             controllers.ClusterServices.updateWithCluster
@@ -130,7 +129,7 @@ DELETE        /unclassifieddatasets/:datasetId                               con
 
 #UnclassifiedDatasetCategory Api
 GET           /unclassifieddatasets/:datasetId/categories                    controllers.UnclassifiedDatasetCategories.allWithDatasetId(datasetId:Long)
-GET           /unclassifieddatasets/categories/:categoryId/datasets                               controllers.UnclassifiedDatasetCategories.allWithCategoryId(categoryId:Long)
+GET           /unclassifieddatasets/categories/:categoryId/datasets          controllers.UnclassifiedDatasetCategories.allWithCategoryId(categoryId:Long)
 POST          /unclassifieddatasets/categories                               controllers.UnclassifiedDatasetCategories.add
 DELETE        /unclassifieddatasets/:datasetId/categories/:categoryId        controllers.UnclassifiedDatasetCategories.delete(datasetId:Long, categoryId:Long)
 

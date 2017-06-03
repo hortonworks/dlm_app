@@ -1,6 +1,6 @@
 package com.hortonworks.dataplane.cs
 
-import com.hortonworks.dataplane.commons.domain.Entities.Datalake
+import com.hortonworks.dataplane.commons.domain.Entities.DataplaneCluster
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import play.api.libs.json.{JsObject, JsValue}
@@ -17,7 +17,7 @@ sealed trait AmbariDatalakeInterface {
 
 }
 
-class AmbariDatalakeInterfaceImpl(datalake: Datalake,
+class AmbariDatalakeInterfaceImpl(datalake: DataplaneCluster,
                                   val ws: WSClient,
                                   val config: Config,
                                   private val credentials: Credentials)
@@ -67,8 +67,8 @@ class AmbariDatalakeInterfaceImpl(datalake: Datalake,
 }
 
 object AmbariDatalakeInterfaceImpl {
-  def apply(datalake: Datalake,
+  def apply(datalake: DataplaneCluster,
             ws: WSClient,
-            config: Config,credentials: Credentials): AmbariDatalakeInterfaceImpl =
+            config: Config, credentials: Credentials): AmbariDatalakeInterfaceImpl =
     new AmbariDatalakeInterfaceImpl(datalake, ws, config,credentials)
 }

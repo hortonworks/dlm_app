@@ -35,13 +35,13 @@ class ClusterPropertiesRepo @Inject()(
       db.run(ClusterProps.filter( c => (c.clusterId === clusterId && c.id === id)).delete)
     }
 
-    final class ClusterPropertiesTable(tag: Tag) extends Table[ClusterProperties](tag, Some("dataplane"), "dp_cluster_properties") {
+    final class ClusterPropertiesTable(tag: Tag) extends Table[ClusterProperties](tag, Some("dataplane"), "cluster_properties") {
 
       def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
       def properties = column[Option[JsValue]]("properties")
 
-      def clusterId = column[Long]("clusterid")
+      def clusterId = column[Long]("cluster_id")
 
       def * = (id, properties, clusterId)<> ((ClusterProperties.apply _).tupled, ClusterProperties.unapply)
     }

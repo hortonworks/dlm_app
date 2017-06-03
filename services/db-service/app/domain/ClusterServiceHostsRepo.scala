@@ -76,13 +76,13 @@ class ClusterServiceHostsRepo @Inject()(
   final class ClusterServiceHostsTable(tag: Tag)
       extends Table[ClusterServiceHost](tag,
                                         Some("dataplane"),
-                                        "dp_cluster_service_hosts") {
+                                        "cluster_service_hosts") {
 
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
     def host = column[String]("host")
 
-    def serviceid = column[Option[Long]]("serviceid")
+    def serviceid = column[Option[Long]]("service_id")
 
     def * =
       (id, host, serviceid) <> ((ClusterServiceHost.apply _).tupled, ClusterServiceHost.unapply)

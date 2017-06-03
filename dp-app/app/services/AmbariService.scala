@@ -3,7 +3,7 @@ package services
 import javax.inject.Inject
 
 import com.google.inject.Singleton
-import com.hortonworks.dataplane.commons.domain.Entities.Datalake
+import com.hortonworks.dataplane.commons.domain.Entities.DataplaneCluster
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
@@ -44,7 +44,7 @@ class AmbariService @Inject()(private val wSClient: WSClient,private val configu
     }
   }
 
-  def syncCluster(datalake: Datalake): Future[Boolean] = {
+  def syncCluster(datalake: DataplaneCluster): Future[Boolean] = {
     wSClient
       .url(s"$clusterService/datalake/sync")
       .post(Json.toJson(datalake))

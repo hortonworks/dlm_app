@@ -76,16 +76,16 @@ object Webservice {
                categoryId: String): Future[Either[Errors, DatasetCategory]]
   }
 
-  trait LakeService extends DbClientService {
+  trait DpClusterService extends DbClientService {
 
-    def list(): Future[Either[Errors, Seq[Datalake]]]
-    def create(datalake: Datalake): Future[Either[Errors, Datalake]]
-    def retrieve(datalakeId: String): Future[Either[Errors, Datalake]]
-    def update(datalakeId: String,
-               datalake: Datalake): Future[Either[Errors, Datalake]]
-    def updateStatus(datalake: Datalake): Future[Either[Errors, Boolean]]
+    def list(): Future[Either[Errors, Seq[DataplaneCluster]]]
+    def create(dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]]
+    def retrieve(dpClusterId: String): Future[Either[Errors, DataplaneCluster]]
+    def update(dpClusterId: String,
+               dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]]
+    def updateStatus(dpCluster: DataplaneCluster): Future[Either[Errors, Boolean]]
 
-    def delete(datalakeId: String): Future[Either[Errors, Datalake]]
+    def delete(dpClusterId: String): Future[Either[Errors, DataplaneCluster]]
 
   }
 
@@ -99,8 +99,7 @@ object Webservice {
   trait ClusterService extends DbClientService {
 
     def list(): Future[Either[Errors, Seq[Cluster]]]
-    def getLinkedClusters(
-                           datalakeId: Long): Future[Either[Errors, Seq[Cluster]]]
+    def getLinkedClusters(dpClusterId: Long): Future[Either[Errors, Seq[Cluster]]]
 
     def create(cluster: Cluster): Future[Either[Errors, Cluster]]
     def retrieve(clusterId: String): Future[Either[Errors, Cluster]]

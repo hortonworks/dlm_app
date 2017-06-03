@@ -25,8 +25,8 @@ class ClusterServiceRepo @Inject()(
     db.run(Services.filter(_.clusterid === clusterId).to[List].result)
   }
 
-  def allWithDatalake(datalakeId: Long) = {
-    db.run(Services.filter(_.datalakeid === datalakeId).to[List].result)
+  def allWithDpCluster(dpClusterId: Long) = {
+    db.run(Services.filter(_.dpClusterId === dpClusterId).to[List].result)
   }
 
   def findByNameAndCluster(serviceName: String, clusterId: Long) = {
@@ -38,11 +38,11 @@ class ClusterServiceRepo @Inject()(
         .headOption)
   }
 
-  def findByIdAndDatalake(serviceId: Long, datalakeId: Long) = {
+  def findByIdAndDpCluster(serviceId: Long, dpClusterId: Long) = {
     db.run(
       Services
         .filter(_.id === serviceId)
-        .filter(_.datalakeid === datalakeId)
+        .filter(_.dpClusterId === dpClusterId)
         .result
         .headOption)
   }
@@ -66,7 +66,7 @@ class ClusterServiceRepo @Inject()(
     db.run(
         Services
           .filter(_.servicename === cs.servicename)
-          .filter(_.clusterid === cs.clusterid)
+          .filter(_.clusterid === cs.clusterId)
           .map(r => r.properties)
           .update(cs.properties))
       .map(r => r)
@@ -81,20 +81,20 @@ class ClusterServiceRepo @Inject()(
   final class ClusterServiceTable(tag: Tag)
       extends Table[ClusterService](tag,
                                     Some("dataplane"),
-                                    "dp_cluster_services") {
+                                    "cluster_services") {
 
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
-    def servicename = column[String]("servicename")
+    def servicename = column[String]("service_name")
 
-    def datalakeid = column[Option[Long]]("datalakeid")
+    def dpClusterId = column[Option[Long]]("dp_clusterid")
 
-    def clusterid = column[Option[Long]]("clusterid")
+    def clusterid = column[Option[Long]]("cluster_id")
 
     def properties = column[Option[JsValue]]("properties")
 
     def * =
-      (id, servicename, properties, clusterid, datalakeid) <> ((ClusterService.apply _).tupled, ClusterService.unapply)
+      (id, servicename, properties, clusterid, dpClusterId) <> ((ClusterService.apply _).tupled, ClusterService.unapply)
 
   }
 

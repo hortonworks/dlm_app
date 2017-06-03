@@ -4,7 +4,7 @@ import akka.actor.Status.Failure
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import com.hortonworks.dataplane.commons.domain.Entities.{
   Cluster,
-  Datalake,
+  DataplaneCluster,
   ClusterService => ClusterData
 }
 import com.hortonworks.dataplane.commons.service.api.Poll
@@ -28,7 +28,7 @@ private[cs] sealed case class ServiceSaved(clusterData: ClusterData,
 private[cs] sealed case class HostInfoSaved(cluster: Cluster)
 
 class ClusterActor(cluster: Cluster,
-                   datalake: Datalake,
+                   datalake: DataplaneCluster,
                    implicit val wSClient: WSClient,
                    storageInterface: StorageInterface,
                    credentials: Credentials,

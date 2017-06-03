@@ -26,7 +26,7 @@ class AmbariClusterInterface(
     // hit Ambari API clusters interface to check connectivity
     logger.info("Starting Ambari connection check")
     // preconditions
-    require(cluster.ambariurl.isDefined, "No Ambari URL defined")
+    require(cluster.clusterUrl.isDefined, "No Ambari URL defined")
     require(credentials.user.isDefined, "No Ambari user defined")
     require(credentials.pass.isDefined, "No Ambari password defined")
     require(
@@ -35,7 +35,7 @@ class AmbariClusterInterface(
       else true,
       "Secure cluster added but Kerberos user/ticket not defined"
     )
-    val url = Try(new URL(cluster.ambariurl.get))
+    val url = Try(new URL(cluster.clusterUrl.get))
     require(url.isSuccess, "registered Ambari url is invalid")
     //Hit ambari URL
     ws.url(s"${url.get.toString}")
@@ -75,7 +75,7 @@ class AmbariClusterInterface(
 
     val serviceSuffix =
       "/configurations/service_config_versions?service_name=ATLAS&is_current=true"
-    ws.url(s"${cluster.ambariurl.get}$serviceSuffix")
+    ws.url(s"${cluster.clusterUrl.get}$serviceSuffix")
       .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
       .map { res =>
@@ -94,12 +94,12 @@ class AmbariClusterInterface(
   override def getNameNodeStats: Future[Either[Throwable, NameNode]] = {
 
     val nameNodeResponse = ws
-      .url(s"${cluster.ambariurl.get}/components/NAMENODE")
+      .url(s"${cluster.clusterUrl.get}/components/NAMENODE")
       .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
 
     val nameNodeHostsApi =
-      s"${cluster.ambariurl.get}/host_components?HostRoles/component_name=NAMENODE"
+      s"${cluster.clusterUrl.get}/host_components?HostRoles/component_name=NAMENODE"
 
     val hostInfo = ws
       .url(nameNodeHostsApi)
@@ -108,7 +108,7 @@ class AmbariClusterInterface(
 
     val nameNodePropertiesResponse = ws
       .url(
-        s"${cluster.ambariurl.get}/configurations/service_config_versions?service_name=HDFS&is_current=true")
+        s"${cluster.clusterUrl.get}/configurations/service_config_versions?service_name=HDFS&is_current=true")
       .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
 
@@ -149,7 +149,7 @@ class AmbariClusterInterface(
     val hostsApi = "/hosts"
 
     val hostsPath =
-      s"${cluster.ambariurl.get}${hostsApi}"
+      s"${cluster.clusterUrl.get}${hostsApi}"
 
     val hostsResponse: Future[WSResponse] = ws
       .url(hostsPath)
@@ -225,9 +225,9 @@ class AmbariClusterInterface(
   override def getHs2Info: Future[Either[Throwable, HiveServer]] = {
     // Get HS2 properties first
     val hiveAPI =
-      s"${cluster.ambariurl.get}/configurations/service_config_versions?service_name=HIVE&is_current=true"
+      s"${cluster.clusterUrl.get}/configurations/service_config_versions?service_name=HIVE&is_current=true"
     val hiveHostApi =
-      s"${cluster.ambariurl.get}/host_components?HostRoles/component_name=HIVE_SERVER"
+      s"${cluster.clusterUrl.get}/host_components?HostRoles/component_name=HIVE_SERVER"
 
     val configResponse = ws
       .url(hiveAPI)
@@ -268,7 +268,7 @@ class AmbariClusterInterface(
   override def getKnoxInfo: Future[Either[Throwable, KnoxInfo]] = {
     // Dump knox properties
     val knoxApi =
-      s"${cluster.ambariurl.get}/configurations/service_config_versions?service_name=KNOX&is_current=true"
+      s"${cluster.clusterUrl.get}/configurations/service_config_versions?service_name=KNOX&is_current=true"
     ws.url(knoxApi)
       .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
@@ -291,9 +291,9 @@ class AmbariClusterInterface(
   override def getBeacon: Future[Either[Throwable, BeaconInfo]] = {
     // Get Beaon properties first
     val beaconApi =
-      s"${cluster.ambariurl.get}/configurations/service_config_versions?service_name=BEACON&is_current=true"
+      s"${cluster.clusterUrl.get}/configurations/service_config_versions?service_name=BEACON&is_current=true"
     val beaconHostApi =
-      s"${cluster.ambariurl.get}/host_components?HostRoles/component_name=BEACON_SERVER"
+      s"${cluster.clusterUrl.get}/host_components?HostRoles/component_name=BEACON_SERVER"
 
     val configResponse = ws
       .url(beaconApi)
@@ -337,7 +337,7 @@ class AmbariClusterInterface(
 
     val hdfsResponse = ws
       .url(
-        s"${cluster.ambariurl.get}/configurations/service_config_versions?service_name=HDFS&is_current=true")
+        s"${cluster.clusterUrl.get}/configurations/service_config_versions?service_name=HDFS&is_current=true")
       .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
 
