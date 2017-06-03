@@ -80,7 +80,7 @@ class DpClusterRepo @Inject()(
   }
 
   private class LocationsTable(tag: Tag)
-      extends Table[Location](tag, Some("dataplane"), "dp_locations") {
+      extends Table[Location](tag, Some("dataplane"), "locations") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
     def country = column[String]("country")
@@ -107,7 +107,7 @@ class DpClusterRepo @Inject()(
 
     def locationId = column[Option[Long]]("location_id")
 
-    def userId = column[Option[Long]]("createdby")
+    def userId = column[Option[Long]]("created_by")
 
     def created = column[Option[LocalDateTime]]("created")
 
