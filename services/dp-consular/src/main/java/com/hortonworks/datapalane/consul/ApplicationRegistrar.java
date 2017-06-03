@@ -1,6 +1,8 @@
 package com.hortonworks.datapalane.consul;
 
 import com.typesafe.config.Config;
+import org.springframework.cloud.commons.util.InetUtils;
+import org.springframework.cloud.commons.util.InetUtilsProperties;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,25 +16,38 @@ public class ApplicationRegistrar {
   private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
   private Config config;
   private Optional<ConsulHook> hook;
-
+  private InetUtils inetUtils=new InetUtils(new InetUtilsProperties());
+  private RandomGenerator randomGenerator=new RandomGenerator(10);
   public ApplicationRegistrar(Config config, Optional<ConsulHook> hook) {
     this.config = config;
     this.hook = hook;
   }
 
   public void initialize() {
-    String host = config.getString("consul.host");
-    int port = config.getInt("consul.port");
-    DpConsulClientImpl dpConsulClient = new DpConsulClientImpl(new ConsulEndpoint(host, port));
-    ClientStart clientStartTask = new ClientStart(dpConsulClient, config, hook);
-    ClientStatus clientStatusTask = new ClientStatus(dpConsulClient, config, hook);
+    String consulHost = config.getString("consul.host");
+    int consulPort = config.getInt("consul.port");
+    DpConsulClientImpl dpConsulClient = new DpConsulClientImpl(new ConsulEndpoint(consulHost, consulPort));
+
+    String serviceName = config.getString("consul.serviceName");
+    List<String> seriveTags = config.getStringList("consul.service.tags");
+    int servicePort = config.getInt("consul.service.port");
+    String serviceId = generateServiceId(serviceName);
+    DpService dpService = new DpService(serviceId, serviceName, seriveTags, getServiceAddress(),servicePort);
+
+    ClientStart clientStartTask = new ClientStart(dpConsulClient, dpService, hook);
+    ClientStatus clientStatusTask = new ClientStatus(dpConsulClient, dpService, hook);
     ExecutionHandler executionHandler = new ExecutionHandler(scheduledExecutorService, () -> clientStartTask, () -> clientStatusTask, config, hook);
     clientStartTask.setExecutionHandler(Optional.of(executionHandler));
     clientStatusTask.setExecutionHandler(Optional.of(executionHandler));
     scheduledExecutorService.schedule(clientStartTask, 2, TimeUnit.SECONDS);
-    Runtime.getRuntime().addShutdownHook(new ShutdownHook(dpConsulClient, config, hook,scheduledExecutorService));
+    Runtime.getRuntime().addShutdownHook(new ShutdownHook(dpConsulClient, dpService, hook,scheduledExecutorService));
   }
-
+  private String getServiceAddress() {
+    return inetUtils.findFirstNonLoopbackAddress().getHostAddress();
+  }
+  private String generateServiceId(String serviceName){
+    return serviceName+"_"+randomGenerator.generate();
+  }
 
   private static class ExecutionHandler {
 
@@ -85,34 +100,29 @@ public class ApplicationRegistrar {
 
     private final DpConsulClient dpConsulClient;
     private Optional<ExecutionHandler> executionHandler = Optional.empty();
-    private final Config config;
+    private final DpService dpService;
     private final Optional<ConsulHook> consulHook;
 
     public void setExecutionHandler(Optional<ExecutionHandler> executionHandler) {
       this.executionHandler = executionHandler;
     }
 
-    public ClientStart(DpConsulClient dpConsulClient, Config config, Optional<ConsulHook> consulHook) {
+    public ClientStart(DpConsulClient dpConsulClient, DpService dpService, Optional<ConsulHook> consulHook) {
       this.dpConsulClient = dpConsulClient;
-      this.config = config;
+      this.dpService = dpService;
       this.consulHook = consulHook;
     }
 
     @Override
     public void run() {
       try {
-        String serviceId = config.getString("consul.serviceId");
-        String name = config.getString("consul.serviceName");
-        List<String> tags = config.getStringList("consul.service.tags");
-        int port = config.getInt("consul.service.port");
-        DpService service = new DpService(serviceId, name, tags, port);
-        dpConsulClient.registerService(service);
-        consulHook.ifPresent(consulHook -> consulHook.onServiceRegistration(service));
-        dpConsulClient.registerCheck(service);
+        dpConsulClient.registerService(dpService);
+        consulHook.ifPresent(consulHook -> consulHook.onServiceRegistration(dpService));
+        dpConsulClient.registerCheck(dpService);
         executionHandler.ifPresent(ExecutionHandler::onSuccess);
         // if at any point in time consul is
       } catch (Throwable th) {
-        consulHook.ifPresent(consulHook -> consulHook.serviceRegistrationFailure(config.getString("consul.serviceId"), th));
+        consulHook.ifPresent(consulHook -> consulHook.serviceRegistrationFailure(dpService.getServiceId(), th));
         executionHandler.ifPresent(ExecutionHandler::onFailure);
       }
     }
@@ -123,23 +133,23 @@ public class ApplicationRegistrar {
 
     private final DpConsulClient dpConsulClient;
     private Optional<ExecutionHandler> executionHandler = Optional.empty();
-    private final Config config;
+    private final DpService dpService;
     private final Optional<ConsulHook> consulHook;
 
     public void setExecutionHandler(Optional<ExecutionHandler> executionHandler) {
       this.executionHandler = executionHandler;
     }
 
-    public ClientStatus(DpConsulClient dpConsulClient, Config config, Optional<ConsulHook> consulHook) {
+    public ClientStatus(DpConsulClient dpConsulClient, DpService dpService, Optional<ConsulHook> consulHook) {
       this.dpConsulClient = dpConsulClient;
-      this.config = config;
+      this.dpService = dpService;
       this.consulHook = consulHook;
     }
 
     @Override
     public void run() {
       try {
-        String serviceId = config.getString("consul.serviceId");
+        String serviceId = dpService.getServiceId();
         boolean available = dpConsulClient.checkServiceAvailability(serviceId);
         consulHook.ifPresent(consulHook -> consulHook.onServiceCheck(serviceId));
         if (available)
@@ -160,13 +170,13 @@ public class ApplicationRegistrar {
 
 
     private final DpConsulClient dpConsulClient;
-    private final Config config;
+    private final DpService dpService;
     private final Optional<ConsulHook> consulHook;
     private final ScheduledExecutorService scheduledExecutorService;
 
-    public ShutdownHook(DpConsulClient dpConsulClient, Config config, Optional<ConsulHook> consulHook, ScheduledExecutorService scheduledExecutorService) {
+    public ShutdownHook(DpConsulClient dpConsulClient, DpService dpService, Optional<ConsulHook> consulHook, ScheduledExecutorService scheduledExecutorService) {
       this.dpConsulClient = dpConsulClient;
-      this.config = config;
+      this.dpService = dpService;
       this.consulHook = consulHook;
       this.scheduledExecutorService = scheduledExecutorService;
     }
@@ -174,7 +184,7 @@ public class ApplicationRegistrar {
     @Override
     public void run() {
       try {
-        String serviceId = config.getString("consul.serviceId");
+        String serviceId = dpService.getServiceId();
         dpConsulClient.unRegisterService(serviceId);
         dpConsulClient.unRegisterCheck(serviceId);
         scheduledExecutorService.shutdown();
@@ -184,6 +194,5 @@ public class ApplicationRegistrar {
       }
     }
   }
-
 
 }

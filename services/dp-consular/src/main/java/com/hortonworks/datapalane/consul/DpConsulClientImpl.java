@@ -7,16 +7,12 @@ import com.ecwid.consul.v1.agent.model.NewCheck;
 import com.ecwid.consul.v1.agent.model.NewService;
 import com.ecwid.consul.v1.agent.model.Service;
 import com.ecwid.consul.v1.health.model.HealthService;
-import org.springframework.cloud.commons.util.InetUtils;
-import org.springframework.cloud.commons.util.InetUtilsProperties;
-
 import java.util.List;
 import java.util.Map;
 
 public class DpConsulClientImpl implements DpConsulClient {
 
   private final ConsulClient consulClient;
-  private InetUtils inetUtils=new InetUtils(new InetUtilsProperties());
 
   public DpConsulClientImpl(ConsulEndpoint consul) {
     consulClient = new ConsulClient(consul.getHost(), consul.getPort());
@@ -30,7 +26,7 @@ public class DpConsulClientImpl implements DpConsulClient {
     newService.setTags(service.getServiceTags());
     newService.setPort(service.getPort());
     newService.setName(service.getServiceName());
-    newService.setAddress(getServiceAddress());
+    newService.setAddress(service.getHost());
     Response<Void> voidResponse = consulClient.agentServiceRegister(newService);
     return ConsulResponse.from(voidResponse);
   }
@@ -41,8 +37,7 @@ public class DpConsulClientImpl implements DpConsulClient {
     newCheck.setId(service.getServiceId() + "-healthCheck");
     newCheck.setServiceId(service.getServiceId());
     newCheck.setName(service.getServiceId() + "-healthCheck");
-    //newCheck.setHttp("http://localhost:" + service.getPort() + "/health");
-    newCheck.setHttp("http://"+ getServiceAddress() +":" + service.getPort() + "/health");
+    newCheck.setHttp(String.format("http://%s:%s/health",service.getHost(),service.getPort()));
     newCheck.setInterval(service.getHealthCheckIntervalInSecs() + "s");
     //Set a default timeout to 1s
     newCheck.setTimeout("10s");
@@ -50,9 +45,6 @@ public class DpConsulClientImpl implements DpConsulClient {
     return ConsulResponse.from(voidResponse);
   }
 
-  private String getServiceAddress() {
-    return inetUtils.findFirstNonLoopbackAddress().getHostAddress();
-  }
 
   @Override
   public ConsulResponse unRegisterService(String serviceId) {

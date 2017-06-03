@@ -7,13 +7,15 @@ public class DpService {
   private String serviceId;
   private String serviceName;
   private List<String> serviceTags;
+  private String host;
   private Integer port;
   private Integer healthCheckIntervalInSecs = 5;
 
-  public DpService(String serviceId,String serviceName,List<String> serviceTags, Integer port) {
+  public DpService(String serviceId,String serviceName,List<String> serviceTags, String host,Integer port) {
     this.serviceId = serviceId;
     this.serviceName = serviceName;
     this.serviceTags = serviceTags;
+    this.host = host;
     this.port = port;
   }
 
@@ -34,6 +36,7 @@ public class DpService {
     return "DpService{" +
       "serviceId='" + serviceId + '\'' +
       ", serviceTags=" + serviceTags +
+      ", port=" + host +
       ", port=" + port +
       '}';
   }
@@ -49,5 +52,9 @@ public class DpService {
 
   public String getServiceName() {
     return serviceName;
+  }
+
+  public String getHost() {
+    return host;
   }
 }
