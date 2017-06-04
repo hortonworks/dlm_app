@@ -7,7 +7,6 @@ import com.ecwid.consul.v1.agent.model.NewCheck;
 import com.ecwid.consul.v1.agent.model.NewService;
 import com.ecwid.consul.v1.agent.model.Service;
 import com.ecwid.consul.v1.health.model.HealthService;
-
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +26,7 @@ public class DpConsulClientImpl implements DpConsulClient {
     newService.setTags(service.getServiceTags());
     newService.setPort(service.getPort());
     newService.setName(service.getServiceName());
+    newService.setAddress(service.getHost());
     Response<Void> voidResponse = consulClient.agentServiceRegister(newService);
     return ConsulResponse.from(voidResponse);
   }
@@ -37,13 +37,14 @@ public class DpConsulClientImpl implements DpConsulClient {
     newCheck.setId(service.getServiceId() + "-healthCheck");
     newCheck.setServiceId(service.getServiceId());
     newCheck.setName(service.getServiceId() + "-healthCheck");
-    newCheck.setHttp("http://localhost:" + service.getPort() + "/health");
+    newCheck.setHttp(String.format("http://%s:%s/health",service.getHost(),service.getPort()));
     newCheck.setInterval(service.getHealthCheckIntervalInSecs() + "s");
     //Set a default timeout to 1s
     newCheck.setTimeout("10s");
     Response<Void> voidResponse = consulClient.agentCheckRegister(newCheck);
     return ConsulResponse.from(voidResponse);
   }
+
 
   @Override
   public ConsulResponse unRegisterService(String serviceId) {

@@ -21,8 +21,6 @@ services:
         CONSUL_HOST: ${CONSUL_HOST}
   dp-db-service:
     image: hortonworks/dp-db-service
-    ports:
-        - "9000:9000"
     depends_on:
         - dp-database
     links:
@@ -31,8 +29,6 @@ services:
       CONSUL_HOST: ${CONSUL_HOST}
   dp-cluster-service:
     image: hortonworks/dp-cluster-service
-    ports:
-        - "9009:9009"
     depends_on:
         - dp-database
     links:
@@ -43,7 +39,6 @@ services:
     image: hortonworks/dp-app
     ports:
         - "80:80"
-        - "8000:9000"
     volumes:
         - ./certs:/usr/dp-app/conf/cert
     environment:
