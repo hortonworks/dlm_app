@@ -25,8 +25,8 @@ class DpClusterActor(private val dpCluster: DataplaneCluster,
     with ActorLogging {
 
   val clusterMap = collection.mutable.Map[Long, ActorRef]()
-  val dataLakeInterface =
-    AmbariDatalakeInterfaceImpl(dpCluster, wSClient, config, credentials)
+  val dpClusterInterface =
+    AmbariDataplaneClusterInterfaceImpl(dpCluster, wSClient, config, credentials)
 
   val prefix = Try(config.getString("dp.service.ambari.cluster.api.prefix"))
     .getOrElse("/api/v1/clusters")
@@ -46,7 +46,7 @@ class DpClusterActor(private val dpCluster: DataplaneCluster,
 
   def makeCluster(cname: String) = {
 
-    dataLakeInterface.getClusterDetails(cname).map { props =>
+    dpClusterInterface.getClusterDetails(cname).map { props =>
       Cluster(
         name = cname,
         description = s"Cluster $cname",
@@ -62,7 +62,7 @@ class DpClusterActor(private val dpCluster: DataplaneCluster,
   override def receive = {
     case Poll() =>
       // Pull cluster related information from linked Ambari
-      val fClusters = dataLakeInterface.discoverClusters
+      val fClusters = dpClusterInterface.discoverClusters
       // Register all clusters in storage
 
       val clustersToCreate =

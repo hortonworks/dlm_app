@@ -15,7 +15,7 @@ import com.hortonworks.dataplane.db.Webservice.{
 import internal.auth.Authenticated
 import models.{JsonResponses, WrappedErrorsException}
 import models.JsonFormatters._
-import models.RequestSyntax.RegisterLake
+import models.RequestSyntax.RegisterDpCluster
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.Controller

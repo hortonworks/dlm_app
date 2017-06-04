@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
-sealed trait AmbariDatalakeInterface {
+sealed trait AmbariDataplaneClusterInterface {
 
   def discoverClusters: Future[Seq[String]]
 
@@ -17,24 +17,24 @@ sealed trait AmbariDatalakeInterface {
 
 }
 
-class AmbariDatalakeInterfaceImpl(datalake: DataplaneCluster,
-                                  val ws: WSClient,
-                                  val config: Config,
-                                  private val credentials: Credentials)
-    extends AmbariDatalakeInterface {
+class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
+                                          val ws: WSClient,
+                                          val config: Config,
+                                          private val credentials: Credentials)
+    extends AmbariDataplaneClusterInterface {
 
-  val logger = Logger(classOf[AmbariDatalakeInterfaceImpl])
+  val logger = Logger(classOf[AmbariDataplaneClusterInterfaceImpl])
 
   val prefix = Try(config.getString("dp.service.ambari.cluster.api.prefix"))
     .getOrElse("/api/v1/clusters")
 
-  /** On a registered datalake, discover the clusters
+  /** On a registered dpCluster, discover the clusters
     * and start data fetch jobs for them
     *
     * @return List of Cluster names
     */
   override def discoverClusters: Future[Seq[String]] = {
-    val response = ws.url(s"${datalake.ambariUrl}$prefix")
+    val response = ws.url(s"${dataplaneCluster.ambariUrl}$prefix")
       .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
     response.map { res =>
@@ -53,7 +53,7 @@ class AmbariDatalakeInterfaceImpl(datalake: DataplaneCluster,
 
 
   override def getClusterDetails(clusterName:String):Future[Option[JsValue]] = {
-    val response = ws.url(s"${datalake.ambariUrl}$prefix/$clusterName")
+    val response = ws.url(s"${dataplaneCluster.ambariUrl}$prefix/$clusterName")
       .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
     response.map { res =>
@@ -66,9 +66,9 @@ class AmbariDatalakeInterfaceImpl(datalake: DataplaneCluster,
   }
 }
 
-object AmbariDatalakeInterfaceImpl {
-  def apply(datalake: DataplaneCluster,
+object AmbariDataplaneClusterInterfaceImpl {
+  def apply(dataplaneCluster: DataplaneCluster,
             ws: WSClient,
-            config: Config, credentials: Credentials): AmbariDatalakeInterfaceImpl =
-    new AmbariDatalakeInterfaceImpl(datalake, ws, config,credentials)
+            config: Config, credentials: Credentials): AmbariDataplaneClusterInterfaceImpl =
+    new AmbariDataplaneClusterInterfaceImpl(dataplaneCluster, ws, config,credentials)
 }

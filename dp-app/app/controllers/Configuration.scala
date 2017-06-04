@@ -24,7 +24,7 @@ class Configuration @Inject()(@Named("dpClusterService") val dpClusterService:
   def init = authenticated.async { request =>
     for {
       user <- Future.successful(request.user)
-      lake <- isLakeSetup()
+      lake <- isDpClusterSetUp()
       auth <- isAuthSetup()
       rbac <- isRBACSetup()
     } yield Ok(
@@ -48,13 +48,11 @@ class Configuration @Inject()(@Named("dpClusterService") val dpClusterService:
 
 
 //  code to check if at least one lake has been setup
-  private def isLakeSetup(): Future[Boolean] = {
+  private def isDpClusterSetUp(): Future[Boolean] = {
     dpClusterService.list()
-      .flatMap { lakes =>
-        lakes match {
-          case Left(errors) => Future.failed(WrappedErrorsException(errors))
-          case Right(lakes) => Future.successful(lakes.length > 0)
-        }
+      .flatMap {
+        case Left(errors) => Future.failed(WrappedErrorsException(errors))
+        case Right(dataplaneClusters) => Future.successful(dataplaneClusters.length > 0)
       }
   }
 

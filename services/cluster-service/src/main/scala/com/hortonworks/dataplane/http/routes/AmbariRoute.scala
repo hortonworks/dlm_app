@@ -5,8 +5,8 @@ import akka.http.scaladsl.server.Directives.{as, entity, path, post, _}
 import com.google.inject.Inject
 import com.hortonworks.dataplane.cs.ClusterErrors.ClusterNotFound
 import com.hortonworks.dataplane.cs.{
-  AmbariDatalakeInterface,
-  AmbariDatalakeInterfaceImpl,
+  AmbariDataplaneClusterInterface,
+  AmbariDataplaneClusterInterfaceImpl,
   Credentials,
   StorageInterface
 }
@@ -58,7 +58,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
 
   private def getDetails(
       clusters: Seq[String],
-      dli: AmbariDatalakeInterface): Future[Seq[Option[AmbariCluster]]] = {
+      dli: AmbariDataplaneClusterInterface): Future[Seq[Option[AmbariCluster]]] = {
     val futures = clusters.map { c =>
       for {
         json <- dli.getClusterDetails(c)
@@ -71,10 +71,10 @@ class AmbariRoute @Inject()(val ws: WSClient,
   def getAmbariDetails(ep: AmbariEndpoint): Future[Seq[AmbariCluster]] = {
 
     val finalList = for {
-      datalake <- Future.successful(new TempDataplaneCluster(url = ep.url))
+      dataplaneCluster <- Future.successful(new TempDataplaneCluster(url = ep.url))
       creds <- loadCredentials
       dli <- Future.successful(
-        AmbariDatalakeInterfaceImpl(datalake, ws, config, creds))
+        AmbariDataplaneClusterInterfaceImpl(dataplaneCluster, ws, config, creds))
       clusters <- dli.discoverClusters
       details <- getDetails(clusters, dli)
     } yield details

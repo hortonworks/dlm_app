@@ -44,17 +44,17 @@ class AmbariService @Inject()(private val wSClient: WSClient,private val configu
     }
   }
 
-  def syncCluster(datalake: DataplaneCluster): Future[Boolean] = {
+  def syncCluster(dpCluster: DataplaneCluster): Future[Boolean] = {
     wSClient
       .url(s"$clusterService/cluster/sync")
-      .post(Json.toJson(datalake))
+      .post(Json.toJson(dpCluster))
       .map { response =>
         if (response.status == 200) {
-          Logger.info(s"Successuly synced datalake with ${datalake.id}")
+          Logger.info(s"Successuly synced datalake with ${dpCluster.id}")
           true
         } else {
           Logger.info(
-            s"Sync failure datalake with id ${datalake.id} Details: ${response}")
+            s"Sync failure datalake with id ${dpCluster.id} Details: ${response}")
           false
         }
       }

@@ -35,8 +35,8 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def provideLakeService(implicit ws: WSClient,
-                         configuration: Config): DpClusterService = {
+  def provideDpClusterService(implicit ws: WSClient,
+                              configuration: Config): DpClusterService = {
 
     new DpClusterServiceImpl(configuration)
   }
@@ -128,13 +128,13 @@ object AppModule extends AbstractModule {
   @Provides
   @Singleton
   def provideStorageInterface(
-                               lakeService: DpClusterService,
+                               dpClusterService: DpClusterService,
                                clusterService: ClusterService,
                                clusterComponentService: ClusterComponentService,
                                clusterHostsServiceImpl: ClusterHostsService,
                                configService: ConfigService): StorageInterface = {
     new StorageInterfaceImpl(clusterService,
-                             lakeService,
+                             dpClusterService,
                              clusterComponentService,
                              clusterHostsServiceImpl,
                              configService)
