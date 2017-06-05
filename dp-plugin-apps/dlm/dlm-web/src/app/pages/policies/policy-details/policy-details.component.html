@@ -17,7 +17,7 @@
   <div class="col-lg-10 col-md-9">
     <dp-jobs-table *ngIf="contentType===policyContent.Jobs" class="clearfix" [showPageSizeMenu]="false" [jobs]="jobs"></dp-jobs-table>
     <div *ngIf="contentType===policyContent.Files">
-      <!-- Files Browser may be here -->
+      <dlm-hdfs-browser [rootPath]="hdfsRootPath" [clusterId]="sourceCluster"></dlm-hdfs-browser>
     </div>
   </div>
 </div>

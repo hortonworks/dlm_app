@@ -7,9 +7,10 @@ import { TableFooterComponent } from 'common/table/table-footer/table-footer.com
 import { ActionColumnComponent } from 'components/table-columns/action-column/action-column.component';
 import { CheckboxComponent } from 'common/checkbox/checkbox.component';
 import { CheckboxColumnComponent } from 'components/table-columns/checkbox-column/checkbox-column.component';
-import {ClusterListComponent} from './cluster-list.component';
-import {TranslateModule} from '@ngx-translate/core';
-import {BytesSizePipe} from '../../../pipes/bytes-size.pipe';
+import { ClusterListComponent } from './cluster-list.component';
+import { TranslateModule } from '@ngx-translate/core';
+import { BytesSizePipe } from 'pipes/bytes-size.pipe';
+import { HdfsBrowserComponent } from 'components/hdfs-browser/hdfs-browser.component';
 import { FormsModule } from '@angular/forms';
 import { NavbarService } from 'services/navbar.service';
 
@@ -33,7 +34,8 @@ xdescribe('ClusterListComponent', () => {
         TableFooterComponent,
         ActionColumnComponent,
         CheckboxComponent,
-        CheckboxColumnComponent
+        CheckboxColumnComponent,
+        HdfsBrowserComponent
       ],
       providers: [
         NavbarService

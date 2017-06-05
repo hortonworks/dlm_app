@@ -53,6 +53,9 @@
 </ng-template>
 
 <ng-template let-cluster="row" ngx-datatable-row-detail-template #rowDetailRef>
-  <!-- TODO: To Vivek file browser can be attached here    -->
-  <pre>{{cluster | json}}</pre>
+  <div class="row">
+    <div class="col col-md-12">
+      <dlm-hdfs-browser [rootPath]="hdfsRootPath" [clusterId]="cluster.id"></dlm-hdfs-browser>
+    </div>
+  </div>
 </ng-template>

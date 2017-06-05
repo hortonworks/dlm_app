@@ -9,6 +9,9 @@
 }
 
 .datatable-body-cell {
+  span.unit {
+    font-size: 0.8em;
+  }
   &.add-actions-cell {
     justify-content: flex-end !important;
 
@@ -18,7 +21,6 @@
       flex-basis: 90px;
       border-left: 1px solid #ccc;
       justify-content: center;
-
       &:hover {
         flex-grow: 1;
         .add-actions-buttons {
@@ -47,4 +49,9 @@
   .add-actions-icon {
     font-size: 20px;
   }
+}
+
+.datatable-row-detail {
+  padding: 25px;
+  background-color: #EEE;
 }

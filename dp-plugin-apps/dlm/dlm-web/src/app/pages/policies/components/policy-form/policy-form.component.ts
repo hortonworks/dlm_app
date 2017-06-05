@@ -5,15 +5,13 @@ import { go } from '@ngrx/router-store';
 import { IMyOptions, IMyDateModel } from 'mydatepicker';
 
 import { RadioItem } from 'common/radio-button/radio-button';
-import { createPolicy } from 'actions/policy.action';
 import { State } from 'reducers/index';
-import { Observable } from 'rxjs/Observable';
 import { Pairing } from 'models/pairing.model';
-import { SessionStorageService } from 'services/session-storage.service';
 import { POLICY_TYPES, POLICY_SUBMIT_TYPES } from 'constants/policy.constant';
 import { markAllTouched } from 'utils/form-util';
 import { getDatePickerDate } from 'utils/date-util';
-import {TranslateService} from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
+import { mapToList } from 'utils/store-util';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 
@@ -101,27 +99,52 @@ export class PolicyFormComponent implements OnInit {
     return date;
   }
 
-  get pairs() {
-    return this.generatePairs(this.pairings);
+  get sourceClusters() {
+    return mapToList(this.getClusterEntities(this.pairings));
   }
 
-  get clustersFromPair() {
-    const pairId = this.policyForm.value.general.pair;
-    let clusters = [];
-    if (pairId) {
-      const pair = this.pairings.filter(pairing => pairing.id === pairId)[0];
-      clusters  = pair.pair.map(cluster => {
-          return {
-            label: cluster.name,
-            value: cluster.id
-          };
-      });
+  get destinationClusters() {
+    if (this.sourceCluster) {
+      const pairings = this.pairings.filter(pairing => pairing.pair.filter(cluster => cluster.id === this.sourceCluster).length);
+      if (pairings) {
+        const clusterEntities = this.getClusterEntities(pairings);
+        // Remove source cluster from the entities
+        delete clusterEntities[this.sourceCluster];
+        return mapToList(clusterEntities);
+      }
+      return [{
+        label: this.t.instant('page.policies.form.fields.destinationCluster.noPair'),
+        value: ''
+      }];
     }
-    return clusters;
+    return [{
+      label: this.t.instant('page.policies.form.fields.destinationCluster.default'),
+      value: ''
+    }];
   }
 
   get sourceCluster() {
     return this.policyForm.value.general.sourceCluster;
+  }
+
+  get destinationCluster() {
+    return this.policyForm.value.general.destinationCluster;
+  }
+
+  getClusterEntities(pairings) {
+    return pairings.reduce((entities: {[id: number]: {}}, entity: Pairing) => {
+      const getClusters = (pairing) => {
+        return pairing.pair.reduce((clusters: {}, cluster) => {
+          return Object.assign({}, clusters, {
+            [cluster.id]: {
+              label: cluster.name,
+              value: cluster.id
+            }
+          });
+        }, {});
+      };
+      return Object.assign({}, entities, getClusters(entity));
+    }, {});
   }
 
   constructor(private formBuilder: FormBuilder, private store: Store<State>, private t: TranslateService) { }
@@ -131,8 +154,8 @@ export class PolicyFormComponent implements OnInit {
       general: this.formBuilder.group({
         name: ['', Validators.required],
         type: [this.selectedPolicyType],
-        pair: [this.pairs.length && this.pairs[0].value || null, Validators.required],
-        sourceCluster: ['', Validators.required]
+        sourceCluster: ['', Validators.required],
+        destinationCluster: ['', Validators.required]
       }),
       databases: [[]],
       directories: ['', Validators.required],
@@ -149,15 +172,6 @@ export class PolicyFormComponent implements OnInit {
         }, { validator: this.validateTime})
       })
     });
-  }
-
-  generatePairs(pairings: Pairing[]) {
-    return pairings.reduce((pairs, pairing) => {
-      return pairs.concat({
-        value: pairing.id,
-        label: [pairing.pair[0].name, pairing.pair[1].name]
-      });
-    }, []);
   }
 
   handleSubmit({ value }) {
@@ -233,16 +247,13 @@ export class PolicyFormComponent implements OnInit {
     });
   }
 
-  handlePairChange(pair) {
-    this.policyForm.patchValue({
-      general: {
-        sourceCluster: ''
-      }
-    });
-  }
-
   handleSourceClusterChange(sourceCluster) {
     this.selectedHdfsPath = this.hdfsRootPath;
+    this.policyForm.patchValue({
+      general: {
+        destinationCluster: ''
+      }
+    });
   }
 
   handleHdfsPathChange(path) {

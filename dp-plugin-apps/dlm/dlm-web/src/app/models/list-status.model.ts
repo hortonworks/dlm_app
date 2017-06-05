@@ -8,7 +8,7 @@ export interface ListStatus {
   modificationTime?: number;
   owner?: string;
   pathSuffix: string;
-  permission?: number;
+  permission?: string;
   replication?: number;
   storagePolicy?: number;
   type?: string;

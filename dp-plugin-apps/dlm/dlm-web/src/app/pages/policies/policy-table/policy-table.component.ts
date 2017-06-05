@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, ViewChild, ViewEncapsulation, TemplateRef, OnDestroy } from '@angular/core';
 import { Policy } from 'models/policy.model';
+import { Cluster } from 'models/cluster.model';
 import { ActionItemType, ActionColumnType } from 'components';
 import { TableTheme } from 'common/table/table-theme.type';
 import { StatusColumnComponent } from 'components/table-columns/status-column/status-column.component';
@@ -22,7 +23,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
-  selector: 'dp-policy-table',
+  selector: 'dlm-policy-table',
   templateUrl: './policy-table.component.html',
   styleUrls: ['./policy-table.component.scss'],
   encapsulation: ViewEncapsulation.None
@@ -43,7 +44,9 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   showOperationResponseModal = false;
   operationResponseSubscription: Subscription;
 
-  activeContentType = 'jobs';
+  activeContentType: PolicyContent = PolicyContent.Jobs;
+  sourceCluster: number;
+  hdfsRootPath: string;
 
   @ViewChild(IconColumnComponent) iconColumn: IconColumnComponent;
   @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;
@@ -61,6 +64,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @ViewChild(TableComponent) tableComponent: TableComponent;
 
   @Input() policies: Policy[] = [];
+  @Input() clusters: Cluster[] = [];
 
   rowActions = <ActionItemType[]>[
     {label: 'Delete', name: 'DELETE'},
@@ -169,22 +173,46 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
    * @param {Policy} policy
    * @param {PolicyContent} contentType
    */
-  toggleRowDetail(policy, contentType) {
+  toggleRowDetail(policy: Policy, contentType: PolicyContent) {
     const selectedPolicy = this.selectedPolicy$.getValue();
-    if (selectedPolicy && selectedPolicy.id === policy.id) {
-      if (this.activeContentType === contentType) {
-        this.tableComponent.toggleRowDetail(policy);
+    if (contentType === PolicyContent.Jobs) {
+      if (selectedPolicy && selectedPolicy.id === policy.id) {
+        if (this.activeContentType === contentType) {
+          this.tableComponent.toggleRowDetail(policy);
+        } else {
+          this.activeContentType = contentType;
+          this.store.dispatch(loadJobsForPolicy(policy));
+          if (!this.tableComponent.expandedRows[policy.id]) {
+            this.tableComponent.toggleRowDetail(policy);
+          }
+        }
       } else {
         this.activeContentType = contentType;
-        if (!this.tableComponent.expandedRows[policy.id]) {
-          this.tableComponent.toggleRowDetail(policy);
-        }
+        this.selectedPolicy$.next(policy);
+        this.store.dispatch(loadJobsForPolicy(policy));
+        this.tableComponent.toggleRowDetail(policy);
       }
-    } else {
-      this.activeContentType = contentType;
-      this.selectedPolicy$.next(policy);
-      this.store.dispatch(loadJobsForPolicy(policy));
-      this.tableComponent.toggleRowDetail(policy);
+    } else if (contentType === PolicyContent.Files) {
+      // todo: Remove this hack once policies API supports unique identification of cluster
+      const clusterId = this.clusters.filter(cluster => cluster.name === policy.sourceCluster)[0].id;
+      if (selectedPolicy && selectedPolicy.id === policy.id) {
+        if (this.activeContentType === contentType) {
+          this.tableComponent.toggleRowDetail(policy);
+        } else {
+          this.activeContentType = contentType;
+          this.sourceCluster = clusterId;
+          this.hdfsRootPath = policy.sourceDataset;
+          if (!this.tableComponent.expandedRows[policy.id]) {
+            this.tableComponent.toggleRowDetail(policy);
+          }
+        }
+      } else {
+        this.activeContentType = contentType;
+        this.selectedPolicy$.next(policy);
+        this.sourceCluster = clusterId;
+        this.hdfsRootPath = policy.sourceDataset;
+        this.tableComponent.toggleRowDetail(policy);
+      }
     }
   }
 

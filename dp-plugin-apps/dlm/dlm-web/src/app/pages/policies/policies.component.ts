@@ -22,7 +22,7 @@ import { TableFilterItem } from 'common/table/table-filter/table-filter-item.typ
 export const ALL = 'all';
 
 @Component({
-  selector: 'dp-main',
+  selector: 'dlm-policies',
   templateUrl: './policies.component.html',
   styleUrls: ['./policies.component.scss']
 })

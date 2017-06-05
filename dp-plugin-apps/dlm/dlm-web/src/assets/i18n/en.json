@@ -183,8 +183,12 @@
           "policy_name": "Policy Name",
           "pairs": "Select Pair",
           "sourceCluster": {
-            "default": "Select a pair first",
             "self": "Source Cluster"
+          },
+          "destinationCluster": {
+            "self": "Destination Cluster",
+            "default": "Select a Source Cluster first",
+            "noPair": "No paired cluster available for the selected source cluster"
           },
           "service": "Service",
           "directories": "File / Folder Path",
