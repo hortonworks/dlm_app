@@ -47,7 +47,7 @@ DELETE        /clusters/:clusterId                                           con
 #Cluster services API
 
 GET           /clusters/:clusterId/services                                  controllers.ClusterServices.allWithCluster(clusterId:Long)
-GET           /dp/clusters/:dpClusterId/services                                controllers.ClusterServices.allWithDpCluster(dpClusterId:Long)
+GET           /dp/clusters/:dpClusterId/services                             controllers.ClusterServices.allWithDpCluster(dpClusterId:Long)
 POST          /cluster/services                                              controllers.ClusterServices.addWithCluster
 POST          /dp/clusters/services                                             controllers.ClusterServices.addWithDpCluster
 GET           /clusters/:clusterId/service/:serviceName                      controllers.ClusterServices.loadWithClusterAndName(clusterId:Long,serviceName:String)

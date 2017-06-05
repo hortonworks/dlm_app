@@ -10,7 +10,7 @@ import scala.concurrent.Future
 
 @Singleton
 class ClusterServiceRepo @Inject()(
-    protected val dbConfigProvider: DatabaseConfigProvider)
+    protected val dbConfigProvider: DatabaseConfigProvider,private val clusterRepo: ClusterRepo)
     extends HasDatabaseConfigProvider[DpPgProfile] {
 
   import profile.api._
@@ -26,7 +26,13 @@ class ClusterServiceRepo @Inject()(
   }
 
   def allWithDpCluster(dpClusterId: Long) = {
-    db.run(Services.filter(_.dpClusterId === dpClusterId).to[List].result)
+
+    val query = for {
+      clusters <- clusterRepo.Clusters if clusters.dpClusterid === dpClusterId
+      services <- Services if services.clusterid === clusters.id
+    } yield services
+
+    db.run(query.to[List].result)
   }
 
   def findByNameAndCluster(serviceName: String, clusterId: Long) = {
@@ -38,14 +44,7 @@ class ClusterServiceRepo @Inject()(
         .headOption)
   }
 
-  def findByIdAndDpCluster(serviceId: Long, dpClusterId: Long) = {
-    db.run(
-      Services
-        .filter(_.id === serviceId)
-        .filter(_.dpClusterId === dpClusterId)
-        .result
-        .headOption)
-  }
+
 
   def findByIdAndCluster(serviceId: Long, clusterId: Long) = {
     db.run(
@@ -87,14 +86,12 @@ class ClusterServiceRepo @Inject()(
 
     def servicename = column[String]("service_name")
 
-    def dpClusterId = column[Option[Long]]("dp_clusterid")
-
     def clusterid = column[Option[Long]]("cluster_id")
 
     def properties = column[Option[JsValue]]("properties")
 
     def * =
-      (id, servicename, properties, clusterid, dpClusterId) <> ((ClusterService.apply _).tupled, ClusterService.unapply)
+      (id, servicename, properties, clusterid) <> ((ClusterService.apply _).tupled, ClusterService.unapply)
 
   }
 

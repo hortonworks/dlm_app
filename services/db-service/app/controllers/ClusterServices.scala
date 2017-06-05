@@ -31,13 +31,11 @@ class ClusterServices @Inject()(
   def allWithDpCluster(dpClusterId: Long) = Action.async {
     csr
       .allWithDpCluster(dpClusterId)
-      .map(cs => success(cs.map(c => linkData(c, makeLink(c)))))
+      .map(cs => success(cs.map(c => linkData(c, makeClusterLink(c)))))
       .recoverWith(apiError)
   }
 
-  private def makeLink(c: ClusterService) = {
-    Map("dpCluster" -> s"$dpClusters/${c.dpClusterId.get}")
-  }
+
   private def makeClusterLink(c: ClusterService) = {
     Map("cluster" -> s"$clusters/${c.clusterId.get}")
   }
@@ -51,7 +49,7 @@ class ClusterServices @Inject()(
       .findById(serviceId)
       .map { co =>
         co.map { c =>
-            success(linkData(c, makeLink(c)))
+            success(linkData(c, makeClusterLink(c)))
           }
           .getOrElse(NotFound)
       }
@@ -79,17 +77,10 @@ class ClusterServices @Inject()(
     Action.async(parse.json) { req =>
       csr
         .findByIdAndCluster(serviceId, clusterId)
-        .map(cs => success(cs.map(c => linkData(c, makeLink(c)))))
+        .map(cs => success(cs.map(c => linkData(c, makeClusterLink(c)))))
         .recoverWith(apiError)
     }
 
-  def loadWithDpClusterId(serviceId: Long, dpClusterId: Long) =
-    Action.async(parse.json) { req =>
-      csr
-        .findByIdAndDpCluster(serviceId, dpClusterId)
-        .map(cs => success(cs.map(c => linkData(c, makeLink(c)))))
-        .recoverWith(apiError)
-    }
 
   def addWithCluster = Action.async(parse.json) { req =>
     req.body
@@ -97,8 +88,6 @@ class ClusterServices @Inject()(
       .map { cl =>
         //        check if cluster is not null and dp-cluster is null
         if (cl.clusterId.isEmpty)
-          Future.successful(UnprocessableEntity)
-        else if (cl.dpClusterId.isDefined)
           Future.successful(UnprocessableEntity)
         else {
           val created = csr.insert(cl)
@@ -118,8 +107,6 @@ class ClusterServices @Inject()(
         //        check if cluster is not null and dp-cluster is null
         if (cl.clusterId.isEmpty)
           Future.successful(UnprocessableEntity)
-        else if (cl.dpClusterId.isDefined)
-          Future.successful(UnprocessableEntity)
         else {
           val created = csr.updateByName(cl)
           created
@@ -138,12 +125,10 @@ class ClusterServices @Inject()(
         //        check if cluster is not null and dp-cluster is null
         if (cl.clusterId.isDefined)
           Future.successful(UnprocessableEntity)
-        else if (cl.dpClusterId.isEmpty)
-          Future.successful(UnprocessableEntity)
         else {
           val created = csr.insert(cl)
           created
-            .map(c => success(linkData(c, makeLink(c))))
+            .map(c => success(linkData(c, makeClusterLink(c))))
             .recoverWith(apiError)
         }
       }

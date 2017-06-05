@@ -94,8 +94,7 @@ object Entities {
       id: Option[Long] = None,
       servicename: String,
       properties: Option[JsValue] = None,
-      clusterId: Option[Long] = None,
-      dpClusterId: Option[Long] = None
+      clusterId: Option[Long] = None
   )
 
   case class ClusterServiceHost(
