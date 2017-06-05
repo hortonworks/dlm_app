@@ -85,7 +85,7 @@ class AtlasServiceImpl(config: Config)(implicit ws: WSClient)
   override def getLineage(clusterId: String, atlasGuid: String, depth: Option[String]) : Future[Either[Errors,JsObject]] = {
     var lineageUrl = s"$url/cluster/$clusterId/atlas/$atlasGuid/lineage"
     if(depth.isDefined){
-      lineageUrl = lineageUrl + s"?depth=$depth.get";
+      lineageUrl = lineageUrl + s"?depth=${depth.get}"
     }
     ws.url(lineageUrl)
       .withHeaders("Accept" -> "application/json")
