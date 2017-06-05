@@ -16,11 +16,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
-
 class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetService,
                          @Named("categoryService") val categoryService: CategoryService,
                          @Named("dataSetCategoryService") val dataSetCategoryService: DataSetCategoryService,
-                         authenticated:Authenticated)
+                         authenticated: Authenticated)
   extends Controller {
 
   def list = authenticated.async {
@@ -39,10 +38,11 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     request.body.validate[DatasetAndCategoryIds].map { dSetNCtgryIds =>
       dataSetService.create(dSetNCtgryIds.copy(dataset = dSetNCtgryIds.dataset.copy(createdBy = request.user.id.get)))
         .map {
-          dataSetNCategories => dataSetNCategories match {
-            case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-            case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
-          }
+          dataSetNCategories =>
+            dataSetNCategories match {
+              case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
+            }
         }
     }.getOrElse(Future.successful(BadRequest))
   }
@@ -51,11 +51,12 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     Logger.info("Received retrieve dataSet request")
     dataSetService.retrieve(dataSetId)
       .map {
-        dataSetNCategories => dataSetNCategories match {
-          case Left(errors) if(errors.errors.size > 0 && errors.errors.head.code == "404") => NotFound
-          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-          case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
-        }
+        dataSetNCategories =>
+          dataSetNCategories match {
+            case Left(errors) if (errors.errors.size > 0 && errors.errors.head.code == "404") => NotFound
+            case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
+          }
       }
   }
 
@@ -65,10 +66,11 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     request.body.validate[DatasetAndCategoryIds].map { dSetNCtgryIds =>
       dataSetService.update(dSetNCtgryIds)
         .map {
-          dataSetNCategories => dataSetNCategories match {
-            case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-            case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
-          }
+          dataSetNCategories =>
+            dataSetNCategories match {
+              case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
+            }
         }
     }.getOrElse(Future.successful(BadRequest))
   }
@@ -78,10 +80,11 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     Logger.info("Received delete dataSet request")
     dataSetService.delete(dataSetId)
       .map {
-        dataSet => dataSet match {
-          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-          case Right(dataSet) => Ok(Json.toJson(dataSet))
-        }
+        dataSet =>
+          dataSet match {
+            case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            case Right(dataSet) => Ok(Json.toJson(dataSet))
+          }
       }
   }
 
@@ -101,12 +104,31 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     request.body.validate[Category].map { category =>
       categoryService.create(category)
         .map {
-          category => category match {
-            case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-            case Right(category) => Ok(Json.toJson(category))
-          }
+          category =>
+            category match {
+              case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case Right(category) => Ok(Json.toJson(category))
+            }
         }
     }.getOrElse(Future.successful(BadRequest))
+  }
+
+  def listCategoriesCount = authenticated.async { request =>
+    categoryService.listWithCount()
+      .map { categories =>
+        categories match {
+          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Right(categories) => Ok(Json.toJson(categories))
+        }
+      }
+  }
+
+  def getCategoryCount(categoryId: String) = authenticated.async { request =>
+    categoryService.listWithCount(categoryId)
+      .map {
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(categoryCount) => Ok(Json.toJson(categoryCount))
+      }
   }
 
 }
@@ -139,8 +161,6 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
   }
 
 */
-
-
 
 
 /*
