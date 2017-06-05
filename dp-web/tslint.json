@@ -78,7 +78,8 @@
       "allow-leading-underscore",
       "allow-pascal-case"
     ],
-    "quotemark": [true, "double", "jsx-double"],
+//    "quotemark": [true, "double", "jsx-double"],
+    "quotemark": false,
     "no-inferrable-types": [true, "ignore-params", "ignore-properties"],
   //  "no-unused-expression": [true, "allow-fast-null-checks"],
   //  "curly": [true, "ignore-same-line"],
