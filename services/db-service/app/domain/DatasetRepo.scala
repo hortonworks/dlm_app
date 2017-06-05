@@ -30,6 +30,10 @@ class DatasetRepo @Inject()(
     }
   }
 
+  def count(): Future[Int] = {
+    db.run(Datasets.length.result)
+  }
+
   def findById(datasetId: Long): Future[Option[Dataset]] = {
     db.run(Datasets.filter(_.id === datasetId).result.headOption)
   }
@@ -43,13 +47,13 @@ class DatasetRepo @Inject()(
   def findByIdWithCategories(datasetId: Long): Future[Option[DatasetAndCategories]] = {
     val datasetQuery = Datasets.filter(_.id === datasetId)
     val categoriesQuery = for {
-    datasetCategories <- datasetCategoryRepo.DatasetCategories if datasetCategories.datasetId === datasetId
-    categories <- categoryRepo.Categories if categories.id === datasetCategories.categoryId
+      datasetCategories <- datasetCategoryRepo.DatasetCategories if datasetCategories.datasetId === datasetId
+      categories <- categoryRepo.Categories if categories.id === datasetCategories.categoryId
     } yield (categories)
 
     val query = for {
-    dataset <- datasetQuery.result
-    categories <- categoriesQuery.result
+      dataset <- datasetQuery.result
+      categories <- categoriesQuery.result
     } yield (dataset, categories)
 
     db.run(query).map {
@@ -61,21 +65,21 @@ class DatasetRepo @Inject()(
     }
   }
 
-  def insertWithCategories(datasetReq: DatasetAndCategoryIds) : Future[DatasetAndCategories] = {
-    val query = (for{
+  def insertWithCategories(datasetReq: DatasetAndCategoryIds): Future[DatasetAndCategories] = {
+    val query = (for {
       dataset <- Datasets returning Datasets += datasetReq.dataset
-      _ <- datasetCategoryRepo.DatasetCategories ++=  datasetReq.categories.map(catId => DatasetCategory(catId,dataset.id.get))
+      _ <- datasetCategoryRepo.DatasetCategories ++= datasetReq.categories.map(catId => DatasetCategory(catId, dataset.id.get))
       categories <- categoryRepo.Categories.filter(_.id.inSet(datasetReq.categories)).result
     } yield (DatasetAndCategories(dataset, categories))).transactionally
 
     db.run(query)
   }
 
-  def updateWithCategories(datasetReq: DatasetAndCategoryIds) : Future[DatasetAndCategories] = {
-    val query = (for{
+  def updateWithCategories(datasetReq: DatasetAndCategoryIds): Future[DatasetAndCategories] = {
+    val query = (for {
       _ <- Datasets.filter(_.id === datasetReq.dataset.id).update(datasetReq.dataset)
       _ <- datasetCategoryRepo.DatasetCategories.filter(_.datasetId === datasetReq.dataset.id).delete
-      _ <- datasetCategoryRepo.DatasetCategories ++=  datasetReq.categories.map(catId => DatasetCategory(catId,datasetReq.dataset.id.get))
+      _ <- datasetCategoryRepo.DatasetCategories ++= datasetReq.categories.map(catId => DatasetCategory(catId, datasetReq.dataset.id.get))
       dataset <- Datasets.filter(_.id === datasetReq.dataset.id).result.head
       categories <- categoryRepo.Categories.filter(_.id.inSet(datasetReq.categories)).result
     } yield (DatasetAndCategories(dataset, categories))).transactionally
