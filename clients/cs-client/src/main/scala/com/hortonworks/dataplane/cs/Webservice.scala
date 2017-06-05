@@ -39,9 +39,11 @@ object Webservice {
 
     def searchQueryAssets(clusterId: String, filters: AtlasSearchQuery): Future[Either[Errors, AtlasEntities]]
 
-    def getProperties(clusterId: String, atlasGuid: String): Future[Either[Errors, AssetProperties]]
+    def getAssetDetails(clusterId: String, atlasGuid: String): Future[Either[Errors, JsObject]]
 
-    def getTypeDefs(clusterId: String, defType: String) : Future[Object]
+    def getTypeDefs(clusterId: String, defType: String) : Future[Either[Errors,JsObject]]
+
+    def getLineage(clusterId: String, atlasGuid: String, depth: Option[String]): Future[Either[Errors,JsObject]]
   }
 
 }

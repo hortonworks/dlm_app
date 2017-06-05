@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {TabStyleType} from '../../../../shared/tabs/tabs.component';
 import {AssetService} from '../../../../services/asset.service';
 import {AssetProperty} from '../../../../models/asset-property';
@@ -7,7 +7,7 @@ import {AssetAudit} from '../../../../models/asset-audit';
 import {AssetSchema} from '../../../../models/asset-schema';
 
 export enum DetailsTabs {
-  PROPERTIES, TAGS, AUDITS, SCHEMA
+  PROPERTIES, TAGS, SCHEMA
 }
 
 @Component({
@@ -24,20 +24,17 @@ export class AssetDetailsViewComponent implements OnInit {
   assetTags: AssetTag[] = [];
   assetAudits: AssetAudit[] = [];
   assetSchemas: AssetSchema[] = [];
+  @Input() clusterId: string = '1989';
+  @Input() guid: string = '1cb2fd1e-03b4-401f-a587-2151865d375a';
 
   constructor(private assetService: AssetService) {
   }
 
   ngOnInit() {
-    this.assetService.getProperties('1989', '1cb2fd1e-03b4-401f-a587-2151865d375a').subscribe(properties => {
-      this.assetProperties = this.extractAssetProperties(properties);
-      this.assetTags = this.extractTags(properties['classifications']);
-    });
-    this.assetService.getAudits("12").subscribe(assetAudits =>{
-      this.assetAudits = assetAudits;
-    });
-    this.assetService.getSchemas("12").subscribe(assetSchemas => {
-      this.assetSchemas = assetSchemas;
+    this.assetService.getDetails(this.clusterId, this.guid).subscribe(details => {
+      this.assetProperties = this.extractAssetProperties(details.entity);
+      this.assetTags = this.extractTags(details.entity.classifications);
+      this.assetSchemas = this.extractSchema(details.referredEntities);
     });
   }
 
@@ -50,6 +47,24 @@ export class AssetDetailsViewComponent implements OnInit {
       assetTags.push(tag);
     });
     return assetTags;
+  }
+
+  private extractSchema(referredEntities){
+    let assetSchemas: AssetSchema[] = [];
+    Object.keys(referredEntities).forEach(key => {
+      if(referredEntities[key].typeName !== 'hive_column'){
+        return;
+      }
+      let schema: AssetSchema = new AssetSchema();
+      let attributes = referredEntities[key].attributes;
+      schema.name = attributes.name;
+      schema.owner = attributes.owner;
+      schema.description = attributes.description;
+      schema.type = attributes.type;
+      schema.comment = attributes.comment;
+      assetSchemas.push(schema);
+    });
+    return assetSchemas;
   }
 
   private extractAssetProperties(properties){

@@ -44,9 +44,9 @@ class AtlasServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
-  private def mapTypeDefs(res: WSResponse) = {
+  private def mapResultsGeneric(res: WSResponse) : Either[Errors,JsObject]= {
     res.status match {
-      case 200 =>  (res.json \ "results" \ "data").get
+      case 200 =>  Right((res.json \ "results" \ "data").as[JsObject])
       case _ => mapErrors(res)
     }
   }
@@ -68,18 +68,29 @@ class AtlasServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToResults)
   }
 
-  override def getProperties(clusterId: String, atlasGuid: String): Future[Either[Errors, AssetProperties]] = {
+  override def getAssetDetails(clusterId: String, atlasGuid: String): Future[Either[Errors, JsObject]] = {
     ws.url(s"$url/cluster/$clusterId/atlas/guid/$atlasGuid")
       .withHeaders("Accept" -> "application/json")
       .get()
-      .map(mapToProperties)
+      .map(mapResultsGeneric)
   }
 
-  override def getTypeDefs(clusterId: String, defType:String) : Future[Object] = {
+  override def getTypeDefs(clusterId: String, defType:String) : Future[Either[Errors,JsObject]] = {
     ws.url(s"$url/cluster/$clusterId/atlas/typedefs/type/$defType")
       .withHeaders("Accept" -> "application/json")
       .get()
-      .map(mapTypeDefs)
+      .map(mapResultsGeneric)
+  }
+
+  override def getLineage(clusterId: String, atlasGuid: String, depth: Option[String]) : Future[Either[Errors,JsObject]] = {
+    var lineageUrl = s"$url/cluster/$clusterId/atlas/$atlasGuid/lineage"
+    if(depth.isDefined){
+      lineageUrl = lineageUrl + s"?depth=$depth.get";
+    }
+    ws.url(lineageUrl)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapResultsGeneric)
   }
 
 

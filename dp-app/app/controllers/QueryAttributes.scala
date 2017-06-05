@@ -31,10 +31,10 @@ class QueryAttributes @Inject()(
       }
   }
 
-  def getProperties(clusterId: String, atlasGuid: String) = authenticated.async {
+  def getAssetDetails(clusterId: String, atlasGuid: String) = authenticated.async {
     Logger.info("Received get properties for entity")
 
-    atlasService.getProperties(clusterId, atlasGuid)
+    atlasService.getAssetDetails(clusterId, atlasGuid)
       .map {
         attributes => attributes match {
           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
@@ -43,4 +43,25 @@ class QueryAttributes @Inject()(
       }
   }
 
+  def getLineage(clusterId: String, atlasGuid: String) = authenticated.async { request =>
+    Logger.info("Received get lineage")
+    atlasService.getLineage(clusterId, atlasGuid, request.getQueryString("depth"))
+      .map {
+        lineage => lineage match {
+          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case  Right(lineage) => Ok(Json.toJson(lineage))
+        }
+      }
+  }
+
+  def getTypeDefs(clusterId: String, defType: String) = authenticated.async {
+    Logger.info(s"Received get type def for $defType")
+    atlasService.getTypeDefs(clusterId, defType)
+    .map {
+      typeDefs => typeDefs match {
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(typeDefs) =>  Ok(Json.toJson(typeDefs))
+      }
+    }
+  }
 }
