@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webservice.LakeService
+import com.hortonworks.dataplane.db.Webservice.DpClusterService
 import internal.KnoxSso
 import internal.auth.Authenticated
 import models.{JsonResponses, WrappedErrorsException}
@@ -14,8 +14,8 @@ import play.api.mvc._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class Configuration @Inject()(@Named("lakeService") val lakeService:
-                              LakeService,authenticated:Authenticated,
+class Configuration @Inject()(@Named("dpClusterService") val dpClusterService:
+                              DpClusterService, authenticated:Authenticated,
                               appConfiguration: play.api.Configuration,
                               knoxSso: KnoxSso)
   extends Controller {
@@ -24,7 +24,7 @@ class Configuration @Inject()(@Named("lakeService") val lakeService:
   def init = authenticated.async { request =>
     for {
       user <- Future.successful(request.user)
-      lake <- isLakeSetup()
+      lake <- isDpClusterSetUp()
       auth <- isAuthSetup()
       rbac <- isRBACSetup()
     } yield Ok(
@@ -48,13 +48,11 @@ class Configuration @Inject()(@Named("lakeService") val lakeService:
 
 
 //  code to check if at least one lake has been setup
-  private def isLakeSetup(): Future[Boolean] = {
-    lakeService.list()
-      .flatMap { lakes =>
-        lakes match {
-          case Left(errors) => Future.failed(WrappedErrorsException(errors))
-          case Right(lakes) => Future.successful(lakes.length > 0)
-        }
+  private def isDpClusterSetUp(): Future[Boolean] = {
+    dpClusterService.list()
+      .flatMap {
+        case Left(errors) => Future.failed(WrappedErrorsException(errors))
+        case Right(dataplaneClusters) => Future.successful(dataplaneClusters.length > 0)
       }
   }
 

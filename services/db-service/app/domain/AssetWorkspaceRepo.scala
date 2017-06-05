@@ -31,11 +31,11 @@ class AssetWorkspaceRepo @Inject()(protected val dbConfigProvider: DatabaseConfi
   }
 
 
-  final class AssetWorkspacesTable(tag: Tag) extends Table[AssetWorkspace](tag, Some("dataplane"), "dp_categories") {
-    
-    def assetType = column[String]("assetType")
-    def assetId = column[Long]("assetid")
-    def workspaceId = column[Long]("workspaceid")
+  final class AssetWorkspacesTable(tag: Tag) extends Table[AssetWorkspace](tag, Some("dataplane"), "categories") {
+
+    def assetType = column[String]("asset_type")
+    def assetId = column[Long]("asset_id")
+    def workspaceId = column[Long]("workspace_id")
 
     def * = (assetType,assetId, workspaceId) <> ((AssetWorkspace.apply _).tupled, AssetWorkspace.unapply)
   }

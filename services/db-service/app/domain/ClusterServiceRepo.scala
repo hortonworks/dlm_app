@@ -10,7 +10,7 @@ import scala.concurrent.Future
 
 @Singleton
 class ClusterServiceRepo @Inject()(
-    protected val dbConfigProvider: DatabaseConfigProvider)
+    protected val dbConfigProvider: DatabaseConfigProvider,private val clusterRepo: ClusterRepo)
     extends HasDatabaseConfigProvider[DpPgProfile] {
 
   import profile.api._
@@ -25,8 +25,14 @@ class ClusterServiceRepo @Inject()(
     db.run(Services.filter(_.clusterid === clusterId).to[List].result)
   }
 
-  def allWithDatalake(datalakeId: Long) = {
-    db.run(Services.filter(_.datalakeid === datalakeId).to[List].result)
+  def allWithDpCluster(dpClusterId: Long) = {
+
+    val query = for {
+      clusters <- clusterRepo.Clusters if clusters.dpClusterid === dpClusterId
+      services <- Services if services.clusterid === clusters.id
+    } yield services
+
+    db.run(query.to[List].result)
   }
 
   def findByNameAndCluster(serviceName: String, clusterId: Long) = {
@@ -38,14 +44,7 @@ class ClusterServiceRepo @Inject()(
         .headOption)
   }
 
-  def findByIdAndDatalake(serviceId: Long, datalakeId: Long) = {
-    db.run(
-      Services
-        .filter(_.id === serviceId)
-        .filter(_.datalakeid === datalakeId)
-        .result
-        .headOption)
-  }
+
 
   def findByIdAndCluster(serviceId: Long, clusterId: Long) = {
     db.run(
@@ -66,7 +65,7 @@ class ClusterServiceRepo @Inject()(
     db.run(
         Services
           .filter(_.servicename === cs.servicename)
-          .filter(_.clusterid === cs.clusterid)
+          .filter(_.clusterid === cs.clusterId)
           .map(r => r.properties)
           .update(cs.properties))
       .map(r => r)
@@ -81,20 +80,18 @@ class ClusterServiceRepo @Inject()(
   final class ClusterServiceTable(tag: Tag)
       extends Table[ClusterService](tag,
                                     Some("dataplane"),
-                                    "dp_cluster_services") {
+                                    "cluster_services") {
 
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
-    def servicename = column[String]("servicename")
+    def servicename = column[String]("service_name")
 
-    def datalakeid = column[Option[Long]]("datalakeid")
-
-    def clusterid = column[Option[Long]]("clusterid")
+    def clusterid = column[Option[Long]]("cluster_id")
 
     def properties = column[Option[JsValue]]("properties")
 
     def * =
-      (id, servicename, properties, clusterid, datalakeid) <> ((ClusterService.apply _).tupled, ClusterService.unapply)
+      (id, servicename, properties, clusterid) <> ((ClusterService.apply _).tupled, ClusterService.unapply)
 
   }
 

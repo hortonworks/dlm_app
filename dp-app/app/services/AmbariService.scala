@@ -3,7 +3,7 @@ package services
 import javax.inject.Inject
 
 import com.google.inject.Singleton
-import com.hortonworks.dataplane.commons.domain.Entities.Datalake
+import com.hortonworks.dataplane.commons.domain.Entities.DataplaneCluster
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
@@ -32,7 +32,7 @@ class AmbariService @Inject()(private val wSClient: WSClient,private val configu
      }
   }
 
-  def getClusterDetails(ambariEndpoint: AmbariEndpoint) = {//: Future[Either[Errors, AmbariCluster]] = {
+  def getClusterDetails(ambariEndpoint: AmbariEndpoint) = {
     wSClient.url(s"$clusterService/ambari/details")
       .post(Json.toJson(ambariEndpoint)).map { response =>
         Logger.info(s"Got cluster information. ${response.json}")
@@ -44,17 +44,17 @@ class AmbariService @Inject()(private val wSClient: WSClient,private val configu
     }
   }
 
-  def syncCluster(datalake: Datalake): Future[Boolean] = {
+  def syncCluster(dpCluster: DataplaneCluster): Future[Boolean] = {
     wSClient
-      .url(s"$clusterService/datalake/sync")
-      .post(Json.toJson(datalake))
+      .url(s"$clusterService/cluster/sync")
+      .post(Json.toJson(dpCluster))
       .map { response =>
         if (response.status == 200) {
-          Logger.info(s"Successuly synced datalake with ${datalake.id}")
+          Logger.info(s"Successuly synced datalake with ${dpCluster.id}")
           true
         } else {
           Logger.info(
-            s"Sync failure datalake with id ${datalake.id} Details: ${response}")
+            s"Sync failure datalake with id ${dpCluster.id} Details: ${response}")
           false
         }
       }

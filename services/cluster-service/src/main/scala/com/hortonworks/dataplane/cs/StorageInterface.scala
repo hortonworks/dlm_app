@@ -6,7 +6,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.{
   Cluster,
   ClusterHost,
   ClusterServiceHost,
-  Datalake,
+  DataplaneCluster,
   Errors,
   ClusterService => ClusterData
 }
@@ -15,7 +15,7 @@ import com.hortonworks.dataplane.db.Webservice.{
   ClusterHostsService,
   ClusterService,
   ConfigService,
-  LakeService
+  DpClusterService
 }
 import com.typesafe.scalalogging.Logger
 
@@ -32,9 +32,9 @@ trait StorageInterface {
   def updateServiceByName(toPersist: ClusterData,
                           hosts: Seq[ClusterServiceHost]): Future[Boolean]
 
-  def getDataLakes: Future[Seq[Datalake]]
+  def getDpClusters: Future[Seq[DataplaneCluster]]
 
-  def getLinkedClusters(datalake: Datalake): Future[Seq[Cluster]]
+  def getLinkedClusters(dataplaneCluster: DataplaneCluster): Future[Seq[Cluster]]
 
   def serviceRegistered(cluster: Cluster, serviceName: String): Future[Boolean]
 
@@ -43,32 +43,32 @@ trait StorageInterface {
 
   def getConfiguration(key: String): Future[Option[String]]
 
-  def updateDatalakeStatus(datalake: Datalake): Future[Boolean]
+  def updateDpClusterStatus(dataplaneCluster: DataplaneCluster): Future[Boolean]
 
 }
 
 @Singleton
 class StorageInterfaceImpl @Inject()(
-    val clusterService: ClusterService,
-    val lakeService: LakeService,
-    val clusterComponentService: ClusterComponentService,
-    clusterHostsService: ClusterHostsService,
-    configService: ConfigService)
+                                      val clusterService: ClusterService,
+                                      val dpClusterService: DpClusterService,
+                                      val clusterComponentService: ClusterComponentService,
+                                      clusterHostsService: ClusterHostsService,
+                                      configService: ConfigService)
     extends StorageInterface {
 
   val logger = Logger(classOf[StorageInterfaceImpl])
 
-  override def getDataLakes: Future[Seq[Datalake]] =
-    lakeService.list
-      .map { lakes =>
-        if (lakes.isLeft) {
+  override def getDpClusters: Future[Seq[DataplaneCluster]] =
+    dpClusterService.list
+      .map { dpClusters =>
+        if (dpClusters.isLeft) {
           logger.warn(
-            s"No data lakes found - Reason: ${lakes.left.get.errors}")
+            s"No data dpClusters found - Reason: ${dpClusters.left.get.errors}")
           Seq()
         } else {
-          val datalakes = lakes.right.get
-          logger.info(s"found data lakes $datalakes")
-          datalakes
+          val dataplaneClusters = dpClusters.right.get
+          logger.info(s"found data dpClusters $dataplaneClusters")
+          dataplaneClusters
         }
 
       }
@@ -78,9 +78,9 @@ class StorageInterfaceImpl @Inject()(
           Future.successful(Seq())
       }
 
-  override def getLinkedClusters(datalake: Datalake): Future[Seq[Cluster]] = {
+  override def getLinkedClusters(dpCluster: DataplaneCluster): Future[Seq[Cluster]] = {
     clusterService
-      .getLinkedClusters(datalake.id.get)
+      .getLinkedClusters(dpCluster.id.get)
       .map { cl =>
         if (cl.isLeft) {
           logger.warn(s"No clusters found - Reason: ${cl.left.get.errors}")
@@ -157,7 +157,7 @@ class StorageInterfaceImpl @Inject()(
       endpoints: Seq[ClusterServiceHost]): Future[Boolean] = {
     for {
       serviceUpdate <- clusterComponentService.updateServiceByName(toPersist)
-      cs <- clusterComponentService.getServiceByName(toPersist.clusterid.get,
+      cs <- clusterComponentService.getServiceByName(toPersist.clusterId.get,
                                                      toPersist.servicename)
       eps <- mapHostsToCluster(Right(cs.right.get), endpoints)
       endpointUpdate <- clusterComponentService.updateClusterHosts(eps)
@@ -218,8 +218,8 @@ class StorageInterfaceImpl @Inject()(
     }
   }
 
-  override def updateDatalakeStatus(datalake: Datalake): Future[Boolean] = {
-    lakeService.updateStatus(datalake).map {
+  override def updateDpClusterStatus(dpCluster: DataplaneCluster): Future[Boolean] = {
+    dpClusterService.updateStatus(dpCluster).map {
       case Right(status) =>
         if (!status)
           logger.error(

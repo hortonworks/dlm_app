@@ -84,7 +84,7 @@ class DatasetRepo @Inject()(
   }
 
   final class DatasetsTable(tag: Tag)
-    extends Table[Dataset](tag, Some("dataplane"), "dp_datasets") {
+    extends Table[Dataset](tag, Some("dataplane"), "datasets") {
 
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
@@ -92,7 +92,7 @@ class DatasetRepo @Inject()(
 
     def description = column[Option[String]]("description")
 
-    def datalakeId = column[Long]("datalakeid")
+    def dpClusterId = column[Long]("dp_clusterid")
 
     def createdBy = column[Long]("createdby")
 
@@ -102,13 +102,13 @@ class DatasetRepo @Inject()(
 
     def version = column[Int]("version")
 
-    def customprops = column[Option[JsValue]]("customprops")
+    def customprops = column[Option[JsValue]]("custom_props")
 
     def * =
       (id,
         name,
         description,
-        datalakeId,
+        dpClusterId,
         createdBy,
         createdOn,
         lastmodified,

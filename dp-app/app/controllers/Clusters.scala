@@ -26,32 +26,27 @@ class Clusters @Inject()(
 
 ) extends Controller {
 
-  def list(lakeId: Option[Long]) = authenticated.async {
-    lakeId match {
-      case Some(lakeId) => listByLakeId(lakeId)
+  def list(dpClusterId: Option[Long]) = authenticated.async {
+    dpClusterId match {
+      case Some(clusterId) => listByDpClusterId(clusterId)
       case None => listAll()
     }
   }
 
-  private def listByLakeId(lakeId: Long) =  {
+  private def listByDpClusterId(dpClusterId: Long) =  {
     clusterService
-      .getLinkedClusters(lakeId)
-      .map{
-        clusters =>
-          clusters match {
-            case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-            case Right(clusters) => Ok(Json.toJson(clusters))
-          }
+      .getLinkedClusters(dpClusterId)
+      .map {
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(clusters) => Ok(Json.toJson(clusters))
       }
   }
 
   private def listAll() = {
     clusterService.list()
-      .map { clusters =>
-        clusters match {
-          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-          case Right(clusters) => Ok(Json.toJson(clusters))
-        }
+      .map {
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(clusters) => Ok(Json.toJson(clusters))
       }
   }
 
@@ -63,10 +58,8 @@ class Clusters @Inject()(
     request.body.validate[Cluster].map { cluster =>
       clusterService.create(cluster.copy(userid = request.user.id))
         .map {
-          cluster => cluster match {
-            case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-            case Right(cluster) => Ok(Json.toJson(cluster))
-          }
+          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Right(cluster) => Ok(Json.toJson(cluster))
         }
     }.getOrElse(Future.successful(BadRequest))
   }
@@ -80,10 +73,8 @@ class Clusters @Inject()(
 
     clusterService.retrieve(clusterId)
       .map {
-        cluster => cluster match {
-          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-          case Right(cluster) => Ok(Json.toJson(cluster))
-        }
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(cluster) => Ok(Json.toJson(cluster))
       }
   }
 
@@ -93,10 +84,8 @@ class Clusters @Inject()(
     ambariService
       .getClusterDetails(AmbariEndpoint(request.getQueryString("url").get))
       .map {
-         clusterDetails =>  clusterDetails match {
-           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-           case Right(clusterDetails) => Ok(Json.toJson(clusterDetails))
-         }
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(clusterDetails) => Ok(Json.toJson(clusterDetails))
       }
   }
 
@@ -107,35 +96,32 @@ class Clusters @Inject()(
 
     clusterHealthService.getClusterHealthData(clusterId)
       .map {
-        clusterHealth => clusterHealth match {
-          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-          case Right(clusterHealth) => Ok(summary match {
-            case Some(summary) => Json.obj(
-                "nodes" -> clusterHealth.hosts.length,
-                "totalSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityTotal),
-                "usedSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityUsed),
-                "status" -> Json.obj(
-                  "state" -> clusterHealth.nameNodeInfo.get.state,
-                  "since" -> (if (clusterHealth.nameNodeInfo.get.StartTime.isDefined) (clusterHealth.nameNodeInfo.get.StartTime.get - System.currentTimeMillis()) else 0)
-                )
-              )
-            case None => Json.toJson(clusterHealth)
-          })
-        }
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(clusterHealth) => Ok(summary match {
+          case Some(summary) => Json.obj(
+            "nodes" -> clusterHealth.hosts.length,
+            "totalSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityTotal),
+            "usedSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityUsed),
+            "status" -> Json.obj(
+              "state" -> clusterHealth.nameNodeInfo.get.state,
+              "since" -> (if (clusterHealth.nameNodeInfo.get.StartTime.isDefined) (clusterHealth.nameNodeInfo.get.StartTime.get - System.currentTimeMillis()) else 0)
+            )
+          )
+          case None => Json.toJson(clusterHealth)
+        })
       }
   }
 
   private def humanizeBytes(bytes: Option[Double]): String = {
     bytes match {
-      case Some(bytes) => {
-        if (bytes == 0) return "0 Bytes";
-        val k = 1024;
-        val sizes = Array("Bytes ", "KB ", "MB ", "GB ", "TB ", "PB ", "EB ", "ZB ", "YB ");
-        val i = Math.floor(Math.log(bytes) / Math.log(k)).toInt;
+      case Some(bytes) =>
+        if (bytes == 0) return "0 Bytes"
+        val k = 1024
+        val sizes = Array("Bytes ", "KB ", "MB ", "GB ", "TB ", "PB ", "EB ", "ZB ", "YB ")
+        val i = Math.floor(Math.log(bytes) / Math.log(k)).toInt
 
-        Math.round(bytes / Math.pow(k, i)) + " " + sizes(i);
-      }
-      case None => return "NA";
+        Math.round(bytes / Math.pow(k, i)) + " " + sizes(i)
+      case None => return "NA"
     }
   }
 
