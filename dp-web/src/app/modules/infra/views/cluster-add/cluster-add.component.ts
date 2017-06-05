@@ -85,6 +85,7 @@ export class ClusterAddComponent implements OnInit {
             this._isClusterValidateSuccessful = true;
             this._isClusterValid = true;
             this.extractClusterInfo(clusterInfo);
+            this.cluster.ambariurl = cleanedUri;
           }, () => {
             this.onError();
           });

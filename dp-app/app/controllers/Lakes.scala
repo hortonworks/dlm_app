@@ -38,7 +38,7 @@ class Lakes @Inject()(@Named("lakeService") val lakeService: LakeService,
       .validate[Datalake]
       .map { lake =>
         lakeService
-          .create(lake.copy(createdBy = request.user.id))
+          .create(lake.copy(createdBy = request.user.id, ambariUrl = lake.ambariUrl.replaceFirst("/$", "")))
           .map {
             case Left(errors) =>
               InternalServerError(JsonResponses.statusError(
