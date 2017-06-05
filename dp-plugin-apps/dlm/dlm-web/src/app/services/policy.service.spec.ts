@@ -54,40 +54,40 @@ describe('PolicyService', () => {
 
   describe('#deletePolicy', () => {
     beforeEach(() => {
-      this.policy = <Policy>{name: 'n1', targetClusterResource: {id: 'c1'}};
+      this.policy = <Policy>{name: 'n1', targetClusterResource: {id: 1}};
       this.policyService.deletePolicy(this.policy);
     });
     it('should do DELETE request', () => {
       expect(this.lastConnection.request.method).toBe(RequestMethod.Delete);
     });
     it('should use valid URL', () => {
-      expect(this.lastConnection.request.url).toContain('clusters/c1/policy/n1');
+      expect(this.lastConnection.request.url).toContain('clusters/1/policy/n1');
     });
   });
 
   describe('#suspendPolicy', () => {
     beforeEach(() => {
-      this.policy = <Policy>{name: 'n1', targetClusterResource: {id: 'c1'}};
+      this.policy = <Policy>{name: 'n1', targetClusterResource: {id: 1}};
       this.policyService.suspendPolicy(this.policy);
     });
     it('should do PUT request', () => {
       expect(this.lastConnection.request.method).toBe(RequestMethod.Put);
     });
     it('should use valid URL', () => {
-      expect(this.lastConnection.request.url).toContain('clusters/c1/policy/n1/suspend');
+      expect(this.lastConnection.request.url).toContain('clusters/1/policy/n1/suspend');
     });
   });
 
   describe('#resumePolicy', () => {
     beforeEach(() => {
-      this.policy = <Policy>{name: 'n1', targetClusterResource: {id: 'c1'}};
+      this.policy = <Policy>{name: 'n1', targetClusterResource: {id: 1}};
       this.policyService.resumePolicy(this.policy);
     });
     it('should do PUT request', () => {
       expect(this.lastConnection.request.method).toBe(RequestMethod.Put);
     });
     it('should use valid URL', () => {
-      expect(this.lastConnection.request.url).toContain('clusters/c1/policy/n1/resume');
+      expect(this.lastConnection.request.url).toContain('clusters/1/policy/n1/resume');
     });
   });
 

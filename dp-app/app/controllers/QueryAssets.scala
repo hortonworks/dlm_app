@@ -3,7 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Atlas.AtlasFilters
+import com.hortonworks.dataplane.commons.domain.Atlas.AtlasSearchQuery
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.cs.Webservice.AtlasService
 import internal.auth.Authenticated
@@ -24,7 +24,7 @@ class QueryAssets @Inject()(
   def search(clusterId: String) = authenticated.async(parse.json) { request =>
     Logger.info("Received get cluster atlas search request")
 
-    request.body.validate[AtlasFilters].map { filters =>
+    request.body.validate[AtlasSearchQuery].map { filters =>
       atlasService.searchQueryAssets(clusterId, filters)
         .map {
           results => results match {

@@ -42,7 +42,7 @@ describe('ClusterService', () => {
 
   describe('#pairWith', () => {
     beforeEach(() => {
-      this.cluster = <Cluster>{id: '1'};
+      this.cluster = <Cluster>{id: 1};
       this.pair = {};
       this.clusterService.pairWith(this.cluster);
     });
@@ -53,7 +53,7 @@ describe('ClusterService', () => {
 
   describe('#unpair', () => {
     beforeEach(() => {
-      this.cluster = <Cluster>{id: '1'};
+      this.cluster = <Cluster>{id: 1};
       this.pair = {};
       this.clusterService.unpair(this.cluster);
     });

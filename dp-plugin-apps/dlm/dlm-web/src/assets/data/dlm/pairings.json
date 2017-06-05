@@ -31,7 +31,7 @@
       }
     }],
     [{
-      "id": "Development Cluster",
+      "id": 3,
       "description": "development",
       "name": "Development Cluster",
       "ambariurl": "http://localhost:8080",
@@ -45,7 +45,7 @@
         "country": "US"
       }
     }, {
-      "id": "Primary Cluster",
+      "id": 1,
       "description": "primary",
       "name": "Primary Cluster",
       "ambariurl": "http://localhost:8080",

@@ -2,7 +2,7 @@ package com.hortonworks.dataplane.cs
 
 import java.net.URLEncoder
 
-import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasFilter, AtlasFilters}
+import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasFilter, AtlasSearchQuery}
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterHost, ClusterService => AtlasService}
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService}
 import com.hortonworks.dataplane.restmock.httpmock.when
@@ -125,7 +125,7 @@ class AtlasInterfaceSpec
         """.stripMargin)
     )
 
-    interface.findHiveTables(AtlasFilters(
+    interface.findHiveTables(AtlasSearchQuery(
       Seq(AtlasFilter(AtlasAttribute("owner", "string"), "equals", "admin")))).map { s =>
       assert(true)
     }

@@ -109,6 +109,14 @@
         "policies": "Policies",
         "jobs": "Jobs"
       },
+      "filter": {
+        "title": "Time Range",
+        "options": {
+          "day": "24 Hours",
+          "week": "1 Week",
+          "month": "1 Month"
+        }
+      },
       "issues": {
         "updates": "Issues & Updates",
         "recent": "Recent Issues",
@@ -168,14 +176,18 @@
         "sections": {
           "general": "General",
           "database": "Select Database",
-          "directories": "Select Directories",
+          "directories": "Select a File / Folder",
           "job": "Run Job"
         },
         "fields": {
           "policy_name": "Policy Name",
           "pairs": "Select Pair",
+          "sourceCluster": {
+            "default": "Select a pair first",
+            "self": "Source Cluster"
+          },
           "service": "Service",
-          "directories": "Directories",
+          "directories": "File / Folder Path",
           "start_time": "Start Time",
           "end_time": "End Time"
         },

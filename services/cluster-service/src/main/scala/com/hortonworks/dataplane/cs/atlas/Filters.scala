@@ -2,7 +2,7 @@ package com.hortonworks.dataplane.cs.atlas
 
 import com.hortonworks.dataplane.commons.domain.Atlas.{
   AtlasFilter,
-  AtlasFilters
+  AtlasSearchQuery
 }
 
 object Filters {
@@ -20,7 +20,7 @@ object Filters {
     new NotEqualsStringPredicate()
   )
 
-  def query(atlasFilters: AtlasFilters) = {
+  def query(atlasFilters: AtlasSearchQuery) = {
 
     val filters = atlasFilters.atlasFilters.map { af =>
       val toApply = predicates.find(p => p.isApplicable(af))

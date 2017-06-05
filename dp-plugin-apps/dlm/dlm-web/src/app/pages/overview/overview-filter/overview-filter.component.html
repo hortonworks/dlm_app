@@ -1,0 +1,21 @@
+{{"page.overview.filter.title" | translate}}
+<div class="btn-group" role="group">
+  <button type="button"
+          class="btn btn-xs btn-default"
+          [class.active]="activeOption === OVERVIEW_FILTERS.DAYS"
+          (click)="doFilter(OVERVIEW_FILTERS.DAYS)">
+    {{"page.overview.filter.options.day" | translate}}
+  </button>
+  <button type="button"
+          class="btn btn-xs btn-default"
+          [class.active]="activeOption === OVERVIEW_FILTERS.WEEKS"
+          (click)="doFilter(OVERVIEW_FILTERS.WEEKS)">
+    {{"page.overview.filter.options.week" | translate}}
+  </button>
+  <button type="button"
+          class="btn btn-xs btn-default"
+          [class.active]="activeOption === OVERVIEW_FILTERS.MONTHS"
+          (click)="doFilter(OVERVIEW_FILTERS.MONTHS)">
+    {{"page.overview.filter.options.month" | translate}}
+  </button>
+</div>

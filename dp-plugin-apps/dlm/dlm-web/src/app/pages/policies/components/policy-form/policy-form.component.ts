@@ -13,6 +13,7 @@ import { SessionStorageService } from 'services/session-storage.service';
 import { POLICY_TYPES, POLICY_SUBMIT_TYPES } from 'constants/policy.constant';
 import { markAllTouched } from 'utils/form-util';
 import { getDatePickerDate } from 'utils/date-util';
+import {TranslateService} from '@ngx-translate/core';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 
@@ -91,6 +92,8 @@ export class PolicyFormComponent implements OnInit {
   ];
   selectedJobType: string = this.jobTypes[0].value;
   selectedPolicyType = POLICY_TYPES.HDFS;
+  hdfsRootPath = '/';
+  selectedHdfsPath = '/';
   get defaultTime(): Date {
     const date = new Date();
     date.setHours(0);
@@ -102,14 +105,34 @@ export class PolicyFormComponent implements OnInit {
     return this.generatePairs(this.pairings);
   }
 
-  constructor(private formBuilder: FormBuilder, private store: Store<State>) { }
+  get clustersFromPair() {
+    const pairId = this.policyForm.value.general.pair;
+    let clusters = [];
+    if (pairId) {
+      const pair = this.pairings.filter(pairing => pairing.id === pairId)[0];
+      clusters  = pair.pair.map(cluster => {
+          return {
+            label: cluster.name,
+            value: cluster.id
+          };
+      });
+    }
+    return clusters;
+  }
+
+  get sourceCluster() {
+    return this.policyForm.value.general.sourceCluster;
+  }
+
+  constructor(private formBuilder: FormBuilder, private store: Store<State>, private t: TranslateService) { }
 
   ngOnInit() {
     this.policyForm = this.formBuilder.group({
       general: this.formBuilder.group({
         name: ['', Validators.required],
         type: [this.selectedPolicyType],
-        pair: [this.pairs.length && this.pairs[0].value || null, Validators.required]
+        pair: [this.pairs.length && this.pairs[0].value || null, Validators.required],
+        sourceCluster: ['', Validators.required]
       }),
       databases: [[]],
       directories: ['', Validators.required],
@@ -210,6 +233,22 @@ export class PolicyFormComponent implements OnInit {
     });
   }
 
+  handlePairChange(pair) {
+    this.policyForm.patchValue({
+      general: {
+        sourceCluster: ''
+      }
+    });
+  }
+
+  handleSourceClusterChange(sourceCluster) {
+    this.selectedHdfsPath = this.hdfsRootPath;
+  }
+
+  handleHdfsPathChange(path) {
+    this.selectedHdfsPath = path;
+  }
+
   cancel() {
     this.store.dispatch(go(['policies']));
   }
@@ -225,7 +264,8 @@ export class PolicyFormComponent implements OnInit {
     if (dateFieldValue) {
       const dateWithTime = this.setTimeForDate(dateFieldValue, timeFieldValue);
       if (dateWithTime.getTime() < Date.now()) {
-        timeControl.setErrors({ lessThanCurrent: true });
+        // TODO: figure out if it depends on time zone
+        // timeControl.setErrors({ lessThanCurrent: true });
         return null;
       }
     }

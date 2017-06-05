@@ -36,6 +36,10 @@ export const routes: Routes = [{
     path: 'assets',
     loadChildren: './modules/assets/asset.module#AssetModule',
     canActivate:[ SignedInForSecureGuard ]
+  },{
+    path: 'workspace',
+    loadChildren: './modules/analytics/analytics.module#AnalyticsModule',
+    canActivate:[ SignedInForSecureGuard ]
   }, {
     path: '',
     pathMatch: 'full',

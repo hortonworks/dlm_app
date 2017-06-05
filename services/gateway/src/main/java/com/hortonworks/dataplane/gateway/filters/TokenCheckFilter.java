@@ -53,7 +53,7 @@ public class TokenCheckFilter extends ZuulFilter {
 
   @Override
   public int filterOrder() {
-    return PRE_DECORATION_FILTER_ORDER + 5;
+    return PRE_DECORATION_FILTER_ORDER + 3;
   }
 
 
@@ -121,6 +121,7 @@ public class TokenCheckFilter extends ZuulFilter {
     }
     setSsoValidCookie();
     setUpstreamUserContext(userList.getResults().get(0));
+    RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY,userList.getResults().get(0));
     return null;
   }
 

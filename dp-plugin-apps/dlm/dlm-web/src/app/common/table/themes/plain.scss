@@ -46,6 +46,10 @@ $table-border-color: #eee;
         border-color: $table-row-hover-border;
         background-color: $table-row-hover;
       }
+
+      &.active {
+        background-color: $table-row-active;
+      }
     }
 
     .datatable-body-cell {

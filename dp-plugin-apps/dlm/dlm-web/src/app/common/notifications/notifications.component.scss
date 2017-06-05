@@ -26,6 +26,8 @@
   }
 
   table > tbody > tr:last-child {
-    border-bottom: none;
+    &:not(:hover) {
+      border-bottom-color: transparent;
+    }
   }
 }

@@ -4,5 +4,21 @@
   background-color: rgb(213, 213, 213);
 }
 
+.maximised {
+  margin-left: $side-nav-width;
+}
+
+.minimized {
+  margin-left: 50px;
+}
+
+.default {
+  margin-left: 0px;
+}
+
+main {
+  transition: 0.5s;
+}
+
 .page-content {
 }

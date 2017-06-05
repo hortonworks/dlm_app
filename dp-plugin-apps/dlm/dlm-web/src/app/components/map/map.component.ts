@@ -1,11 +1,8 @@
-import { Component, OnInit, ViewChild, ElementRef, OnChanges, Input, SimpleChanges } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, OnChanges, Input, SimpleChanges, HostBinding } from '@angular/core';
 import * as L from 'leaflet';
 import 'leaflet-curve';
 
-import { MapData } from 'models/map-data';
-import { MapSize } from 'models/map-data';
-import { MapConnectionStatus } from 'models/map-data';
-
+import { MapData, MapSize, MapSizeSettings, MapConnectionStatus } from 'models/map-data';
 import { GeographyService } from 'services/geography.service';
 
 @Component({
@@ -20,6 +17,9 @@ export class MapComponent implements  OnChanges, OnInit {
   @ViewChild('mapcontainer') mapcontainer: ElementRef;
   @Input('mapData') mapData: MapData[] = [];
   @Input('mapSize') mapSize = 'extraLarge';
+  @HostBinding('style.height') get selfHeight(): string {
+    return this.getMapDimensions().height;
+  }
   markerLookup: L.LatLng[] = [];
   pathLookup = [];
   countries = [];
@@ -42,7 +42,7 @@ export class MapComponent implements  OnChanges, OnInit {
     zoomSnap: 0.3
   };
 
-  defaultMapSizes = [
+  defaultMapSizes: MapSizeSettings[] = [
     {
       height : '240px',
       width : '420px',
@@ -74,6 +74,10 @@ export class MapComponent implements  OnChanges, OnInit {
     private geographyService: GeographyService
   ) { }
 
+  getMapDimensions() {
+    return this.defaultMapSizes[this.mapSize] || this.defaultMapSizes[MapSize.EXTRALARGE];
+  }
+
   ngOnInit() {
     if (this.map) {
       this.map.remove();
@@ -86,7 +90,7 @@ export class MapComponent implements  OnChanges, OnInit {
   }
 
   drawMap(countries) {
-    const mapDimensions = this.defaultMapSizes[this.mapSize] || this.defaultMapSizes[MapSize.EXTRALARGE];
+    const mapDimensions = this.getMapDimensions();
     this.mapcontainer.nativeElement.style.height = mapDimensions.height;
     this.mapcontainer.nativeElement.style.width = mapDimensions.width;
     const map = L.map(this.mapcontainer.nativeElement, this.mapOptions);
