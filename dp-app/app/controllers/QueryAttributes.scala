@@ -31,4 +31,16 @@ class QueryAttributes @Inject()(
       }
   }
 
+  def getProperties(clusterId: String, atlasGuid: String) = authenticated.async {
+    Logger.info("Received get properties for entity")
+
+    atlasService.getProperties(clusterId, atlasGuid)
+      .map {
+        attributes => attributes match {
+          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Right(attributes) => Ok(Json.toJson(attributes))
+        }
+      }
+  }
+
 }

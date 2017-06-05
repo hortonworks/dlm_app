@@ -51,3 +51,6 @@ PUT         /api/datasets                          controllers.DataSets.update()
 POST        /api/query-assets                         controllers.QueryAssets.search(clusterId: String)
 
 GET         /api/query-attributes                     controllers.QueryAttributes.list(clusterId: String)
+
+GET         /api/assets/properties/:clusterId/:atlasGuid controllers.QueryAttributes.getProperties(clusterId: String, atlasGuid: String)
+

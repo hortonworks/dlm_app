@@ -11,6 +11,7 @@ import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, Cluster
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import org.apache.atlas.AtlasClientV2
+import org.apache.atlas.model.SearchFilter
 import org.apache.atlas.model.instance.AtlasEntityHeader
 import org.apache.atlas.model.lineage.AtlasLineageInfo.LineageDirection
 import org.codehaus.jackson.map.ObjectMapper
@@ -124,6 +125,13 @@ class DefaultAtlasInterface(clusterId: Long,
       }
     } yield {
       Json.parse(mapper.writeValueAsString(lineageInfo))
+    }
+  }
+
+  override def getAtlasTypeDefs(searchFilter: SearchFilter): Future[JsValue] = {
+    atlasApi.map { api =>
+      val jsonString = mapper.writeValueAsString(api.getAllTypeDefs(searchFilter))
+      Json.parse(jsonString)
     }
   }
 }
