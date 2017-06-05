@@ -49,17 +49,13 @@ class ClusterRepo @Inject()(
   }
 
   final class ClustersTable(tag: Tag)
-      extends Table[Cluster](tag, Some("dataplane"), "clusters") {
+      extends Table[Cluster](tag, Some("dataplane"), "discovered_clusters") {
 
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
     def name = column[String]("name")
 
-    def description = column[String]("description")
-
     def ambariurl = column[Option[String]]("cluster_url")
-
-    def datacenter = column[Option[String]]("datacenter")
 
     def secured = column[Option[Boolean]]("secured")
 
@@ -77,14 +73,12 @@ class ClusterRepo @Inject()(
     def * =
       (id,
        name,
-       description,
        ambariurl,
        secured,
        kerberosuser,
        kerberosticketLocation,
        dpClusterid,
        userid,
-       datacenter,
        properties) <> ((Cluster.apply _).tupled, Cluster.unapply)
 
   }

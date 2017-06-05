@@ -81,14 +81,12 @@ object Entities {
   case class Cluster(
       id: Option[Long] = None,
       name: String,
-      description: String,
       clusterUrl: Option[String] = None,
       secured: Option[Boolean] = Some(false),
       kerberosuser: Option[String] = None,
       kerberosticketLocation: Option[String] = None,
       dataplaneClusterId: Option[Long] = None,
       userid: Option[Long] = None,
-      datacenter: Option[String] = None,
       properties: Option[JsValue] = None
   )
 

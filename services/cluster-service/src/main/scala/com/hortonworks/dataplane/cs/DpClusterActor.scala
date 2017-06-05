@@ -49,7 +49,6 @@ class DpClusterActor(private val dpCluster: DataplaneCluster,
     dpClusterInterface.getClusterDetails(cname).map { props =>
       Cluster(
         name = cname,
-        description = s"Cluster $cname",
         clusterUrl = Some(s"${dpCluster.ambariUrl}$prefix/$cname"),
         secured = extractSecurity(props),
         properties = props,
