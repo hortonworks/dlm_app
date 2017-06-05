@@ -115,7 +115,7 @@ class DataplaneService @Inject()(
                   BeaconCluster(
                     cluster.id.get,
                     cluster.name,
-                    cluster.description,
+                    "",
                     cluster.clusterUrl,
                     namenodeStats,
                     location,
