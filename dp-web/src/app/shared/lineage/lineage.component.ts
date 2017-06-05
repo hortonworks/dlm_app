@@ -15,8 +15,11 @@ declare var d3Tip:any;
 })
 export class LineageComponent implements OnChanges, AfterViewInit {
 
-  @Input() guid: string = '';
+  @Input() guid: string = '1cb2fd1e-03b4-401f-a587-2151865d375a';
   @Input() entityDefCollection = new TypeDefs();
+  @Input() clusterId = '1989';
+
+  private readonly ENTITY_TYPE: string = 'entity';
 
   g: any;
   svg: any;
@@ -40,7 +43,6 @@ export class LineageComponent implements OnChanges, AfterViewInit {
   };
 
   constructor(private elementRef: ElementRef, private atlasService: AtlasService) {
-    console.log('here ...');
   }
 
   createGraph() {
@@ -262,8 +264,8 @@ export class LineageComponent implements OnChanges, AfterViewInit {
     //   that.$('svg').find('.node').removeClass('active');
     //   tooltip.hide();
     // });
-    
-    
+
+
 
     // Center the graph
     this.setGraphZoomPositionCal();
@@ -287,12 +289,14 @@ export class LineageComponent implements OnChanges, AfterViewInit {
     }
 
     this.activeTip = false;
-    this.graph.nativeElement.querySelector('.node').classList.remove('active');
-    this.tooltip.hide();
+    let node = this.graph.nativeElement.querySelector('.node');
+    if(node){
+      this.graph.nativeElement.querySelector('.node').classList.remove('active');
+      this.tooltip.hide();
+    }
   }
 
   ngAfterViewInit() {
-    console.log('here ...');
   }
 
   checkForLineageOrImpactFlag(relations: any[], guid: string) {
@@ -347,8 +351,8 @@ export class LineageComponent implements OnChanges, AfterViewInit {
 
   getData() {
     Observable.forkJoin(
-      this.atlasService.getEntityTypeDefs(),
-      this.atlasService.getLineage(this.guid)
+      this.atlasService.getEntityTypeDefs(this.clusterId, this.ENTITY_TYPE),
+      this.atlasService.getLineage(this.clusterId, this.guid)
     ).subscribe((response: any) => {
       this.prepareData(response[0], response[1]);
     });
@@ -407,7 +411,7 @@ export class LineageComponent implements OnChanges, AfterViewInit {
     }
     // let entityDef = this.entityDefCollection.fullCollection.find({ name: relationObj.typeName });
     let entityDef = this.entityDefCollection.entityDefs.find(entity => entity.name === relationObj.typeName);
-    
+
     if (entityDef && entityDef['superTypes']) {
       obj['isProcess'] = entityDef['superTypes'].indexOf("Process") > -1 ? true : false;
     }
