@@ -74,7 +74,7 @@ class AtlasRoute @Inject()(
   val hiveTables = {
     path("cluster" / LongNumber / "atlas" / "hive" / "search") { id =>
       post {
-        entity(as[AtlasFilters]) { filters =>
+        entity(as[AtlasSearchQuery]) { filters =>
           val atlasEntities = getInterface(id).findHiveTables(filters)
           onComplete(atlasEntities) {
             case Success(entities) => complete(success(entities))
@@ -130,7 +130,6 @@ class AtlasRoute @Inject()(
             }
           }
         }
-
     }
 
   private def supplyApi(id: Long) = {

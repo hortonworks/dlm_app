@@ -2,7 +2,7 @@ package com.hortonworks.dataplane.db
 
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.Ambari.ClusterServiceWithConfigs
-import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasFilters}
+import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery}
 import play.api.libs.json.{JsResult, Json}
 import play.api.libs.ws.WSResponse
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData}
