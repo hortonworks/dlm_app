@@ -34,6 +34,7 @@ export class DlmComponent implements OnDestroy {
   routeSubscription: Subscription;
 
   // mock current user
+  // TODO: move user to store and dispatch timezone update with action
   user: User = <User>{fullName: 'Jim Raynor', timezone: ''};
 
   constructor(t: TranslateService,
@@ -45,12 +46,8 @@ export class DlmComponent implements OnDestroy {
     t.setTranslation('en', require('../assets/i18n/en.json'));
     t.setDefaultLang('en');
     t.use('en');
-    // Provide selected by user timezone to the TimezoneService instance
-    // It allows to convert dates using this timezone
-    // @see Pipe `fmt-tz`
-    const tz = this.sessionStorageService.get('tz');
-    this.timeZoneService.userTimezoneIndex$.next(tz);
-    this.user.timezone = tz;
+
+    this.user.timezone = timeZoneService.setupUserTimeZone();
 
     this.header = new MenuItem(
       t.instant('sidenav.menuItem.header'),
@@ -119,7 +116,7 @@ export class DlmComponent implements OnDestroy {
   saveUserTimezone(timezoneIndex) {
     // todo save not only in the local storage
     this.sessionStorageService.set('tz', timezoneIndex);
-    this.timeZoneService.userTimezoneIndex$.next(timezoneIndex);
+    this.timeZoneService.setTimezone(timezoneIndex);
   }
 
   logout() {

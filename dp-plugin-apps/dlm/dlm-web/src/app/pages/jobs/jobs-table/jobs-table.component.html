@@ -15,17 +15,25 @@
 </ng-template>
 
 <ng-template #agoTemplate let-value="value">
-  <span *ngIf="value > 0">{{value | amTimeAgo}}</span>
-  <span *ngIf="value <= 0">In Progress</span>
+  <span *ngIf="policy.lastJobResource">
+    <span *ngIf="value; else" [tooltip]="value | fmtTz | amDateFormat:'YYYY-MMM-DD, HH:mm:ss'">
+      {{value | fmtTz | amTimeAgo}}
+    </span>
+    <ng-template #inProgress>
+      In Progress
+    </ng-template>
+  </span>
 </ng-template>
 
 <ng-template #nextRunTemplate let-row="row">
-  {{row.nextRun | amDateFormat:'MMM DD, YYYY'}}
+  <span [tooltip]="row.nextRun | fmtTz | amDateFormat:'YYYY-MMM-DD, HH:mm:ss'">
+    {{row.nextRun | fmtTz | amDateFormat:'MMM DD, YYYY'}}
+  </span>
 </ng-template>
 
 <ng-template #runTimeTemplate let-value="value" let-row="row">
-  <span *ngIf="row.duration > 0">{{value | amDateFormat: 'hh:mm:ss'}}</span>
-  <span *ngIf="row.duration <= 0">Running</span>
+  <span *ngIf="row.duration > 0">{{value | amUtc | amDateFormat:'HH:mm:ss'}}</span>
+  <span *ngIf="row.duration <= 0">{{'jobs.duration.running' | translate}}</span>
 </ng-template>
 
 <ng-template #transferredFormattedTemplate let-value="value">
