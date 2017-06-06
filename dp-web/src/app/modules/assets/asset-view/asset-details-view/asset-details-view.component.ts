@@ -5,6 +5,7 @@ import {AssetProperty} from '../../../../models/asset-property';
 import {AssetTag} from '../../../../models/asset-tag';
 import {AssetAudit} from '../../../../models/asset-audit';
 import {AssetSchema} from '../../../../models/asset-schema';
+import {DateUtils} from '../../../../shared/utils/date-utils';
 
 export enum DetailsTabs {
   PROPERTIES, TAGS, SCHEMA
@@ -71,7 +72,7 @@ export class AssetDetailsViewComponent implements OnInit {
     let assetProps: AssetProperty[] = []
     let attributes = properties.attributes;
     Object.keys(attributes).forEach(key =>{
-      if(key === 'columns' || key === 'sd'){
+      if(key === 'columns' || key === 'sd' || key === 'parameters'){
         return;
       }
       let property = new AssetProperty();
@@ -83,6 +84,8 @@ export class AssetDetailsViewComponent implements OnInit {
       }else if(key === 'db'){
         let dbValues = attributes.qualifiedName.split('.');
         property.value = dbValues[0];
+      }else if(key === 'lastAccessTime' || key === 'createTime'){
+        property.value = DateUtils.formatDate(attributes[key], 'DD MMM YYYY hh:mm:ss A');
       }
       assetProps.push(property);
     });
