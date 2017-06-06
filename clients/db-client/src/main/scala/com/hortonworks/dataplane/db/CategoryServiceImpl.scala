@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class CategoryServiceImpl(config: Config)(implicit ws: WSClient)
-    extends CategoryService {
+  extends CategoryService {
 
   private def url =
     Option(System.getProperty("dp.services.db.service.uri"))
@@ -21,6 +21,13 @@ class CategoryServiceImpl(config: Config)(implicit ws: WSClient)
 
   override def list(): Future[Either[Errors, Seq[Category]]] = {
     ws.url(s"$url/categories")
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToCategories)
+  }
+
+  def search(searchText: String, size: Option[Long]): Future[Either[Errors, Seq[Category]]] = {
+    ws.url(s"$url/categories/search/$searchText?size=${size.getOrElse(Long.MaxValue)}")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToCategories)
@@ -80,7 +87,7 @@ class CategoryServiceImpl(config: Config)(implicit ws: WSClient)
       case 200 =>
         extractEntity[Category](
           res,
-          r => (r.json \\ "results")(0).validate[Category].get)
+          r => (r.json \\ "results") (0).validate[Category].get)
       case _ => mapErrors(res)
     }
   }
@@ -100,7 +107,7 @@ class CategoryServiceImpl(config: Config)(implicit ws: WSClient)
       case 200 =>
         extractEntity[CategoryCount](
           res,
-          r => (r.json \\ "results")(0).validate[CategoryCount].get)
+          r => (r.json \\ "results") (0).validate[CategoryCount].get)
       case _ => mapErrors(res)
     }
   }
