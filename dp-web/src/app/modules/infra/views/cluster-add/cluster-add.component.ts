@@ -1,19 +1,18 @@
 import {Component, ElementRef, ViewChild, OnInit} from '@angular/core';
-import { Router, ActivatedRoute, Params } from '@angular/router';
+import {Router, ActivatedRoute} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 
-import { Cluster } from '../../../../models/cluster';
-import { Lake } from '../../../../models/lake';
-import { Location } from '../../../../models/location';
-import { Point } from '../../../../models/map-data';
-import { MapData } from '../../../../models/map-data';
-import { MapConnectionStatus } from '../../../../models/map-data';
+import {Cluster} from '../../../../models/cluster';
+import {Lake} from '../../../../models/lake';
+import {Location} from '../../../../models/location';
+import {Point} from '../../../../models/map-data';
+import {MapData} from '../../../../models/map-data';
+import {MapConnectionStatus} from '../../../../models/map-data';
 
 
-
-import { LakeService } from '../../../../services/lake.service';
-import { ClusterService } from '../../../../services/cluster.service';
-import { LocationService } from '../../../../services/location.service';
+import {LakeService} from '../../../../services/lake.service';
+import {ClusterService} from '../../../../services/cluster.service';
+import {LocationService} from '../../../../services/location.service';
 
 
 import {StringUtils} from '../../../../shared/utils/stringUtils';
@@ -23,56 +22,55 @@ import {StringUtils} from '../../../../shared/utils/stringUtils';
   templateUrl: './cluster-add.component.html',
   styleUrls: ['./cluster-add.component.scss']
 })
-export class ClusterAddComponent implements OnInit{
-
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private lakeService: LakeService,
-    private clusterService: ClusterService,
-    private locationService: LocationService,
-    private  translateService : TranslateService
-  ) { }
+export class ClusterAddComponent implements OnInit {
 
   @ViewChild('ambariInput') ambariInputContainer: ElementRef;
 
 
-  _isClusterValidateInProgress: boolean = false;
-  _isClusterValidateSuccessful: boolean = false;
+  _isClusterValidateInProgress = false;
+  _isClusterValidateSuccessful = false;
 
   _isClusterValid;
 
   mapData: MapData[] = [];
-  cluster:Cluster = new Cluster();
+  cluster: Cluster = new Cluster();
   searchTerm: string;
 
   dpRequiredServices = ['ATLAS'];
 
   showNotification = false;
 
-  get dLFoundMessage(){
+  constructor(private router: Router,
+              private route: ActivatedRoute,
+              private lakeService: LakeService,
+              private clusterService: ClusterService,
+              private locationService: LocationService,
+              private  translateService: TranslateService) {
+  };
+
+  get dLFoundMessage() {
     let services = `${' ' + this.dpRequiredServices.join(', ')}`;
-    return this.translateService.instant('pages.infra.description.datalake', {serviceNames : services});
+    return this.translateService.instant('pages.infra.description.datalake', {serviceNames: services});
   }
 
-  get reasons(){
+  get reasons() {
     let reasons: string[] = [];
     let reasonsTranslation = this.translateService.instant('pages.infra.description.connectionFailureReasons');
-    Object.keys(reasonsTranslation).forEach(key=> {
+    Object.keys(reasonsTranslation).forEach(key => {
       reasons.push(reasonsTranslation[key]);
     });
     return reasons;
   }
 
-  ngOnInit(){
-    this.route.params.subscribe(params =>{
-      if(params.status && params.status === 'success'){
+  ngOnInit() {
+    this.route.params.subscribe(params => {
+      if (params.status && params.status === 'success') {
         this.showNotification = true;
       }
     });
   }
 
-  closeNotification(){
+  closeNotification() {
     this.showNotification = false;
   }
 
@@ -81,18 +79,19 @@ export class ClusterAddComponent implements OnInit{
     let cleanedUri = StringUtils.cleanupUri(this.cluster.ambariurl);
     this.lakeService.validate(cleanedUri).subscribe(
       response => {
-        if(response.ambariStatus === 200){
-          this.clusterService.getClusterInfo(cleanedUri).subscribe(clusterInfo =>{
+        if (response.ambariStatus === 200) {
+          this.clusterService.getClusterInfo(cleanedUri).subscribe(clusterInfo => {
             this._isClusterValidateInProgress = false;
             this._isClusterValidateSuccessful = true;
             this._isClusterValid = true;
-            this.extractClusterInfo(clusterInfo)
-          },() => {
+            this.extractClusterInfo(clusterInfo);
+            this.cluster.ambariurl = cleanedUri;
+          }, () => {
             this.onError();
           });
-          let classes = this.ambariInputContainer.nativeElement.className.replace('validation-error','');
+          let classes = this.ambariInputContainer.nativeElement.className.replace('validation-error', '');
           this.ambariInputContainer.nativeElement.className = classes;
-        }else{
+        } else {
           this._isClusterValidateInProgress = false;
           this._isClusterValidateSuccessful = true;
           this._isClusterValid = false;
@@ -105,12 +104,12 @@ export class ClusterAddComponent implements OnInit{
     );
   }
 
-  private onError(){
+  private onError() {
     this._isClusterValidateSuccessful = false;
     this._isClusterValidateInProgress = false;
   }
 
-  private extractClusterInfo(clusterInfo){
+  private extractClusterInfo(clusterInfo) {
     this.cluster.name = clusterInfo[0].clusterName;
     this.cluster.services = clusterInfo[0].services;
     // TEMP FIX : Should come from backend
@@ -118,11 +117,11 @@ export class ClusterAddComponent implements OnInit{
     this.cluster.ipAddress = urlParts.length ? urlParts[2].substr(0, urlParts[2].indexOf(':')) : '';
   }
 
-  get showClusterDetails(){
+  get showClusterDetails() {
     return this._isClusterValidateSuccessful && this._isClusterValid;
   }
 
-  get isDataLake(){
+  get isDataLake() {
     for (let name of this.dpRequiredServices) {
       if (this.cluster.services.indexOf(name) === -1) {
         return false;
@@ -131,27 +130,28 @@ export class ClusterAddComponent implements OnInit{
     return true;
   }
 
-  locationFormatter(location:Location) : string{
+  locationFormatter(location: Location): string {
     return `${location.city}, ${location.country}`;
   }
 
-  getLocations(searchTerm){
+  getLocations(searchTerm) {
     return this.locationService.retrieveOptions(searchTerm);
   }
 
-  checkLocation(){
-    if(this.searchTerm.length === 0){
+  checkLocation() {
+    if (this.searchTerm.length === 0) {
       this.mapData = [];
     }
   }
 
   onSelectLocation(location: Location) {
     this.mapData = [];
-    let point = new Point(location.latitude, location.longitude, MapConnectionStatus.UP)
+    let point = new Point(location.latitude, location.longitude, MapConnectionStatus.UP);
     this.mapData = [new MapData(point)];
     this.cluster.location = location;
   }
-  onNewTagAddition(text:string){
+
+  onNewTagAddition(text: string) {
     this.cluster.tags.push(text);
   }
 
@@ -169,21 +169,22 @@ export class ClusterAddComponent implements OnInit{
       );
   }
 
-  onKeyPress(event){
-    if(event.keyCode === 13){
+  onKeyPress(event) {
+    if (event.keyCode === 13) {
       this.getClusterInfo(event);
     }
   }
 
-  createCluster(){
+  createCluster() {
     let lake = new Lake();
     lake.ambariUrl = this.cluster.ambariurl;
     lake.location = this.cluster.location.id;
+    lake.isDatalake = this.isDataLake;
     lake.name = this.cluster.name;
     lake.description = this.cluster.description;
     lake.state = 'TO_SYNC';
-    let properties = {tags : []};
-    this.cluster.tags.forEach(tag => properties.tags.push({'name':tag}));
+    let properties = {tags: []};
+    this.cluster.tags.forEach(tag => properties.tags.push({'name': tag}));
     lake.properties = properties;
     return this.lakeService.insert(lake);
   }
@@ -192,7 +193,7 @@ export class ClusterAddComponent implements OnInit{
     this.router.navigate(['infra']);
   }
 
-  onCreateAndAdd(){
+  onCreateAndAdd() {
     this.createCluster().subscribe(
       () => {
         this.cluster = new Cluster();

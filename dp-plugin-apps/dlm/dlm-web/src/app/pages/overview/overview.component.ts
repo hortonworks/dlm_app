@@ -2,21 +2,26 @@ import { Component, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
+import * as moment from 'moment';
 
 import * as fromRoot from 'reducers/';
-import { Job } from 'models/job.model';
 import { Event } from 'models/event.model';
 import { ProgressState } from 'models/progress-state.model';
 import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
 import { getAllJobs } from 'selectors/job.selector';
-import { getAllPolicies } from 'selectors/policy.selector';
+import { getAllPolicies, getPolicyClusterJob } from 'selectors/policy.selector';
 import { getAllClusters } from 'selectors/cluster.selector';
-import { getAllEvents } from 'selectors/event.selector';
+import { getDisplayedEvents } from 'selectors/event.selector';
 import { loadJobsForClusters } from 'actions/job.action';
 import { loadClusters } from 'actions/cluster.action';
 import { loadPolicies } from 'actions/policy.action';
 import { getMergedProgress } from 'selectors/progress.selector';
 import { ResourceChartData } from './resource-charts/';
+import { POLICY_TYPES_LABELS } from 'constants/policy.constant';
+import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
+import { Policy } from 'models/policy.model';
+import { Cluster } from 'models/cluster.model';
+import { Job } from 'models/job.model';
 
 const POLICIES_REQUEST = 'POLICIES_REQUEST';
 const CLUSTERS_REQUEST = 'CLUSTERS_REQUEST';
@@ -34,33 +39,50 @@ export class OverviewComponent implements OnInit, OnDestroy {
     policies: [POLICY_STATUS.RUNNING, POLICY_STATUS.SUBMITTED, POLICY_STATUS.SUSPENDED],
     jobs: [JOB_STATUS.SUCCESS, JOB_STATUS.IN_PROGRESS, JOB_STATUS.WARNINGS, JOB_STATUS.FAILED]
   };
-  jobs$: Observable<Job[]>;
   events$: Observable<Event[]>;
-  clustersSubscription: Subscription;
+  jobs$: Observable<Job[]>;
+  policies$: Observable<Policy[]>;
+  clusters$: Observable<Cluster[]>;
+  tableResources$: Observable<any>;
   overallProgress$: Observable<ProgressState>;
   resourceChartData$: Observable<ResourceChartData>;
+  tableData$: Observable<any>;
+  clustersSubscription: Subscription;
 
-  constructor(private store: Store<fromRoot.State>) {
+  constructor(private store: Store<fromRoot.State>,
+              private overviewJobsExternalFiltersService: OverviewJobsExternalFiltersService) {
+    this.events$ = store.select(getDisplayedEvents);
     this.jobs$ = store.select(getAllJobs);
-    this.events$ = store.select(getAllEvents);
-    const policies$ = store.select(getAllPolicies);
-    const clusters$ = store.select(getAllClusters);
+    this.policies$ = store.select(getAllPolicies);
+    this.clusters$ = store.select(getAllClusters);
     this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, JOBS_REQUEST));
-    this.clustersSubscription = clusters$
-      .filter(clusters => !!clusters.length)
-      .distinctUntilChanged(null, clusters => {
-        return clusters.map(cluster => cluster.id).join('@') + '_LENGTH' + clusters.length;
-      })
-      .subscribe((clusters) => {
-        store.dispatch(loadJobsForClusters(clusters.map(cluster => cluster.id), JOBS_REQUEST));
-      });
-    this.resourceChartData$ = Observable.combineLatest(this.jobs$, policies$, clusters$)
-      .map(this.mapResourceData);
+    this.tableResources$ = store.select(getPolicyClusterJob);
   }
+
+  protected filterByJobs(policy, filters) {
+    const job = policy.lastJobResource;
+    if (!job) {
+      return true;
+    }
+    if (!filters.timeRange) {
+      return true;
+    }
+    const timestamp = moment().subtract(1, filters.timeRange.toLowerCase()).unix() * 1000;
+    return !filters.timeRange || !job.endTime ? true
+      : job.endTime > timestamp;
+  };
+
+  protected mapTableData(policy) {
+    const job = policy.lastJobResource;
+    return {
+      ...policy,
+      service: job ? POLICY_TYPES_LABELS[job.executionType] : ''
+    };
+  };
 
   mapResourceData = ([jobs, policies, clusters]): ResourceChartData => {
     return {
-      clusters: { data: [clusters.length], labels: ['Registered'] },
+      clusters: {data: [clusters.length], labels: ['Registered']},
       policies: this.makeResourceData('policies', policies),
       jobs: this.makeResourceData('jobs', jobs)
     };
@@ -76,6 +98,18 @@ export class OverviewComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.clustersSubscription = this.clusters$
+      .filter(clusters => !!clusters.length)
+      .distinctUntilChanged(null, clusters => clusters.map(cluster => cluster.id).join('@') + '_LENGTH' + clusters.length)
+      .subscribe(clusters => this.store.dispatch(loadJobsForClusters(clusters.map(cluster => cluster.id), JOBS_REQUEST)));
+
+    this.resourceChartData$ = Observable.combineLatest(this.jobs$, this.policies$, this.clusters$).map(this.mapResourceData);
+
+    this.tableData$ = Observable
+      .combineLatest(this.tableResources$, this.overviewJobsExternalFiltersService.filters$)
+      .map(([policies, filters]) => policies
+        .filter(policy => this.filterByJobs(policy, filters))
+        .map(policy => this.mapTableData(policy)));
     [
       loadPolicies(POLICIES_REQUEST),
       loadClusters(CLUSTERS_REQUEST)

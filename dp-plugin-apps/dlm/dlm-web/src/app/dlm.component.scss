@@ -19,10 +19,12 @@ header {
   background-color: #fff;
   height: 55px;
   .navbar-nav {
-    font-size: 20px;
     margin-top: 12px;
     color: #999999;
     line-height: 40px;
+    .fa, .glyphicon {
+      font-size: 20px;
+    }
   }
   .navbar-right {
     margin: 8px 15px;
@@ -33,4 +35,14 @@ header {
   .notifications-group.open {
     color: $link-color;
   }
+}
+
+#dlm_content {
+  // overwrites container-fluid defaults 15px
+  // required by design
+  padding: 0 20px;
+}
+
+.page-section {
+  margin-top: 15px;
 }

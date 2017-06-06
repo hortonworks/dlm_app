@@ -46,9 +46,9 @@ class Module extends AbstractModule {
 
   @Provides
   @Singleton
-  @Named("lakeService")
-  def provideLakeService(implicit ws: WSClient,configuration: Configuration):LakeService = {
-    new LakeServiceImpl(configuration.underlying)
+  @Named("dpClusterService")
+  def provideDpClusterService(implicit ws: WSClient, configuration: Configuration):DpClusterService = {
+    new DpClusterServiceImpl(configuration.underlying)
   }
 
   @Provides

@@ -8,6 +8,7 @@
     {
       "policyId": "ID",
       "instanceId": "vivek-beacon-1.c.pramod-thangali.internal",
+      "severity": "info",
       "event": "beacon-started",
       "timestamp": "2017-04-05 22:03:11.984",
       "eventStatus": "started",
@@ -16,6 +17,7 @@
     {
       "policyId": "ID",
       "instanceId": "vivek-beacon-1.c.pramod-thangali.internal",
+      "severity": "critical",
       "event": "policy-created",
       "timestamp": "2017-04-12 22:03:11.984",
       "eventStatus": "created",
@@ -24,6 +26,7 @@
     {
       "policyId": "ID",
       "instanceId": "vivek-beacon-1.c.pramod-thangali.internal",
+      "severity": "error",
       "event": "job-started",
       "timestamp": "2017-04-14 22:03:11.984",
       "eventStatus": "started",
@@ -32,6 +35,7 @@
     {
       "policyId": "ID",
       "instanceId": "vivek-beacon-1.c.pramod-thangali.internal",
+      "severity": "warn",
       "event": "job-ended",
       "timestamp": "2017-04-15 22:03:11.984",
       "eventStatus": "completed",
@@ -40,6 +44,7 @@
     {
       "policyId": "ID",
       "instanceId": "vivek-beacon-1.c.pramod-thangali.internal",
+      "severity": "critical",
       "event": "policy-created",
       "timestamp": "2017-05-01 22:03:11.984",
       "eventStatus": "created",

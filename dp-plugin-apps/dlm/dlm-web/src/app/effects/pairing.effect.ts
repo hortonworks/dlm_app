@@ -14,16 +14,17 @@ export class PairingEffects {
 
   @Effect()
   loadPairings$: Observable<any> = this.actions$
-    .ofType(pairingActions.LOAD_PAIRINGS)
-    .switchMap(() => {
+    .ofType(pairingActions.LOAD_PAIRINGS.START)
+    .map(toPayload)
+    .switchMap(payload => {
       return this.pairingService.fetchPairings()
-        .map(pairings => loadPairingsSuccess(pairings))
-        .catch(err => Observable.of(loadPairingsFail(err)));
+        .map(pairings => loadPairingsSuccess(pairings, payload.meta))
+        .catch(err => Observable.of(loadPairingsFail(err, payload.meta)));
     });
 
   @Effect()
   createPairing$: Observable<any> = this.actions$
-    .ofType(pairingActions.CREATE_PAIRING)
+    .ofType(pairingActions.CREATE_PAIRING.START)
     .map(toPayload)
     .switchMap(payload => {
       return this.pairingService.createPairing(payload)
@@ -36,7 +37,7 @@ export class PairingEffects {
 
   @Effect()
   deletePairing$: Observable<any> = this.actions$
-    .ofType(pairingActions.DELETE_PAIRING)
+    .ofType(pairingActions.DELETE_PAIRING.START)
     .map(toPayload)
     .switchMap(payload => {
       return this.pairingService.deletePairing(payload)

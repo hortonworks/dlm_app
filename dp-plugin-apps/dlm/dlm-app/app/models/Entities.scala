@@ -47,7 +47,7 @@ object Entities {
 
   case class PolicySubmitRequest(policyDefinition: PolicyDefinitionRequest, submitType: String)
 
-  case class PolicyInstancesResponse(jobs: Seq[PolicyInstanceResponse])
+  case class PolicyInstancesResponse(totalResults: Long, results: Long, jobs: Seq[PolicyInstanceResponse])
 
   case class EventsDetailResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), events: Seq[BeaconEventResponse])
 

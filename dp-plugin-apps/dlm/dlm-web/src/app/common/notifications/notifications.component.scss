@@ -24,4 +24,10 @@
     top: 125%;
     right: -25px;
   }
+
+  table > tbody > tr:last-child {
+    &:not(:hover) {
+      border-bottom-color: transparent;
+    }
+  }
 }

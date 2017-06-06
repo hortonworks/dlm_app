@@ -1,14 +1,14 @@
 import {Component, Input, OnInit} from "@angular/core";
-import {RichDatasetModel} from "../../../../models/richDatasetModel";
 import {Router} from "@angular/router";
-
+import {RichDatasetModel} from "../../../../models/richDatasetModel";
 
 @Component({
-  selector: 'ds-tile-proxy',
-  templateUrl: './tile-proxy.component.html',
-  styleUrls: ['./tile-proxy.component.scss'],
+  selector: "ds-tile-proxy",
+  styleUrls: ["./tile-proxy.component.scss"],
+  templateUrl: "./tile-proxy.component.html"
 })
-export class DsTileProxy{
+
+export class DsTileProxy {
 
   @Input() dsModel: RichDatasetModel;
 
@@ -16,12 +16,12 @@ export class DsTileProxy{
   }
 
   getID() {
-    return 'dropDownIcon_' + this.dsModel.id;
+    return `dropDownIcon_${this.dsModel.id}`;
   }
 
   showFullView($event) {
-    if ($event.target.tagName != 'I') {
-      this.router.navigate(['dataset/full-view/' + this.dsModel.id]);
+    if ($event.target.tagName != "I") {
+      this.router.navigate([`dataset/full-view/${this.dsModel.id}`]);
     }
   }
 }

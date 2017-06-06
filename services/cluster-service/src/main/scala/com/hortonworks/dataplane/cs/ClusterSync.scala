@@ -5,7 +5,7 @@ import javax.inject.{Inject, Singleton}
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, PoisonPill, Props}
 import com.google.common.base.Supplier
-import com.hortonworks.dataplane.commons.domain.Entities.Datalake
+import com.hortonworks.dataplane.commons.domain.Entities.DataplaneCluster
 import com.hortonworks.dataplane.commons.service.api.Poll
 import com.typesafe.config.Config
 import play.api.libs.ws.WSClient
@@ -14,15 +14,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
-private[cs] sealed case class GetDataLakes(lakes: Seq[Datalake],
-                                           credentials: Credentials)
+private[cs] sealed case class GetDataplaneCluster(dpClusters: Seq[DataplaneCluster],
+                                                  credentials: Credentials)
 
 private[cs] sealed case class CredentialsLoaded(credentials: Credentials,
-                                                datalakes: Seq[Long] = Seq())
+                                                dpClusters: Seq[Long] = Seq())
 
 private[cs] sealed case class InvalidCredentials(credentials: Credentials)
 
-private[cs] sealed case class DataLakeAdded(id: Long)
+private[cs] sealed case class DpClusterAdded(id: Long)
 
 @Singleton
 class ClusterSync @Inject()(val actorSystem: ActorSystem,
@@ -63,12 +63,12 @@ class ClusterSync @Inject()(val actorSystem: ActorSystem,
 
   /**
     * Trigger an off schedule cluster sync
-    * @param dataLakeId The data lake id
+    * @param dpClusterId The data lake id
     */
-  def trigger(dataLakeId: Long) = {
+  def trigger(dpClusterId: Long) = {
     actorSystem.scheduler.scheduleOnce(100 milliseconds,
                                        actorSupplier,
-                                       DataLakeAdded(dataLakeId))
+                                       DpClusterAdded(dpClusterId))
   }
 
 }
@@ -83,7 +83,7 @@ private sealed class Synchronizer(val storageInterface: StorageInterface,
     extends Actor
     with ActorLogging {
 
-  val dataLakeWorkers = collection.mutable.Map[Long, ActorRef]()
+  val dpClusterWorkers = collection.mutable.Map[Long, ActorRef]()
   val dbActor: ActorRef =
     context.actorOf(Props(classOf[PersistenceActor], storageInterface))
 
@@ -94,65 +94,65 @@ private sealed class Synchronizer(val storageInterface: StorageInterface,
       // notify that credentials were loaded
       creds.map(CredentialsLoaded(_)).pipeTo(self)
 
-    case CredentialsLoaded(credentials, lakes) =>
+    case CredentialsLoaded(credentials, dpClusters) =>
       log.info(s"Loaded credentials $credentials")
       if (credentials.pass.isEmpty || credentials.user.isEmpty)
         self ! InvalidCredentials(credentials)
       else {
-        val dataLakes = storageInterface.getDataLakes
-        if (lakes.isEmpty)
-          dataLakes.map(GetDataLakes(_, credentials)).pipeTo(self)
+        val eventualClusters = storageInterface.getDpClusters
+        if (dpClusters.isEmpty)
+          eventualClusters.map(GetDataplaneCluster(_, credentials)).pipeTo(self)
         else
-          dataLakes.map(lk => {
-            val filter = lk.filter(l => l.id.get == lakes.head)
-            GetDataLakes(filter, credentials)
+          eventualClusters.map(lk => {
+            val filter = lk.filter(l => l.id.get == dpClusters.head)
+            GetDataplaneCluster(filter, credentials)
           }).pipeTo(self)
       }
 
     case InvalidCredentials(credentials) =>
       log.error(s"Invalid shared credentials for Ambari $credentials")
 
-    case GetDataLakes(dl, credentials) =>
-      log.info("cleaning up old datalake workers")
-      val currentLakes = collection.mutable.Set[Long]()
-      dl.foreach { lake =>
-        currentLakes += lake.id.get
-        dataLakeWorkers.getOrElseUpdate(
-          lake.id.get,
-          context.actorOf(Props(classOf[DatalakeActor],
-                                lake,
+    case GetDataplaneCluster(dl, credentials) =>
+      log.info("cleaning up old dp-cluster workers")
+      val currentDpClusters = collection.mutable.Set[Long]()
+      dl.foreach { dpc =>
+        currentDpClusters += dpc.id.get
+        dpClusterWorkers.getOrElseUpdate(
+          dpc.id.get,
+          context.actorOf(Props(classOf[DpClusterActor],
+                                dpc,
                                 credentials,
                                 config,
                                 storageInterface,
                                 wSClient,
                                 dbActor),
-                          s"Datalake_${lake.id.get}"))
+                          s"Datalake_${dpc.id.get}"))
       }
 
       // clean up
-      val toClear = dataLakeWorkers.keySet -- currentLakes
-      log.info(s"cleaning up workers for datalakes $toClear")
+      val toClear = dpClusterWorkers.keySet -- currentDpClusters
+      log.info(s"cleaning up workers for dp-clusters $toClear")
       toClear.foreach { tc =>
-        dataLakeWorkers.get(tc).foreach(c => c ! PoisonPill)
-        dataLakeWorkers.remove(tc)
+        dpClusterWorkers.get(tc).foreach(c => c ! PoisonPill)
+        dpClusterWorkers.remove(tc)
       }
-      currentLakes.clear
+      currentDpClusters.clear
       // fire poll to children
-      dataLakeWorkers.values.foreach(_ ! Poll())
+      dpClusterWorkers.values.foreach(_ ! Poll())
 
     case ServiceSaved(clusterData, cluster) =>
       log.info(s"Cluster state saved for - ${clusterData.servicename}")
-      dataLakeWorkers(cluster.datalakeid.get) ! ServiceSaved(clusterData,
+      dpClusterWorkers(cluster.dataplaneClusterId.get) ! ServiceSaved(clusterData,
                                                              cluster)
 
     case HostInfoSaved(cluster) =>
-      dataLakeWorkers(cluster.datalakeid.get) ! HostInfoSaved(cluster)
+      dpClusterWorkers(cluster.dataplaneClusterId.get) ! HostInfoSaved(cluster)
 
-    case DataLakeAdded(dataLakeId) =>
+    case DpClusterAdded(dpCluster) =>
     // Perform the same steps but for a single data lake
       val creds: Future[Credentials] = loadCredentials
       // notify that credentials were loaded
-      creds.map(CredentialsLoaded(_,Seq(dataLakeId))).pipeTo(self)
+      creds.map(CredentialsLoaded(_,Seq(dpCluster))).pipeTo(self)
 
   }
 

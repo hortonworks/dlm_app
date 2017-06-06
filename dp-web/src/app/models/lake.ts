@@ -7,7 +7,7 @@ export class Lake {
   properties?: any;
   created?: string;
   updated?: string;
-
   ambariUrl: string;
   state?: string;
+  isDatalake?:boolean;
 }

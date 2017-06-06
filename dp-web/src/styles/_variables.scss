@@ -1,7 +1,7 @@
 /* MDL overrides */
 $layout-header-desktop-row-height: 55px;
-$layout-drawer-narrow: 175px;
-$layout-drawer-width: 175px;
+//$layout-drawer-narrow: 175px;
+//$layout-drawer-width: 175px;
 $layout-header-desktop-baseline: 0px;
 $layout-header-bg-color: #FFFFFF;
 $layout-text-color: #848484 !important;
@@ -12,6 +12,7 @@ $data-table-hover-color: #E7f6FC;
 /* DP Variables */
 $disabled-opacity: 0.6;
 $page-margins: 10px;
+$side-nav-width: 200px;
 
 $alto: #D3D3D3;
 $concrete: #F2F2F2;
@@ -41,6 +42,7 @@ $bright-gray: #404351;
 $mako: #40424F;
 $alabaster: #FAFAFA;
 $tuna: #323544;
+$pickled-bluewood: #303D54;
 
 /****** These are picked from atlas ********/
 $font_1: Roboto;
@@ -77,3 +79,9 @@ $color_text_gray: #677378;
 $color_green: #60AA5A;
 $color-border: #D0D3D7;
 $font_size_title: 22px;
+
+.borderBox, .borderBox * {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}

@@ -1,18 +1,17 @@
-import { Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter } from '@angular/core';
+import { Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter, HostBinding } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { go } from '@ngrx/router-store';
 import { IMyOptions, IMyDateModel } from 'mydatepicker';
 
 import { RadioItem } from 'common/radio-button/radio-button';
-import { createPolicy } from 'actions/policy.action';
 import { State } from 'reducers/index';
-import { Observable } from 'rxjs/Observable';
 import { Pairing } from 'models/pairing.model';
-import { SessionStorageService } from 'services/session-storage.service';
 import { POLICY_TYPES, POLICY_SUBMIT_TYPES } from 'constants/policy.constant';
 import { markAllTouched } from 'utils/form-util';
 import { getDatePickerDate } from 'utils/date-util';
+import { TranslateService } from '@ngx-translate/core';
+import { mapToList } from 'utils/store-util';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 
@@ -29,6 +28,7 @@ export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 export class PolicyFormComponent implements OnInit {
   @Input() pairings: Pairing[] = [];
   @Output() formSubmit = new EventEmitter<any>();
+  @HostBinding('class') className = 'dlm-policy-form';
   policySubmitTypes = POLICY_SUBMIT_TYPES;
   policyForm: FormGroup;
   databaseListGroup: FormGroup;
@@ -90,6 +90,8 @@ export class PolicyFormComponent implements OnInit {
   ];
   selectedJobType: string = this.jobTypes[0].value;
   selectedPolicyType = POLICY_TYPES.HDFS;
+  hdfsRootPath = '/';
+  selectedHdfsPath = '/';
   get defaultTime(): Date {
     const date = new Date();
     date.setHours(0);
@@ -97,18 +99,63 @@ export class PolicyFormComponent implements OnInit {
     return date;
   }
 
-  get pairs() {
-    return this.generatePairs(this.pairings);
+  get sourceClusters() {
+    return mapToList(this.getClusterEntities(this.pairings));
   }
 
-  constructor(private formBuilder: FormBuilder, private store: Store<State>) { }
+  get destinationClusters() {
+    if (this.sourceCluster) {
+      const pairings = this.pairings.filter(pairing => pairing.pair.filter(cluster => cluster.id === this.sourceCluster).length);
+      if (pairings) {
+        const clusterEntities = this.getClusterEntities(pairings);
+        // Remove source cluster from the entities
+        delete clusterEntities[this.sourceCluster];
+        return mapToList(clusterEntities);
+      }
+      return [{
+        label: this.t.instant('page.policies.form.fields.destinationCluster.noPair'),
+        value: ''
+      }];
+    }
+    return [{
+      label: this.t.instant('page.policies.form.fields.destinationCluster.default'),
+      value: ''
+    }];
+  }
+
+  get sourceCluster() {
+    return this.policyForm.value.general.sourceCluster;
+  }
+
+  get destinationCluster() {
+    return this.policyForm.value.general.destinationCluster;
+  }
+
+  getClusterEntities(pairings) {
+    return pairings.reduce((entities: {[id: number]: {}}, entity: Pairing) => {
+      const getClusters = (pairing) => {
+        return pairing.pair.reduce((clusters: {}, cluster) => {
+          return Object.assign({}, clusters, {
+            [cluster.id]: {
+              label: cluster.name,
+              value: cluster.id
+            }
+          });
+        }, {});
+      };
+      return Object.assign({}, entities, getClusters(entity));
+    }, {});
+  }
+
+  constructor(private formBuilder: FormBuilder, private store: Store<State>, private t: TranslateService) { }
 
   ngOnInit() {
     this.policyForm = this.formBuilder.group({
       general: this.formBuilder.group({
         name: ['', Validators.required],
         type: [this.selectedPolicyType],
-        pair: [this.pairs.length && this.pairs[0].value || null, Validators.required]
+        sourceCluster: ['', Validators.required],
+        destinationCluster: ['', Validators.required]
       }),
       databases: [[]],
       directories: ['', Validators.required],
@@ -125,15 +172,6 @@ export class PolicyFormComponent implements OnInit {
         }, { validator: this.validateTime})
       })
     });
-  }
-
-  generatePairs(pairings: Pairing[]) {
-    return pairings.reduce((pairs, pairing) => {
-      return pairs.concat({
-        value: pairing.id,
-        label: [pairing.pair[0].name, pairing.pair[1].name]
-      });
-    }, []);
   }
 
   handleSubmit({ value }) {
@@ -209,6 +247,19 @@ export class PolicyFormComponent implements OnInit {
     });
   }
 
+  handleSourceClusterChange(sourceCluster) {
+    this.selectedHdfsPath = this.hdfsRootPath;
+    this.policyForm.patchValue({
+      general: {
+        destinationCluster: ''
+      }
+    });
+  }
+
+  handleHdfsPathChange(path) {
+    this.selectedHdfsPath = path;
+  }
+
   cancel() {
     this.store.dispatch(go(['policies']));
   }
@@ -224,7 +275,8 @@ export class PolicyFormComponent implements OnInit {
     if (dateFieldValue) {
       const dateWithTime = this.setTimeForDate(dateFieldValue, timeFieldValue);
       if (dateWithTime.getTime() < Date.now()) {
-        timeControl.setErrors({ lessThanCurrent: true });
+        // TODO: figure out if it depends on time zone
+        // timeControl.setErrors({ lessThanCurrent: true });
         return null;
       }
     }

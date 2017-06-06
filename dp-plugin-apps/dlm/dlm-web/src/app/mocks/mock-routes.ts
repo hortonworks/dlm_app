@@ -30,5 +30,8 @@ export const routes: MockRoute[] = [
   new MockRoute('clusters/:id/jobs', 'jobs.json'),
 
   // Events
-  new MockRoute('events', 'events.json')
+  new MockRoute('events', 'events.json'),
+
+  // HDFS files list
+  new MockRoute('clusters/:clusterId/webhdfs/file', 'files.json')
 ];

@@ -5,46 +5,58 @@
             <input type="text" placeholder="{{'common.search' | translate}}" name="name" id="search" (keyup)="filter($event)" />
             <i class="fa fa-search dp-input__icon" aria-hidden="true"></i>
         </div>
-        <button class="mdl-button btn-hwx-primary" [routerLink]="['/infra/add']"> {{"pages.infra.labels.addButton" | translate}} </button>
+        <button class="mdl-button btn-hwx-primary" [routerLink]="['/infra/add']"> {{"common.add" | translate}} </button>
     </div>
 
     <div style="clear:both;"></div>
 
-    <table class="mdl-data-table mdl-js-data-table" on-mouseleave="hoveredIndex=null">
+    <table class="mdl-data-table mdl-js-data-table" dp-config-table  on-mouseleave="hoveredIndex=null" (onSort)="onSort($event)">
         <thead>
         <tr>
-          <th class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder">{{"common.status" | translate}}</th>
-          <th class="mdl-data-table__cell--non-numeric">{{"common.name" | translate}}</th>
-          <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.nodes" | translate}}</th>
-          <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.uptime" | translate}}</th>
-          <th class="mdl-data-table__cell--non-numeric">{{"common.services" | translate}}</th>
-          <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.hdfsUsed" | translate}}</th>
-          <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.hdfsTotal" | translate}}</th>
+          <th class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder"> {{"common.status" | translate}}</th>
+          <th class="mdl-data-table__cell--non-numeric">
+              <dp-config-sorter [sortBy]="'name'">  {{"common.name" | translate}} </dp-config-sorter>
+          </th>
+          <th class="mdl-data-table__cell--non-numeric">
+            <dp-config-sorter [sortBy]="'city'">  {{"common.location" | translate}} </dp-config-sorter>
+          </th>
+          <th class="mdl-data-table__cell--non-numeric">
+              <dp-config-sorter [type]="'number'" [sortBy]="'nodes'"> {{"pages.infra.labels.nodes" | translate}} </dp-config-sorter>
+          </th>
+          <th class="mdl-data-table__cell--non-numeric">
+              <dp-config-sorter [type]="'number'" [sortBy]="'uptime'"> {{"pages.infra.labels.uptime" | translate}} </dp-config-sorter>
+          </th>
+          <th class="mdl-data-table__cell--non-numeric">
+              <dp-config-sorter [sortBy]="'services'"> {{"common.services" | translate}} </dp-config-sorter>
+          </th>
+          <th class="mdl-data-table__cell--non-numeric">
+              <dp-config-sorter [type]="'number'" [sortBy]="'hdfsUsedInBytes'"> {{"pages.infra.labels.hdfsUsed" | translate}} </dp-config-sorter>
+          </th>
           <th class="mdl-data-table__cell--non-numeric actions"></th>
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let lakeHealth of lakesHealth; let index=index" on-mouseover="hoveredIndex=index">
-            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder">
-                <i class="fa fa-circle" aria-hidden="true" [ngClass]="{'fa-circle--color-up':isUp(lakeHealth.status), 'fa-circle--color-down':isDown(lakeHealth.status), 'fa-circle--color-na':isNotAvailable(lakeHealth.status)}"></i>
+        <tr *ngFor="let lakeInfo of lakesList; let index=index" on-mouseover="hoveredIndex=index">
+            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder status-{{getStatusString(lakeInfo.status)}}">
+                <i class="fa fa-circle" aria-hidden="true"></i>
             </td>
-            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--clickable mdl-data-table__cell--width15">{{lakeHealth.lake.data.name}}</td>
-            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable "><span *ngIf="lakeHealth.health">{{lakeHealth.health.nodes? lakeHealth.health.nodes : 'NA'}}</span></td>
-            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"><span *ngIf="lakeHealth.health && lakeHealth.health.status">{{lakeHealth.health.status.since ? doGetUptime(lakeHealth.health.status.since): 'NA'}}</span></td>
-            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"><span *ngIf="lakeHealth.health">{{lakeHealth.lake.data.services ? lakeHealth.lake.data.services : 'NA'}}</span></td>
-            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"><span *ngIf="lakeHealth.health">{{lakeHealth.health.usedSize ? lakeHealth.health.usedSize : 'NA'}}</span></td>
-            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"><span *ngIf="lakeHealth.health">{{lakeHealth.health.totalSize ? lakeHealth.health.totalSize : 'NA'}}</span></td>
+            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--clickable mdl-data-table__cell--width15">{{lakeInfo.name}}</td>
+            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.city}},&nbsp;{{lakeInfo.country}}</td>
+            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.nodes}}</td>
+            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.uptimeStr}}</td>
+            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.services}}</td>
+            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.hdfsUsed}}/{{lakeInfo.hdfsTotal}}</td>
             <td class="mdl-data-table__cell--non-numeric actions">
                 <div [ngClass]="{'visibility-visible': index === hoveredIndex, 'visibility-hidden': index !== hoveredIndex}">
-                    <button [attr.id]="'dropDown_'+lakeHealth.lake.data.id" class="mdl-button mdl-js-button mdl-button--icon"><i class="fa fa-ellipsis-h fa__fa-ellipsis-h--icon"></i></button>
-                    <ul mdl class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+lakeHealth.lake.data.id">
-                        <li class="mdl-menu__item"><i class="fa__fa-edit--icon fa fa-edit"></i>Edit</li>
-                        <li class="mdl-menu__item"><i class="fa__fa-close--icon fa fa-close"></i>Delete</li>
+                    <button [attr.id]="'dropDown_'+lakeInfo.name" class="mdl-button mdl-js-button mdl-button--icon"><i class="fa fa-ellipsis-h fa__fa-ellipsis-h--icon"></i></button>
+                    <ul mdl class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+lakeInfo.name">
+                        <li class="mdl-menu__item"><i class="fa__fa-edit--icon fa fa-external-link"></i><a href="{{lakeInfo.ambariUrl}}" target="_blank">Go to Ambari</a></li>
+                        <li class="mdl-menu__item" (click)="refresh(lakeInfo)"><i class="fa__fa-close--icon fa fa-refresh"></i>Refresh</li>
                     </ul>
                 </div>
             </td>
         </tr>
-        <tr *ngIf="lakesHealth.length === 0">
+        <tr *ngIf="lakesList.length === 0">
             <td class="mdl-typography--text-center" colspan="8" >{{"pages.infra.labels.emptySearchResult" | translate}}</td>
         </tr>
         </tbody>

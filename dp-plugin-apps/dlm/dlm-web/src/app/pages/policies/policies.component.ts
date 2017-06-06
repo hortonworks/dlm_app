@@ -7,9 +7,12 @@ import { Store } from '@ngrx/store';
 import { loadPolicies } from 'actions/policy.action';
 import { loadClusters } from 'actions/cluster.action';
 import { loadJobsForClusters } from 'actions/job.action';
+import { listFiles } from 'actions/hdfslist.action';
 import { Policy } from 'models/policy.model';
-import { DropdownItem } from 'components/dropdown/dropdown-item';
 import { getPolicyClusterJob } from 'selectors/policy.selector';
+import { Pairing } from 'models/pairing.model';
+import { getAllPairings } from 'selectors/pairing.selector';
+import { loadPairings } from 'actions/pairing.action';
 import { filterCollection } from 'utils/array-util';
 import * as fromRoot from 'reducers/';
 import { Cluster } from 'models/cluster.model';
@@ -19,21 +22,18 @@ import { TableFilterItem } from 'common/table/table-filter/table-filter-item.typ
 export const ALL = 'all';
 
 @Component({
-  selector: 'dp-main',
+  selector: 'dlm-policies',
   templateUrl: './policies.component.html',
   styleUrls: ['./policies.component.scss']
 })
 export class PoliciesComponent implements OnInit, OnDestroy {
   policies$: Observable<Policy[]>;
   clusters$: Observable<Cluster[]>;
+  pairings$: Observable<Pairing[]>;
   clustersSubscription: Subscription;
   filteredPolicies$: Observable<Policy[]>;
   filters$: BehaviorSubject<any> = new BehaviorSubject({});
   filterByService$: BehaviorSubject<any> = new BehaviorSubject('');
-  addOptions: DropdownItem[] = [
-    {label: 'Cluster', path: '../clusters/create'},
-    {label: 'Policy', path: 'create'}
-  ];
   filterBy: TableFilterItem[] = [
     {multiple: true, propertyName: 'sourceCluster'},
     {multiple: false, propertyName: 'targetCluster'},
@@ -46,9 +46,11 @@ export class PoliciesComponent implements OnInit, OnDestroy {
               private route: ActivatedRoute) {
     this.policies$ = this.store.select(getPolicyClusterJob);
     this.clusters$ = store.select(getAllClusters);
+    this.pairings$ = store.select(getAllPairings);
 
     this.clustersSubscription = this.clusters$.subscribe(clusters => {
       const clusterIds = clusters.map(c => c.id);
+      store.dispatch(loadPairings());
       store.dispatch(loadJobsForClusters(clusterIds));
     });
     this.filteredPolicies$ = Observable.combineLatest(this.policies$, this.filters$, this.filterByService$)
@@ -67,11 +69,6 @@ export class PoliciesComponent implements OnInit, OnDestroy {
     const filtered = filterCollection(policies, filters);
     return filterByService ? filtered.filter(policy => policy.type === filterByService) : filtered;
   }
-
-  handleAddSelected(option: DropdownItem) {
-    this.router.navigate([option.path], {relativeTo: this.route});
-  }
-
 
   onFilter(filters) {
     this.filters$.next(filters);

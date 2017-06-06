@@ -161,7 +161,7 @@ class BeaconService @Inject()(
                   hiveServerServiceUrl,
                   clusterToBePairedDetails.pairedClusterRequest.beaconUrl,
                   clusterToBePairedDetails.cluster.name,
-                  clusterToBePairedDetails.cluster.description
+                  ""
                 )
               )
               acc.+(clusterDefinition)
@@ -437,7 +437,7 @@ class BeaconService @Inject()(
         val fullUrl = beaconService.fullURL
         beaconPolicyInstanceService.listPolicyInstance(fullUrl, policyName, queryString).map {
           case Left(errors) => p.success(Left(errors))
-          case Right(policyInstanceService) => p.success(Right(PolicyInstancesResponse(policyInstanceService)))
+          case Right(policyInstanceService) => p.success(Right(PolicyInstancesResponse(policyInstanceService.totalResults, policyInstanceService.results, policyInstanceService.instance)))
         }
     }
     p.future
@@ -450,7 +450,7 @@ class BeaconService @Inject()(
       case Right(beaconService) =>
         beaconPolicyInstanceService.listPolicyInstances(beaconService.fullURL, queryString).map {
           case Left(errors) => p.success(Left(errors))
-          case Right(policyInstanceService) => p.success(Right(PolicyInstancesResponse(policyInstanceService)))
+          case Right(policyInstanceService) => p.success(Right(PolicyInstancesResponse(policyInstanceService.totalResults, policyInstanceService.results, policyInstanceService.instance)))
         }
     }
     p.future
@@ -507,8 +507,8 @@ object BeaconService {
   lazy val POLICY_SUBMIT_SCHEDULE = "SUBMIT_AND_SCHEDULE"
 
   lazy val PAIR_CLUSTER_SIZE = 2
-  
-  
+
+
   def submitTypeError(submitType: String) : String = "Value passed submitType = " + submitType + " is invalid. Valid values for submitType are SUBMIT | SUBMIT_AND_SCHEDULE"
   def clusterPairPaylodError = "Request payload should be a set of two objects"
   def pairClusterError = "Error occurred while getting API response from DB service or/and Beacon service"

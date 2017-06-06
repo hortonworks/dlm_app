@@ -1,0 +1,16 @@
+.dlm-progress-container {
+  display: block;
+  width: 100%;
+}
+
+.progress-container-waiting {
+  width: 100%;
+  text-align: center;
+  font-size: 24px;
+}
+
+.nameLink {
+  &:hover {
+    cursor: pointer;
+  }
+}

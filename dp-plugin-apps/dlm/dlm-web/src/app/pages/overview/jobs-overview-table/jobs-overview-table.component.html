@@ -1,0 +1,55 @@
+<dlm-table
+  #jobsTable
+  [showPageSizeMenu]="showPageSizeMenu"
+  [columns]="columns"
+  [rows]="jobs"
+  (selectColumnAction)="handleSelectedAction($event)">
+</dlm-table>
+
+<dlm-icon-column [showHexagon]="false" [showValue]="true"></dlm-icon-column>
+
+<ng-template #statusCellTemplate let-row="row">
+  <dlm-job-status [job]="row"></dlm-job-status>
+</ng-template>
+
+<ng-template #agoTemplate let-value="value" let-policy="row">
+  <span *ngIf="policy.lastJobResource">
+    <span *ngIf="value > 0">{{value | amTimeAgo}}</span>
+    <span *ngIf="value <= 0">In Progress</span>
+  </span>
+</ng-template>
+
+<ng-template #nextRunTemplate let-row="row">
+  {{row.nextRun | amDateFormat:'MMM DD, YYYY'}}
+</ng-template>
+
+<ng-template #runTimeTemplate let-value="value" let-policy="row">
+  <span *ngIf="policy.lastJobResource">
+    <span *ngIf="value > 0">{{value | amDateFormat: 'hh:mm:ss'}}</span>
+    <span *ngIf="value <= 0">Running</span>
+  </span>
+</ng-template>
+
+<ng-template #transferredFormattedTemplate let-value="value">
+  <span [innerHTML]="value | bytesSize"></span>
+</ng-template>
+
+<ng-template #destinationIconCell>
+  <i class="fa fa-arrow-right"></i>
+</ng-template>
+
+<dlm-modal-dialog
+  [title]="'page.policies.perform_action.confirmation.title'"
+  [body]="'page.policies.perform_action.confirmation.body'"
+  [showDialog]="showActionConfirmationModal"
+  (onClose)="onCloseActionConfirmationModal()"
+  (onOk)="onActionConfirmation()">
+</dlm-modal-dialog>
+
+<dlm-modal-dialog
+  [title]="lastOperationResponse.status"
+  [body]="lastOperationResponse.message"
+  [showDialog]="showOperationResponseModal"
+  [showCancel]="false"
+  (onClose)="onCloseOperationResponseModal()">
+</dlm-modal-dialog>

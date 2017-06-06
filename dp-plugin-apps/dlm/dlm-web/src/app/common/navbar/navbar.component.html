@@ -16,7 +16,9 @@
               </div>
               <ng-template #no_sub_menu>
                 <div>
-                  <span class="ambari-header" style="font-size: 15px; padding: 0px;">{{header.label}}</span>
+                  <span [routerLink]="header.linkURL" class="ambari-header" style="font-size: 15px; padding: 0px; outline: none;">
+                    {{header.label}}
+                  </span>
                 </div>
               </ng-template>
               <ul class="dropdown-menu" [hidden]="!hasSubMenu(header)">

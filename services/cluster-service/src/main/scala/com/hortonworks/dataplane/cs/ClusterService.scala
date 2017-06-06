@@ -83,7 +83,7 @@ object ClusterService extends App {
 
       override def onRecoverableException(reason: String, th: Throwable): Unit = logger.warn(reason,th)
 
-      override def onServiceCheck(serviceId: String): Unit = logger.info("Running a service check for serviceId "+serviceId)
+      override def onServiceCheck(serviceId: String): Unit = logger.debug("Running a service check for serviceId "+serviceId)
     }
   }
 }

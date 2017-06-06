@@ -1,0 +1,38 @@
+<div class="page-container">
+    <div class="mdl-grid mdl-grid--no-spacing ">
+        <div class="mdl-cell--2-col hwx-title"> Workspace | {{ workspaces.length }} </div>
+        <div class="mdl-layout-spacer"> </div>
+        <div class="actions">
+            <div class="dp-input">
+                <input type="text" placeholder="Search" name="name" id="search">
+                <i class="fa fa-search dp-input__icon" aria-hidden="true"></i>
+            </div>
+
+            <dp-tabs [tabEnum]="toggleView" [tabType]="tabType.LAYOUT" [images]="tabImages"> </dp-tabs>
+
+            <button class="mdl-button btn-hwx-primary"> CREATE WORKSPACE</button>
+        </div>
+    </div>
+
+    <div class="spacer-15"> </div>
+    <div class="card-container">
+        <div class=" mdl-card" *ngFor="let workspace of workspaces">
+            <div class="mdl-card__title">
+                <div class="card-title"> {{ workspace.name }}</div>
+                <div class="card-title-sub"><span>Source: </span> <b> {{ workspace.source }} </b></div>
+            </div>
+            <div class="mdl-card__supporting-text">
+                <div class="card-owner"> Owner: {{ workspace.owner }}
+                </div>
+                <div class="card-icons pull-right"> {{ workspace.users }} <i *ngIf="workspace.users > 0" class="fa fa-users" aria-hidden="true"></i></div>
+            </div>
+            <div class="mdl-card__actions mdl-card--border">
+                <div class="mdl-grid mdl-grid--no-spacing">
+                    <div class="mdl-cell--4-col card-count border borderBox"> TABLES <br> {{ workspace.tables }}</div>
+                    <div class="mdl-cell--4-col card-count border borderBox"> NOTEBOOKS <br> {{ workspace.notebooks }}</div>
+                    <div class="mdl-cell--4-col card-count borderBox"> JOBS <br> {{ workspace.jobs }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

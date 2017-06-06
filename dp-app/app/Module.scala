@@ -7,6 +7,7 @@ import com.google.inject.{AbstractModule, Inject, Provides, Singleton}
 import com.hortonworks.datapalane.consul._
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.db.Webservice._
+import com.hortonworks.dataplane.cs._
 import internal.AtlasApiCache
 import internal.auth.Authenticated
 import play.api.{Configuration, Logger}
@@ -60,9 +61,9 @@ class Module extends AbstractModule {
 
   @Provides
   @Singleton
-  @Named("lakeService")
-  def provideLakeService(implicit ws: WSClient,configuration: Configuration):LakeService = {
-    new LakeServiceImpl(configuration.underlying)
+  @Named("dpClusterService")
+  def provideDpClusterService(implicit ws: WSClient, configuration: Configuration):DpClusterService = {
+    new DpClusterServiceImpl(configuration.underlying)
   }
 
 
@@ -79,6 +80,14 @@ class Module extends AbstractModule {
   @Named("clusterService")
   def provideClusterService(implicit ws: WSClient,configuration: Configuration):ClusterService = {
     new ClusterServiceImpl(configuration.underlying)
+  }
+
+
+  @Provides
+  @Singleton
+  @Named("atlasService")
+  def provideAtlasService(implicit ws: WSClient,configuration: Configuration):com.hortonworks.dataplane.cs.Webservice.AtlasService = {
+    new AtlasServiceImpl(configuration.underlying)
   }
 
   @Provides
@@ -120,7 +129,7 @@ class ConsulInitializer @Inject()(config:Configuration){
 
     override def onServiceDeRegister(serviceId: String): Unit = Logger.info(s"Service removed from consul $serviceId")
 
-    override def onRecoverableException(reason: String, th: Throwable): Unit = Logger.warn(reason,th)
+    override def onRecoverableException(reason: String, th: Throwable): Unit = Logger.warn(reason)
 
     override def gatewayDiscovered(zuulServer: ZuulServer): Unit = Logger.info(s"Gateway dicovered $zuulServer")
 

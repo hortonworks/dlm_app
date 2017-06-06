@@ -3,7 +3,7 @@ package com.hortonworks.dataplane.cs
 import java.net.URL
 
 import com.google.common.base.Supplier
-import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasFilters, Entity}
+import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery, Entity}
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterServiceHost, ClusterService => CS}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
 import com.hortonworks.dataplane.cs.atlas.Filters
@@ -11,6 +11,7 @@ import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, Cluster
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import org.apache.atlas.AtlasClientV2
+import org.apache.atlas.model.SearchFilter
 import org.apache.atlas.model.instance.AtlasEntityHeader
 import org.apache.atlas.model.lineage.AtlasLineageInfo.LineageDirection
 import org.codehaus.jackson.map.ObjectMapper
@@ -63,11 +64,11 @@ class DefaultAtlasInterface(clusterId: Long,
     }
   }
 
-  override def findHiveTables(filters: AtlasFilters): Future[AtlasEntities] = {
+  override def findHiveTables(filters: AtlasSearchQuery): Future[AtlasEntities] = {
     // Get the query
     val query = s"$hiveBaseQuery ${Filters.query(filters)}"
     atlasApi.map { api =>
-      val searchResult = api.dslSearch(query)
+      val searchResult = if(filters.isPaged) api.dslSearchWithParams(query,filters.limit.get,filters.offset.get) else api.dslSearch(query)
       val entityHeaders = searchResult.getEntities
       if (entityHeaders == null) {
         AtlasEntities(None)
@@ -124,6 +125,13 @@ class DefaultAtlasInterface(clusterId: Long,
       }
     } yield {
       Json.parse(mapper.writeValueAsString(lineageInfo))
+    }
+  }
+
+  override def getAtlasTypeDefs(searchFilter: SearchFilter): Future[JsValue] = {
+    atlasApi.map { api =>
+      val jsonString = mapper.writeValueAsString(api.getAllTypeDefs(searchFilter))
+      Json.parse(jsonString)
     }
   }
 }

@@ -1,5 +1,61 @@
-<div class="row">
-  <div class="col-md-12">
-    <dlm-cluster-page-card *ngFor="let cluster of clusters" [cluster]="cluster" [policiesCount]="policiesCount" [pairsCount]="pairsCount" [clustersCount]="clusters.length"></dlm-cluster-page-card>
+<dlm-table
+  [rowDetailHeight]="550"
+  [rowDetailTemplate]="rowDetailRef"
+  [theme]="tableTheme"
+  [columns]="columns"
+  [rows]="clusters">
+</dlm-table>
+
+<ng-template #statusCell>
+  <span>
+    <i class="fa fa-circle" style="color: #1EB475;"></i>
+    <!-- TODO: this hardcode should be changed with value from API -->
+    <span>HEALTHY</span>
+  </span>
+</ng-template>
+
+<ng-template #nameCell let-name="value">
+  <span class="cluster-name">{{name}}</span>
+</ng-template>
+
+<ng-template let-stats="value" let-cluster="row" #usageCell>
+  <div class="text-primary cell-content actionable" (click)="toggleClusterDetails(cluster)">
+    <span [innerHTML]="stats.CapacityUsed | bytesSize"></span> / <span [innerHTML]="stats.CapacityTotal | bytesSize"></span>
+    <i class="fa fa-chevron-down"></i>
   </div>
-</div>
+</ng-template>
+
+<ng-template let-value="value" #plainCell>
+  <span *ngIf="value || value === 0; else emptyValue" class="cell-content">{{value}}</span>
+  <ng-template #emptyValue>
+    <i class="fa fa-minus"></i>
+  </ng-template>
+</ng-template>
+
+<ng-template let-location="value" #locationCell>
+  <span>{{location.city}}, {{location.country}}</span>
+</ng-template>
+
+<ng-template let-cluster="row" #addActionsCell>
+  <div class="add-actions-container">
+    <div class="add-actions-icon">
+      <i class="fa fa-plus text-success"></i>
+    </div>
+    <div class="add-actions-buttons">
+      <button class="btn btn-secondary" type="button" [routerLink]="['/pairings/create']" [disabled]="clusters.length - cluster.pairsCounter - 1 === 0">
+        {{ "page.clusters.card.create_pair_text" | translate }}
+      </button>
+      <button class="btn btn-secondary" type="button" [routerLink]="['/policies/create']" [disabled]="cluster.pairsCounter === 0">
+        {{ "page.clusters.card.create_policy_text" | translate }}
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template let-cluster="row" ngx-datatable-row-detail-template #rowDetailRef>
+  <div class="row">
+    <div class="col col-md-12">
+      <dlm-hdfs-browser [rootPath]="hdfsRootPath" [clusterId]="cluster.id"></dlm-hdfs-browser>
+    </div>
+  </div>
+</ng-template>

@@ -7,9 +7,7 @@ import { Event } from 'models/event.model';
   template: `
     <div class="issue-list-item-container">
       <div class="issue-status">
-        <span [ngClass]="{'fa': true, 'fa-circle': true, 'alert-state-CRITICAL': event.eventStatus === 'critical', 
-        'alert-state-WARNING': event.eventStatus === 'warning'}">
-        </span>
+        <dlm-event-status [event]="event"></dlm-event-status>
       </div>
       <div class="issue-info">
         <div class="name">

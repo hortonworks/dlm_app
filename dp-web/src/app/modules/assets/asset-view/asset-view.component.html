@@ -1,7 +1,7 @@
 <div class="dp-view-pane">
     <div class="mdl-grid mdl-grid--no-spacing">
         <div class="mdl-cell--10-col">
-            <div class="mdl-typography--headline"> Sales_2016</div>
+            <div class="mdl-typography--headline">{{this.tableName}}</div>
             <span class="mdl-chip hive-table-chip">
                 <span class="mdl-chip__text">HIVE</span>
             </span>
@@ -13,42 +13,28 @@
 
     <div class="spacer-34"> </div>
 
-    <div class="summary-pane-5">
+    <div class="summary-pane-3">
         <ul>
-            <li>
-                <div> <span class="title">Datalake</span> <br> <span class="value"> Newyork_data </span></div>
-            </li>
-            <li>
-                <div> <span class="title"> Last Used </span> <br> <span class="value"> 2 min ago </span></div>
-            </li>
-            <li>
-                <div> <span class="title"> Users </span> <br> <span class="value"> 43 </span></div>
-            </li>
-            <li>
-                <div> <span class="title"># of Rows</span> <br> <span class="value"> 3002 </span></div>
-            </li>
-            <li>
-                <div> <span class="title"> Table Health</span> <br> <span class="value"> Good </span></div>
+            <li *ngFor="let property of summary">
+                <div> <span class="title">{{property.key}}</span> <br> <span class="value"> {{property.value}} </span></div>
             </li>
         </ul>
     </div>
 
     <div class="spacer-34"> </div>
 
-    <div class="box">
-        <div class="row header">
-            <dp-tabs [tabEnum]="topLevelTabs" [tabType]="tabType.UNDERLINE" (selected)="selectedTopLevelTabs=$event"> </dp-tabs>
-            <div class="spacer-34"> </div>
-        </div>
-        <div class="row content">
-            <section *ngIf="selectedTopLevelTabs === topLevelTabs.DETAILS">
-                <dp-asset-details-view> </dp-asset-details-view>
-            </section>
+    <dp-tabs [tabEnum]="topLevelTabs" [tabType]="tabType.UNDERLINE" (selected)="selectedTopLevelTabs=$event"> </dp-tabs>
 
-            <section>
-                <dp-lineage *ngIf="selectedTopLevelTabs === topLevelTabs.LINEAGE" [clusterId]="'1989'" [guid]="'1cb2fd1e-03b4-401f-a587-2151865d375a'"> </dp-lineage>
-            </section>
-        </div>
-    </div>
+    <div class="spacer-34"> </div>
+
+    <section *ngIf="selectedTopLevelTabs === topLevelTabs.DETAILS">
+        <dp-asset-details-view [assetDetails]="assetDetails" [clusterId]="clusterId" [guid]="guid"> </dp-asset-details-view>
+    </section>
+
+    <div class="spacer-34"> </div>
+
+    <section *ngIf="selectedTopLevelTabs === topLevelTabs.LINEAGE">
+     <dp-lineage [clusterId]="clusterId" [guid]="guid"> </dp-lineage>
+    </section>
 
 </div>

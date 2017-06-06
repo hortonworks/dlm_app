@@ -4,7 +4,7 @@ import akka.actor.Status.Failure
 import akka.actor.{Actor, ActorLogging, ActorRef}
 import com.hortonworks.dataplane.commons.domain.Entities.{
   Cluster,
-  Datalake,
+  DataplaneCluster,
   ClusterService => ClusterData
 }
 import com.hortonworks.dataplane.commons.service.api.Poll
@@ -28,7 +28,7 @@ private[cs] sealed case class ServiceSaved(clusterData: ClusterData,
 private[cs] sealed case class HostInfoSaved(cluster: Cluster)
 
 class ClusterActor(cluster: Cluster,
-                   datalake: Datalake,
+                   dpCluster: DataplaneCluster,
                    implicit val wSClient: WSClient,
                    storageInterface: StorageInterface,
                    credentials: Credentials,
@@ -52,15 +52,15 @@ class ClusterActor(cluster: Cluster,
     case Poll() =>
       // update data lake status
       log.info(s"Received a poll for cluster actor ${self.path}")
-      log.info(s"Updating status for datalake ${datalake.id.get}")
+      log.info(s"Updating status for datalake ${dpCluster.id.get}")
 
       // reset save state
       resetSaveState
       storageInterface
-        .updateDatalakeStatus(datalake.copy(state = Some("SYNC_IN_PROGRESS")))
+        .updateDpClusterStatus(dpCluster.copy(state = Some("SYNC_IN_PROGRESS")))
         .map { res =>
           log.info(
-            s"updated datalake status to SYNC_IN_PROGRESS for datalake ${datalake.id.get} - $res")
+            s"updated datalake status to SYNC_IN_PROGRESS for datalake ${dpCluster.id.get} - $res")
         }
 
       // Make sure we can connect to Ambari
@@ -113,32 +113,32 @@ class ClusterActor(cluster: Cluster,
       log.info(s"Cluster state saved - $service")
       if(service.servicename == "NAMENODE")
         clusterSaveState(service.servicename) = true
-      if (allServicesSaved) updateDatalakeState
+      if (allServicesSaved) updateDpClusterStatus
 
     case HostInfoSaved(cluster)=>
       log.info(s"Host state saved for cluster ${cluster.name}")
       clusterSaveState("HOST_INFO") = true
-      if (allServicesSaved) updateDatalakeState
+      if (allServicesSaved) updateDpClusterStatus
 
 
     case Failure(f) =>
       log.error(s"One of the operations resulted in a failure - ${f}")
       storageInterface
-        .updateDatalakeStatus(datalake.copy(state = Some("SYNC_ERROR")))
+        .updateDpClusterStatus(dpCluster.copy(state = Some("SYNC_ERROR")))
         .map { res =>
           log.info(
-            s"updated datalake status to error for datalake ${datalake.id.get} - ${res}")
+            s"updated datalake status to error for datalake ${dpCluster.id.get} - ${res}")
         }
 
   }
 
-  private def updateDatalakeState = {
+  private def updateDpClusterStatus = {
     log.info("All info saved for cluster")
     storageInterface
-      .updateDatalakeStatus(datalake.copy(state = Some("SYNCED")))
+      .updateDpClusterStatus(dpCluster.copy(state = Some("SYNCED")))
       .map { res =>
         log.info(
-          s"updated datalake status to synced for datalake ${datalake.id.get} - $res")
+          s"updated datalake status to synced for datalake ${dpCluster.id.get} - $res")
         log.info("Resetting save state")
         resetSaveState
       }

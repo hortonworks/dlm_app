@@ -3,18 +3,26 @@ package com.hortonworks.dataplane.http.routes
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{as, entity, path, post, _}
 import com.google.inject.Inject
-import com.hortonworks.dataplane.cs.{AmbariDatalakeInterface, AmbariDatalakeInterfaceImpl, Credentials, StorageInterface}
+import com.hortonworks.dataplane.cs.ClusterErrors.ClusterNotFound
+import com.hortonworks.dataplane.cs.{
+  AmbariDataplaneClusterInterface,
+  AmbariDataplaneClusterInterfaceImpl,
+  Credentials,
+  StorageInterface
+}
+import com.hortonworks.dataplane.db.Webservice.ClusterService
 import com.hortonworks.dataplane.http.BaseRoute
 import com.typesafe.config.Config
 import play.api.libs.json.JsValue
-import play.api.libs.ws.WSClient
+import play.api.libs.ws.{WSAuthScheme, WSClient}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class AmbariRoute @Inject()(val ws: WSClient,
-                            storageInterface: StorageInterface,
+                            val storageInterface: StorageInterface,
+                            val clusterService: ClusterService,
                             val config: Config)
     extends BaseRoute {
 
@@ -22,8 +30,8 @@ class AmbariRoute @Inject()(val ws: WSClient,
   import com.hortonworks.dataplane.commons.domain.Entities._
   import com.hortonworks.dataplane.http.JsonSupport._
 
-  private[dataplane] class TempDatalake(url: String)
-      extends Datalake(id = None,
+  private[dataplane] class TempDataplaneCluster(url: String)
+      extends DataplaneCluster(id = None,
                        name = "",
                        description = "",
                        ambariUrl = url,
@@ -50,7 +58,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
 
   private def getDetails(
       clusters: Seq[String],
-      dli: AmbariDatalakeInterface): Future[Seq[Option[AmbariCluster]]] = {
+      dli: AmbariDataplaneClusterInterface): Future[Seq[Option[AmbariCluster]]] = {
     val futures = clusters.map { c =>
       for {
         json <- dli.getClusterDetails(c)
@@ -63,10 +71,10 @@ class AmbariRoute @Inject()(val ws: WSClient,
   def getAmbariDetails(ep: AmbariEndpoint): Future[Seq[AmbariCluster]] = {
 
     val finalList = for {
-      datalake <- Future.successful(new TempDatalake(url = ep.url))
+      dataplaneCluster <- Future.successful(new TempDataplaneCluster(url = ep.url))
       creds <- loadCredentials
       dli <- Future.successful(
-        AmbariDatalakeInterfaceImpl(datalake, ws, config, creds))
+        AmbariDataplaneClusterInterfaceImpl(dataplaneCluster, ws, config, creds))
       clusters <- dli.discoverClusters
       details <- getDetails(clusters, dli)
     } yield details
@@ -86,6 +94,50 @@ class AmbariRoute @Inject()(val ws: WSClient,
     creds
   }
 
+  def getClusterData(clusterId: Long) = {
+    val result = clusterService.retrieve(clusterId.toString)
+    result.map { r =>
+      if (r.isLeft)
+        throw new ClusterNotFound()
+      else
+        r.right.get
+    }
+  }
+
+  def callAmbariApi(credentials: Credentials, cluster: Cluster, req: String) = {
+    ws.url(s"${cluster.clusterUrl.get}/$req")
+      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
+      .get()
+      .map(_.json)
+  }
+
+  private def issueAmbariCall(clusterId: Long, req: String) = {
+    for {
+      creds <- loadCredentials
+      cluster <- getClusterData(clusterId)
+      response <- callAmbariApi(creds, cluster, req)
+    } yield response
+  }
+
+  val ambariProxy = path(LongNumber / "ambari") { clusterId =>
+    pathEnd {
+      parameters("request") { req =>
+        val ambariResponse = issueAmbariCall(clusterId, req)
+        onComplete(ambariResponse) {
+          case Success(res) =>
+            complete(res)
+          case Failure(th) =>
+            th.getClass match {
+              case c if c == classOf[ClusterNotFound] =>
+                complete(StatusCodes.NotFound, notFound)
+              case _ =>
+                complete(StatusCodes.InternalServerError, errors(th))
+            }
+        }
+      }
+    }
+  }
+
   val route = path("ambari" / "details") {
     post {
       entity(as[AmbariEndpoint]) { ep =>
@@ -94,7 +146,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
           case Success(clusters) =>
             clusters.size match {
               case 0 =>
-                complete(StatusCodes.NotFound,notFound)
+                complete(StatusCodes.NotFound, notFound)
               case _ => complete(success(clusters))
             }
           case Failure(th) =>

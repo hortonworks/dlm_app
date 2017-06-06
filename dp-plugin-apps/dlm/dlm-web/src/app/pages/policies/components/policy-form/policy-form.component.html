@@ -29,24 +29,20 @@
                 </div>
               </div>
             </div>
-            <dlm-form-field [label]="'page.policies.form.fields.pairs' | translate">
-              <dlm-select-field formField formControlName="pair" [options]="pairs">
-                <ng-template selectFieldValue selectFieldOption let-value="value" let-label="label">
-                  <div *ngIf="!value">{{label}}</div>
-                  <div *ngIf="value" class="actionable">
-                    {{label[0]}}
-                    <i class="glyphicon glyphicon-resize-horizontal"></i>
-                    {{label[1]}}
-                   </div>
-                </ng-template>
+            <dlm-form-field [label]="'page.policies.form.fields.sourceCluster.self' | translate">
+              <dlm-select-field formField formControlName="sourceCluster" [options]="sourceClusters" (onSelect)="handleSourceClusterChange($event)">
+              </dlm-select-field>
+            </dlm-form-field>
+            <dlm-form-field [label]="'page.policies.form.fields.destinationCluster.self' | translate">
+              <dlm-select-field formField formControlName="destinationCluster" [options]="destinationClusters">
               </dlm-select-field>
             </dlm-form-field>
           </fieldset>
         </div>
       </div>
 
-      <div class="row" *ngIf="isHDFSPolicy()">
-        <div class="form-section col-md-6">
+      <div class="row" *ngIf="isHDFSPolicy() && sourceCluster">
+        <div class="form-section col-md-12">
           <div class="form-section-title">
             {{'page.policies.form.sections.directories' | translate}}
             <div class="pull-right">
@@ -59,15 +55,16 @@
           <div class="row" [collapse]="sectionCollapsedMap.directories">
             <div class="col-md-12">
               <dlm-form-field [label]="'page.policies.form.fields.directories' | translate">
-                <input type="text" formField class="form-control" formControlName="directories"/>
+                <input type="text" formField class="form-control" formControlName="directories" [(ngModel)]="selectedHdfsPath"/>
               </dlm-form-field>
+              <dlm-hdfs-browser [rootPath]="hdfsRootPath" [clusterId]="sourceCluster" (select)="handleHdfsPathChange($event)"></dlm-hdfs-browser>
             </div>
           </div>
         </div>
       </div>
 
       <div class="row" *ngIf="isHivePolicy()">
-        <div class="form-section col-md-6">
+        <div class="form-section col-md-12">
           <div class="form-section-title">
             {{'page.policies.form.sections.database' | translate}}
             <div class="pull-right">
@@ -178,7 +175,7 @@
             <button type="button" class="btn btn-default" (click)="cancel()">
               {{'common.cancel' | translate}}
             </button>
-            <button class="btn btn-success" type="submit" [disabled]="policyForm.touched && !policyForm.valid">
+            <button class="btn btn-success" type="submit">
               {{'common.review' | translate}}
             </button>
           </div>

@@ -1,6 +1,10 @@
 package com.hortonworks.dataplane.db
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, Errors}
+import com.hortonworks.dataplane.commons.domain.Entities.{
+  Cluster,
+  Error,
+  Errors
+}
 import com.hortonworks.dataplane.db.Webservice.ClusterService
 import com.typesafe.config.Config
 import play.api.libs.json.Json
@@ -22,24 +26,29 @@ class ClusterServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 =>
         extractEntity[Seq[Cluster]](res,
-          r =>
-            (r.json \ "results" \\ "data").map { d =>
-              d.validate[Cluster].get
-            })
+                                    r =>
+                                      (r.json \ "results" \\ "data").map { d =>
+                                        d.validate[Cluster].get
+                                    })
+      case 404 => Left(Errors(Seq(Error("404", "Cluster not found"))))
       case _ => mapErrors(res)
     }
   }
 
   private def mapToCluster(res: WSResponse) = {
     res.status match {
-      case 200 => extractEntity[Cluster](res, r =>(r.json \ "results" \\ "data").head.validate[Cluster].get)
+      case 200 =>
+        extractEntity[Cluster](
+          res,
+          r => (r.json \ "results" \\ "data").head.validate[Cluster].get)
+      case 404 => Left(Errors(Seq(Error("404", "Cluster not found"))))
       case _ => mapErrors(res)
     }
   }
 
   override def getLinkedClusters(
-      datalakeId: Long): Future[Either[Errors, Seq[Cluster]]] = {
-    ws.url(s"$url/datalakes/$datalakeId/clusters")
+      dpClusterId: Long): Future[Either[Errors, Seq[Cluster]]] = {
+    ws.url(s"$url/dp/clusters/$dpClusterId/clusters")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToClusters)
@@ -69,6 +78,5 @@ class ClusterServiceImpl(config: Config)(implicit ws: WSClient)
       .get()
       .map(mapToCluster)
   }
-
 
 }

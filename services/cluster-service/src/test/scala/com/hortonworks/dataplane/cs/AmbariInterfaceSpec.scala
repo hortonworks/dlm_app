@@ -47,8 +47,7 @@ class AmbariInterfaceSpec
     implicit val ws = AhcWSClient()
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "somecluster",
-        description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+        clusterUrl = Some("http://localhost:9999/api/v1/clusters/test")),
       Credentials(Some("admin"),Some("admin")),appConfig)
 
     ambariInterface.ambariConnectionCheck.map { ac =>
@@ -68,8 +67,7 @@ class AmbariInterfaceSpec
     implicit val ws = AhcWSClient()
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
-        description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+        clusterUrl = Some("http://localhost:9999/api/v1/clusters/test")),
       Credentials(Some("admin"),Some("admin")),appConfig)
 
     val atlas  = ambariInterface.getAtlas
@@ -84,24 +82,26 @@ class AmbariInterfaceSpec
 
     val json  = Source.fromURL(getClass.getResource("/namenode.json")).mkString
     val hdfsJson  = Source.fromURL(getClass.getResource("/hdfs.json")).mkString
+    val nnh  = Source.fromURL(getClass.getResource("/namenodehosts.json")).mkString
     val nameNodeConfig = "/api/v1/clusters/test/components/NAMENODE"
     when get nameNodeConfig withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") thenRespond(200,json)
     when get "/api/v1/clusters/test/configurations/service_config_versions" withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") withParams ("service_name"->"HDFS","is_current"->"true") thenRespond(200,hdfsJson)
 
+    when get "/api/v1/clusters/test/host_components" withHeaders ("Authorization" -> "Basic YWRtaW46YWRtaW4=") thenRespond(200,nnh)
+
     implicit val ws = AhcWSClient()
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
-        description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+        clusterUrl = Some("http://localhost:9999/api/v1/clusters/test")),
       Credentials(Some("admin"),Some("admin")),appConfig)
 
     val atlas  = ambariInterface.getNameNodeStats
     atlas.map { either =>
       assert(either.isRight)
-      assert(either.right.get.serviceHost.size == 3)
-      assert(either.right.get.props.isDefined == true)
+      assert(either.right.get.serviceHost.size == 1)
+      assert(either.right.get.props.isDefined)
       //verify the first one
-      assert(either.right.get.serviceHost(0).host == "yusaku-beacon-1.c.pramod-thangali.internal")
+      assert(either.right.get.serviceHost(0).host == "yusaku-beacon-2.c.pramod-thangali.internal")
     }
   }
 
@@ -114,17 +114,14 @@ class AmbariInterfaceSpec
     implicit val ws = AhcWSClient()
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
-        description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+        clusterUrl = Some("http://localhost:9999/api/v1/clusters/test")),
       Credentials(Some("admin"),Some("admin")),appConfig)
 
     val atlas  = ambariInterface.getHdfsInfo
     atlas.map { either =>
       assert(either.isRight)
-      assert(either.right.get.serviceHost.size == 1)
-      assert(either.right.get.props.isEmpty)
-      //verify the first one
-      assert(either.right.get.serviceHost(0).host == "yusaku-beacon-1.c.pramod-thangali.internal")
+      assert(either.right.get.serviceHost.isEmpty)
+      assert(either.right.get.props.isDefined)
     }
   }
 
@@ -140,15 +137,14 @@ class AmbariInterfaceSpec
     implicit val ws = AhcWSClient()
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
-        description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test"))
+        clusterUrl = Some("http://localhost:9999/api/v1/clusters/test"))
       ,Credentials(Some("admin"),Some("admin")),appConfig)
 
     val atlas  = ambariInterface.getGetHostInfo
     atlas.map { either =>
       assert(either.isRight)
       assert(either.right.get.size == 1)
-      assert(either.right.get(0).properties.isDefined)
+      assert(either.right.get.head.properties.isDefined)
     }
 
   }
@@ -161,8 +157,7 @@ class AmbariInterfaceSpec
     implicit val ws = AhcWSClient()
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
-        description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+        clusterUrl = Some("http://localhost:9999/api/v1/clusters/test")),
       Credentials(Some("admin"),Some("admin")),appConfig)
 
     val atlas  = ambariInterface.getKnoxInfo
@@ -182,8 +177,7 @@ class AmbariInterfaceSpec
     implicit val ws = AhcWSClient()
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
-        description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+        clusterUrl = Some("http://localhost:9999/api/v1/clusters/test")),
       Credentials(Some("admin"),Some("admin")),appConfig)
 
     val beacon  = ambariInterface.getBeacon
@@ -203,14 +197,13 @@ class AmbariInterfaceSpec
     implicit val ws = AhcWSClient()
     val ambariInterface = new AmbariClusterInterface(
       Cluster(name = "test",
-        description = "somedescription",
-        ambariurl = Some("http://localhost:9999/api/v1/clusters/test")),
+        clusterUrl = Some("http://localhost:9999/api/v1/clusters/test")),
       Credentials(Some("admin"),Some("admin")),appConfig)
 
     val beacon  = ambariInterface.getHs2Info
     beacon.map { either =>
       assert(either.isRight)
-      assert(either.right.get.props.isEmpty)
+      assert(either.right.get.props.isDefined)
       assert(either.right.get.serviceHost.size == 1)
     }
   }

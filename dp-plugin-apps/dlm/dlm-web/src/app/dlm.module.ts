@@ -20,6 +20,7 @@ import { PolicyEffects } from './effects/policy.effect';
 import { PairingEffects } from './effects/pairing.effect';
 import { JobEffects } from './effects/job.effect';
 import { EventEffects } from './effects/event.effect';
+import { HdfsListEffects } from './effects/hdfslist.effect';
 
 import { FormEffects } from './effects/form.effect';
 
@@ -32,6 +33,8 @@ import { FormService } from 'services/form.service';
 import { NavbarService } from 'services/navbar.service';
 import { EventService } from 'services/event.service';
 import { TimeZoneService } from 'services/time-zone.service';
+import { HdfsService } from 'services/hdfs.service';
+import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
 
 import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
@@ -53,15 +56,16 @@ import { CommonComponentsModule } from './components/common-components.module';
 import { UserDropdownComponent } from './common/user-dropdown/user-dropdown.component';
 import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.component';
 import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route.component';
+import { HdfsBrowserComponent } from './components/hdfs-browser/hdfs-browser.component';
 
 import { ResourceChartsComponent } from './pages/overview/resource-charts/resource-charts.component';
+import { OverviewFilterComponent } from './pages/overview/overview-filter/overview-filter.component';
 import { IssuesListComponent } from './pages/overview/issues-list/issues-list.component';
 import { IssuesListItemComponent } from './pages/overview/issues-list-item/issues-list-item.component';
+import { JobsOverviewTableComponent } from './pages/overview/jobs-overview-table/jobs-overview-table.component';
 
 import { ClustersComponent } from './pages/clusters/clusters.component';
-import { ClusterCardComponent } from './pages/clusters/cluster-card/cluster-card.component';
 import { ClusterListComponent } from './pages/clusters/cluster-list/cluster-list.component';
-import { ClusterSearchComponent } from './pages/clusters/cluster-search/cluster-search.component';
 
 import { JobsTableComponent } from './pages/jobs/jobs-table/jobs-table.component';
 import { JobStatusComponent } from './pages/jobs/job-status/job-status.component';
@@ -98,6 +102,7 @@ import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/rev
 import { BytesSizePipe } from './pipes/bytes-size.pipe';
 import { FmtTzPipe } from './pipes/fmt-tz.pipe';
 import { FrequencyPipe } from './pipes/frequency.pipe';
+import { TruncatePipe } from './pipes/truncate.pipe';
 
 @NgModule({
   imports: [
@@ -114,6 +119,7 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
     EffectsModule.run(JobEffects),
     EffectsModule.run(FormEffects),
     EffectsModule.run(EventEffects),
+    EffectsModule.run(HdfsListEffects),
     CollapseModule.forRoot(),
     TabsModule.forRoot(),
     ModalModule.forRoot(),
@@ -137,12 +143,11 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
     NotificationsPageComponent,
     NotificationsTableComponent,
     ClustersComponent,
-    ClusterCardComponent,
     ClusterListComponent,
-    ClusterSearchComponent,
     PairingsComponent,
     CreatePairingComponent,
     BreadcrumbComponent,
+    HdfsBrowserComponent,
 
     PoliciesComponent,
     PolicyTableComponent,
@@ -155,8 +160,10 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
     PolicyServiceFilterComponent,
 
     ResourceChartsComponent,
+    OverviewFilterComponent,
     IssuesListComponent,
     IssuesListItemComponent,
+    JobsOverviewTableComponent,
 
     JobsTableComponent,
     JobStatusComponent,
@@ -187,7 +194,8 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
     NotificationsComponent,
     BytesSizePipe,
     FmtTzPipe,
-    FrequencyPipe
+    FrequencyPipe,
+    TruncatePipe
   ],
   bootstrap: [DlmComponent],
   providers: [
@@ -200,6 +208,8 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
     NavbarService,
     EventService,
     TimeZoneService,
+    HdfsService,
+    OverviewJobsExternalFiltersService,
     httpServiceProvider
   ]
 })

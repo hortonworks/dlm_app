@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import domain.API.{clusters, datalakes}
+import domain.API.{clusters, dpClusters}
 import domain.{ClusterServiceHostsRepo, ClusterServiceRepo}
 import com.hortonworks.dataplane.commons.domain.Entities.{
   ClusterService,
@@ -28,18 +28,16 @@ class ClusterServices @Inject()(
       .recoverWith(apiError)
   }
 
-  def allWithDatalake(datalakeId: Long) = Action.async {
+  def allWithDpCluster(dpClusterId: Long) = Action.async {
     csr
-      .allWithDatalake(datalakeId)
-      .map(cs => success(cs.map(c => linkData(c, makeLink(c)))))
+      .allWithDpCluster(dpClusterId)
+      .map(cs => success(cs.map(c => linkData(c, makeClusterLink(c)))))
       .recoverWith(apiError)
   }
 
-  private def makeLink(c: ClusterService) = {
-    Map("datalake" -> s"$datalakes/${c.datalakeid.get}")
-  }
+
   private def makeClusterLink(c: ClusterService) = {
-    Map("cluster" -> s"$clusters/${c.clusterid.get}")
+    Map("cluster" -> s"$clusters/${c.clusterId.get}")
   }
 
   private def makServiceLink(e: ClusterServiceHost, clusterId: Long) = {
@@ -51,7 +49,7 @@ class ClusterServices @Inject()(
       .findById(serviceId)
       .map { co =>
         co.map { c =>
-            success(linkData(c, makeLink(c)))
+            success(linkData(c, makeClusterLink(c)))
           }
           .getOrElse(NotFound)
       }
@@ -79,26 +77,17 @@ class ClusterServices @Inject()(
     Action.async(parse.json) { req =>
       csr
         .findByIdAndCluster(serviceId, clusterId)
-        .map(cs => success(cs.map(c => linkData(c, makeLink(c)))))
+        .map(cs => success(cs.map(c => linkData(c, makeClusterLink(c)))))
         .recoverWith(apiError)
     }
 
-  def loadWithDatalake(serviceId: Long, datalakeId: Long) =
-    Action.async(parse.json) { req =>
-      csr
-        .findByIdAndDatalake(serviceId, datalakeId)
-        .map(cs => success(cs.map(c => linkData(c, makeLink(c)))))
-        .recoverWith(apiError)
-    }
 
   def addWithCluster = Action.async(parse.json) { req =>
     req.body
       .validate[ClusterService]
       .map { cl =>
-        //        check if cluster is not null and datalake is null
-        if (cl.clusterid.isEmpty)
-          Future.successful(UnprocessableEntity)
-        else if (cl.datalakeid.isDefined)
+        //        check if cluster is not null and dp-cluster is null
+        if (cl.clusterId.isEmpty)
           Future.successful(UnprocessableEntity)
         else {
           val created = csr.insert(cl)
@@ -115,10 +104,8 @@ class ClusterServices @Inject()(
     req.body
       .validate[ClusterService]
       .map { cl =>
-        //        check if cluster is not null and datalake is null
-        if (cl.clusterid.isEmpty)
-          Future.successful(UnprocessableEntity)
-        else if (cl.datalakeid.isDefined)
+        //        check if cluster is not null and dp-cluster is null
+        if (cl.clusterId.isEmpty)
           Future.successful(UnprocessableEntity)
         else {
           val created = csr.updateByName(cl)
@@ -131,19 +118,17 @@ class ClusterServices @Inject()(
 
   }
 
-  def addWithDatalake = Action.async(parse.json) { req =>
+  def addWithDpCluster = Action.async(parse.json) { req =>
     req.body
       .validate[ClusterService]
       .map { cl =>
-        //        check if cluster is not null and datalake is null
-        if (cl.clusterid.isDefined)
-          Future.successful(UnprocessableEntity)
-        else if (cl.datalakeid.isEmpty)
+        //        check if cluster is not null and dp-cluster is null
+        if (cl.clusterId.isDefined)
           Future.successful(UnprocessableEntity)
         else {
           val created = csr.insert(cl)
           created
-            .map(c => success(linkData(c, makeLink(c))))
+            .map(c => success(linkData(c, makeClusterLink(c))))
             .recoverWith(apiError)
         }
       }
@@ -168,7 +153,7 @@ class ClusterServices @Inject()(
               case Some(value) => Some(value.validate[ConfigurationInfo].get)
               case None => None
             }
-            success(linkData(ClusterServiceWithConfigs(c._1.id, c._1.servicename, c._1.clusterid, c._2.host, properties), Map()))
+            success(linkData(ClusterServiceWithConfigs(c._1.id, c._1.servicename, c._1.clusterId, c._2.host, properties), Map()))
           }
           case None => NotFound
         })
@@ -184,7 +169,7 @@ class ClusterServices @Inject()(
             case Some(value) => Some(value.validate[ConfigurationInfo].get)
             case None => None
           }
-          linkData(ClusterServiceWithConfigs(c._1.id, c._1.servicename, c._1.clusterid, c._2.host, properties), Map())
+          linkData(ClusterServiceWithConfigs(c._1.id, c._1.servicename, c._1.clusterId, c._2.host, properties), Map())
       }))).recoverWith(apiError)
   }
 
@@ -192,7 +177,7 @@ class ClusterServices @Inject()(
     req.body
       .validate[ClusterServiceHost]
       .map { ce =>
-        // check if cluster is not null and datalake is null
+        // check if cluster is not null and dp-cluster is null
         if (ce.serviceid.isEmpty) {
           Future.successful(UnprocessableEntity)
         } else {
@@ -209,7 +194,7 @@ class ClusterServices @Inject()(
     req.body
       .validate[ClusterServiceHost]
       .map { ce =>
-        // check if cluster is not null and datalake is null
+        // check if cluster is not null and dp-cluster is null
         if (ce.serviceid.isEmpty) {
           Future.successful(UnprocessableEntity)
         } else {

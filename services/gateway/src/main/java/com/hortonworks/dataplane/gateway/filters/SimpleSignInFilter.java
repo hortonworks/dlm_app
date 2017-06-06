@@ -25,12 +25,15 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 @Service
 public class SimpleSignInFilter extends ZuulFilter {
 
-  public static final String AUTH_ENTRY_POINT = "/api/app/auth/in";
+  private static final String AUTH_ENTRY_POINT = Constants.DPAPP_BASE_PATH+"/auth/in";
 
   @Autowired
-  UserServiceInterface userServiceInterface;
+  private UserServiceInterface userServiceInterface;
 
-  ObjectMapper objectMapper = new ObjectMapper();
+  @Autowired
+  private Jwt jwt;
+
+  private ObjectMapper objectMapper = new ObjectMapper();
 
   @Override
   public String filterType() {
@@ -70,7 +73,7 @@ public class SimpleSignInFilter extends ZuulFilter {
       if (passwordCheck(ctx, checkpw)) return null;
 
       // Construct a JWT token
-      String token = Jwt.makeJWT(toSignIn);
+      String token = jwt.makeJWT(toSignIn);
       UserRef userRef = getUserRef(credential, toSignIn, token);
 
       ctx.setResponseStatusCode(200);

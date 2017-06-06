@@ -2,6 +2,7 @@ import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { Policy } from 'models/policy.model';
+import { mapResponse } from 'utils/http-util';
 
 @Injectable()
 export class JobService {
@@ -27,4 +28,8 @@ export class JobService {
     return this.http.get(url).map(r => r.json());
   }
 
+  abortJob(policy: Policy): Observable<any> {
+    const url = `clusters/${policy.targetClusterResource.id}/policy/${policy.name}/jobs/abort`;
+    return mapResponse(this.http.put(url, {}));
+  }
 }
