@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {TabStyleType} from '../../../../shared/tabs/tabs.component';
 import {AssetService} from '../../../../services/asset.service';
 import {AssetProperty} from '../../../../models/asset-property';
@@ -15,7 +15,7 @@ export enum DetailsTabs {
   templateUrl: './asset-details-view.component.html',
   styleUrls: ['./asset-details-view.component.scss']
 })
-export class AssetDetailsViewComponent implements OnInit {
+export class AssetDetailsViewComponent implements OnChanges {
 
   tabType = TabStyleType;
   detailsTabs = DetailsTabs;
@@ -23,18 +23,20 @@ export class AssetDetailsViewComponent implements OnInit {
   assetProperties: AssetProperty[] = [];
   assetTags: AssetTag[] = [];
   assetSchemas: AssetSchema[] = [];
+  @Input() assetDetails;
   @Input() clusterId: string = '1989';
   @Input() guid: string = '1cb2fd1e-03b4-401f-a587-2151865d375a';
 
   constructor(private assetService: AssetService) {
   }
 
-  ngOnInit() {
-    this.assetService.getDetails(this.clusterId, this.guid).subscribe(details => {
-      this.assetProperties = this.extractAssetProperties(details.entity);
-      this.assetTags = this.extractTags(details.entity.classifications);
-      this.assetSchemas = this.extractSchema(details.referredEntities);
-    });
+  ngOnChanges(changes: SimpleChanges) {
+    if (!changes['assetDetails'] || !this.assetDetails) {
+      return;
+    }
+    this.assetProperties = this.extractAssetProperties(this.assetDetails.entity);
+    this.assetTags = this.extractTags(this.assetDetails.entity.classifications);
+    this.assetSchemas = this.extractSchema(this.assetDetails.referredEntities);
   }
 
   private extractTags(classifications) {
@@ -66,15 +68,14 @@ export class AssetDetailsViewComponent implements OnInit {
     return assetSchemas;
   }
 
-  private extractAssetProperties(properties) {
-    let assetProps: AssetProperty[] = []
+  private extractAssetProperties(properties){
+    let assetProps: AssetProperty[] = [];
     let attributes = properties.attributes;
     Object.keys(attributes).forEach(key => {
       if (key === 'columns' || key === 'sd' || key === 'parameters') {
         return;
       }
-      let property = new AssetProperty();
-      property.key = key;
+      let property = new AssetProperty(key);
       property.value = attributes[key];
       if (key === 'profileData' && attributes[key]) {
         let rowCount = attributes[key].attributes['rowCount'];

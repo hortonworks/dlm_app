@@ -92,6 +92,8 @@ div.spacer-15 {
 }
 
 @include summary-pane("summary-pane-5", "20%");
+@include summary-pane("summary-pane-3", "33%");
+
 
 .overFlowEllipsis{
   overflow: hidden;
