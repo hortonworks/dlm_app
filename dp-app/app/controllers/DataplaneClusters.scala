@@ -40,7 +40,7 @@ class DataplaneClusters @Inject()(
       .validate[DataplaneCluster]
       .map { dataplaneCluster =>
         dpClusterService
-          .create(dataplaneCluster.copy(createdBy = request.user.id))
+          .create(dataplaneCluster.copy(createdBy = request.user.id, ambariUrl = dataplaneCluster.ambariUrl.replaceFirst("/$", "")))
           .map {
             case Left(errors) =>
               InternalServerError(JsonResponses.statusError(

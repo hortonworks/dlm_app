@@ -1,6 +1,6 @@
 package com.hortonworks.dataplane.commons.domain
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 
 object Atlas {
 
@@ -13,6 +13,18 @@ object Atlas {
                     displayText: Option[String])
 
   case class AtlasEntities(entities: Option[List[Entity]])
+
+  case class AssetProperties(typeName: Option[String],
+                             attributes: JsObject,
+                             guid: Option[String],
+                             status: Option[String],
+                             createdBy: Option[String],
+                             updatedBy: Option[String],
+                             createTime: Option[Long],
+                             updateTime: Option[Long],
+                             version: Option[Long],
+                             classifications: Option[Seq[JsObject]]
+                            )
 
   /**
     *
@@ -53,5 +65,8 @@ object Atlas {
 
   implicit val atlasEntitiesReads = Json.reads[AtlasEntities]
   implicit val atlasEntitiesWrites = Json.writes[AtlasEntities]
+
+  implicit val assetPropertiesReads = Json.reads[AssetProperties]
+  implicit val assetPropertiesWrites = Json.writes[AssetProperties]
 
 }

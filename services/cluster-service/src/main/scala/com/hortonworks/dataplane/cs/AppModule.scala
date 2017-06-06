@@ -117,6 +117,7 @@ object AppModule extends AbstractModule {
         atlasRoute.atlasEntities ~
         atlasRoute.atlasEntity ~
         atlasRoute.atlasLineage ~
+        atlasRoute.atlasTypeDefs ~
         statusRoute.route ~
         statusRoute.sync ~
         statusRoute.health ~
