@@ -37,7 +37,7 @@ class UnclassifiedDatasetRepo @Inject()(
   }
 
   final class UnclassifiedDatasetsTable(tag: Tag)
-      extends Table[UnclassifiedDataset](tag, Some("dataplane"), "dp_unclassified_datasets") {
+      extends Table[UnclassifiedDataset](tag, Some("dataplane"), "unclassified_datasets") {
 
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
@@ -45,7 +45,7 @@ class UnclassifiedDatasetRepo @Inject()(
 
     def description = column[Option[String]]("description")
 
-    def datalakeId = column[Long]("datalakeid")
+    def dpClusterId = column[Long]("dp_clusterid")
 
     def createdBy = column[Long]("createdby")
 
@@ -53,13 +53,13 @@ class UnclassifiedDatasetRepo @Inject()(
 
     def lastmodified = column[Option[LocalDateTime]]("lastmodified")
 
-    def customprops = column[Option[JsValue]]("customprops")
+    def customprops = column[Option[JsValue]]("custom_props")
 
     def * =
       (id,
        name,
        description,
-       datalakeId,
+       dpClusterId,
        createdBy,
        createdOn,
        lastmodified,

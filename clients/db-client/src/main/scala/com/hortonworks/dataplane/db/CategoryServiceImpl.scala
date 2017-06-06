@@ -54,9 +54,9 @@ class CategoryServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToCategories(res: WSResponse) = {
     res.status match {
       case 200 =>
-        Right(((res.json \ "results").as[Seq[JsValue]].map { d =>
+        Right((res.json \ "results").as[Seq[JsValue]].map { d =>
           d.validate[Category].get
-        }))
+        })
       case _ => mapErrors(res)
     }
   }

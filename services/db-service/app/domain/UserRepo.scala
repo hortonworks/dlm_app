@@ -41,14 +41,14 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
     db.run(Users.filter(_.id === userId).result.headOption)
   }
 
-  final class UsersTable(tag: Tag) extends Table[User](tag, Some("dataplane"), "dp_users") {
+  final class UsersTable(tag: Tag) extends Table[User](tag, Some("dataplane"), "users") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
-    def username = column[String]("username")
+    def username = column[String]("user_name")
 
     def password = column[String]("password")
 
-    def displayname = column[String]("displayname")
+    def displayname = column[String]("display_name")
 
     def avatar = column[Option[String]]("avatar")
 

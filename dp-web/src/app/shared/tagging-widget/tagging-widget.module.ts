@@ -1,12 +1,12 @@
-import {NgModule} from '@angular/core';
+import {NgModule} from "@angular/core";
 
-import {SharedModule} from '../shared.module';
+import {SharedModule} from "../shared.module";
 import {TaggingWidget} from "./tagging-widget.component";
 
 @NgModule({
-  imports: [SharedModule],
-  exports: [TaggingWidget],
   declarations: [TaggingWidget],
+  exports: [TaggingWidget],
+  imports: [SharedModule],
   providers: [],
 })
 export class TaggingWidgetModule {

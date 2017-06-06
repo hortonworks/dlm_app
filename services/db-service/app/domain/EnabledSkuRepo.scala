@@ -35,14 +35,14 @@ class EnabledSkuRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     db.run(EnabledSkus.filter(_.skuId === skuId).delete)
   }
 
-  final class EnabledSkusTable(tag: Tag) extends Table[(EnabledSku)](tag, Some("dataplane"), "dp_enabled_skus") {
+  final class EnabledSkusTable(tag: Tag) extends Table[(EnabledSku)](tag, Some("dataplane"), "enabled_skus") {
     def skuId = column[Long]("sku_id")
 
-    def enabledBy = column[Long]("enabledby")
-    def enabledOn = column[Option[LocalDateTime]]("enabledon")
+    def enabledBy = column[Long]("enabled_by")
+    def enabledOn = column[Option[LocalDateTime]]("enabled_on")
 
-    def smartSenseId = column[String]("smartsenseid")
-    def subscriptionId = column[String]("subscriptionid")
+    def smartSenseId = column[String]("smartsense_id")
+    def subscriptionId = column[String]("subscription_id")
 
     def created = column[Option[LocalDateTime]]("created")
     def updated = column[Option[LocalDateTime]]("updated")

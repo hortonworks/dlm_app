@@ -56,7 +56,7 @@
     "@types/leaflet": "^1.0.53",
     "@types/leaflet-curve": "0.0.29",
     "@types/nvd3": "^1.8.34",
-    "codelyzer": "~2.0.0",
+    "codelyzer": "~3.0.1",
     "jasmine-core": "2.4.1",
     "jasmine-spec-reporter": "2.5.0",
     "karma": "1.2.0",
@@ -69,7 +69,7 @@
     "protractor": "4.0.9",
     "roboto-npm-webfont": "0.0.4",
     "ts-node": "1.2.1",
-    "tslint": "^4.0.0",
+    "tslint": "^5.2.0",
     "typescript": "~2.2.2"
   }
 }

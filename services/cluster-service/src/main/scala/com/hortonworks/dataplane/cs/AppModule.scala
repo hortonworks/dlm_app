@@ -3,7 +3,7 @@ package com.hortonworks.dataplane.cs
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provides, Singleton}
-import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, LakeService}
+import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.http.Webserver
 import com.hortonworks.dataplane.http.routes.{AmbariRoute, AtlasRoute, StatusRoute}
@@ -35,10 +35,10 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def provideLakeService(implicit ws: WSClient,
-                         configuration: Config): LakeService = {
+  def provideDpClusterService(implicit ws: WSClient,
+                              configuration: Config): DpClusterService = {
 
-    new LakeServiceImpl(configuration)
+    new DpClusterServiceImpl(configuration)
   }
 
   @Provides
@@ -129,13 +129,13 @@ object AppModule extends AbstractModule {
   @Provides
   @Singleton
   def provideStorageInterface(
-      lakeService: LakeService,
-      clusterService: ClusterService,
-      clusterComponentService: ClusterComponentService,
-      clusterHostsServiceImpl: ClusterHostsService,
-      configService: ConfigService): StorageInterface = {
+                               dpClusterService: DpClusterService,
+                               clusterService: ClusterService,
+                               clusterComponentService: ClusterComponentService,
+                               clusterHostsServiceImpl: ClusterHostsService,
+                               configService: ConfigService): StorageInterface = {
     new StorageInterfaceImpl(clusterService,
-                             lakeService,
+                             dpClusterService,
                              clusterComponentService,
                              clusterHostsServiceImpl,
                              configService)

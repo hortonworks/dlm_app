@@ -12,6 +12,7 @@ import { JobStatusComponent } from '../../jobs/job-status/job-status.component';
 import { JobTransferredGraphComponent } from '../../jobs/jobs-transferred-graph/job-transferred-graph.component';
 import { TableFooterComponent } from 'common/table/table-footer/table-footer.component';
 import { TableComponent } from 'common/table/table.component';
+import { HdfsBrowserComponent } from 'components/hdfs-browser/hdfs-browser.component';
 import { CheckboxComponent } from 'common/checkbox/checkbox.component';
 import { ActionColumnComponent } from 'components/table-columns/action-column/action-column.component';
 import { CheckboxColumnComponent } from 'components/table-columns/checkbox-column/checkbox-column.component';
@@ -40,7 +41,8 @@ describe('PolicyDetailsComponent', () => {
         JobStatusComponent,
         JobTransferredGraphComponent,
         BytesSizePipe,
-        FrequencyPipe
+        FrequencyPipe,
+        HdfsBrowserComponent
       ],
       providers: [NavbarService]
     })

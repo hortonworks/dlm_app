@@ -1,4 +1,4 @@
 export class AssetOwnerModel {
-  id:number;
+  id: number;
   name: string;
 }

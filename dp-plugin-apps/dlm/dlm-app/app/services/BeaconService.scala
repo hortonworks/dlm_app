@@ -161,7 +161,7 @@ class BeaconService @Inject()(
                   hiveServerServiceUrl,
                   clusterToBePairedDetails.pairedClusterRequest.beaconUrl,
                   clusterToBePairedDetails.cluster.name,
-                  clusterToBePairedDetails.cluster.description
+                  ""
                 )
               )
               acc.+(clusterDefinition)
@@ -507,8 +507,8 @@ object BeaconService {
   lazy val POLICY_SUBMIT_SCHEDULE = "SUBMIT_AND_SCHEDULE"
 
   lazy val PAIR_CLUSTER_SIZE = 2
-  
-  
+
+
   def submitTypeError(submitType: String) : String = "Value passed submitType = " + submitType + " is invalid. Valid values for submitType are SUBMIT | SUBMIT_AND_SCHEDULE"
   def clusterPairPaylodError = "Request payload should be a set of two objects"
   def pairClusterError = "Error occurred while getting API response from DB service or/and Beacon service"

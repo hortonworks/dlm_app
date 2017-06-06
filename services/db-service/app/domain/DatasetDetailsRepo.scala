@@ -37,13 +37,13 @@ class DatasetDetailsRepo @Inject()(
   }
 
   final class DatasetDetailsTable(tag: Tag)
-      extends Table[DatasetDetails](tag, Some("dataplane"), "dp_dataset_details") {
+      extends Table[DatasetDetails](tag, Some("dataplane"), "dataset_details") {
 
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
     def details = column[Option[JsValue]]("details")
 
-    def datasetId = column[Long]("datasetid")
+    def datasetId = column[Long]("dataset_id")
 
     def * =
       (id,
