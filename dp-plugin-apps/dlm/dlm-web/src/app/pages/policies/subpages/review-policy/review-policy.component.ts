@@ -13,17 +13,15 @@ import { resetProgressState } from 'actions/progress.action';
 import { resetFormValue } from 'actions/form.action';
 import { getFormValues } from 'selectors/form.selector';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
-import { Pairing } from 'models/pairing.model';
 import { loadPairings } from 'actions/pairing.action';
-import { getPairing } from 'selectors/pairing.selector';
 import { Cluster } from 'models/cluster.model';
 import { bytesToSize } from 'utils/size-util';
 import { POLICY_TYPES } from 'constants/policy.constant';
-import { LoadCluster } from 'actions/cluster.action';
 import { omitEmpty } from 'utils/object-utils';
 import { ProgressState } from 'models/progress-state.model';
 import { getProgressState } from 'selectors/progress.selector';
 import { POLICY_FORM_ID } from '../../components/policy-form/policy-form.component';
+import { getCluster } from 'selectors/cluster.selector';
 
 const CREATE_POLICY_REQUEST = 'CREATE_POLICY';
 
@@ -43,36 +41,35 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     {name: 'volume', label: this.t.instant(`${this.tDetails}.volume`), value: ''},
     {name: 'transferTime', label: this.t.instant(`${this.tDetails}.time`), value: '11hrs 10mins'},
     {name: 'files', label: this.t.instant(`${this.tDetails}.files`), value: '121'},
-    {name: 'destination', label: this.t.instant(`${this.tDetails}.destination`), value: '' }
+    {name: 'destination', label: this.t.instant(`${this.tDetails}.destination`), value: ''}
   ];
   policyForm$: Observable<any>;
-  pairing$: Observable<Pairing>;
   sourceCluster: Cluster;
   targetCluster: Cluster;
   creationState: ProgressState;
+  sourceCluster$: Observable<Cluster>;
+  destinationCluster$: Observable<Cluster>;
 
   private policyFormValue: any;
 
   constructor(private store: Store<State>, private t: TranslateService) {
     this.policyForm$ = store.select(getFormValues(POLICY_FORM_ID));
-    this.pairing$ = this.policyForm$
-      .switchMap(policyForm => store.select(getPairing(policyForm.general.pair)));
-    this.subscriptions.push(
-      store.select(getProgressState(CREATE_POLICY_REQUEST))
-      .subscribe((progressState: ProgressState) => this.creationState = progressState)
-    );
+    this.sourceCluster$ = this.policyForm$.switchMap(policyForm => store.select(getCluster(policyForm.general.sourceCluster)));
+    this.destinationCluster$ = this.policyForm$.switchMap(policyForm => store.select(getCluster(policyForm.general.destinationCluster)));
+    this.subscriptions.push(store
+      .select(getProgressState(CREATE_POLICY_REQUEST))
+      .subscribe((progressState: ProgressState) => this.creationState = progressState));
   }
 
   ngOnInit() {
     this.subscriptions.push(
-      Observable.combineLatest(this.policyForm$, this.pairing$)
-        .subscribe(([policyForm, pairing]) => {
-          if (!pairing) {
+      Observable.combineLatest(this.policyForm$, this.sourceCluster$, this.destinationCluster$)
+        .subscribe(([policyForm, sourceCluster, destinationCluster]) => {
+          if (!sourceCluster || !destinationCluster) {
             return;
           }
-          const [sourceCluster, targetCluster] = pairing.pair;
           this.sourceCluster = sourceCluster;
-          this.targetCluster = targetCluster;
+          this.targetCluster = destinationCluster;
           this.policyFormValue = policyForm;
 
           this.descriptionTranslateParam = {
@@ -81,8 +78,8 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
             sourceCluster: sourceCluster.name
           };
 
-          this.getDetailsField('destination').value = targetCluster.name;
-          this.getDetailsField('volume').value = bytesToSize(targetCluster.stats.CapacityTotal, 0);
+          this.getDetailsField('destination').value = destinationCluster.name;
+          this.getDetailsField('volume').value = bytesToSize(destinationCluster.stats.CapacityTotal, 0);
         })
     );
     this.store.dispatch(resetProgressState(CREATE_POLICY_REQUEST));
