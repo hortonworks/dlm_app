@@ -3,7 +3,6 @@ import {TabStyleType} from '../../../../shared/tabs/tabs.component';
 import {AssetService} from '../../../../services/asset.service';
 import {AssetProperty} from '../../../../models/asset-property';
 import {AssetTag} from '../../../../models/asset-tag';
-import {AssetAudit} from '../../../../models/asset-audit';
 import {AssetSchema} from '../../../../models/asset-schema';
 import {DateUtils} from '../../../../shared/utils/date-utils';
 
@@ -23,7 +22,6 @@ export class AssetDetailsViewComponent implements OnInit {
   selectedDetailsTabs = DetailsTabs.PROPERTIES;
   assetProperties: AssetProperty[] = [];
   assetTags: AssetTag[] = [];
-  assetAudits: AssetAudit[] = [];
   assetSchemas: AssetSchema[] = [];
   @Input() clusterId: string = '1989';
   @Input() guid: string = '1cb2fd1e-03b4-401f-a587-2151865d375a';
