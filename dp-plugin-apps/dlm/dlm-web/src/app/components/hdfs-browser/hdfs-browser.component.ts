@@ -9,12 +9,21 @@ import * as fromRoot from 'reducers';
 import { listFiles } from 'actions/hdfslist.action';
 import { TableComponent } from 'common/table/table.component';
 import { FILE_TYPES } from 'constants/hdfs.constant';
+import { Breadcrumb } from 'components/breadcrumb/breadcrumb.type';
 
 @Component({
   selector: 'dlm-hdfs-browser',
   styleUrls: ['./hdfs-browser.component.scss'],
   encapsulation: ViewEncapsulation.None,
   template: `
+    <div class="breadcrumbs">
+      <span *ngFor="let breadcrumb of breadcrumbs" class="breadcrumb-item">
+        <a *ngIf="breadcrumb.url !== ''" class="nameLink" (click)="switchDirectory(breadcrumb.url)">
+          {{breadcrumb.label}}  
+        </a>
+        <span *ngIf="breadcrumb.url === ''">{{breadcrumb.label}}</span>
+      </span>
+    </div>
     <dlm-table
       #hdfsFilesTable
       [columns]="columns"
@@ -70,6 +79,7 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   rowHeight = '35';
   selected: string;
   fileTypes = FILE_TYPES;
+  breadcrumbs: Breadcrumb[] = [];
 
   constructor(private store: Store<fromRoot.State>) {
   }
@@ -78,6 +88,7 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
     this.currentDirectory$ = new BehaviorSubject(this.rootPath);
     this.rows$ = this.currentDirectory$.switchMap(path => {
       this.store.dispatch(listFiles(this.clusterId, path, {clusterId: this.clusterId, path}));
+      this.updateBreadcrumbs(path);
       return this.store.select(getAllFilesForClusterPath(this.clusterId, path)).map(files => {
         const parent = path === '/' ? [] : [<ListStatus>{pathSuffix: '..', type: FILE_TYPES.DIRECTORY}];
         return [...parent, ...files];
@@ -127,10 +138,33 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
         path = currentDirectory.replace(/\/[^/]*$/, '');
         path = path ? path : '/';
       }
-      this.currentDirectory$.next(path);
-      this.selected = path;
-      this.select.emit(this.selected);
+      this.switchDirectory(path);
     }
+  }
+
+  updateBreadcrumbs(path: string) {
+    const pathArr = path.split('/');
+    const breadcrumbsArr: Breadcrumb[] = [];
+    while (pathArr.length - 1) {
+      breadcrumbsArr.unshift({
+        url: pathArr.join('/'),
+        label: pathArr.pop()
+      });
+    }
+    // Add root as the first element
+    breadcrumbsArr.unshift({
+      label: '/',
+      url: '/'
+    });
+    // Remove url to not have hyperlink for the last element in breadcrumb
+    breadcrumbsArr[breadcrumbsArr.length - 1].url = '';
+    this.breadcrumbs = breadcrumbsArr;
+  }
+
+  switchDirectory(path: string) {
+    this.currentDirectory$.next(path);
+    this.selected = path;
+    this.select.emit(this.selected);
   }
 
   handleSortAction(event) {
