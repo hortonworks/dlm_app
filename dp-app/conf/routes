@@ -42,11 +42,15 @@ POST          /api/datasets/categories                     controllers.DataSets.
 #DataSet
 GET           /api/datasets                                controllers.DataSets.list
 POST          /api/datasets                                controllers.DataSets.create
-POST          /api/datasetswithsearch                      controllers.DataSets.createDatasetWithAtlasSearch
 GET           /api/datasets/:datasetId                     controllers.DataSets.retrieve(datasetId)
 DELETE        /api/datasets/:datasetId                     controllers.DataSets.delete(datasetId)
 PUT           /api/datasets                                controllers.DataSets.update()
 #GET         /api/datasets/:name                    controllers.DataSets.getByname(name,host,datacenter)
+
+# Dataset new
+POST          /api/datasetswithsearch                      controllers.DataSets.createDatasetWithAtlasSearch
+GET           /api/dataset/list                            controllers.DataSets.getRichDataset
+GET           /api/dataset/list/tag/:tagName               controllers.DataSets.getRichDatasetByTag(tagName : String)
 
 # Atlas API Search
 POST          /api/query-assets                            controllers.QueryAssets.search(clusterId: String)

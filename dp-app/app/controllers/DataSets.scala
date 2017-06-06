@@ -83,6 +83,26 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     }.getOrElse(Future.successful(BadRequest))
   }
 
+  def getRichDataset = authenticated.async {
+    dataSetService.listRichDataset()
+      .map { dataSets =>
+        dataSets match {
+          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Right(dataSets) => Ok(Json.toJson(dataSets))
+        }
+      }
+  }
+
+  def getRichDatasetByTag(tagName: String) = authenticated.async {
+    dataSetService.listRichDatasetByTag(tagName)
+      .map { dataSets =>
+        dataSets match {
+          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Right(dataSets) => Ok(Json.toJson(dataSets))
+        }
+      }
+  }
+
   def retrieve(dataSetId: String) = authenticated.async {
     Logger.info("Received retrieve dataSet request")
     dataSetService.retrieve(dataSetId)

@@ -19,9 +19,21 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
     datasetRepo.all.map(dataset => success(dataset.map(c => linkData(c, makeLink(c))))).recoverWith(apiError)
   }
 
+  def allRichDataset = Action.async {
+    datasetRepo.getRichDataset()
+      .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
+      .recoverWith(apiError)
+  }
+
+  def richDatasetByTag(tagName: String) = Action.async {
+    datasetRepo.getRichDatasetByTag(tagName)
+      .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
+      .recoverWith(apiError)
+  }
+
   private def makeLink(c: Dataset) = {
     Map("datalake" -> s"${dpClusters}/${c.dpClusterId}",
-      "users" -> s"${users}/${c.createdBy}")
+      "users" -> s"${users}/${c.createdBy.get}")
   }
 
   def load(datasetId: Long) = Action.async {

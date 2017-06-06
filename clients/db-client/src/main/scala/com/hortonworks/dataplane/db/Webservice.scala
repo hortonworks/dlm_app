@@ -56,6 +56,10 @@ object Webservice {
 
     def create(datasetReq: DatasetCreateRequest): Future[Either[Errors, DatasetAndCategories]]
 
+    def listRichDataset(): Future[Either[Errors, Seq[RichDataset]]]
+
+    def listRichDatasetByTag(tagName: String): Future[Either[Errors, Seq[RichDataset]]]
+
     def retrieve(dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
 
     def update(dataSetAndCatIds: DatasetAndCategoryIds)
@@ -99,10 +103,14 @@ object Webservice {
   trait DpClusterService extends DbClientService {
 
     def list(): Future[Either[Errors, Seq[DataplaneCluster]]]
+
     def create(dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]]
+
     def retrieve(dpClusterId: String): Future[Either[Errors, DataplaneCluster]]
+
     def update(dpClusterId: String,
                dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]]
+
     def updateStatus(dpCluster: DataplaneCluster): Future[Either[Errors, Boolean]]
 
     def delete(dpClusterId: String): Future[Either[Errors, DataplaneCluster]]
@@ -120,6 +128,7 @@ object Webservice {
   trait ClusterService extends DbClientService {
 
     def list(): Future[Either[Errors, Seq[Cluster]]]
+
     def getLinkedClusters(dpClusterId: Long): Future[Either[Errors, Seq[Cluster]]]
 
     def create(cluster: Cluster): Future[Either[Errors, Cluster]]

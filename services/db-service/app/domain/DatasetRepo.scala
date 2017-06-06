@@ -14,6 +14,8 @@ class DatasetRepo @Inject()(
                              protected val datasetCategoryRepo: DatasetCategoryRepo,
                              protected val categoryRepo: CategoryRepo,
                              protected val dataAssetRepo: DataAssetRepo,
+                             protected val userRepo: UserRepo,
+                             protected val clusterRepo: ClusterRepo,
                              protected val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[DpPgProfile] {
 
@@ -81,6 +83,75 @@ class DatasetRepo @Inject()(
     } yield (DatasetAndCategories(savedDataset, categories))
 
     db.run(query.transactionally)
+  }
+
+  private def getDatasetWithNameQuery(inputQuery: Query[DatasetsTable, Dataset, Seq]) = {
+    for {
+      ((dataset, user), cluster) <-
+      (inputQuery.join(userRepo.Users).on(_.createdBy === _.id))
+        .join(clusterRepo.Clusters).on(_._1.dpClusterId === _.id)
+    } yield (dataset, user.username, cluster.name)
+  }
+
+  private def getDatasetAssetCount(datasetIds: Seq[Long]) = {
+    for {
+      ((datasetId, assetType), result) <- dataAssetRepo.DatasetAssets.filter(_.datasetId.inSet(datasetIds))
+        .groupBy(a => (a.datasetId, a.assetType))
+    } yield (datasetId, assetType, result.length)
+  }
+
+  private def getDatasetCategories(datasetIds: Seq[Long]) = {
+    for {
+      (datasetCategory, category) <- datasetCategoryRepo.DatasetCategories.filter(_.datasetId.inSet(datasetIds))
+        .join(categoryRepo.Categories).on(_.categoryId === _.id)
+    } yield (datasetCategory.datasetId, category.name)
+  }
+
+  private def getRichDataset(inputQuery: Query[DatasetsTable, Dataset, Seq]): Future[Seq[RichDataset]] = {
+    val query = for {
+      datasetWithUsername <- getDatasetWithNameQuery(inputQuery).to[List].result
+      datasetAssetCount <- {
+        val datasetIds = datasetWithUsername.map(_._1.id.get)
+        getDatasetAssetCount(datasetIds).to[List].result
+      }
+      datasetCategories <- {
+        val datasetIds = datasetWithUsername.map(_._1.id.get)
+        getDatasetCategories(datasetIds).to[List].result
+      }
+    } yield (datasetWithUsername, datasetAssetCount, datasetCategories)
+
+    db.run(query).map {
+      result =>
+        val datasetWithUsernameMap = result._1.groupBy(_._1.id.get).mapValues(_.head)
+        val datasetWithAssetCountMap = result._2.groupBy(_._1.get).mapValues { e =>
+          e.map {
+            v => DataAssetCount(v._2, v._3)
+          }
+        }
+        val datasetWithCategoriesMap = result._3.groupBy(_._1).mapValues(_.map(_._2))
+        datasetWithUsernameMap.map {
+          case (id, (dataset, user, cluster)) =>
+            RichDataset(
+              dataset,
+              datasetWithCategoriesMap.getOrElse(id, Nil),
+              user,
+              cluster,
+              datasetWithAssetCountMap.getOrElse(id, Nil)
+            )
+        }.toSeq
+    }
+  }
+
+  def getRichDataset(): Future[Seq[RichDataset]] = {
+    getRichDataset(Datasets)
+  }
+
+  def getRichDatasetByTag(tagName: String): Future[Seq[RichDataset]] = {
+    val query = categoryRepo.Categories.filter(_.name === tagName)
+      .join(datasetCategoryRepo.DatasetCategories).on(_.id === _.categoryId)
+      .join(Datasets).on(_._2.datasetId === _.id)
+      .map(_._2)
+    getRichDataset(query)
   }
 
   def insertWithCategories(datasetReq: DatasetAndCategoryIds): Future[DatasetAndCategories] = {

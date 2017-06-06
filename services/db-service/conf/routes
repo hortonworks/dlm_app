@@ -32,9 +32,9 @@ POST          /locations                                                     con
 #DpClusters API
 GET           /dp/clusters                                                   controllers.DpClusters.all
 POST          /dp/clusters                                                   controllers.DpClusters.add
-GET           /dp/clusters/:dpClusterId                                        controllers.DpClusters.load(dpClusterId:Long)
-GET           /dp/clusters/:dpClusterId/clusters                               controllers.DiscoveredClusters.getByDpClusterId(dpClusterId:Long)
-DELETE        /dp/clusters/:dpClusterId                                        controllers.DpClusters.delete(dpClusterId:Long)
+GET           /dp/clusters/:dpClusterId                                      controllers.DpClusters.load(dpClusterId:Long)
+GET           /dp/clusters/:dpClusterId/clusters                             controllers.DiscoveredClusters.getByDpClusterId(dpClusterId:Long)
+DELETE        /dp/clusters/:dpClusterId                                      controllers.DpClusters.delete(dpClusterId:Long)
 PATCH         /dp/clusters/status                                            controllers.DpClusters.updateStatus
 
 #Clusters API
@@ -49,7 +49,7 @@ DELETE        /clusters/:clusterId                                           con
 GET           /clusters/:clusterId/services                                  controllers.ClusterServices.allWithCluster(clusterId:Long)
 GET           /dp/clusters/:dpClusterId/services                             controllers.ClusterServices.allWithDpCluster(dpClusterId:Long)
 POST          /cluster/services                                              controllers.ClusterServices.addWithCluster
-POST          /dp/clusters/services                                             controllers.ClusterServices.addWithDpCluster
+POST          /dp/clusters/services                                          controllers.ClusterServices.addWithDpCluster
 GET           /clusters/:clusterId/service/:serviceName                      controllers.ClusterServices.loadWithClusterAndName(clusterId:Long,serviceName:String)
 DELETE        /services/:serviceId                                           controllers.ClusterServices.delete(serviceId:Long)
 PUT           /clusters/services                                             controllers.ClusterServices.updateWithCluster
@@ -116,6 +116,11 @@ POST          /datasetswithassets                                            con
 PUT           /datasets                                                      controllers.Datasets.update
 GET           /datasets/:datasetId                                           controllers.Datasets.load(datasetId:Long)
 DELETE        /datasets/:datasetId                                           controllers.Datasets.delete(datasetId:Long)
+
+#RichDataset
+GET           /richdatasets                                                  controllers.Datasets.allRichDataset
+GET           /richdatasets/tags/:tagName                                    controllers.Datasets.richDatasetByTag(tagName:String)
+
 
 #Categories Api
 GET           /categoriescount                                               controllers.DatasetCategories.categoriesCount()
