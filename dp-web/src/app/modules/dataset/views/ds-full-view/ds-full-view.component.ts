@@ -1,23 +1,23 @@
 import {Component, OnInit} from "@angular/core";
-import {RichDatasetModel} from "../../models/richDatasetModel";
 import {ActivatedRoute, Router} from "@angular/router";
+import {RichDatasetModel} from "../../models/richDatasetModel";
 import {RichDatasetService} from "../../services/RichDatasetService";
 import {
-  AssetListActionsEnum, AssetSetQueryFilterModel,
+  AssetListActionsEnum,
+  AssetSetQueryFilterModel,
   AssetSetQueryModel
 } from "../ds-assets-list/ds-assets-list.component";
 
-
 @Component({
-  selector: 'ds-full-view',
-  templateUrl: './ds-full-view.component.html',
-  styleUrls: ['./ds-full-view.component.scss'],
+  selector: "ds-full-view",
+  styleUrls: ["./ds-full-view.component.scss"],
+  templateUrl: "./ds-full-view.component.html",
 })
 export class DsFullView implements OnInit {
 
-  public dsModel: RichDatasetModel = null;
-  public applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.EDIT];
-  public dsAssetQueryModel: AssetSetQueryModel;
+  dsModel: RichDatasetModel = null;
+  applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.EDIT];
+  dsAssetQueryModel: AssetSetQueryModel;
 
   constructor(private richDatasetService: RichDatasetService,
               private router: Router,
@@ -28,16 +28,16 @@ export class DsFullView implements OnInit {
     this.activeRoute.params
       .subscribe(params => {
         this.richDatasetService
-          .getById(+params['id'])
+          .getById(+params["id"])
           .subscribe(dsObj => this.dsModel = dsObj);
-        this.dsAssetQueryModel = new AssetSetQueryModel([<AssetSetQueryFilterModel>{
-          column: "dataset.id", operator: "=", value: +params['id']
-        }]);
+        this.dsAssetQueryModel = new AssetSetQueryModel([
+          new AssetSetQueryFilterModel("dataset.id", "=", +params["id"], "-")
+        ]);
       });
   }
 
-  onEdit(action: AssetListActionsEnum) {
-    this.router.navigate(['dataset/edit/' + this.dsModel.id]);
+  private onEdit(action: AssetListActionsEnum) {
+    this.router.navigate([`dataset/edit/${this.dsModel.id}`]);
   }
 
 }

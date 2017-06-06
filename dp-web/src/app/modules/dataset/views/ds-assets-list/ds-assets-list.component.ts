@@ -1,34 +1,28 @@
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChange, ViewChild} from "@angular/core";
+import {DsAssetModel} from "../../models/dsAssetModel";
 import {RichDatasetModel} from "../../models/richDatasetModel";
 import {DsAssetsService} from "../../services/dsAssetsService";
-import {DsAssetModel} from "../../models/dsAssetModel";
 
 export enum AssetTypeEnum { ALL, HIVE, HDFS}
-;
-export var AssetTypeEnumString = ["all", "hive", "file"];
+
+export let AssetTypeEnumString = ["all", "hive", "file"];
 export enum AssetListActionsEnum {EDIT, REMOVE, ADD}
 export class AssetSetQueryFilterModel {
-  column: string;
-  operator: string;
-  value: (string | number);
+  constructor(public column: string, public operator: string, public value: (string | number | boolean), public dataType: string) {
+  }
 }
-class ASQFM extends AssetSetQueryFilterModel {
-}
-;
+class ASQFM extends AssetSetQueryFilterModel {}
 
 export class AssetSetQueryModel {
   constructor(public filters: AssetSetQueryFilterModel[]) {
   }
 }
-class ASQM extends AssetSetQueryModel {
-}
-;
-
+class ASQM extends AssetSetQueryModel {}
 
 @Component({
-  selector: 'ds-assets-list',
-  templateUrl: './ds-assets-list.component.html',
-  styleUrls: ['./ds-assets-list.component.scss'],
+  selector: "ds-assets-list",
+  styleUrls: ["./ds-assets-list.component.scss"],
+  templateUrl: "./ds-assets-list.component.html",
 })
 export class DsAssetList implements OnInit {
 
@@ -43,37 +37,41 @@ export class DsAssetList implements OnInit {
   @Input() searchText: string = "";
   @Input() typeFilter: AssetTypeEnum = AssetTypeEnum.ALL;
 
-  @ViewChild('table') table: ElementRef;
-  @ViewChild('outerCont') outerCont: ElementRef;
-  @ViewChild('listCont') listCont: ElementRef;
+  @ViewChild("table") table: ElementRef;
+  @ViewChild("outerCont") outerCont: ElementRef;
+  @ViewChild("listCont") listCont: ElementRef;
 
-  @Output('onAction')
+  @Output("onAction")
   actionEmitter: EventEmitter<AssetListActionsEnum> = new EventEmitter<AssetListActionsEnum>();
 
-  public pageSizeOptions: number[] = [10, 15, 20, 50, 100, 150, 200];
-  public pageSize: number = 20;
-  public pageStartIndex: number = 1;
-  public assetsCount: number = 0;
+  pageSizeOptions: number[] = [10, 15, 20, 50, 100, 150, 200];
+  pageSize: number = 20;
+  pageStartIndex: number = 1;
+  assetsCount: number = 0;
+  dsAssets: DsAssetModel[] = [];
+  tab = AssetTypeEnum;
+  actionEnum = AssetListActionsEnum;
+  private tableHeight: number = 0;
   private totalPages: number = 1;
-  public dsAssets: DsAssetModel[] = [];
-  public tab = AssetTypeEnum;
-  public actionEnum = AssetListActionsEnum;
-  private tableHeight: number = 0
+  private initDone: boolean = false;
 
   constructor(private dsAssetsService: DsAssetsService,) {
   }
-
-  private initDone: boolean = false;
-
   ngOnInit() {
-    if (this.innerListScrollable) this.outerCont.nativeElement.classList.add('innerListScrollable');
+    if (this.innerListScrollable) {
+      this.outerCont.nativeElement.classList.add("innerListScrollable");
+    }
     this.setTableHeight();
-    !this.avoidLoadingOnInit && this.fetchAssets();
+    if(!this.avoidLoadingOnInit) {
+      this.fetchAssets();
+    }
     this.initDone = true;
   }
 
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-    this.initDone && (changes['dsModel'] || changes['searchText'] || changes['queryModels'] || changes['pageSize']) && this.fetchAssets()
+    if(this.initDone && (changes["dsModel"] || changes["searchText"] || changes["queryModels"] || changes["pageSize"])) {
+      this.fetchAssets();
+    }
   }
 
   setFirstPage() {
@@ -85,49 +83,40 @@ export class DsAssetList implements OnInit {
     this.totalPages = this.assetsCount = 0;
   }
 
-  getQueryModelsForAssetService(countQuery: boolean) {
-    var asqms: ASQM[] = [], asqmsClone: ASQM[] = [], qmdls = this.queryModels;
-    qmdls && asqms.push.apply(asqms, (qmdls.constructor.name == "Array") ? qmdls : [qmdls]); // make sure its an array of asqm
-    if (!asqms.length) asqms.push(new ASQM([])); // make sure its not empty
-    asqms.forEach(asqm => {
-      var newAsqm = new ASQM([]);
-      newAsqm.filters.push.apply(newAsqm.filters, asqm.filters);
-      if (!this.hideSearch) newAsqm.filters.push({column: "asset.name", operator: "contains", value: this.searchText});
-      if (!this.hideTabs && !countQuery)
-        newAsqm.filters.push({column: "asset.source", operator: "==", value: AssetTypeEnumString[this.typeFilter]});
-      asqmsClone.push(newAsqm)
-    });
-    return asqmsClone;
-  }
-
   fetchAssets() {
     this.dsAssets = [];
-    var asqms = this.getQueryModelsForAssetService(true), tab = this.tab, tpfltr = this.typeFilter;
+    let asqms = this.getQueryModelsForAssetService(true);
+    const tab = this.tab, tpfltr = this.typeFilter;
     this.dsAssetsService.count(asqms)
       .subscribe(countModel => {
-        this.dsModel && (this.dsModel.counts = countModel);
+        if(this.dsModel) {
+          this.dsModel.counts = countModel;
+        }
         this.assetsCount = countModel[(tpfltr == tab.HIVE) ? "hiveCount" : (tpfltr == tab.HDFS) ? "filesCount" : "allCount"];
-        this.totalPages = Math.ceil(this.assetsCount / this.pageSize)
+        this.totalPages = Math.ceil(this.assetsCount / this.pageSize);
       });
-    asqms = this.getQueryModelsForAssetService(false)
+    asqms = this.getQueryModelsForAssetService(false);
     this.dsAssetsService.list(asqms, Math.ceil(this.pageStartIndex / this.pageSize), this.pageSize)
       .subscribe(assets => {
         this.dsAssets = assets;
-        ((thisObj) => setTimeout(() => thisObj.setTableHeight(), 0))(this);
+        setTimeout(() => this.setTableHeight(), 0);
       });
   }
 
   calcTableHeight() {
-    if (this.tableHeight) return this.tableHeight
-    var heightAboveTable = this.table.nativeElement.offsetTop - this.listCont.nativeElement.offsetTop;
-    var paginationHeight = this.listCont.nativeElement.offsetHeight - this.table.nativeElement.offsetHeight - heightAboveTable;
+    if (this.tableHeight) {
+      return this.tableHeight;
+    }
+    let heightAboveTable = this.table.nativeElement.offsetTop - this.listCont.nativeElement.offsetTop;
+    const paginationHeight = this.listCont.nativeElement.offsetHeight - this.table.nativeElement.offsetHeight - heightAboveTable;
     heightAboveTable = this.table.nativeElement.offsetTop - this.outerCont.nativeElement.offsetTop;
     return this.tableHeight = this.outerCont.nativeElement.offsetHeight - heightAboveTable - paginationHeight;
   }
 
   setTableHeight() {
     this.table.nativeElement.style.height = "auto";
-    this.table.nativeElement.style.height = ((this.innerListScrollable) ? this.calcTableHeight() : this.table.nativeElement.offsetHeight) + "px";
+    this.table.nativeElement.style.height =
+      `${((this.innerListScrollable) ? this.calcTableHeight() : this.table.nativeElement.offsetHeight)}px`;
   }
 
   resize() {
@@ -156,5 +145,27 @@ export class DsAssetList implements OnInit {
 
   actionEdit() {
     this.actionEmitter.emit(this.actionEnum.EDIT);
+  }
+
+  getQueryModelsForAssetService(countQuery: boolean) {
+    const asqms: ASQM[] = [], asqmsClone: ASQM[] = [], qmdls = this.queryModels;
+    if(qmdls) { // make sure its an array of asqm
+      asqms.push.apply(asqms, (qmdls.constructor.name == "Array") ? qmdls : [qmdls]);
+    }
+    if (!asqms.length) { // make sure its not empty
+      asqms.push(new ASQM([]));
+    }
+    asqms.forEach(asqm => {
+      const newAsqm = new ASQM([]);
+      newAsqm.filters.push.apply(newAsqm.filters, asqm.filters);
+      if (!this.hideSearch) {
+        newAsqm.filters.push({column: "asset.name", operator: "contains", value: this.searchText, dataType:"-"});
+      }
+      if (!this.hideTabs && !countQuery) {
+        newAsqm.filters.push({column: "asset.source", operator: "==", value: AssetTypeEnumString[this.typeFilter], dataType:"-"});
+      }
+      asqmsClone.push(newAsqm);
+    });
+    return asqmsClone;
   }
 }
