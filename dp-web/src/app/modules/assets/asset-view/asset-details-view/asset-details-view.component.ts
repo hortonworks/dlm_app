@@ -37,21 +37,21 @@ export class AssetDetailsViewComponent implements OnInit {
     });
   }
 
-  private extractTags(classifications){
+  private extractTags(classifications) {
     let assetTags: AssetTag[] = [];
-    classifications.forEach(classification =>{
+    classifications.forEach(classification => {
       let tag = new AssetTag();
       tag.name = classification.typeName;
-      tag.attributes = classification.attributes? classification.attributes: 'NA';
+      tag.attributes = classification.attributes ? classification.attributes : 'NA';
       assetTags.push(tag);
     });
     return assetTags;
   }
 
-  private extractSchema(referredEntities){
+  private extractSchema(referredEntities) {
     let assetSchemas: AssetSchema[] = [];
     Object.keys(referredEntities).forEach(key => {
-      if(referredEntities[key].typeName !== 'hive_column'){
+      if (referredEntities[key].typeName !== 'hive_column') {
         return;
       }
       let schema: AssetSchema = new AssetSchema();
@@ -66,23 +66,22 @@ export class AssetDetailsViewComponent implements OnInit {
     return assetSchemas;
   }
 
-  private extractAssetProperties(properties){
+  private extractAssetProperties(properties) {
     let assetProps: AssetProperty[] = []
     let attributes = properties.attributes;
-    Object.keys(attributes).forEach(key =>{
-      if(key === 'columns' || key === 'sd' || key === 'parameters'){
+    Object.keys(attributes).forEach(key => {
+      if (key === 'columns' || key === 'sd' || key === 'parameters') {
         return;
       }
       let property = new AssetProperty();
       property.key = key;
       property.value = attributes[key];
-      if(key === 'profileData'){
+      if (key === 'profileData' && attributes[key]) {
         let rowCount = attributes[key].attributes['rowCount'];
         property.value = `Row Count: ${rowCount}`;
-      }else if(key === 'db'){
-        let dbValues = attributes.qualifiedName.split('.');
-        property.value = dbValues[0];
-      }else if(key === 'lastAccessTime' || key === 'createTime'){
+      } else if (key === 'db') {
+        property.value = attributes.qualifiedName.slice(0, attributes.qualifiedName.indexOf('.'));
+      } else if (key === 'lastAccessTime' || key === 'createTime') {
         property.value = DateUtils.formatDate(attributes[key], 'DD MMM YYYY hh:mm:ss A');
       }
       assetProps.push(property);
