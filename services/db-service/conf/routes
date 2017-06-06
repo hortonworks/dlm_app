@@ -80,6 +80,7 @@ POST          /assets/workspace                                              con
 #Categories
 GET           /categories                                                    controllers.Categories.all
 POST          /categories                                                    controllers.Categories.insert
+GET           /categories/search/:search                                     controllers.Categories.search(search : String, size :Option[Long])
 GET           /categories/:categoryId                                        controllers.Categories.load(categoryId:Long)
 DELETE        /categories/:categoryId                                        controllers.Categories.delete(categoryId:Long)
 
@@ -117,8 +118,8 @@ GET           /datasets/:datasetId                                           con
 DELETE        /datasets/:datasetId                                           controllers.Datasets.delete(datasetId:Long)
 
 #Categories Api
-GET           /categoriescount                                              controllers.DatasetCategories.categoriesCount()
-GET           /categoriescount/:name                                        controllers.DatasetCategories.categoriesCountByName(name : String)
+GET           /categoriescount                                               controllers.DatasetCategories.categoriesCount()
+GET           /categoriescount/:name                                         controllers.DatasetCategories.categoriesCountByName(name : String)
 
 #DatasetCategory Api
 GET           /datasets/:datasetId/categories                                controllers.DatasetCategories.allWithDatasetId(datasetId:Long)

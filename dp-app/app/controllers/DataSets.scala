@@ -10,7 +10,7 @@ import internal.auth.Authenticated
 import models.JsonResponses
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.Controller
+import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -91,6 +91,17 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
   def listAllCategories = authenticated.async {
     Logger.info("Received list dataSet-categories request")
     categoryService.list()
+      .map { categories =>
+        categories match {
+          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Right(categories) => Ok(Json.toJson(categories))
+        }
+      }
+  }
+
+  def searchCategories(searchText: String, size: Option[Long]) = authenticated.async {
+    Logger.info("Received list dataSet-categories request")
+    categoryService.search(searchText, size)
       .map { categories =>
         categories match {
           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))

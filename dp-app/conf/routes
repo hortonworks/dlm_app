@@ -37,6 +37,7 @@ GET           /api/actions/lakes-list-with-clusters        controllers.actions.L
 
 #DTSet-Category
 GET           /api/datasets/categories                     controllers.DataSets.listAllCategories
+GET           /api/datasets/categories/:search             controllers.DataSets.searchCategories(search : String, size :Option[Long])
 POST          /api/datasets/categories                     controllers.DataSets.createCategory
 
 #DataSet
