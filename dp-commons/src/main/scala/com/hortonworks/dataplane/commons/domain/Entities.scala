@@ -153,7 +153,7 @@ object Entities {
                      name: String,
                      description: Option[String],
                      dpClusterId: Long,
-                     createdBy: Long,
+                     createdBy: Option[Long],
                      createdOn: LocalDateTime = LocalDateTime.now(),
                      lastModified: LocalDateTime = LocalDateTime.now(),
                      version: Int = 1,

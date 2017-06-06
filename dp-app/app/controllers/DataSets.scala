@@ -39,7 +39,7 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
   def create = authenticated.async(parse.json) { request =>
     Logger.info("Received create dataSet request")
     request.body.validate[DatasetAndCategoryIds].map { dSetNCtgryIds =>
-      dataSetService.create(dSetNCtgryIds.copy(dataset = dSetNCtgryIds.dataset.copy(createdBy = request.user.id.get)))
+      dataSetService.create(dSetNCtgryIds.copy(dataset = dSetNCtgryIds.dataset.copy(createdBy = request.user.id)))
         .map {
           dataSetNCategories =>
             dataSetNCategories match {
@@ -68,7 +68,7 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     request.body.validate[DatasetCreateRequest].map { req =>
       getAssetFromSearch(req).flatMap {
         case Right(assets) =>
-          val newReq = req.copy(dataset = req.dataset.copy(createdBy = request.user.id.get), dataAssets = assets)
+          val newReq = req.copy(dataset = req.dataset.copy(createdBy = request.user.id), dataAssets = assets)
           dataSetService.create(newReq)
             .map {
               dataSetNCategories =>

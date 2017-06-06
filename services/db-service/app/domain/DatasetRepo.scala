@@ -70,7 +70,10 @@ class DatasetRepo @Inject()(
     val tags = datasetCreateRequest.tags
     val query = for {
       existingCategories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
-      _ <- categoryRepo.Categories ++= tags.filter(t => !existingCategories.contains(t)).map(t => Category(None, t, t))
+      _ <- {
+        val catNames = existingCategories.map(_.name)
+        categoryRepo.Categories ++= tags.filter(t => !catNames.contains(t)).map(t => Category(None, t, t))
+      }
       savedDataset <- Datasets returning Datasets += datasetCreateRequest.dataset
       categories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
       _ <- datasetCategoryRepo.DatasetCategories ++= categories.map(c => DatasetCategory(c.id.get, savedDataset.id.get))
@@ -113,7 +116,7 @@ class DatasetRepo @Inject()(
 
     def dpClusterId = column[Long]("dp_clusterid")
 
-    def createdBy = column[Long]("createdby")
+    def createdBy = column[Option[Long]]("createdby")
 
     def createdOn = column[LocalDateTime]("createdon")
 
