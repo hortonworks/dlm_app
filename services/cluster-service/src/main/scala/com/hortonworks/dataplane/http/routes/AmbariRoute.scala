@@ -104,25 +104,53 @@ class AmbariRoute @Inject()(val ws: WSClient,
     }
   }
 
-  def callAmbariApi(credentials: Credentials, cluster: Cluster, req: String) = {
-    ws.url(s"${cluster.clusterUrl.get}/$req")
+  def callAmbariApi(credentials: Credentials, cluster: Cluster, req: String,clusterCall:Boolean = true) = {
+    ws.url(s"${getUrl(cluster,clusterCall)}/$req")
       .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
       .map(_.json)
   }
 
-  private def issueAmbariCall(clusterId: Long, req: String) = {
+  private def getUrl(cluster: Cluster,clusterCall:Boolean) = {
+    val url = cluster.clusterUrl.get
+    if(!clusterCall){
+      url.substring(0,url.indexOf("/clusters/"))
+    } else
+      url
+  }
+
+  private def issueAmbariCall(clusterId: Long, req: String, clusterCall:Boolean = true) = {
     for {
       creds <- loadCredentials
       cluster <- getClusterData(clusterId)
-      response <- callAmbariApi(creds, cluster, req)
+      response <- callAmbariApi(creds, cluster, req,clusterCall)
     } yield response
   }
 
-  val ambariProxy = path(LongNumber / "ambari") { clusterId =>
+  val ambariClusterProxy = path(LongNumber / "ambari" / "cluster") { clusterId =>
     pathEnd {
       parameters("request") { req =>
         val ambariResponse = issueAmbariCall(clusterId, req)
+        onComplete(ambariResponse) {
+          case Success(res) =>
+            complete(res)
+          case Failure(th) =>
+            th.getClass match {
+              case c if c == classOf[ClusterNotFound] =>
+                complete(StatusCodes.NotFound, notFound)
+              case _ =>
+                complete(StatusCodes.InternalServerError, errors(th))
+            }
+        }
+      }
+    }
+  }
+
+
+  val ambariGenericProxy = path(LongNumber / "ambari") { clusterId =>
+    pathEnd {
+      parameters("request") { req =>
+        val ambariResponse = issueAmbariCall(clusterId, req,false)
         onComplete(ambariResponse) {
           case Success(res) =>
             complete(res)
