@@ -57,7 +57,9 @@
               <dlm-form-field [label]="'page.policies.form.fields.directories' | translate">
                 <input type="text" formField class="form-control" formControlName="directories" [(ngModel)]="selectedHdfsPath"/>
               </dlm-form-field>
-              <dlm-hdfs-browser [rootPath]="hdfsRootPath" [clusterId]="sourceCluster" (select)="handleHdfsPathChange($event)"></dlm-hdfs-browser>
+              <div class="hdfs-browser-container">
+                <dlm-hdfs-browser [rootPath]="hdfsRootPath" [clusterId]="sourceCluster" (select)="handleHdfsPathChange($event)"></dlm-hdfs-browser>
+              </div>
             </div>
           </div>
         </div>
