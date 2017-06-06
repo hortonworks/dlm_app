@@ -1,40 +1,40 @@
 CREATE SCHEMA IF NOT EXISTS dataplane;
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_roles (
+CREATE TABLE IF NOT EXISTS dataplane.roles (
   id      BIGSERIAL PRIMARY KEY,
   name    VARCHAR(32) UNIQUE NOT NULL,
   created TIMESTAMP DEFAULT now(),
   updated TIMESTAMP DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_users (
-  id          BIGSERIAL PRIMARY KEY,
-  username    VARCHAR(255) NOT NULL UNIQUE,
-  displayname VARCHAR(255),
-  avatar      VARCHAR(255),
-  active      BOOLEAN   DEFAULT TRUE,
-  password    VARCHAR(255),
-  created     TIMESTAMP DEFAULT now(),
-  updated     TIMESTAMP DEFAULT now()
+CREATE TABLE IF NOT EXISTS dataplane.users (
+  id           BIGSERIAL PRIMARY KEY,
+  user_name    VARCHAR(255) NOT NULL UNIQUE,
+  display_name VARCHAR(255),
+  avatar       VARCHAR(255),
+  active       BOOLEAN   DEFAULT TRUE,
+  password     VARCHAR(255),
+  created      TIMESTAMP DEFAULT now(),
+  updated      TIMESTAMP DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_users_roles (
-  id     BIGSERIAL PRIMARY KEY,
-  userid BIGINT REFERENCES dataplane.dp_users (id) NOT NULL,
-  roleid BIGINT REFERENCES dataplane.dp_roles (id) NOT NULL,
-  UNIQUE (userid, roleid)
+CREATE TABLE IF NOT EXISTS dataplane.users_roles (
+  id      BIGSERIAL PRIMARY KEY,
+  user_id BIGINT REFERENCES dataplane.users (id) NOT NULL,
+  role_id BIGINT REFERENCES dataplane.roles (id) NOT NULL,
+  UNIQUE (user_id, role_id)
 
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_permissions (
+CREATE TABLE IF NOT EXISTS dataplane.permissions (
   id         BIGSERIAL PRIMARY KEY,
   permission VARCHAR(255) UNIQUE                       NOT NULL,
-  roleid     BIGINT REFERENCES dataplane.dp_roles (id) NOT NULL,
+  role_id    BIGINT REFERENCES dataplane.roles (id)    NOT NULL,
   created    TIMESTAMP DEFAULT now(),
   updated    TIMESTAMP DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_locations (
+CREATE TABLE IF NOT EXISTS dataplane.locations (
   id        BIGSERIAL PRIMARY KEY,
   city      VARCHAR(255)   NOT NULL,
   country   VARCHAR(255)   NOT NULL,
@@ -42,92 +42,90 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_locations (
   longitude DECIMAL(10, 6) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_datalakes (
+-- Represents a logical cluster, the name does not have to be the same as in Ambari
+
+CREATE TABLE IF NOT EXISTS dataplane.dp_clusters (
   id          BIGSERIAL PRIMARY KEY,
-  name        VARCHAR(255)                                  NOT NULL UNIQUE,
+  name        VARCHAR(255)                               NOT NULL,
   description TEXT,
-  ambariurl   VARCHAR(255) NOT NULL ,
-  locationid  BIGINT REFERENCES dataplane.dp_locations (id) NOT NULL,
-  createdby   BIGINT REFERENCES dataplane.dp_users (id)     NOT NULL,
+  ambari_url  VARCHAR(255)                               NOT NULL,
+  location_id BIGINT REFERENCES dataplane.locations (id) NOT NULL,
+  created_by  BIGINT REFERENCES dataplane.users (id)     NOT NULL,
   properties  JSONB,
-  state       VARCHAR(32) NOT NULL DEFAULT 'TO_SYNC',
-  created     TIMESTAMP DEFAULT now(),
-  updated     TIMESTAMP DEFAULT now(),
+  state       VARCHAR(32)                                NOT NULL DEFAULT 'TO_SYNC',
+  created     TIMESTAMP                                           DEFAULT now(),
+  updated     TIMESTAMP                                           DEFAULT now(),
+  is_datalake BOOLEAN                                             DEFAULT FALSE,
   CHECK (state IN ('TO_SYNC', 'SYNC_IN_PROGRESS', 'SYNCED', 'SYNC_ERROR'))
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_clusters (
-  id                     BIGSERIAL PRIMARY KEY,
-  name                   VARCHAR(255),
-  description            TEXT,
-  ambariurl              VARCHAR(255),
-  secured                BOOLEAN DEFAULT FALSE,
-  kerberosuser           VARCHAR(255),
-  kerberosticketLocation TEXT,
-  datalakeid             BIGINT REFERENCES dataplane.dp_datalakes (id) UNIQUE NOT NULL, -- One cluster per DL
-  userid                 BIGINT REFERENCES dataplane.dp_users (id)            NOT NULL, -- The user who created the cluster
-  properties             JSONB
+
+CREATE TABLE IF NOT EXISTS dataplane.discovered_clusters (
+  id                       BIGSERIAL PRIMARY KEY,
+  name                     VARCHAR(255),
+  cluster_url              VARCHAR(255),
+  secured                  BOOLEAN DEFAULT FALSE,
+  kerberos_user            VARCHAR(255),
+  kerberos_ticket_Location TEXT,
+  dp_clusterid             BIGINT REFERENCES dataplane.dp_clusters (id) UNIQUE NOT NULL, -- One cluster per DL
+  user_id                  BIGINT REFERENCES dataplane.users (id)              NOT NULL, -- The user who created the cluster
+  properties               JSONB
 );
 
 
-
-CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_services (
-  id          BIGSERIAL PRIMARY KEY,
-  servicename VARCHAR(255) NOT NULL,
-  properties  JSONB,
-  clusterid   BIGINT REFERENCES dataplane.dp_clusters (id),
-  datalakeid  BIGINT REFERENCES dataplane.dp_datalakes (id),
-  CHECK (clusterid IS NOT NULL OR datalakeid IS NOT NULL)
-
+CREATE TABLE IF NOT EXISTS dataplane.cluster_services (
+  id           BIGSERIAL PRIMARY KEY,
+  service_name VARCHAR(255) NOT NULL,
+  properties   JSONB,
+  cluster_id   BIGINT REFERENCES dataplane.discovered_clusters (id)
 );
 
-COMMENT ON TABLE dataplane.dp_cluster_services  IS 'Services required for DP discovered from the cluster';
+COMMENT ON TABLE dataplane.cluster_services IS 'Services required for DP discovered from the cluster';
 
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_service_hosts (
-  id          BIGSERIAL PRIMARY KEY,
-  host        VARCHAR(255) NOT NULL,
-  serviceid   BIGINT REFERENCES dataplane.dp_cluster_services(id)
+CREATE TABLE IF NOT EXISTS dataplane.cluster_service_hosts (
+  id         BIGSERIAL PRIMARY KEY,
+  host       VARCHAR(255) NOT NULL,
+  service_id BIGINT REFERENCES dataplane.cluster_services (id)
 );
 
-COMMENT ON TABLE dataplane.dp_cluster_service_hosts  IS 'Service hosts for services listed in dp_cluster_services';
+COMMENT ON TABLE dataplane.cluster_service_hosts IS 'Service hosts for services listed in cluster_services';
 
 
-
-CREATE TABLE IF NOT EXISTS dataplane.dp_workspace (
+CREATE TABLE IF NOT EXISTS dataplane.workspace (
   id          BIGSERIAL PRIMARY KEY,
-  name        VARCHAR(255)                              NOT NULL,
+  name        VARCHAR(255)                           NOT NULL,
   description TEXT,
-  createdby   BIGINT REFERENCES dataplane.dp_users (id) NOT NULL,
+  createdby   BIGINT REFERENCES dataplane.users (id) NOT NULL,
   created     TIMESTAMP DEFAULT now(),
   updated     TIMESTAMP DEFAULT now()
 );
 
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_data_asset_workspace (
-  assetType   VARCHAR(10)                                    NOT NULL,
-  assetid     BIGINT                                         NOT NULL,
-  workspaceid BIGINT REFERENCES dataplane.dp_workspace (id)  NOT NULL
+CREATE TABLE IF NOT EXISTS dataplane.data_asset_workspace (
+  asset_type   VARCHAR(10)                                 NOT NULL,
+  asset_id     BIGINT                                      NOT NULL,
+  workspace_id BIGINT REFERENCES dataplane.workspace (id)  NOT NULL
 );
 
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_hosts (
+CREATE TABLE IF NOT EXISTS dataplane.cluster_hosts (
   id         BIGSERIAL PRIMARY KEY,
-  host       VARCHAR(255)                                 NOT NULL,
-  ipaddr     VARCHAR(39)                                  NOT NULL,
-  status     VARCHAR(32)                                  NOT NULL,
+  host       VARCHAR(255)                                         NOT NULL,
+  ipaddr     VARCHAR(39)                                          NOT NULL,
+  status     VARCHAR(32)                                          NOT NULL,
   properties JSONB,
-  clusterid  BIGINT REFERENCES dataplane.dp_clusters (id) NOT NULL
+  cluster_id BIGINT REFERENCES dataplane.discovered_clusters (id) NOT NULL
 );
 
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_cluster_properties (
+CREATE TABLE IF NOT EXISTS dataplane.cluster_properties (
   id         BIGSERIAL PRIMARY KEY,
   properties JSONB,
-  clusterid  BIGINT REFERENCES dataplane.dp_clusters (id) NOT NULL
+  cluster_id BIGINT REFERENCES dataplane.discovered_clusters (id) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_categories (
+CREATE TABLE IF NOT EXISTS dataplane.categories (
   id          BIGSERIAL PRIMARY KEY,
   name        VARCHAR(255) NOT NULL UNIQUE,
   description TEXT,
@@ -135,68 +133,60 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_categories (
   updated     TIMESTAMP DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_datasets (
+CREATE TABLE IF NOT EXISTS dataplane.datasets (
   id           BIGSERIAL PRIMARY KEY,
   name         VARCHAR(255)                                       NOT NULL,
   description  TEXT,
-  datalakeid   BIGINT REFERENCES dataplane.dp_datalakes (id)      NOT NULL,
-  createdby    BIGINT REFERENCES dataplane.dp_users (id)          NOT NULL,
+  dp_clusterid BIGINT REFERENCES dataplane.dp_clusters (id)       NOT NULL,
+  createdby    BIGINT REFERENCES dataplane.users (id)             NOT NULL,
   createdon    TIMESTAMP DEFAULT now()                            NOT NULL,
   lastmodified TIMESTAMP DEFAULT now()                            NOT NULL,
   version      SMALLINT DEFAULT 1,
-  customprops  JSONB
+  custom_props JSONB
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_dataset_categories (
-  category_id BIGINT REFERENCES dataplane.dp_categories (id) NOT NULL,
-  dataset_id  BIGINT REFERENCES dataplane.dp_datasets (id)   NOT NULL
+CREATE TABLE IF NOT EXISTS dataplane.dataset_categories (
+  category_id BIGINT REFERENCES dataplane.categories (id) NOT NULL,
+  dataset_id  BIGINT REFERENCES dataplane.datasets (id)   NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_unclassified_datasets (
+CREATE TABLE IF NOT EXISTS dataplane.unclassified_datasets (
   id           BIGSERIAL PRIMARY KEY,
   name         VARCHAR(255)                                       NOT NULL,
   description  TEXT,
-  datalakeid   BIGINT REFERENCES dataplane.dp_datalakes (id)      NOT NULL,
-  createdby    BIGINT REFERENCES dataplane.dp_users (id)          NOT NULL,
+  dp_clusterid BIGINT REFERENCES dataplane.dp_clusters (id)       NOT NULL,
+  createdby    BIGINT REFERENCES dataplane.users (id)             NOT NULL,
   createdon    TIMESTAMP DEFAULT now()                            NOT NULL,
   lastmodified TIMESTAMP DEFAULT now()                            NOT NULL,
-  customprops  JSONB
+  custom_props JSONB
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_unclassified_datasets_categories (
-  category_id             BIGINT REFERENCES dataplane.dp_categories (id)            NOT NULL,
-  unclassified_dataset_id BIGINT REFERENCES dataplane.dp_unclassified_datasets (id) NOT NULL
+CREATE TABLE IF NOT EXISTS dataplane.unclassified_datasets_categories (
+  category_id             BIGINT REFERENCES dataplane.categories (id)            NOT NULL,
+  unclassified_dataset_id BIGINT REFERENCES dataplane.unclassified_datasets (id) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_data_asset (
-  id              BIGSERIAL PRIMARY KEY,
-  assettype       VARCHAR(10) NOT NULL,
-  assetname       TEXT        NOT NULL,
-  assetdetails    TEXT        NOT NULL,
-  asseturl        TEXT        NOT NULL,
-  assetproperties JSONB       NOT NULL,
-  datasetid       BIGINT REFERENCES dataplane.dp_datasets (id) DEFAULT NULL
+CREATE TABLE IF NOT EXISTS dataplane.data_asset (
+  id               BIGSERIAL PRIMARY KEY,
+  asset_type       VARCHAR(10) NOT NULL,
+  asset_name       TEXT        NOT NULL,
+  asset_details    TEXT        NOT NULL,
+  asset_url        TEXT        NOT NULL,
+  asset_properties JSONB       NOT NULL,
+  dataset_id       BIGINT REFERENCES dataplane.datasets (id) DEFAULT NULL
 
 
 );
 
 -- Since datasets are boxes, we will need to store details
-CREATE TABLE IF NOT EXISTS dataplane.dp_dataset_details (
-  id        BIGSERIAL,
-  details   JSONB,
-  datasetid BIGINT REFERENCES dataplane.dp_datasets (id)
+CREATE TABLE IF NOT EXISTS dataplane.dataset_details (
+  id         BIGSERIAL,
+  details    JSONB,
+  dataset_id BIGINT REFERENCES dataplane.datasets (id)
 );
 
--- create filters
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_filters (
-  id        BIGSERIAL PRIMARY KEY,
-  condition TEXT NOT NULL,
-  active    BOOLEAN DEFAULT FALSE,
-  datasetid BIGINT REFERENCES dataplane.dp_datasets (id)
-);
-
-CREATE TABLE IF NOT EXISTS dataplane.dp_skus (
+CREATE TABLE IF NOT EXISTS dataplane.skus (
   id          BIGSERIAL PRIMARY KEY,
   name        VARCHAR(255) NOT NULL,
   description TEXT,
@@ -205,21 +195,21 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_skus (
   updated     TIMESTAMP DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS dataplane.dp_enabled_skus (
-  sku_id         BIGINT REFERENCES dataplane.dp_skus (id) UNIQUE NOT NULL,
-  enabledby      BIGINT REFERENCES dataplane.dp_users (id)       NOT NULL,
-  enabledon      TIMESTAMP                                       NOT NULL,
-  smartsenseid   TEXT                                            NOT NULL,
-  subscriptionid TEXT                                            NOT NULL,
-  created        TIMESTAMP DEFAULT now(),
-  updated        TIMESTAMP DEFAULT now()
+CREATE TABLE IF NOT EXISTS dataplane.enabled_skus (
+  sku_id          BIGINT REFERENCES dataplane.skus (id) UNIQUE NOT NULL,
+  enabled_by      BIGINT REFERENCES dataplane.users (id)       NOT NULL,
+  enabled_on      TIMESTAMP                                    NOT NULL,
+  smartsense_id   TEXT                                         NOT NULL,
+  subscription_id TEXT                                         NOT NULL,
+  created         TIMESTAMP DEFAULT now(),
+  updated         TIMESTAMP DEFAULT now()
 );
 
 -- Global DP configurations - could be exported to cluster ZK if needed
-CREATE TABLE IF NOT EXISTS dataplane.dp_configs (
-  id          BIGSERIAL PRIMARY KEY,
-  configkey   VARCHAR(255)          NOT NULL  UNIQUE,
-  configvalue TEXT                  NOT NULL,
-  active      BOOLEAN DEFAULT TRUE  NOT NULL,
-  export      BOOLEAN DEFAULT TRUE  NOT NULL
+CREATE TABLE IF NOT EXISTS dataplane.configs (
+  id           BIGSERIAL PRIMARY KEY,
+  config_key   VARCHAR(255)          NOT NULL  UNIQUE,
+  config_value TEXT                  NOT NULL,
+  active       BOOLEAN DEFAULT TRUE  NOT NULL,
+  export       BOOLEAN DEFAULT TRUE  NOT NULL
 )

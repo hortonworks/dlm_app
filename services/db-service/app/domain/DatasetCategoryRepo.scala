@@ -63,7 +63,7 @@ class DatasetCategoryRepo @Inject()(protected val dbConfigProvider: DatabaseConf
     db.run(DatasetCategories.filter(d => d.datasetId === datasetId && d.categoryId === categoryId).delete)
   }
 
-  final class DatasetCategoriesTable(tag: Tag) extends Table[DatasetCategory](tag, Some("dataplane"), "dp_dataset_categories") {
+  final class DatasetCategoriesTable(tag: Tag) extends Table[DatasetCategory](tag, Some("dataplane"), "dataset_categories") {
 
     def categoryId = column[Long]("category_id")
 

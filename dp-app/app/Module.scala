@@ -61,9 +61,9 @@ class Module extends AbstractModule {
 
   @Provides
   @Singleton
-  @Named("lakeService")
-  def provideLakeService(implicit ws: WSClient,configuration: Configuration):LakeService = {
-    new LakeServiceImpl(configuration.underlying)
+  @Named("dpClusterService")
+  def provideDpClusterService(implicit ws: WSClient, configuration: Configuration):DpClusterService = {
+    new DpClusterServiceImpl(configuration.underlying)
   }
 
 
@@ -129,7 +129,7 @@ class ConsulInitializer @Inject()(config:Configuration){
 
     override def onServiceDeRegister(serviceId: String): Unit = Logger.info(s"Service removed from consul $serviceId")
 
-    override def onRecoverableException(reason: String, th: Throwable): Unit = Logger.warn(reason,th)
+    override def onRecoverableException(reason: String, th: Throwable): Unit = Logger.warn(reason)
 
     override def gatewayDiscovered(zuulServer: ZuulServer): Unit = Logger.info(s"Gateway dicovered $zuulServer")
 

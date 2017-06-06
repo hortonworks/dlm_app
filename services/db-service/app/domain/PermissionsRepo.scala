@@ -50,11 +50,11 @@ class PermissionsRepo @Inject()(
   }
 
   final class PermissionsTable(tag: Tag)
-      extends Table[Permission](tag, Some("dataplane"), "dp_permissions") {
+      extends Table[Permission](tag, Some("dataplane"), "permissions") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
     def permission = column[String]("permission")
-    def roleId = column[Option[Long]]("roleid")
+    def roleId = column[Option[Long]]("role_id")
     def created = column[Option[LocalDateTime]]("created")
     def updated = column[Option[LocalDateTime]]("updated")
     def role = foreignKey("user", roleId, roleRepo.Roles)(_.id)

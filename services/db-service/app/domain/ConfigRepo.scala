@@ -20,11 +20,11 @@ class ConfigRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
   }
 
 
-  final class Configtable(tag: Tag) extends Table[DpConfig](tag, Some("dataplane"), "dp_configs") {
+  final class Configtable(tag: Tag) extends Table[DpConfig](tag, Some("dataplane"), "configs") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
-    def configKey = column[String]("configkey")
-    def configValue = column[String]("configvalue")
+    def configKey = column[String]("config_key")
+    def configValue = column[String]("config_value")
 
     def active = column[Option[Boolean]]("active")
     def export = column[Option[Boolean]]("export")

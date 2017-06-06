@@ -7,8 +7,8 @@ export class Lake {
   properties?: any;
   created?: string;
   updated?: string;
-
   ambariUrl: string;
   state?: string;
   clusterId?:number;
+  isDatalake?:boolean;
 }

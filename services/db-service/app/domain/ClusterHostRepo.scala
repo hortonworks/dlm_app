@@ -76,7 +76,7 @@ class ClusterHostRepo @Inject()(
   }
 
   final class ClusterHostTable(tag: Tag)
-      extends Table[ClusterHost](tag, Some("dataplane"), "dp_cluster_hosts") {
+      extends Table[ClusterHost](tag, Some("dataplane"), "cluster_hosts") {
 
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
@@ -88,7 +88,7 @@ class ClusterHostRepo @Inject()(
 
     def properties = column[Option[JsValue]]("properties")
 
-    def clusterId = column[Long]("clusterid")
+    def clusterId = column[Long]("cluster_id")
 
     def * =
       (id, host,ipaddr,status, properties, clusterId) <> ((ClusterHost.apply _).tupled, ClusterHost.unapply)

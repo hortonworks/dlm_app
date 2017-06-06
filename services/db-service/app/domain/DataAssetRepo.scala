@@ -36,21 +36,21 @@ class DataAssetRepo @Inject()(
   }
 
   final class DatasetAssetTable(tag: Tag)
-      extends Table[DataAsset](tag, Some("dataplane"), "dp_data_asset") {
+      extends Table[DataAsset](tag, Some("dataplane"), "data_asset") {
 
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
-    def assetType = column[String]("assettype")
+    def assetType = column[String]("asset_type")
 
-    def assetName = column[String]("assetname")
+    def assetName = column[String]("asset_name")
 
-    def assetDetails = column[String]("assetdetails")
+    def assetDetails = column[String]("asset_details")
 
-    def asserUrl = column[String]("asserurl")
+    def asserUrl = column[String]("asset_url")
 
-    def assetProperties = column[JsValue]("assetproperties")
+    def assetProperties = column[JsValue]("asset_properties")
 
-    def datasetId = column[Long]("datasetid")
+    def datasetId = column[Long]("dataset_id")
 
     def * =
       (id,

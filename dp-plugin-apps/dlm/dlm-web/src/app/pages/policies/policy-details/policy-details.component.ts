@@ -21,6 +21,12 @@ export class PolicyDetailsComponent implements OnInit {
   @Input()
   contentType = PolicyContent.Jobs;
 
+  @Input()
+  sourceCluster: number;
+
+  @Input()
+  hdfsRootPath: string;
+
   ngOnInit() {
 
   }

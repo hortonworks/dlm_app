@@ -1,6 +1,6 @@
 import {
   Component, Input, Output, ViewEncapsulation, ViewChild, TemplateRef, EventEmitter, HostBinding,
-  OnChanges, OnDestroy, AfterViewInit, HostListener
+  OnChanges, OnDestroy, AfterViewInit, HostListener, ChangeDetectorRef, AfterViewChecked
 } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -19,7 +19,7 @@ export const SELECTED_KEY_NAME = '__selected';
   styleUrls: ['./table.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class TableComponent implements OnChanges, OnDestroy, AfterViewInit {
+export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, AfterViewInit {
   private _columns: any[];
   private _rows: any[];
   private _headerHeight: string | number;
@@ -48,6 +48,7 @@ export class TableComponent implements OnChanges, OnDestroy, AfterViewInit {
   @Output() selectColumnAction = new EventEmitter<{}>();
   @Output() selectRowAction = new EventEmitter<{}>();
   @Output() doubleClickAction = new EventEmitter<{}>();
+  @Output() sortAction = new EventEmitter<{}>();
 
   @Input() showPageSizeMenu = true;
   @Input() multiExpand = false;
@@ -60,6 +61,9 @@ export class TableComponent implements OnChanges, OnDestroy, AfterViewInit {
   @Input() columnMode = ColumnMode.force;
   @Input() selectionType: any;
   @Input() loadingIndicator = true;
+  @Input() externalSorting = false;
+  @Input() scrollbarV = false;
+  @Input() scrollbarH = false;
   @Input() cssClasses = {
     sortAscending: 'caret',
     sortDescending: 'caret caret-up',
@@ -150,7 +154,7 @@ export class TableComponent implements OnChanges, OnDestroy, AfterViewInit {
     return this._rows;
   }
 
-  constructor(private navbar: NavbarService) {
+  constructor(private navbar: NavbarService, private cdRef: ChangeDetectorRef) {
     this.navbarCollapse$ = this.navbar.isCollapsed;
     this.navbarCollapseSubscription = this.navbarCollapse$
       .debounceTime(500)
@@ -185,6 +189,10 @@ export class TableComponent implements OnChanges, OnDestroy, AfterViewInit {
     if (type === 'dblclick') {
       this.doubleClickAction.emit(row);
     }
+  }
+
+  onSort(object) {
+    this.sortAction.emit(object);
   }
 
   /**
@@ -222,6 +230,10 @@ export class TableComponent implements OnChanges, OnDestroy, AfterViewInit {
   ngAfterViewInit() {
     // this will avoid issue on initial calculation when parent for this component is not properly rendered
     this.table.recalculate();
+  }
+
+  ngAfterViewChecked() {
+    this.cdRef.detectChanges();
   }
 
   ngOnDestroy() {

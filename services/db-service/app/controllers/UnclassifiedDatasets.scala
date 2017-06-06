@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Entities.UnclassifiedDataset
-import domain.API.{datalakes, users}
+import domain.API.{dpClusters, users}
 import domain.UnclassifiedDatasetRepo
 import play.api.mvc._
 
@@ -21,7 +21,7 @@ class UnclassifiedDatasets @Inject()(datasetRepo: UnclassifiedDatasetRepo)(impli
 
 
   private def makeLink(c: UnclassifiedDataset) = {
-    Map("datalake" -> s"${datalakes}/${c.datalakeId}",
+    Map("dpCluster" -> s"${dpClusters}/${c.dpClusterId}",
       "users" -> s"${users}/${c.createdBy}")
   }
 

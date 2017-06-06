@@ -33,7 +33,7 @@ class UnclassifiedDatasetCategoryRepo @Inject()(protected val dbConfigProvider: 
   }
 
   final class UnclassifiedDatasetCategoriesTable(tag: Tag)
-    extends Table[UnclassifiedDatasetCategory](tag, Some("dataplane"), "dp_dataset_category") {
+    extends Table[UnclassifiedDatasetCategory](tag, Some("dataplane"), "dataset_category") {
 
     def categoryId = column[Long]("category_id")
     def datasetId = column[Long]("unclassified_dataset_id")

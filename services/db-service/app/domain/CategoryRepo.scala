@@ -42,7 +42,7 @@ class CategoryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvi
     db.run(Categories.filter(_.id === categoryId).result.headOption)
   }
 
-  final class CategoriesTable(tag: Tag) extends Table[Category](tag, Some("dataplane"), "dp_categories") {
+  final class CategoriesTable(tag: Tag) extends Table[Category](tag, Some("dataplane"), "categories") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
     def name = column[String]("name")

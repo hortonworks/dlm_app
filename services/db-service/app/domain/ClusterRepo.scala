@@ -17,10 +17,10 @@ class ClusterRepo @Inject()(
 
   val Clusters = TableQuery[ClustersTable]
 
-  def all(datalakeId: Option[Long]): Future[List[Cluster]] = db.run {
-    datalakeId match {
-      case Some(datalakeId) =>
-        Clusters.filter(_.datalakeid === datalakeId).to[List].result
+  def all(dpClusterId: Option[Long]): Future[List[Cluster]] = db.run {
+    dpClusterId match {
+      case Some(dpClusterId) =>
+        Clusters.filter(_.dpClusterid === dpClusterId).to[List].result
       case None => Clusters.to[List].result
     }
   }
@@ -39,9 +39,9 @@ class ClusterRepo @Inject()(
     db.run(Clusters.filter(_.id === clusterId).result.headOption)
   }
 
-  def findByDatalakeId(datalakeId: Long): Future[List[Cluster]] = {
+  def findByDpClusterId(dpClusterId: Long): Future[List[Cluster]] = {
 
-    db.run(Clusters.filter(_.datalakeid === datalakeId).to[List].result)
+    db.run(Clusters.filter(_.dpClusterid === dpClusterId).to[List].result)
   }
 
   def deleteById(clusterId: Long): Future[Int] = {
@@ -49,42 +49,35 @@ class ClusterRepo @Inject()(
   }
 
   final class ClustersTable(tag: Tag)
-      extends Table[Cluster](tag, Some("dataplane"), "dp_clusters") {
+      extends Table[Cluster](tag, Some("dataplane"), "discovered_clusters") {
 
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
     def name = column[String]("name")
 
-    def description = column[String]("description")
-
-    def ambariurl = column[Option[String]]("ambariurl")
-
-    def ambariuser = column[Option[String]]("ambariuser")
-
-    def ambaripass = column[Option[String]]("ambaripass")
+    def ambariurl = column[Option[String]]("cluster_url")
 
     def secured = column[Option[Boolean]]("secured")
 
-    def kerberosuser = column[Option[String]]("kerberosuser")
+    def kerberosuser = column[Option[String]]("kerberos_user")
 
     def kerberosticketLocation =
-      column[Option[String]]("kerberosticketlocation")
+      column[Option[String]]("kerberos_ticket_location")
 
-    def datalakeid = column[Option[Long]]("datalakeid")
+    def dpClusterid = column[Option[Long]]("dp_clusterid")
 
-    def userid = column[Option[Long]]("userid")
+    def userid = column[Option[Long]]("user_id")
 
     def properties = column[Option[JsValue]]("properties")
 
     def * =
       (id,
        name,
-       description,
        ambariurl,
        secured,
        kerberosuser,
        kerberosticketLocation,
-       datalakeid,
+       dpClusterid,
        userid,
        properties) <> ((Cluster.apply _).tupled, Cluster.unapply)
 

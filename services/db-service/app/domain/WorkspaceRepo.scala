@@ -35,12 +35,12 @@ class WorkspaceRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProv
     db.run(Workspaces.filter(_.id === workspaceId).result.headOption)
   }
 
-  final class WorkspacesTable(tag: Tag) extends Table[Workspace](tag, Some("dataplane"), "dp_workspace") {
+  final class WorkspacesTable(tag: Tag) extends Table[Workspace](tag, Some("dataplane"), "workspace") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
     def name = column[String]("name")
     def description = column[String]("description")
-    def createdBy = column[Long]("createdBy")
+    def createdBy = column[Long]("createdby")
     def created = column[Option[LocalDateTime]]("created")
     def updated = column[Option[LocalDateTime]]("updated")
 
