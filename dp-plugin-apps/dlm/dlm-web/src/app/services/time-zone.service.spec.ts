@@ -1,13 +1,14 @@
 import { TestBed } from '@angular/core/testing';
-import { TimeZoneService } from './time-zone.service';
 import { ReflectiveInjector } from '@angular/core';
+import { SessionStorageService } from 'services/session-storage.service';
+import { TimeZoneService } from './time-zone.service';
 
 describe('TimeZoneService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [TimeZoneService]
+      providers: [TimeZoneService, SessionStorageService]
     });
-    this.injector = ReflectiveInjector.resolveAndCreate([TimeZoneService]);
+    this.injector = ReflectiveInjector.resolveAndCreate([TimeZoneService, SessionStorageService]);
     this.timeZoneService = this.injector.get(TimeZoneService);
   });
 

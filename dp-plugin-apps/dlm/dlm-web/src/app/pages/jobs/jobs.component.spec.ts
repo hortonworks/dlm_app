@@ -20,9 +20,10 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {TableFooterComponent} from '../../common/table/table-footer/table-footer.component';
 import { IconColumnComponent } from '../../components/table-columns/icon-column/icon-column.component';
 import { TableFilterComponent } from '../../common/table/table-filter/table-filter.component';
-import { TypeaheadModule } from 'ng2-bootstrap';
+import { TypeaheadModule, TooltipModule } from 'ng2-bootstrap';
 import { JobsStatusFilterComponent } from './jobs-status-filter/jobs-status-filter.component';
 import { NavbarService } from 'services/navbar.service';
+import { FmtTzPipe } from 'pipes/fmt-tz.pipe';
 
 describe('JobsComponent', () => {
   let component: JobsComponent;
@@ -30,9 +31,13 @@ describe('JobsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [TranslateModule.forRoot({
-        loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-      }), TypeaheadModule.forRoot(), NgxDatatableModule, FormsModule, MomentModule, ChartsModule, RouterTestingModule],
+      imports: [
+        TranslateModule.forRoot({
+          loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
+        }),
+        TypeaheadModule.forRoot(), NgxDatatableModule, FormsModule, MomentModule, ChartsModule, RouterTestingModule,
+        TooltipModule.forRoot()
+      ],
       declarations: [
         JobsComponent,
         JobsTableComponent,
@@ -47,7 +52,8 @@ describe('JobsComponent', () => {
         ActionColumnComponent,
         DropdownComponent,
         BytesSizePipe,
-        IconColumnComponent
+        IconColumnComponent,
+        FmtTzPipe
       ],
       providers: [
         {provide: Store, useClass: MockStore},

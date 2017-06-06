@@ -19,7 +19,7 @@
       "instanceId": "vivek-beacon-1.c.pramod-thangali.internal",
       "severity": "critical",
       "event": "policy-created",
-      "timestamp": "2017-04-12 22:03:11.984",
+      "timestamp": "2017-06-06T20:03:11.984",
       "eventStatus": "created",
       "message": "policy hivePolicy1 created successfully"
     },

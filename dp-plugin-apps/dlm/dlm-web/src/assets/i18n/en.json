@@ -94,6 +94,9 @@
       "in_progress": "In Progress",
       "warnings": "Warnings",
       "failed": "Failed"
+    },
+    "duration": {
+      "running": "Running"
     }
   },
   "forms": {
@@ -134,7 +137,13 @@
       "table": {
         "column": {
           "source_cluster": "Source Cluster",
-          "destination_cluster": "Destination Cluster"
+          "destination_cluster": "Destination Cluster",
+          "started": "Started",
+          "ended": "Ended",
+          "runtime": "Runtime",
+          "transferred": "Transferred",
+          "next_run": "Next Run",
+          "action": "Action"
         },
         "actions": {
           "abort_job": "Abort Job",
@@ -262,7 +271,15 @@
       "prev_jobs": "prev jobs"
     },
     "notifications": {
-      "header": "Notifications"
+      "header": "Notifications",
+      "table": {
+        "column": {
+          "status": "Status",
+          "message": "Notification",
+          "created": "Created",
+          "instance_id": "Instance Id"
+        }
+      }
     }
   }
 }
