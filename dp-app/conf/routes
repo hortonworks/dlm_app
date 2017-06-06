@@ -49,4 +49,8 @@ PUT           /api/datasets                                controllers.DataSets.
 # Atlas API Search
 POST          /api/query-assets                            controllers.QueryAssets.search(clusterId: String)
 
-GET           /api/query-attributes                        controllers.QueryAttributes.list(clusterId: String)
+GET         /api/query-attributes                     controllers.QueryAttributes.list(clusterId: String)
+
+GET         /api/assets/details/:clusterId/:atlasGuid controllers.QueryAttributes.getAssetDetails(clusterId: String, atlasGuid: String)
+GET         /api/assets/typeDefs/:clusterId/:defType controllers.QueryAttributes.getTypeDefs(clusterId: String, defType: String)
+GET         /api/assets/lineage/:clusterId/:atlasGuid controllers.QueryAttributes.getLineage(clusterId: String, atlasGuid: String)

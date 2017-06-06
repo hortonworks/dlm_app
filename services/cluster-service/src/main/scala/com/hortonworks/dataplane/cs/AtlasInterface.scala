@@ -1,6 +1,7 @@
 package com.hortonworks.dataplane.cs
 
 import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery}
+import org.apache.atlas.model.SearchFilter
 import play.api.libs.json.JsValue
 
 import scala.concurrent.Future
@@ -12,5 +13,5 @@ trait AtlasInterface {
   def getAtlasEntity(uuid:String):Future[JsValue]
   def getAtlasEntities(uuids:Iterable[String]):Future[JsValue]
   def getAtlasLineage(uuid:String,depth:Option[String]):Future[JsValue]
-
+  def getAtlasTypeDefs(searchFilter: SearchFilter):Future[JsValue]
 }

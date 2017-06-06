@@ -6,19 +6,13 @@ import javax.inject.{Inject, Singleton}
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import com.google.common.base.{Supplier, Suppliers}
-import com.hortonworks.dataplane.cs.{
-  AtlasInterface,
-  DefaultAtlasInterface,
-  StorageInterface
-}
-import com.hortonworks.dataplane.db.Webservice.{
-  ClusterComponentService,
-  ClusterHostsService
-}
+import com.hortonworks.dataplane.cs.{AtlasInterface, DefaultAtlasInterface, StorageInterface}
+import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService}
 import com.hortonworks.dataplane.http.BaseRoute
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import org.apache.atlas.AtlasServiceException
+import org.apache.atlas.model.SearchFilter
 import play.api.libs.json.JsValue
 
 import scala.concurrent.Future
@@ -39,26 +33,14 @@ class AtlasRoute @Inject()(
 
   import scala.collection.JavaConverters._
 
-  val logger = Logger(classOf[AtlasRoute])
-
-  val atlasInterfaceCache =
-    new ConcurrentHashMap[Long, Supplier[AtlasInterface]]().asScala
-
   // Endpoints don't change too often, Cache the API for handling service disruptions and
   // not hit the database too often
   lazy val atlasApiCacheTime =
     Try(config.getLong("dp.services.cluster.http.atlas.endpoint.cache.secs"))
       .getOrElse(60L)
-
-  private def getInterface(id: Long): AtlasInterface = {
-    atlasInterfaceCache
-      .getOrElseUpdate(
-        id,
-        supplyApi(id)
-      )
-      .get()
-  }
-
+  val logger = Logger(classOf[AtlasRoute])
+  val atlasInterfaceCache =
+    new ConcurrentHashMap[Long, Supplier[AtlasInterface]]().asScala
   val hiveAttributes =
     path("cluster" / LongNumber / "atlas" / "hive" / "attributes") { id =>
       get {
@@ -70,7 +52,6 @@ class AtlasRoute @Inject()(
         }
       }
     }
-
   val hiveTables = {
     path("cluster" / LongNumber / "atlas" / "hive" / "search") { id =>
       post {
@@ -85,7 +66,6 @@ class AtlasRoute @Inject()(
       }
     }
   }
-
   val atlasEntity = path("cluster" / LongNumber / "atlas" / "guid" / Segment) {
     (id, uuid) =>
       get {
@@ -93,19 +73,6 @@ class AtlasRoute @Inject()(
         handleResponse(eventualValue)
       }
   }
-
-  private def handleResponse(eventualValue: Future[JsValue]) = {
-    onComplete(eventualValue) {
-      case Success(entities) => complete(success(entities))
-      case Failure(th) =>
-        th match {
-          case exception: AtlasServiceException =>
-            complete(exception.getStatus.getStatusCode, errors(th))
-          case _ => complete(StatusCodes.InternalServerError, errors(th))
-        }
-    }
-  }
-
   val atlasEntities = path("cluster" / LongNumber / "atlas" / "guid") { id =>
     pathEndOrSingleSlash {
       parameters('query.*) { uuids =>
@@ -116,7 +83,6 @@ class AtlasRoute @Inject()(
       }
     }
   }
-
   val atlasLineage =
     path("cluster" / LongNumber / "atlas" / Segment / "lineage") {
       (cluster, guid) =>
@@ -131,6 +97,29 @@ class AtlasRoute @Inject()(
           }
         }
     }
+  val atlasTypeDefs =
+    path("cluster" / LongNumber / "atlas" / "typedefs" / "type" / Segment) {
+      (cluster, typeDef) =>
+        get {
+          val searchFilter = new SearchFilter()
+          searchFilter.setParam("type", typeDef)
+          val typeDefs = getInterface(cluster).getAtlasTypeDefs(searchFilter)
+          onComplete(typeDefs) {
+            case Success(typeDefs) => complete(success(typeDefs))
+            case Failure(th) =>
+              complete(StatusCodes.InternalServerError, errors(th))
+          }
+        }
+    }
+
+  private def getInterface(id: Long): AtlasInterface = {
+    atlasInterfaceCache
+      .getOrElseUpdate(
+        id,
+        supplyApi(id)
+      )
+      .get()
+  }
 
   private def supplyApi(id: Long) = {
     Suppliers.memoizeWithExpiration(newInterface(id),
@@ -144,6 +133,18 @@ class AtlasRoute @Inject()(
                                clusterHostsService,
                                id,
                                config)
+  }
+
+  private def handleResponse(eventualValue: Future[JsValue]) = {
+    onComplete(eventualValue) {
+      case Success(entities) => complete(success(entities))
+      case Failure(th) =>
+        th match {
+          case exception: AtlasServiceException =>
+            complete(exception.getStatus.getStatusCode, errors(th))
+          case _ => complete(StatusCodes.InternalServerError, errors(th))
+        }
+    }
   }
 }
 
