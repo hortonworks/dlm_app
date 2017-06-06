@@ -12,6 +12,7 @@
     #basicQueryEditor ></normlal-query-editor>
     <advance-query-editor *ngIf="activeTab == tabEnum.ADVANCE"
                           [queryModel]="queryModel"
+                          [clusterId]="clusterId"
                           (onHeightChange)="onQueryEditorResize($event)"
     #advanceQueryEditor ></advance-query-editor>
     <div style="clear: both"></div>
@@ -28,6 +29,7 @@
                     [innerListScrollable]="true"
                     [selectionAllowed]="false"
                     [avoidLoadingOnInit]="true"
+                    [clusterId]="clusterId"
       *ngIf="showQueryResults"                    #dsAssetList></ds-assets-list>
     <div *ngIf="!showQueryResults" class="noSearchMessage"><span>Some Message</span></div>
   </div>

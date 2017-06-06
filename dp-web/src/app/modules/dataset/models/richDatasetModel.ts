@@ -14,4 +14,5 @@ export class RichDatasetModel {
   favourite: boolean;
   id: number;
   name: string;
+  clusterId?: number;
 }

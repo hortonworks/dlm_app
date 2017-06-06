@@ -35,7 +35,7 @@ class CategoryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvi
   }
 
   def searchByName(searchText: String, size: Long): Future[List[Category]] = {
-    db.run(Categories.filter(_.name like s"%$searchText%").take(size).to[List].result)
+    db.run(Categories.filter(_.name.toLowerCase like s"%${searchText.toLowerCase}%").take(size).to[List].result)
   }
 
   def findById(categoryId: Long): Future[Option[Category]] = {

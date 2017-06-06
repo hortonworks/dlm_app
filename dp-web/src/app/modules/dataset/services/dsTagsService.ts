@@ -1,22 +1,32 @@
 import {Injectable} from "@angular/core";
-import {Http} from "@angular/http";
+import {Http, RequestOptions} from "@angular/http";
 import {Observable} from "rxjs";
+import {HttpUtil} from "../../../shared/utils/httpUtil";
 
 @Injectable()
 export class DsTagsService {
-  url1 = "/api/tags";
+  url = "/api/datasets/categories/";
 
   constructor(private http: Http) {
   }
 
   list(searchText: string, size: number): Observable<string[]> {
-    return Observable.create(observer => {
-      setTimeout(() =>
-        observer.next(data
-          .filter(str => searchText && str.toLowerCase().indexOf(searchText.toLowerCase()) != -1)
-          .slice(0, size)),
-        300);
-    });
+    return this.http
+      .get(`${this.url}${searchText}?size=${size}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(res=>{
+        let retArr=[];
+        HttpUtil.extractData(res).forEach(data=>retArr.push(data.name));
+        return retArr;
+      })
+      .catch(HttpUtil.handleError);
+
+    // return Observable.create(observer => {
+    //   setTimeout(() =>
+    //     observer.next(data
+    //       .filter(str => searchText && str.toLowerCase().indexOf(searchText.toLowerCase()) != -1)
+    //       .slice(0, size)),
+    //     300);
+    // });
   }
 
   listDatasetTags(dsId: number): Observable<string[]> {

@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Output, ViewChild} from "@angular/core";
+import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from "@angular/core";
 import {
   AssetSetQueryFilterModel, AssetSetQueryModel, AssetTypeEnum, AssetTypeEnumString,
   DsAssetList
@@ -27,16 +27,18 @@ export class DsAssetSearch {
   @ViewChild("basicQueryEditor") basicQueryEditor: BasicQueryEditor;
   @ViewChild("advanceQueryEditor") advanceQueryEditor: AdvanceQueryEditor;
 
+  @Input() clusterId:number;
   @Output("doneNotification") doneNotificationEmitter: EventEmitter<AssetSetQueryModel> = new EventEmitter<AssetSetQueryModel>();
   @Output("cancelNotification") cancelNotificationEmitter: EventEmitter<null> = new EventEmitter<null>();
 
   onSimpleQueryObjUpdate(flag: any) {
     if (!this.showQueryResults) (thisObj => setTimeout(() => thisObj._actionSearch(), 0))(this);
     this.showQueryResults = true;
-    this.queryModel = new AssetSetQueryModel([
-      {column: "asset.name", operator: "contains", value: this.queryObj.searchText, dataType:"-"},
-      {column: "asset.source", operator: "==", value: AssetTypeEnumString[this.queryObj.type], dataType:"-"}
-    ]);
+    this.queryModel = new AssetSetQueryModel([]);
+    if(this.queryObj.searchText){
+      this.queryModel.filters.push({column: "name", operator: "equals", value: this.queryObj.searchText, dataType:"string"});
+      // this.queryModel.filters.push({column: "asset.source", operator: "==", value: AssetTypeEnumString[this.queryObj.type], dataType:"-"});
+    }
   }
 
   actionCancel() {

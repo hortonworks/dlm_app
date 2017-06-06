@@ -30,6 +30,8 @@
         <div *ngIf="currentStage == 3" class="mdl-button btn-hwx-primary" (click)="actionSave()">Save</div>
         <div *ngIf="nextIsVisible || currentStage == 3" class="mdl-button btn-hwx-secondary" (click)="actionCancel()">Cancel</div>
       </div>
+      <br/>
+      <div class="fillMandatoryMsg" #fillMandatoryMsg>All mandatory fields are not filled.</div>
     </div>
     <div style="clear:both;"></div>
   </div>

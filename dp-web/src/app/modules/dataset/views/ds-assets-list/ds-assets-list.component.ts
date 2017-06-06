@@ -19,6 +19,7 @@ export class AssetSetQueryModel {
 }
 class ASQM extends AssetSetQueryModel {}
 
+enum ResultState { LOADING, LOADED, EMPTY}
 @Component({
   selector: "ds-assets-list",
   styleUrls: ["./ds-assets-list.component.scss"],
@@ -36,6 +37,7 @@ export class DsAssetList implements OnInit {
   @Input() avoidLoadingOnInit: boolean = false;
   @Input() searchText: string = "";
   @Input() typeFilter: AssetTypeEnum = AssetTypeEnum.ALL;
+  @Input() clusterId:number;
 
   @ViewChild("table") table: ElementRef;
   @ViewChild("outerCont") outerCont: ElementRef;
@@ -51,6 +53,8 @@ export class DsAssetList implements OnInit {
   dsAssets: DsAssetModel[] = [];
   tab = AssetTypeEnum;
   actionEnum = AssetListActionsEnum;
+  resultState:ResultState = ResultState.LOADED;
+  resultStates = ResultState;
   private tableHeight: number = 0;
   private totalPages: number = 1;
   private initDone: boolean = false;
@@ -87,6 +91,7 @@ export class DsAssetList implements OnInit {
     this.dsAssets = [];
     let asqms = this.getQueryModelsForAssetService(true);
     const tab = this.tab, tpfltr = this.typeFilter;
+    this.resultState = this.resultStates.LOADING
     this.dsAssetsService.count(asqms)
       .subscribe(countModel => {
         if(this.dsModel) {
@@ -96,10 +101,11 @@ export class DsAssetList implements OnInit {
         this.totalPages = Math.ceil(this.assetsCount / this.pageSize);
       });
     asqms = this.getQueryModelsForAssetService(false);
-    this.dsAssetsService.list(asqms, Math.ceil(this.pageStartIndex / this.pageSize), this.pageSize)
+    this.dsAssetsService.list(asqms, Math.ceil(this.pageStartIndex / this.pageSize), this.pageSize, this.clusterId)
       .subscribe(assets => {
         this.dsAssets = assets;
         setTimeout(() => this.setTableHeight(), 0);
+        this.resultState = (this.dsAssets.length)?this.resultStates.LOADED:this.resultStates.EMPTY;
       });
   }
 
@@ -158,12 +164,12 @@ export class DsAssetList implements OnInit {
     asqms.forEach(asqm => {
       const newAsqm = new ASQM([]);
       newAsqm.filters.push.apply(newAsqm.filters, asqm.filters);
-      if (!this.hideSearch) {
-        newAsqm.filters.push({column: "asset.name", operator: "contains", value: this.searchText, dataType:"-"});
+      if (!this.hideSearch && this.searchText) {
+        newAsqm.filters.push({column: "name", operator: "equals", value: this.searchText, dataType:"string"});
       }
-      if (!this.hideTabs && !countQuery) {
-        newAsqm.filters.push({column: "asset.source", operator: "==", value: AssetTypeEnumString[this.typeFilter], dataType:"-"});
-      }
+      // if (!this.hideTabs && !countQuery) {
+      //   newAsqm.filters.push({column: "asset.source", operator: "==", value: AssetTypeEnumString[this.typeFilter], dataType:"-"});
+      // }
       asqmsClone.push(newAsqm);
     });
     return asqmsClone;

@@ -10,4 +10,5 @@ export class Lake {
 
   ambariUrl: string;
   state?: string;
+  clusterId?:number;
 }

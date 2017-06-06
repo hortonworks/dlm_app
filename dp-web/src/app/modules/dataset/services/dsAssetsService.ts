@@ -5,6 +5,7 @@ import {DsAssetModel} from "../models/dsAssetModel";
 import {AssetCountModel} from "../models/richDatasetModel";
 import {AssetSetQueryModel} from "../views/ds-assets-list/ds-assets-list.component";
 import {HttpUtil} from "../../../shared/utils/httpUtil";
+import off = L.DomEvent.off;
 
 @Injectable()
 export class DsAssetsService {
@@ -14,25 +15,11 @@ export class DsAssetsService {
   constructor(private http: Http) {
   }
 
-  getQueryAttribute():Observable<any[]> {
-    // return this.http
-    //   .get(this.url2, new RequestOptions(HttpUtil.getHeaders()))
-    //   .map(HttpUtil.extractData)
-    //   .catch(HttpUtil.handleError);
-    return Observable.create(observer => {
-      observer.next([
-        {"name": "createTime", "dataType": "date"},
-        {"name": "lastAccessTime", "dataType": "date"},
-        {"name": "comment", "dataType": "string"},
-        {"name": "retention", "dataType": "int"},
-        {"name": "viewOriginalText", "dataType": "string"},
-        {"name": "viewExpandedText", "dataType": "string"},
-        {"name": "tableType", "dataType": "string"},
-        {"name": "temporary", "dataType": "boolean"},
-        {"name": "owner", "dataType": "string"},
-        {"name": "name", "dataType": "string"}
-      ])
-    })
+  getQueryAttribute(clsId:number):Observable<any[]> {
+    return this.http
+      .get(`${this.url2}?clusterId=${clsId}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
   }
 
   count(asqms: AssetSetQueryModel[]): Observable<AssetCountModel> {
@@ -51,9 +38,11 @@ export class DsAssetsService {
     });
   }
 
-  list(asqms: AssetSetQueryModel[], pageNo: number, pageSize: number): Observable<DsAssetModel[]> {
-    console.log(asqms)
-    return Observable.create(observer => {
+  list(asqms: AssetSetQueryModel[], pageNo: number, pageSize: number, clusterId:number): Observable<DsAssetModel[]> {
+    console.log(asqms);
+    let callAtlas = true;
+    asqms.forEach(asqm => asqm.filters.forEach(filObj =>{if(filObj.dataType == "-"){callAtlas = false;}}));
+    return (callAtlas)?this.atlasQuery(asqms, (pageNo - 1) * pageSize, pageSize, clusterId):Observable.create(observer => {
       const newData = [];
       asqms.forEach(asqm => {
         let cloneData = data.filter(obj => true); // cloning
@@ -64,19 +53,41 @@ export class DsAssetsService {
     });
   }
 
-  atlasQuery(asqms: AssetSetQueryModel[]) : Observable<DsAssetModel[]> {
-    let obs=null, retArr=[];
+  getAssetServiceQueryParam(asqms: AssetSetQueryModel[], offset:number, limit:number){
+    let asqm, postParams={
+      "atlasFilters":[],
+      "limit":limit,
+      "offset":offset
+    };
+    asqms.forEach(asqm1 => asqm=asqm1)
+    asqm.filters.forEach(filObj => {
+      postParams.atlasFilters.push(
+        {
+          "atlasAttribute":{
+            "name":filObj.column,
+            "dataType":filObj.dataType
+          },
+          "operation":filObj.operator,
+          "operand":filObj.value
+        }
+      )
+    })
+    return postParams;
+  }
+
+  atlasQuery(asqms: AssetSetQueryModel[], offset:number, limit:number, clusterId:number) : Observable<DsAssetModel[]> {
+    let obs=null, retArr=[], asqm, postParams=this.getAssetServiceQueryParam(asqms, offset, limit);
     this.http
-      .get(this.url2, new RequestOptions(HttpUtil.getHeaders()))
+      .post(`${this.url1}?clusterId=${clusterId}`, postParams, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError)
       .subscribe(rsp => {
-        rsp.entities.forEach(ent=>{
+        rsp.entities && rsp.entities.forEach(ent=>{
           retArr.push({
             creationTime: "-",
             id: ent.guid,
             name: ent.displayText,
-            owner: ent.attributes.owner,
+            owner: ent.attributes.owner || "-",
             rowCount: 0,
             source: "hive",
             type: ent.typeName

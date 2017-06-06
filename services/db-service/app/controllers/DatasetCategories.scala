@@ -35,7 +35,10 @@ class DatasetCategories @Inject()(datasetCategoryRepo: DatasetCategoryRepo,
   }
 
   def categoriesCountByName(categoryName: String) = Action.async {
-    datasetCategoryRepo.getCategoryCount(categoryName).map(dc => success(Json.toJson(dc))).recoverWith(apiError)
+    (if (categoryName.equals("All")) {
+      datasetRepo.count().map(i => CategoryCount(categoryName, i))
+    } else datasetCategoryRepo.getCategoryCount(categoryName)
+      ).map(dc => success(Json.toJson(dc))).recoverWith(apiError)
   }
 
   def add = Action.async(parse.json) { req =>
