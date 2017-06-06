@@ -1,11 +1,16 @@
 import {Injectable} from "@angular/core";
-import {Http} from "@angular/http";
+import {Http, RequestOptions} from "@angular/http";
 import {Observable} from "rxjs";
 import {RichDatasetModel} from "../models/richDatasetModel";
+import {AssetSetQueryModel} from "../views/ds-assets-list/ds-assets-list.component";
+import {DsAssetsService} from "./dsAssetsService";
+import {DataSetAndCategories} from "../../../models/data-set";
+import {HttpUtil} from "../../../shared/utils/httpUtil";
 @Injectable()
 export class RichDatasetService {
   url1 = "/api/datasets-by-tag";
   url2 = "/api/datasets-by-id";
+  url3 = "/api/datasetswithsearch";
 
   constructor(private http: Http) {
   }
@@ -22,7 +27,20 @@ export class RichDatasetService {
     return Observable.create(observer => {
       setTimeout(()=>observer.next(data[id-1]), 300);
     });
-
+  }
+  saveDataset(dataSet:RichDatasetModel, asqms: AssetSetQueryModel[], tags: string[]): Observable<DataSetAndCategories> {
+    const postObj = {
+      "dataset":{
+        "name":dataSet.name, "description":dataSet.description, "dpClusterId":dataSet.clusterId, "createdBy":1
+      },
+      "clusterId":dataSet.clusterId,
+      "tags":tags,
+      "assetQueryModels":[{"atlasFilters":DsAssetsService.prototype.getAtlasFilters(asqms)}]
+    }
+    return this.http
+      .post(`${this.url3}`, postObj, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
   }
 }
 const data =

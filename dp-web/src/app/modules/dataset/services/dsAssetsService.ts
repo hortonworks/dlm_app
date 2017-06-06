@@ -54,14 +54,17 @@ export class DsAssetsService {
   }
 
   getAssetServiceQueryParam(asqms: AssetSetQueryModel[], offset:number, limit:number){
-    let asqm, postParams={
-      "atlasFilters":[],
+    return {
+      "atlasFilters":this.getAtlasFilters(asqms),
       "limit":limit,
       "offset":offset
     };
-    asqms.forEach(asqm1 => asqm=asqm1)
+  }
+  getAtlasFilters(asqms: AssetSetQueryModel[]){
+    let asqm, atlasFilters=[];
+    asqms.forEach(asqm1 => asqm=asqm1);
     asqm.filters.forEach(filObj => {
-      postParams.atlasFilters.push(
+      atlasFilters.push(
         {
           "atlasAttribute":{
             "name":filObj.column,
@@ -71,8 +74,8 @@ export class DsAssetsService {
           "operand":filObj.value
         }
       )
-    })
-    return postParams;
+    });
+    return atlasFilters;
   }
 
   atlasQuery(asqms: AssetSetQueryModel[], offset:number, limit:number, clusterId:number) : Observable<DsAssetModel[]> {

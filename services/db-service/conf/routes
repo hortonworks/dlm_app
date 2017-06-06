@@ -112,6 +112,7 @@ DELETE        /clusters/:clusterId/properties/:propertiesId                  con
 #Dataset API
 GET           /datasets                                                      controllers.Datasets.all
 POST          /datasets                                                      controllers.Datasets.add
+POST          /datasetswithassets                                            controllers.Datasets.addWithAsset
 PUT           /datasets                                                      controllers.Datasets.update
 GET           /datasets/:datasetId                                           controllers.Datasets.load(datasetId:Long)
 DELETE        /datasets/:datasetId                                           controllers.Datasets.delete(datasetId:Long)

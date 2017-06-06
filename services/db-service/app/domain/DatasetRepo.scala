@@ -13,6 +13,7 @@ import scala.concurrent.Future
 class DatasetRepo @Inject()(
                              protected val datasetCategoryRepo: DatasetCategoryRepo,
                              protected val categoryRepo: CategoryRepo,
+                             protected val dataAssetRepo: DataAssetRepo,
                              protected val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[DpPgProfile] {
 
@@ -63,6 +64,20 @@ class DatasetRepo @Inject()(
             DatasetAndCategories(dataset, categories)
         }
     }
+  }
+
+  def create(datasetCreateRequest: DatasetCreateRequest) = {
+    val tags = datasetCreateRequest.tags
+    val query = for {
+      existingCategories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
+      _ <- categoryRepo.Categories ++= tags.filter(t => !existingCategories.contains(t)).map(t => Category(None, t, t))
+      savedDataset <- Datasets returning Datasets += datasetCreateRequest.dataset
+      categories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
+      _ <- datasetCategoryRepo.DatasetCategories ++= categories.map(c => DatasetCategory(c.id.get, savedDataset.id.get))
+      _ <- dataAssetRepo.DatasetAssets ++= datasetCreateRequest.dataAssets.map(a => a.copy(datasetId = Some(savedDataset.id.get)))
+    } yield (DatasetAndCategories(savedDataset, categories))
+
+    db.run(query.transactionally)
   }
 
   def insertWithCategories(datasetReq: DatasetAndCategoryIds): Future[DatasetAndCategories] = {

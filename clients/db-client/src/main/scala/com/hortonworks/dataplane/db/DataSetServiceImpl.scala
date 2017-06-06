@@ -38,6 +38,13 @@ class DataSetServiceImpl (config: Config)(implicit ws: WSClient)
       .map(mapToDataSetAndCategories)
   }
 
+  def create(datasetReq: DatasetCreateRequest): Future[Either[Errors, DatasetAndCategories]] = {
+    ws.url(s"$url/datasetswithassets")
+      .withHeaders("Accept" -> "application/json")
+      .post(Json.toJson(datasetReq))
+      .map(mapToDataSetAndCategories)
+  }
+
   override def retrieve(datasetId: String): Future[Either[Errors, DatasetAndCategories]] = {
     ws.url(s"$url/datasets/$datasetId")
       .withHeaders("Accept" -> "application/json")

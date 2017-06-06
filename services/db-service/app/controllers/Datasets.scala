@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Dataset, DatasetAndCategoryIds}
+import com.hortonworks.dataplane.commons.domain.Entities.{Dataset, DatasetAndCategoryIds, DatasetCreateRequest}
 import domain.API.{dpClusters, users}
 import domain.DatasetRepo
 import play.api.mvc._
@@ -44,6 +44,17 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
       .validate[DatasetAndCategoryIds]
       .map { cl =>
         val created = datasetRepo.insertWithCategories(cl)
+        created.map(c => success(linkData(c, makeLink(c.dataset))))
+          .recoverWith(apiError)
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
+
+  def addWithAsset = Action.async(parse.json) { req =>
+    req.body
+      .validate[DatasetCreateRequest]
+      .map { cl =>
+        val created = datasetRepo.create(cl)
         created.map(c => success(linkData(c, makeLink(c.dataset))))
           .recoverWith(apiError)
       }

@@ -67,7 +67,9 @@ export class DsEditor implements OnInit {
   }
 
   actionSave() {
-    this.actionCancel();
+    this.richDatasetService
+      .saveDataset(this.dsModel, this.assetSetQueryModelsForAddition, this.tags)
+      .subscribe(obj => {this.actionCancel();})
   }
 
   actionCancel() {

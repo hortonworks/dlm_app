@@ -54,8 +54,9 @@ object Webservice {
     def create(dataSetAndCatIds: DatasetAndCategoryIds)
     : Future[Either[Errors, DatasetAndCategories]]
 
-    def retrieve(
-                  dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
+    def create(datasetReq: DatasetCreateRequest): Future[Either[Errors, DatasetAndCategories]]
+
+    def retrieve(dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
 
     def update(dataSetAndCatIds: DatasetAndCategoryIds)
     : Future[Either[Errors, DatasetAndCategories]]

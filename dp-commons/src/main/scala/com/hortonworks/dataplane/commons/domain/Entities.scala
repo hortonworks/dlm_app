@@ -2,6 +2,7 @@ package com.hortonworks.dataplane.commons.domain
 
 import java.time.LocalDateTime
 
+import com.hortonworks.dataplane.commons.domain.Atlas.AtlasSearchQuery
 import play.api.libs.json.{JsValue, Json}
 
 /**
@@ -176,10 +177,10 @@ object Entities {
   case class DataAsset(id: Option[Long],
                        assetType: String,
                        assetName: String,
-                       assetDetails: String,
-                       assetUrl: String,
+                       guid : String,
                        assetProperties: JsValue,
-                       datasetId: Long)
+                       clusterId : Long,
+                       datasetId: Option[Long] = None)
 
   case class DatasetDetails(id: Option[Long],
                             details: Option[JsValue],
@@ -202,6 +203,10 @@ object Entities {
   case class CategoryCount(name: String, count: Int)
 
   case class CategoriesCountAndTotal(categoies: Seq[CategoryCount], total: Int)
+
+  case class DatasetCreateRequest(dataset: Dataset, clusterId: Long, tags: Seq[String],
+                                  assetQueryModels: Seq[AtlasSearchQuery],
+                                  dataAssets: Seq[DataAsset] = Nil)
 
 }
 
@@ -305,4 +310,6 @@ object JsonFormatters {
   implicit val categoriesCountAndTotalReads = Json.reads[CategoriesCountAndTotal]
   implicit val categoriesCountAndTotalWrites = Json.writes[CategoriesCountAndTotal]
 
+  implicit val datasetCreateRequestReads = defaultJson.reads[DatasetCreateRequest]
+  implicit val datasetCreateRequestWrites = Json.writes[DatasetCreateRequest]
 }

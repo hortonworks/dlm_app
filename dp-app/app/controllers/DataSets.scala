@@ -3,8 +3,10 @@ package controllers
 import javax.inject.Inject
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{Category, Dataset, DatasetAndCategoryIds}
+import com.hortonworks.dataplane.commons.domain.Atlas.AtlasSearchQuery
+import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+import com.hortonworks.dataplane.cs.Webservice.AtlasService
 import com.hortonworks.dataplane.db.Webservice.{CategoryService, DataSetCategoryService, DataSetService}
 import internal.auth.Authenticated
 import models.JsonResponses
@@ -19,6 +21,7 @@ import scala.concurrent.Future
 class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetService,
                          @Named("categoryService") val categoryService: CategoryService,
                          @Named("dataSetCategoryService") val dataSetCategoryService: DataSetCategoryService,
+                         @Named("atlasService") val atlasService: AtlasService,
                          authenticated: Authenticated)
   extends Controller {
 
@@ -44,6 +47,39 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
               case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
             }
         }
+    }.getOrElse(Future.successful(BadRequest))
+  }
+
+  private def getAssetFromSearch(req: DatasetCreateRequest): Future[Either[Errors, Seq[DataAsset]]] = {
+    atlasService.searchQueryAssets(req.clusterId.toString, req.assetQueryModels.head).map {
+      case Right(entity) =>
+        val assets = entity.entities.getOrElse(Nil).map {
+          e =>
+            DataAsset(None, e.typeName.get,
+              e.attributes.get.get("name").get,
+              e.guid.get, Json.toJson(e.attributes.get), req.clusterId)
+        }
+        Right(assets)
+      case Left(e) => Left(e)
+    }
+  }
+
+  def createDatasetWithAtlasSearch = authenticated.async(parse.json) { request =>
+    request.body.validate[DatasetCreateRequest].map { req =>
+      getAssetFromSearch(req).flatMap {
+        case Right(assets) =>
+          val newReq = req.copy(dataset = req.dataset.copy(createdBy = request.user.id.get), dataAssets = assets)
+          dataSetService.create(newReq)
+            .map {
+              dataSetNCategories =>
+                dataSetNCategories match {
+                  case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+                  case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
+                }
+            }
+        case Left(errors) =>
+          Future.successful(InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}")))
+      }
     }.getOrElse(Future.successful(BadRequest))
   }
 
