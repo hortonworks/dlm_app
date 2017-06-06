@@ -455,6 +455,7 @@ export class LineageComponent implements OnChanges, AfterViewInit {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes && changes['guid']) {
+      this.showLoader = true;
       this.getData();
     }
   }
