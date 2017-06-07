@@ -31,6 +31,15 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
       .recoverWith(apiError)
   }
 
+  def richDatasetById(id: Long) = Action.async {
+    datasetRepo.getRichDatasetById(id).map { co =>
+      co.map { c =>
+        success(linkData(c, makeLink(c.dataset)))
+      }
+        .getOrElse(NotFound)
+    }.recoverWith(apiError)
+  }
+
   private def makeLink(c: Dataset) = {
     Map("datalake" -> s"${dpClusters}/${c.dpClusterId}",
       "users" -> s"${users}/${c.createdBy.get}")

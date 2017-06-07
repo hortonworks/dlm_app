@@ -104,6 +104,30 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     }
   }
 
+
+  def getRichDatasetById(id: Long) = authenticated.async {
+    Logger.info("Received retrieve dataSet request")
+    dataSetService.getRichDatasetById(id)
+      .map {
+        dataSetNCategories =>
+          dataSetNCategories match {
+            case Left(errors) if (errors.errors.size > 0 && errors.errors.head.code == "404") => NotFound
+            case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
+          }
+      }
+  }
+
+  def getDataAssetsByDatasetId(id: Long) = authenticated.async {
+    dataSetService.getDataAssetByDatasetId(id)
+      .map { dataSets =>
+        dataSets match {
+          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Right(dataSets) => Ok(Json.toJson(dataSets))
+        }
+      }
+  }
+
   def retrieve(dataSetId: String) = authenticated.async {
     Logger.info("Received retrieve dataSet request")
     dataSetService.retrieve(dataSetId)

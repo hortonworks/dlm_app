@@ -147,6 +147,10 @@ class DatasetRepo @Inject()(
     getRichDataset(Datasets)
   }
 
+  def getRichDatasetById(id:Long) : Future[Option[RichDataset]] = {
+    getRichDataset(Datasets.filter(_.id === id)).map(_.headOption)
+  }
+
   def getRichDatasetByTag(tagName: String): Future[Seq[RichDataset]] = {
     val query = categoryRepo.Categories.filter(_.name === tagName)
       .join(datasetCategoryRepo.DatasetCategories).on(_.id === _.categoryId)

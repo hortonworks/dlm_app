@@ -52,12 +52,27 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToRichDatasets)
   }
 
+  def getRichDatasetById(id: Long): Future[Either[Errors, RichDataset]] = {
+    ws.url(s"$url/richdatasets/$id")
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToRichDataset)
+  }
+
   def listRichDatasetByTag(tagName: String): Future[Either[Errors, Seq[RichDataset]]] = {
     ws.url(s"$url/richdatasets/tags/$tagName")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToRichDatasets)
   }
+
+  def getDataAssetByDatasetId(id:Long) : Future[Either[Errors, Seq[DataAsset]]] = {
+    ws.url(s"$url/dataassets/$id")
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToDataAssets)
+  }
+
 
 
   override def retrieve(datasetId: String): Future[Either[Errors, DatasetAndCategories]] = {
@@ -106,9 +121,25 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
+  private def mapToRichDataset(res: WSResponse): Either[Errors, RichDataset] = {
+    res.status match {
+      case 200 => Right((res.json \ "results" \\ "data").head.validate[RichDataset].get)
+      case 404 => Left(Errors(Seq(Error("404", "Resource not found"))))
+      case _ => mapErrors(res)
+    }
+  }
+
   private def mapToRichDatasets(res: WSResponse): Either[Errors, Seq[RichDataset]] = {
     res.status match {
       case 200 => extractEntity[Seq[RichDataset]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[RichDataset].get })
+      case 404 => Left(Errors(Seq(Error("404", "Resource not found"))))
+      case _ => mapErrors(res)
+    }
+  }
+
+  private def mapToDataAssets(res: WSResponse): Either[Errors, Seq[DataAsset]] = {
+    res.status match {
+      case 200 => extractEntity[Seq[DataAsset]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[DataAsset].get })
       case 404 => Left(Errors(Seq(Error("404", "Resource not found"))))
       case _ => mapErrors(res)
     }

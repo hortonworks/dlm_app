@@ -120,6 +120,7 @@ DELETE        /datasets/:datasetId                                           con
 #RichDataset
 GET           /richdatasets                                                  controllers.Datasets.allRichDataset
 GET           /richdatasets/tags/:tagName                                    controllers.Datasets.richDatasetByTag(tagName:String)
+GET           /richdatasets/:id                                              controllers.Datasets.richDatasetById(id:Long)
 
 
 #Categories Api
