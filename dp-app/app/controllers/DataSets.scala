@@ -94,13 +94,15 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
   }
 
   def getRichDatasetByTag(tagName: String) = authenticated.async {
-    dataSetService.listRichDatasetByTag(tagName)
-      .map { dataSets =>
-        dataSets match {
-          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-          case Right(dataSets) => Ok(Json.toJson(dataSets))
-        }
+    val future = if (tagName.equalsIgnoreCase("all")) dataSetService.listRichDataset()
+    else dataSetService.listRichDatasetByTag(tagName)
+
+    future.map { dataSets =>
+      dataSets match {
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(dataSets) => Ok(Json.toJson(dataSets))
       }
+    }
   }
 
   def retrieve(dataSetId: String) = authenticated.async {
