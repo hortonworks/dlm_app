@@ -1,6 +1,6 @@
 import { Component, OnChanges, ViewChild, Input, SimpleChanges, AfterViewInit, ElementRef, HostListener } from '@angular/core';
 import {TypeDefs} from '../../models/type-defs';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs/Rx';
 import {Lineage} from '../../models/lineage';
 import {AtlasService} from '../../services/atlas.service';
 
