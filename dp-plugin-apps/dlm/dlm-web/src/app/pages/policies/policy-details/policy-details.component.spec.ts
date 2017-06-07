@@ -1,5 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
+import { TooltipModule } from 'ng2-bootstrap';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { CommonComponentsModule } from 'components/common-components.module';
@@ -20,6 +21,7 @@ import { MockTranslateLoader } from 'mocks/mock-translate-loader';
 import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { FrequencyPipe } from 'pipes/frequency.pipe';
 import { NavbarService } from 'services/navbar.service';
+import { FmtTzPipe } from 'pipes/fmt-tz.pipe';
 
 describe('PolicyDetailsComponent', () => {
   let component: PolicyDetailsComponent;
@@ -29,7 +31,7 @@ describe('PolicyDetailsComponent', () => {
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot({
         loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-      }), ChartsModule, NgxDatatableModule, CommonComponentsModule, FormsModule, MomentModule],
+      }), ChartsModule, NgxDatatableModule, CommonComponentsModule, FormsModule, MomentModule, TooltipModule.forRoot()],
       declarations: [
         PolicyDetailsComponent,
         ActionColumnComponent,
@@ -42,7 +44,8 @@ describe('PolicyDetailsComponent', () => {
         JobTransferredGraphComponent,
         BytesSizePipe,
         FrequencyPipe,
-        HdfsBrowserComponent
+        HdfsBrowserComponent,
+        FmtTzPipe
       ],
       providers: [NavbarService]
     })

@@ -3,6 +3,7 @@ import * as moment from 'moment-timezone';
 import { groupByKey } from 'utils/array-util';
 import { FormattedTimezone, ShownTimeZone, TimezonesMap } from './time-zone.type';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { SessionStorageService } from 'services/session-storage.service';
 
 @Injectable()
 export class TimeZoneService {
@@ -30,7 +31,20 @@ export class TimeZoneService {
 
   get userTimezone(): ShownTimeZone {
     const userTimezoneIndex = this.userTimezoneIndex$.getValue();
-    return userTimezoneIndex ? this.mappedByValueTimezones[userTimezoneIndex] : null;
+    return userTimezoneIndex ? this.getTimezoneByIndex(userTimezoneIndex) : null;
+  }
+
+  get clientTimeZoneIndex(): string {
+    const clientTz = moment.tz.guess();
+    return Object.keys(this.mappedByValueTimezones).filter(id => {
+      return this.mappedByValueTimezones[id].zones.some(zone => zone.value === clientTz);
+    })[0];
+  }
+
+  constructor(private sessionStorageService: SessionStorageService) { }
+
+  public getTimezoneByIndex(timezoneIndex) {
+    return this.mappedByValueTimezones[timezoneIndex];
   }
 
   /**
@@ -131,4 +145,18 @@ export class TimeZoneService {
     return newZones.sort((a, b) => a.utcOffset < b.utcOffset ? -1 : 1);
   }
 
+  setTimezone(timezoneIndex: string) {
+    const zoneIndex = timezoneIndex || this.clientTimeZoneIndex;
+    moment.tz.setDefault(this.getTimezoneByIndex(zoneIndex).zones[0].value);
+    this.userTimezoneIndex$.next(zoneIndex);
+  }
+
+  setupUserTimeZone(): string {
+    // Provide selected by user timezone to the TimezoneService instance
+    // It allows to convert dates using this timezone
+    // @see Pipe `fmt-tz`
+    const tz = this.sessionStorageService.get('tz');
+    this.setTimezone(tz);
+    return this.userTimezoneIndex$.getValue();
+  }
 }

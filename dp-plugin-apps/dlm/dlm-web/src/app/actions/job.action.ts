@@ -3,6 +3,7 @@ import { Action } from '@ngrx/store';
 import { JOB_STATUS } from 'constants/status.constant';
 import { Policy } from 'models/policy.model';
 import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
+import * as moment from 'moment';
 
 export const ActionTypes = {
   LOAD_JOBS: requestType('LOAD_JOBS'),
@@ -34,9 +35,8 @@ export const abortJobSuccess = (response): ActionSuccess => ({type: ActionTypes.
 export const abortJobFailure = (error): ActionFailure => ({type: ActionTypes.ABORT_JOB.FAILURE, payload: {error}});
 
 function prepareJob(job) {
-  job.startTime = new Date(job.startTime).getTime();
-  job.endTime = new Date(job.endTime).getTime();
-  job.duration = job.endTime > 0 ? job.endTime - job.startTime : -1;
+  const duration = moment(job.endTime).diff(moment(job.startTime));
+  job.duration = duration > 0 ? duration : -1;
   job.isCompleted = job.status !== JOB_STATUS.IN_PROGRESS;
   return job;
 }

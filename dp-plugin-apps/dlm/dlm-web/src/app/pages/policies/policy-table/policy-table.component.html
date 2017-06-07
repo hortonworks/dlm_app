@@ -13,7 +13,7 @@
 <dlm-flow-status></dlm-flow-status>
 
 <ng-template #durationCell let-seconds="value">
-  {{seconds ? (seconds | amDateFormat:'hh:mm:ss') : 'Running'}}
+  {{seconds ? (seconds | amUtc | amDateFormat:'HH:mm:ss') : 'Running'}}
 </ng-template>
 
 <ng-template #iconCellTemplate>
@@ -34,7 +34,12 @@
 </ng-template>
 
 <ng-template #lastGoodCell let-time="value">
-  {{time ? (time | amTimeAgo) : 'n/a'}}
+  <span *ngIf="time; else noData" [tooltip]="time | fmtTz | amDateFormat:'YYYY-MMM-DD, HH:mm:ss'">
+    {{time | fmtTz | amTimeAgo}}
+  </span>
+  <ng-template #noData>
+    n/a
+  </ng-template>
 </ng-template>
 
 <ng-template #dataCell let-size="value" let-row="row">

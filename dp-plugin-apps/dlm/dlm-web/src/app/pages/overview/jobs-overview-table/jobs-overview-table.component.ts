@@ -31,6 +31,10 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
     super();
   }
 
+  private translateColumn(columnName: string): string {
+    return this.t.instant(`page.overview.table.column.${columnName}`);
+  }
+
   ngOnInit() {
     const actionLabel = name => this.t.instant(`page.overview.table.actions.${name}`);
     this.rowActions = <ActionItemType[]>[
@@ -43,47 +47,47 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
       {cellTemplate: this.statusCellTemplate, maxWidth: 25, minWidth: 25},
       {prop: 'status', cellClass: 'text-cell', headerClass: 'text-header'},
       {prop: 'name', cellClass: 'text-cell', headerClass: 'text-header'},
-      {prop: 'sourceCluster', name: this.t.instant('page.overview.table.column.source_cluster')},
+      {prop: 'sourceCluster', name: this.translateColumn('source_cluster')},
       {...TableComponent.makeFixedWith(20), name: '', cellTemplate: this.destinationIconCellRef},
-      {prop: 'targetCluster', name: this.t.instant('page.overview.table.column.destination_cluster')},
+      {prop: 'targetCluster', name: this.translateColumn('destination_cluster')},
       {prop: 'service', name: this.t.instant('common.service')},
       {
         prop: 'lastJobResource.startTime',
         cellTemplate: this.agoTemplate,
-        name: 'Started',
+        name: this.translateColumn('started'),
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
       {
         prop: 'lastJobResource.endTime',
         cellTemplate: this.agoTemplate,
-        name: 'Ended',
+        name: this.translateColumn('ended'),
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
       {
         prop: 'lastJobResource.duration',
         cellTemplate: this.runTimeTemplate,
-        name: 'Runtime',
+        name: this.translateColumn('runtime'),
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
       {
         prop: 'transferred',
         cellTemplate: this.transferredFormattedTemplate,
-        name: 'Transferred',
+        name: this.translateColumn('transferred'),
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
       {
         prop: 'nextRun',
         cellTemplate: this.nextRunTemplate,
-        name: 'Next Run',
+        name: this.translateColumn('next_run'),
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
       <ActionColumnType>{
-        name: 'Actions',
+        name: this.translateColumn('actions'),
         actionable: true,
         actions: this.rowActions
       }
