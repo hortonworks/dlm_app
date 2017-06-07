@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import {RichDatasetModel} from "../../models/richDatasetModel";
 import {DsTagsService} from "../../services/dsTagsService";
@@ -13,6 +13,7 @@ import {AssetSetQueryFilterModel, AssetSetQueryModel} from "../ds-assets-list/ds
 })
 export class DsEditor implements OnInit {
 
+  @ViewChild("fillMandatoryMsg") fillMandatoryMsg: ElementRef;
   currentStage: number = 1;
   nextIsVisible: boolean = true;
   tags: string[] = [];
@@ -50,8 +51,11 @@ export class DsEditor implements OnInit {
 
   actionNext() {
     if (!this[`validateStage${this.currentStage}`]()) {
+      this.fillMandatoryMsg.nativeElement.style.display="block";
+      setTimeout(()=>this.fillMandatoryMsg.nativeElement.style.display="none", 3000);
       return;
     }
+    this.fillMandatoryMsg.nativeElement.style.display="none";
     ++this.currentStage;
     this.setVisibilityOfNext();
   }
@@ -63,7 +67,9 @@ export class DsEditor implements OnInit {
   }
 
   actionSave() {
-    this.actionCancel();
+    this.richDatasetService
+      .saveDataset(this.dsModel, this.assetSetQueryModelsForAddition, this.tags)
+      .subscribe(obj => {this.actionCancel();})
   }
 
   actionCancel() {

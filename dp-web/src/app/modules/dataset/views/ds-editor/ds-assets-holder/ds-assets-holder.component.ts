@@ -17,7 +17,8 @@ export class DsAssetsHolder implements OnInit {
   @Input() assetSetQueryModelsForAddition: AssetSetQueryModel[] = null;
   @Input() assetSetQueryModelsForSubtraction: AssetSetQueryModel[] = null;
   @Input() dsModel: RichDatasetModel = null;
-  applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.ADD, AssetListActionsEnum.REMOVE];
+//  applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.ADD, AssetListActionsEnum.REMOVE];
+  applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.REMOVE];
   showPopup: boolean = false;
   showList: boolean = false;
   @Output("onDoneAction") actionEmitter: EventEmitter<AssetListActionsEnum> = new EventEmitter<AssetListActionsEnum>();

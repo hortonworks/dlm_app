@@ -36,10 +36,13 @@ object Webservice {
   trait UserService extends DbClientService {
 
     def loadUser(username: String): Future[Either[Errors, User]]
+
     def getUserRoles(userName: String): Future[Either[Errors, UserRoles]]
 
     def addUser(user: User): Future[Either[Errors, User]]
+
     def addRole(role: Role): Future[Either[Errors, Role]]
+
     def addUserRole(userRole: UserRole): Future[Either[Errors, UserRole]]
 
   }
@@ -47,31 +50,56 @@ object Webservice {
   trait DataSetService extends DbClientService {
 
     def list(): Future[Either[Errors, Seq[Dataset]]]
+
     def create(dataSetAndCatIds: DatasetAndCategoryIds)
-      : Future[Either[Errors, DatasetAndCategories]]
-    def retrieve(
-        dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
+    : Future[Either[Errors, DatasetAndCategories]]
+
+    def create(datasetReq: DatasetCreateRequest): Future[Either[Errors, DatasetAndCategories]]
+
+    def listRichDataset(): Future[Either[Errors, Seq[RichDataset]]]
+
+    def getRichDatasetById(id: Long): Future[Either[Errors, RichDataset]]
+
+    def listRichDatasetByTag(tagName: String): Future[Either[Errors, Seq[RichDataset]]]
+
+    def getDataAssetByDatasetId(id:Long) : Future[Either[Errors, Seq[DataAsset]]]
+
+    def retrieve(dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
+
     def update(dataSetAndCatIds: DatasetAndCategoryIds)
-      : Future[Either[Errors, DatasetAndCategories]]
+    : Future[Either[Errors, DatasetAndCategories]]
+
     def delete(dataSetId: String): Future[Either[Errors, Dataset]]
   }
 
   trait CategoryService extends DbClientService {
 
     def list(): Future[Either[Errors, Seq[Category]]]
+
+    def search(searchText: String, size: Option[Long]): Future[Either[Errors, Seq[Category]]]
+
+    def listWithCount(): Future[Either[Errors, Seq[CategoryCount]]]
+
+    def listWithCount(categoryName: String): Future[Either[Errors, CategoryCount]]
+
     def create(category: Category): Future[Either[Errors, Category]]
+
     def retrieve(categoryId: String): Future[Either[Errors, Category]]
+
     def delete(categoryId: String): Future[Either[Errors, Category]]
   }
 
   trait DataSetCategoryService extends DbClientService {
 
     def getListWithDataSetId(
-        dataSetId: String): Future[Either[Errors, Seq[DatasetCategory]]]
+                              dataSetId: String): Future[Either[Errors, Seq[DatasetCategory]]]
+
     def getListWithCategoryId(
-        categoryId: String): Future[Either[Errors, Seq[DatasetCategory]]]
+                               categoryId: String): Future[Either[Errors, Seq[DatasetCategory]]]
+
     def create(dataSetCategory: DatasetCategory)
-      : Future[Either[Errors, DatasetCategory]]
+    : Future[Either[Errors, DatasetCategory]]
+
     def delete(dataSetId: String,
                categoryId: String): Future[Either[Errors, DatasetCategory]]
   }
@@ -79,10 +107,14 @@ object Webservice {
   trait DpClusterService extends DbClientService {
 
     def list(): Future[Either[Errors, Seq[DataplaneCluster]]]
+
     def create(dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]]
+
     def retrieve(dpClusterId: String): Future[Either[Errors, DataplaneCluster]]
+
     def update(dpClusterId: String,
                dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]]
+
     def updateStatus(dpCluster: DataplaneCluster): Future[Either[Errors, Boolean]]
 
     def delete(dpClusterId: String): Future[Either[Errors, DataplaneCluster]]
@@ -92,6 +124,7 @@ object Webservice {
   trait LocationService extends DbClientService {
 
     def list(query: Option[String]): Future[Either[Errors, Seq[Location]]]
+
     def retrieve(locationId: Long): Future[Either[Errors, Location]]
 
   }
@@ -99,9 +132,11 @@ object Webservice {
   trait ClusterService extends DbClientService {
 
     def list(): Future[Either[Errors, Seq[Cluster]]]
+
     def getLinkedClusters(dpClusterId: Long): Future[Either[Errors, Seq[Cluster]]]
 
     def create(cluster: Cluster): Future[Either[Errors, Cluster]]
+
     def retrieve(clusterId: String): Future[Either[Errors, Cluster]]
 
   }
@@ -110,29 +145,37 @@ object Webservice {
   trait ClusterComponentService extends DbClientService {
 
     def create(
-        clusterService: ClusterData): Future[Either[Errors, ClusterData]]
+                clusterService: ClusterData): Future[Either[Errors, ClusterData]]
+
     def getServiceByName(
-        clusterId: Long,
-        serviceName: String): Future[Either[Errors, ClusterData]]
+                          clusterId: Long,
+                          serviceName: String): Future[Either[Errors, ClusterData]]
+
     def updateServiceByName(
-        clusterData: ClusterData): Future[Either[Errors, Boolean]]
+                             clusterData: ClusterData): Future[Either[Errors, Boolean]]
+
     def addClusterHosts(clusterServiceHosts: Seq[ClusterServiceHost] = Seq())
-      : Future[Seq[Either[Errors, ClusterServiceHost]]]
+    : Future[Seq[Either[Errors, ClusterServiceHost]]]
+
     def updateClusterHosts(
-        clusterServiceHosts: Seq[ClusterServiceHost] = Seq())
-      : Future[Seq[Either[Errors, Boolean]]]
+                            clusterServiceHosts: Seq[ClusterServiceHost] = Seq())
+    : Future[Seq[Either[Errors, Boolean]]]
+
     def getEndpointsForCluster(
-        clusterId: Long,
-        service: String): Future[Either[Errors, ClusterServiceWithConfigs]]
+                                clusterId: Long,
+                                service: String): Future[Either[Errors, ClusterServiceWithConfigs]]
+
     def getAllServiceEndpoints(serviceName: String): Future[Either[Errors, Seq[ClusterServiceWithConfigs]]]
   }
 
   trait ClusterHostsService extends DbClientService {
     def getHostByClusterAndName(
-        clusterId: Long,
-        hostName: String): Future[Either[Errors, ClusterHost]]
+                                 clusterId: Long,
+                                 hostName: String): Future[Either[Errors, ClusterHost]]
+
     def getHostsByCluster(
-        clusterId: Long): Future[Either[Errors, Seq[ClusterHost]]]
+                           clusterId: Long): Future[Either[Errors, Seq[ClusterHost]]]
+
     def createOrUpdate(host: ClusterHost): Future[Option[Errors]]
 
   }

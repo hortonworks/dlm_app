@@ -22,12 +22,19 @@ export class DsInfoHolder implements OnInit {
   }
 
   ngOnInit() {
-//    this.lakeService.list().subscribe(lakes => this.lakes=lakes);
-    (thisObj => setTimeout(() => thisObj.lakes = tmpLakes, 100))(this);
+    !this.dsModel.datalakeId && (this.dsModel.datalakeId=0);
+    this.lakeService.listWithClusters().subscribe(objs => {
+      this.lakes =[];
+      objs.forEach(obj => {
+        obj.clusters.length && (obj.data.clusterId = obj.clusters[0].id);
+        this.lakes.push(obj.data as Lake);
+      })
+    });
   }
 
   onTagSearchChange(text: string) {
-    this.tagService.list(text, 5).subscribe(tags => this.availableTags = tags);
+    this.availableTags = [];
+    text && this.tagService.list(text, 5).subscribe(tags => this.availableTags = tags);
   }
 
   onNewTagAddition(text: string) {
@@ -35,15 +42,17 @@ export class DsInfoHolder implements OnInit {
   }
 
   onLakeSelectionChange() {
-    this.dsModel.datalakeName = this.lakes.filter(lake => lake.id == this.dsModel.datalakeId)[0].name;
+    const selectedLake = this.lakes.filter(lake => lake.id == this.dsModel.datalakeId)[0];
+    this.dsModel.datalakeName = (selectedLake)?selectedLake.name:"";
+    this.dsModel.clusterId = (selectedLake)?selectedLake.clusterId:null;
   }
 
 }
 
-const tmpLakes: Lake[] = [
-  {id: 1, name: "Lake-1", description: "Some Description", location: 0, ambariUrl: "some ambariUrl"},
-  {id: 2, name: "Lake-2", description: "Some Description", location: 0, ambariUrl: "some ambariUrl"},
-  {id: 3, name: "Lake-3", description: "Some Description", location: 0, ambariUrl: "some ambariUrl"},
-  {id: 4, name: "Lake-4", description: "Some Description", location: 0, ambariUrl: "some ambariUrl"},
-  {id: 5, name: "Lake-5", description: "Some Description", location: 0, ambariUrl: "some ambariUrl"}
-];
+// const tmpLakes: Lake[] = [
+//   {id: 1, name: "Lake-1", description: "Some Description", location: 0, ambariUrl: "some ambariUrl"},
+//   {id: 2, name: "Lake-2", description: "Some Description", location: 0, ambariUrl: "some ambariUrl"},
+//   {id: 3, name: "Lake-3", description: "Some Description", location: 0, ambariUrl: "some ambariUrl"},
+//   {id: 4, name: "Lake-4", description: "Some Description", location: 0, ambariUrl: "some ambariUrl"},
+//   {id: 5, name: "Lake-5", description: "Some Description", location: 0, ambariUrl: "some ambariUrl"}
+// ];

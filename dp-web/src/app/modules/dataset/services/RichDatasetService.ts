@@ -1,29 +1,64 @@
 import {Injectable} from "@angular/core";
-import {Http} from "@angular/http";
+import {Http, RequestOptions} from "@angular/http";
 import {Observable} from "rxjs";
 import {RichDatasetModel} from "../models/richDatasetModel";
+import {AssetSetQueryModel} from "../views/ds-assets-list/ds-assets-list.component";
+import {DsAssetsService} from "./dsAssetsService";
+import {DataSetAndCategories} from "../../../models/data-set";
+import {HttpUtil} from "../../../shared/utils/httpUtil";
 @Injectable()
 export class RichDatasetService {
-  url1 = "/api/datasets-by-tag";
+  url1 = "/api/dataset/list/tag";
   url2 = "/api/datasets-by-id";
+  url3 = "/api/atlas-dataset";
 
   constructor(private http: Http) {
   }
 
-  listByTag(tagName: string, start: number, limit: number): Observable<any> {
-    start -= 1;
-    return Observable.create(observer => {
-      setTimeout(()=>observer.next(data.slice(start, start + limit)), 300);
-    });
-
+  listByTag(tagName: string, start: number, limit: number): Observable<RichDatasetModel[]> {
+    return this.http
+      .get(`${this.url1}/${tagName}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .map(this.extractRichDataArray)
+      .catch(HttpUtil.handleError);
   }
 
   getById(id: number): Observable<RichDatasetModel> {
     return Observable.create(observer => {
       setTimeout(()=>observer.next(data[id-1]), 300);
     });
-
   }
+  saveDataset(dataSet:RichDatasetModel, asqms: AssetSetQueryModel[], tags: string[]): Observable<DataSetAndCategories> {
+    const postObj = {
+      "dataset":{
+        "name":dataSet.name, "description":dataSet.description, "dpClusterId":dataSet.clusterId, "createdBy":1
+      },
+      "clusterId":dataSet.clusterId,
+      "tags":tags,
+      "assetQueryModels":[{"atlasFilters":DsAssetsService.prototype.getAtlasFilters(asqms)}]
+    }
+    return this.http
+      .post(`${this.url3}`, postObj, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+  extractRichDataArray(datas:any[]):RichDatasetModel[] {
+    let retArr:RichDatasetModel[] = [];
+    datas.forEach(data => retArr.push(
+      {
+        id:data.dataset.id,
+        name:data.dataset.name,
+        description:data.dataset.description,
+        datalakeId:data.dataset.dpClusterId,
+        datalakeName:data.cluster,
+        creatorId:data.dataset.createdBy,
+        creatorName:data.user,
+        favourite:(data.tags.indexOf("favourite") != -1),
+        counts:{hiveCount:data.counts[0].count, filesCount:0}
+      } as RichDatasetModel))
+    return retArr
+  }
+  
 }
 const data =
 [

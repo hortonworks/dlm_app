@@ -1,4 +1,5 @@
 CREATE SCHEMA IF NOT EXISTS dataplane;
+CREATE SCHEMA IF NOT EXISTS dataplane;
 
 CREATE TABLE IF NOT EXISTS dataplane.roles (
   id      BIGSERIAL PRIMARY KEY,
@@ -168,14 +169,12 @@ CREATE TABLE IF NOT EXISTS dataplane.unclassified_datasets_categories (
 
 CREATE TABLE IF NOT EXISTS dataplane.data_asset (
   id               BIGSERIAL PRIMARY KEY,
-  asset_type       VARCHAR(10) NOT NULL,
+  asset_type       VARCHAR(100) NOT NULL,
   asset_name       TEXT        NOT NULL,
-  asset_details    TEXT        NOT NULL,
-  asset_url        TEXT        NOT NULL,
+  guid             VARCHAR(100) NOT NULL,
   asset_properties JSONB       NOT NULL,
-  dataset_id       BIGINT REFERENCES dataplane.datasets (id) DEFAULT NULL
-
-
+  dataset_id       BIGINT REFERENCES dataplane.datasets (id) DEFAULT NULL,
+  cluster_id       BIGINT REFERENCES dataplane.dp_clusters (id) NOT NULL
 );
 
 -- Since datasets are boxes, we will need to store details

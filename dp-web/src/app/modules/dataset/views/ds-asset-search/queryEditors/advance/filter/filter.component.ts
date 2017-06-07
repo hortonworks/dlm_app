@@ -100,6 +100,7 @@ export class QueryFilterTypeDate extends QueryFilterObject {
 })
 export class QueryFilter implements OnInit {
   @Input() avoidNewLine: boolean = false;
+  @Input() clusterId:number;
   @Output("onClose") closeEmitter: EventEmitter<null> = new EventEmitter<null>();
   filterObject: QueryFilterObject = null;
   availableFilters: any[] = [
@@ -113,7 +114,7 @@ export class QueryFilter implements OnInit {
 
   ngOnInit() {
     // this.ownerService.list().subscribe(owners => this.owners = owners);
-    this.assetService.getQueryAttribute().subscribe(qryAtrs => {
+    this.assetService.getQueryAttribute(this.clusterId).subscribe(qryAtrs => {
       qryAtrs.forEach(qryAtr=>this.availableFilters.push(
         {display: qryAtr.name, dataType: qryAtr.dataType, propertyName: qryAtr.name}
       ));

@@ -20,6 +20,7 @@ import {QueryFilter} from "./filter/filter.component";
 export class AdvanceQueryEditor implements OnInit {
 
   @Input() queryModel: AssetSetQueryModel;
+  @Input() clusterId:number;
 
   @Output("onHeightChange") heightEmitter: EventEmitter<number> = new EventEmitter<number>();
   @ViewChild("filterCont", {read: ViewContainerRef}) filterCont: ViewContainerRef;
@@ -41,6 +42,7 @@ export class AdvanceQueryEditor implements OnInit {
     const qFilter = this.cFR.resolveComponentFactory(QueryFilter);
     const compRef = this.filterCont.createComponent(qFilter);
     this.fltrCmpRfs.push(compRef);
+    compRef.instance.clusterId = this.clusterId;
     compRef.instance.closeEmitter.subscribe(() => {
       this.fltrCmpRfs.splice(this.fltrCmpRfs.indexOf(compRef), 1)[0].destroy();
       (thisObj => setTimeout(() => thisObj.heightEmitter.emit(thisObj.filterContElmRef.nativeElement.parentElement.offsetHeight), 0))(this);

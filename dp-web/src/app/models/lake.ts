@@ -9,5 +9,6 @@ export class Lake {
   updated?: string;
   ambariUrl: string;
   state?: string;
+  clusterId?:number;
   isDatalake?:boolean;
 }

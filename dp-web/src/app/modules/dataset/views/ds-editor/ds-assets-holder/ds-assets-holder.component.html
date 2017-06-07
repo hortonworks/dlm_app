@@ -8,12 +8,13 @@
                   [applicableActions]="applicableListActions"
                   [selectionAllowed]="false"
                   [queryModels]="assetSetQueryModelsForAddition"
+                  [clusterId]="dsModel.clusterId"
                   (onAction)="onListAction($event)"
   ></ds-assets-list>
   <button *ngIf="!showList" class="mdl-button btn-hwx-primary" (click)="showPopup=true;">Add Assets</button>
 </div>
 <div *ngIf="showPopup" class="popup borderBox">
   <div class="opaque">
-    <asset-search (doneNotification)="actionDone($event)" (cancelNotification)="actionCancel()"></asset-search>
+    <asset-search [clusterId]="dsModel.clusterId" (doneNotification)="actionDone($event)" (cancelNotification)="actionCancel()"></asset-search>
   </div>
 </div>

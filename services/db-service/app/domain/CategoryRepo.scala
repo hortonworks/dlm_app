@@ -30,11 +30,15 @@ class CategoryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvi
     Category
   }
 
-  def findByName(name: String):Future[Option[Category]] = {
-      db.run(Categories.filter(_.name === name).result.headOption)
+  def findByName(name: String): Future[Option[Category]] = {
+    db.run(Categories.filter(_.name === name).result.headOption)
   }
 
-  def findById(categoryId: Long):Future[Option[Category]] = {
+  def searchByName(searchText: String, size: Long): Future[List[Category]] = {
+    db.run(Categories.filter(_.name.toLowerCase like s"%${searchText.toLowerCase}%").take(size).to[List].result)
+  }
+
+  def findById(categoryId: Long): Future[Option[Category]] = {
     db.run(Categories.filter(_.id === categoryId).result.headOption)
   }
 
@@ -42,12 +46,14 @@ class CategoryRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvi
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
     def name = column[String]("name")
+
     def description = column[String]("description")
 
     def created = column[Option[LocalDateTime]]("created")
+
     def updated = column[Option[LocalDateTime]]("updated")
 
-    def * = (id,name, description,created,updated) <> ((Category.apply _).tupled, Category.unapply)
+    def * = (id, name, description, created, updated) <> ((Category.apply _).tupled, Category.unapply)
   }
 
 }

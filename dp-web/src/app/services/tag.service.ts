@@ -6,20 +6,20 @@ import {DatasetTag} from "../models/dataset-tag";
 
 @Injectable()
 export class DatasetTagService {
-  url = '/api/dataset-tags';
+  url = '/api/dataset-tag/list';
 
   constructor(private http: Http) {
   }
 
   public list(): Observable<DatasetTag[]> {
-    // return this.http
-    //   .get(this.url, new RequestOptions(HttpUtil.getHeaders()))
-    //   .map(HttpUtil.extractData)
-    //   .catch(HttpUtil.handleError);
+    return this.http
+      .get(this.url, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
 
-    return Observable.create(observer => {
-      setTimeout(()=>observer.next(data), 300);
-    });
+    // return Observable.create(observer => {
+    //   setTimeout(()=>observer.next(data), 300);
+    // });
 
   }
 }

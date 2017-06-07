@@ -10,7 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class Categories @Inject()(categoryRepo: CategoryRepo)(implicit exec: ExecutionContext)
-    extends JsonAPI {
+  extends JsonAPI {
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
@@ -21,10 +21,15 @@ class Categories @Inject()(categoryRepo: CategoryRepo)(implicit exec: ExecutionC
   def get(name: String) = Action.async {
     categoryRepo.findByName(name).map { uo =>
       uo.map { u =>
-          success(u)
-        }
+        success(u)
+      }
         .getOrElse(notFound)
     }.recoverWith(apiError)
+  }
+
+  def search(searchText: String, size: Option[Long]) = Action.async {
+    categoryRepo.searchByName(searchText, size.getOrElse(Long.MaxValue))
+      .map(categorys => success(categorys)).recoverWith(apiError)
   }
 
   def insert = Action.async(parse.json) { req =>
@@ -40,7 +45,7 @@ class Categories @Inject()(categoryRepo: CategoryRepo)(implicit exec: ExecutionC
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def load(categoryId:Long) = Action.async {
+  def load(categoryId: Long) = Action.async {
     categoryRepo.findById(categoryId).map { uo =>
       uo.map { u =>
         success(u)

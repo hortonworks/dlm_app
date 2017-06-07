@@ -46,7 +46,7 @@ input, textarea, select {
   border-radius: 5px;
 }
 textarea {height:100px;}
-select {background-color: inherit}
+select {background-color: white}
 
 label + input, label + textarea {
   margin-top: 5px;
@@ -58,4 +58,8 @@ label + input, label + textarea {
 
 footer {
   margin-top: 15px;
+}
+
+.markMandatory{
+  color:red;
 }

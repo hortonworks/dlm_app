@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Dataset, DatasetAndCategoryIds}
+import com.hortonworks.dataplane.commons.domain.Entities.{Dataset, DatasetAndCategoryIds, DatasetCreateRequest}
 import domain.API.{dpClusters, users}
 import domain.DatasetRepo
 import play.api.mvc._
@@ -19,9 +19,30 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
     datasetRepo.all.map(dataset => success(dataset.map(c => linkData(c, makeLink(c))))).recoverWith(apiError)
   }
 
+  def allRichDataset = Action.async {
+    datasetRepo.getRichDataset()
+      .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
+      .recoverWith(apiError)
+  }
+
+  def richDatasetByTag(tagName: String) = Action.async {
+    datasetRepo.getRichDatasetByTag(tagName)
+      .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
+      .recoverWith(apiError)
+  }
+
+  def richDatasetById(id: Long) = Action.async {
+    datasetRepo.getRichDatasetById(id).map { co =>
+      co.map { c =>
+        success(linkData(c, makeLink(c.dataset)))
+      }
+        .getOrElse(NotFound)
+    }.recoverWith(apiError)
+  }
+
   private def makeLink(c: Dataset) = {
     Map("datalake" -> s"${dpClusters}/${c.dpClusterId}",
-      "users" -> s"${users}/${c.createdBy}")
+      "users" -> s"${users}/${c.createdBy.get}")
   }
 
   def load(datasetId: Long) = Action.async {
@@ -44,6 +65,17 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
       .validate[DatasetAndCategoryIds]
       .map { cl =>
         val created = datasetRepo.insertWithCategories(cl)
+        created.map(c => success(linkData(c, makeLink(c.dataset))))
+          .recoverWith(apiError)
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
+
+  def addWithAsset = Action.async(parse.json) { req =>
+    req.body
+      .validate[DatasetCreateRequest]
+      .map { cl =>
+        val created = datasetRepo.create(cl)
         created.map(c => success(linkData(c, makeLink(c.dataset))))
           .recoverWith(apiError)
       }
