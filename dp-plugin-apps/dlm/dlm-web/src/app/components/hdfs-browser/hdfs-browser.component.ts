@@ -16,14 +16,8 @@ import { Breadcrumb } from 'components/breadcrumb/breadcrumb.type';
   styleUrls: ['./hdfs-browser.component.scss'],
   encapsulation: ViewEncapsulation.None,
   template: `
-    <div class="breadcrumbs">
-      <span *ngFor="let breadcrumb of breadcrumbs" class="breadcrumb-item">
-        <a *ngIf="breadcrumb.url !== ''" class="nameLink" (click)="switchDirectory(breadcrumb.url)">
-          {{breadcrumb.label}}  
-        </a>
-        <span *ngIf="breadcrumb.url === ''">{{breadcrumb.label}}</span>
-      </span>
-    </div>
+    <dlm-hdfs-browser-breadcrumb [breadcrumbs]="breadcrumbs" (onClick)="switchDirectory($event)">
+    </dlm-hdfs-browser-breadcrumb>
     <dlm-table
       #hdfsFilesTable
       [columns]="columns"

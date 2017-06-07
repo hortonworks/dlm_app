@@ -20,6 +20,7 @@ import { MapComponent } from './map/map.component';
 import { PageHeaderComponent } from './page-header/page-header.component';
 import { AddEntityButtonComponent } from './add-entity-button/add-entity-button.component';
 import { EventStatusComponent } from './event-status/event-status.component';
+import { HdfsBrowserBreadcrumbComponent } from './hdfs-browser/breadcrumb/hdfs-browser-breadcrumb.component';
 
 @NgModule({
   imports: [
@@ -48,7 +49,8 @@ import { EventStatusComponent } from './event-status/event-status.component';
     MapComponent,
     PageHeaderComponent,
     AddEntityButtonComponent,
-    EventStatusComponent
+    EventStatusComponent,
+    HdfsBrowserBreadcrumbComponent
   ],
   exports: [
     CardComponent,
@@ -68,7 +70,8 @@ import { EventStatusComponent } from './event-status/event-status.component';
     MapComponent,
     PageHeaderComponent,
     AddEntityButtonComponent,
-    EventStatusComponent
+    EventStatusComponent,
+    HdfsBrowserBreadcrumbComponent
   ]
 })
 export class CommonComponentsModule {}

@@ -4,11 +4,11 @@
       <ng-content></ng-content>
     </div>
     <div *ngIf="!content.children.length" class="pull-left">
-      <span class="text-primary actionable" *ngSwitchCase="'link'">
-        {{text}} <span *ngIf="showChevron" class="glyphicon glyphicon-chevron-down"></span>
+      <span class="text-primary actionable" *ngSwitchCase="'link'" [innerHTML]="text">
+        <span *ngIf="showChevron" class="glyphicon glyphicon-chevron-down"></span>
       </span>
       <button *ngSwitchDefault type="button" class="btn dropdown-toggle" [ngClass]="buttonClass">
-        <span class="pull-left">{{text}}&nbsp;</span>
+        <span class="pull-left" [innerHTML]="text"></span>
         <span *ngIf="showChevron" class="glyphicon glyphicon-chevron-down pull-right"></span>
       </button>
     </div>

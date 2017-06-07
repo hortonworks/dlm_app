@@ -1,0 +1,18 @@
+.nameLink {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.breadcrumbs {
+  margin-bottom: 10px;
+  background-color: white;
+  padding: 15px;
+  .breadcrumb-item:not(:first-child) {
+    &:before {
+      content: ">\00a0";
+      padding: 0 5px;
+      color: #ccc;
+    }
+  }
+}
