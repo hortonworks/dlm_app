@@ -10,7 +10,7 @@ import {HttpUtil} from "../../../shared/utils/httpUtil";
 export class RichDatasetService {
   url1 = "/api/datasets-by-tag";
   url2 = "/api/datasets-by-id";
-  url3 = "/api/datasetswithsearch";
+  url3 = "/api/atlas-dataset";
 
   constructor(private http: Http) {
   }
