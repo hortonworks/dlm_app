@@ -28,8 +28,11 @@
     <div class="spacer-34"> </div>
 
     <section *ngIf="selectedTopLevelTabs === topLevelTabs.DETAILS">
-        <dp-asset-details-view [assetDetails]="assetDetails" [clusterId]="clusterId" [guid]="guid"> </dp-asset-details-view>
+      <dp-asset-details-view [assetDetails]="assetDetails" [clusterId]="clusterId" [guid]="guid"> </dp-asset-details-view>
     </section>
 
+    <section *ngIf="selectedTopLevelTabs === topLevelTabs.LINEAGE">
+     <dp-lineage [clusterId]="clusterId" [guid]="guid"> </dp-lineage>
+    </section>
 
 </div>
