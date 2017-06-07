@@ -137,6 +137,9 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   updateBreadcrumbs(path: string) {
+    if (!path) {
+      return;
+    }
     const pathArr = path.split('/');
     const breadcrumbsArr: Breadcrumb[] = [];
     while (pathArr.length - 1) {

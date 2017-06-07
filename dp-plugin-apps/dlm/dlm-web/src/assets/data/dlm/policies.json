@@ -8,7 +8,9 @@
       "frequency": 7200,
       "endTime": "9999-12-31T00:00:00",
       "sourceCluster": "c1",
-      "targetCluster": "c2"
+      "targetCluster": "c2",
+      "sourceDataset": "/tmp",
+      "targetDataset": "/tmp"
     },
     {
       "name": "hdfs2policy",
@@ -17,7 +19,9 @@
       "frequency": 3600,
       "endTime": "9999-12-31T00:00:00",
       "sourceCluster": "c1",
-      "targetCluster": "c2"
+      "targetCluster": "c2",
+      "sourceDataset": "/app-logs",
+      "targetDataset": "/app-logs"
     },
     {
       "name": "hdfspolicy",
@@ -26,7 +30,9 @@
       "frequency": 7200,
       "endTime": "9999-12-31T00:00:00",
       "sourceCluster": "c1",
-      "targetCluster": "c2"
+      "targetCluster": "c2",
+      "sourceDataset": "/apps",
+      "targetDataset": "/apps"
     }
   ]
 }
