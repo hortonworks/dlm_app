@@ -90,7 +90,7 @@ class DatasetRepo @Inject()(
       ((dataset, user), cluster) <-
       (inputQuery.join(userRepo.Users).on(_.createdBy === _.id))
         .join(clusterRepo.Clusters).on(_._1.dpClusterId === _.id)
-    } yield (dataset, user.username, cluster.name)
+    } yield (dataset, user.username, cluster.name, cluster.id)
   }
 
   private def getDatasetAssetCount(datasetIds: Seq[Long]) = {
@@ -130,12 +130,13 @@ class DatasetRepo @Inject()(
         }
         val datasetWithCategoriesMap = result._3.groupBy(_._1).mapValues(_.map(_._2))
         datasetWithUsernameMap.map {
-          case (id, (dataset, user, cluster)) =>
+          case (id, (dataset, user, cluster, clusterId)) =>
             RichDataset(
               dataset,
               datasetWithCategoriesMap.getOrElse(id, Nil),
               user,
               cluster,
+              clusterId.get,
               datasetWithAssetCountMap.getOrElse(id, Nil)
             )
         }.toSeq

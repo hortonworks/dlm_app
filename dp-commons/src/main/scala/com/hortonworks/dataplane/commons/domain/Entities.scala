@@ -198,7 +198,7 @@ object Entities {
 
   case class DataAssetCount(assetType: String, count: Int)
 
-  case class RichDataset(dataset: Dataset, tags: Seq[String], user: String, cluster: String, counts: Seq[DataAssetCount])
+  case class RichDataset(dataset: Dataset, tags: Seq[String], user: String, cluster: String, clusterId: Long, counts: Seq[DataAssetCount])
 
   case class DatasetAndCategories(dataset: Dataset, categories: Seq[Category])
 

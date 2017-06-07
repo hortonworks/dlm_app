@@ -87,7 +87,7 @@ class CategoryServiceImpl(config: Config)(implicit ws: WSClient)
       case 200 =>
         extractEntity[Category](
           res,
-          r => (r.json \\ "results") (0).validate[Category].get)
+          r => (r.json \\ "results").head.validate[Category].get)
       case _ => mapErrors(res)
     }
   }
@@ -107,7 +107,7 @@ class CategoryServiceImpl(config: Config)(implicit ws: WSClient)
       case 200 =>
         extractEntity[CategoryCount](
           res,
-          r => (r.json \\ "results") (0).validate[CategoryCount].get)
+          r => (r.json \\ "results").head.validate[CategoryCount].get)
       case _ => mapErrors(res)
     }
   }
