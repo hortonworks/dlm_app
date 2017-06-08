@@ -2,6 +2,7 @@ import {Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChange
 import {DsAssetModel} from "../../models/dsAssetModel";
 import {RichDatasetModel} from "../../models/richDatasetModel";
 import {DsAssetsService} from "../../services/dsAssetsService";
+import {Router} from "@angular/router";
 
 export enum AssetTypeEnum { ALL, HIVE, HDFS}
 
@@ -59,7 +60,8 @@ export class DsAssetList implements OnInit {
   private totalPages: number = 1;
   private initDone: boolean = false;
 
-  constructor(private dsAssetsService: DsAssetsService,) {
+  constructor(private dsAssetsService: DsAssetsService
+  ,           private router: Router) {
   }
   ngOnInit() {
     if (this.innerListScrollable) {
@@ -173,5 +175,11 @@ export class DsAssetList implements OnInit {
       asqmsClone.push(newAsqm);
     });
     return asqmsClone;
+  }
+  onAssetClick(id:any, clusterId:number) {
+    // console.log(id, clusterId);
+    if(clusterId) {
+      this.router.navigate([`assets/details/${clusterId}/${id}`]);
+    }
   }
 }
