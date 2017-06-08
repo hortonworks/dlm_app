@@ -22,7 +22,7 @@
 
 * Run `sbt publishLocal` from dataplane root directory to locally publish dataplane projects. This is required because dlm has dependency on `db-client` project of dataplane.
 * Run `sbt compile` from dlm root directory to compile dlm-app and it's dlm dependencies.
-* Run `sh runDlmApp.sh ` to start dlm app server on 9005 port 
+* Run `sh runDlmApp.sh ` to start dlm app server on 9011 port
 
 ## Compile and Start DLM web server
 

@@ -2,6 +2,9 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
+# health
+GET     /health                                               controllers.Status.health
+
 # clusters
 GET     /api/clusters                                         controllers.Clusters.list
 
@@ -31,3 +34,12 @@ GET     /api/events                                           controllers.Events
 
 #HdfsFiles
 GET     /api/clusters/:clusterId/webhdfs/file                 controllers.HdfsFiles.retrieve(clusterId: Long)
+
+
+# Due to the regex involved, Following should be always placed at the end of the file
+# static resources
+# @TODO: Replace `/usr/dlm-web` with env variable DLM_WEB_HOME
+#        which will be set in prod env and will be referred in `StaticAssets.at` method
+GET      /                                                      controllers.StaticAssets.at(path="/usr/dlm-web", file="index.html")
+GET     /dlm/*file                                              controllers.StaticAssets.at(path="/usr/dlm-web", file)
+GET     /*file                                                  controllers.StaticAssets.at(path="/usr/dlm-web", file)

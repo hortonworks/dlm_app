@@ -1,2 +1,2 @@
 #!/bin/sh
-sbt ";project dlmApp;run -Dhttp.port=9005"
+sbt ";project dlmApp;run -Dhttp.port=9011"

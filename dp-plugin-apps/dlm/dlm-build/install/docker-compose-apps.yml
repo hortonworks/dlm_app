@@ -3,8 +3,9 @@ services:
   dlm-app:
     image: hortonworks/dlm-app
     ports:
-        - "9080:9080"
+        - "9011:9011"
     volumes:
         - ./certs:/usr/dlm-app/conf/cert
     environment:
         DLM_APP_HOME: "/usr/dlm-app"
+        CONSUL_HOST: ${CONSUL_HOST}
