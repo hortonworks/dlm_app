@@ -14,6 +14,7 @@ import * as fromRoot from 'reducers';
 import { DropdownItem } from 'components/dropdown/dropdown-item';
 import { TranslateService } from '@ngx-translate/core';
 import { MapData, MapConnectionStatus, Point, MapSize } from 'models/map-data';
+import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
 
 const CLUSTERS_REQUEST_ID = '[CLUSTER_PAGE]CLUSTERS_REQUEST_ID';
 const POLICIES_REQUEST_ID = '[CLUSTER_PAGE]POLICIES_REQUEST_ID';
@@ -26,10 +27,8 @@ const PAIRINGS_REQUEST_ID = '[CLUSTER_PAGE]PAIRINGS_REQUEST_ID';
 })
 export class ClustersComponent implements OnInit {
   tableData$: Observable<Cluster[]>;
-  policiesCount$: Observable<PoliciesCountEntity>;
-  pairsCount$: Observable<PairsCountEntity>;
   mapData$: Observable<MapData[]>;
-  clusters: Cluster[];
+  resourceAvailability$: Observable<{canAddPolicy: boolean, canAddPairing: boolean}>;
   addOptions: DropdownItem[];
   mapSize: MapSize = MapSize.FULLWIDTH;
   canAddPairing = true;
@@ -37,8 +36,9 @@ export class ClustersComponent implements OnInit {
 
   constructor(private store: Store<fromRoot.State>, t: TranslateService) {
     const clusters$: Observable<Cluster[]> = store.select(getAllClusters);
-    this.pairsCount$ = store.select(getCountPairsForClusters);
-    this.policiesCount$ = store.select(getCountPoliciesForSourceClusters);
+    const pairsCount$: Observable<PairsCountEntity> = store.select(getCountPairsForClusters);
+    const policiesCount$: Observable<PoliciesCountEntity> = store.select(getCountPoliciesForSourceClusters);
+    const allResources$ = Observable.combineLatest(clusters$, pairsCount$, policiesCount$);
     this.mapData$ = clusters$
       .startWith([])
       .map(clusters =>
@@ -57,10 +57,8 @@ export class ClustersComponent implements OnInit {
       { label: t.instant('page.clusters.dropdown.cluster') },
       { label: t.instant('page.clusters.dropdown.policy') }
     ];
-    this.tableData$ = Observable.combineLatest(clusters$, this.pairsCount$, this.policiesCount$)
+    this.tableData$ = allResources$
       .map(([clusters, pairsCount, policiesCount]) => {
-        this.canAddPairing = clusters.length > 1;
-        this.canAddPolicy = Object.keys(pairsCount).length > 0;
         return clusters.map(cluster => {
           const pairsCounter = cluster.id in pairsCount &&
           'pairs' in pairsCount[cluster.id] ? pairsCount[cluster.id].pairs : 0;
@@ -73,6 +71,9 @@ export class ClustersComponent implements OnInit {
           };
         });
       });
+      this.resourceAvailability$ = Observable
+        .combineLatest(clusters$, pairsCount$)
+        .map(AddEntityButtonComponent.availableActions);
   }
 
   ngOnInit() {

@@ -15,7 +15,7 @@ export const getCountPairsForClusters = createSelector(getAllPairings, getAllClu
       [entity.id]: {
         clusterId: entity.id,
         clusterName: entity.name,
-        pairs: pairs.filter(pair => pair.pair.filter(clust => clust.id === entity.id).length > 0).length
+        pairs: pairs.filter(pair => pair.pair.some(clust => clust.id === entity.id)).length
       }
     });
   }, {});

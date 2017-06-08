@@ -7,7 +7,9 @@
 <div class="row page-section">
   <div class="col-md-12">
     <div class="pull-right">
-      <dlm-add-entity-button [canAddPolicy]="canAddPolicy" [canAddPairing]="canAddPairing">
+      <dlm-add-entity-button
+        [canAddPolicy]="(resourceAvailability$ | async)?.canAddPolicy"
+        [canAddPairing]="(resourceAvailability$ | async)?.canAddPairing">
       </dlm-add-entity-button>
     </div>
   </div>

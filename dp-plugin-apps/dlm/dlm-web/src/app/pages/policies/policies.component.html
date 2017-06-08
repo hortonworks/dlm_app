@@ -17,8 +17,8 @@
       </div>
 
       <dlm-add-entity-button
-        [canAddPairing]="(clusters$ | async)?.length"
-        [canAddPolicy]="(pairings$ | async)?.length">
+        [canAddPolicy]="(resourceAvailability$ | async)?.canAddPolicy"
+        [canAddPairing]="(resourceAvailability$ | async)?.canAddPairing">
       </dlm-add-entity-button>
     </div>
   </div>

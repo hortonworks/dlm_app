@@ -4,7 +4,6 @@ import {ClustersComponent} from './clusters.component';
 import {ClusterListComponent} from './cluster-list/cluster-list.component';
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {MockTranslateLoader} from '../../mocks/mock-translate-loader';
-import {MapComponent} from '../../components/map/map.component';
 import {BytesSizePipe} from '../../pipes/bytes-size.pipe';
 import {MockStore} from '../../mocks/mock-store';
 import {Store} from '@ngrx/store';
@@ -27,7 +26,6 @@ xdescribe('ClustersComponent', () => {
       declarations: [
         ClustersComponent,
         ClusterListComponent,
-        MapComponent,
         BytesSizePipe
       ],
       providers: [
