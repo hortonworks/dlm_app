@@ -40,8 +40,14 @@ export class DsAssetsService {
 
   list(asqms: AssetSetQueryModel[], pageNo: number, pageSize: number, clusterId:number): Observable<DsAssetModel[]> {
     console.log(asqms);
-    let callAtlas = true;
-    asqms.forEach(asqm => asqm.filters.forEach(filObj =>{if(filObj.dataType == "-"){callAtlas = false;}}));
+    let callAtlas = true, callDB:boolean|number = false;
+    asqms.forEach(asqm => asqm.filters.forEach(filObj =>{
+      if(filObj.dataType == "-") {callAtlas = false;}
+      if(filObj.column == "dataset.id") {callDB = filObj.value as number;}
+    }));
+    if(callDB) {
+      return this.dbQuery(callDB, (pageNo - 1) * pageSize, pageSize);
+    }
     return (callAtlas)?this.atlasQuery(asqms, (pageNo - 1) * pageSize, pageSize, clusterId):Observable.create(observer => {
       const newData = [];
       asqms.forEach(asqm => {
@@ -78,30 +84,57 @@ export class DsAssetsService {
     return atlasFilters;
   }
 
-  atlasQuery(asqms: AssetSetQueryModel[], offset:number, limit:number, clusterId:number) : Observable<DsAssetModel[]> {
-    let obs=null, retArr=[], asqm, postParams=this.getAssetServiceQueryParam(asqms, offset, limit);
-    this.http
-      .post(`${this.url1}?clusterId=${clusterId}`, postParams, new RequestOptions(HttpUtil.getHeaders()))
+  dbQuery (id: number, offset:number, limit:number) : Observable<DsAssetModel[]> {
+    return this.http
+      .get(`api/dataset/${id}/assets`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
+      .map(rsp => this.extractAssetArrayFromDbData(rsp))
       .catch(HttpUtil.handleError)
-      .subscribe(rsp => {
-        rsp.entities && rsp.entities.forEach(ent=>{
-          retArr.push({
-            creationTime: "-",
-            id: ent.guid,
-            name: ent.displayText,
-            owner: ent.attributes.owner || "-",
-            rowCount: 0,
-            source: "hive",
-            type: ent.typeName
-          })
-        })
-        obs.next(retArr)
-      });
-    return Observable.create(observer => obs = observer);
-
   }
 
+  atlasQuery(asqms: AssetSetQueryModel[], offset:number, limit:number, clusterId:number) : Observable<DsAssetModel[]> {
+    let postParams=this.getAssetServiceQueryParam(asqms, offset, limit);
+    return this.http
+      .post(`${this.url1}?clusterId=${clusterId}`, postParams, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .map(rsp => rsp.entities)
+      .map(rsp => this.extractAssetArrayFromAtlasData(rsp))
+      .catch(HttpUtil.handleError)
+  }
+
+  extractAssetArrayFromDbData(dataArr: any[]) :DsAssetModel[]{
+    let assetModelArr :DsAssetModel[] = [];
+    dataArr.forEach(ent=>{
+      assetModelArr.push({
+        creationTime: "-",
+        id: ent.guid,
+        name: ent.assetName,
+        owner: "-",
+        rowCount: 0,
+        source: "hive",
+        type: ent.assetType,
+        clusterId: ent.clusterId
+      })
+    });
+    return assetModelArr;
+  }
+
+  extractAssetArrayFromAtlasData(dataArr: any[]) :DsAssetModel[]{
+    let assetModelArr :DsAssetModel[] = [];
+    dataArr.forEach(ent=>{
+      assetModelArr.push({
+        creationTime: "-",
+        id: ent.guid,
+        name: ent.displayText,
+        owner: ent.attributes.owner || "-",
+        rowCount: 0,
+        source: "hive",
+        type: ent.typeName,
+        clusterId: null
+      })
+    });
+    return assetModelArr;
+  }
 }
 
 const getFilterFunftion = filObj => {

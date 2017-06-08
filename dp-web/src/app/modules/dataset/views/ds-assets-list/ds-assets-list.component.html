@@ -47,7 +47,7 @@
           <div class="col sourceCol {{(asset.source.toUpperCase() == 'HIVE')?'hiveCol':'filesCol'}}">
             <span><i class="fa {{(asset.source.toUpperCase() == 'HIVE')?'fa-table':'fa-file-o'}}"></i>&nbsp;&nbsp;{{asset.source}}</span>
           </div>
-          <div class="col nameCol">{{asset.name}}</div>
+          <div class="col nameCol" (click)="onAssetClick(asset.id, asset.clusterId)">{{asset.name}}</div>
           <div class="col ownerCol">{{asset.owner}}</div>
           <div class="col createdTimeCol">{{asset.creationTime}}</div>
           <div class="col noRowsCol">{{asset.rowCount}}</div>
