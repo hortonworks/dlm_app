@@ -8,7 +8,6 @@ import com.hortonworks.datapalane.consul._
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.db.Webservice._
 import com.hortonworks.dataplane.cs._
-import internal.AtlasApiCache
 import internal.auth.Authenticated
 import play.api.{Configuration, Logger}
 import play.api.inject.ApplicationLifecycle
@@ -20,13 +19,6 @@ class Module extends AbstractModule {
   def configure() = {
     bind(classOf[Authenticated]).asEagerSingleton()
     bind(classOf[ConsulInitializer]).asEagerSingleton()
-  }
-
-  @Provides
-  @Singleton
-  @Named("atlasApiCache")
-  def provideApiCache(configuration: Configuration,actorSystem: ActorSystem,ws: WSClient):ActorRef = {
-    actorSystem.actorOf(Props(classOf[AtlasApiCache], configuration, actorSystem,ws),"atlasApiCache")
   }
 
 

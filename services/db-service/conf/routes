@@ -33,6 +33,7 @@ POST          /locations                                                     con
 GET           /dp/clusters                                                   controllers.DpClusters.all
 POST          /dp/clusters                                                   controllers.DpClusters.add
 GET           /dp/clusters/:dpClusterId                                      controllers.DpClusters.load(dpClusterId:Long)
+#TODO: Fix this ridiculous signature
 GET           /dp/clusters/:dpClusterId/clusters                             controllers.DiscoveredClusters.getByDpClusterId(dpClusterId:Long)
 DELETE        /dp/clusters/:dpClusterId                                      controllers.DpClusters.delete(dpClusterId:Long)
 PATCH         /dp/clusters/status                                            controllers.DpClusters.updateStatus
@@ -45,7 +46,6 @@ DELETE        /clusters/:clusterId                                           con
 
 
 #Cluster services API
-
 GET           /clusters/:clusterId/services                                  controllers.ClusterServices.allWithCluster(clusterId:Long)
 GET           /dp/clusters/:dpClusterId/services                             controllers.ClusterServices.allWithDpCluster(dpClusterId:Long)
 POST          /cluster/services                                              controllers.ClusterServices.addWithCluster
