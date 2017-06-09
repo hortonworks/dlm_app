@@ -1,7 +1,7 @@
 <div class="dsAssetsHolder">
-  <div class="title">Assets</div>
+  <div class="title">{{"pages.dataset.ds-editor.assets" | translate}}</div>
   <br/>
-  <div class="">Some text Babu would provide, probably which describes what are assets, how can one add them or remove them etc. Some text Babu would provide, probably which describes what are assets, how can one add them or remove them etc. Some text Babu would provide, probably which describes what are assets, how can one add them or remove them etc.</div>
+  <div class="description">{{"pages.dataset.ds-editor.asset-description" | translate}}</div>
   <br/>
   <ds-assets-list *ngIf="showList && !showPopup"
                   [dsModel]="dsModel"
@@ -11,7 +11,7 @@
                   [clusterId]="dsModel.clusterId"
                   (onAction)="onListAction($event)"
   ></ds-assets-list>
-  <button *ngIf="!showList" class="mdl-button btn-hwx-primary" (click)="showPopup=true;">Add Assets</button>
+  <button *ngIf="!showList" class="mdl-button btn-hwx-primary" (click)="showPopup=true;">{{"pages.dataset.ds-editor.action.addAssets" | translate}}</button>
 </div>
 <div *ngIf="showPopup" class="popup borderBox">
   <div class="opaque">

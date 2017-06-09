@@ -1,7 +1,7 @@
 <div class="assetSearch borderBox" #outerCont>
   <div class="tabCont" #tabCont>
-    <div class="tab" [class.active]="activeTab == tabEnum.NORMAL"  (click)="activeTab=tabEnum.NORMAL">Search</div>
-    <div class="tab" [class.active]="activeTab == tabEnum.ADVANCE" (click)="activeTab=tabEnum.ADVANCE">Advanced</div>
+    <div class="tab" [class.active]="activeTab == tabEnum.NORMAL"  (click)="activeTab=tabEnum.NORMAL">{{"pages.dataset.asset-search.search" | translate}}</div>
+    <div class="tab" [class.active]="activeTab == tabEnum.ADVANCE" (click)="activeTab=tabEnum.ADVANCE">{{"pages.dataset.asset-search.advanced" | translate}}</div>
     <div style="clear: both"></div>
   </div>
   <div class="queryEditorCont" #queryEditorCont>
@@ -18,8 +18,8 @@
     <div style="clear: both"></div>
   </div>
   <div class="filterActionCont">
-    <button class="mdl-button btn-hwx-primary" (click)="actionSearch()">Search</button>
-    <button class="mdl-button btn-hwx-secondary" (click)="actionReset()" *ngIf="showQueryResults">Reset</button>
+    <button class="mdl-button btn-hwx-primary" (click)="actionSearch()">{{"pages.dataset.asset-search.search" | translate}}</button>
+    <button class="mdl-button btn-hwx-secondary" (click)="actionReset()" *ngIf="showQueryResults">{{"pages.dataset.asset-search.reset" | translate}}</button>
     <div style="clear: both"></div>
   </div>
   <div class="queryResultCont" #queryResultCont>
@@ -31,11 +31,11 @@
                     [avoidLoadingOnInit]="true"
                     [clusterId]="clusterId"
       *ngIf="showQueryResults"                    #dsAssetList></ds-assets-list>
-    <div *ngIf="!showQueryResults" class="noSearchMessage"><span>Some Message</span></div>
+    <div *ngIf="!showQueryResults" class="noSearchMessage"><span>{{"pages.dataset.asset-search.noSearchMsg" | translate}}</span></div>
   </div>
   <div class="actionButtonCont">
-    <button class="mdl-button btn-hwx-secondary" (click)="actionCancel()">Cancel</button>
-    <button class="mdl-button btn-hwx-primary" (click)="actionDone()">Done</button>
+    <button class="mdl-button btn-hwx-secondary" (click)="actionCancel()">{{"pages.dataset.asset-search.cancel" | translate}}</button>
+    <button class="mdl-button btn-hwx-primary" (click)="actionDone()">{{"pages.dataset.asset-search.done" | translate}}</button>
     <div style="clear: both"></div>
   </div>
 </div>

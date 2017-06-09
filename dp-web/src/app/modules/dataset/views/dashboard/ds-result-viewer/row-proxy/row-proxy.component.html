@@ -2,11 +2,11 @@
   <thead>
     <tr>
       <th class="mdl-data-table__cell--non-numeric"></th>
-      <th class="mdl-data-table__cell--non-numeric">NAME</th>
-      <th class="mdl-data-table__cell--non-numeric">DATALAKE</th>
-      <th class="mdl-data-table__cell--non-numeric">CREATED BY</th>
-      <th class="mdl-data-table__cell--non-numeric">HIVE TABLES</th>
-      <th class="mdl-data-table__cell--non-numeric">HDFS FILES</th>
+      <th class="mdl-data-table__cell--non-numeric">{{("pages.dataset.labels.name" | translate).toUpperCase()}}</th>
+      <th class="mdl-data-table__cell--non-numeric">{{("common.datalake" | translate).toUpperCase()}}</th>
+      <th class="mdl-data-table__cell--non-numeric">{{("pages.dataset.labels.createdBy" | translate).toUpperCase()}}</th>
+      <th class="mdl-data-table__cell--non-numeric">{{("pages.dataset.labels.hiveTables" | translate).toUpperCase()}}</th>
+      <th class="mdl-data-table__cell--non-numeric">{{("pages.dataset.labels.hdfsFiles" | translate).toUpperCase()}}</th>
       <th class="mdl-data-table__cell--non-numeric actions"></th>
     </tr>
   </thead>
@@ -23,12 +23,12 @@
           <button  id="dropDownIcon_{{ dsModel.id }}" class="mdl-button mdl-js-button mdl-button--icon"><i class="fa fa-ellipsis-h fa__fa-ellipsis-h--icon"></i></button>
           <label class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
                   for="dropDownIcon_{{ dsModel.id }}">
-              <li class="mdl-menu__item"><i class="fa__fa-edit--icon fa fa-edit"></i>Edit</li>
-              <li class="mdl-menu__item"><i class="fa__fa-close--icon fa fa-close"></i>Delete</li>
+              <li class="mdl-menu__item"><i class="fa__fa-edit--icon fa fa-edit"></i>{{"common.edit" | translate}}</li>
+              <li class="mdl-menu__item"><i class="fa__fa-close--icon fa fa-close"></i>{{"common.delete" | translate}}</li>
               <li class="mdl-menu__item">
               <i class="fa__fa-star--icon fa fa-star"></i>
-              <span *ngIf="dsModel.favourite">Remove from Favourites</span>
-              <span *ngIf="!dsModel.favourite">Add to Favourites</span>
+              <span *ngIf="dsModel.favourite">{{"pages.dataset.dashboard.actions.remFromFav" | translate}}</span>
+              <span *ngIf="!dsModel.favourite">{{"pages.dataset.dashboard.actions.addToFav" | translate}}</span>
               </li>
           </label>
           </div>

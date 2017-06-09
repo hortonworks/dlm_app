@@ -2,6 +2,9 @@
 
 .dataset-dashboard{
   width:100%;
+  height: 100%;
+  position:absolute;
+  background-color: white;
 }
 
 .dataset-search {
@@ -45,10 +48,10 @@
   }
 
   .mdl-button-group {
-    border : 1px solid $dove-gray;
+    border : 1px solid $forest-green-2;
     .mdl-button {
       background-color: $white;
-      color: $dove-gray;
+      color: $forest-green-2;
       float: left;
       padding : 0px;
       box-shadow: none;
@@ -58,7 +61,7 @@
     }
 
     .button-color--dark-grey {
-      background-color: $dove-gray !important;
+      background-color: $forest-green-2 !important;
       color: white;
       border-left: none;
     }

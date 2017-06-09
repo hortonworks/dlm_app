@@ -34,10 +34,9 @@ export class RichDatasetService {
   saveDataset(dataSet: RichDatasetModel, asqms: AssetSetQueryModel[], tags: string[]): Observable<DataSetAndCategories> {
     const postObj = {
       "dataset": {
-        "name": dataSet.name, "description": dataSet.description, "dpClusterId": dataSet.clusterId, "createdBy": 1
+        "name": dataSet.name, "description": dataSet.description, "dpClusterId": +dataSet.datalakeId, "createdBy": 1
       },
       "clusterId": dataSet.clusterId,
-      "lakeId": dataSet.datalakeId,
       "tags": tags,
       "assetQueryModels": [{"atlasFilters": DsAssetsService.prototype.getAtlasFilters(asqms)}]
 
@@ -55,6 +54,7 @@ export class RichDatasetService {
       description: data.dataset.description,
       datalakeId: data.dataset.dpClusterId,
       datalakeName: data.cluster,
+      clusterId : data.clusterId,
       creatorId: data.dataset.createdBy,
       creatorName: data.user,
       favourite: (data.tags.indexOf("favourite") != -1),
