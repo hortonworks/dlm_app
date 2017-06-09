@@ -5,7 +5,7 @@ import { State } from 'reducers/index';
 import { TranslateService } from '@ngx-translate/core';
 import { Event } from 'models/event.model';
 import { Observable } from 'rxjs/Observable';
-import { getDisplayedEvents, getNewEventsCount } from 'selectors/event.selector';
+import { getAllEvents, getNewEventsCount } from 'selectors/event.selector';
 import { initApp } from 'actions/app.action';
 import { loadEvents, loadNewEventsCount } from 'actions/event.action';
 import { NAVIGATION } from 'constants/navigation.constant';
@@ -81,7 +81,7 @@ export class DlmComponent implements OnDestroy {
         '<span class="navigation-icon glyphicon glyphicon-info-sign"></span>'
       )
     ];
-    this.events$ = store.select(getDisplayedEvents);
+    this.events$ = store.select(getAllEvents);
     this.newEventsCount$ = store.select(getNewEventsCount);
     this.store.dispatch(initApp());
     this.store.dispatch(loadNewEventsCount());
