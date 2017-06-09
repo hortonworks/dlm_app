@@ -2,6 +2,7 @@ import { Observable } from 'rxjs/Observable';
 import { Injectable, isDevMode } from '@angular/core';
 import { Http, Request, Response, RequestOptionsArgs, RequestOptions, XHRBackend } from '@angular/http';
 import { MockResolver } from 'mocks/mock-resolver';
+import { API_PREFIX } from 'constants/api.constant';
 
 
 @Injectable()
@@ -28,7 +29,7 @@ export class HttpService extends Http {
   }
 
   buildUrl(url: string|Request): string|Request {
-    let apiPrefix = '/dlm/api/';
+    let apiPrefix = API_PREFIX;
     // Proccess static assets without the api prefix
     const urlString: string = (typeof url === 'string') ? url : (<Request><any>url).url;
     if (urlString.indexOf('assets/') > -1) {
