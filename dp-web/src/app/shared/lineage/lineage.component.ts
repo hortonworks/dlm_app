@@ -1,12 +1,22 @@
-import { Component, OnChanges, ViewChild, Input, SimpleChanges, AfterViewInit, ElementRef, HostListener } from '@angular/core';
+import {
+  Component,
+  OnChanges,
+  ViewChild,
+  Input,
+  SimpleChanges,
+  AfterViewInit,
+  ElementRef,
+  HostListener
+} from '@angular/core';
+import {Router, ActivatedRoute} from '@angular/router';
 import {TypeDefs} from '../../models/type-defs';
 import {Observable} from 'rxjs/Rx';
 import {Lineage} from '../../models/lineage';
 import {AtlasService} from '../../services/atlas.service';
 
-declare var d3:any;
-declare var dagreD3:any;
-declare var d3Tip:any;
+declare var d3: any;
+declare var dagreD3: any;
+declare var d3Tip: any;
 
 @Component({
   selector: 'dp-lineage',
@@ -34,15 +44,16 @@ export class LineageComponent implements OnChanges, AfterViewInit {
   activeNode = false;
   activeTip = false;
   tooltip: any;
+  showLineage = true;
 
-  entityStateReadOnly = {
+  readonly entityStateReadOnly = {
     'ACTIVE': false,
     'DELETED': true,
     'STATUS_ACTIVE': false,
     'STATUS_DELETED': true
   };
 
-  constructor(private elementRef: ElementRef, private atlasService: AtlasService) {
+  constructor(private elementRef: ElementRef, private atlasService: AtlasService, private router: Router, private route: ActivatedRoute) {
   }
 
   createGraph() {
@@ -97,7 +108,7 @@ export class LineageComponent implements OnChanges, AfterViewInit {
         .attr("width", "100%")
         .attr("height", "100%")
         .append('image')
-        .attr("xlink:href", function(d) {
+        .attr("xlink:href", function (d) {
           if (node) {
             if (node.isProcess) {
               if (that.entityStateReadOnly[node.status]) {
@@ -123,7 +134,7 @@ export class LineageComponent implements OnChanges, AfterViewInit {
         .attr("width", currentNode ? "26" : "24")
         .attr("height", currentNode ? "26" : "24")
 
-      node.intersect = function(point) {
+      node.intersect = function (point) {
         //return dagreD3.intersect.circle(node, points, point);
         return dagreD3.intersect.circle(node, currentNode ? 16 : 13, point);
       };
@@ -139,10 +150,10 @@ export class LineageComponent implements OnChanges, AfterViewInit {
 
     function interpolateZoom(translate, scale) {
       let self = this;
-      return d3.transition().duration(350).tween("zoom", function() {
+      return d3.transition().duration(350).tween("zoom", function () {
         var iTranslate = d3.interpolate(zoom.translate(), translate),
           iScale = d3.interpolate(zoom.scale(), scale);
-        return function(t) {
+        return function (t) {
           zoom
             .scale(iScale(t))
             .translate(iTranslate(t));
@@ -162,7 +173,7 @@ export class LineageComponent implements OnChanges, AfterViewInit {
         translate = zoom.translate(),
         translate0 = [],
         l = [],
-        view = { x: translate[0], y: translate[1], k: zoom.scale() };
+        view = {x: translate[0], y: translate[1], k: zoom.scale()};
 
       d3.event.preventDefault();
       direction = (this.id === 'zoom_in') ? 1 : -1;
@@ -181,11 +192,12 @@ export class LineageComponent implements OnChanges, AfterViewInit {
 
       interpolateZoom([view.x, view.y], view.k);
     }
+
     d3.selectAll(this.elementRef.nativeElement.querySelectorAll('span.lineageZoomButton')).on('click', zoomClick);
     this.tooltip = d3.tip()
       .attr('class', 'd3-tip')
       .offset([-18, 0])
-      .html(function(d) {
+      .html(function (d) {
         let value = that.g.node(d);
         let htmlStr = "";
         if (value.id !== that.guid) {
@@ -211,44 +223,13 @@ export class LineageComponent implements OnChanges, AfterViewInit {
     svgGroup.selectAll("g.nodes g.label")
       .attr("transform", "translate(2,-30)");
     svgGroup.selectAll("g.nodes g.node")
-      .on('mouseenter', function(d) {
-        that.activeNode = true;
-        let matrix = this.getScreenCTM()
-          .translate(+this.getAttribute("cx"), +this.getAttribute("cy"));
-        that.graph.nativeElement.querySelector('.node').classList.remove('active');
-        $(this).addClass('active');
-
-        // Fix
-        let width = $('body').width();
-        let currentELWidth = $(this).offset();
-        let direction = 'e';
-        if (((width - currentELWidth.left) < 330)) {
-          direction = (((width - currentELWidth.left) < 330) && ((currentELWidth.top) < 400)) ? 'sw' : 'w';
-          if (((width - currentELWidth.left) < 330) && ((currentELWidth.top) > 600)) {
-            direction = 'nw';
-          }
-        } else if (((currentELWidth.top) > 600)) {
-          direction = (((width - currentELWidth.left) < 330) && ((currentELWidth.top) > 600)) ? 'nw' : 'n';
-          if ((currentELWidth.left) < 50) {
-            direction = 'ne'
-          }
-        } else if ((currentELWidth.top) < 400) {
-          direction = ((currentELWidth.left) < 50) ? 'se' : 's';
-        }
-        that.tooltip.direction(direction).show(d);
-      })
-      .on('dblclick', function(d) {
+      .on('click', function (d) {
         that.tooltip.hide(d);
-        //TODO Handle this
-        // Utils.setUrl({
-        //   url: '#!/detailPage/' + d,
-        //   mergeBrowserUrl: false,
-        //   trigger: true
-        // });
-      }).on('mouseleave', function(d) {
+        that.router.navigate([{outlets: {'sidebar': ['node', d]}}], { relativeTo: that.route });
+      }).on('mouseleave', function (d) {
       that.activeNode = false;
       let nodeEL = this;
-      setTimeout(function(argument) {
+      setTimeout(function (argument) {
         if (!(that.activeTip || that.activeNode)) {
           $(nodeEL).removeClass('active');
           that.tooltip.hide(d);
@@ -256,44 +237,12 @@ export class LineageComponent implements OnChanges, AfterViewInit {
       }, 400)
     });
 
-    // $('body').on('mouseover', '.d3-tip', function(el) {
-    //   that.activeTip = true;
-    // });
-    // $('body').on('mouseleave', '.d3-tip', function(el) {
-    //   that.activeTip = false;
-    //   that.$('svg').find('.node').removeClass('active');
-    //   tooltip.hide();
-    // });
-
-
 
     // Center the graph
     this.setGraphZoomPositionCal();
     zoom.event(svg);
     // svg.attr('height', this.g.graph().height * initialScale + 40);
 
-  }
-
-  @HostListener('document:mouseover', ['$event', '$event.target'])
-  public onMouseover(event: MouseEvent, targetElement: HTMLElement): void {
-    if (targetElement && targetElement.classList && !targetElement.classList.contains('.d3-tip')) {
-      return;
-    }
-    this.activeTip = true;
-  }
-
-  @HostListener('document:mouseleave', ['$event', '$event.target'])
-  public onMouseleave(event: MouseEvent, targetElement: HTMLElement): void {
-    if (targetElement && targetElement.classList && !targetElement.classList.contains('.d3-tip')) {
-      return;
-    }
-
-    this.activeTip = false;
-    let node = this.graph.nativeElement.querySelector('.node');
-    if(node){
-      this.graph.nativeElement.querySelector('.node').classList.remove('active');
-      this.tooltip.hide();
-    }
   }
 
   ngAfterViewInit() {
@@ -308,7 +257,12 @@ export class LineageComponent implements OnChanges, AfterViewInit {
           fill: 'none',
           stroke: '#fb4200'
         };
-        this.g.setEdge(node.fromEntityId, node.toEntityId, { 'arrowhead': "arrowPoint", lineInterpolate: 'basis', "style": "fill:" + styleObj.fill + ";stroke:" + styleObj.stroke + "", 'styleObj': styleObj });
+        this.g.setEdge(node.fromEntityId, node.toEntityId, {
+          'arrowhead': "arrowPoint",
+          lineInterpolate: 'basis',
+          "style": "fill:" + styleObj.fill + ";stroke:" + styleObj.stroke + "",
+          'styleObj': styleObj
+        });
         this.checkForLineageOrImpactFlag(relations, node.toEntityId);
       });
     }
@@ -337,7 +291,12 @@ export class LineageComponent implements OnChanges, AfterViewInit {
         fill: 'none',
         stroke: '#8bc152'
       };
-      this.g.setEdge(obj.fromEntityId, obj.toEntityId, { 'arrowhead': "arrowPoint", lineInterpolate: 'basis', "style": "fill:" + styleObj.fill + ";stroke:" + styleObj.stroke + "", 'styleObj': styleObj });
+      this.g.setEdge(obj.fromEntityId, obj.toEntityId, {
+        'arrowhead': "arrowPoint",
+        lineInterpolate: 'basis',
+        "style": "fill:" + styleObj.fill + ";stroke:" + styleObj.stroke + "",
+        'styleObj': styleObj
+      });
     });
 
     if (this.fromToObj[this.guid]) {
@@ -355,6 +314,8 @@ export class LineageComponent implements OnChanges, AfterViewInit {
       this.atlasService.getLineage(this.clusterId, this.guid)
     ).subscribe((response: any) => {
       this.prepareData(response[0], response[1]);
+    }, error => {
+      this.noLineage();
     });
   }
 
@@ -401,7 +362,7 @@ export class LineageComponent implements OnChanges, AfterViewInit {
     var obj = {};
     obj['shape'] = "img";
     obj['typeName'] = relationObj.typeName;
-    obj['label'] = relationObj.displayText.length > 17 ? relationObj.displayText.substr(0,17) + '...' : relationObj.displayText;
+    obj['label'] = relationObj.displayText.length > 17 ? relationObj.displayText.substr(0, 17) + '...' : relationObj.displayText;
     obj['toolTipLabel'] = relationObj.displayText;
     obj['id'] = relationObj.guid;
     obj['isLineage'] = true;
@@ -421,8 +382,8 @@ export class LineageComponent implements OnChanges, AfterViewInit {
 
   noLineage() {
     this.showLoader = false;
-    //this.$('svg').height('100');
-    this.graph.nativeElement.html('<text x="' + (this.graph.nativeElement.width() - 150) / 2 + '" y="' + this.graph.nativeElement.height() / 2 + '" fill="black">No lineage data found</text>');
+    this.showLineage = false;
+    this.graph.nativeElement.innerHTML = '<text x="' + (this.graph.nativeElement.getBoundingClientRect().width - 150) / 2 + '" y="' + this.graph.nativeElement.getBoundingClientRect().height / 2 + '" fill="#666666">No lineage data found</text>';
   }
 
   onRender() {
@@ -439,7 +400,7 @@ export class LineageComponent implements OnChanges, AfterViewInit {
             return selection.transition().duration(500);
           }
         })
-        .setDefaultEdgeLabel(function() {
+        .setDefaultEdgeLabel(function () {
           return {};
         });
       this.layoutRendered = true;
@@ -456,6 +417,7 @@ export class LineageComponent implements OnChanges, AfterViewInit {
   ngOnChanges(changes: SimpleChanges) {
     if (changes && changes['guid']) {
       this.showLoader = true;
+      this.showLineage = true;
       this.getData();
     }
   }

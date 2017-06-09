@@ -20,4 +20,20 @@ export class StringUtils {
         link = null;
         return cleanedUri;
     }
+
+    public static getFlattenedObjects(obj: any): string {
+      let objArray = Object.keys(obj).map((key) => {
+        if (!obj[key]) {
+          return;
+        }
+        if (!Array.isArray(obj[key]) && typeof obj[key] !== 'object') {
+          return `${key}: ${obj[key]}`;
+        } else if (Array.isArray(obj[key])) {
+          return `${key}: ${obj[key].join()}`;
+        } else {
+          return this.getFlattenedObjects(obj[key]);
+        }
+      });
+      return objArray.join(', ');
+    }
 }
