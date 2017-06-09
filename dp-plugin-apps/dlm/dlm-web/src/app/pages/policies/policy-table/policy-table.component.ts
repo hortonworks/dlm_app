@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, ViewChild, ViewEncapsulation, TemplateRef, OnDestroy } from '@angular/core';
 import { Policy } from 'models/policy.model';
 import { Cluster } from 'models/cluster.model';
-import { ActionItemType, ActionColumnType } from 'components';
+import { ActionItemType } from 'components';
 import { TableTheme } from 'common/table/table-theme.type';
 import { StatusColumnComponent } from 'components/table-columns/status-column/status-column.component';
 import { PolicyInfoComponent } from './policy-info/policy-info.component';
@@ -53,13 +53,13 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @ViewChild(PolicyInfoComponent) policyInfoColumn: PolicyInfoComponent;
   @ViewChild('durationCell') durationCellRef: TemplateRef<any>;
   @ViewChild('lastGoodCell') lastGoodCellRef: TemplateRef<any>;
-  @ViewChild('dataCell') dataCellRef: TemplateRef<any>;
   @ViewChild('prevJobs') prevJobsRef: TemplateRef<any>;
   @ViewChild(FlowStatusComponent) flowStatusColumn: FlowStatusComponent;
   @ViewChild('scheduleCellTemplate') scheduleCellTemplateRef: TemplateRef<any>;
   @ViewChild('rowDetail') rowDetailRef: TemplateRef<any>;
   @ViewChild('iconCellTemplate') iconCellTemplate: TemplateRef<any>;
   @ViewChild('pathCell') pathCellRef: TemplateRef<any>;
+  @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
 
   @ViewChild(TableComponent) tableComponent: TableComponent;
 
@@ -67,9 +67,9 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @Input() clusters: Cluster[] = [];
 
   rowActions = <ActionItemType[]>[
-    {label: 'Delete', name: 'DELETE'},
-    {label: 'Suspend', name: 'SUSPEND'},
-    {label: 'Activate', name: 'ACTIVATE'}
+    {label: 'Delete', name: 'DELETE', disabledFor: ''},
+    {label: 'Suspend', name: 'SUSPEND', disabledFor: 'SUSPENDED'},
+    {label: 'Activate', name: 'ACTIVATE', disabledFor: 'RUNNING'}
   ];
 
   constructor(private t: TranslateService, private store: Store<fromRoot.State>) {
@@ -99,17 +99,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       {prop: 'frequency', name: this.t.instant('common.schedule'), cellTemplate: this.scheduleCellTemplateRef},
       {prop: 'lastJobResource.duration', name: this.t.instant('common.duration'), cellTemplate: this.durationCellRef},
       {prop: 'lastJobResource.startTime', name: 'Last Good', cellTemplate: this.lastGoodCellRef},
-      {
-        prop: 'targetClusterResource.stats.CapacityUsed',
-        name: this.t.instant('common.data'),
-        cellTemplate: this.dataCellRef
-      },
-      <ActionColumnType>{
-        maxWidth: 55,
-        name: 'Actions',
-        actionable: true,
-        actions: this.rowActions
-      }
+      {name: 'Actions', cellTemplate: this.actionsCellRef, maxWidth: 55, sortable: false}
     ];
   }
 
@@ -138,7 +128,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
    * @param {Policy} policy
    * @param {ActionItemType} action
    */
-  handleSelectedAction({row: policy, action}) {
+  handleSelectedAction(policy, action) {
     this.selectedAction = action;
     this.selectedForActionRow = policy;
     this.showActionConfirmationModal = true;

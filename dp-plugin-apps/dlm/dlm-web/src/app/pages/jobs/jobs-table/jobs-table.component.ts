@@ -1,7 +1,11 @@
 import { Component, OnInit, Input, ViewChild, TemplateRef } from '@angular/core';
 import { Job } from 'models/job.model';
-import { ActionItemType, ActionColumnType } from 'components';
+import { ActionItemType } from 'components';
 import { TableComponent } from 'common/table/table.component';
+import { abortJob } from 'actions/job.action';
+import { Policy } from 'models/policy.model';
+import { Store } from '@ngrx/store';
+import * as fromRoot from 'reducers/';
 
 @Component({
   selector: 'dp-jobs-table',
@@ -13,21 +17,23 @@ export class JobsTableComponent implements OnInit {
   @ViewChild('statusCellTemplate') statusCellTemplate: TemplateRef<any>;
   @ViewChild('iconCellTemplate') iconCellTemplate: TemplateRef<any>;
   @ViewChild('agoTemplate') agoTemplate: TemplateRef<any>;
-  @ViewChild('nextRunTemplate') nextRunTemplate: TemplateRef<any>;
   @ViewChild('runTimeTemplate') runTimeTemplate: TemplateRef<any>;
   @ViewChild('transferredTemplate') transferredTemplate: TemplateRef<any>;
   @ViewChild('transferredFormattedTemplate') transferredFormattedTemplate: TemplateRef<any>;
   @ViewChild('serviceTemplate') serviceTemplate: TemplateRef<any>;
+  @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
   @ViewChild('jobsTable') jobsTable: TableComponent;
   @Input() jobs: Job[];
+  @Input() policy: Policy[];
   @Input() showPageSizeMenu = true;
   @Input() selectionType = 'any';
 
-  // todo: labels and actions are subject to change
   rowActions = <ActionItemType[]>[
-    {label: 'Remove', name: 'REMOVE'},
-    {label: 'Rerun', name: 'RERUN'}
+    {label: 'Abort', name: 'ABORT'}
   ];
+
+  constructor(protected store: Store<fromRoot.State>) {
+  }
 
   ngOnInit() {
     this.columns = [
@@ -61,21 +67,11 @@ export class JobsTableComponent implements OnInit {
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
-      {
-        prop: 'nextRun',
-        cellTemplate: this.nextRunTemplate,
-        name: 'Next Run',
-        cellClass: 'date-cell',
-        headerClass: 'date-header'
-      },
-      <ActionColumnType>{
-        name: 'Actions',
-        actionable: true,
-        actions: this.rowActions
-      }
+      {name: 'Actions', cellTemplate: this.actionsCellRef, sortable: false}
     ];
   }
 
-  handleSelectedAction({row, action}) {
+  handleSelectedAction(row, action) {
+    this.store.dispatch(abortJob(row.policy));
   }
 }

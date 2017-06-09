@@ -6,6 +6,7 @@ import { MockResolver } from 'mocks/mock-resolver';
 
 @Injectable()
 export class HttpService extends Http {
+  // prodFlag = true;
   prodFlag = false;
 
   // todo: add auth token to headers

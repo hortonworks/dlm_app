@@ -12,6 +12,10 @@
   <dlm-job-status [job]="row"></dlm-job-status>
 </ng-template>
 
+<ng-template #verbStatusCellTemplate let-value="value">
+  {{value | policyStatusFmt}}
+</ng-template>
+
 <ng-template #agoTemplate let-value="value" let-policy="row">
   <span *ngIf="policy.lastJobResource">
     <span *ngIf="value; else" [tooltip]="value | fmtTz | amDateFormat:'YYYY-MMM-DD, HH:mm:ss'">

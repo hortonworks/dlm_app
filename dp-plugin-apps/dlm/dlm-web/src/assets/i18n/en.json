@@ -136,8 +136,8 @@
       },
       "table": {
         "column": {
-          "source_cluster": "Source Cluster",
-          "destination_cluster": "Destination Cluster",
+          "source_cluster": "Source",
+          "destination_cluster": "Destination",
           "started": "Started",
           "ended": "Ended",
           "runtime": "Runtime",

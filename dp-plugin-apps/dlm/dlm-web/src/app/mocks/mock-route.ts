@@ -12,7 +12,7 @@ const MOCK_FILES_PREFIX = '/assets/data/dlm/';
  * @param  {RequestMethod} [method]   request method
  */
 export class MockRoute {
-  apiPrefix = '/api/';
+  apiPrefix = '/dlm/api/';
 
   constructor(private url: string, private jsonFile: string, private method?: RequestMethod) {
     this.url = this.apiPrefix + url;

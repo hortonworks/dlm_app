@@ -4,7 +4,6 @@
   [columns]="columns"
   [rows]="jobs"
   [selectionType]="selectionType"
-  (selectColumnAction)="handleSelectedAction($event)"
   selectionType="checkbox">
 </dlm-table>
 
@@ -25,12 +24,6 @@
   </span>
 </ng-template>
 
-<ng-template #nextRunTemplate let-row="row">
-  <span [tooltip]="row.nextRun | fmtTz | amDateFormat:'YYYY-MMM-DD, HH:mm:ss'">
-    {{row.nextRun | fmtTz | amDateFormat:'MMM DD, YYYY'}}
-  </span>
-</ng-template>
-
 <ng-template #runTimeTemplate let-value="value" let-row="row">
   <span *ngIf="row.duration > 0">{{value | amUtc | amDateFormat:'HH:mm:ss'}}</span>
   <span *ngIf="row.duration <= 0">{{'jobs.duration.running' | translate}}</span>
@@ -38,4 +31,17 @@
 
 <ng-template #transferredFormattedTemplate let-value="value">
   <span [innerHTML]="value | bytesSize"></span>
+</ng-template>
+
+<ng-template #actionsCell let-row="row">
+  <div class="btn-group" dropdown placement="bottom right">
+    <span dropdownToggle class="actionable">
+      <i class="fa fa-ellipsis-v text-primary"></i>
+    </span>
+    <ul *dropdownMenu class="dropdown-menu dropdown-menu-right">
+      <li *ngFor="let rowAction of rowActions" (click)="handleSelectedAction(row, rowAction)">
+        <a href="javascript:void(0);" class="dropdown-item">{{rowAction.label}}</a>
+      </li>
+    </ul>
+  </div>
 </ng-template>

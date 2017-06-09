@@ -26,9 +26,10 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   lastOperationResponse: OperationResponse = <OperationResponse>{};
 
   @ViewChild('destinationIconCell') destinationIconCellRef: TemplateRef<any>;
+  @ViewChild('verbStatusCellTemplate') verbStatusCellTemplate: TemplateRef<any>;
 
-  constructor(private t: TranslateService, private store: Store<fromRoot.State>) {
-    super();
+  constructor(private t: TranslateService, protected store: Store<fromRoot.State>) {
+    super(store);
   }
 
   private translateColumn(columnName: string): string {
@@ -45,8 +46,8 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
     ];
     this.columns = [
       {cellTemplate: this.statusCellTemplate, maxWidth: 25, minWidth: 25},
-      {prop: 'status', cellClass: 'text-cell', headerClass: 'text-header'},
-      {prop: 'name', cellClass: 'text-cell', headerClass: 'text-header'},
+      {prop: 'status', cellClass: 'text-cell', headerClass: 'text-header', cellTemplate: this.verbStatusCellTemplate},
+      {prop: 'name', cellClass: 'text-cell', headerClass: 'text-header', name: this.t.instant('common.policy')},
       {prop: 'sourceCluster', name: this.translateColumn('source_cluster')},
       {...TableComponent.makeFixedWith(20), name: '', cellTemplate: this.destinationIconCellRef},
       {prop: 'targetCluster', name: this.translateColumn('destination_cluster')},
@@ -76,13 +77,6 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
         prop: 'transferred',
         cellTemplate: this.transferredFormattedTemplate,
         name: this.translateColumn('transferred'),
-        cellClass: 'date-cell',
-        headerClass: 'date-header'
-      },
-      {
-        prop: 'nextRun',
-        cellTemplate: this.nextRunTemplate,
-        name: this.translateColumn('next_run'),
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },

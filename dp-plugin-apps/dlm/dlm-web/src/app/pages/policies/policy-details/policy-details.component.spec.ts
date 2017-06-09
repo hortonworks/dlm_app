@@ -22,6 +22,9 @@ import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { FrequencyPipe } from 'pipes/frequency.pipe';
 import { NavbarService } from 'services/navbar.service';
 import { FmtTzPipe } from 'pipes/fmt-tz.pipe';
+import { PolicyStatusFmtPipe } from 'pipes/policy-status-fmt.pipe';
+import { MockStore } from '../../../mocks/mock-store';
+import { Store } from '@ngrx/store';
 
 describe('PolicyDetailsComponent', () => {
   let component: PolicyDetailsComponent;
@@ -45,9 +48,13 @@ describe('PolicyDetailsComponent', () => {
         BytesSizePipe,
         FrequencyPipe,
         HdfsBrowserComponent,
-        FmtTzPipe
+        FmtTzPipe,
+        PolicyStatusFmtPipe
       ],
-      providers: [NavbarService]
+      providers: [
+        NavbarService,
+        {provide: Store, useClass: MockStore}
+      ]
     })
       .compileComponents();
   }));
