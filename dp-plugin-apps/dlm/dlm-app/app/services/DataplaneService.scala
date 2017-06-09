@@ -12,6 +12,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.{
 }
 import com.hortonworks.dataplane.commons.domain.Ambari.{
   ClusterServiceWithConfigs,
+  ClusterProperties,
   ConfigurationInfo,
   NameNodeInfo
 }
@@ -106,6 +107,12 @@ class DataplaneService @Inject()(
                 }
               case None => None
             }
+
+            val totalHosts : Option[Long] = cluster.properties match {
+              case Some(clusterProperties) => Some(clusterProperties.validate[ClusterProperties].get.total_hosts)
+              case None => None
+            }
+
             val beaconServiceDetails
               : Either[Errors, ClusterServiceEndpointDetails] =
               getBeaconEndpointDetails(endpointData)
@@ -118,6 +125,7 @@ class DataplaneService @Inject()(
                     "",
                     cluster.clusterUrl,
                     namenodeStats,
+                    totalHosts,
                     location,
                     Seq(beaconServiceDetails)
                   ))
