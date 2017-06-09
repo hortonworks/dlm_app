@@ -111,13 +111,13 @@
         "addAssets" : "Add Assets"
       },
       "ds-editor" : {
-        "ds-description" : "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum",
+        "ds-description" : "Organize your data-assets including Hive & Hbase tables, HDFS Files into logical groups for subsequent usage.",
         "information" : "Information",
         "assets" : "Assets",
         "summary" : "Summary",
-        "fillMandatoryMsg" : "All mandatory fields are not filled.",
-        "tagDescription" : "Some text Babu will provide, hopefully it will explain what is tagging in the context of dataset.",
-        "asset-description" : "Some text Babu would provide, probably which describes what are assets, how can one add them or remove them etc. Some text Babu would provide, probably which describes what are assets, how can one add them or remove them etc. Some text Babu would provide, probably which describes what are assets, how can one add them or remove them etc.",
+        "fillMandatoryMsg" : "Please fill mandatory fields",
+        "tagDescription" : "Add tags to your data-set for context and subsequent lookup",
+        "asset-description" : "Add related data assets into your data-set, by searching across the Data-Lake",
         "action" :{
           "next" : "Next",
           "save" : "Save",
@@ -133,7 +133,7 @@
         "advanced" : "Advanced",
         "filter" : "Filter",
         "reset" : "Reset",
-        "noSearchMsg" : "Some No Search Message",
+        "noSearchMsg" : "Please search for assets above or use Advanced Search",
         "cancel" : "Cancel",
         "done" : "Done"
       },
