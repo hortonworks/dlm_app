@@ -39,8 +39,8 @@
       </div>
     </div>
     <div class="justList" #table>
-      <div class="list displayAtCenter"  *ngIf="resultState == resultStates.EMPTY"><span>No Results!!</span></div>
-      <div class="list displayAtCenter"  *ngIf="resultState == resultStates.LOADING"><span>LOADING ...</span></div>
+      <div class="list displayAtCenter"  *ngIf="resultState == resultStates.EMPTY"><span>{{"pages.dataset.asset-search.noResultsMsg" | translate}}</span></div>
+      <div class="list displayAtCenter"  *ngIf="resultState == resultStates.LOADING"><span>{{"common.loading" | translate}} ...</span></div>
       <div *ngIf="dsAssets.length">
         <div class="listRow"  *ngFor="let asset of dsAssets;">
           <div class="col checkboxCont" *ngIf="selectionAllowed"><input type="checkbox"/></div>

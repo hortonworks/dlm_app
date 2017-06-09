@@ -2,6 +2,7 @@
 
 .dsEditorCont {
   min-height:100%;
+  width:100%;
   position: absolute;
   background-color: white;
 }
@@ -29,6 +30,9 @@
 
 .ds-description-head > p {
   margin-top: 10px;
+}
+.ds-description-head .description {
+  margin-top:5px;
 }
 
 .ds-editor-cont {
