@@ -22,7 +22,7 @@
   }
 }
 .panel-body {
-  padding: 15px;
+  padding: 0px 0px 15px 15px;
   border: 1px solid $iron;
 }
 
@@ -134,8 +134,8 @@
   .zoomButtonGroup {
     background-color: $white;
     position: absolute;
-    top: 4px;
-    right: 5px;
+    top: 15px;
+    right: 15px;
   }
 
   .legends {

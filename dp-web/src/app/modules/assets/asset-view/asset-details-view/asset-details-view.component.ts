@@ -5,6 +5,7 @@ import {AssetProperty} from '../../../../models/asset-property';
 import {AssetTag} from '../../../../models/asset-tag';
 import {AssetSchema} from '../../../../models/asset-schema';
 import {DateUtils} from '../../../../shared/utils/date-utils';
+import {StringUtils} from "../../../../shared/utils/stringUtils";
 
 export enum DetailsTabs {
   PROPERTIES, TAGS, SCHEMA
@@ -92,18 +93,19 @@ export class AssetDetailsViewComponent implements OnChanges {
       if (key === 'columns' || key === 'sd' || key === 'parameters') {
         return;
       }
-      let property = new AssetProperty(key);
-      property.value = attributes[key];
-      if (key === 'profileData' && attributes[key]) {
-        let rowCount = attributes[key].attributes['rowCount'];
-        property.value = `Row Count: ${rowCount}`;
-      } else if (key === 'db') {
-        property.value = attributes.qualifiedName.slice(0, attributes.qualifiedName.indexOf('.'));
-      } else if (key === 'lastAccessTime' || key === 'createTime') {
-        property.value = DateUtils.formatDate(attributes[key], 'DD MMM YYYY hh:mm:ss A');
+      let value = attributes[key];
+      if (attributes[key] && typeof attributes[key] === 'object' || Array.isArray(attributes[key])) {
+        value = StringUtils.getFlattenedObjects(value);
       }
+      if (key === 'lastAccessTime' || key === 'createTime' || key === 'endTime' || key === 'startTime') {
+        value = DateUtils.formatDate(attributes[key], 'DD MMM YYYY hh:mm:ss A');
+      } else if (key === 'db') {
+        value = attributes.qualifiedName.slice(0, attributes.qualifiedName.indexOf('.'));
+      }
+      let property = new AssetProperty(key, value);
       assetProps.push(property);
     });
     return assetProps;
   }
+
 }
