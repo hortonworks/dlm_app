@@ -1,7 +1,15 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpModule } from '@angular/http';
-import { CollapseModule, TabsModule, ModalModule, TypeaheadModule, TimepickerModule, TooltipModule } from 'ng2-bootstrap';
+import {
+  CollapseModule,
+  TabsModule,
+  ModalModule,
+  TypeaheadModule,
+  TimepickerModule,
+  TooltipModule,
+  BsDropdownModule
+} from 'ng2-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { StoreModule } from '@ngrx/store';
@@ -90,8 +98,8 @@ import { PairingProgressCardComponent } from './pages/pairings/components/pairin
 import { CreatePairingCardListComponent } from './pages/pairings/components/create-pairing-card-list/create-pairing-card-list.component';
 
 import { TranslateModule } from '@ngx-translate/core';
-import {MomentModule} from 'angular2-moment';
-import {ChartsModule} from 'ng2-charts/ng2-charts';
+import { MomentModule } from 'angular2-moment';
+import { ChartsModule } from 'ng2-charts/ng2-charts';
 
 import { TableComponent } from './common/table/table.component';
 import { TableFooterComponent } from './common/table/table-footer/table-footer.component';
@@ -103,6 +111,7 @@ import { BytesSizePipe } from './pipes/bytes-size.pipe';
 import { FmtTzPipe } from './pipes/fmt-tz.pipe';
 import { FrequencyPipe } from './pipes/frequency.pipe';
 import { TruncatePipe } from './pipes/truncate.pipe';
+import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
 
 @NgModule({
   imports: [
@@ -121,6 +130,7 @@ import { TruncatePipe } from './pipes/truncate.pipe';
     EffectsModule.run(EventEffects),
     EffectsModule.run(HdfsListEffects),
     CollapseModule.forRoot(),
+    BsDropdownModule.forRoot(),
     TabsModule.forRoot(),
     ModalModule.forRoot(),
     TypeaheadModule.forRoot(),
@@ -192,10 +202,12 @@ import { TruncatePipe } from './pipes/truncate.pipe';
     ModalDialogComponent,
     ModalDialogBodyComponent,
     NotificationsComponent,
+
     BytesSizePipe,
     FmtTzPipe,
     FrequencyPipe,
-    TruncatePipe
+    TruncatePipe,
+    PolicyStatusFmtPipe
   ],
   bootstrap: [DlmComponent],
   providers: [
@@ -213,4 +225,5 @@ import { TruncatePipe } from './pipes/truncate.pipe';
     httpServiceProvider
   ]
 })
-export class DlmModule { }
+export class DlmModule {
+}

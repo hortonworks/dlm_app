@@ -16,6 +16,10 @@ describe('StringUtils', () => {
       expect(StringUtils.capitalize('')).toBe('');
     });
 
+    it('should process uppercase string', () => {
+      expect(StringUtils.capitalize('ABC')).toBe('Abc');
+    });
+
   });
 
 });

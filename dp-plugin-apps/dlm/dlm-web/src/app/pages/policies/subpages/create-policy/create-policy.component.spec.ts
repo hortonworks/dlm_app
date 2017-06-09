@@ -23,6 +23,7 @@ import {TableFilterComponent} from 'common/table/table-filter/table-filter.compo
 import {ActionColumnComponent} from 'components/table-columns/action-column/action-column.component';
 import {NavbarService} from 'services/navbar.service';
 import {CheckboxColumnComponent} from 'components/table-columns/checkbox-column/checkbox-column.component';
+import { PolicyStatusFmtPipe } from 'pipes/policy-status-fmt.pipe';
 
 describe('CreatePolicyComponent', () => {
   let component: CreatePolicyComponent;
@@ -52,7 +53,8 @@ describe('CreatePolicyComponent', () => {
         TableFooterComponent,
         TableFilterComponent,
         ActionColumnComponent,
-        CheckboxColumnComponent
+        CheckboxColumnComponent,
+        PolicyStatusFmtPipe,
       ],
       providers: [
         {provide: Store, useClass: MockStore},

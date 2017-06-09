@@ -1,13 +1,15 @@
 <div class="row">
   <div class="col-lg-2 col-md-3 summary">
-    <h6>{{"page.policies.data_summary" | translate}}</h6>
-    <div class="row">
-      <div class="col-md-6 text-left">{{"common.folders" | translate}}</div>
-      <div class="col-md-6 text-right">23</div>
-    </div>
-    <div class="row">
-      <div class="col-md-6 text-left">{{"common.files" | translate}}</div>
-      <div class="col-md-6 text-right">456</div>
+    <div class="hidden">
+      <h6>{{"page.policies.data_summary" | translate}}</h6>
+      <div class="row">
+        <div class="col-md-6 text-left">{{"common.folders" | translate}}</div>
+        <div class="col-md-6 text-right">23</div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 text-left">{{"common.files" | translate}}</div>
+        <div class="col-md-6 text-right">456</div>
+      </div>
     </div>
     <br>
     <h6>{{"common.description" | translate}}</h6>
@@ -15,7 +17,11 @@
     <p>Should be used for all transactional data movement through the system.</p>
   </div>
   <div class="col-lg-10 col-md-9">
-    <dp-jobs-table *ngIf="contentType===policyContent.Jobs" class="clearfix" [showPageSizeMenu]="false" [jobs]="jobs"></dp-jobs-table>
+    <dp-jobs-table *ngIf="contentType===policyContent.Jobs"
+                   class="clearfix"
+                   [showPageSizeMenu]="false"
+                   [jobs]="jobs"
+                   [policy]="policy"></dp-jobs-table>
     <div *ngIf="contentType===policyContent.Files">
       <dlm-hdfs-browser [rootPath]="hdfsRootPath" [clusterId]="sourceCluster"></dlm-hdfs-browser>
     </div>
