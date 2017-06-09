@@ -37,18 +37,24 @@
       <thead>
         <tr>
           <th class="mdl-data-table__cell--non-numeric">Name</th>
-          <th class="mdl-data-table__cell--non-numeric">Description</th>
-          <th class="mdl-data-table__cell--non-numeric">Owner</th>
           <th class="mdl-data-table__cell--non-numeric">Type</th>
+          <th class="mdl-data-table__cell--non-numeric">Unique Values</th>
+          <th class="mdl-data-table__cell--non-numeric">Null Values</th>
+          <th class="mdl-data-table__cell--non-numeric">Max</th>
+          <th class="mdl-data-table__cell--non-numeric">Min</th>
+          <th class="mdl-data-table__cell--non-numeric">Mean</th>
           <th class="mdl-data-table__cell--non-numeric">Comment</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let schema of assetSchemas">
           <td class="mdl-data-table__cell--non-numeric">{{schema.name}}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{schema.description}}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{schema.owner}}</td>
           <td class="mdl-data-table__cell--non-numeric">{{schema.type}}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{schema.noOfUniques}}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{schema.noOfNulls}}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{schema.max}}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{schema.min}}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{schema.mean}}</td>
           <td class="mdl-data-table__cell--non-numeric">{{schema.comment}}</td>
         </tr>
       </tbody>
