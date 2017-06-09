@@ -27,7 +27,7 @@ export class HttpService extends Http {
   }
 
   buildUrl(url: string|Request): string|Request {
-    let apiPrefix = '/api/';
+    let apiPrefix = '/dlm/api/';
     // Proccess static assets without the api prefix
     const urlString: string = (typeof url === 'string') ? url : (<Request><any>url).url;
     if (urlString.indexOf('assets/') > -1) {

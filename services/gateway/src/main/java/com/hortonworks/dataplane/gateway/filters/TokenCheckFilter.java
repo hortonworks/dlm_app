@@ -62,7 +62,7 @@ public class TokenCheckFilter extends ZuulFilter {
     RequestContext ctx = RequestContext.getCurrentContext();
     String serviceId = ctx.get(SERVICE_ID_KEY).toString();
     // Check if its not a sign in call - Protect everything else
-    return serviceId.equals(Constants.DPAPP) && !ctx.getRequest().getServletPath().equals(AUTH_ENTRY_POINT);
+    return (serviceId.equals(Constants.DPAPP) || serviceId.equals(Constants.DLMAPP)) && !ctx.getRequest().getServletPath().equals(AUTH_ENTRY_POINT);
 
   }
 

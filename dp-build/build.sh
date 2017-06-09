@@ -13,7 +13,6 @@ clean_build() {
 	rm -rf build
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-db-service
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-app/dp-web
-	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-app/dlm-web
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-knox
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-cluster-service
  	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-gateway

@@ -1,6 +1,9 @@
 {
-  "/api": {
-    "target": "http://localhost:9005",
-    "secure": false
+  "/dlm/api/": {
+    "target": "http://localhost:9011",
+    "secure": false,
+    "pathRewrite": {
+      "^/dlm": ""
+    }
   }
 }

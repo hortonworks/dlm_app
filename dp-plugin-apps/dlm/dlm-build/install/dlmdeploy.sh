@@ -21,6 +21,9 @@ destroy() {
 
 
 init_app() {
+    echo "Enter the Host IP Address (Consul will bind to this host):"
+    read HOST_IP;
+    export CONSUL_HOST=$HOST_IP;
     docker-compose -f docker-compose-apps.yml up -d
 }
 
