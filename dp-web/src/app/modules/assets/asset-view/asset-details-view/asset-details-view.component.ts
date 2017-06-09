@@ -24,8 +24,9 @@ export class AssetDetailsViewComponent implements OnChanges {
   assetTags: AssetTag[] = [];
   assetSchemas: AssetSchema[] = [];
   @Input() assetDetails;
-  @Input() clusterId: string = '1989';
-  @Input() guid: string = '1cb2fd1e-03b4-401f-a587-2151865d375a';
+  @Input() clusterId: string;
+  @Input() guid: string;
+  rowCount: string = 'NA';
 
   constructor(private assetService: AssetService) {
   }
@@ -36,6 +37,9 @@ export class AssetDetailsViewComponent implements OnChanges {
     }
     this.assetProperties = this.extractAssetProperties(this.assetDetails.entity);
     this.assetTags = this.extractTags(this.assetDetails.entity.classifications);
+    if (this.assetDetails.entity.attributes.profileData && this.assetDetails.entity.attributes.profileData.attributes) {
+      this.rowCount = this.assetDetails.entity.attributes.profileData.attributes.rowCount;
+    }
     this.assetSchemas = this.extractSchema(this.assetDetails.referredEntities);
   }
 
@@ -53,22 +57,34 @@ export class AssetDetailsViewComponent implements OnChanges {
   private extractSchema(referredEntities) {
     let assetSchemas: AssetSchema[] = [];
     Object.keys(referredEntities).forEach(key => {
-      if (referredEntities[key].typeName !== 'hive_column') {
+      if (referredEntities[key].typeName !== 'hive_column' ||referredEntities[key].status === 'DELETED' ) {
         return;
       }
-      let schema: AssetSchema = new AssetSchema();
       let attributes = referredEntities[key].attributes;
+      let schema: AssetSchema = new AssetSchema();
       schema.name = attributes.name;
-      schema.owner = attributes.owner;
-      schema.description = attributes.description;
       schema.type = attributes.type;
       schema.comment = attributes.comment;
+      let profileData = attributes.profileData? attributes.profileData.attributes: null;
+      if(profileData){
+        this.populateProfileData(schema, profileData)
+      }
       assetSchemas.push(schema);
     });
     return assetSchemas;
   }
 
-  private extractAssetProperties(properties){
+  private populateProfileData(schema: AssetSchema, profileData: any){
+    if (schema.type.toLowerCase().indexOf('string') < 0) {
+      schema.min = profileData.minValue;
+      schema.max = profileData.maxValue;
+      schema.mean = profileData.meanValue;
+    }
+    schema.noOfUniques = profileData.cardinality;
+    schema.noOfNulls = this.rowCount !== 'NA' ? (parseInt(this.rowCount, 10) - profileData.nonNullData).toString() : 'NA';
+  }
+
+  private extractAssetProperties(properties) {
     let assetProps: AssetProperty[] = [];
     let attributes = properties.attributes;
     Object.keys(attributes).forEach(key => {

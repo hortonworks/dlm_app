@@ -1,7 +1,10 @@
 export class AssetSchema {
   name: string;
-  description: string;
-  owner: string;
   type: string;
+  noOfUniques: string;
+  noOfNulls: string;
+  max: string;
+  min: string;
+  mean: string;
   comment: string;
 }
