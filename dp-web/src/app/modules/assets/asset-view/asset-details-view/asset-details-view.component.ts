@@ -57,7 +57,7 @@ export class AssetDetailsViewComponent implements OnChanges {
   private extractSchema(referredEntities) {
     let assetSchemas: AssetSchema[] = [];
     Object.keys(referredEntities).forEach(key => {
-      if (referredEntities[key].typeName !== 'hive_column' ||referredEntities[key].status === 'DELETED' ) {
+      if (referredEntities[key].typeName !== 'hive_column' || referredEntities[key].status === 'DELETED') {
         return;
       }
       let attributes = referredEntities[key].attributes;
@@ -65,8 +65,8 @@ export class AssetDetailsViewComponent implements OnChanges {
       schema.name = attributes.name;
       schema.type = attributes.type;
       schema.comment = attributes.comment;
-      let profileData = attributes.profileData? attributes.profileData.attributes: null;
-      if(profileData){
+      let profileData = attributes.profileData ? attributes.profileData.attributes : null;
+      if (profileData) {
         this.populateProfileData(schema, profileData)
       }
       assetSchemas.push(schema);
@@ -74,8 +74,9 @@ export class AssetDetailsViewComponent implements OnChanges {
     return assetSchemas;
   }
 
-  private populateProfileData(schema: AssetSchema, profileData: any){
-    if (schema.type.toLowerCase().indexOf('string') < 0) {
+  private populateProfileData(schema: AssetSchema, profileData: any) {
+    let type = schema.type.toLowerCase();
+    if (type.indexOf('int') >= 0 || type.indexOf('decimal') >= 0 || type.indexOf('long') >= 0 || type.indexOf('float') >= 0 || type.indexOf('double') >= 0) {
       schema.min = profileData.minValue;
       schema.max = profileData.maxValue;
       schema.mean = profileData.meanValue;
