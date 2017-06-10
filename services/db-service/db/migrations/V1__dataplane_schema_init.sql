@@ -174,7 +174,7 @@ CREATE TABLE IF NOT EXISTS dataplane.data_asset (
   guid             VARCHAR(100) NOT NULL,
   asset_properties JSONB       NOT NULL,
   dataset_id       BIGINT REFERENCES dataplane.datasets (id) DEFAULT NULL,
-  cluster_id       BIGINT REFERENCES dataplane.discovered_clusters (id) NOT NULL
+  cluster_id       BIGINT REFERENCES dataplane.discovered_clusters (id) NOT NULL
 );
 
 -- Since datasets are boxes, we will need to store details
