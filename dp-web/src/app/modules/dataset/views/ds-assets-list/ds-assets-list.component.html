@@ -15,9 +15,9 @@
   <!--</div>-->
 
   <span class="actionButtonCont">
-    <button *ngIf="applicableActions.indexOf(actionEnum.REMOVE) != -1" class="mdl-button btn-hwx-secondary" (click)="actionRemove()">Remove All</button>
-    <button *ngIf="applicableActions.indexOf(actionEnum.ADD) != -1" class="mdl-button btn-hwx-secondary" (click)="actionAddMore()">Add Assets</button>
-    <button *ngIf="applicableActions.indexOf(actionEnum.EDIT) != -1" class="mdl-button btn-hwx-primary" (click)="actionEdit()">Edit</button>
+    <button *ngIf="applicableActions.indexOf(actionEnum.REMOVE) != -1" class="mdl-button btn-hwx-secondary" (click)="actionRemove()">{{"pages.dataset.ds-editor.action.removeAll" | translate}}</button>
+    <button *ngIf="applicableActions.indexOf(actionEnum.ADD) != -1" class="mdl-button btn-hwx-secondary" (click)="actionAddMore()">{{"pages.dataset.ds-editor.action.addMoreAssets" | translate}}</button>
+    <button *ngIf="applicableActions.indexOf(actionEnum.EDIT) != -1" class="mdl-button btn-hwx-primary" (click)="actionEdit()">{{"pages.dataset.ds-editor.action.edit" | translate}}</button>
   </span>
   <div style="clear: both;"></div>
 </div>
@@ -39,8 +39,8 @@
       </div>
     </div>
     <div class="justList" #table>
-      <div class="list displayAtCenter"  *ngIf="resultState == resultStates.EMPTY"><span>No Results!!</span></div>
-      <div class="list displayAtCenter"  *ngIf="resultState == resultStates.LOADING"><span>LOADING ...</span></div>
+      <div class="list displayAtCenter"  *ngIf="resultState == resultStates.EMPTY"><span>{{"pages.dataset.asset-search.noResultsMsg" | translate}}</span></div>
+      <div class="list displayAtCenter"  *ngIf="resultState == resultStates.LOADING"><span>{{"common.loading" | translate}} ...</span></div>
       <div *ngIf="dsAssets.length">
         <div class="listRow"  *ngFor="let asset of dsAssets;">
           <div class="col checkboxCont" *ngIf="selectionAllowed"><input type="checkbox"/></div>

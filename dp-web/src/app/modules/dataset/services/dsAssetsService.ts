@@ -104,7 +104,7 @@ export class DsAssetsService {
 
   extractAssetArrayFromDbData(dataArr: any[]) :DsAssetModel[]{
     let assetModelArr :DsAssetModel[] = [];
-    dataArr.forEach(ent=>{
+    dataArr && dataArr.forEach(ent=>{
       assetModelArr.push({
         creationTime: "-",
         id: ent.guid,
@@ -121,7 +121,7 @@ export class DsAssetsService {
 
   extractAssetArrayFromAtlasData(dataArr: any[]) :DsAssetModel[]{
     let assetModelArr :DsAssetModel[] = [];
-    dataArr.forEach(ent=>{
+    dataArr && dataArr.forEach(ent=>{
       assetModelArr.push({
         creationTime: "-",
         id: ent.guid,

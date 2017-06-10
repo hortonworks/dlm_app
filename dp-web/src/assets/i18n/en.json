@@ -29,6 +29,9 @@
       "analyst" : "Analyst",
       "infra" : "Infra Admin",
       "dlm":"DLM"
+    },
+    "pagination" : {
+      "rowsPerPage" : "Rows per page"
     }
   },
   "pages" : {
@@ -94,6 +97,7 @@
         "creator" : "Creator",
         "hive" : "Hive",
         "files" : "Files",
+        "name" : "Name",
         "createdBy" : "Created By",
         "hdfsFiles" : "HDFS Files",
         "hiveTables" : "Hive Tables",
@@ -105,6 +109,45 @@
         "datatype" : "Data Type",
         "selectOperator" : "Select Operator",
         "addAssets" : "Add Assets"
+      },
+      "ds-editor" : {
+        "ds-description" : "Organize your data-assets including Hive & Hbase tables, HDFS Files into logical groups for subsequent usage.",
+        "information" : "Information",
+        "assets" : "Assets",
+        "summary" : "Summary",
+        "fillMandatoryMsg" : "Please fill mandatory fields",
+        "tagDescription" : "Add tags to your data-set for context and subsequent lookup",
+        "asset-description" : "Add related data assets into your data-set, by searching across the Data-Lake",
+        "action" :{
+          "next" : "Next",
+          "save" : "Save",
+          "cancel" : "Cancel",
+          "edit" : "Edit",
+          "addAssets" : "Add Assets",
+          "removeAll" : "Remove All",
+          "addMoreAssets" : "Add More Assets"
+        }
+      },
+      "asset-search" : {
+        "search" : "Search",
+        "advanced" : "Advanced",
+        "filter" : "Filter",
+        "reset" : "Reset",
+        "noSearchMsg" : "Please search for assets above or use Advanced Search",
+        "noResultsMsg" : "No Results!!",
+        "cancel" : "Cancel",
+        "done" : "Done"
+      },
+      "asset-list" : {
+      },
+      "dashboard" : {
+        "tag-nav" : {
+          "tagSearchPlaceHolder" : "Tags"
+        },
+        "actions" : {
+          "addToFav" : "Add to Favourites",
+          "remFromFav" : "Remove from Favourites"
+        }
       }
     }
   }
