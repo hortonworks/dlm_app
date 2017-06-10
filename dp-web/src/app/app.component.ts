@@ -48,7 +48,7 @@ export class AppComponent implements OnInit {
 
   setHeaderData() {
     this.headerData.personas = [
-      new Persona('Analyst', [
+      new Persona('Data Steward', [
         new PersonaTabs('DATASETS', 'dataset'),
         new PersonaTabs('UNCLASSIFIED', 'unclassified'),
         new PersonaTabs('ASSETS', 'assets'),
@@ -57,12 +57,12 @@ export class AppComponent implements OnInit {
       new Persona('Infra Admin', [
         new PersonaTabs('CLUSTERS', 'infra')
       ], false),
-      new Persona('Analytics', [
-        new PersonaTabs('Workspace', 'workspace'),
-        new PersonaTabs('Assets', ''),
-        new PersonaTabs('Clusters', ''),
-        new PersonaTabs('Jobs', '')
-      ], false),
+      // new Persona('Analytics', [
+      //   new PersonaTabs('Workspace', 'workspace'),
+      //   new PersonaTabs('Assets', ''),
+      //   new PersonaTabs('Clusters', ''),
+      //   new PersonaTabs('Jobs', '')
+      // ], false),
       new Persona('DLM', [
       ], false)
     ];
