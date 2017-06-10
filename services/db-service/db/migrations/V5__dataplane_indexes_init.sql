@@ -15,3 +15,6 @@ CREATE INDEX IF NOT EXISTS idx_dp_locations on dataplane.locations(city);
 
 -- cluster services
  CREATE INDEX IF NOT EXISTS idx_dp_clusterservices_servicename on dataplane.cluster_services(service_name);
+
+-- workspaces
+ CREATE INDEX IF NOT EXISTS idx_dp_workspace_name on dataplane.dp_workspace(name);

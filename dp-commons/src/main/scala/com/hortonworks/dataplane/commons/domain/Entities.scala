@@ -110,8 +110,9 @@ object Entities {
   case class Workspace(
                         id: Option[Long] = None,
                         name: String,
+                        source: Long,
                         description: String,
-                        createdBy: Long,
+                        createdBy: Option[Long],
                         created: Option[LocalDateTime] = Some(LocalDateTime.now()),
                         updated: Option[LocalDateTime] = Some(LocalDateTime.now())
                       )
@@ -121,6 +122,13 @@ object Entities {
                              assetId: Long,
                              workspaceId: Long
                            )
+
+  case class NotebookWorkspace(
+                                notebookId: String,
+                                name: String,
+                                created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                                workspaceId: Long
+                              )
 
   case class EnabledSku(
                          skuId: Long,
@@ -211,6 +219,16 @@ object Entities {
   case class DatasetCreateRequest(dataset: Dataset, clusterId: Long, tags: Seq[String],
                                   assetQueryModels: Seq[AtlasSearchQuery],
                                   dataAssets: Seq[DataAsset] = Nil)
+
+  case class WorkspaceDataCount(asset: Int, notebook: Int)
+
+  case class WorkspaceDetails(
+                               workspace: Workspace,
+                               username: String,
+                               clustername: String,
+                               counts: Option[WorkspaceDataCount]
+                             )
+
 
 }
 
@@ -321,5 +339,11 @@ object JsonFormatters {
 
   implicit val richDatasetReads = defaultJson.reads[RichDataset]
   implicit val richDatasetWrites = Json.writes[RichDataset]
+
+  implicit val workspacesAndCountReads = Json.reads[WorkspaceDataCount]
+  implicit val workspacesAndCountWrites = Json.writes[WorkspaceDataCount]
+
+  implicit val workspaceDetailsReads = Json.reads[WorkspaceDetails]
+  implicit val workspaceDetailsWrites = Json.writes[WorkspaceDetails]
 
 }
