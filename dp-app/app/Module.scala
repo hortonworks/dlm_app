@@ -104,6 +104,13 @@ class Module extends AbstractModule {
     new WorkspaceServiceImpl(configuration.underlying)
   }
 
+  @Provides
+  @Singleton
+  @Named("assetWorkspaceService")
+  def provideAssetWorkspaceService(implicit ws: WSClient,configuration: Configuration): AssetWorkspaceService = {
+    new AssetWorkspaceServiceImpl(configuration.underlying)
+  }
+
 }
 
 @Singleton

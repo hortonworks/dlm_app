@@ -54,7 +54,7 @@ GET           /api/dataset/list/tag/:tagName                   controllers.DataS
 GET           /api/dataset/:id                                 controllers.DataSets.getRichDatasetById(id : Long)
 
 #Dataasset
-GET          /api/dataset/:id/assets                           controllers.DataSets.getDataAssetsByDatasetId(id:Long)
+GET           /api/dataset/:id/assets                          controllers.DataSets.getDataAssetsByDatasetId(id:Long)
 
 # Atlas API Search
 POST          /api/query-assets                                controllers.QueryAssets.search(clusterId: String)
@@ -69,7 +69,11 @@ GET           /api/assets/typeDefs/:clusterId/:defType         controllers.Query
 GET           /api/assets/lineage/:clusterId/:atlasGuid        controllers.QueryAttributes.getLineage(clusterId: String, atlasGuid: String)
 
 #Workspace API
-GET           /api/workspaces                              controllers.Workspaces.list
-GET           /api/workspaces/name/:name                   controllers.Workspaces.retrieve(name)
-POST          /api/workspaces                              controllers.Workspaces.create
-DELETE        /api/workspaces/name/:name                   controllers.Workspaces.delete(name)
+GET           /api/workspaces                                  controllers.Workspaces.list
+GET           /api/workspaces/name/:name                       controllers.Workspaces.retrieve(name)
+POST          /api/workspaces                                  controllers.Workspaces.create
+DELETE        /api/workspaces/name/:name                       controllers.Workspaces.delete(name)
+
+# WorkspaceAsset Api
+POST           /api/workspaces/assets                           controllers.AssetWorkspaces.add
+GET           /api/workspaces/:id/assets                        controllers.AssetWorkspaces.getAssets(id:Long)
