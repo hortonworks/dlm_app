@@ -186,4 +186,15 @@ object Webservice {
     def getConfig(key: String): Future[Option[DpConfig]]
   }
 
+  trait WorkspaceService extends DbClientService {
+    def list(): Future[Either[Errors, Seq[WorkspaceDetails]]]
+
+    def retrieve(name: String): Future[Either[Errors, WorkspaceDetails]]
+
+    def create(workspace: Workspace): Future[Either[Errors, Workspace]]
+
+    def delete(name: String): Future[Either[Errors, Int]]
+
+  }
+
 }

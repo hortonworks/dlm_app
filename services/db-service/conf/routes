@@ -65,8 +65,16 @@ PUT           /services/endpoints                                            con
 #Workspaces API
 GET           /workspaces                                                    controllers.Workspaces.all
 POST          /workspaces                                                    controllers.Workspaces.insert
+GET           /workspaces/name/:name                                         controllers.Workspaces.loadByName(name:String)
 GET           /workspaces/:workspaceId                                       controllers.Workspaces.load(workspaceId:Long)
 DELETE        /workspaces/:workspaceId                                       controllers.Workspaces.delete(workspaceId:Long)
+
+#Workspace Details API
+GET           /workspacedetails                                              controllers.Workspaces.allWithDetails
+GET           /workspacedetails/name/:name                                   controllers.Workspaces.loadByNameWithDetails(name:String)
+DELETE        /workspacedetails/name/:name                                   controllers.Workspaces.deleteByName(name:String)
+
+GET           /workspaces/users/:userId                                      controllers.Workspaces.loadByUser(userId:Long)
 
 
 #Asset workspace API
