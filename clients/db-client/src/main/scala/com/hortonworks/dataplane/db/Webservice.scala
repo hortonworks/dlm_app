@@ -64,7 +64,7 @@ object Webservice {
 
     def listRichDatasetByTag(tagName: String): Future[Either[Errors, Seq[RichDataset]]]
 
-    def getDataAssetByDatasetId(id:Long) : Future[Either[Errors, Seq[DataAsset]]]
+    def getDataAssetByDatasetId(id: Long): Future[Either[Errors, Seq[DataAsset]]]
 
     def retrieve(dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
 
@@ -195,6 +195,14 @@ object Webservice {
 
     def delete(name: String): Future[Either[Errors, Int]]
 
+  }
+
+  trait AssetWorkspaceService extends DbClientService {
+    def list(workspaceId: Long): Future[Either[Errors, Seq[DataAsset]]]
+
+    def create(assetReq: AssetWorkspaceRequest): Future[Either[Errors, Seq[DataAsset]]]
+
+    def delete(workspaceId: Long): Future[Either[Errors, Int]]
   }
 
 }

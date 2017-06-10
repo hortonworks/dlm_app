@@ -79,10 +79,8 @@ GET           /workspaces/users/:userId                                      con
 
 #Asset workspace API
 #Get assets for workspace
-GET           /assets/workspace/:workspaceId                                 controllers.AssetWorkspaces.assetsforWorkspace(workspaceId:Long)
-POST          /assets/workspace                                              controllers.AssetWorkspaces.add
-
-
+POST          /workspaces/assets                                             controllers.AssetWorkspaces.add
+GET           /workspaces/:workspaceId/assets                                controllers.AssetWorkspaces.assetsforWorkspace(workspaceId:Long)
 
 #Categories
 GET           /categories                                                    controllers.Categories.all

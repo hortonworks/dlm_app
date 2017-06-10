@@ -229,6 +229,10 @@ object Entities {
                                counts: Option[WorkspaceDataCount]
                              )
 
+  case class AssetWorkspaceRequest(workspaceId: Long, clusterId: Long,
+                                   assetQueryModels: Seq[AtlasSearchQuery],
+                                   dataAssets: Seq[DataAsset] = Nil)
+
 
 }
 
@@ -345,5 +349,8 @@ object JsonFormatters {
 
   implicit val workspaceDetailsReads = Json.reads[WorkspaceDetails]
   implicit val workspaceDetailsWrites = Json.writes[WorkspaceDetails]
+
+  implicit val assetWorkspaceRequestReads = defaultJson.reads[AssetWorkspaceRequest]
+  implicit val assetWorkspaceRequestWrites = Json.writes[AssetWorkspaceRequest]
 
 }
