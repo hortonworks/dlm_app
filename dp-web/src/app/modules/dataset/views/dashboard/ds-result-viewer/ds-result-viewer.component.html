@@ -1,6 +1,6 @@
 <div class="ds-result-viewer borderBox">
   <div class="list">
-    <div *ngIf="!datasetModels">Loading...</div>
+    <div *ngIf="!datasetModels">{{"common.loading" | translate}}...</div>
     <div *ngIf="datasetModels && view === views.grid">
       <ds-tile-proxy *ngFor="let dsMdl of datasetModels" [dsModel]="dsMdl"></ds-tile-proxy>
       <div style="clear:both"></div>

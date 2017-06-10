@@ -21,4 +21,7 @@ main {
 }
 
 .page-content {
+  min-height: calc(100vh - 55px);
+  position: relative;
 }
+

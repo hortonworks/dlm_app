@@ -1,5 +1,5 @@
 <span class="paginationRow">
-  <span>Rows Per Page</span>
+  <span>{{"common.pagination.rowsPerPage" | translate}}</span>
   <span class="pageSizeSpan">
     <select [(ngModel)]="pageSize" (change)="pageSizeChange()">
       <option *ngFor="let opt of pageSizeOptions;" [value]="opt">{{opt}}</option>

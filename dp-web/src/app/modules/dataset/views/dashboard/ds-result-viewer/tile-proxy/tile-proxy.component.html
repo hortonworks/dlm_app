@@ -10,20 +10,20 @@
         <li class="mdl-menu__item"><i class="fa fa-close"></i>Delete</li>
         <li class="mdl-menu__item">
           <i class="fa fa-star"></i>
-          <span *ngIf="dsModel.favourite">Remove from Favourites</span>
-          <span *ngIf="!dsModel.favourite">Add to Favourites</span>
+          <span *ngIf="dsModel.favourite">{{"pages.dataset.dashboard.actions.remFromFav" | translate}}</span>
+          <span *ngIf="!dsModel.favourite">{{"pages.dataset.dashboard.actions.addToFav" | translate}}</span>
         </li>
       </label>
     </span>
   </div>
   <div class="metaInfo">
-    <div><div class="label">DATALAKE:</div><b>{{dsModel.datalakeName}}</b></div>
-    <div><div class="label">CREATOR:</div><b>{{dsModel.creatorName}}</b></div>
+    <div><div class="label">{{("common.datalake" | translate).toUpperCase()}}</div>:&nbsp;<b>{{dsModel.datalakeName}}</b></div>
+    <div><div class="label">{{("pages.dataset.labels.createdBy" | translate).toUpperCase()}}</div>:&nbsp;<b>{{dsModel.creatorName}}</b></div>
   </div>
 
   <div class="footer">
-    <div class="division"><span>HIVE:</span><span>{{dsModel.counts.hiveCount}}</span></div>
-    <div class="division border-left"><span>FILES:</span><span>{{dsModel.counts.filesCount}}</span></div>
+    <div class="division"><span>{{("pages.dataset.labels.hive" | translate).toUpperCase()}}:</span><span>{{dsModel.counts.hiveCount}}</span></div>
+    <div class="division border-left"><span>{{("pages.dataset.labels.files" | translate).toUpperCase()}}:</span><span>{{dsModel.counts.filesCount}}</span></div>
   </div>
 </div>
 
