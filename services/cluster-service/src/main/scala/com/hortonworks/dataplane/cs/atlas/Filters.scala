@@ -17,7 +17,10 @@ object Filters {
     new GreaterThanPredicate(),
     new GreaterThanEqualsPredicate(),
     new NotEqualsPredicate(),
-    new NotEqualsStringPredicate()
+    new NotEqualsStringPredicate(),
+    new StringContainsPredicate(),
+    new StringStartsWithPredicate(),
+    new StringEndsWithPredicate()
   )
 
   def query(atlasFilters: AtlasSearchQuery) = {
@@ -141,5 +144,43 @@ object Filters {
       dataType == "string" && atlasFilter.operation == "nte"
     }
   }
+
+  private class StringContainsPredicate extends Predicate {
+
+    override def isApplicable(atlasFilter: AtlasFilter): Boolean = {
+      val dataType = atlasFilter.atlasAttribute.dataType
+      dataType == "string" && atlasFilter.operation == "contains"
+    }
+
+    override def apply(atlasFilter: AtlasFilter): Query = {
+      Query(s"${atlasFilter.atlasAttribute.name} like '*${atlasFilter.operand}*'")
+    }
+  }
+
+
+  private class StringStartsWithPredicate extends Predicate {
+
+    override def isApplicable(atlasFilter: AtlasFilter): Boolean = {
+      val dataType = atlasFilter.atlasAttribute.dataType
+      dataType == "string" && atlasFilter.operation == "startsWith"
+    }
+
+    override def apply(atlasFilter: AtlasFilter): Query = {
+      Query(s"${atlasFilter.atlasAttribute.name} like '${atlasFilter.operand}*'")
+    }
+  }
+
+  private class StringEndsWithPredicate extends Predicate {
+
+    override def isApplicable(atlasFilter: AtlasFilter): Boolean = {
+      val dataType = atlasFilter.atlasAttribute.dataType
+      dataType == "string" && atlasFilter.operation == "endsWith"
+    }
+
+    override def apply(atlasFilter: AtlasFilter): Query = {
+      Query(s"${atlasFilter.atlasAttribute.name} like '*${atlasFilter.operand}'")
+    }
+  }
+
 
 }
