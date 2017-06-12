@@ -90,7 +90,6 @@ class Clusters @Inject()(
   }
 
   import models.ClusterHealthData._
-  import com.hortonworks.dataplane.commons.domain.Ambari._
   def getHealth(clusterId: Long, summary: Option[Boolean]) = Action.async {
     Logger.info("Received get cluster health request")
 

@@ -27,4 +27,24 @@ export class ClusterHealthSummary {
   };
 }
 
+export class ClusterDetails {
+ nodes: number;
+ size: string;
+ securityType: number;
+ location: string;
+ noOfSerices: number;
+ heapSizeUsed: string;
+ heapSizeTotal: string;
+ healthyNodes: number;
+ hdfsTotal: string;
+ hdfsUsed: string;
+ hdpVersion: string;
+ unhealthyNodes: number;
+ networkUsage: number;
+ ldapUrl: string;
+ tags: string;
+ uptime: string;
+ status: string;
+}
+
 
