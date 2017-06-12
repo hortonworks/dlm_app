@@ -127,6 +127,8 @@ class AmbariClusterInterface(
         host.get
       }
 
+      val metrics = (nnr.json \ "metrics").getOrElse(Json.obj())
+
       val items = (nnpr.json \ "items").as[JsArray]
       val configs =
         (items(0) \ "configurations").as[JsArray]
@@ -134,7 +136,7 @@ class AmbariClusterInterface(
       NameNode(
         hosts.map(ServiceHost),
         Some(
-          Json.obj("stats" -> serviceComponent.get, "properties" -> configs)))
+          Json.obj("stats" -> serviceComponent.get,"metrics" -> metrics, "properties" -> configs)))
     }
 
     nameNodeInfo.map(Right(_)).recoverWith {
@@ -358,4 +360,5 @@ class AmbariClusterInterface(
     }
 
   }
+
 }
