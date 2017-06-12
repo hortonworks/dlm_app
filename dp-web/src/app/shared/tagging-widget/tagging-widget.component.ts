@@ -61,8 +61,10 @@ export class TaggingWidget {
         break;
       case 13  :
         this._manageSelection();
+      case 9:
+        return;
     }
-    (thisObj => setTimeout(() => thisObj._manageFocus(), 0))(this);
+    setTimeout(() => this._manageFocus(), 0);
   }
 
   _SetCursorAtEnd() {
@@ -92,7 +94,7 @@ export class TaggingWidget {
 
   removeFocusTag() {
     this.deleteTagEmitter.emit(this.tags.splice(this.focusStickerIndex, 1)[0]);
-    (thisObj => setTimeout(() => thisObj._SetCursorAtEnd(), 0))(this);
+    setTimeout(() => this._SetCursorAtEnd(), 0);
   }
 
   onInputFocus() {
@@ -101,7 +103,7 @@ export class TaggingWidget {
   }
 
   onInputBlur() {
-    (thisObj => setTimeout(() => thisObj.parent.nativeElement.classList.remove("focus"), 300))(this);
+    setTimeout(() => this.parent.nativeElement.classList.remove("focus"), 300);
     // this.parent.nativeElement.classList.remove('focus')
   }
 
