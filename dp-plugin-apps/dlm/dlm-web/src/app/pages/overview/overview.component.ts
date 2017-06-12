@@ -22,6 +22,7 @@ import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-exter
 import { Policy } from 'models/policy.model';
 import { Cluster } from 'models/cluster.model';
 import { Job } from 'models/job.model';
+import { filterCollection, flatten, unique } from 'utils/array-util';
 
 const POLICIES_REQUEST = 'POLICIES_REQUEST';
 const CLUSTERS_REQUEST = 'CLUSTERS_REQUEST';
@@ -59,28 +60,16 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.tableResources$ = store.select(getPolicyClusterJob);
   }
 
-  protected filterByJobs(policy, filters) {
-    const job = policy.lastJobResource;
-    if (!job) {
-      return true;
-    }
-    if (!filters.timeRange) {
-      return true;
-    }
-    const timestamp = moment().subtract(1, filters.timeRange.toLowerCase()).unix() * 1000;
-    return !filters.timeRange || !job.endTime ? true
-      : job.endTime > timestamp;
-  };
+  prepareChartData(jobs: Job[], policies: Policy[], clusters: Cluster[], filters) {
+    const filteredPolicies = policies.filter(policy => this.filterPolicyByJob(policy, filters));
+    const filteredPolicyNames = filteredPolicies.map(p => p.name);
+    const filteredJobs = filterCollection(jobs, {name: filteredPolicyNames});
+    const clusterNamesByPolicies = unique(flatten(filteredPolicies.map(p => [p.targetCluster, p.sourceCluster])));
+    const filteredClusters = filterCollection(clusters, {name: clusterNamesByPolicies});
+    return this.mapResourceData(filteredJobs, filteredPolicies, filteredClusters);
+  }
 
-  protected mapTableData(policy) {
-    const job = policy.lastJobResource;
-    return {
-      ...policy,
-      service: job ? POLICY_TYPES_LABELS[job.executionType] : ''
-    };
-  };
-
-  mapResourceData = ([jobs, policies, clusters]): ResourceChartData => {
+  mapResourceData(jobs: Job[], policies: Policy[], clusters: Cluster[]): ResourceChartData {
     return {
       clusters: {data: [clusters.length], labels: ['Registered']},
       policies: this.makeResourceData('policies', policies),
@@ -97,19 +86,39 @@ export class OverviewComponent implements OnInit, OnDestroy {
     };
   }
 
+  mapTableData(policy: Policy) {
+    const job = policy.lastJobResource;
+    return {
+      ...policy,
+      service: job ? POLICY_TYPES_LABELS[job.executionType] : ''
+    };
+  }
+
+  filterPolicyByJob(policy: Policy, filters) {
+    const {lastJobResource: job} = policy;
+    if (!job || !filters.timeRange) {
+      return true;
+    }
+    const timestamp = moment().subtract(1, filters.timeRange.toLowerCase()).unix() * 1000;
+    return !job.endTime ? true : new Date(job.endTime).getTime() > timestamp;
+  }
+
   ngOnInit() {
     this.clustersSubscription = this.clusters$
       .filter(clusters => !!clusters.length)
       .distinctUntilChanged(null, clusters => clusters.map(cluster => cluster.id).join('@') + '_LENGTH' + clusters.length)
       .subscribe(clusters => this.store.dispatch(loadJobsForClusters(clusters.map(cluster => cluster.id), JOBS_REQUEST)));
 
-    this.resourceChartData$ = Observable.combineLatest(this.jobs$, this.policies$, this.clusters$).map(this.mapResourceData);
+    this.resourceChartData$ = Observable
+      .combineLatest(this.jobs$, this.tableResources$, this.clusters$, this.overviewJobsExternalFiltersService.filters$)
+      .map(([jobs, policies, clusters, filters]) => this.prepareChartData(jobs, policies, clusters, filters));
 
     this.tableData$ = Observable
       .combineLatest(this.tableResources$, this.overviewJobsExternalFiltersService.filters$)
       .map(([policies, filters]) => policies
-        .filter(policy => this.filterByJobs(policy, filters))
+        .filter(policy => this.filterPolicyByJob(policy, filters))
         .map(policy => this.mapTableData(policy)));
+
     [
       loadPolicies(POLICIES_REQUEST),
       loadClusters(CLUSTERS_REQUEST)

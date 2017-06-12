@@ -12,6 +12,7 @@ export interface Policy {
   targetCluster: string;
   sourceClusterResource?: Cluster;
   targetClusterResource?: Cluster;
+  lastJobResource?: Job;
   jobsResource?: Job[];
   sourceDataset: string;
   targetDataset: string;
