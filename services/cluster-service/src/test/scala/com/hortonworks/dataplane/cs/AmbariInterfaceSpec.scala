@@ -100,6 +100,9 @@ class AmbariInterfaceSpec
       assert(either.isRight)
       assert(either.right.get.serviceHost.size == 1)
       assert(either.right.get.props.isDefined)
+      assert((either.right.get.props.get \ "stats").isDefined)
+      assert((either.right.get.props.get \ "metrics").isDefined)
+      assert(((either.right.get.props.get \ "metrics") \ "jvm").isDefined)
       //verify the first one
       assert(either.right.get.serviceHost(0).host == "yusaku-beacon-2.c.pramod-thangali.internal")
     }
