@@ -4,7 +4,7 @@
   padding-right: 5px;
 }
 .details-container{
-  padding-left: 25px;
+  padding: 25px 25px;
 }
 .overflow-ellipsis {
   text-overflow: ellipsis;
@@ -34,5 +34,15 @@
   margin-top: 3px;
   font-weight: 500;
   width: 70%;
+}
+
+.center {
+  margin-top: 50%;
+  margin-bottom: 50%
+}
+
+.title-container {
+  padding: 5px 10px;
+  text-align: left
 }
 
