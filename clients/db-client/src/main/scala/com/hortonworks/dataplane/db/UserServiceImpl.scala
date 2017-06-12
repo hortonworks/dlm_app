@@ -30,6 +30,15 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       }
   }
 
+  override def loadUserById(id: String): Future[Either[Errors, User]] = {
+    ws.url(s"$url/users?id=$id")
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map { res =>
+        mapToUser(res)
+      }
+  }
+
   private def mapToUser(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results")(0).validate[User].get)

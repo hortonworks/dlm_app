@@ -37,6 +37,8 @@ object Webservice {
 
     def loadUser(username: String): Future[Either[Errors, User]]
 
+    def loadUserById(id: String): Future[Either[Errors, User]]
+
     def getUserRoles(userName: String): Future[Either[Errors, UserRoles]]
 
     def addUser(user: User): Future[Either[Errors, User]]

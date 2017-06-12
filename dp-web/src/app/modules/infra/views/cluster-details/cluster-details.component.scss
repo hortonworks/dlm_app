@@ -1,0 +1,220 @@
+@import "../../../../../styles/_variables.scss";
+
+
+.breadcrumb-container{
+  height:45px;
+  background-color: $albaster-gray;
+  span {
+    padding: 15px 0px;
+    display: inline-block;
+    font-size: 20px;
+  }
+  .link {
+    color: $eastern-blue;
+    cursor: pointer;
+  }
+}
+
+.no-top-bottom-space {
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+  margin-top: 0px !important;
+}
+
+a {
+  color: $eastern-blue;
+  text-decoration-line: none;
+}
+
+.page-container {
+  font-family: "Roboto";
+  background-color: $gallery-gray;
+  height:auto;
+  padding : 7px 0px 5px 1px;
+}
+
+.details-container {
+  padding-top: 0px;
+}
+
+.text-large {
+  display: block;
+  color: $dove-gray;
+  font-size: 20px;
+  font-weight: 500;
+  margin: 6px 6px;
+  line-height: 20px;
+}
+
+.text-dark-small-1 {
+  display: block;
+  color: $dove-gray;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.text-medium {
+  display: block;
+  color: $dusty-gray;
+  font-size: 15px;
+  line-height: 15px;
+}
+
+.text-small-1 {
+  display: block;
+  color: $dusty-gray;
+  font-size: 13px;
+  margin: 5px 0px;
+}
+
+.fa-server {
+  color: $dove-gray;
+  display: inline-block;
+  float: left;
+  margin: 6px 6px;
+  font-size: 20px;
+}
+
+.fa-circle--color-up {
+  color: $forest-green-1;
+  margin-right: 5px;
+}
+
+.fa-circle--color-down {
+  color : $burnt-cienna-red;
+  margin-right: 5px;
+}
+
+.fa-circle--color-na {
+  color : $shuttle-gray;
+  margin-right: 5px;
+}
+
+.mdl-data-table {
+  width: 97%;
+  margin-left : 1%;
+  border: none;
+  margin-top: 40px;
+  margin-right: 30px;
+}
+
+.mdl-data-table {
+  thead {
+    .actions {
+      width: 75px;
+    }
+
+    th {
+      height: 30px;
+      padding: 6px 18px 6px 6px;
+    }
+  }
+  tbody {
+    tr {
+      height: 30px;
+
+      &:hover {
+        background-color:#E7F4F9;
+      }
+    }
+    td {
+      height: 30px;
+      padding: 6px 18px 6px 6px;
+    }
+
+    .actions {
+      padding-top: 0px;
+      padding-bottom: 0px;
+    }
+  }
+}
+
+.mdl-data-table th {
+  color: #ABABAB;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.mdl-data-table__cell--clickable {
+  color: #2192bf;
+  cursor: pointer;
+}
+
+.mdl-data-table__cell--non-clickable{
+  color : #7e898d
+}
+
+.mdl-data-table__cell--placeholder{
+  width:1%
+}
+
+.fa__fa-ellipsis-v--icon {
+  font-size: 12px;
+}
+.mdl-tabs__tab-bar {
+  justify-content: flex-start;
+  a, a.is-active {
+    color: $dusty-gray;
+  }
+}
+
+.mdl-tabs.is-upgraded .mdl-tabs__tab.is-active:after{
+  background: $fruit-salad;
+  height: 5px;
+}
+
+.summary-pane-6 ul {
+  border: none;
+}
+
+.summary-pane-6 li {
+  background-color: $white;
+  div{
+    padding: 0px;
+  }
+  .text-small-1{
+    padding-top: 10px;
+    padding-left: 10px;
+  }
+  .text-dark-small-1{
+    padding-bottom: 10px;
+    padding-left: 10px;
+  }
+}
+
+.dp-progress {
+  width: 150px;
+  margin: 10px 10px 10px 0px;
+}
+
+.progress-percent {
+  padding: 5px;
+  font-weight: 500;
+}
+
+.placeholder{
+  clear: both;
+}
+
+:host /deep/ .mdl-progress > .progressbar{
+  background-color: $forest-green-1;
+}
+
+:host /deep/ .mdl-progress > .bufferbar{
+  background-image: linear-gradient(to right, rgba(255,255,255, 0.7), rgba(255,255,255, 0.7)), linear-gradient(to right, $shuttle-gray, $shuttle-gray);
+}
+
+.refresh-btn {
+  min-width: 40px !important;
+  padding: 9px 10px;
+  margin-right: 5px;
+}
+
+.margin-right-10{
+  margin-right: 10px;
+}
+
+.white-bg{
+  background-color: $white;
+}
+
