@@ -15,7 +15,7 @@ class FilterSpec extends FlatSpec with Matchers {
     val output = Filters.query(AtlasSearchQuery(
       Seq(AtlasFilter(AtlasAttribute("owner", "string"), "equals", "admin"))))
 
-    assert(output == "WHERE owner='admin'")
+    assert(output == "where owner='admin'")
 
   }
 
@@ -26,7 +26,7 @@ class FilterSpec extends FlatSpec with Matchers {
       Seq(AtlasFilter(AtlasAttribute("owner", "string"), "equals", "admin"),
         AtlasFilter(AtlasAttribute("name", "string"), "equals", "trucks"))))
 
-    assert(output == "WHERE owner='admin' AND name='trucks'")
+    assert(output == "where owner='admin' and name='trucks'")
 
   }
 
@@ -37,7 +37,7 @@ class FilterSpec extends FlatSpec with Matchers {
         AtlasFilter(AtlasAttribute("name", "string"), "equals", "trucks"),
         AtlasFilter(AtlasAttribute("created", "date"), "gte", "21-01-2017"))))
 
-    assert(output == "WHERE owner='admin' AND name='trucks' AND created>=21-01-2017")
+    assert(output == "where owner='admin' and name='trucks' and created>=21-01-2017")
 
   }
 
@@ -47,7 +47,16 @@ class FilterSpec extends FlatSpec with Matchers {
       Seq(AtlasFilter(AtlasAttribute("owner", "string"), "equals", "admin"),
         AtlasFilter(AtlasAttribute("temporary", "boolean"), "equals", "false"))))
 
-    assert(output == "WHERE owner='admin' AND temporary=false")
+    assert(output == "where owner='admin' and temporary=false")
+  }
+
+
+  it should "construct DSL queries for partial String matches" in {
+    val output = Filters.query(AtlasSearchQuery(
+      Seq(AtlasFilter(AtlasAttribute("owner", "string"), "contains", "dmi"),AtlasFilter(AtlasAttribute("owner", "string"), "startsWith", "adm"),AtlasFilter(AtlasAttribute("owner", "string"), "endsWith", "min"),
+        AtlasFilter(AtlasAttribute("temporary", "boolean"), "equals", "false"))))
+
+    assert(output == "where owner like '*dmi*' and owner like 'adm*' and owner like '*min' and temporary=false")
   }
 
 }
