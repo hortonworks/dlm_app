@@ -121,15 +121,14 @@ export class LakesListComponent implements OnChanges {
             return val1.localeCompare(val2);
           }
           if ($event.type === 'number') {
-            return val1 < val2;
+            return val1 > val2;
           }
         }
-
         if ($event.type === 'string') {
           return val2.localeCompare(val1);
         }
         if ($event.type === 'number') {
-          return val2 < val1;
+          return val1 < val2;
         }
       } catch (e) {
       }
@@ -158,13 +157,13 @@ export class LakeInfo {
   uptime?: string;
   uptimeStr?: string;
 
-  get hdfsUsedInBytes() {
+  get hdfsUsedInBytes(): number {
     return this.toBytes(this.hdfsUsed);
   }
 
   private toBytes(byteWithSize) {
     if (byteWithSize === 'NA') {
-      return 'NA';
+      return 0;
     } else {
       let values = byteWithSize.trim().split(' ');
       let size = values[1];
