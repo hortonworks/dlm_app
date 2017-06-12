@@ -8,8 +8,8 @@ declare const L: any;
 @Injectable()
 export class GeographyService {
 
-  urlBase = '/assets/geojson/geo-no-antartica.json';
-  urlCountries = '/assets/geojson/countries.json';
+  urlBase = '/dlm/assets/geojson/geo-no-antartica.json';
+  urlCountries = '/dlm/assets/geojson/countries.json';
 
   constructor(private http: Http) {}
 
