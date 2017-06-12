@@ -18,7 +18,8 @@ export class NodeDetailsComponent implements OnInit {
   assetProperties: AssetProperty[] = [];
   assetDetails: AssetDetails;
   name: string;
-  iconSrc: string
+  iconSrc: string;
+  fetchInProgress = true;
 
   readonly entityState = {
     'ACTIVE': false,
@@ -33,6 +34,7 @@ export class NodeDetailsComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe(params => {
+      this.fetchInProgress = true;
       this.clusterId = this.route.parent.snapshot.params['id'];
       this.guid = this.route.snapshot.params['guid'];
       this.assetService.getDetails(this.clusterId, this.guid).subscribe(details => {
@@ -40,7 +42,10 @@ export class NodeDetailsComponent implements OnInit {
         this.assetProperties = this.extractAssetProperties(details.entity);
         this.name = details.entity['attributes'].name;
         this.iconSrc = this.getIcon();
-      });
+        this.fetchInProgress = false;
+      }, (error => {
+        this.fetchInProgress = false;
+      }));
     });
   }
 
@@ -69,7 +74,6 @@ export class NodeDetailsComponent implements OnInit {
   backToLineage() {
     this.router.navigate(['../'], {relativeTo: this.route});
   }
-
 
 
   getIcon() {
