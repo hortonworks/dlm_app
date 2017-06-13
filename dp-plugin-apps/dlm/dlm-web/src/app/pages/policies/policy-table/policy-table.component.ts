@@ -21,6 +21,11 @@ import { FlowStatusComponent } from './flow-status/flow-status.component';
 import { PolicyContent } from '../policy-details/policy-content.type';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { POLICY_TYPES } from 'constants/policy.constant';
+import { loadFullDatabases } from 'actions/hivelist.action';
+import { HiveDatabase } from 'models/hive-database.model';
+import { getDatabase } from 'selectors/hive.selector';
+import { HiveService } from 'services/hive.service';
 
 @Component({
   selector: 'dlm-policy-table',
@@ -34,6 +39,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   jobs$: Observable<Job[]>;
   filteredJobs$: Observable<Job[]>;
   selectedPolicy$: BehaviorSubject<Policy> = new BehaviorSubject(<Policy>{});
+  policyDatabase$: Observable<HiveDatabase>;
   policyContent = PolicyContent;
 
   private selectedAction: ActionItemType;
@@ -72,11 +78,13 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     {label: 'Activate', name: 'ACTIVATE', disabledFor: 'RUNNING'}
   ];
 
-  constructor(private t: TranslateService, private store: Store<fromRoot.State>) {
-    this.jobs$ = this.store.select(getAllJobs);
+  constructor(private t: TranslateService, private store: Store<fromRoot.State>, private hiveService: HiveService) {
+    this.jobs$ = store.select(getAllJobs);
     this.filteredJobs$ = Observable.combineLatest(this.jobs$, this.selectedPolicy$).map(([jobs, selectedPolicy]) => {
       return selectedPolicy ? jobs.filter(job => job.name === selectedPolicy.id) : [];
     });
+    this.policyDatabase$ = this.selectedPolicy$
+      .mergeMap(policy => store.select(getDatabase(this.hiveService.makeDatabaseId(policy.sourceDataset, policy.sourceCluster))));
   }
 
   ngOnInit() {
@@ -165,45 +173,47 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
    */
   toggleRowDetail(policy: Policy, contentType: PolicyContent) {
     const selectedPolicy = this.selectedPolicy$.getValue();
-    if (contentType === PolicyContent.Jobs) {
-      if (selectedPolicy && selectedPolicy.id === policy.id) {
-        if (this.activeContentType === contentType) {
-          this.tableComponent.toggleRowDetail(policy);
-        } else {
-          this.activeContentType = contentType;
-          this.store.dispatch(loadJobsForPolicy(policy));
-          if (!this.tableComponent.expandedRows[policy.id]) {
-            this.tableComponent.toggleRowDetail(policy);
-          }
-        }
-      } else {
-        this.activeContentType = contentType;
-        this.selectedPolicy$.next(policy);
-        this.store.dispatch(loadJobsForPolicy(policy));
-        this.tableComponent.toggleRowDetail(policy);
-      }
-    } else if (contentType === PolicyContent.Files) {
-      // todo: Remove this hack once policies API supports unique identification of cluster
-      const clusterId = this.clusters.filter(cluster => cluster.name === policy.sourceCluster)[0].id;
-      if (selectedPolicy && selectedPolicy.id === policy.id) {
-        if (this.activeContentType === contentType) {
-          this.tableComponent.toggleRowDetail(policy);
-        } else {
-          this.activeContentType = contentType;
-          this.sourceCluster = clusterId;
-          this.hdfsRootPath = policy.sourceDataset;
-          if (!this.tableComponent.expandedRows[policy.id]) {
-            this.tableComponent.toggleRowDetail(policy);
-          }
-        }
-      } else {
-        this.activeContentType = contentType;
-        this.selectedPolicy$.next(policy);
-        this.sourceCluster = clusterId;
-        this.hdfsRootPath = policy.sourceDataset;
-        this.tableComponent.toggleRowDetail(policy);
-      }
+    this.toggleSelectedRow(policy, contentType);
+    this.activatePolicy(policy, contentType);
+    this.loadContentDetails(policy, contentType);
+  }
+
+  activatePolicy(policy, contentType) {
+    this.activeContentType = contentType;
+    this.selectedPolicy$.next(policy);
+  }
+
+  toggleSelectedRow(nextPolicy, contentType) {
+    const selectedPolicy = this.selectedPolicy$.getValue();
+    const isContentChanged = contentType !== this.activeContentType;
+    const isPolicyChanged = selectedPolicy.id !== nextPolicy.id;
+    // always open details on сollapsed item
+    if (!this.tableComponent.expandedRows[nextPolicy.id]) {
+      this.tableComponent.toggleRowDetail(nextPolicy);
+      // collapse active policy and show selected when non-active policy clicked
+    } else if (isPolicyChanged) {
+      this.tableComponent.toggleRowDetail(selectedPolicy);
+      this.tableComponent.toggleRowDetail(nextPolicy);
+      // collapse active policy when clicked on same content toggler e.g. policy name, prev jobs
+    } else if (!isContentChanged) {
+      this.tableComponent.toggleRowDetail(selectedPolicy);
     }
   }
 
+  loadContentDetails(policy, contentType) {
+    if (!this.tableComponent.expandedRows[policy.id]) {
+      return;
+    }
+    if (contentType === PolicyContent.Files) {
+      if (policy.type === POLICY_TYPES.HIVE) {
+        this.store.dispatch(loadFullDatabases(policy.sourceCluster));
+      } else {
+        const cluster = this.clusters.find(c => c.name === policy.sourceCluster);
+        this.sourceCluster = cluster.id;
+        this.hdfsRootPath = policy.sourceDataset;
+      }
+    } else {
+      this.store.dispatch(loadJobsForPolicy(policy));
+    }
+  }
 }

@@ -95,7 +95,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     if (values.general.type === POLICY_TYPES.HDFS) {
       sourceDataset = values.directories;
     } else if (values.general.type === POLICY_TYPES.HIVE) {
-      sourceDataset = values.databases.join(',');
+      sourceDataset = values.databases;
     }
     const policyDefinition = <PolicyDefinition>omitEmpty({
       name: values.general.name,

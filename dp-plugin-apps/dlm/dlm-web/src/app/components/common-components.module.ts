@@ -1,8 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BsDropdownModule, ButtonsModule, TooltipModule } from 'ng2-bootstrap';
+import { BsDropdownModule, ButtonsModule, TooltipModule, CollapseModule } from 'ng2-bootstrap';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { TranslateModule } from '@ngx-translate/core';
+import { SelectModule } from 'ng2-select';
 
 import { CardComponent } from './card/card.component';
 import { SearchInputComponent } from './search-input/search-input.component';
@@ -21,6 +22,7 @@ import { PageHeaderComponent } from './page-header/page-header.component';
 import { AddEntityButtonComponent } from './add-entity-button/add-entity-button.component';
 import { EventStatusComponent } from './event-status/event-status.component';
 import { HdfsBrowserBreadcrumbComponent } from './hdfs-browser/breadcrumb/hdfs-browser-breadcrumb.component';
+import { HiveBrowserComponent, HiveDatabaseComponent } from './hive-browser/';
 
 @NgModule({
   imports: [
@@ -28,8 +30,10 @@ import { HdfsBrowserBreadcrumbComponent } from './hdfs-browser/breadcrumb/hdfs-b
     BsDropdownModule.forRoot(),
     ButtonsModule.forRoot(),
     TooltipModule.forRoot(),
+    CollapseModule.forRoot(),
     ChartsModule,
-    TranslateModule
+    TranslateModule,
+    SelectModule
   ],
   declarations: [
     CardComponent,
@@ -50,7 +54,9 @@ import { HdfsBrowserBreadcrumbComponent } from './hdfs-browser/breadcrumb/hdfs-b
     PageHeaderComponent,
     AddEntityButtonComponent,
     EventStatusComponent,
-    HdfsBrowserBreadcrumbComponent
+    HdfsBrowserBreadcrumbComponent,
+    HiveBrowserComponent,
+    HiveDatabaseComponent
   ],
   exports: [
     CardComponent,
@@ -71,7 +77,9 @@ import { HdfsBrowserBreadcrumbComponent } from './hdfs-browser/breadcrumb/hdfs-b
     PageHeaderComponent,
     AddEntityButtonComponent,
     EventStatusComponent,
-    HdfsBrowserBreadcrumbComponent
+    HdfsBrowserBreadcrumbComponent,
+    HiveBrowserComponent,
+    HiveDatabaseComponent
   ]
 })
 export class CommonComponentsModule {}

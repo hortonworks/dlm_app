@@ -1,8 +1,11 @@
-import { Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter, HostBinding } from '@angular/core';
+import { Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter, HostBinding, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { go } from '@ngrx/router-store';
 import { IMyOptions, IMyDateModel } from 'mydatepicker';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
 
 import { RadioItem } from 'common/radio-button/radio-button';
 import { State } from 'reducers/index';
@@ -12,6 +15,10 @@ import { markAllTouched } from 'utils/form-util';
 import { getDatePickerDate } from 'utils/date-util';
 import { TranslateService } from '@ngx-translate/core';
 import { mapToList } from 'utils/store-util';
+import { simpleSearch } from 'utils/string-utils';
+import { loadFullDatabases } from 'actions/hivelist.action';
+import { getAllDatabases } from 'selectors/hive.selector';
+import { HiveDatabase } from 'models/hive-database.model';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 
@@ -25,16 +32,16 @@ export const POLICY_FORM_ID = 'POLICY_FORM_ID';
   styleUrls: ['./policy-form.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class PolicyFormComponent implements OnInit {
+export class PolicyFormComponent implements OnInit, OnDestroy {
   @Input() pairings: Pairing[] = [];
   @Output() formSubmit = new EventEmitter<any>();
   @HostBinding('class') className = 'dlm-policy-form';
   policySubmitTypes = POLICY_SUBMIT_TYPES;
   policyForm: FormGroup;
-  databaseListGroup: FormGroup;
-  // todo: this mock and should be removed!
-  dbList = Array(6).fill(null).map((i, id) => `db_${id}`);
-  visibleDbList = this.dbList;
+  selectedSource$ = new BehaviorSubject('');
+  sourceDatabases$: Observable<HiveDatabase[]>;
+  databaseSearch$ = new BehaviorSubject<string>('');
+  subscriptions: Subscription[] = [];
   get datePickerOptions(): IMyOptions {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
@@ -150,6 +157,24 @@ export class PolicyFormComponent implements OnInit {
   constructor(private formBuilder: FormBuilder, private store: Store<State>, private t: TranslateService) { }
 
   ngOnInit() {
+    const loadDatabasesSubscription = this.selectedSource$
+      .filter(sourceCluster => !!sourceCluster)
+      .subscribe(sourceCluster => {
+        this.store.dispatch(loadFullDatabases(sourceCluster));
+      });
+    const databases$ = this.selectedSource$.switchMap(sourceCluster => {
+      return this.store.select(getAllDatabases).map(databases => {
+        const dbs = databases.filter(db => db.clusterId === sourceCluster);
+        if (dbs.length) {
+          this.policyForm.patchValue({databases: dbs[0].id});
+        }
+        return dbs;
+      });
+    });
+    this.sourceDatabases$ = Observable.combineLatest(this.databaseSearch$, databases$)
+      .map(([searchPattern, databases]) => {
+        return databases.filter(db => simpleSearch(db.name, searchPattern));
+      });
     this.policyForm = this.formBuilder.group({
       general: this.formBuilder.group({
         name: ['', Validators.required],
@@ -157,7 +182,7 @@ export class PolicyFormComponent implements OnInit {
         sourceCluster: ['', Validators.required],
         destinationCluster: ['', Validators.required]
       }),
-      databases: [[]],
+      databases: ['', Validators.required],
       directories: ['', Validators.required],
       job: this.formBuilder.group({
         schedule: this.policySubmitTypes.SCHEDULE,
@@ -172,6 +197,12 @@ export class PolicyFormComponent implements OnInit {
         }, { validator: this.validateTime})
       })
     });
+    this.policyForm.get('databases').disable();
+    this.subscriptions.push(loadDatabasesSubscription);
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
   handleSubmit({ value }) {
@@ -189,13 +220,7 @@ export class PolicyFormComponent implements OnInit {
   }
 
   handleSearchChange(value: string) {
-    let reg: RegExp;
-    try {
-      reg = new RegExp(value);
-    } catch (e) {
-      reg = new RegExp('');
-    }
-    this.visibleDbList = this.dbList.filter(name => reg.test(name));
+    this.databaseSearch$.next(value);
   }
 
   toggleSection(section: string) {
@@ -235,6 +260,7 @@ export class PolicyFormComponent implements OnInit {
     }
     this.policyForm.get(enableField).enable();
     this.policyForm.get(disableField).disable();
+    this.databaseSearch$.next('');
   }
 
   handleJobTabChange(tab) {
@@ -254,6 +280,8 @@ export class PolicyFormComponent implements OnInit {
         destinationCluster: ''
       }
     });
+    this.selectedSource$.next(sourceCluster);
+    this.databaseSearch$.next('');
   }
 
   handleHdfsPathChange(path) {
