@@ -19,7 +19,6 @@ import { AuthenticationService } from './services/authentication.service';
 import { LakeService } from './services/lake.service';
 import { LocationService } from './services/location.service';
 import { ClusterService } from './services/cluster.service';
-import { AssetService } from './services/asset.service';
 import { IdentityService } from './services/identity.service';
 import { ConfigurationService } from './services/configuration.service';
 import { MdlService } from './services/mdl.service';
@@ -72,7 +71,6 @@ export function HttpLoaderFactory(http: Http) {
     ClusterService,
     IdentityService,
     ConfigurationService,
-    AssetService,
 
     MdlService,
 

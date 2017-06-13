@@ -1,0 +1,17 @@
+.select-wrap /deep/ select {
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    appearance:none;
+}
+.select-wrap {
+    display:inline-block;
+    position:relative;
+    border-radius: 4px;
+}
+.select-wrap::after {
+    font-family: FontAwesome;
+    content: "\f107";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}

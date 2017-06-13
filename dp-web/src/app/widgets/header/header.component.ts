@@ -2,7 +2,7 @@ import {Component, Input, ElementRef, ViewChild, HostListener, Output, EventEmit
 import { Router, NavigationStart } from '@angular/router';
 
 import {User} from '../../models/user';
-import {HeaderData, Persona} from '../../models/header-data';
+import {HeaderData, Persona, PersonaTabs} from '../../models/header-data';
 import {ViewPaneState} from '../../app.component';
 
 declare var componentHandler:any;
@@ -23,9 +23,9 @@ export class HeaderComponent {
 
   @Input() user:User;
   @Input() headerData:HeaderData;
-  @Input() persona: Persona;
+  @Input() personaTabs: PersonaTabs[];
   @Input() viewPaneState: ViewPaneState;
-  @Output() personaChange = new EventEmitter<Persona>();
+  @Output() personaTabsChange = new EventEmitter<PersonaTabs[]>();
   @Output() viewPaneStateChange = new EventEmitter<ViewPaneState>();
 
   @ViewChild('sidenav') sidenav: ElementRef;
@@ -48,15 +48,22 @@ export class HeaderComponent {
     this.activeTabName = null;
 
     for (let persona of this.headerData.personas) {
-      for (let tabs of persona.tabs) {
+      let personaTabs = persona.tabs;
+
+      for (let tabs of personaTabs) {
         if (tabs.URL && tabs.URL.length > 0 && url.startsWith('/' +tabs.URL)) {
           this.activePersona = persona;
-          this. personaChange.emit(this.activePersona);
           this.activePersonaName = persona.name;
           this.activeTabName = tabs.tabName;
+          if (this.activePersona.topNav) {
+            this. personaTabsChange.emit([]);
+          } else {
+            this. personaTabsChange.emit(this.activePersona.tabs);
+          }
           break;
         }
       }
+
     }
   }
 
