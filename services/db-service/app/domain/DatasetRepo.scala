@@ -70,6 +70,11 @@ class DatasetRepo @Inject()(
 
   def create(datasetCreateRequest: DatasetCreateRequest) = {
     val tags = datasetCreateRequest.tags
+    val guids = datasetCreateRequest.dataAssets.map(_.guid)
+
+    def updateAssetQuery(guids: Seq[String]) =
+      for {a <- dataAssetRepo.DatasetAssets.filter(_.guid.inSet(guids))} yield a.datasetId
+
     val query = for {
       existingCategories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
       _ <- {
@@ -77,9 +82,24 @@ class DatasetRepo @Inject()(
         categoryRepo.Categories ++= tags.filter(t => !catNames.contains(t)).map(t => Category(None, t, t))
       }
       savedDataset <- Datasets returning Datasets += datasetCreateRequest.dataset
-      categories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
-      _ <- datasetCategoryRepo.DatasetCategories ++= categories.map(c => DatasetCategory(c.id.get, savedDataset.id.get))
-      _ <- dataAssetRepo.DatasetAssets ++= datasetCreateRequest.dataAssets.map(a => a.copy(datasetId = Some(savedDataset.id.get)))
+      categories <- categoryRepo.Categories
+        .filter(_.name.inSet(tags)).to[List].result
+      _ <- datasetCategoryRepo.DatasetCategories ++= categories
+        .map(c => DatasetCategory(c.id.get, savedDataset.id.get))
+      existingDataAssets <- dataAssetRepo.DatasetAssets
+        .filter(_.guid.inSet(guids)).to[List].result
+      _ <- {
+        val guidsWithoutDataSet = existingDataAssets.filter(_.datasetId == None).map(_.guid)
+        val assetsToUpdate = datasetCreateRequest.dataAssets
+          .filter(a => guidsWithoutDataSet.contains(a.guid)).map(_.guid)
+        updateAssetQuery(assetsToUpdate).update(savedDataset.id)
+      }
+      _ <- {
+        val existingGuids = existingDataAssets.map(_.guid)
+        dataAssetRepo.DatasetAssets ++= datasetCreateRequest.dataAssets
+          .filter(a => !existingGuids.contains(a.guid))
+          .map(a => a.copy(datasetId = Some(savedDataset.id.get)))
+      }
     } yield (DatasetAndCategories(savedDataset, categories))
 
     db.run(query.transactionally)
@@ -147,7 +167,7 @@ class DatasetRepo @Inject()(
     getRichDataset(Datasets)
   }
 
-  def getRichDatasetById(id:Long) : Future[Option[RichDataset]] = {
+  def getRichDatasetById(id: Long): Future[Option[RichDataset]] = {
     getRichDataset(Datasets.filter(_.id === id)).map(_.headOption)
   }
 
