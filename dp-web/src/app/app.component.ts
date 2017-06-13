@@ -19,7 +19,7 @@ export enum ViewPaneState {
 export class AppComponent implements OnInit {
 
   marginLeft = 0;
-  persona: Persona;
+  personaTabs: PersonaTabs[];
   viewPaneStates = ViewPaneState;
   viewPaneState = ViewPaneState.DEFAULT;
   headerData: HeaderData = new HeaderData();
@@ -55,13 +55,18 @@ export class AppComponent implements OnInit {
         new PersonaTabs('AUDITS', 'audits')
       ]),
       new Persona('Infra Admin', [
-        new PersonaTabs('CLUSTERS', 'infra')
+        new PersonaTabs('CLUSTERS', 'infra', 'fa-list')
       ], false),
       new Persona('Analytics', [
-        new PersonaTabs('Workspace', 'workspace'),
-        new PersonaTabs('Assets', ''),
-        new PersonaTabs('Clusters', ''),
-        new PersonaTabs('Jobs', '')
+        new PersonaTabs('Workspace', 'workspace', 'fa-globe', [
+          new PersonaTabs('Dashboard', 'workspaces/dashboard', 'fa-dashboard'),
+          new PersonaTabs('Assets', 'workspaces/assets', 'fa-list-alt'),
+          new PersonaTabs('Notebooks', 'workspaces/notebooks', 'fa-text-o'),
+          new PersonaTabs('Jobs', 'workspaces/jobs', 'fa-briefcase')
+        ]),
+        new PersonaTabs('Assets', 'analytics/assets', 'fa-list-alt'),
+        new PersonaTabs('Clusters', '', 'fa-database'),
+        new PersonaTabs('Jobs', '', 'fa-briefcase')
       ], false),
       new Persona('DLM', [
       ], false)

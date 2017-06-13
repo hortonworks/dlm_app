@@ -30,10 +30,12 @@ import {QueryFilter} from "./views/ds-asset-search/queryEditors/advance/filter/f
 import {SimplePaginationWidget} from "../../shared/pagination/pagination.component";
 
 import {TaggingWidgetModule} from "../../shared/tagging-widget/tagging-widget.module";
+import {SharedModule} from '../../shared/shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
+    SharedModule,
     FormsModule,
     RouterModule.forChild(routes),
     TaggingWidgetModule

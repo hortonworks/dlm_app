@@ -1,6 +1,6 @@
-<div #sideNav class="sidenav"  *ngIf="persona && !persona.topNav" [ngClass]="{'collpased': collpased}">
-  <span class="sidenav-item" *ngFor="let tabEntry of persona.tabs; let i = index" [ngClass]="{'active': activeTabName === tabEntry.tabName}">
-    <i class="fa fa-globe" aria-hidden="true"></i>  <span class="sidenav-item-name"> {{ tabEntry.tabName }} </span>
+<div #sideNav class="sidenav"  *ngIf="personaTabs && personaTabs.length > 0" [ngClass]="{'collpased': collpased}">
+  <span class="sidenav-item" *ngFor="let tabEntry of personaTabs; let i = index" [ngClass]="{'active': activeTabName === tabEntry.tabName}" (click)="navigateToURL(tabEntry)">
+    <i *ngIf="tabEntry.iconClassName != ''" [ngClass]="'fa ' +  tabEntry.iconClassName" aria-hidden="true"></i>  <span class="sidenav-item-name"> {{ tabEntry.tabName }} </span>
   </span>
 
   <div class="expander" style="bottom:55px" (click)="toggleNav()">

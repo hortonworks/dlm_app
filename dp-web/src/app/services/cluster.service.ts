@@ -10,7 +10,15 @@ export class ClusterService {
 
   constructor(private http:Http) { }
 
-  list({ lakeId }): Observable<Cluster[]>{
+
+  list(): Observable<Cluster[]> {
+    return this.http
+      .get(this.uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
+  getByLakeId({ lakeId }): Observable<Cluster[]>{
     const uri = lakeId ? `${this.uri}?lakeId=${lakeId}` : this.uri;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))

@@ -4,8 +4,7 @@
     <span class="options">
       <i *ngIf="dsModel.favourite" class="fa fa-star"></i>
       <button id="dropDownIcon_{{ dsModel.id }}" class="mdl-button mdl-js-button mdl-button--icon"><i class="fa fa-ellipsis-v"></i></button>
-      <label class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
-             for="dropDownIcon_{{ dsModel.id }}">
+      <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDownIcon_' + dsModel.id">
         <li class="mdl-menu__item"><i class="fa fa-edit"></i>Edit</li>
         <li class="mdl-menu__item"><i class="fa fa-close"></i>Delete</li>
         <li class="mdl-menu__item">
@@ -13,7 +12,7 @@
           <span *ngIf="dsModel.favourite">Remove from Favourites</span>
           <span *ngIf="!dsModel.favourite">Add to Favourites</span>
         </li>
-      </label>
+      </ul>
     </span>
   </div>
   <div class="metaInfo">

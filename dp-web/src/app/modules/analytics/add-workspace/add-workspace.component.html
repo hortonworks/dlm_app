@@ -1,0 +1,32 @@
+<div class="load-right-to-left-slider dialog1x">
+    <div class="page-container">
+        <div class="mdl-grid mdl-grid--no-spacing">
+            <div class="mdl-cell--8-col hwx-title"> Add Workspace</div>
+            <div class="mdl-layout-spacer"></div>
+            <div class="close-button" (click)="cancel()"></div>
+        </div>
+        <div class="spacer-15"> </div>
+        <form #workspaceForm="ngForm">
+            <div class="form-group">
+                <label class="required">Name</label>
+                <input name="name" [(ngModel)]="workspace.name">
+            </div>
+            <div class="form-group">
+                <label class="required">Datalake</label>
+                <dp-select>
+                    <select name="source" [(ngModel)]="workspace.source" (ngModelChange)="updateVal()">
+                        <option selected="selected"> Select </option>
+                        <option *ngFor="let cluster of clusterServiceObservable | async " [attr.value]="cluster.id"> {{ cluster.name }} </option>
+                    </select>
+                </dp-select>
+            </div>
+            <div class="form-group">
+                <label class="required">Descripton</label>
+                <textarea name="description" [(ngModel)]="workspace.description"> </textarea>
+            </div>
+
+            <button class="mdl-button btn-hwx-primary" (click)="save()"> SAVE </button>
+            <button class="mdl-button btn-hwx-secondary" (click)="cancel()"> CANCEL </button>
+        </form>
+    </div>
+</div>

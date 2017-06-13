@@ -21,8 +21,8 @@
       <td class="mdl-data-table__cell--non-numeric actions">
         <div [ngClass]="{'visibility-visible': index === hoveredIndex, 'visibility-hidden': index !== hoveredIndex}">
           <button  id="dropDownIcon_{{ dsModel.id }}" class="mdl-button mdl-js-button mdl-button--icon"><i class="fa fa-ellipsis-h fa__fa-ellipsis-h--icon"></i></button>
-          <label class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
-                  for="dropDownIcon_{{ dsModel.id }}">
+          <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
+                  [attr.for]="'dropDownIcon_' + dsModel.id">
               <li class="mdl-menu__item"><i class="fa__fa-edit--icon fa fa-edit"></i>Edit</li>
               <li class="mdl-menu__item"><i class="fa__fa-close--icon fa fa-close"></i>Delete</li>
               <li class="mdl-menu__item">
@@ -30,7 +30,7 @@
               <span *ngIf="dsModel.favourite">Remove from Favourites</span>
               <span *ngIf="!dsModel.favourite">Add to Favourites</span>
               </li>
-          </label>
+          </ul>
           </div>
       </td>
     </tr>
