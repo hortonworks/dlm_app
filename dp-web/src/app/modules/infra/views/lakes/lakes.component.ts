@@ -27,6 +27,7 @@ export class LakesComponent implements OnInit {
   }[];
 
   mapData: MapData[] = [];
+  mapSet = new Map();
   health = new Map();
   mapSize: MapSize;
 
@@ -41,8 +42,6 @@ export class LakesComponent implements OnInit {
     this.lakeService.listWithClusters()
       .subscribe(lakes => {
         this.lakes = lakes;
-        let locations = [];
-        let health = new Map();
         this.lakes.forEach((lake) => {
           let locationObserver = Observable.create();
           if (lake.data.location && lake.clusters && lake.clusters.length > 0) {
@@ -50,32 +49,40 @@ export class LakesComponent implements OnInit {
           } else {
             locationObserver = this.getLocationInfo(lake.data.location);
           }
-          locationObserver.subscribe(locationInfo => {
-            health.set(lake.data.id, locationInfo);
-            this.health = new Map(health.entries());
-            locations.push(new MapData(this.extractMapPoints(locationInfo)));
-            this.mapData = locations.slice();
-          });
+          this.updateHealth(lake, locationObserver);
           /***** MOCK CONNECTIONS ****/
 
-          //  locationObserver.subscribe(locationInfo=> {
-          //    this.lakeService.getPairsMock(lakes, lake.data.id).subscribe((pairedLake)=>{
-          //      if(pairedLake !== null){
-          //         this.getLocationInfoWithStatus(pairedLake.data.location, pairedLake.clusters[0].id).subscribe((pairedLocationInfo=>{
-          //           locations.push({start:this.extractMapPoints(locationInfo), end:this.extractMapPoints(pairedLocationInfo)});
-          //           this.mapData = locations.slice();
-          //         }));
-          //      }else{
-          //         locations.push({start:this.extractMapPoints(locationInfo)});
-          //         this.mapData = locations.slice();
-          //      }
-          //    });
-          //  });
+           // locationObserver.subscribe(locationInfo=> {
+           //   this.lakeService.getPairsMock(lakes, lake.data.id).subscribe((pairedLake)=>{
+           //     if(pairedLake !== null){
+           //        this.getLocationInfoWithStatus(pairedLake.data.location, pairedLake.clusters[0].id).subscribe((pairedLocationInfo=>{
+           //           this.mapData.push({start:this.extractMapPoints(locationInfo), end:this.extractMapPoints(pairedLocationInfo)});
+           //          this.mapData = this.mapData.slice();
+           //        }));
+           //     }else{
+           //         this.mapData.push({start:this.extractMapPoints(locationInfo)});
+           //        this.mapData = this.mapData.slice();
+           //     }
+           //   });
+           // });
         });
       });
   }
 
-  private getLocationInfoWithStatus(locationId, clusterId) {
+  updateHealth(lake, locationObserver: Observable<any>){
+    locationObserver.subscribe(locationInfo => {
+      this.health.set(lake.data.id, locationInfo);
+      this.health = new Map(this.health.entries());
+      this.mapSet.set(lake.data.id, new MapData(this.extractMapPoints(locationInfo)));
+      let mapPoints = [];
+        this.mapSet.forEach(mapData => {
+          mapPoints.push(mapData)
+        });
+      this.mapData = mapPoints;
+    });
+  }
+
+  private getLocationInfoWithStatus(locationId, clusterId): Observable<any> {
     return Observable.forkJoin(
       this.locationService.retrieve(locationId).map((res) => res),
       this.clusterService.retrieveHealth(clusterId).map((res) => res)
@@ -103,9 +110,9 @@ export class LakesComponent implements OnInit {
       let health = locationInfo.health;
       let location = locationInfo.location;
       let status;
-      if (health.status.state === 'STARTED') {
+      if (health && health.status && health.status.state === 'STARTED') {
         status = MapConnectionStatus.UP;
-      } else if (health.status.state === 'NOT STARTED') {
+      } else if (health && health.status && health.status.state === 'NOT STARTED') {
         status = MapConnectionStatus.DOWN;
       } else {
         status = MapConnectionStatus.NA;
@@ -113,4 +120,17 @@ export class LakesComponent implements OnInit {
       return new Point(location.latitude, location.longitude, status);
     }
   }
+
+  onRefresh(lakeId){
+    let lakeInfo = this.lakes.find(lake => lake.data.id === lakeId);
+    if(lakeInfo.clusters && lakeInfo.clusters.length > 0){
+      this.updateHealth(lakeInfo, this.getLocationInfoWithStatus(lakeInfo.data.location, lakeInfo.clusters[0].id));
+    }else{
+      this.clusterService.list({lakeId: lakeInfo.data.id}).subscribe(clusters=> {
+        lakeInfo.clusters = clusters;
+        this.updateHealth(lakeInfo, this.getLocationInfoWithStatus(lakeInfo.data.location, lakeInfo.clusters[0].id));
+      });
+    }
+  }
+
 }
