@@ -11,6 +11,7 @@ POST          /auth/in                                         controllers.Authe
 GET           /auth/userDetail                                 controllers.Authentication.userDetail
 GET           /auth/signInThrougKnox                           controllers.Authentication.signInThrougKnox
 GET           /auth/signOutThrougKnox                          controllers.Authentication.signOutThrougKnox
+GET           /api/identity/:userId                            controllers.Authentication.userById(userId: String)
 
 #api
 

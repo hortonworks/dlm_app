@@ -1,0 +1,106 @@
+<div class="breadcrumb-container">
+  <span class="link" (click)="goToClusters()">My Clusters</span>
+  <span> / {{lake.name}}</span>
+</div>
+<div class="page-container">
+  <div class="mdl-grid">
+    <div class="mdl-cell mdl-cell--12-col">
+      <button class="mdl-button btn-hwx-secondary pull-right">ACTION</button>
+      <button class="mdl-button btn-hwx-secondary pull-right refresh-btn" (click)="fetchClusterDetails(this.lake.id)"><i class="fa fa-refresh"></i></button>
+    </div>
+  </div>
+  <div class="mdl-grid no-top-bottom-space">
+    <div class="mdl-cell mdl-cell--12-col">
+      <div class="summary-pane-6">
+        <ul>
+          <li>
+            <div class="text-small-1">Location</div>
+            <div class="text-dark-small-1">{{clusterDetails.location}}</div>
+          </li>
+          <li>
+            <div class="text-small-1">HDP Version</div>
+            <div class="text-dark-small-1">{{clusterDetails.hdpVersion}}</div>
+          </li>
+          <li>
+            <div class="text-small-1">Nodes</div>
+            <div class="text-dark-small-1">{{clusterDetails.healthyNodes}}/{{clusterDetails.nodes}}</div>
+          </li>
+          <li>
+            <div class="text-small-1">Tags</div>
+            <div class="text-dark-small-1">{{clusterDetails.tags}}</div>
+          </li>
+          <li>
+            <div class="text-small-1">Uptime</div>
+            <div class="text-dark-small-1">{{clusterDetails.uptime}}</div>
+          </li>
+          <li>
+            <div class="text-small-1">Created By</div>
+            <div class="text-dark-small-1">{{user? user.username: ''}}</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="mdl-grid no-top-bottom-space details-container">
+    <div class="mdl-cell mdl-cell--12-col no-top-bottom-space">
+      <div class="mdl-grid white-bg">
+        <div class="mdl-cell mdl-cell--12-col">
+          <div class="mdl-grid">
+            <div class="mdl-cell mdl-cell--12-col">
+              <label class="text-medium pull-left">INFORMATION</label>
+              <button id="info-actions" class="mdl-button mdl-js-button mdl-button--icon pull-right"><i
+                class="fa fa-ellipsis-v fa__fa-ellipsis-v--icon"></i></button>
+                <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect" for="info-actions">
+                </ul>
+            </div>
+            <div class="mdl-cell mdl-cell--12-col">
+              <div class="text-dark-small-1">Description</div>
+              <div class="text-small-1">{{lake.description}}</div>
+            </div>
+          </div>
+          <div class="mdl-grid">
+            <div class="mdl-cell mdl-cell--4-col">
+              <div class="text-dark-small-1">Status</div>
+              <div class="text-small-1">
+                <span *ngIf="clusterDetails && clusterDetails.status === 'STARTED'"><i class="fa fa-circle fa-circle--color-up"></i>Running</span>
+                <span *ngIf="clusterDetails && clusterDetails.status === 'NOT STARTED'"><i class="fa fa-circle fa-circle--color-down"></i>Not Running</span>
+                <span *ngIf="!clusterDetails || !clusterDetails.status || clusterDetails.status === 'NA'"><i class="fa fa-circle fa-circle--color-na"></i>NA</span>
+              </div>
+            </div>
+            <div class="mdl-cell mdl-cell--4-col">
+              <div class="text-dark-small-1">Heap Size</div>
+              <div #heapProgress class="mdl-progress mdl-js-progress dp-progress pull-left"></div>
+              <div class="progress-percent">{{heapPercent}}</div>
+              <div class="placeholder"></div>
+              <div class="text-small-1">{{clusterDetails.heapSizeUsed}}/{{clusterDetails.heapSizeTotal}}</div>
+            </div>
+            <div class="mdl-cell mdl-cell--4-col">
+              <div class="text-dark-small-1">HDFS Disk Space</div>
+              <div #hdfsProgress class="mdl-progress mdl-js-progress dp-progress pull-left"></div>
+              <div class="progress-percent">{{hdfsPercent}}</div>
+              <div class="placeholder"></div>
+              <div class="text-small-1">{{clusterDetails.hdfsUsed}}/{{clusterDetails.hdfsTotal}}</div>
+            </div>
+          </div>
+          <div class="mdl-grid">
+            <div class="mdl-cell mdl-cell--4-col">
+              <div class="text-dark-small-1">Nodes</div>
+              <div class="text-small-1">
+                <span class="margin-right-10"><i class="fa fa-circle fa-circle--color-up"></i>{{clusterDetails.healthyNodes}}</span>
+                <span><i class="fa fa-circle fa-circle--color-down"></i>{{clusterDetails.unhealthyNodes}}</span>
+              </div>
+            </div>
+            <div class="mdl-cell mdl-cell--4-col">
+              <div class="text-dark-small-1">Security Type</div>
+              <div class="text-small-1">{{clusterDetails.securityType}}</div>
+            </div>
+            <div class="mdl-cell mdl-cell--4-col">
+              <div class="text-dark-small-1">No of Services</div>
+              <div class="text-small-1">{{clusterDetails.noOfSerices}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

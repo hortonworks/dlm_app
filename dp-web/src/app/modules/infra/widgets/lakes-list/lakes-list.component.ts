@@ -1,9 +1,11 @@
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {Router} from '@angular/router';
 
 import * as moment from 'moment';
 import {Sort} from '../../../../shared/utils/enums';
 import {Cluster} from '../../../../models/cluster';
 import {ClusterService} from '../../../../services/cluster.service';
+import {DateUtils} from '../../../../shared/utils/date-utils';
 
 @Component({
   selector: 'dp-lakes-list',
@@ -18,7 +20,7 @@ export class LakesListComponent implements OnChanges {
   @Input() lakes = [];
   @Input() healths = new Map();
 
-  constructor(private clusterService: ClusterService) {
+  constructor(private clusterService: ClusterService, private router: Router) {
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -44,7 +46,7 @@ export class LakesListComponent implements OnChanges {
     let lakeInfo: LakeInfo = new LakeInfo();
     lakeInfo.name = lake.data.name;
     lakeInfo.ambariUrl = lake.data.ambariUrl;
-    lakeInfo.lakeId = lake.data.lakeId;
+    lakeInfo.lakeId = lake.data.id;
     lakeInfo.cluster = lake.clusters && lake.clusters.length ? lake.clusters[0] : null;
     lakeInfo.services = lake.data.services ? lake.data.services : 'NA';
     if (health) {
@@ -62,15 +64,12 @@ export class LakesListComponent implements OnChanges {
     lakeInfo.hdfsTotal = health.totalSize ? health.totalSize : 'NA';
     lakeInfo.nodes = health.nodes ? health.nodes : 'NA';
     lakeInfo.status = this.getStatus(health);
-    lakeInfo.uptimeStr = health.status ? this.doGetUptime(health.status.since) : 'NA';
+    lakeInfo.uptimeStr = health.status ? DateUtils.toReadableDate(health.status.since) : 'NA';
     lakeInfo.uptime = health.status ? health.status.since : 'NA';
   }
 
-  doGetUptime(since: number) {
-    if (!since || since === 0) {
-      return 'NA';
-    }
-    return moment.duration(since).humanize();
+  viewDetails(lakeId) {
+    this.router.navigate([`infra/cluster/details`, lakeId]);
   }
 
   private getStatus(health) {
@@ -122,15 +121,14 @@ export class LakesListComponent implements OnChanges {
             return val1.localeCompare(val2);
           }
           if ($event.type === 'number') {
-            return val1 < val2;
+            return val1 > val2;
           }
         }
-
         if ($event.type === 'string') {
           return val2.localeCompare(val1);
         }
         if ($event.type === 'number') {
-          return val2 < val1;
+          return val1 < val2;
         }
       } catch (e) {
       }
@@ -159,18 +157,18 @@ export class LakeInfo {
   uptime?: string;
   uptimeStr?: string;
 
-  get hdfsUsedInBytes(){
+  get hdfsUsedInBytes(): number {
     return this.toBytes(this.hdfsUsed);
   }
 
-  private toBytes(byteWithSize){
-    if(byteWithSize === 'NA'){
-      return 'NA';
-    }else{
-      let values = byteWithSize.trim().split(" ");
+  private toBytes(byteWithSize) {
+    if (byteWithSize === 'NA') {
+      return 0;
+    } else {
+      let values = byteWithSize.trim().split(' ');
       let size = values[1];
       let k = 1024;
-      let sizes = Array("Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB");
+      let sizes = Array('Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
       let i = sizes.indexOf(size);
       return parseInt(values[0], 10) * Math.pow(k, i);
     }
