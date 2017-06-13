@@ -4,7 +4,7 @@ import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Entities.{Dataset, DatasetAndCategoryIds, DatasetCreateRequest}
 import domain.API.{dpClusters, users}
-import domain.DatasetRepo
+import domain.{DatasetRepo, PaginatedQuery, SortQuery}
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -19,14 +19,27 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
     datasetRepo.all.map(dataset => success(dataset.map(c => linkData(c, makeLink(c))))).recoverWith(apiError)
   }
 
-  def allRichDataset = Action.async {
-    datasetRepo.getRichDataset()
+  private def getPaginatedQuery(req: Request[AnyContent]): Option[PaginatedQuery] = {
+    val offset = req.getQueryString("offset")
+    val size = req.getQueryString("size")
+    val sortCol = req.getQueryString("sortBy")
+    val sortOrder = req.getQueryString("sortOrder").getOrElse("asc")
+
+    if(size.isDefined && offset.isDefined){
+      val sortQuery = sortCol.map(s => SortQuery(s, sortOrder))
+      Some(PaginatedQuery(offset.get.toInt, size.get.toInt, sortQuery))
+    } else None
+
+  }
+
+  def allRichDataset = Action.async { req =>
+    datasetRepo.getRichDataset(getPaginatedQuery(req))
       .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
       .recoverWith(apiError)
   }
 
-  def richDatasetByTag(tagName: String) = Action.async {
-    datasetRepo.getRichDatasetByTag(tagName)
+  def richDatasetByTag(tagName: String) = Action.async { req =>
+    datasetRepo.getRichDatasetByTag(tagName, getPaginatedQuery(req))
       .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
       .recoverWith(apiError)
   }

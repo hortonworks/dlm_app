@@ -11,25 +11,23 @@ case class SortQuery(sortCol: String, order: String) {
 }
 
 trait ColumnSelector {
-  def select: Map[String, Rep[_]]
+  val select: Map[String, Rep[_]]
 }
 
 object PaginationSupport {
 
   implicit class PaginationQuery[A <: ColumnSelector, B, C[_]](query: Query[A, B, C]) {
-    def paginate(pqo: Option[PaginatedQuery]) = {
+    def paginate(pqo: Option[PaginatedQuery]): Query[A, B, C] = {
       pqo match {
         case Some(pq) => paginate(pq)
         case None => query
       }
     }
 
-    def paginate(pq: PaginatedQuery) = {
+    def paginate(pq: PaginatedQuery): Query[A, B, C] = {
       val sortQuery = pq.sortQuery match {
         case Some(sq) =>
-          val sortOrderRep = ColumnOrdered(_, sq.ordering)
-          val sortColumnRep: A => Rep[_] = _.select(sq.sortCol)
-          query.sortBy(sortColumnRep)(sortOrderRep)
+          query.sortBy(_.select(sq.sortCol))(ColumnOrdered(_, sq.ordering))
         case None => query
       }
       sortQuery.drop(pq.offset).take(pq.size)
