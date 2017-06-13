@@ -22,7 +22,7 @@
 }
 
 .actions {
-  display: inline-block;
+  display: flex;
 
   .buttons-bar {
     display: inline;
@@ -77,6 +77,23 @@
 
   .mdl-card__actions {
     padding: 0px;
+  }
+
+  .mdl-card__menu {
+    i {
+      display: none;
+      font-size: 12px;
+    }
+
+    &:hover i {
+      display: block;
+      font-size: 12px;
+    }
+
+    .delete:before {
+      font-family: FontAwesome;
+      content: '\f00d';
+    }
   }
 
   .mdl-grid {

@@ -5,7 +5,7 @@ input[type="password"],
 input[type="email"],
 input:not([type]),
 input[type=""],
-textarea{
+textarea, select {
   display: inline-block;
   padding: 9px 10px;
   border: 1px solid #cfd3d7;

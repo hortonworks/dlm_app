@@ -1,10 +1,14 @@
 export class PersonaTabs {
-  tabName:string;
-  URL:string;
+  tabName: string;
+  URL: string;
+  iconClassName: string;
+  tabs: PersonaTabs[];
 
-  constructor(tabName:string, URL:string) {
+  constructor(tabName:string, URL:string, iconClassName = 'fa-globe', tabs = []) {
     this.tabName = tabName;
     this.URL = URL;
+    this.iconClassName = iconClassName;
+    this.tabs = tabs;
   }
 }
 
