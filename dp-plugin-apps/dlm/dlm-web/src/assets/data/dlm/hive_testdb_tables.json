@@ -1,0 +1,14 @@
+{
+  "tables": [
+    {
+      "id": "testdb/school_from_test_db",
+      "name": "school_from_test_db",
+      "databaseId": "testdb"
+    },
+    {
+      "id": "testdb/allstar_full_from_test_db",
+      "name": "allstar_full_from_test_db",
+      "databaseId": "testdb"
+    }
+  ]
+}
