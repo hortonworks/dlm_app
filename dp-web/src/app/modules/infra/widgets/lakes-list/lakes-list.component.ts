@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
 
 import * as moment from 'moment';
 import {Sort} from '../../../../shared/utils/enums';
@@ -17,6 +17,7 @@ export class LakesListComponent implements OnChanges {
   lakesListCopy: LakeInfo[] = [];
   @Input() lakes = [];
   @Input() healths = new Map();
+  @Output("onRefresh") refreshEmitter: EventEmitter<number> = new EventEmitter<number>();
 
   constructor(private clusterService: ClusterService) {
   }
@@ -44,7 +45,7 @@ export class LakesListComponent implements OnChanges {
     let lakeInfo: LakeInfo = new LakeInfo();
     lakeInfo.name = lake.data.name;
     lakeInfo.ambariUrl = lake.data.ambariUrl;
-    lakeInfo.lakeId = lake.data.lakeId;
+    lakeInfo.lakeId = lake.data.id;
     lakeInfo.cluster = lake.clusters && lake.clusters.length ? lake.clusters[0] : null;
     lakeInfo.services = lake.data.services ? lake.data.services : 'NA';
     if (health) {
@@ -102,9 +103,7 @@ export class LakesListComponent implements OnChanges {
   }
 
   refresh(lakeInfo) {
-    this.clusterService.retrieveHealth(lakeInfo.cluster.id).subscribe(health => {
-      this.populateHealthInfo(lakeInfo, health);
-    });
+    this.refreshEmitter.emit(lakeInfo.lakeId);
   }
 
   onSort($event) {
@@ -154,10 +153,10 @@ export class LakeInfo {
   country?: string;
   nodes?: number;
   services?: number;
-  hdfsUsed?: string;
-  hdfsTotal?: string;
-  uptime?: string;
-  uptimeStr?: string;
+  hdfsUsed?: string = 'NA';
+  hdfsTotal?: string = 'NA';
+  uptime?: string = 'NA';
+  uptimeStr?: string = 'NA';
 
   get hdfsUsedInBytes(){
     return this.toBytes(this.hdfsUsed);

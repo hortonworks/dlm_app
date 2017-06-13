@@ -3,6 +3,6 @@
 </section>
 <div class="page-container">
   <section>
-    <dp-lakes-list [lakes]="lakes" [healths]="health"></dp-lakes-list>
+    <dp-lakes-list [lakes]="lakes" [healths]="health" (onRefresh)="onRefresh($event)"></dp-lakes-list>
   </section>
 </div>
