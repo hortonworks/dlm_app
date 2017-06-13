@@ -49,7 +49,13 @@
 </ng-template>
 
 <ng-template let-row="row" ngx-datatable-row-detail-template #rowDetailRef>
-  <dlm-policy-details [contentType]="activeContentType" [policy]="row" [jobs]="filteredJobs$ | async" [sourceCluster]="sourceCluster" [hdfsRootPath]="hdfsRootPath"></dlm-policy-details>
+  <dlm-policy-details
+    [contentType]="activeContentType"
+    [policy]="row"
+    [jobs]="filteredJobs$ | async"
+    [sourceCluster]="sourceCluster"
+    [hdfsRootPath]="hdfsRootPath"
+    [policyDatabase]="policyDatabase$ | async"></dlm-policy-details>
 </ng-template>
 
 <ng-template let-row="row" let-value="value" #pathCell>

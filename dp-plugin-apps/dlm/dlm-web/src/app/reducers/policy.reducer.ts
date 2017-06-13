@@ -1,6 +1,7 @@
 import { Policy } from 'models/policy.model';
 import { BaseState } from 'models/base-resource-state';
 import * as fromPolicy from 'actions/policy.action';
+import { toEntities } from 'utils/store-util';
 
 export type State = BaseState<Policy>;
 
@@ -29,13 +30,8 @@ export function reducer(state = initialState, action): State {
 
 function loadPoliciesSuccess(state: State, action): State {
   const policies = action.payload.response.policies;
-  const policyEntities = policies.reduce((entities: { [id: string]: Policy }, entity: Policy) => {
-    return Object.assign({}, entities, {
-      [entity.id]: entity
-    });
-  }, {});
   return {
-    entities: Object.assign({}, state.entities, policyEntities)
+    entities: Object.assign({}, state.entities, toEntities<Policy>(policies))
   };
 }
 

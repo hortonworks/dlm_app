@@ -33,6 +33,17 @@
       "targetCluster": "c2",
       "sourceDataset": "/apps",
       "targetDataset": "/apps"
+    },
+    {
+      "name": "hivepolicy",
+      "type": "HIVE",
+      "status": "SUBMITTED",
+      "frequency": 7200,
+      "endTime": "9999-12-31T00:00:00",
+      "sourceCluster": "c1",
+      "targetCluster": "c2",
+      "sourceDataset": "testdb",
+      "targetDataset": "testdb"
     }
   ]
 }
