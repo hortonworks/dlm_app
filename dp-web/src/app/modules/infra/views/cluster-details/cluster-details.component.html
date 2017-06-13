@@ -1,5 +1,5 @@
 <div class="breadcrumb-container">
-  <span class="link" (click)="goToClusters()">My Cluster</span>
+  <span class="link" (click)="goToClusters()">My Clusters</span>
   <span> / {{lake.name}}</span>
 </div>
 <div class="page-container">
@@ -14,28 +14,28 @@
       <div class="summary-pane-6">
         <ul>
           <li>
-            <div class="text-small-1">{{clusterDetails.location}}</div>
-            <div class="text-dark-small-1">Location</div>
+            <div class="text-small-1">Location</div>
+            <div class="text-dark-small-1">{{clusterDetails.location}}</div>
           </li>
           <li>
-            <div class="text-small-1">{{clusterDetails.hdpVersion}}</div>
-            <div class="text-dark-small-1">HDP Version</div>
+            <div class="text-small-1">HDP Version</div>
+            <div class="text-dark-small-1">{{clusterDetails.hdpVersion}}</div>
           </li>
           <li>
-            <div class="text-small-1">{{clusterDetails.healthyNodes}}/{{clusterDetails.nodes}}</div>
-            <div class="text-dark-small-1">Nodes</div>
+            <div class="text-small-1">Nodes</div>
+            <div class="text-dark-small-1">{{clusterDetails.healthyNodes}}/{{clusterDetails.nodes}}</div>
           </li>
           <li>
-            <div class="text-small-1">{{clusterDetails.tags}}</div>
-            <div class="text-dark-small-1">Tags</div>
+            <div class="text-small-1">Tags</div>
+            <div class="text-dark-small-1">{{clusterDetails.tags}}</div>
           </li>
           <li>
-            <div class="text-small-1">{{clusterDetails.uptime}}</div>
-            <div class="text-dark-small-1">Uptime</div>
+            <div class="text-small-1">Uptime</div>
+            <div class="text-dark-small-1">{{clusterDetails.uptime}}</div>
           </li>
           <li>
-            <div class="text-small-1">{{user? user.username: ''}}</div>
-            <div class="text-dark-small-1">Created By</div>
+            <div class="text-small-1">Created By</div>
+            <div class="text-dark-small-1">{{user? user.username: ''}}</div>
           </li>
         </ul>
       </div>

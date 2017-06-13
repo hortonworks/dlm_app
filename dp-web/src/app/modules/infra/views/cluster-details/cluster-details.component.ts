@@ -101,7 +101,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   }
 
   getPercent(used, total) {
-    return Math.ceil((parseInt(used) / parseInt(total)) * 100);
+    return ((parseInt(used) / parseInt(total)) * 100).toFixed(2);
   }
 
   getClusterDetails() {
