@@ -20,6 +20,7 @@ class DatasetRepo @Inject()(
   extends HasDatabaseConfigProvider[DpPgProfile] {
 
   import profile.api._
+  import PaginationSupport._
 
   val Datasets = TableQuery[DatasetsTable]
 
@@ -143,20 +144,20 @@ class DatasetRepo @Inject()(
     }
   }
 
-  def getRichDataset(): Future[Seq[RichDataset]] = {
-    getRichDataset(Datasets)
+  def getRichDataset(paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[RichDataset]] = {
+    getRichDataset(Datasets.paginate(paginatedQuery))
   }
 
-  def getRichDatasetById(id:Long) : Future[Option[RichDataset]] = {
+  def getRichDatasetById(id: Long): Future[Option[RichDataset]] = {
     getRichDataset(Datasets.filter(_.id === id)).map(_.headOption)
   }
 
-  def getRichDatasetByTag(tagName: String): Future[Seq[RichDataset]] = {
+  def getRichDatasetByTag(tagName: String, paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[RichDataset]] = {
     val query = categoryRepo.Categories.filter(_.name === tagName)
       .join(datasetCategoryRepo.DatasetCategories).on(_.id === _.categoryId)
       .join(Datasets).on(_._2.datasetId === _.id)
       .map(_._2)
-    getRichDataset(query)
+    getRichDataset(query.paginate(paginatedQuery))
   }
 
   def insertWithCategories(datasetReq: DatasetAndCategoryIds): Future[DatasetAndCategories] = {
@@ -182,7 +183,7 @@ class DatasetRepo @Inject()(
   }
 
   final class DatasetsTable(tag: Tag)
-    extends Table[Dataset](tag, Some("dataplane"), "datasets") {
+    extends Table[Dataset](tag, Some("dataplane"), "datasets") with ColumnSelector {
 
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
@@ -201,6 +202,8 @@ class DatasetRepo @Inject()(
     def version = column[Int]("version")
 
     def customprops = column[Option[JsValue]]("custom_props")
+
+    val select = Map("id" -> this.id, "name" -> this.name)
 
     def * =
       (id,
