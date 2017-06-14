@@ -5,5 +5,13 @@
     "pathRewrite": {
       "^/dlm": ""
     }
+  },
+
+  "/dlm/": {
+    "target": "http://localhost:4444",
+    "secure": false,
+    "pathRewrite": {
+      "^/dlm": ""
+    }
   }
 }

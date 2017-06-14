@@ -9,9 +9,9 @@ import { TableColumn } from 'common/table/table-column.type';
     <ng-template #flowStatusCell let-value="value">
       <div class="flow-status">
         <div class="flow-status-chart">
-          <div class="flow-current-state active">S</div>
+          <div class="flow-current-state active">&nbsp;</div>
           <div class="flow-line"><span class="caret"></span></div>
-          <div class="flow-desired-state">D</div>
+          <div class="flow-desired-state">&nbsp;</div>
         </div>
         <div class="flow-status-text">
           <div class="flow-current-state">Active</div>

@@ -65,7 +65,7 @@
         </div>
       </div>
 
-      <div class="row" *ngIf="isHivePolicy()">
+      <div class="row" *ngIf="isHivePolicy() && sourceCluster">
         <div class="form-section col-md-12">
           <div class="form-section-title">
             {{'page.policies.form.sections.database' | translate}}
@@ -80,14 +80,20 @@
             <div class="row flex-center">
               <div class="col-md-8">
                 <span class="text-muted">
-                  {{'page.policies.form.selected' | translate}}: {{policyForm.value.databases?.length}}
+                  <span>
+                    {{'page.policies.form.selected' | translate}}: {{policyForm.value.databases}}
+                  </span>
                 </span>
               </div>
               <div class="col-md-4">
-                <dlm-search-input (change)="handleSearchChange($event)"></dlm-search-input>
+                <dlm-search-input (valueChange)="handleSearchChange($event)" [value]="databaseSearch$ | async"></dlm-search-input>
               </div>
             </div>
-            <dlm-checkbox-list [items]="visibleDbList" formControlName="databases"></dlm-checkbox-list>
+            <dlm-hive-browser
+              formControlName="databases"
+              [databases]="sourceDatabases$ | async"
+              [readonly]="false"
+              ></dlm-hive-browser>
           </div>
         </div>
       </div>
@@ -186,3 +192,6 @@
     </div>
   </form>
 </div>
+<pre>
+  {{policyForm.value | json}}
+</pre>

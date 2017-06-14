@@ -36,7 +36,8 @@ object ResponseEntities {
   case class PostActionResponse(requestId: String, message: String, status: String)
 
   case class PolicyInstanceResponse(id: String, policyId: String, name: String, `type`: String, executionType: String,
-                                    user: String, status: String, startTime: String, endTime: Option[String], message: String)
+                                    user: String, status: String, startTime: String, endTime: Option[String],
+                                    trackingInfo: Option[String], message: String)
 
   case class PolicyInstancesDetails(totalResults: Long, results: Long, instance: Seq[PolicyInstanceResponse])
 

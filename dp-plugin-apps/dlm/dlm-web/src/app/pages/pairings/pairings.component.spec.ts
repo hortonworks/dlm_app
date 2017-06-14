@@ -10,6 +10,7 @@ import {MockStore} from '../../mocks/mock-store';
 import {ModalModule} from 'ng2-bootstrap';
 import {Store} from '@ngrx/store';
 import { CommonComponentsModule } from 'components/common-components.module';
+import { PolicyStatusFmtPipe } from 'pipes/policy-status-fmt.pipe';
 
 describe('PairingsComponent', () => {
   let component: PairingsComponent;
@@ -29,7 +30,8 @@ describe('PairingsComponent', () => {
         PairingsComponent,
         PairingCardComponent,
         PairingCardListComponent,
-        ModalDialogComponent
+        ModalDialogComponent,
+        PolicyStatusFmtPipe
       ],
       providers: [
         {provide: Store, useClass: MockStore}

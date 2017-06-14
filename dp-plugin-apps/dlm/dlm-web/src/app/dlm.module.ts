@@ -1,7 +1,15 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpModule } from '@angular/http';
-import { CollapseModule, TabsModule, ModalModule, TypeaheadModule, TimepickerModule, TooltipModule } from 'ng2-bootstrap';
+import {
+  CollapseModule,
+  TabsModule,
+  ModalModule,
+  TypeaheadModule,
+  TimepickerModule,
+  TooltipModule,
+  BsDropdownModule
+} from 'ng2-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { StoreModule } from '@ngrx/store';
@@ -21,6 +29,7 @@ import { PairingEffects } from './effects/pairing.effect';
 import { JobEffects } from './effects/job.effect';
 import { EventEffects } from './effects/event.effect';
 import { HdfsListEffects } from './effects/hdfslist.effect';
+import { HiveListEffects } from './effects/hivelist.effect';
 
 import { FormEffects } from './effects/form.effect';
 
@@ -34,6 +43,7 @@ import { NavbarService } from 'services/navbar.service';
 import { EventService } from 'services/event.service';
 import { TimeZoneService } from 'services/time-zone.service';
 import { HdfsService } from 'services/hdfs.service';
+import { HiveService } from 'services/hive.service';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
 
 import { MainComponent } from './pages/main/main.component';
@@ -90,8 +100,8 @@ import { PairingProgressCardComponent } from './pages/pairings/components/pairin
 import { CreatePairingCardListComponent } from './pages/pairings/components/create-pairing-card-list/create-pairing-card-list.component';
 
 import { TranslateModule } from '@ngx-translate/core';
-import {MomentModule} from 'angular2-moment';
-import {ChartsModule} from 'ng2-charts/ng2-charts';
+import { MomentModule } from 'angular2-moment';
+import { ChartsModule } from 'ng2-charts/ng2-charts';
 
 import { TableComponent } from './common/table/table.component';
 import { TableFooterComponent } from './common/table/table-footer/table-footer.component';
@@ -103,6 +113,7 @@ import { BytesSizePipe } from './pipes/bytes-size.pipe';
 import { FmtTzPipe } from './pipes/fmt-tz.pipe';
 import { FrequencyPipe } from './pipes/frequency.pipe';
 import { TruncatePipe } from './pipes/truncate.pipe';
+import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
 
 @NgModule({
   imports: [
@@ -120,7 +131,9 @@ import { TruncatePipe } from './pipes/truncate.pipe';
     EffectsModule.run(FormEffects),
     EffectsModule.run(EventEffects),
     EffectsModule.run(HdfsListEffects),
+    EffectsModule.run(HiveListEffects),
     CollapseModule.forRoot(),
+    BsDropdownModule.forRoot(),
     TabsModule.forRoot(),
     ModalModule.forRoot(),
     TypeaheadModule.forRoot(),
@@ -192,10 +205,12 @@ import { TruncatePipe } from './pipes/truncate.pipe';
     ModalDialogComponent,
     ModalDialogBodyComponent,
     NotificationsComponent,
+
     BytesSizePipe,
     FmtTzPipe,
     FrequencyPipe,
-    TruncatePipe
+    TruncatePipe,
+    PolicyStatusFmtPipe
   ],
   bootstrap: [DlmComponent],
   providers: [
@@ -209,8 +224,10 @@ import { TruncatePipe } from './pipes/truncate.pipe';
     EventService,
     TimeZoneService,
     HdfsService,
+    HiveService,
     OverviewJobsExternalFiltersService,
     httpServiceProvider
   ]
 })
-export class DlmModule { }
+export class DlmModule {
+}

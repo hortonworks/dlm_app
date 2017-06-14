@@ -10,7 +10,8 @@ object Atlas {
                     attributes: Option[Map[String, String]],
                     guid: Option[String],
                     status: Option[String],
-                    displayText: Option[String])
+                    displayText: Option[String],
+                    tags : Option[Seq[String]])
 
   case class AtlasEntities(entities: Option[List[Entity]])
 

@@ -31,4 +31,11 @@ export class IdentityService {
     return <User> JSON.parse(localStorage.getItem('dp_user'));
   }
 
+  getUserById(id: string): Observable<User>{
+    return this.http
+      .get(`${this.url}/${id}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
 }

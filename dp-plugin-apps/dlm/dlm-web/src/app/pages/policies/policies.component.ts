@@ -7,7 +7,6 @@ import { Store } from '@ngrx/store';
 import { loadPolicies } from 'actions/policy.action';
 import { loadClusters } from 'actions/cluster.action';
 import { loadJobsForClusters } from 'actions/job.action';
-import { listFiles } from 'actions/hdfslist.action';
 import { Policy } from 'models/policy.model';
 import { getPolicyClusterJob } from 'selectors/policy.selector';
 import { Pairing } from 'models/pairing.model';

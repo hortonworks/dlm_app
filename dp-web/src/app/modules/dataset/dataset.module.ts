@@ -25,6 +25,7 @@ import {DsEditor} from "./views/ds-editor/ds-editor.component";
 import {DsInfoHolder} from "./views/ds-editor/ds-info-holder/ds-info-holder.component";
 import {DsSummaryHolder} from "./views/ds-editor/ds-summary-holder/ds-summary-holder.component";
 import {DsFullView} from "./views/ds-full-view/ds-full-view.component";
+import {TranslateModule} from "@ngx-translate/core";
 
 @NgModule({
   declarations: [
@@ -51,7 +52,8 @@ import {DsFullView} from "./views/ds-full-view/ds-full-view.component";
     CommonModule,
     FormsModule,
     RouterModule.forChild(routes),
-    TaggingWidgetModule
+    TaggingWidgetModule,
+    TranslateModule
   ],
   providers: [
     RichDatasetService,

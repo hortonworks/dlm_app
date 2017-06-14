@@ -1,0 +1,40 @@
+.dlm-hive-database {
+  display: block;
+
+  .database-header {
+    background: white;
+    margin-bottom: 10px;
+  }
+
+  .database-header-inner {
+    line-height: 40px;
+
+    .database-name {
+      font-size: 14px;
+      margin-left: 5px;
+    }
+
+  }
+
+  .database-radio {
+    margin-top: 15px;
+    margin-right: 10px;
+  }
+
+  .database-tables-list {
+    background: white;
+  }
+
+  .empty-tables {
+    padding: 8px;
+  }
+
+  .database-table {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+
+    &.last {
+      border-bottom: none;
+    }
+  }
+}

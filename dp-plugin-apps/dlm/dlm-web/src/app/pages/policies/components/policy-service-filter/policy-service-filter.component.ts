@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { POLICY_TYPES } from 'constants/policy.constant';
+import { POLICY_TYPES, POLICY_TYPES_LABELS } from 'constants/policy.constant';
 
 @Component({
   selector: 'policy-service-filter',
@@ -11,6 +11,7 @@ export class PolicyServiceFilterComponent {
   activeService: '';
 
   POLICY_TYPES = POLICY_TYPES;
+  POLICY_TYPES_LABELS = POLICY_TYPES_LABELS;
 
   @Output() onFilter: EventEmitter<any> = new EventEmitter();
 

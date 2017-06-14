@@ -99,6 +99,10 @@
       "running": "Running"
     }
   },
+  "hive_database": {
+    "empty_selection": "No Database selected",
+    "empty_tables": "No Tables found"
+  },
   "forms": {
     "validation_errors": {
       "required": "\"{{fieldLabel}}\" is required",
@@ -136,8 +140,8 @@
       },
       "table": {
         "column": {
-          "source_cluster": "Source Cluster",
-          "destination_cluster": "Destination Cluster",
+          "source_cluster": "Source",
+          "destination_cluster": "Destination",
           "started": "Started",
           "ended": "Ended",
           "runtime": "Runtime",

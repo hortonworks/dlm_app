@@ -87,7 +87,8 @@ class DefaultAtlasInterface(clusterId: Long,
            Option(attributeAsString(e)),
            Option(e.getGuid),
            Option(e.getStatus.toString),
-           Option(e.getDisplayText))
+           Option(e.getDisplayText),
+           Option(e.getClassificationNames.asScala))
   }
 
   private def attributeAsString(e: AtlasEntityHeader) = {
