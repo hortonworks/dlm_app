@@ -99,6 +99,26 @@
               <div class="text-small-1">{{clusterDetails.noOfSerices}}</div>
             </div>
           </div>
+          <div class="mdl-grid">
+            <div class="mdl-cell mdl-cell--4-col">
+              <div class="text-dark-small-1">Node Managers Live</div>
+              <div class="text-small-1">
+                <span class="margin-right-10"><i class="fa fa-circle fa-circle--color-up"></i>{{clusterDetails.nodeManagersActive}}</span>
+                <span><i class="fa fa-circle fa-circle--color-down"></i>{{clusterDetails.nodeManagersInactive}}</span>
+              </div>
+            </div>
+            <div class="mdl-cell mdl-cell--4-col">
+              <div class="text-dark-small-1">Resource Manager Heap Size</div>
+              <div #rmHeapProgress class="mdl-progress mdl-js-progress dp-progress pull-left"></div>
+              <div class="progress-percent">{{rmHeapPercent}}</div>
+              <div class="placeholder"></div>
+              <div class="text-small-1">{{clusterDetails.rmHeapUsed}}/{{clusterDetails.rmHeapTotal}}</div>
+            </div>
+            <div class="mdl-cell mdl-cell--4-col">
+              <div class="text-dark-small-1">Resource Manager Uptime</div>
+              <div class="text-small-1">{{clusterDetails.rmUptime}}</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
