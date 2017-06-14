@@ -1,14 +1,19 @@
-import { Routes } from '@angular/router';
+import {Routes} from '@angular/router';
 
-import { LakesComponent } from './views/lakes/lakes.component';
-import { ClusterAddComponent } from './views/cluster-add/cluster-add.component';
+import {LakesComponent} from './views/lakes/lakes.component';
+import {ClusterAddComponent} from './views/cluster-add/cluster-add.component';
+import {ClusterDetailsComponent} from './views/cluster-details/cluster-details.component';
 
 export const routes: Routes = [{
-    path: '',
-    component: LakesComponent
-  },
+  path: '',
+  component: LakesComponent
+},
   {
     path: 'add',
     component: ClusterAddComponent
+  },
+  {
+    path: 'cluster/details/:id',
+    component: ClusterDetailsComponent
   }
 ];

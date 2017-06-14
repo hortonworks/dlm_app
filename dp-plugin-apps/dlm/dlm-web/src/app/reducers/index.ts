@@ -15,6 +15,7 @@ import * as fromEvent from './event.reducer';
 import * as fromProgress from './progress.reducer';
 import * as fromOperation from './operation.reducer';
 import * as fromHdfs from './hdfs.reducer';
+import * as fromHive from './hive.reducer';
 
 export interface State {
   router: RouterState;
@@ -27,6 +28,7 @@ export interface State {
   progress: fromProgress.State;
   operations: fromOperation.State;
   hdfsFiles: fromHdfs.State;
+  hiveDatabases: fromHive.State;
 }
 
 const reducers = {
@@ -39,7 +41,8 @@ const reducers = {
   events: fromEvent.reducer,
   progress: fromProgress.reducer,
   operations: fromOperation.reducer,
-  hdfsFiles: fromHdfs.reducer
+  hdfsFiles: fromHdfs.reducer,
+  hiveDatabases: fromHive.reducer
 };
 
 const devReducer: ActionReducer<State> = compose(storeLogger(), combineReducers)(reducers);
