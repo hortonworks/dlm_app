@@ -7,6 +7,8 @@ import {TabStyleType} from '../../../shared/tabs/tabs.component';
 import {WorkspaceDTO} from '../../../models/workspace-dto';
 import {Alerts} from '../../../shared/utils/alerts';
 import {DialogBox} from '../../../shared/utils/dialog-box';
+import {CollapsibleNavService} from '../../../services/collapsible-nav.service';
+import {PersonaTabs} from '../../../models/header-data';
 
 export enum ToggleView {
   TABLE, GRID
@@ -24,7 +26,8 @@ export class WorkspaceComponent implements OnInit {
 
   tabImages = {'TABLE': 'fa-list-ul', 'GRID': 'fa-th'};
 
-  constructor(private workspaceService: WorkspaceService, private router: Router) { }
+  constructor(private router: Router,
+              private workspaceService: WorkspaceService) { }
 
   addWorkspace() {
     this.router.navigateByUrl('/workspace/(dialog:add-workspace/new)');

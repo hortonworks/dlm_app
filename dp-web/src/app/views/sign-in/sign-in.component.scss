@@ -7,7 +7,8 @@
   bottom: 0;
   display: flex;
   position: absolute;
-  background: $white
+  background: $white;
+  margin-bottom: $layout-header-desktop-row-height * -1;
 }
 
 .login-wrapper {
@@ -16,18 +17,24 @@
 
   .login-pane-wrapper {
     display: flex;
+    align-items: center;
+    height: 100%;
+    min-width: 1260px;
+    margin-bottom: $layout-header-desktop-row-height;
 
-    div {
-      flex: 1;
+    & > div {
+      height: 334px;
+      box-sizing: border-box;
     }
   }
 }
 
 .dp-login-img {
-  height: 334px;
   text-align: right;
   position: relative;
   background: #3fae2a url(../../../assets/images/login-bg-pattern.png);
+  padding-left: 100px;
+  padding-right: 100px;
 
   .hwx-logo {
     width: 205px;
@@ -40,7 +47,7 @@
     color: $white;
     display: inline-block;
     border-left: 1px solid $white;
-    margin: 82px 100px 0px 20px;
+    margin: 82px 0px 0px 20px;
     padding: 54px 0px 54px 20px;
 
     .text-large {
@@ -58,9 +65,9 @@
 .dp-login-controls {
   background: $dove-gray;
   color: $white;
-
+  flex: 1;
   form {
-    padding: 49px 90px 0px 90px;
+    padding: 49px 90px 0px 100px;
   }
 
   .group-title {
@@ -88,9 +95,8 @@
   }
 
   label {
-    font-weight: 100;
     max-width: 100%;
-    margin-bottom: 3px;
+    margin-bottom: 5px;
     display: inline-block;
   }
 }
@@ -102,9 +108,9 @@
   text-overflow: clip;
 }
 
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  input:-webkit-autofill:active {
-    transition: background-color 5000s ease-in-out 0s;
-  }
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+}

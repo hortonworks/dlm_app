@@ -11,6 +11,8 @@ import {WorkspaceAssetsService} from '../../../../services/workspace-assets.serv
 import {WorkspaceAsset} from '../../../../models/workspace-assets';
 import {DsAssetsService} from '../../../dataset/services/dsAssetsService';
 import {DsAssetModel} from '../../../dataset/models/dsAssetModel';
+import {CollapsibleNavService} from '../../../../services/collapsible-nav.service';
+import {PersonaTabs} from '../../../../models/header-data';
 
 enum AssetViewState {
   ADD_ASSETS, EDIT_ASSETS
@@ -37,6 +39,7 @@ export class AssetsComponent implements OnInit {
               private workspaceAssetsService: WorkspaceAssetsService,
               private dsAssetsService: DsAssetsService,
               private clusterService: ClusterService,
+              private collapsibleNavService: CollapsibleNavService,
               private activatedRoute: ActivatedRoute) { }
 
   getAssets() {
@@ -62,6 +65,7 @@ export class AssetsComponent implements OnInit {
   ngOnInit() {
     this.activatedRoute.params.subscribe(params => {
       this.selectedWorkspaceName = params['id'];
+      this.setNavigation();
       this.getWorkSpaceDTO();
     });
   }
@@ -72,6 +76,13 @@ export class AssetsComponent implements OnInit {
     this.cluster = clusters.find(cluster => cluster.name === this.workspaceDTO.clustername);
   }
 
+  setNavigation() {
+    let tabs = [
+      new PersonaTabs('Notebooks', 'workspace/' + this.selectedWorkspaceName + '/notebooks', 'fa-file-text-o'),
+      new PersonaTabs('Assets', 'workspace/'+ this.selectedWorkspaceName +'/assets', 'fa-list-alt')
+    ];
+    this.collapsibleNavService.setTabs(tabs, tabs[1]);
+  }
 
   saveSelectedAssets(asqm: AssetSetQueryModel) {
     this.assetSetQueryModelsForAddition.push(asqm);

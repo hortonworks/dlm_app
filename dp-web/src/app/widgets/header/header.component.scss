@@ -42,15 +42,6 @@
   }
 }
 
-.mdl-navigation__link {
-  cursor: pointer;
-  padding: 0px 9px;
-  margin-right: 10px;
-  position: relative;
-  height: 39px;
-  display: inline-block;
-}
-
 .is_active:after {
   height: 2px;
   width: 100%;
@@ -60,14 +51,6 @@
   left: 0;
   position: absolute;
   background: $fruit-salad;
-}
-
-.mdl-navigation__link {
-  color: $dove-gray !important;
-
-  &.is_active {
-    color: $mine-shaft !important;
-  }
 }
 
 .mdl-navigation {
@@ -83,3 +66,31 @@
   font-size: 13px;
 }
 
+.breadcrumb {
+  .mdl-navigation__link {
+    cursor: pointer;
+    position: relative;
+    height: 39px;
+    font-size: 16px;
+    color: $eastern-blue !important;
+    padding-right: 25px;
+
+    &:after {
+      font-family: FontAwesome;
+      content: "/\A0";
+      margin-left: 8px;
+      font-size: 23px;
+      position: absolute;
+      margin-top: 15px;
+      color: $dove-gray;
+    }
+  }
+
+  .mdl-navigation__link:last-of-type {
+    //color: $dove-gray !important;
+
+    &:after {
+      content: "";
+    }
+  }
+}

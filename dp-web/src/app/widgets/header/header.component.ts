@@ -4,6 +4,7 @@ import { Router, NavigationStart } from '@angular/router';
 import {User} from '../../models/user';
 import {HeaderData, Persona, PersonaTabs} from '../../models/header-data';
 import {ViewPaneState} from '../../app.component';
+import {CollapsibleNavService} from '../../services/collapsible-nav.service';
 
 declare var componentHandler:any;
 
@@ -19,27 +20,29 @@ export class HeaderComponent {
   activePersona: Persona;
   activePersonaName: string;
   sideNavOpen = false;
+  crumbNames: string[] = [];
   viewPaneStates = ViewPaneState;
 
   @Input() user:User;
   @Input() headerData:HeaderData;
-  @Input() personaTabs: PersonaTabs[];
   @Input() viewPaneState: ViewPaneState;
-  @Output() personaTabsChange = new EventEmitter<PersonaTabs[]>();
   @Output() viewPaneStateChange = new EventEmitter<ViewPaneState>();
 
   @ViewChild('sidenav') sidenav: ElementRef;
   @ViewChild('sideNavIcon') sideNavIcon: ElementRef;
 
-  constructor(private router: Router) {
+  constructor(private router: Router,
+              private collapsibleNavService: CollapsibleNavService) {
     router.events.subscribe(event => {
       if (event instanceof NavigationStart ) {
+        this.setCrumbNames(event.url);
         this.navigateTo(event.url)
       }
     });
   }
 
   logout() {
+    this.viewPaneStateChange.emit(ViewPaneState.DEFAULT);
     this.router.navigate(['/sign-out']);
   }
 
@@ -47,48 +50,25 @@ export class HeaderComponent {
     this.activePersona = null;
     this.activeTabName = null;
 
-    let matchFound = false;
     for (let persona of this.headerData.personas) {
-      let personaTabs = persona.tabs;
+      for (let tabs of persona.tabs) {
+        if (tabs.URL && tabs.URL.length > 0 && url.startsWith('/' +tabs.URL)) {
+          this.activePersona = persona;
+          this.activePersonaName = persona.name;
+          this.activeTabName = tabs.tabName;
 
-      for (let firstLevelTab of personaTabs) {
-        matchFound = this.findMatchingTab(firstLevelTab, url, persona, personaTabs);
-        if (matchFound) {
+          this.viewPaneStateChange.emit(ViewPaneState.MAXIMISE);
+          this.collapsibleNavService.setTabs(persona.tabs, tabs);
           break;
-        } else {
-          for (let secondLevelTab of firstLevelTab.tabs) {
-            matchFound = this.findMatchingTab(secondLevelTab, url, persona, firstLevelTab.tabs);
-            if (matchFound) {
-              break;
-            }
-          }
         }
       }
-      if (matchFound) {
-        break;
-      }
     }
   }
-
-  private findMatchingTab(tab: PersonaTabs, url:string, persona, tabs: PersonaTabs[]): boolean {
-    if (tab.URL && tab.URL.length > 0 && url.startsWith('/' +tab.URL)) {
-      this.activePersona = persona;
-      this.activePersonaName = persona.name;
-      this.activeTabName = tab.tabName;
-      if (this.activePersona.topNav) {
-        this.personaTabsChange.emit([]);
-      } else {
-        this.personaTabsChange.emit(tabs);
-      }
-      return true;
-    }
-    return false;
-  }
-
+  
   navigateToPersona(persona: Persona, drawer: any) {
     if (persona.tabs.length > 0 ) {
       this.closeNav();
-      this.viewPaneStateChange.emit(ViewPaneState.DEFAULT);
+      this.viewPaneStateChange.emit(ViewPaneState.MAXIMISE);
       this.router.navigate([persona.tabs[0].URL]);
     }
   }
@@ -121,5 +101,9 @@ export class HeaderComponent {
     if (!clickedInside) {
       this.closeNav();
     }
+  }
+
+  setCrumbNames(url: string) {
+    this.crumbNames = url.replace(/^\//, '').split('/');
   }
 }

@@ -30,12 +30,7 @@ import {DatasetTagService} from "./services/tag.service";
 import {HeaderModule} from './widgets/header/header.module';
 import {CollapsibleNavModule} from './shared/collapsible-nav/collapsible-nav.modue';
 import {SidebarComponent} from './widgets/sidebar/sidebar.component';
-import {DsAssetSearch} from './modules/dataset/views/ds-asset-search/ds-asset-search.component';
-import {BasicQueryEditor} from './modules/dataset/views/ds-asset-search/queryEditors/basic/basic-query-editor.component';
-import {AdvanceQueryEditor} from './modules/dataset/views/ds-asset-search/queryEditors/advance/advance-query-editor.component';
-import {DsAssetList} from './modules/dataset/views/ds-assets-list/ds-assets-list.component';
-import {SimplePaginationWidget} from './shared/pagination/pagination.component';
-import {SearchWidget} from './modules/dataset/views/ds-asset-search/queryEditors/basic/search-widget/search-widget.component';
+import {CollapsibleNavService} from './services/collapsible-nav.service';
 
 export function HttpLoaderFactory(http: Http) {
   return new TranslateHttpLoader(http);
@@ -77,6 +72,7 @@ export function HttpLoaderFactory(http: Http) {
     ClusterService,
     IdentityService,
     ConfigurationService,
+    CollapsibleNavService,
 
     MdlService,
 

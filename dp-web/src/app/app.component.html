@@ -1,5 +1,5 @@
-<dp-header mdl *ngIf="isUserSignedIn()" [headerData]="headerData" [user]="getUser()"  [(personaTabs)]="personaTabs" [(viewPaneState)]="viewPaneState"> </dp-header>
-<dp-collapsible-nav mdl *ngIf="isUserSignedIn()" [personaTabs]="personaTabs" [(viewPaneState)]="viewPaneState"> </dp-collapsible-nav>
+<dp-header mdl *ngIf="isUserSignedIn()" [headerData]="headerData" [user]="getUser()"  [(viewPaneState)]="viewPaneState"> </dp-header>
+<dp-collapsible-nav mdl *ngIf="isUserSignedIn()" [(viewPaneState)]="viewPaneState"> </dp-collapsible-nav>
 <main [ngClass]="{'maximised': viewPaneStates.MAXIMISE  === viewPaneState,
                     'minimized': viewPaneStates.MINIMISE === viewPaneState,
                     'default' : viewPaneStates.DEFAULT === viewPaneState}">

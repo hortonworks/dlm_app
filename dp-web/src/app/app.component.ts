@@ -49,28 +49,23 @@ export class AppComponent implements OnInit {
   setHeaderData() {
     this.headerData.personas = [
       new Persona('Data Steward', [
-        new PersonaTabs('DATASETS', 'dataset'),
-        new PersonaTabs('UNCLASSIFIED', 'unclassified'),
-        new PersonaTabs('ASSETS', 'assets'),
-        new PersonaTabs('AUDITS', 'audits')
+        new PersonaTabs('Data set', 'dataset', 'fa-cubes'),
+        new PersonaTabs('Unclassified', 'unclassified', 'fa-cube'),
+        new PersonaTabs('Assets', 'assets', 'fa-server'),
+        new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')
       ]),
       new Persona('Infra Admin', [
-        new PersonaTabs('CLUSTERS', 'infra', 'fa-list')
-      ], false),
+        new PersonaTabs('Clusters', 'infra', 'fa-list')
+      ]),
 
       new Persona('Analytics', [
-        new PersonaTabs('Workspace', 'workspace', 'fa-globe', [
-          new PersonaTabs('Dashboard', 'workspace/dashboard', 'fa-dashboard'),
-          new PersonaTabs('Assets', 'workspace/.*/assets$', 'fa-list-alt'),
-          new PersonaTabs('Notebooks', 'workspace/notebooks', 'fa-file-text-o'),
-          new PersonaTabs('Jobs', 'workspace/jobs', 'fa-briefcase')
-        ]),
+        new PersonaTabs('Workspace', 'workspace', 'fa-globe'),
         new PersonaTabs('Assets', 'analytics/assets', 'fa-list-alt'),
         new PersonaTabs('Clusters', '', 'fa-database'),
         new PersonaTabs('Jobs', '', 'fa-briefcase')
-      ], false),
-      new Persona('DLM', [
-      ], false)
+      ]),
+      new Persona('Data Life cycle Manager', [
+      ])
     ];
   }
 }
