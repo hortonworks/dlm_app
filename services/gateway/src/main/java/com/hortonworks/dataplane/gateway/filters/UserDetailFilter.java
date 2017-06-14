@@ -4,7 +4,7 @@ package com.hortonworks.dataplane.gateway.filters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hortonworks.dataplane.gateway.domain.Constants;
-import com.hortonworks.dataplane.gateway.domain.User;
+import com.hortonworks.dataplane.gateway.domain.UserRef;
 import com.hortonworks.dataplane.gateway.utils.Utils;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
@@ -47,11 +47,10 @@ public class UserDetailFilter extends ZuulFilter {
     if (userObj==null){
       throw new RuntimeException("illegal state. user should have been set");
     }
-    User user=(User)userObj;
     try {
-      user.setPassword("");
-      String userJson=objectMapper.writeValueAsString(user);
-      ctx.setResponseBody(userJson);
+      UserRef userRef=(UserRef)userObj;
+      String userRefJson=objectMapper.writeValueAsString(userRef);
+      ctx.setResponseBody(userRefJson);
       ctx.setResponseStatusCode(200);
       ctx.setSendZuulResponse(false);
       return null;
