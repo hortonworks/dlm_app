@@ -4,12 +4,16 @@ package com.hortonworks.dataplane.gateway.filters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hortonworks.dataplane.gateway.domain.Constants;
+import com.hortonworks.dataplane.gateway.domain.User;
 import com.hortonworks.dataplane.gateway.domain.UserRef;
+import com.hortonworks.dataplane.gateway.service.UserService;
 import com.hortonworks.dataplane.gateway.utils.Utils;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_DECORATION_FILTER_ORDER;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
@@ -20,10 +24,13 @@ public class UserDetailFilter extends ZuulFilter {
   @Autowired
   private Utils utils;
 
+  @Autowired
+  private UserService userService;
+
   private ObjectMapper objectMapper = new ObjectMapper();
 
   @Autowired
-  private UserServiceInterface userServiceInterface;
+  private Jwt jwt;
 
   @Override
   public String filterType() {
@@ -48,7 +55,10 @@ public class UserDetailFilter extends ZuulFilter {
       throw new RuntimeException("illegal state. user should have been set");
     }
     try {
-      UserRef userRef=(UserRef)userObj;
+      User user=(User)userObj;
+      List<String> roles = userService.getRoles(user.getUsername());
+      String jwtToken = this.jwt.makeJWT(user, roles);
+      UserRef userRef = userService.getUserRef(user, roles, jwtToken);//todo pass right token.
       String userRefJson=objectMapper.writeValueAsString(userRef);
       ctx.setResponseBody(userRefJson);
       ctx.setResponseStatusCode(200);

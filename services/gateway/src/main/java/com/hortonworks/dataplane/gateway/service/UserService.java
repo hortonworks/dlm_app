@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class UserService {
   @Autowired
   private UserServiceInterface userServiceInterface;
 
-  public Optional<User> getUser(String userName){
+  public Optional<User> getUser(String userName) {
     try {
       UserList userList = userServiceInterface.getUser(userName);
       if (userList == null || userList.getResults().size() < 1) {
@@ -31,25 +30,37 @@ public class UserService {
       } else {
         return Optional.of(userList.getResults().get(0));
       }
-    }catch (FeignException e ){
-      if (e.status()== HttpStatus.NOT_FOUND.value()){
+    } catch (FeignException e) {
+      if (e.status() == HttpStatus.NOT_FOUND.value()) {
         //USer is not found
         return Optional.absent();
-      }else{
+      } else {
         throw new RuntimeException(e);
       }
     }
   }
 
-  public Optional<UserRef> getUserRef(String userName){
-    Optional<User> user=getUser(userName);
-    if (user.isPresent()){
-      UserRoleResponse rolesResp = userServiceInterface.getRoles(userName);
-      //TODO check for not found feign exception. not reqquired currently as it is unlikely to be thrown
-      List<String> roles = rolesResp.getResults().getRoles();
-      return Optional.of(getUserRef(user.get(),roles,null));
-    }else{
+  public Optional<UserRef> getUserRef(String userName) {
+    Optional<User> user = getUser(userName);
+    if (user.isPresent()) {
+      List<String> roles = getRoles(userName);
+      return Optional.of(getUserRef(user.get(), roles, null));
+    } else {
       return Optional.absent();
+    }
+  }
+
+  public List<String> getRoles(String userName) {
+    try {
+      UserRoleResponse rolesResponse = userServiceInterface.getRoles(userName);
+      return rolesResponse.getResults().getRoles();
+    } catch (FeignException e) {
+      if (e.status() == HttpStatus.NOT_FOUND.value()) {
+        //USer is not found
+        throw new RuntimeException("User not found");
+      } else {
+        throw new RuntimeException(e);
+      }
     }
   }
 

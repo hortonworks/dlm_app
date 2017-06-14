@@ -4,13 +4,12 @@ package com.hortonworks.dataplane.gateway.filters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
+import com.hortonworks.dataplane.gateway.domain.User;
 import com.hortonworks.dataplane.gateway.domain.UserRef;
 import com.hortonworks.dataplane.gateway.service.UserService;
 import com.hortonworks.dataplane.gateway.utils.KnoxSso;
 import com.hortonworks.dataplane.gateway.utils.Utils;
 import com.hortonworks.dataplane.gateway.domain.Constants;
-import com.hortonworks.dataplane.gateway.domain.User;
-import com.hortonworks.dataplane.gateway.domain.UserList;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import feign.FeignException;
@@ -109,13 +108,13 @@ public class TokenCheckFilter extends ZuulFilter {
       return utils.sendUnauthorized();
     }
     try{
-      Optional<UserRef> userRefOpt = userService.getUserRef(subjectOptional.get());
-      if (!userRefOpt.isPresent()){
+      Optional<User> user = userService.getUser(subjectOptional.get());
+      if (!user.isPresent()){
         return utils.sendForbidden(String.format("User %s not found in the system", subjectOptional.get()));
       }else{
         setSsoValidCookie();
-        setUpstreamUserContext(userRefOpt.get());
-        RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY,userRefOpt.get());
+        setUpstreamUserContext(user.get());
+        RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY,user.get());
         return null;
       }
     }catch (FeignException e){
@@ -152,7 +151,7 @@ public class TokenCheckFilter extends ZuulFilter {
     return null;
   }
 
-  private void setUpstreamUserContext(UserRef userRef) {
+  private void setUpstreamUserContext(User userRef) {
     RequestContext ctx = RequestContext.getCurrentContext();
     try {
       String userJson = objectMapper.writeValueAsString(userRef);
@@ -168,12 +167,12 @@ public class TokenCheckFilter extends ZuulFilter {
 
   private Object authorizeThroughBearerToken(Optional<String> bearerToken) {
     try {
-      Optional<UserRef> userOptional = jwt.parseJWT(bearerToken.get());
+      Optional<User> userOptional = jwt.parseJWT(bearerToken.get());
       if (!userOptional.isPresent()) {
         return utils.sendForbidden("User is not present in system");
       } else {
-        UserRef userRef = userOptional.get();
-        setUpstreamUserContext(userRef);
+        User user = userOptional.get();
+        setUpstreamUserContext(user);
         return null;
         //TODO  role check. api permission check on the specified resource.
       }
