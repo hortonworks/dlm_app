@@ -2,11 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 
-import {WorkspaceService} from '../../../services/workspace.service';
-import {Workspace} from '../../../models/workspace';
-import {Alerts} from '../../../shared/utils/alerts';
-import {ClusterService} from '../../../services/cluster.service';
-import {Cluster} from '../../../models/cluster';
+import {WorkspaceService} from '../../../../services/workspace.service';
+import {Workspace} from '../../../../models/workspace';
+import {Alerts} from '../../../../shared/utils/alerts';
+import {ClusterService} from '../../../../services/cluster.service';
+import {Cluster} from '../../../../models/cluster';
 
 @Component({
   selector: 'dp-add-workspace',

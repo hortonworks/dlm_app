@@ -16,7 +16,7 @@
 
     <div class="spacer-15"> </div>
     <div class="card-container">
-        <div class=" mdl-card" *ngFor="let workspacesDTO of workspacesDTOS">
+        <div class=" mdl-card" *ngFor="let workspacesDTO of workspacesDTOS" (click)="editWorkspace($event, workspacesDTO)">
             <div class="mdl-card__title">
                 <div class="card-title"> {{ workspacesDTO.workspace.name }}</div>
                 <div class="card-title-sub"><span>Source: </span> <b> {{ workspacesDTO.clustername }} </b></div>

@@ -30,6 +30,12 @@ export class WorkspaceComponent implements OnInit {
     this.router.navigateByUrl('/workspace/(dialog:add-workspace/new)');
   }
 
+  editWorkspace($event, workspacesDTO: WorkspaceDTO) {
+    if ($event.target.nodeName !== 'I') {
+      this.router.navigate(['/workspace/' + workspacesDTO.workspace.name + '/assets']);
+    }
+  }
+
   delete(name: string) {
     DialogBox.showConfirmationMessage('Do you wish to delete workspace ' + name).subscribe(result => {
       if (result) {

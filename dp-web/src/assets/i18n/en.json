@@ -25,6 +25,7 @@
     "loading" : "Loading",
     "name" : "Name",
     "moreLink" : "Learn More",
+    "save": "SAVE",
     "sidenav" : {
       "analyst" : "Analyst",
       "infra" : "Infra Admin",

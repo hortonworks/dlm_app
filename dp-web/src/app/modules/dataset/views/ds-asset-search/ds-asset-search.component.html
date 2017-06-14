@@ -35,7 +35,8 @@
   </div>
   <div class="actionButtonCont">
     <button class="mdl-button btn-hwx-secondary" (click)="actionCancel()">{{"pages.dataset.asset-search.cancel" | translate}}</button>
-    <button class="mdl-button btn-hwx-primary" (click)="actionDone()">{{"pages.dataset.asset-search.done" | translate}}</button>
+    <button *ngIf="!saveButton" class="mdl-button btn-hwx-primary" (click)="actionDone()">{{"pages.dataset.asset-search.done" | translate}}</button>
+    <button *ngIf="saveButton" class="mdl-button btn-hwx-primary" (click)="actionDone()">{{"common.save" | translate}}</button>
     <div style="clear: both"></div>
   </div>
 </div>

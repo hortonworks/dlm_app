@@ -60,10 +60,10 @@ export class AppComponent implements OnInit {
 
       new Persona('Analytics', [
         new PersonaTabs('Workspace', 'workspace', 'fa-globe', [
-          new PersonaTabs('Dashboard', 'workspaces/dashboard', 'fa-dashboard'),
-          new PersonaTabs('Assets', 'workspaces/assets', 'fa-list-alt'),
-          new PersonaTabs('Notebooks', 'workspaces/notebooks', 'fa-text-o'),
-          new PersonaTabs('Jobs', 'workspaces/jobs', 'fa-briefcase')
+          new PersonaTabs('Dashboard', 'workspace/dashboard', 'fa-dashboard'),
+          new PersonaTabs('Assets', 'workspace/.*/assets$', 'fa-list-alt'),
+          new PersonaTabs('Notebooks', 'workspace/notebooks', 'fa-file-text-o'),
+          new PersonaTabs('Jobs', 'workspace/jobs', 'fa-briefcase')
         ]),
         new PersonaTabs('Assets', 'analytics/assets', 'fa-list-alt'),
         new PersonaTabs('Clusters', '', 'fa-database'),

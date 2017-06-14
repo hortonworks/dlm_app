@@ -1,0 +1,41 @@
+<div class="page-container">
+    <div class="add-assets" *ngIf="viewState === assetViewState.ADD_ASSETS">
+        <div class="hwx-title"> Add Assets </div>
+        <div class="hwx-desc"> Add related data assets into your workspace, by searching across the Data-Lake </div>
+        <div class="spacer-15"> </div>
+        <button class="mdl-button btn-hwx-primary" (click)="showAssets=true"> ADD ASSETS </button>
+    </div>
+    <div class="edit-assets" *ngIf="viewState === assetViewState.EDIT_ASSETS">
+        <div class="mdl-grid mdl-grid--no-spacing">
+            <div class="mdl-layout-spacer"></div>
+            <button class="mdl-button btn-hwx-primary" (click)="showAssets=true"> ADD ASSETS </button>
+        </div>
+        <div class="spacer-15"> </div>
+        <table class="mdl-data-table mdl-js-data-table" *ngIf="viewState === assetViewState.EDIT_ASSETS">
+            <thead>
+            <th>Source</th>
+            <th>Name</th>
+            <th>Owner</th>
+            <th>Created Time</th>
+            <th>Number of Rows</th>
+            <th>Data Type</th>
+            </thead>
+            <tbody>
+            <tr *ngFor="let asset of dsAssetsServiceObservable | async ">
+                <td> {{ asset.type }} </td>
+                <td> {{ asset.name }} </td>
+                <td> {{ asset.owner }} </td>
+                <td>  - </td>
+                <td> {{ asset.rowCount }} </td>
+                <td> {{ asset.type }} </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div *ngIf="showAssets" class="popup borderBox">
+    <div class="opaque">
+        <asset-search [saveButton]=true [clusterId]="cluster.id" (doneNotification)="saveSelectedAssets($event)" (cancelNotification)="showAssets=false"> </asset-search>
+    </div>
+</div>

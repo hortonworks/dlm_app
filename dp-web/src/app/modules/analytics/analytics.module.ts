@@ -4,28 +4,37 @@ import { CommonModule } from '@angular/common';
 
 import {SharedModule} from '../../shared/shared.module';
 import { WorkspaceComponent } from './workspace/workspace.component';
-import {routes} from './analytics.routes';
+import {analyticsRoutes} from './analytics.routes';
 import {WorkspaceService} from '../../services/workspace.service';
 import {TabsModule} from '../../shared/tabs/tabs.module';
-import { AddWorkspaceComponent } from './add-workspace/add-workspace.component';
+import { AddWorkspaceComponent } from './workspace/add-workspace/add-workspace.component';
 import {ClusterService} from '../../services/cluster.service';
 import {SelectModule} from '../../shared/select/select.module';
+import { AssetsComponent } from './workspace/assets/assets.component';
+import {DatasetModule} from '../dataset/dataset.module';
+import {DatasetSharedModule} from '../dataset/dataset-shared.module';
+import {WorkspaceAssetsService} from '../../services/workspace-assets.service';
+import {DsAssetsService} from '../dataset/services/dsAssetsService';
 
 @NgModule({
   imports: [
-    RouterModule.forChild(routes),
+    RouterModule.forChild(analyticsRoutes),
+    DatasetSharedModule,
     CommonModule,
     SharedModule,
     SelectModule,
     TabsModule
   ],
   declarations: [
-    WorkspaceComponent,
-    AddWorkspaceComponent
+    AddWorkspaceComponent,
+    AssetsComponent,
+    WorkspaceComponent
   ],
   providers: [
+    DsAssetsService,
     ClusterService,
-    WorkspaceService
+    WorkspaceService,
+    WorkspaceAssetsService
   ]
 })
 export class AnalyticsModule { }

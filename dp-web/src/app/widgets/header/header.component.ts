@@ -47,24 +47,42 @@ export class HeaderComponent {
     this.activePersona = null;
     this.activeTabName = null;
 
+    let matchFound = false;
     for (let persona of this.headerData.personas) {
       let personaTabs = persona.tabs;
 
-      for (let tabs of personaTabs) {
-        if (tabs.URL && tabs.URL.length > 0 && url.startsWith('/' +tabs.URL)) {
-          this.activePersona = persona;
-          this.activePersonaName = persona.name;
-          this.activeTabName = tabs.tabName;
-          if (this.activePersona.topNav) {
-            this. personaTabsChange.emit([]);
-          } else {
-            this. personaTabsChange.emit(this.activePersona.tabs);
-          }
+      for (let firstLevelTab of personaTabs) {
+        matchFound = this.findMatchingTab(firstLevelTab, url, persona, personaTabs);
+        if (matchFound) {
           break;
+        } else {
+          for (let secondLevelTab of firstLevelTab.tabs) {
+            matchFound = this.findMatchingTab(secondLevelTab, url, persona, firstLevelTab.tabs);
+            if (matchFound) {
+              break;
+            }
+          }
         }
       }
-
+      if (matchFound) {
+        break;
+      }
     }
+  }
+
+  private findMatchingTab(tab: PersonaTabs, url:string, persona, tabs: PersonaTabs[]): boolean {
+    if (tab.URL && tab.URL.length > 0 && url.startsWith('/' +tab.URL)) {
+      this.activePersona = persona;
+      this.activePersonaName = persona.name;
+      this.activeTabName = tab.tabName;
+      if (this.activePersona.topNav) {
+        this.personaTabsChange.emit([]);
+      } else {
+        this.personaTabsChange.emit(tabs);
+      }
+      return true;
+    }
+    return false;
   }
 
   navigateToPersona(persona: Persona, drawer: any) {

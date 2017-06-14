@@ -6,5 +6,5 @@ export class DsAssetModel {
   rowCount: number;
   source: string;
   type: string;
-  clusterId?:number;
+  clusterId:number;
 }

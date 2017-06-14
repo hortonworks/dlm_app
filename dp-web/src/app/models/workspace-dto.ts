@@ -8,5 +8,9 @@ export class WorkspaceDTO {
   counts: {
     asset: number;
     notebook: number;
+  };
+
+  constructor() {
+    this.counts = {asset: 0, notebook: 0};
   }
 }
