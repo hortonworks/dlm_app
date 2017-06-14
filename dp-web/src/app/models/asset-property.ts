@@ -4,8 +4,11 @@ export class AssetProperty {
 }
 
 export class AssetDetails {
-  referredEntities: Object;
+  referredEntities: any;
   entity: {
-    classifications: Object[]
+    classifications: any[]
+    id: string;
+    typeName: string;
+    status: string;
   };
 }

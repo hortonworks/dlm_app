@@ -1,0 +1,48 @@
+.asset-icon {
+  height: 20px;
+  width: 20px;
+  padding-right: 5px;
+}
+.details-container{
+  padding: 25px 25px;
+}
+.overflow-ellipsis {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.overflow-clip {
+  text-overflow: clip;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.padding0{
+  padding: 0px;
+}
+
+.left-align {
+  text-align: left;
+}
+
+.pointer{
+  cursor: pointer;
+}
+
+.title {
+  margin-top: 3px;
+  font-weight: 500;
+  width: 70%;
+}
+
+.center {
+  margin-top: 50%;
+  margin-bottom: 50%
+}
+
+.title-container {
+  padding: 20px 10px 10px 10px;
+  text-align: left
+}
+

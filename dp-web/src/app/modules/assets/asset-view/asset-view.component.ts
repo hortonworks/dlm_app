@@ -1,8 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, RouterModule, Routes} from '@angular/router';
 
 import {AssetService} from '../../../services/asset.service';
 import {TabStyleType} from '../../../shared/tabs/tabs.component';
+import {NodeDetailsComponent} from './node-details/node-details.component'
 import {AssetDetails, AssetProperty} from '../../../models/asset-property';
 
 
@@ -60,3 +61,4 @@ export class AssetViewComponent implements OnInit {
   }
 
 }
+
