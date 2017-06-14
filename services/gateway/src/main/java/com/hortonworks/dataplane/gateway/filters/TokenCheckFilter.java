@@ -4,6 +4,8 @@ package com.hortonworks.dataplane.gateway.filters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
+import com.hortonworks.dataplane.gateway.domain.UserRef;
+import com.hortonworks.dataplane.gateway.service.UserService;
 import com.hortonworks.dataplane.gateway.utils.KnoxSso;
 import com.hortonworks.dataplane.gateway.utils.Utils;
 import com.hortonworks.dataplane.gateway.domain.Constants;
@@ -32,7 +34,7 @@ public class TokenCheckFilter extends ZuulFilter {
   private static final String AUTH_ENTRY_POINT = "/api/app/auth/in";
 
   @Autowired
-  UserServiceInterface userServiceInterface;
+  private UserService userService;
 
   @Autowired
   private KnoxSso knoxSso;
@@ -106,23 +108,19 @@ public class TokenCheckFilter extends ZuulFilter {
     if (!subjectOptional.isPresent()) {
       return utils.sendUnauthorized();
     }
-    UserList userList=null;
     try{
-      userList = userServiceInterface.getUser(subjectOptional.get());
-    }catch (FeignException e){
-      if (e.status()== HttpStatus.NOT_FOUND.value()){
+      Optional<UserRef> userRefOpt = userService.getUserRef(subjectOptional.get());
+      if (!userRefOpt.isPresent()){
         return utils.sendForbidden(String.format("User %s not found in the system", subjectOptional.get()));
       }else{
-        throw new RuntimeException(e);
+        setSsoValidCookie();
+        setUpstreamUserContext(userRefOpt.get());
+        RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY,userRefOpt.get());
+        return null;
       }
+    }catch (FeignException e){
+      throw new RuntimeException(e);
     }
-    if (userList == null || userList.getResults() == null || userList.getResults().size() < 1) {
-      return utils.sendForbidden(null);
-    }
-    setSsoValidCookie();
-    setUpstreamUserContext(userList.getResults().get(0));
-    RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY,userList.getResults().get(0));
-    return null;
   }
 
   private void setSsoValidCookie() {
@@ -154,11 +152,10 @@ public class TokenCheckFilter extends ZuulFilter {
     return null;
   }
 
-  private void setUpstreamUserContext(User user) {
+  private void setUpstreamUserContext(UserRef userRef) {
     RequestContext ctx = RequestContext.getCurrentContext();
     try {
-      user.setPassword("");
-      String userJson = objectMapper.writeValueAsString(user);
+      String userJson = objectMapper.writeValueAsString(userRef);
       ctx.addZuulRequestHeader(DP_USER_INFO_HEADER_KEY,Base64.encodeBase64String( userJson.getBytes()));
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
@@ -171,12 +168,12 @@ public class TokenCheckFilter extends ZuulFilter {
 
   private Object authorizeThroughBearerToken(Optional<String> bearerToken) {
     try {
-      Optional<User> userOptional = jwt.parseJWT(bearerToken.get());
+      Optional<UserRef> userOptional = jwt.parseJWT(bearerToken.get());
       if (!userOptional.isPresent()) {
         return utils.sendForbidden("User is not present in system");
       } else {
-        User user = userOptional.get();
-        setUpstreamUserContext(user);
+        UserRef userRef = userOptional.get();
+        setUpstreamUserContext(userRef);
         return null;
         //TODO  role check. api permission check on the specified resource.
       }

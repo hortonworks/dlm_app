@@ -3,8 +3,11 @@ package com.hortonworks.dataplane.gateway.filters;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Optional;
 import com.hortonworks.dataplane.gateway.domain.*;
 import com.hortonworks.dataplane.gateway.domain.Error;
+import com.hortonworks.dataplane.gateway.service.UserService;
+import com.hortonworks.dataplane.gateway.utils.Utils;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import feign.FeignException;
@@ -16,7 +19,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.ServletInputStream;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_DECORATION_FILTER_ORDER;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
@@ -28,10 +30,13 @@ public class SimpleSignInFilter extends ZuulFilter {
   private static final String AUTH_ENTRY_POINT = Constants.DPAPP_BASE_PATH+"/auth/in";
 
   @Autowired
-  private UserServiceInterface userServiceInterface;
+  private UserService userService;
 
   @Autowired
   private Jwt jwt;
+
+  @Autowired
+  private Utils utils;
 
   private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -64,21 +69,25 @@ public class SimpleSignInFilter extends ZuulFilter {
     try {
       ServletInputStream inputStream = ctx.getRequest().getInputStream();
       Credential credential = objectMapper.readValue(inputStream, Credential.class);
-      UserList user = userServiceInterface.getUser(credential.getUsername());
-      if (hasNoUser(ctx, user)) return null;
+      Optional<User> user = userService.getUser(credential.getUsername());
+      if (!user.isPresent()){
+        return sendNoUserResponse();
+      }
 
-      // Get the user
-      User toSignIn = user.getResults().get(0);
-      boolean checkpw = BCrypt.checkpw(credential.getPassword(), toSignIn.getPassword());
-      if (passwordCheck(ctx, checkpw)) return null;
-
-      // Construct a JWT token
-      String token = jwt.makeJWT(toSignIn);
-      UserRef userRef = getUserRef(credential, toSignIn, token);
-
-      ctx.setResponseStatusCode(200);
-      ctx.setResponseBody(objectMapper.writeValueAsString(userRef));
-      ctx.setSendZuulResponse(false);
+      boolean validPassword = BCrypt.checkpw(credential.getPassword(), user.get().getPassword());
+      if (!validPassword) {
+        return sendInvalidPasswordResponse();
+      }
+      Optional<UserRef> userRefOpt = userService.getUserRef(credential.getUsername());
+      if (userRefOpt.isPresent()){
+        // Construct a JWT token
+        UserRef userRef=userRefOpt.get();
+        String token = jwt.makeJWT(userRef);
+        userRef.setToken(token);
+        ctx.setResponseStatusCode(200);
+        ctx.setResponseBody(objectMapper.writeValueAsString(userRef));
+        ctx.setSendZuulResponse(false);
+      }
     } catch (IOException e) {
       ctx.setResponseStatusCode(500);
       ctx.setSendZuulResponse(false);
@@ -103,38 +112,20 @@ public class SimpleSignInFilter extends ZuulFilter {
     }
   }
 
-  private boolean passwordCheck(RequestContext ctx, boolean checkpw) throws JsonProcessingException {
-    if (!checkpw) {
-      ctx.setResponseStatusCode(401);
-      ctx.setResponseBody(objectMapper.writeValueAsString(new Error("Incorrect password", "")));
-      ctx.setSendZuulResponse(false);
-      return true;
-    }
-    return false;
+  private boolean sendInvalidPasswordResponse() throws JsonProcessingException {
+    RequestContext ctx = RequestContext.getCurrentContext();
+    ctx.setResponseStatusCode(401);
+    ctx.setResponseBody(objectMapper.writeValueAsString(new Error("Incorrect password", "")));
+    ctx.setSendZuulResponse(false);
+    return true;
+
   }
 
-  private boolean hasNoUser(RequestContext ctx, UserList user) throws JsonProcessingException {
-    if (user.getResults().size() == 0) {
-      ctx.setResponseStatusCode(401);
-      ctx.setResponseBody(objectMapper.writeValueAsString(new Error("Cannot find user", "")));
-      ctx.setSendZuulResponse(false);
-      return true;
-    }
-    return false;
-  }
-
-  private UserRef getUserRef(Credential credential, User toSignIn, String token) {
-    UserRef userRef = new UserRef();
-    userRef.setId(toSignIn.getUsername());
-    userRef.setAvatar(toSignIn.getAvatar());
-    userRef.setDisplay(toSignIn.getDisplayname());
-    try {
-      UserRoleResponse roles = userServiceInterface.getRoles(credential.getUsername());
-      userRef.setRoles(roles.getResults().getRoles());
-    } catch (Throwable th) {
-      userRef.setRoles(new ArrayList<String>());
-    }
-    userRef.setToken(token);
-    return userRef;
+  private boolean sendNoUserResponse() throws JsonProcessingException {
+     RequestContext ctx = RequestContext.getCurrentContext();
+     ctx.setResponseStatusCode(401);
+     ctx.setResponseBody(objectMapper.writeValueAsString(new Error("Cannot find user", "")));
+     ctx.setSendZuulResponse(false);
+     return true;
   }
 }

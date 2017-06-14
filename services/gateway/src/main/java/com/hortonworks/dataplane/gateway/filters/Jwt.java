@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
-import com.hortonworks.dataplane.gateway.domain.User;
+import com.hortonworks.dataplane.gateway.domain.UserRef;
 import com.hortonworks.dataplane.gateway.utils.GatewayKeystore;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
@@ -37,11 +37,11 @@ public class Jwt {
   @Autowired
   private GatewayKeystore gatewayKeystore;
 
-  public String makeJWT(User user) throws JsonProcessingException {
+  public String makeJWT(UserRef userRef) throws JsonProcessingException {
     long timeMillis = System.currentTimeMillis();
     Date now = new Date(timeMillis);
     Map<String, Object> claims = Maps.newHashMap();
-    claims.put("user", objectMapper.writeValueAsString(user));
+    claims.put("user", objectMapper.writeValueAsString(userRef));
 
     JwtBuilder builder = Jwts.builder()
       .setIssuedAt(now)
@@ -54,7 +54,7 @@ public class Jwt {
 
   }
 
-  public Optional<User> parseJWT(String jwt) throws IOException {
+  public Optional<UserRef> parseJWT(String jwt) throws IOException {
     Claims claims = Jwts.parser()
       .setSigningKey(getVerifyingKey())
       .parseClaimsJws(jwt).getBody();
@@ -67,7 +67,7 @@ public class Jwt {
 
     String userJsonString = claims.get("user").toString();
 
-    User user = objectMapper.readValue(userJsonString, User.class);
+    UserRef user = objectMapper.readValue(userJsonString, UserRef.class);
     return Optional.fromNullable(user);
   }
   private Key getSigningKey() {
