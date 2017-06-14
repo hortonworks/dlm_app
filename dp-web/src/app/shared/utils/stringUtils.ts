@@ -30,4 +30,19 @@ export class StringUtils {
     let i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round(bytes / Math.pow(k, i)) + ' ' + sizes[i];
   }
+  public static getFlattenedObjects(obj: any): string {
+    let objArray = Object.keys(obj).map((key) => {
+      if (!obj[key]) {
+        return;
+      }
+      if (!Array.isArray(obj[key]) && typeof obj[key] !== 'object') {
+        return `${key}: ${obj[key]}`;
+      } else if (Array.isArray(obj[key])) {
+        return `${key}: ${obj[key].join()}`;
+      } else {
+        return this.getFlattenedObjects(obj[key]);
+      }
+    });
+    return objArray.join(', ');
+  }
 }

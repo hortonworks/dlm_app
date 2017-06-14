@@ -1,9 +1,21 @@
-import { Routes } from '@angular/router';
+import {Routes} from '@angular/router';
 
 import {AssetViewComponent} from './asset-view/asset-view.component';
+import {NodeDetailsComponent} from './asset-view/node-details/node-details.component';
 
 export const routes: Routes = [{
-    path: 'details/:id/:guid',
-    component: AssetViewComponent
-  }
+  path: '',
+  component: AssetViewComponent
+}, {
+  path: 'details/:id/:guid',
+  component: AssetViewComponent,
+  children: [
+    {
+      path: 'node/:guid',
+      component: NodeDetailsComponent,
+      outlet: 'sidebar'
+
+    }
+  ]
+}
 ];

@@ -19,14 +19,16 @@ class ClusterHealthService @Inject()(
     @Named("clusterComponentsService") val clusterComponentService: ClusterComponentService) {
 
   def getClusterHealthData(
-      clusterId: Long): Future[Either[Errors, ClusterHealthData]] = {
+      clusterId: Long): Future[Either[Errors,ClusterHealthData]]= {
     // get linked clusters
     val chd = for {
       namenode <- clusterComponentService.getServiceByName(clusterId, NAMENODE)
       hosts <- clusterHostsService.getHostsByCluster(clusterId)
     } yield {
-      val nn =
-        (namenode.right.get.properties.get \ "stats").validate[NameNodeInfo].asOpt
+      val nn = namenode match {
+        case Left(errors) => None
+        case Right(namenode) => (namenode.properties.get \ "stats").validate[NameNodeInfo].asOpt
+      }
       val hostsList =
         hosts.right.get.map(h => h.properties.get.validate[ClusterHost].get)
       ClusterHealthData(nn, hostsList)

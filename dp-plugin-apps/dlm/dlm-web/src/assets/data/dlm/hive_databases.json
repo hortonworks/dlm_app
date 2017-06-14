@@ -1,0 +1,12 @@
+{
+  "databases": [
+    {
+      "id": "testdb",
+      "name": "testdb"
+    },
+    {
+      "id": "default",
+      "name": "default"
+    }
+  ]
+}

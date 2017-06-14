@@ -23,7 +23,7 @@ export const SEARCH_INPUT_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class SearchInputComponent implements OnInit, ControlValueAccessor {
   @Input() value = '';
-  @Output() change = new EventEmitter<string>();
+  @Output() valueChange = new EventEmitter<string>();
   onChange = (_: any) => {};
 
   constructor() { }
@@ -46,6 +46,6 @@ export class SearchInputComponent implements OnInit, ControlValueAccessor {
   onKeyup(event: any) {
     const value = event.target.value;
     this.onChange(value);
-    this.change.emit(value);
+    this.valueChange.emit(value);
   }
 }

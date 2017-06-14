@@ -97,15 +97,22 @@ class Clusters @Inject()(
       .map {
         case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
         case Right(clusterHealth) => Ok(summary match {
-          case Some(summary) => Json.obj(
-            "nodes" -> clusterHealth.hosts.length,
-            "totalSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityTotal),
-            "usedSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityUsed),
-            "status" -> Json.obj(
-              "state" -> clusterHealth.nameNodeInfo.get.state,
-              "since" -> (if (clusterHealth.nameNodeInfo.get.StartTime.isDefined) (clusterHealth.nameNodeInfo.get.StartTime.get - System.currentTimeMillis()) else 0)
-            )
-          )
+          case Some(summary) => {
+            clusterHealth.nameNodeInfo match {
+              case Some(nameNodeInfo) =>  Json.obj(
+                "nodes" -> clusterHealth.hosts.length,
+                "totalSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityTotal),
+                "usedSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityUsed),
+                "status" -> Json.obj(
+                  "state" -> clusterHealth.nameNodeInfo.get.state,
+                  "since" -> clusterHealth.nameNodeInfo.get.StartTime.map(_ => clusterHealth.nameNodeInfo.get.StartTime.get - System.currentTimeMillis())
+                )
+              )
+              case None => Json.obj(
+                "nodes" -> clusterHealth.hosts.length
+              )
+            }
+          }
           case None => Json.toJson(clusterHealth)
         })
       }

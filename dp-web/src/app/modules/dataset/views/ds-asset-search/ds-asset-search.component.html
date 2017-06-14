@@ -14,6 +14,7 @@
                           [queryModel]="queryModel"
                           [clusterId]="clusterId"
                           (onHeightChange)="onQueryEditorResize($event)"
+                          (onActionDone)="actionSearch($event)"
     #advanceQueryEditor ></advance-query-editor>
     <div style="clear: both"></div>
   </div>

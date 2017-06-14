@@ -102,6 +102,7 @@ export class QueryFilter implements OnInit {
   @Input() avoidNewLine: boolean = false;
   @Input() clusterId:number;
   @Output("onClose") closeEmitter: EventEmitter<null> = new EventEmitter<null>();
+  @Output("onInputEnter") enterEmitter: EventEmitter<null> = new EventEmitter<null>();
   filterObject: QueryFilterObject = null;
   availableFilters: any[] = [
     {display: "Select Filter Type", dataType: "QueryFilterObject"}
@@ -145,5 +146,13 @@ export class QueryFilter implements OnInit {
 
   onCloseClick() {
     this.closeEmitter.emit();
+  }
+
+  onEnterClick() {
+    this.enterEmitter.emit();
+  }
+
+  onKeyDown (event) {
+    (event.keyCode === 13) && this.onEnterClick();
   }
 }
