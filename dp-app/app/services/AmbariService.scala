@@ -3,13 +3,12 @@ package services
 import javax.inject.Inject
 
 import com.google.inject.Singleton
-import com.hortonworks.dataplane.commons.domain.Entities.DataplaneCluster
-import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, Error, Errors}
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import play.api.Logger
 
@@ -37,7 +36,7 @@ class AmbariService @Inject()(private val wSClient: WSClient,private val configu
       .post(Json.toJson(ambariEndpoint)).map { response =>
         Logger.info(s"Got cluster information. ${response.json}")
       if (response.status == 200) {
-        Right((response.json \ "results" \\ "data")(0))
+        Right((response.json \ "results" \\ "data").head)
       }else{
         Left(Errors(Seq(Error("500", (response.json \ "error" \"message").as[String]))))
       }
@@ -58,6 +57,20 @@ class AmbariService @Inject()(private val wSClient: WSClient,private val configu
           false
         }
       }
+  }
+
+  def getResourceManagerHealth(clusterId: Long, request: String) = {
+    wSClient.url(s"$clusterService/$clusterId/ambari/cluster?request=$request")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      ).get.map { response =>
+      if (response.status == 200) {
+        Right(response.json)
+      }else{
+        Left(Errors(Seq(Error("500", (response.json \ "error" \"message").as[String]))))
+      }
+    }
   }
 
 }
