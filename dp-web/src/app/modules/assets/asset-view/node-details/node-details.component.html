@@ -1,10 +1,10 @@
 <div class="load-right-to-left-slider dialog1x">
   <div class="title-container">
     <img *ngIf="!fetchInProgress" class="asset-icon pull-left" src="{{iconSrc}}"/>
-    <div class="overflow-ellipsis pull-left title" title="{{name}}">{{name}}</div>
+    <div *ngIf="!fetchInProgress" class="overflow-ellipsis pull-left title" title="{{name}}">{{name}}</div>
     <i class="fa fa-remove pull-right pointer" (click)="backToLineage()"></i>
   </div>
-  <div *ngIf="fetchInProgress" class="center">Loading</div>
+  <div *ngIf="fetchInProgress" class="center">Loading...</div>
   <div *ngIf="!fetchInProgress" class="details-container left-align">
     <div class="mdl-grid padding0" *ngFor="let property of assetProperties">
     <div class="mdl-cell mdl-cell--5-col overflow-clip value" title="{{property.key}}">{{property.key}}:</div>
