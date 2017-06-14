@@ -23,6 +23,7 @@ export class AdvanceQueryEditor implements OnInit {
   @Input() clusterId:number;
 
   @Output("onHeightChange") heightEmitter: EventEmitter<number> = new EventEmitter<number>();
+  @Output("onActionDone") doneEmitter: EventEmitter<null> = new EventEmitter<null>();
   @ViewChild("filterCont", {read: ViewContainerRef}) filterCont: ViewContainerRef;
   @ViewChild("filterCont") filterContElmRef: ElementRef;
 
@@ -45,9 +46,10 @@ export class AdvanceQueryEditor implements OnInit {
     compRef.instance.clusterId = this.clusterId;
     compRef.instance.closeEmitter.subscribe(() => {
       this.fltrCmpRfs.splice(this.fltrCmpRfs.indexOf(compRef), 1)[0].destroy();
-      (thisObj => setTimeout(() => thisObj.heightEmitter.emit(thisObj.filterContElmRef.nativeElement.parentElement.offsetHeight), 0))(this);
+      setTimeout(() => this.heightEmitter.emit(this.filterContElmRef.nativeElement.parentElement.offsetHeight), 0);
     });
-    (thisObj => setTimeout(() => thisObj.heightEmitter.emit(thisObj.filterContElmRef.nativeElement.parentElement.offsetHeight), 0))(this);
+    compRef.instance.enterEmitter.subscribe(() => this.doneEmitter.emit());
+    setTimeout(() => this.heightEmitter.emit(this.filterContElmRef.nativeElement.parentElement.offsetHeight), 0);
   }
 
   updateQueryModel() {
