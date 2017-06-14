@@ -108,9 +108,9 @@ export class DsAssetsService {
       assetModelArr.push({
         creationTime: "-",
         id: ent.guid,
-        name: ent.assetName,
-        owner: "-",
-        rowCount: 0,
+        name: ent.assetProperties.name || "-",
+        description : ent.assetProperties.description || "-",
+        owner: ent.assetProperties.owner || "-",
         source: "hive",
         type: ent.assetType,
         clusterId: ent.clusterId
@@ -126,8 +126,8 @@ export class DsAssetsService {
         creationTime: "-",
         id: ent.guid,
         name: ent.displayText,
+        description : ent.attributes.description || "-",
         owner: ent.attributes.owner || "-",
-        rowCount: 0,
         source: "hive",
         type: ent.typeName,
         clusterId: null
