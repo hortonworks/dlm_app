@@ -9,7 +9,7 @@ import {DsAssetsService} from "../../../../../services/dsAssetsService";
 
 export enum FilterOperatorEnum {LT, LTEQ, EQ, NOTEQ, GTEQ, GT, LIKE} // LIKE is contains
 export const FilterOperatorSymbols = ["<", "<=", "==", "!=", "=>", ">", "Contains"];
-export const FilterOperatorForQuery = ["lt", "lte", "equals", "nte", "gte", "gt", "Contains"];
+export const FilterOperatorForQuery = ["lt", "lte", "equals", "nte", "gte", "gt", "contains"];
 
 const FOEnum = FilterOperatorEnum;
 
@@ -59,7 +59,7 @@ export class QueryFilterSource extends QueryFilterObject {
 }
 
 export class QueryFilterTypeString extends QueryFilterObject {
-  operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.NOTEQ];
+  operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.NOTEQ, FOEnum.LIKE];
   helpText: string = "Enter Text";
   _value: string;
 

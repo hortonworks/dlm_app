@@ -102,12 +102,15 @@
 }
 
 .listCont .list .listRow .col {
-  width:12%;
+  width:11%;
   margin:0px 2%;
   overflow: hidden;
   white-space:nowrap ;
   text-overflow: ellipsis;
   float: left;
+}
+.listCont .list .listRow .col.descCol {
+  width:33%;
 }
 
 .listCont .list .listRow .checkboxCont {
