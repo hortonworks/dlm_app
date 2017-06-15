@@ -43,7 +43,7 @@ export class ClusterService {
   }
 
   retrieveResourceMangerHealth(clusterId: number) : Observable<any> {
-    const uri = `${this.uri}/${clusterId}/rmhealth?request=components/RESOURCEMANAGER`;
+    const uri = `${this.uri}/${clusterId}/rmhealth`;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
