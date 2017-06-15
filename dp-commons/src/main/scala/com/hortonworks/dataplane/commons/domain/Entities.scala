@@ -211,6 +211,14 @@ object Entities {
   case class DatasetCreateRequest(dataset: Dataset, clusterId: Long, tags: Seq[String],
                                   assetQueryModels: Seq[AtlasSearchQuery],
                                   dataAssets: Seq[DataAsset] = Nil)
+  case class LdapConfiguration(
+                              id: Option[Long],
+                              ldapUrl:String,
+                              bindDn: Option[String],
+                              userDnTemplate: Option[String],
+                              userSearchBase: Option[String],
+                              groupSearchBase: Option[String]
+                              )
 
 }
 
@@ -321,5 +329,8 @@ object JsonFormatters {
 
   implicit val richDatasetReads = defaultJson.reads[RichDataset]
   implicit val richDatasetWrites = Json.writes[RichDataset]
+
+  implicit val ldapConfigurationReads = Json.reads[LdapConfiguration]
+  implicit val ldapConfigurationWrites= Json.writes[LdapConfiguration]
 
 }

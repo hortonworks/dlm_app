@@ -158,3 +158,7 @@ DELETE        /dataassets/:id                                                con
 
 #Config
 GET           /configurations/:key                                           controllers.Configs.get(key)
+
+#ldapconfig
+POST          /ldapconfig                                                    controllers.LdapConfig.add
+GET          /ldapconfig                                                    controllers.LdapConfig.getAll

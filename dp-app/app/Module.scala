@@ -97,6 +97,12 @@ class Module extends AbstractModule {
     new ClusterComponentServiceImpl(configuration.underlying)
   }
 
+  @Provides
+  @Singleton
+  @Named("ldapConfigService")
+  def provideLdapConfigServic(implicit ws: WSClient,configuration: Configuration):LdapConfigService = {
+    new LdapConfigServiceImpl(configuration.underlying)
+  }
 
 }
 
