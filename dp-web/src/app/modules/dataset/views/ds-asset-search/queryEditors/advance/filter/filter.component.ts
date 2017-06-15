@@ -72,7 +72,7 @@ export class QueryFilterTypeBoolean extends QueryFilterObject {
   operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.NOTEQ];
   helpText: string = "Select";
   _value: number = -1;
-  valueOptions: boolean[] = [false, true];
+  valueOptions: string[] = ["false", "true"];
 
   constructor(public propertyName: string, public dataType: string) {
     super();
