@@ -93,6 +93,16 @@ export class QueryFilterTypeDate extends QueryFilterObject {
   }
 }
 
+export class QueryFilterTypeTag extends QueryFilterObject {
+  operators: FilterOperatorEnum[] = [FOEnum.EQ];
+  helpText: string = "Enter Text";
+  _value: string;
+
+  constructor(public propertyName: string, public dataType: string) {
+    super();
+  }
+}
+
 @Component({
   selector: "query-filter",
   styleUrls: ["./filter.component.scss"],
@@ -132,6 +142,9 @@ export class QueryFilter implements OnInit {
         break;
       case "date"  :
         this.filterObject = new QueryFilterTypeDate(fltr.propertyName, fltr.dataType);
+        break;
+      case "tag" :
+        this.filterObject = new QueryFilterTypeTag(fltr.propertyName, fltr.dataType);
         break;
       default                 :
         this.filterObject = new QueryFilterObject();

@@ -10,7 +10,7 @@ import com.hortonworks.dataplane.cs.atlas.Filters
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService}
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
-import org.apache.atlas.AtlasClientV2
+import org.apache.atlas.{AtlasClient, AtlasClientV2}
 import org.apache.atlas.model.SearchFilter
 import org.apache.atlas.model.instance.AtlasEntityHeader
 import org.apache.atlas.model.lineage.AtlasLineageInfo.LineageDirection
