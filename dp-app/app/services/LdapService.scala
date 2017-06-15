@@ -9,11 +9,7 @@ import com.google.inject.Inject
 import com.google.inject.name.Named
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  Error,
-  Errors,
-  LdapConfiguration
-}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, LdapConfiguration}
 import com.hortonworks.dataplane.commons.domain.Ldap.LdapSearchResult
 import com.hortonworks.dataplane.db.Webservice.{LdapConfigService, UserService}
 import com.typesafe.scalalogging.Logger
@@ -79,10 +75,10 @@ class LdapService @Inject()(
     }
   }
   private def validateUserDnTemlate(
-      userDntemplate: Option[String]): Either[Errors, Boolean] = {
-    userDntemplate match {
+      userDntemplateOption: Option[String]): Either[Errors, Boolean] = {
+    userDntemplateOption match {
       case Some(userDnTemplate) => {
-        if (!userDntemplate.contains(USERDN_SUBSTITUTION_TOKEN)) {
+        if (!userDnTemplate.contains(USERDN_SUBSTITUTION_TOKEN)) {
           Left(
             Errors(
               Seq(Error("invalid config",
@@ -106,10 +102,20 @@ class LdapService @Inject()(
         val prefix = userDnTempate.substring(0, index)
         val suffix = userDnTempate.substring(
           prefix.length + USERDN_SUBSTITUTION_TOKEN.length)
+
         Some(s"$prefix$principal$suffix")
       case None => None
 
     }
+  }
+  private def detemineUserSearchBase(userDnTempate:String): String ={
+    val index = userDnTempate.indexOf(USERDN_SUBSTITUTION_TOKEN)
+    userDnTempate.substring(index+USERDN_SUBSTITUTION_TOKEN.length).trim.substring(1)
+  }
+  private def detemineUserIdentifier(userDnTempate:String): String ={
+    println (s"userdntamplat=$userDnTempate")
+    val index = userDnTempate.indexOf(USERDN_SUBSTITUTION_TOKEN)
+    userDnTempate.substring(0, index)
   }
 
   def validateBindDn(
@@ -141,14 +147,16 @@ class LdapService @Inject()(
       configuredLdap <- getConfiguredLdap
       dirContext <- doWithEither[Seq[LdapConfiguration], DirContext](
         configuredLdap,
-        validateAndGetLdapConfigruation)
+        validateAndGetLdapContext)
       search <- doWithEither[DirContext, Seq[LdapSearchResult]](
         dirContext,
-        context => ldapSearch(context, userName, fuzzyMatch))
+        context => {
+          ldapSearch(context, configuredLdap.right.get,userName, fuzzyMatch)
+        })
 
     } yield search
 
-  private def validateAndGetLdapConfigruation(
+  private def validateAndGetLdapContext(
       configuredLdap: Seq[LdapConfiguration]) = {
     //TODO bind dn validate.
     configuredLdap.headOption
@@ -157,7 +165,6 @@ class LdapService @Inject()(
           ldapKeyStore.getCredentialEntry(l.bindDn.get)
         cred match {
           case Some(cred) => {
-            println("credential=" + cred.password)
             getLdapContext(l.ldapUrl, l.bindDn.get, cred.password)
           }
           case None =>
@@ -171,18 +178,36 @@ class LdapService @Inject()(
 
   private def ldapSearch(
       dirContext: DirContext,
+      ldapConfs:Seq[LdapConfiguration],
       userName: String,
       fuzzyMatch: Boolean): Future[Either[Errors, Seq[LdapSearchResult]]] = {
     searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
     try {
-      val res: NamingEnumeration[SearchResult] =
-        dirContext.search("ou=groups,dc=hadoop,dc=apache,dc=org",
-                          s"(cn=$userName)",
-                          searchControls)
+      val userDn:Option[String]=getUserDn(ldapConfs.head.userDnTemplate,userName)
+      if (!userDn.isDefined){
+        //TODO this is temporary fix. will support advance option sooner.
+        return Future.successful(
+          Left(Errors(Seq(new Error("Exception","current implementation only allows search based on userDn template.")))))
+
+      }
+//      val res: NamingEnumeration[SearchResult] =
+
+//        dirContext.search("ou=groups,dc=hadoop,dc=apache,dc=org",
+//                          s"(cn=$userName)",
+//                          searchControls)
+      println(s"user dn=$userDn")
+      val searchBase=detemineUserSearchBase(ldapConfs.head.userDnTemplate.get)
+      var searchIdtemplate=detemineUserIdentifier(ldapConfs.head.userDnTemplate.get)
+
+      val searchid= if (fuzzyMatch) searchIdtemplate+userName+"*" else  searchIdtemplate+userName
+
+      println(s"search base=$searchBase")
+      println(s"search id=$searchid")
+      val res: NamingEnumeration[SearchResult] =dirContext.search(searchBase,searchid,searchControls)
       val ldapSearchResults: ArrayBuffer[LdapSearchResult] = new ArrayBuffer()
       while (res.hasMore) {
         val sr: SearchResult = res.next()
-        val ldaprs = new LdapSearchResult(sr.getName,
+        val ldaprs = new LdapSearchResult(sr.getName.substring(sr.getName.indexOf(searchIdtemplate)+searchIdtemplate.length),
                                           sr.getClassName,
                                           sr.getNameInNamespace)
         ldapSearchResults += ldaprs

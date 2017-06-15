@@ -7,12 +7,12 @@ import com.typesafe.scalalogging.Logger
 import models.KnoxConfigInfo
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
-import services.LdapService
+import services.{KnoxConfigurator, LdapService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class KnoxConfig @Inject()(val ldapService: LdapService) extends Controller {
+class KnoxConfig @Inject()(val ldapService: LdapService,val knoxConfigurator:KnoxConfigurator) extends Controller {
   val logger = Logger(classOf[KnoxConfig])
 
 
@@ -57,5 +57,9 @@ class KnoxConfig @Inject()(val ldapService: LdapService) extends Controller {
       .getOrElse(
         Future.successful(BadRequest)
       )
+  }
+  def test= Action.async {req =>
+    knoxConfigurator.configure
+    Future.successful(Ok)
   }
 }
