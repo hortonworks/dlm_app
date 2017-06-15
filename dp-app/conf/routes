@@ -72,4 +72,5 @@ GET           /api/assets/lineage/:clusterId/:atlasGuid        controllers.Query
 #LDAP
 POST          /api/knox/validate                               controllers.KnoxConfig.validate
 POST          /api/knox/configure                              controllers.KnoxConfig.configure
-GET           /api/users/ldapsearch                            controllers.UserSearch.ldapSearch
+GET           /api/users/ldapsearch                            controllers.UserManager.ldapSearch
+
