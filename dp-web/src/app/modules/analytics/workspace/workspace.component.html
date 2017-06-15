@@ -1,6 +1,6 @@
 <div class="page-container">
     <div class="mdl-grid mdl-grid--no-spacing ">
-        <div class="mdl-cell--2-col hwx-title"> Workspace | {{ workspacesDTOS.length }} </div>
+        <div class="mdl-cell--2-col hwx-title"> {{ "pages.analytics.workspace.title" | translate }} | {{ workspacesDTOS.length }} </div>
         <div class="mdl-layout-spacer"> </div>
         <div class="actions">
             <div class="dp-input">
@@ -10,7 +10,7 @@
 
             <dp-tabs [tabEnum]="toggleView" [tabType]="tabType.LAYOUT" [images]="tabImages"> </dp-tabs>
 
-            <button class="mdl-button btn-hwx-primary" (click)="addWorkspace()"> CREATE WORKSPACE</button>
+            <button class="mdl-button btn-hwx-primary" (click)="addWorkspace()"> {{ "pages.analytics.workspace.create-workspace" | translate }} </button>
         </div>
     </div>
 

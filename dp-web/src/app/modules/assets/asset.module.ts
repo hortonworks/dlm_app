@@ -21,12 +21,11 @@ import {AssetService} from '../../services/asset.service';
   ],
   declarations: [
     AssetViewComponent,
-    AssetDetailsViewComponent
-  ],
-  providers: [
-    AssetService,
     AssetDetailsViewComponent,
     NodeDetailsComponent
+  ],
+  providers: [
+    AssetService
   ]
 })
 export class AssetModule { }

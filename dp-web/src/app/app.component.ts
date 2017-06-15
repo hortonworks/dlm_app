@@ -49,7 +49,7 @@ export class AppComponent implements OnInit {
   setHeaderData() {
     this.headerData.personas = [
       new Persona('Data Steward', [
-        new PersonaTabs('Data set', 'dataset', 'fa-cubes'),
+        new PersonaTabs('Dataset', 'dataset', 'fa-cubes'),
         new PersonaTabs('Unclassified', 'unclassified', 'fa-cube'),
         new PersonaTabs('Assets', 'assets', 'fa-server'),
         new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')

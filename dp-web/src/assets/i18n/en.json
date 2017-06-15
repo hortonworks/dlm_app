@@ -26,6 +26,7 @@
     "name" : "Name",
     "moreLink" : "Learn More",
     "save": "SAVE",
+    "cancel" : "Cancel",
     "sidenav" : {
       "analyst" : "Analyst",
       "infra" : "Infra Admin",
@@ -149,6 +150,19 @@
           "addToFav" : "Add to Favourites",
           "remFromFav" : "Remove from Favourites"
         }
+      }
+    },
+    "analytics": {
+      "workspace": {
+        "title": "Workspaces",
+        "create-workspace": "Create Workspace",
+        "assets": {
+          "add-assets": "Add Assets",
+          "add-assets-desc": "Add related data assets into your workspace, by searching across the Data-Lake"
+        }
+      },
+      "add-workspace": {
+        "title": "Add Workspace"
       }
     }
   }
