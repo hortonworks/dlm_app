@@ -59,8 +59,10 @@ class AmbariService @Inject()(private val wSClient: WSClient,private val configu
       }
   }
 
-  def getResourceManagerHealth(clusterId: Long, request: String) = {
-    wSClient.url(s"$clusterService/$clusterId/ambari/cluster?request=$request")
+  def getResourceManagerHealth(clusterId: Long) = {
+    val rmHealthRequestParam = Option(System.getProperty("cluster.rm.health.request.param"))
+      .getOrElse(configuration.underlying.getString("cluster.rm.health.request.param"))
+    wSClient.url(s"$clusterService/$clusterId/ambari/cluster?request=$rmHealthRequestParam")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
