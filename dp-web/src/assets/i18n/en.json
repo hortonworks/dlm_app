@@ -8,6 +8,7 @@
     "services" : "Services",
     "location" : "Location",
     "tags" : "Tags",
+    "step": "Step",
     "description" : "Description",
     "new" : "New",
     "add": "Add",
@@ -37,14 +38,19 @@
   "pages" : {
     "onboard" : {
       "labels" : {
-        "welcomeText" : "Welcome to Hortonworks",
+        "welcomeText" : "Welcome to",
+        "hwxDataplane" : "Hortonworks Data Plane",
+        "setupAuth": "Setup Authentication",
+        "defineUsers": "Define User Privileges Roles and Groups",
         "startButton" : "Get Started",
         "addCluster" : "Add Clusters",
         "addDataset" : "Add Datasets",
         "setService" : "Setup Services"
       },
       "description" : {
-        "dataplane": "Welcome to dataplane, your one-stop solution to data management. To start, you need to help us find your data lakes. Please proceed by adding data lakes below.",
+        "dataplane": "Welcome to Hortonworks Data Plane, your one-stop solution to data management. To start, you need to configure the LDAP/Knox properties in Data plane to enable dataplane to use your LDAP as the authentication database. Optionally, you can add Dataplane Administrators. Please proceed by clicking on GET STARTED",
+        "setupAuth": "The first step is to help data plane connect to your LDAP and Knox by providing the LDAP, Knox configurations to Data plane.",
+        "defineUsers": "After connecting Data plane with your LDAP, you can add administrators to Data plane. This step is optional. You can add/modify users to data plane or assign/modify their roles anytime through the User Management Screen.",
         "addCluster" : "Add your cluster to Dataplane",
         "setService" : "Set up services to enable Dataplane to manage your data",
         "addDataset" : "Add your datasets to Dataplane"

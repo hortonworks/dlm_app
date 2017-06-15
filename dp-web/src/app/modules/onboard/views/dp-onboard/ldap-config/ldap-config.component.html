@@ -1,0 +1,55 @@
+<div class="container line-height-1-5">
+  <div class="text-medium">
+    <i class="fa fa-lock green text-large pull-left"></i>
+    <div>
+      <div class="text-uppercase text-xsmall">STEP 1</div>
+      <div class="">Setup Authentication</div>
+    </div>
+  </div>
+  <div class="margin-top-bottom-20">
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  </div>
+  <div class="section margin-top-bottom-20 text-bold text-medium">Knox Configuration</div>
+  <div class="dp-input">
+    <label class="text-medium">Master Password</label>
+    <input *ngIf="!showKnoxPassword" [(ngModel)]="ldapProperties.masterPassword" type="password" placeholder="Knox Master Password"/>
+    <input *ngIf="showKnoxPassword" [(ngModel)]="ldapProperties.masterPassword" type="text" placeholder="Knox Master Password"/>
+    <div class="margin-top-bottom-3">
+      <input type="checkbox" [(ngModel)]="showKnoxPassword"/><span>Show Password</span>
+    </div>
+  </div>
+  <div class="spacer-15"></div>
+  <div class="section margin-top-bottom-20 text-bold text-medium">LDAP Configuration</div>
+  <div class="dp-input">
+    <label class="text-medium">URL</label>
+    <input type="text" [(ngModel)]="ldapProperties.ldapUrl" placeholder="e.g. ldap://localhost:33389"/>
+  </div>
+  <div class="dp-input">
+    <label class="text-medium">User DN Template</label>
+    <input type="text" [(ngModel)]="ldapProperties.userDnTemplate" placeholder="e.g. ou=people,dc=hadoop,dc=apache,dc=org"/>
+  </div>
+  <div class="dp-input">
+    <label class="text-medium">User search base</label>
+    <input type="text" [(ngModel)]="ldapProperties.userSearchBase" placeholder="e.g. ou=people,dc=hadoop,dc=apache,dc=org"/>
+  </div>
+  <div class="dp-input">
+    <label class="text-medium">Group search base</label>
+    <input type="text" [(ngModel)]="ldapProperties.groupSearchBase" placeholder="e.g. ou=groups,dc=hadoop,dc=apache,dc=org"/>
+  </div>
+  <div class="dp-input">
+    <label class="text-medium">Administrator Bind DN</label>
+    <input type="text" [(ngModel)]="ldapProperties.bindDn" placeholder="e.g. uid=admin,ou=people,dc=hadoop,dc=apache,dc=org"/>
+  </div>
+  <div class="dp-input">
+    <label class="text-medium">Administrator Password</label>
+    <input *ngIf="!showLdapPassword" [(ngModel)]="ldapProperties.password" type="password" placeholder="Administrator Password"/>
+    <input *ngIf="showLdapPassword" [(ngModel)]="ldapProperties.password" type="text" placeholder="Administrator Password"/>
+    <div class="margin-top-bottom-3">
+      <input type="checkbox" [(ngModel)]="showLdapPassword"/><span>Show Password</span>
+    </div>
+  </div>
+  <div class="margin-top-30">
+    <button class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">SAVE</button>
+    <button class="mdl-button btn-hwx-secondary" (click)="back()">CANCEL</button>
+  </div>
+</div>
