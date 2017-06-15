@@ -8,14 +8,14 @@
                 <i class="fa fa-search dp-input__icon" aria-hidden="true"></i>
             </div>
 
-            <dp-tabs [tabEnum]="toggleView" [tabType]="tabType.LAYOUT" [images]="tabImages"> </dp-tabs>
+            <dp-tabs [tabEnum]="toggleView" [tabType]="tabType.LAYOUT" [images]="tabImages" (selected)="selectedViewType=$event"> </dp-tabs>
 
             <button class="mdl-button btn-hwx-primary" (click)="addWorkspace()"> {{ "pages.analytics.workspace.create-workspace" | translate }} </button>
         </div>
     </div>
 
     <div class="spacer-15"> </div>
-    <div class="card-container">
+    <div class="card-container" *ngIf="selectedViewType===toggleView.GRID">
         <div class=" mdl-card" *ngFor="let workspacesDTO of workspacesDTOS" (click)="editWorkspace($event, workspacesDTO)">
             <div class="mdl-card__title">
                 <div class="card-title"> {{ workspacesDTO.workspace.name }}</div>
@@ -40,5 +40,35 @@
                 </ul>
             </div>
         </div>
+    </div>
+
+    <div class="table-container" *ngIf="selectedViewType===toggleView.TABLE">
+        <table class="mdl-data-table mdl-js-data-table">
+            <thead>
+            <th class="mdl-data-table__cell--non-numeric">Name</th>
+            <th class="mdl-data-table__cell--non-numeric">Source</th>
+            <th class="mdl-data-table__cell--non-numeric">Owner</th>
+            <th class="mdl-data-table__cell--non-numeric">#Tables</th>
+            <th class="mdl-data-table__cell--non-numeric">#Notebooks</th>
+            <th class="mdl-data-table__cell--non-numeric">#Jobs</th>
+            <th class="mdl-data-table__cell--non-numeric"></th>
+            </thead>
+            <tbody>
+            <tr *ngFor="let workspacesDTO of workspacesDTOS">
+                <td class="mdl-data-table__cell--non-numeric key-column mdl-data-table__cell--non-clickable" (click)="editWorkspace($event, workspacesDTO)"> {{ workspacesDTO.workspace.name }} </td>
+                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"> {{ workspacesDTO.clustername }} </td>
+                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"> {{ workspacesDTO.username }} </td>
+                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">  {{ workspacesDTO.counts.asset ? workspacesDTO.counts.asset : '-'  }} </td>
+                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"> {{ workspacesDTO.counts.notebook ? workspacesDTO.counts.notebook : '-' }} </td>
+                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">  - </td>
+                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">
+                    <button [attr.id]="workspacesDTO.workspace.name" class="mdl-button mdl-js-button mdl-button--icon"> <i class="material-icons">more_vert</i> </button>
+                    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="workspacesDTO.workspace.name">
+                    <li class="mdl-menu__item" (click)="delete(workspacesDTO.workspace.name)"> Delete </li>
+                    </ul>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </div>

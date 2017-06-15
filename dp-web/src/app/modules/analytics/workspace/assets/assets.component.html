@@ -13,21 +13,21 @@
         <div class="spacer-15"> </div>
         <table class="mdl-data-table mdl-js-data-table" *ngIf="viewState === assetViewState.EDIT_ASSETS">
             <thead>
-            <th>Source</th>
-            <th>Name</th>
-            <th>Owner</th>
-            <th>Created Time</th>
-            <th>Number of Rows</th>
-            <th>Data Type</th>
+            <th class="mdl-data-table__cell--non-numeric">Source</th>
+            <th class="mdl-data-table__cell--non-numeric">Name</th>
+            <th class="mdl-data-table__cell--non-numeric">Owner</th>
+            <th class="mdl-data-table__cell--non-numeric">Created Time</th>
+            <th class="mdl-data-table__cell--non-numeric">Number of Rows</th>
+            <th class="mdl-data-table__cell--non-numeric">Data Type</th>
             </thead>
             <tbody>
-            <tr *ngFor="let asset of dsAssetsServiceObservable | async ">
-                <td> {{ asset.type }} </td>
-                <td> {{ asset.name }} </td>
-                <td> {{ asset.owner }} </td>
-                <td>  - </td>
-                <td> {{ asset.rowCount }} </td>
-                <td> {{ asset.type }} </td>
+            <tr *ngFor="let asset of workspaceAssetServiceObservable | async ">
+                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"> {{ asset.assetType }} </td>
+                <td class="mdl-data-table__cell--non-numeric key-column mdl-data-table__cell--width15"> {{ asset.assetName }} </td>
+                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"> {{ asset.assetProperties.owner }} </td>
+                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">  - </td>
+                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"> - </td>
+                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"> {{ asset.assetType }} </td>
             </tr>
             </tbody>
         </table>

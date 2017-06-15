@@ -21,6 +21,7 @@ export enum ToggleView {
 })
 export class WorkspaceComponent implements OnInit {
   toggleView = ToggleView;
+  selectedViewType = ToggleView.TABLE;
   workspacesDTOS: WorkspaceDTO[] = [];
   tabType = TabStyleType;
 

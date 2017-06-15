@@ -55,7 +55,7 @@ export class AppComponent implements OnInit {
         new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')
       ]),
       new Persona('Infra Admin', [
-        new PersonaTabs('Clusters', 'infra', 'fa-list')
+        new PersonaTabs('Clusters', 'infra', 'fa-sitemap')
       ]),
 
       new Persona('Analytics', [

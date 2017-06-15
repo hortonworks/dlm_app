@@ -33,7 +33,7 @@ export class AssetsComponent implements OnInit {
   viewState = AssetViewState.ADD_ASSETS;
   workspaceDTO: WorkspaceDTO = new WorkspaceDTO();
   assetSetQueryModelsForAddition: AssetSetQueryModel[] = [];
-  dsAssetsServiceObservable: Observable<DsAssetModel[]>;
+  workspaceAssetServiceObservable: Observable<WorkspaceAsset[]>;
 
   constructor(private workspaceService: WorkspaceService,
               private workspaceAssetsService: WorkspaceAssetsService,
@@ -43,14 +43,7 @@ export class AssetsComponent implements OnInit {
               private activatedRoute: ActivatedRoute) { }
 
   getAssets() {
-    this.workspaceAssetsService.listAssets(this.workspaceDTO.workspace.id).subscribe(results => {
-      console.log(results);
-    })
-  }
-
-  getSelectedAssets() {
-    this.showSelectedAssets = true;
-    this.dsAssetsServiceObservable = this.dsAssetsService.list(this.assetSetQueryModelsForAddition, 0 , 20, this.cluster.id);
+    this.workspaceAssetServiceObservable = this.workspaceAssetsService.listAssets(this.workspaceDTO.workspace.id);
   }
 
   getWorkSpaceDTO() {
@@ -71,9 +64,13 @@ export class AssetsComponent implements OnInit {
   }
 
   prepareData(workspaceDTO: WorkspaceDTO, clusters: Cluster[]) {
-
     this.workspaceDTO = workspaceDTO;
+    this.viewState = this.workspaceDTO.counts.asset === 0 ?  AssetViewState.ADD_ASSETS : AssetViewState.EDIT_ASSETS;
     this.cluster = clusters.find(cluster => cluster.name === this.workspaceDTO.clustername);
+
+    if (this.viewState === AssetViewState.EDIT_ASSETS) {
+      this.getAssets();
+    }
   }
 
   setNavigation() {
@@ -95,7 +92,21 @@ export class AssetsComponent implements OnInit {
     let workspaceAsset = new WorkspaceAsset();
     workspaceAsset.workspaceId = this.workspaceDTO.workspace.id;
     workspaceAsset.clusterId = this.cluster.id;
-    workspaceAsset.assetQueryModels = this.assetSetQueryModelsForAddition;
+    /* This is hard coded till asset search starts return the results */
+    workspaceAsset['assetQueryModels'] = [
+      {
+        "atlasFilters": [
+          {
+            "atlasAttribute": {
+              "name": "owner",
+              "dataType": "string"
+            },
+            "operation": "equals",
+            "operand": "admin"
+          }
+        ]
+      }
+    ];
 
     this.workspaceAssetsService.save(workspaceAsset).subscribe(assets => {
       this.getAssets();
