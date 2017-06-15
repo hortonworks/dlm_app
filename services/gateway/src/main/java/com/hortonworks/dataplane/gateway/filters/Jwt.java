@@ -18,12 +18,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.security.Key;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Component
 public class Jwt {
   private static final Logger logger = LoggerFactory.getLogger(Jwt.class);
+  public static final String USER_CLAIM = "user";
+  public static final String ROLES_CLAIM="roles";
 
   private ObjectMapper objectMapper = new ObjectMapper();
   private static SignatureAlgorithm sa = SignatureAlgorithm.RS256;
@@ -37,15 +41,19 @@ public class Jwt {
   @Autowired
   private GatewayKeystore gatewayKeystore;
 
-  public String makeJWT(User user) throws JsonProcessingException {
+  public String makeJWT(User user,List<String> roles) throws JsonProcessingException {
     long timeMillis = System.currentTimeMillis();
     Date now = new Date(timeMillis);
     Map<String, Object> claims = Maps.newHashMap();
-    claims.put("user", objectMapper.writeValueAsString(user));
-
+    claims.put(USER_CLAIM, objectMapper.writeValueAsString(user));
+    if (roles==null){
+      roles=new ArrayList<>(0);
+    }
+    claims.put(ROLES_CLAIM, objectMapper.writeValueAsString(roles));
     JwtBuilder builder = Jwts.builder()
       .setIssuedAt(now)
       .setIssuer(issuer)
+      .setSubject(user.getUsername())
       .setClaims(claims)
       .setExpiration(new Date(now.getTime() + jwtValidity *MINUTE))
       .signWith(sa, getSigningKey());
@@ -63,12 +71,11 @@ public class Jwt {
     if (expiration.before(new Date())) {
       logger.debug("Token expired: " + claims.get("user"));
       return Optional.absent();
+    }else{
+      String userJsonString = claims.get(USER_CLAIM).toString();
+      User user = objectMapper.readValue(userJsonString, User.class);
+      return Optional.fromNullable(user);
     }
-
-    String userJsonString = claims.get("user").toString();
-
-    User user = objectMapper.readValue(userJsonString, User.class);
-    return Optional.fromNullable(user);
   }
   private Key getSigningKey() {
     return gatewayKeystore.getPrivate();
@@ -76,4 +83,5 @@ public class Jwt {
   private Key getVerifyingKey() {
     return gatewayKeystore.getPublic();
   }
+
 }
