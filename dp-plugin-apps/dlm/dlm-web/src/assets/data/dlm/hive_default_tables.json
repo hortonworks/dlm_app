@@ -1,0 +1,14 @@
+{
+  "tables": [
+    {
+      "id": "default/school",
+      "name": "school",
+      "databaseId": "default"
+    },
+    {
+      "id": "default/allstar_full",
+      "name": "allstar_full",
+      "databaseId": "default"
+    }
+  ]
+}

@@ -11,6 +11,7 @@ POST          /auth/in                                         controllers.Authe
 GET           /auth/userDetail                                 controllers.Authentication.userDetail
 GET           /auth/signInThrougKnox                           controllers.Authentication.signInThrougKnox
 GET           /auth/signOutThrougKnox                          controllers.Authentication.signOutThrougKnox
+GET           /api/identity/:userId                            controllers.Authentication.userById(userId: String)
 
 #api
 
@@ -30,7 +31,7 @@ GET           /api/locations/:locationId                       controllers.Locat
 GET           /api/clusters                                    controllers.Clusters.list(lakeId: Option[Long])
 GET           /api/clusters/details                            controllers.Clusters.getDetails
 GET           /api/clusters/:clusterId/health                  controllers.Clusters.getHealth(clusterId: Long, summary: Option[Boolean])
-
+GET           /api/clusters/:clusterId/rmhealth                controllers.Clusters.getResourceManagerHealth(clusterId: Long)
 GET           /api/actions/lakes-list-with-clusters            controllers.actions.DpClusterActions.listWithClusters
 
 

@@ -34,6 +34,22 @@ export class ClusterService {
       .catch(HttpUtil.handleError);
   }
 
+  retrieveDetailedHealth(clusterId: number): Observable<any> {
+    const uri = `${this.uri}/${clusterId}/health`;
+    return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
+  retrieveResourceMangerHealth(clusterId: number) : Observable<any> {
+    const uri = `${this.uri}/${clusterId}/rmhealth`;
+    return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
   getClusterInfo(ambariUrl:string) :Observable<Cluster> {
     return this.http
       .get(`api/clusters/details?url=${ambariUrl}`, new RequestOptions(HttpUtil.getHeaders()))

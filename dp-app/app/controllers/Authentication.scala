@@ -42,7 +42,12 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
         BadRequest(JsonResponses.statusError("Cannot parse user request"))))
   }
 
-
+  def userById(userId: String) = authenticated.async {
+    userService.loadUserById(userId).map{
+      case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+      case Right(user) => Ok(Json.toJson(user))
+    }
+  }
 
   def userDetail = authenticated.async { request =>
     val username = request.user.username

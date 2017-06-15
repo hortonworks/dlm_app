@@ -40,7 +40,7 @@
             <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder status-{{getStatusString(lakeInfo.status)}}">
                 <i class="fa fa-circle" aria-hidden="true"></i>
             </td>
-            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--clickable mdl-data-table__cell--width15">{{lakeInfo.name}}</td>
+            <td class="mdl-data-table__cell--non-numeric key-column mdl-data-table__cell--width15" (click)="viewDetails(lakeInfo.lakeId)">{{lakeInfo.name}}</td>
             <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.city}},&nbsp;{{lakeInfo.country}}</td>
             <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.nodes}}</td>
             <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.uptimeStr}}</td>

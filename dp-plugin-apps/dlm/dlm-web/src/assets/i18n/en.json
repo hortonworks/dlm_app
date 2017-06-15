@@ -99,6 +99,10 @@
       "running": "Running"
     }
   },
+  "hive_database": {
+    "empty_selection": "No Database selected",
+    "empty_tables": "No Tables found"
+  },
   "forms": {
     "validation_errors": {
       "required": "\"{{fieldLabel}}\" is required",

@@ -90,7 +90,6 @@ class Clusters @Inject()(
   }
 
   import models.ClusterHealthData._
-  import com.hortonworks.dataplane.commons.domain.Ambari._
   def getHealth(clusterId: Long, summary: Option[Boolean]) = Action.async {
     Logger.info("Received get cluster health request")
 
@@ -98,18 +97,32 @@ class Clusters @Inject()(
       .map {
         case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
         case Right(clusterHealth) => Ok(summary match {
-          case Some(summary) => Json.obj(
-            "nodes" -> clusterHealth.hosts.length,
-            "totalSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityTotal),
-            "usedSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityUsed),
-            "status" -> Json.obj(
-              "state" -> clusterHealth.nameNodeInfo.get.state,
-              "since" -> (if (clusterHealth.nameNodeInfo.get.StartTime.isDefined) (clusterHealth.nameNodeInfo.get.StartTime.get - System.currentTimeMillis()) else 0)
-            )
-          )
+          case Some(summary) => {
+            clusterHealth.nameNodeInfo match {
+              case Some(nameNodeInfo) =>  Json.obj(
+                "nodes" -> clusterHealth.hosts.length,
+                "totalSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityTotal),
+                "usedSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityUsed),
+                "status" -> Json.obj(
+                  "state" -> clusterHealth.nameNodeInfo.get.state,
+                  "since" -> clusterHealth.nameNodeInfo.get.StartTime.map(_ => clusterHealth.nameNodeInfo.get.StartTime.get - System.currentTimeMillis())
+                )
+              )
+              case None => Json.obj(
+                "nodes" -> clusterHealth.hosts.length
+              )
+            }
+          }
           case None => Json.toJson(clusterHealth)
         })
       }
+  }
+
+  def getResourceManagerHealth(clusterId: Long) = authenticated.async { request =>
+    ambariService.getResourceManagerHealth(clusterId).map {
+      case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+      case Right(resourceManagerHealth) => Ok(Json.toJson(resourceManagerHealth))
+    }
   }
 
   private def humanizeBytes(bytes: Option[Double]): String = {
