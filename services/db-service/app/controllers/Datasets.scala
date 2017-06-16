@@ -25,7 +25,7 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
     val sortCol = req.getQueryString("sortBy")
     val sortOrder = req.getQueryString("sortOrder").getOrElse("asc")
 
-    if(size.isDefined && offset.isDefined){
+    if (size.isDefined && offset.isDefined) {
       val sortQuery = sortCol.map(s => SortQuery(s, sortOrder))
       Some(PaginatedQuery(offset.get.toInt, size.get.toInt, sortQuery))
     } else None
@@ -33,13 +33,13 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
   }
 
   def allRichDataset = Action.async { req =>
-    datasetRepo.getRichDataset(getPaginatedQuery(req))
+    datasetRepo.getRichDataset(req.getQueryString("search"), getPaginatedQuery(req))
       .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
       .recoverWith(apiError)
   }
 
   def richDatasetByTag(tagName: String) = Action.async { req =>
-    datasetRepo.getRichDatasetByTag(tagName, getPaginatedQuery(req))
+    datasetRepo.getRichDatasetByTag(tagName, req.getQueryString("search"), getPaginatedQuery(req))
       .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
       .recoverWith(apiError)
   }
