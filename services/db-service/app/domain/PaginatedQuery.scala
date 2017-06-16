@@ -35,17 +35,3 @@ object PaginationSupport {
   }
 
 }
-
-//trait PaginationHelper {
-//
-//  def applyPaginatedQuery[A <: ColumnSelector, B, C[_]](query: Query[A, B, C], pq: PaginatedQuery) = {
-//    val sortQuery = pq.sortQuery match {
-//      case Some(sq) =>
-//        val sortOrderRep = ColumnOrdered(_, sq.ordering)
-//        val sortColumnRep: A => Rep[_] = _.select(sq.sortCol)
-//        query.sortBy(sortColumnRep)(sortOrderRep)
-//      case None => query
-//    }
-//    sortQuery.drop(pq.offset).take(pq.size)
-//  }
-//}
