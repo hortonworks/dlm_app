@@ -93,7 +93,7 @@ class BeaconPolicyServiceImpl()(implicit ws: WSClient) extends BeaconPolicyServi
   }
 
   override def listPolicies(beaconEndpoint : String) : Future[Either[BeaconApiErrors, Seq[PoliciesDetailResponse]]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/list?fields=status,clusters,frequency,startTime,endTime,datasets")
+    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/list?fields=status,clusters,frequency,startTime,endTime,datasets,instances&instanceCount=3")
       .get.map(mapToPoliciesDetailsResponse).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }

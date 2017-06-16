@@ -27,10 +27,6 @@ object ResponseEntities {
                                 customProperties: Map[String, String], retry: Retry, acl: Option[AclObject],
                                 user: String, notification: Notification, entityType: String)
 
-  case class PoliciesDetailResponse(name: String, `type`: String, status: String, sourceDataset: String,
-                                    targetDataset: String, frequencyInSec: Long, sourceCluster: String,
-                                    targetCluster: String, startTime: Option[String], endTime: String)
-
   case class PolicyStatusResponse(status: String, message: String, requestId: String)
 
   case class PostActionResponse(requestId: String, message: String, status: String)
@@ -40,6 +36,11 @@ object ResponseEntities {
                                     trackingInfo: Option[String], message: String)
 
   case class PolicyInstancesDetails(totalResults: Long, results: Long, instance: Seq[PolicyInstanceResponse])
+
+  case class PoliciesDetailResponse(name: String, `type`: String, status: String, sourceDataset: String,
+                                    targetDataset: String, frequencyInSec: Long, sourceCluster: String,
+                                    targetCluster: String, instances: Seq[PolicyInstanceResponse],
+                                    startTime: Option[String], endTime: String)
 
   case class BeaconEventResponse(policyId: Option[String], instanceId: Option[String], eventType: String, severity: String, timestamp: String, message: String)
 }
@@ -84,9 +85,6 @@ object JsonFormatters {
   implicit val policyDataResponseWrites = Json.writes[PolicyDataResponse]
   implicit val policyDataResponseReads = Json.reads[PolicyDataResponse]
 
-  implicit val policiesDetailResponseWrites = Json.writes[PoliciesDetailResponse]
-  implicit val policiesDetailResponseReads = Json.reads[PoliciesDetailResponse]
-
   implicit val policyStatusResponseWrites = Json.writes[PolicyStatusResponse]
   implicit val policyStatusResponseReads = Json.reads[PolicyStatusResponse]
 
@@ -98,6 +96,9 @@ object JsonFormatters {
 
   implicit val policyInstancesDetailsWrites = Json.writes[PolicyInstancesDetails]
   implicit val policyInstancesDetailsReads = Json.reads[PolicyInstancesDetails]
+
+  implicit val policiesDetailResponseWrites = Json.writes[PoliciesDetailResponse]
+  implicit val policiesDetailResponseReads = Json.reads[PoliciesDetailResponse]
 
   implicit val eventResponseWrites = Json.writes[BeaconEventResponse]
   implicit val eventResponseReads = Json.reads[BeaconEventResponse]
