@@ -32,13 +32,17 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   clusters: Cluster[];
   cluster: any;
   clusterHealth: any;
+  rmHealth: any;
   clusterDetails: ClusterDetails = new ClusterDetails();
   location: Location = new Location();
   user: any;
   @ViewChild('hdfsProgress') hdfsProgress: ElementRef;
+  @ViewChild('rmHeapProgress') rmHeapProgress: ElementRef;
   @ViewChild('heapProgress') heapProgress: ElementRef;
   hdfsProgressObservable: Observable<boolean> = Observable.create();
   heapProgressObservable: Observable<boolean> = Observable.create();
+  rmHeapProgressObservable: Observable<boolean> = Observable.create();
+  rmHeapPercent: string;
   hdfsPercent: string;
   heapPercent: string;
 
@@ -59,6 +63,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
             this.clusterHealth = clusterInfo.health;
             this.location = clusterInfo.location;
             this.user = clusterInfo.user;
+            this.rmHealth = clusterInfo.rmhealth;
             this.clusterDetails = this.getClusterDetails();
             this.processProgressbarInfo();
           });
@@ -81,6 +86,12 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
         observer.next(true);
       });
     });
+    this.rmHeapProgress.nativeElement.addEventListener('mdl-componentupgraded', function () {
+      this.MaterialProgress.setProgress(0);
+      self.rmHeapProgressObservable = Observable.create(observer => {
+        observer.next(true);
+      });
+    });
   }
 
   processProgressbarInfo() {
@@ -93,6 +104,11 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       let percent = this.getPercent(this.clusterHealth.nameNodeInfo.HeapMemoryUsed, this.clusterHealth.nameNodeInfo.HeapMemoryMax);
       this.heapPercent = `${percent}%`;
       this.updateProgess(this.heapProgress, percent);
+    });
+    this.rmHeapProgressObservable.subscribe(() => {
+      let percent = this.getPercent(this.rmHealth.metrics.jvm.HeapMemoryUsed, this.rmHealth.metrics.jvm.HeapMemoryMax);
+      this.rmHeapPercent = `${percent}%`;
+      this.updateProgess(this.rmHeapProgress, percent);
     });
   }
 
@@ -124,6 +140,13 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       tags = `${tags} ${tags.length ? ', ' : ''}${tag.name}`;
     });
     clusterDetails.tags = tags;
+    if(this.rmHealth && this.rmHealth.ServiceComponentInfo && this.rmHealth.metrics){
+      clusterDetails.nodeManagersActive = this.rmHealth.ServiceComponentInfo.rm_metrics.cluster.activeNMcount;
+      clusterDetails.nodeManagersInactive = this.rmHealth.ServiceComponentInfo.rm_metrics.cluster.unhealthyNMcount;
+      clusterDetails.rmHeapTotal = StringUtils.humanizeBytes(this.rmHealth.metrics.jvm.HeapMemoryMax);
+      clusterDetails.rmHeapUsed =  StringUtils.humanizeBytes(this.rmHealth.metrics.jvm.HeapMemoryUsed);
+      clusterDetails.rmUptime = DateUtils.toReadableDate(new Date().getTime() - this.rmHealth.metrics.runtime.StartTime);
+    }
     return clusterDetails;
   }
 
@@ -131,12 +154,14 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
     return Observable.forkJoin(
       this.locationService.retrieve(locationId).map((res) => res),
       this.clusterService.retrieveDetailedHealth(clusterId).map((res) => res),
-      this.identityService.getUserById(userId).map((res) => res)
+      this.identityService.getUserById(userId).map((res) => res),
+      this.clusterService.retrieveResourceMangerHealth(clusterId).map(res => res)
     ).map(response => {
       return {
         location: response[0],
         health: response[1],
-        user: response[2]
+        user: response[2],
+        rmhealth : response[3]
       };
     });
   }

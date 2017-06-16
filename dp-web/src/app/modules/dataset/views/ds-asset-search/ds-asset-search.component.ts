@@ -37,7 +37,7 @@ export class DsAssetSearch {
     this.showQueryResults = true;
     this.queryModel = new AssetSetQueryModel([]);
     if(this.queryObj.searchText){
-      this.queryModel.filters.push({column: "name", operator: "equals", value: this.queryObj.searchText, dataType:"string"});
+      this.queryModel.filters.push({column: "name", operator: "contains", value: this.queryObj.searchText, dataType:"string"});
       // this.queryModel.filters.push({column: "asset.source", operator: "==", value: AssetTypeEnumString[this.queryObj.type], dataType:"-"});
     }
   }

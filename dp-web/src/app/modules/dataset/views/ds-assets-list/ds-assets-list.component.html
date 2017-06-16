@@ -32,10 +32,8 @@
         <div class="col checkboxCont" *ngIf="selectionAllowed"><input type="checkbox"/></div>
         <div class="col sourceCol">Source</div>
         <div class="col nameCol">Name</div>
+        <div class="col descCol">Description</div>
         <div class="col ownerCol">Owner</div>
-        <div class="col createdTimeCol">Created Time</div>
-        <div class="col noRowsCol">Number of Rows</div>
-        <div class="col dataTypeCol">Data Type</div>
       </div>
     </div>
     <div class="justList" #table>
@@ -47,11 +45,9 @@
           <div class="col sourceCol {{(asset.source.toUpperCase() == 'HIVE')?'hiveCol':'filesCol'}}">
             <span><i class="fa {{(asset.source.toUpperCase() == 'HIVE')?'fa-table':'fa-file-o'}}"></i>&nbsp;&nbsp;{{asset.source}}</span>
           </div>
-          <div class="col nameCol" (click)="onAssetClick(asset.id, asset.clusterId)">{{asset.name}}</div>
-          <div class="col ownerCol">{{asset.owner}}</div>
-          <div class="col createdTimeCol">{{asset.creationTime}}</div>
-          <div class="col noRowsCol">{{asset.rowCount}}</div>
-          <div class="col dataTypeCol">{{asset.type}}</div>
+          <div class="col nameCol" (click)="onAssetClick(asset.id, asset.clusterId)" title="{{asset.name}}">{{asset.name}}</div>
+          <div class="col descCol" title="{{asset.description}}">{{asset.description}}</div>
+          <div class="col ownerCol" title="{{asset.owner}}">{{asset.owner}}</div>
         </div>
       </div>
     </div>

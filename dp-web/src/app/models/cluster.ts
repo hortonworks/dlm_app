@@ -45,6 +45,11 @@ export class ClusterDetails {
  tags: string;
  uptime: string;
  status: string;
+ nodeManagersActive: number;
+ nodeManagersInactive: number;
+ rmHeapUsed: string;
+ rmHeapTotal: string;
+ rmUptime: string;
 }
 
 
