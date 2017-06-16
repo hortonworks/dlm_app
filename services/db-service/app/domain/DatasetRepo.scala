@@ -16,7 +16,7 @@ class DatasetRepo @Inject()(
                              protected val categoryRepo: CategoryRepo,
                              protected val dataAssetRepo: DataAssetRepo,
                              protected val userRepo: UserRepo,
-                             protected val clusterRepo: ClusterRepo,
+                             protected val clusterRepo: DpClusterRepo,
                              protected val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[DpPgProfile] {
 
@@ -91,7 +91,7 @@ class DatasetRepo @Inject()(
     for {
       ((dataset, user), cluster) <-
       (inputQuery.join(userRepo.Users).on(_.createdBy === _.id))
-        .join(clusterRepo.Clusters).on(_._1.dpClusterId === _.id)
+        .join(clusterRepo.DataplaneClusters).on(_._1.dpClusterId === _.id)
     } yield (dataset, user.username, cluster.name, cluster.id)
   }
 
@@ -131,7 +131,7 @@ class DatasetRepo @Inject()(
   }
 
   private def getRichDataset(inputQuery: Query[DatasetsTable, Dataset, Seq],
-                             paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[RichDataset]] = {
+                             paginatedQuery: Option[PaginatedQuery]): Future[Seq[RichDataset]] = {
     val query = for {
       datasetWithUsername <- sortByDataset(paginatedQuery, getDatasetWithNameQuery(inputQuery)).to[List].result
       datasetAssetCount <- {
@@ -146,22 +146,21 @@ class DatasetRepo @Inject()(
 
     db.run(query).map {
       result =>
-        val datasetWithUsernameMap = result._1.groupBy(_._1.id.get).mapValues(_.head)
         val datasetWithAssetCountMap = result._2.groupBy(_._1.get).mapValues { e =>
           e.map {
             v => DataAssetCount(v._2, v._3)
           }
         }
         val datasetWithCategoriesMap = result._3.groupBy(_._1).mapValues(_.map(_._2))
-        datasetWithUsernameMap.map {
-          case (id, (dataset, user, cluster, clusterId)) =>
+        result._1.map {
+          case (dataset, user, cluster, clusterId) =>
             RichDataset(
               dataset,
-              datasetWithCategoriesMap.getOrElse(id, Nil),
+              datasetWithCategoriesMap.getOrElse(dataset.id.get, Nil),
               user,
               cluster,
               clusterId.get,
-              datasetWithAssetCountMap.getOrElse(id, Nil)
+              datasetWithAssetCountMap.getOrElse(dataset.id.get, Nil)
             )
         }.toSeq
     }
@@ -177,7 +176,7 @@ class DatasetRepo @Inject()(
   }
 
   def getRichDatasetById(id: Long): Future[Option[RichDataset]] = {
-    getRichDataset(Datasets.filter(_.id === id)).map(_.headOption)
+    getRichDataset(Datasets.filter(_.id === id), None).map(_.headOption)
   }
 
   def getRichDatasetByTag(tagName: String, searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[RichDataset]] = {

@@ -15,10 +15,9 @@
   <div style="clear: both;"></div>
   <!--<ds-assets-list [dsModel]="dsModel" [applicableActions]="applicableListActions" (onAction)="onEdit($event)"></ds-assets-list>-->
 
-  <div style="height: 600px;">
+  <div>
     <ds-assets-list [dsModel]="dsModel"
                     [applicableActions]="applicableListActions"
-                    [innerListScrollable]="true"
                     [queryModels]="dsAssetQueryModel"
                     (onAction)="onEdit($event)"
     ></ds-assets-list>
