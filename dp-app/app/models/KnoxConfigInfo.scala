@@ -2,7 +2,7 @@ package models
 
 case class KnoxConfigInfo(
     id: Option[Long],
-    masterPasword: Option[String],
+    masterPassword: Option[String],
     ldapUrl: String,
     userDnTemplate: Option[String],
     userSearchBase: Option[String],

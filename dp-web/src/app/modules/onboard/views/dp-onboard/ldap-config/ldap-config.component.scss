@@ -1,0 +1,18 @@
+.dp-input {
+  margin: 15px 0px;
+  label {
+    display: block;
+  }
+  input[type="text"], input[type="password"] {
+    display: block;
+    height: 20px;
+    padding: 6px 10px;
+    width: 440px;
+    border-radius: 2px;
+    font-size: 13px;
+  }
+}
+
+.margin-right-10 {
+  margin-right: 10px;
+}

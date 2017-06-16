@@ -1,0 +1,29 @@
+<div class="notification-bar line-height-1-5" *ngIf="showNotification">
+  <i class="fa fa-check-circle green margin-right-10 text-medium"></i>
+  <span class="text-medium green">LDAP ADDED SUCCESSFULLY!!!</span>
+  <i class="fa fa-remove pull-right margin-all-3 pointer" (click)="closeNotification()"></i>
+</div>
+<div class="container line-height-1-5">
+  <div class="text-medium">
+    <i class="fa fa-user green text-large pull-left"></i>
+    <div>
+      <div class="text-uppercase text-xsmall">STEP 2</div>
+      <div class="">Setup Dataplane Administrator</div>
+    </div>
+  </div>
+  <div class="margin-top-bottom-20">
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  </div>
+  <div class="dp-input">
+    <label class="text-medium">Users</label>
+    <tagging-widget id="tags" [tags]="tags" [clearOnSearch]="true"
+    [availableTags]="availableTags"
+    [clearOnSearch]="true"
+    (textChange)="onTagSearchChange($event)"
+    (onNewSearch)="onNewUserAddition($event)"></tagging-widget>
+  </div>
+  <div class="margin-top-30">
+    <button class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">SAVE & LOGIN</button>
+    <button class="mdl-button btn-hwx-secondary" (click)="back()">BACK</button>
+  </div>
+</div>
