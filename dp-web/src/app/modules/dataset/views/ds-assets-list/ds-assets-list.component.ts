@@ -39,6 +39,7 @@ export class DsAssetList implements OnInit {
   @Input() searchText: string = "";
   @Input() typeFilter: AssetTypeEnum = AssetTypeEnum.ALL;
   @Input() clusterId:number;
+  @Input() allowAssetNavigation : boolean = true;
 
   @ViewChild("table") table: ElementRef;
   @ViewChild("outerCont") outerCont: ElementRef;
@@ -178,7 +179,7 @@ export class DsAssetList implements OnInit {
   }
   onAssetClick(id:any, clusterId:number) {
     // console.log(id, clusterId);
-    if(clusterId) {
+    if(this.allowAssetNavigation && clusterId) {
       this.router.navigate([`assets/details/${clusterId}/${id}`]);
     }
   }
