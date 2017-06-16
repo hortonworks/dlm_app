@@ -92,21 +92,27 @@ export class AssetsComponent implements OnInit {
     let workspaceAsset = new WorkspaceAsset();
     workspaceAsset.workspaceId = this.workspaceDTO.workspace.id;
     workspaceAsset.clusterId = this.cluster.id;
-    /* This is hard coded till asset search starts return the results */
-    workspaceAsset['assetQueryModels'] = [
-      {
-        "atlasFilters": [
-          {
-            "atlasAttribute": {
-              "name": "owner",
-              "dataType": "string"
-            },
-            "operation": "equals",
-            "operand": "admin"
-          }
-        ]
-      }
-    ];
+
+    /* This is tmp solution till filters in basic search returns query models*/
+    let filters = [{"atlasFilters": DsAssetsService.prototype.getAtlasFilters(this.assetSetQueryModelsForAddition)}];
+    if (!filters || filters.length === 0 || !filters[0].atlasFilters || filters[0].atlasFilters.length === 0) {
+      workspaceAsset.assetQueryModels = [
+        {
+          "atlasFilters": [
+            {
+              "atlasAttribute": {
+                "name": "owner",
+                "dataType": "string"
+              },
+              "operation": "equals",
+              "operand": "admin"
+            }
+          ]
+        }
+      ];
+    } else {
+      workspaceAsset.assetQueryModels = filters;
+    }
 
     this.workspaceAssetsService.save(workspaceAsset).subscribe(assets => {
       this.getAssets();

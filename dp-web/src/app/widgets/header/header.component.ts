@@ -1,4 +1,4 @@
-import {Component, Input, ElementRef, ViewChild, HostListener, Output, EventEmitter} from '@angular/core';
+import {Component, Input, ElementRef, ViewChild, HostListener, Output, EventEmitter, OnInit} from '@angular/core';
 import { Router, NavigationStart } from '@angular/router';
 
 import {User} from '../../models/user';
@@ -6,14 +6,12 @@ import {HeaderData, Persona, PersonaTabs} from '../../models/header-data';
 import {ViewPaneState} from '../../app.component';
 import {CollapsibleNavService} from '../../services/collapsible-nav.service';
 
-declare var componentHandler:any;
-
 @Component({
   selector: 'dp-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
 
   sideNavWidth = '200px';
   activeTabName: string;
@@ -25,7 +23,7 @@ export class HeaderComponent {
 
   @Input() user:User;
   @Input() headerData:HeaderData;
-  @Input() viewPaneState: ViewPaneState;
+  @Input() viewPaneState: ViewPaneState = null;
   @Output() viewPaneStateChange = new EventEmitter<ViewPaneState>();
 
   @ViewChild('sidenav') sidenav: ElementRef;
@@ -57,7 +55,6 @@ export class HeaderComponent {
           this.activePersonaName = persona.name;
           this.activeTabName = tabs.tabName;
 
-          this.viewPaneStateChange.emit(ViewPaneState.MAXIMISE);
           this.collapsibleNavService.setTabs(persona.tabs, tabs);
           break;
         }
@@ -75,6 +72,10 @@ export class HeaderComponent {
 
   navigateToURL(url: string) {
     this.router.navigate([url]);
+  }
+
+  ngOnInit() {
+    setTimeout(() => this.viewPaneStateChange.emit(ViewPaneState.MAXIMISE), 1);
   }
 
   openNav() {
