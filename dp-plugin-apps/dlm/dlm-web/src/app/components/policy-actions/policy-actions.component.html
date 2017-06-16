@@ -1,0 +1,12 @@
+<div class="btn-group" dropdown placement="bottom right">
+  <a dropdownToggle class="actionable">
+    <i class="fa fa-ellipsis-v text-primary"></i>
+  </a>
+  <ul *dropdownMenu class="dropdown-menu dropdown-menu-right">
+    <li *ngFor="let policyAction of policyActions"
+        (click)="handleSelectedAction(policy, policyAction)"
+        [class.disabled]="actionDisabled(policy, policyAction)">
+      <a href="javascript:void(0);" class="dropdown-item">{{policyAction.label}}</a>
+    </li>
+  </ul>
+</div>

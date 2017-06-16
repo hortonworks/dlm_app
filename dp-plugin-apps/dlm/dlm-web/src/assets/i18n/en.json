@@ -147,7 +147,8 @@
           "runtime": "Runtime",
           "transferred": "Transferred",
           "next_run": "Next Run",
-          "action": "Action"
+          "action": "Action",
+          "actions": "Actions"
         },
         "actions": {
           "abort_job": "Abort Job",

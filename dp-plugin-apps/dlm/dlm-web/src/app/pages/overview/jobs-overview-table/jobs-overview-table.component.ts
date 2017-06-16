@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild, TemplateRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs/Subscription';
 
 import * as fromRoot from 'reducers/';
-import { ActionItemType, ActionColumnType } from 'components';
+import { ActionItemType } from 'components';
 import { JobsTableComponent } from 'pages/jobs/jobs-table/jobs-table.component';
 import { TableComponent } from 'common/table/table.component';
 import { getLastOperationResponse } from 'selectors/operation.selector';
@@ -15,7 +15,8 @@ import { abortJob } from 'actions/job.action';
 @Component({
   selector: 'dlm-jobs-overview-table',
   templateUrl: './jobs-overview-table.component.html',
-  styleUrls: ['./jobs-overview-table.component.scss']
+  styleUrls: ['./jobs-overview-table.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class JobsOverviewTableComponent extends JobsTableComponent implements OnInit, OnDestroy {
   private selectedAction: ActionItemType;
@@ -27,6 +28,7 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
 
   @ViewChild('destinationIconCell') destinationIconCellRef: TemplateRef<any>;
   @ViewChild('verbStatusCellTemplate') verbStatusCellTemplate: TemplateRef<any>;
+  @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
 
   constructor(private t: TranslateService, protected store: Store<fromRoot.State>) {
     super(store);
@@ -39,10 +41,10 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   ngOnInit() {
     const actionLabel = name => this.t.instant(`page.overview.table.actions.${name}`);
     this.rowActions = <ActionItemType[]>[
-      {label: actionLabel('abort_job'), name: 'ABORT_JOB'},
-      {label: actionLabel('delete_policy'), name: 'DELETE_POLICY'},
-      {label: actionLabel('suspend_policy'), name: 'SUSPEND_POLICY'},
-      {label: actionLabel('activate_policy'), name: 'ACTIVATE_POLICY'}
+      {label: actionLabel('abort_job'), name: 'ABORT_JOB', enabledFor: 'RUNNING'},
+      {label: actionLabel('delete_policy'), name: 'DELETE_POLICY', disabledFor: ''},
+      {label: actionLabel('suspend_policy'), name: 'SUSPEND_POLICY', disabledFor: 'SUSPENDED'},
+      {label: actionLabel('activate_policy'), name: 'ACTIVATE_POLICY', disabledFor: 'RUNNING'}
     ];
     this.columns = [
       {cellTemplate: this.statusCellTemplate, maxWidth: 25, minWidth: 25},
@@ -80,11 +82,7 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
-      <ActionColumnType>{
-        name: this.translateColumn('actions'),
-        actionable: true,
-        actions: this.rowActions
-      }
+      {name: 'Actions', cellTemplate: this.actionsCellRef, maxWidth: 55, sortable: false}
     ];
   }
 
@@ -94,9 +92,9 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
     }
   }
 
-  handleSelectedAction({row, action}) {
+  handleSelectedAction({policy, action}) {
     this.selectedAction = action;
-    this.selectedForActionRow = row;
+    this.selectedForActionRow = policy;
     this.showActionConfirmationModal = true;
   }
 
