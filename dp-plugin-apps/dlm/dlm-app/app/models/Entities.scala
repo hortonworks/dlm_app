@@ -41,7 +41,7 @@ object Entities {
   case class PairedClustersResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), pairedClusters: Set[Set2[BeaconCluster]] = Set())
 
   case class PoliciesDetails(name: String, `type`: String, status: String, sourceDataset: String, targetDataset: String,
-                             frequency: Long, startTime: Option[String], endTime: String, sourceCluster:String, targetCluster:String)
+                             frequency: Long, startTime: Option[String], endTime: String, sourceCluster:String, targetCluster:String, jobs: Seq[PolicyInstanceResponse])
 
   case class PoliciesDetailsResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), policies: Seq[PoliciesDetails])
 
