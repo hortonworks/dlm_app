@@ -6,6 +6,7 @@ import javax.inject._
 import com.hortonworks.dataplane.commons.domain.Entities._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.libs.json.JsValue
+import slick.lifted.ColumnOrdered
 
 import scala.concurrent.Future
 
@@ -108,9 +109,31 @@ class DatasetRepo @Inject()(
     } yield (datasetCategory.datasetId, category.name)
   }
 
-  private def getRichDataset(inputQuery: Query[DatasetsTable, Dataset, Seq]): Future[Seq[RichDataset]] = {
+  def sortByDataset(paginationQuery: Option[PaginatedQuery],
+                    query: Query[(DatasetsTable, Rep[String], Rep[String], Rep[Option[Long]]), (Dataset, String, String, Option[Long]), Seq]) = {
+    paginationQuery.map {
+      pq =>
+        val q = pq.sortQuery.map {
+          sq =>
+            query.sortBy {
+              oq =>
+                sq.sortCol match {
+                  case "id" => oq._1.id
+                  case "name" => oq._1.name
+                  case "createdOn" => oq._1.createdOn
+                  case "cluster" => oq._3
+                  case "user" => oq._2
+                }
+            } (ColumnOrdered(_, sq.ordering))
+        }.getOrElse(query)
+        q.drop(pq.offset).take(pq.size)
+    }.getOrElse(query)
+  }
+
+  private def getRichDataset(inputQuery: Query[DatasetsTable, Dataset, Seq],
+                             paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[RichDataset]] = {
     val query = for {
-      datasetWithUsername <- getDatasetWithNameQuery(inputQuery).to[List].result
+      datasetWithUsername <- sortByDataset(paginatedQuery, getDatasetWithNameQuery(inputQuery)).to[List].result
       datasetAssetCount <- {
         val datasetIds = datasetWithUsername.map(_._1.id.get)
         getDatasetAssetCount(datasetIds).to[List].result
@@ -150,7 +173,7 @@ class DatasetRepo @Inject()(
   }
 
   def getRichDataset(searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[RichDataset]] = {
-    getRichDataset(Datasets.search(searchText).paginate(paginatedQuery))
+    getRichDataset(Datasets.search(searchText), paginatedQuery)
   }
 
   def getRichDatasetById(id: Long): Future[Option[RichDataset]] = {
@@ -162,7 +185,7 @@ class DatasetRepo @Inject()(
       .join(datasetCategoryRepo.DatasetCategories).on(_.id === _.categoryId)
       .join(Datasets).on(_._2.datasetId === _.id)
       .map(_._2)
-    getRichDataset(query.search(searchText).paginate(paginatedQuery))
+    getRichDataset(query.search(searchText), paginatedQuery)
   }
 
   def insertWithCategories(datasetReq: DatasetAndCategoryIds): Future[DatasetAndCategories] = {
