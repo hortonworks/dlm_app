@@ -7,8 +7,8 @@ describe('Jobs Selectors', () => {
 
   let state: State;
   beforeEach(() => {
-    this.job1 = <Job>{id: '1'};
-    this.job2 = <Job>{id: '2'};
+    this.job1 = <Job>{id: '1', startTime: '2017-06-12T03:32:00'};
+    this.job2 = <Job>{id: '2', startTime: '2018-06-12T03:32:00'};
     const jobsState = {
       jobs: {
         entities: {
@@ -29,11 +29,11 @@ describe('Jobs Selectors', () => {
   });
 
   describe('#getAllJobs', () => {
-    it('should map entities to array', () => {
+    it('should map entities to array sorted by startTime', () => {
       const result = jobSelectors.getAllJobs(state);
       expect(result.length).toEqual(2);
-      expect(result[0]).toBe(this.job1);
-      expect(result[1]).toBe(this.job2);
+      expect(result[0]).toBe(this.job2);
+      expect(result[1]).toBe(this.job1);
     });
   });
 

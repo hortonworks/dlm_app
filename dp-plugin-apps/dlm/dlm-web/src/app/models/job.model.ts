@@ -1,3 +1,4 @@
+import { JobTrackingInfo } from './job-tracking-info.model';
 export interface Job {
   runTime: number;
   nextRun: number;
@@ -16,6 +17,6 @@ export interface Job {
   status: string;
   startTime: string;
   endTime: string;
-  trackingInfo: string;
+  trackingInfo: JobTrackingInfo;
   message: string;
 }

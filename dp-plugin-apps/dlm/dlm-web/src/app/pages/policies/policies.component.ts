@@ -43,9 +43,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
     {multiple: true, propertyName: 'name'}
   ];
 
-  constructor(private store: Store<fromRoot.State>,
-              private router: Router,
-              private route: ActivatedRoute) {
+  constructor(private store: Store<fromRoot.State>) {
     this.policies$ = this.store.select(getPolicyClusterJob);
     this.clusters$ = store.select(getAllClusters);
     this.pairings$ = store.select(getAllPairings);
