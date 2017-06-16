@@ -1,10 +1,10 @@
 {
   "/api": {
-    "target": "http://localhost:9000",
+    "target": "http://localhost:8762/api/app",
     "secure": false
   },
   "/auth": {
-    "target": "http://localhost:9000",
+    "target": "http://localhost:8762/api/app",
     "secure": false
   }
 }
