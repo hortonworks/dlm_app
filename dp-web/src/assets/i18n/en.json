@@ -27,6 +27,7 @@
     "moreLink" : "Learn More",
     "save": "SAVE",
     "cancel" : "Cancel",
+    "defaultRequiredFields": "Please fill in all the required fields marked with '*'",
     "sidenav" : {
       "analyst" : "Analyst",
       "infra" : "Infra Admin",

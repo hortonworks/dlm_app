@@ -9,12 +9,12 @@
         <form #workspaceForm="ngForm">
             <div class="form-group">
                 <label class="required"> {{ "common.name" | translate }} </label>
-                <input name="name" [(ngModel)]="workspace.name">
+                <input required name="name" [(ngModel)]="workspace.name">
             </div>
             <div class="form-group">
                 <label class="required"> {{ "common.datalake" | translate }} </label>
                 <dp-select>
-                    <select name="source" [(ngModel)]="workspace.source" (ngModelChange)="updateVal()">
+                    <select required name="source" [(ngModel)]="workspace.source" (ngModelChange)="updateVal()">
                         <option selected="selected"> Select </option>
                         <option *ngFor="let cluster of clusterServiceObservable | async " [attr.value]="cluster.id"> {{ cluster.name }} </option>
                     </select>
@@ -22,7 +22,7 @@
             </div>
             <div class="form-group">
                 <label class="required"> {{ "common.description" | translate }} </label>
-                <textarea name="description" [(ngModel)]="workspace.description"> </textarea>
+                <textarea required name="description" [(ngModel)]="workspace.description"> </textarea>
             </div>
 
             <button class="mdl-button btn-hwx-primary" (click)="save()"> {{ "common.save" | translate }} </button>

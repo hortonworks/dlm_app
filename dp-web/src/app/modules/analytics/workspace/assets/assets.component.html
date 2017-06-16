@@ -15,19 +15,15 @@
             <thead>
             <th class="mdl-data-table__cell--non-numeric">Source</th>
             <th class="mdl-data-table__cell--non-numeric">Name</th>
+            <th class="mdl-data-table__cell--non-numeric">Description</th>
             <th class="mdl-data-table__cell--non-numeric">Owner</th>
-            <th class="mdl-data-table__cell--non-numeric">Created Time</th>
-            <th class="mdl-data-table__cell--non-numeric">Number of Rows</th>
-            <th class="mdl-data-table__cell--non-numeric">Data Type</th>
             </thead>
             <tbody>
             <tr *ngFor="let asset of workspaceAssetServiceObservable | async ">
                 <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"> {{ asset.assetType }} </td>
                 <td class="mdl-data-table__cell--non-numeric key-column mdl-data-table__cell--width15"> {{ asset.assetName }} </td>
+                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">  {{ asset.description ? asset.description : '-' }} </td>
                 <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"> {{ asset.assetProperties.owner }} </td>
-                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">  - </td>
-                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"> - </td>
-                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"> {{ asset.assetType }} </td>
             </tr>
             </tbody>
         </table>

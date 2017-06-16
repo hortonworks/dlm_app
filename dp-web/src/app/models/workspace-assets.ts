@@ -9,8 +9,10 @@ export class WorkspaceAsset {
   id: number;
   assetType: string;
   assetName: string;
+  description: string = '';
   guid: string;
   assetProperties: {
     name: string
-  }
+  };
+
 }
