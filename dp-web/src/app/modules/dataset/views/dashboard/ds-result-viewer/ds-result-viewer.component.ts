@@ -13,9 +13,10 @@ export class DsNavResultViewer {
 
   @Input() currentDsTag: DatasetTag;
   @Input() view;
+  @Input() dsNameSearch:string = "";
   datasetModels: RichDatasetModel[] = null;
   views = ViewsEnum;
-  start: number = 1;
+  start: number = 0;
   limit: number = 10;
 
   private currentPage: number = 1;
@@ -24,7 +25,8 @@ export class DsNavResultViewer {
   }
 
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-    if (changes["currentDsTag"] && this.currentDsTag) {
+    if ((changes["dsNameSearch"] && !changes["dsNameSearch"].firstChange)
+      || changes["currentDsTag"] && !changes["currentDsTag"].firstChange) {
       this.getDataset();
     }
   }
@@ -39,7 +41,7 @@ export class DsNavResultViewer {
 
   getDataset() {
     this.datasetModels = null;
-    this.richDatasetService.listByTag(this.currentDsTag.name, this.start, this.limit)
+    this.richDatasetService.listByTag(this.currentDsTag.name, this.dsNameSearch, this.start, this.limit)
       .subscribe(result => this.datasetModels = result);
   }
 
