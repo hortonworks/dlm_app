@@ -14,6 +14,7 @@ import {CollapsibleNavModule} from '../../shared/collapsible-nav/collapsible-nav
 import {SharedModule} from '../../shared/shared.module';
 import {DpSorterModule} from '../../shared/dp-table/dp-sorter/dp-sorter.module';
 import {ClusterDetailsComponent} from './views/cluster-details/cluster-details.component';
+import {DropdownModule} from '../../shared/dropdown/dropdown.module';
 
 @NgModule({
   imports: [
@@ -23,6 +24,7 @@ import {ClusterDetailsComponent} from './views/cluster-details/cluster-details.c
     NguiAutoCompleteModule,
     TaggingWidgetModule,
     CollapsibleNavModule,
+    DropdownModule,
     TranslateModule
   ],
 
