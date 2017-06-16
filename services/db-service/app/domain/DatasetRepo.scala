@@ -144,20 +144,25 @@ class DatasetRepo @Inject()(
     }
   }
 
-  def getRichDataset(paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[RichDataset]] = {
-    getRichDataset(Datasets.paginate(paginatedQuery))
+  implicit class NameSearchQuery(query: Query[DatasetsTable, Dataset, Seq]) {
+    def search(searchText: Option[String]) = searchText
+      .map(s => query.filter(_.name.toLowerCase like s"%${s.toLowerCase}%")).getOrElse(query)
+  }
+
+  def getRichDataset(searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[RichDataset]] = {
+    getRichDataset(Datasets.search(searchText).paginate(paginatedQuery))
   }
 
   def getRichDatasetById(id: Long): Future[Option[RichDataset]] = {
     getRichDataset(Datasets.filter(_.id === id)).map(_.headOption)
   }
 
-  def getRichDatasetByTag(tagName: String, paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[RichDataset]] = {
+  def getRichDatasetByTag(tagName: String, searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[RichDataset]] = {
     val query = categoryRepo.Categories.filter(_.name === tagName)
       .join(datasetCategoryRepo.DatasetCategories).on(_.id === _.categoryId)
       .join(Datasets).on(_._2.datasetId === _.id)
       .map(_._2)
-    getRichDataset(query.paginate(paginatedQuery))
+    getRichDataset(query.search(searchText).paginate(paginatedQuery))
   }
 
   def insertWithCategories(datasetReq: DatasetAndCategoryIds): Future[DatasetAndCategories] = {
