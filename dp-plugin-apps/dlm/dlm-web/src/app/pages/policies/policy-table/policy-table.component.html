@@ -63,18 +63,10 @@
 </ng-template>
 
 <ng-template #actionsCell let-row="row">
-  <div class="btn-group" dropdown placement="bottom right">
-    <button dropdownToggle class="btn btn-link">
-      <i class="fa fa-ellipsis-v text-primary"></i>
-    </button>
-    <ul *dropdownMenu class="dropdown-menu dropdown-menu-right">
-      <li *ngFor="let rowAction of rowActions"
-          (click)="handleSelectedAction(row, rowAction)"
-          [class.disabled]="row.status === rowAction.disabledFor">
-        <a href="javascript:void(0);" class="dropdown-item">{{rowAction.label}}</a>
-      </li>
-    </ul>
-  </div>
+  <dlm-policy-actions
+    [policy]="row"
+    [policyActions]="rowActions"
+    (handler)="handleSelectedAction($event)"></dlm-policy-actions>
 </ng-template>
 
 <dlm-modal-dialog
