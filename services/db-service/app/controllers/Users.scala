@@ -2,7 +2,8 @@ package controllers
 
 import javax.inject._
 
-import com.hortonworks.dataplane.commons.domain.Entities.User
+import com.hortonworks.dataplane.commons.domain.Entities.{User, UserRole}
+import domain.API.{roles, users}
 import domain.UserRepo
 import org.mindrot.jbcrypt.BCrypt
 import play.api.mvc._
@@ -57,5 +58,19 @@ class Users @Inject()(userRepo: UserRepo)(implicit exec: ExecutionContext)
     val future = userRepo.deleteByUserId(userId)
     future.map(i => success(i)).recoverWith(apiError)
   }
-
+  def addUserRole = Action.async(parse.json) { req =>
+    req.body
+      .validate[UserRole]
+      .map { role =>
+        val created = userRepo.addUserRole(role)
+        created.map(r => success(linkData(r,getuserRoleMap(r)))).recoverWith(apiError)
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
+  def getRolesForUser(userName:String) = Action.async {
+    userRepo.getRolesForUser(userName).map(success(_))
+  }
+  private def getuserRoleMap(r: UserRole) = {
+    Map("user" -> s"$users/${r.userId.get}", "role" -> s"$roles/${r.roleId.get}")
+  }
 }
