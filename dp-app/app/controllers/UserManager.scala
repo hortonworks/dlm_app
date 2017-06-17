@@ -17,7 +17,7 @@ import scala.concurrent.Future
 class UserManager @Inject()(val ldapService: LdapService,@Named("userService") val userService: UserService) extends Controller {
   val logger = Logger(classOf[KnoxConfig])
 
-  def handleErrors(errors: Errors) = {
+  private def handleErrors(errors: Errors) = {
     if (errors.errors.exists(_.code == "400"))
       BadRequest(Json.toJson(errors))
     else
@@ -25,15 +25,13 @@ class UserManager @Inject()(val ldapService: LdapService,@Named("userService") v
   }
 
   def ldapSearch = Action.async {request =>
-    val fuzzyMatch:Boolean=request.getQueryString("fuzzyMatch") match {
-      case Some(fuzzyMatch) => fuzzyMatch.toBoolean
-      case None=>false
+    val fuzzyMatch:Boolean=request.getQueryString("fuzzyMatch").exists { res =>
+      res.toBoolean
     }
     ldapService.search(request.getQueryString("name").get,fuzzyMatch)
       .map {
         case Left(errors) => handleErrors(errors)
         case Right(ldapSearchResult) => {
-          println("result==" + ldapSearchResult)
           Ok(Json.toJson(ldapSearchResult))
         }
       }
@@ -41,15 +39,10 @@ class UserManager @Inject()(val ldapService: LdapService,@Named("userService") v
   }
   def addLdapUserAsAdmin=Action.async{req=>
     val userNameOpt:Option[String]=req.getQueryString("userName");
-    userNameOpt match  {
-      case Some(userName)=>{
-        val user:User =User(None,userNameOpt.get,"password-dummy",userName,None,Some(true))
-        userService.addUser(user)
-
-        Future.successful(Ok)
-      }
-      case None=>Future.successful(BadRequest)
-    }
+    userNameOpt.map{userName=>
+      val user:User =User(None,userNameOpt.get,"password-dummy",userName,None,Some(true))
+      userService.addUser(user)
+      Future.successful(Ok)
+    }.getOrElse(Future.successful(BadRequest))
   }
-
 }

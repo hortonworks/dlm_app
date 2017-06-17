@@ -29,7 +29,6 @@ class DpKeyStore @Inject()(configuration: Configuration) {
       using(new FileInputStream(dpKeyStoreJceksPath)) { is =>
         keystore.load(is, keyStorePass.toCharArray)
         logger.info("DP Keystore Initialized")
-        println("Keystore initialized")
       }
     } catch {
       case e: Exception => {

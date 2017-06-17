@@ -35,6 +35,7 @@ class KnoxConfig @Inject()(val ldapService: LdapService,val knoxConfigurator:Kno
             }
             case Right(ldapConf) => {
               //TODO configure knox and restart..
+
               Ok(Json.toJson(ldapConf))
             }
           }
@@ -58,8 +59,14 @@ class KnoxConfig @Inject()(val ldapService: LdapService,val knoxConfigurator:Kno
         Future.successful(BadRequest)
       )
   }
+  def knoxStatus =Action.async{req=>
+    //TODO this is mock call for testing until knox containers could be launched.
+    //check if knox is up..
+    Future.successful(Ok)
+  }
+
   def test= Action.async {req =>
-    knoxConfigurator.configure
+   // knoxConfigurator.configure
     Future.successful(Ok)
   }
 }

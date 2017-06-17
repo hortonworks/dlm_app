@@ -62,7 +62,7 @@ class LdapService @Inject()(
     }
   }
   def validate(knoxConf: KnoxConfigInfo): Either[Errors, Boolean] = {
-    validateUserDnTemlate(knoxConf.userDnTemplate) match {
+    validateUserDnTemplate(knoxConf.userDnTemplate) match {
       case Left(errors) => Left(errors)
       case Right(valid) => {
         if (valid) {
@@ -74,46 +74,35 @@ class LdapService @Inject()(
       }
     }
   }
-  private def validateUserDnTemlate(
+  private def validateUserDnTemplate(
       userDntemplateOption: Option[String]): Either[Errors, Boolean] = {
-    userDntemplateOption match {
-      case Some(userDnTemplate) => {
-        if (!userDnTemplate.contains(USERDN_SUBSTITUTION_TOKEN)) {
-          Left(
-            Errors(
-              Seq(Error("invalid config",
-                        "user dn template substitution token absent"))))
-        } else {
-          Right(true)
-        }
-      }
-      case None =>
-        Left(Errors(Seq(Error(
-          "invalid config",
-          "user dn template mandatory")))) //TODO this may change
+    userDntemplateOption.map{userDnTemplate=>
+      if (!userDnTemplate.contains(USERDN_SUBSTITUTION_TOKEN)) {
+        Left(
+          Errors(
+            Seq(Error("invalid config",
+              "user dn template substitution token absent"))))
+      } else Right(true)
+    }.getOrElse{
+      Left(Errors(Seq(Error(
+        "invalid config",
+        "user dn template mandatory")))) //TODO this may change by having advance options rather tham just userr dn template
     }
-
   }
   private def getUserDn(userDntemplateOpt: Option[String],
                         principal: String): Option[String] = {
-    userDntemplateOpt match {
-      case Some(userDnTempate) =>
-        val index = userDnTempate.indexOf(USERDN_SUBSTITUTION_TOKEN)
-        val prefix = userDnTempate.substring(0, index)
-        val suffix = userDnTempate.substring(
-          prefix.length + USERDN_SUBSTITUTION_TOKEN.length)
-
-        Some(s"$prefix$principal$suffix")
-      case None => None
-
-    }
+    userDntemplateOpt.map{ userDnTempate =>
+      val index = userDnTempate.indexOf(USERDN_SUBSTITUTION_TOKEN)
+      val prefix = userDnTempate.substring(0, index)
+      val suffix = userDnTempate.substring(prefix.length + USERDN_SUBSTITUTION_TOKEN.length)
+      Some(s"$prefix$principal$suffix")
+    }.getOrElse(None)
   }
   private def detemineUserSearchBase(userDnTempate:String): String ={
     val index = userDnTempate.indexOf(USERDN_SUBSTITUTION_TOKEN)
     userDnTempate.substring(index+USERDN_SUBSTITUTION_TOKEN.length).trim.substring(1)
   }
   private def detemineUserIdentifier(userDnTempate:String): String ={
-    println (s"userdntamplat=$userDnTempate")
     val index = userDnTempate.indexOf(USERDN_SUBSTITUTION_TOKEN)
     userDnTempate.substring(0, index)
   }
@@ -190,19 +179,10 @@ class LdapService @Inject()(
           Left(Errors(Seq(new Error("Exception","current implementation only allows search based on userDn template.")))))
 
       }
-//      val res: NamingEnumeration[SearchResult] =
-
-//        dirContext.search("ou=groups,dc=hadoop,dc=apache,dc=org",
-//                          s"(cn=$userName)",
-//                          searchControls)
-      println(s"user dn=$userDn")
       val searchBase=detemineUserSearchBase(ldapConfs.head.userDnTemplate.get)
       var searchIdtemplate=detemineUserIdentifier(ldapConfs.head.userDnTemplate.get)
 
       val searchid= if (fuzzyMatch) searchIdtemplate+userName+"*" else  searchIdtemplate+userName
-
-      println(s"search base=$searchBase")
-      println(s"search id=$searchid")
       val res: NamingEnumeration[SearchResult] =dirContext.search(searchBase,searchid,searchControls)
       val ldapSearchResults: ArrayBuffer[LdapSearchResult] = new ArrayBuffer()
       while (res.hasMore) {

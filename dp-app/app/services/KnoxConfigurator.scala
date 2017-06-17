@@ -10,12 +10,7 @@ class KnoxConfigurator @Inject()( private val configuration: play.api.Configurat
   private val APP_PATH = configuration.underlying.getString("DP_APP_HOME")
   private val knoxSsoTemplatePath = s"$APP_PATH/conf/templates/knoxsso.xml"
   def configure={
-
-    val xmlObj=XML.loadFile(knoxSsoTemplatePath)
-    println("*************")
-    val knoxSSoService=(xmlObj \ "topology" ).toString()
-    println (s"conf=[$knoxSSoService]")
-
+    //TODO implementation.  
   }
   private def configureShiro={
 
