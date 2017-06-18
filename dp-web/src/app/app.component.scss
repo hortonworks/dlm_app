@@ -6,20 +6,21 @@
 
 .maximised {
   margin-left: $side-nav-width;
+  transition: 0.5s;
 }
 
 .minimized {
   margin-left: 50px;
+  transition: 0.5s;
 }
 
 .default {
   margin-left: 0px;
 }
 
-main {
+.main {
   transition: 0.5s;
 }
-
 .page-content {
   min-height: calc(100vh - 55px);
   position: relative;
