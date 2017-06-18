@@ -3,12 +3,7 @@
     <div class="result-viewer">
         <div class="mdl-grid mdl-grid--no-spacing dataset-search">
             <div class="dp-input mdl-cell--10-col">
-                <input type="text" placeholder="Search"/>
-            </div>
-            <div class="mdl-cell--2-col">
-                <button class="mdl-button btn-hwx-primary pull-right" (click)="actionAddNewDataset()">
-                    <i class="fa fa-plus"></i> {{("pages.dataset.labels.newDataset" | translate).toUpperCase()}}
-                </button>
+                <input type="text" placeholder="Search" [ngModel]="dsNameSearch" (change)="dsNameSearchChange($event)"/>
             </div>
         </div>
 
@@ -25,13 +20,22 @@
                             <i class="fa fa-th"></i>
                         </button>
                     </div>
+                    <div class="addDatasetButtonCont">
+                      <button class="mdl-button btn-hwx-primary pull-right" (click)="actionAddNewDataset()">
+                        {{("pages.dataset.labels.newDataset" | translate).toUpperCase()}}
+                      </button>
+                    </div>
                 </div>
             </div>
 
             <div class="spacer-15"></div>
 
             <div class="result-container">
-                <ds-nav-result-viewer [view]="currentView" [currentDsTag]="currentDsTag"></ds-nav-result-viewer>
+                <ds-nav-result-viewer
+                  [view]="currentView"
+                  [currentDsTag]="currentDsTag"
+                  [dsNameSearch]="dsNameSearch"
+                ></ds-nav-result-viewer>
             </div>
         </div>
     </div>

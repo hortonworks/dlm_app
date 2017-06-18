@@ -12,6 +12,7 @@ import {ViewsEnum} from "../../../../shared/utils/views";
 export class DatasetDashboardComponent implements OnInit {
 
   currentDsTag: DatasetTag = null;
+  dsNameSearch : string = "";
   views = ViewsEnum;
   currentView: ViewsEnum;
 
@@ -32,5 +33,9 @@ export class DatasetDashboardComponent implements OnInit {
 
   actionAddNewDataset() {
     this.router.navigate(["dataset/add"]);
+  }
+
+  dsNameSearchChange(event) {
+    this.dsNameSearch = event.target.value;
   }
 }

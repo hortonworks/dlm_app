@@ -15,9 +15,11 @@ export class RichDatasetService {
   constructor(private http: Http) {
   }
 
-  listByTag(tagName: string, start: number, limit: number): Observable<RichDatasetModel[]> {
+  listByTag(tagName: string, nameSearchText : string, start: number, limit: number): Observable<RichDatasetModel[]> {
+    let url = `${this.url1}/${tagName}?offset=${start}&size=${limit}`;
+    nameSearchText && (url += `&search=${nameSearchText}`);
     return this.http
-      .get(`${this.url1}/${tagName}`, new RequestOptions(HttpUtil.getHeaders()))
+      .get(url, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .map(res => this.extractRichDataArray(res))
       .catch(HttpUtil.handleError);
