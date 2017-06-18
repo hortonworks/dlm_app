@@ -1,7 +1,7 @@
 package com.hortonworks.dataplane.cs
 
 import com.hortonworks.dataplane.commons.domain.Entities._
-import com.hortonworks.dataplane.commons.domain.Ambari.ClusterServiceWithConfigs
+import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariCheckResponse, AmbariCluster, AmbariDetailRequest, AmbariEndpoint, ClusterServiceWithConfigs}
 import com.hortonworks.dataplane.commons.domain.Atlas.{AssetProperties, AtlasAttribute, AtlasEntities, AtlasSearchQuery}
 import play.api.libs.json.{JsObject, JsResult, Json, JsValue}
 import play.api.libs.ws.WSResponse
@@ -11,7 +11,7 @@ import scala.concurrent.Future
 
 object Webservice {
 
-  trait CSClientService {
+  trait CsClientService {
 
     import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
@@ -33,7 +33,7 @@ object Webservice {
 
   }
 
-  trait AtlasService extends CSClientService {
+  trait AtlasService extends CsClientService {
 
     def listQueryAttributes(clusterId: String): Future[Either[Errors, Seq[AtlasAttribute]]]
 
@@ -46,9 +46,17 @@ object Webservice {
     def getLineage(clusterId: String, atlasGuid: String, depth: Option[String]): Future[Either[Errors,JsObject]]
   }
 
-  trait AmbariService extends CSClientService {
+
+  trait AmbariService extends CsClientService {
 
     def getAmbariResponse(clusterId: Long, ambariUrl: String): Future[Either[Errors, JsValue]]
+  }
+
+  trait AmbariWebService extends CsClientService {
+
+    def checkAmbariStatus(endpoint:AmbariEndpoint)(implicit token:Option[HJwtToken]):Future[Either[Errors,AmbariCheckResponse]]
+
+    def getAmbariDetails(ambariDetailRequest: AmbariDetailRequest)(implicit token:Option[HJwtToken]):Future[Either[Errors,Seq[AmbariCluster]]]
   }
 
 }

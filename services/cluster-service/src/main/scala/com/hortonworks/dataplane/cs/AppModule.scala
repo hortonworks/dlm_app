@@ -8,6 +8,7 @@ import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.http.Webserver
 import com.hortonworks.dataplane.http.routes.{AmbariRoute, AtlasRoute, StatusRoute}
 import com.typesafe.config.{Config, ConfigFactory}
+import org.asynchttpclient.DefaultAsyncHttpClientConfig
 import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcWSClient
 
@@ -30,7 +31,8 @@ object AppModule extends AbstractModule {
   @Singleton
   def provideWsClient(implicit actorSystem: ActorSystem,
                       materializer: ActorMaterializer): WSClient = {
-    AhcWSClient()
+    val config = new DefaultAsyncHttpClientConfig.Builder().setAcceptAnyCertificate(true).build
+    AhcWSClient(config)
   }
 
   @Provides

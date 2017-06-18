@@ -5,6 +5,7 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Inject, Provides, Singleton}
 import com.hortonworks.datapalane.consul._
+import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.db.Webservice._
 import com.hortonworks.dataplane.cs._
@@ -80,6 +81,15 @@ class Module extends AbstractModule {
   @Named("atlasService")
   def provideAtlasService(implicit ws: WSClient, configuration: Configuration): com.hortonworks.dataplane.cs.Webservice.AtlasService = {
     new AtlasServiceImpl(configuration.underlying)
+  }
+
+
+  @Provides
+  @Singleton
+  @Named("clusterAmbariService")
+  def provideAmbariWebService(implicit ws: WSClient,configuration: Configuration):AmbariWebService = {
+    implicit val clusterWsClient:ClusterWsClient = ClusterWsClient(ws)
+    new AmbariWebServiceImpl(configuration.underlying)
   }
 
   @Provides

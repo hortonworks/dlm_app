@@ -8,7 +8,7 @@ import {Location} from '../../../../models/location';
 import {Point} from '../../../../models/map-data';
 import {MapData} from '../../../../models/map-data';
 import {MapConnectionStatus} from '../../../../models/map-data';
-
+import { ClusterState,ClusterDetailRequest } from '../../../../models/cluster-state';
 
 import {LakeService} from '../../../../services/lake.service';
 import {ClusterService} from '../../../../services/cluster.service';
@@ -29,7 +29,7 @@ export class ClusterAddComponent implements OnInit {
 
   _isClusterValidateInProgress = false;
   _isClusterValidateSuccessful = false;
-
+  _clusterState:ClusterState;
   _isClusterValid;
 
   mapData: MapData[] = [];
@@ -79,8 +79,12 @@ export class ClusterAddComponent implements OnInit {
     let cleanedUri = StringUtils.cleanupUri(this.cluster.ambariurl);
     this.lakeService.validate(cleanedUri).subscribe(
       response => {
-        if (response.ambariStatus === 200) {
-          this.clusterService.getClusterInfo(cleanedUri).subscribe(clusterInfo => {
+        if (response.ambariApiStatus === 200) {
+          //TODO - Padma/Babu/Hemanth/Rohit :Display that Knox was detected
+          this._clusterState = response as ClusterState;
+          let detailRequest = new ClusterDetailRequest();
+          this.createDetailRequest(detailRequest, cleanedUri);
+          this.clusterService.getClusterInfo(detailRequest).subscribe(clusterInfo => {
             this._isClusterValidateInProgress = false;
             this._isClusterValidateSuccessful = true;
             this._isClusterValid = true;
@@ -102,6 +106,12 @@ export class ClusterAddComponent implements OnInit {
         this.onError();
       }
     );
+  }
+
+  private createDetailRequest(detailRequest: ClusterDetailRequest, cleanedUri: string) {
+    detailRequest.url = cleanedUri;
+    detailRequest.knoxDetected = this._clusterState.knoxDetected;
+    detailRequest.knoxUrl = this._clusterState.knoxUrl;
   }
 
   private onError() {
@@ -183,6 +193,10 @@ export class ClusterAddComponent implements OnInit {
     lake.name = this.cluster.name;
     lake.description = this.cluster.description;
     lake.state = 'TO_SYNC';
+    if(this._clusterState.knoxDetected){
+      lake.knoxEnabled = true;
+      lake.knoxUrl = this._clusterState.knoxUrl;
+    }
     let properties = {tags: []};
     this.cluster.tags.forEach(tag => properties.tags.push({'name': tag}));
     lake.properties = properties;

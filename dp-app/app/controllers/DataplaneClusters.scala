@@ -103,17 +103,14 @@ class DataplaneClusters @Inject()(
   }
 
   def ambariCheck = authenticated.async { request =>
+    implicit val token = request.token
     ambariService
       .statusCheck(AmbariEndpoint(request.getQueryString("url").get))
       .map {
-        case status => Ok(Json.toJson(Map("ambariStatus" -> status)))
-      }
-      .recoverWith {
-        case e: Exception =>
-          Future.successful(
-            InternalServerError(
-              JsonResponses.statusError(e.getMessage,
-                                        ExceptionUtils.getStackTrace(e))))
+        case Left(errors) =>
+          InternalServerError(
+            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(checkResponse) => Ok(Json.toJson(checkResponse))
       }
   }
 
