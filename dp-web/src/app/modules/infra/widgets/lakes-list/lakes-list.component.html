@@ -10,7 +10,7 @@
 
     <div style="clear:both;"></div>
 
-    <table class="mdl-data-table mdl-js-data-table" dp-config-table  on-mouseleave="hoveredIndex=null" (onSort)="onSort($event)">
+    <table class="mdl-data-table mdl-js-data-table" dp-config-table (onSort)="onSort($event)">
         <thead>
         <tr>
           <th class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder"> {{"common.status" | translate}}</th>
