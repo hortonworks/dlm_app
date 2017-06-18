@@ -10,7 +10,7 @@
       "status": "SUCCESS",
       "startTime": "2017-06-02T20:00:59",
       "endTime": "2017-06-02T21:00:59",
-      "trackingInfo": "job_local888139679_0001",
+      "trackingInfo": "{\"jobId\":\"job_1497547438563_0014\",\"numMapTasks\":1,\"bytesCopied\":213,\"filesCopied\":12,\"timeTaken\":11922}",
       "message": "SUCCESS"
     },
     {
@@ -23,7 +23,7 @@
       "status": "SUCCESS",
       "startTime": "2017-05-10T23:32:00",
       "endTime": "2017-05-10T23:32:02",
-      "trackingInfo": "job_local684574411_0002",
+      "trackingInfo": "{\"jobId\":\"job_1497547438563_0014\",\"numMapTasks\":1,\"bytesCopied\":4244,\"filesCopied\":6,\"timeTaken\":12922}",
       "message": "SUCCESS"
     },
     {
@@ -36,7 +36,7 @@
       "status": "SUCCESS",
       "startTime": "2017-05-11T00:31:07",
       "endTime": "2017-05-11T00:31:09",
-      "trackingInfo": "job_local803512429_0003",
+      "trackingInfo": "{\"jobId\":\"job_1497547438563_0014\",\"numMapTasks\":1,\"bytesCopied\":213232,\"filesCopied\":9,\"timeTaken\":9922}",
       "message": "SUCCESS"
     },
     {
@@ -49,7 +49,7 @@
       "status": "SUCCESS",
       "startTime": "2017-05-11T01:31:07",
       "endTime": "2017-05-11T01:31:09",
-      "trackingInfo": "job_local1585995693_0004",
+      "trackingInfo": "{\"jobId\":\"job_1497547438563_0014\",\"numMapTasks\":1,\"bytesCopied\":65431,\"filesCopied\":8,\"timeTaken\":11922}",
       "message": "SUCCESS"
     },
     {
@@ -62,7 +62,7 @@
       "status": "SUCCESS",
       "startTime": "2017-05-11T01:32:00",
       "endTime": "2017-05-11T01:32:02",
-      "trackingInfo": "job_local1524120196_0005",
+      "trackingInfo": "{\"jobId\":\"job_1497547438563_0014\",\"numMapTasks\":1,\"bytesCopied\":9153726,\"filesCopied\":44,\"timeTaken\":10922}",
       "message": "SUCCESS"
     },
     {
@@ -75,7 +75,7 @@
       "status": "SUCCESS",
       "startTime": "2017-05-11T02:31:07",
       "endTime": "2017-05-11T02:31:09",
-      "trackingInfo": "job_local415586742_0006",
+      "trackingInfo": "{\"jobId\":\"job_1497547438563_0014\",\"numMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":56,\"timeTaken\":12922}",
       "message": "SUCCESS"
     },
     {
@@ -88,7 +88,7 @@
       "status": "SUCCESS",
       "startTime": "2017-05-11T03:31:07",
       "endTime": "2017-05-11T03:31:09",
-      "trackingInfo": "job_local1392464754_0007",
+      "trackingInfo": "{\"jobId\":\"job_1497547438563_0014\",\"numMapTasks\":1,\"bytesCopied\":3243977,\"filesCopied\":38,\"timeTaken\":10922}",
       "message": "SUCCESS"
     },
     {
@@ -101,7 +101,7 @@
       "status": "SUCCESS",
       "startTime": "2017-06-12T03:32:00",
       "endTime": "2017-06-12T03:32:02",
-      "trackingInfo": "job_local1503412815_0008",
+      "trackingInfo": "{\"jobId\":\"job_1497547438563_0014\",\"numMapTasks\":1,\"bytesCopied\":124,\"filesCopied\":19,\"timeTaken\":9922}",
       "message": "SUCCESS"
     },
     {
@@ -114,7 +114,7 @@
       "status": "SUCCESS",
       "startTime": "2017-05-11T04:31:07",
       "endTime": "2017-05-11T04:31:09",
-      "trackingInfo": "job_local1398463895_0009",
+      "trackingInfo": "{\"jobId\":\"job_1497547438563_0014\",\"numMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":81,\"timeTaken\":10922}",
       "message": "SUCCESS"
     },
     {
@@ -127,7 +127,7 @@
       "status": "SUCCESS",
       "startTime": "2017-05-11T05:31:07",
       "endTime": "2017-05-11T05:31:09",
-      "trackingInfo": "job_local1375244070_0010",
+      "trackingInfo": "{\"jobId\":\"job_1497547438563_0014\",\"numMapTasks\":1,\"bytesCopied\":72946,\"filesCopied\":74,\"timeTaken\":13922}",
       "message": "SUCCESS"
     }
   ]

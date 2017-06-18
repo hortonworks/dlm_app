@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DpClusterRepo @Inject()(
-    private val userRepo: UserRepo,
+    protected val userRepo: UserRepo,
     protected val dbConfigProvider: DatabaseConfigProvider) {
 
   val dbConfig = dbConfigProvider.get[DpPgProfile]
@@ -23,8 +23,8 @@ class DpClusterRepo @Inject()(
 
   import dbConfig.profile.api._
 
-  private val Locations = TableQuery[LocationsTable]
-  private val DataplaneClusters = TableQuery[DpClustersTable]
+  val Locations = TableQuery[LocationsTable]
+  val DataplaneClusters = TableQuery[DpClustersTable]
 
   def getLocation(id: Long): Future[Option[Location]] = {
     db.run(Locations.filter(_.id === id).result.headOption)
@@ -85,7 +85,7 @@ class DpClusterRepo @Inject()(
     }
   }
 
-  private class LocationsTable(tag: Tag)
+  final class LocationsTable(tag: Tag)
       extends Table[Location](tag, Some("dataplane"), "locations") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
@@ -101,7 +101,7 @@ class DpClusterRepo @Inject()(
       (id, country, city, latitude, longitude) <> ((Location.apply _).tupled, Location.unapply)
   }
 
-  private class DpClustersTable(tag: Tag)
+  final class DpClustersTable(tag: Tag)
       extends Table[DataplaneCluster](tag, Some("dataplane"), "dp_clusters") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 

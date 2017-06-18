@@ -22,6 +22,7 @@ export interface Policy {
   tags: string[];
   customProperties: Object;
   retry: Object;
+  description: string;
 }
 
 export interface PolicyDefinition {

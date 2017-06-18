@@ -5,6 +5,7 @@ import { PoliciesCount } from 'models/policies-count.model';
 import { Cluster } from 'models/cluster.model';
 import { getAllClusters } from './cluster.selector';
 import { getAllJobs } from './job.selector';
+import { sortByDateField } from 'utils/array-util';
 
 export const getEntities = createSelector(getPolicies, state => state.entities);
 
@@ -22,8 +23,8 @@ export const getAllPoliciesWithClusters = createSelector(getAllPolicies, getAllC
 
 export const getPolicyClusterJob = createSelector(getAllPoliciesWithClusters, getAllJobs, (policies, jobs) => {
   return policies.map(policy => {
-    const jobsResource = jobs.filter(job => job.name === policy.id) || [];
-    const lastJobResource = jobsResource.length ? jobsResource.sort((a, b) => a.startTime > b.startTime ? -1 : 1)[0] : null;
+    const jobsResource = sortByDateField((jobs.filter(job => job.name === policy.id) || []), 'startTime');
+    const lastJobResource = jobsResource.length ? jobsResource[0] : null;
     return {
       ...policy,
       jobsResource,

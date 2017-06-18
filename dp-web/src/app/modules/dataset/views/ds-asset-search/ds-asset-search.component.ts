@@ -42,6 +42,18 @@ export class DsAssetSearch {
     }
   }
 
+  get showDone () {
+    switch (this.activeTab) {
+      case this.tabEnum.NORMAL :
+        if(this.queryObj.searchText) return true;
+        break;
+      case this.tabEnum.ADVANCE:
+        if(this.queryModel.filters.length) return true;
+        break;
+    }
+    return false;
+  }
+
   actionCancel() {
     this.cancelNotificationEmitter.emit();
   }

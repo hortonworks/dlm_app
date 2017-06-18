@@ -58,11 +58,11 @@ object Webservice {
 
     def create(datasetReq: DatasetCreateRequest): Future[Either[Errors, DatasetAndCategories]]
 
-    def listRichDataset(): Future[Either[Errors, Seq[RichDataset]]]
+    def listRichDataset(queryString : String): Future[Either[Errors, Seq[RichDataset]]]
 
     def getRichDatasetById(id: Long): Future[Either[Errors, RichDataset]]
 
-    def listRichDatasetByTag(tagName: String): Future[Either[Errors, Seq[RichDataset]]]
+    def listRichDatasetByTag(tagName: String, queryString : String): Future[Either[Errors, Seq[RichDataset]]]
 
     def getDataAssetByDatasetId(id: Long): Future[Either[Errors, Seq[DataAsset]]]
 

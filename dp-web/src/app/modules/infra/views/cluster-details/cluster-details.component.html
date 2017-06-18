@@ -5,7 +5,7 @@
 <div class="page-container">
   <div class="mdl-grid">
     <div class="mdl-cell mdl-cell--12-col">
-      <button class="mdl-button btn-hwx-secondary pull-right">ACTION</button>
+      <dp-dropdown  class="pull-right"> </dp-dropdown>
       <button class="mdl-button btn-hwx-secondary pull-right refresh-btn" (click)="fetchClusterDetails(this.lake.id)"><i class="fa fa-refresh"></i></button>
     </div>
   </div>
@@ -14,28 +14,28 @@
       <div class="summary-pane-6">
         <ul>
           <li>
-            <div class="text-small-1">Location</div>
-            <div class="text-dark-small-1">{{clusterDetails.location}}</div>
+            <div class="title">Location</div>
+            <div class="value">{{clusterDetails.location}}</div>
           </li>
           <li>
-            <div class="text-small-1">HDP Version</div>
-            <div class="text-dark-small-1">{{clusterDetails.hdpVersion}}</div>
+            <div class="title">HDP Version</div>
+            <div class="value">{{clusterDetails.hdpVersion}}</div>
           </li>
           <li>
-            <div class="text-small-1">Nodes</div>
-            <div class="text-dark-small-1">{{clusterDetails.healthyNodes}}/{{clusterDetails.nodes}}</div>
+            <div class="title">Nodes</div>
+            <div class="value">{{clusterDetails.healthyNodes}}/{{clusterDetails.nodes}}</div>
           </li>
           <li>
-            <div class="text-small-1">Tags</div>
-            <div class="text-dark-small-1">{{clusterDetails.tags}}</div>
+            <div class="title">Tags</div>
+            <div class="value">{{clusterDetails.tags}}</div>
           </li>
           <li>
-            <div class="text-small-1">Uptime</div>
-            <div class="text-dark-small-1">{{clusterDetails.uptime}}</div>
+            <div class="title">Uptime</div>
+            <div class="value">{{clusterDetails.uptime}}</div>
           </li>
           <li>
-            <div class="text-small-1">Created By</div>
-            <div class="text-dark-small-1">{{user? user.username: ''}}</div>
+            <div class="title">Created By</div>
+            <div class="value">{{user? user.username: ''}}</div>
           </li>
         </ul>
       </div>
@@ -46,13 +46,15 @@
       <div class="mdl-grid white-bg">
         <div class="mdl-cell mdl-cell--12-col">
           <div class="mdl-grid">
-            <div class="mdl-cell mdl-cell--12-col">
+            <div class="mdl-cell mdl-cell--6-col">
               <label class="text-medium pull-left">INFORMATION</label>
-              <button id="info-actions" class="mdl-button mdl-js-button mdl-button--icon pull-right"><i
-                class="fa fa-ellipsis-v fa__fa-ellipsis-v--icon"></i></button>
-                <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect" for="info-actions">
-                </ul>
             </div>
+            <div class="mdl-layout-spacer"> </div>
+              <button id="info-actions" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon pull-right">
+                <i class="fa fa-ellipsis-v"></i></button>
+              <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="info-actions">
+                <li class="mdl-menu__item"><i class="fa fa-external-link"></i><a href="{{lake.ambariUrl}}" target="_blank">Go to Ambari</a></li>
+              </ul>
             <div class="mdl-cell mdl-cell--12-col">
               <div class="text-dark-small-1">Description</div>
               <div class="text-small-1 margin-top-10">{{lake.description}}</div>

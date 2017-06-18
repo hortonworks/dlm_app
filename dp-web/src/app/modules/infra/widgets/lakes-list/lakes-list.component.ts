@@ -13,7 +13,6 @@ import {DateUtils} from '../../../../shared/utils/date-utils';
 })
 
 export class LakesListComponent implements OnChanges {
-  hoveredIndex;
   lakesList: LakeInfo[] = [];
   lakesListCopy: LakeInfo[] = [];
   @Input() lakes = [];

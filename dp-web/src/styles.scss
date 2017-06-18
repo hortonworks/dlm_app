@@ -55,6 +55,17 @@ div.spacer-15 {
   color: inherit;
 }
 
+.hwx-button-icon {
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  font-size: 12px;
+
+  &:hover {
+    background-color: transparent;
+  }
+}
+
 .page-container {
   padding: 30px 20px 20px 20px;
 }

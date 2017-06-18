@@ -1,17 +1,13 @@
 <div class="borderBox infoHolder">
   <div class="title">{{"pages.dataset.ds-editor.information" | translate}}</div>
-  <br/>
   <div class="dp-input">
     <label for="name" style="display: block;">{{"common.name" | translate}}&nbsp;<span class="markMandatory">*</span></label>
     <input class="" type="text" placeholder="Name" name="name" id="name" [(ngModel)]="dsModel.name" required/>
   </div>
-  <br/><br/>
   <div class="dp-input">
     <label for="description" style="display: block;">{{"common.description" | translate}}&nbsp;<span class="markMandatory">*</span></label>
     <textarea class="" type="text" placeholder="Description" name="description" id="description" [(ngModel)]="dsModel.description" required></textarea>
   </div>
-  <br/><br/>
-
   <div class="dp-input">
     <label style="display: block;">{{"common.datalake" | translate}}&nbsp;<span class="markMandatory">*</span></label>
     <select [(ngModel)]="dsModel.datalakeId" (change)="onLakeSelectionChange()">
@@ -19,10 +15,6 @@
       <option *ngFor="let lake of lakes" value="{{lake.id}}">{{lake.name}}</option>
     </select>
   </div>
-  <br/><br/>
-
-
-
   <div class="dp-input">
     <label for="tags" style="display: block;">{{"common.tags" | translate}}</label>
     <div class="helpText">{{"pages.dataset.ds-editor.tagDescription" | translate}}</div>

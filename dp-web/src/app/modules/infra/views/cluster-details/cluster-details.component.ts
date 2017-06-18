@@ -137,7 +137,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
     clusterDetails.uptime = DateUtils.toReadableDate(new Date().getTime() - this.clusterHealth.nameNodeInfo.StartTime);
     let tags = '';
     this.lake.properties.tags.forEach(tag => {
-      tags = `${tags} ${tags.length ? ', ' : ''}${tag.name}`;
+      tags = `${tags}${tags.length ? ', ' : ''}${tag.name}`;
     });
     clusterDetails.tags = tags;
     if(this.rmHealth && this.rmHealth.ServiceComponentInfo && this.rmHealth.metrics){

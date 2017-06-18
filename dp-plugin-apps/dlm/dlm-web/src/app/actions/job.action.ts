@@ -4,6 +4,7 @@ import { JOB_STATUS } from 'constants/status.constant';
 import { Policy } from 'models/policy.model';
 import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
 import * as moment from 'moment';
+import { JobTrackingInfo } from 'models/job-tracking-info.model';
 
 export const ActionTypes = {
   LOAD_JOBS: requestType('LOAD_JOBS'),
@@ -38,5 +39,10 @@ function prepareJob(job) {
   const duration = moment(job.endTime).diff(moment(job.startTime));
   job.duration = duration > 0 ? duration : -1;
   job.isCompleted = job.status !== JOB_STATUS.IN_PROGRESS;
+  try {
+    job.trackingInfo = <JobTrackingInfo>JSON.parse(job.trackingInfo);
+  } catch (e) {
+    job.trackingInfo = {};
+  }
   return job;
 }

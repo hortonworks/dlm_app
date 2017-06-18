@@ -35,3 +35,7 @@ export const groupByKey = (collection, keyName) => {
   });
   return group;
 };
+
+export const sortByDateField = (collection, keyName) =>
+  collection.sort((a, b) =>
+    new Date(a[keyName]).getTime() > new Date(b[keyName]).getTime() ? -1 : 1);
