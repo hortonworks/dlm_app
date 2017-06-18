@@ -9,11 +9,13 @@ export class PersonaTabs {
 }
 
 export class Persona {
+  url: string;
   name: string;
   tabs: PersonaTabs[] = [];
   topNav = true;
 
-  constructor(name: string, tabs: PersonaTabs[], topNav = true){
+  constructor(name: string, tabs: PersonaTabs[], topNav = true, url = ''){
+    this.url = url;
     this.name = name;
     this.tabs = tabs ? tabs : [];
     this.topNav = topNav;
