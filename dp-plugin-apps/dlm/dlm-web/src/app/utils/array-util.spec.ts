@@ -1,4 +1,5 @@
 import * as ArrayUtil from './array-util';
+import { sortByDateField } from './array-util';
 
 describe('ArrayUtil', () => {
 
@@ -93,6 +94,24 @@ describe('ArrayUtil', () => {
     it('should group by `b`', () => {
       const result = ArrayUtil.groupByKey(this.collection, 'b');
       expect(result).toEqual(this.groupedByB);
+    });
+
+  });
+
+  describe('#sortByDateField', () => {
+
+    it('should sort collection by selected field comparing values as dates', () => {
+      const data = [
+        {f: '2015-06-12T03:32:00'},
+        {f: '2017-06-12T03:32:00'},
+        {f: '2016-06-12T03:32:00'}
+      ];
+      const expected = [
+        {f: '2017-06-12T03:32:00'},
+        {f: '2016-06-12T03:32:00'},
+        {f: '2015-06-12T03:32:00'}
+      ];
+      expect(sortByDateField(data, 'f')).toEqual(expected);
     });
 
   });

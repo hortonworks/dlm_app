@@ -13,6 +13,8 @@ export class LdapConfigComponent implements OnInit {
 
   showKnoxPassword = false;
   showLdapPassword = false;
+  showNotification = false;
+  notificationMessages: string[] = [];
   ldapProperties: LDAPProperties = new LDAPProperties();
 
 
@@ -24,17 +26,29 @@ export class LdapConfigComponent implements OnInit {
   }
 
   save() {
+    this.notificationMessages = [];
     this.configurationService.configureLDAP(this.ldapProperties).subscribe(() => {
       this.router.navigate(['onboard/adduser', {
         status: 'success'
       }]);
-    }, () => {
-      console.log('error');
+    }, (response) => {
+      this.showNotification = true;
+      if(!response || !response._body){
+        this.notificationMessages.push('Error occurred while saving the configurations.')
+      }else{
+        response._body.forEach(error =>{
+          this.notificationMessages.push(error.message);
+        });
+      }
     });
   }
 
   back() {
-    this.router.navigate(['onboard']);
+    this.router.navigate(['onboard/welcome']);
+  }
+
+  closeNotification(){
+    this.showNotification = false;
   }
 
 }

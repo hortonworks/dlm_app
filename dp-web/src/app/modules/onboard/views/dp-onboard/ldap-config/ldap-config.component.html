@@ -1,3 +1,11 @@
+<div class="notification-bar line-height-1-5" *ngIf="showNotification">
+  <i class="fa fa-times-circle red margin-right-10 text-medium"></i>
+  <span class="text-medium red">LDAP/Knox configuration could not be saved</span>
+  <i class="fa fa-remove pull-right margin-all-3 pointer" (click)="closeNotification()"></i>
+  <ul>
+    <li class="red text-small" *ngFor="let message of notificationMessages">{{message}}</li>
+  </ul>
+  </div>
 <div class="container line-height-1-5">
   <div class="text-medium">
     <i class="fa fa-lock green text-large pull-left"></i>

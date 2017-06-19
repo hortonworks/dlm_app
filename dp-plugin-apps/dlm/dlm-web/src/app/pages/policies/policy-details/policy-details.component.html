@@ -13,8 +13,7 @@
     </div>
     <br>
     <h6>{{"common.description" | translate}}</h6>
-    <p>Global Sales data central schema.</p>
-    <p>Should be used for all transactional data movement through the system.</p>
+    <p>{{policy?.description}}</p>
   </div>
   <div class="col-lg-10 col-md-9">
     <dp-jobs-table *ngIf="contentType===policyContent.Jobs"

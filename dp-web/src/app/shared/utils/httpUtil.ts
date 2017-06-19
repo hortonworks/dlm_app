@@ -26,7 +26,7 @@ export class HttpUtil {
       error.status ? `${error.status} - ${error.statusText}` : 'Server error';
     console.error(errMsg); // log to console instead
     if (error._body) {
-      Alerts.showErrorMessage(JSON.parse(error._body).message);
+      Alerts.showErrorMessage(JSON.parse(error._body).message? JSON.parse(error._body).message: 'Error Occurred');
     }
     return Observable.throw(error);
   }

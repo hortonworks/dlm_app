@@ -97,7 +97,7 @@
         "audits":"Audits"
       },
       "labels" : {
-        "newDataset" : "New Dataset",
+        "newDataset" : "Add Data set",
         "addFavourites" : "Add to Favourites",
         "removeFavourites" : "Remove from Favourites",
         "creator" : "Creator",

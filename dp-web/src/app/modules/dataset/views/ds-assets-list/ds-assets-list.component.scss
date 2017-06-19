@@ -82,7 +82,7 @@
   height:100%;
 }
 
-.listCont .list .listRow .nameCol {
+.listCont .list .listRow .nameCol.hlink {
   color: rgb(64,144,189);
   cursor: pointer;
 }
@@ -102,12 +102,19 @@
 }
 
 .listCont .list .listRow .col {
-  width:12%;
+  width:15%;
   margin:0px 2%;
   overflow: hidden;
   white-space:nowrap ;
   text-overflow: ellipsis;
   float: left;
+}
+.listCont .list .listRow .col.ownerCol {
+  width:10%;
+}
+
+.listCont .list .listRow .col.descCol {
+  width:40%;
 }
 
 .listCont .list .listRow .checkboxCont {

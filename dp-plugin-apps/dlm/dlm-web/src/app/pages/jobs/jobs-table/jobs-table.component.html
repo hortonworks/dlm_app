@@ -39,7 +39,7 @@
       <i class="fa fa-ellipsis-v text-primary"></i>
     </span>
     <ul *dropdownMenu class="dropdown-menu dropdown-menu-right">
-      <li *ngFor="let rowAction of rowActions" (click)="handleSelectedAction(row, rowAction)">
+      <li *ngFor="let rowAction of rowActions" (click)="handleSelectedAction(row, rowAction)" [class.disabled]="row.status !== 'RUNNING'">
         <a href="javascript:void(0);" class="dropdown-item">{{rowAction.label}}</a>
       </li>
     </ul>

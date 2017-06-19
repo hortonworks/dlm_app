@@ -6,6 +6,7 @@ import {DataSetComponent} from './views/datasets/datasets.component';
 import {LdapConfigComponent} from './views/dp-onboard/ldap-config/ldap-config.component';
 import {UserAddComponent} from './views/dp-onboard/user-add/user-add.component';
 import {FirstRunComponent} from './views/first-run/first-run.component';
+import {StatusCheckGuard} from './status-check-guard';
 
 export const routes: Routes = [{
   path: '',
@@ -19,6 +20,7 @@ export const routes: Routes = [{
 }, {
   path: 'adduser',
   component: UserAddComponent,
+  canActivate: [StatusCheckGuard],
 }, {
   path: 'lakes',
   component: LakesComponent

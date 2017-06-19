@@ -15,6 +15,7 @@ import {LdapConfigComponent} from './views/dp-onboard/ldap-config/ldap-config.co
 import {UserAddComponent} from './views/dp-onboard/user-add/user-add.component';
 import {TranslateModule} from '@ngx-translate/core';
 import {TaggingWidgetModule} from '../../shared/tagging-widget/tagging-widget.module';
+import {StatusCheckGuard} from './status-check-guard';
 
 @NgModule({
   imports: [
@@ -34,6 +35,9 @@ import {TaggingWidgetModule} from '../../shared/tagging-widget/tagging-widget.mo
     DpOnboardComponent,
     LdapConfigComponent,
     UserAddComponent
+  ],
+  providers: [
+    StatusCheckGuard
   ]
 })
 export class OnboardModule {

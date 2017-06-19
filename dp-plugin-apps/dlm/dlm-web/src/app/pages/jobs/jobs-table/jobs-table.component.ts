@@ -54,16 +54,22 @@ export class JobsTableComponent implements OnInit {
         headerClass: 'date-header'
       },
       {
-        prop: 'duration',
+        prop: 'trackingInfo.timeTaken',
         cellTemplate: this.runTimeTemplate,
         name: 'Runtime',
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
       {
-        prop: 'transferred',
+        prop: 'trackingInfo.bytesCopied',
         cellTemplate: this.transferredFormattedTemplate,
-        name: 'Transferred',
+        name: 'Transferred Bytes',
+        cellClass: 'date-cell',
+        headerClass: 'date-header'
+      },
+      {
+        prop: 'trackingInfo.filesCopied',
+        name: 'Transferred Files',
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
