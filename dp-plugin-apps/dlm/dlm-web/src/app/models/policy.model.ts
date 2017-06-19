@@ -41,3 +41,15 @@ export interface PolicyPayload {
   policyDefinition: PolicyDefinition;
   submitType: string;
 }
+
+export interface PolicyForm {
+  name: string;
+  description: string;
+  type: string;
+  sourceCluster: string;
+  destinationCluster: string;
+  directories?: string;
+  databases?: string;
+  queueName?: string;
+  maxBandwidth?: number;
+}

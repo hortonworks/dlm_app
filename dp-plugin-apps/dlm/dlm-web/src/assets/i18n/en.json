@@ -2,6 +2,7 @@
   "common": {
     "all": "All",
     "add": "Add",
+    "back": "Back",
     "cancel": "Cancel",
     "review": "Review",
     "submit": "Submit",
@@ -24,11 +25,17 @@
     "clusters": "Clusters",
     "cluster": "Cluster",
     "service": "Service",
+    "hdfs": "HDFS",
+    "hive": "HIVE",
     "time": {
       "hourly": "Hourly",
       "daily": "Daily",
       "weekly": "Weekly",
-      "monthly": "Monthly"
+      "monthly": "Monthly",
+      "hours": "Hour(s)",
+      "minutes": "Minute(s)",
+      "days": "Day(s)",
+      "weeks": "Week(s)"
     },
     "frequency": {
       "yearly": {
@@ -58,7 +65,9 @@
       "secondly": {
         "plural": "Every {{num}} seconds",
         "singular": "Every second"
-      }
+      },
+      "every": "Every",
+      "never": "Never"
     },
     "table": {
       "summary": "{{shown}} of {{count}} showing",
@@ -176,6 +185,7 @@
       "header": "Replication Policies",
       "header_note": "Note: Pairings are bi-directional",
       "header_create": "Create Replication Policy",
+      "header_review": "Review Replication Policy",
       "tags": "Tags",
       "groups": "Groups",
       "data_summary": "Data Summary",
@@ -192,11 +202,12 @@
           "general": "General",
           "database": "Select Database",
           "directories": "Select a File / Folder",
-          "job": "Run Job"
+          "job": "Run Job",
+          "advanced": "Advanced Properties"
         },
         "fields": {
           "policy_name": "Policy Name",
-          "pairs": "Select Pair",
+          "policy_description": "Description",
           "sourceCluster": {
             "self": "Source Cluster"
           },
@@ -207,8 +218,16 @@
           },
           "service": "Service",
           "directories": "File / Folder Path",
+          "databases": "Database",
+          "start_date": "Start Date",
+          "end_date": "End Date",
           "start_time": "Start Time",
-          "end_time": "End Time"
+          "end_time": "End Time",
+          "date_format": "yyyy-mm-dd",
+          "queue_name": "Queue Name",
+          "max_bandwidth": "Max. Bandwidth",
+          "bandwidth_unit": "Mbps",
+          "repeat": "Repeat"
         },
         "schedule": {
           "immediate": "One Time",
@@ -217,17 +236,6 @@
       },
       "subpage": {
         "review": {
-          "description": {
-            "title": "Data replication process for data selected from cluster {{sourceCluster}} using replication policy {{policyName}} will be started."
-          },
-          "details": {
-            "title": "Transfer Details",
-            "volume": "Total Data Volume",
-            "time": "Transfer Time",
-            "files": "Files",
-            "destination": "Destination",
-            "warning": "The first run of the policy will take some time."
-          },
           "error": {
             "create_policy": "Create policy failed",
             "check_error_details": "Check error details"

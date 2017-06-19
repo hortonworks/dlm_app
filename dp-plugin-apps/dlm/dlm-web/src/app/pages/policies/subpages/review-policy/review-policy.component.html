@@ -1,25 +1,14 @@
 <h2>
-  {{'page.policies.header_create' | translate}}
+  {{'page.policies.header_review' | translate}}
 </h2>
 <div class="content">
   <div class="row">
     <div class="col-md-12">
       <div class="review-description">
-        <p>{{'page.policies.subpage.review.description.title' | translate:descriptionTranslateParam}}</p>
-        <br>
-        <p class="h4">{{'page.policies.subpage.review.details.title' | translate}}:</p>
         <p *ngFor="let detail of detailsInfo">
           <span class="text-muted">{{detail.label}}:&nbsp;</span>
           <span [innerHTML]="detail.value"></span>
         </p>
-        <div class="row">
-          <div class="col-md-12">
-            <div class="alert alert-warning alert-small inline-block">
-              <i class="fa fa-warning text-warning"></i>
-              <span class="text-warning">{{'page.policies.subpage.review.details.warning' | translate}}</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -35,7 +24,7 @@
             </div>
           </div>
           <div class="footer-controls pull-right">
-            <button (click)="cancelReview()" class="btn btn-default">{{'common.cancel' | translate}}</button>
+            <button (click)="cancelReview()" class="btn btn-default">{{'common.back' | translate}}</button>
             <button (click)="submitReview()" class="btn btn-success" [disabled]="creationState?.isInProgress">
               {{'common.submit' | translate}}
               <i class="fa fa-spinner fa-spin" *ngIf="creationState?.isInProgress"></i>
