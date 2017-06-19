@@ -58,13 +58,13 @@ object Webservice {
 
     def create(datasetReq: DatasetCreateRequest): Future[Either[Errors, DatasetAndCategories]]
 
-    def listRichDataset(): Future[Either[Errors, Seq[RichDataset]]]
+    def listRichDataset(queryString : String): Future[Either[Errors, Seq[RichDataset]]]
 
     def getRichDatasetById(id: Long): Future[Either[Errors, RichDataset]]
 
-    def listRichDatasetByTag(tagName: String): Future[Either[Errors, Seq[RichDataset]]]
+    def listRichDatasetByTag(tagName: String, queryString : String): Future[Either[Errors, Seq[RichDataset]]]
 
-    def getDataAssetByDatasetId(id:Long) : Future[Either[Errors, Seq[DataAsset]]]
+    def getDataAssetByDatasetId(id: Long): Future[Either[Errors, Seq[DataAsset]]]
 
     def retrieve(dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
 
@@ -184,6 +184,33 @@ object Webservice {
 
   trait ConfigService extends DbClientService {
     def getConfig(key: String): Future[Option[DpConfig]]
+  }
+
+  trait WorkspaceService extends DbClientService {
+    def list(): Future[Either[Errors, Seq[WorkspaceDetails]]]
+
+    def retrieve(name: String): Future[Either[Errors, WorkspaceDetails]]
+
+    def create(workspace: Workspace): Future[Either[Errors, Workspace]]
+
+    def delete(name: String): Future[Either[Errors, Int]]
+
+  }
+
+  trait AssetWorkspaceService extends DbClientService {
+    def list(workspaceId: Long): Future[Either[Errors, Seq[DataAsset]]]
+
+    def create(assetReq: AssetWorkspaceRequest): Future[Either[Errors, Seq[DataAsset]]]
+
+    def delete(workspaceId: Long): Future[Either[Errors, Int]]
+  }
+
+  trait NotebookWorkspaceService extends DbClientService {
+    def list(workspaceId: Long): Future[Either[Errors, Seq[NotebookWorkspace]]]
+
+    def create(notebookWorkspace: NotebookWorkspace): Future[Either[Errors, NotebookWorkspace]]
+
+    def delete(notebookId: String): Future[Either[Errors, Int]]
   }
 
 }

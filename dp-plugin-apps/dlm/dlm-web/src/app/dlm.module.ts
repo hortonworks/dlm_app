@@ -92,6 +92,7 @@ import { RadioButtonComponent } from './common/radio-button/radio-button.compone
 import { CheckboxComponent } from './common/checkbox/checkbox.component';
 import { CheckboxListComponent } from './common/checkbox-list/checkbox-list.component';
 import { PolicyDetailsComponent } from './pages/policies/policy-details/policy-details.component';
+import { PrevJobsComponent } from './pages/policies/components/prev-jobs/prev-jobs.component';
 
 import { PairingCardComponent } from './pages/pairings/components/pairing-card/pairing-card.component';
 import { PairingCardListComponent } from './pages/pairings/components/pairing-card-list/pairing-card-list.component';
@@ -171,6 +172,7 @@ import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
     ReviewPolicyComponent,
     PolicyDetailsComponent,
     PolicyServiceFilterComponent,
+    PrevJobsComponent,
 
     ResourceChartsComponent,
     OverviewFilterComponent,

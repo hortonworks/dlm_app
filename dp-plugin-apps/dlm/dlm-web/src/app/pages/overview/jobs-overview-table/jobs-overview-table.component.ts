@@ -11,6 +11,7 @@ import { getLastOperationResponse } from 'selectors/operation.selector';
 import { OperationResponse } from 'models/operation-response.model';
 import { deletePolicy, resumePolicy, suspendPolicy } from 'actions/policy.action';
 import { abortJob } from 'actions/job.action';
+import { StatusColumnComponent } from 'components/table-columns/status-column/status-column.component';
 
 @Component({
   selector: 'dlm-jobs-overview-table',
@@ -29,6 +30,8 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   @ViewChild('destinationIconCell') destinationIconCellRef: TemplateRef<any>;
   @ViewChild('verbStatusCellTemplate') verbStatusCellTemplate: TemplateRef<any>;
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
+  @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;
+  @ViewChild('prevJobs') prevJobsRef: TemplateRef<any>;
 
   constructor(private t: TranslateService, protected store: Store<fromRoot.State>) {
     super(store);
@@ -47,13 +50,21 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
       {label: actionLabel('activate_policy'), name: 'ACTIVATE_POLICY', disabledFor: 'RUNNING'}
     ];
     this.columns = [
-      {cellTemplate: this.statusCellTemplate, maxWidth: 25, minWidth: 25},
+      {
+        ...this.statusColumn.cellSettings,
+        prop: 'status',
+        cellTemplate: this.statusColumn.cellRef,
+        name: ' ',
+        sortable: false,
+        ...TableComponent.makeFixedWith(25)
+      },
       {prop: 'status', cellClass: 'text-cell', headerClass: 'text-header', cellTemplate: this.verbStatusCellTemplate},
       {prop: 'name', cellClass: 'text-cell', headerClass: 'text-header', name: this.t.instant('common.policy')},
       {prop: 'sourceCluster', name: this.translateColumn('source_cluster')},
       {...TableComponent.makeFixedWith(20), name: '', cellTemplate: this.destinationIconCellRef},
       {prop: 'targetCluster', name: this.translateColumn('destination_cluster')},
       {prop: 'service', name: this.t.instant('common.service')},
+      {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs')},
       {
         prop: 'lastJobResource.startTime',
         cellTemplate: this.agoTemplate,

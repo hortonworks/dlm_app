@@ -1,8 +1,8 @@
 package com.hortonworks.dataplane.cs.atlas
 
 import com.hortonworks.dataplane.commons.domain.Atlas.{
-  AtlasFilter,
-  AtlasSearchQuery
+AtlasFilter,
+AtlasSearchQuery
 }
 
 object Filters {
@@ -20,7 +20,8 @@ object Filters {
     new NotEqualsStringPredicate(),
     new StringContainsPredicate(),
     new StringStartsWithPredicate(),
-    new StringEndsWithPredicate()
+    new StringEndsWithPredicate(),
+    new TagEqualsWithPredicate()
   )
 
   def query(atlasFilters: AtlasSearchQuery) = {
@@ -40,14 +41,14 @@ object Filters {
     val fillers = "where" :: List.fill(filterList.size - 1)(
       "and")
     // zip them together
-    val zipped  = intersperse(fillers,filterList)
+    val zipped = intersperse(fillers, filterList)
     zipped.mkString(" ")
 
   }
 
-  private def intersperse[A](a : List[A], b : List[A]): List[A] = a match {
+  private def intersperse[A](a: List[A], b: List[A]): List[A] = a match {
     case first :: rest => first :: intersperse(b, rest)
-    case _             => b
+    case _ => b
   }
 
   private sealed trait Predicate {
@@ -75,13 +76,14 @@ object Filters {
     }
 
     override def isApplicable(atlasFilter: AtlasFilter): Boolean = {
-      atlasFilter.atlasAttribute.dataType != "string" && atlasFilter.operation == "equals"
+      val dataType = atlasFilter.atlasAttribute.dataType
+      dataType != "string" && dataType != "tag" && atlasFilter.operation == "equals"
     }
   }
 
   private class LessThanPredicate extends Predicate {
     override def apply(atlasFilter: AtlasFilter): Query = {
-      Query(s"${atlasFilter.atlasAttribute.name}<${atlasFilter.operand}" )
+      Query(s"${atlasFilter.atlasAttribute.name}<${atlasFilter.operand}")
     }
 
     override def isApplicable(atlasFilter: AtlasFilter): Boolean = {
@@ -182,5 +184,16 @@ object Filters {
     }
   }
 
+  private class TagEqualsWithPredicate extends Predicate {
+
+    override def isApplicable(atlasFilter: AtlasFilter): Boolean = {
+      val dataType = atlasFilter.atlasAttribute.dataType
+      dataType == "tag" && atlasFilter.operation == "equals"
+    }
+
+    override def apply(atlasFilter: AtlasFilter): Query = {
+      Query(s"hive_table isa ${atlasFilter.operand}")
+    }
+  }
 
 }

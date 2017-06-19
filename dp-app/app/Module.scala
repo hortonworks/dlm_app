@@ -97,6 +97,26 @@ class Module extends AbstractModule {
     new ClusterComponentServiceImpl(configuration.underlying)
   }
 
+  @Provides
+  @Singleton
+  @Named("workspaceService")
+  def provideWorkspaceService(implicit ws: WSClient,configuration: Configuration): WorkspaceService = {
+    new WorkspaceServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("assetWorkspaceService")
+  def provideAssetWorkspaceService(implicit ws: WSClient,configuration: Configuration): AssetWorkspaceService = {
+    new AssetWorkspaceServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("notebookWorkspaceService")
+  def provideNotebookWorkspaceService(implicit ws: WSClient,configuration: Configuration): NotebookWorkspaceService = {
+    new NotebookWorkspaceServiceImpl(configuration.underlying)
+  }
 
 }
 

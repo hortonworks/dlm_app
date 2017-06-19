@@ -28,6 +28,7 @@ export class DsAssetSearch {
   @ViewChild("advanceQueryEditor") advanceQueryEditor: AdvanceQueryEditor;
 
   @Input() clusterId:number;
+  @Input() saveButton = false;
   @Output("doneNotification") doneNotificationEmitter: EventEmitter<AssetSetQueryModel> = new EventEmitter<AssetSetQueryModel>();
   @Output("cancelNotification") cancelNotificationEmitter: EventEmitter<null> = new EventEmitter<null>();
 
@@ -39,6 +40,18 @@ export class DsAssetSearch {
       this.queryModel.filters.push({column: "name", operator: "contains", value: this.queryObj.searchText, dataType:"string"});
       // this.queryModel.filters.push({column: "asset.source", operator: "==", value: AssetTypeEnumString[this.queryObj.type], dataType:"-"});
     }
+  }
+
+  get showDone () {
+    switch (this.activeTab) {
+      case this.tabEnum.NORMAL :
+        if(this.queryObj.searchText) return true;
+        break;
+      case this.tabEnum.ADVANCE:
+        if(this.queryModel.filters.length) return true;
+        break;
+    }
+    return false;
   }
 
   actionCancel() {

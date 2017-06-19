@@ -35,6 +35,7 @@ import { Policy } from 'models/policy.model';
 import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
 import { Job } from 'models/job.model';
 import { Cluster } from 'models/cluster.model';
+import { PrevJobsComponent } from '../policies/components/prev-jobs/prev-jobs.component';
 
 const jobs = [
   <Job>{status: JOB_STATUS.SUCCESS},
@@ -45,8 +46,8 @@ const jobs = [
   <Job>{status: JOB_STATUS.WARNINGS},
   <Job>{status: JOB_STATUS.WARNINGS},
   <Job>{status: JOB_STATUS.WARNINGS},
-  <Job>{status: JOB_STATUS.IN_PROGRESS},
-  <Job>{status: JOB_STATUS.IN_PROGRESS},
+  <Job>{status: JOB_STATUS.RUNNING},
+  <Job>{status: JOB_STATUS.RUNNING},
 ];
 
 const policies = [
@@ -64,7 +65,7 @@ const clusters = [
   <Cluster>{}
 ];
 
-const jobLabels = [JOB_STATUS.SUCCESS, JOB_STATUS.IN_PROGRESS, JOB_STATUS.WARNINGS, JOB_STATUS.FAILED];
+const jobLabels = [JOB_STATUS.SUCCESS, JOB_STATUS.RUNNING, JOB_STATUS.WARNINGS, JOB_STATUS.FAILED];
 const policyLabels = [POLICY_STATUS.RUNNING, POLICY_STATUS.SUBMITTED, POLICY_STATUS.SUSPENDED];
 const clusterLabels = ['Registered'];
 
@@ -105,7 +106,8 @@ describe('OverviewComponent', () => {
         FmtTzPipe,
         PolicyStatusFmtPipe,
         JobsOverviewTableComponent,
-        ModalDialogComponent
+        ModalDialogComponent,
+        PrevJobsComponent
       ],
       providers: [
         {provide: Store, useClass: MockStore},
@@ -273,7 +275,7 @@ describe('OverviewComponent UT', () => {
 
     const jobsData = [
       <Job>{id: '1', name: 'p1', status: JOB_STATUS.SUCCESS},
-      <Job>{id: '2', name: 'p2', status: JOB_STATUS.IN_PROGRESS},
+      <Job>{id: '2', name: 'p2', status: JOB_STATUS.RUNNING},
       <Job>{id: '3', name: 'p3', status: JOB_STATUS.WARNINGS},
       <Job>{id: '4', name: 'p4', status: JOB_STATUS.FAILED},
       <Job>{id: '5', name: 'not mapped job', status: JOB_STATUS.SUCCESS}

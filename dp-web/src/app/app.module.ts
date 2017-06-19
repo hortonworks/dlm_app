@@ -19,7 +19,6 @@ import { AuthenticationService } from './services/authentication.service';
 import { LakeService } from './services/lake.service';
 import { LocationService } from './services/location.service';
 import { ClusterService } from './services/cluster.service';
-import { AssetService } from './services/asset.service';
 import { IdentityService } from './services/identity.service';
 import { ConfigurationService } from './services/configuration.service';
 import { MdlService } from './services/mdl.service';
@@ -31,6 +30,8 @@ import {DatasetTagService} from "./services/tag.service";
 import {HeaderModule} from './widgets/header/header.module';
 import {CollapsibleNavModule} from './shared/collapsible-nav/collapsible-nav.modue';
 import {SidebarComponent} from './widgets/sidebar/sidebar.component';
+import {CollapsibleNavService} from './services/collapsible-nav.service';
+import {AssetService} from './services/asset.service';
 
 export function HttpLoaderFactory(http: Http) {
   return new TranslateHttpLoader(http);
@@ -73,6 +74,7 @@ export function HttpLoaderFactory(http: Http) {
     IdentityService,
     ConfigurationService,
     AssetService,
+    CollapsibleNavService,
 
     MdlService,
 

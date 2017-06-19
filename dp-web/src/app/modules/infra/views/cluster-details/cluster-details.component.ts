@@ -55,7 +55,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   fetchClusterDetails(lakeId) {
     this.lakeService.retrieve(lakeId).subscribe((lake: Lake) => {
       this.lake = lake;
-      this.clusterService.list({lakeId: this.lake.id}).subscribe(clusters => {
+      this.clusterService.listByLakeId({lakeId: this.lake.id}).subscribe(clusters => {
         this.clusters = clusters;
         if (this.clusters && this.clusters.length) {
           this.cluster = clusters[0];
@@ -137,7 +137,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
     clusterDetails.uptime = DateUtils.toReadableDate(new Date().getTime() - this.clusterHealth.nameNodeInfo.StartTime);
     let tags = '';
     this.lake.properties.tags.forEach(tag => {
-      tags = `${tags} ${tags.length ? ', ' : ''}${tag.name}`;
+      tags = `${tags}${tags.length ? ', ' : ''}${tag.name}`;
     });
     clusterDetails.tags = tags;
     if(this.rmHealth && this.rmHealth.ServiceComponentInfo && this.rmHealth.metrics){
