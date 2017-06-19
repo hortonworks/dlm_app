@@ -19,13 +19,11 @@ import { simpleSearch } from 'utils/string-utils';
 import { loadFullDatabases } from 'actions/hivelist.action';
 import { getAllDatabases } from 'selectors/hive.selector';
 import { HiveDatabase } from 'models/hive-database.model';
+import { SelectOption } from 'components/forms/select-field';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 
-// todo: validation
-// todo: error reporting. Figure out the way to consolidate field + error with single component
 // todo: schedule tabs should be filled with form values
-// todo: serialize form value to model
 @Component({
   selector: 'dlm-policy-form',
   templateUrl: './policy-form.component.html',
@@ -273,14 +271,14 @@ export class PolicyFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  handleSourceClusterChange(sourceCluster) {
+  handleSourceClusterChange(sourceCluster: SelectOption) {
     this.selectedHdfsPath = this.hdfsRootPath;
     this.policyForm.patchValue({
       general: {
         destinationCluster: ''
       }
     });
-    this.selectedSource$.next(sourceCluster);
+    this.selectedSource$.next(sourceCluster.value);
     this.databaseSearch$.next('');
   }
 
