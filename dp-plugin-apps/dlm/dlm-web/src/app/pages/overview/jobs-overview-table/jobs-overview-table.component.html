@@ -48,6 +48,13 @@
   <i class="fa fa-arrow-right"></i>
 </ng-template>
 
+<ng-template #actionsCell let-row="row">
+  <dlm-policy-actions
+    [policy]="row"
+    [policyActions]="rowActions"
+    (handler)="handleSelectedAction($event)"></dlm-policy-actions>
+</ng-template>
+
 <dlm-modal-dialog
   [title]="'page.policies.perform_action.confirmation.title'"
   [body]="'page.policies.perform_action.confirmation.body'"

@@ -22,6 +22,7 @@ import { PageHeaderComponent } from './page-header/page-header.component';
 import { AddEntityButtonComponent } from './add-entity-button/add-entity-button.component';
 import { EventStatusComponent } from './event-status/event-status.component';
 import { HdfsBrowserBreadcrumbComponent } from './hdfs-browser/breadcrumb/hdfs-browser-breadcrumb.component';
+import { PolicyActionsComponent } from './policy-actions/policy-actions.component';
 import { HiveBrowserComponent, HiveDatabaseComponent } from './hive-browser/';
 
 @NgModule({
@@ -56,7 +57,8 @@ import { HiveBrowserComponent, HiveDatabaseComponent } from './hive-browser/';
     EventStatusComponent,
     HdfsBrowserBreadcrumbComponent,
     HiveBrowserComponent,
-    HiveDatabaseComponent
+    HiveDatabaseComponent,
+    PolicyActionsComponent
   ],
   exports: [
     CardComponent,
@@ -79,7 +81,8 @@ import { HiveBrowserComponent, HiveDatabaseComponent } from './hive-browser/';
     EventStatusComponent,
     HdfsBrowserBreadcrumbComponent,
     HiveBrowserComponent,
-    HiveDatabaseComponent
+    HiveDatabaseComponent,
+    PolicyActionsComponent
   ]
 })
 export class CommonComponentsModule {}

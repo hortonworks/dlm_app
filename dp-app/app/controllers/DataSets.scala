@@ -82,8 +82,8 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     }.getOrElse(Future.successful(BadRequest))
   }
 
-  def getRichDataset = authenticated.async {
-    dataSetService.listRichDataset()
+  def getRichDataset = authenticated.async { req =>
+    dataSetService.listRichDataset(req.rawQueryString)
       .map { dataSets =>
         dataSets match {
           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
@@ -92,9 +92,9 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
       }
   }
 
-  def getRichDatasetByTag(tagName: String) = authenticated.async {
-    val future = if (tagName.equalsIgnoreCase("all")) dataSetService.listRichDataset()
-    else dataSetService.listRichDatasetByTag(tagName)
+  def getRichDatasetByTag(tagName: String) = authenticated.async { req =>
+    val future = if (tagName.equalsIgnoreCase("all")) dataSetService.listRichDataset(req.rawQueryString)
+    else dataSetService.listRichDatasetByTag(tagName,req.rawQueryString)
 
     future.map { dataSets =>
       dataSets match {
