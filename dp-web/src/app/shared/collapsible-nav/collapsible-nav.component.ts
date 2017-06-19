@@ -45,7 +45,7 @@ export class CollapsibleNavComponent implements OnInit {
       this.personaTabs = this.collapsibleNavService.tabs;
       this.activeTabName = this.collapsibleNavService.activeTab.tabName;
     });
-    
+
     this.collapsibleNavService.collpaseSideNav$.subscribe((minimise: boolean) => {
       if (this.collpased !== minimise) {
         this.toggleNav();

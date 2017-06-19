@@ -1,0 +1,9 @@
+.form-group {
+  label {
+    display: block;
+  }
+  input, textarea, select {
+    width: 275px;
+    box-sizing: border-box;
+  }
+}
