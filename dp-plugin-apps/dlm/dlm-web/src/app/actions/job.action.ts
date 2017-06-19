@@ -38,7 +38,7 @@ export const abortJobFailure = (error): ActionFailure => ({type: ActionTypes.ABO
 function prepareJob(job) {
   const duration = moment(job.endTime).diff(moment(job.startTime));
   job.duration = duration > 0 ? duration : -1;
-  job.isCompleted = job.status !== JOB_STATUS.IN_PROGRESS;
+  job.isCompleted = job.status !== JOB_STATUS.RUNNING;
   try {
     job.trackingInfo = <JobTrackingInfo>JSON.parse(job.trackingInfo);
   } catch (e) {

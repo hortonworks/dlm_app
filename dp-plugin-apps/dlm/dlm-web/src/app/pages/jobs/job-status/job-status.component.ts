@@ -10,11 +10,6 @@ export class JobStatusComponent implements OnInit {
   JOB_STATUS = JOB_STATUS;
   @Input() job: Job;
 
-  get showStatusIndicator() {
-    const { FAILED, WARNINGS, IN_PROGRESS } = JOB_STATUS;
-    return [FAILED, WARNINGS, IN_PROGRESS].indexOf(this.job.status) !== -1;
-  }
-
   constructor() {
   }
 

@@ -10,7 +10,7 @@ import { JOB_STATUS } from 'constants/status.constant';
 export class JobsStatusFilterComponent implements OnInit, OnChanges {
   JOB_STATUS = JOB_STATUS;
   failedJobMock = {status: JOB_STATUS.FAILED};
-  inProgressJobMock = {status: JOB_STATUS.IN_PROGRESS};
+  inProgressJobMock = {status: JOB_STATUS.RUNNING};
   warningsJobMock = {status: JOB_STATUS.WARNINGS};
   groupedByStatusJobs: { [id: string]: Job[] } = {};
 
@@ -26,11 +26,11 @@ export class JobsStatusFilterComponent implements OnInit, OnChanges {
   }
 
   groupByStatus() {
-    const { SUCCESS, FAILED, IN_PROGRESS, WARNINGS } = JOB_STATUS;
+    const { SUCCESS, FAILED, RUNNING, WARNINGS } = JOB_STATUS;
     this.groupedByStatusJobs = {
       [SUCCESS]: [],
       [FAILED]: [],
-      [IN_PROGRESS]: [],
+      [RUNNING]: [],
       [WARNINGS]: []
     };
     this.jobs.forEach(job => {

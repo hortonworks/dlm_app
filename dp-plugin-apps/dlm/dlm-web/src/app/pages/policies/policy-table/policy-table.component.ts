@@ -66,6 +66,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @ViewChild('iconCellTemplate') iconCellTemplate: TemplateRef<any>;
   @ViewChild('pathCell') pathCellRef: TemplateRef<any>;
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
+  @ViewChild('verbStatusCellTemplate') verbStatusCellTemplate: TemplateRef<any>;
 
   @ViewChild(TableComponent) tableComponent: TableComponent;
 
@@ -90,7 +91,15 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.columns = [
       {...this.iconColumn.cellSettings, prop: 'type', cellTemplate: this.iconColumn.cellRef},
-      {...this.statusColumn.cellSettings, prop: 'status', cellTemplate: this.statusColumn.cellRef},
+      {
+        ...this.statusColumn.cellSettings,
+        prop: 'status',
+        name: ' ',
+        cellTemplate: this.statusColumn.cellRef,
+        sortable: false,
+        ...TableComponent.makeFixedWith(25)
+      },
+      {prop: 'status', cellClass: 'text-cell', headerClass: 'text-header', cellTemplate: this.verbStatusCellTemplate},
       {name: ' ', cellTemplate: this.policyInfoColumn.cellRef, sortable: false},
       {prop: 'sourceCluster', name: this.t.instant('common.source')},
       {
@@ -105,7 +114,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       {prop: 'sourceDataset', name: this.t.instant('common.path'), cellTemplate: this.pathCellRef},
       {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs')},
       {prop: 'frequency', name: this.t.instant('common.schedule'), cellTemplate: this.scheduleCellTemplateRef},
-      {prop: 'lastJobResource.duration', name: this.t.instant('common.duration'), cellTemplate: this.durationCellRef},
+      {prop: 'lastJobResource.trackingInfo.timeTaken', name: this.t.instant('common.duration'), cellTemplate: this.durationCellRef},
       {prop: 'lastJobResource.startTime', name: 'Last Good', cellTemplate: this.lastGoodCellRef},
       {name: 'Actions', cellTemplate: this.actionsCellRef, maxWidth: 55, sortable: false}
     ];

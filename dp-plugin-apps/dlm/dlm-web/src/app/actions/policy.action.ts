@@ -44,5 +44,6 @@ export const resumePolicyFail = (error): Action => ({type: ActionTypes.RESUME_PO
 
 function preparePolicy(policy) {
   policy.id = policy.name;
+  policy.lastJobs = policy.jobs;
   return policy;
 }
