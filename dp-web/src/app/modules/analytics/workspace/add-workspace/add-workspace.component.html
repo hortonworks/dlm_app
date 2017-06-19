@@ -16,7 +16,7 @@
                 <dp-select>
                     <select required name="source" [(ngModel)]="workspace.source" (ngModelChange)="updateVal()">
                         <option selected="selected"> Select </option>
-                        <option *ngFor="let cluster of clusterServiceObservable | async " [attr.value]="cluster.id"> {{ cluster.name }} </option>
+                        <option *ngFor="let cluster of clusterServiceObservable | async " [attr.value]="cluster.dataplaneClusterId"> {{ cluster.name }} </option>
                     </select>
                 </dp-select>
             </div>

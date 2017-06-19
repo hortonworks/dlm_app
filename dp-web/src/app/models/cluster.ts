@@ -15,6 +15,7 @@ export class Cluster {
   kerberosticketLocation: string;
   datalakeid: number;
   userid: number;
+  dataplaneClusterId: number;
   properties: any;
 }
 

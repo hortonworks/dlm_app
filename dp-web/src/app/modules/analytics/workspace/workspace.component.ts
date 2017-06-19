@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import {Subscription} from 'rxjs/Rx';
 
 import {WorkspaceService} from '../../../services/workspace.service';
-import {Workspace} from '../../../models/workspace';
 import {TabStyleType} from '../../../shared/tabs/tabs.component';
 import {WorkspaceDTO} from '../../../models/workspace-dto';
 import {Alerts} from '../../../shared/utils/alerts';
 import {DialogBox} from '../../../shared/utils/dialog-box';
-import {CollapsibleNavService} from '../../../services/collapsible-nav.service';
-import {PersonaTabs} from '../../../models/header-data';
+
+declare var zeppelinURL;
 
 export enum ToggleView {
   TABLE, GRID
@@ -19,16 +19,17 @@ export enum ToggleView {
   templateUrl: './workspace.component.html',
   styleUrls: ['./workspace.component.scss']
 })
-export class WorkspaceComponent implements OnInit {
+export class WorkspaceComponent implements OnInit, OnDestroy {
   toggleView = ToggleView;
   selectedViewType = ToggleView.TABLE;
+  workspaceChanged: Subscription;
   workspacesDTOS: WorkspaceDTO[] = [];
   tabType = TabStyleType;
 
   tabImages = {'TABLE': 'fa-list-ul', 'GRID': 'fa-th'};
 
   constructor(private router: Router,
-              private workspaceService: WorkspaceService) { }
+              private workspaceService: WorkspaceService) {}
 
   addWorkspace() {
     this.router.navigateByUrl('/workspace/(dialog:add-workspace/new)');
@@ -36,7 +37,13 @@ export class WorkspaceComponent implements OnInit {
 
   editWorkspace($event, workspacesDTO: WorkspaceDTO) {
     if ($event.target.nodeName !== 'I') {
-      this.router.navigate(['/workspace/' + workspacesDTO.workspace.name + '/assets']);
+      /* Temporary arrangement for demos: zeppelinURL is defined in index.html*/
+      if (typeof(zeppelinURL) !== 'undefined') {
+        window.location.href = zeppelinURL;
+        return
+      } else {
+        this.router.navigate(['/workspace/' + workspacesDTO.workspace.name + '/assets']);
+      }
     }
   }
 
@@ -58,9 +65,15 @@ export class WorkspaceComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.workspaceService.dataChanged$.subscribe(() => {
+    this.workspaceChanged = this.workspaceService.dataChanged$.subscribe(() => {
       this.getWorkspaces();
     });
-    this.getWorkspaces();
+    this.workspaceService.dataChanged.next();
+  }
+
+  ngOnDestroy() {
+    if (this.workspaceChanged && !this.workspaceChanged.closed) {
+      this.workspaceChanged.unsubscribe();
+    }
   }
 }
