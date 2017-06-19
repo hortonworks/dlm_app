@@ -83,7 +83,7 @@ export class AssetDetailsViewComponent implements OnChanges {
       schema.mean = profileData.meanValue;
     }
     schema.noOfUniques = profileData.cardinality;
-    schema.noOfNulls = this.rowCount !== 'NA' ? (parseInt(this.rowCount, 10) - profileData.nonNullData).toString() : 'NA';
+    schema.noOfNulls = this.rowCount !== 'NA' ? (parseInt(this.rowCount, 10) - profileData.nonNullCount).toString() : 'NA';
   }
 
   private extractAssetProperties(properties) {
