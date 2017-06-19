@@ -1,38 +1,39 @@
+@import "../../../../../styles/variables";
+
 .componentCont.innerListScrollable {
   height:100%;
 }
 .tabCont {
-  border-left:1px solid rgb(208,211,215);
-  border-top-right-radius: 3px;
-  border-top-left-radius: 3px;
-  height:55px;
-  color:rgb(103,105,102);
+  border-left: 1px solid $iron;
+  border-top-right-radius: 2px;
+  border-top-left-radius: 2px;
+  height: 55px;
+  color: rgb(103,105,102);
 }
 
 .tabCont .tab{
-  width:80px;
-  height:55px;
-  padding: 5px 10px;
+  width: 80px;
+  height: 55px;
+  padding: 10px 20px;
   background-color: rgb(250,250,250);
-  border-top:1px solid rgb(208,211,215);
-  border-right:1px solid rgb(208,211,215);
-  border-top-right-radius: 3px;
-  border-top-left-radius: 3px;
+  border-top: 1px solid $iron;
+  border-right: 1px solid $iron;
+  border-top-right-radius: 2px;
+  border-top-left-radius: 2px;
   float: left;
   cursor: pointer;
 }
 .tabCont .tab.active {
-  background-color: rgb(208,211,215);
+  background-color: $bgGray;
 }
 
 .tabCont .tab .tabName {
+  margin-bottom: 5px;
   text-transform: uppercase;
-  font-size: 12px;
-  font-weight: lighter;
 }
 
 .tabCont .tab .tabCount {
-  font-weight: bold;
+  font-size: 14px;
 }
 
 .tabCont .actionButtonCont {
@@ -40,19 +41,19 @@
 }
 
 .listCont {
-  border:12px solid rgb(208,211,215);
+  border:1px solid rgb(208,211,215);
   border-radius: 3px;
   border-top-left-radius: 0px;
-  background-color: rgb(208,211,215);
+  background-color: $white;
 }
 .listCont .searchCont {
-  height:30px;
-  line-height: 30px;
-  color:rgb(103,105,102);
-  background-color: white;
-  border-radius: 3px;
+  height:34px;
+  line-height: 34px;
+  background-color: $white;
   position: relative;
-  margin-bottom: 12px;
+  border: 1px solid $iron;
+  border-radius: 2px;
+  margin: 10px 10px 0;
 }
 .listCont .searchCont > span {
   position: absolute;
@@ -60,7 +61,7 @@
   left:10px;
 }
 .listCont .searchCont > input {
-  height:30px;
+  height:34px;
   width:100%;
   background: transparent;
   position: absolute;
@@ -90,8 +91,8 @@
 .listCont .list .listRow.listHead,
 .listCont .list .listRow.listHead .nameCol{
   text-transform: uppercase;
-  font-weight: bold;
-  color: black;
+  color: $dusty-gray;
+  font-size: 12px;
 }
 .listCont .list .listRow {
   clear: both;
@@ -159,4 +160,3 @@
 .listCont .list.unLoaded .listRow{
   border-width: 0px;
 }
-
