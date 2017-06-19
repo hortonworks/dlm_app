@@ -5,13 +5,11 @@
             <img src="../../../assets/images/hw.logo.png">
         </div>
 
-        <div class="mdl-navigation" *ngIf="activeTabName && activePersona.topNav">
-          <span *ngFor="let tabEntry of activePersona.tabs; let i = index" class="mdl-navigation__link"
-                (click)="navigateToURL(tabEntry.URL)"
-                [ngClass]="{'is_active': activeTabName === tabEntry.tabName}">
-            {{ tabEntry.tabName }}
-          </span>
+        <div class="mdl-navigation breadcrumb">
+          <span class="mdl-navigation__link home">Data Plane</span>
+          <!--<span class="mdl-navigation__link" *ngFor="let crumbName of crumbNames"> {{ crumbName }} </span>-->
         </div>
+
     </div>
 
     <div class="mdl-layout-spacer"></div>
