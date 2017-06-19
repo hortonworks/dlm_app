@@ -35,8 +35,11 @@ class DatasetRepo @Inject()(
     }
   }
 
-  def count(): Future[Int] = {
-    db.run(Datasets.length.result)
+  def count(search:Option[String]): Future[Int] = {
+    val query = search
+      .map(s => Datasets.filter(_.name.toLowerCase like s"%${s}%"))
+        .getOrElse(Datasets)
+    db.run(query.length.result)
   }
 
   def findById(datasetId: Long): Future[Option[Dataset]] = {
@@ -208,6 +211,36 @@ class DatasetRepo @Inject()(
 
     db.run(query)
   }
+
+  def getCategoriesCount(searchText: Option[String]): Future[List[CategoryCount]] = {
+    val countQuery = datasetCategoryRepo.DatasetCategories.groupBy(_.categoryId).map {
+      case (catId, results) => (catId -> results.length)
+    }
+    def countQueryWithFilter(st: String) = {
+      ((datasetCategoryRepo.DatasetCategories.joinLeft(
+        Datasets.filter(_.name.toLowerCase like s"%${st.toLowerCase()}%")
+      ) on (_.datasetId === _.id)).groupBy(_._1.categoryId)).map{
+        case(catId, results) => (catId -> results.map(_._2.map(_.name)).countDefined)
+      }
+    }
+
+    val countQueryWithSearchOption = searchText.map(st => countQueryWithFilter(st)).getOrElse(countQuery)
+
+    val statement = countQueryWithSearchOption.to[List].result.statements
+
+    val query = for {
+      ((catId, count), cat) <- countQueryWithSearchOption.join(categoryRepo.Categories).on(_._1 === _.id)
+    } yield (cat.name, count)
+
+    db.run(query.to[List].result).map {
+      rows =>
+        rows.map {
+          case (name, count) =>
+            CategoryCount(name, count)
+        }.sortBy(_.name)
+    }
+  }
+
 
   final class DatasetsTable(tag: Tag)
     extends Table[Dataset](tag, Some("dataplane"), "datasets") with ColumnSelector {
