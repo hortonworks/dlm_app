@@ -3,7 +3,6 @@
 <main [ngClass]="{'maximised': isUserSignedIn() && viewPaneStates.MAXIMISE  === viewPaneState,
                     'minimized': isUserSignedIn() && viewPaneStates.MINIMISE === viewPaneState,
                     'default' : isUserSignedIn() && viewPaneStates.DEFAULT === viewPaneState}">
-
   <div mdl class="page-content">
     <router-outlet></router-outlet>
   </div>
