@@ -10,7 +10,7 @@
 
     <div style="clear:both;"></div>
 
-    <table class="mdl-data-table mdl-js-data-table" dp-config-table  on-mouseleave="hoveredIndex=null" (onSort)="onSort($event)">
+    <table class="mdl-data-table mdl-js-data-table" dp-config-table (onSort)="onSort($event)">
         <thead>
         <tr>
           <th class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder"> {{"common.status" | translate}}</th>
@@ -36,7 +36,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let lakeInfo of lakesList; let index=index" on-mouseover="hoveredIndex=index">
+        <tr *ngFor="let lakeInfo of lakesList">
             <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder status-{{getStatusString(lakeInfo.status)}}">
                 <i class="fa fa-circle" aria-hidden="true"></i>
             </td>
@@ -47,13 +47,12 @@
             <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.services}}</td>
             <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.hdfsUsed}}/{{lakeInfo.hdfsTotal}}</td>
             <td class="mdl-data-table__cell--non-numeric actions">
-                <div [ngClass]="{'visibility-visible': index === hoveredIndex, 'visibility-hidden': index !== hoveredIndex}">
-                    <button [attr.id]="'dropDown_'+lakeInfo.name" class="mdl-button mdl-js-button mdl-button--icon"><i class="fa fa-ellipsis-h fa__fa-ellipsis-h--icon"></i></button>
-                    <ul mdl class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+lakeInfo.name">
-                        <li class="mdl-menu__item"><i class="fa__fa-edit--icon fa fa-external-link"></i><a href="{{lakeInfo.ambariUrl}}" target="_blank">Go to Ambari</a></li>
-                        <li class="mdl-menu__item" (click)="refresh(lakeInfo)"><i class="fa__fa-close--icon fa fa-refresh"></i>Refresh</li>
-                    </ul>
-                </div>
+                  <button [attr.id]="'dropDown_'+lakeInfo.name" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
+                  <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i></button>
+                  <ul mdl class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+lakeInfo.name">
+                      <li class="mdl-menu__item"><i class="fa fa-external-link"></i><a href="{{lakeInfo.ambariUrl}}" target="_blank">Go to Ambari</a></li>
+                      <li class="mdl-menu__item" (click)="refresh(lakeInfo)"><i class="fa__fa-close--icon fa fa-refresh"></i>Refresh</li>
+                  </ul>
             </td>
         </tr>
         <tr *ngIf="lakesList.length === 0">

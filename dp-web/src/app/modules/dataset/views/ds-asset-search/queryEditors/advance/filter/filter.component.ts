@@ -9,7 +9,7 @@ import {DsAssetsService} from "../../../../../services/dsAssetsService";
 
 export enum FilterOperatorEnum {LT, LTEQ, EQ, NOTEQ, GTEQ, GT, LIKE} // LIKE is contains
 export const FilterOperatorSymbols = ["<", "<=", "==", "!=", "=>", ">", "Contains"];
-export const FilterOperatorForQuery = ["lt", "lte", "equals", "nte", "gte", "gt", "Contains"];
+export const FilterOperatorForQuery = ["lt", "lte", "equals", "nte", "gte", "gt", "contains"];
 
 const FOEnum = FilterOperatorEnum;
 
@@ -59,7 +59,7 @@ export class QueryFilterSource extends QueryFilterObject {
 }
 
 export class QueryFilterTypeString extends QueryFilterObject {
-  operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.NOTEQ];
+  operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.NOTEQ, FOEnum.LIKE];
   helpText: string = "Enter Text";
   _value: string;
 
@@ -72,7 +72,7 @@ export class QueryFilterTypeBoolean extends QueryFilterObject {
   operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.NOTEQ];
   helpText: string = "Select";
   _value: number = -1;
-  valueOptions: boolean[] = [false, true];
+  valueOptions: string[] = ["false", "true"];
 
   constructor(public propertyName: string, public dataType: string) {
     super();
@@ -86,6 +86,16 @@ export class QueryFilterTypeBoolean extends QueryFilterObject {
 export class QueryFilterTypeDate extends QueryFilterObject {
   operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.NOTEQ, FOEnum.LT, FOEnum.GT];
   helpText: string = "YYYY-MM-DD";
+  _value: string;
+
+  constructor(public propertyName: string, public dataType: string) {
+    super();
+  }
+}
+
+export class QueryFilterTypeTag extends QueryFilterObject {
+  operators: FilterOperatorEnum[] = [FOEnum.EQ];
+  helpText: string = "Enter Text";
   _value: string;
 
   constructor(public propertyName: string, public dataType: string) {
@@ -133,6 +143,9 @@ export class QueryFilter implements OnInit {
         break;
       case "date"  :
         this.filterObject = new QueryFilterTypeDate(fltr.propertyName, fltr.dataType);
+        break;
+      case "tag" :
+        this.filterObject = new QueryFilterTypeTag(fltr.propertyName, fltr.dataType);
         break;
       default                 :
         this.filterObject = new QueryFilterObject();

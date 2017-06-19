@@ -45,8 +45,8 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToDataSetAndCategories)
   }
 
-  def listRichDataset(): Future[Either[Errors, Seq[RichDataset]]] = {
-    ws.url(s"$url/richdatasets")
+  def listRichDataset(queryString: String): Future[Either[Errors, Seq[RichDataset]]] = {
+    ws.url(s"$url/richdatasets?$queryString")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToRichDatasets)
@@ -59,8 +59,8 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToRichDataset)
   }
 
-  def listRichDatasetByTag(tagName: String): Future[Either[Errors, Seq[RichDataset]]] = {
-    ws.url(s"$url/richdatasets/tags/$tagName")
+  def listRichDatasetByTag(tagName: String, queryString: String): Future[Either[Errors, Seq[RichDataset]]] = {
+    ws.url(s"$url/richdatasets/tags/$tagName?$queryString")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToRichDatasets)

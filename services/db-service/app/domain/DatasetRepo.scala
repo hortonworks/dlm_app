@@ -6,6 +6,7 @@ import javax.inject._
 import com.hortonworks.dataplane.commons.domain.Entities._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.libs.json.JsValue
+import slick.lifted.ColumnOrdered
 
 import scala.concurrent.Future
 
@@ -15,11 +16,12 @@ class DatasetRepo @Inject()(
                              protected val categoryRepo: CategoryRepo,
                              protected val dataAssetRepo: DataAssetRepo,
                              protected val userRepo: UserRepo,
-                             protected val clusterRepo: ClusterRepo,
+                             protected val clusterRepo: DpClusterRepo,
                              protected val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[DpPgProfile] {
 
   import profile.api._
+  import PaginationSupport._
 
   val Datasets = TableQuery[DatasetsTable]
 
@@ -89,7 +91,7 @@ class DatasetRepo @Inject()(
     for {
       ((dataset, user), cluster) <-
       (inputQuery.join(userRepo.Users).on(_.createdBy === _.id))
-        .join(clusterRepo.Clusters).on(_._1.dpClusterId === _.id)
+        .join(clusterRepo.DataplaneClusters).on(_._1.dpClusterId === _.id)
     } yield (dataset, user.username, cluster.name, cluster.id)
   }
 
@@ -107,9 +109,31 @@ class DatasetRepo @Inject()(
     } yield (datasetCategory.datasetId, category.name)
   }
 
-  private def getRichDataset(inputQuery: Query[DatasetsTable, Dataset, Seq]): Future[Seq[RichDataset]] = {
+  def sortByDataset(paginationQuery: Option[PaginatedQuery],
+                    query: Query[(DatasetsTable, Rep[String], Rep[String], Rep[Option[Long]]), (Dataset, String, String, Option[Long]), Seq]) = {
+    paginationQuery.map {
+      pq =>
+        val q = pq.sortQuery.map {
+          sq =>
+            query.sortBy {
+              oq =>
+                sq.sortCol match {
+                  case "id" => oq._1.id
+                  case "name" => oq._1.name
+                  case "createdOn" => oq._1.createdOn
+                  case "cluster" => oq._3
+                  case "user" => oq._2
+                }
+            } (ColumnOrdered(_, sq.ordering))
+        }.getOrElse(query)
+        q.drop(pq.offset).take(pq.size)
+    }.getOrElse(query)
+  }
+
+  private def getRichDataset(inputQuery: Query[DatasetsTable, Dataset, Seq],
+                             paginatedQuery: Option[PaginatedQuery]): Future[Seq[RichDataset]] = {
     val query = for {
-      datasetWithUsername <- getDatasetWithNameQuery(inputQuery).to[List].result
+      datasetWithUsername <- sortByDataset(paginatedQuery, getDatasetWithNameQuery(inputQuery)).to[List].result
       datasetAssetCount <- {
         val datasetIds = datasetWithUsername.map(_._1.id.get)
         getDatasetAssetCount(datasetIds).to[List].result
@@ -122,41 +146,45 @@ class DatasetRepo @Inject()(
 
     db.run(query).map {
       result =>
-        val datasetWithUsernameMap = result._1.groupBy(_._1.id.get).mapValues(_.head)
         val datasetWithAssetCountMap = result._2.groupBy(_._1.get).mapValues { e =>
           e.map {
             v => DataAssetCount(v._2, v._3)
           }
         }
         val datasetWithCategoriesMap = result._3.groupBy(_._1).mapValues(_.map(_._2))
-        datasetWithUsernameMap.map {
-          case (id, (dataset, user, cluster, clusterId)) =>
+        result._1.map {
+          case (dataset, user, cluster, clusterId) =>
             RichDataset(
               dataset,
-              datasetWithCategoriesMap.getOrElse(id, Nil),
+              datasetWithCategoriesMap.getOrElse(dataset.id.get, Nil),
               user,
               cluster,
               clusterId.get,
-              datasetWithAssetCountMap.getOrElse(id, Nil)
+              datasetWithAssetCountMap.getOrElse(dataset.id.get, Nil)
             )
         }.toSeq
     }
   }
 
-  def getRichDataset(): Future[Seq[RichDataset]] = {
-    getRichDataset(Datasets)
+  implicit class NameSearchQuery(query: Query[DatasetsTable, Dataset, Seq]) {
+    def search(searchText: Option[String]) = searchText
+      .map(s => query.filter(_.name.toLowerCase like s"%${s.toLowerCase}%")).getOrElse(query)
   }
 
-  def getRichDatasetById(id:Long) : Future[Option[RichDataset]] = {
-    getRichDataset(Datasets.filter(_.id === id)).map(_.headOption)
+  def getRichDataset(searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[RichDataset]] = {
+    getRichDataset(Datasets.search(searchText), paginatedQuery)
   }
 
-  def getRichDatasetByTag(tagName: String): Future[Seq[RichDataset]] = {
+  def getRichDatasetById(id: Long): Future[Option[RichDataset]] = {
+    getRichDataset(Datasets.filter(_.id === id), None).map(_.headOption)
+  }
+
+  def getRichDatasetByTag(tagName: String, searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[RichDataset]] = {
     val query = categoryRepo.Categories.filter(_.name === tagName)
       .join(datasetCategoryRepo.DatasetCategories).on(_.id === _.categoryId)
       .join(Datasets).on(_._2.datasetId === _.id)
       .map(_._2)
-    getRichDataset(query)
+    getRichDataset(query.search(searchText), paginatedQuery)
   }
 
   def insertWithCategories(datasetReq: DatasetAndCategoryIds): Future[DatasetAndCategories] = {
@@ -182,7 +210,7 @@ class DatasetRepo @Inject()(
   }
 
   final class DatasetsTable(tag: Tag)
-    extends Table[Dataset](tag, Some("dataplane"), "datasets") {
+    extends Table[Dataset](tag, Some("dataplane"), "datasets") with ColumnSelector {
 
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
@@ -201,6 +229,8 @@ class DatasetRepo @Inject()(
     def version = column[Int]("version")
 
     def customprops = column[Option[JsValue]]("custom_props")
+
+    val select = Map("id" -> this.id, "name" -> this.name)
 
     def * =
       (id,

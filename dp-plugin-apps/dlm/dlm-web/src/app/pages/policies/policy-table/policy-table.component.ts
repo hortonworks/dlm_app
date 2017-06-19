@@ -132,11 +132,8 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
 
   /**
    * Show confirmation modal before do action for selected policy
-   *
-   * @param {Policy} policy
-   * @param {ActionItemType} action
    */
-  handleSelectedAction(policy, action) {
+  handleSelectedAction({policy, action}) {
     this.selectedAction = action;
     this.selectedForActionRow = policy;
     this.showActionConfirmationModal = true;
