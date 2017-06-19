@@ -67,7 +67,11 @@ export class HeaderComponent implements OnInit {
       this.closeNav();
       this.viewPaneStateChange.emit(ViewPaneState.MAXIMISE);
       this.router.navigate([persona.tabs[0].URL]);
-    } 
+    } else {
+      if (persona.tabs.length === 0 && persona.url.length > 0) {
+        window.location.pathname = persona.url;
+      }
+    }
   }
 
   navigateToURL(url: string) {
