@@ -11,19 +11,11 @@ export const CUSTOM_RADIO_BUTTON_CONTROL_VALUE_ACCESSOR: any = {
 @Component({
   selector: 'dlm-radio-button',
   template: `
-    <div *ngIf="type === 'radio'" class="dlm-radio-group">
+    <div class="dlm-radio-group">
       <div *ngFor="let radio of items" class="dlm-radio-item">
         <input type="radio" [value]="radio.value" [checked]="radio.value === selectedValue">
         <label class="radio" (click)="selectValue(radio)">{{radio.label}}</label>
       </div>
-    </div>
-    <div *ngIf="type === 'buttons'" class="btn-group dlm-radio-group" data-toggle="buttons">
-      <label *ngFor="let radio of items" (click)="selectValue(radio)"
-      [ngClass]="{'btn': true, 'btn-default': radio.value !== selectedValue,
-      'btn-primary': radio.value === selectedValue}">
-        <input type="radio" [value]="radio.value" [checked]="radio.value === selectedValue">
-        {{radio.label}}
-      </label>
     </div>
   `,
   styleUrls: ['./radio-button.component.scss'],
@@ -33,7 +25,6 @@ export const CUSTOM_RADIO_BUTTON_CONTROL_VALUE_ACCESSOR: any = {
 export class RadioButtonComponent implements OnInit, ControlValueAccessor {
   @Input() items: RadioItem[] = [];
   @Input() selectedValue: string;
-  @Input() type = 'radio';
   @Output() change = new EventEmitter<RadioItem>();
   onChange = (_: any) => {};
 

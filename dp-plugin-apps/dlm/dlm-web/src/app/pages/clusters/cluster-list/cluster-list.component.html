@@ -42,10 +42,10 @@
       <i class="fa fa-plus text-success"></i>
     </div>
     <div class="add-actions-buttons">
-      <button class="btn btn-secondary" type="button" [routerLink]="['/pairings/create']" [queryParams]="{'firstClusterId': cluster.id}" [disabled]="clusters.length - cluster.pairsCounter - 1 === 0">
+      <button class="btn btn-secondary" type="button" [routerLink]="['/pairings/create']" [disabled]="clusters.length - cluster.pairsCounter - 1 === 0">
         {{ "page.clusters.card.create_pair_text" | translate }}
       </button>
-      <button class="btn btn-secondary" type="button" [routerLink]="['/policies/create']" [queryParams]="{'sourceClusterId': cluster.id}" [disabled]="cluster.pairsCounter === 0">
+      <button class="btn btn-secondary" type="button" [routerLink]="['/policies/create']" [disabled]="cluster.pairsCounter === 0">
         {{ "page.clusters.card.create_policy_text" | translate }}
       </button>
     </div>

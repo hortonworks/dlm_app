@@ -213,8 +213,6 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.rowsSubscription$) {
-      this.rowsSubscription$.unsubscribe();
-    }
+    this.rowsSubscription$.unsubscribe();
   }
 }

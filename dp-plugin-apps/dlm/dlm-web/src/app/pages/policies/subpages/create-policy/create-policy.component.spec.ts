@@ -24,7 +24,6 @@ import {ActionColumnComponent} from 'components/table-columns/action-column/acti
 import {NavbarService} from 'services/navbar.service';
 import {CheckboxColumnComponent} from 'components/table-columns/checkbox-column/checkbox-column.component';
 import { PolicyStatusFmtPipe } from 'pipes/policy-status-fmt.pipe';
-import { RouterTestingModule } from '@angular/router/testing';
 
 describe('CreatePolicyComponent', () => {
   let component: CreatePolicyComponent;
@@ -40,7 +39,6 @@ describe('CreatePolicyComponent', () => {
         TimepickerModule.forRoot(),
         ReactiveFormsModule, CollapseModule, TabsModule.forRoot(), MyDatePickerModule, MomentModule,
         NgxDatatableModule,
-        RouterTestingModule,
         TypeaheadModule
       ],
       declarations: [

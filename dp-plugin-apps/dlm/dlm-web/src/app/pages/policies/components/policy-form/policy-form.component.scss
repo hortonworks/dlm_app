@@ -11,9 +11,8 @@
 }
 
 .schedule-group {
-  .new-row {
-    padding-top: 20px;
-  }
+  padding: 10px;
+  border: 1px solid $light-grey;
 }
 
 .date-time-group {
@@ -32,23 +31,4 @@
 .hdfs-browser-container {
   padding: 35px;
   background-color: #EEE;
-}
-
-.fa {
-  &.text-primary:hover {
-    cursor: pointer;
-  }
-}
-
-.policy-form {
-  label {
-    color: $grey-color;
-    font-weight: normal;
-    &.btn-primary {
-      color: #FFF;
-    }
-  }
-  .form-section-title {
-    color: $link-color;
-  }
 }

@@ -228,8 +228,7 @@ import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
     HdfsService,
     HiveService,
     OverviewJobsExternalFiltersService,
-    httpServiceProvider,
-    FrequencyPipe
+    httpServiceProvider
   ]
 })
 export class DlmModule {
