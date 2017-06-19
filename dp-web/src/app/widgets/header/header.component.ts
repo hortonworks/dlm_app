@@ -65,6 +65,10 @@ export class HeaderComponent {
       this.closeNav();
       this.viewPaneStateChange.emit(ViewPaneState.DEFAULT);
       this.router.navigate([persona.tabs[0].URL]);
+    } else {
+      if (persona.tabs.length === 0 && persona.url.length > 0) {
+        window.location.pathname = persona.url;
+      }
     }
   }
 
