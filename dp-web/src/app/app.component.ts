@@ -57,15 +57,13 @@ export class AppComponent implements OnInit {
       new Persona('Infra Admin', [
         new PersonaTabs('Clusters', 'infra', 'fa-sitemap')
       ]),
-
       new Persona('Analytics', [
         new PersonaTabs('Workspace', 'workspace', 'fa-globe'),
         new PersonaTabs('Assets', 'analytics/assets', 'fa-list-alt'),
         new PersonaTabs('Clusters', '', 'fa-database'),
         new PersonaTabs('Jobs', '', 'fa-briefcase')
       ]),
-      new Persona('Data Life cycle Manager', [
-      ])
-    ];
+      new Persona('Data Life cycle Manager', [], '/dlm')
+    ]
   }
 }

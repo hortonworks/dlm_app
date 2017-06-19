@@ -11,6 +11,9 @@ export class CollapsibleNavService {
   navChanged = new Subject<boolean>();
   navChanged$ = this.navChanged.asObservable();
 
+  collpaseSideNav = new Subject<boolean>();
+  collpaseSideNav$ = this.collpaseSideNav.asObservable();
+
   get tabs():PersonaTabs[] {
     return this._tabs;
   }

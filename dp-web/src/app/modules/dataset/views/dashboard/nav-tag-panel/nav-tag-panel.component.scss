@@ -62,11 +62,11 @@
   color: $mine-shaft;
 
   &:before {
-      font-family: FontAwesome;
-      content: '\f0da';
-      color: $fruit-salad;
-      position: absolute;
-      left: 1px;
-      font-size: 16px;
+    font-family: FontAwesome;
+    content: '\f0da';
+    color: $fruit-salad;
+    position: absolute;
+    left: 1px;
+    font-size: 16px;
   }
 }

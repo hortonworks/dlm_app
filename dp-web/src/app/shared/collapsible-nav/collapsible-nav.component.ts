@@ -1,7 +1,7 @@
 import { Component, ViewChild, ElementRef, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import {HeaderData, Persona, PersonaTabs} from '../../models/header-data';
+import {PersonaTabs} from '../../models/header-data';
 import {ViewPaneState} from '../../app.component';
 import {CollapsibleNavService} from '../../services/collapsible-nav.service';
 
@@ -44,6 +44,12 @@ export class CollapsibleNavComponent implements OnInit {
     this.collapsibleNavService.navChanged$.subscribe(() => {
       this.personaTabs = this.collapsibleNavService.tabs;
       this.activeTabName = this.collapsibleNavService.activeTab.tabName;
+    });
+
+    this.collapsibleNavService.collpaseSideNav$.subscribe((minimise: boolean) => {
+      if (this.collpased !== minimise) {
+        this.toggleNav();
+      }
     });
   }
 

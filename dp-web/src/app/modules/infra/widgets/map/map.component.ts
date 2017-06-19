@@ -52,7 +52,7 @@ export class MapComponent implements OnChanges, OnInit {
     new MapDimensions('240px', '420px', 0.5),
     new MapDimensions('360px', '540px', 1),
     new MapDimensions('480px', '680px', 1.3),
-    new MapDimensions('500px', '800px', 1.54)
+    new MapDimensions('500px', '60%', 1.54)
   ];
 
   constructor(private geographyService: GeographyService) {

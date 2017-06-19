@@ -31,6 +31,7 @@ import {HeaderModule} from './widgets/header/header.module';
 import {CollapsibleNavModule} from './shared/collapsible-nav/collapsible-nav.modue';
 import {SidebarComponent} from './widgets/sidebar/sidebar.component';
 import {CollapsibleNavService} from './services/collapsible-nav.service';
+import {AssetService} from './services/asset.service';
 
 export function HttpLoaderFactory(http: Http) {
   return new TranslateHttpLoader(http);
@@ -72,6 +73,7 @@ export function HttpLoaderFactory(http: Http) {
     ClusterService,
     IdentityService,
     ConfigurationService,
+    AssetService,
     CollapsibleNavService,
 
     MdlService,
