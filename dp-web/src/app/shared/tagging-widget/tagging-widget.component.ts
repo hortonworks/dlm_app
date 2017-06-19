@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Input, Output, ViewChild} from "@angular/core";
+import {Component, ElementRef, EventEmitter, Input, Output, SimpleChange, ViewChild} from "@angular/core";
 
 export class TaggingWidgetTagModel {
   constructor(public display: string, public data?: any) {
@@ -27,6 +27,12 @@ export class TaggingWidget {
   focusRowIndex: number = -1;
   private focusStickerIndex: number = -1; // this.tags.length;
 
+  ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
+    if(changes["availableTags"]) {
+      this.focusRowIndex = -1;
+    }
+  }
+
   onSearchTextChange(newValue) {
     this.searchText = newValue;
     this.searchTextEmitter.emit(this.searchText);
@@ -53,7 +59,7 @@ export class TaggingWidget {
       case 38 :
         this.focusRowIndex = Math.max(-1, this.focusRowIndex - 1);
         event.stopPropagation();
-        (thisObj => setTimeout(() => thisObj._SetCursorAtEnd(), 0))(this);
+        setTimeout(() => this._SetCursorAtEnd(), 0);
         break;
       case 40  :
         this.focusRowIndex = Math.min(this.availableTags.length - 1, this.focusRowIndex + 1);
@@ -76,9 +82,11 @@ export class TaggingWidget {
     if (this.focusRowIndex > -1) {
       this.newTagEmitter.emit(this.availableTags[this.focusRowIndex]);
       this.clearOnSearch && this.onSearchTextChange("");
-    } else if (this.focusStickerIndex === this.tags.length) {
+      this.focusStickerIndex++;
+    } else if (this.searchText && this.focusStickerIndex === this.tags.length) {
       this.newTagEmitter.emit(this.searchText);
       this.clearOnSearch && this.onSearchTextChange("");
+      this.focusStickerIndex++;
     }
   }
 
