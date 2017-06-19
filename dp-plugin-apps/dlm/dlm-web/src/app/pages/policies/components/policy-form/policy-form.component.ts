@@ -51,6 +51,9 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   databaseListGroup: FormGroup;
   _pairings$: BehaviorSubject<Pairing[]> = new BehaviorSubject([]);
   _sourceClusterId$: BehaviorSubject<number> = new BehaviorSubject(0);
+  // todo: this mock and should be removed!
+  dbList = Array(6).fill(null).map((i, id) => `db_${id}`);
+  visibleDbList = this.dbList;
   get datePickerOptions(): IMyOptions {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
