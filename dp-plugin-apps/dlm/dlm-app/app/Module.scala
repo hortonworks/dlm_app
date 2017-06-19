@@ -6,6 +6,8 @@ import java.util.Optional
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.db.Webservice._
+import com.hortonworks.dataplane.cs.Webservice.AmbariService
+import com.hortonworks.dataplane.cs.AmbariServiceImpl
 import play.api.{Configuration, Logger}
 import play.api.libs.ws.WSClient
 import com.hortonworks.dlm.beacon.{BeaconClusterServiceImpl, BeaconEventServiceImpl, BeaconPairServiceImpl, BeaconPolicyInstanceServiceImpl, BeaconPolicyServiceImpl}
@@ -99,6 +101,13 @@ class Module extends AbstractModule {
   @Named("fileService")
   def provideFileService(implicit ws: WSClient,configuration: Configuration):FileService = {
     new FileServiceImpl()
+  }
+
+  @Provides
+  @Singleton
+  @Named("ambariService")
+  def provideAmbariService(implicit ws: WSClient, configuration: Configuration):AmbariService = {
+    new AmbariServiceImpl(configuration.underlying)
   }
 
 }
