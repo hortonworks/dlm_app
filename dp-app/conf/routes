@@ -76,5 +76,10 @@ POST          /api/workspaces                                  controllers.Works
 DELETE        /api/workspaces/name/:name                       controllers.Workspaces.delete(name)
 
 # WorkspaceAsset Api
-POST           /api/workspaces/assets                           controllers.AssetWorkspaces.add
-GET           /api/workspaces/:id/assets                        controllers.AssetWorkspaces.getAssets(id:Long)
+POST          /api/workspaces/assets                           controllers.AssetWorkspaces.add
+GET           /api/workspaces/:id/assets                       controllers.AssetWorkspaces.getAssets(id:Long)
+
+# WorkspaceNotebook Api
+POST          /api/workspaces/notebooks                        controllers.NotebookWorkspaces.add
+DELETE        /api/workspaces/notebooks/:id                    controllers.NotebookWorkspaces.delete(id:String)
+GET           /api/workspaces/:id/notebooks                    controllers.NotebookWorkspaces.getNotebooks(id:Long)

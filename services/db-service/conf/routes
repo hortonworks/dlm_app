@@ -82,6 +82,11 @@ GET           /workspaces/users/:userId                                      con
 POST          /workspaces/assets                                             controllers.AssetWorkspaces.add
 GET           /workspaces/:workspaceId/assets                                controllers.AssetWorkspaces.assetsforWorkspace(workspaceId:Long)
 
+#Notebook Workspace API
+POST          /workspaces/notebooks                                          controllers.NotebookWorkspaces.add
+DELETE        /notebooks/:notebookId                                         controllers.NotebookWorkspaces.deleteByNotebookId(notebookId : String)
+GET           /workspaces/:workspaceId/notebooks                             controllers.NotebookWorkspaces.notebookForWorkspace(workspaceId : Long)
+
 #Categories
 GET           /categories                                                    controllers.Categories.all
 POST          /categories                                                    controllers.Categories.insert

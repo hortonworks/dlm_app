@@ -25,9 +25,11 @@ class NotebookWorkspaceRepo @Inject()(protected val dbConfigProvider: DatabaseCo
     }
   }
 
-  def deleteById(notebookWorkspaceId: Long): Future[Int] = {
-    val AssetWorkspace = db.run(NotebookWorkspaces.filter(_.workspaceId === notebookWorkspaceId).delete)
-    AssetWorkspace
+  def allByWorkspaceId(workspaceId: Long): Future[List[NotebookWorkspace]] =
+    db.run(NotebookWorkspaces.filter(_.workspaceId === workspaceId).to[List].result)
+
+  def deleteById(notebookId: String): Future[Int] = db.run {
+    NotebookWorkspaces.filter(_.notebookId === notebookId).delete
   }
 
 

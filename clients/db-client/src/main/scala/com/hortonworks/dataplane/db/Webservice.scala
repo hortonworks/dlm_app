@@ -205,4 +205,12 @@ object Webservice {
     def delete(workspaceId: Long): Future[Either[Errors, Int]]
   }
 
+  trait NotebookWorkspaceService extends DbClientService {
+    def list(workspaceId: Long): Future[Either[Errors, Seq[NotebookWorkspace]]]
+
+    def create(notebookWorkspace: NotebookWorkspace): Future[Either[Errors, NotebookWorkspace]]
+
+    def delete(notebookId: String): Future[Either[Errors, Int]]
+  }
+
 }

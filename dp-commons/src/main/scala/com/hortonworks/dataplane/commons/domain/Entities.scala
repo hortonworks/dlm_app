@@ -353,4 +353,7 @@ object JsonFormatters {
   implicit val assetWorkspaceRequestReads = defaultJson.reads[AssetWorkspaceRequest]
   implicit val assetWorkspaceRequestWrites = Json.writes[AssetWorkspaceRequest]
 
+  implicit val notebookWorkspaceReads = defaultJson.reads[NotebookWorkspace]
+  implicit val notebookWorkspaceWrites = Json.writes[NotebookWorkspace]
+
 }
