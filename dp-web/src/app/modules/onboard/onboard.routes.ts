@@ -19,8 +19,8 @@ export const routes: Routes = [{
   component: LdapConfigComponent
 }, {
   path: 'adduser',
-  component: UserAddComponent,
-  canActivate: [StatusCheckGuard],
+  component: UserAddComponent
+  //canActivate: [StatusCheckGuard],
 }, {
   path: 'lakes',
   component: LakesComponent
