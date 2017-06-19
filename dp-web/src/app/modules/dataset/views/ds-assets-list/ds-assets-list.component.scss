@@ -46,6 +46,9 @@
   border-top-left-radius: 0px;
   background-color: $white;
 }
+.innerListScrollable .listCont {
+  border: 12px solid #d0d3d7;
+}
 .listCont .searchCont {
   height:34px;
   line-height: 34px;
@@ -82,7 +85,7 @@
   height:100%;
 }
 
-.listCont .list .listRow .nameCol {
+.listCont .list .listRow .nameCol.hlink {
   color: $eastern-blue;
   cursor: pointer;
 }
