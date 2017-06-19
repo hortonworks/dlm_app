@@ -23,6 +23,7 @@ export interface Policy {
   customProperties: Object;
   retry: Object;
   description: string;
+  lastJobs: Job[];
 }
 
 export interface PolicyDefinition {

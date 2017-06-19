@@ -38,7 +38,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   private resourceStatusMap = {
     // TODO where to get statuses for clusters?
     policies: [POLICY_STATUS.RUNNING, POLICY_STATUS.SUBMITTED, POLICY_STATUS.SUSPENDED],
-    jobs: [JOB_STATUS.SUCCESS, JOB_STATUS.IN_PROGRESS, JOB_STATUS.WARNINGS, JOB_STATUS.FAILED]
+    jobs: [JOB_STATUS.SUCCESS, JOB_STATUS.RUNNING, JOB_STATUS.WARNINGS, JOB_STATUS.FAILED]
   };
   events$: Observable<Event[]>;
   jobs$: Observable<Job[]>;

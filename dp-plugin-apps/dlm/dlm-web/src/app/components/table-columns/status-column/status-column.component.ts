@@ -1,4 +1,4 @@
-import { Component, ViewChild, TemplateRef } from '@angular/core';
+import { Component, ViewChild, TemplateRef, Input } from '@angular/core';
 import { RUNNING, SUBMITTED, FAILED, SUCCESS } from 'constants/status.constant';
 
 import { TableColumn } from 'common/table/table-column.type';
@@ -9,12 +9,16 @@ export const COLUMN_WIDTH = 100;
   selector: 'dlm-status-column',
   template: `
     <ng-template #statusCell let-value="value">
-      <span [class]="getStatusClassNames(value)">{{value}}</span>
+      <span [class]="getStatusClassNames(value)">
+        <span *ngIf="showText">{{value}}</span>
+      </span>
     </ng-template>
   `,
   styleUrls: ['./status-column.component.scss']
 })
 export class StatusColumnComponent implements TableColumn {
+  @Input()
+  showText = true;
   @ViewChild('statusCell') cellRef: TemplateRef<any>;
   cellSettings = {
     maxWidth: COLUMN_WIDTH,

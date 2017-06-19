@@ -7,12 +7,16 @@
 </dlm-table>
 
 <dlm-icon-column></dlm-icon-column>
-<dlm-status-column></dlm-status-column>
+<dlm-status-column [showText]="false"></dlm-status-column>
 <dlm-policy-info (nameClick)="toggleRowDetail($event, policyContent.Files)"></dlm-policy-info>
 <dlm-flow-status></dlm-flow-status>
 
 <ng-template #durationCell let-seconds="value">
   {{seconds ? (seconds | amUtc | amDateFormat:'HH:mm:ss') : 'Running'}}
+</ng-template>
+
+<ng-template #verbStatusCellTemplate let-value="value">
+  {{value | policyStatusFmt}}
 </ng-template>
 
 <ng-template #iconCellTemplate>
@@ -25,9 +29,7 @@
 
 <ng-template #prevJobs let-row="row">
   <span class="actionable text-primary" (click)="toggleRowDetail(row, policyContent.Jobs)">
-    <i class="fa fa-circle"></i>
-    <i class="fa fa-circle"></i>
-    <i class="fa fa-circle"></i>
+    <dlm-prev-jobs [policy]="row"></dlm-prev-jobs>
     <span class="caret"></span>
   </span>
 </ng-template>
