@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Entities.Workspace
-import domain.{CategoryRepo, WorkspaceRepo}
+import domain.{WorkspaceRepo}
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}

@@ -5,7 +5,7 @@
 #Users API
 
 GET            /Status                                                       controllers.Status.status
-GET            /health                                                  controllers.Status.health
+GET            /health                                                       controllers.Status.health
 
 GET           /users                                                         controllers.Users.all(username: Option[String])
 POST          /users                                                         controllers.Users.insert
@@ -78,10 +78,10 @@ POST          /assets/workspace                                              con
 
 
 #Categories
-GET           /categories                                                    controllers.Categories.all
-POST          /categories                                                    controllers.Categories.insert
-GET           /categories/:categoryId                                        controllers.Categories.load(categoryId:Long)
-DELETE        /categories/:categoryId                                        controllers.Categories.delete(categoryId:Long)
+#GET           /categories                                                    controllers.Categories.all
+#POST          /categories                                                    controllers.Categories.insert
+#GET           /categories/:categoryId                                        controllers.Categories.load(categoryId:Long)
+#DELETE        /categories/:categoryId                                        controllers.Categories.delete(categoryId:Long)
 
 #Skus API
 GET           /skus                                                          controllers.Skus.all
@@ -117,10 +117,10 @@ GET           /datasets/:datasetId                                           con
 DELETE        /datasets/:datasetId                                           controllers.Datasets.delete(datasetId:Long)
 
 #DatasetCategory Api
-GET           /datasets/:datasetId/categories                                controllers.DatasetCategories.allWithDatasetId(datasetId:Long)
-GET           /categories/:categoryId/datasets                               controllers.DatasetCategories.allWithCategoryId(categoryId:Long)
-POST          /datasets/categories                                           controllers.DatasetCategories.add
-DELETE        /datasets/:datasetId/categories/:categoryId                    controllers.DatasetCategories.delete(datasetId:Long, categoryId:Long)
+#GET           /datasets/:datasetId/categories                                controllers.DatasetCategories.allWithDatasetId(datasetId:Long)
+#GET           /categories/:categoryId/datasets                               controllers.DatasetCategories.allWithCategoryId(categoryId:Long)
+#POST          /datasets/categories                                           controllers.DatasetCategories.add
+#DELETE        /datasets/:datasetId/categories/:categoryId                    controllers.DatasetCategories.delete(datasetId:Long, categoryId:Long)
 
 #UnclassifiedDataset API
 GET           /unclassifieddatasets                                          controllers.UnclassifiedDatasets.all
@@ -130,7 +130,7 @@ DELETE        /unclassifieddatasets/:datasetId                               con
 
 #UnclassifiedDatasetCategory Api
 GET           /unclassifieddatasets/:datasetId/categories                    controllers.UnclassifiedDatasetCategories.allWithDatasetId(datasetId:Long)
-GET           /unclassifieddatasets/categories/:categoryId/datasets                               controllers.UnclassifiedDatasetCategories.allWithCategoryId(categoryId:Long)
+GET           /unclassifieddatasets/categories/:categoryId/datasets          controllers.UnclassifiedDatasetCategories.allWithCategoryId(categoryId:Long)
 POST          /unclassifieddatasets/categories                               controllers.UnclassifiedDatasetCategories.add
 DELETE        /unclassifieddatasets/:datasetId/categories/:categoryId        controllers.UnclassifiedDatasetCategories.delete(datasetId:Long, categoryId:Long)
 
@@ -147,3 +147,8 @@ DELETE        /dataassets/:id                                                con
 
 #Config
 GET           /configurations/:key                                           controllers.Configs.get(key)
+
+# Tags
+GET           /dataset-tags                                                  controllers.DatasetTags.getTags(query: Option[String])
+#POST          /dataset-tags                                                  controllers.DatasetTags.create
+

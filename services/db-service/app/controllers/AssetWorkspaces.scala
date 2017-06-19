@@ -6,7 +6,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.{
   AssetWorkspace,
   DatasetTag
 }
-import domain.{AssetWorkspaceRepo, CategoryRepo}
+import domain.{AssetWorkspaceRepo}
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}

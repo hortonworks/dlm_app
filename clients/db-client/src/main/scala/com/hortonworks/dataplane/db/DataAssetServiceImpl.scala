@@ -19,14 +19,14 @@ class DataAssetServiceImpl(config: Config)(implicit ws: WSClient)
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   override def list(): Future[Either[Errors, Seq[DataAsset]]] = {
-    ws.url(s"$url/dataassets")
+    ws.url(s"$url/data-assets")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToDataAssets)
   }
 
   override def create(dataAsset: DataAsset): Future[Either[Errors, DataAsset]] = {
-    ws.url(s"$url/dataasset")
+    ws.url(s"$url/data-assets")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"

@@ -11,8 +11,8 @@ import scala.concurrent.Future
 
 @Singleton
 class DatasetRepo @Inject()(
-                             protected val datasetCategoryRepo: DatasetCategoryRepo,
-                             protected val categoryRepo: CategoryRepo,
+                             protected val datasetCategoryRepo: DatasetWithTagRepo,
+                             protected val tagRepo: DatasetTagRepo,
                              protected val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[DpPgProfile] {
 
@@ -43,8 +43,8 @@ class DatasetRepo @Inject()(
   def findByIdWithCategories(datasetId: Long): Future[Option[DatasetAndCategories]] = {
     val datasetQuery = Datasets.filter(_.id === datasetId)
     val categoriesQuery = for {
-    datasetCategories <- datasetCategoryRepo.DatasetCategories if datasetCategories.datasetId === datasetId
-    categories <- categoryRepo.Categories if categories.id === datasetCategories.categoryId
+      datasetCategories <- datasetCategoryRepo.DatasetCategories if datasetCategories.datasetId === datasetId
+      categories <- tagRepo.Categories if categories.id === datasetCategories.categoryId
     } yield (categories)
 
     val query = for {
@@ -65,7 +65,7 @@ class DatasetRepo @Inject()(
     val query = (for{
       dataset <- Datasets returning Datasets += datasetReq.dataset
       _ <- datasetCategoryRepo.DatasetCategories ++=  datasetReq.categories.map(catId => DatasetCategory(catId,dataset.id.get))
-      categories <- categoryRepo.Categories.filter(_.id.inSet(datasetReq.categories)).result
+      categories <- tagRepo.Categories.filter(_.id.inSet(datasetReq.categories)).result
     } yield (DatasetAndCategories(dataset, categories))).transactionally
 
     db.run(query)
@@ -77,7 +77,7 @@ class DatasetRepo @Inject()(
       _ <- datasetCategoryRepo.DatasetCategories.filter(_.datasetId === datasetReq.dataset.id).delete
       _ <- datasetCategoryRepo.DatasetCategories ++=  datasetReq.categories.map(catId => DatasetCategory(catId,datasetReq.dataset.id.get))
       dataset <- Datasets.filter(_.id === datasetReq.dataset.id).result.head
-      categories <- categoryRepo.Categories.filter(_.id.inSet(datasetReq.categories)).result
+      categories <- tagRepo.Categories.filter(_.id.inSet(datasetReq.categories)).result
     } yield (DatasetAndCategories(dataset, categories))).transactionally
 
     db.run(query)

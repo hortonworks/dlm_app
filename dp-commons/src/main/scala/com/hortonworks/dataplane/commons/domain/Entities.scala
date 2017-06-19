@@ -69,14 +69,6 @@ object Entities {
       created: Option[LocalDateTime] = Some(LocalDateTime.now()),
       updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
-  case class DatasetTag(
-      id: Option[Long] = None,
-      name: String,
-      description: String,
-      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      updated: Option[LocalDateTime] = Some(LocalDateTime.now())
-  )
-
   case class Cluster(
       id: Option[Long] = None,
       name: String,
@@ -146,6 +138,13 @@ object Entities {
                                properties: Option[JsValue] = None,
                                clusterId: Long)
 
+  case class DatasetTag(
+                         id: Option[Long] = None,
+                         name: String,
+                         created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                         updated: Option[LocalDateTime] = Some(LocalDateTime.now())
+                       )
+
   case class Dataset(id: Option[Long] = None,
                      name: String,
                      description: Option[String],
@@ -156,7 +155,7 @@ object Entities {
                      version: Int = 1,
                      customprops: Option[JsValue] = None)
 
-  case class DatasetCategory(categoryId: Long, datasetId: Long)
+  case class DatasetWithTag(tagId: Long, datasetId: Long)
 
   case class UnclassifiedDataset(
       id: Option[Long],
@@ -193,7 +192,7 @@ object Entities {
 
   // classes as data conatiner for Rest Api
 
-  case class DatasetAndCategories(dataset: Dataset, categories: Seq[DatasetTag])
+//  case class DatasetAndCategories(dataset: Dataset, categories: Seq[DatasetTag])
   case class DatasetAndCategoryIds(dataset: Dataset, categories: Seq[Long])
 
 }
@@ -263,9 +262,6 @@ object JsonFormatters {
   implicit val datasetWrites = Json.writes[Dataset]
   implicit val datasetReads = defaultJson.reads[Dataset]
 
-  implicit val datasetCategoryWrites = Json.writes[DatasetCategory]
-  implicit val datasetCategoryReads = Json.reads[DatasetCategory]
-
   implicit val unclassifiedDatasetWrites = Json.writes[UnclassifiedDataset]
   implicit val unclassifiedDatasetReads = Json.reads[UnclassifiedDataset]
 
@@ -282,8 +278,8 @@ object JsonFormatters {
 
   // classes as data conatiner for Rest Api
 
-  implicit val datasetResponseReads = Json.reads[DatasetAndCategories]
-  implicit val datasetResponseWrites = Json.writes[DatasetAndCategories]
+//  implicit val datasetResponseReads = Json.reads[DatasetAndCategories]
+//  implicit val datasetResponseWrites = Json.writes[DatasetAndCategories]
 
   implicit val datasetRequestReads = Json.reads[DatasetAndCategoryIds]
   implicit val datasetRequestWrites = Json.writes[DatasetAndCategoryIds]

@@ -173,8 +173,6 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_data_asset (
   assetlabel      TEXT        NOT NULL,
   assetguid       TEXT        NOT NULL,
   datasetid       BIGINT REFERENCES dataplane.dp_datasets (id) DEFAULT NULL
-
-
 );
 
 -- Since datasets are boxes, we will need to store details
