@@ -20,7 +20,6 @@ export class NavTagPanel implements OnInit {
   }
 
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-    console.log(changes);
     changes["dsNameSearch"] && !changes["dsNameSearch"].firstChange && this.fetchList();
   }
 
