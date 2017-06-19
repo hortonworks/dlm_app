@@ -11,9 +11,9 @@ export class DatasetTagService {
   constructor(private http: Http) {
   }
 
-  public list(): Observable<DatasetTag[]> {
+  public list(text:string): Observable<DatasetTag[]> {
     return this.http
-      .get(this.url, new RequestOptions(HttpUtil.getHeaders()))
+      .get(`${this.url}?search=${text}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
 

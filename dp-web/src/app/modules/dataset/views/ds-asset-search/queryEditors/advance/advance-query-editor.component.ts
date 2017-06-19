@@ -9,7 +9,7 @@ import {QueryFilter} from "./filter/filter.component";
 
 @Component({
   selector: "advance-query-editor",
-  styles: [`.mdl-button {  min-width: 0px;  margin-bottom: 4px;  }`],
+  styles: [`.mdl-button {  min-width: 0px;  margin-top: 1px;  }`],
   template: `
     <div>
       <span #filterCont></span>

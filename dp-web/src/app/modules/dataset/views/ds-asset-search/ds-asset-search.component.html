@@ -21,6 +21,7 @@
   <div class="filterActionCont">
     <button class="mdl-button btn-hwx-primary" (click)="actionSearch()">{{"pages.dataset.asset-search.search" | translate}}</button>
     <button class="mdl-button btn-hwx-secondary" (click)="actionReset()" *ngIf="showQueryResults">{{"pages.dataset.asset-search.reset" | translate}}</button>
+    <span class="emptySearchMsg" #emptySearchMsg>{{"pages.dataset.asset-search.emptySearchMsg" | translate}}</span>
     <div style="clear: both"></div>
   </div>
   <div class="queryResultCont" #queryResultCont>

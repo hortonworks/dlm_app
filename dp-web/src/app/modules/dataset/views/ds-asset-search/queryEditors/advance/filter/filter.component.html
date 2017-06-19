@@ -1,6 +1,6 @@
 <div *ngIf="!avoidNewLine" style="clear: both"></div>
 <div class="queryFilter">
-  <select (change)="onFilterTypeChange($event)">
+  <select class="firstSelect" (change)="onFilterTypeChange($event)">
     <option *ngFor="let obj of availableFilters; let i=index;" [value]="i">{{obj.display}}</option>
   </select>
   <select *ngIf="filterObject" [(ngModel)]="filterObject.selectedOperator" (change)="validate($event)">

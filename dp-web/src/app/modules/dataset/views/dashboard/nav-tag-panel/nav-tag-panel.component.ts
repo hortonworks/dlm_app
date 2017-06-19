@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnInit, Output} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output, SimpleChange} from "@angular/core";
 import {DatasetTag} from "../../../../../models/dataset-tag";
 import {DatasetTagService} from "../../../../../services/tag.service";
 
@@ -9,6 +9,7 @@ import {DatasetTagService} from "../../../../../services/tag.service";
 })
 export class NavTagPanel implements OnInit {
 
+  @Input() dsNameSearch:string = "";
   @Output("updateSelection") updateSelectionEmitter: EventEmitter<DatasetTag> = new EventEmitter<DatasetTag>();
   allTags: DatasetTag[] = null;
   displayTags: DatasetTag[] = null;
@@ -18,9 +19,20 @@ export class NavTagPanel implements OnInit {
   constructor(private tagService: DatasetTagService) {
   }
 
+  ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
+    console.log(changes);
+    changes["dsNameSearch"] && !changes["dsNameSearch"].firstChange && this.fetchList();
+  }
+
   ngOnInit() {
-    this.tagService.list().subscribe(tags =>
-    (this.displayTags = this.allTags = tags) && tags.length && this.onPanelRowSelectionChange(tags[0]));
+    this.fetchList();
+  }
+
+  fetchList() {
+    this.tagService.list(this.dsNameSearch).subscribe(tags => {
+      this.currentDsTag && (this.currentDsTag = tags.filter(tag=>tag.name==this.currentDsTag.name)[0]);
+      (this.displayTags = this.allTags = tags) && tags.length && this.onPanelRowSelectionChange(this.currentDsTag || tags[0]);
+    });
   }
 
   onPanelRowSelectionChange(tagObj: DatasetTag) {
