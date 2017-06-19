@@ -144,8 +144,8 @@ $dialog-4x-width: 1380px;
 }
 
 @include keyframes("keyframe-dialog-rtl",
-  "320px",
-  "0px")
+        "320px",
+        "0px")
 .load-right-to-left {
   @include animation("keyframe-dialog-rtl", "0.5s", "linear");
   right: 0px;
@@ -153,8 +153,8 @@ $dialog-4x-width: 1380px;
 }
 
 @include keyframes("keyframe-dialog-ltr",
-  "-320px",
-  "0px")
+        "-320px",
+        "0px")
 .load-left-to-right {
   @include animation("keyframe-dialog-ltr", "0.5s", "linear")
 }
