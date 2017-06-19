@@ -211,7 +211,7 @@ CREATE TABLE IF NOT EXISTS dataplane.configs (
   config_value TEXT                  NOT NULL,
   active       BOOLEAN DEFAULT TRUE  NOT NULL,
   export       BOOLEAN DEFAULT TRUE  NOT NULL
-)
+);
 
 CREATE TABLE IF NOT EXISTS dataplane.ldap_configs (
   id          BIGSERIAL PRIMARY KEY,
