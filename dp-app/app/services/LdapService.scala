@@ -9,7 +9,11 @@ import com.google.inject.Inject
 import com.google.inject.name.Named
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, LdapConfiguration}
+import com.hortonworks.dataplane.commons.domain.Entities.{
+  Error,
+  Errors,
+  LdapConfiguration
+}
 import com.hortonworks.dataplane.commons.domain.Ldap.LdapSearchResult
 import com.hortonworks.dataplane.db.Webservice.{LdapConfigService, UserService}
 import com.typesafe.scalalogging.Logger
@@ -27,17 +31,15 @@ class LdapService @Inject()(
     private val ldapKeyStore: DpKeyStore,
     private val wSClient: WSClient,
     private val configuration: play.api.Configuration) {
-  val logger = Logger(classOf[LdapService])
+  private val logger = Logger(classOf[LdapService])
   private val USERDN_SUBSTITUTION_TOKEN = "{0}"
   private val searchControls: SearchControls = new SearchControls()
 
-  def configure(
-      knoxConf: KnoxConfigInfo): Future[Either[Errors, LdapConfiguration]] = {
+  def configure(knoxConf: KnoxConfigInfo): Future[Either[Errors, Boolean]] = {
     if (knoxConf.bindDn.isEmpty || knoxConf.password.isEmpty) {
       Future.successful(
         Left(Errors(Seq(Error("400", "username and password mandatory")))))
     } else {
-
       validate(knoxConf) match {
         case Left(errors) => Future.successful(Left(errors))
         case Right(isValid) => {
@@ -45,22 +47,38 @@ class LdapService @Inject()(
             Future.successful(
               Left(Errors(Seq(Error("400", "invalid knox configuration")))))
           } else {
-            val ldapConfiguration =
-              LdapConfiguration(knoxConf.id,
-                                knoxConf.ldapUrl,
-                                knoxConf.bindDn,
-                                knoxConf.userDnTemplate,
-                                knoxConf.userSearchBase,
-                                knoxConf.groupSearchBase)
-            validateBindDn(knoxConf)
-            ldapKeyStore.createCredentialEntry(knoxConf.bindDn.get,
-                                               knoxConf.password.get)
-            ldapConfigService.create(ldapConfiguration)
+            validateBindDn(knoxConf).flatMap { res =>
+              res match {
+                case Left(errors) => Future.successful(Left(errors))
+                case Right(isBound) => {
+                  ldapKeyStore.createCredentialEntry(
+                    knoxConf.bindDn.get,
+                    knoxConf.password.get) match {
+                    case Left(errors) => Future.successful(Left(errors))
+                    case Right(isCreated) => {
+                      val ldapConfiguration =
+                        LdapConfiguration(knoxConf.id,
+                                          knoxConf.ldapUrl,
+                                          knoxConf.bindDn,
+                                          knoxConf.userDnTemplate,
+                                          knoxConf.userSearchBase,
+                                          knoxConf.groupSearchBase)
+
+                      ldapConfigService.create(ldapConfiguration).map {
+                        case Left(errors) => Left(errors)
+                        case Right(createdLdapConfig) => Right(true)
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
     }
   }
+
   def validate(knoxConf: KnoxConfigInfo): Either[Errors, Boolean] = {
     validateUserDnTemplate(knoxConf.userDnTemplate) match {
       case Left(errors) => Left(errors)
@@ -76,33 +94,39 @@ class LdapService @Inject()(
   }
   private def validateUserDnTemplate(
       userDntemplateOption: Option[String]): Either[Errors, Boolean] = {
-    userDntemplateOption.map{userDnTemplate=>
-      if (!userDnTemplate.contains(USERDN_SUBSTITUTION_TOKEN)) {
+    userDntemplateOption
+      .map { userDnTemplate =>
+        if (!userDnTemplate.contains(USERDN_SUBSTITUTION_TOKEN)) {
+          Left(
+            Errors(Seq(Error("invalid config",
+                             "user dn template substitution token absent"))))
+        } else Right(true)
+      }
+      .getOrElse {
         Left(
-          Errors(
-            Seq(Error("invalid config",
-              "user dn template substitution token absent"))))
-      } else Right(true)
-    }.getOrElse{
-      Left(Errors(Seq(Error(
-        "invalid config",
-        "user dn template mandatory")))) //TODO this may change by having advance options rather tham just userr dn template
-    }
+          Errors(Seq(Error("invalid config", "user dn template mandatory")))) //TODO this may change by having advance options rather tham just userr dn template
+      }
   }
   private def getUserDn(userDntemplateOpt: Option[String],
                         principal: String): Option[String] = {
-    userDntemplateOpt.map{ userDnTempate =>
-      val index = userDnTempate.indexOf(USERDN_SUBSTITUTION_TOKEN)
-      val prefix = userDnTempate.substring(0, index)
-      val suffix = userDnTempate.substring(prefix.length + USERDN_SUBSTITUTION_TOKEN.length)
-      Some(s"$prefix$principal$suffix")
-    }.getOrElse(None)
+    userDntemplateOpt
+      .map { userDnTempate =>
+        val index = userDnTempate.indexOf(USERDN_SUBSTITUTION_TOKEN)
+        val prefix = userDnTempate.substring(0, index)
+        val suffix = userDnTempate.substring(
+          prefix.length + USERDN_SUBSTITUTION_TOKEN.length)
+        Some(s"$prefix$principal$suffix")
+      }
+      .getOrElse(None)
   }
-  private def detemineUserSearchBase(userDnTempate:String): String ={
+  private def detemineUserSearchBase(userDnTempate: String): String = {
     val index = userDnTempate.indexOf(USERDN_SUBSTITUTION_TOKEN)
-    userDnTempate.substring(index+USERDN_SUBSTITUTION_TOKEN.length).trim.substring(1)
+    userDnTempate
+      .substring(index + USERDN_SUBSTITUTION_TOKEN.length)
+      .trim
+      .substring(1)
   }
-  private def detemineUserIdentifier(userDnTempate:String): String ={
+  private def detemineUserIdentifier(userDnTempate: String): String = {
     val index = userDnTempate.indexOf(USERDN_SUBSTITUTION_TOKEN)
     userDnTempate.substring(0, index)
   }
@@ -140,7 +164,7 @@ class LdapService @Inject()(
       search <- doWithEither[DirContext, Seq[LdapSearchResult]](
         dirContext,
         context => {
-          ldapSearch(context, configuredLdap.right.get,userName, fuzzyMatch)
+          ldapSearch(context, configuredLdap.right.get, userName, fuzzyMatch)
         })
 
     } yield search
@@ -167,29 +191,38 @@ class LdapService @Inject()(
 
   private def ldapSearch(
       dirContext: DirContext,
-      ldapConfs:Seq[LdapConfiguration],
+      ldapConfs: Seq[LdapConfiguration],
       userName: String,
       fuzzyMatch: Boolean): Future[Either[Errors, Seq[LdapSearchResult]]] = {
     searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
     try {
-      val userDn:Option[String]=getUserDn(ldapConfs.head.userDnTemplate,userName)
-      if (!userDn.isDefined){
+      val userDn: Option[String] =
+        getUserDn(ldapConfs.head.userDnTemplate, userName)
+      if (!userDn.isDefined) {
         //TODO this is temporary fix. will support advance option sooner.
-        return Future.successful(
-          Left(Errors(Seq(new Error("Exception","current implementation only allows search based on userDn template.")))))
+        return Future.successful(Left(Errors(Seq(new Error(
+          "Exception",
+          "current implementation only allows search based on userDn template.")))))
 
       }
-      val searchBase=detemineUserSearchBase(ldapConfs.head.userDnTemplate.get)
-      var searchIdtemplate=detemineUserIdentifier(ldapConfs.head.userDnTemplate.get)
+      val searchBase = detemineUserSearchBase(
+        ldapConfs.head.userDnTemplate.get)
+      var searchIdtemplate = detemineUserIdentifier(
+        ldapConfs.head.userDnTemplate.get)
 
-      val searchid= if (fuzzyMatch) searchIdtemplate+userName+"*" else  searchIdtemplate+userName
-      val res: NamingEnumeration[SearchResult] =dirContext.search(searchBase,searchid,searchControls)
+      val searchid =
+        if (fuzzyMatch) searchIdtemplate + userName + "*"
+        else searchIdtemplate + userName
+      val res: NamingEnumeration[SearchResult] =
+        dirContext.search(searchBase, searchid, searchControls)
       val ldapSearchResults: ArrayBuffer[LdapSearchResult] = new ArrayBuffer()
       while (res.hasMore) {
         val sr: SearchResult = res.next()
-        val ldaprs = new LdapSearchResult(sr.getName.substring(sr.getName.indexOf(searchIdtemplate)+searchIdtemplate.length),
-                                          sr.getClassName,
-                                          sr.getNameInNamespace)
+        val ldaprs = new LdapSearchResult(
+          sr.getName.substring(
+            sr.getName.indexOf(searchIdtemplate) + searchIdtemplate.length),
+          sr.getClassName,
+          sr.getNameInNamespace)
         ldapSearchResults += ldaprs
       }
       Future.successful(Right(ldapSearchResults))
