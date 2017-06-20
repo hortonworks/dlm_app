@@ -1,5 +1,5 @@
-import {
-   Component, OnInit, Input, Output, ViewEncapsulation, forwardRef, EventEmitter, ContentChild, HostListener, ElementRef
+import { Component, OnInit, Input, Output, ViewEncapsulation, forwardRef, ChangeDetectionStrategy,
+  EventEmitter, ContentChild, OnChanges, SimpleChanges, HostListener, ElementRef
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor, NG_VALIDATORS, Validator, FormControl } from '@angular/forms';
 import { SelectOption } from './select-option.type';
@@ -22,6 +22,7 @@ export const CUSTOM_SELECT_CONTROL_VALUE_VALIDATOR: any = {
   styleUrls: ['./select-field.component.scss'],
   encapsulation: ViewEncapsulation.None,
   providers: [CUSTOM_SELECT_CONTROL_VALUE_ACCESSOR, CUSTOM_SELECT_CONTROL_VALUE_VALIDATOR],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="select-field-container">
       <div class="form-control actionable" (click)="toggleMenu()">
@@ -51,7 +52,7 @@ export const CUSTOM_SELECT_CONTROL_VALUE_VALIDATOR: any = {
     </div>
   `
 })
-export class SelectFieldComponent implements OnInit, ControlValueAccessor, Validator {
+export class SelectFieldComponent implements OnInit, ControlValueAccessor, Validator, OnChanges {
   private defaultValue: SelectOption = {
     label: 'None',
     value: null
@@ -77,9 +78,17 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, Valid
   ngOnInit() {
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (this.options) {
+      this.selectedOption = this.options.find(option => '' + option.value === '' + this.value) || this.defaultValue;
+    }
+  }
+
   writeValue(value: any) {
     this.value = value;
-    this.selectedOption = this.options.find(option => option.value === this.value) || this.defaultValue;
+    if (this.options) {
+      this.selectedOption = this.options.find(option => '' + option.value === '' + this.value) || this.defaultValue;
+    }
   }
 
   registerOnChange(onChange) {
@@ -90,7 +99,7 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, Valid
 
   selectOption(value: any) {
     this.value = value;
-    this.selectedOption = this.options.find(option => option.value === this.value);
+    this.selectedOption = this.options.find(option => '' + option.value === '' + this.value);
     this.onChange(value);
     this.onSelect.emit(this.selectedOption);
     this.toggleMenu();
