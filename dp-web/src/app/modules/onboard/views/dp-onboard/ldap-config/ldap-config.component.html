@@ -1,6 +1,6 @@
 <div class="notification-bar line-height-1-5" *ngIf="showNotification">
   <i class="fa fa-times-circle red margin-right-10 text-medium"></i>
-  <span class="text-medium red">LDAP/Knox configuration could not be saved</span>
+  <span class="text-medium red">{{"pages.onboard.configure.labels.configError" | translate}}</span>
   <i class="fa fa-remove pull-right margin-all-3 pointer" (click)="closeNotification()"></i>
   <ul>
     <li class="red text-small" *ngFor="let message of notificationMessages">{{message}}</li>
@@ -10,54 +10,56 @@
   <div class="text-medium">
     <i class="fa fa-lock green text-large pull-left"></i>
     <div>
-      <div class="text-uppercase text-xsmall">STEP 1</div>
-      <div class="">Setup Authentication</div>
+      <div class="text-uppercase text-xsmall">{{("common.step" | translate).toUpperCase()}} 1</div>
+      <div class="">{{"pages.onboard.description.setupAuth" | translate}}</div>
     </div>
   </div>
   <div class="margin-top-bottom-20">
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    {{"pages.onboard.description.setupAuth" | translate}}
   </div>
-  <div class="section margin-top-bottom-20 text-bold text-medium">Knox Configuration</div>
-  <div class="dp-input">
-    <label class="text-medium">Master Password</label>
-    <input *ngIf="!showKnoxPassword" [(ngModel)]="ldapProperties.masterPassword" type="password" placeholder="Knox Master Password"/>
-    <input *ngIf="showKnoxPassword" [(ngModel)]="ldapProperties.masterPassword" type="text" placeholder="Knox Master Password"/>
-    <div class="margin-top-bottom-3">
-      <input type="checkbox" [(ngModel)]="showKnoxPassword"/><span>Show Password</span>
+  <div class="section margin-top-bottom-20 text-bold text-medium">{{"pages.onboard.configure.labels.knoxConfiguration" | translate}}</div>
+  <form #configForm="ngForm">
+    <div class="dp-input">
+      <label class="">{{"pages.onboard.configure.labels.masterPassword" | translate}}</label>
+      <input required *ngIf="!showKnoxPassword" name="knox-password" [(ngModel)]="ldapProperties.masterPassword" type="password" placeholder="Knox Master Password"/>
+      <input required *ngIf="showKnoxPassword" name="knox-password-plain" [(ngModel)]="ldapProperties.masterPassword" type="text" placeholder="Knox Master Password"/>
+      <div class="margin-top-bottom-3">
+        <input name="knox-password-toggle" type="checkbox" [(ngModel)]="showKnoxPassword"/><span>{{"pages.onboard.configure.labels.showPassword" | translate}}</span>
+      </div>
     </div>
-  </div>
-  <div class="spacer-15"></div>
-  <div class="section margin-top-bottom-20 text-bold text-medium">LDAP Configuration</div>
-  <div class="dp-input">
-    <label class="text-medium">URL</label>
-    <input type="text" [(ngModel)]="ldapProperties.ldapUrl" placeholder="e.g. ldap://localhost:33389"/>
-  </div>
-  <div class="dp-input">
-    <label class="text-medium">User DN Template</label>
-    <input type="text" [(ngModel)]="ldapProperties.userDnTemplate" placeholder="e.g. ou=people,dc=hadoop,dc=apache,dc=org"/>
-  </div>
-  <div class="dp-input">
-    <label class="text-medium">User search base</label>
-    <input type="text" [(ngModel)]="ldapProperties.userSearchBase" placeholder="e.g. ou=people,dc=hadoop,dc=apache,dc=org"/>
-  </div>
-  <div class="dp-input">
-    <label class="text-medium">Group search base</label>
-    <input type="text" [(ngModel)]="ldapProperties.groupSearchBase" placeholder="e.g. ou=groups,dc=hadoop,dc=apache,dc=org"/>
-  </div>
-  <div class="dp-input">
-    <label class="text-medium">Administrator Bind DN</label>
-    <input type="text" [(ngModel)]="ldapProperties.bindDn" placeholder="e.g. uid=admin,ou=people,dc=hadoop,dc=apache,dc=org"/>
-  </div>
-  <div class="dp-input">
-    <label class="text-medium">Administrator Password</label>
-    <input *ngIf="!showLdapPassword" [(ngModel)]="ldapProperties.password" type="password" placeholder="Administrator Password"/>
-    <input *ngIf="showLdapPassword" [(ngModel)]="ldapProperties.password" type="text" placeholder="Administrator Password"/>
-    <div class="margin-top-bottom-3">
-      <input type="checkbox" [(ngModel)]="showLdapPassword"/><span>Show Password</span>
+    <div class="spacer-15"></div>
+    <div class="section margin-top-bottom-20 text-bold text-medium">{{"pages.onboard.configure.labels.ldapConfiguration" | translate}}</div>
+    <div class="dp-input form-group">
+      <label class="required">{{"pages.onboard.configure.labels.url" | translate}}</label>
+      <input name="ldap-url" type="text" [(ngModel)]="ldapProperties.ldapUrl" placeholder="e.g. ldap://localhost:33389"/>
     </div>
-  </div>
-  <div class="margin-top-30">
-    <button class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">SAVE</button>
-    <button class="mdl-button btn-hwx-secondary" (click)="back()">CANCEL</button>
-  </div>
+    <div class="dp-input form-group">
+      <label class="required">{{"pages.onboard.configure.labels.userDNTemplate" | translate}}</label>
+      <input name="user-dn-template" type="text" [(ngModel)]="ldapProperties.userDnTemplate" placeholder="e.g. ou=people,dc=hadoop,dc=apache,dc=org"/>
+    </div>
+    <div class="dp-input form-group">
+      <label class="required">{{"pages.onboard.configure.labels.userSearchBase" | translate}}</label>
+      <input name="user-search-base" type="text" [(ngModel)]="ldapProperties.userSearchBase" placeholder="e.g. ou=people,dc=hadoop,dc=apache,dc=org"/>
+    </div>
+    <!--<div class="dp-input">-->
+      <!--<label>Group search base</label>-->
+      <!--<input type="text" [(ngModel)]="ldapProperties.groupSearchBase" placeholder="e.g. ou=groups,dc=hadoop,dc=apache,dc=org"/>-->
+    <!--</div>-->
+    <div class="dp-input">
+      <label>{{"pages.onboard.configure.labels.adminBindDN" | translate}}</label>
+      <input name="admin-bind-dn" type="text" [(ngModel)]="ldapProperties.bindDn" placeholder="e.g. uid=admin,ou=people,dc=hadoop,dc=apache,dc=org"/>
+    </div>
+    <div class="dp-input form-group">
+      <label class="required">{{"pages.onboard.configure.labels.adminPassword" | translate}}</label>
+      <input name="admin-password" *ngIf="!showLdapPassword" [(ngModel)]="ldapProperties.password" type="password" placeholder="Administrator Password"/>
+      <input name="admin-password-plain" *ngIf="showLdapPassword" [(ngModel)]="ldapProperties.password" type="text" placeholder="Administrator Password"/>
+      <div class="margin-top-bottom-3">
+        <input name="admin-password-toggle" type="checkbox" [(ngModel)]="showLdapPassword"/><span>{{"pages.onboard.configure.labels.showPassword" | translate}}</span>
+      </div>
+    </div>
+    <div class="margin-top-30">
+      <button name="save" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"common.save" | translate}}</button>
+      <button name="cancel" class="mdl-button btn-hwx-secondary" (click)="back()">{{"common.cancel" | translate}}</button>
+    </div>
+  </form>
 </div>

@@ -95,20 +95,26 @@ COMMENT ON TABLE dataplane.cluster_service_hosts IS 'Service hosts for services 
 
 CREATE TABLE IF NOT EXISTS dataplane.workspace (
   id          BIGSERIAL PRIMARY KEY,
-  name        VARCHAR(255)                           NOT NULL,
+  name        VARCHAR(255)                        NOT NULL UNIQUE,
+  source      BIGINT REFERENCES dataplane.dp_clusters(id) NOT NULL,
   description TEXT,
   createdby   BIGINT REFERENCES dataplane.users (id) NOT NULL,
   created     TIMESTAMP DEFAULT now(),
   updated     TIMESTAMP DEFAULT now()
 );
 
-
 CREATE TABLE IF NOT EXISTS dataplane.data_asset_workspace (
-  asset_type   VARCHAR(10)                                 NOT NULL,
+  asset_type   VARCHAR(50)                                 NOT NULL,
   asset_id     BIGINT                                      NOT NULL,
   workspace_id BIGINT REFERENCES dataplane.workspace (id)  NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS dataplane.notebook_workspace (
+  notebook_id     VARCHAR(20)                              NOT NULL,
+  name            VARCHAR(255)                             NOT NULL,
+  created         TIMESTAMP DEFAULT  now(),
+  workspace_id BIGINT REFERENCES dataplane.workspace (id)  NOT NULL
+);
 
 CREATE TABLE IF NOT EXISTS dataplane.cluster_hosts (
   id         BIGSERIAL PRIMARY KEY,

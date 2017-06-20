@@ -1,38 +1,39 @@
+@import "../../../../../styles/variables";
+
 .componentCont.innerListScrollable {
   height:100%;
 }
 .tabCont {
-  border-left:1px solid rgb(208,211,215);
-  border-top-right-radius: 3px;
-  border-top-left-radius: 3px;
-  height:55px;
-  color:rgb(103,105,102);
+  border-left: 1px solid $iron;
+  border-top-right-radius: 2px;
+  border-top-left-radius: 2px;
+  height: 55px;
+  color: $dove-gray;
 }
 
 .tabCont .tab{
-  width:80px;
-  height:55px;
-  padding: 5px 10px;
-  background-color: rgb(250,250,250);
-  border-top:1px solid rgb(208,211,215);
-  border-right:1px solid rgb(208,211,215);
-  border-top-right-radius: 3px;
-  border-top-left-radius: 3px;
+  width: 80px;
+  height: 55px;
+  padding: 10px 20px;
+  background-color: $alabaster;
+  border-top: 1px solid $iron;
+  border-right: 1px solid $iron;
+  border-top-right-radius: 2px;
+  border-top-left-radius: 2px;
   float: left;
   cursor: pointer;
 }
 .tabCont .tab.active {
-  background-color: rgb(208,211,215);
+  background-color: $bgGray;
 }
 
 .tabCont .tab .tabName {
+  margin-bottom: 5px;
   text-transform: uppercase;
-  font-size: 12px;
-  font-weight: lighter;
 }
 
 .tabCont .tab .tabCount {
-  font-weight: bold;
+  font-size: 14px;
 }
 
 .tabCont .actionButtonCont {
@@ -40,19 +41,22 @@
 }
 
 .listCont {
-  border:12px solid rgb(208,211,215);
+  border:1px solid $bgGray;
   border-radius: 3px;
   border-top-left-radius: 0px;
-  background-color: rgb(208,211,215);
+  background-color: $white;
+}
+.innerListScrollable .listCont {
+  border: 12px solid #d0d3d7;
 }
 .listCont .searchCont {
-  height:30px;
-  line-height: 30px;
-  color:rgb(103,105,102);
-  background-color: white;
-  border-radius: 3px;
+  height:34px;
+  line-height: 34px;
+  background-color: $white;
   position: relative;
-  margin-bottom: 12px;
+  border: 1px solid $iron;
+  border-radius: 2px;
+  margin: 10px 10px 0;
 }
 .listCont .searchCont > span {
   position: absolute;
@@ -60,7 +64,7 @@
   left:10px;
 }
 .listCont .searchCont > input {
-  height:30px;
+  height:34px;
   width:100%;
   background: transparent;
   position: absolute;
@@ -69,7 +73,6 @@
   border-width: 0px;
   padding:0 0 0 30px;
   font-size: 14px;
-  color:rgb(103,105,102);
   -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
   -moz-box-sizing: border-box;    /* Firefox, other Gecko */
   box-sizing: border-box;         /* Opera/IE 8+ */
@@ -83,22 +86,22 @@
 }
 
 .listCont .list .listRow .nameCol.hlink {
-  color: rgb(64,144,189);
+  color: $eastern-blue;
   cursor: pointer;
 }
 
 .listCont .list .listRow.listHead,
 .listCont .list .listRow.listHead .nameCol{
   text-transform: uppercase;
-  font-weight: bold;
-  color: black;
+  color: $dusty-gray;
+  font-size: 12px;
 }
 .listCont .list .listRow {
   clear: both;
   height: 45px;
   line-height: 45px;
-  color:rgb(103,105,102);
-  border-bottom: 1px solid rgb(208,211,215);
+  color: $dove-gray;
+  border-bottom: 1px solid $iron;
 }
 
 .listCont .list .listRow .col {
@@ -132,14 +135,14 @@
 }
 .listCont .list .listRow .hiveCol > span {
   color:white;
-  background-color: rgb(86,100,105);
+  background-color: $dove-gray;
   padding:3px 8px 2px;
   border-radius: 3px;
 }
 
 .listCont .list .listRow .filesCol > span {
   color:white;
-  background-color: rgb(83,177,122);
+  background-color: $dove-gray;
   padding:3px 8px 2px;
   border-radius: 3px;
 }
@@ -166,4 +169,3 @@
 .listCont .list.unLoaded .listRow{
   border-width: 0px;
 }
-

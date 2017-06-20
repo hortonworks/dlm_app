@@ -126,7 +126,7 @@ export class LakesComponent implements OnInit {
     if(lakeInfo.clusters && lakeInfo.clusters.length > 0){
       this.updateHealth(lakeInfo, this.getLocationInfoWithStatus(lakeInfo.data.location, lakeInfo.clusters[0].id));
     }else{
-      this.clusterService.list({lakeId: lakeInfo.data.id}).subscribe(clusters=> {
+      this.clusterService.listByLakeId({lakeId: lakeInfo.data.id}).subscribe(clusters=> {
         lakeInfo.clusters = clusters;
         this.updateHealth(lakeInfo, this.getLocationInfoWithStatus(lakeInfo.data.location, lakeInfo.clusters[0].id));
       });

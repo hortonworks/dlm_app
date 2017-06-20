@@ -10,7 +10,7 @@
             </div>
             <div class="dp-login-controls">
                 <form (submit)="onSubmit($event)" #loginForm="ngForm">
-                    <div class="group-title">Sign In</div>
+                    <div class="group-title"><span>Sign In</span> | <a href="/auth/signInThrougKnox?landingUrl={{landingPage}}">Sign in with SSO</a></div>
                     <div class="field-group">
                         <label aria-label="Username">Username</label>
                         <input type="text" name="username" [(ngModel)]="credential.username" required>
@@ -19,15 +19,14 @@
                         <label aria-label="Password">Password</label>
                         <input type="password" name="password" [(ngModel)]="credential.password" required>
                     </div>
+                    <div class="error-message"
+                         *ngIf="_isAuthInProgress === false && _isAuthSuccessful === false && message">{{message}}
+                    </div>
                     <div class="action-group">
                         <button class="mdl-button btn-hwx-primary" [disabled]="_isAuthInProgress">
                             <span *ngIf="!_isAuthInProgress"> Login </span>
                             <i *ngIf="_isAuthInProgress" class="fa fa-spinner fa-pulse fa-fw"></i>
                         </button>
-                        | <a href="/auth/signInThrougKnox?landingUrl={{landingPage}}">Sign in with SSO</a>
-                    </div>
-                    <div class="error-message"
-                         *ngIf="_isAuthInProgress === false && _isAuthSuccessful === false && message">{{message}}
                     </div>
                 </form>
             </div>

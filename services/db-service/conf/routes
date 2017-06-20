@@ -66,16 +66,27 @@ PUT           /services/endpoints                                            con
 #Workspaces API
 GET           /workspaces                                                    controllers.Workspaces.all
 POST          /workspaces                                                    controllers.Workspaces.insert
+GET           /workspaces/name/:name                                         controllers.Workspaces.loadByName(name:String)
 GET           /workspaces/:workspaceId                                       controllers.Workspaces.load(workspaceId:Long)
 DELETE        /workspaces/:workspaceId                                       controllers.Workspaces.delete(workspaceId:Long)
+
+#Workspace Details API
+GET           /workspacedetails                                              controllers.Workspaces.allWithDetails
+GET           /workspacedetails/name/:name                                   controllers.Workspaces.loadByNameWithDetails(name:String)
+DELETE        /workspacedetails/name/:name                                   controllers.Workspaces.deleteByName(name:String)
+
+GET           /workspaces/users/:userId                                      controllers.Workspaces.loadByUser(userId:Long)
 
 
 #Asset workspace API
 #Get assets for workspace
-GET           /assets/workspace/:workspaceId                                 controllers.AssetWorkspaces.assetsforWorkspace(workspaceId:Long)
-POST          /assets/workspace                                              controllers.AssetWorkspaces.add
+POST          /workspaces/assets                                             controllers.AssetWorkspaces.add
+GET           /workspaces/:workspaceId/assets                                controllers.AssetWorkspaces.assetsforWorkspace(workspaceId:Long)
 
-
+#Notebook Workspace API
+POST          /workspaces/notebooks                                          controllers.NotebookWorkspaces.add
+DELETE        /notebooks/:notebookId                                         controllers.NotebookWorkspaces.deleteByNotebookId(notebookId : String)
+GET           /workspaces/:workspaceId/notebooks                             controllers.NotebookWorkspaces.notebookForWorkspace(workspaceId : Long)
 
 #Categories
 GET           /categories                                                    controllers.Categories.all

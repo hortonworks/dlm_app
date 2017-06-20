@@ -1,4 +1,8 @@
+@import "../../../../../styles/variables";
+
 .details-wrapper {
   min-height: 500px;
-  border: 4px solid #CFD3D7;
+  border: 1px solid $iron;
+  padding: 10px;
+  background: $white;
 }

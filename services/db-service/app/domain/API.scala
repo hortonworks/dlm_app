@@ -9,5 +9,5 @@ object API {
   val dpClusters = "dp/clusters"
   val clusters = "/clusters"
   val datasets = "/datasets"
-
+  val workspaces = "/workspaces"
 }
