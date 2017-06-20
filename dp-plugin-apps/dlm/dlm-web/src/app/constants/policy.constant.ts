@@ -13,13 +13,13 @@ export const HOURS = 'HOURS';
 export const DAYS = 'DAYS';
 export const WEEKS = 'WEEKS';
 
-export const MONDAY = 'MONDAY';
-export const TUESDAY = 'TUESDAY';
-export const WEDNESDAY = 'WEDNESDAY';
-export const THURSDAY = 'THURSDAY';
-export const FRIDAY = 'FRIDAY';
-export const SATURDAY = 'SATURDAY';
-export const SUNDAY = 'SUNDAY';
+export const MONDAY = 1;
+export const TUESDAY = 2;
+export const WEDNESDAY = 3;
+export const THURSDAY = 4;
+export const FRIDAY = 5;
+export const SATURDAY = 6;
+export const SUNDAY = 7;
 
 export const POLICY_TYPES = {
   HDFS,
