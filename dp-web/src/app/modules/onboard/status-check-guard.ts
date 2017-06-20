@@ -15,7 +15,7 @@ export class StatusCheckGuard implements CanActivate {
     return Observable.create(observer => {
       this.configService.isConfigurationComplete().subscribe(isComplete => {
         if (isComplete) {
-          this.redirect(observer, true, '/onboard/adduser');
+          return true;
         } else {
           this.redirect(observer, true, '/onboard/configure');
         }

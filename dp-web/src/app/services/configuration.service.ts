@@ -33,11 +33,8 @@ export class ConfigurationService {
       .catch(HttpUtil.handleError)
   }
 
-  isConfigurationComplete(): Observable<boolean>{
+  isConfigurationComplete(): Observable<boolean> {
     //TODO Mock to replaced with backend API call
-    return Observable.of(false);
+    return Observable.of(true);
   }
-
-
-
 }
