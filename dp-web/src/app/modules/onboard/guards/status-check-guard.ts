@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
-import {CanActivate, Router} from '@angular/router';
+import {ActivatedRouteSnapshot, CanActivate, Router} from '@angular/router';
 import {Observable} from 'rxjs/Observable'
 
-import {ConfigurationService} from '../../services/configuration.service';
+import {ConfigurationService} from '../../../services/configuration.service';
 
 
 @Injectable()
@@ -11,11 +11,12 @@ export class StatusCheckGuard implements CanActivate {
               private router: Router) {
   }
 
-  canActivate() {
+  canActivate(route: ActivatedRouteSnapshot) {
     return Observable.create(observer => {
       this.configService.isConfigurationComplete().subscribe(isComplete => {
         if (isComplete) {
-          return true;
+          observer.next(true);
+          observer.complete();
         } else {
           this.redirect(observer, true, '/onboard/configure');
         }

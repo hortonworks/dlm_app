@@ -37,4 +37,9 @@ export class ConfigurationService {
     //TODO Mock to replaced with backend API call
     return Observable.of(true);
   }
+
+  isLDAPConfigured(): Observable<boolean> {
+    //TODO Mock to replaced with backend API call
+    return Observable.of(false);
+  }
 }

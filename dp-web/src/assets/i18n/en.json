@@ -16,6 +16,7 @@
     "delete" : "Delete",
     "addAndNew" : "Add & New",
     "cancel": "Cancel",
+    "back": "BACK",
     "go" :"Go",
     "reset" : "Reset",
     "search" : "Search",
@@ -57,6 +58,31 @@
         "addCluster" : "Add your cluster to Dataplane",
         "setService" : "Set up services to enable Dataplane to manage your data",
         "addDataset" : "Add your datasets to Dataplane"
+      },
+      "configure" : {
+        "labels" : {
+          "knoxConfiguration": "Knox Configuration",
+          "ldapConfiguration" : "LDAP Configuration",
+          "masterPassword": "Master Password",
+          "userDNTemplate":"User DN Template",
+          "url" : "URL",
+          "userSearchBase" : "User Search base",
+          "groupSearchBase" : "Group Search base",
+          "adminBindDN": "Administrator Bind DN",
+          "adminPassword":"Administrator Password",
+          "showPassword" : "Show Password",
+          "configError" : "LDAP/Knox configuration could not be saved"
+        },
+        "description" : {
+          "configurationDesctiption": "The first step is to help data plane connect to your LDAP and Knox by providing the LDAP, Knox configurations to Data plane."
+        }
+      },
+      "adduser" : {
+        "labels" : {
+          "users" : "Users",
+          "saveAndLogin" : "SAVE & LOGIN",
+          "configSuccess": "LDAP ADDED SUCCESSFULLY"
+        }
       }
     },
     "infra" : {

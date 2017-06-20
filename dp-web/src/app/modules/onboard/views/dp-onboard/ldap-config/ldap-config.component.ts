@@ -1,8 +1,12 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 
 import {LDAPProperties} from '../../../../../models/ldap-properties';
 import {ConfigurationService} from '../../../../../services/configuration.service';
+import {NgForm} from '@angular/forms';
+import {Alerts} from '../../../../../shared/utils/alerts';
+import {TranslateService} from '@ngx-translate/core';
+
 
 @Component({
   selector: 'dp-ldap-config',
@@ -17,8 +21,13 @@ export class LdapConfigComponent implements OnInit {
   notificationMessages: string[] = [];
   ldapProperties: LDAPProperties = new LDAPProperties();
 
+  @ViewChild('configForm') configForm: NgForm;
 
-  constructor(private configurationService: ConfigurationService, private router: Router, private route: ActivatedRoute) {
+
+  constructor(private configurationService: ConfigurationService,
+              private router: Router,
+              private route: ActivatedRoute,
+              private translateService: TranslateService) {
   }
 
   ngOnInit() {
@@ -27,16 +36,21 @@ export class LdapConfigComponent implements OnInit {
 
   save() {
     this.notificationMessages = [];
+    if (!this.configForm.form.valid) {
+      this.translateService.get('common.defaultRequiredFields').subscribe(msg => this.notificationMessages.push(msg));
+      this.showNotification = true;
+      return;
+    }
     this.configurationService.configureLDAP(this.ldapProperties).subscribe(() => {
       this.router.navigate(['onboard/adduser', {
         status: 'success'
       }]);
     }, (response) => {
       this.showNotification = true;
-      if(!response || !response._body){
+      if (!response || !response._body) {
         this.notificationMessages.push('Error occurred while saving the configurations.')
-      }else{
-        response._body.forEach(error =>{
+      } else {
+        response._body.forEach(error => {
           this.notificationMessages.push(error.message);
         });
       }
@@ -47,7 +61,7 @@ export class LdapConfigComponent implements OnInit {
     this.router.navigate(['onboard/welcome']);
   }
 
-  closeNotification(){
+  closeNotification() {
     this.showNotification = false;
   }
 
