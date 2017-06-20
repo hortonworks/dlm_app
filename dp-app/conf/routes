@@ -62,7 +62,7 @@ POST          /api/query-assets                                controllers.Query
 GET           /api/query-attributes                            controllers.QueryAttributes.list(clusterId: String)
 
 #Tags API
-GET           /api/dataset-tag/list                            controllers.DataSets.listCategoriesCount
+GET           /api/dataset-tag/list                            controllers.DataSets.listCategoriesCount(search:Option[String])
 GET           /api/dataset-tag/:tagName                        controllers.DataSets.getCategoryCount(tagName:String)
 
 GET           /api/assets/details/:clusterId/:atlasGuid        controllers.QueryAttributes.getAssetDetails(clusterId: String, atlasGuid: String)

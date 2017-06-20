@@ -136,6 +136,7 @@
         "advanced" : "Advanced",
         "filter" : "Filter",
         "reset" : "Reset",
+        "emptySearchMsg" : "Empty Search not allowed",
         "noSearchMsg" : "Please search for assets above or use Advanced Search",
         "noResultsMsg" : "No Results!!",
         "cancel" : "Cancel",

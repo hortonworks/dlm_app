@@ -1,5 +1,7 @@
 <div class="dataset-dashboard borderBox">
-    <nav-tag-panel (updateSelection)="onTagChange($event)"></nav-tag-panel>
+    <nav-tag-panel (updateSelection)="onTagChange($event)"
+                   [dsNameSearch]="dsNameSearch"
+    ></nav-tag-panel>
     <div class="result-viewer">
         <div class="mdl-grid mdl-grid--no-spacing dataset-search">
             <div class="dp-input mdl-cell--10-col">

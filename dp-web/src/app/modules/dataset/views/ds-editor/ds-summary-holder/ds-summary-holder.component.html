@@ -9,14 +9,14 @@
   <br/><br/>
   <span class="leftCont"><b>Tags</b></span>:&nbsp;<span><span *ngFor="let tag of tags;">{{tag}}&nbsp;&nbsp;</span></span>
   <br/><br/>
-  <span class="leftCont"><b>Assets</b></span>:
+  <span class="leftCont"><b>Assets</b></span>:&nbsp;<span>{{dsModel.counts.hiveCount + dsModel.counts.filesCount}}</span>
   <br/>
   <br/>
-  <div class="tabCont">
-    <div class="tab active">
-      <div class="tabName">Total</div>
-      <div class="tabCount">{{dsModel.counts.hiveCount + dsModel.counts.filesCount}}</div>
-    </div>
+  <!--<div class="tabCont">-->
+    <!--<div class="tab active">-->
+      <!--<div class="tabName">Total</div>-->
+      <!--<div class="tabCount">{{dsModel.counts.hiveCount + dsModel.counts.filesCount}}</div>-->
+    <!--</div>-->
     <!--<div class="tab">-->
       <!--<div class="tabName">Hive</div>-->
       <!--<div class="tabCount">{{dsModel.counts.hiveCount}}</div>-->
@@ -25,9 +25,9 @@
       <!--<div class="tabName">Files</div>-->
       <!--<div class="tabCount">{{dsModel.counts.filesCount}}</div>-->
     <!--</div>-->
-    <div style="clear: both;"></div>
-  </div>
-  <br/>
+    <!--<div style="clear: both;"></div>-->
+  <!--</div>-->
+  <!--<br/>-->
 
 
 </div>

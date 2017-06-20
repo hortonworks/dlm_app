@@ -22,6 +22,7 @@ export class DsAssetSearch {
 
   @ViewChild("outerCont") outerCont: ElementRef;
   @ViewChild("tabCont") tabCont: ElementRef;
+  @ViewChild("emptySearchMsg") emptySearchMsg: ElementRef;
   @ViewChild("queryResultCont") queryResultCont: ElementRef;
   @ViewChild("dsAssetList") dsAssetList: DsAssetList;
   @ViewChild("basicQueryEditor") basicQueryEditor: BasicQueryEditor;
@@ -33,13 +34,15 @@ export class DsAssetSearch {
   @Output("cancelNotification") cancelNotificationEmitter: EventEmitter<null> = new EventEmitter<null>();
 
   onSimpleQueryObjUpdate(flag: any) {
-    if (!this.showQueryResults) (thisObj => setTimeout(() => thisObj._actionSearch(), 0))(this);
-    this.showQueryResults = true;
     this.queryModel = new AssetSetQueryModel([]);
     if(this.queryObj.searchText){
       this.queryModel.filters.push({column: "name", operator: "contains", value: this.queryObj.searchText, dataType:"string"});
       // this.queryModel.filters.push({column: "asset.source", operator: "==", value: AssetTypeEnumString[this.queryObj.type], dataType:"-"});
     }
+    if(!this.queryModel.filters.length) return this.onEmptySearch();
+    if (!this.showQueryResults) (setTimeout(() => this._actionSearch(), 0));
+    this.showQueryResults = true;
+
   }
 
   get showDone () {
@@ -64,7 +67,7 @@ export class DsAssetSearch {
 
   actionSearch() {
     this.showQueryResults = true;
-    (thisObj => setTimeout(() => thisObj._actionSearch(), 0))(this);
+    setTimeout(() => this._actionSearch(), 0);
   }
 
   _actionSearch() {
@@ -74,6 +77,7 @@ export class DsAssetSearch {
         break;
       case this.tabEnum.ADVANCE:
         this.advanceQueryEditor.updateQueryModel();
+        if(!this.queryModel.filters.length) return this.onEmptySearch();
         this.dsAssetList.fetchAssets();
         break;
     }
@@ -97,5 +101,11 @@ export class DsAssetSearch {
     this.tabCont.nativeElement.style.marginTop = `-${(padding - 10)}px`; // -10 for padding from border
     this.outerCont.nativeElement.style.paddingTop = `${padding}px`;
     this.dsAssetList && this.dsAssetList.resize();
+  }
+
+  onEmptySearch () {
+    this.actionReset();
+    this.emptySearchMsg.nativeElement.style.display='inline-block';
+    setTimeout(()=>this.emptySearchMsg.nativeElement.style.display='none', 2000);
   }
 }

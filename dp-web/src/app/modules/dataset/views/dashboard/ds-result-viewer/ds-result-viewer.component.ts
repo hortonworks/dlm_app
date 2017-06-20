@@ -16,7 +16,7 @@ export class DsNavResultViewer {
   @Input() dsNameSearch:string = "";
   datasetModels: RichDatasetModel[] = null;
   views = ViewsEnum;
-  start: number = 0;
+  start: number = 1;
   limit: number = 10;
 
   private currentPage: number = 1;
@@ -31,17 +31,9 @@ export class DsNavResultViewer {
     }
   }
 
-  get paginationLabel() {
-    if (this.view === ViewsEnum.grid) {
-      return "Results Per Page";
-    } else {
-      return "Rows Per Page";
-    }
-  }
-
   getDataset() {
     this.datasetModels = null;
-    this.richDatasetService.listByTag(this.currentDsTag.name, this.dsNameSearch, this.start, this.limit)
+    this.richDatasetService.listByTag(this.currentDsTag.name, this.dsNameSearch, this.start-1, this.limit)
       .subscribe(result => this.datasetModels = result);
   }
 

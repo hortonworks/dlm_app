@@ -80,7 +80,7 @@ object Webservice {
 
     def search(searchText: String, size: Option[Long]): Future[Either[Errors, Seq[Category]]]
 
-    def listWithCount(): Future[Either[Errors, Seq[CategoryCount]]]
+    def listWithCount(search:Option[String]): Future[Either[Errors, Seq[CategoryCount]]]
 
     def listWithCount(categoryName: String): Future[Either[Errors, CategoryCount]]
 

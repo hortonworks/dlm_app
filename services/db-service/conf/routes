@@ -135,7 +135,7 @@ GET           /richdatasets/:id                                              con
 
 
 #Categories Api
-GET           /categoriescount                                               controllers.DatasetCategories.categoriesCount()
+GET           /categoriescount                                               controllers.DatasetCategories.categoriesCount(search: Option[String])
 GET           /categoriescount/:name                                         controllers.DatasetCategories.categoriesCountByName(name : String)
 
 #DatasetCategory Api
