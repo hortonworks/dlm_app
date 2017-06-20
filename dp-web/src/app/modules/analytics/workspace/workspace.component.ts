@@ -39,7 +39,9 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     if ($event.target.nodeName !== 'I') {
       /* Temporary arrangement for demos: zeppelinURL is defined in index.html*/
       if (typeof(zeppelinURL) !== 'undefined') {
-        window.location.href = zeppelinURL;
+        window.location.href = zeppelinURL +
+                                '&workspaceId=' +encodeURIComponent(encodeURIComponent(String(workspacesDTO.workspace.id))) +
+                                '&workspaceName=' +encodeURIComponent(encodeURIComponent(String(workspacesDTO.workspace.name)));
         return
       } else {
         this.router.navigate(['/workspace/' + workspacesDTO.workspace.name + '/assets']);
