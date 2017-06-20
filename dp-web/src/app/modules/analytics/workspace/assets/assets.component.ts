@@ -14,6 +14,8 @@ import {DsAssetModel} from '../../../dataset/models/dsAssetModel';
 import {CollapsibleNavService} from '../../../../services/collapsible-nav.service';
 import {PersonaTabs} from '../../../../models/header-data';
 
+declare var zeppelinURL;
+
 enum AssetViewState {
   ADD_ASSETS, EDIT_ASSETS
 }
@@ -58,7 +60,6 @@ export class AssetsComponent implements OnInit {
   ngOnInit() {
     this.activatedRoute.params.subscribe(params => {
       this.selectedWorkspaceName = params['id'];
-      this.setNavigation();
       this.getWorkSpaceDTO();
     });
   }
@@ -68,14 +69,19 @@ export class AssetsComponent implements OnInit {
     this.viewState = this.workspaceDTO.counts.asset === 0 ?  AssetViewState.ADD_ASSETS : AssetViewState.EDIT_ASSETS;
     this.cluster = clusters.find(cluster => cluster.name === this.workspaceDTO.clustername);
 
+    this.setNavigation();
+    
     if (this.viewState === AssetViewState.EDIT_ASSETS) {
       this.getAssets();
     }
   }
 
   setNavigation() {
+    let zeppelinNotebook = zeppelinURL +
+                            '&workspaceId=' +encodeURIComponent(encodeURIComponent(String(this.workspaceDTO.workspace.id))) +
+                            '&workspaceName=' +encodeURIComponent(encodeURIComponent(String(this.workspaceDTO.workspace.name)));
     let tabs = [
-      new PersonaTabs('Notebooks', 'workspace/' + this.selectedWorkspaceName + '/notebooks', 'fa-file-text-o'),
+      new PersonaTabs('Notebooks', zeppelinNotebook, 'fa-file-text-o', false),
       new PersonaTabs('Assets', 'workspace/'+ this.selectedWorkspaceName +'/assets', 'fa-list-alt')
     ];
     this.collapsibleNavService.setTabs(tabs, tabs[1]);

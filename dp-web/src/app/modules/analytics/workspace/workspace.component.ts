@@ -42,7 +42,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
         window.location.href = zeppelinURL +
                                 '&workspaceId=' +encodeURIComponent(encodeURIComponent(String(workspacesDTO.workspace.id))) +
                                 '&workspaceName=' +encodeURIComponent(encodeURIComponent(String(workspacesDTO.workspace.name)));
-        return
+        return;
       } else {
         this.router.navigate(['/workspace/' + workspacesDTO.workspace.name + '/assets']);
       }
