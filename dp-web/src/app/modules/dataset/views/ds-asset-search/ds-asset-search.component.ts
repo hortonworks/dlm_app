@@ -29,6 +29,7 @@ export class DsAssetSearch {
   @ViewChild("advanceQueryEditor") advanceQueryEditor: AdvanceQueryEditor;
 
   @Input() clusterId:number;
+  @Input() saveButton = false;
   @Output("doneNotification") doneNotificationEmitter: EventEmitter<AssetSetQueryModel> = new EventEmitter<AssetSetQueryModel>();
   @Output("cancelNotification") cancelNotificationEmitter: EventEmitter<null> = new EventEmitter<null>();
 

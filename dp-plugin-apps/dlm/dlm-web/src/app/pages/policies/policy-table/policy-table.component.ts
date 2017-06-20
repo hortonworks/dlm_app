@@ -66,6 +66,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @ViewChild('iconCellTemplate') iconCellTemplate: TemplateRef<any>;
   @ViewChild('pathCell') pathCellRef: TemplateRef<any>;
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
+  @ViewChild('verbStatusCellTemplate') verbStatusCellTemplate: TemplateRef<any>;
 
   @ViewChild(TableComponent) tableComponent: TableComponent;
 
@@ -84,13 +85,24 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       return selectedPolicy ? jobs.filter(job => job.name === selectedPolicy.id) : [];
     });
     this.policyDatabase$ = this.selectedPolicy$
-      .mergeMap(policy => store.select(getDatabase(this.hiveService.makeDatabaseId(policy.sourceDataset, policy.sourceCluster))));
+      .mergeMap(policy => {
+        const cluster = this.clusterByName(policy.sourceCluster);
+        return store.select(getDatabase(this.hiveService.makeDatabaseId(policy.sourceDataset, cluster.id)));
+      });
   }
 
   ngOnInit() {
     this.columns = [
       {...this.iconColumn.cellSettings, prop: 'type', cellTemplate: this.iconColumn.cellRef},
-      {...this.statusColumn.cellSettings, prop: 'status', cellTemplate: this.statusColumn.cellRef},
+      {
+        ...this.statusColumn.cellSettings,
+        prop: 'status',
+        name: ' ',
+        cellTemplate: this.statusColumn.cellRef,
+        sortable: false,
+        ...TableComponent.makeFixedWith(25)
+      },
+      {prop: 'status', cellClass: 'text-cell', headerClass: 'text-header', cellTemplate: this.verbStatusCellTemplate},
       {name: ' ', cellTemplate: this.policyInfoColumn.cellRef, sortable: false},
       {prop: 'sourceCluster', name: this.t.instant('common.source')},
       {
@@ -105,10 +117,14 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       {prop: 'sourceDataset', name: this.t.instant('common.path'), cellTemplate: this.pathCellRef},
       {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs')},
       {prop: 'frequency', name: this.t.instant('common.schedule'), cellTemplate: this.scheduleCellTemplateRef},
-      {prop: 'lastJobResource.duration', name: this.t.instant('common.duration'), cellTemplate: this.durationCellRef},
+      {prop: 'lastJobResource.trackingInfo.timeTaken', name: this.t.instant('common.duration'), cellTemplate: this.durationCellRef},
       {prop: 'lastJobResource.startTime', name: 'Last Good', cellTemplate: this.lastGoodCellRef},
       {name: 'Actions', cellTemplate: this.actionsCellRef, maxWidth: 55, sortable: false}
     ];
+  }
+
+  clusterByName(clusterName: string): Cluster {
+    return this.clusters.find(cluster => cluster.name === clusterName);
   }
 
   /**
@@ -202,10 +218,10 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       return;
     }
     if (contentType === PolicyContent.Files) {
+      const cluster = this.clusterByName(policy.sourceCluster);
       if (policy.type === POLICY_TYPES.HIVE) {
-        this.store.dispatch(loadFullDatabases(policy.sourceCluster));
+        this.store.dispatch(loadFullDatabases(cluster.id));
       } else {
-        const cluster = this.clusters.find(c => c.name === policy.sourceCluster);
         this.sourceCluster = cluster.id;
         this.hdfsRootPath = policy.sourceDataset;
       }

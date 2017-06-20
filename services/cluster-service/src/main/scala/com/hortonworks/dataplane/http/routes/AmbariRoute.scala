@@ -105,7 +105,8 @@ class AmbariRoute @Inject()(val ws: WSClient,
   }
 
   def callAmbariApi(credentials: Credentials, cluster: Cluster, req: String,clusterCall:Boolean = true) = {
-    ws.url(s"${getUrl(cluster,clusterCall)}/$req")
+    val rest = if(req.startsWith("/")) req.substring(1) else req
+    ws.url(s"${getUrl(cluster, clusterCall)}/$rest")
       .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
       .get()
       .map(_.json)

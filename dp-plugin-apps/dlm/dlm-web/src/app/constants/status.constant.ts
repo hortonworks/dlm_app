@@ -1,4 +1,3 @@
-export const IN_PROGRESS = 'IN_PROGRESS';
 export const SUBMITTED = 'SUBMITTED';
 export const SUCCESS = 'SUCCESS';
 export const FAILED = 'FAILED';
@@ -8,7 +7,7 @@ export const RUNNING = 'RUNNING';
 export const SUSPENDED = 'SUSPENDED';
 
 export const JOB_STATUS = {
-  IN_PROGRESS: IN_PROGRESS,
+  RUNNING: RUNNING,
   SUCCESS: SUCCESS,
   WARNINGS: WARNINGS,
   FAILED: FAILED

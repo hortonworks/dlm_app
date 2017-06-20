@@ -29,17 +29,21 @@ PUT     /api/clusters/:clusterId/policy/:name/jobs/abort      controllers.Policy
 
 
 #Events
-GET     /api/events                                           controllers.Events.list
+GET     /api/events                                               controllers.Events.list
 
 
 #HdfsFiles
-GET     /api/clusters/:clusterId/webhdfs/file                 controllers.HdfsFiles.retrieve(clusterId: Long)
+GET     /api/clusters/:clusterId/webhdfs/file                     controllers.HdfsFiles.retrieve(clusterId: Long)
+
+#HiveDatabases
+GET     /api/clusters/:clusterId/hive/databases                   controllers.HiveDatabases.retrieveDb(clusterId: Long)
+GET     /api/clusters/:clusterId/hive/database/:dbName/tables     controllers.HiveDatabases.retrieveDbTables(clusterId: Long, dbName: String)
 
 
 # Due to the regex involved, Following should be always placed at the end of the file
 # static resources
 # @TODO: Replace `/usr/dlm-web` with env variable DLM_WEB_HOME
 #        which will be set in prod env and will be referred in `StaticAssets.at` method
-GET      /                                                      controllers.StaticAssets.at(path="/usr/dlm-web", file="index.html")
-GET     /dlm/*file                                              controllers.StaticAssets.at(path="/usr/dlm-web", file)
-GET     /*file                                                  controllers.StaticAssets.at(path="/usr/dlm-web", file)
+GET      /                                                        controllers.StaticAssets.at(path="/usr/dlm-web", file="index.html")
+GET     /dlm/*file                                                controllers.StaticAssets.at(path="/usr/dlm-web", file)
+GET     /*file                                                    controllers.StaticAssets.at(path="/usr/dlm-web", file)

@@ -8,16 +8,17 @@
 
 .dataset-search {
   width:100%;
-  background-color: $alabaster;
   padding-right: 15px;
-  border-top: 1px solid $concrete;
-  border-bottom: 1px solid $concrete;
+  border-top: 1px solid $mercury;
+  border-bottom: 1px solid $mercury;
+  background: $wild-sand;
 
   input {
     width: 100%;
     background: transparent;
     padding-left: 40px;
     border:none;
+    font-size: 14px;
   }
 
   .mdl-button {
@@ -29,7 +30,7 @@
       font-family: FontAwesome;
       content: '\f002';
       position: absolute;
-      top: 10px;
+      top: 12px;
       padding-left: 20px;
     }
   }

@@ -6,5 +6,5 @@ export class DsAssetModel {
   owner: string;
   source: string;
   type: string;
-  clusterId?:number;
+  clusterId:number;
 }

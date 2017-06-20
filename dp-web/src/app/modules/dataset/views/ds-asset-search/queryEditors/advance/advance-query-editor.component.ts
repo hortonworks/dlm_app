@@ -31,7 +31,7 @@ export class AdvanceQueryEditor implements OnInit {
   fltrCmpRfs: ComponentRef<QueryFilter>[] = [];
 
   constructor(private ownerService: AssetOwnerService,
-              private cFR: ComponentFactoryResolver,) {
+              private cFR: ComponentFactoryResolver) {
   }
 
   ngOnInit() {

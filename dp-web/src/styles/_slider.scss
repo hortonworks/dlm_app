@@ -2,10 +2,13 @@
 
 $edit-child-background: $white;
 $edit-background-border: $white;
+
 $dialog-1x-width: 340px;
 $dialog-2x-width: 680px;
 $dialog-4x-width: 1380px;
-.metron-slider-pane-details {
+
+.metron-slider-pane-details
+{
   display: inline-block;
   float: right;
   word-wrap: break-word;
@@ -17,7 +20,9 @@ $dialog-4x-width: 1380px;
   border: 1px solid $edit-background-border;
   z-index: 11;
   box-sizing: border-box;
-  .close-button {
+
+  .close-button
+  {
     &:before {
       font-family: FontAwesome;
       content: '\f00d';
@@ -27,8 +32,10 @@ $dialog-4x-width: 1380px;
   }
 }
 
-.metron-slider-pane-editable {
+.metron-slider-pane-editable
+{
   @extend .metron-slider-pane-details;
+
   height: auto;
   background: $white;
   border-left: 1px solid $silver;
@@ -52,115 +59,70 @@ $dialog-4x-width: 1380px;
   }
 }
 
-@mixin keyframes($animation-name,$start,$end) {
-  @-webkit-keyframes #{$animation-name}
-  {
+@mixin keyframes($animation-name, $start, $end) {
+  @-webkit-keyframes #{$animation-name} {
     0% {
-      --webkit-transform: translateX(#{ $start }
-      );
+      --webkit-transform: translateX(#{$start});
     }
     100% {
-      -webkit-transform: translateX(#{ $end }
-      );
+      -webkit-transform: translateX(#{$end});
     }
   }
-  @-moz-keyframes #{
-    $animation-name
-  }
-  {
+  @-moz-keyframes #{$animation-name} {
     0% {
-      -moz-transform: translateX(#{ $start }
-      );
+      -moz-transform: translateX(#{$start});
     }
     100% {
-      -moz-transform: translateX(#{ $end }
-      );
+      -moz-transform: translateX(#{$end});
     }
   }
-  @-ms-keyframes #{
-    $animation-name
-  }
-  {
+  @-ms-keyframes #{$animation-name} {
     0% {
-      -ms-transform: translateX(#{ $start }
-      );
+      -ms-transform: translateX(#{$start});
     }
     100% {
-      -ms-transform: translateX(#{ $end }
-      );
+      -ms-transform: translateX(#{$end});
     }
   }
-  @-o-keyframes #{
-    $animation-name
-  }
-  {
+  @-o-keyframes #{$animation-name} {
     0% {
-      -o-transform: translateX(#{ $start }
-      );
+      -o-transform: translateX(#{$start});
     }
     100% {
-      -o-transform: translateX(#{ $end }
-      );
+      -o-transform: translateX(#{$end});
     }
   }
-  @keyframes #{
-    $animation-name
-  }
-  {
+  @keyframes #{$animation-name} {
     0% {
-      transform: translateX(#{ $start }
-      );
+      transform: translateX(#{$start});
     }
     100% {
-      transform: translateX(#{ $end }
-      );
+      transform: translateX(#{$end});
     }
   }
 }
 
-@mixin animation($name,$duration,$function) {
-  -moz-animation: #{
-    $name
-  }
-  #{
-    $duration
-  } #{
-  $function};
-  -webkit-animation: #{$name
-  }
-  #{
-    $duration
-  } #{
-  $function
-};
-  animation: #{
-    $name
-  }
-  #{
-    $duration
-  } #{
-  $function
-};
+@mixin animation($name, $duration, $function)
+{
+  -moz-animation: #{$name} #{$duration} #{$function};
+  -webkit-animation: #{$name} #{$duration} #{$function};
+  animation: #{$name} #{$duration} #{$function};
 }
 
-@include keyframes("keyframe-dialog-rtl",
-  "320px",
-  "0px")
+@include keyframes("keyframe-dialog-rtl", "320px", "0px")
 .load-right-to-left {
   @include animation("keyframe-dialog-rtl", "0.5s", "linear");
+
   right: 0px;
   float: right;
 }
 
-@include keyframes("keyframe-dialog-ltr",
-  "-320px",
-  "0px")
+@include keyframes("keyframe-dialog-ltr", "-320px", "0px")
 .load-left-to-right {
   @include animation("keyframe-dialog-ltr", "0.5s", "linear")
 }
 
 .load-right-to-left-slider {
-  @extend .load-right-to-left;
+  @extend  .load-right-to-left;
   @extend .metron-slider-pane-editable;
 }
-
