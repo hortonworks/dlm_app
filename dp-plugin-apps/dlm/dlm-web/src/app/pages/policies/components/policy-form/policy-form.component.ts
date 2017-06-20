@@ -1,4 +1,5 @@
-import { Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter, HostBinding, OnDestroy } from '@angular/core';
+import { Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter,
+  HostBinding, SimpleChanges, OnDestroy, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { go } from '@ngrx/router-store';
@@ -10,7 +11,8 @@ import { Subscription } from 'rxjs/Subscription';
 import { RadioItem } from 'common/radio-button/radio-button';
 import { State } from 'reducers/index';
 import { Pairing } from 'models/pairing.model';
-import { POLICY_TYPES, POLICY_SUBMIT_TYPES } from 'constants/policy.constant';
+import { POLICY_TYPES, POLICY_SUBMIT_TYPES, POLICY_REPEAT_MODES, POLICY_TIME_UNITS, POLICY_DAYS } from 'constants/policy.constant';
+import { getFormValues } from 'selectors/form.selector';
 import { markAllTouched } from 'utils/form-util';
 import { getDatePickerDate } from 'utils/date-util';
 import { TranslateService } from '@ngx-translate/core';
@@ -20,26 +22,35 @@ import { loadFullDatabases } from 'actions/hivelist.action';
 import { getAllDatabases } from 'selectors/hive.selector';
 import { HiveDatabase } from 'models/hive-database.model';
 import { SelectOption } from 'components/forms/select-field';
+import * as moment from 'moment';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 
-// todo: schedule tabs should be filled with form values
 @Component({
   selector: 'dlm-policy-form',
   templateUrl: './policy-form.component.html',
   styleUrls: ['./policy-form.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PolicyFormComponent implements OnInit, OnDestroy {
+export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   @Input() pairings: Pairing[] = [];
+  @Input() sourceClusterId = 0;
   @Output() formSubmit = new EventEmitter<any>();
   @HostBinding('class') className = 'dlm-policy-form';
+  policyRepeatModes = POLICY_REPEAT_MODES;
+  policyTimeUnits = POLICY_TIME_UNITS;
+  policyDays = POLICY_DAYS;
   policySubmitTypes = POLICY_SUBMIT_TYPES;
   policyForm: FormGroup;
   selectedSource$ = new BehaviorSubject('');
   sourceDatabases$: Observable<HiveDatabase[]>;
   databaseSearch$ = new BehaviorSubject<string>('');
   subscriptions: Subscription[] = [];
+  policyFormValues$;
+  databaseListGroup: FormGroup;
+  _pairings$: BehaviorSubject<Pairing[]> = new BehaviorSubject([]);
+  _sourceClusterId$: BehaviorSubject<number> = new BehaviorSubject(0);
   get datePickerOptions(): IMyOptions {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
@@ -58,49 +69,91 @@ export class PolicyFormComponent implements OnInit, OnDestroy {
     general: false,
     database: false,
     directories: false,
-    job: false
+    job: false,
+    advanced: true
   };
   frequencyMap = {
-    hourly: 60 * 60,
-    daily: 24 * 60 * 60,
-    weekly: 7 * 24 * 60 * 60,
-    monthly: 30 * 24 * 60 * 60
+    [this.policyTimeUnits.MINUTES]: 60,
+    [this.policyTimeUnits.HOURS]: 60 * 60,
+    [this.policyTimeUnits.DAYS]: 24 * 60 * 60,
+    [this.policyTimeUnits.WEEKS]: 7 * 24 * 60 * 60
   };
-  scheduleTabs = [
-    { title: 'common.time.hourly', value: this.frequencyMap.hourly },
-    { title: 'common.time.daily', value: this.frequencyMap.daily },
-    { title: 'common.time.weekly', value: this.frequencyMap.weekly },
-    { title: 'common.time.monthly', value: this.frequencyMap.monthly }
-  ];
-  storageTypes = <RadioItem[]>[
+  storageTypes = <RadioItem[]> [
     {
-      label: 'HDFS',
+      label: this.t.instant('common.hdfs'),
       value: POLICY_TYPES.HDFS
     },
     {
-      label: 'HIVE',
+      label: this.t.instant('common.hive'),
       value: POLICY_TYPES.HIVE
     }
   ];
-  jobTypes = <RadioItem[]>[
-    // todo: enable this when API will support
-    // {
-    //   label: 'One Time',
-    //   value: this.policySubmitTypes.SUBMIT
-    // },
+  repeatOptions = <SelectOption[]> [
     {
-      label: 'On Schedule',
-      value: this.policySubmitTypes.SCHEDULE
+      label: this.t.instant('common.frequency.every'),
+      value: this.policyRepeatModes.EVERY
+    }, {
+      label: this.t.instant('common.frequency.never'),
+      value: this.policyRepeatModes.NEVER
     }
   ];
-  selectedJobType: string = this.jobTypes[0].value;
+  units = <SelectOption[]> [
+    {
+      label: this.t.instant('common.time.weeks'),
+      value: this.policyTimeUnits.WEEKS
+    },
+    {
+      label: this.t.instant('common.time.days'),
+      value: this.policyTimeUnits.DAYS
+    },
+    {
+      label: this.t.instant('common.time.hours'),
+      value: this.policyTimeUnits.HOURS
+    },
+    {
+      label: this.t.instant('common.time.minutes'),
+      value: this.policyTimeUnits.MINUTES
+    }
+  ];
+  dayOptions = <RadioItem[]> [
+    {
+      label: 'Mo',
+      value: this.policyDays.MONDAY
+    },
+    {
+      label: 'Tu',
+      value: this.policyDays.TUESDAY
+    },
+    {
+      label: 'We',
+      value: this.policyDays.WEDNESDAY
+    },
+    {
+      label: 'Th',
+      value: this.policyDays.THURSDAY
+    },
+    {
+      label: 'Fr',
+      value: this.policyDays.FRIDAY
+    },
+    {
+      label: 'Sa',
+      value: this.policyDays.SATURDAY
+    },
+    {
+      label: 'Su',
+      value: this.policyDays.SUNDAY
+    }
+  ];
   selectedPolicyType = POLICY_TYPES.HDFS;
+  root = '/';
   hdfsRootPath = '/';
   selectedHdfsPath = '/';
   get defaultTime(): Date {
     const date = new Date();
     date.setHours(0);
     date.setMinutes(0);
+    date.setSeconds(0);
     return date;
   }
 
@@ -110,8 +163,8 @@ export class PolicyFormComponent implements OnInit, OnDestroy {
 
   get destinationClusters() {
     if (this.sourceCluster) {
-      const pairings = this.pairings.filter(pairing => pairing.pair.filter(cluster => cluster.id === this.sourceCluster).length);
-      if (pairings) {
+      const pairings = this.pairings.filter(pairing => pairing.pair.filter(cluster => +cluster.id === +this.sourceCluster).length);
+      if (pairings.length) {
         const clusterEntities = this.getClusterEntities(pairings);
         // Remove source cluster from the entities
         delete clusterEntities[this.sourceCluster];
@@ -128,6 +181,18 @@ export class PolicyFormComponent implements OnInit, OnDestroy {
     }];
   }
 
+  get selectedDay() {
+    return this.policyForm.value.job.day;
+  }
+
+  get repeatOption() {
+    return this.policyForm.value.job.repeatMode;
+  }
+
+  get unit() {
+    return this.policyForm.value.job.unit;
+  }
+
   get sourceCluster() {
     return this.policyForm.value.general.sourceCluster;
   }
@@ -136,23 +201,9 @@ export class PolicyFormComponent implements OnInit, OnDestroy {
     return this.policyForm.value.general.destinationCluster;
   }
 
-  getClusterEntities(pairings) {
-    return pairings.reduce((entities: {[id: number]: {}}, entity: Pairing) => {
-      const getClusters = (pairing) => {
-        return pairing.pair.reduce((clusters: {}, cluster) => {
-          return Object.assign({}, clusters, {
-            [cluster.id]: {
-              label: cluster.name,
-              value: cluster.id
-            }
-          });
-        }, {});
-      };
-      return Object.assign({}, entities, getClusters(entity));
-    }, {});
-  }
-
-  constructor(private formBuilder: FormBuilder, private store: Store<State>, private t: TranslateService) { }
+  constructor(private formBuilder: FormBuilder,
+              private store: Store<State>,
+              private t: TranslateService) { }
 
   ngOnInit() {
     const loadDatabasesSubscription = this.selectedSource$
@@ -176,6 +227,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy {
     this.policyForm = this.formBuilder.group({
       general: this.formBuilder.group({
         name: ['', Validators.required],
+        description: [''],
         type: [this.selectedPolicyType],
         sourceCluster: ['', Validators.required],
         destinationCluster: ['', Validators.required]
@@ -183,38 +235,101 @@ export class PolicyFormComponent implements OnInit, OnDestroy {
       databases: ['', Validators.required],
       directories: ['', Validators.required],
       job: this.formBuilder.group({
+        repeatMode: this.policyRepeatModes.EVERY,
+        frequency: [''],
+        day: this.policyDays.MONDAY,
+        frequencyInSec: 0,
+        unit: this.policyTimeUnits.DAYS,
         schedule: this.policySubmitTypes.SCHEDULE,
-        frequencyInSec: 3600,
         endTime: this.formBuilder.group({
           date: [''],
           time: [this.defaultTime]
-        }, { validator: this.validateTime}),
+        }, { validator: this.validateTime }),
         startTime: this.formBuilder.group({
           date: [''],
           time: [this.defaultTime]
-        }, { validator: this.validateTime})
+        }, { validator: this.validateTime })
+      }),
+      advanced: this.formBuilder.group({
+        queue_name: [''],
+        max_bandwidth: ['']
       })
     });
     this.policyForm.get('databases').disable();
     this.subscriptions.push(loadDatabasesSubscription);
+    this.policyFormValues$ = this.store.select(getFormValues(POLICY_FORM_ID));
+    const policyFormValuesSubscription = Observable.combineLatest(this.policyFormValues$, this._pairings$, this._sourceClusterId$)
+      .subscribe(([policyFormValues, pairings, sourceClusterId]) => {
+      if (policyFormValues && (!sourceClusterId || sourceClusterId === 0)) {
+        this.policyForm.patchValue(policyFormValues);
+        this.selectedHdfsPath = policyFormValues['directories'];
+      } else if (sourceClusterId > 0) {
+        this.policyForm.patchValue({
+          general: {
+            sourceCluster: sourceClusterId
+          }
+        });
+      }
+    });
+    this.policyForm.patchValue({
+      job: {
+        endTime: {
+          time: moment(this.defaultTime).toDate()
+        },
+        startTime: {
+          time: moment(this.defaultTime).toDate()
+        }
+      }
+    });
+    this.subscriptions.push(policyFormValuesSubscription);
   }
 
-  ngOnDestroy() {
-    this.subscriptions.forEach(s => s.unsubscribe());
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['pairings']) {
+      this._pairings$.next(this.pairings);
+    }
+    if (changes['sourceClusterId']) {
+      this._sourceClusterId$.next(this.sourceClusterId);
+    }
+  }
+
+  getClusterEntities(pairings) {
+    return pairings.reduce((entities: {[id: number]: {}}, entity: Pairing) => {
+      const getClusters = (pairing) => {
+        return pairing.pair.reduce((clusters: {}, cluster) => {
+          return Object.assign({}, clusters, {
+            [cluster.id]: {
+              label: cluster.name,
+              value: cluster.id
+            }
+          });
+        }, {});
+      };
+      return Object.assign({}, entities, getClusters(entity));
+    }, {});
   }
 
   handleSubmit({ value }) {
     if (this.policyForm.valid) {
+      if (value.job.repeatMode === this.policyRepeatModes.EVERY) {
+        value.job.frequencyInSec = this.frequencyMap[value.job.unit] * value.job.frequency;
+        // Modify the start date to next day chosen if unit is "weeks"
+        if (value.job.unit === this.policyTimeUnits.WEEKS) {
+          const dayToLook = +value.job.day;
+          const startDate = value.job.startTime.date;
+          // if we haven't yet passed the day of the week:
+          if (moment(startDate).isoWeekday() <= dayToLook) {
+            value.job.startTime.date = moment(startDate).isoWeekday(dayToLook).format('YYYY-MM-DD');
+          } else {
+            // otherwise, get next week's instance of that day
+            value.job.startTime.date = moment(startDate).add(1, 'weeks').isoWeekday(dayToLook).format('YYYY-MM-DD');
+          }
+        }
+      }
+      console.log(value);
       this.formSubmit.emit(value);
     }
     markAllTouched(this.policyForm);
-  }
-
-  handleJobChange(radio: RadioItem) {
-    this.selectedJobType = radio.value;
-    if (radio.value === this.policySubmitTypes.SUBMIT) {
-      this.updateFrequency(0);
-    }
   }
 
   handleSearchChange(value: string) {
@@ -237,10 +352,6 @@ export class PolicyFormComponent implements OnInit, OnDestroy {
     return this.policyForm.value.general.type === POLICY_TYPES.HIVE;
   }
 
-  isScheduled() {
-    return this.selectedJobType === POLICY_SUBMIT_TYPES.SCHEDULE;
-  }
-
   handleDateChange(date: IMyDateModel, dateType: string) {
     this.policyForm.patchValue({ job: {[dateType]: { date: date.formatted }}});
   }
@@ -261,18 +372,18 @@ export class PolicyFormComponent implements OnInit, OnDestroy {
     this.databaseSearch$.next('');
   }
 
-  handleJobTabChange(tab) {
-    this.updateFrequency(tab.value);
+  handleDayChange(radioItem: RadioItem) {
+    const { value } = radioItem;
     this.policyForm.patchValue({
       job: {
-        endTime: { date: '', time: this.defaultTime },
-        startTime: { date: '', time: this.defaultTime }
+        day: value
       }
     });
   }
 
+
   handleSourceClusterChange(sourceCluster: SelectOption) {
-    this.selectedHdfsPath = this.hdfsRootPath;
+    this.selectedHdfsPath = this.root;
     this.policyForm.patchValue({
       general: {
         destinationCluster: ''
@@ -302,7 +413,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy {
       const dateWithTime = this.setTimeForDate(dateFieldValue, timeFieldValue);
       if (dateWithTime.getTime() < Date.now()) {
         // TODO: figure out if it depends on time zone
-        // timeControl.setErrors({ lessThanCurrent: true });
+        timeControl.setErrors({ lessThanCurrent: true });
         return null;
       }
     }
@@ -316,5 +427,13 @@ export class PolicyFormComponent implements OnInit, OnDestroy {
     dateValue.setMinutes(timeValue.getMinutes());
     dateValue.setSeconds(0);
     return dateValue;
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(s => {
+      if (s) {
+        s.unsubscribe();
+      }
+    });
   }
 }
