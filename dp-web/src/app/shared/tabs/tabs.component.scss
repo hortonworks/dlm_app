@@ -6,10 +6,14 @@
     padding: 0px 9px;
     margin: 0px 6px;
     position: relative;
+    line-height: 34px;
+    &:hover {
+      color: $mine-shaft !important;
+    }
   }
 
   .is_active:after {
-    height: 5px;
+    height: 2px;
     width: 100%;
     display: block;
     content: " ";
@@ -36,9 +40,9 @@
   .mdl-navigation {
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
-    border-top: 1px solid #CFD3D7;
-    border-left: 1px solid #CFD3D7;
-    border-right: 1px solid #CFD3D7;
+    border-top: 1px solid $iron;
+    border-left: 1px solid $iron;
+    border-right: 1px solid $iron;
 
     span:last-child {
       border-right: none;

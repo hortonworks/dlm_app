@@ -5,18 +5,21 @@
   bottom: 0;
   color: white;
   position: fixed;
-  color: $submarine;
-  background-color: $tuna;
+  color: $dusty-gray;
+  background-color: $alabaster;
   width: $side-nav-width;
   height: calc(100% - 55px);
   overflow-y: hidden;
+  border-right: 1px solid $mercury;
 }
 
 .nav-tag-panel .tag-search {
-  height:40px;
   padding: 7px 30px 7px 15px;
   font-size: 14px;
-  line-height: 26px;
+  height: 36px;
+  line-height: 19px;
+  border-top: 1px solid $concrete;
+  border-bottom: 1px solid $concrete;
 }
 .nav-tag-panel .tag-search input {
   width: 100%;
@@ -55,15 +58,15 @@
 }
 
 .panelRow.selected{
-  background-color: $bright-gray;
-  color: $fruit-salad;
+  background-color: $white;
+  color: $mine-shaft;
 
   &:before {
-      font-family: FontAwesome;
-      content: '\f0da';
-      color: $fruit-salad;
-      position: absolute;
-      left: 1px;
-      font-size: 16px;
+    font-family: FontAwesome;
+    content: '\f0da';
+    color: $fruit-salad;
+    position: absolute;
+    left: 1px;
+    font-size: 16px;
   }
 }

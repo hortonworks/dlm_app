@@ -1,21 +1,46 @@
+@import "../../../../styles/variables";
+
 .dp-view-pane {
   height: 100%;
+
+  & .mdl-typography--headline {
+    text-transform: uppercase;
+  }
 }
 
 .box {
   display: flex;
   flex-flow: column;
   height: 100%;
+  & .row.header {
+    flex: 0 1 auto;
+  }
+  & .row.content {
+    flex: 1 1 auto;
+  }
+  & .row.footer {
+    flex: 0 1 40px;
+  }
 }
 
-.box .row.header {
-  flex: 0 1 auto;
-}
+.summary-pane-3 ul {
+  background: $white;
 
-.box .row.content {
-  flex: 1 1 auto;
-}
+  & li {
+    padding: 10px 20px;
+    line-height: 1;
 
-.box .row.footer {
-  flex: 0 1 40px;
+    & > div {
+      padding: 0;
+
+      &.title {
+        font-size: 12px;
+        margin-bottom: 5px;
+      }
+      &.value {
+        font-size: 16px;
+      }
+
+    }
+  }
 }

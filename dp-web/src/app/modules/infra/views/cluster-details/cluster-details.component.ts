@@ -55,7 +55,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   fetchClusterDetails(lakeId) {
     this.lakeService.retrieve(lakeId).subscribe((lake: Lake) => {
       this.lake = lake;
-      this.clusterService.list({lakeId: this.lake.id}).subscribe(clusters => {
+      this.clusterService.listByLakeId({lakeId: this.lake.id}).subscribe(clusters => {
         this.clusters = clusters;
         if (this.clusters && this.clusters.length) {
           this.cluster = clusters[0];

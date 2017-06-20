@@ -1,14 +1,16 @@
-import { Component, ViewChild, ElementRef, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, ViewChild, ElementRef, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
-import {HeaderData, Persona} from '../../models/header-data';
+import {PersonaTabs} from '../../models/header-data';
 import {ViewPaneState} from '../../app.component';
+import {CollapsibleNavService} from '../../services/collapsible-nav.service';
 
 @Component({
   selector: 'dp-collapsible-nav',
   templateUrl: './collapsible-nav.component.html',
   styleUrls: ['./collapsible-nav.component.scss']
 })
-export class CollapsibleNavComponent implements OnChanges {
+export class CollapsibleNavComponent implements OnInit {
 
   private _viewPaneState: ViewPaneState;
 
@@ -17,8 +19,7 @@ export class CollapsibleNavComponent implements OnChanges {
   collpasedWidth = '50px';
   activeTabName: string = '';
 
-  @Input() persona: Persona;
-  @Input() headerData: HeaderData;
+  personaTabs: PersonaTabs[];
   @Output() viewPaneStateChange = new EventEmitter<ViewPaneState>();
   @ViewChild('sideNav') sideNav: ElementRef;
 
@@ -31,14 +32,25 @@ export class CollapsibleNavComponent implements OnChanges {
     this._viewPaneState = value;
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes && changes['persona']) {
-      if (this.persona && !this.persona.topNav) {
-        this.activeTabName = this.persona.tabs[0].tabName;
-        // Bad hack since viewPaneState is changed by this comp and header component the change cannot happen in same cycle
-        setTimeout(() => {this.viewPaneStateChange.emit(ViewPaneState.MAXIMISE)}, 1);
+  constructor(private router: Router,
+              private collapsibleNavService: CollapsibleNavService) { }
+
+  navigateToURL(tab: PersonaTabs) {
+    this.activeTabName = tab.tabName;
+    this.router.navigate([tab.URL]);
+  }
+
+  ngOnInit() {
+    this.collapsibleNavService.navChanged$.subscribe(() => {
+      this.personaTabs = this.collapsibleNavService.tabs;
+      this.activeTabName = this.collapsibleNavService.activeTab.tabName;
+    });
+
+    this.collapsibleNavService.collpaseSideNav$.subscribe((minimise: boolean) => {
+      if (this.collpased !== minimise) {
+        this.toggleNav();
       }
-    }
+    });
   }
 
   toggleNav() {

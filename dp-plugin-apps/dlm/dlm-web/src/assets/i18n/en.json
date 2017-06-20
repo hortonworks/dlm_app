@@ -179,6 +179,7 @@
       "tags": "Tags",
       "groups": "Groups",
       "data_summary": "Data Summary",
+      "no_jobs": "No jobs",
       "perform_action": {
         "confirmation": {
           "title": "Confirm",
@@ -273,7 +274,7 @@
     "jobs": {
       "header": "Jobs",
       "header_note": "",
-      "prev_jobs": "prev jobs"
+      "prev_jobs": "Prev Jobs"
     },
     "notifications": {
       "header": "Notifications",

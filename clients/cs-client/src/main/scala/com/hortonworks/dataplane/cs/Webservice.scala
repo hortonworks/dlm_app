@@ -3,7 +3,7 @@ package com.hortonworks.dataplane.cs
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.Ambari.ClusterServiceWithConfigs
 import com.hortonworks.dataplane.commons.domain.Atlas.{AssetProperties, AtlasAttribute, AtlasEntities, AtlasSearchQuery}
-import play.api.libs.json.{JsObject, JsResult, Json}
+import play.api.libs.json.{JsObject, JsResult, Json, JsValue}
 import play.api.libs.ws.WSResponse
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData}
 
@@ -44,6 +44,11 @@ object Webservice {
     def getTypeDefs(clusterId: String, defType: String) : Future[Either[Errors,JsObject]]
 
     def getLineage(clusterId: String, atlasGuid: String, depth: Option[String]): Future[Either[Errors,JsObject]]
+  }
+
+  trait AmbariService extends CSClientService {
+
+    def getAmbariResponse(clusterId: Long, ambariUrl: String): Future[Either[Errors, JsValue]]
   }
 
 }

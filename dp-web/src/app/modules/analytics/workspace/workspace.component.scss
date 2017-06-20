@@ -22,7 +22,7 @@
 }
 
 .actions {
-  display: inline-block;
+  display: flex;
 
   .buttons-bar {
     display: inline;
@@ -49,6 +49,20 @@
     display: inline-block;
   }
 }
+.table-container {
+  i {
+    font-size: 12px;
+  }
+  .mdl-button--icon {
+    height: 14px;
+    width: 14px;
+    min-width: 14px;
+
+    &:hover {
+      background-color: #E5F6FC;
+    }
+  }
+}
 
 .card-container {
   display: flex;
@@ -60,6 +74,7 @@
     max-height: 150px;
     min-height: 150px;
     max-width: 275px;
+    cursor: pointer;
     margin: 0px 10px 10px 0px;
     border: 1px solid #cccccc;
   }
@@ -77,6 +92,23 @@
 
   .mdl-card__actions {
     padding: 0px;
+  }
+
+  .mdl-card__menu {
+    i {
+      display: none;
+      font-size: 12px;
+    }
+
+    &:hover i {
+      display: block;
+      font-size: 12px;
+    }
+
+    .delete:before {
+      font-family: FontAwesome;
+      content: '\f00d';
+    }
   }
 
   .mdl-grid {

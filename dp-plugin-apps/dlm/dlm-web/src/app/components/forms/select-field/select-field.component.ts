@@ -60,7 +60,7 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, Valid
   selectedOption: SelectOption;
   @Input() value: any;
   @Input() options: SelectOption[];
-  @Output() onSelect = new EventEmitter<any>();
+  @Output() onSelect = new EventEmitter<SelectOption>();
   @ContentChild(SelectFieldValueDirective) valueView: SelectFieldValueDirective;
   @ContentChild(SelectFieldOptionDirective) optionView: SelectFieldOptionDirective;
   @HostListener('document:click', ['$event'])
