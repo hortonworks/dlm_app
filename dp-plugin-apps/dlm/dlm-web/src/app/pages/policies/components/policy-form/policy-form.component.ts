@@ -313,6 +313,18 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     if (this.policyForm.valid) {
       if (value.job.repeatMode === this.policyRepeatModes.EVERY) {
         value.job.frequencyInSec = this.frequencyMap[value.job.unit] * value.job.frequency;
+        // Modify the start date to next day chosen if unit is "weeks"
+        if (value.job.unit === this.policyTimeUnits.WEEKS) {
+          const dayToLook = +value.job.day;
+          const startDate = value.job.startTime.date;
+          // if we haven't yet passed the day of the week:
+          if (moment(startDate).isoWeekday() <= dayToLook) {
+            value.job.startTime.date = moment(startDate).isoWeekday(dayToLook).format('YYYY-MM-DD');
+          } else {
+            // otherwise, get next week's instance of that day
+            value.job.startTime.date = moment(startDate).add(1, 'weeks').isoWeekday(dayToLook).format('YYYY-MM-DD');
+          }
+        }
       }
       console.log(value);
       this.formSubmit.emit(value);
@@ -401,7 +413,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       const dateWithTime = this.setTimeForDate(dateFieldValue, timeFieldValue);
       if (dateWithTime.getTime() < Date.now()) {
         // TODO: figure out if it depends on time zone
-        // timeControl.setErrors({ lessThanCurrent: true });
+        timeControl.setErrors({ lessThanCurrent: true });
         return null;
       }
     }

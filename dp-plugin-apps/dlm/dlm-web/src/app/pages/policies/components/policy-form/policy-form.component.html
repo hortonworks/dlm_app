@@ -163,11 +163,9 @@
                     </div>
                     <div class="new-row">
                       <dlm-form-field fieldClass="col-md-12" errorClass="col-md-12">
-                        <dlm-form-field
-                          [label]="'page.policies.form.fields.start_time' | translate">
-                          <timepicker formField formControlName="time" [showMeridian]="false" [showSpinners]="false"></timepicker>
-                        </dlm-form-field>
-                        <dlm-field-error *ngIf="policyForm.controls.job.controls.startTime.controls.time.hasError('lessThanCurrent')">
+                        <label>{{'page.policies.form.fields.start_time' | translate}}</label>
+                        <timepicker formField formControlName="time" [showMeridian]="false" [showSpinners]="false"></timepicker>
+                        <dlm-field-error *ngIf="policyForm.get('job').get('startTime').get('time').hasError('lessThanCurrent')">
                           {{'forms.validation_errors.time_less_than_current' | translate}}
                         </dlm-field-error>
                       </dlm-form-field>

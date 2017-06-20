@@ -8,15 +8,15 @@
   "angular-cli": {},
   "scripts": {
     "start": "ng serve",
-    "dev": "ng serve --host 0.0.0.0 --proxy-config proxy.conf.json",
-    "prod": "ng serve --target=production --host 0.0.0.0 --proxy-config proxy.conf.json",
+    "dev": "ng serve --host 0.0.0.0 --proxy-config proxy.conf.dev.json",
+    "prod": "ng serve --target=production --host 0.0.0.0 --proxy-config proxy.conf.prod.json",
     "build": "ng build --target=production --base-href \"/dlm/\"",
     "lint": "tslint \"src/**/*.ts\"",
     "test": "ng test",
     "pree2e": "webdriver-manager update",
     "e2e": "protractor",
     "e2edebug": "protractor debug protractor.conf.js --elementExplorer",
-    "dev:hmr": "ng serve --hmr -e=dev-hmr --host 0.0.0.0 --proxy-config proxy.conf.json"
+    "dev:hmr": "ng serve --hmr -e=dev-hmr --host 0.0.0.0 --proxy-config proxy.conf.dev.json"
   },
   "private": true,
   "dependencies": {
