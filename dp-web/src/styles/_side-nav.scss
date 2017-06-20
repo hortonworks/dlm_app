@@ -9,26 +9,26 @@
   line-height: $header-height;
   background: $logo-background;
   border: 1px solid $logo-background;
+  white-space: nowrap;
+  padding-left: 20px;
 
-  i {
-    padding: 10px 10px 10px 25px;
-    font-size: 16px;
+  & > img {
+    width: 30px;
+    float: left;
+    margin-top: 10px;
     cursor: pointer;
   }
 
-  img {
-    height: 30px;
+  & > span {
+    color: $white;
+    font-size: 20px;
+    padding-left: 10px;
   }
 
   &.minimised {
     width: 50px;
     transition: 0.5s;
-    i {
-      display: none;
-    }
-    img {
-      transform: scale(.5) translate(-30px,0)
-    }
+    padding-left: 10px;
   }
 }
 
@@ -57,9 +57,11 @@
   transition: 0.3s;
   color: $submarine;
   cursor: pointer;
+  white-space: nowrap;
 }
 
-.sidenav .sidenav-item:hover, .sidenav .sidenav-item.active {
+.sidenav .sidenav-item:hover,
+.sidenav .sidenav-item.active {
   color: $white;
   background: $bright-gray;
 }
@@ -71,5 +73,45 @@
     color: $fruit-salad;
     margin-left: -25px;
     position: absolute;
+  }
+}
+
+.suit-navigation {
+  position: absolute;
+  top: 55px;
+  left: 0;
+  margin: 0;
+  padding: 40px 40px 20px;
+  background: $white;
+  -webkit-box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
+  -moz-box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
+  box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
+  z-index: 100;
+  visibility: hidden;
+  width: 400px;
+  display: flex;
+  justify-content: space-between;
+  & > li {
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+
+    & .logo-wrapper {
+      background-color: $eastern-blue;
+      padding: 15px;
+      border-radius: 4px;
+      display: inline-block;
+      height: 72px;
+      & + div {
+        text-align: center;
+        font-size: 14px;
+        padding-top: 5px;
+        text-overflow: ellipsis;
+        width: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+    }
   }
 }
