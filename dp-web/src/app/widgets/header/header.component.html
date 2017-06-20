@@ -1,7 +1,7 @@
 <div class="navbar mdl-grid mdl-grid--no-spacing">
     <div class="mdl-cell--10-col">
         <div class="dp-header-logo borderBox" [ngClass]="{'minimised': viewPaneState === viewPaneStates.MINIMISE}">
-          <img [attr.src]="'../../../assets/images/' + activePersonaImageName" alt="Hortonworks Dataplane" (click)="openNav()"/>
+          <img *ngIf="activePersonaImageName" [attr.src]="'../../../assets/images/' + activePersonaImageName" alt="Hortonworks Dataplane" (click)="openNav()"/>
           <span>{{ activePersonaName }}</span>
         </div>
 

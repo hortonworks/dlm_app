@@ -16,8 +16,8 @@ export class HeaderComponent implements OnInit {
   sideNavWidth = '200px';
   activeTabName: string;
   activePersona: Persona;
-  activePersonaName: string;
-  activePersonaImageName: string;
+  activePersonaName: string = 'Infra Admin'
+  activePersonaImageName: string = 'infra-logo.png';
   sideNavOpen = false;
   crumbNames: string[] = [];
   viewPaneStates = ViewPaneState;
