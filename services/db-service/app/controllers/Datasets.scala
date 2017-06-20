@@ -32,6 +32,17 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
 
   }
 
+  def create = Action.async(parse.json) { request =>
+    request.body
+      .validate[DatasetAndCategoryIds]
+      .map { cl =>
+        val created = datasetRepo.insertWithCategories(cl)
+        created.map(c => success(linkData(c, makeLink(c.dataset))))
+          .recoverWith(apiError)
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
+
   def allRichDataset = Action.async { req =>
     datasetRepo.getRichDataset(req.getQueryString("search"), getPaginatedQuery(req))
       .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
