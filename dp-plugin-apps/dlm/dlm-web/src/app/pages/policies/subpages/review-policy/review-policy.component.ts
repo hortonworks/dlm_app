@@ -24,6 +24,7 @@ import { ProgressState } from 'models/progress-state.model';
 import { getProgressState } from 'selectors/progress.selector';
 import { POLICY_FORM_ID } from '../../components/policy-form/policy-form.component';
 import { getCluster } from 'selectors/cluster.selector';
+import { TimeZoneService } from 'services/time-zone.service';
 
 const CREATE_POLICY_REQUEST = 'CREATE_POLICY';
 
@@ -53,7 +54,12 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
 
   private policyFormValue: any;
 
-  constructor(private store: Store<State>, private t: TranslateService, private frequencyPipe: FrequencyPipe) {
+  constructor(
+    private store: Store<State>,
+    private t: TranslateService,
+    private frequencyPipe: FrequencyPipe,
+    private timeZone: TimeZoneService
+  ) {
     this.policyForm$ = store.select(getFormValues(POLICY_FORM_ID));
     this.sourceCluster$ = this.policyForm$.switchMap(policyForm => store.select(getCluster(policyForm.general.sourceCluster)));
     this.destinationCluster$ = this.policyForm$.switchMap(policyForm => store.select(getCluster(policyForm.general.destinationCluster)));
@@ -117,7 +123,12 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     if (!timeField.date) {
       return null;
     }
-    return `${timeField.date}T${moment(timeField.time).format('HH:mm:ss')}`;
+    const dateTime = moment(timeField.date);
+    const time = new Date(timeField.time);
+    dateTime.hours(time.getHours());
+    dateTime.minutes(time.getMinutes());
+    dateTime.seconds(time.getSeconds());
+    return dateTime.tz(this.timeZone.defaultServerTimezone).format();
   }
 
   formatDateDisplay(timeField) {

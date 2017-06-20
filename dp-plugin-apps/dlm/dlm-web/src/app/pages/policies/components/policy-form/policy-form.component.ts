@@ -22,6 +22,7 @@ import { loadFullDatabases } from 'actions/hivelist.action';
 import { getAllDatabases } from 'selectors/hive.selector';
 import { HiveDatabase } from 'models/hive-database.model';
 import { SelectOption } from 'components/forms/select-field';
+import { TimeZoneService } from 'services/time-zone.service';
 import * as moment from 'moment';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
@@ -149,12 +150,13 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   root = '/';
   hdfsRootPath = '/';
   selectedHdfsPath = '/';
+  userTimeZone$: BehaviorSubject<any>;
   get defaultTime(): Date {
-    const date = new Date();
-    date.setHours(0);
-    date.setMinutes(0);
-    date.setSeconds(0);
-    return date;
+    const date = moment();
+    date.hours(0);
+    date.minutes(0);
+    date.seconds(0);
+    return date.toDate();
   }
 
   get sourceClusters() {
@@ -202,10 +204,12 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   constructor(private formBuilder: FormBuilder,
+              private timezone: TimeZoneService,
               private store: Store<State>,
               private t: TranslateService) { }
 
   ngOnInit() {
+    this.userTimeZone$ = this.timezone.userTimezoneIndex$;
     const loadDatabasesSubscription = this.selectedSource$
       .filter(sourceCluster => !!sourceCluster)
       .subscribe(sourceCluster => {
@@ -326,7 +330,6 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
           }
         }
       }
-      console.log(value);
       this.formSubmit.emit(value);
     }
     markAllTouched(this.policyForm);
@@ -402,6 +405,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   validateTime = (formGroup: FormGroup) => {
+    const momentTz = this.timezone.getMomentTzByIndex(this.userTimeZone$.getValue());
     if (!(formGroup && formGroup.controls)) {
       return null;
     }
@@ -411,8 +415,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     timeControl.setErrors(null);
     if (dateFieldValue) {
       const dateWithTime = this.setTimeForDate(dateFieldValue, timeFieldValue);
-      if (dateWithTime.getTime() < Date.now()) {
-        // TODO: figure out if it depends on time zone
+      if (dateWithTime.isBefore(moment())) {
         timeControl.setErrors({ lessThanCurrent: true });
         return null;
       }
@@ -420,12 +423,12 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     return null;
   }
 
-  private setTimeForDate(date: string, time: string): Date {
-    const dateValue = new Date(date);
+  private setTimeForDate(date: string, time: string) {
+    const dateValue = moment(date);
     const timeValue = new Date(time);
-    dateValue.setHours(timeValue.getHours());
-    dateValue.setMinutes(timeValue.getMinutes());
-    dateValue.setSeconds(0);
+    dateValue.hours(timeValue.getHours());
+    dateValue.minutes(timeValue.getMinutes());
+    dateValue.seconds(0);
     return dateValue;
   }
 
