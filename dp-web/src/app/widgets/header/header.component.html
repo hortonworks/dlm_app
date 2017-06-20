@@ -1,12 +1,12 @@
 <div class="navbar mdl-grid mdl-grid--no-spacing">
     <div class="mdl-cell--10-col">
         <div class="dp-header-logo borderBox" [ngClass]="{'minimised': viewPaneState === viewPaneStates.MINIMISE}">
-            <i #sideNavIcon class="fa fa-bars" aria-hidden="true" (click)="openNav()"></i>
-            <img src="../../../assets/images/hw.logo.png">
+          <img [attr.src]="'../../../assets/images/' + activePersonaName" alt="Hortonworks Dataplane" (click)="openNav()"/>
+          <span>{{ activePersonaName }}</span>
         </div>
 
         <div class="mdl-navigation breadcrumb">
-          <span class="mdl-navigation__link home">Data Plane</span>
+          <span class="mdl-navigation__link home">Dataplane</span>
           <!--<span class="mdl-navigation__link" *ngFor="let crumbName of crumbNames"> {{ crumbName }} </span>-->
         </div>
 
@@ -26,13 +26,12 @@
     </div>
 </div>
 
-<div #sidenav class="sidenav" style="z-index: 3;">
-    <div class="dp-header-logo">
-        <img src="../../../assets/images/hw.logo.png">
-    </div>
 
-  <span class="sidenav-item" [ngClass]="{'active': activePersonaName === persona.name}"
-        *ngFor="let persona of headerData.personas; let i = index" (click)="navigateToPersona(persona, layout)">
-    <span class="sidenav-item-name">  {{ persona.name }} </span>
-  </span>
-</div>
+<ul #sidenav class="suit-navigation">
+  <li *ngFor="let persona of headerData.personas; let i = index" (click)="navigateToPersona(persona, layout)">
+    <div class="logo-wrapper borderBox" title="{{ persona.name }}">
+      <img [attr.src]="'../../../assets/images/' + persona.imageName" alt=""/>
+    </div>
+    <div>{{ persona.name }}</div>
+  </li>
+</ul>

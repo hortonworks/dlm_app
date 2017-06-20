@@ -53,17 +53,17 @@ export class AppComponent implements OnInit {
         new PersonaTabs('Unclassified', 'unclassified', 'fa-cube'),
         new PersonaTabs('Assets', 'assets', 'fa-server'),
         new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')
-      ]),
+      ], '', 'steward-logo.png'),
       new Persona('Infra Admin', [
         new PersonaTabs('Clusters', 'infra', 'fa-sitemap')
-      ]),
+      ], '', 'infra-logo.png'),
       new Persona('Analytics', [
         new PersonaTabs('Workspace', 'workspace', 'fa-globe'),
         new PersonaTabs('Assets', 'analytics/assets', 'fa-list-alt'),
         new PersonaTabs('Clusters', '', 'fa-database'),
         new PersonaTabs('Jobs', '', 'fa-briefcase')
-      ]),
-      new Persona('Data Life cycle Manager', [], '/dlm')
+      ], '', 'analytics-logo.png'),
+      new Persona('Data Life cycle Manager', [], '/dlm', 'dlm-logo.png')
     ]
   }
 }
