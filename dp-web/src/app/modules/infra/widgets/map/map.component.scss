@@ -10,8 +10,10 @@
 }
 
 :host /deep/ .leaflet-control {
-    a {
-        color: $white;
-        text-decoration: none;
-    }
+  padding: 0 20px;
+  text-align: right;
+  a {
+      color: #8fbfeb;
+      text-decoration: none;
+  }
 }

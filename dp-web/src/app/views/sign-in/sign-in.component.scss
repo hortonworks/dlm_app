@@ -71,6 +71,12 @@
 
   .group-title {
     margin-bottom: 15px;
+    & span {
+      margin-right: 20px;
+    }
+    & span + a {
+      margin-left: 20px;
+    }
   }
 
   .field-group {

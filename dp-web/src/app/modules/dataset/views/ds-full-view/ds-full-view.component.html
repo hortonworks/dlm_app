@@ -1,13 +1,13 @@
 <div *ngIf="!dsModel">Loading ... </div>
 <div *ngIf="dsModel" class="dsFullView borderBox">
   <div class="div50Percent">
-    <div class="dsTitle">
+    <div class="dsTitle hwx-title">
       <span>{{dsModel.name}}</span>
       <i *ngIf="dsModel.favourite" class="fa fa-star"></i>
     </div>
     <div class="metaInfo">
-      <div><div class="label">DATALAKE:</div><b>{{dsModel.datalakeName}}</b></div>
-      <div><div class="label">CREATOR:</div><b>{{dsModel.creatorName}}</b></div>
+      <div><span class="label">Datalake:</span><span>{{dsModel.datalakeName}}</span></div>
+      <div><span class="label">Creator:</span><span>{{dsModel.creatorName}}</span></div>
     </div>
   </div>
   <div class="div50Percent">
