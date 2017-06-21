@@ -177,7 +177,7 @@ CREATE TABLE IF NOT EXISTS dataplane.data_asset (
   id               BIGSERIAL PRIMARY KEY,
   asset_type       VARCHAR(100) NOT NULL,
   asset_name       TEXT        NOT NULL,
-  guid             VARCHAR(100) NOT NULL,
+  guid             VARCHAR(100) UNIQUE NOT NULL,
   asset_properties JSONB       NOT NULL,
   dataset_id       BIGINT REFERENCES dataplane.datasets (id) DEFAULT NULL,
   cluster_id       BIGINT REFERENCES dataplane.discovered_clusters (id) NOT NULL
