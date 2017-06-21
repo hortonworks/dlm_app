@@ -166,6 +166,8 @@ GET           /dataassets/:datasetId                                         con
 POST          /dataassets                                                    controllers.DataAssets.add
 DELETE        /dataassets/:id                                                controllers.DataAssets.delete(id:Long)
 
+POST          /query-managed-assets                                          controllers.DataAssets.findManagedAssets(clusterId: Long)
+
 
 #Config
 GET           /configurations/:key                                           controllers.Configs.get(key)
