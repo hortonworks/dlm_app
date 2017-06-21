@@ -49,6 +49,7 @@ export class DsAssetsHolder implements OnInit {
 
   actionRemoveAll() {
     this.assetSetQueryModelsForAddition.splice(0);
+    this.dsModel.counts=null;
     this.setShowListFlag();
     this.actionEmitter.emit();
   }
