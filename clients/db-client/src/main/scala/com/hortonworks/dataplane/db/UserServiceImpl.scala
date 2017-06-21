@@ -68,7 +68,7 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
   override def getUserRoles(userName: String): Future[Either[Errors, UserRoles]] = {
-    ws.url(s"$url/user-role/user/$userName")
+    ws.url(s"$url/users/role/$userName")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map { res =>
@@ -93,7 +93,7 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
 
   override def addUserRole(
       userRole: UserRole): Future[Either[Errors, UserRole]] = {
-    ws.url(s"$url/user-roles")
+    ws.url(s"$url/users/role")
       .withHeaders("Accept" -> "application/json")
       .post(Json.toJson(userRole))
       .map(mapToUserRole(_))

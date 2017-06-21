@@ -34,7 +34,7 @@ class PermissionsRepo @Inject()(
     val query = for {
       users <- userRepo.Users if users.username === username
       roles <- roleRepo.Roles
-      userRoles <- roleRepo.UserRoles  if roles.id === userRoles.roleId if users.id === userRoles.userId
+      userRoles <- userRepo.UserRoles  if roles.id === userRoles.roleId if users.id === userRoles.userId
       permissions <- Permissions if roles.id === permissions.roleId
     } yield (roles.roleName, permissions.permission)
 

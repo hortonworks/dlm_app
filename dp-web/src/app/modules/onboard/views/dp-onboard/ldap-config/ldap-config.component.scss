@@ -1,0 +1,30 @@
+@import "../../../../../../styles/variables";
+.dp-input {
+  margin: 15px 0px;
+  label {
+    display: block;
+  }
+  input[type="text"], input[type="password"] {
+    display: block;
+    height: 20px;
+    padding: 6px 10px;
+    width: 440px;
+    border-radius: 2px;
+    font-size: 13px;
+  }
+}
+
+.notification-bar {
+  padding: 5px 5px;
+  margin: 10px 10px 10px 25px;
+  border: 1px solid $burnt-cienna-red;
+ // background-color: $melon-red;
+}
+
+.margin-right-10 {
+  margin-right: 10px;
+}
+
+.red {
+  color: $roman-red;
+}

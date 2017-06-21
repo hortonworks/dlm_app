@@ -30,6 +30,7 @@ import {DatasetTagService} from "./services/tag.service";
 import {HeaderModule} from './widgets/header/header.module';
 import {CollapsibleNavModule} from './shared/collapsible-nav/collapsible-nav.modue';
 import {SidebarComponent} from './widgets/sidebar/sidebar.component';
+import {UserService} from './services/user.service';
 import {CollapsibleNavService} from './services/collapsible-nav.service';
 import {AssetService} from './services/asset.service';
 
@@ -61,6 +62,7 @@ export function HttpLoaderFactory(http: Http) {
     SidebarComponent,
 
     MdlDirective
+
   ],
   bootstrap: [AppComponent],
   providers: [
@@ -74,6 +76,7 @@ export function HttpLoaderFactory(http: Http) {
     IdentityService,
     ConfigurationService,
     AssetService,
+    UserService,
     CollapsibleNavService,
 
     MdlService,

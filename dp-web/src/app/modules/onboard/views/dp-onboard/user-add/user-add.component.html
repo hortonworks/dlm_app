@@ -1,0 +1,29 @@
+<div class="notification-bar line-height-1-5" *ngIf="showNotification">
+  <i class="fa fa-check-circle green margin-right-10 text-medium"></i>
+  <span class="text-medium green">LDAP ADDED SUCCESSFULLY!!!</span>
+  <i class="fa fa-remove pull-right margin-all-3 pointer" (click)="closeNotification()"></i>
+</div>
+<div class="container line-height-1-5">
+  <div class="text-medium">
+    <i class="fa fa-user green text-large pull-left"></i>
+    <div>
+      <div class="text-uppercase text-xsmall">{{("common.step" | translate).toUpperCase()}} 2</div>
+      <div class="">{{"pages.onboard.labels.defineUsers" | translate}}</div>
+    </div>
+  </div>
+  <div class="margin-top-bottom-20">
+    {{"pages.onboard.description.defineUsers" | translate}}
+  </div>
+  <div class="dp-input">
+    <label class="text-medium">{{"pages.onboard.adduser.labels.users" | translate}}</label>
+    <tagging-widget id="tags" [tags]="tags" [clearOnSearch]="true"
+    [availableTags]="availableUsers"
+    [clearOnSearch]="true"
+    (textChange)="onTagSearchChange($event)"
+    (onNewSearch)="onNewUserAddition($event)"></tagging-widget>
+  </div>
+  <div class="margin-top-30">
+    <button class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"pages.onboard.adduser.labels.saveAndLogin" | translate}}</button>
+    <button class="mdl-button btn-hwx-secondary" (click)="back()">{{"common.back" | translate}}</button>
+  </div>
+</div>
