@@ -52,15 +52,4 @@ class DataAssets @Inject()(dataAssetRepo: DataAssetRepo)(implicit exec: Executio
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def findManagedAssets(clusterId: Long) = Action.async(parse.json) { request =>
-    request.body
-        .validate[Seq[String]]
-        .map { assets =>
-            dataAssetRepo.queryManagedAssets(assets)
-                .map(result => success(Json.toJson(result)))
-                .recoverWith(apiError)
-        }
-        .getOrElse(Future.successful(BadRequest))
-  }
-
 }

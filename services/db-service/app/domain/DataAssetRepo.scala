@@ -4,7 +4,7 @@ import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Entities.DataAsset
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsObject, JsValue, Json}
 
 import scala.concurrent.Future
 

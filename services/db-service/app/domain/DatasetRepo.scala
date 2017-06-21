@@ -5,7 +5,7 @@ import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Entities._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsValue, Json}
 import slick.lifted.ColumnOrdered
 
 import scala.concurrent.Future
@@ -239,6 +239,17 @@ class DatasetRepo @Inject()(
             CategoryCount(name, count)
         }.sortBy(_.name)
     }
+  }
+
+
+
+  def queryManagedAssets(clusterId: Long, assets: Seq[String]) = {
+    val query = for {
+      (dataAsset, dataset) <- dataAssetRepo.DatasetAssets.filter(record => record.guid.inSet(assets) && record.clusterId === clusterId) join Datasets on(_.datasetId === _.id)
+    } yield (dataAsset.guid, dataset.name)
+
+    db.run(query)
+
   }
 
 
