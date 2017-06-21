@@ -14,6 +14,7 @@ import { SessionStorageService } from './services/session-storage.service';
 import { TimeZoneService } from './services/time-zone.service';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
+import * as moment from 'moment';
 
 @Component({
   selector: 'dlm',
@@ -43,10 +44,6 @@ export class DlmComponent implements OnDestroy {
               private timeZoneService: TimeZoneService,
               private router: Router,
               private route: ActivatedRoute) {
-    t.setTranslation('en', require('../assets/i18n/en.json'));
-    t.setDefaultLang('en');
-    t.use('en');
-
     this.user.timezone = timeZoneService.setupUserTimeZone();
 
     this.header = new MenuItem(
