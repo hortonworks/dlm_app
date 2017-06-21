@@ -65,7 +65,7 @@ const clusters = [
   <Cluster>{}
 ];
 
-const jobLabels = [JOB_STATUS.SUCCESS, JOB_STATUS.RUNNING, JOB_STATUS.WARNINGS, JOB_STATUS.FAILED];
+const jobLabels = [JOB_STATUS.SUCCESS, JOB_STATUS.WARNINGS, JOB_STATUS.FAILED, JOB_STATUS.RUNNING];
 const policyLabels = [POLICY_STATUS.RUNNING, POLICY_STATUS.SUBMITTED, POLICY_STATUS.SUSPENDED];
 const clusterLabels = ['Registered'];
 
@@ -206,7 +206,7 @@ describe('OverviewComponent UT', () => {
     it('should group jobs', () => {
       const expectedResult = {
         labels: jobLabels,
-        data: [1, 2, 3, 4]
+        data: [1, 3, 4, 2]
       };
       expect(component.makeResourceData('jobs', jobs)).toEqual(expectedResult);
     });
@@ -233,7 +233,7 @@ describe('OverviewComponent UT', () => {
           labels: policyLabels
         },
         jobs: {
-          data: [1, 2, 3, 4],
+          data: [1, 3, 4, 2],
           labels: jobLabels
         }
       };
@@ -282,10 +282,38 @@ describe('OverviewComponent UT', () => {
     ];
 
     const policiesData = [
-      <Policy>{name: 'p1', sourceCluster: 'c1', targetCluster: 'c2', lastJobResource: jobsData[0], status: POLICY_STATUS.RUNNING},
-      <Policy>{name: 'p2', sourceCluster: 'c2', targetCluster: 'c1', lastJobResource: jobsData[1], status: POLICY_STATUS.SUBMITTED},
-      <Policy>{name: 'p3', sourceCluster: 'c1', targetCluster: 'c2', lastJobResource: jobsData[2], status: POLICY_STATUS.SUSPENDED},
-      <Policy>{name: 'p4', sourceCluster: 'c2', targetCluster: 'c1', lastJobResource: jobsData[3], status: POLICY_STATUS.SUSPENDED}
+      <Policy>{
+        name: 'p1',
+        sourceCluster: 'c1',
+        targetCluster: 'c2',
+        lastJobResource: jobsData[0],
+        status: POLICY_STATUS.RUNNING,
+        jobsResource: [{}]
+      },
+      <Policy>{
+        name: 'p2',
+        sourceCluster: 'c2',
+        targetCluster: 'c1',
+        lastJobResource: jobsData[1],
+        status: POLICY_STATUS.SUBMITTED,
+        jobsResource: [{}]
+      },
+      <Policy>{
+        name: 'p3',
+        sourceCluster: 'c1',
+        targetCluster: 'c2',
+        lastJobResource: jobsData[2],
+        status: POLICY_STATUS.SUSPENDED,
+        jobsResource: [{}]
+      },
+      <Policy>{
+        name: 'p4',
+        sourceCluster: 'c2',
+        targetCluster: 'c1',
+        lastJobResource: jobsData[3],
+        status: POLICY_STATUS.SUSPENDED,
+        jobsResource: [{}]
+      }
     ];
 
     [

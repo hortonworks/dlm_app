@@ -12,6 +12,8 @@ import { OperationResponse } from 'models/operation-response.model';
 import { deletePolicy, resumePolicy, suspendPolicy } from 'actions/policy.action';
 import { abortJob } from 'actions/job.action';
 import { StatusColumnComponent } from 'components/table-columns/status-column/status-column.component';
+import { Policy } from '../../../models/policy.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'dlm-jobs-overview-table',
@@ -33,7 +35,7 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;
   @ViewChild('prevJobs') prevJobsRef: TemplateRef<any>;
 
-  constructor(private t: TranslateService, protected store: Store<fromRoot.State>) {
+  constructor(private t: TranslateService, protected store: Store<fromRoot.State>, private router: Router) {
     super(store);
   }
 
@@ -93,7 +95,7 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
-      {name: 'Actions', cellTemplate: this.actionsCellRef, maxWidth: 55, sortable: false}
+      {name: ' ', cellTemplate: this.actionsCellRef, maxWidth: 55, sortable: false}
     ];
   }
 
@@ -144,6 +146,10 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
 
   onCloseOperationResponseModal() {
     this.showOperationResponseModal = false;
+  }
+
+  gotToPolicy(policy: Policy) {
+    this.router.navigate(['/policies'], {queryParams: {policy: policy.id}});
   }
 
 }
