@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {UserService} from '../../../../../services/user.service';
 import {LDAPUser} from '../../../../../models/ldap-user';
+import {TagTheme} from '../../../../../shared/tagging-widget/tagging-widget.component';
 
 @Component({
   selector: 'dp-user-add',
@@ -13,6 +14,7 @@ export class UserAddComponent implements OnInit {
   showNotification = false;
   tags: string[] = [];
   availableUsers: string[] = [];
+  tagThemes = TagTheme
 
   constructor(private route: ActivatedRoute, private router: Router, private userService: UserService) {
   }

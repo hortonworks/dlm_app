@@ -11,7 +11,7 @@
     <i class="fa fa-lock green text-large pull-left"></i>
     <div>
       <div class="text-uppercase text-xsmall">{{("common.step" | translate).toUpperCase()}} 1</div>
-      <div class="">{{"pages.onboard.description.setupAuth" | translate}}</div>
+      <div class="">{{"pages.onboard.labels.setupAuth" | translate}}</div>
     </div>
   </div>
   <div class="margin-top-bottom-20">
@@ -31,15 +31,15 @@
     <div class="section margin-top-bottom-20 text-bold text-medium">{{"pages.onboard.configure.labels.ldapConfiguration" | translate}}</div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.url" | translate}}</label>
-      <input name="ldap-url" type="text" [(ngModel)]="ldapProperties.ldapUrl" placeholder="e.g. ldap://localhost:33389"/>
+      <input required name="ldap-url" type="text" [(ngModel)]="ldapProperties.ldapUrl" placeholder="e.g. ldap://localhost:33389"/>
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.userDNTemplate" | translate}}</label>
-      <input name="user-dn-template" type="text" [(ngModel)]="ldapProperties.userDnTemplate" placeholder="e.g. ou=people,dc=hadoop,dc=apache,dc=org"/>
+      <input required name="user-dn-template" type="text" [(ngModel)]="ldapProperties.userDnTemplate" placeholder="e.g. ou=people,dc=hadoop,dc=apache,dc=org"/>
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.userSearchBase" | translate}}</label>
-      <input name="user-search-base" type="text" [(ngModel)]="ldapProperties.userSearchBase" placeholder="e.g. ou=people,dc=hadoop,dc=apache,dc=org"/>
+      <input required name="user-search-base" type="text" [(ngModel)]="ldapProperties.userSearchBase" placeholder="e.g. ou=people,dc=hadoop,dc=apache,dc=org"/>
     </div>
     <!--<div class="dp-input">-->
       <!--<label>Group search base</label>-->
@@ -47,12 +47,12 @@
     <!--</div>-->
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.adminBindDN" | translate}}</label>
-      <input name="admin-bind-dn" type="text" [(ngModel)]="ldapProperties.bindDn" placeholder="e.g. uid=admin,ou=people,dc=hadoop,dc=apache,dc=org"/>
+      <input required name="admin-bind-dn" type="text" [(ngModel)]="ldapProperties.bindDn" placeholder="e.g. uid=admin,ou=people,dc=hadoop,dc=apache,dc=org"/>
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.adminPassword" | translate}}</label>
-      <input name="admin-password" *ngIf="!showLdapPassword" [(ngModel)]="ldapProperties.password" type="password" placeholder="Administrator Password"/>
-      <input name="admin-password-plain" *ngIf="showLdapPassword" [(ngModel)]="ldapProperties.password" type="text" placeholder="Administrator Password"/>
+      <input required name="admin-password" *ngIf="!showLdapPassword" [(ngModel)]="ldapProperties.password" type="password" placeholder="Administrator Password"/>
+      <input required name="admin-password-plain" *ngIf="showLdapPassword" [(ngModel)]="ldapProperties.password" type="text" placeholder="Administrator Password"/>
       <div class="margin-top-bottom-3">
         <input name="admin-password-toggle" type="checkbox" [(ngModel)]="showLdapPassword"/><span>{{"pages.onboard.configure.labels.showPassword" | translate}}</span>
       </div>
