@@ -24,9 +24,18 @@ export class HttpUtil {
 
     let errMsg = (error.message) ? error.message :
       error.status ? `${error.status} - ${error.statusText}` : 'Server error';
-    console.error(errMsg); // log to console instead
+      console.error(errMsg); // log to console instead
+    let message;
     if (error._body) {
-      Alerts.showErrorMessage(JSON.parse(error._body).message? JSON.parse(error._body).message: 'Error Occurred');
+      let errorJSON = JSON.parse(error._body);
+      if(Array.isArray(errorJSON)){
+        message = errorJSON.map(err => {return err.message}).join(', ')
+      }else if(errorJSON.message){
+        message = errorJSON.message
+      }else {
+        message = 'Error Occured while processing';
+      }
+      Alerts.showErrorMessage(message);
     }
     return Observable.throw(error);
   }

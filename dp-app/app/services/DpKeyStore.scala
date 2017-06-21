@@ -55,17 +55,18 @@ class DpKeyStore @Inject()(configuration: Configuration) {
   def createCredentialEntry(name: String,
                             credential: String): Either[Errors, Boolean] = {
     if (getJckesKeyStore.containsAlias(name)) {
-      Left(Errors(Seq(Error("Exception", "Keystore already has this key"))))
-    } else {
-      val secretKeySpec: SecretKeySpec =
-        new SecretKeySpec(new String(credential).getBytes("UTF-8"), "AES")
-      getJckesKeyStore.setKeyEntry(name,
-                                   secretKeySpec,
-                                   keyStorePass.toCharArray,
-                                   null)
-      flush() //TODO can this be done on setting flag and on timely basis.
-      Right(true)
+      getJckesKeyStore.deleteEntry(name)
     }
+
+    val secretKeySpec: SecretKeySpec =
+      new SecretKeySpec(new String(credential).getBytes("UTF-8"), "AES")
+    getJckesKeyStore.setKeyEntry(name,
+                                 secretKeySpec,
+                                 keyStorePass.toCharArray,
+                                 null)
+    flush() //TODO can this be done on setting flag and on timely basis.
+    Right(true)
+
   }
 
   def deleteCredentialEntry(name: String): Boolean = {

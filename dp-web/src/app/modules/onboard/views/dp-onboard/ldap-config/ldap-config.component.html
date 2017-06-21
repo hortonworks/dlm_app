@@ -19,8 +19,8 @@
   </div>
   <div class="section margin-top-bottom-20 text-bold text-medium">{{"pages.onboard.configure.labels.knoxConfiguration" | translate}}</div>
   <form #configForm="ngForm">
-    <div class="dp-input">
-      <label class="">{{"pages.onboard.configure.labels.masterPassword" | translate}}</label>
+    <div class="dp-input form-group">
+      <label class="required">{{"pages.onboard.configure.labels.masterPassword" | translate}}</label>
       <input required *ngIf="!showKnoxPassword" name="knox-password" [(ngModel)]="ldapProperties.masterPassword" type="password" placeholder="Knox Master Password"/>
       <input required *ngIf="showKnoxPassword" name="knox-password-plain" [(ngModel)]="ldapProperties.masterPassword" type="text" placeholder="Knox Master Password"/>
       <div class="margin-top-bottom-3">
@@ -45,8 +45,8 @@
       <!--<label>Group search base</label>-->
       <!--<input type="text" [(ngModel)]="ldapProperties.groupSearchBase" placeholder="e.g. ou=groups,dc=hadoop,dc=apache,dc=org"/>-->
     <!--</div>-->
-    <div class="dp-input">
-      <label>{{"pages.onboard.configure.labels.adminBindDN" | translate}}</label>
+    <div class="dp-input form-group">
+      <label class="required">{{"pages.onboard.configure.labels.adminBindDN" | translate}}</label>
       <input name="admin-bind-dn" type="text" [(ngModel)]="ldapProperties.bindDn" placeholder="e.g. uid=admin,ou=people,dc=hadoop,dc=apache,dc=org"/>
     </div>
     <div class="dp-input form-group">

@@ -18,9 +18,9 @@ class KnoxConfig @Inject()(val ldapService: LdapService,val knoxConfigurator:Kno
 
   def handleErrors(errors: Errors) = {
     if (errors.errors.exists(_.code == "400"))
-      BadRequest(Json.toJson(errors))
+      BadRequest(Json.toJson(errors.errors))
     else
-      InternalServerError(Json.toJson(errors))
+      InternalServerError(Json.toJson(errors.errors))
   }
 
   def configure = Action.async(parse.json) { request =>

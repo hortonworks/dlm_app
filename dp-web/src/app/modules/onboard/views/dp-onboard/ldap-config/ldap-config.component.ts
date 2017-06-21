@@ -50,7 +50,7 @@ export class LdapConfigComponent implements OnInit {
       if (!response || !response._body) {
         this.notificationMessages.push('Error occurred while saving the configurations.')
       } else {
-        response._body.forEach(error => {
+        JSON.parse(response._body).forEach(error => {
           this.notificationMessages.push(error.message);
         });
       }
