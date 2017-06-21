@@ -3,7 +3,7 @@ package com.hortonworks.dataplane.commons.domain
 import java.time.LocalDateTime
 
 import com.hortonworks.dataplane.commons.domain.Atlas.AtlasSearchQuery
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsValue, Json, Reads, Writes}
 
 /**
   * Data plane main domain entities
@@ -28,6 +28,14 @@ object Entities {
                   active: Option[Boolean] = Some(true),
                   created: Option[LocalDateTime] = Some(LocalDateTime.now()),
                   updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+
+  case class UserInfo(id: Option[Long] = None,
+                  userName: String,
+                  displayName: String,
+                  password: Option[String]=None,
+                  active: Option[Boolean] = Some(true),
+                  roles: Seq[RoleType.Value]=Seq()
+                  )
 
   case class Role(id: Option[Long] = None,
                   roleName: String,
@@ -366,5 +374,11 @@ object JsonFormatters {
 
   implicit val notebookWorkspaceReads = defaultJson.reads[NotebookWorkspace]
   implicit val notebookWorkspaceWrites = Json.writes[NotebookWorkspace]
+
+  implicit val roleTypeReads = Reads.enumNameReads(RoleType)
+
+  implicit val userInfoReads = Json.reads[UserInfo]
+  implicit val userInfoWrites = Json.writes[UserInfo]
+
 
 }

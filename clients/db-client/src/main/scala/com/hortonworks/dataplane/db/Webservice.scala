@@ -47,6 +47,13 @@ object Webservice {
 
     def addUserRole(userRole: UserRole): Future[Either[Errors, UserRole]]
 
+    def getUsers(): Future[Either[Errors,Seq[User]]]
+
+    def getRoles():  Future[Either[Errors,Seq[Role]]]
+
+    def addUserWithRoles(user: UserInfo): Future[Either[Errors, UserInfo]]
+
+    def updateActiveAndRoles(userInfo: UserInfo): Future[Either[Errors,Boolean]]
   }
 
   trait DataSetService extends DbClientService {

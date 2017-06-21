@@ -2,7 +2,7 @@ package com.hortonworks.dataplane.db
 
 import javax.inject.Singleton
 
-import com.hortonworks.dataplane.commons.domain.Entities._
+import com.hortonworks.dataplane.commons.domain.Entities.{UserInfo, _}
 import com.hortonworks.dataplane.db.Webservice.UserService
 import com.typesafe.config.Config
 import play.api.libs.json.Json
@@ -38,6 +38,19 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
         mapToUser(res)
       }
   }
+  private def mapToUserInfo(res: WSResponse) = {
+    res.status match {
+      case 200 => Right((res.json \ "results").validate[UserInfo].get)
+      case _ => mapErrors(res)
+    }
+  }
+  private def mapToSuccess(res: WSResponse) = {
+    res.status match {
+      case 200 =>{ Right((res.json \ "results"));Right(true
+      )}
+      case _ => mapErrors(res)
+    }
+  }
 
   private def mapToUser(res: WSResponse) = {
     res.status match {
@@ -45,14 +58,24 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       case _ => mapErrors(res)
     }
   }
-
+  private def mapToUsers(res: WSResponse) = {
+    res.status match {
+      case 200 => Right((res.json \ "results").validate[Seq[User]].get)
+      case _ => mapErrors(res)
+    }
+  }
   def mapToRole(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").validate[Role].get)
       case _ => mapErrors(res)
     }
   }
-
+  def mapToRoles(res: WSResponse) = {
+    res.status match {
+      case 200 => Right((res.json \ "results").validate[Seq[Role]].get)
+      case _ => mapErrors(res)
+    }
+  }
   private def mapToUserRoles(res: WSResponse) = {
     res.status match {
       case 200 =>Right((res.json \ "results").validate[UserRoles].get)
@@ -66,6 +89,7 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       case _ => mapErrors(res)
     }
   }
+
 
   override def getUserRoles(userName: String): Future[Either[Errors, UserRoles]] = {
     ws.url(s"$url/users/role/$userName")
@@ -83,6 +107,12 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       .post(Json.toJson(user))
       .map(mapToUser)
   }
+  override def addUserWithRoles(user: UserInfo): Future[Either[Errors, UserInfo]] = {
+    ws.url(s"$url/users/withroles")
+      .withHeaders("Accept" -> "application/json")
+      .post(Json.toJson(user))
+      .map(mapToUserInfo)
+  }
 
   override def addRole(role: Role): Future[Either[Errors, Role]] = {
     ws.url(s"$url/roles")
@@ -97,5 +127,34 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       .withHeaders("Accept" -> "application/json")
       .post(Json.toJson(userRole))
       .map(mapToUserRole(_))
+  }
+  override  def getUsers(): Future[Either[Errors,Seq[User]]]={
+    ws.url(s"$url/users")
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map{res=>
+        mapToUsers(res)
+      }
+  }
+
+
+  override  def getRoles():  Future[Either[Errors,Seq[Role]]]={
+    ws.url(s"$url/roles")
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map { mapToRoles(_)
+      }
+  }
+
+  override def updateActiveAndRoles(userInfo: UserInfo): Future[Either[Errors,Boolean]]= {
+    ws.url(s"$url//users/updateActiveAndRoles")
+      .withHeaders("Accept" -> "application/json")
+      .post(Json.toJson(userInfo))
+      .map { res =>
+        res.status match {
+          case 200 => Right((res.json \ "results").validate[Boolean].get)
+          case _ =>mapErrors(res)
+        }
+      }
   }
 }
