@@ -12,7 +12,7 @@ export class UserAddComponent implements OnInit {
 
   showNotification = false;
   tags: string[] = [];
-  availableTags: string[] = [];
+  availableUsers: string[] = [];
 
   constructor(private route: ActivatedRoute, private router: Router, private userService: UserService) {
   }
@@ -42,11 +42,12 @@ export class UserAddComponent implements OnInit {
   }
 
   onTagSearchChange(text: string) {
-    this.availableTags = [];
+    this.availableUsers = [];
     if(text && text.length > 2){
       this.userService.searchLDAPUsers(text).subscribe((ldapUsers: LDAPUser[])=>{
+        this.availableUsers = [];
         ldapUsers.map(user =>{
-          this.availableTags.push(user.name);
+          this.availableUsers.push(user.name);
         });
       }, ()=>{
         console.error("Error while fetching ldap users");

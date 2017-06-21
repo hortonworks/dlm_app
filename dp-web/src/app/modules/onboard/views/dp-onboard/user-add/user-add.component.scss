@@ -25,6 +25,15 @@
   }
 }
 
+:host /deep/ .taggingWidget > .tagSticker {
+  background: $shuttle-gray;
+  color: $white;
+  padding: 3px 10px;
+  border-radius: 3px;
+  margin: 3px;
+  border: none;
+}
+
 .margin-right-10 {
   margin-right: 10px;
 }
