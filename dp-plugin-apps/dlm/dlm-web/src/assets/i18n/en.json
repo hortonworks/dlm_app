@@ -226,7 +226,7 @@
           "date_format": "yyyy-mm-dd",
           "queue_name": "Queue Name",
           "max_bandwidth": "Max. Bandwidth",
-          "bandwidth_unit": "Mbps",
+          "bandwidth_unit": "MBps",
           "repeat": "Repeat"
         },
         "schedule": {
