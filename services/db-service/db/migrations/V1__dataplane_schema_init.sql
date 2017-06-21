@@ -217,4 +217,14 @@ CREATE TABLE IF NOT EXISTS dataplane.configs (
   config_value TEXT                  NOT NULL,
   active       BOOLEAN DEFAULT TRUE  NOT NULL,
   export       BOOLEAN DEFAULT TRUE  NOT NULL
-)
+);
+
+CREATE TABLE IF NOT EXISTS dataplane.ldap_configs (
+  id          BIGSERIAL PRIMARY KEY,
+  url         VARCHAR(255)          NOT NULL,
+  bind_dn     VARCHAR(255),
+  user_dn_template     VARCHAR(255),
+  user_searchbase      VARCHAR(255),
+  group_searchbase     VARCHAR(255)
+);
+

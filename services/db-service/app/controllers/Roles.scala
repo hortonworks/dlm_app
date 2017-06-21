@@ -20,16 +20,6 @@ class Roles @Inject()(roleRepo: RoleRepo)(implicit exec: ExecutionContext)
     roleRepo.all.map(roles => success(roles))
   }
 
-  def addUserRole = Action.async(parse.json) { req =>
-    req.body
-      .validate[UserRole]
-      .map { role =>
-        val created = roleRepo.addUserRole(role)
-        created.map(r => success(linkData(r,getuserRoleMap(r)))).recoverWith(apiError)
-      }
-      .getOrElse(Future.successful(BadRequest))
-  }
-
   def load(roleId:Long) = Action.async {
     roleRepo.findById(roleId).map { ro =>
       ro.map { r =>
@@ -37,15 +27,6 @@ class Roles @Inject()(roleRepo: RoleRepo)(implicit exec: ExecutionContext)
       }
         .getOrElse(NotFound)
     }.recoverWith(apiError)
-  }
-
-
-  def getRolesForUser(userName:String) = Action.async {
-      roleRepo.getRolesForUser(userName).map(success(_))
-  }
-
-  private def getuserRoleMap(r: UserRole) = {
-    Map("user" -> s"$users/${r.userId.get}", "role" -> s"$roles/${r.roleId.get}")
   }
 
   def add = Action.async(parse.json) { req =>

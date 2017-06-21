@@ -14,6 +14,7 @@ import {CollapsibleNavModule} from '../../shared/collapsible-nav/collapsible-nav
 import {SharedModule} from '../../shared/shared.module';
 import {DpSorterModule} from '../../shared/dp-table/dp-sorter/dp-sorter.module';
 import {ClusterDetailsComponent} from './views/cluster-details/cluster-details.component';
+import { UserManagementComponent } from './views/user-management/user-management.component';
 import {DropdownModule} from '../../shared/dropdown/dropdown.module';
 
 @NgModule({
@@ -34,7 +35,8 @@ import {DropdownModule} from '../../shared/dropdown/dropdown.module';
     LakeStatsComponent,
     LakesListComponent,
     ClusterDetailsComponent,
-    MapComponent
+    MapComponent,
+    UserManagementComponent
   ]
 })
 export class InfraModule {
