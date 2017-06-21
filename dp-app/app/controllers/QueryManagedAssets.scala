@@ -3,9 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Atlas.AtlasSearchQuery
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.cs.Webservice.AtlasService
 import com.hortonworks.dataplane.db.Webservice.DataAssetService
 import internal.auth.Authenticated
 import models.JsonResponses
