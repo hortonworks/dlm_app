@@ -111,7 +111,7 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
     request.body
       .validate[Seq[String]]
       .map { assets =>
-        datasetRepo.queryManagedAssets(assets)
+        datasetRepo.queryManagedAssets(clusterId, assets)
           .map(result => success(Json.toJson(result)))
           .recoverWith(apiError)
       }
