@@ -3,7 +3,7 @@ package com.hortonworks.dataplane.db
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.Ambari.ClusterServiceWithConfigs
 import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery}
-import play.api.libs.json.{JsResult, Json}
+import play.api.libs.json.{JsObject, JsResult, Json}
 import play.api.libs.ws.WSResponse
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData}
 
@@ -211,6 +211,10 @@ object Webservice {
     def create(notebookWorkspace: NotebookWorkspace): Future[Either[Errors, NotebookWorkspace]]
 
     def delete(notebookId: String): Future[Either[Errors, Int]]
+  }
+
+  trait DataAssetService extends DbClientService {
+    def findManagedAssets(clusterId:Long, assets: Seq[String]): Future[Either[Errors, Seq[JsObject]]]
   }
 
 }
