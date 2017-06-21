@@ -1,5 +1,5 @@
 <div class="form-container">
-  <form class="basic-form" [formGroup]="policyForm" (ngSubmit)="handleSubmit(policyForm)">
+  <form class="basic-form policy-form" [formGroup]="policyForm" (ngSubmit)="handleSubmit(policyForm)">
     <div class="container-fluid">
       <div class="row">
         <div class="form-section col-md-12">
@@ -15,7 +15,11 @@
           <fieldset formGroupName="general" [collapse]="sectionCollapsedMap.general">
             <dlm-form-field
               [label]="'page.policies.form.fields.policy_name' | translate">
-              <input type="text" class="form-control" formField formControlName="name"/>
+              <input type="text" class="form-control" formField formControlName="name" required/>
+            </dlm-form-field>
+            <dlm-form-field
+              [label]="'page.policies.form.fields.policy_description' | translate">
+              <textarea rows="4" class="form-control" formField formControlName="description"></textarea>
             </dlm-form-field>
             <div class="form-group">
               <div class="row">
@@ -30,11 +34,11 @@
               </div>
             </div>
             <dlm-form-field [label]="'page.policies.form.fields.sourceCluster.self' | translate">
-              <dlm-select-field formField formControlName="sourceCluster" [options]="sourceClusters" (onSelect)="handleSourceClusterChange($event)">
+              <dlm-select-field formField formControlName="sourceCluster" [options]="sourceClusters" [value]="sourceCluster" (onSelect)="handleSourceClusterChange($event)">
               </dlm-select-field>
             </dlm-form-field>
             <dlm-form-field [label]="'page.policies.form.fields.destinationCluster.self' | translate">
-              <dlm-select-field formField formControlName="destinationCluster" [options]="destinationClusters">
+              <dlm-select-field formField formControlName="destinationCluster" [options]="destinationClusters" [value]="destinationCluster">
               </dlm-select-field>
             </dlm-form-field>
           </fieldset>
@@ -99,7 +103,7 @@
       </div>
 
       <div class="row">
-        <div class="form-section col-md-6">
+        <div class="form-section col-md-12">
           <div class="form-section-title">
             {{'page.policies.form.sections.job' | translate}}
             <div class="pull-right">
@@ -110,73 +114,110 @@
             <div class="clearfix"></div>
           </div>
           <div [collapse]="sectionCollapsedMap.job" formGroupName="job">
-            <dlm-radio-button
-              formControlName="schedule"
-              [items]="jobTypes"
-              [selectedValue]="selectedJobType"
-              (change)="handleJobChange($event)">
-            </dlm-radio-button>
-            <div class="clearfix"></div>
-            <div class="form-group" *ngIf="isScheduled()">
-              <div class="schedule-group">
-                <tabset>
-                  <tab *ngFor="let tab of scheduleTabs" (select)="handleJobTabChange(tab)" [heading]="tab.title | translate">
-                    <div class="row">
-                      <div class="col-md-6" formGroupName="startTime">
-                        <div class="date-time-group">
-                          <div class="date-control">
-                            <my-date-picker
-                              selectionTxtFontSize="12"
-                              [selDate]="policyForm.value.job.startTime.date"
-                              [placeholder]="'page.policies.form.fields.start_time' | translate"
-                              [options]="datePickerOptions"
-                              (dateChanged)="handleDateChange($event, 'startTime')">
-                            </my-date-picker>
-                          </div>
-                          <dlm-form-field fieldClass="col-md-12" errorClass="col-md-12">
-                            <div class="time-control">
-                              <div class="clock-icon">
-                                <i class="fa fa-clock-o"></i>
-                              </div>
-                              <timepicker formField formControlName="time" [showMeridian]="false"></timepicker>
-                            </div>
-                            <dlm-field-error *ngIf="policyForm.controls.job.controls.startTime.controls.time.hasError('lessThanCurrent')">
-                              {{'forms.validation_errors.time_less_than_current' | translate}}
-                            </dlm-field-error>
-                          </dlm-form-field>
+            <div class="schedule-group">
+              <div class="row new-row">
+                <div class="col col-md-12">
+                  <div class="row">
+                    <div class="col col-md-12">
+                      <label>{{'page.policies.form.fields.repeat' | translate}}</label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col col-md-2">
+                      <dlm-select-field formField formControlName="repeatMode" [options]="repeatOptions" [value]="repeatOption">
+                      </dlm-select-field>
+                    </div>
+                    <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-md-1">
+                      <input type="text" class="form-control" placeholder="Freq" formField formControlName="frequency" required/>
+                    </div>
+                    <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-md-2">
+                      <dlm-select-field formField formControlName="unit" [options]="units" [value]="unit">
+                      </dlm-select-field>
+                    </div>
+                    <div *ngIf="repeatOption === policyRepeatModes.EVERY && unit === policyTimeUnits.WEEKS" class="col col-md-7">
+                      <div class="row">
+                        <div class="col col-md-1 text-center" style="margin-top: 10px">
+                          <span>&nbsp;on&nbsp;</span>
                         </div>
-                      </div>
-                      <div class="col-md-6" formGroupName="endTime">
-                        <div class="date-time-group">
-                          <div class="date-control">
-                            <my-date-picker
-                              [selDate]="policyForm.value.job.endTime.date"
-                              [placeholder]="'page.policies.form.fields.end_time' | translate"
-                              (dateChanged)="handleDateChange($event, 'endTime')"
-                              [options]="datePickerOptions">
-                            </my-date-picker>
-                          </div>
-                          <dlm-form-field fieldClass="col-md-12" errorClass="col-md-12">
-                            <div class="time-control">
-                              <div class="clock-icon">
-                                <i class="fa fa-clock-o"></i>
-                              </div>
-                              <timepicker formField formControlName="time" [showMeridian]="false"></timepicker>
-                            </div>
-                            <dlm-field-error *ngIf="policyForm.controls.job.controls.endTime.controls.time.hasError('lessThanCurrent')">
-                              {{'forms.validation_errors.time_less_than_current' | translate}}
-                            </dlm-field-error>
-                          </dlm-form-field>
+                        <div class="col col-md-11">
+                          <dlm-radio-button [items]="dayOptions" formControlName="day" [selectedValue]="selectedDay"
+                                            [type]="'buttons'" (change)="handleDayChange($event)"></dlm-radio-button>
                         </div>
                       </div>
                     </div>
-                  </tab>
-                </tabset>
+                  </div>
+                </div>
+              </div>
+              <div class="row new-row">
+                <div class="col-md-3" formGroupName="startTime">
+                  <div class="date-time-group">
+                    <div class="date-control">
+                      <label>{{'page.policies.form.fields.start_date' | translate}}</label>
+                      <my-date-picker
+                        selectionTxtFontSize="12"
+                        [selDate]="policyForm.value.job.startTime.date"
+                        [placeholder]="'page.policies.form.fields.date_format' | translate"
+                        [options]="datePickerOptions"
+                        (dateChanged)="handleDateChange($event, 'startTime')">
+                      </my-date-picker>
+                    </div>
+                    <div class="new-row">
+                      <dlm-form-field fieldClass="col-md-12" errorClass="col-md-12">
+                        <label>{{'page.policies.form.fields.start_time' | translate}}</label>
+                        <timepicker formField formControlName="time" [showMeridian]="false" [showSpinners]="false"></timepicker>
+                        <dlm-field-error *ngIf="policyForm.get('job').get('startTime').get('time').hasError('lessThanCurrent')">
+                          {{'forms.validation_errors.time_less_than_current' | translate}}
+                        </dlm-field-error>
+                      </dlm-form-field>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3" formGroupName="endTime">
+                  <div class="date-time-group">
+                    <div class="date-control">
+                      <label>{{'page.policies.form.fields.end_date' | translate}}</label>
+                      <my-date-picker
+                        [selDate]="policyForm.value.job.endTime.date"
+                        [placeholder]="'page.policies.form.fields.date_format' | translate"
+                        (dateChanged)="handleDateChange($event, 'endTime')"
+                        [options]="datePickerOptions">
+                      </my-date-picker>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <div class="row">
+        <div class="form-section col-md-12">
+          <div class="form-section-title">
+            {{'page.policies.form.sections.advanced' | translate}}
+            <div class="pull-right">
+              <i class="fa text-primary"
+                 [ngClass]="{'fa-chevron-down': sectionCollapsedMap.advanced, 'fa-chevron-up': !sectionCollapsedMap.advanced}"
+                 (click)="toggleSection('advanced')"></i>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+          <div [collapse]="sectionCollapsedMap.advanced" formGroupName="advanced">
+            <dlm-form-field
+              [label]="'page.policies.form.fields.queue_name' | translate">
+              <input type="text" class="form-control" formField formControlName="queue_name"/>
+            </dlm-form-field>
+            <dlm-form-field
+              [label]="'page.policies.form.fields.max_bandwidth' | translate">
+              <div class="input-group">
+                <input type="text" class="form-control" formField formControlName="max_bandwidth"/>
+                <span class="input-group-addon">{{'page.policies.form.fields.bandwidth_unit' | translate}}</span>
+              </div>
+            </dlm-form-field>
+          </div>
+        </div>
+      </div>
+
       <div class="row">
         <div class="form-footer col-md-12">
           <div class="footer-controls pull-right">

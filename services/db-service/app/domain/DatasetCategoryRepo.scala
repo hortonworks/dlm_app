@@ -23,31 +23,13 @@ class DatasetCategoryRepo @Inject()(protected val dbConfigProvider: DatabaseConf
     }
   }
 
-  def getCategoriesCount(): Future[List[CategoryCount]] = {
-    val countQuery = DatasetCategories.groupBy(_.categoryId).map {
-      case (catId, results) => (catId -> results.length)
-    }
-
-    val query = for {
-      ((catId, count), cat) <- countQuery.join(categoryRepo.Categories).on(_._1 === _.id)
-    } yield (cat.name, count)
-
-    db.run(query.to[List].result).map {
-      rows =>
-        rows.map {
-          case (name, count) =>
-            CategoryCount(name, count)
-        }.sortBy(_.name)
-    }
-  }
-
   def getCategoryCount(categoryName: String): Future[CategoryCount] = {
     val query = (categoryRepo.Categories.filter(_.name === categoryName)
       .join(DatasetCategories).on(_.id === _.categoryId)).length
 
     db.run(query.result).map {
       count =>
-       CategoryCount(categoryName, count)
+        CategoryCount(categoryName, count)
     }
   }
 

@@ -205,8 +205,8 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     }.getOrElse(Future.successful(BadRequest))
   }
 
-  def listCategoriesCount = authenticated.async { request =>
-    categoryService.listWithCount()
+  def listCategoriesCount(search:Option[String]) = authenticated.async { request =>
+    categoryService.listWithCount(search)
       .map { categories =>
         categories match {
           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))

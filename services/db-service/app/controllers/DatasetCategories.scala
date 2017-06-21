@@ -24,10 +24,10 @@ class DatasetCategories @Inject()(datasetCategoryRepo: DatasetCategoryRepo,
     datasetCategoryRepo.allWithDatasetId(datasetId).map(dc => success(dc)).recoverWith(apiError)
   }
 
-  def categoriesCount() = Action.async {
+  def categoriesCount(searchText: Option[String]) = Action.async {
     (for (
-      categoriesCount <- datasetCategoryRepo.getCategoriesCount();
-      totalDataset <- datasetRepo.count()
+      categoriesCount <- datasetRepo.getCategoriesCount(searchText);
+      totalDataset <- datasetRepo.count(searchText)
     ) yield {
       val list = Seq(CategoryCount("ALL", totalDataset)) ++ categoriesCount
       success(list)
@@ -36,7 +36,7 @@ class DatasetCategories @Inject()(datasetCategoryRepo: DatasetCategoryRepo,
 
   def categoriesCountByName(categoryName: String) = Action.async {
     (if (categoryName.equals("All")) {
-      datasetRepo.count().map(i => CategoryCount(categoryName, i))
+      datasetRepo.count(None).map(i => CategoryCount(categoryName, i))
     } else datasetCategoryRepo.getCategoryCount(categoryName)
       ).map(dc => success(Json.toJson(dc))).recoverWith(apiError)
   }

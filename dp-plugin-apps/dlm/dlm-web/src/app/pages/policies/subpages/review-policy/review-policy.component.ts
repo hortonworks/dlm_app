@@ -14,14 +14,17 @@ import { resetFormValue } from 'actions/form.action';
 import { getFormValues } from 'selectors/form.selector';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 import { loadPairings } from 'actions/pairing.action';
+import { loadClusters } from 'actions/cluster.action';
 import { Cluster } from 'models/cluster.model';
-import { bytesToSize } from 'utils/size-util';
-import { POLICY_TYPES } from 'constants/policy.constant';
+import { POLICY_TYPES, POLICY_TYPES_LABELS, POLICY_DAYS_LABELS, POLICY_REPEAT_MODES,
+  POLICY_REPEAT_MODES_LABELS, POLICY_TIME_UNITS } from 'constants/policy.constant';
+import { FrequencyPipe } from 'pipes/frequency.pipe';
 import { omitEmpty } from 'utils/object-utils';
 import { ProgressState } from 'models/progress-state.model';
 import { getProgressState } from 'selectors/progress.selector';
 import { POLICY_FORM_ID } from '../../components/policy-form/policy-form.component';
 import { getCluster } from 'selectors/cluster.selector';
+import { TimeZoneService } from 'services/time-zone.service';
 
 const CREATE_POLICY_REQUEST = 'CREATE_POLICY';
 
@@ -33,16 +36,15 @@ const CREATE_POLICY_REQUEST = 'CREATE_POLICY';
 export class ReviewPolicyComponent implements OnInit, OnDestroy {
   @ViewChild('errorDetailsDialog') errorDetailsDialog: ModalDialogComponent;
   private subscriptions: Subscription[] = [];
-  tDetails = 'page.policies.subpage.review.details';
+  tDetails = 'page.policies.form.fields';
   descriptionTranslateParam = {};
-  // todo: this is mock. Not sure where we can get this info
-  detailsInfo = [
-    // this one probably can be get from cluster info
-    {name: 'volume', label: this.t.instant(`${this.tDetails}.volume`), value: ''},
-    {name: 'transferTime', label: this.t.instant(`${this.tDetails}.time`), value: '11hrs 10mins'},
-    {name: 'files', label: this.t.instant(`${this.tDetails}.files`), value: '121'},
-    {name: 'destination', label: this.t.instant(`${this.tDetails}.destination`), value: ''}
-  ];
+  detailsInfo = [];
+  policyTypes = POLICY_TYPES;
+  policyTypesLabels = POLICY_TYPES_LABELS;
+  policyRepeatModes = POLICY_REPEAT_MODES;
+  policyRepeatModesLabels = POLICY_REPEAT_MODES_LABELS;
+  policyTimeUnits = POLICY_TIME_UNITS;
+  policyDaysLabels = POLICY_DAYS_LABELS;
   policyForm$: Observable<any>;
   sourceCluster: Cluster;
   targetCluster: Cluster;
@@ -52,13 +54,21 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
 
   private policyFormValue: any;
 
-  constructor(private store: Store<State>, private t: TranslateService) {
+  constructor(
+    private store: Store<State>,
+    private t: TranslateService,
+    private frequencyPipe: FrequencyPipe,
+    private timeZone: TimeZoneService
+  ) {
     this.policyForm$ = store.select(getFormValues(POLICY_FORM_ID));
     this.sourceCluster$ = this.policyForm$.switchMap(policyForm => store.select(getCluster(policyForm.general.sourceCluster)));
     this.destinationCluster$ = this.policyForm$.switchMap(policyForm => store.select(getCluster(policyForm.general.destinationCluster)));
     this.subscriptions.push(store
       .select(getProgressState(CREATE_POLICY_REQUEST))
       .subscribe((progressState: ProgressState) => this.creationState = progressState));
+    this.store.dispatch(resetProgressState(CREATE_POLICY_REQUEST));
+    this.store.dispatch(loadPairings());
+    this.store.dispatch(loadClusters());
   }
 
   ngOnInit() {
@@ -77,24 +87,20 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
             policyName: policyForm.general.name,
             sourceCluster: sourceCluster.name
           };
-
-          this.getDetailsField('destination').value = destinationCluster.name;
-          this.getDetailsField('volume').value = bytesToSize(destinationCluster.stats.CapacityTotal, 0);
+          this.setDetails(sourceCluster, destinationCluster, policyForm);
         })
     );
-    this.store.dispatch(resetProgressState(CREATE_POLICY_REQUEST));
-    this.store.dispatch(loadPairings());
   }
 
   ngOnDestroy() {
-    this.subscriptions.forEach(subscrition => subscrition.unsubscribe());
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
   serializeFormValues(values): PolicyPayload {
     let sourceDataset;
-    if (values.general.type === POLICY_TYPES.HDFS) {
+    if (values.general.type === this.policyTypes.HDFS) {
       sourceDataset = values.directories;
-    } else if (values.general.type === POLICY_TYPES.HIVE) {
+    } else if (values.general.type === this.policyTypes.HIVE) {
       sourceDataset = values.databases;
     }
     const policyDefinition = <PolicyDefinition>omitEmpty({
@@ -117,15 +123,27 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     if (!timeField.date) {
       return null;
     }
-    return `${timeField.date}T${moment(timeField.time).format('HH:mm:ss')}`;
+    const dateTime = moment(timeField.date);
+    const time = new Date(timeField.time);
+    dateTime.hours(time.getHours());
+    dateTime.minutes(time.getMinutes());
+    dateTime.seconds(time.getSeconds());
+    return dateTime.tz(this.timeZone.defaultServerTimezone).format();
+  }
+
+  formatDateDisplay(timeField) {
+    if (!timeField.date) {
+      return null;
+    }
+    return `${timeField.date} ${moment(timeField.time).format('HH:mm')}`;
   }
 
   submitReview() {
     this.store.dispatch(createPolicy(this.serializeFormValues(this.policyFormValue), this.targetCluster.id, CREATE_POLICY_REQUEST));
+    this.store.dispatch(resetFormValue(POLICY_FORM_ID));
   }
 
   cancelReview() {
-    this.store.dispatch(resetFormValue(POLICY_FORM_ID));
     this.store.dispatch(go(['policies/create']));
   }
 
@@ -137,4 +155,41 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     this.errorDetailsDialog.show();
   }
 
+  setDetails(sourceCluster: Cluster, destinationCluster: Cluster, policyForm) {
+    const type = policyForm.general.type;
+    const repeatMode = policyForm.job.repeatMode;
+    const details = [
+      {name: 'name', label: this.t.instant(`${this.tDetails}.policy_name`), value: policyForm.general.name},
+      {name: 'description', label: this.t.instant(`${this.tDetails}.policy_description`), value: policyForm.general.description},
+      {name: 'sourceCluster', label: this.t.instant(`${this.tDetails}.sourceCluster.self`), value: sourceCluster.name},
+      {name: 'destinationCluster', label: this.t.instant(`${this.tDetails}.destinationCluster.self`), value: destinationCluster.name},
+      {name: 'type', label: this.t.instant(`${this.tDetails}.service`), value: this.policyTypesLabels[type]}
+    ];
+    if (type === this.policyTypes.HDFS) {
+      details.push({name: 'directories', label: this.t.instant(`${this.tDetails}.directories`), value: policyForm.directories});
+    } else if (type === this.policyTypes.HIVE) {
+      details.push({name: 'databases', label: this.t.instant(`${this.tDetails}.databases`), value: policyForm.databases});
+    }
+    if (repeatMode === this.policyRepeatModes.NEVER) {
+      details.push({name: 'repeatMode', label: this.t.instant(`${this.tDetails}.repeat`), value: this.policyRepeatModesLabels[repeatMode]});
+    } else if (repeatMode === this.policyRepeatModes.EVERY) {
+      let value = this.frequencyPipe.transform(policyForm.job.frequencyInSec);
+      if (policyForm.job.unit === this.policyTimeUnits.WEEKS) {
+        value += ' on ' + this.policyDaysLabels[policyForm.job.day];
+      }
+      details.push({name: 'repeatMode', label: this.t.instant(`${this.tDetails}.repeat`), value});
+    }
+    details.push({name: 'startTime', label: this.t.instant(`${this.tDetails}.start_time`),
+      value: this.formatDateDisplay(policyForm.job.startTime)});
+    details.push({name: 'EndTime', label: this.t.instant(`${this.tDetails}.end_time`),
+      value: this.formatDateDisplay(policyForm.job.endTime)});
+    if (policyForm.advanced.queue_name) {
+      details.push({name: 'queue_name', label: this.t.instant(`${this.tDetails}.queue_name`), value: policyForm.advanced.queue_name});
+    }
+    if (policyForm.advanced.max_bandwidth) {
+      details.push({name: 'max_bandwidth', label: this.t.instant(`${this.tDetails}.max_bandwidth`),
+        value: policyForm.advanced.max_bandwidth});
+    }
+    this.detailsInfo = details;
+  }
 }

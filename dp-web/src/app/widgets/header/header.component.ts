@@ -16,7 +16,8 @@ export class HeaderComponent implements OnInit {
   sideNavWidth = '200px';
   activeTabName: string;
   activePersona: Persona;
-  activePersonaName: string;
+  activePersonaName: string = 'Infra Admin'
+  activePersonaImageName: string = 'infra-logo.png';
   sideNavOpen = false;
   crumbNames: string[] = [];
   viewPaneStates = ViewPaneState;
@@ -53,15 +54,17 @@ export class HeaderComponent implements OnInit {
         if (tabs.URL && tabs.URL.length > 0 && url.startsWith('/' +tabs.URL)) {
           this.activePersona = persona;
           this.activePersonaName = persona.name;
+          this.activePersonaImageName = persona.imageName;
           this.activeTabName = tabs.tabName;
 
+          this.collapsibleNavService.collpaseSideNav.next(false);
           this.collapsibleNavService.setTabs(persona.tabs, tabs);
           break;
         }
       }
     }
   }
-  
+
   navigateToPersona(persona: Persona, drawer: any) {
     if (persona.tabs.length > 0 ) {
       this.closeNav();
@@ -83,13 +86,19 @@ export class HeaderComponent implements OnInit {
   }
 
   openNav() {
+    if (this.sideNavOpen) {
+      this.closeNav();
+      return;
+    }
     this.sideNavOpen = true;
-    this.sidenav.nativeElement.style.width = this.sideNavWidth;
+    /*this.sidenav.nativeElement.style.width = this.sideNavWidth;*/
+    this.sidenav.nativeElement.style.visibility = 'visible';
   }
 
   closeNav() {
     this.sideNavOpen = false;
-    this.sidenav.nativeElement.style.width = '0';
+    /*this.sidenav.nativeElement.style.width = '0';*/
+    this.sidenav.nativeElement.style.visibility = 'hidden';
   }
 
   @HostListener('document:click', ['$event', '$event.target'])

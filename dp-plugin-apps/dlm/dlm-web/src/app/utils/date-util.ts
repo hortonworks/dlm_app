@@ -1,4 +1,5 @@
 import { IMyDate } from 'mydatepicker';
+import * as moment from 'moment';
 
 export const getDatePickerDate = (date: Date): IMyDate => {
   return {

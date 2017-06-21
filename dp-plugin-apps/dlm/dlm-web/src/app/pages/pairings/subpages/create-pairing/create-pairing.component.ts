@@ -76,7 +76,7 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
   }
 
   loadRouteParams() {
-    this.loadParamsSubscription$ = this.route.params
+    this.loadParamsSubscription$ = this.route.queryParams
       .subscribe( params => {
         const clusterId = params['firstClusterId'];
         if (clusterId) {

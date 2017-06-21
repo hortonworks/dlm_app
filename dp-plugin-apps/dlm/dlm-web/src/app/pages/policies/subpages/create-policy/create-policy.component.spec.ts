@@ -24,6 +24,9 @@ import {ActionColumnComponent} from 'components/table-columns/action-column/acti
 import {NavbarService} from 'services/navbar.service';
 import {CheckboxColumnComponent} from 'components/table-columns/checkbox-column/checkbox-column.component';
 import { PolicyStatusFmtPipe } from 'pipes/policy-status-fmt.pipe';
+import { RouterTestingModule } from '@angular/router/testing';
+import {MockTimeZoneService} from 'mocks/mock-timezone';
+import {TimeZoneService} from 'services/time-zone.service';
 
 describe('CreatePolicyComponent', () => {
   let component: CreatePolicyComponent;
@@ -39,6 +42,7 @@ describe('CreatePolicyComponent', () => {
         TimepickerModule.forRoot(),
         ReactiveFormsModule, CollapseModule, TabsModule.forRoot(), MyDatePickerModule, MomentModule,
         NgxDatatableModule,
+        RouterTestingModule,
         TypeaheadModule
       ],
       declarations: [
@@ -58,6 +62,7 @@ describe('CreatePolicyComponent', () => {
       ],
       providers: [
         {provide: Store, useClass: MockStore},
+        {provide: TimeZoneService, useClass: MockTimeZoneService},
         NavbarService
       ]
     })

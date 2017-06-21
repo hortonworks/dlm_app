@@ -22,6 +22,8 @@ import {BytesSizePipe} from 'pipes/bytes-size.pipe';
 import {MomentModule} from 'angular2-moment';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {NavbarService} from 'services/navbar.service';
+import {MockTimeZoneService} from 'mocks/mock-timezone';
+import {TimeZoneService} from 'services/time-zone.service';
 
 describe('PolicyFormComponent', () => {
   let component: PolicyFormComponent;
@@ -55,6 +57,7 @@ describe('PolicyFormComponent', () => {
       ],
       providers: [
         {provide: Store, useClass: MockStore},
+        {provide: TimeZoneService, useClass: MockTimeZoneService},
         NavbarService
       ]
     })
