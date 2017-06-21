@@ -49,6 +49,8 @@ object Webservice {
 
     def getUsers(): Future[Either[Errors,Seq[User]]]
 
+    def getUsersWithRoles(): Future[Either[Errors,Seq[UserInfo]]]
+
     def getRoles():  Future[Either[Errors,Seq[Role]]]
 
     def addUserWithRoles(user: UserInfo): Future[Either[Errors, UserInfo]]

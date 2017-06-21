@@ -92,6 +92,13 @@ class UserManager @Inject()(val ldapService: LdapService,
       case Right(users) => Ok(Json.toJson(users))
     }
   }
+
+  def listUsersWithRoles = Action.async { req =>
+    userService.getUsersWithRoles.map {
+      case Left(errors) => handleErrors(errors)
+      case Right(users) => Ok(Json.toJson(users))
+    }
+  }
   def adminUpdateUserRolesAndStatus = Action.async(parse.json) { req =>
     req.body
       .validate[UserInfo]

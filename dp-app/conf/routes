@@ -80,6 +80,7 @@ GET           /api/knox/test                                   controllers.KnoxC
 POST          /api/users/registerAdmin                         controllers.UserManager.addSuperAdminUser
 POST          /api/users/registerAdmins                        controllers.UserManager.addSuperAdminUsers
 POST          /api/users/updateActiveAndRoles                  controllers.UserManager.adminUpdateUserRolesAndStatus
+GET           /api/users/withRoles                             controllers.UserManager.listUsersWithRoles
 GET           /api/users                                       controllers.UserManager.listUsers
 GET           /api/roles                                       controllers.UserManager.getAllRoles
 
