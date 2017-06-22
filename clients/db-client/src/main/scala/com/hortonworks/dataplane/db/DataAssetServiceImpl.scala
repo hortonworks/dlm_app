@@ -1,9 +1,10 @@
 package com.hortonworks.dataplane.db
 
-import com.hortonworks.dataplane.commons.domain.Entities.{DataAsset, _}
-import com.hortonworks.dataplane.db.Webservice.{DataAssetService, DataSetService}
+import com.hortonworks.dataplane.commons.domain.Atlas.EntityDatasetRelationship
+import com.hortonworks.dataplane.commons.domain.Entities.Errors
+import com.hortonworks.dataplane.db.Webservice.DataAssetService
 import com.typesafe.config.Config
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.Json
 import play.api.libs.ws.{WSClient, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -17,19 +18,19 @@ class DataAssetServiceImpl(config: Config)(implicit ws: WSClient)
     Option(System.getProperty("dp.services.db.service.uri"))
       .getOrElse(config.getString("dp.services.db.service.uri"))
 
-  override def findManagedAssets(clusterId:Long, assets: Seq[String]): Future[Either[Errors, Seq[JsObject]]] = {
+  override def findManagedAssets(clusterId:Long, assets: Seq[String]): Future[Either[Errors, Seq[EntityDatasetRelationship]]] = {
     ws.url(s"$url/dataassets/query-managed?clusterId=$clusterId")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
       )
       .post(Json.toJson(assets))
-      .map(mapToJsObject)
+      .map(mapToEntityDatasetRelationship)
   }
 
-  private def mapToJsObject(res: WSResponse): Either[Errors, Seq[JsObject]] = {
+  private def mapToEntityDatasetRelationship(res: WSResponse): Either[Errors, Seq[EntityDatasetRelationship]] = {
     res.status match {
-      case 200 => extractEntity[Seq[JsObject]](res, r => (r.json \ "results" \\ "data").map { d => d.validate[JsObject].get })
+      case 200 => extractEntity[Seq[EntityDatasetRelationship]](res, r => (r.json \ "results").validate[Seq[EntityDatasetRelationship]].get)
       case _ => mapErrors(res)
     }
   }
