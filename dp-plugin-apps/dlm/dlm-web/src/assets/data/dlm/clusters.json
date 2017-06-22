@@ -25,7 +25,8 @@
           "servicehost": "jaimin-beacon-5.c.pramod-thangali.internal",
           "fullURL": "http://jaimin-beacon-5.c.pramod-thangali.internal:25968"
         }
-      ]
+      ],
+      "totalHosts": 3
     },
     {
       "id": 1,
@@ -52,7 +53,8 @@
           "servicehost": "jaimin-beacon-3.c.pramod-thangali.internal",
           "fullURL": "http://jaimin-beacon-3.c.pramod-thangali.internal:25968"
         }
-      ]
+      ],
+      "totalHosts": 2
     },
     {
       "id": 3,
@@ -79,7 +81,8 @@
           "servicehost": "jaimin-beacon-3.c.pramod-thangali.internal",
           "fullURL": "http://jaimin-beacon-3.c.pramod-thangali.internal:25968"
         }
-      ]
+      ],
+      "totalHosts": 5
     }
   ]
 }
