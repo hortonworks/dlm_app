@@ -60,6 +60,19 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
       UserInfo(id=user.id,userName=user.username,displayName = user.displayname,roles=roles)
     }
   }
+  private def getUserDetailInternal(userName:String)={
+    val query=for{
+      (user, userRole) <- Users.filter(_.username===userName) joinLeft  UserRoles on (_.id === _.userId)
+    }yield {
+      (user,userRole)
+    }
+    val roleIdMap=rolesUtil.getRoleIdMap
+    db.run(query.result).map { results =>
+      val user:User=results.head._1
+      var roles=results.filter(res=>res._2.isDefined );
+      (user,roles)
+    }
+  }
 
   def insert(username: String, password: String, displayname: String, avatar: Option[String]): Future[User] = {
     //    TODO: generate avatar url from username > gravatar?
@@ -69,22 +82,25 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     }
   }
   def updateActiveAndRoles(userInfo:UserInfo)={
-    val userRolesQuery=UserRoles.filter(_.userId === userInfo.id.get).result
-    db.run(userRolesQuery).map { userRoles =>
-      val resolvedIdEntries=resolveUserRolesEntries(userInfo.roles,userRoles)
-      val userRoleObjs=rolesUtil.getUserRoleObjectsforRoles(userInfo.id.get,rolesUtil.getRoleTypesForRoleIds(resolvedIdEntries._1.toList))
-      val query =for{
-        updateActive <- getUpdateActiveQuery(userInfo)
-        insertQuery<-UserRoles returning UserRoles ++= userRoleObjs
-        delQuery <- UserRoles.filter(_.roleId inSet resolvedIdEntries._2).to[List].result
+    getUserDetailInternal(userInfo.userName).flatMap { res =>
+      val userFromDb = res._1
+      val userRolesQuery=UserRoles.filter(_.userId === userFromDb.id.get).result
+      db.run(userRolesQuery).map { userRoles =>
+        val resolvedIdEntries=resolveUserRolesEntries(userInfo.roles,userRoles)
+        val userRoleObjs=rolesUtil.getUserRoleObjectsforRoles(userFromDb.id.get,rolesUtil.getRoleTypesForRoleIds(resolvedIdEntries._1.toList))
+        val query =for{
+          updateActive <- getUpdateActiveQuery(userInfo)
+          insertQuery<-UserRoles returning UserRoles ++= userRoleObjs
+          delQuery <- UserRoles.filter(_.roleId inSet resolvedIdEntries._2).delete
 
-      }yield {
-        (updateActive,delQuery,insertQuery)
+        }yield {
+          (updateActive,delQuery,insertQuery)
+        }
+        db.run(query.transactionally)//TODO try to get updated record.
       }
-
-      db.run(query.transactionally)//TODO try to get updated record.
     }
   }
+
   def insertUserWithRoles(userInfo:UserInfo,password:String):Future[UserInfo]={
     val user = User(username = userInfo.userName, password = password, displayname = userInfo.displayName,avatar = None)
     val query =for{
