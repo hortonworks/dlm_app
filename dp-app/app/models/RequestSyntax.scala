@@ -6,7 +6,6 @@ import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
 object RequestSyntax {
   case class RegisterDpCluster(lake: DataplaneCluster, cluster: Cluster)
-
 }
 
 object Formatters {
