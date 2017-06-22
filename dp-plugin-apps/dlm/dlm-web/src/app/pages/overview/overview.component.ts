@@ -62,7 +62,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
   prepareChartData(jobs: Job[], policies: Policy[], clusters: Cluster[], filters) {
     const filteredPolicies = policies
-      .filter(policy => policy.jobsResource.some(job => job.status !== 'SUCCESS'))
+      .filter(policy => policy.jobsResource.some(job => job.status !== JOB_STATUS.SUCCESS))
       .filter(policy => this.filterPolicyByJob(policy, filters));
     const filteredPolicyNames = filteredPolicies.map(p => p.name);
     const filteredJobs = filterCollection(jobs, {name: filteredPolicyNames});
@@ -118,7 +118,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.tableData$ = Observable
       .combineLatest(this.tableResources$, this.overviewJobsExternalFiltersService.filters$)
       .map(([policies, filters]) => policies
-        .filter(policy => policy.jobsResource.some(job => job.status !== 'SUCCESS'))
+        .filter(policy => policy.jobsResource.some(job => job.status !== JOB_STATUS.SUCCESS))
         .filter(policy => this.filterPolicyByJob(policy, filters))
         .map(policy => this.mapTableData(policy)));
 

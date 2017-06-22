@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, TemplateRef, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -12,8 +13,7 @@ import { OperationResponse } from 'models/operation-response.model';
 import { deletePolicy, resumePolicy, suspendPolicy } from 'actions/policy.action';
 import { abortJob } from 'actions/job.action';
 import { StatusColumnComponent } from 'components/table-columns/status-column/status-column.component';
-import { Policy } from '../../../models/policy.model';
-import { Router } from '@angular/router';
+import { Policy } from 'models/policy.model';
 
 @Component({
   selector: 'dlm-jobs-overview-table',
@@ -148,7 +148,7 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
     this.showOperationResponseModal = false;
   }
 
-  gotToPolicy(policy: Policy) {
+  goToPolicy(policy: Policy) {
     this.router.navigate(['/policies'], {queryParams: {policy: policy.id}});
   }
 
