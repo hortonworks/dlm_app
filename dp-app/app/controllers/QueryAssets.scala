@@ -61,7 +61,7 @@ class QueryAssets @Inject()(
               case Right(relationships) => {
                 val enhanced = entities.map { cEntity =>
 
-                  val cRelationship = relationships.find(_.guid == cEntity.guid)
+                  val cRelationship = relationships.find(_.guid == cEntity.guid.get)
                   cRelationship match {
                     case None => cEntity
                     case Some(relationship) => cEntity.copy(datasetId = Option(relationship.datasetId), datasetName = Option(relationship.datasetName))
