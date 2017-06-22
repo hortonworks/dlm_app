@@ -21,7 +21,7 @@ import { Breadcrumb } from 'components/breadcrumb/breadcrumb.type';
     <dlm-table
       #hdfsFilesTable
       [columns]="columns"
-      [rows]="rows"
+      [rows]="rows$ | async"
       [selectionType]="selectionType"
       [scrollbarV]="scrollbarV"
       (selectRowAction)="handleSelectedAction($event)"
@@ -65,7 +65,6 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   rows$: Observable<ListStatus[]>;
   rows: ListStatus[];
   currentDirectory$: BehaviorSubject<string>;
-  rowsSubscription$;
   columns: any = [];
   externalSorting = true;
   scrollbarV = false;
@@ -100,7 +99,6 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
       {prop: 'modificationTime', name: 'Last Modified', cellClass: 'date-cell', headerClass: 'date-header',
         cellTemplate: this.dateTemplate, maxWidth: 130}
     ];
-    this.rowsSubscription$ = this.rows$.subscribe(rows => this.rows = rows);
   }
 
   ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
@@ -213,8 +211,6 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.rowsSubscription$) {
-      this.rowsSubscription$.unsubscribe();
-    }
+
   }
 }

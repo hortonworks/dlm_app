@@ -25,7 +25,7 @@ class Module extends AbstractModule {
   @Provides
   @Singleton
   @Named("userService")
-  def provideUserService(implicit ws: WSClient,configuration: Configuration):UserService = {
+  def provideUserService(implicit ws: WSClient, configuration: Configuration): UserService = {
     new UserServiceImpl(configuration.underlying)
   }
 
@@ -33,28 +33,28 @@ class Module extends AbstractModule {
   @Provides
   @Singleton
   @Named("dataSetService")
-  def provideDataSetService(implicit ws: WSClient,configuration: Configuration):DataSetService = {
+  def provideDataSetService(implicit ws: WSClient, configuration: Configuration): DataSetService = {
     new DataSetServiceImpl(configuration.underlying)
   }
 
   @Provides
   @Singleton
   @Named("categoryService")
-  def provideCategoryService(implicit ws: WSClient,configuration: Configuration):CategoryService = {
+  def provideCategoryService(implicit ws: WSClient, configuration: Configuration): CategoryService = {
     new CategoryServiceImpl(configuration.underlying)
   }
 
   @Provides
   @Singleton
   @Named("dataSetCategoryService")
-  def provideDataSetCategoryService(implicit ws: WSClient,configuration: Configuration):DataSetCategoryService = {
+  def provideDataSetCategoryService(implicit ws: WSClient, configuration: Configuration): DataSetCategoryService = {
     new DataSetCategoryServiceImpl(configuration.underlying)
   }
 
   @Provides
   @Singleton
   @Named("dpClusterService")
-  def provideDpClusterService(implicit ws: WSClient, configuration: Configuration):DpClusterService = {
+  def provideDpClusterService(implicit ws: WSClient, configuration: Configuration): DpClusterService = {
     new DpClusterServiceImpl(configuration.underlying)
   }
 
@@ -62,7 +62,7 @@ class Module extends AbstractModule {
   @Provides
   @Singleton
   @Named("locationService")
-  def provideLocationService(implicit ws: WSClient,configuration: Configuration):LocationService = {
+  def provideLocationService(implicit ws: WSClient, configuration: Configuration): LocationService = {
     new LocationServiceImpl(configuration.underlying)
   }
 
@@ -70,7 +70,7 @@ class Module extends AbstractModule {
   @Provides
   @Singleton
   @Named("clusterService")
-  def provideClusterService(implicit ws: WSClient,configuration: Configuration):ClusterService = {
+  def provideClusterService(implicit ws: WSClient, configuration: Configuration): ClusterService = {
     new ClusterServiceImpl(configuration.underlying)
   }
 
@@ -78,14 +78,14 @@ class Module extends AbstractModule {
   @Provides
   @Singleton
   @Named("atlasService")
-  def provideAtlasService(implicit ws: WSClient,configuration: Configuration):com.hortonworks.dataplane.cs.Webservice.AtlasService = {
+  def provideAtlasService(implicit ws: WSClient, configuration: Configuration): com.hortonworks.dataplane.cs.Webservice.AtlasService = {
     new AtlasServiceImpl(configuration.underlying)
   }
 
   @Provides
   @Singleton
   @Named("clusterHostsService")
-  def provideClusterHostsService(implicit ws: WSClient,configuration: Configuration):ClusterHostsService = {
+  def provideClusterHostsService(implicit ws: WSClient, configuration: Configuration): ClusterHostsService = {
     new ClusterHostsServiceImpl(configuration.underlying)
   }
 
@@ -93,28 +93,35 @@ class Module extends AbstractModule {
   @Provides
   @Singleton
   @Named("clusterComponentsService")
-  def provideClusterComponentsService(implicit ws: WSClient,configuration: Configuration):ClusterComponentService = {
+  def provideClusterComponentsService(implicit ws: WSClient, configuration: Configuration): ClusterComponentService = {
     new ClusterComponentServiceImpl(configuration.underlying)
   }
 
   @Provides
   @Singleton
+  @Named("ldapConfigService")
+  def provideLdapConfigServic(implicit ws: WSClient, configuration: Configuration): LdapConfigService = {
+    new LdapConfigServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
   @Named("workspaceService")
-  def provideWorkspaceService(implicit ws: WSClient,configuration: Configuration): WorkspaceService = {
+  def provideWorkspaceService(implicit ws: WSClient, configuration: Configuration): WorkspaceService = {
     new WorkspaceServiceImpl(configuration.underlying)
   }
 
   @Provides
   @Singleton
   @Named("assetWorkspaceService")
-  def provideAssetWorkspaceService(implicit ws: WSClient,configuration: Configuration): AssetWorkspaceService = {
+  def provideAssetWorkspaceService(implicit ws: WSClient, configuration: Configuration): AssetWorkspaceService = {
     new AssetWorkspaceServiceImpl(configuration.underlying)
   }
 
   @Provides
   @Singleton
   @Named("notebookWorkspaceService")
-  def provideNotebookWorkspaceService(implicit ws: WSClient,configuration: Configuration): NotebookWorkspaceService = {
+  def provideNotebookWorkspaceService(implicit ws: WSClient, configuration: Configuration): NotebookWorkspaceService = {
     new NotebookWorkspaceServiceImpl(configuration.underlying)
   }
 

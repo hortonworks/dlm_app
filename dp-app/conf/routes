@@ -72,6 +72,11 @@ GET           /api/assets/details/:clusterId/:atlasGuid        controllers.Query
 GET           /api/assets/typeDefs/:clusterId/:defType         controllers.QueryAttributes.getTypeDefs(clusterId: String, defType: String)
 GET           /api/assets/lineage/:clusterId/:atlasGuid        controllers.QueryAttributes.getLineage(clusterId: String, atlasGuid: String)
 
+#LDAP
+POST          /api/knox/validate                               controllers.KnoxConfig.validate
+POST          /api/knox/configure                              controllers.KnoxConfig.configure
+GET           /api/users/ldapsearch                            controllers.UserManager.ldapSearch
+
 #Workspace API
 GET           /api/workspaces                                  controllers.Workspaces.list
 GET           /api/workspaces/name/:name                       controllers.Workspaces.retrieve(name)

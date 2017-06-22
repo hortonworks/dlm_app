@@ -102,6 +102,17 @@ export class DsAssetsService {
       .catch(HttpUtil.handleError)
   }
 
+  tagsQuery(clusterId: number): Observable<string[]> {
+    const uri = `/api/assets/typeDefs/${clusterId}/classification`;
+
+    return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .map(data => data.classificationDefs.map(cTagObj => cTagObj.name))
+      .catch(HttpUtil.handleError)
+
+  }
+
   extractAssetArrayFromDbData(dataArr: any[]) :DsAssetModel[]{
     let assetModelArr :DsAssetModel[] = [];
     dataArr && dataArr.forEach(ent=>{

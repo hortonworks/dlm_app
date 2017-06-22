@@ -14,7 +14,7 @@ public interface UserServiceInterface {
   @RequestMapping(method = RequestMethod.GET, value = "/users")
   UserList getUser(@RequestParam(value = "username") String name);
 
-  @RequestMapping(method = RequestMethod.GET, value = "/user-role/user/{userName}")
+  @RequestMapping(method = RequestMethod.GET, value = "/users/role/{userName}")
   UserRoleResponse getRoles(@PathVariable("userName") String userName);
 
 

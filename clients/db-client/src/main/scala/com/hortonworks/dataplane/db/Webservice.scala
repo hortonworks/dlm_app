@@ -186,6 +186,14 @@ object Webservice {
     def getConfig(key: String): Future[Option[DpConfig]]
   }
 
+  trait LdapConfigService extends DbClientService{
+
+    def create(ldapConfig:LdapConfiguration): Future[Either[Errors, LdapConfiguration]]
+
+    def get(): Future[Either[Errors, Seq[LdapConfiguration]]]
+
+  }
+
   trait WorkspaceService extends DbClientService {
     def list(): Future[Either[Errors, Seq[WorkspaceDetails]]]
 

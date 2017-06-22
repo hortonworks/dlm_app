@@ -21,6 +21,10 @@ export class FormService {
   }
 
   resetForm(formId: string) {
-    this.sessionStorage.delete(formId);
+    const formNamespaceValue = this.sessionStorage.get(this.formNamespace);
+    if (formNamespaceValue[formId]) {
+      delete formNamespaceValue[formId];
+      this.sessionStorage.set(this.formNamespace, formNamespaceValue);
+    }
   }
 }

@@ -329,6 +329,8 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
             value.job.startTime.date = moment(startDate).add(1, 'weeks').isoWeekday(dayToLook).format('YYYY-MM-DD');
           }
         }
+      } else if (value.job.repeatMode === this.policyRepeatModes.NEVER) {
+        value.job.frequencyInSec = 0;
       }
       this.formSubmit.emit(value);
     }

@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Input, Output, SimpleChange, ViewChild} from "@angular/core";
+import {Component, ElementRef, EventEmitter, Input, Output, SimpleChange, ViewChild, AfterViewInit} from "@angular/core";
 
 export class TaggingWidgetTagModel {
   constructor(public display: string, public data?: any) {
@@ -10,13 +10,14 @@ export class TaggingWidgetTagModel {
   styleUrls: ["./tagging-widget.component.scss"],
   templateUrl: "./tagging-widget.component.html",
 })
-export class TaggingWidget {
+export class TaggingWidget implements AfterViewInit{
   @Input() tags: Array<string | TaggingWidgetTagModel> = [];
   @Input() availableTags: Array<string | TaggingWidgetTagModel> = [];
   @Input() allowTagDismissal: boolean = true;
   @Input() clearOnSearch: boolean = false;
   @Input() searchText: string = "";
   @Input() placeHolderText: string = "";
+  @Input() theme: TagTheme  = TagTheme.LIGHT;
 
   @Output("textChange") searchTextEmitter = new EventEmitter<string>();
   @Output("onNewSearch") newTagEmitter = new EventEmitter<string | TaggingWidgetTagModel>();
@@ -40,6 +41,13 @@ export class TaggingWidget {
 
   emitSearchText() {
     this.newTagEmitter.emit(this.searchText);
+  }
+
+  ngAfterViewInit() {
+    if(this.theme as TagTheme === TagTheme.DARK as TagTheme){
+      let classes = this.parent.nativeElement.className;
+      this.parent.nativeElement.className = `${classes} taggingWidget-dark`;
+    }
   }
 
   onKeyDown(event) {
@@ -118,4 +126,9 @@ export class TaggingWidget {
   focusOnSticker(i) {
     this.focusStickerIndex = i;
   }
+}
+
+export enum TagTheme {
+  DARK,
+  LIGHT
 }

@@ -4,12 +4,14 @@
           (click)="filterPoliciesByService(POLICY_TYPES.HDFS)">
     <span class="hexagon hexagon-warning">
       <i class="fa fa-file-o"></i>
-    </span> <span class="service-name">{{POLICY_TYPES_LABELS[POLICY_TYPES.HDFS]}}</span>
+    </span>
+    <span class="service-name">{{POLICY_TYPES_LABELS[POLICY_TYPES.HDFS]}}</span>
   </button>
   <button type="button" class="btn btn-xs btn-default" [class.active]="activeService === POLICY_TYPES.HIVE"
           (click)="filterPoliciesByService(POLICY_TYPES.HIVE)">
     <span class="hexagon hexagon-success">
       <i class="fa fa-database"></i>
-    </span> <span class="service-name">{{POLICY_TYPES_LABELS[POLICY_TYPES.HIVE]}}</span>
+    </span>
+    <span class="service-name">{{POLICY_TYPES_LABELS[POLICY_TYPES.HIVE]}}</span>
   </button>
 </div>
