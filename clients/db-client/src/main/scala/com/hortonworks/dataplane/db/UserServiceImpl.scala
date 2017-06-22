@@ -175,7 +175,7 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       .post(Json.toJson(userInfo))
       .map { res =>
         res.status match {
-          case 200 => Right((res.json \ "results").validate[Boolean].get)
+          case 200 => Right(true)
           case _ =>mapErrors(res)
         }
       }

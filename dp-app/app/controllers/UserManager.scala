@@ -118,7 +118,6 @@ class UserManager @Inject()(val ldapService: LdapService,
           case Left(errors) => handleErrors(errors)
           case Right(updated) => Ok(Json.toJson("success"))
         }
-        Future.successful(BadRequest)
       }
       .getOrElse(Future.successful(BadRequest))
   }
