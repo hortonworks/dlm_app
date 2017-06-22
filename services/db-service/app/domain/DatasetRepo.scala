@@ -244,13 +244,13 @@ class DatasetRepo @Inject()(
 
   def queryManagedAssets(clusterId: Long, assets: Seq[String]): Future[Seq[JsValue]] = {
     val query = for {
-      (dataAsset, dataset) <- dataAssetRepo.DatasetAssets.filter(record => record.guid.inSet(assets) && record.clusterId === clusterId) join Datasets on (_.datasetId === _.id)
-    } yield (dataAsset.guid, dataset.name)
+      (dataAsset, dataset) <- dataAssetRepo.DatasetAssets.filter(record => record.guid.inSet(assets) /* && record.clusterId === clusterId */) join Datasets on (_.datasetId === _.id)
+    } yield (dataAsset.guid, dataset.id, dataset.name)
 
     db.run(query.to[Seq].result).map {
       results =>
         results.map {
-          case (guid, datasetName) => Json.obj("guid" -> guid, "dataset" -> datasetName)
+          case (guid, datasetId, datasetName) => Json.obj("guid" -> guid, "datasetId" -> datasetId, "datasetName" -> datasetName)
         }
     }
 

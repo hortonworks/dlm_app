@@ -18,7 +18,7 @@ class DataAssetServiceImpl(config: Config)(implicit ws: WSClient)
       .getOrElse(config.getString("dp.services.db.service.uri"))
 
   override def findManagedAssets(clusterId:Long, assets: Seq[String]): Future[Either[Errors, Seq[JsObject]]] = {
-    ws.url(s"$url/query-managed-assets?clusterId=$clusterId")
+    ws.url(s"$url/dataassets/query-managed?clusterId=$clusterId")
       .withHeaders(
         "Content-Type" -> "application/json",
         "Accept" -> "application/json"
