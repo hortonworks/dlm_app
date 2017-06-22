@@ -51,5 +51,5 @@ class DataAssets @Inject()(dataAssetRepo: DataAssetRepo)(implicit exec: Executio
       .getOrElse(Future.successful(BadRequest))
   }
 
-  
+
 }

@@ -61,9 +61,6 @@ GET           /api/dataset/:id/assets                          controllers.DataS
 POST          /api/query-assets                                controllers.QueryAssets.search(clusterId: String)
 GET           /api/query-attributes                            controllers.QueryAttributes.list(clusterId: String)
 
-# Assets
-POST          /api/query-managed-assets                       controllers.QueryManagedAssets.findManagedAssets(clusterId: Long)
-
 #Tags API
 GET           /api/dataset-tag/list                            controllers.DataSets.listCategoriesCount(search:Option[String])
 GET           /api/dataset-tag/:tagName                        controllers.DataSets.getCategoryCount(tagName:String)
