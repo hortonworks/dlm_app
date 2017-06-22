@@ -12,7 +12,7 @@ import {TagTheme} from '../../../../../shared/tagging-widget/tagging-widget.comp
 export class UserAddComponent implements OnInit {
 
   showNotification = false;
-  tags: string[] = [];
+  users: string[] = [];
   availableUsers: string[] = [];
   tagThemes = TagTheme
 
@@ -32,7 +32,11 @@ export class UserAddComponent implements OnInit {
   }
 
   save() {
-
+    this.userService.addAdminUsers(this.users).subscribe(response => {
+      console.log(response)
+    }, (error)=>{
+      console.error(error)
+    });
   }
 
   back() {
@@ -40,7 +44,7 @@ export class UserAddComponent implements OnInit {
   }
 
   onNewUserAddition(text: string) {
-    this.tags.push(text);
+    this.users.push(text);
   }
 
   onTagSearchChange(text: string) {

@@ -16,7 +16,7 @@
   </div>
   <div class="dp-input">
     <label class="text-medium">{{"pages.onboard.adduser.labels.users" | translate}}</label>
-    <tagging-widget id="tags" [tags]="tags" [clearOnSearch]="true"
+    <tagging-widget id="tags" [tags]="users" [clearOnSearch]="true"
     [availableTags]="availableUsers"
     [clearOnSearch]="true"
     (textChange)="onTagSearchChange($event)"
