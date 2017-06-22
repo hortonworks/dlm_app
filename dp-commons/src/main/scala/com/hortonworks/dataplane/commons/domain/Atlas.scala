@@ -11,16 +11,16 @@ object Atlas {
                     guid: Option[String],
                     status: Option[String],
                     displayText: Option[String],
-                    tags : Option[Seq[String]])
+                    tags : Option[Seq[String]],
+                    datasetId: Option[Long],
+                    datasetName: Option[String])
 
   case class EntityWithDataset(typeName: Option[String],
                                attributes: Option[Map[String, String]],
                                guid: Option[String],
                                status: Option[String],
                                displayText: Option[String],
-                               tags : Option[Seq[String]],
-                               datasetId: Long,
-                               datasetName: String)
+                               tags : Option[Seq[String]])
 
   case class AtlasEntities(entities: Option[List[Entity]])
 
