@@ -33,4 +33,18 @@ export class UserService {
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }
+
+  getUserByName(userName) : Observable<User> {
+    return this.http
+      .get(`${this.url}/detail?userName=${userName}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
+  getAllRoles(): Observable<any[]> {
+    return this.http
+      .get(`/api/roles`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
 }

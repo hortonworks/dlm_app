@@ -25,7 +25,7 @@ export const routes: Routes = [{
       outlet: 'sidebar',
     },
     {
-      path: 'edit/:id',
+      path: 'edit/:name',
       component: AddUserComponent,
       outlet: 'sidebar',
     }

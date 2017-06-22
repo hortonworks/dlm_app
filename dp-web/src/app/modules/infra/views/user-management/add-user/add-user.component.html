@@ -1,0 +1,71 @@
+<div class="load-right-to-left-slider dialog1x">
+  <div class="title-container">
+    <div class="text-medium">
+      <span *ngIf="mode === 'add'">ADD USER</span>
+      <span *ngIf="mode === 'edit'">{{user? user.userName: ''}}</span>
+      <i class="fa fa-remove close-icon" (click)="back()"></i>
+    </div>
+  </div>
+  <div *ngIf="mode === 'add'" class="slider-container">
+    <div class="dp-input">
+      <label class="text-medium">Username/Group</label>
+      <tagging-widget id="tags" class="user-tags" [tags]="users" [clearOnSearch]="true"
+      [availableTags]="availableUsers"
+      [clearOnSearch]="true"
+      (textChange)="onUserSearchChange($event)"
+      (onNewSearch)="onNewUserAddition($event)"
+      [theme]="tagTheme.DARK"></tagging-widget>
+    </div>
+    <div class="dp-input">
+      <label class="text-medium">Roles</label>
+      <tagging-widget class="role-tags" id="role-tags" [tags]="roles" [clearOnSearch]="true"
+      [availableTags]="availableRoles"
+      [clearOnSearch]="true"
+      (textChange)="onRoleSearchChange($event)"
+      (onNewSearch)="onNewRoleAddition($event)"
+      [theme]="tagTheme.DARK"></tagging-widget>
+    </div>
+    <div class="margin-top-20">
+      <button class="mdl-button btn-hwx-primary margin-right-10" (click)="add()">SAVE</button>
+      <button class="mdl-button btn-hwx-secondary" (click)="back()">CANCEL</button>
+    </div>
+  </div>
+  <div *ngIf="mode === 'edit'" class="slider-container">
+    <div class="">
+      <div class="mdl-grid mdl-grid--no-spacing" style="padding-top: 15px">
+        <div class="mdl-cell mdl-cell--2-col">Username</div>
+        <div class="mdl-cell mdl-cell--1-col">  &nbsp;: </div>
+        <div class="mdl-cell mdl-cell--9-col">{{user? user.userName: ''}} </div>
+      </div>
+      <div class="mdl-grid mdl-grid--no-spacing" style="padding-top: 15px">
+        <div class="mdl-cell mdl-cell--2-col">Status</div>
+        <div class="mdl-cell mdl-cell--1-col"> &nbsp;: </div>
+        <div class="mdl-cell mdl-cell--9-col">
+        <label class="mdl-switch mdl-js-switch" for="status-switch">
+          <input type="checkbox" id="status-switch" class="mdl-switch__input" [(ngModel)] = "user.active"/>
+          <span class="mdl-switch__label"></span>
+          {{user && user.active?'Active' :'Inactive'}}
+        </label>
+      </div>
+      </div>
+      <div class="mdl-grid mdl-grid--no-spacing" style="padding-top: 15px">
+        <div class="mdl-cell mdl-cell--2-col">Roles</div>
+        <div class="mdl-cell mdl-cell--1-col">  &nbsp;: </div>
+        <div class="mdl-cell mdl-cell--9-col">
+            <tagging-widget class="role-edit-tags" id="role-tags" [tags]="user.roles" [clearOnSearch]="true"
+            [availableTags]="availableRoles"
+            [clearOnSearch]="true"
+            (textChange)="onRoleSearchChange($event)"
+            (onNewSearch)="onNewRoleAddition($event)"
+            [theme]="tagTheme.DARK"></tagging-widget>
+        </div>
+      </div>
+    </div>
+    <div class="margin-top-20">
+      <button class="mdl-button btn-hwx-primary margin-right-10" (click)="add()">SAVE</button>
+      <button class="mdl-button btn-hwx-secondary" (click)="back()">CANCEL</button>
+    </div>
+  </div>
+
+
+</div>

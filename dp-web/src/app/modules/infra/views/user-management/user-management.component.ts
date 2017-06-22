@@ -25,8 +25,8 @@ export class UserManagementComponent implements OnInit {
     this.router.navigate([{outlets: {'sidebar': ['add']}}], {relativeTo: this.route});
   }
 
-  editUser(userId) {
-    this.router.navigate([{outlets: {'sidebar': ['edit', userId]}}], {relativeTo: this.route});
+  editUser(userName) {
+    this.router.navigate([{outlets: {'sidebar': ['edit', userName]}}], {relativeTo: this.route});
   }
 
 }
