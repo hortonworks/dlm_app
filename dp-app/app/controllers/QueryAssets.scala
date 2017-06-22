@@ -32,7 +32,7 @@ class QueryAssets @Inject()(
 
       val future = for {
         results <- atlasService.searchQueryAssets(clusterId, filters)
-        enhancedResults <- doEnhanceAssetsWithOwningDataset(clusterId.asInstanceOf[Long], results)
+        enhancedResults <- doEnhanceAssetsWithOwningDataset(clusterId, results)
       } yield enhancedResults
 
       future
@@ -46,14 +46,14 @@ class QueryAssets @Inject()(
 
   }
 
-  private def doEnhanceAssetsWithOwningDataset(clusterId: Long, atlasEntities: Either[Errors, AtlasEntities]): Future[Either[Errors, Seq[Entity]]] = {
+  private def doEnhanceAssetsWithOwningDataset(clusterIdAsString: String, atlasEntities: Either[Errors, AtlasEntities]): Future[Either[Errors, Seq[Entity]]] = {
     atlasEntities match {
       case Left(errors) => Future.successful(Left(errors))
       case Right(atlasEntities) => {
 
         val entities = atlasEntities.entities.getOrElse(Seq[Entity]())
         val assetIds: Seq[String] = entities.filter(_.guid.nonEmpty)map(_.guid.get)
-
+        val clusterId = clusterIdAsString.toLong
         assetService.findManagedAssets(clusterId, assetIds)
           .map { relationships =>
             relationships match {
@@ -64,7 +64,7 @@ class QueryAssets @Inject()(
                   val cRelationship = relationships.find(_.guid == cEntity.guid)
                   cRelationship match {
                     case None => cEntity
-                    case Some(relationship) => cEntity.copy(datasetId = Option(relationship.datasetId), xdatasetName = Option(relationship.datasetName))
+                    case Some(relationship) => cEntity.copy(datasetId = Option(relationship.datasetId), datasetName = Option(relationship.datasetName))
                   }
 
                 }
