@@ -15,6 +15,10 @@ object Atlas {
                     datasetId: Option[Long],
                     datasetName: Option[String])
 
+  case class EntityDatasetRelationship(guid: String,
+                                       datasetId: Long,
+                                       datasetName: String)
+
   case class AtlasEntities(entities: Option[List[Entity]])
 
   case class AssetProperties(typeName: Option[String],
@@ -65,6 +69,9 @@ object Atlas {
 
   implicit val entityReads = Json.reads[Entity]
   implicit val entityWrites = Json.writes[Entity]
+
+  implicit val entityDatasetRelationshipReads = Json.reads[EntityDatasetRelationship]
+  implicit val entityDatasetRelationshipWrites = Json.writes[EntityDatasetRelationship]
 
   implicit val atlasEntitiesReads = Json.reads[AtlasEntities]
   implicit val atlasEntitiesWrites = Json.writes[AtlasEntities]

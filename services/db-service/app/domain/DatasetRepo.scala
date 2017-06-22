@@ -3,9 +3,10 @@ package domain
 import java.time.LocalDateTime
 import javax.inject._
 
+import com.hortonworks.dataplane.commons.domain.Atlas.EntityDatasetRelationship
 import com.hortonworks.dataplane.commons.domain.Entities._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.JsValue
 import slick.lifted.ColumnOrdered
 
 import scala.concurrent.Future
@@ -242,7 +243,7 @@ class DatasetRepo @Inject()(
   }
 
 
-  def queryManagedAssets(clusterId: Long, assets: Seq[String]): Future[Seq[JsValue]] = {
+  def queryManagedAssets(clusterId: Long, assets: Seq[String]): Future[Seq[EntityDatasetRelationship]] = {
     val query = for {
       (dataAsset, dataset) <- dataAssetRepo.DatasetAssets.filter(record => record.guid.inSet(assets) /* && record.clusterId === clusterId */) join Datasets on (_.datasetId === _.id)
     } yield (dataAsset.guid, dataset.id, dataset.name)
@@ -250,7 +251,7 @@ class DatasetRepo @Inject()(
     db.run(query.to[Seq].result).map {
       results =>
         results.map {
-          case (guid, datasetId, datasetName) => Json.obj("guid" -> guid, "datasetId" -> datasetId, "datasetName" -> datasetName)
+          case (guid, datasetId, datasetName) => EntityDatasetRelationship(guid, datasetId.get, datasetName)
         }
     }
 
