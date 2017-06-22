@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { OVERVIEW_FILTERS } from 'constants/date.constant';
 import { OverviewJobsExternalFiltersService } from '../../../services/overview-jobs-external-filters.service';
 
@@ -7,15 +7,21 @@ import { OverviewJobsExternalFiltersService } from '../../../services/overview-j
   templateUrl: './overview-filter.component.html',
   styleUrls: ['./overview-filter.component.scss']
 })
-export class OverviewFilterComponent {
+export class OverviewFilterComponent implements OnInit {
   activeOption = '';
   OVERVIEW_FILTERS = OVERVIEW_FILTERS;
 
   constructor(private overviewJobsExternalFiltersService: OverviewJobsExternalFiltersService) {
   }
 
+  ngOnInit() {
+    this.doFilter(OVERVIEW_FILTERS.DAYS);
+  }
+
   doFilter(option) {
-    this.activeOption = this.activeOption === option ? '' : option;
-    this.overviewJobsExternalFiltersService.setFilter('timeRange', this.activeOption);
+    if (this.activeOption !== option) {
+      this.activeOption = option;
+      this.overviewJobsExternalFiltersService.setFilter('timeRange', this.activeOption);
+    }
   }
 }
