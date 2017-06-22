@@ -6,6 +6,7 @@ ALL_DOCKER_COMPOSE_DB_FILES="-f docker-compose.yml -f docker-compose-migrate.yml
 ALL_DOCKER_COMPOSE_FILES=${ALL_DOCKER_COMPOSE_DB_FILES}" "${ALL_DOCKER_COMPOSE_APP_FILES} 
 
 CERTS_DIR=`dirname $0`/certs
+KNOX_SIGNING_CERTIFICATE=knox-signing.pem
 DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 
@@ -39,7 +40,7 @@ destroy() {
 
 destroy_knox() {
     docker-compose -f docker-compose-knox.yml down
-    rm -rf ${CERTS_DIR}
+    rm -rf ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
 }
 
 init_app() {
@@ -74,7 +75,7 @@ init_knox() {
     fi
     docker exec -it ${KNOX_CONTAINER_ID} ./wait_for_keystore_file.sh
     mkdir -p ${CERTS_DIR}
-    export_knox_cert $MASTER_PASSWD $KNOX_CONTAINER_ID > ${CERTS_DIR}/knox-signing.pem
+    export_knox_cert $MASTER_PASSWD $KNOX_CONTAINER_ID > ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
     if [ ${USE_TEST_LDAP} == "no" ]
     then
         docker exec -it ${KNOX_CONTAINER_ID} ./setup_knox_sso_conf.sh
