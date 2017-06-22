@@ -29,10 +29,7 @@ export class DsFullView implements OnInit {
       .subscribe(params => {
         this.richDatasetService
           .getById(+params["id"])
-          .subscribe(dsObj => {
-            console.log(dsObj.counts);
-            this.dsModel = dsObj
-          });
+          .subscribe(dsObj => this.dsModel = dsObj);
         this.dsAssetQueryModel = new AssetSetQueryModel([
           new AssetSetQueryFilterModel("dataset.id", "=", +params["id"], "-")
         ]);
