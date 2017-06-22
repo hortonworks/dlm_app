@@ -4,7 +4,6 @@ import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Entities.{DataAsset, DatasetDetails}
 import domain.{API, DataAssetRepo, DatasetDetailsRepo}
-import play.api.libs.json.Json
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -52,4 +51,5 @@ class DataAssets @Inject()(dataAssetRepo: DataAssetRepo)(implicit exec: Executio
       .getOrElse(Future.successful(BadRequest))
   }
 
+  
 }
