@@ -26,16 +26,19 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
 
   def allWithRoles(offset:Long=0,pageSize:Long=20): Future[Seq[UserInfo]] = {
     val query=for{
-      (user, userRole) <- Users.drop(offset).take(pageSize) join UserRoles on (_.id === _.userId)
+      (user, userRole) <- Users.drop(offset).take(pageSize) joinLeft  UserRoles on (_.id === _.userId)
     }yield {
-      (user,userRole.roleId)
+      (user,userRole)
     }
     val roleIdMap=rolesUtil.getRoleIdMap
     db.run(query.result).map { res =>
       res.groupBy(_._1.id).map{
         case (id, results) =>
-          var roles=results.map(data=>RoleType.withName(roleIdMap(data._2.get).roleName))
           val user = results.head._1
+          var roles=results.filter(res=>res._2.isDefined )
+            .map{data=>
+              RoleType.withName(roleIdMap(data._2.get.roleId.get).roleName)
+          }
           UserInfo(id=id,userName=user.username,displayName = user.displayname,roles=roles)
       }.toSeq
     }
@@ -43,14 +46,17 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
 
   def getUserDetail(userName:String)={
     val query=for{
-      (user, userRole) <- Users.filter(_.username===userName) join UserRoles on (_.id === _.userId)
+      (user, userRole) <- Users.filter(_.username===userName) joinLeft  UserRoles on (_.id === _.userId)
     }yield {
-      (user,userRole.roleId)
+      (user,userRole)
     }
     val roleIdMap=rolesUtil.getRoleIdMap
-    db.run(query.result).map { res =>
-      var roles=res.seq.map(res=>RoleType.withName(roleIdMap(res._2.get).roleName))
-      val user:User=res.head._1
+    db.run(query.result).map { results =>
+      val user:User=results.head._1
+      var roles=results.filter(res=>res._2.isDefined )
+        .map{data=>
+          RoleType.withName(roleIdMap(data._2.get.roleId.get).roleName)
+        }
       UserInfo(id=user.id,userName=user.username,displayName = user.displayname,roles=roles)
     }
   }
@@ -63,7 +69,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     }
   }
   def updateActiveAndRoles(userInfo:UserInfo)={
-    val userRolesQuery=UserRoles.filter(_.id === userInfo.id.get).result
+    val userRolesQuery=UserRoles.filter(_.userId === userInfo.id.get).result
     db.run(userRolesQuery).map { userRoles =>
       val resolvedIdEntries=resolveUserRolesEntries(userInfo.roles,userRoles)
       val userRoleObjs=rolesUtil.getUserRoleObjectsforRoles(userInfo.id.get,rolesUtil.getRoleTypesForRoleIds(resolvedIdEntries._1.toList))
