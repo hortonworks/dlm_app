@@ -24,7 +24,7 @@
       <tbody>
         <tr *ngFor="let user of users">
           <td class="mdl-data-table__cell--non-numeric"><input name={{user.id}} type="checkbox"/></td>
-          <td class="mdl-data-table__cell--non-numeric key-column"(click)="editUser(user.id)">{{user.userName}}</td>
+          <td class="mdl-data-table__cell--non-numeric key-column"(click)="editUser(user.userName)">{{user.userName}}</td>
           <td class="mdl-data-table__cell--non-numeric">{{user.roles.join(', ')}}</td>
           <td class="mdl-data-table__cell--non-numeric">{{user.active? 'Active' : 'Inactive'}}</td>
           <td>

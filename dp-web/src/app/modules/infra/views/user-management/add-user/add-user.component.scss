@@ -1,0 +1,130 @@
+@import "../../../../../../styles/variables";
+
+.text-medium {
+  font-size: 15px;
+}
+
+.text-large {
+  font-size: 24px;
+}
+
+.text-xlarge {
+  font-size: 30px;
+}
+
+.text-small {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.text-light {
+  color: $dusty-gray;
+}
+
+.text-xsmall{
+  font-size: 12px;
+}
+
+.title-container {
+  padding: 10px 20px;
+  border-bottom: 1px solid $silver;
+}
+
+.dialog1x {
+  width: 400px;
+  border-top: 1px solid $silver;
+}
+
+.slider-container {
+  padding: 10px 20px;
+}
+
+.mdl-chip {
+  border-radius: 2px;
+  background-color: $eastern-blue;
+  padding: 2px;
+  margin: 0px;
+  height: 14px;
+}
+
+.mdl-chip__text {
+  vertical-align: top;
+  line-height: 1;
+  color: $white;
+}
+
+
+.dp-input {
+  margin: 15px 0px;
+  label {
+    display: block;
+  }
+}
+
+:host /deep/ .user-tags .taggingWidget {
+  width: 360px !important;
+  height: 120px !important;
+  padding: 0px;
+  border-radius: 0px !important;
+  input {
+    font-size: 12px !important;
+  }
+}
+
+:host /deep/ .role-tags .taggingWidget{
+  width: 360px !important;
+  height: 34px !important;
+  padding: 0px;
+  border-radius: 0px !important;
+  input {
+    font-size: 12px !important;
+  }
+}
+
+:host /deep/ .role-edit-tags .taggingWidget{
+  width: 270px !important;
+  height: 34px !important;
+  padding: 0px;
+  border-radius: 0px !important;
+  input {
+    font-size: 12px !important;
+  }
+}
+
+.margin-top-20{
+  margin-top: 20px;
+}
+
+.close-icon{
+  float: right;
+  margin-top: 3px;
+  cursor: pointer;
+}
+
+:host /deep/ .mdl-switch__thumb {
+  background: $alabaster;
+  height: 12px;
+  width: 12px;
+  top: 7px;
+  left: 2px
+}
+
+:host /deep/ .mdl-switch__track {
+  background: $shuttle-gray;
+  position: absolute;
+  left: 0;
+  top: 5px;
+  height: 16px;
+  width: 26px;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+:host /deep/ .mdl-switch.is-checked .mdl-switch__thumb {
+  background: $alabaster;
+  left: 12px;
+}
+
+:host /deep/ .mdl-switch.is-checked .mdl-switch__track {
+  background: $forest-green-1
+}
