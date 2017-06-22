@@ -4,7 +4,8 @@ import { JOB_STATUS } from 'constants/status.constant';
 
 @Component({
   selector: 'dlm-job-status',
-  templateUrl: './job-status.component.html'
+  templateUrl: './job-status.component.html',
+  styleUrls: ['./job-status.component.scss']
 })
 export class JobStatusComponent implements OnInit {
   JOB_STATUS = JOB_STATUS;
