@@ -121,6 +121,13 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToUserInfo)
   }
 
+  override  def getUserDetail(userName:String): Future[Either[Errors,UserInfo]]={
+    ws.url(s"$url/users/detail/$userName")
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToUserInfo)
+  }
+
   override def addRole(role: Role): Future[Either[Errors, Role]] = {
     ws.url(s"$url/roles")
       .withHeaders("Accept" -> "application/json")

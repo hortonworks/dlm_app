@@ -6,6 +6,7 @@
 
 GET           /health                                                        controllers.Status.health
 
+GET           /users/detail/:username                                        controllers.Users.getUserDetail(username:String)
 GET           /users                                                         controllers.Users.all(username: Option[String])
 POST          /users/withroles                                               controllers.Users.insertWithRoles
 POST          /users/updateActiveAndRoles                                    controllers.Users.updateActiveAndRoles
@@ -14,6 +15,8 @@ POST          /users/role                                                    con
 GET           /users/role/:username                                          controllers.Users.getRolesForUser(username)
 GET           /users/all                                                     controllers.Users.getUsers
 GET           /users/:userId                                                 controllers.Users.load(userId:Long)
+
+
 DELETE        /users/:userId                                                 controllers.Users.delete(userId:Long)
 
 #Roles API

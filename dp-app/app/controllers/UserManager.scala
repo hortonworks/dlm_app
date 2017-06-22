@@ -4,7 +4,6 @@ import com.google.inject.Inject
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.{
   Errors,
-  User,
   UserInfo
 }
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
@@ -99,6 +98,18 @@ class UserManager @Inject()(val ldapService: LdapService,
       case Right(users) => Ok(Json.toJson(users))
     }
   }
+
+  def getUserDetail = Action.async { req =>
+    val userNameOpt: Option[String] = req.getQueryString("userName");
+    userNameOpt
+      .map { userName =>
+        userService.getUserDetail(userName).map{
+          case Left(errors) => handleErrors(errors)
+          case Right(userInfo) => Ok(Json.toJson(userInfo))
+        }
+      }.getOrElse(Future.successful(BadRequest))
+
+  }
   def adminUpdateUserRolesAndStatus = Action.async(parse.json) { req =>
     req.body
       .validate[UserInfo]
@@ -112,7 +123,7 @@ class UserManager @Inject()(val ldapService: LdapService,
       .getOrElse(Future.successful(BadRequest))
   }
   def getAllRoles = Action.async { req =>
-    userService.getUsers().map {
+    userService.getRoles().map {
       case Left(errors) => handleErrors(errors)
       case Right(roles) => Ok(Json.toJson(roles))
     }

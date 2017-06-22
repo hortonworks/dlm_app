@@ -44,6 +44,12 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
       .recoverWith(apiError)
   }
 
+  def getUserDetail(username:String)=Action.async{
+    userRepo.getUserDetail(username).map{ userDetail=>
+      success(userDetail)
+    }.recoverWith(apiError)
+  }
+
   def load(userId: Long) = Action.async {
     userRepo
       .findById(userId)

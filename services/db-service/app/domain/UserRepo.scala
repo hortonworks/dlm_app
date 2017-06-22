@@ -41,6 +41,20 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     }
   }
 
+  def getUserDetail(userName:String)={
+    val query=for{
+      (user, userRole) <- Users.filter(_.username===userName) join UserRoles on (_.id === _.userId)
+    }yield {
+      (user,userRole.roleId)
+    }
+    val roleIdMap=rolesUtil.getRoleIdMap
+    db.run(query.result).map { res =>
+      var roles=res.seq.map(res=>RoleType.withName(roleIdMap(res._2.get).roleName))
+      val user:User=res.head._1
+      UserInfo(id=user.id,userName=user.username,displayName = user.displayname,roles=roles)
+    }
+  }
+
   def insert(username: String, password: String, displayname: String, avatar: Option[String]): Future[User] = {
     //    TODO: generate avatar url from username > gravatar?
     val user = User(username = username, password = password, displayname = displayname, avatar = avatar)
@@ -59,7 +73,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
         delQuery <- UserRoles.filter(_.roleId inSet resolvedIdEntries._2).to[List].result
 
       }yield {
-        Seq(updateActive,delQuery,insertQuery)
+        (updateActive,delQuery,insertQuery)
       }
 
       db.run(query.transactionally)//TODO try to get updated record.
@@ -80,7 +94,9 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
   }
   private def getUpdateActiveQuery(userInfo:UserInfo)={
     Users.filter(_.username===userInfo.userName)
-      .map(r=>(r.active,r.updated))
+      .map{r=>
+        (r.active,r.updated)
+      }
       .update(userInfo.active, Some(LocalDateTime.now()))
   }
 
