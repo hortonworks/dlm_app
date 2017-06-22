@@ -3,7 +3,8 @@ package controllers
 import javax.inject.Inject
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasSearchQuery, Entity}
+import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasEntities, AtlasSearchQuery, Entity}
+import com.hortonworks.dataplane.commons.domain.Entities.Errors
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.cs.Webservice.AtlasService
 import com.hortonworks.dataplane.db.Webservice.DataAssetService
@@ -29,50 +30,51 @@ class QueryAssets @Inject()(
 
     request.body.validate[AtlasSearchQuery].map { filters =>
 
-      getAssets(clusterId, filters)
-        .flatMap(entities => enhanceAssetsWithOwningDataset(clusterId, entities))
-        .map {
-          entities => Ok(Json.toJson(entities))
+      val future = for {
+        results <- atlasService.searchQueryAssets(clusterId, filters)
+        enhancedResults <- doEnhanceAssetsWithOwningDataset(clusterId.asInstanceOf[Long], results)
+      } yield enhancedResults
+
+      future
+        .map { enhancedResults =>
+          enhancedResults match {
+            case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            case Right(enhanced) => Ok(Json.toJson(enhanced))
+          }
         }
-        .recoverWith(InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}")))
     }.getOrElse(Future.successful(BadRequest))
 
-
   }
 
-  private def getAssets(clusterId: Long, filters: AtlasSearchQuery): Future[Seq[Entity]] = {
-    atlasService.searchQueryAssets(clusterId, filters)
-        .map { results => results match {
-            case Left(errors) => Future.failed(errors)
-            case Right(atlasEntities) => Future.successful(atlasEntities.entities.getOrElse(Seq()))
-          }
-        }
-  }
+  private def doEnhanceAssetsWithOwningDataset(clusterId: Long, atlasEntities: Either[Errors, AtlasEntities]): Future[Either[Errors, Seq[Entity]]] = {
+    atlasEntities match {
+      case Left(errors) => Future.successful(Left(errors))
+      case Right(atlasEntities) => {
 
-  private def enhanceAssetsWithOwningDataset(clusterId: Long, entities: Seq[Entity]): Future[Seq[Entity]] = {
-    val assetIds: Seq[String] = entities.filter(_.guid.nonEmpty)map(_.guid.get)
-    assetService.findManagedAssets(clusterId, assetIds)
-      .map {
-        results => results match {
-          case Left(errors) => Future.failed(errors)
-          case Right(datasetInformation) => {
+        val entities = atlasEntities.entities.getOrElse(Seq[Entity]())
+        val assetIds: Seq[String] = entities.filter(_.guid.nonEmpty)map(_.guid.get)
 
-            entities.map { cEntity =>
+        assetService.findManagedAssets(clusterId, assetIds)
+          .map { relationships =>
+            relationships match {
+              case Left(errors) => Left(errors)
+              case Right(relationships) => {
+                val enhanced = entities.map { cEntity =>
 
-              val dsInfo = datasetInformation.find(_.value("guid") == cEntity.guid)
+                  val cRelationship = relationships.find(_.guid == cEntity.guid)
+                  cRelationship match {
+                    case None => cEntity
+                    case Some(relationship) => cEntity.copy(datasetId = Option(relationship.datasetId), xdatasetName = Option(relationship.datasetName))
+                  }
 
-              dsInfo match {
-                case None => cEntity
-                case Some(dsInfo) => cEntity.copy(
-                  datasetId = Option(dsInfo.value("datasetId")),
-                  datasetName = Option(dsInfo.value("datasetName"))
-                )
+                }
+                Right(enhanced)
               }
-
             }
           }
-        }
+
       }
+    }
   }
 
 }
