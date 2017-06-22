@@ -7,15 +7,24 @@
     <option [value]="-1">Select Operator</option>
     <option *ngFor="let opt of filterObject.operators" [value]="opt">{{filterObject.getOperatorDisplay(opt)}}</option>
   </select>
-  <select *ngIf="filterObject && filterObject.valueOptions" [(ngModel)]="filterObject._value" (change)="validate($event)">
-    <option [value]="-1">{{filterObject.helpText}}</option>
+  <select *ngIf="filterObject && filterObject.valueOptions && filterObject.dataType !== 'tag'" [(ngModel)]="filterObject._value" (change)="validate($event)">
+    <option [value]="-1">{{filterObject.helpTextKey | translate}}</option>
     <option *ngFor="let opt of filterObject.valueOptions;let i=index;" [value]="i" (change)="validate($event)" >{{opt.display||opt.name||opt}}</option>
   </select>
   <input *ngIf="filterObject && !filterObject.valueOptions"
          [(ngModel)]="filterObject._value"
-         [placeholder]="filterObject.helpText"
+         [placeholder]="filterObject.helpTextKey | translate"
          (change)="validate($event)"
          (keydown)="onKeyDown($event)"
   />
+  <div style="display: inline-block;" *ngIf="filterObject && filterObject.valueOptions && filterObject.dataType === 'tag'">
+    <input
+      ngui-auto-complete
+      [(ngModel)]="filterObject._value"
+      [source]="filterObject.valueOptions"
+      [placeholder]="filterObject.helpTextKey | translate"
+      max-num-list="10"
+      (keydown)="onKeyDown($event)"/>
+  </div>
   <button class="mdl-button btn-hwx-secondary" (click)="onCloseClick()"><i class="fa fa-close"></i></button>
 </div>

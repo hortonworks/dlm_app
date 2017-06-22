@@ -120,6 +120,15 @@
       }
     },
     "dataset" : {
+      "asset-query": {
+        "filter": {
+          "source": "Select Source",
+          "string": "Enter Text",
+          "boolean": "Select",
+          "date": "YYYY-MM-DD",
+          "tag": "Start typing to refine"
+        }
+      },
       "topnav" : {
         "unclassified" : "Unclassified",
         "assets" : "Assets",
