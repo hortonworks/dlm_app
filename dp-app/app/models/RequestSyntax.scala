@@ -1,8 +1,8 @@
 package models
 
-import com.hortonworks.dataplane.commons.domain.Atlas.Entity
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster}
 import play.api.libs.json.Json
+import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
 object RequestSyntax {
   case class RegisterDpCluster(lake: DataplaneCluster, cluster: Cluster)
