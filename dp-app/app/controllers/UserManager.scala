@@ -53,6 +53,7 @@ class UserManager @Inject()(val ldapService: LdapService,
       .map { userName =>
         val userInfo: UserInfo = UserInfo(userName = userName,
                                           displayName = userName,
+                                          active =Some(true),
                                           roles = Seq(RoleType.SUPERADMIN))
         userService.addUserWithRoles(userInfo).map {
           case Left(errors) => handleErrors(errors)
@@ -60,6 +61,14 @@ class UserManager @Inject()(val ldapService: LdapService,
         }
       }
       .getOrElse(Future.successful(BadRequest))
+  }
+  def addUserWithRoles =Action.async(parse.json) { req =>
+    req.body.validate[UserInfo].map{userInfo=>
+      userService.addUserWithRoles(userInfo).map{
+        case Left(errors) => handleErrors(errors)
+        case Right(userInfo) => Ok(Json.toJson(userInfo))
+      }
+    }.getOrElse(Future.successful(BadRequest))
   }
 
   def addSuperAdminUsers = Action.async(parse.json) { req =>
@@ -69,6 +78,7 @@ class UserManager @Inject()(val ldapService: LdapService,
         val futures = userList.users.map { userName =>
           val userInfo: UserInfo = UserInfo(userName = userName,
                                             displayName = userName,
+                                            active =Some(true),
                                             roles = Seq(RoleType.SUPERADMIN))
           userService.addUserWithRoles(userInfo)
         }

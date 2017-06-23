@@ -76,7 +76,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
 
   def insert(username: String, password: String, displayname: String, avatar: Option[String]): Future[User] = {
     //    TODO: generate avatar url from username > gravatar?
-    val user = User(username = username, password = password, displayname = displayname, avatar = avatar)
+    val user = User(username = username, password = password, displayname = displayname, avatar = avatar,active = Some(true))
     db.run {
       Users returning Users += user
     }
@@ -102,7 +102,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
   }
 
   def insertUserWithRoles(userInfo:UserInfo,password:String):Future[UserInfo]={
-    val user = User(username = userInfo.userName, password = password, displayname = userInfo.displayName,avatar = None)
+    val user = User(username = userInfo.userName, password = password, displayname = userInfo.displayName,avatar = None,active = userInfo.active)
     val query =for{
       user <- Users returning Users += user
       userRoles <- {
@@ -110,7 +110,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
         UserRoles returning UserRoles ++= userRoleObjs
       }
     }yield {
-      Seq(user,userRoles)
+      (user,userRoles)
     }
     db.run(query.transactionally).map{res=>userInfo}
   }

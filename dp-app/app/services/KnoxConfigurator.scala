@@ -31,8 +31,9 @@ class KnoxConfigurator @Inject()( private val configuration: play.api.Configurat
           {configureKnoxsso(config)}
         </topology>
     }
-    println(xml.toString())
-    new PrintWriter(knoxSsoTemplatePath) { write(xml.toString()); close }
+    val xmlPrettifier = new scala.xml.PrettyPrinter(80, 4)
+    val formattedXml=xmlPrettifier.format(xml)
+    formattedXml
   }
   private def getWebAppSecurityConf={
     {

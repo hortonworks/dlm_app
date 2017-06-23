@@ -73,13 +73,13 @@ GET           /api/assets/lineage/:clusterId/:atlasGuid        controllers.Query
 POST          /api/knox/validate                               controllers.KnoxConfig.validate
 POST          /api/knox/configure                              controllers.KnoxConfig.configure
 GET           /api/users/ldapsearch                            controllers.UserManager.ldapSearch
-GET           /api/knox/test                                   controllers.KnoxConfig.test
 
 
 #User Management
 POST          /api/users/registerAdmin                         controllers.UserManager.addSuperAdminUser
 POST          /api/users/registerAdmins                        controllers.UserManager.addSuperAdminUsers
 POST          /api/users/updateActiveAndRoles                  controllers.UserManager.adminUpdateUserRolesAndStatus
+POST          /api/users/addUserWithRoles                      controllers.UserManager.addUserWithRoles
 GET           /api/users/withRoles                             controllers.UserManager.listUsersWithRoles
 GET           /api/users                                       controllers.UserManager.listUsers
 GET           /api/users/detail                                controllers.UserManager.getUserDetail
