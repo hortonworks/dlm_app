@@ -52,8 +52,8 @@
         "setService" : "Setup Services"
       },
       "description" : {
-        "dataplane": "Welcome to Hortonworks Data Plane, your one-stop solution to data management. To start, you need to configure the LDAP/Knox properties in Data plane to enable dataplane to use your LDAP as the authentication database. Optionally, you can add Dataplane Administrators. Please proceed by clicking on GET STARTED",
-        "setupAuth": "The first step is to help data plane connect to your LDAP and Knox by providing the LDAP, Knox configurations to Data plane.",
+        "dataplane": "Welcome to Hortonworks Data Plane, your one-stop solution to data management. To start, you need to configure the LDAP properties in Data plane to enable dataplane to use your LDAP as the authentication database. Optionally, you can add Dataplane Administrators. Please proceed by clicking on GET STARTED",
+        "setupAuth": "The first step is to help data plane connect to your LDAP by providing the LDAP configurations to Data plane.",
         "defineUsers": "After connecting Data plane with your LDAP, you can add administrators to Data plane. This step is optional. You can add/modify users to data plane or assign/modify their roles anytime through the User Management Screen.",
         "addCluster" : "Add your cluster to Dataplane",
         "setService" : "Set up services to enable Dataplane to manage your data",
@@ -61,7 +61,6 @@
       },
       "configure" : {
         "labels" : {
-          "knoxConfiguration": "Knox Configuration",
           "ldapConfiguration" : "LDAP Configuration",
           "masterPassword": "Master Password",
           "userDNTemplate":"User DN Template",
@@ -71,10 +70,10 @@
           "adminBindDN": "Administrator Bind DN",
           "adminPassword":"Administrator Password",
           "showPassword" : "Show Password",
-          "configError" : "LDAP/Knox configuration could not be saved"
+          "configError" : "LDAP configuration could not be saved"
         },
         "description" : {
-          "configurationDesctiption": "The first step is to help data plane connect to your LDAP and Knox by providing the LDAP, Knox configurations to Data plane."
+          "configurationDesctiption": "The first step is to help data plane connect to your LDAP by providing the LDAP configurations to Data plane."
         }
       },
       "adduser" : {

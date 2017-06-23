@@ -3,6 +3,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {UserService} from '../../../../../services/user.service';
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {TagTheme} from '../../../../../shared/tagging-widget/tagging-widget.component';
+import {AuthenticationService} from '../../../../../services/authentication.service';
 
 @Component({
   selector: 'dp-user-add',
@@ -16,7 +17,7 @@ export class UserAddComponent implements OnInit {
   availableUsers: string[] = [];
   tagThemes = TagTheme
 
-  constructor(private route: ActivatedRoute, private router: Router, private userService: UserService) {
+  constructor(private route: ActivatedRoute, private router: Router, private userService: UserService, private authenticationService: AuthenticationService) {
   }
 
   ngOnInit() {
@@ -33,8 +34,14 @@ export class UserAddComponent implements OnInit {
 
   save() {
     this.userService.addAdminUsers(this.users).subscribe(response => {
-      console.log(response)
-    }, (error)=>{
+      this.authenticationService.signOut()
+        .then(() => {
+          this.router.navigate(['sign-in', {
+            cause: 'sign-out'
+          }]);
+          return true;
+        });
+    }, (error) => {
       console.error(error)
     });
   }
@@ -49,14 +56,14 @@ export class UserAddComponent implements OnInit {
 
   onTagSearchChange(text: string) {
     this.availableUsers = [];
-    if(text && text.length > 2){
-      this.userService.searchLDAPUsers(text).subscribe((ldapUsers: LDAPUser[])=>{
+    if (text && text.length > 2) {
+      this.userService.searchLDAPUsers(text).subscribe((ldapUsers: LDAPUser[]) => {
         this.availableUsers = [];
-        ldapUsers.map(user =>{
+        ldapUsers.map(user => {
           this.availableUsers.push(user.name);
         });
-      }, ()=>{
-        console.error("Error while fetching ldap users");
+      }, () => {
+        console.error('Error while fetching ldap users');
       });
     }
   }

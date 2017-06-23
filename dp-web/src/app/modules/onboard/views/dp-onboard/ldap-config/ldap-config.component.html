@@ -17,17 +17,7 @@
   <div class="margin-top-bottom-20">
     {{"pages.onboard.description.setupAuth" | translate}}
   </div>
-  <div class="section margin-top-bottom-20 text-bold text-medium">{{"pages.onboard.configure.labels.knoxConfiguration" | translate}}</div>
   <form #configForm="ngForm">
-    <div class="dp-input form-group">
-      <label class="required">{{"pages.onboard.configure.labels.masterPassword" | translate}}</label>
-      <input required *ngIf="!showKnoxPassword" name="knox-password" [(ngModel)]="ldapProperties.masterPassword" type="password" placeholder="Knox Master Password"/>
-      <input required *ngIf="showKnoxPassword" name="knox-password-plain" [(ngModel)]="ldapProperties.masterPassword" type="text" placeholder="Knox Master Password"/>
-      <div class="margin-top-bottom-3">
-        <input name="knox-password-toggle" type="checkbox" [(ngModel)]="showKnoxPassword"/><span>{{"pages.onboard.configure.labels.showPassword" | translate}}</span>
-      </div>
-    </div>
-    <div class="spacer-15"></div>
     <div class="section margin-top-bottom-20 text-bold text-medium">{{"pages.onboard.configure.labels.ldapConfiguration" | translate}}</div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.url" | translate}}</label>
