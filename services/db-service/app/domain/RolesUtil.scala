@@ -12,7 +12,7 @@ class RolesUtil  @Inject()(roleRepo: RoleRepo) {
   import scala.collection.mutable
   private var roleNameMapOpt:Option[mutable.Map[String, Role]] =  None
 
-  def getRoleNameMap()  :Option[mutable.Map[String,Role]]={
+  def getRoleNameMap()  :mutable.Map[String,Role]={
     //TODO caching..
     roleNameMapOpt match{
       case None =>{
@@ -23,18 +23,16 @@ class RolesUtil  @Inject()(roleRepo: RoleRepo) {
           }
         }
         roleNameMapOpt=Some(roleMap)
-        Some(roleMap)
+        roleMap
       }
-      case Some(roleMap)=>Some(roleMap)
+      case Some(roleMap)=>roleMap
     }
   }
 
   def getRoleIdMap:mutable.Map[Long,Role]={
     val roleIdMap=mutable.Map.empty[Long,Role]
     getRoleNameMap().foreach { roleMapping =>
-      roleMapping.foreach{roleMap=>
-        roleIdMap.put(roleMap._2.id.get,roleMap._2)
-      }
+      roleIdMap.put(roleMapping._2.id.get,roleMapping._2)
     }
     roleIdMap
   }
@@ -44,12 +42,7 @@ class RolesUtil  @Inject()(roleRepo: RoleRepo) {
   }
 
   def getUserRoleObjectsforRoles(userId:Long,roles:Seq[RoleType.Value]):Seq[UserRole]= {
-    getRoleNameMap() match {
-      case Some(roleMappings) => {
-        roles.map(role=>UserRole(userId=Some(userId),roleId = roleMappings.get(role.toString).get.id))
-      }
-      case None => Seq()
-    }
+    var roleNameMap=getRoleNameMap()
+    roles.map(role=>UserRole(userId=Some(userId),roleId = roleNameMap.get(role.toString).get.id))
   }
-
 }

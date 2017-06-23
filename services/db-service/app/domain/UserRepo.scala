@@ -69,7 +69,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     val roleIdMap=rolesUtil.getRoleIdMap
     db.run(query.result).map { results =>
       val user:User=results.head._1
-      var roles=results.filter(res=>res._2.isDefined );
+      var roles=results.filter(res=>res._2.isDefined )
       (user,roles)
     }
   }
@@ -125,7 +125,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
 
   private def resolveUserRolesEntries(roles: Seq[RoleType.Value], userRoles: Seq[UserRole]):(Seq[Long],Seq[Long]) = {
     val roleNameMap=rolesUtil.getRoleNameMap
-    val requiredRoleIds:Seq[Long]=roles.map(roleType=>roleNameMap.get(roleType.toString).id.get)
+    val requiredRoleIds:Seq[Long]=roles.map(roleType=>roleNameMap.get(roleType.toString).get.id.get)
     val existingRoleIds:Seq[Long]=userRoles.map(userRole=>userRole.roleId.get)
     val toBeAdded=requiredRoleIds.filterNot(existingRoleIds.contains(_))
     val toBeDeleted=existingRoleIds.filterNot(requiredRoleIds.contains(_))

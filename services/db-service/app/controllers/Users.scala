@@ -98,17 +98,13 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
     req.body
       .validate[UserInfo]
       .map { userInfo =>
-        if (rolesUtil.getRoleNameMap().isDefined) {
-          val password: String =
-            BCrypt.hashpw(Random.alphanumeric.toString(), BCrypt.gensalt())
-          //TODO check if user exists and throw exception.
-          userRepo
-            .insertUserWithRoles(userInfo, password)
-            .map(userInfo => success(userInfo))
-            .recoverWith(apiError)
-        } else {
-          Future.successful(BadRequest)
-        }
+        val password: String =
+          BCrypt.hashpw(Random.alphanumeric.toString(), BCrypt.gensalt())
+        //TODO check if user exists and throw exception.
+        userRepo
+          .insertUserWithRoles(userInfo, password)
+          .map(userInfo => success(userInfo))
+          .recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))
   }
