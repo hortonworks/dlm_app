@@ -62,7 +62,7 @@ export class DsAssetsService {
 
   dbQuery (id: number, searchText:string, offset:number, limit:number) : Observable<DsAssetModel[]> {
     return this.http
-      .get(`api/dataset/${id}/assets?query-name=${searchText}&offset=${offset}&limit=${limit}`, new RequestOptions(HttpUtil.getHeaders()))
+      .get(`api/dataset/${id}/assets?queryName=${searchText}&offset=${offset}&limit=${limit}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .map(rsp => this.extractAssetArrayFromDbData(rsp))
       .catch(HttpUtil.handleError)
