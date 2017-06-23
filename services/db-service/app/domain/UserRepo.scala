@@ -39,7 +39,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
             .map{data=>
               RoleType.withName(roleIdMap(data._2.get.roleId.get).roleName)
           }
-          UserInfo(id=id,userName=user.username,displayName = user.displayname,roles=roles)
+          UserInfo(id=id,userName=user.username,displayName = user.displayname,roles=roles,active = user.active)
       }.toSeq
     }
   }
@@ -57,7 +57,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
         .map{data=>
           RoleType.withName(roleIdMap(data._2.get.roleId.get).roleName)
         }
-      UserInfo(id=user.id,userName=user.username,displayName = user.displayname,roles=roles)
+      UserInfo(id=user.id,userName=user.username,displayName = user.displayname,roles=roles,active = user.active)
     }
   }
   private def getUserDetailInternal(userName:String)={
