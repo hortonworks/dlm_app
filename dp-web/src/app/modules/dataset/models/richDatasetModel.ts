@@ -15,4 +15,5 @@ export class RichDatasetModel {
   id: number;
   name: string;
   clusterId?: number;
+  tags?: string[];
 }
