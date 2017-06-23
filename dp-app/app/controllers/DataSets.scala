@@ -118,8 +118,8 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
       }
   }
 
-  def getDataAssetsByDatasetId(id: Long) = authenticated.async {
-    dataSetService.getDataAssetByDatasetId(id)
+  def getDataAssetsByDatasetId(id: Long, queryName: String, offset: Long, limit: Long) = authenticated.async {
+    dataSetService.getDataAssetByDatasetId(id, queryName, offset, limit)
       .map { dataSets =>
         dataSets match {
           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
@@ -224,114 +224,3 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
   }
 
 }
-
-
-/*
-   def create = Authenticated.async(parse.json) { request =>
-    Logger.info("Received create dataSet request")
-    val categoryIdArr = (request.body \\ "categoryId")
-    request.body.validate[Dataset].map { dataSet =>
-      dataSetService.create(dataSet.copy(createdBy = request.user.id.get))
-        .flatMap {
-          dataSet => dataSet match {
-            case Left(errors) => Future.successful(InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}")))
-            case Right(dataSet) => {
-              if(categoryIdArr != null) {
-                val futures: Seq[Future[Either[Entities.Errors, DatasetCategory]]] = categoryIdArr.map(id => {
-                  dataSetCategoryService.create(DatasetCategory(id.as[Long], dataSet.id.get))
-                })
-
-                val f : Future[Seq[Either[Entities.Errors, DatasetCategory]]] = Future.sequence(futures)
-                f.map( e => Ok(""))
-              }
-              else
-               Future.successful( Ok(Json.toJson(dataSet)))
-            }
-          }
-        }
-    }.getOrElse(Future.successful(BadRequest))
-  }
-
-*/
-
-
-/*
-
-package controllers
-
-import com.google.inject.Inject
-import com.hortonworks.dataplane.commons.service.cluster.DataModel.DataSet
-import internal.MongoUtilities
-import internal.auth.Authenticated
-import internal.persistence.DataSetStorage
-import models.JsonResponses
-import play.api.libs.json.Json
-import play.api.mvc._
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
-class DataSets @Inject()(dataSetStorage: DataSetStorage,Authenticated:Authenticated)
-    extends Controller
-    with MongoUtilities {
-
-  import com.hortonworks.dataplane.commons.service.cluster.Formatters._
-
-  def error(e: Exception) =
-    InternalServerError(
-      JsonResponses.statusError("Server error", e.getMessage))
-
-  val ise: PartialFunction[Throwable, Future[Result]] = {
-    case e: Exception =>
-      Future.successful(error(e))
-  }
-
-  def getAll(host: String, datacenter: String) =
-    Authenticated.async {
-      dataSetStorage
-        .getDataSets(host, datacenter)
-        .map(ds => Ok(Json.toJson(ds)))
-        .recoverWith(ise)
-    }
-
-  def getByname(name: String,
-                host: String,
-                datacenter: String) =
-    Authenticated.async {
-      dataSetStorage
-        .getDataSet(name, host, datacenter)
-        .map(ds => Ok(Json.toJson(ds)))
-        .recoverWith(ise)
-    }
-
-  def create = Authenticated.async(parse.json) { req =>
-    req.body.validate[DataSet].map { ds =>
-      val toSave = DataSet.withUser(ds,req.user.username)
-      dataSetStorage.saveDataSet(toSave).map { wr =>
-        if (wr.ok)
-          Ok(JsonResponses.statusOk)
-        else
-          error(new Exception(
-            s"Could not save data set - write error : ${extractWriteError(wr)} "))
-      }.recoverWith(ise)
-    } getOrElse Future.successful(
-      BadRequest(
-        JsonResponses.statusError("Could not parse data set request")))
-  }
-
-  def update = Authenticated.async(parse.json) { req =>
-    req.body.validate[DataSet].map { ds =>
-      dataSetStorage.updateDataSet(ds).map { wr =>
-        if (wr.ok)
-          Ok(JsonResponses.statusOk)
-        else
-          error(new Exception(
-            s"Could not save data set - write error : ${extractWriteError(wr)} "))
-      }.recoverWith(ise)
-    } getOrElse Future.successful(
-      BadRequest(
-        JsonResponses.statusError("Could not parse data set request")))
-  }
-
-}
-*/
