@@ -104,6 +104,9 @@
   border-bottom: 1px solid $iron;
 }
 
+.listCont .list .listRow.disabled {
+  color: $iron;
+}
 .listCont .list .listRow .col {
   width:15%;
   margin:0px 2%;
@@ -112,12 +115,18 @@
   text-overflow: ellipsis;
   float: left;
 }
+.listCont .list.withDsNameCom .listRow .col{
+  width:12%;
+}
 .listCont .list .listRow .col.ownerCol {
   width:10%;
 }
 
 .listCont .list .listRow .col.descCol {
   width:40%;
+}
+.listCont .list.withDsNameCom .listRow .col.descCol {
+  width:34%;
 }
 
 .listCont .list .listRow .checkboxCont {
@@ -138,6 +147,9 @@
   background-color: $dove-gray;
   padding:3px 8px 2px;
   border-radius: 3px;
+}
+.listCont .list .listRow.disabled .hiveCol > span {
+  background-color: $iron;
 }
 
 .listCont .list .listRow .filesCol > span {

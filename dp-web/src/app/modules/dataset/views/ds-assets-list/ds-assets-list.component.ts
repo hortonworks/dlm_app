@@ -40,6 +40,7 @@ export class DsAssetList implements OnInit {
   @Input() typeFilter: AssetTypeEnum = AssetTypeEnum.ALL;
   @Input() clusterId:number;
   @Input() allowAssetNavigation : boolean = true;
+  @Input() showBelongsToColumn : boolean = false;
 
   @ViewChild("table") table: ElementRef;
   @ViewChild("outerCont") outerCont: ElementRef;

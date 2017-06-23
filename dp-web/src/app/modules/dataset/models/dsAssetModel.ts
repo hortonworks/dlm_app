@@ -7,4 +7,5 @@ export class DsAssetModel {
   source: string;
   type: string;
   clusterId:number;
+  dsName?: string;
 }
