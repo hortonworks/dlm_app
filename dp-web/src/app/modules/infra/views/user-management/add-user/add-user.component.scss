@@ -63,7 +63,7 @@
 
 :host /deep/ .user-tags .taggingWidget {
   width: 360px !important;
-  height: 120px !important;
+  min-height: 120px !important;
   padding: 0px;
   border-radius: 0px !important;
   input {
@@ -73,7 +73,7 @@
 
 :host /deep/ .role-tags .taggingWidget{
   width: 360px !important;
-  height: 34px !important;
+  min-height: 34px !important;
   padding: 0px;
   border-radius: 0px !important;
   input {
@@ -83,7 +83,7 @@
 
 :host /deep/ .role-edit-tags .taggingWidget{
   width: 270px !important;
-  height: 34px !important;
+  min-height: 34px !important;
   padding: 0px;
   border-radius: 0px !important;
   input {
@@ -127,4 +127,14 @@
 
 :host /deep/ .mdl-switch.is-checked .mdl-switch__track {
   background: $forest-green-1
+}
+
+:host /deep/ .mdl-switch__label {
+  font-size: 13px;
+  line-height: 2;
+  left: 5px;
+}
+
+.mdl-switch__input{
+  visibility: hidden !important;
 }

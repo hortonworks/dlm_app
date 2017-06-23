@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {UserService} from '../../../../../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TagTheme} from '../../../../../shared/tagging-widget/tagging-widget.component';
-import {IdentityService} from '../../../../../services/identity.service';
 import {User} from '../../../../../models/user';
 
 @Component({
@@ -14,7 +13,8 @@ import {User} from '../../../../../models/user';
 export class AddUserComponent implements OnInit {
   users: string[] = [];
   roles: string[] = [];
-  mode = 'add';
+  modes = Modes;
+  mode = Modes.ADD;
   userName: string;
 
   availableUsers: string[] = [];
@@ -22,14 +22,16 @@ export class AddUserComponent implements OnInit {
 
   allRoles: string[] = [];
 
-  tagTheme = TagTheme
-  user : User = new User('','','','',[], false,'');
-  constructor(private userService: UserService, private router: Router, private route: ActivatedRoute) { }
+  tagTheme = TagTheme;
+  user: User = new User('', '', '', '', [], false, '');
+
+  constructor(private userService: UserService, private router: Router, private route: ActivatedRoute) {
+  }
 
   ngOnInit() {
     this.userName = this.route.snapshot.params['name'];
-    if(this.userName){
-      this.mode = 'edit';
+    if (this.userName) {
+      this.mode = Modes.EDIT;
       this.userService.getUserByName(this.userName).subscribe(user => this.user = user);
     }
     this.userService.getAllRoles().subscribe(roles => {
@@ -45,35 +47,61 @@ export class AddUserComponent implements OnInit {
 
   onUserSearchChange(text: string) {
     this.availableUsers = [];
-    if(text && text.length > 2){
-      this.userService.searchLDAPUsers(text).subscribe((ldapUsers: LDAPUser[])=>{
+    if (text && text.length > 2) {
+      this.userService.searchLDAPUsers(text).subscribe((ldapUsers: LDAPUser[]) => {
         this.availableUsers = [];
-        ldapUsers.map(user =>{
+        ldapUsers.map(user => {
           this.availableUsers.push(user.name);
         });
-      }, ()=>{
-        console.error("Error while fetching ldap users");
+      }, () => {
+        console.error('Error while fetching ldap users');
       });
     }
   }
+
   onNewRoleAddition(text: string) {
     this.roles.push(text);
   }
 
+  onRolesEdit(text: string) {
+    this.user.roles.push(text);
+  }
+
   onRoleSearchChange(text: string) {
     this.availableRoles = [];
-    if(text && text.length > 2){
-      this.availableRoles = this.allRoles.filter(role=> {
+    if (text && text.length > 2) {
+      this.availableRoles = this.allRoles.filter(role => {
         return role.toLowerCase().startsWith(text.toLowerCase());
       });
     }
   }
 
-  add(){
-
+  save() {
+    if (this.mode as Modes === Modes.EDIT) {
+      this.userService.updateUser(this.user).subscribe(user => {
+        this.router.navigate(['/infra/users', {
+          status: 'updated'
+        }]);
+      }, error => {
+        console.error('error')
+      });
+    } else {
+      this.userService.addUsers().subscribe(user => {
+        this.router.navigate(['/infra/users', {
+          status: 'added'
+        }]);
+      }, error => {
+        console.error('error')
+      });
+    }
   }
 
-  back(){
+  back() {
     this.router.navigate(['/infra/users']);
   }
+}
+
+export enum Modes {
+  ADD,
+  EDIT
 }

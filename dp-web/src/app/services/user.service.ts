@@ -34,7 +34,7 @@ export class UserService {
       .catch(HttpUtil.handleError);
   }
 
-  getUserByName(userName) : Observable<User> {
+  getUserByName(userName): Observable<User> {
     return this.http
       .get(`${this.url}/detail?userName=${userName}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
@@ -44,6 +44,17 @@ export class UserService {
   getAllRoles(): Observable<any[]> {
     return this.http
       .get(`/api/roles`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
+  addUsers(): Observable<any[]> {
+    return Observable.of([]);
+  }
+
+  updateUser(user): Observable<any> {
+    return this.http
+      .post(`${this.url}/updateActiveAndRoles`, user, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }
