@@ -80,6 +80,7 @@ POST          /api/users/registerAdmin                         controllers.UserM
 POST          /api/users/registerAdmins                        controllers.UserManager.addSuperAdminUsers
 POST          /api/users/updateActiveAndRoles                  controllers.UserManager.adminUpdateUserRolesAndStatus
 POST          /api/users/addUserWithRoles                      controllers.UserManager.addUserWithRoles
+POST          /api/users/addUsersWithRoles                     controllers.UserManager.addUsersWithRoles
 GET           /api/users/withRoles                             controllers.UserManager.listUsersWithRoles
 GET           /api/users                                       controllers.UserManager.listUsers
 GET           /api/users/detail                                controllers.UserManager.getUserDetail

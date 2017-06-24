@@ -2,16 +2,13 @@ package controllers
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  Errors,
-  UserInfo
-}
+import com.hortonworks.dataplane.commons.domain.Entities.{Errors, UserInfo}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.commons.domain.Ldap.LdapSearchResult.ldapConfigInfoFormat
 import com.hortonworks.dataplane.commons.domain.RoleType
 import com.hortonworks.dataplane.db.Webservice.UserService
 import com.typesafe.scalalogging.Logger
-import models.UserListInput
+import models.{UserListInput, UsersAndRolesListInput}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import services.LdapService
@@ -70,30 +67,42 @@ class UserManager @Inject()(val ldapService: LdapService,
       }
     }.getOrElse(Future.successful(BadRequest))
   }
+  def addUsersWithRoles=Action.async(parse.json) { req =>
+    req.body.validate[UsersAndRolesListInput].map{usersAndRolesInput=>
+      val roleTypes=usersAndRolesInput.roles.map{roleStr=>RoleType.withName(roleStr)}
+      addUserInternal(usersAndRolesInput.users,roleTypes)
+      Future.successful(BadRequest)
+    }.getOrElse{
+      Future.successful(BadRequest)
+    }
+  }
 
   def addSuperAdminUsers = Action.async(parse.json) { req =>
     req.body
       .validate[UserListInput]
       .map { userList =>
-        val futures = userList.users.map { userName =>
-          val userInfo: UserInfo = UserInfo(userName = userName,
-                                            displayName = userName,
-                                            active =Some(true),
-                                            roles = Seq(RoleType.SUPERADMIN))
-          userService.addUserWithRoles(userInfo)
-        }
-        //TODO check of any alternate ways.since it is bulk the json may contain success as well as failures
-        val successFullyAdded = mutable.ArrayBuffer.empty[UserInfo]
-        val errorsReceived = mutable.ArrayBuffer.empty[Errors]
-        Future.sequence(futures).map { respList =>
-          respList.foreach {
-            case Left(error) => errorsReceived += error
-            case Right(userInfo) => successFullyAdded += userInfo
-          }
-          Ok(Json.toJson(successFullyAdded))
-        }
+        addUserInternal(userList.users,Seq(RoleType.SUPERADMIN))
       }
       .getOrElse(Future.successful(BadRequest))
+  }
+  private  def addUserInternal(userList:Seq[String],roles:Seq[RoleType.Value])={
+    val futures = userList.map { userName =>
+      val userInfo: UserInfo = UserInfo(userName = userName,
+        displayName = userName,
+        active =Some(true),
+        roles = roles)
+      userService.addUserWithRoles(userInfo)
+    }
+    //TODO check of any alternate ways.since it is bulk the json may contain success as well as failures
+    val successFullyAdded = mutable.ArrayBuffer.empty[UserInfo]
+    val errorsReceived = mutable.ArrayBuffer.empty[Errors]
+    Future.sequence(futures).map { respList =>
+      respList.foreach {
+        case Left(error) => errorsReceived += error
+        case Right(userInfo) => successFullyAdded += userInfo
+      }
+      Ok(Json.toJson(successFullyAdded))
+    }
   }
   def listUsers = Action.async { req =>
     userService.getUsers().map {
