@@ -30,17 +30,21 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     }yield {
       (user,userRole)
     }
-    val roleIdMap=rolesUtil.getRoleIdMap
-    db.run(query.result).map { res =>
-      res.groupBy(_._1.id).map{
-        case (id, results) =>
-          val user = results.head._1
-          var roles=results.filter(res=>res._2.isDefined )
-            .map{data=>
-              RoleType.withName(roleIdMap(data._2.get.roleId.get).roleName)
-          }
-          UserInfo(id=id,userName=user.username,displayName = user.displayname,roles=roles,active = user.active)
-      }.toSeq
+    for{
+      roleIdMap<-rolesUtil.getRoleIdMap
+      allUsers<-db.run(query.result).map { res =>
+        res.groupBy(_._1.id).map{
+          case (id, results) =>
+            val user = results.head._1
+            var roles=results.filter(res=>res._2.isDefined )
+              .map{data=>
+                RoleType.withName(roleIdMap(data._2.get.roleId.get).roleName)
+              }
+            UserInfo(id=id,userName=user.username,displayName = user.displayname,roles=roles,active = user.active)
+        }.toSeq
+      }
+    }yield {
+      allUsers
     }
   }
 
@@ -50,16 +54,21 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     }yield {
       (user,userRole)
     }
-    val roleIdMap=rolesUtil.getRoleIdMap
-    db.run(query.result).map { results =>
-      val user:User=results.head._1
-      var roles=results.filter(res=>res._2.isDefined )
-        .map{data=>
-          RoleType.withName(roleIdMap(data._2.get.roleId.get).roleName)
-        }
-      UserInfo(id=user.id,userName=user.username,displayName = user.displayname,roles=roles,active = user.active)
+    for{
+      roleIdMap<-rolesUtil.getRoleIdMap
+      userDetail<-db.run(query.result).map { results =>
+        val user:User=results.head._1
+        var roles=results.filter(res=>res._2.isDefined )
+          .map{data=>
+            RoleType.withName(roleIdMap(data._2.get.roleId.get).roleName)
+          }
+        UserInfo(id=user.id,userName=user.username,displayName = user.displayname,roles=roles,active = user.active)
+      }
+    }yield {
+      userDetail
     }
   }
+
   private def getUserDetailInternal(userName:String)={
     val query=for{
       (user, userRole) <- Users.filter(_.username===userName) joinLeft  UserRoles on (_.id === _.userId)
@@ -81,38 +90,40 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
       Users returning Users += user
     }
   }
-  def updateActiveAndRoles(userInfo:UserInfo)={
-    getUserDetailInternal(userInfo.userName).flatMap { res =>
-      val userFromDb = res._1
-      val userRolesQuery=UserRoles.filter(_.userId === userFromDb.id.get).result
-      db.run(userRolesQuery).map { userRoles =>
-        val resolvedIdEntries=resolveUserRolesEntries(userInfo.roles,userRoles)
-        val userRoleObjs=rolesUtil.getUserRoleObjectsforRoles(userFromDb.id.get,rolesUtil.getRoleTypesForRoleIds(resolvedIdEntries._1.toList))
-        val query =for{
-          updateActive <- getUpdateActiveQuery(userInfo)
-          insertQuery<-UserRoles returning UserRoles ++= userRoleObjs
-          delQuery <- UserRoles.filter(_.roleId inSet resolvedIdEntries._2).delete
 
-        }yield {
-          (updateActive,delQuery,insertQuery)
-        }
-        db.run(query.transactionally)//TODO try to get updated record.
+  def updateActiveAndRoles(userInfo:UserInfo)={
+    for{
+      (user,userRoles)<-getUserDetailInternal(userInfo.userName)
+      userRoles<-db.run(UserRoles.filter(_.userId === user.id.get).result)
+      (toBeAddedRoleIds,toBeDeletedRoleIds)<-resolveUserRolesEntries(userInfo.roles,userRoles)
+
+    }yield{
+      val userRoleObjs=rolesUtil.getUserRoleObjectsforRoleIds(user.id.get,toBeAddedRoleIds)
+      val query =for{
+        updateActive <- getUpdateActiveQuery(userInfo)
+        insertQuery<-UserRoles returning UserRoles ++= userRoleObjs
+        delQuery <- UserRoles.filter(_.roleId inSet toBeDeletedRoleIds).delete
+      }yield {
+        (updateActive,delQuery,insertQuery)
       }
+      db.run(query.transactionally)
     }
   }
 
-  def insertUserWithRoles(userInfo:UserInfo,password:String):Future[UserInfo]={
+  def insertUserWithRoles(userInfo:UserInfo,password:String)={
     val user = User(username = userInfo.userName, password = password, displayname = userInfo.displayName,avatar = None,active = userInfo.active)
-    val query =for{
-      user <- Users returning Users += user
-      userRoles <- {
-        val userRoleObjs=rolesUtil.getUserRoleObjectsforRoles(user.id.get,userInfo.roles)
-        UserRoles returning UserRoles ++= userRoleObjs
+    rolesUtil.getRoleNameMap().flatMap{roleNameMap=>
+      val query = for{
+        user <- Users returning Users += user
+        userRoles <-{
+          val userRoleObjs=rolesUtil.getUserRoleObjects(user.id.get,userInfo.roles,roleNameMap)
+          UserRoles returning UserRoles ++= userRoleObjs
+        }
+      }yield {
+        (user,userRoles)
       }
-    }yield {
-      (user,userRoles)
+      db.run(query.transactionally).map(res=>userInfo)
     }
-    db.run(query.transactionally).map{res=>userInfo}
   }
   private def getUpdateActiveQuery(userInfo:UserInfo)={
     Users.filter(_.username===userInfo.userName)
@@ -123,13 +134,14 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
   }
 
 
-  private def resolveUserRolesEntries(roles: Seq[RoleType.Value], userRoles: Seq[UserRole]):(Seq[Long],Seq[Long]) = {
-    val roleNameMap=rolesUtil.getRoleNameMap
-    val requiredRoleIds:Seq[Long]=roles.map(roleType=>roleNameMap.get(roleType.toString).get.id.get)
-    val existingRoleIds:Seq[Long]=userRoles.map(userRole=>userRole.roleId.get)
-    val toBeAdded=requiredRoleIds.filterNot(existingRoleIds.contains(_))
-    val toBeDeleted=existingRoleIds.filterNot(requiredRoleIds.contains(_))
-    (toBeAdded,toBeDeleted)
+  private def resolveUserRolesEntries(roles: Seq[RoleType.Value], userRoles: Seq[UserRole]):Future[(Seq[Long],Seq[Long])] = {
+    rolesUtil.getRoleNameMap().map{ roleNameMap=>
+      val requiredRoleIds:Seq[Long]=roles.map(roleType=>roleNameMap(roleType.toString).id.get)
+      val existingRoleIds:Seq[Long]=userRoles.map(userRole=>userRole.roleId.get)
+      val toBeAdded=requiredRoleIds.filterNot(existingRoleIds.contains(_))
+      val toBeDeleted=existingRoleIds.filterNot(requiredRoleIds.contains(_))
+      (toBeAdded,toBeDeleted)
+    }
   }
 
   def deleteByUserId(userId: Long): Future[Int] = {
