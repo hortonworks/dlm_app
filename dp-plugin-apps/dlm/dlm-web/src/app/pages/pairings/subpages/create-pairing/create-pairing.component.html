@@ -4,46 +4,55 @@
   contextMessage="Create Pairing Page">
 </dlm-page-header>
 <div class="content" id="create_pairing">
-  <div class="content-row header">
-    <div class="col-md-3 col-header">
-      <div class="h6 border-bottom">{{ "page.pairings.create.content.header.step_one" | translate }}</div>
-    </div>
-    <div class="col-md-3 col-header">
-      <div *ngIf="selectedFirstCluster !== null" class="h6 border-bottom">{{ "page.pairings.create.content.header.step_two" | translate }}</div>
-    </div>
-    <div class="col-md-2 col-header">
+  <div *ngIf="(firstSetClusters$ | async)?.length > 0; else noClusters">
+    <div class="content-row header">
+      <div class="col-md-3 col-header">
+        <div class="h6 border-bottom">{{ "page.pairings.create.content.header.step_one" | translate }}</div>
+      </div>
+      <div class="col-md-3 col-header">
+        <div *ngIf="selectedFirstCluster !== null" class="h6 border-bottom">{{ "page.pairings.create.content.header.step_two" | translate }}</div>
+      </div>
+      <div class="col-md-2 col-header">
 
+      </div>
+      <div class="col-md-4 col-header">
+        <div *ngIf="selectedSecondCluster !== null"  class="h6 border-bottom">{{ "page.pairings.create.content.header.in_progress" | translate }}</div>
+      </div>
     </div>
-    <div class="col-md-4 col-header">
-      <div *ngIf="selectedSecondCluster !== null"  class="h6 border-bottom">{{ "page.pairings.create.content.header.in_progress" | translate }}</div>
-    </div>
-  </div>
-  <div class="form-container">
-    <form class="basic-form" [formGroup]="createPairingForm" (ngSubmit)="handleSubmit(createPairingForm)">
-      <div class="content-row">
-        <div class="col-md-3 col">
-          <dlm-create-pairing-card-list [clusters]="firstSetClusters$ | async" formControlName="firstCluster" [selectedCluster]="selectedFirstCluster" [isFrozen]="isPairingProgress" (change)="onFirstClusterChange($event)"></dlm-create-pairing-card-list>
-        </div>
-        <div class="col-md-3 col">
-          <dlm-create-pairing-card-list *ngIf="selectedFirstCluster !== null" [clusters]="secondSetClusters" formControlName="secondCluster" [isFrozen]="isPairingProgress" [selectedCluster]="selectedSecondCluster" (change)="selectSecondCluster($event)"></dlm-create-pairing-card-list>
-        </div>
-        <div class="col-md-2 col pairing-icon-col">
-          <button type="submit" [ngClass]="{'clear': true, 'disabled': isPairingProgress}" [disabled]="isPairingProgress" *ngIf="selectedSecondCluster !== null">
-            <div class="hex-wrap">
-              <div class="hex-icon">
-                <i class="glyphicon glyphicon-resize-horizontal"></i>
+    <div class="form-container">
+      <form class="basic-form" [formGroup]="createPairingForm" (ngSubmit)="handleSubmit(createPairingForm)">
+        <div class="content-row">
+          <div class="col-md-3 col">
+            <dlm-create-pairing-card-list [clusters]="firstSetClusters$ | async" formControlName="firstCluster" [selectedCluster]="selectedFirstCluster" [isFrozen]="isPairingProgress" (change)="onFirstClusterChange($event)"></dlm-create-pairing-card-list>
+          </div>
+          <div class="col-md-3 col">
+            <dlm-create-pairing-card-list *ngIf="selectedFirstCluster !== null" [clusters]="secondSetClusters" formControlName="secondCluster" [isFrozen]="isPairingProgress" [selectedCluster]="selectedSecondCluster" (change)="selectSecondCluster($event)"></dlm-create-pairing-card-list>
+          </div>
+          <div class="col-md-2 col pairing-icon-col">
+            <button type="submit" [ngClass]="{'clear': true, 'disabled': isPairingProgress}" [disabled]="isPairingProgress" *ngIf="selectedSecondCluster !== null">
+              <div class="hex-wrap">
+                <div class="hex-icon">
+                  <i class="glyphicon glyphicon-resize-horizontal"></i>
+                </div>
               </div>
+            </button>
+          </div>
+          <div class="col-md-4 col pairing-col">
+            <div *ngIf="isPairingProgress">
+              <dlm-pairing-progress-card [firstCluster]="selectedFirstCluster" [isCompleted]="progress.state === 'success'" [secondCluster]="selectedSecondCluster"></dlm-pairing-progress-card>
             </div>
-          </button>
-        </div>
-        <div class="col-md-4 col pairing-col">
-          <div *ngIf="isPairingProgress">
-            <dlm-pairing-progress-card [firstCluster]="selectedFirstCluster" [isCompleted]="progress.state === 'success'" [secondCluster]="selectedSecondCluster"></dlm-pairing-progress-card>
           </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
+  <ng-template #noClusters>
+    <div style="padding: 20px;">
+      <div class="alert alert-warning" role="alert">
+        {{ "page.pairings.create.content.no_clusters" | translate }}
+      </div>
+    </div>
+  </ng-template>
 </div>
 <dlm-modal-dialog #confirmationModal
                   [title]="'page.pairings.create.confirmation.title' | translate"

@@ -190,6 +190,7 @@
       "groups": "Groups",
       "data_summary": "Data Summary",
       "no_jobs": "No jobs",
+      "no_policies": "There are no policies created.",
       "perform_action": {
         "confirmation": {
           "title": "Confirm",
@@ -253,7 +254,8 @@
           "status": "STATUS",
           "second_cluster": "SECOND CLUSTER",
           "unpair": "UNPAIR"
-        }
+        },
+        "no_pairs": "There are currently no pairs available."
       },
       "unpair": {
         "confirmation": {
@@ -266,6 +268,7 @@
         "header": "Create Pairing",
         "header_note": "Note: Pairings are bi-directional",
         "content": {
+          "no_clusters": "There are no clusters available to pair.",
           "header": {
             "step_one": "STEP 1: SELECT FIRST CLUSTER",
             "step_two": "STEP 2: SELECT CLUSTER TO BE PAIRED",
