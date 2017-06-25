@@ -7,6 +7,8 @@ import com.hortonworks.dataplane.commons.domain.Entities.{User, UserInfo, UserRo
 import com.hortonworks.dataplane.commons.domain.RoleType
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -25,27 +27,35 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
   }
 
   def allWithRoles(offset:Long=0,pageSize:Long=20): Future[Seq[UserInfo]] = {
-    val query=for{
-      (user, userRole) <- Users.drop(offset).take(pageSize) joinLeft  UserRoles on (_.id === _.userId)
-    }yield {
-      (user,userRole)
-    }
-    for{
-      roleIdMap<-rolesUtil.getRoleIdMap
-      allUsers<-db.run(query.result).map { res =>
-        res.groupBy(_._1.id).map{
-          case (id, results) =>
-            val user = results.head._1
-            var roles=results.filter(res=>res._2.isDefined )
-              .map{data=>
-                RoleType.withName(roleIdMap(data._2.get.roleId.get).roleName)
-              }
-            UserInfo(id=id,userName=user.username,displayName = user.displayname,roles=roles,active = user.active)
-        }.toSeq
+    db.run(Users.drop(offset).take(pageSize).result).flatMap{users=>
+      val userIds=users.map(res=>res.id.get).seq
+      db.run(UserRoles.filter(_.userId inSet userIds).result).flatMap{userRoles=>
+        val roleIdUsersMap= getRolesMap(userRoles)
+        roleRepo.all().map { allRoles =>
+          users.map{user=>
+            val userroles = roleIdUsersMap.get(user.id.get) match {
+              case Some(roles)=>rolesUtil.getRolesAsRoleTypes(roles,allRoles)
+              case None => Seq()
+            }
+            UserInfo(id=user.id,userName=user.username,displayName = user.displayname,roles=userroles,active = user.active)
+          }
+        }
       }
-    }yield {
-      allUsers
     }
+  }
+
+  private def getRolesMap(userRoles: Seq[UserRole]) = {
+    val userIdRolesMap = mutable.Map.empty[Long, ArrayBuffer[Long]]
+    userRoles.foreach { userRole =>
+      if (userIdRolesMap.contains(userRole.userId.get)) {
+        userIdRolesMap.get(userRole.userId.get).get += userRole.roleId.get
+      } else {
+        val roleIdBuff = mutable.ArrayBuffer.empty[Long]
+        roleIdBuff += userRole.roleId.get
+        userIdRolesMap.put(userRole.userId.get,roleIdBuff)
+      }
+    }
+    userIdRolesMap
   }
 
   def getUserDetail(userName:String)={

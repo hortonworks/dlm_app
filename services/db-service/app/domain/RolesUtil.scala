@@ -51,4 +51,18 @@ class RolesUtil  @Inject()(roleRepo: RoleRepo) {
   def getUserRoleObjects(userId:Long,roles:Seq[RoleType.Value],allRolesInDb:mutable.Map[String,Role]):Seq[UserRole]={
     roles.map(role=>UserRole(userId=Some(userId),roleId = Some(role.id)))
   }
+
+  def getRoleAsRoleTypes(roleId:Long,allRoles:Seq[Role]) ={
+    RoleType.withName(allRoles.filter(_.id==roleId).head.roleName)
+  }
+  def getRolesAsRoleTypes(roleIds:Seq[Long],allRoles:Seq[Role]):Seq[RoleType.Value]={
+    val roleMap=mutable.Map.empty[Long,String]
+    allRoles.foreach{role=>
+      roleMap.put(role.id.get,role.roleName)
+    }
+    roleIds.map{roleid=>
+      RoleType.withName(roleMap.get(roleid).get)
+    }
+  }
+
 }
