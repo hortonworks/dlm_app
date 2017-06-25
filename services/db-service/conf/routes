@@ -163,7 +163,7 @@ POST          /datasets/details                                              con
 DELETE        /datasets/details/:id                                          controllers.DatasetDetailsCtrl.delete(id:Long)
 
 #Data Asset Api
-GET           /dataassets/:datasetId                                         controllers.DataAssets.allWithDatasetId(datasetId:Long)
+GET           /dataassets/:datasetId                                         controllers.DataAssets.allWithDatasetId(datasetId:Long, queryName: String, offset: Long, limit: Long)
 POST          /dataassets                                                    controllers.DataAssets.add
 DELETE        /dataassets/:id                                                controllers.DataAssets.delete(id:Long)
 

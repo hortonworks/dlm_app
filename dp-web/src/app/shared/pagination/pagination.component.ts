@@ -6,6 +6,7 @@ import {Component, EventEmitter, Input, Output} from "@angular/core";
   styleUrls: ["./pagination.component.scss"]
 })
 export class SimplePaginationWidget {
+  infinity:number = Infinity;
   @Input() pageSize: number;
   @Input() pageSizeOptions: number[] = [10, 20, 50, 100, 200, 500];
   @Input() pageStartIndex: number;
