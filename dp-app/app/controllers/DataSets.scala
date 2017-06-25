@@ -103,11 +103,13 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
       }
   }
 
-  def getDataAssetsByDatasetId(id: Long) = authenticated.async {
-    dataSetService.getDataAssetByDatasetId(id)
-      .map {
-        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-        case Right(dataSets) => Ok(Json.toJson(dataSets))
+  def getDataAssetsByDatasetId(id: Long, queryName: String, offset: Long, limit: Long) = authenticated.async {
+    dataSetService.getDataAssetByDatasetId(id, queryName, offset, limit)
+      .map { dataSets =>
+        dataSets match {
+          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Right(dataSets) => Ok(Json.toJson(dataSets))
+        }
       }
   }
 
