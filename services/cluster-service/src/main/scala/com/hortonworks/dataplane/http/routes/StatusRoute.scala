@@ -6,6 +6,8 @@ import javax.inject.Inject
 
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
+import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
+import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.{ClusterSync, StorageInterface}
 import com.hortonworks.dataplane.http.BaseRoute
 import com.hortonworks.dataplane.knox.Knox.{ApiCall, KnoxApiRequest, KnoxConfig}
@@ -21,7 +23,8 @@ import scala.util.{Failure, Success, Try}
 class StatusRoute @Inject()(val ws: WSClient,
                             storageInterface: StorageInterface,
                             val config: Config,
-                            clusterSync: ClusterSync)
+                            clusterSync: ClusterSync,
+                            dpClusterSync: DpClusterSync)
     extends BaseRoute {
 
   import com.hortonworks.dataplane.commons.domain.Ambari._
@@ -58,8 +61,10 @@ class StatusRoute @Inject()(val ws: WSClient,
         }
         val tokenHeader = tokenInfoHeader.get.value
         val response =
-          KnoxApiExecutor(KnoxConfig("token", knoxUrl), ws).execute(
-            KnoxApiRequest(delegatedRequest, delegatedApiCall, tokenHeader))
+          KnoxApiExecutor(KnoxConfig("token", Some(knoxUrl)), ws).execute(
+            KnoxApiRequest(delegatedRequest,
+                           delegatedApiCall,
+                           Some(tokenHeader)))
         response.map { res =>
           res.status match {
             case 200 =>
@@ -175,13 +180,17 @@ class StatusRoute @Inject()(val ws: WSClient,
 
   val sync =
     path("cluster" / "sync") {
-      post {
-        entity(as[DataplaneCluster]) { dl =>
-          if (dl.id.isEmpty)
-            complete(StatusCodes.UnprocessableEntity)
-          else {
-            clusterSync.trigger(dl.id.get)
-            complete(success(Map("status" -> 200)))
+      extractRequest { request =>
+        post {
+          entity(as[DataplaneCluster]) { dl =>
+            if (dl.id.isEmpty)
+              complete(StatusCodes.UnprocessableEntity)
+            else {
+              val header = request.getHeader("X-DP-Token-Info")
+              val token =  if(header.isPresent) Some(HJwtToken(header.get().value())) else None
+              dpClusterSync.triggerSync(dl.id.get,token)
+              complete(success(Map("status" -> 200)))
+            }
           }
         }
       }

@@ -42,8 +42,8 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
     val delegatedCall:ApiCall = {req => req.get()}
 
     val response = if(dataplaneCluster.knoxEnabled.get && hJwtToken.isDefined){
-        KnoxApiExecutor(KnoxConfig("token", dataplaneCluster.knoxUrl.get), ws).execute(
-          KnoxApiRequest(request, delegatedCall, hJwtToken.get.token))
+        KnoxApiExecutor(KnoxConfig("token", dataplaneCluster.knoxUrl), ws).execute(
+          KnoxApiRequest(request, delegatedCall, Some(hJwtToken.get.token)))
     } else requestWithLocalAuth.get()
 
     response.map { res =>
@@ -67,8 +67,8 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
     val delegatedCall:ApiCall = {req => req.get()}
 
     val response = if(dataplaneCluster.knoxEnabled.get && hJwtToken.isDefined){
-      KnoxApiExecutor(KnoxConfig("token", dataplaneCluster.knoxUrl.get), ws).execute(
-        KnoxApiRequest(request, delegatedCall, hJwtToken.get.token))
+      KnoxApiExecutor(KnoxConfig("token", dataplaneCluster.knoxUrl), ws).execute(
+        KnoxApiRequest(request, delegatedCall, Some(hJwtToken.get.token)))
     } else requestWithLocalAuth.get()
 
     response.map { res =>

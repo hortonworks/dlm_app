@@ -16,7 +16,7 @@ object Knox {
     * @param executor - A function which applies this request - usually a GET,POST,PUT etc call
     * @param token - The jwt token from knox
     */
-  case class KnoxApiRequest(request:WSRequest,executor: ApiCall, token: String)
+  case class KnoxApiRequest(request:WSRequest,executor: ApiCall, token: Option[String])
 
   /**
     *
@@ -24,11 +24,11 @@ object Knox {
     * @param knoxUrl - knox URL
     */
   case class KnoxConfig(tokenTopologyName: String,
-                        knoxUrl: String,
+                        knoxUrl: Option[String],
                         knoxCookieTokenName: String = "hadoop-jwt") {
 
     def tokenUrl =
-      s"$knoxUrl/gateway/$tokenTopologyName/knoxtoken/api/v1/token"
+      s"${knoxUrl.get}/gateway/$tokenTopologyName/knoxtoken/api/v1/token"
   }
 
   case class TokenResponse(accessToken: String,
