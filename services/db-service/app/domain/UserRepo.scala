@@ -49,23 +49,15 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
   }
 
   def getUserDetail(userName:String)={
-    val query=for{
-      (user, userRole) <- Users.filter(_.username===userName) joinLeft  UserRoles on (_.id === _.userId)
-    }yield {
-      (user,userRole)
-    }
-    for{
+    for {
+      (user, userRoles) <- getUserDetailInternal(userName)
       roleIdMap<-rolesUtil.getRoleIdMap
-      userDetail<-db.run(query.result).map { results =>
-        val user:User=results.head._1
-        var roles=results.filter(res=>res._2.isDefined )
-          .map{data=>
-            RoleType.withName(roleIdMap(data._2.get.roleId.get).roleName)
-          }
-        UserInfo(id=user.id,userName=user.username,displayName = user.displayname,roles=roles,active = user.active)
-      }
     }yield {
-      userDetail
+      val roles=userRoles.map{userRoleObj=>
+        val roleName:String=roleIdMap(userRoleObj._2.get.roleId.get).roleName
+        RoleType.withName(roleName)
+      }
+      UserInfo(id=user.id,userName=user.username,displayName = user.displayname,roles=roles,active = user.active)
     }
   }
 
