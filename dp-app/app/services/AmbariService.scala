@@ -34,20 +34,15 @@ class AmbariService @Inject()(
     ambariWebService.getAmbariDetails(ambariDetailRequest)
   }
 
-  def syncCluster(dpCluster: DataplaneCluster): Future[Boolean] = {
-    wSClient
-      .url(s"$clusterService/cluster/sync")
-      .post(Json.toJson(dpCluster))
-      .map { response =>
-        if (response.status == 200) {
-          Logger.info(s"Successfully synced datalake with ${dpCluster.id}")
-          true
-        } else {
-          Logger.info(
-            s"Sync failure datalake with id ${dpCluster.id} Details: ${response}")
-          false
-        }
-      }
+  def syncCluster(dpCluster: DataplaneCluster)(implicit hJwtToken: Option[HJwtToken]): Future[Boolean] = {
+   ambariWebService.syncAmbari(dpCluster).map {
+     case value@true =>
+       Logger.info(s"Successfully synced datalake with ${dpCluster.id}")
+       value
+     case value@false =>
+       Logger.error(s"Cannot sync datalake with ${dpCluster.id}")
+       value
+   }
   }
 
   def getResourceManagerHealth(clusterId: Long) = {

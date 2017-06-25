@@ -54,6 +54,8 @@ object Webservice {
 
   trait AmbariWebService extends CsClientService {
 
+    def syncAmbari(dpCluster: DataplaneCluster)(implicit token:Option[HJwtToken]):Future[Boolean]
+
     def checkAmbariStatus(endpoint:AmbariEndpoint)(implicit token:Option[HJwtToken]):Future[Either[Errors,AmbariCheckResponse]]
 
     def getAmbariDetails(ambariDetailRequest: AmbariDetailRequest)(implicit token:Option[HJwtToken]):Future[Either[Errors,Seq[AmbariCluster]]]

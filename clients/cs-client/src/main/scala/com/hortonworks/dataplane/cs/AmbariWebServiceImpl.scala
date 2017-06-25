@@ -18,6 +18,8 @@ import scala.concurrent.Future
 class AmbariWebServiceImpl(config: Config)(implicit ws: ClusterWsClient)
     extends AmbariWebService {
 
+  import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+
   private def url =
     Option(System.getProperty("dp.services.cluster.service.uri"))
       .getOrElse(config.getString("dp.services.cluster.service.uri"))
@@ -61,5 +63,13 @@ class AmbariWebServiceImpl(config: Config)(implicit ws: ClusterWsClient)
               Error("500", (response.json \ "error" \ "message").as[String]))))
         }
       }
+  }
+
+  override def syncAmbari(dpCluster: Entities.DataplaneCluster)(
+      implicit token: Option[Entities.HJwtToken]): Future[Boolean] = {
+    ws.url(s"$url/cluster/sync")
+      .withToken(token)
+      .post(Json.toJson(dpCluster))
+      .map(_.status == 200)
   }
 }

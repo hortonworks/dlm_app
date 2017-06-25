@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari.AmbariEndpoint
-import com.hortonworks.dataplane.commons.domain.Entities.DataplaneCluster
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, HJwtToken}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.DpClusterService
 import models.JsonResponses
@@ -35,6 +35,7 @@ class DataplaneClusters @Inject()(
   }
 
   def create = authenticated.async(parse.json) { request =>
+    implicit val token = request.token
     Logger.info("Received create data centre request")
     request.body
       .validate[DataplaneCluster]
@@ -53,7 +54,7 @@ class DataplaneClusters @Inject()(
       .getOrElse(Future.successful(BadRequest))
   }
 
-  private def syncCluster(dataplaneCluster: DataplaneCluster): Future[Boolean] = {
+  private def syncCluster(dataplaneCluster: DataplaneCluster)(implicit hJwtToken: Option[HJwtToken]): Future[Boolean] = {
     ambariService.syncCluster(dataplaneCluster).map { result =>
       Logger.info(s"Asking Cluster service to discover ${dataplaneCluster.ambariUrl}")
       result
