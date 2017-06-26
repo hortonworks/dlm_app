@@ -79,17 +79,15 @@ export class AddUserComponent implements OnInit {
   save() {
     if (this.mode as Modes === Modes.EDIT) {
       this.userService.updateUser(this.user).subscribe(user => {
-        this.router.navigate(['/infra/users', {
-          status: 'updated'
-        }]);
+        this.userService.dataChanged.next();
+        this.router.navigate(['/infra/users']);
       }, error => {
         console.error('error')
       });
     } else {
-      this.userService.addUsers().subscribe(user => {
-        this.router.navigate(['/infra/users', {
-          status: 'added'
-        }]);
+      this.userService.addUsers(this.users, this.roles).subscribe(response => {
+        this.userService.dataChanged.next();
+        this.router.navigate(['/infra/users']);
       }, error => {
         console.error('error')
       });
