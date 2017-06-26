@@ -11,7 +11,13 @@ object Atlas {
                     guid: Option[String],
                     status: Option[String],
                     displayText: Option[String],
-                    tags : Option[Seq[String]])
+                    tags : Option[Seq[String]],
+                    datasetId: Option[Long],
+                    datasetName: Option[String])
+
+  case class EntityDatasetRelationship(guid: String,
+                                       datasetId: Long,
+                                       datasetName: String)
 
   case class AtlasEntities(entities: Option[List[Entity]])
 
@@ -63,6 +69,9 @@ object Atlas {
 
   implicit val entityReads = Json.reads[Entity]
   implicit val entityWrites = Json.writes[Entity]
+
+  implicit val entityDatasetRelationshipReads = Json.reads[EntityDatasetRelationship]
+  implicit val entityDatasetRelationshipWrites = Json.writes[EntityDatasetRelationship]
 
   implicit val atlasEntitiesReads = Json.reads[AtlasEntities]
   implicit val atlasEntitiesWrites = Json.writes[AtlasEntities]

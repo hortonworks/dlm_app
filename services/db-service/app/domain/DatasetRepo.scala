@@ -3,6 +3,7 @@ package domain
 import java.time.LocalDateTime
 import javax.inject._
 
+import com.hortonworks.dataplane.commons.domain.Atlas.EntityDatasetRelationship
 import com.hortonworks.dataplane.commons.domain.Entities._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.libs.json.JsValue
@@ -239,6 +240,21 @@ class DatasetRepo @Inject()(
             CategoryCount(name, count)
         }.sortBy(_.name)
     }
+  }
+
+
+  def queryManagedAssets(clusterId: Long, assets: Seq[String]): Future[Seq[EntityDatasetRelationship]] = {
+    val query = for {
+      (dataAsset, dataset) <- dataAssetRepo.DatasetAssets.filter(record => record.guid.inSet(assets) /* && record.clusterId === clusterId */) join Datasets on (_.datasetId === _.id)
+    } yield (dataAsset.guid, dataset.id, dataset.name)
+
+    db.run(query.to[Seq].result).map {
+      results =>
+        results.map {
+          case (guid, datasetId, datasetName) => EntityDatasetRelationship(guid, datasetId.get, datasetName)
+        }
+    }
+
   }
 
 

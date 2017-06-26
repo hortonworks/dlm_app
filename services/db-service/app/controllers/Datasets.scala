@@ -5,6 +5,7 @@ import javax.inject._
 import com.hortonworks.dataplane.commons.domain.Entities.{Dataset, DatasetAndCategoryIds, DatasetCreateRequest}
 import domain.API.{dpClusters, users}
 import domain.{DatasetRepo, PaginatedQuery, SortQuery}
+import play.api.libs.json.Json
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -101,6 +102,17 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
       .map { cl =>
         val created = datasetRepo.updateWithCategories(cl)
         created.map(c => success(linkData(c, makeLink(c.dataset))))
+          .recoverWith(apiError)
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
+
+  def findManagedAssets(clusterId: Long) = Action.async(parse.json) { request =>
+    request.body
+      .validate[Seq[String]]
+      .map { assets =>
+        datasetRepo.queryManagedAssets(clusterId, assets)
+          .map(result => success(Json.toJson(result)))
           .recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))
