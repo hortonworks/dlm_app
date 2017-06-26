@@ -16,10 +16,8 @@ export class UserManagementComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
-      if (params.status && params.status === 'added' ||  params.status === 'edited') {
-       this.getUsers();
-      }
+    this.userService.dataChanged$.subscribe(() => {
+      this.getUsers();
     });
     this.getUsers();
   }

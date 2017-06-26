@@ -21,7 +21,8 @@
     [clearOnSearch]="true"
     (textChange)="onTagSearchChange($event)"
     (onNewSearch)="onNewUserAddition($event)"
-    [theme]=tagThemes.DARK></tagging-widget>
+    [theme]=tagThemes.DARK
+    [restrictFreeText]="true"></tagging-widget>
   </div>
   <div class="margin-top-30">
     <button class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"pages.onboard.adduser.labels.saveAndLogin" | translate}}</button>
