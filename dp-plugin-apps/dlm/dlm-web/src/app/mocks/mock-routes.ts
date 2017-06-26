@@ -37,6 +37,8 @@ export const routes: MockRoute[] = [
 
   // HIVE databases
   new MockRoute('clusters/:clusterId/hive/databases', 'hive_databases.json'),
-  new MockRoute('clusters/:clusterId/hive/tables/default', 'hive_default_tables.json'),
-  new MockRoute('clusters/:clusterId/hive/tables/testdb', 'hive_testdb_tables.json')
+
+  // HIVE tables related to database
+  new MockRoute('clusters/:clusterId/hive/database/default/tables', 'hive_default_tables.json'),
+  new MockRoute('clusters/:clusterId/hive/database/testdb/tables', 'hive_testdb_tables.json')
 ];

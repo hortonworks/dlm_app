@@ -60,7 +60,8 @@ export class RichDatasetService {
       creatorId: data.dataset.createdBy,
       creatorName: data.user,
       favourite: (data.tags.indexOf("favourite") != -1),
-      counts: {hiveCount: data.counts[0].count, filesCount: 0}
+      counts: {hiveCount: data.counts[0].count, filesCount: 0},
+      tags:data.tags
     } as RichDatasetModel;
   }
 

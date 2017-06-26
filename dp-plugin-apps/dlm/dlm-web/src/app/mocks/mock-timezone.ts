@@ -7,6 +7,7 @@ export class MockTimeZoneService {
     'fake-zone': {}
   };
 
+  getMomentTzByIndex() { }
   formatDateTimeWithTimeZone() {
   }
 }

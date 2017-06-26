@@ -11,7 +11,7 @@ export class TimeZoneService {
   private _parsedTimezones: ShownTimeZone[];
   private _mappedByValueTimezones: TimezonesMap;
 
-  public userTimezoneIndex$: BehaviorSubject<any> = new BehaviorSubject('');
+  public userTimezoneIndex$: BehaviorSubject<string> = new BehaviorSubject('');
 
   defaultServerTimezone = 'Atlantic/Reykjavik';
 
@@ -145,9 +145,13 @@ export class TimeZoneService {
     return newZones.sort((a, b) => a.utcOffset < b.utcOffset ? -1 : 1);
   }
 
+  getMomentTzByIndex(timezoneIndex: string): string {
+    return this.getTimezoneByIndex(timezoneIndex).zones[0].value;
+  }
+
   setTimezone(timezoneIndex: string) {
     const zoneIndex = timezoneIndex || this.clientTimeZoneIndex;
-    moment.tz.setDefault(this.getTimezoneByIndex(zoneIndex).zones[0].value);
+    moment.tz.setDefault(this.getMomentTzByIndex(zoneIndex));
     this.userTimezoneIndex$.next(zoneIndex);
   }
 

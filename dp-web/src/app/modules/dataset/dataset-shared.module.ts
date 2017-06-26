@@ -1,6 +1,7 @@
 import {CommonModule} from "@angular/common";
 import {NgModule} from "@angular/core";
 import {FormsModule} from "@angular/forms";
+import {NguiAutoCompleteModule} from '@ngui/auto-complete';
 import {SimplePaginationWidget} from "../../shared/pagination/pagination.component";
 import {TaggingWidgetModule} from "../../shared/tagging-widget/tagging-widget.module";
 import {AssetOwnerService} from "./services/assetOwnerService";
@@ -49,6 +50,7 @@ import {TranslateModule} from "@ngx-translate/core";
   imports: [
     CommonModule,
     FormsModule,
+    NguiAutoCompleteModule,
     TaggingWidgetModule,
     TranslateModule
   ],

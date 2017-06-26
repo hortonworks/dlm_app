@@ -27,7 +27,7 @@ export class HiveService {
   }
 
   fetchTables(clusterId: string, databaseId: string) {
-    return mapResponse(this.http.get(`clusters/${clusterId}/hive/tables/${databaseId}`))
+    return mapResponse(this.http.get(`clusters/${clusterId}/hive/database/${databaseId}/tables`))
       .map(response => this.normalizeTables(response.tables, databaseId, clusterId));
   }
 

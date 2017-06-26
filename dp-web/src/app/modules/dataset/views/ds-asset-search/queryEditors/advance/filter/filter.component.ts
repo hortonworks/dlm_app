@@ -49,7 +49,7 @@ export class QueryFilterObject {
 export class QueryFilterSource extends QueryFilterObject {
   propertyName: string = "asset.source";
   operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.NOTEQ];
-  helpText: string = "Select Source";
+  helpTextKey: string = 'pages.dataset.asset-query.filter.source';
   _value: number = -1;
   valueOptions: AssetTypeEnum[] = [AssetTypeEnum.HIVE, AssetTypeEnum.HDFS];
 
@@ -60,7 +60,7 @@ export class QueryFilterSource extends QueryFilterObject {
 
 export class QueryFilterTypeString extends QueryFilterObject {
   operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.NOTEQ, FOEnum.LIKE];
-  helpText: string = "Enter Text";
+  helpTextKey: string = 'pages.dataset.asset-query.filter.string';
   _value: string;
 
   constructor(public propertyName: string, public dataType: string) {
@@ -70,7 +70,7 @@ export class QueryFilterTypeString extends QueryFilterObject {
 
 export class QueryFilterTypeBoolean extends QueryFilterObject {
   operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.NOTEQ];
-  helpText: string = "Select";
+  helpTextKey: string = 'pages.dataset.asset-query.filter.boolean';
   _value: number = -1;
   valueOptions: string[] = ["false", "true"];
 
@@ -85,7 +85,7 @@ export class QueryFilterTypeBoolean extends QueryFilterObject {
 
 export class QueryFilterTypeDate extends QueryFilterObject {
   operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.NOTEQ, FOEnum.LT, FOEnum.GT];
-  helpText: string = "YYYY-MM-DD";
+  helpTextKey: string = 'pages.dataset.asset-query.filter.date';
   _value: string;
 
   constructor(public propertyName: string, public dataType: string) {
@@ -95,10 +95,10 @@ export class QueryFilterTypeDate extends QueryFilterObject {
 
 export class QueryFilterTypeTag extends QueryFilterObject {
   operators: FilterOperatorEnum[] = [FOEnum.EQ];
-  helpText: string = "Enter Text";
+  helpTextKey: string = 'pages.dataset.asset-query.filter.tag';
   _value: string;
 
-  constructor(public propertyName: string, public dataType: string) {
+  constructor(public propertyName: string, public dataType: string, public valueOptions: string[]) {
     super();
   }
 }
@@ -118,6 +118,7 @@ export class QueryFilter implements OnInit {
     {display: "Select Filter Type", dataType: "QueryFilterObject"}
   ];
   owners: AssetOwnerModel[] = [];
+  tagsAvailable: string[] = [];
 
   constructor(private ownerService: AssetOwnerService,
               private assetService: DsAssetsService) {
@@ -129,6 +130,10 @@ export class QueryFilter implements OnInit {
       qryAtrs.forEach(qryAtr=>this.availableFilters.push(
         {display: qryAtr.name, dataType: qryAtr.dataType, propertyName: qryAtr.name}
       ));
+    });
+
+    this.assetService.tagsQuery(this.clusterId).subscribe(tags => {
+      this.tagsAvailable = tags;
     });
   }
 
@@ -145,7 +150,7 @@ export class QueryFilter implements OnInit {
         this.filterObject = new QueryFilterTypeDate(fltr.propertyName, fltr.dataType);
         break;
       case "tag" :
-        this.filterObject = new QueryFilterTypeTag(fltr.propertyName, fltr.dataType);
+        this.filterObject = new QueryFilterTypeTag(fltr.propertyName, fltr.dataType, this.tagsAvailable);
         break;
       default                 :
         this.filterObject = new QueryFilterObject();

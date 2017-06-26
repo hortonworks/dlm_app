@@ -1,6 +1,6 @@
 <div class="componentCont borderBox" #outerCont >
 <div *ngIf="!hideTabs" class="tabCont">
-  <div class="tab {{(typeFilter == tab.ALL)?'active':''}}" (click)="typeFilter = tab.ALL;setFirstPage();fetchAssets()">
+  <div *ngIf="dsModel.counts" class="tab firstTab {{(typeFilter == tab.ALL)?'active':''}}" (click)="typeFilter = tab.ALL;setFirstPage();fetchAssets()">
     <div class="tabName">Total</div>
     <div class="tabCount"><span *ngIf="dsModel.counts">{{dsModel.counts.hiveCount + dsModel.counts.filesCount}}</span></div>
   </div>
@@ -37,6 +37,7 @@
       </div>
     </div>
     <div class="justList" #table>
+      <div class="list displayAtCenter"  *ngIf="resultState == resultStates.NOMORE"><span>{{"pages.dataset.asset-search.noMoreResultsMsg" | translate}}</span></div>
       <div class="list displayAtCenter"  *ngIf="resultState == resultStates.EMPTY"><span>{{"pages.dataset.asset-search.noResultsMsg" | translate}}</span></div>
       <div class="list displayAtCenter"  *ngIf="resultState == resultStates.LOADING"><span>{{"common.loading" | translate}} ...</span></div>
       <div *ngIf="dsAssets.length">

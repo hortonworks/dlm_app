@@ -27,6 +27,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   private _footerHeight: string | number;
   private navbarCollapse$: Observable<boolean>;
   private navbarCollapseSubscription: Subscription;
+  private currentComponentWidth;
 
   /**
    * Map for expanded rows
@@ -43,6 +44,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
 
   @ViewChild(CheckboxColumnComponent) checkboxColumn: CheckboxColumnComponent;
   @ViewChild(ActionColumnComponent) actionsColumn: ActionColumnComponent;
+  @ViewChild('tableWrapper') tableWrapper;
   @ViewChild('table') table: DatatableComponent;
 
   @Output() selectColumnAction = new EventEmitter<{}>();
@@ -233,10 +235,17 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   }
 
   ngAfterViewChecked() {
-    this.cdRef.detectChanges();
+    // Check if the table size has changed,
+    if (this.table && this.table.recalculate && (this.tableWrapper.nativeElement.clientWidth !== this.currentComponentWidth)) {
+      this.currentComponentWidth = this.tableWrapper.nativeElement.clientWidth;
+      this.table.recalculate();
+      this.cdRef.detectChanges();
+    }
   }
 
   ngOnDestroy() {
-    this.navbarCollapseSubscription.unsubscribe();
+    if (this.navbarCollapseSubscription) {
+      this.navbarCollapseSubscription.unsubscribe();
+    }
   }
 }

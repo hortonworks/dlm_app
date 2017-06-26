@@ -64,7 +64,7 @@ object Webservice {
 
     def listRichDatasetByTag(tagName: String, queryString : String): Future[Either[Errors, Seq[RichDataset]]]
 
-    def getDataAssetByDatasetId(id: Long): Future[Either[Errors, Seq[DataAsset]]]
+    def getDataAssetByDatasetId(id: Long, queryName: String, offset: Long, limit: Long): Future[Either[Errors, Seq[DataAsset]]]
 
     def retrieve(dataSetId: String): Future[Either[Errors, DatasetAndCategories]]
 
@@ -184,6 +184,14 @@ object Webservice {
 
   trait ConfigService extends DbClientService {
     def getConfig(key: String): Future[Option[DpConfig]]
+  }
+
+  trait LdapConfigService extends DbClientService{
+
+    def create(ldapConfig:LdapConfiguration): Future[Either[Errors, LdapConfiguration]]
+
+    def get(): Future[Either[Errors, Seq[LdapConfiguration]]]
+
   }
 
   trait WorkspaceService extends DbClientService {

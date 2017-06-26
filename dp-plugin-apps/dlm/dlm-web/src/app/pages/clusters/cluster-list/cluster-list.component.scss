@@ -16,6 +16,7 @@
     justify-content: flex-end !important;
 
     .datatable-body-cell-label {
+      padding-right: 20px;
       height: 100%;
       display: flex;
       flex-basis: 90px;
@@ -31,6 +32,11 @@
         }
         width: 100%;
       }
+    }
+  }
+  &.status {
+    .datatable-body-cell-label {
+      padding-left: 20px;
     }
   }
 }
@@ -54,4 +60,18 @@
 .datatable-row-detail {
   padding: 25px;
   background-color: #EEE;
+}
+
+.datatable-scroll {
+  width: 100% !important;
+}
+
+.datatable-header-cell {
+  text-align: center !important;
+}
+
+.text-center {
+  .datatable-body-cell-label {
+    width: 100%;
+  }
 }

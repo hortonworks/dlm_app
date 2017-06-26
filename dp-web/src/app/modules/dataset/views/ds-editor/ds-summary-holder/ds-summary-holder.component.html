@@ -8,8 +8,8 @@
   <span class="leftCont"><b>Datalake</b></span>:&nbsp;<span>{{dsModel.datalakeName}}</span>
   <br/><br/>
   <span class="leftCont"><b>Tags</b></span>:&nbsp;<span><span *ngFor="let tag of tags;">{{tag}}&nbsp;&nbsp;</span></span>
-  <br/><br/>
-  <span class="leftCont"><b>Assets</b></span>:&nbsp;<span>{{dsModel.counts.hiveCount + dsModel.counts.filesCount}}</span>
+  <!--<br/><br/>-->
+  <!--<span class="leftCont"><b>Assets</b></span>:&nbsp;<span *ngIf="dsModel.counts">{{dsModel.counts.hiveCount + dsModel.counts.filesCount}}</span>-->
   <br/>
   <br/>
   <!--<div class="tabCont">-->

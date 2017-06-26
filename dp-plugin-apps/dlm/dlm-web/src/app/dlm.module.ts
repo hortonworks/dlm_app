@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpModule } from '@angular/http';
 import {
@@ -21,6 +21,7 @@ import { RouterModule } from '@angular/router';
 
 import { MyDatePickerModule } from 'mydatepicker';
 
+import { AppConfig, appConfigFactory } from './app.config';
 import { EffectsModule } from '@ngrx/effects';
 import { ClusterEffects } from './effects/cluster.effect';
 import { routes } from './routes/routes.config';
@@ -229,7 +230,14 @@ import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
     HiveService,
     OverviewJobsExternalFiltersService,
     httpServiceProvider,
-    FrequencyPipe
+    FrequencyPipe,
+    AppConfig,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: appConfigFactory,
+      deps: [AppConfig],
+      multi: true
+    }
   ]
 })
 export class DlmModule {

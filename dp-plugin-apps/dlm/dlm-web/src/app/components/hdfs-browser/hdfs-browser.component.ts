@@ -16,12 +16,12 @@ import { Breadcrumb } from 'components/breadcrumb/breadcrumb.type';
   styleUrls: ['./hdfs-browser.component.scss'],
   encapsulation: ViewEncapsulation.None,
   template: `
-    <dlm-hdfs-browser-breadcrumb [breadcrumbs]="breadcrumbs" (onClick)="switchDirectory($event)">
+    <dlm-hdfs-browser-breadcrumb [breadcrumbs]="breadcrumbs$ | async" (onClick)="switchDirectory($event)">
     </dlm-hdfs-browser-breadcrumb>
     <dlm-table
       #hdfsFilesTable
       [columns]="columns"
-      [rows]="rows"
+      [rows]="rows$ | async"
       [selectionType]="selectionType"
       [scrollbarV]="scrollbarV"
       (selectRowAction)="handleSelectedAction($event)"
@@ -62,10 +62,10 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('dateTemplate') dateTemplate: TemplateRef<any>;
   @ViewChild('permissionsTemplate') permissionsTemplate: TemplateRef<any>;
   @ViewChild('nameFormattedTemplate') nameFormattedTemplate: TemplateRef<any>;
+  breadcrumbs$: Observable<Breadcrumb[]>;
   rows$: Observable<ListStatus[]>;
   rows: ListStatus[];
   currentDirectory$: BehaviorSubject<string>;
-  rowsSubscription$;
   columns: any = [];
   externalSorting = true;
   scrollbarV = false;
@@ -73,7 +73,6 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   rowHeight = '35';
   selected: string;
   fileTypes = FILE_TYPES;
-  breadcrumbs: Breadcrumb[] = [];
 
   constructor(private store: Store<fromRoot.State>) {
   }
@@ -82,12 +81,12 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
     this.currentDirectory$ = new BehaviorSubject(this.rootPath);
     this.rows$ = this.currentDirectory$.switchMap(path => {
       this.store.dispatch(listFiles(this.clusterId, path, {clusterId: this.clusterId, path}));
-      this.updateBreadcrumbs(path);
       return this.store.select(getAllFilesForClusterPath(this.clusterId, path)).map(files => {
         const parent = path === '/' ? [] : [<ListStatus>{pathSuffix: '..', type: FILE_TYPES.DIRECTORY}];
         return [...parent, ...files];
       });
     });
+    this.breadcrumbs$ = this.currentDirectory$.map(path => this.updateBreadcrumbs(path));
     this.columns = [
       {prop: 'pathSuffix', name: 'Name', cellClass: 'text-cell', headerClass: 'text-header',
         minWidth: 150, flexGrow: 1, cellTemplate: this.nameFormattedTemplate},
@@ -100,7 +99,6 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
       {prop: 'modificationTime', name: 'Last Modified', cellClass: 'date-cell', headerClass: 'date-header',
         cellTemplate: this.dateTemplate, maxWidth: 130}
     ];
-    this.rowsSubscription$ = this.rows$.subscribe(rows => this.rows = rows);
   }
 
   ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
@@ -136,9 +134,9 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  updateBreadcrumbs(path: string) {
+  updateBreadcrumbs(path: string): Breadcrumb[] {
     if (!path) {
-      return;
+      return [];
     }
     const pathArr = path.split('/');
     const breadcrumbsArr: Breadcrumb[] = [];
@@ -155,7 +153,7 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
     });
     // Remove url to not have hyperlink for the last element in breadcrumb
     breadcrumbsArr[breadcrumbsArr.length - 1].url = '';
-    this.breadcrumbs = breadcrumbsArr;
+    return breadcrumbsArr;
   }
 
   switchDirectory(path: string) {
@@ -213,8 +211,6 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.rowsSubscription$) {
-      this.rowsSubscription$.unsubscribe();
-    }
+
   }
 }

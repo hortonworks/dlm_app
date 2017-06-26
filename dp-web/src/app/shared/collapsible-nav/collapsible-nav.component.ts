@@ -79,7 +79,12 @@ export class CollapsibleNavComponent implements OnInit {
   }
 
   navigateToURL(tab: PersonaTabs) {
-    this.router.navigate([tab.URL]);
+    this.activeTabName = tab.tabName;
+    if (tab.angularRouting) {
+      this.router.navigate([tab.URL]);
+    } else {
+      window.location.href = tab.URL;
+    }
   }
 
   ngOnInit() {

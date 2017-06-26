@@ -67,11 +67,13 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @ViewChild('pathCell') pathCellRef: TemplateRef<any>;
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
   @ViewChild('verbStatusCellTemplate') verbStatusCellTemplate: TemplateRef<any>;
+  @ViewChild('table') table: TemplateRef<any>;
 
   @ViewChild(TableComponent) tableComponent: TableComponent;
 
   @Input() policies: Policy[] = [];
   @Input() clusters: Cluster[] = [];
+  @Input() activePolicyId = '';
 
   rowActions = <ActionItemType[]>[
     {label: 'Delete', name: 'DELETE', disabledFor: ''},
@@ -85,6 +87,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       return selectedPolicy ? jobs.filter(job => job.name === selectedPolicy.id) : [];
     });
     this.policyDatabase$ = this.selectedPolicy$
+      .filter(policy => !!this.clusterByName(policy.sourceCluster))
       .mergeMap(policy => {
         const cluster = this.clusterByName(policy.sourceCluster);
         return store.select(getDatabase(this.hiveService.makeDatabaseId(policy.sourceDataset, cluster.id)));
@@ -102,7 +105,13 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         sortable: false,
         ...TableComponent.makeFixedWith(25)
       },
-      {prop: 'status', cellClass: 'text-cell', headerClass: 'text-header', cellTemplate: this.verbStatusCellTemplate},
+      {
+        prop: 'status',
+        cellClass: 'text-cell',
+        headerClass: 'text-header',
+        cellTemplate: this.verbStatusCellTemplate,
+        ...TableComponent.makeFixedWith(80)
+      },
       {name: ' ', cellTemplate: this.policyInfoColumn.cellRef, sortable: false},
       {prop: 'sourceCluster', name: this.t.instant('common.source')},
       {
@@ -119,8 +128,23 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       {prop: 'frequency', name: this.t.instant('common.schedule'), cellTemplate: this.scheduleCellTemplateRef},
       {prop: 'lastJobResource.trackingInfo.timeTaken', name: this.t.instant('common.duration'), cellTemplate: this.durationCellRef},
       {prop: 'lastJobResource.startTime', name: 'Last Good', cellTemplate: this.lastGoodCellRef},
-      {name: 'Actions', cellTemplate: this.actionsCellRef, maxWidth: 55, sortable: false}
+      {name: ' ', cellTemplate: this.actionsCellRef, maxWidth: 55, sortable: false}
     ];
+    if (this.activePolicyId) {
+      this.openJobsForPolicy();
+    }
+  }
+
+  openJobsForPolicy() {
+    const policy = this.policies.find(p => p.id === this.activePolicyId);
+    if (policy) {
+      const indx = this.policies.indexOf(policy);
+      const page = Math.ceil(indx / this.tableComponent.limit);
+      if (page) {
+        this.tableComponent.changePage(page);
+      }
+      this.toggleRowDetail(policy, PolicyContent.Jobs);
+    }
   }
 
   clusterByName(clusterName: string): Cluster {
@@ -185,7 +209,6 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
    * @param {PolicyContent} contentType
    */
   toggleRowDetail(policy: Policy, contentType: PolicyContent) {
-    const selectedPolicy = this.selectedPolicy$.getValue();
     this.toggleSelectedRow(policy, contentType);
     this.activatePolicy(policy, contentType);
     this.loadContentDetails(policy, contentType);
@@ -209,7 +232,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       this.tableComponent.toggleRowDetail(nextPolicy);
       // collapse active policy when clicked on same content toggler e.g. policy name, prev jobs
     } else if (!isContentChanged) {
-      this.tableComponent.toggleRowDetail(selectedPolicy);
+      this.tableComponent.toggleRowDetail(nextPolicy);
     }
   }
 
