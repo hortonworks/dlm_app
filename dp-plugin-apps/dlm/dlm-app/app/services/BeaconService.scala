@@ -3,14 +3,14 @@ package services
 import javax.inject.{Inject, Singleton}
 
 import com.google.inject.name.Named
-import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconApiError, BeaconApiErrors, BeaconEventResponse, PairedCluster, PolicyDataResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
-import com.hortonworks.dlm.beacon.WebService.{BeaconClusterService, BeaconEventService, BeaconPairService, BeaconPolicyInstanceService, BeaconPolicyService}
+import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconApiError, BeaconApiErrors, BeaconEventResponse, BeaconLogResponse, PairedCluster, PolicyDataResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
+import com.hortonworks.dlm.beacon.WebService._
 import com.hortonworks.dlm.beacon.domain.RequestEntities.ClusterDefinitionRequest
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import models.Entities._
 import models.PolicyAction
-import models.{DELETE, RESUME, SCHEDULE, SUSPEND, DESCEND}
+import models._
 import play.api.http.Status.INTERNAL_SERVER_ERROR
 
 import scala.collection.immutable.Set.Set2
@@ -22,6 +22,9 @@ import scala.concurrent.Promise
   * @param beaconClusterService  beacon service to communicate with beacon cluster endpoints
   * @param beaconPairService beacon service to communicate with beacon pair endpoints
   * @param beaconPolicyService   beacon service to communicate with beacon policy endpoints
+  * @param beaconPolicyInstanceService  beacon service to execute rest api on beacon policy instance resource
+  * @param beaconEventService    beacon service to  get beacon events
+  * @param beaconLogService      beacon service to get beacon logs
   * @param dataplaneService      dataplane service to interact with dataplane db service
   * @param webhdfsService        webhdfs client service
   */
@@ -32,6 +35,7 @@ class BeaconService @Inject()(
    @Named("beaconPolicyService") val beaconPolicyService: BeaconPolicyService,
    @Named("beaconPolicyInstanceService") val beaconPolicyInstanceService: BeaconPolicyInstanceService,
    @Named("beaconEventService") val beaconEventService: BeaconEventService,
+   @Named("beaconLogService") val beaconLogService: BeaconLogService,
    val dataplaneService: DataplaneService,
    val webhdfsService: WebhdfsService) {
 
@@ -492,6 +496,20 @@ class BeaconService @Inject()(
           }
         })
     })
+    p.future
+  }
+
+  def getBeaconLogs(clusterId: Long, queryString: Map[String, String]): Future[Either[BeaconApiErrors, BeaconLogResponse]] = {
+    val p: Promise[Either[BeaconApiErrors, BeaconLogResponse]] = Promise()
+    dataplaneService.getBeaconService(clusterId).map {
+      case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
+      case Right(beaconService) =>
+        val fullUrl = beaconService.fullURL
+        beaconLogService.listLog(fullUrl, queryString).map {
+          case Left(errors) => p.success(Left(errors))
+          case Right(beaconLogResponse) => p.success(Right(beaconLogResponse))
+        }
+    }
     p.future
   }
 }

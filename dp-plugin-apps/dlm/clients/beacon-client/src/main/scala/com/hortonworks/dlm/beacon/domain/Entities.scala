@@ -43,6 +43,8 @@ object ResponseEntities {
                                     startTime: Option[String], endTime: String)
 
   case class BeaconEventResponse(policyId: Option[String], instanceId: Option[String], eventType: String, severity: String, timestamp: String, message: String)
+
+  case class BeaconLogResponse(status: String, message: String, requestId: String)
 }
 
 object RequestEntities {
@@ -102,6 +104,9 @@ object JsonFormatters {
 
   implicit val eventResponseWrites = Json.writes[BeaconEventResponse]
   implicit val eventResponseReads = Json.reads[BeaconEventResponse]
+
+  implicit val beaconLogResponseWrites = Json.writes[BeaconLogResponse]
+  implicit val beaconLogResponseReads = Json.reads[BeaconLogResponse]
 
   //-- RequestEntities
 
