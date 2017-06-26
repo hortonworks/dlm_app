@@ -17,8 +17,8 @@ class DataAssetRepo @Inject()(
 
   val DatasetAssets = TableQuery[DatasetAssetTable]
 
-  def allWithDatasetId(datasetId: Long): Future[List[DataAsset]] = db.run {
-    DatasetAssets.filter(_.datasetId === datasetId).to[List].result
+  def allWithDatasetId(datasetId: Long, queryName: String, offset: Long, limit: Long): Future[List[DataAsset]] = db.run {
+    DatasetAssets.filter(record => record.datasetId === datasetId && record.assetName.like(s"%$queryName%")).drop(offset).take(limit).to[List].result
   }
 
   def insert(dataAsset: DataAsset): Future[DataAsset] = {

@@ -1,4 +1,4 @@
-<dlm-table
+<dlm-table #table
   [rowDetailHeight]="550"
   [rowDetailTemplate]="rowDetailRef"
   [theme]="tableTheme"
@@ -12,7 +12,7 @@
 <dlm-flow-status></dlm-flow-status>
 
 <ng-template #durationCell let-seconds="value">
-  {{seconds ? (seconds | amUtc | amDateFormat:'HH:mm:ss') : 'Running'}}
+  {{seconds ? (seconds | amUtc | amDateFormat:'HH[h]mm[m]ss[s]') : 'Running'}}
 </ng-template>
 
 <ng-template #verbStatusCellTemplate let-value="value">

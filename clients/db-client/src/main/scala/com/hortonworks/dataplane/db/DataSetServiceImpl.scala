@@ -66,8 +66,8 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToRichDatasets)
   }
 
-  def getDataAssetByDatasetId(id:Long) : Future[Either[Errors, Seq[DataAsset]]] = {
-    ws.url(s"$url/dataassets/$id")
+  def getDataAssetByDatasetId(id:Long, queryName: String, offset: Long, limit: Long) : Future[Either[Errors, Seq[DataAsset]]] = {
+    ws.url(s"$url/dataassets/$id?queryName=$queryName&offset=$offset&limit=$limit")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToDataAssets)

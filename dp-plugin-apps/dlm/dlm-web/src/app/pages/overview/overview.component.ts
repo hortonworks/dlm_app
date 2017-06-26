@@ -38,7 +38,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   private resourceStatusMap = {
     // TODO where to get statuses for clusters?
     policies: [POLICY_STATUS.RUNNING, POLICY_STATUS.SUBMITTED, POLICY_STATUS.SUSPENDED],
-    jobs: [JOB_STATUS.SUCCESS, JOB_STATUS.RUNNING, JOB_STATUS.WARNINGS, JOB_STATUS.FAILED]
+    jobs: [JOB_STATUS.SUCCESS, JOB_STATUS.WARNINGS, JOB_STATUS.FAILED, JOB_STATUS.RUNNING]
   };
   events$: Observable<Event[]>;
   jobs$: Observable<Job[]>;
@@ -61,7 +61,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
   }
 
   prepareChartData(jobs: Job[], policies: Policy[], clusters: Cluster[], filters) {
-    const filteredPolicies = policies.filter(policy => this.filterPolicyByJob(policy, filters));
+    const filteredPolicies = policies
+      .filter(policy => policy.jobsResource.some(job => job.status !== JOB_STATUS.SUCCESS))
+      .filter(policy => this.filterPolicyByJob(policy, filters));
     const filteredPolicyNames = filteredPolicies.map(p => p.name);
     const filteredJobs = filterCollection(jobs, {name: filteredPolicyNames});
     const clusterNamesByPolicies = unique(flatten(filteredPolicies.map(p => [p.targetCluster, p.sourceCluster])));
@@ -116,6 +118,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.tableData$ = Observable
       .combineLatest(this.tableResources$, this.overviewJobsExternalFiltersService.filters$)
       .map(([policies, filters]) => policies
+        .filter(policy => policy.jobsResource.some(job => job.status !== JOB_STATUS.SUCCESS))
         .filter(policy => this.filterPolicyByJob(policy, filters))
         .map(policy => this.mapTableData(policy)));
 

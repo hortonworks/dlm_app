@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
@@ -31,6 +31,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   policies$: Observable<Policy[]>;
   clusters$: Observable<Cluster[]>;
   pairings$: Observable<Pairing[]>;
+  activePolicyId = '';
   resourceAvailability$: Observable<{canAddPolicy: boolean, canAddPairing: boolean}>;
   clustersSubscription: Subscription;
   filteredPolicies$: Observable<Policy[]>;
@@ -43,7 +44,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
     {multiple: true, propertyName: 'name'}
   ];
 
-  constructor(private store: Store<fromRoot.State>) {
+  constructor(private store: Store<fromRoot.State>, private route: ActivatedRoute) {
     this.policies$ = this.store.select(getPolicyClusterJob);
     this.clusters$ = store.select(getAllClusters);
     this.pairings$ = store.select(getAllPairings);
@@ -64,6 +65,9 @@ export class PoliciesComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     [loadPolicies, loadClusters].map(action => this.store.dispatch(action()));
+    this.route.queryParams.subscribe(params => {
+      this.activePolicyId = params['policy'];
+    });
   }
 
   ngOnDestroy() {

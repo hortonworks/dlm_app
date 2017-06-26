@@ -1,5 +1,4 @@
 <span class="fa fa-circle"
   [class.text-danger]="job.status === JOB_STATUS.FAILED"
-  [class.status-running]="job.status === JOB_STATUS.RUNNING"
-  [class.text-info]="job.status === JOB_STATUS.SUCCESS"></span>
+  [class.text-success]="job.status === JOB_STATUS.SUCCESS"></span>
 <ng-content></ng-content>

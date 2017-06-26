@@ -40,7 +40,7 @@ export class DsEditor implements OnInit {
       this.richDatasetService.getById(this.datasetId)
         .subscribe(dsModel => {
           this.dsModel = dsModel;
-          this.tagService.listDatasetTags(this.dsModel.id).subscribe(tags => this.tags = tags);
+          this.tags = dsModel.tags;
         });
     }
   }

@@ -29,7 +29,7 @@
 </ng-template>
 
 <ng-template #prevJobs let-row="row">
-  <dlm-prev-jobs [policy]="row"></dlm-prev-jobs>
+  <dlm-prev-jobs class="actionable" (click)="goToPolicy(row)" [policy]="row"></dlm-prev-jobs>
 </ng-template>
 
 <ng-template #nextRunTemplate let-row="row">
@@ -40,7 +40,7 @@
 
 <ng-template #runTimeTemplate let-value="value" let-policy="row">
   <span *ngIf="policy.lastJobResource">
-    <span *ngIf="value > 0">{{value | amUtc | amDateFormat: 'HH:mm:ss'}}</span>
+    <span *ngIf="value > 0">{{value | amUtc | amDateFormat: 'HH[h]mm[m]ss[s]'}}</span>
     <span *ngIf="value <= 0">Running</span>
   </span>
 </ng-template>
