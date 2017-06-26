@@ -81,7 +81,7 @@ object ClusterService extends App {
 
       override def onServiceDeRegister(serviceId: String): Unit = logger.info(s"Service removed from consul $serviceId")
 
-      override def onRecoverableException(reason: String, th: Throwable): Unit = logger.warn(reason,th)
+      override def onRecoverableException(reason: String, th: Throwable): Unit = logger.warn(reason)
 
       override def onServiceCheck(serviceId: String): Unit = logger.debug("Running a service check for serviceId "+serviceId)
     }

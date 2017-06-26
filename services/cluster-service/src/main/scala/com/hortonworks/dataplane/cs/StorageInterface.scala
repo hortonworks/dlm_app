@@ -87,7 +87,7 @@ class StorageInterfaceImpl @Inject()(
           Seq()
         } else {
           val clusters = cl.right.get
-          logger.info(s"found clusters $clusters")
+          logger.debug(s"found clusters $clusters")
           clusters
         }
 
@@ -138,7 +138,7 @@ class StorageInterfaceImpl @Inject()(
         None
       } else {
         val clusterService = cl.right.get
-        logger.info(s"Created cluster service $clusterService")
+        logger.debug(s"Created cluster service $clusterService")
         Some(clusterService)
       }
     }
@@ -211,7 +211,7 @@ class StorageInterfaceImpl @Inject()(
 
     val sequence = Future.sequence(c)
     sequence.map { list =>
-      logger.warn(s"Cluster created status $list")
+      logger.debug(s"Cluster created status $list")
       list.collect {
         case Right(cluster) => cluster
       }

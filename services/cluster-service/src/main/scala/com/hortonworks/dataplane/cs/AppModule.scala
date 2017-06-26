@@ -3,11 +3,13 @@ package com.hortonworks.dataplane.cs
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provides, Singleton}
+import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.http.Webserver
 import com.hortonworks.dataplane.http.routes.{AmbariRoute, AtlasRoute, StatusRoute}
 import com.typesafe.config.{Config, ConfigFactory}
+import org.asynchttpclient.DefaultAsyncHttpClientConfig
 import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcWSClient
 
@@ -30,7 +32,8 @@ object AppModule extends AbstractModule {
   @Singleton
   def provideWsClient(implicit actorSystem: ActorSystem,
                       materializer: ActorMaterializer): WSClient = {
-    AhcWSClient()
+    val config = new DefaultAsyncHttpClientConfig.Builder().setAcceptAnyCertificate(true).build
+    AhcWSClient(config)
   }
 
   @Provides
@@ -88,8 +91,8 @@ object AppModule extends AbstractModule {
   def provideStatusRoute(storageInterface: StorageInterface,
                          config: Config,
                          wSClient: WSClient,
-                         clusterSync: ClusterSync): StatusRoute = {
-    new StatusRoute(wSClient, storageInterface, config, clusterSync)
+                         clusterSync: ClusterSync,dpClusterSync: DpClusterSync): StatusRoute = {
+    new StatusRoute(wSClient, storageInterface, config, clusterSync,dpClusterSync)
   }
 
   @Provides
@@ -149,6 +152,16 @@ object AppModule extends AbstractModule {
                          clusterInterface: StorageInterface,
                          wSClient: WSClient): ClusterSync = {
     new ClusterSync(actorSystem, config, clusterInterface, wSClient)
+  }
+
+  @Provides
+  @Singleton
+  def provideDpClusterSync(actorSystem: ActorSystem,
+                         config: Config,
+                         clusterInterface: StorageInterface,
+                           dpClusterService: DpClusterService,
+                         wSClient: WSClient): DpClusterSync = {
+    new DpClusterSync(actorSystem, config, clusterInterface,dpClusterService, wSClient)
   }
 
 

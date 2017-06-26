@@ -29,11 +29,9 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
   def list = authenticated.async {
     Logger.info("Received list dataSet request")
     dataSetService.list()
-      .map { dataSets =>
-        dataSets match {
-          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-          case Right(dataSets) => Ok(Json.toJson(dataSets))
-        }
+      .map {
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(dataSets) => Ok(Json.toJson(dataSets))
       }
   }
 
@@ -42,11 +40,8 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     request.body.validate[DatasetAndCategoryIds].map { dSetNCtgryIds =>
       dataSetService.create(dSetNCtgryIds.copy(dataset = dSetNCtgryIds.dataset.copy(createdBy = request.user.id)))
         .map {
-          dataSetNCategories =>
-            dataSetNCategories match {
-              case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-              case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
-            }
+          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
         }
     }.getOrElse(Future.successful(BadRequest))
   }
@@ -94,11 +89,9 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
 
   def getRichDataset = authenticated.async { req =>
     dataSetService.listRichDataset(req.rawQueryString)
-      .map { dataSets =>
-        dataSets match {
-          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-          case Right(dataSets) => Ok(Json.toJson(dataSets))
-        }
+      .map {
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(dataSets) => Ok(Json.toJson(dataSets))
       }
   }
 
@@ -106,11 +99,9 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     val future = if (tagName.equalsIgnoreCase("all")) dataSetService.listRichDataset(req.rawQueryString)
     else dataSetService.listRichDatasetByTag(tagName,req.rawQueryString)
 
-    future.map { dataSets =>
-      dataSets match {
-        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-        case Right(dataSets) => Ok(Json.toJson(dataSets))
-      }
+    future.map {
+      case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+      case Right(dataSets) => Ok(Json.toJson(dataSets))
     }
   }
 
@@ -119,12 +110,9 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     Logger.info("Received retrieve dataSet request")
     dataSetService.getRichDatasetById(id)
       .map {
-        dataSetNCategories =>
-          dataSetNCategories match {
-            case Left(errors) if (errors.errors.size > 0 && errors.errors.head.code == "404") => NotFound
-            case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-            case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
-          }
+        case Left(errors) if (errors.errors.size > 0 && errors.errors.head.code == "404") => NotFound
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
       }
   }
 
@@ -142,12 +130,9 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     Logger.info("Received retrieve dataSet request")
     dataSetService.retrieve(dataSetId)
       .map {
-        dataSetNCategories =>
-          dataSetNCategories match {
-            case Left(errors) if (errors.errors.size > 0 && errors.errors.head.code == "404") => NotFound
-            case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-            case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
-          }
+        case Left(errors) if (errors.errors.size > 0 && errors.errors.head.code == "404") => NotFound
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
       }
   }
 
@@ -157,11 +142,8 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     request.body.validate[DatasetAndCategoryIds].map { dSetNCtgryIds =>
       dataSetService.update(dSetNCtgryIds)
         .map {
-          dataSetNCategories =>
-            dataSetNCategories match {
-              case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-              case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
-            }
+          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
         }
     }.getOrElse(Future.successful(BadRequest))
   }
@@ -171,33 +153,26 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     Logger.info("Received delete dataSet request")
     dataSetService.delete(dataSetId)
       .map {
-        dataSet =>
-          dataSet match {
-            case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-            case Right(dataSet) => Ok(Json.toJson(dataSet))
-          }
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(dataSet) => Ok(Json.toJson(dataSet))
       }
   }
 
   def listAllCategories = authenticated.async {
     Logger.info("Received list dataSet-categories request")
     categoryService.list()
-      .map { categories =>
-        categories match {
-          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-          case Right(categories) => Ok(Json.toJson(categories))
-        }
+      .map {
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(categories) => Ok(Json.toJson(categories))
       }
   }
 
   def searchCategories(searchText: String, size: Option[Long]) = authenticated.async {
     Logger.info("Received list dataSet-categories request")
     categoryService.search(searchText, size)
-      .map { categories =>
-        categories match {
-          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-          case Right(categories) => Ok(Json.toJson(categories))
-        }
+      .map {
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(categories) => Ok(Json.toJson(categories))
       }
   }
 
@@ -206,22 +181,18 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     request.body.validate[Category].map { category =>
       categoryService.create(category)
         .map {
-          category =>
-            category match {
-              case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-              case Right(category) => Ok(Json.toJson(category))
-            }
+          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Right(category) => Ok(Json.toJson(category))
         }
     }.getOrElse(Future.successful(BadRequest))
   }
 
+
   def listCategoriesCount(search:Option[String]) = authenticated.async { request =>
     categoryService.listWithCount(search)
-      .map { categories =>
-        categories match {
-          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-          case Right(categories) => Ok(Json.toJson(categories))
-        }
+      .map {
+        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(categories) => Ok(Json.toJson(categories))
       }
   }
 

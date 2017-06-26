@@ -48,13 +48,15 @@ class DpClusterRepo @Inject()(
 
   def insert(dpCluster: DataplaneCluster): Future[DataplaneCluster] = {
     def trimTrailingSlash = {
-      if (dpCluster.ambariUrl.endsWith("/")) dpCluster.ambariUrl.stripSuffix("/") else dpCluster.ambariUrl
+      if (dpCluster.ambariUrl.endsWith("/"))
+        dpCluster.ambariUrl.stripSuffix("/")
+      else dpCluster.ambariUrl
     }
 
     val dataplaneCluster = dpCluster.copy(
       isDatalake = dpCluster.isDatalake.map(Some(_)).getOrElse(Some(false)),
       ambariUrl = trimTrailingSlash
-      )
+    )
     db.run {
       DataplaneClusters returning DataplaneClusters += dataplaneCluster
     }
@@ -125,6 +127,10 @@ class DpClusterRepo @Inject()(
 
     def isDataLake = column[Option[Boolean]]("is_datalake")
 
+    def knoxEnabled = column[Option[Boolean]]("knox_enabled")
+
+    def knoxUrl = column[Option[String]]("knox_url")
+
     def location = foreignKey("location", locationId, Locations)(_.id)
 
     def createdBy = foreignKey("user", userId, userRepo.Users)(_.id)
@@ -139,6 +145,8 @@ class DpClusterRepo @Inject()(
        properties,
        state,
        isDataLake,
+       knoxEnabled,
+       knoxUrl,
        created,
        updated) <> ((DataplaneCluster.apply _).tupled, DataplaneCluster.unapply)
   }
