@@ -10,8 +10,10 @@ import com.hortonworks.dataplane.cs.Webservice.AmbariService
 import com.hortonworks.dataplane.cs.AmbariServiceImpl
 import play.api.{Configuration, Logger}
 import play.api.libs.ws.WSClient
-import com.hortonworks.dlm.beacon.{BeaconClusterServiceImpl, BeaconEventServiceImpl, BeaconPairServiceImpl, BeaconPolicyInstanceServiceImpl, BeaconPolicyServiceImpl}
-import com.hortonworks.dlm.beacon.WebService.{BeaconClusterService, BeaconEventService, BeaconPairService, BeaconPolicyInstanceService, BeaconPolicyService}
+import com.hortonworks.dlm.beacon.{BeaconClusterServiceImpl, BeaconEventServiceImpl, BeaconPairServiceImpl,
+                                   BeaconPolicyInstanceServiceImpl, BeaconPolicyServiceImpl, BeaconLogServiceImpl}
+import com.hortonworks.dlm.beacon.WebService.{BeaconClusterService, BeaconEventService, BeaconPairService,
+                                              BeaconPolicyInstanceService, BeaconPolicyService, BeaconLogService}
 import com.hortonworks.dlm.webhdfs.WebService.FileService
 import com.hortonworks.dlm.webhdfs.FileServiceImpl
 import com.hortonworks.datapalane.consul._
@@ -95,6 +97,14 @@ class Module extends AbstractModule {
   def provideBeaconEventService(implicit ws: WSClient,configuration: Configuration):BeaconEventService = {
     new BeaconEventServiceImpl()
   }
+
+  @Provides
+  @Singleton
+  @Named("beaconLogService")
+  def provideBeaconLogService(implicit ws: WSClient,configuration: Configuration):BeaconLogService = {
+    new BeaconLogServiceImpl()
+  }
+
 
   @Provides
   @Singleton

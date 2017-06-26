@@ -93,4 +93,8 @@ object WebService {
     def listEvents(beaconEndpoint : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, Seq[BeaconEventResponse]]]
   }
 
+  trait BeaconLogService extends ClientService {
+    def listLog(beaconEndpoint : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, BeaconLogResponse]]
+  }
+
 }
