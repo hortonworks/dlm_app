@@ -3,27 +3,28 @@ import { Cluster } from './cluster.model';
 import { Job } from './job.model';
 
 export interface Policy {
-  id: string;
+  id: string; // UI specific
   name: string;
   type: string;
   dataset: string;
   status: string;
   sourceCluster: string;
   targetCluster: string;
-  sourceClusterResource?: Cluster;
-  targetClusterResource?: Cluster;
-  lastJobResource?: Job;
-  jobsResource?: Job[];
   sourceDataset: string;
   targetDataset: string;
   endTime: string;
   frequency: number;
-  policyStatus: RequestStatus;
   tags: string[];
   customProperties: Object;
   retry: Object;
   description: string;
-  lastJobs: Job[];
+  jobs: Job[];
+  // UI specific props
+  lastJobResource?: Job;
+  jobsResource?: Job[];
+  policyStatus: RequestStatus;
+  sourceClusterResource?: Cluster;
+  targetClusterResource?: Cluster;
 }
 
 export interface PolicyDefinition {

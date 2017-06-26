@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, ViewChild, TemplateRef } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
 import { Job } from 'models/job.model';
 import { ActionItemType } from 'components';
 import { TableComponent } from 'common/table/table.component';
@@ -79,5 +80,9 @@ export class JobsTableComponent implements OnInit {
 
   handleSelectedAction(row, action) {
     this.store.dispatch(abortJob(row.policy));
+  }
+
+  isRunning(job: Job) {
+    return job && job.duration <= 0;
   }
 }

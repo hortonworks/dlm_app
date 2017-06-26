@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { Store } from '@ngrx/store';
-import { loadPolicies } from 'actions/policy.action';
+import { loadPolicies, loadLastJobs } from 'actions/policy.action';
 import { loadClusters } from 'actions/cluster.action';
 import { loadJobsForClusters } from 'actions/job.action';
 import { Policy } from 'models/policy.model';
@@ -31,12 +31,15 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   policies$: Observable<Policy[]>;
   clusters$: Observable<Cluster[]>;
   pairings$: Observable<Pairing[]>;
+  subscriptions: Subscription[] = [];
   activePolicyId = '';
   resourceAvailability$: Observable<{canAddPolicy: boolean, canAddPairing: boolean}>;
-  clustersSubscription: Subscription;
   filteredPolicies$: Observable<Policy[]>;
   filters$: BehaviorSubject<any> = new BehaviorSubject({});
   filterByService$: BehaviorSubject<any> = new BehaviorSubject('');
+  // holds list of policy id which has initialiy 0 last jobs because of API error.
+  // as workaround we need to load 3 jobs for such policies and set result to `jobs` and `lastJobs`
+  postLoadPolicyIds: string[] = [];
   filterBy: TableFilterItem[] = [
     {multiple: true, propertyName: 'sourceCluster'},
     {multiple: false, propertyName: 'targetCluster'},
@@ -49,12 +52,6 @@ export class PoliciesComponent implements OnInit, OnDestroy {
     this.clusters$ = store.select(getAllClusters);
     this.pairings$ = store.select(getAllPairings);
     const pairsCount$: Observable<PairsCountEntity> = store.select(getCountPairsForClusters);
-
-    this.clustersSubscription = this.clusters$.subscribe(clusters => {
-      const clusterIds = clusters.map(c => c.id);
-      store.dispatch(loadPairings());
-      store.dispatch(loadJobsForClusters(clusterIds));
-    });
     this.filteredPolicies$ = Observable.combineLatest(this.policies$, this.filters$, this.filterByService$)
       .map(([policies, filters, filterByService]) => this.filterPoliciesWithCondition(policies, filters, filterByService));
 
@@ -65,13 +62,30 @@ export class PoliciesComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     [loadPolicies, loadClusters].map(action => this.store.dispatch(action()));
+    const clusterSubscription = this.clusters$.subscribe(clusters => {
+      const clusterIds = clusters.map(c => c.id);
+      this.store.dispatch(loadPairings());
+      this.store.dispatch(loadJobsForClusters(clusterIds));
+    });
+    const lastJobsWorkaroundSubscription = this.policies$
+      .map(policies => policies.filter(policy => !policy.jobs.length &&
+        policy.targetClusterResource.id &&
+        this.postLoadPolicyIds.indexOf(policy.id) < 0
+      ))
+      .filter(policies => !!policies.length)
+      .subscribe(policies => {
+        this.postLoadPolicyIds = policies.map(policy => policy.id);
+        this.store.dispatch(loadLastJobs(policies));
+      });
+    this.subscriptions.push(clusterSubscription);
+    this.subscriptions.push(lastJobsWorkaroundSubscription);
     this.route.queryParams.subscribe(params => {
       this.activePolicyId = params['policy'];
     });
   }
 
   ngOnDestroy() {
-    this.clustersSubscription.unsubscribe();
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
   filterPoliciesWithCondition(policies, filters, filterByService) {

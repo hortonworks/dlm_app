@@ -3,11 +3,18 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { Policy, PolicyPayload } from 'models/policy.model';
 import { mapResponse } from 'utils/http-util';
+import { JobTrackingInfo } from 'models/job-tracking-info.model';
+import { JobService } from 'services/job.service';
 
 @Injectable()
 export class PolicyService {
 
-  constructor(private http: Http) { }
+  normalizePolicy(policy): Policy {
+    policy.id = policy.name;
+    return policy;
+  }
+
+  constructor(private http: Http, private jobService: JobService) { }
 
   createPolicy(payload: { policy: PolicyPayload, targetClusterId: string }): Observable<any> {
     const { policy, targetClusterId } = payload;
@@ -15,7 +22,16 @@ export class PolicyService {
   }
 
   fetchPolicies(): Observable<any> {
-    return mapResponse(this.http.get('policies'));
+    return mapResponse(this.http.get('policies')).map(response => {
+      response.policies.forEach(policy => {
+        policy.jobs = policy.jobs.map(job => this.jobService.normalizeJob(job));
+        policy = {
+          ...policy,
+          ...this.normalizePolicy(policy)
+        };
+      });
+      return response;
+    });
   }
 
   fetchPolicy(id: string): Observable<any> {
