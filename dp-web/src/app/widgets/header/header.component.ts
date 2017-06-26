@@ -16,7 +16,7 @@ export class HeaderComponent implements OnInit {
   sideNavWidth = '200px';
   activeTabName: string;
   activePersona: Persona;
-  activePersonaName: string = 'Infra Admin'
+  activePersonaName: string = 'Infra Admin';
   activePersonaImageName: string = 'infra-logo.png';
   sideNavOpen = false;
   crumbNames: string[] = [];
@@ -51,7 +51,7 @@ export class HeaderComponent implements OnInit {
 
     for (let persona of this.headerData.personas) {
       for (let tabs of persona.tabs) {
-        if (tabs.URL && tabs.URL.length > 0 && url.startsWith('/' +tabs.URL)) {
+        if (tabs.URL && tabs.URL.length > 0 && url === '/' +tabs.URL) {
           this.activePersona = persona;
           this.activePersonaName = persona.name;
           this.activePersonaImageName = persona.imageName;

@@ -4,11 +4,14 @@ import {Observable} from 'rxjs/Observable';
 import {LDAPUser} from '../models/ldap-user';
 import {HttpUtil} from '../shared/utils/httpUtil';
 import {User} from '../models/user';
+import {Subject} from 'rxjs/Subject';
 
 @Injectable()
 export class UserService {
 
   url = '/api/users';
+  dataChanged = new Subject<boolean>();
+  dataChanged$ = this.dataChanged.asObservable();
 
   constructor(private http: Http) {
   }
@@ -48,8 +51,11 @@ export class UserService {
       .catch(HttpUtil.handleError);
   }
 
-  addUsers(): Observable<any[]> {
-    return Observable.of([]);
+  addUsers(users: string[], roles: string[]): Observable<any[]> {
+    return this.http
+      .post(`${this.url}/addUsersWithRoles`, {users: users, roles: roles}, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
   }
 
   updateUser(user): Observable<any> {

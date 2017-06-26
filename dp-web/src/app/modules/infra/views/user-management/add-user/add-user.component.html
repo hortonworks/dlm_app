@@ -15,7 +15,8 @@
         [clearOnSearch]="true"
         (textChange)="onUserSearchChange($event)"
         (onNewSearch)="onNewUserAddition($event)"
-        [theme]="tagTheme.DARK"></tagging-widget>
+        [theme]="tagTheme.DARK"
+        [restrictFreeText]="true"></tagging-widget>
       </div>
       <div class="dp-input">
         <label class="text-medium">{{"pages.infra.labels.roles" | translate}}</label>
@@ -24,7 +25,8 @@
         [clearOnSearch]="true"
         (textChange)="onRoleSearchChange($event)"
         (onNewSearch)="onNewRoleAddition($event)"
-        [theme]="tagTheme.DARK"></tagging-widget>
+        [theme]="tagTheme.DARK"
+        [restrictFreeText]="true"></tagging-widget>
       </div>
     </div>
     <div *ngIf="mode === modes.EDIT">
@@ -53,7 +55,8 @@
           [clearOnSearch]="true"
           (textChange)="onRoleSearchChange($event)"
           (onNewSearch)="onRolesEdit($event)"
-          [theme]="tagTheme.DARK"></tagging-widget>
+          [theme]="tagTheme.DARK"
+          [restrictFreeText]="true"></tagging-widget>
         </div>
       </div>
     </div>
