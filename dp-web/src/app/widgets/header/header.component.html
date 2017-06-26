@@ -1,37 +1,23 @@
-<div class="navbar mdl-grid mdl-grid--no-spacing">
-    <div class="mdl-cell--10-col">
-        <div class="dp-header-logo borderBox" [ngClass]="{'minimised': viewPaneState === viewPaneStates.MINIMISE}">
-          <img *ngIf="activePersonaImageName" [attr.src]="'../../../assets/images/' + activePersonaImageName" alt="Hortonworks Dataplane" (click)="openNav()"/>
-          <span>{{ activePersonaName }}</span>
+<nav class="navbar">
+    <div class="mdl-grid mdl-grid--no-spacing">
+        <div class="mdl-cell--5-col">
+            <div class="breadcrumb">
+              <span class="mdl-navigation__link home">Dataplane</span>
+              <!--<span class="mdl-navigation__link" *ngFor="let crumbName of crumbNames"> {{ crumbName }} </span>-->
+            </div>
         </div>
 
-        <div class="mdl-navigation breadcrumb">
-          <span class="mdl-navigation__link home">Dataplane</span>
-          <!--<span class="mdl-navigation__link" *ngFor="let crumbName of crumbNames"> {{ crumbName }} </span>-->
+        <div class="mdl-layout-spacer"></div>
+
+        <div class="actions">
+            <button id="logout" class="mdl-button mdl-js-button">
+                <i class="fa fa-user-circle" aria-hidden="true"></i>
+                <span class="user-name"> {{user?.display}} </span>
+                <i class="fa fa-chevron-down" aria-hidden="true"></i>
+            </button>
+            <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="logout">
+                <li class="mdl-menu__item" (click)="logout()">Sign out</li>
+            </ul>
         </div>
-
     </div>
-
-    <div class="mdl-layout-spacer"></div>
-
-    <div class="actions">
-        <button id="logout" class="mdl-button mdl-js-button">
-            <i class="fa fa-user-circle" aria-hidden="true"></i>
-            <span class="user-name"> {{user?.display}} </span>
-            <i class="fa fa-chevron-down" aria-hidden="true"></i>
-        </button>
-        <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="logout">
-            <li class="mdl-menu__item" (click)="logout()">Sign out</li>
-        </ul>
-    </div>
-</div>
-
-
-<ul #sidenav class="suit-navigation">
-  <li *ngFor="let persona of headerData.personas; let i = index" (click)="navigateToPersona(persona, layout)">
-    <div class="logo-wrapper borderBox" title="{{ persona.name }}">
-      <img [attr.src]="'../../../assets/images/' + persona.imageName" alt=""/>
-    </div>
-    <div>{{ persona.name }}</div>
-  </li>
-</ul>
+</nav>

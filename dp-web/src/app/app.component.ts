@@ -6,9 +6,10 @@ import { MdlService } from './services/mdl.service';
 
 import { User } from './models/user';
 import {HeaderData, Persona, PersonaTabs} from './models/header-data';
+import {CollapsibleNavService} from './services/collapsible-nav.service';
 
 export enum ViewPaneState {
-  DEFAULT, MAXIMISE, MINIMISE
+  MAXIMISE, MINIMISE
 }
 
 @Component({
@@ -19,16 +20,15 @@ export enum ViewPaneState {
 export class AppComponent implements OnInit {
 
   marginLeft = 0;
-  personaTabs: PersonaTabs[];
   viewPaneStates = ViewPaneState;
-  viewPaneState = ViewPaneState.DEFAULT;
+  viewPaneState = ViewPaneState.MAXIMISE;
   headerData: HeaderData = new HeaderData();
 
   constructor(
     private mdlService: MdlService,
     private identityService: IdentityService,
-    private translateService: TranslateService
-  ) {
+    private translateService: TranslateService,
+    private collapsibleNavService: CollapsibleNavService) {
     translateService.setTranslation('en', require('../assets/i18n/en.json'));
     translateService.setDefaultLang('en');
     translateService.use('en');
@@ -44,12 +44,15 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.setHeaderData();
+    this.collapsibleNavService.collpaseSideNav$.subscribe(collapsed => {
+      this.viewPaneState =  collapsed ? ViewPaneState.MINIMISE : ViewPaneState.MAXIMISE;
+    })
   }
 
   setHeaderData() {
     this.headerData.personas = [
       new Persona('Data Steward', [
-        new PersonaTabs('Dataset', 'dataset', 'fa-cubes'),
+        new PersonaTabs('Dataset', 'dataset', 'fa-cubes', true),
         new PersonaTabs('Unclassified', 'unclassified', 'fa-cube'),
         new PersonaTabs('Assets', 'assets', 'fa-server'),
         new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')
