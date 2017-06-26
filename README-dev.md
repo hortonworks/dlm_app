@@ -32,8 +32,9 @@
 4. Start Play BE
   * sh runDbService.sh for db service
   * sh runDpApp.sh for app
+  * sh runClusterService.sh for cluster service
 5. Start UI
-  * `yarn install`
+  * `yarn install --pure-lockfile`
   * `yarn run dev`
 
 ## Troubleshooting
