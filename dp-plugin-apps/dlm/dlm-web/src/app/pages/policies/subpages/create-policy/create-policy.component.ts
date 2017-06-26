@@ -16,12 +16,24 @@ import { POLICY_FORM_ID } from '../../components/policy-form/policy-form.compone
   template: `
     <dlm-page-header [title]="'page.policies.header_create'"></dlm-page-header>
     <div class="page-section">
-      <dlm-policy-form
-        [pairings]="pairings$ | async"
-        [sourceClusterId]="sourceClusterId"
-        (formSubmit)="handleFormSubmit($event)"
-        >
-      </dlm-policy-form>
+      <div *ngIf="(pairings$ | async)?.length > 0; else noPairs">
+        <dlm-policy-form
+          [pairings]="pairings$ | async"
+          [sourceClusterId]="sourceClusterId"
+          (formSubmit)="handleFormSubmit($event)"
+          >
+        </dlm-policy-form>
+      </div>
+      <ng-template #noPairs>
+        <div>
+          <div class="alert alert-warning" role="alert">
+            {{ "page.pairings.content.no_pairs" | translate}}
+            <button type="button" class="btn btn-primary" (click)="createPairingClickHandler()">
+              {{ "page.pairings.create_button_text" | translate }}
+            </button>
+          </div>
+        </div>
+      </ng-template>
     </div>
   `,
   styleUrls: ['./create-policy.component.scss']
