@@ -9,11 +9,25 @@ import play.api.libs.json.{JsValue, Json}
   */
 object Ambari {
 
-  case class AmbariCluster(security:String = "NONE",
-                          clusterName:String,
-                          services:Seq[String])
+  case class AmbariCluster(security: String = "NONE",
+                           clusterName: String,
+                           services: Seq[String])
 
-  case class AmbariEndpoint(url:String)
+  case class AmbariEndpoint(url: String)
+
+  case class AmbariCheckResponse(ambariApiCheck: Boolean,
+                                 knoxDetected: Boolean,
+                                 ambariApiStatus: Int,
+                                 knoxUrl: Option[String],
+                                 ambariApiResponseBody: JsValue)
+
+  case class AmbariDetailRequest(url: String,
+                                 knoxDetected: Boolean,
+                                 knoxUrl: Option[String])
+
+  case class AmbariForbiddenResponse(status: Int,
+                                     message: String,
+                                     jwtProviderUrl: Option[String])
 
   case class DiskInfo(
       available: Option[String],
@@ -24,6 +38,7 @@ object Ambari {
       `type`: Option[String],
       mountpoint: Option[String]
   )
+
   case class ClusterHost(
       cluster_name: String,
       cpu_count: Option[Double],
@@ -79,7 +94,6 @@ object Ambari {
   case class ConfigurationInfo(
       stats: JsValue,
       properties: Seq[ConfigType]
-
   )
 
   case class ConfigType(
@@ -87,7 +101,7 @@ object Ambari {
       `type`: String,
       Config: JsValue,
       version: Long,
-      properties: Map[String,String],
+      properties: Map[String, String],
       properties_attributes: JsValue
   )
 
@@ -104,7 +118,6 @@ object Ambari {
       desired_service_config_versions: JsValue
   )
 
-
   implicit val diskInfoReads = Json.reads[DiskInfo]
   implicit val diskInfoWrites = Json.writes[DiskInfo]
   implicit val clusterHealthWrites = Json.writes[ClusterHost]
@@ -117,10 +130,19 @@ object Ambari {
   implicit val configTypeWrites = Json.writes[ConfigType]
   implicit val configurationInfoReads = Json.reads[ConfigurationInfo]
   implicit val configurationInfoWrites = Json.writes[ConfigurationInfo]
-  implicit val serviceWithEndpointWrites = Json.writes[ClusterServiceWithConfigs]
+  implicit val serviceWithEndpointWrites =
+    Json.writes[ClusterServiceWithConfigs]
   implicit val serviceWithEndpointReads = Json.reads[ClusterServiceWithConfigs]
   implicit val ambariClusterReads = Json.reads[AmbariCluster]
   implicit val ambariClusterWrites = Json.writes[AmbariCluster]
+  implicit val ambariCheckResponseWrites = Json.writes[AmbariCheckResponse]
+  implicit val ambariCheckResponseReads = Json.reads[AmbariCheckResponse]
+  implicit val ambariDetailRequestWrites = Json.writes[AmbariDetailRequest]
+  implicit val ambariDetailRequestReads = Json.reads[AmbariDetailRequest]
+
+  implicit val ambariForbiddenWrites = Json.writes[AmbariForbiddenResponse]
+  implicit val ambariForbiddenWritesReads = Json.reads[AmbariForbiddenResponse]
+
   implicit val clusterPropertiesReads = Json.reads[ClusterProperties]
   implicit val clusterPropertiesWrites = Json.writes[ClusterProperties]
 

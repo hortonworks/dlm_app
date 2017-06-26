@@ -46,17 +46,19 @@ CREATE TABLE IF NOT EXISTS dataplane.locations (
 -- Represents a logical cluster, the name does not have to be the same as in Ambari
 
 CREATE TABLE IF NOT EXISTS dataplane.dp_clusters (
-  id          BIGSERIAL PRIMARY KEY,
-  name        VARCHAR(255)                               NOT NULL,
-  description TEXT,
-  ambari_url  VARCHAR(255)                               NOT NULL,
-  location_id BIGINT REFERENCES dataplane.locations (id) NOT NULL,
-  created_by  BIGINT REFERENCES dataplane.users (id)     NOT NULL,
-  properties  JSONB,
-  state       VARCHAR(32)                                NOT NULL DEFAULT 'TO_SYNC',
-  created     TIMESTAMP                                           DEFAULT now(),
-  updated     TIMESTAMP                                           DEFAULT now(),
-  is_datalake BOOLEAN                                             DEFAULT FALSE,
+  id           BIGSERIAL PRIMARY KEY,
+  name         VARCHAR(255)                               NOT NULL,
+  description  TEXT,
+  ambari_url   VARCHAR(255)                               NOT NULL,
+  location_id  BIGINT REFERENCES dataplane.locations (id) NOT NULL,
+  created_by   BIGINT REFERENCES dataplane.users (id)     NOT NULL,
+  properties   JSONB,
+  state        VARCHAR(32)                                NOT NULL DEFAULT 'TO_SYNC',
+  created      TIMESTAMP                                           DEFAULT now(),
+  updated      TIMESTAMP                                           DEFAULT now(),
+  is_datalake  BOOLEAN                                             DEFAULT FALSE,
+  knox_enabled BOOLEAN                                             DEFAULT FALSE,
+  knox_url     VARCHAR(255),
   CHECK (state IN ('TO_SYNC', 'SYNC_IN_PROGRESS', 'SYNCED', 'SYNC_ERROR'))
 );
 

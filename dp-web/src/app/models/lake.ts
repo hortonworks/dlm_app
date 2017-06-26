@@ -11,4 +11,6 @@ export class Lake {
   state: string;
   clusterId:number;
   isDatalake:boolean;
+  knoxEnabled?:boolean;
+  knoxUrl?:string;
 }

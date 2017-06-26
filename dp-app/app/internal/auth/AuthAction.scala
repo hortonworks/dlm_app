@@ -5,162 +5,90 @@ import java.security.cert.X509Certificate
 import com.google.inject.Inject
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities._
+import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.UserService
-import internal.{Jwt, KnoxSso}
+import internal.KnoxSso
 import org.apache.commons.codec.binary.Base64
-import play.api.{Configuration, Logger}
 import play.api.http.Status
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc._
+import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import com.hortonworks.dataplane.commons.domain.Entities._
-import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import scala.concurrent.Future
 
 class Authenticated @Inject()(@Named("userService") userService: UserService,
                               configuration: Configuration,
                               knoxSso: KnoxSso)
-    extends ActionBuilder[AuthenticatedRequest] {
+  extends ActionBuilder[AuthenticatedRequest] {
 
-  private val ssoLoginValidCookieName = "sso_login_valid"
-
-  val gatewayTokenKey = "X-DP-User-Info"
+  val gatewayUserTokenKey = "X-DP-User-Info"
+  val gatewayTokenKey = "X-DP-Token-Info"
 
   def invokeBlock[A](request: Request[A],
                      block: (AuthenticatedRequest[A]) => Future[Result]) = {
 
-    if (request.headers.get(gatewayTokenKey).isDefined){
-      val encodedGatewayToken:String=request.headers.get(gatewayTokenKey).get
-      val userJsonString:String=new String(Base64.decodeBase64(encodedGatewayToken))
+    request.headers.get(gatewayUserTokenKey).map { egt =>
+      val encodedGatewayToken: String = egt
+      val userJsonString: String = new String(
+        Base64.decodeBase64(encodedGatewayToken))
       Json.parse(userJsonString).validate[User] match {
-        case JsSuccess(user, _) => block(AuthenticatedRequest[A](user, request))
-        case JsError(error) =>  {
-          Logger.error("eror while parsing Gateway token.")
+        case JsSuccess(user, _) =>
+          block(setUpAuthContext(request, user))
+        case JsError(error) =>
+          Logger.error(s"Error while parsing Gateway token. $error")
           //TODO could this be a system error.
           Future.successful(Results.Status(Status.UNAUTHORIZED))
-        }
       }
-    }else{
-      if (knoxSso.isSsoConfigured() && request.cookies
-        .get(knoxSso.getSsoCookieName()).isEmpty) {
-        Logger.info(
-          s"Sso is configured but ssocookie ${knoxSso.getSsoCookieName} is not found. " +
-            s"Please check the domain name or sub domain of knox and dp app")
-      }
-      if (knoxSso.isSsoConfigured && request.cookies
-        .get(knoxSso.getSsoCookieName)
-        .isDefined) {
-        Logger.debug("sso cookie is found")
-        authenticateViaKnoxSso(request, block)
-      }else{
-        val userOption: Option[User] = getUserFromBearerToken(request)
-        if (userOption.isDefined)
-          block(AuthenticatedRequest[A](userOption.get, request))
-        else
-          Future.successful(Results.Status(Status.UNAUTHORIZED))
-      }
-    }
+    }.getOrElse(Future.successful(Results.Status(Status.UNAUTHORIZED)))
+
   }
 
-  private def authenticateViaKnoxSso[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[Result]) = {
-    val serializedJWT: String =
-      request.cookies.get(knoxSso.getSsoCookieName).get.value
-    val jwtValidation: Either[Exception, (String, Long)] =
-      knoxSso.validateJwt(serializedJWT)
-    jwtValidation match {
-      case Left(errors) =>
-        Future.successful(
-          Results.Unauthorized.discardingCookies(
-            DiscardingCookie(ssoLoginValidCookieName)))
-      case Right(jwtResp) =>
-        val (subject, tokenExpiry) = jwtResp
-        val userOptionFromBearerToken: Option[User] = getUserFromBearerToken(
-          request)
-        userOptionFromBearerToken match {
-          case Some(user) =>
-            block(AuthenticatedRequest[A](user, request))
-          case None => {
-            Logger.info(
-              " bearer token not present.fetching user details from db for authentication.")
-            getUserFromDb(subject).flatMap { userOption =>
-              if (userOption.isDefined) {
-                val respFuture =
-                  block(AuthenticatedRequest[A](userOption.get, request))
-                val cookie = Cookie(
-                  ssoLoginValidCookieName,
-                  "true",
-                  None,
-                  "/",
-                  None,
-                  false,
-                  false) //Todo set the expiration time got from token if required.
-                respFuture.map(_.withCookies(cookie))
-              } else {
-                Future.successful(
-                  Results.Unauthorized.discardingCookies(
-                    DiscardingCookie(ssoLoginValidCookieName)))
-              }
-            }
-          }
-        }
-    }
-  }
 
-  private def getUserFromDb(userName: String): Future[Option[User]] = {
-    userService.loadUser(userName).map {
-      case Left(errors) => {
-        if (errors.errors.nonEmpty && errors.errors.head.code.equals("404")) {
-          Logger.info(
-            s"User with name[$userName] not found in dataplane db. users authorized from external system" +
-              s" need to be synced to db.")
-        }
-        Logger.error(s"Error while retrieving user $errors")
-        //TODO: domain and https to be done for proper deletiong of cookie.
-        None
+  private def setUpAuthContext[A](request: Request[A], user: User) = {
+    request.headers
+      .get(gatewayTokenKey)
+      .map { tokenHeader =>
+        AuthenticatedRequest[A](user, request, Some(HJwtToken(tokenHeader)))
       }
-      case Right(user) => Some(user)
-    }
-  }
-
-  private def getUserFromBearerToken[A](request: Request[A]): Option[User] = {
-    val token: Option[String] = getBearerToken(request)
-    if (token.isDefined)
-      Jwt.parseJWT(token.get)
-    else
-      None
-  }
-
-  private def getBearerToken[A](request: Request[A]): Option[String] = {
-    if (request.headers.get("Authorization").isEmpty || !request.headers.get("Authorization").get.startsWith("Bearer "))
-      None
-    else{
-      val header: String = request.headers.get("Authorization").get
-      Some(header.replace("Bearer", "").trim)
-    }
+      .getOrElse(AuthenticatedRequest[A](user, request))
   }
 }
 
 trait AuthenticatedRequest[+A] extends Request[A] {
+  val token: Option[HJwtToken]
   val user: User
 }
 
 object AuthenticatedRequest {
-  def apply[A](u: User, r: Request[A]) = new AuthenticatedRequest[A] {
-    def id = r.id
-    def tags = r.tags
-    def uri = r.uri
-    def path = r.path
-    def method = r.method
-    def version = r.version
-    def queryString = r.queryString
-    def headers = r.headers
-    lazy val remoteAddress = r.remoteAddress
-    def username = None
-    val body = r.body
-    val user = u
-    override def secure: Boolean = r.secure
-    override def clientCertificateChain: Option[Seq[X509Certificate]] =
-      r.clientCertificateChain
-  }
+  def apply[A](u: User, r: Request[A], t: Option[HJwtToken] = None) =
+    new AuthenticatedRequest[A] {
+      def id = r.id
+
+      def tags = r.tags
+
+      def uri = r.uri
+
+      def path = r.path
+
+      def method = r.method
+
+      def version = r.version
+
+      def queryString = r.queryString
+
+      def headers = r.headers
+
+      lazy val remoteAddress = r.remoteAddress
+
+      def username = None
+
+      val body = r.body
+      val user = u
+      val token = t
+
+      override def secure: Boolean = r.secure
+
+      override def clientCertificateChain: Option[Seq[X509Certificate]] =
+        r.clientCertificateChain
+    }
 }

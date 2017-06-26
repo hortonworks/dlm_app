@@ -1,7 +1,7 @@
 package com.hortonworks.dataplane.cs
 
 import akka.actor.{Actor, ActorLogging, ActorRef, PoisonPill, Props}
-import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster}
+import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster, HJwtToken}
 import com.hortonworks.dataplane.commons.service.api.Poll
 import com.typesafe.config.Config
 import play.api.libs.json.JsValue
@@ -45,7 +45,7 @@ class DpClusterActor(private val dpCluster: DataplaneCluster,
   }
 
   def makeCluster(cname: String) = {
-
+    implicit val token:Option[HJwtToken] = None
     dpClusterInterface.getClusterDetails(cname).map { props =>
       Cluster(
         name = cname,
@@ -61,6 +61,7 @@ class DpClusterActor(private val dpCluster: DataplaneCluster,
   override def receive = {
     case Poll() =>
       // Pull cluster related information from linked Ambari
+      implicit val token:Option[HJwtToken] = None
       val fClusters = dpClusterInterface.discoverClusters
       // Register all clusters in storage
 

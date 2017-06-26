@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari.AmbariEndpoint
-import com.hortonworks.dataplane.commons.domain.Entities.DataplaneCluster
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, HJwtToken}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.DpClusterService
 import models.JsonResponses
@@ -35,6 +35,7 @@ class DataplaneClusters @Inject()(
   }
 
   def create = authenticated.async(parse.json) { request =>
+    implicit val token = request.token
     Logger.info("Received create data centre request")
     request.body
       .validate[DataplaneCluster]
@@ -53,7 +54,7 @@ class DataplaneClusters @Inject()(
       .getOrElse(Future.successful(BadRequest))
   }
 
-  private def syncCluster(dataplaneCluster: DataplaneCluster): Future[Boolean] = {
+  private def syncCluster(dataplaneCluster: DataplaneCluster)(implicit hJwtToken: Option[HJwtToken]): Future[Boolean] = {
     ambariService.syncCluster(dataplaneCluster).map { result =>
       Logger.info(s"Asking Cluster service to discover ${dataplaneCluster.ambariUrl}")
       result
@@ -103,17 +104,14 @@ class DataplaneClusters @Inject()(
   }
 
   def ambariCheck = authenticated.async { request =>
+    implicit val token = request.token
     ambariService
       .statusCheck(AmbariEndpoint(request.getQueryString("url").get))
       .map {
-        case status => Ok(Json.toJson(Map("ambariStatus" -> status)))
-      }
-      .recoverWith {
-        case e: Exception =>
-          Future.successful(
-            InternalServerError(
-              JsonResponses.statusError(e.getMessage,
-                                        ExceptionUtils.getStackTrace(e))))
+        case Left(errors) =>
+          InternalServerError(
+            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(checkResponse) => Ok(Json.toJson(checkResponse))
       }
   }
 
