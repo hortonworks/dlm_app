@@ -20,7 +20,7 @@
       <dlm-cluster-list [clusters]="tableData$ | async"></dlm-cluster-list>
     </div>
     <ng-template #noClusters>
-      <div style="padding: 20px;">
+      <div>
         <div class="alert alert-warning" role="alert">
           {{ "page.pairings.create.content.no_clusters" | translate }}
         </div>

@@ -25,11 +25,13 @@ import { POLICY_FORM_ID } from '../../components/policy-form/policy-form.compone
         </dlm-policy-form>
       </div>
       <ng-template #noPairs>
-        <div class="alert alert-warning" role="alert">
-          {{ "page.pairings.content.no_pairs" | translate}}
-          <button type="button" class="btn btn-primary" (click)="createPairingClickHandler()">
-            {{ "page.pairings.create_button_text" | translate }}
-          </button>
+        <div>
+          <div class="alert alert-warning" role="alert">
+            {{ "page.pairings.content.no_pairs" | translate}}
+            <button type="button" class="btn btn-primary" (click)="createPairingClickHandler()">
+              {{ "page.pairings.create_button_text" | translate }}
+            </button>
+          </div>
         </div>
       </ng-template>
     </div>

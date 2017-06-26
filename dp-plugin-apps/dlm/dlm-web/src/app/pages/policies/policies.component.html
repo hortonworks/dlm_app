@@ -29,7 +29,7 @@
     <dlm-policy-table [policies]="filteredPolicies$ | async" [clusters]="clusters$ | async" [activePolicyId]="activePolicyId"></dlm-policy-table>
   </div>
   <ng-template #noPolicies>
-    <div style="padding: 20px;">
+    <div class="alert-wrapper">
       <div class="alert alert-warning" role="alert">
         {{ "page.policies.no_policies" | translate }}
       </div>
