@@ -71,7 +71,6 @@ class UserManager @Inject()(val ldapService: LdapService,
     req.body.validate[UsersAndRolesListInput].map{usersAndRolesInput=>
       val roleTypes=usersAndRolesInput.roles.map{roleStr=>RoleType.withName(roleStr)}
       addUserInternal(usersAndRolesInput.users,roleTypes)
-      Future.successful(BadRequest)
     }.getOrElse{
       Future.successful(BadRequest)
     }
