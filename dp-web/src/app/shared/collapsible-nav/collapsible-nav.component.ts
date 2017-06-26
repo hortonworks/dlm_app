@@ -68,9 +68,9 @@ export class CollapsibleNavComponent implements OnInit {
 
   navigateToPersona(persona: Persona, drawer: any) {
     if (persona.tabs.length > 0 ) {
-      this.collapsibleNavService.collpaseSideNav.next(true);
       this.showPersona = false;
       this.router.navigate([persona.tabs[0].URL]);
+      this.collapsibleNavService.collpaseSideNav.next(persona.tabs[0].collapseSideNav);
     } else {
       if (persona.tabs.length === 0 && persona.url.length > 0) {
         window.location.pathname = persona.url;
