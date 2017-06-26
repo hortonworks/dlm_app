@@ -33,6 +33,7 @@
                     [avoidLoadingOnInit]="true"
                     [clusterId]="clusterId"
                     [allowAssetNavigation]="false"
+                    [showBelongsToColumn]="showBelongsToColumn"
       *ngIf="showQueryResults"                    #dsAssetList></ds-assets-list>
     <div *ngIf="!showQueryResults" class="noSearchMessage"><span>{{"pages.dataset.asset-search.noSearchMsg" | translate}}</span></div>
   </div>

@@ -3,10 +3,11 @@ package controllers
 import javax.inject.Inject
 
 import com.google.inject.name.Named
+import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasEntities, Entity}
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.cs.Webservice.AtlasService
-import com.hortonworks.dataplane.db.Webservice.{CategoryService, DataSetCategoryService, DataSetService}
+import com.hortonworks.dataplane.db.Webservice.{CategoryService, DataAssetService, DataSetCategoryService, DataSetService}
 import internal.auth.Authenticated
 import models.JsonResponses
 import play.api.Logger
@@ -18,6 +19,7 @@ import scala.concurrent.Future
 
 
 class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetService,
+                         @Named("dataAssetService") val assetService: DataAssetService,
                          @Named("categoryService") val categoryService: CategoryService,
                          @Named("dataSetCategoryService") val dataSetCategoryService: DataSetCategoryService,
                          @Named("atlasService") val atlasService: AtlasService,
@@ -49,31 +51,39 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
     }.getOrElse(Future.successful(BadRequest))
   }
 
-  private def getAssetFromSearch(req: DatasetCreateRequest): Future[Either[Errors, Seq[DataAsset]]] = {
-    atlasService.searchQueryAssets(req.clusterId.toString, req.assetQueryModels.head).map {
-      case Right(entity) =>
-        val assets = entity.entities.getOrElse(Nil).map {
-          e =>
-            DataAsset(None, e.typeName.get,
-              e.attributes.get.get("name").get,
-              e.guid.get, Json.toJson(e.attributes.get), req.clusterId)
+  private def getAssetFromSearch(req: DatasetCreateRequest): Future[Either[Errors, (Seq[DataAsset], Long, Long)]] = {
+    val future = for {
+      results <- atlasService.searchQueryAssets(req.clusterId.toString, req.assetQueryModels.head)
+      enhancedResults <- doEnhanceAssetsWithOwningDataset(req.clusterId.toString, results)
+    } yield enhancedResults
+
+    future
+      .map { enhancedResults =>
+        enhancedResults match {
+          case Left(errors) => Left(errors)
+          case Right(enhanced) => {
+            val entitiesToSave = enhanced.filter(cEntity => cEntity.datasetId == None)
+            Right(entitiesToSave.map(cEntity => getAssetFromEntity(cEntity, req.clusterId)), entitiesToSave.size, enhanced.size - entitiesToSave.size)
+          }
         }
-        Right(assets)
-      case Left(e) => Left(e)
-    }
+      }
+  }
+
+  private def getAssetFromEntity(entity: Entity, clusterId: Long): DataAsset = {
+    DataAsset(None, entity.typeName.get, entity.attributes.get.get("name").get, entity.guid.get, Json.toJson(entity.attributes.get), clusterId)
   }
 
   def createDatasetWithAtlasSearch = authenticated.async(parse.json) { request =>
     request.body.validate[DatasetCreateRequest].map { req =>
       getAssetFromSearch(req).flatMap {
-        case Right(assets) =>
+        case Right((assets, countOfSaved, countOfIgnored)) =>
           val newReq = req.copy(dataset = req.dataset.copy(createdBy = request.user.id), dataAssets = assets)
           dataSetService.create(newReq)
             .map {
               dataSetNCategories =>
                 dataSetNCategories match {
                   case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-                  case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
+                  case Right(dataSetNCategories) => Ok(Json.obj("result" -> Json.toJson(dataSetNCategories), "countOfSaved" -> countOfSaved, "countOfIgnored" -> countOfIgnored))
                 }
             }
         case Left(errors) =>
@@ -221,6 +231,37 @@ class DataSets @Inject()(@Named("dataSetService") val dataSetService: DataSetSer
         case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
         case Right(categoryCount) => Ok(Json.toJson(categoryCount))
       }
+  }
+
+  private def doEnhanceAssetsWithOwningDataset(clusterIdAsString: String, atlasEntities: Either[Errors, AtlasEntities]): Future[Either[Errors, Seq[Entity]]] = {
+    atlasEntities match {
+      case Left(errors) => Future.successful(Left(errors))
+      case Right(atlasEntities) => {
+
+        val entities = atlasEntities.entities.getOrElse(Seq[Entity]())
+        val assetIds: Seq[String] = entities.filter(_.guid.nonEmpty)map(_.guid.get)
+        val clusterId = clusterIdAsString.toLong
+        assetService.findManagedAssets(clusterId, assetIds)
+          .map { relationships =>
+            relationships match {
+              case Left(errors) => Left(errors)
+              case Right(relationships) => {
+                val enhanced = entities.map { cEntity =>
+
+                  val cRelationship = relationships.find(_.guid == cEntity.guid.get)
+                  cRelationship match {
+                    case None => cEntity
+                    case Some(relationship) => cEntity.copy(datasetId = Option(relationship.datasetId), datasetName = Option(relationship.datasetName))
+                  }
+
+                }
+                Right(enhanced)
+              }
+            }
+          }
+
+      }
+    }
   }
 
 }

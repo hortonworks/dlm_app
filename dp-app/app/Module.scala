@@ -124,6 +124,14 @@ class Module extends AbstractModule {
   def provideNotebookWorkspaceService(implicit ws: WSClient, configuration: Configuration): NotebookWorkspaceService = {
     new NotebookWorkspaceServiceImpl(configuration.underlying)
   }
+
+  @Provides
+  @Singleton
+  @Named("dataAssetService")
+  def provideDataAssetService(implicit ws: WSClient,configuration: Configuration): DataAssetService = {
+    new DataAssetServiceImpl(configuration.underlying)
+  }
+
 }
 
 @Singleton

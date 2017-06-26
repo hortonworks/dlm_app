@@ -73,7 +73,6 @@ export class DsAssetsService {
     return this.http
       .post(`${this.url1}?clusterId=${clusterId}`, postParams, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
-      .map(rsp => rsp.entities)
       .map(rsp => this.extractAssetArrayFromAtlasData(rsp))
       .catch(HttpUtil.handleError)
   }
@@ -117,7 +116,8 @@ export class DsAssetsService {
         owner: ent.attributes.owner || "-",
         source: "hive",
         type: ent.typeName,
-        clusterId: null
+        clusterId: null,
+        dsName:ent.datasetName
       })
     });
     return assetModelArr;
