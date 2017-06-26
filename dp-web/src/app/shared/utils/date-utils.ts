@@ -9,8 +9,13 @@ export class DateUtils {
     return moment.duration(since).humanize();
   }
 
-  public static formatDate(timeInMillisecs, format){
+  public static formatDate(timeInMillisecs, format) {
     return moment(timeInMillisecs).format(format);
+  }
+
+  public static compare(first, second) {
+    let currentTime = moment.now();
+    return moment(currentTime + first).isBefore(currentTime + second);
   }
 
 }
