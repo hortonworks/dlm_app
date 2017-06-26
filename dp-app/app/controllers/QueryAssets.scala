@@ -18,10 +18,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class QueryAssets @Inject()(
-                               @Named("atlasService")
-                               val atlasService: AtlasService,
-                               @Named("dataAssetService")
-                               val assetService: DataAssetService,
+                               @Named("atlasService") val atlasService: AtlasService,
+                               @Named("dataAssetService") val assetService: DataAssetService,
                                val authenticated: Authenticated
                           ) extends Controller {
 
@@ -51,7 +49,7 @@ class QueryAssets @Inject()(
       case Left(errors) => Future.successful(Left(errors))
       case Right(atlasEntities) => {
 
-        val entities = atlasEntities.entities.getOrElse(Seq[Entity]())
+        val entities = atlasEntities.entities.getOrElse(Nil)
         val assetIds: Seq[String] = entities.filter(_.guid.nonEmpty)map(_.guid.get)
         val clusterId = clusterIdAsString.toLong
         assetService.findManagedAssets(clusterId, assetIds)
