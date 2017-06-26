@@ -11,9 +11,9 @@ import scala.concurrent.Future
 @Singleton
 class RolesUtil  @Inject()(roleRepo: RoleRepo) {
   import scala.collection.mutable
-  private var roleNameMapCache:Option[mutable.Map[String, Role]] =  None
+  private var roleNameMapCache:Option[Map[String, Role]] =  None
 
-  def getRoleNameMap()  :Future[mutable.Map[String,Role]]={
+  def getRoleNameMap()  :Future[Map[String,Role]]={
     roleNameMapCache match{
       case None =>{
         val roleMap=mutable.Map.empty[String,Role]
@@ -21,21 +21,21 @@ class RolesUtil  @Inject()(roleRepo: RoleRepo) {
           roles.foreach{role=>
             roleMap.put(role.roleName,role)
           }
-          roleNameMapCache=Some(roleMap)
-          roleMap
+          roleNameMapCache=Some(roleMap.toMap)
+          roleNameMapCache.get
         }
       }
       case Some(roleMap)=>Future.successful(roleMap)
     }
   }
 
-  def getRoleIdMap:Future[mutable.Map[Long,Role]]={
+  def getRoleIdMap:Future[Map[Long,Role]]={
     val roleIdMap=mutable.Map.empty[Long,Role]
     getRoleNameMap().map{roleNameMap=>
       roleNameMap.foreach{ roleMapping =>
         roleIdMap.put(roleMapping._2.id.get,roleMapping._2)
       }
-      roleIdMap
+      roleIdMap.toMap
     }
   }
 
@@ -48,7 +48,7 @@ class RolesUtil  @Inject()(roleRepo: RoleRepo) {
   def getUserRoleObjectsforRoleIds(userId:Long,roles:Seq[Long]): Seq[UserRole] ={
      roles.map(roleId=>UserRole(userId=Some(userId),roleId = Some(roleId)))
   }
-  def getUserRoleObjects(userId:Long,roles:Seq[RoleType.Value],allRolesInDb:mutable.Map[String,Role]):Seq[UserRole]={
+  def getUserRoleObjects(userId:Long,roles:Seq[RoleType.Value],allRolesInDb:Map[String,Role]):Seq[UserRole]={
     roles.map(role=>
       UserRole(userId=Some(userId),roleId = allRolesInDb.get(role.toString).get.id)
     )
