@@ -1,0 +1,7 @@
+@import '../../../styles/variables';
+:host {
+  font-size: smaller;
+}
+.text-success {
+  color: $success-color !important;
+}

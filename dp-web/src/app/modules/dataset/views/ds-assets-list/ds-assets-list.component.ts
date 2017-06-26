@@ -20,7 +20,7 @@ export class AssetSetQueryModel {
 }
 class ASQM extends AssetSetQueryModel {}
 
-enum ResultState { LOADING, LOADED, EMPTY}
+enum ResultState { LOADING, LOADED, EMPTY, NOMORE}
 @Component({
   selector: "ds-assets-list",
   styleUrls: ["./ds-assets-list.component.scss"],
@@ -96,20 +96,20 @@ export class DsAssetList implements OnInit {
     let asqms = this.getQueryModelsForAssetService(true);
     const tab = this.tab, tpfltr = this.typeFilter;
     this.resultState = this.resultStates.LOADING
-    this.dsAssetsService.count(asqms)
-      .subscribe(countModel => {
-        if(this.dsModel) {
-          this.dsModel.counts = countModel;
-        }
-        this.assetsCount = countModel[(tpfltr == tab.HIVE) ? "hiveCount" : (tpfltr == tab.HDFS) ? "filesCount" : "allCount"];
-        this.totalPages = Math.ceil(this.assetsCount / this.pageSize);
-      });
+    if(this.dsModel && this.dsModel.counts) {
+      this.assetsCount = this.dsModel.counts.hiveCount + this.dsModel.counts.filesCount;
+      this.totalPages = Math.ceil(this.assetsCount / this.pageSize);
+    }
+    else
+      this.totalPages = this.assetsCount = Infinity;
+
+    //TODO there must be a separate count query with all filters instead of hard coding assetsCount
     asqms = this.getQueryModelsForAssetService(false);
     this.dsAssetsService.list(asqms, Math.ceil(this.pageStartIndex / this.pageSize), this.pageSize, this.clusterId)
       .subscribe(assets => {
         this.dsAssets = assets;
         setTimeout(() => this.setTableHeight(), 0);
-        this.resultState = (this.dsAssets.length)?this.resultStates.LOADED:this.resultStates.EMPTY;
+        this.resultState = (this.dsAssets.length)?this.resultStates.LOADED:(this.pageStartIndex==1)?this.resultStates.EMPTY:this.resultStates.NOMORE;
       });
   }
 
@@ -141,6 +141,11 @@ export class DsAssetList implements OnInit {
   }
 
   onPageChange(index: number) {
+    if(this.pageStartIndex < index && this.dsAssets.length < this.pageSize) {
+      this.pageStartIndex = index;
+      setTimeout(()=>this.pageStartIndex = index-this.pageSize, 0);
+      return;
+    }
     this.pageStartIndex = index;
     this.fetchAssets();
   }
@@ -169,7 +174,7 @@ export class DsAssetList implements OnInit {
       const newAsqm = new ASQM([]);
       newAsqm.filters.push.apply(newAsqm.filters, asqm.filters);
       if (!this.hideSearch && this.searchText) {
-        newAsqm.filters.push({column: "name", operator: "equals", value: this.searchText, dataType:"string"});
+        newAsqm.filters.push({column: "name", operator: "contains", value: this.searchText, dataType:"string"});
       }
       // if (!this.hideTabs && !countQuery) {
       //   newAsqm.filters.push({column: "asset.source", operator: "==", value: AssetTypeEnumString[this.typeFilter], dataType:"-"});

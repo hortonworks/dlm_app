@@ -67,11 +67,13 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @ViewChild('pathCell') pathCellRef: TemplateRef<any>;
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
   @ViewChild('verbStatusCellTemplate') verbStatusCellTemplate: TemplateRef<any>;
+  @ViewChild('table') table: TemplateRef<any>;
 
   @ViewChild(TableComponent) tableComponent: TableComponent;
 
   @Input() policies: Policy[] = [];
   @Input() clusters: Cluster[] = [];
+  @Input() activePolicyId = '';
 
   rowActions = <ActionItemType[]>[
     {label: 'Delete', name: 'DELETE', disabledFor: ''},
@@ -128,6 +130,21 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       {prop: 'lastJobResource.startTime', name: 'Last Good', cellTemplate: this.lastGoodCellRef},
       {name: ' ', cellTemplate: this.actionsCellRef, maxWidth: 55, sortable: false}
     ];
+    if (this.activePolicyId) {
+      this.openJobsForPolicy();
+    }
+  }
+
+  openJobsForPolicy() {
+    const policy = this.policies.find(p => p.id === this.activePolicyId);
+    if (policy) {
+      const indx = this.policies.indexOf(policy);
+      const page = Math.ceil(indx / this.tableComponent.limit);
+      if (page) {
+        this.tableComponent.changePage(page);
+      }
+      this.toggleRowDetail(policy, PolicyContent.Jobs);
+    }
   }
 
   clusterByName(clusterName: string): Cluster {
@@ -192,7 +209,6 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
    * @param {PolicyContent} contentType
    */
   toggleRowDetail(policy: Policy, contentType: PolicyContent) {
-    const selectedPolicy = this.selectedPolicy$.getValue();
     this.toggleSelectedRow(policy, contentType);
     this.activatePolicy(policy, contentType);
     this.loadContentDetails(policy, contentType);
