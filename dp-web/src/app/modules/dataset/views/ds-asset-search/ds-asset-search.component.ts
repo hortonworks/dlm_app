@@ -30,6 +30,7 @@ export class DsAssetSearch {
 
   @Input() clusterId:number;
   @Input() saveButton = false;
+  @Input() showBelongsToColumn = false;
   @Output("doneNotification") doneNotificationEmitter: EventEmitter<AssetSetQueryModel> = new EventEmitter<AssetSetQueryModel>();
   @Output("cancelNotification") cancelNotificationEmitter: EventEmitter<null> = new EventEmitter<null>();
 

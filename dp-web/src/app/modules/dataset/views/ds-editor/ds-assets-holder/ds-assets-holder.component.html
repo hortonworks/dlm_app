@@ -17,6 +17,6 @@
 </div>
 <div *ngIf="showPopup" class="popup borderBox">
   <div class="opaque">
-    <asset-search [clusterId]="dsModel.clusterId" (doneNotification)="actionDone($event)" (cancelNotification)="actionCancel()"></asset-search>
+    <asset-search [showBelongsToColumn]="true" [clusterId]="dsModel.clusterId" (doneNotification)="actionDone($event)" (cancelNotification)="actionCancel()"></asset-search>
   </div>
 </div>
