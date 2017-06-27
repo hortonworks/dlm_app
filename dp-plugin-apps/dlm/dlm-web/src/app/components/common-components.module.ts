@@ -4,6 +4,7 @@ import { BsDropdownModule, ButtonsModule, TooltipModule, CollapseModule } from '
 import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { TranslateModule } from '@ngx-translate/core';
 import { SelectModule } from 'ng2-select';
+import { MomentModule } from 'angular2-moment';
 
 import { CardComponent } from './card/card.component';
 import { SearchInputComponent } from './search-input/search-input.component';
@@ -24,6 +25,7 @@ import { EventStatusComponent } from './event-status/event-status.component';
 import { HdfsBrowserBreadcrumbComponent } from './hdfs-browser/breadcrumb/hdfs-browser-breadcrumb.component';
 import { PolicyActionsComponent } from './policy-actions/policy-actions.component';
 import { HiveBrowserComponent, HiveDatabaseComponent } from './hive-browser/';
+import { DurationColumnComponent } from './table-columns/duration-column/duration-column.component';
 
 @NgModule({
   imports: [
@@ -34,7 +36,8 @@ import { HiveBrowserComponent, HiveDatabaseComponent } from './hive-browser/';
     CollapseModule.forRoot(),
     ChartsModule,
     TranslateModule,
-    SelectModule
+    SelectModule,
+    MomentModule
   ],
   declarations: [
     CardComponent,
@@ -58,7 +61,8 @@ import { HiveBrowserComponent, HiveDatabaseComponent } from './hive-browser/';
     HdfsBrowserBreadcrumbComponent,
     HiveBrowserComponent,
     HiveDatabaseComponent,
-    PolicyActionsComponent
+    PolicyActionsComponent,
+    DurationColumnComponent
   ],
   exports: [
     CardComponent,
@@ -82,7 +86,8 @@ import { HiveBrowserComponent, HiveDatabaseComponent } from './hive-browser/';
     HdfsBrowserBreadcrumbComponent,
     HiveBrowserComponent,
     HiveDatabaseComponent,
-    PolicyActionsComponent
+    PolicyActionsComponent,
+    DurationColumnComponent
   ]
 })
 export class CommonComponentsModule {}
