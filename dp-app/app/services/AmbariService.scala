@@ -34,7 +34,7 @@ class AmbariService @Inject()(
     ambariWebService.getAmbariDetails(ambariDetailRequest)
   }
 
-  def syncCluster(dpCluster: TempDataplaneCluster)(implicit hJwtToken: Option[HJwtToken]): Future[Boolean] = {
+  def syncCluster(dpCluster: DataplaneClusterIdentifier)(implicit hJwtToken: Option[HJwtToken]): Future[Boolean] = {
    ambariWebService.syncAmbari(dpCluster).map {
      case value@true =>
        Logger.info(s"Successfully synced datalake with ${dpCluster.id}")

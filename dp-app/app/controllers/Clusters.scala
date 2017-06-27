@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari._
-import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, Error, Errors, TempDataplaneCluster}
+import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, Error, Errors, DataplaneClusterIdentifier}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.ClusterService
 import internal.auth.Authenticated
@@ -112,7 +112,7 @@ class Clusters @Inject()(
   def getHealth(clusterId: Long, summary: Option[Boolean]) = authenticated.async { request =>
     Logger.info("Received get cluster health request")
     implicit val token = request.token
-    ambariService.syncCluster(TempDataplaneCluster(Some(clusterId))).flatMap { result =>
+    ambariService.syncCluster(DataplaneClusterIdentifier(clusterId)).flatMap { result =>
       result match {
         case true => {
           clusterHealthService
