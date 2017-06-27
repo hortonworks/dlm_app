@@ -2,6 +2,7 @@ export interface HiveTable {
   id: string;
   name: string;
   databaseId: string;
+  clusterId?: string; // added on UI
   databaseEntityId?: string; // added on UI
 }
 

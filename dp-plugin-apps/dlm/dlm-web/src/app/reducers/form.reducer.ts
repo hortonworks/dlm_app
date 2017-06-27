@@ -20,6 +20,15 @@ export function reducer(state = initialState, action): State {
         }
       };
     }
+    case formAction.ActionTypes.RESET_FORM_VALUE: {
+      const { formId } = action.payload;
+      const { [formId]: removed, ...rest} = state.entities;
+      return {
+        entities: {
+          ...rest
+        }
+      };
+    }
     default:
       return state;
   }
