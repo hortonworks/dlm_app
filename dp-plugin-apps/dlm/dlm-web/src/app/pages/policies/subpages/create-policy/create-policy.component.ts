@@ -28,7 +28,7 @@ import { POLICY_FORM_ID } from '../../components/policy-form/policy-form.compone
         <div>
           <div class="alert alert-warning" role="alert">
             {{ "page.pairings.content.no_pairs" | translate}}
-            <button type="button" class="btn btn-primary" (click)="createPairingClickHandler()">
+            <button type="button" class="btn btn-primary" [routerLink]="'/pairings/create'">
               {{ "page.pairings.create_button_text" | translate }}
             </button>
           </div>

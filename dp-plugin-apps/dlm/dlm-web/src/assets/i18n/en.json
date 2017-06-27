@@ -186,11 +186,14 @@
       "header_note": "Note: Pairings are bi-directional",
       "header_create": "Create Replication Policy",
       "header_review": "Review Replication Policy",
+      "create_button_text": "+ Policy",
       "tags": "Tags",
       "groups": "Groups",
       "data_summary": "Data Summary",
       "no_jobs": "No jobs",
       "no_policies": "There are no policies created.",
+      "no_pairings": "There are no Pairs for clusters. Create a Pair first and then you will be able to create a Policy.",
+      "no_clusters": "There is not enough registered clusters. You should register at least two clusters and make a Pair from them. Then you will be able to create a Policy.",
       "perform_action": {
         "confirmation": {
           "title": "Confirm",

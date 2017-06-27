@@ -138,10 +138,13 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   openJobsForPolicy() {
     const policy = this.policies.find(p => p.id === this.activePolicyId);
     if (policy) {
-      const indx = this.policies.indexOf(policy);
-      const page = Math.ceil(indx / this.tableComponent.limit);
-      if (page) {
-        this.tableComponent.changePage(page);
+      const index = this.policies.indexOf(policy) + 1;
+      const pageSize = this.tableComponent.limit;
+      const div = index % pageSize;
+      const p = index / pageSize;
+      const pageNumber = div ? Math.ceil(p) : Math.floor(p);
+      if (pageNumber) {
+        this.tableComponent.changePage(pageNumber);
       }
       this.toggleRowDetail(policy, PolicyContent.Jobs);
     }
