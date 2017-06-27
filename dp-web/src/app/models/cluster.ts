@@ -22,6 +22,8 @@ export class Cluster {
 export class ClusterHealthSummary {
   nodes: number;
   size: string;
+  totalSize: string;
+  usedSize: string;
   status: {
     state: string,
     since: number
