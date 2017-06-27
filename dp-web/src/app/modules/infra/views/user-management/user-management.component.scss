@@ -5,7 +5,9 @@
 }
 
 .table-container {
-  //margin: 35px 0px 25px;
+  padding: 10px 20px 20px;
+  background: $white;
+  min-height: 500px;
 }
 
 .margin-top-bottom-20 {
@@ -22,18 +24,19 @@
 .search-input {
   position: relative;
   display: inline-block;
-  margin-right: 10px;
+  margin-right: 6px;
   width: 180px;
   box-sizing: border-box;
   input {
     width: 100%;
-    padding-left: 30px;
+    padding: 8px 5px 10px 30px;
     box-sizing: border-box;
   }
 }
 
 .action-bar {
   padding: 0px 0px 25px;
+  width: auto;
 }
 
 .dp-input__icon {
@@ -42,4 +45,10 @@
   bottom: 10px;
   color: $shuttle-gray;
 }
-
+dp-dropdown {
+  display: inline-block;
+  padding-right: 5px !important;
+}
+.menu-icon {
+  margin: 0px 5px;
+}

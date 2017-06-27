@@ -1,6 +1,5 @@
 export class LDAPProperties {
   id: number;
-  masterPassword: string;
   ldapUrl: string;
   userDnTemplate: string;
   userSearchBase: string;

@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import com.hortonworks.dataplane.commons.domain.Entities.Errors
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.typesafe.scalalogging.Logger
-import models.KnoxConfigInfo
+import models.{JsonResponses, KnoxConfigInfo}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import services.{KnoxConfigurator, LdapService}
@@ -33,10 +33,10 @@ class KnoxConfig @Inject()(val ldapService: LdapService,val knoxConfigurator:Kno
             case Left(errors) => {
               handleErrors(errors)
             }
-            case Right(ldapConf) => {
+            case Right(isCreated) => {
               //TODO configure knox and restart..
 
-              Ok(Json.toJson(ldapConf))
+              Ok(Json.toJson(isCreated))
             }
           }
       }
@@ -59,14 +59,9 @@ class KnoxConfig @Inject()(val ldapService: LdapService,val knoxConfigurator:Kno
         Future.successful(BadRequest)
       )
   }
-  def knoxStatus =Action.async{req=>
+  def knoxStatus =Action.async {req=>
     //TODO this is mock call for testing until knox containers could be launched.
     //check if knox is up..
-    Future.successful(Ok)
-  }
-
-  def test= Action.async {req =>
-   // knoxConfigurator.configure
     Future.successful(Ok)
   }
 }
