@@ -158,7 +158,9 @@
         "noOfRows" : "Number Of Rows",
         "datatype" : "Data Type",
         "selectOperator" : "Select Operator",
-        "addAssets" : "Add Assets"
+        "addAssets" : "Add Assets",
+        "description" : "Description",
+        "belongsTo" : "Belongs To"
       },
       "ds-editor" : {
         "ds-description" : "Organize your data-assets including Hive & Hbase tables, HDFS Files into logical groups for subsequent usage.",
@@ -191,6 +193,7 @@
         "done" : "Done"
       },
       "asset-list" : {
+        "starAssetmessage":"Few assets listed above already belong to datasets, and can not be used in any other dataset"
       },
       "dashboard" : {
         "tag-nav" : {

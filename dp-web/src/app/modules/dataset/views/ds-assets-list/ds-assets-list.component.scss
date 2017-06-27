@@ -119,7 +119,7 @@
   float: left;
 }
 .listCont .list.withDsNameCom .listRow .col{
-  width:12%;
+  width:11%;
 }
 .listCont .list .listRow .col.ownerCol {
   width:10%;
@@ -132,7 +132,8 @@
   width:34%;
 }
 
-.listCont .list .listRow .checkboxCont {
+.listCont .list .listRow .checkboxCont,
+.listCont .list.withDsNameCom .listRow .starCol {
   width:3%;
   margin:0px;
   text-align: center;
@@ -183,4 +184,9 @@
 
 .listCont .list.unLoaded .listRow{
   border-width: 0px;
+}
+
+.starExplanation {
+  float:left;
+  margin-top:-30px;
 }
