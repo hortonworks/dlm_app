@@ -47,7 +47,7 @@ class DataplaneClusters @Inject()(
               InternalServerError(JsonResponses.statusError(
                 s"Failed with ${Json.toJson(errors)}"))
             case Right(dpCluster) =>
-              syncCluster(DataplaneClusterIdentifier(dataplaneCluster.id.get))
+              syncCluster(DataplaneClusterIdentifier(dpCluster.id.get))
               Ok(Json.toJson(dpCluster))
           }
       }

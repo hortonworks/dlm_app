@@ -140,11 +140,11 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       tags = `${tags}${tags.length ? ', ' : ''}${tag.name}`;
     });
     clusterDetails.tags = tags;
-    if(this.rmHealth && this.rmHealth.ServiceComponentInfo && this.rmHealth.metrics){
+    if (this.rmHealth && this.rmHealth.ServiceComponentInfo && this.rmHealth.ServiceComponentInfo.rm_metrics && this.rmHealth.metrics && this.rmHealth.metrics.jvm) {
       clusterDetails.nodeManagersActive = this.rmHealth.ServiceComponentInfo.rm_metrics.cluster.activeNMcount;
       clusterDetails.nodeManagersInactive = this.rmHealth.ServiceComponentInfo.rm_metrics.cluster.unhealthyNMcount;
       clusterDetails.rmHeapTotal = StringUtils.humanizeBytes(this.rmHealth.metrics.jvm.HeapMemoryMax);
-      clusterDetails.rmHeapUsed =  StringUtils.humanizeBytes(this.rmHealth.metrics.jvm.HeapMemoryUsed);
+      clusterDetails.rmHeapUsed = StringUtils.humanizeBytes(this.rmHealth.metrics.jvm.HeapMemoryUsed);
       clusterDetails.rmUptime = DateUtils.toReadableDate(new Date().getTime() - this.rmHealth.metrics.runtime.StartTime);
     }
     return clusterDetails;
@@ -161,7 +161,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
         location: response[0],
         health: response[1],
         user: response[2],
-        rmhealth : response[3]
+        rmhealth: response[3]
       };
     });
   }
