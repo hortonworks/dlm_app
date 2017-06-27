@@ -50,6 +50,8 @@ export class RichDatasetService {
   }
 
   extractRichDataModel(data: any): RichDatasetModel {
+    const ASSET_TYPES = [{label: 'hiveCount', key: 'hive_table'}, {label: 'filesCount', key: 'hdfs_files'}];
+
     return {
       id: data.dataset.id,
       name: data.dataset.name,
@@ -60,7 +62,11 @@ export class RichDatasetService {
       creatorId: data.dataset.createdBy,
       creatorName: data.user,
       favourite: (data.tags.indexOf("favourite") != -1),
-      counts: {hiveCount: data.counts[0].count, filesCount: 0},
+      counts: ASSET_TYPES.reduce((accumulator, cAssetType) => {
+        const tAssetType = data.counts.find(cCount => cCount.assetType === cAssetType.key);
+        accumulator[cAssetType.label] = tAssetType ? tAssetType.count : 0;
+        return accumulator;
+      }, {}),
       tags:data.tags
     } as RichDatasetModel;
   }
