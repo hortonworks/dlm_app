@@ -70,6 +70,8 @@ object Entities {
       longitude: Float
   )
 
+  case class TempDataplaneCluster(id: Option[Long])
+
   case class DataplaneCluster(
       id: Option[Long] = None,
       name: String,
@@ -299,6 +301,8 @@ object JsonFormatters {
   implicit val locationReads = Json.reads[Location]
   implicit val dpClusterWrites = Json.writes[DataplaneCluster]
   implicit val dpClusterReads = Json.reads[DataplaneCluster]
+  implicit val tempDpClusterWrites = Json.writes[TempDataplaneCluster]
+  implicit val tempDpClusterReads = Json.reads[TempDataplaneCluster]
 
   implicit val skuWrites = Json.writes[Sku]
   implicit val skuReads = Json.reads[Sku]

@@ -6,7 +6,7 @@ import javax.inject.Inject
 
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
-import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
+import com.hortonworks.dataplane.commons.domain.Entities.{HJwtToken, TempDataplaneCluster}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.{ClusterSync, StorageInterface}
 import com.hortonworks.dataplane.http.BaseRoute
@@ -182,7 +182,7 @@ class StatusRoute @Inject()(val ws: WSClient,
     path("cluster" / "sync") {
       extractRequest { request =>
         post {
-          entity(as[DataplaneCluster]) { dl =>
+          entity(as[TempDataplaneCluster]) { dl =>
             if (dl.id.isEmpty)
               complete(StatusCodes.UnprocessableEntity)
             else {

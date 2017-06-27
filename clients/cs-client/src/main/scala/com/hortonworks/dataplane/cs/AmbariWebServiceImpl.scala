@@ -65,7 +65,7 @@ class AmbariWebServiceImpl(config: Config)(implicit ws: ClusterWsClient)
       }
   }
 
-  override def syncAmbari(dpCluster: Entities.DataplaneCluster)(
+  override def syncAmbari(dpCluster: Entities.TempDataplaneCluster)(
       implicit token: Option[Entities.HJwtToken]): Future[Boolean] = {
     ws.url(s"$url/cluster/sync")
       .withToken(token)
