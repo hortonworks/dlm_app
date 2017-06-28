@@ -3,32 +3,34 @@ package com.hortonworks.dataplane.http.routes
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives.{as, entity, path, post, _}
 import com.google.inject.Inject
+import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.cs.ClusterErrors.ClusterNotFound
-import com.hortonworks.dataplane.cs.{
-  AmbariDataplaneClusterInterface,
-  AmbariDataplaneClusterInterfaceImpl,
-  Credentials,
-  StorageInterface
-}
-import com.hortonworks.dataplane.db.Webservice.ClusterService
+import com.hortonworks.dataplane.cs.{AmbariDataplaneClusterInterface, AmbariDataplaneClusterInterfaceImpl, Credentials, StorageInterface}
+import com.hortonworks.dataplane.db.Webservice.{ClusterService, DpClusterService}
 import com.hortonworks.dataplane.http.BaseRoute
+import com.hortonworks.dataplane.knox.Knox.{KnoxApiRequest, KnoxConfig}
+import com.hortonworks.dataplane.knox.KnoxApiExecutor
 import com.typesafe.config.Config
+import com.typesafe.scalalogging.Logger
 import play.api.libs.json.JsValue
-import play.api.libs.ws.{WSAuthScheme, WSClient}
+import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest}
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class AmbariRoute @Inject()(val ws: WSClient,
                             val storageInterface: StorageInterface,
                             val clusterService: ClusterService,
+                            val dpClusterService: DpClusterService,
                             val config: Config)
     extends BaseRoute {
 
   import com.hortonworks.dataplane.commons.domain.Ambari._
   import com.hortonworks.dataplane.commons.domain.Entities._
   import com.hortonworks.dataplane.http.JsonSupport._
+
+  val logger = Logger(classOf[AmbariRoute])
 
   private[dataplane] class TempDataplaneCluster(
       ambariDetailRequest: AmbariDetailRequest)
@@ -61,8 +63,9 @@ class AmbariRoute @Inject()(val ws: WSClient,
         }
         .getOrElse(None))
 
-  private def getDetails(clusters: Seq[String],
-                         dli: AmbariDataplaneClusterInterface)(implicit token:Option[HJwtToken])
+  private def getDetails(
+      clusters: Seq[String],
+      dli: AmbariDataplaneClusterInterface)(implicit token: Option[HJwtToken])
     : Future[Seq[Option[AmbariCluster]]] = {
     val futures = clusters.map { c =>
       for {
@@ -77,7 +80,8 @@ class AmbariRoute @Inject()(val ws: WSClient,
                        request: HttpRequest): Future[Seq[AmbariCluster]] = {
 
     val header = request.getHeader("X-DP-Token-Info")
-    implicit val token = if (header.isPresent) Some(HJwtToken(header.get.value)) else None
+    implicit val token =
+      if (header.isPresent) Some(HJwtToken(header.get.value)) else None
 
     val finalList = for {
       dataplaneCluster <- Future.successful(
@@ -108,21 +112,97 @@ class AmbariRoute @Inject()(val ws: WSClient,
   }
 
   def getClusterData(clusterId: Long) = {
-    val result = clusterService.retrieve(clusterId.toString)
-    result.map { r =>
-      if (r.isLeft)
-        throw new ClusterNotFound()
-      else
-        r.right.get
+    for {
+      c <- clusterService.retrieve(clusterId.toString)
+      ci <- Future.successful {
+        if (c.isLeft)
+          throw new ClusterNotFound()
+        else
+          c.right.get
+      }
+      dpc <- dpClusterService.retrieve(ci.dataplaneClusterId.get.toString)
+      dpci <- Future.successful {
+        if (dpc.isLeft)
+          throw new ClusterNotFound()
+        else
+          dpc.right.get
+      }
+    } yield (dpci, ci)
+
+  }
+
+  private def getWrappedRequest(
+      url: String,
+      dataplaneCluster: DataplaneCluster,
+      hJwtToken: Option[HJwtToken]): Future[WSRequest] = {
+    val baseReq = ws.url(url)
+    if (knoxEnabledAndTokenPresent(dataplaneCluster, hJwtToken))
+      Future.successful(baseReq)
+    else {
+      for {
+        creds <- loadCredentials
+        req <- Future.successful(
+          baseReq.withAuth(creds.user.get, creds.pass.get, WSAuthScheme.BASIC))
+      } yield req
     }
   }
 
-  def callAmbariApi(credentials: Credentials, cluster: Cluster, req: String,clusterCall:Boolean = true) = {
-    val rest = if(req.startsWith("/")) req.substring(1) else req
-    ws.url(s"${getUrl(cluster, clusterCall)}/$rest")
-      .withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
-      .get()
-      .map(_.json)
+  private def knoxEnabledAndTokenPresent(dataplaneCluster: DataplaneCluster, hJwtToken: Option[HJwtToken]) = {
+    logger.debug("Dump Knox data")
+    logger.debug(s"Token - $hJwtToken")
+    logger.debug(s" Cluster - Knox enabled:${dataplaneCluster.knoxEnabled}, URL: ${dataplaneCluster.knoxUrl}")
+    hJwtToken.isDefined && dataplaneCluster.knoxEnabled.isDefined && dataplaneCluster.knoxEnabled.get && dataplaneCluster.knoxUrl.isDefined
+  }
+
+  def callAmbariApi(cluster: Cluster,
+                    dataplaneCluster: DataplaneCluster,
+                    request: HttpRequest,
+                    req: String,
+                    clusterCall: Boolean = true) = {
+    logger.info("Calling ambari")
+    // Prepare Knox
+    val tokenInfoHeader = request.getHeader(Constants.DPTOKEN)
+    val knoxConfig = KnoxConfig(
+      Try(config.getString("dp.services.knox.token.topology"))
+        .getOrElse("token"),
+      dataplaneCluster.knoxUrl)
+    val token =
+      if (tokenInfoHeader.isPresent)
+        Some(HJwtToken(tokenInfoHeader.get().value()))
+      else None
+
+    // Decide on the executor
+    val executor =
+      if (knoxEnabledAndTokenPresent(dataplaneCluster, token)) {
+        logger.info(s"Knox was enabled and a token was detected, Ambari will be called through Knox at ${dataplaneCluster.knoxUrl.get}")
+        KnoxApiExecutor(knoxConfig, ws)
+      }
+      else {
+        logger.info(s"No knox detected/No token in context, calling Ambari with credentials")
+        KnoxApiExecutor.withTokenDisabled(knoxConfig, ws)
+      }
+
+    val rest = if (req.startsWith("/")) req.substring(1) else req
+
+    val wrappedRequest = getWrappedRequest(
+      s"${getUrl(cluster, clusterCall)}/$rest",
+      dataplaneCluster,
+      token)
+
+    val tokenAsString = token
+      .map { t =>
+        Some(t.token)
+      }
+      .getOrElse(None)
+
+    val knoxResponse = for {
+      wr <- wrappedRequest
+      kr <- executor.execute(KnoxApiRequest(wr, { r =>
+        r.get()
+      }, tokenAsString))
+    } yield kr
+
+    knoxResponse.map(_.json)
   }
 
   private def getUrl(cluster: Cluster, clusterCall: Boolean) = {
@@ -134,20 +214,48 @@ class AmbariRoute @Inject()(val ws: WSClient,
   }
 
   private def issueAmbariCall(clusterId: Long,
+                              request: HttpRequest,
                               req: String,
                               clusterCall: Boolean = true) = {
+    logger.debug(s"Ambari proxy request for $clusterId - $req")
+
     for {
-      creds <- loadCredentials
       cluster <- getClusterData(clusterId)
-      response <- callAmbariApi(creds, cluster, req, clusterCall)
+      response <- callAmbariApi(cluster._2,
+                                cluster._1,
+                                request,
+                                req,
+                                clusterCall)
     } yield response
   }
 
   val ambariClusterProxy = path(LongNumber / "ambari" / "cluster") {
     clusterId =>
       pathEnd {
+        extractRequest { request =>
+          parameters("request") { req =>
+            val ambariResponse = issueAmbariCall(clusterId, request, req)
+            onComplete(ambariResponse) {
+              case Success(res) =>
+                complete(res)
+              case Failure(th) =>
+                th.getClass match {
+                  case c if c == classOf[ClusterNotFound] =>
+                    complete(StatusCodes.NotFound, notFound)
+                  case _ =>
+                    complete(StatusCodes.InternalServerError, errors(th))
+                }
+            }
+          }
+        }
+      }
+  }
+
+  val ambariGenericProxy = path(LongNumber / "ambari") { clusterId =>
+    pathEnd {
+      extractRequest { request =>
         parameters("request") { req =>
-          val ambariResponse = issueAmbariCall(clusterId, req)
+          val ambariResponse = issueAmbariCall(clusterId, request, req, false)
           onComplete(ambariResponse) {
             case Success(res) =>
               complete(res)
@@ -159,24 +267,6 @@ class AmbariRoute @Inject()(val ws: WSClient,
                   complete(StatusCodes.InternalServerError, errors(th))
               }
           }
-        }
-      }
-  }
-
-  val ambariGenericProxy = path(LongNumber / "ambari") { clusterId =>
-    pathEnd {
-      parameters("request") { req =>
-        val ambariResponse = issueAmbariCall(clusterId, req, false)
-        onComplete(ambariResponse) {
-          case Success(res) =>
-            complete(res)
-          case Failure(th) =>
-            th.getClass match {
-              case c if c == classOf[ClusterNotFound] =>
-                complete(StatusCodes.NotFound, notFound)
-              case _ =>
-                complete(StatusCodes.InternalServerError, errors(th))
-            }
         }
       }
     }

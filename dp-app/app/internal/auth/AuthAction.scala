@@ -7,7 +7,6 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.UserService
-import internal.KnoxSso
 import org.apache.commons.codec.binary.Base64
 import play.api.http.Status
 import play.api.libs.json.{JsError, JsSuccess, Json}
@@ -17,8 +16,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.Future
 
 class Authenticated @Inject()(@Named("userService") userService: UserService,
-                              configuration: Configuration,
-                              knoxSso: KnoxSso)
+                              configuration: Configuration)
   extends ActionBuilder[AuthenticatedRequest] {
 
   val gatewayUserTokenKey = "X-DP-User-Info"
