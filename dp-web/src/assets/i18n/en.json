@@ -41,8 +41,8 @@
     "roles" : {
       "SUPERADMIN": "Super Admin",
       "INFRAADMIN": "Cluster Admin",
-      "USER": "Steward",
-      "CURATOR": "Consumer"
+      "USER": "Consumer",
+      "CURATOR": "Steward"
     }
   },
   "pages" : {
