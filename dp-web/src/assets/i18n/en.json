@@ -37,6 +37,12 @@
     },
     "pagination" : {
       "rowsPerPage" : "Rows per page"
+    },
+    "roles" : {
+      "SUPERADMIN": "Super Admin",
+      "INFRAADMIN": "Cluster Admin",
+      "USER": "Steward",
+      "CURATOR": "Consumer"
     }
   },
   "pages" : {
