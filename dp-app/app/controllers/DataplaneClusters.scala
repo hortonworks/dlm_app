@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari.AmbariEndpoint
-import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, HJwtToken}
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, HJwtToken, DataplaneClusterIdentifier}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.DpClusterService
 import models.JsonResponses
@@ -47,16 +47,16 @@ class DataplaneClusters @Inject()(
               InternalServerError(JsonResponses.statusError(
                 s"Failed with ${Json.toJson(errors)}"))
             case Right(dpCluster) =>
-              syncCluster(dpCluster)
+              syncCluster(DataplaneClusterIdentifier(dpCluster.id.get))
               Ok(Json.toJson(dpCluster))
           }
       }
       .getOrElse(Future.successful(BadRequest))
   }
 
-  private def syncCluster(dataplaneCluster: DataplaneCluster)(implicit hJwtToken: Option[HJwtToken]): Future[Boolean] = {
+  private def syncCluster(dataplaneCluster: DataplaneClusterIdentifier)(implicit hJwtToken: Option[HJwtToken]): Future[Boolean] = {
     ambariService.syncCluster(dataplaneCluster).map { result =>
-      Logger.info(s"Asking Cluster service to discover ${dataplaneCluster.ambariUrl}")
+      Logger.info(s"Asking Cluster service to discover ${dataplaneCluster.id}")
       result
     }
 

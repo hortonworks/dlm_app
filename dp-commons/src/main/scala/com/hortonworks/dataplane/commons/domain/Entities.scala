@@ -70,6 +70,8 @@ object Entities {
       longitude: Float
   )
 
+  case class DataplaneClusterIdentifier(id: Long)
+
   case class DataplaneCluster(
       id: Option[Long] = None,
       name: String,
@@ -299,6 +301,8 @@ object JsonFormatters {
   implicit val locationReads = Json.reads[Location]
   implicit val dpClusterWrites = Json.writes[DataplaneCluster]
   implicit val dpClusterReads = Json.reads[DataplaneCluster]
+  implicit val dpClusterIdentifierWrites = Json.writes[DataplaneClusterIdentifier]
+  implicit val dpClusterIdentifierReads = Json.reads[DataplaneClusterIdentifier]
 
   implicit val skuWrites = Json.writes[Sku]
   implicit val skuReads = Json.reads[Sku]
