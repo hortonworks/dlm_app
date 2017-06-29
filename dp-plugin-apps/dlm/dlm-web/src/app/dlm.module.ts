@@ -8,7 +8,8 @@ import {
   TypeaheadModule,
   TimepickerModule,
   TooltipModule,
-  BsDropdownModule
+  BsDropdownModule,
+  ProgressbarModule
 } from 'ng2-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
@@ -141,6 +142,7 @@ import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
     TypeaheadModule.forRoot(),
     TimepickerModule.forRoot(),
     TooltipModule.forRoot(),
+    ProgressbarModule.forRoot(),
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,

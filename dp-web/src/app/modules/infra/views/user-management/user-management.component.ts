@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {UserService} from '../../../../services/user.service';
+import {User} from '../../../../models/user';
 
 @Component({
   selector: 'dp-user-management',
@@ -7,9 +10,30 @@ import { Component, OnInit } from '@angular/core';
 })
 export class UserManagementComponent implements OnInit {
 
-  constructor() { }
+  users: User[] = [];
+
+  constructor(private router: Router, private route: ActivatedRoute, private userService: UserService) {
+  }
 
   ngOnInit() {
+    this.userService.dataChanged$.subscribe(() => {
+      this.getUsers();
+    });
+    this.getUsers();
+  }
+
+  getUsers(){
+    this.userService.getUsersWithRole().subscribe(users => {
+      this.users = users;
+    });
+  }
+
+  addUser() {
+    this.router.navigate([{outlets: {'sidebar': ['add']}}], {relativeTo: this.route});
+  }
+
+  editUser(userName) {
+    this.router.navigate([{outlets: {'sidebar': ['edit', userName]}}], {relativeTo: this.route});
   }
 
 }

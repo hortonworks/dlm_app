@@ -37,16 +37,6 @@ export class LakeService {
       .catch(HttpUtil.handleError);
   }
 
-  // update(lakeId: string, lake: Lake): Observable<Lake> {
-  //   return this.http
-  //     .put(`${this.url}/${lakeId}`, lake, new RequestOptions(HttpUtil.getHeaders()))
-  //     .map(HttpUtil.extractData)
-  //     .catch(HttpUtil.handleError);
-  // }
-
-  // remove(lakeId: string): Observable<Lake> {
-  //   // TODO
-  // }
 
   listWithClusters(): Observable<{
     data: Lake,
@@ -63,7 +53,7 @@ export class LakeService {
     .get(`${this.url}/ambari/status?url=${ambariUrl}`, new RequestOptions(HttpUtil.getHeaders()))
     .map(HttpUtil.extractData)
     .catch(HttpUtil.handleError);
-  }  
+  }
 
   getPairsMock(lakes, id:number) : Observable<{
       data: Lake,

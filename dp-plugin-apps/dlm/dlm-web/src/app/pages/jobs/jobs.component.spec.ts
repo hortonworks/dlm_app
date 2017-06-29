@@ -20,10 +20,11 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {TableFooterComponent} from '../../common/table/table-footer/table-footer.component';
 import { IconColumnComponent } from '../../components/table-columns/icon-column/icon-column.component';
 import { TableFilterComponent } from '../../common/table/table-filter/table-filter.component';
-import { TypeaheadModule, TooltipModule } from 'ng2-bootstrap';
+import { TypeaheadModule, TooltipModule, ProgressbarModule } from 'ng2-bootstrap';
 import { JobsStatusFilterComponent } from './jobs-status-filter/jobs-status-filter.component';
 import { NavbarService } from 'services/navbar.service';
 import { FmtTzPipe } from 'pipes/fmt-tz.pipe';
+import { DurationColumnComponent } from 'components/table-columns/duration-column/duration-column.component';
 
 describe('JobsComponent', () => {
   let component: JobsComponent;
@@ -36,7 +37,8 @@ describe('JobsComponent', () => {
           loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
         }),
         TypeaheadModule.forRoot(), NgxDatatableModule, FormsModule, MomentModule, ChartsModule, RouterTestingModule,
-        TooltipModule.forRoot()
+        TooltipModule.forRoot(),
+        ProgressbarModule.forRoot()
       ],
       declarations: [
         JobsComponent,
@@ -53,7 +55,8 @@ describe('JobsComponent', () => {
         DropdownComponent,
         BytesSizePipe,
         IconColumnComponent,
-        FmtTzPipe
+        FmtTzPipe,
+        DurationColumnComponent
       ],
       providers: [
         {provide: Store, useClass: MockStore},

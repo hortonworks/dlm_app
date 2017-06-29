@@ -92,8 +92,8 @@ public class TokenCheckFilter extends ZuulFilter {
 
   private Object doLogout() {
     //TODO call knox gateway to invalidate token in knox gateway server.
-    utils.deleteCookie(knoxSso.getSsoCookieName(),knoxSso.getCookieDomain());
-    utils.deleteCookie(SSO_CHECK_COOKIE_NAME,null);
+    utils.deleteCookie(knoxSso.getSsoCookieName(), knoxSso.getCookieDomain());
+    utils.deleteCookie(SSO_CHECK_COOKIE_NAME, null);
     //Note. UI should handle redirect.
     return null;
   }
@@ -103,28 +103,30 @@ public class TokenCheckFilter extends ZuulFilter {
     if (!knoxSsoCookie.isPresent()) {
       return utils.sendUnauthorized();
     }
-    Optional<String> subjectOptional = knoxSso.validateJwt(knoxSsoCookie.get().getValue());
+    String knoxSsoCookieValue = knoxSsoCookie.get().getValue();
+    Optional<String> subjectOptional = knoxSso.validateJwt(knoxSsoCookieValue);
     if (!subjectOptional.isPresent()) {
       return utils.sendUnauthorized();
     }
-    try{
+    try {
       Optional<User> user = userService.getUser(subjectOptional.get());
-      if (!user.isPresent()){
+      if (!user.isPresent()) {
         return utils.sendForbidden(String.format("User %s not found in the system", subjectOptional.get()));
-      }else{
+      } else {
         setSsoValidCookie();
         setUpstreamUserContext(user.get());
-        RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY,user.get());
+        setUpstreamTokenContext();
+        RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, user.get());
         return null;
       }
-    }catch (FeignException e){
+    } catch (FeignException e) {
       throw new RuntimeException(e);
     }
   }
 
   private void setSsoValidCookie() {
     RequestContext ctx = RequestContext.getCurrentContext();
-    Cookie cookie = new Cookie(Constants.SSO_CHECK_COOKIE_NAME,Boolean.toString(true));
+    Cookie cookie = new Cookie(Constants.SSO_CHECK_COOKIE_NAME, Boolean.toString(true));
     cookie.setPath("/");
     cookie.setMaxAge(-1);
     cookie.setHttpOnly(false);
@@ -155,9 +157,17 @@ public class TokenCheckFilter extends ZuulFilter {
     RequestContext ctx = RequestContext.getCurrentContext();
     try {
       String userJson = objectMapper.writeValueAsString(userRef);
-      ctx.addZuulRequestHeader(DP_USER_INFO_HEADER_KEY,Base64.encodeBase64String( userJson.getBytes()));
+      ctx.addZuulRequestHeader(DP_USER_INFO_HEADER_KEY, Base64.encodeBase64String(userJson.getBytes()));
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  private void setUpstreamTokenContext() {
+    Optional<Cookie> knoxSsoCookie = getKnoxSsoCookie();
+    if (knoxSsoCookie.isPresent()) {
+      RequestContext ctx = RequestContext.getCurrentContext();
+      ctx.addZuulRequestHeader(DP_TOKEN_INFO_HEADER_KEY, knoxSsoCookie.get().getValue());
     }
   }
 
@@ -173,6 +183,7 @@ public class TokenCheckFilter extends ZuulFilter {
       } else {
         User user = userOptional.get();
         setUpstreamUserContext(user);
+        setUpstreamTokenContext();
         return null;
         //TODO  role check. api permission check on the specified resource.
       }

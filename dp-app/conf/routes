@@ -29,7 +29,7 @@ GET           /api/locations                                   controllers.Locat
 GET           /api/locations/:locationId                       controllers.Locations.retrieve(locationId: Long)
 
 GET           /api/clusters                                    controllers.Clusters.list(lakeId: Option[Long])
-GET           /api/clusters/details                            controllers.Clusters.getDetails
+POST          /api/clusters/details                            controllers.Clusters.getDetails
 GET           /api/clusters/:clusterId/health                  controllers.Clusters.getHealth(clusterId: Long, summary: Option[Boolean])
 GET           /api/clusters/:clusterId/rmhealth                controllers.Clusters.getResourceManagerHealth(clusterId: Long)
 GET           /api/actions/lakes-list-with-clusters            controllers.actions.DpClusterActions.listWithClusters
@@ -73,6 +73,18 @@ GET           /api/assets/lineage/:clusterId/:atlasGuid        controllers.Query
 POST          /api/knox/validate                               controllers.KnoxConfig.validate
 POST          /api/knox/configure                              controllers.KnoxConfig.configure
 GET           /api/users/ldapsearch                            controllers.UserManager.ldapSearch
+
+
+#User Management
+POST          /api/users/registerAdmin                         controllers.UserManager.addSuperAdminUser
+POST          /api/users/registerAdmins                        controllers.UserManager.addSuperAdminUsers
+POST          /api/users/updateActiveAndRoles                  controllers.UserManager.adminUpdateUserRolesAndStatus
+POST          /api/users/addUserWithRoles                      controllers.UserManager.addUserWithRoles
+POST          /api/users/addUsersWithRoles                     controllers.UserManager.addUsersWithRoles
+GET           /api/users/withRoles                             controllers.UserManager.listUsersWithRoles
+GET           /api/users                                       controllers.UserManager.listUsers
+GET           /api/users/detail                                controllers.UserManager.getUserDetail
+GET           /api/roles                                       controllers.UserManager.getAllRoles
 
 #Workspace API
 GET           /api/workspaces                                  controllers.Workspaces.list

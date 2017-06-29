@@ -26,6 +26,7 @@ import { loadFullDatabases } from 'actions/hivelist.action';
 import { HiveDatabase } from 'models/hive-database.model';
 import { getDatabase } from 'selectors/hive.selector';
 import { HiveService } from 'services/hive.service';
+import { POLICY_STATUS } from 'constants/status.constant';
 
 @Component({
   selector: 'dlm-policy-table',
@@ -126,8 +127,8 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       {prop: 'sourceDataset', name: this.t.instant('common.path'), cellTemplate: this.pathCellRef},
       {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs')},
       {prop: 'frequency', name: this.t.instant('common.schedule'), cellTemplate: this.scheduleCellTemplateRef},
-      {prop: 'lastJobResource.trackingInfo.timeTaken', name: this.t.instant('common.duration'), cellTemplate: this.durationCellRef},
-      {prop: 'lastJobResource.startTime', name: 'Last Good', cellTemplate: this.lastGoodCellRef},
+      {prop: 'jobs.0.trackingInfo.timeTaken', name: this.t.instant('common.duration'), cellTemplate: this.durationCellRef},
+      {prop: 'jobs.0.startTime', name: 'Last Good', cellTemplate: this.lastGoodCellRef},
       {name: ' ', cellTemplate: this.actionsCellRef, maxWidth: 55, sortable: false}
     ];
     if (this.activePolicyId) {
@@ -138,10 +139,13 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   openJobsForPolicy() {
     const policy = this.policies.find(p => p.id === this.activePolicyId);
     if (policy) {
-      const indx = this.policies.indexOf(policy);
-      const page = Math.ceil(indx / this.tableComponent.limit);
-      if (page) {
-        this.tableComponent.changePage(page);
+      const index = this.policies.indexOf(policy) + 1;
+      const pageSize = this.tableComponent.limit;
+      const div = index % pageSize;
+      const p = index / pageSize;
+      const pageNumber = div ? Math.ceil(p) : Math.floor(p);
+      if (pageNumber) {
+        this.tableComponent.changePage(pageNumber);
       }
       this.toggleRowDetail(policy, PolicyContent.Jobs);
     }

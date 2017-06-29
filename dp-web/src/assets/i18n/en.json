@@ -52,8 +52,8 @@
         "setService" : "Setup Services"
       },
       "description" : {
-        "dataplane": "Welcome to Hortonworks Data Plane, your one-stop solution to data management. To start, you need to configure the LDAP/Knox properties in Data plane to enable dataplane to use your LDAP as the authentication database. Optionally, you can add Dataplane Administrators. Please proceed by clicking on GET STARTED",
-        "setupAuth": "The first step is to help data plane connect to your LDAP and Knox by providing the LDAP, Knox configurations to Data plane.",
+        "dataplane": "Welcome to Hortonworks Data Plane, your one-stop solution to data management. To start, you need to configure the LDAP properties in Data plane to enable dataplane to use your LDAP as the authentication database. Optionally, you can add Dataplane Administrators. Please proceed by clicking on GET STARTED",
+        "setupAuth": "The first step is to help data plane connect to your LDAP by providing the LDAP configurations to Data plane.",
         "defineUsers": "After connecting Data plane with your LDAP, you can add administrators to Data plane. This step is optional. You can add/modify users to data plane or assign/modify their roles anytime through the User Management Screen.",
         "addCluster" : "Add your cluster to Dataplane",
         "setService" : "Set up services to enable Dataplane to manage your data",
@@ -61,7 +61,6 @@
       },
       "configure" : {
         "labels" : {
-          "knoxConfiguration": "Knox Configuration",
           "ldapConfiguration" : "LDAP Configuration",
           "masterPassword": "Master Password",
           "userDNTemplate":"User DN Template",
@@ -71,10 +70,10 @@
           "adminBindDN": "Administrator Bind DN",
           "adminPassword":"Administrator Password",
           "showPassword" : "Show Password",
-          "configError" : "LDAP/Knox configuration could not be saved"
+          "configError" : "LDAP configuration could not be saved"
         },
         "description" : {
-          "configurationDesctiption": "The first step is to help data plane connect to your LDAP and Knox by providing the LDAP, Knox configurations to Data plane."
+          "configurationDesctiption": "The first step is to help data plane connect to your LDAP by providing the LDAP configurations to Data plane."
         }
       },
       "adduser" : {
@@ -103,7 +102,13 @@
         "clusterLocation" : "Cluster Location",
         "clusterAddSuccess" : "Cluster Added successfully",
         "connectionFailed" : "Not able to connect",
-        "emptySearchResult" : "There are no clusters that match your search."
+        "emptySearchResult" : "There are no clusters that match your search.",
+        "addUser": "ADD USER",
+        "username": "Username",
+        "roles": "Roles",
+        "usernameorgroup": "Username/Group",
+        "active": "Active",
+        "inactive": "Inactive"
       },
       "description" :{
         "addCluster" : "Add your Ambari managed cluster to Dataplane. This enables Dataplane to gather information about the cluster such as the name of the cluster, services running in the cluster etc.",
@@ -116,7 +121,8 @@
         "connectionFailureReasons" : {
           "ambariServerDown": "Check if the Ambari server is up and running in the given url",
           "insufficientAccessRights": "Make sure that you have right access rights to the ambari server"
-        }
+        },
+        "userManagement": "You can manage the users added to Dataplane through User Management. This page is only available to a user who is Dataplane Adminsitrator. You can add new users and assign them roles by clicking on ADD USER button. To activate/deactivate a user or edit roles assigned to the user, click on the username in the below list or click on the menu icon on each row in the users list."
       }
     },
     "dataset" : {
@@ -152,7 +158,9 @@
         "noOfRows" : "Number Of Rows",
         "datatype" : "Data Type",
         "selectOperator" : "Select Operator",
-        "addAssets" : "Add Assets"
+        "addAssets" : "Add Assets",
+        "description" : "Description",
+        "belongsTo" : "Belongs To"
       },
       "ds-editor" : {
         "ds-description" : "Organize your data-assets including Hive & Hbase tables, HDFS Files into logical groups for subsequent usage.",
@@ -185,6 +193,7 @@
         "done" : "Done"
       },
       "asset-list" : {
+        "starAssetmessage":"Few assets listed above already belong to datasets, and can not be used in any other dataset"
       },
       "dashboard" : {
         "tag-nav" : {

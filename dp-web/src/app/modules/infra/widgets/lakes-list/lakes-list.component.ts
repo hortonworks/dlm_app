@@ -17,7 +17,7 @@ export class LakesListComponent implements OnChanges {
   lakesListCopy: LakeInfo[] = [];
   @Input() lakes = [];
   @Input() healths = new Map();
-  @Output("onRefresh") refreshEmitter: EventEmitter<number> = new EventEmitter<number>();
+  @Output('onRefresh') refreshEmitter: EventEmitter<number> = new EventEmitter<number>();
 
   constructor(private clusterService: ClusterService, private router: Router) {
   }
@@ -63,6 +63,7 @@ export class LakesListComponent implements OnChanges {
     lakeInfo.hdfsTotal = health.totalSize ? health.totalSize : 'NA';
     lakeInfo.nodes = health.nodes ? health.nodes : 'NA';
     lakeInfo.status = this.getStatus(health);
+    lakeInfo.startTime = health.status ? health.status.startTime : null;
     lakeInfo.uptimeStr = health.status ? DateUtils.toReadableDate(health.status.since) : 'NA';
     lakeInfo.uptime = health.status ? health.status.since : 'NA';
   }
@@ -120,12 +121,18 @@ export class LakesListComponent implements OnChanges {
           if ($event.type === 'number') {
             return val1 > val2;
           }
+          if ($event.type === 'duration') {
+            return DateUtils.compare(val1, val2);
+          }
         }
         if ($event.type === 'string') {
           return val2.localeCompare(val1);
         }
         if ($event.type === 'number') {
           return val1 < val2;
+        }
+        if ($event.type === 'duration') {
+          return DateUtils.compare(val2, val1);
         }
       } catch (e) {
       }
@@ -153,6 +160,8 @@ export class LakeInfo {
   hdfsTotal?: string = 'NA';
   uptime?: string = 'NA';
   uptimeStr?: string = 'NA';
+  startTime?: number;
+
 
   get hdfsUsedInBytes(): number {
     return this.toBytes(this.hdfsUsed);

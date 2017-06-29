@@ -2,6 +2,7 @@ package com.hortonworks.dataplane.cs
 
 import java.net.URL
 
+import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
 import play.api.libs.json.JsValue
 
 import scala.concurrent.Future
@@ -58,5 +59,30 @@ trait AmbariInterface {
   def getGetHostInfo: Future[Either[Throwable, Seq[HostInformation]]]
 
   def getKnoxInfo: Future[Either[Throwable, KnoxInfo]]
+
+}
+
+trait AmbariInterfaceV2 {
+
+  def getAtlas(
+      implicit hJwtToken: Option[HJwtToken]): Future[Either[Throwable, Atlas]]
+
+  def getBeacon(implicit hJwtToken: Option[HJwtToken])
+    : Future[Either[Throwable, BeaconInfo]]
+
+  def getNameNodeStats(implicit hJwtToken: Option[HJwtToken])
+    : Future[Either[Throwable, NameNode]]
+
+  def getHdfsInfo(
+      implicit hJwtToken: Option[HJwtToken]): Future[Either[Throwable, Hdfs]]
+
+  def getHs2Info(implicit hJwtToken: Option[HJwtToken])
+    : Future[Either[Throwable, HiveServer]]
+
+  def getGetHostInfo(implicit hJwtToken: Option[HJwtToken])
+    : Future[Either[Throwable, Seq[HostInformation]]]
+
+  def getKnoxInfo(implicit hJwtToken: Option[HJwtToken])
+    : Future[Either[Throwable, KnoxInfo]]
 
 }

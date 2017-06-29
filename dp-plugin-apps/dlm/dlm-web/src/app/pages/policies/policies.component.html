@@ -5,14 +5,14 @@
   <div class="col-md-9">
     <div class="pull-right filters-block page-section">
 
-      <div class="filter-item">
+      <div class="filter-item" *ngIf="(policies$ | async)?.length > 0">
         <dlm-table-filter
-        [filterBy]="filterBy"
-        [data]="filteredPolicies$ | async"
-        (onFilter)="onFilter($event)"></dlm-table-filter>
+          [filterBy]="filterBy"
+          [data]="filteredPolicies$ | async"
+          (onFilter)="onFilter($event)"></dlm-table-filter>
       </div>
 
-      <div class="pull-left filter-item">
+      <div class="pull-left filter-item" *ngIf="(policies$ | async)?.length > 0">
         <policy-service-filter (onFilter)="filterPoliciesByService($event)"></policy-service-filter>
       </div>
 
@@ -25,7 +25,33 @@
 </div>
 
 <div class="row page-section">
-  <div class="col-md-12">
-    <dlm-policy-table [policies]="filteredPolicies$ | async" [clusters]="clusters$ | async" [activePolicyId]="activePolicyId"></dlm-policy-table>
+  <div class="col-md-12" *ngIf="(policies$ | async)?.length > 0; else noPolicies">
+    <dlm-policy-table [policies]="filteredPolicies$ | async" [clusters]="clusters$ | async"
+                      [activePolicyId]="activePolicyId"></dlm-policy-table>
   </div>
+  <ng-template #noPolicies>
+    <div class="alert-wrapper">
+      <div class="alert alert-warning" role="alert">
+        <div *ngIf="(pairings$ | async).length > 0; else noPairings">
+          {{ "page.policies.no_policies" | translate }}
+          <button type="button" class="btn btn-primary" [routerLink]="'/policies/create'">
+            {{ "page.policies.create_button_text" | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #noPairings>
+    <div *ngIf="(clusters$ | async).length > 1; else noClusters">
+      {{ "page.policies.no_pairings" | translate }}
+      <button type="button" class="btn btn-primary" [routerLink]="'/pairings/create'">
+        {{ "page.pairings.create_button_text" | translate }}
+      </button>
+    </div>
+  </ng-template>
+
+  <ng-template #noClusters>
+    {{ "page.policies.no_clusters" | translate }}
+  </ng-template>
 </div>

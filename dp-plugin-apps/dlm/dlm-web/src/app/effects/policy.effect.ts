@@ -3,10 +3,12 @@ import { Observable } from 'rxjs/Observable';
 import { go } from '@ngrx/router-store';
 import { Effect, Actions, toPayload } from '@ngrx/effects';
 import { PolicyService } from 'services/policy.service';
+import { JobService } from 'services/job.service';
 
 import {
   loadPoliciesSuccess, loadPoliciesFail, createPolicyFail, createPolicySuccess, ActionTypes as policyActions,
-  deletePolicySuccess, deletePolicyFail, suspendPolicyFail, suspendPolicySuccess, resumePolicySuccess, resumePolicyFail
+  deletePolicySuccess, deletePolicyFail, suspendPolicyFail, suspendPolicySuccess, resumePolicySuccess, resumePolicyFail,
+  loadLastJobsSuccess, loadLastJobsFailure
 } from 'actions/policy.action';
 import { operationComplete, operationFail } from 'actions/operation.action';
 
@@ -75,6 +77,16 @@ export class PolicyEffects {
         .catch(err => Observable.from([operationFail(err.json()), resumePolicyFail(err)]));
     });
 
-  constructor(private actions$: Actions, private policyService: PolicyService) {
+
+  @Effect()
+  loadLastJobs$: Observable<any> = this.actions$
+    .ofType(policyActions.LOAD_LAST_JOBS.START)
+    .map(toPayload)
+    .switchMap(payload => {
+      return this.jobService.getJobsForPolicies(payload.policies, 3)
+        .map(jobs => loadLastJobsSuccess(jobs, payload.meta))
+        .catch(err => Observable.of(loadLastJobsFailure(err, payload.meta)));
+    });
+  constructor(private actions$: Actions, private policyService: PolicyService, private jobService: JobService) {
   }
 }

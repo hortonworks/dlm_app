@@ -2,8 +2,8 @@ package com.hortonworks.dataplane.db
 
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.Ambari.ClusterServiceWithConfigs
-import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery}
-import play.api.libs.json.{JsResult, Json}
+import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery, EntityDatasetRelationship}
+import play.api.libs.json.{JsObject, JsResult, Json}
 import play.api.libs.ws.WSResponse
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData}
 
@@ -47,6 +47,17 @@ object Webservice {
 
     def addUserRole(userRole: UserRole): Future[Either[Errors, UserRole]]
 
+    def getUsers(): Future[Either[Errors,Seq[User]]]
+
+    def getUsersWithRoles(): Future[Either[Errors,Seq[UserInfo]]]
+
+    def getRoles():  Future[Either[Errors,Seq[Role]]]
+
+    def addUserWithRoles(user: UserInfo): Future[Either[Errors, UserInfo]]
+
+    def getUserDetail(userName:String): Future[Either[Errors,UserInfo]]
+
+    def updateActiveAndRoles(userInfo: UserInfo): Future[Either[Errors,Boolean]]
   }
 
   trait DataSetService extends DbClientService {
@@ -219,6 +230,10 @@ object Webservice {
     def create(notebookWorkspace: NotebookWorkspace): Future[Either[Errors, NotebookWorkspace]]
 
     def delete(notebookId: String): Future[Either[Errors, Int]]
+  }
+
+  trait DataAssetService extends DbClientService {
+    def findManagedAssets(clusterId:Long, assets: Seq[String]): Future[Either[Errors, Seq[EntityDatasetRelationship]]]
   }
 
 }

@@ -11,11 +11,12 @@
                   [clusterId]="dsModel.clusterId"
                   (onAction)="onListAction($event)"
                   [allowAssetNavigation]="false"
+                  [showBelongsToColumn]="true"
   ></ds-assets-list>
   <button *ngIf="!showList" class="mdl-button btn-hwx-primary" (click)="showPopup=true;">{{"pages.dataset.ds-editor.action.addAssets" | translate}}</button>
 </div>
 <div *ngIf="showPopup" class="popup borderBox">
   <div class="opaque">
-    <asset-search [clusterId]="dsModel.clusterId" (doneNotification)="actionDone($event)" (cancelNotification)="actionCancel()"></asset-search>
+    <asset-search [showBelongsToColumn]="true" [clusterId]="dsModel.clusterId" (doneNotification)="actionDone($event)" (cancelNotification)="actionCancel()"></asset-search>
   </div>
 </div>

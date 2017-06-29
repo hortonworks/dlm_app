@@ -34,8 +34,12 @@ export class ConfigurationService {
   }
 
   isConfigurationComplete(): Observable<boolean> {
-    //TODO Mock to replaced with backend API call
     return Observable.of(true);
+    //TODO Mock to replaced with backend API call
+    // return this.http
+    //   .get(`${this.knowConfigUri}/status`, new RequestOptions(HttpUtil.getHeaders()))
+    //   .map(HttpUtil.extractData)
+    //   .catch(HttpUtil.handleError);
   }
 
   isLDAPConfigured(): Observable<boolean> {

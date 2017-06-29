@@ -45,7 +45,7 @@ export const sizeToBites = (size: string, defaultValue: number): number => {
 
 export const bytesToSize = (bytes: number = 0, precision: number = 2): string => {
   if (isNaN(parseFloat(String(bytes))) || !isFinite(bytes)) {
-    return '?';
+    return '<i class="fa fa-minus"></i>';
   }
 
   let unit = 0;

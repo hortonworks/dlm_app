@@ -10,7 +10,7 @@ import {CollapsibleNavService} from '../../services/collapsible-nav.service';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
-  
+
   crumbNames: string[] = [];
   @Input() user:User;
 
@@ -26,7 +26,7 @@ export class HeaderComponent {
   logout() {
     this.router.navigate(['/sign-out']);
   }
-  
+
   setCrumbNames(url: string) {
     this.crumbNames = url.replace(/^\//, '').split('/');
   }

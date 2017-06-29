@@ -151,5 +151,4 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   goToPolicy(policy: Policy) {
     this.router.navigate(['/policies'], {queryParams: {policy: policy.id}});
   }
-
 }

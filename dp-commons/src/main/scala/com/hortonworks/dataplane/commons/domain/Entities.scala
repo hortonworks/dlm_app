@@ -3,13 +3,15 @@ package com.hortonworks.dataplane.commons.domain
 import java.time.LocalDateTime
 
 import com.hortonworks.dataplane.commons.domain.Atlas.AtlasSearchQuery
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsValue, Json, Reads, Writes}
 
 /**
   * Data plane main domain entities
   * add objects here which should be persisted
   */
 object Entities {
+
+  case class HJwtToken(token: String)
 
   case class Error(code: String, message: String)
 
@@ -29,17 +31,25 @@ object Entities {
                   created: Option[LocalDateTime] = Some(LocalDateTime.now()),
                   updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
+  case class UserInfo(id: Option[Long] = None,
+                  userName: String,
+                  displayName: String,
+                  password: Option[String]=None,
+                  active: Option[Boolean] = Some(true),
+                  roles: Seq[RoleType.Value]=Seq()
+                  )
+
   case class Role(id: Option[Long] = None,
                   roleName: String,
                   created: Option[LocalDateTime] = Some(LocalDateTime.now()),
                   updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
   case class Permission(
-                         id: Option[Long] = None,
-                         permission: String,
-                         roleId: Option[Long],
-                         created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-                         updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+      id: Option[Long] = None,
+      permission: String,
+      roleId: Option[Long],
+      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+      updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
   case class UserRole(id: Option[Long] = None,
                       userId: Option[Long],
@@ -53,91 +63,95 @@ object Entities {
 
   //Data lake
   case class Location(
-                       id: Option[Long] = None,
-                       country: String,
-                       city: String,
-                       latitude: Float,
-                       longitude: Float
-                     )
+      id: Option[Long] = None,
+      country: String,
+      city: String,
+      latitude: Float,
+      longitude: Float
+  )
+
+  case class DataplaneClusterIdentifier(id: Long)
 
   case class DataplaneCluster(
-                               id: Option[Long] = None,
-                               name: String,
-                               description: String,
-                               ambariUrl: String,
-                               location: Option[Long],
-                               createdBy: Option[Long],
-                               properties: Option[JsValue],
-                               // state should be used to figure out the status of the cluster
-                               state: Option[String] = Some("TO_SYNC"),
-                               isDatalake: Option[Boolean] = Some(false),
-                               created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-                               updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+      id: Option[Long] = None,
+      name: String,
+      description: String,
+      ambariUrl: String,
+      location: Option[Long],
+      createdBy: Option[Long],
+      properties: Option[JsValue],
+      // state should be used to figure out the status of the cluster
+      state: Option[String] = Some("TO_SYNC"),
+      isDatalake: Option[Boolean] = Some(false),
+      knoxEnabled: Option[Boolean] = Some(false),
+      knoxUrl: Option[String],
+      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+      updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
   case class Category(
-                       id: Option[Long] = None,
-                       name: String,
-                       description: String,
-                       created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-                       updated: Option[LocalDateTime] = Some(LocalDateTime.now())
-                     )
+      id: Option[Long] = None,
+      name: String,
+      description: String,
+      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+      updated: Option[LocalDateTime] = Some(LocalDateTime.now())
+  )
 
   case class Cluster(
-                      id: Option[Long] = None,
-                      name: String,
-                      clusterUrl: Option[String] = None,
-                      secured: Option[Boolean] = Some(false),
-                      kerberosuser: Option[String] = None,
-                      kerberosticketLocation: Option[String] = None,
-                      dataplaneClusterId: Option[Long] = None,
-                      userid: Option[Long] = None,
-                      properties: Option[JsValue] = None
-                    )
+      id: Option[Long] = None,
+      name: String,
+      clusterUrl: Option[String] = None,
+      secured: Option[Boolean] = Some(false),
+      kerberosuser: Option[String] = None,
+      kerberosticketLocation: Option[String] = None,
+      dataplaneClusterId: Option[Long] = None,
+      userid: Option[Long] = None,
+      properties: Option[JsValue] = None
+  )
 
   case class ClusterService(
-                             id: Option[Long] = None,
-                             servicename: String,
-                             properties: Option[JsValue] = None,
-                             clusterId: Option[Long] = None
-                           )
+      id: Option[Long] = None,
+      servicename: String,
+      properties: Option[JsValue] = None,
+      clusterId: Option[Long] = None
+  )
 
   case class ClusterServiceHost(
-                                 id: Option[Long] = None,
-                                 host: String,
-                                 serviceid: Option[Long] = None
-                               )
+      id: Option[Long] = None,
+      host: String,
+      serviceid: Option[Long] = None
+  )
 
   case class Workspace(
-                        id: Option[Long] = None,
-                        name: String,
-                        source: Long,
-                        description: String,
-                        createdBy: Option[Long],
-                        created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-                        updated: Option[LocalDateTime] = Some(LocalDateTime.now())
-                      )
+      id: Option[Long] = None,
+      name: String,
+      source: Long,
+      description: String,
+      createdBy: Option[Long],
+      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+      updated: Option[LocalDateTime] = Some(LocalDateTime.now())
+  )
 
   case class AssetWorkspace(
-                             assetType: String,
-                             assetId: Long,
-                             workspaceId: Long
-                           )
+      assetType: String,
+      assetId: Long,
+      workspaceId: Long
+  )
 
   case class NotebookWorkspace(
-                                notebookId: String,
-                                name: String,
-                                created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-                                workspaceId: Long
-                              )
+      notebookId: String,
+      name: String,
+      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+      workspaceId: Long
+  )
 
   case class EnabledSku(
-                         skuId: Long,
-                         enabledBy: Long,
-                         enabledOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
-                         smartSenseId: String,
-                         subscriptionId: String,
-                         created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-                         updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+      skuId: Long,
+      enabledBy: Long,
+      enabledOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
+      smartSenseId: String,
+      subscriptionId: String,
+      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+      updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
   case class Sku(id: Option[Long] = None,
                  name: String,
@@ -170,14 +184,14 @@ object Entities {
   case class DatasetCategory(categoryId: Long, datasetId: Long)
 
   case class UnclassifiedDataset(
-                                  id: Option[Long],
-                                  name: String,
-                                  description: Option[String],
-                                  dpClusterId: Long,
-                                  createdBy: Long,
-                                  createdOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
-                                  lastModified: Option[LocalDateTime] = Some(LocalDateTime.now()),
-                                  customProps: Option[JsValue] = None)
+      id: Option[Long],
+      name: String,
+      description: Option[String],
+      dpClusterId: Long,
+      createdBy: Long,
+      createdOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
+      lastModified: Option[LocalDateTime] = Some(LocalDateTime.now()),
+      customProps: Option[JsValue] = None)
 
   case class UnclassifiedDatasetCategory(categoryId: Long,
                                          unclassifiedDatasetId: Long)
@@ -206,7 +220,12 @@ object Entities {
 
   case class DataAssetCount(assetType: String, count: Int)
 
-  case class RichDataset(dataset: Dataset, tags: Seq[String], user: String, cluster: String, clusterId: Long, counts: Seq[DataAssetCount])
+  case class RichDataset(dataset: Dataset,
+                         tags: Seq[String],
+                         user: String,
+                         cluster: String,
+                         clusterId: Long,
+                         counts: Seq[DataAssetCount])
 
   case class DatasetAndCategories(dataset: Dataset, categories: Seq[Category])
 
@@ -216,7 +235,9 @@ object Entities {
 
   case class CategoriesCountAndTotal(categoies: Seq[CategoryCount], total: Int)
 
-  case class DatasetCreateRequest(dataset: Dataset, clusterId: Long, tags: Seq[String],
+  case class DatasetCreateRequest(dataset: Dataset,
+                                  clusterId: Long,
+                                  tags: Seq[String],
                                   assetQueryModels: Seq[AtlasSearchQuery],
                                   dataAssets: Seq[DataAsset] = Nil)
   case class LdapConfiguration(
@@ -231,16 +252,16 @@ object Entities {
   case class WorkspaceDataCount(asset: Int, notebook: Int)
 
   case class WorkspaceDetails(
-                               workspace: Workspace,
-                               username: String,
-                               clustername: String,
-                               counts: Option[WorkspaceDataCount]
-                             )
+      workspace: Workspace,
+      username: String,
+      clustername: String,
+      counts: Option[WorkspaceDataCount]
+  )
 
-  case class AssetWorkspaceRequest(workspaceId: Long, clusterId: Long,
+  case class AssetWorkspaceRequest(workspaceId: Long,
+                                   clusterId: Long,
                                    assetQueryModels: Seq[AtlasSearchQuery],
                                    dataAssets: Seq[DataAsset] = Nil)
-
 
 }
 
@@ -280,6 +301,8 @@ object JsonFormatters {
   implicit val locationReads = Json.reads[Location]
   implicit val dpClusterWrites = Json.writes[DataplaneCluster]
   implicit val dpClusterReads = Json.reads[DataplaneCluster]
+  implicit val dpClusterIdentifierWrites = Json.writes[DataplaneClusterIdentifier]
+  implicit val dpClusterIdentifierReads = Json.reads[DataplaneClusterIdentifier]
 
   implicit val skuWrites = Json.writes[Sku]
   implicit val skuReads = Json.reads[Sku]
@@ -343,10 +366,13 @@ object JsonFormatters {
   implicit val configReads = Json.reads[DpConfig]
   implicit val configWrites = Json.writes[DpConfig]
 
-  implicit val categoriesCountAndTotalReads = Json.reads[CategoriesCountAndTotal]
-  implicit val categoriesCountAndTotalWrites = Json.writes[CategoriesCountAndTotal]
+  implicit val categoriesCountAndTotalReads =
+    Json.reads[CategoriesCountAndTotal]
+  implicit val categoriesCountAndTotalWrites =
+    Json.writes[CategoriesCountAndTotal]
 
-  implicit val datasetCreateRequestReads = defaultJson.reads[DatasetCreateRequest]
+  implicit val datasetCreateRequestReads =
+    defaultJson.reads[DatasetCreateRequest]
   implicit val datasetCreateRequestWrites = Json.writes[DatasetCreateRequest]
 
   implicit val richDatasetReads = defaultJson.reads[RichDataset]
@@ -361,10 +387,17 @@ object JsonFormatters {
   implicit val workspaceDetailsReads = Json.reads[WorkspaceDetails]
   implicit val workspaceDetailsWrites = Json.writes[WorkspaceDetails]
 
-  implicit val assetWorkspaceRequestReads = defaultJson.reads[AssetWorkspaceRequest]
+  implicit val assetWorkspaceRequestReads =
+    defaultJson.reads[AssetWorkspaceRequest]
   implicit val assetWorkspaceRequestWrites = Json.writes[AssetWorkspaceRequest]
 
   implicit val notebookWorkspaceReads = defaultJson.reads[NotebookWorkspace]
   implicit val notebookWorkspaceWrites = Json.writes[NotebookWorkspace]
+
+  implicit val roleTypeReads = Reads.enumNameReads(RoleType)
+
+  implicit val userInfoReads = Json.reads[UserInfo]
+  implicit val userInfoWrites = Json.writes[UserInfo]
+
 
 }

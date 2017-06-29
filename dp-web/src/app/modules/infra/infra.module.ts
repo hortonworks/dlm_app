@@ -16,6 +16,7 @@ import {DpSorterModule} from '../../shared/dp-table/dp-sorter/dp-sorter.module';
 import {ClusterDetailsComponent} from './views/cluster-details/cluster-details.component';
 import { UserManagementComponent } from './views/user-management/user-management.component';
 import {DropdownModule} from '../../shared/dropdown/dropdown.module';
+import { AddUserComponent } from './views/user-management/add-user/add-user.component';
 
 @NgModule({
   imports: [
@@ -36,7 +37,8 @@ import {DropdownModule} from '../../shared/dropdown/dropdown.module';
     LakesListComponent,
     ClusterDetailsComponent,
     MapComponent,
-    UserManagementComponent
+    UserManagementComponent,
+    AddUserComponent
   ]
 })
 export class InfraModule {

@@ -18,6 +18,7 @@ export class TaggingWidget implements AfterViewInit{
   @Input() searchText: string = "";
   @Input() placeHolderText: string = "";
   @Input() theme: TagTheme  = TagTheme.LIGHT;
+  @Input() restrictFreeText = false;
 
   @Output("textChange") searchTextEmitter = new EventEmitter<string>();
   @Output("onNewSearch") newTagEmitter = new EventEmitter<string | TaggingWidgetTagModel>();
@@ -91,7 +92,7 @@ export class TaggingWidget implements AfterViewInit{
       this.newTagEmitter.emit(this.availableTags[this.focusRowIndex]);
       this.clearOnSearch && this.onSearchTextChange("");
       this.focusStickerIndex++;
-    } else if (this.searchText && this.focusStickerIndex === this.tags.length) {
+    } else if (this.searchText && this.focusStickerIndex === this.tags.length && !this.restrictFreeText) {
       this.newTagEmitter.emit(this.searchText);
       this.clearOnSearch && this.onSearchTextChange("");
       this.focusStickerIndex++;
