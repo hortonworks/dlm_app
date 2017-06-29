@@ -18,7 +18,7 @@ export class ClusterService {
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }
-  
+
   list(): Observable<Cluster[]>{
     return this.http
       .get(this.uri, new RequestOptions(HttpUtil.getHeaders()))
@@ -33,8 +33,8 @@ export class ClusterService {
       .catch(HttpUtil.handleError);
   }
 
-  retrieveHealth(clusterId: number): Observable<ClusterHealthSummary>  {
-    const uri = `${this.uri}/${clusterId}/health?summary=true`;
+  retrieveHealth(clusterId: number, dpClusterId: number): Observable<ClusterHealthSummary>  {
+    const uri = `${this.uri}/${clusterId}/health?dpClusterId=${dpClusterId}&summary=true`;
 
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
@@ -42,8 +42,8 @@ export class ClusterService {
       .catch(HttpUtil.handleError);
   }
 
-  retrieveDetailedHealth(clusterId: number): Observable<any> {
-    const uri = `${this.uri}/${clusterId}/health`;
+  retrieveDetailedHealth(clusterId: number, dpClusterId: number): Observable<any> {
+    const uri = `${this.uri}/${clusterId}/health?dpClusterId=${dpClusterId}`;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)

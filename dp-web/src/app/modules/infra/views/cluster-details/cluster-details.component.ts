@@ -59,7 +59,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
         this.clusters = clusters;
         if (this.clusters && this.clusters.length) {
           this.cluster = clusters[0];
-          this.getClusterWithLocation(this.lake.location, this.cluster.id, this.cluster.userid).subscribe(clusterInfo => {
+          this.getClusterWithLocation(this.lake, this.cluster.id, this.cluster.userid).subscribe(clusterInfo => {
             this.clusterHealth = clusterInfo.health;
             this.location = clusterInfo.location;
             this.user = clusterInfo.user;
@@ -150,10 +150,10 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
     return clusterDetails;
   }
 
-  private getClusterWithLocation(locationId, clusterId, userId) {
+  private getClusterWithLocation(lake, clusterId, userId) {
     return Observable.forkJoin(
-      this.locationService.retrieve(locationId).map((res) => res),
-      this.clusterService.retrieveDetailedHealth(clusterId).map((res) => res),
+      this.locationService.retrieve(lake.location).map((res) => res),
+      this.clusterService.retrieveDetailedHealth(clusterId, lake.id).map((res) => res),
       this.identityService.getUserById(userId).map((res) => res),
       this.clusterService.retrieveResourceMangerHealth(clusterId).map(res => res)
     ).map(response => {

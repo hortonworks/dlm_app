@@ -112,7 +112,8 @@ class Clusters @Inject()(
   def getHealth(clusterId: Long, summary: Option[Boolean]) = authenticated.async { request =>
     Logger.info("Received get cluster health request")
     implicit val token = request.token
-    ambariService.syncCluster(DataplaneClusterIdentifier(clusterId)).flatMap { result =>
+    val dpClusterId = request.getQueryString("dpClusterId").get
+    ambariService.syncCluster(DataplaneClusterIdentifier(dpClusterId.toLong)).flatMap { result =>
       result match {
         case true => {
           clusterHealthService
