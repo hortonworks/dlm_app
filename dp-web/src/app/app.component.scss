@@ -4,22 +4,30 @@
   background-color: rgb(213, 213, 213);
 }
 
-.maximised {
-  margin-left: $side-nav-width;
-  transition: 0.5s;
+.main {
+  padding-top: 55px;
+
+  &.maximised {
+    padding-left: $side-nav-width;
+
+    dp-header {
+      left: $side-nav-width;
+    }
+  }
+
+  &.minimized {
+    padding-left: $side-nav-minimised-width;
+
+    dp-header {
+      left: $side-nav-minimised-width;
+    }
+  }
+
+  .page-content {
+    min-height: calc(100vh - 55px);
+    position: relative;
+  }
 }
 
-.minimized {
-  margin-left: 50px;
-  transition: 0.5s;
-}
 
-.default {
-  margin-left: 0px;
-}
-
-.page-content {
-  min-height: calc(100vh - 55px);
-  position: relative;
-}
 
