@@ -32,6 +32,7 @@ import { JobEffects } from './effects/job.effect';
 import { EventEffects } from './effects/event.effect';
 import { HdfsListEffects } from './effects/hdfslist.effect';
 import { HiveListEffects } from './effects/hivelist.effect';
+import { LogEffects } from './effects/log.effect';
 
 import { FormEffects } from './effects/form.effect';
 
@@ -43,6 +44,7 @@ import { SessionStorageService } from './services/session-storage.service';
 import { FormService } from 'services/form.service';
 import { NavbarService } from 'services/navbar.service';
 import { EventService } from 'services/event.service';
+import { LogService } from 'services/log.service';
 import { TimeZoneService } from 'services/time-zone.service';
 import { HdfsService } from 'services/hdfs.service';
 import { HiveService } from 'services/hive.service';
@@ -135,6 +137,7 @@ import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
     EffectsModule.run(EventEffects),
     EffectsModule.run(HdfsListEffects),
     EffectsModule.run(HiveListEffects),
+    EffectsModule.run(LogEffects),
     CollapseModule.forRoot(),
     BsDropdownModule.forRoot(),
     TabsModule.forRoot(),
@@ -227,6 +230,7 @@ import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
     FormService,
     NavbarService,
     EventService,
+    LogService,
     TimeZoneService,
     HdfsService,
     HiveService,

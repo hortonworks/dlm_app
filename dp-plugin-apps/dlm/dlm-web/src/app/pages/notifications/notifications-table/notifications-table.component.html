@@ -7,9 +7,43 @@
 
 <ng-template let-event="row" #statusTemplate>
   <dlm-event-status [event]="event"></dlm-event-status>
-  <span>{{event.eventStatus}}</span>
+  <span>{{event.event}}</span>
 </ng-template>
 
 <ng-template #agoTemplate let-value="value">
   <span>{{value | fmtTz | amTimeAgo}}</span>
 </ng-template>
+
+<ng-template let-event="row" #entityTemplate>
+  <span *ngIf="event.eventType === 'policyinstance'; else entityNoLinkTemplate">
+    <a [routerLink]="['/policies']" [queryParams]="{'policy': getEntity(event)}">
+      <span>{{getEntity(event)}}</span>
+    </a>
+  </span>
+</ng-template>
+
+<ng-template #entityNoLinkTemplate>
+  <span>{{getEntity(event)}}</span>
+</ng-template>
+
+<ng-template let-event="row" #logTemplate>
+  <span *ngIf="event.eventType === 'policyinstance'; else emptyTemplate" class="text-primary actionable" (click)="showLog(event)">{{ "page.notifications.view_log" | translate }}</span>
+</ng-template>
+
+<ng-template #emptyTemplate>
+  <span></span>
+</ng-template>
+
+<dlm-modal-dialog #logModalDialog
+  [title]=" 'page.notifications.table.column.log' "
+  [modalSize]="modalSize"
+  [showCancel]="false">
+  <dlm-modal-dialog-body>
+    <pre *ngIf="(logMessage$ | async)" class="error-message">
+      {{logMessage$ | async}}
+    </pre>
+    <div *ngIf="!(logMessage$ | async)" class="alert alert-warning" role="alert">
+      {{ "common.errors.no_log" | translate }}
+    </div>
+  </dlm-modal-dialog-body>
+</dlm-modal-dialog>

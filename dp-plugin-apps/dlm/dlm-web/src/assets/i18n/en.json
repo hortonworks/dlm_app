@@ -27,6 +27,9 @@
     "service": "Service",
     "hdfs": "HDFS",
     "hive": "HIVE",
+    "errors": {
+      "no_log": "Oops! Could not retrieve a log message for this event."
+    },
     "time": {
       "hourly": "Hourly",
       "daily": "Daily",
@@ -297,9 +300,11 @@
           "status": "Status",
           "message": "Notification",
           "created": "Created",
-          "instance_id": "Instance Id"
+          "entity": "Entity",
+          "log": "Log"
         }
-      }
+      },
+      "view_log": "View Log"
     }
   }
 }
