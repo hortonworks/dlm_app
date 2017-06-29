@@ -35,6 +35,8 @@ import java.util.stream.Collectors;
 public class Gateway {
 
   public static final int INITIAL_DELAY = 1;
+  public static final int GATEWAY_DISCOVER_RETRY_COUNT = 3;
+  public static final int GATEWAY_DISCOVER_RETRY_WAITBETWEEN_INMILLIS = 500;
   private final Config config;
   private final Map<String, String> serviceConfigs;
   private final Optional<ConsulHook> consulHook;
@@ -102,11 +104,20 @@ public class Gateway {
 
   }
   public ZuulServer getGatewayService(){
-    List<ZuulServer> zuulServers = supplier.get();
-    if (zuulServers.size() == 0){
-      //try one more time
-      zuulServers = supplier.get();
-    }
+    List<ZuulServer> zuulServers = null;
+    int retryCount=3;
+    do{
+      zuulServers=supplier.get();
+      if (zuulServers.size()>0){
+        break;
+      }
+      try {
+        Thread.sleep(GATEWAY_DISCOVER_RETRY_WAITBETWEEN_INMILLIS);
+      } catch (InterruptedException e) {
+        //Do nothing here
+      }
+      retryCount--;
+    }while (zuulServers.size()<1 && retryCount>0);
     if (zuulServers.size() == 0) {
       throw new RuntimeException("No Zuul servers found");
     }
