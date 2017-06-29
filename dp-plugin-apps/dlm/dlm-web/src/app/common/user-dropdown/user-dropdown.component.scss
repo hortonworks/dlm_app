@@ -6,6 +6,9 @@
 }
 
 .user-settings-dropdown {
+  .popup-arrow-up {
+    right: 30px !important;
+  }
   &.dropdown-menu {
     top: 125% !important;
     right: -25px !important;
