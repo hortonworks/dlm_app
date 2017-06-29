@@ -1,11 +1,14 @@
 package com.hortonworks.datapalane.consul;
 
+import com.ecwid.consul.v1.ConsistencyMode;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.NewCheck;
 import com.ecwid.consul.v1.agent.model.NewService;
 import com.ecwid.consul.v1.agent.model.Service;
+import com.ecwid.consul.v1.event.model.Event;
+import com.ecwid.consul.v1.event.model.EventParams;
 import com.ecwid.consul.v1.health.model.HealthService;
 import java.util.List;
 import java.util.Map;
@@ -70,4 +73,14 @@ public class DpConsulClientImpl implements DpConsulClient {
     return agentServices.getValue().keySet().contains(serviceId);
   }
 
+  @Override
+  public String fireEvent(String event,String serviceName, String payload){
+    EventParams eventParams = new EventParams();
+    QueryParams queryParams=new QueryParams(ConsistencyMode.CONSISTENT);
+    if (serviceName!=null) {
+      eventParams.setService(serviceName);
+    }
+    Response<Event > resp=consulClient.eventFire(event,payload!=null?payload:"",eventParams,queryParams);
+    return resp.getValue().getId();//TODO in later implmentation give other details like time etc.
+  }
 }

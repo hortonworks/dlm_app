@@ -101,6 +101,20 @@ public class Gateway {
     scheduledExecutorService.scheduleAtFixedRate(runnable, INITIAL_DELAY, refresh, TimeUnit.SECONDS);
 
   }
+  public ZuulServer getGatewayService(){
+    List<ZuulServer> zuulServers = supplier.get();
+    if (zuulServers.size() == 0){
+      //try one more time
+      zuulServers = supplier.get();
+    }
+    if (zuulServers.size() == 0) {
+      throw new RuntimeException("No Zuul servers found");
+    }
+    final Random randomizer = new Random();
+    ZuulServer zuulServer = zuulServers.get(randomizer.nextInt(zuulServers.size()));
+    return zuulServer;
+  }
+
 
   private static class ServerListSupplier implements Supplier<List<ZuulServer>> {
 
@@ -122,6 +136,4 @@ public class Gateway {
         .collect(Collectors.toList());
     }
   }
-
-
 }

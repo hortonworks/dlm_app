@@ -12,4 +12,5 @@ interface DpConsulClient {
   ConsulResponse unRegisterCheck(String serviceId);
   ConsulResponse<List<HealthService>> getService();
   boolean checkServiceAvailability(String serviceId);
+  public String fireEvent(String event, String serviceName, String payload);
 }
