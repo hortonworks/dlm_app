@@ -10,6 +10,9 @@ import com.ecwid.consul.v1.agent.model.Service;
 import com.ecwid.consul.v1.event.model.Event;
 import com.ecwid.consul.v1.event.model.EventParams;
 import com.ecwid.consul.v1.health.model.HealthService;
+import com.hortonworks.datapalane.consul.model.ConsulEvent;
+import com.hortonworks.datapalane.consul.model.ConsulEventResp;
+
 import java.util.List;
 import java.util.Map;
 
@@ -74,13 +77,14 @@ public class DpConsulClientImpl implements DpConsulClient {
   }
 
   @Override
-  public String fireEvent(String event,String serviceName, String payload){
+  public ConsulEventResp fireEvent(ConsulEvent event){
     EventParams eventParams = new EventParams();
     QueryParams queryParams=new QueryParams(ConsistencyMode.CONSISTENT);
-    if (serviceName!=null) {
-      eventParams.setService(serviceName);
+    if (event.getServiceName()!=null) {
+      eventParams.setService(event.getServiceName());
     }
-    Response<Event > resp=consulClient.eventFire(event,payload!=null?payload:"",eventParams,queryParams);
-    return resp.getValue().getId();//TODO in later implmentation give other details like time etc.
+    Response<Event> resp=consulClient.eventFire(event.getName(),event.getPayload(),eventParams,queryParams);
+    ConsulEventResp eventResp=new ConsulEventResp(resp.getValue().getId(),resp.getValue().getlTime());
+    return eventResp;
   }
 }

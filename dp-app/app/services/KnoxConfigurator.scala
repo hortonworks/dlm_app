@@ -4,6 +4,7 @@ import javax.inject.Singleton
 
 import com.google.inject.Inject
 import com.hortonworks.datapalane.consul.ConsulClientFactory
+import com.hortonworks.datapalane.consul.model.ConsulEvent
 import com.typesafe.scalalogging.Logger
 
 @Singleton
@@ -14,7 +15,10 @@ class KnoxConfigurator @Inject()(private val config: play.api.Configuration) {
     config.getInt("consul.port").getOrElse(8005))
 
   def configure() = {
-    val eventId=dpConsulClient.fireEvent("knoxSSoToplogyConfigured", null, null)
-    logger.info(s"Fired knoxSsoTopolgyConfigured Event id=($eventId)")
+    val event: ConsulEvent =
+      new ConsulEvent("knoxSSoToplogyConfigured", null, null)
+    val eventResp = dpConsulClient.fireEvent(event)
+    logger.info(
+      s"Fired knoxSsoTopolgyConfigured ConsulEvent id=(${eventResp.getId}) at time : ${eventResp.getlTime()}")
   }
 }
