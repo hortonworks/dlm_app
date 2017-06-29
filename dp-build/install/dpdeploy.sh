@@ -73,12 +73,12 @@ init_knox() {
         echo "Knox container not found. Ensure it is running..."
         return -1
     fi
-    docker exec -it ${KNOX_CONTAINER_ID} ./wait_for_keystore_file.sh
+    docker exec -t ${KNOX_CONTAINER_ID} ./wait_for_keystore_file.sh
     mkdir -p ${CERTS_DIR}
     export_knox_cert $MASTER_PASSWD $KNOX_CONTAINER_ID > ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
     if [ ${USE_TEST_LDAP} == "no" ]
     then
-        docker exec -it ${KNOX_CONTAINER_ID} ./setup_knox_sso_conf.sh
+        docker exec -t ${KNOX_CONTAINER_ID} ./setup_knox_sso_conf.sh
     fi
 	echo "Knox Initialized"
 }
@@ -86,7 +86,7 @@ init_knox() {
 export_knox_cert() {
     MASTER_PASSWD=$1
     KNOX_CONTAINER_ID=$2
-    docker exec -it ${KNOX_CONTAINER_ID} \
+    docker exec -t ${KNOX_CONTAINER_ID} \
         keytool -export -alias gateway-identity -storepass ${MASTER_PASSWD} -keystore /var/lib/knox/data-2.6.0.3-8/security/keystores/gateway.jks -rfc
 }
 
