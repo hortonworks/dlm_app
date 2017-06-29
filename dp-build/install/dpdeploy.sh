@@ -43,14 +43,21 @@ destroy_knox() {
     rm -rf ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
 }
 
-init_app() {
+read_consul_host() {
     echo "Enter the Host IP Address (Consul will bind to this host):"
-    read HOST_IP;	
+    read HOST_IP;
     export CONSUL_HOST=$HOST_IP;
+}
+
+init_app() {
+    if [ "$CONSUL_HOST" == "" ]; then
+        read_consul_host
+    fi
+    echo "using CONSUL_HOST: $CONSUL_HOST"
     docker-compose -f docker-compose-apps.yml up -d
 }
 
-init_knox() {
+read_master_password() {
     echo "Enter Knox master password: "
     read -s MASTER_PASSWD
     echo "Reenter password: "
@@ -62,12 +69,26 @@ init_knox() {
        if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
        then
         echo "Password did not match"
-        return 1
+        exit 1
        fi
     fi
+    export MASTER_PASSWORD="$MASTER_PASSWD"
+}
+
+read_use_test_ldap() {
     echo "Use pre-packaged LDAP instance (suitable only for testing) [yes/no]: "
     read USE_TEST_LDAP
-	MASTER_PASSWORD=${MASTER_PASSWD} USE_TEST_LDAP=${USE_TEST_LDAP} docker-compose -f docker-compose-knox.yml up -d
+    export USE_TEST_LDAP
+}
+
+init_knox() {
+    if [ "$MASTER_PASSWORD" == "" ]; then
+        read_master_password
+    fi
+    if [ "$USE_TEST_LDAP" == "" ];then
+        read_use_test_ldap
+    fi
+    docker-compose -f docker-compose-knox.yml up -d
     KNOX_CONTAINER_ID=$(get_knox_container_id)
     if [ -z ${KNOX_CONTAINER_ID} ]; then
         echo "Knox container not found. Ensure it is running..."
