@@ -179,6 +179,7 @@ object Entities {
                      createdBy: Option[Long],
                      createdOn: LocalDateTime = LocalDateTime.now(),
                      lastModified: LocalDateTime = LocalDateTime.now(),
+                     active: Boolean = true,
                      version: Int = 1,
                      customProps: Option[JsValue] = None)
 
