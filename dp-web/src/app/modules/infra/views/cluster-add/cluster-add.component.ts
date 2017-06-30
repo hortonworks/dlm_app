@@ -1,6 +1,7 @@
 import {Component, ElementRef, ViewChild, OnInit} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
+import {Observable} from 'rxjs/Observable';
 
 import {Cluster} from '../../../../models/cluster';
 import {Lake} from '../../../../models/lake';
@@ -35,6 +36,7 @@ export class ClusterAddComponent implements OnInit {
   mapData: MapData[] = [];
   cluster: Cluster = new Cluster();
   searchTerm: string;
+  dcName: string;
 
   dpRequiredServices = ['ATLAS'];
 
@@ -187,6 +189,10 @@ export class ClusterAddComponent implements OnInit {
 
   createCluster() {
     let lake = new Lake();
+    if(!this.dcName) {
+      throw Observable.throw({message: 'Datacenter name is required.'});
+    }
+    lake.dcName = this.dcName;
     lake.ambariUrl = this.cluster.ambariurl;
     lake.location = this.cluster.location.id;
     lake.isDatalake = this.isDataLake;

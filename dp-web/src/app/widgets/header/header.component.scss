@@ -1,26 +1,20 @@
 @import "../../../styles/variables";
-@import "../../../styles/side-nav";
 
 :host{
   height: $header-height;
   min-height: $header-height;
-  display: block;
   z-index: 1;
-}
-
-.mdl-navigation  {
-  @extend .borderBox;
-  border-bottom: 1px solid $concrete;
+  width: inherit;
+  position: fixed;
+  top: 0;
+  right: 0;
 }
 
 .navbar {
   @extend .borderBox;
 
-  top: 0;
   z-index: 10;
-  width: 100%;
   overflow: hidden;
-  position: fixed;
   background: $white;
   height: $header-height;
   max-height: $header-height;
@@ -36,26 +30,6 @@
   font-size: 17px;
 }
 
-.mdl-cell--10-col {
-  div {
-    display: inline-block;
-  }
-}
-
-.is_active:after {
-  height: 2px;
-  width: 100%;
-  display: block;
-  content: " ";
-  bottom: 0px;
-  left: 0;
-  position: absolute;
-  background: $fruit-salad;
-}
-
-.mdl-navigation {
-  padding: 0px 20px;
-}
 
 :host /deep/ .mdl-menu__container{
   position: fixed;
@@ -67,6 +41,8 @@
 }
 
 .breadcrumb {
+  padding-left: 20px;
+
   .mdl-navigation__link {
     cursor: pointer;
     position: relative;

@@ -3,7 +3,7 @@ package services
 import javax.inject.{Inject, Named}
 
 import com.google.inject.Singleton
-import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, Error, Errors, HJwtToken}
+import com.hortonworks.dataplane.commons.domain.Entities._
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
@@ -34,7 +34,7 @@ class AmbariService @Inject()(
     ambariWebService.getAmbariDetails(ambariDetailRequest)
   }
 
-  def syncCluster(dpCluster: DataplaneCluster)(implicit hJwtToken: Option[HJwtToken]): Future[Boolean] = {
+  def syncCluster(dpCluster: DataplaneClusterIdentifier)(implicit hJwtToken: Option[HJwtToken]): Future[Boolean] = {
    ambariWebService.syncAmbari(dpCluster).map {
      case value@true =>
        Logger.info(s"Successfully synced datalake with ${dpCluster.id}")

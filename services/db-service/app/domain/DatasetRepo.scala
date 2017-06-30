@@ -24,7 +24,7 @@ class DatasetRepo @Inject()(
   import profile.api._
   import PaginationSupport._
 
-  val Datasets = TableQuery[DatasetsTable]
+  val Datasets = TableQuery[DatasetsTable].filter(_.active)
 
   def all(): Future[List[Dataset]] = db.run {
     Datasets.to[List].result
@@ -47,8 +47,8 @@ class DatasetRepo @Inject()(
     db.run(Datasets.filter(_.id === datasetId).result.headOption)
   }
 
-  def deleteById(datasetId: Long): Future[Int] = {
-    db.run(Datasets.filter(_.id === datasetId).delete)
+  def archiveById(datasetId: Long): Future[Int] = {
+    db.run(Datasets.filter(_.id === datasetId).map(_.active).update(false))
   }
 
   import scala.concurrent.ExecutionContext.Implicits.global
@@ -275,6 +275,8 @@ class DatasetRepo @Inject()(
 
     def lastmodified = column[LocalDateTime]("lastmodified")
 
+    def active = column[Boolean]("active")
+
     def version = column[Int]("version")
 
     def customprops = column[Option[JsValue]]("custom_props")
@@ -289,6 +291,7 @@ class DatasetRepo @Inject()(
         createdBy,
         createdOn,
         lastmodified,
+        active,
         version,
         customprops
       ) <> ((Dataset.apply _).tupled, Dataset.unapply)

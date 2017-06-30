@@ -109,6 +109,8 @@ class DpClusterRepo @Inject()(
 
     def name = column[String]("name")
 
+    def dcName = column[String]("dc_name")
+
     def description = column[String]("description")
 
     def ambariUrl = column[String]("ambari_url")
@@ -138,6 +140,7 @@ class DpClusterRepo @Inject()(
     def * =
       (id,
        name,
+       dcName,
        description,
        ambariUrl,
        locationId,

@@ -1,6 +1,7 @@
 export class Lake {
   id: number;
   name: string;
+  dcName: string;
   description: string;
   location: number;
   createdBy: string;

@@ -98,9 +98,9 @@ object AppModule extends AbstractModule {
   @Provides
   @Singleton
   def provideAmbariRoute(storageInterface: StorageInterface,
-                         config: Config,clusterService: ClusterService,
+                         config: Config,clusterService: ClusterService,dpClusterService: DpClusterService,
                          wSClient: WSClient): AmbariRoute = {
-    new AmbariRoute(wSClient, storageInterface,clusterService ,config)
+    new AmbariRoute(wSClient, storageInterface,clusterService, dpClusterService,config)
   }
 
   @Provides
