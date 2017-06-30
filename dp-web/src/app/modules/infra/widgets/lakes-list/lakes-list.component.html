@@ -21,6 +21,9 @@
             <dp-config-sorter [sortBy]="'city'">  {{"common.location" | translate}} </dp-config-sorter>
           </th>
           <th class="mdl-data-table__cell--non-numeric">
+            <dp-config-sorter [sortBy]="'dataCenter'">  {{"pages.infra.labels.dataCenter" | translate}} </dp-config-sorter>
+          </th>
+          <th class="mdl-data-table__cell--non-numeric">
               <dp-config-sorter [type]="'number'" [sortBy]="'nodes'"> {{"pages.infra.labels.nodes" | translate}} </dp-config-sorter>
           </th>
           <th class="mdl-data-table__cell--non-numeric">
@@ -42,14 +45,15 @@
             </td>
             <td class="mdl-data-table__cell--non-numeric key-column mdl-data-table__cell--width15" (click)="viewDetails(lakeInfo.lakeId)">{{lakeInfo.name}}</td>
             <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.city}},&nbsp;{{lakeInfo.country}}</td>
+            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.dataCenter}}</td>
             <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.nodes}}</td>
             <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.uptimeStr}}</td>
             <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.services}}</td>
             <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.hdfsUsed}}/{{lakeInfo.hdfsTotal}}</td>
             <td class="mdl-data-table__cell--non-numeric actions">
-                  <button [attr.id]="'dropDown_'+lakeInfo.name" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
+                  <button [attr.id]="'dropDown_'+lakeInfo.id" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
                   <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i></button>
-                  <ul mdl class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+lakeInfo.name">
+                  <ul mdl class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+lakeInfo.id">
                       <li class="mdl-menu__item"><i class="fa fa-external-link"></i><a href="{{lakeInfo.ambariUrl}}" target="_blank">Go to Ambari</a></li>
                       <li class="mdl-menu__item" (click)="refresh(lakeInfo)"><i class="fa__fa-close--icon fa fa-refresh"></i>Refresh</li>
                   </ul>

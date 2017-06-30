@@ -149,6 +149,7 @@ input[type="text"].dp-input-url:focus {
   margin-bottom: 20px;
   .fa-check-circle {
     font-size: 24px;
+    color: $forest-green-1;
   }
   .fa-remove {
     color: $dusty-gray;
@@ -157,6 +158,25 @@ input[type="text"].dp-input-url:focus {
   .text-medium {
     font-weight: 500;
     color: $forest-green-1;
+  }
+}
+
+.error-notification-bar {
+  padding: 15px;
+  background: #F5F5F5;
+  height: 34px;
+  margin-bottom: 20px;
+  .fa-times-circle {
+    font-size: 24px;
+    color: $roman-red;
+  }
+  .fa-remove {
+    color: $dusty-gray;
+    cursor: pointer;
+  }
+  .text-medium {
+    font-weight: 500;
+    color: $roman-red;
   }
 }
 

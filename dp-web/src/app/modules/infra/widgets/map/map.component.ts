@@ -50,7 +50,7 @@ export class MapComponent implements OnChanges, OnInit {
 
   defaultMapSizes: MapDimensions[] = [
     new MapDimensions('240px', '420px', 0.5),
-    new MapDimensions('360px', '540px', 1),
+    new MapDimensions('420px', '540px', 1),
     new MapDimensions('480px', '680px', 1.3),
     new MapDimensions('500px', '60%', 1.54)
   ];
