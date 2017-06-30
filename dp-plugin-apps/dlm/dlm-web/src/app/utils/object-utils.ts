@@ -21,3 +21,5 @@ export const omitEmpty = (obj) => Object.keys(obj).reduce((result, key) => {
   }
   return result;
 }, {});
+
+export const isEmpty = (obj) => Object.keys(obj).length === 0;

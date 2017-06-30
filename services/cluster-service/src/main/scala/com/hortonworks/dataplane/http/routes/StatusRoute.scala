@@ -7,7 +7,7 @@ import javax.inject.Inject
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import com.hortonworks.dataplane.commons.domain.Constants
-import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
+import com.hortonworks.dataplane.commons.domain.Entities.{HJwtToken, DataplaneClusterIdentifier}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.{ClusterSync, StorageInterface}
 import com.hortonworks.dataplane.http.BaseRoute
@@ -183,15 +183,15 @@ class StatusRoute @Inject()(val ws: WSClient,
     path("cluster" / "sync") {
       extractRequest { request =>
         post {
-          entity(as[DataplaneCluster]) { dl =>
-            if (dl.id.isEmpty)
+          if (dl.id.isEmpty)
               complete(StatusCodes.UnprocessableEntity)
             else {
-              val header = request.getHeader(Constants.DPTOKEN)
-              val token =  if(header.isPresent) Some(HJwtToken(header.get().value())) else None
-              dpClusterSync.triggerSync(dl.id.get,token)
-              complete(success(Map("status" -> 200)))
-            }
+          entity(as[DataplaneClusterIdentifier]) { dl =>
+            val header = request.getHeader(Constants.DPTOKEN)
+            val token =  if(header.isPresent) Some(HJwtToken(header.get().value())) else None
+            dpClusterSync.triggerSync(dl.id,token)
+            complete(success(Map("status" -> 200)))
+           }
           }
         }
       }
