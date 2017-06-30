@@ -1,4 +1,4 @@
-<div #sideNav class="sidenav"  *ngIf="personaTabs && personaTabs.length > 0" [ngClass]="{'collpased': collapseSideNav}">
+<div #sideNav class="sidenav"  [ngClass]="{'collpased': collapseSideNav}">
 
   <div class="dp-header-logo borderBox">
     <img #personaNavSrc *ngIf="activePersonaImageName" [attr.src]="'../../../assets/images/' + activePersonaImageName" alt="Hortonworks Dataplane"/>

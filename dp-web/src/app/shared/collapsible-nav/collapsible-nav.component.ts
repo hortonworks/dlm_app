@@ -17,8 +17,8 @@ export class CollapsibleNavComponent implements OnInit {
   activeTabName: string = '';
   personaTabs: PersonaTabs[];
   activePersona: Persona;
-  activePersonaName: string = 'Infra Admin';
-  activePersonaImageName: string = 'infra-logo.png';
+  activePersonaName: string;
+  activePersonaImageName: string;
 
   @Input() headerData:HeaderData;
 
@@ -38,8 +38,11 @@ export class CollapsibleNavComponent implements OnInit {
     this.activePersona = null;
     this.activeTabName = null;
 
-    if (!this.findPersonaAndTabName(url, true)) {
-      this.findPersonaAndTabName(url, false)
+    if (!this.findPersonaAndTabName(url, true) && !this.findPersonaAndTabName(url, false)) {
+      //TODO This should be configurable ?
+      this.activePersonaName = 'Infra Admin';
+      this.activePersonaImageName = 'infra-logo.png';
+      this.collapsibleNavService.collpaseSideNav.next(true);
     }
   }
 
@@ -70,7 +73,6 @@ export class CollapsibleNavComponent implements OnInit {
     if (persona.tabs.length > 0 ) {
       this.showPersona = false;
       this.router.navigate([persona.tabs[0].URL]);
-      this.collapsibleNavService.collpaseSideNav.next(persona.tabs[0].collapseSideNav);
     } else {
       if (persona.tabs.length === 0 && persona.url.length > 0) {
         window.location.pathname = persona.url;
