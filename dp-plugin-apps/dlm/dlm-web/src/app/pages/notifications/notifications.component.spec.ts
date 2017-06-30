@@ -21,6 +21,7 @@ import { PolicyStatusFmtPipe } from 'pipes/policy-status-fmt.pipe';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 import { ModalModule } from 'ng2-bootstrap';
 import { ModalDialogBodyComponent } from 'common/modal-dialog/modal-dialog-body.component';
+import { LogModalDialogComponent } from 'components/log-modal-dialog/log-modal-dialog.component';
 
 describe('NotificationsPageComponent', () => {
   let component: NotificationsPageComponent;
@@ -50,7 +51,8 @@ describe('NotificationsPageComponent', () => {
         FmtTzPipe,
         PolicyStatusFmtPipe,
         ModalDialogComponent,
-        ModalDialogBodyComponent
+        ModalDialogBodyComponent,
+        LogModalDialogComponent
       ],
       providers: [
         {provide: Store, useClass: MockStore},

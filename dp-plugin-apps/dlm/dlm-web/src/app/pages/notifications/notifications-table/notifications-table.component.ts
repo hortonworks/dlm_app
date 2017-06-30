@@ -5,13 +5,12 @@ import { TableComponent } from 'common/table/table.component';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
-import { ModalSize } from 'common/modal-dialog/modal-dialog.size';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers/index';
 import { Log } from 'models/log.model';
 import { getAllLogs } from 'selectors/log.selector';
-import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 import { loadLogs } from 'actions/log.action';
+import { LogModalDialogComponent } from 'components/log-modal-dialog/log-modal-dialog.component';
 
 
 @Component({
@@ -26,11 +25,9 @@ export class NotificationsTableComponent implements OnInit {
   @ViewChild('entityTemplate') entityTemplate: TemplateRef<any>;
   @ViewChild('logTemplate') logTemplate: TemplateRef<any>;
   @ViewChild('notificationsTable') notificationsTable: TableComponent;
-  @ViewChild('logModalDialog') logModalDialog: ModalDialogComponent;
+  @ViewChild('logModalDialog') logModalDialog: LogModalDialogComponent;
   selectedEvent$: BehaviorSubject<Event> = new BehaviorSubject(<Event>{});
   logMessage$: Observable<string>;
-  showLogModal = false;
-  modalSize = ModalSize.LARGE;
   @Input() events: Event[];
   @Input() clusters: Cluster[];
 
@@ -41,7 +38,7 @@ export class NotificationsTableComponent implements OnInit {
         if (filteredLogs.length) {
           return filteredLogs[0].message;
         }
-        return t.instant('common.errors.no_log');
+        return '';
       });
     });
   }

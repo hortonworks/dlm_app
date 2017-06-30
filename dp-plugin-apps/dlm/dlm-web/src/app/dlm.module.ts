@@ -104,6 +104,8 @@ import { CreatePairingCardComponent } from './pages/pairings/components/create-p
 import { PairingProgressCardComponent } from './pages/pairings/components/pairing-progress-card/pairing-progress-card.component';
 import { CreatePairingCardListComponent } from './pages/pairings/components/create-pairing-card-list/create-pairing-card-list.component';
 
+import { LogModalDialogComponent } from 'components/log-modal-dialog/log-modal-dialog.component';
+
 import { TranslateModule } from '@ngx-translate/core';
 import { MomentModule } from 'angular2-moment';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
@@ -213,6 +215,7 @@ import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
     ModalDialogComponent,
     ModalDialogBodyComponent,
     NotificationsComponent,
+    LogModalDialogComponent,
 
     BytesSizePipe,
     FmtTzPipe,

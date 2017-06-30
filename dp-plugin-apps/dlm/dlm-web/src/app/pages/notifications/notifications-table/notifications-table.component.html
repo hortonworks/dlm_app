@@ -34,16 +34,5 @@
   <span></span>
 </ng-template>
 
-<dlm-modal-dialog #logModalDialog
-  [title]=" 'page.notifications.table.column.log' "
-  [modalSize]="modalSize"
-  [showCancel]="false">
-  <dlm-modal-dialog-body>
-    <pre *ngIf="(logMessage$ | async)" class="error-message">
-      {{logMessage$ | async}}
-    </pre>
-    <div *ngIf="!(logMessage$ | async)" class="alert alert-warning" role="alert">
-      {{ "common.errors.no_log" | translate }}
-    </div>
-  </dlm-modal-dialog-body>
-</dlm-modal-dialog>
+<dlm-log-modal-dialog #logModalDialog [message]="logMessage$ | async">
+</dlm-log-modal-dialog>
