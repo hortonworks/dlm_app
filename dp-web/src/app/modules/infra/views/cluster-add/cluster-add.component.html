@@ -82,6 +82,17 @@
                    (valueChanged)="onSelectLocation(location)" [(ngModel)]="searchTerm"/>
           </div>
           <div class="form-group">
+            <label class="required">{{"pages.infra.labels.dcName" | translate}}</label>
+            <div class="hwx-desc">
+              {{"pages.infra.description.dcName" | translate}}
+              <span *ngIf="!dcName">
+                -
+                This field is required.
+              </span>
+            </div>
+            <input class="dp-input" name="dcName" type="text" [(ngModel)]="dcName" required/>
+          </div>
+          <div class="form-group">
             <label class="required">{{"common.tags" | translate}} </label>
             <div class="hwx-desc">{{"pages.infra.description.tags" | translate}}</div>
             <tagging-widget id="tags" [tags]="cluster.tags" [clearOnSearch]="true" (onNewSearch)="onNewTagAddition($event)"></tagging-widget>
