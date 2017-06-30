@@ -182,16 +182,12 @@ class StatusRoute @Inject()(val ws: WSClient,
   val sync =
     path("cluster" / "sync") {
       extractRequest { request =>
-        post {
-          if (dl.id.isEmpty)
-              complete(StatusCodes.UnprocessableEntity)
-            else {
-          entity(as[DataplaneClusterIdentifier]) { dl =>
+        entity(as[DataplaneClusterIdentifier]) { dl =>
+          post {
             val header = request.getHeader(Constants.DPTOKEN)
-            val token =  if(header.isPresent) Some(HJwtToken(header.get().value())) else None
-            dpClusterSync.triggerSync(dl.id,token)
+            val token = if (header.isPresent) Some(HJwtToken(header.get().value())) else None
+            dpClusterSync.triggerSync(dl.id, token)
             complete(success(Map("status" -> 200)))
-           }
           }
         }
       }
