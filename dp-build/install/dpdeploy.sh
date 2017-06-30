@@ -96,10 +96,10 @@ init_knox() {
     fi
     docker exec -t ${KNOX_CONTAINER_ID} ./wait_for_keystore_file.sh
     mkdir -p ${CERTS_DIR}
-    export_knox_cert $MASTER_PASSWD $KNOX_CONTAINER_ID > ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
+    export_knox_cert ${MASTER_PASSWORD} ${KNOX_CONTAINER_ID} > ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
     if [ ${USE_TEST_LDAP} == "no" ]
     then
-        docker exec -t ${KNOX_CONTAINER_ID} ./setup_knox_sso_conf.sh
+        docker exec -it ${KNOX_CONTAINER_ID} ./setup_knox_sso_conf.sh
     fi
 	echo "Knox Initialized"
 }
