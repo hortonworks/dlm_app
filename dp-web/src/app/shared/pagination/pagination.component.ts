@@ -5,7 +5,7 @@ import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '
   templateUrl: './pagination.component.html',
   styleUrls: ['./pagination.component.scss']
 })
-export class SimplePaginationWidget implements OnChanges {
+export class SimplePaginationWidget {
   infinity: number = Infinity;
   @Input() pageSize: number;
   @Input() pageSizeOptions: number[] = [10, 20, 50, 100, 200, 500];
@@ -13,24 +13,13 @@ export class SimplePaginationWidget implements OnChanges {
   @Input() count: number;
   @Output('onPageChange') indexEmitter: EventEmitter<number> = new EventEmitter<number>();
   @Output('onPageSizeChange') pageSizeEmitter: EventEmitter<number> = new EventEmitter<number>();
-  isInit = true;
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['count'] && !this.isInit) {
-      this.isInit = false;
-      if (this.count < this.pageSize) {
-        let startIndex = Math.floor(this.count / this.pageSize) * this.pageSize;
-        this.indexEmitter.emit(this.pageStartIndex = startIndex);
-      }
-    }
-  }
 
   get start(): number {
-    return Math.min(this.count, this.pageStartIndex + 1);
+    return Math.min(this.count, this.pageStartIndex);
   }
 
   get end(): number {
-    return Math.min(this.count, this.pageSize + this.pageStartIndex);
+    return Math.min(this.count, this.pageSize + this.pageStartIndex - 1);
   }
 
   get showPagination(): boolean {
@@ -42,11 +31,17 @@ export class SimplePaginationWidget implements OnChanges {
   }
 
   previous() {
-    (this.pageStartIndex > 1) && this.indexEmitter.emit(this.pageStartIndex -= this.pageSize);
+    if (this.start > 1) {
+      this.pageStartIndex = this.pageStartIndex - this.pageSize;
+      this.indexEmitter.emit(this.pageStartIndex);
+    }
   }
 
   next() {
-    (this.pageStartIndex + this.pageSize <= this.count) && this.indexEmitter.emit(this.pageStartIndex += this.pageSize);
+    if (this.end !== this.count) {
+      this.pageStartIndex = this.pageStartIndex + this.pageSize;
+      this.indexEmitter.emit(this.pageStartIndex);
+    }
   }
 
   Math: any;

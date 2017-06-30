@@ -43,7 +43,7 @@
   </div>
   <simple-pagination *ngIf="users"
   [pageSize]="pageSize"
-  [pageStartIndex]="offset"
+  [pageStartIndex]="start"
   [count]="total"
   (onPageSizeChange)="onPageSizeChange($event)"
   (onPageChange)="onPageChange($event)"

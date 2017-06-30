@@ -42,8 +42,13 @@ export class UserManagementComponent implements OnInit {
 
   onSearch(event) {
     if (event.keyCode === 13) {
+      this.offset = 0;
       this.getUsers();
     }
+  }
+
+  get start(){
+    return this.offset + 1;
   }
 
   onPageSizeChange(pageSize){
@@ -53,7 +58,7 @@ export class UserManagementComponent implements OnInit {
   }
 
   onPageChange(offset){
-    this.offset = offset;
+    this.offset = offset - 1;
     this.getUsers();
   }
 
