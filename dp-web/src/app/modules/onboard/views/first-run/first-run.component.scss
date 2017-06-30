@@ -1,4 +1,32 @@
-h1 {
-  margin: 10px 0;
-  font-size: 3em;
+@import "../../../../../styles/variables";
+
+.feature-intro {
+  & .hwx-title {
+    color: $forest-green-1;
+    font-size: 30px;
+    margin-top: 5px;
+  }
+  & .intro-list {
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+    line-height: 1;
+    & > li {
+      background: $white;
+      margin: 2px 0;
+      padding: 20px 20px 10px;
+
+      & > i.fa {
+        font-size: 15px;
+        color: $forest-green-1;
+
+        & + div {
+          margin-left: 35px;
+          & .hwx-subtitle {
+            font-weight: 500;
+          }
+        }
+      }
+    }
+  }
 }
