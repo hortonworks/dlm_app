@@ -75,6 +75,7 @@ object Entities {
   case class DataplaneCluster(
       id: Option[Long] = None,
       name: String,
+      dcName: String,
       description: String,
       ambariUrl: String,
       location: Option[Long],

@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS dataplane.locations (
 CREATE TABLE IF NOT EXISTS dataplane.dp_clusters (
   id           BIGSERIAL PRIMARY KEY,
   name         VARCHAR(255)                               NOT NULL,
+  dc_name      VARCHAR(255)                               NOT NULL,
   description  TEXT,
   ambari_url   VARCHAR(255)                               NOT NULL,
   location_id  BIGINT REFERENCES dataplane.locations (id) NOT NULL,
@@ -59,6 +60,8 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_clusters (
   is_datalake  BOOLEAN                                             DEFAULT FALSE,
   knox_enabled BOOLEAN                                             DEFAULT FALSE,
   knox_url     VARCHAR(255),
+
+  CONSTRAINT unique_name_and_dc_name_constraint UNIQUE (name, dc_name),
   CHECK (state IN ('TO_SYNC', 'SYNC_IN_PROGRESS', 'SYNCED', 'SYNC_ERROR'))
 );
 

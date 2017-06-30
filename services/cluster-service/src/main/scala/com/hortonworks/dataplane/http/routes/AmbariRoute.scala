@@ -35,6 +35,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
       extends DataplaneCluster(
         id = None,
         name = "",
+        dcName = "",
         description = "",
         ambariUrl = ambariDetailRequest.url,
         createdBy = None,
