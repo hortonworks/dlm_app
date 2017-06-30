@@ -69,7 +69,7 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
   }
 
   def delete(datasetId: Long) = Action.async { req =>
-    val future = datasetRepo.deleteById(datasetId)
+    val future = datasetRepo.archiveById(datasetId)
     future.map(i => success(i)).recoverWith(apiError)
   }
 

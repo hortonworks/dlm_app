@@ -153,13 +153,14 @@ CREATE TABLE IF NOT EXISTS dataplane.datasets (
   createdby    BIGINT REFERENCES dataplane.users (id)             NOT NULL,
   createdon    TIMESTAMP DEFAULT now()                            NOT NULL,
   lastmodified TIMESTAMP DEFAULT now()                            NOT NULL,
+  active       BOOLEAN DEFAULT TRUE,
   version      SMALLINT DEFAULT 1,
   custom_props JSONB
 );
 
 CREATE TABLE IF NOT EXISTS dataplane.dataset_categories (
-  category_id BIGINT REFERENCES dataplane.categories (id) NOT NULL,
-  dataset_id  BIGINT REFERENCES dataplane.datasets (id)   NOT NULL
+  category_id BIGINT REFERENCES dataplane.categories (id) ON DELETE CASCADE NOT NULL,
+  dataset_id  BIGINT REFERENCES dataplane.datasets (id) ON DELETE CASCADE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS dataplane.unclassified_datasets (
@@ -182,9 +183,9 @@ CREATE TABLE IF NOT EXISTS dataplane.data_asset (
   id               BIGSERIAL PRIMARY KEY,
   asset_type       VARCHAR(100) NOT NULL,
   asset_name       TEXT        NOT NULL,
-  guid             VARCHAR(100) UNIQUE NOT NULL,
+  guid             VARCHAR(100) NOT NULL,
   asset_properties JSONB       NOT NULL,
-  dataset_id       BIGINT REFERENCES dataplane.datasets (id) DEFAULT NULL,
+  dataset_id       BIGINT REFERENCES dataplane.datasets (id) ON DELETE CASCADE DEFAULT NULL,
   cluster_id       BIGINT REFERENCES dataplane.discovered_clusters (id) NOT NULL
 );
 
@@ -192,7 +193,7 @@ CREATE TABLE IF NOT EXISTS dataplane.data_asset (
 CREATE TABLE IF NOT EXISTS dataplane.dataset_details (
   id         BIGSERIAL,
   details    JSONB,
-  dataset_id BIGINT REFERENCES dataplane.datasets (id)
+  dataset_id BIGINT REFERENCES dataplane.datasets (id) ON DELETE CASCADE
 );
 
 
