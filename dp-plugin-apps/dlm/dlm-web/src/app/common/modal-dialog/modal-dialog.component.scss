@@ -3,3 +3,15 @@
     outline: 0;
   }
 }
+
+.modal-dialog {
+  &.small-modal {
+    width: 40%;
+  }
+  &.medium-modal {
+    width: 50%;
+  }
+  &.large-modal {
+    width: 70%;
+  }
+}

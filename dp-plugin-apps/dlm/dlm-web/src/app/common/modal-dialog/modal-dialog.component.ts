@@ -3,13 +3,14 @@ import {
   HostListener
 } from '@angular/core';
 import { ModalDirective } from 'ng2-bootstrap';
+import { ModalSize, SIZE_CLASS_MAP } from './modal-dialog.size';
 
 @Component({
   selector: 'dlm-modal-dialog',
   styleUrls: ['./modal-dialog.component.scss'],
   template: `
     <div bsModal #childModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-      <div class="modal-dialog">
+      <div [ngClass]="['modal-dialog', modalSizeClassMap[modalSize]]">
         <div class="modal-content">
           <div class="modal-header">
             <h4 class="modal-title pull-left">{{ title | translate }}</h4>
@@ -35,6 +36,8 @@ import { ModalDirective } from 'ng2-bootstrap';
 export class ModalDialogComponent implements OnInit, OnChanges {
   @ViewChild('childModal') public childModal: ModalDirective;
 
+  size = ModalSize;
+  modalSizeClassMap = SIZE_CLASS_MAP;
   // Ok and Cancel buttons are shown by default
   // and can be overridden by respective inputs
   @Input() title: string;
@@ -48,6 +51,7 @@ export class ModalDialogComponent implements OnInit, OnChanges {
   @Input() showIgnore = false;
   @Input() showDelete = false;
   @Input() showDialog = false;
+  @Input() modalSize = this.size.SMALL;
   @Output() onOk = new EventEmitter<boolean>();
   @Output() onDelete = new EventEmitter<boolean>();
   @Output() onIgnore = new EventEmitter<boolean>();

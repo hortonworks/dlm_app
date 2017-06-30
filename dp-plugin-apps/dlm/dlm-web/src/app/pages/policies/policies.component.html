@@ -8,6 +8,7 @@
       <div class="filter-item" *ngIf="(policies$ | async)?.length > 0">
         <dlm-table-filter
           [filterBy]="filterBy"
+          [initialFilters]="initialFilters"
           [data]="filteredPolicies$ | async"
           (onFilter)="onFilter($event)"></dlm-table-filter>
       </div>

@@ -10,6 +10,7 @@ export interface ClusterStats {
 export interface Cluster {
   id: number;
   name: string;
+  dataCenter: string;
   ambariurl: string;
   description: string;
   location: Location;
