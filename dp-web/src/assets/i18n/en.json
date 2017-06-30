@@ -35,6 +35,7 @@
       "infra" : "Infra Admin",
       "dlm":"DLM"
     },
+    "noResults": "No Results to display.",
     "pagination" : {
       "rowsPerPage" : "Rows per page"
     }

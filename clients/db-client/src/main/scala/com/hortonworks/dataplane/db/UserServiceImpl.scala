@@ -66,7 +66,7 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
   }
   private def mapToUsersWithRoles(res: WSResponse) = {
     res.status match {
-      case 200 => Right((res.json \ "results").validate[Seq[UserInfo]].get)
+      case 200 => Right((res.json \ "results").validate[UsersList].get)
       case _ => mapErrors(res)
     }
   }
@@ -151,8 +151,9 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       }
   }
 
-  override  def getUsersWithRoles(): Future[Either[Errors,Seq[UserInfo]]]={
+  override  def getUsersWithRoles(offset: Option[String], pageSize: Option[String], searchTerm: Option[String]): Future[Either[Errors,UsersList]]={
     ws.url(s"$url/users/all")
+      .withQueryString("offset" -> offset.getOrElse("0"), "pageSize" -> pageSize.getOrElse("10"), "searchTerm" -> searchTerm.getOrElse("") )
       .withHeaders("Accept" -> "application/json")
       .get()
       .map{res=>

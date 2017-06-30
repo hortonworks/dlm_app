@@ -1,4 +1,4 @@
-<span class="paginationRow">
+<span class="paginationRow" *ngIf="showPagination">
   <span>{{"common.pagination.rowsPerPage" | translate}}</span>
   <span class="pageSizeSpan">
     <select [(ngModel)]="pageSize" (change)="pageSizeChange()">
@@ -6,7 +6,7 @@
     </select>
   </span>&nbsp;&nbsp;&nbsp;&nbsp;
   <span *ngIf="count!=infinity">
-    <span>{{Math.min(count,pageStartIndex) + "-" + Math.min(count,(pageSize +pageStartIndex -1)) +" of " + count}}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+    <span>{{start + "-" + end +" of " + count}}</span>&nbsp;&nbsp;&nbsp;&nbsp;
   </span>
   <i class="fa fa-chevron-left" (click)="previous()"></i>&nbsp;&nbsp;
   <i class="fa fa-chevron-right" (click)="next()"></i>

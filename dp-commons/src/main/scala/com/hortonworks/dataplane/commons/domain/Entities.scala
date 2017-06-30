@@ -31,6 +31,8 @@ object Entities {
                   created: Option[LocalDateTime] = Some(LocalDateTime.now()),
                   updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
+  case class UsersList( total: Int, users: Seq[UserInfo])
+
   case class UserInfo(id: Option[Long] = None,
                   userName: String,
                   displayName: String,
@@ -399,5 +401,7 @@ object JsonFormatters {
   implicit val userInfoReads = Json.reads[UserInfo]
   implicit val userInfoWrites = Json.writes[UserInfo]
 
+  implicit val usersListWrites = Json.writes[UsersList]
+  implicit  val usersListReads = Json.reads[UsersList]
 
 }

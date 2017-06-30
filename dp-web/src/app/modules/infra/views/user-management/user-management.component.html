@@ -5,7 +5,7 @@
   <router-outlet name="sidebar"></router-outlet>
   <div class="pull-right action-bar">
     <div  class="search-input">
-      <input  id="search" name="name" type="text" placeholder="{{'common.search' | translate}}">
+      <input  id="search" name="name" type="text" placeholder="{{'common.search' | translate}}" [(ngModel)]="searchTerm" (keyup)="onSearch($event)"/>
       <i aria-hidden="true" class="fa fa-search dp-input__icon"></i>
     </div>
     <dp-dropdown></dp-dropdown>
@@ -35,9 +35,19 @@
             </ul>
           </td>
         </tr>
+        <tr *ngIf="users.length === 0">
+          <td class="center" colspan="5">{{"common.noResults" | translate}}</td>
+        </tr>
       </tbody>
     </table>
   </div>
+  <simple-pagination *ngIf="users"
+  [pageSize]="pageSize"
+  [pageStartIndex]="offset"
+  [count]="total"
+  (onPageSizeChange)="onPageSizeChange($event)"
+  (onPageChange)="onPageChange($event)"
+  ></simple-pagination>
 
 </div>
 
