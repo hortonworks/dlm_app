@@ -6,6 +6,7 @@ import javax.inject.Inject
 
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
+import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.commons.domain.Entities.{HJwtToken, DataplaneClusterIdentifier}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.{ClusterSync, StorageInterface}
@@ -52,7 +53,7 @@ class StatusRoute @Inject()(val ws: WSClient,
           req.get()
         }
 
-        val tokenInfoHeader = request.getHeader("X-DP-Token-Info")
+        val tokenInfoHeader = request.getHeader(Constants.DPTOKEN)
         if (!tokenInfoHeader.isPresent) {
           logger.error(
             "Knox was detected, but the called did not send a JWT token with the request header X-DP-Token-Info")
@@ -182,11 +183,15 @@ class StatusRoute @Inject()(val ws: WSClient,
     path("cluster" / "sync") {
       extractRequest { request =>
         post {
+          if (dl.id.isEmpty)
+              complete(StatusCodes.UnprocessableEntity)
+            else {
           entity(as[DataplaneClusterIdentifier]) { dl =>
-            val header = request.getHeader("X-DP-Token-Info")
+            val header = request.getHeader(Constants.DPTOKEN)
             val token =  if(header.isPresent) Some(HJwtToken(header.get().value())) else None
             dpClusterSync.triggerSync(dl.id,token)
             complete(success(Map("status" -> 200)))
+           }
           }
         }
       }
