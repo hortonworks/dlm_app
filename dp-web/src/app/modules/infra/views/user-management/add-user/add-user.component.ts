@@ -2,8 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {UserService} from '../../../../../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {TagTheme} from '../../../../../shared/tagging-widget/tagging-widget.component';
+import {TaggingWidgetTagModel, TagTheme} from '../../../../../shared/tagging-widget/tagging-widget.component';
 import {User} from '../../../../../models/user';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'dp-add-user',
@@ -12,31 +13,38 @@ import {User} from '../../../../../models/user';
 })
 export class AddUserComponent implements OnInit {
   users: string[] = [];
-  roles: string[] = [];
+  roles: TaggingWidgetTagModel[] = [];
   modes = Modes;
   mode = Modes.ADD;
   userName: string;
 
   availableUsers: string[] = [];
-  availableRoles: string[] = [];
+  availableRoles: TaggingWidgetTagModel[] = [];
 
-  allRoles: string[] = [];
+  allRoles: TaggingWidgetTagModel[] = [];
 
   tagTheme = TagTheme;
   user: User = new User('', '', '', '', [], false, '');
+  userRoles: TaggingWidgetTagModel[] = [];
 
-  constructor(private userService: UserService, private router: Router, private route: ActivatedRoute) {
+  constructor(private userService: UserService, private router: Router, private route: ActivatedRoute, private translateService: TranslateService) {
   }
 
   ngOnInit() {
     this.userName = this.route.snapshot.params['name'];
     if (this.userName) {
       this.mode = Modes.EDIT;
-      this.userService.getUserByName(this.userName).subscribe(user => this.user = user);
+      this.userService.getUserByName(this.userName).subscribe(user => {
+        this.user = user;
+        let roles = [];
+        this.user.roles.forEach(role =>{
+          this.userRoles.push(new TaggingWidgetTagModel(this.translateService.instant(`common.roles.${role}`), role));
+        });
+      });
     }
     this.userService.getAllRoles().subscribe(roles => {
       this.allRoles = roles.map(role => {
-        return role.roleName;
+        return new TaggingWidgetTagModel(this.translateService.instant(`common.roles.${role.roleName}`),role.roleName);
       })
     });
   }
@@ -59,25 +67,28 @@ export class AddUserComponent implements OnInit {
     }
   }
 
-  onNewRoleAddition(text: string) {
-    this.roles.push(text);
+  onNewRoleAddition(tag: TaggingWidgetTagModel) {
+    this.roles.push(tag);
   }
 
-  onRolesEdit(text: string) {
-    this.user.roles.push(text);
+  onRolesEdit(tag: TaggingWidgetTagModel) {
+    this.userRoles.push(tag);
   }
 
   onRoleSearchChange(text: string) {
     this.availableRoles = [];
     if (text && text.length > 2) {
       this.availableRoles = this.allRoles.filter(role => {
-        return role.toLowerCase().startsWith(text.toLowerCase());
+        return role.display.toLowerCase().startsWith(text.toLowerCase());
       });
     }
   }
 
   save() {
     if (this.mode as Modes === Modes.EDIT) {
+      this.user.roles = this.userRoles.map(role => {
+        return role.data
+      });
       this.userService.updateUser(this.user).subscribe(user => {
         this.userService.dataChanged.next();
         this.router.navigate(['/infra/users']);
@@ -85,7 +96,10 @@ export class AddUserComponent implements OnInit {
         console.error('error')
       });
     } else {
-      this.userService.addUsers(this.users, this.roles).subscribe(response => {
+      let roles = this.roles.map(role => {
+        return role.data;
+      });
+      this.userService.addUsers(this.users, roles).subscribe(response => {
         this.userService.dataChanged.next();
         this.router.navigate(['/infra/users']);
       }, error => {

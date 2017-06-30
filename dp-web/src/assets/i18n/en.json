@@ -29,7 +29,7 @@
     "moreLink" : "Learn More",
     "save": "SAVE",
     "cancel" : "Cancel",
-    "defaultRequiredFields": "Please fill in all the required fields marked with '*'",
+    "defaultRequiredFields": "Please fill in mandatory fields marked with '*'",
     "sidenav" : {
       "analyst" : "Analyst",
       "infra" : "Infra Admin",
@@ -37,6 +37,12 @@
     },
     "pagination" : {
       "rowsPerPage" : "Rows per page"
+    },
+    "roles" : {
+      "SUPERADMIN": "Super Admin",
+      "INFRAADMIN": "Cluster Admin",
+      "USER": "Consumer",
+      "CURATOR": "Data Steward"
     }
   },
   "pages" : {
@@ -52,12 +58,12 @@
         "setService" : "Setup Services"
       },
       "description" : {
-        "dataplane": "Welcome to Hortonworks Data Plane, your one-stop solution to data management. To start, you need to configure the LDAP properties in Data plane to enable dataplane to use your LDAP as the authentication database. Optionally, you can add Dataplane Administrators. Please proceed by clicking on GET STARTED",
+        "dataplane": "Welcome to Hortonworks Data Plane. To start, please configure the LDAP properties and allow dataplane authenticate against it. Optionally, you can add Dataplane Administrators. Please proceed by clicking on GET STARTED",
         "setupAuth": "The first step is to help data plane connect to your LDAP by providing the LDAP configurations to Data plane.",
-        "defineUsers": "After connecting Data plane with your LDAP, you can add administrators to Data plane. This step is optional. You can add/modify users to data plane or assign/modify their roles anytime through the User Management Screen.",
-        "addCluster" : "Add your cluster to Dataplane",
+        "defineUsers": "Upon completing the LDAP configuration, you may add administrators to Data plane. You can add users to data plane and assign or modify their roles anytime through the User Management Screen.",
+        "addCluster" : "Add Ambari Managed HDP cluster to Dataplane",
         "setService" : "Set up services to enable Dataplane to manage your data",
-        "addDataset" : "Add your datasets to Dataplane"
+        "addDataset" : "Create datasets using Dataplane Steward Studio capability"
       },
       "configure" : {
         "labels" : {
@@ -70,10 +76,10 @@
           "adminBindDN": "Administrator Bind DN",
           "adminPassword":"Administrator Password",
           "showPassword" : "Show Password",
-          "configError" : "LDAP configuration could not be saved"
+          "configError" : "Unable to save LDAP configuration. Please check and try again."
         },
         "description" : {
-          "configurationDesctiption": "The first step is to help data plane connect to your LDAP by providing the LDAP configurations to Data plane."
+          "configurationDesctiption": "The first step is to help Data Plane connect to your LDAP by providing the appropriate configurations."
         }
       },
       "adduser" : {
@@ -101,7 +107,7 @@
         "ipAddress" : "IP Address",
         "clusterLocation" : "Cluster Location",
         "clusterAddSuccess" : "Cluster Added successfully",
-        "connectionFailed" : "Not able to connect",
+        "connectionFailed" : "Unable to connect, please retry",
         "emptySearchResult" : "There are no clusters that match your search.",
         "addUser": "ADD USER",
         "username": "Username",
@@ -112,7 +118,7 @@
         "dcName": "Data Center name"
       },
       "description" :{
-        "addCluster" : "Add your Ambari managed cluster to Dataplane. This enables Dataplane to gather information about the cluster such as the name of the cluster, services running in the cluster etc.",
+        "addCluster" : "Please add Ambari managed cluster to Dataplane. Dataplane will auto-discover cluster information such as the cluster name, active services & important metrics running.",
         "datalake" : "This cluster has been indentified as a Datalake since it has data management services,  {{serviceNames}} running.",
         "clusterLocation":"Geographical location of the cluster",
         "tags" : "Tags for the cluster",
@@ -123,7 +129,7 @@
           "ambariServerDown": "Check if the Ambari server is up and running in the given url",
           "insufficientAccessRights": "Make sure that you have right access rights to the ambari server"
         },
-        "userManagement": "You can manage the users added to Dataplane through User Management. This page is only available to a user who is Dataplane Adminsitrator. You can add new users and assign them roles by clicking on ADD USER button. To activate/deactivate a user or edit roles assigned to the user, click on the username in the below list or click on the menu icon on each row in the users list.",
+        "userManagement": "You can manage the users added to Dataplane through User Management. This page is available to for the Dataplane Adminsitrator. You can add new users and assign them roles by clicking on ADD USER button. To activate/deactivate a user or to edit his roles, click on the username in the list below or click on the menu icon on the displayed rows.",
         "dcName": "Enter a convenient name for this Data Center"
       }
     },
@@ -171,7 +177,7 @@
         "summary" : "Summary",
         "fillMandatoryMsg" : "Please fill mandatory fields",
         "tagDescription" : "Add tags to your data-set for context and subsequent lookup",
-        "asset-description" : "Add related data assets into your data-set, by searching across the Data-Lake",
+        "asset-description" : "Add related data assets into your data-set, by searching across this Data-Lake",
         "action" :{
           "next" : "Next",
           "save" : "Save",
