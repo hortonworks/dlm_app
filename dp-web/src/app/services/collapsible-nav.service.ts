@@ -8,9 +8,11 @@ export class CollapsibleNavService {
   private _tabs: PersonaTabs[] = [];
   private _activeTab: PersonaTabs;
 
+  /* This event is to reload the side nav*/
   navChanged = new Subject<boolean>();
   navChanged$ = this.navChanged.asObservable();
 
+  /* This event is to expand collpase side nav some cmp like DataSet needs them to be collapsed*/
   collpaseSideNav = new Subject<boolean>();
   collpaseSideNav$ = this.collpaseSideNav.asObservable();
 

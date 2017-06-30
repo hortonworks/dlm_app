@@ -3,8 +3,8 @@ package services
 import javax.inject.{Inject, Singleton}
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.cs.Webservice.{AmbariService => AmbariClientService}
-import com.hortonworks.dataplane.commons.domain.Entities.Errors
+import com.hortonworks.dataplane.cs.Webservice.{AmbariWebService => AmbariClientService}
+import com.hortonworks.dataplane.commons.domain.Entities.{Errors, HJwtToken}
 import play.api.libs.json.JsValue
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -22,9 +22,9 @@ class AmbariService @Inject()(@Named("ambariService") val ambariService: AmbariC
     * @param clusterId cluster id
     * @return
     */
-  def getHiveDatabases(clusterId: Long) : Future[Either[Errors, JsValue]] = {
+  def getHiveDatabases(clusterId: Long)(implicit token:Option[HJwtToken]) : Future[Either[Errors, JsValue]] = {
     val url = "/views/HIVE/versions/2.0.0/instances/AUTO_HIVE20_INSTANCE/resources/ddl/databases"
-    ambariService.getAmbariResponse(clusterId, url)
+    ambariService.requestAmbariApi(clusterId, url)
   }
 
   /**
@@ -32,8 +32,8 @@ class AmbariService @Inject()(@Named("ambariService") val ambariService: AmbariC
     * @param clusterId cluster id
     * @return
     */
-  def getHiveDatabaseTables(clusterId: Long, dbName: String) : Future[Either[Errors, JsValue]] = {
+  def getHiveDatabaseTables(clusterId: Long, dbName: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors, JsValue]] = {
     val url = s"/views/HIVE/versions/2.0.0/instances/AUTO_HIVE20_INSTANCE/resources/ddl/databases/$dbName/tables"
-    ambariService.getAmbariResponse(clusterId, url)
+    ambariService.requestAmbariApi(clusterId, url)
   }
 }
