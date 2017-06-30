@@ -20,10 +20,16 @@ destroy() {
 }
 
 
-init_app() {
+read_consul_host() {
     echo "Enter the Host IP Address (Consul will bind to this host):"
     read HOST_IP;
     export CONSUL_HOST=$HOST_IP;
+}
+
+init_app() {
+    if [ "$CONSUL_HOST" == "" ]; then
+        read_consul_host
+    fi
     docker-compose -f docker-compose-apps.yml up -d
 }
 
