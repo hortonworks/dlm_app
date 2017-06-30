@@ -3,9 +3,7 @@ import { Action } from '@ngrx/store';
 import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
 
 export const ActionTypes = {
-  LOAD_LOGS: requestType('LOAD_LOGS'),
-  LOAD_LOGS_SUCCESS: type('LOAD_LOGS_SUCCESS'),
-  LOAD_LOGS_FAIL: type('LOAD_LOGS_FAIL')
+  LOAD_LOGS: requestType('LOAD_LOGS')
 };
 
 export const loadLogs = (clusterId, instanceId, requestId?): Action => ({

@@ -16,24 +16,14 @@ export class ClusterService {
 
   fetchClusters(): Observable<any> {
     return mapResponse(this.http.get('clusters')).map(response => {
-      response.clusters.map( cluster => {
-        return {
-          ...cluster,
-          ...this.normalizeCluster(cluster)
-        };
-      });
+      response.clusters.map(cluster => this.normalizeCluster(cluster));
       return response;
     });
   }
 
   fetchCluster(id: string): Observable<any> {
     return mapResponse(this.http.get(`clusters/${id}`)).map(response => {
-      response.clusters.map( cluster => {
-        return {
-          ...cluster,
-          ...this.normalizeCluster(cluster)
-        };
-      });
+      response.clusters.map( cluster => this.normalizeCluster(cluster));
       return response;
     });
   }

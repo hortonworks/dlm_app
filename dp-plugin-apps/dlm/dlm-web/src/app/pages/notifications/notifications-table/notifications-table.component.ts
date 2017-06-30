@@ -35,10 +35,7 @@ export class NotificationsTableComponent implements OnInit {
     this.logMessage$ = this.selectedEvent$.switchMap(selectedEvent => {
       return this.store.select(getAllLogs).map(logs => {
         const filteredLogs: Log[] = logs.filter(log => log.instanceId === selectedEvent.instanceId);
-        if (filteredLogs.length) {
-          return filteredLogs[0].message;
-        }
-        return '';
+        return filteredLogs.length ? filteredLogs[0].message : '';
       });
     });
   }
