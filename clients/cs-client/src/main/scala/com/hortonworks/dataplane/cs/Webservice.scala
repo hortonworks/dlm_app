@@ -35,15 +35,15 @@ object Webservice {
 
   trait AtlasService extends CsClientService {
 
-    def listQueryAttributes(clusterId: String): Future[Either[Errors, Seq[AtlasAttribute]]]
+    def listQueryAttributes(clusterId: String)(implicit token:Option[HJwtToken]): Future[Either[Errors, Seq[AtlasAttribute]]]
 
-    def searchQueryAssets(clusterId: String, filters: AtlasSearchQuery): Future[Either[Errors, AtlasEntities]]
+    def searchQueryAssets(clusterId: String, filters: AtlasSearchQuery)(implicit token:Option[HJwtToken]): Future[Either[Errors, AtlasEntities]]
 
-    def getAssetDetails(clusterId: String, atlasGuid: String): Future[Either[Errors, JsObject]]
+    def getAssetDetails(clusterId: String, atlasGuid: String)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsObject]]
 
-    def getTypeDefs(clusterId: String, defType: String) : Future[Either[Errors,JsObject]]
+    def getTypeDefs(clusterId: String, defType: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
 
-    def getLineage(clusterId: String, atlasGuid: String, depth: Option[String]): Future[Either[Errors,JsObject]]
+    def getLineage(clusterId: String, atlasGuid: String, depth: Option[String])(implicit token:Option[HJwtToken]): Future[Either[Errors,JsObject]]
   }
 
 
