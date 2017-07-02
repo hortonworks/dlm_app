@@ -22,7 +22,7 @@ class TokenCachingKnoxApiExecutor(c: KnoxConfig, w: WSClient) extends KnoxApiExe
   val tokenCache = CacheBuilder.newBuilder().expireAfterWrite(expiry,TimeUnit.SECONDS).build(new TokenCacheLoader())
 
 
-  protected def getKnoxApiToken(token: String):Future[TokenResponse] = {
+  def getKnoxApiToken(token: String):Future[TokenResponse] = {
     logger.info("Loading token from cache")
     tokenCache.get(token).flatMap{ tr =>
       logger.info(s"Access token loaded and expires at - ${new DateTime(tr.expires)}")

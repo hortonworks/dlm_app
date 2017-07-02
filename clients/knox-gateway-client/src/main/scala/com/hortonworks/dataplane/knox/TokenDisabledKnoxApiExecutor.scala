@@ -23,7 +23,7 @@ class TokenDisabledKnoxApiExecutor(c: KnoxConfig, w: WSClient)
   override val wSClient: WSClient = w
   override val config: KnoxConfig = c
 
-  protected def getKnoxApiToken(token: String): Future[TokenResponse] = ???
+  def getKnoxApiToken(token: String): Future[TokenResponse] = ???
 
   override def execute(knoxApiRequest: KnoxApiRequest): Future[WSResponse] = {
     val wSRequest = knoxApiRequest.request

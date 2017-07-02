@@ -1,30 +1,24 @@
 package com.hortonworks.dataplane.cs
 
-import java.net.URL
-
 import com.google.common.base.Supplier
+import com.google.common.io.BaseEncoding
 import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery, Entity}
-import com.hortonworks.dataplane.commons.domain.Entities.{ClusterServiceHost, ClusterService => CS}
-import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
+import com.hortonworks.dataplane.commons.domain.Entities.{HJwtToken, ClusterService => CS}
 import com.hortonworks.dataplane.cs.atlas.Filters
-import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService}
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
-import org.apache.atlas.{AtlasClient, AtlasClientV2}
+import org.apache.atlas.AtlasClientV2
 import org.apache.atlas.model.SearchFilter
 import org.apache.atlas.model.instance.AtlasEntityHeader
 import org.apache.atlas.model.lineage.AtlasLineageInfo.LineageDirection
 import org.codehaus.jackson.map.ObjectMapper
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsValue, Json}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
-class DefaultAtlasInterface(clusterId: Long,
-                            storageInterface: StorageInterface,
-                            clusterComponentService: ClusterComponentService,
-                            clusterHostsService: ClusterHostsService,
+class DefaultAtlasInterface(clusterId: Long,token: Option[HJwtToken],
                             config: Config)
     extends AtlasInterface {
 
@@ -48,10 +42,7 @@ class DefaultAtlasInterface(clusterId: Long,
   val includedTypes =
     config.getStringList("dp.services.atlas.hive.accepted.types").asScala.toSet
 
-  private val atlasApi = new AtlasApiSupplier(clusterId,
-                                              storageInterface,
-                                              clusterComponentService,
-                                              clusterHostsService).get()
+  private val atlasApi = new AtlasApiSupplier(clusterId,token,config).get()
 
   override def getHiveAttributes: Future[Seq[AtlasAttribute]] = {
     atlasApi.map { api =>
@@ -139,60 +130,35 @@ class DefaultAtlasInterface(clusterId: Long,
   }
 }
 
-sealed class AtlasApiSupplier(clusterId: Long,
-                              storageInterface: StorageInterface,
-                              clusterComponentService: ClusterComponentService,
-                              clusterHostsService: ClusterHostsService)
+sealed class AtlasApiSupplier(clusterId: Long,token: Option[HJwtToken],config: Config)
+
     extends Supplier[Future[AtlasClientV2]] {
   private val log = Logger(classOf[AtlasApiSupplier])
 
-  def getAtlasUrlFromConfig(service: CS): Future[URL] = Future.successful {
+  val host = Try(config.getString("dp.services.cluster.atlas.proxy.host")).getOrElse("0.0.0.0")
+  val port = Try(config.getString("dp.services.cluster.atlas.proxy.port")).getOrElse("9010")
 
-    val configsAsList = (service.properties.get \ "properties").as[List[JsObject]]
-    val atlasConfig = configsAsList.find(obj =>
-      (obj \ "type").as[String] == "application-properties")
-    if (atlasConfig.isEmpty)
-      throw ServiceNotFound("No properties found for Atlas")
-    val properties = (atlasConfig.get \ "properties").as[JsObject]
-    val apiUrl = (properties \ "atlas.rest.address").as[String]
-    new URL(apiUrl)
-  }
+  /**
+    * This part builds the proxy URL
+    * if there was a token , then a URL safe B64 encoding
+    * is applied to the token and its sent as a part of the URL
+    * if None - NONE is token is attached
+    *
+    * The URL pattern is
+    * ---------------fixed-----------cluster----fixed--token-fixed--atlas_api
+    * Token - /atlas/proxy/cluster/<cluster_id>/token/<token>/url/<atlas_part>
+    */
+
+  private val tokenString = token.map(t => t.token).getOrElse("NONE")
+  private val encoded = BaseEncoding.base64Url().omitPadding().encode(tokenString.getBytes)
+  val proxyUrl=s"http://$host:$port/atlas/proxy/cluster/$clusterId/token/$encoded/url/"
 
   override def get(): Future[AtlasClientV2] = {
-
     log.info("Loading Atlas client from Supplier")
-    for {
-      service <- getUrlOrThrowException
-      url <- getAtlasUrlFromConfig(service)
-      baseUrls <- extractUrls(url, clusterId)
-      user <- storageInterface.getConfiguration("dp.atlas.user")
-      pass <- storageInterface.getConfiguration("dp.atlas.password")
-    } yield {
-      new AtlasClientV2(baseUrls.toArray, Array(user.get, pass.get))
-    }
-  }
-
-  private def getUrlOrThrowException = {
-    clusterComponentService.getServiceByName(clusterId, "ATLAS").map {
-      case Right(endpoints) => endpoints
-      case Left(errors) =>
-        throw new Exception(
-          s"Could not get the service Url from storage - $errors")
-    }
-  }
-
-  def extractUrls(service: URL, clusterId: Long): Future[Seq[String]] = {
-
-    clusterHostsService
-      .getHostByClusterAndName(clusterId, service.getHost)
-      .map {
-        case Right(host) =>
-         Seq(s"${service.getProtocol}://${host.ipaddr}:${service.getPort}")
-        case Left(errors) =>
-          throw new Exception(
-            s"Cannot translate the hostname into an IP address $errors")
-      }
+      Future.successful(
+        // The basic auth is needed because the underlying
+        // client code is silly
+      new AtlasClientV2(Array(proxyUrl),Array("any","any")))
 
   }
-
 }

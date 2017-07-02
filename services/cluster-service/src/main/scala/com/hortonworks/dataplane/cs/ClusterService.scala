@@ -5,7 +5,7 @@ import java.util.Optional
 
 import com.google.inject.Guice
 import com.hortonworks.datapalane.consul._
-import com.hortonworks.dataplane.http.Webserver
+import com.hortonworks.dataplane.http.{AtlasProxy, Webserver}
 import com.typesafe.config.Config
 import play.api.Logger
 
@@ -24,8 +24,10 @@ object ClusterService extends App {
   logger.info(
     s"Starting a server on ${configuration.getInt("dp.services.cluster.http.port")}")
   private val server = injector.getInstance(classOf[Webserver])
+  private val atlasProxy = injector.getInstance(classOf[AtlasProxy])
 
   private val serverState = server.init
+  private val proxyState = atlasProxy.init
 
   logger.info("Starting cluster sync")
 
@@ -35,6 +37,10 @@ object ClusterService extends App {
     val hook = getHook
     val registrar = new ApplicationRegistrar(configuration,Optional.of(hook))
     registrar.initialize()
+  }
+
+  proxyState.onComplete { s =>
+    logger.info("Started the atlas proxy server")
   }
 
 

@@ -4,10 +4,21 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
-import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
+import com.hortonworks.dataplane.db.Webservice.{
+  ClusterComponentService,
+  ClusterHostsService,
+  ClusterService,
+  ConfigService,
+  DpClusterService
+}
 import com.hortonworks.dataplane.db._
-import com.hortonworks.dataplane.http.Webserver
-import com.hortonworks.dataplane.http.routes.{AmbariRoute, AtlasRoute, StatusRoute}
+import com.hortonworks.dataplane.http.{AtlasProxy, Webserver}
+import com.hortonworks.dataplane.http.routes.{
+  AmbariRoute,
+  AtlasProxyRoute,
+  AtlasRoute,
+  StatusRoute
+}
 import com.typesafe.config.{Config, ConfigFactory}
 import org.asynchttpclient.DefaultAsyncHttpClientConfig
 import play.api.libs.ws.WSClient
@@ -32,7 +43,9 @@ object AppModule extends AbstractModule {
   @Singleton
   def provideWsClient(implicit actorSystem: ActorSystem,
                       materializer: ActorMaterializer): WSClient = {
-    val config = new DefaultAsyncHttpClientConfig.Builder().setAcceptAnyCertificate(true).build
+    val config = new DefaultAsyncHttpClientConfig.Builder()
+      .setAcceptAnyCertificate(true)
+      .build
     AhcWSClient(config)
   }
 
@@ -76,14 +89,41 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def provideAtlasRoute(storageInterface: StorageInterface,
-                        clusterComponentService: ClusterComponentService,
-                        clusterHostsService: ClusterHostsService,
-                        config: Config): AtlasRoute = {
-    AtlasRoute(storageInterface,
-               clusterComponentService,
-               clusterHostsService,
-               config)
+  def provideAtlasProxyRoute(actorSystem: ActorSystem,
+                             materializer: ActorMaterializer,
+                             storageInterface: StorageInterface,
+                             clusterComponentService: ClusterComponentService,
+                             clusterHostsService: ClusterHostsService,
+                             dpClusterService: DpClusterService,
+                             clusterService: ClusterService,
+                             wSClient: WSClient,
+                             config: Config): AtlasProxyRoute = {
+    new AtlasProxyRoute(actorSystem,
+                        materializer,
+                        storageInterface,
+                        clusterComponentService,
+                        clusterHostsService,
+                        dpClusterService,
+                        clusterService,
+                        wSClient,
+                        config)
+  }
+  @Provides
+  @Singleton
+  def provideAtlasProxy(actorSystem: ActorSystem,
+                        materializer: ActorMaterializer,
+                        configuration: Config,
+                        atlasProxyRoute: AtlasProxyRoute): AtlasProxy = {
+    new AtlasProxy(actorSystem,
+                   materializer,
+                   configuration,
+                   atlasProxyRoute.proxy)
+  }
+
+  @Provides
+  @Singleton
+  def provideAtlasRoute(config: Config): AtlasRoute = {
+    AtlasRoute(config)
   }
 
   @Provides
@@ -91,16 +131,27 @@ object AppModule extends AbstractModule {
   def provideStatusRoute(storageInterface: StorageInterface,
                          config: Config,
                          wSClient: WSClient,
-                         clusterSync: ClusterSync,dpClusterSync: DpClusterSync): StatusRoute = {
-    new StatusRoute(wSClient, storageInterface, config, clusterSync,dpClusterSync)
+                         clusterSync: ClusterSync,
+                         dpClusterSync: DpClusterSync): StatusRoute = {
+    new StatusRoute(wSClient,
+                    storageInterface,
+                    config,
+                    clusterSync,
+                    dpClusterSync)
   }
 
   @Provides
   @Singleton
   def provideAmbariRoute(storageInterface: StorageInterface,
-                         config: Config,clusterService: ClusterService,dpClusterService: DpClusterService,
+                         config: Config,
+                         clusterService: ClusterService,
+                         dpClusterService: DpClusterService,
                          wSClient: WSClient): AmbariRoute = {
-    new AmbariRoute(wSClient, storageInterface,clusterService, dpClusterService,config)
+    new AmbariRoute(wSClient,
+                    storageInterface,
+                    clusterService,
+                    dpClusterService,
+                    config)
   }
 
   @Provides
@@ -109,7 +160,8 @@ object AppModule extends AbstractModule {
                         materializer: ActorMaterializer,
                         configuration: Config,
                         atlasRoute: AtlasRoute,
-                        statusRoute: StatusRoute,ambariRoute: AmbariRoute): Webserver = {
+                        statusRoute: StatusRoute,
+                        ambariRoute: AmbariRoute): Webserver = {
     import akka.http.scaladsl.server.Directives._
     new Webserver(
       actorSystem,
@@ -133,11 +185,11 @@ object AppModule extends AbstractModule {
   @Provides
   @Singleton
   def provideStorageInterface(
-                               dpClusterService: DpClusterService,
-                               clusterService: ClusterService,
-                               clusterComponentService: ClusterComponentService,
-                               clusterHostsServiceImpl: ClusterHostsService,
-                               configService: ConfigService): StorageInterface = {
+      dpClusterService: DpClusterService,
+      clusterService: ClusterService,
+      clusterComponentService: ClusterComponentService,
+      clusterHostsServiceImpl: ClusterHostsService,
+      configService: ConfigService): StorageInterface = {
     new StorageInterfaceImpl(clusterService,
                              dpClusterService,
                              clusterComponentService,
@@ -157,12 +209,15 @@ object AppModule extends AbstractModule {
   @Provides
   @Singleton
   def provideDpClusterSync(actorSystem: ActorSystem,
-                         config: Config,
-                         clusterInterface: StorageInterface,
+                           config: Config,
+                           clusterInterface: StorageInterface,
                            dpClusterService: DpClusterService,
-                         wSClient: WSClient): DpClusterSync = {
-    new DpClusterSync(actorSystem, config, clusterInterface,dpClusterService, wSClient)
+                           wSClient: WSClient): DpClusterSync = {
+    new DpClusterSync(actorSystem,
+                      config,
+                      clusterInterface,
+                      dpClusterService,
+                      wSClient)
   }
-
 
 }
