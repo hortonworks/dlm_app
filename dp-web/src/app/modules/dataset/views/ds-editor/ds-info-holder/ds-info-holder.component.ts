@@ -23,7 +23,7 @@ export class DsInfoHolder implements OnInit {
 
   ngOnInit() {
     !this.dsModel.datalakeId && (this.dsModel.datalakeId=0);
-    this.lakeService.listWithClusters().subscribe(objs => {
+    this.lakeService.listWithClusters(true).subscribe(objs => {
       this.lakes =[];
       objs.forEach(obj => {
         obj.clusters.length && (obj.data.clusterId = obj.clusters[0].id);

@@ -29,22 +29,31 @@ class DpClusterActions @Inject()(
     authenticated: Authenticated
 ) extends Controller {
 
-  def listWithClusters = authenticated.async {
+  def listWithClusters(validOnly: Option[Boolean]) = authenticated.async {
     Logger.info("list lakes with clusters")
+
+    val validOnlyFlag = validOnly.getOrElse(false);
 
     retrieveLakes()
       .flatMap({ lakes =>
         val lakeFutures =
-          lakes.map({ cLake =>
-            for {
-              lake <- Future.successful(cLake)
-              clusters <- retrieveClusters(cLake.id.get)
-            } yield
-              Json.obj(
-                "data" -> lake,
-                "clusters" -> clusters
-              )
-          })
+          lakes
+            .filter{cLake =>
+              if(validOnlyFlag) {
+                cLake.isDatalake.getOrElse(false)   // only valid lakes
+              }  else {
+                true  // return all results if flag is not sent
+              }}
+            .map({ cLake =>
+              for {
+                lake <- Future.successful(cLake)
+                clusters <- retrieveClusters(cLake.id.get)
+              } yield
+                Json.obj(
+                  "data" -> lake,
+                  "clusters" -> clusters
+                )
+            })
         Future.sequence(lakeFutures)
       })
       .map({ lakes =>

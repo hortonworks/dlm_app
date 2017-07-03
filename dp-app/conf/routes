@@ -32,7 +32,7 @@ GET           /api/clusters                                    controllers.Clust
 POST          /api/clusters/details                            controllers.Clusters.getDetails
 GET           /api/clusters/:clusterId/health                  controllers.Clusters.getHealth(clusterId: Long, summary: Option[Boolean])
 GET           /api/clusters/:clusterId/rmhealth                controllers.Clusters.getResourceManagerHealth(clusterId: Long)
-GET           /api/actions/lakes-list-with-clusters            controllers.actions.DpClusterActions.listWithClusters
+GET           /api/actions/lakes-list-with-clusters            controllers.actions.DpClusterActions.listWithClusters(validOnly: Option[Boolean])
 
 
 #DTSet-Category
