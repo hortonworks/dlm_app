@@ -23,6 +23,8 @@ object KnoxAgentMain {
 
   def main(args: Array[String]): Unit = {
 
+    println("evnhome="+sys.env.get("sso.toplology.path"))
+
     logger.info("knox agent main started")
     process.map { res =>
       wsClient.close()
@@ -39,7 +41,11 @@ object KnoxAgentMain {
       //TODO may be load config from command line args specs
 
       //val appConfig = ConfigFactory.parseFile(resourceDir / "application.conf")
-
+      val ssoTopologyPath = sys.env.get("sso.toplology.path") match {
+        case Some(value)=>value
+        case None=>config.getString("sso.toplology.path")
+      }
+      logger.info(s"filepath==$ssoTopologyPath")
       val gateway: Gateway = new Gateway(config, null, null)
       val gatewayService: ZuulServer = gateway.getGatewayService
       val gatewayUrl =
@@ -50,9 +56,7 @@ object KnoxAgentMain {
           case Some(knoxConfig) => {
             try {
               val knoxSsoTopologyXml = TopologyGenerator.configure(knoxConfig)
-              val filePath = config.getString("sso.toplology.path")
-              logger.info("Filepath=" + filePath)
-              writeTopologyToFile(knoxSsoTopologyXml, filePath)
+              writeTopologyToFile(knoxSsoTopologyXml, ssoTopologyPath)
               Right(true)
             } catch {
               case e: Exception =>
@@ -90,3 +94,4 @@ object KnoxAgentMain {
     }
   }
 }
+
