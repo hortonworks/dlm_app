@@ -1,18 +1,82 @@
 @import "../../../styles/variables";
-@import "../../../styles/side-nav";
 
-.sidenav {
+.dp-header-logo {
+  @extend .borderBox;
+
   width: $side-nav-width;
-  top: $layout-header-desktop-row-height;
+  height: $header-height;
+  line-height: $header-height;
+  background: $logo-background;
+  border: 1px solid $logo-background;
+  white-space: nowrap;
+  padding-left: 25px;
+
+  & > img {
+    width: 30px;
+    float: left;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+
+  & > span {
+    color: $white;
+    font-size: 20px;
+    padding-left: 10px;
+  }
+
+  &.minimised {
+    width: 50px;
+    padding-left: 10px;
+  }
 }
 
-.sidenav-item {
-  i {
-    margin-right: 8px;
+.sidenav {
+  height: 100%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background: $tuna;
+  overflow-x: hidden;
+  width: $side-nav-width;
+
+  .sidenav-item {
+    padding: 15px 5px 15px 25px;
+    font-size: 16px;
+    text-decoration: none;
+    font-weight: normal;
+    display: block;
+    transition: 0.3s;
+    color: $submarine;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover, &.active {
+      color: $white;
+      background: $bright-gray;
+    }
+
+    i {
+      margin-right: 8px;
+    }
+  }
+
+  .sidenav-item.active {
+    &:before {
+      font-family: FontAwesome;
+      content: "\F0DA";
+      color: $fruit-salad;
+      margin-left: -25px;
+      position: absolute;
+    }
   }
 }
 
 .collpased {
+  &.sidenav {
+   width: $side-nav-minimised-width;
+  }
+
   .sidenav-item {
     padding:15px;
     &.active:before {
@@ -28,6 +92,15 @@
   .sidenav-item-name {
     display: none;
   }
+
+  .dp-header-logo {
+    width: 50px;
+    padding-left: 10px;
+  }
+
+  .persona-name {
+    display: none;
+  }
 }
 
 .expander {
@@ -41,6 +114,51 @@
   cursor: pointer;
   position: absolute;
   left: 0;
-  bottom: $layout-header-desktop-row-height;
+  bottom: 0;
 }
 
+
+.suit-navigation {
+  position: absolute;
+  top: 55px;
+  left: 0;
+  margin: 0;
+  padding: 40px 40px 20px;
+  background: $white;
+  -webkit-box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
+  -moz-box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
+  box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
+  z-index: 100;
+  visibility: hidden;
+  width: 400px;
+  display: flex;
+  justify-content: space-between;
+
+  &.showPersona {
+    visibility: visible;
+  }
+
+  & > li {
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+
+    & .logo-wrapper {
+      background-color: $eastern-blue;
+      padding: 15px;
+      border-radius: 4px;
+      display: inline-block;
+      height: 72px;
+      & + div {
+        text-align: center;
+        font-size: 14px;
+        padding-top: 5px;
+        text-overflow: ellipsis;
+        width: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+    }
+  }
+}

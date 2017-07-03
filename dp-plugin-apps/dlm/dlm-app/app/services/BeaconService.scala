@@ -321,9 +321,13 @@ class BeaconService @Inject()(
           val allPolicies: Seq[PolicyDetailsData] = allPoliciesOption.filter(_.isRight).flatMap(_.right.get)
           val allPoliciesData: List[PolicyDetailsData] = allPolicies.foldLeft(List(): List[PolicyDetailsData]) {
             (acc, next) => {
-              if (acc.exists(x => x.name == next.name && x.sourceCluster== next.sourceCluster && x.sourceCluster == next.sourceCluster)) acc
-              else {
-                next :: acc
+              val prev = acc.find(x => x.name == next.name && x.sourceCluster== next.sourceCluster && x.sourceCluster == next.sourceCluster)
+              prev match {
+                case None => next :: acc
+                case Some(accPolicyInstance) =>
+                  // Duplicate policies with empty job information should be filtered out
+                  if (next.instances.isEmpty) acc
+                  else  next :: acc.diff(List(accPolicyInstance))
               }
             }
           }.reverse.filter((policy) => { // filter policies on cluster set that are registered to dataplane

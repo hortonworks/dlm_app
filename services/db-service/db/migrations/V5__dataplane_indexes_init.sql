@@ -18,3 +18,9 @@ CREATE INDEX IF NOT EXISTS idx_dp_locations on dataplane.locations(city);
 
 -- workspaces
  CREATE INDEX IF NOT EXISTS idx_dp_workspace_name on dataplane.workspace(name);
+
+-- datasets
+ CREATE INDEX IF NOT EXISTS idx_dp_dataset_active on dataplane.datasets(id) WHERE active;
+
+ -- data-assets
+ CREATE INDEX IF NOT EXISTS idx_dp_data_asset_guid on dataplane.data_asset(guid);

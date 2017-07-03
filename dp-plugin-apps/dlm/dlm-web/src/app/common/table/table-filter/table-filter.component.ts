@@ -26,6 +26,11 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
   @Input() filterBy: TableFilterItem[];
 
   /**
+   * List of filters to applied by default while initializing
+   */
+  @Input() initialFilters: {propertyName: string, value: string []} [] = [];
+
+  /**
    * Fires when some filter is applied or removed
    * Send information about all current filters
    * @type {EventEmitter}
@@ -64,9 +69,16 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
   ngOnInit() {
     const appliedFilters = {};
     this.filterBy.forEach(filter => {
-      appliedFilters[filter.propertyName] = filter.multiple ? [] : '';
+      const filtered = this.initialFilters ? this.initialFilters.filter(
+        initialFilter => initialFilter.propertyName === filter.propertyName) : [];
+      let value = filter.multiple ? [] : '';
+      if (filtered.length > 0) {
+        value = filter.multiple ? filtered[0].value : filtered[0].value[0];
+      }
+      appliedFilters[filter.propertyName] = value;
     });
     this.appliedFilters.next(appliedFilters);
+    this.onFilter.emit(appliedFilters);
   }
 
   ngOnChanges() {

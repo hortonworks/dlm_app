@@ -45,7 +45,7 @@ export class LakesComponent implements OnInit {
         this.lakes.forEach((lake) => {
           let locationObserver = Observable.create();
           if (lake.data.location && lake.clusters && lake.clusters.length > 0) {
-            locationObserver = this.getLocationInfoWithStatus(lake.data.location, lake.clusters[0].id);
+            locationObserver = this.getLocationInfoWithStatus(lake.data.location, lake.clusters[0].id, lake.data.id);
           } else {
             locationObserver = this.getLocationInfo(lake.data.location);
           }
@@ -82,10 +82,10 @@ export class LakesComponent implements OnInit {
     });
   }
 
-  private getLocationInfoWithStatus(locationId, clusterId): Observable<any> {
+  private getLocationInfoWithStatus(locationId, clusterId, lakeId): Observable<any> {
     return Observable.forkJoin(
       this.locationService.retrieve(locationId).map((res) => res),
-      this.clusterService.retrieveHealth(clusterId).map((res) => res)
+      this.clusterService.retrieveHealth(clusterId, lakeId).map((res) => res)
     ).map(response => {
       return {
         location: response[0],
@@ -124,11 +124,11 @@ export class LakesComponent implements OnInit {
   onRefresh(lakeId){
     let lakeInfo = this.lakes.find(lake => lake.data.id === lakeId);
     if(lakeInfo.clusters && lakeInfo.clusters.length > 0){
-      this.updateHealth(lakeInfo, this.getLocationInfoWithStatus(lakeInfo.data.location, lakeInfo.clusters[0].id));
+      this.updateHealth(lakeInfo, this.getLocationInfoWithStatus(lakeInfo.data.location, lakeInfo.clusters[0].id, lakeId));
     }else{
       this.clusterService.listByLakeId({lakeId: lakeInfo.data.id}).subscribe(clusters=> {
         lakeInfo.clusters = clusters;
-        this.updateHealth(lakeInfo, this.getLocationInfoWithStatus(lakeInfo.data.location, lakeInfo.clusters[0].id));
+        this.updateHealth(lakeInfo, this.getLocationInfoWithStatus(lakeInfo.data.location, lakeInfo.clusters[0].id, lakeId));
       });
     }
   }

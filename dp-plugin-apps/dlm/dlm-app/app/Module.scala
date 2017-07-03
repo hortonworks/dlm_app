@@ -6,17 +6,15 @@ import java.util.Optional
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.db.Webservice._
-import com.hortonworks.dataplane.cs.Webservice.AmbariService
-import com.hortonworks.dataplane.cs.AmbariServiceImpl
 import play.api.{Configuration, Logger}
 import play.api.libs.ws.WSClient
-import com.hortonworks.dlm.beacon.{BeaconClusterServiceImpl, BeaconEventServiceImpl, BeaconPairServiceImpl,
-                                   BeaconPolicyInstanceServiceImpl, BeaconPolicyServiceImpl, BeaconLogServiceImpl}
-import com.hortonworks.dlm.beacon.WebService.{BeaconClusterService, BeaconEventService, BeaconPairService,
-                                              BeaconPolicyInstanceService, BeaconPolicyService, BeaconLogService}
+import com.hortonworks.dlm.beacon.{BeaconClusterServiceImpl, BeaconEventServiceImpl, BeaconLogServiceImpl, BeaconPairServiceImpl, BeaconPolicyInstanceServiceImpl, BeaconPolicyServiceImpl}
+import com.hortonworks.dlm.beacon.WebService.{BeaconClusterService, BeaconEventService, BeaconLogService, BeaconPairService, BeaconPolicyInstanceService, BeaconPolicyService}
 import com.hortonworks.dlm.webhdfs.WebService.FileService
 import com.hortonworks.dlm.webhdfs.FileServiceImpl
 import com.hortonworks.datapalane.consul._
+import com.hortonworks.dataplane.cs.{AmbariWebServiceImpl, ClusterWsClient}
+import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 
 
 /**
@@ -30,7 +28,7 @@ import com.hortonworks.datapalane.consul._
  * configuration file.
  */
 class Module extends AbstractModule {
-  
+
   def configure() = {
     bind(classOf[ConsulInitializer]).asEagerSingleton()
   }
@@ -116,8 +114,9 @@ class Module extends AbstractModule {
   @Provides
   @Singleton
   @Named("ambariService")
-  def provideAmbariService(implicit ws: WSClient, configuration: Configuration):AmbariService = {
-    new AmbariServiceImpl(configuration.underlying)
+  def provideAmbariService(implicit ws: WSClient, configuration: Configuration):AmbariWebService = {
+    implicit val clusterWsClient = ClusterWsClient(ws)
+    new AmbariWebServiceImpl(configuration.underlying)
   }
 
 }

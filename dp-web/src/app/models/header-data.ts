@@ -3,12 +3,14 @@ export class PersonaTabs {
   URL: string;
   angularRouting: boolean;
   iconClassName: string;
-  
+  collapseSideNav: boolean;
 
-  constructor(tabName:string, URL:string, iconClassName = 'fa-globe', angularRouting = true) {
+  constructor(tabName:string, URL:string, iconClassName = 'fa-globe', collapseSideNav = false, angularRouting = true) {
     this.tabName = tabName;
     this.URL = URL;
+    this.tabName = tabName;
     this.iconClassName = iconClassName;
+    this.collapseSideNav = collapseSideNav;
     this.angularRouting = angularRouting;
   }
 }

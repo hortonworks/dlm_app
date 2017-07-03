@@ -47,14 +47,11 @@ object Webservice {
   }
 
 
-  trait AmbariService extends CsClientService {
-
-    def getAmbariResponse(clusterId: Long, ambariUrl: String): Future[Either[Errors, JsValue]]
-  }
-
   trait AmbariWebService extends CsClientService {
 
-    def syncAmbari(dpCluster: DataplaneCluster)(implicit token:Option[HJwtToken]):Future[Boolean]
+    def requestAmbariApi(clusterId: Long, ambariUrl: String)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsValue]]
+
+    def syncAmbari(dpCluster: DataplaneClusterIdentifier)(implicit token:Option[HJwtToken]):Future[Boolean]
 
     def checkAmbariStatus(endpoint:AmbariEndpoint)(implicit token:Option[HJwtToken]):Future[Either[Errors,AmbariCheckResponse]]
 

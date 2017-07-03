@@ -1,16 +1,12 @@
 package com.hortonworks.dataplane.cs
 
-import com.hortonworks.dataplane.commons.domain.Ambari.{
-  AmbariCheckResponse,
-  AmbariCluster
-}
-import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
+import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariCheckResponse, AmbariCluster}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, HJwtToken}
 import com.hortonworks.dataplane.commons.domain.{Ambari, Entities}
 import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 import com.typesafe.config.Config
-import play.api.Logger
-import play.api.libs.json.Json
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.json.{JsValue, Json}
+import play.api.libs.ws.WSResponse
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -65,11 +61,29 @@ class AmbariWebServiceImpl(config: Config)(implicit ws: ClusterWsClient)
       }
   }
 
-  override def syncAmbari(dpCluster: Entities.DataplaneCluster)(
+  override def syncAmbari(dpCluster: Entities.DataplaneClusterIdentifier)(
       implicit token: Option[Entities.HJwtToken]): Future[Boolean] = {
     ws.url(s"$url/cluster/sync")
       .withToken(token)
       .post(Json.toJson(dpCluster))
       .map(_.status == 200)
   }
+
+  private def mapToResults(res: WSResponse) = {
+    res.status match {
+      case 200 => Right(res.json)
+      case _ => mapErrors(res)
+    }
+  }
+
+
+  override def requestAmbariApi(clusterId: Long, ambariUrl: String)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsValue]] = {
+    ws.url(s"$url/$clusterId/ambari?request=$ambariUrl")
+        .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToResults)
+  }
+
+
 }

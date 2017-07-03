@@ -27,7 +27,9 @@
     top: 125%;
     right: -25px;
   }
-
+  .popup-arrow-up {
+    right: 30px !important;
+  }
   table > tbody > tr:last-child {
     &:not(:hover) {
       border-bottom-color: transparent;
