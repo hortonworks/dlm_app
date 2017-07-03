@@ -127,7 +127,7 @@
         "tags" : "Tags for the cluster",
         "description" :"Description of the cluster",
         "clusterAddSuccess" : "Your cluster has been added to dataplane.",
-        "duplicateDataCenter": "Cluster Name and Datacenter combination exists.",
+        "duplicateDataCenter": "A cluster with the same name already exists in the given data center. Please select a different cluster, or specify a different data center name.",
         "connectionFailed" :" Dataplane could not retreive cluster information.",
         "connectionFailureReasons" : {
           "ambariServerDown": "Check if the Ambari server is up and running in the given url",
