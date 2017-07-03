@@ -1,20 +1,24 @@
-<div class="dsAssetsHolder">
-  <div class="title">{{"pages.dataset.ds-editor.assets" | translate}}</div>
-  <br/>
-  <div class="description">{{"pages.dataset.ds-editor.asset-description" | translate}}</div>
-  <br/>
-  <ds-assets-list *ngIf="showList && !showPopup"
-                  [dsModel]="dsModel"
-                  [applicableActions]="applicableListActions"
-                  [selectionAllowed]="false"
-                  [queryModels]="assetSetQueryModelsForAddition"
-                  [clusterId]="dsModel.clusterId"
-                  (onAction)="onListAction($event)"
-                  [allowAssetNavigation]="false"
-                  [showBelongsToColumn]="true"
-  ></ds-assets-list>
+
+<div class="hwx-title">{{"pages.dataset.ds-editor.assets" | translate}}</div>
+
+<div class="hwx-desc">{{"pages.dataset.ds-editor.asset-description" | translate}}</div>
+
+<ds-assets-list *ngIf="showList && !showPopup"
+                [dsModel]="dsModel"
+                [applicableActions]="applicableListActions"
+                [selectionAllowed]="false"
+                [queryModels]="assetSetQueryModelsForAddition"
+                [clusterId]="dsModel.clusterId"
+                (onAction)="onListAction($event)"
+                [allowAssetNavigation]="false"
+                [showBelongsToColumn]="true"
+></ds-assets-list>
+
+<div class="button-container">
   <button *ngIf="!showList" class="mdl-button btn-hwx-primary" (click)="showPopup=true;">{{"pages.dataset.ds-editor.action.addAssets" | translate}}</button>
 </div>
+
+
 <div *ngIf="showPopup" class="popup borderBox">
   <div class="opaque">
     <asset-search [showBelongsToColumn]="true" [clusterId]="dsModel.clusterId" (doneNotification)="actionDone($event)" (cancelNotification)="actionCancel()"></asset-search>

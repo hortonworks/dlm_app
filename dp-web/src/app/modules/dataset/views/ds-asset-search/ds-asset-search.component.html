@@ -20,7 +20,7 @@
   </div>
   <div class="filterActionCont">
     <button class="mdl-button btn-hwx-primary" (click)="actionSearch()">{{"pages.dataset.asset-search.search" | translate}}</button>
-    <button class="mdl-button btn-hwx-secondary" (click)="actionReset()" *ngIf="showQueryResults">{{"pages.dataset.asset-search.reset" | translate}}</button>
+    <button class="mdl-button btn-hwx-default" (click)="actionReset()" *ngIf="showQueryResults">{{"pages.dataset.asset-search.reset" | translate}}</button>
     <span class="emptySearchMsg" #emptySearchMsg>{{"pages.dataset.asset-search.emptySearchMsg" | translate}}</span>
     <div style="clear: both"></div>
   </div>
@@ -38,7 +38,7 @@
     <div *ngIf="!showQueryResults" class="noSearchMessage"><span>{{"pages.dataset.asset-search.noSearchMsg" | translate}}</span></div>
   </div>
   <div class="actionButtonCont">
-    <button class="mdl-button btn-hwx-secondary" (click)="actionCancel()">{{"pages.dataset.asset-search.cancel" | translate}}</button>
+    <button class="mdl-button btn-hwx-default" (click)="actionCancel()">{{"pages.dataset.asset-search.cancel" | translate}}</button>
     <button *ngIf="showDone && !saveButton" class="mdl-button btn-hwx-primary" (click)="actionDone()">{{"pages.dataset.asset-search.done" | translate}}</button>
     <button *ngIf="showDone && saveButton" class="mdl-button btn-hwx-primary" (click)="actionDone()">{{"common.save" | translate}}</button>
     <div style="clear: both"></div>

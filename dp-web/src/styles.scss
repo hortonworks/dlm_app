@@ -170,6 +170,15 @@ a:hover {
   }
 }
 
+.cs-list > span {
+  &:after {
+    content: ', ';
+  }
+  &:last-child:after {
+    content: '';
+  }
+}
+
 //Lightening the Input placeholder texts
 
 ::-webkit-input-placeholder {

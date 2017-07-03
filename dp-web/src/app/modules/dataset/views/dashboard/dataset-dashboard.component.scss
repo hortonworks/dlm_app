@@ -1,11 +1,5 @@
 @import "../../../../../styles/variables";
 
-.dataset-dashboard{
-  width:100%;
-  height: 100%;
-  position:absolute;
-}
-
 .dataset-search {
   width:100%;
   padding-right: 15px;
@@ -41,42 +35,42 @@
 }
 
 .result-header {
-  width:100%;
-
-  .hwx-title {
-    margin: auto;
-  }
-
   .mdl-button-group {
-    border : 1px solid $forest-green-2;
     .mdl-button {
-      background-color: $white;
-      color: $forest-green-2;
       float: left;
-      padding : 0px;
+      background-color: $white;
+      color: $dove-gray;
+      padding: 0 15px;
       box-shadow: none;
-      border-radius: 0px;
+      border-radius: 0;
       height: 34px;
       min-width: 42px;
+      border: 1px solid $iron;
+      box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+
+      & + .mdl-button {
+        border-left: 0;
+        border-top-right-radius: 2px;
+        border-bottom-right-radius: 2px;
+      }
     }
 
     .button-color--dark-grey {
-      background-color: $forest-green-2 !important;
+      background-color: $dove-gray;
       color: white;
-      border-left: none;
+    }
+    & > *:first-child {
+      border-top-left-radius: 2px;
+      border-bottom-left-radius: 2px;
+    }
+    & + * {
+      margin-left: 10px;
     }
   }
 }
 
 .result-header  .result-header-buttonCont {
   float: right;
-}
-
-.result-container {
-  width:100%;
-  height:100%;
-}
-
-.addDatasetButtonCont{
-  margin-left:20px;
 }
