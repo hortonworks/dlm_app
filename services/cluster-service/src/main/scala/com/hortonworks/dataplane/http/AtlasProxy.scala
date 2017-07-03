@@ -18,8 +18,8 @@ import scala.util.Try
   * The proxy attaches the cluster related context and forwards the call
   * to atlas
   *
-  *                             ---------DP---------- -------ATLAS------
-  * The expected URL pattern is [/dp/cluster/:clusterID][/api/atlas/v2/...]
+  *
+  * The expected URL pattern is (\/atlas\/proxy\/cluster\/)(\d+)(\/token\/)(\w+)(\/url\/)(.*)
   * @param actorSystem
   * @param actorMaterializer
   * @param config

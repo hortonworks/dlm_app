@@ -1,7 +1,7 @@
 package com.hortonworks.dataplane.http.routes
 
 import java.net.URL
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.{Executors, TimeUnit}
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
@@ -11,7 +11,7 @@ import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import com.google.common.base.{Supplier, Suppliers}
-import com.google.common.cache.{CacheBuilder, CacheLoader}
+import com.google.common.cache.{Cache, CacheBuilder, CacheLoader}
 import com.google.common.io.BaseEncoding
 import com.google.inject.Inject
 import com.hortonworks.dataplane.commons.domain.Constants
@@ -19,15 +19,15 @@ import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => CS}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
 import com.hortonworks.dataplane.cs.StorageInterface
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, DpClusterService}
-import com.hortonworks.dataplane.knox.Knox.KnoxConfig
+import com.hortonworks.dataplane.knox.Knox.{KnoxConfig, TokenResponse}
 import com.hortonworks.dataplane.knox.KnoxApiExecutor
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
+import org.joda.time.DateTime
 import play.api.libs.json.JsObject
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 class AtlasProxyRoute @Inject()(
@@ -41,16 +41,21 @@ class AtlasProxyRoute @Inject()(
     private val wSClient: WSClient,
     private val config: Config) {
 
+  //Create a new Execution context for use in our proxy
+  private implicit val ec = ExecutionContext.fromExecutor(Executors.newWorkStealingPool())
+
   // The time for which the cluster-supplier mapping should be help in memory
   private val cacheExpiry =
     Try(config.getInt("dp.services.cluster.atlas.proxy.cache.expiry.secs"))
       .getOrElse(600)
 
-  private val prefix =
-    Try(config.getString("dp.services.cluster.atlas.api.prefix"))
-      .getOrElse("/api/atlas/v2")
-  private val dpPrefix = "/dp/cluster/"
-  private lazy val http = Http(actorSystem)
+  private val tokenCacheExpiry =
+    Try(config.getInt("dp.services.cluster.knox.token.cache.expiry.secs"))
+      .getOrElse(3600)
+
+  private val tokenExpiryTime =
+    Try(config.getInt("dp.services.cluster.knox.token.cache.removal.time"))
+      .getOrElse(3)
 
   private lazy val log = Logger(classOf[AtlasProxyRoute])
 
@@ -64,8 +69,8 @@ class AtlasProxyRoute @Inject()(
   private lazy val localPass: Future[Option[String]] =
     storageInterface.getConfiguration("dp.atlas.password")
 
-
   log.info(s"Constructing a cache with expiry $cacheExpiry secs")
+
   private val clusterAtlasSupplierCache = CacheBuilder
     .newBuilder()
     .expireAfterAccess(cacheExpiry, TimeUnit.SECONDS)
@@ -74,10 +79,24 @@ class AtlasProxyRoute @Inject()(
                                  clusterHostsService,
                                  urlCacheTime))
 
+  private val tokenCache: Cache[String, TokenResponse] = CacheBuilder
+    .newBuilder()
+    .expireAfterWrite(tokenCacheExpiry, TimeUnit.SECONDS)
+    .build()
+    .asInstanceOf[Cache[String, TokenResponse]]
+
   implicit val materializer = actorMaterializer
 
   private lazy val urlPattern =
     """(\/atlas\/proxy\/cluster\/)(\d+)(\/token\/)(\w+)(\/url\/)(.*)""".r
+
+  def validToken(tr: TokenResponse): Boolean = {
+    val expiry = new DateTime(tr.expires)
+      .minusSeconds(tokenExpiryTime)
+      .toInstant
+      .getMillis
+    new DateTime().toInstant.getMillis <= expiry
+  }
 
   val proxy = Route { context =>
     val request = context.request
@@ -103,6 +122,7 @@ class AtlasProxyRoute @Inject()(
       c <- Future.successful(cl.right.get)
       dpce <- dpClusterService.retrieve(c.dataplaneClusterId.get.toString)
       dpc <- Future.successful(dpce.right.get)
+      // should be cached
       url <- supplier.get()
       executor <- Future.successful {
         KnoxApiExecutor(
@@ -111,41 +131,68 @@ class AtlasProxyRoute @Inject()(
                      dpc.knoxUrl),
           wSClient)
       }
-      newToken <- Future.successful({() => executor.getKnoxApiToken(s"${Constants.HJWT}=$decodedToken")})
-      lu <- localUser
-      lp <- localPass
+      // Callback when knox is detected
+      newToken <- Future.successful({ () =>
+        executor.getKnoxApiToken(s"${Constants.HJWT}=$decodedToken")
+      })
 
-      parsedHeader <-  {
+      // The auth header - Either a token or a cookie
+      parsedHeader <- {
         if (decodedToken != "NONE" && dpc.knoxEnabled.isDefined && dpc.knoxEnabled.get && dpc.knoxUrl.isDefined) {
           // Build cookie header
           log.info("Building cookie for Knox call")
-          newToken().map { t =>
-            HttpHeader.parse("Cookie",
-              s"${Constants.HJWT}=${t.accessToken}")
+          val accessToken = tokenCache.getIfPresent(decodedToken)
+          val optionalToken = Option(accessToken)
+          if (optionalToken.isDefined && validToken(optionalToken.get)) {
+            log.info("Token in cache and not expired, reusing...")
+            Future.successful {
+              HttpHeader.parse(
+                "Cookie",
+                s"${Constants.HJWT}=${optionalToken.get.accessToken}")
+            }
+          } else {
+            // token not in cache or expired
+            // remove token from cache
+            tokenCache.invalidate(decodedToken)
+            newToken().map { t =>
+              // add new token to cache
+              log.info("No token in cache, Loaded from knox and added to cache")
+              tokenCache.put(decodedToken, t)
+              HttpHeader.parse("Cookie", s"${Constants.HJWT}=${t.accessToken}")
+            }
           }
         } else {
           // build auth header
           log.info("Adding auth for non knox call")
-          log.info(s"Local credentials are $lu:$lp")
-          val toEncode = s"${lu.get}:${lp.get}"
-          Future.successful {
-            HttpHeader.parse(
-              "Authorization", s"Basic ${BaseEncoding.base64().encode(toEncode.getBytes)}")
-          }
+          for {
+            lu <- localUser
+            lp <- localPass
+            toEncode <- Future.successful { s"${lu.get}:${lp.get}" }
+            pHeader <- Future.successful {
+              log.info(s"Local credentials are $lu:$lp")
+              HttpHeader.parse(
+                "Authorization",
+                s"Basic ${BaseEncoding.base64().encode(toEncode.getBytes)}")
+            }
+          } yield pHeader
         }
       }
+
       header <- Future.successful {
         parsedHeader match {
           case ParsingResult.Ok(h, e) => Seq(h)
           case _                      => Seq()
         }
       }
+
+
       h <- {
         val target = HttpRequest(
           request.method,
           entity = request.entity,
           // The filter is needed to clean the dummy auth header added
-          headers = request.headers.filterNot(_.lowercaseName() == "authorization") ++ header,
+          headers = request.headers.filterNot(
+            _.lowercaseName() == "authorization") ++ header,
           uri = Uri.from(scheme = url.getProtocol,
                          host = url.getHost,
                          port = url.getPort,
@@ -162,9 +209,9 @@ class AtlasProxyRoute @Inject()(
           .single(target)
           .via(flow)
           .runWith(Sink.head)
-          .flatMap {
-            o =>
-            context.complete(o)}
+          .flatMap { o =>
+            context.complete(o)
+          }
         handler
 
       }
@@ -178,7 +225,7 @@ class AtlasProxyRoute @Inject()(
 private sealed class AtlasURLSupplier(
     clusterId: Long,
     clusterComponentService: ClusterComponentService,
-    clusterHostsService: ClusterHostsService)
+    clusterHostsService: ClusterHostsService)(implicit ec:ExecutionContext)
     extends Supplier[Future[URL]] {
 
   private lazy val log = Logger(classOf[AtlasURLSupplier])
@@ -238,7 +285,7 @@ private sealed class AtlasURLSupplier(
 sealed class URLSupplierCacheLoader(
     private val clusterComponentService: ClusterComponentService,
     private val clusterHostsService: ClusterHostsService,
-    expiry: Int)
+    expiry: Int)(implicit ec:ExecutionContext)
     extends CacheLoader[String, Supplier[Future[URL]]]() {
 
   private lazy val log = Logger(classOf[URLSupplierCacheLoader])
