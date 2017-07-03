@@ -7,9 +7,28 @@
 
 <ng-template let-event="row" #statusTemplate>
   <dlm-event-status [event]="event"></dlm-event-status>
-  <span>{{event.eventStatus}}</span>
+  <span>{{event.event}}</span>
 </ng-template>
 
 <ng-template #agoTemplate let-value="value">
   <span>{{value | fmtTz | amTimeAgo}}</span>
 </ng-template>
+
+<ng-template let-event="row" #entityTemplate>
+  <span *ngIf="event.eventType === 'policyinstance'; else entityNoLinkTemplate">
+    <a [routerLink]="['/policies']" [queryParams]="{'policy': getEntity(event)}">
+      <span>{{getEntity(event)}}</span>
+    </a>
+  </span>
+</ng-template>
+
+<ng-template #entityNoLinkTemplate>
+  <span>{{getEntity(event)}}</span>
+</ng-template>
+
+<ng-template let-event="row" #logTemplate>
+  <span *ngIf="event.eventType === 'policyinstance'" class="text-primary actionable" (click)="showLog(event)">{{ "page.notifications.view_log" | translate }}</span>
+</ng-template>
+
+<dlm-log-modal-dialog #logModalDialog [message]="logMessage$ | async">
+</dlm-log-modal-dialog>

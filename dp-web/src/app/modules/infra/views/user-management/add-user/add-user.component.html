@@ -51,14 +51,13 @@
         <div class="mdl-cell mdl-cell--2-col">Roles</div>
         <div class="mdl-cell mdl-cell--1-col">  : </div>
         <div class="mdl-cell mdl-cell--9-col">
-          <tagging-widget class="role-edit-tags" id="role-tags"
-            [tags]="user.roles"
-            [availableTags]="availableRoles"
-            [clearOnSearch]="true"
-            [theme]="tagTheme.DARK"
-            [restrictFreeText]="true"
-            (textChange)="onRoleSearchChange($event)"
-            (onNewSearch)="onRolesEdit($event)"></tagging-widget>
+          <tagging-widget class="role-edit-tags" id="role-tags" [tags]="userRoles"
+          [availableTags]="availableRoles"
+          [clearOnSearch]="true"
+          (textChange)="onRoleSearchChange($event)"
+          (onNewSearch)="onRolesEdit($event)"
+          [theme]="tagTheme.DARK"
+          [restrictFreeText]="true"></tagging-widget>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {UserService} from '../../../../services/user.service';
 import {User} from '../../../../models/user';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'dp-user-management',
@@ -11,8 +12,9 @@ import {User} from '../../../../models/user';
 export class UserManagementComponent implements OnInit {
 
   users: User[] = [];
+  rolesMap = new Map();
 
-  constructor(private router: Router, private route: ActivatedRoute, private userService: UserService) {
+  constructor(private router: Router, private route: ActivatedRoute, private userService: UserService, private translateService: TranslateService) {
   }
 
   ngOnInit() {
@@ -22,9 +24,16 @@ export class UserManagementComponent implements OnInit {
     this.getUsers();
   }
 
-  getUsers(){
+  getUsers() {
     this.userService.getUsersWithRole().subscribe(users => {
-      this.users = users;
+      this.users = users
+      this.users.forEach(user => {
+        let roles = [];
+        user.roles.forEach(role => {
+          roles.push(this.translateService.instant(`common.roles.${role}`));
+        });
+        this.rolesMap.set(user.id, roles.join(', '));
+      });
     });
   }
 

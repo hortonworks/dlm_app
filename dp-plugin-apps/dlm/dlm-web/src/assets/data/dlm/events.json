@@ -1,54 +1,106 @@
 {
   "status": "SUCCEEDED",
   "message": "success",
-  "requestId": "262315164@qtp-1028472807-2",
-  "size": 5,
-  "totalCount": 3,
+  "requestId": "1922453655@qtp-2021854618-15",
+  "totalCount": 10,
   "events": [
     {
-      "policyId": "ID",
-      "instanceId": "vivek-beacon-1.c.pramod-thangali.internal",
+      "policyId": "/c1/c1/ystest/0/1497564970816/000000008",
+      "instanceId": "/c1/c1/ystest/0/1497564970816/000000008@36",
+      "event": "succeeded",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
       "severity": "info",
-      "event": "beacon-started",
-      "timestamp": "2017-04-05 22:03:11.984",
-      "eventStatus": "started",
-      "message": "beacon server started successfully"
+      "timestamp": "2017-06-23 21:12:38.158",
+      "message": "policy instance succeeded"
     },
     {
-      "policyId": "ID",
-      "instanceId": "vivek-beacon-1.c.pramod-thangali.internal",
-      "severity": "critical",
-      "event": "policy-created",
-      "timestamp": "2017-06-06T20:03:11.984",
-      "eventStatus": "created",
-      "message": "policy hivePolicy1 created successfully"
-    },
-    {
-      "policyId": "ID",
-      "instanceId": "vivek-beacon-1.c.pramod-thangali.internal",
+      "policyId": "/c1/c1/hd_policy/0/1497564970816/000000003",
+      "instanceId": "/c1/c1/hd_policy/0/1497564970816/000000003@99",
+      "event": "failed",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
       "severity": "error",
-      "event": "job-started",
-      "timestamp": "2017-04-14 22:03:11.984",
-      "eventStatus": "started",
-      "message": "job instance of hivePolicy1 started"
+      "timestamp": "2017-06-23 20:45:30.482",
+      "message": "policy instance failed"
     },
     {
-      "policyId": "ID",
-      "instanceId": "vivek-beacon-1.c.pramod-thangali.internal",
-      "severity": "warn",
-      "event": "job-ended",
-      "timestamp": "2017-04-15 22:03:11.984",
-      "eventStatus": "completed",
-      "message": "job instance of hivePolicy1 completed"
+      "policyId": "/c1/c1/tdk/0/1497564970816/000000002",
+      "instanceId": "/c1/c1/tdk/0/1497564970816/000000002@168",
+      "event": "succeeded",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "info",
+      "timestamp": "2017-06-23 20:44:12.052",
+      "message": "policy instance succeeded"
     },
     {
-      "policyId": "ID",
-      "instanceId": "vivek-beacon-1.c.pramod-thangali.internal",
-      "severity": "critical",
-      "event": "policy-created",
-      "timestamp": "2017-05-01 22:03:11.984",
-      "eventStatus": "created",
-      "message": "policy hivePolicy2 created successfully"
+      "policyId": "/c1/c1/hdfsPolicy/0/1497564970816/000000001",
+      "instanceId": "/c1/c1/hdfsPolicy/0/1497564970816/000000001@184",
+      "event": "succeeded",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "info",
+      "timestamp": "2017-06-23 20:43:36.829",
+      "message": "policy instance succeeded"
+    },
+    {
+      "policyId": "/c1/c1/ystest/0/1497564970816/000000008",
+      "instanceId": "/c1/c1/ystest/0/1497564970816/000000008@35",
+      "event": "succeeded",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "info",
+      "timestamp": "2017-06-23 20:43:04.67",
+      "message": "policy instance succeeded"
+    },
+    {
+      "policyId": "/c1/c1/asdf/0/1497564970816/000000004",
+      "instanceId": "/c1/c1/asdf/0/1497564970816/000000004@50",
+      "event": "failed",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "error",
+      "timestamp": "2017-06-23 20:42:18.454",
+      "message": "policy instance failed"
+    },
+    {
+      "policyId": "/c1/c1/tdk111/0/1497564970816/000000007",
+      "instanceId": "/c1/c1/tdk111/0/1497564970816/000000007@2",
+      "event": "failed",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "error",
+      "timestamp": "2017-06-23 20:42:18.454",
+      "message": "policy instance failed"
+    },
+    {
+      "policyId": "yusaku-dlm-159-b-1.c.pramod-thangali.internal",
+      "event": "started",
+      "eventType": "system",
+      "severity": "info",
+      "timestamp": "2017-06-23 20:42:15.206",
+      "message": "beacon started successfully"
+    },
+    {
+      "policyId": "/c1/c1/testhivepolicy/0/1497564970816/000000006",
+      "instanceId": "/c1/c1/testhivepolicy/0/1497564970816/000000006@47",
+      "event": "ignored",
+      "eventType": "policyinstance",
+      "policyReplType": "HIVE",
+      "severity": "info",
+      "timestamp": "2017-06-23 20:42:03.852",
+      "message": "policy instance ignored"
+    },
+    {
+      "policyId": "/c1/c1/hdfsPolicy/0/1497564970816/000000001",
+      "instanceId": "/c1/c1/hdfsPolicy/0/1497564970816/000000001@183",
+      "event": "succeeded",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "info",
+      "timestamp": "2017-06-23 12:16:48.306",
+      "message": "policy instance succeeded"
     }
   ]
 }
