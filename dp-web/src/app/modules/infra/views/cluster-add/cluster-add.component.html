@@ -21,6 +21,7 @@
     <div class="hwx-desc">{{"pages.infra.description.addCluster" | translate}} </div>
 
     <div class="spacer-15"> </div>
+
     <form #clusterForm="ngForm">
       <div  class="form-group" #ambariInput>
         <label class="required">{{"pages.infra.labels.ambariUrl" | translate}}</label>
@@ -46,29 +47,26 @@
 
       <div *ngIf="showClusterDetails">
         <div class="cluster-details">
-          <div>
-            <label class="label">{{"pages.infra.labels.clusterName" | translate}}</label>
-            <div class="value">{{cluster.name}}</div>
+          <div class="display-group">
+            <label>{{"pages.infra.labels.clusterName" | translate}}</label>
+            <div>{{cluster.name}}</div>
           </div>
-          <div class="spacer-15"> </div>
-          <div>
-            <label class="label">{{"pages.infra.labels.ipAddress" | translate}}</label>
-            <div class="value">{{cluster.ipAddress}}</div>
+          <div class="display-group">
+            <label>{{"pages.infra.labels.ipAddress" | translate}}</label>
+            <div>{{cluster.ipAddress}}</div>
           </div>
-          <div class="spacer-15"> </div>
-
-          <div>
-            <label class="label">{{"pages.infra.labels.services" | translate}}</label>
+          <div class="display-group">
+            <label>{{"pages.infra.labels.services" | translate}}</label>
             <div *ngFor="let service of cluster.services" class="services"><i class="fa fa-check-circle"></i> {{service}}</div>
           </div>
         </div>
 
-        <div *ngIf="isDataLake" class="datalake-indicator">
+        <div *ngIf="isDataLake" class="datalake-indicator callout">
           <div *ngIf="isDataLake" class="icon-container">
             <div class="datalake-notification">
-              <div class="title">{{"common.datalake" | translate}}</div>
-              <div class="message"> {{ dLFoundMessage }}</div>
-              <div class="anchor"><a target="_blank" href="https://en.wikipedia.org/wiki/Data_lake">{{"common.moreLink" | translate}}</a> </div>
+              <div class="hwx-title">{{"common.datalake" | translate}}</div>
+              <div class="hwx-desc"> {{ dLFoundMessage }}</div>
+              <div><a target="_blank" href="https://en.wikipedia.org/wiki/Data_lake">{{"common.moreLink" | translate}}</a> </div>
             </div>
           </div>
         </div>
@@ -76,7 +74,7 @@
           <div class="mdl-cell mdl-cell--8-col datalake-input">
             <div class="form-group">
               <label class="required">{{"pages.infra.labels.clusterLocation" | translate}}</label>
-              <div class="hwx-desc">{{"pages.infra.description.clusterLocation" | translate}}</div>
+              <div class="hwx-inline-desc">{{"pages.infra.description.clusterLocation" | translate}}</div>
               <input required class="dp-input" name="location" type="text" ngui-auto-complete
                      (keyup)="checkLocation()"
                      [min-chars]=3
@@ -90,17 +88,17 @@
             </div>
             <div class="form-group">
               <label class="required">{{"pages.infra.labels.dataCenter" | translate}}</label>
-              <div class="hwx-desc">{{"pages.infra.description.dataCenter" | translate}}</div>
+              <div class="hwx-inline-desc">{{"pages.infra.description.dataCenter" | translate}}</div>
               <input required class="dp-input" style="width: 330px" name="datacenter" type="text" [(ngModel)]="cluster.dcName"/>
             </div>
             <div class="form-group">
               <label class="required">{{"common.tags" | translate}} </label>
-              <div class="hwx-desc">{{"pages.infra.description.tags" | translate}}</div>
+              <div class="hwx-inline-desc">{{"pages.infra.description.tags" | translate}}</div>
               <tagging-widget id="tags" [tags]="cluster.tags" [clearOnSearch]="true" (onNewSearch)="onNewTagAddition($event)"></tagging-widget>
             </div>
             <div class="form-group">
               <label class="required">{{"common.description" | translate}}</label>
-              <div class="hwx-desc">{{"pages.infra.description.description" | translate}}</div>
+              <div class="hwx-inline-desc">{{"pages.infra.description.description" | translate}}</div>
               <textarea name="desc" required [(ngModel)]="cluster.description"></textarea>
             </div>
           </div>
@@ -113,7 +111,7 @@
     <div class="button-container"  *ngIf="showClusterDetails">
       <button class="mdl-button btn-hwx-primary" (click)="onCreate($event)">{{"common.add" | translate}}</button>
       <button class="mdl-button btn-hwx-primary" (click)="onCreateAndAdd($event)">{{"common.addAndNew" | translate}}</button>
-      <button class="mdl-button btn-hwx-secondary" (click)="onCancel($event)">{{"common.cancel" | translate}}</button>
+      <button class="mdl-button btn-hwx-default" (click)="onCancel($event)">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

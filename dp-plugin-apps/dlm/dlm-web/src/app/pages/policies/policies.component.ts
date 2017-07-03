@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -25,7 +25,8 @@ export const ALL = 'all';
 @Component({
   selector: 'dlm-policies',
   templateUrl: './policies.component.html',
-  styleUrls: ['./policies.component.scss']
+  styleUrls: ['./policies.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PoliciesComponent implements OnInit, OnDestroy {
   policies$: Observable<Policy[]>;
@@ -46,6 +47,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
     {multiple: true, propertyName: 'status'},
     {multiple: true, propertyName: 'name'}
   ];
+  initialFilters: {propertyName: string, value: string []} [];
 
   constructor(private store: Store<fromRoot.State>, private route: ActivatedRoute) {
     this.policies$ = this.store.select(getPolicyClusterJob);
@@ -81,6 +83,14 @@ export class PoliciesComponent implements OnInit, OnDestroy {
     this.subscriptions.push(lastJobsWorkaroundSubscription);
     this.route.queryParams.subscribe(params => {
       this.activePolicyId = params['policy'];
+      if (params['policy']) {
+        this.initialFilters = [
+          {
+            propertyName: 'name',
+            value: [params['policy']]
+          }
+        ];
+      }
     });
   }
 

@@ -1,17 +1,12 @@
 import { type, requestType } from '../utils/type-action';
 import { Action } from '@ngrx/store';
-import { JOB_STATUS } from 'constants/status.constant';
 import { Policy } from 'models/policy.model';
 import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
-import * as moment from 'moment';
-import { JobTrackingInfo } from 'models/job-tracking-info.model';
 
 export const ActionTypes = {
   LOAD_JOBS: requestType('LOAD_JOBS'),
   LOAD_JOBS_FOR_CLUSTERS: type('LOAD_JOBS_FOR_CLUSTERS'),
   LOAD_JOBS_FOR_POLICY: type('LOAD_JOBS_FOR_POLICY'),
-  LOAD_JOBS_SUCCESS: type('LOAD_JOBS_SUCCESS'),
-  LOAD_JOBS_FAIL: type('LOAD_JOBS_FAIL'),
   ABORT_JOB: requestType('ABORT_JOB')
 };
 
