@@ -28,6 +28,7 @@ object TopologyGenerator {
   }
 
   def configure(config: KnoxConfig) = {
+
     val doc: Document = getSsoTemplateDoc
 
     val authParams = getAuthenticationParams(doc)
@@ -55,11 +56,17 @@ object TopologyGenerator {
 
     val whiteListDomains = config.domains match {
       case Some(domains) => {
-        domains.mkString("|").trim
+        if (domains.size>0) {
+          domains.mkString("|").trim+"|"
+        }else{
+          ""
+        }
       }
       case None => ""
     }
-
+    val whitelistRegex="^https?:\\\\/\\\\/("+whiteListDomains+"dataplane|localhost|127.0.0.1|0:0:0:0:0:0:0:1|::1)(:[0-9])*.*$"
+    replaceParamValue(ssoServiceParams.get("knoxsso.redirect.whitelist.regex").get,
+      whitelistRegex)
     val transformerFactory = TransformerFactory.newInstance
     val transformer = transformerFactory.newTransformer
     val stringWriter: StringWriter = new StringWriter()
