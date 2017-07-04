@@ -31,7 +31,9 @@ export class LdapConfigComponent implements OnInit {
   }
 
   ngOnInit() {
-
+    let currentLocation = window.location.href.split('/');
+    let domain = currentLocation[2].indexOf(':') > -1 ? currentLocation[2].substring(0, currentLocation[2].indexOf(':')) : currentLocation[2];
+    this.ldapProperties.domains.push(domain);
   }
 
   save() {
