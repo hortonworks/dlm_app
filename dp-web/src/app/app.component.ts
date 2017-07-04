@@ -7,6 +7,7 @@ import { MdlService } from './services/mdl.service';
 import { User } from './models/user';
 import {HeaderData, Persona, PersonaTabs} from './models/header-data';
 import {CollapsibleNavService} from './services/collapsible-nav.service';
+import {Loader, LoaderStatus} from './shared/utils/loader';
 
 export enum ViewPaneState {
   MAXIMISE, MINIMISE
@@ -23,6 +24,7 @@ export class AppComponent implements OnInit {
   viewPaneStates = ViewPaneState;
   viewPaneState = ViewPaneState.MAXIMISE;
   headerData: HeaderData = new HeaderData();
+  showLoader : LoaderStatus;
 
   constructor(
     private mdlService: MdlService,
@@ -46,7 +48,10 @@ export class AppComponent implements OnInit {
     this.setHeaderData();
     this.collapsibleNavService.collpaseSideNav$.subscribe(collapsed => {
       this.viewPaneState =  collapsed ? ViewPaneState.MINIMISE : ViewPaneState.MAXIMISE;
-    })
+    });
+    Loader.getStatus().subscribe(status => {
+      this.showLoader = status
+    });
   }
 
   setHeaderData() {
