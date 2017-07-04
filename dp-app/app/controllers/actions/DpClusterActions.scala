@@ -29,17 +29,17 @@ class DpClusterActions @Inject()(
     authenticated: Authenticated
 ) extends Controller {
 
-  def listWithClusters(validOnly: Option[Boolean]) = authenticated.async {
+  def listWithClusters(`type`: Option[String]) = authenticated.async {
     Logger.info("list lakes with clusters")
 
-    val validOnlyFlag = validOnly.getOrElse(false);
+    val typeFlag = `type`.getOrElse("all");
 
     retrieveLakes()
       .flatMap({ lakes =>
         val lakeFutures =
           lakes
             .filter{cLake =>
-              if(validOnlyFlag) {
+              if(typeFlag == "lake") {
                 cLake.isDatalake.getOrElse(false)   // only valid lakes
               }  else {
                 true  // return all results if flag is not sent
