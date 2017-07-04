@@ -1,9 +1,5 @@
 version: '2'  
 services:
-  dp-consul-server:
-    image: consul
-    network_mode: "host"
-    command: agent -server -bootstrap -bind=${CONSUL_HOST} -client=${CONSUL_HOST} -ui
   dp-gateway:
     image: hortonworks/dp-gateway
     ports:

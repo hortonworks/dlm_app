@@ -10,6 +10,18 @@ KNOX_SIGNING_CERTIFICATE=knox-signing.pem
 DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 
+init_consul(){
+  read_consul_host
+  docker-compose -f docker-compose-consul.yml up -d
+}
+read_consul_host(){
+ if [ -z "$CONSUL_HOST" ]; then
+  echo "Enter the Host IP Address (Consul will bind to this host):"
+  read HOST_IP;
+  export CONSUL_HOST=$HOST_IP;
+ fi  
+}
+
 init_db() {
     docker-compose up -d
 }
@@ -44,13 +56,12 @@ destroy_knox() {
 }
 
 init_app() {
-    echo "Enter the Host IP Address (Consul will bind to this host):"
-    read HOST_IP;	
-    export CONSUL_HOST=$HOST_IP;
+    read_consul_host
     docker-compose -f docker-compose-apps.yml up -d
 }
 
 init_knox() {
+    read_consul_host
     echo "Enter Knox master password: "
     read -s MASTER_PASSWD
     echo "Reenter password: "
@@ -67,7 +78,7 @@ init_knox() {
     fi
     echo "Use pre-packaged LDAP instance (suitable only for testing) [yes/no]: "
     read USE_TEST_LDAP
-	MASTER_PASSWORD=${MASTER_PASSWD} USE_TEST_LDAP=${USE_TEST_LDAP} docker-compose -f docker-compose-knox.yml up -d
+	MASTER_PASSWORD=${MASTER_PASSWD} USE_TEST_LDAP=${USE_TEST_LDAP} CONSUL_HOST=$CONSUL_HOST docker-compose  -f docker-compose-knox.yml up -d 
     KNOX_CONTAINER_ID=$(get_knox_container_id)
     if [ -z ${KNOX_CONTAINER_ID} ]; then
         echo "Knox container not found. Ensure it is running..."
@@ -80,7 +91,7 @@ init_knox() {
     then
         docker exec -it ${KNOX_CONTAINER_ID} ./setup_knox_sso_conf.sh
     fi
-	echo "Knox Initialized"
+    echo "Knox Initialized"
 }
 
 export_knox_cert() {
@@ -122,8 +133,9 @@ print_version() {
 usage() {
     local tabspace=20
     echo "Usage: dpdeploy.sh <command>"
-    printf "%-${tabspace}s:%s\n" "Commands" "init [db|knox|app] | migrate | ps | logs [db|all] | start | stop [knox] | destroy [knox]"
+    printf "%-${tabspace}s:%s\n" "Commands" "init [db|consul|knox|app] | migrate | ps | logs [db|all] | start | stop [knox] | destroy [knox]"
     printf "%-${tabspace}s:%s\n" "init db" "Initialize postgres DB for first time"
+    printf "%-${tabspace}s:%s\n" "init consul" "Initialize consul"
     printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox container"
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
@@ -157,6 +169,9 @@ else
                     ;;
                 app)
                     init_app
+                    ;;
+                consul)
+                    init_consul
                     ;;
                 *)
                     usage
@@ -205,4 +220,3 @@ else
             ;;
     esac
 fi
-
