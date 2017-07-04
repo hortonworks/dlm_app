@@ -35,8 +35,8 @@ import java.util.stream.Collectors;
 public class Gateway {
 
   public static final int INITIAL_DELAY = 1;
-  public static final int GATEWAY_DISCOVER_RETRY_COUNT = 3;
-  public static final int GATEWAY_DISCOVER_RETRY_WAITBETWEEN_INMILLIS = 500;
+  public static final int DEFAULT_GATEWAY_DISCOVER_RETRY_COUNT = 5;
+  public static final int DFAULT_GATEWAY_DISCOVER_RETRY_WAITBETWEEN_INMILLIS = 3000;
   private final Config config;
   private final Map<String, String> serviceConfigs;
   private final Optional<ConsulHook> consulHook;
@@ -44,6 +44,7 @@ public class Gateway {
   private final AtomicReference<Set<ZuulServer>> serverSet;
   private Supplier<List<ZuulServer>> supplier;
   private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+  private int gatewayDiscoverRetryCount=DEFAULT_GATEWAY_DISCOVER_RETRY_COUNT;
 
 
   public Gateway(Config config, Map<String, String> serviceConfigs, Optional<ConsulHook> consulHook) {
@@ -52,6 +53,9 @@ public class Gateway {
     this.consulHook = consulHook;
     String host = config.getString("consul.host");
     int port = config.getInt("consul.port");
+    if (config.hasPath("gateway.discover.retry.count")) {
+      gatewayDiscoverRetryCount=config.getInt("gateway.discover.retry.count");
+    }
     dpConsulClient = new DpConsulClientImpl(new ConsulEndpoint(host, port));
     supplier = new ServerListSupplier(dpConsulClient);
     serverSet = new AtomicReference<>(Sets.newHashSet());
@@ -105,14 +109,14 @@ public class Gateway {
   }
   public ZuulServer getGatewayService(){
     List<ZuulServer> zuulServers = null;
-    int retryCount=3;
+    int retryCount=gatewayDiscoverRetryCount;
     do{
       zuulServers=supplier.get();
       if (zuulServers.size()>0){
         break;
       }
       try {
-        Thread.sleep(GATEWAY_DISCOVER_RETRY_WAITBETWEEN_INMILLIS);
+        Thread.sleep(DFAULT_GATEWAY_DISCOVER_RETRY_WAITBETWEEN_INMILLIS);
       } catch (InterruptedException e) {
         //Do nothing here
       }
