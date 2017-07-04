@@ -1,132 +1,147 @@
 package com.hortonworks.dataplane.knoxagent
 
+import java.io.StringWriter
+import javax.xml.parsers.{DocumentBuilder, DocumentBuilderFactory}
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
+import javax.xml.xpath.{XPath, XPathConstants, XPathFactory}
+
+import org.w3c.dom.{Document, Element, Node, NodeList}
+
+import scala.collection.mutable
 
 object TopologyGenerator {
- def configure(config:KnoxConfig)={
-  //val xmlObj=XML.loadFile(knoxSsoTemplatePath)
-  var xml={
-   <topology>
-    <gateway>
-     {getWebAppSecurityConf}
-     {configureShiroProvider(config)}
-     <provider>
-      <role>identity-assertion</role>
-      <name>Default</name>
-      <enabled>true</enabled>
-     </provider>
-     {configureHostMap}
-    </gateway>
-    <application>
-     <name>knoxauth</name>
-    </application>
-    {configureKnoxsso(config)}
-   </topology>
-  }
-  val xmlPrettifier = new scala.xml.PrettyPrinter(80, 4)
-  val formattedXml=xmlPrettifier.format(xml)
-  formattedXml
- }
- private def getWebAppSecurityConf={
-  {
-   <provider>
-    <role>webappsec</role>
-    <name>WebAppSec</name>
-    <enabled>true</enabled>
-    <param><name>xframe.options.enabled</name><value>true</value></param>
-   </provider>
-  }
- }
- private def configureHostMap={
-  //TODO need to check how hostmap is useful
-  <provider>
-   <role>hostmap</role>
-   <name>static</name>
-   <enabled>true</enabled>
-   <param><name>localhost</name><value>sandbox,sandbox.hortonworks.com</value></param>
-  </provider>
- }
- private def configureShiroProvider(config:KnoxConfig)={
-  <provider>
-   <role>authentication</role>
-   <name>ShiroProvider</name>
-   <enabled>true</enabled>
-   <param>
-    <name>sessionTimeout</name>
-    <value>30</value>
-   </param>
-   <param>
-    <name>redirectToUrl</name>
-    <value>/gateway/knoxsso/knoxauth/login.html</value>
-   </param>
-   <param>
-    <name>restrictedCookies</name>
-    <value>rememberme,WWW-Authenticate</value>
-   </param>
-   <param>
-    <name>main.ldapRealm</name>
-    <value>org.apache.hadoop.gateway.shirorealm.KnoxLdapRealm</value>
-   </param>
-   <param>
-    <name>main.ldapContextFactory</name>
-    <value>org.apache.hadoop.gateway.shirorealm.KnoxLdapContextFactory</value>
-   </param>
-   <param>
-    <name>main.ldapRealm.contextFactory</name>
-    <value>$ldapContextFactory</value>
-   </param>
-   <param>
-    <name>main.ldapRealm.userDnTemplate</name>
-    <value>{config.userDnTemplate.get}</value>
-   </param>
-   <param>
-    <name>main.ldapRealm.contextFactory.url</name>
-    <value>{config.ldapUrl.get}</value>
-   </param>
-   <param>
-    <name>main.ldapRealm.authenticationCachingEnabled</name>
-    <value>false</value>
-   </param>
-   <param>
-    <name>main.ldapRealm.contextFactory.authenticationMechanism</name>
-    <value>simple</value>
-   </param>
-   <param>
-    <name>urls./**</name>
-    <value>authcBasic</value>
-   </param>
-  </provider>
-
- }
- private def configureKnoxsso(config:KnoxConfig)={
-  var ttlMilliSecs=config.signedTokenTtl match {
-   case Some(ttlInMinutes)=>ttlInMinutes *60000
-   case None=> -1
-  }
-  var httpsOnly=config.allowHttpsOnly match {
-   case Some(httpsOnly)=>httpsOnly
-   case None=>false
-  }
-  val whiteListDomains=config.domains   match {
-   case Some(domains) =>{
-    domains.mkString("|")
-   }
-   case None =>"localhost"
+  val xPath: XPath = XPathFactory.newInstance().newXPath()
+  private def findByRoleName(nodeList: NodeList,
+                             roleName: String): Option[Node] = {
+    var i = 0
+    while (i < nodeList.getLength) {
+      val node = nodeList.item(i)
+      val roleNode = xPath.evaluate("role", node)
+      if (roleNode.equals(roleName)) {
+        return Some(node)
+      }
+      i = i + 1
+    }
+    None
   }
 
-   <service>
-    <role>KNOXSSO</role>
-    <param>
-     <name>knoxsso.cookie.secure.only</name>
-     <value>{httpsOnly}</value>
-    </param>
-    <param>
-     <name>knoxsso.token.ttl</name>
-     <value>{ttlMilliSecs}</value>
-    </param>
-    <param>
-     <name>knoxsso.redirect.whitelist.regex</name>
-     <value>^https?:\/\/({whiteListDomains}|localhost|127\.0\.0\.1|0:0:0:0:0:0:0:1|::1)(:[0-9])*.*$</value>
-    </param>
-   </service>
- }
+  def configure(config: KnoxConfig) = {
+    val doc: Document = getSsoTemplateDoc
+
+    val authParams = getAuthenticationParams(doc)
+
+    replaceParamValue(authParams.get("main.ldapRealm.userDnTemplate").get,
+                      config.userDnTemplate.get)
+    replaceParamValue(authParams.get("main.ldapRealm.contextFactory.url").get,
+                      config.ldapUrl.get)
+    replaceParamValue(authParams.get("main.ldapRealm.contextFactory.url").get,
+                      config.ldapUrl.get)
+
+    val ssoServiceParams = getKnoxSsoServiceParams(doc)
+    var ttlMilliSecs = config.signedTokenTtl match {
+      case Some(ttlInMinutes) => ttlInMinutes * 60000
+      case None => -1
+    }
+    replaceParamValue(ssoServiceParams.get("knoxsso.token.ttl").get,
+                      ttlMilliSecs.toString)
+    var httpsOnly = config.allowHttpsOnly match {
+      case Some(httpsOnly) => httpsOnly
+      case None => false
+    }
+    replaceParamValue(ssoServiceParams.get("knoxsso.cookie.secure.only").get,
+                      httpsOnly.toString)
+
+    val whiteListDomains = config.domains match {
+      case Some(domains) => {
+        domains.mkString("|").trim
+      }
+      case None => ""
+    }
+
+    val transformerFactory = TransformerFactory.newInstance
+    val transformer = transformerFactory.newTransformer
+    val stringWriter: StringWriter = new StringWriter()
+    transformer.transform(new DOMSource(doc), new StreamResult(stringWriter))
+    stringWriter.toString
+  }
+
+  private def getKnoxSsoServiceParams(doc: Document) = {
+    val services: NodeList = xPath
+      .evaluate("/topology/service",
+                doc.getDocumentElement(),
+                XPathConstants.NODESET)
+      .asInstanceOf[NodeList]
+    val knoxSsoNode = findByRoleName(services, "KNOXSSO")
+    val knoxSsoParamVals = getParamNodeMap(
+      knoxSsoNode.get.asInstanceOf[Element])
+    knoxSsoParamVals
+  }
+
+  private def getAuthenticationParams(doc: Document) = {
+    val gatewayProviders: NodeList = xPath
+      .evaluate("/topology/gateway/provider",
+                doc.getDocumentElement(),
+                XPathConstants.NODESET)
+      .asInstanceOf[NodeList]
+    val authenticationNode = findByRoleName(gatewayProviders, "authentication")
+    val authParamVals = getParamNodeMap(
+      authenticationNode.get.asInstanceOf[Element])
+    authParamVals
+  }
+
+  private def getSsoTemplateDoc = {
+    val ssoTopologyTemplateStream =
+      getClass.getResourceAsStream("/knoxssotopology_template.xml")
+    val docFactory: DocumentBuilderFactory =
+      DocumentBuilderFactory.newInstance()
+    val docBuilder: DocumentBuilder = docFactory.newDocumentBuilder()
+    val doc: Document = docBuilder.parse(ssoTopologyTemplateStream)
+    doc
+  }
+
+  private def replaceParamValue(node: Node, paramValue: String) {
+
+    val paramNodeChildren = node.getChildNodes
+    var i = 0
+    while (i < paramNodeChildren.getLength) {
+      {
+        val item = paramNodeChildren.item(i)
+        if (item.getNodeName.equals("value")) item.setTextContent(paramValue)
+      }
+      {
+        i += 1; i - 1
+      }
+    }
+  }
+  private def getParamNodeMap(knoxSsoConfig: Element) = {
+    val paramNodes = knoxSsoConfig.getElementsByTagName("param")
+    val paramNameToNodesMap = new mutable.HashMap[String, Node]()
+
+    var i = 0
+    while (i < paramNodes.getLength) {
+      {
+        val paramNode = paramNodes.item(i)
+        val paramProperties = paramNode.getChildNodes
+        var j = 0
+        while (j < paramProperties.getLength) {
+          {
+            val paramProperty = paramProperties.item(j)
+            if (paramProperty.getNodeName.equals("name"))
+              paramNameToNodesMap.put(paramProperty.getFirstChild.getNodeValue,
+                                      paramNode)
+          }
+          {
+            j += 1; j - 1
+          }
+        }
+      }
+      {
+        i += 1; i - 1
+      }
+    }
+    paramNameToNodesMap
+  }
+
 }
