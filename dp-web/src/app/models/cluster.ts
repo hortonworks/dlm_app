@@ -3,6 +3,7 @@ export class Cluster {
   id: number;
   name: string;
   description: string = '';
+  dcName: string;
   ambariurl: string;
   ipAddress: string;
   services: string[] = [];
@@ -35,6 +36,7 @@ export class ClusterDetails {
  size: string;
  securityType: number;
  location: string;
+ dataCenter: string;
  noOfSerices: number;
  heapSizeUsed: string;
  heapSizeTotal: string;
