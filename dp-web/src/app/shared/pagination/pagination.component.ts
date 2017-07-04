@@ -43,10 +43,4 @@ export class SimplePaginationWidget {
       this.indexEmitter.emit(this.pageStartIndex);
     }
   }
-
-  Math: any;
-
-  constructor() {
-    this.Math = Math;
-  }
 }
