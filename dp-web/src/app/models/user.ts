@@ -10,3 +10,9 @@ export class User {
     public username: string
   ) {}
 }
+
+export class UserList {
+  total : number;
+  users : User[]
+
+}

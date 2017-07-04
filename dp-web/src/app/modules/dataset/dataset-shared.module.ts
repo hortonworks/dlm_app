@@ -2,7 +2,7 @@ import {CommonModule} from "@angular/common";
 import {NgModule} from "@angular/core";
 import {FormsModule} from "@angular/forms";
 import {NguiAutoCompleteModule} from '@ngui/auto-complete';
-import {SimplePaginationWidget} from "../../shared/pagination/pagination.component";
+import {PaginationModule} from "../../shared/pagination/pagination.module";
 import {TaggingWidgetModule} from "../../shared/tagging-widget/tagging-widget.module";
 import {AssetOwnerService} from "./services/assetOwnerService";
 import {DsAssetsService} from "./services/dsAssetsService";
@@ -39,7 +39,6 @@ import {TranslateModule} from "@ngx-translate/core";
     DsAssetList,
     DsRowProxy,
     DatasetDashboardComponent,
-    SimplePaginationWidget,
     DsAssetSearch,
     BasicQueryEditor,
     AdvanceQueryEditor,
@@ -52,7 +51,8 @@ import {TranslateModule} from "@ngx-translate/core";
     FormsModule,
     NguiAutoCompleteModule,
     TaggingWidgetModule,
-    TranslateModule
+    TranslateModule,
+    PaginationModule
   ],
   exports: [
     NavTagPanel,
@@ -66,7 +66,6 @@ import {TranslateModule} from "@ngx-translate/core";
     DsAssetList,
     DsRowProxy,
     DatasetDashboardComponent,
-    SimplePaginationWidget,
     DsAssetSearch,
     BasicQueryEditor,
     AdvanceQueryEditor,

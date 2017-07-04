@@ -110,8 +110,8 @@ class UserManager @Inject()(val ldapService: LdapService,
     }
   }
 
-  def listUsersWithRoles = Action.async { req =>
-    userService.getUsersWithRoles.map {
+  def listUsersWithRoles = Action.async { request =>
+    userService.getUsersWithRoles(request.getQueryString("offset"), request.getQueryString("pageSize"), request.getQueryString("searchTerm")).map {
       case Left(errors) => handleErrors(errors)
       case Right(users) => Ok(Json.toJson(users))
     }

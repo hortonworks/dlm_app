@@ -3,7 +3,7 @@ import {Http, Headers, RequestOptions} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import {LDAPUser} from '../models/ldap-user';
 import {HttpUtil} from '../shared/utils/httpUtil';
-import {User} from '../models/user';
+import {User, UserList} from '../models/user';
 import {Subject} from 'rxjs/Subject';
 
 @Injectable()
@@ -30,9 +30,13 @@ export class UserService {
       .catch(HttpUtil.handleError);
   }
 
-  getUsersWithRole(): Observable<User[]> {
+  getUsersWithRole(offset: number, pageSize:number, searchTerm?:string): Observable<UserList> {
+    let url = `${this.url}/withRoles?offset=${offset}&pageSize=${pageSize}`;
+    if(searchTerm && searchTerm.trim().length>0){
+      url = `${url}&searchTerm=${searchTerm}`;
+    }
     return this.http
-      .get(`${this.url}/withRoles`, new RequestOptions(HttpUtil.getHeaders()))
+      .get(url, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

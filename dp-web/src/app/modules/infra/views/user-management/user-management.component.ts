@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {UserService} from '../../../../services/user.service';
-import {User} from '../../../../models/user';
+import {User, UserList} from '../../../../models/user';
 import {TranslateService} from '@ngx-translate/core';
 
 @Component({
@@ -10,11 +10,17 @@ import {TranslateService} from '@ngx-translate/core';
   styleUrls: ['./user-management.component.scss']
 })
 export class UserManagementComponent implements OnInit {
-
   users: User[] = [];
+  offset = 0;
+  pageSize = 10;
+  total: number;
+  searchTerm;
   rolesMap = new Map();
 
-  constructor(private router: Router, private route: ActivatedRoute, private userService: UserService, private translateService: TranslateService) {
+  constructor(private router: Router,
+              private route: ActivatedRoute,
+              private userService: UserService,
+              private translateService: TranslateService) {
   }
 
   ngOnInit() {
@@ -24,9 +30,10 @@ export class UserManagementComponent implements OnInit {
     this.getUsers();
   }
 
-  getUsers() {
-    this.userService.getUsersWithRole().subscribe(users => {
-      this.users = users
+  getUsers(){
+    this.userService.getUsersWithRole(this.offset, this.pageSize, this.searchTerm).subscribe((userList: UserList) => {
+      this.users = userList.users;
+      this.total = userList.total;
       this.users.forEach(user => {
         let roles = [];
         user.roles.forEach(role => {
@@ -43,6 +50,28 @@ export class UserManagementComponent implements OnInit {
 
   editUser(userName) {
     this.router.navigate([{outlets: {'sidebar': ['edit', userName]}}], {relativeTo: this.route});
+  }
+
+  onSearch(event) {
+    if (event.keyCode === 13) {
+      this.offset = 0;
+      this.getUsers();
+    }
+  }
+
+  get start(){
+    return this.offset + 1;
+  }
+
+  onPageSizeChange(pageSize){
+    this.offset = 0;
+    this.pageSize = pageSize;
+    this.getUsers();
+  }
+
+  onPageChange(offset){
+    this.offset = offset - 1;
+    this.getUsers();
   }
 
 }
