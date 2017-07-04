@@ -47,7 +47,6 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   hdfsPercent: string;
   heapPercent: string;
   ngOnInit() {
-
     this.route.params.subscribe(params => {
       this.fetchClusterDetails(params['id']);
     });
