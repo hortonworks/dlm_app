@@ -65,7 +65,7 @@ abstract class ClusterSyncTask(cl: ClusterData,
     cl.dataplaneCluster.knoxUrl)
   private implicit val ws: WSClient = w
   final protected def knoxEnabled =
-    cl.dataplaneCluster.knoxEnabled.isDefined && cl.dataplaneCluster.knoxUrl.isDefined
+    cl.dataplaneCluster.knoxEnabled.isDefined && cl.dataplaneCluster.knoxEnabled.get && cl.dataplaneCluster.knoxUrl.isDefined
   final protected val executor =
     if (knoxEnabled) KnoxApiExecutor.withTokenCaching(knoxConfig, w)
     else KnoxApiExecutor.withTokenDisabled(knoxConfig, w)

@@ -7,6 +7,14 @@
       <div class="text-small-1">{{"pages.infra.description.clusterAddSuccess" | translate}} </div>
     </div>
   </div>
+  <div *ngIf="showError">
+    <div class="error-notification-bar">
+      <i class="fa fa-times-circle pull-left"></i>
+      <i class="fa fa-remove pull-right" (click)="closeError()"></i>
+      <div class="text-medium">{{"pages.infra.labels.clusterAddError" | translate}}</div>
+      <div class="text-small-1">{{errorMessage}} </div>
+    </div>
+  </div>
 
   <div class="icon-container">
     <div class="hwx-title">{{"pages.infra.labels.addCluster" | translate}}</div>
@@ -14,93 +22,96 @@
 
     <div class="spacer-15"> </div>
 
-    <div  class="form-group" #ambariInput>
-      <label class="required">{{"pages.infra.labels.ambariUrl" | translate}}</label>
-      <div class="input-group">
-        <input class="dp-input-url" placeholder="eg. http://10.10.10.10:8080" name="url" type="text" [(ngModel)]="cluster.ambariurl" (keypress)="onKeyPress($event)"/>
-        <button class="mdl-button btn-hwx-primary" (click)="getClusterInfo($event)">
-          <span *ngIf="_isClusterValidateInProgress"><i class="fa fa-spinner fa-spin"></i></span>
-          <span *ngIf="!_isClusterValidateInProgress">{{"common.go" | translate}}</span>
-        </button>
-      </div>
-    </div>
-
-    <div *ngIf="_isClusterValidateSuccessful && !_isClusterValid" class="error-section validation-error">
-      <i class="fa fa-times-circle"></i>
-      <div class="">
-        <span class="text-medium">{{"pages.infra.labels.connectionFailed" | translate}}</span>
-        <span class="text-small-1">{{"pages.infra.description.connectionFailed" | translate}}</span>
-        <ul>
-          <li *ngFor="let reason of reasons">{{reason}}</li>
-        </ul>
-      </div>
-    </div>
-
-    <div *ngIf="showClusterDetails">
-      <div class="cluster-details">
-        <div>
-          <label class="label">{{"pages.infra.labels.clusterName" | translate}}</label>
-          <div class="value">{{cluster.name}}</div>
-        </div>
-        <div class="spacer-15"> </div>
-        <div>
-          <label class="label">{{"pages.infra.labels.ipAddress" | translate}}</label>
-          <div class="value">{{cluster.ipAddress}}</div>
-        </div>
-        <div class="spacer-15"> </div>
-
-        <div>
-          <label class="label">{{"pages.infra.labels.services" | translate}}</label>
-          <div *ngFor="let service of cluster.services" class="services"><i class="fa fa-check-circle"></i> {{service}}</div>
+    <form #clusterForm="ngForm">
+      <div  class="form-group" #ambariInput>
+        <label class="required">{{"pages.infra.labels.ambariUrl" | translate}}</label>
+        <div class="input-group">
+          <input required class="dp-input-url" placeholder="eg. http://10.10.10.10:8080" name="url" type="text" [(ngModel)]="cluster.ambariurl" (keypress)="onKeyPress($event)"/>
+          <button class="mdl-button btn-hwx-primary" (click)="getClusterInfo($event)">
+            <span *ngIf="_isClusterValidateInProgress"><i class="fa fa-spinner fa-spin"></i></span>
+            <span *ngIf="!_isClusterValidateInProgress">{{"common.go" | translate}}</span>
+          </button>
         </div>
       </div>
 
-      <div *ngIf="isDataLake" class="datalake-indicator">
-        <div *ngIf="isDataLake" class="icon-container">
-          <div class="datalake-notification">
-            <div class="title">{{"common.datalake" | translate}}</div>
-            <div class="message"> {{ dLFoundMessage }}</div>
-            <div class="anchor"><a target="_blank" href="https://en.wikipedia.org/wiki/Data_lake">{{"common.moreLink" | translate}}</a> </div>
+      <div *ngIf="_isClusterValidateSuccessful && !_isClusterValid" class="error-section validation-error">
+        <i class="fa fa-times-circle"></i>
+        <div class="">
+          <span class="text-medium">{{"pages.infra.labels.connectionFailed" | translate}}</span>
+          <span class="text-small-1">{{"pages.infra.description.connectionFailed" | translate}}</span>
+          <ul>
+            <li *ngFor="let reason of reasons">{{reason}}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div *ngIf="showClusterDetails">
+        <div class="cluster-details">
+          <div class="display-group">
+            <label>{{"pages.infra.labels.clusterName" | translate}}</label>
+            <div>{{cluster.name}}</div>
+          </div>
+          <div class="display-group">
+            <label>{{"pages.infra.labels.ipAddress" | translate}}</label>
+            <div>{{cluster.ipAddress}}</div>
+          </div>
+          <div class="display-group">
+            <label>{{"pages.infra.labels.services" | translate}}</label>
+            <div *ngFor="let service of cluster.services" class="services"><i class="fa fa-check-circle"></i> {{service}}</div>
+          </div>
+        </div>
+
+        <div *ngIf="isDataLake" class="datalake-indicator callout">
+          <div *ngIf="isDataLake" class="icon-container">
+            <div class="datalake-notification">
+              <div class="hwx-title">{{"common.datalake" | translate}}</div>
+              <div class="hwx-desc"> {{ dLFoundMessage }}</div>
+              <div><a target="_blank" href="https://en.wikipedia.org/wiki/Data_lake">{{"common.moreLink" | translate}}</a> </div>
+            </div>
+          </div>
+        </div>
+        <div class="mdl-grid mdl-grid--no-spacing">
+          <div class="mdl-cell mdl-cell--8-col datalake-input">
+            <div class="form-group">
+              <label class="required">{{"pages.infra.labels.clusterLocation" | translate}}</label>
+              <div class="hwx-inline-desc">{{"pages.infra.description.clusterLocation" | translate}}</div>
+              <input required class="dp-input" name="location" type="text" ngui-auto-complete
+                     (keyup)="checkLocation()"
+                     [min-chars]=3
+                     [(ngModel)]="location"
+                     [source]="getLocations.bind(this)"
+                     [value-formatter]="locationFormatter"
+                     [list-formatter]="locationFormatter"
+                     [no-match-found-text]="'No locations found'"
+                     placeholder="Location"
+                     (valueChanged)="onSelectLocation(location)" [(ngModel)]="searchTerm"/>
+            </div>
+            <div class="form-group">
+              <label class="required">{{"pages.infra.labels.dataCenter" | translate}}</label>
+              <div class="hwx-inline-desc">{{"pages.infra.description.dataCenter" | translate}}</div>
+              <input required class="dp-input" style="width: 330px" name="datacenter" type="text" [(ngModel)]="cluster.dcName"/>
+            </div>
+            <div class="form-group">
+              <label class="required">{{"common.tags" | translate}} </label>
+              <div class="hwx-inline-desc">{{"pages.infra.description.tags" | translate}}</div>
+              <tagging-widget id="tags" [tags]="cluster.tags" [clearOnSearch]="true" (onNewSearch)="onNewTagAddition($event)"></tagging-widget>
+            </div>
+            <div class="form-group">
+              <label class="required">{{"common.description" | translate}}</label>
+              <div class="hwx-inline-desc">{{"pages.infra.description.description" | translate}}</div>
+              <textarea name="desc" required [(ngModel)]="cluster.description"></textarea>
+            </div>
+          </div>
+          <div class="mdl-cell mdl-cell--4-col">
+            <dp-map [mapData]="mapData" class="pull-right"  style="padding: 0px;margin-top:0px;margin-right: 0px" [mapSize]="1"></dp-map>
           </div>
         </div>
       </div>
-
-      <div class="mdl-grid mdl-grid--no-spacing">
-        <div class="mdl-cell mdl-cell--8-col datalake-input">
-          <div class="form-group">
-            <label class="required">{{"pages.infra.labels.clusterLocation" | translate}}</label>
-            <div class="hwx-desc">{{"pages.infra.description.clusterLocation" | translate}}</div>
-            <input class="dp-input" name="url" type="text" ngui-auto-complete
-                   (keyup)="checkLocation()"
-                   [min-chars]=3
-                   [(ngModel)]="location"
-                   [source]="getLocations.bind(this)"
-                   [value-formatter]="locationFormatter"
-                   [list-formatter]="locationFormatter"
-                   [no-match-found-text]="'No locations found'"
-                   placeholder="Location"
-                   (valueChanged)="onSelectLocation(location)" [(ngModel)]="searchTerm"/>
-          </div>
-          <div class="form-group">
-            <label class="required">{{"common.tags" | translate}} </label>
-            <div class="hwx-desc">{{"pages.infra.description.tags" | translate}}</div>
-            <tagging-widget id="tags" [tags]="cluster.tags" [clearOnSearch]="true" (onNewSearch)="onNewTagAddition($event)"></tagging-widget>
-          </div>
-          <div class="form-group">
-            <label class="required">{{"common.description" | translate}}</label>
-            <div class="hwx-desc">{{"pages.infra.description.description" | translate}}</div>
-            <textarea  [(ngModel)]="cluster.description"></textarea>
-          </div>
-        </div>
-        <div class="mdl-cell mdl-cell--4-col">
-          <dp-map [mapData]="mapData" class="pull-right"  style="padding: 0px;margin-top:0px;margin-right: 0px" [mapSize]="1"></dp-map>
-        </div>
-      </div>
-    </div>
+    </form>
     <div class="button-container"  *ngIf="showClusterDetails">
       <button class="mdl-button btn-hwx-primary" (click)="onCreate($event)">{{"common.add" | translate}}</button>
       <button class="mdl-button btn-hwx-primary" (click)="onCreateAndAdd($event)">{{"common.addAndNew" | translate}}</button>
-      <button class="mdl-button btn-hwx-secondary" (click)="onCancel($event)">{{"common.cancel" | translate}}</button>
+      <button class="mdl-button btn-hwx-default" (click)="onCancel($event)">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

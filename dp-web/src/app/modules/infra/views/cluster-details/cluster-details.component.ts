@@ -140,6 +140,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       tags = `${tags}${tags.length ? ', ' : ''}${tag.name}`;
     });
     clusterDetails.tags = tags;
+    clusterDetails.dataCenter = this.lake.dcName;
     if (this.rmHealth && this.rmHealth.ServiceComponentInfo && this.rmHealth.ServiceComponentInfo.rm_metrics && this.rmHealth.metrics && this.rmHealth.metrics.jvm) {
       clusterDetails.nodeManagersActive = this.rmHealth.ServiceComponentInfo.rm_metrics.cluster.activeNMcount;
       clusterDetails.nodeManagersInactive = this.rmHealth.ServiceComponentInfo.rm_metrics.cluster.unhealthyNMcount;

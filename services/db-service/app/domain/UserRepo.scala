@@ -118,7 +118,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
       val query =for{
         updateActive <- getUpdateActiveQuery(userInfo)
         insertQuery<-UserRoles returning UserRoles ++= userRoleObjs
-        delQuery <- UserRoles.filter(_.roleId inSet toBeDeletedRoleIds).delete
+        delQuery <- UserRoles.filter(_.id inSet toBeDeletedRoleIds).delete
       }yield {
         (updateActive,delQuery,insertQuery)
       }
@@ -156,7 +156,13 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
       val existingRoleIds:Seq[Long]=userRoles.map(userRole=>userRole.roleId.get)
       val toBeAdded=requiredRoleIds.filterNot(existingRoleIds.contains(_))
       val toBeDeleted=existingRoleIds.filterNot(requiredRoleIds.contains(_))
-      (toBeAdded,toBeDeleted)
+      val toBeDeletedRoles=userRoles.filter{ur=>
+        toBeDeleted.contains(ur.roleId.get)
+      }
+      val toBeDeletedIDs = toBeDeletedRoles.map{userRole=>
+        userRole.id.get
+      }
+      (toBeAdded,toBeDeletedIDs)
     }
   }
 

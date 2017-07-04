@@ -77,6 +77,7 @@ object Entities {
   case class DataplaneCluster(
       id: Option[Long] = None,
       name: String,
+      dcName: String,
       description: String,
       ambariUrl: String,
       location: Option[Long],
@@ -180,6 +181,7 @@ object Entities {
                      createdBy: Option[Long],
                      createdOn: LocalDateTime = LocalDateTime.now(),
                      lastModified: LocalDateTime = LocalDateTime.now(),
+                     active: Boolean = true,
                      version: Int = 1,
                      customProps: Option[JsValue] = None)
 

@@ -1,9 +1,10 @@
 export interface Event {
   policyId: string;
-  instanceId: string;
+  instanceId?: string;
   event: string;
+  eventType: string;
+  policyReplType: string;
   timestamp: string;
-  eventStatus: string;
   message: string;
   severity: string;
 }

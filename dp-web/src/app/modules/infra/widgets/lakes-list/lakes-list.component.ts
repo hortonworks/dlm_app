@@ -43,9 +43,11 @@ export class LakesListComponent implements OnChanges {
 
   private extractLakeInfo(lake, health, location) {
     let lakeInfo: LakeInfo = new LakeInfo();
+    lakeInfo.id = lake.data.id;
     lakeInfo.name = lake.data.name;
     lakeInfo.ambariUrl = lake.data.ambariUrl;
     lakeInfo.lakeId = lake.data.id;
+    lakeInfo.dataCenter= lake.data.dcName;
     lakeInfo.cluster = lake.clusters && lake.clusters.length ? lake.clusters[0] : null;
     lakeInfo.services = lake.data.services ? lake.data.services : 'NA';
     if (health) {
@@ -147,11 +149,13 @@ export enum LakeStatus {
 }
 
 export class LakeInfo {
+  id: number;
   name: string;
   lakeId: number;
   ambariUrl: string;
   cluster?: Cluster;
   status?: LakeStatus;
+  dataCenter: string;
   city?: string;
   country?: string;
   nodes?: number;
