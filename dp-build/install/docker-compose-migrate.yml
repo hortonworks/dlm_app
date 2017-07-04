@@ -8,4 +8,4 @@ services:
         - dp-database
     links:
         - dp-database
-    command: -configFile=/dbscripts/flyway-docker.conf clean migrate -X
+    command: -configFile=/dbscripts/flyway-docker.conf clean migrate
