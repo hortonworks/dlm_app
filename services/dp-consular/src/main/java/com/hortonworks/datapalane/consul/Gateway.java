@@ -11,9 +11,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -107,29 +106,32 @@ public class Gateway {
     scheduledExecutorService.scheduleAtFixedRate(runnable, INITIAL_DELAY, refresh, TimeUnit.SECONDS);
 
   }
-  public ZuulServer getGatewayService(){
-    List<ZuulServer> zuulServers = null;
-    int retryCount=gatewayDiscoverRetryCount;
-    do{
-      zuulServers=supplier.get();
-      if (zuulServers.size()>0){
-        break;
-      }
-      try {
-        Thread.sleep(DFAULT_GATEWAY_DISCOVER_RETRY_WAITBETWEEN_INMILLIS);
-      } catch (InterruptedException e) {
-        //Do nothing here
-      }
-      retryCount--;
-    }while (zuulServers.size()<1 && retryCount>0);
-    if (zuulServers.size() == 0) {
-      throw new RuntimeException("No Zuul servers found");
-    }
-    final Random randomizer = new Random();
-    ZuulServer zuulServer = zuulServers.get(randomizer.nextInt(zuulServers.size()));
-    return zuulServer;
-  }
 
+  public void getGatewayService(GatewayHook gatewayHook) {
+    final Random randomizer = new Random();
+    AtomicInteger retryCounter = new AtomicInteger(gatewayDiscoverRetryCount);
+    AtomicReference<Future> futureRef = new AtomicReference<>();
+    Future future = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+      List<ZuulServer> zuulServers = supplier.get();
+      if (zuulServers.size() > 0) {
+        try {
+          gatewayHook.gatewayDiscovered(zuulServers.get(randomizer.nextInt(zuulServers.size())));
+        }finally {
+          futureRef.get().cancel(true);
+        }
+      } else {
+        if (retryCounter.decrementAndGet() < 0) {
+          try {
+            gatewayHook.gatewayDiscoverFailure("Not able to discover gateway");
+          }finally {
+            futureRef.get().cancel(true);
+          }
+        }
+      }
+
+    }, INITIAL_DELAY, DFAULT_GATEWAY_DISCOVER_RETRY_WAITBETWEEN_INMILLIS, TimeUnit.MILLISECONDS);
+    futureRef.set(future);
+  }
 
   private static class ServerListSupplier implements Supplier<List<ZuulServer>> {
 
