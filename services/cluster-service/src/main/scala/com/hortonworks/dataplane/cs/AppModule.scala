@@ -3,22 +3,12 @@ package com.hortonworks.dataplane.cs
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provides, Singleton}
+import com.hortonworks.dataplane.cs.atlas.AtlasApiData
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
-import com.hortonworks.dataplane.db.Webservice.{
-  ClusterComponentService,
-  ClusterHostsService,
-  ClusterService,
-  ConfigService,
-  DpClusterService
-}
+import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
 import com.hortonworks.dataplane.db._
-import com.hortonworks.dataplane.http.{AtlasProxy, Webserver}
-import com.hortonworks.dataplane.http.routes.{
-  AmbariRoute,
-  AtlasProxyRoute,
-  AtlasRoute,
-  StatusRoute
-}
+import com.hortonworks.dataplane.http.Webserver
+import com.hortonworks.dataplane.http.routes.{AmbariRoute, AtlasRoute, StatusRoute}
 import com.typesafe.config.{Config, ConfigFactory}
 import org.asynchttpclient.DefaultAsyncHttpClientConfig
 import play.api.libs.ws.WSClient
@@ -89,16 +79,16 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def provideAtlasProxyRoute(actorSystem: ActorSystem,
-                             materializer: ActorMaterializer,
-                             storageInterface: StorageInterface,
-                             clusterComponentService: ClusterComponentService,
-                             clusterHostsService: ClusterHostsService,
-                             dpClusterService: DpClusterService,
-                             clusterService: ClusterService,
-                             wSClient: WSClient,
-                             config: Config): AtlasProxyRoute = {
-    new AtlasProxyRoute(actorSystem,
+  def provideAtlasApiData(actorSystem: ActorSystem,
+                          materializer: ActorMaterializer,
+                          storageInterface: StorageInterface,
+                          clusterComponentService: ClusterComponentService,
+                          clusterHostsService: ClusterHostsService,
+                          dpClusterService: DpClusterService,
+                          clusterService: ClusterService,
+                          wSClient: WSClient,
+                          config: Config): AtlasApiData = {
+    new AtlasApiData(actorSystem,
                         materializer,
                         storageInterface,
                         clusterComponentService,
@@ -108,22 +98,11 @@ object AppModule extends AbstractModule {
                         wSClient,
                         config)
   }
-  @Provides
-  @Singleton
-  def provideAtlasProxy(actorSystem: ActorSystem,
-                        materializer: ActorMaterializer,
-                        configuration: Config,
-                        atlasProxyRoute: AtlasProxyRoute): AtlasProxy = {
-    new AtlasProxy(actorSystem,
-                   materializer,
-                   configuration,
-                   atlasProxyRoute.proxy)
-  }
 
   @Provides
   @Singleton
-  def provideAtlasRoute(config: Config): AtlasRoute = {
-    AtlasRoute(config)
+  def provideAtlasRoute(config: Config,atlasApiData: AtlasApiData): AtlasRoute = {
+    AtlasRoute(config,atlasApiData)
   }
 
   @Provides

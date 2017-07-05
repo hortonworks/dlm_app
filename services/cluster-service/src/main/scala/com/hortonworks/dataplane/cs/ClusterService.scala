@@ -5,12 +5,12 @@ import java.util.Optional
 
 import com.google.inject.Guice
 import com.hortonworks.datapalane.consul._
-import com.hortonworks.dataplane.http.{AtlasProxy, Webserver}
+import com.hortonworks.dataplane.http.Webserver
 import com.typesafe.config.Config
 import play.api.Logger
 
-import scala.util.Try
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Try
 
 object ClusterService extends App {
 
@@ -24,10 +24,9 @@ object ClusterService extends App {
   logger.info(
     s"Starting a server on ${configuration.getInt("dp.services.cluster.http.port")}")
   private val server = injector.getInstance(classOf[Webserver])
-  private val atlasProxy = injector.getInstance(classOf[AtlasProxy])
 
   private val serverState = server.init
-  private val proxyState = atlasProxy.init
+
 
   logger.info("Starting cluster sync")
 
@@ -38,11 +37,6 @@ object ClusterService extends App {
     val registrar = new ApplicationRegistrar(configuration,Optional.of(hook))
     registrar.initialize()
   }
-
-  proxyState.onComplete { s =>
-    logger.info("Started the atlas proxy server")
-  }
-
 
   // This hook takes care of setting up the application correctly
   // when consul and ZUUL services are available

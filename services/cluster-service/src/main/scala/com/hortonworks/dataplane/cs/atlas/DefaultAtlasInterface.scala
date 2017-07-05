@@ -1,10 +1,8 @@
-package com.hortonworks.dataplane.cs
+package com.hortonworks.dataplane.cs.atlas
 
 import com.google.common.base.Supplier
-import com.google.common.io.BaseEncoding
 import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery, Entity}
-import com.hortonworks.dataplane.commons.domain.Entities.{HJwtToken, ClusterService => CS}
-import com.hortonworks.dataplane.cs.atlas.Filters
+import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => CS}
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import org.apache.atlas.AtlasClientV2
@@ -18,8 +16,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
-class DefaultAtlasInterface(clusterId: Long,token: Option[HJwtToken],
-                            config: Config)
+class DefaultAtlasInterface(private val clusterId: Long,
+                            private val config: Config,
+                            private val atlasApiData: AtlasApiData)
     extends AtlasInterface {
 
   import scala.collection.JavaConverters._
@@ -42,9 +41,11 @@ class DefaultAtlasInterface(clusterId: Long,token: Option[HJwtToken],
   val includedTypes =
     config.getStringList("dp.services.atlas.hive.accepted.types").asScala.toSet
 
-  private val atlasApi = new AtlasApiSupplier(clusterId,token,config).get()
+  private val atlasApi =
+    new AtlasApiSupplier(clusterId, config, atlasApiData).get()
 
   override def getHiveAttributes: Future[Seq[AtlasAttribute]] = {
+    log.info("Fetching hive attributes")
     atlasApi.map { api =>
       val entityDef = api.getEntityDefByName("hive_table")
       val attributeDefs = entityDef.getAttributeDefs
@@ -55,11 +56,17 @@ class DefaultAtlasInterface(clusterId: Long,token: Option[HJwtToken],
     }
   }
 
-  override def findHiveTables(filters: AtlasSearchQuery): Future[AtlasEntities] = {
+  override def findHiveTables(
+      filters: AtlasSearchQuery): Future[AtlasEntities] = {
+    log.info("Fetching hive tables")
+    log.info(s"Search query -> $filters")
     // Get the query
     val query = s"$hiveBaseQuery ${Filters.query(filters)}"
     atlasApi.map { api =>
-      val searchResult = if(filters.isPaged) api.dslSearchWithParams(query,filters.limit.get,filters.offset.get) else api.dslSearch(query)
+      val searchResult =
+        if (filters.isPaged)
+          api.dslSearchWithParams(query, filters.limit.get, filters.offset.get)
+        else api.dslSearch(query)
       val entityHeaders = searchResult.getEntities
       if (entityHeaders == null) {
         AtlasEntities(None)
@@ -74,14 +81,16 @@ class DefaultAtlasInterface(clusterId: Long,token: Option[HJwtToken],
   }
 
   private def createEntityRep(e: AtlasEntityHeader) = {
-    Entity(Option(e.getTypeName),
-           Option(attributeAsString(e)),
-           Option(e.getGuid),
-           Option(e.getStatus.toString),
-           Option(e.getDisplayText),
-           Option(e.getClassificationNames.asScala),
-           None,
-           None)
+    Entity(
+      Option(e.getTypeName),
+      Option(attributeAsString(e)),
+      Option(e.getGuid),
+      Option(e.getStatus.toString),
+      Option(e.getDisplayText),
+      Option(e.getClassificationNames.asScala),
+      None,
+      None
+    )
   }
 
   private def attributeAsString(e: AtlasEntityHeader) = {
@@ -95,6 +104,7 @@ class DefaultAtlasInterface(clusterId: Long,token: Option[HJwtToken],
   private val mapper = new ObjectMapper()
 
   override def getAtlasEntity(uuid: String): Future[JsValue] = {
+    log.info(s"Get atlas entity uuid -> $uuid")
     atlasApi.map { api =>
       val entityWithExtInfo = api.getEntityByGuid(uuid)
       val jsonString = mapper.writeValueAsString(entityWithExtInfo)
@@ -103,6 +113,7 @@ class DefaultAtlasInterface(clusterId: Long,token: Option[HJwtToken],
   }
 
   override def getAtlasEntities(uuids: Iterable[String]): Future[JsValue] = {
+    log.info(s"Get atlas entities uuids -> $uuids")
     atlasApi.map { api =>
       val entityWithExtInfo = api.getEntitiesByGuids(uuids.toList.asJava)
       val jsonString = mapper.writeValueAsString(entityWithExtInfo)
@@ -110,12 +121,14 @@ class DefaultAtlasInterface(clusterId: Long,token: Option[HJwtToken],
     }
   }
 
-  override def getAtlasLineage(uuid:String,depth:Option[String]):Future[JsValue] =  {
+  override def getAtlasLineage(uuid: String,
+                               depth: Option[String]): Future[JsValue] = {
+    log.info(s"Get Lineage entity uuid -> $uuid depth -> $depth")
     for {
       api <- atlasApi
       depth <- Future.successful(depth.map(i => i.toInt).getOrElse(3))
       lineageInfo <- Future {
-        api.getLineageInfo(uuid,LineageDirection.BOTH,depth)
+        api.getLineageInfo(uuid, LineageDirection.BOTH, depth)
       }
     } yield {
       Json.parse(mapper.writeValueAsString(lineageInfo))
@@ -123,42 +136,42 @@ class DefaultAtlasInterface(clusterId: Long,token: Option[HJwtToken],
   }
 
   override def getAtlasTypeDefs(searchFilter: SearchFilter): Future[JsValue] = {
+    log.info(s"Getting atlas type defs")
     atlasApi.map { api =>
-      val jsonString = mapper.writeValueAsString(api.getAllTypeDefs(searchFilter))
+      val jsonString =
+        mapper.writeValueAsString(api.getAllTypeDefs(searchFilter))
       Json.parse(jsonString)
     }
   }
 }
 
-sealed class AtlasApiSupplier(clusterId: Long,token: Option[HJwtToken],config: Config)
-
+sealed class AtlasApiSupplier(clusterId: Long,
+                              config: Config,
+                              atlasApiData: AtlasApiData)
     extends Supplier[Future[AtlasClientV2]] {
   private val log = Logger(classOf[AtlasApiSupplier])
 
-  val host = Try(config.getString("dp.services.cluster.atlas.proxy.host")).getOrElse("0.0.0.0")
-  val port = Try(config.getString("dp.services.cluster.atlas.proxy.port")).getOrElse("9010")
-
-  /**
-    * This part builds the proxy URL
-    * if there was a token , then a URL safe B64 encoding
-    * is applied to the token and its sent as a part of the URL
-    * if None - NONE is token is attached
-    *
-    * The URL pattern is
-    * ---------------fixed-----------cluster----fixed--token-fixed--atlas_api
-    * Token - /atlas/proxy/cluster/<cluster_id>/token/<token>/url/<atlas_part>
-    */
-
-  private val tokenString = token.map(t => t.token).getOrElse("NONE")
-  private val encoded = BaseEncoding.base64Url().omitPadding().encode(tokenString.getBytes)
-  val proxyUrl=s"http://$host:$port/atlas/proxy/cluster/$clusterId/token/$encoded/url/"
-
   override def get(): Future[AtlasClientV2] = {
     log.info("Loading Atlas client from Supplier")
-      Future.successful(
-        // The basic auth is needed because the underlying
-        // client code is silly
-      new AtlasClientV2(Array(proxyUrl),Array("any","any")))
-
+    for {
+      f <- for {
+        url <- atlasApiData.getAtlasUrl(clusterId)
+        shouldUseToken <- atlasApiData.shouldUseToken(clusterId)
+        client <- {
+          if (shouldUseToken) {
+            //TODO: Load an API client with token - placeholder for now
+            atlasApiData.getCredentials.map { c =>
+              new AtlasClientV2(Array(url.toString), Array(c.user.get,c.pass.get))
+            }
+          } else {
+            atlasApiData.getCredentials.map { c =>
+              new AtlasClientV2(Array(url.toString), Array(c.user.get,c.pass.get))
+            }
+          }
+        }
+      } yield client
+      // Make sure to complete
+      c <- Future.successful(f)
+    } yield c
   }
 }
