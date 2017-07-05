@@ -62,7 +62,7 @@ export class AppComponent implements OnInit {
         new PersonaTabs('User Management', 'infra/users', 'fa-users')
       ], '', 'infra-logo.png'),
       new Persona('Analytics', [
-        new PersonaTabs('Workspace', 'workspace', 'fa-globe'),
+        new PersonaTabs('Workspace', 'analytics/workspace', 'fa-globe'),
         new PersonaTabs('Assets', 'analytics/assets', 'fa-list-alt'),
         new PersonaTabs('Clusters', '', 'fa-database'),
         new PersonaTabs('Jobs', '', 'fa-briefcase')

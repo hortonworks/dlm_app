@@ -3,7 +3,8 @@
         <div class="mdl-cell--5-col">
             <div class="breadcrumb">
               <span class="mdl-navigation__link home">Dataplane</span>
-              <!--<span class="mdl-navigation__link" *ngFor="let crumbName of crumbNames"> {{ crumbName }} </span>-->
+                <span class="mdl-navigation__link home">{{personaName | breadCrumbName}}</span>
+              <span class="mdl-navigation__link" *ngFor="let crumbName of crumbNames"> {{ crumbName | breadCrumbName }} </span>
             </div>
         </div>
 

@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import { Router, NavigationStart } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 
 import {User} from '../../models/user';
 import {CollapsibleNavService} from '../../services/collapsible-nav.service';
@@ -11,14 +11,15 @@ import {CollapsibleNavService} from '../../services/collapsible-nav.service';
 })
 export class HeaderComponent {
 
+  personaName = '';
   crumbNames: string[] = [];
   @Input() user:User;
 
   constructor(private router: Router,
               private collapsibleNavService: CollapsibleNavService) {
     router.events.subscribe(event => {
-      if (event instanceof NavigationStart ) {
-        this.setCrumbNames(event.url);
+      if (event instanceof NavigationEnd) {
+        this.setCrumbNames(event.urlAfterRedirects);
       }
     });
   }
@@ -28,6 +29,25 @@ export class HeaderComponent {
   }
 
   setCrumbNames(url: string) {
-    this.crumbNames = url.replace(/^\//, '').split('/');
+    url = url.replace(/\/\(.*\)$/, ''); //Remove all the aux outlet routes
+    url = url.replace(/^\//, ''); // Remove leading slash '/'
+
+    this.crumbNames = [];
+    let crumbs = url.split('/');
+    this.personaName = crumbs.shift();
+    let crumbName = '';
+    crumbs.forEach(name => {
+      let isValueCrumb =  crumbName.length !== 0;
+      crumbName += isValueCrumb ? ' - ' : '';
+      crumbName += name;
+      if (isValueCrumb) {
+        this.crumbNames.push(crumbName);
+        crumbName = '';
+      }
+    });
+
+    if (crumbName.length > 0) {
+      this.crumbNames.push(crumbName);
+    }
   }
 }

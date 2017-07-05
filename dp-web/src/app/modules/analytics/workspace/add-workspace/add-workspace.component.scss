@@ -1,3 +1,5 @@
+@import "../../../../../styles/variables";
+
 .form-group {
   label {
     display: block;
@@ -6,4 +8,9 @@
     width: 275px;
     box-sizing: border-box;
   }
+}
+
+.load-right-to-left-slider {
+  margin-top: $layout-header-desktop-row-height * -1;
+  bottom: 0;
 }
