@@ -12,6 +12,7 @@ import {LocationService} from '../../../../services/location.service';
 import {StringUtils} from '../../../../shared/utils/stringUtils';
 import {IdentityService} from '../../../../services/identity.service';
 import {DateUtils} from '../../../../shared/utils/date-utils';
+import {Loader} from '../../../../shared/utils/loader';
 
 @Component({
   selector: 'dp-cluster-details',
@@ -45,7 +46,6 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   rmHeapPercent: string;
   hdfsPercent: string;
   heapPercent: string;
-
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.fetchClusterDetails(params['id']);
@@ -53,6 +53,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   }
 
   fetchClusterDetails(lakeId) {
+    Loader.show();
     this.lakeService.retrieve(lakeId).subscribe((lake: Lake) => {
       this.lake = lake;
       this.clusterService.listByLakeId({lakeId: this.lake.id}).subscribe(clusters => {
@@ -66,9 +67,12 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
             this.rmHealth = clusterInfo.rmhealth;
             this.clusterDetails = this.getClusterDetails();
             this.processProgressbarInfo();
+            Loader.hide();
           });
         }
       });
+    }, (error) =>{
+      Loader.hide();
     });
   }
 
