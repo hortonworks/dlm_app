@@ -16,7 +16,7 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
   /**
    * Data shown in the table
    */
-  @Input() data: any[];
+  @Input() data: any[] = [];
 
   /**
    * List of possible filters. Each item should contain info about:

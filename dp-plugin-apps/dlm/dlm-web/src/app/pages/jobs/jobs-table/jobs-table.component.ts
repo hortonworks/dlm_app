@@ -14,7 +14,9 @@ import { JOB_STATUS } from 'constants/status.constant';
   styleUrls: ['./jobs-table.component.scss']
 })
 export class JobsTableComponent implements OnInit {
+  private visibleActionMap = {};
   columns: any[];
+
   @ViewChild('statusCellTemplate') statusCellTemplate: TemplateRef<any>;
   @ViewChild('iconCellTemplate') iconCellTemplate: TemplateRef<any>;
   @ViewChild('agoTemplate') agoTemplate: TemplateRef<any>;
@@ -87,4 +89,16 @@ export class JobsTableComponent implements OnInit {
   isRunning(job: Job) {
     return job && job.duration <= 0;
   }
+
+  handleActionOpenChange(event: {rowId: string, isOpen: boolean}) {
+    const { rowId, isOpen } = event;
+    if (rowId) {
+      this.visibleActionMap[rowId] = isOpen;
+    }
+  }
+
+  shouldShowAction(rowId) {
+    return rowId in this.visibleActionMap && this.visibleActionMap[rowId];
+  }
+
 }

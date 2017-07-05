@@ -1,5 +1,5 @@
-<div class="btn-group" dropdown placement="bottom right">
-  <a dropdownToggle class="actionable action-button">
+<div class="btn-group" dropdown [isOpen]="isOpen" placement="bottom right">
+  <a class="actionable action-button" (click)="toggleDropDown()">
     <i class="fa fa-ellipsis-v text-primary"></i>
   </a>
   <ul *dropdownMenu class="dropdown-menu dropdown-menu-right">

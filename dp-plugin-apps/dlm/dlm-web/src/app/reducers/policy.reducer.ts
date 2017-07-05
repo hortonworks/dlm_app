@@ -36,7 +36,7 @@ export function reducer(state = initialState, action): State {
 function loadPoliciesSuccess(state: State, action): State {
   const policies = action.payload.response.policies;
   return {
-    entities: Object.assign({}, state.entities, toEntities<Policy>(policies))
+    entities: toEntities<Policy>(policies)
   };
 }
 
