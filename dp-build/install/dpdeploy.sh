@@ -165,10 +165,11 @@ usage() {
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
     printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
-    printf "%-${tabspace}s:%s\n" "start knox" "Start the  docker container for knox"
     printf "%-${tabspace}s:%s\n" "start consul" "Start the  docker container for consul"
+    printf "%-${tabspace}s:%s\n" "start knox" "Start the  docker container for knox"
     printf "%-${tabspace}s:%s\n" "stop" "Stop the application docker containers"
     printf "%-${tabspace}s:%s\n" "stop knox" "Stop the Knox docker container"
+    printf "%-${tabspace}s:%s\n" "stop consul" "Stop the consul docker container"
     printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
     local logman='List of the docker containers
         No options: app containers, db: all DB containers, all: all containers.
