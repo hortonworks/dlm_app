@@ -9,6 +9,7 @@ CERTS_DIR=`dirname $0`/certs
 KNOX_SIGNING_CERTIFICATE=knox-signing.pem
 DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
+KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
 init_db() {
     docker-compose up -d
