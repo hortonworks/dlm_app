@@ -25,12 +25,14 @@
 </ng-template>
 
 <ng-template #runTimeTemplate let-value="value" let-row="row">
-  <span *ngIf="row.duration > 0">{{value | amUtc | amDateFormat:'HH:mm:ss'}}</span>
-  <span *ngIf="row.duration <= 0">{{'jobs.duration.running' | translate}}</span>
+  <dlm-duration-column [isRunning]="isRunning(row)" [duration]="value"></dlm-duration-column>
 </ng-template>
 
-<ng-template #transferredFormattedTemplate let-value="value">
-  <span [innerHTML]="value | bytesSize"></span>
+<ng-template #transferredFormattedTemplate let-value="value" let-job="row">
+  <span *ngIf="value >= 0 && !isRunning(job)" [innerHTML]="value | bytesSize"></span>
+  <!-- @TODO: this is placeholder for progress -->
+  <!-- <progressbar *ngIf="isRunning(job)" [value]="progress$ | async" [max]="15"></progressbar> -->
+  <i *ngIf="value === undefined" class="fa fa-minus"></i>
 </ng-template>
 
 <ng-template #actionsCell let-row="row">

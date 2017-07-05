@@ -3,6 +3,7 @@ import 'rxjs/add/observable/throw';
 import { EffectsTestingModule, EffectsRunner } from '@ngrx/effects/testing';
 import { TestBed } from '@angular/core/testing';
 import { PolicyEffects } from './policy.effect';
+import { JobService } from 'services/job.service';
 import { PolicyService } from 'services/policy.service';
 import { Observable } from 'rxjs/Observable';
 import * as policyActions from 'actions/policy.action';
@@ -20,6 +21,10 @@ describe('PolicyEffects', () => {
       {
         provide: PolicyService,
         useValue: jasmine.createSpyObj('policyService', ['deletePolicy', 'suspendPolicy', 'resumePolicy'])
+      },
+      {
+        provide: JobService,
+        useValue: jasmine.createSpyObj('jobService', ['getJobsForPolicies'])
       }
     ]
   }));

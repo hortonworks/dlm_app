@@ -8,14 +8,15 @@ export const ActionTypes = {
   CREATE_POLICY: requestType('CREATE_POLICY'),
   DELETE_POLICY: requestType('DELETE_POLICY'),
   SUSPEND_POLICY: requestType('SUSPEND_POLICY'),
-  RESUME_POLICY: requestType('RESUME_POLICY')
+  RESUME_POLICY: requestType('RESUME_POLICY'),
+  LOAD_LAST_JOBS: requestType('LOAD_JOBS_FOR_POLICY')
 };
 
 export const loadPolicies = (requestId?): Action => ({type: ActionTypes.LOAD_POLICIES.START, payload: { meta: {requestId}}});
-export const loadPoliciesSuccess = (policies, meta): ActionSuccess => {
-  policies.policies = policies.policies.map(preparePolicy);
-  return {type: ActionTypes.LOAD_POLICIES.SUCCESS, payload: {response: policies, meta}};
-};
+export const loadPoliciesSuccess = (policies, meta): ActionSuccess => ({
+  type: ActionTypes.LOAD_POLICIES.SUCCESS,
+  payload: {response: policies, meta}
+});
 
 export const loadPoliciesFail = (error, meta): ActionFailure => ({
   type: ActionTypes.LOAD_POLICIES.FAILURE, payload: {error, meta}
@@ -42,8 +43,17 @@ export const resumePolicy = (payload: Policy, meta?): Action => ({type: ActionTy
 export const resumePolicySuccess = (id): Action => ({type: ActionTypes.RESUME_POLICY.SUCCESS, payload: id});
 export const resumePolicyFail = (error): Action => ({type: ActionTypes.RESUME_POLICY.FAILURE, payload: error});
 
-function preparePolicy(policy) {
-  policy.id = policy.name;
-  policy.lastJobs = policy.jobs;
-  return policy;
-}
+export const loadLastJobs = (policies: Policy[], meta = {}): Action => ({
+  type: ActionTypes.LOAD_LAST_JOBS.START,
+  payload: {policies, meta}
+});
+
+export const loadLastJobsSuccess = (jobs, meta = {}): ActionSuccess => ({
+  type: ActionTypes.LOAD_LAST_JOBS.SUCCESS,
+  payload: {response: jobs, meta}
+});
+
+export const loadLastJobsFailure = (error, meta = {}): ActionFailure => ({
+  type: ActionTypes.LOAD_LAST_JOBS.FAILURE,
+  payload: {error}
+});

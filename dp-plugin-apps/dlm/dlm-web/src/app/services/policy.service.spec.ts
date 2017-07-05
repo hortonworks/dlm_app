@@ -4,6 +4,7 @@ import { BaseRequestOptions, ConnectionBackend, Http, RequestMethod, RequestOpti
 import { MockBackend } from '@angular/http/testing';
 import { ReflectiveInjector } from '@angular/core';
 import { Policy, PolicyPayload } from '../models/policy.model';
+import { JobService } from 'services/job.service';
 
 describe('PolicyService', () => {
   beforeEach(() => {
@@ -12,7 +13,8 @@ describe('PolicyService', () => {
       {provide: RequestOptions, useClass: BaseRequestOptions},
       Http,
       HttpService,
-      PolicyService
+      PolicyService,
+      JobService
     ]);
 
     this.policyService = this.injector.get(PolicyService);

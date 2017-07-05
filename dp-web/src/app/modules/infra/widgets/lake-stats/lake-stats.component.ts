@@ -38,7 +38,7 @@ export class LakeStatsComponent implements OnInit {
     }
 
     if(this.cCluster && this.cCluster.id) {
-      this.clusterService.retrieveHealth(this.cCluster.id)
+      this.clusterService.retrieveHealth(this.cCluster.id, this.lake.id)
         .subscribe(health => this.cHealth = health);
     }
 

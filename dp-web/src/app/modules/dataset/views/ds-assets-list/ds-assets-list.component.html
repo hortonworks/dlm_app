@@ -30,11 +30,12 @@
     <div class="listRow listHead">
       <div *ngIf="dsAssets.length">
         <div class="col checkboxCont" *ngIf="selectionAllowed"><input type="checkbox"/></div>
-        <div class="col sourceCol">Source</div>
-        <div class="col nameCol">Name</div>
-        <div class="col descCol">Description</div>
-        <div class="col ownerCol">Owner</div>
-        <div class="col dsNameCol" *ngIf="showBelongsToColumn">Belongs to</div>
+        <div class="col starCol" *ngIf="showBelongsToColumn">&nbsp;</div>
+        <div class="col sourceCol">{{"pages.dataset.labels.source" | translate}}</div>
+        <div class="col nameCol">{{"pages.dataset.labels.name" | translate}}</div>
+        <div class="col descCol">{{"pages.dataset.labels.description" | translate}}</div>
+        <div class="col ownerCol">{{"pages.dataset.labels.owner" | translate}}</div>
+        <div class="col dsNameCol" *ngIf="showBelongsToColumn">{{"pages.dataset.labels.belongsTo" | translate}}</div>
 
       </div>
     </div>
@@ -45,6 +46,7 @@
       <div *ngIf="dsAssets.length">
         <div class="listRow"  *ngFor="let asset of dsAssets;" [class.disabled]="asset.dsName">
           <div class="col checkboxCont" *ngIf="selectionAllowed"><input type="checkbox"/></div>
+          <div class="col starCol" *ngIf="showBelongsToColumn">{{asset.dsName?"*":"&nbsp;"}}</div>
           <div class="col sourceCol {{(asset.source.toUpperCase() == 'HIVE')?'hiveCol':'filesCol'}}">
             <span><i class="fa {{(asset.source.toUpperCase() == 'HIVE')?'fa-table':'fa-file-o'}}"></i>&nbsp;&nbsp;{{asset.source}}</span>
           </div>
@@ -62,7 +64,8 @@
       (onPageSizeChange)="onPageSizeChange($event)"
       (onPageChange)="onPageChange($event)"
     ></simple-pagination>
-
+    <span class="starExplanation" *ngIf="showBelongsToColumn && showStarMessage" >* {{"pages.dataset.asset-list.starAssetmessage" | translate}}</span>
+    <div style="clear: both;"></div>
   </div>
 </div>
 </div>

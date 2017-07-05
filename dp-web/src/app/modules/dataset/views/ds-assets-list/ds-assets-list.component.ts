@@ -188,5 +188,9 @@ export class DsAssetList implements OnInit {
     if(this.allowAssetNavigation && clusterId) {
       this.router.navigate([`assets/details/${clusterId}/${id}`]);
     }
+  }  
+
+  get showStarMessage() {
+    return this.dsAssets.filter(ass=>ass.dsName).length;
   }
 }

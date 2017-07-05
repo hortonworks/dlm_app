@@ -10,7 +10,8 @@
       "sourceCluster": "c1",
       "targetCluster": "c2",
       "sourceDataset": "/tmp",
-      "targetDataset": "/tmp"
+      "targetDataset": "/tmp",
+      "jobs": []
     },
     {
       "name": "hdfs2policy",
@@ -21,7 +22,8 @@
       "sourceCluster": "c1",
       "targetCluster": "c2",
       "sourceDataset": "/app-logs",
-      "targetDataset": "/app-logs"
+      "targetDataset": "/app-logs",
+      "jobs": []
     },
     {
       "name": "hdfspolicy",
@@ -32,7 +34,8 @@
       "sourceCluster": "c1",
       "targetCluster": "c2",
       "sourceDataset": "/apps",
-      "targetDataset": "/apps"
+      "targetDataset": "/apps",
+      "jobs": []
     },
     {
       "name": "hivepolicy",
@@ -43,7 +46,8 @@
       "sourceCluster": "c1",
       "targetCluster": "c2",
       "sourceDataset": "testdb",
-      "targetDataset": "testdb"
+      "targetDataset": "testdb",
+      "jobs": []
     }
   ]
 }

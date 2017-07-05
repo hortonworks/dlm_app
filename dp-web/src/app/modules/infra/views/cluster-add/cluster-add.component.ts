@@ -1,6 +1,7 @@
 import {Component, ElementRef, ViewChild, OnInit} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
+import {Observable} from 'rxjs/Observable';
 
 import {Cluster} from '../../../../models/cluster';
 import {Lake} from '../../../../models/lake';
@@ -8,7 +9,7 @@ import {Location} from '../../../../models/location';
 import {Point} from '../../../../models/map-data';
 import {MapData} from '../../../../models/map-data';
 import {MapConnectionStatus} from '../../../../models/map-data';
-import { ClusterState,ClusterDetailRequest } from '../../../../models/cluster-state';
+import {ClusterState, ClusterDetailRequest} from '../../../../models/cluster-state';
 
 import {LakeService} from '../../../../services/lake.service';
 import {ClusterService} from '../../../../services/cluster.service';
@@ -16,6 +17,7 @@ import {LocationService} from '../../../../services/location.service';
 
 
 import {StringUtils} from '../../../../shared/utils/stringUtils';
+import {NgForm} from '@angular/forms';
 
 @Component({
   selector: 'dp-cluster-add',
@@ -25,20 +27,24 @@ import {StringUtils} from '../../../../shared/utils/stringUtils';
 export class ClusterAddComponent implements OnInit {
 
   @ViewChild('ambariInput') ambariInputContainer: ElementRef;
+  @ViewChild('clusterForm') clusterForm: NgForm;
 
 
   _isClusterValidateInProgress = false;
   _isClusterValidateSuccessful = false;
-  _clusterState:ClusterState;
+  _clusterState: ClusterState;
   _isClusterValid;
 
   mapData: MapData[] = [];
   cluster: Cluster = new Cluster();
   searchTerm: string;
+  dcName: string;
 
   dpRequiredServices = ['ATLAS'];
 
   showNotification = false;
+  showError = false;
+  errorMessage = '';
 
   constructor(private router: Router,
               private route: ActivatedRoute,
@@ -74,7 +80,13 @@ export class ClusterAddComponent implements OnInit {
     this.showNotification = false;
   }
 
+  closeError() {
+    this.showError = false;
+  }
+
   getClusterInfo(event) {
+    this.showError = false;
+    this.showNotification = false;
     this._isClusterValidateInProgress = true;
     let cleanedUri = StringUtils.cleanupUri(this.cluster.ambariurl);
     this.lakeService.validate(cleanedUri).subscribe(
@@ -166,7 +178,11 @@ export class ClusterAddComponent implements OnInit {
   }
 
   onCreate() {
-
+    if (!this.clusterForm.form.valid) {
+      this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
+      this.showError = true;
+      return;
+    }
     this.createCluster()
       .subscribe(
         () => {
@@ -175,8 +191,18 @@ export class ClusterAddComponent implements OnInit {
           }]);
         },
         error => {
+          this.handleError(error);
         }
       );
+  }
+
+  handleError(error) {
+    this.showError = true;
+    if (error._body.indexOf('unique_name_and_dc_name_constraint') >= 0) {
+      this.errorMessage = this.translateService.instant('pages.infra.description.duplicateDataCenter');
+    } else {
+      this.errorMessage = this.translateService.instant('pages.infra.description.clusterAddError');
+    }
   }
 
   onKeyPress(event) {
@@ -187,13 +213,15 @@ export class ClusterAddComponent implements OnInit {
 
   createCluster() {
     let lake = new Lake();
+    lake.dcName = this.dcName;
     lake.ambariUrl = this.cluster.ambariurl;
     lake.location = this.cluster.location.id;
     lake.isDatalake = this.isDataLake;
     lake.name = this.cluster.name;
     lake.description = this.cluster.description;
+    lake.dcName = this.cluster.dcName;
     lake.state = 'TO_SYNC';
-    if(this._clusterState.knoxDetected){
+    if (this._clusterState.knoxDetected) {
       lake.knoxEnabled = true;
       lake.knoxUrl = this._clusterState.knoxUrl;
     }
@@ -218,6 +246,7 @@ export class ClusterAddComponent implements OnInit {
         }]);
       },
       error => {
+        this.handleError(error);
       }
     );
   }

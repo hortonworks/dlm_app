@@ -12,6 +12,7 @@ import {LocationService} from '../../../../services/location.service';
 import {StringUtils} from '../../../../shared/utils/stringUtils';
 import {IdentityService} from '../../../../services/identity.service';
 import {DateUtils} from '../../../../shared/utils/date-utils';
+import {Loader} from '../../../../shared/utils/loader';
 
 @Component({
   selector: 'dp-cluster-details',
@@ -45,7 +46,6 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   rmHeapPercent: string;
   hdfsPercent: string;
   heapPercent: string;
-
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.fetchClusterDetails(params['id']);
@@ -53,22 +53,26 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   }
 
   fetchClusterDetails(lakeId) {
+    Loader.show();
     this.lakeService.retrieve(lakeId).subscribe((lake: Lake) => {
       this.lake = lake;
       this.clusterService.listByLakeId({lakeId: this.lake.id}).subscribe(clusters => {
         this.clusters = clusters;
         if (this.clusters && this.clusters.length) {
           this.cluster = clusters[0];
-          this.getClusterWithLocation(this.lake.location, this.cluster.id, this.cluster.userid).subscribe(clusterInfo => {
+          this.getClusterWithLocation(this.lake, this.cluster.id, this.cluster.userid).subscribe(clusterInfo => {
             this.clusterHealth = clusterInfo.health;
             this.location = clusterInfo.location;
             this.user = clusterInfo.user;
             this.rmHealth = clusterInfo.rmhealth;
             this.clusterDetails = this.getClusterDetails();
             this.processProgressbarInfo();
+            Loader.hide();
           });
         }
       });
+    }, (error) =>{
+      Loader.hide();
     });
   }
 
@@ -140,20 +144,21 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       tags = `${tags}${tags.length ? ', ' : ''}${tag.name}`;
     });
     clusterDetails.tags = tags;
-    if(this.rmHealth && this.rmHealth.ServiceComponentInfo && this.rmHealth.metrics){
+    clusterDetails.dataCenter = this.lake.dcName;
+    if (this.rmHealth && this.rmHealth.ServiceComponentInfo && this.rmHealth.ServiceComponentInfo.rm_metrics && this.rmHealth.metrics && this.rmHealth.metrics.jvm) {
       clusterDetails.nodeManagersActive = this.rmHealth.ServiceComponentInfo.rm_metrics.cluster.activeNMcount;
       clusterDetails.nodeManagersInactive = this.rmHealth.ServiceComponentInfo.rm_metrics.cluster.unhealthyNMcount;
       clusterDetails.rmHeapTotal = StringUtils.humanizeBytes(this.rmHealth.metrics.jvm.HeapMemoryMax);
-      clusterDetails.rmHeapUsed =  StringUtils.humanizeBytes(this.rmHealth.metrics.jvm.HeapMemoryUsed);
+      clusterDetails.rmHeapUsed = StringUtils.humanizeBytes(this.rmHealth.metrics.jvm.HeapMemoryUsed);
       clusterDetails.rmUptime = DateUtils.toReadableDate(new Date().getTime() - this.rmHealth.metrics.runtime.StartTime);
     }
     return clusterDetails;
   }
 
-  private getClusterWithLocation(locationId, clusterId, userId) {
+  private getClusterWithLocation(lake, clusterId, userId) {
     return Observable.forkJoin(
-      this.locationService.retrieve(locationId).map((res) => res),
-      this.clusterService.retrieveDetailedHealth(clusterId).map((res) => res),
+      this.locationService.retrieve(lake.location).map((res) => res),
+      this.clusterService.retrieveDetailedHealth(clusterId, lake.id).map((res) => res),
       this.identityService.getUserById(userId).map((res) => res),
       this.clusterService.retrieveResourceMangerHealth(clusterId).map(res => res)
     ).map(response => {
@@ -161,7 +166,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
         location: response[0],
         health: response[1],
         user: response[2],
-        rmhealth : response[3]
+        rmhealth: response[3]
       };
     });
   }

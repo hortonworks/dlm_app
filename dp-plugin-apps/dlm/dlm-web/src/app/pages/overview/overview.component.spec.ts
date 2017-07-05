@@ -5,7 +5,7 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { TooltipModule, ModalModule } from 'ng2-bootstrap';
+import { TooltipModule, ModalModule, ProgressbarModule } from 'ng2-bootstrap';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as moment from 'moment';
@@ -78,6 +78,7 @@ describe('OverviewComponent', () => {
       imports: [
         RouterTestingModule,
         ModalModule.forRoot(),
+        ProgressbarModule.forRoot(),
         TooltipModule,
         TranslateModule.forRoot({
           loader: {provide: TranslateLoader, useClass: MockTranslateLoader}

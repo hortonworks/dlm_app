@@ -21,10 +21,8 @@ class Clusters @Inject()(
     */
   def list() = Action.async {
     dataplaneService.getBeaconClusters.map {
-      beaconClusters => beaconClusters match {
-        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-        case Right(beaconClusters) => Ok(Json.toJson(beaconClusters))
-      }
+      case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+      case Right(beaconClusters) => Ok(Json.toJson(beaconClusters))
     }
   }
 }

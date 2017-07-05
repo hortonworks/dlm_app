@@ -6,6 +6,7 @@ import { abortJob } from 'actions/job.action';
 import { Policy } from 'models/policy.model';
 import { Store } from '@ngrx/store';
 import * as fromRoot from 'reducers/';
+import { JOB_STATUS } from 'constants/status.constant';
 
 @Component({
   selector: 'dp-jobs-table',
@@ -13,7 +14,9 @@ import * as fromRoot from 'reducers/';
   styleUrls: ['./jobs-table.component.scss']
 })
 export class JobsTableComponent implements OnInit {
+  private visibleActionMap = {};
   columns: any[];
+
   @ViewChild('statusCellTemplate') statusCellTemplate: TemplateRef<any>;
   @ViewChild('iconCellTemplate') iconCellTemplate: TemplateRef<any>;
   @ViewChild('agoTemplate') agoTemplate: TemplateRef<any>;
@@ -24,7 +27,7 @@ export class JobsTableComponent implements OnInit {
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
   @ViewChild('jobsTable') jobsTable: TableComponent;
   @Input() jobs: Job[];
-  @Input() policy: Policy[];
+  @Input() policy: Policy;
   @Input() showPageSizeMenu = true;
   @Input() selectionType = 'any';
 
@@ -78,6 +81,24 @@ export class JobsTableComponent implements OnInit {
   }
 
   handleSelectedAction(row, action) {
-    this.store.dispatch(abortJob(row.policy));
+    if (row.status === JOB_STATUS.RUNNING) {
+      this.store.dispatch(abortJob(this.policy));
+    }
   }
+
+  isRunning(job: Job) {
+    return job && job.duration <= 0;
+  }
+
+  handleActionOpenChange(event: {rowId: string, isOpen: boolean}) {
+    const { rowId, isOpen } = event;
+    if (rowId) {
+      this.visibleActionMap[rowId] = isOpen;
+    }
+  }
+
+  shouldShowAction(rowId) {
+    return rowId in this.visibleActionMap && this.visibleActionMap[rowId];
+  }
+
 }

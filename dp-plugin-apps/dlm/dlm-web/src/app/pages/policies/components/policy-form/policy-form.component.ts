@@ -19,10 +19,12 @@ import { TranslateService } from '@ngx-translate/core';
 import { mapToList } from 'utils/store-util';
 import { simpleSearch } from 'utils/string-utils';
 import { loadFullDatabases } from 'actions/hivelist.action';
+import { resetFormValue } from 'actions/form.action';
 import { getAllDatabases } from 'selectors/hive.selector';
 import { HiveDatabase } from 'models/hive-database.model';
 import { SelectOption } from 'components/forms/select-field';
 import { TimeZoneService } from 'services/time-zone.service';
+import { isEmpty } from 'utils/object-utils';
 import * as moment from 'moment';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
@@ -44,7 +46,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   policyDays = POLICY_DAYS;
   policySubmitTypes = POLICY_SUBMIT_TYPES;
   policyForm: FormGroup;
-  selectedSource$ = new BehaviorSubject('');
+  selectedSource$ = new BehaviorSubject(0);
   sourceDatabases$: Observable<HiveDatabase[]>;
   databaseSearch$ = new BehaviorSubject<string>('');
   subscriptions: Subscription[] = [];
@@ -208,6 +210,10 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
               private store: Store<State>,
               private t: TranslateService) { }
 
+  // todo: to Denys. This method looks quite scary. Things to improve:
+  // - split code into self-descriptive methods
+  // - revisit logic around observables
+  // - simplify overall logic
   ngOnInit() {
     this.userTimeZone$ = this.timezone.userTimezoneIndex$;
     const loadDatabasesSubscription = this.selectedSource$
@@ -216,14 +222,17 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         this.store.dispatch(loadFullDatabases(sourceCluster));
       });
     const databases$ = this.selectedSource$.switchMap(sourceCluster => {
-      return this.store.select(getAllDatabases).map(databases => {
-        const dbs = databases.filter(db => db.clusterId === sourceCluster);
-        if (dbs.length) {
-          this.policyForm.patchValue({databases: dbs[0].id});
-        }
-        return dbs;
+      return this.store.select(getAllDatabases)
+        .map(databases => databases.filter(db => db.clusterId === sourceCluster))
+        .do(databases => {
+          const selectedDatabase = this.policyForm.value.databases;
+          const selectedSource = this.policyForm.value.general.sourceCluster;
+          // select first database when source changed and selected database is not exist on selected cluster
+          if (databases.length && !databases.some(db => db.clusterId === selectedSource && db.name === selectedDatabase)) {
+            this.policyForm.patchValue({databases: databases[0].id});
+          }
+        });
       });
-    });
     this.sourceDatabases$ = Observable.combineLatest(this.databaseSearch$, databases$)
       .map(([searchPattern, databases]) => {
         return databases.filter(db => simpleSearch(db.name, searchPattern));
@@ -240,7 +249,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       directories: ['', Validators.required],
       job: this.formBuilder.group({
         repeatMode: this.policyRepeatModes.EVERY,
-        frequency: [''],
+        frequency: ['', Validators.required],
         day: this.policyDays.MONDAY,
         frequencyInSec: 0,
         unit: this.policyTimeUnits.DAYS,
@@ -259,22 +268,34 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         max_bandwidth: ['']
       })
     });
-    this.policyForm.get('databases').disable();
-    this.subscriptions.push(loadDatabasesSubscription);
-    this.policyFormValues$ = this.store.select(getFormValues(POLICY_FORM_ID));
-    const policyFormValuesSubscription = Observable.combineLatest(this.policyFormValues$, this._pairings$, this._sourceClusterId$)
-      .subscribe(([policyFormValues, pairings, sourceClusterId]) => {
-      if (policyFormValues && (!sourceClusterId || sourceClusterId === 0)) {
-        this.policyForm.patchValue(policyFormValues);
-        this.selectedHdfsPath = policyFormValues['directories'];
-      } else if (sourceClusterId > 0) {
-        this.policyForm.patchValue({
-          general: {
-            sourceCluster: sourceClusterId
-          }
-        });
-      }
+    const jobCtrl = (<any>this.policyForm).controls.job;
+    const changes$ = jobCtrl.controls.repeatMode.valueChanges;
+    const repeatModeSubscription$ = changes$.subscribe(repeatMode => {
+      const newValidator = repeatMode === this.policyRepeatModes.NEVER ? null : Validators.required;
+      jobCtrl.controls.frequency.setValidators(newValidator);
+      jobCtrl.controls.frequency.updateValueAndValidity();
     });
+    this.subscriptions.push(repeatModeSubscription$);
+
+    this.activateFieldsForType(this.selectedPolicyType);
+    this.policyFormValues$ = this.store.select(getFormValues(POLICY_FORM_ID));
+    const policyFormValuesSubscription = Observable
+      .combineLatest(this.policyFormValues$, this._pairings$, this._sourceClusterId$)
+      .subscribe(([policyFormValues, pairings, sourceClusterId]) => {
+        if (!isEmpty(policyFormValues) && (!sourceClusterId || sourceClusterId === 0)) {
+          this.policyForm.patchValue(policyFormValues);
+          this.selectedHdfsPath = policyFormValues['directories'];
+          this.selectedSource$.next(policyFormValues['general']['sourceCluster']);
+          this.activateFieldsForType(policyFormValues['general']['type']);
+        } else if (sourceClusterId > 0) {
+          this.policyForm.patchValue({
+            general: {
+              sourceCluster: sourceClusterId
+            }
+          });
+          this.selectedSource$.next(sourceClusterId);
+        }
+      });
     this.policyForm.patchValue({
       job: {
         endTime: {
@@ -285,6 +306,8 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
     });
+
+    this.subscriptions.push(loadDatabasesSubscription);
     this.subscriptions.push(policyFormValuesSubscription);
   }
 
@@ -363,18 +386,22 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
 
   handlePolicyTypeChange(radioItem: RadioItem) {
     const { value } = radioItem;
+    this.activateFieldsForType(value);
+    this.databaseSearch$.next('');
+  }
+
+  activateFieldsForType(policyType: string) {
     let disableField,
         enableField;
-    if (value === POLICY_TYPES.HDFS) {
+    if (policyType === POLICY_TYPES.HDFS) {
       disableField = 'databases';
       enableField  = 'directories';
-    } else if (value === POLICY_TYPES.HIVE) {
+    } else if (policyType === POLICY_TYPES.HIVE) {
       disableField = 'directories';
       enableField = 'databases';
     }
     this.policyForm.get(enableField).enable();
     this.policyForm.get(disableField).disable();
-    this.databaseSearch$.next('');
   }
 
   handleDayChange(radioItem: RadioItem) {
@@ -385,7 +412,6 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       }
     });
   }
-
 
   handleSourceClusterChange(sourceCluster: SelectOption) {
     this.selectedHdfsPath = this.root;
@@ -403,6 +429,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   cancel() {
+    this.store.dispatch(resetFormValue(POLICY_FORM_ID));
     this.store.dispatch(go(['policies']));
   }
 

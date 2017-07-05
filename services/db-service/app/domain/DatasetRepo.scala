@@ -24,7 +24,9 @@ class DatasetRepo @Inject()(
   import profile.api._
   import PaginationSupport._
 
-  val Datasets = TableQuery[DatasetsTable]
+  val Datasets = TableQuery[DatasetsTable].filter(_.active)
+
+  val DatasetsWritable = TableQuery[DatasetsTable]
 
   def all(): Future[List[Dataset]] = db.run {
     Datasets.to[List].result
@@ -32,7 +34,7 @@ class DatasetRepo @Inject()(
 
   def insert(dataset: Dataset): Future[Dataset] = {
     db.run {
-      Datasets returning Datasets += dataset
+      DatasetsWritable returning DatasetsWritable += dataset
     }
   }
 
@@ -47,8 +49,8 @@ class DatasetRepo @Inject()(
     db.run(Datasets.filter(_.id === datasetId).result.headOption)
   }
 
-  def deleteById(datasetId: Long): Future[Int] = {
-    db.run(Datasets.filter(_.id === datasetId).delete)
+  def archiveById(datasetId: Long): Future[Int] = {
+    db.run(Datasets.filter(_.id === datasetId).map(_.active).update(false))
   }
 
   import scala.concurrent.ExecutionContext.Implicits.global
@@ -82,7 +84,7 @@ class DatasetRepo @Inject()(
         val catNames = existingCategories.map(_.name)
         categoryRepo.Categories ++= tags.filter(t => !catNames.contains(t)).map(t => Category(None, t, t))
       }
-      savedDataset <- Datasets returning Datasets += datasetCreateRequest.dataset
+      savedDataset <- DatasetsWritable returning DatasetsWritable += datasetCreateRequest.dataset
       categories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
       _ <- datasetCategoryRepo.DatasetCategories ++= categories.map(c => DatasetCategory(c.id.get, savedDataset.id.get))
       _ <- dataAssetRepo.DatasetAssets ++= datasetCreateRequest.dataAssets.map(a => a.copy(datasetId = Some(savedDataset.id.get)))
@@ -193,7 +195,7 @@ class DatasetRepo @Inject()(
 
   def insertWithCategories(datasetReq: DatasetAndCategoryIds): Future[DatasetAndCategories] = {
     val query = (for {
-      dataset <- Datasets returning Datasets += datasetReq.dataset
+      dataset <- DatasetsWritable returning DatasetsWritable += datasetReq.dataset
       _ <- datasetCategoryRepo.DatasetCategories ++= datasetReq.categories.map(catId => DatasetCategory(catId, dataset.id.get))
       categories <- categoryRepo.Categories.filter(_.id.inSet(datasetReq.categories)).result
     } yield (DatasetAndCategories(dataset, categories))).transactionally
@@ -275,6 +277,8 @@ class DatasetRepo @Inject()(
 
     def lastmodified = column[LocalDateTime]("lastmodified")
 
+    def active = column[Boolean]("active")
+
     def version = column[Int]("version")
 
     def customprops = column[Option[JsValue]]("custom_props")
@@ -289,6 +293,7 @@ class DatasetRepo @Inject()(
         createdBy,
         createdOn,
         lastmodified,
+        active,
         version,
         customprops
       ) <> ((Dataset.apply _).tupled, Dataset.unapply)

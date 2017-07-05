@@ -1,7 +1,9 @@
 import { Policy } from 'models/policy.model';
+import { Job } from 'models/job.model';
 import { BaseState } from 'models/base-resource-state';
 import * as fromPolicy from 'actions/policy.action';
 import { toEntities } from 'utils/store-util';
+import { sortByDateField } from 'utils/array-util';
 
 export type State = BaseState<Policy>;
 
@@ -23,6 +25,9 @@ export function reducer(state = initialState, action): State {
     case fromPolicy.ActionTypes.RESUME_POLICY.SUCCESS:
       return resumePolicySuccess(state, action);
 
+    case fromPolicy.ActionTypes.LOAD_LAST_JOBS.SUCCESS:
+      return loadLastJobsSuccess(state, action);
+
     default:
       return state;
   }
@@ -31,7 +36,7 @@ export function reducer(state = initialState, action): State {
 function loadPoliciesSuccess(state: State, action): State {
   const policies = action.payload.response.policies;
   return {
-    entities: Object.assign({}, state.entities, toEntities<Policy>(policies))
+    entities: toEntities<Policy>(policies)
   };
 }
 
@@ -53,4 +58,28 @@ function updateEntityField(state: State, action, fieldName: string, newValue): S
   const updatedEntity = {...state.entities[id], [fieldName]: newValue};
   const newEntities = Object.assign({}, state.entities, {[id]: updatedEntity});
   return Object.assign({}, state, {entities: newEntities});
+}
+
+function loadLastJobsSuccess(state: State, action): State {
+  const { jobs } = action.payload.response;
+  const updatedPolicies = jobs.reduce((policyEntities: {[id: string]: Policy}, job: Job) => {
+    if (job.name in state.entities) {
+      const policy = state.entities[job.name];
+      const lastJobs = sortByDateField((policyEntities[job.name] && policyEntities[job.name].jobs || []).concat(job), 'startTime');
+      return {
+        ...policyEntities,
+        [policy.id]: {
+          ...policy,
+          jobs: lastJobs
+        }
+      };
+    }
+    return policyEntities;
+  }, {});
+  return {
+    entities: {
+      ...state.entities,
+      ...updatedPolicies
+    }
+  };
 }

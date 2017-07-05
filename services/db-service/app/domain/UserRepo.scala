@@ -3,7 +3,7 @@ package domain
 import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
 
-import com.hortonworks.dataplane.commons.domain.Entities.{User, UserInfo, UserRole, UserRoles}
+import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.RoleType
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 
@@ -26,21 +26,35 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     Users.to[List].result
   }
 
-  def allWithRoles(offset:Long=0,pageSize:Long=20): Future[Seq[UserInfo]] = {
-    db.run(Users.drop(offset).take(pageSize).result).flatMap{users=>
-      val userIds=users.map(res=>res.id.get).seq
-      db.run(UserRoles.filter(_.userId inSet userIds).result).flatMap{userRoles=>
-        val roleIdUsersMap= getRolesMap(userRoles)
-        roleRepo.all().map { allRoles =>
-          users.map{user=>
-            val userroles = roleIdUsersMap.get(user.id.get) match {
-              case Some(roles)=>rolesUtil.getRolesAsRoleTypes(roles,allRoles)
-              case None => Seq()
+  def allWithRoles(offset:Long=0,pageSize:Long=10, searchTerm:Option[String]): Future[UsersList] = {
+    val query = searchTerm match {
+      case Some(searchTerm) => Users.filter(_.username like (s"%$searchTerm%")).sortBy(_.updated.desc).drop(offset).take(pageSize)
+      case None =>  Users.sortBy(_.updated.desc).drop(offset).take(pageSize)
+    }
+
+    val countQuery = searchTerm match {
+      case Some(searchTerm) => Users.filter(_.username like (s"%$searchTerm%")).length
+      case None =>  Users.length
+    }
+    for {
+        users <- db.run(query.result).flatMap{users=>
+        val userIds=users.map(res=>res.id.get).seq
+        db.run(UserRoles.filter(_.userId inSet userIds).result).flatMap{userRoles=>
+          val roleIdUsersMap= getRolesMap(userRoles)
+          roleRepo.all().map { allRoles =>
+            users.map{user=>
+              val userroles = roleIdUsersMap.get(user.id.get) match {
+                case Some(roles)=>rolesUtil.getRolesAsRoleTypes(roles,allRoles)
+                case None => Seq()
+              }
+              UserInfo(id=user.id,userName=user.username,displayName = user.displayname,roles=userroles,active = user.active)
             }
-            UserInfo(id=user.id,userName=user.username,displayName = user.displayname,roles=userroles,active = user.active)
           }
         }
       }
+        count <- db.run(countQuery.result).map(c => c)
+    }yield {
+      UsersList(count, users)
     }
   }
 
@@ -104,7 +118,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
       val query =for{
         updateActive <- getUpdateActiveQuery(userInfo)
         insertQuery<-UserRoles returning UserRoles ++= userRoleObjs
-        delQuery <- UserRoles.filter(_.roleId inSet toBeDeletedRoleIds).delete
+        delQuery <- UserRoles.filter(_.id inSet toBeDeletedRoleIds).delete
       }yield {
         (updateActive,delQuery,insertQuery)
       }
@@ -142,7 +156,13 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
       val existingRoleIds:Seq[Long]=userRoles.map(userRole=>userRole.roleId.get)
       val toBeAdded=requiredRoleIds.filterNot(existingRoleIds.contains(_))
       val toBeDeleted=existingRoleIds.filterNot(requiredRoleIds.contains(_))
-      (toBeAdded,toBeDeleted)
+      val toBeDeletedRoles=userRoles.filter{ur=>
+        toBeDeleted.contains(ur.roleId.get)
+      }
+      val toBeDeletedIDs = toBeDeletedRoles.map{userRole=>
+        userRole.id.get
+      }
+      (toBeAdded,toBeDeletedIDs)
     }
   }
 

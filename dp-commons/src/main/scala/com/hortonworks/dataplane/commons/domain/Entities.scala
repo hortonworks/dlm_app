@@ -31,6 +31,8 @@ object Entities {
                   created: Option[LocalDateTime] = Some(LocalDateTime.now()),
                   updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
+  case class UsersList( total: Int, users: Seq[UserInfo])
+
   case class UserInfo(id: Option[Long] = None,
                   userName: String,
                   displayName: String,
@@ -70,9 +72,12 @@ object Entities {
       longitude: Float
   )
 
+  case class DataplaneClusterIdentifier(id: Long)
+
   case class DataplaneCluster(
       id: Option[Long] = None,
       name: String,
+      dcName: String,
       description: String,
       ambariUrl: String,
       location: Option[Long],
@@ -176,6 +181,7 @@ object Entities {
                      createdBy: Option[Long],
                      createdOn: LocalDateTime = LocalDateTime.now(),
                      lastModified: LocalDateTime = LocalDateTime.now(),
+                     active: Boolean = true,
                      version: Int = 1,
                      customProps: Option[JsValue] = None)
 
@@ -299,6 +305,8 @@ object JsonFormatters {
   implicit val locationReads = Json.reads[Location]
   implicit val dpClusterWrites = Json.writes[DataplaneCluster]
   implicit val dpClusterReads = Json.reads[DataplaneCluster]
+  implicit val dpClusterIdentifierWrites = Json.writes[DataplaneClusterIdentifier]
+  implicit val dpClusterIdentifierReads = Json.reads[DataplaneClusterIdentifier]
 
   implicit val skuWrites = Json.writes[Sku]
   implicit val skuReads = Json.reads[Sku]
@@ -395,5 +403,7 @@ object JsonFormatters {
   implicit val userInfoReads = Json.reads[UserInfo]
   implicit val userInfoWrites = Json.writes[UserInfo]
 
+  implicit val usersListWrites = Json.writes[UsersList]
+  implicit  val usersListReads = Json.reads[UsersList]
 
 }

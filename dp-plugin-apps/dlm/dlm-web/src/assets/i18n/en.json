@@ -27,6 +27,9 @@
     "service": "Service",
     "hdfs": "HDFS",
     "hive": "HIVE",
+    "errors": {
+      "no_log": "Oops! Could not retrieve a log message for this event."
+    },
     "time": {
       "hourly": "Hourly",
       "daily": "Daily",
@@ -115,7 +118,7 @@
   "forms": {
     "validation_errors": {
       "required": "\"{{fieldLabel}}\" is required",
-      "time_less_than_current": "Selected time is less than current"
+      "time_less_than_current": "Start time must be later than the current time in the selected timezone."
     }
   },
   "page": {
@@ -134,11 +137,11 @@
         }
       },
       "issues": {
-        "updates": "Issues & Updates",
+        "updates": "Issues and Updates",
         "recent": "Recent Issues",
         "list": {
           "view_all": "view all",
-          "empty_list": "No issues to show",
+          "empty_list": "No issues or updates within the selected time period.",
           "status": {
             "in_progress": "is in progress",
             "failed": "failed",
@@ -183,14 +186,17 @@
     },
     "policies": {
       "header": "Replication Policies",
-      "header_note": "Note: Pairings are bi-directional",
+      "header_note": "You must create a cluster pairing before you can create a replication policy.",
       "header_create": "Create Replication Policy",
       "header_review": "Review Replication Policy",
+      "create_button_text": "+ Policy",
       "tags": "Tags",
       "groups": "Groups",
       "data_summary": "Data Summary",
       "no_jobs": "No jobs",
-      "no_policies": "There are no policies created.",
+      "no_policies": "Create your first replication policy.",
+      "no_pairings": "You must create a cluster pairing before you can create a replication policy.",
+      "no_clusters": "You must first select at least two clusters to register with Data Lifecycle Manager. Ensure that clusters to be used for replication jobs meet Data Lifecycle Manager configuration requirements.",
       "perform_action": {
         "confirmation": {
           "title": "Confirm",
@@ -222,11 +228,11 @@
           "databases": "Database",
           "start_date": "Start Date",
           "end_date": "End Date",
-          "start_time": "Start Time",
+          "start_time": "Start Time  (24-Hour Clock)",
           "end_time": "End Time",
           "date_format": "yyyy-mm-dd",
           "queue_name": "Queue Name",
-          "max_bandwidth": "Max. Bandwidth",
+          "max_bandwidth": "Maximum Bandwidth",
           "bandwidth_unit": "MBps",
           "repeat": "Repeat"
         },
@@ -268,13 +274,13 @@
         "header": "Create Pairing",
         "header_note": "Note: Pairings are bi-directional",
         "content": {
-          "no_clusters": "There are no clusters available to pair.",
+          "no_clusters": "No clusters are registered with Data Lifecycle Manager. Click Add>Cluster and register at least two clusters for pairing. Ensure that clusters to be used for replication jobs meet Data Lifecycle Manager configuration requirements.",
           "header": {
             "step_one": "STEP 1: SELECT FIRST CLUSTER",
             "step_two": "STEP 2: SELECT CLUSTER TO BE PAIRED",
             "in_progress": "IN PROGRESS"
           },
-          "cluster_disabled": "Cluster is already paired with the selected cluster"
+          "cluster_disabled": "This cluster is already paired with the selected cluster."
         },
         "confirmation": {
           "title": "Pairing Successful",
@@ -294,9 +300,11 @@
           "status": "Status",
           "message": "Notification",
           "created": "Created",
-          "instance_id": "Instance Id"
+          "entity": "Entity",
+          "log": "Log"
         }
-      }
+      },
+      "view_log": "View Log"
     }
   }
 }
