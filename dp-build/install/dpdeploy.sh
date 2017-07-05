@@ -158,7 +158,7 @@ print_version() {
 usage() {
     local tabspace=20
     echo "Usage: dpdeploy.sh <command>"
-    printf "%-${tabspace}s:%s\n" "Commands" "init [db|consul|knox|app] | migrate | ps | logs [db|all] | start | stop [knox] | destroy [knox]"
+    printf "%-${tabspace}s:%s\n" "Commands" "init [db|consul|knox|app] | migrate | ps | logs [db|all] | start [consul|knox ]| stop [knox|consul] | destroy [knox|consul]"
     printf "%-${tabspace}s:%s\n" "init db" "Initialize postgres DB for first time"
     printf "%-${tabspace}s:%s\n" "init consul" "Initialize consul"
     printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox container"
