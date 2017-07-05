@@ -51,6 +51,10 @@ destroy() {
     docker-compose -f docker-compose.yml -f docker-compose-migrate.yml -f docker-compose-apps.yml down
 }
 
+destroy_consul(){
+    docker-compose -f docker-compose-consul.yml down
+}
+
 destroy_knox() {
     docker-compose -f docker-compose-knox.yml down
     rm -rf ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
@@ -86,6 +90,7 @@ read_use_test_ldap() {
 }
 
 init_knox() {
+    read_consul_host
     if [ "$MASTER_PASSWORD" == "" ]; then
         read_master_password
     fi
@@ -127,6 +132,9 @@ start_app() {
 start_knox() {
     docker-compose -f docker-compose-knox.yml start
 }
+start_consul() {
+    docker-compose -f docker-compose-consul.yml start
+}
 
 stop_app() {
     docker-compose -f docker-compose-apps.yml stop
@@ -134,6 +142,9 @@ stop_app() {
 
 stop_knox() {
     docker-compose -f docker-compose-knox.yml stop
+}
+stop_consul(){
+    docker-compose -f docker-compose-consul.yml stop
 }
 
 print_version() {
@@ -153,7 +164,9 @@ usage() {
     printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox container"
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
+    printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
     printf "%-${tabspace}s:%s\n" "start knox" "Start the  docker container for knox"
+    printf "%-${tabspace}s:%s\n" "start consul" "Start the  docker container for consul"
     printf "%-${tabspace}s:%s\n" "stop" "Stop the application docker containers"
     printf "%-${tabspace}s:%s\n" "stop knox" "Stop the Knox docker container"
     printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
@@ -163,6 +176,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "logs" "$logman"
     printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them. Needs to start from init db again"
     printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox container and remove it. Needs to start from init knox again"
+    printf "%-${tabspace}s:%s\n" "destroy consul" "Kill consul container"
     printf "%-${tabspace}s:%s\n" "version" "Print the version of dataplane"
 }
 
@@ -196,21 +210,24 @@ else
             migrate_schema
             ;;
         start)
-            if [ "$2" == "knox" ]
-            then
-                start_knox
-            else
-                start_app
-            fi
-            ;;
+            case "$2" in
+                knox) start_knox
+                ;;
+                consul) start_consul
+                ;;
+                *) start_app
+             esac
+             ;;
         stop)
-            if [ "$2" == "knox" ]
-            then
-                stop_knox
-            else
-                stop_app
-            fi
-            ;;
+            case "$2" in
+                knox) stop_knox
+                ;;
+                consul) stop_consul
+                ;;
+                *) stop_app
+             esac
+             ;;
+
         ps)
             ps
             ;;
@@ -219,13 +236,15 @@ else
             list_logs "$@"
             ;;
         destroy)
-            if [ "$2" == "knox" ]
-            then
-                destroy_knox
-            else
-                destroy
-            fi
-            ;;
+            case "$2" in
+                knox) destroy_knox
+                ;;
+                consul) destroy_consul
+                ;;
+                *) destroy
+                 ;;
+             esac
+             ;;
         version)
             print_version
             ;;
