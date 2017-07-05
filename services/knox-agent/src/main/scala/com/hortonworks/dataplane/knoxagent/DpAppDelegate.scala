@@ -11,7 +11,7 @@ class DpAppDelegate(wsClient: WSClient, actorSystem: ActorSystem) {
   private val logger = Logging(actorSystem, "DpAppDelegate")
   def getLdapConfiguration(serviceUrl: String): Future[Option[KnoxConfig]] = {
     wsClient
-      .url(s"$serviceUrl//api/app/api/knox/configuration")
+      .url(s"$serviceUrl/api/app/api/knox/configuration")
       .get()
       .map { resp =>
         logger.info("got resp from dpapp")
