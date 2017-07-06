@@ -120,7 +120,7 @@ import { BytesSizePipe } from './pipes/bytes-size.pipe';
 import { FmtTzPipe } from './pipes/fmt-tz.pipe';
 import { FrequencyPipe } from './pipes/frequency.pipe';
 import { TruncatePipe } from './pipes/truncate.pipe';
-import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
+import { StatusFmtPipe } from './pipes/status-fmt.pipe';
 
 @NgModule({
   imports: [
@@ -221,7 +221,7 @@ import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
     FmtTzPipe,
     FrequencyPipe,
     TruncatePipe,
-    PolicyStatusFmtPipe
+    StatusFmtPipe
   ],
   bootstrap: [DlmComponent],
   providers: [

@@ -292,7 +292,7 @@
       "header": "Jobs",
       "header_note": "",
       "prev_jobs": "Prev Jobs",
-      "job_ignored": "Prior instance is still executing and so the new instance will not be triggered and ignored"
+      "job_ignored": "Prior instance was still executing so this instance was not triggered and ignored."
     },
     "notifications": {
       "header": "Notifications",
