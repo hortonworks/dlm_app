@@ -57,7 +57,7 @@ textarea {
       &:after {
         font-family: "FontAwesome";
         font-style: normal;
-        font-size: 8px;
+        font-size: 6px;
         content: '\f069';
         vertical-align: text-top;
         color: $burnt-sienna;
@@ -84,5 +84,15 @@ textarea {
   & label {
     font-size: 14px;
     font-weight: 500;
+  }
+  &.display-group-h {
+    & label {
+      display: inline-block;
+      min-width: 90px;
+      &:after {
+        content: ": ";
+      }
+    }
+
   }
 }

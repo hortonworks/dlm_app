@@ -25,8 +25,11 @@
                 <textarea required name="description" [(ngModel)]="workspace.description"> </textarea>
             </div>
 
-            <button class="mdl-button btn-hwx-primary" (click)="save()"> {{ "common.save" | translate }} </button>
-            <button class="mdl-button btn-hwx-secondary" (click)="cancel()"> {{ "common.cancel" | translate }} </button>
+            <div class="button-container">
+              <button class="mdl-button btn-hwx-primary" (click)="save()"> {{ "common.save" | translate }} </button>
+              <button class="mdl-button btn-hwx-default" (click)="cancel()"> {{ "common.cancel" | translate }} </button>
+            </div>
+
         </form>
     </div>
 </div>
