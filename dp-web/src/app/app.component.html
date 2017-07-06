@@ -4,6 +4,7 @@
                   'minimized': viewPaneStates.MINIMISE === viewPaneState}">
   <dp-header mdl *ngIf="isUserSignedIn()" [user]="getUser()"> </dp-header>
   <div mdl class="page-content">
+    <dp-loader *ngIf="showLoader"></dp-loader>
     <router-outlet></router-outlet>
   </div>
 </main>

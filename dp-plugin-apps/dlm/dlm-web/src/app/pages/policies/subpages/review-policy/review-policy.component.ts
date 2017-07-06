@@ -19,7 +19,7 @@ import { Cluster } from 'models/cluster.model';
 import { POLICY_TYPES, POLICY_TYPES_LABELS, POLICY_DAYS_LABELS, POLICY_REPEAT_MODES,
   POLICY_REPEAT_MODES_LABELS, POLICY_TIME_UNITS } from 'constants/policy.constant';
 import { FrequencyPipe } from 'pipes/frequency.pipe';
-import { omitEmpty } from 'utils/object-utils';
+import { omitEmpty, isEmpty } from 'utils/object-utils';
 import { ProgressState } from 'models/progress-state.model';
 import { getProgressState } from 'selectors/progress.selector';
 import { POLICY_FORM_ID } from '../../components/policy-form/policy-form.component';
@@ -60,9 +60,12 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     private frequencyPipe: FrequencyPipe,
     private timeZone: TimeZoneService
   ) {
-    this.policyForm$ = store.select(getFormValues(POLICY_FORM_ID));
-    this.sourceCluster$ = this.policyForm$.switchMap(policyForm => store.select(getCluster(policyForm.general.sourceCluster)));
-    this.destinationCluster$ = this.policyForm$.switchMap(policyForm => store.select(getCluster(policyForm.general.destinationCluster)));
+    this.policyForm$ = store.select(getFormValues(POLICY_FORM_ID))
+      .filter(policyForm => !isEmpty(policyForm));
+    this.sourceCluster$ = this.policyForm$
+      .switchMap(policyForm => store.select(getCluster(policyForm.general.sourceCluster)));
+    this.destinationCluster$ = this.policyForm$
+      .switchMap(policyForm => store.select(getCluster(policyForm.general.destinationCluster)));
     this.subscriptions.push(store
       .select(getProgressState(CREATE_POLICY_REQUEST))
       .subscribe((progressState: ProgressState) => this.creationState = progressState));
@@ -74,10 +77,8 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.subscriptions.push(
       Observable.combineLatest(this.policyForm$, this.sourceCluster$, this.destinationCluster$)
+        .filter(([policyForm, sourceCluster, destinationCluster]) => sourceCluster && destinationCluster && !isEmpty(policyForm))
         .subscribe(([policyForm, sourceCluster, destinationCluster]) => {
-          if (!sourceCluster || !destinationCluster) {
-            return;
-          }
           this.sourceCluster = sourceCluster;
           this.targetCluster = destinationCluster;
           this.policyFormValue = policyForm;

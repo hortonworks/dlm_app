@@ -14,9 +14,10 @@ import {CollapsibleNavModule} from '../../shared/collapsible-nav/collapsible-nav
 import {SharedModule} from '../../shared/shared.module';
 import {DpSorterModule} from '../../shared/dp-table/dp-sorter/dp-sorter.module';
 import {ClusterDetailsComponent} from './views/cluster-details/cluster-details.component';
-import { UserManagementComponent } from './views/user-management/user-management.component';
+import {UserManagementComponent} from './views/user-management/user-management.component';
 import {DropdownModule} from '../../shared/dropdown/dropdown.module';
-import { AddUserComponent } from './views/user-management/add-user/add-user.component';
+import {AddUserComponent} from './views/user-management/add-user/add-user.component';
+import {PaginationModule} from '../../shared/pagination/pagination.module';
 
 @NgModule({
   imports: [
@@ -27,7 +28,8 @@ import { AddUserComponent } from './views/user-management/add-user/add-user.comp
     TaggingWidgetModule,
     CollapsibleNavModule,
     DropdownModule,
-    TranslateModule
+    TranslateModule,
+    PaginationModule
   ],
 
   declarations: [

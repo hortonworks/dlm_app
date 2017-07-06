@@ -35,9 +35,12 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
     }
 
   }
-  def getUsers() = Action.async {
+  def getUsers() = Action.async { request =>
+    val offset: Long = request.getQueryString("offset").get.toLong
+    val pageSize:Long = request.getQueryString("pageSize").get.toLong
+    val searchTerm:Option[String] = request.getQueryString("searchTerm")
     userRepo
-      .allWithRoles()
+      .allWithRoles(offset, pageSize, searchTerm)
       .map { users =>
         success(users)
       }

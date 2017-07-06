@@ -79,6 +79,8 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
     }
   };
 
+  @Input() trackByProp = 'id';
+
   static makeFixedWith(size: number) {
     return { width: size, maxWidth: size, minWidth: size};
   }

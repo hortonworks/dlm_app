@@ -23,6 +23,8 @@ import { Policy } from 'models/policy.model';
 import { Cluster } from 'models/cluster.model';
 import { Job } from 'models/job.model';
 import { filterCollection, flatten, unique } from 'utils/array-util';
+import { isEqual } from 'utils/object-utils';
+import { POLL_INTERVAL } from 'constants/api.constant';
 
 const POLICIES_REQUEST = 'POLICIES_REQUEST';
 const CLUSTERS_REQUEST = 'CLUSTERS_REQUEST';
@@ -44,10 +46,12 @@ export class OverviewComponent implements OnInit, OnDestroy {
   jobs$: Observable<Job[]>;
   policies$: Observable<Policy[]>;
   clusters$: Observable<Cluster[]>;
+  fullfilledClusters$: Observable<Cluster[]>;
   tableResources$: Observable<any>;
   overallProgress$: Observable<ProgressState>;
   resourceChartData$: Observable<ResourceChartData>;
   tableData$: Observable<any>;
+  subscriptions: Subscription[] = [];
   clustersSubscription: Subscription;
 
   constructor(private store: Store<fromRoot.State>,
@@ -57,6 +61,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.policies$ = store.select(getAllPolicies);
     this.clusters$ = store.select(getAllClusters);
     this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, JOBS_REQUEST));
+    this.fullfilledClusters$ = this.clusters$
+      .filter(clusters => !!clusters.length)
+      .distinctUntilChanged(null, clusters => clusters.map(cluster => cluster.id).join('@') + '_LENGTH' + clusters.length);
     this.tableResources$ = store.select(getPolicyClusterJob);
   }
 
@@ -105,15 +112,28 @@ export class OverviewComponent implements OnInit, OnDestroy {
     return !job.endTime ? true : new Date(job.endTime).getTime() > timestamp;
   }
 
+  private initPolling() {
+    const polling$ = Observable.interval(POLL_INTERVAL)
+      .withLatestFrom(this.fullfilledClusters$)
+      .do(([_, clusters]) => {
+        [
+          loadPolicies(),
+          loadClusters()
+        ].map(action => this.store.dispatch(action));
+        this.store.dispatch(loadJobsForClusters(clusters.map(cluster => cluster.id)));
+      });
+
+    this.subscriptions.push(polling$.subscribe());
+  }
+
   ngOnInit() {
-    this.clustersSubscription = this.clusters$
-      .filter(clusters => !!clusters.length)
-      .distinctUntilChanged(null, clusters => clusters.map(cluster => cluster.id).join('@') + '_LENGTH' + clusters.length)
+    const clusterSubscribtion = this.fullfilledClusters$
       .subscribe(clusters => this.store.dispatch(loadJobsForClusters(clusters.map(cluster => cluster.id), JOBS_REQUEST)));
 
     this.resourceChartData$ = Observable
       .combineLatest(this.jobs$, this.tableResources$, this.clusters$, this.overviewJobsExternalFiltersService.filters$)
-      .map(([jobs, policies, clusters, filters]) => this.prepareChartData(jobs, policies, clusters, filters));
+      .map(([jobs, policies, clusters, filters]) => this.prepareChartData(jobs, policies, clusters, filters))
+      .distinctUntilChanged(isEqual);
 
     this.tableData$ = Observable
       .combineLatest(this.tableResources$, this.overviewJobsExternalFiltersService.filters$)
@@ -126,9 +146,11 @@ export class OverviewComponent implements OnInit, OnDestroy {
       loadPolicies(POLICIES_REQUEST),
       loadClusters(CLUSTERS_REQUEST)
     ].map(action => this.store.dispatch(action));
+    this.subscriptions.push(clusterSubscribtion);
+    this.initPolling();
   }
 
   ngOnDestroy() {
-    this.clustersSubscription.unsubscribe();
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 }
