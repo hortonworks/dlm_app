@@ -47,16 +47,23 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let schema of assetSchemas">
-          <td class="mdl-data-table__cell--non-numeric">{{schema.name}}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{schema.type}}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{schema.noOfUniques}}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{schema.noOfNulls}}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{schema.max}}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{schema.min}}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{schema.mean}}</td>
-          <td class="mdl-data-table__cell--non-numeric">{{schema.comment}}</td>
-        </tr>
+        <ng-container *ngFor="let schema of assetSchemas">
+          <tr  (click)="colGuid = schema.guid">
+            <td class="mdl-data-table__cell--non-numeric">{{schema.name}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{schema.type}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{schema.noOfUniques}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{schema.noOfNulls}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{schema.max}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{schema.min}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{schema.mean}}</td>
+            <td class="mdl-data-table__cell--non-numeric">{{schema.comment}}</td>
+          </tr>
+          <tr *ngIf="colGuid === schema.guid">
+            <td colspan="8" style="height:100px;">
+              <asset-column-visual [data]="colVisualData"></asset-column-visual>
+            </td>
+          </tr>
+        </ng-container>
       </tbody>
     </table>
   </section>
