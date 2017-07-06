@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-ALL_DOCKER_COMPOSE_APP_FILES="-f docker-compose-apps.yml -f docker-compose-knox.yml"
+ALL_DOCKER_COMPOSE_APP_FILES="-f docker-compose-apps.yml -f docker-compose-knox.yml -f docker-compose-consul.yml"
 ALL_DOCKER_COMPOSE_DB_FILES="-f docker-compose.yml -f docker-compose-migrate.yml"
 ALL_DOCKER_COMPOSE_FILES=${ALL_DOCKER_COMPOSE_DB_FILES}" "${ALL_DOCKER_COMPOSE_APP_FILES} 
 
@@ -172,20 +172,20 @@ usage() {
     echo "Usage: dpdeploy.sh <command>"
     printf "%-${tabspace}s:%s\n" "Commands" "init [db|knox|app] | migrate | ps | logs [db|all] | start [knox]| stop [knox] | destroy [knox]"
     printf "%-${tabspace}s:%s\n" "init db" "Initialize postgres DB for first time"
-    printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox container"
+    printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox and Consul containers"
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
     printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
-    printf "%-${tabspace}s:%s\n" "start knox" "Start the  docker container for knox"
+    printf "%-${tabspace}s:%s\n" "start knox" "Start the Knox and Consul containers"
     printf "%-${tabspace}s:%s\n" "stop" "Stop the application docker containers"
-    printf "%-${tabspace}s:%s\n" "stop knox" "Stop the Knox docker container"
+    printf "%-${tabspace}s:%s\n" "stop knox" "Stop the Knox and Consul containers"
     printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
     local logman='List of the docker containers
         No options: app containers, db: all DB containers, all: all containers.
         All \"docker-compose logs\" options are supported'
     printf "%-${tabspace}s:%s\n" "logs" "$logman"
     printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them. Needs to start from init db again"
-    printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox container and remove it. Needs to start from init knox again"
+    printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox and Consul containers and remove them. Needs to start from init knox again"
     printf "%-${tabspace}s:%s\n" "version" "Print the version of dataplane"
 }
 
