@@ -116,11 +116,7 @@ import { TableFilterComponent } from './common/table/table-filter/table-filter.c
 import { CheckboxColumnComponent, ActionColumnComponent } from './components';
 import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/review-policy.component';
 
-import { BytesSizePipe } from './pipes/bytes-size.pipe';
-import { FmtTzPipe } from './pipes/fmt-tz.pipe';
-import { FrequencyPipe } from './pipes/frequency.pipe';
-import { TruncatePipe } from './pipes/truncate.pipe';
-import { StatusFmtPipe } from './pipes/status-fmt.pipe';
+import { PipesModule } from './pipes/pipes.module';
 
 @NgModule({
   imports: [
@@ -156,7 +152,8 @@ import { StatusFmtPipe } from './pipes/status-fmt.pipe';
 
     RouterModule.forRoot(routes),
     CommonComponentsModule,
-    TranslateModule.forRoot()
+    TranslateModule.forRoot(),
+    PipesModule
   ],
   declarations: [
     DlmComponent,
@@ -215,13 +212,7 @@ import { StatusFmtPipe } from './pipes/status-fmt.pipe';
     ModalDialogComponent,
     ModalDialogBodyComponent,
     NotificationsComponent,
-    LogModalDialogComponent,
-
-    BytesSizePipe,
-    FmtTzPipe,
-    FrequencyPipe,
-    TruncatePipe,
-    StatusFmtPipe
+    LogModalDialogComponent
   ],
   bootstrap: [DlmComponent],
   providers: [
@@ -239,7 +230,6 @@ import { StatusFmtPipe } from './pipes/status-fmt.pipe';
     HiveService,
     OverviewJobsExternalFiltersService,
     httpServiceProvider,
-    FrequencyPipe,
     AppConfig,
     {
       provide: APP_INITIALIZER,
