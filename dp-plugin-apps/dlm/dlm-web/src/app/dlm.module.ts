@@ -16,6 +16,7 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { StoreModule } from '@ngrx/store';
 import { RouterStoreModule } from '@ngrx/router-store';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { reducer } from './reducers';
 import { RouterModule } from '@angular/router';
@@ -49,6 +50,7 @@ import { TimeZoneService } from 'services/time-zone.service';
 import { HdfsService } from 'services/hdfs.service';
 import { HiveService } from 'services/hive.service';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
+import { NotificationService } from 'services/notification.service';
 
 import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
@@ -121,6 +123,7 @@ import { FmtTzPipe } from './pipes/fmt-tz.pipe';
 import { FrequencyPipe } from './pipes/frequency.pipe';
 import { TruncatePipe } from './pipes/truncate.pipe';
 import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
+import { SimpleNotificationsModule } from 'angular2-notifications';
 
 @NgModule({
   imports: [
@@ -156,7 +159,9 @@ import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
 
     RouterModule.forRoot(routes),
     CommonComponentsModule,
-    TranslateModule.forRoot()
+    TranslateModule.forRoot(),
+    BrowserAnimationsModule,
+    SimpleNotificationsModule.forRoot()
   ],
   declarations: [
     DlmComponent,
@@ -240,6 +245,7 @@ import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
     OverviewJobsExternalFiltersService,
     httpServiceProvider,
     FrequencyPipe,
+    NotificationService,
     AppConfig,
     {
       provide: APP_INITIALIZER,

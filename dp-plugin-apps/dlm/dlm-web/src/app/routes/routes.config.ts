@@ -4,7 +4,6 @@ import { OverviewComponent } from 'pages/overview/overview.component';
 import { ClustersComponent } from 'pages/clusters/clusters.component';
 import { PairingsComponent } from 'pages/pairings/pairings.component';
 import { PoliciesComponent } from 'pages/policies/policies.component';
-import { JobsComponent } from 'pages/jobs/jobs.component';
 import { NotificationsPageComponent } from 'pages/notifications/notifications.component';
 import { HelpComponent } from 'pages/help/help.component';
 import { CreatePolicyComponent } from 'pages/policies/subpages/create-policy/create-policy.component';

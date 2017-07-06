@@ -52,7 +52,7 @@ export class NavbarComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    $(this.navbar).navigationBar(this.options);
+    (<any> $(this.navbar)).navigationBar(this.options);
   }
 
   hasSubMenu(item: MenuItem): boolean {
