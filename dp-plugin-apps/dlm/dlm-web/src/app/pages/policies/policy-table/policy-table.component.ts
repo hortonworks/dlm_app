@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ViewEncapsulation, TemplateRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, Output, ViewChild, ViewEncapsulation, TemplateRef, OnDestroy, EventEmitter } from '@angular/core';
 import { Policy } from 'models/policy.model';
 import { Cluster } from 'models/cluster.model';
 import { ActionItemType } from 'components';
@@ -27,6 +27,7 @@ import { HiveDatabase } from 'models/hive-database.model';
 import { getDatabase } from 'selectors/hive.selector';
 import { HiveService } from 'services/hive.service';
 import { POLICY_STATUS } from 'constants/status.constant';
+import { POLL_INTERVAL } from 'constants/api.constant';
 
 @Component({
   selector: 'dlm-policy-table',
@@ -45,6 +46,11 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
 
   private selectedAction: ActionItemType;
   private selectedForActionRow: Policy;
+  private selectedJobsSort = {};
+  private selectedJobsPage = {};
+  private selectedJobsActions = {};
+  private subscriptions: Subscription[] = [];
+  private visibleActionMap = {};
   showActionConfirmationModal = false;
 
   lastOperationResponse: OperationResponse = <OperationResponse>{};
@@ -75,12 +81,25 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @Input() policies: Policy[] = [];
   @Input() clusters: Cluster[] = [];
   @Input() activePolicyId = '';
+  @Output() detailsToggle = new EventEmitter<any>();
 
   rowActions = <ActionItemType[]>[
     {label: 'Delete', name: 'DELETE', disabledFor: ''},
     {label: 'Suspend', name: 'SUSPEND', disabledFor: 'SUSPENDED'},
     {label: 'Activate', name: 'ACTIVATE', disabledFor: 'RUNNING'}
   ];
+
+  private initPolling() {
+    const polling$ = Observable.interval(POLL_INTERVAL)
+      .withLatestFrom(this.selectedPolicy$)
+      .filter(([_, policy]) => Boolean(
+        this.activeContentType === PolicyContent.Jobs && policy && policy.id && this.tableComponent.expandedRows[policy.id]
+      ))
+      .do(([_, policy]) => {
+        this.store.dispatch(loadJobsForPolicy(policy));
+      });
+    this.subscriptions.push(polling$.subscribe());
+  }
 
   constructor(private t: TranslateService, private store: Store<fromRoot.State>, private hiveService: HiveService) {
     this.jobs$ = store.select(getAllJobs);
@@ -134,6 +153,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     if (this.activePolicyId) {
       this.openJobsForPolicy();
     }
+    this.initPolling();
   }
 
   openJobsForPolicy() {
@@ -172,6 +192,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     if (this.operationResponseSubscription) {
       this.operationResponseSubscription.unsubscribe();
     }
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
   /**
@@ -216,6 +237,11 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     this.toggleSelectedRow(policy, contentType);
     this.activatePolicy(policy, contentType);
     this.loadContentDetails(policy, contentType);
+    this.detailsToggle.emit({
+      policy: policy.id,
+      expanded: this.tableComponent.expandedRows[policy.id],
+      contentType
+    });
   }
 
   activatePolicy(policy, contentType) {
@@ -255,5 +281,40 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     } else {
       this.store.dispatch(loadJobsForPolicy(policy));
     }
+  }
+
+  handleOnSortJobs(sort, rowId) {
+    this.selectedJobsSort[rowId] = sort.sorts;
+  }
+
+  getJobsSortForRow(rowId) {
+    return rowId && rowId in this.selectedJobsSort ? this.selectedJobsSort[rowId] : [];
+  }
+
+  handleJobsPageChange(page, rowId) {
+    this.selectedJobsPage[rowId] = page.offset;
+  }
+
+  getJobsPageForRow(rowId) {
+    return rowId && rowId in this.selectedJobsPage ? this.selectedJobsPage[rowId] : 0;
+  }
+
+  handleActionOpenChange(event: {rowId: string, isOpen: boolean}) {
+    const { rowId, isOpen } = event;
+    if (rowId) {
+      this.visibleActionMap[rowId] = isOpen;
+    }
+  }
+
+  shouldShowAction(rowId) {
+    return rowId in this.visibleActionMap && this.visibleActionMap[rowId];
+  }
+
+  handleOnSelectActionJobs(jobEvent: { rowId: string, isOpen: boolean}, rowId) {
+    this.selectedJobsActions[rowId] = jobEvent;
+  }
+
+  getJobsActiveActionsForRow(rowId) {
+    return rowId && rowId in this.selectedJobsActions ? this.selectedJobsActions[rowId] : {};
   }
 }

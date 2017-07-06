@@ -17,7 +17,9 @@ export class PolicyActionsComponent {
   outsideClickHandler(e) {
     if (!this.elementRef.nativeElement.contains(event.target)) {
       this.isOpen = false;
-      this.openChange.emit({ rowId: this.rowId, isOpen: this.isOpen});
+      if (this.isOpen) {
+        this.openChange.emit({ rowId: this.rowId, isOpen: this.isOpen});
+      }
     }
   }
 

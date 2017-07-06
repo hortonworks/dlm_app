@@ -1,9 +1,13 @@
 <dlm-table
   #jobsTable
+  [sorts]="sorts"
+  [offset]="page"
   [showPageSizeMenu]="showPageSizeMenu"
   [columns]="columns"
   [rows]="jobs"
   [selectionType]="selectionType"
+  (sortAction)="handleOnSort($event)"
+  (pageChange)="handlePageChange($event)"
   selectionType="checkbox">
 </dlm-table>
 
@@ -43,14 +47,12 @@
 </ng-template>
 
 <ng-template #actionsCell let-row="row">
-  <div class="btn-group" dropdown placement="bottom right">
-    <span dropdownToggle class="actionable">
-      <i class="fa fa-ellipsis-v text-primary"></i>
-    </span>
-    <ul *dropdownMenu class="dropdown-menu dropdown-menu-right">
-      <li *ngFor="let rowAction of rowActions" (click)="handleSelectedAction(row, rowAction)" [class.disabled]="row.status !== 'RUNNING'">
-        <a href="javascript:void(0);" class="dropdown-item">{{rowAction.label}}</a>
-      </li>
-    </ul>
-  </div>
+  <dlm-policy-actions
+    [rowId]="row.id"
+    [policy]="row"
+    [isOpen]="shouldShowAction(row.id)"
+    [policyActions]="rowActions"
+    (openChange)="handleActionOpenChange($event)"
+    (handler)="handleSelectedAction($event)">
+  </dlm-policy-actions>
 </ng-template>

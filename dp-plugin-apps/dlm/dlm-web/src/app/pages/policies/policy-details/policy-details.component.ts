@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import { Policy } from 'models/policy.model';
 import { Job } from 'models/job.model';
 import { PolicyContent } from './policy-content.type';
@@ -13,6 +13,10 @@ import { HiveDatabase } from 'models/hive-database.model';
 export class PolicyDetailsComponent implements OnInit {
 
   policyContent = PolicyContent;
+
+  @Output() onSortJobs = new EventEmitter<any>();
+  @Output() onPageChangeJobs = new EventEmitter<any>();
+  @Output() onSelectActionJobs = new EventEmitter<any>();
 
   @Input()
   policy: Policy;
@@ -31,6 +35,12 @@ export class PolicyDetailsComponent implements OnInit {
 
   @Input() policyDatabase: HiveDatabase;
 
+  @Input() jobsSort = [];
+
+  @Input() jobsPage = 0;
+
+  @Input() jobsActiveActions = {};
+
   ngOnInit() {
 
   }
@@ -43,4 +53,15 @@ export class PolicyDetailsComponent implements OnInit {
     return POLICY_TYPES.HIVE === this.policy.type;
   }
 
+  handleOnSort(sorts) {
+    this.onSortJobs.emit(sorts);
+  }
+
+  handleOnPageChange(page) {
+    this.onPageChangeJobs.emit(page);
+  }
+
+  handleOnSelectAction(event) {
+    this.onSelectActionJobs.emit(event);
+  }
 }

@@ -19,6 +19,9 @@ import { Cluster } from 'models/cluster.model';
 import { getAllClusters } from 'selectors/cluster.selector';
 import { TableFilterItem } from 'common/table/table-filter/table-filter-item.type';
 import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
+import { PolicyContent } from './policy-details/policy-content.type';
+import { isEqual } from 'utils/object-utils';
+import { POLL_INTERVAL } from 'constants/api.constant';
 
 export const ALL = 'all';
 
@@ -29,6 +32,7 @@ export const ALL = 'all';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PoliciesComponent implements OnInit, OnDestroy {
+  private lastPolicyToggles;
   policies$: Observable<Policy[]>;
   clusters$: Observable<Cluster[]>;
   pairings$: Observable<Pairing[]>;
@@ -49,8 +53,19 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   ];
   initialFilters: {propertyName: string, value: string []} [];
 
+  private initPolling() {
+    const polling$ = Observable.interval(POLL_INTERVAL)
+      .filter(_ => !this.lastPolicyToggles ||
+          (this.lastPolicyToggles.expanded && this.lastPolicyToggles.contentType === PolicyContent.Jobs)
+      )
+      .do(_ => {
+        this.store.dispatch(loadPolicies());
+      });
+    this.subscriptions.push(polling$.subscribe());
+  }
+
   constructor(private store: Store<fromRoot.State>, private route: ActivatedRoute) {
-    this.policies$ = this.store.select(getPolicyClusterJob);
+    this.policies$ = this.store.select(getPolicyClusterJob).distinctUntilChanged(isEqual);
     this.clusters$ = store.select(getAllClusters);
     this.pairings$ = store.select(getAllPairings);
     const pairsCount$: Observable<PairsCountEntity> = store.select(getCountPairsForClusters);
@@ -92,6 +107,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
         ];
       }
     });
+    this.initPolling();
   }
 
   ngOnDestroy() {
@@ -109,5 +125,9 @@ export class PoliciesComponent implements OnInit, OnDestroy {
 
   filterPoliciesByService(type) {
     this.filterByService$.next(type);
+  }
+
+  handleDetailsToggle(event) {
+    this.lastPolicyToggles = event;
   }
 }
