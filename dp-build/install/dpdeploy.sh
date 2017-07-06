@@ -10,6 +10,20 @@ KNOX_SIGNING_CERTIFICATE=knox-signing.pem
 DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 
+init_consul(){
+  echo "Initializing Consul"
+  read_consul_host
+  docker-compose -f docker-compose-consul.yml up -d
+}
+read_consul_host(){
+ if [ -z "$CONSUL_HOST" ]; then
+  echo "Enter the Host IP Address (Consul will bind to this host):"
+  read HOST_IP;
+  export CONSUL_HOST=$HOST_IP;
+ fi
+ echo "using CONSUL_HOST: $CONSUL_HOST"
+}
+
 init_db() {
     docker-compose up -d
 }
@@ -38,22 +52,17 @@ destroy() {
     docker-compose -f docker-compose.yml -f docker-compose-migrate.yml -f docker-compose-apps.yml down
 }
 
+destroy_consul(){
+    docker-compose -f docker-compose-consul.yml down
+}
+
 destroy_knox() {
     docker-compose -f docker-compose-knox.yml down
     rm -rf ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
 }
 
-read_consul_host() {
-    echo "Enter the Host IP Address (Consul will bind to this host):"
-    read HOST_IP;
-    export CONSUL_HOST=$HOST_IP;
-}
-
 init_app() {
-    if [ "$CONSUL_HOST" == "" ]; then
-        read_consul_host
-    fi
-    echo "using CONSUL_HOST: $CONSUL_HOST"
+    read_consul_host
     docker-compose -f docker-compose-apps.yml up -d
 }
 
@@ -82,6 +91,7 @@ read_use_test_ldap() {
 }
 
 init_knox() {
+    init_consul
     if [ "$MASTER_PASSWORD" == "" ]; then
         read_master_password
     fi
@@ -101,7 +111,7 @@ init_knox() {
     then
         docker exec -it ${KNOX_CONTAINER_ID} ./setup_knox_sso_conf.sh
     fi
-	echo "Knox Initialized"
+    echo "Knox Initialized"
 }
 
 export_knox_cert() {
@@ -123,6 +133,9 @@ start_app() {
 start_knox() {
     docker-compose -f docker-compose-knox.yml start
 }
+start_consul() {
+    docker-compose -f docker-compose-consul.yml start
+}
 
 stop_app() {
     docker-compose -f docker-compose-apps.yml stop
@@ -130,6 +143,9 @@ stop_app() {
 
 stop_knox() {
     docker-compose -f docker-compose-knox.yml stop
+}
+stop_consul(){
+    docker-compose -f docker-compose-consul.yml stop
 }
 
 print_version() {
@@ -143,11 +159,12 @@ print_version() {
 usage() {
     local tabspace=20
     echo "Usage: dpdeploy.sh <command>"
-    printf "%-${tabspace}s:%s\n" "Commands" "init [db|knox|app] | migrate | ps | logs [db|all] | start | stop [knox] | destroy [knox]"
+    printf "%-${tabspace}s:%s\n" "Commands" "init [db|knox|app] | migrate | ps | logs [db|all] | start [knox]| stop [knox] | destroy [knox]"
     printf "%-${tabspace}s:%s\n" "init db" "Initialize postgres DB for first time"
     printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox container"
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
+    printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
     printf "%-${tabspace}s:%s\n" "start knox" "Start the  docker container for knox"
     printf "%-${tabspace}s:%s\n" "stop" "Stop the application docker containers"
     printf "%-${tabspace}s:%s\n" "stop knox" "Stop the Knox docker container"
@@ -188,21 +205,20 @@ else
             migrate_schema
             ;;
         start)
-            if [ "$2" == "knox" ]
-            then
-                start_knox
-            else
-                start_app
-            fi
-            ;;
+            case "$2" in
+                knox) start_knox
+                ;;
+                *) start_app
+             esac
+             ;;
         stop)
-            if [ "$2" == "knox" ]
-            then
-                stop_knox
-            else
-                stop_app
-            fi
-            ;;
+            case "$2" in
+                knox) stop_knox
+                ;;
+                *) stop_app
+             esac
+             ;;
+
         ps)
             ps
             ;;
@@ -211,13 +227,13 @@ else
             list_logs "$@"
             ;;
         destroy)
-            if [ "$2" == "knox" ]
-            then
-                destroy_knox
-            else
-                destroy
-            fi
-            ;;
+            case "$2" in
+                knox) destroy_knox
+                ;;
+                *) destroy
+                 ;;
+             esac
+             ;;
         version)
             print_version
             ;;
@@ -226,4 +242,3 @@ else
             ;;
     esac
 fi
-
