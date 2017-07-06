@@ -11,6 +11,7 @@ DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 
 init_consul(){
+  echo "Initializing Consul"
   read_consul_host
   docker-compose -f docker-compose-consul.yml up -d
 }
@@ -90,7 +91,7 @@ read_use_test_ldap() {
 }
 
 init_knox() {
-    read_consul_host
+    init_consul
     if [ "$MASTER_PASSWORD" == "" ]; then
         read_master_password
     fi
@@ -158,18 +159,15 @@ print_version() {
 usage() {
     local tabspace=20
     echo "Usage: dpdeploy.sh <command>"
-    printf "%-${tabspace}s:%s\n" "Commands" "init [db|consul|knox|app] | migrate | ps | logs [db|all] | start [consul|knox ]| stop [knox|consul] | destroy [knox|consul]"
+    printf "%-${tabspace}s:%s\n" "Commands" "init [db|knox|app] | migrate | ps | logs [db|all] | start [knox]| stop [knox] | destroy [knox]"
     printf "%-${tabspace}s:%s\n" "init db" "Initialize postgres DB for first time"
-    printf "%-${tabspace}s:%s\n" "init consul" "Initialize consul"
     printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox container"
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
     printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
-    printf "%-${tabspace}s:%s\n" "start consul" "Start the  docker container for consul"
     printf "%-${tabspace}s:%s\n" "start knox" "Start the  docker container for knox"
     printf "%-${tabspace}s:%s\n" "stop" "Stop the application docker containers"
     printf "%-${tabspace}s:%s\n" "stop knox" "Stop the Knox docker container"
-    printf "%-${tabspace}s:%s\n" "stop consul" "Stop the consul docker container"
     printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
     local logman='List of the docker containers
         No options: app containers, db: all DB containers, all: all containers.
@@ -177,7 +175,6 @@ usage() {
     printf "%-${tabspace}s:%s\n" "logs" "$logman"
     printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them. Needs to start from init db again"
     printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox container and remove it. Needs to start from init knox again"
-    printf "%-${tabspace}s:%s\n" "destroy consul" "Kill consul container"
     printf "%-${tabspace}s:%s\n" "version" "Print the version of dataplane"
 }
 
@@ -199,9 +196,6 @@ else
                 app)
                     init_app
                     ;;
-                consul)
-                    init_consul
-                    ;;
                 *)
                     usage
                     ;;
@@ -214,16 +208,12 @@ else
             case "$2" in
                 knox) start_knox
                 ;;
-                consul) start_consul
-                ;;
                 *) start_app
              esac
              ;;
         stop)
             case "$2" in
                 knox) stop_knox
-                ;;
-                consul) stop_consul
                 ;;
                 *) stop_app
              esac
@@ -239,8 +229,6 @@ else
         destroy)
             case "$2" in
                 knox) destroy_knox
-                ;;
-                consul) destroy_consul
                 ;;
                 *) destroy
                  ;;
