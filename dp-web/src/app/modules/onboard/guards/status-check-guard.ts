@@ -13,12 +13,11 @@ export class StatusCheckGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot) {
     return Observable.create(observer => {
-      this.configService.isConfigurationComplete().subscribe(isComplete => {
-        if (isComplete) {
-          observer.next(true);
-          observer.complete();
-        } else {
-          this.redirect(observer, true, '/onboard/configure');
+      this.configService.isKnoxConfigured().subscribe(response => {
+        if (response.isConfigured && this.router.url === '/onboard/configure') {
+          this.redirect(observer, true);
+        }else{
+          this.redirect(observer, false, '/');
         }
       }, error => {
         this.redirect(observer, true, '/onboard/configure');
@@ -27,7 +26,7 @@ export class StatusCheckGuard implements CanActivate {
     });
   }
 
-  redirect(observer, canActivate, route) {
+  redirect(observer, canActivate, route?) {
     observer.next(canActivate);
     observer.complete();
     if (route) {

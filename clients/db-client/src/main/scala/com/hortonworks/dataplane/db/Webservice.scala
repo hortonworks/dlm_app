@@ -194,7 +194,11 @@ object Webservice {
   }
 
   trait ConfigService extends DbClientService {
+
     def getConfig(key: String): Future[Option[DpConfig]]
+
+    def addConfig(dpConfig: DpConfig): Future[Either[Errors, DpConfig]]
+
   }
 
   trait LdapConfigService extends DbClientService{

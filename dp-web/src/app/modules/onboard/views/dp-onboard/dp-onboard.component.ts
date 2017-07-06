@@ -14,8 +14,8 @@ export class DpOnboardComponent implements OnInit {
   ngOnInit() {
   }
 
-  start(){
-    this.router.navigate(['/onboard/configure'])
+  start() {
+    this.router.navigate(['/onboard/configure']);
   }
 
 }
