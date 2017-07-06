@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
-declare var d3, nv: any;
+import * as d3 from 'd3';
+import * as nv from 'nvd3';
 
 @Component({
   selector: 'asset-column-visual'
@@ -45,17 +46,17 @@ export class AssetColumnVisualComponent implements OnInit{
 	            .call(chart);
 	        nv.utils.windowResize(chart.update);
 
-	        var barsWidth:number = d3.select(".nv-barsWrap").node().getBoundingClientRect().width;
+	        var barsWidth:number = d3.select(".nv-barsWrap").node()['getBoundingClientRect']().width;
 	        var padding=1, allowedWidth = barsWidth/dataa[0].values.length;
 
 	        function wrap() {
 			  var self = d3.select(this),
-			    textLength = self.node().getComputedTextLength(),
+			    textLength = self.node()['getComputedTextLength'](),
 			    text = self.text();
 			  while (textLength > (allowedWidth - 2 * padding) && text.length > 0) {
 			    text = text.slice(0, -1);
 			    self.text(text + '...');
-			    textLength = self.node().getComputedTextLength();
+			    textLength = self.node()['getComputedTextLength']();
 			  }
 			}
 			d3.select(".nv-axis")
@@ -125,7 +126,7 @@ export class AssetColumnVisualComponent implements OnInit{
 			    .y(function(d) { return d.y })
 			    // .width(width)
 			    // .height(height)
-			    .showTooltipPercent(true);
+			    ['showTooltipPercent'](true);
 			d3.select("#chart1 svg")
 				.datum(_this.getDataForPiChart())
 				.transition().duration(1200)
