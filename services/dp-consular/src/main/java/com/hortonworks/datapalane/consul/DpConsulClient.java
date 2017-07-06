@@ -1,6 +1,8 @@
 package com.hortonworks.datapalane.consul;
 
 import com.ecwid.consul.v1.health.model.HealthService;
+import com.hortonworks.datapalane.consul.model.ConsulEvent;
+import com.hortonworks.datapalane.consul.model.ConsulEventResp;
 
 import java.util.List;
 
@@ -12,4 +14,5 @@ interface DpConsulClient {
   ConsulResponse unRegisterCheck(String serviceId);
   ConsulResponse<List<HealthService>> getService();
   boolean checkServiceAvailability(String serviceId);
+  public ConsulEventResp fireEvent(ConsulEvent event);
 }

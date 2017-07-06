@@ -8,7 +8,7 @@ case class KnoxConfigInfo(
     groupSearchBase: Option[String],
     bindDn :Option[String],
     password: Option[String],
-    domains: Option[String],/*list of urls from which app is accessible*/
+    domains: Option[Seq[String]],/*list of urls from which app is accessible*/
     signedTokenTtl : Option[Long], /* None will make it -1 and valid forever. Give this in minutes*/
     allowHttpsOnly : Option[Boolean]=Some(false) /* the app has to be on https for more security*/
 )

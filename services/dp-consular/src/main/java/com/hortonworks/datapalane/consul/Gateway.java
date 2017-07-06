@@ -11,9 +11,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -35,6 +34,8 @@ import java.util.stream.Collectors;
 public class Gateway {
 
   public static final int INITIAL_DELAY = 1;
+  public static final int DEFAULT_GATEWAY_DISCOVER_RETRY_COUNT = 5;
+  public static final int DFAULT_GATEWAY_DISCOVER_RETRY_WAITBETWEEN_INMILLIS = 3000;
   private final Config config;
   private final Map<String, String> serviceConfigs;
   private final Optional<ConsulHook> consulHook;
@@ -42,6 +43,7 @@ public class Gateway {
   private final AtomicReference<Set<ZuulServer>> serverSet;
   private Supplier<List<ZuulServer>> supplier;
   private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+  private int gatewayDiscoverRetryCount=DEFAULT_GATEWAY_DISCOVER_RETRY_COUNT;
 
 
   public Gateway(Config config, Map<String, String> serviceConfigs, Optional<ConsulHook> consulHook) {
@@ -50,6 +52,9 @@ public class Gateway {
     this.consulHook = consulHook;
     String host = config.getString("consul.host");
     int port = config.getInt("consul.port");
+    if (config.hasPath("gateway.discover.retry.count")) {
+      gatewayDiscoverRetryCount=config.getInt("gateway.discover.retry.count");
+    }
     dpConsulClient = new DpConsulClientImpl(new ConsulEndpoint(host, port));
     supplier = new ServerListSupplier(dpConsulClient);
     serverSet = new AtomicReference<>(Sets.newHashSet());
@@ -102,6 +107,32 @@ public class Gateway {
 
   }
 
+  public void getGatewayService(GatewayHook gatewayHook) {
+    final Random randomizer = new Random();
+    AtomicInteger retryCounter = new AtomicInteger(gatewayDiscoverRetryCount);
+    AtomicReference<Future> futureRef = new AtomicReference<>();
+    Future future = scheduledExecutorService.scheduleWithFixedDelay(() -> {
+      List<ZuulServer> zuulServers = supplier.get();
+      if (zuulServers.size() > 0) {
+        try {
+          gatewayHook.gatewayDiscovered(zuulServers.get(randomizer.nextInt(zuulServers.size())));
+        }finally {
+          futureRef.get().cancel(true);
+        }
+      } else {
+        if (retryCounter.decrementAndGet() < 0) {
+          try {
+            gatewayHook.gatewayDiscoverFailure("Not able to discover gateway");
+          }finally {
+            futureRef.get().cancel(true);
+          }
+        }
+      }
+
+    }, INITIAL_DELAY, DFAULT_GATEWAY_DISCOVER_RETRY_WAITBETWEEN_INMILLIS, TimeUnit.MILLISECONDS);
+    futureRef.set(future);
+  }
+
   private static class ServerListSupplier implements Supplier<List<ZuulServer>> {
 
 
@@ -122,6 +153,4 @@ public class Gateway {
         .collect(Collectors.toList());
     }
   }
-
-
 }

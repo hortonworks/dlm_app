@@ -13,6 +13,7 @@ clean_build() {
 	rm -rf build
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-db-service
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-app/dp-web
+    mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-knox-agent
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-knox
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-cluster-service
  	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-gateway
@@ -99,11 +100,20 @@ build_dp_web() {
 	cp -R ./dist/* ../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-app/dp-web
 	popd
 }
+build_knox_agent() {
+     log "Building Knox Agent"
+     rm -rf ../services/knox-agent/build
+     mkdir ../services/knox-agent/build
+     pushd ../services/knox-agent
+     unpack_for_docker_deploy build/tmp_dp-knox-agent ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-knox-agent/dp-knox-agent
+     popd
+}
 
 build_dp_knox() {
 	log "Building dp-knox"
 	cp -R knox-scripts ${DP_DOCKER_ROOT_FOLDER}/dp-knox/
 	cp Dockerfile.knox ${DP_DOCKER_ROOT_FOLDER}/dp-knox/Dockerfile
+    cp -R build/dp-docker/dp-knox-agent/dp-knox-agent/ ${DP_DOCKER_ROOT_FOLDER}/dp-knox/dp-knox-agent
     cp ../dp-configurator/target/dp-configurator-1.0-SNAPSHOT.jar ${DP_DOCKER_ROOT_FOLDER}/dp-knox/
 }
 
@@ -175,8 +185,10 @@ build_dp_configurator
 build_db_service
 build_dp_app
 build_dp_web
+build_knox_agent
 build_dp_knox
 build_cluster_service
 build_installer
 zip_dp_binaries
 log "All done"
+
