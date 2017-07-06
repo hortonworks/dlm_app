@@ -122,6 +122,9 @@ import { FrequencyPipe } from './pipes/frequency.pipe';
 import { TruncatePipe } from './pipes/truncate.pipe';
 import { StatusFmtPipe } from './pipes/status-fmt.pipe';
 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SimpleNotificationsModule } from 'angular2-notifications';
+
 @NgModule({
   imports: [
     MomentModule,

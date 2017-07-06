@@ -166,6 +166,7 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    console.log("llll");
     this.loadParamsSubscription$.unsubscribe();
     this.pairingsSubscription$.unsubscribe();
     this.firstSetClustersSubscription$.unsubscribe();
