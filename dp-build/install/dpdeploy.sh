@@ -53,15 +53,19 @@ destroy() {
 }
 
 destroy_consul(){
+    echo "Destroying Consul"
     docker-compose -f docker-compose-consul.yml down
 }
 
 destroy_knox() {
+    echo "Destroying Knox"
     docker-compose -f docker-compose-knox.yml down
     rm -rf ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
+    destroy_consul
 }
 
 init_app() {
+    echo "Initializing app"
     read_consul_host
     docker-compose -f docker-compose-apps.yml up -d
 }
@@ -91,6 +95,7 @@ read_use_test_ldap() {
 }
 
 init_knox() {
+    echo "Initializing Knox"
     init_consul
     if [ "$MASTER_PASSWORD" == "" ]; then
         read_master_password
@@ -129,23 +134,29 @@ get_knox_container_id() {
 start_app() {
     docker-compose -f docker-compose-apps.yml start
 }
-
-start_knox() {
-    docker-compose -f docker-compose-knox.yml start
-}
 start_consul() {
+    echo "Starting Consul"
     docker-compose -f docker-compose-consul.yml start
+}
+start_knox() {
+    echo "Starting Knox"
+    start_consul
+    docker-compose -f docker-compose-knox.yml start
 }
 
 stop_app() {
     docker-compose -f docker-compose-apps.yml stop
 }
 
-stop_knox() {
-    docker-compose -f docker-compose-knox.yml stop
-}
 stop_consul(){
+    echo "Stopping Consul"
     docker-compose -f docker-compose-consul.yml stop
+}
+
+stop_knox() {
+    echo "Stopping Knox"
+    docker-compose -f docker-compose-knox.yml stop
+    stop_consul
 }
 
 print_version() {
