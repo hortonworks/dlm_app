@@ -128,7 +128,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs')},
       {prop: 'frequency', name: this.t.instant('common.schedule'), cellTemplate: this.scheduleCellTemplateRef},
       {prop: 'jobs.0.trackingInfo.timeTaken', name: this.t.instant('common.duration'), cellTemplate: this.durationCellRef},
-      {prop: 'jobs.0.startTime', name: 'Last Good', cellTemplate: this.lastGoodCellRef},
+      {prop: 'lastGoodJobResource.startTime', name: 'Last Good', cellTemplate: this.lastGoodCellRef},
       {name: ' ', cellTemplate: this.actionsCellRef, maxWidth: 55, sortable: false}
     ];
     if (this.activePolicyId) {
