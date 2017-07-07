@@ -67,7 +67,7 @@ export class AssetColumnVisualComponent implements OnInit{
 				return d;
 				}).each(wrap);
 
-			!_this.onlyHisto && d3.select(".nv-axis")
+			(_this.data.type != "string") && d3.select(".nv-axis")
 				.selectAll(".tick")
 				.selectAll("text")
 				.attr('transform', function(d,i,j) { return 'translate (-'+allowedWidth/2 +', 8)' }) ;	
