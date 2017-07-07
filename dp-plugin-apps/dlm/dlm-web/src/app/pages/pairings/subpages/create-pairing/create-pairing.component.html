@@ -54,10 +54,3 @@
     </div>
   </ng-template>
 </div>
-<dlm-modal-dialog #confirmationModal
-                  [title]="'page.pairings.create.confirmation.title' | translate"
-                  [body]="'page.pairings.create.confirmation.body' | translate"
-                  [showCancel]="false"
-                  [showDialog]="progress.state === 'success'"
-                  (onOk)="onConfirmation()">
-</dlm-modal-dialog>

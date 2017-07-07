@@ -13,6 +13,7 @@ import { MockTranslateLoader } from 'mocks/mock-translate-loader';
 import { RouterTestingModule } from '@angular/router/testing';
 import { TooltipModule } from 'ng2-bootstrap';
 import { CommonComponentsModule } from 'components/common-components.module';
+import { NotificationService } from 'services/notification.service';
 import { PipesModule } from 'pipes/pipes.module';
 
 describe('CreatePairingComponent', () => {
@@ -40,7 +41,14 @@ describe('CreatePairingComponent', () => {
         ModalDialogComponent
       ],
       providers: [
-        {provide: Store, useClass: MockStore}
+        {
+          provide: Store,
+          useClass: MockStore
+        },
+        {
+          provide: NotificationService,
+          useValue: jasmine.createSpyObj('notificationService', ['create'])
+        }
       ]
     })
       .compileComponents();
