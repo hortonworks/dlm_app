@@ -9,8 +9,8 @@ import com.hortonworks.dataplane.http.Webserver
 import com.typesafe.config.Config
 import play.api.Logger
 
-import scala.util.Try
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Try
 
 object ClusterService extends App {
 
@@ -27,6 +27,7 @@ object ClusterService extends App {
 
   private val serverState = server.init
 
+
   logger.info("Starting cluster sync")
 
   // Try to register the service on consul
@@ -36,7 +37,6 @@ object ClusterService extends App {
     val registrar = new ApplicationRegistrar(configuration,Optional.of(hook))
     registrar.initialize()
   }
-
 
   // This hook takes care of setting up the application correctly
   // when consul and ZUUL services are available

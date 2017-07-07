@@ -80,7 +80,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
   def getAmbariDetails(ambariDetailRequest: AmbariDetailRequest,
                        request: HttpRequest): Future[Seq[AmbariCluster]] = {
 
-    val header = request.getHeader("X-DP-Token-Info")
+    val header = request.getHeader(Constants.DPTOKEN)
     implicit val token =
       if (header.isPresent) Some(HJwtToken(header.get.value)) else None
 

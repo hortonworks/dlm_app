@@ -1,4 +1,4 @@
-package com.hortonworks.dataplane.cs
+package com.hortonworks.dataplane.cs.atlas
 
 import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery}
 import org.apache.atlas.model.SearchFilter
