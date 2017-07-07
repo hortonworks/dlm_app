@@ -48,6 +48,7 @@ import { LogService } from 'services/log.service';
 import { TimeZoneService } from 'services/time-zone.service';
 import { HdfsService } from 'services/hdfs.service';
 import { HiveService } from 'services/hive.service';
+import { NotificationService } from 'services/notification.service';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
 
 import { MainComponent } from './pages/main/main.component';
@@ -159,7 +160,9 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
 
     RouterModule.forRoot(routes),
     CommonComponentsModule,
-    TranslateModule.forRoot()
+    TranslateModule.forRoot(),
+    BrowserAnimationsModule,
+    SimpleNotificationsModule.forRoot()
   ],
   declarations: [
     DlmComponent,
@@ -240,6 +243,7 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     TimeZoneService,
     HdfsService,
     HiveService,
+    NotificationService,
     OverviewJobsExternalFiltersService,
     httpServiceProvider,
     FrequencyPipe,

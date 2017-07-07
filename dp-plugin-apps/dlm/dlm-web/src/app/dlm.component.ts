@@ -14,7 +14,6 @@ import { SessionStorageService } from './services/session-storage.service';
 import { TimeZoneService } from './services/time-zone.service';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
-import * as moment from 'moment';
 
 @Component({
   selector: 'dlm',
@@ -33,6 +32,15 @@ export class DlmComponent implements OnDestroy {
   navigationColumns = NAVIGATION;
   onOverviewPage = false;
   routeSubscription: Subscription;
+
+  // Options for Toast Notification
+  notificationOptions = {
+    position: ['top', 'right'],
+    showProgressBar: false,
+    lastOnBottom: false,
+    theClass: 'toast-notification',
+    timeOut: 10000
+  };
 
   // mock current user
   // TODO: move user to store and dispatch timezone update with action

@@ -14,6 +14,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { TooltipModule } from 'ng2-bootstrap';
 import { CommonComponentsModule } from 'components/common-components.module';
+import { NotificationService } from 'services/notification.service';
 
 describe('CreatePairingComponent', () => {
   let component: CreatePairingComponent;
@@ -39,7 +40,14 @@ describe('CreatePairingComponent', () => {
         BytesSizePipe
       ],
       providers: [
-        {provide: Store, useClass: MockStore}
+        {
+          provide: Store,
+          useClass: MockStore
+        },
+        {
+          provide: NotificationService,
+          useValue: jasmine.createSpyObj('notificationService', ['create'])
+        }
       ]
     })
       .compileComponents();
