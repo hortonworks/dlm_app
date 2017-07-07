@@ -71,7 +71,7 @@ export class JobsTableComponent implements OnInit {
         headerClass: 'date-header'
       },
       {
-        prop: 'trackingInfo.bytesCopied',
+        prop: 'trackingInfo',
         cellTemplate: this.transferredFormattedTemplate,
         name: 'Transferred Bytes',
         cellClass: 'date-cell',

@@ -42,11 +42,8 @@
   <dlm-duration-column [isRunning]="isRunning(policy?.lastJobResource)" [duration]="value"></dlm-duration-column>
 </ng-template>
 
-<ng-template #transferredFormattedTemplate let-value="value" let-policy="row">
-  <span *ngIf="value >= 0 && !isRunning(policy?.lastJobResource)" [innerHTML]="value | bytesSize"></span>
-  <!-- @TODO: this is mock -->
-  <!-- <progressbar *ngIf="isRunning(policy?.lastJobResource)" [value]="progress$ | async" [max]="15"></progressbar> -->
-  <i *ngIf="value === undefined" class="fa fa-minus"></i>
+<ng-template #transferredFormattedTemplate let-value="value">
+  <dlm-transferred-column [trackingInfo]="value"></dlm-transferred-column>
 </ng-template>
 
 <ng-template #destinationIconCell>

@@ -14,7 +14,6 @@ import {FormsModule} from '@angular/forms';
 import {MockStore} from '../../mocks/mock-store';
 import {Store} from '@ngrx/store';
 import {MomentModule} from 'angular2-moment';
-import {BytesSizePipe} from '../../pipes/bytes-size.pipe';
 import {ChartsModule} from 'ng2-charts';
 import {RouterTestingModule} from '@angular/router/testing';
 import {TableFooterComponent} from '../../common/table/table-footer/table-footer.component';
@@ -23,9 +22,9 @@ import { TableFilterComponent } from '../../common/table/table-filter/table-filt
 import { TypeaheadModule, TooltipModule, ProgressbarModule } from 'ng2-bootstrap';
 import { JobsStatusFilterComponent } from './jobs-status-filter/jobs-status-filter.component';
 import { NavbarService } from 'services/navbar.service';
-import { FmtTzPipe } from 'pipes/fmt-tz.pipe';
 import { DurationColumnComponent } from 'components/table-columns/duration-column/duration-column.component';
-import { StatusFmtPipe } from 'pipes/status-fmt.pipe';
+import { TransferredColumnComponent } from 'components/table-columns/transferred-column/transferred-column.component';
+import { PipesModule } from 'pipes/pipes.module';
 
 describe('JobsComponent', () => {
   let component: JobsComponent;
@@ -39,7 +38,8 @@ describe('JobsComponent', () => {
         }),
         TypeaheadModule.forRoot(), NgxDatatableModule, FormsModule, MomentModule, ChartsModule, RouterTestingModule,
         TooltipModule.forRoot(),
-        ProgressbarModule.forRoot()
+        ProgressbarModule.forRoot(),
+        PipesModule
       ],
       declarations: [
         JobsComponent,
@@ -54,11 +54,9 @@ describe('JobsComponent', () => {
         CheckboxColumnComponent,
         ActionColumnComponent,
         DropdownComponent,
-        BytesSizePipe,
         IconColumnComponent,
-        FmtTzPipe,
         DurationColumnComponent,
-        StatusFmtPipe
+        TransferredColumnComponent
       ],
       providers: [
         {provide: Store, useClass: MockStore},
