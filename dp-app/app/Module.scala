@@ -80,6 +80,7 @@ class Module extends AbstractModule {
   @Singleton
   @Named("atlasService")
   def provideAtlasService(implicit ws: WSClient, configuration: Configuration): com.hortonworks.dataplane.cs.Webservice.AtlasService = {
+    implicit val wSClient = ClusterWsClient(ws)
     new AtlasServiceImpl(configuration.underlying)
   }
 

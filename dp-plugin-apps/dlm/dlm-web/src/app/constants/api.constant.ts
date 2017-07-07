@@ -1,2 +1,2 @@
 export const API_PREFIX = '/dlm/api/';
-export const POLL_INTERVAL = 5000;
+export const POLL_INTERVAL = 8000;

@@ -13,7 +13,7 @@ class DefaultKnoxApiExecutor(c: KnoxConfig, w: WSClient) extends KnoxApiExecutor
 
   protected val tokenUrl = config.tokenUrl
 
-  protected def getKnoxApiToken(token: String):Future[TokenResponse] = {
+  def getKnoxApiToken(token: String):Future[TokenResponse] = {
     wSClient
       .url(tokenUrl)
       .withHeaders("Cookie" -> token,"Content-Type" -> "application/json","Accept" -> "application/json")

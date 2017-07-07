@@ -5,7 +5,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, HJwtTok
 import com.hortonworks.dataplane.commons.domain.{Ambari, Entities}
 import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 import com.typesafe.config.Config
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json._
 import play.api.libs.ws.WSResponse
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -15,6 +15,7 @@ class AmbariWebServiceImpl(config: Config)(implicit ws: ClusterWsClient)
     extends AmbariWebService {
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+  import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariResponseWithDpClusterId, ambariResponseWithDpClusterIdReads, ambariResponseWithDpClusterIdWrites}
 
   private def url =
     Option(System.getProperty("dp.services.cluster.service.uri"))
@@ -69,21 +70,29 @@ class AmbariWebServiceImpl(config: Config)(implicit ws: ClusterWsClient)
       .map(_.status == 200)
   }
 
-  private def mapToResults(res: WSResponse) = {
+  private def insert(path: JsPath, value: JsValue) = __.json.update(path.json.put(value))
+
+  private def mapToResults(res: WSResponse)(implicit clusterId: Option[Long])  = {
     res.status match {
-      case 200 => Right(res.json)
+      case 200 => {
+        clusterId match {
+          case None => Right(res.json)
+          case Some(value) => {
+            Right(Json.toJson(AmbariResponseWithDpClusterId(value,res.json)))
+          }
+        }
+      }
       case _ => mapErrors(res)
     }
   }
 
 
-  override def requestAmbariApi(clusterId: Long, ambariUrl: String)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsValue]] = {
+  override def requestAmbariApi(clusterId: Long, ambariUrl: String, addClusterIdToResponse: Boolean = false)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsValue]] = {
+    implicit val _ = if (addClusterIdToResponse) Some(clusterId) else None
     ws.url(s"$url/$clusterId/ambari?request=$ambariUrl")
         .withToken(token)
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToResults)
   }
-
-
 }

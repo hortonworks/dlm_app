@@ -22,12 +22,9 @@ import { JobStatusComponent } from 'pages/jobs/job-status/job-status.component';
 import { JobTransferredGraphComponent } from 'pages/jobs/jobs-transferred-graph/job-transferred-graph.component';
 import { TableComponent } from 'common/table/table.component';
 import { CheckboxColumnComponent, ActionColumnComponent } from 'components';
-import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { TableFooterComponent } from 'common/table/table-footer/table-footer.component';
 import { CheckboxComponent } from 'common/checkbox/checkbox.component';
 import { NavbarService } from 'services/navbar.service';
-import { FmtTzPipe } from 'pipes/fmt-tz.pipe';
-import { StatusFmtPipe } from 'pipes/status-fmt.pipe';
 import { JobsOverviewTableComponent } from './jobs-overview-table/jobs-overview-table.component';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
@@ -36,6 +33,7 @@ import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
 import { Job } from 'models/job.model';
 import { Cluster } from 'models/cluster.model';
 import { PrevJobsComponent } from '../policies/components/prev-jobs/prev-jobs.component';
+import { PipesModule } from 'pipes/pipes.module';
 
 const jobs = [
   <Job>{status: JOB_STATUS.SUCCESS},
@@ -88,7 +86,8 @@ describe('OverviewComponent', () => {
         ChartsModule,
         FormsModule,
         ReactiveFormsModule,
-        CommonComponentsModule
+        CommonComponentsModule,
+        PipesModule
       ],
       declarations: [
         OverviewComponent,
@@ -99,13 +98,10 @@ describe('OverviewComponent', () => {
         JobStatusComponent,
         TableComponent,
         JobTransferredGraphComponent,
-        BytesSizePipe,
         TableFooterComponent,
         CheckboxColumnComponent,
         ActionColumnComponent,
         CheckboxComponent,
-        FmtTzPipe,
-        StatusFmtPipe,
         JobsOverviewTableComponent,
         ModalDialogComponent,
         PrevJobsComponent

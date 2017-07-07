@@ -117,11 +117,7 @@ import { TableFilterComponent } from './common/table/table-filter/table-filter.c
 import { CheckboxColumnComponent, ActionColumnComponent } from './components';
 import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/review-policy.component';
 
-import { BytesSizePipe } from './pipes/bytes-size.pipe';
-import { FmtTzPipe } from './pipes/fmt-tz.pipe';
-import { FrequencyPipe } from './pipes/frequency.pipe';
-import { TruncatePipe } from './pipes/truncate.pipe';
-import { StatusFmtPipe } from './pipes/status-fmt.pipe';
+import { PipesModule } from './pipes/pipes.module';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SimpleNotificationsModule } from 'angular2-notifications';
@@ -162,7 +158,8 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     CommonComponentsModule,
     TranslateModule.forRoot(),
     BrowserAnimationsModule,
-    SimpleNotificationsModule.forRoot()
+    SimpleNotificationsModule.forRoot(),
+    PipesModule
   ],
   declarations: [
     DlmComponent,
@@ -221,13 +218,7 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     ModalDialogComponent,
     ModalDialogBodyComponent,
     NotificationsComponent,
-    LogModalDialogComponent,
-
-    BytesSizePipe,
-    FmtTzPipe,
-    FrequencyPipe,
-    TruncatePipe,
-    StatusFmtPipe
+    LogModalDialogComponent
   ],
   bootstrap: [DlmComponent],
   providers: [
@@ -246,7 +237,6 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     NotificationService,
     OverviewJobsExternalFiltersService,
     httpServiceProvider,
-    FrequencyPipe,
     AppConfig,
     {
       provide: APP_INITIALIZER,

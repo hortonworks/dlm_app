@@ -14,54 +14,63 @@ import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class QueryAttributes @Inject()(
-                                 @Named("atlasService")
-                                 val atlasService: AtlasService,
-                                 val authenticated: Authenticated
-                        ) extends Controller {
+    @Named("atlasService")
+    val atlasService: AtlasService,
+    val authenticated: Authenticated
+) extends Controller {
 
-  def list(clusterId: String) = authenticated.async {
+  def list(clusterId: String) = authenticated.async { req =>
     Logger.info("Received get cluster atlas attributes request")
-
-    atlasService.listQueryAttributes(clusterId)
+    implicit val token = req.token
+    atlasService
+      .listQueryAttributes(clusterId)
       .map {
-        attributes => attributes match {
-          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-          case Right(attributes) => Ok(Json.toJson(attributes))
-        }
+        case Left(errors) =>
+          InternalServerError(
+            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(attributes) => Ok(Json.toJson(attributes))
       }
   }
 
-  def getAssetDetails(clusterId: String, atlasGuid: String) = authenticated.async {
-    Logger.info("Received get properties for entity")
-
-    atlasService.getAssetDetails(clusterId, atlasGuid)
-      .map {
-        attributes => attributes match {
-          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+  def getAssetDetails(clusterId: String, atlasGuid: String) =
+    authenticated.async { req =>
+      Logger.info("Received get properties for entity")
+      implicit val token = req.token
+      atlasService
+        .getAssetDetails(clusterId, atlasGuid)
+        .map {
+          case Left(errors) =>
+            InternalServerError(
+              JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
           case Right(attributes) => Ok(Json.toJson(attributes))
         }
-      }
-  }
+    }
 
-  def getLineage(clusterId: String, atlasGuid: String) = authenticated.async { request =>
-    Logger.info("Received get lineage")
-    atlasService.getLineage(clusterId, atlasGuid, request.getQueryString("depth"))
-      .map {
-        lineage => lineage match {
-          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-          case  Right(lineage) => Ok(Json.toJson(lineage))
+  def getLineage(clusterId: String, atlasGuid: String) = authenticated.async {
+    request =>
+      Logger.info("Received get lineage")
+      implicit val token = request.token
+      atlasService
+        .getLineage(clusterId, atlasGuid, request.getQueryString("depth"))
+        .map {
+          case Left(errors) =>
+            InternalServerError(
+              JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Right(lineage) => Ok(Json.toJson(lineage))
         }
-      }
   }
 
   def getTypeDefs(clusterId: String, defType: String) = authenticated.async {
-    Logger.info(s"Received get type def for $defType")
-    atlasService.getTypeDefs(clusterId, defType)
-    .map {
-      typeDefs => typeDefs match {
-        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-        case Right(typeDefs) =>  Ok(Json.toJson(typeDefs))
-      }
-    }
+    req =>
+      Logger.info(s"Received get type def for $defType")
+      implicit val token = req.token
+      atlasService
+        .getTypeDefs(clusterId, defType)
+        .map {
+          case Left(errors) =>
+            InternalServerError(
+              JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Right(typeDefs) => Ok(Json.toJson(typeDefs))
+        }
   }
 }

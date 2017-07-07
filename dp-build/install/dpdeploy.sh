@@ -9,6 +9,7 @@ CERTS_DIR=`dirname $0`/certs
 KNOX_SIGNING_CERTIFICATE=knox-signing.pem
 DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
+export KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
 init_consul(){
   echo "Initializing Consul"

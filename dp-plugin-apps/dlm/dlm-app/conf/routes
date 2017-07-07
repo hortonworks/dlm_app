@@ -7,6 +7,8 @@ GET     /health                                               controllers.Status
 
 # clusters
 GET     /api/clusters                                         controllers.Clusters.list
+GET     /api/clusters/status                                  controllers.Clusters.listStatus
+GET     /api/clusters/:clusterId/status                       controllers.Clusters.retrieveStatus(clusterId : Long)
 
 #Pairs
 GET     /api/pairs                                            controllers.Pairs.list

@@ -14,7 +14,7 @@ trait KnoxApiExecutor {
   val config: KnoxConfig
   val wSClient: WSClient
 
-  protected def getKnoxApiToken(token: String):Future[TokenResponse]
+  def getKnoxApiToken(token: String):Future[TokenResponse]
 
   protected def wrapTokenIfUnwrapped(token: String): String =
     if (token.startsWith("hadoop-jwt")) token

@@ -95,9 +95,12 @@ public class Gateway {
           consulHook.get().gatewayDiscovered(zuulServer);
         }
       } catch (Throwable th) {
+        //Clear server set for rediscovery
+        serverSet.get().clear();
         serviceConfigs.forEach((k, v) -> {
           System.clearProperty(k);
         });
+
         consulHook.ifPresent(consulHook -> consulHook.gatewayDiscoverFailure("Error getting gateway URL, removing service configs from System, fallback will proceed", th));
 
       }
