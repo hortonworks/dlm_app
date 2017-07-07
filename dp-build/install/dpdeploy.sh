@@ -11,7 +11,7 @@ DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
-getbindAddrFromConsul (){
+get_bindaddr_from_consul (){
  consul_id=$(docker ps -af 'name=consul' -q)
  echo "consul container id=$consul_id"
  if [ -z $consul_id ]; then
@@ -36,7 +36,7 @@ init_consul(){
 }
 read_consul_host(){
  if [ -z "$CONSUL_HOST" ]; then
-  getbindAddrFromConsul
+  get_bindaddr_from_consul
  fi
  if [ -z "$CONSUL_HOST" ]; then
   echo "Enter the Host IP Address (Consul will bind to this host):"
