@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, Input, Output, ViewChild, TemplateRef, EventEmitter } from '@angular/core';
 import { Job } from 'models/job.model';
 import { ActionItemType } from 'components';
 import { TableComponent } from 'common/table/table.component';
@@ -15,7 +15,6 @@ import { JOB_STATUS } from 'constants/status.constant';
 })
 export class JobsTableComponent implements OnInit {
   JOB_STATUS = JOB_STATUS;
-  private visibleActionMap = {};
   columns: any[];
 
   @ViewChild('statusCellTemplate') statusCellTemplate: TemplateRef<any>;
@@ -28,13 +27,21 @@ export class JobsTableComponent implements OnInit {
   @ViewChild('serviceTemplate') serviceTemplate: TemplateRef<any>;
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
   @ViewChild('jobsTable') jobsTable: TableComponent;
+
   @Input() jobs: Job[];
   @Input() policy: Policy;
   @Input() showPageSizeMenu = true;
   @Input() selectionType = 'any';
+  @Input() sorts = [];
+  @Input() page = 0;
+  @Input() visibleActionMap = {};
+
+  @Output() onSort = new EventEmitter<any>();
+  @Output() onPageChange = new EventEmitter<any>();
+  @Output() onSelectAction = new EventEmitter<any>();
 
   rowActions = <ActionItemType[]>[
-    {label: 'Abort', name: 'ABORT'}
+    {label: 'Abort', name: 'ABORT', enabledFor: JOB_STATUS.RUNNING}
   ];
 
   constructor(protected store: Store<fromRoot.State>) {
@@ -101,6 +108,7 @@ export class JobsTableComponent implements OnInit {
     const { rowId, isOpen } = event;
     if (rowId) {
       this.visibleActionMap[rowId] = isOpen;
+      this.onSelectAction.emit({[rowId]: isOpen});
     }
   }
 
@@ -108,4 +116,11 @@ export class JobsTableComponent implements OnInit {
     return rowId in this.visibleActionMap && this.visibleActionMap[rowId];
   }
 
+  handleOnSort(sorts) {
+    this.onSort.emit(sorts);
+  }
+
+  handlePageChange(page) {
+    this.onPageChange.emit(page);
+  }
 }

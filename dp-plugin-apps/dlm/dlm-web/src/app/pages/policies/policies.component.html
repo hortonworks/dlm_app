@@ -27,8 +27,13 @@
 
 <div class="row page-section">
   <div class="col-md-12" *ngIf="(policies$ | async)?.length > 0; else noPolicies">
-    <dlm-policy-table [policies]="filteredPolicies$ | async" [clusters]="clusters$ | async"
-                      [activePolicyId]="activePolicyId"></dlm-policy-table>
+    <dlm-policy-table
+      [policies]="filteredPolicies$ | async"
+      [clusters]="clusters$ | async"
+      [activePolicyId]="activePolicyId"
+      (detailsToggle)="handleDetailsToggle($event)"
+    >
+    </dlm-policy-table>
   </div>
   <ng-template #noPolicies>
     <div class="alert-wrapper">
