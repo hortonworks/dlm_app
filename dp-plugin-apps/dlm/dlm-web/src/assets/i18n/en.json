@@ -291,7 +291,8 @@
     "jobs": {
       "header": "Jobs",
       "header_note": "",
-      "prev_jobs": "Prev Jobs"
+      "prev_jobs": "Prev Jobs",
+      "job_ignored": "Prior instance was still executing so this instance was not triggered and ignored."
     },
     "notifications": {
       "header": "Notifications",

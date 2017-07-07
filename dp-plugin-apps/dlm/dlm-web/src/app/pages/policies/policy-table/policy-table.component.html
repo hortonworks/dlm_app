@@ -17,7 +17,7 @@
 </ng-template>
 
 <ng-template #verbStatusCellTemplate let-value="value">
-  {{value | policyStatusFmt}}
+  {{value | statusFmt}}
 </ng-template>
 
 <ng-template #iconCellTemplate>
@@ -29,7 +29,7 @@
 </ng-template>
 
 <ng-template #prevJobs let-row="row">
-  <span class="actionable text-primary" (click)="toggleRowDetail(row, policyContent.Jobs)">
+  <span class="actionable" (click)="toggleRowDetail(row, policyContent.Jobs)">
     <dlm-prev-jobs [policy]="row"></dlm-prev-jobs>
     <span class="caret"></span>
   </span>

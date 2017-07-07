@@ -27,7 +27,7 @@ import { TableFooterComponent } from 'common/table/table-footer/table-footer.com
 import { CheckboxComponent } from 'common/checkbox/checkbox.component';
 import { NavbarService } from 'services/navbar.service';
 import { FmtTzPipe } from 'pipes/fmt-tz.pipe';
-import { PolicyStatusFmtPipe } from 'pipes/policy-status-fmt.pipe';
+import { StatusFmtPipe } from 'pipes/status-fmt.pipe';
 import { JobsOverviewTableComponent } from './jobs-overview-table/jobs-overview-table.component';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
@@ -105,7 +105,7 @@ describe('OverviewComponent', () => {
         ActionColumnComponent,
         CheckboxComponent,
         FmtTzPipe,
-        PolicyStatusFmtPipe,
+        StatusFmtPipe,
         JobsOverviewTableComponent,
         ModalDialogComponent,
         PrevJobsComponent

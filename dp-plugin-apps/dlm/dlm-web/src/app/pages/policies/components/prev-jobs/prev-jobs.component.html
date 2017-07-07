@@ -1,4 +1,4 @@
 <span *ngIf="policy.jobs?.length; else noJobs">
   <dlm-job-status *ngFor="let job of policy.jobs" [job]="job"></dlm-job-status>
 </span>
-<template #noJobs>{{"page.policies.no_jobs" | translate}}</template>
+<template #noJobs><span class="text-primary">{{"page.policies.no_jobs" | translate}}</span></template>

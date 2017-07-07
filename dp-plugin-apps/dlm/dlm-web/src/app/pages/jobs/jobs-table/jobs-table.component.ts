@@ -14,10 +14,12 @@ import { JOB_STATUS } from 'constants/status.constant';
   styleUrls: ['./jobs-table.component.scss']
 })
 export class JobsTableComponent implements OnInit {
+  JOB_STATUS = JOB_STATUS;
   private visibleActionMap = {};
   columns: any[];
 
   @ViewChild('statusCellTemplate') statusCellTemplate: TemplateRef<any>;
+  @ViewChild('statusVerbTemplate') statusVerbTemplate: TemplateRef<any>;
   @ViewChild('iconCellTemplate') iconCellTemplate: TemplateRef<any>;
   @ViewChild('agoTemplate') agoTemplate: TemplateRef<any>;
   @ViewChild('runTimeTemplate') runTimeTemplate: TemplateRef<any>;
@@ -41,7 +43,12 @@ export class JobsTableComponent implements OnInit {
   ngOnInit() {
     this.columns = [
       {cellTemplate: this.statusCellTemplate, maxWidth: 25, minWidth: 25},
-      {prop: 'status', cellClass: 'text-cell', headerClass: 'text-header'},
+      {
+        cellTemplate: this.statusVerbTemplate,
+        prop: 'status',
+        cellClass: 'text-cell',
+        headerClass: 'text-header'
+      },
       {
         prop: 'startTime',
         cellTemplate: this.agoTemplate,

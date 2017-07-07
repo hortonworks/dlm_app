@@ -1,28 +1,29 @@
-<section style="padding: 40px;">
-  <header>
-    <div>Welcome to Hortonworks</div>
-    <h1>Data Plane</h1>
-  </header>
-  <div>
-    <p>
-      Welcome to dataplane, your one-stop solution to data management. To start, you need to help us find your data lakes. Please proceed by adding data lakes below.
-    </p>
-    <div>
-      <a [routerLink]="['/infra/add']" class="mdl-button" style="height: initial; text-transform:none; font-size: 1em; text-align: left; display: flex;padding: 10px;">
-        <div style="width: 50px;"><i class="fa fa-server" aria-hidden="true" style="font-size: 1.2em;"></i></div>
-        <div style="flex-grow: 1;">
-          <div style="text-transform: uppercase; font-size: 1.2em; font-weight: bold;">Add clusters</div>
-          <p>desc.</p>
-        </div>
-      </a>
-      <a [routerLink]="['/onboard/dataset-add']" class="mdl-button" style="height: initial; text-transform:none; font-size: 1em; text-align: left; display: flex;padding: 10px;">
-        <div style="width: 50px;"><i class="fa fa-server" aria-hidden="true" style="font-size: 1.2em;"></i></div>
-        <div style="flex-grow: 1;">
-          <div style="text-transform: uppercase; font-size: 1.2em; font-weight: bold;">Add dataset</div>
-          <p>desc.</p>
-        </div>
-      </a>
+<div class="page-container">
+  <section class="feature-intro">
 
+    <div class="hwx-subtitle">Welcome to</div>
+    <div class="hwx-title">Hortonworks Dataplane</div>
+    <div class="hwx-desc">Welcome to dataplane, your one-stop solution to data management. To start, you need to help us find your data lakes. Please proceed by adding data lakes below.</div>
+
+    <ul class="intro-list">
+      <li>
+        <i class="fa fa-server pull-left"></i>
+        <div>
+          <div class="hwx-subtitle">Add Cluster</div>
+          <div class="hwx-desc">Description TBD</div>
+        </div>
+      </li>
+      <li>
+        <i class="fa fa-cubes pull-left"></i>
+        <div>
+          <div class="hwx-subtitle">Add Dataset</div>
+          <div class="hwx-desc">Description TBD</div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="button-container">
+      <a [routerLink]="['/infra/add']"><button class="mdl-button btn-hwx-primary">Get Started</button></a>
     </div>
-  </div>
-</section>
+  </section>
+</div>

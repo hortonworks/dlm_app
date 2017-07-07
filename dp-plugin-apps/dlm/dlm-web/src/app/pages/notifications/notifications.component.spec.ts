@@ -17,7 +17,7 @@ import { FormsModule } from '@angular/forms';
 import { NavbarService } from 'services/navbar.service';
 import { FmtTzPipe } from 'pipes/fmt-tz.pipe';
 import { CommonComponentsModule } from 'components/common-components.module';
-import { PolicyStatusFmtPipe } from 'pipes/policy-status-fmt.pipe';
+import { StatusFmtPipe } from 'pipes/status-fmt.pipe';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 import { ModalModule } from 'ng2-bootstrap';
 import { ModalDialogBodyComponent } from 'common/modal-dialog/modal-dialog-body.component';
@@ -49,7 +49,7 @@ describe('NotificationsPageComponent', () => {
         CheckboxComponent,
         ActionColumnComponent,
         FmtTzPipe,
-        PolicyStatusFmtPipe,
+        StatusFmtPipe,
         ModalDialogComponent,
         ModalDialogBodyComponent,
         LogModalDialogComponent

@@ -1,4 +1,9 @@
-<span class="fa fa-circle"
-  [class.text-danger]="job.status === JOB_STATUS.FAILED"
-  [class.text-success]="job.status === JOB_STATUS.SUCCESS"></span>
+<span class="fa fa-circle text-ignored" *ngIf="job.status === JOB_STATUS.IGNORED; else notIgnored" [tooltip]="'page.jobs.job_ignored' | translate"></span>
+
+<ng-template #notIgnored>
+  <span class="fa fa-circle"
+    [class.text-danger]="job.status === JOB_STATUS.FAILED"
+    [class.text-success]="job.status === JOB_STATUS.SUCCESS">
+  </span>
+</ng-template>
 <ng-content></ng-content>

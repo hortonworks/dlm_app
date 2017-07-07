@@ -10,7 +10,7 @@ import { MockTranslateLoader } from '../../mocks/mock-translate-loader';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NavbarService } from 'services/navbar.service';
 import { CommonComponentsModule } from 'components/common-components.module';
-import { PolicyStatusFmtPipe } from 'pipes/policy-status-fmt.pipe';
+import { StatusFmtPipe } from 'pipes/status-fmt.pipe';
 
 describe('NotificationsComponent', () => {
   let component: NotificationsComponent;
@@ -29,7 +29,7 @@ describe('NotificationsComponent', () => {
       declarations: [
         NotificationsComponent,
         FmtTzPipe,
-        PolicyStatusFmtPipe
+        StatusFmtPipe
       ],
       providers: [
         {provide: Store, useClass: MockStore},

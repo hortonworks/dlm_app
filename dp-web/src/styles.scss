@@ -42,7 +42,9 @@ div.spacer-15 {
   font-size: 20px;
   color: $mine-shaft;
 }
-
+.hwx-subtitle {
+  font-size: 15px;
+}
 .hwx-desc {
   font-size: 12px;
   line-height: 1.5;
@@ -168,6 +170,15 @@ a:hover {
     color: $dusty-gray;
   }
 }
+.cs-list > span {
+  &:after {
+    content: ', ';
+  }
+  &:last-child:after {
+    content: '';
+  }
+}
+
 
 //Lightening the Input placeholder texts
 

@@ -13,6 +13,16 @@
   <dlm-job-status [job]="row"></dlm-job-status>
 </ng-template>
 
+<ng-template #statusVerbTemplate let-value="value">
+  <span *ngIf="value === JOB_STATUS.IGNORED; else notIgnored" [tooltip]="'page.jobs.job_ignored' | translate">
+    {{value | statusFmt}}
+  </span>
+
+  <ng-template #notIgnored>
+    {{value | statusFmt}}
+  </ng-template>
+</ng-template>
+
 <ng-template #agoTemplate let-value="value">
   <span *ngIf="policy.lastJobResource">
     <span *ngIf="value; else" [tooltip]="value | fmtTz | amDateFormat:'YYYY-MMM-DD, HH:mm:ss'">

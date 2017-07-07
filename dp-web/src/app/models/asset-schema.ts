@@ -7,4 +7,5 @@ export class AssetSchema {
   min: string;
   mean: string;
   comment: string;
+  guid?: string;
 }

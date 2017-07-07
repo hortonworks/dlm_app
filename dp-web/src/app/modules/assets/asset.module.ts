@@ -8,6 +8,7 @@ import {NodeDetailsComponent} from './asset-view/node-details/node-details.compo
 import {DropdownModule} from '../../shared/dropdown/dropdown.module';
 import {TabsModule} from '../../shared/tabs/tabs.module';
 import { AssetDetailsViewComponent } from './asset-view/asset-details-view/asset-details-view.component';
+import { AssetColumnVisualComponent } from './asset-view/asset-column-visual/asset-column-visual.component';
 import {LineageModule} from '../../shared/lineage/lineage.module';
 import {AssetService} from '../../services/asset.service';
 
@@ -22,7 +23,8 @@ import {AssetService} from '../../services/asset.service';
   declarations: [
     AssetViewComponent,
     AssetDetailsViewComponent,
-    NodeDetailsComponent
+    NodeDetailsComponent,
+    AssetColumnVisualComponent
   ],
   providers: [
     AssetService

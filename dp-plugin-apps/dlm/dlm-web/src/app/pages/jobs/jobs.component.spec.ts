@@ -25,6 +25,7 @@ import { JobsStatusFilterComponent } from './jobs-status-filter/jobs-status-filt
 import { NavbarService } from 'services/navbar.service';
 import { FmtTzPipe } from 'pipes/fmt-tz.pipe';
 import { DurationColumnComponent } from 'components/table-columns/duration-column/duration-column.component';
+import { StatusFmtPipe } from 'pipes/status-fmt.pipe';
 
 describe('JobsComponent', () => {
   let component: JobsComponent;
@@ -56,7 +57,8 @@ describe('JobsComponent', () => {
         BytesSizePipe,
         IconColumnComponent,
         FmtTzPipe,
-        DurationColumnComponent
+        DurationColumnComponent,
+        StatusFmtPipe
       ],
       providers: [
         {provide: Store, useClass: MockStore},
