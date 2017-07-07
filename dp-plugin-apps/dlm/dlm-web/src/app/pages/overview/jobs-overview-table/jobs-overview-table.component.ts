@@ -89,7 +89,7 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
         headerClass: 'date-header'
       },
       {
-        prop: 'lastJobResource.trackingInfo.bytesCopied',
+        prop: 'lastJobResource.trackingInfo',
         cellTemplate: this.transferredFormattedTemplate,
         name: this.translateColumn('transferred'),
         cellClass: 'date-cell',

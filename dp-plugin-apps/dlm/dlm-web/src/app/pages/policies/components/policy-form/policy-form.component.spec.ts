@@ -18,12 +18,12 @@ import {TableComponent} from 'common/table/table.component';
 import {TableFooterComponent} from 'common/table/table-footer/table-footer.component';
 import {TableFilterComponent} from 'common/table/table-filter/table-filter.component';
 import {ActionColumnComponent} from 'components/table-columns/action-column/action-column.component';
-import {BytesSizePipe} from 'pipes/bytes-size.pipe';
 import {MomentModule} from 'angular2-moment';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {NavbarService} from 'services/navbar.service';
 import {MockTimeZoneService} from 'mocks/mock-timezone';
 import {TimeZoneService} from 'services/time-zone.service';
+import { PipesModule } from 'pipes/pipes.module';
 
 describe('PolicyFormComponent', () => {
   let component: PolicyFormComponent;
@@ -40,7 +40,8 @@ describe('PolicyFormComponent', () => {
         CommonComponentsModule,
         MomentModule,
         NgxDatatableModule,
-        TypeaheadModule
+        TypeaheadModule,
+        PipesModule
       ],
       declarations: [
         PolicyFormComponent,
@@ -51,7 +52,6 @@ describe('PolicyFormComponent', () => {
         HdfsBrowserComponent,
         TableComponent,
         TableFooterComponent,
-        BytesSizePipe,
         TableFilterComponent,
         ActionColumnComponent
       ],

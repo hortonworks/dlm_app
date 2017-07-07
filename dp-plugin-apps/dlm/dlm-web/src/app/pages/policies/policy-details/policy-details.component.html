@@ -16,11 +16,20 @@
     <p>{{policy?.description}}</p>
   </div>
   <div class="col-lg-10 col-md-9">
-    <dp-jobs-table *ngIf="contentType===policyContent.Jobs"
-                   class="clearfix"
-                   [showPageSizeMenu]="false"
-                   [jobs]="jobs"
-                   [policy]="policy"></dp-jobs-table>
+    <dp-jobs-table
+      class="clearfix"
+      *ngIf="contentType===policyContent.Jobs"
+      [sorts]="jobsSort"
+      [page]="jobsPage"
+      [visibleActionMap]="jobsActiveActions"
+      [showPageSizeMenu]="false"
+      [jobs]="jobs"
+      [policy]="policy"
+      (onSort)="handleOnSort($event)"
+      (onSelectAction)="handleOnSelectAction($event)"
+      (onPageChange)="handleOnPageChange($event)"
+    >
+    </dp-jobs-table>
     <div *ngIf="contentType===policyContent.Files">
       <dlm-hdfs-browser *ngIf="fileBasedPolicy()" [rootPath]="hdfsRootPath" [clusterId]="sourceCluster"></dlm-hdfs-browser>
       <dlm-hive-browser *ngIf="databaseBasedPolicy()" [databases]="[policyDatabase]"></dlm-hive-browser>

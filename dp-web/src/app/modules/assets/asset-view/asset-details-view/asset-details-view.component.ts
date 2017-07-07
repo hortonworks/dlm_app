@@ -114,6 +114,7 @@ export class AssetDetailsViewComponent implements OnChanges {
     if(!this.colGuid) return ret;
     ret = this.assetDetails.referredEntities[this.colGuid].attributes.profileData.attributes;
     ret['name'] = this.assetDetails.referredEntities[this.colGuid].attributes.name;
+    ret['type'] = this.assetDetails.referredEntities[this.colGuid].attributes.type;
     return ret;
   }
 

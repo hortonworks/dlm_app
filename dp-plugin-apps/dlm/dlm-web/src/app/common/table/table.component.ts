@@ -51,6 +51,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   @Output() selectRowAction = new EventEmitter<{}>();
   @Output() doubleClickAction = new EventEmitter<{}>();
   @Output() sortAction = new EventEmitter<{}>();
+  @Output() pageChange = new EventEmitter<{}>();
 
   @Input() showPageSizeMenu = true;
   @Input() multiExpand = false;
@@ -72,6 +73,9 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
     pagerLeftArrow: 'fa fa-chevron-left',
     pagerRightArrow: 'fa fa-chevron-right',
   };
+  @Input() sorts = [];
+  @Input() offset = 0;
+
   // hacky but seems like there is no other easy solution to set template for Row Detail
   @Input() set rowDetailTemplate(template: TemplateRef<any>) {
     if (template) {
@@ -199,6 +203,10 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
     this.sortAction.emit(object);
   }
 
+  onPage(page) {
+    this.pageChange.emit(page);
+  }
+
   /**
    * Expand or collapse selected row
    * If `multiExpand` is false, previously expanded row will be collapsed
@@ -250,4 +258,5 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
       this.navbarCollapseSubscription.unsubscribe();
     }
   }
+
 }
