@@ -16,6 +16,7 @@ import { fromJS } from 'immutable';
 import { PairingsComponent } from '../../pairings.component';
 import { NotificationService } from 'services/notification.service';
 import { NOTIFICATION_TYPES } from 'constants/notification.constant';
+import { ToastNotification } from 'models/toast-notification.model';
 
 @Component({
   selector: 'dlm-create-pairing',
@@ -69,10 +70,12 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
     this.progressSubscription$ = this.progress$.subscribe( progress => {
       this.progress = progress;
       if (progress && 'state' in progress && progress.state === 'success') {
-        this.notificationsService.create(this.t.instant('page.pairings.create.confirmation.title'),
-          this.t.instant('page.pairings.create.confirmation.body'),
-          NOTIFICATION_TYPES.SUCCESS);
         this.router.navigate(['pairings']);
+        this.notificationsService.create(<ToastNotification>{
+          title: this.t.instant('page.pairings.create.confirmation.title'),
+          body: this.t.instant('page.pairings.create.confirmation.body'),
+          type: NOTIFICATION_TYPES.SUCCESS
+        });
       }
     });
     this.firstSetClustersPromise = new Promise( (resolve, reject) => {

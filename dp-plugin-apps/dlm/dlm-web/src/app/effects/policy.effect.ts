@@ -6,6 +6,7 @@ import { PolicyService } from 'services/policy.service';
 import { JobService } from 'services/job.service';
 import { NotificationService } from 'services/notification.service';
 import { TranslateService } from '@ngx-translate/core';
+import { ToastNotification } from 'models/toast-notification.model';
 import { NOTIFICATION_TYPES } from 'constants/notification.constant';
 
 import {
@@ -37,9 +38,11 @@ export class PolicyEffects {
         .mergeMap(response => [
           createPolicySuccess(response, payload.meta),
           go(['/policies']),
-          this.notificationService.create(this.t.instant('page.policies.success.title'),
-            this.t.instant('page.policies.success.body', {policyName: payload.policy.policyDefinition.name}),
-            NOTIFICATION_TYPES.SUCCESS)
+          this.notificationService.create(<ToastNotification>{
+            title: this.t.instant('page.policies.success.title'),
+            body: this.t.instant('page.policies.success.body', {policyName: payload.policy.policyDefinition.name}),
+            type: NOTIFICATION_TYPES.SUCCESS
+          })
         ])
         .catch(err => Observable.of(createPolicyFail(err.json(), payload.meta)));
     });
