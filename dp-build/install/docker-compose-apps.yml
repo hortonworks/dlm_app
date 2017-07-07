@@ -8,6 +8,7 @@ services:
       - ./certs:/usr/dp-app/conf/cert
     environment:
       CONSUL_HOST: ${CONSUL_HOST}
+    command: --knox.url=https://${KNOX_FQDN}:8443
   dp-database:
      image: postgres
      environment:
