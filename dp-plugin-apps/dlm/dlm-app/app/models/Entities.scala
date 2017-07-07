@@ -22,7 +22,7 @@ object Entities {
 
   case class ClusterStats(CapacityTotal: Option[Double], CapacityUsed: Option[Double], CapacityRemaining: Option[Double])
 
-  case class BeaconCluster(id: Long, name: String, description: String, ambariurl: Option[String] = None,
+  case class BeaconCluster(id: Long, name: String, dataCenter: String, description: String, ambariurl: Option[String] = None,
                           stats: Option[ClusterStats], totalHosts: Option[Long], location: Location, services: Seq[ClusterServiceEndpointDetails] = Seq())
 
   case class BeaconClusters(clusters: Seq[BeaconCluster])

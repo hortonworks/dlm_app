@@ -118,6 +118,12 @@ object Ambari {
       desired_service_config_versions: JsValue
   )
 
+  case class AmbariResponseWithDpClusterId(
+      id : Long,
+      data: JsValue
+  )
+
+
   implicit val diskInfoReads = Json.reads[DiskInfo]
   implicit val diskInfoWrites = Json.writes[DiskInfo]
   implicit val clusterHealthWrites = Json.writes[ClusterHost]
@@ -145,5 +151,9 @@ object Ambari {
 
   implicit val clusterPropertiesReads = Json.reads[ClusterProperties]
   implicit val clusterPropertiesWrites = Json.writes[ClusterProperties]
+
+  implicit val ambariResponseWithDpClusterIdReads = Json.reads[AmbariResponseWithDpClusterId]
+  implicit val ambariResponseWithDpClusterIdWrites = Json.writes[AmbariResponseWithDpClusterId]
+
 
 }
