@@ -33,17 +33,17 @@ export class ConfigurationService {
       .catch(HttpUtil.handleError)
   }
 
-  isConfigurationComplete(): Observable<boolean> {
-    return Observable.of(true);
-    //TODO Mock to replaced with backend API call
-    // return this.http
-    //   .get(`${this.knowConfigUri}/status`, new RequestOptions(HttpUtil.getHeaders()))
-    //   .map(HttpUtil.extractData)
-    //   .catch(HttpUtil.handleError);
+  isKnoxConfigured(): Observable<any> {
+    return this.http
+      .get(`${this.knowConfigUri}/status`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
   }
 
-  isLDAPConfigured(): Observable<boolean> {
-    //TODO Mock to replaced with backend API call
-    return Observable.of(false);
+  getLdapConfiguration(): Observable<LDAPProperties> {
+    return this.http
+      .get(`${this.knowConfigUri}/ldap`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
   }
 }

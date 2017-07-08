@@ -3,6 +3,7 @@ import { CanActivate, Router} from '@angular/router';
 
 import { AuthenticationService } from '../../services/authentication.service';
 import 'rxjs/add/operator/first';
+import {Observable} from 'rxjs/Observable';
 
 
 @Injectable()
@@ -13,18 +14,15 @@ export class SignedInForSecureGuard implements CanActivate {
   ) {}
 
   canActivate():Promise<boolean> {
-      var isAuthenticated = this.authenticationService.isAuthenticated()
-            .then(()=>{ return true})
-            .catch(()=>{
-                this.router.navigate(['sign-in', {
-                cause: 'unauthenticated'
-               }]);
-              return false;
-            });
-      return isAuthenticated;
-
+    var isAuthenticated = this.authenticationService.isAuthenticated()
+      .then(()=>{ return true})
+      .catch(()=>{
+        this.authenticationService.redirectToSignIn();
+        return false;
+      });
+    return isAuthenticated;
   }
-   
+
 }
 
 @Injectable()
@@ -57,10 +55,8 @@ export class DoCleanUpAndRedirectGuard implements CanActivate {
 
   canActivate() {
       return this.authenticationService.signOut()
-       .then(()=>{ this.router.navigate(['sign-in', {
-          cause: 'sign-out'
-
-        }]);
+       .then(()=>{
+        this.authenticationService.redirectToSignIn();
         return true;
        });
     }

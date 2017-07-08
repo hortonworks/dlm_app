@@ -8,36 +8,20 @@ import {ConfigurationService} from '../../../services/configuration.service';
 @Injectable()
 export class ConfigCheckGuard implements CanActivate {
   constructor(private configService: ConfigurationService,
-              private router: Router,
-              private route: ActivatedRoute) {
+              private router: Router) {
   }
 
   canActivate(route: ActivatedRouteSnapshot) {
-    let currentUrl = this.router.url;
     return Observable.create(observer => {
-      this.configService.isLDAPConfigured().subscribe(isConfigured => {
-        if (isConfigured) {
-          observer.next(false);
-          observer.complete();
-          if(currentUrl === '/'){
-            this.redirect(observer, true, '/infra');
-          }
-        } else {
-          observer.next(true);
-          observer.complete();
-        }
-      }, error => {
-        observer.next(false);
-        observer.complete();
-        if(currentUrl === '/'){
-          this.redirect(observer, true, '/infra');
-        }
-      });
-
+      if (this.router.url.startsWith('/onboard/adduser') || this.router.url === '/onboard/welcome') {
+        this.redirect(observer, true);
+      } else {
+        this.redirect(observer, false, '/');
+      }
     });
   }
 
-  redirect(observer, canActivate, route) {
+  redirect(observer, canActivate, route?) {
     observer.next(canActivate);
     observer.complete();
     if (route) {
