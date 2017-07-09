@@ -31,7 +31,7 @@ class AtlasRoute @Inject()(private val config: Config,private val atlasApiData: 
   // Endpoints don't change too often, Cache the API
   // not hit the database too often
   lazy val atlasApiCacheTime =
-    Try(config.getInt("dp.services.cluster.http.atlas.token.cache.secs"))
+    Try(config.getInt("dp.services.cluster.http.atlas.api.cache.secs"))
       .getOrElse(600)
   val logger = Logger(classOf[AtlasRoute])
 
