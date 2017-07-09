@@ -6,14 +6,14 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari._
 import com.hortonworks.dataplane.commons.domain.Entities.{
   Cluster,
+  DataplaneClusterIdentifier,
   Error,
-  Errors,
-  DataplaneClusterIdentifier
+  Errors
 }
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.ClusterService
 import internal.auth.Authenticated
-import models.JsonResponses
+import models.{ClusterHealthData, JsonResponses}
 import play.api.Logger
 import play.api.mvc._
 import play.api.libs.json.Json
@@ -121,16 +121,12 @@ class Clusters @Inject()(
       val dpClusterId = request.getQueryString("dpClusterId").get
       ambariService
         .syncCluster(DataplaneClusterIdentifier(dpClusterId.toLong))
-        .flatMap { result =>
-          result match {
-            case true => {
-              clusterHealthService
-                .getClusterHealthData(clusterId)
-            }
-            case false => {
-              Future.successful(Left(Errors(Seq(Error("500", "Sync failed")))))
-            }
-          }
+        .flatMap {
+          case true =>
+            clusterHealthService
+              .getClusterHealthData(clusterId)
+          case false =>
+            Future.successful(Left(Errors(Seq(Error("500", "Sync failed")))))
         }
         .map {
           case Left(errors) =>
@@ -138,33 +134,35 @@ class Clusters @Inject()(
               JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
           case Right(clusterHealth) =>
             Ok(summary match {
-              case Some(summary) => {
+              case Some(_) =>
                 clusterHealth.nameNodeInfo match {
-                  case Some(nameNodeInfo) =>
-                    Json.obj(
-                      "nodes" -> clusterHealth.hosts.length,
-                      "totalSize" -> humanizeBytes(
-                        clusterHealth.nameNodeInfo.get.CapacityTotal),
-                      "usedSize" -> humanizeBytes(
-                        clusterHealth.nameNodeInfo.get.CapacityUsed),
-                      "status" -> Json.obj(
-                        "state" -> clusterHealth.nameNodeInfo.get.state,
-                        "since" -> clusterHealth.nameNodeInfo.get.StartTime
-                          .map(_ =>
-                            clusterHealth.nameNodeInfo.get.StartTime.get - System
-                              .currentTimeMillis())
-                      )
-                    )
+                  case Some(_) =>
+                    mapToJson(clusterHealth)
                   case None =>
                     Json.obj(
                       "nodes" -> clusterHealth.hosts.length
                     )
                 }
-              }
               case None => Json.toJson(clusterHealth)
             })
         }
     }
+
+  private def mapToJson(clusterHealth: ClusterHealthData) = {
+    Json.obj(
+      "nodes" -> clusterHealth.hosts.length,
+      "totalSize" -> humanizeBytes(
+        clusterHealth.nameNodeInfo.get.CapacityTotal),
+      "usedSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityUsed),
+      "status" -> Json.obj(
+        "state" -> clusterHealth.nameNodeInfo.get.state,
+        "since" -> clusterHealth.nameNodeInfo.get.StartTime
+          .map(_ =>
+            clusterHealth.nameNodeInfo.get.StartTime.get - System
+              .currentTimeMillis())
+      )
+    )
+  }
 
   def getResourceManagerHealth(clusterId: Long) = authenticated.async {
     request =>

@@ -73,7 +73,7 @@ class DefaultAtlasInterface(private val clusterId: Long,
     for{
       a <- atlasApi
       t <- atlasApiData.getTokenForCluster(clusterId,hJwtToken)
-      api <- Future.successful(a.api.setToken(t))
+      api <- Future.successful (a.api.setToken(t))
     } yield api
 
   }

@@ -119,15 +119,14 @@ class AtlasApiData @Inject()(
       c <- Future.successful(cl.right.get)
       dpce <- dpClusterService.retrieve(c.dataplaneClusterId.get.toString)
       dpc <- Future.successful(dpce.right.get)
-      executor <- Future.successful {
-        KnoxApiExecutor(
-          KnoxConfig(Try(config.getString("dp.services.knox.token.topology"))
-                       .getOrElse("token"),
-                     dpc.knoxUrl),
-          wSClient)
-      }
 
       newToken <- Future.successful({ t: String =>
+       val executor =  KnoxApiExecutor(
+          KnoxConfig(Try(config.getString("dp.services.knox.token.topology"))
+            .getOrElse("token"),
+            dpc.knoxUrl),
+          wSClient)
+
         executor.getKnoxApiToken(s"${Constants.HJWT}=$t")
       })
 
