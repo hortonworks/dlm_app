@@ -38,12 +38,12 @@ export class LakeService {
   }
 
 
-  listWithClusters(): Observable<{
+  listWithClusters(type: string = 'all'): Observable<{
     data: Lake,
     clusters: Cluster[]
   }[]> {
     return this.http
-      .get('/api/actions/lakes-list-with-clusters', new RequestOptions(HttpUtil.getHeaders()))
+      .get(`/api/actions/clusters?type=${type}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

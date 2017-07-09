@@ -1,3 +1,5 @@
+import * as _isEqual from 'lodash.isequal';
+
 export const toKeyValueArray = (obj: string) => {
   let result = [];
   Object.keys(obj).forEach(key => {
@@ -23,3 +25,5 @@ export const omitEmpty = (obj) => Object.keys(obj).reduce((result, key) => {
 }, {});
 
 export const isEmpty = (obj) => Object.keys(obj).length === 0;
+
+export const isEqual = _isEqual;

@@ -28,6 +28,7 @@ export class AssetDetailsViewComponent implements OnChanges {
   @Input() clusterId: string;
   @Input() guid: string;
   rowCount: string = 'NA';
+  colGuid : string = "";
 
   constructor(private assetService: AssetService) {
   }
@@ -65,6 +66,7 @@ export class AssetDetailsViewComponent implements OnChanges {
       let schema: AssetSchema = new AssetSchema();
       schema.name = attributes.name;
       schema.type = attributes.type;
+      schema.guid = key;
       schema.comment = attributes.comment;
       let profileData = attributes.profileData ? attributes.profileData.attributes : null;
       if (profileData) {
@@ -106,6 +108,14 @@ export class AssetDetailsViewComponent implements OnChanges {
       assetProps.push(property);
     });
     return assetProps;
+  }
+  get colVisualData() {
+    var ret = {};
+    if(!this.colGuid) return ret;
+    ret = this.assetDetails.referredEntities[this.colGuid].attributes.profileData.attributes;
+    ret['name'] = this.assetDetails.referredEntities[this.colGuid].attributes.name;
+    ret['type'] = this.assetDetails.referredEntities[this.colGuid].attributes.type;
+    return ret;
   }
 
 }

@@ -122,7 +122,8 @@ class DataplaneService @Inject()(
                   BeaconCluster(
                     cluster.id.get,
                     cluster.name,
-                    "",
+                    dataplaneCluster.dcName,
+                    dataplaneCluster.description,
                     cluster.clusterUrl,
                     namenodeStats,
                     totalHosts,
@@ -340,6 +341,15 @@ class DataplaneService @Inject()(
   def getCluster(clusterId: Long): Future[Either[Errors, Cluster]] = {
     clusterService.retrieve(clusterId.toString)
   }
+
+  /**
+    * Get future for cluster details from datapane db client
+    * @return
+    */
+  def getAllClusters: Future[Either[Errors, Seq[Cluster]]] = {
+    clusterService.list()
+  }
+
 
   /**
     *  Get future for service details from dataplane db client

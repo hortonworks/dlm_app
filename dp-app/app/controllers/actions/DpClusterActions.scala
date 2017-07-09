@@ -29,22 +29,31 @@ class DpClusterActions @Inject()(
     authenticated: Authenticated
 ) extends Controller {
 
-  def listWithClusters = authenticated.async {
+  def listWithClusters(`type`: Option[String]) = authenticated.async {
     Logger.info("list lakes with clusters")
+
+    val typeFlag = `type`.getOrElse("all");
 
     retrieveLakes()
       .flatMap({ lakes =>
         val lakeFutures =
-          lakes.map({ cLake =>
-            for {
-              lake <- Future.successful(cLake)
-              clusters <- retrieveClusters(cLake.id.get)
-            } yield
-              Json.obj(
-                "data" -> lake,
-                "clusters" -> clusters
-              )
-          })
+          lakes
+            .filter{cLake =>
+              if(typeFlag == "lake") {
+                cLake.isDatalake.getOrElse(false)   // only valid lakes
+              }  else {
+                true  // return all results if flag is not sent
+              }}
+            .map({ cLake =>
+              for {
+                lake <- Future.successful(cLake)
+                clusters <- retrieveClusters(cLake.id.get)
+              } yield
+                Json.obj(
+                  "data" -> lake,
+                  "clusters" -> clusters
+                )
+            })
         Future.sequence(lakeFutures)
       })
       .map({ lakes =>

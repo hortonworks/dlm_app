@@ -249,7 +249,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       directories: ['', Validators.required],
       job: this.formBuilder.group({
         repeatMode: this.policyRepeatModes.EVERY,
-        frequency: [''],
+        frequency: ['', Validators.required],
         day: this.policyDays.MONDAY,
         frequencyInSec: 0,
         unit: this.policyTimeUnits.DAYS,
@@ -268,6 +268,15 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         max_bandwidth: ['']
       })
     });
+    const jobCtrl = (<any>this.policyForm).controls.job;
+    const changes$ = jobCtrl.controls.repeatMode.valueChanges;
+    const repeatModeSubscription$ = changes$.subscribe(repeatMode => {
+      const newValidator = repeatMode === this.policyRepeatModes.NEVER ? null : Validators.required;
+      jobCtrl.controls.frequency.setValidators(newValidator);
+      jobCtrl.controls.frequency.updateValueAndValidity();
+    });
+    this.subscriptions.push(repeatModeSubscription$);
+
     this.activateFieldsForType(this.selectedPolicyType);
     this.policyFormValues$ = this.store.select(getFormValues(POLICY_FORM_ID));
     const policyFormValuesSubscription = Observable

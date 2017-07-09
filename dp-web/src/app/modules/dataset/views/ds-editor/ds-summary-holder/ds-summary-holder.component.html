@@ -1,17 +1,19 @@
-<div class="dsSummaryHolder">
-  <div class="title">Summary</div>
-  <br/><br/>
-  <span class="leftCont"><b>Name</b></span>:&nbsp;<span>{{dsModel.name}}</span>
-  <br/><br/>
-  <span class="leftCont"><b>Description</b></span>:&nbsp;<span>{{dsModel.description}}</span>
-  <br/><br/>
-  <span class="leftCont"><b>Datalake</b></span>:&nbsp;<span>{{dsModel.datalakeName}}</span>
-  <br/><br/>
-  <span class="leftCont"><b>Tags</b></span>:&nbsp;<span><span *ngFor="let tag of tags;">{{tag}}&nbsp;&nbsp;</span></span>
+<div class="hwx-title">Summary</div>
+<div class="display-group display-group-h">
+  <label>Name</label><span>{{dsModel.name}}</span>
+</div>
+<div class="display-group display-group-h">
+  <label>Description</label><span>{{dsModel.description}}</span>
+</div>
+<div class="display-group display-group-h">
+  <label>Datalake</label><span>{{dsModel.datalakeName}}</span>
+</div>
+<div class="display-group display-group-h">
+  <label>Tags</label><span class="cs-list"><span *ngFor="let tag of tags;">{{tag}}</span></span>
+</div>
+
   <!--<br/><br/>-->
   <!--<span class="leftCont"><b>Assets</b></span>:&nbsp;<span *ngIf="dsModel.counts">{{dsModel.counts.hiveCount + dsModel.counts.filesCount}}</span>-->
-  <br/>
-  <br/>
   <!--<div class="tabCont">-->
     <!--<div class="tab active">-->
       <!--<div class="tabName">Total</div>-->
@@ -30,4 +32,4 @@
   <!--<br/>-->
 
 
-</div>
+

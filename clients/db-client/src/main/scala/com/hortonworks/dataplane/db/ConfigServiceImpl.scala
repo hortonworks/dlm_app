@@ -1,12 +1,13 @@
 package com.hortonworks.dataplane.db
 
-import com.hortonworks.dataplane.commons.domain.Entities.DpConfig
+import com.hortonworks.dataplane.commons.domain.Entities.{DpConfig, Errors}
 import com.hortonworks.dataplane.db.Webservice.ConfigService
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
+import play.api.libs.json.Json
 import play.api.libs.ws.{WSClient, WSResponse}
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ConfigServiceImpl(config: Config)(implicit ws: WSClient)
@@ -32,10 +33,24 @@ class ConfigServiceImpl(config: Config)(implicit ws: WSClient)
       }
   }
 
+  override def addConfig(dpConfig: DpConfig): Future[Either[Errors, DpConfig]] = {
+    ws.url(s"$url/configurations")
+      .withHeaders("Accept" -> "application/json")
+      .post(Json.toJson(dpConfig))
+      .map(mapToConfigWithError)
+  }
+
   private def mapToConfig(res: WSResponse) = {
     res.status match {
       case 200 => (res.json \ "results").validate[DpConfig].asOpt
       case _ => None
+    }
+  }
+
+  private def mapToConfigWithError(res: WSResponse) = {
+    res.status match {
+      case 200 => Right((res.json \ "results").validate[DpConfig].get)
+      case _ => mapErrors(res)
     }
   }
 

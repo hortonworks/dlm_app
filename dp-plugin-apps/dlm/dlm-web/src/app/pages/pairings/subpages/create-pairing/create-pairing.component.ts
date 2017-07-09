@@ -14,6 +14,9 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Progress } from 'models/progress.model';
 import { fromJS } from 'immutable';
 import { PairingsComponent } from '../../pairings.component';
+import { NotificationService } from 'services/notification.service';
+import { NOTIFICATION_TYPES } from 'constants/notification.constant';
+import { ToastNotification } from 'models/toast-notification.model';
 
 @Component({
   selector: 'dlm-create-pairing',
@@ -40,10 +43,11 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
   selectedSecondCluster: ClusterPairing = null;
 
   constructor(private store: Store<fromRoot.State>,
-              t: TranslateService,
+              private t: TranslateService,
               private formBuilder: FormBuilder,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              private notificationsService: NotificationService) {
     this.firstSetClusters$ = store.select(getAllClusters);
     this.pairings$ = store.select(getAllPairings);
     this.progress$ = store.select(getProgress);
@@ -63,7 +67,17 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
         this.onFirstClusterChange(this.selectedFirstCluster);
       }
     });
-    this.progressSubscription$ = this.progress$.subscribe( progress => this.progress = progress);
+    this.progressSubscription$ = this.progress$.subscribe( progress => {
+      this.progress = progress;
+      if (progress && 'state' in progress && progress.state === 'success') {
+        this.router.navigate(['pairings']);
+        this.notificationsService.create(<ToastNotification>{
+          title: this.t.instant('page.pairings.create.confirmation.title'),
+          body: this.t.instant('page.pairings.create.confirmation.body'),
+          type: NOTIFICATION_TYPES.SUCCESS
+        });
+      }
+    });
     this.firstSetClustersPromise = new Promise( (resolve, reject) => {
       this.firstSetClustersSubscription$ = this.firstSetClusters$.subscribe(clusters => {
         this.firstSetClusters = clusters;
@@ -159,10 +173,6 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
     const flattened = [].concat.apply([], pairs);
     const filtered = flattened.filter( clust => clust.id !== cluster.id);
     return filtered.map( clust => clust.id);
-  }
-
-  onConfirmation() {
-    this.router.navigate(['pairings']);
   }
 
   ngOnDestroy() {

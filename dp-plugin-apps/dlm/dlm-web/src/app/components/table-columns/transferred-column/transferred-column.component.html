@@ -1,0 +1,9 @@
+<div>
+  <span *ngIf="!isFailed() && !isInProgress()" [innerHTML]="trackingInfo?.bytesCopied | bytesSize"></span>
+  <progressbar
+    *ngIf="isInProgress()"
+    [value]="trackingInfo?.completedMapTasks"
+    [max]="trackingInfo?.totalMapTasks">
+  </progressbar>
+  <i *ngIf="isFailed()" class="fa fa-minus"></i>
+</div>

@@ -11,9 +11,10 @@ import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component
 import { ModalModule } from 'ng2-bootstrap';
 import { MockTranslateLoader } from 'mocks/mock-translate-loader';
 import { RouterTestingModule } from '@angular/router/testing';
-import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { TooltipModule } from 'ng2-bootstrap';
 import { CommonComponentsModule } from 'components/common-components.module';
+import { NotificationService } from 'services/notification.service';
+import { PipesModule } from 'pipes/pipes.module';
 
 describe('CreatePairingComponent', () => {
   let component: CreatePairingComponent;
@@ -21,25 +22,33 @@ describe('CreatePairingComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [TranslateModule.forRoot({
-        loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-      }),
+      imports: [
+        TranslateModule.forRoot({
+          loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
+        }),
         ReactiveFormsModule,
         ModalModule.forRoot(),
         RouterTestingModule,
         TooltipModule.forRoot(),
-        CommonComponentsModule
+        CommonComponentsModule,
+        PipesModule
       ],
       declarations: [
         CreatePairingComponent,
         CreatePairingCardListComponent,
         PairingProgressCardComponent,
         CreatePairingCardComponent,
-        ModalDialogComponent,
-        BytesSizePipe
+        ModalDialogComponent
       ],
       providers: [
-        {provide: Store, useClass: MockStore}
+        {
+          provide: Store,
+          useClass: MockStore
+        },
+        {
+          provide: NotificationService,
+          useValue: jasmine.createSpyObj('notificationService', ['create'])
+        }
       ]
     })
       .compileComponents();

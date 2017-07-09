@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BsDropdownModule, ButtonsModule, TooltipModule, CollapseModule } from 'ng2-bootstrap';
+import { BsDropdownModule, ButtonsModule, TooltipModule, CollapseModule, ProgressbarModule } from 'ng2-bootstrap';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { TranslateModule } from '@ngx-translate/core';
 import { SelectModule } from 'ng2-select';
 import { MomentModule } from 'angular2-moment';
 
+import { PipesModule } from 'pipes/pipes.module';
 import { CardComponent } from './card/card.component';
 import { SearchInputComponent } from './search-input/search-input.component';
 import { DropdownComponent } from './dropdown/dropdown.component';
@@ -26,6 +27,7 @@ import { HdfsBrowserBreadcrumbComponent } from './hdfs-browser/breadcrumb/hdfs-b
 import { PolicyActionsComponent } from './policy-actions/policy-actions.component';
 import { HiveBrowserComponent, HiveDatabaseComponent } from './hive-browser/';
 import { DurationColumnComponent } from './table-columns/duration-column/duration-column.component';
+import { TransferredColumnComponent } from './table-columns/transferred-column/transferred-column.component';
 
 @NgModule({
   imports: [
@@ -34,10 +36,12 @@ import { DurationColumnComponent } from './table-columns/duration-column/duratio
     ButtonsModule.forRoot(),
     TooltipModule.forRoot(),
     CollapseModule.forRoot(),
+    ProgressbarModule.forRoot(),
     ChartsModule,
     TranslateModule,
     SelectModule,
-    MomentModule
+    MomentModule,
+    PipesModule
   ],
   declarations: [
     CardComponent,
@@ -62,7 +66,8 @@ import { DurationColumnComponent } from './table-columns/duration-column/duratio
     HiveBrowserComponent,
     HiveDatabaseComponent,
     PolicyActionsComponent,
-    DurationColumnComponent
+    DurationColumnComponent,
+    TransferredColumnComponent
   ],
   exports: [
     CardComponent,
@@ -87,7 +92,8 @@ import { DurationColumnComponent } from './table-columns/duration-column/duratio
     HiveBrowserComponent,
     HiveDatabaseComponent,
     PolicyActionsComponent,
-    DurationColumnComponent
+    DurationColumnComponent,
+    TransferredColumnComponent
   ]
 })
 export class CommonComponentsModule {}

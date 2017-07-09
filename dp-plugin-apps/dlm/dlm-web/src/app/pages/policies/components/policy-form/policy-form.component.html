@@ -15,7 +15,7 @@
           <fieldset formGroupName="general" [collapse]="sectionCollapsedMap.general">
             <dlm-form-field
               [label]="'page.policies.form.fields.policy_name' | translate">
-              <input type="text" class="form-control" formField formControlName="name" required/>
+              <input type="text" class="form-control" formField formControlName="name" />
             </dlm-form-field>
             <dlm-form-field
               [label]="'page.policies.form.fields.policy_description' | translate">
@@ -128,7 +128,7 @@
                       </dlm-select-field>
                     </div>
                     <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-md-1">
-                      <input type="text" class="form-control" placeholder="Freq" formField formControlName="frequency" required/>
+                      <input type="text" class="form-control" placeholder="Freq" formField formControlName="frequency" />
                     </div>
                     <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-md-2">
                       <dlm-select-field formField formControlName="unit" [options]="units" [value]="unit">

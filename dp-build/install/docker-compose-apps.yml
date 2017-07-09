@@ -1,9 +1,5 @@
 version: '2'  
 services:
-  dp-consul-server:
-    image: consul
-    network_mode: "host"
-    command: agent -server -bootstrap -bind=${CONSUL_HOST} -client=${CONSUL_HOST} -ui
   dp-gateway:
     image: hortonworks/dp-gateway
     ports:
@@ -12,6 +8,7 @@ services:
       - ./certs:/usr/dp-app/conf/cert
     environment:
       CONSUL_HOST: ${CONSUL_HOST}
+    command: --knox.url=https://${KNOX_FQDN}:8443
   dp-database:
      image: postgres
      environment:

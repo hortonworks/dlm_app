@@ -2,10 +2,10 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ClusterCardComponent } from 'components/cluster-card/cluster-card.component';
 import { CreatePairingCardComponent } from './create-pairing-card.component';
 import { Cluster } from 'models/cluster.model';
-import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { TooltipModule } from 'ng2-bootstrap';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { MockTranslateLoader } from 'mocks/mock-translate-loader';
+import { PipesModule } from 'pipes/pipes.module';
 
 describe('CreatePairingCardComponent', () => {
   let component: CreatePairingCardComponent;
@@ -13,10 +13,13 @@ describe('CreatePairingCardComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [TooltipModule.forRoot(), TranslateModule.forRoot({
-        loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-      })],
-      declarations: [CreatePairingCardComponent, ClusterCardComponent, BytesSizePipe]
+      imports: [
+        TooltipModule.forRoot(), TranslateModule.forRoot({
+          loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
+        }),
+        PipesModule
+      ],
+      declarations: [CreatePairingCardComponent, ClusterCardComponent]
     })
       .compileComponents();
   }));

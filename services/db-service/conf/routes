@@ -178,6 +178,7 @@ POST          /dataassets/managedresults                                     con
 
 #Config
 GET           /configurations/:key                                           controllers.Configs.get(key)
+POST          /configurations                                                controllers.Configs.add
 
 #ldapconfig
 POST          /ldapconfig                                                    controllers.LdapConfig.add

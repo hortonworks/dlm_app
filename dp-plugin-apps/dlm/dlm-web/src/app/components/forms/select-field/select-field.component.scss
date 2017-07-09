@@ -26,6 +26,8 @@
   background: white;
   margin-top: -1px;
   border-radius: 0 0 4px 4px;
+  max-height: 35px * 6;
+  overflow: auto;
 
   .select-field-option-item {
     padding: 10px;

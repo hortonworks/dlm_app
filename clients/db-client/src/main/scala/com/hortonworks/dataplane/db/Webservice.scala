@@ -49,7 +49,7 @@ object Webservice {
 
     def getUsers(): Future[Either[Errors,Seq[User]]]
 
-    def getUsersWithRoles(): Future[Either[Errors,Seq[UserInfo]]]
+    def getUsersWithRoles(offset: Option[String], pageSize: Option[String], searchTerm: Option[String]): Future[Either[Errors,UsersList]]
 
     def getRoles():  Future[Either[Errors,Seq[Role]]]
 
@@ -194,7 +194,11 @@ object Webservice {
   }
 
   trait ConfigService extends DbClientService {
+
     def getConfig(key: String): Future[Option[DpConfig]]
+
+    def addConfig(dpConfig: DpConfig): Future[Either[Errors, DpConfig]]
+
   }
 
   trait LdapConfigService extends DbClientService{

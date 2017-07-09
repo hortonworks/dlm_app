@@ -5,12 +5,14 @@ export const WARNING = 'WARNING';
 export const WARNINGS = 'WARNINGS';
 export const RUNNING = 'RUNNING';
 export const SUSPENDED = 'SUSPENDED';
+export const IGNORED = 'IGNORED';
 
 export const JOB_STATUS = {
   RUNNING: RUNNING,
   SUCCESS: SUCCESS,
   WARNINGS: WARNINGS,
-  FAILED: FAILED
+  FAILED: FAILED,
+  IGNORED: IGNORED
 };
 
 export const POLICY_STATUS = {

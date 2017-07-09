@@ -16,7 +16,7 @@
 </ng-template>
 
 <ng-template #verbStatusCellTemplate let-value="value">
-  {{value | policyStatusFmt}}
+  {{value | statusFmt}}
 </ng-template>
 
 <ng-template #iconCellTemplate>
@@ -28,7 +28,7 @@
 </ng-template>
 
 <ng-template #prevJobs let-row="row">
-  <span class="actionable text-primary" (click)="toggleRowDetail(row, policyContent.Jobs)">
+  <span class="actionable" (click)="toggleRowDetail(row, policyContent.Jobs)">
     <dlm-prev-jobs [policy]="row"></dlm-prev-jobs>
     <span class="caret"></span>
   </span>
@@ -57,7 +57,14 @@
     [jobs]="filteredJobs$ | async"
     [sourceCluster]="sourceCluster"
     [hdfsRootPath]="hdfsRootPath"
-    [policyDatabase]="policyDatabase$ | async"></dlm-policy-details>
+    [policyDatabase]="policyDatabase$ | async"
+    [jobsSort]="getJobsSortForRow(row.id)"
+    [jobsPage]="getJobsPageForRow(row.id)"
+    [jobsActiveActions]="getJobsActiveActionsForRow(row.id)"
+    (onSortJobs)="handleOnSortJobs($event, row.id)"
+    (onSelectActionJobs)="handleOnSelectActionJobs($event, row.id)"
+    (onPageChangeJobs)="handleJobsPageChange($event, row.id)"
+  ></dlm-policy-details>
 </ng-template>
 
 <ng-template let-row="row" let-value="value" #pathCell>
@@ -66,9 +73,13 @@
 
 <ng-template #actionsCell let-row="row">
   <dlm-policy-actions
+    [rowId]="row.id"
     [policy]="row"
+    [isOpen]="shouldShowAction(row.id)"
     [policyActions]="rowActions"
-    (handler)="handleSelectedAction($event)"></dlm-policy-actions>
+    (openChange)="handleActionOpenChange($event)"
+    (handler)="handleSelectedAction($event)">
+  </dlm-policy-actions>
 </ng-template>
 
 <dlm-modal-dialog

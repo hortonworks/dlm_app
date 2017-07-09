@@ -15,7 +15,6 @@ import {PolicyFormComponent} from '../../components/policy-form/policy-form.comp
 import {CreatePolicyComponent} from './create-policy.component';
 import {HdfsBrowserComponent} from 'components/hdfs-browser/hdfs-browser.component';
 import {TableComponent} from 'common/table/table.component';
-import {BytesSizePipe} from 'pipes/bytes-size.pipe';
 import {MomentModule} from 'angular2-moment';
 import {TableFooterComponent} from 'common/table/table-footer/table-footer.component';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
@@ -23,10 +22,10 @@ import {TableFilterComponent} from 'common/table/table-filter/table-filter.compo
 import {ActionColumnComponent} from 'components/table-columns/action-column/action-column.component';
 import {NavbarService} from 'services/navbar.service';
 import {CheckboxColumnComponent} from 'components/table-columns/checkbox-column/checkbox-column.component';
-import { PolicyStatusFmtPipe } from 'pipes/policy-status-fmt.pipe';
 import { RouterTestingModule } from '@angular/router/testing';
 import {MockTimeZoneService} from 'mocks/mock-timezone';
 import {TimeZoneService} from 'services/time-zone.service';
+import { PipesModule } from 'pipes/pipes.module';
 
 describe('CreatePolicyComponent', () => {
   let component: CreatePolicyComponent;
@@ -43,7 +42,8 @@ describe('CreatePolicyComponent', () => {
         ReactiveFormsModule, CollapseModule, TabsModule.forRoot(), MyDatePickerModule, MomentModule,
         NgxDatatableModule,
         RouterTestingModule,
-        TypeaheadModule
+        TypeaheadModule,
+        PipesModule
       ],
       declarations: [
         CreatePolicyComponent,
@@ -53,12 +53,10 @@ describe('CreatePolicyComponent', () => {
         CheckboxComponent,
         HdfsBrowserComponent,
         TableComponent,
-        BytesSizePipe,
         TableFooterComponent,
         TableFilterComponent,
         ActionColumnComponent,
-        CheckboxColumnComponent,
-        PolicyStatusFmtPipe,
+        CheckboxColumnComponent
       ],
       providers: [
         {provide: Store, useClass: MockStore},

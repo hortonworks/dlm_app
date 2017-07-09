@@ -233,7 +233,7 @@ class LdapService @Inject()(
           Left(Errors(Seq(new Error("Exception", e.getMessage)))))
     }
   }
-  private def getConfiguredLdap
+  def getConfiguredLdap
     : Future[Either[Errors, Seq[LdapConfiguration]]] = {
     ldapConfigService
       .get()

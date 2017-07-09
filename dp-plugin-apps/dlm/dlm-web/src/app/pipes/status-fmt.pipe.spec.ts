@@ -1,13 +1,13 @@
-import { PolicyStatusFmtPipe } from './policy-status-fmt.pipe';
+import { StatusFmtPipe } from './status-fmt.pipe';
 import { async, TestBed } from '@angular/core/testing';
 
-describe('PolicyStatusFmtPipe', () => {
+describe('StatusFmtPipe', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [PolicyStatusFmtPipe]
+      declarations: [StatusFmtPipe]
     });
-    this.pipe = new PolicyStatusFmtPipe();
+    this.pipe = new StatusFmtPipe();
   }));
 
   describe('#transform', () => {

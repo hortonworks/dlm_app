@@ -48,6 +48,7 @@ import { LogService } from 'services/log.service';
 import { TimeZoneService } from 'services/time-zone.service';
 import { HdfsService } from 'services/hdfs.service';
 import { HiveService } from 'services/hive.service';
+import { NotificationService } from 'services/notification.service';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
 
 import { MainComponent } from './pages/main/main.component';
@@ -116,11 +117,10 @@ import { TableFilterComponent } from './common/table/table-filter/table-filter.c
 import { CheckboxColumnComponent, ActionColumnComponent } from './components';
 import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/review-policy.component';
 
-import { BytesSizePipe } from './pipes/bytes-size.pipe';
-import { FmtTzPipe } from './pipes/fmt-tz.pipe';
-import { FrequencyPipe } from './pipes/frequency.pipe';
-import { TruncatePipe } from './pipes/truncate.pipe';
-import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
+import { PipesModule } from './pipes/pipes.module';
+
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SimpleNotificationsModule } from 'angular2-notifications';
 
 @NgModule({
   imports: [
@@ -156,7 +156,10 @@ import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
 
     RouterModule.forRoot(routes),
     CommonComponentsModule,
-    TranslateModule.forRoot()
+    TranslateModule.forRoot(),
+    BrowserAnimationsModule,
+    SimpleNotificationsModule.forRoot(),
+    PipesModule
   ],
   declarations: [
     DlmComponent,
@@ -215,13 +218,7 @@ import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
     ModalDialogComponent,
     ModalDialogBodyComponent,
     NotificationsComponent,
-    LogModalDialogComponent,
-
-    BytesSizePipe,
-    FmtTzPipe,
-    FrequencyPipe,
-    TruncatePipe,
-    PolicyStatusFmtPipe
+    LogModalDialogComponent
   ],
   bootstrap: [DlmComponent],
   providers: [
@@ -237,9 +234,9 @@ import { PolicyStatusFmtPipe } from './pipes/policy-status-fmt.pipe';
     TimeZoneService,
     HdfsService,
     HiveService,
+    NotificationService,
     OverviewJobsExternalFiltersService,
     httpServiceProvider,
-    FrequencyPipe,
     AppConfig,
     {
       provide: APP_INITIALIZER,

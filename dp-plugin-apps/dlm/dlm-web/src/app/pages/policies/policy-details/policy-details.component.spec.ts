@@ -18,13 +18,10 @@ import { CheckboxComponent } from 'common/checkbox/checkbox.component';
 import { ActionColumnComponent } from 'components/table-columns/action-column/action-column.component';
 import { CheckboxColumnComponent } from 'components/table-columns/checkbox-column/checkbox-column.component';
 import { MockTranslateLoader } from 'mocks/mock-translate-loader';
-import { BytesSizePipe } from 'pipes/bytes-size.pipe';
-import { FrequencyPipe } from 'pipes/frequency.pipe';
 import { NavbarService } from 'services/navbar.service';
-import { FmtTzPipe } from 'pipes/fmt-tz.pipe';
-import { PolicyStatusFmtPipe } from 'pipes/policy-status-fmt.pipe';
 import { MockStore } from '../../../mocks/mock-store';
 import { Store } from '@ngrx/store';
+import { PipesModule } from 'pipes/pipes.module';
 
 describe('PolicyDetailsComponent', () => {
   let component: PolicyDetailsComponent;
@@ -37,7 +34,8 @@ describe('PolicyDetailsComponent', () => {
           loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
         }),
         ChartsModule, NgxDatatableModule, CommonComponentsModule, FormsModule, MomentModule, TooltipModule.forRoot(),
-        ProgressbarModule.forRoot()
+        ProgressbarModule.forRoot(),
+        PipesModule
       ],
       declarations: [
         PolicyDetailsComponent,
@@ -49,11 +47,7 @@ describe('PolicyDetailsComponent', () => {
         JobsTableComponent,
         JobStatusComponent,
         JobTransferredGraphComponent,
-        BytesSizePipe,
-        FrequencyPipe,
-        HdfsBrowserComponent,
-        FmtTzPipe,
-        PolicyStatusFmtPipe
+        HdfsBrowserComponent
       ],
       providers: [
         NavbarService,

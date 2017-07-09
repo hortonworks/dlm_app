@@ -3,7 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{AssetWorkspaceRequest, DataAsset, Errors}
+import com.hortonworks.dataplane.commons.domain.Entities.{AssetWorkspaceRequest, DataAsset, Errors, HJwtToken}
 import com.hortonworks.dataplane.cs.Webservice.AtlasService
 import com.hortonworks.dataplane.db.Webservice.AssetWorkspaceService
 import internal.auth.Authenticated
@@ -20,7 +20,7 @@ class AssetWorkspaces @Inject()(@Named("assetWorkspaceService") val assetWorkspa
   import scala.concurrent.ExecutionContext.Implicits.global
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  private def getAssetFromSearch(req: AssetWorkspaceRequest): Future[Either[Errors, Seq[DataAsset]]] = {
+  private def getAssetFromSearch(req: AssetWorkspaceRequest)(implicit token:Option[HJwtToken]): Future[Either[Errors, Seq[DataAsset]]] = {
     atlasService.searchQueryAssets(req.clusterId.toString, req.assetQueryModels.head).map {
       case Right(entity) =>
         val assets = entity.entities.getOrElse(Nil).map {
@@ -44,6 +44,7 @@ class AssetWorkspaces @Inject()(@Named("assetWorkspaceService") val assetWorkspa
 
   def add() = authenticated.async(parse.json) { request =>
     request.body.validate[AssetWorkspaceRequest].map { req =>
+      implicit val token = request.token
       getAssetFromSearch(req).flatMap {
         case Right(assets) =>
           val newReq = req.copy(dataAssets = assets)
