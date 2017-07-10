@@ -8,7 +8,7 @@ import {Persona} from '../../../models/header-data';
 })
 export class PersonaPopupComponent implements OnInit {
   
-  showPersona = false;
+  showPopup = false;
   
   @Input() personas:Persona[] = [];
   @Input() personaNavSrc: ElementRef;
@@ -22,7 +22,7 @@ export class PersonaPopupComponent implements OnInit {
   }
 
   navigateToPersona(persona: Persona) {
-    this.showPersona = false;
+    this.showPopup = false;
     this.personaChange.emit(persona);
   }
 
@@ -33,13 +33,13 @@ export class PersonaPopupComponent implements OnInit {
     }
 
     if (targetElement === this.personaNavSrc.nativeElement) {
-      this.showPersona = !this.showPersona;
+      this.showPopup = !this.showPopup;
       return;
     }
 
     const clickedInside = this.personaNav.nativeElement.contains(targetElement);
     if (!clickedInside) {
-      this.showPersona = false;
+      this.showPopup = false;
     }
   }
 
