@@ -54,7 +54,7 @@ export class CollapsibleNavComponent implements OnInit {
           this.activePersona = persona;
           this.activePersonaName = persona.name;
           this.activePersonaImageName = persona.imageName;
-          this.activeTabName = tab.tabName;
+          setTimeout(() => { this.activeTabName = tab.tabName }, 100);
 
           this.collapsibleNavService.setTabs(persona.tabs, tab);
 
@@ -92,7 +92,7 @@ export class CollapsibleNavComponent implements OnInit {
   ngOnInit() {
     this.collapsibleNavService.navChanged$.subscribe(() => {
       this.personaTabs = this.collapsibleNavService.tabs;
-      this.activeTabName = this.collapsibleNavService.activeTab.tabName;
+      setTimeout(() => { this.activeTabName = this.collapsibleNavService.activeTab.tabName }, 100);
     });
 
     this.collapsibleNavService.collpaseSideNav$.subscribe((minimise: boolean) => {

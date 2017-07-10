@@ -10,7 +10,7 @@ export const routes:Routes = [
   { path: '', redirectTo: 'clusters' },
   { path: 'clusters', component: LakesComponent },
   { path: 'add', component: ClusterAddComponent },
-  { path: 'clusters/:id/details', component: ClusterDetailsComponent },
+  { path: 'cluster/details/:id', component: ClusterDetailsComponent },
   { path: 'users', component: UserManagementComponent,
     children: [
       { path: 'add', component: AddUserComponent, outlet: 'sidebar',},

@@ -17,7 +17,7 @@ export const routes: Routes = [{
       DoCleanUpAndRedirectGuard,
     ]
   }, {
-    path: 'dataset',
+    path: 'datasteward',
     loadChildren: './modules/dataset/dataset.module#DatasetModule',
     canActivate:[ SignedInForSecureGuard ]
   }, {
