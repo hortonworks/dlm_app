@@ -11,12 +11,33 @@ DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 export KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
+get_bindaddr_from_consul (){
+ consul_id=$(docker ps -af 'name=consul' -q)
+ echo "consul container id=$consul_id"
+ if [ -z $consul_id ]; then
+   return 0
+ fi
+ consul_args=$(docker inspect -f {{.Args}} $consul_id)
+ for word in $consul_args; do
+   if [[ $word == -bind* ]]
+   then
+
+    bindaddr=${word##*=}
+   fi
+ done
+ echo "Consul Bind Addr=$bindaddr"
+ export CONSUL_HOST=$bindaddr;
+
+}
 init_consul(){
   echo "Initializing Consul"
   read_consul_host
   docker-compose -f docker-compose-consul.yml up -d
 }
 read_consul_host(){
+ if [ -z "$CONSUL_HOST" ]; then
+  get_bindaddr_from_consul
+ fi
  if [ -z "$CONSUL_HOST" ]; then
   echo "Enter the Host IP Address (Consul will bind to this host):"
   read HOST_IP;
