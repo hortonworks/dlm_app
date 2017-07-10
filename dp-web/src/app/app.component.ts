@@ -1,13 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
-import { IdentityService } from './services/identity.service';
-import { MdlService } from './services/mdl.service';
+import {IdentityService} from './services/identity.service';
+import {MdlService} from './services/mdl.service';
 
-import { User } from './models/user';
+import {User} from './models/user';
 import {HeaderData, Persona, PersonaTabs} from './models/header-data';
 import {CollapsibleNavService} from './services/collapsible-nav.service';
 import {Loader, LoaderStatus} from './shared/utils/loader';
+import {RbacService} from './services/rbac.service';
+import {AuthenticationService} from './services/authentication.service';
+import {NavigationStart, Router} from '@angular/router';
 
 export enum ViewPaneState {
   MAXIMISE, MINIMISE
@@ -18,19 +21,21 @@ export enum ViewPaneState {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
 
   marginLeft = 0;
   viewPaneStates = ViewPaneState;
   viewPaneState = ViewPaneState.MAXIMISE;
   headerData: HeaderData = new HeaderData();
-  showLoader : LoaderStatus;
+  showLoader: LoaderStatus;
 
-  constructor(
-    private mdlService: MdlService,
-    private identityService: IdentityService,
-    private translateService: TranslateService,
-    private collapsibleNavService: CollapsibleNavService) {
+  constructor(private mdlService: MdlService,
+              private identityService: IdentityService,
+              private translateService: TranslateService,
+              private collapsibleNavService: CollapsibleNavService,
+              private rbacService: RbacService,
+              private authenticationService: AuthenticationService,
+              private router: Router) {
     translateService.setTranslation('en', require('../assets/i18n/en.json'));
     translateService.setDefaultLang('en');
     translateService.use('en');
@@ -45,34 +50,30 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.setHeaderData();
+    this.authenticationService.userAuthenticated$.subscribe(() => {
+      this.setHeaderData();
+    });
+
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart && this.isUserSignedIn()) {
+        this.setHeaderData();
+      }
+    });
+
     this.collapsibleNavService.collpaseSideNav$.subscribe(collapsed => {
-      this.viewPaneState =  collapsed ? ViewPaneState.MINIMISE : ViewPaneState.MAXIMISE;
+      this.viewPaneState = collapsed ? ViewPaneState.MINIMISE : ViewPaneState.MAXIMISE;
     });
     Loader.getStatus().subscribe(status => {
       this.showLoader = status
     });
   }
 
+  ngOnDestroy() {
+    this.headerData = new HeaderData();
+  }
+
+
   setHeaderData() {
-    this.headerData.personas = [
-      new Persona('Data Steward', [
-        new PersonaTabs('Dataset', 'dataset', 'fa-cubes', true),
-        new PersonaTabs('Unclassified', 'unclassified', 'fa-cube'),
-        new PersonaTabs('Assets', 'assets', 'fa-server'),
-        new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')
-      ], '', 'steward-logo.png'),
-      new Persona('Infra Admin', [
-        new PersonaTabs('Clusters', 'infra', 'fa-sitemap'),
-        new PersonaTabs('User Management', 'infra/users', 'fa-users')
-      ], '', 'infra-logo.png'),
-      new Persona('Analytics', [
-        new PersonaTabs('Workspace', 'workspace', 'fa-globe'),
-        new PersonaTabs('Assets', 'analytics/assets', 'fa-list-alt'),
-        new PersonaTabs('Clusters', '', 'fa-database'),
-        new PersonaTabs('Jobs', '', 'fa-briefcase')
-      ], '', 'analytics-logo.png'),
-      new Persona('Data Life cycle Manager', [], '/dlm', 'dlm-logo.png')
-    ]
+    this.headerData.personas = this.rbacService.getPersonaDetails();
   }
 }
