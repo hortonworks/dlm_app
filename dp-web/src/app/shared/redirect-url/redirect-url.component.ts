@@ -9,8 +9,7 @@ export interface RedirectUrlData {
 
 @Component({
   selector: 'dp-redirect-url',
-  templateUrl: './redirect-url.component.html',
-  styleUrls: ['./redirect-url.component.scss']
+  templateUrl: './redirect-url.component.html'
 })
 
 export class RedirectUrlComponent implements OnInit {
@@ -21,7 +20,6 @@ export class RedirectUrlComponent implements OnInit {
               private activatedRoute: ActivatedRoute) {
     activatedRoute.data.subscribe(data => {
       this.data = data;
-      console.log(data);
     });
   }
 
