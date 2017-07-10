@@ -8,20 +8,20 @@ ALL_IMAGES_OPT="all"
 
 build_knox() {
     VERSION=$(get_version)
-    docker build -t hortonworks/dp-knox:${VERSION} build/dp-docker/dp-knox
+    docker build -t ${IMAGE_PREFIX}/dp-knox:${VERSION} build/dp-docker/dp-knox
 }
 
 build_images() {
     VERSION=$(get_version)
     echo "Using version ${VERSION}"
     echo "Building gateway"
-    docker build -t hortonworks/dp-gateway:${VERSION} build/dp-docker/dp-gateway/
+    docker build -t ${IMAGE_PREFIX}/dp-gateway:${VERSION} build/dp-docker/dp-gateway/
     echo "Building dp-db-service"
-    docker build -t hortonworks/dp-db-service:${VERSION} build/dp-docker/dp-db-service/
+    docker build -t ${IMAGE_PREFIX}/dp-db-service:${VERSION} build/dp-docker/dp-db-service/
     echo "Building dp-cluster-service"
-    docker build -t hortonworks/dp-cluster-service:${VERSION} build/dp-docker/dp-cluster-service
+    docker build -t ${IMAGE_PREFIX}/dp-cluster-service:${VERSION} build/dp-docker/dp-cluster-service
     echo "Building dp-app"
-    docker build -t hortonworks/dp-app:${VERSION} build/dp-docker/dp-app
+    docker build -t ${IMAGE_PREFIX}/dp-app:${VERSION} build/dp-docker/dp-app
 }
 
 push_images() {
@@ -60,6 +60,43 @@ push_one_image() {
     docker push ${IMAGE_NAME}
 }
 
+save_images() {
+    if [ $# -lt 1 ]
+    then
+        usage
+        return -1
+    fi
+
+    VERSION=$(get_version)
+
+    if [ $1 == ${ALL_IMAGES_OPT} ]
+    then
+        for img in ${ALL_IMAGES}
+        do
+            save_one_image ${img} ${IMAGE_PREFIX}/${img} ${VERSION}
+            if [ $? -ne 0 ]
+            then
+                echo "Failed saving image ${img}, exiting. Verify if the image has been built."
+                return -1
+            fi
+        done
+    else
+        save_one_image $1 ${IMAGE_PREFIX}/${1} ${VERSION}
+    fi
+}
+
+save_one_image() {
+    IMAGE_LABEL=$1
+    IMAGE_NAME=$2
+    TAG=$3
+    if [ ! -z ${TAG} ]
+    then
+        IMAGE_NAME=${IMAGE_NAME}:${TAG}
+    fi
+    echo "Saving ${IMAGE_NAME} to ${IMAGE_LABEL}.tar"
+    docker save --output ${IMAGE_LABEL}.tar ${IMAGE_NAME}
+}
+
 get_version() {
     if [ -f build/dp-docker/installer/VERSION ]
     then
@@ -79,6 +116,9 @@ usage() {
     printf "%-${tabspace}s:%s\n" "push" "Push images to Hortonworks docker-hub account. Needs login to happen separately.
         all: Pushes all images
         <image-name>: Pushes a specific image"
+    printf "%-${tabspace}s:%s\n" "save" "Saves all images to local tarballs.
+        all: Saves all images
+        <image-name>: Saves a specific image"
 }
 
 if [ $# -lt 1 ]
@@ -98,6 +138,10 @@ else
         push)
             shift
             push_images "$@"
+            ;;
+        save)
+            shift
+            save_images "$@"
             ;;
         *)
             usage
