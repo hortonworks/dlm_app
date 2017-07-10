@@ -93,8 +93,9 @@ save_one_image() {
     then
         IMAGE_NAME=${IMAGE_NAME}:${TAG}
     fi
-    echo "Saving ${IMAGE_NAME} to ${IMAGE_LABEL}.tar"
-    docker save --output ${IMAGE_LABEL}.tar ${IMAGE_NAME}
+    echo "Saving ${IMAGE_NAME} to ./build/dp-docker/images/${IMAGE_LABEL}.tar"
+    mkdir -p ./build/dp-docker/images
+    docker save --output ./build/dp-docker/images/${IMAGE_LABEL}.tar ${IMAGE_NAME}
 }
 
 get_version() {
