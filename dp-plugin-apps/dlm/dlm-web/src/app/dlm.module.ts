@@ -48,6 +48,7 @@ import { LogService } from 'services/log.service';
 import { TimeZoneService } from 'services/time-zone.service';
 import { HdfsService } from 'services/hdfs.service';
 import { HiveService } from 'services/hive.service';
+import { NotificationService } from 'services/notification.service';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
 
 import { MainComponent } from './pages/main/main.component';
@@ -117,6 +118,10 @@ import { CheckboxColumnComponent, ActionColumnComponent } from './components';
 import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/review-policy.component';
 
 import { PipesModule } from './pipes/pipes.module';
+import { FrequencyPipe } from 'pipes/frequency.pipe';
+
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SimpleNotificationsModule } from 'angular2-notifications';
 
 @NgModule({
   imports: [
@@ -153,6 +158,8 @@ import { PipesModule } from './pipes/pipes.module';
     RouterModule.forRoot(routes),
     CommonComponentsModule,
     TranslateModule.forRoot(),
+    BrowserAnimationsModule,
+    SimpleNotificationsModule.forRoot(),
     PipesModule
   ],
   declarations: [
@@ -228,8 +235,10 @@ import { PipesModule } from './pipes/pipes.module';
     TimeZoneService,
     HdfsService,
     HiveService,
+    NotificationService,
     OverviewJobsExternalFiltersService,
     httpServiceProvider,
+    FrequencyPipe,
     AppConfig,
     {
       provide: APP_INITIALIZER,

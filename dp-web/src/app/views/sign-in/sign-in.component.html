@@ -10,7 +10,6 @@
             </div>
             <div class="dp-login-controls">
                 <form (submit)="onSubmit($event)" #loginForm="ngForm">
-                    <div class="group-title"><span>Sign In</span> | <a href="/auth/signInThrougKnox?landingUrl={{landingPage}}">Sign in with SSO</a></div>
                     <div class="field-group">
                         <label aria-label="Username">Username</label>
                         <input type="text" name="username" [(ngModel)]="credential.username" required>

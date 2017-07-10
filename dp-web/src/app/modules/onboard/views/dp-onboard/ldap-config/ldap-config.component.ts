@@ -6,6 +6,7 @@ import {ConfigurationService} from '../../../../../services/configuration.servic
 import {NgForm} from '@angular/forms';
 import {Alerts} from '../../../../../shared/utils/alerts';
 import {TranslateService} from '@ngx-translate/core';
+import {Loader} from '../../../../../shared/utils/loader';
 
 
 @Component({
@@ -31,9 +32,18 @@ export class LdapConfigComponent implements OnInit {
   }
 
   ngOnInit() {
+    Loader.show();
+    this.configurationService.getLdapConfiguration().subscribe(ldapConfig => {
+      this.ldapProperties = ldapConfig;
+      Loader.hide();
+    }, error => {
+      Loader.hide();
+    });
     let currentLocation = window.location.href.split('/');
     let domain = currentLocation[2].indexOf(':') > -1 ? currentLocation[2].substring(0, currentLocation[2].indexOf(':')) : currentLocation[2];
-    this.ldapProperties.domains.push(domain);
+    if(!this.ldapProperties.domains.find(dm => dm === domain)){
+      this.ldapProperties.domains.push(domain);
+    }
   }
 
   save() {
@@ -45,7 +55,7 @@ export class LdapConfigComponent implements OnInit {
     }
     this.configurationService.configureLDAP(this.ldapProperties).subscribe(() => {
       this.router.navigate(['onboard/adduser', {
-        status: 'success'
+        status: 'success',
       }]);
     }, (response) => {
       this.showNotification = true;

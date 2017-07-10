@@ -15,9 +15,12 @@ export class UserAddComponent implements OnInit {
   showNotification = false;
   users: string[] = [];
   availableUsers: string[] = [];
-  tagThemes = TagTheme
+  tagThemes = TagTheme;
 
-  constructor(private route: ActivatedRoute, private router: Router, private userService: UserService, private authenticationService: AuthenticationService) {
+  constructor(private route: ActivatedRoute,
+              private router: Router,
+              private userService: UserService,
+              private authenticationService: AuthenticationService) {
   }
 
   ngOnInit() {

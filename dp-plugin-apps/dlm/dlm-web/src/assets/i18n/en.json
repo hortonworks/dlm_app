@@ -203,6 +203,10 @@
           "body": "Are you sure?"
         }
       },
+      "success": {
+        "title": "Policy Creation Successful",
+        "body": "Replication policy {{policyName}} created successfully!"
+      },
       "form": {
         "selected": "Selected",
         "sections": {

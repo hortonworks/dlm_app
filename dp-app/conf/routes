@@ -5,7 +5,6 @@
 
 GET           /health                                          controllers.Status.health
 
-
 #auth calls
 POST          /auth/in                                         controllers.Authentication.signIn
 GET           /auth/userDetail                                 controllers.Authentication.userDetail
@@ -16,7 +15,7 @@ GET           /api/identity/:userId                            controllers.Authe
 #api
 
 GET           /api/init                                        controllers.Configuration.init
-GET           /api/appConfig                                   controllers.Configuration.appConfig
+GET           /login                                           controllers.Configuration.login
 
 GET           /api/lakes                                       controllers.DataplaneClusters.list
 POST          /api/lakes                                       controllers.DataplaneClusters.create
@@ -73,6 +72,8 @@ GET           /api/assets/lineage/:clusterId/:atlasGuid        controllers.Query
 POST          /api/knox/validate                               controllers.KnoxConfig.validate
 POST          /api/knox/configure                              controllers.KnoxConfig.configure
 GET           /api/knox/configuration                          controllers.KnoxConfig.configuration
+GET           /api/knox/ldap                                   controllers.KnoxConfig.getLdapConfiguration
+GET           /api/knox/status                                 controllers.KnoxConfig.isKnoxConfigured
 GET           /api/users/ldapsearch                            controllers.UserManager.ldapSearch
 
 

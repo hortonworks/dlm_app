@@ -32,6 +32,7 @@ public class TokenCheckFilter extends ZuulFilter {
   private static final Logger logger = LoggerFactory.getLogger(TokenCheckFilter.class);
   private static final String AUTH_ENTRY_POINT = Constants.DPAPP_BASE_PATH+"/auth/in";
   private static final String KNOX_CONFIG_PATH = Constants.DPAPP_BASE_PATH+"/api/knox/configuration";
+  private static final String LOGIN_POINT = Constants.DPAPP_BASE_PATH + "/login";
 
   @Autowired
   private UserService userService;
@@ -69,6 +70,7 @@ public class TokenCheckFilter extends ZuulFilter {
     return (serviceId.equals(Constants.DPAPP) || serviceId.equals(Constants.DLMAPP)) &&
       !(ctx.getRequest().getServletPath().equals(AUTH_ENTRY_POINT)
       || ctx.getRequest().getServletPath().equals(KNOX_CONFIG_PATH)
+      || ctx.getRequest().getServletPath().equals(LOGIN_POINT)
       );
 
   }

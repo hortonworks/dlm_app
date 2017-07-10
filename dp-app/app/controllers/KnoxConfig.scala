@@ -1,11 +1,11 @@
 package controllers
 
 import com.google.inject.Inject
-import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
+import com.hortonworks.dataplane.commons.domain.Entities.{Errors, Error}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.typesafe.scalalogging.Logger
 import internal.auth.Authenticated
-import models.{JsonResponses, KnoxConfigInfo, KnoxConfiguration}
+import models.{KnoxConfigInfo, KnoxConfiguration}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import services.{KnoxConfigurator, LdapService}
@@ -46,6 +46,31 @@ class KnoxConfig @Inject()(val ldapService: LdapService,
         Future.successful(BadRequest)
       )
   }
+
+  def getLdapConfiguration = Action.async {
+    ldapService.getConfiguredLdap.map {
+      case Left(errors) => handleErrors(errors)
+      case Right(ldapConfigs) => ldapConfigs.length match {
+        case 0 => Ok(Json.toJson(false))
+        case _ => Ok(Json.toJson(ldapConfigs.head))
+      }
+    }
+  }
+
+  def isKnoxConfigured = Action.async {
+    ldapService.getConfiguredLdap.map {
+      case Left(errors) => handleErrors(errors)
+      case Right(ldapConfigs) => ldapConfigs.length match {
+        case 0 => Ok(Json.obj(
+          "isConfigured" -> false
+        ))
+        case _ => Ok(Json.obj(
+          "isConfigured" -> true
+        ))
+      }
+    }
+  }
+
   def validate = authenticated.async(parse.json) { request =>
     request.body
       .validate[KnoxConfigInfo]
@@ -61,7 +86,7 @@ class KnoxConfig @Inject()(val ldapService: LdapService,
         Future.successful(BadRequest)
       )
   }
-  //Configuration is not authenticated as it will be called fro other service
+  //Configuration is not authenticated as it will be called fro other service from knox agent
   def configuration = Action.async { req =>
     ldapService.getConfiguredLdap.map {
       case Left(errors) => handleErrors(errors)

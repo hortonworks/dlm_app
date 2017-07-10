@@ -10,6 +10,8 @@ import * as policyActions from 'actions/policy.action';
 import * as operationActions from 'actions/operation.action';
 import { Policy } from 'models/policy.model';
 import { OperationResponse } from 'models/operation-response.model';
+import { TranslateService } from '@ngx-translate/core';
+import { NotificationService } from 'services/notification.service';
 
 describe('PolicyEffects', () => {
   beforeEach(() => TestBed.configureTestingModule({
@@ -19,12 +21,20 @@ describe('PolicyEffects', () => {
     providers: [
       PolicyEffects,
       {
+        provide: TranslateService,
+        useValue: jasmine.createSpyObj('t', ['instant'])
+      },
+      {
         provide: PolicyService,
         useValue: jasmine.createSpyObj('policyService', ['deletePolicy', 'suspendPolicy', 'resumePolicy'])
       },
       {
         provide: JobService,
         useValue: jasmine.createSpyObj('jobService', ['getJobsForPolicies'])
+      },
+      {
+        provide: NotificationService,
+        useValue: jasmine.createSpyObj('notificationService', ['create'])
       }
     ]
   }));
