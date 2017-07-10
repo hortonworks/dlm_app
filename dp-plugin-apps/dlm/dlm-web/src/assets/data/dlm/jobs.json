@@ -2,7 +2,7 @@
   "jobs": [
     {
       "id": "/c1/c1/hdfs2policy/0/1494275689257/000000004@1",
-      "policyId": "/c1/c1/hdfs2policy/0/1494275689257/000000004",
+      "policyId": "/c1/c1/c2/c2/hdfs2policy/0/1494275689257/000000004",
       "name": "hdfs2policy",
       "type": "FS",
       "executionType": "FS",
@@ -15,7 +15,7 @@
     },
     {
       "id": "/c1/c1/hdfs1policy/0/1494275689257/000000003@1",
-      "policyId": "/c1/c1/hdfs1policy/0/1494275689257/000000003",
+      "policyId": "/c1/c1/c2/c2/hdfs1policy/0/1494275689257/000000003",
       "name": "hdfs1policy",
       "type": "FS",
       "executionType": "FS",
@@ -28,7 +28,7 @@
     },
     {
       "id": "/c1/c1/hdfs2policy/0/1494275689257/000000004@2",
-      "policyId": "/c1/c1/hdfs2policy/0/1494275689257/000000004",
+      "policyId": "/c1/c1/c2/c2/hdfs2policy/0/1494275689257/000000004",
       "name": "hdfs2policy",
       "type": "FS",
       "executionType": "FS",
@@ -41,7 +41,7 @@
     },
     {
       "id": "/c1/c1/hdfs2policy/0/1494275689257/000000004@3",
-      "policyId": "/c1/c1/hdfs2policy/0/1494275689257/000000004",
+      "policyId": "/c1/c1/c2/c2/hdfs2policy/0/1494275689257/000000004",
       "name": "hdfs2policy",
       "type": "FS",
       "executionType": "FS",
@@ -54,7 +54,7 @@
     },
     {
       "id": "/c1/c1/hdfs1policy/0/1494275689257/000000003@2",
-      "policyId": "/c1/c1/hdfs1policy/0/1494275689257/000000003",
+      "policyId": "/c1/c1/c2/c2/hdfs1policy/0/1494275689257/000000003",
       "name": "hdfs1policy",
       "type": "FS",
       "executionType": "FS",
@@ -67,7 +67,7 @@
     },
     {
       "id": "/c1/c1/hdfs2policy/0/1494275689257/000000004@4",
-      "policyId": "/c1/c1/hdfs2policy/0/1494275689257/000000004",
+      "policyId": "/c1/c1/c2/c2/hdfs2policy/0/1494275689257/000000004",
       "name": "hdfs2policy",
       "type": "FS",
       "executionType": "FS",
@@ -80,7 +80,7 @@
     },
     {
       "id": "/c1/c1/hdfs2policy/0/1494275689257/000000004@5",
-      "policyId": "/c1/c1/hdfs2policy/0/1494275689257/000000004",
+      "policyId": "/c1/c1/c2/c2/hdfs2policy/0/1494275689257/000000004",
       "name": "hdfs2policy",
       "type": "FS",
       "executionType": "FS",
@@ -93,7 +93,7 @@
     },
     {
       "id": "/c1/c1/hdfs1policy/0/1494275689257/000000003@3",
-      "policyId": "/c1/c1/hdfs1policy/0/1494275689257/000000003",
+      "policyId": "/c1/c1/c2/c2/hdfs1policy/0/1494275689257/000000003",
       "name": "hdfs1policy",
       "type": "FS",
       "executionType": "FS",
@@ -106,7 +106,7 @@
     },
     {
       "id": "/c1/c1/hdfs2policy/0/1494275689257/000000004@6",
-      "policyId": "/c1/c1/hdfs2policy/0/1494275689257/000000004",
+      "policyId": "/c1/c1/c2/c2/hdfs2policy/0/1494275689257/000000004",
       "name": "hdfs2policy",
       "type": "FS",
       "executionType": "FS",
@@ -119,7 +119,7 @@
     },
     {
       "id": "/c1/c1/hdfs2policy/0/1494275689257/000000004@7",
-      "policyId": "/c1/c1/hdfs2policy/0/1494275689257/000000004",
+      "policyId": "/c1/c1/c2/c2/hdfs2policy/0/1494275689257/000000004",
       "name": "hdfs2policy",
       "type": "FS",
       "executionType": "FS",
