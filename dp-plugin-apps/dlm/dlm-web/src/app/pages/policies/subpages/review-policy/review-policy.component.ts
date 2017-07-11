@@ -171,9 +171,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     } else if (type === this.policyTypes.HIVE) {
       details.push({name: 'databases', label: this.t.instant(`${this.tDetails}.databases`), value: policyForm.databases});
     }
-    if (repeatMode === this.policyRepeatModes.NEVER) {
-      details.push({name: 'repeatMode', label: this.t.instant(`${this.tDetails}.repeat`), value: this.policyRepeatModesLabels[repeatMode]});
-    } else if (repeatMode === this.policyRepeatModes.EVERY) {
+    if (repeatMode === this.policyRepeatModes.EVERY) {
       let value = this.frequencyPipe.transform(policyForm.job.frequencyInSec);
       if (policyForm.job.unit === this.policyTimeUnits.WEEKS) {
         value += ' on ' + this.policyDaysLabels[policyForm.job.day];

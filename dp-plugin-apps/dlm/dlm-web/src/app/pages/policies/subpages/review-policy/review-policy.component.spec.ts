@@ -25,7 +25,7 @@ describe('ReviewPolicyComponent', () => {
         TranslateModule.forRoot({
           loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
         }),
-        ModalModule.forRoot()
+        ModalModule.forRoot(),
         CommonComponentsModule,
         RouterTestingModule,
         PipesModule
