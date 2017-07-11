@@ -57,7 +57,7 @@ export class RbacService {
     return Observable.create(observer => {
       if (this.hasRole('SUPERADMIN')) {
         this.configService.isKnoxConfigured().subscribe(response => {
-          if (response.isConfigured) {
+          if (response.configured) {
             return this.getLandingInternal(observer, 'SUPERADMIN');
           } else {
             return this.getLandingInternal(observer, 'SUPERADMIN_ONBOARD');
