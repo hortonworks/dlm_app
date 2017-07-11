@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, Input, HostListener, OnInit } from '@angular/core';
+import { Component, ViewChild, ElementRef, Input, ChangeDetectorRef, OnInit, AfterViewChecked } from '@angular/core';
 import { Router, NavigationStart } from '@angular/router';
 
 import {PersonaTabs, HeaderData, Persona} from '../../models/header-data';
@@ -9,9 +9,8 @@ import {CollapsibleNavService} from '../../services/collapsible-nav.service';
   templateUrl: './collapsible-nav.component.html',
   styleUrls: ['./collapsible-nav.component.scss']
 })
-export class CollapsibleNavComponent implements OnInit {
-
-  showPersona = false;
+export class CollapsibleNavComponent implements OnInit, AfterViewChecked {
+  
   collapseSideNav = false;
 
   activeTabName: string = '';
@@ -23,9 +22,9 @@ export class CollapsibleNavComponent implements OnInit {
   @Input() headerData:HeaderData;
 
   @ViewChild('personaNavSrc') personaNavSrc: ElementRef;
-  @ViewChild('personaNav') personaNav: ElementRef;
 
   constructor(private router: Router,
+              private cdRef: ChangeDetectorRef,
               private collapsibleNavService: CollapsibleNavService) {
     router.events.subscribe(event => {
       if (event instanceof NavigationStart ) {
@@ -69,9 +68,8 @@ export class CollapsibleNavComponent implements OnInit {
     return false;
   }
 
-  navigateToPersona(persona: Persona, drawer: any) {
+  navigateToPersona(persona: Persona) {
     if (persona.tabs.length > 0 ) {
-      this.showPersona = false;
       this.router.navigate([persona.tabs[0].URL]);
     } else {
       if (persona.tabs.length === 0 && persona.url.length > 0) {
@@ -87,6 +85,10 @@ export class CollapsibleNavComponent implements OnInit {
     } else {
       window.location.href = tab.URL;
     }
+  }
+
+  ngAfterViewChecked() {
+    this.cdRef.detectChanges();
   }
 
   ngOnInit() {
@@ -105,22 +107,5 @@ export class CollapsibleNavComponent implements OnInit {
   toggleNav() {
     this.collapseSideNav = !this.collapseSideNav;
     this.collapsibleNavService.collpaseSideNav.next(this.collapseSideNav);
-  }
-
-  @HostListener('document:click', ['$event', '$event.target'])
-  public onClick(event: MouseEvent, targetElement: HTMLElement): void {
-    if (!targetElement) {
-      return;
-    }
-
-    if (targetElement === this.personaNavSrc.nativeElement) {
-      this.showPersona = !this.showPersona;
-      return;
-    }
-
-    const clickedInside = this.personaNav.nativeElement.contains(targetElement);
-    if (!clickedInside) {
-      this.showPersona = false;
-    }
   }
 }

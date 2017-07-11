@@ -22,7 +22,7 @@ import { FrequencyPipe } from 'pipes/frequency.pipe';
 import { omitEmpty, isEmpty } from 'utils/object-utils';
 import { ProgressState } from 'models/progress-state.model';
 import { getProgressState } from 'selectors/progress.selector';
-import { POLICY_FORM_ID } from '../../components/policy-form/policy-form.component';
+import { POLICY_FORM_ID } from 'pages/policies/components/policy-form/policy-form.component';
 import { getCluster } from 'selectors/cluster.selector';
 import { TimeZoneService } from 'services/time-zone.service';
 
