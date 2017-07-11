@@ -27,5 +27,5 @@
   <span *ngIf="event.eventType === 'policyinstance'" class="text-primary actionable" (click)="showLog(event)">{{ "page.notifications.view_log" | translate }}</span>
 </ng-template>
 
-<dlm-log-modal-dialog #logModalDialog [message]="logMessage$ | async">
+<dlm-log-modal-dialog #logModalDialog [message]="logMessage$ | async" (onClose)="onCloseLog()">
 </dlm-log-modal-dialog>

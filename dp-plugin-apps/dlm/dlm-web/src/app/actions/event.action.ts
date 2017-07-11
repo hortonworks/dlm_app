@@ -10,7 +10,12 @@ export const ActionTypes = {
   LOAD_NEW_EVENTS_COUNT_FAIL: type('LOAD_NEW_EVENTS_COUNT_FAIL')
 };
 
-export const loadEvents = (): Action => ({type: ActionTypes.LOAD_EVENTS});
+export const loadEvents = (requestId?: string): Action => ({
+  type: ActionTypes.LOAD_EVENTS,
+  payload: {
+    meta: {requestId}
+  }
+});
 
 export const loadEventsSuccess = (events): Action => ({type: ActionTypes.LOAD_EVENTS_SUCCESS, payload: events});
 

@@ -21,3 +21,5 @@ export const NOTIFICATION_TYPE_CLASSES = {
   [NOTIFICATION_TYPES.INFO]: 'alert-info',
   [NOTIFICATION_TYPES.WARNING]: 'alert-warning'
 };
+
+export const NOTIFICATION_LOG_NOT_LOADED = 'not loaded';

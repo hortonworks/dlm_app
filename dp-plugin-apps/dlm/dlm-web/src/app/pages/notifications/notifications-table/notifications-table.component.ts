@@ -11,6 +11,7 @@ import { Log } from 'models/log.model';
 import { getAllLogs } from 'selectors/log.selector';
 import { loadLogs } from 'actions/log.action';
 import { LogModalDialogComponent } from 'components/log-modal-dialog/log-modal-dialog.component';
+import { NOTIFICATION_LOG_NOT_LOADED } from '../../../constants/notification.constant';
 
 
 @Component({
@@ -35,7 +36,7 @@ export class NotificationsTableComponent implements OnInit {
     this.logMessage$ = this.selectedEvent$.switchMap(selectedEvent => {
       return this.store.select(getAllLogs).map(logs => {
         const filteredLogs: Log[] = logs.filter(log => log.instanceId === selectedEvent.instanceId);
-        return filteredLogs.length ? filteredLogs[0].message : '';
+        return filteredLogs.length ? filteredLogs[0].message : NOTIFICATION_LOG_NOT_LOADED;
       });
     });
   }
@@ -94,6 +95,10 @@ export class NotificationsTableComponent implements OnInit {
         maxWidth: 200
       }
     ];
+  }
+
+  onCloseLog() {
+    this.selectedEvent$.next(<Event>{});
   }
 
   showLog(event: Event) {
