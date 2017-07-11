@@ -30,7 +30,7 @@ export class RbacService {
       new PersonaTabs('Clusters', '', 'fa-database'),
       new PersonaTabs('Jobs', '', 'fa-briefcase')
     ], '', 'analytics-logo.png')]);
-    this.personaMap.set('INFRAADMIN', [new Persona('Dataplane Admin', [
+    this.personaMap.set('INFRAADMIN', [new Persona('Cluster Admin', [
       new PersonaTabs('Clusters', 'infra', 'fa-sitemap')
     ], '', 'infra-logo.png'), new Persona('Data Life cycle Manager', [], '/dlm', 'dlm-logo.png')]);
 

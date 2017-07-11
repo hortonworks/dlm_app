@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, DoCheck, OnDestroy, OnInit} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
 import {IdentityService} from './services/identity.service';
@@ -21,7 +21,7 @@ export enum ViewPaneState {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit, AfterViewChecked {
 
   marginLeft = 0;
   viewPaneStates = ViewPaneState;
@@ -35,7 +35,8 @@ export class AppComponent implements OnInit, OnDestroy {
               private collapsibleNavService: CollapsibleNavService,
               private rbacService: RbacService,
               private authenticationService: AuthenticationService,
-              private router: Router) {
+              private router: Router,
+              private cdRef: ChangeDetectorRef) {
     translateService.setTranslation('en', require('../assets/i18n/en.json'));
     translateService.setDefaultLang('en');
     translateService.use('en');
@@ -51,29 +52,23 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.authenticationService.userAuthenticated$.subscribe(() => {
-      this.setHeaderData();
-    });
-
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationStart && this.isUserSignedIn()) {
         this.setHeaderData();
-      }
     });
 
     this.collapsibleNavService.collpaseSideNav$.subscribe(collapsed => {
       this.viewPaneState = collapsed ? ViewPaneState.MINIMISE : ViewPaneState.MAXIMISE;
     });
+
     Loader.getStatus().subscribe(status => {
       this.showLoader = status
     });
   }
-
-  ngOnDestroy() {
-    this.headerData = new HeaderData();
+  ngAfterViewChecked() {
+    this.cdRef.detectChanges();
   }
 
-
   setHeaderData() {
+    this.headerData = new HeaderData();
     this.headerData.personas = this.rbacService.getPersonaDetails();
   }
 }
