@@ -46,15 +46,19 @@ export class NotificationsTableComponent implements OnInit {
 
   getEntity(event: Event) {
     const eventType = (event && 'eventType' in event) ? event['eventType'] : '';
-    if (eventType === 'policyinstance') {
+    if (eventType === 'policyinstance' || eventType === 'policy') {
       if (event['instanceId']) {
-        const splits = event.instanceId.split('/');
-        if (splits.length >= 4) {
-          return splits[3];
-        }
+        return this.getPolicyName(event.instanceId);
+      } else if (event['policyId']) {
+        return this.getPolicyName(event.policyId);
       }
     }
     return eventType;
+  }
+
+  getPolicyName(id: string): string {
+    const splits = id.split('/');
+    return splits.length >= 6 ? splits[5] : '';
   }
 
   ngOnInit() {
@@ -97,9 +101,9 @@ export class NotificationsTableComponent implements OnInit {
     if (eventType === 'policyinstance') {
       if (event['instanceId']) {
         const splits = event.instanceId.split('/');
-        if (splits.length >= 3 && splits[1] && splits[2]) {
-          const dataCenter = splits[1];
-          const clusterName = splits[2];
+        if (splits.length >= 5 && splits[3] && splits[4]) {
+          const dataCenter = splits[3];
+          const clusterName = splits[4];
           const filteredClusters = this.clusters.filter(cluster => cluster.dataCenter === dataCenter && cluster.name === clusterName);
           if (filteredClusters.length) {
             const clusterId = filteredClusters[0].id;

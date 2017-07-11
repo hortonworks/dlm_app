@@ -15,15 +15,12 @@
 </ng-template>
 
 <ng-template let-event="row" #entityTemplate>
-  <span *ngIf="event.eventType === 'policyinstance'; else entityNoLinkTemplate">
+  <span *ngIf="event.eventType === 'policyinstance' || event.eventType === 'policy'">
     <a [routerLink]="['/policies']" [queryParams]="{'policy': getEntity(event)}">
       <span>{{getEntity(event)}}</span>
     </a>
   </span>
-</ng-template>
-
-<ng-template #entityNoLinkTemplate>
-  <span>{{getEntity(event)}}</span>
+  <span *ngIf="event.eventType !== 'policyinstance' && event.eventType !== 'policy' ">{{getEntity(event)}}</span>
 </ng-template>
 
 <ng-template let-event="row" #logTemplate>
