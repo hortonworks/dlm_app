@@ -22,8 +22,13 @@ import { AddEntityButtonComponent } from 'components/add-entity-button/add-entit
 import { PolicyContent } from './policy-details/policy-content.type';
 import { isEqual } from 'utils/object-utils';
 import { POLL_INTERVAL } from 'constants/api.constant';
+import { ProgressState } from 'models/progress-state.model';
+import { getMergedProgress } from 'selectors/progress.selector';
 
 export const ALL = 'all';
+const POLICIES_REQUEST = '[POLICY_PAGE] POLICIES_REQUEST';
+const CLUSTERS_REQUEST = '[POLICY_PAGE] CLUSTERS_REQUEST';
+const PAIRINGS_REQUEST = '[POLICY_PAGE] PAIRINGS_REQUEST';
 
 @Component({
   selector: 'dlm-policies',
@@ -37,6 +42,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   clusters$: Observable<Cluster[]>;
   pairings$: Observable<Pairing[]>;
   subscriptions: Subscription[] = [];
+  overallProgress$: Observable<ProgressState>;
   activePolicyId = '';
   resourceAvailability$: Observable<{canAddPolicy: boolean, canAddPairing: boolean}>;
   filteredPolicies$: Observable<Policy[]>;
@@ -68,6 +74,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
     this.policies$ = this.store.select(getPolicyClusterJob).distinctUntilChanged(isEqual);
     this.clusters$ = store.select(getAllClusters);
     this.pairings$ = store.select(getAllPairings);
+    this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, PAIRINGS_REQUEST));
     const pairsCount$: Observable<PairsCountEntity> = store.select(getCountPairsForClusters);
     this.filteredPolicies$ = Observable.combineLatest(this.policies$, this.filters$, this.filterByService$)
       .map(([policies, filters, filterByService]) => this.filterPoliciesWithCondition(policies, filters, filterByService));
@@ -78,10 +85,11 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    [loadPolicies, loadClusters].map(action => this.store.dispatch(action()));
+    this.store.dispatch(loadPolicies(POLICIES_REQUEST));
+    this.store.dispatch(loadClusters(CLUSTERS_REQUEST));
     const clusterSubscription = this.clusters$.subscribe(clusters => {
       const clusterIds = clusters.map(c => c.id);
-      this.store.dispatch(loadPairings());
+      this.store.dispatch(loadPairings(PAIRINGS_REQUEST));
       this.store.dispatch(loadJobsForClusters(clusterIds));
     });
     const lastJobsWorkaroundSubscription = this.policies$

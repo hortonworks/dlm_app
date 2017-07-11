@@ -15,6 +15,8 @@ import { DropdownItem } from 'components/dropdown/dropdown-item';
 import { TranslateService } from '@ngx-translate/core';
 import { MapData, MapConnectionStatus, Point, MapSize } from 'models/map-data';
 import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
+import { ProgressState } from 'models/progress-state.model';
+import { getMergedProgress } from 'selectors/progress.selector';
 
 const CLUSTERS_REQUEST_ID = '[CLUSTER_PAGE]CLUSTERS_REQUEST_ID';
 const POLICIES_REQUEST_ID = '[CLUSTER_PAGE]POLICIES_REQUEST_ID';
@@ -28,6 +30,7 @@ const PAIRINGS_REQUEST_ID = '[CLUSTER_PAGE]PAIRINGS_REQUEST_ID';
 export class ClustersComponent implements OnInit {
   tableData$: Observable<Cluster[]>;
   mapData$: Observable<MapData[]>;
+  overallProgress$: Observable<ProgressState>;
   resourceAvailability$: Observable<{canAddPolicy: boolean, canAddPairing: boolean}>;
   addOptions: DropdownItem[];
   mapSize: MapSize = MapSize.FULLWIDTH;
@@ -39,6 +42,7 @@ export class ClustersComponent implements OnInit {
     const pairsCount$: Observable<PairsCountEntity> = store.select(getCountPairsForClusters);
     const policiesCount$: Observable<PoliciesCountEntity> = store.select(getCountPoliciesForSourceClusters);
     const allResources$ = Observable.combineLatest(clusters$, pairsCount$, policiesCount$);
+    this.overallProgress$ = store.select(getMergedProgress(CLUSTERS_REQUEST_ID, POLICIES_REQUEST_ID, PAIRINGS_REQUEST_ID));
     this.mapData$ = clusters$
       .startWith([])
       .map(clusters =>
