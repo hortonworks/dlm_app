@@ -3,12 +3,11 @@ package com.hortonworks.dataplane.cs
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provides, Singleton}
-import com.hortonworks.dataplane.cs.atlas.AtlasApiData
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
 import com.hortonworks.dataplane.db._
-import com.hortonworks.dataplane.http.Webserver
-import com.hortonworks.dataplane.http.routes.{AmbariRoute, AtlasRoute, StatusRoute}
+import com.hortonworks.dataplane.http.{ProxyServer, Webserver}
+import com.hortonworks.dataplane.http.routes.{AmbariRoute, AtlasRoute, HdpRoute, StatusRoute}
 import com.typesafe.config.{Config, ConfigFactory}
 import org.asynchttpclient.DefaultAsyncHttpClientConfig
 import play.api.libs.ws.WSClient
@@ -87,8 +86,8 @@ object AppModule extends AbstractModule {
                           dpClusterService: DpClusterService,
                           clusterService: ClusterService,
                           wSClient: WSClient,
-                          config: Config): AtlasApiData = {
-    new AtlasApiData(actorSystem,
+                          config: Config): ClusterDataApi = {
+    new ClusterDataApi(actorSystem,
                         materializer,
                         storageInterface,
                         clusterComponentService,
@@ -101,7 +100,7 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def provideAtlasRoute(config: Config,atlasApiData: AtlasApiData): AtlasRoute = {
+  def provideAtlasRoute(config: Config,atlasApiData: ClusterDataApi): AtlasRoute = {
     AtlasRoute(config,atlasApiData)
   }
 
@@ -131,6 +130,20 @@ object AppModule extends AbstractModule {
                     clusterService,
                     dpClusterService,
                     config)
+  }
+
+
+  @Provides
+  @Singleton
+  def provideHdpProxyRoute(actorSystem: ActorSystem,actorMaterializer: ActorMaterializer,clusterData: ClusterDataApi,config: Config): HdpRoute = {
+      new HdpRoute(actorSystem,actorMaterializer,clusterData,config)
+  }
+
+  @Provides
+  @Singleton
+  def provideHdpProxyServer(actorSystem: ActorSystem,
+                            materializer: ActorMaterializer,config: Config,hdpRoute: HdpRoute):ProxyServer = {
+    new ProxyServer(actorSystem,materializer,config,hdpRoute.proxy)
   }
 
   @Provides
