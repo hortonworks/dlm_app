@@ -6,6 +6,7 @@ import {HttpUtil} from '../shared/utils/httpUtil';
 
 import {Credential} from '../models/credential';
 import {User} from '../models/user';
+import {Subject} from 'rxjs/Subject';
 
 
 @Injectable()
@@ -14,6 +15,9 @@ export class AuthenticationService {
   private isUserAuthenticated: boolean = false;
   private ssoCheckCookieName = 'sso_login_valid';
 
+  userAuthenticated = new Subject<boolean>();
+  userAuthenticated$ = this.userAuthenticated.asObservable();
+
   constructor(private http: Http) {
     this.isUserAuthenticated = !!localStorage.getItem('dp_user');
   }
@@ -21,6 +25,7 @@ export class AuthenticationService {
   isAuthenticated() : Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       if(this.isUserAuthenticated){
+        this.userAuthenticated.next();
         resolve(true);
       }else{
         this.http.get("/auth/userDetail")
