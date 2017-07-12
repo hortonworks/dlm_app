@@ -6,6 +6,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Event } from 'models/event.model';
 import { Observable } from 'rxjs/Observable';
 import { getAllEvents, getNewEventsCount } from 'selectors/event.selector';
+import { getMergedProgress } from 'selectors/progress.selector';
 import { initApp } from 'actions/app.action';
 import { loadEvents, loadNewEventsCount } from 'actions/event.action';
 import { NAVIGATION } from 'constants/navigation.constant';
@@ -14,6 +15,11 @@ import { SessionStorageService } from './services/session-storage.service';
 import { TimeZoneService } from './services/time-zone.service';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
+import * as moment from 'moment';
+import { POLL_INTERVAL } from 'constants/api.constant';
+
+const POLL_EVENTS_ID = 'POLL_EVENT_ID';
+const POLL_NEW_EVENTS_ID = 'POLL_NEW_EVENTS_ID';
 
 @Component({
   selector: 'dlm',
@@ -21,7 +27,6 @@ import { Subscription } from 'rxjs/Subscription';
   styleUrls: ['./dlm.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-
 export class DlmComponent implements OnDestroy {
   header: MenuItem;
   menuItems: MenuItem[];
@@ -31,7 +36,7 @@ export class DlmComponent implements OnDestroy {
   newEventsCount$: Observable<number>;
   navigationColumns = NAVIGATION;
   onOverviewPage = false;
-  routeSubscription: Subscription;
+  subscriptions: Subscription[] = [];
 
   // Options for Toast Notification
   notificationOptions = {
@@ -45,6 +50,20 @@ export class DlmComponent implements OnDestroy {
   // mock current user
   // TODO: move user to store and dispatch timezone update with action
   user: User = <User>{fullName: 'Jim Raynor', timezone: ''};
+
+  private initPolling() {
+    const pollProgress$ = this.store
+      .select(getMergedProgress(POLL_EVENTS_ID, POLL_NEW_EVENTS_ID))
+      .filter(requestsState => !requestsState.isInProgress)
+      .delay(POLL_INTERVAL)
+      .do(_ => {
+        this.store.dispatch(loadNewEventsCount({requestId: POLL_NEW_EVENTS_ID}));
+        this.store.dispatch(loadEvents({ requestId: POLL_EVENTS_ID}));
+      })
+      .repeat();
+
+    this.subscriptions.push(pollProgress$.subscribe());
+  }
 
   constructor(t: TranslateService,
               private store: Store<State>,
@@ -89,13 +108,16 @@ export class DlmComponent implements OnDestroy {
     this.events$ = store.select(getAllEvents);
     this.newEventsCount$ = store.select(getNewEventsCount);
     this.store.dispatch(initApp());
-    this.store.dispatch(loadNewEventsCount());
-    this.store.dispatch(loadEvents());
-    this.routeSubscription = router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
+    this.store.dispatch(loadNewEventsCount({requestId: POLL_NEW_EVENTS_ID}));
+    this.store.dispatch(loadEvents({ requestId: POLL_EVENTS_ID}));
+    const pathChange$ = router.events
+      .filter(e => e instanceof NavigationEnd)
+      .do(_ => {
         this.onOverviewPage = this.checkTopPath(route, 'overview');
-      }
-    });
+      });
+
+    this.subscriptions.push(pathChange$.subscribe());
+    this.initPolling();
   }
 
   private checkTopPath(route, path) {
@@ -115,7 +137,7 @@ export class DlmComponent implements OnDestroy {
   }
 
   ngOnDestroy() {
-    this.routeSubscription.unsubscribe();
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
   saveUserTimezone(timezoneIndex) {

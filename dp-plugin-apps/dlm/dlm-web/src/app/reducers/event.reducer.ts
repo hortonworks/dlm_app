@@ -25,7 +25,7 @@ export function reducer(state = initialState, action): State {
 }
 
 function loadEventsSuccess(state = initialState, action): State {
-  const events = action.payload.events;
+  const events = action.payload.response.events;
   return {
     entities: Object.assign([], state.entities, events),
     newEventsCount: state.newEventsCount
@@ -33,7 +33,7 @@ function loadEventsSuccess(state = initialState, action): State {
 }
 
 function loadNewEventsCountSuccess(state = initialState, action): State {
-  const count = action.payload.totalCount;
+  const count = action.payload.response.totalCount;
   return {
     entities: state.entities,
     newEventsCount: count
