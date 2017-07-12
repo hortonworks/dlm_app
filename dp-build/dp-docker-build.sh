@@ -5,11 +5,6 @@ IMAGE_PREFIX="hortonworks"
 ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service dp-gateway"
 ALL_IMAGES_OPT="all"
 
-build_knox() {
-    VERSION=$(get_version)
-    docker build -t hortonworks/dp-knox:${VERSION} build/dp-docker/dp-knox
-}
-
 build_images() {
     VERSION=$(get_version)
     echo "Using version ${VERSION}"
@@ -21,6 +16,8 @@ build_images() {
     docker build -t hortonworks/dp-cluster-service:${VERSION} build/dp-docker/dp-cluster-service
     echo "Building dp-app"
     docker build -t hortonworks/dp-app:${VERSION} build/dp-docker/dp-app
+    echo "Building dp-knox"
+    docker build -t hortonworks/dp-knox:${VERSION} build/dp-docker/dp-knox
 }
 
 push_images() {
@@ -73,9 +70,8 @@ get_version() {
 usage() {
     local tabspace=20
     echo "Usage: dp-docker-build.sh <command>"
-    printf "%-${tabspace}s:%s\n" "Commands" "build [knox] | push all|<image-name>"
+    printf "%-${tabspace}s:%s\n" "Commands" "build | push all|<image-name>"
     printf "%-${tabspace}s:%s\n" "build" "Create images of Dataplane specific containers"
-    printf "%-${tabspace}s:%s\n" "build knox" "Create Knox image for Dataplane"
     printf "%-${tabspace}s:%s\n" "push" "Push images to Hortonworks docker-hub account. Needs login to happen separately.
         all: Pushes all images
         <image-name>: Pushes a specific image"
@@ -88,12 +84,7 @@ then
 else
     case "$1" in
         build)
-            if [ "$2" == "knox" ]
-            then
-                build_knox
-            else
-                build_images
-            fi
+            build_images
             ;;
         push)
             shift
