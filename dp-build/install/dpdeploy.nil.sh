@@ -37,37 +37,6 @@ init_app() {
     docker-compose -f docker-compose-apps.yml up -d
 }
 
-read_master_password() {
-    echo "Enter Knox master password: "
-    read -s MASTER_PASSWD
-    echo "Reenter password: "
-    read -s MASTER_PASSWD_VERIFY
-    if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
-    then
-       echo "Password did not match. Reenter password:"
-       read -s MASTER_PASSWD_VERIFY
-       if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
-       then
-        echo "Password did not match"
-        exit 1
-       fi
-    fi
-    export MASTER_PASSWORD="$MASTER_PASSWD"
-}
-
-read_use_test_ldap() {
-    echo "Use pre-packaged LDAP instance (suitable only for testing) [yes/no]: "
-    read USE_TEST_LDAP
-    export USE_TEST_LDAP
-}
-
-export_knox_cert() {
-    MASTER_PASSWD=$1
-    KNOX_CONTAINER_ID=$2
-    docker exec -t ${KNOX_CONTAINER_ID} \
-        keytool -export -alias gateway-identity -storepass ${MASTER_PASSWD} -keystore /var/lib/knox/data-2.6.0.3-8/security/keystores/gateway.jks -rfc
-}
-
 init_knox() {
     echo "Initializing Knox"
     init_consul
@@ -80,7 +49,7 @@ init_knox() {
 
     docker-compose -f docker-compose-knox.yml up -d
     
-    KNOX_CONTAINER_ID=$(docker ps -aqf "name=knox")
+    KNOX_CONTAINER_ID=$(docker ps --all --quiet --filter "name=knox")
     if [ -z ${KNOX_CONTAINER_ID} ]; then
         echo "Knox container not found. Ensure it is running..."
         return -1
@@ -108,15 +77,13 @@ stop_knox() {
 }
 
 destroy_knox() {
-    echo "Destroying Knox"
-    docker-compose -f docker-compose-knox.yml down
+    echo "Destroying Knox certificates"
     rm -rf ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
-    destroy_consul
 }
 
 start_app() {
     docker-compose -f docker-compose-apps.yml start
-    
+
 }
 
 stop_app() {
@@ -124,7 +91,8 @@ stop_app() {
 }
 
 destroy() {
-    docker-compose -f docker-compose.yml -f docker-compose-migrate.yml -f docker-compose-apps.yml down
+    docker stop $(docker ps --all --quiet --filter "network=dp")
+    docker rm $(docker ps --all --quiet --filter "network=dp")
 }
 
 init_db() {
@@ -141,12 +109,7 @@ ps() {
 }
 
 list_logs() {
-    DOCKER_FILES=${ALL_DOCKER_COMPOSE_APP_FILES}
-    if [ "$1" == "all" ]; then
-        DOCKER_FILES=${ALL_DOCKER_COMPOSE_FILES}
-        shift
-    fi
-    docker-compose ${DOCKER_FILES} logs "$@"
+    docker logs "$@"
 }
 
 print_version() {
@@ -204,6 +167,37 @@ read_consul_host(){
         export CONSUL_HOST=$HOST_IP;
     fi
     echo "using CONSUL_HOST: ${CONSUL_HOST}"
+}
+
+read_master_password() {
+    echo "Enter Knox master password: "
+    read -s MASTER_PASSWD
+    echo "Reenter password: "
+    read -s MASTER_PASSWD_VERIFY
+    if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
+    then
+       echo "Password did not match. Reenter password:"
+       read -s MASTER_PASSWD_VERIFY
+       if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
+       then
+        echo "Password did not match"
+        exit 1
+       fi
+    fi
+    export MASTER_PASSWORD="$MASTER_PASSWD"
+}
+
+read_use_test_ldap() {
+    echo "Use pre-packaged LDAP instance (suitable only for testing) [yes/no]: "
+    read USE_TEST_LDAP
+    export USE_TEST_LDAP
+}
+
+export_knox_cert() {
+    MASTER_PASSWD=$1
+    KNOX_CONTAINER_ID=$2
+    docker exec -t ${KNOX_CONTAINER_ID} \
+        keytool -export -alias gateway-identity -storepass ${MASTER_PASSWD} -keystore /var/lib/knox/data-2.6.0.3-8/security/keystores/gateway.jks -rfc
 }
 ################################################
 
