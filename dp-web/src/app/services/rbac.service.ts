@@ -14,7 +14,7 @@ export class RbacService {
 
   constructor(private identityService: IdentityService, private configService: ConfigurationService) {
     this.personaMap.set('SUPERADMIN', [
-      new Persona('Dataplane Admin', [
+      new Persona('Admin', [
         new PersonaTabs('Clusters', 'infra', 'fa-sitemap'),
         new PersonaTabs('User Management', 'infra/users', 'fa-users')
       ], '', 'infra-logo.png')]);
@@ -33,6 +33,7 @@ export class RbacService {
     this.personaMap.set('INFRAADMIN', [new Persona('Cluster Admin', [
       new PersonaTabs('Clusters', 'infra', 'fa-sitemap')
     ], '', 'infra-logo.png'), new Persona('Data Life cycle Manager', [], '/dlm', 'dlm-logo.png')]);
+    this.personaMap.set('INFRAADMIN_SUPERADMIN', [new Persona('Data Life cycle Manager', [], '/dlm', 'dlm-logo.png')]);
 
     this.landingPageMap.set('SUPERADMIN', '/infra');
     this.landingPageMap.set('SUPERADMIN_ONBOARD', '/onboard/welcome');
@@ -131,11 +132,15 @@ export class RbacService {
 
   getPersonaDetails() {
     let personas = [];
+    let isSuperAdmin = false;
     if (this.hasRole('SUPERADMIN')) {
+      isSuperAdmin = true;
       personas.push(...this.personaMap.get('SUPERADMIN'));
     }
-    if (this.hasRole('INFRAADMIN')) {
+    if (this.hasRole('INFRAADMIN') && !isSuperAdmin) {
       personas.push(...this.personaMap.get('INFRAADMIN'));
+    }else if(this.hasRole('INFRAADMIN') && isSuperAdmin){
+      personas.push(...this.personaMap.get('INFRAADMIN_SUPERADM'));
     }
     if (this.hasRole('CURATOR')) {
       personas.push(...this.personaMap.get('CURATOR'));

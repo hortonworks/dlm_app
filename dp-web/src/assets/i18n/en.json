@@ -40,7 +40,7 @@
       "rowsPerPage" : "Rows per page"
     },
     "roles" : {
-      "SUPERADMIN": "Super Admin",
+      "SUPERADMIN": "Admin",
       "INFRAADMIN": "Cluster Admin",
       "USER": "Consumer",
       "CURATOR": "Data Steward"
