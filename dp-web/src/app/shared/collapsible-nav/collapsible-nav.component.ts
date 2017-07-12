@@ -48,7 +48,7 @@ export class CollapsibleNavComponent implements OnInit, OnChanges {
 
     if (!this.findPersonaAndTabName(url, true) && !this.findPersonaAndTabName(url, false)) {
       //TODO This should be configurable ?
-      this.activePersonaName = 'Infra Admin';
+      this.activePersonaName = 'Cluster Admin';
       this.activePersonaImageName = 'infra-logo.png';
       this.collapsibleNavService.collpaseSideNav.next(true);
     }
