@@ -54,8 +54,8 @@ public class CookieManager {
   public void deleteDataplaneJwtCookie(){
     deleteCookie(Constants.DP_JWT_COOKIE,null);//The token might have been expired.
   }
-  public void addDataplaneJwtCookie(String jwtToken,Optional<Date> expirtyTime) {
-    addCookie(Constants.DP_JWT_COOKIE, jwtToken,expirtyTime);
+  public void addDataplaneJwtCookie(String jwtToken,Optional<Date> expiryTime) {
+    addCookie(Constants.DP_JWT_COOKIE, jwtToken,expiryTime);
   }
   private Optional<Cookie> getCookie(String cookieName) {
     RequestContext ctx = RequestContext.getCurrentContext();
@@ -70,14 +70,14 @@ public class CookieManager {
     return Optional.absent();
   }
 
-  private void addCookie(String cookieName,String value,Optional<Date> expirtyTime){
+  private void addCookie(String cookieName,String value,Optional<Date> expiryTime){
     RequestContext ctx = RequestContext.getCurrentContext();
     Cookie cookie=new Cookie(cookieName,value);
     cookie.setPath("/");
-    if (expirtyTime.isPresent()){
+    if (expiryTime.isPresent()){
       Date now=new Date();
-      int expirtyInSecs=(int)(expirtyTime.get().getTime()-now.getTime())/1000;
-      cookie.setMaxAge(expirtyInSecs);
+      int expiryInSecs=(int)(expiryTime.get().getTime()-now.getTime())/1000;
+      cookie.setMaxAge(expiryInSecs);
     }
     ctx.getResponse().addCookie(cookie);
   }
