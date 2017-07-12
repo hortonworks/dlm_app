@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Effect, Actions, toPayload } from '@ngrx/effects';
-import { EventService } from '../services/event.service';
+import { EventService } from 'services/event.service';
 
 import {
   loadEventsSuccess, loadEventsFail, ActionTypes as eventActions, loadNewEventsCountSuccess, loadNewEventsCountFail
-} from '../actions/event.action';
+} from 'actions/event.action';
 
 @Injectable()
 export class EventEffects {
@@ -29,5 +29,6 @@ export class EventEffects {
         .map(events => loadNewEventsCountSuccess(events, payload.meta))
         .catch(err => Observable.of(loadNewEventsCountFail(err, payload.meta)));
     });
+
   constructor(private actions$: Actions, private eventService: EventService) { }
 }

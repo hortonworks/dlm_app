@@ -1,4 +1,4 @@
-import { type, requestType } from 'utils/type-action';
+import { requestType } from 'utils/type-action';
 import { Action } from '@ngrx/store';
 import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
 
