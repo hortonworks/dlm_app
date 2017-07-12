@@ -42,7 +42,7 @@ export class RbacService {
     this.landingPageMap.set('INFRAADMIN', '/infra');
     this.landingPageMap.set('INFRAADMIN_ONBOARD', '/onboard');
 
-    this.nonPersonaRoutesMap.set('SUPERADMIN', ['/onboard/welcome', '/onboard/configure', '/onboard/adduser']);
+    this.nonPersonaRoutesMap.set('SUPERADMIN', ['/onboard', '/onboard/welcome', '/onboard/configure', '/onboard/adduser']);
     this.nonPersonaRoutesMap.set('INFRAADMIN', ['/onboard']);
     this.nonPersonaRoutesMap.set('CURATOR', []);
     this.nonPersonaRoutesMap.set('USER', []);
