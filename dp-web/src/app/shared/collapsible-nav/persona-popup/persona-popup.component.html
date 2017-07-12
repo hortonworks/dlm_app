@@ -1,4 +1,4 @@
-<ul #personaNav class="suit-navigation" [ngClass]="{'showPopup': showPopup}">
+<ul #personaNav class="suit-navigation" [ngClass]="{'showPopup': showPopup}" *ngIf="personas.length > 1">
   <li *ngFor="let persona of personas; let i = index" (click)="navigateToPersona(persona)">
     <div class="logo-wrapper borderBox" title="{{ persona.name }}">
       <img [attr.src]="'../../../assets/images/' + persona.imageName" alt=""/>
