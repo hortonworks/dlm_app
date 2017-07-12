@@ -95,9 +95,6 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     {
       label: this.t.instant('common.frequency.every'),
       value: this.policyRepeatModes.EVERY
-    }, {
-      label: this.t.instant('common.frequency.never'),
-      value: this.policyRepeatModes.NEVER
     }
   ];
   units = <SelectOption[]> [
@@ -270,12 +267,6 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     });
     const jobCtrl = (<any>this.policyForm).controls.job;
     const changes$ = jobCtrl.controls.repeatMode.valueChanges;
-    const repeatModeSubscription$ = changes$.subscribe(repeatMode => {
-      const newValidator = repeatMode === this.policyRepeatModes.NEVER ? null : Validators.required;
-      jobCtrl.controls.frequency.setValidators(newValidator);
-      jobCtrl.controls.frequency.updateValueAndValidity();
-    });
-    this.subscriptions.push(repeatModeSubscription$);
 
     this.activateFieldsForType(this.selectedPolicyType);
     this.policyFormValues$ = this.store.select(getFormValues(POLICY_FORM_ID));
@@ -352,8 +343,6 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
             value.job.startTime.date = moment(startDate).add(1, 'weeks').isoWeekday(dayToLook).format('YYYY-MM-DD');
           }
         }
-      } else if (value.job.repeatMode === this.policyRepeatModes.NEVER) {
-        value.job.frequencyInSec = 0;
       }
       this.formSubmit.emit(value);
     }

@@ -22,7 +22,7 @@ import { FrequencyPipe } from 'pipes/frequency.pipe';
 import { omitEmpty, isEmpty } from 'utils/object-utils';
 import { ProgressState } from 'models/progress-state.model';
 import { getProgressState } from 'selectors/progress.selector';
-import { POLICY_FORM_ID } from '../../components/policy-form/policy-form.component';
+import { POLICY_FORM_ID } from 'pages/policies/components/policy-form/policy-form.component';
 import { getCluster } from 'selectors/cluster.selector';
 import { TimeZoneService } from 'services/time-zone.service';
 
@@ -171,9 +171,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     } else if (type === this.policyTypes.HIVE) {
       details.push({name: 'databases', label: this.t.instant(`${this.tDetails}.databases`), value: policyForm.databases});
     }
-    if (repeatMode === this.policyRepeatModes.NEVER) {
-      details.push({name: 'repeatMode', label: this.t.instant(`${this.tDetails}.repeat`), value: this.policyRepeatModesLabels[repeatMode]});
-    } else if (repeatMode === this.policyRepeatModes.EVERY) {
+    if (repeatMode === this.policyRepeatModes.EVERY) {
       let value = this.frequencyPipe.transform(policyForm.job.frequencyInSec);
       if (policyForm.job.unit === this.policyTimeUnits.WEEKS) {
         value += ' on ' + this.policyDaysLabels[policyForm.job.day];

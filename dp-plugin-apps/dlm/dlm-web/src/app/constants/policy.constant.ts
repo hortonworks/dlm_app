@@ -43,8 +43,7 @@ export const POLICY_DAYS = {
 };
 
 export const POLICY_REPEAT_MODES = {
-  EVERY,
-  NEVER
+  EVERY
 };
 
 export const POLICY_TIME_UNITS = {

@@ -5,8 +5,8 @@
   "totalCount": 10,
   "events": [
     {
-      "policyId": "/c1/c1/ystest/0/1497564970816/000000008",
-      "instanceId": "/c1/c1/ystest/0/1497564970816/000000008@36",
+      "policyId": "/c1/c1/c2/c2/ystest/0/1497564970816/000000008",
+      "instanceId": "/c1/c1/c2/c2/ystest/0/1497564970816/000000008@36",
       "event": "succeeded",
       "eventType": "policyinstance",
       "policyReplType": "FS",
@@ -15,8 +15,8 @@
       "message": "policy instance succeeded"
     },
     {
-      "policyId": "/c1/c1/hd_policy/0/1497564970816/000000003",
-      "instanceId": "/c1/c1/hd_policy/0/1497564970816/000000003@99",
+      "policyId": "/c1/c1/c2/c2/hd_policy/0/1497564970816/000000003",
+      "instanceId": "/c1/c1/c2/c2/hd_policy/0/1497564970816/000000003@99",
       "event": "failed",
       "eventType": "policyinstance",
       "policyReplType": "FS",
@@ -25,8 +25,8 @@
       "message": "policy instance failed"
     },
     {
-      "policyId": "/c1/c1/tdk/0/1497564970816/000000002",
-      "instanceId": "/c1/c1/tdk/0/1497564970816/000000002@168",
+      "policyId": "/c1/c1/c2/c2/tdk/0/1497564970816/000000002",
+      "instanceId": "/c1/c1/c2/c2/tdk/0/1497564970816/000000002@168",
       "event": "succeeded",
       "eventType": "policyinstance",
       "policyReplType": "FS",
@@ -35,8 +35,8 @@
       "message": "policy instance succeeded"
     },
     {
-      "policyId": "/c1/c1/hdfsPolicy/0/1497564970816/000000001",
-      "instanceId": "/c1/c1/hdfsPolicy/0/1497564970816/000000001@184",
+      "policyId": "/c1/c1/c2/c2/hdfsPolicy/0/1497564970816/000000001",
+      "instanceId": "/c1/c1/c2/c2/hdfsPolicy/0/1497564970816/000000001@184",
       "event": "succeeded",
       "eventType": "policyinstance",
       "policyReplType": "FS",
@@ -45,8 +45,8 @@
       "message": "policy instance succeeded"
     },
     {
-      "policyId": "/c1/c1/ystest/0/1497564970816/000000008",
-      "instanceId": "/c1/c1/ystest/0/1497564970816/000000008@35",
+      "policyId": "/c1/c1/c2/c2/ystest/0/1497564970816/000000008",
+      "instanceId": "/c1/c1/c2/c2/ystest/0/1497564970816/000000008@35",
       "event": "succeeded",
       "eventType": "policyinstance",
       "policyReplType": "FS",
@@ -55,8 +55,8 @@
       "message": "policy instance succeeded"
     },
     {
-      "policyId": "/c1/c1/asdf/0/1497564970816/000000004",
-      "instanceId": "/c1/c1/asdf/0/1497564970816/000000004@50",
+      "policyId": "/c1/c1/c2/c2/asdf/0/1497564970816/000000004",
+      "instanceId": "/c1/c1/c2/c2/asdf/0/1497564970816/000000004@50",
       "event": "failed",
       "eventType": "policyinstance",
       "policyReplType": "FS",
@@ -65,8 +65,8 @@
       "message": "policy instance failed"
     },
     {
-      "policyId": "/c1/c1/tdk111/0/1497564970816/000000007",
-      "instanceId": "/c1/c1/tdk111/0/1497564970816/000000007@2",
+      "policyId": "/c1/c1/c2/c2/tdk111/0/1497564970816/000000007",
+      "instanceId": "/c1/c1/c2/c2/tdk111/0/1497564970816/000000007@2",
       "event": "failed",
       "eventType": "policyinstance",
       "policyReplType": "FS",
@@ -83,8 +83,8 @@
       "message": "beacon started successfully"
     },
     {
-      "policyId": "/c1/c1/testhivepolicy/0/1497564970816/000000006",
-      "instanceId": "/c1/c1/testhivepolicy/0/1497564970816/000000006@47",
+      "policyId": "/c1/c1/c2/c2/testhivepolicy/0/1497564970816/000000006",
+      "instanceId": "/c1/c1/c2/c2/testhivepolicy/0/1497564970816/000000006@47",
       "event": "ignored",
       "eventType": "policyinstance",
       "policyReplType": "HIVE",
@@ -93,8 +93,8 @@
       "message": "policy instance ignored"
     },
     {
-      "policyId": "/c1/c1/hdfsPolicy/0/1497564970816/000000001",
-      "instanceId": "/c1/c1/hdfsPolicy/0/1497564970816/000000001@183",
+      "policyId": "/c1/c1/c2/c2/hdfsPolicy/0/1497564970816/000000001",
+      "instanceId": "/c1/c1/c2/c2/hdfsPolicy/0/1497564970816/000000001@183",
       "event": "succeeded",
       "eventType": "policyinstance",
       "policyReplType": "FS",

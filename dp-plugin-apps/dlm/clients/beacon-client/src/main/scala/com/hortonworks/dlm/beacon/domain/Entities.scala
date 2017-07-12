@@ -42,7 +42,8 @@ object ResponseEntities {
                                     targetCluster: String, instances: Seq[PolicyInstanceResponse],
                                     startTime: Option[String], endTime: String)
 
-  case class BeaconEventResponse(policyId: Option[String], instanceId: Option[String], eventType: String, severity: String, timestamp: String, message: String)
+  case class BeaconEventResponse(policyId: Option[String], instanceId: Option[String], event: String, eventType: String,
+                                 policyReplType: Option[String], severity: String, timestamp: String, message: String)
 
   case class BeaconLogResponse(status: String, message: String, requestId: String)
 }
