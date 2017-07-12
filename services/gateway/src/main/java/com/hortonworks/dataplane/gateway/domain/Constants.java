@@ -11,4 +11,6 @@ public interface Constants {
     String KNOX_LOGOUT_PATH =DPAPP_BASE_PATH+"/auth/signOutThrougKnox";
     String AUTHORIZATION_HEADER = "Authorization";
     String USER_CTX_KEY = "user_ctx";
+    String DP_JWT_COOKIE = "dp_jwt";
+    boolean BEARER_TOKEN_IN_COOKIE=true;//If set to false value is taken from header
 }

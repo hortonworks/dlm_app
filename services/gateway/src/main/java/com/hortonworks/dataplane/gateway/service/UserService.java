@@ -49,6 +49,10 @@ public class UserService {
       return Optional.absent();
     }
   }
+  public UserRef getUserRef(User user) {
+    List<String> roles = getRoles(user.getUsername());
+    return getUserRef(user, roles, null);
+  }
 
   public List<String> getRoles(String userName) {
     try {

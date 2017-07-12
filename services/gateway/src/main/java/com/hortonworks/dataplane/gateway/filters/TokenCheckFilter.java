@@ -4,9 +4,11 @@ package com.hortonworks.dataplane.gateway.filters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
+import com.hortonworks.dataplane.gateway.domain.TokenInfo;
 import com.hortonworks.dataplane.gateway.domain.User;
 import com.hortonworks.dataplane.gateway.domain.UserRef;
 import com.hortonworks.dataplane.gateway.service.UserService;
+import com.hortonworks.dataplane.gateway.utils.CookieManager;
 import com.hortonworks.dataplane.gateway.utils.KnoxSso;
 import com.hortonworks.dataplane.gateway.utils.Utils;
 import com.hortonworks.dataplane.gateway.domain.Constants;
@@ -18,11 +20,12 @@ import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
 import java.io.IOException;
+import java.util.Date;
 
 import static com.hortonworks.dataplane.gateway.domain.Constants.*;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
@@ -46,7 +49,11 @@ public class TokenCheckFilter extends ZuulFilter {
   @Autowired
   private Jwt jwt;
 
+  @Autowired
+  private CookieManager cookieManager;
+
   private ObjectMapper objectMapper = new ObjectMapper();
+
 
   @Override
   public String filterType() {
@@ -77,20 +84,18 @@ public class TokenCheckFilter extends ZuulFilter {
 
   @Override
   public Object run() {
-    // Sign in call
-    // get user and roles, and create token
     RequestContext ctx = RequestContext.getCurrentContext();
-    if (isSsoLogin()) {
+    if (isSsoLoginPath()) {
       return redirectToKnox(ctx);
-    } else if (logout()) {
+    } else if (isLogoutPath()) {
       return doLogout();
     } else {
-      Optional<String> bearerToken = utils.getBearerToken();
+      Optional<String> bearerToken=BEARER_TOKEN_IN_COOKIE?cookieManager.getDataplaneJwtCookie():utils.getBearerTokenFromHeader();
       if (bearerToken.isPresent()) {
         utils.deleteAuthorizationHeaderToUpstream();
-        return authorizeThroughBearerToken(bearerToken);
+        return authorizeThroughDPToken(bearerToken);
       } else if (knoxSso.isSsoConfigured()) {
-        return authorizeThroughSso();
+        return authorizeThroughSsoToken();
       } else {  //TODO validate knox sso.
         return utils.sendForbidden(null);
       }
@@ -100,30 +105,38 @@ public class TokenCheckFilter extends ZuulFilter {
 
   private Object doLogout() {
     //TODO call knox gateway to invalidate token in knox gateway server.
-    utils.deleteCookie(knoxSso.getSsoCookieName(), knoxSso.getCookieDomain());
-    utils.deleteCookie(SSO_CHECK_COOKIE_NAME, null);
+    cookieManager.deleteKnoxSsoCookie();
+    cookieManager.deleteSsoValidCookie();
+    cookieManager.deleteDataplaneJwtCookie();
     //Note. UI should handle redirect.
     return null;
   }
 
-  private Object authorizeThroughSso() {
-    Optional<Cookie> knoxSsoCookie = getKnoxSsoCookie();
+  private Object authorizeThroughSsoToken() {
+    Optional<Cookie> knoxSsoCookie = cookieManager.getKnoxSsoCookie();
     if (!knoxSsoCookie.isPresent()) {
       return utils.sendUnauthorized();
     }
     String knoxSsoCookieValue = knoxSsoCookie.get().getValue();
-    Optional<String> subjectOptional = knoxSso.validateJwt(knoxSsoCookieValue);
-    if (!subjectOptional.isPresent()) {
+    TokenInfo tokenInfo = knoxSso.validateJwt(knoxSsoCookieValue);
+    if (!tokenInfo.isValid()) {
       return utils.sendUnauthorized();
     }
     try {
-      Optional<User> user = userService.getUser(subjectOptional.get());
+      Optional<User> user = userService.getUser(tokenInfo.getSubject());
       if (!user.isPresent()) {
-        return utils.sendForbidden(String.format("User %s not found in the system", subjectOptional.get()));
+        return utils.sendForbidden(String.format("User %s not found in the system",tokenInfo.getSubject()));
       } else {
-        setSsoValidCookie();
+        cookieManager.setSsoValidCookie();
+        UserRef userRef=userService.getUserRef(user.get());
+        try {
+          String jwtToken = jwt.makeJWT(user.get(),userRef.getRoles());
+          cookieManager.addDataplaneJwtCookie(jwtToken,tokenInfo.getExpiryTime());
+        } catch (JsonProcessingException e) {
+          throw new RuntimeException(e);
+        }
         setUpstreamUserContext(user.get());
-        setUpstreamTokenContext();
+        setUpstreamKnoxTokenContext();
         RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, user.get());
         return null;
       }
@@ -132,21 +145,12 @@ public class TokenCheckFilter extends ZuulFilter {
     }
   }
 
-  private void setSsoValidCookie() {
-    RequestContext ctx = RequestContext.getCurrentContext();
-    Cookie cookie = new Cookie(Constants.SSO_CHECK_COOKIE_NAME, Boolean.toString(true));
-    cookie.setPath("/");
-    cookie.setMaxAge(-1);
-    cookie.setHttpOnly(false);
-    ctx.getResponse().addCookie(cookie);
-  }
-
-  private boolean isSsoLogin() {
+  private boolean isSsoLoginPath() {
     RequestContext ctx = RequestContext.getCurrentContext();
     return KNOX_LOGIN_PATH.equals(ctx.getRequest().getServletPath());
   }
 
-  private boolean logout() {
+  private boolean isLogoutPath() {
     RequestContext ctx = RequestContext.getCurrentContext();
     return KNOX_LOGOUT_PATH.equals(ctx.getRequest().getServletPath());
   }
@@ -171,27 +175,25 @@ public class TokenCheckFilter extends ZuulFilter {
     }
   }
 
-  private void setUpstreamTokenContext() {
-    Optional<Cookie> knoxSsoCookie = getKnoxSsoCookie();
+  private void setUpstreamKnoxTokenContext() {
+    Optional<Cookie> knoxSsoCookie = cookieManager.getKnoxSsoCookie();
     if (knoxSsoCookie.isPresent()) {
       RequestContext ctx = RequestContext.getCurrentContext();
       ctx.addZuulRequestHeader(DP_TOKEN_INFO_HEADER_KEY, knoxSsoCookie.get().getValue());
     }
   }
 
-  private Optional<Cookie> getKnoxSsoCookie() {
-    return utils.getCookie(knoxSso.getSsoCookieName());
-  }
-
-  private Object authorizeThroughBearerToken(Optional<String> bearerToken) {
+  private Object authorizeThroughDPToken(Optional<String> bearerToken) {
     try {
       Optional<User> userOptional = jwt.parseJWT(bearerToken.get());
       if (!userOptional.isPresent()) {
-        return utils.sendForbidden("User is not present in system");
+        cookieManager.deleteDataplaneJwtCookie();
+        return utils.sendForbidden("DP_JWT_COOKIE has expired or not valid");
       } else {
         User user = userOptional.get();
         setUpstreamUserContext(user);
-        setUpstreamTokenContext();
+        setUpstreamKnoxTokenContext();
+        RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, user);
         return null;
         //TODO  role check. api permission check on the specified resource.
       }

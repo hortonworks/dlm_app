@@ -7,10 +7,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.hortonworks.dataplane.gateway.domain.User;
 import com.hortonworks.dataplane.gateway.utils.GatewayKeystore;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,20 +60,25 @@ public class Jwt {
   }
 
   public Optional<User> parseJWT(String jwt) throws IOException {
-    Claims claims = Jwts.parser()
-      .setSigningKey(getVerifyingKey())
-      .parseClaimsJws(jwt).getBody();
-
-    Date expiration = claims.getExpiration();
-    if (expiration.before(new Date())) {
-      logger.debug("Token expired: " + claims.get("user"));
+    try {
+      Claims claims = Jwts.parser()
+        .setSigningKey(getVerifyingKey())
+        .parseClaimsJws(jwt).getBody();
+      Date expiration = claims.getExpiration();
+      if (expiration.before(new Date())) {
+        logger.debug("Token expired: " + claims.get("user"));
+        return Optional.absent();
+      }else{
+        String userJsonString = claims.get(USER_CLAIM).toString();
+        User user = objectMapper.readValue(userJsonString, User.class);
+        return Optional.fromNullable(user);
+      }
+    }catch (ExpiredJwtException ex){
+      logger.error("token expired",ex);
       return Optional.absent();
-    }else{
-      String userJsonString = claims.get(USER_CLAIM).toString();
-      User user = objectMapper.readValue(userJsonString, User.class);
-      return Optional.fromNullable(user);
     }
   }
+
   private Key getSigningKey() {
     return gatewayKeystore.getPrivate();
   }

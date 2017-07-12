@@ -7,6 +7,7 @@ import com.hortonworks.dataplane.gateway.domain.Constants;
 import com.hortonworks.dataplane.gateway.domain.User;
 import com.hortonworks.dataplane.gateway.domain.UserRef;
 import com.hortonworks.dataplane.gateway.service.UserService;
+import com.hortonworks.dataplane.gateway.utils.CookieManager;
 import com.hortonworks.dataplane.gateway.utils.Utils;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
@@ -31,6 +32,9 @@ public class UserDetailFilter extends ZuulFilter {
 
   @Autowired
   private Jwt jwt;
+
+  @Autowired
+  private CookieManager cookieManager;
 
   @Override
   public String filterType() {
@@ -57,12 +61,13 @@ public class UserDetailFilter extends ZuulFilter {
     try {
       User user=(User)userObj;
       List<String> roles = userService.getRoles(user.getUsername());
-      String jwtToken = this.jwt.makeJWT(user, roles);
+      String jwtToken = jwt.makeJWT(user, roles);
       UserRef userRef = userService.getUserRef(user, roles, jwtToken);//todo pass right token.
       String userRefJson=objectMapper.writeValueAsString(userRef);
       ctx.setResponseBody(userRefJson);
       ctx.setResponseStatusCode(200);
       ctx.setSendZuulResponse(false);
+     // cookieManager.addDataplaneJwtCookie(jwtToken);
       return null;
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
