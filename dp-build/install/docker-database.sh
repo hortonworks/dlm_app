@@ -7,6 +7,7 @@
 #       POSTGRES_PASSWORD: dp_admin
 #       POSTGRES_USER: dp_admin
 #       POSTGRES_DB: dataplane
+
 docker start dp-database || \
     docker run \
         --name dp-database \
