@@ -1,7 +1,6 @@
 #!/bin/sh
 set -e
 
-RELEASE_NUMBER=0.0.1
 IMAGE_PREFIX="hortonworks"
 ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service dp-gateway"
 ALL_IMAGES_OPT="all"
@@ -66,7 +65,8 @@ get_version() {
         VERSION_STRING=`cat build/dp-docker/installer/VERSION`
         echo ${VERSION_STRING}
     else
-        echo ${RELEASE_NUMBER}:"latest"
+        echo "Unable to find VERSION file."
+        exit 0
     fi
 }
 
