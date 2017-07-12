@@ -13,12 +13,12 @@
 
 docker start knox || \
     docker run \
-        –-name knox \
+        --name knox \
         --network=dp \
         --detach \
         --publish 8443:8443 \
         --env MASTER_PASSWORD \
         --env USE_TEST_LDAP \
         --env CONSUL_HOST \
-        hortonworks/dp-knox \
+        hortonworks/dp-knox:$VERSION \
         sh ./launch-knox.sh

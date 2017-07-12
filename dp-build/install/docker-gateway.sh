@@ -17,5 +17,5 @@ docker start dp-gateway || \
         --publish 8762:8762 \
         --env CONSUL_HOST \
         --mount type=bind,readonly=true,source=$(pwd)/certs,target=/usr/dp-app/conf/cert \
-        hortonworks/dp-gateway \
+        hortonworks/dp-gateway:$VERSION \
         --knox.url=https://${KNOX_FQDN}:8443

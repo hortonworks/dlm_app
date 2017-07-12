@@ -63,7 +63,7 @@ get_version() {
         echo ${VERSION_STRING}
     else
         echo "Unable to find VERSION file."
-        exit 0
+        exit 1
     fi
 }
 
