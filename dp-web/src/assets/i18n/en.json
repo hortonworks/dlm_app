@@ -62,7 +62,7 @@
         "dataplane": "Welcome to Hortonworks Data Plane. To start, please configure the LDAP properties and allow dataplane authenticate against it. Optionally, you can add Dataplane Administrators. Please proceed by clicking on GET STARTED",
         "setupAuth": "The first step is to help data plane connect to your LDAP by providing the LDAP configurations to Data plane.",
         "defineUsers": "Upon completing the LDAP configuration, you may add administrators to Data plane. You can add users to data plane and assign or modify their roles anytime through the User Management Screen.",
-        "addCluster" : "Add Ambari Managed HDP cluster to Dataplane",
+        "addCluster" : "Add Ambari Managed HDP clusters to Dataplane. Dataplane will auto-discover cluster information such as the cluster name, active services & important metrics running.",
         "setService" : "Set up services to enable Dataplane to manage your data",
         "addDataset" : "Create datasets using Dataplane Steward Studio capability"
       },
@@ -122,7 +122,7 @@
       },
       "description" :{
         "addCluster" : "Please add Ambari managed cluster to Dataplane. Dataplane will auto-discover cluster information such as the cluster name, active services & important metrics running.",
-        "datalake" : "This cluster has been indentified as a Datalake since it has data management services,  {{serviceNames}} running.",
+        "datalake" : "This cluster has been identified as a Datalake since it has data management services,  {{serviceNames}} running.",
         "clusterLocation":"Geographical location of the cluster",
         "dataCenter": "Data Center of the cluster",
         "tags" : "Tags for the cluster",

@@ -33,7 +33,7 @@ export class RbacService {
     this.personaMap.set('INFRAADMIN', [new Persona('Cluster Admin', [
       new PersonaTabs('Clusters', 'infra', 'fa-sitemap')
     ], '', 'infra-logo.png'), new Persona('Data Life cycle Manager', [], '/dlm', 'dlm-logo.png')]);
-    this.personaMap.set('INFRAADMIN_SUPERADMIN', [new Persona('Data Life cycle Manager', [], '/dlm', 'dlm-logo.png')]);
+    this.personaMap.set('INFRAADMIN_SUPERADMIN', [new Persona('DLM', [], '/dlm', 'dlm-logo.png')]);
 
     this.landingPageMap.set('SUPERADMIN', '/infra');
     this.landingPageMap.set('SUPERADMIN_ONBOARD', '/onboard/welcome');
@@ -59,7 +59,13 @@ export class RbacService {
       if (this.hasRole('SUPERADMIN')) {
         this.configService.isKnoxConfigured().subscribe(response => {
           if (response.configured) {
-            return this.getLandingInternal(observer, 'SUPERADMIN');
+            this.configService.retrieve().subscribe(({lakeWasInitialized}) => {
+              if (lakeWasInitialized) {
+                return this.getLandingInternal(observer, 'INFRAADMIN');
+              } else {
+                return this.getLandingInternal(observer, 'INFRAADMIN_ONBOARD');
+              }
+            });
           } else {
             return this.getLandingInternal(observer, 'SUPERADMIN_ONBOARD');
           }
@@ -140,7 +146,7 @@ export class RbacService {
     if (this.hasRole('INFRAADMIN') && !isSuperAdmin) {
       personas.push(...this.personaMap.get('INFRAADMIN'));
     }else if(this.hasRole('INFRAADMIN') && isSuperAdmin){
-      personas.push(...this.personaMap.get('INFRAADMIN_SUPERADM'));
+      personas.push(...this.personaMap.get('INFRAADMIN_SUPERADMIN'));
     }
     if (this.hasRole('CURATOR')) {
       personas.push(...this.personaMap.get('CURATOR'));
