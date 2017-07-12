@@ -37,7 +37,7 @@ object ResponseEntities {
 
   case class PolicyInstancesDetails(totalResults: Long, results: Long, instance: Seq[PolicyInstanceResponse])
 
-  case class PoliciesDetailResponse(name: String, `type`: String, status: String, sourceDataset: String,
+  case class PoliciesDetailResponse(policyId: String, name: String, `type`: String, status: String, sourceDataset: String,
                                     targetDataset: String, frequencyInSec: Long, sourceCluster: String,
                                     targetCluster: String, instances: Seq[PolicyInstanceResponse],
                                     startTime: Option[String], endTime: String)
