@@ -14,4 +14,4 @@ docker start dp-db-service || \
         --network=dp \
         --detach \
         --env CONSUL_HOST \
-        hortonworks/dp-db-service:0.0.1
+        hortonworks/dp-db-service:$VERSION

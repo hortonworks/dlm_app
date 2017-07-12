@@ -14,4 +14,4 @@ docker start dp-cluster-service || \
         --network=dp \
         --detach \
         --env CONSUL_HOST \
-        hortonworks/dp-cluster-service:0.0.1
+        hortonworks/dp-cluster-service:$VERSION

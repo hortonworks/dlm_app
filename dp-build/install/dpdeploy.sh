@@ -3,9 +3,124 @@ set -e
 
 CERTS_DIR=`dirname $0`/certs
 KNOX_SIGNING_CERTIFICATE=knox-signing.pem
-DEFAULT_VERSION=0.0.1
 
 export KNOX_FQDN=${KNOX_FQDN:-dataplane}
+
+############# Cleanup Dunctions ################
+cleanup_knox() {
+    echo "Cleaning up Knox: Removing certificates"
+    rm -rf ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
+}
+################################################
+
+############# Utility Functions ################
+
+read_master_password() {
+    echo "Enter Knox master password: "
+    read -s MASTER_PASSWD
+    echo "Reenter password: "
+    read -s MASTER_PASSWD_VERIFY
+    if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
+    then
+       echo "Password did not match. Reenter password:"
+       read -s MASTER_PASSWD_VERIFY
+       if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
+       then
+        echo "Password did not match"
+        exit 1
+       fi
+    fi
+    export MASTER_PASSWORD="$MASTER_PASSWD"
+}
+
+read_use_test_ldap() {
+    echo "Use pre-packaged LDAP instance (suitable only for testing) [yes/no]: "
+    read USE_TEST_LDAP
+    export USE_TEST_LDAP
+}
+
+init_knox() {
+    echo "Initializing Knox"
+    if [ "$MASTER_PASSWORD" == "" ]; then
+        read_master_password
+    fi
+    if [ "$USE_TEST_LDAP" == "" ]; then
+        read_use_test_ldap
+    fi
+
+    echo "Starting Knox first..."
+    source $(pwd)/docker-knox.sh .
+    KNOX_CONTAINER_ID=$(docker ps --all --quiet --filter "name=knox")
+    if [ -z ${KNOX_CONTAINER_ID} ]; then
+        echo "Knox container not found. Ensure it is running..."
+        return -1
+    fi
+
+    docker exec \
+        --tty \
+        ${KNOX_CONTAINER_ID} \
+        ./wait_for_keystore_file.sh
+
+    mkdir -p ${CERTS_DIR}
+    docker exec \
+        --tty \
+        ${KNOX_CONTAINER_ID} \
+        keytool \
+            -export \
+            -alias gateway-identity \
+            -storepass ${MASTER_PASSWD} \
+            -keystore /var/lib/knox/data-2.6.0.3-8/security/keystores/gateway.jks \
+            -rfc
+    if [ ${USE_TEST_LDAP} == "no" ]; then
+        docker exec \
+            --interactive \
+            --tty \
+            ${KNOX_CONTAINER_ID} \
+            ./setup_knox_sso_conf.sh
+    fi
+    echo "Knox Initialized"
+}
+
+get_bind_address_from_consul_container() {
+    CONSUL_ID=$(docker ps --all --quiet --filter "name=dp-consul-server")
+    if [ -z ${CONSUL_ID} ]; then
+        return 0
+    fi
+    CONSUL_ARGS=$(docker inspect -f {{.Args}} ${CONSUL_ID})
+    for word in $CONSUL_ARGS; do
+        if [[ $word == -bind* ]]
+        then
+            BIND_ADDR=${word##*=}
+        fi
+    done
+    export CONSUL_HOST=${BIND_ADDR};
+}
+
+read_consul_host(){
+    if [ -z "${CONSUL_HOST}" ]; then
+        get_bind_address_from_consul_container
+    fi
+    if [ -z "${CONSUL_HOST}" ]; then
+        echo "Enter the Host IP Address (Consul will bind to this host):"
+        read HOST_IP;
+        export CONSUL_HOST=$HOST_IP;
+    fi
+    echo "using CONSUL_HOST: ${CONSUL_HOST}"
+}
+
+get_version() {
+    if [ -f VERSION ]
+    then
+        VERSION_STRING=`cat ./VERSION`
+        echo ${VERSION_STRING}
+    else
+        {
+            echo "Unable to find VERSION file."
+            exit 1
+        }
+    fi
+}
+################################################
 
 init_application() {
     echo "Initializing application"
@@ -74,14 +189,6 @@ list_logs() {
     docker logs "$@"
 }
 
-print_version() {
-    if [ -f VERSION ]; then
-        cat VERSION
-    else
-        cat ${DEFAULT_VERSION}
-    fi
-}
-
 usage() {
     local tabspace=20
     echo "Usage: dpdeploy.sh <command>"
@@ -102,116 +209,12 @@ usage() {
     printf "%-${tabspace}s:%s\n" "version" "Print the version of dataplane"
 }
 
-############# Cleanup Dunctions ################
-cleanup_knox() {
-    echo "Cleaning up Knox: Removing certificates"
-    rm -rf ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
-}
-################################################
-
-############# Utility Functions ################
-
-init_knox() {
-    echo "Initializing Knox"
-    if [ "$MASTER_PASSWORD" == "" ]; then
-        read_master_password
-    fi
-    if [ "$USE_TEST_LDAP" == "" ]; then
-        read_use_test_ldap
-    fi
-
-    echo "Starting Knox first..."
-    source $(pwd)/docker-knox.sh .
-    KNOX_CONTAINER_ID=$(docker ps --all --quiet --filter "name=knox")
-    if [ -z ${KNOX_CONTAINER_ID} ]; then
-        echo "Knox container not found. Ensure it is running..."
-        return -1
-    fi
-
-    docker exec \
-        --tty \
-        ${KNOX_CONTAINER_ID} \
-        ./wait_for_keystore_file.sh
-
-    mkdir -p ${CERTS_DIR}
-    export_knox_cert ${MASTER_PASSWORD} ${KNOX_CONTAINER_ID} > ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
-    docker exec \
-        --tty \
-        ${KNOX_CONTAINER_ID} \
-        keytool \
-            -export \
-            -alias gateway-identity \
-            -storepass ${MASTER_PASSWD} \
-            -keystore /var/lib/knox/data-2.6.0.3-8/security/keystores/gateway.jks \
-            -rfc
-    if [ ${USE_TEST_LDAP} == "no" ]; then
-        docker exec \
-            --interactive \
-            --tty \
-            ${KNOX_CONTAINER_ID} \
-            ./setup_knox_sso_conf.sh
-    fi
-    echo "Knox Initialized"
+print_version() {
+    echo $(get_version)
 }
 
-get_bind_address_from_consul_container() {
-    CONSUL_ID=$(docker ps --all --quiet --filter "name=dp-consul-server")
-    if [ -z ${CONSUL_ID} ]; then
-        return 0
-    fi
-    CONSUL_ARGS=$(docker inspect -f {{.Args}} ${CONSUL_ID})
-    for word in $CONSUL_ARGS; do
-        if [[ $word == -bind* ]]
-        then
-            BIND_ADDR=${word##*=}
-        fi
-    done
-    export CONSUL_HOST=${BIND_ADDR};
-}
 
-read_consul_host(){
-    if [ -z "${CONSUL_HOST}" ]; then
-        get_bind_address_from_consul_container
-    fi
-    if [ -z "${CONSUL_HOST}" ]; then
-        echo "Enter the Host IP Address (Consul will bind to this host):"
-        read HOST_IP;
-        export CONSUL_HOST=$HOST_IP;
-    fi
-    echo "using CONSUL_HOST: ${CONSUL_HOST}"
-}
-
-read_master_password() {
-    echo "Enter Knox master password: "
-    read -s MASTER_PASSWD
-    echo "Reenter password: "
-    read -s MASTER_PASSWD_VERIFY
-    if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
-    then
-       echo "Password did not match. Reenter password:"
-       read -s MASTER_PASSWD_VERIFY
-       if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
-       then
-        echo "Password did not match"
-        exit 1
-       fi
-    fi
-    export MASTER_PASSWORD="$MASTER_PASSWD"
-}
-
-read_use_test_ldap() {
-    echo "Use pre-packaged LDAP instance (suitable only for testing) [yes/no]: "
-    read USE_TEST_LDAP
-    export USE_TEST_LDAP
-}
-
-export_knox_cert() {
-    MASTER_PASSWD=$1
-    KNOX_CONTAINER_ID=$2
-    docker exec -t ${KNOX_CONTAINER_ID} \
-        keytool -export -alias gateway-identity -storepass ${MASTER_PASSWD} -keystore /var/lib/knox/data-2.6.0.3-8/security/keystores/gateway.jks -rfc
-}
-################################################
+VERSION=$(get_version)
 
 if [ $# -lt 1 ]
 then
