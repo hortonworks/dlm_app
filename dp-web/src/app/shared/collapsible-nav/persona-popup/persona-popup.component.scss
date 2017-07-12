@@ -5,7 +5,7 @@
   top: 55px;
   left: 0;
   margin: 0;
-  padding: 40px 40px 20px;
+  padding: 40px 20px;
   background: $white;
   -webkit-box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
   -moz-box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
@@ -14,7 +14,6 @@
   visibility: hidden;
   width: auto;
   display: flex;
-  justify-content: space-between;
 
   &.showPopup {
     visibility: visible;
@@ -24,6 +23,7 @@
     display: inline-block;
     cursor: pointer;
     text-align: center;
+    margin: 0 20px;
 
     & .logo-wrapper {
       background-color: $eastern-blue;
@@ -33,13 +33,10 @@
       height: 72px;
       & + div {
         text-align: center;
-        font-size: 14px;
+        font-size: 13px;
         padding-top: 5px;
-        text-overflow: ellipsis;
-        width: 80px;
         white-space: nowrap;
-        overflow: hidden;
-        margin-bottom: 20px;
+        line-height: 1;
       }
     }
   }
