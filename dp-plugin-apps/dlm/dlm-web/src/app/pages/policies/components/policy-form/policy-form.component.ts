@@ -231,9 +231,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         });
       });
     this.sourceDatabases$ = Observable.combineLatest(this.databaseSearch$, databases$)
-      .map(([searchPattern, databases]) => {
-        return databases.filter(db => simpleSearch(db.name, searchPattern));
-      });
+      .map(([searchPattern, databases]) => databases.filter(db => simpleSearch(db.name, searchPattern)));
     this.policyForm = this.formBuilder.group({
       general: this.formBuilder.group({
         name: ['', Validators.required],
@@ -423,7 +421,6 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   validateTime = (formGroup: FormGroup) => {
-    const momentTz = this.timezone.getMomentTzByIndex(this.userTimeZone$.getValue());
     if (!(formGroup && formGroup.controls)) {
       return null;
     }
@@ -432,7 +429,21 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     const timeFieldValue = timeControl.value;
     timeControl.setErrors(null);
     if (dateFieldValue) {
-      const dateWithTime = this.setTimeForDate(dateFieldValue, timeFieldValue);
+      const mDate = moment(dateFieldValue);
+      if (this.policyForm && this.policyForm.controls['job']['controls'].unit) {
+        const jobControls = this.policyForm.controls['job']['controls'];
+        const unit = jobControls.unit.value;
+        if (unit === this.policyTimeUnits.WEEKS) {
+          const startTimeDay = mDate.day();
+          const scheduledDFay = jobControls.day.value;
+          if (scheduledDFay > startTimeDay) {
+            mDate.add(scheduledDFay - startTimeDay, 'days'); // first day will be on this week
+          } else {
+            mDate.add(7 - scheduledDFay, 'days'); // first day will be on next week
+          }
+        }
+      }
+      const dateWithTime = this.setTimeForDate(mDate.format(), timeFieldValue);
       if (dateWithTime.isBefore(moment())) {
         timeControl.setErrors({ lessThanCurrent: true });
         return null;
