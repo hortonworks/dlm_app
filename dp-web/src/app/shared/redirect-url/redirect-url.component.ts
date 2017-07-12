@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, AfterContentInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router'; 
 
 export interface RedirectUrlData {
   urlToRediect?: string;
@@ -12,7 +12,7 @@ export interface RedirectUrlData {
   templateUrl: './redirect-url.component.html'
 })
 
-export class RedirectUrlComponent implements OnInit {
+export class RedirectUrlComponent implements OnInit, AfterContentInit {
 
   data: RedirectUrlData;
 
@@ -23,7 +23,13 @@ export class RedirectUrlComponent implements OnInit {
     });
   }
 
+  ngAfterContentInit() {
+    debugger;
+  }
+
   ngOnInit() {
+    debugger;
+
     let newURL = '';
 
     let urlToRediect = this.data.urlToRediect;
