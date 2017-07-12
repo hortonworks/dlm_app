@@ -13,19 +13,19 @@ export const initialState: State = {
 
 export function reducer(state = initialState, action): State {
   switch (action.type) {
-    case fromEvent.ActionTypes.LOAD_EVENTS_SUCCESS:
+    case fromEvent.ActionTypes.LOAD_EVENTS.SUCCESS:
       return loadEventsSuccess(state, action);
-    case fromEvent.ActionTypes.LOAD_NEW_EVENTS_COUNT_SUCCESS:
+    case fromEvent.ActionTypes.LOAD_NEW_EVENTS_COUNT.SUCCESS:
       return loadNewEventsCountSuccess(state, action);
-    case fromEvent.ActionTypes.LOAD_EVENTS_FAIL:
-    case fromEvent.ActionTypes.LOAD_NEW_EVENTS_COUNT_FAIL:
+    case fromEvent.ActionTypes.LOAD_EVENTS.FAILURE:
+    case fromEvent.ActionTypes.LOAD_NEW_EVENTS_COUNT.FAILURE:
     default:
       return state;
   }
 }
 
 function loadEventsSuccess(state = initialState, action): State {
-  const events = action.payload.events;
+  const events = action.payload.response.events;
   return {
     entities: Object.assign([], state.entities, events),
     newEventsCount: state.newEventsCount
@@ -33,7 +33,7 @@ function loadEventsSuccess(state = initialState, action): State {
 }
 
 function loadNewEventsCountSuccess(state = initialState, action): State {
-  const count = action.payload.totalCount;
+  const count = action.payload.response.totalCount;
   return {
     entities: state.entities,
     newEventsCount: count
