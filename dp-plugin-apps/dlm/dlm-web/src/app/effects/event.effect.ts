@@ -12,7 +12,7 @@ export class EventEffects {
 
   @Effect()
   loadEvents$: Observable<any> = this.actions$
-    .ofType(eventActions.LOAD_EVENTS)
+    .ofType(eventActions.LOAD_EVENTS.START)
     .switchMap(() => {
       return this.eventService.getEvents()
         .map(events => loadEventsSuccess(events))
@@ -21,7 +21,7 @@ export class EventEffects {
 
   @Effect()
   loadNewEventsCount$: Observable<any> = this.actions$
-    .ofType(eventActions.LOAD_NEW_EVENTS_COUNT)
+    .ofType(eventActions.LOAD_NEW_EVENTS_COUNT.START)
     .switchMap(() => {
       return this.eventService.getNewEvents()
         .map(events => loadNewEventsCountSuccess(events))

@@ -13,12 +13,12 @@ export const initialState: State = {
 
 export function reducer(state = initialState, action): State {
   switch (action.type) {
-    case fromEvent.ActionTypes.LOAD_EVENTS_SUCCESS:
+    case fromEvent.ActionTypes.LOAD_EVENTS.SUCCESS:
       return loadEventsSuccess(state, action);
-    case fromEvent.ActionTypes.LOAD_NEW_EVENTS_COUNT_SUCCESS:
+    case fromEvent.ActionTypes.LOAD_NEW_EVENTS_COUNT.SUCCESS:
       return loadNewEventsCountSuccess(state, action);
-    case fromEvent.ActionTypes.LOAD_EVENTS_FAIL:
-    case fromEvent.ActionTypes.LOAD_NEW_EVENTS_COUNT_FAIL:
+    case fromEvent.ActionTypes.LOAD_EVENTS.FAILURE:
+    case fromEvent.ActionTypes.LOAD_NEW_EVENTS_COUNT.FAILURE:
     default:
       return state;
   }

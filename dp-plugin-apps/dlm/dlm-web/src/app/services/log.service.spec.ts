@@ -3,13 +3,16 @@ import { HttpService } from './http.service';
 import { BaseRequestOptions, ConnectionBackend, Http, RequestMethod, RequestOptions } from '@angular/http';
 import { MockBackend } from '@angular/http/testing';
 import { ReflectiveInjector } from '@angular/core';
-import { Log } from 'models/log.model';
+import { Store } from '@ngrx/store';
+import { MockStore } from 'mocks/mock-store';
+import { EntityType } from 'constants/log.constant';
 
 describe('LogService', () => {
   beforeEach(() => {
     this.injector = ReflectiveInjector.resolveAndCreate([
       {provide: ConnectionBackend, useClass: MockBackend},
       {provide: RequestOptions, useClass: BaseRequestOptions},
+      {provide: Store, useClass: MockStore},
       Http,
       HttpService,
       LogService
@@ -22,7 +25,7 @@ describe('LogService', () => {
 
   describe('#fetchLogs', () => {
     beforeEach(() => {
-      this.logService.getLogs(1, 1);
+      this.logService.getLogs(1, '1', EntityType.policy);
     });
     it('should do GET request', () => {
       expect(this.lastConnection.request.method).toBe(RequestMethod.Get);

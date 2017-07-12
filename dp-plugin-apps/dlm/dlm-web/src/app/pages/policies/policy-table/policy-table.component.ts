@@ -28,6 +28,8 @@ import { getDatabase } from 'selectors/hive.selector';
 import { HiveService } from 'services/hive.service';
 import { POLICY_STATUS } from 'constants/status.constant';
 import { POLL_INTERVAL } from 'constants/api.constant';
+import { LogService } from 'services/log.service';
+import { EntityType } from 'constants/log.constant';
 
 @Component({
   selector: 'dlm-policy-table',
@@ -86,7 +88,8 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   rowActions = <ActionItemType[]>[
     {label: 'Delete', name: 'DELETE', disabledFor: ''},
     {label: 'Suspend', name: 'SUSPEND', disabledFor: 'SUSPENDED'},
-    {label: 'Activate', name: 'ACTIVATE', disabledFor: 'RUNNING'}
+    {label: 'Activate', name: 'ACTIVATE', disabledFor: 'RUNNING'},
+    {label: 'View Log', name: 'LOG', disabledFor: ''}
   ];
 
   private initPolling() {
@@ -101,7 +104,10 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     this.subscriptions.push(polling$.subscribe());
   }
 
-  constructor(private t: TranslateService, private store: Store<fromRoot.State>, private hiveService: HiveService) {
+  constructor(private t: TranslateService,
+              private store: Store<fromRoot.State>,
+              private hiveService: HiveService,
+              private logService: LogService) {
     this.jobs$ = store.select(getAllJobs);
     this.filteredJobs$ = Observable.combineLatest(this.jobs$, this.selectedPolicy$).map(([jobs, selectedPolicy]) => {
       return selectedPolicy ? jobs.filter(job => job.name === selectedPolicy.id) : [];
@@ -198,10 +204,14 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   /**
    * Show confirmation modal before do action for selected policy
    */
-  handleSelectedAction({policy, action}) {
+  handleSelectedAction({row, action}) {
     this.selectedAction = action;
-    this.selectedForActionRow = policy;
-    this.showActionConfirmationModal = true;
+    this.selectedForActionRow = row;
+    if (action.name === 'LOG') {
+      this.logService.showLog(EntityType.policy, row.id);
+    } else {
+      this.showActionConfirmationModal = true;
+    }
   }
 
   onActionConfirmation() {
