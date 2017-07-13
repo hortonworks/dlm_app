@@ -127,7 +127,7 @@
                       <dlm-select-field formField formControlName="repeatMode" [options]="repeatOptions" [value]="repeatOption">
                       </dlm-select-field>
                     </div>
-                    <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-md-1">
+                    <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-md-1" [class.has-error]="policyForm.get('job').get('frequency').touched && policyForm.get('job').get('frequency').invalid">
                       <input type="text" class="form-control" placeholder="Freq" formField formControlName="frequency" />
                     </div>
                     <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-md-2">
@@ -144,6 +144,13 @@
                                             [type]="'buttons'" (change)="handleDayChange($event)"></dlm-radio-button>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col col-md-5 col-md-offset-2">
+                      <dlm-field-error *ngIf="policyForm.get('job').get('frequency').touched && policyForm.get('job').get('frequency').hasError('required')">
+                        {{'forms.validation_errors.required' | translate:freqRequired}}
+                      </dlm-field-error>
                     </div>
                   </div>
                 </div>
