@@ -38,11 +38,11 @@ export class PolicyEffects {
         .mergeMap(response => [
           createPolicySuccess(response, payload.meta),
           go(['/policies']),
-          this.notificationService.create(<ToastNotification>{
+          Observable.of(this.notificationService.create(<ToastNotification>{
             title: this.t.instant('page.policies.success.title'),
             body: this.t.instant('page.policies.success.body', {policyName: payload.policy.policyDefinition.name}),
             type: NOTIFICATION_TYPES.SUCCESS
-          })
+          }))
         ])
         .catch(err => Observable.of(createPolicyFail(err.json(), payload.meta)));
     });
