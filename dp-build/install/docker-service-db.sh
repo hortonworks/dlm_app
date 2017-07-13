@@ -10,7 +10,7 @@
 
 docker start dp-db-service || \
     docker run \
-        --name dp-db-service
+        --name dp-db-service \
         --network=dp \
         --detach \
         --env CONSUL_HOST \

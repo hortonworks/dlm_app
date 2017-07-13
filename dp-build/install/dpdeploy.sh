@@ -74,7 +74,7 @@ init_knox() {
             -alias gateway-identity \
             -storepass ${MASTER_PASSWD} \
             -keystore /var/lib/knox/data-2.6.0.3-8/security/keystores/gateway.jks \
-            -rfc
+            -rfc > ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
     if [ ${USE_TEST_LDAP} == "no" ]; then
         docker exec \
             --interactive \
@@ -83,6 +83,12 @@ init_knox() {
             ./setup_knox_sso_conf.sh
     fi
     echo "Knox Initialized"
+
+    echo "Stopping Knox (until start)"
+    docker container stop knox
+
+    echo "Stopping Consul (until start)"
+    docker container stop dp-consul-server
 }
 
 get_bind_address_from_consul_container() {
@@ -121,12 +127,29 @@ get_version() {
         { echo "Unable to find VERSION file."; exit 1; }
     fi
 }
+
+init_network() {
+    NETWORK_ID=$(docker network ls --quiet --filter "name=dp")
+    if [ -z ${NETWORK_ID} ]; then
+        echo "Network dp not found. Creating new network with name dp."
+        docker network create dp
+    else
+        echo "Network dp already exists. Destroying all containers on network dp."
+        CONTAINER_LIST=$(docker ps --all --quiet --filter "network=dp")
+        if [[ $(echo $CONTAINER_LIST) ]]; then
+            docker rm  --force $CONTAINER_LIST
+        fi
+    fi
+}
 ################################################
 
 init_application() {
     echo "Initializing application"
 
-    echo "Configuring Consul"
+    echo "Configuring network"
+    init_network
+
+    echo "Reading Consul"
     read_consul_host
 
     echo "Configuring Knox"
@@ -134,9 +157,15 @@ init_application() {
 
     echo "Configuring Database (schema)"
     reset_schema
+
+    echo "Stopping Database (until start)"
 }
 
 start_application() {
+
+    echo "Reading Consul"
+    read_consul_host
+
     echo "Starting Consul"
     source $(pwd)/docker-consul.sh .
 
@@ -161,6 +190,7 @@ start_application() {
 }
 
 stop_application() {
+    # TODO individual
     docker stop $(docker ps --all --quiet --filter "network=dp")
 }
 
@@ -173,17 +203,24 @@ destroy_application() {
 
     # finally cleanup
     cleanup_knox
+
+    # destroy network dp
+    # TODO
 }
 
 reset_schema() {
     # start database container
     source $(pwd)/docker-database.sh .
+
+    # wait for database start
+    sleep 5
+
     # start flyway container and trigger migrate script
     source $(pwd)/docker-migrate.sh .
 }
 
 ps() {
-    docker ps --filter "network=dp"
+    docker ps --filter "network=dp" --filter "name=dp-consul-server"
 }
 
 list_logs() {

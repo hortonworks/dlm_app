@@ -11,10 +11,10 @@
 
 docker start dp-app || \
     docker run \
-        --name dp-app
+        --name dp-app \
         --network=dp \
         --detach \
-        --publish 80:80
+        --publish 80:80 \
         --env CONSUL_HOST \
         --env DP_APP_HOME=/usr/dp-app \
         --mount type=bind,readonly=true,source=$(pwd)/certs,target=/usr/dp-app/conf/cert \

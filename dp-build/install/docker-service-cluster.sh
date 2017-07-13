@@ -10,7 +10,7 @@
 
 docker start dp-cluster-service || \
     docker run \
-        --name dp-cluster-service
+        --name dp-cluster-service \
         --network=dp \
         --detach \
         --env CONSUL_HOST \
