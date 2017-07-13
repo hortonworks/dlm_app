@@ -8,7 +8,7 @@
 #     environment:
 #         CONSUL_HOST: ${CONSUL_HOST}
 
-docker start dp-db-service || \
+docker start dp-db-service >> install.log 2>&1 || \
     docker run \
         --name dp-db-service \
         --network=dp \

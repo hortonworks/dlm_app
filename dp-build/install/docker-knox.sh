@@ -11,7 +11,7 @@
 #      - CONSUL_HOST
 #     command: sh ./launch-knox.sh
 
-docker start knox || \
+docker start knox >> install.log 2>&1 || \
     docker run \
         --name knox \
         --network=dp \

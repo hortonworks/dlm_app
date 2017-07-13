@@ -5,7 +5,7 @@
 #     command: agent -server -bootstrap -bind=${CONSUL_HOST} -client=${CONSUL_HOST} -ui
 #     command: agent -server -ui -bind=172.19.0.2 -client=172.19.0.2 -bootstrap-expect=1
 
-docker start dp-consul-server || \
+docker start dp-consul-server >> install.log 2>&1 || \
     docker run \
         --name dp-consul-server \
         --network=host \

@@ -3,14 +3,14 @@
 #     image: hortonworks/dp-app
 #     ports:
 #         - "80:80"
-#         - not required > in dockerfile
+#         - required > in dockerfile
 #     volumes:
 #         - ./certs:/usr/dp-app/conf/cert
 #     environment:
 #         DP_APP_HOME: "/usr/dp-app"
 #         CONSUL_HOST: ${CONSUL_HOST}
 
-docker start dp-app || \
+docker start dp-app >> install.log 2>&1 || \
     docker run \
         --name dp-app \
         --network=dp \

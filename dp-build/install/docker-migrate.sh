@@ -11,7 +11,7 @@
 #         - dp-database
 #     command: -configFile=/dbscripts/flyway-docker.conf clean migrate
 
-docker start dp-migrate || \
+docker start dp-migrate >> install.log 2>&1 || \
     docker run \
         --name dp-migrate \
         --network=dp \

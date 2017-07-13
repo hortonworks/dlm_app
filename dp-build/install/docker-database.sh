@@ -8,7 +8,7 @@
 #       POSTGRES_USER: dp_admin
 #       POSTGRES_DB: dataplane
 
-docker start dp-database || \
+docker start dp-database >> install.log 2>&1 || \
     docker run \
         --name dp-database \
         --network=dp \

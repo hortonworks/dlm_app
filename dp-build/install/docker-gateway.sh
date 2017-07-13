@@ -10,7 +10,7 @@
 #       CONSUL_HOST: ${CONSUL_HOST}
 #     command: --knox.url=https://${KNOX_FQDN}:8443
 
-docker start dp-gateway || \
+docker start dp-gateway >> install.log 2>&1 || \
     docker run \
         --name dp-gateway \
         --network=dp \
