@@ -12,12 +12,13 @@ init_network() {
     if [ -z ${NETWORK_ID} ]; then
         echo "Network dp not found. Creating new network with name dp."
         docker network create dp
-    else
-        echo "Network dp already exists. Destroying all containers on network dp."
-        CONTAINER_LIST=$(docker ps --all --quiet --filter "network=dp")
-        if [[ $(echo $CONTAINER_LIST) ]]; then
-            docker rm  --force $CONTAINER_LIST
-        fi
+    # This is not a clean solution and will be fixed later
+    # else
+    #     echo "Network dp already exists. Destroying all containers on network dp."
+    #     CONTAINER_LIST=$(docker ps --all --quiet --filter "network=dp")
+    #     if [[ $(echo $CONTAINER_LIST) ]]; then
+    #         docker rm  --force $CONTAINER_LIST
+    #     fi
     fi
 }
 
@@ -247,6 +248,7 @@ usage() {
 }
 
 VERSION=$(print_version)
+init_network
 
 if [ $# -lt 1 ]
 then
