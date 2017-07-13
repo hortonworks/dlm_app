@@ -3,9 +3,9 @@ set -e
 
 CERTS_DIR=`dirname $0`/certs
 KNOX_SIGNING_CERTIFICATE=knox-signing.pem
+# CONSUL_HOST=dp-consul-server
 
 export KNOX_FQDN=${KNOX_FQDN:-dataplane}
-
 ############# Cleanup Dunctions ################
 cleanup_knox() {
     echo "Cleaning up Knox: Removing certificates"
@@ -48,8 +48,12 @@ init_knox() {
         read_use_test_ldap
     fi
 
-    echo "Starting Knox first..."
+    echo "Starting Consul first..."
+    source $(pwd)/docker-consul.sh .
+
+    echo "Then starting Knox..."
     source $(pwd)/docker-knox.sh .
+
     KNOX_CONTAINER_ID=$(docker ps --all --quiet --filter "name=knox")
     if [ -z ${KNOX_CONTAINER_ID} ]; then
         echo "Knox container not found. Ensure it is running..."
@@ -114,10 +118,7 @@ get_version() {
         VERSION_STRING=`cat ./VERSION`
         echo ${VERSION_STRING}
     else
-        {
-            echo "Unable to find VERSION file."
-            exit 1
-        }
+        { echo "Unable to find VERSION file."; exit 1; }
     fi
 }
 ################################################
