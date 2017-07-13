@@ -54,6 +54,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   databaseListGroup: FormGroup;
   _pairings$: BehaviorSubject<Pairing[]> = new BehaviorSubject([]);
   _sourceClusterId$: BehaviorSubject<number> = new BehaviorSubject(0);
+  freqRequired = {fieldLabel: 'Frequency'};
   get datePickerOptions(): IMyOptions {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
@@ -435,11 +436,11 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         const unit = jobControls.unit.value;
         if (unit === this.policyTimeUnits.WEEKS) {
           const startTimeDay = mDate.day();
-          const scheduledDFay = jobControls.day.value;
-          if (scheduledDFay > startTimeDay) {
-            mDate.add(scheduledDFay - startTimeDay, 'days'); // first day will be on this week
+          const scheduledDay = jobControls.day.value;
+          if (scheduledDay > startTimeDay) {
+            mDate.add(scheduledDay - startTimeDay, 'days'); // first day will be on this week
           } else {
-            mDate.add(7 - scheduledDFay, 'days'); // first day will be on next week
+            mDate.add(7 - scheduledDay, 'days'); // first day will be on next week
           }
         }
       }
