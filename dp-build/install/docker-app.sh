@@ -18,4 +18,4 @@ docker start dp-app || \
         --env CONSUL_HOST \
         --env DP_APP_HOME=/usr/dp-app \
         --mount type=bind,readonly=true,source=$(pwd)/certs,target=/usr/dp-app/conf/cert \
-        hortonworks/dp-db-service:$VERSION
+        hortonworks/dp-app:$VERSION
