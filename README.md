@@ -11,7 +11,7 @@
   * `sudo yum install sbt`
 * Nodejs 6.10.0 or above. To get Nodejs on Linux, you can follow instructions here: https://nodejs.org/en/download/package-manager/#enterprise-linux-and-fedora
 * [Yarn](https://yarnpkg.com) package manager (`npm install --global yarn`)
-* docker-machine (tested with 0.7.0), docker (tested with 1.8.0), docker-compose (tested with 1.7.1)
+* docker-machine (tested with 0.7.0), docker (tested with 1.8.0)
 * Centos 7 or Mac OSX are tested platforms
 
 ## Build
@@ -25,7 +25,7 @@
 
 * Ensure the steps in Build section above are followed.
 * We can use docker to bring up the application without requiring to install other runtime dependencies like Postgres, NGinx etc. Follow these steps to bring up the docker containers.
-* A utility script has been provided in the `dp-build/build/dp-docker/installer` folder called `dpdeploy.sh` to help with this. This wraps around docker-compose commands and aims to provide a simpler interface.
+* A utility script has been provided in the `dp-build/build/dp-docker/installer` folder called `dpdeploy.sh` to help with this. This wraps around docker commands and aims to provide a simpler interface.
 * There is a certain sequence to follow to bring up the application, as detailed below. All commands need to be executed from the dp-build folder.
 * For a fresh setup:
   * Initialize the Postgres database: `./dpdeploy.sh init db`
