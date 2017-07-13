@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
 import java.io.IOException;
-import java.util.Date;
 
 import static com.hortonworks.dataplane.gateway.domain.Constants.*;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
@@ -150,9 +149,14 @@ public class TokenCheckFilter extends ZuulFilter {
     return KNOX_LOGIN_PATH.equals(ctx.getRequest().getServletPath());
   }
 
-  private boolean isLogoutPath() {
+  private boolean isKnoxLogoutPath() {
     RequestContext ctx = RequestContext.getCurrentContext();
     return KNOX_LOGOUT_PATH.equals(ctx.getRequest().getServletPath());
+  }
+
+  private boolean isLogoutPath() {
+    RequestContext ctx = RequestContext.getCurrentContext();
+    return LOGOUT_PATH.equals(ctx.getRequest().getServletPath());
   }
 
   private Object redirectToKnox(RequestContext ctx) {
