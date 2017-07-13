@@ -39,6 +39,8 @@ import {RbacService} from './services/rbac.service';
 import {AuthErrorComponent} from './shared/auth-error/auth-error.component';
 import {NavigationGuard} from './shared/utils/navigation-guard';
 
+import {JwtHelper} from 'angular2-jwt';
+
 export function HttpLoaderFactory(http: Http) {
   return new TranslateHttpLoader(http);
 }
@@ -94,7 +96,9 @@ export function HttpLoaderFactory(http: Http) {
     NotSignedInForUnsecureGuard,
     DoCleanUpAndRedirectGuard,
     LandingPageGuard,
-    NavigationGuard
+    NavigationGuard,
+
+    JwtHelper
   ]
 })
 export class AppModule {

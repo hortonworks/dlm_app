@@ -20,7 +20,7 @@ public class TokenInfo {
 
   private boolean isExpired(Date expiration) {
     if (expiration==null){
-      return true;//if expiration is null, it means infinite validity
+      return false;//if expiration is null, it means infinite validity
     }
     return expiration.before(new Date());
   }

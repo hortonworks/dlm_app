@@ -17,8 +17,7 @@ export class HttpUtil {
 
   public static handleError(error: any) {
     if (error.status === 401) {
-      localStorage.removeItem('dp_user');
-      window.location.replace(window.location.origin + '/sign-in#SESSEXPIRED');
+     // window.location.replace(window.location.origin + '/sign-in#SESSEXPIRED');
       return Observable.throw(error);
     }
 

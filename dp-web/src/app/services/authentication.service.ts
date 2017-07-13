@@ -7,40 +7,30 @@ import {HttpUtil} from '../shared/utils/httpUtil';
 import {Credential} from '../models/credential';
 import {User} from '../models/user';
 import {Subject} from 'rxjs/Subject';
-
+import {JwtHelper} from 'angular2-jwt';
 
 @Injectable()
 export class AuthenticationService {
   private URI: string = 'auth';
   private isUserAuthenticated: boolean = false;
   private ssoCheckCookieName = 'sso_login_valid';
+  private jwtHelper: JwtHelper = new JwtHelper();
 
   userAuthenticated = new Subject<boolean>();
   userAuthenticated$ = this.userAuthenticated.asObservable();
 
   constructor(private http: Http) {
-    this.isUserAuthenticated = !!localStorage.getItem('dp_user');
+    this.isUserAuthenticated = this.getCookie('dp_jwt') && !this.jwtHelper.isTokenExpired(this.getCookie('dp_jwt'));
   }
 
-  isAuthenticated() : Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      if(this.isUserAuthenticated){
-        this.userAuthenticated.next();
-        resolve(true);
-      }else{
-        this.http.get("/auth/userDetail")
-          .map(HttpUtil.extractData)
-          .subscribe(
-            (user: User) => {
-              this.isUserAuthenticated = true;
-              this.setUser(user);
-              //TODO setup the landing page which determines the target page when first time user logs in ...
-              resolve(true);
-            }, () => {
-              reject(false)
-            }
-          );
+  isAuthenticated() : Observable<boolean> {
+    return Observable.create(observer =>{
+      if(!this.getCookie('dp_jwt')){
+        observer.next(false);
+        observer.complete();
+        return;
       }
+      observer.next(!this.jwtHelper.isTokenExpired(this.getCookie('dp_jwt')))
     });
   }
 
@@ -96,19 +86,7 @@ export class AuthenticationService {
   }
 
   signOut() {
-    return new Promise<boolean>((resolve, reject) => {
-      if (this.isKnoxSSOLoggedIn()) {
-        this.deleteCookie(this.ssoCheckCookieName);
-        this.http.get('/auth/signOutThrougKnox').map(() => {
-          this.removeUser();
-          this.isUserAuthenticated = false;
-          resolve(true)
-        }).subscribe();
-      } else {
-        this.removeUser();
-        this.isUserAuthenticated = false;
-        resolve(true)
-      }
-    });
+   window.location.href = '/auth/signOut';
+   return Observable.of(true);
   }
 }

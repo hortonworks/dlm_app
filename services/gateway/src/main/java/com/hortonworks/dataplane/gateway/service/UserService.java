@@ -88,6 +88,7 @@ public class UserService {
     user.setUsername(userRef.getUsername());
     user.setAvatar(userRef.getAvatar());
     user.setDisplayname(userRef.getDisplay());
+    user.setPassword("******");
     return user;
   }
 }

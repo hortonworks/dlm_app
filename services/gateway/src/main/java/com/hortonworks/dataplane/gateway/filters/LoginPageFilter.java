@@ -50,6 +50,7 @@ public class LoginPageFilter extends ZuulFilter {
       //user is already logged in.
       try {
         ctx.getResponse().sendRedirect("/");
+        return null;
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
@@ -59,6 +60,7 @@ public class LoginPageFilter extends ZuulFilter {
       String knoxRedirectUrl=knoxSso.getLoginUrl(landingPage);
       try {
         ctx.getResponse().sendRedirect(knoxRedirectUrl);
+        return null;
       } catch (IOException e) {
         throw new RuntimeException(e);
       }

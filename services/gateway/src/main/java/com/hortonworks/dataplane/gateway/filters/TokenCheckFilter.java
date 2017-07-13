@@ -76,7 +76,7 @@ public class TokenCheckFilter extends ZuulFilter {
     return (serviceId.equals(Constants.DPAPP) || serviceId.equals(Constants.DLMAPP)) &&
       !(ctx.getRequest().getServletPath().equals(AUTH_ENTRY_POINT)
       || ctx.getRequest().getServletPath().equals(KNOX_CONFIG_PATH)
-      || ctx.getRequest().getServletPath().equals(LOGIN_POINT)
+
       );
 
   }
@@ -104,9 +104,15 @@ public class TokenCheckFilter extends ZuulFilter {
 
   private Object doLogout() {
     //TODO call knox gateway to invalidate token in knox gateway server.
+    RequestContext ctx = RequestContext.getCurrentContext();
     cookieManager.deleteKnoxSsoCookie();
     cookieManager.deleteSsoValidCookie();
     cookieManager.deleteDataplaneJwtCookie();
+    try{
+      ctx.getResponse().sendRedirect("/");
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
     //Note. UI should handle redirect.
     return null;
   }

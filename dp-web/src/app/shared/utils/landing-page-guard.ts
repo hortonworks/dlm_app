@@ -18,34 +18,21 @@ export class LandingPageGuard implements CanActivate {
 
   canActivate() {
     return Observable.create(observer => {
-      var isAuthenticated = this.authenticationService.isAuthenticated()
-        .then(() => {
-          this.rbacService.getLandingPage().subscribe(landingPage => {
-            this.redirect(observer, true, landingPage);
-          });
-          // this.configService.isKnoxConfigured().subscribe(response => {
-          //   if (!response.isConfigured) {
-          //     this.redirect(observer, true, '/onboard/welcome');
-          //   } else {
-          //     this.configService.retrieve().subscribe(({lakeWasInitialized}) => {
-          //       if (lakeWasInitialized) {
-          //         this.redirect(observer, true, '/infra');
-          //       } else {
-          //         this.redirect(observer, true, '/onboard');
-          //       }
-          //     }, error => {
-          //       this.authenticationService.redirectToSignIn();
-          //     });
-          //   }
-          // }, ldapError => {
-          //   this.redirect(observer, false);
-          //   this.authenticationService.redirectToSignIn();
-          // });
-        })
-        .catch(() => {
+        this.authenticationService.isAuthenticated()
+        .subscribe(isAuthenticated => {
+          if(isAuthenticated){
+            this.rbacService.getLandingPage().subscribe(landingPage => {
+              this.redirect(observer, true, landingPage);
+            });
+          }else{
+            this.redirect(observer, false);
+            this.authenticationService.redirectToSignIn();
+          }
+        }, error => {
           this.redirect(observer, false);
           this.authenticationService.redirectToSignIn();
         })
+
     });
   }
 
