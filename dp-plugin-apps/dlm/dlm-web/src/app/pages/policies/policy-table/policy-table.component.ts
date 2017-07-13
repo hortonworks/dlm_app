@@ -110,7 +110,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
               private logService: LogService) {
     this.jobs$ = store.select(getAllJobs);
     this.filteredJobs$ = Observable.combineLatest(this.jobs$, this.selectedPolicy$).map(([jobs, selectedPolicy]) => {
-      return selectedPolicy ? jobs.filter(job => job.name === selectedPolicy.id) : [];
+      return selectedPolicy ? jobs.filter(job => job.policyId === selectedPolicy.id) : [];
     });
     this.policyDatabase$ = this.selectedPolicy$
       .filter(policy => !!this.clusterByName(policy.sourceCluster))

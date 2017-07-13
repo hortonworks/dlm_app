@@ -23,7 +23,7 @@ export const getAllPoliciesWithClusters = createSelector(getAllPolicies, getAllC
 
 export const getPolicyClusterJob = createSelector(getAllPoliciesWithClusters, getAllJobs, (policies, jobs) => {
   return policies.map(policy => {
-    let policyJobs = jobs.filter(job => job.name === policy.id);
+    let policyJobs = jobs.filter(job => job.policyId === policy.id);
     policyJobs = policyJobs.length ? policyJobs : policy.jobs || [];
     const jobsResource = sortByDateField(policyJobs, 'startTime');
     const lastJobResource = jobsResource.length ? jobsResource[0] : null;
