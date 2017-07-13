@@ -1,14 +1,20 @@
 package com.hortonworks.dataplane.cs
 
+import javax.inject.Named
+
 import akka.actor.ActorSystem
+import akka.http.scaladsl.{Http, HttpsConnectionContext}
 import akka.stream.ActorMaterializer
-import com.google.inject.{AbstractModule, Provides, Singleton}
+import com.google.inject.{AbstractModule, Provider, Provides, Singleton}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
+import com.hortonworks.dataplane.cs.utils.SSLUtils.DPKeystore
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.http.{ProxyServer, Webserver}
 import com.hortonworks.dataplane.http.routes.{AmbariRoute, AtlasRoute, HdpRoute, StatusRoute}
 import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.sslconfig.akka.AkkaSSLConfig
+import com.typesafe.sslconfig.ssl.{TrustManagerConfig, TrustStoreConfig}
 import org.asynchttpclient.DefaultAsyncHttpClientConfig
 import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcWSClient
@@ -16,9 +22,26 @@ import play.api.libs.ws.ahc.AhcWSClient
 object AppModule extends AbstractModule {
 
   override def configure() = {
+    bind(classOf[DPKeystore]).asEagerSingleton()
     bind(classOf[Config]).toInstance(ConfigFactory.load())
     bind(classOf[ActorSystem]).toInstance(ActorSystem("cluster-service"))
 
+  }
+
+  @Provides
+  @Named("connectionContext")
+  def provideSSlConfig(implicit actorSystem: ActorSystem,
+                       materializer: ActorMaterializer,
+                       config: Config,
+                       dPKeystore: DPKeystore): HttpsConnectionContext = {
+    // provides a custom ssl config with the dp keystore
+    val c  =  AkkaSSLConfig().mapSettings(
+      s =>
+        s.withDisabledKeyAlgorithms(scala.collection.immutable.Seq("RSA keySize < 1024")).withTrustManagerConfig(
+          TrustManagerConfig().withTrustStoreConfigs(
+            scala.collection.immutable.Seq(TrustStoreConfig(None, Some(dPKeystore.getKeyStoreFilePath))))))
+    val dpCtx = Http().createClientHttpsContext(c)
+    dpCtx
   }
 
   @Provides
@@ -88,20 +111,21 @@ object AppModule extends AbstractModule {
                           wSClient: WSClient,
                           config: Config): ClusterDataApi = {
     new ClusterDataApi(actorSystem,
-                        materializer,
-                        storageInterface,
-                        clusterComponentService,
-                        clusterHostsService,
-                        dpClusterService,
-                        clusterService,
-                        wSClient,
-                        config)
+                       materializer,
+                       storageInterface,
+                       clusterComponentService,
+                       clusterHostsService,
+                       dpClusterService,
+                       clusterService,
+                       wSClient,
+                       config)
   }
 
   @Provides
   @Singleton
-  def provideAtlasRoute(config: Config,atlasApiData: ClusterDataApi): AtlasRoute = {
-    AtlasRoute(config,atlasApiData)
+  def provideAtlasRoute(config: Config,
+                        atlasApiData: ClusterDataApi): AtlasRoute = {
+    AtlasRoute(config, atlasApiData)
   }
 
   @Provides
@@ -135,15 +159,20 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def provideHdpProxyRoute(actorSystem: ActorSystem,actorMaterializer: ActorMaterializer,clusterData: ClusterDataApi,config: Config): HdpRoute = {
-      new HdpRoute(actorSystem,actorMaterializer,clusterData,config)
+  def provideHdpProxyRoute(actorSystem: ActorSystem,
+                           actorMaterializer: ActorMaterializer,
+                           clusterData: ClusterDataApi,
+                           config: Config,@Named ("connectionContext") sslContext:Provider[HttpsConnectionContext],dPKeystore: DPKeystore): HdpRoute = {
+    new HdpRoute(actorSystem, actorMaterializer, clusterData, sslContext,config,dPKeystore)
   }
 
   @Provides
   @Singleton
   def provideHdpProxyServer(actorSystem: ActorSystem,
-                            materializer: ActorMaterializer,config: Config,hdpRoute: HdpRoute):ProxyServer = {
-    new ProxyServer(actorSystem,materializer,config,hdpRoute.proxy)
+                            materializer: ActorMaterializer,
+                            config: Config,
+                            hdpRoute: HdpRoute): ProxyServer = {
+    new ProxyServer(actorSystem, materializer, config, hdpRoute.proxy)
   }
 
   @Provides

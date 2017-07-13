@@ -1,10 +1,10 @@
 package com.hortonworks.dataplane.http.routes
 
 import java.net.URL
-import javax.inject.Inject
+import javax.inject.{Inject, Named}
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.Http
+import akka.http.scaladsl.{Http, HttpsConnectionContext}
 import akka.http.scaladsl.model.HttpHeader.ParsingResult
 import akka.http.scaladsl.model.headers.Cookie
 import akka.http.scaladsl.model.{HttpHeader, HttpRequest, Uri}
@@ -12,15 +12,19 @@ import akka.http.scaladsl.server.{Route, RouteResult, ValidationRejection}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import com.google.common.cache.{CacheBuilder, CacheLoader}
+import com.google.inject.Provider
 import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
 import com.hortonworks.dataplane.cs.ClusterDataApi
+import com.hortonworks.dataplane.cs.utils.SSLUtils
+import com.hortonworks.dataplane.cs.utils.SSLUtils.DPKeystore
 import com.hortonworks.dataplane.http.BaseRoute
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import play.api.libs.json.Json
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success, Try}
 
 /**
   * This route enables other services to talk to other HDP http services
@@ -40,7 +44,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class HdpRoute @Inject()(private val actorSystem: ActorSystem,
                          private val actorMaterializer: ActorMaterializer,
                          private val clusterData: ClusterDataApi,
-                         config: Config)
+                         private val sslContext: Provider[HttpsConnectionContext],
+                         private val config: Config,dPKeystore: DPKeystore)
     extends BaseRoute {
 
   private implicit val system = actorSystem
@@ -186,8 +191,18 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
               log.info(s"Opening connection to ${targetUrl.getHost}:${targetUrl.getPort}")
               log.info(s"The forwarded request is $target, path $targetPath")
 
-              val flow = if(shouldUseKnox(jwtToken, url)) Http(system)
-                .outgoingConnectionHttps(targetUrl.getHost, targetUrl.getPort)
+
+
+              val flow = if(shouldUseKnox(jwtToken, url)) {
+                // set up cert chain
+                Try(dPKeystore.storeCertificate(targetUrl)) match {
+                  case Success(_) => log.info("Certificate extracted from knox and saved")
+                  case Failure(e) => log.warn("Certificate installation failed, add the certificate to the dp keystore manually",e)
+                }
+
+                Http(system)
+                  .outgoingConnectionHttps(targetUrl.getHost, targetUrl.getPort, sslContext.get())
+              }
               else Http(system)
                 .outgoingConnection(targetUrl.getHost, targetUrl.getPort)
               val handler = Source
