@@ -129,7 +129,7 @@ public class TokenCheckFilter extends ZuulFilter {
         cookieManager.setSsoValidCookie();
         UserRef userRef=userService.getUserRef(user.get());
         try {
-          String jwtToken = jwt.makeJWT(user.get(),userRef.getRoles());
+          String jwtToken = jwt.makeJWT(userRef);
           cookieManager.addDataplaneJwtCookie(jwtToken,tokenInfo.getExpiryTime());
         } catch (JsonProcessingException e) {
           throw new RuntimeException(e);
@@ -189,12 +189,13 @@ public class TokenCheckFilter extends ZuulFilter {
 
   private Object authorizeThroughDPToken(Optional<String> bearerToken) {
     try {
-      Optional<User> userOptional = jwt.parseJWT(bearerToken.get());
-      if (!userOptional.isPresent()) {
+      Optional<UserRef> userRefOptional = jwt.parseJWT(bearerToken.get());
+      if (!userRefOptional.isPresent()) {
         cookieManager.deleteDataplaneJwtCookie();
         return utils.sendForbidden("DP_JWT_COOKIE has expired or not valid");
       } else {
-        User user = userOptional.get();
+        UserRef userRef = userRefOptional.get();
+        User user=userService.getUserFromUserRef(userRef);
         setUpstreamUserContext(user);
         setUpstreamKnoxTokenContext();
         RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, user);

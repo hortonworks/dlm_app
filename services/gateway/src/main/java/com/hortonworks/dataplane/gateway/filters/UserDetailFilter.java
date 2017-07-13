@@ -61,8 +61,9 @@ public class UserDetailFilter extends ZuulFilter {
     try {
       User user=(User)userObj;
       List<String> roles = userService.getRoles(user.getUsername());
-      String jwtToken = jwt.makeJWT(user, roles);
-      UserRef userRef = userService.getUserRef(user, roles, jwtToken);//todo pass right token.
+      UserRef userRef = userService.getUserRef(user, roles,null);///todo pass right token
+      String jwtToken = jwt.makeJWT(userRef);
+      userRef.setToken(jwtToken);
       String userRefJson=objectMapper.writeValueAsString(userRef);
       ctx.setResponseBody(userRefJson);
       ctx.setResponseStatusCode(200);

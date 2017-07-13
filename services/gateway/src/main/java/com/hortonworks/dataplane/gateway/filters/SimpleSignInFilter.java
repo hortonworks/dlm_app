@@ -87,7 +87,7 @@ public class SimpleSignInFilter extends ZuulFilter {
       if (userRefOpt.isPresent()){
         // Construct a JWT token
         UserRef userRef=userRefOpt.get();
-        String jwtToken = jwt.makeJWT(user.get(),userRef.getRoles());
+        String jwtToken = jwt.makeJWT(userRef);
         userRef.setToken(jwtToken);
         ctx.setResponseStatusCode(200);
         ctx.setResponseBody(objectMapper.writeValueAsString(userRef));

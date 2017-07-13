@@ -70,7 +70,8 @@ public class UserService {
 
   public UserRef getUserRef(User user, List<String> roles, String token) {
     UserRef userRef = new UserRef();
-    userRef.setId(user.getUsername());
+    userRef.setId(user.getId());//TODO currently id is username. check later
+    userRef.setUsername(user.getUsername());
     userRef.setAvatar(user.getAvatar());
     userRef.setDisplay(user.getDisplayname());
     try {
@@ -80,5 +81,13 @@ public class UserService {
     }
     userRef.setToken(token);
     return userRef;
+  }
+  public User getUserFromUserRef(UserRef userRef){
+    User user=new User();
+    user.setId(userRef.getId());
+    user.setUsername(userRef.getUsername());
+    user.setAvatar(userRef.getAvatar());
+    user.setDisplayname(userRef.getDisplay());
+    return user;
   }
 }
