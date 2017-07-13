@@ -7,6 +7,20 @@ DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 export KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
+init_network() {
+    NETWORK_ID=$(docker network ls --quiet --filter "name=dp")
+    if [ -z ${NETWORK_ID} ]; then
+        echo "Network dp not found. Creating new network with name dp."
+        docker network create dp
+    else
+        echo "Network dp already exists. Destroying all containers on network dp."
+        CONTAINER_LIST=$(docker ps --all --quiet --filter "network=dp")
+        if [[ $(echo $CONTAINER_LIST) ]]; then
+            docker rm  --force $CONTAINER_LIST
+        fi
+    fi
+}
+
 get_bind_address_from_consul_container() {
     CONSUL_ID=$(docker ps -af 'name=consul' -q)
     if [ -z ${CONSUL_ID} ]; then
@@ -216,7 +230,7 @@ print_version() {
 usage() {
     local tabspace=20
     echo "Usage: dpdeploy.sh <command>"
-    printf "%-${tabspace}s:%s\n" "Commands" "init [db|knox|app] | migrate | ps | logs [db|all] | start [knox]| stop [knox] | destroy [knox]"
+    printf "%-${tabspace}s:%s\n" "Commands" "init [db|knox|app] | migrate | ps | logs [container id|name] | start [knox]| stop [knox] | destroy [knox]"
     printf "%-${tabspace}s:%s\n" "init db" "Initialize postgres DB for first time"
     printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox and Consul containers"
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
@@ -231,6 +245,8 @@ usage() {
     printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox and Consul containers and remove them. Needs to start from init knox again"
     printf "%-${tabspace}s:%s\n" "version" "Print the version of dataplane"
 }
+
+VERSION=$(print_version)
 
 if [ $# -lt 1 ]
 then
