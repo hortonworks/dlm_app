@@ -11,6 +11,10 @@ import { getAllPairings } from 'selectors/pairing.selector';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { ClusterPairing } from 'models/cluster-pairing.model';
+import { getMergedProgress } from 'selectors/progress.selector';
+import { ProgressState } from 'models/progress-state.model';
+
+const PAIRINGS_REQUEST = '[PAIRING_PAGE] PAIRINGS_REQUEST';
 
 @Component({
   selector: 'dlm-pairings',
@@ -21,6 +25,7 @@ export class PairingsComponent implements OnInit {
 
   @ViewChild('confirmationModal') public confirmationModel: ModalDialogComponent;
   pairings$: Observable<Pairing[]>;
+  overallProgress$: Observable<ProgressState>;
   private unpairParams: Array<Object>;
 
   static getBeaconUrl(cluster: Cluster | ClusterPairing): string {
@@ -42,10 +47,11 @@ export class PairingsComponent implements OnInit {
     private translate: TranslateService
   ) {
     this.pairings$ = store.select(getAllPairings);
+    this.overallProgress$ = store.select(getMergedProgress(PAIRINGS_REQUEST));
   }
 
   ngOnInit() {
-    this.store.dispatch(loadPairings());
+    this.store.dispatch(loadPairings(PAIRINGS_REQUEST));
   }
 
   createPairingClickHandler() {
