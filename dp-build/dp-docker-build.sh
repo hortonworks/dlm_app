@@ -37,12 +37,8 @@ push_images() {
     then
         for img in ${ALL_IMAGES}
         do
-            push_one_image ${IMAGE_PREFIX}/${img} ${VERSION}
-            if [ $? -ne 0 ]
-            then
+            push_one_image ${IMAGE_PREFIX}/${img} ${VERSION} || \
                 echo "Failed pushing image ${img}, exiting. Verify if you have logged in to docker-hub with a valid account."
-                return -1
-            fi
         done
     else
         push_one_image $1 ${VERSION}
@@ -73,12 +69,8 @@ save_images() {
     then
         for img in ${ALL_IMAGES}
         do
-            save_one_image ${img} ${IMAGE_PREFIX}/${img} ${VERSION}
-            if [ $? -ne 0 ]
-            then
+            save_one_image ${img} ${IMAGE_PREFIX}/${img} ${VERSION} || \
                 echo "Failed saving image ${img}, exiting. Verify if the image has been built."
-                return -1
-            fi
         done
     else
         save_one_image $1 ${IMAGE_PREFIX}/${1} ${VERSION}
