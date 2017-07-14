@@ -17,7 +17,7 @@ import com.google.inject.Provider
 import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
 import com.hortonworks.dataplane.cs.ClusterDataApi
-import com.hortonworks.dataplane.cs.utils.SSLUtils.DPKeystore
+import com.hortonworks.dataplane.cs.utils.SSLUtils.DPTrustStore
 import com.hortonworks.dataplane.http.BaseRoute
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
@@ -34,9 +34,6 @@ import scala.util.{Failure, Success}
   *
   * /cluster/:cluster_id/service/:service_name/<path>
   *
-  * supported service names are defined as a list in the config key
-  * dp.services.cluster.proxy.supported.services
-  *
   * @param actorSystem
   * @param actorMaterializer
   * @param clusterData
@@ -45,7 +42,7 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
                          private val actorMaterializer: ActorMaterializer,
                          private val clusterData: ClusterDataApi,
                          private val sslContext: Provider[HttpsConnectionContext],
-                         private val config: Config,dPKeystore: DPKeystore)
+                         private val config: Config,dPKeystore: DPTrustStore)
     extends BaseRoute {
 
   private implicit val system = actorSystem
@@ -56,11 +53,6 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
 
   private lazy val serviceRoutes =
     CacheBuilder.newBuilder().build(new KnoxGatewayCacheLoader(clusterData))
-
-  import scala.collection.JavaConverters._
-
-  private val serviceMap =
-    config.getStringList("dp.services.knox.gateway.services").asScala.toSet
 
   private lazy val pathRegex =
     """(\/cluster\/)(\d+)(\/service\/)(\w+)\/(.*)""".r
@@ -107,11 +99,6 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
           val targetPath = matched.group(5)
           log.info(s"path $targetPath")
 
-          // log a warning
-          if (!serviceMap.contains(service)) {
-            log.warn(
-              s"the service $service is not configured to be proxied, the call will probably fail!!")
-          }
 
           /*
            * Load the knox URL

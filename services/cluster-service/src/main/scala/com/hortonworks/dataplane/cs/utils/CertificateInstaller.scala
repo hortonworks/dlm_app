@@ -37,8 +37,13 @@ class CertificateInstaller(keyStore: KeyStore,
     val socket = socketFactory
       .createSocket(url.getHost, url.getPort)
       .asInstanceOf[SSLSocket]
-    socket.startHandshake
-    socket.close()
+    try {
+      log.info("Starting SSL handshake")
+      socket.startHandshake()
+    } finally {
+      log.info("Closing SSL socket")
+      socket.close()
+    }
 
     val chain = tm.chain
     val option = chain.find(c => c.isInstanceOf[X509Certificate])
@@ -48,12 +53,15 @@ class CertificateInstaller(keyStore: KeyStore,
       log.debug(s"Certificate - $cert")
       keyStore.setCertificateEntry(url.getHost, cert.get)
       val out = new FileOutputStream(keystoreFile)
-      keyStore.store(out, pass.toCharArray)
-      out.close()
+      try {
+        keyStore.store(out, pass.toCharArray)
+      } finally {
+        out.close()
+      }
 
     } else {
       log.info(
-        "No X509 certificate from server, downlaod the certificate and install it at the DP keystore")
+        "No X509 certificate from server, download the certificate and install it at the DP keystore")
     }
 
   }

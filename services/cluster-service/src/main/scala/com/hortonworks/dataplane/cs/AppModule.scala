@@ -7,7 +7,7 @@ import akka.http.scaladsl.{Http, HttpsConnectionContext}
 import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provider, Provides, Singleton}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
-import com.hortonworks.dataplane.cs.utils.SSLUtils.DPKeystore
+import com.hortonworks.dataplane.cs.utils.SSLUtils.DPTrustStore
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.http.{ProxyServer, Webserver}
@@ -22,7 +22,7 @@ import play.api.libs.ws.ahc.AhcWSClient
 object AppModule extends AbstractModule {
 
   override def configure() = {
-    bind(classOf[DPKeystore]).asEagerSingleton()
+    bind(classOf[DPTrustStore]).asEagerSingleton()
     bind(classOf[Config]).toInstance(ConfigFactory.load())
     bind(classOf[ActorSystem]).toInstance(ActorSystem("cluster-service"))
 
@@ -30,10 +30,10 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Named("connectionContext")
-  def provideSSlConfig(implicit actorSystem: ActorSystem,
+  def provideSSLConfig(implicit actorSystem: ActorSystem,
                        materializer: ActorMaterializer,
                        config: Config,
-                       dPKeystore: DPKeystore): HttpsConnectionContext = {
+                       dPKeystore: DPTrustStore): HttpsConnectionContext = {
     // provides a custom ssl config with the dp keystore
     val c  =  AkkaSSLConfig().mapSettings(
       s =>
@@ -162,7 +162,7 @@ object AppModule extends AbstractModule {
   def provideHdpProxyRoute(actorSystem: ActorSystem,
                            actorMaterializer: ActorMaterializer,
                            clusterData: ClusterDataApi,
-                           config: Config,@Named ("connectionContext") sslContext:Provider[HttpsConnectionContext],dPKeystore: DPKeystore): HdpRoute = {
+                           config: Config,@Named ("connectionContext") sslContext:Provider[HttpsConnectionContext],dPKeystore: DPTrustStore): HdpRoute = {
     new HdpRoute(actorSystem, actorMaterializer, clusterData, sslContext,config,dPKeystore)
   }
 
