@@ -1,14 +1,15 @@
 package com.hortonworks.dataplane.http.routes
 
 import java.net.URL
-import javax.inject.{Inject, Named}
+import java.util.concurrent.atomic.AtomicReference
+import javax.inject.Inject
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.{Http, HttpsConnectionContext}
 import akka.http.scaladsl.model.HttpHeader.ParsingResult
 import akka.http.scaladsl.model.headers.Cookie
 import akka.http.scaladsl.model.{HttpHeader, HttpRequest, Uri}
 import akka.http.scaladsl.server.{Route, RouteResult, ValidationRejection}
+import akka.http.scaladsl.{Http, HttpsConnectionContext}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import com.google.common.cache.{CacheBuilder, CacheLoader}
@@ -16,7 +17,6 @@ import com.google.inject.Provider
 import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
 import com.hortonworks.dataplane.cs.ClusterDataApi
-import com.hortonworks.dataplane.cs.utils.SSLUtils
 import com.hortonworks.dataplane.cs.utils.SSLUtils.DPKeystore
 import com.hortonworks.dataplane.http.BaseRoute
 import com.typesafe.config.Config
@@ -24,7 +24,7 @@ import com.typesafe.scalalogging.Logger
 import play.api.libs.json.Json
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 /**
   * This route enables other services to talk to other HDP http services
@@ -68,6 +68,8 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
   def valid(request: HttpRequest): Boolean = {
     pathRegex.pattern.matcher(request.uri.path.toString()).matches()
   }
+
+  private lazy val sslConnectionContext = new AtomicReference[HttpsConnectionContext](sslContext.get())
 
   import com.hortonworks.dataplane.http.JsonSupport._
 
@@ -195,13 +197,20 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
 
               val flow = if(shouldUseKnox(jwtToken, url)) {
                 // set up cert chain
-                Try(dPKeystore.storeCertificate(targetUrl)) match {
-                  case Success(_) => log.info("Certificate extracted from knox and saved")
-                  case Failure(e) => log.warn("Certificate installation failed, add the certificate to the dp keystore manually",e)
+                dPKeystore.storeCertificate(targetUrl) match {
+                  case Success(status) =>
+                    if (status) {
+                      log.info(s"Certificate for ${targetUrl.getHost} was saved")
+                      log.info("reloading SSL context")
+                      sslConnectionContext.set(sslContext.get())
+                    } else {
+                      log.info(s"The certificate for ${targetUrl.getHost} is already in the keystore")
+                    }
+                  case Failure(e) => log.warn(s"The certificate for ${targetUrl.getHost} was not updated",e)
                 }
 
                 Http(system)
-                  .outgoingConnectionHttps(targetUrl.getHost, targetUrl.getPort, sslContext.get())
+                  .outgoingConnectionHttps(targetUrl.getHost, targetUrl.getPort, sslConnectionContext.get())
               }
               else Http(system)
                 .outgoingConnection(targetUrl.getHost, targetUrl.getPort)

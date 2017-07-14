@@ -30,7 +30,7 @@ object SSLUtils {
     // construct a keystore
     import java.security.KeyStore
 
-    // The private keystore
+    // The private keystore handle
     val keyStore = KeyStore.getInstance(KeyStore.getDefaultType)
     private val keyStoreFileHandle = new File(dir,keystoreName)
 
@@ -46,7 +46,7 @@ object SSLUtils {
       stream.close()
 
       //add a default certificate
-      val st = asStream
+      val st = certAsStream
       import java.security.cert.CertificateFactory
       val cf = CertificateFactory.getInstance("X.509")
       val certs = cf.generateCertificate(st)
@@ -58,20 +58,17 @@ object SSLUtils {
 
     }
 
-    val installer = new CertificateInstaller(keyStore,keystorePass,keyStoreFileHandle)
+    private val installer = new CertificateInstaller(keyStore,keystorePass,keyStoreFileHandle)
 
 
     import java.io.{ByteArrayInputStream, IOException}
 
     @throws[IOException]
-    private def asStream = {
+    private def certAsStream = {
       import com.google.common.io.ByteStreams
       val bytes = ByteStreams.toByteArray(this.getClass.getClassLoader.getResourceAsStream("hw.crt"))
-      val bais = new ByteArrayInputStream(bytes)
-      bais
+      new ByteArrayInputStream(bytes)
     }
-
-
 
 
     // make sure we close everything on shutdown
@@ -84,9 +81,13 @@ object SSLUtils {
       keyStoreFileHandle.getAbsolutePath
     }
 
-    def storeCertificate(url: URL) = {
-        if(installer.shouldSave(url))
-        installer.saveCert(url)
+    def storeCertificate(url: URL):Try[Boolean] = {
+      Try {
+        if (installer.shouldSave(url)) {
+          installer.saveCert(url)
+          true
+        } else false
+      }
     }
   }
 }
