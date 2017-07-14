@@ -6,6 +6,7 @@ import com.google.common.base.Supplier
 import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery, Entity}
 import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.commons.domain.Entities.{HJwtToken, ClusterService => CS}
+import com.hortonworks.dataplane.cs.ClusterDataApi
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import org.apache.atlas.AtlasClientV2
@@ -41,7 +42,7 @@ object ClientExtension {
 
 class DefaultAtlasInterface(private val clusterId: Long,
                             private val config: Config,
-                            private val atlasApiData: AtlasApiData)
+                            private val atlasApiData: ClusterDataApi)
     extends AtlasInterface {
 
   import scala.collection.JavaConverters._
@@ -185,7 +186,7 @@ class DefaultAtlasInterface(private val clusterId: Long,
 
 sealed class AtlasApiSupplier(clusterId: Long,
                               config: Config,
-                              atlasApiData: AtlasApiData)
+                              atlasApiData: ClusterDataApi)
     extends Supplier[Future[ClientWrapper]] {
   private val log = Logger(classOf[AtlasApiSupplier])
 

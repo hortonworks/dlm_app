@@ -18,4 +18,6 @@ trait BaseRoute {
 
   def notFound = Json.obj("error" -> Json.obj("message" -> "Not found", "trace" -> ""))
 
+  def badRequest = Json.obj("error" -> Json.obj("message" -> "BadRequest", "trace" -> ""))
+
 }

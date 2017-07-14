@@ -5,8 +5,8 @@ import java.util.Optional
 
 import com.google.inject.Guice
 import com.hortonworks.datapalane.consul._
-import com.hortonworks.dataplane.http.Webserver
-import com.typesafe.config.Config
+import com.hortonworks.dataplane.http.{ProxyServer, Webserver}
+import com.typesafe.config.{Config, ConfigFactory}
 import play.api.Logger
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -21,20 +21,28 @@ object ClusterService extends App {
   private val clusterSync = injector.getInstance(classOf[ClusterSync])
   private val configuration = injector.getInstance(classOf[Config])
 
-  logger.info(
-    s"Starting a server on ${configuration.getInt("dp.services.cluster.http.port")}")
   private val server = injector.getInstance(classOf[Webserver])
 
   private val serverState = server.init
 
+  private val proxy = injector.getInstance(classOf[ProxyServer])
+  proxy.init.onComplete { _ =>
+    logger.info("Proxy server started, Setting up service registry")
+    // load the proxy configuration
+    val proxyConfig = configuration.getConfig("dp.services.hdp.proxy")
 
-  logger.info("Starting cluster sync")
+    val registrar = new ApplicationRegistrar(
+      proxyConfig,
+      Optional.of(getProxyHook)
+    )
+    registrar.initialize()
 
-  // Try to register the service on consul
-  serverState.onComplete { s =>
+  }
+
+  serverState.onComplete { _ =>
     logger.info("Web service started, Setting up service registry")
     val hook = getHook
-    val registrar = new ApplicationRegistrar(configuration,Optional.of(hook))
+    val registrar = new ApplicationRegistrar(configuration, Optional.of(hook))
     registrar.initialize()
   }
 
@@ -48,42 +56,74 @@ object ClusterService extends App {
         logger.info(s"Registered service $dpService")
         // Service registered now, override the db service endpoint
         val config = configuration.getConfig("dp.services.db")
-        val map = new util.HashMap[String,String]()
-        map.put("dp.services.db.service.uri",config.getString("service.path"))
-        val gateway = new Gateway(configuration,map,Optional.of(this))
+        val map = new util.HashMap[String, String]()
+        map.put("dp.services.db.service.uri", config.getString("service.path"))
+        val gateway = new Gateway(configuration, map, Optional.of(this))
         gateway.initialize()
 
       }
 
-
       override def gatewayDiscovered(zuulServer: ZuulServer): Unit = {
-      logger.info(s"Gateway Discovered - $zuulServer")
+        logger.info(s"Gateway Discovered - $zuulServer")
         tryStartClusterSync
       }
 
-
       private def tryStartClusterSync = {
         if (Try(configuration.getBoolean("dp.services.cluster.run.jobs"))
-          .getOrElse(false)) {
+              .getOrElse(false)) {
           clusterSync.initialize
         }
       }
 
-      override def gatewayDiscoverFailure(message: String, th: Throwable): Unit  = {
-        logger.warn(message,th)
+      override def gatewayDiscoverFailure(message: String,
+                                          th: Throwable): Unit = {
+        logger.warn(message, th)
         tryStartClusterSync
       }
 
-      override def serviceRegistrationFailure(serviceId: String, th: Throwable) = {
-        logger.warn(s"Service registration failed for $serviceId",th)
+      override def serviceRegistrationFailure(serviceId: String,
+                                              th: Throwable) = {
+        logger.warn(s"Service registration failed for $serviceId", th)
         tryStartClusterSync
       }
 
-      override def onServiceDeRegister(serviceId: String): Unit = logger.info(s"Service removed from consul $serviceId")
+      override def onServiceDeRegister(serviceId: String): Unit =
+        logger.info(s"Service removed from consul $serviceId")
 
-      override def onRecoverableException(reason: String, th: Throwable): Unit = logger.warn(reason)
+      override def onRecoverableException(reason: String,
+                                          th: Throwable): Unit =
+        logger.warn(reason)
 
-      override def onServiceCheck(serviceId: String): Unit = logger.debug("Running a service check for serviceId "+serviceId)
+      override def onServiceCheck(serviceId: String): Unit =
+        logger.debug(s"Running a service check for serviceId $serviceId")
     }
   }
+
+  // Try to register the service on consul
+  private def getProxyHook = {
+    new ConsulHook {
+      override def gatewayDiscoverFailure(message: String,
+                                          th: Throwable): Unit = ???
+
+      override def onServiceRegistration(dpService: DpService): Unit =
+        logger.info(s"Service registered $dpService")
+
+      override def onRecoverableException(reason: String,
+                                          th: Throwable): Unit =
+        logger.info(s"Recovered from $reason")
+
+      override def onServiceDeRegister(serviceId: String): Unit =
+        logger.info(s"Service removed $serviceId")
+
+      override def gatewayDiscovered(zuulServer: ZuulServer): Unit = ???
+
+      override def onServiceCheck(serviceId: String): Unit =
+        logger.debug(s"Running a service check for serviceId $serviceId")
+
+      override def serviceRegistrationFailure(serviceId: String,
+                                              th: Throwable): Unit =
+        logger.warn(s"Service registration failed for $serviceId", th)
+    }
+  }
+
 }

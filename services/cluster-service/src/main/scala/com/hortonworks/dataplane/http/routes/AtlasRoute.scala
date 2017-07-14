@@ -9,7 +9,8 @@ import com.google.common.base.Supplier
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
-import com.hortonworks.dataplane.cs.atlas.{AtlasApiData, AtlasInterface, DefaultAtlasInterface}
+import com.hortonworks.dataplane.cs.ClusterDataApi
+import com.hortonworks.dataplane.cs.atlas.{AtlasInterface, DefaultAtlasInterface}
 import com.hortonworks.dataplane.cs.atlas.AtlasInterface
 import com.hortonworks.dataplane.http.BaseRoute
 import com.typesafe.config.Config
@@ -22,7 +23,7 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
 @Singleton
-class AtlasRoute @Inject()(private val config: Config,private val atlasApiData: AtlasApiData)
+class AtlasRoute @Inject()(private val config: Config,private val atlasApiData: ClusterDataApi)
     extends BaseRoute {
 
   import com.hortonworks.dataplane.commons.domain.Atlas._
@@ -174,13 +175,13 @@ class AtlasRoute @Inject()(private val config: Config,private val atlasApiData: 
 
 
 object AtlasRoute {
-  def apply(config: Config,atlasApiData: AtlasApiData): AtlasRoute =
+  def apply(config: Config,atlasApiData: ClusterDataApi): AtlasRoute =
     new AtlasRoute(config,atlasApiData)
 }
 
 private[http] class AtlasInterfaceSupplier(
     clusterId: Long,
-    config: Config,atlasApiData:AtlasApiData)
+    config: Config,atlasApiData:ClusterDataApi)
     extends Supplier[AtlasInterface] {
 
   override def get(): AtlasInterface = {
