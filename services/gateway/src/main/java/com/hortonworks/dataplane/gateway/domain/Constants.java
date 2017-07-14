@@ -8,7 +8,7 @@ public interface Constants {
     String DP_TOKEN_INFO_HEADER_KEY = "X-DP-Token-Info";
     String SSO_CHECK_COOKIE_NAME="sso_login_valid";
     String KNOX_LOGIN_PATH =DPAPP_BASE_PATH+ "/auth/signInThrougKnox";
-    String KNOX_LOGOUT_PATH =DPAPP_BASE_PATH+"/auth/signOutThrougKnox";
+
     String LOGOUT_PATH =DPAPP_BASE_PATH+"/auth/signOut";
     String AUTHORIZATION_HEADER = "Authorization";
     String USER_CTX_KEY = "user_ctx";
