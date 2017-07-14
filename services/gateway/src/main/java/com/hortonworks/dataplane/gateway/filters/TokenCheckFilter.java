@@ -7,7 +7,7 @@ import com.google.common.base.Optional;
 import com.hortonworks.dataplane.gateway.domain.TokenInfo;
 import com.hortonworks.dataplane.gateway.domain.User;
 import com.hortonworks.dataplane.gateway.domain.UserRef;
-import com.hortonworks.dataplane.gateway.service.Jwt;
+import com.hortonworks.dataplane.gateway.utils.Jwt;
 import com.hortonworks.dataplane.gateway.service.UserService;
 import com.hortonworks.dataplane.gateway.utils.CookieManager;
 import com.hortonworks.dataplane.gateway.utils.KnoxSso;

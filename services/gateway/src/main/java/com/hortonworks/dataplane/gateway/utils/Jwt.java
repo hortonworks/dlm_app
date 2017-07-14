@@ -1,4 +1,4 @@
-package com.hortonworks.dataplane.gateway.service;
+package com.hortonworks.dataplane.gateway.utils;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.hortonworks.dataplane.gateway.domain.UserRef;
-import com.hortonworks.dataplane.gateway.utils.GatewayKeystore;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +21,7 @@ import java.util.Map;
 public class Jwt {
   private static final Logger logger = LoggerFactory.getLogger(Jwt.class);
   public static final String USER_CLAIM = "user";
-  public static final String ROLES_CLAIM="roles";
-
+  
   private ObjectMapper objectMapper = new ObjectMapper();
   private static SignatureAlgorithm sa = SignatureAlgorithm.RS256;
   private static String issuer = "data_plane";
