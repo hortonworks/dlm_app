@@ -23,12 +23,17 @@ public class RequestResponseUtils {
   }
 
   private String getRootPath() {
-    String realHost = getRequestHost();
-    if (realHost!=null){
-      return String.format("http://%s/",realHost);
+    if (isRequestFromProxy()){
+      return String.format("http://%s/",getRequestHost());
     }else{
       return "/";
     }
+  }
+  private boolean isRequestFromProxy(){
+    //currently check ngnix.
+    RequestContext ctx = RequestContext.getCurrentContext();
+    String realHost= ctx.getRequest().getHeader("X-Forwarded-Host");
+    return realHost!=null;
   }
 
   private String getRequestHost() {
