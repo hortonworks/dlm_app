@@ -11,6 +11,7 @@ import {Loader, LoaderStatus} from './shared/utils/loader';
 import {RbacService} from './services/rbac.service';
 import {AuthenticationService} from './services/authentication.service';
 import {NavigationStart, Router} from '@angular/router';
+import {AuthUtils} from './shared/utils/auth-utils';
 
 export enum ViewPaneState {
   MAXIMISE, MINIMISE
@@ -28,6 +29,8 @@ export class AppComponent implements OnInit, AfterViewChecked {
   viewPaneState = ViewPaneState.MAXIMISE;
   headerData: HeaderData = new HeaderData();
   showLoader: LoaderStatus;
+ user: User;
+  isUserSignedIn = false;
 
   constructor(private mdlService: MdlService,
               private identityService: IdentityService,
@@ -35,24 +38,17 @@ export class AppComponent implements OnInit, AfterViewChecked {
               private collapsibleNavService: CollapsibleNavService,
               private rbacService: RbacService,
               private authenticationService: AuthenticationService,
-              private router: Router,
               private cdRef: ChangeDetectorRef) {
     translateService.setTranslation('en', require('../assets/i18n/en.json'));
     translateService.setDefaultLang('en');
     translateService.use('en');
   }
 
-  getUser(): User {
-    return this.identityService.getUser();
-  }
-
-  isUserSignedIn(): boolean {
-    return this.identityService.isUserAuthenticated();
-  }
-
   ngOnInit() {
     this.authenticationService.userAuthenticated$.subscribe(() => {
-        this.setHeaderData();
+      this.isUserSignedIn = true;
+      this.setHeaderData();
+      this.user = AuthUtils.getUser();
     });
 
     this.collapsibleNavService.collpaseSideNav$.subscribe(collapsed => {
@@ -63,6 +59,7 @@ export class AppComponent implements OnInit, AfterViewChecked {
       this.showLoader = status
     });
   }
+
   ngAfterViewChecked() {
     this.cdRef.detectChanges();
   }

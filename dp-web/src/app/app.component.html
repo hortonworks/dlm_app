@@ -1,8 +1,8 @@
-<dp-collapsible-nav mdl *ngIf="isUserSignedIn()" [headerData]="headerData"> </dp-collapsible-nav>
-<main [ngClass]="{'main': isUserSignedIn(),
+<dp-collapsible-nav mdl *ngIf="isUserSignedIn" [headerData]="headerData"> </dp-collapsible-nav>
+<main [ngClass]="{'main': isUserSignedIn,
                   'maximised': viewPaneStates.MAXIMISE  === viewPaneState,
                   'minimized': viewPaneStates.MINIMISE === viewPaneState}">
-  <dp-header mdl *ngIf="isUserSignedIn()" [user]="getUser()"> </dp-header>
+  <dp-header mdl *ngIf="isUserSignedIn" [user]="user"> </dp-header>
   <div mdl class="page-content">
     <dp-loader *ngIf="showLoader"></dp-loader>
     <router-outlet></router-outlet>

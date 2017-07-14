@@ -4,6 +4,9 @@ import {Persona, PersonaTabs} from '../models/header-data';
 import {Observable} from 'rxjs/Observable';
 import {ConfigurationService} from './configuration.service';
 import {Observer} from 'rxjs/Observer';
+import {User} from '../models/user';
+import {AuthenticationService} from './authentication.service';
+import {AuthUtils} from '../shared/utils/auth-utils';
 
 @Injectable()
 export class RbacService {
@@ -12,7 +15,7 @@ export class RbacService {
   private landingPageMap = new Map();
   private nonPersonaRoutesMap = new Map();
 
-  constructor(private identityService: IdentityService, private configService: ConfigurationService) {
+  constructor(private configService: ConfigurationService) {
     this.personaMap.set('SUPERADMIN', [
       new Persona('Admin', [
         new PersonaTabs('Clusters', 'infra', 'fa-sitemap'),
@@ -46,7 +49,10 @@ export class RbacService {
     this.nonPersonaRoutesMap.set('INFRAADMIN', ['/onboard']);
     this.nonPersonaRoutesMap.set('CURATOR', []);
     this.nonPersonaRoutesMap.set('USER', []);
+  }
 
+  get user() {
+    return AuthUtils.getUser()
   }
 
   private getLandingInternal(observer: Observer<string>, key: String) {
@@ -92,10 +98,6 @@ export class RbacService {
   private hasRole(userRole) {
     let roles = this.user.roles;
     return roles.find(role => role === userRole);
-  }
-
-  get user() {
-    return this.identityService.getUser();
   }
 
   isAuthorized(route: string): boolean {
@@ -145,7 +147,7 @@ export class RbacService {
     }
     if (this.hasRole('INFRAADMIN') && !isSuperAdmin) {
       personas.push(...this.personaMap.get('INFRAADMIN'));
-    }else if(this.hasRole('INFRAADMIN') && isSuperAdmin){
+    } else if (this.hasRole('INFRAADMIN') && isSuperAdmin) {
       personas.push(...this.personaMap.get('INFRAADMIN_SUPERADMIN'));
     }
     if (this.hasRole('CURATOR')) {
