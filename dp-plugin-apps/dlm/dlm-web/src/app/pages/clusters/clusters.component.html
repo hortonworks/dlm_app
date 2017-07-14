@@ -4,27 +4,29 @@
     <dp-map [mapSize]="mapSize" [mapData]="mapData$ | async"></dp-map>
   </div>
 </div>
-<div class="row page-section">
-  <div class="col-md-12">
-    <div class="pull-right">
-      <dlm-add-entity-button
-        [canAddPolicy]="(resourceAvailability$ | async)?.canAddPolicy"
-        [canAddPairing]="(resourceAvailability$ | async)?.canAddPairing">
-      </dlm-add-entity-button>
-    </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-12">
-    <div *ngIf="(tableData$ | async)?.length > 0; else noClusters">
-      <dlm-cluster-list [clusters]="tableData$ | async"></dlm-cluster-list>
-    </div>
-    <ng-template #noClusters>
-      <div>
-        <div class="alert alert-warning" role="alert">
-          {{ "page.pairings.create.content.no_clusters" | translate }}
-        </div>
+<dlm-progress-container [progressState]="overallProgress$ | async">
+  <div class="row page-section">
+    <div class="col-md-12">
+      <div class="pull-right">
+        <dlm-add-entity-button
+          [canAddPolicy]="(resourceAvailability$ | async)?.canAddPolicy"
+          [canAddPairing]="(resourceAvailability$ | async)?.canAddPairing">
+        </dlm-add-entity-button>
       </div>
-    </ng-template>
+    </div>
   </div>
-</div>
+  <div class="row">
+    <div class="col-md-12">
+      <div *ngIf="(tableData$ | async)?.length > 0; else noClusters">
+        <dlm-cluster-list [clusters]="tableData$ | async"></dlm-cluster-list>
+      </div>
+      <ng-template #noClusters>
+        <div>
+          <div class="alert alert-warning" role="alert">
+            {{ "page.pairings.create.content.no_clusters" | translate }}
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</dlm-progress-container>

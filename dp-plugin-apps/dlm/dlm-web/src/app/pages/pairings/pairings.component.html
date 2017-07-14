@@ -8,48 +8,52 @@
   </div>
   <div class="col-md-4">
     <div class="pull-right page-section">
-      <button type="button" class="btn btn-primary" (click)="createPairingClickHandler()">{{ "page.pairings.create_button_text" | translate }}</button>
+      <button type="button" class="btn btn-primary" (click)="createPairingClickHandler()">{{
+        "page.pairings.create_button_text" | translate }}
+      </button>
     </div>
   </div>
 </div>
-<div class="content page-section">
-  <div *ngIf="(pairings$ | async)?.length > 0; else noPairs">
-    <div class="row">
-      <div class="col-md-8 col-sm-11 col-lg-6">
-        <div class="header-container">
-          <div class="row content-row">
-            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-5 col text-center">
-              <div class="h6">{{ "page.pairings.content.header.first_cluster" | translate }}</div>
-            </div>
-            <div class="col-md-1 col-sm-1 col-lg-1 col-xs-1 col text-center">
-              <div class="h6">{{ "page.pairings.content.header.status" | translate }}</div>
-            </div>
-            <div class="col-md-5 col-sm-5 col-lg-5 col-xs-5 col second-cluster text-center">
-              <div class="h6">{{ "page.pairings.content.header.second_cluster" | translate }}</div>
-            </div>
-            <div class="col-md-1 col-sm-1 col-lg-1 col-xs-1 col unpair text-center">
-              <div class="h6">{{ "page.pairings.content.header.unpair" | translate }}</div>
+<dlm-progress-container [progressState]="overallProgress$ | async">
+  <div class="content page-section">
+    <div *ngIf="(pairings$ | async)?.length > 0; else noPairs">
+      <div class="row">
+        <div class="col-md-8 col-sm-11 col-lg-6">
+          <div class="header-container">
+            <div class="row content-row">
+              <div class="col-md-5 col-sm-5 col-lg-5 col-xs-5 col text-center">
+                <div class="h6">{{ "page.pairings.content.header.first_cluster" | translate }}</div>
+              </div>
+              <div class="col-md-1 col-sm-1 col-lg-1 col-xs-1 col text-center">
+                <div class="h6">{{ "page.pairings.content.header.status" | translate }}</div>
+              </div>
+              <div class="col-md-5 col-sm-5 col-lg-5 col-xs-5 col second-cluster text-center">
+                <div class="h6">{{ "page.pairings.content.header.second_cluster" | translate }}</div>
+              </div>
+              <div class="col-md-1 col-sm-1 col-lg-1 col-xs-1 col unpair text-center">
+                <div class="h6">{{ "page.pairings.content.header.unpair" | translate }}</div>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row pairings-container">
-          <dlm-pairing-card-list [pairings]="pairings$ | async" (onUnpair)="onUnpair($event)"></dlm-pairing-card-list>
+          <div class="row pairings-container">
+            <dlm-pairing-card-list [pairings]="pairings$ | async" (onUnpair)="onUnpair($event)"></dlm-pairing-card-list>
+          </div>
         </div>
       </div>
     </div>
+    <ng-template #noPairs>
+      <div class="alert alert-warning" role="alert">
+        {{ "page.pairings.content.no_pairs" | translate}}
+        <button type="button" class="btn btn-primary" (click)="createPairingClickHandler()">
+          {{ "page.pairings.create_button_text" | translate }}
+        </button>
+      </div>
+    </ng-template>
   </div>
-  <ng-template #noPairs>
-    <div class="alert alert-warning" role="alert">
-      {{ "page.pairings.content.no_pairs" | translate}}
-      <button type="button" class="btn btn-primary" (click)="createPairingClickHandler()">
-        {{ "page.pairings.create_button_text" | translate }}
-      </button>
-    </div>
-  </ng-template>
-</div>
-<dlm-modal-dialog #confirmationModal
-                  title="{{ 'page.pairings.unpair.confirmation.title' | translate }}"
-                  body="{{ 'page.pairings.unpair.confirmation.body' | translate }}"
-                  okText="{{ 'page.pairings.unpair.confirmation.primaryButton' | translate }}"
-                  (onOk)="onConfirmation()">
-</dlm-modal-dialog>
+  <dlm-modal-dialog #confirmationModal
+                    title="{{ 'page.pairings.unpair.confirmation.title' | translate }}"
+                    body="{{ 'page.pairings.unpair.confirmation.body' | translate }}"
+                    okText="{{ 'page.pairings.unpair.confirmation.primaryButton' | translate }}"
+                    (onOk)="onConfirmation()">
+  </dlm-modal-dialog>
+</dlm-progress-container>

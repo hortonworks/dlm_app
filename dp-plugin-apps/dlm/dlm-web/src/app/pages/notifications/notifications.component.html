@@ -1,8 +1,10 @@
 <dlm-page-header
   [title]="'page.notifications.header'">
 </dlm-page-header>
-<div class="row page-section">
-  <div class="col-md-12">
-    <dlm-notifications-table [events]="events$ | async" [clusters]="clusters$ | async"></dlm-notifications-table>
+<dlm-progress-container [progressState]="overallProgress$ | async">
+  <div class="row page-section">
+    <div class="col-md-12">
+      <dlm-notifications-table [events]="events$ | async" [clusters]="clusters$ | async"></dlm-notifications-table>
+    </div>
   </div>
-</div>
+</dlm-progress-container>
