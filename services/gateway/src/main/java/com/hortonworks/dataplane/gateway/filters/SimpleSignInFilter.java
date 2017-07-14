@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.hortonworks.dataplane.gateway.domain.*;
 import com.hortonworks.dataplane.gateway.domain.Error;
+import com.hortonworks.dataplane.gateway.service.Jwt;
 import com.hortonworks.dataplane.gateway.service.UserService;
 import com.hortonworks.dataplane.gateway.utils.CookieManager;
 import com.hortonworks.dataplane.gateway.utils.Utils;

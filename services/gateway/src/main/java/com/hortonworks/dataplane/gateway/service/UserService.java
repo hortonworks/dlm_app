@@ -5,7 +5,6 @@ import com.hortonworks.dataplane.gateway.domain.User;
 import com.hortonworks.dataplane.gateway.domain.UserList;
 import com.hortonworks.dataplane.gateway.domain.UserRef;
 import com.hortonworks.dataplane.gateway.domain.UserRoleResponse;
-import com.hortonworks.dataplane.gateway.filters.UserServiceInterface;
 import com.hortonworks.dataplane.gateway.utils.Utils;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -27,23 +27,8 @@ public class CookieManager {
   @Autowired
   private KnoxSso knoxSso;
 
-
-
   @Autowired
   private Utils utils;
-
-  public void setSsoValidCookie() {
-    RequestContext ctx = RequestContext.getCurrentContext();
-    Cookie cookie = new Cookie(Constants.SSO_CHECK_COOKIE_NAME, Boolean.toString(true));
-    cookie.setPath("/");
-    cookie.setMaxAge(-1);
-    cookie.setHttpOnly(false);
-    ctx.getResponse().addCookie(cookie);
-  }
-
-  public void deleteSsoValidCookie(){
-    deleteCookie(SSO_CHECK_COOKIE_NAME, null);
-  }
 
   public Optional<Cookie> getKnoxSsoCookie() {
     return getCookie(knoxSso.getSsoCookieName());

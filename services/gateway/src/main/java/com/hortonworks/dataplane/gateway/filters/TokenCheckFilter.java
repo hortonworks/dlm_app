@@ -7,6 +7,7 @@ import com.google.common.base.Optional;
 import com.hortonworks.dataplane.gateway.domain.TokenInfo;
 import com.hortonworks.dataplane.gateway.domain.User;
 import com.hortonworks.dataplane.gateway.domain.UserRef;
+import com.hortonworks.dataplane.gateway.service.Jwt;
 import com.hortonworks.dataplane.gateway.service.UserService;
 import com.hortonworks.dataplane.gateway.utils.CookieManager;
 import com.hortonworks.dataplane.gateway.utils.KnoxSso;
@@ -111,7 +112,6 @@ public class TokenCheckFilter extends ZuulFilter {
     //TODO call knox gateway to invalidate token in knox gateway server.
 
     cookieManager.deleteKnoxSsoCookie();
-    cookieManager.deleteSsoValidCookie();
     cookieManager.deleteDataplaneJwtCookie();
     requestResponseUtils.redirectToRoot();
 
@@ -134,7 +134,6 @@ public class TokenCheckFilter extends ZuulFilter {
       if (!user.isPresent()) {
         return utils.sendForbidden(String.format("User %s not found in the system",tokenInfo.getSubject()));
       } else {
-        cookieManager.setSsoValidCookie();
         UserRef userRef=userService.getUserRef(user.get());
         try {
           String jwtToken = jwt.makeJWT(userRef);
