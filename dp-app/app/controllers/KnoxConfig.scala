@@ -62,10 +62,10 @@ class KnoxConfig @Inject()(val ldapService: LdapService,
       case Left(errors) => handleErrors(errors)
       case Right(ldapConfigs) => ldapConfigs.length match {
         case 0 => Ok(Json.obj(
-          "isConfigured" -> false
+          "configured" -> false
         ))
         case _ => Ok(Json.obj(
-          "isConfigured" -> true
+          "configured" -> true
         ))
       }
     }

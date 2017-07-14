@@ -7,6 +7,8 @@ import { Policy } from 'models/policy.model';
 import { Store } from '@ngrx/store';
 import * as fromRoot from 'reducers/';
 import { JOB_STATUS } from 'constants/status.constant';
+import { LogService } from 'services/log.service';
+import { EntityType } from 'constants/log.constant';
 
 @Component({
   selector: 'dp-jobs-table',
@@ -41,10 +43,11 @@ export class JobsTableComponent implements OnInit {
   @Output() onSelectAction = new EventEmitter<any>();
 
   rowActions = <ActionItemType[]>[
-    {label: 'Abort', name: 'ABORT', enabledFor: JOB_STATUS.RUNNING}
+    {label: 'Abort', name: 'ABORT', enabledFor: JOB_STATUS.RUNNING},
+    {label: 'View Log', name: 'LOG', }
   ];
 
-  constructor(protected store: Store<fromRoot.State>) {
+  constructor(protected store: Store<fromRoot.State>, protected logService: LogService) {
   }
 
   ngOnInit() {
@@ -94,8 +97,10 @@ export class JobsTableComponent implements OnInit {
     ];
   }
 
-  handleSelectedAction(row, action) {
-    if (row.status === JOB_STATUS.RUNNING) {
+  handleSelectedAction({row, action}) {
+    if (action.name === 'LOG') {
+      this.logService.showLog(EntityType.policyinstance, row.id);
+    } else if (row.status === JOB_STATUS.RUNNING) {
       this.store.dispatch(abortJob(this.policy));
     }
   }

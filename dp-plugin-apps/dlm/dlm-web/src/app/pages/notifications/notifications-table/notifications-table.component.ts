@@ -3,21 +3,15 @@ import { Event } from 'models/event.model';
 import { Cluster } from 'models/cluster.model';
 import { TableComponent } from 'common/table/table.component';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
-import { Store } from '@ngrx/store';
-import { State } from 'reducers/index';
-import { Log } from 'models/log.model';
-import { getAllLogs } from 'selectors/log.selector';
-import { loadLogs } from 'actions/log.action';
-import { LogModalDialogComponent } from 'components/log-modal-dialog/log-modal-dialog.component';
-
+import { LogService } from 'services/log.service';
+import { LOG_EVENT_TYPE_MAP, EntityType } from 'constants/log.constant';
 
 @Component({
   selector: 'dlm-notifications-table',
   templateUrl: './notifications-table.component.html',
   styleUrls: ['./notifications-table.component.scss']
 })
+
 export class NotificationsTableComponent implements OnInit {
   columns: any[];
   @ViewChild('agoTemplate') agoTemplate: TemplateRef<any>;
@@ -25,20 +19,11 @@ export class NotificationsTableComponent implements OnInit {
   @ViewChild('entityTemplate') entityTemplate: TemplateRef<any>;
   @ViewChild('logTemplate') logTemplate: TemplateRef<any>;
   @ViewChild('notificationsTable') notificationsTable: TableComponent;
-  @ViewChild('logModalDialog') logModalDialog: LogModalDialogComponent;
-  selectedEvent$: BehaviorSubject<Event> = new BehaviorSubject(<Event>{});
-  logMessage$: Observable<string>;
+  logEventTypeMap = LOG_EVENT_TYPE_MAP;
   @Input() events: Event[];
   @Input() clusters: Cluster[];
 
-  constructor(private t: TranslateService, private store: Store<State>) {
-    this.logMessage$ = this.selectedEvent$.switchMap(selectedEvent => {
-      return this.store.select(getAllLogs).map(logs => {
-        const filteredLogs: Log[] = logs.filter(log => log.instanceId === selectedEvent.instanceId);
-        return filteredLogs.length ? filteredLogs[0].message : '';
-      });
-    });
-  }
+  constructor(private t: TranslateService, private logService: LogService) {}
 
   private translateColumn(columnName: string): string {
     return this.t.instant(`page.notifications.table.column.${columnName}`);
@@ -46,15 +31,21 @@ export class NotificationsTableComponent implements OnInit {
 
   getEntity(event: Event) {
     const eventType = (event && 'eventType' in event) ? event['eventType'] : '';
-    if (eventType === 'policyinstance') {
+    if (eventType === 'policyinstance' || eventType === 'policy') {
       if (event['instanceId']) {
-        const splits = event.instanceId.split('/');
-        if (splits.length >= 4) {
-          return splits[3];
-        }
+        return this.getPolicyName(event.instanceId);
+      } else if (event['policyId']) {
+        return this.getPolicyName(event.policyId);
       }
     }
     return eventType;
+  }
+
+  getPolicyName(id: string): string {
+    // Extract policy name from the policy id in the format
+    // "policyId": "/beaconsource/beaconsource/beacontarget/beacontarget/hdfsdr/0/1494924228843/000000002"
+    const splits = id.split('/');
+    return splits.length >= 6 ? splits[5] : '';
   }
 
   ngOnInit() {
@@ -94,21 +85,8 @@ export class NotificationsTableComponent implements OnInit {
 
   showLog(event: Event) {
     const eventType = event.eventType;
-    if (eventType === 'policyinstance') {
-      if (event['instanceId']) {
-        const splits = event.instanceId.split('/');
-        if (splits.length >= 3 && splits[1] && splits[2]) {
-          const dataCenter = splits[1];
-          const clusterName = splits[2];
-          const filteredClusters = this.clusters.filter(cluster => cluster.dataCenter === dataCenter && cluster.name === clusterName);
-          if (filteredClusters.length) {
-            const clusterId = filteredClusters[0].id;
-            this.store.dispatch(loadLogs(clusterId, event.instanceId));
-            this.selectedEvent$.next(event);
-            this.logModalDialog.show();
-          }
-        }
-      }
+    if (eventType in EntityType) {
+      this.logService.showLog(EntityType[eventType], event[this.logEventTypeMap[EntityType[eventType]]]);
     }
   }
 }

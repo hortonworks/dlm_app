@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
-import * as d3 from 'd3';
-import * as nv from 'nvd3';
+
+declare var d3: any;
+declare var nv: any;
 
 @Component({
   selector: 'asset-column-visual'

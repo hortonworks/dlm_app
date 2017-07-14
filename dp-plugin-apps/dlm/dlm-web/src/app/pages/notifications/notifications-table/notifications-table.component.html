@@ -15,20 +15,14 @@
 </ng-template>
 
 <ng-template let-event="row" #entityTemplate>
-  <span *ngIf="event.eventType === 'policyinstance'; else entityNoLinkTemplate">
+  <span *ngIf="event.eventType === 'policyinstance' || event.eventType === 'policy'">
     <a [routerLink]="['/policies']" [queryParams]="{'policy': getEntity(event)}">
       <span>{{getEntity(event)}}</span>
     </a>
   </span>
-</ng-template>
-
-<ng-template #entityNoLinkTemplate>
-  <span>{{getEntity(event)}}</span>
+  <span *ngIf="event.eventType !== 'policyinstance' && event.eventType !== 'policy' ">{{getEntity(event)}}</span>
 </ng-template>
 
 <ng-template let-event="row" #logTemplate>
-  <span *ngIf="event.eventType === 'policyinstance'" class="text-primary actionable" (click)="showLog(event)">{{ "page.notifications.view_log" | translate }}</span>
+  <span *ngIf="event.eventType === 'policyinstance' || event.eventType === 'policy'" class="text-primary actionable" (click)="showLog(event)">{{ "page.notifications.view_log" | translate }}</span>
 </ng-template>
-
-<dlm-log-modal-dialog #logModalDialog [message]="logMessage$ | async">
-</dlm-log-modal-dialog>

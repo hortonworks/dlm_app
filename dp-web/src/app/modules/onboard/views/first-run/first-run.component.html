@@ -1,29 +1,29 @@
 <div class="page-container">
   <section class="feature-intro">
 
-    <div class="hwx-subtitle">Welcome to</div>
-    <div class="hwx-title">Hortonworks Dataplane</div>
-    <div class="hwx-desc">Welcome to dataplane, your one-stop solution to data management. To start, you need to help us find your data lakes. Please proceed by adding data lakes below.</div>
+    <div class="hwx-subtitle">{{"pages.onboard.labels.welcomeText" | translate}}</div>
+    <div class="hwx-title">{{"pages.onboard.labels.hwxDataplane" | translate}}</div>
+    <div class="hwx-desc">{{"pages.onboard.description.dataplane" | translate}}</div>
 
     <ul class="intro-list">
       <li>
         <i class="fa fa-server pull-left"></i>
         <div>
-          <div class="hwx-subtitle">Add Cluster</div>
-          <div class="hwx-desc">Description TBD</div>
+          <div class="hwx-subtitle">{{"pages.onboard.labels.addCluster" | translate}}</div>
+          <div class="hwx-desc">{{"pages.onboard.description.addCluster" | translate}}</div>
         </div>
       </li>
       <li>
         <i class="fa fa-cubes pull-left"></i>
         <div>
-          <div class="hwx-subtitle">Add Dataset</div>
-          <div class="hwx-desc">Description TBD</div>
+          <div class="hwx-subtitle">{{"pages.onboard.labels.addDataset" | translate}}</div>
+          <div class="hwx-desc">{{"pages.onboard.description.addDataset" | translate}}</div>
         </div>
       </li>
     </ul>
 
     <div class="button-container">
-      <a [routerLink]="['/infra/add']"><button class="mdl-button btn-hwx-primary">Get Started</button></a>
+      <a [routerLink]="['/infra/add']"><button class="mdl-button btn-hwx-primary">{{"pages.onboard.labels.startButton" | translate}}</button></a>
     </div>
   </section>
 </div>

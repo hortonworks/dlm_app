@@ -336,7 +336,7 @@ class BeaconService @Inject()(
 
           val policies : Seq[PolicyDetailsData] = getProcessedResponse(allPoliciesData, queryStringPaginated, originalPageLenth, originalOffset)
           val policiesDetails: Seq[PoliciesDetails] = policies.map(policy => {
-            PoliciesDetails(policy.name, policy.`type`, policy.status, policy.sourceDataset, policy.targetDataset,
+            PoliciesDetails(policy.policyId, policy.name, policy.`type`, policy.status, policy.sourceDataset, policy.targetDataset,
                             policy.frequencyInSec, policy.startTime, policy.endTime, policy.sourceCluster, policy.targetCluster, policy.instances)
           })
 
