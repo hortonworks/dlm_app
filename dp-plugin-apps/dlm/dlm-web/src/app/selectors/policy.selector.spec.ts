@@ -14,8 +14,8 @@ describe('Policy Selectors', () => {
     this.policy3 = <Policy>{id: 'p3', targetCluster: 'not-existing-cluster-1', sourceCluster: 'not-existing-cluster-2'};
     this.cluster1 = <Cluster>{id: 1, name: 'c1'};
     this.cluster2 = <Cluster>{id: 2, name: 'c2'};
-    this.job1 = <Job>{id: '1', name: 'p1', startTime: '2016-06-12T03:32:00'};
-    this.job2 = <Job>{id: '2', name: 'p2', startTime: '2017-06-12T03:32:00'};
+    this.job1 = <Job>{id: '1', name: 'p1', startTime: '2016-06-12T03:32:00', policyId: 'p1'};
+    this.job2 = <Job>{id: '2', name: 'p2', startTime: '2017-06-12T03:32:00', policyId: 'p2'};
     const policiesState = {
       policies: {
         entities: {

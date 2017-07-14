@@ -1,6 +1,8 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ModalSize } from 'common/modal-dialog/modal-dialog.size';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
+import { LogService } from 'services/log.service';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'dlm-log-modal-dialog',
@@ -22,12 +24,19 @@ import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component
 })
 export class LogModalDialogComponent implements OnInit {
   modalSize = ModalSize.LARGE;
-  @Input() message: string;
+  message: string;
+  private listener: Subscription;
   @ViewChild('logModalDialog') logModalDialog: ModalDialogComponent;
 
-  constructor() { }
+  constructor(private logService: LogService) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
+    // Listen for changes in the service
+    this.listener = this.logService.getChangeEmitter()
+      .subscribe(item => {
+        this.message = item;
+        this.logModalDialog.show();
+      });
   }
 
   public show(): void {

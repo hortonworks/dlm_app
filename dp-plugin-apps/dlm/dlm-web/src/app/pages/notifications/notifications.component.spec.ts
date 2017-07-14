@@ -21,6 +21,10 @@ import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component
 import { ModalModule } from 'ng2-bootstrap';
 import { ModalDialogBodyComponent } from 'common/modal-dialog/modal-dialog-body.component';
 import { LogModalDialogComponent } from 'components/log-modal-dialog/log-modal-dialog.component';
+import { LogService } from 'services/log.service';
+import {MockBackend} from '@angular/http/testing';
+import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions} from '@angular/http';
+import {HttpService} from 'services/http.service';
 
 describe('NotificationsPageComponent', () => {
   let component: NotificationsPageComponent;
@@ -54,7 +58,13 @@ describe('NotificationsPageComponent', () => {
       ],
       providers: [
         {provide: Store, useClass: MockStore},
-        NavbarService
+        {provide: ConnectionBackend, useClass: MockBackend},
+        {provide: RequestOptions, useClass: BaseRequestOptions},
+        {provide: Http, useClass: HttpService},
+        Http,
+        HttpService,
+        NavbarService,
+        LogService
       ]
     })
       .compileComponents();

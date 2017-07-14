@@ -37,12 +37,13 @@ object ResponseEntities {
 
   case class PolicyInstancesDetails(totalResults: Long, results: Long, instance: Seq[PolicyInstanceResponse])
 
-  case class PoliciesDetailResponse(name: String, `type`: String, status: String, sourceDataset: String,
+  case class PoliciesDetailResponse(policyId: String, name: String, `type`: String, status: String, sourceDataset: String,
                                     targetDataset: String, frequencyInSec: Long, sourceCluster: String,
                                     targetCluster: String, instances: Seq[PolicyInstanceResponse],
                                     startTime: Option[String], endTime: String)
 
-  case class BeaconEventResponse(policyId: Option[String], instanceId: Option[String], eventType: String, severity: String, timestamp: String, message: String)
+  case class BeaconEventResponse(policyId: Option[String], instanceId: Option[String], event: String, eventType: String,
+                                 policyReplType: Option[String], severity: String, timestamp: String, message: String)
 
   case class BeaconLogResponse(status: String, message: String, requestId: String)
 }
@@ -51,7 +52,8 @@ object RequestEntities {
   case class ClusterDefinitionRequest( fsEndpoint: String, hsEndpoint: Option[String], beaconEndpoint: String, name: String, description: String)
   case class PolicyDefinitionRequest( name: String, `type`: String, sourceDataset: String,
                                       sourceCluster: String, targetCluster: String, frequencyInSec: Long,
-                                      startTime: Option[String], endTime: Option[String])
+                                      startTime: Option[String], endTime: Option[String], distcpMapBandwidth: Option[Long],
+                                      queueName: Option[String], description: Option[String])
 }
 
 object JsonFormatters {

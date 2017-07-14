@@ -34,6 +34,10 @@ import { Job } from 'models/job.model';
 import { Cluster } from 'models/cluster.model';
 import { PrevJobsComponent } from '../policies/components/prev-jobs/prev-jobs.component';
 import { PipesModule } from 'pipes/pipes.module';
+import { LogService } from 'services/log.service';
+import {MockBackend} from '@angular/http/testing';
+import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions} from '@angular/http';
+import {HttpService} from 'services/http.service';
 
 const jobs = [
   <Job>{status: JOB_STATUS.SUCCESS},
@@ -113,7 +117,13 @@ describe('OverviewComponent', () => {
           filters$: new BehaviorSubject({})
         }
         },
-        NavbarService
+        {provide: ConnectionBackend, useClass: MockBackend},
+        {provide: RequestOptions, useClass: BaseRequestOptions},
+        {provide: Http, useClass: HttpService},
+        Http,
+        HttpService,
+        NavbarService,
+        LogService
       ]
     })
       .compileComponents();

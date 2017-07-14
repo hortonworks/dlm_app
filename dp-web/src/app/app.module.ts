@@ -35,6 +35,9 @@ import {CollapsibleNavService} from './services/collapsible-nav.service';
 import {AssetService} from './services/asset.service';
 import {LoaderSpinModule} from './shared/loader-spin/loader-spin.module';
 import {Loader} from './shared/utils/loader';
+import {RbacService} from './services/rbac.service';
+import {AuthErrorComponent} from './shared/auth-error/auth-error.component';
+import {NavigationGuard} from './shared/utils/navigation-guard';
 
 export function HttpLoaderFactory(http: Http) {
   return new TranslateHttpLoader(http);
@@ -63,6 +66,7 @@ export function HttpLoaderFactory(http: Http) {
     NotFoundRouteComponent,
     SignInComponent,
     SidebarComponent,
+    AuthErrorComponent,
 
     MdlDirective
 
@@ -82,13 +86,15 @@ export function HttpLoaderFactory(http: Http) {
     UserService,
     CollapsibleNavService,
     Loader,
+    RbacService,
 
     MdlService,
 
     SignedInForSecureGuard,
     NotSignedInForUnsecureGuard,
     DoCleanUpAndRedirectGuard,
-    LandingPageGuard
+    LandingPageGuard,
+    NavigationGuard
   ]
 })
 export class AppModule {

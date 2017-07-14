@@ -16,7 +16,6 @@ import {AtlasService} from '../../services/atlas.service';
 
 declare var d3: any;
 declare var dagreD3: any;
-declare var d3Tip: any;
 
 @Component({
   selector: 'dp-lineage',

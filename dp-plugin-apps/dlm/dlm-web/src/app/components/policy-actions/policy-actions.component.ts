@@ -32,7 +32,7 @@ export class PolicyActionsComponent {
   handleSelectedAction(policy, action) {
     this.toggleDropDown();
     if (!this.actionDisabled(policy, action)) {
-      this.handler.emit({policy, action});
+      this.handler.emit({row: policy, action});
     }
   }
 

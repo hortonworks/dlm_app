@@ -54,6 +54,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   databaseListGroup: FormGroup;
   _pairings$: BehaviorSubject<Pairing[]> = new BehaviorSubject([]);
   _sourceClusterId$: BehaviorSubject<number> = new BehaviorSubject(0);
+  freqRequired = {fieldLabel: 'Frequency'};
   get datePickerOptions(): IMyOptions {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
@@ -95,9 +96,6 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     {
       label: this.t.instant('common.frequency.every'),
       value: this.policyRepeatModes.EVERY
-    }, {
-      label: this.t.instant('common.frequency.never'),
-      value: this.policyRepeatModes.NEVER
     }
   ];
   units = <SelectOption[]> [
@@ -234,9 +232,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         });
       });
     this.sourceDatabases$ = Observable.combineLatest(this.databaseSearch$, databases$)
-      .map(([searchPattern, databases]) => {
-        return databases.filter(db => simpleSearch(db.name, searchPattern));
-      });
+      .map(([searchPattern, databases]) => databases.filter(db => simpleSearch(db.name, searchPattern)));
     this.policyForm = this.formBuilder.group({
       general: this.formBuilder.group({
         name: ['', Validators.required],
@@ -270,12 +266,6 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     });
     const jobCtrl = (<any>this.policyForm).controls.job;
     const changes$ = jobCtrl.controls.repeatMode.valueChanges;
-    const repeatModeSubscription$ = changes$.subscribe(repeatMode => {
-      const newValidator = repeatMode === this.policyRepeatModes.NEVER ? null : Validators.required;
-      jobCtrl.controls.frequency.setValidators(newValidator);
-      jobCtrl.controls.frequency.updateValueAndValidity();
-    });
-    this.subscriptions.push(repeatModeSubscription$);
 
     this.activateFieldsForType(this.selectedPolicyType);
     this.policyFormValues$ = this.store.select(getFormValues(POLICY_FORM_ID));
@@ -352,8 +342,6 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
             value.job.startTime.date = moment(startDate).add(1, 'weeks').isoWeekday(dayToLook).format('YYYY-MM-DD');
           }
         }
-      } else if (value.job.repeatMode === this.policyRepeatModes.NEVER) {
-        value.job.frequencyInSec = 0;
       }
       this.formSubmit.emit(value);
     }
@@ -434,7 +422,6 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   validateTime = (formGroup: FormGroup) => {
-    const momentTz = this.timezone.getMomentTzByIndex(this.userTimeZone$.getValue());
     if (!(formGroup && formGroup.controls)) {
       return null;
     }
@@ -443,7 +430,21 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     const timeFieldValue = timeControl.value;
     timeControl.setErrors(null);
     if (dateFieldValue) {
-      const dateWithTime = this.setTimeForDate(dateFieldValue, timeFieldValue);
+      const mDate = moment(dateFieldValue);
+      if (this.policyForm && this.policyForm.controls['job']['controls'].unit) {
+        const jobControls = this.policyForm.controls['job']['controls'];
+        const unit = jobControls.unit.value;
+        if (unit === this.policyTimeUnits.WEEKS) {
+          const startTimeDay = mDate.day();
+          const scheduledDay = jobControls.day.value;
+          if (scheduledDay > startTimeDay) {
+            mDate.add(scheduledDay - startTimeDay, 'days'); // first day will be on this week
+          } else {
+            mDate.add(7 - scheduledDay, 'days'); // first day will be on next week
+          }
+        }
+      }
+      const dateWithTime = this.setTimeForDate(mDate.format(), timeFieldValue);
       if (dateWithTime.isBefore(moment())) {
         timeControl.setErrors({ lessThanCurrent: true });
         return null;

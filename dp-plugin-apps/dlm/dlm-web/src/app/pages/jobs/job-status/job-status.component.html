@@ -3,6 +3,7 @@
 <ng-template #notIgnored>
   <span class="fa fa-circle"
     [class.text-danger]="job.status === JOB_STATUS.FAILED"
+    [class.text-info]="job.status === JOB_STATUS.RUNNING"
     [class.text-success]="job.status === JOB_STATUS.SUCCESS">
   </span>
 </ng-template>

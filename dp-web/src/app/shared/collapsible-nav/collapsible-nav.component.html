@@ -16,11 +16,4 @@
 
 </div>
 
-<ul #personaNav class="suit-navigation" [ngClass]="{'showPersona': showPersona}">
-  <li *ngFor="let persona of headerData.personas; let i = index" (click)="navigateToPersona(persona, layout)">
-    <div class="logo-wrapper borderBox" title="{{ persona.name }}">
-      <img [attr.src]="'../../../assets/images/' + persona.imageName" alt=""/>
-    </div>
-    <div>{{ persona.name }}</div>
-  </li>
-</ul>
+<dp-persona-popup [personas]="headerData.personas" [personaNavSrc]="personaNavSrc" (personaChange)="navigateToPersona($event)"> </dp-persona-popup>

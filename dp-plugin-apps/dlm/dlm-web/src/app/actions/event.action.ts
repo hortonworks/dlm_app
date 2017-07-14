@@ -1,23 +1,29 @@
-import { type } from '../utils/type-action';
+import { requestType } from 'utils/type-action';
 import { Action } from '@ngrx/store';
+import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
 
 export const ActionTypes = {
-  LOAD_EVENTS: type('LOAD_EVENTS'),
-  LOAD_EVENTS_SUCCESS: type('LOAD_EVENTS_SUCCESS'),
-  LOAD_EVENTS_FAIL: type('LOAD_EVENTS_FAIL'),
-  LOAD_NEW_EVENTS_COUNT: type('LOAD_NEW_EVENTS_COUNT'),
-  LOAD_NEW_EVENTS_COUNT_SUCCESS: type('LOAD_NEW_EVENTS_COUNT_SUCCESS'),
-  LOAD_NEW_EVENTS_COUNT_FAIL: type('LOAD_NEW_EVENTS_COUNT_FAIL')
+  LOAD_EVENTS: requestType('LOAD_EVENTS'),
+  LOAD_NEW_EVENTS_COUNT: requestType('LOAD_NEW_EVENTS_COUNT')
 };
 
-export const loadEvents = (): Action => ({type: ActionTypes.LOAD_EVENTS});
+export const loadEvents = (meta = {}): Action => ({type: ActionTypes.LOAD_EVENTS.START, payload: { meta }});
 
-export const loadEventsSuccess = (events): Action => ({type: ActionTypes.LOAD_EVENTS_SUCCESS, payload: events});
+export const loadEventsSuccess = (events, meta = {}): ActionSuccess => ({
+  type: ActionTypes.LOAD_EVENTS.SUCCESS,
+  payload: { response: events, meta }
+});
 
-export const loadEventsFail = (error): Action => ({type: ActionTypes.LOAD_EVENTS_FAIL});
+export const loadEventsFail = (error, meta = {}): ActionFailure => ({type: ActionTypes.LOAD_EVENTS.FAILURE, payload: { error, meta }});
 
-export const loadNewEventsCount = (): Action => ({type: ActionTypes.LOAD_NEW_EVENTS_COUNT});
+export const loadNewEventsCount = (meta = {}): Action => ({type: ActionTypes.LOAD_NEW_EVENTS_COUNT.START, payload: { meta }});
 
-export const loadNewEventsCountSuccess = (events): Action => ({type: ActionTypes.LOAD_NEW_EVENTS_COUNT_SUCCESS, payload: events});
+export const loadNewEventsCountSuccess = (events, meta = {}): ActionSuccess => ({
+  type: ActionTypes.LOAD_NEW_EVENTS_COUNT.SUCCESS,
+  payload: { response: events, meta }
+});
 
-export const loadNewEventsCountFail = (error): Action => ({type: ActionTypes.LOAD_NEW_EVENTS_COUNT_FAIL});
+export const loadNewEventsCountFail = (error, meta = {}): ActionFailure => ({
+  type: ActionTypes.LOAD_NEW_EVENTS_COUNT.FAILURE,
+  payload: { error, meta}
+});
