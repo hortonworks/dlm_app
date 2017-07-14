@@ -13,5 +13,6 @@ public interface Constants {
     String AUTHORIZATION_HEADER = "Authorization";
     String USER_CTX_KEY = "user_ctx";
     String DP_JWT_COOKIE = "dp_jwt";
+    String LOCAL_SIGNIN_PATH="/sign-in";
     boolean BEARER_TOKEN_IN_COOKIE=true;//If set to false value is taken from header
 }

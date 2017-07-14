@@ -1,5 +1,6 @@
 package com.hortonworks.dataplane.gateway.utils;
 
+import com.hortonworks.dataplane.gateway.domain.Constants;
 import com.netflix.zuul.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -61,9 +62,13 @@ public class RequestResponseUtils {
   }
 
   public void redirectToLcalSignin(){
-    redirectTo(getRootPath()+"/sign-in");
-
+    if (isRequestFromProxy()){
+      redirectTo(getRootPath()+ Constants.LOCAL_SIGNIN_PATH);
+    }else{
+      redirectTo(Constants.LOCAL_SIGNIN_PATH);
+    }
   }
+
   public String getDomainFromRequest()  {
     return this.getRequestHost();
   }
