@@ -4,6 +4,8 @@ package com.hortonworks.dataplane.gateway.utils;
 import com.google.common.base.Optional;
 import com.hortonworks.dataplane.gateway.domain.Constants;
 import com.netflix.zuul.context.RequestContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +19,15 @@ import static com.hortonworks.dataplane.gateway.domain.Constants.SSO_CHECK_COOKI
 
 @Component
 public class CookieManager {
+  private static final Logger logger = LoggerFactory.getLogger(CookieManager.class);
+
+  @Autowired
+  private RequestResponseUtils requestResponseUtils;
+
   @Autowired
   private KnoxSso knoxSso;
+
+
 
   @Autowired
   private Utils utils;
@@ -52,7 +61,11 @@ public class CookieManager {
     }
   }
   public void deleteDataplaneJwtCookie(){
-    deleteCookie(Constants.DP_JWT_COOKIE,null);//The token might have been expired.
+    if (getCookie(Constants.DP_JWT_COOKIE).isPresent()){
+      deleteCookie(getCookie(Constants.DP_JWT_COOKIE).get());
+    }else{
+      logger.debug("dp-jwt cookie not found in cookies");
+    }
   }
   public void addDataplaneJwtCookie(String jwtToken,Optional<Date> expiryTime) {
     addCookie(Constants.DP_JWT_COOKIE, jwtToken,expiryTime);
@@ -84,7 +97,7 @@ public class CookieManager {
 
   private void deleteCookie(String cookieName,String domain) {
     if (domain==null){
-      domain=getDomainFromRequest();
+      domain=requestResponseUtils.getDomainFromRequest();
     }
     Optional<Cookie> cookieOpt = getCookie(cookieName);
     if (cookieOpt.isPresent()) {
@@ -97,16 +110,8 @@ public class CookieManager {
   private void deleteCookie(Cookie cookie) {
     RequestContext ctx = RequestContext.getCurrentContext();
     cookie.setMaxAge(0);
+    cookie.setPath("/");
     ctx.getResponse().addCookie(cookie);
   }
-  private String getDomainFromRequest()  {
-    RequestContext ctx = RequestContext.getCurrentContext();
-    String requestURLStr = ctx.getRequest().getRequestURL().toString();
-    try {
-      URI uri = new URI(requestURLStr);
-      return uri.getHost();
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
-  }
+
 }

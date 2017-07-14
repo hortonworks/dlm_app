@@ -10,6 +10,7 @@ import com.hortonworks.dataplane.gateway.domain.UserRef;
 import com.hortonworks.dataplane.gateway.service.UserService;
 import com.hortonworks.dataplane.gateway.utils.CookieManager;
 import com.hortonworks.dataplane.gateway.utils.KnoxSso;
+import com.hortonworks.dataplane.gateway.utils.RequestResponseUtils;
 import com.hortonworks.dataplane.gateway.utils.Utils;
 import com.hortonworks.dataplane.gateway.domain.Constants;
 import com.netflix.zuul.ZuulFilter;
@@ -51,6 +52,9 @@ public class TokenCheckFilter extends ZuulFilter {
   @Autowired
   private CookieManager cookieManager;
 
+  @Autowired
+  private RequestResponseUtils requestResponseUtils;
+
   private ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -85,7 +89,8 @@ public class TokenCheckFilter extends ZuulFilter {
   public Object run() {
     RequestContext ctx = RequestContext.getCurrentContext();
     if (isSsoLoginPath()) {
-      return redirectToKnox(ctx);
+      requestResponseUtils.redirectToKnoxLogin(ctx.getRequest().getParameter("landingUrl"));
+      return null;
     } else if (isLogoutPath()) {
       return doLogout();
     } else {
@@ -104,15 +109,12 @@ public class TokenCheckFilter extends ZuulFilter {
 
   private Object doLogout() {
     //TODO call knox gateway to invalidate token in knox gateway server.
-    RequestContext ctx = RequestContext.getCurrentContext();
+
     cookieManager.deleteKnoxSsoCookie();
     cookieManager.deleteSsoValidCookie();
     cookieManager.deleteDataplaneJwtCookie();
-    try{
-      ctx.getResponse().sendRedirect("/");
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    requestResponseUtils.redirectToRoot();
+
     //Note. UI should handle redirect.
     return null;
   }
@@ -154,25 +156,9 @@ public class TokenCheckFilter extends ZuulFilter {
     RequestContext ctx = RequestContext.getCurrentContext();
     return KNOX_LOGIN_PATH.equals(ctx.getRequest().getServletPath());
   }
-
-  private boolean isKnoxLogoutPath() {
-    RequestContext ctx = RequestContext.getCurrentContext();
-    return KNOX_LOGOUT_PATH.equals(ctx.getRequest().getServletPath());
-  }
-
   private boolean isLogoutPath() {
     RequestContext ctx = RequestContext.getCurrentContext();
     return LOGOUT_PATH.equals(ctx.getRequest().getServletPath());
-  }
-
-  private Object redirectToKnox(RequestContext ctx) {
-    String redirectUrl = knoxSso.getLoginUrl(ctx.getRequest().getParameter("landingUrl"));
-    try {
-      ctx.getResponse().sendRedirect(redirectUrl);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-    return null;
   }
 
   private void setUpstreamUserContext(User userRef) {
