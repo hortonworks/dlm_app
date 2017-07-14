@@ -107,12 +107,15 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     const policyDefinition = <PolicyDefinition>omitEmpty({
       name: values.general.name,
       type: values.general.type,
+      description: values.general.description,
       sourceCluster: this.sourceCluster.name,
       targetCluster: this.targetCluster.name,
       frequencyInSec: values.job.frequencyInSec,
       startTime: this.formatDateValue(values.job.startTime),
       endTime: this.formatDateValue(values.job.endTime),
-      sourceDataset
+      sourceDataset,
+      distcpMapBandwidth: +values.advanced.max_bandwidth,
+      queueName: values.advanced.queue_name
     });
     return {
       policyDefinition,

@@ -52,7 +52,8 @@ object RequestEntities {
   case class ClusterDefinitionRequest( fsEndpoint: String, hsEndpoint: Option[String], beaconEndpoint: String, name: String, description: String)
   case class PolicyDefinitionRequest( name: String, `type`: String, sourceDataset: String,
                                       sourceCluster: String, targetCluster: String, frequencyInSec: Long,
-                                      startTime: Option[String], endTime: Option[String])
+                                      startTime: Option[String], endTime: Option[String], distcpMapBandwidth: Option[Long],
+                                      queueName: Option[String], description: Option[String])
 }
 
 object JsonFormatters {
