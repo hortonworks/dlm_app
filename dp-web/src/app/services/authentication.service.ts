@@ -7,14 +7,11 @@ import {HttpUtil} from '../shared/utils/httpUtil';
 import {Credential} from '../models/credential';
 import {User} from '../models/user';
 import {AuthUtils} from '../shared/utils/auth-utils';
-import {Subject} from 'rxjs/Subject';
 
 @Injectable()
 export class AuthenticationService {
-  private URI: string = 'auth';
 
-  userAuthenticated = new Subject<boolean>();
-  userAuthenticated$ = this.userAuthenticated.asObservable();
+  private URI: string = 'auth';
 
   constructor(private http: Http) {
   }
@@ -23,10 +20,9 @@ export class AuthenticationService {
     return Observable.create(observer => {
       if (!AuthUtils.isDPCookieValid()) {
         observer.next(false);
-        return;
+      }else{
+        observer.next(true);
       }
-      observer.next(true);
-      this.userAuthenticated.next();
     });
   }
 

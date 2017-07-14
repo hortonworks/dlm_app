@@ -1,4 +1,4 @@
-import {AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, DoCheck, OnDestroy, OnInit} from '@angular/core';
+import {AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, DoCheck, OnChanges, OnDestroy, OnInit} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
 import {IdentityService} from './services/identity.service';
@@ -10,7 +10,7 @@ import {CollapsibleNavService} from './services/collapsible-nav.service';
 import {Loader, LoaderStatus} from './shared/utils/loader';
 import {RbacService} from './services/rbac.service';
 import {AuthenticationService} from './services/authentication.service';
-import {NavigationStart, Router} from '@angular/router';
+import {NavigationEnd, NavigationStart, Router} from '@angular/router';
 import {AuthUtils} from './shared/utils/auth-utils';
 
 export enum ViewPaneState {
@@ -29,11 +29,11 @@ export class AppComponent implements OnInit, AfterViewChecked {
   viewPaneState = ViewPaneState.MAXIMISE;
   headerData: HeaderData = new HeaderData();
   showLoader: LoaderStatus;
- user: User;
+  user: User;
   isUserSignedIn = false;
 
   constructor(private mdlService: MdlService,
-              private identityService: IdentityService,
+              private router: Router,
               private translateService: TranslateService,
               private collapsibleNavService: CollapsibleNavService,
               private rbacService: RbacService,
@@ -45,18 +45,28 @@ export class AppComponent implements OnInit, AfterViewChecked {
   }
 
   ngOnInit() {
-    this.authenticationService.userAuthenticated$.subscribe(() => {
-      this.isUserSignedIn = true;
-      this.setHeaderData();
-      this.user = AuthUtils.getUser();
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.isAuthenticated();
+      }
     });
-
+    this.isAuthenticated();
     this.collapsibleNavService.collpaseSideNav$.subscribe(collapsed => {
       this.viewPaneState = collapsed ? ViewPaneState.MINIMISE : ViewPaneState.MAXIMISE;
     });
 
     Loader.getStatus().subscribe(status => {
       this.showLoader = status
+    });
+  }
+
+  isAuthenticated(){
+    this.authenticationService.isAuthenticated().subscribe((isAuthenticated) => {
+      this.isUserSignedIn = isAuthenticated;
+      if (isAuthenticated) {
+        this.user = AuthUtils.getUser();
+        this.setHeaderData();
+      }
     });
   }
 
