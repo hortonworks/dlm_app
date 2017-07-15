@@ -56,12 +56,15 @@ public class RequestResponseUtils {
   public void redirectToRoot(){
     redirectTo(getRootPath());
   }
+  public void redirectToLogin(){
+    redirectTo(getRootPath()+Constants.LOGIN_PATH);
+  }
 
   public void redirectToKnoxLogin(String redirectTo) {
     redirectTo(knoxSso.getLoginUrl(redirectTo));
   }
 
-  public void redirectToLcalSignin(){
+  public void redirectToLocalSignin(){
     if (isRequestFromProxy()){
       redirectTo(getRootPath()+ Constants.LOCAL_SIGNIN_PATH);
     }else{

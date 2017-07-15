@@ -113,7 +113,7 @@ public class TokenCheckFilter extends ZuulFilter {
 
     cookieManager.deleteKnoxSsoCookie();
     cookieManager.deleteDataplaneJwtCookie();
-    requestResponseUtils.redirectToRoot();
+    requestResponseUtils.redirectToLogin();
 
     //Note. UI should handle redirect.
     return null;

@@ -14,7 +14,6 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 
 @Service
 public class LoginPageFilter extends ZuulFilter {
-  private static final String LOGIN_ENTRY_POINT = Constants.DPAPP_BASE_PATH+"/login";
 
   @Autowired
   private ConfigurationService configurationService;
@@ -36,7 +35,7 @@ public class LoginPageFilter extends ZuulFilter {
   public boolean shouldFilter() {
     RequestContext ctx = RequestContext.getCurrentContext();
     String serviceId = ctx.get(SERVICE_ID_KEY).toString();
-    return serviceId.equals(Constants.DPAPP) && ctx.getRequest().getServletPath().equals(LOGIN_ENTRY_POINT);
+    return serviceId.equals(Constants.DPAPP) && ctx.getRequest().getServletPath().equals(Constants.LOGIN_ENTRY_POINT);
   }
 
   @Override
@@ -53,7 +52,7 @@ public class LoginPageFilter extends ZuulFilter {
       requestResponseUtils.redirectToKnoxLogin(landingPage);
       return null;
     }else{
-      requestResponseUtils.redirectToLcalSignin();
+      requestResponseUtils.redirectToLocalSignin();
     }
     return null;
   }
