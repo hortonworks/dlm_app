@@ -21,7 +21,7 @@ export class DsTileProxy {
 
   showFullView($event) {
     if ($event.target.tagName != "I") {
-      this.router.navigate([`datasteward/dataset/full-view/${this.dsModel.id}`]);
+      this.router.navigate([`datasteward/datafolio/full-view/${this.dsModel.id}`]);
     }
   }
 }

@@ -32,7 +32,7 @@ export class DatasetDashboardComponent implements OnInit {
   }
 
   actionAddNewDataset() {
-    this.router.navigate(["datasteward/dataset/add"]);
+    this.router.navigate(["datasteward/datafolio/add"]);
   }
 
   dsNameSearchChange(event) {

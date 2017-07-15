@@ -31,7 +31,7 @@ export class DsEditor implements OnInit {
   ngOnInit() {
     this.activeRoute.params.subscribe(params => this.datasetId = +params["id"]);
     if (isNaN(this.datasetId)) {
-      this.router.navigate(["datasteward/dataset/add"]);
+      this.router.navigate(["datasteward/datafolio/add"]);
     }
     else {
       this.assetSetQueryModelsForAddition.push(
@@ -73,7 +73,7 @@ export class DsEditor implements OnInit {
   }
 
   actionCancel() {
-    this.router.navigate(["datasteward/dataset"]);
+    this.router.navigate(["datasteward/datafolio"]);
   }
 
   validateStage1() {

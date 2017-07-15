@@ -4,7 +4,7 @@ import {Pipe, PipeTransform} from '@angular/core';
 export class BreadCrumbNamePipe implements PipeTransform {
   static transforms = {
     datasteward: 'Data Steward',
-    infra: 'Infra Admin'
+    infra: 'Admin'
   };
 
   transform(name: string): string {

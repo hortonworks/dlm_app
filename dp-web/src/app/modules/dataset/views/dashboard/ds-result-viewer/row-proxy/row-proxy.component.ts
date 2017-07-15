@@ -16,6 +16,6 @@ export class DsRowProxy {
   }
 
   showFullView(dsModel) {
-    this.router.navigate([`datasteward/dataset/full-view/${dsModel.id}`]);
+    this.router.navigate([`datasteward/datafolio/full-view/${dsModel.id}`]);
   }
 }
