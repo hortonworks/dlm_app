@@ -33,9 +33,16 @@ public class Utils {
   public void deleteAuthorizationHeaderToUpstream(){
     proxyRequestHelper.addIgnoredHeaders(Constants.AUTHORIZATION_HEADER);
   }
+
   public Object sendUnauthorized() {
+    return sendUnauthorized(null);
+  }
+  public Object sendUnauthorized(String message) {
     RequestContext ctx = RequestContext.getCurrentContext();
     ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
+    if (message!=null){
+      ctx.setResponseBody(message);
+    }
     ctx.setSendZuulResponse(false);
     return null;
   }

@@ -88,9 +88,8 @@ public class TokenCheckFilter extends ZuulFilter {
 
   @Override
   public Object run() {
-    RequestContext ctx = RequestContext.getCurrentContext();
     if (isSsoLoginPath()) {
-      requestResponseUtils.redirectToKnoxLogin(ctx.getRequest().getParameter("landingUrl"));
+      requestResponseUtils.redirectToKnoxLogin();
       return null;
     } else if (isLogoutPath()) {
       return doLogout();
@@ -122,12 +121,12 @@ public class TokenCheckFilter extends ZuulFilter {
   private Object authorizeThroughSsoToken() {
     Optional<Cookie> knoxSsoCookie = cookieManager.getKnoxSsoCookie();
     if (!knoxSsoCookie.isPresent()) {
-      return utils.sendUnauthorized();
+      return handleUnAuthorized(null);
     }
     String knoxSsoCookieValue = knoxSsoCookie.get().getValue();
     TokenInfo tokenInfo = knoxSso.validateJwt(knoxSsoCookieValue);
     if (!tokenInfo.isValid()) {
-      return utils.sendUnauthorized();
+      return handleUnAuthorized(null);
     }
     try {
       Optional<User> user = userService.getUser(tokenInfo.getSubject());
@@ -183,7 +182,7 @@ public class TokenCheckFilter extends ZuulFilter {
       Optional<UserRef> userRefOptional = jwt.parseJWT(bearerToken.get());
       if (!userRefOptional.isPresent()) {
         cookieManager.deleteDataplaneJwtCookie();
-        return utils.sendForbidden("DP_JWT_COOKIE has expired or not valid");
+        return handleUnAuthorized("DP_JWT_COOKIE has expired or not valid");
       } else {
         UserRef userRef = userRefOptional.get();
         User user=userService.getUserFromUserRef(userRef);
@@ -199,6 +198,14 @@ public class TokenCheckFilter extends ZuulFilter {
     } catch (IOException e) {
       logger.error("Exception", e);
       return utils.sendUnauthorized();
+    }
+  }
+
+  private Object handleUnAuthorized(String reason) {
+    if (!requestResponseUtils.isLoginPath()){
+      return utils.sendUnauthorized(reason);
+    }else{
+      return  null;//Login would be handled in next filters.
     }
   }
 }

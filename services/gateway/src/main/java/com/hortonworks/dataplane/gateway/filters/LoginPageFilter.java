@@ -47,9 +47,8 @@ public class LoginPageFilter extends ZuulFilter {
       requestResponseUtils.redirectToRoot();
       return null;
     }
-    String landingPage=ctx.getRequest().getParameter("landingPage");
     if (configurationService.isLdapConfigured()){
-      requestResponseUtils.redirectToKnoxLogin(landingPage);
+      requestResponseUtils.redirectToKnoxLogin();
       return null;
     }else{
       requestResponseUtils.redirectToLocalSignin();

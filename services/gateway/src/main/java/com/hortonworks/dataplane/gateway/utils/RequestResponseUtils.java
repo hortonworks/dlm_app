@@ -14,9 +14,9 @@ public class RequestResponseUtils {
   @Autowired
   private KnoxSso knoxSso;
 
-  private void redirectTo(String path){
+  private void redirectTo(String path) {
     RequestContext ctx = RequestContext.getCurrentContext();
-    try{
+    try {
       ctx.getResponse().sendRedirect(path);
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -24,25 +24,26 @@ public class RequestResponseUtils {
   }
 
   private String getRootPath() {
-    if (isRequestFromProxy()){
-      return String.format("http://%s/",getRequestHost());
-    }else{
+    if (isRequestFromProxy()) {
+      return String.format("http://%s/", getRequestHost());
+    } else {
       return "/";
     }
   }
-  private boolean isRequestFromProxy(){
+
+  private boolean isRequestFromProxy() {
     //currently check ngnix.
     RequestContext ctx = RequestContext.getCurrentContext();
-    String realHost= ctx.getRequest().getHeader("X-Forwarded-Host");
-    return realHost!=null;
+    String realHost = ctx.getRequest().getHeader("X-Forwarded-Host");
+    return realHost != null;
   }
 
   private String getRequestHost() {
     RequestContext ctx = RequestContext.getCurrentContext();
-    String realHost= ctx.getRequest().getHeader("X-Forwarded-Host");
-    if (realHost!=null){
+    String realHost = ctx.getRequest().getHeader("X-Forwarded-Host");
+    if (realHost != null) {
       return realHost;
-    }else{
+    } else {
       String requestURLStr = ctx.getRequest().getRequestURL().toString();
       try {
         URI uri = new URI(requestURLStr);
@@ -53,26 +54,36 @@ public class RequestResponseUtils {
     }
   }
 
-  public void redirectToRoot(){
+  public void redirectToRoot() {
     redirectTo(getRootPath());
   }
-  public void redirectToLogin(){
-    redirectTo(getRootPath()+Constants.LOGIN_PATH);
+
+  public void redirectToLogin() {
+    redirectTo(getRootPath() + "login/");
   }
 
-  public void redirectToKnoxLogin(String redirectTo) {
+  public void redirectToKnoxLogin() {
+    RequestContext ctx = RequestContext.getCurrentContext();
+    String redirectTo = ctx.getRequest().getParameter("landingUrl");
+    if (redirectTo == null) {
+      redirectTo = String.format("http://%s/", getRequestHost());
+    }
     redirectTo(knoxSso.getLoginUrl(redirectTo));
   }
 
-  public void redirectToLocalSignin(){
-    if (isRequestFromProxy()){
-      redirectTo(getRootPath()+ Constants.LOCAL_SIGNIN_PATH);
-    }else{
+  public void redirectToLocalSignin() {
+    if (isRequestFromProxy()) {
+      redirectTo(getRootPath() + Constants.LOCAL_SIGNIN_PATH);
+    } else {
       redirectTo(Constants.LOCAL_SIGNIN_PATH);
     }
   }
 
-  public String getDomainFromRequest()  {
+  public String getDomainFromRequest() {
     return this.getRequestHost();
+  }
+
+  public boolean isLoginPath() {
+    return RequestContext.getCurrentContext().getRequest().getServletPath().equals(Constants.LOGIN_ENTRY_POINT);
   }
 }
