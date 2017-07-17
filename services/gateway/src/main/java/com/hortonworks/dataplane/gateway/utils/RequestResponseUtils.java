@@ -25,7 +25,7 @@ public class RequestResponseUtils {
 
   private String getRootPath() {
     if (isRequestFromProxy()) {
-      return String.format("http://%s/", getRequestHost());
+      return appRootUrl();
     } else {
       return "/";
     }
@@ -39,9 +39,19 @@ public class RequestResponseUtils {
   }
   private String getRequestPort(){
     RequestContext ctx = RequestContext.getCurrentContext();
-    int serverPort = ctx.getRequest().getServerPort();
-    return ":"+String.valueOf(serverPort==80?"":serverPort);
+    if (isRequestFromProxy()){
+      String forwardedPort=ctx.getRequest().getHeader("X-Forwarded-Port");
+      if (forwardedPort==null || forwardedPort.equals("80")){
+        return "";
+      }else{
+        return ":"+forwardedPort;
+      }
+    }else{
+      int serverPort = ctx.getRequest().getServerPort();
+      return ":"+String.valueOf(serverPort==80?"":serverPort);
+    }
   }
+
   private String getRequestHost() {
     RequestContext ctx = RequestContext.getCurrentContext();
     String realHost = ctx.getRequest().getHeader("X-Forwarded-Host");
@@ -70,9 +80,13 @@ public class RequestResponseUtils {
     RequestContext ctx = RequestContext.getCurrentContext();
     String redirectTo = ctx.getRequest().getParameter("landingUrl");
     if (redirectTo == null) {
-      redirectTo = String.format("http://%s%s", getRequestHost(),getRequestPort());
+      redirectTo = appRootUrl();
     }
     redirectTo(knoxSso.getLoginUrl(redirectTo));
+  }
+
+  private String appRootUrl() {
+    return String.format("http://%s%s/", getRequestHost(),getRequestPort());
   }
 
   public void redirectToLocalSignin() {
