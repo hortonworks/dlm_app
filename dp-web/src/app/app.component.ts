@@ -48,6 +48,7 @@ export class AppComponent implements OnInit, AfterViewChecked {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.isAuthenticated();
+        this.collapsibleNavService.collpaseSideNav.next(this.viewPaneState === ViewPaneState.MINIMISE ? false : true);
       }
     });
     this.isAuthenticated();
@@ -60,7 +61,7 @@ export class AppComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  isAuthenticated(){
+  isAuthenticated() {
     this.authenticationService.isAuthenticated().subscribe((isAuthenticated) => {
       this.isUserSignedIn = isAuthenticated;
       if (isAuthenticated) {
