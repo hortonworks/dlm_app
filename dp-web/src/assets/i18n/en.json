@@ -3,7 +3,7 @@
     "dashboard" : "Dashboard",
     "dataplane" : "Dataplane",
     "clusters" : "Clusters",
-    "datasets" : "Datasets",
+    "datasets" : "Asset Collection",
     "datalake" : "Datalake",
     "services" : "Services",
     "location" : "Location",
@@ -55,7 +55,7 @@
         "defineUsers": "Define User Privileges Roles and Groups",
         "startButton" : "Get Started",
         "addCluster" : "Add Clusters",
-        "addDataset" : "Add Datasets",
+        "addDataset" : "Add Asset Collection",
         "setService" : "Setup Services"
       },
       "description" : {
@@ -64,7 +64,7 @@
         "defineUsers": "Upon completing the LDAP configuration, you may add administrators to Data plane. You can add users to data plane and assign or modify their roles anytime through the User Management Screen.",
         "addCluster" : "Add Ambari Managed HDP clusters to Dataplane. Dataplane will auto-discover cluster information such as the cluster name, active services & important metrics running.",
         "setService" : "Set up services to enable Dataplane to manage your data",
-        "addDataset" : "Create datasets using Dataplane Steward Studio capability"
+        "addDataset" : "Create asset collection using Dataplane Steward Studio capability"
       },
       "configure" : {
         "labels" : {
@@ -153,7 +153,7 @@
         "audits":"Audits"
       },
       "labels" : {
-        "newDataset" : "Add Data set",
+        "newDataset" : "Add Asset Collection",
         "addFavourites" : "Add to Favourites",
         "removeFavourites" : "Remove from Favourites",
         "creator" : "Creator",
@@ -163,7 +163,7 @@
         "createdBy" : "Created By",
         "hdfsFiles" : "HDFS Files",
         "hiveTables" : "Hive Tables",
-        "emptySearchResult" : "There are no data sets that match your search.",
+        "emptySearchResult" : "There are no asset collection that match your search.",
         "source" : "Source",
         "owner" : "Owner",
         "createdTime": "Created Time",
@@ -180,8 +180,8 @@
         "assets" : "Assets",
         "summary" : "Summary",
         "fillMandatoryMsg" : "Please fill mandatory fields",
-        "tagDescription" : "Add tags to your data-set for context and subsequent lookup",
-        "asset-description" : "Add related data assets into your data-set, by searching across this Data-Lake",
+        "tagDescription" : "Add tags to your asset collection for context and subsequent lookup",
+        "asset-description" : "Add related data assets into your asset collection, by searching across this Data-Lake",
         "action" :{
           "next" : "Next",
           "save" : "Save",
@@ -205,7 +205,7 @@
         "done" : "Done"
       },
       "asset-list" : {
-        "starAssetmessage":"Few assets listed above already belong to datasets, and can not be used in any other dataset"
+        "starAssetmessage":"Few assets listed above already belong to asset collection, and cannot be used in any other asset collection"
       },
       "dashboard" : {
         "tag-nav" : {
