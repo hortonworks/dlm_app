@@ -134,6 +134,7 @@ class ConsulInitializer @Inject()(config:Configuration){
       val map = new util.HashMap[String,String]()
       map.put("dp.services.db.service.uri",config.getString("dp.services.db.service.path").get)
       map.put("dp.services.cluster.service.uri",config.getString("dp.services.cluster.service.path").get)
+      map.put("dp.services.proxy.service.uri",config.getString("dp.services.proxy.service.path").get)
       val gateway = new Gateway(config.underlying,map,Optional.of(this))
       gateway.initialize()
     }
