@@ -19,7 +19,7 @@ init_network() {
     # This is not a clean solution and will be fixed later
     # else
     #     echo "Network dp already exists. Destroying all containers on network dp."
-    #     CONTAINER_LIST=$(docker ps --all --quiet --filter "network=dp")
+    #     CONTAINER_LIST=$(docker container ls --all --quiet --filter "network=dp")
     #     if [[ $(echo $CONTAINER_LIST) ]]; then
     #         docker rm  --force $CONTAINER_LIST
     #     fi
@@ -27,11 +27,11 @@ init_network() {
 }
 
 get_bind_address_from_consul_container() {
-    CONSUL_ID=$(docker ps -af 'name=consul' -q)
+    CONSUL_ID=$(docker container ls -af 'ancestor=consul' -q)
     if [ -z ${CONSUL_ID} ]; then
         return 0
     fi
-    CONSUL_ARGS=$(docker inspect -f {{.Args}} ${CONSUL_ID})
+    CONSUL_ARGS=$(docker container inspect -f {{.Args}} ${CONSUL_ID})
     for word in $CONSUL_ARGS; do
         if [[ $word == -bind* ]]
         then
@@ -64,12 +64,12 @@ init_db() {
 }
 
 ps() {
-    docker container ps \
+    docker container ls \
         --filter "name=dp-app|dp-db-service|dp-cluster-service|dp-gateway|dp-database|knox|dp-consul-server"
 }
 
 list_logs() {
-    docker logs "$@"
+    docker container logs "$@"
 }
 
 migrate_schema() {
@@ -161,12 +161,12 @@ init_knox() {
         echo "Knox container not found. Ensure it is running..."
         return -1
     fi
-    docker exec -t ${KNOX_CONTAINER_ID} ./wait_for_keystore_file.sh
+    docker container exec -t ${KNOX_CONTAINER_ID} ./wait_for_keystore_file.sh
     mkdir -p ${CERTS_DIR}
     export_knox_cert ${MASTER_PASSWORD} ${KNOX_CONTAINER_ID} > ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
     if [ ${USE_TEST_LDAP} == "no" ]
     then
-        docker exec -it ${KNOX_CONTAINER_ID} ./setup_knox_sso_conf.sh
+        docker container exec -it ${KNOX_CONTAINER_ID} ./setup_knox_sso_conf.sh
     fi
     echo "Knox Initialized"
 }
@@ -174,12 +174,12 @@ init_knox() {
 export_knox_cert() {
     MASTER_PASSWD=$1
     KNOX_CONTAINER_ID=$2
-    docker exec -t ${KNOX_CONTAINER_ID} \
+    docker container exec -t ${KNOX_CONTAINER_ID} \
         keytool -export -alias gateway-identity -storepass ${MASTER_PASSWD} -keystore /var/lib/knox/data-2.6.0.3-8/security/keystores/gateway.jks -rfc
 }
 
 get_knox_container_id() {
-    KNOX_CONTAINER_ID=`docker container ps --quiet --filter="name=knox"`
+    KNOX_CONTAINER_ID=`docker container ls --quiet --filter="name=knox"`
     echo ${KNOX_CONTAINER_ID}
 }
 
