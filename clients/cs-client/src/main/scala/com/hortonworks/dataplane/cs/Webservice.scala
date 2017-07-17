@@ -3,8 +3,8 @@ package com.hortonworks.dataplane.cs
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariCheckResponse, AmbariCluster, AmbariDetailRequest, AmbariEndpoint, ClusterServiceWithConfigs}
 import com.hortonworks.dataplane.commons.domain.Atlas.{AssetProperties, AtlasAttribute, AtlasEntities, AtlasSearchQuery}
-import play.api.libs.json.{JsObject, JsResult, Json, JsValue}
-import play.api.libs.ws.WSResponse
+import play.api.libs.json.{JsObject, JsResult, JsValue, Json}
+import play.api.libs.ws.{WSRequest, WSResponse}
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData}
 
 import scala.concurrent.Future
@@ -56,6 +56,15 @@ object Webservice {
     def checkAmbariStatus(endpoint:AmbariEndpoint)(implicit token:Option[HJwtToken]):Future[Either[Errors,AmbariCheckResponse]]
 
     def getAmbariDetails(ambariDetailRequest: AmbariDetailRequest)(implicit token:Option[HJwtToken]):Future[Either[Errors,Seq[AmbariCluster]]]
+  }
+
+
+  trait KnoxProxyService extends CsClientService {
+
+    def getProxyUrl:String
+
+    def execute(request:WSRequest,call: WSRequest => Future[WSResponse],fallback:Option[String])(implicit token:Option[HJwtToken]) : Future[WSResponse]
+
   }
 
 }
