@@ -60,30 +60,25 @@ export class RbacService {
     observer.complete();
   }
 
-  getLandingPage(): Observable<string> {
+  getLandingPage(isLakeInitialized: boolean): Observable<string> {
     return Observable.create(observer => {
       if (this.hasRole('SUPERADMIN')) {
         this.configService.isKnoxConfigured().subscribe(response => {
-          if (response.configured) {
-            this.configService.retrieve().subscribe(({lakeWasInitialized}) => {
-              if (lakeWasInitialized) {
-                return this.getLandingInternal(observer, 'INFRAADMIN');
-              } else {
-                return this.getLandingInternal(observer, 'INFRAADMIN_ONBOARD');
-              }
-            });
-          } else {
+          if (!response.configured) {
             return this.getLandingInternal(observer, 'SUPERADMIN_ONBOARD');
           }
-        });
-      } else if (this.hasRole('INFRAADMIN')) {
-        this.configService.retrieve().subscribe(({lakeWasInitialized}) => {
-          if (lakeWasInitialized) {
+          if (isLakeInitialized) {
             return this.getLandingInternal(observer, 'INFRAADMIN');
           } else {
             return this.getLandingInternal(observer, 'INFRAADMIN_ONBOARD');
           }
         });
+      } else if (this.hasRole('INFRAADMIN')) {
+        if (isLakeInitialized) {
+          return this.getLandingInternal(observer, 'INFRAADMIN');
+        } else {
+          return this.getLandingInternal(observer, 'INFRAADMIN_ONBOARD');
+        }
       } else if (this.hasRole('CURATOR')) {
         return this.getLandingInternal(observer, 'CURATOR');
       }

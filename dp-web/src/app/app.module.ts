@@ -10,7 +10,7 @@ import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {routes} from './app.routes';
 
 import {AppComponent} from './app.component';
-import {SignedInForSecureGuard, NotSignedInForUnsecureGuard, DoCleanUpAndRedirectGuard} from './shared/utils/auth-guard';
+import {SecuredRouteGuard, UnsecuredRouteGuard, DoCleanUpAndRedirectGuard} from './shared/utils/auth-guard';
 import {LandingPageGuard} from './shared/utils/landing-page-guard';
 
 import {NotFoundRouteComponent} from './views/not-found-route/not-found-route.component';
@@ -92,8 +92,8 @@ export function HttpLoaderFactory(http: Http) {
 
     MdlService,
 
-    SignedInForSecureGuard,
-    NotSignedInForUnsecureGuard,
+    SecuredRouteGuard,
+    UnsecuredRouteGuard,
     DoCleanUpAndRedirectGuard,
     LandingPageGuard,
     NavigationGuard,

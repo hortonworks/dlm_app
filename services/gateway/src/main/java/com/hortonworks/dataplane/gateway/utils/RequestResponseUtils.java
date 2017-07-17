@@ -37,7 +37,11 @@ public class RequestResponseUtils {
     String realHost = ctx.getRequest().getHeader("X-Forwarded-Host");
     return realHost != null;
   }
-
+  private String getRequestPort(){
+    RequestContext ctx = RequestContext.getCurrentContext();
+    int serverPort = ctx.getRequest().getServerPort();
+    return ":"+String.valueOf(serverPort==80?"":serverPort);
+  }
   private String getRequestHost() {
     RequestContext ctx = RequestContext.getCurrentContext();
     String realHost = ctx.getRequest().getHeader("X-Forwarded-Host");
@@ -59,14 +63,14 @@ public class RequestResponseUtils {
   }
 
   public void redirectToLogin() {
-    redirectTo(getRootPath() + "login/");
+    redirectTo(getRootPath() + "login");
   }
 
   public void redirectToKnoxLogin() {
     RequestContext ctx = RequestContext.getCurrentContext();
     String redirectTo = ctx.getRequest().getParameter("landingUrl");
     if (redirectTo == null) {
-      redirectTo = String.format("http://%s/", getRequestHost());
+      redirectTo = String.format("http://%s%s", getRequestHost(),getRequestPort());
     }
     redirectTo(knoxSso.getLoginUrl(redirectTo));
   }
