@@ -40,7 +40,7 @@ get_bind_address_from_consul_container() {
 init_consul(){
     echo "Initializing Consul"
     read_consul_host
-    source $(pwd)/docker-consul.sh .
+    source $(pwd)/docker-consul.sh
 }
 
 read_consul_host(){
@@ -56,7 +56,7 @@ read_consul_host(){
 }
 
 init_db() {
-    source $(pwd)/docker-database.sh .
+    source $(pwd)/docker-database.sh
 }
 
 ps() {
@@ -70,13 +70,13 @@ list_logs() {
 
 migrate_schema() {
     # start database container
-    source $(pwd)/docker-database.sh .
+    source $(pwd)/docker-database.sh
 
     # wait for database start
     sleep 5
 
     # start flyway container and trigger migrate script
-    source $(pwd)/docker-migrate.sh .
+    source $(pwd)/docker-migrate.sh
 }
 
 destroy() {
@@ -100,19 +100,19 @@ init_app() {
     read_consul_host
 
     echo "Starting Database (Postgres)"
-    source $(pwd)/docker-database.sh .
+    source $(pwd)/docker-database.sh
 
     echo "Starting Gateway"
-    source $(pwd)/docker-gateway.sh .
+    source $(pwd)/docker-gateway.sh
 
     echo "Starting DB Service"
-    source $(pwd)/docker-service-db.sh .
+    source $(pwd)/docker-service-db.sh
 
     echo "Starting Cluster Service"
-    source $(pwd)/docker-service-cluster.sh .
+    source $(pwd)/docker-service-cluster.sh
 
     echo "Starting Application API"
-    source $(pwd)/docker-app.sh .
+    source $(pwd)/docker-app.sh
 }
 
 read_master_password() {
@@ -150,7 +150,7 @@ init_knox() {
     fi
     
     echo "Starting Knox"
-    source $(pwd)/docker-knox.sh .
+    source $(pwd)/docker-knox.sh
 
     KNOX_CONTAINER_ID=$(get_knox_container_id)
     if [ -z ${KNOX_CONTAINER_ID} ]; then
@@ -181,28 +181,28 @@ get_knox_container_id() {
 
 start_app() {
     echo "Starting Database (Postgres)"
-    source $(pwd)/docker-database.sh .
+    source $(pwd)/docker-database.sh
 
     echo "Starting Gateway"
-    source $(pwd)/docker-gateway.sh .
+    source $(pwd)/docker-gateway.sh
 
     echo "Starting DB Service"
-    source $(pwd)/docker-service-db.sh .
+    source $(pwd)/docker-service-db.sh
 
     echo "Starting Cluster Service"
-    source $(pwd)/docker-service-cluster.sh .
+    source $(pwd)/docker-service-cluster.sh
 
     echo "Starting Application API"
-    source $(pwd)/docker-app.sh .
+    source $(pwd)/docker-app.sh
 }
 start_consul() {
     echo "Starting Consul"
-    source $(pwd)/docker-consul.sh .
+    source $(pwd)/docker-consul.sh
 }
 start_knox() {
     echo "Starting Knox"
     start_consul
-    source $(pwd)/docker-knox.sh .
+    source $(pwd)/docker-knox.sh
 }
 
 stop_app() {
