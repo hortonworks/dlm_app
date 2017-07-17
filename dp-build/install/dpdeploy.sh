@@ -80,17 +80,17 @@ migrate_schema() {
 }
 
 destroy() {
-    docker container rm dp-database dp-app dp-db-service dp-cluster-service dp-gateway
+    docker container rm --force dp-database dp-app dp-db-service dp-cluster-service dp-gateway
 }
 
 destroy_consul(){
     echo "Destroying Consul"
-    docker container rm dp-consul-server
+    docker container rm --force dp-consul-server
 }
 
 destroy_knox() {
     echo "Destroying Knox"
-    docker container rm knox
+    docker container rm --force knox
     rm -rf ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
     destroy_consul
 }
