@@ -7,6 +7,10 @@ DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 export KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
+APP_CONTAINERS="dp-database dp-app dp-db-service dp-cluster-service dp-gateway"
+KNOX_CONTAINER="knox"
+CONSUL_CONTAINER="dp-consul-server"
+
 init_network() {
     NETWORK_ID=$(docker network ls --quiet --filter "name=dp")
     if [ -z ${NETWORK_ID} ]; then
@@ -80,17 +84,17 @@ migrate_schema() {
 }
 
 destroy() {
-    docker container rm --force dp-database dp-app dp-db-service dp-cluster-service dp-gateway
+    docker container rm --force $APP_CONTAINERS
 }
 
 destroy_consul(){
     echo "Destroying Consul"
-    docker container rm --force dp-consul-server
+    docker container rm --force $CONSUL_CONTAINER
 }
 
 destroy_knox() {
     echo "Destroying Knox"
-    docker container rm --force knox
+    docker container rm --force $KNOX_CONTAINER
     rm -rf ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
     destroy_consul
 }
@@ -206,17 +210,17 @@ start_knox() {
 }
 
 stop_app() {
-    docker container stop dp-database dp-app dp-db-service dp-cluster-service dp-gateway
+    docker container stop $APP_CONTAINERS
 }
 
 stop_consul(){
     echo "Stopping Consul"
-    docker container stop dp-consul-server
+    docker container stop $CONSUL_CONTAINER
 }
 
 stop_knox() {
     echo "Stopping Knox"
-    docker container stop knox
+    docker container stop $KNOX_CONTAINER
     stop_consul
 }
 
