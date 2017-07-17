@@ -56,4 +56,13 @@
                     okText="{{ 'page.pairings.unpair.confirmation.primaryButton' | translate }}"
                     (onOk)="onConfirmation()">
   </dlm-modal-dialog>
+
+  <dlm-modal-dialog
+    [title]="lastOperationResponse.status"
+    [body]="lastOperationResponse.message"
+    [showDialog]="showOperationResponseModal"
+    [showCancel]="false"
+    (onClose)="onCloseOperationResponseModal()">
+  </dlm-modal-dialog>
+
 </dlm-progress-container>
