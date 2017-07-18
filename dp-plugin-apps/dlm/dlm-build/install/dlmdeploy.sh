@@ -28,13 +28,15 @@ init_app() {
     if [ "$CONSUL_HOST" == "" ]; then
         read_consul_host
     fi
-    docker container create \
-        --name dlm-app \
-        --network dp \
-        --publish 9011:9011 \
-        --env CONSUL_HOST \
-        --env DLM_APP_HOME="/usr/dlm-app"
-        hortonworks/dlm-app:$VERSION
+    docker start dlm-app >> install.log 2>&1 || \
+        docker container run \
+            --name dlm-app \
+            --network dp \
+            --publish 9011:9011 \
+            --detach \
+            --env CONSUL_HOST \
+            --env DLM_APP_HOME="/usr/dlm-app" \
+            hortonworks/dlm-app:$VERSION
 }
 
 
@@ -50,7 +52,7 @@ print_version() {
     if [ -f VERSION ]; then
         cat VERSION
     else
-        cat ${DEFAULT_VERSION}:${DEFAULT_TAG}
+        echo ${DEFAULT_VERSION}:${DEFAULT_TAG}
     fi
 }
 
@@ -72,6 +74,7 @@ then
     usage;
     exit 0;
 else
+    VERSION=$(print_version)
     case "$1" in
         init)
            init_app
