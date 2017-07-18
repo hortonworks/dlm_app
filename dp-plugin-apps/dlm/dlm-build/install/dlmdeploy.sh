@@ -5,16 +5,16 @@ DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 
 ps() {
-    docker container ls --filter "name=dlm-app"
+    docker ps --filter "name=dlm-app"
 }
 
 list_logs() {
-    docker container logs dlm-app
+    docker logs dlm-app
 }
 
 
 destroy() {
-    docker container rm --force dlm-app
+    docker rm --force dlm-app
 }
 
 
@@ -29,7 +29,7 @@ init_app() {
         read_consul_host
     fi
     docker start dlm-app >> install.log 2>&1 || \
-        docker container run \
+        docker run \
             --name dlm-app \
             --network dp \
             --publish 9011:9011 \
@@ -41,11 +41,11 @@ init_app() {
 
 
 start_app() {
-    docker container start dlm-app
+    docker start dlm-app
 }
 
 stop_app() {
-    docker container stop dlm-app
+    docker stop dlm-app
 }
 
 print_version() {
