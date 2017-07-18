@@ -1,0 +1,6 @@
+version: '2'
+services:
+  dp-consul-server:
+    image: consul:0.8.5
+    network_mode: "host"
+    command: agent -server -bootstrap -bind=${CONSUL_HOST} -client=${CONSUL_HOST} -ui
