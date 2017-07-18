@@ -186,7 +186,7 @@ export class DsAssetList implements OnInit {
   onAssetClick(id:any, clusterId:number) {
     // console.log(id, clusterId);
     if(this.allowAssetNavigation && clusterId) {
-      this.router.navigate([`datasteward/datafolio/assets/details/${clusterId}/${id}`]);
+      this.router.navigate([`datasteward/dataset/assets/details/${clusterId}/${id}`]);
     }
   }  
 

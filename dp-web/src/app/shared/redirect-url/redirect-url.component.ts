@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterContentInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router'; 
 
 export interface RedirectUrlData {
@@ -12,8 +12,9 @@ export interface RedirectUrlData {
   templateUrl: './redirect-url.component.html'
 })
 
-export class RedirectUrlComponent implements OnInit, AfterContentInit {
+export class RedirectUrlComponent implements OnInit {
 
+  url: string;
   data: RedirectUrlData;
 
   constructor(private router: Router,
@@ -23,12 +24,8 @@ export class RedirectUrlComponent implements OnInit, AfterContentInit {
     });
   }
 
-  ngAfterContentInit() {
-    debugger;
-  }
-
   ngOnInit() {
-    debugger;
+    this.url = this.router.routerState.snapshot.url;
 
     let newURL = '';
 
