@@ -54,7 +54,9 @@ export class DlmComponent implements OnDestroy {
   private initPolling() {
     const pollProgress$ = this.store
       .select(getMergedProgress(POLL_EVENTS_ID, POLL_NEW_EVENTS_ID))
-      .filter(requestsState => !requestsState.isInProgress)
+      .map(r => r.isInProgress)
+      .distinctUntilChanged()
+      .filter(isInProgress => !isInProgress)
       .delay(POLL_INTERVAL)
       .do(_ => {
         this.store.dispatch(loadNewEventsCount({requestId: POLL_NEW_EVENTS_ID}));
