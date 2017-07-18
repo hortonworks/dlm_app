@@ -30,12 +30,15 @@ export interface Policy {
 export interface PolicyDefinition {
   type: string;
   name: string;
+  description?: string;
   sourceCluster: string;
   targetCluster: string;
   sourceDataset: string;
   frequencyInSec: number;
   startTime?: string;
   endTime?: string;
+  queueName?: string;
+  distcpMapBandwidth?: number;
 }
 
 export interface PolicyPayload {

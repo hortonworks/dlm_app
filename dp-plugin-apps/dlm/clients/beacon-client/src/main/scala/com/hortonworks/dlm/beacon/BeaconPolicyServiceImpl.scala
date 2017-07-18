@@ -73,6 +73,18 @@ class BeaconPolicyServiceImpl()(implicit ws: WSClient) extends BeaconPolicyServi
       (policyDefinitionRequest.startTime match {
         case Some(startTime) => "\nstartTime = " + startTime
         case None => ""
+      }) +
+      (policyDefinitionRequest.distcpMapBandwidth match {
+        case Some(distcpMapBandwidth) => "\ndistcpMapBandwidth = " + distcpMapBandwidth
+        case None => ""
+      }) +
+      (policyDefinitionRequest.queueName match {
+        case Some(queueName) => "\nqueueName = " + queueName
+        case None => ""
+      }) +
+      (policyDefinitionRequest.description match {
+        case Some(description) => "\ndescription = " + description
+        case None => ""
       })
   }
 

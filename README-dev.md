@@ -30,9 +30,9 @@
   * Navigate to `<project_parent>/dataplane/services/db-service/db`
   * Run `flyway migrate`
 4. Start Play BE
-  * sh runDbService.sh for db service
-  * sh runDpApp.sh for app
-  * sh runClusterService.sh for cluster service
+  * `sh runDbService.sh` for db service
+  * `sh runDpApp.sh` for app
+  * `sh runClusterService.sh` for cluster service
 5. Start UI
   * `yarn install --pure-lockfile`
   * `yarn run dev`

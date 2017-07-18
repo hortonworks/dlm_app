@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { loadPairings, deletePairing } from 'actions/pairing.action';
@@ -11,16 +11,27 @@ import { getAllPairings } from 'selectors/pairing.selector';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { ClusterPairing } from 'models/cluster-pairing.model';
+import { getMergedProgress } from 'selectors/progress.selector';
+import { ProgressState } from 'models/progress-state.model';
+import { OperationResponse } from 'models/operation-response.model';
+import { Subscription } from 'rxjs/Subscription';
+import { getLastOperationResponse } from '../../selectors/operation.selector';
+
+const PAIRINGS_REQUEST = '[PAIRING_PAGE] PAIRINGS_REQUEST';
 
 @Component({
   selector: 'dlm-pairings',
   templateUrl: './pairings.component.html',
   styleUrls: ['./pairings.component.scss']
 })
-export class PairingsComponent implements OnInit {
+export class PairingsComponent implements OnInit, OnDestroy {
 
   @ViewChild('confirmationModal') public confirmationModel: ModalDialogComponent;
   pairings$: Observable<Pairing[]>;
+  overallProgress$: Observable<ProgressState>;
+  lastOperationResponse: OperationResponse = <OperationResponse>{};
+  showOperationResponseModal = false;
+  operationResponseSubscription: Subscription;
   private unpairParams: Array<Object>;
 
   static getBeaconUrl(cluster: Cluster | ClusterPairing): string {
@@ -42,10 +53,11 @@ export class PairingsComponent implements OnInit {
     private translate: TranslateService
   ) {
     this.pairings$ = store.select(getAllPairings);
+    this.overallProgress$ = store.select(getMergedProgress(PAIRINGS_REQUEST));
   }
 
   ngOnInit() {
-    this.store.dispatch(loadPairings());
+    this.store.dispatch(loadPairings(PAIRINGS_REQUEST));
   }
 
   createPairingClickHandler() {
@@ -71,6 +83,28 @@ export class PairingsComponent implements OnInit {
   }
 
   onConfirmation() {
+    if (!this.operationResponseSubscription) {
+      this.subscribeToOperation();
+    }
     this.store.dispatch(deletePairing(this.unpairParams));
+  }
+
+  subscribeToOperation() {
+    this.operationResponseSubscription = this.store.select(getLastOperationResponse).subscribe(op => {
+      if (op && op.status) {
+        this.showOperationResponseModal = true;
+        this.lastOperationResponse = op;
+      }
+    });
+  }
+
+  onCloseOperationResponseModal() {
+    this.showOperationResponseModal = false;
+  }
+
+  ngOnDestroy() {
+    if (this.operationResponseSubscription) {
+      this.operationResponseSubscription.unsubscribe();
+    }
   }
 }

@@ -118,6 +118,7 @@ import { CheckboxColumnComponent, ActionColumnComponent } from './components';
 import { ReviewPolicyComponent } from 'pages/policies/subpages/review-policy/review-policy.component';
 
 import { PipesModule } from './pipes/pipes.module';
+import { FrequencyPipe } from 'pipes/frequency.pipe';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SimpleNotificationsModule } from 'angular2-notifications';
@@ -237,6 +238,7 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     NotificationService,
     OverviewJobsExternalFiltersService,
     httpServiceProvider,
+    FrequencyPipe,
     AppConfig,
     {
       provide: APP_INITIALIZER,

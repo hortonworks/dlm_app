@@ -153,8 +153,8 @@ class StorageInterfaceImpl @Inject()(
   }
 
   override def updateServiceByName(
-      toPersist: ClusterData,
-      endpoints: Seq[ClusterServiceHost]): Future[Boolean] = {
+                                    toPersist: ClusterData,
+                                    endpoints: Seq[ClusterServiceHost]): Future[Boolean] = {
     for {
       serviceUpdate <- clusterComponentService.updateServiceByName(toPersist)
       cs <- clusterComponentService.getServiceByName(toPersist.clusterId.get,

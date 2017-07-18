@@ -14,7 +14,7 @@ export class StatusCheckGuard implements CanActivate {
   canActivate(route: ActivatedRouteSnapshot) {
     return Observable.create(observer => {
       this.configService.isKnoxConfigured().subscribe(response => {
-        if (response.isConfigured && this.router.url === '/onboard/configure') {
+        if (response.configured && this.router.url === '/onboard/configure') {
           this.redirect(observer, true);
         }else{
           this.redirect(observer, false, '/');

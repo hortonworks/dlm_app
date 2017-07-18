@@ -90,7 +90,7 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
     this.columns = [
       {prop: 'pathSuffix', name: 'Name', cellClass: 'text-cell', headerClass: 'text-header',
         minWidth: 150, flexGrow: 1, cellTemplate: this.nameFormattedTemplate},
-      {prop: 'blockSize', name: 'Size', cellClass: 'text-cell', headerClass: 'text-header',
+      {prop: 'length', name: 'Size', cellClass: 'text-cell', headerClass: 'text-header',
         cellTemplate: this.sizeFormattedTemplate, maxWidth: 120},
       {prop: 'owner', name: 'Owner', cellClass: 'text-cell', headerClass: 'text-header', maxWidth: 150},
       {prop: 'group', name: 'Group', cellClass: 'text-cell', headerClass: 'text-header', maxWidth: 150},

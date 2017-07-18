@@ -10,7 +10,7 @@ import { JobService } from 'services/job.service';
 export class PolicyService {
 
   normalizePolicy(policy): Policy {
-    policy.id = policy.name;
+    policy.id = policy.policyId;
     return policy;
   }
 

@@ -1,0 +1,43 @@
+@import "../../../../styles/variables";
+
+.suit-navigation {
+  position: fixed;
+  top: 55px;
+  left: 0;
+  margin: 0;
+  padding: 40px 20px;
+  background: $white;
+  -webkit-box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
+  -moz-box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
+  box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
+  z-index: 100;
+  visibility: hidden;
+  width: auto;
+  display: flex;
+
+  &.showPopup {
+    visibility: visible;
+  }
+
+  & > li {
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+    margin: 0 20px;
+
+    & .logo-wrapper {
+      background-color: $eastern-blue;
+      padding: 15px;
+      border-radius: 4px;
+      display: inline-block;
+      height: 72px;
+      & + div {
+        text-align: center;
+        font-size: 13px;
+        padding-top: 5px;
+        white-space: nowrap;
+        line-height: 1;
+      }
+    }
+  }
+}

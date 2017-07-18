@@ -3,32 +3,12 @@ package services
 import javax.inject.{Inject, Singleton}
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  Cluster,
-  DataplaneCluster,
-  Error,
-  Errors,
-  Location
-}
-import com.hortonworks.dataplane.commons.domain.Ambari.{
-  ClusterServiceWithConfigs,
-  ClusterProperties,
-  ConfigurationInfo,
-  NameNodeInfo
-}
-import com.hortonworks.dataplane.db.Webservice.{
-  ClusterComponentService,
-  ClusterService,
-  DpClusterService,
-  LocationService
-}
-import models.Entities.{
-  ClusterStats,
-  BeaconCluster,
-  BeaconClusters,
-  ClusterServiceEndpointDetails
-}
+import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster, Error, Errors, Location}
+import com.hortonworks.dataplane.commons.domain.Ambari.{ClusterProperties, ClusterServiceWithConfigs, ConfigurationInfo, NameNodeInfo}
+import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterService, DpClusterService, LocationService}
+import models.Entities.{BeaconCluster, BeaconClusters, ClusterServiceEndpointDetails, ClusterStats}
 import play.api.Logger
+import play.api.http.Status.BAD_GATEWAY
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
@@ -200,12 +180,19 @@ class DataplaneService @Inject()(
     */
   def getBeaconEndpointDetails(endpointData: ClusterServiceWithConfigs)
     : Either[Errors, ClusterServiceEndpointDetails] = {
-    val beaconPort: Either[Errors, String] =
-      getPropertyValue(endpointData, "beacon-env", "beacon_port")
+
+    val beaconSchemePortMap = Map("http" -> "beacon_port", "https" -> "beacon_tls_enabled")
+    val beaconScheme : String = getPropertyValue(endpointData, "beacon-env", "beacon_tls_enabled") match {
+      case Right(beaconScheme) => if (beaconScheme == "true") "https" else "http"
+      case Left(errors) => "http"
+    }
+
+    val beaconPort =  getPropertyValue(endpointData, "beacon-env", beaconSchemePortMap(beaconScheme))
+
     beaconPort match {
       case Right(beaconPort) =>
         val beaconHostName = endpointData.servicehost
-        val fullurl = s"http://$beaconHostName:$beaconPort"
+        val fullurl = s"$beaconScheme://$beaconHostName:$beaconPort"
         Right(
           ClusterServiceEndpointDetails(endpointData.serviceid,
                                         endpointData.servicename,
@@ -240,19 +227,46 @@ class DataplaneService @Inject()(
   }
 
   /**
-    * Get namenode node endpoint details for http connection
+    * Get namenode endpoint details for http connection
     * @param endpointData configuration blob for namenode
-    * @return
+    * @param namenodeHostName namenode hostname
+    * @param isNameNodeHAEnabled HA status of the namenode
+    * @return                                                                   
     */
-  def getNameNodeHttpEndpointDetails(endpointData: ClusterServiceWithConfigs)
+  def getNameNodeHttpEndpointDetails(endpointData: ClusterServiceWithConfigs, namenodeHostName: String, isNameNodeHAEnabled: Boolean)
     : Either[Errors, ClusterServiceEndpointDetails] = {
-    val endpoint: Either[Errors, String] =
-      getPropertyValue(endpointData, "hdfs-site", "dfs.namenode.http-address")
+
+    val nameNodeSchemePortMap = Map("http" -> "dfs.namenode.http-address", "https" -> "dfs.namenode.https-address")
+
+    val nameNodeScheme : String = getPropertyValue(endpointData, "hdfs-site", "dfs.http.policy") match {
+      case Right(nameNodeScheme) => if (nameNodeScheme == "HTTPS_ONLY") "https" else "http"
+      case Left(errors) => "http"
+    }
+
+    val endpoint: Either[Errors, String] = if (isNameNodeHAEnabled) {
+      getPropertyValue(endpointData, "hdfs-site", "dfs.nameservices") match {
+        case Right(nameService) => {
+          getPropertyValue(endpointData, "hdfs-site", s"dfs.ha.namenodes.$nameService")  match {
+            case Right(nameServicePrefixes) => {
+              val endpointConfigs : Seq[String] = nameServicePrefixes.split(",").map((x) => s"dfs.namenode.$nameNodeScheme-address.$nameService.$x")
+              val endpoints = for (config <- endpointConfigs) yield getPropertyValue(endpointData, "hdfs-site", config)
+              val namenodeHostEndpoint : Option[Either[Errors, String]] = endpoints.filter(_.isRight).find((x) => new java.net.URI(s"$nameNodeScheme://$x").getHost == namenodeHostName)
+              val errorMsg = DataplaneService.nameNodeEndpointErrMsg + namenodeHostName
+              if (namenodeHostEndpoint.isDefined) namenodeHostEndpoint.get else  Left(Errors(Seq(Error(BAD_GATEWAY.toString, errorMsg))))
+            }
+            case Left(errors) => Left(errors)
+          }
+        }
+        case Left(errors) => Left(errors)
+      }
+    } else {
+      getPropertyValue(endpointData, "hdfs-site", nameNodeSchemePortMap(nameNodeScheme))
+    }
+    
     endpoint match {
       case Right(endpoint) => {
-        val namenodeHostName = endpointData.servicehost
-        val namenodePort: Int = new java.net.URI(s"http://$endpoint").getPort
-        val fullurl = s"http://$namenodeHostName:$namenodePort"
+        val namenodePort = new java.net.URI(s"$nameNodeScheme://$endpoint").getPort
+        val fullurl = s"$nameNodeScheme://$namenodeHostName:$namenodePort"
         Right(
           ClusterServiceEndpointDetails(endpointData.serviceid,
                                         endpointData.servicename,
@@ -273,10 +287,17 @@ class DataplaneService @Inject()(
     : Either[Errors, ClusterServiceEndpointDetails] = {
     val hiveServerPort: Either[Errors, String] =
       getPropertyValue(endpointData, "hive-site", "hive.server2.thrift.port")
+
+    val hiveServerScheme: Either[Errors, String] = getPropertyValue(endpointData, "hive-site", "hive.server2.use.SSL")
+
     hiveServerPort match {
       case Right(hiveServerPort) => {
         val hiveServerHostName = endpointData.servicehost
-        val fullurl = s"http://$hiveServerHostName:$hiveServerPort"
+        val hiveServerScheme = getPropertyValue(endpointData, "hive-site", "hive.server2.use.SSL") match {
+          case Right(schemeValue) =>  if (schemeValue == "true") "https" else "http"
+          case Left(errors) => "http"
+        }
+        val fullurl = s"$hiveServerScheme://$hiveServerHostName:$hiveServerPort"
         Right(
           ClusterServiceEndpointDetails(endpointData.serviceid,
                                         endpointData.servicename,
@@ -326,7 +347,7 @@ class DataplaneService @Inject()(
 
       }
       case None => {
-        val errorMsg = s"configuration blob is not availaible for $serviceName"
+        val errorMsg = s"configuration blob is not available for $serviceName"
         Logger.error(errorMsg)
         Left(Errors(Seq(Error("500", errorMsg))))
       }
@@ -376,18 +397,6 @@ class DataplaneService @Inject()(
   }
 
   /**
-    * Get future for namenode details from dataplane db client
-    * @param clusterId cluster id
-    * @return
-    */
-  def getNameNodeHttpService(clusterId: Long)
-    : Future[Either[Errors, ClusterServiceEndpointDetails]] = {
-    getServiceEndpointDetails(clusterId,
-                              DataplaneService.NAMENODE,
-                              getNameNodeHttpEndpointDetails)
-  }
-
-  /**
     *  Get future for Hive Server details from dataplane
     * @param clusterId cluster id
     * @return
@@ -426,10 +435,18 @@ class DataplaneService @Inject()(
       })
     p.future
   }
+
+  def getServiceConfigs(clusterId: Long,
+                        serviceName: String): Future[Either[Errors, ClusterServiceWithConfigs]] = {
+    clusterComponentService
+      .getEndpointsForCluster(clusterId, serviceName)
+  }
 }
 
 object DataplaneService {
   val BEACON_SERVER = "BEACON"
   val NAMENODE = "NAMENODE"
   val HIVE_SERVER = "HIVE"
+
+  def nameNodeEndpointErrMsg = "NameNode address config with active namenode hostname in the key not found: "
 }
