@@ -63,9 +63,9 @@ function updateEntityField(state: State, action, fieldName: string, newValue): S
 function loadLastJobsSuccess(state: State, action): State {
   const { jobs } = action.payload.response;
   const updatedPolicies = jobs.reduce((policyEntities: {[id: string]: Policy}, job: Job) => {
-    if (job.name in state.entities) {
-      const policy = state.entities[job.name];
-      const lastJobs = sortByDateField((policyEntities[job.name] && policyEntities[job.name].jobs || []).concat(job), 'startTime');
+    if (job.policyId in state.entities) {
+      const policy = state.entities[job.policyId];
+      const lastJobs = sortByDateField((policyEntities[job.policyId] && policyEntities[job.policyId].jobs || []).concat(job), 'startTime');
       return {
         ...policyEntities,
         [policy.id]: {

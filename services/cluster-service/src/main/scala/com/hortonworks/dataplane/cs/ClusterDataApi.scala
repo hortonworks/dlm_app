@@ -1,4 +1,4 @@
-package com.hortonworks.dataplane.cs.atlas
+package com.hortonworks.dataplane.cs
 
 import java.net.URL
 import java.util.concurrent.{Executors, TimeUnit}
@@ -8,23 +8,23 @@ import akka.stream.ActorMaterializer
 import com.google.common.base.{Supplier, Suppliers}
 import com.google.common.cache.{Cache, CacheBuilder, CacheLoader, LoadingCache}
 import com.google.inject.Inject
-import com.hortonworks.dataplane.commons.domain.Constants
+import com.hortonworks.dataplane.commons.domain.{Constants, Entities}
 import com.hortonworks.dataplane.commons.domain.Entities.{HJwtToken, ClusterService => CS}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
-import com.hortonworks.dataplane.cs.{Credentials, StorageInterface}
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, DpClusterService}
 import com.hortonworks.dataplane.knox.Knox.{KnoxConfig, TokenResponse}
 import com.hortonworks.dataplane.knox.KnoxApiExecutor
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import org.joda.time.DateTime
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsArray, JsObject, JsValue}
 import play.api.libs.ws.WSClient
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class AtlasApiData @Inject()(
+
+class ClusterDataApi @Inject()(
     private val actorSystem: ActorSystem,
     private val actorMaterializer: ActorMaterializer,
     private val storageInterface: StorageInterface,
@@ -52,7 +52,7 @@ class AtlasApiData @Inject()(
     Try(config.getInt("dp.services.cluster.knox.token.cache.removal.time"))
       .getOrElse(3)
 
-  private lazy val log = Logger(classOf[AtlasApiData])
+  private lazy val log = Logger(classOf[ClusterDataApi])
 
   // The time for which the URL should be cached
   private lazy val urlCacheTime =
@@ -162,6 +162,33 @@ class AtlasApiData @Inject()(
   def getAtlasUrl(clusterId:Long) = {
      clusterAtlasSupplierCache.get(clusterId).get()
   }
+
+
+  private def getKnoxUrl(dpc: Entities.DataplaneCluster, cs: CS) = {
+    val topology = config.getString("dp.services.knox.token.target.topology")
+    cs.properties match {
+      case Some(json) =>
+        val item = (json \ "items").as[JsArray].head
+        val target = (item \ "configurations").as[List[JsValue]].find(v => (v \ "type").as[String] == "gateway-site")
+        val gatewayPath = (target.get \ "properties" \ "gateway.path").as[String]
+        Some(s"${dpc.knoxUrl.get.stripSuffix("/")}/$gatewayPath/$topology")
+      case None => None
+    }
+  }
+
+  def getKnoxUrl(clusterId:Long):Future[Option[String]] = {
+    for{
+      cl <- clusterService.retrieve(clusterId.toString)
+      c <- Future.successful(cl.right.get)
+      dpce <- dpClusterService.retrieve(c.dataplaneClusterId.get.toString)
+      dpc <- Future.successful(dpce.right.get)
+      service <- clusterComponentService.getServiceByName(clusterId,Constants.KNOX)
+      cs <- Future.successful(service.right.get)
+    } yield getKnoxUrl(dpc,cs)
+  }
+
+
+
 }
 
 

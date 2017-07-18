@@ -14,6 +14,7 @@ import { deletePolicy, resumePolicy, suspendPolicy } from 'actions/policy.action
 import { abortJob } from 'actions/job.action';
 import { StatusColumnComponent } from 'components/table-columns/status-column/status-column.component';
 import { Policy } from 'models/policy.model';
+import { LogService } from 'services/log.service';
 
 @Component({
   selector: 'dlm-jobs-overview-table',
@@ -35,8 +36,11 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;
   @ViewChild('prevJobs') prevJobsRef: TemplateRef<any>;
 
-  constructor(private t: TranslateService, protected store: Store<fromRoot.State>, private router: Router) {
-    super(store);
+  constructor(private t: TranslateService,
+              protected store: Store<fromRoot.State>,
+              private router: Router,
+              protected logService: LogService) {
+    super(store, logService);
   }
 
   private translateColumn(columnName: string): string {
@@ -105,9 +109,9 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
     }
   }
 
-  handleSelectedAction({policy, action}) {
+  handleSelectedAction({row, action}) {
     this.selectedAction = action;
-    this.selectedForActionRow = policy;
+    this.selectedForActionRow = row;
     this.showActionConfirmationModal = true;
   }
 
@@ -149,6 +153,6 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   }
 
   goToPolicy(policy: Policy) {
-    this.router.navigate(['/policies'], {queryParams: {policy: policy.id}});
+    this.router.navigate(['/policies'], {queryParams: {policy: policy.name}});
   }
 }

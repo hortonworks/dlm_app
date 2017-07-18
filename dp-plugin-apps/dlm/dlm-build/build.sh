@@ -60,16 +60,8 @@ build_installer() {
 	log "Building installer"
 	cp -R install/* ${DLM_DOCKER_ROOT_FOLDER}/installer
 	cp dlm-docker-build.sh ${DLM_DOCKER_ROOT_FOLDER}/installer/
-	append_docker_image_version "hortonworks\/dlm-app" ${DLM_DOCKER_ROOT_FOLDER}/installer/docker-compose-apps.yml
 	VERSION_STRING=$(get_version)
 	echo ${VERSION_STRING} > ${DLM_DOCKER_ROOT_FOLDER}/installer/VERSION
-}
-
-append_docker_image_version() {
-	IMAGE_NAME=$1
-	DOCKER_COMPOSE_FILE_NAME=$2
-	VERSION=$(get_version)
-	sed -i".bak" -e "s/${IMAGE_NAME}/${IMAGE_NAME}:${VERSION}/g" ${DOCKER_COMPOSE_FILE_NAME}
 }
 
 get_version() {

@@ -9,7 +9,11 @@ import { JobTrackingInfo } from 'models/job-tracking-info.model';
 })
 export class TransferredColumnComponent implements OnInit {
 
-  @Input() trackingInfo = {};
+  @Input() trackingInfo: JobTrackingInfo = <JobTrackingInfo>{};
+
+  get progress() {
+    return Math.round((this.trackingInfo.completedMapTasks || 0) / (this.trackingInfo.totalMapTasks || 1) * 100);
+  }
 
   constructor() { }
 
@@ -22,7 +26,7 @@ export class TransferredColumnComponent implements OnInit {
   }
 
   isInProgress() {
-    const { completedMapTasks, totalMapTasks } = <JobTrackingInfo>this.trackingInfo;
+    const { completedMapTasks, totalMapTasks } = this.trackingInfo;
     return !this.isFailed() && completedMapTasks < totalMapTasks;
   }
 }

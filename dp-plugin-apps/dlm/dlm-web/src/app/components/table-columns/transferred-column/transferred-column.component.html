@@ -4,6 +4,7 @@
     *ngIf="isInProgress()"
     [value]="trackingInfo?.completedMapTasks"
     [max]="trackingInfo?.totalMapTasks">
+    {{progress}} %
   </progressbar>
   <i *ngIf="isFailed()" class="fa fa-minus"></i>
 </div>

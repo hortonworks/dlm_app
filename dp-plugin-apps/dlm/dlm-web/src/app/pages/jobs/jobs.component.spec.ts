@@ -26,6 +26,10 @@ import { DurationColumnComponent } from 'components/table-columns/duration-colum
 import { TransferredColumnComponent } from 'components/table-columns/transferred-column/transferred-column.component';
 import { PipesModule } from 'pipes/pipes.module';
 import { PolicyActionsComponent } from 'components/policy-actions/policy-actions.component';
+import { LogService } from 'services/log.service';
+import {MockBackend} from '@angular/http/testing';
+import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions} from '@angular/http';
+import {HttpService} from 'services/http.service';
 
 describe('JobsComponent', () => {
   let component: JobsComponent;
@@ -63,7 +67,13 @@ describe('JobsComponent', () => {
       ],
       providers: [
         {provide: Store, useClass: MockStore},
-        NavbarService
+        {provide: ConnectionBackend, useClass: MockBackend},
+        {provide: RequestOptions, useClass: BaseRequestOptions},
+        {provide: Http, useClass: HttpService},
+        Http,
+        HttpService,
+        NavbarService,
+        LogService
       ]
     })
       .compileComponents();

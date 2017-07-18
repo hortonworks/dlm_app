@@ -22,6 +22,10 @@ import { NavbarService } from 'services/navbar.service';
 import { MockStore } from '../../../mocks/mock-store';
 import { Store } from '@ngrx/store';
 import { PipesModule } from 'pipes/pipes.module';
+import { LogService } from 'services/log.service';
+import {MockBackend} from '@angular/http/testing';
+import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions} from '@angular/http';
+import {HttpService} from 'services/http.service';
 
 describe('PolicyDetailsComponent', () => {
   let component: PolicyDetailsComponent;
@@ -50,7 +54,13 @@ describe('PolicyDetailsComponent', () => {
         HdfsBrowserComponent
       ],
       providers: [
+        {provide: ConnectionBackend, useClass: MockBackend},
+        {provide: RequestOptions, useClass: BaseRequestOptions},
+        {provide: Http, useClass: HttpService},
+        Http,
+        HttpService,
         NavbarService,
+        LogService,
         {provide: Store, useClass: MockStore}
       ]
     })

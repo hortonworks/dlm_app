@@ -19,7 +19,7 @@ export class RbacService {
         new PersonaTabs('User Management', 'infra/users', 'fa-users')
       ], '', 'infra-logo.png')]);
     this.personaMap.set('CURATOR', [new Persona('Data Steward', [
-      new PersonaTabs('Dataset', 'datasteward/dataset', 'fa-cubes', true),
+      new PersonaTabs('Asset Collection', 'datasteward/dataset', 'fa-cubes', true),
       new PersonaTabs('Unclassified', 'unclassified', 'fa-cube'),
       new PersonaTabs('Assets', 'assets', 'fa-server'),
       new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')

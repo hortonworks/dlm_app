@@ -6,7 +6,7 @@ public class RandomGenerator {
   private static char[] _base62chars =
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
   private static Random _random = new Random();
-  int stringLength;
+  private int stringLength;
 
   public RandomGenerator(int stringLength) {
     this.stringLength = stringLength;

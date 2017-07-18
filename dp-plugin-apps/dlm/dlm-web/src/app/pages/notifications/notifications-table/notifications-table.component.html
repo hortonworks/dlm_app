@@ -24,8 +24,5 @@
 </ng-template>
 
 <ng-template let-event="row" #logTemplate>
-  <span *ngIf="event.eventType === 'policyinstance'" class="text-primary actionable" (click)="showLog(event)">{{ "page.notifications.view_log" | translate }}</span>
+  <span *ngIf="event.eventType === 'policyinstance' || event.eventType === 'policy'" class="text-primary actionable" (click)="showLog(event)">{{ "page.notifications.view_log" | translate }}</span>
 </ng-template>
-
-<dlm-log-modal-dialog #logModalDialog [message]="logMessage$ | async">
-</dlm-log-modal-dialog>

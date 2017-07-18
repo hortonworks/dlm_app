@@ -280,7 +280,7 @@
         "content": {
           "no_clusters": "No clusters are registered with Data Lifecycle Manager. Click Add>Cluster and register at least two clusters for pairing. Ensure that clusters to be used for replication jobs meet Data Lifecycle Manager configuration requirements.",
           "header": {
-            "step_one": "STEP 1: SELECT FIRST CLUSTER",
+            "step_one": "STEP 1: SELECT PEER CLUSTER",
             "step_two": "STEP 2: SELECT CLUSTER TO BE PAIRED",
             "in_progress": "IN PROGRESS"
           },
