@@ -65,7 +65,6 @@ init_db() {
 
 ps() {
     docker container ls \
-        --all \
         --filter "name=dp-app|dp-db-service|dp-cluster-service|dp-gateway|dp-database|knox|dp-consul-server"
 }
 

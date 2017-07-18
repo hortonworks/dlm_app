@@ -5,7 +5,7 @@ DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 
 ps() {
-    docker container ls --all --filter "name=dlm-app"
+    docker container ls --filter "name=dlm-app"
 }
 
 list_logs() {
