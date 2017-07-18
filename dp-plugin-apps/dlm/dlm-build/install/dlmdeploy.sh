@@ -1,22 +1,20 @@
 #!/bin/sh
 set -e
 
-DOCKER_FILES="-f docker-compose-apps.yml"
-
 DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 
 ps() {
-    docker-compose ${DOCKER_FILES} ps
+    docker container ls --filter "name=dlm-app"
 }
 
 list_logs() {
-    docker-compose ${DOCKER_FILES} logs "$@"
+    docker container logs dlm-app
 }
 
 
 destroy() {
-    docker-compose -f docker-compose-apps.yml down
+    docker container rm --force dlm-app
 }
 
 
@@ -30,23 +28,31 @@ init_app() {
     if [ "$CONSUL_HOST" == "" ]; then
         read_consul_host
     fi
-    docker-compose -f docker-compose-apps.yml up -d
+    docker start dlm-app >> install.log 2>&1 || \
+        docker container run \
+            --name dlm-app \
+            --network dp \
+            --publish 9011:9011 \
+            --detach \
+            --env CONSUL_HOST \
+            --env DLM_APP_HOME="/usr/dlm-app" \
+            hortonworks/dlm-app:$VERSION
 }
 
 
 start_app() {
-    docker-compose -f docker-compose-apps.yml start
+    docker container start dlm-app
 }
 
 stop_app() {
-    docker-compose -f docker-compose-apps.yml stop
+    docker container stop dlm-app
 }
 
 print_version() {
     if [ -f VERSION ]; then
         cat VERSION
     else
-        cat ${DEFAULT_VERSION}:${DEFAULT_TAG}
+        echo ${DEFAULT_VERSION}:${DEFAULT_TAG}
     fi
 }
 
@@ -68,6 +74,7 @@ then
     usage;
     exit 0;
 else
+    VERSION=$(print_version)
     case "$1" in
         init)
            init_app
