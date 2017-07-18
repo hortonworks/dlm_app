@@ -1,12 +1,13 @@
-import { Component, Input, ElementRef, OnInit, AfterViewInit } from '@angular/core';
+import { Component, Input, ElementRef, OnInit, AfterViewInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { NavbarService } from 'services/navbar.service';
-
+import { Persona } from 'models/header-data';
 import { MenuItem } from './menu-item';
 
 @Component({
   selector: 'navbar',
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+  styleUrls: ['./navbar.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class NavbarComponent implements OnInit, AfterViewInit {
@@ -26,10 +27,14 @@ export class NavbarComponent implements OnInit, AfterViewInit {
   @Input() activeClass = 'active';
   @Input() navBarToggleDataAttr = 'collapse-side-nav';
   @Input() subMenuNavToggleDataAttr = 'collapse-sub-menu';
+  @Input() personas: Persona[];
+  @ViewChild('personaNavSrc') personaNavSrc: ElementRef;
+  personaNavSrcNativeElement;
 
   navbar: any;
   options: any = {};
-  constructor(navbar: ElementRef, private navbarService: NavbarService) {
+  constructor(navbar: ElementRef,
+              private navbarService: NavbarService) {
     this.navbar = navbar.nativeElement;
   }
 
@@ -53,6 +58,7 @@ export class NavbarComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     $(this.navbar).navigationBar(this.options);
+    this.personaNavSrcNativeElement = this.personaNavSrc.nativeElement;
   }
 
   hasSubMenu(item: MenuItem): boolean {
@@ -60,6 +66,12 @@ export class NavbarComponent implements OnInit, AfterViewInit {
       return item.subMenu.length > 0;
     }
     return false;
+  }
+
+  navigateToPersona(persona: Persona) {
+    if (persona.url.length > 0) {
+      window.location.pathname = persona.url;
+    }
   }
 
   toggleNavbar() {

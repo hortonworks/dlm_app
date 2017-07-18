@@ -1,6 +1,10 @@
 export interface User {
-  fullName: string;
-  role: string;
-  email: string;
+  id: string;
+  avatar: string;
+  display: string;
+  token: string;
+  roles: string[];
+  active: boolean;
+  username: string;
   timezone: string;
 }

@@ -3,6 +3,8 @@ import {RouterTestingModule} from '@angular/router/testing';
 import { NavbarComponent } from './navbar.component';
 import { NavbarService } from 'services/navbar.service';
 import { MenuItem } from './menu-item';
+import { PersonaPopupComponent } from 'common/persona-popup/persona-popup.component';
+import { Persona } from 'models/header-data';
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
@@ -11,7 +13,7 @@ describe('NavbarComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
-      declarations: [ NavbarComponent ],
+      declarations: [ NavbarComponent, PersonaPopupComponent ],
       providers: [ NavbarService ]
     })
     .compileComponents();
@@ -21,6 +23,7 @@ describe('NavbarComponent', () => {
     fixture = TestBed.createComponent(NavbarComponent);
     component = fixture.componentInstance;
     component.header = new MenuItem('a', 'b', 'c');
+    component.personas = [new Persona('admin', [], '', '')];
     fixture.detectChanges();
   });
 

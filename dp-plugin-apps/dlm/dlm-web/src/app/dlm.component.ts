@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { MenuItem } from './common/navbar/menu-item';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers/index';
@@ -17,6 +17,8 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import * as moment from 'moment';
 import { POLL_INTERVAL } from 'constants/api.constant';
+import {HeaderData, Persona, PersonaTabs} from 'models/header-data';
+import { IdentityService } from 'services/identity.service';
 
 const POLL_EVENTS_ID = 'POLL_EVENT_ID';
 const POLL_NEW_EVENTS_ID = 'POLL_NEW_EVENTS_ID';
@@ -27,7 +29,7 @@ const POLL_NEW_EVENTS_ID = 'POLL_NEW_EVENTS_ID';
   styleUrls: ['./dlm.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class DlmComponent implements OnDestroy {
+export class DlmComponent implements OnDestroy, OnInit {
   header: MenuItem;
   menuItems: MenuItem[];
   mainContentSelector = '#dlm_content';
@@ -37,6 +39,7 @@ export class DlmComponent implements OnDestroy {
   navigationColumns = NAVIGATION;
   onOverviewPage = false;
   subscriptions: Subscription[] = [];
+  headerData: HeaderData = new HeaderData();
 
   // Options for Toast Notification
   notificationOptions = {
@@ -47,9 +50,7 @@ export class DlmComponent implements OnDestroy {
     timeOut: 10000
   };
 
-  // mock current user
-  // TODO: move user to store and dispatch timezone update with action
-  user: User = <User>{fullName: 'Jim Raynor', timezone: ''};
+  user: User = <User>{};
 
   private initPolling() {
     const pollProgress$ = this.store
@@ -69,6 +70,7 @@ export class DlmComponent implements OnDestroy {
               private store: Store<State>,
               private sessionStorageService: SessionStorageService,
               private timeZoneService: TimeZoneService,
+              private identityService: IdentityService,
               private router: Router,
               private route: ActivatedRoute) {
     this.user.timezone = timeZoneService.setupUserTimeZone();
@@ -136,8 +138,31 @@ export class DlmComponent implements OnDestroy {
     return urlValue[0].path === path;
   }
 
-  ngOnDestroy() {
-    this.subscriptions.forEach(s => s.unsubscribe());
+  getUser(): User {
+    return this.identityService.getUser();
+  }
+
+  isUserSignedIn(): boolean {
+    return this.identityService.isUserAuthenticated();
+  }
+
+  ngOnInit() {
+    this.setHeaderData();
+    const user = this.getUser();
+    if (user && user.id) {
+      this.user = user;
+    } else {
+      // TODO: Log the user out of DLM
+    }
+  }
+
+  setHeaderData() {
+    this.headerData.personas = [
+      new Persona('Data Steward', [], '/dataset', 'steward-logo.png'),
+      new Persona('Infra Admin', [], '/infra', 'infra-logo.png'),
+      new Persona('Analytics', [], '/workspace', 'analytics-logo.png'),
+      new Persona('Data Life cycle Manager', [], '', 'dlm-logo.png')
+    ];
   }
 
   saveUserTimezone(timezoneIndex) {
@@ -148,6 +173,10 @@ export class DlmComponent implements OnDestroy {
 
   logout() {
     // do logout
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
 }
