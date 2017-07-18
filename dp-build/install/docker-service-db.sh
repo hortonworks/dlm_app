@@ -11,7 +11,7 @@
 docker start dp-db-service >> install.log 2>&1 || \
     docker run \
         --name dp-db-service \
-        --network=dp \
+        --network dp \
         --detach \
         --env CONSUL_HOST \
         hortonworks/dp-db-service:$VERSION

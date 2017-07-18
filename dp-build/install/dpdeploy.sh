@@ -27,11 +27,11 @@ init_network() {
 }
 
 get_bind_address_from_consul_container() {
-    CONSUL_ID=$(docker container ls -af 'ancestor=consul' -q)
+    CONSUL_ID=$(docker ps --all --quiet --filter 'ancestor=consul:0.8.5')
     if [ -z ${CONSUL_ID} ]; then
         return 0
     fi
-    CONSUL_ARGS=$(docker container inspect -f {{.Args}} ${CONSUL_ID})
+    CONSUL_ARGS=$(docker inspect -f {{.Args}} ${CONSUL_ID})
     for word in $CONSUL_ARGS; do
         if [[ $word == -bind* ]]
         then
@@ -64,12 +64,12 @@ init_db() {
 }
 
 ps() {
-    docker container ls \
+    docker ps \
         --filter "name=dp-app|dp-db-service|dp-cluster-service|dp-gateway|dp-database|knox|dp-consul-server"
 }
 
 list_logs() {
-    docker container logs "$@"
+    docker logs "$@"
 }
 
 migrate_schema() {
@@ -84,17 +84,17 @@ migrate_schema() {
 }
 
 destroy() {
-    docker container rm --force $APP_CONTAINERS
+    docker rm --force $APP_CONTAINERS
 }
 
 destroy_consul(){
     echo "Destroying Consul"
-    docker container rm --force $CONSUL_CONTAINER
+    docker rm --force $CONSUL_CONTAINER
 }
 
 destroy_knox() {
     echo "Destroying Knox"
-    docker container rm --force $KNOX_CONTAINER
+    docker rm --force $KNOX_CONTAINER
     rm -rf ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
     destroy_consul
 }
@@ -161,12 +161,12 @@ init_knox() {
         echo "Knox container not found. Ensure it is running..."
         return -1
     fi
-    docker container exec -t ${KNOX_CONTAINER_ID} ./wait_for_keystore_file.sh
+    docker exec -t ${KNOX_CONTAINER_ID} ./wait_for_keystore_file.sh
     mkdir -p ${CERTS_DIR}
     export_knox_cert ${MASTER_PASSWORD} ${KNOX_CONTAINER_ID} > ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
     if [ ${USE_TEST_LDAP} == "no" ]
     then
-        docker container exec -it ${KNOX_CONTAINER_ID} ./setup_knox_sso_conf.sh
+        docker exec -it ${KNOX_CONTAINER_ID} ./setup_knox_sso_conf.sh
     fi
     echo "Knox Initialized"
 }
@@ -174,12 +174,12 @@ init_knox() {
 export_knox_cert() {
     MASTER_PASSWD=$1
     KNOX_CONTAINER_ID=$2
-    docker container exec -t ${KNOX_CONTAINER_ID} \
+    docker exec -t ${KNOX_CONTAINER_ID} \
         keytool -export -alias gateway-identity -storepass ${MASTER_PASSWD} -keystore /var/lib/knox/data-2.6.0.3-8/security/keystores/gateway.jks -rfc
 }
 
 get_knox_container_id() {
-    KNOX_CONTAINER_ID=`docker container ls --quiet --filter="name=knox"`
+    KNOX_CONTAINER_ID=`docker ps --quiet --filter="name=knox"`
     echo ${KNOX_CONTAINER_ID}
 }
 
@@ -210,17 +210,17 @@ start_knox() {
 }
 
 stop_app() {
-    docker container stop $APP_CONTAINERS
+    docker stop $APP_CONTAINERS
 }
 
 stop_consul(){
     echo "Stopping Consul"
-    docker container stop $CONSUL_CONTAINER
+    docker stop $CONSUL_CONTAINER
 }
 
 stop_knox() {
     echo "Stopping Knox"
-    docker container stop $KNOX_CONTAINER
+    docker stop $KNOX_CONTAINER
     stop_consul
 }
 

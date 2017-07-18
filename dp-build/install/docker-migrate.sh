@@ -14,7 +14,7 @@
 docker start dp-migrate >> install.log 2>&1 || \
     docker run \
         --name dp-migrate \
-        --network=dp \
+        --network dp \
         --rm \
         --mount type=bind,readonly=true,source=$(pwd)/dbscripts,target=/dbscripts \
         claycephas/flyway:4 \

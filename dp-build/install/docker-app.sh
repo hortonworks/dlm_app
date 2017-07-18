@@ -13,7 +13,7 @@
 docker start dp-app >> install.log 2>&1 || \
     docker run \
         --name dp-app \
-        --network=dp \
+        --network dp \
         --detach \
         --publish 80:80 \
         --env CONSUL_HOST \

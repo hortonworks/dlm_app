@@ -11,7 +11,7 @@
 docker start dp-database >> install.log 2>&1 || \
     docker run \
         --name dp-database \
-        --network=dp \
+        --network dp \
         --detach \
         --env POSTGRES_PASSWORD=dp_admin \
         --env POSTGRES_USER=dp_admin \
