@@ -1,3 +1,4 @@
+import { Action } from '@ngrx/store';
 import { isDevMode } from '@angular/core';
 
 export const START_MARKER = '[REQUEST_START]';
@@ -28,6 +29,15 @@ export const requestType = (actionName: string): RequestAction => ({
   FAILURE: type(`${actionName} ${FAILURE_MARKER}`)
 });
 
-export const isStartAction = (action): boolean => action.type.endsWith(START_MARKER);
-export const isSuccessAction = (action): boolean => action.type.endsWith(SUCCESS_MARKER);
-export const isFailureAction = (action): boolean => action.type.endsWith(FAILURE_MARKER);
+export const isStartAction = (action: Action): boolean => action.type.endsWith(START_MARKER);
+export const isSuccessAction = (action: Action): boolean => action.type.endsWith(SUCCESS_MARKER);
+export const isFailureAction = (action: Action): boolean => action.type.endsWith(FAILURE_MARKER);
+export const isCompletedAction = (action: Action): boolean => isFailureAction(action) || isSuccessAction(action);
+export const isRequestAction = (action: Action): boolean => isCompletedAction(action) || isStartAction(action);
+export const originalActionName = (action: Action): string => {
+  const splitted = action.type.split(' ');
+  if (!isRequestAction(action)) {
+    return null;
+  }
+  return splitted.slice(0, splitted.length - 1).join(' ');
+};

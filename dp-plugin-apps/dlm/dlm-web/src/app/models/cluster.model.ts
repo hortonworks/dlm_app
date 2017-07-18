@@ -8,7 +8,7 @@ export interface ClusterStats {
 }
 
 export interface ServiceStatus {
-  serviceName: string;
+  service_name: string;
   state: string;
 }
 

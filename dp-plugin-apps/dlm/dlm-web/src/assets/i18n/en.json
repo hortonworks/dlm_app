@@ -1,6 +1,7 @@
 {
   "common": {
     "all": "All",
+    "and": "And",
     "add": "Add",
     "back": "Back",
     "cancel": "Cancel",
@@ -85,6 +86,9 @@
       "self": "Status",
       "failed": "Failed",
       "in_progress": "In Progress"
+    },
+    "warnings": {
+      "beacon_unavailable": "Data presented may not be complete due to Beacon service outage on clusters {{clusters}}."
     }
   },
   "topnav": {

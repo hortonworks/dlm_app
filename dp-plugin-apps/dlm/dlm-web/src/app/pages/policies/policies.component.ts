@@ -92,7 +92,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   constructor(private store: Store<fromRoot.State>, private route: ActivatedRoute) {
     this.policies$ = this.store.select(getPolicyClusterJob).distinctUntilChanged(isEqual);
     this.subscriptions.push(this.policies$.subscribe(_ => this.policiesLoaded = true));
-    this.clusters$ = store.select(getAllClusters);
+    this.clusters$ = store.select(getAllClusters).distinctUntilChanged(isEqual);
     this.pairings$ = store.select(getAllPairings);
     this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, PAIRINGS_REQUEST));
     this.subscriptions.push(this.overallProgress$.subscribe(progress => {
