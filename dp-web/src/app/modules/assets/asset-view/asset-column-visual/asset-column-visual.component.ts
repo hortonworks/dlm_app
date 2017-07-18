@@ -14,20 +14,26 @@ export class AssetColumnVisualComponent implements OnInit{
 	@Input() data;
 	onlyHisto :boolean = true;
 	showPi : boolean = false;
+	noDataAvailable : boolean = false;
 	ngOnInit () {
-		if(!this.data) return;
+		if(!this.data || !this.data.histogram && !this.data.quartiles) {
+      this.noDataAvailable = true;
+		  return;
+    }
 		if(this.data.quartiles)
 			this.onlyHisto = false;
-		if(this.data.cardinality < 6) 
+		if(this.data.cardinality < 6)
 			this.showPi = true;
-		if(this.showPi)
-			this.drawPiChart();
-		else 
-			this.drawHisto();
+		if(this.data.histogram) {
+      if (this.showPi)
+        this.drawPiChart();
+      else
+        this.drawHisto();
+    }
 		if(!this.data.quartiles) return;
 		this.drawBoxPlot();
 	}
-	drawHisto () {	
+	drawHisto () {
 		var _this = this;
 		nv.addGraph(function() {
 			var dataa = _this.getDataForHistogram();
@@ -71,13 +77,13 @@ export class AssetColumnVisualComponent implements OnInit{
 			(_this.data.type != "string") && d3.select(".nv-axis")
 				.selectAll(".tick")
 				.selectAll("text")
-				.attr('transform', function(d,i,j) { return 'translate (-'+allowedWidth/2 +', 8)' }) ;	
+				.attr('transform', function(d,i,j) { return 'translate (-'+allowedWidth/2 +', 8)' }) ;
 
 	        // var label = d3.select(".nv-axislabel");
 	        // label.attr("y", +(label.attr("y"))-5);
 
 	        return chart;
-	    });	
+	    });
 	}
 	getDataForHistogram () {
 		return [{
@@ -97,7 +103,7 @@ export class AssetColumnVisualComponent implements OnInit{
 			  .yDomain([_this.data.minValue-domainRange/10, _this.data.maxValue+domainRange/10])
 			  ;
 		chart.yAxis.axisLabel(_this.data.name);
-			  
+
 		d3.select('#chart2 svg')
 		  .datum(_this.getDataForBoxPlot())
 		  .call(chart);
@@ -122,7 +128,7 @@ export class AssetColumnVisualComponent implements OnInit{
 	drawPiChart () {
 		var _this = this;
 		nv.addGraph(function() {
-			var chart = nv.models.pieChart()
+      var chart = nv.models.pieChart()
 			    .x(function(d) { return d.key })
 			    .y(function(d) { return d.y })
 			    // .width(width)
