@@ -4,8 +4,9 @@ set -e
 RELEASE_NUMBER=0.0.1
 IMAGE_PREFIX="hortonworks"
 ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service dp-gateway"
+VENDOR_IMAGES="postgres:9.6.3-alpine consul:0.8.5 claycephas/flyway:4"
 ALL_IMAGES_OPT="--all"
-EXT_IMAGES="postgres:9.6.3-alpine consul:0.8.5 claycephas/flyway:4"
+VENDOR_IMAGES_OPT="--vendor"
 
 build_knox() {
     VERSION=$(get_version)
@@ -66,13 +67,14 @@ save_images() {
 
     VERSION=$(get_version)
 
-    if [ $1 == ${ALL_IMAGES_OPT} ]
-    then
+    if [ $1 == ${ALL_IMAGES_OPT} ]; then
         for img in ${ALL_IMAGES}
         do
             save_one_image ${img} ${IMAGE_PREFIX}/${img} ${VERSION} || \
                 echo "Failed saving image ${img}, exiting. Verify if the image has been built."
         done
+        save_vendor_images
+    elif [ $1 == ${VENDOR_IMAGES_OPT} ]; then
         save_vendor_images
     else
         save_one_image $1 ${IMAGE_PREFIX}/${1} ${VERSION}
@@ -93,8 +95,8 @@ save_one_image() {
 }
 
 save_vendor_images() {
-    echo "Saving ${EXT_IMAGES} to ./build/dp-docker/images/vendors.tar"
-    docker save --output ./build/dp-docker/images/vendors.tar ${EXT_IMAGES}
+    echo "Saving ${VENDOR_IMAGES} to ./build/dp-docker/images/vendors.tar"
+    docker save --output ./build/dp-docker/images/vendors.tar ${VENDOR_IMAGES}
 }
 
 get_version() {
@@ -118,6 +120,7 @@ usage() {
         <image-name>: Pushes a specific image"
     printf "%-${tabspace}s:%s\n" "save" "Saves all images to local tarballs.
         --all: Saves all images
+        --vendor: Saves all pre-packaged vendor images
         <image-name>: Saves a specific image"
 }
 
