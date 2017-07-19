@@ -59,11 +59,10 @@ class LdapService @Inject()(
                       val ldapConfiguration =
                         LdapConfiguration(id=knoxConf.id,
                           ldapUrl=knoxConf.ldapUrl,
-                          bindDn=           knoxConf.bindDn,
-                          userDnTemplate=           knoxConf.userDnTemplate,
-                          userSearchBase=                knoxConf.userSearchBase,
+                          bindDn=knoxConf.bindDn,
+                          userSearchBase=knoxConf.userSearchBase,
                           userSearchAttributeName=knoxConf.userSearchAttributeName,
-                          groupSearchBase=              knoxConf.groupSearchBase,
+                          groupSearchBase=knoxConf.groupSearchBase,
                           groupSearchAttributeName=knoxConf.groupSearchAttributeName
                         )
                       ldapConfigService.create(ldapConfiguration).map {
@@ -82,55 +81,12 @@ class LdapService @Inject()(
   }
 
   def validate(knoxConf: KnoxConfigInfo): Either[Errors, Boolean] = {
-    validateUserDnTemplate(knoxConf.userDnTemplate) match {
-      case Left(errors) => Left(errors)
-      case Right(valid) => {
-        if (valid) {
-          Right(true)
-        } else {
-          Left(
-            Errors(Seq(Error("invalid config", "user dn template mandatory"))))
-        }
-      }
+    if (knoxConf.userSearchBase.isEmpty || knoxConf.userSearchAttributeName.isEmpty){
+      Left(
+        Errors(Seq(Error("invalid config", "user dn template mandatory"))))
+    }else{
+      Right(true)
     }
-  }
-  private def validateUserDnTemplate(
-      userDntemplateOption: Option[String]): Either[Errors, Boolean] = {
-    userDntemplateOption
-      .map { userDnTemplate =>
-        if (!userDnTemplate.contains(USERDN_SUBSTITUTION_TOKEN)) {
-          Left(
-            Errors(Seq(Error("invalid config",
-                             "user dn template substitution token absent"))))
-        } else Right(true)
-      }
-      .getOrElse {
-        Left(
-          Errors(Seq(Error("invalid config", "user dn template mandatory")))) //TODO this may change by having advance options rather tham just userr dn template
-      }
-  }
-  private def getUserDn(userDntemplateOpt: Option[String],
-                        principal: String): Option[String] = {
-    userDntemplateOpt
-      .map { userDnTempate =>
-        val index = userDnTempate.indexOf(USERDN_SUBSTITUTION_TOKEN)
-        val prefix = userDnTempate.substring(0, index)
-        val suffix = userDnTempate.substring(
-          prefix.length + USERDN_SUBSTITUTION_TOKEN.length)
-        Some(s"$prefix$principal$suffix")
-      }
-      .getOrElse(None)
-  }
-  private def detemineUserSearchBase(userDnTempate: String): String = {
-    val index = userDnTempate.indexOf(USERDN_SUBSTITUTION_TOKEN)
-    userDnTempate
-      .substring(index + USERDN_SUBSTITUTION_TOKEN.length)
-      .trim
-      .substring(1)
-  }
-  private def detemineUserIdentifier(userDnTempate: String): String = {
-    val index = userDnTempate.indexOf(USERDN_SUBSTITUTION_TOKEN)
-    userDnTempate.substring(0, index)
   }
 
   def validateBindDn(

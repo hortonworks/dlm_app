@@ -270,7 +270,6 @@ object Entities {
                               id: Option[Long],
                               ldapUrl:String,
                               bindDn: Option[String],
-                              userDnTemplate: Option[String],
                               userSearchBase: Option[String],
                               userSearchAttributeName:Option[String],
                               groupSearchBase: Option[String],

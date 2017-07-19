@@ -3,7 +3,6 @@ package models
 case class KnoxConfigInfo(
     id: Option[Long],
     ldapUrl: String,
-    userDnTemplate: Option[String],
     userSearchBase: Option[String],
     userSearchAttributeName:Option[String],
     groupSearchBase: Option[String],
