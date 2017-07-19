@@ -118,10 +118,10 @@ usage() {
     printf "%-${tabspace}s:%s\n" "build" "Create images of Dataplane specific containers"
     printf "%-${tabspace}s:%s\n" "build knox" "Create Knox image for Dataplane"
     printf "%-${tabspace}s:%s\n" "push" "Push images to Hortonworks docker-hub account. Needs login to happen separately.
-        --all: Pushes all images
+        all: Pushes all images
         <image-name>: Pushes a specific image"
     printf "%-${tabspace}s:%s\n" "save" "Saves all images to local tarballs.
-        --all: Saves all images
+        all: Saves all images
         <image-name>: Saves a specific image"
 }
 
