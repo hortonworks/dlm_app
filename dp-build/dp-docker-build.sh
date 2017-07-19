@@ -96,6 +96,11 @@ save_one_image() {
 
 save_vendor_images() {
     echo "Saving ${VENDOR_IMAGES} to ./build/dp-docker/images/vendors.tar"
+    for img in ${VENDOR_IMAGES}
+    do
+        docker pull $img || \
+            echo "Failed to pull image ${img}, exiting."
+    done
     docker save --output ./build/dp-docker/images/vendors.tar ${VENDOR_IMAGES}
 }
 
