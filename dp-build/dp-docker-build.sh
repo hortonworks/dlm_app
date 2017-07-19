@@ -73,12 +73,7 @@ save_images() {
             save_one_image ${img} ${IMAGE_PREFIX}/${img} ${VERSION} || \
                 echo "Failed saving image ${img}, exiting. Verify if the image has been built."
         done
-        for img in ${EXT_IMAGES}
-        do
-            docker pull ${img}
-            save_one_image ${img} ${img} || \
-                echo "Failed saving image ${img}, exiting. Verify if the image has been built."
-        done
+        save_vendor_images
     else
         save_one_image $1 ${IMAGE_PREFIX}/${1} ${VERSION}
     fi
@@ -95,6 +90,11 @@ save_one_image() {
     echo "Saving ${IMAGE_NAME} to ./build/dp-docker/images/${IMAGE_LABEL}.tar"
     mkdir -p ./build/dp-docker/images
     docker save --output ./build/dp-docker/images/${IMAGE_LABEL}.tar ${IMAGE_NAME}
+}
+
+save_vendor_images() {
+    echo "Saving ${EXT_IMAGES} to ./build/dp-docker/images/vendors.tar"
+    docker save --output ./build/dp-docker/images/vendors.tar ${EXT_IMAGES}
 }
 
 get_version() {
