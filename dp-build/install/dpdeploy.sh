@@ -1,18 +1,33 @@
 #!/bin/sh
 set -e
 
-ALL_DOCKER_COMPOSE_APP_FILES="-f docker-compose-apps.yml -f docker-compose-knox.yml -f docker-compose-consul.yml"
-ALL_DOCKER_COMPOSE_DB_FILES="-f docker-compose.yml -f docker-compose-migrate.yml"
-ALL_DOCKER_COMPOSE_FILES=${ALL_DOCKER_COMPOSE_DB_FILES}" "${ALL_DOCKER_COMPOSE_APP_FILES} 
-
 CERTS_DIR=`dirname $0`/certs
 KNOX_SIGNING_CERTIFICATE=knox-signing.pem
 DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 export KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
+APP_CONTAINERS="dp-database dp-app dp-db-service dp-cluster-service dp-gateway"
+KNOX_CONTAINER="knox"
+CONSUL_CONTAINER="dp-consul-server"
+
+init_network() {
+    NETWORK_ID=$(docker network ls --quiet --filter "name=dp")
+    if [ -z ${NETWORK_ID} ]; then
+        echo "Network dp not found. Creating new network with name dp."
+        docker network create dp
+    # This is not a clean solution and will be fixed later
+    # else
+    #     echo "Network dp already exists. Destroying all containers on network dp."
+    #     CONTAINER_LIST=$(docker container ls --all --quiet --filter "network=dp")
+    #     if [[ $(echo $CONTAINER_LIST) ]]; then
+    #         docker rm  --force $CONTAINER_LIST
+    #     fi
+    fi
+}
+
 get_bind_address_from_consul_container() {
-    CONSUL_ID=$(docker ps -af 'name=consul' -q)
+    CONSUL_ID=$(docker ps --all --quiet --filter "name=$CONSUL_CONTAINER")
     if [ -z ${CONSUL_ID} ]; then
         return 0
     fi
@@ -27,9 +42,9 @@ get_bind_address_from_consul_container() {
 }
 
 init_consul(){
-  echo "Initializing Consul"
-  read_consul_host
-  docker-compose -f docker-compose-consul.yml up -d
+    echo "Initializing Consul"
+    read_consul_host
+    source $(pwd)/docker-consul.sh
 }
 
 read_consul_host(){
@@ -45,41 +60,41 @@ read_consul_host(){
 }
 
 init_db() {
-    docker-compose up -d
+    source $(pwd)/docker-database.sh
 }
 
 ps() {
-    docker-compose ${ALL_DOCKER_COMPOSE_FILES} ps
+    docker ps \
+        --filter "name=dp-app|dp-db-service|dp-cluster-service|dp-gateway|dp-database|knox|dp-consul-server"
 }
 
 list_logs() {
-    DOCKER_FILES=${ALL_DOCKER_COMPOSE_APP_FILES}
-    if [ "$1" == "all" ]; then
-        DOCKER_FILES=${ALL_DOCKER_COMPOSE_FILES}
-        shift
-    elif [ "$1" == "db" ]; then
-        DOCKER_FILES=${ALL_DOCKER_COMPOSE_DB_FILES}
-        shift
-    fi
-    docker-compose ${DOCKER_FILES} logs "$@"
+    docker logs "$@"
 }
 
 migrate_schema() {
-    docker-compose -f docker-compose.yml -f docker-compose-migrate.yml run dp-migrate
+    # start database container
+    source $(pwd)/docker-database.sh
+
+    # wait for database start
+    sleep 5
+
+    # start flyway container and trigger migrate script
+    source $(pwd)/docker-migrate.sh
 }
 
 destroy() {
-    docker-compose -f docker-compose.yml -f docker-compose-migrate.yml -f docker-compose-apps.yml down
+    docker rm --force $APP_CONTAINERS
 }
 
 destroy_consul(){
     echo "Destroying Consul"
-    docker-compose -f docker-compose-consul.yml down
+    docker rm --force $CONSUL_CONTAINER
 }
 
 destroy_knox() {
     echo "Destroying Knox"
-    docker-compose -f docker-compose-knox.yml down
+    docker rm --force $KNOX_CONTAINER
     rm -rf ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
     destroy_consul
 }
@@ -87,7 +102,21 @@ destroy_knox() {
 init_app() {
     echo "Initializing app"
     read_consul_host
-    docker-compose -f docker-compose-apps.yml up -d
+
+    echo "Starting Database (Postgres)"
+    source $(pwd)/docker-database.sh
+
+    echo "Starting Gateway"
+    source $(pwd)/docker-gateway.sh
+
+    echo "Starting DB Service"
+    source $(pwd)/docker-service-db.sh
+
+    echo "Starting Cluster Service"
+    source $(pwd)/docker-service-cluster.sh
+
+    echo "Starting Application API"
+    source $(pwd)/docker-app.sh
 }
 
 read_master_password() {
@@ -123,7 +152,10 @@ init_knox() {
     if [ "$USE_TEST_LDAP" == "" ];then
         read_use_test_ldap
     fi
-    docker-compose -f docker-compose-knox.yml up -d
+    
+    echo "Starting Knox"
+    source $(pwd)/docker-knox.sh
+
     KNOX_CONTAINER_ID=$(get_knox_container_id)
     if [ -z ${KNOX_CONTAINER_ID} ]; then
         echo "Knox container not found. Ensure it is running..."
@@ -147,35 +179,48 @@ export_knox_cert() {
 }
 
 get_knox_container_id() {
-    KNOX_CONTAINER_ID=`docker-compose -f docker-compose-knox.yml ps -q knox`
+    KNOX_CONTAINER_ID=`docker ps --quiet --filter="name=knox"`
     echo ${KNOX_CONTAINER_ID}
 }
 
 start_app() {
-    docker-compose -f docker-compose-apps.yml start
+    echo "Starting Database (Postgres)"
+    source $(pwd)/docker-database.sh
+
+    echo "Starting Gateway"
+    source $(pwd)/docker-gateway.sh
+
+    echo "Starting DB Service"
+    source $(pwd)/docker-service-db.sh
+
+    echo "Starting Cluster Service"
+    source $(pwd)/docker-service-cluster.sh
+
+    echo "Starting Application API"
+    source $(pwd)/docker-app.sh
 }
 start_consul() {
     echo "Starting Consul"
-    docker-compose -f docker-compose-consul.yml start
+    source $(pwd)/docker-consul.sh
 }
 start_knox() {
     echo "Starting Knox"
     start_consul
-    docker-compose -f docker-compose-knox.yml start
+    source $(pwd)/docker-knox.sh
 }
 
 stop_app() {
-    docker-compose -f docker-compose-apps.yml stop
+    docker stop $APP_CONTAINERS
 }
 
 stop_consul(){
     echo "Stopping Consul"
-    docker-compose -f docker-compose-consul.yml stop
+    docker stop $CONSUL_CONTAINER
 }
 
 stop_knox() {
     echo "Stopping Knox"
-    docker-compose -f docker-compose-knox.yml stop
+    docker stop $KNOX_CONTAINER
     stop_consul
 }
 
@@ -190,7 +235,7 @@ print_version() {
 usage() {
     local tabspace=20
     echo "Usage: dpdeploy.sh <command>"
-    printf "%-${tabspace}s:%s\n" "Commands" "init [db|knox|app] | migrate | ps | logs [db|all] | start [knox]| stop [knox] | destroy [knox]"
+    printf "%-${tabspace}s:%s\n" "Commands" "init [db|knox|app] | migrate | ps | logs [container id|name] | start [knox]| stop [knox] | destroy [knox]"
     printf "%-${tabspace}s:%s\n" "init db" "Initialize postgres DB for first time"
     printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox and Consul containers"
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
@@ -200,14 +245,14 @@ usage() {
     printf "%-${tabspace}s:%s\n" "stop" "Stop the application docker containers"
     printf "%-${tabspace}s:%s\n" "stop knox" "Stop the Knox and Consul containers"
     printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
-    local logman='List of the docker containers
-        No options: app containers, db: all DB containers, all: all containers.
-        All \"docker-compose logs\" options are supported'
-    printf "%-${tabspace}s:%s\n" "logs" "$logman"
+    printf "%-${tabspace}s:%s\n" "logs [container name]" "Logs of supplied container id or name"
     printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them. Needs to start from init db again"
     printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox and Consul containers and remove them. Needs to start from init knox again"
     printf "%-${tabspace}s:%s\n" "version" "Print the version of dataplane"
 }
+
+VERSION=$(print_version)
+init_network
 
 if [ $# -lt 1 ]
 then
