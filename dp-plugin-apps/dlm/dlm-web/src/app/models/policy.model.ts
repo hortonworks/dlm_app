@@ -12,6 +12,7 @@ export interface Policy {
   targetCluster: string;
   sourceDataset: string;
   targetDataset: string;
+  policyId: string;
   endTime: string;
   frequency: number;
   tags: string[];

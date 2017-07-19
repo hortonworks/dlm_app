@@ -28,6 +28,7 @@
       (onSort)="handleOnSort($event)"
       (onSelectAction)="handleOnSelectAction($event)"
       (onPageChange)="handleOnPageChange($event)"
+      (abortJobAction)="handleAbortJobAction($event)"
     >
     </dp-jobs-table>
     <div *ngIf="contentType===policyContent.Files">
