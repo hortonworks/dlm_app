@@ -4,7 +4,7 @@ set -e
 RELEASE_NUMBER=0.0.1
 IMAGE_PREFIX="hortonworks"
 ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service dp-gateway"
-ALL_IMAGES_OPT="all"
+ALL_IMAGES_OPT="--all"
 EXT_IMAGES="postgres:9.6.3-alpine consul:0.8.5 claycephas/flyway:4"
 
 build_knox() {
@@ -114,10 +114,10 @@ usage() {
     printf "%-${tabspace}s:%s\n" "build" "Create images of Dataplane specific containers"
     printf "%-${tabspace}s:%s\n" "build knox" "Create Knox image for Dataplane"
     printf "%-${tabspace}s:%s\n" "push" "Push images to Hortonworks docker-hub account. Needs login to happen separately.
-        all: Pushes all images
+        --all: Pushes all images
         <image-name>: Pushes a specific image"
     printf "%-${tabspace}s:%s\n" "save" "Saves all images to local tarballs.
-        all: Saves all images
+        --all: Saves all images
         <image-name>: Saves a specific image"
 }
 
