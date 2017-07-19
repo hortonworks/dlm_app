@@ -1,11 +1,10 @@
 import { Component, OnInit, Input, ViewChild, TemplateRef, ViewEncapsulation, HostBinding, ChangeDetectorRef } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Cluster } from 'models/cluster.model';
-import { PoliciesCountEntity } from 'models/policies-count-entity.model';
-import { PairsCountEntity } from 'models/pairs-count-entity.model';
 import { TableTheme } from 'common/table/table-theme.type';
 import { TableComponent } from 'common/table/table.component';
 import { ColumnMode } from '@swimlane/ngx-datatable';
+import { CLUSTER_STATUS } from 'constants/status.constant';
 
 @Component({
   selector: 'dlm-cluster-list',
@@ -14,6 +13,7 @@ import { ColumnMode } from '@swimlane/ngx-datatable';
   encapsulation: ViewEncapsulation.None
 })
 export class ClusterListComponent implements OnInit {
+  CLUSTER_STATUS = CLUSTER_STATUS;
   tableTheme = TableTheme.Cards;
   columns = [];
   hdfsRootPath = '/';
@@ -37,7 +37,7 @@ export class ClusterListComponent implements OnInit {
 
   ngOnInit() {
     this.columns = [
-      {prop: 'status', name: this.t.instant('common.status.self'), cellTemplate: this.statusCellRef,
+      {prop: 'healthStatus', name: this.t.instant('common.status.self'), cellTemplate: this.statusCellRef,
         flexGrow: 2, cellClass: 'status'},
       {prop: 'name', name: '', cellTemplate: this.nameCellRef, flexGrow: 2},
       {prop: 'stats', name: this.t.instant('page.clusters.card.usage'), cellTemplate: this.usageCellRef, minWidth: 160, flexGrow: 2},
