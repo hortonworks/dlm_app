@@ -10,6 +10,8 @@
 #         DP_APP_HOME: "/usr/dp-app"
 #         CONSUL_HOST: ${CONSUL_HOST}
 
+# for mount (new) >> --mount type=bind,readonly=false,source=$(pwd)/certs,target=/usr/dp-app/conf/cert \
+
 docker start dp-app >> install.log 2>&1 || \
     docker run \
         --name dp-app \
@@ -18,5 +20,5 @@ docker start dp-app >> install.log 2>&1 || \
         --publish 80:80 \
         --env CONSUL_HOST \
         --env DP_APP_HOME=/usr/dp-app \
-        --mount type=bind,readonly=false,source=$(pwd)/certs,target=/usr/dp-app/conf/cert \
+        --volume $(pwd)/certs:/usr/dp-app/conf/cert \
         hortonworks/dp-app:$VERSION

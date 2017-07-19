@@ -27,7 +27,7 @@ init_network() {
 }
 
 get_bind_address_from_consul_container() {
-    CONSUL_ID=$(docker ps --all --quiet --filter 'ancestor=consul:0.8.5')
+    CONSUL_ID=$(docker ps --all --quiet --filter "name=$CONSUL_CONTAINER")
     if [ -z ${CONSUL_ID} ]; then
         return 0
     fi
