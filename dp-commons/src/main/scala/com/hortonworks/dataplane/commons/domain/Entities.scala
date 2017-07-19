@@ -250,7 +250,9 @@ object Entities {
                               bindDn: Option[String],
                               userDnTemplate: Option[String],
                               userSearchBase: Option[String],
-                              groupSearchBase: Option[String]
+                              userSearchAttributeName:Option[String],
+                              groupSearchBase: Option[String],
+                              groupSearchAttributeName:Option[String]
                               )
 
   case class WorkspaceDataCount(asset: Int, notebook: Int)

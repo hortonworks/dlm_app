@@ -35,8 +35,10 @@ class UserManager @Inject()(val ldapService: LdapService,
       res =>
         res.toBoolean
     }
+    val searchType=request.getQueryString("searchType");
+
     ldapService
-      .search(request.getQueryString("name").get, fuzzyMatch)
+      .search(request.getQueryString("name").get,searchType,fuzzyMatch)
       .map {
         case Left(errors) => handleErrors(errors)
         case Right(ldapSearchResult) =>

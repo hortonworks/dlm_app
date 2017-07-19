@@ -33,7 +33,7 @@ class LdapService @Inject()(
     private val configuration: play.api.Configuration) {
   private val logger = Logger(classOf[LdapService])
   private val USERDN_SUBSTITUTION_TOKEN = "{0}"
-  private val searchControls: SearchControls = new SearchControls()
+
 
   def configure(knoxConf: KnoxConfigInfo): Future[Either[Errors, Boolean]] = {
     if (knoxConf.bindDn.isEmpty || knoxConf.password.isEmpty) {
@@ -57,13 +57,15 @@ class LdapService @Inject()(
                     case Left(errors) => Future.successful(Left(errors))
                     case Right(isCreated) => {
                       val ldapConfiguration =
-                        LdapConfiguration(knoxConf.id,
-                                          knoxConf.ldapUrl,
-                                          knoxConf.bindDn,
-                                          knoxConf.userDnTemplate,
-                                          knoxConf.userSearchBase,
-                                          knoxConf.groupSearchBase)
-
+                        LdapConfiguration(id=knoxConf.id,
+                          ldapUrl=knoxConf.ldapUrl,
+                          bindDn=           knoxConf.bindDn,
+                          userDnTemplate=           knoxConf.userDnTemplate,
+                          userSearchBase=                knoxConf.userSearchBase,
+                          userSearchAttributeName=knoxConf.userSearchAttributeName,
+                          groupSearchBase=              knoxConf.groupSearchBase,
+                          groupSearchAttributeName=knoxConf.groupSearchAttributeName
+                        )
                       ldapConfigService.create(ldapConfiguration).map {
                         case Left(errors) => Left(errors)
                         case Right(createdLdapConfig) => Right(true)
@@ -155,6 +157,7 @@ class LdapService @Inject()(
 
   def search(
       userName: String,
+      searchType: Option[String],
       fuzzyMatch: Boolean): Future[Either[Errors, Seq[LdapSearchResult]]] =
     for {
       configuredLdap <- getConfiguredLdap
@@ -164,7 +167,7 @@ class LdapService @Inject()(
       search <- doWithEither[DirContext, Seq[LdapSearchResult]](
         dirContext,
         context => {
-          ldapSearch(context, configuredLdap.right.get, userName, fuzzyMatch)
+          ldapSearch(context, configuredLdap.right.get, userName, searchType,fuzzyMatch)
         })
 
     } yield search
@@ -193,46 +196,79 @@ class LdapService @Inject()(
       dirContext: DirContext,
       ldapConfs: Seq[LdapConfiguration],
       userName: String,
+      searchType: Option[String],
       fuzzyMatch: Boolean): Future[Either[Errors, Seq[LdapSearchResult]]] = {
-    searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
-    try {
-      val userDn: Option[String] =
-        getUserDn(ldapConfs.head.userDnTemplate, userName)
-      if (!userDn.isDefined) {
-        //TODO this is temporary fix. will support advance option sooner.
-        return Future.successful(Left(Errors(Seq(new Error(
-          "Exception",
-          "current implementation only allows search based on userDn template.")))))
+    val groupSerch=if (searchType.isDefined && searchType.get=="group")true else false
+    if (groupSerch){
+      ldapGroupSearch(dirContext,ldapConfs,userName)
+    }else{
+      val searchControls: SearchControls = new SearchControls()
+      searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
+      try {
+        val userDn: Option[String] =
+          getUserDn(ldapConfs.head.userDnTemplate, userName)
+        if (!userDn.isDefined) {
+          //TODO this is temporary fix. will support advance option sooner.
+          return Future.successful(Left(Errors(Seq(new Error(
+            "Exception",
+            "current implementation only allows search based on userDn template.")))))
 
+        }
+        val searchBase = detemineUserSearchBase(
+          ldapConfs.head.userDnTemplate.get)
+        var searchIdtemplate = detemineUserIdentifier(
+          ldapConfs.head.userDnTemplate.get)
+
+        val searchid =
+          if (fuzzyMatch) searchIdtemplate + userName + "*"
+          else searchIdtemplate + userName
+        val res: NamingEnumeration[SearchResult] =
+          dirContext.search(searchBase, searchid, searchControls)
+        val ldapSearchResults: ArrayBuffer[LdapSearchResult] = new ArrayBuffer()
+        while (res.hasMore) {
+          val sr: SearchResult = res.next()
+          val ldaprs = new LdapSearchResult(
+            sr.getName.substring(
+              sr.getName.indexOf(searchIdtemplate) + searchIdtemplate.length),
+            sr.getClassName,
+            sr.getNameInNamespace)
+          ldapSearchResults += ldaprs
+        }
+        Future.successful(Right(ldapSearchResults))
+      } catch {
+        case e: Exception =>
+          logger.error("exception", e)
+          Future.successful(
+            Left(Errors(Seq(new Error("Exception", e.getMessage)))))
       }
-      val searchBase = detemineUserSearchBase(
-        ldapConfs.head.userDnTemplate.get)
-      var searchIdtemplate = detemineUserIdentifier(
-        ldapConfs.head.userDnTemplate.get)
+    }
+  }
 
-      val searchid =
-        if (fuzzyMatch) searchIdtemplate + userName + "*"
-        else searchIdtemplate + userName
-      val res: NamingEnumeration[SearchResult] =
-        dirContext.search(searchBase, searchid, searchControls)
+  private def ldapGroupSearch(  dirContext: DirContext,
+                                ldapConfs: Seq[LdapConfiguration],groupName:String):Future[Either[Errors, Seq[LdapSearchResult]]]={
+    val groupSearchBase=ldapConfs.head.groupSearchBase
+    if (groupSearchBase.isEmpty || ldapConfs.head.groupSearchAttributeName.isEmpty){
+      Future.successful(Left(Errors(Seq(new Error("Exception", "Group search base must be configured")))))
+    }else{
+      val searchControls: SearchControls = new SearchControls()
+      searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
+      val groupSearchBase=ldapConfs.head.groupSearchBase.get
+      val groupSearchAttributeName=ldapConfs.head.groupSearchAttributeName.get
+      val searchParam=s"$groupSearchAttributeName=$groupName*"
+      val res: NamingEnumeration[SearchResult]=dirContext.search(groupSearchBase,searchParam,searchControls)
       val ldapSearchResults: ArrayBuffer[LdapSearchResult] = new ArrayBuffer()
       while (res.hasMore) {
         val sr: SearchResult = res.next()
         val ldaprs = new LdapSearchResult(
-          sr.getName.substring(
-            sr.getName.indexOf(searchIdtemplate) + searchIdtemplate.length),
+          sr.getName.substring(groupSearchAttributeName.length+1),
           sr.getClassName,
           sr.getNameInNamespace)
         ldapSearchResults += ldaprs
       }
       Future.successful(Right(ldapSearchResults))
-    } catch {
-      case e: Exception =>
-        logger.error("exception", e)
-        Future.successful(
-          Left(Errors(Seq(new Error("Exception", e.getMessage)))))
     }
   }
+
   def getConfiguredLdap
     : Future[Either[Errors, Seq[LdapConfiguration]]] = {
     ldapConfigService
@@ -248,7 +284,7 @@ class LdapService @Inject()(
     env.put(Context.INITIAL_CONTEXT_FACTORY,
             "com.sun.jndi.ldap.LdapCtxFactory")
     env.put(Context.SECURITY_AUTHENTICATION, "simple") //TODO configure for other types.
-    env.put(Context.PROVIDER_URL, url);
+    env.put(Context.PROVIDER_URL, url)
     env.put(Context.SECURITY_PRINCIPAL, bindDn)
     env.put(Context.SECURITY_CREDENTIALS, pass)
     try {
