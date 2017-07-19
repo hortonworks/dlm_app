@@ -6,7 +6,6 @@ import { mapResponse } from 'utils/http-util';
 import { JOB_STATUS } from 'constants/status.constant';
 import { Job } from 'models/job.model';
 import { JobTrackingInfo } from 'models/job-tracking-info.model';
-import * as moment from 'moment';
 
 @Injectable()
 export class JobService {
@@ -52,8 +51,7 @@ export class JobService {
   getJobsForPolicies(policies: Policy[], numResults = 1000): Observable<any> {
     const requests = policies.map(policy => this.getJobsForPolicy(policy, numResults).catch(err => Observable.of({jobs: []})));
     return Observable.forkJoin(requests).map(responses => {
-      const ret = responses.reduce((response, combined) => ({jobs: [...combined.jobs, ...response.jobs]}), {jobs: []});
-      return ret;
+      return responses.reduce((response, combined) => ({jobs: [...combined.jobs, ...response.jobs]}), {jobs: []});
     });
   }
 

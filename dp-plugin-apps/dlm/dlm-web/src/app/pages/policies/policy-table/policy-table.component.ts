@@ -13,7 +13,7 @@ import * as fromRoot from 'reducers/';
 import { getAllJobs } from 'selectors/job.selector';
 import { Observable } from 'rxjs/Observable';
 import { Job } from 'models/job.model';
-import { loadJobsForPolicy } from 'actions/job.action';
+import { abortJob, loadJobsForPolicy } from 'actions/job.action';
 import { deletePolicy, resumePolicy, suspendPolicy } from 'actions/policy.action';
 import { OperationResponse } from 'models/operation-response.model';
 import { getLastOperationResponse } from 'selectors/operation.selector';
@@ -26,7 +26,6 @@ import { loadFullDatabases } from 'actions/hivelist.action';
 import { HiveDatabase } from 'models/hive-database.model';
 import { getDatabase } from 'selectors/hive.selector';
 import { HiveService } from 'services/hive.service';
-import { POLICY_STATUS } from 'constants/status.constant';
 import { POLL_INTERVAL } from 'constants/api.constant';
 import { LogService } from 'services/log.service';
 import { EntityType } from 'constants/log.constant';
@@ -225,7 +224,15 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         return this.store.dispatch(suspendPolicy(this.selectedForActionRow));
       case 'ACTIVATE':
         return this.store.dispatch(resumePolicy(this.selectedForActionRow));
+      case 'ABORT_JOB':
+        return this.store.dispatch(abortJob(this.selectedForActionRow));
     }
+  }
+
+  abortJobAction(policy) {
+    this.selectedAction = <ActionItemType>{name: 'ABORT_JOB'};
+    this.selectedForActionRow = this.policies.find(p => p.policyId === policy.policyId);
+    this.showActionConfirmationModal = true;
   }
 
   onCloseActionConfirmationModal() {
