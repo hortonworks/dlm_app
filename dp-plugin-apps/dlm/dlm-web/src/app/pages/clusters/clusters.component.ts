@@ -34,7 +34,6 @@ export class ClustersComponent implements OnInit, OnDestroy {
   overallProgress$: Observable<ProgressState>;
   overallProgressSubscription$: Subscription;
   resourceAvailability$: Observable<{canAddPolicy: boolean, canAddPairing: boolean}>;
-  addOptions: DropdownItem[];
   mapSize: MapSize = MapSize.FULLWIDTH;
   canAddPairing = true;
   canAddPolicy = true;
@@ -50,10 +49,6 @@ export class ClustersComponent implements OnInit, OnDestroy {
         this.store.dispatch(loadClustersStatuses());
       }
     });
-    this.addOptions = [
-      { label: t.instant('page.clusters.dropdown.cluster') },
-      { label: t.instant('page.clusters.dropdown.policy') }
-    ];
     this.tableData$ = allResources$
       .map(([clusters, pairsCount, policiesCount]) => {
         return clusters.map(cluster => {

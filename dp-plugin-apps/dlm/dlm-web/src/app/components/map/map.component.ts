@@ -5,13 +5,13 @@ import 'leaflet-curve';
 import { MapSize, MapSizeSettings, ClusterMapData } from 'models/map-data';
 import { GeographyService } from 'services/geography.service';
 import LatLng = L.LatLng;
-import { CLUSTER_STATUS } from 'constants/status.constant';
+import { CLUSTER_STATUS, SERVICE_STATUS } from 'constants/status.constant';
 import { without } from 'utils/array-util';
 
 function formatMapPopup(cluster) {
-  const notStartedServices = cluster.status ? cluster.status.filter(s => s.state !== 'STARTED') : [];
+  const notStartedServices = cluster.status ? cluster.status.filter(s => s.state !== SERVICE_STATUS.STARTED) : [];
   const notStartedServiceNames = notStartedServices.map(s => s.service_name);
-  const popup = `<p>${cluster.name}<br />${cluster.originDataCenter}<br />Policies: ${cluster.policiesCounter}</p>`;
+  const popup = `<p>${cluster.name}<br />${cluster.dataCenter}<br />Policies: ${cluster.policiesCounter}</p>`;
   if (notStartedServices.length) {
     return `${popup}<p>Not started services: ${notStartedServiceNames.join(', ')}</p>`;
   }
