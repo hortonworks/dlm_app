@@ -205,41 +205,32 @@ class LdapService @Inject()(
       val searchControls: SearchControls = new SearchControls()
       searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
       try {
-        val userDn: Option[String] =
-          getUserDn(ldapConfs.head.userDnTemplate, userName)
-        if (!userDn.isDefined) {
-          //TODO this is temporary fix. will support advance option sooner.
-          return Future.successful(Left(Errors(Seq(new Error(
+        if (ldapConfs.head.userSearchBase.isEmpty || ldapConfs.head.userSearchAttributeName.isEmpty){
+          Future.successful(Left(Errors(Seq(Error(
             "Exception",
-            "current implementation only allows search based on userDn template.")))))
-
+            "User search base and user search attribute must be configured.")))))
+        }else{
+          val userSearchBase=ldapConfs.head.userSearchBase.get
+          val userSearchAttributeName=ldapConfs.head.userSearchAttributeName.get
+          val searchParam=s"$userSearchAttributeName=$userName*"
+          val res: NamingEnumeration[SearchResult] =
+            dirContext.search(userSearchBase, searchParam, searchControls)
+          val ldapSearchResults: ArrayBuffer[LdapSearchResult] = new ArrayBuffer()
+          while (res.hasMore) {
+            val sr: SearchResult = res.next()
+            val ldaprs = new LdapSearchResult(
+              sr.getName.substring(userSearchAttributeName.length+1),
+              sr.getClassName,
+              sr.getNameInNamespace)
+            ldapSearchResults += ldaprs
+          }
+          Future.successful(Right(ldapSearchResults))
         }
-        val searchBase = detemineUserSearchBase(
-          ldapConfs.head.userDnTemplate.get)
-        var searchIdtemplate = detemineUserIdentifier(
-          ldapConfs.head.userDnTemplate.get)
-
-        val searchid =
-          if (fuzzyMatch) searchIdtemplate + userName + "*"
-          else searchIdtemplate + userName
-        val res: NamingEnumeration[SearchResult] =
-          dirContext.search(searchBase, searchid, searchControls)
-        val ldapSearchResults: ArrayBuffer[LdapSearchResult] = new ArrayBuffer()
-        while (res.hasMore) {
-          val sr: SearchResult = res.next()
-          val ldaprs = new LdapSearchResult(
-            sr.getName.substring(
-              sr.getName.indexOf(searchIdtemplate) + searchIdtemplate.length),
-            sr.getClassName,
-            sr.getNameInNamespace)
-          ldapSearchResults += ldaprs
-        }
-        Future.successful(Right(ldapSearchResults))
       } catch {
         case e: Exception =>
           logger.error("exception", e)
           Future.successful(
-            Left(Errors(Seq(new Error("Exception", e.getMessage)))))
+            Left(Errors(Seq(Error("Exception", e.getMessage)))))
       }
     }
   }
