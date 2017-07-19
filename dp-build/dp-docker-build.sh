@@ -5,6 +5,7 @@ RELEASE_NUMBER=0.0.1
 IMAGE_PREFIX="hortonworks"
 ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service dp-gateway"
 ALL_IMAGES_OPT="all"
+EXT_IMAGES="postgres:9.6.3-alpine consul:0.8.5 claycephas/flyway:4"
 
 build_knox() {
     VERSION=$(get_version)
@@ -70,6 +71,12 @@ save_images() {
         for img in ${ALL_IMAGES}
         do
             save_one_image ${img} ${IMAGE_PREFIX}/${img} ${VERSION} || \
+                echo "Failed saving image ${img}, exiting. Verify if the image has been built."
+        done
+        for img in ${EXT_IMAGES}
+        do
+            docker pull ${img}
+            save_one_image ${img} ${img} || \
                 echo "Failed saving image ${img}, exiting. Verify if the image has been built."
         done
     else
