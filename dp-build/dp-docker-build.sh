@@ -5,7 +5,7 @@ RELEASE_NUMBER=0.0.1
 IMAGE_PREFIX="hortonworks"
 ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service dp-gateway"
 VENDOR_IMAGES="postgres:9.6.3-alpine consul:0.8.5 claycephas/flyway:4"
-ALL_IMAGES_OPT="--all"
+ALL_IMAGES_OPT="all"
 
 build_knox() {
     VERSION=$(get_version)
@@ -92,12 +92,12 @@ save_one_image() {
 }
 
 save_vendor_images() {
-    echo "Saving ${VENDOR_IMAGES} to ./build/dp-docker/images/vendors.tar"
     for img in ${VENDOR_IMAGES}
     do
         docker pull ${img} || \
             echo "Failed to pull image ${img}, exiting."
-        save_one_image ${img}.tar ${img}
+        save_one_image ${img////-} ${img} || \
+                echo "Failed saving image ${img}, exiting. Verify if the image was available."
     done
 }
 
