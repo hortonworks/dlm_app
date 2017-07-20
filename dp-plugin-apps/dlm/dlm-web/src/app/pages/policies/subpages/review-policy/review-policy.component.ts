@@ -144,7 +144,6 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
 
   submitReview() {
     this.store.dispatch(createPolicy(this.serializeFormValues(this.policyFormValue), this.targetCluster.id, CREATE_POLICY_REQUEST));
-    this.store.dispatch(resetFormValue(POLICY_FORM_ID));
   }
 
   cancelReview() {
