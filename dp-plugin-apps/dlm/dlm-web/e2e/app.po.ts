@@ -24,6 +24,24 @@ export class Page {
       element(by.linkText(item));
   }
 
+  getAddButton() {
+    return element(by.partialButtonText('Add'));
+  }
+  
+  getDropDownItem(item) {
+    return element.all(by.css('.dropdown-menu .dropdown-item')).filter(function(elem) {
+      return elem.getText().then( function(text) {
+        return text === item;
+      });
+    }).first();
+  }
+
+  clickAddDropdownButton(buttonText) {
+    const actionButton = this.getAddButton();
+    actionButton.click();
+    this.getDropDownItem(buttonText).click();
+  }
+  
   getUrl() {
     return browser.getCurrentUrl();
   }
@@ -45,23 +63,13 @@ export class PoliciesPage extends Page {
     super();
     new SideNav().navigateTo('Policies');
   }
-
-  getAddButton() {
-    return element(by.partialButtonText('Add'));
-  }
-
-  getDropDownItem(item) {
-    return element.all(by.css('.dropdown-menu .dropdown-item')).filter(function(elem) {
-      return elem.getText().then( function(text) {
-        return text === item;
-      });
-    }).first();
-  }
-
+  
   clickAddPolicy() {
-    const actionButton = this.getAddButton();
-    actionButton.click();
-    this.getDropDownItem('Policy').click();
+    this.clickAddDropdownButton('Policy');
+  }
+
+  clickAddPairing() {
+    this.clickAddDropdownButton('Pairing');
   }
 }
 
@@ -78,5 +86,20 @@ export class PairingsPage extends Page {
   clickAddPairing() {
     const actionButton = this.getAddPairingButton();
     actionButton.click();
+  }
+}
+
+export class ClustersPage extends Page {
+  constructor() {
+    super();
+    new SideNav().navigateTo('Clusters');
+  }
+
+  clickAddPolicy() {
+    this.clickAddDropdownButton('Policy');
+  }
+
+  clickAddPairing() {
+    this.clickAddDropdownButton('Pairing');
   }
 }
