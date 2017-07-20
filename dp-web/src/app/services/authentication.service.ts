@@ -18,7 +18,7 @@ export class AuthenticationService {
 
   isAuthenticated(): Observable<boolean> {
     return Observable.create(observer => {
-      if (!AuthUtils.isDPCookieValid()) {
+      if (!AuthUtils.isUserLoggedIn()) {
         observer.next(false);
       }else{
         observer.next(true);
@@ -26,15 +26,12 @@ export class AuthenticationService {
     });
   }
 
-  redirectToSignIn() {
-    window.location.href = AuthUtils.signinURL;
-  }
-
   signIn(credential: Credential): Observable<User> {
     return this.http
       .post(`${this.URI}/in`, credential, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .do((user: User) => {
+        AuthUtils.setUser(user);
         return user;
       });
   }

@@ -1,8 +1,6 @@
 import {Injectable} from '@angular/core';
 import {CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router} from '@angular/router';
-import {User} from '../../models/user';
 import {RbacService} from '../../services/rbac.service';
-
 
 @Injectable()
 export class NavigationGuard implements CanActivate {

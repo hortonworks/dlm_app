@@ -22,27 +22,27 @@ export const routes: Routes = [{
   }, {
     path: 'dataset',
     loadChildren: './modules/dataset/dataset.module#DatasetModule',
-    canActivate:[ SecuredRouteGuard, NavigationGuard ]
+    canActivate:[ NavigationGuard ]
   }, {
     path: 'onboard',
     loadChildren: './modules/onboard/onboard.module#OnboardModule',
-    canActivate:[ SecuredRouteGuard, NavigationGuard ]
+    canActivate:[ NavigationGuard ]
   }, {
     path: 'infra',
     loadChildren: './modules/infra/infra.module#InfraModule',
-    canActivate:[ SecuredRouteGuard, NavigationGuard]
+    canActivate:[ NavigationGuard]
   }, {
     path: 'dashboard',
     loadChildren: './modules/dashboard/dashboard.module#DashboardModule',
-    canActivate:[ SecuredRouteGuard, NavigationGuard ]
+    canActivate:[ NavigationGuard ]
   },{
     path: 'assets',
     loadChildren: './modules/assets/asset.module#AssetModule',
-    canActivate:[ SecuredRouteGuard, NavigationGuard ]
+    canActivate:[ NavigationGuard ]
   },{
     path: 'workspace',
     loadChildren: './modules/analytics/analytics.module#AnalyticsModule',
-    canActivate:[ SecuredRouteGuard, NavigationGuard ]
+    canActivate:[ NavigationGuard ]
   },
   {
     path: 'unauthorized',

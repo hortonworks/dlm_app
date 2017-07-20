@@ -3,6 +3,7 @@ import {CanActivate, Router} from '@angular/router';
 
 import {AuthenticationService} from '../../services/authentication.service';
 import {Observable} from 'rxjs/Observable';
+import {AuthUtils} from './auth-utils';
 
 @Injectable()
 export class SecuredRouteGuard implements CanActivate {

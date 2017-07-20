@@ -1,16 +1,15 @@
-import {AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, DoCheck, OnChanges, OnDestroy, OnInit} from '@angular/core';
+import {AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, DoCheck, OnDestroy, OnInit} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
 import {IdentityService} from './services/identity.service';
 import {MdlService} from './services/mdl.service';
 
 import {User} from './models/user';
-import {HeaderData, Persona, PersonaTabs} from './models/header-data';
+import {HeaderData} from './models/header-data';
 import {CollapsibleNavService} from './services/collapsible-nav.service';
 import {Loader, LoaderStatus} from './shared/utils/loader';
 import {RbacService} from './services/rbac.service';
 import {AuthenticationService} from './services/authentication.service';
-import {NavigationEnd, NavigationStart, Router} from '@angular/router';
 import {AuthUtils} from './shared/utils/auth-utils';
 
 export enum ViewPaneState {
@@ -29,29 +28,34 @@ export class AppComponent implements OnInit, AfterViewChecked {
   viewPaneState = ViewPaneState.MAXIMISE;
   headerData: HeaderData = new HeaderData();
   showLoader: LoaderStatus;
-  user: User;
-  isUserSignedIn = false;
 
   constructor(private mdlService: MdlService,
-              private router: Router,
               private translateService: TranslateService,
               private collapsibleNavService: CollapsibleNavService,
               private rbacService: RbacService,
-              private authenticationService: AuthenticationService,
               private cdRef: ChangeDetectorRef) {
     translateService.setTranslation('en', require('../assets/i18n/en.json'));
     translateService.setDefaultLang('en');
     translateService.use('en');
   }
 
+  getUser(): User {
+    return AuthUtils.getUser();
+  }
+
+  isUserSignedIn(): boolean {
+    return AuthUtils.isUserLoggedIn();
+  }
+
   ngOnInit() {
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        this.isAuthenticated();
-        this.collapsibleNavService.collpaseSideNav.next(this.viewPaneState === ViewPaneState.MINIMISE ? false : true);
-      }
+    AuthUtils.loggedIn$.subscribe(() => {
+      this.setHeaderData();
     });
-    this.isAuthenticated();
+
+    if(this.isUserSignedIn()){
+      this.setHeaderData();
+    }
+
     this.collapsibleNavService.collpaseSideNav$.subscribe(collapsed => {
       this.viewPaneState = collapsed ? ViewPaneState.MINIMISE : ViewPaneState.MAXIMISE;
     });
@@ -60,17 +64,6 @@ export class AppComponent implements OnInit, AfterViewChecked {
       this.showLoader = status
     });
   }
-
-  isAuthenticated() {
-    this.authenticationService.isAuthenticated().subscribe((isAuthenticated) => {
-      this.isUserSignedIn = isAuthenticated;
-      if (isAuthenticated) {
-        this.user = AuthUtils.getUser();
-        this.setHeaderData();
-      }
-    });
-  }
-
   ngAfterViewChecked() {
     this.cdRef.detectChanges();
   }

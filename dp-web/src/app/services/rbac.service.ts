@@ -49,10 +49,11 @@ export class RbacService {
     this.nonPersonaRoutesMap.set('INFRAADMIN', ['/onboard']);
     this.nonPersonaRoutesMap.set('CURATOR', []);
     this.nonPersonaRoutesMap.set('USER', []);
+
   }
 
   get user() {
-    return AuthUtils.getUser()
+    return AuthUtils.getUser();
   }
 
   private getLandingInternal(observer: Observer<string>, key: String) {
