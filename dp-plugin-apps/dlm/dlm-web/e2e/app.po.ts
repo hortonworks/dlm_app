@@ -46,6 +46,20 @@ export class Page {
     return browser.getCurrentUrl();
   }
 
+  clickNotificationIcon() {
+    const icon = element(by.tagName('dlm-notifications')).element(by.className('alerts-label'));
+    icon.click();
+  }
+
+  clickViewAllNotifications() {
+    this.clickNotificationIcon();
+    const viewAll = element(by.tagName('dlm-notifications'))
+      .element(by.id('notifications-dropdown'))
+      .element(by.className('notifications-footer'))
+      .element(by.tagName('button'));
+    viewAll.click();
+  }
+
 }
 
 export class OverviewPage extends Page {

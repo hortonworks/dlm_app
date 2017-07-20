@@ -70,4 +70,12 @@ describe('DLM', function() {
 
     expect(page.getUrl()).toContain('/pairings/create');
   });
+
+  it('should navigate to notifications page when View All button is clicked', () => {
+    const page = new OverviewPage();
+
+    page.clickViewAllNotifications();
+
+    expect(page.getUrl()).toContain('/notifications');
+  });
 });
