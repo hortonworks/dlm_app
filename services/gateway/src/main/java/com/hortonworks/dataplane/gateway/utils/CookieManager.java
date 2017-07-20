@@ -72,6 +72,7 @@ public class CookieManager {
     RequestContext ctx = RequestContext.getCurrentContext();
     Cookie cookie=new Cookie(cookieName,value);
     cookie.setPath("/");
+    cookie.setHttpOnly(true);
     if (expiryTime.isPresent()){
       Date now=new Date();
       int expiryInSecs=(int)(expiryTime.get().getTime()-now.getTime())/1000;
