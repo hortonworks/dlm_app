@@ -18,6 +18,7 @@ import { AddEntityButtonComponent } from 'components/add-entity-button/add-entit
 import { ProgressState } from 'models/progress-state.model';
 import { getMergedProgress } from 'selectors/progress.selector';
 import { Subscription } from 'rxjs/Subscription';
+import { isEqual } from 'utils/object-utils';
 
 const CLUSTERS_REQUEST_ID = '[CLUSTER_PAGE]CLUSTERS_REQUEST_ID';
 const POLICIES_REQUEST_ID = '[CLUSTER_PAGE]POLICIES_REQUEST_ID';
@@ -45,7 +46,7 @@ export class ClustersComponent implements OnInit, OnDestroy {
     const policiesCount$: Observable<PoliciesCountEntity> = store.select(getCountPoliciesForSourceClusters);
     const allResources$ = Observable.combineLatest(clusters$, pairsCount$, policiesCount$);
     this.overallProgress$ = store.select(getMergedProgress(CLUSTERS_REQUEST_ID, POLICIES_REQUEST_ID, PAIRINGS_REQUEST_ID));
-    this.overallProgressSubscription$ = this.overallProgress$.subscribe(progress => {
+    this.overallProgressSubscription$ = this.overallProgress$.distinctUntilChanged(isEqual).subscribe(progress => {
       if (progress.success) {
         this.store.dispatch(loadClustersStatuses());
       }
