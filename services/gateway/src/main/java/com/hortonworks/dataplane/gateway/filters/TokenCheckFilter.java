@@ -141,7 +141,7 @@ public class TokenCheckFilter extends ZuulFilter {
         } catch (JsonProcessingException e) {
           throw new RuntimeException(e);
         }
-        setUpstreamUserContext(user.get());
+        setUpstreamUserContext(userRef);
         setUpstreamKnoxTokenContext();
         RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY,userRef);
         return null;
@@ -160,10 +160,10 @@ public class TokenCheckFilter extends ZuulFilter {
     return LOGOUT_PATH.equals(ctx.getRequest().getServletPath());
   }
 
-  private void setUpstreamUserContext(User user) {
+  private void setUpstreamUserContext(UserRef userRef) {
     RequestContext ctx = RequestContext.getCurrentContext();
     try {
-      String userJson = objectMapper.writeValueAsString(user);
+      String userJson = objectMapper.writeValueAsString(userRef);
       ctx.addZuulRequestHeader(DP_USER_INFO_HEADER_KEY, Base64.encodeBase64String(userJson.getBytes()));
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
@@ -187,7 +187,7 @@ public class TokenCheckFilter extends ZuulFilter {
       } else {
         UserRef userRef = userRefOptional.get();
         User user=userService.getUserFromUserRef(userRef);
-        setUpstreamUserContext(user);
+        setUpstreamUserContext(userRef);
         setUpstreamKnoxTokenContext();
         RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, userRef);
         return null;

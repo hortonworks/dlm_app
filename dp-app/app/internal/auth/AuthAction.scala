@@ -32,9 +32,9 @@ class Authenticated @Inject()(@Named("userService") userService: UserService,
       Json.parse(userJsonString).validate[UserContext] match {
         case JsSuccess(userContext, _) =>{
           val user=User(id=userContext.id,
-            username = userContext.userName,
+            username = userContext.username,
             password = "",
-            displayname = if (userContext.display.isDefined) userContext.display.get else userContext.userName,
+            displayname = if (userContext.display.isDefined) userContext.display.get else userContext.username,
             avatar = userContext.avatar
           )
 
