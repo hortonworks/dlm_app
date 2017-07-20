@@ -136,6 +136,7 @@ public class TokenCheckFilter extends ZuulFilter {
         UserRef userRef=userService.getUserRef(user.get());
         try {
           String jwtToken = jwt.makeJWT(userRef);
+          userRef.setToken(jwtToken);
           cookieManager.addDataplaneJwtCookie(jwtToken,tokenInfo.getExpiryTime());
         } catch (JsonProcessingException e) {
           throw new RuntimeException(e);
@@ -159,10 +160,10 @@ public class TokenCheckFilter extends ZuulFilter {
     return LOGOUT_PATH.equals(ctx.getRequest().getServletPath());
   }
 
-  private void setUpstreamUserContext(User userRef) {
+  private void setUpstreamUserContext(User user) {
     RequestContext ctx = RequestContext.getCurrentContext();
     try {
-      String userJson = objectMapper.writeValueAsString(userRef);
+      String userJson = objectMapper.writeValueAsString(user);
       ctx.addZuulRequestHeader(DP_USER_INFO_HEADER_KEY, Base64.encodeBase64String(userJson.getBytes()));
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);

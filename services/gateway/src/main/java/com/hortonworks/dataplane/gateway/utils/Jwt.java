@@ -65,6 +65,7 @@ public class Jwt {
       }else{
         String userJsonString = claims.get(USER_CLAIM).toString();
         UserRef userRef = objectMapper.readValue(userJsonString, UserRef.class);
+        userRef.setToken(jwt);
         return Optional.fromNullable(userRef);
       }
     }catch (ExpiredJwtException ex){
