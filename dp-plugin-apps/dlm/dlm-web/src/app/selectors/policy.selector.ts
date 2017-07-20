@@ -3,9 +3,11 @@ import { getPolicies } from './root.selector';
 import { mapToList } from 'utils/store-util';
 import { PoliciesCount } from 'models/policies-count.model';
 import { Cluster } from 'models/cluster.model';
+import { Policy } from 'models/policy.model';
 import { getAllClusters } from './cluster.selector';
 import { getAllJobs } from './job.selector';
 import { sortByDateField } from 'utils/array-util';
+import { JOB_STATUS, CLUSTER_STATUS } from 'constants/status.constant';
 
 export const getEntities = createSelector(getPolicies, state => state.entities);
 
@@ -48,3 +50,18 @@ export const getCountPoliciesForSourceClusters = createSelector(getAllPoliciesWi
     });
   }, {});
 });
+
+
+export const getNonCompletedPolicies = createSelector(getPolicyClusterJob, (policies: Policy[]): Policy[] => {
+  return policies.filter(policy => policy.jobsResource.some(job => job.status !== JOB_STATUS.SUCCESS));
+});
+
+export const getUnhealthyPolicies = createSelector(
+  getAllPoliciesWithClusters,
+  (policies: Policy[]) => policies
+    .filter(policy => [
+        policy.targetClusterResource.healthStatus,
+        policy.sourceClusterResource.healthStatus
+      ].indexOf(CLUSTER_STATUS.UNHEALTHY) > -1
+    )
+);

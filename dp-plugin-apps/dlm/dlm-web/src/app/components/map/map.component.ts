@@ -33,6 +33,7 @@ export class MapComponent implements OnChanges, OnInit {
   @ViewChild('mapcontainer') mapcontainer: ElementRef;
   @Input('mapData') mapData: ClusterMapData[] = [];
   @Input('mapSize') mapSize = 'extraLarge';
+  @Input() sizeSettings: any;
 
   @HostBinding('style.height') get selfHeight(): string {
     return this.getMapDimensions().height;
@@ -88,14 +89,17 @@ export class MapComponent implements OnChanges, OnInit {
   }
 
   getMapDimensions() {
-    return this.defaultMapSizes[this.mapSize] || this.defaultMapSizes[MapSize.EXTRALARGE];
+    return this.sizeSettings || this.defaultMapSizes[this.mapSize] || this.defaultMapSizes[MapSize.EXTRALARGE];
   }
 
   ngOnInit() {
     if (this.map) {
       this.map.remove();
     }
-    this.geographyService.getCountries().subscribe(countries => {
+    this.geographyService.getCountries()
+      // for some reason map don't draw sometimes
+      .delay(500)
+      .subscribe(countries => {
       this.countries = countries;
       this.drawMap(countries);
       this.plotPoints();
