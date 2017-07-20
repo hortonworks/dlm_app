@@ -142,7 +142,7 @@ public class TokenCheckFilter extends ZuulFilter {
         }
         setUpstreamUserContext(user.get());
         setUpstreamKnoxTokenContext();
-        RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, user.get());
+        RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY,userRef);
         return null;
       }
     } catch (FeignException e) {
@@ -188,7 +188,7 @@ public class TokenCheckFilter extends ZuulFilter {
         User user=userService.getUserFromUserRef(userRef);
         setUpstreamUserContext(user);
         setUpstreamKnoxTokenContext();
-        RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, user);
+        RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, userRef);
         return null;
         //TODO  role check. api permission check on the specified resource.
       }

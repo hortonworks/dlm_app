@@ -29,9 +29,17 @@ class Authenticated @Inject()(@Named("userService") userService: UserService,
       val encodedGatewayToken: String = egt
       val userJsonString: String = new String(
         Base64.decodeBase64(encodedGatewayToken))
-      Json.parse(userJsonString).validate[User] match {
-        case JsSuccess(user, _) =>
+      Json.parse(userJsonString).validate[UserContext] match {
+        case JsSuccess(userContext, _) =>{
+          val user=User(id=userContext.id,
+            username = userContext.userName,
+            password = "",
+            displayname = if (userContext.display.isDefined) userContext.display.get else userContext.userName,
+            avatar = userContext.avatar
+          )
+
           block(setUpAuthContext(request, user))
+        }
         case JsError(error) =>
           Logger.error(s"Error while parsing Gateway token. $error")
           //TODO could this be a system error.

@@ -41,8 +41,8 @@ public class LoginPageFilter extends ZuulFilter {
   @Override
   public Object run() {
     RequestContext ctx = RequestContext.getCurrentContext();
-    Object userObj = RequestContext.getCurrentContext().get(Constants.USER_CTX_KEY);
-    if (userObj!=null){
+    Object userRefObj = RequestContext.getCurrentContext().get(Constants.USER_CTX_KEY);
+    if (userRefObj!=null){
       //user is already logged in.
       requestResponseUtils.redirectToRoot();
       return null;
