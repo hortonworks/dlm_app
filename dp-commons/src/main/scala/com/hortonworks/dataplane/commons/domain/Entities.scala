@@ -49,6 +49,7 @@ object Entities {
                   active: Option[Boolean] = Some(true),
                   roles: Seq[RoleType.Value]=Seq()
                   )
+  case class UserContext(id:Option[Long],username:String,avatar:Option[String],roles:Seq[String],display:Option[String],token:Option[String])
 
   case class GroupInfo(id: Option[Long] = None,
                       groupName: String,
@@ -434,5 +435,8 @@ object JsonFormatters {
 
   implicit val groupsListWrites = Json.writes[GroupsList]
   implicit  val groupsListReads = Json.reads[GroupsList]
+
+  implicit val userContextWrites= Json.writes[UserContext]
+  implicit val userContextReads= Json.reads[UserContext]
 
 }

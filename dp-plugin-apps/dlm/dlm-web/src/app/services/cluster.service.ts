@@ -8,6 +8,8 @@ import { Cluster } from 'models/cluster.model';
 export class ClusterService {
 
   normalizeCluster(cluster: Cluster): Cluster {
+    cluster.originDataCenter = cluster.dataCenter;
+    // todo: why we rewrite dataCenter???
     cluster.dataCenter = cluster.name;
     return cluster;
   }
@@ -26,6 +28,10 @@ export class ClusterService {
       response.clusters.map( cluster => this.normalizeCluster(cluster));
       return response;
     });
+  }
+
+  fetchClustersStatuses(): Observable<any> {
+    return mapResponse(this.http.get('clusters/status'));
   }
 
   pairWith(cluster: any, pair: any): Observable<any> {

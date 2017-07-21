@@ -29,7 +29,7 @@ export class NotificationsPageComponent {
     this.events$ = store.select(getAllDisplayedEvents);
     this.clusters$ = store.select(getAllClusters);
     this.overallProgress$ = store.select(getMergedProgress(CLUSTERS_REQUEST, EVENTS_REQUEST));
-    this.store.dispatch(loadEvents(EVENTS_REQUEST));
+    this.store.dispatch(loadEvents({requestId: EVENTS_REQUEST}));
     this.store.dispatch(loadClusters(CLUSTERS_REQUEST));
   }
 

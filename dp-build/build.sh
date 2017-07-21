@@ -134,22 +134,10 @@ build_installer() {
     mkdir -p ${DP_DOCKER_ROOT_FOLDER}/installer/certs/
 	cp -R install/* ${DP_DOCKER_ROOT_FOLDER}/installer
 	cp dp-docker-build.sh ${DP_DOCKER_ROOT_FOLDER}/installer/
-	append_docker_image_version "hortonworks\/dp-db-service" ${DP_DOCKER_ROOT_FOLDER}/installer/docker-compose-apps.yml
-	append_docker_image_version "hortonworks\/dp-cluster-service" ${DP_DOCKER_ROOT_FOLDER}/installer/docker-compose-apps.yml
-	append_docker_image_version "hortonworks\/dp-gateway" ${DP_DOCKER_ROOT_FOLDER}/installer/docker-compose-apps.yml
-	append_docker_image_version "hortonworks\/dp-app" ${DP_DOCKER_ROOT_FOLDER}/installer/docker-compose-apps.yml
-	append_docker_image_version "hortonworks\/dp-knox" ${DP_DOCKER_ROOT_FOLDER}/installer/docker-compose-knox.yml
 	cp -R ../services/db-service/db/* ${DP_DOCKER_ROOT_FOLDER}/installer/dbscripts/
     cp ../dp-app/conf/cert/dp-keystore.jck ${DP_DOCKER_ROOT_FOLDER}/installer/certs/
 	VERSION_STRING=$(get_version)
 	echo ${VERSION_STRING} > ${DP_DOCKER_ROOT_FOLDER}/installer/VERSION	
-}
-
-append_docker_image_version() {
-	IMAGE_NAME=$1
-	DOCKER_COMPOSE_FILE_NAME=$2
-	VERSION=$(get_version)
-	sed -i".bak" -e "s/${IMAGE_NAME}/${IMAGE_NAME}:${VERSION}/g" ${DOCKER_COMPOSE_FILE_NAME}
 }
 
 get_version() {

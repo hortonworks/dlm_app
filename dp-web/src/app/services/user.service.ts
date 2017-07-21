@@ -16,6 +16,12 @@ export class UserService {
   constructor(private http: Http) {
   }
 
+  getUserDetail(): Observable<User> {
+    return this.http.get('/auth/userDetail', new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError)
+  }
+
   searchLDAPUsers(searchTerm: string): Observable<LDAPUser[]> {
     return this.http
       .get(`${this.url}/ldapsearch?name=${searchTerm}&fuzzyMatch=true`, new RequestOptions(HttpUtil.getHeaders()))
@@ -37,9 +43,9 @@ export class UserService {
       .catch(HttpUtil.handleError);
   }
 
-  getUsersWithRole(offset: number, pageSize:number, searchTerm?:string): Observable<UserList> {
+  getUsersWithRole(offset: number, pageSize: number, searchTerm?: string): Observable<UserList> {
     let url = `${this.url}/withRoles?offset=${offset}&pageSize=${pageSize}`;
-    if(searchTerm && searchTerm.trim().length>0){
+    if (searchTerm && searchTerm.trim().length > 0) {
       url = `${url}&searchTerm=${searchTerm}`;
     }
     return this.http

@@ -7,11 +7,10 @@
   [rows]="clusters">
 </dlm-table>
 
-<ng-template #statusCell>
+<ng-template #statusCell let-status="value">
   <span>
-    <i class="fa fa-circle" style="color: #1EB475;"></i>
-    <!-- TODO: this hardcode should be changed with value from API -->
-    <span>HEALTHY</span>
+    <i class="fa fa-circle" [style.color]="status === CLUSTER_STATUS.HEALTHY ? '#1EB475' : '#EF6162'"></i>
+    <span [innerHtml]="status"></span>
   </span>
 </ng-template>
 

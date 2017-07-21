@@ -1,5 +1,5 @@
 import {BrowserModule} from '@angular/platform-browser';
-import {NgModule} from '@angular/core';
+import {APP_INITIALIZER, NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {HttpModule, Http} from '@angular/http';
 import {RouterModule} from '@angular/router';
@@ -10,7 +10,7 @@ import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {routes} from './app.routes';
 
 import {AppComponent} from './app.component';
-import {SignedInForSecureGuard, NotSignedInForUnsecureGuard, DoCleanUpAndRedirectGuard} from './shared/utils/auth-guard';
+import {SecuredRouteGuard, UnsecuredRouteGuard, DoCleanUpAndRedirectGuard} from './shared/utils/auth-guard';
 import {LandingPageGuard} from './shared/utils/landing-page-guard';
 
 import {NotFoundRouteComponent} from './views/not-found-route/not-found-route.component';
@@ -40,8 +40,24 @@ import {AuthErrorComponent} from './shared/auth-error/auth-error.component';
 import {NavigationGuard} from './shared/utils/navigation-guard';
 import {GroupService} from './services/group.service';
 
+import {AuthUtils} from './shared/utils/auth-utils';
+
 export function HttpLoaderFactory(http: Http) {
   return new TranslateHttpLoader(http);
+}
+
+export function init_app(userService: UserService) {
+  return () => new Promise((resolve, reject) => {
+    userService.getUserDetail().subscribe(user => {
+      if (Object.keys(user).length) {
+        AuthUtils.setUser(user);
+      }
+      resolve(true)
+    }, (error) => {
+      console.error(error);
+      resolve(false)
+    })
+  })
 }
 
 @NgModule({
@@ -85,6 +101,12 @@ export function HttpLoaderFactory(http: Http) {
     ConfigurationService,
     AssetService,
     UserService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: init_app,
+      deps: [UserService],
+      multi: true
+    },
     CollapsibleNavService,
     Loader,
     RbacService,
@@ -92,11 +114,12 @@ export function HttpLoaderFactory(http: Http) {
 
     MdlService,
 
-    SignedInForSecureGuard,
-    NotSignedInForUnsecureGuard,
+    SecuredRouteGuard,
+    UnsecuredRouteGuard,
     DoCleanUpAndRedirectGuard,
     LandingPageGuard,
     NavigationGuard
+
   ]
 })
 export class AppModule {

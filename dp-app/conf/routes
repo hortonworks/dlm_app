@@ -15,8 +15,6 @@ GET           /api/identity/:userId                            controllers.Authe
 #api
 
 GET           /api/init                                        controllers.Configuration.init
-GET           /login                                           controllers.Configuration.login
-
 GET           /api/lakes                                       controllers.DataplaneClusters.list
 POST          /api/lakes                                       controllers.DataplaneClusters.create
 GET           /api/lakes/:lakeId                               controllers.DataplaneClusters.retrieve(lakeId)

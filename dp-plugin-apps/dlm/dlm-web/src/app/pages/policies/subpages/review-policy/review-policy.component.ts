@@ -104,6 +104,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     } else if (values.general.type === this.policyTypes.HIVE) {
       sourceDataset = values.databases;
     }
+    const maxBandwidth = values.advanced.max_bandwidth ? +values.advanced.max_bandwidth : '';
     const policyDefinition = <PolicyDefinition>omitEmpty({
       name: values.general.name,
       type: values.general.type,
@@ -114,7 +115,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
       startTime: this.formatDateValue(values.job.startTime),
       endTime: this.formatDateValue(values.job.endTime),
       sourceDataset,
-      distcpMapBandwidth: +values.advanced.max_bandwidth,
+      distcpMapBandwidth: maxBandwidth,
       queueName: values.advanced.queue_name
     });
     return {
@@ -144,7 +145,6 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
 
   submitReview() {
     this.store.dispatch(createPolicy(this.serializeFormValues(this.policyFormValue), this.targetCluster.id, CREATE_POLICY_REQUEST));
-    this.store.dispatch(resetFormValue(POLICY_FORM_ID));
   }
 
   cancelReview() {

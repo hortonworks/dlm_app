@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
-import { loadClusters } from 'actions/cluster.action';
+import { loadClusters, loadClustersStatuses } from 'actions/cluster.action';
 import { loadPairings } from 'actions/pairing.action';
 import { loadPolicies } from 'actions/policy.action';
 import { Cluster } from 'models/cluster.model';
@@ -13,10 +13,12 @@ import { getCountPoliciesForSourceClusters } from 'selectors/policy.selector';
 import * as fromRoot from 'reducers';
 import { DropdownItem } from 'components/dropdown/dropdown-item';
 import { TranslateService } from '@ngx-translate/core';
-import { MapData, MapConnectionStatus, Point, MapSize } from 'models/map-data';
+import { MapSize, ClusterMapData, ClusterMapPoint } from 'models/map-data';
 import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
 import { ProgressState } from 'models/progress-state.model';
 import { getMergedProgress } from 'selectors/progress.selector';
+import { Subscription } from 'rxjs/Subscription';
+import { isEqual } from 'utils/object-utils';
 
 const CLUSTERS_REQUEST_ID = '[CLUSTER_PAGE]CLUSTERS_REQUEST_ID';
 const POLICIES_REQUEST_ID = '[CLUSTER_PAGE]POLICIES_REQUEST_ID';
@@ -27,10 +29,11 @@ const PAIRINGS_REQUEST_ID = '[CLUSTER_PAGE]PAIRINGS_REQUEST_ID';
   templateUrl: './clusters.component.html',
   styleUrls: ['./clusters.component.scss']
 })
-export class ClustersComponent implements OnInit {
+export class ClustersComponent implements OnInit, OnDestroy {
   tableData$: Observable<Cluster[]>;
-  mapData$: Observable<MapData[]>;
+  clustersMapData$: Observable<ClusterMapData[]>;
   overallProgress$: Observable<ProgressState>;
+  overallProgressSubscription$: Subscription;
   resourceAvailability$: Observable<{canAddPolicy: boolean, canAddPairing: boolean}>;
   addOptions: DropdownItem[];
   mapSize: MapSize = MapSize.FULLWIDTH;
@@ -43,20 +46,11 @@ export class ClustersComponent implements OnInit {
     const policiesCount$: Observable<PoliciesCountEntity> = store.select(getCountPoliciesForSourceClusters);
     const allResources$ = Observable.combineLatest(clusters$, pairsCount$, policiesCount$);
     this.overallProgress$ = store.select(getMergedProgress(CLUSTERS_REQUEST_ID, POLICIES_REQUEST_ID, PAIRINGS_REQUEST_ID));
-    this.mapData$ = clusters$
-      .startWith([])
-      .map(clusters =>
-        clusters.map(cluster =>
-          new MapData(
-            new Point(
-              cluster.location.latitude,
-              cluster.location.longitude,
-              MapConnectionStatus.NA,
-              cluster.name
-            )
-          )
-        )
-      );
+    this.overallProgressSubscription$ = this.overallProgress$.distinctUntilChanged(isEqual).subscribe(progress => {
+      if (progress.success) {
+        this.store.dispatch(loadClustersStatuses());
+      }
+    });
     this.addOptions = [
       { label: t.instant('page.clusters.dropdown.cluster') },
       { label: t.instant('page.clusters.dropdown.policy') }
@@ -75,14 +69,21 @@ export class ClustersComponent implements OnInit {
           };
         });
       });
-      this.resourceAvailability$ = Observable
-        .combineLatest(clusters$, pairsCount$)
-        .map(AddEntityButtonComponent.availableActions);
+    this.clustersMapData$ = this.tableData$
+      .startWith([])
+      .map(clusters => clusters.map(cluster => (<ClusterMapData>{start: <ClusterMapPoint>{cluster}})));
+    this.resourceAvailability$ = Observable
+      .combineLatest(clusters$, pairsCount$)
+      .map(AddEntityButtonComponent.availableActions);
   }
 
   ngOnInit() {
     this.store.dispatch(loadClusters(CLUSTERS_REQUEST_ID));
     this.store.dispatch(loadPairings(PAIRINGS_REQUEST_ID));
     this.store.dispatch(loadPolicies(POLICIES_REQUEST_ID));
+  }
+
+  ngOnDestroy() {
+    this.overallProgressSubscription$.unsubscribe();
   }
 }

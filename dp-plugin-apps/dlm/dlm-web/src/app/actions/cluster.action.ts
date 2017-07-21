@@ -4,6 +4,7 @@ import { Cluster } from 'models/cluster.model';
 
 export const ActionTypes = {
   LOAD_CLUSTERS: requestType('LOAD_CLUSTERS'),
+  LOAD_CLUSTERS_STATUSES: requestType('LOAD_CLUSTERS_STATUSES'),
   LOAD_CLUSTER: type('LOAD_CLUSTER'),
   LOAD_CLUSTER_SUCCESS: type('LOAD_CLUSTER_SUCCESS'),
   LOAD_CLUSTER_FAILURE: type('LOAD_CLUSTER_FAILURE')
@@ -47,6 +48,23 @@ export const loadClustersSuccess = (clusters, meta): Action => ({
 
 export const loadClustersFailure = (error, meta): Action => ({
   type: ActionTypes.LOAD_CLUSTERS.FAILURE,
+  payload: { error, meta }
+});
+
+export const loadClustersStatuses = (requestId?: string): Action => ({
+  type: ActionTypes.LOAD_CLUSTERS_STATUSES.START,
+  payload: {
+    meta: { requestId }
+  }
+});
+
+export const loadClustersStatusesSuccess = (clusters, meta): Action => ({
+  type: ActionTypes.LOAD_CLUSTERS_STATUSES.SUCCESS,
+  payload: { response: clusters, meta }
+});
+
+export const loadClustersStatusesFailure = (error, meta): Action => ({
+  type: ActionTypes.LOAD_CLUSTERS_STATUSES.FAILURE,
   payload: { error, meta }
 });
 

@@ -29,3 +29,13 @@ export const EVENT_SEVERITY = {
   ERROR: 'error',
   CRITICAL: 'critical'
 };
+
+export const CLUSTER_STATUS = {
+  HEALTHY: 'HEALTHY',
+  UNHEALTHY: 'UNHEALTHY'
+};
+
+export const SERVICE_STATUS = {
+  STARTED: 'STARTED',
+  INSTALLED: 'INSTALLED'
+};

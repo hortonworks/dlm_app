@@ -1,7 +1,7 @@
 <dlm-page-header [title]="'common.clusters'"></dlm-page-header>
 <div class="row page-section">
   <div class="col-md-12">
-    <dp-map [mapSize]="mapSize" [mapData]="mapData$ | async"></dp-map>
+    <dp-map [mapSize]="mapSize" [mapData]="clustersMapData$ | async"></dp-map>
   </div>
 </div>
 <dlm-progress-container [progressState]="overallProgress$ | async">

@@ -15,6 +15,8 @@ import {
   loadLastJobsSuccess, loadLastJobsFailure
 } from 'actions/policy.action';
 import { operationComplete, operationFail } from 'actions/operation.action';
+import { POLICY_FORM_ID } from 'pages/policies/components/policy-form/policy-form.component';
+import { resetFormValue } from 'actions/form.action';
 
 @Injectable()
 export class PolicyEffects {
@@ -38,6 +40,7 @@ export class PolicyEffects {
         .mergeMap(response => [
           createPolicySuccess(response, payload.meta),
           go(['/policies']),
+          resetFormValue(POLICY_FORM_ID),
           Observable.of(this.notificationService.create(<ToastNotification>{
             title: this.t.instant('page.policies.success.title'),
             body: this.t.instant('page.policies.success.body', {policyName: payload.policy.policyDefinition.name}),

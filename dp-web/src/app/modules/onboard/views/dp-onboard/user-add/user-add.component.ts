@@ -39,13 +39,7 @@ export class UserAddComponent implements OnInit {
 
   save() {
     this.userService.addAdminUsers(this.users).subscribe(response => {
-      this.authenticationService.signOut()
-        .then(() => {
-          this.router.navigate(['sign-in', {
-            cause: 'sign-out'
-          }]);
-          return true;
-        });
+      this.authenticationService.signOut();
     }, (error) => {
       console.error(error)
     });
