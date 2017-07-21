@@ -19,22 +19,6 @@
     <div *ngIf="(pairings$ | async)?.length > 0; else noPairs">
       <div class="row">
         <div class="col-md-8 col-sm-11 col-lg-6">
-          <div class="header-container">
-            <div class="row content-row">
-              <div class="col-md-5 col-sm-5 col-lg-5 col-xs-5 col text-center">
-                <div class="h6">{{ "page.pairings.content.header.first_cluster" | translate }}</div>
-              </div>
-              <div class="col-md-1 col-sm-1 col-lg-1 col-xs-1 col text-center">
-                <div class="h6">{{ "page.pairings.content.header.status" | translate }}</div>
-              </div>
-              <div class="col-md-5 col-sm-5 col-lg-5 col-xs-5 col second-cluster text-center">
-                <div class="h6">{{ "page.pairings.content.header.second_cluster" | translate }}</div>
-              </div>
-              <div class="col-md-1 col-sm-1 col-lg-1 col-xs-1 col unpair text-center">
-                <div class="h6">{{ "page.pairings.content.header.unpair" | translate }}</div>
-              </div>
-            </div>
-          </div>
           <div class="row pairings-container">
             <dlm-pairing-card-list [pairings]="pairings$ | async" (onUnpair)="onUnpair($event)"></dlm-pairing-card-list>
           </div>
@@ -56,4 +40,13 @@
                     okText="{{ 'page.pairings.unpair.confirmation.primaryButton' | translate }}"
                     (onOk)="onConfirmation()">
   </dlm-modal-dialog>
+
+  <dlm-modal-dialog
+    [title]="lastOperationResponse.status"
+    [body]="lastOperationResponse.message"
+    [showDialog]="showOperationResponseModal"
+    [showCancel]="false"
+    (onClose)="onCloseOperationResponseModal()">
+  </dlm-modal-dialog>
+
 </dlm-progress-container>

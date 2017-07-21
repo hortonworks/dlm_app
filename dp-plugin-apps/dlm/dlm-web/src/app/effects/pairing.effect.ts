@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { go } from '@ngrx/router-store';
 import { Effect, Actions, toPayload } from '@ngrx/effects';
-import { PairingService } from '../services/pairing.service';
+import { PairingService } from 'services/pairing.service';
 
 import {
   loadPairingsSuccess, loadPairingsFail, createPairingSuccess, createPairingFail,
   deletePairingSuccess, deletePairingFail, ActionTypes as pairingActions
-} from '../actions/pairing.action';
+} from 'actions/pairing.action';
+import { operationComplete, operationFail } from 'actions/operation.action';
 
 @Injectable()
 export class PairingEffects {
@@ -41,11 +41,14 @@ export class PairingEffects {
     .map(toPayload)
     .switchMap(payload => {
       return this.pairingService.deletePairing(payload)
-        .map(response => {
+        .mergeMap(response => {
           response['payload'] = payload;
-          return deletePairingSuccess(response);
+          return [
+            operationComplete(response),
+            deletePairingSuccess(response)
+          ];
         })
-        .catch(err => Observable.of(deletePairingFail(err)));
+        .catch(err => Observable.from([operationFail(err.json()), deletePairingFail(err)]));
     });
 
   constructor(private actions$: Actions, private pairingService: PairingService) { }

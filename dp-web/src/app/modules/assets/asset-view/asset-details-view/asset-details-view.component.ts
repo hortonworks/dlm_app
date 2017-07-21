@@ -111,7 +111,7 @@ export class AssetDetailsViewComponent implements OnChanges {
   }
   get colVisualData() {
     var ret = {};
-    if(!this.colGuid) return ret;
+    if(!this.colGuid || !this.assetDetails.referredEntities[this.colGuid].attributes.profileData) return ret;
     ret = this.assetDetails.referredEntities[this.colGuid].attributes.profileData.attributes;
     ret['name'] = this.assetDetails.referredEntities[this.colGuid].attributes.name;
     ret['type'] = this.assetDetails.referredEntities[this.colGuid].attributes.type;

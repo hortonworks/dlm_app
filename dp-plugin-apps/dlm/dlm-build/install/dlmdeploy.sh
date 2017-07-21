@@ -1,22 +1,36 @@
 #!/bin/sh
 set -e
 
-DOCKER_FILES="-f docker-compose-apps.yml"
-
 DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 
+init_network() {
+    IS_NETWORK_PRESENT="false"
+    docker network inspect --format "{{title .ID}}" dp >> install.log 2>&1 && IS_NETWORK_PRESENT="true"
+    if [ $IS_NETWORK_PRESENT == "false" ]; then
+        echo "Network dp not found. Creating new network with name dp."
+        docker network create dp
+    # This is not a clean solution and will be fixed later
+    # else
+    #     echo "Network dp already exists. Destroying all containers on network dp."
+    #     CONTAINER_LIST=$(docker container ls --all --quiet --filter "network=dp")
+    #     if [[ $(echo $CONTAINER_LIST) ]]; then
+    #         docker rm  --force $CONTAINER_LIST
+    #     fi
+    fi
+}
+
 ps() {
-    docker-compose ${DOCKER_FILES} ps
+    docker ps --filter "name=dlm-app"
 }
 
 list_logs() {
-    docker-compose ${DOCKER_FILES} logs "$@"
+    docker logs dlm-app
 }
 
 
 destroy() {
-    docker-compose -f docker-compose-apps.yml down
+    docker rm --force dlm-app
 }
 
 
@@ -30,23 +44,31 @@ init_app() {
     if [ "$CONSUL_HOST" == "" ]; then
         read_consul_host
     fi
-    docker-compose -f docker-compose-apps.yml up -d
+    docker start dlm-app >> install.log 2>&1 || \
+        docker run \
+            --name dlm-app \
+            --network dp \
+            --publish 9011:9011 \
+            --detach \
+            --env CONSUL_HOST \
+            --env DLM_APP_HOME="/usr/dlm-app" \
+            hortonworks/dlm-app:$VERSION
 }
 
 
 start_app() {
-    docker-compose -f docker-compose-apps.yml start
+    docker start dlm-app
 }
 
 stop_app() {
-    docker-compose -f docker-compose-apps.yml stop
+    docker stop dlm-app
 }
 
 print_version() {
     if [ -f VERSION ]; then
         cat VERSION
     else
-        cat ${DEFAULT_VERSION}:${DEFAULT_TAG}
+        echo ${DEFAULT_VERSION}:${DEFAULT_TAG}
     fi
 }
 
@@ -68,6 +90,9 @@ then
     usage;
     exit 0;
 else
+    VERSION=$(print_version)
+    init_network
+    
     case "$1" in
         init)
            init_app

@@ -3,8 +3,11 @@ package services
 import javax.inject.{Inject, Singleton}
 
 import com.google.inject.name.Named
+import models.Ambari._
 import com.hortonworks.dataplane.cs.Webservice.{AmbariWebService => AmbariClientService}
-import com.hortonworks.dataplane.commons.domain.Entities.{Errors, HJwtToken}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, HJwtToken}
+import play.api.Logger
+import play.api.http.Status.BAD_GATEWAY
 import play.api.libs.json.JsValue
 import utils.StringExtensions._
 
@@ -94,4 +97,46 @@ class AmbariService @Inject()(@Named("ambariService") val ambariService: AmbariC
     }
     p.future
   }
+
+  /**
+    *
+    * @param clusterId  cluster id
+    * @param token   JWT token
+    * @return   (String, Boolean)
+    *           ._1 = active namenode
+    *           ._2 = Namenode HA enabled
+    */
+  def getActiveComponent(clusterId: Long)(implicit token:Option[HJwtToken]) : Future[Either[Errors, (String, Boolean)]] = {
+    val p: Promise[Either[Errors, (String, Boolean)]] = Promise()
+
+    dataplaneService.getCluster(clusterId).map {
+      case Left(errors) =>  p.success(Left(errors))
+      case Right(response) =>
+        val clusterName = response.name
+        val ambariApiSuffix = AmbariService.getNameNodeAmbariUrl
+        val url = s"clusters/$clusterName/$ambariApiSuffix"
+        ambariService.requestAmbariApi(clusterId, url.encode).map {
+          case Left(errors) =>  p.success(Left(errors))
+          case Right(response) => {
+            val nameNodes : Seq[HostComponent] = response.validate[HostComponents].get.host_components
+            val activeNameNode = nameNodes.find((x) => x.metrics.dfs.`FSNamesystem`.HAState == "active")
+            activeNameNode match {
+              case None => {
+                val errorMsg = AmbariService.getActiveNameNodeErrMsg
+                Logger.error(errorMsg)
+                p.success(Left(Errors(Seq(Error(BAD_GATEWAY.toString, errorMsg)))))
+              }
+              case Some(activeNameNode) => p.success(Right(activeNameNode.HostRoles.host_name, nameNodes.size > 1))
+            }
+          }
+        }
+    }
+    p.future
+  }
 }
+
+object AmbariService {
+  def getNameNodeAmbariUrl = "services/HDFS/components/NAMENODE?fields=host_components/metrics/dfs/FSNamesystem/HAState,host_components/HostRoles/host_name&minimal_response=true"
+  def getActiveNameNodeErrMsg = "No active namenode found from Ambari REST APIs"
+}
+

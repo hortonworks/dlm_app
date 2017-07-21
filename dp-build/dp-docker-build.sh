@@ -4,6 +4,7 @@ set -e
 RELEASE_NUMBER=0.0.1
 IMAGE_PREFIX="hortonworks"
 ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service dp-gateway"
+VENDOR_IMAGES="postgres:9.6.3-alpine consul:0.8.5 claycephas/flyway:4"
 ALL_IMAGES_OPT="all"
 
 build_knox() {
@@ -65,13 +66,13 @@ save_images() {
 
     VERSION=$(get_version)
 
-    if [ $1 == ${ALL_IMAGES_OPT} ]
-    then
+    if [ $1 == ${ALL_IMAGES_OPT} ]; then
         for img in ${ALL_IMAGES}
         do
             save_one_image ${img} ${IMAGE_PREFIX}/${img} ${VERSION} || \
                 echo "Failed saving image ${img}, exiting. Verify if the image has been built."
         done
+        save_vendor_images
     else
         save_one_image $1 ${IMAGE_PREFIX}/${1} ${VERSION}
     fi
@@ -88,6 +89,16 @@ save_one_image() {
     echo "Saving ${IMAGE_NAME} to ./build/dp-docker/images/${IMAGE_LABEL}.tar"
     mkdir -p ./build/dp-docker/images
     docker save --output ./build/dp-docker/images/${IMAGE_LABEL}.tar ${IMAGE_NAME}
+}
+
+save_vendor_images() {
+    for img in ${VENDOR_IMAGES}
+    do
+        docker pull ${img} || \
+            echo "Failed to pull image ${img}, exiting."
+        save_one_image ${img////-} ${img} || \
+                echo "Failed saving image ${img}, exiting. Verify if the image was available."
+    done
 }
 
 get_version() {

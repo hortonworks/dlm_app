@@ -39,3 +39,6 @@ export const groupByKey = (collection, keyName) => {
 export const sortByDateField = (collection, keyName) =>
   collection.sort((a, b) =>
     new Date(a[keyName]).getTime() > new Date(b[keyName]).getTime() ? -1 : 1);
+
+export const without = (collection, itemToRemove) =>
+  collection.indexOf(itemToRemove) === -1 ? collection : collection.filter(item => item !== itemToRemove);

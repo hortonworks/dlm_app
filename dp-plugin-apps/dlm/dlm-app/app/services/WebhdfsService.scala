@@ -3,8 +3,11 @@ package services
 import javax.inject.{Inject, Singleton}
 
 import com.google.inject.name.Named
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, HJwtToken}
 import com.hortonworks.dlm.webhdfs.WebService.FileService
 import com.hortonworks.dlm.webhdfs.domain.Entities.WebHdfsApiError
+import models.Entities.ClusterServiceEndpointDetails
+import play.api.Logger
 import play.api.libs.json.JsValue
 import play.api.http.Status._
 
@@ -19,7 +22,8 @@ import scala.concurrent.{Future, Promise}
 @Singleton
 class WebhdfsService @Inject()(
    @Named("fileService") val fileService: FileService,
-   val dataplaneService: DataplaneService) {
+   val dataplaneService: DataplaneService,
+   val ambariService: AmbariService) {
 
   /**
     * 
@@ -27,7 +31,7 @@ class WebhdfsService @Inject()(
     * @param queryString  query parameters with `path` and `operation` parameter
     * @return
     */
-  def getFileOperationResult(clusterId: Long, queryString: Map[String, String]) : Future[Either[WebHdfsApiError, JsValue]] = {
+  def getFileOperationResult(clusterId: Long, queryString: Map[String, String])(implicit token:Option[HJwtToken]) : Future[Either[WebHdfsApiError, JsValue]] = {
     val p: Promise[Either[WebHdfsApiError, JsValue]] = Promise()
     val filePath = queryString.get(WebhdfsService.QUERY_PARAM_FILEPATH_KEY)
     filePath match {
@@ -37,7 +41,7 @@ class WebhdfsService @Inject()(
         case None => p.success(Left(WebHdfsApiError(BAD_REQUEST, None, None,
           Some(WebhdfsService.operationErrorMsg))))
         case Some(operation) => {
-          dataplaneService.getNameNodeHttpService(clusterId).map {
+          getActiveNameNodeEndpoint(clusterId).map {
             case Left(errors) => {
               val NAMENODE_ERROR_PREFIX = WebhdfsService.getNnErrorMsgPrefix
               p.success(Left(WebHdfsApiError(errors.errors.head.code.toInt, None, None,
@@ -56,14 +60,43 @@ class WebhdfsService @Inject()(
     p.future
 
   }
+
+
+  def getActiveNameNodeEndpoint(clusterId: Long)(implicit token:Option[HJwtToken]) : Future[Either[Errors, ClusterServiceEndpointDetails]] = {
+    val p: Promise[Either[Errors, ClusterServiceEndpointDetails]] = Promise()
+
+    for {
+      nameNodeDetails <- ambariService.getActiveComponent(clusterId)
+      clusterServiceWithConfigs <- dataplaneService.getServiceConfigs(clusterId, DataplaneService.NAMENODE)
+    } yield {
+      val futureFailedList = List(nameNodeDetails, clusterServiceWithConfigs).filter(_.isLeft)
+      if (futureFailedList.isEmpty) {
+        val namenodeDetails = nameNodeDetails.right.get
+        val namenodeName = namenodeDetails._1
+        val isHAEnabled =  namenodeDetails._2
+        dataplaneService.getNameNodeHttpEndpointDetails(clusterServiceWithConfigs.right.get, namenodeName, isHAEnabled) match {
+          case Left(errors) => p.success(Left(errors))
+          case Right(clusterServiceEndpointDetails) => p.success(Right(clusterServiceEndpointDetails))
+        }
+      } else {
+        val errorMsg = WebhdfsService.getActiveNameNodeErrMsg
+        Logger.error(errorMsg)
+        p.success(Left(Errors(Seq(Error(BAD_GATEWAY.toString, errorMsg)))))
+      }
+    }
+    p.future
+  }
   
 }
 
 object WebhdfsService {
   lazy val QUERY_PARAM_FILEPATH_KEY = "path"
   lazy val QUERY_PARAM_OPERATION_KEY = "operation"
+  lazy val SERVICE_NAME = "HDFS"
 
+  def activeNnpredicate = "fields=host_components/metrics/dfs/FSNamesystem/HAState,host_components/HostRoles/host_name&minimal_response=true"
   def pathErrorMsg = "endpoint expects path parameter"
   def operationErrorMsg = "endpoint expects operation parameter"
   def getNnErrorMsgPrefix = "error getting namenode endpoint details from dataplane: "
+  def getActiveNameNodeErrMsg = "Failed to get active namenode details"
 }

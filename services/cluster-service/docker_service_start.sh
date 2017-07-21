@@ -4,4 +4,4 @@ if [ -z "$CONSUL_HOST" ]; then
     exit 1
 fi
 
-/usr/dp-cluster-service/bin/cluster-service -Ddp.services.db.service.uri=http://dp-db-service:9000 -Dconsul.host=${CONSUL_HOST}
+/usr/dp-cluster-service/bin/cluster-service -Ddp.services.db.service.uri=http://dp-db-service:9000 -Dconsul.host=${CONSUL_HOST} -Ddp.services.hdp.proxy.consul.host=${CONSUL_HOST}
