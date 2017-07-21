@@ -9,12 +9,7 @@ import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SERVICE_ID_KEY;
 
@@ -25,7 +20,7 @@ public class Utils {
   @Autowired
   private ProxyRequestHelper proxyRequestHelper;
 
-  public Optional<String> getBearerToken() {
+  public Optional<String> getBearerTokenFromHeader() {
     HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
     String AuthHeader = request.getHeader(Constants.AUTHORIZATION_HEADER);
     if (StringUtils.isNotBlank(AuthHeader) && AuthHeader.startsWith(BEARER_TOKEN_KEY)) {
@@ -35,24 +30,19 @@ public class Utils {
     return Optional.absent();
   }
 
-  public Optional<Cookie> getCookie(String cookieName) {
-    RequestContext ctx = RequestContext.getCurrentContext();
-    Cookie[] cookies = ctx.getRequest().getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (cookie.getName().equals(cookieName)) {
-          return Optional.of(cookie);
-        }
-      }
-    }
-    return Optional.absent();
-  }
   public void deleteAuthorizationHeaderToUpstream(){
     proxyRequestHelper.addIgnoredHeaders(Constants.AUTHORIZATION_HEADER);
   }
+
   public Object sendUnauthorized() {
+    return sendUnauthorized(null);
+  }
+  public Object sendUnauthorized(String message) {
     RequestContext ctx = RequestContext.getCurrentContext();
     ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
+    if (message!=null){
+      ctx.setResponseBody(message);
+    }
     ctx.setSendZuulResponse(false);
     return null;
   }
@@ -67,35 +57,7 @@ public class Utils {
     return null;
   }
 
-  public void deleteCookie(String cookieName,String domain) {
-    if (domain==null){
-      domain=getDomainFromRequest();
-    }
-    Optional<Cookie> cookieOpt = getCookie(cookieName);
-    if (cookieOpt.isPresent()) {
-      Cookie cookie = cookieOpt.get();
-      cookie.setDomain(domain);
-      cookie.setPath("/");
-      deleteCookie(cookieOpt.get());
-    }
-  }
 
-  private String getDomainFromRequest()  {
-    RequestContext ctx = RequestContext.getCurrentContext();
-    String requestURLStr = ctx.getRequest().getRequestURL().toString();
-    try {
-      URI uri = new URI(requestURLStr);
-      return uri.getHost();
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private void deleteCookie(Cookie cookie) {
-    RequestContext ctx = RequestContext.getCurrentContext();
-    cookie.setMaxAge(0);
-    ctx.getResponse().addCookie(cookie);
-  }
   public String getServiceId(){
     RequestContext ctx = RequestContext.getCurrentContext();
     return  ctx.get(SERVICE_ID_KEY).toString();
