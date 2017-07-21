@@ -14,7 +14,9 @@ export class UserAddComponent implements OnInit {
 
   showNotification = false;
   users: string[] = [];
+  groups: string[] = [];
   availableUsers: string[] = [];
+  availableGroups: string[] = [];
   tagThemes = TagTheme;
 
   constructor(private route: ActivatedRoute,
@@ -57,13 +59,31 @@ export class UserAddComponent implements OnInit {
     this.users.push(text);
   }
 
-  onTagSearchChange(text: string) {
+  onNewGroupAddition(text: string) {
+    this.groups.push(text);
+  }
+
+  onUserSearchChange(text: string) {
     this.availableUsers = [];
     if (text && text.length > 2) {
       this.userService.searchLDAPUsers(text).subscribe((ldapUsers: LDAPUser[]) => {
         this.availableUsers = [];
         ldapUsers.map(user => {
           this.availableUsers.push(user.name);
+        });
+      }, () => {
+        console.error('Error while fetching ldap users');
+      });
+    }
+  }
+
+  onGroupSearchChange(text: string) {
+    this.availableGroups = [];
+    if (text && text.length > 2) {
+      this.userService.searchLDAPGroups(text).subscribe((ldapGroups: any[]) => {
+        this.availableGroups = [];
+        ldapGroups.map(group => {
+          this.availableGroups.push(group.name);
         });
       }, () => {
         console.error('Error while fetching ldap users');

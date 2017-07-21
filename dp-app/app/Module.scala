@@ -30,6 +30,13 @@ class Module extends AbstractModule {
     new UserServiceImpl(configuration.underlying)
   }
 
+  @Provides
+  @Singleton
+  @Named("groupService")
+  def provideGroupService(implicit ws: WSClient, configuration: Configuration): GroupService = {
+    new GroupServiceImpl(configuration.underlying)
+  }
+
 
   @Provides
   @Singleton

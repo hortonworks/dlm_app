@@ -38,6 +38,7 @@ import {Loader} from './shared/utils/loader';
 import {RbacService} from './services/rbac.service';
 import {AuthErrorComponent} from './shared/auth-error/auth-error.component';
 import {NavigationGuard} from './shared/utils/navigation-guard';
+import {GroupService} from './services/group.service';
 
 export function HttpLoaderFactory(http: Http) {
   return new TranslateHttpLoader(http);
@@ -87,6 +88,7 @@ export function HttpLoaderFactory(http: Http) {
     CollapsibleNavService,
     Loader,
     RbacService,
+    GroupService,
 
     MdlService,
 

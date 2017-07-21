@@ -16,9 +16,10 @@ GET           /users/role/:username                                          con
 GET           /users/all                                                     controllers.Users.getUsers
 GET           /users/:userId                                                 controllers.Users.load(userId:Long)
 
-GET           /groups/all                                                    controllers.Groups.getGroups
+GET           /groups                                                        controllers.Groups.getGroups
 POST          /groups/withroles                                              controllers.Groups.insertWithRoles
 POST          /groups/update                                                 controllers.Groups.updateGroupInfo
+GET           /groups/:name                                                  controllers.Groups.groupInfoByName(name: String)
 
 DELETE        /users/:userId                                                 controllers.Users.delete(userId:Long)
 

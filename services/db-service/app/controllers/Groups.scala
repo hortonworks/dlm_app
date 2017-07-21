@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
-import com.hortonworks.dataplane.commons.domain.Entities.{GroupInfo, UserInfo}
+import com.hortonworks.dataplane.commons.domain.Entities.{GroupInfo}
 import domain.{GroupsRepo, RolesUtil}
 import play.api.mvc.Action
 
@@ -50,6 +50,15 @@ class Groups @Inject()(groupsRepo: GroupsRepo, rolesUtil: RolesUtil)(
           .recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))
+  }
+
+  def groupInfoByName(groupName: String) = Action.async { request =>
+    groupsRepo
+      .getGroupByName(groupName)
+      .map { group =>
+        success(group)
+      }
+      .recoverWith(apiError)
   }
 
 }

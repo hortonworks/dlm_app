@@ -86,6 +86,7 @@
       "adduser" : {
         "labels" : {
           "users" : "Users",
+          "groups": "Groups",
           "saveAndLogin" : "SAVE & LOGIN",
           "configSuccess": "LDAP ADDED SUCCESSFULLY"
         }

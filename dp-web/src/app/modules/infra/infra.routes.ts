@@ -5,6 +5,7 @@ import {ClusterAddComponent} from './views/cluster-add/cluster-add.component';
 import {ClusterDetailsComponent} from './views/cluster-details/cluster-details.component';
 import {UserManagementComponent} from './views/user-management/user-management.component';
 import {AddUserComponent} from './views/user-management/add-user/add-user.component';
+import {AddGroupComponent} from './views/user-management/add-group/add-group.component';
 
 export const routes: Routes = [{
   path: '',
@@ -27,6 +28,16 @@ export const routes: Routes = [{
     {
       path: 'edit/:name',
       component: AddUserComponent,
+      outlet: 'sidebar',
+    },
+    {
+      path: 'addgroup',
+      component: AddGroupComponent,
+      outlet: 'sidebar',
+    },
+    {
+      path: 'editgroup/:name',
+      component: AddGroupComponent,
       outlet: 'sidebar',
     }
   ]

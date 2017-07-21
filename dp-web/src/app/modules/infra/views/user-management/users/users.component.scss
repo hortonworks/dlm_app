@@ -1,4 +1,4 @@
-@import "../../../../../styles/variables";
+@import "../../../../../../styles/variables";
 
 .container {
   padding: 35px 25px;
@@ -55,39 +55,4 @@ dp-dropdown {
 
 .center {
   text-align: center !important;
-}
-
-.mdl-button-group {
-  .mdl-button {
-    float: left;
-    background-color: $white;
-    color: $dove-gray;
-    padding: 0 15px;
-    box-shadow: none;
-    border-radius: 0;
-    height: 34px;
-    min-width: 42px;
-    border: 1px solid $iron;
-    box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-
-    & + .mdl-button {
-      border-left: 0;
-      border-top-right-radius: 2px;
-      border-bottom-right-radius: 2px;
-    }
-  }
-
-  .button-color--dark-grey {
-    background-color: $dove-gray;
-    color: white;
-  }
-  & > *:first-child {
-    border-top-left-radius: 2px;
-    border-bottom-left-radius: 2px;
-  }
-  & + * {
-    margin-left: 10px;
-  }
 }

@@ -99,7 +99,20 @@ class GroupsRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     }
   }
 
-  private def getGroupDetailInternal(groupName: String) = {
+  def getGroupByName(groupName: String) = {
+    for {
+      (group, groupRoles) <- getGroupDetailInternal(groupName)
+      roleIdMap <- rolesUtil.getRoleIdMap
+    } yield {
+      val roles = groupRoles.map { userRoleObj =>
+        val roleName: String = roleIdMap(userRoleObj._2.get.roleId.get).roleName
+        RoleType.withName(roleName)
+      }
+      GroupInfo(id = group.id, groupName = group.groupName, displayName = group.displayName, roles = roles, active = group.active)
+    }
+  }
+
+  def getGroupDetailInternal(groupName: String) = {
     val query = for {
       (group, groupRole) <- Groups.filter(_.groupName === groupName) joinLeft GroupsRoles on (_.id === _.groupId)
     } yield {
