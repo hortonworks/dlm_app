@@ -56,16 +56,18 @@
             </div>
             <div class="clearfix"></div>
           </div>
-          <div class="row" [collapse]="sectionCollapsedMap.directories">
-            <div class="col-md-12">
-              <dlm-form-field [label]="'page.policies.form.fields.directories' | translate">
-                <input type="text" formField class="form-control" formControlName="directories" [(ngModel)]="selectedHdfsPath"/>
-              </dlm-form-field>
-              <div class="hdfs-browser-container">
-                <dlm-hdfs-browser [rootPath]="hdfsRootPath" [clusterId]="sourceCluster" (select)="handleHdfsPathChange($event)"></dlm-hdfs-browser>
+          <fieldset [collapse]="sectionCollapsedMap.directories">
+            <div class="row">
+              <div class="col-md-12">
+                <dlm-form-field [label]="'page.policies.form.fields.directories' | translate">
+                  <input type="text" formField class="form-control" formControlName="directories" [(ngModel)]="selectedHdfsPath"/>
+                </dlm-form-field>
+                <div class="hdfs-browser-container">
+                  <dlm-hdfs-browser [rootPath]="hdfsRootPath" [clusterId]="sourceCluster" (select)="handleHdfsPathChange($event)"></dlm-hdfs-browser>
+                </div>
               </div>
             </div>
-          </div>
+          </fieldset>
         </div>
       </div>
 
@@ -80,25 +82,27 @@
             </div>
             <div class="clearfix"></div>
           </div>
-          <div class="form-group" [collapse]="sectionCollapsedMap.database">
-            <div class="row flex-center">
-              <div class="col-md-8">
-                <span class="text-muted">
-                  <span>
-                    {{'page.policies.form.selected' | translate}}: {{policyForm.value.databases}}
+          <fieldset [collapse]="sectionCollapsedMap.database">
+            <div class="form-group">
+              <div class="row flex-center">
+                <div class="col-md-8">
+                  <span class="text-muted">
+                    <span>
+                      {{'page.policies.form.selected' | translate}}: {{policyForm.value.databases}}
+                    </span>
                   </span>
-                </span>
+                </div>
+                <div class="col-md-4">
+                  <dlm-search-input (valueChange)="handleSearchChange($event)" [value]="databaseSearch$ | async"></dlm-search-input>
+                </div>
               </div>
-              <div class="col-md-4">
-                <dlm-search-input (valueChange)="handleSearchChange($event)" [value]="databaseSearch$ | async"></dlm-search-input>
-              </div>
+              <dlm-hive-browser
+                formControlName="databases"
+                [databases]="sourceDatabases$ | async"
+                [readonly]="false"
+                ></dlm-hive-browser>
             </div>
-            <dlm-hive-browser
-              formControlName="databases"
-              [databases]="sourceDatabases$ | async"
-              [readonly]="false"
-              ></dlm-hive-browser>
-          </div>
+          </fieldset>
         </div>
       </div>
 
@@ -113,7 +117,7 @@
             </div>
             <div class="clearfix"></div>
           </div>
-          <div [collapse]="sectionCollapsedMap.job" formGroupName="job">
+          <fieldset [collapse]="sectionCollapsedMap.job" formGroupName="job">
             <div class="schedule-group">
               <div class="row new-row">
                 <div class="col col-md-12">
@@ -124,17 +128,20 @@
                   </div>
                   <div class="row">
                     <div class="col col-md-2">
-                      <dlm-select-field formField formControlName="repeatMode" [options]="repeatOptions" [value]="repeatOption">
+                      <dlm-select-field formField formControlName="repeatMode" [options]="repeatOptions"
+                                        [value]="repeatOption">
                       </dlm-select-field>
                     </div>
-                    <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-md-1" [class.has-error]="policyForm.get('job').get('frequency').touched && policyForm.get('job').get('frequency').invalid">
-                      <input type="text" class="form-control" placeholder="Freq" formField formControlName="frequency" />
+                    <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-md-1"
+                         [class.has-error]="policyForm.get('job').get('frequency').touched && policyForm.get('job').get('frequency').invalid">
+                      <input type="text" class="form-control" placeholder="Freq" formField formControlName="frequency"/>
                     </div>
                     <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-md-2">
                       <dlm-select-field formField formControlName="unit" [options]="units" [value]="unit">
                       </dlm-select-field>
                     </div>
-                    <div *ngIf="repeatOption === policyRepeatModes.EVERY && unit === policyTimeUnits.WEEKS" class="col col-md-7">
+                    <div *ngIf="repeatOption === policyRepeatModes.EVERY && unit === policyTimeUnits.WEEKS"
+                         class="col col-md-7">
                       <div class="row">
                         <div class="col col-md-1 text-center" style="margin-top: 10px">
                           <span>&nbsp;on&nbsp;</span>
@@ -148,7 +155,8 @@
                   </div>
                   <div class="row">
                     <div class="col col-md-5 col-md-offset-2">
-                      <dlm-field-error *ngIf="policyForm.get('job').get('frequency').touched && policyForm.get('job').get('frequency').hasError('required')">
+                      <dlm-field-error
+                        *ngIf="policyForm.get('job').get('frequency').touched && policyForm.get('job').get('frequency').hasError('required')">
                         {{'forms.validation_errors.required' | translate:freqRequired}}
                       </dlm-field-error>
                     </div>
@@ -171,8 +179,10 @@
                     <div class="new-row">
                       <dlm-form-field fieldClass="col-md-12" errorClass="col-md-12">
                         <label>{{'page.policies.form.fields.start_time' | translate}}</label>
-                        <timepicker formField formControlName="time" [showMeridian]="false" [showSpinners]="false"></timepicker>
-                        <dlm-field-error *ngIf="policyForm.get('job').get('startTime').get('time').hasError('lessThanCurrent')">
+                        <timepicker formField formControlName="time" [showMeridian]="false"
+                                    [showSpinners]="false"></timepicker>
+                        <dlm-field-error
+                          *ngIf="policyForm.get('job').get('startTime').get('time').hasError('lessThanCurrent')">
                           {{'forms.validation_errors.time_less_than_current' | translate}}
                         </dlm-field-error>
                       </dlm-form-field>
@@ -194,7 +204,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </fieldset>
         </div>
       </div>
 
@@ -209,7 +219,7 @@
             </div>
             <div class="clearfix"></div>
           </div>
-          <div [collapse]="sectionCollapsedMap.advanced" formGroupName="advanced">
+          <fieldset [collapse]="sectionCollapsedMap.advanced" formGroupName="advanced">
             <dlm-form-field
               [label]="'page.policies.form.fields.queue_name' | translate">
               <input type="text" class="form-control" formField formControlName="queue_name"/>
@@ -221,7 +231,7 @@
                 <span class="input-group-addon">{{'page.policies.form.fields.bandwidth_unit' | translate}}</span>
               </div>
             </dlm-form-field>
-          </div>
+          </fieldset>
         </div>
       </div>
 
