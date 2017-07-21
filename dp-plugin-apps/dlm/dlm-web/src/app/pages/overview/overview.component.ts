@@ -73,8 +73,14 @@ export class OverviewComponent implements OnInit, OnDestroy {
       .filter(policy => this.filterPolicyByJob(policy, filters));
     const filteredPolicyNames = filteredPolicies.map(p => p.name);
     const filteredJobs = filterCollection(jobs, {name: filteredPolicyNames});
-    const clusterNamesByPolicies = unique(flatten(filteredPolicies.map(p => [p.targetCluster, p.sourceCluster])));
-    const filteredClusters = filterCollection(clusters, {name: clusterNamesByPolicies});
+    const clusterNamesByPolicies : Array<String> = unique(flatten(filteredPolicies.map(p => [p.targetCluster, p.sourceCluster])));
+    const clusterDataCenterName : Array<any> = clusterNamesByPolicies.map(p => {
+      let nameArr =  p.split("$");
+      let [dcName,clusterName] = nameArr.length == 1 ? ["",nameArr[0]] : [nameArr[0],nameArr[1]];
+      return {clusterName, dcName}
+    });
+    const filteredClusters = clusters.filter(cluster =>
+      clusterDataCenterName.some(p => p.clusterName == cluster.name && p.dcName == cluster.dataCenter));
     return this.mapResourceData(filteredJobs, filteredPolicies, filteredClusters);
   }
 
