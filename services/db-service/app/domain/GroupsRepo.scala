@@ -190,7 +190,7 @@ class GroupsRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
 
     def roleId = column[Option[Long]]("role_id")
 
-    def user = foreignKey("group_groupRole", groupId, Groups)(_.id)
+    def group = foreignKey("group_groupRole", groupId, Groups)(_.id)
 
     def role = foreignKey("role_groupRole", roleId, roleRepo.Roles)(_.id)
 

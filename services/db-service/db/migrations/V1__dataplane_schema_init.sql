@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS dataplane.groups (
 
 CREATE TABLE IF NOT EXISTS dataplane.groups_roles (
   id      BIGSERIAL PRIMARY KEY,
-  group_id BIGINT REFERENCES dataplane.users (id) NOT NULL,
+  group_id BIGINT REFERENCES dataplane.groups (id) NOT NULL,
   role_id BIGINT REFERENCES dataplane.roles (id) NOT NULL,
   UNIQUE (group_id, role_id)
 );
