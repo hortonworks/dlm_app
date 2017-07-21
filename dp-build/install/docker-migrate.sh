@@ -18,6 +18,5 @@ docker start dp-migrate >> install.log 2>&1 || \
         --name dp-migrate \
         --network dp \
         --rm \
-        --volume $(pwd)/dbscripts:/dbscripts \
-        claycephas/flyway:4 \
-        -configFile=/dbscripts/flyway-docker.conf clean migrate
+        hortonworks/dp-knox:$VERSION \
+        clean migrate
