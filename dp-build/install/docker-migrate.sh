@@ -18,5 +18,5 @@ docker start dp-migrate >> install.log 2>&1 || \
         --name dp-migrate \
         --network dp \
         --rm \
-        hortonworks/dp-knox:$VERSION \
+        hortonworks/dp-migrate:$VERSION \
         clean migrate
