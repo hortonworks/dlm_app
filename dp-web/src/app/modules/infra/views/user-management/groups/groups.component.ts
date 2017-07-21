@@ -45,11 +45,11 @@ export class GroupsComponent implements OnInit {
   }
 
   addGroup() {
-    this.router.navigate([{outlets: {'sidebar': ['addgroup']}}], {relativeTo: this.route});
+    this.router.navigate([{outlets: {'sidebar': ['add']}}], {relativeTo: this.route});
   }
 
   editGroup(groupName) {
-    this.router.navigate([{outlets: {'sidebar': ['editgroup', groupName]}}], {relativeTo: this.route});
+    this.router.navigate([{outlets: {'sidebar': ['edit', groupName]}}], {relativeTo: this.route});
   }
 
   onSearch(event) {

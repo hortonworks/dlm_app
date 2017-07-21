@@ -1,7 +1,7 @@
 <div class="load-right-to-left-slider dialog1x">
   <div class="title-container">
     <div class="text-medium">
-      <span *ngIf="mode === modes.ADD">{{"pages.infra.labels.addUser" | translate}}</span>
+      <span *ngIf="mode === modes.ADD">{{"pages.infra.labels.addGroup" | translate}}</span>
       <span *ngIf="mode === modes.EDIT">{{group? group.groupName: ''}}</span>
       <i class="fa fa-remove close-icon" (click)="back()"></i>
     </div>
@@ -9,7 +9,7 @@
   <div class="slider-container">
     <div *ngIf="mode === modes.ADD">
       <div class="dp-input">
-        <label>{{"pages.infra.labels.usernameorgroup" | translate}}</label>
+        <label>{{"pages.infra.labels.groupName" | translate}}</label>
         <tagging-widget id="tags" class="user-tags"
           [tags]="groups"
           [availableTags]="availableGroups"

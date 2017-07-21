@@ -95,8 +95,8 @@ export class AddGroupComponent {//implements OnInit {
         return role.data
       });
       this.groupService.updateGroup(this.group).subscribe(user => {
-        this.userService.dataChanged.next();
-        this.router.navigate(['/infra/users']);
+        this.groupService.dataChanged.next();
+        this.router.navigate(['groups'], {relativeTo: this.route});
       }, error => {
         console.error('error')
       });
@@ -105,8 +105,8 @@ export class AddGroupComponent {//implements OnInit {
         return role.data;
       });
       this.groupService.addGroups(this.groups, roles).subscribe(response => {
-        this.userService.dataChanged.next();
-        this.router.navigate(['/infra/users']);
+        this.groupService.dataChanged.next();
+        this.router.navigate(['groups'], {relativeTo: this.route});
       }, error => {
         console.error('error')
       });
@@ -114,7 +114,7 @@ export class AddGroupComponent {//implements OnInit {
   }
 
   back() {
-    this.router.navigate(['/infra/users']);
+    this.router.navigate(['groups'], {relativeTo: this.route});
   }
 }
 

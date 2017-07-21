@@ -13,10 +13,5 @@
   <div class="margin-top-bottom-20">
     {{"pages.infra.description.userManagement" | translate}}
   </div>
-  <div *ngIf="currentView === views.USERS">
-    <dp-users></dp-users>
-  </div>
-  <div *ngIf="currentView === views.GROUPS">
-    <dp-groups></dp-groups>
-  </div>
+  <router-outlet></router-outlet>
 </div>

@@ -41,7 +41,7 @@ export class GroupService {
   }
 
   getGroupByName(name: string): Observable<Group> {
-    let url = `${this.url}?name=${name}`;
+    let url = `${this.url}/byname?name=${name}`;
     return this.http
       .get(url, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
