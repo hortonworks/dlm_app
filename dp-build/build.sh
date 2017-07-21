@@ -128,6 +128,14 @@ build_cluster_service() {
 	popd
 }
 
+build_dp_migrate() {
+	log "Building dp-migrate"
+	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/
+	cp -R ./docker/migrate/* ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/
+	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/
+	cp -R ../services/db-service/db/* ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/
+}
+
 build_installer() {
 	log "Building installer"
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/installer/dbscripts/
