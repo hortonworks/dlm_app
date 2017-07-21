@@ -40,6 +40,7 @@ export class ClusterListComponent implements OnInit {
       {prop: 'healthStatus', name: this.t.instant('common.status.self'), cellTemplate: this.statusCellRef,
         flexGrow: 2, cellClass: 'status'},
       {prop: 'name', name: '', cellTemplate: this.nameCellRef, flexGrow: 2},
+      {prop: 'dataCenter', name: '', cellTemplate: this.nameCellRef, flexGrow: 2},
       {prop: 'stats', name: this.t.instant('page.clusters.card.usage'), cellTemplate: this.usageCellRef, minWidth: 160, flexGrow: 2},
       {prop: 'totalHosts', name: this.t.instant('page.clusters.card.nodes'),
         cellTemplate: this.plainCellRef, flexGrow: 1, cellClass: 'text-cell', headerClass: 'text-header'},

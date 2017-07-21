@@ -43,8 +43,6 @@ export class AddEntityButtonComponent implements OnInit, OnChanges {
 
   constructor(private t: TranslateService, private router: Router) {
     this.addOptions = [
-      // TODO: clusters link should be changed with absolute reference to dataplane application
-      { label: t.instant('common.cluster'), routeTo: ['/clusters'] },
       { label: t.instant('common.policy'), routeTo: ['/policies/create'], disabled: !this.canAddPolicy },
       { label: t.instant('common.pairing'), routeTo: ['/pairings/create'], disabled: !this.canAddPairing },
     ];
@@ -54,8 +52,8 @@ export class AddEntityButtonComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-    this.addOptions[1].disabled = !this.canAddPolicy;
-    this.addOptions[2].disabled = !this.canAddPairing;
+    this.addOptions[0].disabled = !this.canAddPolicy;
+    this.addOptions[1].disabled = !this.canAddPairing;
   }
 
   handleSelectedAdd(item) {
