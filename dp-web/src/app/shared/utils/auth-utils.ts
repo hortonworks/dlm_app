@@ -22,8 +22,12 @@ export class AuthUtils {
     return this.user;
   }
 
+  public static clearUser(){
+    this.user = null;
+  }
+
   public static setUser(user: User) {
     this.user = user;
-    this.loggedIn.next()
+    this.loggedIn.next(true);
   }
 }
