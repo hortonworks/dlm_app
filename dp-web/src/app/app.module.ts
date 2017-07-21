@@ -51,8 +51,8 @@ export function init_app(userService: UserService) {
     userService.getUserDetail().subscribe(user => {
       if (Object.keys(user).length) {
         AuthUtils.setUser(user);
-        resolve(true)
       }
+      resolve(true)
     }, (error) => {
       console.error(error);
       resolve(false)

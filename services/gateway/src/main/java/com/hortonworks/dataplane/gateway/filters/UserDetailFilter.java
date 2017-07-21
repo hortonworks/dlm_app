@@ -46,7 +46,7 @@ public class UserDetailFilter extends ZuulFilter {
     Object userRefObj = RequestContext.getCurrentContext().get(Constants.USER_CTX_KEY);
     if (userRefObj == null) {
       ctx.setResponseStatusCode(200);
-      ctx.setResponseBody("");
+      ctx.setResponseBody("{}");
       return null;
     }else{
       try {
