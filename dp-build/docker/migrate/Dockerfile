@@ -10,8 +10,7 @@ RUN mkdir -p /opt $FLYWAY_SQL_DIR \
     && mv /opt/flyway-${FLYWAY_VERSION} /opt/flyway \
     && sed -i 's/bash/sh/' /opt/flyway/flyway \
     && ln -s /opt/flyway/flyway /usr/local/bin/flyway \
-    && apk del wget ca-certificates \
-    && apk del .build-deps
+    && apk del wget ca-certificates
 
 COPY ./utils/entry.sh /entry.sh
 COPY ./dbscripts /dbscripts 
