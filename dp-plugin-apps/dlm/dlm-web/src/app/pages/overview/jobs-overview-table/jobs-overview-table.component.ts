@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, TemplateRef, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Output, ViewChild, TemplateRef, OnDestroy, ViewEncapsulation, EventEmitter } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -15,6 +15,7 @@ import { abortJob } from 'actions/job.action';
 import { StatusColumnComponent } from 'components/table-columns/status-column/status-column.component';
 import { Policy } from 'models/policy.model';
 import { LogService } from 'services/log.service';
+import { JOB_STATUS } from 'constants/status.constant';
 
 @Component({
   selector: 'dlm-jobs-overview-table',
@@ -25,6 +26,7 @@ import { LogService } from 'services/log.service';
 export class JobsOverviewTableComponent extends JobsTableComponent implements OnInit, OnDestroy {
   private selectedAction: ActionItemType;
   private selectedForActionRow: any;
+  JOB_STATUS = JOB_STATUS;
   showOperationResponseModal = false;
   showActionConfirmationModal = false;
   operationResponseSubscription: Subscription;
@@ -32,9 +34,12 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
 
   @ViewChild('destinationIconCell') destinationIconCellRef: TemplateRef<any>;
   @ViewChild('verbStatusCellTemplate') verbStatusCellTemplate: TemplateRef<any>;
+  @ViewChild('policyNameCellTemplate') policyNameCellTemplate: TemplateRef<any>;
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
   @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;
   @ViewChild('prevJobs') prevJobsRef: TemplateRef<any>;
+
+  @Output() onShowJobLog = new EventEmitter<any>();
 
   constructor(private t: TranslateService,
               protected store: Store<fromRoot.State>,
@@ -56,32 +61,30 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
       {label: actionLabel('activate_policy'), name: 'ACTIVATE_POLICY', disabledFor: 'RUNNING'}
     ];
     this.columns = [
+      {cellTemplate: this.statusCellTemplate, maxWidth: 25, minWidth: 25},
       {
-        ...this.statusColumn.cellSettings,
-        prop: 'status',
-        cellTemplate: this.statusColumn.cellRef,
-        name: ' ',
-        sortable: false,
-        ...TableComponent.makeFixedWith(25)
+        prop: 'lastJobResource',
+        cellClass: 'text-cell',
+        headerClass: 'text-header',
+        cellTemplate: this.verbStatusCellTemplate,
+        name: this.translateColumn('job_status')
       },
-      {prop: 'status', cellClass: 'text-cell', headerClass: 'text-header', cellTemplate: this.verbStatusCellTemplate},
-      {prop: 'name', cellClass: 'text-cell', headerClass: 'text-header', name: this.t.instant('common.policy')},
       {prop: 'sourceCluster', name: this.translateColumn('source_cluster')},
       {...TableComponent.makeFixedWith(20), name: '', cellTemplate: this.destinationIconCellRef},
       {prop: 'targetCluster', name: this.translateColumn('destination_cluster')},
       {prop: 'service', name: this.t.instant('common.service')},
-      {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs')},
       {
-        prop: 'lastJobResource.startTime',
-        cellTemplate: this.agoTemplate,
-        name: this.translateColumn('started'),
-        cellClass: 'date-cell',
-        headerClass: 'date-header'
+        prop: 'name',
+        cellClass: 'text-cell',
+        headerClass: 'text-header',
+        name: this.t.instant('common.policy'),
+        cellTemplate: this.policyNameCellTemplate
       },
+      {cellTemplate: this.prevJobsRef, name: this.translateColumn('last_ten_jobs'), prop: 'lastTenJobs'},
       {
-        prop: 'lastJobResource.endTime',
-        cellTemplate: this.agoTemplate,
-        name: this.translateColumn('ended'),
+        prop: 'lastJobResource.trackingInfo',
+        cellTemplate: this.transferredFormattedTemplate,
+        name: this.translateColumn('transferred'),
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
@@ -93,9 +96,16 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
         headerClass: 'date-header'
       },
       {
-        prop: 'lastJobResource.trackingInfo',
-        cellTemplate: this.transferredFormattedTemplate,
-        name: this.translateColumn('transferred'),
+        prop: 'lastJobResource.startTime',
+        cellTemplate: this.agoTemplate,
+        name: this.translateColumn('started'),
+        cellClass: 'date-cell',
+        headerClass: 'date-header'
+      },
+      {
+        prop: 'lastJobResource.endTime',
+        cellTemplate: this.agoTemplate,
+        name: this.translateColumn('ended'),
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
@@ -154,5 +164,9 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
 
   goToPolicy(policy: Policy) {
     this.router.navigate(['/policies'], {queryParams: {policy: policy.name}});
+  }
+
+  showPolicyLog(job) {
+    this.onShowJobLog.emit(job);
   }
 }

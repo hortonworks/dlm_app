@@ -95,7 +95,7 @@ export class PolicyEffects {
     .ofType(policyActions.LOAD_LAST_JOBS.START)
     .map(toPayload)
     .switchMap(payload => {
-      return this.jobService.getJobsForPolicies(payload.policies, 3)
+      return this.jobService.getJobsForPolicies(payload.policies, payload.numJobs)
         .map(jobs => loadLastJobsSuccess(jobs, payload.meta))
         .catch(err => Observable.of(loadLastJobsFailure(err, payload.meta)));
     });
