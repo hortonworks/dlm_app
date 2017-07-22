@@ -30,10 +30,20 @@
       <div class="col-md-3">
         <h4>{{'page.overview.issues.updates' | translate}}</h4>
       </div>
+      <div class="col-md-9">
+        <div class="btn-group pull-right">
+          <button class="btn btn-xs btn-secondary" type="button" [disabled]="!addingPairsAvailable(clusters$ | async, pairsCount$ | async)" routerLink="/pairings/create">
+            <span class="text-uppercase">{{'common.pair' | translate}} +</span>
+          </button>
+          <button class="btn btn-xs btn-secondary" type="button" [disabled]="!addingPoliciesAvailable(pairsCount$ | async)" routerLink="/policies/create">
+            <span class="text-uppercase">{{'common.policy' | translate}} +</span>
+          </button>
+        </div>
+      </div>
     </div>
     <div class="row">
       <div class="col-md-12">
-        <dlm-jobs-overview-table [jobs]="tableData$ | async"></dlm-jobs-overview-table>
+        <dlm-jobs-overview-table [jobs]="tableData$ | async" (onShowJobLog)="handleOnShowJobLog($event)"></dlm-jobs-overview-table>
       </div>
     </div>
   </div>

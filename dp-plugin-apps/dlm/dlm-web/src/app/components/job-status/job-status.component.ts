@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Job } from '../../../models/job.model';
+import { Job } from 'models/job.model';
 import { JOB_STATUS } from 'constants/status.constant';
 
 @Component({

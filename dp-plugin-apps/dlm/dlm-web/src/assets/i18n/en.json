@@ -169,15 +169,17 @@
       },
       "table": {
         "column": {
+          "job_status": "Job Status",
           "source_cluster": "Source",
           "destination_cluster": "Destination",
           "started": "Started",
           "ended": "Ended",
           "runtime": "Runtime",
-          "transferred": "Transferred",
+          "transferred": "Transferred / Files",
           "next_run": "Next Run",
           "action": "Action",
-          "actions": "Actions"
+          "actions": "Actions",
+          "last_ten_jobs": "Policy Performance"
         },
         "actions": {
           "abort_job": "Abort Job",

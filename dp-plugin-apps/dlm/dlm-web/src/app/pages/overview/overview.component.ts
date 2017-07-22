@@ -9,12 +9,12 @@ import { Event } from 'models/event.model';
 import { ProgressState } from 'models/progress-state.model';
 import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
 import { getAllJobs } from 'selectors/job.selector';
-import { getAllPolicies, getPolicyClusterJob, getUnhealthyPolicies } from 'selectors/policy.selector';
+import { getPolicyClusterJob, getUnhealthyPolicies, getAllPoliciesWithClusters } from 'selectors/policy.selector';
 import { getAllClusters, getUnhealthyClusters, getClustersWithLowCapacity } from 'selectors/cluster.selector';
 import { getDisplayedEvents } from 'selectors/event.selector';
-import { loadJobsForClusters } from 'actions/job.action';
+import { loadJobsForPolicy } from 'actions/job.action';
 import { loadClusters, loadClustersStatuses } from 'actions/cluster.action';
-import { loadPolicies } from 'actions/policy.action';
+import { loadPolicies, loadLastJobs } from 'actions/policy.action';
 import { getMergedProgress, getProgressState } from 'selectors/progress.selector';
 import { POLICY_TYPES_LABELS } from 'constants/policy.constant';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
@@ -23,12 +23,18 @@ import { Cluster } from 'models/cluster.model';
 import { Job } from 'models/job.model';
 import { ClustersStatus, PoliciesStatus, JobsStatus } from 'models/aggregations.model';
 import { filterCollection, flatten, unique } from 'utils/array-util';
-import { isEqual } from 'utils/object-utils';
+import { isEqual, isEmpty } from 'utils/object-utils';
 import { POLL_INTERVAL } from 'constants/api.constant';
 import { getClustersHealth, getPoliciesHealth, getJobsHealth } from 'selectors/aggregation.selector';
 import { SUMMARY_PANELS, CLUSTERS_HEALTH_STATE } from './resource-summary/';
 import { CLUSTER_STATUS, SERVICE_STATUS } from 'constants/status.constant';
 import { MapSizeSettings, ClusterMapData, ClusterMapPoint } from 'models/map-data';
+import { LogService } from 'services/log.service';
+import { EntityType } from 'constants/log.constant';
+import { PairsCountEntity } from 'models/pairs-count-entity.model';
+import { getCountPairsForClusters } from 'selectors/pairing.selector';
+import { loadPairings } from 'actions/pairing.action';
+import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
 
 const POLICIES_REQUEST = 'POLICIES_REQUEST';
 const CLUSTERS_REQUEST = 'CLUSTERS_REQUEST';
@@ -57,6 +63,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
   isWarningClustersModalVisible = false;
   isUnhealthyPoliciesModalVisible = false;
 
+  addingPairsAvailable = AddEntityButtonComponent.addingPairingsAvailable;
+  addingPoliciesAvailable = AddEntityButtonComponent.addingPoliciesAvailable;
+
   events$: Observable<Event[]>;
   jobs$: Observable<Job[]>;
   policies$: Observable<Policy[]>;
@@ -65,6 +74,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   tableResources$: Observable<any>;
   overallProgress$: Observable<ProgressState>;
   tableData$: Observable<any>;
+  pairsCount$: Observable<PairsCountEntity[]>;
   subscriptions: Subscription[] = [];
   clustersSubscription: Subscription;
   clustersSummary$: Observable<ClustersStatus>;
@@ -75,13 +85,14 @@ export class OverviewComponent implements OnInit, OnDestroy {
   unhealthyPolicies$: Observable<Policy[]>;
   clustersMapData$: Observable<ClusterMapData[]>;
 
-
   constructor(private store: Store<fromRoot.State>,
-              private overviewJobsExternalFiltersService: OverviewJobsExternalFiltersService) {
+              private overviewJobsExternalFiltersService: OverviewJobsExternalFiltersService,
+              private logService: LogService) {
     this.events$ = store.select(getDisplayedEvents);
     this.jobs$ = store.select(getAllJobs);
-    this.policies$ = store.select(getAllPolicies);
+    this.policies$ = store.select(getAllPoliciesWithClusters);
     this.clusters$ = store.select(getAllClusters);
+    this.pairsCount$ = store.select(getCountPairsForClusters);
     this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, JOBS_REQUEST, CLUSTER_STATUS_REQUEST));
     this.fullfilledClusters$ = this.clusters$
       .filter(clusters => !!clusters.length)
@@ -142,7 +153,6 @@ export class OverviewComponent implements OnInit, OnDestroy {
           loadClusters(),
           loadClustersStatuses()
         ].map(action => this.store.dispatch(action));
-        this.store.dispatch(loadJobsForClusters(clusters.map(cluster => cluster.id)));
       });
 
     this.subscriptions.push(polling$.subscribe());
@@ -164,26 +174,35 @@ export class OverviewComponent implements OnInit, OnDestroy {
     // todo: apply filter logic
   }
 
-  ngOnInit() {
-    [
-      loadPolicies(POLICIES_REQUEST),
-      loadClusters(CLUSTERS_REQUEST)
-    ].map(action => this.store.dispatch(action));
-    const clusterSubscribtion = this.fullfilledClusters$
-      .subscribe(clusters => this.store.dispatch(loadJobsForClusters(clusters.map(cluster => cluster.id), JOBS_REQUEST)));
-    const overallProgressSubscription = this.overallProgress$
+  private completedRequest$(progress$) {
+    return progress$
       .skip(1)
       .map(p => p.isInProgress)
       .distinctUntilChanged()
-      .filter(isInProgress => !isInProgress)
-      .subscribe(_ => this.initPolling());
+      .filter(isInProgress => !isInProgress);
+  }
 
-    const clustersRequestSubscription = this.store.select(getProgressState(CLUSTERS_REQUEST))
-      .map(p => p.isInProgress)
-      .distinctUntilChanged()
-      .filter(isInProgress => !isInProgress)
+  ngOnInit() {
+    [
+      loadPolicies(POLICIES_REQUEST),
+      loadClusters(CLUSTERS_REQUEST),
+      loadPairings()
+    ].map(action => this.store.dispatch(action));
+    const overallProgressSubscription = this.completedRequest$(this.overallProgress$)
+      .subscribe(_ => this.initPolling());
+    const clustersRequestSubscription = this.completedRequest$(this.store.select(getProgressState(CLUSTERS_REQUEST)))
       .subscribe(_ => this.store.dispatch(loadClustersStatuses(CLUSTER_STATUS_REQUEST)));
 
+    const fullFilledPolicies$ = this.policies$
+      .filter(policies => policies.length && policies.every(policy => !isEmpty(policy.sourceClusterResource)))
+      .take(1);
+    const clusterPoliciesCompleteSubscription = Observable.combineLatest(
+      this.completedRequest$(this.store.select(getProgressState(CLUSTERS_REQUEST))),
+      this.completedRequest$(this.store.select(getProgressState(POLICIES_REQUEST))),
+      fullFilledPolicies$
+    ).subscribe(([_, _1, policies]) => {
+      this.store.dispatch(loadLastJobs({policies, numJobs: 10}, {requestId: JOBS_REQUEST}));
+    });
     this.tableData$ = Observable
       .combineLatest(this.tableResources$, this.overviewJobsExternalFiltersService.filters$)
       .map(([policies, filters]) => policies
@@ -191,9 +210,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
         .filter(policy => this.filterPolicyByJob(policy, filters))
         .map(policy => this.mapTableData(policy)));
 
-    this.subscriptions.push(clusterSubscribtion);
     this.subscriptions.push(overallProgressSubscription);
     this.subscriptions.push(clustersRequestSubscription);
+    this.subscriptions.push(clusterPoliciesCompleteSubscription);
   }
 
 
@@ -221,5 +240,11 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.isUnhealthyClustersModalVisible = false;
     this.isWarningClustersModalVisible = false;
     this.isUnhealthyPoliciesModalVisible = false;
+  }
+
+  handleOnShowJobLog(job) {
+    if (job.status !== JOB_STATUS.RUNNING) {
+      this.logService.showLog(EntityType.policyinstance, job.id);
+    }
   }
 }
