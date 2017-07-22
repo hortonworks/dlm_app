@@ -59,8 +59,29 @@ read_consul_host(){
     echo "using CONSUL_HOST: ${CONSUL_HOST}"
 }
 
+read_external_db() {
+    if [ -z "${FLYWAY_URI}" ]; then
+        echo "Enter JDBC connection string: "
+        read FLYWAY_URI
+    fi
+    if [ -z "${FLYWAY_USER}" ]; then
+        echo "Enter database user name: "
+        read FLYWAY_USER
+    fi
+    if [ -z "${FLYWAY_PASS}" ]; then
+        echo "Enter database password: "
+        read -s FLYWAY_PASS
+    fi
+}
+
 init_db() {
-    source $(pwd)/docker-database.sh
+    echo "Use external database [yes/no]: "
+    read USE_EXT_DB
+    if [ "$USE_EXT_DB" == "yes" ]; then
+        echo "Assuming DB is already initialized. Nothing to initialize."
+    else
+        source $(pwd)/docker-database.sh
+    fi
 }
 
 ps() {
@@ -73,8 +94,15 @@ list_logs() {
 }
 
 migrate_schema() {
-    # start database container
-    source $(pwd)/docker-database.sh
+
+    echo "Use external database [yes/no]: "
+    read USE_EXT_DB
+    if [ "$USE_EXT_DB" == "yes" ]; then
+        read_external_db
+    else
+        # start database container
+        source $(pwd)/docker-database.sh
+    fi
 
     # wait for database start
     sleep 5
@@ -103,8 +131,15 @@ init_app() {
     echo "Initializing app"
     read_consul_host
 
-    echo "Starting Database (Postgres)"
-    source $(pwd)/docker-database.sh
+
+    echo "Use external database [yes/no]: "
+    read USE_EXT_DB
+    if [ "$USE_EXT_DB" == "yes" ]; then
+        read_external_db
+    else
+        echo "Starting Database (Postgres)"
+        source $(pwd)/docker-database.sh
+    fi
 
     echo "Starting Gateway"
     source $(pwd)/docker-gateway.sh
@@ -184,8 +219,15 @@ get_knox_container_id() {
 }
 
 start_app() {
-    echo "Starting Database (Postgres)"
-    source $(pwd)/docker-database.sh
+
+    echo "Use external database [yes/no]: "
+    read USE_EXT_DB
+    if [ "$USE_EXT_DB" == "yes" ]; then
+        read_external_db
+    else
+        echo "Starting Database (Postgres)"
+        source $(pwd)/docker-database.sh
+    fi
 
     echo "Starting Gateway"
     source $(pwd)/docker-gateway.sh
