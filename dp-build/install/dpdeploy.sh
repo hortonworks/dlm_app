@@ -60,17 +60,17 @@ read_consul_host(){
 }
 
 read_external_db() {
-    if [ -z "${FLYWAY_URI}" ]; then
+    if [ -z "${DATABASE_URI}" ]; then
         echo "Enter JDBC connection string: "
-        read FLYWAY_URI
+        read DATABASE_URI
     fi
-    if [ -z "${FLYWAY_USER}" ]; then
+    if [ -z "${DATABASE_USER}" ]; then
         echo "Enter database user name: "
-        read FLYWAY_USER
+        read DATABASE_USER
     fi
-    if [ -z "${FLYWAY_PASS}" ]; then
+    if [ -z "${DATABASE_PASS}" ]; then
         echo "Enter database password: "
-        read -s FLYWAY_PASS
+        read -s DATABASE_PASS
     fi
 }
 

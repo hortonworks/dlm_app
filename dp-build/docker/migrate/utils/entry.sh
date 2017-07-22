@@ -3,16 +3,16 @@ set -e
 
 FLYWAY_ARGS="-configFile=$FLYWAY_SQL_DIR/flyway-docker.conf"
 
-if [ -n "$FLYWAY_URI" ]; then
-    FLYWAY_ARGS="$FLYWAY_ARGS -url=$FLYWAY_URI"
+if [ -n "$DATABASE_URI" ]; then
+    FLYWAY_ARGS="$FLYWAY_ARGS -url=$DATABASE_URI"
 fi
 
-if [ -n "$FLYWAY_USER" ]; then
-    FLYWAY_ARGS="$FLYWAY_ARGS -user=$FLYWAY_USER"
+if [ -n "$DATABASE_USER" ]; then
+    FLYWAY_ARGS="$FLYWAY_ARGS -user=$DATABASE_USER"
 fi
 
-if [ -n "$FLYWAY_PASS" ]; then
-    FLYWAY_ARGS="$FLYWAY_ARGS -password=$FLYWAY_PASS"
+if [ -n "$DATABASE_PASS" ]; then
+    FLYWAY_ARGS="$FLYWAY_ARGS -password=$DATABASE_PASS"
 fi
 
 flyway $FLYWAY_ARGS $@
