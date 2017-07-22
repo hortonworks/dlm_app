@@ -10,9 +10,6 @@
     <div class="notifications navbar-nav navbar-right">
       <dlm-notifications [events]="events$ | async" [newEventsCount]="newEventsCount$ | async"></dlm-notifications>
     </div>
-    <div class="navbar-nav navbar-right" [class.hidden]="!onOverviewPage">
-      <dlm-overview-filter></dlm-overview-filter>
-    </div>
   </header>
   <router-outlet></router-outlet>
 </div>

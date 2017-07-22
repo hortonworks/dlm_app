@@ -73,6 +73,7 @@ import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.componen
 import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route.component';
 import { HdfsBrowserComponent } from './components/hdfs-browser/hdfs-browser.component';
 
+import { OverviewModule } from './pages/overview/overview.module';
 import { ResourceChartsComponent } from './pages/overview/resource-charts/resource-charts.component';
 import { OverviewFilterComponent } from './pages/overview/overview-filter/overview-filter.component';
 import { IssuesListComponent } from './pages/overview/issues-list/issues-list.component';
@@ -160,7 +161,8 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     TranslateModule.forRoot(),
     BrowserAnimationsModule,
     SimpleNotificationsModule.forRoot(),
-    PipesModule
+    PipesModule,
+    OverviewModule
   ],
   declarations: [
     DlmComponent,
