@@ -365,15 +365,6 @@ class DataplaneService @Inject()(
 
   /**
     * Get future for cluster details from datapane db client
-    * @param clusterId cluster id
-    * @return
-    */
-  def getDpCluster(clusterId: Long): Future[Either[Errors, DataplaneCluster]] = {
-    dpClusterService.retrieve(clusterId.toString)
-  }
-
-  /**
-    * Get future for cluster details from datapane db client
     * @return
     */
   def getAllClusters: Future[Either[Errors, Seq[Cluster]]] = {

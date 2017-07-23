@@ -5,7 +5,9 @@ import { Cluster } from 'models/cluster.model';
 export const ActionTypes = {
   LOAD_CLUSTERS: requestType('LOAD_CLUSTERS'),
   LOAD_CLUSTERS_STATUSES: requestType('LOAD_CLUSTERS_STATUSES'),
-  LOAD_CLUSTER: requestType('LOAD_CLUSTER')
+  LOAD_CLUSTER: type('LOAD_CLUSTER'),
+  LOAD_CLUSTER_SUCCESS: type('LOAD_CLUSTER_SUCCESS'),
+  LOAD_CLUSTER_FAILURE: type('LOAD_CLUSTER_FAILURE')
 };
 
 export class LoadClustersFailure implements Action {
@@ -15,19 +17,19 @@ export class LoadClustersFailure implements Action {
 };
 
 export class LoadCluster implements Action {
-  type = ActionTypes.LOAD_CLUSTER.START;
+  type = ActionTypes.LOAD_CLUSTER;
 
   constructor(public entityId: string, public payload?: any) {}
 };
 
 export class LoadClusterSuccess implements Action {
-  type = ActionTypes.LOAD_CLUSTER.SUCCESS;
+  type = ActionTypes.LOAD_CLUSTER_SUCCESS;
 
   constructor(public payload: any) {}
 };
 
 export class LoadClusterFailure implements Action {
-  type = ActionTypes.LOAD_CLUSTER.FAILURE;
+  type = ActionTypes.LOAD_CLUSTER_FAILURE;
 
   constructor(public payload: string) {}
 };
