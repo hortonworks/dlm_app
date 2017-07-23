@@ -237,27 +237,39 @@ class LdapService @Inject()(
     if (groupSearchBase.isEmpty ){
       Future.successful(Left(Errors(Seq(new Error("Exception", "Group search base must be configured")))))
     }else{
-      val groupSearchControls = new SearchControls
-      groupSearchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
-      val groupObjectClass="groupofnames" //TODO get from conf
-      val groupMemberAttributeName="member" //TODO get from conf
-      val extendedGroupSearchFilter = s"(objectclass= $groupObjectClass)"
-      var groupSearchFilter=s"(&$extendedGroupSearchFilter($groupMemberAttributeName={0}))"
-      val userArr=List(userName).toArray[Object]
-      val res: NamingEnumeration[SearchResult]=dirContext.search(groupSearchBase.get,groupSearchFilter,userArr,groupSearchControls)
-      val ldapSearchResults: ArrayBuffer[LdapSearchResult]=new ArrayBuffer
-      while (res.hasMore) {
-        val sr: SearchResult = res.next()
-        val ldaprs = new LdapSearchResult(
-          sr.getName,
-          sr.getClassName,
-          sr.getNameInNamespace)
-        ldapSearchResults += ldaprs
+      search(userName,Some("user"),false).map{
+        case Left(errors)=>Left(errors)
+        case Right(userSearchResults)=>{
+          userSearchResults.headOption match {
+            case None=>Left(Errors(Seq(new Error("No user", "There is no such user"))))
+            case Some(result)=>{
+              result.nameInNameSpace
+              val groupSearchControls = new SearchControls
+              groupSearchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
+              val groupObjectClass="groupofnames" //TODO get from conf
+              val groupMemberAttributeName="member" //TODO get from conf
+              val extendedGroupSearchFilter = s"(objectclass= $groupObjectClass)"
+              var groupSearchFilter=s"(&$extendedGroupSearchFilter($groupMemberAttributeName={0}))"
+              val userArr=List(result.nameInNameSpace).toArray[Object]
+              val res: NamingEnumeration[SearchResult]=dirContext.search(groupSearchBase.get,groupSearchFilter,userArr,groupSearchControls)
+              val ldapSearchResults: ArrayBuffer[LdapSearchResult]=new ArrayBuffer
+              while (res.hasMore) {
+                val sr: SearchResult = res.next()
+                val ldaprs = new LdapSearchResult(
+                  sr.getName,
+                  sr.getClassName,
+                  sr.getNameInNamespace)
+                ldapSearchResults += ldaprs
+              }
+              println(s"User group result=$ldapSearchResults")
+              Right(ldapSearchResults)
+            }
+          }
+        }
       }
-      println(s"User group result=$ldapSearchResults")
-      Future.successful(Right(ldapSearchResults))
     }
   }
+
   def getConfiguredLdap
     : Future[Either[Errors, Seq[LdapConfiguration]]] = {
     ldapConfigService
