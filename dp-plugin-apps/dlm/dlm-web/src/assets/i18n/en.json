@@ -137,7 +137,7 @@
         }
       },
       "issues": {
-        "updates": "Issues and Updates",
+        "updates": "Issues & Updates",
         "recent": "Recent Issues",
         "list": {
           "view_all": "view all",
@@ -148,6 +148,23 @@
             "warning": "completed with warnings",
             "success": "completed"
           }
+        }
+      },
+      "summary_panels": {
+        "title": {
+          "clusters": "Cluster Health",
+          "policies": "Policies",
+          "jobs": "Jobs"
+        },
+        "status": {
+          "unhealthy": "Unhealthy",
+          "healthy": "Healthy",
+          "in_progress": "In Progress",
+          "failed_last": "Failed Last",
+          "failed_last_10": "Failed in Last 10",
+          "active": "Active",
+          "suspended": "Suspended",
+          "warning": "Warning"
         }
       },
       "table": {
@@ -167,6 +184,31 @@
           "delete_policy": "Delete Policy",
           "suspend_policy": "Suspend Policy",
           "activate_policy": "Activate Policy"
+        }
+      },
+      "modals": {
+        "unhealthy_cluster": {
+          "title": "Unhealthy Clusters",
+          "columns": {
+            "cluster_name": "Cluster Name",
+            "services": "Unhealthy Services"
+          }
+        },
+        "hdfs_capacity": {
+          "title": "HDFS Remaining Capacity",
+          "columns": {
+            "cluster_name": "Cluster",
+            "capacity": "Remaining Capacity"
+          }
+        },
+        "unhealthy_policy": {
+          "title": "Unhealthy Policy",
+          "columns": {
+            "policy": "Policy",
+            "source": "Source",
+            "destination": "Destination",
+            "issues": "Issues"
+          }
         }
       }
     },
