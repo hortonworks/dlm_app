@@ -47,6 +47,7 @@ class BeaconClusterServiceImpl()(implicit ws: WSClient) extends BeaconClusterSer
   private def mapToClusterDefinitionRequest(clusterDefinitionRequest:ClusterDefinitionRequest) = {
       "fsEndpoint = " + clusterDefinitionRequest.fsEndpoint +
       "\nbeaconEndpoint = " + clusterDefinitionRequest.beaconEndpoint +
+      "\nname = " +  clusterDefinitionRequest.name +
       "\ndescription = " + clusterDefinitionRequest.description +
       (if (clusterDefinitionRequest.hsEndpoint.isDefined) "\nhsEndpoint = " + clusterDefinitionRequest.hsEndpoint.get else "")
   }
@@ -66,11 +67,11 @@ class BeaconClusterServiceImpl()(implicit ws: WSClient) extends BeaconClusterSer
     }
   }
 
-  override def createClusterDefinition(beaconEndpoint : String, dataCenterClusterName : String,
+  override def createClusterDefinition(beaconEndpoint : String, clusterName : String,
                                        clusterDefinitionRequest:ClusterDefinitionRequest) :
   Future[Either[BeaconApiErrors, PostActionResponse]] = {
     val requestData:String =  mapToClusterDefinitionRequest(clusterDefinitionRequest)
-    ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/submit/$dataCenterClusterName")
+    ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/submit/$clusterName")
       .withHeaders(httpHeaders.toList: _*)
       .post(requestData)
       .map(mapToPostActionResponse).recoverWith {

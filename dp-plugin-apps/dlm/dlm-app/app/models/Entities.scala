@@ -28,7 +28,7 @@ object Entities {
   case class BeaconClusters(clusters: Seq[BeaconCluster])
 
 
-  case class ClusterDefinitionDetails (cluster:Cluster, dpCluster: DataplaneCluster, nnClusterService : ClusterServiceEndpointDetails, hiveServerService : Either[Errors, ClusterServiceEndpointDetails],
+  case class ClusterDefinitionDetails (cluster:Cluster, nnClusterService : ClusterServiceEndpointDetails, hiveServerService : Either[Errors, ClusterServiceEndpointDetails],
                                        clusterDefinitions: Seq[PairedCluster], pairedClusterRequest:PairClusterRequest)
 
   // Request schema submitted to Beacon for cluster definition
