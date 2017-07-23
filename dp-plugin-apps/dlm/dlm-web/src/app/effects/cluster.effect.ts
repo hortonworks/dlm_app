@@ -29,7 +29,7 @@ export class ClusterEffects {
     });
 
   @Effect() loadCluster$: Observable<any> = this.actions$
-    .ofType(ActionTypes.LOAD_CLUSTER.START)
+    .ofType(ActionTypes.LOAD_CLUSTER)
     .switchMap(action => {
       return this.clusterService.fetchCluster(action.entityId)
         .map(cluster => new LoadClusterSuccess(cluster))
