@@ -50,7 +50,7 @@ import { HdfsService } from 'services/hdfs.service';
 import { HiveService } from 'services/hive.service';
 import { NotificationService } from 'services/notification.service';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
-import { IdentityService } from 'services/identity.service';
+import { UserService } from 'services/user.service';
 
 import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
@@ -242,12 +242,12 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     OverviewJobsExternalFiltersService,
     httpServiceProvider,
     FrequencyPipe,
-    IdentityService,
+    UserService,
     AppConfig,
     {
       provide: APP_INITIALIZER,
       useFactory: appConfigFactory,
-      deps: [AppConfig],
+      deps: [AppConfig, UserService],
       multi: true
     }
   ]

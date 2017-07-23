@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import * as moment from 'moment';
+import { UserService } from 'services/user.service';
+import { AuthUtils } from 'utils/auth-utils';
 
 @Injectable()
 export class AppConfig {
@@ -8,9 +10,10 @@ export class AppConfig {
     private t: TranslateService
   ) { }
 
-  load() {
+  load(userService: UserService) {
     this.setupMoment();
     this.setupTranslate();
+    this.setUser(userService);
     return Promise.resolve();
   }
 
@@ -35,6 +38,10 @@ export class AppConfig {
     });
   }
 
+  setUser(userService: UserService) {
+      userService.getUserDetail().subscribe(user => AuthUtils.setUser(user));
+  }
+
   setupTranslate() {
     this.t.setTranslation('en', require('../assets/i18n/en.json'));
     this.t.setDefaultLang('en');
@@ -42,6 +49,6 @@ export class AppConfig {
   }
 }
 
-export function appConfigFactory(config: AppConfig) {
-  return () => config.load();
+export function appConfigFactory(config: AppConfig, userService: UserService) {
+  return () => config.load(userService);
 };

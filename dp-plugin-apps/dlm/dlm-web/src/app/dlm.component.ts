@@ -17,8 +17,9 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import * as moment from 'moment';
 import { POLL_INTERVAL } from 'constants/api.constant';
-import {HeaderData, Persona, PersonaTabs} from 'models/header-data';
-import { IdentityService } from 'services/identity.service';
+import { HeaderData, Persona } from 'models/header-data';
+import { UserService } from 'services/user.service';
+import { AuthUtils } from 'utils/auth-utils';
 
 const POLL_EVENTS_ID = 'POLL_EVENT_ID';
 const POLL_NEW_EVENTS_ID = 'POLL_NEW_EVENTS_ID';
@@ -72,7 +73,7 @@ export class DlmComponent implements OnDestroy, OnInit {
               private store: Store<State>,
               private sessionStorageService: SessionStorageService,
               private timeZoneService: TimeZoneService,
-              private identityService: IdentityService,
+              private userService: UserService,
               private router: Router,
               private route: ActivatedRoute) {
     this.user.timezone = timeZoneService.setupUserTimeZone();
@@ -141,21 +142,20 @@ export class DlmComponent implements OnDestroy, OnInit {
   }
 
   getUser(): User {
-    return this.identityService.getUser();
-  }
-
-  isUserSignedIn(): boolean {
-    return this.identityService.isUserAuthenticated();
+    return AuthUtils.getUser();
   }
 
   ngOnInit() {
-    this.setHeaderData();
-    const user = this.getUser();
-    if (user && user.id) {
-      this.user = user;
-    } else {
-      // TODO: Log the user out of DLM
-    }
+    AuthUtils.loggedIn$.subscribe(() => {
+      this.setHeaderData();
+      const user = this.getUser();
+      if (user && user.id) {
+        this.user = user;
+      } else {
+        // Log the user out of DLM
+        this.userService.logoutUser();
+      }
+    });
   }
 
   setHeaderData() {
@@ -175,6 +175,7 @@ export class DlmComponent implements OnDestroy, OnInit {
 
   logout() {
     // do logout
+    this.userService.logoutUser();
   }
 
   ngOnDestroy() {
