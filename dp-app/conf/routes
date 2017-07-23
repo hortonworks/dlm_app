@@ -85,6 +85,7 @@ GET           /api/users/withRoles                             controllers.UserM
 GET           /api/users                                       controllers.UserManager.listUsers
 GET           /api/users/detail                                controllers.UserManager.getUserDetail
 GET           /api/roles                                       controllers.UserManager.getAllRoles
+GET           /api/userGroups                                  controllers.UserManager.getUserGroupsFromLdap
 
 #Group Management
 GET           /api/groups                                      controllers.GroupManager.getGroups

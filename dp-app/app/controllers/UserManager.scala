@@ -147,4 +147,17 @@ class UserManager @Inject()(val ldapService: LdapService,
       case Right(roles) => Ok(Json.toJson(roles))
     }
   }
+  def getUserGroupsFromLdap()=Action.async { req =>
+    val userNameOpt: Option[String] = req.getQueryString("userName")
+    if (userNameOpt.isEmpty){
+      Future.successful(BadRequest)
+    }else{
+      ldapService.getUserGroups(userNameOpt.get).map{
+        case Left(errors) => handleErrors(errors)
+        case Right(ldapSearchResult) =>
+          Ok(Json.toJson(ldapSearchResult))
+
+      }
+    }
+  }
 }

@@ -215,7 +215,49 @@ class LdapService @Inject()(
       Future.successful(Right(ldapSearchResults))
     }
   }
+  def getUserGroups(userName:String):  Future[Either[Errors, Seq[LdapSearchResult]]] ={
+    for {
+      configuredLdap <- getConfiguredLdap
+      dirContext <- doWithEither[Seq[LdapConfiguration], DirContext](
+        configuredLdap,
+        validateAndGetLdapContext)
+      search <- doWithEither[DirContext, Seq[LdapSearchResult]](
+        dirContext,
+        context => {
+          getUserGroups(context, configuredLdap.right.get, userName)
+        })
+    } yield search
 
+  }
+
+  private def getUserGroups(  dirContext: DirContext,
+                      ldapConfs: Seq[LdapConfiguration],userName:String):
+  Future[Either[Errors, Seq[LdapSearchResult]]]={
+    val groupSearchBase=ldapConfs.head.groupSearchBase
+    if (groupSearchBase.isEmpty ){
+      Future.successful(Left(Errors(Seq(new Error("Exception", "Group search base must be configured")))))
+    }else{
+      val groupSearchControls = new SearchControls
+      groupSearchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
+      val groupObjectClass="groupofnames" //TODO get from conf
+      val groupMemberAttributeName="member" //TODO get from conf
+      val extendedGroupSearchFilter = s"(objectclass= $groupObjectClass)"
+      var groupSearchFilter=s"(&$extendedGroupSearchFilter($groupMemberAttributeName={0}))"
+      val userArr=List(userName).toArray[Object]
+      val res: NamingEnumeration[SearchResult]=dirContext.search(groupSearchBase.get,groupSearchFilter,userArr,groupSearchControls)
+      val ldapSearchResults: ArrayBuffer[LdapSearchResult]=new ArrayBuffer
+      while (res.hasMore) {
+        val sr: SearchResult = res.next()
+        val ldaprs = new LdapSearchResult(
+          sr.getName,
+          sr.getClassName,
+          sr.getNameInNamespace)
+        ldapSearchResults += ldaprs
+      }
+      println(s"User group result=$ldapSearchResults")
+      Future.successful(Right(ldapSearchResults))
+    }
+  }
   def getConfiguredLdap
     : Future[Either[Errors, Seq[LdapConfiguration]]] = {
     ldapConfigService
