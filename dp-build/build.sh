@@ -144,11 +144,9 @@ build_migrate() {
 
 build_installer() {
 	log "Building installer"
-	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/installer/dbscripts/
     mkdir -p ${DP_DOCKER_ROOT_FOLDER}/installer/certs/
 	cp -R install/* ${DP_DOCKER_ROOT_FOLDER}/installer
 	cp dp-docker-build.sh ${DP_DOCKER_ROOT_FOLDER}/installer/
-	cp -R ../services/db-service/db/* ${DP_DOCKER_ROOT_FOLDER}/installer/dbscripts/
     cp ../dp-app/conf/cert/dp-keystore.jck ${DP_DOCKER_ROOT_FOLDER}/installer/certs/
 	VERSION_STRING=$(get_version)
 	echo ${VERSION_STRING} > ${DP_DOCKER_ROOT_FOLDER}/installer/VERSION	
