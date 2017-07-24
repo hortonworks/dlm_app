@@ -128,6 +128,20 @@ build_cluster_service() {
 	popd
 }
 
+build_migrate() {
+	log "Building dp-migrate"
+	# move docker files and utils
+	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/
+	cp -R ./docker/migrate/* ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/
+	# move flyway migration scripts
+	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/
+	cp -R ../services/db-service/db/* ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/
+	# removed unneccesary files
+	rm -rf ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/generators
+	rm ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/flyway.conf
+	rm ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/erd.png
+}
+
 build_installer() {
 	log "Building installer"
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/installer/dbscripts/
@@ -176,6 +190,7 @@ build_dp_web
 build_knox_agent
 build_dp_knox
 build_cluster_service
+build_migrate
 build_installer
 zip_dp_binaries
 log "All done"
