@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+source $(pwd)/config.env.sh
+
 CERTS_DIR=`dirname $0`/certs
 KNOX_SIGNING_CERTIFICATE=knox-signing.pem
 DEFAULT_VERSION=0.0.1
@@ -59,24 +61,7 @@ read_consul_host(){
     echo "using CONSUL_HOST: ${CONSUL_HOST}"
 }
 
-read_external_db() {
-    if [ -z "${DATABASE_URI}" ]; then
-        echo "Enter JDBC connection string: "
-        read DATABASE_URI
-    fi
-    if [ -z "${DATABASE_USER}" ]; then
-        echo "Enter database user name: "
-        read DATABASE_USER
-    fi
-    if [ -z "${DATABASE_PASS}" ]; then
-        echo "Enter database password: "
-        read -s DATABASE_PASS
-    fi
-}
-
 init_db() {
-    echo "Use external database [yes/no]: "
-    read USE_EXT_DB
     if [ "$USE_EXT_DB" == "yes" ]; then
         echo "Assuming DB is already initialized. Nothing to initialize."
     else
@@ -86,7 +71,7 @@ init_db() {
 
 ps() {
     docker ps \
-        --filter "name=dp-app|dp-db-service|dp-cluster-service|dp-gateway|dp-database|knox|dp-consul-server"
+        --filter "name=dp-app|dp-db-service|dp-cluster-service|dp-gateway|dp-database|knox|dp-consul-server|dp-migrate"
 }
 
 list_logs() {
@@ -94,12 +79,7 @@ list_logs() {
 }
 
 migrate_schema() {
-
-    echo "Use external database [yes/no]: "
-    read USE_EXT_DB
-    if [ "$USE_EXT_DB" == "yes" ]; then
-        read_external_db
-    else
+    if [ "$USE_EXT_DB" == "no" ]; then
         # start database container
         source $(pwd)/docker-database.sh
     fi
@@ -131,12 +111,7 @@ init_app() {
     echo "Initializing app"
     read_consul_host
 
-
-    echo "Use external database [yes/no]: "
-    read USE_EXT_DB
-    if [ "$USE_EXT_DB" == "yes" ]; then
-        read_external_db
-    else
+    if [ "$USE_EXT_DB" == "no" ]; then
         echo "Starting Database (Postgres)"
         source $(pwd)/docker-database.sh
     fi
@@ -219,12 +194,7 @@ get_knox_container_id() {
 }
 
 start_app() {
-
-    echo "Use external database [yes/no]: "
-    read USE_EXT_DB
-    if [ "$USE_EXT_DB" == "yes" ]; then
-        read_external_db
-    else
+    if [ "$USE_EXT_DB" == "no" ]; then
         echo "Starting Database (Postgres)"
         source $(pwd)/docker-database.sh
     fi
