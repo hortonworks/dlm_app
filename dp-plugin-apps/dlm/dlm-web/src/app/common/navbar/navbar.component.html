@@ -25,13 +25,13 @@
             routerLinkActive="active">
 
           <a [routerLink]="item.linkURL" *ngIf="!hasSubMenu(item);else has_sub_menu">
-            <span [innerHTML]="item.iconHtml"></span>
+            <span [ngClass]="item.iconClasses"></span>
             <span class="navigation-menu-item">{{item.label}}</span>
           </a>
 
           <ng-template #has_sub_menu>
             <a href="#" data-toggle="collapse-sub-menu">
-              <span [innerHTML]="item.iconHtml"></span>
+              <span [ngClass]="item.iconClasses"></span>
               <span class="navigation-menu-item">{{item.label}}</span>
               <span class="toggle-icon glyphicon glyphicon-menu-down pull-right"></span>
             </a>
@@ -40,7 +40,7 @@
                   [ngClass]="{'submenu-li': true, 'active': false}"
                   routerLinkActive="active">
                 <a [routerLink]="subItem.linkURL">
-                  <span [innerHTML]="subItem.iconHtml"></span>
+                  <span [ngClass]="subItem.iconClasses"></span>
                   <span class="submenu-item">{{subItem.label}}</span>
                 </a>
               </li>

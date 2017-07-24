@@ -15,7 +15,6 @@ import { SessionStorageService } from './services/session-storage.service';
 import { TimeZoneService } from './services/time-zone.service';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
-import * as moment from 'moment';
 import { POLL_INTERVAL } from 'constants/api.constant';
 import { HeaderData, Persona } from 'models/header-data';
 import { UserService } from 'services/user.service';
@@ -81,33 +80,34 @@ export class DlmComponent implements OnDestroy, OnInit {
     this.header = new MenuItem(
       t.instant('sidenav.menuItem.header'),
       './overview',
-      '<i class="fa fa-gg" aria-hidden="true"></i>'
+      ''
     );
+    this.header.iconHtml = '<i class="fa fa-gg" aria-hidden="true"></i>';
     this.menuItems = [
       new MenuItem(
         t.instant('sidenav.menuItem.overview'),
         './overview',
-        '<span class="navigation-icon glyphicon glyphicon-home"></span>'
+        'navigation-icon glyphicon glyphicon-home'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.clusters'),
         './clusters',
-        '<span class="navigation-icon glyphicon glyphicon-globe"></span>'
+        'navigation-icon glyphicon glyphicon-globe'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.pairings'),
         './pairings',
-        '<span class="navigation-icon glyphicon glyphicon-resize-horizontal"></span>'
+        'navigation-icon glyphicon glyphicon-resize-horizontal'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.policies'),
         './policies',
-        '<span class="navigation-icon glyphicon glyphicon-list-alt"></span>'
+        'navigation-icon glyphicon glyphicon-list-alt'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.help'),
         './help',
-        '<span class="navigation-icon glyphicon glyphicon-info-sign"></span>'
+        'navigation-icon glyphicon glyphicon-info-sign'
       )
     ];
     this.events$ = store.select(getAllEvents);
