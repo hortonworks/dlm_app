@@ -86,7 +86,6 @@ import { ClustersComponent } from './pages/clusters/clusters.component';
 import { ClusterListComponent } from './pages/clusters/cluster-list/cluster-list.component';
 
 import { JobsTableComponent } from './pages/jobs/jobs-table/jobs-table.component';
-import { JobStatusComponent } from './pages/jobs/job-status/job-status.component';
 import { JobTransferredGraphComponent } from './pages/jobs/jobs-transferred-graph/job-transferred-graph.component';
 import { JobsStatusFilterComponent } from './pages/jobs/jobs-status-filter/jobs-status-filter.component';
 
@@ -197,7 +196,6 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     JobsOverviewTableComponent,
 
     JobsTableComponent,
-    JobStatusComponent,
     JobTransferredGraphComponent,
     JobsStatusFilterComponent,
 

@@ -18,7 +18,6 @@ import { IssuesListComponent } from './issues-list/issues-list.component';
 import { IssuesListItemComponent } from './issues-list-item/issues-list-item.component';
 import { ResourceChartsComponent } from './resource-charts/';
 import { JobsTableComponent } from 'pages/jobs/jobs-table/jobs-table.component';
-import { JobStatusComponent } from 'pages/jobs/job-status/job-status.component';
 import { JobTransferredGraphComponent } from 'pages/jobs/jobs-transferred-graph/job-transferred-graph.component';
 import { TableComponent } from 'common/table/table.component';
 import { CheckboxColumnComponent, ActionColumnComponent } from 'components';
@@ -102,7 +101,6 @@ describe('OverviewComponent', () => {
         IssuesListItemComponent,
         ResourceChartsComponent,
         JobsTableComponent,
-        JobStatusComponent,
         TableComponent,
         JobTransferredGraphComponent,
         TableFooterComponent,
@@ -141,16 +139,6 @@ describe('OverviewComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
-  });
-
-});
-
-describe('OverviewComponent UT', () => {
-
-  let component;
-
-  beforeEach(() => {
-    component = new OverviewComponent(new MockStore(), new OverviewJobsExternalFiltersService());
   });
 
   describe('#filterPolicyByJob', () => {
