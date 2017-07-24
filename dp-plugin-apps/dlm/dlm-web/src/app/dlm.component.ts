@@ -159,12 +159,7 @@ export class DlmComponent implements OnDestroy, OnInit {
   }
 
   setHeaderData() {
-    this.headerData.personas = [
-      new Persona('Data Steward', [], '/dataset', 'steward-logo.png'),
-      new Persona('Infra Admin', [], '/infra', 'infra-logo.png'),
-      new Persona('Analytics', [], '/workspace', 'analytics-logo.png'),
-      new Persona('Data Lifecycle Manager', [], '', 'dlm-logo.png')
-    ];
+    this.headerData.personas = this.userService.getPersonaDetails();
   }
 
   saveUserTimezone(timezoneIndex) {
