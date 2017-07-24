@@ -23,7 +23,7 @@ build_images() {
     echo "Building dp-app"
     docker build -t ${IMAGE_PREFIX}/dp-app:${VERSION} build/dp-docker/dp-app
     echo "Building dp-migrate"
-    docker build -t ${IMAGE_PREFIX}/dp-migrate:${VERSION} build/dp-migrate
+    docker build -t ${IMAGE_PREFIX}/dp-migrate:${VERSION} build/dp-docker/dp-migrate
 }
 
 push_images() {
@@ -98,7 +98,7 @@ get_version() {
         VERSION_STRING=`cat build/dp-docker/installer/VERSION`
         echo ${VERSION_STRING}
     else
-        echo ${RELEASE_NUMBER}:"latest"
+        echo ${RELEASE_NUMBER}-"latest"
     fi
 }
 

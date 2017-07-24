@@ -14,7 +14,7 @@ docker start dp-db-service >> install.log 2>&1 || \
         --network dp \
         --detach \
         --env CONSUL_HOST \
-        --env DATABASE_URI \
-        --env DATABASE_USER \
-        --env DATABASE_PASS \
+        --env "DATABASE_URI=$DATABASE_URI" \
+        --env "DATABASE_USER=$DATABASE_USER" \
+        --env "DATABASE_PASS=$DATABASE_PASS" \
         hortonworks/dp-db-service:$VERSION
