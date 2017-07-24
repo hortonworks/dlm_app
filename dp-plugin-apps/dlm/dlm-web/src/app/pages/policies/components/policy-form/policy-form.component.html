@@ -3,12 +3,10 @@
     <div class="container-fluid">
       <div class="row">
         <div class="form-section col-md-12">
-          <div class="form-section-title">
+          <div class="form-section-title actionable" (click)="toggleSection('general')">
             {{'page.policies.form.sections.general' | translate}}
             <div class="pull-right">
-              <i class="fa text-primary"
-                [ngClass]="{'fa-chevron-down': sectionCollapsedMap.general, 'fa-chevron-up': !sectionCollapsedMap.general}"
-                (click)="toggleSection('general')"></i>
+              <i class="fa text-primary" [ngClass]="{'fa-chevron-down': sectionCollapsedMap.general, 'fa-chevron-up': !sectionCollapsedMap.general}"></i>
             </div>
             <div class="clearfix"></div>
           </div>
@@ -47,12 +45,10 @@
 
       <div class="row" *ngIf="isHDFSPolicy() && sourceCluster">
         <div class="form-section col-md-12">
-          <div class="form-section-title">
+          <div class="form-section-title actionable" (click)="toggleSection('directories')">
             {{'page.policies.form.sections.directories' | translate}}
             <div class="pull-right">
-              <i class="fa text-primary"
-                [ngClass]="{'fa-chevron-down': sectionCollapsedMap.directories, 'fa-chevron-up': !sectionCollapsedMap.directories}"
-                (click)="toggleSection('directories')"></i>
+              <i class="fa text-primary" [ngClass]="{'fa-chevron-down': sectionCollapsedMap.directories, 'fa-chevron-up': !sectionCollapsedMap.directories}"></i>
             </div>
             <div class="clearfix"></div>
           </div>
@@ -73,12 +69,10 @@
 
       <div class="row" *ngIf="isHivePolicy() && sourceCluster">
         <div class="form-section col-md-12">
-          <div class="form-section-title">
+          <div class="form-section-title actionable" (click)="toggleSection('database')">
             {{'page.policies.form.sections.database' | translate}}
             <div class="pull-right">
-              <i class="fa text-primary"
-                [ngClass]="{'fa-chevron-down': sectionCollapsedMap.database, 'fa-chevron-up': !sectionCollapsedMap.database}"
-                (click)="toggleSection('database')"></i>
+              <i class="fa text-primary" [ngClass]="{'fa-chevron-down': sectionCollapsedMap.database, 'fa-chevron-up': !sectionCollapsedMap.database}"></i>
             </div>
             <div class="clearfix"></div>
           </div>
@@ -108,12 +102,10 @@
 
       <div class="row">
         <div class="form-section col-md-12">
-          <div class="form-section-title">
+          <div class="form-section-title actionable" (click)="toggleSection('job')">
             {{'page.policies.form.sections.job' | translate}}
             <div class="pull-right">
-              <i class="fa text-primary"
-                [ngClass]="{'fa-chevron-down': sectionCollapsedMap.job, 'fa-chevron-up': !sectionCollapsedMap.job}"
-                (click)="toggleSection('job')"></i>
+              <i class="fa text-primary" [ngClass]="{'fa-chevron-down': sectionCollapsedMap.job, 'fa-chevron-up': !sectionCollapsedMap.job}"></i>
             </div>
             <div class="clearfix"></div>
           </div>
@@ -210,12 +202,10 @@
 
       <div class="row">
         <div class="form-section col-md-12">
-          <div class="form-section-title">
+          <div class="form-section-title actionable" (click)="toggleSection('advanced')">
             {{'page.policies.form.sections.advanced' | translate}}
             <div class="pull-right">
-              <i class="fa text-primary"
-                 [ngClass]="{'fa-chevron-down': sectionCollapsedMap.advanced, 'fa-chevron-up': !sectionCollapsedMap.advanced}"
-                 (click)="toggleSection('advanced')"></i>
+              <i class="fa text-primary" [ngClass]="{'fa-chevron-down': sectionCollapsedMap.advanced, 'fa-chevron-up': !sectionCollapsedMap.advanced}"></i>
             </div>
             <div class="clearfix"></div>
           </div>
