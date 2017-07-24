@@ -19,8 +19,8 @@ export class UserService {
     this.personaMap.set(this.ROLES.CURATOR, [new Persona('Data Steward', [], '/dataset', 'steward-logo.png')]);
     this.personaMap.set(this.ROLES.USER, [new Persona('Analytics', [], '/workspace', 'analytics-logo.png')]);
     this.personaMap.set(this.ROLES.INFRAADMIN, [new Persona('Cluster Admin', [], '/infra', 'infra-logo.png'),
-      new Persona('Data Life cycle Manager', [], '', 'dlm-logo.png')]);
-    this.personaMap.set(this.ROLES.INFRAADMIN_SUPERADMIN, [new Persona('DLM', [], '', 'dlm-logo.png')]);
+      new Persona('Data Lifecycle Manager', [], '', 'dlm-logo.png')]);
+    this.personaMap.set(this.ROLES.INFRAADMIN_SUPERADMIN, [new Persona('Data Lifecycle Manager', [], '', 'dlm-logo.png')]);
   }
 
   get user() {
