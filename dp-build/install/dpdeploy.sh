@@ -9,7 +9,10 @@ DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 export KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
-APP_CONTAINERS="dp-database dp-app dp-db-service dp-cluster-service dp-gateway"
+APP_CONTAINERS="dp-app dp-db-service dp-cluster-service dp-gateway"
+if [ "$USE_EXT_DB" == "no" ]; then
+    APP_CONTAINERS="dp-database $APP_CONTAINERS"
+fi
 KNOX_CONTAINER="knox"
 CONSUL_CONTAINER="dp-consul-server"
 
