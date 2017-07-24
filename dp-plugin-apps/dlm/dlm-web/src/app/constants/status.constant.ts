@@ -32,7 +32,8 @@ export const EVENT_SEVERITY = {
 
 export const CLUSTER_STATUS = {
   HEALTHY: 'HEALTHY',
-  UNHEALTHY: 'UNHEALTHY'
+  UNHEALTHY: 'UNHEALTHY',
+  WARNING: 'WARNING'
 };
 
 export const SERVICE_STATUS = {

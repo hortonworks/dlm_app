@@ -50,6 +50,7 @@ import { HdfsService } from 'services/hdfs.service';
 import { HiveService } from 'services/hive.service';
 import { NotificationService } from 'services/notification.service';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
+import { UserService } from 'services/user.service';
 
 import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
@@ -72,7 +73,9 @@ import { UserDropdownComponent } from './common/user-dropdown/user-dropdown.comp
 import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.component';
 import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route.component';
 import { HdfsBrowserComponent } from './components/hdfs-browser/hdfs-browser.component';
+import { PersonaPopupComponent } from 'common/persona-popup/persona-popup.component';
 
+import { OverviewModule } from './pages/overview/overview.module';
 import { ResourceChartsComponent } from './pages/overview/resource-charts/resource-charts.component';
 import { OverviewFilterComponent } from './pages/overview/overview-filter/overview-filter.component';
 import { IssuesListComponent } from './pages/overview/issues-list/issues-list.component';
@@ -160,7 +163,8 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     TranslateModule.forRoot(),
     BrowserAnimationsModule,
     SimpleNotificationsModule.forRoot(),
-    PipesModule
+    PipesModule,
+    OverviewModule
   ],
   declarations: [
     DlmComponent,
@@ -219,7 +223,8 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     ModalDialogComponent,
     ModalDialogBodyComponent,
     NotificationsComponent,
-    LogModalDialogComponent
+    LogModalDialogComponent,
+    PersonaPopupComponent
   ],
   bootstrap: [DlmComponent],
   providers: [
@@ -239,11 +244,12 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     OverviewJobsExternalFiltersService,
     httpServiceProvider,
     FrequencyPipe,
+    UserService,
     AppConfig,
     {
       provide: APP_INITIALIZER,
       useFactory: appConfigFactory,
-      deps: [AppConfig],
+      deps: [AppConfig, UserService],
       multi: true
     }
   ]

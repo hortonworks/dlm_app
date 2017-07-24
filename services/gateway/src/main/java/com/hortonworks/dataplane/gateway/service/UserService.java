@@ -5,7 +5,6 @@ import com.hortonworks.dataplane.gateway.domain.User;
 import com.hortonworks.dataplane.gateway.domain.UserList;
 import com.hortonworks.dataplane.gateway.domain.UserRef;
 import com.hortonworks.dataplane.gateway.domain.UserRoleResponse;
-import com.hortonworks.dataplane.gateway.filters.UserServiceInterface;
 import com.hortonworks.dataplane.gateway.utils.Utils;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +48,10 @@ public class UserService {
       return Optional.absent();
     }
   }
+  public UserRef getUserRef(User user) {
+    List<String> roles = getRoles(user.getUsername());
+    return getUserRef(user, roles, null);
+  }
 
   public List<String> getRoles(String userName) {
     try {
@@ -66,7 +69,8 @@ public class UserService {
 
   public UserRef getUserRef(User user, List<String> roles, String token) {
     UserRef userRef = new UserRef();
-    userRef.setId(user.getUsername());
+    userRef.setId(user.getId());//TODO currently id is username. check later
+    userRef.setUsername(user.getUsername());
     userRef.setAvatar(user.getAvatar());
     userRef.setDisplay(user.getDisplayname());
     try {
@@ -76,5 +80,14 @@ public class UserService {
     }
     userRef.setToken(token);
     return userRef;
+  }
+  public User getUserFromUserRef(UserRef userRef){
+    User user=new User();
+    user.setId(userRef.getId());
+    user.setUsername(userRef.getUsername());
+    user.setAvatar(userRef.getAvatar());
+    user.setDisplayname(userRef.getDisplay());
+    user.setPassword("******");
+    return user;
   }
 }

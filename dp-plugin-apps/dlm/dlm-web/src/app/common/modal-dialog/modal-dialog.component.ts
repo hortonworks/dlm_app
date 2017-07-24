@@ -9,7 +9,7 @@ import { ModalSize, SIZE_CLASS_MAP } from './modal-dialog.size';
   selector: 'dlm-modal-dialog',
   styleUrls: ['./modal-dialog.component.scss'],
   template: `
-    <div bsModal #childModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div bsModal #childModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" (onHide)="onClose.emit()">
       <div [ngClass]="['modal-dialog', modalSizeClassMap[modalSize]]">
         <div class="modal-content">
           <div class="modal-header">
@@ -84,7 +84,6 @@ export class ModalDialogComponent implements OnInit, OnChanges {
   }
 
   public hide(): void {
-    this.onClose.emit();
     this.childModal.hide();
   }
 

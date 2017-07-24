@@ -32,7 +32,7 @@ export class HttpService extends Http {
     let apiPrefix = API_PREFIX;
     // Proccess static assets without the api prefix
     const urlString: string = (typeof url === 'string') ? url : (<Request><any>url).url;
-    if (urlString.indexOf('assets/') > -1) {
+    if (urlString.indexOf('assets/') > -1 || urlString.indexOf('http') > -1) {
       apiPrefix = '';
     }
     if (typeof url === 'string') {

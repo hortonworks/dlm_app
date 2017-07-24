@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.hortonworks.dataplane.gateway.domain.*;
 import com.hortonworks.dataplane.gateway.domain.Error;
+import com.hortonworks.dataplane.gateway.utils.Jwt;
 import com.hortonworks.dataplane.gateway.service.UserService;
+import com.hortonworks.dataplane.gateway.utils.CookieManager;
 import com.hortonworks.dataplane.gateway.utils.Utils;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.ServletInputStream;
 
 import java.io.IOException;
+import java.util.Date;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_DECORATION_FILTER_ORDER;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
@@ -37,6 +40,9 @@ public class SimpleSignInFilter extends ZuulFilter {
 
   @Autowired
   private Utils utils;
+
+  @Autowired
+  private CookieManager cookieManager;
 
   private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -82,10 +88,11 @@ public class SimpleSignInFilter extends ZuulFilter {
       if (userRefOpt.isPresent()){
         // Construct a JWT token
         UserRef userRef=userRefOpt.get();
-        String token = jwt.makeJWT(user.get(),userRef.getRoles());
-        userRef.setToken(token);
+        String jwtToken = jwt.makeJWT(userRef);
+        userRef.setToken(jwtToken);
         ctx.setResponseStatusCode(200);
         ctx.setResponseBody(objectMapper.writeValueAsString(userRef));
+        cookieManager.addDataplaneJwtCookie(jwtToken,Optional.<Date>absent());
         ctx.setSendZuulResponse(false);
       }
     } catch (IOException e) {

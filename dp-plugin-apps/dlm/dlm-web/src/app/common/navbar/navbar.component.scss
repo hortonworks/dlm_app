@@ -1,16 +1,79 @@
+$width: 200px;
+$collapsed-width: 60px;
+$header-height: 60px;
+$footer-height: 48px;
+.navigation-bar {
+  width: $width;
+  .side-nav-header, .side-nav-menu, .side-nav-footer {
+    width: $width;
+  }
+  .side-nav-header {
+    height: $header-height;
+    .navigation-header {
+      height: $header-height;
+      padding: 0!important;
+      #header_icon {
+        background-color: #374b67;
+        height: $header-height;
+        padding-top: 15px !important;
+        padding-left: 0;
+        padding-right: 0;
+        width: 60px;
+        a {
+          display: block;
+          padding: 0 15px;
+        }
+      }
+      #header_content {
+        width: 140px;
+      }
+    }
+  }
+  .side-nav-menu {
+    top: $header-height;
+    bottom: $footer-height;
+    padding-top: 5px;
+    li {
+      a {
+        width: $width;
+        padding: 7px 5px 7px 25px;
+        .navigation-icon.glyphicon, .navigation-menu-item {
+          font-size: 14px !important;
+        }
+      }
+    }
+  }
+  .side-nav-footer {
+    height: $footer-height;
+    a {
+      font-size: 19px;
+      width: $width;
+    }
+  }
+}
+
 .navigation-bar-container {
+  &.collapsed {
+    width: 60px;
+    .side-nav-header, .side-nav-menu, .side-nav-footer {
+      width: $collapsed-width;
+    }
+  }
   ul.nav.side-nav-header {
     li.navigation-header {
-      padding: 10px;
+      .row {
+        margin: 0 !important;
+      }
       #header_icon {
         padding-top: 5px;
         font-size: 28px;
         .ambari-logo {
           color: #b8bec4;
+          cursor: pointer;
         }
       }
       #header_content {
-        padding: 5px;
+        padding: 15px 5px;
       }
     }
   }
