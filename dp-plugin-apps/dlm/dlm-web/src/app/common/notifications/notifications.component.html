@@ -1,5 +1,5 @@
 <span class="notifications-group pull-right">
-  <span class="alerts-label dropdown-toggle" data-toggle="dropdown">
+  <span class="alerts-label dropdown-toggle" data-toggle="dropdown" qe-attr="notifications-dropdown-toggler">
     <span class="glyphicon glyphicon-bell"></span>
     <span *ngIf="newEventsCount && newEventsCount > 0" class="numberCircle alert-crit-count">{{ newEventsCount }}</span>
   </span>
@@ -32,7 +32,7 @@
       </div>
     </ng-template>
     <div class="notifications-footer col-sm-12">
-      <button type="button" class="btn btn-primary pull-right" (click)="viewAllClickHandler()">View All</button>
+      <button qe-attr="go-to-notifications" type="button" class="btn btn-primary pull-right" (click)="viewAllClickHandler()">View All</button>
     </div>
   </div>
 </span>

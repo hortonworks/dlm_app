@@ -1,5 +1,5 @@
 <dlm-cluster-card>
-  <div class="row pairing-card">
+  <div class="row pairing-card" qe-attr="pairing">
     <div class="col-md-5 col-sm-5 col-lg-5 col-xs-5 col">
       <div class="cluster-name">{{ pairing.pair[0].name }}</div>
       <div>{{ pairing.pair[0].location.city }}, {{ pairing.pair[0].location.country }}</div>
@@ -12,7 +12,7 @@
       <div>{{ pairing.pair[1].location.city }}, {{ pairing.pair[1].location.country }}</div>
     </div>
     <div class="col-md-1 col-sm-1 col-lg-1 col-xs-1 col cross text-right">
-      <button type="button" class="close" aria-label="Unpair" (click)="onClickUnpair(pairing)"><span aria-hidden="true">&times;</span></button>
+      <button qe-attr="unpair" type="button" class="close" aria-label="Unpair" (click)="onClickUnpair(pairing)"><span aria-hidden="true">&times;</span></button>
     </div>
   </div>
 </dlm-cluster-card>

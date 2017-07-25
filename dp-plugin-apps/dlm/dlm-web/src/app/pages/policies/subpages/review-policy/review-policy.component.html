@@ -24,8 +24,8 @@
             </div>
           </div>
           <div class="footer-controls pull-right">
-            <button (click)="cancelReview()" class="btn btn-default">{{'common.back' | translate}}</button>
-            <button (click)="submitReview()" class="btn btn-success" [disabled]="creationState?.isInProgress">
+            <button qe-attr="policy-cancel" (click)="cancelReview()" class="btn btn-default">{{'common.back' | translate}}</button>
+            <button qe-attr="policy-submit" (click)="submitReview()" class="btn btn-success" [disabled]="creationState?.isInProgress">
               {{'common.submit' | translate}}
               <i class="fa fa-spinner fa-spin" *ngIf="creationState?.isInProgress"></i>
             </button>

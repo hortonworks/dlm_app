@@ -13,11 +13,11 @@
           <fieldset formGroupName="general" [collapse]="sectionCollapsedMap.general">
             <dlm-form-field
               [label]="'page.policies.form.fields.policy_name' | translate">
-              <input type="text" class="form-control" formField formControlName="name" />
+              <input type="text" class="form-control" qe-attr="policy-name" formField formControlName="name" />
             </dlm-form-field>
             <dlm-form-field
               [label]="'page.policies.form.fields.policy_description' | translate">
-              <textarea rows="4" class="form-control" formField formControlName="description"></textarea>
+              <textarea rows="4" class="form-control" qe-attr="policy-description" formField formControlName="description"></textarea>
             </dlm-form-field>
             <div class="form-group">
               <div class="row">
@@ -27,16 +27,16 @@
               </div>
               <div class="row">
                 <div class="col-md-6">
-                  <dlm-radio-button [items]="storageTypes" formControlName="type" (change)="handlePolicyTypeChange($event)"></dlm-radio-button>
+                  <dlm-radio-button qe-attr="policy-type" [items]="storageTypes" formControlName="type" (change)="handlePolicyTypeChange($event)"></dlm-radio-button>
                 </div>
               </div>
             </div>
             <dlm-form-field [label]="'page.policies.form.fields.sourceCluster.self' | translate">
-              <dlm-select-field formField formControlName="sourceCluster" [options]="sourceClusters" [value]="sourceCluster" (onSelect)="handleSourceClusterChange($event)">
+              <dlm-select-field qe-attr="policy-source-cluster" formField formControlName="sourceCluster" [options]="sourceClusters" [value]="sourceCluster" (onSelect)="handleSourceClusterChange($event)">
               </dlm-select-field>
             </dlm-form-field>
             <dlm-form-field [label]="'page.policies.form.fields.destinationCluster.self' | translate">
-              <dlm-select-field formField formControlName="destinationCluster" [options]="destinationClusters" [value]="destinationCluster">
+              <dlm-select-field qe-attr="policy-destination-cluster" formField formControlName="destinationCluster" [options]="destinationClusters" [value]="destinationCluster">
               </dlm-select-field>
             </dlm-form-field>
           </fieldset>
@@ -87,7 +87,7 @@
                   </span>
                 </div>
                 <div class="col-md-4">
-                  <dlm-search-input (valueChange)="handleSearchChange($event)" [value]="databaseSearch$ | async"></dlm-search-input>
+                  <dlm-search-input qe-attr="policy-database-search-filter" (valueChange)="handleSearchChange($event)" [value]="databaseSearch$ | async"></dlm-search-input>
                 </div>
               </div>
               <dlm-hive-browser
@@ -120,16 +120,16 @@
                   </div>
                   <div class="row">
                     <div class="col col-md-2">
-                      <dlm-select-field formField formControlName="repeatMode" [options]="repeatOptions"
+                      <dlm-select-field qe-attr="policy-repeat-mode" formField formControlName="repeatMode" [options]="repeatOptions"
                                         [value]="repeatOption">
                       </dlm-select-field>
                     </div>
                     <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-md-1"
                          [class.has-error]="policyForm.get('job').get('frequency').touched && policyForm.get('job').get('frequency').invalid">
-                      <input type="text" class="form-control" placeholder="Freq" formField formControlName="frequency"/>
+                      <input type="text" qe-attr="policy-frequency" class="form-control" placeholder="Freq" formField formControlName="frequency"/>
                     </div>
                     <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-md-2">
-                      <dlm-select-field formField formControlName="unit" [options]="units" [value]="unit">
+                      <dlm-select-field qe-attr="policy-unit" formField formControlName="unit" [options]="units" [value]="unit">
                       </dlm-select-field>
                     </div>
                     <div *ngIf="repeatOption === policyRepeatModes.EVERY && unit === policyTimeUnits.WEEKS"
@@ -139,7 +139,7 @@
                           <span>&nbsp;on&nbsp;</span>
                         </div>
                         <div class="col col-md-11">
-                          <dlm-radio-button [items]="dayOptions" formControlName="day" [selectedValue]="selectedDay"
+                          <dlm-radio-button qe-attr="policy-selected-days" [items]="dayOptions" formControlName="day" [selectedValue]="selectedDay"
                                             [type]="'buttons'" (change)="handleDayChange($event)"></dlm-radio-button>
                         </div>
                       </div>
@@ -161,6 +161,7 @@
                     <div class="date-control">
                       <label>{{'page.policies.form.fields.start_date' | translate}}</label>
                       <my-date-picker
+                        qe-attr="policy-start-date"
                         selectionTxtFontSize="12"
                         [selDate]="policyForm.value.job.startTime.date"
                         [placeholder]="'page.policies.form.fields.date_format' | translate"
@@ -171,7 +172,7 @@
                     <div class="new-row">
                       <dlm-form-field fieldClass="col-md-12" errorClass="col-md-12">
                         <label>{{'page.policies.form.fields.start_time' | translate}}</label>
-                        <timepicker formField formControlName="time" [showMeridian]="false"
+                        <timepicker qe-attr="policy-start-time" formField formControlName="time" [showMeridian]="false"
                                     [showSpinners]="false"></timepicker>
                         <dlm-field-error
                           *ngIf="policyForm.get('job').get('startTime').get('time').hasError('lessThanCurrent')">
@@ -186,6 +187,7 @@
                     <div class="date-control">
                       <label>{{'page.policies.form.fields.end_date' | translate}}</label>
                       <my-date-picker
+                        qe-attr="policy-end-time"
                         [selDate]="policyForm.value.job.endTime.date"
                         [placeholder]="'page.policies.form.fields.date_format' | translate"
                         (dateChanged)="handleDateChange($event, 'endTime')"
@@ -228,10 +230,10 @@
       <div class="row">
         <div class="form-footer col-md-12">
           <div class="footer-controls pull-right">
-            <button type="button" class="btn btn-default" (click)="cancel()">
+            <button qe-attr="policy-cancel" type="button" class="btn btn-default" (click)="cancel()">
               {{'common.cancel' | translate}}
             </button>
-            <button class="btn btn-success" type="submit">
+            <button qe-attr="policy-submit" class="btn btn-success" type="submit">
               {{'common.review' | translate}}
             </button>
           </div>

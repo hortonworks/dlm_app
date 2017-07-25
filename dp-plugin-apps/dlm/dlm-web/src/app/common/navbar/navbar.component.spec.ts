@@ -22,7 +22,7 @@ describe('NavbarComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(NavbarComponent);
     component = fixture.componentInstance;
-    component.header = new MenuItem('a', 'b', 'c');
+    component.header = new MenuItem('a', 'b', 'c', 'd');
     component.personas = [new Persona('admin', [], '', '')];
     fixture.detectChanges();
   });
