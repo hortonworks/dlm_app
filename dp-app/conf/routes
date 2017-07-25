@@ -89,6 +89,7 @@ GET           /api/userGroups                                  controllers.UserM
 
 #Group Management
 GET           /api/groups                                      controllers.GroupManager.getGroups
+POST          /api/groups/admin                                controllers.GroupManager.addAdminGroups
 POST          /api/groups/add                                  controllers.GroupManager.addGroupsWithRoles
 POST          /api/groups/update                               controllers.GroupManager.updateGroupInfo
 GET           /api/groups/byname                               controllers.GroupManager.getGroupsByName

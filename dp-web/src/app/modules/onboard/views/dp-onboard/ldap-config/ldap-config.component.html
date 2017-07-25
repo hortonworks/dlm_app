@@ -24,17 +24,21 @@
       <input required name="ldap-url" type="text" [(ngModel)]="ldapProperties.ldapUrl" placeholder="e.g. ldap://localhost:33389"/>
     </div>
     <div class="dp-input form-group">
-      <label class="required">{{"pages.onboard.configure.labels.userDNTemplate" | translate}}</label>
-      <input required name="user-dn-template" type="text" [(ngModel)]="ldapProperties.userDnTemplate" placeholder="e.g. ou=people,dc=hadoop,dc=apache,dc=org"/>
-    </div>
-    <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.userSearchBase" | translate}}</label>
       <input required name="user-search-base" type="text" [(ngModel)]="ldapProperties.userSearchBase" placeholder="e.g. ou=people,dc=hadoop,dc=apache,dc=org"/>
     </div>
-    <!--<div class="dp-input">-->
-      <!--<label>Group search base</label>-->
-      <!--<input type="text" [(ngModel)]="ldapProperties.groupSearchBase" placeholder="e.g. ou=groups,dc=hadoop,dc=apache,dc=org"/>-->
-    <!--</div>-->
+    <div class="dp-input form-group">
+      <label class="required">{{"pages.onboard.configure.labels.userSearchAttributeName" | translate}}</label>
+      <input required name="user-dn-template" type="text" [(ngModel)]="ldapProperties.userSearchAttributeName" placeholder="e.g. uid"/>
+    </div>
+    <div class="dp-input form-group">
+      <label class="required">{{"pages.onboard.configure.labels.groupSearchBase" | translate}}</label>
+      <input required name="group-search-base" type="text" [(ngModel)]="ldapProperties.groupSearchBase" placeholder="e.g. ou=groups,dc=hadoop,dc=apache,dc=org"/>
+    </div>
+    <div class="dp-input form-group">
+      <label class="required">{{"pages.onboard.configure.labels.groupSearchAttributeName" | translate}}</label>
+      <input required name="user-dn-template" type="text" [(ngModel)]="ldapProperties.groupSearchAttributeName" placeholder="e.g. cn"/>
+    </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.adminBindDN" | translate}}</label>
       <input required name="admin-bind-dn" type="text" [(ngModel)]="ldapProperties.bindDn" placeholder="e.g. uid=admin,ou=people,dc=hadoop,dc=apache,dc=org"/>

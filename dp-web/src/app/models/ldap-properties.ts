@@ -2,9 +2,10 @@ export class LDAPProperties {
   id: number;
   ldapUrl: string;
   domains: string[] = [];
-  userDnTemplate: string;
   userSearchBase: string;
+  userSearchAttributeName: string;
   groupSearchBase:string;
+  groupSearchAttributeName: String;
   bindDn :string;
   password: string
 }

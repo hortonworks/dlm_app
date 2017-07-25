@@ -4,6 +4,8 @@ import {UserService} from '../../../../../services/user.service';
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {TagTheme} from '../../../../../shared/tagging-widget/tagging-widget.component';
 import {AuthenticationService} from '../../../../../services/authentication.service';
+import {Observable} from 'rxjs/Observable';
+import {GroupService} from '../../../../../services/group.service';
 
 @Component({
   selector: 'dp-user-add',
@@ -18,10 +20,13 @@ export class UserAddComponent implements OnInit {
   availableUsers: string[] = [];
   availableGroups: string[] = [];
   tagThemes = TagTheme;
+  groupsSaved = false;
+  usersSaved = false;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
               private userService: UserService,
+              private groupService: GroupService,
               private authenticationService: AuthenticationService) {
   }
 
@@ -38,10 +43,43 @@ export class UserAddComponent implements OnInit {
   }
 
   save() {
-    this.userService.addAdminUsers(this.users).subscribe(response => {
-      this.authenticationService.signOut();
-    }, (error) => {
-      console.error(error)
+    if (!this.groupsSaved && !this.usersSaved) {
+      this.saveUsersAndGroups().subscribe(res => {
+        this.groupsSaved = res.groupsAddtionSuccess;
+        this.usersSaved = res.userAdditionSuccess;
+        if (res.groupsAddtionSuccess && res.userAdditionSuccess) {
+          this.authenticationService.signOut();
+        }
+      });
+    } else if (!this.usersSaved && this.groupsSaved) {
+      this.userService.addAdminUsers(this.users).subscribe(response => {
+        this.usersSaved = true;
+        this.authenticationService.signOut();
+      }, (error) => {
+        console.error(error);
+        this.usersSaved = false;
+      });
+    } else if (this.usersSaved && !this.groupsSaved) {
+      this.groupService.addAdminGroups(this.groups).subscribe(response => {
+        this.groupsSaved = true;
+        this.authenticationService.signOut();
+      }, (error) => {
+        console.error(error);
+        this.usersSaved = false;
+      });
+    }
+  }
+
+  saveUsersAndGroups() {
+    return Observable.forkJoin(
+      this.userService.addAdminUsers(this.users),
+      this.groupService.addAdminGroups(this.groups)
+    ).map(responses => {
+      console.log(responses);
+      return {
+        userAdditionSuccess: this.users.length === responses[0].length,
+        groupsAddtionSuccess: this.groups.length === responses[1].length
+      };
     });
   }
 
@@ -80,7 +118,7 @@ export class UserAddComponent implements OnInit {
           this.availableGroups.push(group.name);
         });
       }, () => {
-        console.error('Error while fetching ldap users');
+        console.error('Error while fetching ldap groups');
       });
     }
   }

@@ -15,15 +15,19 @@ export class UserManagementComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.currentView = Views.USERS;
-    this.onViewChange(this.currentView)
+    if (this.router.url.indexOf('/users') > -1) {
+      this.currentView = Views.USERS;
+    } else if (this.router.url.indexOf('/groups') > -1) {
+      this.currentView = Views.GROUPS;
+    }
+    this.router.navigateByUrl(this.router.url);
   }
 
-  onViewChange(view){
+  onViewChange(view) {
     this.currentView = view;
-    if(this.currentView === Views.GROUPS){
+    if (this.currentView === Views.GROUPS) {
       this.router.navigate(['groups'], {relativeTo: this.route});
-    }else {
+    } else {
       this.router.navigate(['users'], {relativeTo: this.route});
     }
   }

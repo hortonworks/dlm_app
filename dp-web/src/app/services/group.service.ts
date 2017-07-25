@@ -33,6 +33,13 @@ export class GroupService {
       .catch(HttpUtil.handleError);
   }
 
+  addAdminGroups(groups: string[]): Observable<any[]> {
+    return this.http
+      .post(`${this.url}/admin`, {groups: groups}, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
   updateGroup(group: Group): Observable<Group> {
     return this.http
       .post(`${this.url}/update`, group, new RequestOptions(HttpUtil.getHeaders()))

@@ -7,7 +7,7 @@ import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.commons.domain.RoleType
 import com.hortonworks.dataplane.db.Webservice.GroupService
 import com.typesafe.scalalogging.Logger
-import models.{GroupsAndRolesListInput}
+import models.{GroupsAndRolesListInput, GroupsListInput}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 
@@ -32,6 +32,14 @@ class GroupManager @Inject()(@Named("groupService") val groupService: GroupServi
       case Left(errors) => handleErrors(errors)
       case Right(groups) => Ok(Json.toJson(groups))
     }
+  }
+
+  def addAdminGroups() = Action.async(parse.json) { request =>
+    request.body
+      .validate[GroupsListInput]
+      .map { groupsList =>
+        addGroupInternal(groupsList.groups, Seq(RoleType.SUPERADMIN))
+      }.getOrElse(Future.successful(BadRequest))
   }
 
   def getGroupsByName() = Action.async { request =>
