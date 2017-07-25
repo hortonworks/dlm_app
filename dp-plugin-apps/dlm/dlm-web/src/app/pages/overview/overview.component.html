@@ -27,10 +27,19 @@
   </div>
   <div class="page-section">
     <div class="row">
-      <div class="col-md-3">
+      <div class="col-md-2">
         <h4>{{'page.overview.issues.updates' | translate}}</h4>
       </div>
-      <div class="col-md-9">
+      <div class="col-md-6">
+        <div *ngIf="jobStatusFilter$ | async" class="job-status-filter">
+          <span class="label label-default">
+            <span class="text-bold text-uppercase">{{'common.jobs' | translate}}:&nbsp;</span>
+            <span>{{formatStatusFilter(jobStatusFilter$ | async)}} </span>
+            <a href="javascript:void(0);" (click)="removeJobStatusFilter()">&times;</a>
+          </span>
+        </div>
+      </div>
+      <div class="col-md-4">
         <div class="btn-group pull-right">
           <button class="btn btn-xs btn-secondary" type="button" [disabled]="!addingPairsAvailable(clusters$ | async, pairsCount$ | async)" routerLink="/pairings/create">
             <span class="text-uppercase">{{'common.pair' | translate}} +</span>
