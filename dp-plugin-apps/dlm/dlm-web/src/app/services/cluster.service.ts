@@ -7,27 +7,14 @@ import { Cluster } from 'models/cluster.model';
 @Injectable()
 export class ClusterService {
 
-  normalizeCluster(cluster: Cluster): Cluster {
-    cluster.originDataCenter = cluster.dataCenter;
-    // todo: why we rewrite dataCenter???
-    cluster.dataCenter = cluster.name;
-    return cluster;
-  }
-
   constructor(private http: Http) { }
 
   fetchClusters(): Observable<any> {
-    return mapResponse(this.http.get('clusters')).map(response => {
-      response.clusters.map(cluster => this.normalizeCluster(cluster));
-      return response;
-    });
+    return mapResponse(this.http.get('clusters'));
   }
 
   fetchCluster(id: string): Observable<any> {
-    return mapResponse(this.http.get(`clusters/${id}`)).map(response => {
-      response.clusters.map( cluster => this.normalizeCluster(cluster));
-      return response;
-    });
+    return mapResponse(this.http.get(`clusters/${id}`));
   }
 
   fetchClustersStatuses(): Observable<any> {

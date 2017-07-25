@@ -11,7 +11,7 @@ import { Component, OnInit, Input, ViewEncapsulation, HostBinding } from '@angul
         <span class="page-title">
           {{title | translate}}
         </span>
-        <i class="fa fa-question-circle-o text-primary help-note" *ngIf="contextMessage" [tooltip]="contextMessage | translate"></i>
+        <i class="fa fa-question-circle help-note" *ngIf="contextMessage" [tooltip]="contextMessage | translate"></i>
       </div>
     </div>
     <div class="row" *ngIf="description">

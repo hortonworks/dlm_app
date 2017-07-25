@@ -9,7 +9,6 @@ import { MomentModule } from 'angular2-moment';
 
 import { PolicyDetailsComponent } from './policy-details.component';
 import { JobsTableComponent } from '../../jobs/jobs-table/jobs-table.component';
-import { JobStatusComponent } from '../../jobs/job-status/job-status.component';
 import { JobTransferredGraphComponent } from '../../jobs/jobs-transferred-graph/job-transferred-graph.component';
 import { TableFooterComponent } from 'common/table/table-footer/table-footer.component';
 import { TableComponent } from 'common/table/table.component';
@@ -49,7 +48,6 @@ describe('PolicyDetailsComponent', () => {
         TableComponent,
         TableFooterComponent,
         JobsTableComponent,
-        JobStatusComponent,
         JobTransferredGraphComponent,
         HdfsBrowserComponent
       ],

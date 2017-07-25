@@ -24,7 +24,6 @@ import { NavbarService } from 'services/navbar.service';
 import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { PolicyDetailsComponent } from './policy-details/policy-details.component';
 import { JobsTableComponent } from '../jobs/jobs-table/jobs-table.component';
-import { JobStatusComponent } from '../jobs/job-status/job-status.component';
 import { JobTransferredGraphComponent } from '../jobs/jobs-transferred-graph/job-transferred-graph.component';
 import { FrequencyPipe } from 'pipes/frequency.pipe';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
@@ -65,7 +64,6 @@ xdescribe('PoliciesComponent', () => {
         BytesSizePipe,
         FrequencyPipe,
         JobsTableComponent,
-        JobStatusComponent,
         JobTransferredGraphComponent,
         ModalDialogComponent,
         TableFilterComponent,

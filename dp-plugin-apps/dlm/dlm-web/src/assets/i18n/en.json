@@ -137,7 +137,7 @@
         }
       },
       "issues": {
-        "updates": "Issues and Updates",
+        "updates": "Issues & Updates",
         "recent": "Recent Issues",
         "list": {
           "view_all": "view all",
@@ -150,23 +150,67 @@
           }
         }
       },
+      "summary_panels": {
+        "title": {
+          "clusters": "Cluster Health",
+          "policies": "Policies",
+          "jobs": "Jobs"
+        },
+        "status": {
+          "unhealthy": "Unhealthy",
+          "healthy": "Healthy",
+          "in_progress": "In Progress",
+          "failed_last": "Failed Last",
+          "failed_last_10": "Failed in Last 10",
+          "active": "Active",
+          "suspended": "Suspended",
+          "warning": "Warning"
+        }
+      },
       "table": {
         "column": {
+          "job_status": "Job Status",
           "source_cluster": "Source",
           "destination_cluster": "Destination",
           "started": "Started",
           "ended": "Ended",
           "runtime": "Runtime",
-          "transferred": "Transferred",
+          "transferred": "Transferred / Files",
           "next_run": "Next Run",
           "action": "Action",
-          "actions": "Actions"
+          "actions": "Actions",
+          "last_ten_jobs": "Policy Performance"
         },
         "actions": {
           "abort_job": "Abort Job",
           "delete_policy": "Delete Policy",
           "suspend_policy": "Suspend Policy",
           "activate_policy": "Activate Policy"
+        }
+      },
+      "modals": {
+        "unhealthy_cluster": {
+          "title": "Unhealthy Clusters",
+          "columns": {
+            "cluster_name": "Cluster Name",
+            "services": "Unhealthy Services"
+          }
+        },
+        "hdfs_capacity": {
+          "title": "HDFS Remaining Capacity",
+          "columns": {
+            "cluster_name": "Cluster",
+            "capacity": "Remaining Capacity"
+          }
+        },
+        "unhealthy_policy": {
+          "title": "Unhealthy Policy",
+          "columns": {
+            "policy": "Policy",
+            "source": "Source",
+            "destination": "Destination",
+            "issues": "Issues"
+          }
         }
       }
     },
@@ -180,8 +224,8 @@
         "nodes": "Nodes",
         "volume": "Volume",
         "location": "Location",
-        "create_pair_text": "+ Pair",
-        "create_policy_text": "+ Policy"
+        "create_pair_text": "Add Pair",
+        "create_policy_text": "Add Policy"
       }
     },
     "policies": {
@@ -189,7 +233,7 @@
       "header_note": "You must create a cluster pairing before you can create a replication policy.",
       "header_create": "Create Replication Policy",
       "header_review": "Review Replication Policy",
-      "create_button_text": "+ Policy",
+      "create_button_text": "Add Policy",
       "tags": "Tags",
       "groups": "Groups",
       "data_summary": "Data Summary",
@@ -257,7 +301,7 @@
     "pairings": {
       "header": "Pairings",
       "header_note": "Note: Pairings are bi-directional",
-      "create_button_text": "+ Pairing",
+      "create_button_text": "Add Pairing",
       "content": {
         "header": {
           "first_cluster": "FIRST CLUSTER",

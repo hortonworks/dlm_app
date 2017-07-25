@@ -43,9 +43,9 @@ export const resumePolicy = (payload: Policy, meta?): Action => ({type: ActionTy
 export const resumePolicySuccess = (id): Action => ({type: ActionTypes.RESUME_POLICY.SUCCESS, payload: id});
 export const resumePolicyFail = (error): Action => ({type: ActionTypes.RESUME_POLICY.FAILURE, payload: error});
 
-export const loadLastJobs = (policies: Policy[], meta = {}): Action => ({
+export const loadLastJobs = ({policies, numJobs = 3}: {policies: Policy[], numJobs?: number}, meta = {}): Action => ({
   type: ActionTypes.LOAD_LAST_JOBS.START,
-  payload: {policies, meta}
+  payload: {policies, numJobs, meta}
 });
 
 export const loadLastJobsSuccess = (jobs, meta = {}): ActionSuccess => ({

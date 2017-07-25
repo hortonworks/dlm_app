@@ -5,13 +5,13 @@ import 'leaflet-curve';
 import { MapSize, MapSizeSettings, ClusterMapData } from 'models/map-data';
 import { GeographyService } from 'services/geography.service';
 import LatLng = L.LatLng;
-import { CLUSTER_STATUS } from 'constants/status.constant';
+import { CLUSTER_STATUS, SERVICE_STATUS } from 'constants/status.constant';
 import { without } from 'utils/array-util';
 
 function formatMapPopup(cluster) {
-  const notStartedServices = cluster.status ? cluster.status.filter(s => s.state !== 'STARTED') : [];
+  const notStartedServices = cluster.status ? cluster.status.filter(s => s.state !== SERVICE_STATUS.STARTED) : [];
   const notStartedServiceNames = notStartedServices.map(s => s.service_name);
-  const popup = `<p>${cluster.name}<br />${cluster.originDataCenter}<br />Policies: ${cluster.policiesCounter}</p>`;
+  const popup = `<p>${cluster.name}<br />${cluster.dataCenter}<br />Policies: ${cluster.policiesCounter}</p>`;
   if (notStartedServices.length) {
     return `${popup}<p>Not started services: ${notStartedServiceNames.join(', ')}</p>`;
   }
@@ -33,6 +33,7 @@ export class MapComponent implements OnChanges, OnInit {
   @ViewChild('mapcontainer') mapcontainer: ElementRef;
   @Input('mapData') mapData: ClusterMapData[] = [];
   @Input('mapSize') mapSize = 'extraLarge';
+  @Input() sizeSettings: any;
 
   @HostBinding('style.height') get selfHeight(): string {
     return this.getMapDimensions().height;
@@ -88,14 +89,17 @@ export class MapComponent implements OnChanges, OnInit {
   }
 
   getMapDimensions() {
-    return this.defaultMapSizes[this.mapSize] || this.defaultMapSizes[MapSize.EXTRALARGE];
+    return this.sizeSettings || this.defaultMapSizes[this.mapSize] || this.defaultMapSizes[MapSize.EXTRALARGE];
   }
 
   ngOnInit() {
     if (this.map) {
       this.map.remove();
     }
-    this.geographyService.getCountries().subscribe(countries => {
+    this.geographyService.getCountries()
+      // for some reason map don't draw sometimes
+      .delay(500)
+      .subscribe(countries => {
       this.countries = countries;
       this.drawMap(countries);
       this.plotPoints();

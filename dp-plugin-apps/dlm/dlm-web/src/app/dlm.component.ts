@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { MenuItem } from './common/navbar/menu-item';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers/index';
@@ -15,8 +15,10 @@ import { SessionStorageService } from './services/session-storage.service';
 import { TimeZoneService } from './services/time-zone.service';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
-import * as moment from 'moment';
 import { POLL_INTERVAL } from 'constants/api.constant';
+import { HeaderData, Persona } from 'models/header-data';
+import { UserService } from 'services/user.service';
+import { AuthUtils } from 'utils/auth-utils';
 
 const POLL_EVENTS_ID = 'POLL_EVENT_ID';
 const POLL_NEW_EVENTS_ID = 'POLL_NEW_EVENTS_ID';
@@ -27,7 +29,7 @@ const POLL_NEW_EVENTS_ID = 'POLL_NEW_EVENTS_ID';
   styleUrls: ['./dlm.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class DlmComponent implements OnDestroy {
+export class DlmComponent implements OnDestroy, OnInit {
   header: MenuItem;
   menuItems: MenuItem[];
   mainContentSelector = '#dlm_content';
@@ -37,6 +39,7 @@ export class DlmComponent implements OnDestroy {
   navigationColumns = NAVIGATION;
   onOverviewPage = false;
   subscriptions: Subscription[] = [];
+  headerData: HeaderData = new HeaderData();
 
   // Options for Toast Notification
   notificationOptions = {
@@ -47,9 +50,7 @@ export class DlmComponent implements OnDestroy {
     timeOut: 10000
   };
 
-  // mock current user
-  // TODO: move user to store and dispatch timezone update with action
-  user: User = <User>{fullName: 'Jim Raynor', timezone: ''};
+  user: User = <User>{};
 
   private initPolling() {
     const pollProgress$ = this.store
@@ -71,6 +72,7 @@ export class DlmComponent implements OnDestroy {
               private store: Store<State>,
               private sessionStorageService: SessionStorageService,
               private timeZoneService: TimeZoneService,
+              private userService: UserService,
               private router: Router,
               private route: ActivatedRoute) {
     this.user.timezone = timeZoneService.setupUserTimeZone();
@@ -78,33 +80,34 @@ export class DlmComponent implements OnDestroy {
     this.header = new MenuItem(
       t.instant('sidenav.menuItem.header'),
       './overview',
-      '<i class="fa fa-gg" aria-hidden="true"></i>'
+      ''
     );
+    this.header.iconHtml = '<i class="fa fa-gg" aria-hidden="true"></i>';
     this.menuItems = [
       new MenuItem(
         t.instant('sidenav.menuItem.overview'),
         './overview',
-        '<span class="navigation-icon glyphicon glyphicon-home"></span>'
+        'navigation-icon glyphicon glyphicon-home'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.clusters'),
         './clusters',
-        '<span class="navigation-icon glyphicon glyphicon-globe"></span>'
+        'navigation-icon glyphicon glyphicon-globe'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.pairings'),
         './pairings',
-        '<span class="navigation-icon glyphicon glyphicon-resize-horizontal"></span>'
+        'navigation-icon glyphicon glyphicon-resize-horizontal'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.policies'),
         './policies',
-        '<span class="navigation-icon glyphicon glyphicon-list-alt"></span>'
+        'navigation-icon glyphicon glyphicon-list-alt'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.help'),
         './help',
-        '<span class="navigation-icon glyphicon glyphicon-info-sign"></span>'
+        'navigation-icon glyphicon glyphicon-info-sign'
       )
     ];
     this.events$ = store.select(getAllEvents);
@@ -138,8 +141,25 @@ export class DlmComponent implements OnDestroy {
     return urlValue[0].path === path;
   }
 
-  ngOnDestroy() {
-    this.subscriptions.forEach(s => s.unsubscribe());
+  getUser(): User {
+    return AuthUtils.getUser();
+  }
+
+  ngOnInit() {
+    AuthUtils.loggedIn$.subscribe(() => {
+      this.setHeaderData();
+      const user = this.getUser();
+      if (user && user.id) {
+        this.user = user;
+      } else {
+        // Log the user out of DLM
+        this.userService.logoutUser();
+      }
+    });
+  }
+
+  setHeaderData() {
+    this.headerData.personas = this.userService.getPersonaDetails();
   }
 
   saveUserTimezone(timezoneIndex) {
@@ -150,6 +170,11 @@ export class DlmComponent implements OnDestroy {
 
   logout() {
     // do logout
+    this.userService.logoutUser();
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
 }

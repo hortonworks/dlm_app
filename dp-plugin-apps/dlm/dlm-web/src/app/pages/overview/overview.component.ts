@@ -9,26 +9,37 @@ import { Event } from 'models/event.model';
 import { ProgressState } from 'models/progress-state.model';
 import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
 import { getAllJobs } from 'selectors/job.selector';
-import { getAllPolicies, getPolicyClusterJob } from 'selectors/policy.selector';
-import { getAllClusters } from 'selectors/cluster.selector';
+import { getPolicyClusterJob, getUnhealthyPolicies, getAllPoliciesWithClusters } from 'selectors/policy.selector';
+import { getAllClusters, getUnhealthyClusters, getClustersWithLowCapacity } from 'selectors/cluster.selector';
 import { getDisplayedEvents } from 'selectors/event.selector';
-import { loadJobsForClusters } from 'actions/job.action';
-import { loadClusters } from 'actions/cluster.action';
-import { loadPolicies } from 'actions/policy.action';
-import { getMergedProgress } from 'selectors/progress.selector';
-import { ResourceChartData } from './resource-charts/';
+import { loadJobsForPolicy } from 'actions/job.action';
+import { loadClusters, loadClustersStatuses } from 'actions/cluster.action';
+import { loadPolicies, loadLastJobs } from 'actions/policy.action';
+import { getMergedProgress, getProgressState } from 'selectors/progress.selector';
 import { POLICY_TYPES_LABELS } from 'constants/policy.constant';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
 import { Policy } from 'models/policy.model';
 import { Cluster } from 'models/cluster.model';
 import { Job } from 'models/job.model';
+import { ClustersStatus, PoliciesStatus, JobsStatus } from 'models/aggregations.model';
 import { filterCollection, flatten, unique } from 'utils/array-util';
-import { isEqual } from 'utils/object-utils';
+import { isEqual, isEmpty } from 'utils/object-utils';
 import { POLL_INTERVAL } from 'constants/api.constant';
+import { getClustersHealth, getPoliciesHealth, getJobsHealth } from 'selectors/aggregation.selector';
+import { SUMMARY_PANELS, CLUSTERS_HEALTH_STATE } from './resource-summary/';
+import { CLUSTER_STATUS, SERVICE_STATUS } from 'constants/status.constant';
+import { MapSizeSettings, ClusterMapData, ClusterMapPoint } from 'models/map-data';
+import { LogService } from 'services/log.service';
+import { EntityType } from 'constants/log.constant';
+import { PairsCountEntity } from 'models/pairs-count-entity.model';
+import { getCountPairsForClusters } from 'selectors/pairing.selector';
+import { loadPairings } from 'actions/pairing.action';
+import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
 
 const POLICIES_REQUEST = 'POLICIES_REQUEST';
 const CLUSTERS_REQUEST = 'CLUSTERS_REQUEST';
 const JOBS_REQUEST = 'JOBS_REQUEST';
+const CLUSTER_STATUS_REQUEST = 'CLUSTERS_STATUS_REQUEST';
 
 @Component({
   selector: 'dlm-overview',
@@ -42,6 +53,19 @@ export class OverviewComponent implements OnInit, OnDestroy {
     policies: [POLICY_STATUS.RUNNING, POLICY_STATUS.SUBMITTED, POLICY_STATUS.SUSPENDED],
     jobs: [JOB_STATUS.SUCCESS, JOB_STATUS.WARNINGS, JOB_STATUS.FAILED, JOB_STATUS.RUNNING]
   };
+  CLUSTER_STATUS = CLUSTER_STATUS;
+  mapSizeSettings: MapSizeSettings = {
+    width: '100%',
+    height: '300px',
+    zoom: 2
+  };
+  isUnhealthyClustersModalVisible = false;
+  isWarningClustersModalVisible = false;
+  isUnhealthyPoliciesModalVisible = false;
+
+  addingPairsAvailable = AddEntityButtonComponent.addingPairingsAvailable;
+  addingPoliciesAvailable = AddEntityButtonComponent.addingPoliciesAvailable;
+
   events$: Observable<Event[]>;
   jobs$: Observable<Job[]>;
   policies$: Observable<Policy[]>;
@@ -49,50 +73,58 @@ export class OverviewComponent implements OnInit, OnDestroy {
   fullfilledClusters$: Observable<Cluster[]>;
   tableResources$: Observable<any>;
   overallProgress$: Observable<ProgressState>;
-  resourceChartData$: Observable<ResourceChartData>;
   tableData$: Observable<any>;
+  pairsCount$: Observable<PairsCountEntity[]>;
   subscriptions: Subscription[] = [];
   clustersSubscription: Subscription;
+  clustersSummary$: Observable<ClustersStatus>;
+  policiesSummary$: Observable<PoliciesStatus>;
+  jobsSummary$: Observable<JobsStatus>;
+  unhealthyClusters$: Observable<Cluster[]>;
+  lowCapacityClusters$: Observable<Cluster[]>;
+  unhealthyPolicies$: Observable<Policy[]>;
+  clustersMapData$: Observable<ClusterMapData[]>;
 
   constructor(private store: Store<fromRoot.State>,
-              private overviewJobsExternalFiltersService: OverviewJobsExternalFiltersService) {
+              private overviewJobsExternalFiltersService: OverviewJobsExternalFiltersService,
+              private logService: LogService) {
     this.events$ = store.select(getDisplayedEvents);
     this.jobs$ = store.select(getAllJobs);
-    this.policies$ = store.select(getAllPolicies);
+    this.policies$ = store.select(getAllPoliciesWithClusters);
     this.clusters$ = store.select(getAllClusters);
-    this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, JOBS_REQUEST));
+    this.pairsCount$ = store.select(getCountPairsForClusters);
+    this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, JOBS_REQUEST, CLUSTER_STATUS_REQUEST));
     this.fullfilledClusters$ = this.clusters$
       .filter(clusters => !!clusters.length)
       .distinctUntilChanged(null, clusters => clusters.map(cluster => cluster.id).join('@') + '_LENGTH' + clusters.length);
+
+    this.clustersSummary$ = store.select(getClustersHealth);
+    this.policiesSummary$ = store.select(getPoliciesHealth);
+    this.jobsSummary$ = store.select(getJobsHealth);
+
     this.tableResources$ = store.select(getPolicyClusterJob);
-  }
-
-  prepareChartData(jobs: Job[], policies: Policy[], clusters: Cluster[], filters) {
-    const filteredPolicies = policies
-      .filter(policy => policy.jobsResource.some(job => job.status !== JOB_STATUS.SUCCESS))
-      .filter(policy => this.filterPolicyByJob(policy, filters));
-    const filteredPolicyNames = filteredPolicies.map(p => p.name);
-    const filteredJobs = filterCollection(jobs, {name: filteredPolicyNames});
-    const clusterNamesByPolicies = unique(flatten(filteredPolicies.map(p => [p.targetCluster, p.sourceCluster])));
-    const filteredClusters = filterCollection(clusters, {name: clusterNamesByPolicies});
-    return this.mapResourceData(filteredJobs, filteredPolicies, filteredClusters);
-  }
-
-  mapResourceData(jobs: Job[], policies: Policy[], clusters: Cluster[]): ResourceChartData {
-    return {
-      clusters: {data: [clusters.length], labels: ['Registered']},
-      policies: this.makeResourceData('policies', policies),
-      jobs: this.makeResourceData('jobs', jobs)
-    };
-  }
-
-  makeResourceData(resourceName: string, resourceData: any) {
-    const statuses = this.resourceStatusMap[resourceName];
-    const countStatus = (resources, status) => resources.filter(resource => resource.status === status).length;
-    return {
-      data: statuses.map(countStatus.bind(this, resourceData)),
-      labels: statuses
-    };
+    this.unhealthyClusters$ = this.store.select(getUnhealthyClusters)
+      .distinctUntilChanged(isEqual)
+      .map(clusters => clusters.map(cluster => ({
+        ...cluster,
+        status: cluster.status.filter(service => service.state !== SERVICE_STATUS.STARTED)
+      })));
+    this.lowCapacityClusters$ = this.store.select(getClustersWithLowCapacity);
+    this.unhealthyPolicies$ = this.store.select(getUnhealthyPolicies)
+      .map(policies => policies.map(policy => ({
+        ...policy,
+        sourceClusterResource: {
+          ...policy.sourceClusterResource,
+          status: (policy.sourceClusterResource.status || []).filter(service => service.state !== SERVICE_STATUS.STARTED)
+        },
+        targetClusterResource: {
+          ...policy.targetClusterResource,
+          status: (policy.targetClusterResource.status || []).filter(service => service.state !== SERVICE_STATUS.STARTED)
+        }
+      })));
+    this.clustersMapData$ = this.fullfilledClusters$
+      .startWith([])
+      .map(clusters => clusters.map(cluster => (<ClusterMapData>{start: <ClusterMapPoint>{cluster}})));
   }
 
   mapTableData(policy: Policy) {
@@ -118,23 +150,59 @@ export class OverviewComponent implements OnInit, OnDestroy {
       .do(([_, clusters]) => {
         [
           loadPolicies(),
-          loadClusters()
+          loadClusters(),
+          loadClustersStatuses()
         ].map(action => this.store.dispatch(action));
-        this.store.dispatch(loadJobsForClusters(clusters.map(cluster => cluster.id)));
       });
 
     this.subscriptions.push(polling$.subscribe());
   }
 
+  private showClusterSummaryDialog(healthStatus) {
+    if (healthStatus === CLUSTERS_HEALTH_STATE.UNHEALTHY) {
+      this.isUnhealthyClustersModalVisible = true;
+    } else {
+      this.isWarningClustersModalVisible = true;
+    }
+  }
+
+  private showPoliciesSummaryDialog(healthStatus) {
+    this.isUnhealthyPoliciesModalVisible = true;
+  }
+
+  private applyJobFilter(healthStatus) {
+    // todo: apply filter logic
+  }
+
+  private completedRequest$(progress$) {
+    return progress$
+      .skip(1)
+      .map(p => p.isInProgress)
+      .distinctUntilChanged()
+      .filter(isInProgress => !isInProgress);
+  }
+
   ngOnInit() {
-    const clusterSubscribtion = this.fullfilledClusters$
-      .subscribe(clusters => this.store.dispatch(loadJobsForClusters(clusters.map(cluster => cluster.id), JOBS_REQUEST)));
+    [
+      loadPolicies(POLICIES_REQUEST),
+      loadClusters(CLUSTERS_REQUEST),
+      loadPairings()
+    ].map(action => this.store.dispatch(action));
+    const overallProgressSubscription = this.completedRequest$(this.overallProgress$)
+      .subscribe(_ => this.initPolling());
+    const clustersRequestSubscription = this.completedRequest$(this.store.select(getProgressState(CLUSTERS_REQUEST)))
+      .subscribe(_ => this.store.dispatch(loadClustersStatuses(CLUSTER_STATUS_REQUEST)));
 
-    this.resourceChartData$ = Observable
-      .combineLatest(this.jobs$, this.tableResources$, this.clusters$, this.overviewJobsExternalFiltersService.filters$)
-      .map(([jobs, policies, clusters, filters]) => this.prepareChartData(jobs, policies, clusters, filters))
-      .distinctUntilChanged(isEqual);
-
+    const fullFilledPolicies$ = this.policies$
+      .filter(policies => policies.length && policies.every(policy => !isEmpty(policy.sourceClusterResource)))
+      .take(1);
+    const clusterPoliciesCompleteSubscription = Observable.combineLatest(
+      this.completedRequest$(this.store.select(getProgressState(CLUSTERS_REQUEST))),
+      this.completedRequest$(this.store.select(getProgressState(POLICIES_REQUEST))),
+      fullFilledPolicies$
+    ).subscribe(([_, _1, policies]) => {
+      this.store.dispatch(loadLastJobs({policies, numJobs: 10}, {requestId: JOBS_REQUEST}));
+    });
     this.tableData$ = Observable
       .combineLatest(this.tableResources$, this.overviewJobsExternalFiltersService.filters$)
       .map(([policies, filters]) => policies
@@ -142,15 +210,41 @@ export class OverviewComponent implements OnInit, OnDestroy {
         .filter(policy => this.filterPolicyByJob(policy, filters))
         .map(policy => this.mapTableData(policy)));
 
-    [
-      loadPolicies(POLICIES_REQUEST),
-      loadClusters(CLUSTERS_REQUEST)
-    ].map(action => this.store.dispatch(action));
-    this.subscriptions.push(clusterSubscribtion);
-    this.initPolling();
+    this.subscriptions.push(overallProgressSubscription);
+    this.subscriptions.push(clustersRequestSubscription);
+    this.subscriptions.push(clusterPoliciesCompleteSubscription);
   }
+
 
   ngOnDestroy() {
     this.subscriptions.forEach(s => s.unsubscribe());
+  }
+
+  handleOnSelectPanelCell(e) {
+    switch (e.panel) {
+      case SUMMARY_PANELS.CLUSTER:
+        this.showClusterSummaryDialog(e.cell);
+        break;
+      case SUMMARY_PANELS.POLICIES:
+        this.showPoliciesSummaryDialog(e.cell);
+        break;
+      case SUMMARY_PANELS.JOBS:
+        this.applyJobFilter(e.cell);
+        break;
+      default:
+        break;
+    }
+  }
+
+  hideSummaryModals() {
+    this.isUnhealthyClustersModalVisible = false;
+    this.isWarningClustersModalVisible = false;
+    this.isUnhealthyPoliciesModalVisible = false;
+  }
+
+  handleOnShowJobLog(job) {
+    if (job.status !== JOB_STATUS.RUNNING) {
+      this.logService.showLog(EntityType.policyinstance, job.id);
+    }
   }
 }

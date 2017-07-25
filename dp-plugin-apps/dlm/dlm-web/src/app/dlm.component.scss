@@ -17,13 +17,13 @@ html, body {
 
 header {
   background-color: #fff;
-  height: 55px;
+  height: 60px;
   .navbar-nav {
     margin-top: 12px;
-    color: #999999;
+    color: #666;
     line-height: 40px;
     .fa, .glyphicon {
-      font-size: 20px;
+      font-size: 16px;
     }
   }
   .navbar-right {
@@ -40,7 +40,7 @@ header {
 #dlm_content {
   // overwrites container-fluid defaults 15px
   // required by design
-  padding: 0 20px;
+  padding: 0 30px;
 }
 
 .page-section {

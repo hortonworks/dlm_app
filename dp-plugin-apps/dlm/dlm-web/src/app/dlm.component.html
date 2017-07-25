@@ -1,5 +1,5 @@
 <div class="dlm-content container-fluid" id="dlm_content">
-  <navbar [menuItems]="menuItems" [header]="header" [mainContentSelector]="mainContentSelector" [fitHeight]="fitHeight"></navbar>
+  <navbar [menuItems]="menuItems" [header]="header" [personas]="headerData.personas" [mainContentSelector]="mainContentSelector" [fitHeight]="fitHeight"></navbar>
   <header class="row">
     <div class="navbar-header navbar-nav">
       <breadcrumb></breadcrumb>
@@ -9,9 +9,6 @@
     </div>
     <div class="notifications navbar-nav navbar-right">
       <dlm-notifications [events]="events$ | async" [newEventsCount]="newEventsCount$ | async"></dlm-notifications>
-    </div>
-    <div class="navbar-nav navbar-right" [class.hidden]="!onOverviewPage">
-      <dlm-overview-filter></dlm-overview-filter>
     </div>
   </header>
   <router-outlet></router-outlet>

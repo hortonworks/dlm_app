@@ -12,8 +12,9 @@ KNOX_CONTAINER="knox"
 CONSUL_CONTAINER="dp-consul-server"
 
 init_network() {
-    NETWORK_ID=$(docker network ls --quiet --filter "name=dp")
-    if [ -z ${NETWORK_ID} ]; then
+    IS_NETWORK_PRESENT="false"
+    docker network inspect --format "{{title .ID}}" dp >> install.log 2>&1 && IS_NETWORK_PRESENT="true"
+    if [ $IS_NETWORK_PRESENT == "false" ]; then
         echo "Network dp not found. Creating new network with name dp."
         docker network create dp
     # This is not a clean solution and will be fixed later

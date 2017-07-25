@@ -16,7 +16,6 @@ export interface Cluster {
   id: number;
   name: string;
   dataCenter: string;
-  originDataCenter: string;
   ambariurl: string;
   description: string;
   location: Location;
@@ -24,11 +23,5 @@ export interface Cluster {
   stats?: ClusterStats;
   healthStatus?: string;
   status: ServiceStatus[];
-  /*
-    The following properties need to be removed eventually
-    since the API response doesn't align with these properties
-   */
-  type: string;
-  createdAt: number;
-  nodesCount: number;
+  totalHosts;
 }

@@ -24,3 +24,23 @@ $modal-padding: 20px;
 $row-padding: 15px; // padding size used by bootstrap for .row
 
 $body-background: #f8f8f8;
+
+$header-height: 55px;
+$oxford-blue: #333F54;
+$logo-background: $oxford-blue;
+$side-nav-width: 200px;
+$side-nav-minimised-width: 50px;
+$eastern-blue : #2192bf;
+$tuna: #323544;
+$pickled-bluewood: #303D54;
+$forest-green-1: #3FAE2A;
+$fruit-salad: #4AAB52;
+$submarine: #B8BEC4;
+$bright-gray: #404351;
+
+.borderBox, .borderBox * {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+

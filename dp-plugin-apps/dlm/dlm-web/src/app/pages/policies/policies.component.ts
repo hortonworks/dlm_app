@@ -123,7 +123,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
       .filter(policies => !!policies.length)
       .subscribe(policies => {
         this.postLoadPolicyIds = policies.map(policy => policy.id);
-        this.store.dispatch(loadLastJobs(policies));
+        this.store.dispatch(loadLastJobs({policies}));
       });
     this.subscriptions.push(clusterSubscription);
     this.subscriptions.push(lastJobsWorkaroundSubscription);

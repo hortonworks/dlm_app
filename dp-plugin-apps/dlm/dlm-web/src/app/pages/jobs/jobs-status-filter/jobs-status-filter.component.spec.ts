@@ -2,8 +2,8 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { JobsStatusFilterComponent } from './jobs-status-filter.component';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { MockTranslateLoader } from '../../../mocks/mock-translate-loader';
-import { JobStatusComponent } from '../job-status/job-status.component';
 import { TooltipModule } from 'ng2-bootstrap';
+import { CommonComponentsModule } from 'components/common-components.module';
 
 describe('TableFilterComponent', () => {
   let component: JobsStatusFilterComponent;
@@ -13,8 +13,8 @@ describe('TableFilterComponent', () => {
     TestBed.configureTestingModule({
       imports: [TooltipModule.forRoot(), TranslateModule.forRoot({
         loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
-      })],
-      declarations: [JobsStatusFilterComponent, JobStatusComponent]
+      }), CommonComponentsModule],
+      declarations: [JobsStatusFilterComponent]
     })
       .compileComponents();
   }));
