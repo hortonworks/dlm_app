@@ -56,7 +56,7 @@ export class UserService {
 
   private hasRole(userRole) {
     const roles = this.user.roles;
-    return roles.find(role => role === userRole);
+    return roles && roles.find(role => role === userRole);
   }
 
   getPersonaDetails() {
