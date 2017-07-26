@@ -13,7 +13,7 @@ import { Event } from 'models/event.model';
     </div>
     <div class="row" *ngIf="events.length">
       <div class="pull-right view-all">
-        <small class="text-primary actionable" (click)="showAll()" *ngIf="!isAllVisible">
+        <small qe-attr="go-to-notifications" class="text-primary actionable" (click)="showAll()" *ngIf="!isAllVisible">
           <strong>{{'page.overview.issues.list.view_all' | translate}}</strong>
         </small>
       </div>

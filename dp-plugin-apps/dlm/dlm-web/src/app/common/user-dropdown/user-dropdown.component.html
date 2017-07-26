@@ -1,5 +1,5 @@
 <div class="notifications-group pull-right">
-  <div class="alerts-label dropdown-toggle" data-toggle="dropdown">
+  <div class="alerts-label dropdown-toggle" data-toggle="dropdown" qe-attr="user-dropdown-toggler">
     <span class="glyphicon glyphicon-user"></span>
   </div>
   <div id="notifications-dropdown" class="user-settings-dropdown dropdown-menu row">
@@ -14,6 +14,7 @@
           <td>
             {{"topnav.timezone" | translate}}:
             <ng-select
+              qe-attr="select-user-timezone"
               [active]="timezoneValue"
               [items]="timeZoneOptions"
               (selected)="onTimezoneSelect($event)"></ng-select>

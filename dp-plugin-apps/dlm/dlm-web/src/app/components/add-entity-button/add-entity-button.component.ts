@@ -11,6 +11,7 @@ import { mapToList } from 'utils/store-util';
   styleUrls: ['./add-entity-button.component.scss'],
   template: `
     <dlm-dropdown
+      qe-attr="add-entity"
       [items]="addOptions"
       [text]="'common.add' | translate"
       [buttonClass]="buttonClass"

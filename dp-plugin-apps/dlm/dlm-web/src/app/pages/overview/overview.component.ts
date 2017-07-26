@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as moment from 'moment';
 
 import * as fromRoot from 'reducers/';
@@ -26,7 +27,7 @@ import { filterCollection, flatten, unique } from 'utils/array-util';
 import { isEqual, isEmpty } from 'utils/object-utils';
 import { POLL_INTERVAL } from 'constants/api.constant';
 import { getClustersHealth, getPoliciesHealth, getJobsHealth } from 'selectors/aggregation.selector';
-import { SUMMARY_PANELS, CLUSTERS_HEALTH_STATE } from './resource-summary/';
+import { SUMMARY_PANELS, CLUSTERS_HEALTH_STATE, JOBS_HEALTH_STATE } from './resource-summary/';
 import { CLUSTER_STATUS, SERVICE_STATUS } from 'constants/status.constant';
 import { MapSizeSettings, ClusterMapData, ClusterMapPoint } from 'models/map-data';
 import { LogService } from 'services/log.service';
@@ -35,6 +36,7 @@ import { PairsCountEntity } from 'models/pairs-count-entity.model';
 import { getCountPairsForClusters } from 'selectors/pairing.selector';
 import { loadPairings } from 'actions/pairing.action';
 import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
+import { TranslateService } from '@ngx-translate/core';
 
 const POLICIES_REQUEST = 'POLICIES_REQUEST';
 const CLUSTERS_REQUEST = 'CLUSTERS_REQUEST';
@@ -85,9 +87,12 @@ export class OverviewComponent implements OnInit, OnDestroy {
   unhealthyPolicies$: Observable<Policy[]>;
   clustersMapData$: Observable<ClusterMapData[]>;
 
+  jobStatusFilter$ = new BehaviorSubject('');
+
   constructor(private store: Store<fromRoot.State>,
               private overviewJobsExternalFiltersService: OverviewJobsExternalFiltersService,
-              private logService: LogService) {
+              private logService: LogService,
+              private t: TranslateService) {
     this.events$ = store.select(getDisplayedEvents);
     this.jobs$ = store.select(getAllJobs);
     this.policies$ = store.select(getAllPoliciesWithClusters);
@@ -171,7 +176,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   }
 
   private applyJobFilter(healthStatus) {
-    // todo: apply filter logic
+    this.jobStatusFilter$.next(healthStatus);
   }
 
   private completedRequest$(progress$) {
@@ -180,6 +185,19 @@ export class OverviewComponent implements OnInit, OnDestroy {
       .map(p => p.isInProgress)
       .distinctUntilChanged()
       .filter(isInProgress => !isInProgress);
+  }
+
+  private matchJobStatus(policy: Policy, jobStatusFilter) {
+    switch (jobStatusFilter) {
+      case JOBS_HEALTH_STATE.IN_PROGRESS:
+        return policy.lastJobResource.status === JOB_STATUS.RUNNING;
+      case JOBS_HEALTH_STATE.LAST_FAILED:
+        return policy.lastJobResource.status === JOB_STATUS.FAILED;
+      case JOBS_HEALTH_STATE.LAST_10_FAILED:
+        return policy.lastTenJobs.some(job => job.status === JOB_STATUS.FAILED);
+      default:
+        return true;
+    }
   }
 
   ngOnInit() {
@@ -204,11 +222,11 @@ export class OverviewComponent implements OnInit, OnDestroy {
       this.store.dispatch(loadLastJobs({policies, numJobs: 10}, {requestId: JOBS_REQUEST}));
     });
     this.tableData$ = Observable
-      .combineLatest(this.tableResources$, this.overviewJobsExternalFiltersService.filters$)
-      .map(([policies, filters]) => policies
-        .filter(policy => policy.jobsResource.some(job => job.status !== JOB_STATUS.SUCCESS))
-        .filter(policy => this.filterPolicyByJob(policy, filters))
-        .map(policy => this.mapTableData(policy)));
+      .combineLatest(this.tableResources$, this.jobStatusFilter$)
+      .map(([policies, jobStatusFilter]) => policies
+      .filter(policy => policy.jobsResource.some(job => job.status !== JOB_STATUS.SUCCESS) &&
+        this.matchJobStatus(policy, jobStatusFilter))
+      .map(policy => this.mapTableData(policy)));
 
     this.subscriptions.push(overallProgressSubscription);
     this.subscriptions.push(clustersRequestSubscription);
@@ -246,5 +264,17 @@ export class OverviewComponent implements OnInit, OnDestroy {
     if (job.status !== JOB_STATUS.RUNNING) {
       this.logService.showLog(EntityType.policyinstance, job.id);
     }
+  }
+
+  formatStatusFilter(jobStatusFilter) {
+    return {
+      [JOBS_HEALTH_STATE.IN_PROGRESS]: this.t.instant('page.overview.summary_panels.status.in_progress'),
+      [JOBS_HEALTH_STATE.LAST_FAILED]: this.t.instant('page.overview.summary_panels.status.failed_last'),
+      [JOBS_HEALTH_STATE.LAST_10_FAILED]: this.t.instant('page.overview.summary_panels.status.failed_last_10')
+    }[jobStatusFilter];
+  }
+
+  removeJobStatusFilter() {
+    this.applyJobFilter('');
   }
 }
