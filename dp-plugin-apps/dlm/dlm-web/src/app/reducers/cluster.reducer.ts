@@ -12,7 +12,7 @@ export const initialState: State = {
 
 export function reducer(state = initialState, action: fromCluster.Actions): State {
   switch (action.type) {
-    case fromCluster.ActionTypes.LOAD_CLUSTER_SUCCESS: {
+    case fromCluster.ActionTypes.LOAD_CLUSTER.SUCCESS: {
       const cluster = action.payload;
       return {
         entities: {
