@@ -48,6 +48,8 @@ object WebService {
     }
 
     protected def urlPrefix(beaconEndpoint: String) : String = beaconEndpoint + "/api/beacon"
+    protected val user = "admin"
+    protected val password = "admin"
     
     protected def httpHeaders : Map[String,String] = Map (
       CONTENT_TYPE -> TEXT,

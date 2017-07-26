@@ -1,7 +1,7 @@
 package com.hortonworks.dlm.beacon
 
 import com.hortonworks.dlm.beacon.Exception.JsonException
-import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
+import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest, WSResponse}
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import com.hortonworks.dlm.beacon.WebService.BeaconClusterService
 import com.hortonworks.dlm.beacon.domain.RequestEntities._
@@ -54,7 +54,7 @@ class BeaconClusterServiceImpl()(implicit ws: WSClient) extends BeaconClusterSer
 
 
   override def listCluster(beaconEndpoint : String, clusterName: String): Future[Either[BeaconApiErrors, BeaconEntityResponse]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/getEntity/$clusterName")
+    ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/getEntity/$clusterName").withAuth(user, password, WSAuthScheme.BASIC)
       .get.map(mapToBeaconEntityResponse).recoverWith {
       case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }

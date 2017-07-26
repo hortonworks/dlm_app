@@ -4,7 +4,7 @@ import com.hortonworks.dlm.beacon.WebService.BeaconLogService
 import play.api.http.Status.{BAD_GATEWAY, SERVICE_UNAVAILABLE}
 import play.api.libs.json.{JsError, JsSuccess}
 import play.api.libs.ws.ahc.AhcWSResponse
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -28,7 +28,7 @@ class BeaconLogServiceImpl()(implicit ws: WSClient) extends BeaconLogService {
   }
 
   override def listLog(beaconEndpoint : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, BeaconLogResponse]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/logs").withQueryString(queryString.toList: _*)
+    ws.url(s"${urlPrefix(beaconEndpoint)}/logs").withAuth(user, password, WSAuthScheme.BASIC).withQueryString(queryString.toList: _*)
       .get.map(mapToBeaconLogsResponse).recoverWith {
       case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
