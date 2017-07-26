@@ -3,6 +3,7 @@ package com.hortonworks.dlm.beacon
 import com.hortonworks.dlm.beacon.Exception.JsonException
 import com.hortonworks.dlm.beacon.WebService.BeaconEventService
 import play.api.http.Status._
+import play.api.libs.ws.WSAuthScheme
 import play.api.libs.json.{JsError, JsSuccess}
 import play.api.libs.ws.ahc.AhcWSResponse
 import play.api.libs.ws.{WSClient, WSResponse}
@@ -31,7 +32,7 @@ class BeaconEventServiceImpl()(implicit ws: WSClient) extends BeaconEventService
 
 
   override def listEvents(beaconEndpoint : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, Seq[BeaconEventResponse]]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/events/all").withQueryString(queryString.toList: _*)
+    ws.url(s"${urlPrefix(beaconEndpoint)}/events/all").withAuth(user, password, WSAuthScheme.BASIC).withQueryString(queryString.toList: _*)
       .get.map(mapToBeaconEventsResponse).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
