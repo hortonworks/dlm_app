@@ -13,7 +13,11 @@
     </div>
     <br>
     <h6>{{"common.description" | translate}}</h6>
-    <p>{{policy?.description}}</p>
+    <p *ngIf="policy?.description; else noDescription">{{policy?.description}}</p>
+    <ng-template #noDescription>
+      <span class="no-description">No description</span>
+    </ng-template>
+    <p *ngIf="policy?.frequency" class="policy-details">Running {{policy?.frequency | frequency}} <span *ngIf="policy?.startTime">from {{policy?.startTime | date}}</span> <span *ngIf="policy?.endTime">to {{policy?.endTime | date}}</span></p>
   </div>
   <div class="col-lg-10 col-md-9">
     <dp-jobs-table
