@@ -32,7 +32,9 @@ class BeaconEventServiceImpl()(implicit ws: WSClient) extends BeaconEventService
 
 
   override def listEvents(beaconEndpoint : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, Seq[BeaconEventResponse]]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/events/all").withAuth(user, password, WSAuthScheme.BASIC).withQueryString(queryString.toList: _*)
+    ws.url(s"${urlPrefix(beaconEndpoint)}/events/all")
+      .withAuth(user, password, WSAuthScheme.BASIC)
+      .withQueryString(queryString.toList: _*)
       .get.map(mapToBeaconEventsResponse).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }

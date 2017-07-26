@@ -54,7 +54,8 @@ class BeaconClusterServiceImpl()(implicit ws: WSClient) extends BeaconClusterSer
 
 
   override def listCluster(beaconEndpoint : String, clusterName: String): Future[Either[BeaconApiErrors, BeaconEntityResponse]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/getEntity/$clusterName").withAuth(user, password, WSAuthScheme.BASIC)
+    ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/getEntity/$clusterName")
+      .withAuth(user, password, WSAuthScheme.BASIC)
       .get.map(mapToBeaconEntityResponse).recoverWith {
       case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
@@ -62,6 +63,7 @@ class BeaconClusterServiceImpl()(implicit ws: WSClient) extends BeaconClusterSer
 
   override def listClusterStatus(beaconEndpoint : String, clusterName: String): Future[Either[BeaconApiErrors, BeaconClusterStatusResponse]] = {
     ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/status/$clusterName")
+      .withAuth(user, password, WSAuthScheme.BASIC)
       .get.map(mapToBeaconClusterStatusResponse).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
@@ -72,6 +74,7 @@ class BeaconClusterServiceImpl()(implicit ws: WSClient) extends BeaconClusterSer
   Future[Either[BeaconApiErrors, PostActionResponse]] = {
     val requestData:String =  mapToClusterDefinitionRequest(clusterDefinitionRequest)
     ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/submit/$clusterName")
+      .withAuth(user, password, WSAuthScheme.BASIC)
       .withHeaders(httpHeaders.toList: _*)
       .post(requestData)
       .map(mapToPostActionResponse).recoverWith {

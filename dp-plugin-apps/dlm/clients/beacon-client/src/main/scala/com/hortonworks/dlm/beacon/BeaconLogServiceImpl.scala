@@ -28,7 +28,9 @@ class BeaconLogServiceImpl()(implicit ws: WSClient) extends BeaconLogService {
   }
 
   override def listLog(beaconEndpoint : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, BeaconLogResponse]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/logs").withAuth(user, password, WSAuthScheme.BASIC).withQueryString(queryString.toList: _*)
+    ws.url(s"${urlPrefix(beaconEndpoint)}/logs")
+      .withAuth(user, password, WSAuthScheme.BASIC)
+      .withQueryString(queryString.toList: _*)
       .get.map(mapToBeaconLogsResponse).recoverWith {
       case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
