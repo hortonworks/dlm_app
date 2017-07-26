@@ -25,6 +25,7 @@ import { getProgressState } from 'selectors/progress.selector';
 import { POLICY_FORM_ID } from 'pages/policies/components/policy-form/policy-form.component';
 import { getCluster } from 'selectors/cluster.selector';
 import { TimeZoneService } from 'services/time-zone.service';
+import { PolicyService } from 'services/policy.service';
 
 const CREATE_POLICY_REQUEST = 'CREATE_POLICY';
 
@@ -109,8 +110,8 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
       name: values.general.name,
       type: values.general.type,
       description: values.general.description,
-      sourceCluster: this.sourceCluster.dataCenter + '$' + this.sourceCluster.name,
-      targetCluster: this.targetCluster.dataCenter + '$' + this.targetCluster.name,
+      sourceCluster: PolicyService.makeClusterId(this.sourceCluster.dataCenter, this.sourceCluster.name),
+      targetCluster: PolicyService.makeClusterId(this.targetCluster.dataCenter, this.targetCluster.name),
       frequencyInSec: values.job.frequencyInSec,
       startTime: this.formatDateValue(values.job.startTime),
       endTime: this.formatDateValue(values.job.endTime),
