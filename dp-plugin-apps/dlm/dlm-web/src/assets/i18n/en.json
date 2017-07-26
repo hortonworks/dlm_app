@@ -94,7 +94,7 @@
   "sidenav": {
     "menuItem": {
       "overview": "Overview",
-      "clusters": "My Clusters",
+      "clusters": "Clusters",
       "policies": "Policies",
       "pairings": "Pairings",
       "jobs": "Jobs",
