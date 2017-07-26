@@ -9,6 +9,14 @@ import { JobService } from 'services/job.service';
 @Injectable()
 export class PolicyService {
 
+  static makeClusterId(datacenter, clusterName): string {
+    return datacenter + '$' + clusterName;
+  }
+
+  static getClusterName(policyClusterId): string {
+    return policyClusterId.split('$')[1];
+  }
+
   normalizePolicy(policy): Policy {
     policy.id = policy.policyId;
     return policy;

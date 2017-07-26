@@ -8,6 +8,7 @@ import { getAllClusters } from './cluster.selector';
 import { getAllJobs } from './job.selector';
 import { sortByDateField } from 'utils/array-util';
 import { JOB_STATUS, CLUSTER_STATUS } from 'constants/status.constant';
+import { PolicyService } from 'services/policy.service';
 
 export const getEntities = createSelector(getPolicies, state => state.entities);
 
@@ -17,8 +18,8 @@ export const getAllPoliciesWithClusters = createSelector(getAllPolicies, getAllC
   return policies.map(policy => {
     return {
       ...policy,
-      targetClusterResource: clusters.find(cluster => cluster.name === policy.targetCluster) || {},
-      sourceClusterResource: clusters.find(cluster => cluster.name === policy.sourceCluster) || {}
+      targetClusterResource: clusters.find(cluster => cluster.name === PolicyService.getClusterName(policy.targetCluster)) || {},
+      sourceClusterResource: clusters.find(cluster => cluster.name === PolicyService.getClusterName(policy.sourceCluster)) || {}
     };
   });
 });
