@@ -23,6 +23,11 @@ export const routes: Routes = [{
   component: UserManagementComponent,
   children: [
     {
+      path: '',
+      pathMatch: 'full',
+      redirectTo: 'users'
+    },
+    {
       path: 'users',
       component: UsersComponent,
       children: [

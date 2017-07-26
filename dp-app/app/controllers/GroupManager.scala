@@ -42,8 +42,8 @@ class GroupManager @Inject()(@Named("groupService") val groupService: GroupServi
       }.getOrElse(Future.successful(BadRequest))
   }
 
-  def getGroupsByName() = Action.async { request =>
-    groupService.getGroupByName(request.getQueryString("name").get).map {
+  def getGroupsByName(name: String) = Action.async { request =>
+    groupService.getGroupByName(name).map {
       case Left(errors) => handleErrors(errors)
       case Right(group) => Ok(Json.toJson(group))
     }
