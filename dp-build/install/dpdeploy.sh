@@ -229,7 +229,7 @@ print_version() {
     if [ -f VERSION ]; then
         cat VERSION
     else
-        cat ${DEFAULT_VERSION}:${DEFAULT_TAG}
+        echo ${DEFAULT_VERSION}-${DEFAULT_TAG}
     fi
 }
 
