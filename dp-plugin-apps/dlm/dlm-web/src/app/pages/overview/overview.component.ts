@@ -294,9 +294,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.isUnhealthyPoliciesModalVisible = false;
   }
 
-  handleOnShowJobLog(job) {
-    if (job.status !== JOB_STATUS.RUNNING) {
-      this.logService.showLog(EntityType.policyinstance, job.id);
+  handleOnShowPolicyLog(policy) {
+    if (policy.lastJobResource.status !== JOB_STATUS.RUNNING) {
+      this.logService.showLog(EntityType.policyinstance, policy.lastJobResource.id);
     }
   }
 
