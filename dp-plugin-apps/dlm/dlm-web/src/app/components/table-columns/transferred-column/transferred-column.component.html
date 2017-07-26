@@ -1,10 +1,11 @@
 <div>
   <span *ngIf="!isFailed() && !isInProgress()" [innerHTML]="trackingInfo?.bytesCopied | bytesSize"></span>
-  <progressbar
-    *ngIf="isInProgress()"
-    [value]="trackingInfo?.completedMapTasks"
-    [max]="trackingInfo?.totalMapTasks">
-    {{progress}} %
-  </progressbar>
+  <div class="progressbar-container" *ngIf="isInProgress()">
+    <progressbar
+      [value]="trackingInfo?.completedMapTasks"
+      [max]="trackingInfo?.totalMapTasks">
+    </progressbar>
+    <span class="progress-value text-info">{{progress}} %</span>
+  </div>
   <i *ngIf="isFailed()" class="fa fa-minus"></i>
 </div>

@@ -1,0 +1,19 @@
+:host /deep/  {
+  .progress {
+    height: 12px !important;
+  }
+
+  .progressbar-container {
+    display: flex;
+  }
+
+  progressbar {
+    flex-grow: 1;
+    margin-top: 2px;
+  }
+
+  .progress-value {
+    padding-left: 8px;
+    margin-top: -1px;
+  }
+}

@@ -4,6 +4,6 @@ export interface JobTrackingInfo {
   completedMapTasks: number;
   numMapTasks: number;
   bytesCopied: number;
-  filesCopies: number;
+  filesCopied: number;
   timeTaken: number;
 }

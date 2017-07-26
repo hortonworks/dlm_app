@@ -35,7 +35,7 @@ export class PersonaPopupComponent implements OnInit {
       return;
     }
 
-    const clickedInside = this.personaNav.nativeElement.contains(targetElement);
+    const clickedInside = !!this.personaNav && this.personaNav.nativeElement.contains(targetElement);
     if (!clickedInside) {
       this.showPopup = false;
     }

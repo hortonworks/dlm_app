@@ -1,0 +1,15 @@
+:host /deep/ {
+  .last-ten-jobs-list {
+    display: flex;
+    height: 18px;
+
+    dlm-job-status {
+      display: flex;
+    }
+
+    .fa-circle {
+      font-size: 8px;
+      margin: 0 1px;
+    }
+  }
+}

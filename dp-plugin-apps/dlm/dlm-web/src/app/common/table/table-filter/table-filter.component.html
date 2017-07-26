@@ -1,5 +1,5 @@
-<div class="pull-left applied-filters-wrapper">
-  <span class="label label-default filter-item"
+<div class="pull-left applied-filters-wrapper" qe-attr="applied-filters">
+  <span class="label label-default filter-item" qe-attr="applied-filter"
         *ngFor="let filter of appliedFiltersMapped"><strong>{{filter.key}}</strong>: {{filter.value}} <a
     href="javascript:void(0);" (click)="removeFilter(filter)">&times;</a></span>
 </div>
@@ -7,6 +7,7 @@
   <div class="form-group has-feedback">
     <span class="glyphicon glyphicon-filter form-control-feedback"></span>
     <input
+      qe-attr="table-filter-input"
       [(ngModel)]="filter"
       [typeahead]="typeaheadOptions"
       typeaheadOptionField="value"

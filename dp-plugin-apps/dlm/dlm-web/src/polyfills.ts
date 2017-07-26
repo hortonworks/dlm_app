@@ -47,3 +47,4 @@ import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/repeat';
 import 'rxjs/add/operator/skip';
+import 'rxjs/add/operator/take';

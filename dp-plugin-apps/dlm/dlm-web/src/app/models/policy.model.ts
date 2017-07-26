@@ -23,6 +23,7 @@ export interface Policy {
   // UI specific props
   lastJobResource?: Job;
   jobsResource?: Job[];
+  lastTenJobs?: Job[];
   policyStatus: RequestStatus;
   sourceClusterResource?: Cluster;
   targetClusterResource?: Cluster;

@@ -28,6 +28,7 @@ import { PolicyActionsComponent } from './policy-actions/policy-actions.componen
 import { HiveBrowserComponent, HiveDatabaseComponent } from './hive-browser/';
 import { DurationColumnComponent } from './table-columns/duration-column/duration-column.component';
 import { TransferredColumnComponent } from './table-columns/transferred-column/transferred-column.component';
+import { JobStatusComponent } from './job-status/job-status.component';
 
 @NgModule({
   imports: [
@@ -67,7 +68,8 @@ import { TransferredColumnComponent } from './table-columns/transferred-column/t
     HiveDatabaseComponent,
     PolicyActionsComponent,
     DurationColumnComponent,
-    TransferredColumnComponent
+    TransferredColumnComponent,
+    JobStatusComponent
   ],
   exports: [
     CardComponent,
@@ -93,7 +95,8 @@ import { TransferredColumnComponent } from './table-columns/transferred-column/t
     HiveDatabaseComponent,
     PolicyActionsComponent,
     DurationColumnComponent,
-    TransferredColumnComponent
+    TransferredColumnComponent,
+    JobStatusComponent
   ]
 })
 export class CommonComponentsModule {}

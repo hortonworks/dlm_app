@@ -7,7 +7,9 @@ import { TableColumn } from 'common/table/table-column.type';
   template: `
     <ng-template #policyInfoCell let-row="row">
       <div class="policy-info">
-        <p class="policy-name text-primary actionable" (click)="onNameClick(row)">{{row.name}} <span class="caret"></span></p>
+        <p class="policy-name text-primary actionable" qe-attr="policy-info" (click)="onNameClick(row)">
+          {{row.name}} <span class="caret"></span>
+        </p>
         <p *ngIf="row.startTime" class="text-muted">{{row.startTime | date}}</p>
       </div>
     </ng-template>

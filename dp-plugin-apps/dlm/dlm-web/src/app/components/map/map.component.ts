@@ -103,6 +103,7 @@ export class MapComponent implements OnChanges, OnInit {
       this.countries = countries;
       this.drawMap(countries);
       this.plotPoints();
+      this.map.fitBounds(L.featureGroup(this.markerLookup).getBounds());
     });
   }
 
@@ -125,7 +126,6 @@ export class MapComponent implements OnChanges, OnInit {
     baseLayer.addTo(map);
     map.fitBounds(baseLayer.getBounds());
     this.map = map;
-    this.map.setZoom(mapDimensions.zoom);
     this.mapcontainer.nativeElement.querySelector('.leaflet-map-pane').style.height = `${ parseInt(mapDimensions.height, 10) - 20}px`;
   }
 
@@ -135,10 +135,10 @@ export class MapComponent implements OnChanges, OnInit {
       const end = data.end;
       if (start) {
         this.plotPoint(start);
-      }
-      if (start && end) {
-        this.plotPoint(end);
-        this.drawConnection(start, end);
+        if (end) {
+          this.plotPoint(end);
+          this.drawConnection(start, end);
+        }
       }
     });
   }
@@ -157,6 +157,21 @@ export class MapComponent implements OnChanges, OnInit {
   }
 
   createMarker(latLng: LatLng, clusterInfo) {
+    const smallMarker = L.circleMarker(latLng, {
+      radius: 5,
+      color: this.markerColorInnerBorder,
+      weight: 2,
+      fillColor: clusterInfo.healthStatus === CLUSTER_STATUS.HEALTHY ? this.statusColorUp : this.statusColorDown,
+      fillOpacity: 0.8
+    });
+    const existingSmallMarker = getExistingMarker(this.smallMarkerLookup, latLng);
+    if (existingSmallMarker) {
+      this.map.removeLayer(existingSmallMarker);
+      this.smallMarkerLookup = without(this.smallMarkerLookup, existingSmallMarker);
+    }
+    this.smallMarkerLookup.push(smallMarker);
+    this.map.addLayer(smallMarker);
+
     const marker = L.circleMarker(latLng, {
       radius: 14,
       color: this.markerColorOuterBorder,
@@ -173,21 +188,6 @@ export class MapComponent implements OnChanges, OnInit {
     const mapPopup = marker.bindPopup(formatMapPopup(clusterInfo));
     mapPopup.on('mouseover', _ => marker.openPopup());
     mapPopup.on('mouseout', _ => marker.closePopup());
-
-    const smallMarker = L.circleMarker(latLng, {
-      radius: 5,
-      color: this.markerColorInnerBorder,
-      weight: 2,
-      fillColor: clusterInfo.healthStatus === CLUSTER_STATUS.HEALTHY ? this.statusColorUp : this.statusColorDown,
-      fillOpacity: 0.8
-    });
-    const existingSmallMarker = getExistingMarker(this.smallMarkerLookup, latLng);
-    if (existingSmallMarker) {
-      this.map.removeLayer(existingSmallMarker);
-      this.smallMarkerLookup = without(this.smallMarkerLookup, existingSmallMarker);
-    }
-    this.smallMarkerLookup.push(smallMarker);
-    this.map.addLayer(smallMarker);
   }
 
   pathExists(curve) {

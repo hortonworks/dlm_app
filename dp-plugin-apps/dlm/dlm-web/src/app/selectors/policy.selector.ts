@@ -30,11 +30,13 @@ export const getPolicyClusterJob = createSelector(getAllPoliciesWithClusters, ge
     const jobsResource = sortByDateField(policyJobs, 'startTime');
     const lastJobResource = jobsResource.length ? jobsResource[0] : null;
     const lastGoodJobResource = jobsResource.length ? jobsResource.find(j => j.status === 'SUCCESS') : null;
+    const lastTenJobs = jobsResource.length ? policyJobs.slice(0, 10) : [];
     return {
       ...policy,
       jobsResource,
       lastJobResource,
-      lastGoodJobResource
+      lastGoodJobResource,
+      lastTenJobs
     };
   });
 });

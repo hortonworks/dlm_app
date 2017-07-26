@@ -22,14 +22,14 @@
     <div class="form-container">
       <form class="basic-form" [formGroup]="createPairingForm" (ngSubmit)="handleSubmit(createPairingForm)">
         <div class="content-row">
-          <div class="col-md-3 col">
+          <div class="col-md-3 col" qe-attr="first-cluster">
             <dlm-create-pairing-card-list [clusters]="firstSetClusters$ | async" formControlName="firstCluster" [selectedCluster]="selectedFirstCluster" [isFrozen]="isPairingProgress" (change)="onFirstClusterChange($event)"></dlm-create-pairing-card-list>
           </div>
-          <div class="col-md-3 col">
+          <div class="col-md-3 col" qe-attr="second-cluster">
             <dlm-create-pairing-card-list *ngIf="selectedFirstCluster !== null" [clusters]="secondSetClusters" formControlName="secondCluster" [isFrozen]="isPairingProgress" [selectedCluster]="selectedSecondCluster" (change)="selectSecondCluster($event)"></dlm-create-pairing-card-list>
           </div>
           <div class="col-md-2 col pairing-icon-col">
-            <button type="submit" [ngClass]="{'clear': true, 'disabled': isPairingProgress}" [disabled]="isPairingProgress" *ngIf="selectedSecondCluster !== null">
+            <button qe-attr="create-pair" type="submit" [ngClass]="{'clear': true, 'disabled': isPairingProgress}" [disabled]="isPairingProgress" *ngIf="selectedSecondCluster !== null">
               <div class="hex-wrap">
                 <div class="hex-icon">
                   <i class="glyphicon glyphicon-resize-horizontal"></i>

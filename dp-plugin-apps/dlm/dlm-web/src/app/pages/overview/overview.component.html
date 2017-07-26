@@ -27,19 +27,39 @@
   </div>
   <div class="page-section">
     <div class="row">
-      <div class="col-md-3">
+      <div class="col-md-2">
         <h4>{{'page.overview.issues.updates' | translate}}</h4>
+      </div>
+      <div class="col-md-6">
+        <div *ngIf="jobStatusFilter$ | async" class="job-status-filter">
+          <span class="label label-default">
+            <span class="text-bold text-uppercase">{{'common.jobs' | translate}}:&nbsp;</span>
+            <span>{{formatStatusFilter(jobStatusFilter$ | async)}} </span>
+            <a href="javascript:void(0);" (click)="removeJobStatusFilter()">&times;</a>
+          </span>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="btn-group pull-right">
+          <button qe-attr="add-pairing" class="btn btn-xs btn-secondary" type="button" [disabled]="!addingPairsAvailable(clusters$ | async, pairsCount$ | async)" routerLink="/pairings/create">
+            <span class="text-uppercase">{{'common.pair' | translate}} +</span>
+          </button>
+          <button qe-attr="add-policy" class="btn btn-xs btn-secondary" type="button" [disabled]="!addingPoliciesAvailable(pairsCount$ | async)" routerLink="/policies/create">
+            <span class="text-uppercase">{{'common.policy' | translate}} +</span>
+          </button>
+        </div>
       </div>
     </div>
     <div class="row">
       <div class="col-md-12">
-        <dlm-jobs-overview-table [jobs]="tableData$ | async"></dlm-jobs-overview-table>
+        <dlm-jobs-overview-table [jobs]="tableData$ | async" (onShowJobLog)="handleOnShowJobLog($event)"></dlm-jobs-overview-table>
       </div>
     </div>
   </div>
 </dlm-progress-container>
 
 <dlm-modal-dialog
+  qe-attr="unhealthy-clusters-modal"
   #unhealthyClusters
   [title]="'page.overview.modals.unhealthy_cluster.title'"
   [showDialog]="isUnhealthyClustersModalVisible"
@@ -71,6 +91,7 @@
 
 <dlm-modal-dialog
   #lowCapacity
+  qe-attr="low-capacity-modal"
   [title]="'page.overview.modals.hdfs_capacity.title'"
   [showDialog]="isWarningClustersModalVisible"
   [showCancel]="false"
@@ -96,6 +117,7 @@
 
 <dlm-modal-dialog
   #unhealthyPolicy
+  qe-attr="unhealthy-policy-modal"
   [title]="'page.overview.modals.unhealthy_policy.title'"
   [showDialog]="isUnhealthyPoliciesModalVisible"
   [showCancel]="false"

@@ -95,7 +95,8 @@ describe('Policy Selectors', () => {
           sourceClusterResource: this.cluster2,
           jobsResource: [this.job1],
           lastJobResource: this.job1,
-          lastGoodJobResource: undefined
+          lastGoodJobResource: undefined,
+          lastTenJobs: [this.job1]
         },
         {
           ...this.policy2,
@@ -103,7 +104,8 @@ describe('Policy Selectors', () => {
           sourceClusterResource: this.cluster1,
           jobsResource: [this.job2],
           lastJobResource: this.job2,
-          lastGoodJobResource: undefined
+          lastGoodJobResource: undefined,
+          lastTenJobs: [this.job2]
         },
         {
           ...this.policy3,
@@ -111,7 +113,8 @@ describe('Policy Selectors', () => {
           sourceClusterResource: {},
           jobsResource: [],
           lastJobResource: null,
-          lastGoodJobResource: null
+          lastGoodJobResource: null,
+          lastTenJobs: []
         }
       ];
       expect(result).toEqual(expectedResult);

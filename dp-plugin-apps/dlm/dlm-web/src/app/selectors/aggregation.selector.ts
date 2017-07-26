@@ -46,7 +46,7 @@ export const getPoliciesHealth = createSelector(getAllPolicies, getAllClusters,
     }, []);
 
     policies.forEach(policy => {
-      if (unhealthyClusters.indexOf(policy.sourceCluster) < 0 || unhealthyClusters.indexOf(policy.targetCluster) < 0) {
+      if (unhealthyClusters.indexOf(policy.sourceCluster) > 0 || unhealthyClusters.indexOf(policy.targetCluster) > 0) {
         unhealthy++;
       } else if (policy.status === POLICY_STATUS.SUSPENDED) {
         suspended++;

@@ -15,7 +15,6 @@ import { SessionStorageService } from './services/session-storage.service';
 import { TimeZoneService } from './services/time-zone.service';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
-import * as moment from 'moment';
 import { POLL_INTERVAL } from 'constants/api.constant';
 import { HeaderData, Persona } from 'models/header-data';
 import { UserService } from 'services/user.service';
@@ -81,33 +80,40 @@ export class DlmComponent implements OnDestroy, OnInit {
     this.header = new MenuItem(
       t.instant('sidenav.menuItem.header'),
       './overview',
-      '<i class="fa fa-gg" aria-hidden="true"></i>'
+      '',
+      'header-icon'
     );
+    this.header.iconHtml = '<i class="fa fa-gg" aria-hidden="true"></i>';
     this.menuItems = [
       new MenuItem(
         t.instant('sidenav.menuItem.overview'),
         './overview',
-        '<span class="navigation-icon glyphicon glyphicon-home"></span>'
+        'navigation-icon glyphicon glyphicon-home',
+        'go-to-overview'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.clusters'),
         './clusters',
-        '<span class="navigation-icon glyphicon glyphicon-globe"></span>'
+        'navigation-icon glyphicon glyphicon-globe',
+        'go-to-clusters'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.pairings'),
         './pairings',
-        '<span class="navigation-icon glyphicon glyphicon-resize-horizontal"></span>'
+        'navigation-icon glyphicon glyphicon-resize-horizontal',
+        'go-to-pairings'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.policies'),
         './policies',
-        '<span class="navigation-icon glyphicon glyphicon-list-alt"></span>'
+        'navigation-icon glyphicon glyphicon-list-alt',
+        'go-to-policies'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.help'),
         './help',
-        '<span class="navigation-icon glyphicon glyphicon-info-sign"></span>'
+        'navigation-icon glyphicon glyphicon-info-sign',
+        'go-to-help'
       )
     ];
     this.events$ = store.select(getAllEvents);
@@ -159,12 +165,7 @@ export class DlmComponent implements OnDestroy, OnInit {
   }
 
   setHeaderData() {
-    this.headerData.personas = [
-      new Persona('Data Steward', [], '/dataset', 'steward-logo.png'),
-      new Persona('Infra Admin', [], '/infra', 'infra-logo.png'),
-      new Persona('Analytics', [], '/workspace', 'analytics-logo.png'),
-      new Persona('Data Lifecycle Manager', [], '', 'dlm-logo.png')
-    ];
+    this.headerData.personas = this.userService.getPersonaDetails();
   }
 
   saveUserTimezone(timezoneIndex) {
