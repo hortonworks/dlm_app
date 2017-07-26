@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewEncapsulation, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -10,7 +10,9 @@ import { Event } from 'models/event.model';
 import { ProgressState } from 'models/progress-state.model';
 import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
 import { getAllJobs } from 'selectors/job.selector';
-import { getPolicyClusterJob, getUnhealthyPolicies, getAllPoliciesWithClusters } from 'selectors/policy.selector';
+import {
+  getPolicyClusterJob, getUnhealthyPolicies, getAllPoliciesWithClusters, getCountPoliciesForSourceClusters
+} from 'selectors/policy.selector';
 import { getAllClusters, getUnhealthyClusters, getClustersWithLowCapacity } from 'selectors/cluster.selector';
 import { getDisplayedEvents } from 'selectors/event.selector';
 import { loadJobsForPolicy } from 'actions/job.action';
@@ -38,6 +40,8 @@ import { loadPairings } from 'actions/pairing.action';
 import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
 import { TranslateService } from '@ngx-translate/core';
 
+import { MapComponent } from 'components/map/map.component';
+
 const POLICIES_REQUEST = 'POLICIES_REQUEST';
 const CLUSTERS_REQUEST = 'CLUSTERS_REQUEST';
 const JOBS_REQUEST = 'JOBS_REQUEST';
@@ -55,6 +59,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
     policies: [POLICY_STATUS.RUNNING, POLICY_STATUS.SUBMITTED, POLICY_STATUS.SUSPENDED],
     jobs: [JOB_STATUS.SUCCESS, JOB_STATUS.WARNINGS, JOB_STATUS.FAILED, JOB_STATUS.RUNNING]
   };
+  @ViewChild(MapComponent) mapComponent: MapComponent;
+
   CLUSTER_STATUS = CLUSTER_STATUS;
   mapSizeSettings: MapSizeSettings = {
     width: '100%',
@@ -86,6 +92,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
   lowCapacityClusters$: Observable<Cluster[]>;
   unhealthyPolicies$: Observable<Policy[]>;
   clustersMapData$: Observable<ClusterMapData[]>;
+  selectedCluster$ = new BehaviorSubject<null|Cluster>(null);
+  clusterLegend$: Observable<any>;
 
   jobStatusFilter$ = new BehaviorSubject('');
 
@@ -126,9 +134,21 @@ export class OverviewComponent implements OnInit, OnDestroy {
           status: (policy.targetClusterResource.status || []).filter(service => service.state !== SERVICE_STATUS.STARTED)
         }
       })));
-    this.clustersMapData$ = this.fullfilledClusters$
-      .startWith([])
-      .map(clusters => clusters.map(cluster => (<ClusterMapData>{start: <ClusterMapPoint>{cluster}})));
+    this.clustersMapData$ = Observable.combineLatest(this.clusters$, store.select(getCountPoliciesForSourceClusters))
+      .startWith([[], []])
+      .map(([clusters, policiesCount]) => this.makeClustersMapData(clusters, policiesCount));
+    this.clusterLegend$ = Observable
+      .combineLatest(this.clustersMapData$, this.selectedCluster$, this.policies$)
+      .map(([clustersMapData, selectedCluster, policies]) => {
+        if (!selectedCluster) {
+          return false;
+        }
+        const cluster = clustersMapData.find(c => c.start.cluster.id === selectedCluster.id).start.cluster;
+        return {
+          ...cluster,
+          alerts: cluster.status.filter(service => service.state !== SERVICE_STATUS.STARTED)
+        };
+      });
   }
 
   mapTableData(policy: Policy) {
@@ -199,6 +219,18 @@ export class OverviewComponent implements OnInit, OnDestroy {
     }
   }
 
+  private makeClustersMapData(clusters, policiesCount) {
+    return clusters.map(cluster => {
+      const policiesCounter = cluster.id in policiesCount &&
+        'policies' in policiesCount[cluster.id] ? policiesCount[cluster.id].policies : 0;
+      const clusterData = {
+        ...cluster,
+        policiesCounter
+      };
+      return <ClusterMapData>{start: <ClusterMapPoint>{cluster: clusterData}};
+    });
+  }
+
   ngOnInit() {
     [
       loadPolicies(POLICIES_REQUEST),
@@ -206,7 +238,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
       loadPairings()
     ].map(action => this.store.dispatch(action));
     const overallProgressSubscription = this.completedRequest$(this.overallProgress$)
-      .subscribe(_ => this.initPolling());
+      .subscribe(_ => {
+        this.mapComponent.draw();
+        this.initPolling();
+      });
     const clustersRequestSubscription = this.completedRequest$(this.store.select(getProgressState(CLUSTERS_REQUEST)))
       .subscribe(_ => this.store.dispatch(loadClustersStatuses(CLUSTER_STATUS_REQUEST)));
 
@@ -275,5 +310,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
   removeJobStatusFilter() {
     this.applyJobFilter('');
+  }
+
+  handleClickMarker(cluster: Cluster) {
+    this.selectedCluster$.next(cluster);
   }
 }

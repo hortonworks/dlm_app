@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TooltipModule } from 'ng2-bootstrap';
 import { CommonComponentsModule} from 'components/common-components.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { ResourceSummaryComponent } from './resource-summary/resource-summary.component';
@@ -9,12 +10,14 @@ import { PoliciesSummaryComponent } from './resource-summary/policies-summary/po
 import { SummaryPanelComponent } from './resource-summary/summary-panel/summary-panel.component';
 import { SummaryPanelCellComponent } from './resource-summary/summary-panel-cell/summary-panel-cell.component';
 import { LastTenJobsColumnComponent } from './jobs-overview-table/last-ten-jobs-column/last-ten-jobs-column.component';
+import { ClusterLegendComponent } from './cluster-legend/cluster-legend.component';
 
 @NgModule({
   imports: [
     CommonModule,
     CommonComponentsModule,
-    TranslateModule
+    TranslateModule,
+    TooltipModule.forRoot()
   ],
   declarations: [
     ResourceSummaryComponent,
@@ -23,7 +26,8 @@ import { LastTenJobsColumnComponent } from './jobs-overview-table/last-ten-jobs-
     PoliciesSummaryComponent,
     SummaryPanelComponent,
     SummaryPanelCellComponent,
-    LastTenJobsColumnComponent
+    LastTenJobsColumnComponent,
+    ClusterLegendComponent
   ],
   exports: [
     ResourceSummaryComponent,
@@ -32,7 +36,8 @@ import { LastTenJobsColumnComponent } from './jobs-overview-table/last-ten-jobs-
     PoliciesSummaryComponent,
     SummaryPanelComponent,
     SummaryPanelCellComponent,
-    LastTenJobsColumnComponent
+    LastTenJobsColumnComponent,
+    ClusterLegendComponent
   ]
 })
 export class OverviewModule { }

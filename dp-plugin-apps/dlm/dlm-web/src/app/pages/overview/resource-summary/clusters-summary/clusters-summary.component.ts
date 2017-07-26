@@ -5,7 +5,10 @@ import { CLUSTERS_HEALTH_STATE } from '../resource-summary.type';
 @Component({
   selector: 'dlm-clusters-summary',
   template: `
-    <dlm-summary-panel [title]="'page.overview.summary_panels.title.clusters' | translate" [total]="data.total">
+    <dlm-summary-panel
+      [title]="'page.overview.summary_panels.title.clusters'"
+      [total]="data.total"
+      [hint]="'page.overview.summary_panels.hint.clusters'">
       <div class="row">
         <dlm-summary-panel-cell
           class="col-md-4"

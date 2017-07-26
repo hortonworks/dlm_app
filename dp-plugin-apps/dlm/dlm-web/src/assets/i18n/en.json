@@ -167,6 +167,18 @@
           "active": "Active",
           "suspended": "Suspended",
           "warning": "Warning"
+        },
+        "hint": {
+          "clusters": "Clusters Hint",
+          "policies": "Policies Hint",
+          "jobs": "Jobs Hint"
+        }
+      },
+      "world_map": {
+        "cluster_legend": {
+          "alerts": "Alerts",
+          "fix_alerts": "Fix Alerts",
+          "launch_ambari": "Launch Ambari"
         }
       },
       "table": {
