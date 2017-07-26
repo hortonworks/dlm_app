@@ -44,31 +44,31 @@
     },
     "frequency": {
       "yearly": {
-        "plural": "Every {{num}} years",
+        "plural": "Every {{num}}y",
         "singular": "Every year"
       },
       "monthly": {
-        "plural": "Every {{num}} months",
+        "plural": "Every {{num}}m",
         "singular": "Every month"
       },
       "weekly": {
-        "plural": "Every {{num}} weeks",
+        "plural": "Every {{num}}w",
         "singular": "Every week"
       },
       "daily": {
-        "plural": "Every {{num}} days",
+        "plural": "Every {{num}}d",
         "singular": "Every day"
       },
       "hourly": {
-        "plural": "Every {{num}} hours",
+        "plural": "Every {{num}}h",
         "singular": "Every hour"
       },
       "minutely": {
-        "plural": "Every {{num}} minutes",
+        "plural": "Every {{num}}m",
         "singular": "Every minute"
       },
       "secondly": {
-        "plural": "Every {{num}} seconds",
+        "plural": "Every {{num}}s",
         "singular": "Every second"
       },
       "every": "Every",
@@ -94,7 +94,7 @@
   "sidenav": {
     "menuItem": {
       "overview": "Overview",
-      "clusters": "My Clusters",
+      "clusters": "Clusters",
       "policies": "Policies",
       "pairings": "Pairings",
       "jobs": "Jobs",

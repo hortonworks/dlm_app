@@ -102,7 +102,6 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.fullfilledClusters$ = this.clusters$
       .filter(clusters => !!clusters.length)
       .distinctUntilChanged(null, clusters => clusters.map(cluster => cluster.id).join('@') + '_LENGTH' + clusters.length);
-
     this.clustersSummary$ = store.select(getClustersHealth);
     this.policiesSummary$ = store.select(getPoliciesHealth);
     this.jobsSummary$ = store.select(getJobsHealth);

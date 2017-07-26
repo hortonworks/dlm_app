@@ -23,10 +23,6 @@
   <span class="fa fa-arrow-right" aria-hidden="true"></span>
 </ng-template>
 
-<ng-template #scheduleCellTemplate let-value="value">
-  <span>{{value | frequency}}</span>
-</ng-template>
-
 <ng-template #prevJobs let-row="row">
   <span class="actionable" qe-attr="policy-jobs" (click)="toggleRowDetail(row, policyContent.Jobs)">
     <dlm-prev-jobs [policy]="row"></dlm-prev-jobs>
@@ -62,7 +58,7 @@
 </ng-template>
 
 <ng-template let-row="row" let-value="value" #pathCell>
-  <span [tooltip]="value">{{value | truncate:15}}</span>
+  <span [tooltip]="value">{{value | truncate:20}}</span>
 </ng-template>
 
 <ng-template #actionsCell let-row="row">
