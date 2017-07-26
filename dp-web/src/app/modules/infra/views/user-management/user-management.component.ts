@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, DoCheck, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
@@ -6,7 +6,7 @@ import {ActivatedRoute, Router} from '@angular/router';
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss']
 })
-export class UserManagementComponent implements OnInit {
+export class UserManagementComponent implements OnInit, DoCheck {
 
   views = Views;
   currentView: Views;
@@ -15,11 +15,7 @@ export class UserManagementComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.router.url.indexOf('/users') > -1) {
-      this.currentView = Views.USERS;
-    } else if (this.router.url.indexOf('/groups') > -1) {
-      this.currentView = Views.GROUPS;
-    }
+    this.setView();
     this.router.navigateByUrl(this.router.url);
   }
 
@@ -30,6 +26,18 @@ export class UserManagementComponent implements OnInit {
     } else {
       this.router.navigate(['users'], {relativeTo: this.route});
     }
+  }
+
+  setView() {
+    if (this.router.url.indexOf('/users') > -1 && this.currentView !== Views.USERS) {
+      this.currentView = Views.USERS;
+    } else if (this.router.url.indexOf('/groups') > -1 && this.currentView !== Views.GROUPS) {
+      this.currentView = Views.GROUPS;
+    }
+  }
+
+  ngDoCheck() {
+    this.setView();
   }
 
 }
