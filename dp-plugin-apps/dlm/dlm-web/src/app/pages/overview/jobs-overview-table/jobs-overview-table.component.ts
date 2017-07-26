@@ -39,7 +39,7 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;
   @ViewChild('prevJobs') prevJobsRef: TemplateRef<any>;
 
-  @Output() onShowJobLog = new EventEmitter<any>();
+  @Output() onShowPolicyLog = new EventEmitter<any>();
 
   constructor(private t: TranslateService,
               protected store: Store<fromRoot.State>,
@@ -166,7 +166,7 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
     this.router.navigate(['/policies'], {queryParams: {policy: policy.name}});
   }
 
-  showPolicyLog(job) {
-    this.onShowJobLog.emit(job);
+  showPolicyLog(policy) {
+    this.onShowPolicyLog.emit(policy);
   }
 }
