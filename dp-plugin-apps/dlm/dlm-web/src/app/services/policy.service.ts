@@ -13,8 +13,9 @@ export class PolicyService {
     return datacenter + '$' + clusterName;
   }
 
-  static getClusterName(policyClusterId): string {
-    return policyClusterId.split('$')[1];
+  static getClusterName(policyClusterName): string {
+    const clusterSplit = policyClusterName.split('$');
+    return clusterSplit.length > 1 ? clusterSplit[1] : '';
   }
 
   normalizePolicy(policy): Policy {

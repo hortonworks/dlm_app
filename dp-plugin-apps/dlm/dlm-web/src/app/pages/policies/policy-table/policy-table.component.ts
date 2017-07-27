@@ -74,6 +74,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @ViewChild('pathCell') pathCellRef: TemplateRef<any>;
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
   @ViewChild('verbStatusCellTemplate') verbStatusCellTemplate: TemplateRef<any>;
+  @ViewChild('clusterCellTemplate') clusterCellTemplateRef: TemplateRef<any>;
   @ViewChild('table') table: TemplateRef<any>;
 
   @ViewChild(TableComponent) tableComponent: TableComponent;
@@ -137,7 +138,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         ...TableComponent.makeFixedWith(80)
       },
       {name: ' ', cellTemplate: this.policyInfoColumn.cellRef, sortable: false, minWidth: 200},
-      {prop: 'sourceCluster', name: this.t.instant('common.source')},
+      {prop: 'sourceClusterResource', name: this.t.instant('common.source'), cellTemplate: this.clusterCellTemplateRef},
       {
         prop: 'status',
         name: ' ',
@@ -146,7 +147,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         cellClass: 'flow-status-cell',
         sortable: false
       },
-      {prop: 'targetCluster', name: this.t.instant('common.destination')},
+      {prop: 'targetClusterResource', name: this.t.instant('common.destination'), cellTemplate: this.clusterCellTemplateRef},
       {prop: 'sourceDataset', name: this.t.instant('common.path'), cellTemplate: this.pathCellRef, minWidth: 200},
       {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs')},
       {prop: 'jobs.0.trackingInfo.timeTaken', name: this.t.instant('common.duration'), cellTemplate: this.durationCellRef},

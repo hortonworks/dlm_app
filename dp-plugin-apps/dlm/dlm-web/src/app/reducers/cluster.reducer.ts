@@ -46,7 +46,7 @@ export function reducer(state = initialState, action: fromCluster.Actions): Stat
       });
       const entities = Object.keys(state.entities).reduce((newEntities, clusterId) => {
         const status = clusterServices[clusterId];
-        const someServiceIsNotStarted = !!status.find(d => d.state !== SERVICE_STATUS.STARTED);
+        const someServiceIsNotStarted = status && !!status.find(d => d.state !== SERVICE_STATUS.STARTED);
         const clusterHealthStatus = someServiceIsNotStarted ? CLUSTER_STATUS.UNHEALTHY : CLUSTER_STATUS.HEALTHY;
         newEntities[clusterId] = Object.assign({}, state.entities[clusterId], {status, healthStatus: clusterHealthStatus});
         return newEntities;
