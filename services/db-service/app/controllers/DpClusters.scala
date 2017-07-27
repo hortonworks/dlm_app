@@ -33,8 +33,8 @@ class DpClusters @Inject()(dpClusterRepo: DpClusterRepo)(
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def getLocations(query: Option[String]) = Action.async {
-    dpClusterRepo.getLocations(query).map(success(_)).recoverWith(apiError)
+  def getLocations(isQuery: Option[Boolean], city: Option[String], country: Option[String]) = Action.async {
+    dpClusterRepo.getLocations(isQuery, city, country).map(success(_)).recoverWith(apiError)
   }
 
   def loadLocation(id:Long) = Action.async {

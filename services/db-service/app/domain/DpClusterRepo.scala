@@ -75,14 +75,21 @@ class DpClusterRepo @Inject()(
       .map(r => r)
   }
 
-  def getLocations(query: Option[String]): Future[List[Location]] = db.run {
-    query match {
-      case Some(query) =>
-        Locations
-          .filter(_.city.toLowerCase.startsWith(query.toLowerCase))
-          .take(20)
-          .to[List]
-          .result
+  def getLocations(isQuery: Option[Boolean], city: Option[String], country: Option[String]): Future[List[Location]] = db.run {
+    isQuery match {
+      case Some(isQuery) => {
+        if(isQuery)  {
+          Locations
+            .filter(cLocation => {
+              cLocation.city.toLowerCase.startsWith(city.getOrElse("").toLowerCase) && cLocation.country.toLowerCase.startsWith(country.getOrElse("").toLowerCase)
+            })
+            .take(20)
+            .to[List]
+            .result
+        } else {
+          Locations.to[List].result
+        }
+      }
       case None => Locations.to[List].result
     }
   }
