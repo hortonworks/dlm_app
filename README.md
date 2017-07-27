@@ -82,12 +82,12 @@ Only Postgresql is supported. To prepare the database, following steps need to b
 5. LogIn to `postgresql` with `psql -h <database_ip> <database_name>`.
 6. Add user with `CREATE USER <user_name> WITH PASSWORD '<passowrd>';`.
 7. Give neccessary permissions of created database to desired user. Recommended: `ALTER DATABASE <database_name> OWNER TO <user_name>;`
-8. Provide connection information in `config.env.sh`.
+8. Provide connection information in `${INSTALLER_HOME}/config.env.sh`.
 ```
 USE_EXT_DB="yes"
-# DATABASE_URI="jdbc:postgresql://<host_name>:5432/<database_name>"
-# DATABASE_USER="<user_name>"
-# DATABASE_PASS="<password>"
+DATABASE_URI="jdbc:postgresql://<host_name>:5432/<database_name>"
+DATABASE_USER="<user_name>"
+DATABASE_PASS="<password>"
 ```
 9. Deploy dataplane as usual using `./dpdeploy.sh`
 
