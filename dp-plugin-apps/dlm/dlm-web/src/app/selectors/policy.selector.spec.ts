@@ -9,8 +9,8 @@ describe('Policy Selectors', () => {
 
   let state: State;
   beforeEach(() => {
-    this.policy1 = <Policy>{id: 'p1', targetCluster: 'c1', sourceCluster: 'c2'};
-    this.policy2 = <Policy>{id: 'p2', targetCluster: 'c2', sourceCluster: 'c1'};
+    this.policy1 = <Policy>{id: 'p1', targetCluster: 'dc1$c1', sourceCluster: 'dc1$c2'};
+    this.policy2 = <Policy>{id: 'p2', targetCluster: 'dc1$c2', sourceCluster: 'dc1$c1'};
     this.policy3 = <Policy>{id: 'p3', targetCluster: 'not-existing-cluster-1', sourceCluster: 'not-existing-cluster-2'};
     this.cluster1 = <Cluster>{id: 1, name: 'c1'};
     this.cluster2 = <Cluster>{id: 2, name: 'c2'};
