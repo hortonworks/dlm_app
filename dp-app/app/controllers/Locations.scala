@@ -15,8 +15,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class Locations @Inject()(@Named("locationService") val locationService: LocationService,authenticated:Authenticated)
   extends Controller {
 
-  def list(query: Option[String]) = authenticated.async {
-    locationService.list(query)
+  def list(isQuery: Option[Boolean], city: Option[String], country: Option[String]) = authenticated.async {
+    locationService.list(isQuery, city, country)
       .map { locations =>
         locations match {
           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
