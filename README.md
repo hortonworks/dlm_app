@@ -85,7 +85,7 @@ Only Postgresql is supported. To prepare the database, following steps need to b
 8. Provide connection information in `config.env.sh`.
 ```
 USE_EXT_DB="yes"
-# DATABASE_URI="jdbc:postgresql://<host_name>:5432/dataplane"
+# DATABASE_URI="jdbc:postgresql://<host_name>:5432/<database_name>"
 # DATABASE_USER="<user_name>"
 # DATABASE_PASS="<password>"
 ```
