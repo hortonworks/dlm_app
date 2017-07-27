@@ -67,7 +67,7 @@ read_consul_host(){
 
 init_db() {
     if [ "$USE_EXT_DB" == "yes" ]; then
-        echo "Assuming DB is already initialized. Nothing to initialize."
+        echo "Dataplane is configured to use an external database in config.env.sh. Database initialization is not required and assumed to be done already."
     else
         source $(pwd)/docker-database.sh
     fi
