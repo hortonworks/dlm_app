@@ -66,21 +66,24 @@
   }
 }
 
-.datatable-row-detail {
-  padding: 25px;
-  background-color: #EEE;
-}
+.dlm-cluster-list {
+  .datatable-row-detail {
+    padding: 25px;
+    background-color: #EEE;
+    overflow-y: visible !important;
+  }
 
-.datatable-scroll {
-  width: 100% !important;
-}
+  .datatable-scroll {
+    width: 100% !important;
+  }
 
-.datatable-header-cell {
-  text-align: center !important;
-}
+  .datatable-header-cell {
+    text-align: center !important;
+  }
 
-.text-center {
-  .datatable-body-cell-label {
-    width: 100%;
+  .text-center {
+    .datatable-body-cell-label {
+      width: 100%;
+    }
   }
 }

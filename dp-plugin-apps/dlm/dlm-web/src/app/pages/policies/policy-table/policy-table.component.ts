@@ -15,6 +15,7 @@ import { Observable } from 'rxjs/Observable';
 import { Job } from 'models/job.model';
 import { abortJob, loadJobsForPolicy } from 'actions/job.action';
 import { deletePolicy, resumePolicy, suspendPolicy } from 'actions/policy.action';
+import { PolicyService } from 'services/policy.service';
 import { OperationResponse } from 'models/operation-response.model';
 import { getLastOperationResponse } from 'selectors/operation.selector';
 import { FlowStatusComponent } from './flow-status/flow-status.component';
@@ -106,6 +107,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   constructor(private t: TranslateService,
               private store: Store<fromRoot.State>,
               private hiveService: HiveService,
+              private policyService: PolicyService,
               private logService: LogService) {
     this.jobs$ = store.select(getAllJobs);
     this.filteredJobs$ = Observable.combineLatest(this.jobs$, this.selectedPolicy$).map(([jobs, selectedPolicy]) => {
@@ -287,7 +289,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       return;
     }
     if (contentType === PolicyContent.Files) {
-      const cluster = this.clusterByName(policy.sourceCluster);
+      const cluster = this.clusterByName(PolicyService.getClusterName(policy.sourceCluster));
       if (policy.type === POLICY_TYPES.HIVE) {
         this.store.dispatch(loadFullDatabases(cluster.id));
       } else {
