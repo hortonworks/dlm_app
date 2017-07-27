@@ -1,4 +1,4 @@
-package internal.auth
+package com.hortonworks.dataplane.commons.auth
 
 import java.security.cert.X509Certificate
 
@@ -6,7 +6,6 @@ import com.google.inject.Inject
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webservice.UserService
 import org.apache.commons.codec.binary.Base64
 import play.api.http.Status
 import play.api.libs.json.{JsError, JsSuccess, Json}
@@ -15,9 +14,7 @@ import play.api.{Configuration, Logger}
 
 import scala.concurrent.Future
 
-class Authenticated @Inject()(@Named("userService") userService: UserService,
-                              configuration: Configuration)
-  extends ActionBuilder[AuthenticatedRequest] {
+class Authenticated extends ActionBuilder[AuthenticatedRequest] {
 
   val gatewayUserTokenKey = "X-DP-User-Info"
   val gatewayTokenKey = "X-DP-Token-Info"

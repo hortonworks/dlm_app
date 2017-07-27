@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.cs.Webservice.{AtlasService}
-import internal.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.JsonResponses
 import play.api.Logger
 import play.api.libs.json.Json

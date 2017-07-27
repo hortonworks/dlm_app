@@ -18,9 +18,8 @@ class Logs @Inject() (
 ) extends Controller {
 
   /**
-    * Retrieve all instances of a specific policy
+    * Retrieve logs for beacon target cluster
     * @param clusterId   target cluster id
-    * @param policyName  name of the policy
     * @return
     */
   def retrieve(clusterId: Long) = Action.async { request =>
