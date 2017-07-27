@@ -38,6 +38,7 @@ import {Loader} from './shared/utils/loader';
 import {RbacService} from './services/rbac.service';
 import {AuthErrorComponent} from './shared/auth-error/auth-error.component';
 import {NavigationGuard} from './shared/utils/navigation-guard';
+import {GroupService} from './services/group.service';
 
 import {AuthUtils} from './shared/utils/auth-utils';
 
@@ -109,6 +110,7 @@ export function init_app(userService: UserService) {
     CollapsibleNavService,
     Loader,
     RbacService,
+    GroupService,
 
     MdlService,
 

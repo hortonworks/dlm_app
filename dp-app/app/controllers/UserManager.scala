@@ -35,8 +35,10 @@ class UserManager @Inject()(val ldapService: LdapService,
       res =>
         res.toBoolean
     }
+    val searchType=request.getQueryString("searchType");
+
     ldapService
-      .search(request.getQueryString("name").get, fuzzyMatch)
+      .search(request.getQueryString("name").get,searchType,fuzzyMatch)
       .map {
         case Left(errors) => handleErrors(errors)
         case Right(ldapSearchResult) =>
@@ -143,6 +145,19 @@ class UserManager @Inject()(val ldapService: LdapService,
     userService.getRoles().map {
       case Left(errors) => handleErrors(errors)
       case Right(roles) => Ok(Json.toJson(roles))
+    }
+  }
+  def getUserGroupsFromLdap()=Action.async { req =>
+    val userNameOpt: Option[String] = req.getQueryString("userName")
+    if (userNameOpt.isEmpty){
+      Future.successful(BadRequest)
+    }else{
+      ldapService.getUserGroups(userNameOpt.get).map{
+        case Left(errors) => handleErrors(errors)
+        case Right(ldapSearchResult) =>
+          Ok(Json.toJson(ldapSearchResult))
+
+      }
     }
   }
 }

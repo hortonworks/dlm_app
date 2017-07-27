@@ -73,6 +73,8 @@
           "userDNTemplate":"User DN Template",
           "url" : "URL",
           "userSearchBase" : "User Search base",
+          "userSearchAttributeName": "User Search Attribute",
+          "groupSearchAttributeName": "Group Search Attribute",
           "groupSearchBase" : "Group Search base",
           "adminBindDN": "Administrator Bind DN",
           "adminPassword":"Administrator Password",
@@ -86,6 +88,7 @@
       "adduser" : {
         "labels" : {
           "users" : "Users",
+          "groups": "Groups",
           "saveAndLogin" : "SAVE & LOGIN",
           "configSuccess": "LDAP ADDED SUCCESSFULLY"
         }
@@ -114,7 +117,9 @@
         "connectionFailed" : "Not able to connect",
         "emptySearchResult" : "There are no clusters that match your search.",
         "addUser": "ADD USER",
+        "addGroup": "ADD GROUP",
         "username": "Username",
+        "groupName":"Group Name",
         "roles": "Roles",
         "usernameorgroup": "Username/Group",
         "active": "Active",
