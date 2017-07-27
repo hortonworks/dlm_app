@@ -67,8 +67,10 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   // as workaround we need to load 3 jobs for such policies and set result to `jobs` and `lastJobs`
   postLoadPolicyIds: string[] = [];
   filterBy: TableFilterItem[] = [
-    {multiple: true, propertyName: 'sourceCluster'},
-    {multiple: false, propertyName: 'targetCluster'},
+    {multiple: true, propertyName: 'sourceClusterResource.name', filterTitle: 'Source Cluster'},
+    {multiple: false, propertyName: 'targetClusterResource.name', filterTitle: 'Destination Cluster'},
+    {multiple: true, propertyName: 'sourceClusterResource.dataCenter', filterTitle: 'Source Datacenter'},
+    {multiple: false, propertyName: 'targetClusterResource.dataCenter', filterTitle: 'Destination Datacenter'},
     {multiple: true, propertyName: 'status'},
     {multiple: true, propertyName: 'name'}
   ];

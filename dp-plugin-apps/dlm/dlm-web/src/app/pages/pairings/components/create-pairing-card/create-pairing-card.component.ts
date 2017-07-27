@@ -13,6 +13,10 @@ export class CreatePairingCardComponent implements OnInit {
   @Input() isSelected = false;
   @Input() isFrozen = false;
 
+  get location() {
+    return this.cluster.disabled ? '' : this.cluster.location.city + ', ' + this.cluster.location.country;
+  }
+
   get tooltip() {
     return this.cluster.disabled ? this.t.instant('page.pairings.create.content.cluster_disabled') : '';
   }

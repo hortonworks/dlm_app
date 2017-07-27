@@ -19,6 +19,11 @@
   {{value | statusFmt}}
 </ng-template>
 
+<ng-template #clusterCellTemplate let-value="value">
+  <div class="cluster-name">{{value.name}}</div>
+  <div class="datacenter-name">{{value.dataCenter}}</div>
+</ng-template>
+
 <ng-template #iconCellTemplate>
   <span class="fa fa-arrow-right" aria-hidden="true"></span>
 </ng-template>

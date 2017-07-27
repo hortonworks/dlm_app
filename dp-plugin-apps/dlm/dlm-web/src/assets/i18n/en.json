@@ -226,8 +226,8 @@
         "nodes": "Nodes",
         "volume": "Volume",
         "location": "Location",
-        "create_pair_text": "Add Pair",
-        "create_policy_text": "Add Policy"
+        "create_pair_text": "+ Pair",
+        "create_policy_text": "+ Policy"
       }
     },
     "policies": {
