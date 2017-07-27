@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import com.hortonworks.dataplane.commons.domain.Entities.{Errors, Error}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.typesafe.scalalogging.Logger
-import internal.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.{KnoxConfigInfo, KnoxConfiguration}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}

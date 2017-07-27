@@ -16,7 +16,7 @@ import services.AmbariService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import internal.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.Authenticated
 class DataplaneClusters @Inject()(
     @Named("dpClusterService") val dpClusterService: DpClusterService,
     ambariService: AmbariService,
