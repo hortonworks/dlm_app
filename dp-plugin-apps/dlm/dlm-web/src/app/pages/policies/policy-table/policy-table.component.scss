@@ -33,6 +33,16 @@ dlm-table.cards-theme {
   height: auto;
 }
 
-.datacenter-name {
-  color: #666;
+
+dlm-policy-table {
+  .datatable-body-cell-label {
+    .cluster-name {
+      font-size: 17px;
+    }
+    .datacenter-name {
+      font-size: 13px;
+      color: #666;
+    }
+  }
 }
+
