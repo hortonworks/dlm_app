@@ -8,6 +8,7 @@ import * as moment from 'moment';
 import * as fromRoot from 'reducers/';
 import { Event } from 'models/event.model';
 import { ProgressState } from 'models/progress-state.model';
+import { updateProgressState } from 'actions/progress.action';
 import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
 import { getAllJobs } from 'selectors/job.selector';
 import {
@@ -40,8 +41,6 @@ import { loadPairings } from 'actions/pairing.action';
 import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
 import { TranslateService } from '@ngx-translate/core';
 
-import { MapComponent } from 'components/map/map.component';
-
 const POLICIES_REQUEST = 'POLICIES_REQUEST';
 const CLUSTERS_REQUEST = 'CLUSTERS_REQUEST';
 const JOBS_REQUEST = 'JOBS_REQUEST';
@@ -54,13 +53,6 @@ const CLUSTER_STATUS_REQUEST = 'CLUSTERS_STATUS_REQUEST';
   encapsulation: ViewEncapsulation.None
 })
 export class OverviewComponent implements OnInit, OnDestroy {
-  private resourceStatusMap = {
-    // TODO where to get statuses for clusters?
-    policies: [POLICY_STATUS.RUNNING, POLICY_STATUS.SUBMITTED, POLICY_STATUS.SUSPENDED],
-    jobs: [JOB_STATUS.SUCCESS, JOB_STATUS.WARNINGS, JOB_STATUS.FAILED, JOB_STATUS.RUNNING]
-  };
-  @ViewChild(MapComponent) mapComponent: MapComponent;
-
   CLUSTER_STATUS = CLUSTER_STATUS;
   mapSizeSettings: MapSizeSettings = {
     width: '100%',
@@ -96,6 +88,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   clusterLegend$: Observable<any>;
 
   jobStatusFilter$ = new BehaviorSubject('');
+  areJobsLoaded = false;
 
   constructor(private store: Store<fromRoot.State>,
               private overviewJobsExternalFiltersService: OverviewJobsExternalFiltersService,
@@ -239,21 +232,25 @@ export class OverviewComponent implements OnInit, OnDestroy {
     ].map(action => this.store.dispatch(action));
     const overallProgressSubscription = this.completedRequest$(this.overallProgress$)
       .subscribe(_ => {
-        this.mapComponent.draw();
         this.initPolling();
       });
     const clustersRequestSubscription = this.completedRequest$(this.store.select(getProgressState(CLUSTERS_REQUEST)))
       .subscribe(_ => this.store.dispatch(loadClustersStatuses(CLUSTER_STATUS_REQUEST)));
-
-    const fullFilledPolicies$ = this.policies$
-      .filter(policies => policies.length && policies.every(policy => !isEmpty(policy.sourceClusterResource)))
-      .take(1);
     const clusterPoliciesCompleteSubscription = Observable.combineLatest(
       this.completedRequest$(this.store.select(getProgressState(CLUSTERS_REQUEST))),
       this.completedRequest$(this.store.select(getProgressState(POLICIES_REQUEST))),
-      fullFilledPolicies$
-    ).subscribe(([_, _1, policies]) => {
-      this.store.dispatch(loadLastJobs({policies, numJobs: 10}, {requestId: JOBS_REQUEST}));
+      this.policies$
+    )
+      .subscribe(([p1, p2, policies]) => {
+        if (this.areJobsLoaded) {
+          return;
+        }
+        this.areJobsLoaded = true;
+        if (!policies.length) {
+          this.store.dispatch(updateProgressState(JOBS_REQUEST, { isInProgress: false }));
+        } else {
+          this.store.dispatch(loadLastJobs({policies, numJobs: 10}, {requestId: JOBS_REQUEST}));
+        }
     });
     this.tableData$ = Observable
       .combineLatest(this.tableResources$, this.jobStatusFilter$)
