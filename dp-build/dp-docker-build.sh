@@ -3,8 +3,8 @@ set -e
 
 RELEASE_NUMBER=0.0.1
 IMAGE_PREFIX="hortonworks"
-ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service dp-gateway"
-VENDOR_IMAGES="postgres:9.6.3-alpine consul:0.8.5 claycephas/flyway:4"
+ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service dp-gateway dp-migrate"
+VENDOR_IMAGES="postgres:9.6.3-alpine consul:0.8.5"
 ALL_IMAGES_OPT="all"
 
 build_knox() {
@@ -23,6 +23,8 @@ build_images() {
     docker build -t ${IMAGE_PREFIX}/dp-cluster-service:${VERSION} build/dp-docker/dp-cluster-service
     echo "Building dp-app"
     docker build -t ${IMAGE_PREFIX}/dp-app:${VERSION} build/dp-docker/dp-app
+    echo "Building dp-migrate"
+    docker build -t ${IMAGE_PREFIX}/dp-migrate:${VERSION} build/dp-docker/dp-migrate
 }
 
 push_images() {
@@ -107,7 +109,7 @@ get_version() {
         VERSION_STRING=`cat build/dp-docker/installer/VERSION`
         echo ${VERSION_STRING}
     else
-        echo ${RELEASE_NUMBER}:"latest"
+        echo ${RELEASE_NUMBER}-"latest"
     fi
 }
 

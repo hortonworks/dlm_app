@@ -69,7 +69,6 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @ViewChild('lastGoodCell') lastGoodCellRef: TemplateRef<any>;
   @ViewChild('prevJobs') prevJobsRef: TemplateRef<any>;
   @ViewChild(FlowStatusComponent) flowStatusColumn: FlowStatusComponent;
-  @ViewChild('scheduleCellTemplate') scheduleCellTemplateRef: TemplateRef<any>;
   @ViewChild('rowDetail') rowDetailRef: TemplateRef<any>;
   @ViewChild('iconCellTemplate') iconCellTemplate: TemplateRef<any>;
   @ViewChild('pathCell') pathCellRef: TemplateRef<any>;
@@ -138,20 +137,19 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         cellTemplate: this.verbStatusCellTemplate,
         ...TableComponent.makeFixedWith(80)
       },
-      {name: ' ', cellTemplate: this.policyInfoColumn.cellRef, sortable: false},
+      {name: ' ', cellTemplate: this.policyInfoColumn.cellRef, sortable: false, minWidth: 200},
       {prop: 'sourceClusterResource', name: this.t.instant('common.source'), cellTemplate: this.clusterCellTemplateRef},
       {
         prop: 'status',
         name: ' ',
         cellTemplate: this.flowStatusColumn.cellRef,
-        minWidth: 200,
+        minWidth: 130,
         cellClass: 'flow-status-cell',
         sortable: false
       },
       {prop: 'targetClusterResource', name: this.t.instant('common.destination'), cellTemplate: this.clusterCellTemplateRef},
-      {prop: 'sourceDataset', name: this.t.instant('common.path'), cellTemplate: this.pathCellRef},
+      {prop: 'sourceDataset', name: this.t.instant('common.path'), cellTemplate: this.pathCellRef, minWidth: 200},
       {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs')},
-      {prop: 'frequency', name: this.t.instant('common.schedule'), cellTemplate: this.scheduleCellTemplateRef},
       {prop: 'jobs.0.trackingInfo.timeTaken', name: this.t.instant('common.duration'), cellTemplate: this.durationCellRef},
       {prop: 'lastGoodJobResource.startTime', name: 'Last Good', cellTemplate: this.lastGoodCellRef},
       {name: ' ', cellTemplate: this.actionsCellRef, maxWidth: 55, sortable: false}

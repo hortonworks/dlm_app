@@ -9,6 +9,15 @@ import { JobService } from 'services/job.service';
 @Injectable()
 export class PolicyService {
 
+  static makeClusterId(datacenter, clusterName): string {
+    return datacenter + '$' + clusterName;
+  }
+
+  static getClusterName(policyClusterName): string {
+    const clusterSplit = policyClusterName.split('$');
+    return clusterSplit.length > 1 ? clusterSplit[1] : '';
+  }
+
   normalizePolicy(policy): Policy {
     policy.id = policy.policyId;
     return policy;

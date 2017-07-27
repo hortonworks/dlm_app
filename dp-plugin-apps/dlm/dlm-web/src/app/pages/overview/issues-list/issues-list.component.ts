@@ -27,7 +27,7 @@ import { Event } from 'models/event.model';
   styleUrls: ['./issues-list.component.scss']
 })
 export class IssuesListComponent {
-  visibleItems = 3;
+  visibleItems = 4;
   @Input() events: Event[];
   @HostBinding('class.all-visible') get isVisible() { return this.isAllVisible; };
 

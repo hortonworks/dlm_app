@@ -59,8 +59,8 @@ export class MapComponent implements OnChanges, OnInit {
   }
 
   ngOnInit() {
-    //The TRANSITION is causing a horizontal scrollbar disabling for now
-    L.DomUtil['TRANSITION'] = false;
+    //The TRANSITION is causing a horizontal scrollbar disabling for now via hack
+    L.DomUtil['TRANSITION'] = 'unused';
     if (this.map) {
       this.map.remove();
     }

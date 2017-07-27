@@ -40,7 +40,7 @@ export class ClusterListComponent implements OnInit {
   ngOnInit() {
     this.columns = [
       {prop: 'healthStatus', name: this.t.instant('common.status.self'), cellTemplate: this.statusCellRef,
-        flexGrow: 2, cellClass: 'status'},
+        flexGrow: 3, cellClass: 'status'},
       {prop: 'dataCenter', name: '', cellTemplate: this.dcCellRef, flexGrow: 3},
       {name: '', cellTemplate: this.slashIconCellRef, flexGrow: 1},
       {prop: 'name', name: '', cellTemplate: this.nameCellRef, flexGrow: 4},
@@ -52,7 +52,7 @@ export class ClusterListComponent implements OnInit {
       {prop: 'policiesCounter', name: this.t.instant('common.policies'),
         cellTemplate: this.plainCellRef, flexGrow: 2, cellClass: 'text-cell', headerClass: 'text-header'},
       {prop: 'location', name: this.t.instant('page.clusters.card.location'),
-        cellTemplate: this.locationCellRef, flexGrow: 5},
+        cellTemplate: this.locationCellRef, flexGrow: 4},
       {name: '', cellTemplate: this.addActionsCellRef, minWidth: 230,
         cellClass: 'add-actions-cell', flexGrow: 6}
     ];

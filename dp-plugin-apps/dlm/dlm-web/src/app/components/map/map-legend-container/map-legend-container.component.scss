@@ -1,0 +1,11 @@
+@import '../../../styles/variables.scss';
+
+:host {
+  display: block;
+  position: absolute;
+  z-index: 400;
+  top: 0;
+  right: 0;
+  height: 100%;
+  background: $tuna;
+}

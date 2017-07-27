@@ -8,6 +8,7 @@ import { getAllClusters } from './cluster.selector';
 import { getAllJobs } from './job.selector';
 import { sortByDateField } from 'utils/array-util';
 import { JOB_STATUS, CLUSTER_STATUS } from 'constants/status.constant';
+import { PolicyService } from 'services/policy.service';
 
 export const getEntities = createSelector(getPolicies, state => state.entities);
 
@@ -15,14 +16,10 @@ export const getAllPolicies = createSelector(getEntities, mapToList);
 
 export const getAllPoliciesWithClusters = createSelector(getAllPolicies, getAllClusters, (policies, clusters) => {
   return policies.map(policy => {
-    const sourceClusterArray = policy.sourceCluster.split('$');
-    const targetClusterArray = policy.targetCluster.split('$');
-    const sourceClusterName = sourceClusterArray.length > 1 ? sourceClusterArray[1] : '';
-    const targetClusterName = targetClusterArray.length > 1 ? targetClusterArray[1] : '';
     return {
       ...policy,
-      targetClusterResource: clusters.find(cluster => cluster.name === targetClusterName) || {},
-      sourceClusterResource: clusters.find(cluster => cluster.name === sourceClusterName) || {}
+      targetClusterResource: clusters.find(cluster => cluster.name === PolicyService.getClusterName(policy.targetCluster)) || {},
+      sourceClusterResource: clusters.find(cluster => cluster.name === PolicyService.getClusterName(policy.sourceCluster)) || {}
     };
   });
 });
