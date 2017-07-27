@@ -27,13 +27,6 @@ dlm-table.cards-theme {
   }
 }
 
-.datatable-row-detail {
-  padding: 35px;
-  background: $table-row-active;
-  height: auto;
-}
-
-
 dlm-policy-table {
   .datatable-body-cell-label {
     .cluster-name {
@@ -43,6 +36,12 @@ dlm-policy-table {
       font-size: 13px;
       color: #666;
     }
+  }
+  .datatable-row-detail {
+    padding: 35px;
+    background: $table-row-active;
+    height: auto;
+    overflow-y: visible !important;
   }
 }
 

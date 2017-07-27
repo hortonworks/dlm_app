@@ -14,3 +14,11 @@
     cursor: pointer;
   }
 }
+
+.dlm-hdfs-browser {
+  .datatable-body {
+    height: 340px !important;
+    overflow-y: scroll;
+  }
+}
+
