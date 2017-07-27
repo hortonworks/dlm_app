@@ -34,7 +34,7 @@
         </div>
         <div class="row">
           <div class="col-md-12">
-            <dp-map [sizeSettings]="mapSizeSettings" [mapData]="clustersMapData$ | async" (clickMarker)="handleClickMarker($event)" *ngIf="(clustersMapData$ | async).length">
+            <dp-map [sizeSettings]="mapSizeSettings" [mapData]="clustersMapData$ | async" (clickMarker)="handleClickMarker($event)" *ngIf="!(overallProgress$ | async)?.isInProgress && (clustersMapData$ | async).length">
               <dlm-map-legend class="overview-map-legend" *ngIf="clusterLegend$ | async">
                 <dlm-cluster-legend [cluster]="clusterLegend$ | async"></dlm-cluster-legend>
               </dlm-map-legend>
