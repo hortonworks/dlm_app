@@ -7,7 +7,7 @@ import javax.inject.Inject
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import com.hortonworks.dataplane.commons.domain.Constants
-import com.hortonworks.dataplane.commons.domain.Entities.{HJwtToken, DataplaneClusterIdentifier}
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneClusterIdentifier, HJwtToken}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.{ClusterSync, StorageInterface}
 import com.hortonworks.dataplane.http.BaseRoute
@@ -15,6 +15,7 @@ import com.hortonworks.dataplane.knox.Knox.{ApiCall, KnoxApiRequest, KnoxConfig}
 import com.hortonworks.dataplane.knox.KnoxApiExecutor
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
+import play.api.libs.json.Json
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -47,40 +48,59 @@ class StatusRoute @Inject()(val ws: WSClient,
         val uri = new URL(providerUrl)
         val knoxUrl = s"${uri.getProtocol}://${uri.getHost}:${uri.getPort}"
         logger.info(s"Knox detected at $knoxUrl")
-        val delegatedRequest =
-          ws.url(endpoint).withRequestTimeout(timeout seconds)
-        val delegatedApiCall: ApiCall = { req =>
-          req.get()
-        }
 
-        val tokenInfoHeader = request.getHeader(Constants.DPTOKEN)
-        if (!tokenInfoHeader.isPresent) {
-          logger.error(
-            "Knox was detected, but the called did not send a JWT token with the request header X-DP-Token-Info")
-          throw new RuntimeException(
-            "Ambari was Knox protected but no jwt token was sent with the request")
-        }
-        val tokenHeader = tokenInfoHeader.get.value
-        val response =
-          KnoxApiExecutor(KnoxConfig("token", Some(knoxUrl)), ws).execute(
-            KnoxApiRequest(delegatedRequest,
-                           delegatedApiCall,
-                           Some(tokenHeader)))
-        response.map { res =>
-          res.status match {
-            case 200 =>
-              AmbariCheckResponse(ambariApiCheck = true,
-                                  knoxDetected = true,
-                                  res.status,
-                                  Some(knoxUrl),
-                                  res.json)
-            case _ =>
-              AmbariCheckResponse(ambariApiCheck = false,
-                                  knoxDetected = true,
-                                  res.status,
-                                  Some(knoxUrl),
-                                  res.json)
-          }
+        // If Ambari indicates a JWT URL and cluster service is configured to pick up
+        // expect a separate config group then return with a response which allows
+        // the FE to ask the user for her/his Ambari credentials/Knox URL
+        // Return again with the username/password to complete the flow
+
+        val expectConfigGroup =
+          config.getBoolean("dp.services.knox.token.expect.separate.config")
+        val checkCredentials = config.getBoolean("dp.services.knox.token.infer.endpoint.using.credentials")
+
+        expectConfigGroup match {
+          case true =>
+            Future.successful(AmbariCheckResponse(ambariApiCheck = false,
+              knoxDetected = true,
+              404,
+              Some(knoxUrl),
+              Json.obj(),if (checkCredentials) true else false,if (!checkCredentials) true else false))
+          case false =>
+            val delegatedRequest =
+              ws.url(endpoint).withRequestTimeout(timeout seconds)
+            val delegatedApiCall: ApiCall = { req =>
+              req.get()
+            }
+
+            val tokenInfoHeader = request.getHeader(Constants.DPTOKEN)
+            if (!tokenInfoHeader.isPresent) {
+              logger.error(
+                "Knox was detected, but the called did not send a JWT token with the request header X-DP-Token-Info")
+              throw new RuntimeException(
+                "Ambari was Knox protected but no jwt token was sent with the request")
+            }
+            val tokenHeader = tokenInfoHeader.get.value
+            val response =
+              KnoxApiExecutor(KnoxConfig("token", Some(knoxUrl)), ws).execute(
+                KnoxApiRequest(delegatedRequest,
+                               delegatedApiCall,
+                               Some(tokenHeader)))
+            response.map { res =>
+              res.status match {
+                case 200 =>
+                  AmbariCheckResponse(ambariApiCheck = true,
+                                      knoxDetected = true,
+                                      res.status,
+                                      Some(knoxUrl),
+                                      res.json)
+                case _ =>
+                  AmbariCheckResponse(ambariApiCheck = false,
+                                      knoxDetected = true,
+                                      res.status,
+                                      Some(knoxUrl),
+                                      res.json)
+              }
+            }
         }
       }
       .getOrElse {
@@ -182,12 +202,14 @@ class StatusRoute @Inject()(val ws: WSClient,
   val sync =
     path("cluster" / "sync") {
       extractRequest { request =>
-          post {
-            entity(as[DataplaneClusterIdentifier]) { dl =>
-              val header = request.getHeader(Constants.DPTOKEN)
-              val token = if (header.isPresent) Some(HJwtToken(header.get().value())) else None
-              dpClusterSync.triggerSync(dl.id, token)
-              complete(success(Map("status" -> 200)))
+        post {
+          entity(as[DataplaneClusterIdentifier]) { dl =>
+            val header = request.getHeader(Constants.DPTOKEN)
+            val token =
+              if (header.isPresent) Some(HJwtToken(header.get().value()))
+              else None
+            dpClusterSync.triggerSync(dl.id, token)
+            complete(success(Map("status" -> 200)))
           }
         }
       }

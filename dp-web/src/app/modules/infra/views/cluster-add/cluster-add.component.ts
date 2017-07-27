@@ -96,18 +96,26 @@ export class ClusterAddComponent implements OnInit {
           this._clusterState = response as ClusterState;
           let detailRequest = new ClusterDetailRequest();
           this.createDetailRequest(detailRequest, cleanedUri);
-          this.clusterService.getClusterInfo(detailRequest).subscribe(clusterInfo => {
-            this._isClusterValidateInProgress = false;
-            this._isClusterValidateSuccessful = true;
-            this._isClusterValid = true;
-            this.extractClusterInfo(clusterInfo);
-            this.cluster.ambariurl = cleanedUri;
-          }, () => {
-            this.onError();
-          });
-          let classes = this.ambariInputContainer.nativeElement.className.replace('validation-error', '');
-          this.ambariInputContainer.nativeElement.className = classes;
-        } else {
+          this.requestClusterInfo(detailRequest, cleanedUri);
+          this.removeValidationError();
+        } else if (response.requestAmbariCreds) {
+          //TODO - Padma/Babu/Hemanth/Rohit :Display a modal for ambari credentials
+          //Sending admin/admin for now
+          this._clusterState = response as ClusterState;
+          let detailRequest = new ClusterDetailRequest();
+          this.createDetailRequest(detailRequest, cleanedUri);
+          this.updateCredentials(detailRequest);
+          this.requestClusterInfo(detailRequest, cleanedUri);
+          this.removeValidationError();
+        } else if(response.requestKnoxURL) {
+          //TODO - Padma/Babu/Hemanth/Rohit :Display a modal for Knox Topology
+          let detailRequest = new ClusterDetailRequest();
+          this.createDetailRequest(detailRequest, cleanedUri);
+          this.updateTokenToplogy(detailRequest);
+          this.requestClusterInfo(detailRequest, cleanedUri);
+          this.removeValidationError();
+        }
+        else {
           this._isClusterValidateInProgress = false;
           this._isClusterValidateSuccessful = true;
           this._isClusterValid = false;
@@ -120,10 +128,41 @@ export class ClusterAddComponent implements OnInit {
     );
   }
 
+  private removeValidationError() {
+    this.ambariInputContainer.nativeElement.className = this.ambariInputContainer.nativeElement.className.replace('validation-error', '');
+  }
+
+  private requestClusterInfo(detailRequest: ClusterDetailRequest, cleanedUri: string) {
+    this.clusterService.getClusterInfo(detailRequest).subscribe(clusterInfo => {
+      this._isClusterValidateInProgress = false;
+      this._isClusterValidateSuccessful = true;
+      this._isClusterValid = true;
+      this.extractClusterInfo(clusterInfo);
+      this.cluster.ambariurl = cleanedUri;
+      if(this._clusterState.knoxDetected) {
+        // Update cluster state with the final knox URL - determined by
+        this._clusterState.knoxUrl = clusterInfo.knoxUrl
+      }
+    }, () => {
+      this.onError();
+    });
+  }
+
   private createDetailRequest(detailRequest: ClusterDetailRequest, cleanedUri: string) {
     detailRequest.url = cleanedUri;
     detailRequest.knoxDetected = this._clusterState.knoxDetected;
     detailRequest.knoxUrl = this._clusterState.knoxUrl;
+  }
+
+  private updateCredentials(detailRequest: ClusterDetailRequest) {
+    //TODO:TAKE this info from user
+    detailRequest.ambariUser = "admin";
+    detailRequest.ambariPass = "admin";
+  }
+
+  private updateTokenToplogy(detailRequest: ClusterDetailRequest) {
+    //TODO:TAKE this info from user
+    detailRequest.knoxTopology = "https://localhost:8443";
   }
 
   private onError() {
