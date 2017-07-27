@@ -12,8 +12,7 @@ import { CLUSTER_STATUS, SERVICE_STATUS } from 'constants/status.constant';
 import { without } from 'utils/array-util';
 
 function formatMapPopup(cluster) {
-  const popup = `<span>${cluster.name} ${cluster.dataCenter} / ${cluster.policiesCounter}</span>`;
-  return popup;
+  return `<span>${cluster.name} ${cluster.dataCenter} / ${cluster.policiesCounter}</span>`;
 }
 
 function getExistingMarker(collection: L.CircleMarker[], latLng: LatLng): L.CircleMarker {
@@ -39,16 +38,12 @@ export class MapComponent implements OnChanges, OnInit {
   }
 
   markerLookup: L.CircleMarker[] = [];
-  smallMarkerLookup: L.CircleMarker[] = [];
   pathLookup = [];
   countries = [];
 
   statusColorUp = '#3FAE2A';
   statusColorDown = '#EF6162';
-
-  markerColorOuterBorder = '#C4DCEC';
   markerColorInnerBorder = '#FFFFFF';
-
   mapColor = '#CFCFCF';
 
   mapOptions = {
@@ -99,13 +94,21 @@ export class MapComponent implements OnChanges, OnInit {
     if (this.map) {
       this.map.remove();
     }
-    this.geographyService.getCountries()
-      .subscribe(countries => {
+    this.geographyService.getCountries().subscribe(countries => {
       this.countries = countries;
       this.drawMap(countries);
       this.plotPoints();
-      this.map.fitBounds(L.featureGroup(this.markerLookup).getBounds());
+      this.fitBounds();
     });
+  }
+
+  fitBounds() {
+    if (this.markerLookup.length) {
+      this.map.fitBounds(L.featureGroup(this.markerLookup).getBounds(), {animate: false});
+      if (this.map.getZoom() > 5) {
+        this.map.setZoom(5, {animate: false});
+      }
+    }
   }
 
   drawMap(countries) {
