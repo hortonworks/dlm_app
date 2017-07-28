@@ -134,22 +134,26 @@ public class TokenCheckFilter extends ZuulFilter {
         //trying with Ldap Groups config
         UserRef userRef=userService.syncUserFromLdapGroupsConfiguration(tokenInfo.getSubject());
         if (userRef!=null){
-          addDpJwtToken(tokenInfo, userRef);
+          setupUserSession(tokenInfo, userRef);
           return null;
         }else{
           return utils.sendForbidden(String.format("User %s not found in the system",tokenInfo.getSubject()));
         }
       } else {
         UserRef userRef=userService.getUserRef(user.get());
-        addDpJwtToken(tokenInfo, userRef);
-        setUpstreamUserContext(userRef);
-        setUpstreamKnoxTokenContext();
-        RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY,userRef);
+        setupUserSession(tokenInfo, userRef);
         return null;
       }
     } catch (FeignException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private void setupUserSession(TokenInfo tokenInfo, UserRef userRef) {
+    addDpJwtToken(tokenInfo, userRef);
+    setUpstreamUserContext(userRef);
+    setUpstreamKnoxTokenContext();
+    RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY,userRef);
   }
 
   private void addDpJwtToken(TokenInfo tokenInfo, UserRef userRef) {
