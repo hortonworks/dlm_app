@@ -13,7 +13,7 @@ import { Event } from 'models/event.model';
     </div>
     <div class="row" *ngIf="events.length">
       <div class="pull-right view-all">
-        <small qe-attr="go-to-notifications" class="text-primary actionable" (click)="showAll()" *ngIf="!isAllVisible">
+        <small qe-attr="go-to-notifications" class="text-primary actionable" (click)="showAll()">
           <strong>{{'page.overview.issues.list.view_all' | translate}}</strong>
         </small>
       </div>
@@ -29,11 +29,7 @@ import { Event } from 'models/event.model';
 export class IssuesListComponent {
   visibleItems = 4;
   @Input() events: Event[];
-  @HostBinding('class.all-visible') get isVisible() { return this.isAllVisible; };
-
-  get isAllVisible(): boolean {
-    return this.events && this.visibleItems === this.events.length;
-  }
+  @HostBinding('class') className = 'all-visible';
 
   constructor(private router: Router) { }
 
