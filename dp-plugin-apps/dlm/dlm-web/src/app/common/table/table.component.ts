@@ -239,16 +239,20 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
     }
   }
 
+  recalculateTable() {
+    this.table.recalculate();
+  }
+
   ngAfterViewInit() {
     // this will avoid issue on initial calculation when parent for this component is not properly rendered
-    this.table.recalculate();
+    this.recalculateTable();
   }
 
   ngAfterViewChecked() {
     // Check if the table size has changed,
     if (this.table && this.table.recalculate && (this.tableWrapper.nativeElement.clientWidth !== this.currentComponentWidth)) {
       this.currentComponentWidth = this.tableWrapper.nativeElement.clientWidth;
-      this.table.recalculate();
+      this.recalculateTable();
       this.cdRef.detectChanges();
     }
   }

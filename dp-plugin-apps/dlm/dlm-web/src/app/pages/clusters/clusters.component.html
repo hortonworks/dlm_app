@@ -1,7 +1,11 @@
-<dlm-page-header [title]="'common.clusters'"></dlm-page-header>
 <div class="row page-section">
   <div class="col-md-12">
-    <dp-map [mapSize]="mapSize" [mapData]="clustersMapData$ | async"></dp-map>
+    <dlm-page-header [title]="'common.clusters'"></dlm-page-header>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <dp-map *ngIf="(clustersMapData$ | async).length" [mapSize]="mapSize" [mapData]="clustersMapData$ | async"></dp-map>
   </div>
 </div>
 <dlm-progress-container [progressState]="overallProgress$ | async">
