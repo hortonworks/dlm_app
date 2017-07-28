@@ -31,7 +31,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
 
   def allWithRoles(offset:Long=0,pageSize:Long=10, searchTerm:Option[String]): Future[UsersList] = {
     val query = searchTerm match {
-      case Some(searchTerm) => Users.filter(_.username like (s"%$searchTerm%")).sortBy(_.updated.desc).drop(offset).take(pageSize)
+      case Some(searchTerm) => Users.filter(user=>(user.groupManaged===false && (user.username like (s"%$searchTerm%")))).sortBy(_.updated.desc).drop(offset).take(pageSize)
       case None =>  Users.sortBy(_.updated.desc).drop(offset).take(pageSize)
     }
 
@@ -147,7 +147,8 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
   def insertUserWithGroups(userGroupInfo:UserGroupInfo)={
       val query = for {
         user <-{
-          val user = User(username = userGroupInfo.userName, password = "", displayname = userGroupInfo.displayName,avatar = None,active = userGroupInfo.active)
+          val user = User(username = userGroupInfo.userName, password = "", displayname = userGroupInfo.displayName,avatar = None,
+            active = userGroupInfo.active,groupManaged=Some(true))
           Users returning Users += user
         }
         userGroups<- {
