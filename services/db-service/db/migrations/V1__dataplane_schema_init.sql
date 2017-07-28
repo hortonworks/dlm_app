@@ -248,7 +248,9 @@ CREATE TABLE IF NOT EXISTS dataplane.ldap_configs (
   user_searchbase      VARCHAR(255),
   usersearch_attributename  VARCHAR(255),
   group_searchbase     VARCHAR(255),
-  groupsearch_attributename  VARCHAR(255)
+  groupsearch_attributename  VARCHAR(255),
+  group_objectclass VARCHAR(255),
+  groupmember_attributename VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS dataplane.user_groups (

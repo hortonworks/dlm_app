@@ -285,7 +285,9 @@ object Entities {
                               userSearchBase: Option[String],
                               userSearchAttributeName:Option[String],
                               groupSearchBase: Option[String],
-                              groupSearchAttributeName:Option[String]
+                              groupSearchAttributeName:Option[String],
+                              groupObjectClass:Option[String],
+                              groupMemberAttributeName: Option[String]
                               )
 
   case class WorkspaceDataCount(asset: Int, notebook: Int)

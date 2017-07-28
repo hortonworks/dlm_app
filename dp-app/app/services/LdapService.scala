@@ -55,7 +55,9 @@ class LdapService @Inject()(
                           userSearchBase=knoxConf.userSearchBase,
                           userSearchAttributeName=knoxConf.userSearchAttributeName,
                           groupSearchBase=knoxConf.groupSearchBase,
-                          groupSearchAttributeName=knoxConf.groupSearchAttributeName
+                          groupSearchAttributeName=knoxConf.groupSearchAttributeName,
+                          groupObjectClass=knoxConf.groupObjectClass,
+                          groupMemberAttributeName=knoxConf.groupMemberAttributeName
                         )
                       ldapConfigService.create(ldapConfiguration).map {
                         case Left(errors) => Left(errors)
@@ -224,9 +226,10 @@ class LdapService @Inject()(
   private def getUserAndGroups(  dirContext: DirContext,
                       ldapConfs: Seq[LdapConfiguration],userName:String):
   Future[Either[Errors, LdapUser]]={
-    val groupSearchBase=ldapConfs.head.groupSearchBase
-    if (groupSearchBase.isEmpty ){
-      Future.successful(Left(Errors(Seq(Error("Exception", "Group search base must be configured")))))
+    var ldapConf=ldapConfs.head
+    val groupSearchBase=ldapConf.groupSearchBase
+    if (groupSearchBase.isEmpty || ldapConf.groupObjectClass.isEmpty ||ldapConf.groupMemberAttributeName.isEmpty ){
+      Future.successful(Left(Errors(Seq(Error("Exception", "Group search base,groupObjectClass and groupmemberAttributeName must be configured")))))
     }else{
       search(userName,Some("user"),fuzzyMatch = false).map{
         case Left(errors)=>Left(errors)
@@ -236,8 +239,8 @@ class LdapService @Inject()(
             case Some(userRes)=>{
               val groupSearchControls = new SearchControls
               groupSearchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
-              val groupObjectClass="groupofnames" //TODO get from conf
-              val groupMemberAttributeName="member" //TODO get from conf
+              val groupObjectClass=ldapConf.groupObjectClass.get;//ex "groupofnames"
+              val groupMemberAttributeName=ldapConf.groupMemberAttributeName.get;//ex "member"
               val extendedGroupSearchFilter = s"(objectclass= $groupObjectClass)"
               var groupSearchFilter=s"(&$extendedGroupSearchFilter($groupMemberAttributeName={0}))"
               val userArr=List(userRes.nameInNameSpace).toArray[Object]
