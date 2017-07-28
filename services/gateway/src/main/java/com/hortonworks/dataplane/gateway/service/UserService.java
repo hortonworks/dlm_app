@@ -3,7 +3,7 @@ package com.hortonworks.dataplane.gateway.service;
 import com.google.common.base.Optional;
 import com.hortonworks.dataplane.gateway.domain.User;
 import com.hortonworks.dataplane.gateway.domain.UserList;
-import com.hortonworks.dataplane.gateway.domain.UserRef;
+import com.hortonworks.dataplane.gateway.domain.UserContext;
 import com.hortonworks.dataplane.gateway.domain.UserRoleResponse;
 import com.hortonworks.dataplane.gateway.utils.Utils;
 import feign.FeignException;
@@ -42,18 +42,18 @@ public class UserService {
     }
   }
 
-  public Optional<UserRef> getUserRef(String userName) {
+  public Optional<UserContext> getUserContext(String userName) {
     Optional<User> user = getUser(userName);
     if (user.isPresent()) {
       List<String> roles = getRoles(userName);
-      return Optional.of(getUserRef(user.get(), roles, null));
+      return Optional.of(getUserContext(user.get(), roles, null));
     } else {
       return Optional.absent();
     }
   }
-  public UserRef getUserRef(User user) {
+  public UserContext getUserContext(User user) {
     List<String> roles = getRoles(user.getUsername());
-    return getUserRef(user, roles, null);
+    return getUserContext(user, roles, null);
   }
 
   public List<String> getRoles(String userName) {
@@ -70,21 +70,21 @@ public class UserService {
     }
   }
 
-  public UserRef getUserRef(User user, List<String> roles, String token) {
-    UserRef userRef = new UserRef();
-    userRef.setId(user.getId());//TODO currently id is username. check later
-    userRef.setUsername(user.getUsername());
-    userRef.setAvatar(user.getAvatar());
-    userRef.setDisplay(user.getDisplayname());
+  public UserContext getUserContext(User user, List<String> roles, String token) {
+    UserContext userContext = new UserContext();
+    userContext.setId(user.getId());//TODO currently id is username. check later
+    userContext.setUsername(user.getUsername());
+    userContext.setAvatar(user.getAvatar());
+    userContext.setDisplay(user.getDisplayname());
     try {
-      userRef.setRoles(roles);
+      userContext.setRoles(roles);
     } catch (Throwable th) {
-      userRef.setRoles(new ArrayList<String>());
+      userContext.setRoles(new ArrayList<String>());
     }
-    userRef.setToken(token);
-    return userRef;
+    userContext.setToken(token);
+    return userContext;
   }
-  public UserRef syncUserFromLdapGroupsConfiguration(String subject) {
+  public UserContext syncUserFromLdapGroupsConfiguration(String subject) {
     try {
       return ldapUserInterface.addUserFromLdapGroupsConfiguration(subject);
     }catch (FeignException fe){

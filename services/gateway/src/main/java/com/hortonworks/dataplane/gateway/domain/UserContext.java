@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.List;
 
-public class UserRef implements Serializable {
+public class UserContext implements Serializable {
 
   private Long id;
   private String username;
@@ -15,7 +15,7 @@ public class UserRef implements Serializable {
   private String display;
   private String token;
 
-  public UserRef() {
+  public UserContext() {
   }
 
   @JsonProperty

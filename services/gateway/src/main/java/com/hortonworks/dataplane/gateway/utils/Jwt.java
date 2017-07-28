@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
-import com.hortonworks.dataplane.gateway.domain.UserRef;
+import com.hortonworks.dataplane.gateway.domain.UserContext;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,16 +34,16 @@ public class Jwt {
   @Autowired
   private GatewayKeystore gatewayKeystore;
 
-  public String makeJWT(UserRef userRef) throws JsonProcessingException {
+  public String makeJWT(UserContext userContext) throws JsonProcessingException {
     long timeMillis = System.currentTimeMillis();
     Date now = new Date(timeMillis);
     Map<String, Object> claims = Maps.newHashMap();
-    claims.put(USER_CLAIM, objectMapper.writeValueAsString(userRef));
+    claims.put(USER_CLAIM, objectMapper.writeValueAsString(userContext));
 
     JwtBuilder builder = Jwts.builder()
       .setIssuedAt(now)
       .setIssuer(issuer)
-      .setSubject(userRef.getUsername())
+      .setSubject(userContext.getUsername())
       .setClaims(claims)
       .setExpiration(new Date(now.getTime() + jwtValidity *MINUTE))
       .signWith(sa, getSigningKey());
@@ -53,7 +53,7 @@ public class Jwt {
   }
 
 
-  public Optional<UserRef> parseJWT(String jwt) throws IOException {
+  public Optional<UserContext> parseJWT(String jwt) throws IOException {
     try {
       Claims claims = Jwts.parser()
         .setSigningKey(getVerifyingKey())
@@ -64,9 +64,9 @@ public class Jwt {
         return Optional.absent();
       }else{
         String userJsonString = claims.get(USER_CLAIM).toString();
-        UserRef userRef = objectMapper.readValue(userJsonString, UserRef.class);
-        userRef.setToken(jwt);
-        return Optional.fromNullable(userRef);
+        UserContext userContext = objectMapper.readValue(userJsonString, UserContext.class);
+        userContext.setToken(jwt);
+        return Optional.fromNullable(userContext);
       }
     }catch (ExpiredJwtException ex){
       logger.error("token expired",ex);

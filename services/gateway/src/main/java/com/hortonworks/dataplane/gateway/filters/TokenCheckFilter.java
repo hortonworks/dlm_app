@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.hortonworks.dataplane.gateway.domain.TokenInfo;
 import com.hortonworks.dataplane.gateway.domain.User;
-import com.hortonworks.dataplane.gateway.domain.UserRef;
+import com.hortonworks.dataplane.gateway.domain.UserContext;
 import com.hortonworks.dataplane.gateway.utils.Jwt;
 import com.hortonworks.dataplane.gateway.service.UserService;
 import com.hortonworks.dataplane.gateway.utils.CookieManager;
@@ -132,16 +132,16 @@ public class TokenCheckFilter extends ZuulFilter {
       Optional<User> user = userService.getUser(tokenInfo.getSubject());
       if (!user.isPresent()) {
         //trying with Ldap Groups config
-        UserRef userRef=userService.syncUserFromLdapGroupsConfiguration(tokenInfo.getSubject());
-        if (userRef!=null){
-          setupUserSession(tokenInfo, userRef);
+        UserContext userContext=userService.syncUserFromLdapGroupsConfiguration(tokenInfo.getSubject());
+        if (userContext!=null){
+          setupUserSession(tokenInfo, userContext);
           return null;
         }else{
           return utils.sendForbidden(String.format("User %s not found in the system",tokenInfo.getSubject()));
         }
       } else {
-        UserRef userRef=userService.getUserRef(user.get());
-        setupUserSession(tokenInfo, userRef);
+        UserContext userContext=userService.getUserContext(user.get());
+        setupUserSession(tokenInfo, userContext);
         return null;
       }
     } catch (FeignException e) {
@@ -149,17 +149,17 @@ public class TokenCheckFilter extends ZuulFilter {
     }
   }
 
-  private void setupUserSession(TokenInfo tokenInfo, UserRef userRef) {
-    addDpJwtToken(tokenInfo, userRef);
-    setUpstreamUserContext(userRef);
+  private void setupUserSession(TokenInfo tokenInfo, UserContext userContext) {
+    addDpJwtToken(tokenInfo, userContext);
+    setUpstreamUserContext(userContext);
     setUpstreamKnoxTokenContext();
-    RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY,userRef);
+    RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY,userContext);
   }
 
-  private void addDpJwtToken(TokenInfo tokenInfo, UserRef userRef) {
+  private void addDpJwtToken(TokenInfo tokenInfo, UserContext userContext) {
     try {
-      String jwtToken = jwt.makeJWT(userRef);
-      userRef.setToken(jwtToken);
+      String jwtToken = jwt.makeJWT(userContext);
+      userContext.setToken(jwtToken);
       cookieManager.addDataplaneJwtCookie(jwtToken,tokenInfo.getExpiryTime());
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
@@ -175,10 +175,10 @@ public class TokenCheckFilter extends ZuulFilter {
     return LOGOUT_PATH.equals(ctx.getRequest().getServletPath());
   }
 
-  private void setUpstreamUserContext(UserRef userRef) {
+  private void setUpstreamUserContext(UserContext userContext) {
     RequestContext ctx = RequestContext.getCurrentContext();
     try {
-      String userJson = objectMapper.writeValueAsString(userRef);
+      String userJson = objectMapper.writeValueAsString(userContext);
       ctx.addZuulRequestHeader(DP_USER_INFO_HEADER_KEY, Base64.encodeBase64String(userJson.getBytes()));
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
@@ -195,15 +195,15 @@ public class TokenCheckFilter extends ZuulFilter {
 
   private Object authorizeThroughDPToken(Optional<String> bearerToken) {
     try {
-      Optional<UserRef> userRefOptional = jwt.parseJWT(bearerToken.get());
-      if (!userRefOptional.isPresent()) {
+      Optional<UserContext> userContextOptional = jwt.parseJWT(bearerToken.get());
+      if (!userContextOptional.isPresent()) {
         cookieManager.deleteDataplaneJwtCookie();
         return handleUnAuthorized("DP_JWT_COOKIE has expired or not valid");
       } else {
-        UserRef userRef = userRefOptional.get();
-        setUpstreamUserContext(userRef);
+        UserContext userContext = userContextOptional.get();
+        setUpstreamUserContext(userContext);
         setUpstreamKnoxTokenContext();
-        RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, userRef);
+        RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, userContext);
         return null;
         //TODO  role check. api permission check on the specified resource.
       }

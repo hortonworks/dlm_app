@@ -84,14 +84,14 @@ public class SimpleSignInFilter extends ZuulFilter {
       if (!validPassword) {
         return sendInvalidPasswordResponse();
       }
-      Optional<UserRef> userRefOpt = userService.getUserRef(credential.getUsername());
-      if (userRefOpt.isPresent()){
+      Optional<UserContext> userContextOpt = userService.getUserContext(credential.getUsername());
+      if (userContextOpt.isPresent()){
         // Construct a JWT token
-        UserRef userRef=userRefOpt.get();
-        String jwtToken = jwt.makeJWT(userRef);
-        userRef.setToken(jwtToken);
+        UserContext userContext= userContextOpt.get();
+        String jwtToken = jwt.makeJWT(userContext);
+        userContext.setToken(jwtToken);
         ctx.setResponseStatusCode(200);
-        ctx.setResponseBody(objectMapper.writeValueAsString(userRef));
+        ctx.setResponseBody(objectMapper.writeValueAsString(userContext));
         cookieManager.addDataplaneJwtCookie(jwtToken,Optional.<Date>absent());
         ctx.setSendZuulResponse(false);
       }
