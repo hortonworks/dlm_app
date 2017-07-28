@@ -3,6 +3,7 @@ import {Subject} from 'rxjs/Subject';
 export class AuthUtils {
 
   private static user;
+  private static validUser;
 
   public static loggedIn = new Subject<boolean>();
   public static loggedIn$ =  AuthUtils.loggedIn.asObservable();
@@ -16,6 +17,14 @@ export class AuthUtils {
 
   public static isUserLoggedIn() {
     return !!this.getUser();
+  }
+
+  public static isValidUser(){
+    return this.validUser;
+  }
+
+  public static setValidUser(isValid: boolean){
+    this.validUser = isValid;
   }
 
   public static getUser(): User {
