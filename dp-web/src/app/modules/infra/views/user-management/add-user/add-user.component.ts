@@ -1,10 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {UserService} from '../../../../../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TaggingWidgetTagModel, TagTheme} from '../../../../../shared/tagging-widget/tagging-widget.component';
 import {User} from '../../../../../models/user';
 import {TranslateService} from '@ngx-translate/core';
+import {NgForm} from '@angular/forms';
 
 @Component({
   selector: 'dp-add-user',
@@ -27,6 +28,12 @@ export class AddUserComponent implements OnInit {
   user: User = new User('', '', '', '', [], false, '');
   userRoles: TaggingWidgetTagModel[] = [];
 
+  errorMessage: string;
+  showError = false;
+
+  @ViewChild('addUserForm') addUserForm: NgForm;
+  @ViewChild('editUserForm') editUserForm: NgForm;
+
   constructor(private userService: UserService, private router: Router, private route: ActivatedRoute, private translateService: TranslateService) {
   }
 
@@ -37,14 +44,14 @@ export class AddUserComponent implements OnInit {
       this.userService.getUserByName(this.userName).subscribe(user => {
         this.user = user;
         let roles = [];
-        this.user.roles.forEach(role =>{
+        this.user.roles.forEach(role => {
           this.userRoles.push(new TaggingWidgetTagModel(this.translateService.instant(`common.roles.${role}`), role));
         });
       });
     }
     this.userService.getAllRoles().subscribe(roles => {
       this.allRoles = roles.map(role => {
-        return new TaggingWidgetTagModel(this.translateService.instant(`common.roles.${role.roleName}`),role.roleName);
+        return new TaggingWidgetTagModel(this.translateService.instant(`common.roles.${role.roleName}`), role.roleName);
       })
     });
   }
@@ -85,7 +92,8 @@ export class AddUserComponent implements OnInit {
   }
 
   save() {
-    if (this.mode as Modes === Modes.EDIT) {
+    this.showError = false;
+    if (this.mode as Modes === Modes.EDIT && this.isEditDataValid()) {
       this.user.roles = this.userRoles.map(role => {
         return role.data
       });
@@ -93,9 +101,11 @@ export class AddUserComponent implements OnInit {
         this.userService.dataChanged.next();
         this.router.navigate(['users'], {relativeTo: this.route});
       }, error => {
-        console.error('error')
+        console.error(error);
+        this.showError = true;
+        this.errorMessage = 'Error while updating user/roles';
       });
-    } else {
+    } else if (this.isCreateDataValid()) {
       let roles = this.roles.map(role => {
         return role.data;
       });
@@ -103,9 +113,29 @@ export class AddUserComponent implements OnInit {
         this.userService.dataChanged.next();
         this.router.navigate(['users'], {relativeTo: this.route});
       }, error => {
-        console.error('error')
+        this.errorMessage = 'Error while saving user/roles';
+        this.showError = true;
+        console.error(error);
       });
     }
+  }
+
+  isEditDataValid() {
+    if (!this.editUserForm.form.valid || this.user.roles.length === 0) {
+      this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
+      this.showError = true;
+      return false;
+    }
+    return true;
+  }
+
+  isCreateDataValid() {
+    if (!this.addUserForm.form.valid || this.roles.length === 0) {
+      this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
+      this.showError = true;
+      return false;
+    }
+    return true;
   }
 
   back() {
