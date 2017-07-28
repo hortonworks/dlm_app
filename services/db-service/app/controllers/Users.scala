@@ -2,14 +2,11 @@ package controllers
 
 import javax.inject._
 
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  User,
-  UserInfo,
-  UserRole
-}
+import com.hortonworks.dataplane.commons.domain.Entities._
 import domain.API.{roles, users}
 import domain.{RolesUtil, UserRepo}
 import org.mindrot.jbcrypt.BCrypt
+import play.api.libs.json.Json
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -110,6 +107,18 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
           .recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))
+  }
+  def insertWithGroups =Action.async(parse.json) { req=>
+    req.body.validate[UserGroupInfo]
+      .map { userGroupInfo =>
+        if (userGroupInfo.groupIds.isEmpty){
+          Future.successful(BadRequest(Json.toJson(Errors(Seq(Error("Input Error","Group needs to be specified"))))))
+        }else{
+          userRepo.insertUserWithGroups(userGroupInfo)
+            .map(userGroupInfo => success(userGroupInfo))
+            .recoverWith(apiError)
+        }
+      }.getOrElse(Future.successful(BadRequest))
   }
 
   def delete(userId: Long) = Action.async {

@@ -9,16 +9,11 @@ import com.google.inject.Inject
 import com.google.inject.name.Named
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  Error,
-  Errors,
-  LdapConfiguration
-}
-import com.hortonworks.dataplane.commons.domain.Ldap.LdapSearchResult
-import com.hortonworks.dataplane.db.Webservice.{LdapConfigService, UserService}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, LdapConfiguration}
+import com.hortonworks.dataplane.commons.domain.Ldap.{LdapGroup, LdapSearchResult, LdapUser}
+import com.hortonworks.dataplane.db.Webservice.LdapConfigService
 import com.typesafe.scalalogging.Logger
 import models.{CredentialEntry, KnoxConfigInfo}
-import play.api.libs.ws.WSClient
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
@@ -26,14 +21,11 @@ import scala.util.Left
 
 @Singleton
 class LdapService @Inject()(
-    @Named("userService") val userService: UserService,
     @Named("ldapConfigService") val ldapConfigService: LdapConfigService,
     private val ldapKeyStore: DpKeyStore,
-    private val wSClient: WSClient,
     private val configuration: play.api.Configuration) {
   private val logger = Logger(classOf[LdapService])
   private val USERDN_SUBSTITUTION_TOKEN = "{0}"
-
 
   def configure(knoxConf: KnoxConfigInfo): Future[Either[Errors, Boolean]] = {
     if (knoxConf.bindDn.isEmpty || knoxConf.password.isEmpty) {
@@ -136,16 +128,15 @@ class LdapService @Inject()(
         val cred: Option[CredentialEntry] =
           ldapKeyStore.getCredentialEntry(l.bindDn.get)
         cred match {
-          case Some(cred) => {
+          case Some(cred) =>
             getLdapContext(l.ldapUrl, l.bindDn.get, cred.password)
-          }
           case None =>
             Future.successful(
-              Left(Errors(Seq(new Error("Exception", "no password ")))))
+              Left(Errors(Seq(Error("Exception", "no password ")))))
         }
       }
       .getOrElse(Future.successful(
-        Left(Errors(Seq(new Error("Exception", "no configuration"))))))
+        Left(Errors(Seq(Error("Exception", "no configuration"))))))
   }
 
   private def ldapSearch(
@@ -195,7 +186,7 @@ class LdapService @Inject()(
                                 ldapConfs: Seq[LdapConfiguration],groupName:String):Future[Either[Errors, Seq[LdapSearchResult]]]={
     val groupSearchBase=ldapConfs.head.groupSearchBase
     if (groupSearchBase.isEmpty || ldapConfs.head.groupSearchAttributeName.isEmpty){
-      Future.successful(Left(Errors(Seq(new Error("Exception", "Group search base must be configured")))))
+      Future.successful(Left(Errors(Seq(Error("Exception", "Group search base must be configured")))))
     }else{
       val searchControls: SearchControls = new SearchControls()
       searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
@@ -215,54 +206,53 @@ class LdapService @Inject()(
       Future.successful(Right(ldapSearchResults))
     }
   }
-  def getUserGroups(userName:String):  Future[Either[Errors, Seq[LdapSearchResult]]] ={
+  def getUserGroups(userName:String):  Future[Either[Errors,LdapUser]] ={
     for {
       configuredLdap <- getConfiguredLdap
       dirContext <- doWithEither[Seq[LdapConfiguration], DirContext](
         configuredLdap,
         validateAndGetLdapContext)
-      search <- doWithEither[DirContext, Seq[LdapSearchResult]](
+      search <- doWithEither[DirContext, LdapUser](
         dirContext,
         context => {
-          getUserGroups(context, configuredLdap.right.get, userName)
+          getUserAndGroups(context, configuredLdap.right.get, userName)
         })
     } yield search
 
   }
 
-  private def getUserGroups(  dirContext: DirContext,
+  private def getUserAndGroups(  dirContext: DirContext,
                       ldapConfs: Seq[LdapConfiguration],userName:String):
-  Future[Either[Errors, Seq[LdapSearchResult]]]={
+  Future[Either[Errors, LdapUser]]={
     val groupSearchBase=ldapConfs.head.groupSearchBase
     if (groupSearchBase.isEmpty ){
-      Future.successful(Left(Errors(Seq(new Error("Exception", "Group search base must be configured")))))
+      Future.successful(Left(Errors(Seq(Error("Exception", "Group search base must be configured")))))
     }else{
-      search(userName,Some("user"),false).map{
+      search(userName,Some("user"),fuzzyMatch = false).map{
         case Left(errors)=>Left(errors)
         case Right(userSearchResults)=>{
           userSearchResults.headOption match {
-            case None=>Left(Errors(Seq(new Error("No user", "There is no such user"))))
-            case Some(result)=>{
-              result.nameInNameSpace
+            case None=>Left(Errors(Seq(Error("No user", "There is no such user"))))
+            case Some(userRes)=>{
               val groupSearchControls = new SearchControls
               groupSearchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
               val groupObjectClass="groupofnames" //TODO get from conf
               val groupMemberAttributeName="member" //TODO get from conf
               val extendedGroupSearchFilter = s"(objectclass= $groupObjectClass)"
               var groupSearchFilter=s"(&$extendedGroupSearchFilter($groupMemberAttributeName={0}))"
-              val userArr=List(result.nameInNameSpace).toArray[Object]
+              val userArr=List(userRes.nameInNameSpace).toArray[Object]
               val res: NamingEnumeration[SearchResult]=dirContext.search(groupSearchBase.get,groupSearchFilter,userArr,groupSearchControls)
-              val ldapSearchResults: ArrayBuffer[LdapSearchResult]=new ArrayBuffer
+              val ldapGroups: ArrayBuffer[LdapGroup]=new ArrayBuffer
               while (res.hasMore) {
                 val sr: SearchResult = res.next()
-                val ldaprs = new LdapSearchResult(
+                val ldaprs = LdapGroup(
                   sr.getName,
                   sr.getClassName,
                   sr.getNameInNamespace)
-                ldapSearchResults += ldaprs
+                ldapGroups += ldaprs
               }
-              println(s"User group result=$ldapSearchResults")
-              Right(ldapSearchResults)
+              val ldapUser=LdapUser(userRes.name,userRes.className,userRes.nameInNameSpace,ldapGroups)
+              Right(ldapUser)
             }
           }
         }
@@ -294,7 +284,7 @@ class LdapService @Inject()(
     } catch {
       case e: NamingException =>
         Future.successful(
-          Left(Errors(Seq(new Error("Exception", e.getMessage)))))
+          Left(Errors(Seq(Error("Exception", e.getMessage)))))
     }
   }
 }

@@ -111,6 +111,13 @@ class GroupsRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
       GroupInfo(id = group.id, groupName = group.groupName, displayName = group.displayName, roles = roles, active = group.active)
     }
   }
+  def getRolesForGroups(groupIds:Seq[Long])={
+    val query=GroupsRoles.filter(_.groupId.inSet(groupIds)).to[List].result
+    db.run(query).flatMap{res=>
+      val roleIds:Seq[Long]=res.map(role=>role.roleId.get)
+      rolesUtil.getRoleTypesForRoleIds(roleIds)
+    }
+  }
 
   def getGroupDetailInternal(groupName: String) = {
     val query = for {

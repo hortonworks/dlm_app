@@ -131,22 +131,33 @@ public class TokenCheckFilter extends ZuulFilter {
     try {
       Optional<User> user = userService.getUser(tokenInfo.getSubject());
       if (!user.isPresent()) {
-        return utils.sendForbidden(String.format("User %s not found in the system",tokenInfo.getSubject()));
+        //trying with Ldap Groups config
+        UserRef userRef=userService.syncUserFromLdapGroupsConfiguration(tokenInfo.getSubject());
+        if (userRef!=null){
+          addDpJwtToken(tokenInfo, userRef);
+          return null;
+        }else{
+          return utils.sendForbidden(String.format("User %s not found in the system",tokenInfo.getSubject()));
+        }
       } else {
         UserRef userRef=userService.getUserRef(user.get());
-        try {
-          String jwtToken = jwt.makeJWT(userRef);
-          userRef.setToken(jwtToken);
-          cookieManager.addDataplaneJwtCookie(jwtToken,tokenInfo.getExpiryTime());
-        } catch (JsonProcessingException e) {
-          throw new RuntimeException(e);
-        }
+        addDpJwtToken(tokenInfo, userRef);
         setUpstreamUserContext(userRef);
         setUpstreamKnoxTokenContext();
         RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY,userRef);
         return null;
       }
     } catch (FeignException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void addDpJwtToken(TokenInfo tokenInfo, UserRef userRef) {
+    try {
+      String jwtToken = jwt.makeJWT(userRef);
+      userRef.setToken(jwtToken);
+      cookieManager.addDataplaneJwtCookie(jwtToken,tokenInfo.getExpiryTime());
+    } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
   }
@@ -186,7 +197,6 @@ public class TokenCheckFilter extends ZuulFilter {
         return handleUnAuthorized("DP_JWT_COOKIE has expired or not valid");
       } else {
         UserRef userRef = userRefOptional.get();
-        User user=userService.getUserFromUserRef(userRef);
         setUpstreamUserContext(userRef);
         setUpstreamKnoxTokenContext();
         RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, userRef);

@@ -21,6 +21,9 @@ public class UserService {
   @Autowired
   private UserServiceInterface userServiceInterface;
 
+  @Autowired
+  private LdapUserInterface ldapUserInterface;
+
   public Optional<User> getUser(String userName) {
     try {
       UserList userList = userServiceInterface.getUser(userName);
@@ -81,13 +84,11 @@ public class UserService {
     userRef.setToken(token);
     return userRef;
   }
-  public User getUserFromUserRef(UserRef userRef){
-    User user=new User();
-    user.setId(userRef.getId());
-    user.setUsername(userRef.getUsername());
-    user.setAvatar(userRef.getAvatar());
-    user.setDisplayname(userRef.getDisplay());
-    user.setPassword("******");
-    return user;
+  public UserRef syncUserFromLdapGroupsConfiguration(String subject) {
+    try {
+      return ldapUserInterface.addUserFromLdapGroupsConfiguration(subject);
+    }catch (FeignException fe){
+      throw new RuntimeException(fe);
+    }
   }
 }

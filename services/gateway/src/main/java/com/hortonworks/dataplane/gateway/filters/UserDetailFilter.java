@@ -43,7 +43,7 @@ public class UserDetailFilter extends ZuulFilter {
   @Override
   public Object run() {
     RequestContext ctx = RequestContext.getCurrentContext();
-    Object userRefObj = RequestContext.getCurrentContext().get(Constants.USER_CTX_KEY);
+    Object userRefObj = ctx.get(Constants.USER_CTX_KEY);
     if (userRefObj == null) {
       ctx.setResponseStatusCode(200);
       ctx.setResponseBody("{}");

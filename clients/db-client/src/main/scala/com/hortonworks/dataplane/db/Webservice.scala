@@ -58,6 +58,9 @@ object Webservice {
     def getUserDetail(userName:String): Future[Either[Errors,UserInfo]]
 
     def updateActiveAndRoles(userInfo: UserInfo): Future[Either[Errors,Boolean]]
+
+    def addUserWithGroups(userGroupInfo: UserGroupInfo): Future[Either[Errors,UserGroupInfo]]
+
   }
 
   trait GroupService extends DbClientService {
@@ -69,6 +72,8 @@ object Webservice {
     def updateGroupInfo(groupInfo: GroupInfo): Future[Either[Errors,Boolean]]
 
     def getGroupByName(groupName: String): Future[Either[Errors,GroupInfo]]
+
+    def getRolesForGroups(groupIds:Seq[Long]): Future[Either[Errors,Seq[String]]]
   }
 
   trait DataSetService extends DbClientService {

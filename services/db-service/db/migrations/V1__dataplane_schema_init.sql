@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS dataplane.users (
   user_name    VARCHAR(255) NOT NULL UNIQUE,
   display_name VARCHAR(255),
   avatar       VARCHAR(255),
+  group_managed BOOLEAN DEFAULT FALSE,
   active       BOOLEAN   DEFAULT TRUE,
   password     VARCHAR(255),
   created      TIMESTAMP DEFAULT now(),
@@ -250,3 +251,10 @@ CREATE TABLE IF NOT EXISTS dataplane.ldap_configs (
   groupsearch_attributename  VARCHAR(255)
 );
 
+CREATE TABLE IF NOT EXISTS dataplane.user_groups (
+  id           BIGSERIAL PRIMARY KEY,
+  user_id BIGINT REFERENCES dataplane.users (id) NOT NULL,
+  group_id BIGINT REFERENCES dataplane.groups (id) NOT NULL,
+  created      TIMESTAMP DEFAULT now(),
+  updated      TIMESTAMP DEFAULT now()
+);

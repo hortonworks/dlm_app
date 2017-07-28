@@ -1,5 +1,5 @@
 package com.hortonworks.dataplane.db
-
+import com.hortonworks.dataplane.commons.domain.RoleType
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.db.Webservice.GroupService
 import com.typesafe.config.Config
@@ -69,6 +69,18 @@ class GroupServiceImpl(config: Config)(implicit ws: WSClient) extends GroupServi
       .map { res =>
         res.status match {
           case 200 => Right((res.json \ "results").validate[GroupInfo].get)
+          case _ => mapErrors(res)
+        }
+      }
+  }
+  override def getRolesForGroups(groupIds:Seq[Long]): Future[Either[Errors,Seq[String]]]={
+    val groupIdsStr=groupIds.mkString(",")
+    ws.url(s"$url/groups/roles?groupIds=$groupIdsStr")
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map { res =>
+        res.status match {
+          case 200 => Right((res.json \ "results").validate[Seq[String]].get)
           case _ => mapErrors(res)
         }
       }

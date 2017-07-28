@@ -60,5 +60,19 @@ class Groups @Inject()(groupsRepo: GroupsRepo, rolesUtil: RolesUtil)(
       }
       .recoverWith(apiError)
   }
-
+  /*
+  groupIds: comma separated groupIds
+   */
+  def getRoles()=Action.async {req=>
+    val groupIdsStr = req.getQueryString("groupIds")
+    groupIdsStr match {
+      case None=> Future.successful(BadRequest("groupIds not given"))
+      case Some(groupIdStr)=>{
+        val groupIds=groupIdsStr.get.split(",").map(group=>group.toLong)
+        groupsRepo.getRolesForGroups(groupIds).map{roles=>
+          success(roles)
+        }.recoverWith(apiError)
+      }
+    }
+  }
 }
