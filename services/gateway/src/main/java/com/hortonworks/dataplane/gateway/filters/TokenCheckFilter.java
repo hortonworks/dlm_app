@@ -4,16 +4,13 @@ package com.hortonworks.dataplane.gateway.filters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
-import com.hortonworks.dataplane.gateway.domain.TokenInfo;
-import com.hortonworks.dataplane.gateway.domain.User;
-import com.hortonworks.dataplane.gateway.domain.UserContext;
+import com.hortonworks.dataplane.gateway.domain.*;
 import com.hortonworks.dataplane.gateway.utils.Jwt;
 import com.hortonworks.dataplane.gateway.service.UserService;
 import com.hortonworks.dataplane.gateway.utils.CookieManager;
 import com.hortonworks.dataplane.gateway.utils.KnoxSso;
 import com.hortonworks.dataplane.gateway.utils.RequestResponseUtils;
 import com.hortonworks.dataplane.gateway.utils.Utils;
-import com.hortonworks.dataplane.gateway.domain.Constants;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import feign.FeignException;
@@ -132,12 +129,16 @@ public class TokenCheckFilter extends ZuulFilter {
       Optional<User> user = userService.getUser(tokenInfo.getSubject());
       if (!user.isPresent()) {
         //trying with Ldap Groups config
-        UserContext userContext=userService.syncUserFromLdapGroupsConfiguration(tokenInfo.getSubject());
-        if (userContext!=null){
-          setupUserSession(tokenInfo, userContext);
-          return null;
-        }else{
-          return utils.sendForbidden(String.format("User %s not found in the system",tokenInfo.getSubject()));
+        try {
+          UserContext userContext = userService.syncUserFromLdapGroupsConfiguration(tokenInfo.getSubject());
+          if (userContext != null) {
+            setupUserSession(tokenInfo, userContext);
+            return null;
+          } else {
+            return utils.sendForbidden(String.format("User %s not found in the system", tokenInfo.getSubject()));
+          }
+        }catch (NoAllowedGroupsException nge){
+          return utils.sendForbidden(String.format("User %s does not found in the system. groups are not confiugred.", tokenInfo.getSubject()));
         }
       } else {
         UserContext userContext=userService.getUserContext(user.get());

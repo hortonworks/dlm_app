@@ -185,11 +185,15 @@ class UserManager @Inject()(val ldapService: LdapService,
     getMatchingGroupsFromLdapAndDb(userName).flatMap{
       case Left(errors)=>Future.successful(Left(errors))
       case Right(groups)=>{
-        val groupIds=groups.map(grp=>grp.id.get)
-        val userGroupInfo=UserGroupInfo(id=None,userName=userName,displayName=userName,groupIds = groupIds )
-        userService.addUserWithGroups(userGroupInfo).map {
-          case Left(errors)=>Left(errors)
-          case Right(userGroupInfo)=>Right(userGroupInfo)
+        if (groups.length<1){
+          Future.successful(Left(Errors(Seq(Error("400","NO_ALLOWED_GROUPS:The user doesnt have valid groups configured")))))
+        }else{
+          val groupIds=groups.map(grp=>grp.id.get)
+          val userGroupInfo=UserGroupInfo(id=None,userName=userName,displayName=userName,groupIds = groupIds )
+          userService.addUserWithGroups(userGroupInfo).map {
+            case Left(errors)=>Left(errors)
+            case Right(userGroupInfo)=>Right(userGroupInfo)
+          }
         }
       }
     }

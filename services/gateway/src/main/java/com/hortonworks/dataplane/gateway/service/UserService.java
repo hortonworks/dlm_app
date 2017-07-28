@@ -1,16 +1,17 @@
 package com.hortonworks.dataplane.gateway.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
-import com.hortonworks.dataplane.gateway.domain.User;
-import com.hortonworks.dataplane.gateway.domain.UserList;
-import com.hortonworks.dataplane.gateway.domain.UserContext;
-import com.hortonworks.dataplane.gateway.domain.UserRoleResponse;
+import com.hortonworks.dataplane.gateway.domain.*;
 import com.hortonworks.dataplane.gateway.utils.Utils;
+import com.netflix.zuul.context.RequestContext;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,8 @@ public class UserService {
 
   @Autowired
   private LdapUserInterface ldapUserInterface;
+
+  private ObjectMapper objectMapper = new ObjectMapper();
 
   public Optional<User> getUser(String userName) {
     try {
@@ -88,7 +91,25 @@ public class UserService {
     try {
       return ldapUserInterface.addUserFromLdapGroupsConfiguration(subject);
     }catch (FeignException fe){
-      throw new RuntimeException(fe);
+      String responseContent=null;
+      String message=fe.getMessage();
+      int contentIdx=message.indexOf("content:");
+      if (contentIdx>-1){
+        responseContent=message.substring(contentIdx+9);
+        try {
+          DpErrors dpErrors = objectMapper.readValue(responseContent, DpErrors.class);
+          if (dpErrors.hasErrors() && dpErrors.getFirstError().getMessage()!=null &&
+            dpErrors.getFirstError().getMessage().startsWith("NO_ALLOWED_GROUPS")){
+            throw new NoAllowedGroupsException();
+          }else{
+            throw fe;
+          }
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      }else{
+        throw fe;
+      }
     }
   }
 }
