@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row page-section">
   <div class="col-md-8">
     <dlm-page-header
       [title]="'page.pairings.header'"
@@ -7,14 +7,14 @@
     </dlm-page-header>
   </div>
   <div class="col-md-4">
-    <div class="pull-right page-section">
+    <div class="pull-right">
       <button qe-attr="add-pairing" type="button" class="btn btn-primary" (click)="createPairingClickHandler()">{{"page.pairings.create_button_text" | translate }}
       </button>
     </div>
   </div>
 </div>
 <dlm-progress-container [progressState]="overallProgress$ | async">
-  <div class="content page-section">
+  <div class="content">
     <div *ngIf="(pairings$ | async)?.length > 0; else noPairs">
       <div class="row">
         <div class="col-md-8 col-sm-11 col-lg-6">

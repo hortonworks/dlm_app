@@ -44,7 +44,11 @@
       "INFRAADMIN": "Cluster Admin",
       "USER": "Consumer",
       "CURATOR": "Data Steward"
-    }
+    },
+    "signout": "Sign Out",
+    "unauthorized":"Unauthorized",
+    "unauthorizedMessage":"You are not authorized to view this page.",
+    "invalidUser":"You are not an authorized Data plane user. Please contact your Data plane Administrator."
   },
   "pages" : {
     "onboard" : {

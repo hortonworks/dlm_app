@@ -1,13 +1,3 @@
-.cluster-name {
-  font-weight: 500;
-  font-size: 20px;
-}
-
-.datacenter-name {
-  font-weight: 500;
-  font-size: 16px;
-}
-
 .slash {
   font-size: 18px;
   font-weight: 500;
@@ -22,6 +12,14 @@
 .datatable-body-cell {
   span.unit {
     font-size: 0.8em;
+  }
+  .cluster-name {
+    font-weight: 500;
+    font-size: 20px;
+  }
+  .datacenter-name {
+    font-weight: 500;
+    font-size: 16px;
   }
   &.add-actions-cell {
     justify-content: flex-end !important;
@@ -68,21 +66,24 @@
   }
 }
 
-.datatable-row-detail {
-  padding: 25px;
-  background-color: #EEE;
-}
+.dlm-cluster-list {
+  .datatable-row-detail {
+    padding: 25px;
+    background-color: #EEE;
+    overflow-y: visible !important;
+  }
 
-.datatable-scroll {
-  width: 100% !important;
-}
+  .datatable-scroll {
+    width: 100% !important;
+  }
 
-.datatable-header-cell {
-  text-align: center !important;
-}
+  .datatable-header-cell {
+    text-align: center !important;
+  }
 
-.text-center {
-  .datatable-body-cell-label {
-    width: 100%;
+  .text-center {
+    .datatable-body-cell-label {
+      width: 100%;
+    }
   }
 }

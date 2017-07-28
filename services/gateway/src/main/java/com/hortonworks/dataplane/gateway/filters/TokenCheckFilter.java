@@ -64,7 +64,7 @@ public class TokenCheckFilter extends ZuulFilter {
 
   @Override
   public int filterOrder() {
-    return PRE_DECORATION_FILTER_ORDER + 3;
+    return PRE_DECORATION_FILTER_ORDER + 1;
   }
 
 
@@ -128,17 +128,16 @@ public class TokenCheckFilter extends ZuulFilter {
     try {
       Optional<User> user = userService.getUser(tokenInfo.getSubject());
       if (!user.isPresent()) {
-        //trying with Ldap Groups config
         try {
           UserContext userContext = userService.syncUserFromLdapGroupsConfiguration(tokenInfo.getSubject());
           if (userContext != null) {
             setupUserSession(tokenInfo, userContext);
             return null;
           } else {
-            return utils.sendForbidden(String.format("User %s not found in the system", tokenInfo.getSubject()));
+            return utils.sendForbidden(String.format("{\"code\": \"USER_NOT_FOUND\", \"message\":  User %s not found in the system}",tokenInfo.getSubject()));
           }
         }catch (NoAllowedGroupsException nge){
-          return utils.sendForbidden(String.format("User %s does not found in the system. groups are not confiugred.", tokenInfo.getSubject()));
+          return utils.sendForbidden(String.format("{\"code\": \"USER_NOT_FOUND\", \"message\":  User %s not found in the system.Group not configured.}",tokenInfo.getSubject()));
         }
       } else {
         UserContext userContext=userService.getUserContext(user.get());

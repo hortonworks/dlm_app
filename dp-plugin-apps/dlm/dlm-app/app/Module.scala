@@ -15,6 +15,7 @@ import com.hortonworks.dlm.webhdfs.FileServiceImpl
 import com.hortonworks.datapalane.consul._
 import com.hortonworks.dataplane.cs.{AmbariWebServiceImpl, ClusterWsClient}
 import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
+import com.hortonworks.dataplane.commons.auth.Authenticated
 
 
 /**
@@ -30,6 +31,7 @@ import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 class Module extends AbstractModule {
 
   def configure() = {
+    bind(classOf[Authenticated]).asEagerSingleton()
     bind(classOf[ConsulInitializer]).asEagerSingleton()
   }
 

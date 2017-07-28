@@ -29,5 +29,29 @@
   }
 }
 
+.inline {
+  display: inline-block;
+  position: relative;
+}
+.error-notification-bar {
+  line-height: 1.2;
+  padding: 15px;
+  background: $concrete;
+  height: 34px;
+  margin-bottom: 20px;
+  .fa-times-circle {
+    font-size: 24px;
+    color: $roman-red;
+  }
+  .fa-remove {
+    color: $dusty-gray;
+    cursor: pointer;
+  }
+  .text-medium {
+    font-weight: 500;
+    color: $roman-red;
+  }
+}
+
 
 

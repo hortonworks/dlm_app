@@ -41,9 +41,11 @@ export function reducer(state = initialState, action: fromCluster.Actions): Stat
     }
     case fromCluster.ActionTypes.LOAD_CLUSTERS_STATUSES.SUCCESS: {
       const clusterServices = {};
-      action.payload.response.map(cluster => {
-        clusterServices[cluster.id] = cluster.data.items.map(item => item.ServiceInfo);
-      });
+      if (action.payload.response.length) {
+        action.payload.response.map(cluster => {
+          clusterServices[cluster.id] = cluster.data.items.map(item => item.ServiceInfo);
+        });
+      }
       const entities = Object.keys(state.entities).reduce((newEntities, clusterId) => {
         const status = clusterServices[clusterId];
         const someServiceIsNotStarted = status && !!status.find(d => d.state !== SERVICE_STATUS.STARTED);

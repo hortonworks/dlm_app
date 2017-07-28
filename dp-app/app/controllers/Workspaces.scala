@@ -5,7 +5,7 @@ import javax.inject.Inject
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.{DatasetAndCategoryIds, Workspace}
 import com.hortonworks.dataplane.db.Webservice.WorkspaceService
-import internal.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.JsonResponses
 import play.api.Logger
 import play.api.libs.json.Json

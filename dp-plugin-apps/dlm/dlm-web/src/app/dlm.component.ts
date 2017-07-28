@@ -32,7 +32,7 @@ const POLL_NEW_EVENTS_ID = 'POLL_NEW_EVENTS_ID';
 export class DlmComponent implements OnDestroy, OnInit {
   header: MenuItem;
   menuItems: MenuItem[];
-  mainContentSelector = '#dlm_content';
+  mainContentSelector = '#dlm_main_content';
   fitHeight = true;
   events$: Observable<Event[]>;
   newEventsCount$: Observable<number>;
