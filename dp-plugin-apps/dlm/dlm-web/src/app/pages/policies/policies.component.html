@@ -3,7 +3,7 @@
     <dlm-page-header [title]="'page.policies.header'"></dlm-page-header>
   </div>
   <div class="col-md-9 actions">
-    <div class="pull-right filters-block page-section">
+    <div class="pull-right filters-block">
 
       <div class="filter-item" *ngIf="(policies$ | async)?.length > 0">
         <dlm-table-filter
