@@ -1,8 +1,8 @@
-<div class="row">
+<div class="row page-section">
   <div class="col-md-3">
     <dlm-page-header [title]="'page.policies.header'"></dlm-page-header>
   </div>
-  <div class="col-md-9">
+  <div class="col-md-9 actions">
     <div class="pull-right filters-block page-section">
 
       <div class="filter-item" *ngIf="(policies$ | async)?.length > 0">
@@ -25,7 +25,7 @@
   </div>
 </div>
 <dlm-progress-container [progressState]="overallProgress$ | async">
-  <div class="row page-section">
+  <div class="row page-section" *ngIf="!(overallProgress$ | async).inProgress">
     <div class="col-md-12" *ngIf="(policies$ | async)?.length > 0; else noPolicies">
       <dlm-policy-table
         [policies]="filteredPolicies$ | async"

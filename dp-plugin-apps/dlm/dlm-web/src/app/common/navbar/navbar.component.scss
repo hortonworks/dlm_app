@@ -3,7 +3,6 @@ $collapsed-width: 60px;
 $header-height: 60px;
 $footer-height: 48px;
 .navigation-bar {
-  width: $width;
   .side-nav-header, .side-nav-menu, .side-nav-footer {
     width: $width;
   }
@@ -55,6 +54,7 @@ $footer-height: 48px;
 }
 
 .navigation-bar-container {
+  width: $width;
   &.collapsed {
     width: 60px;
     .side-nav-header, .side-nav-menu, .side-nav-footer {
