@@ -114,7 +114,9 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
         if (userGroupInfo.groupIds.isEmpty){
           Future.successful(BadRequest(Json.toJson(Errors(Seq(Error("Input Error","Group needs to be specified"))))))
         }else{
-          userRepo.insertUserWithGroups(userGroupInfo)
+          val password: String =
+            BCrypt.hashpw(Random.alphanumeric.toString(), BCrypt.gensalt())
+          userRepo.insertUserWithGroups(userGroupInfo,password)
             .map(userGroupInfo => success(userGroupInfo))
             .recoverWith(apiError)
         }

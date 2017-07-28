@@ -144,10 +144,10 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
       db.run(query.transactionally).map(res=>userInfo)
     }
   }
-  def insertUserWithGroups(userGroupInfo:UserGroupInfo)={
+  def insertUserWithGroups(userGroupInfo:UserGroupInfo,password:String)={
       val query = for {
         user <-{
-          val user = User(username = userGroupInfo.userName, password = "", displayname = userGroupInfo.displayName,avatar = None,
+          val user = User(username = userGroupInfo.userName, password = password, displayname = userGroupInfo.displayName,avatar = None,
             active = userGroupInfo.active,groupManaged=Some(true))
           Users returning Users += user
         }
