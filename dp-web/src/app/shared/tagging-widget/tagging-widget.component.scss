@@ -16,10 +16,8 @@
   outline: none;
 }
 .taggingWidget input{
-  width: 100%;
   font-size: 1em;
   height: 32px;
-  min-width: 250px;
   border-width: 0px;
   margin-top: -1px;
   padding: 0 5px;
@@ -28,7 +26,7 @@
   outline: none;
 }
 .taggingWidget > .tagSticker{
-  float: left;
+  display: inline-block;
   padding:5px 8px;
   background-color: rgb(221, 221, 221);
   border-radius: 5px;
@@ -36,7 +34,6 @@
   border: 2px solid rgb(221, 221, 221);
 }
 .taggingWidget > .inputSpan {
-  display: block;
   overflow: hidden;
   padding-right:10px;
 }
@@ -66,12 +63,21 @@
   background-color: rgb(133,191,253);
 }
 
+.remove {
+  cursor: pointer;
+}
+
 .taggingWidget-dark > .tagSticker {
   background: $shuttle-gray;
   color: $white;
   padding: 3px 10px;
   border-radius: 3px;
   margin: 3px;
-  border: none;
+  border: 1px solid $shuttle-gray;
+}
+
+.taggingWidget-dark > .tagSticker.focus{
+  border: 1px solid $dusty-gray;
+  //outline:auto 5px -webkit-focus-ring-color
 }
 
