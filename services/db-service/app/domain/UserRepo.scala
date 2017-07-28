@@ -218,8 +218,6 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
            queryForUserRoles(user)
          }
        }
-        val stmt = query.result.statements.headOption
-
        db.run(query.result).map(r =>
          com.hortonworks.dataplane.commons.domain.Entities.UserRoles(userName, r)
          )
