@@ -204,17 +204,6 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     db.run(Users.filter(_.id === userId).result.headOption)
   }
 
-  def getRolesForUserOlder(userName: String): Future[UserRoles] = {
-    val query = for {
-      users <- Users if users.username === userName
-      roles <- roleRepo.Roles
-      userRoles <- UserRoles if roles.id === userRoles.roleId if users.id === userRoles.userId
-    } yield (roles.roleName)
-
-    val result = db.run(query.result)
-    result.map(r => com.hortonworks.dataplane.commons.domain.Entities.UserRoles(userName, r))
-  }
-
   def getRolesForUser(userName: String): Future[UserRoles] = {
     findByName(userName).flatMap{
       case None=>{
