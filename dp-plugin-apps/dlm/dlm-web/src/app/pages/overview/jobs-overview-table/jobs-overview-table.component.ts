@@ -1,4 +1,6 @@
-import { Component, OnInit, Output, ViewChild, TemplateRef, OnDestroy, ViewEncapsulation, EventEmitter } from '@angular/core';
+import {
+  Component, OnInit, Output, ViewChild, TemplateRef, OnDestroy, ViewEncapsulation, EventEmitter, HostBinding
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -38,6 +40,8 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
   @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;
   @ViewChild('prevJobs') prevJobsRef: TemplateRef<any>;
+
+  @HostBinding('class') className = 'dlm-jobs-overview-table';
 
   @Output() onShowPolicyLog = new EventEmitter<any>();
 

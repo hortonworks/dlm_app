@@ -20,7 +20,7 @@ export class LastTenJobsColumnComponent implements OnInit {
   }
 
   getCircleAlignment(job: Job, index) {
-    if (job.status === JOB_STATUS.IGNORED) {
+    if (job.status === JOB_STATUS.IGNORED || job.status === JOB_STATUS.FAILED) {
       return 'flex-end';
     }
     if (index === 0 && job.status === JOB_STATUS.RUNNING) {
