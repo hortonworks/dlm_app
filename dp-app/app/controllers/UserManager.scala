@@ -27,6 +27,8 @@ class UserManager @Inject()(val ldapService: LdapService,
   private def handleErrors(errors: Errors) = {
     if (errors.errors.exists(_.code == "400"))
       BadRequest(Json.toJson(errors))
+    else if (errors.errors.exists(_.code == "403"))
+      Forbidden(Json.toJson(errors))
     else
       InternalServerError(Json.toJson(errors))
   }
@@ -172,7 +174,7 @@ class UserManager @Inject()(val ldapService: LdapService,
             case Left(errors)=>handleErrors(errors)
             case Right(roles)=>{
               val userCtx=UserContext(id=userGroupInfo.id,username=userGroupInfo.userName,display=Some(userGroupInfo.displayName),
-                avatar=Some(userGroupInfo.displayName),roles=roles,token=None)
+                avatar=Some(userGroupInfo.displayName),roles=roles,token=None,password = userGroupInfo.password)
               Ok(Json.toJson(userCtx))
             }
           }
@@ -186,7 +188,7 @@ class UserManager @Inject()(val ldapService: LdapService,
       case Left(errors)=>Future.successful(Left(errors))
       case Right(groups)=>{
         if (groups.length<1){
-          Future.successful(Left(Errors(Seq(Error("400","NO_ALLOWED_GROUPS:The user doesnt have valid groups configured")))))
+          Future.successful(Left(Errors(Seq(Error("403","NO_ALLOWED_GROUPS:The user doesnt have valid groups configured")))))
         }else{
           val groupIds=groups.map(grp=>grp.id.get)
           val userGroupInfo=UserGroupInfo(id=None,userName=userName,displayName=userName,groupIds = groupIds )

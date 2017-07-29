@@ -39,9 +39,6 @@ public class SimpleSignInFilter extends ZuulFilter {
   private Jwt jwt;
 
   @Autowired
-  private Utils utils;
-
-  @Autowired
   private CookieManager cookieManager;
 
   private ObjectMapper objectMapper = new ObjectMapper();
@@ -75,26 +72,21 @@ public class SimpleSignInFilter extends ZuulFilter {
     try {
       ServletInputStream inputStream = ctx.getRequest().getInputStream();
       Credential credential = objectMapper.readValue(inputStream, Credential.class);
-      Optional<User> user = userService.getUser(credential.getUsername());
-      if (!user.isPresent()){
+      Optional<UserContext> userContextFromDb = userService.getUserContext(credential.getUsername());
+      if (!userContextFromDb.isPresent()){
         return sendNoUserResponse();
       }
-
-      boolean validPassword = BCrypt.checkpw(credential.getPassword(), user.get().getPassword());
+      boolean validPassword = BCrypt.checkpw(credential.getPassword(), userContextFromDb.get().getPassword());
       if (!validPassword) {
         return sendInvalidPasswordResponse();
       }
-      Optional<UserContext> userContextOpt = userService.getUserContext(credential.getUsername());
-      if (userContextOpt.isPresent()){
-        // Construct a JWT token
-        UserContext userContext= userContextOpt.get();
-        String jwtToken = jwt.makeJWT(userContext);
-        userContext.setToken(jwtToken);
-        ctx.setResponseStatusCode(200);
-        ctx.setResponseBody(objectMapper.writeValueAsString(userContext));
-        cookieManager.addDataplaneJwtCookie(jwtToken,Optional.<Date>absent());
-        ctx.setSendZuulResponse(false);
-      }
+      UserContext userContext= userContextFromDb.get();
+      String jwtToken = jwt.makeJWT(userContext);
+      userContext.setToken(jwtToken);
+      ctx.setResponseStatusCode(200);
+      ctx.setResponseBody(objectMapper.writeValueAsString(userContext));
+      cookieManager.addDataplaneJwtCookie(jwtToken,Optional.<Date>absent());
+      ctx.setSendZuulResponse(false);
     } catch (IOException e) {
       ctx.setResponseStatusCode(500);
       ctx.setSendZuulResponse(false);

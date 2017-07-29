@@ -126,8 +126,8 @@ public class TokenCheckFilter extends ZuulFilter {
       return handleUnAuthorized(null);
     }
     try {
-      Optional<User> user = userService.getUser(tokenInfo.getSubject());
-      if (!user.isPresent()) {
+      Optional<UserContext> userContextFromDb = userService.getUserContext(tokenInfo.getSubject());
+      if (!userContextFromDb.isPresent()) {
         try {
           UserContext userContext = userService.syncUserFromLdapGroupsConfiguration(tokenInfo.getSubject());
           if (userContext != null) {
@@ -140,8 +140,7 @@ public class TokenCheckFilter extends ZuulFilter {
           return utils.sendForbidden(String.format("{\"code\": \"USER_NOT_FOUND\", \"message\":  User %s not found in the system.Group not configured.}",tokenInfo.getSubject()));
         }
       } else {
-        UserContext userContext=userService.getUserContext(user.get());
-        setupUserSession(tokenInfo, userContext);
+        setupUserSession(tokenInfo, userContextFromDb.get());
         return null;
       }
     } catch (FeignException e) {

@@ -163,7 +163,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
       db.run(query.transactionally).map { res =>
         val groupIds = res._2.map(res => res.groupId.get)
         UserGroupInfo(id = res._1.id, userName = res._1.username, displayName = res._1.displayname,
-          active = res._1.active,groupIds=groupIds)
+          active = res._1.active,groupIds=groupIds,password=Some(res._1.password))
       }
   }
 
@@ -203,11 +203,10 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
   def findById(userId: Long):Future[Option[User]] = {
     db.run(Users.filter(_.id === userId).result.headOption)
   }
-
-  def getRolesForUser(userName: String): Future[UserRoles] = {
+  def getUserAndRoles(userName: String): Future[Option[(User,UserRoles)]] = {
     findByName(userName).flatMap{
       case None=>{
-        throw new Exception("user not found")
+        Future.successful(None)
       }
       case Some(user)=>{
        val query=user.groupManaged match {
@@ -219,7 +218,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
          }
        }
        db.run(query.result).map(r =>
-         com.hortonworks.dataplane.commons.domain.Entities.UserRoles(userName, r)
+         Some(user,com.hortonworks.dataplane.commons.domain.Entities.UserRoles(userName, r))
          )
        }
     }

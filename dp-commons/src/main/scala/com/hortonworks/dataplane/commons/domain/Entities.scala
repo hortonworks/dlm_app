@@ -52,12 +52,13 @@ object Entities {
                   )
 
   case class UserGroupInfo(id: Option[Long] = None,
-                      userName: String,
-                      displayName: String,
-                      active: Option[Boolean] = Some(true),
-                      groupIds: Seq[Long]=Seq()
-                     )
-  case class UserContext(id:Option[Long],username:String,avatar:Option[String],roles:Seq[String],display:Option[String],token:Option[String])
+                  userName: String,
+                  displayName: String,
+                  password: Option[String]=None,
+                  active: Option[Boolean] = Some(true),
+                  groupIds: Seq[Long]=Seq()
+                 )
+  case class UserContext(id:Option[Long],username:String,avatar:Option[String],roles:Seq[String],display:Option[String],token:Option[String],password:Option[String])
 
   case class GroupInfo(id: Option[Long] = None,
                       groupName: String,

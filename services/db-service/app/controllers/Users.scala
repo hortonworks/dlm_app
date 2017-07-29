@@ -49,6 +49,18 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
       success(userDetail)
     }.recoverWith(apiError)
   }
+  /*this gives detail for users who are group managed as well*/
+  def getUserContext(userName:String)= Action.async{
+    userRepo.getUserAndRoles(userName).map{
+      case None=>NotFound
+      case Some(res)=>{
+        val user=res._1
+        val userRoleObj=res._2
+        val userCtx=UserContext(id=user.id ,username=user.username,avatar=user.avatar,display =Some(user.displayname),roles=userRoleObj.roles,token=None,password = Some(user.password ))
+        success(userCtx)
+      }
+    }.recoverWith(apiError)
+  }
 
   def load(userId: Long) = Action.async {
     userRepo
@@ -139,7 +151,10 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
       .getOrElse(Future.successful(BadRequest))
   }
   def getRolesForUser(userName: String) = Action.async {
-    userRepo.getRolesForUser(userName).map(success(_))
+    userRepo.getUserAndRoles(userName).map{
+      case None=>NotFound
+      case Some(res)=>success(res._2)
+    }
   }
   private def getuserRoleMap(r: UserRole) = {
     Map("user" -> s"$users/${r.userId.get}",

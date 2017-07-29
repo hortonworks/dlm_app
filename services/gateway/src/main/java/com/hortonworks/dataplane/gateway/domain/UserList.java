@@ -7,14 +7,14 @@ import java.util.List;
 
 public class UserList implements Serializable {
 
-  private List<User> results;
+  private UserContext results;
 
   @JsonProperty
-  public List<User> getResults() {
+  public UserContext getResults() {
     return results;
   }
 
-  public void setResults(List<User> results) {
+  public void setResults(UserContext results) {
     this.results = results;
   }
 }
