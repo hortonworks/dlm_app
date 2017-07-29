@@ -56,7 +56,8 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
       case Some(res)=>{
         val user=res._1
         val userRoleObj=res._2
-        val userCtx=UserContext(id=user.id ,username=user.username,avatar=user.avatar,display =Some(user.displayname),roles=userRoleObj.roles,token=None,password = Some(user.password ))
+        val userCtx=UserContext(id=user.id ,username=user.username,avatar=user.avatar,
+          display =Some(user.displayname),active=user.active,roles=userRoleObj.roles,token=None,password = Some(user.password ))
         success(userCtx)
       }
     }.recoverWith(apiError)

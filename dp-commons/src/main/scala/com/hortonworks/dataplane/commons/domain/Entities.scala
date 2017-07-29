@@ -58,7 +58,14 @@ object Entities {
                   active: Option[Boolean] = Some(true),
                   groupIds: Seq[Long]=Seq()
                  )
-  case class UserContext(id:Option[Long],username:String,avatar:Option[String],roles:Seq[String],display:Option[String],token:Option[String],password:Option[String])
+  case class UserContext(id:Option[Long],
+                         username:String,
+                         avatar:Option[String],
+                         active: Option[Boolean] = Some(true),
+                         roles:Seq[String],
+                         display:Option[String],
+                         token:Option[String],
+                         password:Option[String])
 
   case class GroupInfo(id: Option[Long] = None,
                       groupName: String,

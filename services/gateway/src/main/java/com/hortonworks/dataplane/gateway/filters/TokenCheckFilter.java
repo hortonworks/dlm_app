@@ -134,14 +134,18 @@ public class TokenCheckFilter extends ZuulFilter {
             setupUserSession(tokenInfo, userContext);
             return null;
           } else {
-            return utils.sendForbidden(String.format("{\"code\": \"USER_NOT_FOUND\", \"message\":  User %s not found in the system}",tokenInfo.getSubject()));
+            return utils.sendForbidden(utils.getUserNotFoundErrorMsg(tokenInfo.getSubject()));
           }
         }catch (NoAllowedGroupsException nge){
-          return utils.sendForbidden(String.format("{\"code\": \"USER_NOT_FOUND\", \"message\":  User %s not found in the system.Group not configured.}",tokenInfo.getSubject()));
+          return utils.sendForbidden(utils.getGroupNotFoundErrorMsg(tokenInfo.getSubject()));
         }
       } else {
-        setupUserSession(tokenInfo, userContextFromDb.get());
-        return null;
+        if (userContextFromDb.get().isActive()){
+          setupUserSession(tokenInfo, userContextFromDb.get());
+          return null;
+        }else{
+          return utils.sendForbidden(utils.getInactiveErrorMsg(tokenInfo.getSubject()));
+        }
       }
     } catch (FeignException e) {
       throw new RuntimeException(e);
@@ -200,11 +204,14 @@ public class TokenCheckFilter extends ZuulFilter {
         return handleUnAuthorized("DP_JWT_COOKIE has expired or not valid");
       } else {
         UserContext userContext = userContextOptional.get();
-        setUpstreamUserContext(userContext);
-        setUpstreamKnoxTokenContext();
-        RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, userContext);
-        return null;
-        //TODO  role check. api permission check on the specified resource.
+        if (userContext.isActive()){
+          setUpstreamUserContext(userContext);
+          setUpstreamKnoxTokenContext();
+          RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, userContext);
+          return null;
+        }else{
+          return utils.sendForbidden(utils.getInactiveErrorMsg(userContext.getUsername()));
+        }
       }
     } catch (JwtException e) {
       logger.error("Exception", e);

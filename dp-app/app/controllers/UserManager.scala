@@ -174,7 +174,8 @@ class UserManager @Inject()(val ldapService: LdapService,
             case Left(errors)=>handleErrors(errors)
             case Right(roles)=>{
               val userCtx=UserContext(id=userGroupInfo.id,username=userGroupInfo.userName,display=Some(userGroupInfo.displayName),
-                avatar=Some(userGroupInfo.displayName),roles=roles,token=None,password = userGroupInfo.password)
+                avatar=Some(userGroupInfo.displayName),roles=roles,token=None,password = userGroupInfo.password,active = Some(true))
+
               Ok(Json.toJson(userCtx))
             }
           }

@@ -41,6 +41,9 @@ public class SimpleSignInFilter extends ZuulFilter {
   @Autowired
   private CookieManager cookieManager;
 
+  @Autowired
+  private Utils utils;
+
   private ObjectMapper objectMapper = new ObjectMapper();
 
   @Override
@@ -81,12 +84,16 @@ public class SimpleSignInFilter extends ZuulFilter {
         return sendInvalidPasswordResponse();
       }
       UserContext userContext= userContextFromDb.get();
-      String jwtToken = jwt.makeJWT(userContext);
-      userContext.setToken(jwtToken);
-      ctx.setResponseStatusCode(200);
-      ctx.setResponseBody(objectMapper.writeValueAsString(userContext));
-      cookieManager.addDataplaneJwtCookie(jwtToken,Optional.<Date>absent());
-      ctx.setSendZuulResponse(false);
+      if (!userContext.isActive()){
+        return utils.sendForbidden(utils.getInactiveErrorMsg(userContext.getUsername()));
+      }else {
+        String jwtToken = jwt.makeJWT(userContext);
+        userContext.setToken(jwtToken);
+        ctx.setResponseStatusCode(200);
+        ctx.setResponseBody(objectMapper.writeValueAsString(userContext));
+        cookieManager.addDataplaneJwtCookie(jwtToken,Optional.<Date>absent());
+        ctx.setSendZuulResponse(false);
+      }
     } catch (IOException e) {
       ctx.setResponseStatusCode(500);
       ctx.setSendZuulResponse(false);

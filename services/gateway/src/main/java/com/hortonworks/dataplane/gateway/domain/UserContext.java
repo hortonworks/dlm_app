@@ -15,6 +15,7 @@ public class UserContext implements Serializable {
   private String display;
   private String token;
   private String password;
+  private boolean active;
 
   public UserContext() {
   }
@@ -64,6 +65,7 @@ public class UserContext implements Serializable {
     this.token = token;
   }
 
+  @JsonProperty
   public String getPassword() {
     return password;
   }
@@ -73,7 +75,15 @@ public class UserContext implements Serializable {
   }
 
   @JsonProperty
+  public boolean isActive() {
+    return active;
+  }
 
+  public void setActive(boolean active) {
+    this.active = active;
+  }
+
+  @JsonProperty
   public List<String> getRoles() {
     return roles;
   }
