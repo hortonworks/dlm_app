@@ -218,7 +218,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
          }
        }
        db.run(query.result).map(r =>
-         Some(user,com.hortonworks.dataplane.commons.domain.Entities.UserRoles(userName, r))
+         Some(user,com.hortonworks.dataplane.commons.domain.Entities.UserRoles(userName, r.distinct))
          )
        }
     }
