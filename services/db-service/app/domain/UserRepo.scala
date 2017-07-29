@@ -233,6 +233,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
    for {
       roles <- roleRepo.Roles
       groupRoles<- groupsRepo.GroupsRoles
+      groups<-groupsRepo.Groups if groups.active === true
       userGroups <- UserGroups if userGroups.userId === user.id if groupRoles.roleId===roles.id
     } yield (roles.roleName)
   }
