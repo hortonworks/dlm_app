@@ -28,6 +28,10 @@ import { PolicyActionsComponent } from './policy-actions/policy-actions.componen
 import { HiveBrowserComponent, HiveDatabaseComponent } from './hive-browser/';
 import { DurationColumnComponent } from './table-columns/duration-column/duration-column.component';
 import { TransferredColumnComponent } from './table-columns/transferred-column/transferred-column.component';
+import { JobStatusComponent } from './job-status/job-status.component';
+import { MapLegendComponent } from './map/map-legend/map-legend.component';
+import { MapLegendContainerComponent } from './map/map-legend-container/map-legend-container.component';
+import { ClusterStatusIconComponent } from './cluster-status-icon/cluster-status-icon.component';
 
 @NgModule({
   imports: [
@@ -67,7 +71,11 @@ import { TransferredColumnComponent } from './table-columns/transferred-column/t
     HiveDatabaseComponent,
     PolicyActionsComponent,
     DurationColumnComponent,
-    TransferredColumnComponent
+    TransferredColumnComponent,
+    JobStatusComponent,
+    MapLegendComponent,
+    MapLegendContainerComponent,
+    ClusterStatusIconComponent
   ],
   exports: [
     CardComponent,
@@ -93,7 +101,11 @@ import { TransferredColumnComponent } from './table-columns/transferred-column/t
     HiveDatabaseComponent,
     PolicyActionsComponent,
     DurationColumnComponent,
-    TransferredColumnComponent
+    TransferredColumnComponent,
+    JobStatusComponent,
+    MapLegendComponent,
+    MapLegendContainerComponent,
+    ClusterStatusIconComponent
   ]
 })
 export class CommonComponentsModule {}

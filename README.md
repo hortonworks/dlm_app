@@ -11,7 +11,7 @@
   * `sudo yum install sbt`
 * Nodejs 6.10.0 or above. To get Nodejs on Linux, you can follow instructions here: https://nodejs.org/en/download/package-manager/#enterprise-linux-and-fedora
 * [Yarn](https://yarnpkg.com) package manager (`npm install --global yarn`)
-* docker-machine (tested with 0.12.0), docker (tested with 17.x)
+* docker-machine (tested with 0.7.0), docker (tested with 1.8.0), docker-compose (tested with 1.7.1)
 * Centos 7 or Mac OSX are tested platforms
 
 ## Build
@@ -25,7 +25,7 @@
 
 * Ensure the steps in Build section above are followed.
 * We can use docker to bring up the application without requiring to install other runtime dependencies like Postgres, NGinx etc. Follow these steps to bring up the docker containers.
-* A utility script has been provided in the `dp-build/build/dp-docker/installer` folder called `dpdeploy.sh` to help with this. This wraps around docker commands and aims to provide a simpler interface.
+* A utility script has been provided in the `dp-build/build/dp-docker/installer` folder called `dpdeploy.sh` to help with this. This wraps around docker-compose commands and aims to provide a simpler interface.
 * There is a certain sequence to follow to bring up the application, as detailed below. All commands need to be executed from the dp-build folder.
 * For a fresh setup:
   * Initialize the Postgres database: `./dpdeploy.sh init db`
@@ -70,6 +70,26 @@ So, to get a version of dataplane on a docker supported machine, do the followin
 * Untar it.
 * `cd installer`
 * Execute the usual `dpdeploy.sh` commands described above. These will pull the correspondingly tagged images from docker-hub. The first pull from the docker-hub repo might take a while, but once the layers are cached, it should be faster.
+
+## Using external database
+Only Postgresql is supported. To prepare the database, following steps need to be followed:
+1. Install `postgresql-server` via yum. `sudo yum install postgresql-server`.
+2. Enable remote access:
+  * Edit `postgresql.conf` to have `listen_addresses = '*'`.
+  * Edit `pg_hba.conf` to have `host    all             all             0.0.0.0/0            md5`. IP ranges can be modified as required if known.
+3. Restart `postgresql` with `service postgresql restart`.
+4. Create a database with `createdb <database_name>`. You might need to impersonate the default user `postgres`.
+5. LogIn to `postgresql` with `psql -h <database_ip> <database_name>`.
+6. Add user with `CREATE USER <user_name> WITH PASSWORD '<passowrd>';`.
+7. Give neccessary permissions of created database to desired user. Recommended: `ALTER DATABASE <database_name> OWNER TO <user_name>;`
+8. Provide connection information in `${INSTALLER_HOME}/config.env.sh`.
+```
+USE_EXT_DB="yes"
+DATABASE_URI="jdbc:postgresql://<host_name>:5432/<database_name>"
+DATABASE_USER="<user_name>"
+DATABASE_PASS="<password>"
+```
+9. Deploy dataplane as usual using `./dpdeploy.sh`
 
 ## Known Issues
 

@@ -1,16 +1,14 @@
-import {AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, DoCheck, OnDestroy, OnInit} from '@angular/core';
+import {AfterViewChecked, ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
-import {IdentityService} from './services/identity.service';
 import {MdlService} from './services/mdl.service';
 
 import {User} from './models/user';
-import {HeaderData, Persona, PersonaTabs} from './models/header-data';
+import {HeaderData} from './models/header-data';
 import {CollapsibleNavService} from './services/collapsible-nav.service';
 import {Loader, LoaderStatus} from './shared/utils/loader';
 import {RbacService} from './services/rbac.service';
-import {AuthenticationService} from './services/authentication.service';
-import {NavigationStart, Router} from '@angular/router';
+import {AuthUtils} from './shared/utils/auth-utils';
 
 export enum ViewPaneState {
   MAXIMISE, MINIMISE
@@ -28,32 +26,38 @@ export class AppComponent implements OnInit, AfterViewChecked {
   viewPaneState = ViewPaneState.MAXIMISE;
   headerData: HeaderData = new HeaderData();
   showLoader: LoaderStatus;
+  signOutUrl = AuthUtils.signoutURL;
 
   constructor(private mdlService: MdlService,
-              private identityService: IdentityService,
               private translateService: TranslateService,
               private collapsibleNavService: CollapsibleNavService,
               private rbacService: RbacService,
-              private authenticationService: AuthenticationService,
-              private router: Router,
               private cdRef: ChangeDetectorRef) {
     translateService.setTranslation('en', require('../assets/i18n/en.json'));
     translateService.setDefaultLang('en');
     translateService.use('en');
   }
 
-  getUser(): User {
-    return this.identityService.getUser();
+  isUserSignedIn() {
+    return  AuthUtils.isUserLoggedIn();
   }
 
-  isUserSignedIn(): boolean {
-    return this.identityService.isUserAuthenticated();
+  getUser(): User {
+    return AuthUtils.getUser();
+  }
+
+  isValidUser() {
+    return AuthUtils.isValidUser();
   }
 
   ngOnInit() {
-    this.authenticationService.userAuthenticated$.subscribe(() => {
-        this.setHeaderData();
+    AuthUtils.loggedIn$.subscribe(() => {
+      this.setHeaderData();
     });
+
+    if(this.isUserSignedIn()){
+      this.setHeaderData();
+    }
 
     this.collapsibleNavService.collpaseSideNav$.subscribe(collapsed => {
       this.viewPaneState = collapsed ? ViewPaneState.MINIMISE : ViewPaneState.MAXIMISE;

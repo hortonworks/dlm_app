@@ -24,13 +24,12 @@ import { NavbarService } from 'services/navbar.service';
 import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { PolicyDetailsComponent } from './policy-details/policy-details.component';
 import { JobsTableComponent } from '../jobs/jobs-table/jobs-table.component';
-import { JobStatusComponent } from '../jobs/job-status/job-status.component';
 import { JobTransferredGraphComponent } from '../jobs/jobs-transferred-graph/job-transferred-graph.component';
 import { FrequencyPipe } from 'pipes/frequency.pipe';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 import { TableFilterComponent } from 'common/table/table-filter/table-filter.component';
 import { PolicyServiceFilterComponent } from './components/policy-service-filter/policy-service-filter.component';
-import { TypeaheadModule } from 'ng2-bootstrap';
+import { TypeaheadModule, TooltipModule } from 'ng2-bootstrap';
 
 xdescribe('PoliciesComponent', () => {
   let component: PoliciesComponent;
@@ -49,7 +48,8 @@ xdescribe('PoliciesComponent', () => {
         MomentModule,
         ChartsModule,
         ModalModule.forRoot(),
-        TypeaheadModule
+        TypeaheadModule,
+        TooltipModule.forRoot()
       ],
       declarations: [
         PoliciesComponent,
@@ -65,7 +65,6 @@ xdescribe('PoliciesComponent', () => {
         BytesSizePipe,
         FrequencyPipe,
         JobsTableComponent,
-        JobStatusComponent,
         JobTransferredGraphComponent,
         ModalDialogComponent,
         TableFilterComponent,

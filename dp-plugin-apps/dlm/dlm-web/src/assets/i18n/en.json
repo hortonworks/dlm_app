@@ -22,6 +22,8 @@
     "pairing": "Pairing",
     "pairs": "Pairs",
     "policy": "Policy",
+    "job": "Job",
+    "jobs": "Jobs",
     "clusters": "Clusters",
     "cluster": "Cluster",
     "service": "Service",
@@ -42,31 +44,31 @@
     },
     "frequency": {
       "yearly": {
-        "plural": "Every {{num}} years",
+        "plural": "Every {{num}}y",
         "singular": "Every year"
       },
       "monthly": {
-        "plural": "Every {{num}} months",
+        "plural": "Every {{num}}m",
         "singular": "Every month"
       },
       "weekly": {
-        "plural": "Every {{num}} weeks",
+        "plural": "Every {{num}}w",
         "singular": "Every week"
       },
       "daily": {
-        "plural": "Every {{num}} days",
+        "plural": "Every {{num}}d",
         "singular": "Every day"
       },
       "hourly": {
-        "plural": "Every {{num}} hours",
+        "plural": "Every {{num}}h",
         "singular": "Every hour"
       },
       "minutely": {
-        "plural": "Every {{num}} minutes",
+        "plural": "Every {{num}}m",
         "singular": "Every minute"
       },
       "secondly": {
-        "plural": "Every {{num}} seconds",
+        "plural": "Every {{num}}s",
         "singular": "Every second"
       },
       "every": "Every",
@@ -92,7 +94,7 @@
   "sidenav": {
     "menuItem": {
       "overview": "Overview",
-      "clusters": "My Clusters",
+      "clusters": "Clusters",
       "policies": "Policies",
       "pairings": "Pairings",
       "jobs": "Jobs",
@@ -137,7 +139,7 @@
         }
       },
       "issues": {
-        "updates": "Issues and Updates",
+        "updates": "Issues & Updates",
         "recent": "Recent Issues",
         "list": {
           "view_all": "view all",
@@ -150,23 +152,79 @@
           }
         }
       },
+      "summary_panels": {
+        "title": {
+          "clusters": "Cluster Health",
+          "policies": "Policies",
+          "jobs": "Jobs"
+        },
+        "status": {
+          "unhealthy": "Unhealthy",
+          "healthy": "Healthy",
+          "in_progress": "In Progress",
+          "failed_last": "Failed Last",
+          "failed_last_10": "Failed in Last 10",
+          "active": "Active",
+          "suspended": "Suspended",
+          "warning": "Warning"
+        },
+        "hint": {
+          "clusters": "Clusters Hint",
+          "policies": "Policies Hint",
+          "jobs": "Jobs Hint"
+        }
+      },
+      "world_map": {
+        "cluster_legend": {
+          "alerts": "Alerts",
+          "fix_alerts": "Fix Alerts",
+          "launch_ambari": "Launch Ambari"
+        }
+      },
       "table": {
         "column": {
+          "job_status": "Job Status",
           "source_cluster": "Source",
           "destination_cluster": "Destination",
           "started": "Started",
           "ended": "Ended",
           "runtime": "Runtime",
-          "transferred": "Transferred",
+          "transferred": "Transferred / Files",
           "next_run": "Next Run",
           "action": "Action",
-          "actions": "Actions"
+          "actions": "Actions",
+          "last_ten_jobs": "Policy Performance"
         },
         "actions": {
           "abort_job": "Abort Job",
           "delete_policy": "Delete Policy",
           "suspend_policy": "Suspend Policy",
           "activate_policy": "Activate Policy"
+        }
+      },
+      "modals": {
+        "unhealthy_cluster": {
+          "title": "Unhealthy Clusters",
+          "columns": {
+            "cluster_name": "Cluster Name",
+            "services": "Unhealthy Services"
+          }
+        },
+        "hdfs_capacity": {
+          "title": "HDFS Remaining Capacity",
+          "columns": {
+            "cluster_name": "Cluster",
+            "capacity": "Remaining Capacity"
+          }
+        },
+        "unhealthy_policy": {
+          "title": "Unhealthy Policy",
+          "columns": {
+            "policy": "Policy",
+            "source": "Source",
+            "destination": "Destination",
+            "issues": "Issues"
+          }
         }
       }
     },
@@ -189,7 +247,7 @@
       "header_note": "You must create a cluster pairing before you can create a replication policy.",
       "header_create": "Create Replication Policy",
       "header_review": "Review Replication Policy",
-      "create_button_text": "+ Policy",
+      "create_button_text": "Add Policy",
       "tags": "Tags",
       "groups": "Groups",
       "data_summary": "Data Summary",
@@ -231,7 +289,7 @@
           "directories": "File / Folder Path",
           "databases": "Database",
           "start_date": "Start Date",
-          "end_date": "End Date",
+          "end_date": "End Date (Optional)",
           "start_time": "Start Time  (24-Hour Clock)",
           "end_time": "End Time",
           "date_format": "yyyy-mm-dd",
@@ -257,7 +315,7 @@
     "pairings": {
       "header": "Pairings",
       "header_note": "Note: Pairings are bi-directional",
-      "create_button_text": "+ Pairing",
+      "create_button_text": "Add Pairing",
       "content": {
         "header": {
           "first_cluster": "FIRST CLUSTER",
@@ -280,7 +338,7 @@
         "content": {
           "no_clusters": "No clusters are registered with Data Lifecycle Manager. Click Add>Cluster and register at least two clusters for pairing. Ensure that clusters to be used for replication jobs meet Data Lifecycle Manager configuration requirements.",
           "header": {
-            "step_one": "STEP 1: SELECT PEER CLUSTER",
+            "step_one": "STEP 1: SELECT CLUSTER",
             "step_two": "STEP 2: SELECT CLUSTER TO BE PAIRED",
             "in_progress": "IN PROGRESS"
           },

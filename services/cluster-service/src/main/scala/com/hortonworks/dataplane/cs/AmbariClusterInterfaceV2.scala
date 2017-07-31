@@ -66,6 +66,53 @@ class AmbariClusterInterfaceV2(
       }
   }
 
+  override def getRanger(implicit hJwtToken: Option[HJwtToken])
+  : Future[Either[Throwable, Ranger]] = {
+    logger.info("Fetching Ranger information")
+
+    val hostInfoUrl = s"${cluster.clusterUrl.get}/host_components?HostRoles/component_name=RANGER_ADMIN"
+    val hostInfo = getWrappedRequest(hostInfoUrl, hJwtToken)
+
+    val serviceSuffix = "/configurations/service_config_versions?service_name=RANGER&is_current=true"
+    val request = getWrappedRequest(s"${cluster.clusterUrl.get}$serviceSuffix", hJwtToken)
+
+    val tokenAsString = hJwtToken
+      .map { t =>
+        Some(t.token)
+      }
+      .getOrElse(None)
+
+    val rangerInfo =
+      for {
+        hir <- hostInfo
+        hi <- knoxApiExecutor.execute(KnoxApiRequest(hir, { r => r.get() }, tokenAsString))
+        req <- request
+        res <- knoxApiExecutor.execute(KnoxApiRequest(req, { req => req.get() }, tokenAsString))
+      } yield {
+
+        val hostItems = (hi.json \ "items").as[JsArray].validate[List[JsObject]].get
+
+        val hosts = hostItems.map { h =>
+          val host = (h \ "HostRoles" \ "host_name").validate[String]
+          host.get
+        }
+
+        val json = res.json
+        val configurations = json \ "items" \\ "configurations"
+        val configs: JsValue = configurations.head
+
+        Ranger(hosts.map(ServiceHost),
+          Some(Json.obj("stats" -> Json.obj(), "properties" -> configs))
+        )
+
+      }
+    rangerInfo.map(Right(_)).recoverWith {
+      case e: Exception =>
+        logger.error("Cannot get Ranger info")
+        Future.successful(Left(e))
+    }
+  }
+
   private def getWrappedRequest(
       url: String,
       hJwtToken: Option[HJwtToken]): Future[WSRequest] = {

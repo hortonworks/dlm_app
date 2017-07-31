@@ -13,7 +13,11 @@
     </div>
     <br>
     <h6>{{"common.description" | translate}}</h6>
-    <p>{{policy?.description}}</p>
+    <p *ngIf="policy?.description; else noDescription" class="description">{{policy?.description}}</p>
+    <ng-template #noDescription>
+      <span class="no-description">No description</span>
+    </ng-template>
+    <p *ngIf="policy?.frequency" class="policy-details">Running {{policy?.frequency | frequency}} <span *ngIf="policy?.startTime">from {{policy?.startTime | date:'MMM dd, y HH:mm'}}</span> <span *ngIf="policy?.endTime">to {{policy?.endTime | date:'MMM dd, y HH:mm'}}</span></p>
   </div>
   <div class="col-lg-10 col-md-9">
     <dp-jobs-table
@@ -28,6 +32,7 @@
       (onSort)="handleOnSort($event)"
       (onSelectAction)="handleOnSelectAction($event)"
       (onPageChange)="handleOnPageChange($event)"
+      (abortJobAction)="handleAbortJobAction($event)"
     >
     </dp-jobs-table>
     <div *ngIf="contentType===policyContent.Files">

@@ -1,4 +1,4 @@
-package internal.auth
+package com.hortonworks.dataplane.commons.auth
 
 import java.security.cert.X509Certificate
 
@@ -6,7 +6,6 @@ import com.google.inject.Inject
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webservice.UserService
 import org.apache.commons.codec.binary.Base64
 import play.api.http.Status
 import play.api.libs.json.{JsError, JsSuccess, Json}
@@ -15,9 +14,7 @@ import play.api.{Configuration, Logger}
 
 import scala.concurrent.Future
 
-class Authenticated @Inject()(@Named("userService") userService: UserService,
-                              configuration: Configuration)
-  extends ActionBuilder[AuthenticatedRequest] {
+class Authenticated extends ActionBuilder[AuthenticatedRequest] {
 
   val gatewayUserTokenKey = "X-DP-User-Info"
   val gatewayTokenKey = "X-DP-Token-Info"
@@ -29,9 +26,17 @@ class Authenticated @Inject()(@Named("userService") userService: UserService,
       val encodedGatewayToken: String = egt
       val userJsonString: String = new String(
         Base64.decodeBase64(encodedGatewayToken))
-      Json.parse(userJsonString).validate[User] match {
-        case JsSuccess(user, _) =>
+      Json.parse(userJsonString).validate[UserContext] match {
+        case JsSuccess(userContext, _) =>{
+          val user=User(id=userContext.id,
+            username = userContext.username,
+            password = "",
+            displayname = if (userContext.display.isDefined) userContext.display.get else userContext.username,
+            avatar = userContext.avatar
+          )
+
           block(setUpAuthContext(request, user))
+        }
         case JsError(error) =>
           Logger.error(s"Error while parsing Gateway token. $error")
           //TODO could this be a system error.

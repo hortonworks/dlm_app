@@ -3,7 +3,8 @@ set -e
 
 RELEASE_NUMBER=0.0.1
 IMAGE_PREFIX="hortonworks"
-ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service dp-gateway"
+ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service dp-gateway dp-migrate"
+VENDOR_IMAGES="postgres:9.6.3-alpine consul:0.8.5"
 ALL_IMAGES_OPT="all"
 
 build_knox() {
@@ -22,6 +23,8 @@ build_images() {
     docker build -t ${IMAGE_PREFIX}/dp-cluster-service:${VERSION} build/dp-docker/dp-cluster-service
     echo "Building dp-app"
     docker build -t ${IMAGE_PREFIX}/dp-app:${VERSION} build/dp-docker/dp-app
+    echo "Building dp-migrate"
+    docker build -t ${IMAGE_PREFIX}/dp-migrate:${VERSION} build/dp-docker/dp-migrate
 }
 
 push_images() {
@@ -65,13 +68,13 @@ save_images() {
 
     VERSION=$(get_version)
 
-    if [ $1 == ${ALL_IMAGES_OPT} ]
-    then
+    if [ $1 == ${ALL_IMAGES_OPT} ]; then
         for img in ${ALL_IMAGES}
         do
             save_one_image ${img} ${IMAGE_PREFIX}/${img} ${VERSION} || \
                 echo "Failed saving image ${img}, exiting. Verify if the image has been built."
         done
+        save_vendor_images
     else
         save_one_image $1 ${IMAGE_PREFIX}/${1} ${VERSION}
     fi
@@ -90,13 +93,23 @@ save_one_image() {
     docker save --output ./build/dp-docker/images/${IMAGE_LABEL}.tar ${IMAGE_NAME}
 }
 
+save_vendor_images() {
+    for img in ${VENDOR_IMAGES}
+    do
+        docker pull ${img} || \
+            echo "Failed to pull image ${img}, exiting."
+        save_one_image ${img////-} ${img} || \
+                echo "Failed saving image ${img}, exiting. Verify if the image was available."
+    done
+}
+
 get_version() {
     if [ -f build/dp-docker/installer/VERSION ]
     then
         VERSION_STRING=`cat build/dp-docker/installer/VERSION`
         echo ${VERSION_STRING}
     else
-        echo ${RELEASE_NUMBER}:"latest"
+        echo ${RELEASE_NUMBER}-"latest"
     fi
 }
 

@@ -16,7 +16,7 @@
 
 <ng-template let-event="row" #entityTemplate>
   <span *ngIf="event.eventType === 'policyinstance' || event.eventType === 'policy'">
-    <a [routerLink]="['/policies']" [queryParams]="{'policy': getEntity(event)}">
+    <a qe-attr="go-to-policies" [routerLink]="['/policies']" [queryParams]="{'policy': getEntity(event)}">
       <span>{{getEntity(event)}}</span>
     </a>
   </span>
@@ -24,5 +24,5 @@
 </ng-template>
 
 <ng-template let-event="row" #logTemplate>
-  <span *ngIf="event.eventType === 'policyinstance' || event.eventType === 'policy'" class="text-primary actionable" (click)="showLog(event)">{{ "page.notifications.view_log" | translate }}</span>
+  <span qe-attr="show-log" *ngIf="event.eventType === 'policyinstance' || event.eventType === 'policy'" class="text-primary actionable" (click)="showLog(event)">{{ "page.notifications.view_log" | translate }}</span>
 </ng-template>

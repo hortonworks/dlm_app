@@ -11,11 +11,15 @@
 #         - dp-database
 #     command: -configFile=/dbscripts/flyway-docker.conf clean migrate
 
+# for mount (new) >> --mount type=bind,readonly=true,source=$(pwd)/dbscripts,target=/dbscripts \
+
 docker start dp-migrate >> install.log 2>&1 || \
     docker run \
         --name dp-migrate \
-        --network=dp \
+        --network dp \
         --rm \
-        --mount type=bind,readonly=true,source=$(pwd)/dbscripts,target=/dbscripts \
-        claycephas/flyway:4 \
-        -configFile=/dbscripts/flyway-docker.conf clean migrate
+        --env "DATABASE_URI=$DATABASE_URI" \
+        --env "DATABASE_USER=$DATABASE_USER" \
+        --env "DATABASE_PASS=$DATABASE_PASS" \
+        hortonworks/dp-migrate:$VERSION \
+        clean migrate

@@ -1,4 +1,4 @@
-package com.hortonworks.dataplane.gateway.filters;
+package com.hortonworks.dataplane.gateway.service;
 
 import com.hortonworks.dataplane.gateway.domain.UserList;
 import com.hortonworks.dataplane.gateway.domain.UserRoleResponse;

@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import com.hortonworks.dataplane.commons.domain.Entities.{Errors, Error}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.typesafe.scalalogging.Logger
-import internal.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.{KnoxConfigInfo, KnoxConfiguration}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
@@ -94,11 +94,17 @@ class KnoxConfig @Inject()(val ldapService: LdapService,
         configurations.headOption match {
           //TODO Assuming only one valid ldap configuration. impl can chane later.
           case Some(config) => {
-            val knoxLdapConfig = KnoxConfiguration(ldapUrl = config.ldapUrl,
-                                                   bindDn = config.bindDn,
-                                                   userDnTemplate =
-                                                     config.userDnTemplate)
-            Ok(Json.toJson(knoxLdapConfig))
+            if (config.userSearchAttributeName.isEmpty || config.userSearchBase.isEmpty){
+              handleErrors(
+                Errors(
+                  Seq(new Error("Exception", "ldap is not configured correctly"))))
+            }else{
+              val userDnTemplate=s"${config.userSearchAttributeName.get}={0},${config.userSearchBase.get}"
+              val knoxLdapConfig = KnoxConfiguration(ldapUrl = config.ldapUrl,
+                bindDn = config.bindDn,
+                userDnTemplate =Some(userDnTemplate)                                                    )
+              Ok(Json.toJson(knoxLdapConfig))
+            }
           }
           case None =>
             handleErrors(
@@ -107,10 +113,5 @@ class KnoxConfig @Inject()(val ldapService: LdapService,
         }
     }
   }
-
-  def knoxStatus = authenticated.async { req =>
-    //TODO this is mock call for testing until knox containers could be launched.
-    //check if knox is up..
-    Future.successful(Ok)
-  }
+  
 }

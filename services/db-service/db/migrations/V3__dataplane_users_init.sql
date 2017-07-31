@@ -1,8 +1,3 @@
-GRANT ALL PRIVILEGES ON SCHEMA dataplane TO dp_admin;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA dataplane TO dp_admin;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA dataplane TO dp_admin;
-ALTER DATABASE dataplane SET search_path = dataplane;
-
 INSERT INTO dataplane.roles  (name) VALUES ('SUPERADMIN'), ('INFRAADMIN'), ('USER'), ('CURATOR');
 
 INSERT INTO dataplane.users (user_name, display_name, password) VALUES ('admin', 'Super Administrator', '$2a$10$G8hE1YikawgkzbFy3XQmk.XEbYVRef62DiOcaublWLcC9bE3oo6UW');

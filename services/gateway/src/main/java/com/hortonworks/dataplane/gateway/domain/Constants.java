@@ -8,7 +8,15 @@ public interface Constants {
     String DP_TOKEN_INFO_HEADER_KEY = "X-DP-Token-Info";
     String SSO_CHECK_COOKIE_NAME="sso_login_valid";
     String KNOX_LOGIN_PATH =DPAPP_BASE_PATH+ "/auth/signInThrougKnox";
-    String KNOX_LOGOUT_PATH =DPAPP_BASE_PATH+"/auth/signOutThrougKnox";
+
+    String LOGOUT_PATH =DPAPP_BASE_PATH+"/auth/signOut";
+    String LOGIN_PATH="/login";
+    String LOGIN_ENTRY_POINT = DPAPP_BASE_PATH+LOGIN_PATH;
     String AUTHORIZATION_HEADER = "Authorization";
     String USER_CTX_KEY = "user_ctx";
+    String DP_JWT_COOKIE = "dp_jwt";
+    String LOCAL_SIGNIN_PATH="/sign-in";
+    boolean BEARER_TOKEN_IN_COOKIE=true;//If set to false value is taken from header
+
+
 }

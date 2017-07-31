@@ -1,7 +1,11 @@
-<dlm-page-header [title]="'common.clusters'"></dlm-page-header>
 <div class="row page-section">
   <div class="col-md-12">
-    <dp-map [mapSize]="mapSize" [mapData]="mapData$ | async"></dp-map>
+    <dlm-page-header [title]="'common.clusters'"></dlm-page-header>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <dp-map *ngIf="(clustersMapData$ | async).length" [mapSize]="mapSize" [mapData]="clustersMapData$ | async"></dp-map>
   </div>
 </div>
 <dlm-progress-container [progressState]="overallProgress$ | async">
@@ -15,15 +19,15 @@
       </div>
     </div>
   </div>
-  <div class="row">
+  <div class="row" *ngIf="!(overallProgress$ | async)?.isInProgress">
     <div class="col-md-12">
       <div *ngIf="(tableData$ | async)?.length > 0; else noClusters">
         <dlm-cluster-list [clusters]="tableData$ | async"></dlm-cluster-list>
       </div>
       <ng-template #noClusters>
-        <div>
+        <div qe-attr="no-clusters-alert">
           <div class="alert alert-warning" role="alert">
-            {{ "page.pairings.create.content.no_clusters" | translate }}
+            {{"page.pairings.create.content.no_clusters" | translate}}
           </div>
         </div>
       </ng-template>

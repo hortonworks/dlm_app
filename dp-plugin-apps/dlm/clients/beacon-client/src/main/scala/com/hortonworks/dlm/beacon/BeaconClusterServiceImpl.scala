@@ -1,7 +1,7 @@
 package com.hortonworks.dlm.beacon
 
 import com.hortonworks.dlm.beacon.Exception.JsonException
-import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
+import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest, WSResponse}
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import com.hortonworks.dlm.beacon.WebService.BeaconClusterService
 import com.hortonworks.dlm.beacon.domain.RequestEntities._
@@ -47,7 +47,6 @@ class BeaconClusterServiceImpl()(implicit ws: WSClient) extends BeaconClusterSer
   private def mapToClusterDefinitionRequest(clusterDefinitionRequest:ClusterDefinitionRequest) = {
       "fsEndpoint = " + clusterDefinitionRequest.fsEndpoint +
       "\nbeaconEndpoint = " + clusterDefinitionRequest.beaconEndpoint +
-      "\nname = " +  clusterDefinitionRequest.name +
       "\ndescription = " + clusterDefinitionRequest.description +
       (if (clusterDefinitionRequest.hsEndpoint.isDefined) "\nhsEndpoint = " + clusterDefinitionRequest.hsEndpoint.get else "")
   }
@@ -55,6 +54,7 @@ class BeaconClusterServiceImpl()(implicit ws: WSClient) extends BeaconClusterSer
 
   override def listCluster(beaconEndpoint : String, clusterName: String): Future[Either[BeaconApiErrors, BeaconEntityResponse]] = {
     ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/getEntity/$clusterName")
+      .withAuth(user, password, WSAuthScheme.BASIC)
       .get.map(mapToBeaconEntityResponse).recoverWith {
       case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
@@ -62,16 +62,18 @@ class BeaconClusterServiceImpl()(implicit ws: WSClient) extends BeaconClusterSer
 
   override def listClusterStatus(beaconEndpoint : String, clusterName: String): Future[Either[BeaconApiErrors, BeaconClusterStatusResponse]] = {
     ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/status/$clusterName")
+      .withAuth(user, password, WSAuthScheme.BASIC)
       .get.map(mapToBeaconClusterStatusResponse).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
   }
 
-  override def createClusterDefinition(beaconEndpoint : String, clusterName : String,
+  override def createClusterDefinition(beaconEndpoint : String, dataCenterClusterName : String,
                                        clusterDefinitionRequest:ClusterDefinitionRequest) :
   Future[Either[BeaconApiErrors, PostActionResponse]] = {
     val requestData:String =  mapToClusterDefinitionRequest(clusterDefinitionRequest)
-    ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/submit/$clusterName")
+    ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/submit/$dataCenterClusterName")
+      .withAuth(user, password, WSAuthScheme.BASIC)
       .withHeaders(httpHeaders.toList: _*)
       .post(requestData)
       .map(mapToPostActionResponse).recoverWith {

@@ -53,11 +53,14 @@ export class LdapConfigComponent implements OnInit {
       this.showNotification = true;
       return;
     }
+    Loader.show();
     this.configurationService.configureLDAP(this.ldapProperties).subscribe(() => {
       this.router.navigate(['onboard/adduser', {
         status: 'success',
       }]);
+      Loader.hide();
     }, (response) => {
+      Loader.hide();
       this.showNotification = true;
       if (!response || !response._body) {
         this.notificationMessages.push('Error occurred while saving the configurations.')

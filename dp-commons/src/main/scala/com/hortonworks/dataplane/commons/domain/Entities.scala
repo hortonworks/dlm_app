@@ -31,6 +31,15 @@ object Entities {
                   created: Option[LocalDateTime] = Some(LocalDateTime.now()),
                   updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
+  case class Group(id: Option[Long] = None,
+                   groupName: String,
+                   displayName: String,
+                   active: Option[Boolean] = Some(true),
+                   created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                   updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+
+  case class GroupsList(total: Int, groups: Seq[GroupInfo])
+
   case class UsersList( total: Int, users: Seq[UserInfo])
 
   case class UserInfo(id: Option[Long] = None,
@@ -40,6 +49,14 @@ object Entities {
                   active: Option[Boolean] = Some(true),
                   roles: Seq[RoleType.Value]=Seq()
                   )
+  case class UserContext(id:Option[Long],username:String,avatar:Option[String],roles:Seq[String],display:Option[String],token:Option[String])
+
+  case class GroupInfo(id: Option[Long] = None,
+                      groupName: String,
+                      displayName: String,
+                      active: Option[Boolean] = Some(true),
+                      roles: Seq[RoleType.Value]=Seq()
+                     )
 
   case class Role(id: Option[Long] = None,
                   roleName: String,
@@ -58,6 +75,12 @@ object Entities {
                       roleId: Option[Long])
 
   case class UserRoles(username: String, roles: Seq[String])
+
+  case class GroupRoles(groupName: String, roles: Seq[String])
+
+  case class GroupRole(id: Option[Long] = None,
+                       groupId: Option[Long],
+                       roleId: Option[Long])
 
   case class RolePermission(role: String, permissions: Seq[String])
 
@@ -248,9 +271,10 @@ object Entities {
                               id: Option[Long],
                               ldapUrl:String,
                               bindDn: Option[String],
-                              userDnTemplate: Option[String],
                               userSearchBase: Option[String],
-                              groupSearchBase: Option[String]
+                              userSearchAttributeName:Option[String],
+                              groupSearchBase: Option[String],
+                              groupSearchAttributeName:Option[String]
                               )
 
   case class WorkspaceDataCount(asset: Int, notebook: Int)
@@ -405,5 +429,14 @@ object JsonFormatters {
 
   implicit val usersListWrites = Json.writes[UsersList]
   implicit  val usersListReads = Json.reads[UsersList]
+
+  implicit val groupInfoReads = Json.reads[GroupInfo]
+  implicit val groupInfoWrites = Json.writes[GroupInfo]
+
+  implicit val groupsListWrites = Json.writes[GroupsList]
+  implicit  val groupsListReads = Json.reads[GroupsList]
+
+  implicit val userContextWrites= Json.writes[UserContext]
+  implicit val userContextReads= Json.reads[UserContext]
 
 }

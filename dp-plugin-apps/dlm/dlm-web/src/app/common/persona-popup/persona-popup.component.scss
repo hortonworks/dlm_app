@@ -1,0 +1,49 @@
+@import "../../styles/variables";
+
+$icon-width: 75px;
+
+.suit-navigation {
+  position: fixed;
+  top: 55px;
+  left: 0;
+  margin: 0;
+  padding: 40px 20px;
+  background: $white-color;
+  -webkit-box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
+  -moz-box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
+  box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
+  z-index: 100000;
+  visibility: hidden;
+  width: auto;
+  display: flex;
+
+  &.showPopup {
+    visibility: visible;
+  }
+
+  & > li {
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+    margin: 0 20px;
+    width: $icon-width;
+
+    & .logo-wrapper {
+      background-color: $logo-icon;
+      border-radius: 4px;
+      display: inline-block;
+      height: $icon-width;
+      width: $icon-width;
+      img {
+        padding: 17px;
+      }
+      & + div {
+        text-align: center;
+        font-size: 13px;
+        padding-top: 10px;
+        line-height: 1;
+        color: $popup-font;
+      }
+    }
+  }
+}

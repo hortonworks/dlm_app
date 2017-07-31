@@ -12,7 +12,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.Errors
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.cs.Webservice.AtlasService
 import com.hortonworks.dataplane.db.Webservice.DataAssetService
-import internal.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.JsonResponses
 import play.api.Logger
 import play.api.libs.json.Json

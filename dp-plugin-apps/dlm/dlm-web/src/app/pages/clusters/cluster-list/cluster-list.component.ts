@@ -1,11 +1,10 @@
 import { Component, OnInit, Input, ViewChild, TemplateRef, ViewEncapsulation, HostBinding, ChangeDetectorRef } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Cluster } from 'models/cluster.model';
-import { PoliciesCountEntity } from 'models/policies-count-entity.model';
-import { PairsCountEntity } from 'models/pairs-count-entity.model';
 import { TableTheme } from 'common/table/table-theme.type';
 import { TableComponent } from 'common/table/table.component';
 import { ColumnMode } from '@swimlane/ngx-datatable';
+import { CLUSTER_STATUS } from 'constants/status.constant';
 
 @Component({
   selector: 'dlm-cluster-list',
@@ -14,6 +13,7 @@ import { ColumnMode } from '@swimlane/ngx-datatable';
   encapsulation: ViewEncapsulation.None
 })
 export class ClusterListComponent implements OnInit {
+  CLUSTER_STATUS = CLUSTER_STATUS;
   tableTheme = TableTheme.Cards;
   columns = [];
   hdfsRootPath = '/';
@@ -25,6 +25,8 @@ export class ClusterListComponent implements OnInit {
   // TODO: should use StatusColumnComponent instead. Currently cluster status is missed in API
   @ViewChild('statusCell') statusCellRef: TemplateRef<any>;
   @ViewChild('nameCell') nameCellRef: TemplateRef<any>;
+  @ViewChild('dcCell') dcCellRef: TemplateRef<any>;
+  @ViewChild('slashIconCell') slashIconCellRef: TemplateRef<any>;
   @ViewChild('usageCell') usageCellRef: TemplateRef<any>;
   @ViewChild('plainCell') plainCellRef: TemplateRef<any>;
   @ViewChild('locationCell') locationCellRef: TemplateRef<any>;
@@ -37,20 +39,22 @@ export class ClusterListComponent implements OnInit {
 
   ngOnInit() {
     this.columns = [
-      {prop: 'status', name: this.t.instant('common.status.self'), cellTemplate: this.statusCellRef,
-        flexGrow: 2, cellClass: 'status'},
-      {prop: 'name', name: '', cellTemplate: this.nameCellRef, flexGrow: 2},
-      {prop: 'stats', name: this.t.instant('page.clusters.card.usage'), cellTemplate: this.usageCellRef, minWidth: 160, flexGrow: 2},
+      {prop: 'healthStatus', name: this.t.instant('common.status.self'), cellTemplate: this.statusCellRef,
+        flexGrow: 3, cellClass: 'status'},
+      {prop: 'dataCenter', name: '', cellTemplate: this.dcCellRef, flexGrow: 3},
+      {name: '', cellTemplate: this.slashIconCellRef, flexGrow: 1},
+      {prop: 'name', name: '', cellTemplate: this.nameCellRef, flexGrow: 4},
+      {prop: 'stats', name: this.t.instant('page.clusters.card.usage'), cellTemplate: this.usageCellRef, minWidth: 160, flexGrow: 5},
       {prop: 'totalHosts', name: this.t.instant('page.clusters.card.nodes'),
-        cellTemplate: this.plainCellRef, flexGrow: 1, cellClass: 'text-center'},
+        cellTemplate: this.plainCellRef, flexGrow: 1, cellClass: 'text-cell', headerClass: 'text-header'},
       {prop: 'pairsCounter', name: this.t.instant('common.pairs'),
-        cellTemplate: this.plainCellRef, flexGrow: 1, cellClass: 'text-center'},
+        cellTemplate: this.plainCellRef, flexGrow: 1, cellClass: 'text-cell', headerClass: 'text-header'},
       {prop: 'policiesCounter', name: this.t.instant('common.policies'),
-        cellTemplate: this.plainCellRef, flexGrow: 1, cellClass: 'text-center'},
+        cellTemplate: this.plainCellRef, flexGrow: 2, cellClass: 'text-cell', headerClass: 'text-header'},
       {prop: 'location', name: this.t.instant('page.clusters.card.location'),
-        cellTemplate: this.locationCellRef, flexGrow: 2},
-      {name: '', cellTemplate: this.addActionsCellRef, ...TableComponent.makeFixedWith(230),
-        cellClass: 'add-actions-cell', flexGrow: 2}
+        cellTemplate: this.locationCellRef, flexGrow: 4},
+      {name: '', cellTemplate: this.addActionsCellRef, minWidth: 230,
+        cellClass: 'add-actions-cell', flexGrow: 6}
     ];
   }
 

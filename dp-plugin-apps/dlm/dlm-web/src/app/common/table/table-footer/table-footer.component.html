@@ -9,6 +9,7 @@
     <div class="pull-right" *ngIf="showPageSizeMenu">
       {{"common.show" | translate}}:
       <dlm-dropdown
+        qe-attr="change-page-size"
         class="page-size-menu"
         type="link"
         [text]="pageSize"
@@ -26,10 +27,10 @@
   </div>
   <div class="col-sm-2 col-md-1 col-lg-1">
     <div class="pull-right">
-      <button class="btn btn-link" (click)="handleGoToPrev()" [disabled]="prevDisabled">
+      <button qe-attr="prev-page" class="btn btn-link" (click)="handleGoToPrev()" [disabled]="prevDisabled">
         <span class="fa fa-arrow-left" aria-hidden="true"></span>
       </button>
-      <button class="btn btn-link" (click)="handleGoToNext()" [disabled]="nextDisabled">
+      <button qe-attr="next-page" class="btn btn-link" (click)="handleGoToNext()" [disabled]="nextDisabled">
         <span class="fa fa-arrow-right" aria-hidden="true"></span>
       </button>
     </div>

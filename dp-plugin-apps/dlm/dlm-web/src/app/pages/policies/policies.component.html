@@ -1,9 +1,9 @@
-<div class="row">
+<div class="row page-section">
   <div class="col-md-3">
     <dlm-page-header [title]="'page.policies.header'"></dlm-page-header>
   </div>
-  <div class="col-md-9">
-    <div class="pull-right filters-block page-section">
+  <div class="col-md-9 actions">
+    <div class="pull-right filters-block">
 
       <div class="filter-item" *ngIf="(policies$ | async)?.length > 0">
         <dlm-table-filter
@@ -25,7 +25,7 @@
   </div>
 </div>
 <dlm-progress-container [progressState]="overallProgress$ | async">
-  <div class="row page-section">
+  <div class="row page-section" *ngIf="!(overallProgress$ | async).inProgress">
     <div class="col-md-12" *ngIf="(policies$ | async)?.length > 0; else noPolicies">
       <dlm-policy-table
         [policies]="filteredPolicies$ | async"
@@ -37,7 +37,7 @@
     </div>
     <ng-template #noPolicies>
       <div class="alert-wrapper">
-        <div class="alert alert-warning" role="alert">
+        <div class="alert alert-warning" role="alert" qe-attr="no-policies-alert">
           <div *ngIf="(pairings$ | async).length > 0; else noPairings">
             {{ "page.policies.no_policies" | translate }}
             <button type="button" class="btn btn-primary" [routerLink]="'/policies/create'">
@@ -49,7 +49,7 @@
     </ng-template>
 
     <ng-template #noPairings>
-      <div *ngIf="(clusters$ | async).length > 1; else noClusters">
+      <div qe-attr="no-pairings-alert"  *ngIf="(clusters$ | async).length > 1; else noClusters">
         {{ "page.policies.no_pairings" | translate }}
         <button type="button" class="btn btn-primary" [routerLink]="'/pairings/create'">
           {{ "page.pairings.create_button_text" | translate }}
@@ -58,7 +58,9 @@
     </ng-template>
 
     <ng-template #noClusters>
-      {{ "page.policies.no_clusters" | translate }}
+      <div qe-attr="no-clusters-alert">
+        {{ "page.policies.no_clusters" | translate }}
+      </div>
     </ng-template>
   </div>
 </dlm-progress-container>

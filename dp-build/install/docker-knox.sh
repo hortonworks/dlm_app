@@ -14,7 +14,7 @@
 docker start knox >> install.log 2>&1 || \
     docker run \
         --name knox \
-        --network=dp \
+        --network dp \
         --detach \
         --publish 8443:8443 \
         --env MASTER_PASSWORD \

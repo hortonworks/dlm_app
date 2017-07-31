@@ -41,6 +41,7 @@ export class JobsTableComponent implements OnInit {
   @Output() onSort = new EventEmitter<any>();
   @Output() onPageChange = new EventEmitter<any>();
   @Output() onSelectAction = new EventEmitter<any>();
+  @Output() abortJobAction = new EventEmitter<any>();
 
   rowActions = <ActionItemType[]>[
     {label: 'Abort', name: 'ABORT', enabledFor: JOB_STATUS.RUNNING},
@@ -101,7 +102,7 @@ export class JobsTableComponent implements OnInit {
     if (action.name === 'LOG') {
       this.logService.showLog(EntityType.policyinstance, row.id);
     } else if (row.status === JOB_STATUS.RUNNING) {
-      this.store.dispatch(abortJob(this.policy));
+      this.abortJobAction.emit(row);
     }
   }
 

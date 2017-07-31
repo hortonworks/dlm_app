@@ -19,21 +19,23 @@ const makeProgressInstance = (requestId): ProgressState => ({
 
 export const updateLoadingProgress = (request: ProgressState, action): ProgressState => {
   if (isStartAction(action)) {
-    return {
+    return <ProgressState>{
       ...request,
       isInProgress: true,
       success: false,
       error: false
     };
-  } else if (isSuccessAction(action)) {
-    return {
+  }
+  if (isSuccessAction(action)) {
+    return <ProgressState>{
       ...request,
       isInProgress: false,
       success: true,
       error: false
     };
-  } else if (isFailureAction(action)) {
-    return {
+  }
+  if (isFailureAction(action)) {
+    return <ProgressState>{
       ...request,
       isInProgress: false,
       success: false,
@@ -47,7 +49,7 @@ export const updateLoadingProgress = (request: ProgressState, action): ProgressS
 export function reducer(state = initialState, action: Action): State {
   switch (action.type) {
     case ActionTypes.RESET_PROGRESS_STATE: {
-      const { requestId } = action.payload;
+      const {requestId} = action.payload;
       return {
         entities: {
           ...state.entities,
@@ -55,11 +57,24 @@ export function reducer(state = initialState, action: Action): State {
         }
       };
     }
+    case ActionTypes.UPDATE_PROGRESS_STATE: {
+      const { requestId, progressState } = action.payload;
+      const progressEntity = state.entities[requestId] || makeProgressInstance(requestId);
+      return {
+        entities: {
+          ...state.entities,
+          [requestId]: {
+            ...progressEntity,
+            ...progressState
+          }
+        }
+      };
+    }
   }
   if (!(action.payload && action.payload.meta && action.payload.meta.requestId)) {
     return state;
   }
-  const { meta: { requestId }} = action.payload;
+  const {meta: {requestId}} = action.payload;
   const request = state.entities[requestId] || makeProgressInstance(requestId);
   return {
     entities: {

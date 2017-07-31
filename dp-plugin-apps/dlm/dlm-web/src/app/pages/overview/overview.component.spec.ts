@@ -18,7 +18,6 @@ import { IssuesListComponent } from './issues-list/issues-list.component';
 import { IssuesListItemComponent } from './issues-list-item/issues-list-item.component';
 import { ResourceChartsComponent } from './resource-charts/';
 import { JobsTableComponent } from 'pages/jobs/jobs-table/jobs-table.component';
-import { JobStatusComponent } from 'pages/jobs/job-status/job-status.component';
 import { JobTransferredGraphComponent } from 'pages/jobs/jobs-transferred-graph/job-transferred-graph.component';
 import { TableComponent } from 'common/table/table.component';
 import { CheckboxColumnComponent, ActionColumnComponent } from 'components';
@@ -26,7 +25,7 @@ import { TableFooterComponent } from 'common/table/table-footer/table-footer.com
 import { CheckboxComponent } from 'common/checkbox/checkbox.component';
 import { NavbarService } from 'services/navbar.service';
 import { JobsOverviewTableComponent } from './jobs-overview-table/jobs-overview-table.component';
-import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
+import { ModalDialogBodyComponent } from 'common/modal-dialog/modal-dialog-body.component';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
 import { Policy } from 'models/policy.model';
 import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
@@ -38,6 +37,8 @@ import { LogService } from 'services/log.service';
 import {MockBackend} from '@angular/http/testing';
 import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions} from '@angular/http';
 import {HttpService} from 'services/http.service';
+import { OverviewModule } from './overview.module';
+import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 
 const jobs = [
   <Job>{status: JOB_STATUS.SUCCESS},
@@ -91,7 +92,8 @@ describe('OverviewComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         CommonComponentsModule,
-        PipesModule
+        PipesModule,
+        OverviewModule
       ],
       declarations: [
         OverviewComponent,
@@ -99,7 +101,6 @@ describe('OverviewComponent', () => {
         IssuesListItemComponent,
         ResourceChartsComponent,
         JobsTableComponent,
-        JobStatusComponent,
         TableComponent,
         JobTransferredGraphComponent,
         TableFooterComponent,
@@ -108,7 +109,8 @@ describe('OverviewComponent', () => {
         CheckboxComponent,
         JobsOverviewTableComponent,
         ModalDialogComponent,
-        PrevJobsComponent
+        PrevJobsComponent,
+        ModalDialogBodyComponent
       ],
       providers: [
         {provide: Store, useClass: MockStore},
@@ -137,16 +139,6 @@ describe('OverviewComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
-  });
-
-});
-
-describe('OverviewComponent UT', () => {
-
-  let component;
-
-  beforeEach(() => {
-    component = new OverviewComponent(new MockStore(), new OverviewJobsExternalFiltersService());
   });
 
   describe('#filterPolicyByJob', () => {
@@ -208,46 +200,6 @@ describe('OverviewComponent UT', () => {
 
   });
 
-  describe('#makeResourceData', () => {
-
-    it('should group jobs', () => {
-      const expectedResult = {
-        labels: jobLabels,
-        data: [1, 3, 4, 2]
-      };
-      expect(component.makeResourceData('jobs', jobs)).toEqual(expectedResult);
-    });
-
-    it('should group policies', () => {
-      const expectedResult = {
-        labels: policyLabels,
-        data: [1, 2, 3]
-      };
-      expect(component.makeResourceData('policies', policies)).toEqual(expectedResult);
-    });
-
-  });
-
-  describe('#mapResourceData', () => {
-    it('should map resources data', () => {
-      const expectedResult = {
-        clusters: {
-          data: [3],
-          labels: clusterLabels
-        },
-        policies: {
-          data: [1, 2, 3],
-          labels: policyLabels
-        },
-        jobs: {
-          data: [1, 3, 4, 2],
-          labels: jobLabels
-        }
-      };
-      expect(component.mapResourceData(jobs, policies, clusters)).toEqual(expectedResult);
-    });
-  });
-
   describe('#mapTableData', () => {
     [
       {
@@ -271,83 +223,4 @@ describe('OverviewComponent UT', () => {
       });
     });
   });
-
-  describe('#prepareChartData', () => {
-
-    const clustersData = [
-      <Cluster>{id: 1, name: 'c1'},
-      <Cluster>{id: 2, name: 'c2'},
-      <Cluster>{id: 3, name: 'not mapped cluster'}
-    ];
-
-    const jobsData = [
-      <Job>{id: '1', name: 'p1', status: JOB_STATUS.SUCCESS},
-      <Job>{id: '2', name: 'p2', status: JOB_STATUS.RUNNING},
-      <Job>{id: '3', name: 'p3', status: JOB_STATUS.WARNINGS},
-      <Job>{id: '4', name: 'p4', status: JOB_STATUS.FAILED},
-      <Job>{id: '5', name: 'not mapped job', status: JOB_STATUS.SUCCESS}
-    ];
-
-    const policiesData = [
-      <Policy>{
-        name: 'p1',
-        sourceCluster: 'c1',
-        targetCluster: 'c2',
-        lastJobResource: jobsData[0],
-        status: POLICY_STATUS.RUNNING,
-        jobsResource: [{}]
-      },
-      <Policy>{
-        name: 'p2',
-        sourceCluster: 'c2',
-        targetCluster: 'c1',
-        lastJobResource: jobsData[1],
-        status: POLICY_STATUS.SUBMITTED,
-        jobsResource: [{}]
-      },
-      <Policy>{
-        name: 'p3',
-        sourceCluster: 'c1',
-        targetCluster: 'c2',
-        lastJobResource: jobsData[2],
-        status: POLICY_STATUS.SUSPENDED,
-        jobsResource: [{}]
-      },
-      <Policy>{
-        name: 'p4',
-        sourceCluster: 'c2',
-        targetCluster: 'c1',
-        lastJobResource: jobsData[3],
-        status: POLICY_STATUS.SUSPENDED,
-        jobsResource: [{}]
-      }
-    ];
-
-    [
-      {
-        m: 'jobs, policies and clusters are mapped',
-        e: {
-          clusters: {
-            data: [2],
-            labels: clusterLabels
-          },
-          policies: {
-            data: [1, 1, 2],
-            labels: policyLabels
-          },
-          jobs: {
-            data: [1, 1, 1, 1],
-            labels: jobLabels
-          }
-        },
-        args: [jobsData, policiesData, clustersData, {}],
-      }
-    ].forEach(test => {
-      it(test.m, () => {
-        expect(component.prepareChartData(...test.args)).toEqual(test.e);
-      });
-    });
-
-  });
-
 });

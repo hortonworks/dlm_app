@@ -1,7 +1,8 @@
 import {Component, Input} from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router } from '@angular/router';
 
 import {User} from '../../models/user';
+import {AuthUtils} from '../../shared/utils/auth-utils';
 
 @Component({
   selector: 'dp-header',
@@ -11,10 +12,12 @@ import {User} from '../../models/user';
 export class HeaderComponent {
 
   @Input() user:User;
+  signoutURL = AuthUtils.signoutURL;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router) {
+  }
 
   logout() {
-    this.router.navigate(['/sign-out']);
+    this.router.navigate([this.signoutURL]);
   }
 }

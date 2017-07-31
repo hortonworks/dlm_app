@@ -6,7 +6,7 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.{AssetWorkspaceRequest, DataAsset, Errors, HJwtToken}
 import com.hortonworks.dataplane.cs.Webservice.AtlasService
 import com.hortonworks.dataplane.db.Webservice.AssetWorkspaceService
-import internal.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.JsonResponses
 import play.api.libs.json.Json
 import play.api.mvc.Controller

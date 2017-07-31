@@ -1,19 +1,25 @@
 #!/bin/sh
 set -e
 
+source $(pwd)/config.env.sh
+
 CERTS_DIR=`dirname $0`/certs
 KNOX_SIGNING_CERTIFICATE=knox-signing.pem
 DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 export KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
-APP_CONTAINERS="dp-database dp-app dp-db-service dp-cluster-service dp-gateway"
+APP_CONTAINERS="dp-app dp-db-service dp-cluster-service dp-gateway"
+if [ "$USE_EXT_DB" == "no" ]; then
+    APP_CONTAINERS="dp-database $APP_CONTAINERS"
+fi
 KNOX_CONTAINER="knox"
 CONSUL_CONTAINER="dp-consul-server"
 
 init_network() {
-    NETWORK_ID=$(docker network ls --quiet --filter "name=dp")
-    if [ -z ${NETWORK_ID} ]; then
+    IS_NETWORK_PRESENT="false"
+    docker network inspect --format "{{title .ID}}" dp >> install.log 2>&1 && IS_NETWORK_PRESENT="true"
+    if [ $IS_NETWORK_PRESENT == "false" ]; then
         echo "Network dp not found. Creating new network with name dp."
         docker network create dp
     # This is not a clean solution and will be fixed later
@@ -27,11 +33,11 @@ init_network() {
 }
 
 get_bind_address_from_consul_container() {
-    CONSUL_ID=$(docker container ls -af 'ancestor=consul' -q)
+    CONSUL_ID=$(docker ps --all --quiet --filter "name=$CONSUL_CONTAINER")
     if [ -z ${CONSUL_ID} ]; then
         return 0
     fi
-    CONSUL_ARGS=$(docker container inspect -f {{.Args}} ${CONSUL_ID})
+    CONSUL_ARGS=$(docker inspect -f {{.Args}} ${CONSUL_ID})
     for word in $CONSUL_ARGS; do
         if [[ $word == -bind* ]]
         then
@@ -60,21 +66,27 @@ read_consul_host(){
 }
 
 init_db() {
-    source $(pwd)/docker-database.sh
+    if [ "$USE_EXT_DB" == "yes" ]; then
+        echo "Dataplane is configured to use an external database in config.env.sh. Database initialization is not required and assumed to be done already."
+    else
+        source $(pwd)/docker-database.sh
+    fi
 }
 
 ps() {
-    docker container ls \
-        --filter "name=dp-app|dp-db-service|dp-cluster-service|dp-gateway|dp-database|knox|dp-consul-server"
+    docker ps \
+        --filter "name=dp-app|dp-db-service|dp-cluster-service|dp-gateway|dp-database|knox|dp-consul-server|dp-migrate"
 }
 
 list_logs() {
-    docker container logs "$@"
+    docker logs "$@"
 }
 
 migrate_schema() {
-    # start database container
-    source $(pwd)/docker-database.sh
+    if [ "$USE_EXT_DB" == "no" ]; then
+        # start database container
+        source $(pwd)/docker-database.sh
+    fi
 
     # wait for database start
     sleep 5
@@ -84,17 +96,17 @@ migrate_schema() {
 }
 
 destroy() {
-    docker container rm --force $APP_CONTAINERS
+    docker rm --force $APP_CONTAINERS
 }
 
 destroy_consul(){
     echo "Destroying Consul"
-    docker container rm --force $CONSUL_CONTAINER
+    docker rm --force $CONSUL_CONTAINER
 }
 
 destroy_knox() {
     echo "Destroying Knox"
-    docker container rm --force $KNOX_CONTAINER
+    docker rm --force $KNOX_CONTAINER
     rm -rf ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
     destroy_consul
 }
@@ -103,8 +115,10 @@ init_app() {
     echo "Initializing app"
     read_consul_host
 
-    echo "Starting Database (Postgres)"
-    source $(pwd)/docker-database.sh
+    if [ "$USE_EXT_DB" == "no" ]; then
+        echo "Starting Database (Postgres)"
+        source $(pwd)/docker-database.sh
+    fi
 
     echo "Starting Gateway"
     source $(pwd)/docker-gateway.sh
@@ -161,12 +175,12 @@ init_knox() {
         echo "Knox container not found. Ensure it is running..."
         return -1
     fi
-    docker container exec -t ${KNOX_CONTAINER_ID} ./wait_for_keystore_file.sh
+    docker exec -t ${KNOX_CONTAINER_ID} ./wait_for_keystore_file.sh
     mkdir -p ${CERTS_DIR}
     export_knox_cert ${MASTER_PASSWORD} ${KNOX_CONTAINER_ID} > ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
     if [ ${USE_TEST_LDAP} == "no" ]
     then
-        docker container exec -it ${KNOX_CONTAINER_ID} ./setup_knox_sso_conf.sh
+        docker exec -it ${KNOX_CONTAINER_ID} ./setup_knox_sso_conf.sh
     fi
     echo "Knox Initialized"
 }
@@ -174,18 +188,20 @@ init_knox() {
 export_knox_cert() {
     MASTER_PASSWD=$1
     KNOX_CONTAINER_ID=$2
-    docker container exec -t ${KNOX_CONTAINER_ID} \
+    docker exec -t ${KNOX_CONTAINER_ID} \
         keytool -export -alias gateway-identity -storepass ${MASTER_PASSWD} -keystore /var/lib/knox/data-2.6.0.3-8/security/keystores/gateway.jks -rfc
 }
 
 get_knox_container_id() {
-    KNOX_CONTAINER_ID=`docker container ls --quiet --filter="name=knox"`
+    KNOX_CONTAINER_ID=`docker ps --quiet --filter="name=knox"`
     echo ${KNOX_CONTAINER_ID}
 }
 
 start_app() {
-    echo "Starting Database (Postgres)"
-    source $(pwd)/docker-database.sh
+    if [ "$USE_EXT_DB" == "no" ]; then
+        echo "Starting Database (Postgres)"
+        source $(pwd)/docker-database.sh
+    fi
 
     echo "Starting Gateway"
     source $(pwd)/docker-gateway.sh
@@ -210,17 +226,17 @@ start_knox() {
 }
 
 stop_app() {
-    docker container stop $APP_CONTAINERS
+    docker stop $APP_CONTAINERS
 }
 
 stop_consul(){
     echo "Stopping Consul"
-    docker container stop $CONSUL_CONTAINER
+    docker stop $CONSUL_CONTAINER
 }
 
 stop_knox() {
     echo "Stopping Knox"
-    docker container stop $KNOX_CONTAINER
+    docker stop $KNOX_CONTAINER
     stop_consul
 }
 
@@ -228,7 +244,7 @@ print_version() {
     if [ -f VERSION ]; then
         cat VERSION
     else
-        cat ${DEFAULT_VERSION}:${DEFAULT_TAG}
+        echo ${DEFAULT_VERSION}-${DEFAULT_TAG}
     fi
 }
 

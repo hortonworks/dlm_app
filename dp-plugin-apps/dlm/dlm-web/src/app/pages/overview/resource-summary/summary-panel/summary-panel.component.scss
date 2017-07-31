@@ -1,0 +1,35 @@
+$panel-border-color: #f0f0f0;
+$cell-border: 1px solid #ddd;
+
+:host /deep/ .row > dlm-summary-panel-cell {
+  &.col-md-4:nth-child(2) .cell-value {
+    border-left: $cell-border;
+    border-right: $cell-border;
+    padding-bottom: 10px;
+  }
+}
+
+.panel-heading {
+  background-color: transparent;
+  border-color: $panel-border-color;
+  border-bottom-width: 2px;
+  justify-content: space-between;
+}
+
+.panel {
+  box-shadow: none;
+  border-radius: 2px;
+
+  &.panel-default {
+    border-color: $panel-border-color;
+  }
+
+  .panel-body {
+    padding-bottom: 10px;
+  }
+}
+
+.total-counter {
+  font-size: 20px;
+  align-self: flex-end;
+}

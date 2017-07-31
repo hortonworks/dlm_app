@@ -6,7 +6,7 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.DpClusterService
 import internal.KnoxSso
-import internal.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.{JsonResponses, WrappedErrorsException}
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -36,19 +36,6 @@ class Configuration @Inject()(@Named("dpClusterService") val dpClusterService:
         "authWasInitialized" -> auth,
         "rbacWasInitialized" -> rbac
       )
-    )
-  }
-
-  def login = Action.async { request =>
-    val response = ldapService.getConfiguredLdap.map {
-      case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-      case Right(ldapConfigs) => ldapConfigs.length match {
-        case 0 => s"${request.getQueryString("landingPage").get}/${request.getQueryString("signInUrl").get}"
-        case _ => knoxSso.getLoginUrl(request.getQueryString("landingPage").get)
-      }
-    }
-    response.flatMap(url =>
-      Future.successful(Redirect(url.toString,302))
     )
   }
 

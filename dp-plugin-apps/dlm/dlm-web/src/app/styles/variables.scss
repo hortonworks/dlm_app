@@ -17,6 +17,7 @@ $table-row-hover-border: #A7DFF2;
 $table-row-active: #EEE;
 $table-header: #999;
 $modal-backdrop: #808080;
+$navigation-header-bg: #313d54;
 //Fonts
 $roboto-font: 'Roboto', sans-serif;
 //Sizes
@@ -24,3 +25,24 @@ $modal-padding: 20px;
 $row-padding: 15px; // padding size used by bootstrap for .row
 
 $body-background: #f8f8f8;
+
+$header-height: 55px;
+$oxford-blue: #333F54;
+$logo-background: $oxford-blue;
+$side-nav-width: 200px;
+$side-nav-minimised-width: 50px;
+$eastern-blue : #2192bf;
+$tuna: #323544;
+$pickled-bluewood: #303D54;
+$forest-green-1: #3FAE2A;
+$logo-icon: #1491C1;
+$popup-font: #6e6f72;
+$fruit-salad: #4AAB52;
+$submarine: #B8BEC4;
+$bright-gray: #404351;
+
+.borderBox, .borderBox * {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}

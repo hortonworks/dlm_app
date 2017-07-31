@@ -1,26 +1,20 @@
 <div class="notifications-group pull-right">
-  <div class="alerts-label dropdown-toggle" data-toggle="dropdown">
-    <span class="glyphicon glyphicon-user"></span>
+  <div class="alerts-label dropdown-toggle" data-toggle="dropdown" qe-attr="user-dropdown-toggler">
+    <span class="fa fa-user"></span>
+    <span class="caret"></span>
   </div>
   <div id="notifications-dropdown" class="user-settings-dropdown dropdown-menu row">
     <div class="popup-arrow-up"></div>
     <div class="notifications-header col-sm-12">
-      <div class="notifications-title">{{user.fullName}}</div>
+      <div class="notifications-title">{{user.display}}</div>
     </div>
     <div class="notifications-body col-sm-12">
-      <table class="alerts-table table">
-        <tbody>
-        <tr>
-          <td>
-            {{"topnav.timezone" | translate}}:
+            <label>{{"topnav.timezone" | translate}}:</label>
             <ng-select
+              qe-attr="select-user-timezone"
               [active]="timezoneValue"
               [items]="timeZoneOptions"
               (selected)="onTimezoneSelect($event)"></ng-select>
-          </td>
-        </tr>
-        </tbody>
-      </table>
     </div>
     <div class="notifications-footer col-sm-12">
       <button class="btn btn-secondary pull-right" (click)="doLogout()">Logout</button>

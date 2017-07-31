@@ -1,14 +1,4 @@
-import {
-  Component,
-  ViewChild,
-  ElementRef,
-  Input,
-  ChangeDetectorRef,
-  OnInit,
-  OnChanges,
-  SimpleChanges,
-  AfterViewChecked
-} from '@angular/core';
+import { Component, ViewChild, ElementRef, Input, ChangeDetectorRef, OnInit, OnChanges, SimpleChanges, } from '@angular/core';
 import {Router, NavigationStart} from '@angular/router';
 
 import {PersonaTabs, HeaderData, Persona} from '../../models/header-data';
@@ -56,7 +46,8 @@ export class CollapsibleNavComponent implements OnInit, OnChanges {
 
   findPersonaAndTabName(url: string, exactMatch: boolean): boolean {
     for (let persona of this.headerData.personas) {
-      for (let tab of persona.tabs) {
+      for (let i = 0; i< persona.tabs.length; i++) {
+        let tab = persona.tabs[i];
         if (tab.URL && tab.URL.length > 0 &&
           ((exactMatch && url == '/' + tab.URL) || (!exactMatch && url.startsWith('/' + tab.URL)))) {
           this.activePersona = persona;
@@ -69,8 +60,11 @@ export class CollapsibleNavComponent implements OnInit, OnChanges {
           if (exactMatch) {
             this.collapsibleNavService.collpaseSideNav.next(tab.collapseSideNav || this.collapseSideNav);
           }
+          if(i === persona.tabs.length - 1 && !exactMatch){
+            this.collapsibleNavService.collpaseSideNav.next(tab.collapseSideNav || this.collapseSideNav)
+            return true;
+          }
 
-          return true;
         }
       }
     }

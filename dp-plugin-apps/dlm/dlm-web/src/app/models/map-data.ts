@@ -1,3 +1,4 @@
+import { Cluster } from './cluster.model';
 export class MapData {
   constructor(
     public start: Point,
@@ -13,6 +14,17 @@ export class Point {
     public status?: MapConnectionStatus,
     public name = ''
   ) { }
+}
+
+export interface ClusterMapData {
+  start: ClusterMapPoint;
+  end?: ClusterMapPoint;
+  connectionStatus?: MapConnectionStatus;
+}
+
+export interface ClusterMapPoint {
+  cluster: Cluster;
+  status?: MapConnectionStatus;
 }
 
 export enum MapConnectionStatus {

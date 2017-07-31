@@ -30,6 +30,11 @@
   font-size: 17px;
 }
 
+.mdl-menu__item a{
+  padding: 0;
+  color: $dove-gray;
+  font-size: 14px;
+}
 
 :host /deep/ .mdl-menu__container{
   position: fixed;
@@ -38,4 +43,33 @@
 .mdl-button {
   color: $dove-gray;
   font-size: 13px;
+}
+
+.breadcrumb {
+  padding-left: 20px;
+
+  .mdl-navigation__link {
+    cursor: pointer;
+    position: relative;
+    height: 39px;
+    font-size: 16px;
+    color: $eastern-blue !important;
+    padding-right: 25px;
+
+    &:after {
+      font-family: FontAwesome;
+      content: "/\A0";
+      margin-left: 8px;
+      font-size: 23px;
+      position: absolute;
+      margin-top: 15px;
+      color: $dove-gray;
+    }
+  }
+
+  .mdl-navigation__link:last-of-type {
+    &:after {
+      content: "";
+    }
+  }
 }
