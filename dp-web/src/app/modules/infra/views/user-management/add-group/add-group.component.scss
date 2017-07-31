@@ -1,28 +1,7 @@
 @import "../../../../../../styles/variables";
 
-.text-medium {
-  font-size: 15px;
-}
-
-.text-large {
-  font-size: 24px;
-}
-
-.text-xlarge {
-  font-size: 30px;
-}
-
-.text-small {
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.text-light {
-  color: $dusty-gray;
-}
-
-.text-xsmall{
-  font-size: 12px;
+.padding-top15{
+  padding-top: 15px
 }
 
 .title-container {
@@ -137,4 +116,23 @@
 
 .mdl-switch__input{
   visibility: hidden !important;
+}
+
+.error-notification-bar {
+  padding: 15px;
+  background: $concrete;
+  height: 34px;
+  margin-bottom: 20px;
+  .fa-times-circle {
+    font-size: 24px;
+    color: $roman-red;
+  }
+  .fa-remove {
+    color: $dusty-gray;
+    cursor: pointer;
+  }
+  .text-medium {
+    font-weight: 500;
+    color: $roman-red;
+  }
 }

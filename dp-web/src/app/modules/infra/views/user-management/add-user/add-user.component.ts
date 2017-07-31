@@ -101,7 +101,6 @@ export class AddUserComponent implements OnInit {
         this.userService.dataChanged.next();
         this.router.navigate(['users'], {relativeTo: this.route});
       }, error => {
-        console.error(error);
         this.showError = true;
         this.errorMessage = 'Error while updating user/roles';
       });
@@ -110,8 +109,20 @@ export class AddUserComponent implements OnInit {
         return role.data;
       });
       this.userService.addUsers(this.users, roles).subscribe(response => {
-        this.userService.dataChanged.next();
-        this.router.navigate(['users'], {relativeTo: this.route});
+        if (response.length === this.users.length) {
+          this.userService.dataChanged.next();
+          this.router.navigate(['users'], {relativeTo: this.route});
+        } else {
+          let failedUsers = [];
+          this.users.forEach(user => {
+            if (!response.find(res => res.userName === user)) {
+              failedUsers.push(user)
+            }
+          });
+          this.errorMessage = `Error while saving user/roles - ${failedUsers.join(', ')}`;
+          this.showError = true;
+        }
+
       }, error => {
         this.errorMessage = 'Error while saving user/roles';
         this.showError = true;
@@ -121,21 +132,22 @@ export class AddUserComponent implements OnInit {
   }
 
   isEditDataValid() {
-    if (!this.editUserForm.form.valid || this.user.roles.length === 0) {
-      this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
-      this.showError = true;
-      return false;
+    if (this.userRoles.length > 0 && this.editUserForm.form.valid) {
+      return true;
     }
-    return true;
+    this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
+    this.showError = true;
+    return false;
   }
 
   isCreateDataValid() {
-    if (!this.addUserForm.form.valid || this.roles.length === 0) {
-      this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
-      this.showError = true;
-      return false;
+    if (this.roles.length > 0 && this.addUserForm.form.valid) {
+      return true;
     }
-    return true;
+    this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
+    this.showError = true;
+    return false;
+
   }
 
   back() {
