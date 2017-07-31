@@ -1,0 +1,7 @@
+import { CLUSTER_STATUS } from './status.constant';
+
+export const CLUSTER_STATUS_COLOR = {
+  [CLUSTER_STATUS.HEALTHY]: '#3FAE2A',
+  [CLUSTER_STATUS.UNHEALTHY]: '#EF6162',
+  [CLUSTER_STATUS.WARNING]: '#E98A40'
+};
