@@ -1,6 +1,7 @@
 import {
   Component, OnInit, ViewChild, ElementRef, OnChanges, Input, Output, SimpleChanges, HostBinding, EventEmitter
 } from '@angular/core';
+import { CLUSTER_STATUS_COLOR } from 'constants/color.constant';
 import * as L from 'leaflet';
 import 'leaflet-curve';
 
@@ -42,7 +43,6 @@ export class MapComponent implements OnChanges, OnInit {
   countries = [];
 
   statusColorUp = '#3FAE2A';
-  statusColorDown = '#EF6162';
   markerColorInnerBorder = '#FFFFFF';
   mapColor = '#CFCFCF';
 
@@ -165,7 +165,7 @@ export class MapComponent implements OnChanges, OnInit {
       radius: 7,
       color: this.markerColorInnerBorder,
       weight: 0,
-      fillColor: clusterInfo.healthStatus === CLUSTER_STATUS.HEALTHY ? this.statusColorUp : this.statusColorDown,
+      fillColor: CLUSTER_STATUS_COLOR[clusterInfo.healthStatus],
       fillOpacity: 0.8
     });
     const existingMarker = getExistingMarker(this.markerLookup, latLng);

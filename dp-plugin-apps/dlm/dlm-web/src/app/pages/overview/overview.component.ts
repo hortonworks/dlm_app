@@ -126,9 +126,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
           status: (policy.targetClusterResource.status || []).filter(service => service.state !== SERVICE_STATUS.STARTED)
         }
       })));
-    this.clustersMapData$ = Observable.combineLatest(this.clusters$, store.select(getCountPoliciesForSourceClusters))
-      .startWith([[], []])
-      .map(([clusters, policiesCount]) => this.makeClustersMapData(clusters, policiesCount));
+    this.clustersMapData$ = Observable
+      .combineLatest(this.clusters$, store.select(getCountPoliciesForSourceClusters), this.lowCapacityClusters$)
+      .startWith([[], [], []])
+      .map(([clusters, policiesCount, lowCapacityClusters]) => this.makeClustersMapData(clusters, policiesCount, lowCapacityClusters));
     this.clusterLegend$ = Observable
       .combineLatest(this.clustersMapData$, this.selectedCluster$, this.policies$)
       .map(([clustersMapData, selectedCluster, policies]) => {
@@ -211,12 +212,16 @@ export class OverviewComponent implements OnInit, OnDestroy {
     }
   }
 
-  private makeClustersMapData(clusters, policiesCount) {
+  private makeClustersMapData(clusters, policiesCount, lowCapacityClusters) {
     return clusters.map(cluster => {
       const policiesCounter = cluster.id in policiesCount &&
         'policies' in policiesCount[cluster.id] ? policiesCount[cluster.id].policies : 0;
+      // prioritize UNHEALTHY status over WARNING when display cluster dot marker
+      const healthStatus = lowCapacityClusters.some(c => c.id === cluster.id) && cluster.healthStatus !== CLUSTER_STATUS.UNHEALTHY ?
+        CLUSTER_STATUS.WARNING : cluster.healthStatus;
       const clusterData = {
         ...cluster,
+        healthStatus,
         policiesCounter
       };
       return <ClusterMapData>{start: <ClusterMapPoint>{cluster: clusterData}};
@@ -293,9 +298,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   }
 
   handleOnShowPolicyLog(policy) {
-    if (policy.lastJobResource.status !== JOB_STATUS.RUNNING) {
-      this.logService.showLog(EntityType.policyinstance, policy.lastJobResource.id);
-    }
+    this.logService.showLog(EntityType.policyinstance, policy.lastJobResource.id);
   }
 
   formatStatusFilter(jobStatusFilter) {
