@@ -172,6 +172,33 @@ stop_knox() {
     stop_consul
 }
 
+init_all() {
+    init_db
+    migrate_schema
+
+    init_knox
+
+    init_app
+}
+
+start_all() {
+    start_knox
+
+    start_app
+}
+
+stop_all() {
+    stop_app
+
+    stop_knox
+}
+
+destroy_all() {
+    destroy
+
+    destroy_knox
+}
+
 print_version() {
     if [ -f VERSION ]; then
         cat VERSION
@@ -183,19 +210,23 @@ print_version() {
 usage() {
     local tabspace=20
     echo "Usage: dpdeploy.sh <command>"
-    printf "%-${tabspace}s:%s\n" "Commands" "init [db|knox|app] | migrate | ps | logs [container id|name] | start [knox]| stop [knox] | destroy [knox]"
+    printf "%-${tabspace}s:%s\n" "Commands" "init [db | knox | app |--all] | migrate | ps | logs [container id|name] | start [knox | --all]| stop [knox | --all] | destroy [knox | --all]"
     printf "%-${tabspace}s:%s\n" "init db" "Initialize postgres DB for first time"
     printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox and Consul containers"
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
+    printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
     printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
     printf "%-${tabspace}s:%s\n" "start knox" "Start the Knox and Consul containers"
+    printf "%-${tabspace}s:%s\n" "start --all" "Start all containers"
     printf "%-${tabspace}s:%s\n" "stop" "Stop the application docker containers"
     printf "%-${tabspace}s:%s\n" "stop knox" "Stop the Knox and Consul containers"
+    printf "%-${tabspace}s:%s\n" "stop --all" "Stop all containers"
     printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
     printf "%-${tabspace}s:%s\n" "logs [container name]" "Logs of supplied container id or name"
     printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them. Needs to start from init db again"
     printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox and Consul containers and remove them. Needs to start from init knox again"
+    printf "%-${tabspace}s:%s\n" "destroy --all" "Kill all containers and remove them. Needs to start from init again"
     printf "%-${tabspace}s:%s\n" "version" "Print the version of dataplane"
 }
 
@@ -220,6 +251,9 @@ else
                 app)
                     init_app
                     ;;
+                --all)
+                    init_all
+                    ;;
                 *)
                     usage
                     ;;
@@ -232,6 +266,9 @@ else
             case "$2" in
                 knox) start_knox
                 ;;
+                --all)
+                    start_all
+                    ;;
                 *) start_app
              esac
              ;;
@@ -239,6 +276,9 @@ else
             case "$2" in
                 knox) stop_knox
                 ;;
+                --all)
+                    stop_all
+                    ;;
                 *) stop_app
              esac
              ;;
@@ -254,6 +294,9 @@ else
             case "$2" in
                 knox) destroy_knox
                 ;;
+                --all)
+                    destroy_all
+                    ;;
                 *) destroy
                  ;;
              esac
