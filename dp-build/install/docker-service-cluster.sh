@@ -13,5 +13,5 @@ docker start dp-cluster-service >> install.log 2>&1 || \
         --name dp-cluster-service \
         --network dp \
         --detach \
-        --env CONSUL_HOST \
+        --env "CONSUL_HOST=$CONSUL_HOST" \
         hortonworks/dp-cluster-service:$VERSION

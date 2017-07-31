@@ -18,7 +18,7 @@ docker start dp-gateway >> install.log 2>&1 || \
         --network dp \
         --detach \
         --publish 8762:8762 \
-        --env CONSUL_HOST \
+        --env "CONSUL_HOST=$CONSUL_HOST" \
         --volume $(pwd)/certs:/usr/dp-app/conf/cert \
         hortonworks/dp-gateway:$VERSION \
         --knox.url=https://${KNOX_FQDN}:8443
