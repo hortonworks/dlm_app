@@ -7,13 +7,27 @@
   color: $dove-gray;
 }
 
-.dialog-container{
+.mdl-dialog-large {
+  width: 720px;
+}
+
+.dp-input {
+  width: 330px;
+}
+
+.dp-input-url {
+  width: 690px;
+}
+
+.dialog-container {
   padding: 0 15px 15px;
 }
-.dialog-title{
+
+.dialog-title {
   padding: 10px 15px;
   border-bottom: 1px solid $silver;
 }
+
 .actions {
   float: right;
   margin: 15px 0px;
