@@ -18,6 +18,7 @@ import {UserManagementComponent} from './views/user-management/user-management.c
 import {DropdownModule} from '../../shared/dropdown/dropdown.module';
 import {AddUserComponent} from './views/user-management/add-user/add-user.component';
 import {PaginationModule} from '../../shared/pagination/pagination.module';
+import { ConfigDialogComponent } from './widgets/config-dialog/config-dialog.component';
 
 @NgModule({
   imports: [
@@ -40,7 +41,8 @@ import {PaginationModule} from '../../shared/pagination/pagination.module';
     ClusterDetailsComponent,
     MapComponent,
     UserManagementComponent,
-    AddUserComponent
+    AddUserComponent,
+    ConfigDialogComponent
   ]
 })
 export class InfraModule {

@@ -29,6 +29,7 @@
     "moreLink" : "Learn More",
     "save": "SAVE",
     "cancel" : "Cancel",
+    "failed" : "Failed",
     "defaultRequiredFields": "Please fill in mandatory fields marked with '*'",
     "sidenav" : {
       "analyst" : "Analyst",
@@ -104,6 +105,9 @@
         "addButton" : "Add Cluster",
         "addCluster" : "Add Your Cluster",
         "ambariUrl":"Ambari URL",
+        "ambariUsername":"Ambari Username",
+        "ambariPassword": "Ambari Password",
+        "knoxUrl":"Knox URL",
         "clusterName" : "Cluster Name",
         "ipAddress" : "IP Address",
         "clusterLocation" : "Cluster Location",

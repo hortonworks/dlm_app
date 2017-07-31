@@ -11,7 +11,7 @@
     <div class="error-notification-bar">
       <i class="fa fa-times-circle pull-left"></i>
       <i class="fa fa-remove pull-right" (click)="closeError()"></i>
-      <div class="text-medium">{{"pages.infra.labels.clusterAddError" | translate}}</div>
+      <div class="text-medium">{{"common.failed" | translate}}</div>
       <div class="text-small-1">{{errorMessage}} </div>
     </div>
   </div>
@@ -21,6 +21,10 @@
     <div class="hwx-desc">{{"pages.infra.description.addCluster" | translate}} </div>
 
     <div class="spacer-15"> </div>
+
+    <div [hidden]="!showConfig">
+      <dp-config-dialog #config [show]="showConfig" (onCancel)="closeConfig()" (onSave)="getConfigs($event)" [requestAmbariCreds]="_clusterState.requestAmbariCreds" [requestKnoxURL]="_clusterState.requestKnoxURL"></dp-config-dialog>
+    </div>
 
     <form #clusterForm="ngForm">
       <div  class="form-group" #ambariInput>
