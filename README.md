@@ -22,7 +22,7 @@
 
 ## Package
 
-If your goal is to build and package the core dataplane project for distribution, trigger `./package.sh` without any arguments. This would generate a tar with name `dp-core` labelled with correct version.
+If your goal is to build and package the core dataplane project for distribution, trigger `./dp-docker-build.sh package` without any additional arguments. This would generate a tar with name `dp-core` labelled with correct version.
 This tarball includes deployment scripts and relevant docker images.
 
 
