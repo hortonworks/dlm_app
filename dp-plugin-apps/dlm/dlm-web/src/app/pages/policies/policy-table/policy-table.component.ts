@@ -146,7 +146,11 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         cellTemplate: this.verbStatusCellTemplate,
         ...TableComponent.makeFixedWith(80)
       },
-      {name: ' ', cellTemplate: this.policyInfoColumn.cellRef, sortable: false, ...TableComponent.makeFixedWith(200)},
+      {
+        name: this.t.instant('common.name'),
+        cellTemplate: this.policyInfoColumn.cellRef,
+        sortable: false, ...TableComponent.makeFixedWith(200)
+      },
       {prop: 'sourceClusterResource', name: this.t.instant('common.source'), cellTemplate: this.clusterCellTemplateRef},
       {prop: 'targetClusterResource', name: this.t.instant('common.destination'), cellTemplate: this.clusterCellTemplateRef},
       {prop: 'sourceDataset', name: this.t.instant('common.path'), cellTemplate: this.pathCellRef, ...TableComponent.makeFixedWith(200)},
