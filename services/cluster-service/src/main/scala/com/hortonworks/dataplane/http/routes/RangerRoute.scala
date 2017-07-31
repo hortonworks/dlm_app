@@ -26,24 +26,28 @@ class RangerRoute @Inject()(
       private val ws: WSClient
                            ) extends BaseRoute {
   val rangerAudit =
-    path ("cluster" / LongNumber / "ranger" / "audit" / Segment) { (clusterId, assetName) =>
-      get {
-        onComplete (requestRangerForAudit(clusterId, assetName)) {
-          case Success(res) => complete(success(res.json))
-          case Failure(th) => complete(StatusCodes.InternalServerError, errors(th))
+    path ("cluster" / LongNumber / "ranger" / "audit" / Segment / Segment) { (clusterId, dbName, tableName) =>
+      parameters("limit".as[Int], "offset".as[Int]) { (limit, offset) =>
+        get {
+          println(limit, offset)
+          onComplete(requestRangerForAudit(clusterId, dbName, tableName, offset, limit)) {
+            case Success(res) => complete(success(res.json))
+            case Failure(th) => complete(StatusCodes.InternalServerError, errors(th))
+          }
         }
       }
     }
 
 
-  private def requestRangerForAudit(clusterId: Long, assetName: String) : Future[WSResponse] = {
+  private def requestRangerForAudit(clusterId: Long, dbName: String, tableName: String, offset: Long, pageSize: Long) : Future[WSResponse] = {
     for {
       service <- getConfigOrThrowException(clusterId)
       url <- getRangerUrlFromConfig(service)
       baseUrls <- extractUrlsWithIp(url, clusterId)
       user <- storageInterface.getConfiguration("dp.ranger.user")
       pass <- storageInterface.getConfiguration("dp.ranger.password")
-      urlToHit <- Future.successful(s"${baseUrls.head}/service/assets/accessAudit?page=0&pageSize=20&sortBy=eventTime&resourceType=@table&resourcePath=${assetName}")
+      urlToHit <- Future.successful(s"${baseUrls.head}/service/assets/accessAudit?startIndex=${offset}&pageSize=${pageSize}&sortBy=eventTime&resourceType=@table&resourcePath=${dbName}%2F${tableName}")
+      tmp <- Future.successful(println(urlToHit))
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
         .withAuth(user.get,pass.get,WSAuthScheme.BASIC)
