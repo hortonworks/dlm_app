@@ -16,7 +16,6 @@ import {
 } from 'selectors/policy.selector';
 import { getAllClusters, getUnhealthyClusters, getClustersWithLowCapacity } from 'selectors/cluster.selector';
 import { getDisplayedEvents } from 'selectors/event.selector';
-import { loadJobsForPolicy } from 'actions/job.action';
 import { loadClusters, loadClustersStatuses } from 'actions/cluster.action';
 import { loadPolicies, loadLastJobs } from 'actions/policy.action';
 import { getMergedProgress, getProgressState } from 'selectors/progress.selector';
@@ -238,18 +237,20 @@ export class OverviewComponent implements OnInit, OnDestroy {
       .subscribe(_ => this.store.dispatch(loadClustersStatuses(CLUSTER_STATUS_REQUEST)));
     const clusterPoliciesCompleteSubscription = Observable.combineLatest(
       this.completedRequest$(this.store.select(getProgressState(CLUSTERS_REQUEST))),
-      this.completedRequest$(this.store.select(getProgressState(POLICIES_REQUEST))),
-      this.policies$
-    )
-      .subscribe(([p1, p2, policies]) => {
+      this.completedRequest$(this.store.select(getProgressState(POLICIES_REQUEST)))
+    ).switchMap(_ => this.policies$)
+      .subscribe(policies => {
         if (this.areJobsLoaded) {
           return;
         }
-        this.areJobsLoaded = true;
         if (!policies.length) {
+          this.areJobsLoaded = true;
           this.store.dispatch(updateProgressState(JOBS_REQUEST, { isInProgress: false }));
         } else {
-          this.store.dispatch(loadLastJobs({policies, numJobs: 10}, {requestId: JOBS_REQUEST}));
+          if (policies.some(policy => !isEmpty(policy.sourceClusterResource))) {
+            this.areJobsLoaded = true;
+            this.store.dispatch(loadLastJobs({policies, numJobs: 10}, {requestId: JOBS_REQUEST}));
+          }
         }
     });
     this.tableData$ = Observable

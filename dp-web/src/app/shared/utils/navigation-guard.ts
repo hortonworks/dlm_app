@@ -12,6 +12,7 @@ export class NavigationGuard implements CanActivate {
     if (!AuthUtils.isUserLoggedIn()) {
       AuthUtils.clearUser();
       window.location.href = AuthUtils.signoutURL;
+      return false;
     }
     if (this.rbacService.isAuthorized(state.url)) {
       return true;

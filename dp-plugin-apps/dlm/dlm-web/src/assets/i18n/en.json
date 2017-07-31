@@ -289,7 +289,7 @@
           "directories": "File / Folder Path",
           "databases": "Database",
           "start_date": "Start Date",
-          "end_date": "End Date",
+          "end_date": "End Date (Optional)",
           "start_time": "Start Time  (24-Hour Clock)",
           "end_time": "End Time",
           "date_format": "yyyy-mm-dd",

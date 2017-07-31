@@ -1,5 +1,7 @@
 @import "../../styles/variables";
 
+$icon-width: 75px;
+
 .suit-navigation {
   position: fixed;
   top: 55px;
@@ -24,19 +26,23 @@
     cursor: pointer;
     text-align: center;
     margin: 0 20px;
+    width: $icon-width;
 
     & .logo-wrapper {
-      background-color: $eastern-blue;
-      padding: 15px;
+      background-color: $logo-icon;
       border-radius: 4px;
       display: inline-block;
-      height: 72px;
+      height: $icon-width;
+      width: $icon-width;
+      img {
+        padding: 17px;
+      }
       & + div {
         text-align: center;
         font-size: 13px;
-        padding-top: 5px;
-        white-space: nowrap;
+        padding-top: 10px;
         line-height: 1;
+        color: $popup-font;
       }
     }
   }

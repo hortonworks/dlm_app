@@ -35,9 +35,9 @@
 </ng-template>
 
 <ng-template #policyNameCellTemplate let-row="row" let-name="value">
-  <a qe-attr="go-to-policies" (click)="goToPolicy(row)" class="actionable">
+  <span qe-attr="go-to-policies" (click)="goToPolicy(row)" class="actionable text-primary policy-name">
    {{name}}
-  </a>
+  </span>
 </ng-template>
 
 <ng-template #agoTemplate let-value="value" let-policy="row">

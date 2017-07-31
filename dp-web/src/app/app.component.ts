@@ -1,7 +1,6 @@
-import {AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, DoCheck, OnDestroy, OnInit} from '@angular/core';
+import {AfterViewChecked, ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
-import {IdentityService} from './services/identity.service';
 import {MdlService} from './services/mdl.service';
 
 import {User} from './models/user';
@@ -9,7 +8,6 @@ import {HeaderData} from './models/header-data';
 import {CollapsibleNavService} from './services/collapsible-nav.service';
 import {Loader, LoaderStatus} from './shared/utils/loader';
 import {RbacService} from './services/rbac.service';
-import {AuthenticationService} from './services/authentication.service';
 import {AuthUtils} from './shared/utils/auth-utils';
 
 export enum ViewPaneState {
@@ -28,6 +26,7 @@ export class AppComponent implements OnInit, AfterViewChecked {
   viewPaneState = ViewPaneState.MAXIMISE;
   headerData: HeaderData = new HeaderData();
   showLoader: LoaderStatus;
+  signOutUrl = AuthUtils.signoutURL;
 
   constructor(private mdlService: MdlService,
               private translateService: TranslateService,
@@ -39,12 +38,16 @@ export class AppComponent implements OnInit, AfterViewChecked {
     translateService.use('en');
   }
 
+  isUserSignedIn() {
+    return  AuthUtils.isUserLoggedIn();
+  }
+
   getUser(): User {
     return AuthUtils.getUser();
   }
 
-  isUserSignedIn(): boolean {
-    return AuthUtils.isUserLoggedIn();
+  isValidUser() {
+    return AuthUtils.isValidUser();
   }
 
   ngOnInit() {

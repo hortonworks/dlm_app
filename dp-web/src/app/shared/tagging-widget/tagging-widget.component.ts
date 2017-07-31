@@ -99,6 +99,10 @@ export class TaggingWidget implements AfterViewInit{
     }
   }
 
+  onClick(){
+    this.parent.nativeElement.querySelector("span.inputSpan input").focus();
+  }
+
   _manageFocus() {
     if (this.focusStickerIndex < this.tags.length) {
       this.parent.nativeElement.querySelector("span.tagSticker").focus();

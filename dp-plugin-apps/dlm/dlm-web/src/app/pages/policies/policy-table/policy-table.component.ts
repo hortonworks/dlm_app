@@ -1,4 +1,14 @@
-import { Component, OnInit, Input, Output, ViewChild, ViewEncapsulation, TemplateRef, OnDestroy, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  ViewChild,
+  ViewEncapsulation,
+  TemplateRef,
+  OnDestroy,
+  EventEmitter
+} from '@angular/core';
 import { Policy } from 'models/policy.model';
 import { Cluster } from 'models/cluster.model';
 import { ActionItemType } from 'components';
@@ -18,7 +28,6 @@ import { deletePolicy, resumePolicy, suspendPolicy } from 'actions/policy.action
 import { PolicyService } from 'services/policy.service';
 import { OperationResponse } from 'models/operation-response.model';
 import { getLastOperationResponse } from 'selectors/operation.selector';
-import { FlowStatusComponent } from './flow-status/flow-status.component';
 import { PolicyContent } from '../policy-details/policy-content.type';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -69,7 +78,6 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @ViewChild('durationCell') durationCellRef: TemplateRef<any>;
   @ViewChild('lastGoodCell') lastGoodCellRef: TemplateRef<any>;
   @ViewChild('prevJobs') prevJobsRef: TemplateRef<any>;
-  @ViewChild(FlowStatusComponent) flowStatusColumn: FlowStatusComponent;
   @ViewChild('rowDetail') rowDetailRef: TemplateRef<any>;
   @ViewChild('iconCellTemplate') iconCellTemplate: TemplateRef<any>;
   @ViewChild('pathCell') pathCellRef: TemplateRef<any>;
@@ -107,7 +115,6 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   constructor(private t: TranslateService,
               private store: Store<fromRoot.State>,
               private hiveService: HiveService,
-              private policyService: PolicyService,
               private logService: LogService) {
     this.jobs$ = store.select(getAllJobs);
     this.filteredJobs$ = Observable.combineLatest(this.jobs$, this.selectedPolicy$).map(([jobs, selectedPolicy]) => {
@@ -139,22 +146,14 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         cellTemplate: this.verbStatusCellTemplate,
         ...TableComponent.makeFixedWith(80)
       },
-      {name: ' ', cellTemplate: this.policyInfoColumn.cellRef, sortable: false, minWidth: 200},
+      {name: ' ', cellTemplate: this.policyInfoColumn.cellRef, sortable: false, ...TableComponent.makeFixedWith(200)},
       {prop: 'sourceClusterResource', name: this.t.instant('common.source'), cellTemplate: this.clusterCellTemplateRef},
-      {
-        prop: 'status',
-        name: ' ',
-        cellTemplate: this.flowStatusColumn.cellRef,
-        minWidth: 130,
-        cellClass: 'flow-status-cell',
-        sortable: false
-      },
       {prop: 'targetClusterResource', name: this.t.instant('common.destination'), cellTemplate: this.clusterCellTemplateRef},
-      {prop: 'sourceDataset', name: this.t.instant('common.path'), cellTemplate: this.pathCellRef, minWidth: 200},
+      {prop: 'sourceDataset', name: this.t.instant('common.path'), cellTemplate: this.pathCellRef, ...TableComponent.makeFixedWith(200)},
       {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs')},
       {prop: 'jobs.0.trackingInfo.timeTaken', name: this.t.instant('common.duration'), cellTemplate: this.durationCellRef},
       {prop: 'lastGoodJobResource.startTime', name: 'Last Good', cellTemplate: this.lastGoodCellRef},
-      {name: ' ', cellTemplate: this.actionsCellRef, maxWidth: 55, sortable: false}
+      {name: ' ', cellTemplate: this.actionsCellRef, ...TableComponent.makeFixedWith(55), sortable: false}
     ];
     if (this.activePolicyId) {
       this.openJobsForPolicy();

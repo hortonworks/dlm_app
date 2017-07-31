@@ -2,11 +2,14 @@
 
 .alerts-label {
   cursor: pointer;
+  .caret {
+    margin-left: 0;
+  }
 }
 
 .user-settings-dropdown {
   .popup-arrow-up {
-    right: 30px !important;
+    right: 20px !important;
   }
   &.dropdown-menu {
     top: 125% !important;

@@ -9,8 +9,10 @@ import {DropdownModule} from '../../shared/dropdown/dropdown.module';
 import {TabsModule} from '../../shared/tabs/tabs.module';
 import { AssetDetailsViewComponent } from './asset-view/asset-details-view/asset-details-view.component';
 import { AssetColumnVisualComponent } from './asset-view/asset-column-visual/asset-column-visual.component';
+import { AssetAuditView } from './asset-view/asset-audit-view/asset-audit-view.component';
 import {LineageModule} from '../../shared/lineage/lineage.module';
 import {AssetService} from '../../services/asset.service';
+import {RangerService} from '../../services/ranger.service';
 
 @NgModule({
   imports: [
@@ -24,10 +26,12 @@ import {AssetService} from '../../services/asset.service';
     AssetViewComponent,
     AssetDetailsViewComponent,
     NodeDetailsComponent,
-    AssetColumnVisualComponent
+    AssetColumnVisualComponent,
+    AssetAuditView
   ],
   providers: [
-    AssetService
+    AssetService,
+    RangerService
   ]
 })
 export class AssetModule { }
