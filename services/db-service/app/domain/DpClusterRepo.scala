@@ -3,14 +3,11 @@ package domain
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  DataplaneCluster,
-  Location
-}
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, Location}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.JsValue
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DpClusterRepo @Inject()(
@@ -40,6 +37,10 @@ class DpClusterRepo @Inject()(
 
   def findById(dpClusterId: Long): Future[Option[DataplaneCluster]] = {
     db.run(DataplaneClusters.filter(_.id === dpClusterId).result.headOption)
+  }
+
+  def findByAmbariUrl(ambariUrl: String): Future[Option[DataplaneCluster]] = {
+    db.run(DataplaneClusters.filter(_.ambariUrl === ambariUrl).result.headOption)
   }
 
   def deleteById(dpClusterId: Long): Future[Int] = {

@@ -32,7 +32,7 @@ export class ClusterAddComponent implements OnInit {
 
   _isClusterValidateInProgress = false;
   _isClusterValidateSuccessful = false;
-  _clusterState: ClusterState;
+  _clusterState: ClusterState = new ClusterState();
   _isClusterValid;
 
   mapData: MapData[] = [];
@@ -61,10 +61,16 @@ export class ClusterAddComponent implements OnInit {
 
   get reasons() {
     let reasons: string[] = [];
-    let reasonsTranslation = this.translateService.instant('pages.infra.description.connectionFailureReasons');
-    Object.keys(reasonsTranslation).forEach(key => {
-      reasons.push(reasonsTranslation[key]);
-    });
+    if (this._isClusterValidateSuccessful && !this._isClusterValid && !this._clusterState.alreadyExists) {
+      let reasonsTranslation = this.translateService.instant('pages.infra.description.connectionFailureReasons');
+      Object.keys(reasonsTranslation).forEach(key => {
+        reasons.push(reasonsTranslation[key]);
+      });
+    } else if (this._clusterState.alreadyExists) {
+      let reasonsTranslation = this.translateService.instant('pages.infra.description.clusterAlreadyExists');
+      reasons.push(reasonsTranslation);
+    }
+
     return reasons;
   }
 
@@ -88,12 +94,13 @@ export class ClusterAddComponent implements OnInit {
     this.showError = false;
     this.showNotification = false;
     this._isClusterValidateInProgress = true;
+    this._isClusterValidateSuccessful = false;
     let cleanedUri = StringUtils.cleanupUri(this.cluster.ambariurl);
     this.lakeService.validate(cleanedUri).subscribe(
       response => {
+        this._clusterState = response as ClusterState;
         if (response.ambariApiStatus === 200) {
           //TODO - Padma/Babu/Hemanth/Rohit :Display that Knox was detected
-          this._clusterState = response as ClusterState;
           let detailRequest = new ClusterDetailRequest();
           this.createDetailRequest(detailRequest, cleanedUri);
           this.clusterService.getClusterInfo(detailRequest).subscribe(clusterInfo => {

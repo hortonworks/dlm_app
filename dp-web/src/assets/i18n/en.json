@@ -1,45 +1,45 @@
 {
-  "common" : {
-    "dashboard" : "Dashboard",
-    "dataplane" : "Dataplane",
-    "clusters" : "Clusters",
-    "datasets" : "Asset Collection",
-    "datalake" : "Datalake",
-    "services" : "Services",
-    "location" : "Location",
-    "tags" : "Tags",
+  "common": {
+    "dashboard": "Dashboard",
+    "dataplane": "Dataplane",
+    "clusters": "Clusters",
+    "datasets": "Asset Collection",
+    "datalake": "Datalake",
+    "services": "Services",
+    "location": "Location",
+    "tags": "Tags",
     "step": "Step",
-    "description" : "Description",
-    "new" : "New",
+    "description": "Description",
+    "new": "New",
     "add": "Add",
-    "edit" : "Edit",
-    "delete" : "Delete",
-    "addAndNew" : "Add & New",
+    "edit": "Edit",
+    "delete": "Delete",
+    "addAndNew": "Add & New",
     "cancel": "Cancel",
     "back": "BACK",
-    "go" :"Go",
-    "reset" : "Reset",
-    "search" : "Search",
-    "done" : "Done",
-    "removeAll" : "Remove All",
-    "advanced" : "Advanced",
-    "status" : "Status",
-    "loading" : "Loading",
-    "name" : "Name",
-    "moreLink" : "Learn More",
+    "go": "Go",
+    "reset": "Reset",
+    "search": "Search",
+    "done": "Done",
+    "removeAll": "Remove All",
+    "advanced": "Advanced",
+    "status": "Status",
+    "loading": "Loading",
+    "name": "Name",
+    "moreLink": "Learn More",
     "save": "SAVE",
-    "cancel" : "Cancel",
+    "cancel": "Cancel",
     "defaultRequiredFields": "Please fill in mandatory fields marked with '*'",
-    "sidenav" : {
-      "analyst" : "Analyst",
-      "infra" : "Infra Admin",
-      "dlm":"DLM"
+    "sidenav": {
+      "analyst": "Analyst",
+      "infra": "Infra Admin",
+      "dlm": "DLM"
     },
     "noResults": "No Results to display.",
-    "pagination" : {
-      "rowsPerPage" : "Rows per page"
+    "pagination": {
+      "rowsPerPage": "Rows per page"
     },
-    "roles" : {
+    "roles": {
       "SUPERADMIN": "Admin",
       "INFRAADMIN": "Cluster Admin",
       "USER": "Consumer",
@@ -50,19 +50,19 @@
     "unauthorizedMessage":"You are not authorized to view this page.",
     "invalidUser":"You are not an authorized Data plane user. Please contact your Data plane Administrator."
   },
-  "pages" : {
-    "onboard" : {
-      "labels" : {
-        "welcomeText" : "Welcome to",
-        "hwxDataplane" : "Hortonworks Data Plane",
+  "pages": {
+    "onboard": {
+      "labels": {
+        "welcomeText": "Welcome to",
+        "hwxDataplane": "Hortonworks Data Plane",
         "setupAuth": "Setup Authentication",
         "defineUsers": "Define User Privileges Roles and Groups",
-        "startButton" : "Get Started",
-        "addCluster" : "Add Clusters",
-        "addDataset" : "Add Asset Collection",
-        "setService" : "Setup Services"
+        "startButton": "Get Started",
+        "addCluster": "Add Clusters",
+        "addDataset": "Add Asset Collection",
+        "setService": "Setup Services"
       },
-      "description" : {
+      "description": {
         "dataplane": "Welcome to Hortonworks Data Plane. To start, please configure the LDAP properties and allow dataplane authenticate against it. Optionally, you can add Dataplane Administrators. Please proceed by clicking on GET STARTED",
         "setupAuth": "The first step is to help data plane connect to your LDAP by providing the LDAP configurations to Data plane.",
         "defineUsers": "Upon completing the LDAP configuration, you may add administrators to Data plane. You can add users or groups to data plane and assign or modify their roles anytime through the User Management Screen.",
@@ -70,9 +70,9 @@
         "setService" : "Set up services to enable Dataplane to manage your data",
         "addDataset" : "Create asset collection using Dataplane Steward Studio capability"
       },
-      "configure" : {
-        "labels" : {
-          "ldapConfiguration" : "LDAP Configuration",
+      "configure": {
+        "labels": {
+          "ldapConfiguration": "LDAP Configuration",
           "masterPassword": "Master Password",
           "userDNTemplate":"User DN Template",
           "url" : "URL",
@@ -81,11 +81,11 @@
           "groupSearchAttributeName": "Group Search Attribute",
           "groupSearchBase" : "Group Search base",
           "adminBindDN": "Administrator Bind DN",
-          "adminPassword":"Administrator Password",
-          "showPassword" : "Show Password",
-          "configError" : "Unable to save LDAP configuration. Please check and try again."
+          "adminPassword": "Administrator Password",
+          "showPassword": "Show Password",
+          "configError": "Unable to save LDAP configuration. Please check and try again."
         },
-        "description" : {
+        "description": {
           "configurationDesctiption": "The first step is to help Data Plane connect to your LDAP by providing the appropriate configurations."
         }
       },
@@ -98,28 +98,28 @@
         }
       }
     },
-    "infra" : {
-      "topnav" : {
-        "cluster-link" : "CLUSTERS"
+    "infra": {
+      "topnav": {
+        "cluster-link": "CLUSTERS"
       },
-      "labels" : {
-        "nodes" : "Nodes",
-        "uptime":"Uptime",
-        "services" :"Services",
-        "hdfsUsed" : "HDFS Used",
-        "hdfsTotal" : "HDFS Total",
-        "addButton" : "Add Cluster",
-        "addCluster" : "Add Your Cluster",
-        "ambariUrl":"Ambari URL",
-        "clusterName" : "Cluster Name",
-        "ipAddress" : "IP Address",
-        "clusterLocation" : "Cluster Location",
+      "labels": {
+        "nodes": "Nodes",
+        "uptime": "Uptime",
+        "services": "Services",
+        "hdfsUsed": "HDFS Used",
+        "hdfsTotal": "HDFS Total",
+        "addButton": "Add Cluster",
+        "addCluster": "Add Your Cluster",
+        "ambariUrl": "Ambari URL",
+        "clusterName": "Cluster Name",
+        "ipAddress": "IP Address",
+        "clusterLocation": "Cluster Location",
         "dataCenter": "Data Center",
-        "clusterAddSuccess" : "Cluster Added successfully",
-        "connectionFailed" : "Unable to connect, please retry",
+        "clusterAddSuccess": "Cluster Added successfully",
+        "connectionFailed": "Unable to connect, please retry",
         "clusterAddError": "Failed to Add Cluster",
-        "connectionFailed" : "Not able to connect",
-        "emptySearchResult" : "There are no clusters that match your search.",
+        "connectionFailed": "Not able to connect",
+        "emptySearchResult": "There are no clusters that match your search.",
         "addUser": "ADD USER",
         "addGroup": "ADD GROUP",
         "username": "Username",
@@ -129,24 +129,25 @@
         "active": "Active",
         "inactive": "Inactive"
       },
-      "description" :{
-        "addCluster" : "Please add Ambari managed cluster to Dataplane. Dataplane will auto-discover cluster information such as the cluster name, active services & important metrics running.",
-        "datalake" : "This cluster has been identified as a Datalake since it has data management services,  {{serviceNames}} running.",
-        "clusterLocation":"Geographical location of the cluster",
+      "description": {
+        "addCluster": "Please add Ambari managed cluster to Dataplane. Dataplane will auto-discover cluster information such as the cluster name, active services & important metrics running.",
+        "datalake": "This cluster has been identified as a Datalake since it has data management services,  {{serviceNames}} running.",
+        "clusterLocation": "Geographical location of the cluster",
         "dataCenter": "Data Center of the cluster",
-        "tags" : "Tags for the cluster",
-        "description" :"Description of the cluster",
-        "clusterAddSuccess" : "Your cluster has been added to dataplane.",
+        "tags": "Tags for the cluster",
+        "description": "Description of the cluster",
+        "clusterAddSuccess": "Your cluster has been added to dataplane.",
         "duplicateDataCenter": "A cluster with the same name already exists in the given data center. Please select a different cluster, or specify a different data center name.",
-        "connectionFailed" :" Dataplane could not retreive cluster information.",
-        "connectionFailureReasons" : {
+        "connectionFailed": " Dataplane could not retreive cluster information.",
+        "connectionFailureReasons": {
           "ambariServerDown": "Check if the Ambari server is up and running in the given url",
           "insufficientAccessRights": "Make sure that you have right access rights to the ambari server"
         },
+        "clusterAlreadyExists": "Cluster Already exists in dataplane",
         "userManagement": "You can manage the users or groups added to Dataplane through User Management. This page is available for the Dataplane Adminsitrator. You can add new users or groups and assign them roles by clicking on ADD USER or ADD GROUP button. To activate/deactivate to edit their roles, click on the username in the list below or click on the menu icon on the displayed rows."
       }
     },
-    "dataset" : {
+    "dataset": {
       "asset-query": {
         "filter": {
           "source": "Select Source",
@@ -156,73 +157,73 @@
           "tag": "Start typing to refine"
         }
       },
-      "topnav" : {
-        "unclassified" : "Unclassified",
-        "assets" : "Assets",
-        "audits":"Audits"
+      "topnav": {
+        "unclassified": "Unclassified",
+        "assets": "Assets",
+        "audits": "Audits"
       },
-      "labels" : {
-        "newDataset" : "Add Asset Collection",
-        "addFavourites" : "Add to Favourites",
-        "removeFavourites" : "Remove from Favourites",
-        "creator" : "Creator",
-        "hive" : "Hive",
-        "files" : "Files",
-        "name" : "Name",
-        "createdBy" : "Created By",
-        "hdfsFiles" : "HDFS Files",
-        "hiveTables" : "Hive Tables",
-        "emptySearchResult" : "There are no asset collection that match your search.",
-        "source" : "Source",
-        "owner" : "Owner",
+      "labels": {
+        "newDataset": "Add Asset Collection",
+        "addFavourites": "Add to Favourites",
+        "removeFavourites": "Remove from Favourites",
+        "creator": "Creator",
+        "hive": "Hive",
+        "files": "Files",
+        "name": "Name",
+        "createdBy": "Created By",
+        "hdfsFiles": "HDFS Files",
+        "hiveTables": "Hive Tables",
+        "emptySearchResult": "There are no asset collection that match your search.",
+        "source": "Source",
+        "owner": "Owner",
         "createdTime": "Created Time",
-        "noOfRows" : "Number Of Rows",
-        "datatype" : "Data Type",
-        "selectOperator" : "Select Operator",
-        "addAssets" : "Add Assets",
-        "description" : "Description",
-        "belongsTo" : "Belongs To"
+        "noOfRows": "Number Of Rows",
+        "datatype": "Data Type",
+        "selectOperator": "Select Operator",
+        "addAssets": "Add Assets",
+        "description": "Description",
+        "belongsTo": "Belongs To"
       },
-      "ds-editor" : {
-        "ds-description" : "Organize your data-assets including Hive & Hbase tables, HDFS Files into logical groups for subsequent usage.",
-        "information" : "Information",
-        "assets" : "Assets",
-        "summary" : "Summary",
-        "fillMandatoryMsg" : "Please fill mandatory fields",
-        "tagDescription" : "Add tags to your asset collection for context and subsequent lookup",
-        "asset-description" : "Add related data assets into your asset collection, by searching across this Data-Lake",
-        "action" :{
-          "next" : "Next",
-          "save" : "Save",
-          "cancel" : "Cancel",
-          "edit" : "Edit",
-          "addAssets" : "Add Assets",
-          "removeAll" : "Remove All",
-          "addMoreAssets" : "Add More Assets"
+      "ds-editor": {
+        "ds-description": "Organize your data-assets including Hive & Hbase tables, HDFS Files into logical groups for subsequent usage.",
+        "information": "Information",
+        "assets": "Assets",
+        "summary": "Summary",
+        "fillMandatoryMsg": "Please fill mandatory fields",
+        "tagDescription": "Add tags to your asset collection for context and subsequent lookup",
+        "asset-description": "Add related data assets into your asset collection, by searching across this Data-Lake",
+        "action": {
+          "next": "Next",
+          "save": "Save",
+          "cancel": "Cancel",
+          "edit": "Edit",
+          "addAssets": "Add Assets",
+          "removeAll": "Remove All",
+          "addMoreAssets": "Add More Assets"
         }
       },
-      "asset-search" : {
-        "search" : "Search",
-        "advanced" : "Advanced",
-        "filter" : "Filter",
-        "reset" : "Reset",
-        "emptySearchMsg" : "Empty Search not allowed",
-        "noSearchMsg" : "Please search for assets above or use Advanced Search",
-        "noResultsMsg" : "No Results!!",
-        "noMoreResultsMsg" : "No More Results!!",
-        "cancel" : "Cancel",
-        "done" : "Done"
+      "asset-search": {
+        "search": "Search",
+        "advanced": "Advanced",
+        "filter": "Filter",
+        "reset": "Reset",
+        "emptySearchMsg": "Empty Search not allowed",
+        "noSearchMsg": "Please search for assets above or use Advanced Search",
+        "noResultsMsg": "No Results!!",
+        "noMoreResultsMsg": "No More Results!!",
+        "cancel": "Cancel",
+        "done": "Done"
       },
-      "asset-list" : {
-        "starAssetmessage":"Few assets listed above already belong to asset collection, and cannot be used in any other asset collection"
+      "asset-list": {
+        "starAssetmessage": "Few assets listed above already belong to asset collection, and cannot be used in any other asset collection"
       },
-      "dashboard" : {
-        "tag-nav" : {
-          "tagSearchPlaceHolder" : "Tags"
+      "dashboard": {
+        "tag-nav": {
+          "tagSearchPlaceHolder": "Tags"
         },
-        "actions" : {
-          "addToFav" : "Add to Favourites",
-          "remFromFav" : "Remove from Favourites"
+        "actions": {
+          "addToFav": "Add to Favourites",
+          "remFromFav": "Remove from Favourites"
         }
       }
     },
