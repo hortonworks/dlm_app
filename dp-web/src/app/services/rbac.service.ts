@@ -22,13 +22,13 @@ export class RbacService {
         new PersonaTabs('User Management', 'infra/usermgmt', 'fa-users')
       ], '', 'infra-logo.png')]);
     this.personaMap.set('CURATOR', [new Persona('Data Steward', [
-      new PersonaTabs('Asset Collection', 'dataset', 'fa-cubes', true),
+      new PersonaTabs('Asset Collection', 'datasteward/dataset', 'fa-cubes', true),
       new PersonaTabs('Unclassified', 'unclassified', 'fa-cube'),
       new PersonaTabs('Assets', 'assets', 'fa-server'),
       new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')
     ], '', 'steward-logo.png')]);
     this.personaMap.set('USER', [new Persona('Analytics', [
-      new PersonaTabs('Workspace', 'workspace', 'fa-globe'),
+      new PersonaTabs('Workspace', 'analytics/workspace', 'fa-globe'),
       new PersonaTabs('Assets', 'analytics/assets', 'fa-list-alt'),
       new PersonaTabs('Clusters', '', 'fa-database'),
       new PersonaTabs('Jobs', '', 'fa-briefcase')
@@ -40,8 +40,8 @@ export class RbacService {
 
     this.landingPageMap.set('SUPERADMIN', '/infra');
     this.landingPageMap.set('SUPERADMIN_ONBOARD', '/onboard/welcome');
-    this.landingPageMap.set('CURATOR', '/dataset');
-    this.landingPageMap.set('USER', '/workspace');
+    this.landingPageMap.set('CURATOR', '/datasteward');
+    this.landingPageMap.set('USER', '/analytics');
     this.landingPageMap.set('INFRAADMIN', '/infra');
     this.landingPageMap.set('INFRAADMIN_ONBOARD', '/onboard');
 
