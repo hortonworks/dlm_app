@@ -31,7 +31,7 @@
         <label class="required">{{"pages.infra.labels.ambariUrl" | translate}}</label>
         <div class="input-group">
           <input required class="dp-input-url" placeholder="eg. http://10.10.10.10:8080" name="url" type="text" [(ngModel)]="cluster.ambariurl" (keypress)="onKeyPress($event)"/>
-          <button class="mdl-button btn-hwx-primary" (click)="getClusterInfo($event)">
+          <button class="mdl-button btn-hwx-primary" type="button" (click)="getClusterInfo($event)">
             <span *ngIf="_isClusterValidateInProgress"><i class="fa fa-spinner fa-spin"></i></span>
             <span *ngIf="!_isClusterValidateInProgress">{{"common.go" | translate}}</span>
           </button>
