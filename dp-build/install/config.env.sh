@@ -4,5 +4,5 @@ USE_EXT_DB="no"
 # DATABASE_PASS="dp_admin"
 
 CONSUL_HOST="<host_ip_address>"
-KNOX_MASTER="admin"
+MASTER_PASSWORD="admin"
 USE_TEST_LDAP="yes"
