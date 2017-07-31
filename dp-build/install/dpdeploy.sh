@@ -1,13 +1,18 @@
 #!/bin/sh
 set -e
 
+source $(pwd)/config.env.sh
+
 CERTS_DIR=`dirname $0`/certs
 KNOX_SIGNING_CERTIFICATE=knox-signing.pem
 DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 export KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
-APP_CONTAINERS="dp-database dp-app dp-db-service dp-cluster-service dp-gateway"
+APP_CONTAINERS="dp-app dp-db-service dp-cluster-service dp-gateway"
+if [ "$USE_EXT_DB" == "no" ]; then
+    APP_CONTAINERS="dp-database $APP_CONTAINERS"
+fi
 KNOX_CONTAINER="knox"
 CONSUL_CONTAINER="dp-consul-server"
 
@@ -61,12 +66,16 @@ read_consul_host(){
 }
 
 init_db() {
-    source $(pwd)/docker-database.sh
+    if [ "$USE_EXT_DB" == "yes" ]; then
+        echo "Dataplane is configured to use an external database in config.env.sh. Database initialization is not required and assumed to be done already."
+    else
+        source $(pwd)/docker-database.sh
+    fi
 }
 
 ps() {
     docker ps \
-        --filter "name=dp-app|dp-db-service|dp-cluster-service|dp-gateway|dp-database|knox|dp-consul-server"
+        --filter "name=dp-app|dp-db-service|dp-cluster-service|dp-gateway|dp-database|knox|dp-consul-server|dp-migrate"
 }
 
 list_logs() {
@@ -74,8 +83,10 @@ list_logs() {
 }
 
 migrate_schema() {
-    # start database container
-    source $(pwd)/docker-database.sh
+    if [ "$USE_EXT_DB" == "no" ]; then
+        # start database container
+        source $(pwd)/docker-database.sh
+    fi
 
     # wait for database start
     sleep 5
@@ -104,8 +115,10 @@ init_app() {
     echo "Initializing app"
     read_consul_host
 
-    echo "Starting Database (Postgres)"
-    source $(pwd)/docker-database.sh
+    if [ "$USE_EXT_DB" == "no" ]; then
+        echo "Starting Database (Postgres)"
+        source $(pwd)/docker-database.sh
+    fi
 
     echo "Starting Gateway"
     source $(pwd)/docker-gateway.sh
@@ -185,8 +198,10 @@ get_knox_container_id() {
 }
 
 start_app() {
-    echo "Starting Database (Postgres)"
-    source $(pwd)/docker-database.sh
+    if [ "$USE_EXT_DB" == "no" ]; then
+        echo "Starting Database (Postgres)"
+        source $(pwd)/docker-database.sh
+    fi
 
     echo "Starting Gateway"
     source $(pwd)/docker-gateway.sh

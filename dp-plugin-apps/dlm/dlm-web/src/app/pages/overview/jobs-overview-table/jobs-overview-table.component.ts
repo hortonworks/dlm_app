@@ -1,4 +1,6 @@
-import { Component, OnInit, Output, ViewChild, TemplateRef, OnDestroy, ViewEncapsulation, EventEmitter } from '@angular/core';
+import {
+  Component, OnInit, Output, ViewChild, TemplateRef, OnDestroy, ViewEncapsulation, EventEmitter, HostBinding
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -39,7 +41,9 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;
   @ViewChild('prevJobs') prevJobsRef: TemplateRef<any>;
 
-  @Output() onShowJobLog = new EventEmitter<any>();
+  @HostBinding('class') className = 'dlm-jobs-overview-table';
+
+  @Output() onShowPolicyLog = new EventEmitter<any>();
 
   constructor(private t: TranslateService,
               protected store: Store<fromRoot.State>,
@@ -166,7 +170,7 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
     this.router.navigate(['/policies'], {queryParams: {policy: policy.name}});
   }
 
-  showPolicyLog(job) {
-    this.onShowJobLog.emit(job);
+  showPolicyLog(policy) {
+    this.onShowPolicyLog.emit(policy);
   }
 }

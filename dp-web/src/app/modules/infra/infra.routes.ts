@@ -5,6 +5,9 @@ import {ClusterAddComponent} from './views/cluster-add/cluster-add.component';
 import {ClusterDetailsComponent} from './views/cluster-details/cluster-details.component';
 import {UserManagementComponent} from './views/user-management/user-management.component';
 import {AddUserComponent} from './views/user-management/add-user/add-user.component';
+import {AddGroupComponent} from './views/user-management/add-group/add-group.component';
+import {UsersComponent} from './views/user-management/users/users.component';
+import {GroupsComponent} from './views/user-management/groups/groups.component';
 
 export const routes: Routes = [{
   path: '',
@@ -16,18 +19,45 @@ export const routes: Routes = [{
   path: 'cluster/details/:id',
   component: ClusterDetailsComponent
 }, {
-  path: 'users',
+  path: 'usermgmt',
   component: UserManagementComponent,
   children: [
     {
-      path: 'add',
-      component: AddUserComponent,
-      outlet: 'sidebar',
+      path: '',
+      pathMatch: 'full',
+      redirectTo: 'users'
     },
     {
-      path: 'edit/:name',
-      component: AddUserComponent,
-      outlet: 'sidebar',
+      path: 'users',
+      component: UsersComponent,
+      children: [
+        {
+          path: 'add',
+          component: AddUserComponent,
+          outlet: 'sidebar',
+        },
+        {
+          path: 'edit/:name',
+          component: AddUserComponent,
+          outlet: 'sidebar',
+        }
+      ]
+    },
+    {
+      path: 'groups',
+      component: GroupsComponent,
+      children: [
+        {
+          path: 'add',
+          component: AddGroupComponent,
+          outlet: 'sidebar',
+        },
+        {
+          path: 'edit/:name',
+          component: AddGroupComponent,
+          outlet: 'sidebar',
+        }
+      ]
     }
   ]
 }];

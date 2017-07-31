@@ -1,0 +1,16 @@
+@import '../../../styles/variables.scss';
+
+:host {
+  display: block;
+  height: 100%;
+
+  & /deep/ {
+    .map-legend-header, .map-legend-body {
+      padding: 15px 25px;
+      width: 100%;
+    }
+    .map-legend-header {
+      background-color: $navigation-header-bg;
+    }
+  }
+}

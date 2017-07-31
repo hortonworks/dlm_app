@@ -6,7 +6,7 @@ import com.hortonworks.dlm.beacon.domain.ResponseEntities._
 import play.api.http.Status.{BAD_GATEWAY, SERVICE_UNAVAILABLE}
 import play.api.libs.json.{JsError, JsSuccess}
 import play.api.libs.ws.ahc.AhcWSResponse
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
 import play.api.mvc.Results
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -33,6 +33,7 @@ class BeaconPolicyInstanceServiceImpl()(implicit ws: WSClient) extends BeaconPol
 
   override def listPolicyInstances(beaconEndpoint : String, queryString: Map[String,String]) : Future[Either[BeaconApiErrors, PolicyInstancesDetails]] = {
     ws.url(s"${urlPrefix(beaconEndpoint)}/instance/list").withQueryString(queryString.toList: _*)
+      .withAuth(user, password, WSAuthScheme.BASIC)
       .withHeaders(httpHeaders.toList: _*)
       .get.map(mapToPolicyInstanceResponse).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
@@ -41,6 +42,7 @@ class BeaconPolicyInstanceServiceImpl()(implicit ws: WSClient) extends BeaconPol
 
   override def listPolicyInstance(beaconEndpoint : String, policyName : String, queryString: Map[String,String]) : Future[Either[BeaconApiErrors, PolicyInstancesDetails]] = {
     ws.url(s"${urlPrefix(beaconEndpoint)}/policy/instance/list/$policyName").withQueryString(queryString.toList: _*)
+      .withAuth(user, password, WSAuthScheme.BASIC)
       .withHeaders(httpHeaders.toList: _*)
       .get.map(mapToPolicyInstanceResponse).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
@@ -49,6 +51,7 @@ class BeaconPolicyInstanceServiceImpl()(implicit ws: WSClient) extends BeaconPol
 
   override def abortPolicyInstances(beaconEndpoint : String, policyName : String): Future[Either[BeaconApiErrors, PostActionResponse]] = {
     ws.url(s"${urlPrefix(beaconEndpoint)}/policy/instance/abort/$policyName")
+      .withAuth(user, password, WSAuthScheme.BASIC)
       .withHeaders(httpHeaders.toList: _*)
       .post(Results.EmptyContent()).map(mapToPostActionResponse).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))

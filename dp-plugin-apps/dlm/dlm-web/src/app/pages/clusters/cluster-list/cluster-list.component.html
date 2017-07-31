@@ -14,8 +14,16 @@
   </span>
 </ng-template>
 
+<ng-template #slashIconCell>
+  <span class="slash">&#47;</span>
+</ng-template>
+
 <ng-template #nameCell let-name="value">
   <span class="cluster-name">{{name}}</span>
+</ng-template>
+
+<ng-template #dcCell let-name="value">
+  <span class="datacenter-name">{{name}}</span>
 </ng-template>
 
 <ng-template let-stats="value" let-cluster="row" #usageCell>

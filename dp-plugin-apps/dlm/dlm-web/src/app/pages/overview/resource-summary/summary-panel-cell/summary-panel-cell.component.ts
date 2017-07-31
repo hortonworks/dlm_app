@@ -10,7 +10,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
       </p>
       <p class="cell-value" [class.btn-link]="actionable" [class.actionable]="actionable" (click)="handleCellClick($event)">
         {{value}}
-      <p>
+      </p>
    </div>
   `,
   styleUrls: ['./summary-panel-cell.component.scss']

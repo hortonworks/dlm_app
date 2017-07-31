@@ -8,7 +8,7 @@ const {isInteger} = Number;
 export class FrequencyPipe implements PipeTransform {
 
   private _fmt(num, type) {
-    const tKey = `common.frequency.${type}.` + (num === 1 ? 'singular' : 'plural');
+    const tKey = `common.frequency.${type}.plural`;
     return this.t.instant(tKey, {num});
   }
 

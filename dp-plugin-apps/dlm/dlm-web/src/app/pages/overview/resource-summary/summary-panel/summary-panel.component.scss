@@ -5,6 +5,7 @@ $cell-border: 1px solid #ddd;
   &.col-md-4:nth-child(2) .cell-value {
     border-left: $cell-border;
     border-right: $cell-border;
+    padding-bottom: 10px;
   }
 }
 
@@ -21,6 +22,10 @@ $cell-border: 1px solid #ddd;
 
   &.panel-default {
     border-color: $panel-border-color;
+  }
+
+  .panel-body {
+    padding-bottom: 10px;
   }
 }
 
