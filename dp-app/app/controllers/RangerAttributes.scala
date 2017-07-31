@@ -3,13 +3,14 @@ package controllers
 import javax.inject.Inject
 
 import com.google.inject.name.Named
+import com.hortonworks.dataplane.commons.auth.Authenticated
 import com.hortonworks.dataplane.cs.Webservice.RangerService
-import internal.auth.Authenticated
 import models.JsonResponses
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.Controller
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by dsingh on 7/28/17.
