@@ -5,7 +5,10 @@ import { JOBS_HEALTH_STATE } from '../resource-summary.type';
 @Component({
   selector: 'dlm-jobs-summary',
   template: `
-    <dlm-summary-panel [title]="'page.overview.summary_panels.title.jobs' | translate" [total]="data.total">
+    <dlm-summary-panel
+      [title]="'page.overview.summary_panels.title.jobs'"
+      [total]="data.total"
+      [hint]="'page.overview.summary_panels.hint.jobs'">
       <div class="row">
         <dlm-summary-panel-cell
           class="col-md-4"

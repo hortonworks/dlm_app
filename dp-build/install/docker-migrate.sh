@@ -18,5 +18,8 @@ docker start dp-migrate >> install.log 2>&1 || \
         --name dp-migrate \
         --network dp \
         --rm \
+        --env "DATABASE_URI=$DATABASE_URI" \
+        --env "DATABASE_USER=$DATABASE_USER" \
+        --env "DATABASE_PASS=$DATABASE_PASS" \
         hortonworks/dp-migrate:$VERSION \
         clean migrate

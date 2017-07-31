@@ -49,7 +49,7 @@ object ResponseEntities {
 }
 
 object RequestEntities {
-  case class ClusterDefinitionRequest( fsEndpoint: String, hsEndpoint: Option[String], beaconEndpoint: String, name: String, description: String)
+  case class ClusterDefinitionRequest( fsEndpoint: String, hsEndpoint: Option[String], beaconEndpoint: String, name: String, dataCenter: String, description: String)
   case class PolicyDefinitionRequest( name: String, `type`: String, sourceDataset: String,
                                       sourceCluster: String, targetCluster: String, frequencyInSec: Long,
                                       startTime: Option[String], endTime: Option[String], distcpMapBandwidth: Option[Long],

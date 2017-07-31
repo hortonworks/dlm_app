@@ -11,15 +11,15 @@ import { SUMMARY_PANELS } from './resource-summary.type';
   selector: 'dlm-resource-summary',
   template: `
     <div class="row">
-      <dlm-clusters-summary class="col-md-4"
+      <dlm-clusters-summary class="col-md-4 summary-panel"
         (selectPanelCell)="handleSelectPanelCell(panels.CLUSTER, $event)"
         [data]="clusters">
       </dlm-clusters-summary>
-      <dlm-policies-summary class="col-md-4"
+      <dlm-policies-summary class="col-md-4 summary-panel"
         (selectPanelCell)="handleSelectPanelCell(panels.POLICIES, $event)"
         [data]="policies">
       </dlm-policies-summary>
-      <dlm-jobs-summary class="col-md-4"
+      <dlm-jobs-summary class="col-md-4 summary-panel"
         (selectPanelCell)="handleSelectPanelCell(panels.JOBS, $event)"
         [data]="jobs">
       </dlm-jobs-summary>

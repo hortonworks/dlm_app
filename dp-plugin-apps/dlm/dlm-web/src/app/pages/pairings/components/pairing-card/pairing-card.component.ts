@@ -11,6 +11,13 @@ export class PairingCardComponent implements OnInit {
   @Input() pairing: Pairing;
   @Output() onListUnpair: EventEmitter<Pairing> = new EventEmitter<Pairing>();
 
+  get locations() {
+    return [
+      this.pairing.pair[0].location.city + ', ' + this.pairing.pair[0].location.country,
+      this.pairing.pair[1].location.city + ', ' + this.pairing.pair[1].location.country
+    ];
+  }
+
   constructor() { }
 
   ngOnInit() {

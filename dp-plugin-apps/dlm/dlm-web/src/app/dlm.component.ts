@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation, isDevMode } from '@angular/core';
 import { MenuItem } from './common/navbar/menu-item';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers/index';
@@ -32,7 +32,7 @@ const POLL_NEW_EVENTS_ID = 'POLL_NEW_EVENTS_ID';
 export class DlmComponent implements OnDestroy, OnInit {
   header: MenuItem;
   menuItems: MenuItem[];
-  mainContentSelector = '#dlm_content';
+  mainContentSelector = '#dlm_main_content';
   fitHeight = true;
   events$: Observable<Event[]>;
   newEventsCount$: Observable<number>;
@@ -158,8 +158,10 @@ export class DlmComponent implements OnDestroy, OnInit {
       if (user && user.id) {
         this.user = user;
       } else {
-        // Log the user out of DLM
-        this.userService.logoutUser();
+        if (!isDevMode()) {
+          // Log the user out of DLM
+          this.userService.logoutUser();
+        }
       }
     });
   }

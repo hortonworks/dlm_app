@@ -1,9 +1,5 @@
-$issues-max-height: 300px;
-
 :host {
   &.all-visible {
-    max-height: $issues-max-height;
-    overflow: auto;
     padding-right: 15px;
     display: block;
   }

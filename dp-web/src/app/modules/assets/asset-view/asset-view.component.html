@@ -28,4 +28,7 @@
     <section *ngIf="selectedTopLevelTabs === topLevelTabs.LINEAGE">
      <dp-lineage [clusterId]="clusterId" [guid]="guid"> </dp-lineage>
     </section>
+    <section *ngIf="selectedTopLevelTabs === topLevelTabs.AUDIT">
+     <asset-audit-view [clusterId]="clusterId" [assetDetails]="assetDetails"> </asset-audit-view>
+    </section>
 </div>

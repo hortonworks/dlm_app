@@ -1,0 +1,47 @@
+$legend-font-size: 12px;
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .map-legend-header {
+    flex-shrink: 0;
+    min-height: 0;
+    font-size: 16px;
+  }
+
+  .map-legend-body {
+    flex-grow: 1;
+    overflow: auto;
+  }
+}
+
+dl {
+  margin-bottom: 25px;
+
+  dt {
+    color: #67676e;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    font-size: $legend-font-size;
+    font-weight: normal;
+    line-height: auto;
+
+  }
+
+  &.fix-alerts {
+    dt {
+      margin-bottom: 0;
+    }
+  }
+
+  dd {
+    color: #808288;
+    font-size: $legend-font-size;
+  }
+
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
