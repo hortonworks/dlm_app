@@ -85,7 +85,6 @@ destroy_knox() {
 
 init_app() {
     echo "Initializing app"
-    read_consul_host
 
     if [ "$USE_EXT_DB" == "no" ]; then
         echo "Starting Database (Postgres)"
@@ -173,30 +172,38 @@ stop_knox() {
 }
 
 init_all() {
-    init_db
-    migrate_schema
+    init_db >> install.log 2>&1
+    migrate_schema >> install.log 2>&1
 
-    init_knox
+    init_knox >> install.log 2>&1
 
-    init_app
+    init_app >> install.log 2>&1
+
+    echo "Initialization and start complete."
 }
 
 start_all() {
-    start_knox
+    start_knox >> install.log 2>&1
 
-    start_app
+    start_app >> install.log 2>&1
+
+    echo "Start complete."
 }
 
 stop_all() {
-    stop_app
+    stop_app >> install.log 2>&1
 
-    stop_knox
+    stop_knox >> install.log 2>&1
+
+    echo "Stop complete."
 }
 
 destroy_all() {
-    destroy
+    destroy >> install.log 2>&1
 
-    destroy_knox
+    destroy_knox >> install.log 2>&1
+
+    echo "Destroy complete."
 }
 
 print_version() {
