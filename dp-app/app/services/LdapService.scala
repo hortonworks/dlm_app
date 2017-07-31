@@ -264,7 +264,7 @@ class LdapService @Inject()(
   }
 
   private def validateGroupSettings(ldapConf: LdapConfiguration):Option[Errors] = {
-    if (ldapConf.groupSearchBase.isEmpty || ldapConf.groupObjectClass.isEmpty || ldapConf.groupMemberAttributeName.isEmpty)
+    if (!(ldapConf.groupSearchBase.isEmpty || ldapConf.groupObjectClass.isEmpty || ldapConf.groupMemberAttributeName.isEmpty))
       None
     else{
       val errors=ArrayBuffer.empty[Error]
