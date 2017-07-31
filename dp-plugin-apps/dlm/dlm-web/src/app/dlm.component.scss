@@ -18,19 +18,25 @@ html, body {
 header {
   background-color: #fff;
   height: 60px;
+  &.row {
+    margin-right: 0;
+  }
   .navbar-nav {
     margin-top: 12px;
     color: #666;
     line-height: 40px;
+    padding-right: 15px;
+    ol.breadcrumb {
+      padding-left: 30px;
+    }
     .fa, .glyphicon {
       font-size: 16px;
     }
   }
   .navbar-right {
-    margin: 8px 15px;
   }
-  .navbar-footer {
-    margin-right: 40px;
+  .navbar-user {
+    margin-right: 30px;
   }
   .notifications-group.open {
     color: $link-color;
@@ -41,6 +47,11 @@ header {
   // overwrites container-fluid defaults 15px
   // required by design
   padding: 0 30px;
+}
+
+#dlm_main_content {
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .page-section {

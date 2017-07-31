@@ -1,9 +1,29 @@
+$tooltip-background: #323544;
+
 :host {
   display: block;
+  position: relative;
 }
 
 .leaflet-container{
   background: #F4F4F4;
+}
+
+:host /deep/ {
+  .leaflet-popup-content-wrapper {
+    background-color: $tooltip-background;
+    color: white;
+    border-radius: 4px;
+    padding: 8px 16px;
+  }
+
+  .leaflet-popup-content {
+    margin: 0;
+  }
+
+  .leaflet-popup-tip {
+    background-color: $tooltip-background;
+  }
 }
 
 .map-container {

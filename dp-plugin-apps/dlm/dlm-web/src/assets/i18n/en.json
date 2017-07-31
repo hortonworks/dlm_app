@@ -22,6 +22,8 @@
     "pairing": "Pairing",
     "pairs": "Pairs",
     "policy": "Policy",
+    "job": "Job",
+    "jobs": "Jobs",
     "clusters": "Clusters",
     "cluster": "Cluster",
     "service": "Service",
@@ -42,31 +44,31 @@
     },
     "frequency": {
       "yearly": {
-        "plural": "Every {{num}} years",
+        "plural": "Every {{num}}y",
         "singular": "Every year"
       },
       "monthly": {
-        "plural": "Every {{num}} months",
+        "plural": "Every {{num}}m",
         "singular": "Every month"
       },
       "weekly": {
-        "plural": "Every {{num}} weeks",
+        "plural": "Every {{num}}w",
         "singular": "Every week"
       },
       "daily": {
-        "plural": "Every {{num}} days",
+        "plural": "Every {{num}}d",
         "singular": "Every day"
       },
       "hourly": {
-        "plural": "Every {{num}} hours",
+        "plural": "Every {{num}}h",
         "singular": "Every hour"
       },
       "minutely": {
-        "plural": "Every {{num}} minutes",
+        "plural": "Every {{num}}m",
         "singular": "Every minute"
       },
       "secondly": {
-        "plural": "Every {{num}} seconds",
+        "plural": "Every {{num}}s",
         "singular": "Every second"
       },
       "every": "Every",
@@ -92,7 +94,7 @@
   "sidenav": {
     "menuItem": {
       "overview": "Overview",
-      "clusters": "My Clusters",
+      "clusters": "Clusters",
       "policies": "Policies",
       "pairings": "Pairings",
       "jobs": "Jobs",
@@ -165,6 +167,18 @@
           "active": "Active",
           "suspended": "Suspended",
           "warning": "Warning"
+        },
+        "hint": {
+          "clusters": "Clusters Hint",
+          "policies": "Policies Hint",
+          "jobs": "Jobs Hint"
+        }
+      },
+      "world_map": {
+        "cluster_legend": {
+          "alerts": "Alerts",
+          "fix_alerts": "Fix Alerts",
+          "launch_ambari": "Launch Ambari"
         }
       },
       "table": {
@@ -224,8 +238,8 @@
         "nodes": "Nodes",
         "volume": "Volume",
         "location": "Location",
-        "create_pair_text": "Add Pair",
-        "create_policy_text": "Add Policy"
+        "create_pair_text": "+ Pair",
+        "create_policy_text": "+ Policy"
       }
     },
     "policies": {
@@ -275,7 +289,7 @@
           "directories": "File / Folder Path",
           "databases": "Database",
           "start_date": "Start Date",
-          "end_date": "End Date",
+          "end_date": "End Date (Optional)",
           "start_time": "Start Time  (24-Hour Clock)",
           "end_time": "End Time",
           "date_format": "yyyy-mm-dd",

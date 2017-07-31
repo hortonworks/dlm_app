@@ -57,6 +57,19 @@ export function reducer(state = initialState, action: Action): State {
         }
       };
     }
+    case ActionTypes.UPDATE_PROGRESS_STATE: {
+      const { requestId, progressState } = action.payload;
+      const progressEntity = state.entities[requestId] || makeProgressInstance(requestId);
+      return {
+        entities: {
+          ...state.entities,
+          [requestId]: {
+            ...progressEntity,
+            ...progressState
+          }
+        }
+      };
+    }
   }
   if (!(action.payload && action.payload.meta && action.payload.meta.requestId)) {
     return state;

@@ -48,6 +48,8 @@ object WebService {
     }
 
     protected def urlPrefix(beaconEndpoint: String) : String = beaconEndpoint + "/api/beacon"
+    protected val user = "admin"
+    protected val password = "admin"
     
     protected def httpHeaders : Map[String,String] = Map (
       CONTENT_TYPE -> TEXT,
@@ -60,7 +62,7 @@ object WebService {
 
     def listCluster(beaconEndpoint : String, clusterName: String): Future[Either[BeaconApiErrors, BeaconEntityResponse]]
     def listClusterStatus(beaconEndpoint : String, clusterName: String): Future[Either[BeaconApiErrors, BeaconClusterStatusResponse]]
-    def createClusterDefinition(beaconEndpoint : String, clusterName : String, clusterDefinitionRequest : ClusterDefinitionRequest): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def createClusterDefinition(beaconEndpoint : String, dataCenterClusterName : String, clusterDefinitionRequest : ClusterDefinitionRequest): Future[Either[BeaconApiErrors, PostActionResponse]]
   }
 
   trait BeaconPairService extends ClientService {

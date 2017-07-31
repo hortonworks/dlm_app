@@ -11,6 +11,7 @@
 
 <ng-template #statusCellTemplate let-policy="row">
   <dlm-job-status
+    qe-attr="show-log"
     class="actionable"
     [job]="policy.lastJobResource"
     [tooltip]="policy.lastJobResource.status !== JOB_STATUS.RUNNING ? ('page.notifications.view_log' | translate) : ''"
@@ -24,17 +25,19 @@
     [trackingInfo]="job.trackingInfo">
   </dlm-transferred-column>
   <ng-template #verbTpl>
-    <span class="actionable" [tooltip]="'page.notifications.view_log' | translate" (click)="showPolicyLog(policy)">
+    <span class="actionable"
+          [tooltip]="job.status === JOB_STATUS.RUNNING ? '' : ('page.notifications.view_log' | translate)"
+          (click)="showPolicyLog(policy)">
       {{job.status}}
-      <i class="fa fa-file-text-o text-info"></i>
+      <i class="fa fa-file-text-o text-info" *ngIf="job.status !== JOB_STATUS.RUNNING"></i>
     </span>
   </ng-template>
 </ng-template>
 
 <ng-template #policyNameCellTemplate let-row="row" let-name="value">
-  <a (click)="goToPolicy(row)" class="actionable">
+  <span qe-attr="go-to-policies" (click)="goToPolicy(row)" class="actionable text-primary policy-name">
    {{name}}
-  </a>
+  </span>
 </ng-template>
 
 <ng-template #agoTemplate let-value="value" let-policy="row">
@@ -49,7 +52,7 @@
 </ng-template>
 
 <ng-template #prevJobs let-jobs="value" let-row="row">
-  <dlm-last-ten-jobs-column class="actionable" (click)="goToPolicy(row)" [jobs]="jobs"></dlm-last-ten-jobs-column>
+  <dlm-last-ten-jobs-column qe-attr="go-to-policies" class="actionable" (click)="goToPolicy(row)" [jobs]="jobs"></dlm-last-ten-jobs-column>
 </ng-template>
 
 <ng-template #nextRunTemplate let-row="row">
@@ -78,6 +81,7 @@
 
 <ng-template #actionsCell let-row="row">
   <dlm-policy-actions
+    qe-attr="entity-actions"
     [rowId]="row.id"
     [policy]="row"
     [isOpen]="shouldShowAction(row.id)"
@@ -88,6 +92,7 @@
 </ng-template>
 
 <dlm-modal-dialog
+  qe-attr="confirmation-modal"
   [title]="'page.policies.perform_action.confirmation.title'"
   [body]="'page.policies.perform_action.confirmation.body'"
   [showDialog]="showActionConfirmationModal"
@@ -96,6 +101,7 @@
 </dlm-modal-dialog>
 
 <dlm-modal-dialog
+  qe-attr="entity-action-result-modal"
   [title]="lastOperationResponse.status"
   [body]="lastOperationResponse.message"
   [showDialog]="showOperationResponseModal"

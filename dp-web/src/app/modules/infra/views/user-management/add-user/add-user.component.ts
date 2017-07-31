@@ -91,7 +91,7 @@ export class AddUserComponent implements OnInit {
       });
       this.userService.updateUser(this.user).subscribe(user => {
         this.userService.dataChanged.next();
-        this.router.navigate(['/infra/users']);
+        this.router.navigate(['users'], {relativeTo: this.route});
       }, error => {
         console.error('error')
       });
@@ -101,7 +101,7 @@ export class AddUserComponent implements OnInit {
       });
       this.userService.addUsers(this.users, roles).subscribe(response => {
         this.userService.dataChanged.next();
-        this.router.navigate(['/infra/users']);
+        this.router.navigate(['users'], {relativeTo: this.route});
       }, error => {
         console.error('error')
       });
@@ -109,7 +109,7 @@ export class AddUserComponent implements OnInit {
   }
 
   back() {
-    this.router.navigate(['/infra/users']);
+    this.router.navigate(['users'], {relativeTo: this.route});
   }
 }
 

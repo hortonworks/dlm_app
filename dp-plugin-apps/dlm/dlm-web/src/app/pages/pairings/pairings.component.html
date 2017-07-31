@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row page-section">
   <div class="col-md-8">
     <dlm-page-header
       [title]="'page.pairings.header'"
@@ -7,15 +7,14 @@
     </dlm-page-header>
   </div>
   <div class="col-md-4">
-    <div class="pull-right page-section">
-      <button type="button" class="btn btn-primary" (click)="createPairingClickHandler()">{{
-        "page.pairings.create_button_text" | translate }}
+    <div class="pull-right">
+      <button qe-attr="add-pairing" type="button" class="btn btn-primary" (click)="createPairingClickHandler()">{{"page.pairings.create_button_text" | translate }}
       </button>
     </div>
   </div>
 </div>
 <dlm-progress-container [progressState]="overallProgress$ | async">
-  <div class="content page-section">
+  <div class="content">
     <div *ngIf="(pairings$ | async)?.length > 0; else noPairs">
       <div class="row">
         <div class="col-md-8 col-sm-11 col-lg-6">
@@ -26,7 +25,7 @@
       </div>
     </div>
     <ng-template #noPairs>
-      <div class="alert alert-warning" role="alert">
+      <div qe-attr="no-pairs-alert" class="alert alert-warning" role="alert">
         {{ "page.pairings.content.no_pairs" | translate}}
         <button type="button" class="btn btn-primary" (click)="createPairingClickHandler()">
           {{ "page.pairings.create_button_text" | translate }}
@@ -35,6 +34,7 @@
     </ng-template>
   </div>
   <dlm-modal-dialog #confirmationModal
+                    qe-attr="confirmation-modal"
                     title="{{ 'page.pairings.unpair.confirmation.title' | translate }}"
                     body="{{ 'page.pairings.unpair.confirmation.body' | translate }}"
                     okText="{{ 'page.pairings.unpair.confirmation.primaryButton' | translate }}"
@@ -42,6 +42,7 @@
   </dlm-modal-dialog>
 
   <dlm-modal-dialog
+    qe-attr="pairing-action-result-modal"
     [title]="lastOperationResponse.status"
     [body]="lastOperationResponse.message"
     [showDialog]="showOperationResponseModal"

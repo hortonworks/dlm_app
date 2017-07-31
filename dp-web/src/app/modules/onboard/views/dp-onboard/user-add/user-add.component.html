@@ -19,8 +19,18 @@
     <tagging-widget id="tags" [tags]="users" [clearOnSearch]="true"
     [availableTags]="availableUsers"
     [clearOnSearch]="true"
-    (textChange)="onTagSearchChange($event)"
+    (textChange)="onUserSearchChange($event)"
     (onNewSearch)="onNewUserAddition($event)"
+    [theme]=tagThemes.DARK
+    [restrictFreeText]="true"></tagging-widget>
+  </div>
+  <div class="dp-input">
+    <label class="text-medium">{{"pages.onboard.adduser.labels.groups" | translate}}</label>
+    <tagging-widget id="tags" [tags]="groups" [clearOnSearch]="true"
+    [availableTags]="availableGroups"
+    [clearOnSearch]="true"
+    (textChange)="onGroupSearchChange($event)"
+    (onNewSearch)="onNewGroupAddition($event)"
     [theme]=tagThemes.DARK
     [restrictFreeText]="true"></tagging-widget>
   </div>

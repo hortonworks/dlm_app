@@ -9,6 +9,7 @@ export const routes: MockRoute[] = [
   // cluster mocks
   new MockRoute('clusters', 'clusters.json'),
   new MockRoute('clusters', 'cluster.json', RequestMethod.Post),
+  new MockRoute('clusters/status', 'clusters_status.json'),
   new MockRoute('clusters/:id', 'cluster.json'),
   new MockRoute('clusters/:id', 'cluster.json', RequestMethod.Delete),
 

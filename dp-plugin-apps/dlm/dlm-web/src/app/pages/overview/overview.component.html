@@ -9,47 +9,76 @@
   </div>
   <div class="page-section">
     <div class="row">
-      <div class="col-md-12">
-        <h4>
-          {{'page.overview.issues.recent' | translate}}
-        </h4>
-      </div>
-    </div>
-    <div class="row">
       <div class="col-md-4">
-        <dlm-issues-list [events]="events$ | async">
-        </dlm-issues-list>
+        <div class="row">
+          <div class="col-md-12">
+            <h4>
+              {{'page.overview.issues.recent' | translate}}
+            </h4>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <dlm-issues-list [events]="events$ | async">
+            </dlm-issues-list>
+          </div>
+        </div>
       </div>
       <div class="col-md-8">
-        <dp-map [sizeSettings]="mapSizeSettings" [mapData]="clustersMapData$ | async"></dp-map>
+        <div class="row">
+          <div class="col-md-12">
+            <h4>
+              {{'common.clusters' | translate}}
+            </h4>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <dp-map [sizeSettings]="mapSizeSettings" [mapData]="clustersMapData$ | async" (clickMarker)="handleClickMarker($event)" *ngIf="!(overallProgress$ | async)?.isInProgress && (clustersMapData$ | async).length">
+              <dlm-map-legend class="overview-map-legend" *ngIf="clusterLegend$ | async">
+                <dlm-cluster-legend [cluster]="clusterLegend$ | async"></dlm-cluster-legend>
+              </dlm-map-legend>
+            </dp-map>
+          </div>
+        </div>
       </div>
     </div>
   </div>
   <div class="page-section">
     <div class="row">
-      <div class="col-md-3">
-        <h4>{{'page.overview.issues.updates' | translate}}</h4>
+      <div class="col-md-7">
+        <div class="flex-center">
+          <span class="h4">{{'page.overview.issues.updates' | translate}}</span>
+          <div *ngIf="jobStatusFilter$ | async" class="job-status-filter inline-block">
+            <span class="label label-default">
+              <span class="text-bold text-uppercase">{{'common.jobs' | translate}}:&nbsp;</span>
+              <span>{{formatStatusFilter(jobStatusFilter$ | async)}} </span>
+              <a href="javascript:void(0);" (click)="removeJobStatusFilter()">&times;</a>
+            </span>
+          </div>
+        </div>
       </div>
-      <div class="col-md-9">
+      <div class="col-md-5">
         <div class="btn-group pull-right">
-          <button class="btn btn-xs btn-secondary" type="button" [disabled]="!addingPairsAvailable(clusters$ | async, pairsCount$ | async)" routerLink="/pairings/create">
+          <button qe-attr="add-pairing" class="btn btn-xs btn-secondary" type="button" [disabled]="!addingPairsAvailable(clusters$ | async, pairsCount$ | async)" routerLink="/pairings/create">
             <span class="text-uppercase">{{'common.pair' | translate}} +</span>
           </button>
-          <button class="btn btn-xs btn-secondary" type="button" [disabled]="!addingPoliciesAvailable(pairsCount$ | async)" routerLink="/policies/create">
+          <button qe-attr="add-policy" class="btn btn-xs btn-secondary" type="button" [disabled]="!addingPoliciesAvailable(pairsCount$ | async)" routerLink="/policies/create">
             <span class="text-uppercase">{{'common.policy' | translate}} +</span>
           </button>
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="row" *ngIf="!(overallProgress$ | async)?.isInProgress">
       <div class="col-md-12">
-        <dlm-jobs-overview-table [jobs]="tableData$ | async" (onShowJobLog)="handleOnShowJobLog($event)"></dlm-jobs-overview-table>
+        <dlm-jobs-overview-table [jobs]="tableData$ | async" (onShowPolicyLog)="handleOnShowPolicyLog($event)"></dlm-jobs-overview-table>
       </div>
     </div>
   </div>
 </dlm-progress-container>
 
 <dlm-modal-dialog
+  qe-attr="unhealthy-clusters-modal"
   #unhealthyClusters
   [title]="'page.overview.modals.unhealthy_cluster.title'"
   [showDialog]="isUnhealthyClustersModalVisible"
@@ -81,6 +110,7 @@
 
 <dlm-modal-dialog
   #lowCapacity
+  qe-attr="low-capacity-modal"
   [title]="'page.overview.modals.hdfs_capacity.title'"
   [showDialog]="isWarningClustersModalVisible"
   [showCancel]="false"
@@ -106,6 +136,7 @@
 
 <dlm-modal-dialog
   #unhealthyPolicy
+  qe-attr="unhealthy-policy-modal"
   [title]="'page.overview.modals.unhealthy_policy.title'"
   [showDialog]="isUnhealthyPoliciesModalVisible"
   [showCancel]="false"

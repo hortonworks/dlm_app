@@ -3,7 +3,6 @@
 }
 .alerts-label {
   cursor: pointer;
-  margin: 0 15px 0 5px;
   .numberCircle {
     border-radius: 50%;
     min-width: 20px;
@@ -28,7 +27,7 @@
     right: -25px;
   }
   .popup-arrow-up {
-    right: 30px !important;
+    right: 12px !important;
   }
   table > tbody > tr:last-child {
     &:not(:hover) {

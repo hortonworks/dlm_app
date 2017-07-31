@@ -1,21 +1,18 @@
-import { Component, OnInit, ViewChild, ElementRef, OnChanges, Input, SimpleChanges, HostBinding } from '@angular/core';
+import {
+  Component, OnInit, ViewChild, ElementRef, OnChanges, Input, Output, SimpleChanges, HostBinding, EventEmitter
+} from '@angular/core';
 import * as L from 'leaflet';
 import 'leaflet-curve';
 
 import { MapSize, MapSizeSettings, ClusterMapData } from 'models/map-data';
 import { GeographyService } from 'services/geography.service';
 import LatLng = L.LatLng;
+import { Cluster } from 'models/cluster.model';
 import { CLUSTER_STATUS, SERVICE_STATUS } from 'constants/status.constant';
 import { without } from 'utils/array-util';
 
 function formatMapPopup(cluster) {
-  const notStartedServices = cluster.status ? cluster.status.filter(s => s.state !== SERVICE_STATUS.STARTED) : [];
-  const notStartedServiceNames = notStartedServices.map(s => s.service_name);
-  const popup = `<p>${cluster.name}<br />${cluster.dataCenter}<br />Policies: ${cluster.policiesCounter}</p>`;
-  if (notStartedServices.length) {
-    return `${popup}<p>Not started services: ${notStartedServiceNames.join(', ')}</p>`;
-  }
-  return popup;
+  return `<span>${cluster.name} ${cluster.dataCenter} / ${cluster.policiesCounter}</span>`;
 }
 
 function getExistingMarker(collection: L.CircleMarker[], latLng: LatLng): L.CircleMarker {
@@ -34,22 +31,19 @@ export class MapComponent implements OnChanges, OnInit {
   @Input('mapData') mapData: ClusterMapData[] = [];
   @Input('mapSize') mapSize = 'extraLarge';
   @Input() sizeSettings: any;
+  @Output() clickMarker = new EventEmitter<Cluster>();
 
   @HostBinding('style.height') get selfHeight(): string {
     return this.getMapDimensions().height;
   }
 
   markerLookup: L.CircleMarker[] = [];
-  smallMarkerLookup: L.CircleMarker[] = [];
   pathLookup = [];
   countries = [];
 
   statusColorUp = '#3FAE2A';
   statusColorDown = '#EF6162';
-
-  markerColorOuterBorder = '#C4DCEC';
   markerColorInnerBorder = '#FFFFFF';
-
   mapColor = '#CFCFCF';
 
   mapOptions = {
@@ -93,17 +87,28 @@ export class MapComponent implements OnChanges, OnInit {
   }
 
   ngOnInit() {
+    this.draw();
+  }
+
+  draw() {
     if (this.map) {
       this.map.remove();
     }
-    this.geographyService.getCountries()
-      // for some reason map don't draw sometimes
-      .delay(500)
-      .subscribe(countries => {
+    this.geographyService.getCountries().subscribe(countries => {
       this.countries = countries;
       this.drawMap(countries);
       this.plotPoints();
+      this.fitBounds();
     });
+  }
+
+  fitBounds() {
+    if (this.markerLookup.length) {
+      this.map.fitBounds(L.featureGroup(this.markerLookup).getBounds(), {animate: false});
+      if (this.map.getZoom() > 5) {
+        this.map.setZoom(5, {animate: false});
+      }
+    }
   }
 
   drawMap(countries) {
@@ -125,7 +130,6 @@ export class MapComponent implements OnChanges, OnInit {
     baseLayer.addTo(map);
     map.fitBounds(baseLayer.getBounds());
     this.map = map;
-    this.map.setZoom(mapDimensions.zoom);
     this.mapcontainer.nativeElement.querySelector('.leaflet-map-pane').style.height = `${ parseInt(mapDimensions.height, 10) - 20}px`;
   }
 
@@ -135,10 +139,10 @@ export class MapComponent implements OnChanges, OnInit {
       const end = data.end;
       if (start) {
         this.plotPoint(start);
-      }
-      if (start && end) {
-        this.plotPoint(end);
-        this.drawConnection(start, end);
+        if (end) {
+          this.plotPoint(end);
+          this.drawConnection(start, end);
+        }
       }
     });
   }
@@ -156,12 +160,13 @@ export class MapComponent implements OnChanges, OnInit {
     this.createMarker(latLng, cluster);
   }
 
-  createMarker(latLng: LatLng, clusterInfo) {
+  createMarker(latLng: LatLng, clusterInfo: Cluster) {
     const marker = L.circleMarker(latLng, {
-      radius: 14,
-      color: this.markerColorOuterBorder,
-      weight: 2,
-      fillOpacity: 0.25
+      radius: 7,
+      color: this.markerColorInnerBorder,
+      weight: 0,
+      fillColor: clusterInfo.healthStatus === CLUSTER_STATUS.HEALTHY ? this.statusColorUp : this.statusColorDown,
+      fillOpacity: 0.8
     });
     const existingMarker = getExistingMarker(this.markerLookup, latLng);
     if (existingMarker) {
@@ -170,24 +175,10 @@ export class MapComponent implements OnChanges, OnInit {
     }
     this.markerLookup.push(marker);
     this.map.addLayer(marker);
-    const mapPopup = marker.bindPopup(formatMapPopup(clusterInfo));
+    const mapPopup = marker.bindPopup(formatMapPopup(clusterInfo), { closeButton: false });
     mapPopup.on('mouseover', _ => marker.openPopup());
     mapPopup.on('mouseout', _ => marker.closePopup());
-
-    const smallMarker = L.circleMarker(latLng, {
-      radius: 5,
-      color: this.markerColorInnerBorder,
-      weight: 2,
-      fillColor: clusterInfo.healthStatus === CLUSTER_STATUS.HEALTHY ? this.statusColorUp : this.statusColorDown,
-      fillOpacity: 0.8
-    });
-    const existingSmallMarker = getExistingMarker(this.smallMarkerLookup, latLng);
-    if (existingSmallMarker) {
-      this.map.removeLayer(existingSmallMarker);
-      this.smallMarkerLookup = without(this.smallMarkerLookup, existingSmallMarker);
-    }
-    this.smallMarkerLookup.push(smallMarker);
-    this.map.addLayer(smallMarker);
+    mapPopup.on('click', _ => this.clickMarker.emit(clusterInfo));
   }
 
   pathExists(curve) {

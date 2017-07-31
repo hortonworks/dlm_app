@@ -1,77 +1,48 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, DoCheck, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {UserService} from '../../../../services/user.service';
-import {User, UserList} from '../../../../models/user';
-import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'dp-user-management',
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss']
 })
-export class UserManagementComponent implements OnInit {
-  users: User[] = [];
-  offset = 0;
-  pageSize = 10;
-  total: number;
-  searchTerm;
-  rolesMap = new Map();
+export class UserManagementComponent implements OnInit, DoCheck {
 
-  constructor(private router: Router,
-              private route: ActivatedRoute,
-              private userService: UserService,
-              private translateService: TranslateService) {
+  views = Views;
+  currentView: Views;
+
+  constructor(private router: Router, private route: ActivatedRoute) {
   }
 
   ngOnInit() {
-    this.userService.dataChanged$.subscribe(() => {
-      this.getUsers();
-    });
-    this.getUsers();
+    this.setView();
+    this.router.navigateByUrl(this.router.url);
   }
 
-  getUsers(){
-    this.userService.getUsersWithRole(this.offset, this.pageSize, this.searchTerm).subscribe((userList: UserList) => {
-      this.users = userList.users;
-      this.total = userList.total;
-      this.users.forEach(user => {
-        let roles = [];
-        user.roles.forEach(role => {
-          roles.push(this.translateService.instant(`common.roles.${role}`));
-        });
-        this.rolesMap.set(user.id, roles.join(', '));
-      });
-    });
-  }
-
-  addUser() {
-    this.router.navigate([{outlets: {'sidebar': ['add']}}], {relativeTo: this.route});
-  }
-
-  editUser(userName) {
-    this.router.navigate([{outlets: {'sidebar': ['edit', userName]}}], {relativeTo: this.route});
-  }
-
-  onSearch(event) {
-    if (event.keyCode === 13) {
-      this.offset = 0;
-      this.getUsers();
+  onViewChange(view) {
+    this.currentView = view;
+    if (this.currentView === Views.GROUPS) {
+      this.router.navigate(['groups'], {relativeTo: this.route});
+    } else {
+      this.router.navigate(['users'], {relativeTo: this.route});
     }
   }
 
-  get start(){
-    return this.offset + 1;
+  setView() {
+    if (this.router.url.indexOf('/users') > -1 && this.currentView !== Views.USERS) {
+      this.currentView = Views.USERS;
+    } else if (this.router.url.indexOf('/groups') > -1 && this.currentView !== Views.GROUPS) {
+      this.currentView = Views.GROUPS;
+    }
   }
 
-  onPageSizeChange(pageSize){
-    this.offset = 0;
-    this.pageSize = pageSize;
-    this.getUsers();
+  ngDoCheck() {
+    this.setView();
   }
 
-  onPageChange(offset){
-    this.offset = offset - 1;
-    this.getUsers();
-  }
+}
 
+export enum Views {
+  USERS,
+  GROUPS
 }

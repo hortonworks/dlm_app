@@ -3,8 +3,9 @@ import { AppliedFilterMapped, TableFilterItem } from './table-filter-item.type';
 import { TypeaheadOption } from './typeahead-option.type';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
-import { toKeyValueArray } from '../../../utils/object-utils';
-import { capitalize } from '../../../utils/string-utils';
+import { toKeyValueArray } from 'utils/object-utils';
+import { capitalize } from 'utils/string-utils';
+import { multiLevelResolve } from 'utils/object-utils';
 
 @Component({
   selector: 'dlm-table-filter',
@@ -105,8 +106,8 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
     });
     this.data.map(record => {
       this.filterBy.forEach(filter => {
-        const val = record[filter.propertyName];
-        if (filter.values.indexOf(val) === -1) {
+        const val = multiLevelResolve(record, filter.propertyName);
+        if (val && filter.values.indexOf(val) === -1) {
           filter.values.push(val);
         }
       });
@@ -159,4 +160,8 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
     this.onFilter.emit(appliedFilters);
   }
 
+  getFilterTitle(key) {
+    const filtered = this.filterBy.filter(filter => filter.propertyName === key);
+    return filtered.length ? filtered[0].filterTitle : capitalize(key);
+  }
 }

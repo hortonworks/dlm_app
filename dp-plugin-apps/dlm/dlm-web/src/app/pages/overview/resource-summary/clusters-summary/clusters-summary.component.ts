@@ -5,7 +5,10 @@ import { CLUSTERS_HEALTH_STATE } from '../resource-summary.type';
 @Component({
   selector: 'dlm-clusters-summary',
   template: `
-    <dlm-summary-panel [title]="'page.overview.summary_panels.title.clusters' | translate" [total]="data.total">
+    <dlm-summary-panel
+      [title]="'page.overview.summary_panels.title.clusters'"
+      [total]="data.total"
+      [hint]="'page.overview.summary_panels.hint.clusters'">
       <div class="row">
         <dlm-summary-panel-cell
           class="col-md-4"
@@ -16,6 +19,7 @@ import { CLUSTERS_HEALTH_STATE } from '../resource-summary.type';
         <dlm-summary-panel-cell
           class="col-md-4"
           iconClass="fa fa-circle text-warning"
+          qe-attr="show-clusters-warnings"
           (cellClick)="selectPanelCell.emit(healthStates.WARNING)"
           [actionable]="data.warning > 0"
           [label]="'page.overview.summary_panels.status.warning' | translate"
@@ -24,6 +28,7 @@ import { CLUSTERS_HEALTH_STATE } from '../resource-summary.type';
         <dlm-summary-panel-cell
           class="col-md-4"
           iconClass="fa fa-exclamation-triangle text-danger"
+          qe-attr="show-unhealthy-clusters"
           (cellClick)="selectPanelCell.emit(healthStates.UNHEALTHY)"
           [actionable]="data.unhealthy > 0"
           [label]="'page.overview.summary_panels.status.unhealthy' | translate"

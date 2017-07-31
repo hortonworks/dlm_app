@@ -1,18 +1,21 @@
-import { Component, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewEncapsulation, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as moment from 'moment';
 
 import * as fromRoot from 'reducers/';
 import { Event } from 'models/event.model';
 import { ProgressState } from 'models/progress-state.model';
+import { updateProgressState } from 'actions/progress.action';
 import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
 import { getAllJobs } from 'selectors/job.selector';
-import { getPolicyClusterJob, getUnhealthyPolicies, getAllPoliciesWithClusters } from 'selectors/policy.selector';
+import {
+  getPolicyClusterJob, getUnhealthyPolicies, getAllPoliciesWithClusters, getCountPoliciesForSourceClusters
+} from 'selectors/policy.selector';
 import { getAllClusters, getUnhealthyClusters, getClustersWithLowCapacity } from 'selectors/cluster.selector';
 import { getDisplayedEvents } from 'selectors/event.selector';
-import { loadJobsForPolicy } from 'actions/job.action';
 import { loadClusters, loadClustersStatuses } from 'actions/cluster.action';
 import { loadPolicies, loadLastJobs } from 'actions/policy.action';
 import { getMergedProgress, getProgressState } from 'selectors/progress.selector';
@@ -26,7 +29,7 @@ import { filterCollection, flatten, unique } from 'utils/array-util';
 import { isEqual, isEmpty } from 'utils/object-utils';
 import { POLL_INTERVAL } from 'constants/api.constant';
 import { getClustersHealth, getPoliciesHealth, getJobsHealth } from 'selectors/aggregation.selector';
-import { SUMMARY_PANELS, CLUSTERS_HEALTH_STATE } from './resource-summary/';
+import { SUMMARY_PANELS, CLUSTERS_HEALTH_STATE, JOBS_HEALTH_STATE } from './resource-summary/';
 import { CLUSTER_STATUS, SERVICE_STATUS } from 'constants/status.constant';
 import { MapSizeSettings, ClusterMapData, ClusterMapPoint } from 'models/map-data';
 import { LogService } from 'services/log.service';
@@ -35,6 +38,7 @@ import { PairsCountEntity } from 'models/pairs-count-entity.model';
 import { getCountPairsForClusters } from 'selectors/pairing.selector';
 import { loadPairings } from 'actions/pairing.action';
 import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
+import { TranslateService } from '@ngx-translate/core';
 
 const POLICIES_REQUEST = 'POLICIES_REQUEST';
 const CLUSTERS_REQUEST = 'CLUSTERS_REQUEST';
@@ -48,11 +52,6 @@ const CLUSTER_STATUS_REQUEST = 'CLUSTERS_STATUS_REQUEST';
   encapsulation: ViewEncapsulation.None
 })
 export class OverviewComponent implements OnInit, OnDestroy {
-  private resourceStatusMap = {
-    // TODO where to get statuses for clusters?
-    policies: [POLICY_STATUS.RUNNING, POLICY_STATUS.SUBMITTED, POLICY_STATUS.SUSPENDED],
-    jobs: [JOB_STATUS.SUCCESS, JOB_STATUS.WARNINGS, JOB_STATUS.FAILED, JOB_STATUS.RUNNING]
-  };
   CLUSTER_STATUS = CLUSTER_STATUS;
   mapSizeSettings: MapSizeSettings = {
     width: '100%',
@@ -84,10 +83,16 @@ export class OverviewComponent implements OnInit, OnDestroy {
   lowCapacityClusters$: Observable<Cluster[]>;
   unhealthyPolicies$: Observable<Policy[]>;
   clustersMapData$: Observable<ClusterMapData[]>;
+  selectedCluster$ = new BehaviorSubject<null|Cluster>(null);
+  clusterLegend$: Observable<any>;
+
+  jobStatusFilter$ = new BehaviorSubject('');
+  areJobsLoaded = false;
 
   constructor(private store: Store<fromRoot.State>,
               private overviewJobsExternalFiltersService: OverviewJobsExternalFiltersService,
-              private logService: LogService) {
+              private logService: LogService,
+              private t: TranslateService) {
     this.events$ = store.select(getDisplayedEvents);
     this.jobs$ = store.select(getAllJobs);
     this.policies$ = store.select(getAllPoliciesWithClusters);
@@ -97,7 +102,6 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.fullfilledClusters$ = this.clusters$
       .filter(clusters => !!clusters.length)
       .distinctUntilChanged(null, clusters => clusters.map(cluster => cluster.id).join('@') + '_LENGTH' + clusters.length);
-
     this.clustersSummary$ = store.select(getClustersHealth);
     this.policiesSummary$ = store.select(getPoliciesHealth);
     this.jobsSummary$ = store.select(getJobsHealth);
@@ -122,9 +126,21 @@ export class OverviewComponent implements OnInit, OnDestroy {
           status: (policy.targetClusterResource.status || []).filter(service => service.state !== SERVICE_STATUS.STARTED)
         }
       })));
-    this.clustersMapData$ = this.fullfilledClusters$
-      .startWith([])
-      .map(clusters => clusters.map(cluster => (<ClusterMapData>{start: <ClusterMapPoint>{cluster}})));
+    this.clustersMapData$ = Observable.combineLatest(this.clusters$, store.select(getCountPoliciesForSourceClusters))
+      .startWith([[], []])
+      .map(([clusters, policiesCount]) => this.makeClustersMapData(clusters, policiesCount));
+    this.clusterLegend$ = Observable
+      .combineLatest(this.clustersMapData$, this.selectedCluster$, this.policies$)
+      .map(([clustersMapData, selectedCluster, policies]) => {
+        if (!selectedCluster) {
+          return false;
+        }
+        const cluster = clustersMapData.find(c => c.start.cluster.id === selectedCluster.id).start.cluster;
+        return {
+          ...cluster,
+          alerts: cluster.status.filter(service => service.state !== SERVICE_STATUS.STARTED)
+        };
+      });
   }
 
   mapTableData(policy: Policy) {
@@ -171,7 +187,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   }
 
   private applyJobFilter(healthStatus) {
-    // todo: apply filter logic
+    this.jobStatusFilter$.next(healthStatus);
   }
 
   private completedRequest$(progress$) {
@@ -182,6 +198,31 @@ export class OverviewComponent implements OnInit, OnDestroy {
       .filter(isInProgress => !isInProgress);
   }
 
+  private matchJobStatus(policy: Policy, jobStatusFilter) {
+    switch (jobStatusFilter) {
+      case JOBS_HEALTH_STATE.IN_PROGRESS:
+        return policy.lastJobResource.status === JOB_STATUS.RUNNING;
+      case JOBS_HEALTH_STATE.LAST_FAILED:
+        return policy.lastJobResource.status === JOB_STATUS.FAILED;
+      case JOBS_HEALTH_STATE.LAST_10_FAILED:
+        return policy.lastTenJobs.some(job => job.status === JOB_STATUS.FAILED);
+      default:
+        return true;
+    }
+  }
+
+  private makeClustersMapData(clusters, policiesCount) {
+    return clusters.map(cluster => {
+      const policiesCounter = cluster.id in policiesCount &&
+        'policies' in policiesCount[cluster.id] ? policiesCount[cluster.id].policies : 0;
+      const clusterData = {
+        ...cluster,
+        policiesCounter
+      };
+      return <ClusterMapData>{start: <ClusterMapPoint>{cluster: clusterData}};
+    });
+  }
+
   ngOnInit() {
     [
       loadPolicies(POLICIES_REQUEST),
@@ -189,26 +230,35 @@ export class OverviewComponent implements OnInit, OnDestroy {
       loadPairings()
     ].map(action => this.store.dispatch(action));
     const overallProgressSubscription = this.completedRequest$(this.overallProgress$)
-      .subscribe(_ => this.initPolling());
+      .subscribe(_ => {
+        this.initPolling();
+      });
     const clustersRequestSubscription = this.completedRequest$(this.store.select(getProgressState(CLUSTERS_REQUEST)))
       .subscribe(_ => this.store.dispatch(loadClustersStatuses(CLUSTER_STATUS_REQUEST)));
-
-    const fullFilledPolicies$ = this.policies$
-      .filter(policies => policies.length && policies.every(policy => !isEmpty(policy.sourceClusterResource)))
-      .take(1);
     const clusterPoliciesCompleteSubscription = Observable.combineLatest(
       this.completedRequest$(this.store.select(getProgressState(CLUSTERS_REQUEST))),
-      this.completedRequest$(this.store.select(getProgressState(POLICIES_REQUEST))),
-      fullFilledPolicies$
-    ).subscribe(([_, _1, policies]) => {
-      this.store.dispatch(loadLastJobs({policies, numJobs: 10}, {requestId: JOBS_REQUEST}));
+      this.completedRequest$(this.store.select(getProgressState(POLICIES_REQUEST)))
+    ).switchMap(_ => this.policies$)
+      .subscribe(policies => {
+        if (this.areJobsLoaded) {
+          return;
+        }
+        if (!policies.length) {
+          this.areJobsLoaded = true;
+          this.store.dispatch(updateProgressState(JOBS_REQUEST, { isInProgress: false }));
+        } else {
+          if (policies.some(policy => !isEmpty(policy.sourceClusterResource))) {
+            this.areJobsLoaded = true;
+            this.store.dispatch(loadLastJobs({policies, numJobs: 10}, {requestId: JOBS_REQUEST}));
+          }
+        }
     });
     this.tableData$ = Observable
-      .combineLatest(this.tableResources$, this.overviewJobsExternalFiltersService.filters$)
-      .map(([policies, filters]) => policies
-        .filter(policy => policy.jobsResource.some(job => job.status !== JOB_STATUS.SUCCESS))
-        .filter(policy => this.filterPolicyByJob(policy, filters))
-        .map(policy => this.mapTableData(policy)));
+      .combineLatest(this.tableResources$, this.jobStatusFilter$)
+      .map(([policies, jobStatusFilter]) => policies
+      .filter(policy => policy.jobsResource.some(job => job.status !== JOB_STATUS.SUCCESS) &&
+        this.matchJobStatus(policy, jobStatusFilter))
+      .map(policy => this.mapTableData(policy)));
 
     this.subscriptions.push(overallProgressSubscription);
     this.subscriptions.push(clustersRequestSubscription);
@@ -242,9 +292,25 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.isUnhealthyPoliciesModalVisible = false;
   }
 
-  handleOnShowJobLog(job) {
-    if (job.status !== JOB_STATUS.RUNNING) {
-      this.logService.showLog(EntityType.policyinstance, job.id);
+  handleOnShowPolicyLog(policy) {
+    if (policy.lastJobResource.status !== JOB_STATUS.RUNNING) {
+      this.logService.showLog(EntityType.policyinstance, policy.lastJobResource.id);
     }
+  }
+
+  formatStatusFilter(jobStatusFilter) {
+    return {
+      [JOBS_HEALTH_STATE.IN_PROGRESS]: this.t.instant('page.overview.summary_panels.status.in_progress'),
+      [JOBS_HEALTH_STATE.LAST_FAILED]: this.t.instant('page.overview.summary_panels.status.failed_last'),
+      [JOBS_HEALTH_STATE.LAST_10_FAILED]: this.t.instant('page.overview.summary_panels.status.failed_last_10')
+    }[jobStatusFilter];
+  }
+
+  removeJobStatusFilter() {
+    this.applyJobFilter('');
+  }
+
+  handleClickMarker(cluster: Cluster) {
+    this.selectedCluster$.next(cluster);
   }
 }

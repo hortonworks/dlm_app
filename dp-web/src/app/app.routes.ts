@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 
 import { SignInComponent } from './views/sign-in/sign-in.component';
 
-import { UnsecuredRouteGuard, SecuredRouteGuard, DoCleanUpAndRedirectGuard } from './shared/utils/auth-guard';
+import { UnsecuredRouteGuard, DoCleanUpAndRedirectGuard } from './shared/utils/auth-guard';
 import { LandingPageGuard } from './shared/utils/landing-page-guard';
 import { NotFoundRouteComponent } from './views/not-found-route/not-found-route.component';
 import {NavigationGuard} from './shared/utils/navigation-guard';
@@ -55,5 +55,6 @@ export const routes: Routes = [{
   }, {
     path: '**',
     component: NotFoundRouteComponent
-  },
+  }
+
 ];

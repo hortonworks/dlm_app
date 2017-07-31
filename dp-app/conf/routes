@@ -79,15 +79,25 @@ GET           /api/users/ldapsearch                                  controllers
 
 
 #User Management
-POST          /api/users/registerAdmin                               controllers.UserManager.addSuperAdminUser
-POST          /api/users/registerAdmins                              controllers.UserManager.addSuperAdminUsers
-POST          /api/users/updateActiveAndRoles                        controllers.UserManager.adminUpdateUserRolesAndStatus
-POST          /api/users/addUserWithRoles                            controllers.UserManager.addUserWithRoles
-POST          /api/users/addUsersWithRoles                           controllers.UserManager.addUsersWithRoles
-GET           /api/users/withRoles                                   controllers.UserManager.listUsersWithRoles
-GET           /api/users                                             controllers.UserManager.listUsers
-GET           /api/users/detail                                      controllers.UserManager.getUserDetail
-GET           /api/roles                                             controllers.UserManager.getAllRoles
+
+POST          /api/users/registerAdmin                         controllers.UserManager.addSuperAdminUser
+POST          /api/users/registerAdmins                        controllers.UserManager.addSuperAdminUsers
+POST          /api/users/updateActiveAndRoles                  controllers.UserManager.adminUpdateUserRolesAndStatus
+POST          /api/users/addUserWithRoles                      controllers.UserManager.addUserWithRoles
+POST          /api/users/addUsersWithRoles                     controllers.UserManager.addUsersWithRoles
+GET           /api/users/withRoles                             controllers.UserManager.listUsersWithRoles
+GET           /api/users                                       controllers.UserManager.listUsers
+GET           /api/users/detail                                controllers.UserManager.getUserDetail
+GET           /api/roles                                       controllers.UserManager.getAllRoles
+GET           /api/userGroups                                  controllers.UserManager.getUserGroupsFromLdap
+
+#Group Management
+GET           /api/groups/:name                                controllers.GroupManager.getGroupsByName(name:String)
+GET           /api/groups                                      controllers.GroupManager.getGroups
+POST          /api/groups/admin                                controllers.GroupManager.addAdminGroups
+POST          /api/groups/add                                  controllers.GroupManager.addGroupsWithRoles
+POST          /api/groups/update                               controllers.GroupManager.updateGroupInfo
+
 
 #Workspace API
 GET           /api/workspaces                                        controllers.Workspaces.list

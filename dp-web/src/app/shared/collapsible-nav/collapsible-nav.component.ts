@@ -56,21 +56,24 @@ export class CollapsibleNavComponent implements OnInit, OnChanges {
 
   findPersonaAndTabName(url: string, exactMatch: boolean): boolean {
     for (let persona of this.headerData.personas) {
-      for (let tab of persona.tabs) {
+      for (let i = 0; i< persona.tabs.length; i++) {
+        let tab = persona.tabs[i];
         if (tab.URL && tab.URL.length > 0 &&
           ((exactMatch && url == '/' + tab.URL) || (!exactMatch && url.startsWith('/' + tab.URL)))) {
           this.activePersona = persona;
           this.activePersonaName = persona.name;
           this.activePersonaImageName = persona.imageName;
           this.activeTabName = tab.tabName;
-
           this.collapsibleNavService.setTabs(persona.tabs, tab);
 
           if (exactMatch) {
             this.collapsibleNavService.collpaseSideNav.next(tab.collapseSideNav || this.collapseSideNav);
           }
+          if(i === persona.tabs.length - 1 && !exactMatch){
+            this.collapsibleNavService.collpaseSideNav.next(tab.collapseSideNav || this.collapseSideNav)
+            return true;
+          }
 
-          return true;
         }
       }
     }

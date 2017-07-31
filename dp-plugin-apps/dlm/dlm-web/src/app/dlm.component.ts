@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation, isDevMode } from '@angular/core';
 import { MenuItem } from './common/navbar/menu-item';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers/index';
@@ -32,7 +32,7 @@ const POLL_NEW_EVENTS_ID = 'POLL_NEW_EVENTS_ID';
 export class DlmComponent implements OnDestroy, OnInit {
   header: MenuItem;
   menuItems: MenuItem[];
-  mainContentSelector = '#dlm_content';
+  mainContentSelector = '#dlm_main_content';
   fitHeight = true;
   events$: Observable<Event[]>;
   newEventsCount$: Observable<number>;
@@ -80,34 +80,40 @@ export class DlmComponent implements OnDestroy, OnInit {
     this.header = new MenuItem(
       t.instant('sidenav.menuItem.header'),
       './overview',
-      ''
+      '',
+      'header-icon'
     );
     this.header.iconHtml = '<i class="fa fa-gg" aria-hidden="true"></i>';
     this.menuItems = [
       new MenuItem(
         t.instant('sidenav.menuItem.overview'),
         './overview',
-        'navigation-icon glyphicon glyphicon-home'
+        'navigation-icon glyphicon glyphicon-home',
+        'go-to-overview'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.clusters'),
         './clusters',
-        'navigation-icon glyphicon glyphicon-globe'
+        'navigation-icon glyphicon glyphicon-globe',
+        'go-to-clusters'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.pairings'),
         './pairings',
-        'navigation-icon glyphicon glyphicon-resize-horizontal'
+        'navigation-icon glyphicon glyphicon-resize-horizontal',
+        'go-to-pairings'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.policies'),
         './policies',
-        'navigation-icon glyphicon glyphicon-list-alt'
+        'navigation-icon glyphicon glyphicon-list-alt',
+        'go-to-policies'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.help'),
         './help',
-        'navigation-icon glyphicon glyphicon-info-sign'
+        'navigation-icon glyphicon glyphicon-info-sign',
+        'go-to-help'
       )
     ];
     this.events$ = store.select(getAllEvents);
@@ -152,8 +158,10 @@ export class DlmComponent implements OnDestroy, OnInit {
       if (user && user.id) {
         this.user = user;
       } else {
-        // Log the user out of DLM
-        this.userService.logoutUser();
+        if (!isDevMode()) {
+          // Log the user out of DLM
+          this.userService.logoutUser();
+        }
       }
     });
   }
