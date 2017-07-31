@@ -9,6 +9,10 @@
 <dlm-icon-column [showHexagon]="false" [showValue]="true"></dlm-icon-column>
 <dlm-status-column [showText]="false"></dlm-status-column>
 
+<ng-template #clusterNameCellRef let-name="value">
+  <span [tooltip]="getDatacenterName(name)">{{getClusterName(name)}}</span>
+</ng-template>
+
 <ng-template #statusCellTemplate let-policy="row">
   <dlm-job-status
     qe-attr="show-log"
