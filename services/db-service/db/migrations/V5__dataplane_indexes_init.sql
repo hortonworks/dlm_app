@@ -24,3 +24,7 @@ CREATE INDEX IF NOT EXISTS idx_dp_locations on dataplane.locations(city);
 
  -- data-assets
  CREATE INDEX IF NOT EXISTS idx_dp_data_asset_guid on dataplane.data_asset(guid);
+
+ --user-groups
+ CREATE INDEX IF NOT EXISTS idx_dp_user_groups_user_id on dataplane.user_groups(user_id);
+ CREATE INDEX IF NOT EXISTS idx_dp_user_groups_group_id on dataplane.user_groups(group_id);

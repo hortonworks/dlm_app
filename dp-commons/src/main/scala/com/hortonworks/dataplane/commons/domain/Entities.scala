@@ -451,6 +451,10 @@ object JsonFormatters {
   implicit val usersListWrites = Json.writes[UsersList]
   implicit  val usersListReads = Json.reads[UsersList]
 
+
+  implicit val groupReads = Json.reads[Group]
+  implicit val groupWrites = Json.writes[Group]
+
   implicit val groupInfoReads = Json.reads[GroupInfo]
   implicit val groupInfoWrites = Json.writes[GroupInfo]
 

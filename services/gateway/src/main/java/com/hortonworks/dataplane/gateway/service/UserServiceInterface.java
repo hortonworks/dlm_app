@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @FeignClient("dpdb")
 public interface UserServiceInterface {
-  @RequestMapping(method = RequestMethod.GET, value = "/users/usercontext/{username}")
+  @RequestMapping(method = RequestMethod.GET, value = "/users/{username}/usercontext")
   UserList getUserContext(@PathVariable("username") String userName);
 
 }

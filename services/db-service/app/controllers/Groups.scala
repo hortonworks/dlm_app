@@ -26,6 +26,11 @@ class Groups @Inject()(groupsRepo: GroupsRepo, rolesUtil: RolesUtil)(
       }
       .recoverWith(apiError)
   }
+  def getAllActiveGroups()=Action.async{request =>
+   groupsRepo.getAllActiveGroups().map{groups=>
+     success(groups)
+   }.recoverWith(apiError)
+  }
 
   def insertWithRoles = Action.async(parse.json) { req =>
     req.body

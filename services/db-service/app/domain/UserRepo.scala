@@ -234,7 +234,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
       roles <- roleRepo.Roles
       groupRoles<- groupsRepo.GroupsRoles
       groups<-groupsRepo.Groups if groups.active === true
-      userGroups <- UserGroups if userGroups.userId === user.id if groupRoles.roleId===roles.id
+      userGroups <- UserGroups if userGroups.userId === user.id if groupRoles.roleId===roles.id if groups.id===groupRoles.groupId
     } yield (roles.roleName)
   }
 

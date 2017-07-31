@@ -39,30 +39,28 @@ class LdapService @Inject()(
             Future.successful(
               Left(Errors(Seq(Error("400", "invalid knox configuration")))))
           } else {
-            validateBindDn(knoxConf).flatMap { res =>
-              res match {
-                case Left(errors) => Future.successful(Left(errors))
-                case Right(isBound) => {
-                  ldapKeyStore.createCredentialEntry(
-                    knoxConf.bindDn.get,
-                    knoxConf.password.get) match {
-                    case Left(errors) => Future.successful(Left(errors))
-                    case Right(isCreated) => {
-                      val ldapConfiguration =
-                        LdapConfiguration(id=knoxConf.id,
-                          ldapUrl=knoxConf.ldapUrl,
-                          bindDn=knoxConf.bindDn,
-                          userSearchBase=knoxConf.userSearchBase,
-                          userSearchAttributeName=knoxConf.userSearchAttributeName,
-                          groupSearchBase=knoxConf.groupSearchBase,
-                          groupSearchAttributeName=knoxConf.groupSearchAttributeName,
-                          groupObjectClass=knoxConf.groupObjectClass,
-                          groupMemberAttributeName=knoxConf.groupMemberAttributeName
-                        )
-                      ldapConfigService.create(ldapConfiguration).map {
-                        case Left(errors) => Left(errors)
-                        case Right(createdLdapConfig) => Right(true)
-                      }
+            validateBindDn(knoxConf).flatMap {
+              case Left(errors) => Future.successful(Left(errors))
+              case Right(isBound) => {
+                ldapKeyStore.createCredentialEntry(
+                  knoxConf.bindDn.get,
+                  knoxConf.password.get) match {
+                  case Left(errors) => Future.successful(Left(errors))
+                  case Right(isCreated) => {
+                    val ldapConfiguration =
+                      LdapConfiguration(id = knoxConf.id,
+                        ldapUrl = knoxConf.ldapUrl,
+                        bindDn = knoxConf.bindDn,
+                        userSearchBase = knoxConf.userSearchBase,
+                        userSearchAttributeName = knoxConf.userSearchAttributeName,
+                        groupSearchBase = knoxConf.groupSearchBase,
+                        groupSearchAttributeName = knoxConf.groupSearchAttributeName,
+                        groupObjectClass = knoxConf.groupObjectClass,
+                        groupMemberAttributeName = knoxConf.groupMemberAttributeName
+                      )
+                    ldapConfigService.create(ldapConfiguration).map {
+                      case Left(errors) => Left(errors)
+                      case Right(createdLdapConfig) => Right(true)
                     }
                   }
                 }
@@ -227,40 +225,59 @@ class LdapService @Inject()(
                       ldapConfs: Seq[LdapConfiguration],userName:String):
   Future[Either[Errors, LdapUser]]={
     var ldapConf=ldapConfs.head
-    val groupSearchBase=ldapConf.groupSearchBase
-    if (groupSearchBase.isEmpty || ldapConf.groupObjectClass.isEmpty ||ldapConf.groupMemberAttributeName.isEmpty ){
-      Future.successful(Left(Errors(Seq(Error("Exception", "Group search base,groupObjectClass and groupmemberAttributeName must be configured")))))
-    }else{
-      search(userName,Some("user"),fuzzyMatch = false).map{
-        case Left(errors)=>Left(errors)
-        case Right(userSearchResults)=>{
-          userSearchResults.headOption match {
-            case None=>Left(Errors(Seq(Error("No user", "There is no such user"))))
-            case Some(userRes)=>{
-              val groupSearchControls = new SearchControls
-              groupSearchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
-              val groupObjectClass=ldapConf.groupObjectClass.get;//ex "groupofnames"
-              val groupMemberAttributeName=ldapConf.groupMemberAttributeName.get;//ex "member"
-              val extendedGroupSearchFilter = s"(objectclass= $groupObjectClass)"
-              var groupSearchFilter=s"(&$extendedGroupSearchFilter($groupMemberAttributeName={0}))"
-              val userArr=List(userRes.nameInNameSpace).toArray[Object]
-              val res: NamingEnumeration[SearchResult]=dirContext.search(groupSearchBase.get,groupSearchFilter,userArr,groupSearchControls)
-              var groupAttributeLen=ldapConfs.head.groupSearchAttributeName.get.length+1
-              val ldapGroups: ArrayBuffer[LdapGroup]=new ArrayBuffer
-              while (res.hasMore) {
-                val sr: SearchResult = res.next()
-                val ldaprs = LdapGroup(
-                  sr.getName.substring(groupAttributeLen),
-                  sr.getClassName,
-                  sr.getNameInNamespace)
-                ldapGroups += ldaprs
+    validateGroupSettings(ldapConf) match {
+      case Some(errors)=>Future.successful(Left(errors))
+      case _ =>{
+        val groupSearchBase=ldapConf.groupSearchBase
+        search(userName,Some("user"),fuzzyMatch = false).map{
+          case Left(errors)=>Left(errors)
+          case Right(userSearchResults)=>{
+            userSearchResults.headOption match {
+              case None=>Left(Errors(Seq(Error("No user", "There is no such user"))))
+              case Some(userRes)=>{
+                val groupSearchControls = new SearchControls
+                groupSearchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
+                val groupObjectClass=ldapConf.groupObjectClass.get;//ex "groupofnames"
+                val groupMemberAttributeName=ldapConf.groupMemberAttributeName.get;//ex "member"
+                val extendedGroupSearchFilter = s"(objectclass= $groupObjectClass)"
+                var groupSearchFilter=s"(&$extendedGroupSearchFilter($groupMemberAttributeName={0}))"
+                val userArr=List(userRes.nameInNameSpace).toArray[Object]
+                val res: NamingEnumeration[SearchResult]=dirContext.search(groupSearchBase.get,groupSearchFilter,userArr,groupSearchControls)
+                var groupAttributeLen=ldapConfs.head.groupSearchAttributeName.get.length+1
+                val ldapGroups: ArrayBuffer[LdapGroup]=new ArrayBuffer
+                while (res.hasMore) {
+                  val sr: SearchResult = res.next()
+                  val ldaprs = LdapGroup(
+                    sr.getName.substring(groupAttributeLen),
+                    sr.getClassName,
+                    sr.getNameInNamespace)
+                  ldapGroups += ldaprs
+                }
+                val ldapUser=LdapUser(userRes.name,userRes.className,userRes.nameInNameSpace,ldapGroups)
+                Right(ldapUser)
               }
-              val ldapUser=LdapUser(userRes.name,userRes.className,userRes.nameInNameSpace,ldapGroups)
-              Right(ldapUser)
             }
           }
         }
       }
+    }
+  }
+
+  private def validateGroupSettings(ldapConf: LdapConfiguration):Option[Errors] = {
+    if (ldapConf.groupSearchBase.isEmpty || ldapConf.groupObjectClass.isEmpty || ldapConf.groupMemberAttributeName.isEmpty)
+      None
+    else{
+      val errors=ArrayBuffer.empty[Error]
+      if (ldapConf.groupSearchBase.isEmpty){
+        errors+=Error("Exception","Group Search base not configured")
+      }
+      if (ldapConf.groupObjectClass.isEmpty){
+        errors+=Error("Exception","Group Search base not configured")
+      }
+      if (ldapConf.groupMemberAttributeName.isEmpty){
+        errors+=Error("Exception","Group Member AttributeName not configured")
+      }
+      Some(Errors(errors.seq))
     }
   }
 

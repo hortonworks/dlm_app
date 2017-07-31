@@ -10,22 +10,33 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class GroupServiceImpl(config: Config)(implicit ws: WSClient) extends GroupService {
-
+  import com.hortonworks.dataplane.commons.domain.JsonFormatters._
   def getGroups(offset: Option[String], pageSize: Option[String], searchTerm: Option[String]): Future[Either[Errors, GroupsList]] = {
     ws.url(s"$url/groups")
       .withQueryString("offset" -> offset.getOrElse("0"), "pageSize" -> pageSize.getOrElse("10"), "searchTerm" -> searchTerm.getOrElse(""))
       .withHeaders("Accept" -> "application/json")
       .get()
       .map { res =>
-        mapToGroups(res)
+        mapToGroupInfos(res)
       }
   }
+  def getAllActiveGroups() : Future[Either[Errors,Seq[Group]]]={
+    ws.url(s"$url/groups/active")
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(res=>
+        mapToGroups(res))
 
-  import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-
-  private def mapToGroups(res: WSResponse) = {
+ }
+  private def mapToGroupInfos(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").validate[GroupsList].get)
+      case _ => mapErrors(res)
+    }
+  }
+  private def mapToGroups(res: WSResponse) = {
+    res.status match {
+      case 200 => Right((res.json \ "results").validate[Seq[Group]].get)
       case _ => mapErrors(res)
     }
   }

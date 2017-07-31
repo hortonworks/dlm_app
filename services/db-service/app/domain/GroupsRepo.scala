@@ -25,6 +25,9 @@ class GroupsRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     Groups.to[List].result
   }
 
+  def getAllActiveGroups(): Future[List[Group]] = db.run {
+    Groups.filter(_.active===true).to[List].result
+  }
 
   def allWithRoles(offset: Long = 0, pageSize: Long = 10, searchTerm: Option[String]): Future[GroupsList] = {
     val query = searchTerm match {

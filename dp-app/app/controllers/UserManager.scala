@@ -165,7 +165,8 @@ class UserManager @Inject()(val ldapService: LdapService,
   def createUserFromLdapGroupsConfiguration()=Action.async { req =>
     val userNameOpt: Option[String] = req.getQueryString("userName")
     if (userNameOpt.isEmpty) {
-      Future.successful(BadRequest)
+      logger.error("userName is not specified")
+      Future.successful(BadRequest("userName not specified"))
     } else {
       createUserWithLdapGroups(userNameOpt.get).flatMap{
         case Left(errors)=>Future.successful(handleErrors(errors))
@@ -202,10 +203,10 @@ class UserManager @Inject()(val ldapService: LdapService,
     }
   }
 
-  private def getMatchingGroupsFromLdapAndDb(userName: String):Future[Either[Errors,Seq[Entities.GroupInfo]]] = {
+  private def getMatchingGroupsFromLdapAndDb(userName: String):Future[Either[Errors,Seq[Entities.Group]]] = {
     for {
       ldapUser <- ldapService.getUserGroups(userName)
-      dbGroups <- groupService.getGroups(None, None, None)
+      dbGroups <- groupService.getAllActiveGroups()
     } yield {
       ldapUser match {
         case Left(errors) => Left(errors)
@@ -214,7 +215,7 @@ class UserManager @Inject()(val ldapService: LdapService,
           dbGroups match {
             case Left(errors) => Left(errors)
             case Right(dbGrps) => {
-              val filteredGroups=dbGrps.groups.filter(res => ldapGroupNames.contains(res.groupName))
+              val filteredGroups=dbGrps.filter(res => ldapGroupNames.contains(res.groupName))
               Right(filteredGroups)
             }
           }

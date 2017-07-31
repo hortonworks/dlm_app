@@ -11,7 +11,7 @@ GET           /users                                                         con
 POST          /users/withroles                                               controllers.Users.insertWithRoles
 POST          /users/updateActiveAndRoles                                    controllers.Users.updateActiveAndRoles
 POST          /users/withgroups                                              controllers.Users.insertWithGroups
-GET           /users/usercontext/:username                                   controllers.Users.getUserContext(username:String)
+GET           /users/:username/usercontext                                   controllers.Users.getUserContext(username:String)
 POST          /users                                                         controllers.Users.insert
 POST          /users/role                                                    controllers.Users.addUserRole
 GET           /users/role/:username                                          controllers.Users.getRolesForUser(username)
@@ -19,6 +19,7 @@ GET           /users/all                                                     con
 GET           /users/:userId                                                 controllers.Users.load(userId:Long)
 
 GET           /groups                                                        controllers.Groups.getGroups
+GET           /groups/active                                                 controllers.Groups.getAllActiveGroups
 POST          /groups/withroles                                              controllers.Groups.insertWithRoles
 POST          /groups/update                                                 controllers.Groups.updateGroupInfo
 GET           /groups/roles                                                  controllers.Groups.getRoles

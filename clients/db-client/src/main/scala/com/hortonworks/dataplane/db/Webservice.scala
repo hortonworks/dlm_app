@@ -67,6 +67,8 @@ object Webservice {
 
     def getGroups(offset: Option[String], pageSize: Option[String], searchTerm: Option[String]): Future[Either[Errors, GroupsList]]
 
+    def getAllActiveGroups(): Future[Either[Errors,Seq[Group]]]
+
     def addGroupWithRoles(groupInfo: GroupInfo): Future[Either[Errors,GroupInfo]]
 
     def updateGroupInfo(groupInfo: GroupInfo): Future[Either[Errors,Boolean]]
