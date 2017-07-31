@@ -18,9 +18,10 @@ import {UserManagementComponent} from './views/user-management/user-management.c
 import {DropdownModule} from '../../shared/dropdown/dropdown.module';
 import {AddUserComponent} from './views/user-management/add-user/add-user.component';
 import {PaginationModule} from '../../shared/pagination/pagination.module';
-import { UsersComponent } from './views/user-management/users/users.component';
-import { GroupsComponent } from './views/user-management/groups/groups.component';
+import {UsersComponent} from './views/user-management/users/users.component';
+import {GroupsComponent} from './views/user-management/groups/groups.component';
 import {AddGroupComponent} from './views/user-management/add-group/add-group.component';
+import {ConfigDialogComponent} from './widgets/config-dialog/config-dialog.component';
 
 @NgModule({
   imports: [
@@ -46,7 +47,8 @@ import {AddGroupComponent} from './views/user-management/add-group/add-group.com
     AddUserComponent,
     UsersComponent,
     GroupsComponent,
-    AddGroupComponent
+    AddGroupComponent,
+    ConfigDialogComponent
   ]
 })
 export class InfraModule {
