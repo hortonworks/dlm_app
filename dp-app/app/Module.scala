@@ -91,6 +91,14 @@ class Module extends AbstractModule {
     new AtlasServiceImpl(configuration.underlying)
   }
 
+  @Provides
+  @Singleton
+  @Named("rangerService")
+  def provideRangerService(implicit ws: WSClient, configuration: Configuration): com.hortonworks.dataplane.cs.Webservice.RangerService = {
+    implicit val wSClient = ClusterWsClient(ws)
+    new RangerServiceImpl(configuration.underlying)
+  }
+
 
   @Provides
   @Singleton
