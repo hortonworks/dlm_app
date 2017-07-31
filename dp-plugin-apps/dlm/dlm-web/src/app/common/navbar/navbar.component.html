@@ -15,7 +15,7 @@
               <div class="btn-group">
               <div aria-haspopup="true" aria-expanded="false">
                 <span class="ambari-header" style="font-size: 15px; padding: 0">{{header.label}}</span>
-                <span *ngIf="personas.length > 0" class="toggle-icon fa fa-chevron-down"></span>
+                <span *ngIf="personas.length > 0" class="toggle-icon-down fa fa-chevron-down"></span>
               </div>
             </div>
             </div>
@@ -36,7 +36,7 @@
             <a href="#" data-toggle="collapse-sub-menu">
               <span [ngClass]="item.iconClasses"></span>
               <span class="navigation-menu-item">{{item.label}}</span>
-              <span class="toggle-icon glyphicon glyphicon-menu-down pull-right"></span>
+              <span class="toggle-icon fa fa-chevron-down pull-right"></span>
             </a>
             <ul class="sub-menu nav nav-pills nav-stacked">
               <li *ngFor="let subItem of item.subMenu"
