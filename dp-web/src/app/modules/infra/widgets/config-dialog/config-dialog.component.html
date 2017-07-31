@@ -1,10 +1,10 @@
-<dialog id="dialog" class="mdl-dialog">
-  <div class="dialog-title">
+<dialog id="dialog" class="mdl-dialog" [ngClass]="{'mdl-dialog-large': requestKnoxURL}">
+  <div class="dialog-title hwx-subtitle">
     <i class="fa fa-cogs"></i>
-    Additional Config
+    {{("pages.infra.labels.additionalConfigs" | translate).toUpperCase()}}
   </div>
   <div class="dialog-container">
-    <div class="hwx-desc">Please provide these additional configurations required by Dataplane to discover the cluster information</div>
+    <div class="hwx-desc">{{"pages.infra.description.additionalConfigs" | translate}}</div>
     <div *ngIf="showError">
       <div class="error-notification-bar">
         <i class="fa fa-times-circle pull-left"></i>
@@ -16,24 +16,24 @@
       <div *ngIf="requestAmbariCreds">
         <div class="form-group">
           <label class="required">{{"pages.infra.labels.ambariUsername" | translate}}</label>
-          <input required class="dp-input" style="width: 330px" name="username" type="text" [(ngModel)]="clusterDetailsRequest.ambariUser"/>
+          <input required class="dp-input" name="username" type="text" [(ngModel)]="clusterDetailsRequest.ambariUser"/>
         </div>
         <div class="form-group">
           <label class="required">{{"pages.infra.labels.ambariPassword" | translate}}</label>
-          <input required class="dp-input" style="width: 330px" name="password" type="password" [(ngModel)]="clusterDetailsRequest.ambariPass"/>
+          <input required class="dp-input" name="password" type="password" [(ngModel)]="clusterDetailsRequest.ambariPass"/>
         </div>
       </div>
       <div *ngIf="requestKnoxURL">
         <div class="form-group">
           <label class="required">{{"pages.infra.labels.knoxUrl" | translate}}</label>
-          <div class="hwx-inline-desc">Url of Knox running in Ambari managed cluster</div>
-          <input required class="dp-input" style="width: 330px" name="knox-url" type="text" [(ngModel)]="clusterDetailsRequest.knoxUrl"/>
+          <div class="hwx-inline-desc">{{"pages.infra.description.knoxUrl" | translate}}</div>
+          <input required class="dp-input-url" name="knox-url" type="text" [(ngModel)]="clusterDetailsRequest.knoxTopology"/>
         </div>
       </div>
     </form>
     <div class="actions">
-      <button type="button" (click)="save()" class="mdl-button btn-hwx-primary">OK</button>
-      <button type="button" (click)="cancel()" class="mdl-button btn-hwx-primary">Cancel</button>
+      <button type="button" (click)="save()" class="mdl-button btn-hwx-primary">{{"common.save" | translate}}</button>
+      <button type="button" (click)="cancel()" class="mdl-button btn-hwx-secondary">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 

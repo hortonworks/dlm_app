@@ -28,7 +28,6 @@
     "name" : "Name",
     "moreLink" : "Learn More",
     "save": "SAVE",
-    "cancel" : "Cancel",
     "failed" : "Failed",
     "defaultRequiredFields": "Please fill in mandatory fields marked with '*'",
     "sidenav" : {
@@ -131,7 +130,8 @@
         "roles": "Roles",
         "usernameorgroup": "Username/Group",
         "active": "Active",
-        "inactive": "Inactive"
+        "inactive": "Inactive",
+        "additionalConfigs": "Additional Configs"
       },
       "description" :{
         "addCluster" : "Please add Ambari managed cluster to Dataplane. Dataplane will auto-discover cluster information such as the cluster name, active services & important metrics running.",
@@ -147,7 +147,9 @@
           "ambariServerDown": "Check if the Ambari server is up and running in the given url",
           "insufficientAccessRights": "Make sure that you have right access rights to the ambari server"
         },
-        "userManagement": "You can manage the users or groups added to Dataplane through User Management. This page is available for the Dataplane Adminsitrator. You can add new users or groups and assign them roles by clicking on ADD USER or ADD GROUP button. To activate/deactivate to edit their roles, click on the username in the list below or click on the menu icon on the displayed rows."
+        "userManagement": "You can manage the users or groups added to Dataplane through User Management. This page is available for the Dataplane Adminsitrator. You can add new users or groups and assign them roles by clicking on ADD USER or ADD GROUP button. To activate/deactivate to edit their roles, click on the username in the list below or click on the menu icon on the displayed rows.",
+        "additionalConfigs":"Please provide these additional configurations required by Dataplane to discover the cluster information",
+        "knoxUrl": "Url of Knox running in Ambari managed cluster"
       }
     },
     "dataset" : {

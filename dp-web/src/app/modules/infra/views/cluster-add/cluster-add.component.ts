@@ -129,8 +129,8 @@ export class ClusterAddComponent implements OnInit {
 
   getConfigs(detailRequest: any) {
     detailRequest.url = this.cluster.ambariurl;
+    detailRequest.knoxUrl = this._clusterState.knoxUrl;
     detailRequest.knoxDetected = this._clusterState.knoxDetected;
-    console.log(detailRequest);
     this.requestClusterInfo(detailRequest, this.cluster.ambariurl);
     this.removeValidationError();
     this.closeConfig();
