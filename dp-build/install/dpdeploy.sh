@@ -16,6 +16,10 @@ fi
 KNOX_CONTAINER="knox"
 CONSUL_CONTAINER="dp-consul-server"
 
+log() {
+	echo $@
+}
+
 init_network() {
     IS_NETWORK_PRESENT="false"
     docker network inspect --format "{{title .ID}}" dp >> install.log 2>&1 && IS_NETWORK_PRESENT="true"
@@ -32,9 +36,37 @@ init_network() {
     fi
 }
 
+get_bind_address_from_consul_container() {
+    CONSUL_ID=$(docker ps --all --quiet --filter "name=$CONSUL_CONTAINER")
+    if [ -z ${CONSUL_ID} ]; then
+        return 0
+    fi
+    CONSUL_ARGS=$(docker inspect -f {{.Args}} ${CONSUL_ID})
+    for word in $CONSUL_ARGS; do
+        if [[ $word == -bind* ]]
+        then
+            BIND_ADDR=${word##*=}
+        fi
+    done
+    export CONSUL_HOST=${BIND_ADDR};
+ }
+
 init_consul(){
     echo "Initializing Consul"
+    read_consul_host
     source $(pwd)/docker-consul.sh
+}
+
+read_consul_host(){
+    if [ -z "${CONSUL_HOST}" ]; then
+        get_bind_address_from_consul_container
+    fi
+    if [ -z "${CONSUL_HOST}" ]; then
+        echo "Enter the Host IP Address (Consul will bind to this host):"
+        read HOST_IP;
+        export CONSUL_HOST=$HOST_IP;
+    fi
+    echo "using CONSUL_HOST: ${CONSUL_HOST}"
 }
 
 init_db() {
@@ -85,6 +117,7 @@ destroy_knox() {
 
 init_app() {
     echo "Initializing app"
+    read_consul_host
 
     if [ "$USE_EXT_DB" == "no" ]; then
         echo "Starting Database (Postgres)"
@@ -104,9 +137,39 @@ init_app() {
     source $(pwd)/docker-app.sh
 }
 
+read_master_password() {
+    echo "Enter Knox master password: "
+    read -s MASTER_PASSWD
+    echo "Reenter password: "
+    read -s MASTER_PASSWD_VERIFY
+    if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
+    then
+       echo "Password did not match. Reenter password:"
+       read -s MASTER_PASSWD_VERIFY
+       if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
+       then
+        echo "Password did not match"
+        exit 1
+       fi
+    fi
+    export MASTER_PASSWORD="$MASTER_PASSWD"
+}
+
+read_use_test_ldap() {
+    echo "Use pre-packaged LDAP instance (suitable only for testing) [yes/no]: "
+    read USE_TEST_LDAP
+    export USE_TEST_LDAP
+}
+
 init_knox() {
     echo "Initializing Knox"
     init_consul
+    if [ "$MASTER_PASSWORD" == "" ]; then
+        read_master_password
+    fi
+    if [ "$USE_TEST_LDAP" == "" ];then
+        read_use_test_ldap
+    fi
     
     echo "Starting Knox"
     source $(pwd)/docker-knox.sh
