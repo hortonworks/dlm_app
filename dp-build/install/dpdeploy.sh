@@ -242,11 +242,15 @@ stop_knox() {
 
 load_images() {
     LIB_DIR=../lib
-    for imgFileName in $LIB_DIR/*.tar; do
-        echo "Loading $imgFileName"
-        docker load --input $imgFileName
-    done
-    echo "All done!"
+    if [ -d "$LIB_DIR" ]; then
+        for imgFileName in $LIB_DIR/*.tar; do
+            echo "Loading $imgFileName"
+            docker load --input $imgFileName
+        done
+        echo "All done!"
+    else
+        echo "$LIB_DIR directory does not exist."
+    fi
 }
 
 print_version() {
