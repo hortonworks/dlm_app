@@ -27,7 +27,7 @@
         <div class="form-group">
           <label class="required">{{"pages.infra.labels.knoxUrl" | translate}}</label>
           <div class="hwx-inline-desc">{{"pages.infra.description.knoxUrl" | translate}}</div>
-          <input required class="dp-input-url" name="knox-url" type="text" [(ngModel)]="clusterDetailsRequest.knoxTopology"/>
+          <input required class="dp-input-url" name="knox-url" type="text" placeholder="https://hostname:8443/" [(ngModel)]="clusterDetailsRequest.knoxTopology"/>
         </div>
       </div>
     </form>

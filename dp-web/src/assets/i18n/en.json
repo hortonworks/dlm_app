@@ -149,7 +149,7 @@
         },
         "userManagement": "You can manage the users or groups added to Dataplane through User Management. This page is available for the Dataplane Adminsitrator. You can add new users or groups and assign them roles by clicking on ADD USER or ADD GROUP button. To activate/deactivate to edit their roles, click on the username in the list below or click on the menu icon on the displayed rows.",
         "additionalConfigs":"Please provide these additional configurations required by Dataplane to discover the cluster information",
-        "knoxUrl": "Url of Knox running in Ambari managed cluster"
+        "knoxUrl": "Please enter the URL of the Knox Service on the HDP cluster which is configured to work with Data plane."
       }
     },
     "dataset" : {
