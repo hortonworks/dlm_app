@@ -16,10 +16,6 @@ fi
 KNOX_CONTAINER="knox"
 CONSUL_CONTAINER="dp-consul-server"
 
-log() {
-	echo $@
-}
-
 init_network() {
     IS_NETWORK_PRESENT="false"
     docker network inspect --format "{{title .ID}}" dp >> install.log 2>&1 && IS_NETWORK_PRESENT="true"
