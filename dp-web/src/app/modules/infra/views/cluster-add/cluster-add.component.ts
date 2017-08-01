@@ -178,6 +178,7 @@ export class ClusterAddComponent implements OnInit {
   }
 
   onCreate() {
+    this.showError = false;
     if (!this.clusterForm.form.valid) {
       this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
       this.showError = true;
@@ -236,6 +237,7 @@ export class ClusterAddComponent implements OnInit {
   }
 
   onCreateAndAdd() {
+    this.showError = false;
     this.createCluster().subscribe(
       () => {
         this.cluster = new Cluster();
