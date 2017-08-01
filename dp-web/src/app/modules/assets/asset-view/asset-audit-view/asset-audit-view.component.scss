@@ -10,18 +10,19 @@
 }
 
 .tableRow {
-	height:45px;
-	padding:18px 0px;
+	height:34px;
+	padding:12px 0px;
 }
 
 .tableRow.tableHeader{
-	color:#999999;	
+	color:#999;	
 	border-bottom: 1px solid #D0D0D0;
 }
 
 .tableRow.normalRow {
 	border-bottom: 1px solid #F0F0F0;
 	font-size:12px;
+	color:#666
 }
 
 .tableCell {

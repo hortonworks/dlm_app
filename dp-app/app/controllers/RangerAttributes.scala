@@ -28,9 +28,12 @@ class RangerAttributes @Inject()(
       rangerService
         .getAuditDetails(clusterId, dbName, tableName, offset, limit)
         .map {
-          case Left(errors) =>
-            InternalServerError(
-              JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Left(errors) => {
+            errors.errors.head.code match {
+              case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case  _    => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            }
+          }
           case Right(attributes) => Ok(Json.toJson(attributes))
         }
     }

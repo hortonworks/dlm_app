@@ -31,8 +31,10 @@ export class AssetAuditView implements OnInit {
   	this.rangerService.getAuditDetails(this.clusterId, dbName, name, 0, 20)
   	  .subscribe(details=>{
   	  	this.state = this.AWS.LOADED;
-  	  	this.audits = details.vXAccessAudits;
-  	  });
+  	  	this.audits = details;
+  	  },
+  	  err => (err.status === 404) && (this.state = this.AWS.NOINFO)
+  	  );
 
   }
 
