@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild, OnInit} from '@angular/core';
+import {Component, ElementRef, ViewChild, OnInit, HostListener} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {Observable} from 'rxjs/Observable';
@@ -18,6 +18,7 @@ import {LocationService} from '../../../../services/location.service';
 
 import {StringUtils} from '../../../../shared/utils/stringUtils';
 import {NgForm} from '@angular/forms';
+import {ConfigDialogComponent} from '../../widgets/config-dialog/config-dialog.component';
 
 @Component({
   selector: 'dp-cluster-add',
@@ -28,12 +29,22 @@ export class ClusterAddComponent implements OnInit {
 
   @ViewChild('ambariInput') ambariInputContainer: ElementRef;
   @ViewChild('clusterForm') clusterForm: NgForm;
+  @ViewChild('config') private config: ConfigDialogComponent;
+
+  @HostListener('keydown', ['$event', '$event.target'])
+  public onKeyDown($event: KeyboardEvent, targetElement: HTMLElement): void {
+    const code = $event.which || $event.keyCode;
+    if (code === 27 && this.showConfig) {
+      this.closeConfig();
+    }
+  }
 
 
   _isClusterValidateInProgress = false;
   _isClusterValidateSuccessful = false;
-  _clusterState: ClusterState;
+  _clusterState: ClusterState = new ClusterState();
   _isClusterValid;
+  showConfig = false;
 
   mapData: MapData[] = [];
   cluster: Cluster = new Cluster();
@@ -61,10 +72,16 @@ export class ClusterAddComponent implements OnInit {
 
   get reasons() {
     let reasons: string[] = [];
-    let reasonsTranslation = this.translateService.instant('pages.infra.description.connectionFailureReasons');
-    Object.keys(reasonsTranslation).forEach(key => {
-      reasons.push(reasonsTranslation[key]);
-    });
+    if (this._isClusterValidateSuccessful && !this._isClusterValid && !this._clusterState.alreadyExists) {
+      let reasonsTranslation = this.translateService.instant('pages.infra.description.connectionFailureReasons');
+      Object.keys(reasonsTranslation).forEach(key => {
+        reasons.push(reasonsTranslation[key]);
+      });
+    } else if (this._clusterState.alreadyExists) {
+      let reasonsTranslation = this.translateService.instant('pages.infra.description.clusterAlreadyExists');
+      reasons.push(reasonsTranslation);
+    }
+
     return reasons;
   }
 
@@ -88,30 +105,29 @@ export class ClusterAddComponent implements OnInit {
     this.showError = false;
     this.showNotification = false;
     this._isClusterValidateInProgress = true;
+    this._isClusterValidateSuccessful = false;
     let cleanedUri = StringUtils.cleanupUri(this.cluster.ambariurl);
     this.lakeService.validate(cleanedUri).subscribe(
       response => {
+        this._clusterState = response as ClusterState;
         if (response.ambariApiStatus === 200) {
           //TODO - Padma/Babu/Hemanth/Rohit :Display that Knox was detected
-          this._clusterState = response as ClusterState;
           let detailRequest = new ClusterDetailRequest();
           this.createDetailRequest(detailRequest, cleanedUri);
-          this.clusterService.getClusterInfo(detailRequest).subscribe(clusterInfo => {
-            this._isClusterValidateInProgress = false;
-            this._isClusterValidateSuccessful = true;
-            this._isClusterValid = true;
-            this.extractClusterInfo(clusterInfo);
-            this.cluster.ambariurl = cleanedUri;
-          }, () => {
-            this.onError();
-          });
-          let classes = this.ambariInputContainer.nativeElement.className.replace('validation-error', '');
-          this.ambariInputContainer.nativeElement.className = classes;
-        } else {
+          this.requestClusterInfo(detailRequest, cleanedUri);
+          this.removeValidationError();
+        } else if (response.requestAmbariCreds) {
+          this.showConfig = true;
+        } else if (response.requestKnoxURL) {
+          this.showConfig = true;
+        }
+        else {
           this._isClusterValidateInProgress = false;
           this._isClusterValidateSuccessful = true;
           this._isClusterValid = false;
-          this.ambariInputContainer.nativeElement.className += ' validation-error';
+          if(this.ambariInputContainer.nativeElement.className.indexOf('validation-error') === -1){
+            this.ambariInputContainer.nativeElement.className += ' validation-error';
+          }
         }
       },
       () => {
@@ -120,15 +136,53 @@ export class ClusterAddComponent implements OnInit {
     );
   }
 
+  getConfigs(detailRequest: any) {
+    detailRequest.url = this.cluster.ambariurl;
+    detailRequest.knoxUrl = this._clusterState.knoxUrl;
+    detailRequest.knoxDetected = this._clusterState.knoxDetected;
+    this.requestClusterInfo(detailRequest, this.cluster.ambariurl);
+    this.removeValidationError();
+    this.closeConfig();
+  }
+
+  closeConfig() {
+    this._isClusterValidateInProgress = false;
+    this.showConfig = false;
+  }
+
+  private removeValidationError() {
+    this.ambariInputContainer.nativeElement.className = this.ambariInputContainer.nativeElement.className.replace('validation-error', '');
+  }
+
+  private requestClusterInfo(detailRequest: ClusterDetailRequest, cleanedUri: string) {
+    this._isClusterValidateInProgress = true;
+    this.clusterService.getClusterInfo(detailRequest).subscribe(clusterInfo => {
+      this._isClusterValidateInProgress = false;
+      this._isClusterValidateSuccessful = true;
+      this._isClusterValid = true;
+      this.extractClusterInfo(clusterInfo);
+      this.cluster.ambariurl = cleanedUri;
+      if (this._clusterState.knoxDetected) {
+        // Update cluster state with the final knox URL - determined by
+        this._clusterState.knoxUrl = clusterInfo[0].knoxUrl
+      }
+    }, (error) => {
+      this.onError();
+    });
+  }
+
   private createDetailRequest(detailRequest: ClusterDetailRequest, cleanedUri: string) {
     detailRequest.url = cleanedUri;
     detailRequest.knoxDetected = this._clusterState.knoxDetected;
     detailRequest.knoxUrl = this._clusterState.knoxUrl;
+
   }
 
   private onError() {
     this._isClusterValidateSuccessful = false;
     this._isClusterValidateInProgress = false;
+    this.showError = true;
+    this.errorMessage = this.translateService.instant('pages.infra.description.connectionFailed');
   }
 
   private extractClusterInfo(clusterInfo) {

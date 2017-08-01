@@ -288,16 +288,10 @@ class DataplaneService @Inject()(
     val hiveServerPort: Either[Errors, String] =
       getPropertyValue(endpointData, "hive-site", "hive.server2.thrift.port")
 
-    val hiveServerScheme: Either[Errors, String] = getPropertyValue(endpointData, "hive-site", "hive.server2.use.SSL")
-
     hiveServerPort match {
       case Right(hiveServerPort) => {
         val hiveServerHostName = endpointData.servicehost
-        val hiveServerScheme = getPropertyValue(endpointData, "hive-site", "hive.server2.use.SSL") match {
-          case Right(schemeValue) =>  if (schemeValue == "true") "https" else "http"
-          case Left(errors) => "http"
-        }
-        val fullurl = s"$hiveServerScheme://$hiveServerHostName:$hiveServerPort"
+        val fullurl = s"hive2://$hiveServerHostName:$hiveServerPort"
         Right(
           ClusterServiceEndpointDetails(endpointData.serviceid,
                                         endpointData.servicename,

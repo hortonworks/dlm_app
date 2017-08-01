@@ -44,3 +44,5 @@ export const sortByDateField = (collection, keyName) =>
 
 export const without = (collection, itemToRemove) =>
   collection.indexOf(itemToRemove) === -1 ? collection : collection.filter(item => item !== itemToRemove);
+
+export const contains = (collection, item): boolean => collection.indexOf(item) > -1;

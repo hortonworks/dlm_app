@@ -1,13 +1,12 @@
 package com.hortonworks.dataplane.cs
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Errors, HJwtToken}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, HJwtToken}
 import com.hortonworks.dataplane.cs.Webservice.RangerService
 import com.typesafe.config.Config
 import play.api.libs.json.JsObject
 import play.api.libs.ws.WSResponse
 
 import scala.concurrent.Future
-
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
@@ -24,6 +23,9 @@ class RangerServiceImpl(config: Config)(implicit ws: ClusterWsClient)
   private def mapResultsGeneric(res: WSResponse) : Either[Errors,JsObject]= {
     res.status match {
       case 200 =>  Right((res.json \ "results" \ "data").as[JsObject])
+      case 404 => Left(
+        Errors(Seq(
+          Error("404", (res.json \ "errors" \\ "code").head.toString()))))
       case _ => mapErrors(res)
     }
   }

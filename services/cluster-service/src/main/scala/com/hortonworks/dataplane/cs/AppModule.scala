@@ -1,12 +1,14 @@
 package com.hortonworks.dataplane.cs
 
 import javax.inject.Named
+import javax.net.ssl.HostnameVerifier
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.{Http, HttpsConnectionContext}
 import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provider, Provides, Singleton}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
+import com.hortonworks.dataplane.cs.utils.SSLUtils
 import com.hortonworks.dataplane.cs.utils.SSLUtils.DPTrustStore
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
 import com.hortonworks.dataplane.db._
@@ -35,11 +37,16 @@ object AppModule extends AbstractModule {
                        config: Config,
                        dPKeystore: DPTrustStore): HttpsConnectionContext = {
     // provides a custom ssl config with the dp keystore
-    val c  =  AkkaSSLConfig().mapSettings(
+    val c  =  AkkaSSLConfig().mapSettings{
       s =>
-        s.withDisabledKeyAlgorithms(scala.collection.immutable.Seq("RSA keySize < 1024")).withTrustManagerConfig(
+        val settings = s.withDisabledKeyAlgorithms(scala.collection.immutable.Seq("RSA keySize < 1024")).withTrustManagerConfig(
           TrustManagerConfig().withTrustStoreConfigs(
-            scala.collection.immutable.Seq(TrustStoreConfig(None, Some(dPKeystore.getKeyStoreFilePath))))))
+            scala.collection.immutable.Seq(TrustStoreConfig(None, Some(dPKeystore.getKeyStoreFilePath)))))
+        if(config.getBoolean("dp.services.ssl.config.disable.hostname.verification"))
+          settings.withLoose(s.loose.withDisableHostnameVerification(true))
+        else
+          settings
+    }
     val dpCtx = Http().createClientHttpsContext(c)
     dpCtx
   }
