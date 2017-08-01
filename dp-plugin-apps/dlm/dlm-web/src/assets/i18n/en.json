@@ -30,6 +30,7 @@
     "service": "Service",
     "hdfs": "HDFS",
     "hive": "HIVE",
+    "for": "for",
     "errors": {
       "no_log": "Oops! Could not retrieve a log message for this event."
     },

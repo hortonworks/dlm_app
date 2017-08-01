@@ -4,6 +4,11 @@
   }
 }
 
+.modal {
+  // navbar has z-index 2079
+  z-index: 2080;
+}
+
 .modal-dialog {
   &.small-modal {
     width: 40%;
