@@ -5,6 +5,7 @@ KNOX_CONFIG_USING_CREDS=true
 # DATABASE_USER="dp_admin"
 # DATABASE_PASS="dp_admin"
 
-CONSUL_HOST="<host_ip_address>"
-MASTER_PASSWORD="admin"
-USE_TEST_LDAP="yes"
+# Uncomment and set right values for below lines to enable silent install
+#CONSUL_HOST="<host_ip_address>"
+#MASTER_PASSWORD="admin"
+#USE_TEST_LDAP="yes"
