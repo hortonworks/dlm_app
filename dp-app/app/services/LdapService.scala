@@ -239,10 +239,10 @@ class LdapService @Inject()(
                 groupSearchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
                 val groupObjectClass=ldapConf.groupObjectClass.get;//ex "groupofnames"
                 val groupMemberAttributeName=ldapConf.groupMemberAttributeName.get;//ex "member"
-                val extendedGroupSearchFilter = s"(objectclass= $groupObjectClass)"
-                var groupSearchFilter=s"(&$extendedGroupSearchFilter($groupMemberAttributeName={0}))"
-                val userArr=List(userRes.nameInNameSpace).toArray[Object]
-                val res: NamingEnumeration[SearchResult]=dirContext.search(groupSearchBase.get,groupSearchFilter,userArr,groupSearchControls)
+                val extendedGroupSearchFilter = s"(objectclass=$groupObjectClass)"
+                val fullUserdn=userRes.nameInNameSpace
+                var groupSearchFilter=s"(&$extendedGroupSearchFilter($groupMemberAttributeName=$fullUserdn))"
+                val res: NamingEnumeration[SearchResult]=dirContext.search(groupSearchBase.get,groupSearchFilter,groupSearchControls)
                 var groupAttributeLen=ldapConfs.head.groupSearchAttributeName.get.length+1
                 val ldapGroups: ArrayBuffer[LdapGroup]=new ArrayBuffer
                 while (res.hasMore) {
