@@ -72,10 +72,16 @@ export class ClusterAddComponent implements OnInit {
 
   get reasons() {
     let reasons: string[] = [];
-    let reasonsTranslation = this.translateService.instant('pages.infra.description.connectionFailureReasons');
-    Object.keys(reasonsTranslation).forEach(key => {
-      reasons.push(reasonsTranslation[key]);
-    });
+    if (this._isClusterValidateSuccessful && !this._isClusterValid && !this._clusterState.alreadyExists) {
+      let reasonsTranslation = this.translateService.instant('pages.infra.description.connectionFailureReasons');
+      Object.keys(reasonsTranslation).forEach(key => {
+        reasons.push(reasonsTranslation[key]);
+      });
+    } else if (this._clusterState.alreadyExists) {
+      let reasonsTranslation = this.translateService.instant('pages.infra.description.clusterAlreadyExists');
+      reasons.push(reasonsTranslation);
+    }
+
     return reasons;
   }
 
@@ -99,6 +105,7 @@ export class ClusterAddComponent implements OnInit {
     this.showError = false;
     this.showNotification = false;
     this._isClusterValidateInProgress = true;
+    this._isClusterValidateSuccessful = false;
     let cleanedUri = StringUtils.cleanupUri(this.cluster.ambariurl);
     this.lakeService.validate(cleanedUri).subscribe(
       response => {
@@ -118,7 +125,9 @@ export class ClusterAddComponent implements OnInit {
           this._isClusterValidateInProgress = false;
           this._isClusterValidateSuccessful = true;
           this._isClusterValid = false;
-          this.ambariInputContainer.nativeElement.className += ' validation-error';
+          if(this.ambariInputContainer.nativeElement.className.indexOf('validation-error') === -1){
+            this.ambariInputContainer.nativeElement.className += ' validation-error';
+          }
         }
       },
       () => {

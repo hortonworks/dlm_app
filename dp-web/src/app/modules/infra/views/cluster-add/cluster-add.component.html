@@ -38,7 +38,18 @@
         </div>
       </div>
 
-      <div *ngIf="_isClusterValidateSuccessful && !_isClusterValid" class="error-section validation-error">
+
+      <div *ngIf="_clusterState.alreadyExists && _isClusterValidateSuccessful && !_isClusterValid"
+           class="error-section validation-error">
+        <div class="">
+          <ul>
+            <li *ngFor="let reason of reasons">{{reason}}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div *ngIf="!_clusterState.alreadyExists && _isClusterValidateSuccessful && !_isClusterValid"
+           class="error-section validation-error">
         <i class="fa fa-times-circle"></i>
         <div class="">
           <span class="text-medium">{{"pages.infra.labels.connectionFailed" | translate}}</span>
@@ -48,6 +59,7 @@
           </ul>
         </div>
       </div>
+
 
       <div *ngIf="showClusterDetails">
         <div class="cluster-details">
