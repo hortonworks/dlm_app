@@ -20,7 +20,7 @@ export const routes: Routes = [{
       DoCleanUpAndRedirectGuard,
     ]
   }, {
-    path: 'dataset',
+    path: 'datasteward',
     loadChildren: './modules/dataset/dataset.module#DatasetModule',
     canActivate:[ NavigationGuard ]
   }, {
@@ -40,7 +40,7 @@ export const routes: Routes = [{
     loadChildren: './modules/assets/asset.module#AssetModule',
     canActivate:[ NavigationGuard ]
   },{
-    path: 'workspace',
+    path: 'analytics',
     loadChildren: './modules/analytics/analytics.module#AnalyticsModule',
     canActivate:[ NavigationGuard ]
   },

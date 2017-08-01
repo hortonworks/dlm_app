@@ -1,14 +1,4 @@
-import {
-  Component,
-  ViewChild,
-  ElementRef,
-  Input,
-  ChangeDetectorRef,
-  OnInit,
-  OnChanges,
-  SimpleChanges,
-  AfterViewChecked
-} from '@angular/core';
+import { Component, ViewChild, ElementRef, Input, ChangeDetectorRef, OnInit, OnChanges, SimpleChanges, } from '@angular/core';
 import {Router, NavigationStart} from '@angular/router';
 
 import {PersonaTabs, HeaderData, Persona} from '../../models/header-data';
@@ -63,7 +53,8 @@ export class CollapsibleNavComponent implements OnInit, OnChanges {
           this.activePersona = persona;
           this.activePersonaName = persona.name;
           this.activePersonaImageName = persona.imageName;
-          this.activeTabName = tab.tabName;
+          setTimeout(() => { this.activeTabName = tab.tabName }, 100);
+
           this.collapsibleNavService.setTabs(persona.tabs, tab);
 
           if (exactMatch) {
@@ -102,7 +93,7 @@ export class CollapsibleNavComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.collapsibleNavService.navChanged$.subscribe(() => {
       this.personaTabs = this.collapsibleNavService.tabs;
-      this.activeTabName = this.collapsibleNavService.activeTab.tabName;
+      setTimeout(() => { this.activeTabName = this.collapsibleNavService.activeTab.tabName }, 100);
     });
 
     this.collapsibleNavService.collpaseSideNav$.subscribe((minimise: boolean) => {

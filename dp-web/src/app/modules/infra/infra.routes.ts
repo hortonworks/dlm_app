@@ -9,54 +9,35 @@ import {AddGroupComponent} from './views/user-management/add-group/add-group.com
 import {UsersComponent} from './views/user-management/users/users.component';
 import {GroupsComponent} from './views/user-management/groups/groups.component';
 
-export const routes: Routes = [{
-  path: '',
-  component: LakesComponent
-}, {
-  path: 'add',
-  component: ClusterAddComponent
-}, {
-  path: 'cluster/details/:id',
-  component: ClusterDetailsComponent
-}, {
-  path: 'usermgmt',
-  component: UserManagementComponent,
-  children: [
-    {
-      path: '',
-      pathMatch: 'full',
-      redirectTo: 'users'
-    },
-    {
-      path: 'users',
-      component: UsersComponent,
+// export const routes:Routes = [
+//   { path: '', redirectTo: 'clusters' },
+//   { path: 'clusters', component: LakesComponent },
+//   { path: 'add', component: ClusterAddComponent },
+//   { path: 'cluster/details/:id', component: ClusterDetailsComponent },
+//   { path: 'users', component: UserManagementComponent,
+//     children: [
+//       { path: 'add', component: AddUserComponent, outlet: 'sidebar',},
+//       { path: 'edit/:name', component: AddUserComponent, outlet: 'sidebar'}
+//     ]
+//   }
+// ];
+export const routes: Routes = [
+  { path: '', redirectTo: 'clusters' },
+  { path: 'clusters', component: LakesComponent },
+  { path: 'add', component: ClusterAddComponent },
+  { path: 'cluster/details/:id', component: ClusterDetailsComponent },
+  { path: 'usermgmt', component: UserManagementComponent,
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'users'},
+      { path: 'users', component: UsersComponent,
+          children: [
+            { path: 'add', component: AddUserComponent, outlet: 'sidebar',}, { path: 'edit/:name', component: AddUserComponent, outlet: 'sidebar',}
+        ]
+      },
+    { path: 'groups', component: GroupsComponent,
       children: [
-        {
-          path: 'add',
-          component: AddUserComponent,
-          outlet: 'sidebar',
-        },
-        {
-          path: 'edit/:name',
-          component: AddUserComponent,
-          outlet: 'sidebar',
-        }
-      ]
-    },
-    {
-      path: 'groups',
-      component: GroupsComponent,
-      children: [
-        {
-          path: 'add',
-          component: AddGroupComponent,
-          outlet: 'sidebar',
-        },
-        {
-          path: 'edit/:name',
-          component: AddGroupComponent,
-          outlet: 'sidebar',
-        }
+        { path: 'add', component: AddGroupComponent, outlet: 'sidebar',},
+        { path: 'edit/:name', component: AddGroupComponent, outlet: 'sidebar',}
       ]
     }
   ]
