@@ -21,7 +21,10 @@ class LocationServiceImpl(config: Config)(implicit ws: WSClient)
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   override def list(isQuery: Option[Boolean], city: Option[String], country: Option[String]): Future[Either[Errors, Seq[Location]]] = {
-    val uri = isQuery match {case Some(isQuery) => s"$url/locations?isQuery=$isQuery&city=$city&country=$country" case None => s"$url/locations"}
+    val uri = isQuery match {
+      case Some(isQuery) => s"$url/locations?isQuery=${isQuery}&city=${city.getOrElse("")}&country=${country.getOrElse("")}"
+      case None => s"$url/locations"
+    }
     ws.url(uri)
       .withHeaders("Accept" -> "application/json")
       .get()
