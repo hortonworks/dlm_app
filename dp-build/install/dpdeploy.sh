@@ -240,6 +240,10 @@ stop_knox() {
     stop_consul
 }
 
+load_images() {
+
+}
+
 print_version() {
     if [ -f VERSION ]; then
         cat VERSION
@@ -326,6 +330,9 @@ else
                  ;;
              esac
              ;;
+        load)
+            load_images
+            ;;
         version)
             print_version
             ;;
