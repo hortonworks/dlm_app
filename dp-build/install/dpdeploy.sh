@@ -241,7 +241,12 @@ stop_knox() {
 }
 
 load_images() {
-
+    LIB_DIR=../lib
+    for imgFileName in $LIB_DIR/*.tar; do
+        echo "Loading $imgFileName"
+        docker load --input $imgFileName
+    done
+    echo "All done!"
 }
 
 print_version() {
@@ -268,6 +273,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "logs [container name]" "Logs of supplied container id or name"
     printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them. Needs to start from init db again"
     printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox and Consul containers and remove them. Needs to start from init knox again"
+    printf "%-${tabspace}s:%s\n" "load" "Load all images from lib directory into docker"
     printf "%-${tabspace}s:%s\n" "version" "Print the version of dataplane"
 }
 
