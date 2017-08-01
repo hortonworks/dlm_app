@@ -98,7 +98,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
       .validate[UserInfo]
       .map { userInfo =>
         userRepo
-          .updateActiveAndRoles(userInfo)
+          .updateUserAndRoles(userInfo,false)
           .map { res =>
             Ok
           }
@@ -113,11 +113,25 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
       .map { userInfo =>
         val password: String =
           BCrypt.hashpw(Random.alphanumeric.toString(), BCrypt.gensalt())
-        //TODO check if user exists and throw exception.
-        userRepo
-          .insertUserWithRoles(userInfo, password)
-          .map(userInfo => success(userInfo))
-          .recoverWith(apiError)
+        userRepo.findByName(userInfo.userName).flatMap{
+          case  None=>{
+            userRepo
+              .insertUserWithRoles(userInfo, password)
+              .map(userInfo => success(userInfo))
+              .recoverWith(apiError)
+          }
+          case Some(user)=>{
+            user.groupManaged match {
+              case Some(true)=> userRepo
+                .updateUserAndRoles(userInfo,true)
+                .map(userInfo => Ok)
+                .recoverWith(apiError)
+              case _=>{
+                Future.successful(Conflict("User already exists"))
+              }
+            }
+           }
+        }
       }
       .getOrElse(Future.successful(BadRequest))
   }

@@ -110,7 +110,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     }
   }
 
-  def updateActiveAndRoles(userInfo:UserInfo)={
+  def updateUserAndRoles(userInfo:UserInfo, upgradeFromGroupManaged:Boolean)={
     for{
       (user,userRoles)<-getUserDetailInternal(userInfo.userName)
       userRoles<-db.run(UserRoles.filter(_.userId === user.id.get).result)
@@ -119,11 +119,17 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     }yield{
       val userRoleObjs=rolesUtil.getUserRoleObjectsforRoleIds(user.id.get,toBeAddedRoleIds)
       val query =for{
-        updateActive <- getUpdateActiveQuery(userInfo)
+        updateUser <- {
+          Users.filter(_.username===userInfo.userName)
+            .map{r=>
+              (r.active,r.updated,r.groupManaged)
+            }
+            .update(userInfo.active, Some(LocalDateTime.now()),Some(!upgradeFromGroupManaged))
+        }
         insertQuery<-UserRoles returning UserRoles ++= userRoleObjs
         delQuery <- UserRoles.filter(_.id inSet toBeDeletedRoleIds).delete
       }yield {
-        (updateActive,delQuery,insertQuery)
+        (updateUser,delQuery,insertQuery)
       }
       db.run(query.transactionally)
     }
@@ -166,15 +172,6 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
           active = res._1.active,groupIds=groupIds,password=Some(res._1.password))
       }
   }
-
-  private def getUpdateActiveQuery(userInfo:UserInfo)={
-    Users.filter(_.username===userInfo.userName)
-      .map{r=>
-        (r.active,r.updated)
-      }
-      .update(userInfo.active, Some(LocalDateTime.now()))
-  }
-
 
   private def resolveUserRolesEntries(roles: Seq[RoleType.Value], userRoles: Seq[UserRole]):Future[(Seq[Long],Seq[Long])] = {
     rolesUtil.getRoleNameMap().map{ roleNameMap=>
