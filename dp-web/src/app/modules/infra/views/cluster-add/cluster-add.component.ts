@@ -118,7 +118,9 @@ export class ClusterAddComponent implements OnInit {
           this._isClusterValidateInProgress = false;
           this._isClusterValidateSuccessful = true;
           this._isClusterValid = false;
-          this.ambariInputContainer.nativeElement.className += ' validation-error';
+          if(this.ambariInputContainer.nativeElement.className.indexOf('validation-error') === -1){
+            this.ambariInputContainer.nativeElement.className += ' validation-error';
+          }
         }
       },
       () => {
