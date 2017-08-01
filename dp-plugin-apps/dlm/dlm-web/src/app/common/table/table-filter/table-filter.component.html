@@ -1,7 +1,9 @@
 <div class="pull-left applied-filters-wrapper" qe-attr="applied-filters">
   <span class="label label-default filter-item" qe-attr="applied-filter"
-        *ngFor="let filter of appliedFiltersMapped"><strong>{{filter.key}}</strong>: {{filter.value}} <a
-    href="javascript:void(0);" (click)="removeFilter(filter)">&times;</a></span>
+        *ngFor="let filter of appliedFiltersMapped">
+    <strong>{{getFilterTitle(filter.key)}}</strong>: {{filter.value}}
+    <a href="javascript:void(0);" (click)="removeFilter(filter)">&times;</a>
+  </span>
 </div>
 <div class="pull-right">
   <div class="form-group has-feedback">

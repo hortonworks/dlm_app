@@ -2,7 +2,7 @@ package domain
 
 import javax.inject.{Inject, Singleton}
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Role, UserRole}
+import com.hortonworks.dataplane.commons.domain.Entities.{GroupRole, Role, UserRole}
 import com.hortonworks.dataplane.commons.domain.RoleType
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -53,6 +53,17 @@ class RolesUtil  @Inject()(roleRepo: RoleRepo) {
       UserRole(userId=Some(userId),roleId = allRolesInDb.get(role.toString).get.id)
     )
   }
+
+  def getGroupRolesObjectsforRoleIds(userId:Long, roles:Seq[Long]): Seq[GroupRole] = {
+    roles.map(roleId => GroupRole(groupId = Some(userId), roleId = Some(roleId)))
+  }
+
+  def getGroupRoleObjects(groupId:Long, roles:Seq[RoleType.Value], allRolesInDb:Map[String,Role]) : Seq[GroupRole] = {
+    roles.map(role =>
+      GroupRole(groupId = Some(groupId), roleId = allRolesInDb.get(role.toString).get.id)
+    )
+  }
+
 
   def getRoleAsRoleTypes(roleId:Long,allRoles:Seq[Role]) ={
     RoleType.withName(allRoles.filter(_.id==roleId).head.roleName)

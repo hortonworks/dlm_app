@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { Policy, PolicyPayload } from 'models/policy.model';
 import { mapResponse } from 'utils/http-util';
-import { JobTrackingInfo } from 'models/job-tracking-info.model';
 import { JobService } from 'services/job.service';
 
 @Injectable()
@@ -13,12 +12,21 @@ export class PolicyService {
     return datacenter + '$' + clusterName;
   }
 
-  static getClusterName(policyClusterId): string {
-    return policyClusterId.split('$')[1];
+  static getDatacenterName(policyClusterName): string {
+    const clusterSplit = policyClusterName.split('$');
+    return clusterSplit.length > 0 ? clusterSplit[0] : '';
+  }
+
+  static getClusterName(policyClusterName): string {
+    const clusterSplit = policyClusterName.split('$');
+    return clusterSplit.length > 1 ? clusterSplit[1] : '';
   }
 
   normalizePolicy(policy): Policy {
     policy.id = policy.policyId;
+    if (policy.endTime.indexOf('9999') === 0) {
+      policy.endTime = null;
+    }
     return policy;
   }
 

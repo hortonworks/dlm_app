@@ -67,7 +67,7 @@ public class TokenCheckFilter extends ZuulFilter {
 
   @Override
   public int filterOrder() {
-    return PRE_DECORATION_FILTER_ORDER + 3;
+    return PRE_DECORATION_FILTER_ORDER + 1;
   }
 
 
@@ -131,7 +131,7 @@ public class TokenCheckFilter extends ZuulFilter {
     try {
       Optional<User> user = userService.getUser(tokenInfo.getSubject());
       if (!user.isPresent()) {
-        return utils.sendForbidden(String.format("User %s not found in the system",tokenInfo.getSubject()));
+        return utils.sendForbidden(String.format("{\"code\": \"USER_NOT_FOUND\", \"message\":  User %s not found in the system}",tokenInfo.getSubject()));
       } else {
         UserRef userRef=userService.getUserRef(user.get());
         try {

@@ -31,7 +31,7 @@ export class AddWorkspaceComponent implements OnInit {
   }
 
   cancel() {
-     this.router.navigateByUrl('/workspace');
+     this.router.navigateByUrl('analytics/workspace');
   }
 
   save() {
@@ -42,7 +42,7 @@ export class AddWorkspaceComponent implements OnInit {
     this.workspaceService.save(this.workspace).subscribe(() => {
       Alerts.showSuccessMessage('Added workspace ' + this.workspace.name);
       this.workspaceService.dataChanged.next();
-      this.router.navigateByUrl('/workspace');
+      this.router.navigateByUrl('analytics/workspace');
     });
   }
 

@@ -22,6 +22,7 @@
     "pairing": "Pairing",
     "pairs": "Pairs",
     "policy": "Policy",
+    "name": "Name",
     "job": "Job",
     "jobs": "Jobs",
     "clusters": "Clusters",
@@ -238,8 +239,8 @@
         "nodes": "Nodes",
         "volume": "Volume",
         "location": "Location",
-        "create_pair_text": "Add Pair",
-        "create_policy_text": "Add Policy"
+        "create_pair_text": "+ Pair",
+        "create_policy_text": "+ Policy"
       }
     },
     "policies": {
@@ -289,7 +290,7 @@
           "directories": "File / Folder Path",
           "databases": "Database",
           "start_date": "Start Date",
-          "end_date": "End Date",
+          "end_date": "End Date (Optional)",
           "start_time": "Start Time  (24-Hour Clock)",
           "end_time": "End Time",
           "date_format": "yyyy-mm-dd",

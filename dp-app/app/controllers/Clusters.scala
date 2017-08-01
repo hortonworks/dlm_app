@@ -12,7 +12,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.{
 }
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.ClusterService
-import internal.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.{ClusterHealthData, JsonResponses}
 import play.api.Logger
 import play.api.mvc._

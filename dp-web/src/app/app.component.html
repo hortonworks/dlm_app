@@ -1,11 +1,16 @@
 <dp-collapsible-nav mdl *ngIf="isUserSignedIn()" [headerData]="headerData"> </dp-collapsible-nav>
 <main [ngClass]="{'main': isUserSignedIn(),
-  'maximised': viewPaneStates.MAXIMISE  === viewPaneState,
-  'minimized': viewPaneStates.MINIMISE === viewPaneState}">
-<dp-header mdl *ngIf="isUserSignedIn()" [user]="getUser()"> </dp-header>
-<div mdl class="page-content">
-<dp-loader *ngIf="showLoader"></dp-loader>
-<router-outlet></router-outlet>
+'maximised': viewPaneStates.MAXIMISE  === viewPaneState,
+'minimized': viewPaneStates.MINIMISE === viewPaneState}">
+  <dp-header mdl *ngIf="isUserSignedIn()" [user]="getUser()"> </dp-header>
+  <div mdl class="page-content">
+    <div class="error-notification-bar" *ngIf="isValidUser() === false">
+      <i class="fa fa-times-circle pull-left"></i>
+      <div class="text-medium">{{"common.unauthorized" | translate}}</div>
+      <div class="text-small-1 inline">{{"common.invalidUser" | translate}}</div>
+      <div class="text-small-1 inline pull-right"><a href="{{signOutUrl}}">{{"common.signout" | translate}}</a></div>
+    </div>
+    <dp-loader *ngIf="showLoader"></dp-loader>
+    <router-outlet></router-outlet>
   </div>
-  </main>
-<router-outlet name="dialog" ></router-outlet>
+</main>

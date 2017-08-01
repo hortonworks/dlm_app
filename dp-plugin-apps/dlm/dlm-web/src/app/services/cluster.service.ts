@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Http } from '@angular/http';
 import { mapResponse } from 'utils/http-util';
-import { Cluster } from 'models/cluster.model';
 
 @Injectable()
 export class ClusterService {

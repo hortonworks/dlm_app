@@ -11,7 +11,7 @@ import com.hortonworks.dataplane.cs.utils.SSLUtils.DPTrustStore
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.http.{ProxyServer, Webserver}
-import com.hortonworks.dataplane.http.routes.{AmbariRoute, AtlasRoute, HdpRoute, StatusRoute}
+import com.hortonworks.dataplane.http.routes.{AmbariRoute, AtlasRoute, RangerRoute, HdpRoute, StatusRoute}
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.sslconfig.akka.AkkaSSLConfig
 import com.typesafe.sslconfig.ssl.{TrustManagerConfig, TrustStoreConfig}
@@ -177,10 +177,20 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
+  def provideRangerRoute(storageInterface: StorageInterface,
+                         clusterComponentService: ClusterComponentService,
+                         clusterHostsService: ClusterHostsService,
+                         wSClient: WSClient): RangerRoute = {
+    new RangerRoute(clusterComponentService, clusterHostsService, storageInterface, wSClient)
+  }
+
+  @Provides
+  @Singleton
   def provideWebservice(actorSystem: ActorSystem,
                         materializer: ActorMaterializer,
                         configuration: Config,
                         atlasRoute: AtlasRoute,
+                        rangerRoute: RangerRoute,
                         statusRoute: StatusRoute,
                         ambariRoute: AmbariRoute): Webserver = {
     import akka.http.scaladsl.server.Directives._
@@ -188,6 +198,7 @@ object AppModule extends AbstractModule {
       actorSystem,
       materializer,
       configuration,
+      rangerRoute.rangerAudit ~
       atlasRoute.hiveAttributes ~
         atlasRoute.hiveTables ~
         atlasRoute.atlasEntities ~

@@ -12,6 +12,13 @@ export class PairingProgressCardComponent implements OnInit {
   @Input() secondCluster: Cluster;
   @Input() isCompleted = false;
 
+  get locations() {
+    return [
+      this.firstCluster.location.city + ', ' + this.firstCluster.location.country,
+      this.secondCluster.location.city + ', ' + this.secondCluster.location.country
+    ];
+  }
+
   constructor() { }
 
   ngOnInit() {

@@ -1,4 +1,6 @@
-import { Component, OnInit, Output, ViewChild, TemplateRef, OnDestroy, ViewEncapsulation, EventEmitter } from '@angular/core';
+import {
+  Component, OnInit, Output, ViewChild, TemplateRef, OnDestroy, ViewEncapsulation, EventEmitter, HostBinding
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -16,6 +18,7 @@ import { StatusColumnComponent } from 'components/table-columns/status-column/st
 import { Policy } from 'models/policy.model';
 import { LogService } from 'services/log.service';
 import { JOB_STATUS } from 'constants/status.constant';
+import { PolicyService } from 'services/policy.service';
 
 @Component({
   selector: 'dlm-jobs-overview-table',
@@ -32,12 +35,15 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   operationResponseSubscription: Subscription;
   lastOperationResponse: OperationResponse = <OperationResponse>{};
 
+  @ViewChild('clusterNameCellRef') clusterNameCellRef: TemplateRef<any>;
   @ViewChild('destinationIconCell') destinationIconCellRef: TemplateRef<any>;
   @ViewChild('verbStatusCellTemplate') verbStatusCellTemplate: TemplateRef<any>;
   @ViewChild('policyNameCellTemplate') policyNameCellTemplate: TemplateRef<any>;
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
   @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;
   @ViewChild('prevJobs') prevJobsRef: TemplateRef<any>;
+
+  @HostBinding('class') className = 'dlm-jobs-overview-table';
 
   @Output() onShowPolicyLog = new EventEmitter<any>();
 
@@ -50,6 +56,14 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
 
   private translateColumn(columnName: string): string {
     return this.t.instant(`page.overview.table.column.${columnName}`);
+  }
+
+  private getClusterName(policyClusterName: string) {
+    return PolicyService.getClusterName(policyClusterName);
+  }
+
+  private getDatacenterName(policyClusterName: string) {
+    return PolicyService.getDatacenterName(policyClusterName);
   }
 
   ngOnInit() {
@@ -69,9 +83,9 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
         cellTemplate: this.verbStatusCellTemplate,
         name: this.translateColumn('job_status')
       },
-      {prop: 'sourceCluster', name: this.translateColumn('source_cluster')},
+      {prop: 'sourceCluster', name: this.translateColumn('source_cluster'), cellTemplate: this.clusterNameCellRef},
       {...TableComponent.makeFixedWith(20), name: '', cellTemplate: this.destinationIconCellRef},
-      {prop: 'targetCluster', name: this.translateColumn('destination_cluster')},
+      {prop: 'targetCluster', name: this.translateColumn('destination_cluster'), cellTemplate: this.clusterNameCellRef},
       {prop: 'service', name: this.t.instant('common.service')},
       {
         prop: 'name',

@@ -7,7 +7,7 @@ import {PairingCardListComponent} from './components/pairing-card-list/pairing-c
 import {PairingCardComponent} from './components/pairing-card/pairing-card.component';
 import {ModalDialogComponent} from '../../common/modal-dialog/modal-dialog.component';
 import {MockStore} from '../../mocks/mock-store';
-import {ModalModule} from 'ng2-bootstrap';
+import {ModalModule, TooltipModule} from 'ng2-bootstrap';
 import {Store} from '@ngrx/store';
 import { CommonComponentsModule } from 'components/common-components.module';
 import { PipesModule } from 'pipes/pipes.module';
@@ -25,7 +25,8 @@ describe('PairingsComponent', () => {
         RouterTestingModule,
         ModalModule.forRoot(),
         CommonComponentsModule,
-        PipesModule
+        PipesModule,
+        TooltipModule.forRoot()
       ],
       declarations: [
         PairingsComponent,

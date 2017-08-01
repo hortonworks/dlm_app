@@ -12,7 +12,7 @@ import com.hortonworks.dataplane.db.Webservice.{
   ClusterService,
   DpClusterService
 }
-import internal.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.{JsonResponses, WrappedErrorsException}
 import models.JsonFormatters._
 import models.RequestSyntax.RegisterDpCluster

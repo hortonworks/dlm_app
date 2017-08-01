@@ -1,7 +1,8 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {ClusterCardComponent} from '../../../../components/cluster-card/cluster-card.component';
 import {PairingCardComponent} from './pairing-card.component';
-import {Pairing} from '../../../../models/pairing.model';
+import {Pairing} from 'models/pairing.model';
+import {TooltipModule} from 'ng2-bootstrap';
 
 describe('PairingCardComponent', () => {
   let component: PairingCardComponent;
@@ -9,6 +10,9 @@ describe('PairingCardComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [
+        TooltipModule.forRoot()
+      ],
       declarations: [PairingCardComponent, ClusterCardComponent]
     })
       .compileComponents();

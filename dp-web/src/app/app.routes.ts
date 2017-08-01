@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 
 import { SignInComponent } from './views/sign-in/sign-in.component';
 
-import { UnsecuredRouteGuard, SecuredRouteGuard, DoCleanUpAndRedirectGuard } from './shared/utils/auth-guard';
+import { UnsecuredRouteGuard, DoCleanUpAndRedirectGuard } from './shared/utils/auth-guard';
 import { LandingPageGuard } from './shared/utils/landing-page-guard';
 import { NotFoundRouteComponent } from './views/not-found-route/not-found-route.component';
 import {NavigationGuard} from './shared/utils/navigation-guard';
@@ -20,7 +20,7 @@ export const routes: Routes = [{
       DoCleanUpAndRedirectGuard,
     ]
   }, {
-    path: 'dataset',
+    path: 'datasteward',
     loadChildren: './modules/dataset/dataset.module#DatasetModule',
     canActivate:[ NavigationGuard ]
   }, {
@@ -40,7 +40,7 @@ export const routes: Routes = [{
     loadChildren: './modules/assets/asset.module#AssetModule',
     canActivate:[ NavigationGuard ]
   },{
-    path: 'workspace',
+    path: 'analytics',
     loadChildren: './modules/analytics/analytics.module#AnalyticsModule',
     canActivate:[ NavigationGuard ]
   },
@@ -55,5 +55,6 @@ export const routes: Routes = [{
   }, {
     path: '**',
     component: NotFoundRouteComponent
-  },
+  }
+
 ];

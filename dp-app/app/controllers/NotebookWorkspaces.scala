@@ -14,7 +14,7 @@ import com.hortonworks.dataplane.db.Webservice.{
   AssetWorkspaceService,
   NotebookWorkspaceService
 }
-import internal.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.JsonResponses
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}

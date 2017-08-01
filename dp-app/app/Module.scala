@@ -9,7 +9,7 @@ import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.db.Webservice._
 import com.hortonworks.dataplane.cs._
-import internal.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.Authenticated
 import play.api.{Configuration, Logger}
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.ws.WSClient
@@ -28,6 +28,13 @@ class Module extends AbstractModule {
   @Named("userService")
   def provideUserService(implicit ws: WSClient, configuration: Configuration): UserService = {
     new UserServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("groupService")
+  def provideGroupService(implicit ws: WSClient, configuration: Configuration): GroupService = {
+    new GroupServiceImpl(configuration.underlying)
   }
 
 
@@ -82,6 +89,14 @@ class Module extends AbstractModule {
   def provideAtlasService(implicit ws: WSClient, configuration: Configuration): com.hortonworks.dataplane.cs.Webservice.AtlasService = {
     implicit val wSClient = ClusterWsClient(ws)
     new AtlasServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("rangerService")
+  def provideRangerService(implicit ws: WSClient, configuration: Configuration): com.hortonworks.dataplane.cs.Webservice.RangerService = {
+    implicit val wSClient = ClusterWsClient(ws)
+    new RangerServiceImpl(configuration.underlying)
   }
 
 

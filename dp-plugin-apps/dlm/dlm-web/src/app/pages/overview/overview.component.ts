@@ -8,6 +8,7 @@ import * as moment from 'moment';
 import * as fromRoot from 'reducers/';
 import { Event } from 'models/event.model';
 import { ProgressState } from 'models/progress-state.model';
+import { updateProgressState } from 'actions/progress.action';
 import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
 import { getAllJobs } from 'selectors/job.selector';
 import {
@@ -15,7 +16,6 @@ import {
 } from 'selectors/policy.selector';
 import { getAllClusters, getUnhealthyClusters, getClustersWithLowCapacity } from 'selectors/cluster.selector';
 import { getDisplayedEvents } from 'selectors/event.selector';
-import { loadJobsForPolicy } from 'actions/job.action';
 import { loadClusters, loadClustersStatuses } from 'actions/cluster.action';
 import { loadPolicies, loadLastJobs } from 'actions/policy.action';
 import { getMergedProgress, getProgressState } from 'selectors/progress.selector';
@@ -40,8 +40,6 @@ import { loadPairings } from 'actions/pairing.action';
 import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
 import { TranslateService } from '@ngx-translate/core';
 
-import { MapComponent } from 'components/map/map.component';
-
 const POLICIES_REQUEST = 'POLICIES_REQUEST';
 const CLUSTERS_REQUEST = 'CLUSTERS_REQUEST';
 const JOBS_REQUEST = 'JOBS_REQUEST';
@@ -54,13 +52,6 @@ const CLUSTER_STATUS_REQUEST = 'CLUSTERS_STATUS_REQUEST';
   encapsulation: ViewEncapsulation.None
 })
 export class OverviewComponent implements OnInit, OnDestroy {
-  private resourceStatusMap = {
-    // TODO where to get statuses for clusters?
-    policies: [POLICY_STATUS.RUNNING, POLICY_STATUS.SUBMITTED, POLICY_STATUS.SUSPENDED],
-    jobs: [JOB_STATUS.SUCCESS, JOB_STATUS.WARNINGS, JOB_STATUS.FAILED, JOB_STATUS.RUNNING]
-  };
-  @ViewChild(MapComponent) mapComponent: MapComponent;
-
   CLUSTER_STATUS = CLUSTER_STATUS;
   mapSizeSettings: MapSizeSettings = {
     width: '100%',
@@ -96,6 +87,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   clusterLegend$: Observable<any>;
 
   jobStatusFilter$ = new BehaviorSubject('');
+  areJobsLoaded = false;
 
   constructor(private store: Store<fromRoot.State>,
               private overviewJobsExternalFiltersService: OverviewJobsExternalFiltersService,
@@ -134,9 +126,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
           status: (policy.targetClusterResource.status || []).filter(service => service.state !== SERVICE_STATUS.STARTED)
         }
       })));
-    this.clustersMapData$ = Observable.combineLatest(this.clusters$, store.select(getCountPoliciesForSourceClusters))
-      .startWith([[], []])
-      .map(([clusters, policiesCount]) => this.makeClustersMapData(clusters, policiesCount));
+    this.clustersMapData$ = Observable
+      .combineLatest(this.clusters$, store.select(getCountPoliciesForSourceClusters), this.lowCapacityClusters$)
+      .startWith([[], [], []])
+      .map(([clusters, policiesCount, lowCapacityClusters]) => this.makeClustersMapData(clusters, policiesCount, lowCapacityClusters));
     this.clusterLegend$ = Observable
       .combineLatest(this.clustersMapData$, this.selectedCluster$, this.policies$)
       .map(([clustersMapData, selectedCluster, policies]) => {
@@ -219,12 +212,16 @@ export class OverviewComponent implements OnInit, OnDestroy {
     }
   }
 
-  private makeClustersMapData(clusters, policiesCount) {
+  private makeClustersMapData(clusters, policiesCount, lowCapacityClusters) {
     return clusters.map(cluster => {
       const policiesCounter = cluster.id in policiesCount &&
         'policies' in policiesCount[cluster.id] ? policiesCount[cluster.id].policies : 0;
+      // prioritize UNHEALTHY status over WARNING when display cluster dot marker
+      const healthStatus = lowCapacityClusters.some(c => c.id === cluster.id) && cluster.healthStatus !== CLUSTER_STATUS.UNHEALTHY ?
+        CLUSTER_STATUS.WARNING : cluster.healthStatus;
       const clusterData = {
         ...cluster,
+        healthStatus,
         policiesCounter
       };
       return <ClusterMapData>{start: <ClusterMapPoint>{cluster: clusterData}};
@@ -239,21 +236,27 @@ export class OverviewComponent implements OnInit, OnDestroy {
     ].map(action => this.store.dispatch(action));
     const overallProgressSubscription = this.completedRequest$(this.overallProgress$)
       .subscribe(_ => {
-        this.mapComponent.draw();
         this.initPolling();
       });
     const clustersRequestSubscription = this.completedRequest$(this.store.select(getProgressState(CLUSTERS_REQUEST)))
       .subscribe(_ => this.store.dispatch(loadClustersStatuses(CLUSTER_STATUS_REQUEST)));
-
-    const fullFilledPolicies$ = this.policies$
-      .filter(policies => policies.length && policies.every(policy => !isEmpty(policy.sourceClusterResource)))
-      .take(1);
     const clusterPoliciesCompleteSubscription = Observable.combineLatest(
       this.completedRequest$(this.store.select(getProgressState(CLUSTERS_REQUEST))),
-      this.completedRequest$(this.store.select(getProgressState(POLICIES_REQUEST))),
-      fullFilledPolicies$
-    ).subscribe(([_, _1, policies]) => {
-      this.store.dispatch(loadLastJobs({policies, numJobs: 10}, {requestId: JOBS_REQUEST}));
+      this.completedRequest$(this.store.select(getProgressState(POLICIES_REQUEST)))
+    ).switchMap(_ => this.policies$)
+      .subscribe(policies => {
+        if (this.areJobsLoaded) {
+          return;
+        }
+        if (!policies.length) {
+          this.areJobsLoaded = true;
+          this.store.dispatch(updateProgressState(JOBS_REQUEST, { isInProgress: false }));
+        } else {
+          if (policies.some(policy => !isEmpty(policy.sourceClusterResource))) {
+            this.areJobsLoaded = true;
+            this.store.dispatch(loadLastJobs({policies, numJobs: 10}, {requestId: JOBS_REQUEST}));
+          }
+        }
     });
     this.tableData$ = Observable
       .combineLatest(this.tableResources$, this.jobStatusFilter$)
@@ -295,9 +298,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   }
 
   handleOnShowPolicyLog(policy) {
-    if (policy.lastJobResource.status !== JOB_STATUS.RUNNING) {
-      this.logService.showLog(EntityType.policyinstance, policy.lastJobResource.id);
-    }
+    this.logService.showLog(EntityType.policyinstance, policy.lastJobResource.id);
   }
 
   formatStatusFilter(jobStatusFilter) {
