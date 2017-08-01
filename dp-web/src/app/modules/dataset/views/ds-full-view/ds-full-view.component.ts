@@ -37,7 +37,7 @@ export class DsFullView implements OnInit {
   }
 
   private onEdit(action: AssetListActionsEnum) {
-    this.router.navigate([`dataset/edit/${this.dsModel.id}`]);
+    this.router.navigate([`datasteward/dataset/edit/${this.dsModel.id}`]);
   }
 
 }

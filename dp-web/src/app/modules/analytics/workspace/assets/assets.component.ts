@@ -82,7 +82,7 @@ export class AssetsComponent implements OnInit {
                             '&workspaceName=' +encodeURIComponent(encodeURIComponent(String(this.workspaceDTO.workspace.name)));
     let tabs = [
       new PersonaTabs('Notebooks', zeppelinNotebook, 'fa-file-text-o', false, false),
-      new PersonaTabs('Assets', 'workspace/'+ this.selectedWorkspaceName +'/assets', 'fa-list-alt')
+      new PersonaTabs('Assets', 'analytics/workspace/'+ this.selectedWorkspaceName +'/assets', 'fa-list-alt')
     ];
     this.collapsibleNavService.setTabs(tabs, tabs[1]);
   }

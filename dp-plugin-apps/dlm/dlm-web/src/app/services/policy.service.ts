@@ -12,6 +12,11 @@ export class PolicyService {
     return datacenter + '$' + clusterName;
   }
 
+  static getDatacenterName(policyClusterName): string {
+    const clusterSplit = policyClusterName.split('$');
+    return clusterSplit.length > 0 ? clusterSplit[0] : '';
+  }
+
   static getClusterName(policyClusterName): string {
     const clusterSplit = policyClusterName.split('$');
     return clusterSplit.length > 1 ? clusterSplit[1] : '';

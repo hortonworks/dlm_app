@@ -13,6 +13,8 @@ import { Cluster } from 'models/cluster.model';
 import { loadClusters } from 'actions/cluster.action';
 import { getAllClusters } from 'selectors/cluster.selector';
 
+export const LOG_REQUEST = '[LOG_SERVICE] LOG_REQUEST';
+
 @Injectable()
 export class LogService {
 
@@ -56,7 +58,7 @@ export class LogService {
           const filteredClusters = this.clusters.filter(cluster => cluster.dataCenter === dataCenter && cluster.name === clusterName);
           if (filteredClusters.length) {
             const clusterId = filteredClusters[0].id;
-            this.store.dispatch(loadLogs(clusterId, entityId, entityType));
+            this.store.dispatch(loadLogs(clusterId, entityId, entityType, LOG_REQUEST));
             this.entityId$.next(entityId);
           }
         }
