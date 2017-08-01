@@ -1,5 +1,7 @@
 package com.hortonworks.dataplane.http.routes
 
+import java.net.URL
+
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives.{as, entity, path, post, _}
 import com.google.inject.Inject
@@ -13,11 +15,11 @@ import com.hortonworks.dataplane.knox.KnoxApiExecutor
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import play.api.libs.json.JsValue
-import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest}
+import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest, WSResponse}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class AmbariRoute @Inject()(val ws: WSClient,
                             val storageInterface: StorageInterface,
@@ -48,7 +50,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
       )
 
   def mapToCluster(json: Option[JsValue],
-                   cluster: String): Future[Option[AmbariCluster]] =
+                   cluster: String,dataplaneCluster: DataplaneCluster): Future[Option[AmbariCluster]] =
     Future.successful(
       json
         .map { j =>
@@ -60,18 +62,17 @@ class AmbariRoute @Inject()(val ws: WSClient,
           Some(
             AmbariCluster(security = secured,
                           clusterName = cluster,
-                          services = map.keys.toSeq))
+                          services = map.keys.toSeq, knoxUrl = dataplaneCluster.knoxUrl))
         }
         .getOrElse(None))
 
-  private def getDetails(
-      clusters: Seq[String],
+  private def getDetails(dataplaneCluster: DataplaneCluster,clusters: Seq[String],
       dli: AmbariDataplaneClusterInterface)(implicit token: Option[HJwtToken])
     : Future[Seq[Option[AmbariCluster]]] = {
     val futures = clusters.map { c =>
       for {
         json <- dli.getClusterDetails(c)
-        ambariCluster <- mapToCluster(json, c)
+        ambariCluster <- mapToCluster(json, c,dataplaneCluster)
       } yield ambariCluster
     }
     Future.sequence(futures)
@@ -80,13 +81,38 @@ class AmbariRoute @Inject()(val ws: WSClient,
   def getAmbariDetails(ambariDetailRequest: AmbariDetailRequest,
                        request: HttpRequest): Future[Seq[AmbariCluster]] = {
 
+    /*
+    Check if Ambari credentials were sent with the request
+    and if the configuration expects a separate config group
+    for knox
+
+    If true, then update the knox URL to the one pointed to by the
+    config group
+     */
+
+    val expectConfigGroup =
+      config.getBoolean("dp.services.knox.token.expect.separate.config")
+    val checkCredentials =
+      config.getBoolean("dp.services.knox.token.infer.endpoint.using.credentials")
+
+    // validations
+    if (ambariDetailRequest.knoxDetected && expectConfigGroup) {
+      if (checkCredentials)
+        assert(
+          ambariDetailRequest.hasCredentials,
+          "Knox detected and a config group was expected, but no credentials sent in request")
+      else
+        assert(
+          ambariDetailRequest.hasTopology,
+          "Knox detected and a config group was expected, but no topology sent in request")
+    }
+
     val header = request.getHeader(Constants.DPTOKEN)
     implicit val token =
       if (header.isPresent) Some(HJwtToken(header.get.value)) else None
 
     val finalList = for {
-      dataplaneCluster <- Future.successful(
-        new TempDataplaneCluster(ambariDetailRequest))
+      dataplaneCluster <- getDpCluster(ambariDetailRequest,expectConfigGroup,checkCredentials)
       creds <- loadCredentials
       dli <- Future.successful(
         AmbariDataplaneClusterInterfaceImpl(dataplaneCluster,
@@ -94,12 +120,78 @@ class AmbariRoute @Inject()(val ws: WSClient,
                                             config,
                                             creds))
       clusters <- dli.discoverClusters
-      details <- getDetails(clusters, dli)
+      details <- getDetails(dataplaneCluster,clusters, dli)
     } yield details
+
     finalList.map { item =>
       item.collect { case o if o.isDefined => o.get }
     }
 
+  }
+
+  private def loadDefaultCluster(ambariDetailRequest: AmbariDetailRequest) = {
+    val clusters = ws.url(s"${ambariDetailRequest.url}/api/v1/clusters")
+        .withAuth(ambariDetailRequest.ambariUser.get,ambariDetailRequest.ambariPass.get,WSAuthScheme.BASIC).get()
+    clusters.map { cl =>
+      val firstCluster = (cl.json \ "items").as[Seq[JsValue]].head
+      (firstCluster \ "Clusters" \ "cluster_name").as[String]
+    }
+  }
+
+  private def rewriteKnoxUrlFromConfigGroup(clusterName: String, ambariDetailRequest: AmbariDetailRequest, groups: WSResponse) = {
+    val items =  (groups.json \ "items").as[Seq[JsValue]]
+    val groupIds = items.map(i =>(i \ "ConfigGroup" \ "id").as[Int])
+    val groupNames = groupIds.map { gid =>
+      ws.url(s"${ambariDetailRequest.url}/api/v1/clusters/$clusterName/config_groups/$gid")
+        .withAuth(ambariDetailRequest.ambariUser.get,ambariDetailRequest.ambariPass.get,WSAuthScheme.BASIC).get().map { r =>
+        val name = (r.json \ "ConfigGroup" \ "group_name").as[String]
+        val hostName = ((r.json \ "ConfigGroup" \ "hosts").as[Seq[JsValue]].head \ "host_name").as[String]
+        (name,hostName)
+      }
+    }
+
+    val name = config.getString("dp.services.knox.token.config.group.name")
+    val tokenHost = Future.sequence(groupNames).map { gn =>
+      gn.find(_._1 == name)
+    }.map { v =>
+      assert(v.isDefined,s"Could not locate any config group with the name $name")
+      v.get._2
+    }
+
+    //Create a new token URL using this host
+    val jwtProviderUrl = new URL(ambariDetailRequest.knoxUrl.get)
+    tokenHost.map(th => s"${jwtProviderUrl.getProtocol}://$th:" +jwtProviderUrl.getPort)
+  }
+
+  private def loadKnoxUrl(clusterName: String, ambariDetailRequest: AmbariDetailRequest) = {
+    // get all config group ids
+    val configGroups =  ws.url(s"${ambariDetailRequest.url}/api/v1/clusters/$clusterName/config_groups")
+      .withAuth(ambariDetailRequest.ambariUser.get,ambariDetailRequest.ambariPass.get,WSAuthScheme.BASIC).get()
+    for {
+      groups <- configGroups
+      knoxUrl <- rewriteKnoxUrlFromConfigGroup(clusterName,ambariDetailRequest,groups)
+    } yield knoxUrl
+
+  }
+
+  private def getTargetUrl(ambariDetailRequest: AmbariDetailRequest) = {
+    for {
+      clusterName <- loadDefaultCluster(ambariDetailRequest)
+      newUrl <- loadKnoxUrl(clusterName,ambariDetailRequest)
+    } yield newUrl
+  }
+
+  private def getDpCluster(ambariDetailRequest: AmbariDetailRequest, expectConfigGroup:Boolean, checkCredentials:Boolean) = {
+    // set the Knox Url with the entered URL if set up
+    val newRequest = if(ambariDetailRequest.knoxDetected && expectConfigGroup ){
+      if(!checkCredentials)
+        Future.successful(ambariDetailRequest.copy(knoxUrl = Some(ambariDetailRequest.knoxTopology.get)))
+      else{
+        getTargetUrl(ambariDetailRequest).map(url => ambariDetailRequest.copy(knoxUrl = Some(url)))
+      }
+    } else Future.successful(ambariDetailRequest)
+
+    newRequest.map(new TempDataplaneCluster(_))
   }
 
   private def loadCredentials = {
@@ -148,10 +240,12 @@ class AmbariRoute @Inject()(val ws: WSClient,
     }
   }
 
-  private def knoxEnabledAndTokenPresent(dataplaneCluster: DataplaneCluster, hJwtToken: Option[HJwtToken]) = {
+  private def knoxEnabledAndTokenPresent(dataplaneCluster: DataplaneCluster,
+                                         hJwtToken: Option[HJwtToken]) = {
     logger.debug("Dump Knox data")
     logger.debug(s"Token - $hJwtToken")
-    logger.debug(s" Cluster - Knox enabled:${dataplaneCluster.knoxEnabled}, URL: ${dataplaneCluster.knoxUrl}")
+    logger.debug(
+      s" Cluster - Knox enabled:${dataplaneCluster.knoxEnabled}, URL: ${dataplaneCluster.knoxUrl}")
     hJwtToken.isDefined && dataplaneCluster.knoxEnabled.isDefined && dataplaneCluster.knoxEnabled.get && dataplaneCluster.knoxUrl.isDefined
   }
 
@@ -175,11 +269,12 @@ class AmbariRoute @Inject()(val ws: WSClient,
     // Decide on the executor
     val executor =
       if (knoxEnabledAndTokenPresent(dataplaneCluster, token)) {
-        logger.info(s"Knox was enabled and a token was detected, Ambari will be called through Knox at ${dataplaneCluster.knoxUrl.get}")
+        logger.info(
+          s"Knox was enabled and a token was detected, Ambari will be called through Knox at ${dataplaneCluster.knoxUrl.get}")
         KnoxApiExecutor(knoxConfig, ws)
-      }
-      else {
-        logger.info(s"No knox detected/No token in context, calling Ambari with credentials")
+      } else {
+        logger.info(
+          s"No knox detected/No token in context, calling Ambari with credentials")
         KnoxApiExecutor.withTokenDisabled(knoxConfig, ws)
       }
 
