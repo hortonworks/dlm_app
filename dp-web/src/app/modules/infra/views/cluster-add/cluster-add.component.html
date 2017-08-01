@@ -75,7 +75,7 @@
             <div class="form-group">
               <label class="required">{{"pages.infra.labels.clusterLocation" | translate}}</label>
               <div class="hwx-inline-desc">{{"pages.infra.description.clusterLocation" | translate}}</div>
-              <input required class="dp-input" name="location" type="text" ngui-auto-complete
+              <input required class="dp-input" name="location" type="text" autocomplete="off" ngui-auto-complete
                      (keyup)="checkLocation()"
                      [min-chars]=3
                      [(ngModel)]="location"
