@@ -49,7 +49,7 @@ get_bind_address_from_consul_container() {
         fi
     done
     export CONSUL_HOST=${BIND_ADDR};
- }
+}
 
 init_consul(){
     echo "Initializing Consul"
