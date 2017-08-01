@@ -67,6 +67,11 @@ $footer-height: 48px;
       .row {
         margin: 0 !important;
       }
+      .nav-header-container {
+        &:hover {
+          background-color: $navigation-header-hover;
+        }
+      }
       #header_icon {
         padding-top: 5px;
         font-size: 28px;
@@ -84,7 +89,7 @@ $footer-height: 48px;
       }
       #header_content {
         padding: 15px 5px;
-        .toggle-icon {
+        .toggle-icon-down {
           color: $primary-color;
           font-size: 16px;
         }

@@ -7,9 +7,9 @@
   [rows]="clusters">
 </dlm-table>
 
-<ng-template #statusCell let-status="value">
+<ng-template #statusCell let-status="value" let-cluster="row">
   <span>
-    <i class="fa fa-circle" [style.color]="status === CLUSTER_STATUS.HEALTHY ? '#1EB475' : '#EF6162'"></i>
+    <dlm-cluster-status-icon [cluster]="cluster"></dlm-cluster-status-icon>
     <span [innerHtml]="status"></span>
   </span>
 </ng-template>

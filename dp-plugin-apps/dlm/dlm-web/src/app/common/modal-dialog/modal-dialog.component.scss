@@ -19,6 +19,8 @@
 .modal-body {
   min-height: 70px;
   font-size: 14px !important;
+  max-height: calc(100vh - 225px);
+  overflow-y: auto;
 }
 
 .modal-title {
