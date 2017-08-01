@@ -155,7 +155,7 @@ export class ClusterAddComponent implements OnInit {
       this.cluster.ambariurl = cleanedUri;
       if (this._clusterState.knoxDetected) {
         // Update cluster state with the final knox URL - determined by
-        this._clusterState.knoxUrl = clusterInfo.knoxUrl
+        this._clusterState.knoxUrl = clusterInfo[0].knoxUrl
       }
     }, (error) => {
       this.onError();
