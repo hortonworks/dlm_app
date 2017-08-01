@@ -7,6 +7,7 @@ import * as moment from 'moment';
 
 import * as fromRoot from 'reducers/';
 import { Event } from 'models/event.model';
+import { JOB_EVENT, POLICY_EVENT } from 'constants/event.constant';
 import { ProgressState } from 'models/progress-state.model';
 import { updateProgressState } from 'actions/progress.action';
 import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
@@ -33,7 +34,7 @@ import { SUMMARY_PANELS, CLUSTERS_HEALTH_STATE, JOBS_HEALTH_STATE } from './reso
 import { CLUSTER_STATUS, SERVICE_STATUS } from 'constants/status.constant';
 import { MapSizeSettings, ClusterMapData, ClusterMapPoint } from 'models/map-data';
 import { LogService } from 'services/log.service';
-import { EntityType } from 'constants/log.constant';
+import { EntityType, LOG_EVENT_TYPE_MAP } from 'constants/log.constant';
 import { PairsCountEntity } from 'models/pairs-count-entity.model';
 import { getCountPairsForClusters } from 'selectors/pairing.selector';
 import { loadPairings } from 'actions/pairing.action';
@@ -315,5 +316,10 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
   handleClickMarker(cluster: Cluster) {
     this.selectedCluster$.next(cluster);
+  }
+
+  showEventEntityLogs(event: Event) {
+    const entityType = JOB_EVENT === event.eventType ? EntityType.policyinstance : EntityType.policy;
+    this.logService.showLog(entityType, event[LOG_EVENT_TYPE_MAP[entityType]]);
   }
 }

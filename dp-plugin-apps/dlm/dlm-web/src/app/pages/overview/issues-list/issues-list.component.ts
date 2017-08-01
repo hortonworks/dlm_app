@@ -1,4 +1,4 @@
-import { Component, Input, HostBinding } from '@angular/core';
+import { Component, Input, Output, HostBinding, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { Event } from 'models/event.model';
 
@@ -7,7 +7,7 @@ import { Event } from 'models/event.model';
   template: `
     <div class="row" *ngFor="let event of events | slice:0:visibleItems">
       <div class="col-md-12">
-        <dlm-issues-list-item [event]="event">
+        <dlm-issues-list-item [event]="event" (selectEventEntity)="onSelectEventEntity.emit($event)">
         </dlm-issues-list-item>
       </div>
     </div>
@@ -29,6 +29,8 @@ import { Event } from 'models/event.model';
 export class IssuesListComponent {
   visibleItems = 4;
   @Input() events: Event[];
+  @Output() onSelectEventEntity = new EventEmitter<Event>();
+
   @HostBinding('class') className = 'all-visible';
 
   constructor(private router: Router) { }
