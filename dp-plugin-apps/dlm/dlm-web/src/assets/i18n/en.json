@@ -122,6 +122,8 @@
   "forms": {
     "validation_errors": {
       "required": "\"{{fieldLabel}}\" is required",
+      "maxlength": "\"{{fieldLabel}}\" should be lower than {{maxLengthValue}} symbols",
+      "freqValidator": "\"{{fieldLabel}}\" is too big",
       "time_less_than_current": "Start time must be later than the current time in the selected timezone."
     }
   },
