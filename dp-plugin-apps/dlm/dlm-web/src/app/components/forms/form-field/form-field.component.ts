@@ -10,7 +10,7 @@ import { FormFieldDirective } from './form-field.directive';
 })
 export class FormFieldComponent implements OnInit {
   @Input() label: string;
-  @Input() num: string|number;
+  @Input() maxLengthValue: string|number;
   @ContentChild(FormFieldDirective) formField: FormFieldDirective;
   @Input() fieldClass = 'col-md-6';
   @Input() errorClass = 'col-md-6';
@@ -21,6 +21,6 @@ export class FormFieldComponent implements OnInit {
 
   ngOnInit() {
     this.fieldControl = this.formField.formFieldControl;
-    this.labelTranslate = { fieldLabel: this.label, num: this.num };
+    this.labelTranslate = { fieldLabel: this.label, maxLengthValue: this.maxLengthValue };
   }
 }

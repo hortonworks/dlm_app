@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-export function trunk(value: string, maxNumber: number): string {
+export function truncate(value: string, maxNumber: number): string {
   return value && value.length > maxNumber ? value.slice(0, maxNumber - 3) + '...' : value;
 }
 
@@ -15,6 +15,6 @@ export function trunk(value: string, maxNumber: number): string {
 @Pipe({name: 'truncate'})
 export class TruncatePipe implements PipeTransform {
   transform(value: string, maxNumber: number): string {
-    return trunk(value, maxNumber);
+    return truncate(value, maxNumber);
   }
 }

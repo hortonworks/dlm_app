@@ -13,12 +13,12 @@
           <fieldset formGroupName="general" [collapse]="sectionCollapsedMap.general">
             <dlm-form-field
               [label]="'page.policies.form.fields.policy_name' | translate"
-              [num]="64">
+              [maxLengthValue]="64">
               <input type="text" class="form-control" qe-attr="policy-name" formField formControlName="name" />
             </dlm-form-field>
             <dlm-form-field
               [label]="'page.policies.form.fields.policy_description' | translate"
-              [num]="512">
+              [maxLengthValue]="512">
               <textarea rows="4" class="form-control" qe-attr="policy-description" formField formControlName="description"></textarea>
             </dlm-form-field>
             <div class="form-group">
