@@ -231,36 +231,36 @@ stop_knox() {
 }
 
 init_all() {
-    init_db >> install.log 2>&1
-    migrate_schema >> install.log 2>&1
+    init_db
+    migrate_schema
 
-    init_knox >> install.log 2>&1
+    init_knox
 
-    init_app >> install.log 2>&1
+    init_app
 
     echo "Initialization and start complete."
 }
 
 start_all() {
-    start_knox >> install.log 2>&1
+    start_knox
 
-    start_app >> install.log 2>&1
+    start_app
 
     echo "Start complete."
 }
 
 stop_all() {
-    stop_app >> install.log 2>&1
+    stop_app
 
-    stop_knox >> install.log 2>&1
+    stop_knox
 
     echo "Stop complete."
 }
 
 destroy_all() {
-    destroy >> install.log 2>&1
+    destroy
 
-    destroy_knox >> install.log 2>&1
+    destroy_knox
 
     echo "Destroy complete."
 }
