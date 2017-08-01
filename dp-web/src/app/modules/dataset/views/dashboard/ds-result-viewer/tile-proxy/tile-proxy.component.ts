@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {Router} from "@angular/router";
 import {RichDatasetModel} from "../../../../models/richDatasetModel";
 
@@ -12,7 +12,7 @@ export class DsTileProxy {
 
   @Input() dsModel: RichDatasetModel;
 
-  constructor(private router: Router,) {
+  constructor(private router: Router) {
   }
 
   getID() {
@@ -21,7 +21,7 @@ export class DsTileProxy {
 
   showFullView($event) {
     if ($event.target.tagName != "I") {
-      this.router.navigate([`dataset/full-view/${this.dsModel.id}`]);
+      this.router.navigate([`datasteward/dataset/full-view/${this.dsModel.id}`]);
     }
   }
 }
