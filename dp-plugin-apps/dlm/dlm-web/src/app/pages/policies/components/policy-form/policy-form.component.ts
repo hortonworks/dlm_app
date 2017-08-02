@@ -42,6 +42,16 @@ export function freqValidator(frequencyMap): ValidatorFn {
   };
 }
 
+export function integerValidator(): ValidatorFn {
+  return (control: AbstractControl): {[key: string]: any} => {
+    const {value} = control;
+    if (!value) {
+      return null;
+    }
+    const n = Math.floor(Number(control.value));
+    return String(n) === value && n > 0 ? null : {'integerValidator': {name: control.value}};
+  };
+}
 
 @Component({
   selector: 'dlm-policy-form',
@@ -260,7 +270,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       directories: ['', Validators.required],
       job: this.formBuilder.group({
         repeatMode: this.policyRepeatModes.EVERY,
-        frequency: ['', Validators.compose([Validators.required, freqValidator(this.frequencyMap)])],
+        frequency: ['', Validators.compose([Validators.required, freqValidator(this.frequencyMap), integerValidator()])],
         day: this.policyDays.MONDAY,
         frequencyInSec: 0,
         unit: this.policyTimeUnits.DAYS,

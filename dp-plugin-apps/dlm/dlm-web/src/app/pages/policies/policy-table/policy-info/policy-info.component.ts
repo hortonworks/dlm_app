@@ -13,9 +13,9 @@ import { TableColumn } from 'common/table/table-column.type';
         <p *ngIf="row.frequency" [tooltip]=popTemplate>{{row.frequency | frequency}}</p>
       </div>
       <template #popTemplate>
-        {{row.startTime | date:'MMM dd, y HH:mm'}} 
+        {{row.startTime | fmtTz:'MMM DD, Y HH:mm'}} 
         <span *ngIf="row.startTime && row.endTime">-</span>
-        <span *ngIf="row.endTime">{{row.endTime | date:'MMM dd, y HH:mm'}}</span>
+        <span *ngIf="row.endTime">{{row.endTime | fmtTz:'MMM DD, Y HH:mm'}}</span>
       </template>
     </ng-template>
   `,

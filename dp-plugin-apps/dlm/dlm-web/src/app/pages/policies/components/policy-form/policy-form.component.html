@@ -149,10 +149,20 @@
                   </div>
                   <div class="row">
                     <div class="col col-md-5 col-md-offset-2">
-                      <dlm-field-error
-                        *ngIf="policyForm.get('job').get('frequency').touched && policyForm.get('job').get('frequency').hasError('required')">
-                        {{'forms.validation_errors.required' | translate:freqRequired}}
-                      </dlm-field-error>
+                      <div *ngIf="policyForm.get('job').get('frequency').touched">
+                        <dlm-field-error
+                          *ngIf="policyForm.get('job').get('frequency').hasError('required')">
+                          {{'forms.validation_errors.required' | translate:freqRequired}}
+                        </dlm-field-error>
+                        <dlm-field-error
+                          *ngIf="policyForm.get('job').get('frequency').hasError('freqValidator')">
+                          {{'forms.validation_errors.freqValidator' | translate:freqLimit}}
+                        </dlm-field-error>
+                        <dlm-field-error
+                          *ngIf="policyForm.get('job').get('frequency').hasError('integerValidator')">
+                          {{'forms.validation_errors.integerValidator' | translate:freqLimit}}
+                        </dlm-field-error>
+                      </div>
                       <dlm-field-error
                         *ngIf="policyForm.get('job').get('frequency').touched && policyForm.get('job').get('frequency').hasError('freqValidator')">
                         {{'forms.validation_errors.freqValidator' | translate:freqLimit}}
