@@ -22,7 +22,7 @@ DELETE        /api/lakes/:lakeId                                     controllers
 PUT           /api/lakes/:lakeId                                     controllers.DataplaneClusters.update(lakeId)
 GET           /api/lakes/ambari/status                               controllers.DataplaneClusters.ambariCheck
 
-GET           /api/locations                                         controllers.Locations.list(isQuery: Option[Boolean], city: Option[String], country: Option[String])
+GET           /api/locations                                         controllers.Locations.list(query: Option[String])
 GET           /api/locations/:locationId                             controllers.Locations.retrieve(locationId: Long)
 
 GET           /api/clusters                                          controllers.Clusters.list(lakeId: Option[Long])

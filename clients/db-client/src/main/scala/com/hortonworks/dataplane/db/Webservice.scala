@@ -147,7 +147,7 @@ object Webservice {
 
   trait LocationService extends DbClientService {
 
-    def list(isQuery: Option[Boolean], city: Option[String], country: Option[String]): Future[Either[Errors, Seq[Location]]]
+    def list(query: Option[String]): Future[Either[Errors, Seq[Location]]]
 
     def retrieve(locationId: Long): Future[Either[Errors, Location]]
 
