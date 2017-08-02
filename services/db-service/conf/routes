@@ -35,7 +35,7 @@ POST          /permissions                                                   con
 GET           /permissions/user/:username                                    controllers.Permissions.userPermissions(username)
 
 #Locations
-GET           /locations                                                     controllers.DpClusters.getLocations(isQuery: Option[Boolean], city: Option[String], country: Option[String])
+GET           /locations                                                     controllers.DpClusters.getLocations(query: Option[String])
 GET           /locations/:locationId                                         controllers.DpClusters.loadLocation(locationId:Long)
 DELETE        /locations/:locationId                                         controllers.DpClusters.deleteLocation(locationId:Long)
 POST          /locations                                                     controllers.DpClusters.addLocation
