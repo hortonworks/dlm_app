@@ -1,7 +1,7 @@
 {
   "name": "db-gen",
   "version": "1.0.0",
-  "description": "Generates script to import locations",
+  "description": "Sourced from [CC]: http://download.geonames.org/export/dump/",
   "main": "migrate.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
