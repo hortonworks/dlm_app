@@ -6,6 +6,7 @@ import javax.inject.Inject
 import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, Location}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.JsValue
+import slick.jdbc.GetResult
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -76,17 +77,31 @@ class DpClusterRepo @Inject()(
       .map(r => r)
   }
 
-  def getLocations(query: Option[String]): Future[List[Location]] = db.run {
-    query match {
-      case Some(query) =>
-        Locations
-          .filter(_.city.toLowerCase.startsWith(query.toLowerCase))
-          .take(20)
-          .to[List]
-          .result
-      case None => Locations.to[List].result
-    }
+  private def getLocationsByQuery(query: String): Future[List[Location]] = {
+    implicit val getLocationResult = GetResult(r => Location(
+      r.nextLongOption,
+      r.nextString,
+      r.nextString,
+      r.nextFloat,
+      r.nextFloat)
+    )
+    db.run(
+      sql"""select  l.id, l.country, l.city, l.latitude, l.longitude
+            from dataplane.locations as l
+            where lower(l.city) || ', ' || lower(l.country) like ${query.toLowerCase} || '%'
+            limit 20""".as[Location]
+    ).map(v => v.toList)
   }
+
+  private def  getAllLocations(): Future[List[Location]] = db.run {
+    Locations.to[List].result
+  }
+
+  def getLocations(query: Option[String]): Future[List[Location]] =
+    query match {
+      case Some(query) => getLocationsByQuery(query)
+      case None => getAllLocations()
+    }
 
   final class LocationsTable(tag: Tag)
       extends Table[Location](tag, Some("dataplane"), "locations") {
