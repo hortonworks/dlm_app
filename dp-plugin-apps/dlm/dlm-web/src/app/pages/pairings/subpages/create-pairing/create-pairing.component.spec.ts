@@ -8,6 +8,7 @@ import { CreatePairingCardComponent } from 'pages/pairings/components/create-pai
 import { MockStore } from 'mocks/mock-store';
 import { Store } from '@ngrx/store';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
+import { ModalDialogBodyComponent } from 'common/modal-dialog/modal-dialog-body.component';
 import { ModalModule } from 'ng2-bootstrap';
 import { MockTranslateLoader } from 'mocks/mock-translate-loader';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -38,7 +39,8 @@ describe('CreatePairingComponent', () => {
         CreatePairingCardListComponent,
         PairingProgressCardComponent,
         CreatePairingCardComponent,
-        ModalDialogComponent
+        ModalDialogComponent,
+        ModalDialogBodyComponent
       ],
       providers: [
         {
