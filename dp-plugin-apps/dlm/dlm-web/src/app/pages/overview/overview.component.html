@@ -19,7 +19,10 @@
         </div>
         <div class="row">
           <div class="col-md-12">
-            <dlm-issues-list [events]="events$ | async" (onSelectEventEntity)="showEventEntityLogs($event)">
+            <dlm-issues-list
+              [events]="events$ | async"
+              (onSelectLog)="showEventEntityLogs($event)"
+              (onSelectPolicy)="goToPolicy($event)">
             </dlm-issues-list>
           </div>
         </div>
