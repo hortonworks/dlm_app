@@ -75,7 +75,7 @@ class DpClusterRepo @Inject()(
       .map(r => r)
   }
 
-  def getLocations(isQuery: Option[Boolean], city: Option[String], country: Option[String]): Future[List[Location]] = db.run {
+  def getLocations(query: Option[String]): Future[List[Location]] = db.run {
     isQuery match {
       case Some(isQuery) => {
         if(isQuery)  {
