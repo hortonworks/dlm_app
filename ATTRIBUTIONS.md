@@ -7,6 +7,8 @@
     - License: MIT
     - http://simplemaps.com/data/world-cities
 
-* [NOT IN USE] Geonames
+## Used by a previous version
+
+ * Geonames
     - License: CC 3.0
     - http://www.geonames.org/

@@ -89,8 +89,9 @@ object Entities {
   //Data lake
   case class Location(
       id: Option[Long] = None,
-      country: String,
       city: String,
+      province: String,
+      country: String,
       latitude: Float,
       longitude: Float
   )

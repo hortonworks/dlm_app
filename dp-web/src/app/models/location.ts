@@ -1,7 +1,8 @@
 export class Location {
   id: number;
-  country: string;
   city: string;
+  province: string;
+  country: string;
   latitude: number;
   longitude: number;
 }
