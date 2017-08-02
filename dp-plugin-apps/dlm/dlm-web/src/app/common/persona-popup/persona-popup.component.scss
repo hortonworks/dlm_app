@@ -21,6 +21,10 @@ $icon-width: 75px;
     visibility: visible;
   }
 
+  .active-persona {
+    color: $link-color !important;
+  }
+
   & > li {
     display: inline-block;
     cursor: pointer;
