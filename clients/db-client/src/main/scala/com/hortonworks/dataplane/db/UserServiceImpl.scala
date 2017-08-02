@@ -119,11 +119,11 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       .post(Json.toJson(user))
       .map(mapToUser)
   }
-  override def addUserWithRoles(user: UserInfo): Future[Either[Errors, UserInfo]] = {
+  override def addUserWithRoles(userInfo: UserInfo): Future[Either[Errors, UserInfo]] = {
     ws.url(s"$url/users/withroles")
       .withHeaders("Accept" -> "application/json")
-      .post(Json.toJson(user))
-      .map(mapToUserInfo)
+      .post(Json.toJson(userInfo))
+      .map{res=>Right(userInfo)}
   }
 
   override  def getUserDetail(userName:String): Future[Either[Errors,UserInfo]]={

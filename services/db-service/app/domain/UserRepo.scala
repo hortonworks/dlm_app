@@ -110,7 +110,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     }
   }
 
-  def updateUserAndRoles(userInfo:UserInfo, upgradeFromGroupManaged:Boolean)={
+  def updateUserAndRoles(userInfo:UserInfo, groupManaged:Boolean)={
     for{
       (user,userRoles)<-getUserDetailInternal(userInfo.userName)
       userRoles<-db.run(UserRoles.filter(_.userId === user.id.get).result)
@@ -124,7 +124,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
             .map{r=>
               (r.active,r.updated,r.groupManaged)
             }
-            .update(userInfo.active, Some(LocalDateTime.now()),Some(!upgradeFromGroupManaged))
+            .update(userInfo.active, Some(LocalDateTime.now()),Some(groupManaged))
         }
         insertQuery<-UserRoles returning UserRoles ++= userRoleObjs
         delQuery <- UserRoles.filter(_.id inSet toBeDeletedRoleIds).delete

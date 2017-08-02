@@ -53,7 +53,7 @@ object Webservice {
 
     def getRoles():  Future[Either[Errors,Seq[Role]]]
 
-    def addUserWithRoles(user: UserInfo): Future[Either[Errors, UserInfo]]
+    def addUserWithRoles(userInfo: UserInfo): Future[Either[Errors, UserInfo]]
 
     def getUserDetail(userName:String): Future[Either[Errors,UserInfo]]
 
