@@ -17,9 +17,9 @@ export class LocationService {
       .catch(HttpUtil.handleError);
   }
 
-  retrieveOptions(isQuery: boolean, city: string, country: string): Observable<Location[]> {
+  retrieveOptions(query: string): Observable<Location[]> {
     return this.http
-      .get(`${this.url}?isQuery=${isQuery}&city=${city}&country=${country}`, new RequestOptions(HttpUtil.getHeaders()))
+      .get(`${this.url}?query=${query}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }
