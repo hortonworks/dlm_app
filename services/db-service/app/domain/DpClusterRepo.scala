@@ -93,6 +93,10 @@ class DpClusterRepo @Inject()(
               lower(l.city) || ', ' || lower(l.country) like ${query.toLowerCase} || '%'
               or
               lower(l.city) || ', ' || lower(l.province) || ', ' || lower(l.country) like ${query.toLowerCase} || '%'
+              or
+              lower(l.province) || ', ' || lower(l.country) like ${query.toLowerCase} || '%'
+              or
+              lower(l.country) like ${query.toLowerCase} || '%'
             limit 20""".as[Location]
     ).map(v => v.toList)
   }
