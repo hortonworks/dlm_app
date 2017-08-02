@@ -40,6 +40,10 @@ class DpClusterRepo @Inject()(
     db.run(DataplaneClusters.filter(_.id === dpClusterId).result.headOption)
   }
 
+  def findByAmbariUrl(ambariUrl: String): Future[Option[DataplaneCluster]] = {
+    db.run(DataplaneClusters.filter(_.ambariUrl === ambariUrl).result.headOption)
+  }
+
   def deleteById(dpClusterId: Long): Future[Int] = {
     db.run(DataplaneClusters.filter(_.id === dpClusterId).delete)
   }

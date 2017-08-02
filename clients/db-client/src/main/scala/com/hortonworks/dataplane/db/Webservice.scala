@@ -136,6 +136,8 @@ object Webservice {
 
     def retrieve(dpClusterId: String): Future[Either[Errors, DataplaneCluster]]
 
+    def retrieveByAmbariUrl(ambariUrl: String): Future[Either[Errors, Boolean]]
+
     def update(dpClusterId: String,
                dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]]
 
