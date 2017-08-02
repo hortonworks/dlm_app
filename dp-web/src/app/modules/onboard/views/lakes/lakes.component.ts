@@ -36,7 +36,7 @@ export class LakesComponent {
   ) { }
 
   locationFormatter(location:Location) : string{
-    return `${location.city}, ${location.province}, ${location.country}`;
+    return `${location.city}${location.province ? ', ' + location.province : ''}, ${location.country}`;
   }
 
   getLocations(searchTerm){

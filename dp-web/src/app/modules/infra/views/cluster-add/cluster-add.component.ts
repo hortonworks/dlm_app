@@ -207,7 +207,7 @@ export class ClusterAddComponent implements OnInit {
   }
 
   locationFormatter(location: Location): string {
-    return `${location.city}, ${location.province}, ${location.country}`;
+    return `${location.city}${location.province ? ', ' + location.province : ''}, ${location.country}`;
   }
 
   getLocations(searchTerm) {
