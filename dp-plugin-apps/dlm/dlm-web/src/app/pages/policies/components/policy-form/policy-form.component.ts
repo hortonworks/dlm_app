@@ -184,6 +184,14 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     return date.toDate();
   }
 
+  get defaultEndTime(): Date {
+    const date = moment();
+    date.hours(23);
+    date.minutes(59);
+    date.seconds(59);
+    return date.toDate();
+  }
+
   get sourceClusters() {
     return mapToList(this.getClusterEntities(this.pairings));
   }
@@ -277,7 +285,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         schedule: this.policySubmitTypes.SCHEDULE,
         endTime: this.formBuilder.group({
           date: [''],
-          time: [this.defaultTime]
+          time: [this.defaultEndTime]
         }, { validator: this.validateTime }),
         startTime: this.formBuilder.group({
           date: [''],
