@@ -87,6 +87,7 @@ GET           /api/users/detail                                controllers.UserM
 GET           /api/roles                                       controllers.UserManager.getAllRoles
 GET           /api/userGroups                                  controllers.UserManager.getUserGroupsFromLdap
 POST          /api/users/withLdapGroups                        controllers.UserManager.createUserFromLdapGroupsConfiguration
+POST          /api/users/resyncLdapGroups                      controllers.UserManager.resyncUserFromLdap
 
 #Group Management
 GET           /api/groups/:name                                controllers.GroupManager.getGroupsByName(name:String)

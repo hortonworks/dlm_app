@@ -119,6 +119,7 @@ public class TokenCheckFilter extends ZuulFilter {
     Optional<Cookie> knoxSsoCookie = cookieManager.getKnoxSsoCookie();
     if (!knoxSsoCookie.isPresent()) {
       return handleUnAuthorized(null);
+
     }
     String knoxSsoCookieValue = knoxSsoCookie.get().getValue();
     TokenInfo tokenInfo = knoxSso.validateJwt(knoxSsoCookieValue);
@@ -141,8 +142,16 @@ public class TokenCheckFilter extends ZuulFilter {
         }
       } else {
         if (userContextFromDb.get().isActive()){
-          setupUserSession(tokenInfo, userContextFromDb.get());
-          return null;
+          if (needsResyncFromLdap(userContextFromDb)){
+            //TODO rescyn...
+            logger.debug("needs resync");
+            UserContext updatedUserContext = userService.resyncUserFromLdapGroupsConfiguration(tokenInfo.getSubject());
+            setupUserSession(tokenInfo, updatedUserContext);
+            return null;
+          }else{
+            setupUserSession(tokenInfo, userContextFromDb.get());
+            return null;
+          }
         }else{
           return utils.sendForbidden(utils.getInactiveErrorMsg(tokenInfo.getSubject()));
         }
@@ -150,6 +159,11 @@ public class TokenCheckFilter extends ZuulFilter {
     } catch (FeignException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private boolean needsResyncFromLdap(Optional<UserContext> userContextFromDb) {
+    //300000 is 5 minutes TODO get from conf.
+    return userContextFromDb.get().isGroupManaged() && userContextFromDb.get().getUpdatedAt()-System.currentTimeMillis()>300000;
   }
 
   private void setupUserSession(TokenInfo tokenInfo, UserContext userContext) {

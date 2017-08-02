@@ -1,5 +1,7 @@
 package controllers
 
+import java.time.LocalDateTime
+
 import com.google.inject.Inject
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities._
@@ -175,10 +177,29 @@ class UserManager @Inject()(val ldapService: LdapService,
             case Left(errors)=>handleErrors(errors)
             case Right(roles)=>{
               val userCtx=UserContext(id=userGroupInfo.id,username=userGroupInfo.userName,display=Some(userGroupInfo.displayName),
-                avatar=Some(userGroupInfo.displayName),roles=roles,token=None,password = userGroupInfo.password,active = Some(true))
-
+                avatar=Some(userGroupInfo.displayName),roles=roles,token=None,password = userGroupInfo.password,
+                active = Some(true),groupManaged = Some(true),updatedAt = Some(System.currentTimeMillis()))
               Ok(Json.toJson(userCtx))
             }
+          }
+        }
+      }
+    }
+  }
+  def resyncUserFromLdap()=Action.async { req =>
+    val userNameOpt: Option[String] = req.getQueryString("userName")
+    if (userNameOpt.isEmpty) {
+      logger.error("userName is not specified")
+      Future.successful(BadRequest("userName not specified"))
+    } else {
+      val userName=userNameOpt.get
+      getMatchingGroupsFromLdapAndDb(userName).flatMap{
+        case Left(errors)=>Future.successful(handleErrors(errors))
+        case Right(ldapGroups)=>{
+          val userLdapGroups=UserLdapGroups(userName ,ldapGroups = ldapGroups.map(_.groupName))
+          userService.updateUserWithGroups(userLdapGroups).map{
+            case Left(errors)=>handleErrors(errors)
+            case Right(userCtx)=>Ok(Json.toJson(userCtx))
           }
         }
       }

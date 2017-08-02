@@ -2,8 +2,10 @@ package com.hortonworks.dataplane.gateway.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.joda.time.LocalDateTime;
 
 import java.io.Serializable;
+
 import java.util.List;
 
 public class UserContext implements Serializable {
@@ -16,6 +18,8 @@ public class UserContext implements Serializable {
   private String token;
   private String password;
   private boolean active;
+  private boolean groupManaged;
+  private Long updatedAt ;
 
   public UserContext() {
   }
@@ -74,9 +78,26 @@ public class UserContext implements Serializable {
     this.password = password;
   }
 
+  public Long getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(Long updatedAt) {
+    this.updatedAt = updatedAt;
+  }
+
   @JsonProperty
   public boolean isActive() {
     return active;
+
+  }
+  @JsonProperty
+  public boolean isGroupManaged() {
+    return groupManaged;
+  }
+
+  public void setGroupManaged(boolean groupManaged) {
+    this.groupManaged = groupManaged;
   }
 
   public void setActive(boolean active) {
@@ -91,5 +112,6 @@ public class UserContext implements Serializable {
   public void setRoles(List<String> roles) {
     this.roles = roles;
   }
+
 
 }
