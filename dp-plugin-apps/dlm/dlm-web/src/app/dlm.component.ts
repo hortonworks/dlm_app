@@ -88,31 +88,31 @@ export class DlmComponent implements OnDestroy, OnInit {
       new MenuItem(
         t.instant('sidenav.menuItem.overview'),
         './overview',
-        'navigation-icon glyphicon glyphicon-home',
+        'navigation-icon fa fa-home',
         'go-to-overview'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.clusters'),
         './clusters',
-        'navigation-icon glyphicon glyphicon-globe',
+        'navigation-icon fa fa-globe',
         'go-to-clusters'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.pairings'),
         './pairings',
-        'navigation-icon glyphicon glyphicon-resize-horizontal',
+        'navigation-icon fa fa-arrows-h',
         'go-to-pairings'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.policies'),
         './policies',
-        'navigation-icon glyphicon glyphicon-list-alt',
+        'navigation-icon fa fa-th-list',
         'go-to-policies'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.help'),
         './help',
-        'navigation-icon glyphicon glyphicon-info-sign',
+        'navigation-icon fa fa-info-circle',
         'go-to-help'
       )
     ];
