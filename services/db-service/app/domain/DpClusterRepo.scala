@@ -82,11 +82,12 @@ class DpClusterRepo @Inject()(
       r.nextLongOption,
       r.nextString,
       r.nextString,
+      r.nextString,
       r.nextFloat,
       r.nextFloat)
     )
     db.run(
-      sql"""select  l.id, l.country, l.city, l.latitude, l.longitude
+      sql"""select  l.id, l.city, l.province, l.country, l.latitude, l.longitude
             from dataplane.locations as l
             where lower(l.city) || ', ' || lower(l.country) like ${query.toLowerCase} || '%'
             limit 20""".as[Location]
@@ -109,6 +110,8 @@ class DpClusterRepo @Inject()(
 
     def country = column[String]("country")
 
+    def province = column[String]("province")
+
     def city = column[String]("city")
 
     def latitude = column[Float]("latitude")
@@ -116,7 +119,7 @@ class DpClusterRepo @Inject()(
     def longitude = column[Float]("longitude")
 
     def * =
-      (id, country, city, latitude, longitude) <> ((Location.apply _).tupled, Location.unapply)
+      (id, country, province, city, latitude, longitude) <> ((Location.apply _).tupled, Location.unapply)
   }
 
   final class DpClustersTable(tag: Tag)
