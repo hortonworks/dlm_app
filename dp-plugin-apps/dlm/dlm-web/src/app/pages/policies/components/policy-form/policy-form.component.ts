@@ -348,7 +348,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         return pairing.pair.reduce((clusters: {}, cluster) => {
           return Object.assign({}, clusters, {
             [cluster.id]: {
-              label: cluster.name,
+              label: `${cluster.name} (${cluster.dataCenter})`,
               value: cluster.id
             }
           });
