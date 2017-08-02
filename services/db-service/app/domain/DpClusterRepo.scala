@@ -79,10 +79,10 @@ class DpClusterRepo @Inject()(
     query match {
       case Some(query) =>
         Locations
-        .filter(_.city.toLowerCase.startsWith(query.toLowerCase))
-        .take(20)
-        .to[List]
-        .result
+          .filter(_.city.toLowerCase.startsWith(query.toLowerCase))
+          .take(20)
+          .to[List]
+          .result
       case None => Locations.to[List].result
     }
   }
