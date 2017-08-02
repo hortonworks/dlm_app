@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewEncapsulation, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -28,6 +29,7 @@ import { Job } from 'models/job.model';
 import { ClustersStatus, PoliciesStatus, JobsStatus } from 'models/aggregations.model';
 import { filterCollection, flatten, unique } from 'utils/array-util';
 import { isEqual, isEmpty } from 'utils/object-utils';
+import { getEventEntityName } from 'utils/event-utils';
 import { POLL_INTERVAL } from 'constants/api.constant';
 import { getClustersHealth, getPoliciesHealth, getJobsHealth } from 'selectors/aggregation.selector';
 import { SUMMARY_PANELS, CLUSTERS_HEALTH_STATE, JOBS_HEALTH_STATE } from './resource-summary/';
@@ -67,7 +69,6 @@ export class OverviewComponent implements OnInit, OnDestroy {
   addingPoliciesAvailable = AddEntityButtonComponent.addingPoliciesAvailable;
 
   events$: Observable<Event[]>;
-  jobs$: Observable<Job[]>;
   policies$: Observable<Policy[]>;
   clusters$: Observable<Cluster[]>;
   fullfilledClusters$: Observable<Cluster[]>;
@@ -93,9 +94,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
   constructor(private store: Store<fromRoot.State>,
               private overviewJobsExternalFiltersService: OverviewJobsExternalFiltersService,
               private logService: LogService,
+              private router: Router,
               private t: TranslateService) {
     this.events$ = store.select(getDisplayedEvents);
-    this.jobs$ = store.select(getAllJobs);
     this.policies$ = store.select(getAllPoliciesWithClusters);
     this.clusters$ = store.select(getAllClusters);
     this.pairsCount$ = store.select(getCountPairsForClusters);
@@ -321,5 +322,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
   showEventEntityLogs(event: Event) {
     const entityType = JOB_EVENT === event.eventType ? EntityType.policyinstance : EntityType.policy;
     this.logService.showLog(entityType, event[LOG_EVENT_TYPE_MAP[entityType]]);
+  }
+
+  goToPolicy(event: Event) {
+    this.router.navigate(['/policies'], {queryParams: {policy: getEventEntityName(event)}});
   }
 }

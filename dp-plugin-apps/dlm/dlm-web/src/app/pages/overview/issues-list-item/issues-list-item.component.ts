@@ -3,7 +3,6 @@ import { Event } from 'models/event.model';
 import { EVENT_TYPE } from 'constants/event.constant';
 import { getEventEntityName } from 'utils/event-utils';
 
-// todo: job messsage is missing
 @Component({
   selector: 'dlm-issues-list-item',
   template: `
@@ -19,9 +18,12 @@ import { getEventEntityName } from 'utils/event-utils';
           <span>{{ event.message }}</span>
           <span *ngIf="shouldShowLogsLink">
             <span>{{'common.for' | translate}}</span>
-            <span class="actionable text-primary" (click)="selectEntity()">
-              {{policyName}}
-              <i class="fa fa-file-text-o"></i>
+            <span class="actionable text-primary">
+              <span (click)="selectPolicy.emit(event)">{{policyName}}</span>
+              <i class="fa fa-file-text-o"
+                (click)="selectLog.emit(event)"
+                [tooltip]="'page.notifications.view_log' | translate">
+              </i>
             </span>
           </span>
         </div>
@@ -44,16 +46,12 @@ export class IssuesListItemComponent implements OnInit {
     return getEventEntityName(this.event);
   }
 
-  @Output() selectEventEntity = new EventEmitter<Event>();
+  @Output() selectLog = new EventEmitter<Event>();
+  @Output() selectPolicy = new EventEmitter<Event>();
   @Input() event: Event;
 
   constructor() { }
 
   ngOnInit() {
   }
-
-  selectEntity() {
-    this.selectEventEntity.emit(this.event);
-  }
-
 }
