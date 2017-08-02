@@ -3,17 +3,32 @@
 .dashboard-title{
     padding: 30px;
 }
-.dp-input {
-    position: relative;
-    display: inline-block;
-    margin-right: 10px;
-    width: 412px;
+
+.content-pane{
+  padding-top: 0;
+}
+
+.search-input {
+  position: relative;
+  display: inline-block;
+  margin-right: 6px;
+  width: 250px;
+  box-sizing: border-box;
+  input {
+    width: 100%;
     box-sizing: border-box;
+  }
+  .dp-input__icon {
+    position: absolute;
+    margin-top: -10%;
+    margin-left: 90%;
+    color: $dove-gray;
+    font-size: 14px;
+  }
 }
 
 input {
     width: 100%;
-    padding-left: 30px;
     box-sizing: border-box;
 }
 
@@ -21,15 +36,8 @@ input {
     float: right;
 }
 
-.dp-input__icon {
-  position: absolute;
-  left: 10px;
-  bottom: 10px;
-  color: $shuttle-gray;
-}
-
 .mdl-data-table {
-    margin-top: 20px;
+    margin-top: 17px;
 }
 
 .mdl-typography--text-center {
@@ -57,4 +65,9 @@ input {
   .fa {
     padding: 0 8px;
   }
+}
+
+.hwx-title {
+  display: inline-block;
+  padding-top: 10px;
 }
