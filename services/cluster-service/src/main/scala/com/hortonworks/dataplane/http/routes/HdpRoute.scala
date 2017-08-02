@@ -57,6 +57,8 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
   private lazy val pathRegex =
     """(\/cluster\/)(\d+)(\/service\/)(\w+)\/(.*)""".r
 
+  private val enabledServices = config.getStringList("dp.services.hdp.proxy.services")
+
   def valid(request: HttpRequest): Boolean = {
     pathRegex.pattern.matcher(request.uri.path.toString()).matches()
   }
@@ -123,7 +125,7 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
             url <- serviceRoutes.get(cluster)
 
             targetUrl <- Future.successful {
-              if (shouldUseKnox(jwtToken, url))
+              if (shouldUseKnox(jwtToken, url) && serviceEnabled(service))
                 url.get
               else
                 new URL(
@@ -164,7 +166,7 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
                   hi.isInstanceOf[Cookie]
                     || hi.lowercaseName() == Constants.DPTOKEN.toLowerCase)
 
-              val finalPath = if(shouldUseKnox(jwtToken, url)) s"${targetUrl.getPath}/$service/$targetPath" else s"${targetUrl.getPath}/$targetPath"
+              val finalPath = if(shouldUseKnox(jwtToken, url) && serviceEnabled(service)) s"${targetUrl.getPath}/$service/$targetPath" else s"${targetUrl.getPath}/$targetPath"
               val target = HttpRequest(
                 method = request.method,
                 entity = request.entity,
@@ -182,7 +184,7 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
 
 
 
-              val flow = if(shouldUseKnox(jwtToken, url)) {
+              val flow = if((shouldUseKnox(jwtToken, url) && serviceEnabled(service)) || targetUrl.getProtocol == "https") {
                 // set up cert chain
                 dPKeystore.storeCertificate(targetUrl) match {
                   case Success(status) =>
@@ -212,6 +214,10 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
         }
     }
 
+  }
+
+  private def serviceEnabled(service: String) = {
+    enabledServices.contains(service.toLowerCase)
   }
 
   private def shouldUseKnox(jwtToken: Option[HJwtToken], url: Option[URL]) = {
