@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, HostListener, ViewChild} from '@angular/core';
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {UserService} from '../../../../../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -19,6 +19,7 @@ export class AddGroupComponent {//implements OnInit {
   modes = Modes;
   mode = Modes.ADD;
   groupName: string;
+  showRoles = false;
 
   availableGroups: string[] = [];
   availableRoles: TaggingWidgetTagModel[] = [];
@@ -40,6 +41,14 @@ export class AddGroupComponent {//implements OnInit {
               private router: Router,
               private route: ActivatedRoute,
               private translateService: TranslateService) {
+  }
+
+  @HostListener('click', ['$event', '$event.target'])
+  public onClick($event:MouseEvent, targetElement:HTMLElement):void {
+    let optionList = targetElement.querySelector('.option-list');
+    if(optionList){
+      this.showRoles = false;
+    }
   }
 
   ngOnInit() {
@@ -74,7 +83,8 @@ export class AddGroupComponent {//implements OnInit {
           this.availableGroups.push(user.name);
         });
       }, () => {
-        console.error('Error while fetching ldap users');
+        this.showError = true;
+        this.errorMessage = this.translateService.instant('pages.infra.description.ldapError');
       });
     }
   }
@@ -96,6 +106,14 @@ export class AddGroupComponent {//implements OnInit {
     }
   }
 
+  showRoleOptions(){
+    if(this.showRoles){
+      this.showRoles = false;
+    }else{
+      this.showRoles = true;
+    }
+  }
+
   save() {
     if (this.mode as Modes === Modes.EDIT && this.isEditDataValid()) {
       this.group.roles = this.groupRoles.map(role => {
@@ -105,9 +123,8 @@ export class AddGroupComponent {//implements OnInit {
         this.groupService.dataChanged.next();
         this.router.navigate(['groups'], {relativeTo: this.route});
       }, error => {
-        console.error('error');
         this.showError = true;
-        this.errorMessage = 'Error while updating group/roles';
+        this.errorMessage = this.translateService.instant('pages.infra.description.updateGroupError');
       });
     } else if (this.isCreateDataValid()) {
       let roles = this.roles.map(role => {
@@ -124,13 +141,12 @@ export class AddGroupComponent {//implements OnInit {
               failedGroups.push(grp);
             }
           });
-          this.errorMessage = `Error while saving user/roles - ${failedGroups.join(', ')}`;
+          this.errorMessage = `${this.translateService.instant('pages.infra.description.addGroupError')} - ${failedGroups.join(', ')}`;
           this.showError = true;
         }
       }, error => {
-        console.error('error');
         this.showError = true;
-        this.errorMessage = 'Error while saving groups/roles';
+        this.errorMessage = this.translateService.instant('pages.infra.description.addGroupError');
       });
     }
   }

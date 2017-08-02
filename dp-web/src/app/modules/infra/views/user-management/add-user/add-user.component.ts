@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {UserService} from '../../../../../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -18,6 +18,7 @@ export class AddUserComponent implements OnInit {
   modes = Modes;
   mode = Modes.ADD;
   userName: string;
+  showRoles = false;
 
   availableUsers: string[] = [];
   availableRoles: TaggingWidgetTagModel[] = [];
@@ -34,7 +35,18 @@ export class AddUserComponent implements OnInit {
   @ViewChild('addUserForm') addUserForm: NgForm;
   @ViewChild('editUserForm') editUserForm: NgForm;
 
-  constructor(private userService: UserService, private router: Router, private route: ActivatedRoute, private translateService: TranslateService) {
+  constructor(private userService: UserService,
+              private router: Router,
+              private route: ActivatedRoute,
+              private translateService: TranslateService) {
+  }
+
+  @HostListener('click', ['$event', '$event.target'])
+  public onClick($event: MouseEvent, targetElement: HTMLElement): void {
+    let optionList = targetElement.querySelector('.option-list');
+    if (optionList) {
+      this.showRoles = false;
+    }
   }
 
   ngOnInit() {
@@ -69,7 +81,8 @@ export class AddUserComponent implements OnInit {
           this.availableUsers.push(user.name);
         });
       }, () => {
-        console.error('Error while fetching ldap users');
+        this.showError = true;
+        this.errorMessage = this.translateService.instant('pages.infra.description.ldapError');
       });
     }
   }
@@ -83,11 +96,20 @@ export class AddUserComponent implements OnInit {
   }
 
   onRoleSearchChange(text: string) {
+    this.showRoles = false;
     this.availableRoles = [];
     if (text && text.length > 2) {
       this.availableRoles = this.allRoles.filter(role => {
         return role.display.toLowerCase().startsWith(text.toLowerCase());
       });
+    }
+  }
+
+  showRoleOptions() {
+    if (this.showRoles) {
+      this.showRoles = false;
+    } else {
+      this.showRoles = true;
     }
   }
 
@@ -102,7 +124,7 @@ export class AddUserComponent implements OnInit {
         this.router.navigate(['users'], {relativeTo: this.route});
       }, error => {
         this.showError = true;
-        this.errorMessage = 'Error while updating user/roles';
+        this.errorMessage = this.translateService.instant('pages.infra.description.updateUserError');
       });
     } else if (this.isCreateDataValid()) {
       let roles = this.roles.map(role => {
@@ -119,14 +141,13 @@ export class AddUserComponent implements OnInit {
               failedUsers.push(user)
             }
           });
-          this.errorMessage = `Error while saving user/roles - ${failedUsers.join(', ')}`;
+          this.errorMessage = `${this.translateService.instant('pages.infra.description.addUserError')}- ${failedUsers.join(', ')}`;
           this.showError = true;
         }
 
       }, error => {
-        this.errorMessage = 'Error while saving user/roles';
+        this.errorMessage = this.translateService.instant('pages.infra.description.addUserError');
         this.showError = true;
-        console.error(error);
       });
     }
   }

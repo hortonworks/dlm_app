@@ -22,6 +22,7 @@ import {UsersComponent} from './views/user-management/users/users.component';
 import {GroupsComponent} from './views/user-management/groups/groups.component';
 import {AddGroupComponent} from './views/user-management/add-group/add-group.component';
 import {ConfigDialogComponent} from './widgets/config-dialog/config-dialog.component';
+import {TabsModule} from '../../shared/tabs/tabs.module';
 
 @NgModule({
   imports: [
@@ -33,7 +34,8 @@ import {ConfigDialogComponent} from './widgets/config-dialog/config-dialog.compo
     CollapsibleNavModule,
     DropdownModule,
     TranslateModule,
-    PaginationModule
+    PaginationModule,
+    TabsModule
   ],
 
   declarations: [

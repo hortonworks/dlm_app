@@ -124,7 +124,7 @@
   height: 34px;
   margin-bottom: 20px;
   .fa-times-circle {
-    font-size: 24px;
+    font-size: 14px;
     color: $roman-red;
   }
   .fa-remove {
@@ -135,4 +135,35 @@
     font-weight: 500;
     color: $roman-red;
   }
+}
+
+.drop-down-icon {
+  position: absolute;
+  margin-top: -6%;
+  left: 90%;
+  color: $dove-gray;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.option-list {
+  position: absolute;
+  z-index: 1000;
+  background: $white;
+  border-radius: 0 0 2px 2px;
+  border: 1px solid $iron;
+  box-shadow: 1px 2px 3px $iron;
+  max-height: 200px;
+  overflow: auto;
+  width: 260px;
+}
+
+.option-list > div:hover, .option-list > div:focus {
+  background: $color_celeste_approx;
+  outline: none;
+}
+
+.option-list > div {
+  padding: 5px 20px;
+  cursor: pointer;
 }
