@@ -54,3 +54,14 @@
     </div>
   </ng-template>
 </div>
+<dlm-modal-dialog
+  #errorDialog
+  qe-attr="create-pair-error-modal"
+  [title]="'common.error'"
+  [showDialog]="false"
+  [showCancel]="false"
+>
+  <dlm-modal-dialog-body>
+    <pre>{{ errorMessage }}</pre>
+  </dlm-modal-dialog-body>
+</dlm-modal-dialog>

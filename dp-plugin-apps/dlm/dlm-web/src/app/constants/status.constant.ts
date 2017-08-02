@@ -6,6 +6,8 @@ export const WARNINGS = 'WARNINGS';
 export const RUNNING = 'RUNNING';
 export const SUSPENDED = 'SUSPENDED';
 export const IGNORED = 'IGNORED';
+export const INIT = 'INIT';
+export const IN_PROGRESS = 'IN_PROGRESS';
 
 export const JOB_STATUS = {
   RUNNING: RUNNING,
@@ -39,4 +41,11 @@ export const CLUSTER_STATUS = {
 export const SERVICE_STATUS = {
   STARTED: 'STARTED',
   INSTALLED: 'INSTALLED'
+};
+
+export const PROGRESS_STATUS = {
+  INIT: INIT,
+  IN_PROGRESS: IN_PROGRESS,
+  SUCCESS: SUCCESS,
+  FAILED: FAILED
 };
