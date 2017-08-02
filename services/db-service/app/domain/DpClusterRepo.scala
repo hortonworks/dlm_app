@@ -89,7 +89,10 @@ class DpClusterRepo @Inject()(
     db.run(
       sql"""select  l.id, l.city, l.province, l.country, l.latitude, l.longitude
             from dataplane.locations as l
-            where lower(l.city) || ', ' || lower(l.country) like ${query.toLowerCase} || '%'
+            where
+              lower(l.city) || ', ' || lower(l.country) like ${query.toLowerCase} || '%'
+              or
+              lower(l.city) || ', ' || lower(l.province) || ', ' || lower(l.country) like ${query.toLowerCase} || '%'
             limit 20""".as[Location]
     ).map(v => v.toList)
   }
