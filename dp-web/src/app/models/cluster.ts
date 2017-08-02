@@ -18,6 +18,8 @@ export class Cluster {
   userid: number;
   dataplaneClusterId: number;
   properties: any;
+  knoxUrl?:string;
+
 }
 
 export class ClusterHealthSummary {

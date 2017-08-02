@@ -12,11 +12,13 @@
           </div>
           <fieldset formGroupName="general" [collapse]="sectionCollapsedMap.general">
             <dlm-form-field
-              [label]="'page.policies.form.fields.policy_name' | translate">
+              [label]="'page.policies.form.fields.policy_name' | translate"
+              [maxLengthValue]="64">
               <input type="text" class="form-control" qe-attr="policy-name" formField formControlName="name" />
             </dlm-form-field>
             <dlm-form-field
-              [label]="'page.policies.form.fields.policy_description' | translate">
+              [label]="'page.policies.form.fields.policy_description' | translate"
+              [maxLengthValue]="512">
               <textarea rows="4" class="form-control" qe-attr="policy-description" formField formControlName="description"></textarea>
             </dlm-form-field>
             <div class="form-group">
@@ -150,6 +152,10 @@
                       <dlm-field-error
                         *ngIf="policyForm.get('job').get('frequency').touched && policyForm.get('job').get('frequency').hasError('required')">
                         {{'forms.validation_errors.required' | translate:freqRequired}}
+                      </dlm-field-error>
+                      <dlm-field-error
+                        *ngIf="policyForm.get('job').get('frequency').touched && policyForm.get('job').get('frequency').hasError('freqValidator')">
+                        {{'forms.validation_errors.freqValidator' | translate:freqLimit}}
                       </dlm-field-error>
                     </div>
                   </div>

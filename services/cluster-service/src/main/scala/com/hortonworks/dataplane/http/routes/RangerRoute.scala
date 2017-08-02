@@ -19,6 +19,7 @@ import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
+
 class RangerRoute @Inject()(
       private val clusterComponentService: ClusterComponentService,
       private val clusterHostsService: ClusterHostsService,
@@ -32,7 +33,11 @@ class RangerRoute @Inject()(
           println(limit, offset)
           onComplete(requestRangerForAudit(clusterId, dbName, tableName, offset, limit)) {
             case Success(res) => complete(success(res.json))
-            case Failure(th) => complete(StatusCodes.InternalServerError, errors(th))
+            case Failure(th) => th match {
+              case th:ServiceNotFound => complete(StatusCodes.NotFound, errors(th))
+              case _ => complete(StatusCodes.InternalServerError, errors(th))
+            }
+            //
           }
         }
       }
@@ -61,7 +66,7 @@ class RangerRoute @Inject()(
     clusterComponentService.getServiceByName(clusterId, "RANGER").map {
       case Right(endpoints) => endpoints
       case Left(errors) =>
-        throw new Exception(
+        throw new ServiceNotFound(
           s"Could not get the service Url from storage - $errors")
     }
   }

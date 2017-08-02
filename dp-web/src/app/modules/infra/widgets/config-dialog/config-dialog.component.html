@@ -1,0 +1,40 @@
+<dialog id="dialog" class="mdl-dialog" [ngClass]="{'mdl-dialog-large': requestKnoxURL}">
+  <div class="dialog-title hwx-subtitle">
+    <i class="fa fa-cogs"></i>
+    {{("pages.infra.labels.additionalConfigs" | translate).toUpperCase()}}
+  </div>
+  <div class="dialog-container">
+    <div class="hwx-desc">{{"pages.infra.description.additionalConfigs" | translate}}</div>
+    <div *ngIf="showError">
+      <div class="error-notification-bar">
+        <i class="fa fa-times-circle pull-left"></i>
+        <div class="text-medium">{{"common.failed" | translate}}</div>
+        <div class="text-small-1">{{errorMessage}} </div>
+      </div>
+    </div>
+    <form #configForm="ngForm">
+      <div *ngIf="requestAmbariCreds">
+        <div class="form-group">
+          <label class="required">{{"pages.infra.labels.ambariUsername" | translate}}</label>
+          <input required class="dp-input" name="username" type="text" [(ngModel)]="clusterDetailsRequest.ambariUser"/>
+        </div>
+        <div class="form-group">
+          <label class="required">{{"pages.infra.labels.ambariPassword" | translate}}</label>
+          <input required class="dp-input" name="password" type="password" [(ngModel)]="clusterDetailsRequest.ambariPass"/>
+        </div>
+      </div>
+      <div *ngIf="requestKnoxURL">
+        <div class="form-group">
+          <label class="required">{{"pages.infra.labels.knoxUrl" | translate}}</label>
+          <div class="hwx-inline-desc">{{"pages.infra.description.knoxUrl" | translate}}</div>
+          <input required class="dp-input-url" name="knox-url" type="text" placeholder="https://hostname:8443/" [(ngModel)]="clusterDetailsRequest.knoxTopology"/>
+        </div>
+      </div>
+    </form>
+    <div class="actions">
+      <button type="button" (click)="save()" class="mdl-button btn-hwx-primary">{{"common.save" | translate}}</button>
+      <button type="button" (click)="cancel()" class="mdl-button btn-hwx-secondary">{{"common.cancel" | translate}}</button>
+    </div>
+  </div>
+
+</dialog>
