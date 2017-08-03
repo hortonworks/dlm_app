@@ -44,7 +44,7 @@ get_bind_address_from_consul_container() {
             BIND_ADDR=${word##*=}
         fi
     done
-    export CONSUL_HOST=${BIND_ADDR};
+    CONSUL_HOST=${BIND_ADDR};
 }
 
 init_consul(){
@@ -60,7 +60,7 @@ read_consul_host(){
     if [ -z "${CONSUL_HOST}" ]; then
         echo "Enter the Host IP Address (Consul will bind to this host):"
         read HOST_IP;
-        export CONSUL_HOST=$HOST_IP;
+        CONSUL_HOST=$HOST_IP;
     fi
     echo "using CONSUL_HOST: ${CONSUL_HOST}"
 }
@@ -161,13 +161,13 @@ read_master_password() {
         exit 1
        fi
     fi
-    export MASTER_PASSWORD="$MASTER_PASSWD"
+    MASTER_PASSWORD="$MASTER_PASSWD"
 }
 
 read_use_test_ldap() {
     echo "Use pre-packaged LDAP instance (suitable only for testing) [yes/no]: "
     read USE_TEST_LDAP
-    export USE_TEST_LDAP
+    USE_TEST_LDAP
 }
 
 init_knox() {
