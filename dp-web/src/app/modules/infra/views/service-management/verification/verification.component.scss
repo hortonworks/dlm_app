@@ -25,10 +25,28 @@ input[type="text"].dp-input {
   }
 }
 
+.error-message {
+  color: $roman-red;
+  padding-top: 10px;
+}
+
+
 .padding-left-12{
   padding-left: 12px;
 }
 
 .width-90 {
   width: 90px;
+}
+
+.error-notification-bar {
+  line-height: 1.2;
+  padding: 15px;
+  background: $concrete;
+  height: 34px;
+  margin-bottom: 20px;
+  .fa-times-circle {
+    font-size: 24px;
+    color: $roman-red;
+  }
 }

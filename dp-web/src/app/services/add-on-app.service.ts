@@ -3,7 +3,7 @@ import {Http, RequestOptions} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 
 import {HttpUtil} from '../shared/utils/httpUtil';
-import {AddOnAppInfo, EnabledAppInfo} from '../models/add-on-app';
+import {AddOnAppInfo, ConfigPayload, EnabledAppInfo, SKU} from '../models/add-on-app';
 
 @Injectable()
 export class AddOnAppService {
@@ -27,11 +27,24 @@ export class AddOnAppService {
       .catch(HttpUtil.handleError);
   }
 
-  enableService(serviceId) {
-
+  enableService(configPayload: ConfigPayload) {
+    return this.http
+      .post(`${this.uri}/enable`, configPayload, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
   }
 
-  verify(smartSenseid: string) {
+  verify(smartSenseid: string): Observable<any> {
+    return this.http
+      .post(`${this.uri}/verifyCode?smartSenseId=${smartSenseid}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
 
+  getServiceByName(name: string): Observable<SKU> {
+    return this.http
+      .get(`${this.uri}/byName?skuName=${name}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
   }
 }

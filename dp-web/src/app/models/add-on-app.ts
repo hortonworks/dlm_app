@@ -30,4 +30,9 @@ export class EnabledSKU {
   updated: string;
 }
 
+export class ConfigPayload {
+  skuName: string;
+  smartSenseId: string;
+}
+
 
