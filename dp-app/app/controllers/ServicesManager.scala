@@ -3,7 +3,7 @@ package controllers
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{DpService, Errors}
+import com.hortonworks.dataplane.commons.domain.Entities.{DpService, DpServiceEnableConfig, Errors}
 import com.hortonworks.dataplane.db.Webservice.SkuService
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
@@ -32,12 +32,27 @@ class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService) 
       }
     }
   }
-  def enableService=Action.async { request =>
-    //todo smarsense regex check
-    //todo insert row in enabledsku
-    Future.successful(Ok)
+  def verifySmartSense=Action.async(parse.json) { request =>
+    val smartSenseId=request.getQueryString("smartSenseId");
+    if (smartSenseId.isEmpty){
+      Future.successful(BadRequest("smartSenseId is required"))
+    }else{
+      if (smartSenseId.get.startsWith("smart")){//TODO meaningful regex from config
+        Future.successful(Ok(true))
+      }else{
+        Future.successful(Ok(false))
+      }
+    }
   }
+  def enableService=Action.async(parse.json) { request =>
+    request.body.validate[DpServiceEnableConfig].map{config=>
+      //TODO implementation.
+      Future.successful(Ok)
+    }.getOrElse(Future.successful(BadRequest))
+  }
+
   def getEnabledServiceDetail= Action.async { request =>
+    //TODO imiplementation
     Future.successful(Ok)
   }
   private def getDpServicesInternal(): Future[Either[Errors,Seq[DpService]]] ={

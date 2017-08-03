@@ -118,4 +118,5 @@ GET           /api/workspaces/:id/notebooks                          controllers
 #apps
 GET           /api/services                                  controllers.ServicesManager.getServices
 GET           /api/services/enabled                          controllers.ServicesManager.getEnabledServies
+POST          /api/services/verifyCode                       controllers.ServicesManager.verifySmartSense
 GET           /api/services/enable                           controllers.ServicesManager.enableService
