@@ -191,8 +191,15 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
          }
          UserGroups returning UserGroups ++=  userGroups
        }
+       updatedUserUpdatedTime<-
+         Users.filter(_.username===userName)
+           .map{r=>
+             (r.updated)
+           }
+           .update(Some(LocalDateTime.now()))
+
      }yield{
-       (deleteUserGroups,inserUserGroups)
+       (deleteUserGroups,inserUserGroups,updatedUserUpdatedTime)
      }
      db.run(query.transactionally)
    }
