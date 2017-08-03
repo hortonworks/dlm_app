@@ -115,8 +115,9 @@ POST          /api/workspaces/notebooks                              controllers
 DELETE        /api/workspaces/notebooks/:id                          controllers.NotebookWorkspaces.delete(id:String)
 GET           /api/workspaces/:id/notebooks                          controllers.NotebookWorkspaces.getNotebooks(id:Long)
 
-#apps
+#services
 GET           /api/services                                  controllers.ServicesManager.getServices
+GET           /api/services/byName                           controllers.ServicesManager.getSkuByName
 GET           /api/services/enabled                          controllers.ServicesManager.getEnabledServies
 POST          /api/services/verifyCode                       controllers.ServicesManager.verifySmartSense
-GET           /api/services/enable                           controllers.ServicesManager.enableService
+POST          /api/services/enable                           controllers.ServicesManager.enableService

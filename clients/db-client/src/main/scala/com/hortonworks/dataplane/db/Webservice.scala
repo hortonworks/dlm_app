@@ -261,6 +261,7 @@ object Webservice {
   }
   trait SkuService extends  DbClientService {
     def getAllSkus():Future[Either[Errors,Seq[Sku]]]
+    def getSku(name:String): Future[Either[Errors,Sku]]
     def getEnabledSkus():Future[Either[Errors,Seq[EnabledSku]]]
     def enableSku(enabledSku: EnabledSku):Future[Either[Errors,EnabledSku]]
   }

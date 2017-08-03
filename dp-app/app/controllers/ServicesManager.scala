@@ -3,7 +3,8 @@ package controllers
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{DpService, DpServiceEnableConfig, Errors}
+import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.commons.domain.Entities.{DpService, DpServiceEnableConfig, EnabledSku, Errors}
 import com.hortonworks.dataplane.db.Webservice.SkuService
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
@@ -14,7 +15,8 @@ import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import scala.concurrent.Future
 import scala.util.Left
 
-class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService) extends Controller{
+class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService
+                               ,authenticated: Authenticated) extends Controller{
 
   def getServices = Action.async { request =>
     getDpServicesInternal().map{
@@ -37,17 +39,52 @@ class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService) 
     if (smartSenseId.isEmpty){
       Future.successful(BadRequest("smartSenseId is required"))
     }else{
-      if (smartSenseId.get.startsWith("smart")){//TODO meaningful regex from config
-        Future.successful(Ok(true))
+      if (vefifySmartSenseCode(smartSenseId.get)){//TODO meaningful regex from config
+        Future.successful(Ok("true"))
       }else{
-        Future.successful(Ok(false))
+        Future.successful(Ok("false"))
       }
     }
   }
-  def enableService=Action.async(parse.json) { request =>
+  def getSkuByName= Action.async { request =>
+    val skuNameOpt = request.getQueryString("skuName")
+    if (skuNameOpt.isEmpty) {
+      Future.successful(BadRequest("skuName not provided"))
+    } else {
+      skuService.getSku(skuNameOpt.get)map {
+        case Left(errors) =>handleErrors(errors)
+        case Right(services) => {
+          Ok(Json.toJson(services))
+        }
+      }
+    }
+  }
+
+  private def vefifySmartSenseCode(smartSenseId: String) = {
+    smartSenseId.startsWith("smart")
+  }
+
+  def enableService=authenticated.async(parse.json) { request =>
     request.body.validate[DpServiceEnableConfig].map{config=>
-      //TODO implementation.
-      Future.successful(Ok)
+      if (!vefifySmartSenseCode(config.smartSenseId)){
+        Future.successful(BadRequest("Invalid Smart SenseId"))
+      }else{
+        skuService.getSku(config.skuName).flatMap{
+          case Left(errors) =>Future.successful(handleErrors(errors))
+          case Right(sku)=>{
+            val enabledSku=EnabledSku(
+              skuId=sku.id.get,
+              enabledBy=request.user.id.get,
+              smartSenseId = config.smartSenseId,
+              subscriptionId =config.smartSenseId//TODO check subscription id later.
+            )
+            skuService.enableSku(enabledSku).map{
+              case Left(errors) =>handleErrors(errors)
+              case Right(enabledSku)=>Ok(Json.toJson(enabledSku))
+            }
+          }
+        }
+      }
     }.getOrElse(Future.successful(BadRequest))
   }
 
