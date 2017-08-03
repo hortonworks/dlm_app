@@ -16,7 +16,10 @@ import scala.concurrent.Future
 import scala.util.Left
 
 class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService
-                               ,authenticated: Authenticated) extends Controller{
+                               ,authenticated: Authenticated
+                               ,private val configuration: play.api.Configuration) extends Controller{
+
+  private val smartSenseRegex: String = configuration.underlying.getString("smartsense.regex")
 
   def getServices = Action.async { request =>
     getDpServicesInternal().map{
@@ -61,7 +64,7 @@ class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService
   }
 
   private def vefifySmartSenseCode(smartSenseId: String) = {
-    smartSenseId.startsWith("smart")
+    smartSenseId.matches(smartSenseRegex)
   }
 
   def enableService=authenticated.async(parse.json) { request =>
