@@ -10,17 +10,27 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class DpClusters @Inject()(dpClusterRepo: DpClusterRepo)(
-    implicit exec: ExecutionContext)
-    extends JsonAPI {
+  implicit exec: ExecutionContext)
+  extends JsonAPI {
 
   import domain.API._
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  def all = Action.async {
-    dpClusterRepo.all.map { dl =>
-      val datums = dl.map(d => linkData(d, makeLink(d)))
-      success(datums)
-    }.recoverWith(apiError)
+  def all = Action.async { request =>
+    if(!request.getQueryString("ambariUrl").isEmpty){
+      val url = request.getQueryString("ambariUrl").get
+      dpClusterRepo.findByAmbariUrl(url).map { dlo =>
+        dlo.map { dl =>
+          success(linkData(dl, makeLink(dl)))
+        }
+          .getOrElse(NotFound)
+      }.recoverWith(apiError)
+    }else{
+      dpClusterRepo.all.map { dl =>
+        val datums = dl.map(d => linkData(d, makeLink(d)))
+        success(datums)
+      }.recoverWith(apiError)
+    }
   }
 
   def addLocation = Action.async(parse.json) { req =>
@@ -55,7 +65,7 @@ class DpClusters @Inject()(dpClusterRepo: DpClusterRepo)(
 
   private def makeLink(d: DataplaneCluster) = {
     Map("createdBy" -> s"${users}/${d.createdBy.get}",
-        "location" -> s"${locations}/${d.location.getOrElse(0)}")
+      "location" -> s"${locations}/${d.location.getOrElse(0)}")
   }
 
   def load(dpClusterId:Long) = Action.async {

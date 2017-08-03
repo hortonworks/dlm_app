@@ -2,17 +2,19 @@ import { Pairing } from '../models/pairing.model';
 import * as fromPairing from '../actions/pairing.action';
 import { Cluster } from 'models/cluster.model';
 import {BaseState} from 'models/base-resource-state';
+import {PROGRESS_STATUS} from 'constants/status.constant';
+import {Progress} from 'models/progress.model';
+import { Response } from '@angular/http';
 
 export interface State extends BaseState<Pairing> {
-  progress: {
-    state: string;
-  };
+  progress: Progress;
 }
 
 export const initialState: State = {
   entities: {},
-  progress: {
-    state: 'initial'
+  progress: <Progress>{
+    state: PROGRESS_STATUS.INIT,
+    response: <Response>{}
   }
 };
 
@@ -38,7 +40,8 @@ export function reducer(state = initialState, action): State {
       return {
         entities: Object.assign({}, state.entities),
         progress: Object.assign({}, state.progress, {
-          state: 'success'
+          state: PROGRESS_STATUS.SUCCESS,
+          response: {}
         })
       };
     }
@@ -49,6 +52,16 @@ export function reducer(state = initialState, action): State {
       return {
         entities: Object.assign({}, entities),
         progress: Object.assign({}, state.progress)
+      };
+    }
+    case fromPairing.ActionTypes.CREATE_PAIRING.FAILURE: {
+      const error = action.payload;
+      return {
+        entities: Object.assign({}, state.entities),
+        progress: Object.assign({}, state.progress, {
+          state: PROGRESS_STATUS.FAILED,
+          response: error
+        })
       };
     }
     case fromPairing.ActionTypes.LOAD_PAIRINGS.FAILURE:

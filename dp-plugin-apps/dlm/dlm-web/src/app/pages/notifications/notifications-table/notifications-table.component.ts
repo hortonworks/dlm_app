@@ -5,6 +5,7 @@ import { TableComponent } from 'common/table/table.component';
 import { TranslateService } from '@ngx-translate/core';
 import { LogService } from 'services/log.service';
 import { LOG_EVENT_TYPE_MAP, EntityType } from 'constants/log.constant';
+import { getEventEntityName } from 'utils/event-utils';
 
 @Component({
   selector: 'dlm-notifications-table',
@@ -29,23 +30,8 @@ export class NotificationsTableComponent implements OnInit {
     return this.t.instant(`page.notifications.table.column.${columnName}`);
   }
 
-  getEntity(event: Event) {
-    const eventType = (event && 'eventType' in event) ? event['eventType'] : '';
-    if (eventType === 'policyinstance' || eventType === 'policy') {
-      if (event['instanceId']) {
-        return this.getPolicyName(event.instanceId);
-      } else if (event['policyId']) {
-        return this.getPolicyName(event.policyId);
-      }
-    }
-    return eventType;
-  }
-
-  getPolicyName(id: string): string {
-    // Extract policy name from the policy id in the format
-    // "policyId": "/beaconsource/beaconsource/beacontarget/beacontarget/hdfsdr/0/1494924228843/000000002"
-    const splits = id.split('/');
-    return splits.length >= 6 ? splits[5] : '';
+  getEntity(event: Event): string {
+    return getEventEntityName(event);
   }
 
   ngOnInit() {

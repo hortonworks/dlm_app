@@ -40,6 +40,14 @@
       <input required name="group-search-attr" type="text" [(ngModel)]="ldapProperties.groupSearchAttributeName" placeholder="e.g. cn"/>
     </div>
     <div class="dp-input form-group">
+      <label class="required">{{"pages.onboard.configure.labels.groupObjectClass" | translate}}</label>
+      <input required name="group-object-class" type="text" [(ngModel)]="ldapProperties.groupObjectClass" placeholder="e.g. groupofnames"/>
+    </div>
+    <div class="dp-input form-group">
+      <label class="required">{{"pages.onboard.configure.labels.groupMemberAttributeName" | translate}}</label>
+      <input required name="group-member-attr-name" type="text" [(ngModel)]="ldapProperties.groupMemberAttributeName" placeholder="e.g. member"/>
+    </div>
+    <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.adminBindDN" | translate}}</label>
       <input required name="admin-bind-dn" type="text" [(ngModel)]="ldapProperties.bindDn" placeholder="e.g. uid=admin,ou=people,dc=hadoop,dc=apache,dc=org"/>
     </div>

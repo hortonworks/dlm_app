@@ -17,7 +17,8 @@
 ## Build
 
 * `git clone https://github.com/hortonworks/dataplane`
-* In folder dp-build `sh ./build.sh`. First time build could take sometime as all Scala dependencies are downloaded and cached.
+* In folder dp-build `./build.sh`. First time build could take sometime as all Scala dependencies are downloaded and cached.
+* In the same folder, trigger `./dp-docker-build.sh build` and `./dp-docker-build.sh build knox` to build required docker images.
 * In folder dp-build/build/dp-docker, an install tarball is created called `dp-installer.tar.gz`. This can be used to deploy Dataplane components on any machine with docker support.
 
 ## Package

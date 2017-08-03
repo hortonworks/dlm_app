@@ -30,6 +30,8 @@
     "service": "Service",
     "hdfs": "HDFS",
     "hive": "HIVE",
+    "for": "for",
+    "error": "Error",
     "errors": {
       "no_log": "Oops! Could not retrieve a log message for this event."
     },
@@ -121,6 +123,9 @@
   "forms": {
     "validation_errors": {
       "required": "\"{{fieldLabel}}\" is required",
+      "maxlength": "\"{{fieldLabel}}\" should be lower than {{maxLengthValue}} symbols",
+      "freqValidator": "\"{{fieldLabel}}\" is too big",
+      "integerValidator": "\"{{fieldLabel}}\" should be a positive integer",
       "time_less_than_current": "Start time must be later than the current time in the selected timezone."
     }
   },

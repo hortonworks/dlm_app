@@ -3,14 +3,12 @@ package domain
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  DataplaneCluster,
-  Location
-}
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, Location}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.JsValue
-import scala.concurrent.ExecutionContext.Implicits.global
+import slick.jdbc.GetResult
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DpClusterRepo @Inject()(
@@ -40,6 +38,10 @@ class DpClusterRepo @Inject()(
 
   def findById(dpClusterId: Long): Future[Option[DataplaneCluster]] = {
     db.run(DataplaneClusters.filter(_.id === dpClusterId).result.headOption)
+  }
+
+  def findByAmbariUrl(ambariUrl: String): Future[Option[DataplaneCluster]] = {
+    db.run(DataplaneClusters.filter(_.ambariUrl === ambariUrl).result.headOption)
   }
 
   def deleteById(dpClusterId: Long): Future[Int] = {
@@ -75,23 +77,47 @@ class DpClusterRepo @Inject()(
       .map(r => r)
   }
 
-  def getLocations(query: Option[String]): Future[List[Location]] = db.run {
-    query match {
-      case Some(query) =>
-        Locations
-          .filter(_.city.toLowerCase.startsWith(query.toLowerCase))
-          .take(20)
-          .to[List]
-          .result
-      case None => Locations.to[List].result
-    }
+  private def getLocationsByQuery(query: String): Future[List[Location]] = {
+    implicit val getLocationResult = GetResult(r => Location(
+      r.nextLongOption,
+      r.nextString,
+      r.nextString,
+      r.nextString,
+      r.nextFloat,
+      r.nextFloat)
+    )
+    db.run(
+      sql"""select  l.id, l.city, l.province, l.country, l.latitude, l.longitude
+            from dataplane.locations as l
+            where
+              lower(l.city) || ', ' || lower(l.country) like ${query.toLowerCase} || '%'
+              or
+              lower(l.city) || ', ' || lower(l.province) || ', ' || lower(l.country) like ${query.toLowerCase} || '%'
+              or
+              lower(l.province) || ', ' || lower(l.country) like ${query.toLowerCase} || '%'
+              or
+              lower(l.country) like ${query.toLowerCase} || '%'
+            limit 20""".as[Location]
+    ).map(v => v.toList)
   }
+
+  private def  getAllLocations(): Future[List[Location]] = db.run {
+    Locations.to[List].result
+  }
+
+  def getLocations(query: Option[String]): Future[List[Location]] =
+    query match {
+      case Some(query) => getLocationsByQuery(query)
+      case None => getAllLocations()
+    }
 
   final class LocationsTable(tag: Tag)
       extends Table[Location](tag, Some("dataplane"), "locations") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
     def country = column[String]("country")
+
+    def province = column[String]("province")
 
     def city = column[String]("city")
 
@@ -100,7 +126,7 @@ class DpClusterRepo @Inject()(
     def longitude = column[Float]("longitude")
 
     def * =
-      (id, country, city, latitude, longitude) <> ((Location.apply _).tupled, Location.unapply)
+      (id, country, province, city, latitude, longitude) <> ((Location.apply _).tupled, Location.unapply)
   }
 
   final class DpClustersTable(tag: Tag)

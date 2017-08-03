@@ -18,7 +18,7 @@
     qe-attr="show-log"
     class="actionable"
     [job]="policy.lastJobResource"
-    [tooltip]="policy.lastJobResource.status !== JOB_STATUS.RUNNING ? ('page.notifications.view_log' | translate) : ''"
+    [tooltip]="'page.notifications.view_log' | translate"
     (click)="showPolicyLog(policy)">
   </dlm-job-status>
 </ng-template>

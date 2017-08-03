@@ -1,7 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import { Event } from 'models/event.model';
+import { EVENT_TYPE } from 'constants/event.constant';
+import { getEventEntityName } from 'utils/event-utils';
 
-// todo: job messsage is missing
 @Component({
   selector: 'dlm-issues-list-item',
   template: `
@@ -13,7 +14,19 @@ import { Event } from 'models/event.model';
         <div class="name">
           <strong>{{ event.event }}</strong>
         </div>
-        <div class="description">{{ event.message }}</div>
+        <div class="description">
+          <span>{{ event.message }}</span>
+          <span *ngIf="shouldShowLogsLink">
+            <span>{{'common.for' | translate}}</span>
+            <span class="actionable text-primary">
+              <span (click)="selectPolicy.emit(event)">{{policyName}}</span>
+              <i class="fa fa-file-text-o"
+                (click)="selectLog.emit(event)"
+                [tooltip]="'page.notifications.view_log' | translate">
+              </i>
+            </span>
+          </span>
+        </div>
         <div class="text-right text-muted timestamp">
           <small>
             {{ event.timestamp | fmtTz | amTimeAgo }}
@@ -25,12 +38,20 @@ import { Event } from 'models/event.model';
   styleUrls: ['./issues-list-item.component.scss']
 })
 export class IssuesListItemComponent implements OnInit {
+  get shouldShowLogsLink(): boolean {
+    return Boolean(EVENT_TYPE[this.event.eventType]);
+  }
 
+  get policyName(): string {
+    return getEventEntityName(this.event);
+  }
+
+  @Output() selectLog = new EventEmitter<Event>();
+  @Output() selectPolicy = new EventEmitter<Event>();
   @Input() event: Event;
 
   constructor() { }
 
   ngOnInit() {
   }
-
 }

@@ -1,9 +1,13 @@
 @import '../../styles/variables';
 
 $width: 200px;
-$collapsed-width: 60px;
+$collapsed-width: 50px;
+$collapsed-icon-size: 19px;
 $header-height: 60px;
 $footer-height: 48px;
+$menu-item-height: 38px;
+$collapsed-menu-item-height: 50px;
+
 .navigation-bar {
   .side-nav-header, .side-nav-menu, .side-nav-footer {
     width: $width;
@@ -15,17 +19,17 @@ $footer-height: 48px;
       padding: 0!important;
       #header_icon {
         height: $header-height;
-        padding-top: 15px !important;
+        padding-top: 18px !important;
         padding-left: 0;
         padding-right: 0;
-        width: 50px;
+        width: 40px;
         a {
           display: block;
-          padding: 0 10px 0 15px;
+          padding: 0 10px;
         }
       }
       #header_content {
-        width: 150px;
+        width: 160px;
       }
     }
   }
@@ -33,11 +37,21 @@ $footer-height: 48px;
     top: $header-height;
     bottom: $footer-height;
     li {
+      &:first-child {
+        margin-top: 5px;
+      }
+      &.active {
+        a:after {
+          border-width: 10px 5px;
+          margin-top: -10px;
+        }
+      }
       a {
         width: $width;
-        padding: 6px 5px 8px 25px;
-        .navigation-icon.glyphicon {
-          top: 4px !important;
+        padding: 0 8px 0 20px;
+        line-height: $menu-item-height;
+        .navigation-icon {
+          font-size: 16px;
         }
         .navigation-menu-item {
           font-size: 14px !important;
@@ -47,9 +61,19 @@ $footer-height: 48px;
   }
   .side-nav-footer {
     height: $footer-height;
-    a {
-      font-size: 19px;
-      width: $width;
+    .navigation-footer {
+      height: $footer-height;
+      a {
+        font-size: 19px;
+        width: $width;
+        height: $footer-height;
+        text-align: center;
+        padding: 0;
+        .navigation-icon {
+          font-size: 19px;
+          left: 0;
+        }
+      }
     }
   }
 }
@@ -57,9 +81,20 @@ $footer-height: 48px;
 .navigation-bar-container {
   width: $width;
   &.collapsed {
-    width: 60px;
+    width: $collapsed-width;
     .side-nav-header, .side-nav-menu, .side-nav-footer {
       width: $collapsed-width;
+    }
+    .side-nav-menu {
+      li {
+        a {
+          line-height: $collapsed-menu-item-height;
+          padding: 0 8px 0 15px;
+          .navigation-icon {
+            font-size: $collapsed-icon-size;
+          }
+        }
+      }
     }
   }
   ul.nav.side-nav-header {
@@ -70,14 +105,14 @@ $footer-height: 48px;
       .nav-header-container {
         &:hover {
           background-color: $navigation-header-hover;
+          cursor: pointer;
         }
       }
       #header_icon {
-        padding-top: 5px;
         font-size: 28px;
         .ambari-logo {
           color: #b8bec4;
-          cursor: pointer;
+          font-size: 25px;
           .toggle-small-icon {
             color: $primary-color;
             font-size: 12px;
@@ -88,7 +123,14 @@ $footer-height: 48px;
         }
       }
       #header_content {
-        padding: 15px 5px;
+        padding: 15px 12px 15px 6px;
+        .btn-group {
+          display: table;
+          > div {
+            display: table-cell;
+            vertical-align: middle;
+          }
+        }
         .toggle-icon-down {
           color: $primary-color;
           font-size: 16px;

@@ -2,14 +2,11 @@ package controllers
 
 import javax.inject._
 
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  User,
-  UserInfo,
-  UserRole
-}
+import com.hortonworks.dataplane.commons.domain.Entities._
 import domain.API.{roles, users}
 import domain.{RolesUtil, UserRepo}
 import org.mindrot.jbcrypt.BCrypt
+import play.api.libs.json.Json
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -52,6 +49,19 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
       success(userDetail)
     }.recoverWith(apiError)
   }
+  /*this gives detail for users who are group managed as well*/
+  def getUserContext(userName:String)= Action.async{
+    userRepo.getUserAndRoles(userName).map{
+      case None=>NotFound
+      case Some(res)=>{
+        val user=res._1
+        val userRoleObj=res._2
+        val userCtx=UserContext(id=user.id ,username=user.username,avatar=user.avatar,
+          display =Some(user.displayname),active=user.active,roles=userRoleObj.roles,token=None,password = Some(user.password ))
+        success(userCtx)
+      }
+    }.recoverWith(apiError)
+  }
 
   def load(userId: Long) = Action.async {
     userRepo
@@ -88,7 +98,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
       .validate[UserInfo]
       .map { userInfo =>
         userRepo
-          .updateActiveAndRoles(userInfo)
+          .updateUserAndRoles(userInfo,false)
           .map { res =>
             Ok
           }
@@ -103,13 +113,41 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
       .map { userInfo =>
         val password: String =
           BCrypt.hashpw(Random.alphanumeric.toString(), BCrypt.gensalt())
-        //TODO check if user exists and throw exception.
-        userRepo
-          .insertUserWithRoles(userInfo, password)
-          .map(userInfo => success(userInfo))
-          .recoverWith(apiError)
+        userRepo.findByName(userInfo.userName).flatMap{
+          case  None=>{
+            userRepo
+              .insertUserWithRoles(userInfo, password)
+              .map(userInfo => success(userInfo))
+              .recoverWith(apiError)
+          }
+          case Some(user)=>{
+            user.groupManaged match {
+              case Some(true)=> userRepo
+                .updateUserAndRoles(userInfo,false)
+                .map(userInfo => Ok)
+                .recoverWith(apiError)
+              case _=>{
+                Future.successful(Conflict(Json.toJson(Errors(Seq(Error("USER_ALREADY_EXISTS","User Already Exists"))))))
+              }
+            }
+           }
+        }
       }
       .getOrElse(Future.successful(BadRequest))
+  }
+  def insertWithGroups =Action.async(parse.json) { req=>
+    req.body.validate[UserGroupInfo]
+      .map { userGroupInfo =>
+        if (userGroupInfo.groupIds.isEmpty){
+          Future.successful(BadRequest(Json.toJson(Errors(Seq(Error("INPUT_ERROR","Group needs to be specified"))))))
+        }else{
+          val password: String =
+            BCrypt.hashpw(Random.alphanumeric.toString(), BCrypt.gensalt())
+          userRepo.insertUserWithGroups(userGroupInfo,password)
+            .map(userGroupInfo => success(userGroupInfo))
+            .recoverWith(apiError)
+        }
+      }.getOrElse(Future.successful(BadRequest))
   }
 
   def delete(userId: Long) = Action.async {
@@ -128,7 +166,10 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
       .getOrElse(Future.successful(BadRequest))
   }
   def getRolesForUser(userName: String) = Action.async {
-    userRepo.getRolesForUser(userName).map(success(_))
+    userRepo.getUserAndRoles(userName).map{
+      case None=>NotFound
+      case Some(res)=>success(res._2)
+    }
   }
   private def getuserRoleMap(r: UserRole) = {
     Map("user" -> s"$users/${r.userId.get}",

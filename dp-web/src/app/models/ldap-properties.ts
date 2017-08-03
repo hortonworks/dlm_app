@@ -7,5 +7,8 @@ export class LDAPProperties {
   groupSearchBase:string;
   groupSearchAttributeName: string;
   bindDn :string;
-  password: string
+  password: string;
+  groupObjectClass: string;
+  groupMemberAttributeName: string;
+
 }

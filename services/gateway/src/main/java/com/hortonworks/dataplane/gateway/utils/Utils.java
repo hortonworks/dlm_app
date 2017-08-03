@@ -66,4 +66,13 @@ public class Utils {
     RequestContext ctx = RequestContext.getCurrentContext();
     return ctx.getRequest().getServletPath().equals(path);
   }
+  public String getInactiveErrorMsg(String subject){
+    return String.format("{\"code\": \"USER_INACTIVATED\", \"message\":  User %s is marked inactive}",subject);
+  }
+  public String getUserNotFoundErrorMsg(String subject){
+    return String.format("{\"code\": \"USER_NOT_FOUND\", \"message\":  User %s not found in the system}",subject);
+  }
+  public String getGroupNotFoundErrorMsg(String subject){
+    return String.format("{\"code\": \"USER_NOT_FOUND\", \"message\":  User %s not found in the system.Group not configured.}",subject);
+  }
 }

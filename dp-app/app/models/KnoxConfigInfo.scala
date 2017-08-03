@@ -7,6 +7,8 @@ case class KnoxConfigInfo(
     userSearchAttributeName:Option[String],
     groupSearchBase: Option[String],
     groupSearchAttributeName:Option[String],
+    groupObjectClass:Option[String],
+    groupMemberAttributeName: Option[String],
     bindDn :Option[String],
     password: Option[String],
     domains: Option[Seq[String]],/*list of urls from which app is accessible*/

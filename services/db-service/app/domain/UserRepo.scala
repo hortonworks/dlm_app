@@ -1,5 +1,6 @@
 package domain
 
+import java.lang.RuntimeException
 import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
 
@@ -15,12 +16,14 @@ import scala.concurrent.Future
 @Singleton
 class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
                          protected val roleRepo: RoleRepo,
+                         protected val groupsRepo:GroupsRepo,
                          private val rolesUtil:RolesUtil) extends HasDatabaseConfigProvider[DpPgProfile] {
 
   import profile.api._
 
   val Users = TableQuery[UsersTable]
   val UserRoles = TableQuery[UserRolesTable]
+  val UserGroups = TableQuery[UserGroupsTable]
 
   def all(): Future[List[User]] = db.run {
     Users.to[List].result
@@ -28,7 +31,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
 
   def allWithRoles(offset:Long=0,pageSize:Long=10, searchTerm:Option[String]): Future[UsersList] = {
     val query = searchTerm match {
-      case Some(searchTerm) => Users.filter(_.username like (s"%$searchTerm%")).sortBy(_.updated.desc).drop(offset).take(pageSize)
+      case Some(searchTerm) => Users.filter(user=>(user.groupManaged===false && (user.username like (s"%$searchTerm%")))).sortBy(_.updated.desc).drop(offset).take(pageSize)
       case None =>  Users.sortBy(_.updated.desc).drop(offset).take(pageSize)
     }
 
@@ -107,7 +110,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     }
   }
 
-  def updateActiveAndRoles(userInfo:UserInfo)={
+  def updateUserAndRoles(userInfo:UserInfo, groupManaged:Boolean)={
     for{
       (user,userRoles)<-getUserDetailInternal(userInfo.userName)
       userRoles<-db.run(UserRoles.filter(_.userId === user.id.get).result)
@@ -116,11 +119,17 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     }yield{
       val userRoleObjs=rolesUtil.getUserRoleObjectsforRoleIds(user.id.get,toBeAddedRoleIds)
       val query =for{
-        updateActive <- getUpdateActiveQuery(userInfo)
+        updateUser <- {
+          Users.filter(_.username===userInfo.userName)
+            .map{r=>
+              (r.active,r.updated,r.groupManaged)
+            }
+            .update(userInfo.active, Some(LocalDateTime.now()),Some(groupManaged))
+        }
         insertQuery<-UserRoles returning UserRoles ++= userRoleObjs
         delQuery <- UserRoles.filter(_.id inSet toBeDeletedRoleIds).delete
       }yield {
-        (updateActive,delQuery,insertQuery)
+        (updateUser,delQuery,insertQuery)
       }
       db.run(query.transactionally)
     }
@@ -141,14 +150,28 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
       db.run(query.transactionally).map(res=>userInfo)
     }
   }
-  private def getUpdateActiveQuery(userInfo:UserInfo)={
-    Users.filter(_.username===userInfo.userName)
-      .map{r=>
-        (r.active,r.updated)
+  def insertUserWithGroups(userGroupInfo:UserGroupInfo,password:String)={
+      val query = for {
+        user <-{
+          val user = User(username = userGroupInfo.userName, password = password, displayname = userGroupInfo.displayName,avatar = None,
+            active = userGroupInfo.active,groupManaged=Some(true))
+          Users returning Users += user
+        }
+        userGroups<- {
+         val userGroups=userGroupInfo.groupIds.map{grpId=>
+           UserGroup(userId=user.id,groupId = Some(grpId))
+         }
+         UserGroups returning UserGroups ++=  userGroups
+        }
+      }yield {
+        (user,userGroups)
       }
-      .update(userInfo.active, Some(LocalDateTime.now()))
+      db.run(query.transactionally).map { res =>
+        val groupIds = res._2.map(res => res.groupId.get)
+        UserGroupInfo(id = res._1.id, userName = res._1.username, displayName = res._1.displayname,
+          active = res._1.active,groupIds=groupIds,password=Some(res._1.password))
+      }
   }
-
 
   private def resolveUserRolesEntries(roles: Seq[RoleType.Value], userRoles: Seq[UserRole]):Future[(Seq[Long],Seq[Long])] = {
     rolesUtil.getRoleNameMap().map{ roleNameMap=>
@@ -177,16 +200,39 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
   def findById(userId: Long):Future[Option[User]] = {
     db.run(Users.filter(_.id === userId).result.headOption)
   }
-
-  def getRolesForUser(userName: String): Future[UserRoles] = {
-    val query = for {
-      users <- Users if users.username === userName
+  def getUserAndRoles(userName: String): Future[Option[(User,UserRoles)]] = {
+    findByName(userName).flatMap{
+      case None=>{
+        Future.successful(None)
+      }
+      case Some(user)=>{
+       val query=user.groupManaged match {
+         case Some(true)=>{
+           queryForUserRolesUsingGroups(user)
+         }
+         case _=>{
+           queryForUserRoles(user)
+         }
+       }
+       db.run(query.result).map(r =>
+         Some(user,com.hortonworks.dataplane.commons.domain.Entities.UserRoles(userName, r.distinct))
+         )
+       }
+    }
+  }
+  private def queryForUserRoles(user:User)={
+   for {
       roles <- roleRepo.Roles
-      userRoles <- UserRoles if roles.id === userRoles.roleId if users.id === userRoles.userId
+      userRoles <- UserRoles if roles.id === userRoles.roleId if userRoles.userId === user.id.get
     } yield (roles.roleName)
-
-    val result = db.run(query.result)
-    result.map(r => com.hortonworks.dataplane.commons.domain.Entities.UserRoles(userName, r))
+  }
+  private def queryForUserRolesUsingGroups(user:User)  ={
+   for {
+      roles <- roleRepo.Roles
+      groupRoles<- groupsRepo.GroupsRoles
+      groups<-groupsRepo.Groups if groups.active === true
+      userGroups <- UserGroups  if userGroups.userId === user.id  if userGroups.groupId===groups.id if groupRoles.roleId===roles.id if groupRoles.groupId===userGroups.groupId
+    } yield (roles.roleName)
   }
 
   def addUserRole(userRole: UserRole): Future[UserRole] = {
@@ -208,10 +254,12 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
 
     def active = column[Option[Boolean]]("active")
 
+    def groupManaged = column[Option[Boolean]]("group_managed")
+
     def created = column[Option[LocalDateTime]]("created")
     def updated = column[Option[LocalDateTime]]("updated")
 
-    def * = (id, username, password, displayname, avatar, active, created, updated) <> ((User.apply _).tupled, User.unapply)
+    def * = (id, username, password, displayname, avatar, active,groupManaged, created, updated) <> ((User.apply _).tupled, User.unapply)
   }
 
   final class UserRolesTable(tag: Tag) extends Table[(UserRole)](tag, Some("dataplane"), "users_roles") {
@@ -226,6 +274,18 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     def role = foreignKey("role_userRole", roleId, roleRepo.Roles)(_.id)
 
     def * = (id, userId, roleId) <> ((UserRole.apply _).tupled, UserRole.unapply)
+
+  }
+
+  final class UserGroupsTable(tag: Tag) extends Table[(UserGroup)](tag, Some("dataplane"), "user_groups"){
+    def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
+
+    def userId = column[Option[Long]]("user_id")
+
+    def groupId = column[Option[Long]]("group_id")
+    def user = foreignKey("user_userGroup", userId, Users)(_.id)
+    def group = foreignKey("group_userGroup", groupId, groupsRepo.Groups)(_.id)
+    def * = (id, userId, groupId) <> ((UserGroup.apply _).tupled, UserGroup.unapply)
 
   }
 

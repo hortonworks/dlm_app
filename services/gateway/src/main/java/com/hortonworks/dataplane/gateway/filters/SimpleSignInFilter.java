@@ -39,10 +39,10 @@ public class SimpleSignInFilter extends ZuulFilter {
   private Jwt jwt;
 
   @Autowired
-  private Utils utils;
+  private CookieManager cookieManager;
 
   @Autowired
-  private CookieManager cookieManager;
+  private Utils utils;
 
   private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -75,23 +75,22 @@ public class SimpleSignInFilter extends ZuulFilter {
     try {
       ServletInputStream inputStream = ctx.getRequest().getInputStream();
       Credential credential = objectMapper.readValue(inputStream, Credential.class);
-      Optional<User> user = userService.getUser(credential.getUsername());
-      if (!user.isPresent()){
+      Optional<UserContext> userContextFromDb = userService.getUserContext(credential.getUsername());
+      if (!userContextFromDb.isPresent()){
         return sendNoUserResponse();
       }
-
-      boolean validPassword = BCrypt.checkpw(credential.getPassword(), user.get().getPassword());
+      boolean validPassword = BCrypt.checkpw(credential.getPassword(), userContextFromDb.get().getPassword());
       if (!validPassword) {
         return sendInvalidPasswordResponse();
       }
-      Optional<UserRef> userRefOpt = userService.getUserRef(credential.getUsername());
-      if (userRefOpt.isPresent()){
-        // Construct a JWT token
-        UserRef userRef=userRefOpt.get();
-        String jwtToken = jwt.makeJWT(userRef);
-        userRef.setToken(jwtToken);
+      UserContext userContext= userContextFromDb.get();
+      if (!userContext.isActive()){
+        return utils.sendForbidden(utils.getInactiveErrorMsg(userContext.getUsername()));
+      }else {
+        String jwtToken = jwt.makeJWT(userContext);
+        userContext.setToken(jwtToken);
         ctx.setResponseStatusCode(200);
-        ctx.setResponseBody(objectMapper.writeValueAsString(userRef));
+        ctx.setResponseBody(objectMapper.writeValueAsString(userContext));
         cookieManager.addDataplaneJwtCookie(jwtToken,Optional.<Date>absent());
         ctx.setSendZuulResponse(false);
       }

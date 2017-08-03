@@ -4,16 +4,13 @@ package com.hortonworks.dataplane.gateway.filters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
-import com.hortonworks.dataplane.gateway.domain.TokenInfo;
-import com.hortonworks.dataplane.gateway.domain.User;
-import com.hortonworks.dataplane.gateway.domain.UserRef;
+import com.hortonworks.dataplane.gateway.domain.*;
 import com.hortonworks.dataplane.gateway.utils.Jwt;
 import com.hortonworks.dataplane.gateway.service.UserService;
 import com.hortonworks.dataplane.gateway.utils.CookieManager;
 import com.hortonworks.dataplane.gateway.utils.KnoxSso;
 import com.hortonworks.dataplane.gateway.utils.RequestResponseUtils;
 import com.hortonworks.dataplane.gateway.utils.Utils;
-import com.hortonworks.dataplane.gateway.domain.Constants;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import feign.FeignException;
@@ -129,24 +126,45 @@ public class TokenCheckFilter extends ZuulFilter {
       return handleUnAuthorized(null);
     }
     try {
-      Optional<User> user = userService.getUser(tokenInfo.getSubject());
-      if (!user.isPresent()) {
-        return utils.sendForbidden(String.format("{\"code\": \"USER_NOT_FOUND\", \"message\":  User %s not found in the system}",tokenInfo.getSubject()));
-      } else {
-        UserRef userRef=userService.getUserRef(user.get());
+      Optional<UserContext> userContextFromDb = userService.getUserContext(tokenInfo.getSubject());
+      if (!userContextFromDb.isPresent()) {
         try {
-          String jwtToken = jwt.makeJWT(userRef);
-          userRef.setToken(jwtToken);
-          cookieManager.addDataplaneJwtCookie(jwtToken,tokenInfo.getExpiryTime());
-        } catch (JsonProcessingException e) {
-          throw new RuntimeException(e);
+          UserContext userContext = userService.syncUserFromLdapGroupsConfiguration(tokenInfo.getSubject());
+          if (userContext != null) {
+            setupUserSession(tokenInfo, userContext);
+            return null;
+          } else {
+            return utils.sendForbidden(utils.getUserNotFoundErrorMsg(tokenInfo.getSubject()));
+          }
+        }catch (NoAllowedGroupsException nge){
+          return utils.sendForbidden(utils.getGroupNotFoundErrorMsg(tokenInfo.getSubject()));
         }
-        setUpstreamUserContext(userRef);
-        setUpstreamKnoxTokenContext();
-        RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY,userRef);
-        return null;
+      } else {
+        if (userContextFromDb.get().isActive()){
+          setupUserSession(tokenInfo, userContextFromDb.get());
+          return null;
+        }else{
+          return utils.sendForbidden(utils.getInactiveErrorMsg(tokenInfo.getSubject()));
+        }
       }
     } catch (FeignException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void setupUserSession(TokenInfo tokenInfo, UserContext userContext) {
+    addDpJwtToken(tokenInfo, userContext);
+    setUpstreamUserContext(userContext);
+    setUpstreamKnoxTokenContext();
+    RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY,userContext);
+  }
+
+  private void addDpJwtToken(TokenInfo tokenInfo, UserContext userContext) {
+    try {
+      String jwtToken = jwt.makeJWT(userContext);
+      userContext.setToken(jwtToken);
+      cookieManager.addDataplaneJwtCookie(jwtToken,tokenInfo.getExpiryTime());
+    } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
   }
@@ -160,10 +178,10 @@ public class TokenCheckFilter extends ZuulFilter {
     return LOGOUT_PATH.equals(ctx.getRequest().getServletPath());
   }
 
-  private void setUpstreamUserContext(UserRef userRef) {
+  private void setUpstreamUserContext(UserContext userContext) {
     RequestContext ctx = RequestContext.getCurrentContext();
     try {
-      String userJson = objectMapper.writeValueAsString(userRef);
+      String userJson = objectMapper.writeValueAsString(userContext);
       ctx.addZuulRequestHeader(DP_USER_INFO_HEADER_KEY, Base64.encodeBase64String(userJson.getBytes()));
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
@@ -180,18 +198,20 @@ public class TokenCheckFilter extends ZuulFilter {
 
   private Object authorizeThroughDPToken(Optional<String> bearerToken) {
     try {
-      Optional<UserRef> userRefOptional = jwt.parseJWT(bearerToken.get());
-      if (!userRefOptional.isPresent()) {
+      Optional<UserContext> userContextOptional = jwt.parseJWT(bearerToken.get());
+      if (!userContextOptional.isPresent()) {
         cookieManager.deleteDataplaneJwtCookie();
         return handleUnAuthorized("DP_JWT_COOKIE has expired or not valid");
       } else {
-        UserRef userRef = userRefOptional.get();
-        User user=userService.getUserFromUserRef(userRef);
-        setUpstreamUserContext(userRef);
-        setUpstreamKnoxTokenContext();
-        RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, userRef);
-        return null;
-        //TODO  role check. api permission check on the specified resource.
+        UserContext userContext = userContextOptional.get();
+        if (userContext.isActive()){
+          setUpstreamUserContext(userContext);
+          setUpstreamKnoxTokenContext();
+          RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, userContext);
+          return null;
+        }else{
+          return utils.sendForbidden(utils.getInactiveErrorMsg(userContext.getUsername()));
+        }
       }
     } catch (JwtException e) {
       logger.error("Exception", e);
