@@ -1,5 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
+import {AddOnAppService} from '../../../../services/add-on-app.service';
+import {AddOnAppInfo, EnabledAppInfo} from '../../../../models/add-on-app';
 
 @Component({
   selector: 'dp-service-management',
@@ -8,26 +10,29 @@ import {ActivatedRoute, Router} from '@angular/router';
 })
 export class ServiceManagementComponent implements OnInit {
 
-  services = [];
-  enabledServices = [];
+  allServices: AddOnAppInfo[] = [];
+  availableServices: AddOnAppInfo[] = [];
+  enabledServices: EnabledAppInfo[] = [];
 
   constructor(private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              private addOnAppService: AddOnAppService) {
   }
 
   ngOnInit() {
-    this.services = [
-      {name: 'Data Lifecycle Manager', imageName: 'dlm-logo.png'},
-      {name: 'Data Steward Studio', imageName: 'steward-logo.png'}
-    ]
-    this.enabledServices = [
-      {name: 'Data Lifecycle Manager', imageName: 'dlm-logo.png'},
-      {name: 'Data Steward Studio', imageName: 'steward-logo.png'}
-    ]
+    this.addOnAppService.getAllServices().subscribe((services) => {
+      this.allServices = services;
+      this.availableServices = this.allServices.filter(service => service.enabled === false);
+    });
+    this.addOnAppService.getEnabledServices().subscribe((services) => {
+      this.enabledServices = services;
+    });
+
   }
 
-  enableService(service) {
-    this.router.navigate(['verify', '1'], {relativeTo: this.route})
+
+  enableService(service: AddOnAppInfo) {
+    this.router.navigate(['verify', service.skuName], {relativeTo: this.route})
   }
 
 }

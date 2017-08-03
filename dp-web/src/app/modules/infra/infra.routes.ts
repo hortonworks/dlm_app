@@ -29,7 +29,7 @@ export const routes: Routes = [
   { path: 'add', component: ClusterAddComponent },
   { path: 'cluster/details/:id', component: ClusterDetailsComponent },
   { path: 'services', component: ServiceManagementComponent},
-  { path: 'services/verify/:id', component: VerificationComponent},
+  { path: 'services/verify/:name', component: VerificationComponent},
   { path: 'usermgmt', component: UserManagementComponent,
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'users'},

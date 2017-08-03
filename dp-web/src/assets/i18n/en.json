@@ -101,6 +101,22 @@
         }
       }
     },
+    "services": {
+      "labels": {
+        "enabledServices" : "Enabled Services",
+        "availableServices" : "Available Services",
+        "smartSenseId" : "SMARTSENSE ID",
+        "enabled" : "ENABLED",
+        "enable" : "ENABLE",
+        "next" : "Next",
+        "verify" : "Verify",
+        "verifySmartSenseId": "Verify SmartSense ID",
+        "verified" : "VERIFIED"
+      },
+      "description" : {
+        "verificationWelcome" : "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your Smart Sense ID"
+      }
+    },
     "infra": {
       "topnav": {
         "cluster-link": "CLUSTERS"
