@@ -1,0 +1,34 @@
+@import "../../../../../../styles/variables";
+
+input[type="text"].dp-input {
+  width: 250px;
+}
+
+.validation-error {
+  width: 36px;
+  background-color: $roman-red;
+  border: 1px solid $roman-red;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  .fa {
+    color: $white;
+    font-size: 14px;
+    margin: 8px 12px;
+  }
+}
+
+.error {
+  .dp-input {
+    width: 214px;
+    border: 1px solid $roman-red;
+    border-right: 0;
+  }
+}
+
+.padding-left-12{
+  padding-left: 12px;
+}
+
+.width-90 {
+  width: 90px;
+}

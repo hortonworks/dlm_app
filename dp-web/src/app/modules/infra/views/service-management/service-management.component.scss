@@ -1,0 +1,151 @@
+@import "../../../../../styles/variables";
+
+.services-list {
+  @extend .borderBox;
+  width: auto;
+  display: inline;
+  margin: 0;
+  padding: 0;
+
+}
+.title-pane {
+  padding:25px 0px;
+}
+
+.services-table {
+  border: 1px solid $white;
+  width: 900px;
+  .row:last-child{
+    border-bottom: 1px solid $gallery;
+  }
+}
+
+.row {
+  background-color: $white;
+  border: 1px solid $gallery;
+  border-bottom: 0;
+  padding: 5px;
+
+  span {
+    display: inline-block;
+  }
+
+   .logo-img {
+    width: 20px;
+     margin: 0 10px;
+  }
+  .name {
+    width: 250px;
+    display: inline-block;
+  }
+  .divider {
+    margin: 10px;
+  }
+  .smart-sense {
+    width: 250px;
+  }
+  .action {
+    margin: 12px 15px;
+    color: $eastern-blue;
+    cursor: pointer;
+  }
+}
+
+.logo-wrapper {
+  background-color: $gallery;
+  padding: 15px;
+  height: 120px;
+  position: relative;
+}
+
+.service-item {
+  display: inline-block;
+  float: left;
+  cursor: pointer;
+  text-align: center;
+  margin-right: 25px;
+  margin-bottom: 25px;
+  border: 1px solid $iron-gray;
+  border-radius: 2px;
+  width: 200px;
+  height: 175px;
+  .action-btn {
+    display: none;
+  }
+}
+
+.service-item:hover{
+  .logo-img{
+    opacity: 0.1;
+  }
+  .logo-wrapper {
+    background: rgba(0, 0, 0, 0.7);
+  }
+  .action-btn {
+    display: block;
+    position: absolute;
+    bottom: 40px;
+    left: 55px;
+    opacity:1;
+  }
+}
+
+.service-name {
+  height: 24px;
+  background-color: $white;
+  margin: 0px;
+  padding: 3px;
+}
+
+.version {
+  background-color: $wild-sand;
+  margin: 0;
+  height: 28px;
+  padding: 10px;
+}
+
+.logo-img {
+  background-color: $eastern-blue;
+  color: $eastern-blue;
+  width: 50px;
+  margin: 25px;
+  cursor: pointer;
+}
+
+.hexagon {
+  width: 20px;
+  height: 150px;
+  left: 90px;
+  top: 75px;
+  background: red;
+  position: relative;
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  transform: rotate(90deg);
+}
+
+.hexagon:before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 12px solid red;
+}
+
+.hexagon:after {
+  content: "";
+  position: absolute;
+  bottom: -12px;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 12px solid red;
+}

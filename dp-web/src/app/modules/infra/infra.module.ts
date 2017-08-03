@@ -22,6 +22,8 @@ import {UsersComponent} from './views/user-management/users/users.component';
 import {GroupsComponent} from './views/user-management/groups/groups.component';
 import {AddGroupComponent} from './views/user-management/add-group/add-group.component';
 import {ConfigDialogComponent} from './widgets/config-dialog/config-dialog.component';
+import { ServiceManagementComponent } from './views/service-management/service-management.component';
+import { VerificationComponent } from './views/service-management/verification/verification.component';
 
 @NgModule({
   imports: [
@@ -48,7 +50,9 @@ import {ConfigDialogComponent} from './widgets/config-dialog/config-dialog.compo
     UsersComponent,
     GroupsComponent,
     AddGroupComponent,
-    ConfigDialogComponent
+    ConfigDialogComponent,
+    ServiceManagementComponent,
+    VerificationComponent
   ]
 })
 export class InfraModule {
