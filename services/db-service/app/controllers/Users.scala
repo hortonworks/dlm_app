@@ -4,7 +4,7 @@ import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Entities._
 import domain.API.{roles, users}
-import domain.{RolesUtil, UserRepo}
+import domain.{EnabledSkuRepo, RolesUtil, UserRepo}
 import org.mindrot.jbcrypt.BCrypt
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -12,7 +12,7 @@ import play.api.mvc._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 @Singleton
-class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
+class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: EnabledSkuRepo)(
     implicit exec: ExecutionContext)
     extends JsonAPI {
 
@@ -51,16 +51,31 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
   }
   /*this gives detail for users who are group managed as well*/
   def getUserContext(userName:String)= Action.async{
-    userRepo.getUserAndRoles(userName).map{
-      case None=>NotFound
-      case Some(res)=>{
-        val user=res._1
-        val userRoleObj=res._2
-        val userCtx=UserContext(id=user.id ,username=user.username,avatar=user.avatar,
-          display =Some(user.displayname),active=user.active,roles=userRoleObj.roles,token=None,password = Some(user.password ))
-        success(userCtx)
-      }
+    getUserContextInternal(userName).map{
+      case None =>NotFound
+      case Some(userContext)=>success(userContext)
     }.recoverWith(apiError)
+  }
+
+  private def getUserContextInternal(userName: String):Future[Option[UserContext]] = {
+    for {
+      enabledServices <- enabledSkuRepo.getEnabledSkus()
+      userAndRoles <- userRepo.getUserAndRoles(userName)
+    } yield {
+      userAndRoles match {
+        case None => None
+        case Some(userAndRoles) => {
+          val user = userAndRoles._1
+          val userRoleObj = userAndRoles._2
+          val userCtx = UserContext(id = user.id, username = user.username, avatar = user.avatar,
+            display = Some(user.displayname), active = user.active, roles = userRoleObj.roles,
+            token = None, password = Some(user.password),
+            services = enabledServices
+          )
+          Some(userCtx)
+        }
+      }
+    }
   }
 
   def load(userId: Long) = Action.async {

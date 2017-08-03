@@ -171,14 +171,9 @@ class UserManager @Inject()(val ldapService: LdapService,
       createUserWithLdapGroups(userNameOpt.get).flatMap{
         case Left(errors)=>Future.successful(handleErrors(errors))
         case Right(userGroupInfo)=>{
-          groupService.getRolesForGroups(userGroupInfo.groupIds).map {
+          userService.getUserContext(userNameOpt.get).map{
             case Left(errors)=>handleErrors(errors)
-            case Right(roles)=>{
-              val userCtx=UserContext(id=userGroupInfo.id,username=userGroupInfo.userName,display=Some(userGroupInfo.displayName),
-                avatar=Some(userGroupInfo.displayName),roles=roles,token=None,password = userGroupInfo.password,active = Some(true))
-
-              Ok(Json.toJson(userCtx))
-            }
+            case Right(userContext)=>Ok(Json.toJson(userContext))
           }
         }
       }

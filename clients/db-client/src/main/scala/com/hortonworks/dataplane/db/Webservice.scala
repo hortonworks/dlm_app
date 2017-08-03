@@ -61,6 +61,8 @@ object Webservice {
 
     def addUserWithGroups(userGroupInfo: UserGroupInfo): Future[Either[Errors,UserGroupInfo]]
 
+    def getUserContext(userName:String): Future[Either[Errors,UserContext]]
+
   }
 
   trait GroupService extends DbClientService {

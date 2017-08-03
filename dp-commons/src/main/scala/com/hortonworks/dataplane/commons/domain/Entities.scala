@@ -63,6 +63,7 @@ object Entities {
                          avatar:Option[String],
                          active: Option[Boolean] = Some(true),
                          roles:Seq[String],
+                         services: Seq[String],
                          display:Option[String],
                          token:Option[String],
                          password:Option[String])
