@@ -3,14 +3,13 @@
     <span class="hwx-title">Verify</span>
   </div>
   <div class="content-pane" style="margin:0px 25px;padding: 25px;background-color: white; height: 570px">
-    <div class="hwx-inline-desc">Welcome to the Data Lifecyle Manager Enablement Wizard. Please begin by verifying your Smartsense ID.</div>
+    <div class="hwx-inline-desc">{{welcomeMessage}}</div>
     <div class="spacer-15"></div>
-    <div class="hwx-subtitle">Verify SmartSense ID</div>
+    <div class="hwx-subtitle">{{"pages.services.labels.verifySmartSenseId" | translate}}</div>
     <div class="spacer-15"></div>
     <form #smartSenseForm="ngForm">
       <div class="form-group" [ngClass]="{'error':isInvalid}">
-        <label class="required">SMARTSENSE ID</label>
-        <div class="hwx-inline-desc">{{"pages.infra.description.tags" | translate}}</div>
+        <label class="required">{{"pages.services.labels.smartSenseId" | translate}}</label>
         <div class="mdl-grid mdl-grid--no-spacing">
           <div class="input-group">
             <input required class="dp-input" name="smartsense-id" type="text" [(ngModel)]="smartSenseId"/>
@@ -19,10 +18,10 @@
           <div class="padding-left-12">
             <button *ngIf="!verified" type="button" (click)="verifySmartSenseId()" class="btn btn-hwx-primary width-90">
               <span *ngIf="verificationInProgress"><i class="fa fa-spinner fa-spin"></i></span>
-              <span *ngIf="!verificationInProgress">VERIFY</span>
+              <span *ngIf="!verificationInProgress">{{"pages.services.labels.verify" | translate}}</span>
             </button>
             <button *ngIf="verified" type="button" class="btn btn-hwx-secondary">
-              <span>VERIFIED</span>
+              <span>{{"pages.services.labels.verified" | translate}}</span>
             </button>
           </div>
         </div>
@@ -30,8 +29,8 @@
     </form>
     <div class="spacer-15"></div>
     <div class="button-container">
-      <button class="btn btn-hwx-primary" (click)="next()">NEXT</button>
-      <button class="btn btn-hwx-default" (click)="cancel()">CANCEL</button>
+      <button class="btn btn-hwx-primary" (click)="next()">{{"pages.services.labels.next" | translate}}</button>
+      <button class="btn btn-hwx-default" (click)="cancel()">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

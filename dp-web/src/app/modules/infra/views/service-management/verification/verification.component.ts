@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import {Router} from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'dp-verification',
@@ -11,22 +12,27 @@ export class VerificationComponent implements OnInit {
   verificationInProgress = false;
   verified = false;
   smartSenseId: string;
+  welcomeMessage: string;
 
-  constructor(private router: Router) { }
-
-  ngOnInit() {
-
+  constructor(private router: Router,
+              private translateService: TranslateService,
+              private route: ActivatedRoute) {
   }
 
-  verifySmartSenseId(){
+  ngOnInit() {
+    let serviceName = this.route.snapshot.params['name'];
+    this.welcomeMessage = this.translateService.instant('pages.services.description.verificationWelcome', {serviceName: serviceName});
+  }
+
+  verifySmartSenseId() {
     this.verificationInProgress = true;
   }
 
-  next(){
+  next() {
     this.router.navigate(['infra', 'services'])
   }
 
-  cancel(){
+  cancel() {
     this.router.navigate(['infra', 'services'])
   }
 

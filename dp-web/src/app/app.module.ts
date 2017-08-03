@@ -41,6 +41,7 @@ import {NavigationGuard} from './shared/utils/navigation-guard';
 import {GroupService} from './services/group.service';
 
 import {AuthUtils} from './shared/utils/auth-utils';
+import {AddOnAppService} from './services/add-on-app.service';
 
 export function HttpLoaderFactory(http: Http) {
   return new TranslateHttpLoader(http);
@@ -111,6 +112,7 @@ export function init_app(userService: UserService) {
     Loader,
     RbacService,
     GroupService,
+    AddOnAppService,
 
     MdlService,
 
