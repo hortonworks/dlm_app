@@ -114,3 +114,8 @@ GET           /api/workspaces/:id/assets                             controllers
 POST          /api/workspaces/notebooks                              controllers.NotebookWorkspaces.add
 DELETE        /api/workspaces/notebooks/:id                          controllers.NotebookWorkspaces.delete(id:String)
 GET           /api/workspaces/:id/notebooks                          controllers.NotebookWorkspaces.getNotebooks(id:Long)
+
+#apps
+GET           /api/services                                  controllers.ServicesManager.getServices
+GET           /api/services/enabled                          controllers.ServicesManager.getEnabledServies
+GET           /api/services/enable                           controllers.ServicesManager.enableService

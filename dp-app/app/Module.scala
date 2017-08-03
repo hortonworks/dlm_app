@@ -158,6 +158,13 @@ class Module extends AbstractModule {
     new DataAssetServiceImpl(configuration.underlying)
   }
 
+  @Provides
+  @Singleton
+  @Named("skuService")
+  def provideSkuService(implicit ws: WSClient,configuration: Configuration): SkuService = {
+    new SkuServiceImpl(configuration.underlying)
+  }
+
 }
 
 @Singleton

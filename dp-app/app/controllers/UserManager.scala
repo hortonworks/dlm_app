@@ -22,7 +22,7 @@ class UserManager @Inject()(val ldapService: LdapService,
                             @Named("userService") val userService: UserService,
                             @Named("groupService")val groupService:GroupService)
     extends Controller {
-  val logger = Logger(classOf[KnoxConfig])
+  val logger = Logger(classOf[UserManager])
 
   private def handleErrors(errors: Errors) = {
     if (errors.errors.exists(_.code == "400"))

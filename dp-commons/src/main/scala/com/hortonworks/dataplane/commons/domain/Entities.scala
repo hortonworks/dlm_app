@@ -205,6 +205,11 @@ object Entities {
                  status: Option[Short] = Some(0),
                  created: Option[LocalDateTime] = Some(LocalDateTime.now()),
                  updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+  case class DpService(skuName:String,
+                       enabled:Boolean,
+                       sku: Sku,
+                       enabledSku: Option[EnabledSku]
+                      )
 
   case class ClusterHost(id: Option[Long] = None,
                          host: String,
@@ -467,5 +472,9 @@ object JsonFormatters {
 
   implicit val userGroupInfoWrites= Json.writes[UserGroupInfo]
   implicit val userGroupInfoReads= Json.reads[UserGroupInfo]
+
+  implicit val dpServiceWrites= Json.writes[DpService]
+  implicit val dpServiceReads= Json.reads[DpService]
+
 
 }
