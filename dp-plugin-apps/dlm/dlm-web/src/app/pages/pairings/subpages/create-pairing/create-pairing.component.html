@@ -1,9 +1,10 @@
 <dlm-page-header
+  [isFlexCenter]="true"
   [title]="'page.pairings.create.header'"
   description="page.pairings.create.header_note"
   contextMessage="Create Pairing Page">
 </dlm-page-header>
-<div class="content page-section" id="create_pairing">
+<div class="content" id="create_pairing">
   <div *ngIf="(firstSetClusters$ | async)?.length > 0; else noClusters">
     <div class="content-row header">
       <div class="col-md-3 col-header">
