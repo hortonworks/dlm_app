@@ -114,7 +114,9 @@
         "verified" : "VERIFIED"
       },
       "description" : {
-        "verificationWelcome" : "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your Smart Sense ID"
+        "verificationWelcome" : "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your Smart Sense ID",
+        "enableError" : "Service could not be enabled.",
+        "verificationError" : "Incorrect Smartsense ID format"
       }
     },
     "infra": {

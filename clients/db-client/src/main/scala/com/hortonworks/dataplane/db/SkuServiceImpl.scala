@@ -68,14 +68,14 @@ class SkuServiceImpl(config: Config)(implicit ws: WSClient)
   }
   private def mapToSku(res: WSResponse) = {
     res.status match {
-      case 200 => Right((res.json \ "results")(0).validate[Sku].get)
+      case 200 => Right((res.json \ "results").validate[Sku].get)
       case _ => mapErrors(res)
     }
   }
 
   private def mapToEnabledSku(res: WSResponse) = {
     res.status match {
-      case 200 => Right((res.json \ "results")(0).validate[EnabledSku].get)
+      case 200 => Right((res.json \ "results").validate[EnabledSku].get)
       case _ => mapErrors(res)
     }
   }

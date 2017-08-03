@@ -43,9 +43,9 @@ class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService
       Future.successful(BadRequest("smartSenseId is required"))
     }else{
       if (vefifySmartSenseCode(smartSenseId.get)){//TODO meaningful regex from config
-        Future.successful(Ok("true"))
+        Future.successful(Ok(Json.obj("isValid" -> true)))
       }else{
-        Future.successful(Ok("false"))
+        Future.successful(Ok(Json.obj("isValid" -> false)))
       }
     }
   }
