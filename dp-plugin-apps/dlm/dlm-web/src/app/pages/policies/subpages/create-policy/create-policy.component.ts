@@ -14,8 +14,8 @@ import { POLICY_FORM_ID } from '../../components/policy-form/policy-form.compone
 @Component({
   selector: 'dp-create-policy',
   template: `
-    <dlm-page-header [title]="'page.policies.header_create'"></dlm-page-header>
-    <div class="page-section">
+    <dlm-page-header [title]="'page.policies.header_create'" [isFlexCenter]="true"></dlm-page-header>
+    <div>
       <div *ngIf="(pairings$ | async)?.length > 0; else noPairs">
         <dlm-policy-form
           [pairings]="pairings$ | async"
