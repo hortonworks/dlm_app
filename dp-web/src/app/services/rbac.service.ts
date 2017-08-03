@@ -63,6 +63,11 @@ export class RbacService {
 
   getLandingPage(isLakeInitialized: boolean): Observable<string> {
     return Observable.create(observer => {
+      if(!this.user.roles || this.user.roles.length === 0){
+        observer.next('/unauthorized');
+        observer.complete();
+        return;
+      }
       if (this.hasRole('SUPERADMIN')) {
         this.configService.isKnoxConfigured().subscribe(response => {
           if (!response.configured) {
@@ -85,8 +90,6 @@ export class RbacService {
       }
       else if (this.hasRole('USER')) {
         return this.getLandingInternal(observer, 'USER');
-      } else {
-        return this.getLandingInternal(observer, '/');
       }
     });
   }

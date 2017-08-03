@@ -33,8 +33,10 @@ class LdapConfigRepo @Inject()(
     def userSearchAttributeName = column[Option[String]]("usersearch_attributename")
     def groupSearchBase = column[Option[String]]("group_searchbase")
     def groupSearchAttributeName = column[Option[String]]("groupsearch_attributename")
+    def groupObjectClass = column[Option[String]]("group_objectclass")
+    def groupMemberAttributeName = column[Option[String]]("groupmember_attributename")
 
-    def * = (id,ldapUrl, bindDn,userSearchBase,userSearchAttributeName,groupSearchBase,groupSearchAttributeName) <> ((LdapConfiguration.apply _).tupled, LdapConfiguration.unapply)
+    def * = (id,ldapUrl, bindDn,userSearchBase,userSearchAttributeName,groupSearchBase,groupSearchAttributeName,groupObjectClass,groupMemberAttributeName) <> ((LdapConfiguration.apply _).tupled, LdapConfiguration.unapply)
    /* def * = (id,url, config) <> ((LdapConfiguration.apply _).tupled, LdapConfiguration.unapply)*/
 
   }

@@ -2,11 +2,11 @@ package controllers
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{Errors, UserInfo}
+import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.commons.domain.Ldap.LdapSearchResult.ldapConfigInfoFormat
-import com.hortonworks.dataplane.commons.domain.RoleType
-import com.hortonworks.dataplane.db.Webservice.UserService
+import com.hortonworks.dataplane.commons.domain.{Entities, RoleType}
+import com.hortonworks.dataplane.db.Webservice.{GroupService, UserService}
 import com.typesafe.scalalogging.Logger
 import models.{UserListInput, UsersAndRolesListInput}
 import play.api.libs.json.Json
@@ -19,13 +19,16 @@ import scala.concurrent.Future
 import scala.util.Left
 
 class UserManager @Inject()(val ldapService: LdapService,
-                            @Named("userService") val userService: UserService)
+                            @Named("userService") val userService: UserService,
+                            @Named("groupService")val groupService:GroupService)
     extends Controller {
   val logger = Logger(classOf[KnoxConfig])
 
   private def handleErrors(errors: Errors) = {
     if (errors.errors.exists(_.code == "400"))
       BadRequest(Json.toJson(errors))
+    else if (errors.errors.exists(_.code == "403"))
+      Forbidden(Json.toJson(errors))
     else
       InternalServerError(Json.toJson(errors))
   }
@@ -154,9 +157,69 @@ class UserManager @Inject()(val ldapService: LdapService,
     }else{
       ldapService.getUserGroups(userNameOpt.get).map{
         case Left(errors) => handleErrors(errors)
-        case Right(ldapSearchResult) =>
-          Ok(Json.toJson(ldapSearchResult))
+        case Right(ldapUser) =>
+          Ok(Json.toJson(ldapUser))
+      }
+    }
+  }
+  def createUserFromLdapGroupsConfiguration()=Action.async { req =>
+    val userNameOpt: Option[String] = req.getQueryString("userName")
+    if (userNameOpt.isEmpty) {
+      logger.error("userName is not specified")
+      Future.successful(BadRequest("userName not specified"))
+    } else {
+      createUserWithLdapGroups(userNameOpt.get).flatMap{
+        case Left(errors)=>Future.successful(handleErrors(errors))
+        case Right(userGroupInfo)=>{
+          groupService.getRolesForGroups(userGroupInfo.groupIds).map {
+            case Left(errors)=>handleErrors(errors)
+            case Right(roles)=>{
+              val userCtx=UserContext(id=userGroupInfo.id,username=userGroupInfo.userName,display=Some(userGroupInfo.displayName),
+                avatar=Some(userGroupInfo.displayName),roles=roles,token=None,password = userGroupInfo.password,active = Some(true))
 
+              Ok(Json.toJson(userCtx))
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private def createUserWithLdapGroups(userName: String):Future[Either[Errors,UserGroupInfo]] = {
+    getMatchingGroupsFromLdapAndDb(userName).flatMap{
+      case Left(errors)=>Future.successful(Left(errors))
+      case Right(groups)=>{
+        if (groups.length<1){
+          Future.successful(Left(Errors(Seq(Error("403","NO_ALLOWED_GROUPS:The user doesnt have valid groups configured")))))
+        }else{
+          val groupIds=groups.map(grp=>grp.id.get)
+          val userGroupInfo=UserGroupInfo(id=None,userName=userName,displayName=userName,groupIds = groupIds )
+          userService.addUserWithGroups(userGroupInfo).map {
+            case Left(errors)=>Left(errors)
+            case Right(userGroupInfo)=>Right(userGroupInfo)
+          }
+        }
+      }
+    }
+  }
+
+  private def getMatchingGroupsFromLdapAndDb(userName: String):Future[Either[Errors,Seq[Entities.Group]]] = {
+    for {
+      ldapUser <- ldapService.getUserGroups(userName)
+      dbGroups <- groupService.getAllActiveGroups()
+    } yield {
+      ldapUser match {
+        case Left(errors) => Left(errors)
+        case Right(ldpUsr) => {
+          val ldapGroupNames: Seq[String] = ldpUsr.groups.map(res => res.name)
+          dbGroups match {
+            case Left(errors) => Left(errors)
+            case Right(dbGrps) => {
+              val filteredGroups=dbGrps.filter(res => ldapGroupNames.contains(res.groupName))
+              Right(filteredGroups)
+            }
+          }
+        }
       }
     }
   }

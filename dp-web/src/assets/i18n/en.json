@@ -80,6 +80,8 @@
           "userSearchBase" : "User Search base",
           "userSearchAttributeName": "User Search Attribute",
           "groupSearchAttributeName": "Group Search Attribute",
+          "groupMemberAttributeName":"Group Member Attribute Name",
+          "groupObjectClass": "Group Object Class",
           "groupSearchBase" : "Group Search base",
           "adminBindDN": "Administrator Bind DN",
           "adminPassword": "Administrator Password",

@@ -4,14 +4,12 @@ package com.hortonworks.dataplane.gateway.filters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hortonworks.dataplane.gateway.domain.Constants;
-import com.hortonworks.dataplane.gateway.domain.UserRef;
+import com.hortonworks.dataplane.gateway.domain.UserContext;
 import com.hortonworks.dataplane.gateway.utils.Utils;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_DECORATION_FILTER_ORDER;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
@@ -43,15 +41,15 @@ public class UserDetailFilter extends ZuulFilter {
   @Override
   public Object run() {
     RequestContext ctx = RequestContext.getCurrentContext();
-    Object userRefObj = RequestContext.getCurrentContext().get(Constants.USER_CTX_KEY);
+    Object userRefObj = ctx.get(Constants.USER_CTX_KEY);
     if (userRefObj == null) {
       ctx.setResponseStatusCode(200);
       ctx.setResponseBody("{}");
       return null;
     }else{
       try {
-        UserRef userRef = (UserRef) userRefObj;
-        String userRefJson = objectMapper.writeValueAsString(userRef);
+        UserContext userContext = (UserContext) userRefObj;
+        String userRefJson = objectMapper.writeValueAsString(userContext);
         ctx.setResponseBody(userRefJson);
         ctx.setResponseStatusCode(200);
         ctx.setSendZuulResponse(false);

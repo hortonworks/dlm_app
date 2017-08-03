@@ -25,6 +25,9 @@ class GroupsRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     Groups.to[List].result
   }
 
+  def getAllActiveGroups(): Future[List[Group]] = db.run {
+    Groups.filter(_.active===true).to[List].result
+  }
 
   def allWithRoles(offset: Long = 0, pageSize: Long = 10, searchTerm: Option[String]): Future[GroupsList] = {
     val query = searchTerm match {
@@ -109,6 +112,13 @@ class GroupsRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
         RoleType.withName(roleName)
       }
       GroupInfo(id = group.id, groupName = group.groupName, displayName = group.displayName, roles = roles, active = group.active)
+    }
+  }
+  def getRolesForGroups(groupIds:Seq[Long])={
+    val query=GroupsRoles.filter(_.groupId.inSet(groupIds)).to[List].result
+    db.run(query).flatMap{res=>
+      val roleIds:Seq[Long]=res.map(role=>role.roleId.get)
+      rolesUtil.getRoleTypesForRoleIds(roleIds)
     }
   }
 

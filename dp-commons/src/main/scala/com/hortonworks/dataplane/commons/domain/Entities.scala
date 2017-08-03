@@ -28,6 +28,7 @@ object Entities {
                   displayname: String,
                   avatar: Option[String],
                   active: Option[Boolean] = Some(true),
+                  groupManaged: Option[Boolean] = Some(false),
                   created: Option[LocalDateTime] = Some(LocalDateTime.now()),
                   updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
@@ -49,7 +50,22 @@ object Entities {
                   active: Option[Boolean] = Some(true),
                   roles: Seq[RoleType.Value]=Seq()
                   )
-  case class UserContext(id:Option[Long],username:String,avatar:Option[String],roles:Seq[String],display:Option[String],token:Option[String])
+
+  case class UserGroupInfo(id: Option[Long] = None,
+                  userName: String,
+                  displayName: String,
+                  password: Option[String]=None,
+                  active: Option[Boolean] = Some(true),
+                  groupIds: Seq[Long]=Seq()
+                 )
+  case class UserContext(id:Option[Long],
+                         username:String,
+                         avatar:Option[String],
+                         active: Option[Boolean] = Some(true),
+                         roles:Seq[String],
+                         display:Option[String],
+                         token:Option[String],
+                         password:Option[String])
 
   case class GroupInfo(id: Option[Long] = None,
                       groupName: String,
@@ -73,6 +89,9 @@ object Entities {
   case class UserRole(id: Option[Long] = None,
                       userId: Option[Long],
                       roleId: Option[Long])
+  case class UserGroup(id: Option[Long] = None,
+                       userId: Option[Long],
+                       groupId: Option[Long])
 
   case class UserRoles(username: String, roles: Seq[String])
 
@@ -275,7 +294,9 @@ object Entities {
                               userSearchBase: Option[String],
                               userSearchAttributeName:Option[String],
                               groupSearchBase: Option[String],
-                              groupSearchAttributeName:Option[String]
+                              groupSearchAttributeName:Option[String],
+                              groupObjectClass:Option[String],
+                              groupMemberAttributeName: Option[String]
                               )
 
   case class WorkspaceDataCount(asset: Int, notebook: Int)
@@ -431,6 +452,10 @@ object JsonFormatters {
   implicit val usersListWrites = Json.writes[UsersList]
   implicit  val usersListReads = Json.reads[UsersList]
 
+
+  implicit val groupReads = Json.reads[Group]
+  implicit val groupWrites = Json.writes[Group]
+
   implicit val groupInfoReads = Json.reads[GroupInfo]
   implicit val groupInfoWrites = Json.writes[GroupInfo]
 
@@ -439,5 +464,8 @@ object JsonFormatters {
 
   implicit val userContextWrites= Json.writes[UserContext]
   implicit val userContextReads= Json.reads[UserContext]
+
+  implicit val userGroupInfoWrites= Json.writes[UserGroupInfo]
+  implicit val userGroupInfoReads= Json.reads[UserGroupInfo]
 
 }

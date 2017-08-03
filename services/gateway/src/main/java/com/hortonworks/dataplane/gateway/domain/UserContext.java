@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.List;
 
-public class UserRef implements Serializable {
+public class UserContext implements Serializable {
 
   private Long id;
   private String username;
@@ -14,8 +14,10 @@ public class UserRef implements Serializable {
   private List<String> roles;
   private String display;
   private String token;
+  private String password;
+  private boolean active;
 
-  public UserRef() {
+  public UserContext() {
   }
 
   @JsonProperty
@@ -64,6 +66,24 @@ public class UserRef implements Serializable {
   }
 
   @JsonProperty
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
+  @JsonProperty
+  public boolean isActive() {
+    return active;
+  }
+
+  public void setActive(boolean active) {
+    this.active = active;
+  }
+
+  @JsonProperty
   public List<String> getRoles() {
     return roles;
   }
@@ -71,4 +91,5 @@ public class UserRef implements Serializable {
   public void setRoles(List<String> roles) {
     this.roles = roles;
   }
+
 }
