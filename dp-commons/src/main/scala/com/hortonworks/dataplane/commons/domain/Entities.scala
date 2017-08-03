@@ -210,6 +210,7 @@ object Entities {
                        sku: Sku,
                        enabledSku: Option[EnabledSku]
                       )
+  case class DpServiceEnableConfig(skuName:String,smartSenseId:String)
 
   case class ClusterHost(id: Option[Long] = None,
                          host: String,
@@ -475,6 +476,9 @@ object JsonFormatters {
 
   implicit val dpServiceWrites= Json.writes[DpService]
   implicit val dpServiceReads= Json.reads[DpService]
+
+  implicit val dpServiceEnableConfigWrites= Json.writes[DpServiceEnableConfig]
+  implicit val dpServiceEnableConfigReads= Json.reads[DpServiceEnableConfig]
 
 
 }
