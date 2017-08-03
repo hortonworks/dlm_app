@@ -162,8 +162,8 @@ public class TokenCheckFilter extends ZuulFilter {
   }
 
   private boolean needsResyncFromLdap(Optional<UserContext> userContextFromDb) {
-    //300000 is 5 minutes TODO get from conf.
-    return userContextFromDb.get().isGroupManaged() && userContextFromDb.get().getUpdatedAt()-System.currentTimeMillis()>300000;
+    //60000 is 1 minutes TODO get from conf.
+    return userContextFromDb.get().isGroupManaged() && System.currentTimeMillis()-userContextFromDb.get().getUpdatedAt()>60000;
   }
 
   private void setupUserSession(TokenInfo tokenInfo, UserContext userContext) {

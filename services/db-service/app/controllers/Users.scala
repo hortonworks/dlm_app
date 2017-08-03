@@ -107,7 +107,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
       .validate[UserInfo]
       .map { userInfo =>
         userRepo
-          .updateUserAndRoles(userInfo,upgradeFromGroupManaged=false)
+          .updateUserAndRoles(userInfo,false)
           .map { res =>
             Ok
           }
@@ -132,11 +132,11 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
           case Some(user)=>{
             user.groupManaged match {
               case Some(true)=> userRepo
-                .updateUserAndRoles(userInfo,upgradeFromGroupManaged=true)
+                .updateUserAndRoles(userInfo,false)
                 .map(userInfo => Ok)
                 .recoverWith(apiError)
               case _=>{
-                Future.successful(Conflict("User already exists"))
+                Future.successful(Conflict(Json.toJson(Errors(Seq(Error("USER_ALREADY_EXISTS","User Already Exists"))))))
               }
             }
            }
@@ -148,7 +148,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil)(
     req.body.validate[UserGroupInfo]
       .map { userGroupInfo =>
         if (userGroupInfo.groupIds.isEmpty){
-          Future.successful(BadRequest(Json.toJson(Errors(Seq(Error("Input Error","Group needs to be specified"))))))
+          Future.successful(BadRequest(Json.toJson(Errors(Seq(Error("INPUT_ERROR","Group needs to be specified"))))))
         }else{
           val password: String =
             BCrypt.hashpw(Random.alphanumeric.toString(), BCrypt.gensalt())
