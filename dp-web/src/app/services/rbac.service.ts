@@ -19,7 +19,8 @@ export class RbacService {
     this.personaMap.set('SUPERADMIN', [
       new Persona('Admin', [
         new PersonaTabs('Clusters', 'infra', 'fa-sitemap'),
-        new PersonaTabs('User Management', 'infra/usermgmt', 'fa-users')
+        new PersonaTabs('Users', 'infra/usermgmt', 'fa-users'),
+        new PersonaTabs('Services', 'infra/services', 'fa-arrows-h')
       ], '', 'infra-logo.png')]);
     this.personaMap.set('CURATOR', [new Persona('Data Steward', [
       new PersonaTabs('Asset Collection', 'datasteward/dataset', 'fa-cubes', true),

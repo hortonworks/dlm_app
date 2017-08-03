@@ -8,6 +8,8 @@ import {AddUserComponent} from './views/user-management/add-user/add-user.compon
 import {AddGroupComponent} from './views/user-management/add-group/add-group.component';
 import {UsersComponent} from './views/user-management/users/users.component';
 import {GroupsComponent} from './views/user-management/groups/groups.component';
+import {ServiceManagementComponent} from './views/service-management/service-management.component';
+import {VerificationComponent} from './views/service-management/verification/verification.component';
 
 // export const routes:Routes = [
 //   { path: '', redirectTo: 'clusters' },
@@ -26,6 +28,8 @@ export const routes: Routes = [
   { path: 'clusters', component: LakesComponent },
   { path: 'add', component: ClusterAddComponent },
   { path: 'cluster/details/:id', component: ClusterDetailsComponent },
+  { path: 'services', component: ServiceManagementComponent},
+  { path: 'services/verify/:id', component: VerificationComponent},
   { path: 'usermgmt', component: UserManagementComponent,
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'users'},
