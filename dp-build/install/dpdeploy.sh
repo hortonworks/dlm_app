@@ -86,13 +86,26 @@ migrate_schema() {
     if [ "$USE_EXT_DB" == "no" ]; then
         # start database container
         source $(pwd)/docker-database.sh
+
+        # wait for database start
+        sleep 5
     fi
 
-    # wait for database start
-    sleep 5
+    # start flyway container and trigger migrate script
+    source $(pwd)/docker-flyway-migrate.sh
+}
+
+reset_db() {
+    if [ "$USE_EXT_DB" == "no" ]; then
+        # start database container
+        source $(pwd)/docker-database.sh
+
+        # wait for database start
+        sleep 5
+    fi
 
     # start flyway container and trigger migrate script
-    source $(pwd)/docker-migrate.sh
+    source $(pwd)/docker-flyway-init.sh
 }
 
 destroy() {
@@ -232,7 +245,7 @@ stop_knox() {
 
 init_all() {
     init_db
-    migrate_schema
+    reset_db
 
     init_knox
 
@@ -281,6 +294,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox and Consul containers"
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
+    printf "%-${tabspace}s:%s\n" "reset" "Reset database to its initial state"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
     printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
     printf "%-${tabspace}s:%s\n" "start knox" "Start the Knox and Consul containers"
@@ -324,6 +338,9 @@ else
                     usage
                     ;;
             esac
+            ;;
+        reset)
+            reset_db
             ;;
         migrate)
             migrate_schema
