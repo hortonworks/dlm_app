@@ -33,7 +33,6 @@ export class LogService {
     });
     this.logMessage$.subscribe(logMessage => this.emitter.next(logMessage));
     this.clusters$ = store.select(getAllClusters);
-    this.store.dispatch(loadClusters());
     this.clusters$.subscribe(clusters => this.clusters = clusters);
   }
 

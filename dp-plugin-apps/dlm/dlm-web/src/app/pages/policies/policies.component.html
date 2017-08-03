@@ -25,6 +25,7 @@
   </div>
 </div>
 <dlm-progress-container [progressState]="overallProgress$ | async">
+  <dlm-beacon-validity></dlm-beacon-validity>
   <div class="row page-section" *ngIf="!(overallProgress$ | async).inProgress">
     <div class="col-md-12" *ngIf="(policies$ | async)?.length > 0; else noPolicies">
       <dlm-policy-table

@@ -46,7 +46,6 @@ import { TranslateService } from '@ngx-translate/core';
 const POLICIES_REQUEST = 'POLICIES_REQUEST';
 const CLUSTERS_REQUEST = 'CLUSTERS_REQUEST';
 const JOBS_REQUEST = 'JOBS_REQUEST';
-const CLUSTER_STATUS_REQUEST = 'CLUSTERS_STATUS_REQUEST';
 
 @Component({
   selector: 'dlm-overview',
@@ -100,7 +99,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.policies$ = store.select(getAllPoliciesWithClusters);
     this.clusters$ = store.select(getAllClusters);
     this.pairsCount$ = store.select(getCountPairsForClusters);
-    this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, JOBS_REQUEST, CLUSTER_STATUS_REQUEST));
+    this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, JOBS_REQUEST));
     this.fullfilledClusters$ = this.clusters$
       .filter(clusters => !!clusters.length)
       .distinctUntilChanged(null, clusters => clusters.map(cluster => cluster.id).join('@') + '_LENGTH' + clusters.length);
@@ -169,8 +168,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
       .do(([_, clusters]) => {
         [
           loadPolicies(),
-          loadClusters(),
-          loadClustersStatuses()
+          loadClusters()
         ].map(action => this.store.dispatch(action));
       });
 
@@ -193,7 +191,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.jobStatusFilter$.next(healthStatus);
   }
 
-  private completedRequest$(progress$) {
+  private completedRequest$(progress$: Observable<ProgressState>): Observable<boolean> {
     return progress$
       .skip(1)
       .map(p => p.isInProgress)
@@ -237,11 +235,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
       loadPairings()
     ].map(action => this.store.dispatch(action));
     const overallProgressSubscription = this.completedRequest$(this.overallProgress$)
-      .subscribe(_ => {
-        this.initPolling();
-      });
-    const clustersRequestSubscription = this.completedRequest$(this.store.select(getProgressState(CLUSTERS_REQUEST)))
-      .subscribe(_ => this.store.dispatch(loadClustersStatuses(CLUSTER_STATUS_REQUEST)));
+      .take(1)
+      .do(_ => this.initPolling())
+      .subscribe();
     const clusterPoliciesCompleteSubscription = Observable.combineLatest(
       this.completedRequest$(this.store.select(getProgressState(CLUSTERS_REQUEST))),
       this.completedRequest$(this.store.select(getProgressState(POLICIES_REQUEST)))
@@ -268,7 +264,6 @@ export class OverviewComponent implements OnInit, OnDestroy {
       .map(policy => this.mapTableData(policy)));
 
     this.subscriptions.push(overallProgressSubscription);
-    this.subscriptions.push(clustersRequestSubscription);
     this.subscriptions.push(clusterPoliciesCompleteSubscription);
   }
 

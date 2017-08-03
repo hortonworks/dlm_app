@@ -6,8 +6,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { Event } from 'models/event.model';
 import { Observable } from 'rxjs/Observable';
 import { getAllEvents, getNewEventsCount } from 'selectors/event.selector';
-import { getMergedProgress } from 'selectors/progress.selector';
+import { getMergedProgress, getProgressState } from 'selectors/progress.selector';
 import { initApp } from 'actions/app.action';
+import { loadClusters, loadClustersStatuses } from 'actions/cluster.action';
 import { loadEvents, loadNewEventsCount } from 'actions/event.action';
 import { NAVIGATION } from 'constants/navigation.constant';
 import { User } from './models/user.model';
@@ -19,9 +20,12 @@ import { POLL_INTERVAL } from 'constants/api.constant';
 import { HeaderData, Persona } from 'models/header-data';
 import { UserService } from 'services/user.service';
 import { AuthUtils } from 'utils/auth-utils';
+import { getAllClusters } from 'selectors/cluster.selector';
 
-const POLL_EVENTS_ID = 'POLL_EVENT_ID';
-const POLL_NEW_EVENTS_ID = 'POLL_NEW_EVENTS_ID';
+const POLL_EVENTS_ID = '[DLM_COMPONENT] POLL_EVENT_ID';
+const POLL_NEW_EVENTS_ID = '[DLM_COMPONENT] POLL_NEW_EVENTS_ID';
+const POLL_CLUSTER_STATUSES_ID = '[DLM_COMPONENT] POLL_CLUSTER_STATUSES_ID';
+const CLUSTERS_REQUEST = '[DLM_COMPONENT] CLUSTERS_REQUEST';
 
 @Component({
   selector: 'dlm',
@@ -54,7 +58,7 @@ export class DlmComponent implements OnDestroy, OnInit {
 
   private initPolling() {
     const pollProgress$ = this.store
-      .select(getMergedProgress(POLL_EVENTS_ID, POLL_NEW_EVENTS_ID))
+      .select(getMergedProgress(POLL_EVENTS_ID, POLL_NEW_EVENTS_ID, POLL_CLUSTER_STATUSES_ID))
       .map(r => r.isInProgress)
       .distinctUntilChanged()
       .filter(isInProgress => !isInProgress)
@@ -62,6 +66,7 @@ export class DlmComponent implements OnDestroy, OnInit {
       .do(_ => {
         this.store.dispatch(loadNewEventsCount({requestId: POLL_NEW_EVENTS_ID}));
         this.store.dispatch(loadEvents({ requestId: POLL_EVENTS_ID}));
+        this.store.dispatch(loadClustersStatuses(POLL_CLUSTER_STATUSES_ID));
       })
       .repeat();
 
@@ -121,14 +126,19 @@ export class DlmComponent implements OnDestroy, OnInit {
     this.store.dispatch(initApp());
     this.store.dispatch(loadNewEventsCount({requestId: POLL_NEW_EVENTS_ID}));
     this.store.dispatch(loadEvents({ requestId: POLL_EVENTS_ID}));
+    this.store.dispatch(loadClusters(CLUSTERS_REQUEST));
     const pathChange$ = router.events
       .filter(e => e instanceof NavigationEnd)
       .do(_ => {
         this.onOverviewPage = this.checkTopPath(route, 'overview');
       });
-
+    const clustersRequestSubscription = this.store.select(getProgressState(CLUSTERS_REQUEST))
+      .filter(progressState => !progressState.isInProgress)
+      .take(1)
+      .do(_ => this.store.dispatch(loadClustersStatuses(POLL_CLUSTER_STATUSES_ID)))
+      .subscribe(_ => this.initPolling());
+    this.subscriptions.push(clustersRequestSubscription);
     this.subscriptions.push(pathChange$.subscribe());
-    this.initPolling();
   }
 
   private checkTopPath(route, path) {

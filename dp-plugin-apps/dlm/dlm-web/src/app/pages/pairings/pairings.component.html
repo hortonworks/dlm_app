@@ -13,6 +13,7 @@
     </div>
   </div>
 </div>
+<dlm-beacon-validity></dlm-beacon-validity>
 <dlm-progress-container [progressState]="overallProgress$ | async">
   <div class="content">
     <div *ngIf="(pairings$ | async)?.length > 0; else noPairs">
