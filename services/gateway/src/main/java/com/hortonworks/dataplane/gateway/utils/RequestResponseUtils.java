@@ -75,6 +75,9 @@ public class RequestResponseUtils {
   public void redirectToLogin() {
     redirectTo(getRootPath() + "login");
   }
+  public void redirectToServiceError(){
+    redirectTo(getRootPath() + "service-notenabled");
+  }
 
   public void redirectToKnoxLogin() {
     RequestContext ctx = RequestContext.getCurrentContext();

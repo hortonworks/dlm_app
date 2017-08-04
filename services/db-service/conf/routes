@@ -115,6 +115,7 @@ DELETE        /categories/:categoryId                                        con
 GET           /skus                                                          controllers.Skus.all
 POST          /skus                                                          controllers.Skus.insert
 GET           /skus/:skuId                                                   controllers.Skus.load(skuId: Long)
+GET           /skus/byName/:name                                             controllers.Skus.findByName(name:String)
 DELETE        /skus/:skuId                                                   controllers.Skus.delete(skuId: Long)
 
 #EnabledSkus API

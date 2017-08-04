@@ -20,12 +20,14 @@ export class Persona {
   name: string;
   imageName: string;
   tabs: PersonaTabs[] = [];
+  enabled:boolean;
 
-  constructor(name: string, tabs: PersonaTabs[], url = '', imageName = ''){
+  constructor(name: string, tabs: PersonaTabs[], url = '', imageName = '', enabled = true){
     this.url = url;
     this.name = name;
     this.imageName = imageName;
     this.tabs = tabs ? tabs : [];
+    this.enabled = enabled;
   }
 }
 
