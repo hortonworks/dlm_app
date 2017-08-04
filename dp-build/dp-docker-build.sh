@@ -128,7 +128,7 @@ package() {
     tar -czf ${PACKAGE_NAME}-${VERSION_STRING}.tar.gz ${PACKAGE_NAME}
     popd
 
-    echo "All done. Created $BUILD_ROOT/${PACKAGE_NAME}-${VERSION_STRING}.tar.gz"
+    echo "All done. Created $BUILD_ROOT/pkg/${PACKAGE_NAME}-${VERSION_STRING}.tar.gz"
 }
 
 get_version() {
