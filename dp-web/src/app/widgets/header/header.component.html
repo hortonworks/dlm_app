@@ -8,11 +8,13 @@
 
         <div class="actions">
             <button id="logout" class="mdl-button mdl-js-button">
-                <i class="fa fa-user-circle" aria-hidden="true"></i>
-                <span class="user-name"> {{user?.display}} </span>
-                <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                <i class="fa fa-user" aria-hidden="true"></i>
+                <i class="fa fa-caret-down" aria-hidden="true"></i>
             </button>
             <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="logout">
+              <li class="mdl-menu__item mdl-menu__item--full-bleed-divider user-name">
+                {{user?.display}}
+              </li>
               <li class="mdl-menu__item"><a href="{{signoutURL}}">Sign out</a></li>
             </ul>
         </div>
