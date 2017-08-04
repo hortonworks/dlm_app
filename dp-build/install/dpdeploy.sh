@@ -92,7 +92,7 @@ migrate_schema() {
     fi
 
     # start flyway container and trigger migrate script
-    source $(pwd)/docker-flyway-migrate.sh
+    source $(pwd)/docker-flyway.sh migrate
 }
 
 reset_db() {
@@ -105,7 +105,7 @@ reset_db() {
     fi
 
     # start flyway container and trigger migrate script
-    source $(pwd)/docker-flyway-init.sh
+    source $(pwd)/docker-flyway.sh clean migrate
 }
 
 destroy() {
