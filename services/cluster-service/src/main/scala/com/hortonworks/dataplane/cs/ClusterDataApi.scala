@@ -75,11 +75,14 @@ class ClusterDataApi @Inject()(
                                  clusterHostsService,
                                  urlCacheTime)).asInstanceOf[LoadingCache[Long,Supplier[Future[URL]]]]
 
-  private val tokenCache: Cache[String, TokenResponse] = CacheBuilder
+
+  private case class CacheKey(cluster:Long,token:String)
+
+  private val tokenCache: Cache[CacheKey, TokenResponse] = CacheBuilder
     .newBuilder()
     .expireAfterWrite(tokenCacheExpiry, TimeUnit.SECONDS)
     .build()
-    .asInstanceOf[Cache[String, TokenResponse]]
+    .asInstanceOf[Cache[CacheKey, TokenResponse]]
 
   implicit val materializer = actorMaterializer
 
@@ -135,7 +138,7 @@ class ClusterDataApi @Inject()(
           val decodedToken = inputToken.get.token
           // Build cookie header
           log.info("Building cookie for Knox call")
-          val accessToken = tokenCache.getIfPresent(decodedToken)
+          val accessToken = tokenCache.getIfPresent(CacheKey(clusterId,decodedToken))
           val optionalToken = Option(accessToken)
           if (optionalToken.isDefined && validToken(optionalToken.get)) {
             log.info("Token in cache and not expired, reusing...")
@@ -143,12 +146,12 @@ class ClusterDataApi @Inject()(
           } else {
             // token not in cache or expired
             // remove token from cache
-            tokenCache.invalidate(decodedToken)
+            tokenCache.invalidate(CacheKey(clusterId,decodedToken))
             newToken(decodedToken).map { t =>
               // add new token to cache
               log.info(
                 "No token in cache, Loaded from knox and added to cache")
-              tokenCache.put(decodedToken, t)
+              tokenCache.put(CacheKey(clusterId,decodedToken), t)
               Some(t.accessToken)
             }
           }
