@@ -27,6 +27,15 @@ class Skus @Inject()(skuRepo: SkuRepo)(implicit exec: ExecutionContext)
     }.recoverWith(apiError)
   }
 
+  def findByName(name:String) = Action.async {
+    skuRepo.findByName(name).map { skuO =>
+      skuO.map { u =>
+        success(u)
+      }
+        .getOrElse(NotFound)
+    }.recoverWith(apiError)
+  }
+
   def insert = Action.async(parse.json) { req =>
     req.body
       .validate[Sku]

@@ -22,7 +22,7 @@ class UserManager @Inject()(val ldapService: LdapService,
                             @Named("userService") val userService: UserService,
                             @Named("groupService")val groupService:GroupService)
     extends Controller {
-  val logger = Logger(classOf[KnoxConfig])
+  val logger = Logger(classOf[UserManager])
 
   private def handleErrors(errors: Errors) = {
     if (errors.errors.exists(_.code == "400"))
@@ -171,14 +171,9 @@ class UserManager @Inject()(val ldapService: LdapService,
       createUserWithLdapGroups(userNameOpt.get).flatMap{
         case Left(errors)=>Future.successful(handleErrors(errors))
         case Right(userGroupInfo)=>{
-          groupService.getRolesForGroups(userGroupInfo.groupIds).map {
+          userService.getUserContext(userNameOpt.get).map{
             case Left(errors)=>handleErrors(errors)
-            case Right(roles)=>{
-              val userCtx=UserContext(id=userGroupInfo.id,username=userGroupInfo.userName,display=Some(userGroupInfo.displayName),
-                avatar=Some(userGroupInfo.displayName),roles=roles,token=None,password = userGroupInfo.password,active = Some(true))
-
-              Ok(Json.toJson(userCtx))
-            }
+            case Right(userContext)=>Ok(Json.toJson(userContext))
           }
         }
       }

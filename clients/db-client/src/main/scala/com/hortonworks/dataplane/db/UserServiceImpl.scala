@@ -58,6 +58,13 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       case _ => mapErrors(res)
     }
   }
+  private def mapToUserContext(res: WSResponse) = {
+    res.status match {
+      case 200 => Right((res.json \ "results").validate[UserContext].get)
+      case _ => mapErrors(res)
+    }
+  }
+
   private def mapToUsers(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").validate[Seq[User]].get)
@@ -192,5 +199,11 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       .withHeaders("Accept" -> "application/json")
       .post(Json.toJson(userGroupInfo))
       .map(mapToUserGroupInfo)
+  }
+  override def getUserContext(userName:String): Future[Either[Errors,UserContext]] ={
+    ws.url(s"$url/users/$userName/usercontext")
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToUserContext)
   }
 }
