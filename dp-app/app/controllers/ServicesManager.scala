@@ -28,7 +28,7 @@ class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService
     }
   }
 
-  def getEnabledServies= Action.async { request =>
+  def getEnabledServices= Action.async { request =>
     getDpServicesInternal().map{
       case Left(errors) =>handleErrors(errors)
       case Right(services)=>{
@@ -42,7 +42,7 @@ class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService
     if (smartSenseId.isEmpty){
       Future.successful(BadRequest("smartSenseId is required"))
     }else{
-      if (vefifySmartSenseCode(smartSenseId.get)){//TODO meaningful regex from config
+      if (verifySmartSenseCode(smartSenseId.get)){//TODO meaningful regex from config
         Future.successful(Ok(Json.obj("isValid" -> true)))
       }else{
         Future.successful(Ok(Json.obj("isValid" -> false)))
@@ -54,7 +54,7 @@ class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService
     if (skuNameOpt.isEmpty) {
       Future.successful(BadRequest("skuName not provided"))
     } else {
-      skuService.getSku(skuNameOpt.get)map {
+      skuService.getSku(skuNameOpt.get).map {
         case Left(errors) =>handleErrors(errors)
         case Right(services) => {
           Ok(Json.toJson(services))
@@ -63,13 +63,13 @@ class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService
     }
   }
 
-  private def vefifySmartSenseCode(smartSenseId: String) = {
+  private def verifySmartSenseCode(smartSenseId: String) = {
     smartSenseId.matches(smartSenseRegex)
   }
 
   def enableService=authenticated.async(parse.json) { request =>
     request.body.validate[DpServiceEnableConfig].map{config=>
-      if (!vefifySmartSenseCode(config.smartSenseId)){
+      if (!verifySmartSenseCode(config.smartSenseId)){
         Future.successful(BadRequest("Invalid Smart SenseId"))
       }else{
         skuService.getSku(config.skuName).flatMap{

@@ -118,6 +118,6 @@ GET           /api/workspaces/:id/notebooks                          controllers
 #services
 GET           /api/services                                  controllers.ServicesManager.getServices
 GET           /api/services/byName                           controllers.ServicesManager.getSkuByName
-GET           /api/services/enabled                          controllers.ServicesManager.getEnabledServies
+GET           /api/services/enabled                          controllers.ServicesManager.getEnabledServices
 POST          /api/services/verifyCode                       controllers.ServicesManager.verifySmartSense
 POST          /api/services/enable                           controllers.ServicesManager.enableService

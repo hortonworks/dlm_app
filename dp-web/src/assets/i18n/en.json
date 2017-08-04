@@ -59,6 +59,7 @@
         "hwxDataplane": "Hortonworks Data Plane",
         "setupAuth": "Setup Authentication",
         "defineUsers": "Define User Privileges Roles and Groups",
+        "manageUsers": "Manage User Privileges Roles and Groups",
         "startButton": "Get Started",
         "addCluster": "Add Clusters",
         "addDataset": "Add Asset Collection",
@@ -68,6 +69,7 @@
         "dataplane": "Welcome to Hortonworks Data Plane. To start, please configure the LDAP properties and allow dataplane authenticate against it. Optionally, you can add Dataplane Administrators. Please proceed by clicking on GET STARTED",
         "setupAuth": "The first step is to help data plane connect to your LDAP by providing the LDAP configurations to Data plane.",
         "defineUsers": "Upon completing the LDAP configuration, you may add administrators to Data plane. You can add users or groups to data plane and assign or modify their roles anytime through the User Management Screen.",
+        "manageUsers": "You can manage users or groups in data plane and assign or modify their roles anytime through the User Management Screen.",
         "addCluster": "Add Ambari Managed HDP clusters to Dataplane. Dataplane will auto-discover cluster information such as the cluster name, active services & important metrics running.",
         "setService": "Set up services to enable Dataplane to manage your data",
         "addDataset": "Create asset collection using Dataplane Steward Studio capability"
@@ -115,9 +117,9 @@
         "verified": "VERIFIED"
       },
       "description": {
-        "verificationWelcome": "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your Smart Sense ID",
+        "verificationWelcome": "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your SmartSense ID.",
         "enableError": "Service could not be enabled.",
-        "verificationError": "Incorrect Smartsense ID format"
+        "verificationError": "Incorrect SmartSense ID format"
       }
     },
     "infra": {
