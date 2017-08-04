@@ -8,6 +8,7 @@ import { NotFoundRouteComponent } from './views/not-found-route/not-found-route.
 import {NavigationGuard} from './shared/utils/navigation-guard';
 import {AuthErrorComponent} from './shared/auth-error/auth-error.component';
 import {LoaderSpinComponent} from './shared/loader-spin/loader-spin.component';
+import {ServiceErrorComponent} from './shared/service-error/service-error.component';
 
 export const routes: Routes = [{
     path: 'sign-in',
@@ -48,6 +49,9 @@ export const routes: Routes = [{
     path: 'unauthorized',
     component: AuthErrorComponent
   }, {
+    path: 'service-error',
+    component: ServiceErrorComponent
+  },{
     path: '',
     pathMatch: 'full',
     component: LoaderSpinComponent,

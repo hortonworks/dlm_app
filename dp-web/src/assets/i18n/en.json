@@ -28,7 +28,7 @@
     "name": "Name",
     "moreLink": "Learn More",
     "save": "SAVE",
-    "failed" : "Failed",
+    "failed": "Failed",
     "defaultRequiredFields": "Please fill in mandatory fields marked with '*'",
     "sidenav": {
       "analyst": "Analyst",
@@ -46,9 +46,11 @@
       "CURATOR": "Data Steward"
     },
     "signout": "Sign Out",
-    "unauthorized":"Unauthorized",
-    "unauthorizedMessage":"You are not authorized to view this page.",
-    "invalidUser":"You are not an authorized Data plane user. Please contact your Data plane Administrator."
+    "unauthorized": "Unauthorized",
+    "unauthorizedMessage": "You are not authorized to view this page.",
+    "serviceDisabled": "Service Not Enabled",
+    "serviceDisabledMessage": "This service has not been enabled by your Admin. Please contact your Data plane Administrator to enable it.",
+    "invalidUser": "You are not an authorized Data plane user. Please contact your Data plane Administrator."
   },
   "pages": {
     "onboard": {
@@ -66,22 +68,22 @@
         "dataplane": "Welcome to Hortonworks Data Plane. To start, please configure the LDAP properties and allow dataplane authenticate against it. Optionally, you can add Dataplane Administrators. Please proceed by clicking on GET STARTED",
         "setupAuth": "The first step is to help data plane connect to your LDAP by providing the LDAP configurations to Data plane.",
         "defineUsers": "Upon completing the LDAP configuration, you may add administrators to Data plane. You can add users or groups to data plane and assign or modify their roles anytime through the User Management Screen.",
-        "addCluster" : "Add Ambari Managed HDP clusters to Dataplane. Dataplane will auto-discover cluster information such as the cluster name, active services & important metrics running.",
-        "setService" : "Set up services to enable Dataplane to manage your data",
-        "addDataset" : "Create asset collection using Dataplane Steward Studio capability"
+        "addCluster": "Add Ambari Managed HDP clusters to Dataplane. Dataplane will auto-discover cluster information such as the cluster name, active services & important metrics running.",
+        "setService": "Set up services to enable Dataplane to manage your data",
+        "addDataset": "Create asset collection using Dataplane Steward Studio capability"
       },
       "configure": {
         "labels": {
           "ldapConfiguration": "LDAP Configuration",
           "masterPassword": "Master Password",
-          "userDNTemplate":"User DN Template",
-          "url" : "URL",
-          "userSearchBase" : "User Search base",
+          "userDNTemplate": "User DN Template",
+          "url": "URL",
+          "userSearchBase": "User Search base",
           "userSearchAttributeName": "User Search Attribute",
           "groupSearchAttributeName": "Group Search Attribute",
-          "groupMemberAttributeName":"Group Member Attribute Name",
+          "groupMemberAttributeName": "Group Member Attribute Name",
           "groupObjectClass": "Group Object Class",
-          "groupSearchBase" : "Group Search base",
+          "groupSearchBase": "Group Search base",
           "adminBindDN": "Administrator Bind DN",
           "adminPassword": "Administrator Password",
           "showPassword": "Show Password",
@@ -91,52 +93,52 @@
           "configurationDesctiption": "The first step is to help Data Plane connect to your LDAP by providing the appropriate configurations."
         }
       },
-      "adduser" : {
-        "labels" : {
-          "users" : "Users",
+      "adduser": {
+        "labels": {
+          "users": "Users",
           "groups": "Groups",
-          "saveAndLogin" : "SAVE & LOGIN",
+          "saveAndLogin": "SAVE & LOGIN",
           "configSuccess": "LDAP ADDED SUCCESSFULLY"
         }
       }
     },
     "services": {
       "labels": {
-        "enabledServices" : "Enabled Services",
-        "availableServices" : "Available Services",
-        "smartSenseId" : "SMARTSENSE ID",
-        "enabled" : "ENABLED",
-        "enable" : "ENABLE",
-        "next" : "Next",
-        "verify" : "Verify",
+        "enabledServices": "Enabled Services",
+        "availableServices": "Available Services",
+        "smartSenseId": "SMARTSENSE ID",
+        "enabled": "ENABLED",
+        "enable": "ENABLE",
+        "next": "Next",
+        "verify": "Verify",
         "verifySmartSenseId": "Verify SmartSense ID",
-        "verified" : "VERIFIED"
+        "verified": "VERIFIED"
       },
-      "description" : {
-        "verificationWelcome" : "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your Smart Sense ID",
-        "enableError" : "Service could not be enabled.",
-        "verificationError" : "Incorrect Smartsense ID format"
+      "description": {
+        "verificationWelcome": "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your Smart Sense ID",
+        "enableError": "Service could not be enabled.",
+        "verificationError": "Incorrect Smartsense ID format"
       }
     },
     "infra": {
       "topnav": {
         "cluster-link": "CLUSTERS"
       },
-      "labels" : {
-        "nodes" : "Nodes",
-        "uptime":"Uptime",
-        "services" :"Services",
-        "hdfsUsed" : "HDFS Used",
-        "hdfsTotal" : "HDFS Total",
-        "addButton" : "Add Cluster",
-        "addCluster" : "Add Your Cluster",
-        "ambariUrl":"Ambari URL",
-        "ambariUsername":"Ambari Username",
+      "labels": {
+        "nodes": "Nodes",
+        "uptime": "Uptime",
+        "services": "Services",
+        "hdfsUsed": "HDFS Used",
+        "hdfsTotal": "HDFS Total",
+        "addButton": "Add Cluster",
+        "addCluster": "Add Your Cluster",
+        "ambariUrl": "Ambari URL",
+        "ambariUsername": "Ambari Username",
         "ambariPassword": "Ambari Password",
-        "knoxUrl":"Knox URL",
-        "clusterName" : "Cluster Name",
-        "ipAddress" : "IP Address",
-        "clusterLocation" : "Cluster Location",
+        "knoxUrl": "Knox URL",
+        "clusterName": "Cluster Name",
+        "ipAddress": "IP Address",
+        "clusterLocation": "Cluster Location",
         "dataCenter": "Data Center",
         "clusterAddSuccess": "Cluster Added successfully",
         "connectionFailed": "Unable to connect, please retry",
@@ -145,7 +147,7 @@
         "addUser": "ADD USER",
         "addGroup": "ADD GROUP",
         "username": "Username",
-        "groupName":"Group Name",
+        "groupName": "Group Name",
         "roles": "Roles",
         "usernameorgroup": "Username/Group",
         "active": "Active",
@@ -168,7 +170,7 @@
         },
         "clusterAlreadyExists": "Cluster Already exists in dataplane",
         "userManagement": "You can manage the users or groups added to Dataplane through User Management. This page is available for the Dataplane Adminsitrator. You can add new users or groups and assign them roles by clicking on ADD USER or ADD GROUP button. To activate/deactivate to edit their roles, click on the username in the list below or click on the menu icon on the displayed rows.",
-        "additionalConfigs":"Please provide these additional configurations required by Dataplane to discover the cluster information",
+        "additionalConfigs": "Please provide these additional configurations required by Dataplane to discover the cluster information",
         "knoxUrl": "Please enter the URL of the Knox Service on the HDP cluster which is configured to work with Data plane.",
         "ldapError": "Not able to fetch users from LDAP",
         "addUserError": "Not able to save users",

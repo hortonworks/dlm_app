@@ -16,29 +16,6 @@ export class RbacService {
   private nonPersonaRoutesMap = new Map();
 
   constructor(private configService: ConfigurationService) {
-    this.personaMap.set('SUPERADMIN', [
-      new Persona('Admin', [
-        new PersonaTabs('Clusters', 'infra', 'fa-sitemap'),
-        new PersonaTabs('Users', 'infra/usermgmt', 'fa-users'),
-        new PersonaTabs('Services', 'infra/services', 'fa-arrows-h')
-      ], '', 'infra-logo.png')]);
-    this.personaMap.set('CURATOR', [new Persona('Data Steward', [
-      new PersonaTabs('Asset Collection', 'datasteward/dataset', 'fa-cubes', true),
-      new PersonaTabs('Unclassified', 'unclassified', 'fa-cube'),
-      new PersonaTabs('Assets', 'assets', 'fa-server'),
-      new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')
-    ], '', 'steward-logo.png')]);
-    this.personaMap.set('USER', [new Persona('Analytics', [
-      new PersonaTabs('Workspace', 'analytics/workspace', 'fa-globe'),
-      new PersonaTabs('Assets', 'analytics/assets', 'fa-list-alt'),
-      new PersonaTabs('Clusters', '', 'fa-database'),
-      new PersonaTabs('Jobs', '', 'fa-briefcase')
-    ], '', 'analytics-logo.png')]);
-    this.personaMap.set('INFRAADMIN', [new Persona('Cluster Admin', [
-      new PersonaTabs('Clusters', 'infra', 'fa-sitemap')
-    ], '', 'infra-logo.png'), new Persona('Data Life cycle Manager', [], '/dlm', 'dlm-logo.png')]);
-    this.personaMap.set('INFRAADMIN_SUPERADMIN', [new Persona('DLM', [], '/dlm', 'dlm-logo.png')]);
-
     this.landingPageMap.set('SUPERADMIN', '/infra');
     this.landingPageMap.set('SUPERADMIN_ONBOARD', '/onboard/welcome');
     this.landingPageMap.set('CURATOR', '/datasteward');
@@ -57,6 +34,40 @@ export class RbacService {
     return AuthUtils.getUser();
   }
 
+  getPersonaMap() {
+    let personaMap = new Map();
+    personaMap.set('SUPERADMIN', [
+      new Persona('Admin', [
+        new PersonaTabs('Clusters', 'infra', 'fa-sitemap'),
+        new PersonaTabs('Users', 'infra/usermgmt', 'fa-users'),
+        new PersonaTabs('Services', 'infra/services', 'fa-arrows-h')
+      ], '', 'infra-logo.png')
+    ]);
+    personaMap.set('CURATOR', [
+      new Persona('Data Steward', [
+        new PersonaTabs('Asset Collection', 'datasteward/dataset', 'fa-cubes', true),
+        new PersonaTabs('Unclassified', 'unclassified', 'fa-cube'),
+        new PersonaTabs('Assets', 'assets', 'fa-server'),
+        new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')
+      ], '', 'steward-logo.png', !!this.user && this.user.services.indexOf('dss') > -1)]);
+    personaMap.set('USER', [
+      new Persona('Analytics', [
+        new PersonaTabs('Workspace', 'analytics/workspace', 'fa-globe'),
+        new PersonaTabs('Assets', 'analytics/assets', 'fa-list-alt'),
+        new PersonaTabs('Clusters', '', 'fa-database'),
+        new PersonaTabs('Jobs', '', 'fa-briefcase')
+      ], '', 'analytics-logo.png')]);
+    personaMap.set('INFRAADMIN', [
+      new Persona('Cluster Admin', [
+        new PersonaTabs('Clusters', 'infra', 'fa-sitemap')
+      ], '', 'infra-logo.png'),
+      new Persona('Data Life cycle Manager', [], '/dlm', 'dlm-logo.png', !!this.user && this.user.services.indexOf('dlm') > -1)]);
+    personaMap.set('INFRAADMIN_SUPERADMIN', [
+      new Persona('DLM', [], '/dlm', 'dlm-logo.png', !!this.user && this.user.services.indexOf('dlm') > -1)
+    ]);
+    return personaMap;
+  }
+
   private getLandingInternal(observer: Observer<string>, key: String) {
     observer.next(this.landingPageMap.get(key));
     observer.complete();
@@ -64,7 +75,7 @@ export class RbacService {
 
   getLandingPage(isLakeInitialized: boolean): Observable<string> {
     return Observable.create(observer => {
-      if(!this.user.roles || this.user.roles.length === 0){
+      if (!this.user.roles || this.user.roles.length === 0) {
         observer.next('/unauthorized');
         observer.complete();
         return;
@@ -104,6 +115,24 @@ export class RbacService {
     return this.isAuthorizedPersonaRoute(route) || this.isAuthorizedNonPersonaRoute(route);
   }
 
+  isServiceEnabled(route: string): boolean {
+    let isEnabled = true;
+    let personas = this.getPersonaDetails();
+    personas.forEach(persona => {
+      if (!persona.enabled) {
+        let tabs = persona.tabs;
+        for (let i = 0; i < tabs.length; i++) {
+          let tab: PersonaTabs = tabs[i];
+          if (route.startsWith(`/${tab.URL}`)) {
+            isEnabled = false;
+            break;
+          }
+        }
+      }
+    });
+    return isEnabled;
+  }
+  
   private isAuthorizedPersonaRoute(route: string): boolean {
     let authorized = false;
     let personas = this.getPersonaDetails();
@@ -140,6 +169,7 @@ export class RbacService {
 
   getPersonaDetails() {
     let personas = [];
+    this.personaMap = this.getPersonaMap();
     let isSuperAdmin = false;
     if (this.hasRole('SUPERADMIN')) {
       isSuperAdmin = true;

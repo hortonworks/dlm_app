@@ -14,11 +14,14 @@ export class NavigationGuard implements CanActivate {
       window.location.href = AuthUtils.signoutURL;
       return false;
     }
-    if (this.rbacService.isAuthorized(state.url)) {
-      return true;
-    } else {
+    if (!this.rbacService.isAuthorized(state.url)) {
       this.router.navigate(['/unauthorized']);
       return false;
+    } else if (!this.rbacService.isServiceEnabled(state.url)) {
+      this.router.navigate(['/service-error']);
+      return false;
+    } else {
+      return true;
     }
   }
 }
