@@ -168,7 +168,6 @@ read_master_password() {
 read_use_test_ldap() {
     echo "Use pre-packaged LDAP instance (suitable only for testing) [yes/no]: "
     read USE_TEST_LDAP
-    USE_TEST_LDAP
 }
 
 init_knox() {
