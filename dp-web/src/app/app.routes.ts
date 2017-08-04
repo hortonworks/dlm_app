@@ -49,7 +49,7 @@ export const routes: Routes = [{
     path: 'unauthorized',
     component: AuthErrorComponent
   }, {
-    path: 'service-error',
+    path: 'service-notenabled',
     component: ServiceErrorComponent
   },{
     path: '',

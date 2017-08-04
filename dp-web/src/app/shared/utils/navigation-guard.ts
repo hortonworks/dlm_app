@@ -18,7 +18,7 @@ export class NavigationGuard implements CanActivate {
       this.router.navigate(['/unauthorized']);
       return false;
     } else if (!this.rbacService.isServiceEnabled(state.url)) {
-      this.router.navigate(['/service-error']);
+      this.router.navigate(['/service-notenabled']);
       return false;
     } else {
       return true;
