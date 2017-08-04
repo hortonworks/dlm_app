@@ -14,10 +14,11 @@ export class TabsComponent implements OnChanges {
   @Input() tabType: TabStyleType = TabStyleType.UNDERLINE;
   @Input() tabEnum: any;
   @Input() images = {};
+  @Input() activeTabName: string = '';
   @Output() selected = new EventEmitter<string>();
 
   tabNames: string[] = [];
-  activeTabName: string = '';
+  //activeTabName: string = '';
   tabTypes = TabStyleType;
   imagesLength = 0;
 

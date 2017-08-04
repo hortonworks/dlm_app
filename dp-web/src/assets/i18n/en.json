@@ -28,7 +28,6 @@
     "name": "Name",
     "moreLink": "Learn More",
     "save": "SAVE",
-    "cancel": "Cancel",
     "failed" : "Failed",
     "defaultRequiredFields": "Please fill in mandatory fields marked with '*'",
     "sidenav": {
@@ -124,7 +123,6 @@
         "clusterAddSuccess": "Cluster Added successfully",
         "connectionFailed": "Unable to connect, please retry",
         "clusterAddError": "Failed to Add Cluster",
-        "connectionFailed": "Not able to connect",
         "emptySearchResult": "There are no clusters that match your search.",
         "addUser": "ADD USER",
         "addGroup": "ADD GROUP",
@@ -153,7 +151,12 @@
         "clusterAlreadyExists": "Cluster Already exists in dataplane",
         "userManagement": "You can manage the users or groups added to Dataplane through User Management. This page is available for the Dataplane Adminsitrator. You can add new users or groups and assign them roles by clicking on ADD USER or ADD GROUP button. To activate/deactivate to edit their roles, click on the username in the list below or click on the menu icon on the displayed rows.",
         "additionalConfigs":"Please provide these additional configurations required by Dataplane to discover the cluster information",
-        "knoxUrl": "Please enter the URL of the Knox Service on the HDP cluster which is configured to work with Data plane."
+        "knoxUrl": "Please enter the URL of the Knox Service on the HDP cluster which is configured to work with Data plane.",
+        "ldapError": "Not able to fetch users from LDAP",
+        "addUserError": "Not able to save users",
+        "updateUserError": "Not able to update user",
+        "addGroupError": "Not able to save groups",
+        "updateGroupError": "Not able to update group"
       }
     },
     "dataset": {

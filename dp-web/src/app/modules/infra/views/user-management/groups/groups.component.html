@@ -1,58 +1,51 @@
 <router-outlet name="sidebar"></router-outlet>
-<div class="action-bar mdl-grid mdl-grid--no-spacing">
-<div class="mdl-layout-spacer"></div>
-<div class="search-input">
-  <input id="search" name="name" type="text" placeholder="{{'common.search' | translate}}" [(ngModel)]="searchTerm"
-  (keyup)="onSearch($event)"/>
-  <i aria-hidden="true" class="fa fa-search dp-input__icon"></i>
-</div>
-<dp-dropdown></dp-dropdown>
-<button class="mdl-button btn-hwx-primary"
-(click)="addGroup()"> {{"pages.infra.labels.addGroup" | translate}}
-</button>
+<div class="container">
+  <div class="action-bar mdl-grid mdl-grid--no-spacing">
+    <div class="mdl-cell mdl-cell--2-col">
+      <dp-tabs [tabEnum]="tabs" [tabType]="tabType.UNDERLINE" [activeTabName]="tabs[tabs.GROUPS]" (selected)="switchView($event)"> </dp-tabs>
+    </div>
+    <div class="mdl-layout-spacer"></div>
+    <div class="padding-top-10">
+      <div class="search-input">
+        <input id="search" name="name" type="text" placeholder="{{'common.search' | translate}}" [(ngModel)]="searchTerm"
+        (keyup)="onSearch($event)"/>
+        <i aria-hidden="true" class="fa fa-search dp-input__icon"></i>
+      </div>
+      <button class="mdl-button btn-hwx-primary" (click)="addGroup()"> {{"pages.infra.labels.addGroup" | translate}}</button>
+    </div>
   </div>
-<div style="clear: both"></div>
-<div class="table-container">
-<table class="mdl-data-table mdl-js-data-table" dp-config-table>
-  <thead>
-  <th class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder"></th>
-  <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.groupName" | translate}}</th>
-  <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.roles" | translate}}</th>
-  <th class="mdl-data-table__cell--non-numeric">{{"common.status" | translate}}</th>
-  <th class="mdl-data-table__cell--non-numeric"></th>
-  </thead>
-  <tbody>
-  <tr
-  *ngFor="let group of groups">
-  <td class="mdl-data-table__cell--non-numeric"><input name={{group.id}} type="checkbox"/></td>
-  <td class="mdl-data-table__cell--non-numeric key-column"
-  (click)="editGroup(group.groupName)">{{group.groupName}}
-  </td>
-  <td class="mdl-data-table__cell--non-numeric">{{rolesMap.get(group.id)}}</td>
-  <td class="mdl-data-table__cell--non-numeric">{{group.active? 'Active' : 'Inactive'}}</td>
-  <td>
-    <button
-    [attr.id]="'dropDown_'+group.id" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
-    <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i></button>
-  <ul mdl class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect"
-  [attr.for]="'dropDown_'+group.id">
-  <li class="mdl-menu__item"
-  (click)="editGroup(group.groupName)"><i class="fa fa-edit menu-icon"></i>{{"common.edit" | translate}}
-</li>
-</ul>
-  </td>
-  </tr>
-<tr *ngIf="groups.length === 0">
-<td class="center" colspan="5">{{"common.noResults" | translate}}</td>
-  </tr>
-  </tbody>
-  </table>
+  <div style="clear: both"></div>
+  <div class="table-container">
+    <table class="mdl-data-table mdl-js-data-table" dp-config-table>
+      <thead>
+      <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.groupName" | translate}}</th>
+      <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.roles" | translate}}</th>
+      <th class="mdl-data-table__cell--non-numeric">{{"common.status" | translate}}</th>
+      <th class="mdl-data-table__cell--non-numeric"></th>
+      </thead>
+      <tbody>
+        <tr *ngFor="let group of groups">
+          <td class="mdl-data-table__cell--non-numeric key-column"(click)="editGroup(group.groupName)">{{group.groupName}}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{rolesMap.get(group.id)}}</td>
+          <td class="mdl-data-table__cell--non-numeric">{{group.active? 'Active' : 'Inactive'}}</td>
+          <td>
+            <button [attr.id]="'dropDown_'+group.id" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
+              <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i></button>
+            <ul mdl class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+group.id">
+              <li class="mdl-menu__item" (click)="editGroup(group.groupName)"><i class="fa fa-edit menu-icon"></i>{{"common.edit" | translate}}</li>
+            </ul>
+          </td>
+        </tr>
+        <tr *ngIf="groups.length === 0">
+          <td class="center" colspan="5">{{"common.noResults" | translate}}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-<simple-pagination *ngIf="groups"
-  [pageSize]="pageSize"
-  [pageStartIndex]="start"
-  [count]="total"
-  (onPageSizeChange)="onPageSizeChange($event)"
-  (onPageChange)="onPageChange($event)"
-  ></simple-pagination>
-
+  <simple-pagination *ngIf="groups"
+    [pageSize]="pageSize"
+    [pageStartIndex]="start"
+    [count]="total"
+    (onPageSizeChange)="onPageSizeChange($event)"
+    (onPageChange)="onPageChange($event)"></simple-pagination>
+ </div>

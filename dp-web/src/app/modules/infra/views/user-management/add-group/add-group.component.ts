@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, ViewChild} from '@angular/core';
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {UserService} from '../../../../../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -6,6 +6,7 @@ import {TaggingWidgetTagModel, TagTheme} from '../../../../../shared/tagging-wid
 import {TranslateService} from '@ngx-translate/core';
 import {GroupService} from '../../../../../services/group.service';
 import {Group} from '../../../../../models/group';
+import {NgForm} from '@angular/forms';
 
 @Component({
   selector: 'dp-add-user',
@@ -18,6 +19,7 @@ export class AddGroupComponent {//implements OnInit {
   modes = Modes;
   mode = Modes.ADD;
   groupName: string;
+  showRoles = false;
 
   availableGroups: string[] = [];
   availableRoles: TaggingWidgetTagModel[] = [];
@@ -28,11 +30,25 @@ export class AddGroupComponent {//implements OnInit {
   group: Group = new Group();
   groupRoles: TaggingWidgetTagModel[] = [];
 
+  errorMessage: string;
+  showError = false;
+
+  @ViewChild('addGroupForm') addGroupForm: NgForm;
+  @ViewChild('editGroupForm') editGroupForm: NgForm;
+
   constructor(private userService: UserService,
               private groupService: GroupService,
               private router: Router,
               private route: ActivatedRoute,
               private translateService: TranslateService) {
+  }
+
+  @HostListener('click', ['$event', '$event.target'])
+  public onClick($event:MouseEvent, targetElement:HTMLElement):void {
+    let optionList = targetElement.querySelector('.option-list');
+    if(optionList){
+      this.showRoles = false;
+    }
   }
 
   ngOnInit() {
@@ -67,7 +83,8 @@ export class AddGroupComponent {//implements OnInit {
           this.availableGroups.push(user.name);
         });
       }, () => {
-        console.error('Error while fetching ldap users');
+        this.showError = true;
+        this.errorMessage = this.translateService.instant('pages.infra.description.ldapError');
       });
     }
   }
@@ -89,8 +106,16 @@ export class AddGroupComponent {//implements OnInit {
     }
   }
 
+  showRoleOptions(){
+    if(this.showRoles){
+      this.showRoles = false;
+    }else{
+      this.showRoles = true;
+    }
+  }
+
   save() {
-    if (this.mode as Modes === Modes.EDIT) {
+    if (this.mode as Modes === Modes.EDIT && this.isEditDataValid()) {
       this.group.roles = this.groupRoles.map(role => {
         return role.data
       });
@@ -98,23 +123,54 @@ export class AddGroupComponent {//implements OnInit {
         this.groupService.dataChanged.next();
         this.router.navigate(['groups'], {relativeTo: this.route});
       }, error => {
-        console.error('error')
+        this.showError = true;
+        this.errorMessage = this.translateService.instant('pages.infra.description.updateGroupError');
       });
-    } else {
+    } else if (this.isCreateDataValid()) {
       let roles = this.roles.map(role => {
         return role.data;
       });
       this.groupService.addGroups(this.groups, roles).subscribe(response => {
-        this.groupService.dataChanged.next();
-        this.router.navigate(['groups'], {relativeTo: this.route});
+        if (response.length === this.groups.length) {
+          this.groupService.dataChanged.next();
+          this.router.navigate(['groups'], {relativeTo: this.route});
+        } else {
+          let failedGroups = [];
+          this.groups.forEach(grp => {
+            if (!response.find(res => res.groupName === grp)) {
+              failedGroups.push(grp);
+            }
+          });
+          this.errorMessage = `${this.translateService.instant('pages.infra.description.addGroupError')} - ${failedGroups.join(', ')}`;
+          this.showError = true;
+        }
       }, error => {
-        console.error('error')
+        this.showError = true;
+        this.errorMessage = this.translateService.instant('pages.infra.description.addGroupError');
       });
     }
   }
 
   back() {
     this.router.navigate(['groups'], {relativeTo: this.route});
+  }
+
+  isEditDataValid() {
+    if (this.groupRoles.length > 0 && this.editGroupForm.form.valid) {
+      return true;
+    }
+    this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
+    this.showError = true;
+    return false;
+  }
+
+  isCreateDataValid() {
+    if (this.roles.length > 0 && this.addGroupForm.form.valid) {
+      return true;
+    }
+    this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
+    this.showError = true;
+    return false;
   }
 }
 
