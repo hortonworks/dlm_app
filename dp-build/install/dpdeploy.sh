@@ -280,8 +280,8 @@ destroy_all() {
 
 upgrade() {
     # destroy all but db
-    docker rm -f $APP_CONTAINERS_WITHOUT_DB
-    destroy_knox
+    docker rm -f $APP_CONTAINERS_WITHOUT_DB || echo "App is not up."
+    destroy_knox || echo "Knox is not up."
 
     # migrate schema to new version
     migrate_schema
@@ -309,7 +309,6 @@ usage() {
     printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox and Consul containers"
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
-    printf "%-${tabspace}s:%s\n" "reset" "Reset database to its initial state"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
     printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
     printf "%-${tabspace}s:%s\n" "start knox" "Start the Knox and Consul containers"
@@ -322,6 +321,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them. Needs to start from init db again"
     printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox and Consul containers and remove them. Needs to start from init knox again"
     printf "%-${tabspace}s:%s\n" "destroy --all" "Kill all containers and remove them. Needs to start from init again"
+    printf "%-${tabspace}s:%s\n" "upgrade" "Upgrade existing dp-core to current version"
     printf "%-${tabspace}s:%s\n" "version" "Print the version of dataplane"
 }
 
@@ -353,9 +353,6 @@ else
                     usage
                     ;;
             esac
-            ;;
-        upgrade)
-            upgrade
             ;;
         migrate)
             reset_db
@@ -399,6 +396,9 @@ else
                  ;;
              esac
              ;;
+        upgrade)
+            upgrade
+            ;;
         version)
             print_version
             ;;
