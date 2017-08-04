@@ -81,7 +81,10 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
         cellClass: 'text-cell',
         headerClass: 'text-header',
         cellTemplate: this.verbStatusCellTemplate,
-        name: this.translateColumn('job_status')
+        name: this.translateColumn('job_status'),
+        comparator(job1, job2) {
+          return job1.status > job2.status ? 1 : -1;
+        }
       },
       {prop: 'sourceCluster', name: this.translateColumn('source_cluster'), cellTemplate: this.clusterNameCellRef},
       {...TableComponent.makeFixedWith(20), name: '', cellTemplate: this.destinationIconCellRef},
@@ -94,13 +97,14 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
         name: this.t.instant('common.policy'),
         cellTemplate: this.policyNameCellTemplate
       },
-      {cellTemplate: this.prevJobsRef, name: this.translateColumn('last_ten_jobs'), prop: 'lastTenJobs'},
+      {cellTemplate: this.prevJobsRef, name: this.translateColumn('last_ten_jobs'), prop: 'lastTenJobs', sortable: false},
       {
         prop: 'lastJobResource.trackingInfo',
         cellTemplate: this.transferredFormattedTemplate,
         name: this.translateColumn('transferred'),
         cellClass: 'date-cell',
-        headerClass: 'date-header'
+        headerClass: 'date-header',
+        sortable: false
       },
       {
         prop: 'lastJobResource.trackingInfo.timeTaken',
