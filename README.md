@@ -97,6 +97,12 @@ DATABASE_PASS="<password>"
 ```
 9. Deploy dataplane as usual using `./dpdeploy.sh`
 
+## Upgrading
+Follow these steps in-order:
+1. Ensure that new versions of all containers have been loaded into docker.
+2. Switch to new `install` directory.
+3. Invoke `./dpdeploy.sh upgrade`.
+
 ## Known Issues
 
 * When trying with Centos 7, SE Linux needs to be disabled for now. This is a workaround to a bug that causes external volume mounts to fail. We will try and resolve this issue going forward.

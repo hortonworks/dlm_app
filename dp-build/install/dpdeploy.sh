@@ -9,7 +9,8 @@ DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
-APP_CONTAINERS="dp-app dp-db-service dp-cluster-service dp-gateway"
+APP_CONTAINERS_WITHOUT_DB="dp-app dp-db-service dp-cluster-service dp-gateway"
+APP_CONTAINERS=$APP_CONTAINERS_WITHOUT_DB
 if [ "$USE_EXT_DB" == "no" ]; then
     APP_CONTAINERS="dp-database $APP_CONTAINERS"
 fi
@@ -278,6 +279,21 @@ destroy_all() {
     echo "Destroy complete."
 }
 
+upgrade() {
+    # destroy all but db
+    docker rm -f $APP_CONTAINERS_WITHOUT_DB
+    destroy_knox
+
+    # migrate schema to new version
+    migrate_schema
+
+    # init all
+    init_knox
+    init_app
+
+    echo "Upgrade complete."
+}
+
 print_version() {
     if [ -f VERSION ]; then
         cat VERSION
@@ -339,11 +355,11 @@ else
                     ;;
             esac
             ;;
-        reset)
-            reset_db
+        upgrade)
+            upgrade
             ;;
         migrate)
-            migrate_schema
+            reset_db
             ;;
         start)
             case "$2" in
