@@ -79,6 +79,9 @@ export function reducer(state = initialState, action: Action): State {
   // check if dispatched action is completed action (e.g SUCCESS, FAILURE) and update all entities marked with
   // dispatched action name as completed. This hack is present because of nature angular's http service which emits
   // response object once per several request sent within very short interval (kinda "one run cycle")
+  if (!action.type) {
+    return state;
+  }
   if (isCompletedAction(action)) {
     const requests = mapToList(state.entities).reduce((allRequests, request) => {
       if (request.actionType === originalActionName(action)) {
