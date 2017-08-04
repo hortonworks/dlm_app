@@ -5,7 +5,7 @@
     </div>
     <div class="services-table">
       <div class="row" *ngFor="let service of enabledServices">
-        <span class="logo"><img class="logo-img" [attr.src]="'../../../assets/images/' + + service.skuName +'-logo.png'" alt=""/></span>
+        <span class="logo"><img class="logo-img" [attr.src]="'../../../assets/images/' + + service.skuName +'-logo-blue.png'" alt=""/></span>
         <span class="hwx-subtitle name">{{ service.sku.description }}</span>
         <span class="divider hwx-inline-desc"> | </span>
         <span class="hwx-inline-desc">{{"pages.services.labels.smartSenseId" | translate}} - </span>
@@ -23,7 +23,7 @@
       <div class="services-list">
         <div *ngFor="let service of availableServices; let i = index" class="service-item pull-left">
           <div class="logo-wrapper borderBox" title="{{ service.skuName }}">
-            <img  class="logo-img" [attr.src]="'../../../assets/images/' + service.skuName +'-logo.png'" alt=""/>
+            <img  class="logo-img" [attr.src]="'../../../assets/images/' + service.skuName +'-logo-blue.png'" alt=""/>
             <button type="button" class="btn-hwx-primary action-btn" (click)="enableService(service)">{{"pages.services.labels.enable" | translate}}</button>
           </div>
           <div class="service-name hwx-desc"> {{ service.sku.description }}</div>

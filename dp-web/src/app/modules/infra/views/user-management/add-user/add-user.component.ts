@@ -1,10 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {UserService} from '../../../../../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TaggingWidgetTagModel, TagTheme} from '../../../../../shared/tagging-widget/tagging-widget.component';
 import {User} from '../../../../../models/user';
 import {TranslateService} from '@ngx-translate/core';
+import {NgForm} from '@angular/forms';
 
 @Component({
   selector: 'dp-add-user',
@@ -17,6 +18,7 @@ export class AddUserComponent implements OnInit {
   modes = Modes;
   mode = Modes.ADD;
   userName: string;
+  showRoles = false;
 
   availableUsers: string[] = [];
   availableRoles: TaggingWidgetTagModel[] = [];
@@ -27,7 +29,24 @@ export class AddUserComponent implements OnInit {
   user: User = new User('', '', '', '', [], false, '');
   userRoles: TaggingWidgetTagModel[] = [];
 
-  constructor(private userService: UserService, private router: Router, private route: ActivatedRoute, private translateService: TranslateService) {
+  errorMessage: string;
+  showError = false;
+
+  @ViewChild('addUserForm') addUserForm: NgForm;
+  @ViewChild('editUserForm') editUserForm: NgForm;
+
+  constructor(private userService: UserService,
+              private router: Router,
+              private route: ActivatedRoute,
+              private translateService: TranslateService) {
+  }
+
+  @HostListener('click', ['$event', '$event.target'])
+  public onClick($event: MouseEvent, targetElement: HTMLElement): void {
+    let optionList = targetElement.querySelector('.option-list');
+    if (optionList) {
+      this.showRoles = false;
+    }
   }
 
   ngOnInit() {
@@ -37,14 +56,14 @@ export class AddUserComponent implements OnInit {
       this.userService.getUserByName(this.userName).subscribe(user => {
         this.user = user;
         let roles = [];
-        this.user.roles.forEach(role =>{
+        this.user.roles.forEach(role => {
           this.userRoles.push(new TaggingWidgetTagModel(this.translateService.instant(`common.roles.${role}`), role));
         });
       });
     }
     this.userService.getAllRoles().subscribe(roles => {
       this.allRoles = roles.map(role => {
-        return new TaggingWidgetTagModel(this.translateService.instant(`common.roles.${role.roleName}`),role.roleName);
+        return new TaggingWidgetTagModel(this.translateService.instant(`common.roles.${role.roleName}`), role.roleName);
       })
     });
   }
@@ -62,7 +81,8 @@ export class AddUserComponent implements OnInit {
           this.availableUsers.push(user.name);
         });
       }, () => {
-        console.error('Error while fetching ldap users');
+        this.showError = true;
+        this.errorMessage = this.translateService.instant('pages.infra.description.ldapError');
       });
     }
   }
@@ -76,6 +96,7 @@ export class AddUserComponent implements OnInit {
   }
 
   onRoleSearchChange(text: string) {
+    this.showRoles = false;
     this.availableRoles = [];
     if (text && text.length > 2) {
       this.availableRoles = this.allRoles.filter(role => {
@@ -84,8 +105,17 @@ export class AddUserComponent implements OnInit {
     }
   }
 
+  showRoleOptions() {
+    if (this.showRoles) {
+      this.showRoles = false;
+    } else {
+      this.showRoles = true;
+    }
+  }
+
   save() {
-    if (this.mode as Modes === Modes.EDIT) {
+    this.showError = false;
+    if (this.mode as Modes === Modes.EDIT && this.isEditDataValid()) {
       this.user.roles = this.userRoles.map(role => {
         return role.data
       });
@@ -93,19 +123,52 @@ export class AddUserComponent implements OnInit {
         this.userService.dataChanged.next();
         this.router.navigate(['users'], {relativeTo: this.route});
       }, error => {
-        console.error('error')
+        this.showError = true;
+        this.errorMessage = this.translateService.instant('pages.infra.description.updateUserError');
       });
-    } else {
+    } else if (this.isCreateDataValid()) {
       let roles = this.roles.map(role => {
         return role.data;
       });
       this.userService.addUsers(this.users, roles).subscribe(response => {
-        this.userService.dataChanged.next();
-        this.router.navigate(['users'], {relativeTo: this.route});
+        if (response.length === this.users.length) {
+          this.userService.dataChanged.next();
+          this.router.navigate(['users'], {relativeTo: this.route});
+        } else {
+          let failedUsers = [];
+          this.users.forEach(user => {
+            if (!response.find(res => res.userName === user)) {
+              failedUsers.push(user)
+            }
+          });
+          this.errorMessage = `${this.translateService.instant('pages.infra.description.addUserError')}- ${failedUsers.join(', ')}`;
+          this.showError = true;
+        }
+
       }, error => {
-        console.error('error')
+        this.errorMessage = this.translateService.instant('pages.infra.description.addUserError');
+        this.showError = true;
       });
     }
+  }
+
+  isEditDataValid() {
+    if (this.userRoles.length > 0 && this.editUserForm.form.valid) {
+      return true;
+    }
+    this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
+    this.showError = true;
+    return false;
+  }
+
+  isCreateDataValid() {
+    if (this.roles.length > 0 && this.addUserForm.form.valid) {
+      return true;
+    }
+    this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
+    this.showError = true;
+    return false;
+
   }
 
   back() {

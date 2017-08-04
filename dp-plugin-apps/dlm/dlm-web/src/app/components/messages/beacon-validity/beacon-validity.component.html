@@ -1,0 +1,7 @@
+<div class="row page-section" *ngIf="(clustersList$ | async)?.clusters">
+  <div class="col-md-12">
+    <alert type="warning">
+      <span [innerHtml]="'common.warnings.beacon_unavailable' | translate:(clustersList$ | async)"></span>
+    </alert>
+  </div>
+</div>

@@ -1,6 +1,6 @@
-<div class="row page-section">
+<div class="row">
   <div class="col-md-3">
-    <dlm-page-header [title]="'page.policies.header'"></dlm-page-header>
+    <dlm-page-header [title]="'page.policies.header'" [isFlexCenter]="true"></dlm-page-header>
   </div>
   <div class="col-md-9 actions">
     <div class="pull-right filters-block">
@@ -25,7 +25,8 @@
   </div>
 </div>
 <dlm-progress-container [progressState]="overallProgress$ | async">
-  <div class="row page-section" *ngIf="!(overallProgress$ | async).inProgress">
+  <dlm-beacon-validity></dlm-beacon-validity>
+  <div class="row" *ngIf="!(overallProgress$ | async).inProgress">
     <div class="col-md-12" *ngIf="(policies$ | async)?.length > 0; else noPolicies">
       <dlm-policy-table
         [policies]="filteredPolicies$ | async"

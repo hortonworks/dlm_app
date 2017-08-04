@@ -42,7 +42,8 @@ export class MapComponent implements OnChanges, OnInit {
     dragging: false,
     boxZoom: false,
     doubleClickZoom: false,
-    zoomSnap: 0.1
+    zoomSnap: 0.1,
+    zoomAnimation: false
   };
 
   markerAndCurveLayer: Layer[] = [];
@@ -52,7 +53,7 @@ export class MapComponent implements OnChanges, OnInit {
     new MapDimensions('240px', '420px', 0.5),
     new MapDimensions('420px', '540px', 1),
     new MapDimensions('480px', '680px', 1.3),
-    new MapDimensions('500px', '60%', 1.54)
+    new MapDimensions('500px', '59%', 1.54)
   ];
 
   constructor(private geographyService: GeographyService) {

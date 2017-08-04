@@ -1,7 +1,8 @@
-<div class="row page-section">
+<div class="row flex-center">
   <div class="col-md-8">
     <dlm-page-header
       [title]="'page.pairings.header'"
+      [isFlexCenter]="true"
       description="page.pairings.header_note"
       contextMessage="Create Pairings">
     </dlm-page-header>
@@ -13,6 +14,7 @@
     </div>
   </div>
 </div>
+<dlm-beacon-validity></dlm-beacon-validity>
 <dlm-progress-container [progressState]="overallProgress$ | async">
   <div class="content">
     <div *ngIf="(pairings$ | async)?.length > 0; else noPairs">

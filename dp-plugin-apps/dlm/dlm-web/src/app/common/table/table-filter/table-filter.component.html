@@ -1,7 +1,7 @@
 <div class="pull-left applied-filters-wrapper" qe-attr="applied-filters">
   <span class="label label-default filter-item" qe-attr="applied-filter"
         *ngFor="let filter of appliedFiltersMapped">
-    <strong>{{getFilterTitle(filter.key)}}</strong>: {{filter.value}}
+    <strong>{{getFilterTitle(filter.key)}}</strong>: {{filter.value | truncate:25}}
     <a href="javascript:void(0);" (click)="removeFilter(filter)">&times;</a>
   </span>
 </div>
