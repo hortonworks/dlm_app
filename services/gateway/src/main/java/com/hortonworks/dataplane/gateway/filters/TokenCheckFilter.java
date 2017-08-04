@@ -214,7 +214,9 @@ public class TokenCheckFilter extends ZuulFilter {
             RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, userContext);
             return null;
           }else{
-            return utils.sendForbidden("dont have access to this resource");
+            requestResponseUtils.redirectToServiceError();
+            RequestContext.getCurrentContext().setSendZuulResponse(false);//TODO move to redirection after thorough testing
+            return null;
           }
         }else{
           return utils.sendForbidden(utils.getInactiveErrorMsg(userContext.getUsername()));
