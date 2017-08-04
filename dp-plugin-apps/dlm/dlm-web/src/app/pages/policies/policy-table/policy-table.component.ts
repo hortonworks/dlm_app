@@ -154,7 +154,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       {prop: 'sourceClusterResource', name: this.t.instant('common.source'), cellTemplate: this.clusterCellTemplateRef},
       {prop: 'targetClusterResource', name: this.t.instant('common.destination'), cellTemplate: this.clusterCellTemplateRef},
       {prop: 'sourceDataset', name: this.t.instant('common.path'), cellTemplate: this.pathCellRef, ...TableComponent.makeFixedWith(200)},
-      {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs')},
+      {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs'), sortable: false},
       {prop: 'jobs.0.trackingInfo.timeTaken', name: this.t.instant('common.duration'), cellTemplate: this.durationCellRef},
       {prop: 'lastGoodJobResource.startTime', name: 'Last Good', cellTemplate: this.lastGoodCellRef},
       {name: ' ', cellTemplate: this.actionsCellRef, ...TableComponent.makeFixedWith(55), sortable: false}
