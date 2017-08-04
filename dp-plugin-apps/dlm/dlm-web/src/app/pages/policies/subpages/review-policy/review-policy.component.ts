@@ -25,6 +25,7 @@ import { getProgressState } from 'selectors/progress.selector';
 import { POLICY_FORM_ID } from 'pages/policies/components/policy-form/policy-form.component';
 import { getCluster } from 'selectors/cluster.selector';
 import { TimeZoneService } from 'services/time-zone.service';
+import { PolicyService } from 'services/policy.service';
 
 const CREATE_POLICY_REQUEST = 'CREATE_POLICY';
 
@@ -104,17 +105,18 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     } else if (values.general.type === this.policyTypes.HIVE) {
       sourceDataset = values.databases;
     }
+    const maxBandwidth = values.advanced.max_bandwidth ? +values.advanced.max_bandwidth : '';
     const policyDefinition = <PolicyDefinition>omitEmpty({
       name: values.general.name,
       type: values.general.type,
       description: values.general.description,
-      sourceCluster: this.sourceCluster.name,
-      targetCluster: this.targetCluster.name,
+      sourceCluster: PolicyService.makeClusterId(this.sourceCluster.dataCenter, this.sourceCluster.name),
+      targetCluster: PolicyService.makeClusterId(this.targetCluster.dataCenter, this.targetCluster.name),
       frequencyInSec: values.job.frequencyInSec,
       startTime: this.formatDateValue(values.job.startTime),
       endTime: this.formatDateValue(values.job.endTime),
       sourceDataset,
-      distcpMapBandwidth: +values.advanced.max_bandwidth,
+      distcpMapBandwidth: maxBandwidth,
       queueName: values.advanced.queue_name
     });
     return {
@@ -144,7 +146,6 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
 
   submitReview() {
     this.store.dispatch(createPolicy(this.serializeFormValues(this.policyFormValue), this.targetCluster.id, CREATE_POLICY_REQUEST));
-    this.store.dispatch(resetFormValue(POLICY_FORM_ID));
   }
 
   cancelReview() {

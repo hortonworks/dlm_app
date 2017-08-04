@@ -4,29 +4,22 @@
     <div class="navigation-bar-container">
       <ul class="side-nav-header nav nav-pills nav-stacked">
         <li class="navigation-header">
-          <div class="row">
+          <div #personaNavSrc class="row nav-header-container">
             <div id="header_icon" class="col-sm-3">
-              <a *ngIf="header.iconHtml != ''" [routerLink]="header.linkURL" class="ambari-logo"><span [innerHTML]="header.iconHtml"></span></a>
+              <a *ngIf="header.iconHtml != ''" class="ambari-logo">
+                <span [innerHTML]="header.iconHtml"></span>
+                <span *ngIf="isCollapsed" class="toggle-small-icon fa fa-chevron-down"></span>
+              </a>
             </div>
             <div id="header_content" class="col-sm-9">
               <div class="btn-group">
-              <div *ngIf="hasSubMenu(header);else no_sub_menu" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="ambari-header" style="font-size: 15px; padding: 0px;">{{header.label}}</span>
-                <span class="toggle-icon glyphicon glyphicon-menu-down"></span>
-              </div>
-              <ng-template #no_sub_menu>
-                <div>
-                  <span [routerLink]="header.linkURL" class="ambari-header" style="font-size: 15px; padding: 0px; outline: none;">
-                    {{header.label}}
-                  </span>
+                <div aria-haspopup="true" aria-expanded="false">
+                  <span class="ambari-header" style="font-size: 15px; padding: 0">{{header.label}}</span>
                 </div>
-              </ng-template>
-              <ul class="dropdown-menu" [hidden]="!hasSubMenu(header)">
-                <li *ngFor="let item of header.subMenu">
-                  <a [routerLink]="item.linkURL">{{item.label}}</a>
-                </li>
-              </ul>
-            </div>
+                <div>
+                  <span class="toggle-icon-down fa fa-chevron-down"></span>
+                </div>
+              </div>
             </div>
           </div>
         </li>
@@ -37,22 +30,22 @@
             routerLinkActive="active">
 
           <a [routerLink]="item.linkURL" *ngIf="!hasSubMenu(item);else has_sub_menu">
-            <span [innerHTML]="item.iconHtml"></span>
+            <span [ngClass]="item.iconClasses"></span>
             <span class="navigation-menu-item">{{item.label}}</span>
           </a>
 
           <ng-template #has_sub_menu>
             <a href="#" data-toggle="collapse-sub-menu">
-              <span [innerHTML]="item.iconHtml"></span>
+              <span [ngClass]="item.iconClasses"></span>
               <span class="navigation-menu-item">{{item.label}}</span>
-              <span class="toggle-icon glyphicon glyphicon-menu-down pull-right"></span>
+              <span class="toggle-icon fa fa-chevron-down pull-right"></span>
             </a>
             <ul class="sub-menu nav nav-pills nav-stacked">
               <li *ngFor="let subItem of item.subMenu"
                   [ngClass]="{'submenu-li': true, 'active': false}"
                   routerLinkActive="active">
                 <a [routerLink]="subItem.linkURL">
-                  <span [innerHTML]="subItem.iconHtml"></span>
+                  <span [ngClass]="subItem.iconClasses"></span>
                   <span class="submenu-item">{{subItem.label}}</span>
                 </a>
               </li>
@@ -70,3 +63,4 @@
     </div>
   </div>
 </div>
+<dp-persona-popup [personas]="personas" [personaNavSrc]="personaNavSrcNativeElement" (personaChange)="navigateToPersona($event)"> </dp-persona-popup>

@@ -48,6 +48,7 @@
 
 <ng-template #actionsCell let-row="row">
   <dlm-policy-actions
+    qe-attr="job-actions"
     [rowId]="row.id"
     [policy]="row"
     [isOpen]="shouldShowAction(row.id)"

@@ -3,9 +3,12 @@ import { getPolicies } from './root.selector';
 import { mapToList } from 'utils/store-util';
 import { PoliciesCount } from 'models/policies-count.model';
 import { Cluster } from 'models/cluster.model';
+import { Policy } from 'models/policy.model';
 import { getAllClusters } from './cluster.selector';
 import { getAllJobs } from './job.selector';
 import { sortByDateField } from 'utils/array-util';
+import { JOB_STATUS, CLUSTER_STATUS } from 'constants/status.constant';
+import { PolicyService } from 'services/policy.service';
 
 export const getEntities = createSelector(getPolicies, state => state.entities);
 
@@ -15,8 +18,8 @@ export const getAllPoliciesWithClusters = createSelector(getAllPolicies, getAllC
   return policies.map(policy => {
     return {
       ...policy,
-      targetClusterResource: clusters.find(cluster => cluster.name === policy.targetCluster) || {},
-      sourceClusterResource: clusters.find(cluster => cluster.name === policy.sourceCluster) || {}
+      targetClusterResource: clusters.find(cluster => cluster.name === PolicyService.getClusterName(policy.targetCluster)) || {},
+      sourceClusterResource: clusters.find(cluster => cluster.name === PolicyService.getClusterName(policy.sourceCluster)) || {}
     };
   });
 });
@@ -28,11 +31,13 @@ export const getPolicyClusterJob = createSelector(getAllPoliciesWithClusters, ge
     const jobsResource = sortByDateField(policyJobs, 'startTime');
     const lastJobResource = jobsResource.length ? jobsResource[0] : null;
     const lastGoodJobResource = jobsResource.length ? jobsResource.find(j => j.status === 'SUCCESS') : null;
+    const lastTenJobs = jobsResource.length ? policyJobs.slice(0, 10) : [];
     return {
       ...policy,
       jobsResource,
       lastJobResource,
-      lastGoodJobResource
+      lastGoodJobResource,
+      lastTenJobs
     };
   });
 });
@@ -48,3 +53,18 @@ export const getCountPoliciesForSourceClusters = createSelector(getAllPoliciesWi
     });
   }, {});
 });
+
+
+export const getNonCompletedPolicies = createSelector(getPolicyClusterJob, (policies: Policy[]): Policy[] => {
+  return policies.filter(policy => policy.jobsResource.some(job => job.status !== JOB_STATUS.SUCCESS));
+});
+
+export const getUnhealthyPolicies = createSelector(
+  getAllPoliciesWithClusters,
+  (policies: Policy[]) => policies
+    .filter(policy => [
+        policy.targetClusterResource.healthStatus,
+        policy.sourceClusterResource.healthStatus
+      ].indexOf(CLUSTER_STATUS.UNHEALTHY) > -1
+    )
+);

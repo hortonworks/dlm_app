@@ -31,9 +31,12 @@ html, body, svg {
 }
 .showPi .histoPiCont{
     margin-top:0px;
-    height:300px;    
+    height:300px;
 }
 
 .showPi .boxPlotCont{
     display:none;
+}
+.noDataAvailable {
+  text-align: center;
 }

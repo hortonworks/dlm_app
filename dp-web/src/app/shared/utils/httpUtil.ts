@@ -2,8 +2,10 @@ import {Response, RequestOptionsArgs} from '@angular/http';
 import {Observable}     from 'rxjs/Observable';
 import {Headers} from '@angular/http';
 import {Alerts} from './alerts';
-import { User } from '../../models/user';
+import {AuthUtils} from './auth-utils';
+import {Router} from '@angular/router';
 export class HttpUtil {
+  static router: Router;
 
   public static extractString(res: Response): string {
     let text: string = res.text();
@@ -17,8 +19,12 @@ export class HttpUtil {
 
   public static handleError(error: any) {
     if (error.status === 401) {
-      localStorage.removeItem('dp_user');
-      window.location.replace(window.location.origin + '/sign-in#SESSEXPIRED');
+      window.location.href = AuthUtils.signoutURL;
+      return Observable.throw(error);
+    }
+
+    if (error.status === 403) {
+      AuthUtils.setValidUser(false);
       return Observable.throw(error);
     }
 
@@ -44,19 +50,6 @@ export class HttpUtil {
     const headers = {
       'Content-Type': 'application/json',
     };
-
-    try {
-      const user = <User> JSON.parse(localStorage.getItem('dp_user'));
-
-      if(user.token) {
-        Object.assign(headers, {
-          'Authorization': `Bearer ${user.token}`
-        });
-      }
-    } catch (error) {
-      // TODO: do something reasonable
-    }
-
     return ({
       headers: new Headers(headers)
     });

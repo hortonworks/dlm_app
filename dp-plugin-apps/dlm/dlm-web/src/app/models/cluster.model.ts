@@ -7,6 +7,11 @@ export interface ClusterStats {
   CapacityRemaining: number;
 }
 
+export interface ServiceStatus {
+  service_name: string;
+  state: string;
+}
+
 export interface Cluster {
   id: number;
   name: string;
@@ -16,11 +21,7 @@ export interface Cluster {
   location: Location;
   services: Array<Service>;
   stats?: ClusterStats;
-  /*
-    The following properties need to be removed eventually
-    since the API response doesn't align with these properties
-   */
-  type: string;
-  createdAt: number;
-  nodesCount: number;
+  healthStatus?: string;
+  status: ServiceStatus[];
+  totalHosts;
 }

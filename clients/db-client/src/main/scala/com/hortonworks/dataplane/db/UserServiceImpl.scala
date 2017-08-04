@@ -96,7 +96,12 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       case _ => mapErrors(res)
     }
   }
-
+  private  def mapToUserGroupInfo(res:WSResponse)={
+    res.status match {
+      case 200 => Right((res.json \ "results").validate[UserGroupInfo].get)
+      case _ => mapErrors(res)
+    }
+  }
 
   override def getUserRoles(userName: String): Future[Either[Errors, UserRoles]] = {
     ws.url(s"$url/users/role/$userName")
@@ -114,11 +119,11 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       .post(Json.toJson(user))
       .map(mapToUser)
   }
-  override def addUserWithRoles(user: UserInfo): Future[Either[Errors, UserInfo]] = {
+  override def addUserWithRoles(userInfo: UserInfo): Future[Either[Errors, UserInfo]] = {
     ws.url(s"$url/users/withroles")
       .withHeaders("Accept" -> "application/json")
-      .post(Json.toJson(user))
-      .map(mapToUserInfo)
+      .post(Json.toJson(userInfo))
+      .map{res=>Right(userInfo)}
   }
 
   override  def getUserDetail(userName:String): Future[Either[Errors,UserInfo]]={
@@ -180,5 +185,12 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
           case _ =>mapErrors(res)
         }
       }
+  }
+
+  override def addUserWithGroups(userGroupInfo: UserGroupInfo): Future[Either[Errors,UserGroupInfo]]={
+    ws.url(s"$url/users/withgroups")
+      .withHeaders("Accept" -> "application/json")
+      .post(Json.toJson(userGroupInfo))
+      .map(mapToUserGroupInfo)
   }
 }

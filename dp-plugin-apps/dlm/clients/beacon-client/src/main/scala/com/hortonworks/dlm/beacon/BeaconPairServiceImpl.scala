@@ -1,7 +1,7 @@
 package com.hortonworks.dlm.beacon
 
 import com.hortonworks.dlm.beacon.Exception.JsonException
-import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
+import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest, WSResponse}
 import com.hortonworks.dlm.beacon.WebService.BeaconPairService
 import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconApiError, BeaconApiErrors, PairedCluster, PostActionResponse}
 import play.api.http.Status.{BAD_GATEWAY, SERVICE_UNAVAILABLE}
@@ -31,6 +31,7 @@ class BeaconPairServiceImpl(implicit ws: WSClient) extends BeaconPairService {
 
   override def listPairedClusters(beaconEndpoint : String): Future[Either[BeaconApiErrors, Seq[PairedCluster]]] = {
     ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/list?fields=peers")
+      .withAuth(user, password, WSAuthScheme.BASIC)
       .get.map(mapToBeaconClusterResponse).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
@@ -38,6 +39,7 @@ class BeaconPairServiceImpl(implicit ws: WSClient) extends BeaconPairService {
 
   override def createClusterPair(beaconEndpoint : String, remoteClusterName : String): Future[Either[BeaconApiErrors, PostActionResponse]] = {
     ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/pair?remoteClusterName=$remoteClusterName")
+      .withAuth(user, password, WSAuthScheme.BASIC)
       .withHeaders(httpHeaders.toList: _*)
       .post(Results.EmptyContent())
       .map(mapToPostActionResponse).recoverWith {
@@ -47,6 +49,7 @@ class BeaconPairServiceImpl(implicit ws: WSClient) extends BeaconPairService {
 
   override def createClusterUnpair(beaconEndpoint : String, remoteClusterName : String): Future[Either[BeaconApiErrors, PostActionResponse]] = {
     ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/unpair?remoteClusterName=$remoteClusterName")
+      .withAuth(user, password, WSAuthScheme.BASIC)
       .withHeaders(httpHeaders.toList: _*)
       .post(Results.EmptyContent())
       .map(mapToPostActionResponse).recoverWith {

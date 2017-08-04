@@ -1,16 +1,140 @@
-.navigation-bar-container {
-  ul.nav.side-nav-header {
-    li.navigation-header {
-      padding: 10px;
+@import '../../styles/variables';
+
+$width: 200px;
+$collapsed-width: 50px;
+$collapsed-icon-size: 19px;
+$header-height: 60px;
+$footer-height: 48px;
+$menu-item-height: 38px;
+$collapsed-menu-item-height: 50px;
+
+.navigation-bar {
+  .side-nav-header, .side-nav-menu, .side-nav-footer {
+    width: $width;
+  }
+  .side-nav-header {
+    height: $header-height;
+    .navigation-header {
+      height: $header-height;
+      padding: 0!important;
       #header_icon {
-        padding-top: 5px;
-        font-size: 28px;
-        .ambari-logo {
-          color: #b8bec4;
+        height: $header-height;
+        padding-top: 18px !important;
+        padding-left: 0;
+        padding-right: 0;
+        width: 40px;
+        a {
+          display: block;
+          padding: 0 10px;
         }
       }
       #header_content {
-        padding: 5px;
+        width: 160px;
+      }
+    }
+  }
+  .side-nav-menu {
+    top: $header-height;
+    bottom: $footer-height;
+    li {
+      &:first-child {
+        margin-top: 5px;
+      }
+      &.active {
+        a:after {
+          border-width: 10px 5px;
+          margin-top: -10px;
+        }
+      }
+      a {
+        width: $width;
+        padding: 0 8px 0 20px;
+        line-height: $menu-item-height;
+        .navigation-icon {
+          font-size: 16px;
+        }
+        .navigation-menu-item {
+          font-size: 14px !important;
+        }
+      }
+    }
+  }
+  .side-nav-footer {
+    height: $footer-height;
+    .navigation-footer {
+      height: $footer-height;
+      a {
+        font-size: 19px;
+        width: $width;
+        height: $footer-height;
+        text-align: center;
+        padding: 0;
+        .navigation-icon {
+          font-size: 19px;
+          left: 0;
+        }
+      }
+    }
+  }
+}
+
+.navigation-bar-container {
+  width: $width;
+  &.collapsed {
+    width: $collapsed-width;
+    .side-nav-header, .side-nav-menu, .side-nav-footer {
+      width: $collapsed-width;
+    }
+    .side-nav-menu {
+      li {
+        a {
+          line-height: $collapsed-menu-item-height;
+          padding: 0 8px 0 15px;
+          .navigation-icon {
+            font-size: $collapsed-icon-size;
+          }
+        }
+      }
+    }
+  }
+  ul.nav.side-nav-header {
+    li.navigation-header {
+      .row {
+        margin: 0 !important;
+      }
+      .nav-header-container {
+        &:hover {
+          background-color: $navigation-header-hover;
+          cursor: pointer;
+        }
+      }
+      #header_icon {
+        font-size: 28px;
+        .ambari-logo {
+          color: #b8bec4;
+          font-size: 25px;
+          .toggle-small-icon {
+            color: $primary-color;
+            font-size: 12px;
+            position: absolute;
+            top: 7px;
+            right: -2px;
+          }
+        }
+      }
+      #header_content {
+        padding: 15px 12px 15px 6px;
+        .btn-group {
+          display: table;
+          > div {
+            display: table-cell;
+            vertical-align: middle;
+          }
+        }
+        .toggle-icon-down {
+          color: $primary-color;
+          font-size: 16px;
+        }
       }
     }
   }

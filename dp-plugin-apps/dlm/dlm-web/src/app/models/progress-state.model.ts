@@ -4,4 +4,6 @@ export interface ProgressState {
   success: boolean;
   error?: boolean;
   errorMessage?: any;
+  actionType?: string;
+  [key: string]: any;
 };

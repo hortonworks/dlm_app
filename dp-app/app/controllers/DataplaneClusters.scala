@@ -4,11 +4,10 @@ import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari.AmbariEndpoint
-import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, HJwtToken, DataplaneClusterIdentifier}
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, DataplaneClusterIdentifier, HJwtToken}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.DpClusterService
 import models.JsonResponses
-import org.apache.commons.lang3.exception.ExceptionUtils
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -16,7 +15,8 @@ import services.AmbariService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import internal.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.Authenticated
+
 class DataplaneClusters @Inject()(
     @Named("dpClusterService") val dpClusterService: DpClusterService,
     ambariService: AmbariService,
@@ -105,13 +105,25 @@ class DataplaneClusters @Inject()(
 
   def ambariCheck = authenticated.async { request =>
     implicit val token = request.token
-    ambariService
-      .statusCheck(AmbariEndpoint(request.getQueryString("url").get))
-      .map {
+    dpClusterService.retrieveByAmbariUrl(request.getQueryString("url").get)
+      .flatMap{
         case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-        case Right(checkResponse) => Ok(Json.toJson(checkResponse))
+          Future.successful(InternalServerError(
+            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}")))
+        case Right(status) =>
+          if (status) {
+            Future.successful(Ok(Json.obj("alreadyExists" -> true)))
+          } else {
+            val res = ambariService
+              .statusCheck(AmbariEndpoint(request.getQueryString("url").get))
+              .map {
+                case Left(errors) =>
+                  InternalServerError(
+                    JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+                case Right(checkResponse) => Ok(Json.toJson(checkResponse))
+              }
+            res
+          }
       }
   }
 

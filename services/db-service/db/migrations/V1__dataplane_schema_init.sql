@@ -1,5 +1,4 @@
 CREATE SCHEMA IF NOT EXISTS dataplane;
-CREATE SCHEMA IF NOT EXISTS dataplane;
 
 CREATE TABLE IF NOT EXISTS dataplane.roles (
   id      BIGSERIAL PRIMARY KEY,
@@ -13,6 +12,7 @@ CREATE TABLE IF NOT EXISTS dataplane.users (
   user_name    VARCHAR(255) NOT NULL UNIQUE,
   display_name VARCHAR(255),
   avatar       VARCHAR(255),
+  group_managed BOOLEAN DEFAULT FALSE,
   active       BOOLEAN   DEFAULT TRUE,
   password     VARCHAR(255),
   created      TIMESTAMP DEFAULT now(),
@@ -27,6 +27,22 @@ CREATE TABLE IF NOT EXISTS dataplane.users_roles (
 
 );
 
+CREATE TABLE IF NOT EXISTS dataplane.groups (
+  id           BIGSERIAL PRIMARY KEY,
+  group_name    VARCHAR(255) NOT NULL UNIQUE,
+  display_name VARCHAR(255),
+  active       BOOLEAN   DEFAULT TRUE,
+  created      TIMESTAMP DEFAULT now(),
+  updated      TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS dataplane.groups_roles (
+  id      BIGSERIAL PRIMARY KEY,
+  group_id BIGINT REFERENCES dataplane.groups (id) NOT NULL,
+  role_id BIGINT REFERENCES dataplane.roles (id) NOT NULL,
+  UNIQUE (group_id, role_id)
+);
+
 CREATE TABLE IF NOT EXISTS dataplane.permissions (
   id         BIGSERIAL PRIMARY KEY,
   permission VARCHAR(255) UNIQUE                       NOT NULL,
@@ -38,7 +54,9 @@ CREATE TABLE IF NOT EXISTS dataplane.permissions (
 CREATE TABLE IF NOT EXISTS dataplane.locations (
   id        BIGSERIAL PRIMARY KEY,
   city      VARCHAR(255)   NOT NULL,
+  province  VARCHAR(255),
   country   VARCHAR(255)   NOT NULL,
+  iso2      VARCHAR(10)     NOT NULL,
   latitude  DECIMAL(10, 6) NOT NULL,
   longitude DECIMAL(10, 6) NOT NULL
 );
@@ -229,8 +247,18 @@ CREATE TABLE IF NOT EXISTS dataplane.ldap_configs (
   id          BIGSERIAL PRIMARY KEY,
   url         VARCHAR(255)          NOT NULL,
   bind_dn     VARCHAR(255),
-  user_dn_template     VARCHAR(255),
   user_searchbase      VARCHAR(255),
-  group_searchbase     VARCHAR(255)
+  usersearch_attributename  VARCHAR(255),
+  group_searchbase     VARCHAR(255),
+  groupsearch_attributename  VARCHAR(255),
+  group_objectclass VARCHAR(255),
+  groupmember_attributename VARCHAR(255)
 );
 
+CREATE TABLE IF NOT EXISTS dataplane.user_groups (
+  id           BIGSERIAL PRIMARY KEY,
+  user_id BIGINT REFERENCES dataplane.users (id) NOT NULL,
+  group_id BIGINT REFERENCES dataplane.groups (id) NOT NULL,
+  created      TIMESTAMP DEFAULT now(),
+  updated      TIMESTAMP DEFAULT now()
+);

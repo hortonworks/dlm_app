@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation, isDevMode } from '@angular/core';
 import { MenuItem } from './common/navbar/menu-item';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers/index';
@@ -6,8 +6,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { Event } from 'models/event.model';
 import { Observable } from 'rxjs/Observable';
 import { getAllEvents, getNewEventsCount } from 'selectors/event.selector';
-import { getMergedProgress } from 'selectors/progress.selector';
+import { getMergedProgress, getProgressState } from 'selectors/progress.selector';
 import { initApp } from 'actions/app.action';
+import { loadClusters, loadClustersStatuses } from 'actions/cluster.action';
 import { loadEvents, loadNewEventsCount } from 'actions/event.action';
 import { NAVIGATION } from 'constants/navigation.constant';
 import { User } from './models/user.model';
@@ -15,11 +16,16 @@ import { SessionStorageService } from './services/session-storage.service';
 import { TimeZoneService } from './services/time-zone.service';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
-import * as moment from 'moment';
 import { POLL_INTERVAL } from 'constants/api.constant';
+import { HeaderData, Persona } from 'models/header-data';
+import { UserService } from 'services/user.service';
+import { AuthUtils } from 'utils/auth-utils';
+import { getAllClusters } from 'selectors/cluster.selector';
 
-const POLL_EVENTS_ID = 'POLL_EVENT_ID';
-const POLL_NEW_EVENTS_ID = 'POLL_NEW_EVENTS_ID';
+const POLL_EVENTS_ID = '[DLM_COMPONENT] POLL_EVENT_ID';
+const POLL_NEW_EVENTS_ID = '[DLM_COMPONENT] POLL_NEW_EVENTS_ID';
+const POLL_CLUSTER_STATUSES_ID = '[DLM_COMPONENT] POLL_CLUSTER_STATUSES_ID';
+const CLUSTERS_REQUEST = '[DLM_COMPONENT] CLUSTERS_REQUEST';
 
 @Component({
   selector: 'dlm',
@@ -27,16 +33,17 @@ const POLL_NEW_EVENTS_ID = 'POLL_NEW_EVENTS_ID';
   styleUrls: ['./dlm.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class DlmComponent implements OnDestroy {
+export class DlmComponent implements OnDestroy, OnInit {
   header: MenuItem;
   menuItems: MenuItem[];
-  mainContentSelector = '#dlm_content';
+  mainContentSelector = '#dlm_main_content';
   fitHeight = true;
   events$: Observable<Event[]>;
   newEventsCount$: Observable<number>;
   navigationColumns = NAVIGATION;
   onOverviewPage = false;
   subscriptions: Subscription[] = [];
+  headerData: HeaderData = new HeaderData();
 
   // Options for Toast Notification
   notificationOptions = {
@@ -47,18 +54,19 @@ export class DlmComponent implements OnDestroy {
     timeOut: 10000
   };
 
-  // mock current user
-  // TODO: move user to store and dispatch timezone update with action
-  user: User = <User>{fullName: 'Jim Raynor', timezone: ''};
+  user: User = <User>{};
 
   private initPolling() {
     const pollProgress$ = this.store
-      .select(getMergedProgress(POLL_EVENTS_ID, POLL_NEW_EVENTS_ID))
-      .filter(requestsState => !requestsState.isInProgress)
+      .select(getMergedProgress(POLL_EVENTS_ID, POLL_NEW_EVENTS_ID, POLL_CLUSTER_STATUSES_ID))
+      .map(r => r.isInProgress)
+      .distinctUntilChanged()
+      .filter(isInProgress => !isInProgress)
       .delay(POLL_INTERVAL)
       .do(_ => {
         this.store.dispatch(loadNewEventsCount({requestId: POLL_NEW_EVENTS_ID}));
         this.store.dispatch(loadEvents({ requestId: POLL_EVENTS_ID}));
+        this.store.dispatch(loadClustersStatuses(POLL_CLUSTER_STATUSES_ID));
       })
       .repeat();
 
@@ -69,6 +77,7 @@ export class DlmComponent implements OnDestroy {
               private store: Store<State>,
               private sessionStorageService: SessionStorageService,
               private timeZoneService: TimeZoneService,
+              private userService: UserService,
               private router: Router,
               private route: ActivatedRoute) {
     this.user.timezone = timeZoneService.setupUserTimeZone();
@@ -76,33 +85,40 @@ export class DlmComponent implements OnDestroy {
     this.header = new MenuItem(
       t.instant('sidenav.menuItem.header'),
       './overview',
-      '<i class="fa fa-gg" aria-hidden="true"></i>'
+      '',
+      'header-icon'
     );
+    this.header.iconHtml = '<i class="fa fa-gg" aria-hidden="true"></i>';
     this.menuItems = [
       new MenuItem(
         t.instant('sidenav.menuItem.overview'),
         './overview',
-        '<span class="navigation-icon glyphicon glyphicon-home"></span>'
+        'navigation-icon fa fa-home',
+        'go-to-overview'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.clusters'),
         './clusters',
-        '<span class="navigation-icon glyphicon glyphicon-globe"></span>'
+        'navigation-icon fa fa-globe',
+        'go-to-clusters'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.pairings'),
         './pairings',
-        '<span class="navigation-icon glyphicon glyphicon-resize-horizontal"></span>'
+        'navigation-icon fa fa-arrows-h',
+        'go-to-pairings'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.policies'),
         './policies',
-        '<span class="navigation-icon glyphicon glyphicon-list-alt"></span>'
+        'navigation-icon fa fa-th-list',
+        'go-to-policies'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.help'),
         './help',
-        '<span class="navigation-icon glyphicon glyphicon-info-sign"></span>'
+        'navigation-icon fa fa-info-circle',
+        'go-to-help'
       )
     ];
     this.events$ = store.select(getAllEvents);
@@ -110,14 +126,19 @@ export class DlmComponent implements OnDestroy {
     this.store.dispatch(initApp());
     this.store.dispatch(loadNewEventsCount({requestId: POLL_NEW_EVENTS_ID}));
     this.store.dispatch(loadEvents({ requestId: POLL_EVENTS_ID}));
+    this.store.dispatch(loadClusters(CLUSTERS_REQUEST));
     const pathChange$ = router.events
       .filter(e => e instanceof NavigationEnd)
       .do(_ => {
         this.onOverviewPage = this.checkTopPath(route, 'overview');
       });
-
+    const clustersRequestSubscription = this.store.select(getProgressState(CLUSTERS_REQUEST))
+      .filter(progressState => !progressState.isInProgress)
+      .take(1)
+      .do(_ => this.store.dispatch(loadClustersStatuses(POLL_CLUSTER_STATUSES_ID)))
+      .subscribe(_ => this.initPolling());
+    this.subscriptions.push(clustersRequestSubscription);
     this.subscriptions.push(pathChange$.subscribe());
-    this.initPolling();
   }
 
   private checkTopPath(route, path) {
@@ -136,8 +157,27 @@ export class DlmComponent implements OnDestroy {
     return urlValue[0].path === path;
   }
 
-  ngOnDestroy() {
-    this.subscriptions.forEach(s => s.unsubscribe());
+  getUser(): User {
+    return AuthUtils.getUser();
+  }
+
+  ngOnInit() {
+    AuthUtils.loggedIn$.subscribe(() => {
+      this.setHeaderData();
+      const user = this.getUser();
+      if (user && user.id) {
+        this.user = user;
+      } else {
+        if (!isDevMode()) {
+          // Log the user out of DLM
+          this.userService.logoutUser();
+        }
+      }
+    });
+  }
+
+  setHeaderData() {
+    this.headerData.personas = this.userService.getPersonaDetails();
   }
 
   saveUserTimezone(timezoneIndex) {
@@ -148,6 +188,11 @@ export class DlmComponent implements OnDestroy {
 
   logout() {
     // do logout
+    this.userService.logoutUser();
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
 }

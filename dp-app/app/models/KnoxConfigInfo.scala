@@ -3,9 +3,12 @@ package models
 case class KnoxConfigInfo(
     id: Option[Long],
     ldapUrl: String,
-    userDnTemplate: Option[String],
     userSearchBase: Option[String],
+    userSearchAttributeName:Option[String],
     groupSearchBase: Option[String],
+    groupSearchAttributeName:Option[String],
+    groupObjectClass:Option[String],
+    groupMemberAttributeName: Option[String],
     bindDn :Option[String],
     password: Option[String],
     domains: Option[Seq[String]],/*list of urls from which app is accessible*/

@@ -42,7 +42,6 @@
 
 .policy-form {
   label {
-    color: $grey-color;
     font-weight: normal;
     &.btn-primary {
       color: #FFF;
@@ -51,4 +50,8 @@
   .form-section-title {
     color: $link-color;
   }
+}
+
+fieldset {
+  margin: 15px 10px 15px 20px;
 }

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BsDropdownModule, ButtonsModule, TooltipModule, CollapseModule, ProgressbarModule } from 'ng2-bootstrap';
+import { BsDropdownModule, ButtonsModule, TooltipModule, CollapseModule, ProgressbarModule, AlertModule } from 'ng2-bootstrap';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { TranslateModule } from '@ngx-translate/core';
 import { SelectModule } from 'ng2-select';
@@ -28,6 +28,11 @@ import { PolicyActionsComponent } from './policy-actions/policy-actions.componen
 import { HiveBrowserComponent, HiveDatabaseComponent } from './hive-browser/';
 import { DurationColumnComponent } from './table-columns/duration-column/duration-column.component';
 import { TransferredColumnComponent } from './table-columns/transferred-column/transferred-column.component';
+import { JobStatusComponent } from './job-status/job-status.component';
+import { MapLegendComponent } from './map/map-legend/map-legend.component';
+import { MapLegendContainerComponent } from './map/map-legend-container/map-legend-container.component';
+import { ClusterStatusIconComponent } from './cluster-status-icon/cluster-status-icon.component';
+import { BeaconValidityComponent } from './messages/beacon-validity/beacon-validity.component';
 
 @NgModule({
   imports: [
@@ -37,6 +42,7 @@ import { TransferredColumnComponent } from './table-columns/transferred-column/t
     TooltipModule.forRoot(),
     CollapseModule.forRoot(),
     ProgressbarModule.forRoot(),
+    AlertModule.forRoot(),
     ChartsModule,
     TranslateModule,
     SelectModule,
@@ -67,7 +73,12 @@ import { TransferredColumnComponent } from './table-columns/transferred-column/t
     HiveDatabaseComponent,
     PolicyActionsComponent,
     DurationColumnComponent,
-    TransferredColumnComponent
+    TransferredColumnComponent,
+    JobStatusComponent,
+    MapLegendComponent,
+    MapLegendContainerComponent,
+    ClusterStatusIconComponent,
+    BeaconValidityComponent
   ],
   exports: [
     CardComponent,
@@ -93,7 +104,12 @@ import { TransferredColumnComponent } from './table-columns/transferred-column/t
     HiveDatabaseComponent,
     PolicyActionsComponent,
     DurationColumnComponent,
-    TransferredColumnComponent
+    TransferredColumnComponent,
+    JobStatusComponent,
+    MapLegendComponent,
+    MapLegendContainerComponent,
+    ClusterStatusIconComponent,
+    BeaconValidityComponent
   ]
 })
 export class CommonComponentsModule {}

@@ -13,9 +13,6 @@ $hex-color: $primary-color;
     display: table;
     table-layout: fixed;
     width: 98%;
-    &.header {
-      margin: 15px 15px 0;
-    }
     .col, .col-header {
       padding: 0 15px;
       float: none;

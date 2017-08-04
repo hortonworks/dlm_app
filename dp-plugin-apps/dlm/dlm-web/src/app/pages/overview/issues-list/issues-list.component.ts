@@ -1,4 +1,4 @@
-import { Component, Input, HostBinding } from '@angular/core';
+import { Component, Input, Output, HostBinding, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { Event } from 'models/event.model';
 
@@ -7,13 +7,16 @@ import { Event } from 'models/event.model';
   template: `
     <div class="row" *ngFor="let event of events | slice:0:visibleItems">
       <div class="col-md-12">
-        <dlm-issues-list-item [event]="event">
+        <dlm-issues-list-item
+          [event]="event"
+          (selectLog)="onSelectLog.emit($event)"
+          (selectPolicy)="onSelectPolicy.emit($event)">
         </dlm-issues-list-item>
       </div>
     </div>
     <div class="row" *ngIf="events.length">
       <div class="pull-right view-all">
-        <small class="text-primary actionable" (click)="showAll()" *ngIf="!isAllVisible">
+        <small qe-attr="go-to-notifications" class="text-primary actionable" (click)="showAll()">
           <strong>{{'page.overview.issues.list.view_all' | translate}}</strong>
         </small>
       </div>
@@ -27,13 +30,12 @@ import { Event } from 'models/event.model';
   styleUrls: ['./issues-list.component.scss']
 })
 export class IssuesListComponent {
-  visibleItems = 3;
+  visibleItems = 4;
   @Input() events: Event[];
-  @HostBinding('class.all-visible') get isVisible() { return this.isAllVisible; };
+  @Output() onSelectLog = new EventEmitter<Event>();
+  @Output() onSelectPolicy = new EventEmitter<Event>();
 
-  get isAllVisible(): boolean {
-    return this.events && this.visibleItems === this.events.length;
-  }
+  @HostBinding('class') className = 'all-visible';
 
   constructor(private router: Router) { }
 

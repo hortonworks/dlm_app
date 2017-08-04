@@ -6,13 +6,13 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.{Errors, User, UserRoles}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.UserService
+import com.hortonworks.dataplane.commons.auth.Authenticated
 import internal.{Jwt, KnoxSso}
 import models.JsonFormats._
 import models.{Credential, JsonResponses}
 import org.mindrot.jbcrypt.BCrypt
 import play.api.libs.json.Json
 import play.api.mvc._
-import internal.auth.Authenticated
 import play.api.Logger
 
 import scala.concurrent.ExecutionContext.Implicits.global

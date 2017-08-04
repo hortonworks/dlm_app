@@ -24,7 +24,7 @@
       line-height: 1.3;
     }
     .name {
-      margin-bottom: 5px;
+      margin-bottom: 1px;
     }
     .description {
       color: #666;
@@ -32,6 +32,12 @@
     }
     .timestamp {
       color: #999;
+    }
+  }
+
+  .description {
+    .fa-file-text-o {
+      margin-left: 5px;
     }
   }
 }

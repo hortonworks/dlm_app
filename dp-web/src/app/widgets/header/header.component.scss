@@ -30,6 +30,11 @@
   font-size: 17px;
 }
 
+.mdl-menu__item a{
+  padding: 0;
+  color: $dove-gray;
+  font-size: 14px;
+}
 
 :host /deep/ .mdl-menu__container{
   position: fixed;

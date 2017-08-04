@@ -11,19 +11,30 @@ object Ambari {
 
   case class AmbariCluster(security: String = "NONE",
                            clusterName: String,
-                           services: Seq[String])
+                           services: Seq[String],
+                           knoxUrl:Option[String])
 
   case class AmbariEndpoint(url: String)
 
   case class AmbariCheckResponse(ambariApiCheck: Boolean,
                                  knoxDetected: Boolean,
-                                 ambariApiStatus: Int,
+                                 ambariApiStatus: Int = -1,
                                  knoxUrl: Option[String],
-                                 ambariApiResponseBody: JsValue)
+                                 ambariApiResponseBody: JsValue,
+                                 requestAmbariCreds: Boolean = false,
+                                 requestKnoxURL: Boolean = false)
 
   case class AmbariDetailRequest(url: String,
                                  knoxDetected: Boolean,
-                                 knoxUrl: Option[String])
+                                 knoxUrl: Option[String],
+                                 ambariUser: Option[String],
+                                 ambariPass: Option[String],
+                                 knoxTopology: Option[String]) {
+
+    def hasCredentials =  ambariUser.isDefined && ambariPass.isDefined && knoxTopology.isEmpty
+    def hasTopology = knoxTopology.isDefined && ambariUser.isEmpty && ambariPass.isEmpty
+
+  }
 
   case class AmbariForbiddenResponse(status: Int,
                                      message: String,
@@ -119,10 +130,9 @@ object Ambari {
   )
 
   case class AmbariResponseWithDpClusterId(
-      id : Long,
+      id: Long,
       data: JsValue
   )
-
 
   implicit val diskInfoReads = Json.reads[DiskInfo]
   implicit val diskInfoWrites = Json.writes[DiskInfo]
@@ -152,8 +162,9 @@ object Ambari {
   implicit val clusterPropertiesReads = Json.reads[ClusterProperties]
   implicit val clusterPropertiesWrites = Json.writes[ClusterProperties]
 
-  implicit val ambariResponseWithDpClusterIdReads = Json.reads[AmbariResponseWithDpClusterId]
-  implicit val ambariResponseWithDpClusterIdWrites = Json.writes[AmbariResponseWithDpClusterId]
-
+  implicit val ambariResponseWithDpClusterIdReads =
+    Json.reads[AmbariResponseWithDpClusterId]
+  implicit val ambariResponseWithDpClusterIdWrites =
+    Json.writes[AmbariResponseWithDpClusterId]
 
 }

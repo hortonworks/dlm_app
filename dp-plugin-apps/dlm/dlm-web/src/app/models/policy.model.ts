@@ -12,6 +12,7 @@ export interface Policy {
   targetCluster: string;
   sourceDataset: string;
   targetDataset: string;
+  policyId: string;
   endTime: string;
   frequency: number;
   tags: string[];
@@ -22,6 +23,7 @@ export interface Policy {
   // UI specific props
   lastJobResource?: Job;
   jobsResource?: Job[];
+  lastTenJobs?: Job[];
   policyStatus: RequestStatus;
   sourceClusterResource?: Cluster;
   targetClusterResource?: Cluster;

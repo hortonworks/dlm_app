@@ -9,12 +9,39 @@
 <dlm-icon-column [showHexagon]="false" [showValue]="true"></dlm-icon-column>
 <dlm-status-column [showText]="false"></dlm-status-column>
 
-<ng-template #statusCellTemplate let-row="row">
-  <dlm-job-status [job]="row"></dlm-job-status>
+<ng-template #clusterNameCellRef let-name="value">
+  <span [tooltip]="getDatacenterName(name)">{{getClusterName(name)}}</span>
 </ng-template>
 
-<ng-template #verbStatusCellTemplate let-value="value">
-  {{value | statusFmt}}
+<ng-template #statusCellTemplate let-policy="row">
+  <dlm-job-status
+    qe-attr="show-log"
+    class="actionable"
+    [job]="policy.lastJobResource"
+    [tooltip]="'page.notifications.view_log' | translate"
+    (click)="showPolicyLog(policy)">
+  </dlm-job-status>
+</ng-template>
+
+<ng-template #verbStatusCellTemplate let-job="value" let-policy="row">
+  <dlm-transferred-column
+    *ngIf="job.status === JOB_STATUS.RUNNING && job.trackingInfo?.completedMapTasks; else verbTpl"
+    [trackingInfo]="job.trackingInfo">
+  </dlm-transferred-column>
+  <ng-template #verbTpl>
+    <span class="actionable"
+          [tooltip]="job.status === JOB_STATUS.RUNNING ? '' : ('page.notifications.view_log' | translate)"
+          (click)="showPolicyLog(policy)">
+      {{job.status}}
+      <i class="fa fa-file-text-o text-info" *ngIf="job.status !== JOB_STATUS.RUNNING"></i>
+    </span>
+  </ng-template>
+</ng-template>
+
+<ng-template #policyNameCellTemplate let-row="row" let-name="value">
+  <span qe-attr="go-to-policies" (click)="goToPolicy(row)" class="actionable text-primary policy-name">
+   {{name}}
+  </span>
 </ng-template>
 
 <ng-template #agoTemplate let-value="value" let-policy="row">
@@ -23,13 +50,13 @@
       {{value | fmtTz | amTimeAgo}}
     </span>
     <ng-template #inProgress>
-      In Progress
+      {{'common.status.in_progress' | translate}}
     </ng-template>
   </span>
 </ng-template>
 
-<ng-template #prevJobs let-row="row">
-  <dlm-prev-jobs class="actionable" (click)="goToPolicy(row)" [policy]="row"></dlm-prev-jobs>
+<ng-template #prevJobs let-jobs="value" let-row="row">
+  <dlm-last-ten-jobs-column qe-attr="go-to-policies" class="actionable" (click)="goToPolicy(row)" [jobs]="jobs"></dlm-last-ten-jobs-column>
 </ng-template>
 
 <ng-template #nextRunTemplate let-row="row">
@@ -42,8 +69,14 @@
   <dlm-duration-column [isRunning]="isRunning(policy?.lastJobResource)" [duration]="value"></dlm-duration-column>
 </ng-template>
 
-<ng-template #transferredFormattedTemplate let-value="value">
-  <dlm-transferred-column [trackingInfo]="value"></dlm-transferred-column>
+<ng-template #transferredFormattedTemplate let-value="value" let-policy="row">
+  <div *ngIf="policy.lastJobResource.status === JOB_STATUS.RUNNING; else transferredTpl" class="text-muted text-uppercase">
+    {{'common.status.in_progress' | translate}}
+  </div>
+  <ng-template #transferredTpl>
+    <span [innerHtml]="value.bytesCopied | bytesSize"></span>
+    <span *ngIf="value.filesCopied">/ {{value.filesCopied}}</span>
+  </ng-template>
 </ng-template>
 
 <ng-template #destinationIconCell>
@@ -52,6 +85,7 @@
 
 <ng-template #actionsCell let-row="row">
   <dlm-policy-actions
+    qe-attr="entity-actions"
     [rowId]="row.id"
     [policy]="row"
     [isOpen]="shouldShowAction(row.id)"
@@ -62,6 +96,7 @@
 </ng-template>
 
 <dlm-modal-dialog
+  qe-attr="confirmation-modal"
   [title]="'page.policies.perform_action.confirmation.title'"
   [body]="'page.policies.perform_action.confirmation.body'"
   [showDialog]="showActionConfirmationModal"
@@ -70,6 +105,7 @@
 </dlm-modal-dialog>
 
 <dlm-modal-dialog
+  qe-attr="entity-action-result-modal"
   [title]="lastOperationResponse.status"
   [body]="lastOperationResponse.message"
   [showDialog]="showOperationResponseModal"

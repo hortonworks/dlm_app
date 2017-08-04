@@ -53,11 +53,29 @@ object Webservice {
 
     def getRoles():  Future[Either[Errors,Seq[Role]]]
 
-    def addUserWithRoles(user: UserInfo): Future[Either[Errors, UserInfo]]
+    def addUserWithRoles(userInfo: UserInfo): Future[Either[Errors, UserInfo]]
 
     def getUserDetail(userName:String): Future[Either[Errors,UserInfo]]
 
     def updateActiveAndRoles(userInfo: UserInfo): Future[Either[Errors,Boolean]]
+
+    def addUserWithGroups(userGroupInfo: UserGroupInfo): Future[Either[Errors,UserGroupInfo]]
+
+  }
+
+  trait GroupService extends DbClientService {
+
+    def getGroups(offset: Option[String], pageSize: Option[String], searchTerm: Option[String]): Future[Either[Errors, GroupsList]]
+
+    def getAllActiveGroups(): Future[Either[Errors,Seq[Group]]]
+
+    def addGroupWithRoles(groupInfo: GroupInfo): Future[Either[Errors,GroupInfo]]
+
+    def updateGroupInfo(groupInfo: GroupInfo): Future[Either[Errors,Boolean]]
+
+    def getGroupByName(groupName: String): Future[Either[Errors,GroupInfo]]
+
+    def getRolesForGroups(groupIds:Seq[Long]): Future[Either[Errors,Seq[String]]]
   }
 
   trait DataSetService extends DbClientService {
@@ -124,6 +142,8 @@ object Webservice {
     def create(dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]]
 
     def retrieve(dpClusterId: String): Future[Either[Errors, DataplaneCluster]]
+
+    def retrieveByAmbariUrl(ambariUrl: String): Future[Either[Errors, Boolean]]
 
     def update(dpClusterId: String,
                dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]]

@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.hortonworks.dataplane.gateway.domain.*;
 import com.hortonworks.dataplane.gateway.domain.Error;
+import com.hortonworks.dataplane.gateway.utils.Jwt;
 import com.hortonworks.dataplane.gateway.service.UserService;
+import com.hortonworks.dataplane.gateway.utils.CookieManager;
 import com.hortonworks.dataplane.gateway.utils.Utils;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.ServletInputStream;
 
 import java.io.IOException;
+import java.util.Date;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_DECORATION_FILTER_ORDER;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
@@ -34,6 +37,9 @@ public class SimpleSignInFilter extends ZuulFilter {
 
   @Autowired
   private Jwt jwt;
+
+  @Autowired
+  private CookieManager cookieManager;
 
   @Autowired
   private Utils utils;
@@ -69,23 +75,23 @@ public class SimpleSignInFilter extends ZuulFilter {
     try {
       ServletInputStream inputStream = ctx.getRequest().getInputStream();
       Credential credential = objectMapper.readValue(inputStream, Credential.class);
-      Optional<User> user = userService.getUser(credential.getUsername());
-      if (!user.isPresent()){
+      Optional<UserContext> userContextFromDb = userService.getUserContext(credential.getUsername());
+      if (!userContextFromDb.isPresent()){
         return sendNoUserResponse();
       }
-
-      boolean validPassword = BCrypt.checkpw(credential.getPassword(), user.get().getPassword());
+      boolean validPassword = BCrypt.checkpw(credential.getPassword(), userContextFromDb.get().getPassword());
       if (!validPassword) {
         return sendInvalidPasswordResponse();
       }
-      Optional<UserRef> userRefOpt = userService.getUserRef(credential.getUsername());
-      if (userRefOpt.isPresent()){
-        // Construct a JWT token
-        UserRef userRef=userRefOpt.get();
-        String token = jwt.makeJWT(user.get(),userRef.getRoles());
-        userRef.setToken(token);
+      UserContext userContext= userContextFromDb.get();
+      if (!userContext.isActive()){
+        return utils.sendForbidden(utils.getInactiveErrorMsg(userContext.getUsername()));
+      }else {
+        String jwtToken = jwt.makeJWT(userContext);
+        userContext.setToken(jwtToken);
         ctx.setResponseStatusCode(200);
-        ctx.setResponseBody(objectMapper.writeValueAsString(userRef));
+        ctx.setResponseBody(objectMapper.writeValueAsString(userContext));
+        cookieManager.addDataplaneJwtCookie(jwtToken,Optional.<Date>absent());
         ctx.setSendZuulResponse(false);
       }
     } catch (IOException e) {

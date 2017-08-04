@@ -50,6 +50,7 @@ import { HdfsService } from 'services/hdfs.service';
 import { HiveService } from 'services/hive.service';
 import { NotificationService } from 'services/notification.service';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
+import { UserService } from 'services/user.service';
 
 import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
@@ -72,7 +73,9 @@ import { UserDropdownComponent } from './common/user-dropdown/user-dropdown.comp
 import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.component';
 import { NotFoundRouteComponent } from './routes/not-found-route/not-found-route.component';
 import { HdfsBrowserComponent } from './components/hdfs-browser/hdfs-browser.component';
+import { PersonaPopupComponent } from 'common/persona-popup/persona-popup.component';
 
+import { OverviewModule } from './pages/overview/overview.module';
 import { ResourceChartsComponent } from './pages/overview/resource-charts/resource-charts.component';
 import { OverviewFilterComponent } from './pages/overview/overview-filter/overview-filter.component';
 import { IssuesListComponent } from './pages/overview/issues-list/issues-list.component';
@@ -83,7 +86,6 @@ import { ClustersComponent } from './pages/clusters/clusters.component';
 import { ClusterListComponent } from './pages/clusters/cluster-list/cluster-list.component';
 
 import { JobsTableComponent } from './pages/jobs/jobs-table/jobs-table.component';
-import { JobStatusComponent } from './pages/jobs/job-status/job-status.component';
 import { JobTransferredGraphComponent } from './pages/jobs/jobs-transferred-graph/job-transferred-graph.component';
 import { JobsStatusFilterComponent } from './pages/jobs/jobs-status-filter/jobs-status-filter.component';
 
@@ -160,7 +162,8 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     TranslateModule.forRoot(),
     BrowserAnimationsModule,
     SimpleNotificationsModule.forRoot(),
-    PipesModule
+    PipesModule,
+    OverviewModule
   ],
   declarations: [
     DlmComponent,
@@ -193,7 +196,6 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     JobsOverviewTableComponent,
 
     JobsTableComponent,
-    JobStatusComponent,
     JobTransferredGraphComponent,
     JobsStatusFilterComponent,
 
@@ -219,7 +221,8 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     ModalDialogComponent,
     ModalDialogBodyComponent,
     NotificationsComponent,
-    LogModalDialogComponent
+    LogModalDialogComponent,
+    PersonaPopupComponent
   ],
   bootstrap: [DlmComponent],
   providers: [
@@ -239,11 +242,12 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     OverviewJobsExternalFiltersService,
     httpServiceProvider,
     FrequencyPipe,
+    UserService,
     AppConfig,
     {
       provide: APP_INITIALIZER,
       useFactory: appConfigFactory,
-      deps: [AppConfig],
+      deps: [AppConfig, UserService],
       multi: true
     }
   ]

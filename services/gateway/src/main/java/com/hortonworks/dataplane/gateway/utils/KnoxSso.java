@@ -1,8 +1,8 @@
 package com.hortonworks.dataplane.gateway.utils;
 
 import com.google.common.base.Optional;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import com.hortonworks.dataplane.gateway.domain.TokenInfo;
+import io.jsonwebtoken.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -84,15 +84,21 @@ public class KnoxSso {
     return String.format("%s%s?originalUrl=%s", knoxUrl, knoxWebssoPath, appRedirectUrl);
   }
 
-  public Optional<String> validateJwt(String token) {
-    Claims claims = Jwts.parser()
-      .setSigningKey(signingKey.get())
-      .parseClaimsJws(token).getBody();
-    Date expiration = claims.getExpiration();
-    if (expiration != null && expiration.before(new Date())) {
-      Optional.absent();
+  public TokenInfo validateJwt(String token) {
+    TokenInfo tokenInfo=new TokenInfo();
+    try {
+      Claims claims = Jwts.parser()
+        .setSigningKey(signingKey.get())
+        .parseClaimsJws(token).getBody();
+      tokenInfo.setClaims(claims);
+      return tokenInfo;
+    }catch(ExpiredJwtException ex){
+      logger.info("knox sso cookie has expired");
+      return tokenInfo;
+    }catch (JwtException e){
+      logger.error("knox sso validate exception",e);
+      return tokenInfo;
     }
-    return Optional.of(claims.getSubject());
   }
 
   private void configureSigningKey() {

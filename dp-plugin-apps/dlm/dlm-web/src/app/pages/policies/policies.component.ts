@@ -67,8 +67,10 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   // as workaround we need to load 3 jobs for such policies and set result to `jobs` and `lastJobs`
   postLoadPolicyIds: string[] = [];
   filterBy: TableFilterItem[] = [
-    {multiple: true, propertyName: 'sourceCluster'},
-    {multiple: false, propertyName: 'targetCluster'},
+    {multiple: true, propertyName: 'sourceClusterResource.name', filterTitle: 'Source Cluster'},
+    {multiple: false, propertyName: 'targetClusterResource.name', filterTitle: 'Destination Cluster'},
+    {multiple: true, propertyName: 'sourceClusterResource.dataCenter', filterTitle: 'Source Datacenter'},
+    {multiple: false, propertyName: 'targetClusterResource.dataCenter', filterTitle: 'Destination Datacenter'},
     {multiple: true, propertyName: 'status'},
     {multiple: true, propertyName: 'name'}
   ];
@@ -90,7 +92,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   constructor(private store: Store<fromRoot.State>, private route: ActivatedRoute) {
     this.policies$ = this.store.select(getPolicyClusterJob).distinctUntilChanged(isEqual);
     this.subscriptions.push(this.policies$.subscribe(_ => this.policiesLoaded = true));
-    this.clusters$ = store.select(getAllClusters);
+    this.clusters$ = store.select(getAllClusters).distinctUntilChanged(isEqual);
     this.pairings$ = store.select(getAllPairings);
     this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, PAIRINGS_REQUEST));
     this.subscriptions.push(this.overallProgress$.subscribe(progress => {
@@ -123,7 +125,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
       .filter(policies => !!policies.length)
       .subscribe(policies => {
         this.postLoadPolicyIds = policies.map(policy => policy.id);
-        this.store.dispatch(loadLastJobs(policies));
+        this.store.dispatch(loadLastJobs({policies}));
       });
     this.subscriptions.push(clusterSubscription);
     this.subscriptions.push(lastJobsWorkaroundSubscription);

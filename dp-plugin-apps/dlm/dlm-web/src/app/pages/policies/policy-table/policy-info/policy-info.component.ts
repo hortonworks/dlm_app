@@ -7,9 +7,16 @@ import { TableColumn } from 'common/table/table-column.type';
   template: `
     <ng-template #policyInfoCell let-row="row">
       <div class="policy-info">
-        <p class="policy-name text-primary actionable" (click)="onNameClick(row)">{{row.name}} <span class="caret"></span></p>
-        <p *ngIf="row.startTime" class="text-muted">{{row.startTime | date}}</p>
+        <p class="policy-name text-primary actionable" qe-attr="policy-info" (click)="onNameClick(row)" [tooltip]="row.name">
+          {{row.name | truncate:20}} <span class="caret"></span>
+        </p>
+        <p *ngIf="row.frequency" [tooltip]=popTemplate>{{row.frequency | frequency}}</p>
       </div>
+      <template #popTemplate>
+        {{row.startTime | fmtTz:'MMM DD, Y HH:mm'}} 
+        <span *ngIf="row.startTime && row.endTime">-</span>
+        <span *ngIf="row.endTime">{{row.endTime | fmtTz:'MMM DD, Y HH:mm'}}</span>
+      </template>
     </ng-template>
   `,
   styleUrls: ['./policy-info.component.scss'],
