@@ -130,7 +130,9 @@
       "maxlength": "\"{{fieldLabel}}\" should be lower than {{maxLengthValue}} symbols",
       "freqValidator": "\"{{fieldLabel}}\" is too big",
       "integerValidator": "\"{{fieldLabel}}\" should be a positive integer",
-      "time_less_than_current": "Start time must be later than the current time in the selected timezone."
+      "time_less_than_current": "Start time must be later than the current time in the selected timezone.",
+      "not_directory": "\"{{fieldLabel}}\" should be a path to directory",
+      "not_exist_directory": "\"{{fieldLabel}}\" selected directory does not exist"
     }
   },
   "page": {
@@ -280,7 +282,7 @@
         "sections": {
           "general": "General",
           "database": "Select Database",
-          "directories": "Select a File / Folder",
+          "directories": "Select a Folder",
           "job": "Run Job",
           "advanced": "Advanced Properties"
         },
@@ -296,7 +298,7 @@
             "noPair": "No paired cluster available for the selected source cluster"
           },
           "service": "Service",
-          "directories": "File / Folder Path",
+          "directories": "Folder Path",
           "databases": "Database",
           "start_date": "Start Date",
           "end_date": "End Date (Optional)",

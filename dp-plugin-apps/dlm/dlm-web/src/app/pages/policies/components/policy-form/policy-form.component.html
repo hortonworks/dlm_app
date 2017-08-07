@@ -68,9 +68,21 @@
               <div class="col-md-12">
                 <dlm-form-field [label]="'page.policies.form.fields.directories' | translate">
                   <input type="text" formField class="form-control" formControlName="directories" [(ngModel)]="selectedHdfsPath"/>
+                  <dlm-field-error *ngIf="policyForm.get('directories').hasError('isFile')">
+                    {{'forms.validation_errors.not_directory' | translate:directoryField}}
+                  </dlm-field-error>
+                  <dlm-field-error *ngIf="policyForm.get('directories').hasError('notExist')">
+                    {{'forms.validation_errors.not_exist_directory' | translate:directoryField}}
+                  </dlm-field-error>
                 </dlm-form-field>
                 <div class="hdfs-browser-container">
-                  <dlm-hdfs-browser [rootPath]="hdfsRootPath" [clusterId]="sourceCluster" (select)="handleHdfsPathChange($event)"></dlm-hdfs-browser>
+                  <dlm-hdfs-browser
+                    formControlName="directories"
+                    [rootPath]="hdfsRootPath"
+                    [clusterId]="sourceCluster"
+                    [selectFiles]="false"
+                    (select)="handleHdfsPathChange($event)"
+                  ></dlm-hdfs-browser>
                 </div>
               </div>
             </div>
