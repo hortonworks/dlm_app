@@ -9,6 +9,9 @@
 
 package com.hortonworks.dlm.beacon
 
+import com.hortonworks.dataplane.cs.KnoxProxyWsClient
+import com.hortonworks.dataplane.commons.domain.Constants.BEACON
+import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
 import com.hortonworks.dlm.beacon.WebService.BeaconLogService
 import play.api.http.Status.{BAD_GATEWAY, SERVICE_UNAVAILABLE}
 import play.api.libs.json.{JsError, JsSuccess}
@@ -18,7 +21,7 @@ import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class BeaconLogServiceImpl()(implicit ws: WSClient) extends BeaconLogService {
+class BeaconLogServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconLogService {
   import com.hortonworks.dlm.beacon.domain.ResponseEntities._
   import com.hortonworks.dlm.beacon.domain.JsonFormatters._
 
@@ -36,8 +39,9 @@ class BeaconLogServiceImpl()(implicit ws: WSClient) extends BeaconLogService {
     }
   }
 
-  override def listLog(beaconEndpoint : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, BeaconLogResponse]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/logs")
+  override def listLog(beaconEndpoint : String, clusterId: Long, queryString: Map[String,String])
+                      (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconLogResponse]] = {
+    ws.url(s"${urlPrefix(beaconEndpoint)}/logs", clusterId, BEACON).withHeaders(token)
       .withAuth(user, password, WSAuthScheme.BASIC)
       .withQueryString(queryString.toList: _*)
       .get.map(mapToBeaconLogsResponse).recoverWith {

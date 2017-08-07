@@ -9,6 +9,7 @@
 
 package com.hortonworks.dlm.beacon
 
+import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
 import com.hortonworks.dlm.beacon.domain.ResponseEntities._
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._
 import com.hortonworks.dlm.beacon.domain.RequestEntities._
@@ -69,43 +70,63 @@ object WebService {
 
   trait BeaconClusterService extends ClientService {
 
-    def listCluster(beaconEndpoint : String, clusterName: String): Future[Either[BeaconApiErrors, BeaconEntityResponse]]
-    def listClusterStatus(beaconEndpoint : String, clusterName: String): Future[Either[BeaconApiErrors, BeaconClusterStatusResponse]]
-    def createClusterDefinition(beaconEndpoint : String, dataCenterClusterName : String, clusterDefinitionRequest : ClusterDefinitionRequest): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def listCluster(beaconEndpoint : String, clusterId: Long, clusterName: String)
+                   (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconEntityResponse]]
+    def listClusterStatus(beaconEndpoint : String, clusterId: Long, clusterName: String)
+                         (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconClusterStatusResponse]]
+    def createClusterDefinition(beaconEndpoint : String, clusterId: Long, dataCenterClusterName : String, clusterDefinitionRequest : ClusterDefinitionRequest)
+                               (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
   }
 
   trait BeaconPairService extends ClientService {
 
-    def listPairedClusters(beaconEndpoint : String): Future[Either[BeaconApiErrors, Seq[PairedCluster]]]
-    def createClusterPair(beaconEndpoint : String, remoteClusterName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
-    def createClusterUnpair(beaconEndpoint : String, remoteClusterName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def listPairedClusters(beaconEndpoint : String, clusterId: Long)
+                          (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, Seq[PairedCluster]]]
+    def createClusterPair(beaconEndpoint : String, clusterId: Long, remoteClusterName : String)
+                         (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def createClusterUnpair(beaconEndpoint : String, clusterId: Long, remoteClusterName : String)
+                           (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
   }
 
   trait BeaconPolicyService extends ClientService {
 
-    def listPolicies(beaconEndpoint : String): Future[Either[BeaconApiErrors, Seq[PoliciesDetailResponse]]]
-    def listPolicy(beaconEndpoint : String, policyName : String): Future[Either[BeaconApiErrors, PolicyDataResponse]]
-    def listPolicyStatus(beaconEndpoint : String, policyName : String): Future[Either[BeaconApiErrors, PolicyStatusResponse]]
-    def submitAndSchedulePolicy(beaconEndpoint : String, policyName : String, policyDefinitionRequest : PolicyDefinitionRequest): Future[Either[BeaconApiErrors, PostActionResponse]]
-    def submitPolicy(beaconEndpoint : String, policyName : String, policyDefinitionRequest : PolicyDefinitionRequest): Future[Either[BeaconApiErrors, PostActionResponse]]
-    def schedulePolicy(beaconEndpoint : String, policyName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
-    def suspendPolicy(beaconEndpoint : String, policyName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
-    def resumePolicy(beaconEndpoint : String, policyName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
-    def deletePolicy(beaconEndpoint : String, policyName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def listPolicies(beaconEndpoint : String, clusterId: Long)
+                    (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, Seq[PoliciesDetailResponse]]]
+    def listPolicy(beaconEndpoint : String, clusterId: Long, policyName : String)
+                  (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PolicyDataResponse]]
+    def listPolicyStatus(beaconEndpoint : String, clusterId: Long, policyName : String)
+                        (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PolicyStatusResponse]]
+    def submitAndSchedulePolicy(beaconEndpoint : String, clusterId: Long, policyName : String, policyDefinitionRequest : PolicyDefinitionRequest)
+                               (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def submitPolicy(beaconEndpoint : String, clusterId: Long, policyName : String, policyDefinitionRequest : PolicyDefinitionRequest)
+                    (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def schedulePolicy(beaconEndpoint : String, clusterId: Long, policyName : String)
+                      (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def suspendPolicy(beaconEndpoint : String, clusterId: Long, policyName : String)
+                     (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def resumePolicy(beaconEndpoint : String, clusterId: Long, policyName : String)
+                    (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def deletePolicy(beaconEndpoint : String, clusterId: Long, policyName : String)
+                    (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
   }
 
   trait BeaconPolicyInstanceService extends ClientService {
-    def listPolicyInstances(beaconEndpoint : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, PolicyInstancesDetails]]
-    def listPolicyInstance(beaconEndpoint : String, policyName : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, PolicyInstancesDetails]]
-    def abortPolicyInstances(beaconEndpoint : String, policyName : String): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def listPolicyInstances(beaconEndpoint : String, clusterId: Long, queryString: Map[String,String])
+                           (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PolicyInstancesDetails]]
+    def listPolicyInstance(beaconEndpoint : String, clusterId: Long, policyName : String, queryString: Map[String,String])
+                          (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PolicyInstancesDetails]]
+    def abortPolicyInstances(beaconEndpoint : String, clusterId: Long, policyName : String)
+                            (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
   }
 
   trait BeaconEventService extends ClientService {
-    def listEvents(beaconEndpoint : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, Seq[BeaconEventResponse]]]
+    def listEvents(beaconEndpoint : String, clusterId: Long, queryString: Map[String,String])
+                  (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, Seq[BeaconEventResponse]]]
   }
 
   trait BeaconLogService extends ClientService {
-    def listLog(beaconEndpoint : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, BeaconLogResponse]]
+    def listLog(beaconEndpoint : String, clusterId: Long, queryString: Map[String,String])
+               (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconLogResponse]]
   }
 
 }
