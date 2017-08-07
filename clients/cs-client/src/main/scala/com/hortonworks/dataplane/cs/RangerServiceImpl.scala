@@ -30,8 +30,8 @@ class RangerServiceImpl(config: Config)(implicit ws: ClusterWsClient)
     }
   }
 
-  override def getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String, limit: String)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsObject]] = {
-    ws.url(s"$url/cluster/$clusterId/ranger/audit/$dbName/$tableName?limit=$limit&offset=$offset")
+  override def getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String, limit: String, accessType:String, accessResult:String)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsObject]] = {
+    ws.url(s"$url/cluster/$clusterId/ranger/audit/$dbName/$tableName?limit=$limit&offset=$offset&accessType=$accessType&accessResult=$accessResult")
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
       .get()

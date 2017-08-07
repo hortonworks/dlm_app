@@ -1,3 +1,10 @@
+.filterCont{
+	text-align:right;
+	margin-top:-56px;
+	margin-bottom:26px;
+}
+
+
 .infoNotAvailable, .loading{
 	text-align : center;
 }
@@ -32,4 +39,12 @@
 
 .tableCell.eventTime {
 	width:18%;
+}
+
+select {
+  font-size: 1em;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid rgb(221, 221, 221);
+  border-radius: 5px;
 }
