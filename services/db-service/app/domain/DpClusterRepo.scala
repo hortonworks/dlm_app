@@ -115,18 +115,18 @@ class DpClusterRepo @Inject()(
       extends Table[Location](tag, Some("dataplane"), "locations") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
-    def country = column[String]("country")
+    def city = column[String]("city")
 
     def province = column[String]("province")
 
-    def city = column[String]("city")
+    def country = column[String]("country")
 
     def latitude = column[Float]("latitude")
 
     def longitude = column[Float]("longitude")
 
     def * =
-      (id, country, province, city, latitude, longitude) <> ((Location.apply _).tupled, Location.unapply)
+      (id, city, province, country, latitude, longitude) <> ((Location.apply _).tupled, Location.unapply)
   }
 
   final class DpClustersTable(tag: Tag)
