@@ -10,11 +10,12 @@
   border: 1px solid $logo-background;
   white-space: nowrap;
   padding-left: 25px;
+  margin-bottom: 5px;
 
   & > img {
-    width: 30px;
+    width: 25px;
     float: left;
-    margin-top: 10px;
+    margin-top: 15px;
     cursor: pointer;
   }
 
@@ -41,8 +42,8 @@
   width: $side-nav-width;
 
   .sidenav-item {
-    padding: 15px 5px 15px 25px;
-    font-size: 16px;
+    padding: 11px 5px 11px 25px;
+    font-size: 14px;
     text-decoration: none;
     font-weight: normal;
     display: block;
@@ -57,6 +58,7 @@
     }
 
     i {
+      font-size: 16px;
       margin-right: 8px;
     }
   }
@@ -78,14 +80,15 @@
   }
 
   .sidenav-item {
-    padding:15px;
+    padding:15px 15px 16px 15px;
+
     &.active:before {
       margin-left: -15px;
       margin-top: 5px;
     }
 
     i {
-      font-size: 24px;
+      font-size: 19px;
       margin-right: 8px;
     }
   }
@@ -106,8 +109,8 @@
 .expander {
   width: 100%;
   background: $pickled-bluewood;
-  height: 42px;
-  line-height: 42px;
+  height: 48px;
+  line-height: 48px;
   text-align: center;
   color: $forest-green-1;
   font-size: 16px;
@@ -120,7 +123,7 @@
 
 .suit-navigation {
   position: absolute;
-  top: 55px;
+  top: $layout-header-desktop-row-height;
   left: 0;
   margin: 0;
   padding: 40px 40px 20px;
@@ -130,7 +133,6 @@
   box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
   z-index: 100;
   visibility: hidden;
- // width: 400px;
   display: flex;
   justify-content: space-between;
 

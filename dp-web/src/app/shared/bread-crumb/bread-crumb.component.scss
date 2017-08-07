@@ -1,32 +1,23 @@
 @import "../../../styles/variables";
 
 .breadcrumb {
-  padding-left: 20px;
+  padding-left: 25px;
 
   .mdl-navigation__link {
     cursor: pointer;
     position: relative;
-    height: 39px;
-    font-size: 16px;
-    color: $eastern-blue !important;
-    padding-right: 18px;
+    font-size: 20px;
+    color: $shuttle-gray-1 !important;
+    padding-right: 5px;
 
-    &:after {
-      font-family: FontAwesome;
-      content: "/\A0";
-      margin-left: 5px;
-      font-size: 23px;
-      position: absolute;
-      margin-top: 15px;
-      color: $dove-gray;
+    .slash {
+      font-size: 20px;
+      color: $iron;
+      padding-right: 5px;
     }
   }
 
   .mdl-navigation__link:last-of-type {
-    color: $dove-gray !important;
-
-    &:after {
-      content: "";
-    }
+    color: $tuna-1 !important;
   }
 }
