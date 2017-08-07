@@ -1,8 +1,8 @@
 <div class="notification-bar line-height-1-5" *ngIf="showNotification">
   <i class="fa fa-times-circle red margin-right-10 text-medium"></i>
   <span class="text-medium red">{{"pages.onboard.configure.labels.configError" | translate}}</span>
-  <i class="fa fa-remove pull-right margin-all-3 pointer" (click)="closeNotification()"></i>
-  <ul>
+  <i id="notification-close" class="fa fa-remove pull-right margin-all-3 pointer" (click)="closeNotification()"></i>
+  <ul id="errors">
     <li class="red text-small" *ngFor="let message of notificationMessages">{{message}}</li>
   </ul>
   </div>
@@ -60,8 +60,8 @@
       </div>
     </div>
     <div class="margin-top-30">
-      <button name="save" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"common.save" | translate}}</button>
-      <button name="cancel" class="mdl-button btn-hwx-secondary" (click)="back()">{{"common.cancel" | translate}}</button>
+      <button id="save-btn" name="save" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"common.save" | translate}}</button>
+      <button id="cancel-btn" name="cancel" class="mdl-button btn-hwx-secondary" (click)="back()">{{"common.cancel" | translate}}</button>
     </div>
   </form>
 </div>
