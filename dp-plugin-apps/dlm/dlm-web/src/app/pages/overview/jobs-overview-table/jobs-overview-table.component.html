@@ -34,7 +34,7 @@
 
 <ng-template #verbStatusCellTemplate let-job="value" let-policy="row">
   <dlm-transferred-column
-    *ngIf="job.status === JOB_STATUS.RUNNING && job.trackingInfo?.completedMapTasks; else verbTpl"
+    *ngIf="job.status === JOB_STATUS.RUNNING; else verbTpl"
     [trackingInfo]="job.trackingInfo">
   </dlm-transferred-column>
   <ng-template #verbTpl>
