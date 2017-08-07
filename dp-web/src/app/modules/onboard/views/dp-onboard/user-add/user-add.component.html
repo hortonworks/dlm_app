@@ -16,7 +16,7 @@
   </div>
   <div class="dp-input">
     <label class="text-medium">{{"pages.onboard.adduser.labels.users" | translate}}</label>
-    <tagging-widget id="tags" [tags]="users" [clearOnSearch]="true"
+    <tagging-widget id="users-tags" [tags]="users" [clearOnSearch]="true"
     [availableTags]="availableUsers"
     [clearOnSearch]="true"
     (textChange)="onUserSearchChange($event)"
@@ -26,7 +26,7 @@
   </div>
   <div class="dp-input">
     <label class="text-medium">{{"pages.onboard.adduser.labels.groups" | translate}}</label>
-    <tagging-widget id="tags" [tags]="groups" [clearOnSearch]="true"
+    <tagging-widget id="groups-tags" [tags]="groups" [clearOnSearch]="true"
     [availableTags]="availableGroups"
     [clearOnSearch]="true"
     (textChange)="onGroupSearchChange($event)"
@@ -35,7 +35,7 @@
     [restrictFreeText]="true"></tagging-widget>
   </div>
   <div class="margin-top-30">
-    <button class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"pages.onboard.adduser.labels.saveAndLogin" | translate}}</button>
-    <button class="mdl-button btn-hwx-secondary" (click)="back()">{{"common.back" | translate}}</button>
+    <button id="save-btn" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"pages.onboard.adduser.labels.saveAndLogin" | translate}}</button>
+    <button id="back-btn" class="mdl-button btn-hwx-secondary" (click)="back()">{{"common.back" | translate}}</button>
   </div>
 </div>

@@ -1,18 +1,18 @@
 <div class="page-container">
   <div *ngIf="showNotification">
-    <div class="notification-bar">
+    <div id="success-notification-bar" class="notification-bar">
       <i class="fa fa-check-circle pull-left"></i>
-      <i class="fa fa-remove pull-right" (click)="closeNotification()"></i>
-      <div class="text-medium">{{"pages.infra.labels.clusterAddSuccess" | translate}}</div>
-      <div class="text-small-1">{{"pages.infra.description.clusterAddSuccess" | translate}} </div>
+      <i id="success-close" class="fa fa-remove pull-right" (click)="closeNotification()"></i>
+      <div id="success-heading" class="text-medium">{{"pages.infra.labels.clusterAddSuccess" | translate}}</div>
+      <div id="success-message" class="text-small-1">{{"pages.infra.description.clusterAddSuccess" | translate}} </div>
     </div>
   </div>
   <div *ngIf="showError">
-    <div class="error-notification-bar">
+    <div id="error-notification-bar" class="error-notification-bar">
       <i class="fa fa-times-circle pull-left"></i>
-      <i class="fa fa-remove pull-right" (click)="closeError()"></i>
-      <div class="text-medium">{{"common.failed" | translate}}</div>
-      <div class="text-small-1">{{errorMessage}} </div>
+      <i id="e" class="fa fa-remove pull-right" (click)="closeError()"></i>
+      <div id="error-header" class="text-medium">{{"common.failed" | translate}}</div>
+      <div id="error-message" class="text-small-1">{{errorMessage}} </div>
     </div>
   </div>
 
@@ -27,11 +27,11 @@
     </div>
 
     <form #clusterForm="ngForm">
-      <div  class="form-group" #ambariInput>
+      <div class="form-group" #ambariInput>
         <label class="required">{{"pages.infra.labels.ambariUrl" | translate}}</label>
         <div class="input-group">
-          <input required class="dp-input-url" placeholder="eg. http://10.10.10.10:8080" name="url" type="text" [(ngModel)]="cluster.ambariurl" (keypress)="onKeyPress($event)"/>
-          <button class="mdl-button btn-hwx-primary" type="button" (click)="getClusterInfo($event)">
+          <input required class="dp-input-url" placeholder="eg. http://10.10.10.10:8080" name="ambari-url" type="text" [(ngModel)]="cluster.ambariurl" (keypress)="onKeyPress($event)"/>
+          <button id="go-btn" class="mdl-button btn-hwx-primary" type="button" (click)="getClusterInfo($event)">
             <span *ngIf="_isClusterValidateInProgress"><i class="fa fa-spinner fa-spin"></i></span>
             <span *ngIf="!_isClusterValidateInProgress">{{"common.go" | translate}}</span>
           </button>
@@ -125,9 +125,9 @@
       </div>
     </form>
     <div class="button-container"  *ngIf="showClusterDetails">
-      <button class="mdl-button btn-hwx-primary" (click)="onCreate($event)">{{"common.add" | translate}}</button>
-      <button class="mdl-button btn-hwx-primary" (click)="onCreateAndAdd($event)">{{"common.addAndNew" | translate}}</button>
-      <button class="mdl-button btn-hwx-default" (click)="onCancel($event)">{{"common.cancel" | translate}}</button>
+      <button id="add-btn" class="mdl-button btn-hwx-primary" (click)="onCreate($event)">{{"common.add" | translate}}</button>
+      <button id="add-and-new-btn" class="mdl-button btn-hwx-primary" (click)="onCreateAndAdd($event)">{{"common.addAndNew" | translate}}</button>
+      <button id="cancel-btn" class="mdl-button btn-hwx-default" (click)="onCancel($event)">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

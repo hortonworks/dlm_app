@@ -4,6 +4,17 @@ input[type="text"].dp-input {
   width: 250px;
 }
 
+.title-pane {
+  padding: 25px
+}
+
+.content-pane {
+  margin: 0px 25px;
+  padding: 25px;
+  background-color: white;
+  height: 570px
+}
+
 .validation-error {
   width: 36px;
   background-color: $roman-red;
@@ -30,8 +41,7 @@ input[type="text"].dp-input {
   padding-top: 10px;
 }
 
-
-.padding-left-12{
+.padding-left-12 {
   padding-left: 12px;
 }
 
@@ -48,5 +58,8 @@ input[type="text"].dp-input {
   .fa-times-circle {
     font-size: 24px;
     color: $roman-red;
+  }
+  .hwx-desc {
+    margin: 0;
   }
 }

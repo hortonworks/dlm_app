@@ -24,7 +24,7 @@
         <div *ngFor="let service of availableServices; let i = index" class="service-item pull-left">
           <div class="logo-wrapper borderBox" title="{{ service.skuName }}">
             <img  class="logo-img" [attr.src]="'../../../assets/images/' + service.skuName +'-logo-blue.png'" alt=""/>
-            <button type="button" class="btn-hwx-primary action-btn" (click)="enableService(service)">{{"pages.services.labels.enable" | translate}}</button>
+            <button id="enable-{{service.skuName}}-btn" type="button" class="btn-hwx-primary action-btn" (click)="enableService(service)">{{"pages.services.labels.enable" | translate}}</button>
           </div>
           <div class="service-name hwx-desc"> {{ service.sku.description }}</div>
           <div class="version hwx-inline-desc">v1.0.0</div>
