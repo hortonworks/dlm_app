@@ -221,6 +221,8 @@ object Webservice {
 
     def addConfig(dpConfig: DpConfig): Future[Either[Errors, DpConfig]]
 
+    def setConfig(key: String,value:String): Future[Either[Errors, DpConfig]]
+
   }
 
   trait LdapConfigService extends DbClientService{

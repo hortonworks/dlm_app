@@ -125,6 +125,13 @@ class Module extends AbstractModule {
 
   @Provides
   @Singleton
+  @Named("configService")
+  def provideConfigService(implicit ws: WSClient, configuration: Configuration): ConfigService = {
+    new ConfigServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
   @Named("ldapConfigService")
   def provideLdapConfigServic(implicit ws: WSClient, configuration: Configuration): LdapConfigService = {
     new LdapConfigServiceImpl(configuration.underlying)

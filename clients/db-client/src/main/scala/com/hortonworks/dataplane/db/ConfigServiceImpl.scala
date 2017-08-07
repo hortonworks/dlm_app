@@ -1,5 +1,7 @@
 package com.hortonworks.dataplane.db
 
+import javax.inject.Singleton
+
 import com.hortonworks.dataplane.commons.domain.Entities.{DpConfig, Errors}
 import com.hortonworks.dataplane.db.Webservice.ConfigService
 import com.typesafe.config.Config
@@ -10,6 +12,7 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+@Singleton
 class ConfigServiceImpl(config: Config)(implicit ws: WSClient)
     extends ConfigService {
 
@@ -37,6 +40,13 @@ class ConfigServiceImpl(config: Config)(implicit ws: WSClient)
     ws.url(s"$url/configurations")
       .withHeaders("Accept" -> "application/json")
       .post(Json.toJson(dpConfig))
+      .map(mapToConfigWithError)
+  }
+  override def setConfig(key: String,value:String): Future[Either[Errors, DpConfig]] = {
+    val dpConfig=DpConfig(id=None,configKey = key,configValue = value) //Note if configkey is not present it will insert.
+    ws.url(s"$url/configurations")
+      .withHeaders("Accept" -> "application/json")
+      .put(Json.toJson(dpConfig))
       .map(mapToConfigWithError)
   }
 
