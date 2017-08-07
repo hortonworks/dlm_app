@@ -30,6 +30,7 @@ export class LakesComponent implements OnInit {
   mapSet = new Map();
   health = new Map();
   mapSize: MapSize;
+  syncedString =  "SYNCED";
 
   constructor(private router: Router,
               private lakeService: LakeService,
@@ -39,34 +40,51 @@ export class LakesComponent implements OnInit {
 
   ngOnInit() {
     this.mapSize = MapSize.EXTRALARGE;
+    let unSyncedLakes = [];
     this.lakeService.listWithClusters()
       .subscribe(lakes => {
         this.lakes = lakes;
         this.lakes.forEach((lake) => {
           let locationObserver = Observable.create();
-          if (lake.data.location && lake.clusters && lake.clusters.length > 0) {
+          if (lake.data.state === this.syncedString) {
             locationObserver = this.getLocationInfoWithStatus(lake.data.location, lake.clusters[0].id, lake.data.id);
           } else {
+            unSyncedLakes.push(lake);
             locationObserver = this.getLocationInfo(lake.data.location);
           }
           this.updateHealth(lake, locationObserver);
           /***** MOCK CONNECTIONS ****/
 
-           // locationObserver.subscribe(locationInfo=> {
-           //   this.lakeService.getPairsMock(lakes, lake.data.id).subscribe((pairedLake)=>{
-           //     if(pairedLake !== null){
-           //        this.getLocationInfoWithStatus(pairedLake.data.location, pairedLake.clusters[0].id).subscribe((pairedLocationInfo=>{
-           //           this.mapData.push({start:this.extractMapPoints(locationInfo), end:this.extractMapPoints(pairedLocationInfo)});
-           //          this.mapData = this.mapData.slice();
-           //        }));
-           //     }else{
-           //         this.mapData.push({start:this.extractMapPoints(locationInfo)});
-           //        this.mapData = this.mapData.slice();
-           //     }
-           //   });
-           // });
+          // locationObserver.subscribe(locationInfo=> {
+          //   this.lakeService.getPairsMock(lakes, lake.data.id).subscribe((pairedLake)=>{
+          //     if(pairedLake !== null){
+          //        this.getLocationInfoWithStatus(pairedLake.data.location, pairedLake.clusters[0].id).subscribe((pairedLocationInfo=>{
+          //           this.mapData.push({start:this.extractMapPoints(locationInfo), end:this.extractMapPoints(pairedLocationInfo)});
+          //          this.mapData = this.mapData.slice();
+          //        }));
+          //     }else{
+          //         this.mapData.push({start:this.extractMapPoints(locationInfo)});
+          //        this.mapData = this.mapData.slice();
+          //     }
+          //   });
+          // });
         });
+        this.updateUnSyncedLakes(unSyncedLakes);
       });
+  }
+
+  updateUnSyncedLakes(unSyncedLakes){
+    let callCounts = 10;
+    let delayInterval = 2000;
+    unSyncedLakes.forEach((unSyncedlake) =>{
+      this.lakeService.retrieve(unSyncedlake.data.id).delay(delayInterval).repeat(callCounts).skipWhile((lake) => lake.state !== this.syncedString).first().subscribe(lake =>{
+        this.clusterService.listByLakeId({lakeId: lake.id}).subscribe(clusters=> {
+          unSyncedlake.clusters = clusters;
+          this.updateHealth(unSyncedlake, this.getLocationInfoWithStatus(unSyncedlake.data.location, unSyncedlake.clusters[0].id, unSyncedlake.data.id));
+        });
+
+      });
+    });
   }
 
   updateHealth(lake, locationObserver: Observable<any>){
@@ -123,13 +141,12 @@ export class LakesComponent implements OnInit {
 
   onRefresh(lakeId){
     let lakeInfo = this.lakes.find(lake => lake.data.id === lakeId);
-    if(lakeInfo.clusters && lakeInfo.clusters.length > 0){
+    if(lakeInfo.data.state === this.syncedString){
       this.updateHealth(lakeInfo, this.getLocationInfoWithStatus(lakeInfo.data.location, lakeInfo.clusters[0].id, lakeId));
     }else{
-      this.clusterService.listByLakeId({lakeId: lakeInfo.data.id}).subscribe(clusters=> {
-        lakeInfo.clusters = clusters;
-        this.updateHealth(lakeInfo, this.getLocationInfoWithStatus(lakeInfo.data.location, lakeInfo.clusters[0].id, lakeId));
-      });
+      let unSyncedLakes = [];
+      unSyncedLakes.push(lakeInfo);
+      this.updateUnSyncedLakes(unSyncedLakes);
     }
   }
 
