@@ -9,8 +9,9 @@
   background: $logo-background;
   border: 1px solid $logo-background;
   white-space: nowrap;
-  padding-left: 25px;
+  padding-left: 10px;
   margin-bottom: 5px;
+  cursor: pointer;
 
   & > img {
     width: 25px;
@@ -23,6 +24,38 @@
     color: $white;
     font-size: 20px;
     padding-left: 10px;
+  }
+
+  .persona-name {
+    text-transform: uppercase;
+    font-size: 15px;
+
+    &:after {
+      font-family: "FontAwesome";
+      font-style: normal;
+      font-size: 15px;
+      content: '\f078';
+      margin-left: 10px;
+      display: inline-block;
+      color: $fruit-salad;
+    }
+  }
+
+  .persona-drop-down-small {
+    display: none;
+
+    &:after {
+      font-family: "FontAwesome";
+      font-style: normal;
+      font-size: 12px;
+      content: '\f078';
+      margin-left: 5px;
+      display: inline-block;
+      color: $fruit-salad;
+      position: absolute;
+      left: 28px;
+      top: -20px;
+    }
   }
 
   &.minimised {
@@ -42,7 +75,7 @@
   width: $side-nav-width;
 
   .sidenav-item {
-    padding: 11px 5px 11px 25px;
+    padding: 11px 5px 11px 20px;
     font-size: 14px;
     text-decoration: none;
     font-weight: normal;
@@ -68,7 +101,8 @@
       font-family: FontAwesome;
       content: "\F0DA";
       color: $fruit-salad;
-      margin-left: -25px;
+      margin-left: -20px;
+      font-size: 18px;
       position: absolute;
     }
   }
@@ -104,11 +138,15 @@
   .persona-name {
     display: none;
   }
+
+  .persona-drop-down-small {
+    display: block;
+  }
 }
 
 .expander {
   width: 100%;
-  background: $pickled-bluewood;
+  background: $logo-background;
   height: 48px;
   line-height: 48px;
   text-align: center;
