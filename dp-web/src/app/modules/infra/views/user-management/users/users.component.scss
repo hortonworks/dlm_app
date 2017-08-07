@@ -1,13 +1,17 @@
 @import "../../../../../../styles/variables";
 
 .container {
-  padding: 35px 25px;
+  padding: 0px 25px;
+}
+
+.padding-top-10{
+  padding-top: 10px;
 }
 
 .table-container {
   padding: 10px 20px 20px;
   background: $white;
-  min-height: 500px;
+  min-height: 530px;
 }
 
 .margin-top-bottom-20 {
@@ -25,26 +29,25 @@
   position: relative;
   display: inline-block;
   margin-right: 6px;
-  width: 180px;
+  width: 250px;
   box-sizing: border-box;
   input {
     width: 100%;
-    padding: 8px 5px 10px 30px;
     box-sizing: border-box;
+  }
+  .dp-input__icon {
+    position: absolute;
+    margin-top: -10%;
+    margin-left: 90%;
+    color: $dove-gray;
+    font-size: 14px;
   }
 }
 
 .action-bar {
-  padding: 0px 0px 25px;
-  width: auto;
+  padding: 7px 0px
 }
 
-.dp-input__icon {
-  position: absolute;
-  left: 10px;
-  bottom: 10px;
-  color: $shuttle-gray;
-}
 dp-dropdown {
   display: inline-block;
   padding-right: 5px !important;

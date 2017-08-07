@@ -230,6 +230,19 @@ stop_knox() {
     stop_consul
 }
 
+load_images() {
+    LIB_DIR=../lib
+    if [ -d "$LIB_DIR" ]; then
+        for imgFileName in $LIB_DIR/*.tar; do
+            echo "Loading $imgFileName"
+            docker load --input $imgFileName
+        done
+        echo "All done!"
+    else
+        echo "$LIB_DIR directory does not exist."
+    fi
+}
+
 init_all() {
     init_db
     migrate_schema
@@ -293,6 +306,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them. Needs to start from init db again"
     printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox and Consul containers and remove them. Needs to start from init knox again"
     printf "%-${tabspace}s:%s\n" "destroy --all" "Kill all containers and remove them. Needs to start from init again"
+    printf "%-${tabspace}s:%s\n" "load" "Load all images from lib directory into docker"
     printf "%-${tabspace}s:%s\n" "version" "Print the version of dataplane"
 }
 
@@ -367,6 +381,9 @@ else
                  ;;
              esac
              ;;
+        load)
+            load_images
+            ;;
         version)
             print_version
             ;;

@@ -3,12 +3,16 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {GroupService} from '../../../../../services/group.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Group, GroupList} from '../../../../../models/group';
+import {TabStyleType} from '../../../../../shared/tabs/tabs.component';
 @Component({
   selector: 'dp-groups',
   templateUrl: './groups.component.html',
   styleUrls: ['./groups.component.scss']
 })
 export class GroupsComponent implements OnInit {
+
+  tabType = TabStyleType;
+  tabs = UserMgmtTabs;
 
   groups: Group[] = [];
   offset = 0;
@@ -59,6 +63,12 @@ export class GroupsComponent implements OnInit {
     }
   }
 
+  switchView(tab) {
+    if (tab === UserMgmtTabs.USERS) {
+      this.router.navigate(['/infra/usermgmt/users']);
+    }
+  }
+
   get start() {
     return this.offset + 1;
   }
@@ -74,5 +84,8 @@ export class GroupsComponent implements OnInit {
     this.getGroups();
   }
 
+}
 
+export enum UserMgmtTabs {
+  USERS, GROUPS
 }

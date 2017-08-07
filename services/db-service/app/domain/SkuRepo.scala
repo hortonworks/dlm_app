@@ -30,6 +30,10 @@ class SkuRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) 
     db.run(Skus.filter(_.id === skuId).result.headOption)
   }
 
+  def findByName(skuName: String) :Future[Option[Sku]] = {
+    db.run(Skus.filter(_.name === skuName).result.headOption)
+  }
+
   def deleteById(skuId: Long): Future[Int] = {
     db.run(Skus.filter(_.id === skuId).delete)
   }

@@ -67,7 +67,7 @@ GET           /api/assets/typeDefs/:clusterId/:defType               controllers
 GET           /api/assets/lineage/:clusterId/:atlasGuid              controllers.QueryAttributes.getLineage(clusterId: String, atlasGuid: String)
 
 #Ranger
-GET           /api/ranger/audit/:clusterId/:dbName/:tableName        controllers.RangerAttributes.getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String ?= "0", limit:String ?= "20")
+GET           /api/ranger/audit/:clusterId/:dbName/:tableName        controllers.RangerAttributes.getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String ?= "0", limit:String ?= "20", accessType:String ?="", accessResult:String ?="")
 
 #LDAP
 POST          /api/knox/validate                                     controllers.KnoxConfig.validate
@@ -114,3 +114,10 @@ GET           /api/workspaces/:id/assets                             controllers
 POST          /api/workspaces/notebooks                              controllers.NotebookWorkspaces.add
 DELETE        /api/workspaces/notebooks/:id                          controllers.NotebookWorkspaces.delete(id:String)
 GET           /api/workspaces/:id/notebooks                          controllers.NotebookWorkspaces.getNotebooks(id:Long)
+
+#services
+GET           /api/services                                  controllers.ServicesManager.getServices
+GET           /api/services/byName                           controllers.ServicesManager.getSkuByName
+GET           /api/services/enabled                          controllers.ServicesManager.getEnabledServices
+POST          /api/services/verifyCode                       controllers.ServicesManager.verifySmartSense
+POST          /api/services/enable                           controllers.ServicesManager.enableService

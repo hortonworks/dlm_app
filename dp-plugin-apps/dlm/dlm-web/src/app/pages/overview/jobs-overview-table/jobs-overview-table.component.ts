@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 import {
   Component, OnInit, Output, ViewChild, TemplateRef, OnDestroy, ViewEncapsulation, EventEmitter, HostBinding
 } from '@angular/core';
@@ -81,7 +90,10 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
         cellClass: 'text-cell',
         headerClass: 'text-header',
         cellTemplate: this.verbStatusCellTemplate,
-        name: this.translateColumn('job_status')
+        name: this.translateColumn('job_status'),
+        comparator(job1, job2) {
+          return job1.status > job2.status ? 1 : -1;
+        }
       },
       {prop: 'sourceCluster', name: this.translateColumn('source_cluster'), cellTemplate: this.clusterNameCellRef},
       {...TableComponent.makeFixedWith(20), name: '', cellTemplate: this.destinationIconCellRef},
@@ -94,13 +106,14 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
         name: this.t.instant('common.policy'),
         cellTemplate: this.policyNameCellTemplate
       },
-      {cellTemplate: this.prevJobsRef, name: this.translateColumn('last_ten_jobs'), prop: 'lastTenJobs'},
+      {cellTemplate: this.prevJobsRef, name: this.translateColumn('last_ten_jobs'), prop: 'lastTenJobs', sortable: false},
       {
         prop: 'lastJobResource.trackingInfo',
         cellTemplate: this.transferredFormattedTemplate,
         name: this.translateColumn('transferred'),
         cellClass: 'date-cell',
-        headerClass: 'date-header'
+        headerClass: 'date-header',
+        sortable: false
       },
       {
         prop: 'lastJobResource.trackingInfo.timeTaken',
