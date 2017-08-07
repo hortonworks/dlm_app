@@ -122,12 +122,6 @@ export class DlmComponent implements OnDestroy, OnInit {
         './policies',
         'navigation-icon fa fa-th-list',
         'go-to-policies'
-      ),
-      new MenuItem(
-        t.instant('sidenav.menuItem.help'),
-        './help',
-        'navigation-icon fa fa-info-circle',
-        'go-to-help'
       )
     ];
     this.events$ = store.select(getAllEvents);

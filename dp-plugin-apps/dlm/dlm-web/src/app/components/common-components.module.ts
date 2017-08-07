@@ -42,6 +42,7 @@ import { MapLegendComponent } from './map/map-legend/map-legend.component';
 import { MapLegendContainerComponent } from './map/map-legend-container/map-legend-container.component';
 import { ClusterStatusIconComponent } from './cluster-status-icon/cluster-status-icon.component';
 import { BeaconValidityComponent } from './messages/beacon-validity/beacon-validity.component';
+import { HelpLinkComponent } from './help-link/help-link.component';
 
 @NgModule({
   imports: [
@@ -87,7 +88,8 @@ import { BeaconValidityComponent } from './messages/beacon-validity/beacon-valid
     MapLegendComponent,
     MapLegendContainerComponent,
     ClusterStatusIconComponent,
-    BeaconValidityComponent
+    BeaconValidityComponent,
+    HelpLinkComponent
   ],
   exports: [
     CardComponent,
@@ -118,7 +120,8 @@ import { BeaconValidityComponent } from './messages/beacon-validity/beacon-valid
     MapLegendComponent,
     MapLegendContainerComponent,
     ClusterStatusIconComponent,
-    BeaconValidityComponent
+    BeaconValidityComponent,
+    HelpLinkComponent
   ]
 })
 export class CommonComponentsModule {}

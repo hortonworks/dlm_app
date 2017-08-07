@@ -49,8 +49,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   private navbarCollapse$: Observable<boolean>;
   private navbarCollapseSubscription: Subscription;
 
-  constructor(navbar: ElementRef,
-              private navbarService: NavbarService) {
+  constructor(navbar: ElementRef, private navbarService: NavbarService) {
     this.navbar = navbar.nativeElement;
     this.navbarCollapse$ = navbarService.isCollapsed;
     this.navbarCollapseSubscription = this.navbarCollapse$
@@ -103,5 +102,17 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.navbarCollapseSubscription) {
       this.navbarCollapseSubscription.unsubscribe();
     }
+  }
+
+  /**
+   * Navigation bar handles clicks itself and add class "active" on clicked item
+   * External link should not have class "active", however NavBar doesn't allow ignore clicks for such links
+   */
+  restoreActiveItems() {
+    const activeLink = $('.side-nav-menu .active');
+    setTimeout(() => {
+      $('.side-nav-menu .active').removeClass('active');
+      activeLink.addClass('active');
+    }, 50);
   }
 }

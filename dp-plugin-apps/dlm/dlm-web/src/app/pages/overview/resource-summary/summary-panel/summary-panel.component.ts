@@ -16,7 +16,7 @@ import { Component, OnInit, Input } from '@angular/core';
       <div class="panel-heading flex-center">
         <span class="panel-title">
           {{title | translate}}
-          <i class="fa fa-question-circle text-info actionable" *ngIf="hint" [tooltip]="hint | translate"></i>
+          <dlm-help-link [iconHint]="hint"></dlm-help-link>
         </span>
         <span class="total-counter">{{total}}</span>
       </div>
