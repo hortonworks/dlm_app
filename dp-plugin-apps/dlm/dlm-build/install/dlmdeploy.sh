@@ -64,6 +64,19 @@ stop_app() {
     docker stop dlm-app
 }
 
+load_image() {
+    LIB_DIR=../lib
+    if [ -d "$LIB_DIR" ]; then
+        for imgFileName in $LIB_DIR/*.tar; do
+            echo "Loading $imgFileName"
+            docker load --input $imgFileName
+        done
+        echo "All done!"
+    else
+        echo "$LIB_DIR directory does not exist."
+    fi
+}
+
 print_version() {
     if [ -f VERSION ]; then
         cat VERSION
@@ -82,6 +95,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
     printf "%-${tabspace}s:%s\n" "logs" "Log of the application docker containers"
     printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them"
+    printf "%-${tabspace}s:%s\n" "load" "Load image from lib directory into docker"
     printf "%-${tabspace}s:%s\n" "version" "Print the version of dlm"
 }
 
@@ -113,6 +127,9 @@ else
             ;;
         destroy)
             destroy
+            ;;
+        load)
+            load_image
             ;;
         version)
             print_version
