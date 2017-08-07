@@ -29,7 +29,7 @@ push_image() {
 save_image() {
     VERSION=$(get_version)
     IMAGE_NAME=${IMAGE_PREFIX}/${IMG}:${VERSION}
-    echo "Saving ${IMAGE_PREFIX}/${IMG} to ./build/dp-docker/images/${IMG}.tar"
+    echo "Saving ${IMAGE_PREFIX}/${IMG} to ./build/dlm-docker/images/${IMG}.tar"
     mkdir -p ./build/dlm-docker/images
     docker save --output ./build/dlm-docker/images/${IMG}.tar ${IMAGE_NAME}
 }
