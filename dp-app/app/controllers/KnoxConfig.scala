@@ -1,21 +1,28 @@
 package controllers
 
 import com.google.inject.Inject
-import com.hortonworks.dataplane.commons.domain.Entities.{Errors, Error}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.typesafe.scalalogging.Logger
-import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.{
+  Authenticated,
+  AuthenticatedRequest
+}
+import com.hortonworks.dataplane.db.Webservice.ConfigService
 import models.{KnoxConfigInfo, KnoxConfiguration}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, Controller}
 import services.{KnoxConfigurator, LdapService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import com.google.inject.name.Named
 
-class KnoxConfig @Inject()(val ldapService: LdapService,
-                           val knoxConfigurator: KnoxConfigurator,
-                           authenticated: Authenticated)
+class KnoxConfig @Inject()(
+    val ldapService: LdapService,
+    val knoxConfigurator: KnoxConfigurator,
+    @Named("configService") configService: ConfigService,
+    authenticated: Authenticated)
     extends Controller {
   val logger = Logger(classOf[KnoxConfig])
 
@@ -26,12 +33,21 @@ class KnoxConfig @Inject()(val ldapService: LdapService,
       InternalServerError(Json.toJson(errors.errors))
   }
 
+  def getRequestHost(request: AuthenticatedRequest[JsValue]) = {
+    //TODO test with different proxies.
+    request.headers.get("X-Forwarded-Host") match {
+      case Some(host) => host.split(",")(0)
+      case None => request.host
+    }
+  }
+
   def configure = authenticated.async(parse.json) { request =>
     request.body
       .validate[KnoxConfigInfo]
       .map { ldapConfigInfo: KnoxConfigInfo =>
+        val requestHost: String = getRequestHost(request)
         ldapService
-          .configure(ldapConfigInfo)
+          .configure(ldapConfigInfo, requestHost)
           .map {
             case Left(errors) => {
               handleErrors(errors)
@@ -50,24 +66,30 @@ class KnoxConfig @Inject()(val ldapService: LdapService,
   def getLdapConfiguration = Action.async {
     ldapService.getConfiguredLdap.map {
       case Left(errors) => handleErrors(errors)
-      case Right(ldapConfigs) => ldapConfigs.length match {
-        case 0 => Ok(Json.toJson(false))
-        case _ => Ok(Json.toJson(ldapConfigs.head))
-      }
+      case Right(ldapConfigs) =>
+        ldapConfigs.length match {
+          case 0 => Ok(Json.toJson(false))
+          case _ => Ok(Json.toJson(ldapConfigs.head))
+        }
     }
   }
 
   def isKnoxConfigured = Action.async {
     ldapService.getConfiguredLdap.map {
       case Left(errors) => handleErrors(errors)
-      case Right(ldapConfigs) => ldapConfigs.length match {
-        case 0 => Ok(Json.obj(
-          "configured" -> false
-        ))
-        case _ => Ok(Json.obj(
-          "configured" -> true
-        ))
-      }
+      case Right(ldapConfigs) =>
+        ldapConfigs.length match {
+          case 0 =>
+            Ok(
+              Json.obj(
+                "configured" -> false
+              ))
+          case _ =>
+            Ok(
+              Json.obj(
+                "configured" -> true
+              ))
+        }
     }
   }
 
@@ -88,30 +110,35 @@ class KnoxConfig @Inject()(val ldapService: LdapService,
   }
   //Configuration is not authenticated as it will be called fro other service from knox agent
   def configuration = Action.async { req =>
-    ldapService.getConfiguredLdap.map {
-      case Left(errors) => handleErrors(errors)
-      case Right(configurations) =>
-        configurations.headOption match {
-          //TODO Assuming only one valid ldap configuration. impl can chane later.
-          case Some(config) => {
-            if (config.userSearchAttributeName.isEmpty || config.userSearchBase.isEmpty){
+    for {
+      ldapConfig <- ldapService.getConfiguredLdap
+      whitelists <- configService.getConfig("dp.knox.whitelist")
+    } yield {
+      ldapConfig match {
+        case Left(errors) => handleErrors(errors)
+        case Right(ldapConfigs) => {
+          val whiteListdomains: Option[Seq[String]] = whitelists match {
+            case Some(whitelist) => Some(whitelist.configValue.split(","))
+            case None => None
+          }
+          ldapConfigs.headOption match {
+            case None =>
               handleErrors(
                 Errors(
-                  Seq(new Error("Exception", "ldap is not configured correctly"))))
-            }else{
-              val userDnTemplate=s"${config.userSearchAttributeName.get}={0},${config.userSearchBase.get}"
-              val knoxLdapConfig = KnoxConfiguration(ldapUrl = config.ldapUrl,
-                bindDn = config.bindDn,
-                userDnTemplate =Some(userDnTemplate)                                                    )
+                  Seq(new Error("Exception", "No ldap configuration found"))))
+            case Some(ldapConfig) => {
+              val userDnTemplate =
+                s"${ldapConfig.userSearchAttributeName.get}={0},${ldapConfig.userSearchBase.get}"
+              val knoxLdapConfig =
+                KnoxConfiguration(ldapUrl = ldapConfig.ldapUrl,
+                                  bindDn = ldapConfig.bindDn,
+                                  userDnTemplate = Some(userDnTemplate),
+                                  domains = whiteListdomains)
               Ok(Json.toJson(knoxLdapConfig))
             }
           }
-          case None =>
-            handleErrors(
-              Errors(
-                Seq(new Error("Exception", "No ldap configuration found"))))
         }
+      }
     }
   }
-  
 }
