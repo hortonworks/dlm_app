@@ -37,8 +37,13 @@ public class RequestResponseUtils {
   }
 
   public void redirectToLogin() {
-    redirectTo(getRootPath() + "login");
+    redirectTo(getLoginUrl());
   }
+
+  public String getLoginUrl() {
+    return getRootPath() + "login";
+  }
+
   public void redirectToServiceError(){
     redirectTo(getRootPath() + "service-notenabled");
   }

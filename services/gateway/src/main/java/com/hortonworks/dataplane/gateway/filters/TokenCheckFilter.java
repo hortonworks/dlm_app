@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
@@ -55,6 +57,10 @@ public class TokenCheckFilter extends ZuulFilter {
 
   @Autowired
   private ServicesConfigUtil servicesConfigUtil;
+
+  @Value("${metaredirect.forsafari}")
+  private Boolean useMetaRedirectForSafari;
+
 
   private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -109,13 +115,35 @@ public class TokenCheckFilter extends ZuulFilter {
 
   private Object doLogout() {
     //TODO call knox gateway to invalidate token in knox gateway server.
-
+    RequestContext ctx = RequestContext.getCurrentContext();
     cookieManager.deleteKnoxSsoCookie();
     cookieManager.deleteDataplaneJwtCookie();
-    requestResponseUtils.redirectToLogin();
-
+    if (useMetaRedirectForSafari && !isCookieSupportedOnRedirect()){
+      String loginUrl=requestResponseUtils.getLoginUrl();
+      String loginRedirectHtml=utils.getLoginRedirectPage(loginUrl);
+      ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
+      ctx.setResponseBody(loginRedirectHtml);
+      ctx.setSendZuulResponse(false);
+      return null;
+    }else{
+      requestResponseUtils.redirectToLogin();
+      return null;
+    }
     //Note. UI should handle redirect.
-    return null;
+  }
+
+  private boolean isCookieSupportedOnRedirect() {
+    RequestContext ctx = RequestContext.getCurrentContext();
+    String userAgent = ctx.getRequest().getHeader("User-Agent");
+    if (userAgent==null){
+      return false;//Not sure if supported or not as userAgent is null.
+    }else{
+      if (userAgent.contains("Safari") && !(userAgent.contains("Chrome"))){
+        return false;
+      }else{
+        return true;
+      }
+    }
   }
 
   private Object authorizeThroughSsoToken() {
@@ -203,7 +231,7 @@ public class TokenCheckFilter extends ZuulFilter {
     try {
       Optional<UserContext> userContextOptional = jwt.parseJWT(bearerToken.get());
       if (!userContextOptional.isPresent()) {
-        cookieManager.deleteDataplaneJwtCookie();
+        cookieManager.deleteDataplaneJwtCookie();//TODO check for safari.
         return handleUnAuthorized("DP_JWT_COOKIE has expired or not valid");
       } else {
         UserContext userContext = userContextOptional.get();
