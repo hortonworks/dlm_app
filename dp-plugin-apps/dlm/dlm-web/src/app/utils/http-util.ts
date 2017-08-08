@@ -22,3 +22,14 @@ export const getHeaders = (): RequestOptionsArgs => {
     headers: new Headers(headers)
   });
 };
+
+export const getError = (response) => {
+  const message = response.message.replace('Failed with ', '');
+  let error;
+  try {
+    error = JSON.parse(message).error;
+  } catch (e) {
+    error = message;
+  }
+  return error;
+};

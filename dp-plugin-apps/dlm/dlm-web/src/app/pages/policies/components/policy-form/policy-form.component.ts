@@ -89,6 +89,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   _sourceClusterId$: BehaviorSubject<number> = new BehaviorSubject(0);
   freqRequired = {fieldLabel: 'Frequency'};
   freqLimit = {fieldLabel: 'Frequency'};
+  directoryField = {fieldLabel: 'Folder path'};
   get datePickerOptions(): IMyOptions {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);

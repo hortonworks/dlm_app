@@ -38,7 +38,7 @@
           [ngClass]="{'mainmenu-li': true, 'active': false, 'has-sub-menu': hasSubMenu(item)}"
             routerLinkActive="active">
 
-          <a [routerLink]="item.linkURL" *ngIf="!hasSubMenu(item);else has_sub_menu">
+          <a [routerLink]="item.linkURL" *ngIf="!hasSubMenu(item);else has_sub_menu" [attr.qe-attr]="item.qeAttr">
             <span [ngClass]="item.iconClasses"></span>
             <span class="navigation-menu-item">{{item.label}}</span>
           </a>
@@ -60,6 +60,13 @@
               </li>
             </ul>
           </ng-template>
+        </li>
+        <li class="mainmenu-li">
+          <!-- @todo replace with a real url -->
+          <a href="http://dataplane/" qe-attr="go-to-help" target="_blank" (click)="restoreActiveItems()">
+            <span class="navigation-icon fa fa-info-circle"></span>
+            <span class="navigation-menu-item">{{'sidenav.menuItem.help' | translate}}</span>
+          </a>
         </li>
       </ul>
       <ul class="side-nav-footer nav nav-pills nav-stacked">
