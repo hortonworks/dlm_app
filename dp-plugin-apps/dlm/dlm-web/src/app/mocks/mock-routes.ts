@@ -51,5 +51,8 @@ export const routes: MockRoute[] = [
   new MockRoute('clusters/:clusterId/hive/database/testdb/tables', 'hive_testdb_tables.json'),
 
   // Event log for specific policy instance Id and cluster Id
-  new MockRoute('clusters/:clusterId/logs', 'event_log.json')
+  new MockRoute('clusters/:clusterId/logs', 'event_log.json'),
+
+  // User Detail
+  new MockRoute('auth/userDetail', 'user_detail.json')
 ];

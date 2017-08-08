@@ -16,4 +16,5 @@ export interface User {
   active: boolean;
   username: string;
   timezone: string;
+  services: string[];
 }
