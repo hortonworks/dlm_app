@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BsDropdownModule, ButtonsModule, TooltipModule, CollapseModule, ProgressbarModule, AlertModule } from 'ng2-bootstrap';
@@ -33,6 +42,7 @@ import { MapLegendComponent } from './map/map-legend/map-legend.component';
 import { MapLegendContainerComponent } from './map/map-legend-container/map-legend-container.component';
 import { ClusterStatusIconComponent } from './cluster-status-icon/cluster-status-icon.component';
 import { BeaconValidityComponent } from './messages/beacon-validity/beacon-validity.component';
+import { HelpLinkComponent } from './help-link/help-link.component';
 
 @NgModule({
   imports: [
@@ -78,7 +88,8 @@ import { BeaconValidityComponent } from './messages/beacon-validity/beacon-valid
     MapLegendComponent,
     MapLegendContainerComponent,
     ClusterStatusIconComponent,
-    BeaconValidityComponent
+    BeaconValidityComponent,
+    HelpLinkComponent
   ],
   exports: [
     CardComponent,
@@ -109,7 +120,8 @@ import { BeaconValidityComponent } from './messages/beacon-validity/beacon-valid
     MapLegendComponent,
     MapLegendContainerComponent,
     ClusterStatusIconComponent,
-    BeaconValidityComponent
+    BeaconValidityComponent,
+    HelpLinkComponent
   ]
 })
 export class CommonComponentsModule {}

@@ -1,3 +1,12 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
 <div class="form-container">
   <form class="basic-form policy-form" [formGroup]="policyForm" (ngSubmit)="handleSubmit(policyForm)">
     <div class="container-fluid">
@@ -59,9 +68,21 @@
               <div class="col-md-12">
                 <dlm-form-field [label]="'page.policies.form.fields.directories' | translate">
                   <input type="text" formField class="form-control" formControlName="directories" [(ngModel)]="selectedHdfsPath"/>
+                  <dlm-field-error *ngIf="policyForm.get('directories').hasError('isFile')">
+                    {{'forms.validation_errors.not_directory' | translate:directoryField}}
+                  </dlm-field-error>
+                  <dlm-field-error *ngIf="policyForm.get('directories').hasError('notExist')">
+                    {{'forms.validation_errors.not_exist_directory' | translate:directoryField}}
+                  </dlm-field-error>
                 </dlm-form-field>
                 <div class="hdfs-browser-container">
-                  <dlm-hdfs-browser [rootPath]="hdfsRootPath" [clusterId]="sourceCluster" (select)="handleHdfsPathChange($event)"></dlm-hdfs-browser>
+                  <dlm-hdfs-browser
+                    formControlName="directories"
+                    [rootPath]="hdfsRootPath"
+                    [clusterId]="sourceCluster"
+                    [selectFiles]="false"
+                    (select)="handleHdfsPathChange($event)"
+                  ></dlm-hdfs-browser>
                 </div>
               </div>
             </div>

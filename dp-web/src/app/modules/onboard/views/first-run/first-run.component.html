@@ -14,16 +14,23 @@
         </div>
       </li>
       <li>
-        <i class="fa fa-cubes pull-left"></i>
+        <i class="fa fa-users pull-left"></i>
         <div>
-          <div class="hwx-subtitle">{{"pages.onboard.labels.addDataset" | translate}}</div>
-          <div class="hwx-desc">{{"pages.onboard.description.addDataset" | translate}}</div>
+          <div class="hwx-subtitle">{{"pages.onboard.labels.manageUsers" | translate}}</div>
+          <div class="hwx-desc">{{"pages.onboard.description.manageUsers" | translate}}</div>
+        </div>
+      </li>
+      <li>
+        <i class="fa fa-cogs pull-left"></i>
+        <div>
+          <div class="hwx-subtitle">{{"pages.onboard.labels.setService" | translate}}</div>
+          <div class="hwx-desc">{{"pages.onboard.description.setService" | translate}}</div>
         </div>
       </li>
     </ul>
 
     <div class="button-container">
-      <a [routerLink]="['/infra/add']"><button class="mdl-button btn-hwx-primary">{{"pages.onboard.labels.startButton" | translate}}</button></a>
+      <a id="get-started-link" [routerLink]="['/infra/add']"><button id="start-btn" class="mdl-button btn-hwx-primary">{{"pages.onboard.labels.startButton" | translate}}</button></a>
     </div>
   </section>
 </div>

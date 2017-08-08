@@ -61,6 +61,8 @@ object Webservice {
 
     def addUserWithGroups(userGroupInfo: UserGroupInfo): Future[Either[Errors,UserGroupInfo]]
 
+    def getUserContext(userName:String): Future[Either[Errors,UserContext]]
+
   }
 
   trait GroupService extends DbClientService {
@@ -219,6 +221,8 @@ object Webservice {
 
     def addConfig(dpConfig: DpConfig): Future[Either[Errors, DpConfig]]
 
+    def setConfig(key: String,value:String): Future[Either[Errors, DpConfig]]
+
   }
 
   trait LdapConfigService extends DbClientService{
@@ -259,5 +263,10 @@ object Webservice {
   trait DataAssetService extends DbClientService {
     def findManagedAssets(clusterId:Long, assets: Seq[String]): Future[Either[Errors, Seq[EntityDatasetRelationship]]]
   }
-
+  trait SkuService extends  DbClientService {
+    def getAllSkus():Future[Either[Errors,Seq[Sku]]]
+    def getSku(name:String): Future[Either[Errors,Sku]]
+    def getEnabledSkus():Future[Either[Errors,Seq[EnabledSku]]]
+    def enableSku(enabledSku: EnabledSku):Future[Either[Errors,EnabledSku]]
+  }
 }

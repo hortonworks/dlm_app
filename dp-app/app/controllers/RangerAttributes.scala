@@ -21,12 +21,12 @@ class RangerAttributes @Inject()(
       val authenticated: Authenticated
 ) extends Controller {
 
-  def getAuditDetails(clusterId: String, dbName: String, tableName: String, offset:String, limit:String) =
+  def getAuditDetails(clusterId: String, dbName: String, tableName: String, offset:String, limit:String, accessType:String, accessResult:String) =
     authenticated.async { req =>
       Logger.info("Received getAuditDetails for entity")
       implicit val token = req.token
       rangerService
-        .getAuditDetails(clusterId, dbName, tableName, offset, limit)
+        .getAuditDetails(clusterId, dbName, tableName, offset, limit, accessType, accessResult)
         .map {
           case Left(errors) => {
             errors.errors.head.code match {

@@ -1,3 +1,12 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
 <dlm-table
   #jobsTable
   [showPageSizeMenu]="showPageSizeMenu"
@@ -25,7 +34,7 @@
 
 <ng-template #verbStatusCellTemplate let-job="value" let-policy="row">
   <dlm-transferred-column
-    *ngIf="job.status === JOB_STATUS.RUNNING && job.trackingInfo?.completedMapTasks; else verbTpl"
+    *ngIf="job.status === JOB_STATUS.RUNNING; else verbTpl"
     [trackingInfo]="job.trackingInfo">
   </dlm-transferred-column>
   <ng-template #verbTpl>

@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 import { Component, Input, ElementRef, OnInit, AfterViewInit, ViewChild, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { NavbarService } from 'services/navbar.service';
 import { Persona } from 'models/header-data';
@@ -40,8 +49,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   private navbarCollapse$: Observable<boolean>;
   private navbarCollapseSubscription: Subscription;
 
-  constructor(navbar: ElementRef,
-              private navbarService: NavbarService) {
+  constructor(navbar: ElementRef, private navbarService: NavbarService) {
     this.navbar = navbar.nativeElement;
     this.navbarCollapse$ = navbarService.isCollapsed;
     this.navbarCollapseSubscription = this.navbarCollapse$
@@ -94,5 +102,17 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.navbarCollapseSubscription) {
       this.navbarCollapseSubscription.unsubscribe();
     }
+  }
+
+  /**
+   * Navigation bar handles clicks itself and add class "active" on clicked item
+   * External link should not have class "active", however NavBar doesn't allow ignore clicks for such links
+   */
+  restoreActiveItems() {
+    const activeLink = $('.side-nav-menu .active');
+    setTimeout(() => {
+      $('.side-nav-menu .active').removeClass('active');
+      activeLink.addClass('active');
+    }, 50);
   }
 }

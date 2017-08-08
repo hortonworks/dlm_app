@@ -1,3 +1,12 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
 <div class="row">
   <div
     [ngClass]="{'navigation-bar': true, 'navigation-bar-fit-height': 'fitHeight'}">
@@ -29,7 +38,7 @@
           [ngClass]="{'mainmenu-li': true, 'active': false, 'has-sub-menu': hasSubMenu(item)}"
             routerLinkActive="active">
 
-          <a [routerLink]="item.linkURL" *ngIf="!hasSubMenu(item);else has_sub_menu">
+          <a [routerLink]="item.linkURL" *ngIf="!hasSubMenu(item);else has_sub_menu" [attr.qe-attr]="item.qeAttr">
             <span [ngClass]="item.iconClasses"></span>
             <span class="navigation-menu-item">{{item.label}}</span>
           </a>
@@ -51,6 +60,13 @@
               </li>
             </ul>
           </ng-template>
+        </li>
+        <li class="mainmenu-li">
+          <!-- @todo replace with a real url -->
+          <a href="http://dataplane/" qe-attr="go-to-help" target="_blank" (click)="restoreActiveItems()">
+            <span class="navigation-icon fa fa-info-circle"></span>
+            <span class="navigation-menu-item">{{'sidenav.menuItem.help' | translate}}</span>
+          </a>
         </li>
       </ul>
       <ul class="side-nav-footer nav nav-pills nav-stacked">

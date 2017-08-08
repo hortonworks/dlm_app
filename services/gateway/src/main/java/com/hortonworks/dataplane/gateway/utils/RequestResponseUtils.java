@@ -6,13 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 @Component
 public class RequestResponseUtils {
   @Autowired
   private KnoxSso knoxSso;
+
+  @Autowired
+  private HostUtils hostUtils;
 
   private void redirectTo(String path) {
     RequestContext ctx = RequestContext.getCurrentContext();
@@ -24,47 +25,10 @@ public class RequestResponseUtils {
   }
 
   private String getRootPath() {
-    if (isRequestFromProxy()) {
+    if (hostUtils.isRequestFromProxy()) {
       return appRootUrl();
     } else {
       return "/";
-    }
-  }
-
-  private boolean isRequestFromProxy() {
-    //currently check ngnix.
-    RequestContext ctx = RequestContext.getCurrentContext();
-    String realHost = ctx.getRequest().getHeader("X-Forwarded-Host");
-    return realHost != null;
-  }
-  private String getRequestPort(){
-    RequestContext ctx = RequestContext.getCurrentContext();
-    if (isRequestFromProxy()){
-      String forwardedPort=ctx.getRequest().getHeader("X-Forwarded-Port");
-      if (forwardedPort==null || forwardedPort.equals("80")){
-        return "";
-      }else{
-        return ":"+forwardedPort;
-      }
-    }else{
-      int serverPort = ctx.getRequest().getServerPort();
-      return ":"+String.valueOf(serverPort==80?"":serverPort);
-    }
-  }
-
-  private String getRequestHost() {
-    RequestContext ctx = RequestContext.getCurrentContext();
-    String realHost = ctx.getRequest().getHeader("X-Forwarded-Host");
-    if (realHost != null) {
-      return realHost;
-    } else {
-      String requestURLStr = ctx.getRequest().getRequestURL().toString();
-      try {
-        URI uri = new URI(requestURLStr);
-        return uri.getHost();
-      } catch (URISyntaxException e) {
-        throw new RuntimeException(e);
-      }
     }
   }
 
@@ -74,6 +38,9 @@ public class RequestResponseUtils {
 
   public void redirectToLogin() {
     redirectTo(getRootPath() + "login");
+  }
+  public void redirectToServiceError(){
+    redirectTo(getRootPath() + "service-notenabled");
   }
 
   public void redirectToKnoxLogin() {
@@ -86,11 +53,11 @@ public class RequestResponseUtils {
   }
 
   private String appRootUrl() {
-    return String.format("http://%s%s/", getRequestHost(),getRequestPort());
+    return String.format("http://%s%s/", hostUtils.getRequestHost(),hostUtils.getRequestPort());
   }
 
   public void redirectToLocalSignin() {
-    if (isRequestFromProxy()) {
+    if (hostUtils.isRequestFromProxy()) {
       redirectTo(getRootPath() + Constants.LOCAL_SIGNIN_PATH);
     } else {
       redirectTo(Constants.LOCAL_SIGNIN_PATH);
@@ -98,7 +65,7 @@ public class RequestResponseUtils {
   }
 
   public String getDomainFromRequest() {
-    return this.getRequestHost();
+    return hostUtils.getRequestHost();
   }
 
   public boolean isLoginPath() {

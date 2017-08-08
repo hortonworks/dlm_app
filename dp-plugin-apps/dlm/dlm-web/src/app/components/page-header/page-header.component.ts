@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 import { Component, OnInit, Input, ViewEncapsulation, HostBinding } from '@angular/core';
 
 @Component({
@@ -12,7 +21,7 @@ import { Component, OnInit, Input, ViewEncapsulation, HostBinding } from '@angul
           <span class="page-title">
             {{title | translate}}
           </span>
-          <i class="fa fa-question-circle help-note" *ngIf="contextMessage" [tooltip]="contextMessage | translate"></i>
+          <dlm-help-link [iconHint]="contextMessage"></dlm-help-link>
         </div>
       </div>
       <div class="row" *ngIf="description">

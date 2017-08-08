@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 import { browser, element, by } from 'protractor';
 
 export class SideNav {
@@ -27,7 +36,7 @@ export class Page {
   getAddButton() {
     return element(by.partialButtonText('Add'));
   }
-  
+
   getDropDownItem(item) {
     return element.all(by.css('.dropdown-menu .dropdown-item')).filter(function(elem) {
       return elem.getText().then( function(text) {
@@ -42,7 +51,7 @@ export class Page {
     const element = this.getDropDownItem(buttonText);
     browser.actions().mouseMove(element).click().perform();
   }
-  
+
   getUrl() {
     return browser.getCurrentUrl();
   }
@@ -78,7 +87,7 @@ export class PoliciesPage extends Page {
     super();
     new SideNav().navigateTo('Policies');
   }
-  
+
   clickAddPolicy() {
     this.clickAddDropdownButton('Policy');
   }

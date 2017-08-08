@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import {FormsModule} from "@angular/forms";
 
 import { routes } from './asset.routes';
 import {AssetViewComponent} from './asset-view/asset-view.component';
@@ -13,14 +14,17 @@ import { AssetAuditView } from './asset-view/asset-audit-view/asset-audit-view.c
 import {LineageModule} from '../../shared/lineage/lineage.module';
 import {AssetService} from '../../services/asset.service';
 import {RangerService} from '../../services/ranger.service';
+import {PaginationModule} from "../../shared/pagination/pagination.module";
 
 @NgModule({
   imports: [
+    FormsModule,
     CommonModule,
     RouterModule.forChild(routes),
     DropdownModule,
     TabsModule,
-    LineageModule
+    LineageModule,
+    PaginationModule
   ],
   declarations: [
     AssetViewComponent,

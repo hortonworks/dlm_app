@@ -28,10 +28,10 @@ class RangerRoute @Inject()(
                            ) extends BaseRoute {
   val rangerAudit =
     path ("cluster" / LongNumber / "ranger" / "audit" / Segment / Segment) { (clusterId, dbName, tableName) =>
-      parameters("limit".as[Int], "offset".as[Int]) { (limit, offset) =>
+      parameters("limit".as[Int], "offset".as[Int], "accessType".as[String], "accessResult".as[String]) { (limit, offset, accessType, accessResult) =>
         get {
-          println(limit, offset)
-          onComplete(requestRangerForAudit(clusterId, dbName, tableName, offset, limit)) {
+          println(limit, offset, accessType, accessResult)
+          onComplete(requestRangerForAudit(clusterId, dbName, tableName, offset, limit, accessType, accessResult)) {
             case Success(res) => complete(success(res.json))
             case Failure(th) => th match {
               case th:ServiceNotFound => complete(StatusCodes.NotFound, errors(th))
@@ -44,14 +44,14 @@ class RangerRoute @Inject()(
     }
 
 
-  private def requestRangerForAudit(clusterId: Long, dbName: String, tableName: String, offset: Long, pageSize: Long) : Future[WSResponse] = {
+  private def requestRangerForAudit(clusterId: Long, dbName: String, tableName: String, offset: Long, pageSize: Long, accessType: String, accessResult:String) : Future[WSResponse] = {
     for {
       service <- getConfigOrThrowException(clusterId)
       url <- getRangerUrlFromConfig(service)
       baseUrls <- extractUrlsWithIp(url, clusterId)
       user <- storageInterface.getConfiguration("dp.ranger.user")
       pass <- storageInterface.getConfiguration("dp.ranger.password")
-      urlToHit <- Future.successful(s"${baseUrls.head}/service/assets/accessAudit?startIndex=${offset}&pageSize=${pageSize}&sortBy=eventTime&resourceType=@table&resourcePath=${dbName}%2F${tableName}")
+      urlToHit <- Future.successful(s"${baseUrls.head}/service/assets/accessAudit?startIndex=${offset}&pageSize=${pageSize}&sortBy=eventTime&resourceType=@table&resourcePath=${dbName}%2F${tableName}&accessType=${accessType}&accessResult=${accessResult}")
       tmp <- Future.successful(println(urlToHit))
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")

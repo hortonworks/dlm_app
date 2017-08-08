@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 import { Component, OnDestroy, OnInit, ViewEncapsulation, isDevMode } from '@angular/core';
 import { MenuItem } from './common/navbar/menu-item';
 import { Store } from '@ngrx/store';
@@ -113,12 +122,6 @@ export class DlmComponent implements OnDestroy, OnInit {
         './policies',
         'navigation-icon fa fa-th-list',
         'go-to-policies'
-      ),
-      new MenuItem(
-        t.instant('sidenav.menuItem.help'),
-        './help',
-        'navigation-icon fa fa-info-circle',
-        'go-to-help'
       )
     ];
     this.events$ = store.select(getAllEvents);
