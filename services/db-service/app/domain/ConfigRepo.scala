@@ -23,6 +23,13 @@ class ConfigRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
   def findByKey(key: String): Future[Option[DpConfig]] = {
     db.run(Configs.filter(_.configKey === key).result.headOption)
   }
+  def update(dpConfig: DpConfig):Future[Int]={
+    db.run (
+      Configs.filter(_.configKey===dpConfig.configKey)
+        .map(r=>(r.configValue,r.active,r.export))
+        .update(dpConfig.configValue,dpConfig.active,dpConfig.export)
+    )
+  }
 
 
   final class Configtable(tag: Tag) extends Table[DpConfig](tag, Some("dataplane"), "configs") {

@@ -2,11 +2,11 @@
   <div class="title-pane clearfix">
     <span class="hwx-title">{{"common.clusters" | translate}}</span>
     <div class="pull-right">
-      <div class="search-input">
-        <input type="text" placeholder="{{'common.search' | translate}}" name="name" id="search" (keyup)="filter($event)" />
-        <i class="fa fa-search dp-input__icon" aria-hidden="true"></i>
-      </div>
-      <button class="mdl-button btn-hwx-primary" [routerLink]="['/infra/add']"> {{"pages.infra.labels.addButton" | translate}} </button>
+        <div class="search-input">
+            <input type="text" placeholder="{{'common.search' | translate}}" name="search-input" id="search" (keyup)="filter($event)" />
+            <i class="fa fa-search dp-input__icon" aria-hidden="true"></i>
+        </div>
+        <button id="add-btn" class="mdl-button btn-hwx-primary" [routerLink]="['/infra/add']"> {{"pages.infra.labels.addButton" | translate}} </button>
     </div>
   </div>
 

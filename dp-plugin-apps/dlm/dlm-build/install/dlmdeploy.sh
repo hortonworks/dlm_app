@@ -1,4 +1,14 @@
 #!/bin/sh
+
+#
+# Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+#
+# Except as expressly permitted in a written agreement between you or your company
+# and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+# reproduction, modification, redistribution, sharing, lending or other exploitation
+# of all or any part of the contents of this software is strictly prohibited.
+#
+
 set -e
 
 DEFAULT_VERSION=0.0.1
@@ -64,6 +74,19 @@ stop_app() {
     docker stop dlm-app
 }
 
+load_image() {
+    LIB_DIR=../lib
+    if [ -d "$LIB_DIR" ]; then
+        for imgFileName in $LIB_DIR/*.tar; do
+            echo "Loading $imgFileName"
+            docker load --input $imgFileName
+        done
+        echo "All done!"
+    else
+        echo "$LIB_DIR directory does not exist."
+    fi
+}
+
 print_version() {
     if [ -f VERSION ]; then
         cat VERSION
@@ -82,6 +105,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
     printf "%-${tabspace}s:%s\n" "logs" "Log of the application docker containers"
     printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them"
+    printf "%-${tabspace}s:%s\n" "load" "Load image from lib directory into docker"
     printf "%-${tabspace}s:%s\n" "version" "Print the version of dlm"
 }
 
@@ -92,7 +116,7 @@ then
 else
     VERSION=$(print_version)
     init_network
-    
+
     case "$1" in
         init)
            init_app
@@ -114,6 +138,9 @@ else
         destroy)
             destroy
             ;;
+        load)
+            load_image
+            ;;
         version)
             print_version
             ;;
@@ -122,4 +149,3 @@ else
             ;;
     esac
 fi
-

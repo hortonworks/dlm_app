@@ -3,20 +3,20 @@
     <div class="hwx-subtitle">
       <span *ngIf="mode === modes.ADD">{{"pages.infra.labels.addUser" | translate}}</span>
       <span *ngIf="mode === modes.EDIT">{{user? user.userName: ''}}</span>
-      <i class="fa fa-remove close-icon" (click)="back()"></i>
+      <i id="back" class="fa fa-remove close-icon" (click)="back()"></i>
     </div>
   </div>
   <div class="slider-container">
     <div class="error-notification-bar" *ngIf="showError">
       <i class="fa fa-times-circle pull-left"></i>
-      <div class="hwx-subtitle">Failed</div>
+      <div class="hwx-desc">{{"common.failed" | translate}}</div>
       <div class="hwx-desc">{{errorMessage}}</div>
     </div>
     <form #addUserForm="ngForm">
       <div *ngIf="mode === modes.ADD">
         <div class="form-group dp-input">
           <label class="required">{{"pages.infra.labels.username" | translate}}</label>
-          <tagging-widget id="tags" class="user-tags"
+          <tagging-widget id="user-tags" class="user-tags"
             [tags]="users"
             [availableTags]="availableUsers"
             [clearOnSearch]="true"
@@ -35,9 +35,9 @@
             [restrictFreeText]="true"
             (textChange)="onRoleSearchChange($event)"
             (onNewSearch)="onNewRoleAddition($event)"></tagging-widget>
-            <i class="fa fa-caret-down drop-down-icon" (click)="showRoleOptions()"></i>
-            <div *ngIf="showRoles" class="option-list">
-              <div *ngFor="let roleOption of allRoles" (click)="onNewRoleAddition(roleOption)">{{roleOption.display}}</div>
+            <i id="roles-dropdown" class="fa fa-caret-down drop-down-icon" (click)="showRoleOptions()"></i>
+            <div id="roles-option-list" *ngIf="showRoles" class="option-list">
+              <div *ngFor="let roleOption of allRoles" id="role-{{roleOption.data}}" (click)="onNewRoleAddition(roleOption)">{{roleOption.display}}</div>
             </div>
         </div>
 
@@ -74,17 +74,17 @@
               [restrictFreeText]="true"
               (textChange)="onRoleSearchChange($event)"
               (onNewSearch)="onRolesEdit($event)"></tagging-widget>
-              <i class="fa fa-caret-down drop-down-icon" (click)="showRoleOptions()"></i>
-              <div *ngIf="showRoles" class="option-list">
-                <div *ngFor="let roleOption of allRoles" (click)="onRolesEdit(roleOption)">{{roleOption.display}}</div>
+              <i id="roles-dropdown" class="fa fa-caret-down drop-down-icon" (click)="showRoleOptions()"></i>
+              <div id="roles-option-list" *ngIf="showRoles" class="option-list">
+                <div *ngFor="let roleOption of allRoles" id="role-{{roleOption.data}}" (click)="onRolesEdit(roleOption)">{{roleOption.display}}</div>
               </div>
           </div>
         </div>
       </div>
     </form>
     <div class="margin-top-20">
-      <button class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">SAVE</button>
-      <button class="mdl-button btn-hwx-default" (click)="back()">CANCEL</button>
+      <button id="save-btn" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"common.save" | translate}}</button>
+      <button id="cancel-btn" class="mdl-button btn-hwx-default" (click)="back()">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

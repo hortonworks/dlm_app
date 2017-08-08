@@ -7,11 +7,11 @@
     <div class="mdl-layout-spacer"></div>
     <div class="padding-top-10">
       <div class="search-input">
-        <input id="search" name="name" type="text" placeholder="{{'common.search' | translate}}" [(ngModel)]="searchTerm"
+        <input id="search" name="search-input" type="text" placeholder="{{'common.search' | translate}}" [(ngModel)]="searchTerm"
         (keyup)="onSearch($event)"/>
         <i aria-hidden="true" class="fa fa-search dp-input__icon"></i>
       </div>
-      <button class="mdl-button btn-hwx-primary" (click)="addUser()"> {{"pages.infra.labels.addUser" | translate}}</button>
+      <button id="add-user" class="mdl-button btn-hwx-primary" (click)="addUser()"> {{"pages.infra.labels.addUser" | translate}}</button>
     </div>
   </div>
   <div style="clear: both"></div>
@@ -25,14 +25,14 @@
       </thead>
       <tbody>
         <tr *ngFor="let user of users">
-          <td class="mdl-data-table__cell--non-numeric key-column" (click)="editUser(user.userName)">{{user.userName}}</td>
+          <td class="mdl-data-table__cell--non-numeric key-column" [attr.id]="'edit_'+user.id" (click)="editUser(user.userName)">{{user.userName}}</td>
           <td class="mdl-data-table__cell--non-numeric">{{rolesMap.get(user.id)}}</td>
           <td class="mdl-data-table__cell--non-numeric">{{user.active? 'Active' : 'Inactive'}}</td>
           <td>
             <button [attr.id]="'dropDown_'+user.id" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
               <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i></button>
             <ul mdl class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+user.id">
-              <li class="mdl-menu__item" (click)="editUser(user.userName)"><i class="fa fa-edit menu-icon"></i>{{"common.edit" | translate}}</li>
+              <li [attr.id]="'edit_'+user.id+'_li'" class="mdl-menu__item" (click)="editUser(user.userName)"><i class="fa fa-edit menu-icon"></i>{{"common.edit" | translate}}</li>
             </ul>
           </td>
         </tr>

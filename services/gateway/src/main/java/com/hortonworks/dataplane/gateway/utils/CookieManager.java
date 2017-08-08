@@ -34,7 +34,8 @@ public class CookieManager {
     return getCookie(knoxSso.getSsoCookieName());
   }
   public void deleteKnoxSsoCookie(){
-    deleteCookie(knoxSso.getSsoCookieName(), knoxSso.getCookieDomain());
+   // deleteCookie(knoxSso.getSsoCookieName(), knoxSso.getCookieDomain());
+    deleteCookie(knoxSso.getSsoCookieName());
   }
 
   public Optional<String> getDataplaneJwtCookie() {
@@ -89,6 +90,14 @@ public class CookieManager {
     if (cookieOpt.isPresent()) {
       Cookie cookie = cookieOpt.get();
       cookie.setDomain(domain);
+      cookie.setPath("/");
+      deleteCookie(cookieOpt.get());
+    }
+  }
+  private void deleteCookie(String cookieName){
+    Optional<Cookie> cookieOpt = getCookie(cookieName);
+    if (cookieOpt.isPresent()) {
+      Cookie cookie = cookieOpt.get();
       cookie.setPath("/");
       deleteCookie(cookieOpt.get());
     }
