@@ -94,4 +94,14 @@ class BeaconClusterServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconC
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
   }
+
+  override def deleteClusterDefinition(beaconEndpoint : String, clusterId: Long, dataCenterClusterName : String) (implicit token:Option[HJwtToken]):
+  Future[Either[BeaconApiErrors, PostActionResponse]] = {
+    ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/delete/$dataCenterClusterName", clusterId, BEACON).withHeaders(token)
+      .withAuth(user, password, WSAuthScheme.BASIC)
+      .withHeaders(httpHeaders.toList: _*)
+      .delete().map(mapToPostActionResponse).recoverWith {
+      case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
+    }
+  }
 }

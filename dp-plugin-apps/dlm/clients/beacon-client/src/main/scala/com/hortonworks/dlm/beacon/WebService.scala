@@ -76,6 +76,8 @@ object WebService {
                          (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconClusterStatusResponse]]
     def createClusterDefinition(beaconEndpoint : String, clusterId: Long, dataCenterClusterName : String, clusterDefinitionRequest : ClusterDefinitionRequest)
                                (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def deleteClusterDefinition(beaconEndpoint : String, clusterId: Long, dataCenterClusterName : String)
+                               (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
   }
 
   trait BeaconPairService extends ClientService {
