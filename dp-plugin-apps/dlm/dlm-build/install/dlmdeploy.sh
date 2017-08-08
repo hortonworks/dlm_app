@@ -87,6 +87,15 @@ load_image() {
     fi
 }
 
+upgrade() {
+    destroy || echo "App is not up."
+
+    # init all but db and knox
+    init_app
+
+    echo "Upgrade complete."
+}
+
 print_version() {
     if [ -f VERSION ]; then
         cat VERSION
@@ -106,6 +115,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "logs" "Log of the application docker containers"
     printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them"
     printf "%-${tabspace}s:%s\n" "load" "Load image from lib directory into docker"
+    printf "%-${tabspace}s:%s\n" "upgrade" "Upgrade existing dlm to current version"
     printf "%-${tabspace}s:%s\n" "version" "Print the version of dlm"
 }
 
@@ -140,6 +150,9 @@ else
             ;;
         load)
             load_image
+            ;;
+        upgrade)
+            upgrade
             ;;
         version)
             print_version
