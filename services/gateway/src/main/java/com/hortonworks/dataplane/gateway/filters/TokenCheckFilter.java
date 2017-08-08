@@ -138,12 +138,12 @@ public class TokenCheckFilter extends ZuulFilter {
     if (userAgent==null){
       return false;//Not sure if supported or not as userAgent is null.
     }else{
-      if (userAgent.contains("Safari") && !(userAgent.contains("Chrome"))){
-        return false;
-      }else{
-        return true;
-      }
+      return isSafariAgent(userAgent)?false:true;
     }
+  }
+
+  private boolean isSafariAgent(String userAgent) {
+    return userAgent.contains("Safari") && !(userAgent.contains("Chrome"));
   }
 
   private Object authorizeThroughSsoToken() {

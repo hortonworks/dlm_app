@@ -83,10 +83,13 @@ public class Utils {
     return String.format("{\"code\": \"USER_NOT_FOUND\", \"message\":  User %s not found in the system.Group not configured.}",subject);
   }
   public String getLoginRedirectPage(String url){
-    String template=getLoginRedirectTemplate();
-    String html=template.replace("${url}",url);
-    loginRedirectCache.putIfAbsent(url,html);
+    String html=loginRedirectCache.computeIfAbsent(url,urlInp-> getLoginRedirectHtml(urlInp));
     return html;
+  }
+
+  private String getLoginRedirectHtml(String url) {
+    String template=getLoginRedirectTemplate();
+    return template.replace("${url}",url);
   }
 
   private String getLoginRedirectTemplate() {
