@@ -101,7 +101,8 @@ DATABASE_PASS="<password>"
 Follow these steps in-order:
 1. Ensure that new versions of all containers have been loaded into docker.
 2. Switch to new `install` directory.
-3. Invoke `./dpdeploy.sh upgrade`.
+3. Load all new docker images using `./dpdeploy.sh load`.
+3. Invoke `./dpdeploy.sh upgrade --from <old_setup_directory>`.
 
 ## Known Issues
 
