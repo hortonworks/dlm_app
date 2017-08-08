@@ -11,7 +11,7 @@ import com.google.inject.name.Named
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, LdapConfiguration}
 import com.hortonworks.dataplane.commons.domain.Ldap.{LdapGroup, LdapSearchResult, LdapUser}
-import com.hortonworks.dataplane.db.Webservice.LdapConfigService
+import com.hortonworks.dataplane.db.Webservice.{ConfigService, LdapConfigService}
 import com.typesafe.scalalogging.Logger
 import models.{CredentialEntry, KnoxConfigInfo}
 
@@ -22,12 +22,13 @@ import scala.util.Left
 @Singleton
 class LdapService @Inject()(
     @Named("ldapConfigService") val ldapConfigService: LdapConfigService,
+    @Named("configService") val configService: ConfigService,
     private val ldapKeyStore: DpKeyStore,
     private val configuration: play.api.Configuration) {
   private val logger = Logger(classOf[LdapService])
   private val USERDN_SUBSTITUTION_TOKEN = "{0}"
 
-  def configure(knoxConf: KnoxConfigInfo): Future[Either[Errors, Boolean]] = {
+  def configure(knoxConf: KnoxConfigInfo,requestHost:String): Future[Either[Errors, Boolean]] = {
     if (knoxConf.bindDn.isEmpty || knoxConf.password.isEmpty) {
       Future.successful(
         Left(Errors(Seq(Error("400", "username and password mandatory")))))
@@ -60,7 +61,10 @@ class LdapService @Inject()(
                       )
                     ldapConfigService.create(ldapConfiguration).map {
                       case Left(errors) => Left(errors)
-                      case Right(createdLdapConfig) => Right(true)
+                      case Right(createdLdapConfig) => {
+                        configService.setConfig("dp.knox.whitelist",requestHost)
+                        Right(true)
+                      }
                     }
                   }
                 }

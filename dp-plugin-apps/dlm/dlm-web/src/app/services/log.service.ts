@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
@@ -12,6 +21,8 @@ import { loadLogs } from 'actions/log.action';
 import { Cluster } from 'models/cluster.model';
 import { loadClusters } from 'actions/cluster.action';
 import { getAllClusters } from 'selectors/cluster.selector';
+
+export const LOG_REQUEST = '[LOG_SERVICE] LOG_REQUEST';
 
 @Injectable()
 export class LogService {
@@ -31,7 +42,6 @@ export class LogService {
     });
     this.logMessage$.subscribe(logMessage => this.emitter.next(logMessage));
     this.clusters$ = store.select(getAllClusters);
-    this.store.dispatch(loadClusters());
     this.clusters$.subscribe(clusters => this.clusters = clusters);
   }
 
@@ -56,7 +66,7 @@ export class LogService {
           const filteredClusters = this.clusters.filter(cluster => cluster.dataCenter === dataCenter && cluster.name === clusterName);
           if (filteredClusters.length) {
             const clusterId = filteredClusters[0].id;
-            this.store.dispatch(loadLogs(clusterId, entityId, entityType));
+            this.store.dispatch(loadLogs(clusterId, entityId, entityType, LOG_REQUEST));
             this.entityId$.next(entityId);
           }
         }

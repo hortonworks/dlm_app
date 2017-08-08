@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 package services
 
 import javax.inject.{Inject, Singleton}
@@ -288,16 +297,10 @@ class DataplaneService @Inject()(
     val hiveServerPort: Either[Errors, String] =
       getPropertyValue(endpointData, "hive-site", "hive.server2.thrift.port")
 
-    val hiveServerScheme: Either[Errors, String] = getPropertyValue(endpointData, "hive-site", "hive.server2.use.SSL")
-
     hiveServerPort match {
       case Right(hiveServerPort) => {
         val hiveServerHostName = endpointData.servicehost
-        val hiveServerScheme = getPropertyValue(endpointData, "hive-site", "hive.server2.use.SSL") match {
-          case Right(schemeValue) =>  if (schemeValue == "true") "https" else "http"
-          case Left(errors) => "http"
-        }
-        val fullurl = s"$hiveServerScheme://$hiveServerHostName:$hiveServerPort"
+        val fullurl = s"hive2://$hiveServerHostName:$hiveServerPort"
         Right(
           ClusterServiceEndpointDetails(endpointData.serviceid,
                                         endpointData.servicename,

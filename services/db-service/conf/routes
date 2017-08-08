@@ -51,6 +51,7 @@ POST          /locations                                                     con
 GET           /dp/clusters                                                   controllers.DpClusters.all
 POST          /dp/clusters                                                   controllers.DpClusters.add
 GET           /dp/clusters/:dpClusterId                                      controllers.DpClusters.load(dpClusterId:Long)
+
 #TODO: Fix this ridiculous signature
 GET           /dp/clusters/:dpClusterId/clusters                             controllers.DiscoveredClusters.getByDpClusterId(dpClusterId:Long)
 DELETE        /dp/clusters/:dpClusterId                                      controllers.DpClusters.delete(dpClusterId:Long)
@@ -116,6 +117,7 @@ DELETE        /categories/:categoryId                                        con
 GET           /skus                                                          controllers.Skus.all
 POST          /skus                                                          controllers.Skus.insert
 GET           /skus/:skuId                                                   controllers.Skus.load(skuId: Long)
+GET           /skus/byName/:name                                             controllers.Skus.findByName(name:String)
 DELETE        /skus/:skuId                                                   controllers.Skus.delete(skuId: Long)
 
 #EnabledSkus API
@@ -188,8 +190,10 @@ POST          /dataassets/managedresults                                     con
 
 
 #Config
-GET           /configurations/:key                                           controllers.Configs.get(key)
-POST          /configurations                                                controllers.Configs.add
+GET          /configurations/:key                                           controllers.Configs.get(key)
+POST         /configurations                                                controllers.Configs.add
+PUT          /configurations                                                controllers.Configs.addOrUpdate
+
 
 #ldapconfig
 POST          /ldapconfig                                                    controllers.LdapConfig.add

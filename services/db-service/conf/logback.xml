@@ -35,6 +35,7 @@
   <logger name="org.jdbcdslog.ConnectionLogger" level="OFF"  /> <!-- Won' log connections -->
   <logger name="org.jdbcdslog.StatementLogger"  level="INFO" /> <!-- Will log all statements -->
   <logger name="org.jdbcdslog.ResultSetLogger"  level="OFF"  /> <!-- Won' log result sets -->
+  <logger name="slick.jdbc.JdbcBackend.statement"  level="OFF" /> <!-- Won't log generated sql statements -->
 
   <root level="WARN">
     <appender-ref ref="ASYNCFILE" />

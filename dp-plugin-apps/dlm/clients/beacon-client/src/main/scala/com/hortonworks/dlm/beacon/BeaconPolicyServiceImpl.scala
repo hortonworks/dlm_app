@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 package com.hortonworks.dlm.beacon
 
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
@@ -19,8 +28,8 @@ class BeaconPolicyServiceImpl()(implicit ws: WSClient) extends BeaconPolicyServi
   private def mapToPolicyDetailsResponse(res: WSResponse) = {
     res.status match {
       case 200 =>
-        res.json.validate[PolicyDataResponse] match {
-          case JsSuccess(result, _) => Right(result)
+        (res.json \ "policy").get.validate[Seq[PolicyDataResponse]] match {
+          case JsSuccess(result, _) => Right(result.head)
           case JsError(error) => {
             val url = Some(res.asInstanceOf[AhcWSResponse].ahcResponse.getUri.toUrl)
             Left(BeaconApiErrors(BAD_GATEWAY, url, Some(BeaconApiError(error.toString()))))
@@ -74,6 +83,10 @@ class BeaconPolicyServiceImpl()(implicit ws: WSClient) extends BeaconPolicyServi
         case Some(startTime) => "\nstartTime = " + startTime
         case None => ""
       }) +
+      (policyDefinitionRequest.distcpMaxMaps match {
+        case Some(distcpMaxMaps) => "\ndistcpMaxMaps = " + distcpMaxMaps
+        case None => ""
+      }) +
       (policyDefinitionRequest.distcpMapBandwidth match {
         case Some(distcpMapBandwidth) => "\ndistcpMapBandwidth = " + distcpMapBandwidth
         case None => ""
@@ -107,7 +120,7 @@ class BeaconPolicyServiceImpl()(implicit ws: WSClient) extends BeaconPolicyServi
   }
 
   override def listPolicies(beaconEndpoint : String) : Future[Either[BeaconApiErrors, Seq[PoliciesDetailResponse]]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/list?fields=status,clusters,frequency,startTime,endTime,datasets,instances&instanceCount=3")
+    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/list?fields=status,clusters,frequency,startTime,endTime,datasets,description,instances&instanceCount=10")
       .withAuth(user, password, WSAuthScheme.BASIC)
       .get.map(mapToPoliciesDetailsResponse).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))

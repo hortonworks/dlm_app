@@ -7,6 +7,10 @@ input[type="text"].dp-input-url {
   }
 }
 
+input[type="text"].dp-input {
+  width: 350px;
+}
+
 .cluster-details {
   margin-top: 10px;
   background-color: $iron-gray;
@@ -37,7 +41,12 @@ input[type="text"].dp-input-url {
 }
 
 :host /deep/ .taggingWidget {
-  width: 350px !important;
+  width: 348px !important;
+  min-height: 32px !important;
+  border-radius: 2px !important;
+  input {
+    font-size: 12px !important;
+  }
 }
 
 .error-section {

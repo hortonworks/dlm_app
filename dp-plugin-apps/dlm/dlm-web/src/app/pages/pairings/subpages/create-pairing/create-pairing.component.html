@@ -1,9 +1,19 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
 <dlm-page-header
+  [isFlexCenter]="true"
   [title]="'page.pairings.create.header'"
   description="page.pairings.create.header_note"
   contextMessage="Create Pairing Page">
 </dlm-page-header>
-<div class="content page-section" id="create_pairing">
+<div class="content" id="create_pairing">
   <div *ngIf="(firstSetClusters$ | async)?.length > 0; else noClusters">
     <div class="content-row header">
       <div class="col-md-3 col-header">
@@ -54,3 +64,14 @@
     </div>
   </ng-template>
 </div>
+<dlm-modal-dialog
+  #errorDialog
+  qe-attr="create-pair-error-modal"
+  [title]="'common.error'"
+  [showDialog]="false"
+  [showCancel]="false"
+>
+  <dlm-modal-dialog-body>
+    <pre>{{ errorMessage }}</pre>
+  </dlm-modal-dialog-body>
+</dlm-modal-dialog>

@@ -32,7 +32,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
               private workspaceService: WorkspaceService) {}
 
   addWorkspace() {
-    this.router.navigateByUrl('/workspace/(dialog:add-workspace/new)');
+    this.router.navigateByUrl('analytics/workspace/(dialog:add-workspace/new)');
   }
 
   editWorkspace($event, workspacesDTO: WorkspaceDTO) {

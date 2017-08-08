@@ -18,7 +18,7 @@ docker start dp-app >> install.log 2>&1 || \
         --network dp \
         --detach \
         --publish 80:80 \
-        --env CONSUL_HOST \
-        --env DP_APP_HOME=/usr/dp-app \
+        --env "CONSUL_HOST=$CONSUL_HOST" \
+        --env "DP_APP_HOME=/usr/dp-app" \
         --volume $(pwd)/certs:/usr/dp-app/conf/cert \
         hortonworks/dp-app:$VERSION

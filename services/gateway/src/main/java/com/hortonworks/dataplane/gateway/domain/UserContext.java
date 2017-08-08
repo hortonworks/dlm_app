@@ -1,19 +1,21 @@
 package com.hortonworks.dataplane.gateway.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.joda.time.LocalDateTime;
 
 import java.io.Serializable;
 
 import java.util.List;
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserContext implements Serializable {
 
   private Long id;
   private String username;
   private String avatar;
   private List<String> roles;
+  private List<String> services;
   private String display;
   private String token;
   private String password;
@@ -78,6 +80,7 @@ public class UserContext implements Serializable {
     this.password = password;
   }
 
+  @JsonProperty
   public Long getUpdatedAt() {
     return updatedAt;
   }
@@ -102,6 +105,15 @@ public class UserContext implements Serializable {
 
   public void setActive(boolean active) {
     this.active = active;
+  }
+
+  @JsonProperty
+  public List<String> getServices() {
+    return services;
+  }
+
+  public void setServices(List<String> services) {
+    this.services = services;
   }
 
   @JsonProperty

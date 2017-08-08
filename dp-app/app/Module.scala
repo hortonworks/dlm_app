@@ -91,6 +91,14 @@ class Module extends AbstractModule {
     new AtlasServiceImpl(configuration.underlying)
   }
 
+  @Provides
+  @Singleton
+  @Named("rangerService")
+  def provideRangerService(implicit ws: WSClient, configuration: Configuration): com.hortonworks.dataplane.cs.Webservice.RangerService = {
+    implicit val wSClient = ClusterWsClient(ws)
+    new RangerServiceImpl(configuration.underlying)
+  }
+
 
   @Provides
   @Singleton
@@ -113,6 +121,13 @@ class Module extends AbstractModule {
   @Named("clusterComponentsService")
   def provideClusterComponentsService(implicit ws: WSClient, configuration: Configuration): ClusterComponentService = {
     new ClusterComponentServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("configService")
+  def provideConfigService(implicit ws: WSClient, configuration: Configuration): ConfigService = {
+    new ConfigServiceImpl(configuration.underlying)
   }
 
   @Provides
@@ -148,6 +163,13 @@ class Module extends AbstractModule {
   @Named("dataAssetService")
   def provideDataAssetService(implicit ws: WSClient,configuration: Configuration): DataAssetService = {
     new DataAssetServiceImpl(configuration.underlying)
+  }
+
+  @Provides
+  @Singleton
+  @Named("skuService")
+  def provideSkuService(implicit ws: WSClient,configuration: Configuration): SkuService = {
+    new SkuServiceImpl(configuration.underlying)
   }
 
 }

@@ -1,6 +1,15 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BsDropdownModule, ButtonsModule, TooltipModule, CollapseModule, ProgressbarModule } from 'ng2-bootstrap';
+import { BsDropdownModule, ButtonsModule, TooltipModule, CollapseModule, ProgressbarModule, AlertModule } from 'ng2-bootstrap';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { TranslateModule } from '@ngx-translate/core';
 import { SelectModule } from 'ng2-select';
@@ -32,6 +41,8 @@ import { JobStatusComponent } from './job-status/job-status.component';
 import { MapLegendComponent } from './map/map-legend/map-legend.component';
 import { MapLegendContainerComponent } from './map/map-legend-container/map-legend-container.component';
 import { ClusterStatusIconComponent } from './cluster-status-icon/cluster-status-icon.component';
+import { BeaconValidityComponent } from './messages/beacon-validity/beacon-validity.component';
+import { HelpLinkComponent } from './help-link/help-link.component';
 
 @NgModule({
   imports: [
@@ -41,6 +52,7 @@ import { ClusterStatusIconComponent } from './cluster-status-icon/cluster-status
     TooltipModule.forRoot(),
     CollapseModule.forRoot(),
     ProgressbarModule.forRoot(),
+    AlertModule.forRoot(),
     ChartsModule,
     TranslateModule,
     SelectModule,
@@ -75,7 +87,9 @@ import { ClusterStatusIconComponent } from './cluster-status-icon/cluster-status
     JobStatusComponent,
     MapLegendComponent,
     MapLegendContainerComponent,
-    ClusterStatusIconComponent
+    ClusterStatusIconComponent,
+    BeaconValidityComponent,
+    HelpLinkComponent
   ],
   exports: [
     CardComponent,
@@ -105,7 +119,9 @@ import { ClusterStatusIconComponent } from './cluster-status-icon/cluster-status
     JobStatusComponent,
     MapLegendComponent,
     MapLegendContainerComponent,
-    ClusterStatusIconComponent
+    ClusterStatusIconComponent,
+    BeaconValidityComponent,
+    HelpLinkComponent
   ]
 })
 export class CommonComponentsModule {}

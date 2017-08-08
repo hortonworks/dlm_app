@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 package services
 
 import javax.inject.{Inject, Singleton}
@@ -368,7 +377,7 @@ class BeaconService @Inject()(
 
           val policies : Seq[PolicyDetailsData] = getProcessedResponse(allPoliciesData, queryStringPaginated, originalPageLenth, originalOffset)
           val policiesDetails: Seq[PoliciesDetails] = policies.map(policy => {
-            PoliciesDetails(policy.policyId, policy.name, policy.`type`, policy.status, policy.sourceDataset, policy.targetDataset,
+            PoliciesDetails(policy.policyId, policy.name, policy.description, policy.`type`, policy.status, policy.sourceDataset, policy.targetDataset,
                             policy.frequencyInSec, policy.startTime, policy.endTime, policy.sourceCluster, policy.targetCluster, policy.instances)
           })
 

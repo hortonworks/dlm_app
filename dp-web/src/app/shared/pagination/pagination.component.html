@@ -1,14 +1,14 @@
 <span class="paginationRow" *ngIf="showPagination">
   <span>{{"common.pagination.rowsPerPage" | translate}}</span>
   <span class="pageSizeSpan">
-    <select [(ngModel)]="pageSize" (change)="pageSizeChange()">
-      <option *ngFor="let opt of pageSizeOptions;" [value]="opt">{{opt}}</option>
+    <select id="page-size-dropdown" [(ngModel)]="pageSize" (change)="pageSizeChange()">
+      <option *ngFor="let opt of pageSizeOptions;" [value]="opt" id="size-{{opt}}">{{opt}}</option>
     </select>
   </span>&nbsp;&nbsp;&nbsp;&nbsp;
   <span *ngIf="count!=infinity">
     <span>{{start + "-" + end +" of " + count}}</span>&nbsp;&nbsp;&nbsp;&nbsp;
   </span>
-  <i class="fa fa-chevron-left" [ngClass]="{'disabled': start === 1}" (click)="previous()"></i>&nbsp;&nbsp;
-  <i class="fa fa-chevron-right" [ngClass]="{'disabled': end === count}" (click)="next()"></i>
+  <i id="previous-btn" class="fa fa-chevron-left" [ngClass]="{'disabled': start === 1}" (click)="previous()"></i>&nbsp;&nbsp;
+  <i id="next-btn" class="fa fa-chevron-right" [ngClass]="{'disabled': end === count}" (click)="next()"></i>
 </span>
 <div style="clear: both"></div>

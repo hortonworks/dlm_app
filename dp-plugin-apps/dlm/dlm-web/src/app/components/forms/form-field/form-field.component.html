@@ -1,3 +1,12 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
 <div class="form-group" [ngClass]="{'has-error': !fieldControl.valid && fieldControl.touched}">
   <div class="row">
     <div class="col-md-12">
@@ -13,6 +22,9 @@
         <div [ngClass]="errorClass">
           <dlm-field-error *ngIf="fieldControl.touched && fieldControl.hasError('required')">
             {{'forms.validation_errors.required' | translate:labelTranslate}}
+          </dlm-field-error>
+          <dlm-field-error *ngIf="fieldControl.touched && fieldControl.hasError('maxlength')">
+            {{'forms.validation_errors.maxlength' | translate:labelTranslate}}
           </dlm-field-error>
           <ng-content select="dlm-field-error"></ng-content>
         </div>

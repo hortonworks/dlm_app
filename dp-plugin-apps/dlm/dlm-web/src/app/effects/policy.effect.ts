@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { go } from '@ngrx/router-store';
@@ -17,6 +26,7 @@ import {
 import { operationComplete, operationFail } from 'actions/operation.action';
 import { POLICY_FORM_ID } from 'pages/policies/components/policy-form/policy-form.component';
 import { resetFormValue } from 'actions/form.action';
+import { truncate } from 'pipes/truncate.pipe';
 
 @Injectable()
 export class PolicyEffects {
@@ -41,9 +51,9 @@ export class PolicyEffects {
           createPolicySuccess(response, payload.meta),
           go(['/policies']),
           resetFormValue(POLICY_FORM_ID),
-          Observable.of(this.notificationService.create(<ToastNotification>{
+          Observable.of(this.notificationService.create(<ToastNotification> {
             title: this.t.instant('page.policies.success.title'),
-            body: this.t.instant('page.policies.success.body', {policyName: payload.policy.policyDefinition.name}),
+            body: this.t.instant('page.policies.success.body', {policyName: truncate(payload.policy.policyDefinition.name, 25)}),
             type: NOTIFICATION_TYPES.SUCCESS
           }))
         ])

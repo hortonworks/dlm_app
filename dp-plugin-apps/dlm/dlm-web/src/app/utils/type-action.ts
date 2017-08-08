@@ -1,3 +1,13 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
+import { Action } from '@ngrx/store';
 import { isDevMode } from '@angular/core';
 
 export const START_MARKER = '[REQUEST_START]';
@@ -28,6 +38,15 @@ export const requestType = (actionName: string): RequestAction => ({
   FAILURE: type(`${actionName} ${FAILURE_MARKER}`)
 });
 
-export const isStartAction = (action): boolean => action.type.endsWith(START_MARKER);
-export const isSuccessAction = (action): boolean => action.type.endsWith(SUCCESS_MARKER);
-export const isFailureAction = (action): boolean => action.type.endsWith(FAILURE_MARKER);
+export const isStartAction = (action: Action): boolean => action.type.endsWith(START_MARKER);
+export const isSuccessAction = (action: Action): boolean => action.type.endsWith(SUCCESS_MARKER);
+export const isFailureAction = (action: Action): boolean => action.type.endsWith(FAILURE_MARKER);
+export const isCompletedAction = (action: Action): boolean => isFailureAction(action) || isSuccessAction(action);
+export const isRequestAction = (action: Action): boolean => isCompletedAction(action) || isStartAction(action);
+export const originalActionName = (action: Action): string => {
+  const splitted = action.type.split(' ');
+  if (!isRequestAction(action)) {
+    return null;
+  }
+  return splitted.slice(0, splitted.length - 1).join(' ');
+};

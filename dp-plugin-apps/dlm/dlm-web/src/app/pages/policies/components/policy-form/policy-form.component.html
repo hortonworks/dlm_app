@@ -1,3 +1,12 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
 <div class="form-container">
   <form class="basic-form policy-form" [formGroup]="policyForm" (ngSubmit)="handleSubmit(policyForm)">
     <div class="container-fluid">
@@ -12,11 +21,13 @@
           </div>
           <fieldset formGroupName="general" [collapse]="sectionCollapsedMap.general">
             <dlm-form-field
-              [label]="'page.policies.form.fields.policy_name' | translate">
+              [label]="'page.policies.form.fields.policy_name' | translate"
+              [maxLengthValue]="64">
               <input type="text" class="form-control" qe-attr="policy-name" formField formControlName="name" />
             </dlm-form-field>
             <dlm-form-field
-              [label]="'page.policies.form.fields.policy_description' | translate">
+              [label]="'page.policies.form.fields.policy_description' | translate"
+              [maxLengthValue]="512">
               <textarea rows="4" class="form-control" qe-attr="policy-description" formField formControlName="description"></textarea>
             </dlm-form-field>
             <div class="form-group">
@@ -147,9 +158,23 @@
                   </div>
                   <div class="row">
                     <div class="col col-md-5 col-md-offset-2">
+                      <div *ngIf="policyForm.get('job').get('frequency').touched">
+                        <dlm-field-error
+                          *ngIf="policyForm.get('job').get('frequency').hasError('required')">
+                          {{'forms.validation_errors.required' | translate:freqRequired}}
+                        </dlm-field-error>
+                        <dlm-field-error
+                          *ngIf="policyForm.get('job').get('frequency').hasError('freqValidator')">
+                          {{'forms.validation_errors.freqValidator' | translate:freqLimit}}
+                        </dlm-field-error>
+                        <dlm-field-error
+                          *ngIf="policyForm.get('job').get('frequency').hasError('integerValidator')">
+                          {{'forms.validation_errors.integerValidator' | translate:freqLimit}}
+                        </dlm-field-error>
+                      </div>
                       <dlm-field-error
-                        *ngIf="policyForm.get('job').get('frequency').touched && policyForm.get('job').get('frequency').hasError('required')">
-                        {{'forms.validation_errors.required' | translate:freqRequired}}
+                        *ngIf="policyForm.get('job').get('frequency').touched && policyForm.get('job').get('frequency').hasError('freqValidator')">
+                        {{'forms.validation_errors.freqValidator' | translate:freqLimit}}
                       </dlm-field-error>
                     </div>
                   </div>

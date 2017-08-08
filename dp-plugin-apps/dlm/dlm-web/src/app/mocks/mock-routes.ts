@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 import { RequestMethod } from '@angular/http';
 import { MockRoute } from './mock-route';
 
@@ -26,9 +35,7 @@ export const routes: MockRoute[] = [
   new MockRoute('unpair', 'unpair.json', RequestMethod.Post),
 
   // Jobs
-  new MockRoute('jobs', 'jobs.json'),
-  new MockRoute('jobs/:id', 'job.json'),
-  new MockRoute('clusters/:id/jobs', 'jobs.json'),
+  new MockRoute('clusters/:clusterId/policy/:policyName/jobs', 'jobs.json'),
 
   // Events
   new MockRoute('events', 'events.json'),

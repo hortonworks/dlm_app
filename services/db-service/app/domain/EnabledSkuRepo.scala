@@ -5,10 +5,10 @@ import javax.inject.Inject
 
 import com.hortonworks.dataplane.commons.domain.Entities.EnabledSku
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class EnabledSkuRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)
+class EnabledSkuRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,skuRepo: SkuRepo)
   extends HasDatabaseConfigProvider[DpPgProfile] {
 
   import profile.api._
@@ -18,7 +18,17 @@ class EnabledSkuRepo @Inject()(protected val dbConfigProvider: DatabaseConfigPro
   def all(): Future[List[EnabledSku]] = db.run {
     EnabledSkus.to[List].result
   }
-
+  def getEnabledSkus():Future[Seq[String]]={//TODO caching for a perios of time
+    val query=for{
+      skus<-skuRepo.Skus if skus.status===1.toShort
+      enabledSkus<-EnabledSkus if enabledSkus.skuId===skus.id
+    }yield {
+      (skus,enabledSkus)
+    }
+    db.run(query.result).map{res=>
+      res.map{r=>r._1.name}
+    }
+  }
   def insert(skuId: Long, enabledBy: Long, smartSenseId: String, subscriptionId: String): Future[EnabledSku] = {
     val enabledSku = EnabledSku(skuId = skuId, enabledBy = enabledBy,
       smartSenseId = smartSenseId, subscriptionId = subscriptionId)

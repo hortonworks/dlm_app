@@ -13,5 +13,7 @@ docker start dp-cluster-service >> install.log 2>&1 || \
         --name dp-cluster-service \
         --network dp \
         --detach \
-        --env CONSUL_HOST \
+        --env "CONSUL_HOST=$CONSUL_HOST" \
+        --env "SEPARATE_KNOX_CONFIG=${SEPARATE_KNOX_CONFIG}" \
+        --env "KNOX_CONFIG_USING_CREDS=${KNOX_CONFIG_USING_CREDS}" \
         hortonworks/dp-cluster-service:$VERSION

@@ -1,3 +1,12 @@
+/*!
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 @import './styles/ngx-table-theme.scss';
 @import './styles/forms.scss';
 @import './styles/variables.scss';
@@ -25,6 +34,7 @@ header {
     margin-top: 12px;
     color: #666;
     line-height: 40px;
+    padding-right: 15px;
     ol.breadcrumb {
       padding-left: 30px;
     }
@@ -49,7 +59,7 @@ header {
 }
 
 #dlm_main_content {
-  padding-left: 10px;
+  padding-left: 0;
   padding-right: 0;
 }
 

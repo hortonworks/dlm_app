@@ -1,4 +1,15 @@
-import { Component, OnInit, Output, ViewChild, TemplateRef, OnDestroy, ViewEncapsulation, EventEmitter } from '@angular/core';
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
+import {
+  Component, OnInit, Output, ViewChild, TemplateRef, OnDestroy, ViewEncapsulation, EventEmitter, HostBinding
+} from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -16,6 +27,7 @@ import { StatusColumnComponent } from 'components/table-columns/status-column/st
 import { Policy } from 'models/policy.model';
 import { LogService } from 'services/log.service';
 import { JOB_STATUS } from 'constants/status.constant';
+import { PolicyService } from 'services/policy.service';
 
 @Component({
   selector: 'dlm-jobs-overview-table',
@@ -32,12 +44,15 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   operationResponseSubscription: Subscription;
   lastOperationResponse: OperationResponse = <OperationResponse>{};
 
+  @ViewChild('clusterNameCellRef') clusterNameCellRef: TemplateRef<any>;
   @ViewChild('destinationIconCell') destinationIconCellRef: TemplateRef<any>;
   @ViewChild('verbStatusCellTemplate') verbStatusCellTemplate: TemplateRef<any>;
   @ViewChild('policyNameCellTemplate') policyNameCellTemplate: TemplateRef<any>;
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
   @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;
   @ViewChild('prevJobs') prevJobsRef: TemplateRef<any>;
+
+  @HostBinding('class') className = 'dlm-jobs-overview-table';
 
   @Output() onShowPolicyLog = new EventEmitter<any>();
 
@@ -50,6 +65,14 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
 
   private translateColumn(columnName: string): string {
     return this.t.instant(`page.overview.table.column.${columnName}`);
+  }
+
+  private getClusterName(policyClusterName: string) {
+    return PolicyService.getClusterName(policyClusterName);
+  }
+
+  private getDatacenterName(policyClusterName: string) {
+    return PolicyService.getDatacenterName(policyClusterName);
   }
 
   ngOnInit() {
@@ -67,11 +90,14 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
         cellClass: 'text-cell',
         headerClass: 'text-header',
         cellTemplate: this.verbStatusCellTemplate,
-        name: this.translateColumn('job_status')
+        name: this.translateColumn('job_status'),
+        comparator(job1, job2) {
+          return job1.status > job2.status ? 1 : -1;
+        }
       },
-      {prop: 'sourceCluster', name: this.translateColumn('source_cluster')},
+      {prop: 'sourceCluster', name: this.translateColumn('source_cluster'), cellTemplate: this.clusterNameCellRef},
       {...TableComponent.makeFixedWith(20), name: '', cellTemplate: this.destinationIconCellRef},
-      {prop: 'targetCluster', name: this.translateColumn('destination_cluster')},
+      {prop: 'targetCluster', name: this.translateColumn('destination_cluster'), cellTemplate: this.clusterNameCellRef},
       {prop: 'service', name: this.t.instant('common.service')},
       {
         prop: 'name',
@@ -80,13 +106,14 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
         name: this.t.instant('common.policy'),
         cellTemplate: this.policyNameCellTemplate
       },
-      {cellTemplate: this.prevJobsRef, name: this.translateColumn('last_ten_jobs'), prop: 'lastTenJobs'},
+      {cellTemplate: this.prevJobsRef, name: this.translateColumn('last_ten_jobs'), prop: 'lastTenJobs', sortable: false},
       {
         prop: 'lastJobResource.trackingInfo',
         cellTemplate: this.transferredFormattedTemplate,
         name: this.translateColumn('transferred'),
         cellClass: 'date-cell',
-        headerClass: 'date-header'
+        headerClass: 'date-header',
+        sortable: false
       },
       {
         prop: 'lastJobResource.trackingInfo.timeTaken',

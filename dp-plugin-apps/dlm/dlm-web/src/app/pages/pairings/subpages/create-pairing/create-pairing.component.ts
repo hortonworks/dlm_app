@@ -1,4 +1,13 @@
-import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
+import { Component, OnInit, ViewEncapsulation, OnDestroy, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Store } from '@ngrx/store';
@@ -15,8 +24,10 @@ import { Progress } from 'models/progress.model';
 import { fromJS } from 'immutable';
 import { PairingsComponent } from '../../pairings.component';
 import { NotificationService } from 'services/notification.service';
+import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 import { NOTIFICATION_TYPES } from 'constants/notification.constant';
 import { ToastNotification } from 'models/toast-notification.model';
+import { PROGRESS_STATUS } from 'constants/status.constant';
 
 @Component({
   selector: 'dlm-create-pairing',
@@ -37,10 +48,12 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
   private pairingsSubscription$;
   private progressSubscription$;
   progress: Progress;
+  errorMessage = '';
   isPairingProgress = false;
   createPairingForm: FormGroup;
   selectedFirstCluster: ClusterPairing = null;
   selectedSecondCluster: ClusterPairing = null;
+  @ViewChild('errorDialog') errorDialog: ModalDialogComponent;
 
   constructor(private store: Store<fromRoot.State>,
               private t: TranslateService,
@@ -69,13 +82,19 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
     });
     this.progressSubscription$ = this.progress$.subscribe( progress => {
       this.progress = progress;
-      if (progress && 'state' in progress && progress.state === 'success') {
-        this.router.navigate(['pairings']);
-        this.notificationsService.create(<ToastNotification>{
-          title: this.t.instant('page.pairings.create.confirmation.title'),
-          body: this.t.instant('page.pairings.create.confirmation.body'),
-          type: NOTIFICATION_TYPES.SUCCESS
-        });
+      if (progress && 'state' in progress) {
+        if (progress.state === PROGRESS_STATUS.SUCCESS) {
+          this.router.navigate(['pairings']);
+          this.notificationsService.create(<ToastNotification>{
+            title: this.t.instant('page.pairings.create.confirmation.title'),
+            body: this.t.instant('page.pairings.create.confirmation.body'),
+            type: NOTIFICATION_TYPES.SUCCESS
+          });
+        } else if (progress.state === PROGRESS_STATUS.FAILED) {
+          this.isPairingProgress = false;
+          this.errorMessage = progress.response.text();
+          this.errorDialog.show();
+        }
       }
     });
     this.firstSetClustersPromise = new Promise( (resolve, reject) => {

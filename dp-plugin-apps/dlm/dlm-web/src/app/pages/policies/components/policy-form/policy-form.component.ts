@@ -1,6 +1,15 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 import { Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter,
   HostBinding, SimpleChanges, OnDestroy, OnChanges, ChangeDetectionStrategy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { go } from '@ngrx/router-store';
 import { IMyOptions, IMyDateModel } from 'mydatepicker';
@@ -29,6 +38,30 @@ import * as moment from 'moment';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 
+export function freqValidator(frequencyMap): ValidatorFn {
+  return (control: AbstractControl): {[key: string]: any} => {
+    const parent = control.parent;
+    if (!parent) {
+      return null;
+    }
+    const unit = parent.controls['unit'].value;
+    const value = frequencyMap[unit] * control.value;
+    // 2147472000 - 24855 days in seconds. closest days number to integer size
+    return value < 2147472000 ? null : {'freqValidator': {name: control.value}};
+  };
+}
+
+export function integerValidator(): ValidatorFn {
+  return (control: AbstractControl): {[key: string]: any} => {
+    const {value} = control;
+    if (!value) {
+      return null;
+    }
+    const n = Math.floor(Number(control.value));
+    return String(n) === value && n > 0 ? null : {'integerValidator': {name: control.value}};
+  };
+}
+
 @Component({
   selector: 'dlm-policy-form',
   templateUrl: './policy-form.component.html',
@@ -55,6 +88,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   _pairings$: BehaviorSubject<Pairing[]> = new BehaviorSubject([]);
   _sourceClusterId$: BehaviorSubject<number> = new BehaviorSubject(0);
   freqRequired = {fieldLabel: 'Frequency'};
+  freqLimit = {fieldLabel: 'Frequency'};
   get datePickerOptions(): IMyOptions {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
@@ -159,6 +193,14 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     return date.toDate();
   }
 
+  get defaultEndTime(): Date {
+    const date = moment();
+    date.hours(23);
+    date.minutes(59);
+    date.seconds(59);
+    return date.toDate();
+  }
+
   get sourceClusters() {
     return mapToList(this.getClusterEntities(this.pairings));
   }
@@ -235,8 +277,8 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       .map(([searchPattern, databases]) => databases.filter(db => simpleSearch(db.name, searchPattern)));
     this.policyForm = this.formBuilder.group({
       general: this.formBuilder.group({
-        name: ['', Validators.required],
-        description: [''],
+        name: ['', Validators.compose([Validators.required, Validators.maxLength(64)])],
+        description: ['', Validators.maxLength(512)],
         type: [this.selectedPolicyType],
         sourceCluster: ['', Validators.required],
         destinationCluster: ['', Validators.required]
@@ -245,14 +287,14 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       directories: ['', Validators.required],
       job: this.formBuilder.group({
         repeatMode: this.policyRepeatModes.EVERY,
-        frequency: ['', Validators.required],
+        frequency: ['', Validators.compose([Validators.required, freqValidator(this.frequencyMap), integerValidator()])],
         day: this.policyDays.MONDAY,
         frequencyInSec: 0,
         unit: this.policyTimeUnits.DAYS,
         schedule: this.policySubmitTypes.SCHEDULE,
         endTime: this.formBuilder.group({
           date: [''],
-          time: [this.defaultTime]
+          time: [this.defaultEndTime]
         }, { validator: this.validateTime }),
         startTime: this.formBuilder.group({
           date: [''],
@@ -264,9 +306,8 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         max_bandwidth: ['']
       })
     });
-    const jobCtrl = (<any>this.policyForm).controls.job;
-    const changes$ = jobCtrl.controls.repeatMode.valueChanges;
-
+    const jobControls = this.policyForm.controls['job']['controls'];
+    this.subscriptions.push(jobControls['unit'].valueChanges.subscribe(() => jobControls['frequency'].updateValueAndValidity()));
     this.activateFieldsForType(this.selectedPolicyType);
     this.policyFormValues$ = this.store.select(getFormValues(POLICY_FORM_ID));
     const policyFormValuesSubscription = Observable
@@ -316,7 +357,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         return pairing.pair.reduce((clusters: {}, cluster) => {
           return Object.assign({}, clusters, {
             [cluster.id]: {
-              label: cluster.name,
+              label: `${cluster.name} (${cluster.dataCenter})`,
               value: cluster.id
             }
           });

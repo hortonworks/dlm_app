@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 import { Component, Output, ViewChild, TemplateRef, ViewEncapsulation, EventEmitter } from '@angular/core';
 import { TableColumn } from 'common/table/table-column.type';
 
@@ -13,9 +22,9 @@ import { TableColumn } from 'common/table/table-column.type';
         <p *ngIf="row.frequency" [tooltip]=popTemplate>{{row.frequency | frequency}}</p>
       </div>
       <template #popTemplate>
-        {{row.startTime | date:'MMM dd, y HH:mm'}} 
+        {{row.startTime | fmtTz:'MMM DD, Y HH:mm'}} 
         <span *ngIf="row.startTime && row.endTime">-</span>
-        <span *ngIf="row.endTime">{{row.endTime | date:'MMM dd, y HH:mm'}}</span>
+        <span *ngIf="row.endTime">{{row.endTime | fmtTz:'MMM DD, Y HH:mm'}}</span>
       </template>
     </ng-template>
   `,

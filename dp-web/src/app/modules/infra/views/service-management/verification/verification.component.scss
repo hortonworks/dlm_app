@@ -1,0 +1,65 @@
+@import "../../../../../../styles/variables";
+
+input[type="text"].dp-input {
+  width: 250px;
+}
+
+.title-pane {
+  padding: 25px
+}
+
+.content-pane {
+  margin: 0px 25px;
+  padding: 25px;
+  background-color: white;
+  height: 570px
+}
+
+.validation-error {
+  width: 36px;
+  background-color: $roman-red;
+  border: 1px solid $roman-red;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  .fa {
+    color: $white;
+    font-size: 14px;
+    margin: 8px 12px;
+  }
+}
+
+.error {
+  .dp-input {
+    width: 214px;
+    border: 1px solid $roman-red;
+    border-right: 0;
+  }
+}
+
+.error-message {
+  color: $roman-red;
+  padding-top: 10px;
+}
+
+.padding-left-12 {
+  padding-left: 12px;
+}
+
+.width-90 {
+  width: 90px;
+}
+
+.error-notification-bar {
+  line-height: 1.2;
+  padding: 15px;
+  background: $concrete;
+  height: 34px;
+  margin-bottom: 20px;
+  .fa-times-circle {
+    font-size: 24px;
+    color: $roman-red;
+  }
+  .hwx-desc {
+    margin: 0;
+  }
+}

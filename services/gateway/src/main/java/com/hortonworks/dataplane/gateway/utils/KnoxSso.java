@@ -5,6 +5,7 @@ import com.hortonworks.dataplane.gateway.domain.TokenInfo;
 import io.jsonwebtoken.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -42,8 +43,34 @@ public class KnoxSso {
   @Value("${signing.pub.key.path}")
   private String publicKeyPath;
 
-  @Value("${knox.url}")
-  private String knoxUrl;
+  @Value("${knox.url.discover.fromrequest}")
+  private Boolean knoxUrlDiscoverFromRequest;
+
+  @Value("${knox.port}")
+  private String knoxPort;
+
+  @Value("${server.domain}")
+  private String serverDomain;
+
+  @Autowired
+  private HostUtils hostUtils;
+
+  public String getKnoxUrl() {
+    if (knoxUrlDiscoverFromRequest){
+      return String.format("https://%s%s",hostUtils.getRequestHost(),getKnoxPort());
+    }else {
+      return String.format("https://%s%s",serverDomain,getKnoxPort());
+    }
+  }
+
+  public String getKnoxPort() {
+    if (StringUtils.isEmpty(this.knoxPort) || this.knoxPort.trim().equals("443")){
+      return "";
+    }else{
+      return ":"+this.knoxPort;
+    }
+  }
+
 
   @Value("${knox.websso.path}")
   private String knoxWebssoPath;
@@ -73,7 +100,7 @@ public class KnoxSso {
 
   private String inferDomainFromKnoxUrl() {
     try {
-      URL url=new URL(knoxUrl);
+      URL url=new URL(getKnoxUrl());
       return url.getHost();
     } catch (MalformedURLException e) {
       throw new RuntimeException(e);
@@ -81,7 +108,7 @@ public class KnoxSso {
   }
 
   public String getLoginUrl(String appRedirectUrl) {
-    return String.format("%s%s?originalUrl=%s", knoxUrl, knoxWebssoPath, appRedirectUrl);
+    return String.format("%s%s?originalUrl=%s", getKnoxUrl(), knoxWebssoPath, appRedirectUrl);
   }
 
   public TokenInfo validateJwt(String token) {

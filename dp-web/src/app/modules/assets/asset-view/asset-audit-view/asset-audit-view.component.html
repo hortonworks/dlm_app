@@ -1,0 +1,40 @@
+<div *ngIf="state==AWS.NOINFO" class="infoNotAvailable">Audit information is not available</div>
+<div *ngIf="state==AWS.LOADING" class="loading">Loading ...</div>
+<div *ngIf="state==AWS.LOADED" class='filterCont'>
+	<span>Access Type:</span>
+	<select (change)="onRefresh()" [(ngModel)]="accessType"><option *ngFor="let optn of accessTypeOptions" [value]="optn">{{optn}}</option></select>
+	&nbsp;&nbsp;&nbsp;
+	<span>Result:</span>
+	<select (change)="onRefresh()" [(ngModel)]="result"><option *ngFor="let optn of resultOptions" [value]="optn">{{optn}}</option></select>
+	&nbsp;&nbsp;&nbsp;
+	<button class="mdl-button btn-hwx-default" (click)="onRefresh()"><i class="fa fa-refresh"></i></button>
+</div>
+<div *ngIf="state==AWS.LOADED" class="infoTable borderBox">
+	
+	<div class="tableRow tableHeader">
+		<div class="tableCell pId">Policy ID</div>
+		<div class="tableCell eventTime">Event Time</div>
+		<div class="tableCell user">User</div> 
+		<div class="tableCell accessType">Access Type</div>
+		<div class="tableCell result">Result</div>
+		<div class="tableCell enforcer">Access Enforcer</div>
+		<div class="tableCell ip">Client IP</div>
+	</div>
+	<div class="tableRow normalRow" *ngFor="let audit of audits">
+		<div class="tableCell pId">{{audit.policyId}}</div>
+		<div class="tableCell eventTime">{{audit.eventTime}}</div>
+		<div class="tableCell user">{{audit.requestUser}}</div> 
+		<div class="tableCell accessType">{{audit.accessType}}</div>
+		<div class="tableCell result">{{audit.accessResult}}</div>
+		<div class="tableCell enforcer">{{audit.aclEnforcer}}</div>
+		<div class="tableCell ip">{{audit.clientIP}}</div>
+	</div>
+	<simple-pagination
+      [pageSize]="pageSize"
+      [pageStartIndex]="pageStartsFrom"
+      [count]="count"
+      (onPageSizeChange)="onPageSizeChange($event)"
+      (onPageChange)="onPageChange($event)"
+    ></simple-pagination>
+
+</div>

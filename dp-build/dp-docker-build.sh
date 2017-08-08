@@ -103,6 +103,34 @@ save_vendor_images() {
     done
 }
 
+package() {
+    PACKAGE_NAME=dp-core
+    BUILD_ROOT=$(pwd)/build
+    PACKAGE_ROOT=$BUILD_ROOT/pkg/$PACKAGE_NAME
+
+    echo "Starting docker build"
+    ./dp-docker-build.sh build
+    ./dp-docker-build.sh build knox
+
+    echo "Exporting docker images"
+    ./dp-docker-build.sh save all
+
+    rm -rf $PACKAGE_ROOT
+    
+    echo "Preparing package dp-core"
+    mkdir -p $PACKAGE_ROOT
+    cp -R $BUILD_ROOT/dp-docker/installer $PACKAGE_ROOT/bin
+    cp -R $BUILD_ROOT/dp-docker/images $PACKAGE_ROOT/lib
+
+    echo "Creating archive for distribution"
+    VERSION_STRING=$(cat $PACKAGE_ROOT/bin/VERSION)
+    pushd $BUILD_ROOT/pkg
+    tar -czf ${PACKAGE_NAME}-${VERSION_STRING}.tar.gz ${PACKAGE_NAME}
+    popd
+
+    echo "All done. Created $BUILD_ROOT/pkg/${PACKAGE_NAME}-${VERSION_STRING}.tar.gz"
+}
+
 get_version() {
     if [ -f build/dp-docker/installer/VERSION ]
     then
@@ -125,6 +153,8 @@ usage() {
     printf "%-${tabspace}s:%s\n" "save" "Saves all images to local tarballs.
         all: Saves all images
         <image-name>: Saves a specific image"
+    printf "%-${tabspace}s:%s\n" "package" "Build all images and package them together"
+        
 }
 
 if [ $# -lt 1 ]
@@ -148,6 +178,10 @@ else
         save)
             shift
             save_images "$@"
+            ;;
+        package)
+            shift
+            package
             ;;
         *)
             usage

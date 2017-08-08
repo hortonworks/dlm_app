@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 import { Component, Input, OnInit, ContentChild, ViewEncapsulation, HostBinding } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { FormFieldDirective } from './form-field.directive';
@@ -10,6 +19,7 @@ import { FormFieldDirective } from './form-field.directive';
 })
 export class FormFieldComponent implements OnInit {
   @Input() label: string;
+  @Input() maxLengthValue: string|number;
   @ContentChild(FormFieldDirective) formField: FormFieldDirective;
   @Input() fieldClass = 'col-md-6';
   @Input() errorClass = 'col-md-6';
@@ -20,6 +30,6 @@ export class FormFieldComponent implements OnInit {
 
   ngOnInit() {
     this.fieldControl = this.formField.formFieldControl;
-    this.labelTranslate = { fieldLabel: this.label };
+    this.labelTranslate = { fieldLabel: this.label, maxLengthValue: this.maxLengthValue };
   }
 }

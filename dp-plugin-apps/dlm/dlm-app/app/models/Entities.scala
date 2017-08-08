@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 package models
 
 import com.hortonworks.dataplane.commons.domain.Entities._
@@ -40,7 +49,7 @@ object Entities {
   // Response schema for Pair cluster request
   case class PairedClustersResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), pairedClusters: Set[Set2[BeaconCluster]] = Set())
 
-  case class PoliciesDetails(policyId: String, name: String, `type`: String, status: String, sourceDataset: String, targetDataset: String,
+  case class PoliciesDetails(policyId: String, name: String, description: Option[String], `type`: String, status: String, sourceDataset: String, targetDataset: String,
                              frequency: Long, startTime: Option[String], endTime: String, sourceCluster:String, targetCluster:String, jobs: Seq[PolicyInstanceResponse])
 
   case class PoliciesDetailsResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), policies: Seq[PoliciesDetails])

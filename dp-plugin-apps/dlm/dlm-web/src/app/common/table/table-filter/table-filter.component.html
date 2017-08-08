@@ -1,7 +1,16 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
 <div class="pull-left applied-filters-wrapper" qe-attr="applied-filters">
   <span class="label label-default filter-item" qe-attr="applied-filter"
         *ngFor="let filter of appliedFiltersMapped">
-    <strong>{{getFilterTitle(filter.key)}}</strong>: {{filter.value}}
+    <strong>{{getFilterTitle(filter.key)}}</strong>: {{filter.value | truncate:25}}
     <a href="javascript:void(0);" (click)="removeFilter(filter)">&times;</a>
   </span>
 </div>

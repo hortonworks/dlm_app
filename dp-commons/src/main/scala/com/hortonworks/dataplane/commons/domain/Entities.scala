@@ -63,6 +63,7 @@ object Entities {
                          avatar:Option[String],
                          active: Option[Boolean] = Some(true),
                          roles:Seq[String],
+                         services: Seq[String],
                          display:Option[String],
                          token:Option[String],
                          password:Option[String],
@@ -113,8 +114,9 @@ object Entities {
   //Data lake
   case class Location(
       id: Option[Long] = None,
-      country: String,
       city: String,
+      province: String,
+      country: String,
       latitude: Float,
       longitude: Float
   )
@@ -209,6 +211,12 @@ object Entities {
                  status: Option[Short] = Some(0),
                  created: Option[LocalDateTime] = Some(LocalDateTime.now()),
                  updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+  case class DpService(skuName:String,
+                       enabled:Boolean,
+                       sku: Sku,
+                       enabledSku: Option[EnabledSku]
+                      )
+  case class DpServiceEnableConfig(skuName:String,smartSenseId:String)
 
   case class ClusterHost(id: Option[Long] = None,
                          host: String,
@@ -472,6 +480,14 @@ object JsonFormatters {
   implicit val userGroupInfoWrites= Json.writes[UserGroupInfo]
   implicit val userGroupInfoReads= Json.reads[UserGroupInfo]
 
+
   implicit val userLdapGroupsWrites= Json.writes[UserLdapGroups]
   implicit val userLdapGroupsReads= Json.reads[UserLdapGroups]
+
+  implicit val dpServiceWrites= Json.writes[DpService]
+  implicit val dpServiceReads= Json.reads[DpService]
+
+  implicit val dpServiceEnableConfigWrites= Json.writes[DpServiceEnableConfig]
+  implicit val dpServiceEnableConfigReads= Json.reads[DpServiceEnableConfig]
+
 }

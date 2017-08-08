@@ -201,10 +201,17 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToUserGroupInfo)
   }
 
-  override def updateUserWithGroups(userLdapGroups: UserLdapGroups): Future[Either[Errors,UserContext]]={
+
+  override def updateUserWithGroups(userLdapGroups: UserLdapGroups): Future[Either[Errors,UserContext]]= {
     ws.url(s"$url/users/withgroups")
       .withHeaders("Accept" -> "application/json")
       .put(Json.toJson(userLdapGroups))
+      .map(mapToUserContext)
+  }
+  override def getUserContext(userName:String): Future[Either[Errors,UserContext]] ={
+    ws.url(s"$url/users/$userName/usercontext")
+      .withHeaders("Accept" -> "application/json")
+      .get()
       .map(mapToUserContext)
   }
 }

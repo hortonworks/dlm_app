@@ -1,3 +1,12 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
 <dlm-table
   #jobsTable
   [showPageSizeMenu]="showPageSizeMenu"
@@ -9,12 +18,16 @@
 <dlm-icon-column [showHexagon]="false" [showValue]="true"></dlm-icon-column>
 <dlm-status-column [showText]="false"></dlm-status-column>
 
+<ng-template #clusterNameCellRef let-name="value">
+  <span [tooltip]="getDatacenterName(name)">{{getClusterName(name)}}</span>
+</ng-template>
+
 <ng-template #statusCellTemplate let-policy="row">
   <dlm-job-status
     qe-attr="show-log"
     class="actionable"
     [job]="policy.lastJobResource"
-    [tooltip]="policy.lastJobResource.status !== JOB_STATUS.RUNNING ? ('page.notifications.view_log' | translate) : ''"
+    [tooltip]="'page.notifications.view_log' | translate"
     (click)="showPolicyLog(policy)">
   </dlm-job-status>
 </ng-template>
@@ -35,9 +48,9 @@
 </ng-template>
 
 <ng-template #policyNameCellTemplate let-row="row" let-name="value">
-  <a qe-attr="go-to-policies" (click)="goToPolicy(row)" class="actionable">
+  <span qe-attr="go-to-policies" (click)="goToPolicy(row)" class="actionable text-primary policy-name">
    {{name}}
-  </a>
+  </span>
 </ng-template>
 
 <ng-template #agoTemplate let-value="value" let-policy="row">

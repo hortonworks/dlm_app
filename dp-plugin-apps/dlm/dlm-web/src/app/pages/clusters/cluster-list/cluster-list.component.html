@@ -1,3 +1,12 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
 <dlm-table
   [rowDetailHeight]="550"
   [rowDetailTemplate]="rowDetailRef"
@@ -7,9 +16,9 @@
   [rows]="clusters">
 </dlm-table>
 
-<ng-template #statusCell let-status="value">
+<ng-template #statusCell let-status="value" let-cluster="row">
   <span>
-    <i class="fa fa-circle" [style.color]="status === CLUSTER_STATUS.HEALTHY ? '#1EB475' : '#EF6162'"></i>
+    <dlm-cluster-status-icon [cluster]="cluster"></dlm-cluster-status-icon>
     <span [innerHtml]="status"></span>
   </span>
 </ng-template>

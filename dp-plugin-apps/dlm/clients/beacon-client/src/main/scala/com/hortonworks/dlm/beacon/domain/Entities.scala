@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 package com.hortonworks.dlm.beacon.domain
 
 import play.api.libs.json.Json
@@ -17,15 +26,13 @@ object ResponseEntities {
 
   case class BeaconClusterStatusResponse(status:String, message: String, requestId: String)
 
-  case class Retry(attempts: Long, delay: Long)
-
   case class Notification(`type`: Option[String], to: Option[String])
 
-  case class PolicyDataResponse(policyId: String, name: String, `type`: String, status : String, executionType: Option[String],
-                                sourceDataset: String, targetDataset: String, sourceCluster: String, targetCluster: String,
-                                startTime: Option[String], endTime: String, frequencyInSec: Long, tags: Option[String],
-                                customProperties: Map[String, String], retry: Retry, acl: Option[AclObject],
-                                user: String, notification: Notification, entityType: String)
+  case class PolicyDataResponse(policyId: String, name: String, `type`: String, status : String, description: Option[String],
+                                executionType: Option[String], sourceDataset: String, targetDataset: String,
+                                sourceCluster: String, targetCluster: String, startTime: Option[String], endTime: String,
+                                frequencyInSec: Long, tags: Option[String], customProperties: Map[String, String],
+                                user: String, retryAttempts: Long, retryDelay: Long)
 
   case class PolicyStatusResponse(status: String, message: String, requestId: String)
 
@@ -37,9 +44,9 @@ object ResponseEntities {
 
   case class PolicyInstancesDetails(totalResults: Long, results: Long, instance: Seq[PolicyInstanceResponse])
 
-  case class PoliciesDetailResponse(policyId: String, name: String, `type`: String, status: String, sourceDataset: String,
-                                    targetDataset: String, frequencyInSec: Long, sourceCluster: String,
-                                    targetCluster: String, instances: Seq[PolicyInstanceResponse],
+  case class PoliciesDetailResponse(policyId: String, name: String, description: Option[String], `type`: String,
+                                    status: String, sourceDataset: String, targetDataset: String, frequencyInSec: Long,
+                                    sourceCluster: String, targetCluster: String, instances: Seq[PolicyInstanceResponse],
                                     startTime: Option[String], endTime: String)
 
   case class BeaconEventResponse(policyId: Option[String], instanceId: Option[String], event: String, eventType: String,
@@ -52,8 +59,8 @@ object RequestEntities {
   case class ClusterDefinitionRequest( fsEndpoint: String, hsEndpoint: Option[String], beaconEndpoint: String, name: String, dataCenter: String, description: String)
   case class PolicyDefinitionRequest( name: String, `type`: String, sourceDataset: String,
                                       sourceCluster: String, targetCluster: String, frequencyInSec: Long,
-                                      startTime: Option[String], endTime: Option[String], distcpMapBandwidth: Option[Long],
-                                      queueName: Option[String], description: Option[String])
+                                      startTime: Option[String], endTime: Option[String], distcpMaxMaps: Option[Long],
+                                      distcpMapBandwidth: Option[Long], queueName: Option[String], description: Option[String])
 }
 
 object JsonFormatters {
@@ -79,9 +86,6 @@ object JsonFormatters {
 
   implicit val beaconClusterStatusResponseWrites = Json.writes[BeaconClusterStatusResponse]
   implicit val beaconClusterStatusResponseReads = Json.reads[BeaconClusterStatusResponse]
-
-  implicit val retryWrites = Json.writes[Retry]
-  implicit val retryReads = Json.reads[Retry]
 
   implicit val notificationWrites = Json.writes[Notification]
   implicit val notificationReads = Json.reads[Notification]

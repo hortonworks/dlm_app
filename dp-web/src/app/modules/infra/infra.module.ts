@@ -18,9 +18,13 @@ import {UserManagementComponent} from './views/user-management/user-management.c
 import {DropdownModule} from '../../shared/dropdown/dropdown.module';
 import {AddUserComponent} from './views/user-management/add-user/add-user.component';
 import {PaginationModule} from '../../shared/pagination/pagination.module';
-import { UsersComponent } from './views/user-management/users/users.component';
-import { GroupsComponent } from './views/user-management/groups/groups.component';
+import {UsersComponent} from './views/user-management/users/users.component';
+import {GroupsComponent} from './views/user-management/groups/groups.component';
 import {AddGroupComponent} from './views/user-management/add-group/add-group.component';
+import {ConfigDialogComponent} from './widgets/config-dialog/config-dialog.component';
+import {ServiceManagementComponent} from './views/service-management/service-management.component';
+import {VerificationComponent} from './views/service-management/verification/verification.component';
+import {TabsModule} from '../../shared/tabs/tabs.module';
 
 @NgModule({
   imports: [
@@ -32,7 +36,8 @@ import {AddGroupComponent} from './views/user-management/add-group/add-group.com
     CollapsibleNavModule,
     DropdownModule,
     TranslateModule,
-    PaginationModule
+    PaginationModule,
+    TabsModule
   ],
 
   declarations: [
@@ -46,7 +51,10 @@ import {AddGroupComponent} from './views/user-management/add-group/add-group.com
     AddUserComponent,
     UsersComponent,
     GroupsComponent,
-    AddGroupComponent
+    AddGroupComponent,
+    ConfigDialogComponent,
+    ServiceManagementComponent,
+    VerificationComponent
   ]
 })
 export class InfraModule {

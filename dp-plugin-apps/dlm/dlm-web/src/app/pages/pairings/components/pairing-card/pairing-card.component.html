@@ -1,3 +1,12 @@
+<!--
+  ~ Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~
+  ~ Except as expressly permitted in a written agreement between you or your company
+  ~ and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~ reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~ of all or any part of the contents of this software is strictly prohibited.
+  -->
+
 <dlm-cluster-card>
   <div class="row pairing-card" qe-attr="pairing">
     <div class="col-md-5 col-sm-5 col-lg-5 col-xs-5 col" [tooltip]="locations[0]">
@@ -9,7 +18,7 @@
     </div>
     <div class="col-md-5 col-sm-5 col-lg-5 col-xs-5 col text-right" [tooltip]="locations[1]">
       <div class="cluster-name">{{ pairing.pair[1].name }}</div>
-      <div>{{ pairing.pair[0].dataCenter }}</div>
+      <div>{{ pairing.pair[1].dataCenter }}</div>
     </div>
     <div class="col-md-1 col-sm-1 col-lg-1 col-xs-1 col cross text-right">
       <button qe-attr="unpair" type="button" class="close" aria-label="Unpair" (click)="onClickUnpair(pairing)"><span aria-hidden="true">&times;</span></button>

@@ -57,6 +57,9 @@ public class TokenCheckFilter extends ZuulFilter {
   @Autowired
   private RequestResponseUtils requestResponseUtils;
 
+  @Autowired
+  private ServicesConfigUtil servicesConfigUtil;
+
   private ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -223,10 +226,16 @@ public class TokenCheckFilter extends ZuulFilter {
       } else {
         UserContext userContext = userContextOptional.get();
         if (userContext.isActive()){
-          setUpstreamUserContext(userContext);
-          setUpstreamKnoxTokenContext();
-          RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, userContext);
-          return null;
+          if (servicesConfigUtil.isRouteAllowed(userContext.getServices())){
+            setUpstreamUserContext(userContext);
+            setUpstreamKnoxTokenContext();
+            RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, userContext);
+            return null;
+          }else{
+            requestResponseUtils.redirectToServiceError();
+            RequestContext.getCurrentContext().setSendZuulResponse(false);//TODO move to redirection after thorough testing
+            return null;
+          }
         }else{
           return utils.sendForbidden(utils.getInactiveErrorMsg(userContext.getUsername()));
         }

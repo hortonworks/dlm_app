@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 import {Injectable, isDevMode} from '@angular/core';
 import {Http, RequestOptions} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
@@ -19,8 +28,8 @@ export class UserService {
     this.personaMap.set(this.ROLES.CURATOR, [new Persona('Data Steward', [], '/dataset', 'steward-logo.png')]);
     this.personaMap.set(this.ROLES.USER, [new Persona('Analytics', [], '/workspace', 'analytics-logo.png')]);
     this.personaMap.set(this.ROLES.INFRAADMIN, [new Persona('Cluster Admin', [], '/infra', 'infra-logo.png'),
-      new Persona('Data Lifecycle Manager', [], '', 'dlm-logo.png')]);
-    this.personaMap.set(this.ROLES.INFRAADMIN_SUPERADMIN, [new Persona('Data Lifecycle Manager', [], '', 'dlm-logo.png')]);
+      new Persona('Data Lifecycle Manager', [], '', 'dlm-logo.png', true)]);
+    this.personaMap.set(this.ROLES.INFRAADMIN_SUPERADMIN, [new Persona('Data Lifecycle Manager', [], '', 'dlm-logo.png', true)]);
   }
 
   get user() {

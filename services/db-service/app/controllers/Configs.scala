@@ -30,4 +30,23 @@ class Configs @Inject()(configRepo: ConfigRepo)(implicit exec: ExecutionContext)
       }.recoverWith(apiError)
     }.getOrElse(Future.successful(BadRequest))
   }
+  def addOrUpdate() = Action.async(parse.json) {request =>
+    request.body.validate[DpConfig].map { dpConfig =>
+      configRepo.findByKey(dpConfig.configKey).flatMap {
+        case Some(conf) => {
+          val dpConfigObj = DpConfig(id = conf.id, configKey = dpConfig.configKey, configValue = dpConfig.configValue, active = dpConfig.active, export = conf.export)
+          configRepo.update(dpConfigObj).map { res =>
+            success(dpConfigObj)
+          }.recoverWith(apiError)
+          Future.successful(success(conf))
+        }
+        case None => {
+          val dpConfigObj = DpConfig(id = None, configKey = dpConfig.configKey, configValue = dpConfig.configValue, active = Some(true), export = Some(true))
+          configRepo.insert(dpConfigObj).map {config =>
+             success(config)
+          }.recoverWith(apiError)
+        }
+      }.recoverWith(apiError)
+    }.getOrElse(Future.successful(BadRequest))
+  }
 }

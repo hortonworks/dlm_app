@@ -1,3 +1,12 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
@@ -92,7 +101,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   constructor(private store: Store<fromRoot.State>, private route: ActivatedRoute) {
     this.policies$ = this.store.select(getPolicyClusterJob).distinctUntilChanged(isEqual);
     this.subscriptions.push(this.policies$.subscribe(_ => this.policiesLoaded = true));
-    this.clusters$ = store.select(getAllClusters);
+    this.clusters$ = store.select(getAllClusters).distinctUntilChanged(isEqual);
     this.pairings$ = store.select(getAllPairings);
     this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, PAIRINGS_REQUEST));
     this.subscriptions.push(this.overallProgress$.subscribe(progress => {

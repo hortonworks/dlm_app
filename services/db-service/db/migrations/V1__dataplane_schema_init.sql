@@ -54,7 +54,9 @@ CREATE TABLE IF NOT EXISTS dataplane.permissions (
 CREATE TABLE IF NOT EXISTS dataplane.locations (
   id        BIGSERIAL PRIMARY KEY,
   city      VARCHAR(255)   NOT NULL,
+  province  VARCHAR(255),
   country   VARCHAR(255)   NOT NULL,
+  iso2      VARCHAR(10)     NOT NULL,
   latitude  DECIMAL(10, 6) NOT NULL,
   longitude DECIMAL(10, 6) NOT NULL
 );

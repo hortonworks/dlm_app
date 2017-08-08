@@ -1,23 +1,40 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ModalSize } from 'common/modal-dialog/modal-dialog.size';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
-import { LogService } from 'services/log.service';
+import { LogService, LOG_REQUEST } from 'services/log.service';
+import { Store } from '@ngrx/store';
+import * as fromRoot from 'reducers';
 import { Subscription } from 'rxjs/Subscription';
+import { getMergedProgress } from 'selectors/progress.selector';
+import { Observable } from 'rxjs/Observable';
+import { ProgressState } from 'models/progress-state.model';
 
 @Component({
   selector: 'dlm-log-modal-dialog',
   styleUrls: ['./log-modal-dialog.component.scss'],
-  template: `<dlm-modal-dialog #logModalDialog
+  template: `
+  <dlm-modal-dialog #logModalDialog
     [title]=" 'page.notifications.table.column.log' "
     [modalSize]="modalSize"
     [showCancel]="false">
     <dlm-modal-dialog-body>
-      <pre *ngIf="message" class="log-message">
-        {{message}}
-      </pre>
-      <div *ngIf="!message" class="alert alert-warning" role="alert">
-        {{ "common.errors.no_log" | translate }}
-      </div>
+      <dlm-progress-container [progressState]="overallProgress$ | async">
+        <pre *ngIf="message" class="log-message">
+          {{message}}
+        </pre>
+        <div *ngIf="!message" class="alert alert-warning" role="alert">
+          {{ "common.errors.no_log" | translate }}
+        </div>
+      </dlm-progress-container>
     </dlm-modal-dialog-body>
   </dlm-modal-dialog>
   `
@@ -25,10 +42,13 @@ import { Subscription } from 'rxjs/Subscription';
 export class LogModalDialogComponent implements OnInit {
   modalSize = ModalSize.LARGE;
   message: string;
+  overallProgress$: Observable<ProgressState>;
   private listener: Subscription;
   @ViewChild('logModalDialog') logModalDialog: ModalDialogComponent;
 
-  constructor(private logService: LogService) { }
+  constructor(private logService: LogService, private store: Store<fromRoot.State>) {
+    this.overallProgress$ = store.select(getMergedProgress(LOG_REQUEST));
+  }
 
   ngOnInit(): void {
     // Listen for changes in the service

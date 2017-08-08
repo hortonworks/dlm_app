@@ -1,6 +1,16 @@
+/*
+ * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *
+ * Except as expressly permitted in a written agreement between you or your company
+ * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ * reproduction, modification, redistribution, sharing, lending or other exploitation
+ * of all or any part of the contents of this software is strictly prohibited.
+ */
+
 import {
   Component, OnInit, ViewChild, ElementRef, OnChanges, Input, Output, SimpleChanges, HostBinding, EventEmitter
 } from '@angular/core';
+import { CLUSTER_STATUS_COLOR } from 'constants/color.constant';
 import * as L from 'leaflet';
 import 'leaflet-curve';
 
@@ -42,7 +52,6 @@ export class MapComponent implements OnChanges, OnInit {
   countries = [];
 
   statusColorUp = '#3FAE2A';
-  statusColorDown = '#EF6162';
   markerColorInnerBorder = '#FFFFFF';
   mapColor = '#CFCFCF';
 
@@ -165,7 +174,7 @@ export class MapComponent implements OnChanges, OnInit {
       radius: 7,
       color: this.markerColorInnerBorder,
       weight: 0,
-      fillColor: clusterInfo.healthStatus === CLUSTER_STATUS.HEALTHY ? this.statusColorUp : this.statusColorDown,
+      fillColor: CLUSTER_STATUS_COLOR[clusterInfo.healthStatus],
       fillOpacity: 0.8
     });
     const existingMarker = getExistingMarker(this.markerLookup, latLng);
