@@ -9,6 +9,9 @@
 
 package com.hortonworks.dlm.beacon
 
+import com.hortonworks.dataplane.commons.domain.Constants.BEACON
+import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
+import com.hortonworks.dataplane.cs.KnoxProxyWsClient
 import com.hortonworks.dlm.beacon.Exception.JsonException
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest, WSResponse}
 import play.api.libs.json.{JsError, JsSuccess, Json}
@@ -20,7 +23,7 @@ import play.api.libs.ws.ahc.AhcWSResponse
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class BeaconClusterServiceImpl()(implicit ws: WSClient) extends BeaconClusterService {
+class BeaconClusterServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconClusterService {
   import com.hortonworks.dlm.beacon.domain.ResponseEntities._
   import com.hortonworks.dlm.beacon.domain.JsonFormatters._
   import com.hortonworks.dlm.beacon.domain.RequestEntities._
@@ -61,32 +64,44 @@ class BeaconClusterServiceImpl()(implicit ws: WSClient) extends BeaconClusterSer
   }
 
 
-  override def listCluster(beaconEndpoint : String, clusterName: String): Future[Either[BeaconApiErrors, BeaconEntityResponse]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/getEntity/$clusterName")
+  override def listCluster(beaconEndpoint : String, clusterId: Long, clusterName: String)
+                          (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconEntityResponse]] = {
+    ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/getEntity/$clusterName", clusterId, BEACON).withHeaders(token)
       .withAuth(user, password, WSAuthScheme.BASIC)
       .get.map(mapToBeaconEntityResponse).recoverWith {
       case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
   }
 
-  override def listClusterStatus(beaconEndpoint : String, clusterName: String): Future[Either[BeaconApiErrors, BeaconClusterStatusResponse]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/status/$clusterName")
+  override def listClusterStatus(beaconEndpoint : String, clusterId: Long, clusterName: String)
+                                (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconClusterStatusResponse]] = {
+    ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/status/$clusterName", clusterId, BEACON).withHeaders(token)
       .withAuth(user, password, WSAuthScheme.BASIC)
       .get.map(mapToBeaconClusterStatusResponse).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
   }
 
-  override def createClusterDefinition(beaconEndpoint : String, dataCenterClusterName : String,
-                                       clusterDefinitionRequest:ClusterDefinitionRequest) :
+  override def createClusterDefinition(beaconEndpoint : String, clusterId: Long, dataCenterClusterName : String,
+                                       clusterDefinitionRequest:ClusterDefinitionRequest) (implicit token:Option[HJwtToken]):
   Future[Either[BeaconApiErrors, PostActionResponse]] = {
     val requestData:String =  mapToClusterDefinitionRequest(clusterDefinitionRequest)
-    ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/submit/$dataCenterClusterName")
+    ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/submit/$dataCenterClusterName", clusterId, BEACON).withHeaders(token)
       .withAuth(user, password, WSAuthScheme.BASIC)
       .withHeaders(httpHeaders.toList: _*)
       .post(requestData)
       .map(mapToPostActionResponse).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
+    }
+  }
+
+  override def deleteClusterDefinition(beaconEndpoint : String, clusterId: Long, dataCenterClusterName : String) (implicit token:Option[HJwtToken]):
+  Future[Either[BeaconApiErrors, PostActionResponse]] = {
+    ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/delete/$dataCenterClusterName", clusterId, BEACON).withHeaders(token)
+      .withAuth(user, password, WSAuthScheme.BASIC)
+      .withHeaders(httpHeaders.toList: _*)
+      .delete().map(mapToPostActionResponse).recoverWith {
+      case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
   }
 }
