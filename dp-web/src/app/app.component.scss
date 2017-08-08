@@ -5,7 +5,7 @@
 }
 
 .main {
-  padding-top: 55px;
+  padding-top: $layout-header-desktop-row-height;
 
   &.maximised {
     padding-left: $side-nav-width;
@@ -24,7 +24,7 @@
   }
 
   .page-content {
-    min-height: calc(100vh - 55px);
+    min-height: calc(100vh - #{$layout-header-desktop-row-height});
     position: relative;
   }
 }
