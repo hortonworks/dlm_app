@@ -92,6 +92,7 @@ migrate_schema() {
         sleep 5
     fi
 
+    echo "This will update database schema which can not be reverted. Please backup database manually"
     # start flyway container and trigger migrate script
     source $(pwd)/docker-flyway.sh migrate
 }
