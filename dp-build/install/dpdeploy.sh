@@ -292,15 +292,13 @@ destroy_all() {
 }
 
 upgrade() {
-    # destroy all but db
+    # destroy all but db and knox
     docker rm -f $APP_CONTAINERS_WITHOUT_DB || echo "App is not up."
-    destroy_knox || echo "Knox is not up."
 
     # migrate schema to new version
     migrate_schema
 
-    # init all
-    init_knox
+    # init all but db and knox
     init_app
 
     echo "Upgrade complete."
