@@ -59,3 +59,7 @@ dp-dropdown {
 .center {
   text-align: center !important;
 }
+
+:host /deep/ dp-tabs > .mdl-layout__header-row {
+  height: 55px;
+}

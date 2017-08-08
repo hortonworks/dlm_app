@@ -1,11 +1,14 @@
 @import "../../../../../styles/variables";
 
-.dashboard-title{
-    padding: 30px;
+.content-pane {
+  padding: 0 25px;
 }
 
-.content-pane{
-  padding-top: 0;
+.title-pane {
+  padding: 18px 0px;
+  span {
+    line-height: 34px;
+  }
 }
 
 .search-input {
@@ -20,24 +23,20 @@
   }
   .dp-input__icon {
     position: absolute;
-    margin-top: -10%;
-    margin-left: 90%;
+    right: 10px;
+    top: 10px;
     color: $dove-gray;
     font-size: 14px;
   }
 }
 
 input {
-    width: 100%;
-    box-sizing: border-box;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .btn-hwx-primary {
-    float: right;
-}
-
-.mdl-data-table {
-    margin-top: 17px;
+  float: right;
 }
 
 .mdl-typography--text-center {
@@ -57,7 +56,7 @@ input {
 }
 
 .mdl-menu__item {
-  a{
+  a {
     color: $dove-gray;
     text-decoration: none;
     font-weight: normal;
@@ -65,9 +64,4 @@ input {
   .fa {
     padding: 0 8px;
   }
-}
-
-.hwx-title {
-  display: inline-block;
-  padding-top: 10px;
 }

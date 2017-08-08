@@ -7,15 +7,16 @@ import {Persona} from '../../../models/header-data';
   styleUrls: ['./persona-popup.component.scss']
 })
 export class PersonaPopupComponent implements OnInit {
-  
+
   showPopup = false;
-  
+
   @Input() personas:Persona[] = [];
   @Input() personaNavSrc: HTMLElement;
   @Output() personaChange = new EventEmitter<Persona>();
+  @Input() activePersona;
 
   @ViewChild('personaNav') personaNav: ElementRef;
-  
+
   constructor() { }
 
   ngOnInit() {

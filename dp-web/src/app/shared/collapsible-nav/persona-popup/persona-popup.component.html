@@ -4,7 +4,7 @@
       <div class="logo-wrapper borderBox" title="{{ persona.name }}">
         <img [attr.src]="'../../../assets/images/' + persona.imageName" alt=""/>
       </div>
-      <div>{{ persona.name }}</div>
+      <div [ngClass]="{'active': activePersona === persona.name}">{{ persona.name }}</div>
     </ng-container>
   </li>
 </ul>

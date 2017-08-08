@@ -35,7 +35,7 @@
             [restrictFreeText]="true"
             (textChange)="onRoleSearchChange($event)"
             (onNewSearch)="onNewRoleAddition($event)"></tagging-widget>
-            <i class="fa fa-caret-square-o-down drop-down-icon" (click)="showRoleOptions()"></i>
+            <i class="fa fa-caret-down drop-down-icon" (click)="showRoleOptions()"></i>
             <div *ngIf="showRoles" class="option-list">
               <div *ngFor="let roleOption of allRoles" (click)="onNewRoleAddition(roleOption)">{{roleOption.display}}</div>
             </div>
@@ -74,7 +74,7 @@
               [restrictFreeText]="true"
               (textChange)="onRoleSearchChange($event)"
               (onNewSearch)="onRolesEdit($event)"></tagging-widget>
-              <i class="fa fa-caret-square-o-down drop-down-icon" (click)="showRoleOptions()"></i>
+              <i class="fa fa-caret-down drop-down-icon" (click)="showRoleOptions()"></i>
               <div *ngIf="showRoles" class="option-list">
                 <div *ngFor="let roleOption of allRoles" (click)="onRolesEdit(roleOption)">{{roleOption.display}}</div>
               </div>

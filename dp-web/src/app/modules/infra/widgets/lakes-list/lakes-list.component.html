@@ -1,67 +1,67 @@
 <div class="content-pane">
-    <div class="hwx-title">{{"common.clusters" | translate}}</div>
+  <div class="title-pane clearfix">
+    <span class="hwx-title">{{"common.clusters" | translate}}</span>
     <div class="pull-right">
-        <div class="search-input">
-            <input type="text" placeholder="{{'common.search' | translate}}" name="name" id="search" (keyup)="filter($event)" />
-            <i class="fa fa-search dp-input__icon" aria-hidden="true"></i>
-        </div>
-        <button class="mdl-button btn-hwx-primary" [routerLink]="['/infra/add']"> {{"pages.infra.labels.addButton" | translate}} </button>
+      <div class="search-input">
+        <input type="text" placeholder="{{'common.search' | translate}}" name="name" id="search" (keyup)="filter($event)" />
+        <i class="fa fa-search dp-input__icon" aria-hidden="true"></i>
+      </div>
+      <button class="mdl-button btn-hwx-primary" [routerLink]="['/infra/add']"> {{"pages.infra.labels.addButton" | translate}} </button>
     </div>
+  </div>
 
-    <div style="clear:both;"></div>
-
-    <table class="mdl-data-table mdl-js-data-table" dp-config-table (onSort)="onSort($event)">
-        <thead>
-        <tr>
-          <th class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder"> {{"common.status" | translate}}</th>
-          <th class="mdl-data-table__cell--non-numeric">
-              <dp-config-sorter [sortBy]="'name'">  {{"common.name" | translate}} </dp-config-sorter>
-          </th>
-          <th class="mdl-data-table__cell--non-numeric">
-            <dp-config-sorter [sortBy]="'city'">  {{"common.location" | translate}} </dp-config-sorter>
-          </th>
-          <th class="mdl-data-table__cell--non-numeric">
-            <dp-config-sorter [sortBy]="'dataCenter'">  {{"pages.infra.labels.dataCenter" | translate}} </dp-config-sorter>
-          </th>
-          <th class="mdl-data-table__cell--non-numeric">
-              <dp-config-sorter [type]="'number'" [sortBy]="'nodes'"> {{"pages.infra.labels.nodes" | translate}} </dp-config-sorter>
-          </th>
-          <th class="mdl-data-table__cell--non-numeric">
-              <dp-config-sorter [type]="'duration'" [sortBy]="'uptime'"> {{"pages.infra.labels.uptime" | translate}} </dp-config-sorter>
-          </th>
-          <th class="mdl-data-table__cell--non-numeric">
-              <dp-config-sorter [sortBy]="'services'"> {{"common.services" | translate}} </dp-config-sorter>
-          </th>
-          <th class="mdl-data-table__cell--non-numeric">
-              <dp-config-sorter [type]="'number'" [sortBy]="'hdfsUsedInBytes'"> {{"pages.infra.labels.hdfsUsed" | translate}} </dp-config-sorter>
-          </th>
-          <th class="mdl-data-table__cell--non-numeric actions"></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let lakeInfo of lakesList">
-            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder status-{{getStatusString(lakeInfo.status)}}">
-                <i class="fa fa-circle" aria-hidden="true"></i>
-            </td>
-            <td class="mdl-data-table__cell--non-numeric key-column mdl-data-table__cell--width15" (click)="viewDetails(lakeInfo.lakeId)">{{lakeInfo.name}}</td>
-            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.city}},&nbsp;{{lakeInfo.country}}</td>
-            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.dataCenter}}</td>
-            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.nodes}}</td>
-            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.uptimeStr}}</td>
-            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.services}}</td>
-            <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.hdfsUsed}}/{{lakeInfo.hdfsTotal}}</td>
-            <td class="mdl-data-table__cell--non-numeric actions">
-                  <button [attr.id]="'dropDown_'+lakeInfo.id" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
-                  <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i></button>
-                  <ul mdl class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+lakeInfo.id">
-                      <li class="mdl-menu__item"><i class="fa fa-external-link"></i><a href="{{lakeInfo.ambariUrl}}" target="_blank">Go to Ambari</a></li>
-                      <li class="mdl-menu__item" (click)="refresh(lakeInfo)"><i class="fa__fa-close--icon fa fa-refresh"></i>Refresh</li>
-                  </ul>
-            </td>
-        </tr>
-        <tr *ngIf="lakesList.length === 0">
-            <td class="mdl-typography--text-center" colspan="8" >{{"pages.infra.labels.emptySearchResult" | translate}}</td>
-        </tr>
-        </tbody>
-    </table>
+  <table class="mdl-data-table mdl-js-data-table" dp-config-table (onSort)="onSort($event)">
+      <thead>
+      <tr>
+        <th class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder"> {{"common.status" | translate}}</th>
+        <th class="mdl-data-table__cell--non-numeric">
+            <dp-config-sorter [sortBy]="'name'">  {{"common.name" | translate}} </dp-config-sorter>
+        </th>
+        <th class="mdl-data-table__cell--non-numeric">
+          <dp-config-sorter [sortBy]="'city'">  {{"common.location" | translate}} </dp-config-sorter>
+        </th>
+        <th class="mdl-data-table__cell--non-numeric">
+          <dp-config-sorter [sortBy]="'dataCenter'">  {{"pages.infra.labels.dataCenter" | translate}} </dp-config-sorter>
+        </th>
+        <th class="mdl-data-table__cell--non-numeric">
+            <dp-config-sorter [type]="'number'" [sortBy]="'nodes'"> {{"pages.infra.labels.nodes" | translate}} </dp-config-sorter>
+        </th>
+        <th class="mdl-data-table__cell--non-numeric">
+            <dp-config-sorter [type]="'duration'" [sortBy]="'uptime'"> {{"pages.infra.labels.uptime" | translate}} </dp-config-sorter>
+        </th>
+        <th class="mdl-data-table__cell--non-numeric">
+            <dp-config-sorter [sortBy]="'services'"> {{"common.services" | translate}} </dp-config-sorter>
+        </th>
+        <th class="mdl-data-table__cell--non-numeric">
+            <dp-config-sorter [type]="'number'" [sortBy]="'hdfsUsedInBytes'"> {{"pages.infra.labels.hdfsUsed" | translate}} </dp-config-sorter>
+        </th>
+        <th class="mdl-data-table__cell--non-numeric actions"></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let lakeInfo of lakesList">
+          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder status-{{getStatusString(lakeInfo.status)}}">
+              <i class="fa fa-circle" aria-hidden="true"></i>
+          </td>
+          <td class="mdl-data-table__cell--non-numeric key-column mdl-data-table__cell--width15" (click)="viewDetails(lakeInfo.lakeId)">{{lakeInfo.name}}</td>
+          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.city}},&nbsp;{{lakeInfo.country}}</td>
+          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.dataCenter}}</td>
+          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.nodes}}</td>
+          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.uptimeStr}}</td>
+          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.services}}</td>
+          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.hdfsUsed}}/{{lakeInfo.hdfsTotal}}</td>
+          <td class="mdl-data-table__cell--non-numeric actions">
+                <button [attr.id]="'dropDown_'+lakeInfo.id" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
+                <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i></button>
+                <ul mdl class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+lakeInfo.id">
+                    <li class="mdl-menu__item"><i class="fa fa-external-link"></i><a href="{{lakeInfo.ambariUrl}}" target="_blank">Go to Ambari</a></li>
+                    <li class="mdl-menu__item" (click)="refresh(lakeInfo)"><i class="fa__fa-close--icon fa fa-refresh"></i>Refresh</li>
+                </ul>
+          </td>
+      </tr>
+      <tr *ngIf="lakesList.length === 0">
+          <td class="mdl-typography--text-center" colspan="9" >{{"pages.infra.labels.emptySearchResult" | translate}}</td>
+      </tr>
+      </tbody>
+  </table>
 </div>
