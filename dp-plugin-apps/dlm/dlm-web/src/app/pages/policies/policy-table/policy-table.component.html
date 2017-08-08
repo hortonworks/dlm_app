@@ -63,6 +63,7 @@
     [jobsSort]="getJobsSortForRow(row.id)"
     [jobsPage]="getJobsPageForRow(row.id)"
     [jobsActiveActions]="getJobsActiveActionsForRow(row.id)"
+    (onSelectFile)="handleOnSelectFile($event)"
     (onSortJobs)="handleOnSortJobs($event, row.id)"
     (onSelectActionJobs)="handleOnSelectActionJobs($event, row.id)"
     (onPageChangeJobs)="handleJobsPageChange($event, row.id)"
