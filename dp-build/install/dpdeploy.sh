@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 source $(pwd)/config.env.sh
@@ -293,6 +293,15 @@ destroy_all() {
 }
 
 upgrade() {
+    if [ $# -lt 2 ] || [ "$1" != "--from" ] || [ ! -d "$2" ]; then
+        usage
+    fi
+
+    mv $(pwd)/config.env.sh $(pwd)/config.env.sh.bak
+    cp $2/config.env.sh $(pwd)/config.env.sh
+
+    /bin/cp -rf  $2/certs/* $(pwd)/certs
+
     # destroy all but db and knox
     docker rm -f $APP_CONTAINERS_WITHOUT_DB || echo "App is not up."
 
@@ -334,7 +343,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox and Consul containers and remove them. Needs to start from init knox again"
     printf "%-${tabspace}s:%s\n" "destroy --all" "Kill all containers and remove them. Needs to start from init again"
     printf "%-${tabspace}s:%s\n" "load" "Load all images from lib directory into docker"
-    printf "%-${tabspace}s:%s\n" "upgrade" "Upgrade existing dp-core to current version"
+    printf "%-${tabspace}s:%s\n" "upgrade --from <old_setup_directory>" "Upgrade existing dp-core to current version"
     printf "%-${tabspace}s:%s\n" "version" "Print the version of dataplane"
 }
 
@@ -413,7 +422,8 @@ else
             load_images
             ;;
         upgrade)
-            upgrade
+            shift
+            upgrade "$@"
             ;;
         version)
             print_version
