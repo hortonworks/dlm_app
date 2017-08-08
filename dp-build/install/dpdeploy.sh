@@ -295,12 +295,16 @@ destroy_all() {
 upgrade() {
     if [ $# -lt 2 ] || [ "$1" != "--from" ] || [ ! -d "$2" ]; then
         usage
+        exit -1
     fi
 
+    echo "Moving configuration..."
     mv $(pwd)/config.env.sh $(pwd)/config.env.sh.bak
     cp $2/config.env.sh $(pwd)/config.env.sh
 
-    /bin/cp -rf  $2/certs/* $(pwd)/certs
+    echo "Moving certs directory"
+    mkdir -p $(pwd)/certs
+    cp -R $2/certs/* $(pwd)/certs
 
     # destroy all but db and knox
     docker rm -f $APP_CONTAINERS_WITHOUT_DB || echo "App is not up."
