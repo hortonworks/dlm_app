@@ -27,6 +27,7 @@ export class PolicyDetailsComponent implements OnInit {
   @Output() onPageChangeJobs = new EventEmitter<any>();
   @Output() onSelectActionJobs = new EventEmitter<any>();
   @Output() abortJobAction = new EventEmitter<any>();
+  @Output() onSelectFile = new EventEmitter<any>();
 
   @Input()
   policy: Policy;
@@ -77,5 +78,9 @@ export class PolicyDetailsComponent implements OnInit {
 
   handleAbortJobAction(event) {
     this.abortJobAction.emit(event);
+  }
+
+  handleSelectFile(event) {
+    this.onSelectFile.emit(event);
   }
 }

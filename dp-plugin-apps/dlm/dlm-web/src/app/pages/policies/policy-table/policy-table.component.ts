@@ -347,4 +347,8 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   getJobsActiveActionsForRow(rowId) {
     return rowId && rowId in this.selectedJobsActions ? this.selectedJobsActions[rowId] : {};
   }
+
+  handleOnSelectFile(path) {
+    this.hdfsRootPath = path;
+  }
 }
