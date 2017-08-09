@@ -99,7 +99,7 @@ upgrade() {
     echo "Initializing Consul"
     read_consul_host
     docker run \
-        --name dp-consul-server \
+        --name $CONSUL_CONTAINER \
         --network host \
         --detach \
         consul:0.8.5 \
