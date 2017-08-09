@@ -73,6 +73,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
           val userCtx = UserContext(id = user.id, username = user.username, avatar = user.avatar,
             display = Some(user.displayname), active = user.active, roles = userRoleObj.roles,
             token = None, password = Some(user.password),
+            groupManaged= user.groupManaged,
             services = enabledServices, updatedAt = Some(time)
           )
           Some(userCtx)
