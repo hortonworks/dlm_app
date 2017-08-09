@@ -66,7 +66,12 @@ object Entities {
                          services: Seq[String],
                          display:Option[String],
                          token:Option[String],
-                         password:Option[String])
+                         password:Option[String],
+                         groupManaged:Option[Boolean]=Some(false),
+                         updatedAt:Option[Long])
+  case class UserLdapGroups(userName: String,
+                            ldapGroups:Seq[String]
+                           )
 
   case class GroupInfo(id: Option[Long] = None,
                       groupName: String,
@@ -475,11 +480,14 @@ object JsonFormatters {
   implicit val userGroupInfoWrites= Json.writes[UserGroupInfo]
   implicit val userGroupInfoReads= Json.reads[UserGroupInfo]
 
+
+  implicit val userLdapGroupsWrites= Json.writes[UserLdapGroups]
+  implicit val userLdapGroupsReads= Json.reads[UserLdapGroups]
+
   implicit val dpServiceWrites= Json.writes[DpService]
   implicit val dpServiceReads= Json.reads[DpService]
 
   implicit val dpServiceEnableConfigWrites= Json.writes[DpServiceEnableConfig]
   implicit val dpServiceEnableConfigReads= Json.reads[DpServiceEnableConfig]
-
 
 }

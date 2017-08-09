@@ -14,3 +14,14 @@
 .ngx-datatable .datatable-header-cell {
   user-select: initial !important;
 }
+
+.ngx-datatable {
+  .datatable-body-cell {
+    .datatable-body-cell-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+    }
+  }
+}

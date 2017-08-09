@@ -11,4 +11,7 @@ public interface LdapUserInterface {
 
   @RequestMapping(method = RequestMethod.POST, value = "api/users/withLdapGroups")
   UserContext addUserFromLdapGroupsConfiguration(@RequestParam(value="userName")String userName);
+
+  @RequestMapping(method = RequestMethod.POST, value = "/api/users/resyncLdapGroups")
+  UserContext resyncUserFromLdapGroupsConfiguration(@RequestParam(value="userName")String userName);
 }

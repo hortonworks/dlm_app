@@ -172,6 +172,43 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
           active = res._1.active,groupIds=groupIds,password=Some(res._1.password))
       }
   }
+  def updateUserGroups(userName:String,groupNamesFromLdap:Seq[String]) ={
+   for{
+     user<-findByName(userName)
+     allActiveGroups<-groupsRepo.getAllActiveGroups
+     currentGroupsForUser<-getCurrentGroupsForUser(user.get.id.get)
+   }yield{
+     val groupsFromLdap:Seq[Group]=allActiveGroups.filter(grp=>groupNamesFromLdap.contains(grp.groupName))
+     val groupIdsFromLdap:Seq[Long]=groupsFromLdap.map(_.id.get)
+     val groupIdsInDb:Seq[Long]=currentGroupsForUser.map(_.groupId.get)
+     val toBeDeletedUserGroups:Seq[UserGroup]=currentGroupsForUser.filterNot(ug=>groupIdsFromLdap.contains(ug.groupId.get))
+     val toBeAddedGroupIds:Seq[Long]=groupsFromLdap.filterNot(grp=>groupIdsInDb.contains(grp.id.get)).map(_.id.get)
+     val query = for {
+       deleteUserGroups<-UserGroups.filter(_.id inSet toBeDeletedUserGroups.map(_.id.get)).delete
+       inserUserGroups<-{
+         val userGroups=toBeAddedGroupIds.map{id=>
+           UserGroup(userId=Some(user.get.id.get),groupId = Some(id))
+         }
+         UserGroups returning UserGroups ++=  userGroups
+       }
+       updatedUserUpdatedTime<-
+         Users.filter(_.username===userName)
+           .map{r=>
+             (r.updated)
+           }
+           .update(Some(LocalDateTime.now()))
+
+     }yield{
+       (deleteUserGroups,inserUserGroups,updatedUserUpdatedTime)
+     }
+     db.run(query.transactionally)
+   }
+  }
+
+  private def getCurrentGroupsForUser(userId: Long) :Future[Seq[UserGroup]]= {
+    val query=UserGroups.filter(_.userId === userId).result
+    db.run(query)
+  }
 
   private def resolveUserRolesEntries(roles: Seq[RoleType.Value], userRoles: Seq[UserRole]):Future[(Seq[Long],Seq[Long])] = {
     rolesUtil.getRoleNameMap().map{ roleNameMap=>

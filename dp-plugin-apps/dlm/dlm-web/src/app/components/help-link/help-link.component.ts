@@ -36,7 +36,13 @@ import { Component, Input } from '@angular/core';
       <a [href]="linkTo" [target]="linkNewTab ? '_blank' : ''" [tooltip]="linkHint | translate">{{linkText | translate}}</a>
     </span>
     <ng-template #asIcon>
-      <i class="text-info actionable" [ngClass]="icon" *ngIf="iconHint" [tooltip]="iconHint | translate"></i>
+      <i class="text-info actionable" [ngClass]="icon" *ngIf="iconHint" [tooltip]="iconHint | translate"
+      [tooltipPlacement]="placement"></i>
+      <span *ngIf="iconLink">
+        <a [href]="iconLink" [target]="'_blank'">
+          <i class="text-info" [ngClass]="icon"></i>
+        </a>
+      </span>
     </ng-template>
   `,
   styleUrls: ['./help-link.component.scss']
@@ -47,7 +53,7 @@ export class HelpLinkComponent {
    * Font-awesome or glyphicon or any other icon-lib item
    * @type {string}
    */
-  @Input() icon = 'fa fa-question-circle';
+  @Input() icon = 'fa fa-question-circle-o';
   /**
    * Tooltip message shown on icon hover
    * @type {string}
@@ -73,6 +79,16 @@ export class HelpLinkComponent {
    * @type {string}
    */
   @Input() linkHint = '';
+
+  /**
+   * Help icon with hyperlink
+   */
+  @Input() iconLink = '';
+
+  /**
+   * Tooltip Placement
+   */
+  @Input() placement = 'bottom';
 
   constructor() {
   }

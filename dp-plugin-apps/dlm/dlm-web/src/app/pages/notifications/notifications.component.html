@@ -8,10 +8,11 @@
   -->
 
 <dlm-page-header
+  [isFlexCenter]="true"
   [title]="'page.notifications.header'">
 </dlm-page-header>
 <dlm-progress-container [progressState]="overallProgress$ | async">
-  <div class="row page-section">
+  <div class="row">
     <div class="col-md-12">
       <dlm-notifications-table [events]="events$ | async" [clusters]="clusters$ | async"></dlm-notifications-table>
     </div>

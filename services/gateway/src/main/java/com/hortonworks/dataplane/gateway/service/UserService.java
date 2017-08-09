@@ -51,4 +51,16 @@ public class UserService {
       }
     }
   }
+  public UserContext resyncUserFromLdapGroupsConfiguration(String subject) {
+    try {
+      return ldapUserInterface.resyncUserFromLdapGroupsConfiguration(subject);
+    }catch (FeignException fe){
+      if (fe.status()==403){
+        throw new NoAllowedGroupsException();//Usaually groups are not configured for this user.
+      }else{
+        throw fe;
+      }
+    }
+  }
+
 }
