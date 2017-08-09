@@ -24,11 +24,9 @@ export class PolicyActionsComponent {
 
   @HostListener('document:click', ['$event'])
   outsideClickHandler(e) {
-    if (!this.elementRef.nativeElement.contains(event.target)) {
+    if (!this.elementRef.nativeElement.contains(event.target) && this.isOpen) {
       this.isOpen = false;
-      if (this.isOpen) {
-        this.openChange.emit({ rowId: this.rowId, isOpen: this.isOpen});
-      }
+      this.openChange.emit({ rowId: this.rowId, isOpen: this.isOpen});
     }
   }
 
