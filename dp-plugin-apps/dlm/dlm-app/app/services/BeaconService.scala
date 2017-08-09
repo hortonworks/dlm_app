@@ -180,7 +180,7 @@ class BeaconService @Inject()(
         val accumulateClusters: Set[ClusterDefinition] = clusterNames.foldLeft(Set(): Set[ClusterDefinition]) {
           (acc, nextClusterName) => {
             if (next.clusterDefinitions.map(_.name).contains(nextClusterName)) acc else {
-              val clusterToBePairedDetails: ClusterDefinitionDetails = listOfClusters.find(_.cluster.name == nextClusterName).get
+              val clusterToBePairedDetails: ClusterDefinitionDetails = listOfClusters.find(x => x.dpCluster.dcName + "$" + x.dpCluster.name == nextClusterName).get
               val nnService = clusterToBePairedDetails.nnClusterService
               val hiveServerServiceUrl = clusterToBePairedDetails.hiveServerService match {
                 case Right(hiveServerService) => Some(hiveServerService.fullURL)
