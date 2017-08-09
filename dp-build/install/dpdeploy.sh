@@ -92,7 +92,12 @@ migrate_schema() {
         sleep 5
     fi
 
-    echo "This will update database schema which can not be reverted. Please backup database manually"
+    echo "This will update database schema which can not be reverted. All backups need to made manually. Please confirm to proceed (yes/no):"
+    read CONTINUE_MIGRATE
+    if [ "$CONTINUE_MIGRATE" != "yes" ]; then
+        exit -1
+    fi
+
     # start flyway container and trigger migrate script
     source $(pwd)/docker-flyway.sh migrate
 }
@@ -308,6 +313,18 @@ upgrade() {
 
     # destroy all but db and knox
     docker rm -f $APP_CONTAINERS_WITHOUT_DB || echo "App is not up."
+
+    # stop knox
+    docker stop $KNOX_CONTAINER
+
+    # destroy consul
+    destroy_consul
+
+    # bring consul back
+    init_consul
+
+    # start knox
+    docker start $KNOX_CONTAINER
 
     # migrate schema to new version
     migrate_schema
