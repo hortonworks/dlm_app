@@ -14,10 +14,13 @@ import { NotificationsComponent } from './notifications.component';
 import { MockStore } from '../../mocks/mock-store';
 import { Store } from '@ngrx/store';
 import { MomentModule } from 'angular2-moment';
+import { TooltipModule } from 'ng2-bootstrap';
 import { MockTranslateLoader } from '../../mocks/mock-translate-loader';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NavbarService } from 'services/navbar.service';
+import { LogService } from 'services/log.service';
 import { CommonComponentsModule } from 'components/common-components.module';
+import { EventMessageComponent } from 'common/notifications/event-message/event-message.component';
 import { PipesModule } from 'pipes/pipes.module';
 
 describe('NotificationsComponent', () => {
@@ -33,14 +36,17 @@ describe('NotificationsComponent', () => {
         RouterTestingModule,
         MomentModule,
         CommonComponentsModule,
-        PipesModule
+        PipesModule,
+        TooltipModule
       ],
       declarations: [
         NotificationsComponent,
+        EventMessageComponent
       ],
       providers: [
         {provide: Store, useClass: MockStore},
-        NavbarService
+        NavbarService,
+        LogService
       ]
     })
       .compileComponents();

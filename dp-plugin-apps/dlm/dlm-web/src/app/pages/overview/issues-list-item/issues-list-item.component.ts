@@ -9,8 +9,6 @@
 
 import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import { Event } from 'models/event.model';
-import { EVENT_TYPE } from 'constants/event.constant';
-import { getEventEntityName } from 'utils/event-utils';
 
 @Component({
   selector: 'dlm-issues-list-item',
@@ -24,17 +22,7 @@ import { getEventEntityName } from 'utils/event-utils';
           <strong>{{ event.event }}</strong>
         </div>
         <div class="description">
-          <span>{{ event.message }}</span>
-          <span *ngIf="shouldShowLogsLink">
-            <span>{{'common.for' | translate}}</span>
-            <span class="actionable text-primary">
-              <span (click)="selectPolicy.emit(event)">{{policyName}}</span>
-              <i class="fa fa-file-text-o"
-                (click)="selectLog.emit(event)"
-                [tooltip]="'page.notifications.view_log' | translate">
-              </i>
-            </span>
-          </span>
+          <dlm-event-message [event]="event"></dlm-event-message>
         </div>
         <div class="text-right text-muted timestamp">
           <small>
@@ -47,16 +35,7 @@ import { getEventEntityName } from 'utils/event-utils';
   styleUrls: ['./issues-list-item.component.scss']
 })
 export class IssuesListItemComponent implements OnInit {
-  get shouldShowLogsLink(): boolean {
-    return Boolean(EVENT_TYPE[this.event.eventType]);
-  }
 
-  get policyName(): string {
-    return getEventEntityName(this.event);
-  }
-
-  @Output() selectLog = new EventEmitter<Event>();
-  @Output() selectPolicy = new EventEmitter<Event>();
   @Input() event: Event;
 
   constructor() { }
