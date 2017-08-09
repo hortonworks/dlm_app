@@ -17,26 +17,26 @@
 
 .hexagon {
   &.hexagon-success {
-    background-color: $success-color;
+    background-color: $hive-hexagon-color;
 
     &:after {
-      border-top-color: $success-color;
+      border-top-color: $hive-hexagon-color;
     }
 
     &:before {
-      border-bottom-color: $success-color;
+      border-bottom-color: $hive-hexagon-color;
     }
   }
 
   &.hexagon-warning {
-    background-color: $warning-color;
+    background-color: $hdfs-hexagon-color;
 
     &:after {
-      border-top-color: $warning-color;
+      border-top-color: $hdfs-hexagon-color;
     }
 
     &:before {
-      border-bottom-color: $warning-color;
+      border-bottom-color: $hdfs-hexagon-color;
     }
   }
 }
@@ -47,4 +47,12 @@
 
 .inline-block {
   display: inline-block;
+}
+
+.primary {
+  color: $primary-color;
+}
+
+.link {
+  color: $link-color;
 }
