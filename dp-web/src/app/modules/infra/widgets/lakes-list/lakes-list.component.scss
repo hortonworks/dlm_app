@@ -51,7 +51,9 @@ input {
 .status-down {
   color: $roman-red;
 }
-
+.status-waiting {
+  color: $forest-green-1;
+}
 .status-na {
   color: $shuttle-gray;
 }

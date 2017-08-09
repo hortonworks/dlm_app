@@ -13,7 +13,6 @@ import {MapConnectionStatus} from '../../../../models/map-data';
 import {Point} from '../../../../models/map-data';
 import {MapSize} from '../../../../models/map-data';
 
-
 @Component({
   selector: 'dp-infra-lakes',
   templateUrl: './lakes.component.html',
@@ -30,7 +29,10 @@ export class LakesComponent implements OnInit {
   mapSet = new Map();
   health = new Map();
   mapSize: MapSize;
-  syncedString =  "SYNCED";
+  private syncedString =  "SYNCED";
+  private callCounts = 10;
+  private delayIntervalMs = 2000;
+
 
   constructor(private router: Router,
               private lakeService: LakeService,
@@ -50,6 +52,7 @@ export class LakesComponent implements OnInit {
             locationObserver = this.getLocationInfoWithStatus(lake.data.location, lake.clusters[0].id, lake.data.id);
           } else {
             unSyncedLakes.push(lake);
+            lake.data.isWaiting = true;
             locationObserver = this.getLocationInfo(lake.data.location);
           }
           this.updateHealth(lake, locationObserver);
@@ -74,15 +77,22 @@ export class LakesComponent implements OnInit {
   }
 
   updateUnSyncedLakes(unSyncedLakes){
-    let callCounts = 10;
-    let delayInterval = 2000;
     unSyncedLakes.forEach((unSyncedlake) =>{
-      this.lakeService.retrieve(unSyncedlake.data.id).delay(delayInterval).repeat(callCounts).skipWhile((lake) => lake.state !== this.syncedString).first().subscribe(lake =>{
-        this.clusterService.listByLakeId({lakeId: lake.id}).subscribe(clusters=> {
-          unSyncedlake.clusters = clusters;
-          this.updateHealth(unSyncedlake, this.getLocationInfoWithStatus(unSyncedlake.data.location, unSyncedlake.clusters[0].id, unSyncedlake.data.id));
-        });
-
+      let count =1;
+      this.lakeService.retrieve(unSyncedlake.data.id).delay(this.delayIntervalMs).repeat(this.callCounts).skipWhile((lake) => lake.state !== this.syncedString && count++ < this.callCounts).first().subscribe(lake =>{
+        let locationObserver = Observable.create();
+        if(lake.state === this.syncedString){
+          this.clusterService.listByLakeId({lakeId: lake.id}).subscribe(clusters=> {
+            unSyncedlake.clusters = clusters;
+            locationObserver = this.getLocationInfoWithStatus(unSyncedlake.data.location, unSyncedlake.clusters[0].id, unSyncedlake.data.id);
+            unSyncedlake.data.isWaiting = false;
+            this.updateHealth(unSyncedlake, locationObserver);
+          });
+        }else{
+          locationObserver = this.getLocationInfo(unSyncedlake.data.location);
+          unSyncedlake.data.isWaiting = false;
+          this.updateHealth(unSyncedlake, locationObserver);
+        }
       });
     });
   }

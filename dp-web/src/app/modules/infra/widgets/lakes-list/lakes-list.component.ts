@@ -50,8 +50,11 @@ export class LakesListComponent implements OnChanges {
     lakeInfo.dataCenter= lake.data.dcName;
     lakeInfo.cluster = lake.clusters && lake.clusters.length ? lake.clusters[0] : null;
     lakeInfo.services = lake.data.services ? lake.data.services : 'NA';
+    lakeInfo.isWaiting = lake.data.isWaiting;
     if (health) {
       this.populateHealthInfo(lakeInfo, health);
+    }else{
+      lakeInfo.status = lakeInfo.isWaiting ? LakeStatus.WAITING : LakeStatus.NA;
     }
     if (location) {
       lakeInfo.city = location.city;
@@ -64,7 +67,7 @@ export class LakesListComponent implements OnChanges {
     lakeInfo.hdfsUsed = health.usedSize ? health.usedSize : 'NA';
     lakeInfo.hdfsTotal = health.totalSize ? health.totalSize : 'NA';
     lakeInfo.nodes = health.nodes ? health.nodes : 'NA';
-    lakeInfo.status = this.getStatus(health);
+    lakeInfo.status = this.getStatus(health,lakeInfo);
     lakeInfo.startTime = health.status ? health.status.startTime : null;
     lakeInfo.uptimeStr = health.status ? DateUtils.toReadableDate(health.status.since) : 'NA';
     lakeInfo.uptime = health.status ? health.status.since : 'NA';
@@ -74,11 +77,13 @@ export class LakesListComponent implements OnChanges {
     this.router.navigate([`infra/cluster/details`, lakeId]);
   }
 
-  private getStatus(health) {
+  private getStatus(health,lakeInfo) {
     if (health && health.status && health.status.state === 'STARTED') {
       return LakeStatus.UP;
     } else if (health && health.status && health.status.state === 'NOT STARTED') {
       return LakeStatus.DOWN;
+    } else if(lakeInfo.isWaiting){
+      return LakeStatus.WAITING;
     } else {
       return LakeStatus.NA;
     }
@@ -89,6 +94,8 @@ export class LakesListComponent implements OnChanges {
       return LakeStatus[LakeStatus.UP].toLowerCase();
     } else if (status === LakeStatus.DOWN) {
       return LakeStatus[LakeStatus.DOWN].toLowerCase();
+    } else if(status === LakeStatus.WAITING){
+      return LakeStatus[LakeStatus.WAITING].toLowerCase();
     } else {
       return LakeStatus[LakeStatus.NA].toLowerCase();
     }
@@ -145,6 +152,7 @@ export class LakesListComponent implements OnChanges {
 export enum LakeStatus {
   UP,
   DOWN,
+  WAITING,
   NA
 }
 
@@ -165,6 +173,7 @@ export class LakeInfo {
   uptime?: string = 'NA';
   uptimeStr?: string = 'NA';
   startTime?: number;
+  isWaiting: boolean = false;
 
 
   get hdfsUsedInBytes(): number {
