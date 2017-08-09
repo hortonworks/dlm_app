@@ -2,7 +2,7 @@ import {Component, HostListener, ViewChild} from '@angular/core';
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {UserService} from '../../../../../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {TaggingWidgetTagModel, TagTheme} from '../../../../../shared/tagging-widget/tagging-widget.component';
+import {TaggingWidget, TaggingWidgetTagModel, TagTheme} from '../../../../../shared/tagging-widget/tagging-widget.component';
 import {TranslateService} from '@ngx-translate/core';
 import {GroupService} from '../../../../../services/group.service';
 import {Group} from '../../../../../models/group';
@@ -30,11 +30,13 @@ export class AddGroupComponent {//implements OnInit {
   group: Group = new Group();
   groupRoles: TaggingWidgetTagModel[] = [];
 
-  errorMessage: string;
+  errorMessages: string[] = [];
   showError = false;
 
   @ViewChild('addGroupForm') addGroupForm: NgForm;
   @ViewChild('editGroupForm') editGroupForm: NgForm;
+  @ViewChild('userTags') private userTags: TaggingWidget;
+  @ViewChild('roleTags') private roleTags: TaggingWidget;
 
   constructor(private userService: UserService,
               private groupService: GroupService,
@@ -44,9 +46,9 @@ export class AddGroupComponent {//implements OnInit {
   }
 
   @HostListener('click', ['$event', '$event.target'])
-  public onClick($event:MouseEvent, targetElement:HTMLElement):void {
+  public onClick($event: MouseEvent, targetElement: HTMLElement): void {
     let optionList = targetElement.querySelector('.option-list');
-    if(optionList){
+    if (optionList) {
       this.showRoles = false;
     }
   }
@@ -84,7 +86,7 @@ export class AddGroupComponent {//implements OnInit {
         });
       }, () => {
         this.showError = true;
-        this.errorMessage = this.translateService.instant('pages.infra.description.ldapError');
+        this.onError(this.translateService.instant('pages.infra.description.ldapError'));
       });
     }
   }
@@ -106,15 +108,12 @@ export class AddGroupComponent {//implements OnInit {
     }
   }
 
-  showRoleOptions(){
-    if(this.showRoles){
-      this.showRoles = false;
-    }else{
-      this.showRoles = true;
-    }
+  showRoleOptions() {
+    this.showRoles = !this.showRoles;
   }
 
   save() {
+    this.clearErrors();
     if (this.mode as Modes === Modes.EDIT && this.isEditDataValid()) {
       this.group.roles = this.groupRoles.map(role => {
         return role.data
@@ -123,10 +122,9 @@ export class AddGroupComponent {//implements OnInit {
         this.groupService.dataChanged.next();
         this.router.navigate(['groups'], {relativeTo: this.route});
       }, error => {
-        this.showError = true;
-        this.errorMessage = this.translateService.instant('pages.infra.description.updateGroupError');
+        this.onError(this.translateService.instant('pages.infra.description.updateGroupError'));
       });
-    } else if (this.isCreateDataValid()) {
+    } else if (this.mode as Modes === Modes.ADD && this.isCreateDataValid()) {
       let roles = this.roles.map(role => {
         return role.data;
       });
@@ -141,12 +139,10 @@ export class AddGroupComponent {//implements OnInit {
               failedGroups.push(grp);
             }
           });
-          this.errorMessage = `${this.translateService.instant('pages.infra.description.addGroupError')} - ${failedGroups.join(', ')}`;
-          this.showError = true;
+          this.onError(`${this.translateService.instant('pages.infra.description.addGroupError')} - ${failedGroups.join(', ')}`);
         }
       }, error => {
-        this.showError = true;
-        this.errorMessage = this.translateService.instant('pages.infra.description.addGroupError');
+        this.onError(this.translateService.instant('pages.infra.description.addGroupError'));
       });
     }
   }
@@ -155,22 +151,44 @@ export class AddGroupComponent {//implements OnInit {
     this.router.navigate(['groups'], {relativeTo: this.route});
   }
 
+
+  clearErrors() {
+    this.showError = false;
+    this.errorMessages = []
+  }
+
   isEditDataValid() {
-    if (this.groupRoles.length > 0 && this.editGroupForm.form.valid) {
-      return true;
+    let valid = true;
+    if (this.groupRoles.length === 0 || !this.editGroupForm.form.valid) {
+      this.onError(this.translateService.instant('common.defaultRequiredFields'));
+      valid = false;
+    } else if (!this.roleTags.isValid) {
+      this.onError(this.translateService.instant('pages.infra.description.invalidRoleInput'));
+      valid = false;
     }
-    this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
-    this.showError = true;
-    return false;
+    return valid;
   }
 
   isCreateDataValid() {
-    if (this.roles.length > 0 && this.addGroupForm.form.valid) {
-      return true;
+    let valid = true;
+    if (this.roles.length === 0 || !this.addGroupForm.form.valid) {
+      this.onError(this.translateService.instant('common.defaultRequiredFields'));
+      valid = false;
     }
-    this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
+    if (!this.roleTags.isValid) {
+      this.onError(this.translateService.instant('pages.infra.description.invalidRoleInput'));
+      valid = false;
+    }
+    if (!this.userTags.isValid) {
+      this.onError(this.translateService.instant('pages.infra.description.invalidUserInput'));
+      valid = false;
+    }
+    return valid;
+  }
+
+  onError(errorMessage) {
+    this.errorMessages.push(errorMessage);
     this.showError = true;
-    return false;
   }
 }
 

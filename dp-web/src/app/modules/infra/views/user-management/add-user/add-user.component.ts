@@ -2,7 +2,7 @@ import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {UserService} from '../../../../../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {TaggingWidgetTagModel, TagTheme} from '../../../../../shared/tagging-widget/tagging-widget.component';
+import {TaggingWidget, TaggingWidgetTagModel, TagTheme} from '../../../../../shared/tagging-widget/tagging-widget.component';
 import {User} from '../../../../../models/user';
 import {TranslateService} from '@ngx-translate/core';
 import {NgForm} from '@angular/forms';
@@ -29,11 +29,13 @@ export class AddUserComponent implements OnInit {
   user: User = new User('', '', '', '', [], false, '');
   userRoles: TaggingWidgetTagModel[] = [];
 
-  errorMessage: string;
+  errorMessages: string[] = [];
   showError = false;
 
   @ViewChild('addUserForm') addUserForm: NgForm;
   @ViewChild('editUserForm') editUserForm: NgForm;
+  @ViewChild('userTags') private userTags: TaggingWidget;
+  @ViewChild('roleTags') private roleTags: TaggingWidget;
 
   constructor(private userService: UserService,
               private router: Router,
@@ -81,8 +83,7 @@ export class AddUserComponent implements OnInit {
           this.availableUsers.push(user.name);
         });
       }, () => {
-        this.showError = true;
-        this.errorMessage = this.translateService.instant('pages.infra.description.ldapError');
+        this.onError(this.translateService.instant('pages.infra.description.ldapError'));
       });
     }
   }
@@ -106,15 +107,11 @@ export class AddUserComponent implements OnInit {
   }
 
   showRoleOptions() {
-    if (this.showRoles) {
-      this.showRoles = false;
-    } else {
-      this.showRoles = true;
-    }
+    this.showRoles = !this.showRoles;
   }
 
   save() {
-    this.showError = false;
+    this.clearErrors();
     if (this.mode as Modes === Modes.EDIT && this.isEditDataValid()) {
       this.user.roles = this.userRoles.map(role => {
         return role.data
@@ -123,10 +120,9 @@ export class AddUserComponent implements OnInit {
         this.userService.dataChanged.next();
         this.router.navigate(['users'], {relativeTo: this.route});
       }, error => {
-        this.showError = true;
-        this.errorMessage = this.translateService.instant('pages.infra.description.updateUserError');
+        this.onError(this.translateService.instant('pages.infra.description.updateUserError'));
       });
-    } else if (this.isCreateDataValid()) {
+    } else if (this.mode as Modes === Modes.ADD && this.isCreateDataValid()) {
       let roles = this.roles.map(role => {
         return role.data;
       });
@@ -141,34 +137,52 @@ export class AddUserComponent implements OnInit {
               failedUsers.push(user)
             }
           });
-          this.errorMessage = `${this.translateService.instant('pages.infra.description.addUserError')}- ${failedUsers.join(', ')}`;
-          this.showError = true;
+          this.onError(`${this.translateService.instant('pages.infra.description.addUserError')}- ${failedUsers.join(', ')}`);
         }
 
       }, error => {
-        this.errorMessage = this.translateService.instant('pages.infra.description.addUserError');
-        this.showError = true;
+        this.onError(this.translateService.instant('pages.infra.description.addUserError'));
       });
     }
   }
 
+  clearErrors() {
+    this.showError = false;
+    this.errorMessages = []
+  }
+
   isEditDataValid() {
-    if (this.userRoles.length > 0 && this.editUserForm.form.valid) {
-      return true;
+    let valid = true;
+    if (this.userRoles.length === 0 || !this.editUserForm.form.valid) {
+      this.onError(this.translateService.instant('common.defaultRequiredFields'));
+      valid = false;
+    } else if (!this.roleTags.isValid) {
+      this.onError(this.translateService.instant('pages.infra.description.invalidRoleInput'));
+      valid = false;
     }
-    this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
-    this.showError = true;
-    return false;
+    return valid;
   }
 
   isCreateDataValid() {
-    if (this.roles.length > 0 && this.addUserForm.form.valid) {
-      return true;
+    let valid = true;
+    if (this.roles.length === 0 || !this.addUserForm.form.valid) {
+      this.onError(this.translateService.instant('common.defaultRequiredFields'));
+      valid = false;
     }
-    this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
-    this.showError = true;
-    return false;
+    if (!this.roleTags.isValid) {
+      this.onError(this.translateService.instant('pages.infra.description.invalidRoleInput'));
+      valid = false;
+    }
+    if (!this.userTags.isValid) {
+      this.onError(this.translateService.instant('pages.infra.description.invalidUserInput'));
+      valid = false;
+    }
+    return valid;
+  }
 
+  onError(errorMessage) {
+    this.errorMessages.push(errorMessage);
+    this.showError = true;
   }
 
   back() {
