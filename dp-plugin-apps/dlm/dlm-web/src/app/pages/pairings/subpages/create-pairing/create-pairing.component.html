@@ -13,6 +13,7 @@
   description="page.pairings.create.header_note"
   contextMessage="Create Pairing Page">
 </dlm-page-header>
+<dlm-progress-container [progressState]="overallProgress$ | async">
 <div class="content" id="create_pairing">
   <div *ngIf="(firstSetClusters$ | async)?.length > 0; else noClusters">
     <div class="content-row header">
@@ -64,6 +65,7 @@
     </div>
   </ng-template>
 </div>
+</dlm-progress-container>
 <dlm-modal-dialog
   #errorDialog
   qe-attr="create-pair-error-modal"

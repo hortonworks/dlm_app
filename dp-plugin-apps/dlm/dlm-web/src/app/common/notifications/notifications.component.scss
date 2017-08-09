@@ -31,6 +31,7 @@
 }
 
 #notifications-dropdown {
+  z-index: 1100;
   &.dropdown-menu {
     top: 125%;
     right: -25px;

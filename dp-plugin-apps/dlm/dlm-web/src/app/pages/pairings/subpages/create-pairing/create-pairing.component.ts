@@ -28,6 +28,11 @@ import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component
 import { NOTIFICATION_TYPES } from 'constants/notification.constant';
 import { ToastNotification } from 'models/toast-notification.model';
 import { PROGRESS_STATUS } from 'constants/status.constant';
+import { ProgressState } from 'models/progress-state.model';
+import { getMergedProgress } from 'selectors/progress.selector';
+
+const PAIR_REQUEST = '[CREATE PAIR] PAIR_REQUEST';
+const CLUSTERS_REQUEST = '[CREATE PAIR] CLUSTERS_REQUEST';
 
 @Component({
   selector: 'dlm-create-pairing',
@@ -39,6 +44,7 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
   firstSetClusters$: Observable<ClusterPairing[]>;
   pairings$: Observable<Pairing[]>;
   progress$: Observable<Progress>;
+  overallProgress$: Observable<ProgressState>;
   private firstSetClusters: ClusterPairing[];
   private secondSetClusters: ClusterPairing[];
   private pairings: Pairing[];
@@ -71,8 +77,9 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
       firstCluster: '',
       secondCluster: ''
     });
-    this.store.dispatch(loadClusters());
-    this.store.dispatch(loadPairings());
+    this.store.dispatch(loadClusters(CLUSTERS_REQUEST));
+    this.store.dispatch(loadPairings(PAIR_REQUEST));
+    this.overallProgress$ = this.store.select(getMergedProgress(PAIR_REQUEST, CLUSTERS_REQUEST));
     this.pairingsSubscription$ = this.pairings$.subscribe(pairings => {
       this.pairings = pairings;
       // Select the first cluster again incase pairs did not load while selecting the first cluster from route params
