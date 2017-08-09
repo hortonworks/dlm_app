@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
@@ -34,6 +35,9 @@ public class TokenCheckFilter extends ZuulFilter {
   private static final String AUTH_ENTRY_POINT = Constants.DPAPP_BASE_PATH+"/auth/in";
   private static final String KNOX_CONFIG_PATH = Constants.DPAPP_BASE_PATH+"/api/knox/configuration";
   private static final String LOGIN_POINT = Constants.DPAPP_BASE_PATH + "/login";
+
+  @Value("${ldap.groups.resync.interval.minutes}")
+  private Long userGroupsResyncInterval;
 
   @Autowired
   private UserService userService;
@@ -122,6 +126,7 @@ public class TokenCheckFilter extends ZuulFilter {
     Optional<Cookie> knoxSsoCookie = cookieManager.getKnoxSsoCookie();
     if (!knoxSsoCookie.isPresent()) {
       return handleUnAuthorized(null);
+
     }
     String knoxSsoCookieValue = knoxSsoCookie.get().getValue();
     TokenInfo tokenInfo = knoxSso.validateJwt(knoxSsoCookieValue);
@@ -144,8 +149,16 @@ public class TokenCheckFilter extends ZuulFilter {
         }
       } else {
         if (userContextFromDb.get().isActive()){
-          setupUserSession(tokenInfo, userContextFromDb.get());
-          return null;
+          if (needsResyncFromLdap(userContextFromDb)){
+            logger.info(String.format("resyncing from ldap for user [%s]",tokenInfo.getSubject()));
+            UserContext updatedUserContext = userService.resyncUserFromLdapGroupsConfiguration(tokenInfo.getSubject());
+            setupUserSession(tokenInfo, updatedUserContext);
+            logger.info(("resync complete"));
+            return null;
+          }else{
+            setupUserSession(tokenInfo, userContextFromDb.get());
+            return null;
+          }
         }else{
           return utils.sendForbidden(utils.getInactiveErrorMsg(tokenInfo.getSubject()));
         }
@@ -153,6 +166,12 @@ public class TokenCheckFilter extends ZuulFilter {
     } catch (FeignException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private boolean needsResyncFromLdap(Optional<UserContext> userContextFromDb) {
+    //60000 is 1 minutes TODO get from conf.
+    return userContextFromDb.get().isGroupManaged() && System.currentTimeMillis()-userContextFromDb.get().getUpdatedAt()>
+      userGroupsResyncInterval*60000;
   }
 
   private void setupUserSession(TokenInfo tokenInfo, UserContext userContext) {
