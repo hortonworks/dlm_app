@@ -53,6 +53,15 @@
   </span>
 </ng-template>
 
+<ng-template #serviceNameCellTemplate let-name="value">
+  <div>
+    <span class="hexagon" [ngClass]="{'hexagon-warning': isHDFS(name), 'hexagon-success': !isHDFS(name)}">
+        <i class="fa" [ngClass]="{'fa-file-o': isHDFS(name), 'fa-database': !isHDFS(name)}"></i>
+    </span>
+    <span class="service-name">{{name}}</span>
+  </div>
+</ng-template>
+
 <ng-template #agoTemplate let-value="value" let-policy="row">
   <span *ngIf="policy.lastJobResource">
     <span *ngIf="value; else" [tooltip]="value | fmtTz | amDateFormat:'YYYY-MMM-DD, HH:mm:ss'">

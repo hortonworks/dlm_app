@@ -249,6 +249,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   constructor(private formBuilder: FormBuilder,
               private timezone: TimeZoneService,
               private store: Store<State>,
+              private timezoneService: TimeZoneService,
               private t: TranslateService) { }
 
   // todo: to Denys. This method looks quite scary. Things to improve:
@@ -305,7 +306,8 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       advanced: this.formBuilder.group({
         queue_name: [''],
         max_bandwidth: ['']
-      })
+      }),
+      userTimezone: ['']
     });
     const jobControls = this.policyForm.controls['job']['controls'];
     this.subscriptions.push(jobControls['unit'].valueChanges.subscribe(() => jobControls['frequency'].updateValueAndValidity()));
@@ -385,6 +387,8 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
           }
         }
       }
+      const userTimezone = this.timezoneService.userTimezone;
+      value.userTimezone =  userTimezone ? userTimezone.label : '';
       this.formSubmit.emit(value);
     }
     markAllTouched(this.policyForm);
