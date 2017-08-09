@@ -48,8 +48,8 @@
 </ng-template>
 
 <ng-template #policyNameCellTemplate let-row="row" let-name="value">
-  <span qe-attr="go-to-policies" (click)="goToPolicy(row)" class="actionable text-primary policy-name">
-   {{name}}
+  <span qe-attr="go-to-policies" (click)="goToPolicy(row)" class="actionable text-primary policy-name" [tooltip]="name">
+   {{name | truncate:17}}
   </span>
 </ng-template>
 
