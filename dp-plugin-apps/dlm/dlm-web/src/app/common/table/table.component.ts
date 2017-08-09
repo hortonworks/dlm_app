@@ -164,7 +164,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   };
 
   @HostListener('window:resize') onWindowResize() {
-    this.recalculateTable();
+    this.table.recalculate();
   }
 
   get rows(): any[] {
@@ -175,10 +175,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
     this.navbarCollapse$ = this.navbar.isCollapsed;
     this.navbarCollapseSubscription = this.navbarCollapse$
       .debounceTime(500)
-      .subscribe(() => {
-        this.table.recalculate();
-        this.cdRef.detectChanges();
-      });
+      .subscribe(() => this.table.recalculate());
   }
 
   handleSelectedCell({row, column, checked}) {
@@ -194,7 +191,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
      * TODO Replace this code after ngx-datatable is updated with dynamic page size selection
      */
     this.table.limit = newLimit;
-    this.recalculateTable();
+    this.table.recalculate();
   }
 
   changePage(page) {
