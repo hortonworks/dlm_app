@@ -17,7 +17,7 @@ import { TableColumn } from 'common/table/table-column.type';
     <ng-template #policyInfoCell let-row="row">
       <div class="policy-info">
         <p class="policy-name text-primary actionable" qe-attr="policy-info" (click)="onNameClick(row)" [tooltip]="row.name">
-          {{row.name | truncate:20}} <span class="caret"></span>
+          {{row.name}} <span class="caret"></span>
         </p>
         <p *ngIf="row.frequency" [tooltip]=popTemplate>{{row.frequency | frequency}}</p>
       </div>

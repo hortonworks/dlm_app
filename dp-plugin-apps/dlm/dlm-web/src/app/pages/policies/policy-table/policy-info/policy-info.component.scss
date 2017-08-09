@@ -10,6 +10,9 @@
 .policy-info {
   .policy-name {
     cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }
 

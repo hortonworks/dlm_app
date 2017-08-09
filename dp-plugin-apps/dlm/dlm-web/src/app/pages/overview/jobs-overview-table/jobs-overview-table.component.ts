@@ -97,9 +97,11 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
         }
       },
       {prop: 'sourceCluster', name: this.translateColumn('source_cluster'), cellTemplate: this.clusterNameCellRef},
-      {...TableComponent.makeFixedWith(20), name: '', cellTemplate: this.destinationIconCellRef},
+      {...TableComponent.makeFixedWith(20), name: '',
+        cellTemplate: this.destinationIconCellRef, cellClass: 'arrow-cell'},
       {prop: 'targetCluster', name: this.translateColumn('destination_cluster'), cellTemplate: this.clusterNameCellRef},
-      {prop: 'service', name: this.t.instant('common.service'), cellTemplate: this.serviceNameCellRef},
+      {prop: 'service', name: this.t.instant('common.service'),
+        cellTemplate: this.serviceNameCellRef, cellClass: 'service-cell'},
       {
         prop: 'name',
         cellClass: 'text-cell',
