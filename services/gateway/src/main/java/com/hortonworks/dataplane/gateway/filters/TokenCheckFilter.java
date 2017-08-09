@@ -150,9 +150,10 @@ public class TokenCheckFilter extends ZuulFilter {
       } else {
         if (userContextFromDb.get().isActive()){
           if (needsResyncFromLdap(userContextFromDb)){
-            logger.debug("resyncing");
+            logger.info(String.format("resyncing from ldap for user [%s]",tokenInfo.getSubject()));
             UserContext updatedUserContext = userService.resyncUserFromLdapGroupsConfiguration(tokenInfo.getSubject());
             setupUserSession(tokenInfo, updatedUserContext);
+            logger.info(("resync complete"));
             return null;
           }else{
             setupUserSession(tokenInfo, userContextFromDb.get());
