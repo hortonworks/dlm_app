@@ -48,6 +48,7 @@ import { HiveService } from 'services/hive.service';
 import { POLL_INTERVAL } from 'constants/api.constant';
 import { LogService } from 'services/log.service';
 import { EntityType } from 'constants/log.constant';
+import { ColumnMode } from '@swimlane/ngx-datatable';
 
 @Component({
   selector: 'dlm-policy-table',
@@ -58,6 +59,7 @@ import { EntityType } from 'constants/log.constant';
 export class PolicyTableComponent implements OnInit, OnDestroy {
   columns: any[];
   tableTheme = TableTheme.Cards;
+  columnMode = ColumnMode.flex;
   jobs$: Observable<Job[]>;
   filteredJobs$: Observable<Job[]>;
   selectedPolicy$: BehaviorSubject<Policy> = new BehaviorSubject(<Policy>{});
@@ -115,9 +117,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       .filter(([_, policy]) => Boolean(
         this.activeContentType === PolicyContent.Jobs && policy && policy.id && this.tableComponent.expandedRows[policy.id]
       ))
-      .do(([_, policy]) => {
-        this.store.dispatch(loadJobsForPolicy(policy));
-      });
+      .do(([_, policy]) => this.store.dispatch(loadJobsForPolicy(policy)));
     this.subscriptions.push(polling$.subscribe());
   }
 
@@ -139,38 +139,38 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.columns = [
-      {...this.iconColumn.cellSettings, prop: 'type', cellTemplate: this.iconColumn.cellRef},
+      {prop: 'type', cellTemplate: this.iconColumn.cellRef, flexGrow: 1, name: ' ',
+        sortable: false,
+        cellClass: 'icon-cell'},
       {
-        ...this.statusColumn.cellSettings,
         prop: 'status',
         name: ' ',
         cellTemplate: this.statusColumn.cellRef,
-        sortable: false,
-        ...TableComponent.makeFixedWith(20)
+        sortable: false, flexGrow: 1,
+        cellClass: 'icon-cell'
       },
       {
         prop: 'status',
         cellClass: 'text-cell',
         headerClass: 'text-header',
-        cellTemplate: this.verbStatusCellTemplate,
-        ...TableComponent.makeFixedWith(80)
+        cellTemplate: this.verbStatusCellTemplate, flexGrow: 4
       },
       {
         name: this.t.instant('common.name'),
         cellTemplate: this.policyInfoColumn.cellRef,
-        sortable: false, ...TableComponent.makeFixedWith(200)
+        sortable: false,  flexGrow: 7
       },
       {prop: 'sourceClusterResource', name: this.t.instant('common.source'),
-        cellTemplate: this.clusterCellTemplateRef, comparator: this.clusterResourceComparator.bind(this)},
+        cellTemplate: this.clusterCellTemplateRef, comparator: this.clusterResourceComparator.bind(this), flexGrow: 8},
       {prop: 'targetClusterResource', name: this.t.instant('common.destination'),
-        cellTemplate: this.clusterCellTemplateRef, comparator: this.clusterResourceComparator.bind(this)},
-      {prop: 'sourceDataset', name: this.t.instant('common.path'), cellTemplate: this.pathCellRef},
-      {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs'), sortable: false},
+        cellTemplate: this.clusterCellTemplateRef, comparator: this.clusterResourceComparator.bind(this), flexGrow: 8},
+      {prop: 'sourceDataset', name: this.t.instant('common.path'), cellTemplate: this.pathCellRef, flexGrow: 8},
+      {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs'), sortable: false, flexGrow: 4},
       {prop: 'jobs.0.trackingInfo.timeTaken', name: this.t.instant('common.duration'),
-        cellTemplate: this.durationCellRef, ...TableComponent.makeFixedWith(120)},
+        cellTemplate: this.durationCellRef, flexGrow: 5},
       {prop: 'lastGoodJobResource.startTime', name: 'Last Good',
-        cellTemplate: this.lastGoodCellRef, ...TableComponent.makeFixedWith(120)},
-      {name: ' ', cellTemplate: this.actionsCellRef, ...TableComponent.makeFixedWith(55), sortable: false}
+        cellTemplate: this.lastGoodCellRef, flexGrow: 5},
+      {name: ' ', cellTemplate: this.actionsCellRef, sortable: false, flexGrow: 2}
     ];
     if (this.activePolicyId) {
       this.openJobsForPolicy();
