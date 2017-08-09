@@ -59,9 +59,10 @@ export class CollapsibleNavComponent implements OnInit, OnChanges {
 
           if (exactMatch) {
             this.collapsibleNavService.collpaseSideNav.next(tab.collapseSideNav || this.collapseSideNav);
+            return true;
           }
           if(i === persona.tabs.length - 1 && !exactMatch){
-            this.collapsibleNavService.collpaseSideNav.next(tab.collapseSideNav || this.collapseSideNav)
+            this.collapsibleNavService.collpaseSideNav.next(tab.collapseSideNav || this.collapseSideNav);
             return true;
           }
 

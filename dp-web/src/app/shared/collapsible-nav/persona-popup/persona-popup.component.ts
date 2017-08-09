@@ -7,15 +7,16 @@ import {Persona} from '../../../models/header-data';
   styleUrls: ['./persona-popup.component.scss']
 })
 export class PersonaPopupComponent implements OnInit {
-  
+
   showPopup = false;
-  
+
   @Input() personas:Persona[] = [];
-  @Input() personaNavSrc: ElementRef;
+  @Input() personaNavSrc: HTMLElement;
   @Output() personaChange = new EventEmitter<Persona>();
+  @Input() activePersona;
 
   @ViewChild('personaNav') personaNav: ElementRef;
-  
+
   constructor() { }
 
   ngOnInit() {
@@ -32,13 +33,10 @@ export class PersonaPopupComponent implements OnInit {
       return;
     }
 
-    if (targetElement === this.personaNavSrc.nativeElement) {
+    const clickedInside = this.personaNavSrc.contains(targetElement);
+    if (clickedInside) {
       this.showPopup = !this.showPopup;
-      return;
-    }
-
-    const clickedInside = this.personaNav.nativeElement.contains(targetElement);
-    if (!clickedInside) {
+    } else {
       this.showPopup = false;
     }
   }

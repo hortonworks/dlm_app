@@ -146,11 +146,15 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     return dateTime.tz(this.timeZone.defaultServerTimezone).format();
   }
 
-  formatDateDisplay(timeField) {
+  formatDateDisplay(timeField, timezone) {
     if (!timeField.date) {
       return null;
     }
-    return `${timeField.date} ${moment(timeField.time).format('HH:mm')}`;
+    // timezone string is like
+    // (UTC-07:00 PDT) America / Dawson, Ensenada, Los Angeles, Santa Isabel, Tijuana, Vancouver, Whitehorse
+    // Trim it to first 15 characters to extract (UTC-07:00 PDT)
+    const trimmedTimezone = timezone.substring(0, 15);
+    return `${timeField.date} ${moment(timeField.time).format('HH:mm')} ${trimmedTimezone}`;
   }
 
   submitReview() {
@@ -172,11 +176,16 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
   setDetails(sourceCluster: Cluster, destinationCluster: Cluster, policyForm) {
     const type = policyForm.general.type;
     const repeatMode = policyForm.job.repeatMode;
+    const timezone = policyForm.userTimezone;
+    const formattedEndTime = this.formatDateDisplay(policyForm.job.endTime, timezone);
     const details = [
       {name: 'name', label: this.t.instant(`${this.tDetails}.policy_name`), value: policyForm.general.name},
       {name: 'description', label: this.t.instant(`${this.tDetails}.policy_description`), value: policyForm.general.description},
       {name: 'sourceCluster', label: this.t.instant(`${this.tDetails}.sourceCluster.self`), value: sourceCluster.name},
+      {name: 'sourceDataCenter', label: this.t.instant(`${this.tDetails}.sourceDataCenter`), value: sourceCluster.dataCenter},
       {name: 'destinationCluster', label: this.t.instant(`${this.tDetails}.destinationCluster.self`), value: destinationCluster.name},
+      {name: 'destinationDataCenter', label: this.t.instant(`${this.tDetails}.destinationDataCenter`),
+        value: destinationCluster.dataCenter},
       {name: 'type', label: this.t.instant(`${this.tDetails}.service`), value: this.policyTypesLabels[type]}
     ];
     if (type === this.policyTypes.HDFS) {
@@ -192,9 +201,13 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
       details.push({name: 'repeatMode', label: this.t.instant(`${this.tDetails}.repeat`), value});
     }
     details.push({name: 'startTime', label: this.t.instant(`${this.tDetails}.start_time`),
-      value: this.formatDateDisplay(policyForm.job.startTime)});
-    details.push({name: 'EndTime', label: this.t.instant(`${this.tDetails}.end_time`),
-      value: this.formatDateDisplay(policyForm.job.endTime)});
+      value: this.formatDateDisplay(policyForm.job.startTime, timezone)});
+    if (formattedEndTime) {
+      details.push({
+        name: 'EndTime', label: this.t.instant(`${this.tDetails}.end_time`),
+        value: formattedEndTime
+      });
+    }
     if (policyForm.advanced.queue_name) {
       details.push({name: 'queue_name', label: this.t.instant(`${this.tDetails}.queue_name`), value: policyForm.advanced.queue_name});
     }

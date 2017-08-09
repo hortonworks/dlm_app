@@ -146,7 +146,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         name: ' ',
         cellTemplate: this.statusColumn.cellRef,
         sortable: false,
-        ...TableComponent.makeFixedWith(25)
+        ...TableComponent.makeFixedWith(20)
       },
       {
         prop: 'status',
@@ -160,18 +160,26 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         cellTemplate: this.policyInfoColumn.cellRef,
         sortable: false, ...TableComponent.makeFixedWith(200)
       },
-      {prop: 'sourceClusterResource', name: this.t.instant('common.source'), cellTemplate: this.clusterCellTemplateRef},
-      {prop: 'targetClusterResource', name: this.t.instant('common.destination'), cellTemplate: this.clusterCellTemplateRef},
-      {prop: 'sourceDataset', name: this.t.instant('common.path'), cellTemplate: this.pathCellRef, ...TableComponent.makeFixedWith(200)},
+      {prop: 'sourceClusterResource', name: this.t.instant('common.source'),
+        cellTemplate: this.clusterCellTemplateRef, comparator: this.clusterResourceComparator.bind(this)},
+      {prop: 'targetClusterResource', name: this.t.instant('common.destination'),
+        cellTemplate: this.clusterCellTemplateRef, comparator: this.clusterResourceComparator.bind(this)},
+      {prop: 'sourceDataset', name: this.t.instant('common.path'), cellTemplate: this.pathCellRef},
       {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs'), sortable: false},
-      {prop: 'jobs.0.trackingInfo.timeTaken', name: this.t.instant('common.duration'), cellTemplate: this.durationCellRef},
-      {prop: 'lastGoodJobResource.startTime', name: 'Last Good', cellTemplate: this.lastGoodCellRef},
+      {prop: 'jobs.0.trackingInfo.timeTaken', name: this.t.instant('common.duration'),
+        cellTemplate: this.durationCellRef, ...TableComponent.makeFixedWith(120)},
+      {prop: 'lastGoodJobResource.startTime', name: 'Last Good',
+        cellTemplate: this.lastGoodCellRef, ...TableComponent.makeFixedWith(120)},
       {name: ' ', cellTemplate: this.actionsCellRef, ...TableComponent.makeFixedWith(55), sortable: false}
     ];
     if (this.activePolicyId) {
       this.openJobsForPolicy();
     }
     this.initPolling();
+  }
+
+  clusterResourceComparator(cluster1: Cluster, cluster2: Cluster) {
+    return cluster1.name.toLowerCase() > cluster2.name.toLowerCase() ? 1 : -1;
   }
 
   openJobsForPolicy() {
@@ -346,5 +354,9 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
 
   getJobsActiveActionsForRow(rowId) {
     return rowId && rowId in this.selectedJobsActions ? this.selectedJobsActions[rowId] : {};
+  }
+
+  handleOnSelectFile(path) {
+    this.hdfsRootPath = path;
   }
 }

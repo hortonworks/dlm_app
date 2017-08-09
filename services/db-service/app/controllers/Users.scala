@@ -1,5 +1,6 @@
 package controllers
 
+import java.time.{ZoneId, ZonedDateTime}
 import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Entities._
@@ -52,10 +53,11 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
   /*this gives detail for users who are group managed as well*/
   def getUserContext(userName:String)= Action.async{
     getUserContextInternal(userName).map{
-      case None =>NotFound
-      case Some(userContext)=>success(userContext)
+      case None=> NotFound
+      case Some(userCtx)=>success(userCtx)
     }.recoverWith(apiError)
   }
+
 
   private def getUserContextInternal(userName: String):Future[Option[UserContext]] = {
     for {
@@ -67,16 +69,19 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
         case Some(userAndRoles) => {
           val user = userAndRoles._1
           val userRoleObj = userAndRoles._2
+          val time = user.updated.get.atZone(ZoneId.systemDefault()).toInstant.getEpochSecond
           val userCtx = UserContext(id = user.id, username = user.username, avatar = user.avatar,
             display = Some(user.displayname), active = user.active, roles = userRoleObj.roles,
             token = None, password = Some(user.password),
-            services = enabledServices
+            groupManaged= user.groupManaged,
+            services = enabledServices, updatedAt = Some(time)
           )
           Some(userCtx)
         }
       }
     }
   }
+
 
   def load(userId: Long) = Action.async {
     userRepo
@@ -150,7 +155,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
       }
       .getOrElse(Future.successful(BadRequest))
   }
-  def insertWithGroups =Action.async(parse.json) { req=>
+  def insertWithGroups = Action.async(parse.json) { req=>
     req.body.validate[UserGroupInfo]
       .map { userGroupInfo =>
         if (userGroupInfo.groupIds.isEmpty){
@@ -161,6 +166,19 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
           userRepo.insertUserWithGroups(userGroupInfo,password)
             .map(userGroupInfo => success(userGroupInfo))
             .recoverWith(apiError)
+        }
+      }.getOrElse(Future.successful(BadRequest))
+  }
+  def updateWithGroups = Action.async(parse.json) { req =>
+    req.body.validate[UserLdapGroups]
+      .map{inp=>
+        userRepo.updateUserGroups(inp.userName,inp.ldapGroups).flatMap {res=>
+          getUserContextInternal(inp.userName).map{res=>
+            res match {
+              case Some(userCtx)=>success(userCtx)
+              case None=>InternalServerError
+            }
+          }
         }
       }.getOrElse(Future.successful(BadRequest))
   }

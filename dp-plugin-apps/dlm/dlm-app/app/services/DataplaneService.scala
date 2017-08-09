@@ -15,7 +15,7 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster, Error, Errors, Location}
 import com.hortonworks.dataplane.commons.domain.Ambari.{ClusterProperties, ClusterServiceWithConfigs, ConfigurationInfo, NameNodeInfo}
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterService, DpClusterService, LocationService}
-import models.Entities.{BeaconCluster, BeaconClusters, ClusterServiceEndpointDetails, ClusterStats}
+import models.Entities.{BeaconCluster, BeaconClusters, ClusterServiceEndpointDetails, ClusterStats, ClusterIdWithBeaconUrl}
 import play.api.Logger
 import play.api.http.Status.BAD_GATEWAY
 
@@ -146,32 +146,32 @@ class DataplaneService @Inject()(
   }
 
   /**
-    * Gets list of beacon urls registered with dataplane
+    * Gets list of clusterids with beacon urls registered with dataplane
     * @return
     */
-  def getBeaconUrls: Future[Either[Errors, Seq[String]]] = {
-    val p: Promise[Either[Errors, Seq[String]]] = Promise()
+  def getClusterIdWithBeaconUrls: Future[Either[Errors, Seq[ClusterIdWithBeaconUrl]]] = {
+    val p: Promise[Either[Errors, Seq[ClusterIdWithBeaconUrl]]] = Promise()
 
     clusterComponentService
       .getAllServiceEndpoints(DataplaneService.BEACON_SERVER)
       .map({
         case Right(beaconClusters) => {
-          val beaconUrls = beaconClusters.map(x => {
+          val clusterIdWithBeaconUrl : Seq[Either[Errors, ClusterIdWithBeaconUrl]] = beaconClusters.map(x => {
             val beaconServiceDetails
               : Either[Errors, ClusterServiceEndpointDetails] =
               getBeaconEndpointDetails(x)
 
             beaconServiceDetails match {
               case Right(beaconServiceDetails) =>
-                Right(beaconServiceDetails.fullURL)
+                Right(ClusterIdWithBeaconUrl(beaconServiceDetails.fullURL, x.clusterid.get))
               case Left(errors) => Left(errors)
             }
           })
 
-          if (!beaconUrls.exists(_.isLeft)) {
-            p.success(Right(beaconUrls.map(_.right.get)))
+          if (!clusterIdWithBeaconUrl.exists(_.isLeft)) {
+            p.success(Right(clusterIdWithBeaconUrl.map(_.right.get)))
           } else {
-            val errors: Errors = beaconUrls.find(_.isLeft).get.left.get
+            val errors: Errors = clusterIdWithBeaconUrl.find(_.isLeft).get.left.get
             p.trySuccess(Left(errors))
           }
 

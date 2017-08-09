@@ -1,6 +1,6 @@
 @import "../../../styles/variables";
 
-:host{
+:host {
   height: $header-height;
   min-height: $header-height;
   z-index: 1;
@@ -30,7 +30,7 @@
   font-size: 17px;
 }
 
-.mdl-menu__item a{
+.mdl-menu__item a {
   padding: 0;
   color: $dove-gray;
   font-size: 14px;
@@ -41,25 +41,32 @@
   text-align: left;
 }
 
-.user-name{
+.user-name {
   height: 34px;
   cursor: auto;
 }
 
-.user-name:hover{
+.user-name:hover {
   background-color: $white !important;
 }
 
-:host /deep/ .mdl-menu__container{
+:host /deep/ .mdl-menu__container {
   position: fixed;
 }
- .mdl-menu {
+
+.mdl-menu {
   width: 200px;
 }
 
 .mdl-button {
   color: $dove-gray;
   font-size: 14px;
+}
+
+.actions {
+  .fa {
+    font-size: 16px;
+  }
 }
 
 .breadcrumb {

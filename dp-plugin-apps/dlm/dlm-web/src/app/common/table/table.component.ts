@@ -239,7 +239,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
       // restore expanded rows after data update
       Object.keys(this.expandedRows).forEach(id => {
         if (this.expandedRows[id]) {
-          const policy = this.rows.find(p => p.id === id);
+          const policy = this.rows.find(p => '' + p.id === id);
           if (policy) {
             this.table.rowDetail.toggleExpandRow(policy);
           }

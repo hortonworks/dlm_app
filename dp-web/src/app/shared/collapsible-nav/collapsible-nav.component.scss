@@ -9,12 +9,14 @@
   background: $logo-background;
   border: 1px solid $logo-background;
   white-space: nowrap;
-  padding-left: 25px;
+  padding-left: 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
 
   & > img {
-    width: 30px;
+    width: 25px;
     float: left;
-    margin-top: 10px;
+    margin-top: 15px;
     cursor: pointer;
   }
 
@@ -22,6 +24,38 @@
     color: $white;
     font-size: 20px;
     padding-left: 10px;
+  }
+
+  .persona-name {
+    text-transform: uppercase;
+    font-size: 15px;
+
+    &:after {
+      font-family: "FontAwesome";
+      font-style: normal;
+      font-size: 15px;
+      content: '\f078';
+      margin-left: 10px;
+      display: inline-block;
+      color: $fruit-salad;
+    }
+  }
+
+  .persona-drop-down-small {
+    display: none;
+
+    &:after {
+      font-family: "FontAwesome";
+      font-style: normal;
+      font-size: 12px;
+      content: '\f078';
+      margin-left: 5px;
+      display: inline-block;
+      color: $fruit-salad;
+      position: absolute;
+      left: 28px;
+      top: -20px;
+    }
   }
 
   &.minimised {
@@ -41,8 +75,8 @@
   width: $side-nav-width;
 
   .sidenav-item {
-    padding: 15px 5px 15px 25px;
-    font-size: 16px;
+    padding: 11px 5px 11px 20px;
+    font-size: 14px;
     text-decoration: none;
     font-weight: normal;
     display: block;
@@ -57,6 +91,7 @@
     }
 
     i {
+      font-size: 16px;
       margin-right: 8px;
     }
   }
@@ -66,7 +101,8 @@
       font-family: FontAwesome;
       content: "\F0DA";
       color: $fruit-salad;
-      margin-left: -25px;
+      margin-left: -20px;
+      font-size: 18px;
       position: absolute;
     }
   }
@@ -78,14 +114,14 @@
   }
 
   .sidenav-item {
-    padding:15px;
+    padding:15px 15px 16px 15px;
+
     &.active:before {
       margin-left: -15px;
-      margin-top: 5px;
     }
 
     i {
-      font-size: 24px;
+      font-size: 19px;
       margin-right: 8px;
     }
   }
@@ -101,13 +137,17 @@
   .persona-name {
     display: none;
   }
+
+  .persona-drop-down-small {
+    display: block;
+  }
 }
 
 .expander {
   width: 100%;
-  background: $pickled-bluewood;
-  height: 42px;
-  line-height: 42px;
+  background: $logo-background;
+  height: 48px;
+  line-height: 48px;
   text-align: center;
   color: $forest-green-1;
   font-size: 16px;
@@ -120,7 +160,7 @@
 
 .suit-navigation {
   position: absolute;
-  top: 55px;
+  top: $layout-header-desktop-row-height;
   left: 0;
   margin: 0;
   padding: 40px 40px 20px;
@@ -130,7 +170,6 @@
   box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
   z-index: 100;
   visibility: hidden;
- // width: 400px;
   display: flex;
   justify-content: space-between;
 

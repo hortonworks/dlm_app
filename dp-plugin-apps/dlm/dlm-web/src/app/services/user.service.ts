@@ -24,16 +24,25 @@ export class UserService {
   private ROLES = ROLES;
 
   constructor(private http: Http) {
-    this.personaMap.set(this.ROLES.SUPERADMIN, [new Persona('Admin', [], '/infra', 'infra-logo.png')]);
-    this.personaMap.set(this.ROLES.CURATOR, [new Persona('Data Steward', [], '/dataset', 'steward-logo.png')]);
-    this.personaMap.set(this.ROLES.USER, [new Persona('Analytics', [], '/workspace', 'analytics-logo.png')]);
-    this.personaMap.set(this.ROLES.INFRAADMIN, [new Persona('Cluster Admin', [], '/infra', 'infra-logo.png'),
-      new Persona('Data Lifecycle Manager', [], '', 'dlm-logo.png', true)]);
-    this.personaMap.set(this.ROLES.INFRAADMIN_SUPERADMIN, [new Persona('Data Lifecycle Manager', [], '', 'dlm-logo.png', true)]);
   }
 
-  get user() {
+  get user(): User {
     return AuthUtils.getUser();
+  }
+
+  getPersonaMap() {
+    const personaMap = new Map();
+    personaMap.set(this.ROLES.SUPERADMIN, [new Persona('Admin', [], '/infra', 'infra-logo.png')]);
+    personaMap.set(this.ROLES.CURATOR, [
+      new Persona('Data Steward', [], '/dataset', 'steward-logo.png', !!this.user && this.user.services.indexOf('dss') > -1, false)
+    ]);
+    personaMap.set(this.ROLES.USER, [new Persona('Analytics', [], '/workspace', 'analytics-logo.png')]);
+    personaMap.set(this.ROLES.INFRAADMIN, [
+      new Persona('Cluster Admin', [], '/infra', 'infra-logo.png'),
+      new Persona('Data Lifecycle Manager', [], '', 'dlm-logo.png', true, true)
+    ]);
+    personaMap.set(this.ROLES.INFRAADMIN_SUPERADMIN, [new Persona('Data Lifecycle Manager', [], '', 'dlm-logo.png', true, true)]);
+    return personaMap;
   }
 
   getUserDetail(): Observable<User> {
@@ -43,7 +52,8 @@ export class UserService {
     if (!isDevMode()) {
       return mapResponse(this.http.get(urlPrefix + '/auth/userDetail', new RequestOptions(getHeaders())));
     }
-    return Observable.of(<User>{});
+    // Get mock response
+    return mapResponse(this.http.get('auth/userDetail'));
   }
 
   logoutUser() {
@@ -71,6 +81,7 @@ export class UserService {
   getPersonaDetails() {
     const personas = [];
     let isSuperAdmin = false;
+    this.personaMap = this.getPersonaMap();
     if (this.hasRole(this.ROLES.SUPERADMIN)) {
       isSuperAdmin = true;
       personas.push(...this.personaMap.get(this.ROLES.SUPERADMIN));

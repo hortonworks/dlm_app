@@ -60,7 +60,7 @@ object Webservice {
     def updateActiveAndRoles(userInfo: UserInfo): Future[Either[Errors,Boolean]]
 
     def addUserWithGroups(userGroupInfo: UserGroupInfo): Future[Either[Errors,UserGroupInfo]]
-
+    def updateUserWithGroups(userLdapGroups: UserLdapGroups): Future[Either[Errors,UserContext]]
     def getUserContext(userName:String): Future[Either[Errors,UserContext]]
 
   }

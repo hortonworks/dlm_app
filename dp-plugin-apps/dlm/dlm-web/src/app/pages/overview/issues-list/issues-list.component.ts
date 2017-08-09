@@ -32,7 +32,7 @@ import { Event } from 'models/event.model';
     </div>
     <div class="row" *ngIf="!events.length">
       <div class="col-md-12">
-        <p>{{'page.overview.issues.list.empty_list' | translate}}</p>
+        <p class="text-muted">{{'page.overview.issues.list.empty_list' | translate}}</p>
       </div>
     </div>
   `,

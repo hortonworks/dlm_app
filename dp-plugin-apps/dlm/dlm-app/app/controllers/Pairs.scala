@@ -14,6 +14,7 @@ import javax.inject.Inject
 
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+import com.hortonworks.dataplane.commons.auth.Authenticated
 import services.BeaconService
 import models.JsonResponses
 import models.Entities.PairClusterRequest
@@ -21,6 +22,7 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 
+import com.hortonworks.dataplane.commons.auth.Authenticated
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._
 import models.JsonFormatters._
 
@@ -28,14 +30,16 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class Pairs @Inject() (
-  val beaconService: BeaconService
+  val beaconService: BeaconService,
+  authenticated: Authenticated
 ) extends Controller {
 
   /**
     * Get list of all beacon cluster pairing
     */
-  def list () = Action.async {
-    beaconService.getAllPairedClusters.map {
+  def list () = authenticated.async { request =>
+    implicit val token = request.token
+    beaconService.getAllPairedClusters().map {
       pairedClusters => pairedClusters match {
         case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
         case Right(pairedClusters) => Ok(Json.toJson(pairedClusters))
@@ -46,9 +50,10 @@ class Pairs @Inject() (
   /**
     * Pair clusters
     */
-  def create () = Action.async (parse.json) { request =>
+  def create () = authenticated.async (parse.json) { request =>
     Logger.info("Received create pair request")
     request.body.validate[Set[PairClusterRequest]].map { pairClusterRequest =>
+      implicit val token = request.token
       beaconService.pairClusters(pairClusterRequest)
         .map {
           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
@@ -60,9 +65,10 @@ class Pairs @Inject() (
   /**
     * Unpair clusters
     */
-  def unpair () = Action.async (parse.json) { request =>
+  def unpair () = authenticated.async (parse.json) { request =>
     Logger.info("Received create pair request")
     request.body.validate[Set[PairClusterRequest]].map { pairClusterRequest =>
+      implicit val token = request.token
       beaconService.unPairClusters(pairClusterRequest)
         .map {
           case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))

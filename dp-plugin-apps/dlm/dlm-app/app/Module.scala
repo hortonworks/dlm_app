@@ -22,7 +22,7 @@ import com.hortonworks.dlm.beacon.WebService.{BeaconClusterService, BeaconEventS
 import com.hortonworks.dlm.webhdfs.WebService.FileService
 import com.hortonworks.dlm.webhdfs.FileServiceImpl
 import com.hortonworks.datapalane.consul._
-import com.hortonworks.dataplane.cs.{AmbariWebServiceImpl, ClusterWsClient}
+import com.hortonworks.dataplane.cs.{AmbariWebServiceImpl, ClusterWsClient, KnoxProxyWsClient}
 import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 import com.hortonworks.dataplane.commons.auth.Authenticated
 
@@ -76,6 +76,7 @@ class Module extends AbstractModule {
   @Singleton
   @Named("beaconClusterService")
   def provideBeaconClusterService(implicit ws: WSClient,configuration: Configuration):BeaconClusterService = {
+    implicit val knoxProxyWsClient = KnoxProxyWsClient(ws, configuration.underlying)
     new BeaconClusterServiceImpl()
   }
 
@@ -83,6 +84,7 @@ class Module extends AbstractModule {
   @Singleton
   @Named("beaconPairService")
   def provideBeaconClusterPairService(implicit ws: WSClient,configuration: Configuration):BeaconPairService = {
+    implicit val knoxProxyWsClient = KnoxProxyWsClient(ws, configuration.underlying)
     new BeaconPairServiceImpl()
   }
 
@@ -90,6 +92,7 @@ class Module extends AbstractModule {
   @Singleton
   @Named("beaconPolicyService")
   def provideBeaconPolicyService(implicit ws: WSClient,configuration: Configuration):BeaconPolicyService = {
+    implicit val knoxProxyWsClient = KnoxProxyWsClient(ws, configuration.underlying)
     new BeaconPolicyServiceImpl()
   }
 
@@ -97,6 +100,7 @@ class Module extends AbstractModule {
   @Singleton
   @Named("beaconPolicyInstanceService")
   def provideBeaconPolicyInstanceService(implicit ws: WSClient,configuration: Configuration):BeaconPolicyInstanceService = {
+    implicit val knoxProxyWsClient = KnoxProxyWsClient(ws, configuration.underlying)
     new BeaconPolicyInstanceServiceImpl()
   }
 
@@ -104,6 +108,7 @@ class Module extends AbstractModule {
   @Singleton
   @Named("beaconEventService")
   def provideBeaconEventService(implicit ws: WSClient,configuration: Configuration):BeaconEventService = {
+    implicit val knoxProxyWsClient = KnoxProxyWsClient(ws, configuration.underlying)
     new BeaconEventServiceImpl()
   }
 
@@ -111,6 +116,7 @@ class Module extends AbstractModule {
   @Singleton
   @Named("beaconLogService")
   def provideBeaconLogService(implicit ws: WSClient,configuration: Configuration):BeaconLogService = {
+    implicit val knoxProxyWsClient = KnoxProxyWsClient(ws, configuration.underlying)
     new BeaconLogServiceImpl()
   }
 

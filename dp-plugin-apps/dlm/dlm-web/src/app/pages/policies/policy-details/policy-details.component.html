@@ -45,7 +45,10 @@
     >
     </dp-jobs-table>
     <div *ngIf="contentType===policyContent.Files">
-      <dlm-hdfs-browser *ngIf="fileBasedPolicy()" [rootPath]="hdfsRootPath" [clusterId]="sourceCluster"></dlm-hdfs-browser>
+      <dlm-hdfs-browser *ngIf="fileBasedPolicy()"
+        [rootPath]="hdfsRootPath"
+        [clusterId]="sourceCluster"
+        (select)="handleSelectFile($event)"></dlm-hdfs-browser>
       <dlm-hive-browser *ngIf="databaseBasedPolicy()" [databases]="[policyDatabase]"></dlm-hive-browser>
     </div>
   </div>

@@ -9,7 +9,10 @@
 
 package com.hortonworks.dlm.beacon
 
-import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
+import com.hortonworks.dataplane.cs.KnoxProxyWsClient
+import com.hortonworks.dataplane.commons.domain.Constants.BEACON
+import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
+import play.api.libs.ws.{WSAuthScheme, WSResponse}
 import com.hortonworks.dlm.beacon.WebService.BeaconPolicyService
 import com.hortonworks.dlm.beacon.domain.ResponseEntities._
 import com.hortonworks.dlm.beacon.Exception.JsonException
@@ -19,10 +22,11 @@ import play.api.libs.json.{JsError, JsSuccess}
 import play.api.libs.ws.ahc.AhcWSResponse
 import play.api.mvc.Results
 
+import scala.collection.immutable.HashMap
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class BeaconPolicyServiceImpl()(implicit ws: WSClient) extends BeaconPolicyService {
+class BeaconPolicyServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconPolicyService {
   import com.hortonworks.dlm.beacon.domain.JsonFormatters._
 
   private def mapToPolicyDetailsResponse(res: WSResponse) = {
@@ -103,33 +107,40 @@ class BeaconPolicyServiceImpl()(implicit ws: WSClient) extends BeaconPolicyServi
 
 
 
-  override def listPolicyStatus(beaconEndpoint : String, policyName : String) : Future[Either[BeaconApiErrors, PolicyStatusResponse]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/status/$policyName")
+  override def listPolicyStatus(beaconEndpoint : String, clusterId: Long, policyName : String)
+                               (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PolicyStatusResponse]] = {
+    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/status/$policyName", clusterId, BEACON).withHeaders(token)
       .withAuth(user, password, WSAuthScheme.BASIC)
       .get.map(mapToPolicyStatusResponse).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
   }
 
-  override def listPolicy(beaconEndpoint : String, policyName : String) : Future[Either[BeaconApiErrors, PolicyDataResponse]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/getEntity/$policyName")
+  override def listPolicy(beaconEndpoint : String, clusterId: Long, policyName : String)
+                         (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PolicyDataResponse]] = {
+    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/getEntity/$policyName", clusterId, BEACON).withHeaders(token)
       .withAuth(user, password, WSAuthScheme.BASIC)
       .get.map(mapToPolicyDetailsResponse).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
   }
 
-  override def listPolicies(beaconEndpoint : String) : Future[Either[BeaconApiErrors, Seq[PoliciesDetailResponse]]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/list?fields=status,clusters,frequency,startTime,endTime,datasets,description,instances&instanceCount=10")
+  override def listPolicies(beaconEndpoint : String, clusterId: Long)
+                           (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, Seq[PoliciesDetailResponse]]] = {
+    val queryString = HashMap("fields" -> "status,clusters,frequency,startTime,endTime,datasets,description,instances",
+                              "instanceCount" -> "10")
+    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/list", clusterId, BEACON).withHeaders(token)
+      .withQueryString(queryString.toList: _*)
       .withAuth(user, password, WSAuthScheme.BASIC)
       .get.map(mapToPoliciesDetailsResponse).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
   }
 
-  override def submitAndSchedulePolicy(beaconEndpoint : String, policyName : String, policyDefinitionRequest : PolicyDefinitionRequest) : Future[Either[BeaconApiErrors, PostActionResponse]] = {
+  override def submitAndSchedulePolicy(beaconEndpoint : String, clusterId: Long, policyName : String, policyDefinitionRequest : PolicyDefinitionRequest)
+                                      (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]] = {
     val requestData:String =  mapToPolicyDefinitionRequest(policyDefinitionRequest)
-    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/submitAndSchedule/$policyName")
+    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/submitAndSchedule/$policyName", clusterId, BEACON).withHeaders(token)
       .withAuth(user, password, WSAuthScheme.BASIC)
       .withHeaders(httpHeaders.toList: _*)
       .post(requestData)
@@ -138,9 +149,10 @@ class BeaconPolicyServiceImpl()(implicit ws: WSClient) extends BeaconPolicyServi
     }
   }
 
-  override def submitPolicy(beaconEndpoint : String, policyName : String, policyDefinitionRequest : PolicyDefinitionRequest) : Future[Either[BeaconApiErrors, PostActionResponse]] = {
+  override def submitPolicy(beaconEndpoint : String, clusterId: Long, policyName : String, policyDefinitionRequest : PolicyDefinitionRequest)
+                           (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]] = {
     val requestData:String =  mapToPolicyDefinitionRequest(policyDefinitionRequest)
-    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/submit/$policyName")
+    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/submit/$policyName", clusterId, BEACON).withHeaders(token)
       .withAuth(user, password, WSAuthScheme.BASIC)
       .withHeaders(httpHeaders.toList: _*)
       .post(requestData)
@@ -150,8 +162,9 @@ class BeaconPolicyServiceImpl()(implicit ws: WSClient) extends BeaconPolicyServi
     }
   }
 
-  override def schedulePolicy(beaconEndpoint : String, policyName : String) : Future[Either[BeaconApiErrors, PostActionResponse]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/schedule/$policyName")
+  override def schedulePolicy(beaconEndpoint : String, clusterId: Long, policyName : String)
+                             (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]] = {
+    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/schedule/$policyName", clusterId, BEACON).withHeaders(token)
       .withAuth(user, password, WSAuthScheme.BASIC)
       .withHeaders(httpHeaders.toList: _*)
       .post(Results.EmptyContent())
@@ -160,8 +173,9 @@ class BeaconPolicyServiceImpl()(implicit ws: WSClient) extends BeaconPolicyServi
     }
   }
 
-  override def suspendPolicy(beaconEndpoint : String, policyName : String) : Future[Either[BeaconApiErrors, PostActionResponse]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/suspend/$policyName")
+  override def suspendPolicy(beaconEndpoint : String, clusterId: Long, policyName : String)
+                            (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]] = {
+    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/suspend/$policyName", clusterId, BEACON).withHeaders(token)
       .withAuth(user, password, WSAuthScheme.BASIC)
       .withHeaders(httpHeaders.toList: _*)
       .post(Results.EmptyContent())
@@ -170,8 +184,9 @@ class BeaconPolicyServiceImpl()(implicit ws: WSClient) extends BeaconPolicyServi
     }
   }
 
-  override def resumePolicy(beaconEndpoint : String, policyName : String) : Future[Either[BeaconApiErrors, PostActionResponse]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/resume/$policyName")
+  override def resumePolicy(beaconEndpoint : String, clusterId: Long, policyName : String)
+                           (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]] = {
+    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/resume/$policyName", clusterId, BEACON).withHeaders(token)
       .withAuth(user, password, WSAuthScheme.BASIC)
       .withHeaders(httpHeaders.toList: _*)
       .post(Results.EmptyContent())
@@ -180,8 +195,9 @@ class BeaconPolicyServiceImpl()(implicit ws: WSClient) extends BeaconPolicyServi
     }
   }
 
-  override def deletePolicy(beaconEndpoint : String, policyName : String) : Future[Either[BeaconApiErrors, PostActionResponse]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/delete/$policyName")
+  override def deletePolicy(beaconEndpoint : String, clusterId: Long, policyName : String)
+                           (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]] = {
+    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/delete/$policyName", clusterId, BEACON).withHeaders(token)
       .withAuth(user, password, WSAuthScheme.BASIC)
       .withHeaders(httpHeaders.toList: _*)
       .delete()
