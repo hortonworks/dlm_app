@@ -34,6 +34,7 @@ import { TableFooterComponent } from 'common/table/table-footer/table-footer.com
 import { CheckboxComponent } from 'common/checkbox/checkbox.component';
 import { NavbarService } from 'services/navbar.service';
 import { JobsOverviewTableComponent } from './jobs-overview-table/jobs-overview-table.component';
+import { EventMessageComponent } from 'common/notifications/event-message/event-message.component';
 import { ModalDialogBodyComponent } from 'common/modal-dialog/modal-dialog-body.component';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
 import { Policy } from 'models/policy.model';
@@ -119,7 +120,8 @@ describe('OverviewComponent', () => {
         JobsOverviewTableComponent,
         ModalDialogComponent,
         PrevJobsComponent,
-        ModalDialogBodyComponent
+        ModalDialogBodyComponent,
+        EventMessageComponent
       ],
       providers: [
         {provide: Store, useClass: MockStore},
