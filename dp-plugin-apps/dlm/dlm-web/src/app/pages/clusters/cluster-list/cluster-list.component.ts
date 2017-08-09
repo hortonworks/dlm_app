@@ -14,6 +14,7 @@ import { TableTheme } from 'common/table/table-theme.type';
 import { TableComponent } from 'common/table/table.component';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { CLUSTER_STATUS } from 'constants/status.constant';
+import { ROOT_PATH } from 'constants/hdfs.constant';
 
 @Component({
   selector: 'dlm-cluster-list',
@@ -25,7 +26,7 @@ export class ClusterListComponent implements OnInit {
   CLUSTER_STATUS = CLUSTER_STATUS;
   tableTheme = TableTheme.Cards;
   columns = [];
-  hdfsRootPath = '/';
+  hdfsRootPath = ROOT_PATH;
   columnMode = ColumnMode.flex;
 
   @Input() clusters: Cluster[];
@@ -68,7 +69,16 @@ export class ClusterListComponent implements OnInit {
   }
 
   toggleClusterDetails(clusterRow) {
+    this.toggleClusterContent(clusterRow);
     this.tableComponent.toggleRowDetail(clusterRow);
     this.cdRef.detectChanges();
+  }
+
+  private toggleClusterContent(clusterRow) {
+    this.hdfsRootPath = ROOT_PATH;
+  }
+
+  onSelectFile(path) {
+    this.hdfsRootPath = path;
   }
 }

@@ -30,13 +30,15 @@ export class Persona {
   imageName: string;
   active: boolean;
   tabs: PersonaTabs[] = [];
+  enabled: boolean;
 
-  constructor(name: string, tabs: PersonaTabs[], url = '', imageName = '', active = false) {
+  constructor(name: string, tabs: PersonaTabs[], url = '', imageName = '', enabled = true, active = false) {
     this.url = url;
     this.name = name;
     this.imageName = imageName;
     this.tabs = tabs ? tabs : [];
     this.active = active;
+    this.enabled = enabled;
   }
 }
 

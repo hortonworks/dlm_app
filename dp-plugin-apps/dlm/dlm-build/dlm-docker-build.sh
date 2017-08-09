@@ -1,4 +1,14 @@
 #!/bin/sh
+
+#
+# Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+#
+# Except as expressly permitted in a written agreement between you or your company
+# and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+# reproduction, modification, redistribution, sharing, lending or other exploitation
+# of all or any part of the contents of this software is strictly prohibited.
+#
+
 set -e
 
 RELEASE_NUMBER=0.0.1
@@ -23,7 +33,7 @@ push_image() {
        echo "Failed pushing image ${IMG}, exiting. Verify if you have logged in to docker-hub with a valid account."
        return -1
     fi
-           
+
 }
 
 save_image() {

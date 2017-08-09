@@ -20,8 +20,8 @@ import { Component, OnInit, Input, ViewEncapsulation, HostBinding } from '@angul
           <i [class]="iconClass" *ngIf="iconClass"></i>
           <span class="page-title">
             {{title | translate}}
+            <dlm-help-link [iconHint]="contextMessage" [iconLink]="iconLink | translate" [placement]="'right'"></dlm-help-link>
           </span>
-          <i class="fa fa-question-circle help-note" *ngIf="contextMessage" [tooltip]="contextMessage | translate"></i>
         </div>
       </div>
       <div class="row" *ngIf="description">
@@ -37,6 +37,7 @@ export class PageHeaderComponent implements OnInit {
   @Input() iconClass = '';
   @Input() description = '';
   @Input() contextMessage = '';
+  @Input() iconLink = '';
   @HostBinding('class') className = 'dlm-page-header';
   @HostBinding('class.flex-center') @Input() isFlexCenter = false;
 

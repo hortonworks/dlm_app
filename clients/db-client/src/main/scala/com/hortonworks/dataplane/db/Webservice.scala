@@ -60,7 +60,7 @@ object Webservice {
     def updateActiveAndRoles(userInfo: UserInfo): Future[Either[Errors,Boolean]]
 
     def addUserWithGroups(userGroupInfo: UserGroupInfo): Future[Either[Errors,UserGroupInfo]]
-
+    def updateUserWithGroups(userLdapGroups: UserLdapGroups): Future[Either[Errors,UserContext]]
     def getUserContext(userName:String): Future[Either[Errors,UserContext]]
 
   }
@@ -220,6 +220,8 @@ object Webservice {
     def getConfig(key: String): Future[Option[DpConfig]]
 
     def addConfig(dpConfig: DpConfig): Future[Either[Errors, DpConfig]]
+
+    def setConfig(key: String,value:String): Future[Either[Errors, DpConfig]]
 
   }
 

@@ -8,7 +8,7 @@
   color: $dusty-gray;
   background-color: $alabaster;
   width: $side-nav-width;
-  height: calc(100% - 55px);
+  height: calc(100% - #{$layout-header-desktop-row-height});
   overflow-y: hidden;
   border-right: 1px solid $mercury;
 }

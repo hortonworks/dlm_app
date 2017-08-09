@@ -34,7 +34,7 @@
 
 <ng-template #verbStatusCellTemplate let-job="value" let-policy="row">
   <dlm-transferred-column
-    *ngIf="job.status === JOB_STATUS.RUNNING && job.trackingInfo?.completedMapTasks; else verbTpl"
+    *ngIf="job.status === JOB_STATUS.RUNNING; else verbTpl"
     [trackingInfo]="job.trackingInfo">
   </dlm-transferred-column>
   <ng-template #verbTpl>
@@ -51,6 +51,15 @@
   <span qe-attr="go-to-policies" (click)="goToPolicy(row)" class="actionable text-primary policy-name">
    {{name}}
   </span>
+</ng-template>
+
+<ng-template #serviceNameCellTemplate let-name="value">
+  <div>
+    <span class="hexagon" [ngClass]="{'hexagon-warning': isHDFS(name), 'hexagon-success': !isHDFS(name)}">
+        <i class="fa" [ngClass]="{'fa-file-o': isHDFS(name), 'fa-database': !isHDFS(name)}"></i>
+    </span>
+    <span class="service-name">{{name}}</span>
+  </div>
 </ng-template>
 
 <ng-template #agoTemplate let-value="value" let-policy="row">

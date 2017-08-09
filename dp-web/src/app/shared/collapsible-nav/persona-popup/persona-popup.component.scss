@@ -2,10 +2,10 @@
 
 .suit-navigation {
   position: fixed;
-  top: 55px;
+  top: $layout-header-desktop-row-height;
   left: 0;
   margin: 0;
-  padding: 40px 20px;
+  padding: 40px 20px 37px;
   background: $white;
   -webkit-box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
   -moz-box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
@@ -28,18 +28,23 @@
     & .logo-wrapper {
       background-color: $eastern-blue;
       padding: 15px;
-      border-radius: 4px;
+      border-radius: 2px;
       display: inline-block;
-      height: 72px;
+      height: 75px;
+      width: 75px;
       & + div {
         text-align: center;
         font-size: 13px;
-        padding-top: 5px;
+        padding-top: 10px;
         white-space: nowrap;
         line-height: 1;
       }
     }
   }
+}
+
+.active {
+  color: $eastern-blue !important;
 }
 
 .disabled {

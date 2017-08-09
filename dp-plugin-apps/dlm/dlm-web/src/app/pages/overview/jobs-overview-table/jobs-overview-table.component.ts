@@ -51,6 +51,7 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
   @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;
   @ViewChild('prevJobs') prevJobsRef: TemplateRef<any>;
+  @ViewChild('serviceNameCellTemplate') serviceNameCellRef: TemplateRef<any>;
 
   @HostBinding('class') className = 'dlm-jobs-overview-table';
 
@@ -98,7 +99,7 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
       {prop: 'sourceCluster', name: this.translateColumn('source_cluster'), cellTemplate: this.clusterNameCellRef},
       {...TableComponent.makeFixedWith(20), name: '', cellTemplate: this.destinationIconCellRef},
       {prop: 'targetCluster', name: this.translateColumn('destination_cluster'), cellTemplate: this.clusterNameCellRef},
-      {prop: 'service', name: this.t.instant('common.service')},
+      {prop: 'service', name: this.t.instant('common.service'), cellTemplate: this.serviceNameCellRef},
       {
         prop: 'name',
         cellClass: 'text-cell',
@@ -195,5 +196,9 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
 
   showPolicyLog(policy) {
     this.onShowPolicyLog.emit(policy);
+  }
+
+  isHDFS(serviceName): boolean {
+    return serviceName.toLowerCase() === 'hdfs';
   }
 }

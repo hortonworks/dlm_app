@@ -20,6 +20,8 @@
     "none": "None",
     "policies": "Policies",
     "pair": "Pair",
+    "add_pair": "Add Pair",
+    "add_policy": "Add Policy",
     "pairing": "Pairing",
     "pairs": "Pairs",
     "policy": "Policy",
@@ -130,7 +132,9 @@
       "maxlength": "\"{{fieldLabel}}\" should be lower than {{maxLengthValue}} symbols",
       "freqValidator": "\"{{fieldLabel}}\" is too big",
       "integerValidator": "\"{{fieldLabel}}\" should be a positive integer",
-      "time_less_than_current": "Start time must be later than the current time in the selected timezone."
+      "time_less_than_current": "Start time must be later than the current time in the selected timezone.",
+      "not_directory": "\"{{fieldLabel}}\" should be a path to directory",
+      "not_exist_directory": "\"{{fieldLabel}}\" selected directory does not exist"
     }
   },
   "page": {
@@ -139,6 +143,9 @@
         "clusters": "Clusters",
         "policies": "Policies",
         "jobs": "Jobs"
+      },
+      "hints": {
+        "issues_and_updates": "Policy History shows the status of the last 10 jobs of the policy including the latest job."
       },
       "filter": {
         "title": "Time Range",
@@ -203,7 +210,7 @@
           "next_run": "Next Run",
           "action": "Action",
           "actions": "Actions",
-          "last_ten_jobs": "Policy Performance"
+          "last_ten_jobs": "Policy History"
         },
         "actions": {
           "abort_job": "Abort Job",
@@ -248,8 +255,11 @@
         "nodes": "Nodes",
         "volume": "Volume",
         "location": "Location",
-        "create_pair_text": "+ Pair",
-        "create_policy_text": "+ Policy"
+        "create_pair_text": "Add Pair",
+        "create_policy_text": "Add Policy"
+      },
+      "hints": {
+        "header": "Clusters shown below are enabled for DLM"
       }
     },
     "policies": {
@@ -261,6 +271,7 @@
       "tags": "Tags",
       "groups": "Groups",
       "data_summary": "Data Summary",
+      "help_url": "http://dataplane",
       "no_jobs": "No jobs",
       "no_policies": "Create your first replication policy.",
       "no_pairings": "You must create a cluster pairing before you can create a replication policy.",
@@ -280,7 +291,7 @@
         "sections": {
           "general": "General",
           "database": "Select Database",
-          "directories": "Select a File / Folder",
+          "directories": "Select a Folder",
           "job": "Run Job",
           "advanced": "Advanced Properties"
         },
@@ -295,16 +306,18 @@
             "default": "Select a Source Cluster first",
             "noPair": "No paired cluster available for the selected source cluster"
           },
+          "sourceDataCenter": "Source Data Center",
+          "destinationDataCenter": "Destination Data Center",
           "service": "Service",
-          "directories": "File / Folder Path",
+          "directories": "Folder Path",
           "databases": "Database",
           "start_date": "Start Date",
           "end_date": "End Date (Optional)",
-          "start_time": "Start Time  (24-Hour Clock)",
-          "end_time": "End Time",
+          "start_time": "Start Time (24-Hour Clock)",
+          "end_time": "End Time (24-Hour Clock)",
           "date_format": "yyyy-mm-dd",
-          "queue_name": "Queue Name",
-          "max_bandwidth": "Maximum Bandwidth",
+          "queue_name": "Queue Name (Optional)",
+          "max_bandwidth": "Maximum Bandwidth (Optional)",
           "bandwidth_unit": "MBps",
           "repeat": "Repeat"
         },
@@ -326,6 +339,7 @@
       "header": "Pairings",
       "header_note": "Note: Pairings are bi-directional",
       "create_button_text": "Add Pairing",
+      "help_url": "http://dataplane",
       "content": {
         "header": {
           "first_cluster": "FIRST CLUSTER",

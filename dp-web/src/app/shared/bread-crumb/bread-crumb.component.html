@@ -1,4 +1,7 @@
 <div class="breadcrumb">
     <span class="mdl-navigation__link home" (click)="navigateToPersonaHome()">{{personaName | breadCrumbName}}</span>
-    <span class="mdl-navigation__link" *ngFor="let crumbName of crumbNames" (click)="navigateToBreadCrumb(crumbName)"> {{ crumbName | breadCrumbName }} </span>
+    <span class="mdl-navigation__link" *ngFor="let crumbName of crumbNames" (click)="navigateToBreadCrumb(crumbName)">
+        <span class="slash"> / </span>
+        {{ crumbName | breadCrumbName }}
+    </span>
 </div>

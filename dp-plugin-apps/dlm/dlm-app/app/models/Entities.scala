@@ -41,10 +41,16 @@ object Entities {
                                        clusterDefinitions: Seq[PairedCluster], pairedClusterRequest:PairClusterRequest)
 
   // Request schema submitted to Beacon for cluster definition
-  case class ClusterDefinition (beaconUrl:String, clusterDefRequest : ClusterDefinitionRequest)
+  case class ClusterDefinition (beaconUrl:String, clusterId: Long, clusterDefRequest : ClusterDefinitionRequest)
+
+  case class ClusterIdWithBeaconUrl (beaconUrl:String, clusterId: Long)
 
   // Request submitted to beacon client for pairing clusters
   case class PairClusterRequest(clusterId: Long, beaconUrl: String)
+
+  case class UnpairClusterDefinition(dpCluster: DataplaneCluster, beaconUrl: String, clusterId: Long, clusterDefinitions: Seq[PairedCluster])
+
+  case class UnpairClusterRequest(beaconUrl: String, clusterId: Long, clusterName: String)
 
   // Response schema for Pair cluster request
   case class PairedClustersResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), pairedClusters: Set[Set2[BeaconCluster]] = Set())
