@@ -82,6 +82,7 @@ export class LakesComponent implements OnInit {
       this.lakeService.retrieve(unSyncedlake.data.id).delay(this.delayIntervalMs).repeat(this.callCounts).skipWhile((lake) => lake.state !== this.syncedString && count++ < this.callCounts).first().subscribe(lake =>{
         let locationObserver = Observable.create();
         if(lake.state === this.syncedString){
+          unSyncedlake.data = lake;
           this.clusterService.listByLakeId({lakeId: lake.id}).subscribe(clusters=> {
             unSyncedlake.clusters = clusters;
             locationObserver = this.getLocationInfoWithStatus(unSyncedlake.data.location, unSyncedlake.clusters[0].id, unSyncedlake.data.id);
