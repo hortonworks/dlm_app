@@ -12,6 +12,7 @@
   [rowDetailTemplate]="rowDetailRef"
   [theme]="tableTheme"
   [columns]="columns"
+  [columnMode]="columnMode"
   [rows]="policies">
 </dlm-table>
 
@@ -71,8 +72,8 @@
   ></dlm-policy-details>
 </ng-template>
 
-<ng-template let-row="row" let-value="value" #pathCell>
-  <span [tooltip]="value">{{value | truncate: 25}}</span>
+<ng-template #pathCell let-row="row" let-value="value">
+  <span [tooltip]="value">{{value}}</span>
 </ng-template>
 
 <ng-template #actionsCell let-row="row">
