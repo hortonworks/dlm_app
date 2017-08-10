@@ -74,4 +74,18 @@ class PolicyInstances @Inject() (
       case Right(response) => Ok(Json.toJson(response))
     }
   }
+
+  /**
+    * rerun last instance of the policy on target cluster
+    * @param clusterId  target cluster id
+    * @return
+    */
+  def rerun(clusterId: Long, policyName: String) = authenticated.async { request =>
+    Logger.info("Received rerun last job of the policy on target cluster request")
+    implicit val token = request.token
+    beaconService.rerunLastPolicyInstance(clusterId, policyName).map {
+      case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+      case Right(response) => Ok(Json.toJson(response))
+    }
+  }
 }

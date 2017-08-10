@@ -73,4 +73,14 @@ class BeaconPolicyInstanceServiceImpl()(implicit ws: KnoxProxyWsClient) extends 
     }
   }
 
+  override def rerunPolicyInstance(beaconEndpoint : String, clusterId: Long, policyName : String)
+                                   (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]] = {
+    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/instance/rerun/$policyName", clusterId, BEACON).withHeaders(token)
+      .withAuth(user, password, WSAuthScheme.BASIC)
+      .withHeaders(httpHeaders.toList: _*)
+      .post(Results.EmptyContent()).map(mapToPostActionResponse).recoverWith {
+      case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
+    }
+  }
+
 }

@@ -28,6 +28,7 @@ DELETE  /api/clusters/:clusterId/policy/:name                 controllers.Polici
 GET     /api/clusters/:clusterId/policy/:name/jobs            controllers.PolicyInstances.retrieve(clusterId : Long, name : String)
 GET     /api/clusters/:clusterId/jobs                         controllers.PolicyInstances.list(clusterId : Long)
 PUT     /api/clusters/:clusterId/policy/:name/jobs/abort      controllers.PolicyInstances.abort(clusterId : Long, name : String)
+POST     /api/clusters/:clusterId/policy/:name/jobs/rerun     controllers.PolicyInstances.rerun(clusterId : Long, name : String)
 
 
 #Events
