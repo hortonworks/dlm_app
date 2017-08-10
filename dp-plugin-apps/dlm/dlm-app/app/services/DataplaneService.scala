@@ -253,15 +253,17 @@ class DataplaneService @Inject()(
     }
 
     val endpoint: Either[Errors, String] = if (isNameNodeHAEnabled) {
-      getPropertyValue(endpointData, "hdfs-site", "dfs.nameservices") match {
+      getPropertyValue(endpointData, "hdfs-site", "dfs.internal.nameservices") match {
         case Right(nameService) => {
-          getPropertyValue(endpointData, "hdfs-site", s"dfs.ha.namenodes.$nameService")  match {
+          val internalNameService =  nameService.split(",")(0)
+          getPropertyValue(endpointData, "hdfs-site", s"dfs.ha.namenodes.$internalNameService")  match {
             case Right(nameServicePrefixes) => {
-              val endpointConfigs : Seq[String] = nameServicePrefixes.split(",").map((x) => s"dfs.namenode.$nameNodeScheme-address.$nameService.$x")
+              val endpointConfigs : Seq[String] = nameServicePrefixes.split(",").map((x) => s"dfs.namenode.$nameNodeScheme-address.$internalNameService.$x")
               val endpoints = for (config <- endpointConfigs) yield getPropertyValue(endpointData, "hdfs-site", config)
-              val namenodeHostEndpoint : Option[Either[Errors, String]] = endpoints.filter(_.isRight).find((x) => new java.net.URI(s"$nameNodeScheme://$x").getHost == namenodeHostName)
+              val nameNodeHostEndpoints : Seq[String] = endpoints.filter(_.isRight).map(_.right.get)
+              val namenodeHostEndpoint : Option[String] = nameNodeHostEndpoints.find((x) => new java.net.URI(s"$nameNodeScheme://$x").getHost == namenodeHostName)
               val errorMsg = DataplaneService.nameNodeEndpointErrMsg + namenodeHostName
-              if (namenodeHostEndpoint.isDefined) namenodeHostEndpoint.get else  Left(Errors(Seq(Error(BAD_GATEWAY.toString, errorMsg))))
+              if (namenodeHostEndpoint.isDefined) Right(namenodeHostEndpoint.get) else  Left(Errors(Seq(Error(BAD_GATEWAY.toString, errorMsg))))
             }
             case Left(errors) => Left(errors)
           }
