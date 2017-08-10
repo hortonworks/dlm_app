@@ -25,13 +25,13 @@ import { Component, OnInit, Input } from '@angular/core';
           {{alert.service_name}}
         </dd>
       </dl>
-      <dl *ngIf="cluster?.alerts?.length" class="fix-alerts">
-        <dt>{{'page.overview.world_map.cluster_legend.fix_alerts' | translate}}</dt>
-          <dd>
-            <a [href]="cluster.ambariurl" target="_blank">
-              {{'page.overview.world_map.cluster_legend.launch_ambari' | translate}}
-            </a>
-          </dd>
+      <dl class="fix-alerts">
+        <dt>{{'page.overview.world_map.cluster_legend.manage_ambari' | translate}}</dt>
+        <dd>
+          <a [href]="cluster.ambariurl" target="_blank">
+            {{'page.overview.world_map.cluster_legend.launch_ambari' | translate}}
+          </a>
+        </dd>
       </dl>
       <dl>
         <dt>{{'common.policies' | translate}}</dt>

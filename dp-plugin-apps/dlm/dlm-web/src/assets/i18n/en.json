@@ -195,7 +195,8 @@
         "cluster_legend": {
           "alerts": "Alerts",
           "fix_alerts": "Fix Alerts",
-          "launch_ambari": "Launch Ambari"
+          "launch_ambari": "Launch Ambari",
+          "manage_ambari": "Manage Ambari"
         }
       },
       "table": {
