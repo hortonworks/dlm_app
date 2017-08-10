@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+source $(pwd)/config.clear.sh
 source $(pwd)/config.env.sh
 
 CERTS_DIR=`dirname $0`/certs
@@ -306,6 +307,9 @@ upgrade() {
     echo "Moving configuration..."
     mv $(pwd)/config.env.sh $(pwd)/config.env.sh.bak
     cp $2/config.env.sh $(pwd)/config.env.sh
+    # sourcing again to overwrite values
+    source $(pwd)/config.clear.sh
+    source $(pwd)/config.env.sh
 
     echo "Moving certs directory"
     mkdir -p $(pwd)/certs
