@@ -309,17 +309,17 @@ class LdapService @Inject()(
     } catch {
 
       case e: CommunicationException=>{
-        logger.error("error while getting ldapContext",e);
+        logger.error("error while getting ldapContext",e)
         Future.successful(
           Left(Errors(Seq(Error("Communication Exception", "Could not coummicate with ldap server. Check connectivity")))))
       }
       case e: AuthenticationException=>{
-        logger.error("error while getting ldapContext",e);
+        logger.error("error while getting ldapContext",e)
         Future.successful(
           Left(Errors(Seq(Error("Authentication Exception", "Some credentials are incorrect for ldap")))))
       }
       case e: NamingException =>{
-        logger.error("error while getting ldapContext",e);
+        logger.error("error while getting ldapContext",e)
         Future.successful(
           Left(Errors(Seq(Error("Exception", e.getMessage)))))
       }
