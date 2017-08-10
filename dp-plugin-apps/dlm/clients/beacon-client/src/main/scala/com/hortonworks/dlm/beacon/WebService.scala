@@ -119,6 +119,8 @@ object WebService {
                           (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PolicyInstancesDetails]]
     def abortPolicyInstances(beaconEndpoint : String, clusterId: Long, policyName : String)
                             (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
+    def rerunPolicyInstance(beaconEndpoint : String, clusterId: Long, policyName : String)
+                           (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
   }
 
   trait BeaconEventService extends ClientService {

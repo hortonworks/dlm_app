@@ -586,6 +586,28 @@ class BeaconService @Inject()(
     p.future
   }
 
+  /**
+    *  Rerun last instance of the policy
+    * @param clusterId  target cluster id
+    * @param policyName  policy name whose last job is to be rerun
+    * @param token  JWT token
+    * @return
+    */
+  def rerunLastPolicyInstance(clusterId: Long, policyName: String)
+                                   (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]] = {
+    val p: Promise[Either[BeaconApiErrors, PostActionResponse]] = Promise()
+    dataplaneService.getBeaconService(clusterId).map {
+      case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
+      case Right(beaconService) =>
+        beaconPolicyInstanceService.rerunPolicyInstance(beaconService.fullURL, clusterId, policyName).map {
+          case Left(errors) => p.success(Left(errors))
+          case Right(response) => p.success(Right(response))
+        }
+    }
+    p.future
+  }
+
+
   def getAllEvents(queryString: Map[String, String])
                   (implicit token:Option[HJwtToken]): Future[Either[DlmApiErrors, EventsDetailResponse]] = {
     val p: Promise[Either[DlmApiErrors, EventsDetailResponse]] = Promise()
