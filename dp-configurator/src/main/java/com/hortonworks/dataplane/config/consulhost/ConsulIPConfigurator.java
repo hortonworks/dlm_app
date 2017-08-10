@@ -44,7 +44,7 @@ public class ConsulIPConfigurator {
         }
       }
     } else {
-      selectedIp = privateIps.get(option + 1).getHostAddress();
+      selectedIp = privateIps.get(option -1).getHostAddress();
     }
     return selectedIp;
   }
