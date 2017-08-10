@@ -93,12 +93,6 @@ migrate_schema() {
         sleep 5
     fi
 
-    echo "This will update database schema which can not be reverted. All backups need to made manually. Please confirm to proceed (yes/no):"
-    read CONTINUE_MIGRATE
-    if [ "$CONTINUE_MIGRATE" != "yes" ]; then
-        exit -1
-    fi
-
     # start flyway container and trigger migrate script
     source $(pwd)/docker-flyway.sh migrate
 }
@@ -299,8 +293,19 @@ destroy_all() {
 }
 
 upgrade() {
-    if [ $# -lt 2 ] || [ "$1" != "--from" ] || [ ! -d "$2" ]; then
+    if [ $# -lt 2 ] || [ "$1" != "--from" ]; then
         usage
+        exit -1
+    fi
+
+    if [ ! -d "$2" ]; then
+        echo "Not a valid directory."
+        exit -1
+    fi
+
+    echo "This will update database schema which can not be reverted. All backups need to made manually. Please confirm to proceed (yes/no):"
+    read CONTINUE_MIGRATE
+    if [ "$CONTINUE_MIGRATE" != "yes" ]; then
         exit -1
     fi
 
