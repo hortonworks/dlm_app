@@ -1,6 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
+source $(pwd)/config.clear.sh
 source $(pwd)/config.env.sh
 
 CERTS_DIR=`dirname $0`/certs
@@ -9,7 +10,8 @@ DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
 KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
-APP_CONTAINERS="dp-app dp-db-service dp-cluster-service dp-gateway"
+APP_CONTAINERS_WITHOUT_DB="dp-app dp-db-service dp-cluster-service dp-gateway"
+APP_CONTAINERS=$APP_CONTAINERS_WITHOUT_DB
 if [ "$USE_EXT_DB" == "no" ]; then
     APP_CONTAINERS="dp-database $APP_CONTAINERS"
 fi
@@ -44,7 +46,7 @@ get_bind_address_from_consul_container() {
             BIND_ADDR=${word##*=}
         fi
     done
-    export CONSUL_HOST=${BIND_ADDR};
+    CONSUL_HOST=${BIND_ADDR};
 }
 
 init_consul(){
@@ -60,7 +62,7 @@ read_consul_host(){
     if [ -z "${CONSUL_HOST}" ]; then
         echo "Enter the Host IP Address (Consul will bind to this host):"
         read HOST_IP;
-        export CONSUL_HOST=$HOST_IP;
+        CONSUL_HOST=$HOST_IP;
     fi
     echo "using CONSUL_HOST: ${CONSUL_HOST}"
 }
@@ -86,13 +88,26 @@ migrate_schema() {
     if [ "$USE_EXT_DB" == "no" ]; then
         # start database container
         source $(pwd)/docker-database.sh
+
+        # wait for database start
+        sleep 5
     fi
 
-    # wait for database start
-    sleep 5
+    # start flyway container and trigger migrate script
+    source $(pwd)/docker-flyway.sh migrate
+}
+
+reset_db() {
+    if [ "$USE_EXT_DB" == "no" ]; then
+        # start database container
+        source $(pwd)/docker-database.sh
+
+        # wait for database start
+        sleep 5
+    fi
 
     # start flyway container and trigger migrate script
-    source $(pwd)/docker-migrate.sh
+    source $(pwd)/docker-flyway.sh clean migrate
 }
 
 destroy() {
@@ -148,13 +163,12 @@ read_master_password() {
         exit 1
        fi
     fi
-    export MASTER_PASSWORD="$MASTER_PASSWD"
+    MASTER_PASSWORD="$MASTER_PASSWD"
 }
 
 read_use_test_ldap() {
     echo "Use pre-packaged LDAP instance (suitable only for testing) [yes/no]: "
     read USE_TEST_LDAP
-    export USE_TEST_LDAP
 }
 
 init_knox() {
@@ -245,7 +259,7 @@ load_images() {
 
 init_all() {
     init_db
-    migrate_schema
+    reset_db
 
     init_knox
 
@@ -278,6 +292,58 @@ destroy_all() {
     echo "Destroy complete."
 }
 
+upgrade() {
+    if [ $# -lt 2 ] || [ "$1" != "--from" ]; then
+        usage
+        exit -1
+    fi
+
+    if [ ! -d "$2" ]; then
+        echo "Not a valid directory."
+        exit -1
+    fi
+
+    echo "This will update database schema which can not be reverted. All backups need to made manually. Please confirm to proceed (yes/no):"
+    read CONTINUE_MIGRATE
+    if [ "$CONTINUE_MIGRATE" != "yes" ]; then
+        exit -1
+    fi
+
+    echo "Moving configuration..."
+    mv $(pwd)/config.env.sh $(pwd)/config.env.sh.bak
+    cp $2/config.env.sh $(pwd)/config.env.sh
+    # sourcing again to overwrite values
+    source $(pwd)/config.clear.sh
+    source $(pwd)/config.env.sh
+
+    echo "Moving certs directory"
+    mkdir -p $(pwd)/certs
+    cp -R $2/certs/* $(pwd)/certs
+
+    # destroy all but db and knox
+    docker rm -f $APP_CONTAINERS_WITHOUT_DB || echo "App is not up."
+
+    # stop knox
+    docker stop $KNOX_CONTAINER
+
+    # destroy consul
+    destroy_consul
+
+    # bring consul back
+    init_consul
+
+    # start knox
+    docker start $KNOX_CONTAINER
+
+    # migrate schema to new version
+    migrate_schema
+
+    # init all but db and knox
+    init_app
+
+    echo "Upgrade complete."
+}
+
 print_version() {
     if [ -f VERSION ]; then
         cat VERSION
@@ -307,6 +373,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox and Consul containers and remove them. Needs to start from init knox again"
     printf "%-${tabspace}s:%s\n" "destroy --all" "Kill all containers and remove them. Needs to start from init again"
     printf "%-${tabspace}s:%s\n" "load" "Load all images from lib directory into docker"
+    printf "%-${tabspace}s:%s\n" "upgrade --from <old_setup_directory>" "Upgrade existing dp-core to current version"
     printf "%-${tabspace}s:%s\n" "version" "Print the version of dataplane"
 }
 
@@ -340,7 +407,7 @@ else
             esac
             ;;
         migrate)
-            migrate_schema
+            reset_db
             ;;
         start)
             case "$2" in
@@ -383,6 +450,10 @@ else
              ;;
         load)
             load_images
+            ;;
+        upgrade)
+            shift
+            upgrade "$@"
             ;;
         version)
             print_version
