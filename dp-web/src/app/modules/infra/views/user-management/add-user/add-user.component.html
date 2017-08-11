@@ -9,14 +9,14 @@
   <div class="slider-container">
     <div class="error-notification-bar" *ngIf="showError">
       <i class="fa fa-times-circle pull-left"></i>
-      <div class="hwx-desc">{{"common.failed" | translate}}</div>
-      <div class="hwx-desc">{{errorMessage}}</div>
+      <div class="error-title">{{"common.failed" | translate}}</div>
+      <div *ngFor="let msg of errorMessages" class="error-text">{{msg}}</div>
     </div>
     <form #addUserForm="ngForm">
       <div *ngIf="mode === modes.ADD">
         <div class="form-group dp-input">
           <label class="required">{{"pages.infra.labels.username" | translate}}</label>
-          <tagging-widget id="user-tags" class="user-tags"
+          <tagging-widget #userTags id="user-tags" class="user-tags"
             [tags]="users"
             [availableTags]="availableUsers"
             [clearOnSearch]="true"
@@ -27,7 +27,7 @@
         </div>
         <div class="form-group dp-input">
           <label class="required">{{"pages.infra.labels.roles" | translate}}</label>
-          <tagging-widget class="role-tags" id="role-tags"
+          <tagging-widget #roleTags class="role-tags" id="role-tags"
             [tags]="roles"
             [availableTags]="availableRoles"
             [clearOnSearch]="true"
@@ -66,7 +66,7 @@
           </div>
           <div class="mdl-cell mdl-cell--1-col">  : </div>
           <div class="mdl-cell mdl-cell--9-col">
-            <tagging-widget class="role-edit-tags" id="role-tags"
+            <tagging-widget #roleTags class="role-edit-tags" id="role-tags"
               [tags]="userRoles"
               [availableTags]="availableRoles"
               [clearOnSearch]="true"

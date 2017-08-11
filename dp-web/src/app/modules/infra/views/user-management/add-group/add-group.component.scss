@@ -121,18 +121,23 @@
 .error-notification-bar {
   padding: 15px;
   background: $concrete;
-  height: 34px;
   margin-bottom: 20px;
   .fa-times-circle {
-    font-size: 14px;
+    font-size: 16px;
     color: $roman-red;
   }
   .fa-remove {
     color: $dusty-gray;
     cursor: pointer;
   }
-  .hwx-desc {
-    margin: 0;
+  .error-title {
+    font-size: 12px;
+    color: $roman-red;
+  }
+  .error-text {
+    font-size: 12px;
+    padding: 3px 10px;
+    margin-left: 10px;
   }
 }
 
