@@ -15,7 +15,7 @@ import {DateUtils} from '../../../../shared/utils/date-utils';
 export class LakesListComponent implements OnChanges {
   lakesList: LakeInfo[] = [];
   lakesListCopy: LakeInfo[] = [];
-  StatusEnum = LakeStatus;
+  statusEnum = LakeStatus;
   @Input() lakes = [];
   @Input() healths = new Map();
   @Output('onRefresh') refreshEmitter: EventEmitter<number> = new EventEmitter<number>();
