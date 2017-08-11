@@ -44,7 +44,7 @@ import { HdfsService } from 'services/hdfs.service';
     <ng-template #nameFormattedTemplate let-value="value" let-row="row">
       <i *ngIf="row.pathSuffix !== '..'"
       [ngClass]="{'fa': true, 'fa-folder-o': row.type === fileTypes.DIRECTORY, 'fa-file-text-o': row.type !== fileTypes.DIRECTORY}"></i>
-      <a *ngIf="row.type === fileTypes.DIRECTORY" class="nameLink" (click)="handleDoubleClickAction($event, row); $event.stopPropagation()">
+      <a *ngIf="row.type === fileTypes.DIRECTORY" class="nameLink" (click)="handleDoubleClickAction(row, $event)">
         <span *ngIf="row.pathSuffix !== '..'" [innerHTML]="value" style="padding-left: 5px;"></span>
         <i *ngIf="row.pathSuffix === '..'" class="fa fa-reply"></i>
       </a>
@@ -67,11 +67,11 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   @Input() rootPath: string;
 
   /**
-   * Select files won't emit value when set to `false`. Select files is turned on by default
+   * Select files won't emit value when set to `false`. Select files is turned off by default
    *
    * @type {boolean}
    */
-  @Input() selectFiles = true;
+  @Input() selectFiles = false;
   @Output() select: EventEmitter<string> = new EventEmitter<string>();
   @HostBinding('class') componentClass = 'dlm-hdfs-browser';
   @ViewChild('hdfsFilesTable') jobsTable: TableComponent;
@@ -142,8 +142,10 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  handleDoubleClickAction(event, _row?) {
-    const row = arguments.length === 2 ? _row : event;
+  handleDoubleClickAction(row, e?) {
+    if (e) {
+      e.stopPropagation();
+    }
     if (row.type === FILE_TYPES.DIRECTORY) {
       const currentDirectory = this.currentDirectory$.getValue();
       const prefix = currentDirectory === '/' ? '' : currentDirectory;

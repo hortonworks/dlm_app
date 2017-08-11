@@ -72,7 +72,7 @@
 <ng-template let-cluster="row" ngx-datatable-row-detail-template #rowDetailRef>
   <div class="row">
     <div class="col col-md-12">
-      <dlm-hdfs-browser [selectFiles]="false" [rootPath]="hdfsRootPath" [clusterId]="cluster.id" (select)="onSelectFile($event)"></dlm-hdfs-browser>
+      <dlm-hdfs-browser [rootPath]="hdfsRootPath" [clusterId]="cluster.id" (select)="onSelectFile($event)"></dlm-hdfs-browser>
     </div>
   </div>
 </ng-template>
