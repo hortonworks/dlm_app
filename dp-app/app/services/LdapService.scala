@@ -140,7 +140,7 @@ class LdapService @Inject()(
         }
       }
       .getOrElse(Future.successful(
-        Left(Errors(Seq(Error("Exception", "no configuration"))))))
+        Left(Errors(Seq(Error("409", "LDAP is not yet configured."))))))
   }
 
   private def ldapSearch(
