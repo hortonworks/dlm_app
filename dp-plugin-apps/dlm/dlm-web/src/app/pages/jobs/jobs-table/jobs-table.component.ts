@@ -15,9 +15,10 @@ import { abortJob } from 'actions/job.action';
 import { Policy } from 'models/policy.model';
 import { Store } from '@ngrx/store';
 import * as fromRoot from 'reducers/';
-import { JOB_STATUS } from 'constants/status.constant';
+import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
 import { LogService } from 'services/log.service';
 import { EntityType } from 'constants/log.constant';
+import { contains } from 'utils/array-util';
 
 @Component({
   selector: 'dp-jobs-table',
@@ -51,13 +52,19 @@ export class JobsTableComponent implements OnInit {
   @Output() onPageChange = new EventEmitter<any>();
   @Output() onSelectAction = new EventEmitter<any>();
   @Output() abortJobAction = new EventEmitter<any>();
+  @Output() rerunJobAction = new EventEmitter<any>();
 
   rowActions = <ActionItemType[]>[
     {label: 'Abort', name: 'ABORT', enabledFor: JOB_STATUS.RUNNING},
-    {label: 'View Log', name: 'LOG', }
+    {label: 'Re-run', name: 'RERUN', disableFn: this.isRerunDisabled.bind(this)},
+    {label: 'View Log', name: 'LOG'}
   ];
 
   constructor(protected store: Store<fromRoot.State>, protected logService: LogService) {
+  }
+
+  protected cannotRerun(policy, lastJob) {
+    return !lastJob || policy.status === POLICY_STATUS.SUSPENDED || contains([JOB_STATUS.SUCCESS, JOB_STATUS.RUNNING], lastJob.status);
   }
 
   ngOnInit() {
@@ -108,10 +115,13 @@ export class JobsTableComponent implements OnInit {
   }
 
   handleSelectedAction({row, action}) {
-    if (action.name === 'LOG') {
-      this.logService.showLog(EntityType.policyinstance, row.id);
-    } else if (row.status === JOB_STATUS.RUNNING) {
-      this.abortJobAction.emit(row);
+    switch (action.name) {
+      case 'LOG':
+        return this.logService.showLog(EntityType.policyinstance, row.id);
+      case 'ABORT':
+        return row.status === JOB_STATUS.RUNNING && this.abortJobAction.emit(row);
+      case 'RERUN':
+        return this.rerunJobAction.emit(row);
     }
   }
 
@@ -137,5 +147,11 @@ export class JobsTableComponent implements OnInit {
 
   handlePageChange(page) {
     this.onPageChange.emit(page);
+  }
+
+
+  isRerunDisabled(job, _): boolean {
+    const lastJob = this.policy.lastJobResource;
+    return !lastJob || lastJob.id !== job.id || this.cannotRerun(this.policy, lastJob);
   }
 }
