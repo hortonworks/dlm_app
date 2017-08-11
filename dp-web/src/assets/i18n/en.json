@@ -114,12 +114,23 @@
         "next": "Next",
         "verify": "Verify",
         "verifySmartSenseId": "Verify SmartSense ID",
-        "verified": "VERIFIED"
+        "verified": "VERIFIED",
+        "lastUpdated": "Last Updated",
+        "action": "Action",
+        "installationSteps": "Steps for Installation:",
+        "installationLink":"Installation Steps.",
+        "installationStepsDoc":"https://docs.hortonworks.com/"
       },
       "description": {
         "verificationWelcome": "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your SmartSense ID.",
+        "manualInstall" : "Please go through the following steps to enable {{serviceName}} on cluster {{clusterName}}. After all the dependent services are installed on the cluster, please click on the verification check box.",
         "enableError": "Service could not be enabled.",
-        "verificationError": "Incorrect SmartSense ID format"
+        "verificationError": "Incorrect SmartSense ID format",
+        "installationConfirmation":"All the dependent services have been installed on cluster {{clusterName}}.",
+        "installationLink": "For detailed steps on the installation process, please visit ",
+        "verifyingStatus": "Verifying dependent services status on the cluster...",
+        "successStatus":"All the service dependencies are met. Please click Next to continue",
+        "errorStatus":"The following dependent service(s) information is not present on the cluster. Please install them to continue."
       }
     },
     "infra": {

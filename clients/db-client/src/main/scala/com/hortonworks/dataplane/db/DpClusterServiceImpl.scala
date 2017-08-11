@@ -47,6 +47,12 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToDpCluster)
   }
 
+   override def retrieveServiceInfo(dpClusterId: String): Future[Either[Errors, Seq[ClusterService]]] = {
+    ws.url(s"$url/dp/clusters/$dpClusterId/services")
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToClusterService)
+  }
   override def retrieveByAmbariUrl(
                                     ambariUrl: String): Future[Either[Errors, Boolean]] = {
     ws.url(s"$url/dp/clusters?ambariUrl=$ambariUrl")
@@ -94,6 +100,17 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
           res,
           r =>
             (r.json \ "results" \\ "data").head.validate[DataplaneCluster].get)
+      case _ => mapErrors(res)
+    }
+  }
+
+  private def mapToClusterService(res: WSResponse) = {
+    res.status match {
+      case 200 =>
+        extractEntity[Seq[ClusterService]](
+          res,
+          r =>
+            (r.json \ "results" \\ "data").map{services => services.validate[ClusterService].get})
       case _ => mapErrors(res)
     }
   }

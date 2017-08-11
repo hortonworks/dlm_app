@@ -37,6 +37,13 @@ export class LakeService {
       .catch(HttpUtil.handleError);
   }
 
+  getDiscoveredServices(lakeId: string): Observable<any[]> {
+    return this.http
+      .get(`${this.url}/${lakeId}/services`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
 
   listWithClusters(type: string = 'all'): Observable<{
     data: Lake,
