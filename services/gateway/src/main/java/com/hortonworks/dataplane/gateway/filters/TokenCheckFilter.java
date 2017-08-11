@@ -13,7 +13,6 @@ import com.hortonworks.dataplane.gateway.utils.RequestResponseUtils;
 import com.hortonworks.dataplane.gateway.utils.Utils;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import feign.FeignException;
 import io.jsonwebtoken.JwtException;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -21,6 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.beans.factory.annotation.Value;
+
+import org.springframework.http.HttpStatus;
+
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
@@ -34,7 +36,6 @@ public class TokenCheckFilter extends ZuulFilter {
   private static final Logger logger = LoggerFactory.getLogger(TokenCheckFilter.class);
   private static final String AUTH_ENTRY_POINT = Constants.DPAPP_BASE_PATH+"/auth/in";
   private static final String KNOX_CONFIG_PATH = Constants.DPAPP_BASE_PATH+"/api/knox/configuration";
-  private static final String LOGIN_POINT = Constants.DPAPP_BASE_PATH + "/login";
 
   @Value("${ldap.groups.resync.interval.minutes}")
   private Long userGroupsResyncInterval;
@@ -59,6 +60,10 @@ public class TokenCheckFilter extends ZuulFilter {
 
   @Autowired
   private ServicesConfigUtil servicesConfigUtil;
+
+  @Value("${metaredirect.forsafari}")
+  private Boolean useMetaRedirectForSafari;
+
 
   private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -113,13 +118,35 @@ public class TokenCheckFilter extends ZuulFilter {
 
   private Object doLogout() {
     //TODO call knox gateway to invalidate token in knox gateway server.
-
+    RequestContext ctx = RequestContext.getCurrentContext();
     cookieManager.deleteKnoxSsoCookie();
     cookieManager.deleteDataplaneJwtCookie();
-    requestResponseUtils.redirectToLogin();
-
+    if (useMetaRedirectForSafari && !isCookieSupportedOnRedirect()){
+      String loginUrl=requestResponseUtils.getLoginUrl();
+      String loginRedirectHtml=utils.getLoginRedirectPage(loginUrl);
+      ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
+      ctx.setResponseBody(loginRedirectHtml);
+      ctx.setSendZuulResponse(false);
+      return null;
+    }else{
+      requestResponseUtils.redirectToLogin();
+      return null;
+    }
     //Note. UI should handle redirect.
-    return null;
+  }
+
+  private boolean isCookieSupportedOnRedirect() {
+    RequestContext ctx = RequestContext.getCurrentContext();
+    String userAgent = ctx.getRequest().getHeader("User-Agent");
+    if (userAgent==null){
+      return false;//Not sure if supported or not as userAgent is null.
+    }else{
+      return isSafariAgent(userAgent)?false:true;
+    }
+  }
+
+  private boolean isSafariAgent(String userAgent) {
+    return userAgent.contains("Safari") && !(userAgent.contains("Chrome"));
   }
 
   private Object authorizeThroughSsoToken() {
@@ -133,38 +160,35 @@ public class TokenCheckFilter extends ZuulFilter {
     if (!tokenInfo.isValid()) {
       return handleUnAuthorized(null);
     }
-    try {
-      Optional<UserContext> userContextFromDb = userService.getUserContext(tokenInfo.getSubject());
-      if (!userContextFromDb.isPresent()) {
-        try {
-          UserContext userContext = userService.syncUserFromLdapGroupsConfiguration(tokenInfo.getSubject());
-          if (userContext != null) {
-            setupUserSession(tokenInfo, userContext);
-            return null;
-          } else {
-            return utils.sendForbidden(utils.getUserNotFoundErrorMsg(tokenInfo.getSubject()));
-          }
-        }catch (NoAllowedGroupsException nge){
-          return utils.sendForbidden(utils.getGroupNotFoundErrorMsg(tokenInfo.getSubject()));
+
+    Optional<UserContext> userContextFromDb = userService.getUserContext(tokenInfo.getSubject());
+    if (!userContextFromDb.isPresent()) {
+      try {
+        UserContext userContext = userService.syncUserFromLdapGroupsConfiguration(tokenInfo.getSubject());
+        if (userContext != null) {
+          setupUserSession(tokenInfo, userContext);
+          return null;
+        } else {
+          return utils.sendForbidden(utils.getUserNotFoundErrorMsg(tokenInfo.getSubject()));
         }
-      } else {
-        if (userContextFromDb.get().isActive()){
-          if (needsResyncFromLdap(userContextFromDb)){
-            logger.info(String.format("resyncing from ldap for user [%s]",tokenInfo.getSubject()));
-            UserContext updatedUserContext = userService.resyncUserFromLdapGroupsConfiguration(tokenInfo.getSubject());
-            setupUserSession(tokenInfo, updatedUserContext);
-            logger.info(("resync complete"));
-            return null;
-          }else{
-            setupUserSession(tokenInfo, userContextFromDb.get());
-            return null;
-          }
-        }else{
-          return utils.sendForbidden(utils.getInactiveErrorMsg(tokenInfo.getSubject()));
-        }
+      }catch (NoAllowedGroupsException nge){
+        return utils.sendForbidden(utils.getGroupNotFoundErrorMsg(tokenInfo.getSubject()));
       }
-    } catch (FeignException e) {
-      throw new RuntimeException(e);
+    } else {
+      if (userContextFromDb.get().isActive()){
+        if (needsResyncFromLdap(userContextFromDb)){
+          logger.info(String.format("resyncing from ldap for user [%s]",tokenInfo.getSubject()));
+          UserContext updatedUserContext = userService.resyncUserFromLdapGroupsConfiguration(tokenInfo.getSubject());
+          setupUserSession(tokenInfo, updatedUserContext);
+          logger.info(("resync complete"));
+          return null;
+        }else{
+          setupUserSession(tokenInfo, userContextFromDb.get());
+          return null;
+        }
+      }else{
+        return utils.sendForbidden(utils.getInactiveErrorMsg(tokenInfo.getSubject()));
+      }
     }
   }
 
@@ -222,7 +246,7 @@ public class TokenCheckFilter extends ZuulFilter {
     try {
       Optional<UserContext> userContextOptional = jwt.parseJWT(bearerToken.get());
       if (!userContextOptional.isPresent()) {
-        cookieManager.deleteDataplaneJwtCookie();
+        cookieManager.deleteDataplaneJwtCookie();//TODO check for safari.
         return handleUnAuthorized("DP_JWT_COOKIE has expired or not valid");
       } else {
         UserContext userContext = userContextOptional.get();

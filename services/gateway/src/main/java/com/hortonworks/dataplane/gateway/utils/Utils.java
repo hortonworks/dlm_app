@@ -3,6 +3,7 @@ package com.hortonworks.dataplane.gateway.utils;
 import com.google.common.base.Optional;
 import com.hortonworks.dataplane.gateway.domain.Constants;
 import com.netflix.zuul.context.RequestContext;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
@@ -11,12 +12,18 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.HashMap;
+
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SERVICE_ID_KEY;
 
 @Component
 public class Utils {
   private static final int BEARER_TOK_LEN = "Bearer ".length();
   private static final String BEARER_TOKEN_KEY = "Bearer ";
+  private HashMap<String,String> loginRedirectCache=new HashMap<>();
   @Autowired
   private ProxyRequestHelper proxyRequestHelper;
 
@@ -74,5 +81,25 @@ public class Utils {
   }
   public String getGroupNotFoundErrorMsg(String subject){
     return String.format("{\"code\": \"USER_NOT_FOUND\", \"message\":  User %s not found in the system.Group not configured.}",subject);
+  }
+  public String getLoginRedirectPage(String url){
+    String html=loginRedirectCache.computeIfAbsent(url,urlInp-> getLoginRedirectHtml(urlInp));
+    return html;
+  }
+
+  private String getLoginRedirectHtml(String url) {
+    String template=getLoginRedirectTemplate();
+    return template.replace("${url}",url);
+  }
+
+  private String getLoginRedirectTemplate() {
+    InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("logoutredirect.tmpl");
+    StringWriter writer = new StringWriter();
+    try {
+      IOUtils.copy(resourceAsStream, writer);
+      return writer.toString();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
