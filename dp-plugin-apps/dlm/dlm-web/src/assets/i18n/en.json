@@ -196,7 +196,7 @@
           "alerts": "Alerts",
           "fix_alerts": "Fix Alerts",
           "launch_ambari": "Launch Ambari",
-          "manage_ambari": "Manage Ambari"
+          "manage_ambari": "Manage Cluster"
         }
       },
       "table": {
