@@ -8,8 +8,7 @@
  */
 
 import { Component, Input, Output, ViewEncapsulation, EventEmitter, ViewChild, HostBinding, OnInit, OnDestroy } from '@angular/core';
-import { forwardRef, TemplateRef, SimpleChange, OnChanges } from '@angular/core';
-import { NG_VALUE_ACCESSOR, ControlValueAccessor, NG_ASYNC_VALIDATORS, Validator, AbstractControl } from '@angular/forms';
+import { TemplateRef, SimpleChange, OnChanges } from '@angular/core';
 import { ListStatus } from 'models/list-status.model';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -22,23 +21,10 @@ import { FILE_TYPES } from 'constants/hdfs.constant';
 import { Breadcrumb } from 'components/breadcrumb/breadcrumb.type';
 import { HdfsService } from 'services/hdfs.service';
 
-export const HDFS_FILE_BROWSER_VALIDATOR = {
-  provide: NG_ASYNC_VALIDATORS,
-  useExisting: forwardRef(() => HdfsBrowserComponent),
-  multi: true
-};
-
-export const HDFS_FILE_BROWSER_VALUE_ACCESSOR = {
-  provide: NG_VALUE_ACCESSOR,
-  useExisting: forwardRef(() => HdfsBrowserComponent),
-  multi: true
-};
-
 @Component({
   selector: 'dlm-hdfs-browser',
   styleUrls: ['./hdfs-browser.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  providers: [HDFS_FILE_BROWSER_VALIDATOR, HDFS_FILE_BROWSER_VALUE_ACCESSOR],
   template: `
     <dlm-hdfs-browser-breadcrumb [breadcrumbs]="breadcrumbs$ | async" (onClick)="switchDirectory($event)">
     </dlm-hdfs-browser-breadcrumb>
@@ -58,7 +44,7 @@ export const HDFS_FILE_BROWSER_VALUE_ACCESSOR = {
     <ng-template #nameFormattedTemplate let-value="value" let-row="row">
       <i *ngIf="row.pathSuffix !== '..'"
       [ngClass]="{'fa': true, 'fa-folder-o': row.type === fileTypes.DIRECTORY, 'fa-file-text-o': row.type !== fileTypes.DIRECTORY}"></i>
-      <a *ngIf="row.type === fileTypes.DIRECTORY" class="nameLink" (click)="handleDoubleClickAction(row)">
+      <a *ngIf="row.type === fileTypes.DIRECTORY" class="nameLink" (click)="handleDoubleClickAction($event, row); $event.stopPropagation()">
         <span *ngIf="row.pathSuffix !== '..'" [innerHTML]="value" style="padding-left: 5px;"></span>
         <i *ngIf="row.pathSuffix === '..'" class="fa fa-reply"></i>
       </a>
@@ -76,7 +62,7 @@ export const HDFS_FILE_BROWSER_VALUE_ACCESSOR = {
     </ng-template>
   `,
 })
-export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy, Validator, ControlValueAccessor {
+export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   @Input() clusterId: number;
   @Input() rootPath: string;
 
@@ -94,8 +80,6 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy, Valid
   @ViewChild('permissionsTemplate') permissionsTemplate: TemplateRef<any>;
   @ViewChild('nameFormattedTemplate') nameFormattedTemplate: TemplateRef<any>;
 
-  private validationRequestTimeout: any = null;
-
   breadcrumbs$: Observable<Breadcrumb[]>;
   rows$: Observable<ListStatus[]>;
   rows: ListStatus[];
@@ -107,8 +91,6 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy, Valid
   rowHeight = '35';
   selected: string;
   fileTypes = FILE_TYPES;
-
-  onChange = (_: any) => {};
 
   constructor(private store: Store<fromRoot.State>, private hdfs: HdfsService) {
   }
@@ -160,7 +142,8 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy, Valid
     }
   }
 
-  handleDoubleClickAction(row) {
+  handleDoubleClickAction(event, _row?) {
+    const row = arguments.length === 2 ? _row : event;
     if (row.type === FILE_TYPES.DIRECTORY) {
       const currentDirectory = this.currentDirectory$.getValue();
       const prefix = currentDirectory === '/' ? '' : currentDirectory;
@@ -199,7 +182,6 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy, Valid
     this.currentDirectory$.next(path);
     this.selected = path;
     this.select.emit(this.selected);
-    this.onChange(path);
   }
 
   handleSortAction(event) {
@@ -253,36 +235,6 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy, Valid
   ngOnDestroy() {
 
   }
-
-  validate(c: AbstractControl) {
-    if (this.validationRequestTimeout) {
-      clearTimeout(this.validationRequestTimeout);
-    }
-    return new Promise((resolve, reject) => {
-      this.validationRequestTimeout = setTimeout(() => {
-        if (!c.value) {
-          resolve(null);
-          return;
-        }
-        this.hdfs.getFilesList(this.clusterId, c.value).toPromise()
-          .then(response => {
-            const files = response.FileStatuses.FileStatus;
-            if (files.length && files[0].type === FILE_TYPES.FILE && files[0].pathSuffix === '') {
-              resolve({ isFile: true });
-            } else {
-              resolve(null);
-            }
-          })
-          .catch(_ => resolve({ notExist: true }));
-      }, 500);
-    });
-  }
-
-  registerOnChange(onChange) {
-    this.onChange = onChange;
-  }
-
-  registerOnTouched() {}
 
   writeValue(value: any) {
     this.currentDirectory$.next(value);
