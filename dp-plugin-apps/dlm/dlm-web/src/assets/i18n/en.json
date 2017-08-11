@@ -273,7 +273,7 @@
       "tags": "Tags",
       "groups": "Groups",
       "data_summary": "Data Summary",
-      "help_url": "http://dataplane",
+      "help_url": "http://docs.hortonworks.com",
       "no_jobs": "No jobs",
       "no_policies": "Create your first replication policy.",
       "no_pairings": "You must create a cluster pairing before you can create a replication policy.",
@@ -341,7 +341,7 @@
       "header": "Pairings",
       "header_note": "Note: Pairings are bi-directional",
       "create_button_text": "Add Pairing",
-      "help_url": "http://dataplane",
+      "help_url": "http://docs.hortonworks.com",
       "content": {
         "header": {
           "first_cluster": "FIRST CLUSTER",
