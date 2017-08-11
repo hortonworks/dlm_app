@@ -145,6 +145,7 @@ build_migrate() {
 build_installer() {
 	log "Building installer"
     mkdir -p ${DP_DOCKER_ROOT_FOLDER}/installer/certs/
+	cp -R knox-config ${DP_DOCKER_ROOT_FOLDER}/installer/knox-config
 	cp -R install/* ${DP_DOCKER_ROOT_FOLDER}/installer
 	cp dp-docker-build.sh ${DP_DOCKER_ROOT_FOLDER}/installer/
     cp ../dp-app/conf/cert/dp-keystore.jck ${DP_DOCKER_ROOT_FOLDER}/installer/certs/
