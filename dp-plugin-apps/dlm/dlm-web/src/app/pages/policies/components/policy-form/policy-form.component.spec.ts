@@ -33,12 +33,17 @@ import {NavbarService} from 'services/navbar.service';
 import {MockTimeZoneService} from 'mocks/mock-timezone';
 import {TimeZoneService} from 'services/time-zone.service';
 import { PipesModule } from 'pipes/pipes.module';
+import { HdfsService } from 'services/hdfs.service';
+import { Observable } from 'rxjs/Observable';
 
 describe('PolicyFormComponent', () => {
   let component: PolicyFormComponent;
   let fixture: ComponentFixture<PolicyFormComponent>;
 
   beforeEach(async(() => {
+    const mockHdfsService = {
+      getFilesList() {return Observable.of([]); }
+    };
     TestBed.configureTestingModule({
       imports: [
         TranslateModule.forRoot({
@@ -67,6 +72,7 @@ describe('PolicyFormComponent', () => {
       providers: [
         {provide: Store, useClass: MockStore},
         {provide: TimeZoneService, useClass: MockTimeZoneService},
+        {provide: HdfsService, useValue: mockHdfsService},
         NavbarService
       ]
     })
