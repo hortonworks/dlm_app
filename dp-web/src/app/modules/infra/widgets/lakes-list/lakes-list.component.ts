@@ -15,6 +15,7 @@ import {DateUtils} from '../../../../shared/utils/date-utils';
 export class LakesListComponent implements OnChanges {
   lakesList: LakeInfo[] = [];
   lakesListCopy: LakeInfo[] = [];
+  StatusEnum = LakeStatus;
   @Input() lakes = [];
   @Input() healths = new Map();
   @Output('onRefresh') refreshEmitter: EventEmitter<number> = new EventEmitter<number>();
@@ -86,18 +87,6 @@ export class LakesListComponent implements OnChanges {
       return LakeStatus.WAITING;
     } else {
       return LakeStatus.NA;
-    }
-  }
-
-  getStatusString(status: LakeStatus) {
-    if (status === LakeStatus.UP) {
-      return LakeStatus[LakeStatus.UP].toLowerCase();
-    } else if (status === LakeStatus.DOWN) {
-      return LakeStatus[LakeStatus.DOWN].toLowerCase();
-    } else if(status === LakeStatus.WAITING){
-      return LakeStatus[LakeStatus.WAITING].toLowerCase();
-    } else {
-      return LakeStatus[LakeStatus.NA].toLowerCase();
     }
   }
 
@@ -173,7 +162,7 @@ export class LakeInfo {
   uptime?: string = 'NA';
   uptimeStr?: string = 'NA';
   startTime?: number;
-  isWaiting: boolean = false;
+  isWaiting: boolean;
 
 
   get hdfsUsedInBytes(): number {

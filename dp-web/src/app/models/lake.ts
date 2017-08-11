@@ -14,5 +14,5 @@ export class Lake {
   isDatalake:boolean;
   knoxEnabled?:boolean;
   knoxUrl?:string;
-  isWaiting: boolean = false;
+  isWaiting: boolean;
 }

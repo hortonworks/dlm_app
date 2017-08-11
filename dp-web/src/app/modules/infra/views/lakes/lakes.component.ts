@@ -29,9 +29,9 @@ export class LakesComponent implements OnInit {
   mapSet = new Map();
   health = new Map();
   mapSize: MapSize;
-  private syncedString =  "SYNCED";
-  private callCounts = 10;
-  private delayIntervalMs = 2000;
+  private SYNCED =  "SYNCED";
+  private MAXCALLS = 10;
+  private DELAY_IN_MS = 2000;
 
 
   constructor(private router: Router,
@@ -47,8 +47,8 @@ export class LakesComponent implements OnInit {
       .subscribe(lakes => {
         this.lakes = lakes;
         this.lakes.forEach((lake) => {
-          let locationObserver = Observable.create();
-          if (lake.data.state === this.syncedString) {
+          let locationObserver;
+          if (lake.data.state === this.SYNCED) {
             locationObserver = this.getLocationInfoWithStatus(lake.data.location, lake.clusters[0].id, lake.data.id);
           } else {
             unSyncedLakes.push(lake);
@@ -56,21 +56,6 @@ export class LakesComponent implements OnInit {
             locationObserver = this.getLocationInfo(lake.data.location);
           }
           this.updateHealth(lake, locationObserver);
-          /***** MOCK CONNECTIONS ****/
-
-          // locationObserver.subscribe(locationInfo=> {
-          //   this.lakeService.getPairsMock(lakes, lake.data.id).subscribe((pairedLake)=>{
-          //     if(pairedLake !== null){
-          //        this.getLocationInfoWithStatus(pairedLake.data.location, pairedLake.clusters[0].id).subscribe((pairedLocationInfo=>{
-          //           this.mapData.push({start:this.extractMapPoints(locationInfo), end:this.extractMapPoints(pairedLocationInfo)});
-          //          this.mapData = this.mapData.slice();
-          //        }));
-          //     }else{
-          //         this.mapData.push({start:this.extractMapPoints(locationInfo)});
-          //        this.mapData = this.mapData.slice();
-          //     }
-          //   });
-          // });
         });
         this.updateUnSyncedLakes(unSyncedLakes);
       });
@@ -79,9 +64,9 @@ export class LakesComponent implements OnInit {
   updateUnSyncedLakes(unSyncedLakes){
     unSyncedLakes.forEach((unSyncedlake) =>{
       let count =1;
-      this.lakeService.retrieve(unSyncedlake.data.id).delay(this.delayIntervalMs).repeat(this.callCounts).skipWhile((lake) => lake.state !== this.syncedString && count++ < this.callCounts).first().subscribe(lake =>{
-        let locationObserver = Observable.create();
-        if(lake.state === this.syncedString){
+      this.lakeService.retrieve(unSyncedlake.data.id).delay(this.DELAY_IN_MS).repeat(this.MAXCALLS).skipWhile((lake) => lake.state !== this.SYNCED && count++ < this.MAXCALLS).first().subscribe(lake =>{
+        let locationObserver;
+        if(lake.state === this.SYNCED){
           unSyncedlake.data = lake;
           this.clusterService.listByLakeId({lakeId: lake.id}).subscribe(clusters=> {
             unSyncedlake.clusters = clusters;
@@ -152,12 +137,10 @@ export class LakesComponent implements OnInit {
 
   onRefresh(lakeId){
     let lakeInfo = this.lakes.find(lake => lake.data.id === lakeId);
-    if(lakeInfo.data.state === this.syncedString){
+    if(lakeInfo.data.state === this.SYNCED){
       this.updateHealth(lakeInfo, this.getLocationInfoWithStatus(lakeInfo.data.location, lakeInfo.clusters[0].id, lakeId));
     }else{
-      let unSyncedLakes = [];
-      unSyncedLakes.push(lakeInfo);
-      this.updateUnSyncedLakes(unSyncedLakes);
+      this.updateUnSyncedLakes([lakeInfo]);
     }
   }
 
