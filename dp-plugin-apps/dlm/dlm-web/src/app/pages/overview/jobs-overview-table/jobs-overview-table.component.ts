@@ -81,7 +81,7 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
     const actionLabel = name => this.t.instant(`page.overview.table.actions.${name}`);
     this.rowActions = <ActionItemType[]>[
       {label: actionLabel('abort_job'), name: 'ABORT_JOB', enabledFor: 'RUNNING'},
-      {label: actionLabel('rerun_job'), name: 'RERUN_JOB', disableFn: this.isRerunDisabled},
+      {label: actionLabel('rerun_job'), name: 'RERUN_JOB', disableFn: this.isRerunDisabled.bind(this)},
       {label: actionLabel('delete_policy'), name: 'DELETE_POLICY', disabledFor: ''},
       {label: actionLabel('suspend_policy'), name: 'SUSPEND_POLICY', disabledFor: 'SUSPENDED'},
       {label: actionLabel('activate_policy'), name: 'ACTIVATE_POLICY', disabledFor: 'RUNNING'}
@@ -209,7 +209,6 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   }
 
   isRerunDisabled(policy: Policy, action): boolean {
-    const lastJob = policy.lastJobResource;
-    return !lastJob || policy.status === POLICY_STATUS.SUSPENDED || contains([JOB_STATUS.SUCCESS, JOB_STATUS.RUNNING], lastJob.status);
+    return this.cannotRerun(policy, policy.lastJobResource);
   }
 }

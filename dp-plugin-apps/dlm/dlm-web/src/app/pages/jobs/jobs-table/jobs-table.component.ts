@@ -57,10 +57,14 @@ export class JobsTableComponent implements OnInit {
   rowActions = <ActionItemType[]>[
     {label: 'Abort', name: 'ABORT', enabledFor: JOB_STATUS.RUNNING},
     {label: 'Re-run', name: 'RERUN', disableFn: this.isRerunDisabled.bind(this)},
-    {label: 'View Log', name: 'LOG', }
+    {label: 'View Log', name: 'LOG'}
   ];
 
   constructor(protected store: Store<fromRoot.State>, protected logService: LogService) {
+  }
+
+  protected cannotRerun(policy, lastJob) {
+    return !lastJob || policy.status === POLICY_STATUS.SUSPENDED || contains([JOB_STATUS.SUCCESS, JOB_STATUS.RUNNING], lastJob.status);
   }
 
   ngOnInit() {
@@ -145,9 +149,9 @@ export class JobsTableComponent implements OnInit {
     this.onPageChange.emit(page);
   }
 
-  isRerunDisabled(job, _) {
+
+  isRerunDisabled(job, _): boolean {
     const lastJob = this.policy.lastJobResource;
-    return !lastJob || lastJob.id !== job.id || this.policy.status === POLICY_STATUS.SUSPENDED ||
-      contains([JOB_STATUS.SUCCESS, JOB_STATUS.RUNNING], lastJob.status);
+    return !lastJob || lastJob.id !== job.id || this.cannotRerun(this.policy, lastJob);
   }
 }

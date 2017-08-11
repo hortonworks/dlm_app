@@ -19,6 +19,10 @@ import { JobTrackingInfo } from 'models/job-tracking-info.model';
 @Injectable()
 export class JobService {
 
+  private getUrlForJobs(policy: Policy) {
+    return `clusters/${policy.targetClusterResource.id}/policy/${policy.name}/jobs`;
+  }
+
   normalizeJob(job): Job {
     job.isCompleted = job.status !== JOB_STATUS.RUNNING;
     try {
@@ -50,7 +54,7 @@ export class JobService {
   }
 
   getJobsForPolicy(policy: Policy, numResults = 1000): Observable<any> {
-    const url = `clusters/${policy.targetClusterResource.id}/policy/${policy.name}/jobs?numResults=${numResults}`;
+    const url = `${this.getUrlForJobs(policy)}?numResults=${numResults}`;
     return mapResponse(this.http.get(url)).map(response => {
       response.jobs = response.jobs.map(this.normalizeJob);
       return response;
@@ -65,12 +69,12 @@ export class JobService {
   }
 
   abortJob(policy: Policy): Observable<any> {
-    const url = `clusters/${policy.targetClusterResource.id}/policy/${policy.name}/jobs/abort`;
+    const url = `${this.getUrlForJobs(policy)}/abort`;
     return mapResponse(this.http.put(url, {}));
   }
 
   rerunJob(policy: Policy): Observable<any> {
-    const url = `clusters/${policy.targetClusterResource.id}/policy/${policy.name}/jobs/rerun`;
+    const url = `${this.getUrlForJobs(policy)}/rerun`;
     return mapResponse(this.http.post(url, {}));
   }
 }
