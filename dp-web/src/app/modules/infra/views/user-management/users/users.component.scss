@@ -37,8 +37,8 @@
   }
   .dp-input__icon {
     position: absolute;
-    margin-top: -10%;
-    margin-left: 90%;
+    right: 10px;
+    top: 10px;
     color: $dove-gray;
     font-size: 14px;
   }
@@ -58,4 +58,8 @@ dp-dropdown {
 
 .center {
   text-align: center !important;
+}
+
+:host /deep/ dp-tabs > .mdl-layout__header-row {
+  height: 55px;
 }

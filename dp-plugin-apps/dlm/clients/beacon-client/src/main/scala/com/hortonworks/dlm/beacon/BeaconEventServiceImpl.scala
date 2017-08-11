@@ -9,19 +9,22 @@
 
 package com.hortonworks.dlm.beacon
 
+import com.hortonworks.dataplane.cs.KnoxProxyWsClient
 import com.hortonworks.dlm.beacon.Exception.JsonException
+import com.hortonworks.dataplane.commons.domain.Constants.BEACON
+import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
 import com.hortonworks.dlm.beacon.WebService.BeaconEventService
 import play.api.http.Status._
 import play.api.libs.ws.WSAuthScheme
 import play.api.libs.json.{JsError, JsSuccess}
 import play.api.libs.ws.ahc.AhcWSResponse
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.ws.{WSClient, WSResponse, WSRequest}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
-class BeaconEventServiceImpl()(implicit ws: WSClient) extends BeaconEventService {
+class BeaconEventServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconEventService {
   import com.hortonworks.dlm.beacon.domain.ResponseEntities._
   import com.hortonworks.dlm.beacon.domain.JsonFormatters._
 
@@ -40,8 +43,9 @@ class BeaconEventServiceImpl()(implicit ws: WSClient) extends BeaconEventService
   }
 
 
-  override def listEvents(beaconEndpoint : String, queryString: Map[String,String]): Future[Either[BeaconApiErrors, Seq[BeaconEventResponse]]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/events/all")
+  override def listEvents(beaconEndpoint : String, clusterId: Long, queryString: Map[String,String])
+                         (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, Seq[BeaconEventResponse]]] = {
+    ws.url(s"${urlPrefix(beaconEndpoint)}/events/all", clusterId, BEACON).withHeaders(token)
       .withAuth(user, password, WSAuthScheme.BASIC)
       .withQueryString(queryString.toList: _*)
       .get.map(mapToBeaconEventsResponse).recoverWith {

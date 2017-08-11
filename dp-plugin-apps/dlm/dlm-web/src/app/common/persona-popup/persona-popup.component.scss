@@ -30,6 +30,10 @@ $icon-width: 75px;
     visibility: visible;
   }
 
+  li.disabled {
+    display: none;
+  }
+
   .active-persona {
     color: $link-color !important;
   }

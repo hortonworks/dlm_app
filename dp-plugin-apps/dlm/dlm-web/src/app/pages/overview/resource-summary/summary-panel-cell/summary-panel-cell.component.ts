@@ -18,7 +18,10 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
         <span class="text-muted">{{label}}</span>
       </p>
       <p class="cell-value" [class.btn-link]="actionable" [class.actionable]="actionable" (click)="handleCellClick($event)">
-        {{value}}
+        <span *ngIf="value > 0; else dash">{{value}}</span>
+        <ng-template #dash>
+          <span class="text-muted">-</span>
+        </ng-template>
       </p>
    </div>
   `,

@@ -72,6 +72,7 @@ import { HelpComponent } from './pages/help/help.component';
 import { NavbarComponent } from './common/navbar/navbar.component';
 import { NavigationDropdownComponent } from './common/navigation-dropdown/navigation-dropdown.component';
 import { NotificationsComponent } from './common/notifications/notifications.component';
+import { EventMessageComponent } from './common/notifications/event-message/event-message.component';
 import { NotificationsPageComponent } from './pages/notifications/notifications.component';
 import { NotificationsTableComponent } from './pages/notifications/notifications-table/notifications-table.component';
 import { ModalDialogComponent } from './common/modal-dialog/modal-dialog.component';
@@ -230,6 +231,7 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     ModalDialogComponent,
     ModalDialogBodyComponent,
     NotificationsComponent,
+    EventMessageComponent,
     LogModalDialogComponent,
     PersonaPopupComponent
   ],

@@ -15,7 +15,7 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster, Error, Errors, Location}
 import com.hortonworks.dataplane.commons.domain.Ambari.{ClusterProperties, ClusterServiceWithConfigs, ConfigurationInfo, NameNodeInfo}
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterService, DpClusterService, LocationService}
-import models.Entities.{BeaconCluster, BeaconClusters, ClusterServiceEndpointDetails, ClusterStats}
+import models.Entities.{BeaconCluster, BeaconClusters, ClusterServiceEndpointDetails, ClusterStats, ClusterIdWithBeaconUrl}
 import play.api.Logger
 import play.api.http.Status.BAD_GATEWAY
 
@@ -146,32 +146,32 @@ class DataplaneService @Inject()(
   }
 
   /**
-    * Gets list of beacon urls registered with dataplane
+    * Gets list of clusterids with beacon urls registered with dataplane
     * @return
     */
-  def getBeaconUrls: Future[Either[Errors, Seq[String]]] = {
-    val p: Promise[Either[Errors, Seq[String]]] = Promise()
+  def getClusterIdWithBeaconUrls: Future[Either[Errors, Seq[ClusterIdWithBeaconUrl]]] = {
+    val p: Promise[Either[Errors, Seq[ClusterIdWithBeaconUrl]]] = Promise()
 
     clusterComponentService
       .getAllServiceEndpoints(DataplaneService.BEACON_SERVER)
       .map({
         case Right(beaconClusters) => {
-          val beaconUrls = beaconClusters.map(x => {
+          val clusterIdWithBeaconUrl : Seq[Either[Errors, ClusterIdWithBeaconUrl]] = beaconClusters.map(x => {
             val beaconServiceDetails
               : Either[Errors, ClusterServiceEndpointDetails] =
               getBeaconEndpointDetails(x)
 
             beaconServiceDetails match {
               case Right(beaconServiceDetails) =>
-                Right(beaconServiceDetails.fullURL)
+                Right(ClusterIdWithBeaconUrl(beaconServiceDetails.fullURL, x.clusterid.get))
               case Left(errors) => Left(errors)
             }
           })
 
-          if (!beaconUrls.exists(_.isLeft)) {
-            p.success(Right(beaconUrls.map(_.right.get)))
+          if (!clusterIdWithBeaconUrl.exists(_.isLeft)) {
+            p.success(Right(clusterIdWithBeaconUrl.map(_.right.get)))
           } else {
-            val errors: Errors = beaconUrls.find(_.isLeft).get.left.get
+            val errors: Errors = clusterIdWithBeaconUrl.find(_.isLeft).get.left.get
             p.trySuccess(Left(errors))
           }
 
@@ -253,15 +253,17 @@ class DataplaneService @Inject()(
     }
 
     val endpoint: Either[Errors, String] = if (isNameNodeHAEnabled) {
-      getPropertyValue(endpointData, "hdfs-site", "dfs.nameservices") match {
+      getPropertyValue(endpointData, "hdfs-site", "dfs.internal.nameservices") match {
         case Right(nameService) => {
-          getPropertyValue(endpointData, "hdfs-site", s"dfs.ha.namenodes.$nameService")  match {
+          val internalNameService =  nameService.split(",")(0)
+          getPropertyValue(endpointData, "hdfs-site", s"dfs.ha.namenodes.$internalNameService")  match {
             case Right(nameServicePrefixes) => {
-              val endpointConfigs : Seq[String] = nameServicePrefixes.split(",").map((x) => s"dfs.namenode.$nameNodeScheme-address.$nameService.$x")
+              val endpointConfigs : Seq[String] = nameServicePrefixes.split(",").map((x) => s"dfs.namenode.$nameNodeScheme-address.$internalNameService.$x")
               val endpoints = for (config <- endpointConfigs) yield getPropertyValue(endpointData, "hdfs-site", config)
-              val namenodeHostEndpoint : Option[Either[Errors, String]] = endpoints.filter(_.isRight).find((x) => new java.net.URI(s"$nameNodeScheme://$x").getHost == namenodeHostName)
+              val nameNodeHostEndpoints : Seq[String] = endpoints.filter(_.isRight).map(_.right.get)
+              val namenodeHostEndpoint : Option[String] = nameNodeHostEndpoints.find((x) => new java.net.URI(s"$nameNodeScheme://$x").getHost == namenodeHostName)
               val errorMsg = DataplaneService.nameNodeEndpointErrMsg + namenodeHostName
-              if (namenodeHostEndpoint.isDefined) namenodeHostEndpoint.get else  Left(Errors(Seq(Error(BAD_GATEWAY.toString, errorMsg))))
+              if (namenodeHostEndpoint.isDefined) Right(namenodeHostEndpoint.get) else  Left(Errors(Seq(Error(BAD_GATEWAY.toString, errorMsg))))
             }
             case Left(errors) => Left(errors)
           }

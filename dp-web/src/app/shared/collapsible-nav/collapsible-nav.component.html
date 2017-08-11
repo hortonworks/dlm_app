@@ -1,7 +1,8 @@
 <div #sideNav class="sidenav"  [ngClass]="{'collpased': collapseSideNav}">
 
-  <div class="dp-header-logo borderBox">
-    <img #personaNavSrc *ngIf="activePersonaImageName" [attr.src]="'../../../assets/images/' + activePersonaImageName" alt="Hortonworks Dataplane"/>
+  <div #personaNavSrc class="dp-header-logo borderBox">
+    <img  *ngIf="activePersonaImageName" [attr.src]="'../../../assets/images/' + activePersonaImageName" alt="Hortonworks Dataplane"/>
+    <span class="persona-drop-down-small"></span>
     <span class="persona-name">{{ activePersonaName }}</span>
   </div>
 
@@ -16,4 +17,4 @@
 
 </div>
 
-<dp-persona-popup [personas]="headerData.personas" [personaNavSrc]="personaNavSrc" (personaChange)="navigateToPersona($event)"> </dp-persona-popup>
+<dp-persona-popup [personas]="headerData.personas" [activePersona]="activePersonaName" [personaNavSrc]="personaNavSrc" (personaChange)="navigateToPersona($event)"> </dp-persona-popup>

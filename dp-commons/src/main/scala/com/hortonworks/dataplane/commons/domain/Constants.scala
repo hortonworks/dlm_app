@@ -8,6 +8,7 @@ object Constants {
   val HJWT = "hadoop-jwt"
   val NAMENODE = "NAMENODE"
   val ATLAS = "ATLAS"
+  val BEACON = "BEACON"
   val DPTOKEN = "X-DP-Token-Info"
 
 }

@@ -17,9 +17,7 @@ import { Event } from 'models/event.model';
     <div class="row" *ngFor="let event of events | slice:0:visibleItems">
       <div class="col-md-12">
         <dlm-issues-list-item
-          [event]="event"
-          (selectLog)="onSelectLog.emit($event)"
-          (selectPolicy)="onSelectPolicy.emit($event)">
+          [event]="event">
         </dlm-issues-list-item>
       </div>
     </div>
@@ -32,7 +30,7 @@ import { Event } from 'models/event.model';
     </div>
     <div class="row" *ngIf="!events.length">
       <div class="col-md-12">
-        <p>{{'page.overview.issues.list.empty_list' | translate}}</p>
+        <p class="text-muted">{{'page.overview.issues.list.empty_list' | translate}}</p>
       </div>
     </div>
   `,
@@ -41,8 +39,6 @@ import { Event } from 'models/event.model';
 export class IssuesListComponent {
   visibleItems = 4;
   @Input() events: Event[];
-  @Output() onSelectLog = new EventEmitter<Event>();
-  @Output() onSelectPolicy = new EventEmitter<Event>();
 
   @HostBinding('class') className = 'all-visible';
 

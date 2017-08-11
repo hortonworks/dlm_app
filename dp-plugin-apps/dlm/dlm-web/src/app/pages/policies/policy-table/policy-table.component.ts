@@ -48,6 +48,7 @@ import { HiveService } from 'services/hive.service';
 import { POLL_INTERVAL } from 'constants/api.constant';
 import { LogService } from 'services/log.service';
 import { EntityType } from 'constants/log.constant';
+import { ColumnMode } from '@swimlane/ngx-datatable';
 
 @Component({
   selector: 'dlm-policy-table',
@@ -58,6 +59,7 @@ import { EntityType } from 'constants/log.constant';
 export class PolicyTableComponent implements OnInit, OnDestroy {
   columns: any[];
   tableTheme = TableTheme.Cards;
+  columnMode = ColumnMode.flex;
   jobs$: Observable<Job[]>;
   filteredJobs$: Observable<Job[]>;
   selectedPolicy$: BehaviorSubject<Policy> = new BehaviorSubject(<Policy>{});
@@ -115,9 +117,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       .filter(([_, policy]) => Boolean(
         this.activeContentType === PolicyContent.Jobs && policy && policy.id && this.tableComponent.expandedRows[policy.id]
       ))
-      .do(([_, policy]) => {
-        this.store.dispatch(loadJobsForPolicy(policy));
-      });
+      .do(([_, policy]) => this.store.dispatch(loadJobsForPolicy(policy)));
     this.subscriptions.push(polling$.subscribe());
   }
 
@@ -139,39 +139,51 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.columns = [
-      {...this.iconColumn.cellSettings, prop: 'type', cellTemplate: this.iconColumn.cellRef},
+      {name: ' ', prop: 'type', cellClass: 'icon-cell',
+        cellTemplate: this.iconColumn.cellRef, sortable: false, flexGrow: 1},
       {
-        ...this.statusColumn.cellSettings,
         prop: 'status',
         name: ' ',
         cellTemplate: this.statusColumn.cellRef,
         sortable: false,
-        ...TableComponent.makeFixedWith(25)
+        flexGrow: 1,
+        cellClass: 'icon-cell'
       },
       {
         prop: 'status',
         cellClass: 'text-cell',
         headerClass: 'text-header',
         cellTemplate: this.verbStatusCellTemplate,
-        ...TableComponent.makeFixedWith(80)
+        flexGrow: 4
       },
       {
         name: this.t.instant('common.name'),
         cellTemplate: this.policyInfoColumn.cellRef,
-        sortable: false, ...TableComponent.makeFixedWith(200)
+        sortable: false,
+        flexGrow: 7
       },
-      {prop: 'sourceClusterResource', name: this.t.instant('common.source'), cellTemplate: this.clusterCellTemplateRef},
-      {prop: 'targetClusterResource', name: this.t.instant('common.destination'), cellTemplate: this.clusterCellTemplateRef},
-      {prop: 'sourceDataset', name: this.t.instant('common.path'), cellTemplate: this.pathCellRef, ...TableComponent.makeFixedWith(200)},
-      {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs'), sortable: false},
-      {prop: 'jobs.0.trackingInfo.timeTaken', name: this.t.instant('common.duration'), cellTemplate: this.durationCellRef},
-      {prop: 'lastGoodJobResource.startTime', name: 'Last Good', cellTemplate: this.lastGoodCellRef},
-      {name: ' ', cellTemplate: this.actionsCellRef, ...TableComponent.makeFixedWith(55), sortable: false}
+      {prop: 'sourceClusterResource', name: this.t.instant('common.source'), flexGrow: 8,
+        cellTemplate: this.clusterCellTemplateRef, comparator: this.clusterResourceComparator.bind(this)},
+      {prop: 'targetClusterResource', name: this.t.instant('common.destination'), flexGrow: 8,
+        cellTemplate: this.clusterCellTemplateRef, comparator: this.clusterResourceComparator.bind(this)},
+      {prop: 'sourceDataset', name: this.t.instant('common.path'),
+        cellTemplate: this.pathCellRef, flexGrow: 10, sortable: false},
+      {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs'),
+        sortable: false, flexGrow: 5},
+      {prop: 'jobs.0.trackingInfo.timeTaken', name: this.t.instant('common.duration'),
+        cellTemplate: this.durationCellRef, flexGrow: 5},
+      {prop: 'lastGoodJobResource.startTime', name: 'Last Good',
+        cellTemplate: this.lastGoodCellRef, flexGrow: 5},
+      {name: ' ', cellTemplate: this.actionsCellRef, flexGrow: 2, sortable: false}
     ];
     if (this.activePolicyId) {
       this.openJobsForPolicy();
     }
     this.initPolling();
+  }
+
+  clusterResourceComparator(cluster1: Cluster, cluster2: Cluster) {
+    return cluster1.name.toLowerCase() > cluster2.name.toLowerCase() ? 1 : -1;
   }
 
   openJobsForPolicy() {
@@ -346,5 +358,9 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
 
   getJobsActiveActionsForRow(rowId) {
     return rowId && rowId in this.selectedJobsActions ? this.selectedJobsActions[rowId] : {};
+  }
+
+  handleOnSelectFile(path) {
+    this.hdfsRootPath = path;
   }
 }

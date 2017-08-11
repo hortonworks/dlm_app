@@ -164,7 +164,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   };
 
   @HostListener('window:resize') onWindowResize() {
-    this.table.recalculate();
+    this.recalculateTable();
   }
 
   get rows(): any[] {
@@ -175,7 +175,10 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
     this.navbarCollapse$ = this.navbar.isCollapsed;
     this.navbarCollapseSubscription = this.navbarCollapse$
       .debounceTime(500)
-      .subscribe(() => this.table.recalculate());
+      .subscribe(() => {
+        this.recalculateTable();
+        this.cdRef.detectChanges();
+      });
   }
 
   handleSelectedCell({row, column, checked}) {
@@ -191,7 +194,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
      * TODO Replace this code after ngx-datatable is updated with dynamic page size selection
      */
     this.table.limit = newLimit;
-    this.table.recalculate();
+    this.recalculateTable();
   }
 
   changePage(page) {
@@ -239,7 +242,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
       // restore expanded rows after data update
       Object.keys(this.expandedRows).forEach(id => {
         if (this.expandedRows[id]) {
-          const policy = this.rows.find(p => p.id === id);
+          const policy = this.rows.find(p => '' + p.id === id);
           if (policy) {
             this.table.rowDetail.toggleExpandRow(policy);
           }
@@ -255,6 +258,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   ngAfterViewInit() {
     // this will avoid issue on initial calculation when parent for this component is not properly rendered
     this.recalculateTable();
+    this.cdRef.detectChanges();
   }
 
   ngAfterViewChecked() {

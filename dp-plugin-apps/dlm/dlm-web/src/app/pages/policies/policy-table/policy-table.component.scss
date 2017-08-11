@@ -37,6 +37,13 @@ dlm-table.cards-theme {
 }
 
 dlm-policy-table {
+  .datatable-body-cell {
+    &.icon-cell {
+      .datatable-body-cell-label {
+        overflow: visible;
+      }
+    }
+  }
   .datatable-body-cell-label {
     .cluster-name {
       font-size: 17px;

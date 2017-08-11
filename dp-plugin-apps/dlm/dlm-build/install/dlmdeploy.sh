@@ -13,6 +13,7 @@ set -e
 
 DEFAULT_VERSION=0.0.1
 DEFAULT_TAG="latest"
+CONSUL_CONTAINER="dp-consul-server"
 
 init_network() {
     IS_NETWORK_PRESENT="false"
@@ -87,6 +88,29 @@ load_image() {
     fi
 }
 
+upgrade() {
+    destroy || echo "App is not up."
+
+    # destroy consul to flush services
+    echo "Destroying Consul"
+    docker rm --force $CONSUL_CONTAINER || echo "Consul is not up."
+
+    # bring consul back up
+    echo "Initializing Consul"
+    read_consul_host
+    docker run \
+        --name $CONSUL_CONTAINER \
+        --network host \
+        --detach \
+        consul:0.8.5 \
+        agent -server -ui -bootstrap -bind=$CONSUL_HOST -client=$CONSUL_HOST
+
+    # init all but db and knox
+    init_app
+
+    echo "Upgrade complete."
+}
+
 print_version() {
     if [ -f VERSION ]; then
         cat VERSION
@@ -106,6 +130,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "logs" "Log of the application docker containers"
     printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them"
     printf "%-${tabspace}s:%s\n" "load" "Load image from lib directory into docker"
+    printf "%-${tabspace}s:%s\n" "upgrade" "Upgrade existing dlm to current version"
     printf "%-${tabspace}s:%s\n" "version" "Print the version of dlm"
 }
 
@@ -140,6 +165,9 @@ else
             ;;
         load)
             load_image
+            ;;
+        upgrade)
+            upgrade
             ;;
         version)
             print_version

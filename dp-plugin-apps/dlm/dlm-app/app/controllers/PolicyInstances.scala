@@ -17,6 +17,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import services.BeaconService
 
+import com.hortonworks.dataplane.commons.auth.Authenticated
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._
 import models.JsonFormatters._
@@ -24,7 +25,10 @@ import models.JsonFormatters._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class PolicyInstances @Inject() (val beaconService: BeaconService) extends Controller {
+class PolicyInstances @Inject() (
+  val beaconService: BeaconService,
+  authenticated: Authenticated
+) extends Controller {
 
   /**
     * Retrieve all instances of a specific policy
@@ -32,8 +36,9 @@ class PolicyInstances @Inject() (val beaconService: BeaconService) extends Contr
     * @param policyName  name of the policy
     * @return
     */
-  def retrieve(clusterId: Long, policyName: String) = Action.async { request =>
+  def retrieve(clusterId: Long, policyName: String) = authenticated.async { request =>
     Logger.info("Received retrieve policy instance request")
+    implicit val token = request.token
     val queryString : Map[String,String] = request.queryString.map { case (k,v) => k -> v.mkString }
     beaconService.getPolicyInstances(clusterId, policyName, queryString).map {
       case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
@@ -46,8 +51,9 @@ class PolicyInstances @Inject() (val beaconService: BeaconService) extends Contr
     * @param clusterId  target cluster id
     * @return
     */
-  def list(clusterId: Long) = Action.async { request =>
+  def list(clusterId: Long) = authenticated.async { request =>
     Logger.info("Received list all jobs on target cluster request")
+    implicit val token = request.token
     val queryString : Map[String,String] = request.queryString.map { case (k,v) => k -> v.mkString }
     beaconService.getPolicyInstancesForCluster(clusterId, queryString).map {
       case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
@@ -60,9 +66,24 @@ class PolicyInstances @Inject() (val beaconService: BeaconService) extends Contr
     * @param clusterId  target cluster id
     * @return
     */
-  def abort(clusterId: Long, policyName: String) = Action.async {
+  def abort(clusterId: Long, policyName: String) = authenticated.async { request =>
     Logger.info("Received abort jobs on target cluster request")
+    implicit val token = request.token
     beaconService.abortPolicyInstancesOnCluster(clusterId, policyName).map {
+      case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+      case Right(response) => Ok(Json.toJson(response))
+    }
+  }
+
+  /**
+    * rerun last instance of the policy on target cluster
+    * @param clusterId  target cluster id
+    * @return
+    */
+  def rerun(clusterId: Long, policyName: String) = authenticated.async { request =>
+    Logger.info("Received rerun last job of the policy on target cluster request")
+    implicit val token = request.token
+    beaconService.rerunLastPolicyInstance(clusterId, policyName).map {
       case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
       case Right(response) => Ok(Json.toJson(response))
     }

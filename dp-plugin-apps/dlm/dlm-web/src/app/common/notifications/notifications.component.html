@@ -26,7 +26,9 @@
             </td>
             <td class="content">
               <div class="name">{{ event.event }}</div>
-              <div class="description">{{ event.message }}</div>
+              <div class="description">
+                <dlm-event-message [event]="event"></dlm-event-message>
+              </div>
               <div class="timestamp">{{ event.timestamp | fmtTz | amTimeAgo }}</div>
             </td>
           </tr>
