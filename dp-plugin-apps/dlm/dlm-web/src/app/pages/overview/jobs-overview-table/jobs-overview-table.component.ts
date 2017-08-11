@@ -22,12 +22,13 @@ import { TableComponent } from 'common/table/table.component';
 import { getLastOperationResponse } from 'selectors/operation.selector';
 import { OperationResponse } from 'models/operation-response.model';
 import { deletePolicy, resumePolicy, suspendPolicy } from 'actions/policy.action';
-import { abortJob } from 'actions/job.action';
+import { abortJob, rerunJob } from 'actions/job.action';
 import { StatusColumnComponent } from 'components/table-columns/status-column/status-column.component';
 import { Policy } from 'models/policy.model';
 import { LogService } from 'services/log.service';
-import { JOB_STATUS } from 'constants/status.constant';
+import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
 import { PolicyService } from 'services/policy.service';
+import { contains } from 'utils/array-util';
 
 @Component({
   selector: 'dlm-jobs-overview-table',
@@ -80,6 +81,7 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
     const actionLabel = name => this.t.instant(`page.overview.table.actions.${name}`);
     this.rowActions = <ActionItemType[]>[
       {label: actionLabel('abort_job'), name: 'ABORT_JOB', enabledFor: 'RUNNING'},
+      {label: actionLabel('rerun_job'), name: 'RERUN_JOB', disableFn: this.isRerunDisabled},
       {label: actionLabel('delete_policy'), name: 'DELETE_POLICY', disabledFor: ''},
       {label: actionLabel('suspend_policy'), name: 'SUSPEND_POLICY', disabledFor: 'SUSPENDED'},
       {label: actionLabel('activate_policy'), name: 'ACTIVATE_POLICY', disabledFor: 'RUNNING'}
@@ -162,6 +164,8 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
     switch (this.selectedAction.name) {
       case 'ABORT_JOB':
         return this.store.dispatch(abortJob(this.selectedForActionRow));
+      case 'RERUN_JOB':
+        return this.store.dispatch(rerunJob(this.selectedForActionRow));
       case 'DELETE_POLICY':
         return this.store.dispatch(deletePolicy(this.selectedForActionRow));
       case 'SUSPEND_POLICY':
@@ -202,5 +206,10 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
 
   isHDFS(serviceName): boolean {
     return serviceName.toLowerCase() === 'hdfs';
+  }
+
+  isRerunDisabled(policy: Policy, action): boolean {
+    const lastJob = policy.lastJobResource;
+    return !lastJob || policy.status === POLICY_STATUS.SUSPENDED || contains([JOB_STATUS.SUCCESS, JOB_STATUS.RUNNING], lastJob.status);
   }
 }

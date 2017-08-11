@@ -32,7 +32,7 @@ import * as fromRoot from 'reducers/';
 import { getAllJobs } from 'selectors/job.selector';
 import { Observable } from 'rxjs/Observable';
 import { Job } from 'models/job.model';
-import { abortJob, loadJobsForPolicy } from 'actions/job.action';
+import { abortJob, rerunJob, loadJobsForPolicy } from 'actions/job.action';
 import { deletePolicy, resumePolicy, suspendPolicy } from 'actions/policy.action';
 import { PolicyService } from 'services/policy.service';
 import { OperationResponse } from 'models/operation-response.model';
@@ -251,11 +251,19 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         return this.store.dispatch(resumePolicy(this.selectedForActionRow));
       case 'ABORT_JOB':
         return this.store.dispatch(abortJob(this.selectedForActionRow));
+      case 'RERUN_JOB':
+        return this.store.dispatch(rerunJob(this.selectedForActionRow));
     }
   }
 
   abortJobAction(policy) {
     this.selectedAction = <ActionItemType>{name: 'ABORT_JOB'};
+    this.selectedForActionRow = this.policies.find(p => p.policyId === policy.policyId);
+    this.showActionConfirmationModal = true;
+  }
+
+  rerunJobAction(policy) {
+    this.selectedAction = <ActionItemType>{name: 'RERUN_JOB'};
     this.selectedForActionRow = this.policies.find(p => p.policyId === policy.policyId);
     this.showActionConfirmationModal = true;
   }

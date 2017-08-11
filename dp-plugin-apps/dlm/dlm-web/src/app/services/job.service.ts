@@ -68,4 +68,9 @@ export class JobService {
     const url = `clusters/${policy.targetClusterResource.id}/policy/${policy.name}/jobs/abort`;
     return mapResponse(this.http.put(url, {}));
   }
+
+  rerunJob(policy: Policy): Observable<any> {
+    const url = `clusters/${policy.targetClusterResource.id}/policy/${policy.name}/jobs/rerun`;
+    return mapResponse(this.http.post(url, {}));
+  }
 }

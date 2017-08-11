@@ -215,6 +215,7 @@
         },
         "actions": {
           "abort_job": "Abort Job",
+          "rerun_job": "Re-run Job",
           "delete_policy": "Delete Policy",
           "suspend_policy": "Suspend Policy",
           "activate_policy": "Activate Policy"
