@@ -8,7 +8,7 @@ import {AssetDetails, AssetProperty} from '../../../models/asset-property';
 
 
 export enum TopLevelTabs {
-  DETAILS, LINEAGE, AUDIT, POLICY//, REPLICATION
+  DETAILS, LINEAGE, POLICY, AUDIT//, REPLICATION
 }
 
 @Component({
