@@ -2,7 +2,7 @@ package services
 import java.util
 import javax.inject.Singleton
 import javax.naming.directory.{DirContext, SearchControls, SearchResult}
-import javax.naming.{Context, NamingEnumeration, NamingException}
+import javax.naming._
 import javax.naming.ldap.InitialLdapContext
 
 import com.google.inject.Inject
@@ -307,9 +307,23 @@ class LdapService @Inject()(
       val ctx: DirContext = new InitialLdapContext(env, null)
       Future.successful(Right(ctx))
     } catch {
-      case e: NamingException =>
+
+      case e: CommunicationException=>{
+        logger.error("error while getting ldapContext",e)
+        Future.successful(
+          Left(Errors(Seq(Error("Communication Exception", "Could not communicate with LDAP server.Check connectivity.")))))
+      }
+      case e: AuthenticationException=>{
+        logger.error("error while getting ldapContext",e)
+        Future.successful(
+          Left(Errors(Seq(Error("Authentication Exception", "Some credentials are incorrect for LDAP")))))
+      }
+      case e: NamingException =>{
+        logger.error("error while getting ldapContext",e)
         Future.successful(
           Left(Errors(Seq(Error("Exception", e.getMessage)))))
+      }
+
     }
   }
 }
