@@ -31,4 +31,8 @@
     <section *ngIf="selectedTopLevelTabs === topLevelTabs.AUDIT">
      <asset-audit-view [clusterId]="clusterId" [assetDetails]="assetDetails"> </asset-audit-view>
     </section>
+    <section *ngIf="selectedTopLevelTabs === topLevelTabs.POLICY">
+     <asset-policy-view [clusterId]="clusterId" [assetDetails]="assetDetails"> </asset-policy-view>
+    </section>
+
 </div>

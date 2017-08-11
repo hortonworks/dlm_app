@@ -68,6 +68,7 @@ GET           /api/assets/lineage/:clusterId/:atlasGuid              controllers
 
 #Ranger
 GET           /api/ranger/audit/:clusterId/:dbName/:tableName        controllers.RangerAttributes.getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String ?= "0", limit:String ?= "20", accessType:String ?="", accessResult:String ?="")
+GET           /api/ranger/policy/:clusterId/:dbName/:tableName        controllers.RangerAttributes.getPolicyDetails(clusterId: String, dbName: String, tableName: String, offset: String ?= "0", limit:String ?= "20")
 
 #LDAP
 POST          /api/knox/validate                                     controllers.KnoxConfig.validate

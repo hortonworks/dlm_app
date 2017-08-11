@@ -206,6 +206,7 @@ object AppModule extends AbstractModule {
       materializer,
       configuration,
       rangerRoute.rangerAudit ~
+      rangerRoute.rangerPolicy ~
       atlasRoute.hiveAttributes ~
         atlasRoute.hiveTables ~
         atlasRoute.atlasEntities ~
