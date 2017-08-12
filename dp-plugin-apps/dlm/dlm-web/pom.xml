@@ -5,8 +5,23 @@
 
   <groupId>com.hortonworks.dataplane</groupId>
   <artifactId>dlm-web</artifactId>
-  <version>0.0.1</version>
   <packaging>pom</packaging>
+  <name>DLM Web</name>
+  <version>1.0</version>
+  <description>DLM Web</description>
+
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.rat</groupId>
+      <artifactId>apache-rat-plugin</artifactId>
+      <version>0.11</version>
+    </dependency>
+  </dependencies>
+
+  <properties>
+    <nodemodules.dir>node_modules</nodemodules.dir> <!-- specify -Dnodemodules.dir option to reduce dlm-web build time by not re-downloading npm modules -->
+  </properties>
 
   <build>
     <plugins>
@@ -15,35 +30,41 @@
         <artifactId>frontend-maven-plugin</artifactId>
         <version>1.5</version>
         <configuration>
-          <installDirectory>target</installDirectory>
+          <nodeVersion>v6.10.1</nodeVersion>
+          <npmVersion>3.10.0</npmVersion>
+          <yarnVersion>v0.22.0</yarnVersion>
+          <installDirectory>${project.build.directory}</installDirectory>
+          <npmInheritsProxyConfigFromMaven>false</npmInheritsProxyConfigFromMaven>
+          <!-- setting npm_config_tmp environment variable is a workaround for
+               https://github.com/Medium/phantomjs/issues/673 -->
+          <environmentVariables>
+            <npm_config_tmp>/tmp/npm_config_tmp</npm_config_tmp>
+          </environmentVariables>
         </configuration>
 
         <executions>
-
           <execution>
             <id>install node and npm</id>
+            <phase>generate-sources</phase>
             <goals>
               <goal>install-node-and-yarn</goal>
             </goals>
-            <configuration>
-              <nodeVersion>v7.4.0</nodeVersion>
-              <npmVersion>4.0.5</npmVersion>
-              <yarnVersion>v0.27.5</yarnVersion>
-            </configuration>
           </execution>
 
           <execution>
             <id>yarn install</id>
+            <phase>generate-sources</phase>
             <goals>
               <goal>yarn</goal>
             </goals>
             <configuration>
-              <arguments>install</arguments>
+              <arguments>install --ignore-engines --pure-lockfile</arguments>
             </configuration>
           </execution>
 
           <execution>
-            <id>yarn run build</id>
+            <id>DLM web compile sources</id>
+            <phase>compile</phase>
             <goals>
               <goal>yarn</goal>
             </goals>
@@ -52,8 +73,104 @@
             </configuration>
           </execution>
 
+          <execution>
+            <id>DLM Web unit tests</id>
+            <phase>test</phase>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <configuration>
+              <skip>${skipTests}</skip>
+              <arguments>run test</arguments>
+            </configuration>
+          </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <version>0.11</version>
+        <configuration>
+          <licenses>
+            <license implementation="org.apache.rat.analysis.license.SimplePatternBasedLicense">
+              <licenseFamilyCategory>YASL1</licenseFamilyCategory>
+              <licenseFamilyName>Yet Another Software License (YASL) 1.0</licenseFamilyName>
+              <notes></notes>
+              <patterns>
+                <pattern>Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.</pattern>
+              </patterns>
+            </license>
+          </licenses>
+          <licenseFamilies>
+            <licenseFamily implementation="org.apache.rat.license.SimpleLicenseFamily">
+              <familyName>Yet Another Software License (YASL) 1.0</familyName>
+            </licenseFamily>
+          </licenseFamilies>
+          <excludes>
+            <exclude>.idea/**</exclude>
+            <exclude>**/*.json</exclude>
+            <exclude>.angular-cli.json</exclude>
+            <exclude>.editorconfig</exclude>
+            <exclude>dist/**</exclude>
+            <exclude>target/**</exclude>
+            <exclude>vendor/**</exclude>
+            <exclude>node_modules/**</exclude>
+            <exclude>node/**</exclude>
+            <exclude>src/assets/**</exclude>
+            <exclude>npm-debug.log</exclude>
+            <exclude>yarn.lock</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>exec-maven-plugin</artifactId>
+      <version>1.2.1</version>
+      <executions>
+        <execution>
+          <id>clean-rmdir</id>
+          <phase>clean</phase>
+          <goals>
+            <goal>exec</goal>
+          </goals>
+          <configuration>
+            <executable>${executable.rmdir}</executable>
+            <workingDirectory>${basedir}</workingDirectory>
+            <commandlineArgs>${args.rm.clean} dist ${project.build.directory} ${nodemodules.dir}</commandlineArgs>
+            <successCodes>
+              <successCode>0</successCode>
+              <successCode>1</successCode>
+              <successCode>2</successCode>
+            </successCodes>
+          </configuration>
+        </execution>
+      </executions>
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>linux</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <properties>
+        <envClassifier>linux</envClassifier>
+        <dirsep>/</dirsep>
+        <executable.rmdir>rm</executable.rmdir>
+        <args.rm.clean>-rf</args.rm.clean>
+      </properties>
+    </profile>
+  </profiles>
 </project>
