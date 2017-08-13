@@ -11,6 +11,13 @@ export class ClusterService {
 
   constructor(private http:Http) { }
 
+  syncCluster(lakeId) {
+    return this.http
+      .post(`${this.uri}/sync/${lakeId}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
   listByLakeId({ lakeId }): Observable<Cluster[]>{
     const uri = lakeId ? `${this.uri}?lakeId=${lakeId}` : this.uri;
     return this.http

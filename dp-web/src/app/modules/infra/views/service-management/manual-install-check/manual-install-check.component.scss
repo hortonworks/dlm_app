@@ -1,0 +1,50 @@
+@import "../../../../../../styles/variables";
+
+.container {
+  padding: 0 25px;
+}
+
+.title-pane {
+  padding: 25px 0;
+}
+
+.page-content {
+  padding: 20px;
+  background: $white;
+  min-height: 580px;
+}
+
+.status-panel {
+  .fa {
+    margin-bottom: 14px;
+    margin-right: 5px;
+  }
+
+  .error, .success {
+    .fa {
+      float: left;
+    }
+  }
+  .status-desc {
+    font-size: 12px;
+    padding: 5px 0;
+  }
+}
+
+.failure-list {
+  padding-left: 32px;
+  margin-top: 0px;
+}
+
+.error {
+  color: $roman-red !important;
+}
+
+.success {
+  color: $forest-green-1;
+}
+
+.margin-0 {
+  margin: 0;
+}
+

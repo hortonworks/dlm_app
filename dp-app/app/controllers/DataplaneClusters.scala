@@ -74,6 +74,18 @@ class DataplaneClusters @Inject()(
       }
   }
 
+  def retrieveServices(clusterId: String) = authenticated.async {
+    Logger.info("Received retrieve data centre request")
+    dpClusterService
+      .retrieveServiceInfo(clusterId)
+      .map {
+        case Left(errors) =>
+          InternalServerError(
+            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(clusterServices) => Ok(Json.toJson(clusterServices))
+      }
+  }
+
   def update(clusterId: String) = authenticated.async(parse.json) { request =>
     Logger.info("Received update data centre request")
     request.body
