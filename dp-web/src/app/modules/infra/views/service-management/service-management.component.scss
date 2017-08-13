@@ -1,7 +1,7 @@
 @import "../../../../../styles/variables";
 
 .container {
-  padding-left: 25px;
+  padding: 0 25px;
 }
 
 .services-list {
@@ -12,14 +12,14 @@
   padding: 0;
 
 }
+
 .title-pane {
-  padding:25px 0px;
+  padding: 25px 0;
 }
 
 .services-table {
   border: 1px solid $white;
-  width: 900px;
-  .row:last-child{
+  .row:last-child {
     border-bottom: 1px solid $gallery;
   }
 }
@@ -34,9 +34,9 @@
     display: inline-block;
   }
 
-   .logo-img {
+  .logo-img {
     width: 20px;
-     margin: 0 10px;
+    margin: 0 10px;
   }
   .name {
     width: 250px;
@@ -53,6 +53,37 @@
     color: $eastern-blue;
     cursor: pointer;
   }
+}
+
+.inner-row {
+  background-color: $white;
+  border: 1px solid $gallery;
+  border-bottom: 0;
+  height: 42px;
+
+
+}
+
+table.mdl-data-table {
+  thead th {
+    background-color: $gallery !important;
+    height: 42px;
+  }
+}
+
+.inner-list {
+  background-color: $gallery;
+  padding: 0 10px 10px;
+}
+
+.list-title {
+  text-align: center;
+  padding-top: 25px;
+}
+
+.list-item {
+  text-align: center;
+  padding: 15px 0px;
 }
 
 .logo-wrapper {
@@ -78,8 +109,8 @@
   }
 }
 
-.service-item:hover{
-  .logo-img{
+.service-item:hover {
+  .logo-img {
     opacity: 0.1;
   }
   .logo-wrapper {
@@ -89,8 +120,9 @@
     display: block;
     position: absolute;
     bottom: 40px;
-    left: 55px;
-    opacity:1;
+    width: 96px;
+    left: 52px;
+    opacity: 1;
   }
 }
 
@@ -113,6 +145,13 @@
   width: 50px;
   margin: 25px;
   cursor: pointer;
+}
+
+.enable-btn {
+  height: 21px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: normal;
 }
 
 .hexagon {

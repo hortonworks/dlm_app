@@ -1,17 +1,42 @@
 <div class="container">
-  <div class="" *ngIf="enabledServices.length > 0">
+  <div class="" *ngIf="enabledAppDetails.length > 0">
     <div class="title-pane">
       <span class="hwx-title">{{"pages.services.labels.enabledServices" | translate}}</span>
     </div>
     <div class="services-table">
-      <div class="row" *ngFor="let service of enabledServices">
-        <span class="logo"><img class="logo-img" [attr.src]="'../../../assets/images/' + + service.skuName +'-logo-blue.png'" alt=""/></span>
-        <span class="hwx-subtitle name">{{ service.sku.description }}</span>
-        <span class="divider hwx-inline-desc"> | </span>
-        <span class="hwx-inline-desc">{{"pages.services.labels.smartSenseId" | translate}} - </span>
-        <span class="hwx-desc smart-sense">{{service.enabledSku.smartSenseId}}</span>
-        <span class="hwx-inline-desc">{{"pages.services.labels.enabled" | translate}}</span>
-        <!--<span class="hwx-desc action pull-right"><i class="fa fa-chevron-down"></i></span>-->
+      <div *ngFor="let enabledApp of enabledAppDetails">
+        <div class="row" (click)="getClusters(enabledApp)">
+          <span class="logo"><img class="logo-img" [attr.src]="'../../../assets/images/' + + enabledApp.service.skuName +'-logo-blue.png'" alt=""/></span>
+          <span class="hwx-subtitle name">{{ enabledApp.service.sku.description }}</span>
+          <span class="divider hwx-inline-desc"> | </span>
+          <span class="hwx-inline-desc">{{"pages.services.labels.smartSenseId" | translate}} - </span>
+          <span class="hwx-desc smart-sense">{{enabledApp.service.enabledSku.smartSenseId}}</span>
+          <span class="hwx-desc action pull-right"><i class="fa fa-chevron-down"></i></span>
+        </div>
+        <div *ngIf="enabledApp.isOpen" class="inner-list">
+          <table *ngIf="enabledApp.isOpen" class="mdl-data-table mdl-js-data-table" dp-config-table (onSort)="onSort($event)">
+            <thead>
+              <th class="mdl-data-table__cell--non-numeric">
+                <dp-config-sorter [sortBy]="'name'">  {{"common.clusters" | translate}} </dp-config-sorter>
+              </th>
+              <th class="mdl-data-table__cell--non-numeric">
+                <dp-config-sorter [sortBy]="'name'">  {{"pages.services.labels.lastUpdated" | translate}} </dp-config-sorter>
+              </th>
+              <th class="mdl-data-table__cell--non-numeric">
+                <dp-config-sorter [sortBy]="'name'">  {{"pages.services.labels.action" | translate}} </dp-config-sorter>
+              </th>
+            </thead>
+            <tbody>
+              <tr *ngFor="let cluster of enabledApp.clustersInfo">
+                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{cluster.name}}</td>
+                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{cluster.lastUpdated}}</td>
+                <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">
+                  <button id="enable-service-{{cluster.dpClusterId}}" class="mdl-button btn-hwx-primary enable-btn" (click)="enableServiceOnCluster(cluster.dpClusterId, enabledApp.service)"> Enable</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -23,7 +48,7 @@
       <div class="services-list">
         <div *ngFor="let service of availableServices; let i = index" class="service-item pull-left">
           <div class="logo-wrapper borderBox" title="{{ service.skuName }}">
-            <img  class="logo-img" [attr.src]="'../../../assets/images/' + service.skuName +'-logo-blue.png'" alt=""/>
+            <img class="logo-img" [attr.src]="'../../../assets/images/' + service.skuName +'-logo-blue.png'" alt=""/>
             <button id="enable-{{service.skuName}}-btn" type="button" class="btn-hwx-primary action-btn" (click)="enableService(service)">{{"pages.services.labels.enable" | translate}}</button>
           </div>
           <div class="service-name hwx-desc"> {{ service.sku.description }}</div>
