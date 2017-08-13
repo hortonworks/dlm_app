@@ -4,6 +4,9 @@
   </div>
   <div class="page-content">
     <div class="hwx-desc">{{description}}</div>
+    <div class="hwx-subtitle">
+      {{"pages.services.labels.dependentServicesLabel" | translate}}
+    </div>
     <ul class="failure-list">
       <li *ngFor="let service of dependentServices">{{service}}</li>
     </ul>
