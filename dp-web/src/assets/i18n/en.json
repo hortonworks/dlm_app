@@ -114,12 +114,24 @@
         "next": "Next",
         "verify": "Verify",
         "verifySmartSenseId": "Verify SmartSense ID",
-        "verified": "VERIFIED"
+        "verified": "VERIFIED",
+        "lastUpdated": "Last Updated",
+        "action": "Action",
+        "installationSteps": "Steps for Installation:",
+        "installationLink":"Installation Steps.",
+        "installationStepsDoc":"https://docs.hortonworks.com/",
+        "dependentServicesLabel":"DEPENDENT SERVICES:"
       },
       "description": {
         "verificationWelcome": "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your SmartSense ID.",
+        "manualInstall" : "Service {{serviceName}} is not enabled on cluster {{clusterName}} as one or more of the dependent services have not been enabled. Please enable the dependent services on the cluster using the documentation link. After all the dependent services are installed on the cluster, please click on the verification check box.",
         "enableError": "Service could not be enabled.",
-        "verificationError": "Incorrect SmartSense ID format"
+        "verificationError": "Incorrect SmartSense ID format",
+        "installationConfirmation":"All the dependent services have been installed on cluster {{clusterName}}.",
+        "installationLink": "For detailed steps on the installation process, please visit ",
+        "verifyingStatus": "Verifying dependent services status on the cluster...",
+        "successStatus":"All the service dependencies are met. Please click Next to continue",
+        "errorStatus":"The following dependent service(s) information is not present on the cluster. Please install them to continue."
       }
     },
     "infra": {
@@ -170,7 +182,7 @@
           "ambariServerDown": "Check if the Ambari server is up and running in the given url",
           "insufficientAccessRights": "Make sure that you have right access rights to the ambari server"
         },
-        "clusterAlreadyExists": "Cluster Already exists in dataplane",
+        "clusterAlreadyExists": "Cluster already exists in dataplane",
         "userManagement": "You can manage the users or groups added to Dataplane through User Management. This page is available for the Dataplane Adminsitrator. You can add new users or groups and assign them roles by clicking on ADD USER or ADD GROUP button. To activate/deactivate to edit their roles, click on the username in the list below or click on the menu icon on the displayed rows.",
         "additionalConfigs": "Please provide these additional configurations required by Dataplane to discover the cluster information",
         "knoxUrl": "Please enter the URL of the Knox Service on the HDP cluster which is configured to work with Data plane.",
@@ -178,7 +190,9 @@
         "addUserError": "Not able to save users",
         "updateUserError": "Not able to update user",
         "addGroupError": "Not able to save groups",
-        "updateGroupError": "Not able to update group"
+        "updateGroupError": "Not able to update group",
+        "invalidRoleInput": "Invalid Entry in Roles Input",
+        "invalidUserInput": "Invalid Entry in Users Input"
       }
     },
     "dataset": {

@@ -9,7 +9,7 @@
         <button id="add-btn" class="mdl-button btn-hwx-primary" [routerLink]="['/infra/add']"> {{"pages.infra.labels.addButton" | translate}} </button>
     </div>
   </div>
-
+  <div style="clear:both;"></div>
   <table class="mdl-data-table mdl-js-data-table" dp-config-table (onSort)="onSort($event)">
       <thead>
       <tr>
@@ -40,8 +40,9 @@
       </thead>
       <tbody>
       <tr *ngFor="let lakeInfo of lakesList">
-          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder status-{{getStatusString(lakeInfo.status)}}">
-              <i class="fa fa-circle" aria-hidden="true"></i>
+          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--placeholder status-{{statusEnum[lakeInfo.status].toLowerCase()}}">
+              <span *ngIf="lakeInfo.status !== statusEnum.WAITING"><i class="fa fa-circle" aria-hidden="true"></i></span>
+              <span *ngIf="lakeInfo.status === statusEnum.WAITING"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i></span>
           </td>
           <td class="mdl-data-table__cell--non-numeric key-column mdl-data-table__cell--width15" (click)="viewDetails(lakeInfo.lakeId)">{{lakeInfo.name}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.city}},&nbsp;{{lakeInfo.country}}</td>

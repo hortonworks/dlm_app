@@ -233,9 +233,7 @@ export class ClusterAddComponent implements OnInit {
 
   onCreate() {
     this.showError = false;
-    if (!this.clusterForm.form.valid) {
-      this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
-      this.showError = true;
+    if(!this.isFormValid()){
       return;
     }
     this.createCluster()
@@ -249,6 +247,16 @@ export class ClusterAddComponent implements OnInit {
           this.handleError(error);
         }
       );
+  }
+
+  isFormValid(){
+    if (!this.clusterForm.form.valid) {
+      this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
+      this.showError = true;
+      window.scrollTo(0,0);
+      return false;
+    }
+    return true;
   }
 
   handleError(error) {
@@ -292,6 +300,9 @@ export class ClusterAddComponent implements OnInit {
 
   onCreateAndAdd() {
     this.showError = false;
+    if(!this.isFormValid()){
+      return;
+    }
     this.createCluster().subscribe(
       () => {
         this.cluster = new Cluster();

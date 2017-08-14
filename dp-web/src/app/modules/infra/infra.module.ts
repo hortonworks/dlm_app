@@ -25,6 +25,7 @@ import {ConfigDialogComponent} from './widgets/config-dialog/config-dialog.compo
 import {ServiceManagementComponent} from './views/service-management/service-management.component';
 import {VerificationComponent} from './views/service-management/verification/verification.component';
 import {TabsModule} from '../../shared/tabs/tabs.module';
+import { ManualInstallCheckComponent } from './views/service-management/manual-install-check/manual-install-check.component';
 
 @NgModule({
   imports: [
@@ -54,7 +55,8 @@ import {TabsModule} from '../../shared/tabs/tabs.module';
     AddGroupComponent,
     ConfigDialogComponent,
     ServiceManagementComponent,
-    VerificationComponent
+    VerificationComponent,
+    ManualInstallCheckComponent
   ]
 })
 export class InfraModule {

@@ -33,6 +33,9 @@ export class PolicyActionsComponent {
   constructor(private elementRef: ElementRef) { }
 
   private actionDisabled(policy, action) {
+    if (action.disableFn && typeof action.disableFn === 'function') {
+      return action.disableFn(policy, action);
+    }
     return action.disabledFor === policy.status || action.enabledFor && policy.status !== action.enabledFor;
   }
 

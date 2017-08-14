@@ -38,5 +38,21 @@ class RangerAttributes @Inject()(
         }
     }
 
+  def getPolicyDetails(clusterId: String, dbName: String, tableName: String, offset:String, limit:String) =
+    authenticated.async { req =>
+      Logger.info("Received getPolicyDetails for entity")
+      implicit val token = req.token
+      rangerService
+        .getPolicyDetails(clusterId, dbName, tableName, offset, limit)
+        .map {
+          case Left(errors) => {
+            errors.errors.head.code match {
+              case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case  _    => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            }
+          }
+          case Right(attributes) => Ok(Json.toJson(attributes))
+        }
+    }
 
 }

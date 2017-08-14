@@ -12,6 +12,7 @@ import { Observable } from 'rxjs/Observable';
 import { Effect, Actions, toPayload } from '@ngrx/effects';
 import { JobService } from 'services/job.service';
 import { loadJobsSuccess, loadJobsFail, abortJobSuccess, abortJobFailure, ActionTypes as jobActions } from 'actions/job.action';
+import { rerunJobSuccess, rerunJobFailure } from 'actions/job.action';
 import { operationComplete, operationFail } from 'actions/operation.action';
 
 @Injectable()
@@ -58,6 +59,19 @@ export class JobEffects {
           operationComplete(result)
         ])
         .catch(err => Observable.from([operationFail(err.json()), abortJobFailure(err)]));
+    });
+
+  @Effect()
+  rerunJob$: Observable<any> = this.actions$
+    .ofType(jobActions.RERUN_JOB.START)
+    .map(toPayload)
+    .switchMap(payload => {
+      return this.jobService.rerunJob(payload.policy)
+        .mergeMap(result => [
+          rerunJobSuccess(payload),
+          operationComplete(result)
+        ])
+        .catch(err => Observable.from([operationFail(err.json()), rerunJobFailure(err)]));
     });
 
   constructor(private actions$: Actions, private jobService: JobService) {

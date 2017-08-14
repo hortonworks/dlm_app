@@ -18,6 +18,7 @@ GET           /api/init                                              controllers
 GET           /api/lakes                                             controllers.DataplaneClusters.list
 POST          /api/lakes                                             controllers.DataplaneClusters.create
 GET           /api/lakes/:lakeId                                     controllers.DataplaneClusters.retrieve(lakeId)
+GET           /api/lakes/:lakeId/services                            controllers.DataplaneClusters.retrieveServices(lakeId)
 DELETE        /api/lakes/:lakeId                                     controllers.DataplaneClusters.delete(lakeId)
 PUT           /api/lakes/:lakeId                                     controllers.DataplaneClusters.update(lakeId)
 GET           /api/lakes/ambari/status                               controllers.DataplaneClusters.ambariCheck
@@ -30,6 +31,7 @@ POST          /api/clusters/details                                  controllers
 GET           /api/clusters/:clusterId/health                        controllers.Clusters.getHealth(clusterId: Long, summary: Option[Boolean])
 GET           /api/clusters/:clusterId/rmhealth                      controllers.Clusters.getResourceManagerHealth(clusterId: Long)
 GET           /api/actions/clusters                                  controllers.actions.DpClusterActions.listWithClusters(type: Option[String])
+POST          /api/clusters/sync/:dpClusterId                        controllers.Clusters.syncCluster(dpClusterId: Long)
 
 
 #DTSet-Category
@@ -68,6 +70,7 @@ GET           /api/assets/lineage/:clusterId/:atlasGuid              controllers
 
 #Ranger
 GET           /api/ranger/audit/:clusterId/:dbName/:tableName        controllers.RangerAttributes.getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String ?= "0", limit:String ?= "20", accessType:String ?="", accessResult:String ?="")
+GET           /api/ranger/policy/:clusterId/:dbName/:tableName        controllers.RangerAttributes.getPolicyDetails(clusterId: String, dbName: String, tableName: String, offset: String ?= "0", limit:String ?= "20")
 
 #LDAP
 POST          /api/knox/validate                                     controllers.KnoxConfig.validate

@@ -134,7 +134,7 @@
       "integerValidator": "\"{{fieldLabel}}\" should be a positive integer",
       "time_less_than_current": "Start time must be later than the current time in the selected timezone.",
       "not_directory": "\"{{fieldLabel}}\" should be a path to directory",
-      "not_exist_directory": "\"{{fieldLabel}}\" selected directory does not exist"
+      "not_exist_directory": "Either the path does not exist or you don't have permissions on the path"
     }
   },
   "page": {
@@ -196,7 +196,7 @@
           "alerts": "Alerts",
           "fix_alerts": "Fix Alerts",
           "launch_ambari": "Launch Ambari",
-          "manage_ambari": "Manage Ambari"
+          "manage_ambari": "Manage Cluster"
         }
       },
       "table": {
@@ -215,6 +215,7 @@
         },
         "actions": {
           "abort_job": "Abort Job",
+          "rerun_job": "Re-run Job",
           "delete_policy": "Delete Policy",
           "suspend_policy": "Suspend Policy",
           "activate_policy": "Activate Policy"
@@ -272,7 +273,7 @@
       "tags": "Tags",
       "groups": "Groups",
       "data_summary": "Data Summary",
-      "help_url": "http://dataplane",
+      "help_url": "http://docs.hortonworks.com",
       "no_jobs": "No jobs",
       "no_policies": "Create your first replication policy.",
       "no_pairings": "You must create a cluster pairing before you can create a replication policy.",
@@ -340,7 +341,7 @@
       "header": "Pairings",
       "header_note": "Note: Pairings are bi-directional",
       "create_button_text": "Add Pairing",
-      "help_url": "http://dataplane",
+      "help_url": "http://docs.hortonworks.com",
       "content": {
         "header": {
           "first_cluster": "FIRST CLUSTER",

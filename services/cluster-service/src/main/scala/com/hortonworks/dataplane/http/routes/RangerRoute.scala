@@ -37,12 +37,43 @@ class RangerRoute @Inject()(
               case th:ServiceNotFound => complete(StatusCodes.NotFound, errors(th))
               case _ => complete(StatusCodes.InternalServerError, errors(th))
             }
-            //
           }
         }
       }
     }
 
+  val rangerPolicy =
+    path ("cluster" / LongNumber / "ranger" / "policy" / Segment / Segment) { (clusterId, dbName, tableName) =>
+      parameters("limit".as[Int], "offset".as[Int]) { (limit, offset) =>
+        get {
+          onComplete(requestRangerForPolicies(clusterId, dbName, tableName, offset, limit)) {
+            case Success(res) => complete(success(res.json))
+            case Failure(th) => th match {
+              case th:ServiceNotFound => complete(StatusCodes.NotFound, errors(th))
+              case _ => complete(StatusCodes.InternalServerError, errors(th))
+            }
+          }
+        }
+      }
+    }
+
+  private def requestRangerForPolicies(clusterId: Long, dbName: String, tableName: String, offset: Long, pageSize: Long) : Future[WSResponse] = {
+    for {
+      service <- getConfigOrThrowException(clusterId)
+      url <- getRangerUrlFromConfig(service)
+      baseUrls <- extractUrlsWithIp(url, clusterId)
+      user <- storageInterface.getConfiguration("dp.ranger.user")
+      pass <- storageInterface.getConfiguration("dp.ranger.password")
+      urlToHit <- Future.successful(s"${baseUrls.head}/service/plugins/policies/service/1?startIndex=${offset}&pageSize=${pageSize}&resource:database=${dbName}&resource:table=${tableName}")
+      tmp <- Future.successful(println(urlToHit))
+      response <- ws.url(urlToHit)
+        .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+        .withAuth(user.get,pass.get,WSAuthScheme.BASIC)
+        .get()
+    } yield {
+      response
+    }
+  }
 
   private def requestRangerForAudit(clusterId: Long, dbName: String, tableName: String, offset: Long, pageSize: Long, accessType: String, accessResult:String) : Future[WSResponse] = {
     for {
