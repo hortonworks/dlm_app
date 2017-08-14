@@ -35,6 +35,11 @@
 }
 
 .result-header {
+  margin: 18px 0;
+
+  & .hwx-title {
+    line-height: 34px;
+  }
   .mdl-button-group {
     .mdl-button {
       float: left;
