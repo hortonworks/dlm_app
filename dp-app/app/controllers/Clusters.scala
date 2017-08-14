@@ -5,10 +5,10 @@ import javax.inject.Inject
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari._
 import com.hortonworks.dataplane.commons.domain.Entities.{
-  Cluster,
-  DataplaneClusterIdentifier,
-  Error,
-  Errors
+Cluster,
+DataplaneClusterIdentifier,
+Error,
+Errors
 }
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.ClusterService
@@ -24,16 +24,16 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class Clusters @Inject()(
-    @Named("clusterService") val clusterService: ClusterService,
-    val clusterHealthService: ClusterHealthService,
-    authenticated: Authenticated,
-    ambariService: AmbariService
-) extends Controller {
+                          @Named("clusterService") val clusterService: ClusterService,
+                          val clusterHealthService: ClusterHealthService,
+                          authenticated: Authenticated,
+                          ambariService: AmbariService
+                        ) extends Controller {
 
   def list(dpClusterId: Option[Long]) = authenticated.async {
     dpClusterId match {
       case Some(clusterId) => listByDpClusterId(clusterId)
-      case None            => listAll()
+      case None => listAll()
     }
   }
 
@@ -112,6 +112,16 @@ class Clusters @Inject()(
 
   }
 
+  def syncCluster(dpClusterId: Long) = authenticated.async { request =>
+    implicit val token = request.token
+    ambariService.syncCluster(DataplaneClusterIdentifier(dpClusterId)).map {
+      case true =>
+        Ok(Json.toJson(true))
+      case false =>
+        Ok(Json.toJson(false))
+    }
+  }
+
   import models.ClusterHealthData._
 
   def getHealth(clusterId: Long, summary: Option[Boolean]) =
@@ -181,14 +191,14 @@ class Clusters @Inject()(
         if (bytes == 0) return "0 Bytes"
         val k = 1024
         val sizes = Array("Bytes ",
-                          "KB ",
-                          "MB ",
-                          "GB ",
-                          "TB ",
-                          "PB ",
-                          "EB ",
-                          "ZB ",
-                          "YB ")
+          "KB ",
+          "MB ",
+          "GB ",
+          "TB ",
+          "PB ",
+          "EB ",
+          "ZB ",
+          "YB ")
         val i = Math.floor(Math.log(bytes) / Math.log(k)).toInt
 
         Math.round(bytes / Math.pow(k, i)) + " " + sizes(i)

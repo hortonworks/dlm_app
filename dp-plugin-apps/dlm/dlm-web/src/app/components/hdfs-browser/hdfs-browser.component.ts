@@ -73,6 +73,7 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
    */
   @Input() selectFiles = false;
   @Output() select: EventEmitter<string> = new EventEmitter<string>();
+  @Output() openDirectory = new EventEmitter<string>();
   @HostBinding('class') componentClass = 'dlm-hdfs-browser';
   @ViewChild('hdfsFilesTable') jobsTable: TableComponent;
   @ViewChild('sizeFormattedTemplate') sizeFormattedTemplate: TemplateRef<any>;
@@ -184,6 +185,7 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
     this.currentDirectory$.next(path);
     this.selected = path;
     this.select.emit(this.selected);
+    this.openDirectory.emit(this.selected);
   }
 
   handleSortAction(event) {

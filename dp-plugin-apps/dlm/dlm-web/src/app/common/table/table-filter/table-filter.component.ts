@@ -77,6 +77,10 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnInit() {
+    this.applyInitialFilters();
+  }
+
+  applyInitialFilters() {
     const appliedFilters = {};
     this.filterBy.forEach(filter => {
       const filtered = this.initialFilters ? this.initialFilters.filter(
@@ -91,8 +95,11 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
     this.onFilter.emit(appliedFilters);
   }
 
-  ngOnChanges() {
+  ngOnChanges(changes) {
     this.typeaheadOptions = this.prepareTypeaheadOptions();
+    if (changes['initialFilters']) {
+      this.applyInitialFilters();
+    }
   }
 
   ngOnDestroy() {

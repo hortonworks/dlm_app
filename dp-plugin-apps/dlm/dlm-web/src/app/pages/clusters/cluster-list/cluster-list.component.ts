@@ -78,7 +78,7 @@ export class ClusterListComponent implements OnInit {
     this.hdfsRootPath = ROOT_PATH;
   }
 
-  onSelectFile(path) {
+  handleOpenDirectory(path) {
     this.hdfsRootPath = path;
   }
 }

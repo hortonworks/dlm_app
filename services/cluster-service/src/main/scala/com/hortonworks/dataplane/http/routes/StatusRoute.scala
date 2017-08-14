@@ -208,8 +208,9 @@ class StatusRoute @Inject()(val ws: WSClient,
             val token =
               if (header.isPresent) Some(HJwtToken(header.get().value()))
               else None
-            dpClusterSync.triggerSync(dl.id, token)
-            complete(success(Map("status" -> 200)))
+              onComplete(dpClusterSync.triggerSync(dl.id, token)){ response =>
+                complete(success(Map("status" -> 200)))
+              }
           }
         }
       }

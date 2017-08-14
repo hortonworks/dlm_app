@@ -101,16 +101,19 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
     *
     * @param dpClusterId
     */
-  def triggerSync(dpClusterId: Long, hJwtToken: Option[HJwtToken]): Unit = {
+  def triggerSync(dpClusterId: Long, hJwtToken: Option[HJwtToken]): Future[Boolean] = {
     // Check if the cluster is already being synced
     val dpCluster = dpClusterService.retrieve(dpClusterId.toString)
     val actorRef: AtomicReference[ActorRef] = new AtomicReference[ActorRef]()
-    dpCluster.map {
-      case Left(errors)            => logger.error(s"Cannot load cluster - $errors")
+    dpCluster.flatMap {
+      case Left(errors)            => {logger.error(s"Cannot load cluster - $errors")
+        Future.successful(false)
+      }
       case Right(dataplaneCluster) =>
         // Cluster loaded
         if (dataplaneCluster.state.get == "SYNC_IN_PROGRESS"){
          logger.warn(s"Sync in progress for cluster ${dataplaneCluster.ambariUrl}, ignoring request")
+          Future.successful(true)
         }
         else {
           createClusterIfNotExists(dataplaneCluster, hJwtToken).map { cl =>
@@ -135,6 +138,7 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
             storageInterface.updateDpClusterStatus(dataplaneCluster.copy(state = Some("SYNC_IN_PROGRESS")))
             logger.info(s"Starting cluster sync for ${dataplaneCluster.ambariUrl}")
             sync ! ExecuteTask(hJwtToken)
+            true
 
           }
         }

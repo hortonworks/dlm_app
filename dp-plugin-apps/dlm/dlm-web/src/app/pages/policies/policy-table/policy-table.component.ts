@@ -147,6 +147,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         cellTemplate: this.statusColumn.cellRef,
         sortable: false,
         flexGrow: 1,
+        headerClass: 'no-sort-cell',
         cellClass: 'icon-cell'
       },
       {
@@ -368,7 +369,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     return rowId && rowId in this.selectedJobsActions ? this.selectedJobsActions[rowId] : {};
   }
 
-  handleOnSelectFile(path) {
+  handleOnOpenDirectory(path) {
     this.hdfsRootPath = path;
   }
 }
