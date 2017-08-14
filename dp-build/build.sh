@@ -18,6 +18,7 @@ clean_build() {
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-cluster-service
  	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-gateway
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/installer
+        mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-configurator
 }
 
 unpack_for_docker_deploy() {
@@ -40,14 +41,17 @@ build_dp() {
 }
 
 build_dp_configurator() {
+    pushd ../dp-configurator
     if [ ${IS_JENKINS} == false ]; then
         log "Building DP Configurator"
-        pushd ../dp-configurator
         mvn clean package
-        popd
     else
         echo "Not building DP Configurator again in Jenkins"
     fi
+    mkdir -p ../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-configurator/build/
+    cp -rf target/**  ../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-configurator/build/
+    cp Dockerfile ../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-configurator/ 
+    popd	
 }
 
 build_db_service() {
