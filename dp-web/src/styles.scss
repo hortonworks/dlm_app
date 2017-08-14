@@ -179,6 +179,12 @@ a:hover {
   }
 }
 
+.hwx-title-panel {
+  margin: 18px 0;
+  & .hwx-title {
+    line-height: 34px;
+  }
+}
 
 //Lightening the Input placeholder texts
 
