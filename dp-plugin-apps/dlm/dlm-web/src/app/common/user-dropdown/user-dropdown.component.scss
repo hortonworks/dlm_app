@@ -38,6 +38,9 @@
   }
   .ui-select-container {
     width: 270px;
+    .ui-select-choices {
+      width: 200%;
+    }
     .ui-select-match-text {
       width: 220px;
       overflow: hidden;
