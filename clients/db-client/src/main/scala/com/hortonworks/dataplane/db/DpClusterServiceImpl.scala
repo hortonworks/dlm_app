@@ -143,4 +143,14 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
       .patch(Json.toJson(dpCluster))
       .map(mapStatus)
   }
+
+  override def update(dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]] = {
+    ws.url(s"$url/dp/clusters")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      )
+      .put(Json.toJson(dpCluster))
+      .map(mapToDpCluster)
+  }
 }
