@@ -8,7 +8,7 @@
  */
 
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
@@ -98,7 +98,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
     this.subscriptions.push(polling$.subscribe());
   }
 
-  constructor(private store: Store<fromRoot.State>, private route: ActivatedRoute) {
+  constructor(private store: Store<fromRoot.State>, private route: ActivatedRoute, private router: Router) {
     this.policies$ = this.store.select(getPolicyClusterJob).distinctUntilChanged(isEqual);
     this.subscriptions.push(this.policies$.subscribe(_ => this.policiesLoaded = true));
     this.clusters$ = store.select(getAllClusters).distinctUntilChanged(isEqual);
@@ -171,5 +171,9 @@ export class PoliciesComponent implements OnInit, OnDestroy {
 
   handleDetailsToggle(event) {
     this.lastPolicyToggles = event;
+  }
+
+  addPolicyClickHandler() {
+    this.router.navigate(['/policies/create']);
   }
 }

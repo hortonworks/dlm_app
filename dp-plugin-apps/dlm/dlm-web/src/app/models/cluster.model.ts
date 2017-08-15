@@ -38,3 +38,8 @@ export interface Cluster extends ClusterUI {
   status: ServiceStatus[];
   totalHosts;
 }
+
+export interface ClusterAction {
+  label: string;
+  type: string;
+}

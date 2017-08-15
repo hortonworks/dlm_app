@@ -18,11 +18,10 @@ import { MapSize, MapSizeSettings, ClusterMapData } from 'models/map-data';
 import { GeographyService } from 'services/geography.service';
 import LatLng = L.LatLng;
 import { Cluster } from 'models/cluster.model';
-import { CLUSTER_STATUS, SERVICE_STATUS } from 'constants/status.constant';
 import { without } from 'utils/array-util';
 
 function formatMapPopup(cluster) {
-  return `<span>${cluster.name} ${cluster.dataCenter} / ${cluster.policiesCounter}</span>`;
+  return `<div>${cluster.dataCenter} / ${cluster.name}</div><div>Policies: ${cluster.policiesCounter}</div>`;
 }
 
 function getExistingMarker(collection: L.CircleMarker[], latLng: LatLng): L.CircleMarker {
