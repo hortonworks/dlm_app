@@ -11,6 +11,33 @@
   GET     /dlm/*file                                                controllers.StaticAssets.at(path="/usr/local/etc/nginx/servers/dlm-web", file)
   GET     /*file                                                    controllers.StaticAssets.at(path="/usr/local/etc/nginx/servers/dlm-web", file)
   ```
+* Edit `<dataplane>/dp-plugin-apps/dlm/dlm-app/app/controllers/StaticAssets.scala` and modify the following lines
+ ```diff
+  diff --git a/dp-plugin-apps/dlm/dlm-app/app/controllers/StaticAssets.scala b/dp-plugin-apps/dlm/dlm-app/app/controllers/StaticAssets.scala
+index b78843e..3c37cf2 100644
+--- a/dp-plugin-apps/dlm/dlm-app/app/controllers/StaticAssets.scala
++++ b/dp-plugin-apps/dlm/dlm-app/app/controllers/StaticAssets.scala
+@@ -31,7 +31,7 @@ class StaticAssets @Inject() (environment: play.api.Environment,
+     */
+   override def at(rootPath: String, file: String): Action[AnyContent] = Action { request =>
+     environment.mode match {
+-      case Mode.Prod => {
++      case _ => {
+
+         val fileToServe = rootPath match {
+           case AbsolutePath(_) => new File(rootPath, file)
+@@ -47,7 +47,6 @@ class StaticAssets @Inject() (environment: play.api.Environment,
+         }
+
+       }
+-      case _ => NotFound
+     }
+   }
+-}
+\ No newline at end of file
++}
+  ```
+ 
 * Follow the instructions in this [README](https://github.com/hortonworks/dataplane/tree/master/dp-plugin-apps/dlm) to run dlmApp service.
 * **Do not start** DLM web server.
 
@@ -179,7 +206,7 @@
                   proxy_set_header X-Forwarded-Host $host;
                   proxy_set_header X-Forwarded-Server $host;
                   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                  proxy_pass http://localhost:9011/;
+                  proxy_pass http://localhost:8762/api/dlm/;
               }
 
           }
@@ -192,10 +219,9 @@
     * `sudo nginx`
     * If nginx is already started, reload nginx conf by `sudo nginx -s reload`
 
-Now modify `/etc/hosts` file to add an entry `127.0.0.1   dataplane` and point your browser to http://dataplane/
+Now modify `/etc/hosts` file to add an entry `127.0.0.1   dataplane-local` and point your browser to http://dataplane-local/
 
 # Known Issues
 
-* Trying to load `/dlm/` via zuul doesn't work
 * Hot Module Replacement doesn't work since nginx complains of permissions issues if a soft link is created to the source path.
     
