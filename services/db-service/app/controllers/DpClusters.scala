@@ -89,9 +89,10 @@ class DpClusters @Inject()(dpClusterRepo: DpClusterRepo)(
       .validate[DataplaneCluster]
       .map { dl =>
         val created = dpClusterRepo.update(dl)
-        created
-          .map(d => success(linkData(d, makeLink(d))))
-          .recoverWith(apiError)
+        created.map {
+          case d@(_, false) => success(linkData(d._1, makeLink(d._1)))
+          case d@(_, true) => entityCreated(linkData(d._1, makeLink(d._1)))
+        }.recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))
   }

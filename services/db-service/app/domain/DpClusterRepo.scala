@@ -26,24 +26,24 @@ class DpClusterRepo @Inject()(
   val DataplaneClusters = TableQuery[DpClustersTable]
 
 
-  def update(dl: DataplaneCluster):Future[DataplaneCluster] = {
+  def update(dl: DataplaneCluster):Future[(DataplaneCluster,Boolean)] = {
     if(dl.id.isEmpty)
-      insert(dl)
+      insert(dl).map((_,true))
     else {
       findById(dl.id.get).flatMap { dpc =>
         if (dpc.isDefined) {
           // Found an entity, only update applicable fields and return
           db.run(
             DataplaneClusters.filter(_.id === dl.id)
-              .map(r => (r.dcName, r.description, r.ambariUrl, r.locationId, r.name))
-              .update(dl.dcName, dl.description, dl.ambariUrl, dl.location, dl.name)
+              .map(r => (r.dcName, r.description, r.ambariUrl, r.locationId, r.name,r.properties,r.userId,r.updated))
+              .update(dl.dcName, dl.description, dl.ambariUrl, dl.location, dl.name,dl.properties,dl.createdBy,Some(LocalDateTime.now()))
 
           ).flatMap { v =>
-            if (v > 0) findById(dl.id.get).map(_.get)
+            if (v > 0) findById(dl.id.get).map(r => (r.get,false))
             else Future.failed(UpdateError())
           }
         } else {
-          insert(dl)
+          insert(dl).map((_,true))
         }
       }
     }
@@ -83,7 +83,9 @@ class DpClusterRepo @Inject()(
 
     val dataplaneCluster = dpCluster.copy(
       isDatalake = dpCluster.isDatalake.map(Some(_)).getOrElse(Some(false)),
-      ambariUrl = trimTrailingSlash
+      ambariUrl = trimTrailingSlash,
+      created = Some(LocalDateTime.now()),
+      updated = Some(LocalDateTime.now())
     )
     db.run {
       DataplaneClusters returning DataplaneClusters += dataplaneCluster

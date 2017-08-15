@@ -17,6 +17,7 @@ trait JsonAPI extends Controller {
   val pgErrors = Map("23503" -> Conflict,"23514" -> BadRequest,"23505" -> Conflict,"23502" -> BadRequest,"23000"-> BadRequest)
 
   def success(data: JsValueWrapper) = Ok(Json.obj("results" -> data))
+  def entityCreated(data: JsValueWrapper) = Created(Json.obj("results" -> data))
 
   val notFound = NotFound(Json.toJson(wrapErrors("404","Not found")))
 
