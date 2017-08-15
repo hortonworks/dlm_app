@@ -95,7 +95,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
 
   private def mapToDpCluster(res: WSResponse) = {
     res.status match {
-      case 200 =>
+      case x if x == 200 || x == 201 =>
         extractEntity[DataplaneCluster](
           res,
           r =>
@@ -142,5 +142,15 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
       )
       .patch(Json.toJson(dpCluster))
       .map(mapStatus)
+  }
+
+  override def update(dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]] = {
+    ws.url(s"$url/dp/clusters")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      )
+      .put(Json.toJson(dpCluster))
+      .map(mapToDpCluster)
   }
 }
