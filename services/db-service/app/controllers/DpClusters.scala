@@ -2,9 +2,10 @@ package controllers
 
 import javax.inject._
 
-import domain.DpClusterRepo
 import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, Location}
+import domain.DpClusterRepo
 import play.api.mvc._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -13,8 +14,8 @@ class DpClusters @Inject()(dpClusterRepo: DpClusterRepo)(
   implicit exec: ExecutionContext)
   extends JsonAPI {
 
-  import domain.API._
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+  import domain.API._
 
   def all = Action.async { request =>
     if(!request.getQueryString("ambariUrl").isEmpty){
@@ -80,6 +81,19 @@ class DpClusters @Inject()(dpClusterRepo: DpClusterRepo)(
   def delete(dpClusterId: Long) = Action.async { req =>
     val future = dpClusterRepo.deleteById(dpClusterId)
     future.map(i => success(i)).recoverWith(apiError)
+  }
+
+
+  def update = Action.async(parse.json) { req =>
+    req.body
+      .validate[DataplaneCluster]
+      .map { dl =>
+        val created = dpClusterRepo.update(dl)
+        created
+          .map(d => success(linkData(d, makeLink(d))))
+          .recoverWith(apiError)
+      }
+      .getOrElse(Future.successful(BadRequest))
   }
 
 
