@@ -39,7 +39,7 @@ import { Event } from 'models/event.model';
   styleUrls: ['./issues-list.component.scss']
 })
 export class IssuesListComponent {
-  visibleItems = 4;
+  visibleItems = 5;
   @Input() events: Event[];
 
   @HostBinding('class') className = 'all-visible';

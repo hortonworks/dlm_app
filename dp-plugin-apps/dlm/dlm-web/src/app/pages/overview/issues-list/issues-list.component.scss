@@ -18,9 +18,9 @@
   }
 
   .issues-list-container {
-    overflow-y: scroll;
+    overflow-y: auto;
+    overflow-x: hidden;
     height: 270px;
-    padding-right: 15px;
     .no-issues {
       margin: 20px 0 0 15px;
     }
