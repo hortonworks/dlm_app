@@ -95,7 +95,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
 
   private def mapToDpCluster(res: WSResponse) = {
     res.status match {
-      case 200 =>
+      case x if x == 200 || x == 201 =>
         extractEntity[DataplaneCluster](
           res,
           r =>
