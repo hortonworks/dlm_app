@@ -16,11 +16,11 @@ import { loadPolicies } from 'actions/policy.action';
 import { Cluster } from 'models/cluster.model';
 import { PairsCountEntity } from 'models/pairs-count-entity.model';
 import { PoliciesCountEntity } from 'models/policies-count-entity.model';
-import { getAllClusters } from 'selectors/cluster.selector';
+import { getAllClusters, getClustersWithLowCapacity } from 'selectors/cluster.selector';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { getCountPairsForClusters } from 'selectors/pairing.selector';
-import { getCountPoliciesForSourceClusters } from 'selectors/policy.selector';
+import { getAllPoliciesWithClusters, getCountPoliciesForSourceClusters } from 'selectors/policy.selector';
 import * as fromRoot from 'reducers';
-import { DropdownItem } from 'components/dropdown/dropdown-item';
 import { TranslateService } from '@ngx-translate/core';
 import { MapSize, ClusterMapData, ClusterMapPoint } from 'models/map-data';
 import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
@@ -28,6 +28,8 @@ import { ProgressState } from 'models/progress-state.model';
 import { getMergedProgress } from 'selectors/progress.selector';
 import { Subscription } from 'rxjs/Subscription';
 import { isEqual } from 'utils/object-utils';
+import { Policy } from 'models/policy.model';
+import { CLUSTER_STATUS, SERVICE_STATUS } from 'constants/status.constant';
 
 const CLUSTERS_REQUEST_ID = '[CLUSTER_PAGE]CLUSTERS_REQUEST_ID';
 const POLICIES_REQUEST_ID = '[CLUSTER_PAGE]POLICIES_REQUEST_ID';
@@ -45,8 +47,10 @@ export class ClustersComponent implements OnInit, OnDestroy {
   overallProgressSubscription$: Subscription;
   resourceAvailability$: Observable<{canAddPolicy: boolean, canAddPairing: boolean}>;
   mapSize: MapSize = MapSize.FULLWIDTH;
-  canAddPairing = true;
-  canAddPolicy = true;
+  clusterLegend$: Observable<any>;
+  policies$: Observable<Policy[]>;
+  lowCapacityClusters$: Observable<Cluster[]>;
+  selectedCluster$ = new BehaviorSubject<null|Cluster>(null);
 
   constructor(private store: Store<fromRoot.State>, t: TranslateService) {
     const clusters$: Observable<Cluster[]> = store.select(getAllClusters);
@@ -54,6 +58,8 @@ export class ClustersComponent implements OnInit, OnDestroy {
     const policiesCount$: Observable<PoliciesCountEntity> = store.select(getCountPoliciesForSourceClusters);
     const allResources$ = Observable.combineLatest(clusters$, pairsCount$, policiesCount$);
     this.overallProgress$ = store.select(getMergedProgress(CLUSTERS_REQUEST_ID, POLICIES_REQUEST_ID, PAIRINGS_REQUEST_ID));
+    this.lowCapacityClusters$ = this.store.select(getClustersWithLowCapacity);
+    this.policies$ = store.select(getAllPoliciesWithClusters);
     this.overallProgressSubscription$ = this.overallProgress$.distinctUntilChanged(isEqual).subscribe(progress => {
       if (progress.success) {
         this.store.dispatch(loadClustersStatuses());
@@ -73,18 +79,51 @@ export class ClustersComponent implements OnInit, OnDestroy {
           };
         });
       });
-    this.clustersMapData$ = this.tableData$
-      .startWith([])
-      .map(clusters => clusters.map(cluster => (<ClusterMapData>{start: <ClusterMapPoint>{cluster}})));
+    this.clustersMapData$ = Observable
+      .combineLatest(clusters$, store.select(getCountPoliciesForSourceClusters), this.lowCapacityClusters$)
+      .startWith([[], [], []])
+      .map(([clusters, policiesCount, lowCapacityClusters]) => this.makeClustersMapData(clusters, policiesCount, lowCapacityClusters));
     this.resourceAvailability$ = Observable
       .combineLatest(clusters$, pairsCount$)
       .map(AddEntityButtonComponent.availableActions);
+    this.clusterLegend$ = Observable
+      .combineLatest(this.clustersMapData$, this.selectedCluster$, this.policies$)
+      .map(([clustersMapData, selectedCluster, policies]) => {
+        if (!selectedCluster) {
+          return false;
+        }
+        const cluster = clustersMapData.find(c => c.start.cluster.id === selectedCluster.id).start.cluster;
+        return {
+          ...cluster,
+          alerts: cluster.status.filter(service => service.state !== SERVICE_STATUS.STARTED)
+        };
+      });
+  }
+
+  private makeClustersMapData(clusters, policiesCount, lowCapacityClusters) {
+    return clusters.map(cluster => {
+      const policiesCounter = cluster.id in policiesCount &&
+      'policies' in policiesCount[cluster.id] ? policiesCount[cluster.id].policies : 0;
+      // prioritize UNHEALTHY status over WARNING when display cluster dot marker
+      const healthStatus = lowCapacityClusters.some(c => c.id === cluster.id) && cluster.healthStatus !== CLUSTER_STATUS.UNHEALTHY ?
+        CLUSTER_STATUS.WARNING : cluster.healthStatus;
+      const clusterData = {
+        ...cluster,
+        healthStatus,
+        policiesCounter
+      };
+      return <ClusterMapData>{start: <ClusterMapPoint>{cluster: clusterData}};
+    });
   }
 
   ngOnInit() {
     this.store.dispatch(loadClusters(CLUSTERS_REQUEST_ID));
     this.store.dispatch(loadPairings(PAIRINGS_REQUEST_ID));
     this.store.dispatch(loadPolicies(POLICIES_REQUEST_ID));
+  }
+
+  handleClickMarker(cluster: Cluster) {
+    this.selectedCluster$.next(cluster);
   }
 
   ngOnDestroy() {

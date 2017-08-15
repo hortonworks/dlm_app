@@ -34,3 +34,8 @@ export interface Cluster {
   status: ServiceStatus[];
   totalHosts;
 }
+
+export interface ClusterAction {
+  label: string;
+  type: string;
+}

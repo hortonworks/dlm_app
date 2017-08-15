@@ -17,26 +17,26 @@
 
 .hexagon {
   &.hexagon-success {
-    background-color: $hive-hexagon-color;
+    background-color: $hive-hexagon-color !important;
 
     &:after {
-      border-top-color: $hive-hexagon-color;
+      border-top-color: $hive-hexagon-color !important;
     }
 
     &:before {
-      border-bottom-color: $hive-hexagon-color;
+      border-bottom-color: $hive-hexagon-color !important;
     }
   }
 
   &.hexagon-warning {
-    background-color: $hdfs-hexagon-color;
+    background-color: $hdfs-hexagon-color !important;
 
     &:after {
-      border-top-color: $hdfs-hexagon-color;
+      border-top-color: $hdfs-hexagon-color !important;
     }
 
     &:before {
-      border-bottom-color: $hdfs-hexagon-color;
+      border-bottom-color: $hdfs-hexagon-color !important;
     }
   }
 }

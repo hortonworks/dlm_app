@@ -13,26 +13,28 @@ import { Event } from 'models/event.model';
 
 @Component({
   selector: 'dlm-issues-list',
-  template: `
-    <div class="row" *ngFor="let event of events | slice:0:visibleItems">
-      <div class="col-md-12">
-        <dlm-issues-list-item
-          [event]="event">
-        </dlm-issues-list-item>
+    template: `
+      <div class="issues-list-container">
+        <div class="row" *ngIf="!events.length">
+          <div class="col-md-12">
+            <p class="text-muted no-issues">{{'page.overview.issues.list.empty_list' | translate}}</p>
+          </div>
+        </div>
+        <div class="row" *ngFor="let event of events | slice:0:visibleItems">
+          <div class="col-md-12">
+            <dlm-issues-list-item
+              [event]="event">
+            </dlm-issues-list-item>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="row" *ngIf="events.length">
-      <div class="pull-right view-all">
-        <small qe-attr="go-to-notifications" class="text-primary actionable" (click)="showAll()">
-          <strong>{{'page.overview.issues.list.view_all' | translate}}</strong>
-        </small>
+      <div class="view-all-container" *ngIf="events.length">
+        <div class="pull-right view-all">
+          <small qe-attr="go-to-notifications" class="text-primary actionable" (click)="showAll()">
+            <strong>{{'page.overview.issues.list.view_all' | translate}}</strong>
+          </small>
+        </div>
       </div>
-    </div>
-    <div class="row" *ngIf="!events.length">
-      <div class="col-md-12">
-        <p class="text-muted">{{'page.overview.issues.list.empty_list' | translate}}</p>
-      </div>
-    </div>
   `,
   styleUrls: ['./issues-list.component.scss']
 })

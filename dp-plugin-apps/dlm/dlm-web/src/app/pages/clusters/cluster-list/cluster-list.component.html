@@ -54,19 +54,16 @@
 </ng-template>
 
 <ng-template let-cluster="row" #addActionsCell>
-  <div class="add-actions-container">
-    <div class="add-actions-icon" qe-attr="add-entity-icon">
-      <i class="fa fa-plus text-success"></i>
-    </div>
-    <div class="add-actions-buttons">
-      <button class="btn btn-secondary" qe-attr="add-pairing" type="button" [routerLink]="['/pairings/create']" [queryParams]="{'firstClusterId': cluster.id}" [disabled]="clusters.length - cluster.pairsCounter - 1 === 0">
-        {{ "page.clusters.card.create_pair_text" | translate }}
-      </button>
-      <button class="btn btn-secondary" qe-attr="add-policy" type="button" [routerLink]="['/policies/create']" [queryParams]="{'sourceClusterId': cluster.id}" [disabled]="cluster.pairsCounter === 0">
-        {{ "page.clusters.card.create_policy_text" | translate }}
-      </button>
-    </div>
-  </div>
+  <dlm-cluster-actions
+    qe-attr="cluster-actions"
+    [rowId]="cluster.id"
+    [cluster]="cluster"
+    [clusterActions]="clusterActions"
+    [clustersLength]="clusters.length"
+    [isOpen]="shouldShowAction(cluster.id)"
+    (handler)="handleSelectedAction($event)"
+    (openChange)="handleActionOpenChange($event)">
+  </dlm-cluster-actions>
 </ng-template>
 
 <ng-template let-cluster="row" ngx-datatable-row-detail-template #rowDetailRef>

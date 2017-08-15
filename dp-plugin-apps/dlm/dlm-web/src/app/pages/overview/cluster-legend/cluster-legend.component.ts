@@ -13,7 +13,7 @@ import { Component, OnInit, Input } from '@angular/core';
   selector: 'dlm-cluster-legend',
   template: `
     <div class="map-legend-header">
-      <span class="text-muted">{{cluster.name}}</span>
+      <span>{{cluster.name}}</span>
       <dlm-cluster-status-icon [cluster]="cluster" class="pull-right"></dlm-cluster-status-icon>
       <div class="clearfix"></div>
     </div>

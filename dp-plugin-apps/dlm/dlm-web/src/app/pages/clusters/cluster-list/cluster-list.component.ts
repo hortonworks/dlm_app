@@ -7,14 +7,17 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, OnInit, Input, ViewChild, TemplateRef, ViewEncapsulation, HostBinding, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, TemplateRef, ViewEncapsulation, HostBinding,
+  ChangeDetectorRef } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { Cluster } from 'models/cluster.model';
+import { Router } from '@angular/router';
+import { Cluster, ClusterAction } from 'models/cluster.model';
 import { TableTheme } from 'common/table/table-theme.type';
 import { TableComponent } from 'common/table/table.component';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { CLUSTER_STATUS } from 'constants/status.constant';
 import { ROOT_PATH } from 'constants/hdfs.constant';
+import { ACTION_TYPES } from 'components/cluster-actions/cluster-actions.component';
 
 @Component({
   selector: 'dlm-cluster-list',
@@ -22,13 +25,29 @@ import { ROOT_PATH } from 'constants/hdfs.constant';
   styleUrls: ['./cluster-list.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
+
 export class ClusterListComponent implements OnInit {
   CLUSTER_STATUS = CLUSTER_STATUS;
   tableTheme = TableTheme.Cards;
   columns = [];
   hdfsRootPath = ROOT_PATH;
   columnMode = ColumnMode.flex;
-
+  isOpen = false;
+  visibleActionMap = {};
+  clusterActions = [
+    {
+      label: this.t.instant('page.clusters.card.create_pair_text'),
+      type: ACTION_TYPES.PAIRING
+    },
+    {
+      label: this.t.instant('page.clusters.card.create_policy_text'),
+      type: ACTION_TYPES.POLICY
+    },
+    {
+      label: this.t.instant('page.clusters.card.launch_ambari'),
+      type: ACTION_TYPES.AMBARI
+    }
+  ];
   @Input() clusters: Cluster[];
 
   @ViewChild(TableComponent) tableComponent: TableComponent;
@@ -45,7 +64,7 @@ export class ClusterListComponent implements OnInit {
 
   @HostBinding('class') className = 'dlm-cluster-list';
 
-  constructor(private t: TranslateService, private cdRef: ChangeDetectorRef) { }
+  constructor(private t: TranslateService, private cdRef: ChangeDetectorRef, private router: Router) { }
 
   ngOnInit() {
     this.columns = [
@@ -63,8 +82,8 @@ export class ClusterListComponent implements OnInit {
         cellTemplate: this.plainCellRef, flexGrow: 2, cellClass: 'text-cell', headerClass: 'text-header'},
       {prop: 'location', name: this.t.instant('page.clusters.card.location'),
         cellTemplate: this.locationCellRef, flexGrow: 4},
-      {name: '', cellTemplate: this.addActionsCellRef, minWidth: 230,
-        cellClass: 'add-actions-cell', flexGrow: 6}
+      {name: '', cellTemplate: this.addActionsCellRef,
+        cellClass: 'add-actions-cell', flexGrow: 1}
     ];
   }
 
@@ -80,5 +99,28 @@ export class ClusterListComponent implements OnInit {
 
   onSelectFile(path) {
     this.hdfsRootPath = path;
+  }
+
+  handleSelectedAction({cluster, action}) {
+    switch (action.type) {
+      case ACTION_TYPES.PAIRING:
+        return this.router.navigate(['/pairings/create'], {queryParams: {'firstClusterId': cluster.id}});
+      case ACTION_TYPES.POLICY:
+        return this.router.navigate(['/policies/create'], {queryParams: {'sourceClusterId': cluster.id}});
+      case ACTION_TYPES.AMBARI:
+        // TODO: Call a method in cluster service to get ambari web url
+        window.open(cluster.ambariurl, '_blank');
+    }
+  }
+
+  handleActionOpenChange(event: {rowId: string, isOpen: boolean}) {
+    const { rowId, isOpen } = event;
+    if (rowId) {
+      this.visibleActionMap[rowId] = isOpen;
+    }
+  }
+
+  shouldShowAction(rowId) {
+    return rowId in this.visibleActionMap && this.visibleActionMap[rowId];
   }
 }
