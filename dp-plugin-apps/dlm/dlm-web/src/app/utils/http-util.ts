@@ -33,3 +33,13 @@ export const getError = (response) => {
   }
   return error;
 };
+
+
+export const getUrlDomain = (urlAddress: string): string => {
+  let url: URL|string = urlAddress;
+  try {
+    url = new URL(url);
+    url = `${url.protocol}//${url.host}`;
+  } catch (e) {}
+  return url;
+};

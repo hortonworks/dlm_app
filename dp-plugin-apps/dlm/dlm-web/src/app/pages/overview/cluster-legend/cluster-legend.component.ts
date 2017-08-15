@@ -28,7 +28,7 @@ import { Component, OnInit, Input } from '@angular/core';
       <dl class="fix-alerts">
         <dt>{{'page.overview.world_map.cluster_legend.manage_ambari' | translate}}</dt>
         <dd>
-          <a [href]="cluster.ambariurl" target="_blank">
+          <a [href]="cluster.ambariWebUrl" target="_blank">
             {{'page.overview.world_map.cluster_legend.launch_ambari' | translate}}
           </a>
         </dd>
