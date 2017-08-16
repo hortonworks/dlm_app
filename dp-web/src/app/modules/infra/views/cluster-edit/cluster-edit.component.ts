@@ -101,11 +101,13 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
   }
 
   onSelectLocation(location: Location) {
-    this.mapData = [];
-    let point = new Point(location.latitude, location.longitude, MapConnectionStatus.UP);
-    this.mapData = [new MapData(point)];
+    if(location.id) {
+      this.mapData = [];
+      let point = new Point(location.latitude, location.longitude, MapConnectionStatus.UP);
+      this.mapData = [new MapData(point)];
 
-    this.lake.location = location.id;
+      this.lake.location = location.id;
+    }
   }
 
   onNewTagAddition(text: string) {
