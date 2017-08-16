@@ -150,7 +150,7 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
     if(!this.isFormValid()){
       return;
     }
-    this.lakeService.update(this.lake.id, this.lake)
+    this.lakeService.update(this.lake)
       .subscribe(
         () => {
           this.router.navigate(['infra', {

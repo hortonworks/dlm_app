@@ -40,7 +40,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
   override def retrieve(
-                         dpClusterId: String): Future[Either[Errors, DataplaneCluster]] = {
+                         dpClusterId: Long): Future[Either[Errors, DataplaneCluster]] = {
     ws.url(s"$url/dp/clusters/$dpClusterId")
       .withHeaders("Accept" -> "application/json")
       .get()

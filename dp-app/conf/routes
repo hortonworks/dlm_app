@@ -17,7 +17,7 @@ GET           /api/identity/:userId                                  controllers
 GET           /api/init                                              controllers.Configuration.init
 GET           /api/lakes                                             controllers.DataplaneClusters.list
 POST          /api/lakes                                             controllers.DataplaneClusters.create
-GET           /api/lakes/:lakeId                                     controllers.DataplaneClusters.retrieve(lakeId)
+GET           /api/lakes/:lakeId                                     controllers.DataplaneClusters.retrieve(lakeId: Long)
 GET           /api/lakes/:lakeId/services                            controllers.DataplaneClusters.retrieveServices(lakeId)
 DELETE        /api/lakes/:lakeId                                     controllers.DataplaneClusters.delete(lakeId)
 PUT           /api/lakes                                             controllers.DataplaneClusters.update
