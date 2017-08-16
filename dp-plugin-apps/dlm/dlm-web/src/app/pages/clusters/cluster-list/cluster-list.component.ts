@@ -108,8 +108,7 @@ export class ClusterListComponent implements OnInit {
       case ACTION_TYPES.POLICY:
         return this.router.navigate(['/policies/create'], {queryParams: {'sourceClusterId': cluster.id}});
       case ACTION_TYPES.AMBARI:
-        // TODO: Call a method in cluster service to get ambari web url
-        window.open(cluster.ambariurl, '_blank');
+        window.open(cluster.ambariWebUrl, '_blank');
     }
   }
 

@@ -25,10 +25,10 @@ export interface Policy {
   endTime: string;
   frequency: number;
   tags: string[];
-  customProperties: Object;
   retry: Object;
   description: string;
   jobs: Job[];
+  customProperties?: CustomProperties;
   // UI specific props
   lastJobResource?: Job;
   jobsResource?: Job[];
@@ -67,4 +67,17 @@ export interface PolicyForm {
   databases?: string;
   queueName?: string;
   maxBandwidth?: number;
+}
+
+export interface CustomProperties {
+  distcpMapBandwidth?: string;
+  targetSnapshotRetentionAgeLimit?: string;
+  sourceSnapshotRetentionNumber?: string;
+  distcpMaxMaps?: string;
+  preserveAcl?: string;
+  queueName?: string;
+  tdeEncryptionEnabled?: string;
+  preservePermission?: string;
+  targetSnapshotRetentionNumber?: string;
+  sourceSnapshotRetentionAgeLimit?: string;
 }
