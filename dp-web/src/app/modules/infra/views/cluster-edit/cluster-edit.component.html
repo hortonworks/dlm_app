@@ -17,51 +17,13 @@
   </div>
 
   <div class="icon-container">
-    <div class="hwx-title">{{"pages.infra.labels.addCluster" | translate}}</div>
-    <div class="hwx-desc">{{"pages.infra.description.addCluster" | translate}} </div>
+    <div class="hwx-title">{{"pages.infra.labels.editCluster" | translate}}</div>
+    <div class="hwx-desc">{{"pages.infra.description.editCluster" | translate}} </div>
 
     <div class="spacer-15"> </div>
 
-    <div [hidden]="!showConfig">
-      <dp-config-dialog #config [show]="showConfig" (onCancel)="closeConfig()" (onSave)="getConfigs($event)" [requestAmbariCreds]="_clusterState.requestAmbariCreds" [requestKnoxURL]="_clusterState.requestKnoxURL"></dp-config-dialog>
-    </div>
-
     <form #clusterForm="ngForm">
-      <div class="form-group" #ambariInput>
-        <label class="required">{{"pages.infra.labels.ambariUrl" | translate}}</label>
-        <div class="input-group">
-          <input required class="dp-input-url" placeholder="eg. http://10.10.10.10:8080" name="ambari-url" type="text" [(ngModel)]="cluster.ambariurl" (keypress)="onKeyPress($event)"/>
-          <button id="go-btn" class="mdl-button btn-hwx-primary" type="button" (click)="getClusterInfo($event)">
-            <span *ngIf="_isClusterValidateInProgress"><i class="fa fa-spinner fa-spin"></i></span>
-            <span *ngIf="!_isClusterValidateInProgress">{{"common.go" | translate}}</span>
-          </button>
-        </div>
-      </div>
-
-
-      <div *ngIf="_clusterState.alreadyExists && _isClusterValidateSuccessful && !_isClusterValid"
-           class="error-section validation-error">
-        <div class="">
-          <ul>
-            <li *ngFor="let reason of reasons">{{reason}}</li>
-          </ul>
-        </div>
-      </div>
-
-      <div *ngIf="!_clusterState.alreadyExists && _isClusterValidateSuccessful && !_isClusterValid"
-           class="error-section validation-error">
-        <i class="fa fa-times-circle"></i>
-        <div class="">
-          <span class="text-medium">{{"pages.infra.labels.connectionFailed" | translate}}</span>
-          <span class="text-small-1">{{"pages.infra.description.connectionFailed" | translate}}</span>
-          <ul>
-            <li *ngFor="let reason of reasons">{{reason}}</li>
-          </ul>
-        </div>
-      </div>
-
-
-      <div *ngIf="showClusterDetails">
+      <div>
         <div class="cluster-details">
           <div class="display-group">
             <label>{{"pages.infra.labels.clusterName" | translate}}</label>
@@ -124,9 +86,8 @@
         </div>
       </div>
     </form>
-    <div class="button-container"  *ngIf="showClusterDetails">
-      <button id="add-btn" class="mdl-button btn-hwx-primary" (click)="onCreate($event)">{{"common.add" | translate}}</button>
-      <button id="add-and-new-btn" class="mdl-button btn-hwx-primary" (click)="onCreateAndAdd($event)">{{"common.addAndNew" | translate}}</button>
+    <div class="button-container">
+      <button id="add-btn" class="mdl-button btn-hwx-primary" (click)="onUpdate($event)">{{"common.update" | translate}}</button>
       <button id="cancel-btn" class="mdl-button btn-hwx-default" (click)="onCancel($event)">{{"common.cancel" | translate}}</button>
     </div>
   </div>
