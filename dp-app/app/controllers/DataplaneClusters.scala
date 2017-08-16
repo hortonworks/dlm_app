@@ -4,7 +4,11 @@ import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari.AmbariEndpoint
-import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, DataplaneClusterIdentifier, HJwtToken}
+import com.hortonworks.dataplane.commons.domain.Entities.{
+  DataplaneCluster,
+  DataplaneClusterIdentifier,
+  HJwtToken
+}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.DpClusterService
 import models.{JsonResponses, WrappedErrorsException}
@@ -41,7 +45,10 @@ class DataplaneClusters @Inject()(
       .validate[DataplaneCluster]
       .map { dataplaneCluster =>
         dpClusterService
-          .create(dataplaneCluster.copy(createdBy = request.user.id, ambariUrl = dataplaneCluster.ambariUrl.replaceFirst("/$", "")))
+          .create(
+            dataplaneCluster.copy(
+              createdBy = request.user.id,
+              ambariUrl = dataplaneCluster.ambariUrl.replaceFirst("/$", "")))
           .map {
             case Left(errors) =>
               InternalServerError(JsonResponses.statusError(
@@ -54,7 +61,8 @@ class DataplaneClusters @Inject()(
       .getOrElse(Future.successful(BadRequest))
   }
 
-  private def syncCluster(dataplaneCluster: DataplaneClusterIdentifier)(implicit hJwtToken: Option[HJwtToken]): Future[Boolean] = {
+  private def syncCluster(dataplaneCluster: DataplaneClusterIdentifier)(
+      implicit hJwtToken: Option[HJwtToken]): Future[Boolean] = {
     ambariService.syncCluster(dataplaneCluster).map { result =>
       Logger.info(s"Asking Cluster service to discover ${dataplaneCluster.id}")
       result
@@ -125,11 +133,13 @@ class DataplaneClusters @Inject()(
 
   def ambariCheck = authenticated.async { request =>
     implicit val token = request.token
-    dpClusterService.retrieveByAmbariUrl(request.getQueryString("url").get)
-      .flatMap{
+    dpClusterService
+      .retrieveByAmbariUrl(request.getQueryString("url").get)
+      .flatMap {
         case Left(errors) =>
-          Future.successful(InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}")))
+          Future.successful(
+            InternalServerError(
+              JsonResponses.statusError(errors.firstMessage)))
         case Right(status) =>
           if (status) {
             Future.successful(Ok(Json.obj("alreadyExists" -> true)))
@@ -139,7 +149,7 @@ class DataplaneClusters @Inject()(
               .map {
                 case Left(errors) =>
                   InternalServerError(
-                    JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+                    JsonResponses.statusError(errors.firstMessage))
                 case Right(checkResponse) => Ok(Json.toJson(checkResponse))
               }
             res
