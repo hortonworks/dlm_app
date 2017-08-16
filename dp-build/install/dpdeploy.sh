@@ -184,6 +184,7 @@ init_knox() {
 
     docker exec -t knox ./wait_for_keystore_file.sh
     mkdir -p ${CERTS_DIR}
+    sleep 5
     export_knox_cert ${MASTER_PASSWORD} knox > ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
     if [ ${USE_TEST_LDAP} == "no" ]
     then
