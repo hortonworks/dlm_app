@@ -1,7 +1,8 @@
-import {Component, ElementRef, ViewChild, OnInit, HostListener} from '@angular/core';
+import {Component, ElementRef, ViewChild, OnInit, AfterViewChecked, HostListener} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {Observable} from 'rxjs/Observable';
+import {Subject} from 'rxjs/Subject';
 
 import {Cluster} from '../../../../models/cluster';
 import {Lake} from '../../../../models/lake';
@@ -25,7 +26,7 @@ import {ConfigDialogComponent} from '../../widgets/config-dialog/config-dialog.c
   templateUrl: './cluster-edit.component.html',
   styleUrls: ['./cluster-edit.component.scss']
 })
-export class ClusterEditComponent implements OnInit {
+export class ClusterEditComponent implements OnInit, AfterViewChecked {
 
   @ViewChild('clusterForm') clusterForm: NgForm;
 
@@ -33,6 +34,9 @@ export class ClusterEditComponent implements OnInit {
   cluster: Cluster = new Cluster();
   searchTerm: string;
   dcName: string;
+  lake: Lake;
+  location: Location;
+  rxReady: Subject<any> = new Subject();
 
   showNotification = false;
   showError = false;
@@ -43,63 +47,42 @@ export class ClusterEditComponent implements OnInit {
               private lakeService: LakeService,
               private clusterService: ClusterService,
               private locationService: LocationService,
-              private  translateService: TranslateService) {
+              private translateService: TranslateService) {
   };
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
-      if (params.status && params.status === 'success') {
-        this.showNotification = true;
-      }
-    });
+    const rxLake =
+      this.route.params
+        .map(params => params['id'])
+        .flatMap(lakeId => this.lakeService.retrieve(lakeId));
+
+    rxLake
+      .subscribe(lake => this.lake = lake);
+
+    // const rxLocation =
+      rxLake
+        .flatMap(lake => this.locationService.retrieve(lake.location))//;
+
+    // Observable
+      // .forkJoin(rxLocation, this.rxReady, location => location)
+      .subscribe(location => {
+        this.location = location;
+        // this.onSelectLocation(location);
+        setTimeout(() => this.onSelectLocation(location), 500);
+      });
   }
 
-  closeNotification() {
-    this.showNotification = false;
+  ngAfterViewChecked() {
+    this.rxReady.next(undefined);
   }
 
   closeError() {
     this.showError = false;
   }
 
-  getClusterInfo(event) {
-    this.showError = false;
-    this.showNotification = false;
-    let cleanedUri = StringUtils.cleanupUri(this.cluster.ambariurl);
-    this.lakeService.validate(cleanedUri).subscribe(
-      response => {
-        if (response.ambariApiStatus === 200) {
-          //TODO - Padma/Babu/Hemanth/Rohit :Display that Knox was detected
-          let detailRequest = new ClusterDetailRequest();
-          this.requestClusterInfo(detailRequest, cleanedUri);
-        }
-      },
-      () => {
-        this.onError();
-      }
-    );
-  }
-
-  private requestClusterInfo(detailRequest: ClusterDetailRequest, cleanedUri: string) {
-    this.clusterService.getClusterInfo(detailRequest).subscribe(clusterInfo => {
-      this.extractClusterInfo(clusterInfo);
-      this.cluster.ambariurl = cleanedUri;
-    }, (error) => {
-      this.onError();
-    });
-  }
-
   private onError() {
     this.showError = true;
     this.errorMessage = this.translateService.instant('pages.infra.description.connectionFailed');
-  }
-
-  private extractClusterInfo(clusterInfo) {
-    this.cluster.name = clusterInfo[0].clusterName;
-    this.cluster.services = clusterInfo[0].services;
-    // TEMP FIX : Should come from backend
-    let urlParts = this.cluster.ambariurl.split('/');
-    this.cluster.ipAddress = urlParts.length ? urlParts[2].substr(0, urlParts[2].indexOf(':')) : '';
   }
 
   locationFormatter(location: Location): string {
@@ -120,29 +103,20 @@ export class ClusterEditComponent implements OnInit {
     this.mapData = [];
     let point = new Point(location.latitude, location.longitude, MapConnectionStatus.UP);
     this.mapData = [new MapData(point)];
-    this.cluster.location = location;
+
+    this.lake.location = location.id;
   }
 
   onNewTagAddition(text: string) {
-    this.cluster.tags.push(text);
+    this.lake.properties = this.lake.properties ? this.lake.properties : {};
+    this.lake.properties.tags = this.lake.properties.tags ? this.lake.properties.tags : [];
+    this.lake.properties.tags.push({
+      name: text
+    });
   }
 
-  onCreate() {
-    this.showError = false;
-    if(!this.isFormValid()){
-      return;
-    }
-    this.createCluster()
-      .subscribe(
-        () => {
-          this.router.navigate(['infra', {
-            status: 'success'
-          }]);
-        },
-        error => {
-          this.handleError(error);
-        }
-      );
+  onTagDelete(tagDeleted) {
+    this.lake.properties.tags = this.lake.properties.tags.filter(cTag => cTag.name !== tagDeleted);
   }
 
   isFormValid(){
@@ -164,41 +138,29 @@ export class ClusterEditComponent implements OnInit {
     }
   }
 
-  onKeyPress(event) {
-    if (event.keyCode === 13) {
-      this.getClusterInfo(event);
-    }
+  doGetTagsAsStringArray(tags: any[] = []) {
+    return tags.map(cTag => cTag.name);
   }
 
-  createCluster() {
-    let lake = new Lake();
-    lake.dcName = this.cluster.dcName;
-    lake.description = this.cluster.description;
-    let properties = {tags: []};
-    this.cluster.tags.forEach(tag => properties.tags.push({'name': tag}));
-    lake.properties = properties;
-    return this.lakeService.insert(lake);
-  }
-
-  onCancel() {
-    this.router.navigate(['infra']);
-  }
-
-  onCreateAndAdd() {
+  onUpdate() {
     this.showError = false;
     if(!this.isFormValid()){
       return;
     }
-    this.createCluster().subscribe(
-      () => {
-        this.cluster = new Cluster();
-        this.router.navigate(['infra/add', {
-          status: 'success'
-        }]);
-      },
-      error => {
-        this.handleError(error);
-      }
-    );
+    this.lakeService.update(this.lake.id, this.lake)
+      .subscribe(
+        () => {
+          this.router.navigate(['infra', {
+            status: 'success'
+          }]);
+        },
+        error => {
+          this.handleError(error);
+        }
+      );
+  }
+
+  onCancel() {
+    this.router.navigate(['infra']);
   }
 }

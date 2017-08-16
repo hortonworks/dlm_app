@@ -1,12 +1,4 @@
 <div class="page-container">
-  <div *ngIf="showNotification">
-    <div id="success-notification-bar" class="notification-bar">
-      <i class="fa fa-check-circle pull-left"></i>
-      <i id="success-close" class="fa fa-remove pull-right" (click)="closeNotification()"></i>
-      <div id="success-heading" class="text-medium">{{"pages.infra.labels.clusterAddSuccess" | translate}}</div>
-      <div id="success-message" class="text-small-1">{{"pages.infra.description.clusterAddSuccess" | translate}} </div>
-    </div>
-  </div>
   <div *ngIf="showError">
     <div id="error-notification-bar" class="error-notification-bar">
       <i class="fa fa-times-circle pull-left"></i>
@@ -16,7 +8,7 @@
     </div>
   </div>
 
-  <div class="icon-container">
+  <div class="icon-container" *ngIf="lake">
     <div class="hwx-title">{{"pages.infra.labels.editCluster" | translate}}</div>
     <div class="hwx-desc">{{"pages.infra.description.editCluster" | translate}} </div>
 
@@ -27,27 +19,14 @@
         <div class="cluster-details">
           <div class="display-group">
             <label>{{"pages.infra.labels.clusterName" | translate}}</label>
-            <div>{{cluster.name}}</div>
+            <div>{{lake.name}}</div>
           </div>
           <div class="display-group">
-            <label>{{"pages.infra.labels.ipAddress" | translate}}</label>
-            <div>{{cluster.ipAddress}}</div>
-          </div>
-          <div class="display-group">
-            <label>{{"pages.infra.labels.services" | translate}}</label>
-            <div *ngFor="let service of cluster.services" class="services"><i class="fa fa-check-circle"></i> {{service}}</div>
+            <label>{{"pages.infra.labels.ambariUrl" | translate}}</label>
+            <div>{{lake.ambariUrl}}</div>
           </div>
         </div>
 
-        <div *ngIf="isDataLake" class="datalake-indicator callout">
-          <div *ngIf="isDataLake" class="icon-container">
-            <div class="datalake-notification">
-              <div class="hwx-title">{{"common.datalake" | translate}}</div>
-              <div class="hwx-desc"> {{ dLFoundMessage }}</div>
-              <div><a target="_blank" href="https://en.wikipedia.org/wiki/Data_lake">{{"common.moreLink" | translate}}</a> </div>
-            </div>
-          </div>
-        </div>
         <div class="mdl-grid mdl-grid--no-spacing">
           <div class="mdl-cell mdl-cell--8-col datalake-input">
             <div class="form-group">
@@ -67,17 +46,17 @@
             <div class="form-group">
               <label class="required">{{"pages.infra.labels.dataCenter" | translate}}</label>
               <div class="hwx-inline-desc">{{"pages.infra.description.dataCenter" | translate}}</div>
-              <input required class="dp-input" placeholder="Datacenter" name="datacenter" type="text" [(ngModel)]="cluster.dcName"/>
+              <input required class="dp-input" placeholder="Datacenter" name="datacenter" type="text" [(ngModel)]="lake.dcName"/>
             </div>
             <div class="form-group">
               <label>{{"common.tags" | translate}} </label>
               <div class="hwx-inline-desc">{{"pages.infra.description.tags" | translate}}</div>
-              <tagging-widget id="tags" [tags]="cluster.tags" [clearOnSearch]="true" (onNewSearch)="onNewTagAddition($event)"></tagging-widget>
+              <tagging-widget id="tags" [tags]="doGetTagsAsStringArray(lake.properties.tags)" [clearOnSearch]="true" (onNewSearch)="onNewTagAddition($event)" (onTagDelete)="onTagDelete($event)"></tagging-widget>
             </div>
             <div class="form-group">
               <label>{{"common.description" | translate}}</label>
               <div class="hwx-inline-desc">{{"pages.infra.description.description" | translate}}</div>
-              <textarea name="desc" [(ngModel)]="cluster.description"></textarea>
+              <textarea name="desc" [(ngModel)]="lake.description"></textarea>
             </div>
           </div>
           <div class="mdl-cell mdl-cell--4-col">

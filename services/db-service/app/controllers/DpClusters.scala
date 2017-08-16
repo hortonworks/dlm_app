@@ -84,7 +84,7 @@ class DpClusters @Inject()(dpClusterRepo: DpClusterRepo)(
   }
 
 
-  def update = Action.async(parse.json) { req =>
+  def update(dpClusterId: Long) = Action.async(parse.json) { req =>
     req.body
       .validate[DataplaneCluster]
       .map { dl =>

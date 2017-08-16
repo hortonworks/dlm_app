@@ -7,7 +7,7 @@ import com.hortonworks.dataplane.commons.domain.Ambari.AmbariEndpoint
 import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, DataplaneClusterIdentifier, HJwtToken}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.DpClusterService
-import models.JsonResponses
+import models.{JsonResponses, WrappedErrorsException}
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -91,14 +91,22 @@ class DataplaneClusters @Inject()(
     request.body
       .validate[DataplaneCluster]
       .map { lake =>
-        dpClusterService
-          .update(clusterId, lake)
-          .map {
-            case Left(errors) =>
-              InternalServerError(JsonResponses.statusError(
-                s"Failed with ${Json.toJson(errors)}"))
-            case Right(dataplaneCluster) => Ok(Json.toJson(dataplaneCluster))
-          }
+        (for {
+          cluster <- retrieveClusterById(clusterId)
+          newCluster <- Future.successful(cluster.copy(
+            id = Some(clusterId.toLong),
+            dcName = lake.dcName,
+            description = lake.description,
+            location= lake.location,
+            properties = lake.properties
+          ))
+          updated <- updateClusterById(clusterId, newCluster)
+        } yield {
+          Ok(Json.toJson(updated))
+        })
+        .recover{
+          case ex: WrappedErrorsException => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(ex.errors)}"))
+        }
       }
       .getOrElse(Future.successful(BadRequest))
   }
@@ -137,6 +145,22 @@ class DataplaneClusters @Inject()(
             res
           }
       }
+  }
+
+  private def retrieveClusterById(clusterId: String): Future[DataplaneCluster] = {
+    dpClusterService.retrieve(clusterId)
+        .map {
+          case Left(errors) => throw WrappedErrorsException(errors)
+          case Right(cluster) => cluster
+        }
+  }
+
+  private def updateClusterById(clusterId: String, cluster: DataplaneCluster): Future[DataplaneCluster] = {
+    dpClusterService.update(clusterId, cluster)
+        .map {
+          case Left(errors) => throw WrappedErrorsException(errors)
+          case Right(cluster) => cluster
+        }
   }
 
 }

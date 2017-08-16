@@ -30,6 +30,13 @@ export class LakeService {
       .catch(HttpUtil.handleError);
   }
 
+  update(lakeId: number, lake: Lake): Observable<Lake> {
+    return this.http
+      .put(`${this.url}/${lakeId}`, lake, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
   retrieve(lakeId: string): Observable<Lake> {
     return this.http
       .get(`${this.url}/${lakeId}`, new RequestOptions(HttpUtil.getHeaders()))
