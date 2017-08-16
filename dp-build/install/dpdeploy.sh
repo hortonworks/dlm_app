@@ -186,6 +186,11 @@ init_knox() {
     mkdir -p ${CERTS_DIR}
     sleep 5
     export_knox_cert ${MASTER_PASSWORD} knox > ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
+    local cert_first_line=$(head -n 1 ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE})
+    if [[ $cert_first_line != *"-BEGIN CERTIFICATE-"* ]]; then
+      echo "Cerificate not generated properly. Initialize knox again"
+      exit 1
+    fi
     if [ ${USE_TEST_LDAP} == "no" ]
     then
         docker exec -it knox ./setup_knox_sso_conf.sh
