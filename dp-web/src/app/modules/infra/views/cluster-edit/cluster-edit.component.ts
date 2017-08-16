@@ -58,12 +58,8 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
     rxLake
       .subscribe(lake => this.lake = lake);
 
-    // const rxLocation =
-      rxLake
-        .flatMap(lake => this.locationService.retrieve(lake.location))//;
-
-    // Observable
-      // .forkJoin(rxLocation, this.rxReady, location => location)
+    rxLake
+      .flatMap(lake => this.locationService.retrieve(lake.location))
       .subscribe(location => {
         this.location = location;
         this.updateMap();
