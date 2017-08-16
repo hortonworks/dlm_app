@@ -10,17 +10,32 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Http } from '@angular/http';
-import { mapResponse } from 'utils/http-util';
+import { mapResponse, getUrlDomain } from 'utils/http-util';
+import { Cluster } from 'models/cluster.model';
 
 @Injectable()
 export class ClusterService {
 
+  private decorateCluster(cluster: Cluster): Cluster {
+    return {
+      ...cluster,
+      ambariWebUrl: getUrlDomain(cluster.ambariurl)
+    };
+  }
+
   constructor(private http: Http) { }
 
   fetchClusters(): Observable<any> {
-    return mapResponse(this.http.get('clusters'));
+    return mapResponse(this.http.get('clusters'))
+      .map(({clusters}) => ({
+        ...clusters,
+        clusters: clusters.map(this.decorateCluster)
+      }));
   }
 
+  /**
+   * @deprecated
+   */
   fetchCluster(id: string): Observable<any> {
     return mapResponse(this.http.get(`clusters/${id}`));
   }

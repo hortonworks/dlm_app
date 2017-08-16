@@ -26,8 +26,12 @@
     "pairs": "Pairs",
     "policy": "Policy",
     "name": "Name",
+    "queue_name": "Queue Name",
+    "max_bandwidth": "Maximum Bandwidth",
     "job": "Job",
     "jobs": "Jobs",
+    "start_time": "Start Time",
+    "end_time": "End Time",
     "clusters": "Clusters",
     "cluster": "Cluster",
     "service": "Service",
@@ -49,6 +53,7 @@
       "weeks": "Week(s)"
     },
     "frequency": {
+      "self": "Frequency",
       "yearly": {
         "plural": "Every {{num}}y",
         "singular": "Every year"
@@ -159,7 +164,7 @@
         "updates": "Issues & Updates",
         "recent": "Recent Issues",
         "list": {
-          "view_all": "view all",
+          "view_all": "View all",
           "empty_list": "No issues or updates within the selected time period.",
           "status": {
             "in_progress": "is in progress",
@@ -258,7 +263,8 @@
         "volume": "Volume",
         "location": "Location",
         "create_pair_text": "Add Pair",
-        "create_policy_text": "Add Policy"
+        "create_policy_text": "Add Policy",
+        "launch_ambari": "Launch Ambari"
       },
       "hints": {
         "header": "Clusters shown below are enabled for DLM"
@@ -274,6 +280,7 @@
       "groups": "Groups",
       "data_summary": "Data Summary",
       "help_url": "http://docs.hortonworks.com",
+      "help_text": "What are policies?",
       "no_jobs": "No jobs",
       "no_policies": "Create your first replication policy.",
       "no_pairings": "You must create a cluster pairing before you can create a replication policy.",
@@ -329,6 +336,10 @@
         }
       },
       "subpage": {
+        "create_policy": {
+          "help_url": "http://docs.hortonworks.com",
+          "help_text": "Policy properties"
+        },
         "review": {
           "error": {
             "create_policy": "Create policy failed",
@@ -342,6 +353,7 @@
       "header_note": "Note: Pairings are bi-directional",
       "create_button_text": "Add Pairing",
       "help_url": "http://docs.hortonworks.com",
+      "help_text": "What are pairings?",
       "content": {
         "header": {
           "first_cluster": "FIRST CLUSTER",

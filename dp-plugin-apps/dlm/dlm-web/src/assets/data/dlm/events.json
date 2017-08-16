@@ -101,6 +101,36 @@
       "severity": "info",
       "timestamp": "2017-06-23 12:16:48.306",
       "message": "policy instance succeeded"
+    },
+    {
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/hdfsPolicy/0/1497564970816/000000007",
+      "instanceId": "/dc-Europe/c1/dc-Europe/c2/hdfsPolicy/0/1497564970816/000000007@2",
+      "event": "failed",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "error",
+      "timestamp": "2017-06-24 20:42:18.454",
+      "message": "policy instance failed"
+    },
+    {
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/tdk111/0/1497564970816/000000007",
+      "instanceId": "/dc-Europe/c1/dc-Europe/c2/tdk111/0/1497564970816/000000007@2",
+      "event": "failed",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "error",
+      "timestamp": "2017-06-25 20:42:18.454",
+      "message": "policy instance failed"
+    },
+    {
+      "policyId": "/dc-Europe/c1/dc-Europe/c2/testhivepolicy/0/1497564970816/000000007",
+      "instanceId": "/dc-Europe/c1/dc-Europe/c2/testhivepolicy/0/1497564970816/000000007@2",
+      "event": "failed",
+      "eventType": "policyinstance",
+      "policyReplType": "FS",
+      "severity": "error",
+      "timestamp": "2017-06-26 20:42:18.454",
+      "message": "policy instance failed"
     }
   ]
 }

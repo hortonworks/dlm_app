@@ -7,23 +7,27 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-.summary {
-  white-space: normal;
-  h6 {
-    text-transform: uppercase;
+:host {
+  .summary {
+    white-space: normal;
   }
-}
 
-.no-description {
-  color: #999;
-  font-size: 12px;
-}
+  .policy-details {
+    margin-top: 15px;
+  }
 
-.policy-details {
-  margin-top: 15px;
-}
-
-.policy-details, .description {
-  font-size: 14px;
-  color: #333;
+  .summary-item {
+    margin-bottom: 15px;
+    h6 {
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+    .detail {
+      font-size: 14px;
+      color: #333;
+      overflow: hidden;
+      word-wrap: break-word;
+      line-height: 1.3;
+    }
+  }
 }

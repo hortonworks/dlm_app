@@ -20,13 +20,15 @@ export class Persona {
   name: string;
   imageName: string;
   tabs: PersonaTabs[] = [];
+  nonTabUrls: string[] = [];
   enabled:boolean;
 
-  constructor(name: string, tabs: PersonaTabs[], url = '', imageName = '', enabled = true){
+  constructor(name: string, tabs: PersonaTabs[], nonTabUrls: string[], url = '', imageName = '', enabled = true){
     this.url = url;
     this.name = name;
     this.imageName = imageName;
     this.tabs = tabs ? tabs : [];
+    this.nonTabUrls = nonTabUrls ? nonTabUrls : [];
     this.enabled = enabled;
   }
 }

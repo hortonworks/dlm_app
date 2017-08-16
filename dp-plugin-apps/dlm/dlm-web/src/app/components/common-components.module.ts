@@ -43,6 +43,7 @@ import { MapLegendContainerComponent } from './map/map-legend-container/map-lege
 import { ClusterStatusIconComponent } from './cluster-status-icon/cluster-status-icon.component';
 import { BeaconValidityComponent } from './messages/beacon-validity/beacon-validity.component';
 import { HelpLinkComponent } from './help-link/help-link.component';
+import { ClusterActionsComponent } from './cluster-actions/cluster-actions.component';
 
 @NgModule({
   imports: [
@@ -82,6 +83,7 @@ import { HelpLinkComponent } from './help-link/help-link.component';
     HiveBrowserComponent,
     HiveDatabaseComponent,
     PolicyActionsComponent,
+    ClusterActionsComponent,
     DurationColumnComponent,
     TransferredColumnComponent,
     JobStatusComponent,
@@ -114,6 +116,7 @@ import { HelpLinkComponent } from './help-link/help-link.component';
     HiveBrowserComponent,
     HiveDatabaseComponent,
     PolicyActionsComponent,
+    ClusterActionsComponent,
     DurationColumnComponent,
     TransferredColumnComponent,
     JobStatusComponent,

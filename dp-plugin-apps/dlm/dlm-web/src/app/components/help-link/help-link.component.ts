@@ -32,7 +32,7 @@ import { Component, Input } from '@angular/core';
 @Component({
   selector: 'dlm-help-link',
   template: `
-    <span *ngIf="linkTo; else asIcon">
+    <span class="link-text" *ngIf="linkTo; else asIcon">
       <a [href]="linkTo" [target]="linkNewTab ? '_blank' : ''" [tooltip]="linkHint | translate">{{linkText | translate}}</a>
     </span>
     <ng-template #asIcon>

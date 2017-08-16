@@ -38,6 +38,8 @@ export class HttpUtil {
         message = errorJSON.map(err => {return err.message}).join(', ')
       }else if(errorJSON.message){
         message = errorJSON.message
+      }else if (errorJSON.errors){
+        message = errorJSON.errors.map(err => {return err.message}).join(', ')
       }else {
         message = 'Error Occured while processing';
       }

@@ -11,7 +11,7 @@
 
 set -e
 
-RELEASE_NUMBER=0.0.1
+RELEASE_NUMBER=0.0.1-latest
 IMAGE_PREFIX="hortonworks"
 IMG="dlm-app"
 
@@ -77,7 +77,7 @@ get_version() {
         VERSION_STRING=`cat build/dlm-docker/installer/VERSION`
         echo ${VERSION_STRING}
     else
-        echo ${RELEASE_NUMBER}:"latest"
+        echo ${RELEASE_NUMBER}
     fi
 }
 
