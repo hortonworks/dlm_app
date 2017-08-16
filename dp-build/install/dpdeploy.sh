@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-source $(pwd)/config.clear.sh
 source $(pwd)/config.env.sh
 
 CERTS_DIR=`dirname $0`/certs
