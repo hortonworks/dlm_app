@@ -27,16 +27,12 @@ import {ConfigDialogComponent} from '../../widgets/config-dialog/config-dialog.c
 })
 export class ClusterEditComponent implements OnInit {
 
-  @ViewChild('ambariInput') ambariInputContainer: ElementRef;
   @ViewChild('clusterForm') clusterForm: NgForm;
-  @ViewChild('config') private config: ConfigDialogComponent;
 
   mapData: MapData[] = [];
   cluster: Cluster = new Cluster();
   searchTerm: string;
   dcName: string;
-
-  dpRequiredServices = ['ATLAS'];
 
   showNotification = false;
   showError = false;
@@ -49,11 +45,6 @@ export class ClusterEditComponent implements OnInit {
               private locationService: LocationService,
               private  translateService: TranslateService) {
   };
-
-  get dLFoundMessage() {
-    let services = `${' ' + this.dpRequiredServices.join(', ')}`;
-    return this.translateService.instant('pages.infra.description.datalake', {serviceNames: services});
-  }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -81,22 +72,12 @@ export class ClusterEditComponent implements OnInit {
           //TODO - Padma/Babu/Hemanth/Rohit :Display that Knox was detected
           let detailRequest = new ClusterDetailRequest();
           this.requestClusterInfo(detailRequest, cleanedUri);
-          this.removeValidationError();
-        }
-        else {
-          if(this.ambariInputContainer.nativeElement.className.indexOf('validation-error') === -1){
-            this.ambariInputContainer.nativeElement.className += ' validation-error';
-          }
         }
       },
       () => {
         this.onError();
       }
     );
-  }
-
-  private removeValidationError() {
-    this.ambariInputContainer.nativeElement.className = this.ambariInputContainer.nativeElement.className.replace('validation-error', '');
   }
 
   private requestClusterInfo(detailRequest: ClusterDetailRequest, cleanedUri: string) {
@@ -119,15 +100,6 @@ export class ClusterEditComponent implements OnInit {
     // TEMP FIX : Should come from backend
     let urlParts = this.cluster.ambariurl.split('/');
     this.cluster.ipAddress = urlParts.length ? urlParts[2].substr(0, urlParts[2].indexOf(':')) : '';
-  }
-
-  get isDataLake() {
-    for (let name of this.dpRequiredServices) {
-      if (this.cluster.services.indexOf(name) === -1) {
-        return false;
-      }
-    }
-    return true;
   }
 
   locationFormatter(location: Location): string {
