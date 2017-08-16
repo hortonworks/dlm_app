@@ -13,57 +13,55 @@ export class RbacService {
 
   private personaMap = new Map();
   private landingPageMap = new Map();
-  private nonPersonaRoutesMap = new Map();
 
   constructor(private configService: ConfigurationService) {
     this.landingPageMap.set('SUPERADMIN', '/infra');
     this.landingPageMap.set('SUPERADMIN_ONBOARD', '/onboard/welcome');
-    this.landingPageMap.set('CURATOR', '/datasteward');
-    this.landingPageMap.set('USER', '/analytics');
+    this.landingPageMap.set('CURATOR', '/datasteward/dataset');
     this.landingPageMap.set('INFRAADMIN', '/infra');
     this.landingPageMap.set('INFRAADMIN_ONBOARD', '/onboard');
-
-    this.nonPersonaRoutesMap.set('SUPERADMIN', ['/onboard', '/onboard/welcome', '/onboard/configure', '/onboard/adduser']);
-    this.nonPersonaRoutesMap.set('INFRAADMIN', ['/onboard']);
-    this.nonPersonaRoutesMap.set('CURATOR', []);
-    this.nonPersonaRoutesMap.set('USER', []);
-
   }
 
   get user() {
     return AuthUtils.getUser();
   }
 
-  getPersonaMap() {
+  getActivePersona() {
+    this.personaMap = this.getPersonaMap();
+    if (this.hasRole('SUPERADMIN')) {
+      return this.personaMap.get('SUPERADMIN');
+    } else if (this.hasRole('INFRAADMIN')) {
+      return this.personaMap.get('INFRAADMIN');
+    } else if (this.hasRole('CURATOR')) {
+      return this.personaMap.get('CURATOR');
+    } else {
+      return this.personaMap.get('SUPERADMIN');
+    }
+  }
+
+  private getPersonaMap() {
     let personaMap = new Map();
     personaMap.set('SUPERADMIN', [
-      new Persona('Admin', [
+      new Persona('Dataplane Admin', [
         new PersonaTabs('Clusters', 'infra', 'fa-sitemap'),
         new PersonaTabs('Users', 'infra/usermgmt', 'fa-users'),
         new PersonaTabs('Services', 'infra/services', 'fa-arrows-h')
-      ], '', 'infra-logo.png')
+      ], ['/onboard', '/onboard/welcome', '/onboard/configure', '/onboard/adduser'], '', 'infra-logo.png')
     ]);
     personaMap.set('CURATOR', [
-      new Persona('Data Steward', [
+      new Persona('Data Steward Studio', [
         new PersonaTabs('Asset Collection', 'datasteward/dataset', 'fa-cubes', true),
         new PersonaTabs('Unclassified', 'unclassified', 'fa-cube'),
         new PersonaTabs('Assets', 'assets', 'fa-server'),
         new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')
-      ], '', 'steward-logo.png', !!this.user && this.user.services.indexOf('dss') > -1)]);
-    personaMap.set('USER', [
-      new Persona('Analytics', [
-        new PersonaTabs('Workspace', 'analytics/workspace', 'fa-globe'),
-        new PersonaTabs('Assets', 'analytics/assets', 'fa-list-alt'),
-        new PersonaTabs('Clusters', '', 'fa-database'),
-        new PersonaTabs('Jobs', '', 'fa-briefcase')
-      ], '', 'analytics-logo.png')]);
+      ], ['/onboard'], '', 'steward-logo.png', !!this.user && this.user.services.indexOf('dss') > -1)]);
     personaMap.set('INFRAADMIN', [
-      new Persona('Cluster Admin', [
+      new Persona('Infra Admin', [
         new PersonaTabs('Clusters', 'infra', 'fa-sitemap')
-      ], '', 'infra-logo.png'),
-      new Persona('Data Life cycle Manager', [], '/dlm', 'dlm-logo.png', !!this.user && this.user.services.indexOf('dlm') > -1)]);
+      ], [], '', 'infra-logo.png'),
+      new Persona('Data Lifecycle Manager', [], [], '/dlm', 'dlm-logo.png', !!this.user && this.user.services.indexOf('dlm') > -1)]);
     personaMap.set('INFRAADMIN_SUPERADMIN', [
-      new Persona('DLM', [], '/dlm', 'dlm-logo.png', !!this.user && this.user.services.indexOf('dlm') > -1)
+      new Persona('Data Lifecycle Manager', [], [], '/dlm', 'dlm-logo.png', !!this.user && this.user.services.indexOf('dlm') > -1)
     ]);
     return personaMap;
   }
@@ -100,9 +98,6 @@ export class RbacService {
       } else if (this.hasRole('CURATOR')) {
         return this.getLandingInternal(observer, 'CURATOR');
       }
-      else if (this.hasRole('USER')) {
-        return this.getLandingInternal(observer, 'USER');
-      }
     });
   }
 
@@ -112,59 +107,21 @@ export class RbacService {
   }
 
   isAuthorized(route: string): boolean {
-    return this.isAuthorizedPersonaRoute(route) || this.isAuthorizedNonPersonaRoute(route);
+    let personas = this.getPersonaDetails();
+    return this.isAuthorizedPersonaRoute(personas, route) || this.isAuthorizedNonPersonaRoute(personas, route);
   }
 
   isServiceEnabled(route: string): boolean {
-    let isEnabled = true;
     let personas = this.getPersonaDetails();
-    personas.forEach(persona => {
-      if (!persona.enabled) {
-        let tabs = persona.tabs;
-        for (let i = 0; i < tabs.length; i++) {
-          let tab: PersonaTabs = tabs[i];
-          if (route.startsWith(`/${tab.URL}`)) {
-            isEnabled = false;
-            break;
-          }
-        }
-      }
-    });
-    return isEnabled;
-  }
-  
-  private isAuthorizedPersonaRoute(route: string): boolean {
-    let authorized = false;
-    let personas = this.getPersonaDetails();
-    let tabs: PersonaTabs[] = [];
-    personas.forEach(persona => {
-      tabs.push(...persona.tabs);
-    });
-    for (let i = 0; i < tabs.length; i++) {
-      let tab: PersonaTabs = tabs[i];
-      if (route.startsWith(`/${tab.URL}`)) {
-        authorized = true;
-        break;
-      }
-    }
-    return authorized;
+    return !personas.find(persona => !persona.enabled && !!persona.tabs.find(tab => route.startsWith(`/${tab.URL}`)));
   }
 
-  private isAuthorizedNonPersonaRoute(route: string): boolean {
-    let urls = [];
-    if (this.hasRole('SUPERADMIN')) {
-      urls.push(...this.nonPersonaRoutesMap.get('SUPERADMIN'));
-    }
-    if (this.hasRole('INFRAADMIN')) {
-      urls.push(...this.nonPersonaRoutesMap.get('INFRAADMIN'));
-    }
-    if (this.hasRole('CURATOR')) {
-      urls.push(...this.nonPersonaRoutesMap.get('CURATOR'));
-    }
-    if (this.hasRole('USER')) {
-      urls.push(...this.nonPersonaRoutesMap.get('USER'));
-    }
-    return !!urls.find(url => url === route);
+  private isAuthorizedPersonaRoute(personas, route: string): boolean {
+    return !!personas.find(persona => !!persona.tabs.find(tab => route.startsWith(`/${tab.URL}`)));
+  }
+
+  private isAuthorizedNonPersonaRoute(personas, route: string): boolean {
+    return !!personas.find(persona => !!persona.nonTabUrls.find(url => url === route));
   }
 
   getPersonaDetails() {
@@ -182,9 +139,6 @@ export class RbacService {
     }
     if (this.hasRole('CURATOR')) {
       personas.push(...this.personaMap.get('CURATOR'));
-    }
-    if (this.hasRole('USER')) {
-      personas.push(...this.personaMap.get('USER'));
     }
     return personas;
   }
