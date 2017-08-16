@@ -81,7 +81,7 @@ export class LakesListComponent implements OnChanges {
   private getStatus(health,lakeInfo) {
     if (health && health.status && health.status.state === 'STARTED') {
       return LakeStatus.UP;
-    } else if (health && health.status && health.status.state === 'NOT STARTED') {
+    } else if (health && health.status && (health.status.state === 'NOT STARTED' || health.status.state === "SYNC_ERROR")) {
       return LakeStatus.DOWN;
     } else if(lakeInfo.isWaiting){
       return LakeStatus.WAITING;

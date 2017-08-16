@@ -82,6 +82,12 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
       result <- storageInterface.addClusters(Seq(cl))
     } yield result
 
+    clusters.onFailure{
+      case e: Throwable =>
+        logger.warn("Caught error on contacting cluster", e)
+        storageInterface.updateDpClusterStatus(dataplaneCluster.copy(state = Some("SYNC_ERROR")))
+    }
+
     addedClusters.onFailure {
       case e: Throwable => logger.warn("Caught error on adding cluster", e)
     }
