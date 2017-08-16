@@ -13,6 +13,7 @@ import {Store} from '@ngrx/store';
 import {MockTranslateLoader} from 'mocks/mock-translate-loader';
 import {MockStore} from 'mocks/mock-store';
 import { CommonComponentsModule } from 'components/common-components.module';
+import { HortonStyleModule } from 'common/horton-style.module';
 import {ReviewPolicyComponent} from './review-policy.component';
 import {NavbarService} from 'services/navbar.service';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -20,8 +21,6 @@ import {MockTimeZoneService} from 'mocks/mock-timezone';
 import {TimeZoneService} from 'services/time-zone.service';
 import { PipesModule } from 'pipes/pipes.module';
 import {FrequencyPipe} from 'pipes/frequency.pipe';
-import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
-import { ModalDialogBodyComponent } from 'common/modal-dialog/modal-dialog-body.component';
 import { ModalModule } from 'ng2-bootstrap';
 
 describe('ReviewPolicyComponent', () => {
@@ -37,12 +36,11 @@ describe('ReviewPolicyComponent', () => {
         ModalModule.forRoot(),
         CommonComponentsModule,
         RouterTestingModule,
-        PipesModule
+        PipesModule,
+        HortonStyleModule
       ],
       declarations: [
-        ReviewPolicyComponent,
-        ModalDialogComponent,
-        ModalDialogBodyComponent
+        ReviewPolicyComponent
       ],
       providers: [
         {provide: Store, useClass: MockStore},

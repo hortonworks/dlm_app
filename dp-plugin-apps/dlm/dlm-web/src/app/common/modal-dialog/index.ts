@@ -7,17 +7,6 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import * as uuid from 'uuid';
-
-export const capitalize = (str: string) => str ? str[0].toUpperCase() + str.slice(1).toLowerCase() : '';
-export const simpleSearch = (str: string, search: string): boolean => {
-  let reg: RegExp;
-  try {
-    reg = new RegExp(search);
-  } catch (e) {
-    reg = new RegExp('');
-  }
-  return reg.test(str);
-};
-
-export const genId = (): String => uuid.v4();
+export * from './modal-dialog-body.component';
+export * from './modal-dialog.component';
+export * from './modal-dialog.size';

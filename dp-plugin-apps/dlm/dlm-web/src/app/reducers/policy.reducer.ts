@@ -63,7 +63,7 @@ function resumePolicySuccess(state: State, action): State {
 }
 
 function updateEntityField(state: State, action, fieldName: string, newValue): State {
-  const id = action.payload;
+  const id = action.payload.response;
   const updatedEntity = {...state.entities[id], [fieldName]: newValue};
   const newEntities = Object.assign({}, state.entities, {[id]: updatedEntity});
   return Object.assign({}, state, {entities: newEntities});

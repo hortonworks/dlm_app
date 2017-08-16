@@ -49,6 +49,8 @@ import { POLL_INTERVAL } from 'constants/api.constant';
 import { LogService } from 'services/log.service';
 import { EntityType } from 'constants/log.constant';
 import { ColumnMode } from '@swimlane/ngx-datatable';
+import { NOTIFICATION_TYPES, NOTIFICATION_CONTENT_TYPE } from 'constants/notification.constant';
+import { confirmNextAction } from 'actions/confirmation.action';
 
 @Component({
   selector: 'dlm-policy-table',
@@ -105,9 +107,9 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @Output() detailsToggle = new EventEmitter<any>();
 
   rowActions = <ActionItemType[]>[
-    {label: 'Delete', name: 'DELETE', disabledFor: ''},
-    {label: 'Suspend', name: 'SUSPEND', disabledFor: 'SUSPENDED'},
-    {label: 'Activate', name: 'ACTIVATE', disabledFor: 'RUNNING'},
+    {label: 'Delete', name: 'DELETE_POLICY', disabledFor: ''},
+    {label: 'Suspend', name: 'SUSPEND_POLICY', disabledFor: 'SUSPENDED'},
+    {label: 'Activate', name: 'ACTIVATE_POLICY', disabledFor: 'RUNNING'},
     {label: 'View Log', name: 'LOG', disabledFor: ''}
   ];
 
@@ -119,6 +121,23 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       ))
       .do(([_, policy]) => this.store.dispatch(loadJobsForPolicy(policy)));
     this.subscriptions.push(polling$.subscribe());
+  }
+
+  private generateNotification() {
+    const actionName = this.selectedAction.name.toLowerCase();
+    return {
+      [NOTIFICATION_TYPES.SUCCESS]: {
+        title: this.t.instant(`common.action_notifications.${actionName}.success.title`),
+        body: this.t.instant(`common.action_notifications.${actionName}.success.body`, {
+          policyName: this.selectedForActionRow.name
+        })
+      },
+      [NOTIFICATION_TYPES.ERROR]: {
+        title: this.t.instant(`common.action_notifications.${actionName}.error.title`),
+        contentType: NOTIFICATION_CONTENT_TYPE.MODAL_LINK
+      },
+      levels: [NOTIFICATION_TYPES.SUCCESS, NOTIFICATION_TYPES.ERROR]
+    };
   }
 
   constructor(private t: TranslateService,
@@ -235,46 +254,31 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     if (action.name === 'LOG') {
       this.logService.showLog(EntityType.policy, row.id);
     } else {
-      this.showActionConfirmationModal = true;
+      const nextAction = {
+        DELETE_POLICY: deletePolicy,
+        SUSPEND_POLICY: suspendPolicy,
+        ACTIVATE_POLICY: resumePolicy,
+        ABORT_JOB: abortJob,
+        RERUN_JOB: rerunJob
+      }[this.selectedAction.name];
+      if (nextAction) {
+        this.store.dispatch(confirmNextAction(
+          nextAction(this.selectedForActionRow, { notification: this.generateNotification()})
+        ));
+      }
     }
   }
 
-  onActionConfirmation() {
-    if (!this.operationResponseSubscription) {
-      this.subscribeToOperation();
-    }
-    switch (this.selectedAction.name) {
-      case 'DELETE':
-        return this.store.dispatch(deletePolicy(this.selectedForActionRow));
-      case 'SUSPEND':
-        return this.store.dispatch(suspendPolicy(this.selectedForActionRow));
-      case 'ACTIVATE':
-        return this.store.dispatch(resumePolicy(this.selectedForActionRow));
-      case 'ABORT_JOB':
-        return this.store.dispatch(abortJob(this.selectedForActionRow));
-      case 'RERUN_JOB':
-        return this.store.dispatch(rerunJob(this.selectedForActionRow));
-    }
+  abortJobAction(job) {
+    const policy = this.policies.find(p => p.policyId === job.policyId);
+    const action = <ActionItemType>{name: 'ABORT_JOB'};
+    this.handleSelectedAction({ row: policy, action });
   }
 
-  abortJobAction(policy) {
-    this.selectedAction = <ActionItemType>{name: 'ABORT_JOB'};
-    this.selectedForActionRow = this.policies.find(p => p.policyId === policy.policyId);
-    this.showActionConfirmationModal = true;
-  }
-
-  rerunJobAction(policy) {
-    this.selectedAction = <ActionItemType>{name: 'RERUN_JOB'};
-    this.selectedForActionRow = this.policies.find(p => p.policyId === policy.policyId);
-    this.showActionConfirmationModal = true;
-  }
-
-  onCloseActionConfirmationModal() {
-    this.showActionConfirmationModal = false;
-  }
-
-  onCloseOperationResponseModal() {
-    this.showOperationResponseModal = false;
+  rerunJobAction(job) {
+    const policy = this.policies.find(p => p.policyId === job.policyId);
+    const action = <ActionItemType>{name: 'RERUN_JOB'};
+    this.handleSelectedAction({ row: policy, action });
   }
 
   /**

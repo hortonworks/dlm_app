@@ -112,21 +112,3 @@
     (handler)="handleSelectedAction($event)">
   </dlm-policy-actions>
 </ng-template>
-
-<dlm-modal-dialog
-  qe-attr="confirmation-modal"
-  [title]="'page.policies.perform_action.confirmation.title'"
-  [body]="'page.policies.perform_action.confirmation.body'"
-  [showDialog]="showActionConfirmationModal"
-  (onClose)="onCloseActionConfirmationModal()"
-  (onOk)="onActionConfirmation()">
-</dlm-modal-dialog>
-
-<dlm-modal-dialog
-  qe-attr="entity-action-result-modal"
-  [title]="lastOperationResponse.status"
-  [body]="lastOperationResponse.message"
-  [showDialog]="showOperationResponseModal"
-  [showCancel]="false"
-  (onClose)="onCloseOperationResponseModal()">
-</dlm-modal-dialog>

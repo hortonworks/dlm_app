@@ -66,13 +66,11 @@ describe('PolicyEffects', () => {
     it('should return a new deletePolicySuccess and new operationComplete actions, on success', () => {
       const {policyService, runner, policyEffects} = setup();
       policyService.deletePolicy.and.returnValue(Observable.of(this.operationSuccess));
-      const expectedDeleteSuccessAction = policyActions.deletePolicySuccess(this.policy1.id);
-      const expectedOperationCompleteAction = operationActions.operationComplete(this.operationSuccess);
+      const expectedDeleteSuccessAction = policyActions.deletePolicySuccess(this.policy1.id, {});
       runner.queue(policyActions.deletePolicy(this.policy1));
 
-      policyEffects.deletePolicy$.pairwise().subscribe(([firstAction, secondAction]) => {
-        expect(firstAction).toEqual(expectedDeleteSuccessAction);
-        expect(secondAction).toEqual(expectedOperationCompleteAction);
+      policyEffects.deletePolicy$.subscribe(action => {
+        expect(action).toEqual(expectedDeleteSuccessAction);
       });
 
     });
@@ -84,13 +82,11 @@ describe('PolicyEffects', () => {
     it('should return a new suspendPolicySuccess and new operationComplete actions, on success', () => {
       const {policyService, runner, policyEffects} = setup();
       policyService.suspendPolicy.and.returnValue(Observable.of(this.operationSuccess));
-      const expectedDeleteSuccessAction = policyActions.suspendPolicySuccess(this.policy1.id);
-      const expectedOperationCompleteAction = operationActions.operationComplete(this.operationSuccess);
+      const expectedDeleteSuccessAction = policyActions.suspendPolicySuccess(this.policy1.id, {});
       runner.queue(policyActions.suspendPolicy(this.policy1));
 
-      policyEffects.suspendPolicy$.pairwise().subscribe(([firstAction, secondAction]) => {
-        expect(firstAction).toEqual(expectedDeleteSuccessAction);
-        expect(secondAction).toEqual(expectedOperationCompleteAction);
+      policyEffects.suspendPolicy$.subscribe(action => {
+        expect(action).toEqual(expectedDeleteSuccessAction);
       });
 
     });
@@ -102,13 +98,11 @@ describe('PolicyEffects', () => {
     it('should return a new resumePolicySuccess and new operationComplete actions, on success', () => {
       const {policyService, runner, policyEffects} = setup();
       policyService.resumePolicy.and.returnValue(Observable.of(this.operationSuccess));
-      const expectedDeleteSuccessAction = policyActions.resumePolicySuccess(this.policy1.id);
-      const expectedOperationCompleteAction = operationActions.operationComplete(this.operationSuccess);
-      runner.queue(policyActions.resumePolicy(this.policy1));
+      const expectedDeleteSuccessAction = policyActions.resumePolicySuccess(this.policy1.id, {});
+      runner.queue(policyActions.resumePolicy(this.policy1, {}));
 
-      policyEffects.resumePolicy$.pairwise().subscribe(([firstAction, secondAction]) => {
-        expect(firstAction).toEqual(expectedDeleteSuccessAction);
-        expect(secondAction).toEqual(expectedOperationCompleteAction);
+      policyEffects.resumePolicy$.subscribe(action => {
+        expect(action).toEqual(expectedDeleteSuccessAction);
       });
 
     });
