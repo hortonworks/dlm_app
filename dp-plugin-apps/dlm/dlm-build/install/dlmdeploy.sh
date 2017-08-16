@@ -11,8 +11,7 @@
 
 set -e
 
-DEFAULT_VERSION=0.0.1
-DEFAULT_TAG="latest"
+DEFAULT_VERSION=0.0.1-latest
 CONSUL_CONTAINER="dp-consul-server"
 
 init_network() {
@@ -115,7 +114,7 @@ print_version() {
     if [ -f VERSION ]; then
         cat VERSION
     else
-        echo ${DEFAULT_VERSION}:${DEFAULT_TAG}
+        echo ${DEFAULT_VERSION}
     fi
 }
 
