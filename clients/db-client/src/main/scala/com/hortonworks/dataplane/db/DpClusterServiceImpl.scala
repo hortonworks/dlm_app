@@ -61,7 +61,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapClusterExists)
   }
 
-  override def update(dpClusterId: String, dpCluster: DataplaneCluster)
+  override def update(dpClusterId: Long, dpCluster: DataplaneCluster)
   : Future[Either[Errors, DataplaneCluster]] = {
     ws.url(s"$url/dp/clusters/$dpClusterId")
       .withHeaders(

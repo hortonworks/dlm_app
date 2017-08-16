@@ -20,7 +20,7 @@ POST          /api/lakes                                             controllers
 GET           /api/lakes/:lakeId                                     controllers.DataplaneClusters.retrieve(lakeId)
 GET           /api/lakes/:lakeId/services                            controllers.DataplaneClusters.retrieveServices(lakeId)
 DELETE        /api/lakes/:lakeId                                     controllers.DataplaneClusters.delete(lakeId)
-PUT           /api/lakes/:lakeId                                     controllers.DataplaneClusters.update(lakeId)
+PUT           /api/lakes                                             controllers.DataplaneClusters.update
 GET           /api/lakes/ambari/status                               controllers.DataplaneClusters.ambariCheck
 
 GET           /api/locations                                         controllers.Locations.list(query: Option[String])
