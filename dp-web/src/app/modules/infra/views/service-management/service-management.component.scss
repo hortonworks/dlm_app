@@ -69,6 +69,9 @@ table.mdl-data-table {
     background-color: $gallery !important;
     height: 42px;
   }
+  tbody tr {
+    height: 42px;
+  }
 }
 
 .inner-list {
@@ -152,6 +155,10 @@ table.mdl-data-table {
   padding: 3px 10px;
   font-size: 12px;
   font-weight: normal;
+}
+
+.cluster-check {
+  margin: 25px 0 0;
 }
 
 .hexagon {

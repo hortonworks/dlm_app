@@ -27,6 +27,7 @@ export class ManualInstallCheckComponent implements OnInit {
   description: string;
   installationConfirmation: string;
   failedServices: string[] = [];
+  successfulServices: string[] = [];
   dependentServices: string[] = [];
 
   constructor(private router: Router,
@@ -42,10 +43,10 @@ export class ManualInstallCheckComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.service = params['name'];
       this.dpClusterId = params['id'];
-      this.dependentServices = this.addOnAppService.getServiceDependencies(this.service);
       Observable.forkJoin(
         this.clusterService.listByLakeId({lakeId: this.dpClusterId}),
-        this.addOnAppService.getServiceByName(this.service)
+        this.addOnAppService.getServiceByName(this.service),
+        this.addOnAppService.getServiceDependencies(this.service)
       ).subscribe(responses => {
         let cluster: Cluster = responses[0][0];
         let sku = responses[1];
@@ -56,6 +57,7 @@ export class ManualInstallCheckComponent implements OnInit {
         this.installationConfirmation = this.translateService.instant('pages.services.description.installationConfirmation', {
           clusterName: cluster.name
         });
+        this.dependentServices = responses[2].dependencies;
       });
 
     });
@@ -80,6 +82,7 @@ export class ManualInstallCheckComponent implements OnInit {
 
   checkServices() {
     this.failedServices = [];
+    this.successfulServices = [];
     Observable.forkJoin(
       this.clusterService.listByLakeId({lakeId: this.dpClusterId}),
       this.lakeService.getDiscoveredServices(this.dpClusterId)).subscribe(responses => {
@@ -91,6 +94,8 @@ export class ManualInstallCheckComponent implements OnInit {
         if (!services.find(key => key === dependency) && !discoveredService.find(service => service.servicename === dependency)) {
           this.failedServices.push(dependency);
           installSuccessful = false;
+        } else {
+          this.successfulServices.push(dependency);
         }
       });
       this.verificationComplete = true;

@@ -116,6 +116,7 @@
         "verifySmartSenseId": "Verify SmartSense ID",
         "verified": "VERIFIED",
         "lastUpdated": "Last Updated",
+        "serviceSummary": "SERVICE STATUS SUMMARY",
         "action": "Action",
         "installationSteps": "Steps for Installation:",
         "installationLink":"Installation Steps.",

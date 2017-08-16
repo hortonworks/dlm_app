@@ -22,10 +22,21 @@
     <div class="status-panel">
       <div class="spacer-15"></div>
       <div *ngIf="checkInProgress" class="hwx-desc">
-      <i class="fa fa-spinner fa-spin"></i><span>{{"pages.services.description.verifyingStatus"| translate}}</span>
+       <i class="fa fa-spinner fa-spin"></i><span>{{"pages.services.description.verifyingStatus"| translate}}</span>
+      </div>
+      <div *ngIf="!checkInProgress && verificationComplete">
+        <div class="hwx-subtitle">{{"pages.services.labels.serviceSummary" | translate}}</div>
+        <div class="spacer-15"></div>
+        <div class="success-list-item" *ngFor="let service of successfulServices">
+          <i class="fa fa-check-circle"></i>{{service}}
+        </div>
+        <div class="error-list-item" *ngFor="let service of failedServices">
+          <i class="fa fa-times-circle"></i>{{service}}
+        </div>
+        <div class="spacer-15"></div>
       </div>
       <div *ngIf="!checkInProgress && verificationComplete && installSuccessful" class="hwx-subtitle success">
-        <i class="fa fa-check-circle"></i> <span>{{"pages.services.labels.verified" | translate}}</span>
+        <span><i class="fa fa-check-circle"></i> {{"pages.services.labels.verified" | translate}}</span>
         <div class="status-desc">{{"pages.services.description.successStatus"| translate}}</div>
       </div>
       <div *ngIf="verificationComplete && installSuccessful === false" class="hwx-subtitle error">
