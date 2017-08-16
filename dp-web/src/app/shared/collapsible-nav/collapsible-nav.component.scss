@@ -28,7 +28,15 @@
 
   .persona-name {
     text-transform: uppercase;
-    font-size: 15px;
+    font-size: 14px;
+    padding: 16px 0;
+    display: block;
+    width: 152px;
+    height: 60px;
+    word-wrap: break-word;
+    white-space: normal !important;
+    line-height: 1.2;
+    margin-left: 35px;
 
     &:after {
       font-family: "FontAwesome";

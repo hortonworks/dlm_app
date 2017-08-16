@@ -40,9 +40,8 @@
       "rowsPerPage": "Rows per page"
     },
     "roles": {
-      "SUPERADMIN": "Admin",
-      "INFRAADMIN": "Cluster Admin",
-      "USER": "Consumer",
+      "SUPERADMIN": "Dataplane Admin",
+      "INFRAADMIN": "Infra Admin",
       "CURATOR": "Data Steward"
     },
     "signout": "Sign Out",
