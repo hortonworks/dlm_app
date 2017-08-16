@@ -2,7 +2,6 @@ import {Component, ElementRef, ViewChild, OnInit, AfterViewChecked, HostListener
 import {Router, ActivatedRoute} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {Observable} from 'rxjs/Observable';
-import {Subject} from 'rxjs/Subject';
 
 import {Cluster} from '../../../../models/cluster';
 import {Lake} from '../../../../models/lake';
@@ -36,7 +35,7 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
   dcName: string;
   lake: Lake;
   location: Location;
-  rxReady: Subject<any> = new Subject();
+  isDOMReady: boolean = false;
 
   showNotification = false;
   showError = false;
@@ -67,13 +66,19 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
       // .forkJoin(rxLocation, this.rxReady, location => location)
       .subscribe(location => {
         this.location = location;
-        // this.onSelectLocation(location);
-        setTimeout(() => this.onSelectLocation(location), 500);
+        this.updateMap();
       });
   }
 
   ngAfterViewChecked() {
-    this.rxReady.next(undefined);
+    this.isDOMReady = true;
+    this.updateMap();
+  }
+
+  updateMap() {
+    if(this.isDOMReady && this.location) {
+      this.onSelectLocation(this.location);
+    }
   }
 
   closeError() {
