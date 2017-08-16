@@ -6,6 +6,7 @@ import {NguiAutoCompleteModule} from '@ngui/auto-complete';
 import {routes} from './infra.routes';
 import {LakesComponent} from './views/lakes/lakes.component';
 import {ClusterAddComponent} from './views/cluster-add/cluster-add.component';
+import {ClusterEditComponent} from './views/cluster-edit/cluster-edit.component';
 import {LakeStatsComponent} from './widgets/lake-stats/lake-stats.component';
 import {LakesListComponent} from './widgets/lakes-list/lakes-list.component';
 import {MapComponent} from './widgets/map/map.component';
@@ -44,6 +45,7 @@ import { ManualInstallCheckComponent } from './views/service-management/manual-i
   declarations: [
     LakesComponent,
     ClusterAddComponent,
+    ClusterEditComponent,
     LakeStatsComponent,
     LakesListComponent,
     ClusterDetailsComponent,

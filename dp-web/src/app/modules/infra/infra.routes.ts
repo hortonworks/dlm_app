@@ -2,6 +2,7 @@ import {Routes} from '@angular/router';
 
 import {LakesComponent} from './views/lakes/lakes.component';
 import {ClusterAddComponent} from './views/cluster-add/cluster-add.component';
+import {ClusterEditComponent} from './views/cluster-edit/cluster-edit.component';
 import {ClusterDetailsComponent} from './views/cluster-details/cluster-details.component';
 import {AddUserComponent} from './views/user-management/add-user/add-user.component';
 import {AddGroupComponent} from './views/user-management/add-group/add-group.component';
@@ -27,6 +28,7 @@ export const routes: Routes = [
     {path: '', redirectTo: 'clusters'},
     {path: 'clusters', component: LakesComponent},
     {path: 'add', component: ClusterAddComponent},
+    {path: 'edit/:id', component: ClusterEditComponent},
     {path: 'cluster/details/:id', component: ClusterDetailsComponent},
     {path: 'services', component: ServiceManagementComponent},
     {path: 'services/verify/:name', component: VerificationComponent},

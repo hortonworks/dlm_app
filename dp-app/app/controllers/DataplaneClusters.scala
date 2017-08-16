@@ -7,7 +7,7 @@ import com.hortonworks.dataplane.commons.domain.Ambari.AmbariEndpoint
 import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, DataplaneClusterIdentifier, HJwtToken}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.DpClusterService
-import models.JsonResponses
+import models.{JsonResponses, WrappedErrorsException}
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -62,10 +62,10 @@ class DataplaneClusters @Inject()(
 
   }
 
-  def retrieve(clusterId: String) = authenticated.async {
+  def retrieve(clusterId: Long) = authenticated.async {
     Logger.info("Received retrieve data centre request")
     dpClusterService
-      .retrieve(clusterId)
+      .retrieve(clusterId.toString)
       .map {
         case Left(errors) =>
           InternalServerError(
@@ -86,19 +86,27 @@ class DataplaneClusters @Inject()(
       }
   }
 
-  def update(clusterId: String) = authenticated.async(parse.json) { request =>
+  def update = authenticated.async(parse.json) { request =>
     Logger.info("Received update data centre request")
     request.body
       .validate[DataplaneCluster]
       .map { lake =>
-        dpClusterService
-          .update(clusterId, lake)
-          .map {
-            case Left(errors) =>
-              InternalServerError(JsonResponses.statusError(
-                s"Failed with ${Json.toJson(errors)}"))
-            case Right(dataplaneCluster) => Ok(Json.toJson(dataplaneCluster))
-          }
+        (for {
+          cluster <- retrieveClusterById(lake.id.get)
+          newCluster <- Future.successful(cluster.copy(
+            id = lake.id,
+            dcName = lake.dcName,
+            description = lake.description,
+            location= lake.location,
+            properties = lake.properties
+          ))
+          updated <- updateClusterById(lake.id.get, newCluster)
+        } yield {
+          Ok(Json.toJson(updated))
+        })
+        .recover{
+          case ex: WrappedErrorsException => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(ex.errors)}"))
+        }
       }
       .getOrElse(Future.successful(BadRequest))
   }
@@ -137,6 +145,22 @@ class DataplaneClusters @Inject()(
             res
           }
       }
+  }
+
+  private def retrieveClusterById(clusterId: Long): Future[DataplaneCluster] = {
+    dpClusterService.retrieve(clusterId.toString)
+        .flatMap {
+          case Left(errors) => Future.failed(WrappedErrorsException(errors))
+          case Right(cluster) => Future.successful(cluster)
+        }
+  }
+
+  private def updateClusterById(clusterId: Long, cluster: DataplaneCluster): Future[DataplaneCluster] = {
+    dpClusterService.update(cluster)
+        .flatMap {
+          case Left(errors) => Future.failed(WrappedErrorsException(errors))
+          case Right(cluster) => Future.successful(cluster)
+        }
   }
 
 }

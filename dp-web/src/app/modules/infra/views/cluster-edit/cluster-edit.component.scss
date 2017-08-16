@@ -1,0 +1,132 @@
+@import "../../../../../styles/variables";
+
+input[type="text"].dp-input-url {
+  width: 550px;
+  &:focus {
+    border-color: $iron;
+  }
+}
+
+input[type="text"].dp-input {
+  width: 350px;
+}
+
+.cluster-details {
+  margin-top: 10px;
+  background-color: $iron-gray;
+  padding: 30px;
+
+  .services {
+    margin: 10px 0 0;
+    & .fa-check-circle {
+      color: $forest-green-1;
+      margin-right: 10px;
+    }
+  }
+}
+
+.mdl-grid {
+  background-color: $white;
+  .datalake-input {
+    padding: 20px 30px;
+  }
+
+  textarea {
+    width: 350px;
+  }
+}
+
+:host /deep/ .ngui-auto-complete-wrapper input {
+  width: 350px;
+}
+
+:host /deep/ .taggingWidget {
+  width: 348px !important;
+  min-height: 32px !important;
+  border-radius: 2px !important;
+  input {
+    font-size: 12px !important;
+  }
+}
+
+.error-section {
+  .fa-times-circle {
+    font-size: 20px;
+    display: inline-block;
+    float: left;
+    color: $roman-red;
+  }
+  div {
+    padding-left: 27px;
+    padding-top: 3px;
+  }
+  .text-medium {
+    margin-top: 0;
+    color: $roman-red;
+  }
+
+  .text-small-1 {
+    color: $roman-red;
+    margin: 6px 0;
+  }
+  .text-small-2 {
+    color: $roman-red;
+  }
+  ul {
+    padding-left: 20px;
+  }
+  li {
+    color: $roman-red;
+    font-size: 12px;
+  }
+}
+
+.validation-error {
+  input {
+    color: $roman-red;
+    border: 1px solid $roman-red;
+    outline: none;
+  }
+  button {
+    background-color: $roman-red;
+    border-color: $roman-red;
+  }
+
+}
+
+.notification-bar {
+  padding: 15px;
+  background: $concrete;
+  height: 34px;
+  margin-bottom: 20px;
+  .fa-check-circle {
+    font-size: 24px;
+  }
+  .fa-remove {
+    color: $dusty-gray;
+    cursor: pointer;
+  }
+  .text-medium {
+    font-weight: 500;
+    color: $forest-green-1;
+  }
+}
+
+.error-notification-bar {
+  padding: 15px;
+  background: $concrete;
+  height: 34px;
+  margin-bottom: 20px;
+  .fa-times-circle {
+    font-size: 24px;
+    color: $roman-red;
+  }
+  .fa-remove {
+    color: $dusty-gray;
+    cursor: pointer;
+  }
+  .text-medium {
+    font-weight: 500;
+    color: $roman-red;
+  }
+}
