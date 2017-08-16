@@ -65,7 +65,7 @@ class DataplaneClusters @Inject()(
   def retrieve(clusterId: Long) = authenticated.async {
     Logger.info("Received retrieve data centre request")
     dpClusterService
-      .retrieve(clusterId)
+      .retrieve(clusterId.toString)
       .map {
         case Left(errors) =>
           InternalServerError(
@@ -148,7 +148,7 @@ class DataplaneClusters @Inject()(
   }
 
   private def retrieveClusterById(clusterId: Long): Future[DataplaneCluster] = {
-    dpClusterService.retrieve(clusterId)
+    dpClusterService.retrieve(clusterId.toString)
         .flatMap {
           case Left(errors) => Future.failed(WrappedErrorsException(errors))
           case Right(cluster) => Future.successful(cluster)

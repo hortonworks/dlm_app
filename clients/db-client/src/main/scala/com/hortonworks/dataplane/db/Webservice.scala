@@ -142,7 +142,7 @@ object Webservice {
 
     def create(dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]]
 
-    def retrieve(dpClusterId: Long): Future[Either[Errors, DataplaneCluster]]
+    def retrieve(dpClusterId: String): Future[Either[Errors, DataplaneCluster]]
 
     def retrieveServiceInfo(dpClusterId: String): Future[Either[Errors, Seq[ClusterData]]]
 
