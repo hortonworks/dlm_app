@@ -26,8 +26,12 @@
     "pairs": "Pairs",
     "policy": "Policy",
     "name": "Name",
+    "queue_name": "Queue Name",
+    "max_bandwidth": "Maximum Bandwidth",
     "job": "Job",
     "jobs": "Jobs",
+    "start_time": "Start Time",
+    "end_time": "End Time",
     "clusters": "Clusters",
     "cluster": "Cluster",
     "service": "Service",
@@ -49,6 +53,7 @@
       "weeks": "Week(s)"
     },
     "frequency": {
+      "self": "Frequency",
       "yearly": {
         "plural": "Every {{num}}y",
         "singular": "Every year"
