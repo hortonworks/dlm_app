@@ -24,7 +24,7 @@ object Entities {
 
   case class Errors(errors: Seq[Error] = Seq()) {
     def combine(newErrors: Errors) = Errors(errors ++ newErrors.errors)
-    def firstMessage = errors.headOption.map(_.code).getOrElse("Generic Error")
+    def firstMessage = errors.headOption.map(_.code).getOrElse("Unknown Error")
   }
 
   // Pagination
