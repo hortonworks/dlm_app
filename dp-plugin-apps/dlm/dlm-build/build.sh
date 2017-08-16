@@ -57,7 +57,8 @@ build_dlm_web() {
 	log "Building dlm-web"
 	pushd ../dlm-web
 	if [ ${IS_JENKINS} == false ]; then
-		mvn clean test -DskipTests
+		yarn
+		npm run build
 	else
 		echo "Not running dlm-web build again"
 	fi
