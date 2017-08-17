@@ -24,11 +24,12 @@ export class ManualInstallCheckComponent implements OnInit {
   verificationComplete = false;
   installSuccessful = true;
   verificationChecked = false;
-  description: string;
-  installationConfirmation: string;
+  descriptionParams: any;
+  clusterNameParams: any;
   failedServices: string[] = [];
   successfulServices: string[] = [];
   dependentServices: string[] = [];
+  discoveredServices: any[] = [];
 
   constructor(private router: Router,
               private route: ActivatedRoute,
@@ -46,18 +47,28 @@ export class ManualInstallCheckComponent implements OnInit {
       Observable.forkJoin(
         this.clusterService.listByLakeId({lakeId: this.dpClusterId}),
         this.addOnAppService.getServiceByName(this.service),
-        this.addOnAppService.getServiceDependencies(this.service)
+        this.addOnAppService.getServiceDependencies(this.service),
+        this.lakeService.getDiscoveredServices(this.dpClusterId)
       ).subscribe(responses => {
         let cluster: Cluster = responses[0][0];
         let sku = responses[1];
-        this.description = this.translateService.instant('pages.services.description.manualInstall', {
+        this.descriptionParams = {
           serviceName: `${sku.description}`,
           clusterName: cluster.name
-        });
-        this.installationConfirmation = this.translateService.instant('pages.services.description.installationConfirmation', {
+        };
+        this.clusterNameParams = {
           clusterName: cluster.name
-        });
+        }
+        let services = Object.keys(cluster.properties.desired_service_config_versions);
         this.dependentServices = responses[2].dependencies;
+        this.discoveredServices = responses[3];
+        this.dependentServices.forEach(dependency => {
+          if (!services.find(key => key === dependency) && !this.discoveredServices.find(service => service.servicename === dependency)) {
+            this.failedServices.push(dependency);
+          } else {
+            this.successfulServices.push(dependency);
+          }
+        });
       });
 
     });

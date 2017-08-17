@@ -12,6 +12,7 @@
           <span class="hwx-inline-desc">{{"pages.services.labels.smartSenseId" | translate}} - </span>
           <span class="hwx-desc smart-sense">{{enabledApp.service.enabledSku.smartSenseId}}</span>
           <span class="hwx-desc action pull-right"><i class="fa fa-chevron-down"></i></span>
+          <span *ngIf="enabledApp.isOpen" (click)="getClusters(enabledApp)" class="hwx-desc action pull-right"><i class="fa fa-refresh"></i></span>
         </div>
         <div *ngIf="enabledApp.isOpen" class="inner-list">
           <div class="pull-right">
@@ -24,24 +25,21 @@
                 <dp-config-sorter [sortBy]="'name'">  {{"common.clusters" | translate}} </dp-config-sorter>
               </th>
               <th class="mdl-data-table__cell--non-numeric">
-                <dp-config-sorter [sortBy]="'name'">  {{"pages.services.labels.lastUpdated" | translate}} </dp-config-sorter>
-              </th>
-              <th class="mdl-data-table__cell--non-numeric">
                 <dp-config-sorter [sortBy]="'name'">  {{"pages.services.labels.action" | translate}} </dp-config-sorter>
               </th>
-              <th class="mdl-data-table__cell--non-numeric"></th>
             </thead>
             <tbody>
               <ng-container *ngFor="let cluster of enabledApp.clustersInfo">
                 <tr *ngIf="!cluster.dependenciesMet || enabledApp.showAll">
-                  <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable"><i *ngIf="cluster.syncInProgress" class="fa fa-spinner fa-spin"></i></td>
+                  <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable status-col">
+                    <i *ngIf="cluster.syncInProgress" class="fa fa-spinner fa-spin"></i>
+                    <i *ngIf="cluster.synced === false" title="{{'pages.services.labels.syncFailed' | translate}}" class="fa fa-exclamation-triangle"></i>
+                  </td>
                   <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{cluster.name}}</td>
-                  <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{cluster.lastUpdated}}</td>
                   <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">
                     <button *ngIf="!cluster.dependenciesMet" id="enable-service-{{cluster.dpClusterId}}" class="mdl-button btn-hwx-primary enable-btn" (click)="enableServiceOnCluster(cluster.dpClusterId, enabledApp.service)"> Enable</button>
-                    <span *ngIf="cluster.dependenciesMet">Enabled</span>
+                    <span *ngIf="cluster.dependenciesMet">{{"pages.services.labels.enabled" | translate}}</span>
                   </td>
-                  <td><i class="fa fa-refresh"></i></td>
                 </tr>
               </ng-container>
             </tbody>
