@@ -15,7 +15,7 @@ RUN chmod +x /usr/dp-knox-agent/bin/knox-agent
 ADD knox-scripts/knox-consul.config /consul-config/
 RUN mkdir -p /knox/consul/data
 RUN chmod a+w /knox/consul/data
-VOLUME ["/knox/consul/data"]
+RUN chmod -R a+w /etc/knox/conf
 
 ADD knox-scripts/setup-master-password.sh /usr/hdp/current/knox-server/bin/
 RUN chown -R knox /usr/hdp/current/knox-server/bin/setup-master-password.sh
@@ -37,6 +37,7 @@ RUN wget ${HASHICORP_RELEASES}/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}
         unzip -d /bin consul_${CONSUL_VERSION}_linux_amd64.zip
 
 
+VOLUME ["/knox/consul/data", "/etc/knox/conf"]
 EXPOSE 8300 8301 8301/udp 8302 8302/udp 8400 8500 53/udp
 ENV sso.toplology.path=/usr/hdp/current/knox-server/conf/topologies/knoxsso.xml
 USER knox

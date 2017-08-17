@@ -20,6 +20,6 @@ docker start knox >> install.log 2>&1 || \
         --env "MASTER_PASSWORD=$MASTER_PASSWORD" \
         --env "USE_TEST_LDAP=$USE_TEST_LDAP" \
         --env "CONSUL_HOST=$CONSUL_HOST" \
-        --volume $(pwd)/knox-config:/etc/knox/conf \
+        --volume knox-config:/etc/knox/conf \
         hortonworks/dp-knox:$VERSION \
         sh ./launch-knox.sh
