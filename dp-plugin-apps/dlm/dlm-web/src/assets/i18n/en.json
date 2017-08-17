@@ -194,7 +194,8 @@
       "integerValidator": "\"{{fieldLabel}}\" should be a positive integer",
       "time_less_than_current": "Start time must be later than the current time in the selected timezone.",
       "not_directory": "\"{{fieldLabel}}\" should be a path to directory",
-      "not_exist_directory": "Either the path does not exist or you don't have permissions on the path"
+      "not_exist_directory": "Either the path does not exist or you don't have permissions on the path",
+      "namePattern": "\"Policy Name\" should contain only letters, digits, spaces, hyphens '-', and underscores '_'."
     }
   },
   "page": {

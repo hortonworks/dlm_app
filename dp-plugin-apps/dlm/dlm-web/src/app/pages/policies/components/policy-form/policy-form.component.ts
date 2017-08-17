@@ -67,6 +67,19 @@ export function integerValidator(): ValidatorFn {
   };
 }
 
+export function nameValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors => {
+    const {value} = control;
+    if (!value) {
+      return null;
+    }
+    if (!value.trim() || !/^[A-Za-z0-9 _\-]*$/.test(value)) {
+      return {'nameValidator': {name: value}};
+    }
+    return null;
+  };
+}
+
 export function pathValidator(hdfsService): AsyncValidatorFn {
   let validationRequestTimeout;
   return (control: AbstractControl): Promise<ValidationErrors> => {
@@ -311,7 +324,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       .map(([searchPattern, databases]) => databases.filter(db => simpleSearch(db.name, searchPattern)));
     this.policyForm = this.formBuilder.group({
       general: this.formBuilder.group({
-        name: ['', Validators.compose([Validators.required, Validators.maxLength(64)])],
+        name: ['', Validators.compose([Validators.required, Validators.maxLength(64), nameValidator()])],
         description: ['', Validators.maxLength(512)],
         type: [this.selectedPolicyType],
         sourceCluster: ['', Validators.required],
