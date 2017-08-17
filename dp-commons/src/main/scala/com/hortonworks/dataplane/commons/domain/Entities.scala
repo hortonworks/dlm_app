@@ -219,6 +219,9 @@ object Entities {
                  status: Option[Short] = Some(0),
                  created: Option[LocalDateTime] = Some(LocalDateTime.now()),
                  updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+
+  case class ServiceDependency(serviceName: String, dependencies: Seq[String])
+
   case class DpService(skuName:String,
                        enabled:Boolean,
                        sku: Sku,
@@ -497,5 +500,8 @@ object JsonFormatters {
 
   implicit val dpServiceEnableConfigWrites= Json.writes[DpServiceEnableConfig]
   implicit val dpServiceEnableConfigReads= Json.reads[DpServiceEnableConfig]
+
+  implicit val serviceDependencyWrites = Json.writes[ServiceDependency]
+  implicit val serviceDependencyReads = Json.reads[ServiceDependency]
 
 }

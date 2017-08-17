@@ -125,3 +125,4 @@ GET           /api/services/byName                           controllers.Service
 GET           /api/services/enabled                          controllers.ServicesManager.getEnabledServices
 POST          /api/services/verifyCode                       controllers.ServicesManager.verifySmartSense
 POST          /api/services/enable                           controllers.ServicesManager.enableService
+GET           /api/services/:name/dependencies               controllers.ServicesManager.getDependentServices(name: String)

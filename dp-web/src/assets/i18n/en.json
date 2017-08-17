@@ -45,6 +45,9 @@
       "INFRAADMIN": "Infra Admin",
       "CURATOR": "Data Steward"
     },
+    "serviceNameMappings" : {
+      "BEACON": "Data Lifecycle Manager Engine"
+    },
     "signout": "Sign Out",
     "unauthorized": "Unauthorized",
     "unauthorizedMessage": "You are not authorized to view this page.",
@@ -116,18 +119,20 @@
         "verifySmartSenseId": "Verify SmartSense ID",
         "verified": "VERIFIED",
         "lastUpdated": "Last Updated",
+        "serviceSummary": "SERVICE STATUS SUMMARY",
         "action": "Action",
         "installationSteps": "Steps for Installation:",
         "installationLink":"Installation Steps.",
         "installationStepsDoc":"https://docs.hortonworks.com/",
-        "dependentServicesLabel":"DEPENDENT SERVICES:"
+        "dependentServicesLabel":"DEPENDENT SERVICES:",
+        "syncFailed":"Cluster Information could not be fetched"
       },
       "description": {
         "verificationWelcome": "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your SmartSense ID.",
-        "manualInstall" : "Service {{serviceName}} is not enabled on cluster {{clusterName}} as one or more of the dependent services have not been enabled. Please enable the dependent services on the cluster using the documentation link. After all the dependent services are installed on the cluster, please click on the verification check box.",
+        "manualInstall" : "Service <b>{{serviceName}}</b> is not enabled on cluster <b>{{clusterName}}</b> as one or more of the dependent services have not been enabled. Please enable the dependent services on the cluster using the documentation link. After all the dependent services are installed on the cluster, please click on the verification check box.",
         "enableError": "Service could not be enabled.",
         "verificationError": "Incorrect SmartSense ID format",
-        "installationConfirmation":"All the dependent services have been installed on cluster {{clusterName}}.",
+        "installationConfirmation":"All the dependent services have been installed on cluster <b>{{clusterName}}.</b>",
         "installationLink": "For detailed steps on the installation process, please visit ",
         "verifyingStatus": "Verifying dependent services status on the cluster...",
         "successStatus":"All the service dependencies are met. Please click Next to continue",

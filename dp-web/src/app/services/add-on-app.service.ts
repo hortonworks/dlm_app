@@ -3,7 +3,7 @@ import {Http, RequestOptions} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 
 import {HttpUtil} from '../shared/utils/httpUtil';
-import {AddOnAppInfo, ConfigPayload, EnabledAppInfo, SKU} from '../models/add-on-app';
+import {AddOnAppInfo, AppDependency, ConfigPayload, EnabledAppInfo, SKU} from '../models/add-on-app';
 
 @Injectable()
 export class AddOnAppService {
@@ -17,8 +17,14 @@ export class AddOnAppService {
     this.dependenciesMap.set('dss', ['ATLAS', 'RANGER'])
   }
 
-  getServiceDependencies(appName) {
-    return this.dependenciesMap.get(appName);
+  getServiceDependencies(appName): Observable<AppDependency> {
+    return this.http
+      .get(`${this.uri}/${appName}/dependencies`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .do(a => {
+        console.log(a);
+      })
+      .catch(HttpUtil.handleError);
   }
 
   getAllServices(): Observable<AddOnAppInfo[]> {
