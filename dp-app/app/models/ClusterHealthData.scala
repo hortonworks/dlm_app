@@ -4,7 +4,8 @@ import com.hortonworks.dataplane.commons.domain.Ambari.{ClusterHost, NameNodeInf
 import play.api.libs.json.Json
 
 case class ClusterHealthData(nameNodeInfo: Option[NameNodeInfo],
-                             hosts: Seq[ClusterHost] = Seq())
+                             hosts: Seq[ClusterHost] = Seq(),
+                             syncState: Option[String])
 
 object ClusterHealthData {
   implicit val clusterHealthDataWrites = Json.writes[ClusterHealthData]
