@@ -6,6 +6,7 @@ import {NguiAutoCompleteModule} from '@ngui/auto-complete';
 import {routes} from './infra.routes';
 import {LakesComponent} from './views/lakes/lakes.component';
 import {ClusterAddComponent} from './views/cluster-add/cluster-add.component';
+import {ClusterEditComponent} from './views/cluster-edit/cluster-edit.component';
 import {LakeStatsComponent} from './widgets/lake-stats/lake-stats.component';
 import {LakesListComponent} from './widgets/lakes-list/lakes-list.component';
 import {MapComponent} from './widgets/map/map.component';
@@ -25,6 +26,7 @@ import {ConfigDialogComponent} from './widgets/config-dialog/config-dialog.compo
 import {ServiceManagementComponent} from './views/service-management/service-management.component';
 import {VerificationComponent} from './views/service-management/verification/verification.component';
 import {TabsModule} from '../../shared/tabs/tabs.module';
+import { ManualInstallCheckComponent } from './views/service-management/manual-install-check/manual-install-check.component';
 
 @NgModule({
   imports: [
@@ -43,6 +45,7 @@ import {TabsModule} from '../../shared/tabs/tabs.module';
   declarations: [
     LakesComponent,
     ClusterAddComponent,
+    ClusterEditComponent,
     LakeStatsComponent,
     LakesListComponent,
     ClusterDetailsComponent,
@@ -54,7 +57,8 @@ import {TabsModule} from '../../shared/tabs/tabs.module';
     AddGroupComponent,
     ConfigDialogComponent,
     ServiceManagementComponent,
-    VerificationComponent
+    VerificationComponent,
+    ManualInstallCheckComponent
   ]
 })
 export class InfraModule {

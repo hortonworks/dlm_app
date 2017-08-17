@@ -13,7 +13,7 @@ import { Component, OnInit, Input } from '@angular/core';
   selector: 'dlm-cluster-legend',
   template: `
     <div class="map-legend-header">
-      <span class="text-muted">{{cluster.name}}</span>
+      <span>{{cluster.name}}</span>
       <dlm-cluster-status-icon [cluster]="cluster" class="pull-right"></dlm-cluster-status-icon>
       <div class="clearfix"></div>
     </div>
@@ -28,7 +28,7 @@ import { Component, OnInit, Input } from '@angular/core';
       <dl class="fix-alerts">
         <dt>{{'page.overview.world_map.cluster_legend.manage_ambari' | translate}}</dt>
         <dd>
-          <a [href]="cluster.ambariurl" target="_blank">
+          <a [href]="cluster.ambariWebUrl" target="_blank">
             {{'page.overview.world_map.cluster_legend.launch_ambari' | translate}}
           </a>
         </dd>

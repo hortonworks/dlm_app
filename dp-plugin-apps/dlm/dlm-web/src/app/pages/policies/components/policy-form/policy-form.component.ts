@@ -9,7 +9,10 @@
 
 import { Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter,
   HostBinding, SimpleChanges, OnDestroy, OnChanges, ChangeDetectionStrategy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
+import {
+  FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl, AsyncValidatorFn,
+  ValidationErrors
+} from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { go } from '@ngrx/router-store';
 import { IMyOptions, IMyDateModel } from 'mydatepicker';
@@ -35,11 +38,13 @@ import { SelectOption } from 'components/forms/select-field';
 import { TimeZoneService } from 'services/time-zone.service';
 import { isEmpty } from 'utils/object-utils';
 import * as moment from 'moment';
+import { FILE_TYPES } from 'constants/hdfs.constant';
+import { HdfsService } from 'services/hdfs.service';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 
 export function freqValidator(frequencyMap): ValidatorFn {
-  return (control: AbstractControl): {[key: string]: any} => {
+  return (control: AbstractControl): ValidationErrors => {
     const parent = control.parent;
     if (!parent) {
       return null;
@@ -52,13 +57,39 @@ export function freqValidator(frequencyMap): ValidatorFn {
 }
 
 export function integerValidator(): ValidatorFn {
-  return (control: AbstractControl): {[key: string]: any} => {
+  return (control: AbstractControl): ValidationErrors => {
     const {value} = control;
     if (!value) {
       return null;
     }
     const n = Math.floor(Number(control.value));
     return String(n) === value && n > 0 ? null : {'integerValidator': {name: control.value}};
+  };
+}
+
+export function pathValidator(hdfsService): AsyncValidatorFn {
+  let validationRequestTimeout;
+  return (control: AbstractControl): Promise<ValidationErrors> => {
+    if (validationRequestTimeout) {
+      clearTimeout(validationRequestTimeout);
+    }
+    return new Promise((resolve, reject) => {
+      validationRequestTimeout = setTimeout(() => {
+        if (!control.value) {
+          return resolve(null);
+        }
+        const clusterId = control.parent['controls']['general'].controls.sourceCluster.value;
+        return hdfsService.getFilesList(clusterId, control.value).toPromise()
+          .then(response => {
+            const files = response.FileStatuses.FileStatus;
+            if (files.length && files[0].type === FILE_TYPES.FILE && files[0].pathSuffix === '') {
+              return resolve({isFile: true});
+            }
+            return resolve(null);
+          })
+          .catch(_ => resolve({notExist: true}));
+      }, 500);
+    });
   };
 }
 
@@ -250,7 +281,8 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
               private timezone: TimeZoneService,
               private store: Store<State>,
               private timezoneService: TimeZoneService,
-              private t: TranslateService) { }
+              private t: TranslateService,
+              private hdfs: HdfsService) { }
 
   // todo: to Denys. This method looks quite scary. Things to improve:
   // - split code into self-descriptive methods
@@ -286,7 +318,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         destinationCluster: ['', Validators.required]
       }),
       databases: ['', Validators.required],
-      directories: ['', Validators.required],
+      directories: ['', Validators.compose([Validators.required]), pathValidator(this.hdfs)],
       job: this.formBuilder.group({
         repeatMode: this.policyRepeatModes.EVERY,
         frequency: ['', Validators.compose([Validators.required, freqValidator(this.frequencyMap), integerValidator()])],

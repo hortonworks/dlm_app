@@ -69,6 +69,9 @@ export class BreadCrumbComponent {
     } else if (url.startsWith('infra/add')) {
       this.crumbNamesToURLMap['Clusters'] = 'infra/clusters';
       this.crumbNamesToURLMap['Add'] = '';
+    } else if (url.startsWith('infra/edit')) {
+      this.crumbNamesToURLMap['Clusters'] = 'infra/clusters';
+      this.crumbNamesToURLMap['Edit'] = '';
     } else if (url.startsWith('infra/cluster/details')) {
       this.crumbNamesToURLMap['Clusters'] = 'infra/clusters';
       this.crumbNamesToURLMap['Details'] = '';

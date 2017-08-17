@@ -10,4 +10,8 @@ object API {
   val clusters = "/clusters"
   val datasets = "/datasets"
   val workspaces = "/workspaces"
+
+  case class EntityNotFound() extends Throwable
+  case class UpdateError() extends Throwable
+
 }

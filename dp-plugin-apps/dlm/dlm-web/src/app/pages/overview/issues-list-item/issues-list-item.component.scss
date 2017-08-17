@@ -38,15 +38,17 @@
     .description {
       color: #666;
       font-size: 13px;
+      .fa-file-text-o {
+        margin-left: 5px;
+      }
     }
     .timestamp {
       color: #999;
     }
   }
-
-  .description {
-    .fa-file-text-o {
-      margin-left: 5px;
+  .first-letter-capitalize {
+    &::first-letter {
+      text-transform: uppercase;
     }
   }
 }

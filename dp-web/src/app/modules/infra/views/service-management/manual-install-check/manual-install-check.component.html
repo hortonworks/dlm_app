@@ -1,0 +1,45 @@
+<div class="container">
+  <div class="title-pane">
+    <span class="hwx-title"> Manual Install</span>
+  </div>
+  <div class="page-content">
+    <div class="hwx-desc">{{description}}</div>
+    <div class="hwx-subtitle">
+      {{"pages.services.labels.dependentServicesLabel" | translate}}
+    </div>
+    <ul class="failure-list">
+      <li *ngFor="let service of dependentServices">{{service}}</li>
+    </ul>
+    <div class="spacer-15"></div>
+    <div class="hwx-subtitle">
+      {{"pages.services.labels.installationSteps" | translate}}
+      <div class="hwx-desc">{{"pages.services.description.installationLink"| translate}}
+        <a href="{{'pages.services.labels.installationStepsDoc'| translate}}">{{'pages.services.labels.installationLink'| translate}}</a>
+      </div>
+    </div>
+    <div class="spacer-15"></div>
+    <input type="checkbox" class="margin-0" name="verify-services" [(ngModel)]="verificationChecked" (change)="verify()"/> {{installationConfirmation}}
+    <div class="status-panel">
+      <div class="spacer-15"></div>
+      <div *ngIf="checkInProgress" class="hwx-desc">
+      <i class="fa fa-spinner fa-spin"></i><span>{{"pages.services.description.verifyingStatus"| translate}}</span>
+      </div>
+      <div *ngIf="!checkInProgress && verificationComplete && installSuccessful" class="hwx-subtitle success">
+        <i class="fa fa-check-circle"></i> <span>{{"pages.services.labels.verified" | translate}}</span>
+        <div class="status-desc">{{"pages.services.description.successStatus"| translate}}</div>
+      </div>
+      <div *ngIf="verificationComplete && installSuccessful === false" class="hwx-subtitle error">
+        <span><i class="fa fa-times-circle"></i> {{"common.failed" | translate}}</span>
+        <div class="status-desc">{{"pages.services.description.errorStatus"| translate}}</div>
+        <ul class="failure-list">
+          <li *ngFor="let service of failedServices">{{service}}</li>
+        </ul>
+      </div>
+    </div>
+    <div class="button-container">
+      <button *ngIf="!verificationComplete || !installSuccessful" disabled id="next-btn" class="btn btn-hwx-primary">{{"pages.services.labels.next" | translate}}</button>
+      <button *ngIf="verificationComplete && installSuccessful" id="next-btn" class="btn btn-hwx-primary" (click)="next()">{{"pages.services.labels.next" | translate}}</button>
+      <button id="cancel-btn" class="btn btn-hwx-default" (click)="cancel()">{{"common.cancel" | translate}}</button>
+    </div>
+  </div>
+</div>

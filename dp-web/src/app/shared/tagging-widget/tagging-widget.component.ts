@@ -1,4 +1,4 @@
-import {Component, ElementRef, EventEmitter, Input, Output, SimpleChange, ViewChild, AfterViewInit} from "@angular/core";
+import {Component, ElementRef, EventEmitter, Input, Output, SimpleChange, ViewChild, AfterViewInit} from '@angular/core';
 
 export class TaggingWidgetTagModel {
   constructor(public display: string, public data?: any) {
@@ -6,31 +6,33 @@ export class TaggingWidgetTagModel {
 }
 
 @Component({
-  selector: "tagging-widget",
-  styleUrls: ["./tagging-widget.component.scss"],
-  templateUrl: "./tagging-widget.component.html",
+  selector: 'tagging-widget',
+  styleUrls: ['./tagging-widget.component.scss'],
+  templateUrl: './tagging-widget.component.html',
 })
-export class TaggingWidget implements AfterViewInit{
+export class TaggingWidget implements AfterViewInit {
   @Input() tags: Array<string | TaggingWidgetTagModel> = [];
   @Input() availableTags: Array<string | TaggingWidgetTagModel> = [];
   @Input() allowTagDismissal: boolean = true;
   @Input() clearOnSearch: boolean = false;
-  @Input() searchText: string = "";
-  @Input() placeHolderText: string = "";
-  @Input() theme: TagTheme  = TagTheme.LIGHT;
+  @Input() searchText: string = '';
+  @Input() placeHolderText: string = '';
+  @Input() theme: TagTheme = TagTheme.LIGHT;
   @Input() restrictFreeText = false;
 
-  @Output("textChange") searchTextEmitter = new EventEmitter<string>();
-  @Output("onNewSearch") newTagEmitter = new EventEmitter<string | TaggingWidgetTagModel>();
-  @Output("onTagDelete") deleteTagEmitter = new EventEmitter<string | TaggingWidgetTagModel>();
+  @Output('textChange') searchTextEmitter = new EventEmitter<string>();
+  @Output('onNewSearch') newTagEmitter = new EventEmitter<string | TaggingWidgetTagModel>();
+  @Output('onTagDelete') deleteTagEmitter = new EventEmitter<string | TaggingWidgetTagModel>();
 
-  @ViewChild("parent") parent: ElementRef;
+  @ViewChild('parent') parent: ElementRef;
+
+  isValid = true;
 
   focusRowIndex: number = -1;
   private focusStickerIndex: number = -1; // this.tags.length;
 
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
-    if(changes["availableTags"]) {
+    if (changes['availableTags']) {
       this.focusRowIndex = -1;
     }
   }
@@ -38,6 +40,11 @@ export class TaggingWidget implements AfterViewInit{
   onSearchTextChange(newValue) {
     this.searchText = newValue;
     this.searchTextEmitter.emit(this.searchText);
+    if(newValue && newValue.length && this.restrictFreeText){
+      this.isValid = false;
+    }else{
+      this.isValid = true;
+    }
   }
 
   emitSearchText() {
@@ -45,14 +52,16 @@ export class TaggingWidget implements AfterViewInit{
   }
 
   ngAfterViewInit() {
-    if(this.theme as TagTheme === TagTheme.DARK as TagTheme){
+    if (this.theme as TagTheme === TagTheme.DARK as TagTheme) {
       let classes = this.parent.nativeElement.className;
       this.parent.nativeElement.className = `${classes} taggingWidget-dark`;
     }
   }
 
   onKeyDown(event) {
-    if ([13, 38, 40].indexOf(event.keyCode) === -1 && this.focusStickerIndex === this.tags.length && event.target.selectionStart) return;
+    if ([13, 38, 40].indexOf(event.keyCode) === -1 && this.focusStickerIndex === this.tags.length && event.target.selectionStart){
+      return;
+    }
     switch (event.keyCode) {
       case 8  :
       case 46 :
@@ -83,33 +92,33 @@ export class TaggingWidget implements AfterViewInit{
   }
 
   _SetCursorAtEnd() {
-    const input = this.parent.nativeElement.querySelector("span.inputSpan input");
+    const input = this.parent.nativeElement.querySelector('span.inputSpan input');
     input.value = input.value;
   }
 
   _manageSelection() {
     if (this.focusRowIndex > -1) {
       this.newTagEmitter.emit(this.availableTags[this.focusRowIndex]);
-      this.clearOnSearch && this.onSearchTextChange("");
+      this.clearOnSearch && this.onSearchTextChange('');
       this.focusStickerIndex++;
     } else if (this.searchText && this.focusStickerIndex === this.tags.length && !this.restrictFreeText) {
       this.newTagEmitter.emit(this.searchText);
-      this.clearOnSearch && this.onSearchTextChange("");
+      this.clearOnSearch && this.onSearchTextChange('');
       this.focusStickerIndex++;
     }
   }
 
-  onClick(){
-    this.parent.nativeElement.querySelector("span.inputSpan input").focus();
+  onClick() {
+    this.parent.nativeElement.querySelector('span.inputSpan input').focus();
   }
 
   _manageFocus() {
     if (this.focusStickerIndex < this.tags.length) {
-      this.parent.nativeElement.querySelector("span.tagSticker").focus();
+      this.parent.nativeElement.querySelector('span.tagSticker').focus();
       this.focusRowIndex = -1;
     }
     if (this.focusStickerIndex === this.tags.length) {
-      this.parent.nativeElement.querySelector("span.inputSpan input").focus();
+      this.parent.nativeElement.querySelector('span.inputSpan input').focus();
     }
   }
 
@@ -120,11 +129,11 @@ export class TaggingWidget implements AfterViewInit{
 
   onInputFocus() {
     this.focusStickerIndex = this.tags.length;
-    this.parent.nativeElement.classList.add("focus");
+    this.parent.nativeElement.classList.add('focus');
   }
 
   onInputBlur() {
-    setTimeout(() => this.parent.nativeElement.classList.remove("focus"), 300);
+    setTimeout(() => this.parent.nativeElement.classList.remove('focus'), 300);
     // this.parent.nativeElement.classList.remove('focus')
   }
 

@@ -10,7 +10,15 @@ export class AddOnAppService {
 
   uri = '/api/services';
 
+  private dependenciesMap = new Map();
+
   constructor(private http: Http) {
+    this.dependenciesMap.set('dlm', ['BEACON', 'HDFS', 'HIVE']);
+    this.dependenciesMap.set('dss', ['ATLAS', 'RANGER'])
+  }
+
+  getServiceDependencies(appName) {
+    return this.dependenciesMap.get(appName);
   }
 
   getAllServices(): Observable<AddOnAppInfo[]> {

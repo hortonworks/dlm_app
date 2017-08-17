@@ -22,12 +22,15 @@ import { TableComponent } from 'common/table/table.component';
 import { getLastOperationResponse } from 'selectors/operation.selector';
 import { OperationResponse } from 'models/operation-response.model';
 import { deletePolicy, resumePolicy, suspendPolicy } from 'actions/policy.action';
-import { abortJob } from 'actions/job.action';
+import { abortJob, rerunJob } from 'actions/job.action';
 import { StatusColumnComponent } from 'components/table-columns/status-column/status-column.component';
 import { Policy } from 'models/policy.model';
 import { LogService } from 'services/log.service';
-import { JOB_STATUS } from 'constants/status.constant';
+import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
 import { PolicyService } from 'services/policy.service';
+import { confirmNextAction } from 'actions/confirmation.action';
+import { contains } from 'utils/array-util';
+import { NOTIFICATION_TYPES, NOTIFICATION_CONTENT_TYPE } from 'constants/notification.constant';
 
 @Component({
   selector: 'dlm-jobs-overview-table',
@@ -35,14 +38,10 @@ import { PolicyService } from 'services/policy.service';
   styleUrls: ['./jobs-overview-table.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class JobsOverviewTableComponent extends JobsTableComponent implements OnInit, OnDestroy {
+export class JobsOverviewTableComponent extends JobsTableComponent implements OnInit {
   private selectedAction: ActionItemType;
-  private selectedForActionRow: any;
+  private selectedForActionRow: Policy;
   JOB_STATUS = JOB_STATUS;
-  showOperationResponseModal = false;
-  showActionConfirmationModal = false;
-  operationResponseSubscription: Subscription;
-  lastOperationResponse: OperationResponse = <OperationResponse>{};
 
   @ViewChild('clusterNameCellRef') clusterNameCellRef: TemplateRef<any>;
   @ViewChild('destinationIconCell') destinationIconCellRef: TemplateRef<any>;
@@ -76,10 +75,28 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
     return PolicyService.getDatacenterName(policyClusterName);
   }
 
+  private generateNotification() {
+    const actionName = this.selectedAction.name.toLowerCase();
+    return {
+      [NOTIFICATION_TYPES.SUCCESS]: {
+        title: this.t.instant(`common.action_notifications.${actionName}.success.title`),
+        body: this.t.instant(`common.action_notifications.${actionName}.success.body`, {
+          policyName: this.selectedForActionRow.name
+        })
+      },
+      [NOTIFICATION_TYPES.ERROR]: {
+        title: this.t.instant(`common.action_notifications.${actionName}.error.title`),
+        contentType: NOTIFICATION_CONTENT_TYPE.MODAL_LINK
+      },
+      levels: [NOTIFICATION_TYPES.SUCCESS, NOTIFICATION_TYPES.ERROR]
+    };
+  }
+
   ngOnInit() {
     const actionLabel = name => this.t.instant(`page.overview.table.actions.${name}`);
     this.rowActions = <ActionItemType[]>[
       {label: actionLabel('abort_job'), name: 'ABORT_JOB', enabledFor: 'RUNNING'},
+      {label: actionLabel('rerun_job'), name: 'RERUN_JOB', disableFn: this.isRerunDisabled.bind(this)},
       {label: actionLabel('delete_policy'), name: 'DELETE_POLICY', disabledFor: ''},
       {label: actionLabel('suspend_policy'), name: 'SUSPEND_POLICY', disabledFor: 'SUSPENDED'},
       {label: actionLabel('activate_policy'), name: 'ACTIVATE_POLICY', disabledFor: 'RUNNING'}
@@ -143,53 +160,21 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
     ];
   }
 
-  ngOnDestroy() {
-    if (this.operationResponseSubscription) {
-      this.operationResponseSubscription.unsubscribe();
-    }
-  }
-
   handleSelectedAction({row, action}) {
     this.selectedAction = action;
     this.selectedForActionRow = row;
-    this.showActionConfirmationModal = true;
-  }
-
-  onActionConfirmation() {
-    if (!this.operationResponseSubscription) {
-      this.subscribeToOperation();
+    const nextAction = {
+      DELETE_POLICY: deletePolicy,
+      SUSPEND_POLICY: suspendPolicy,
+      ACTIVATE_POLICY: resumePolicy,
+      ABORT_JOB: abortJob,
+      RERUN_JOB: rerunJob
+    }[this.selectedAction.name];
+    if (nextAction) {
+      this.store.dispatch(confirmNextAction(
+        nextAction(this.selectedForActionRow, { notification: this.generateNotification()})
+      ));
     }
-    switch (this.selectedAction.name) {
-      case 'ABORT_JOB':
-        return this.store.dispatch(abortJob(this.selectedForActionRow));
-      case 'DELETE_POLICY':
-        return this.store.dispatch(deletePolicy(this.selectedForActionRow));
-      case 'SUSPEND_POLICY':
-        return this.store.dispatch(suspendPolicy(this.selectedForActionRow));
-      case 'ACTIVATE_POLICY':
-        return this.store.dispatch(resumePolicy(this.selectedForActionRow));
-    }
-  }
-
-  /**
-   * Subscription to the last operation result should be done only some operation initiated
-   * It SHOULD NOT be added in the constructor or ngOnInit
-   */
-  subscribeToOperation() {
-    this.operationResponseSubscription = this.store.select(getLastOperationResponse).subscribe(op => {
-      if (op && op.status) {
-        this.showOperationResponseModal = true;
-        this.lastOperationResponse = op;
-      }
-    });
-  }
-
-  onCloseActionConfirmationModal() {
-    this.showActionConfirmationModal = false;
-  }
-
-  onCloseOperationResponseModal() {
-    this.showOperationResponseModal = false;
   }
 
   goToPolicy(policy: Policy) {
@@ -202,5 +187,9 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
 
   isHDFS(serviceName): boolean {
     return serviceName.toLowerCase() === 'hdfs';
+  }
+
+  isRerunDisabled(policy: Policy, action): boolean {
+    return this.cannotRerun(policy, policy.lastJobResource);
   }
 }

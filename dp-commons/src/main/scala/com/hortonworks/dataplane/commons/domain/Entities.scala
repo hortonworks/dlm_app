@@ -11,12 +11,20 @@ import play.api.libs.json.{JsValue, Json, Reads, Writes}
   */
 object Entities {
 
+  import scala.reflect.runtime.universe._
+
+  // Routine to get field names for a class
+  def fieldsNames[T: TypeTag]: Set[String] = typeOf[T].members.collect {
+    case m: MethodSymbol if m.isCaseAccessor => m.fullName
+  }.toSet
+
   case class HJwtToken(token: String)
 
   case class Error(code: String, message: String)
 
   case class Errors(errors: Seq[Error] = Seq()) {
     def combine(newErrors: Errors) = Errors(errors ++ newErrors.errors)
+    def firstMessage = errors.headOption.map(_.code).getOrElse("Unknown Error")
   }
 
   // Pagination

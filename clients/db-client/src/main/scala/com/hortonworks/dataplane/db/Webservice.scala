@@ -1,11 +1,10 @@
 package com.hortonworks.dataplane.db
 
-import com.hortonworks.dataplane.commons.domain.Entities._
+import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData, _}
 import com.hortonworks.dataplane.commons.domain.Ambari.ClusterServiceWithConfigs
 import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery, EntityDatasetRelationship}
 import play.api.libs.json.{JsObject, JsResult, Json}
 import play.api.libs.ws.WSResponse
-import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData}
 
 import scala.concurrent.Future
 
@@ -145,10 +144,15 @@ object Webservice {
 
     def retrieve(dpClusterId: String): Future[Either[Errors, DataplaneCluster]]
 
+    def retrieveServiceInfo(dpClusterId: String): Future[Either[Errors, Seq[ClusterData]]]
+
     def retrieveByAmbariUrl(ambariUrl: String): Future[Either[Errors, Boolean]]
 
     def update(dpClusterId: String,
                dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]]
+
+    def update(dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]]
+
 
     def updateStatus(dpCluster: DataplaneCluster): Future[Either[Errors, Boolean]]
 

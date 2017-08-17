@@ -10,6 +10,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BsDropdownModule, ButtonsModule, TooltipModule, CollapseModule, ProgressbarModule, AlertModule } from 'ng2-bootstrap';
+import { ModalModule } from 'ng2-bootstrap';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { TranslateModule } from '@ngx-translate/core';
 import { SelectModule } from 'ng2-select';
@@ -43,6 +44,9 @@ import { MapLegendContainerComponent } from './map/map-legend-container/map-lege
 import { ClusterStatusIconComponent } from './cluster-status-icon/cluster-status-icon.component';
 import { BeaconValidityComponent } from './messages/beacon-validity/beacon-validity.component';
 import { HelpLinkComponent } from './help-link/help-link.component';
+import { ClusterActionsComponent } from './cluster-actions/cluster-actions.component';
+import { HortonStyleModule } from 'common/horton-style.module';
+import { ConfirmationModalContainerComponent } from './confirmation-modal/confirmation-modal-container.component';
 
 @NgModule({
   imports: [
@@ -53,8 +57,10 @@ import { HelpLinkComponent } from './help-link/help-link.component';
     CollapseModule.forRoot(),
     ProgressbarModule.forRoot(),
     AlertModule.forRoot(),
+    ModalModule.forRoot(),
     ChartsModule,
     TranslateModule,
+    HortonStyleModule,
     SelectModule,
     MomentModule,
     PipesModule
@@ -82,6 +88,7 @@ import { HelpLinkComponent } from './help-link/help-link.component';
     HiveBrowserComponent,
     HiveDatabaseComponent,
     PolicyActionsComponent,
+    ClusterActionsComponent,
     DurationColumnComponent,
     TransferredColumnComponent,
     JobStatusComponent,
@@ -89,7 +96,8 @@ import { HelpLinkComponent } from './help-link/help-link.component';
     MapLegendContainerComponent,
     ClusterStatusIconComponent,
     BeaconValidityComponent,
-    HelpLinkComponent
+    HelpLinkComponent,
+    ConfirmationModalContainerComponent
   ],
   exports: [
     CardComponent,
@@ -114,6 +122,7 @@ import { HelpLinkComponent } from './help-link/help-link.component';
     HiveBrowserComponent,
     HiveDatabaseComponent,
     PolicyActionsComponent,
+    ClusterActionsComponent,
     DurationColumnComponent,
     TransferredColumnComponent,
     JobStatusComponent,
@@ -121,7 +130,8 @@ import { HelpLinkComponent } from './help-link/help-link.component';
     MapLegendContainerComponent,
     ClusterStatusIconComponent,
     BeaconValidityComponent,
-    HelpLinkComponent
+    HelpLinkComponent,
+    ConfirmationModalContainerComponent
   ]
 })
 export class CommonComponentsModule {}

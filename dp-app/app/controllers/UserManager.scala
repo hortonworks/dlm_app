@@ -31,6 +31,8 @@ class UserManager @Inject()(val ldapService: LdapService,
       BadRequest(Json.toJson(errors))
     else if (errors.errors.exists(_.code == "403"))
       Forbidden(Json.toJson(errors))
+    else if (errors.errors.exists(_.code == "409"))
+      Conflict(Json.toJson(errors))
     else
       InternalServerError(Json.toJson(errors))
   }
