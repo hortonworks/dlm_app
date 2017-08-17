@@ -56,6 +56,7 @@ export class ClusterAddComponent implements OnInit {
   showNotification = false;
   showError = false;
   errorMessage = '';
+  isInvalidAmbariUrl = false;
 
   constructor(private router: Router,
               private route: ActivatedRoute,
@@ -80,6 +81,9 @@ export class ClusterAddComponent implements OnInit {
     } else if (this._clusterState.alreadyExists) {
       let reasonsTranslation = this.translateService.instant('pages.infra.description.clusterAlreadyExists');
       reasons.push(reasonsTranslation);
+    } else if(this.isInvalidAmbariUrl){
+      let reasonsTranslation = this.translateService.instant('pages.infra.description.invalidAmbariUrl');
+      reasons.push(reasonsTranslation);
     }
 
     return reasons;
@@ -103,10 +107,18 @@ export class ClusterAddComponent implements OnInit {
 
   getClusterInfo(event) {
     this.showError = false;
+    this.isInvalidAmbariUrl = false;
     this.showNotification = false;
     this._isClusterValidateInProgress = true;
     this._isClusterValidateSuccessful = false;
+    this._clusterState = new ClusterState();
     let cleanedUri = StringUtils.cleanupUri(this.cluster.ambariurl);
+    if(!cleanedUri){
+      this.isInvalidAmbariUrl = true;
+      this._isClusterValidateInProgress = false;
+      this.applyErrorClass();
+      return;
+    }
     this.lakeService.validate(cleanedUri).subscribe(
       response => {
         this._clusterState = response as ClusterState;
@@ -125,9 +137,7 @@ export class ClusterAddComponent implements OnInit {
           this._isClusterValidateInProgress = false;
           this._isClusterValidateSuccessful = true;
           this._isClusterValid = false;
-          if(this.ambariInputContainer.nativeElement.className.indexOf('validation-error') === -1){
-            this.ambariInputContainer.nativeElement.className += ' validation-error';
-          }
+          this.applyErrorClass();
         }
       },
       () => {
@@ -136,6 +146,11 @@ export class ClusterAddComponent implements OnInit {
     );
   }
 
+  applyErrorClass(){
+    if(this.ambariInputContainer.nativeElement.className.indexOf('validation-error') === -1){
+      this.ambariInputContainer.nativeElement.className += ' validation-error';
+    }
+  }
   getConfigs(detailRequest: any) {
     detailRequest.url = this.cluster.ambariurl;
     detailRequest.knoxUrl = this._clusterState.knoxUrl;
