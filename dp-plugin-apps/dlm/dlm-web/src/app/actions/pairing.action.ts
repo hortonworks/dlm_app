@@ -10,6 +10,7 @@
 import { type, requestType } from '../utils/type-action';
 import { Action } from '@ngrx/store';
 import { ActionSuccess, ActionFailure } from 'utils/extended-actions.type';
+import { PairingRequestBody } from 'models/pairing.model';
 
 export const ActionTypes = {
   LOAD_PAIRINGS: requestType('LOAD_PAIRINGS'),
@@ -24,10 +25,28 @@ export const loadPairingsSuccess = (pairings, meta = {}): ActionSuccess => ({
 });
 export const loadPairingsFail = (error, meta = {}): ActionFailure => ({type: ActionTypes.LOAD_PAIRINGS.FAILURE, payload: {error, meta}});
 
-export const createPairing = (pairing): Action => ({type: ActionTypes.CREATE_PAIRING.START, payload: pairing});
-export const createPairingSuccess = (payload): ActionSuccess => ({type: ActionTypes.CREATE_PAIRING.SUCCESS, payload});
-export const createPairingFail = (error): ActionFailure => ({type: ActionTypes.CREATE_PAIRING.FAILURE, payload: error});
+export const createPairing = (pairing, meta = {}): Action => ({
+  type: ActionTypes.CREATE_PAIRING.START,
+  payload: { pairing, meta }
+});
+export const createPairingSuccess = (response, meta): ActionSuccess => ({
+  type: ActionTypes.CREATE_PAIRING.SUCCESS,
+  payload: { response, meta }
+});
+export const createPairingFail = (error, meta): ActionFailure => ({
+  type: ActionTypes.CREATE_PAIRING.FAILURE,
+  payload: { error, meta }
+});
 
-export const deletePairing = (pairingId): Action => ({type: ActionTypes.DELETE_PAIRING.START, payload: pairingId});
-export const deletePairingSuccess = (payload): ActionSuccess => ({type: ActionTypes.DELETE_PAIRING.SUCCESS, payload});
-export const deletePairingFail = (error): ActionFailure => ({type: ActionTypes.DELETE_PAIRING.FAILURE, payload: error});
+export const deletePairing = (pairing: PairingRequestBody, meta = {}): Action => ({
+  type: ActionTypes.DELETE_PAIRING.START,
+  payload: { pairing, meta }
+});
+export const deletePairingSuccess = (response, meta): ActionSuccess => ({
+  type: ActionTypes.DELETE_PAIRING.SUCCESS,
+  payload: { response, meta }
+});
+export const deletePairingFail = (error, meta): ActionFailure => ({
+  type: ActionTypes.DELETE_PAIRING.FAILURE,
+  payload: { error, meta }
+});

@@ -35,6 +35,8 @@ import { POLICY_FORM_ID } from 'pages/policies/components/policy-form/policy-for
 import { getCluster } from 'selectors/cluster.selector';
 import { TimeZoneService } from 'services/time-zone.service';
 import { PolicyService } from 'services/policy.service';
+import { NOTIFICATION_TYPES } from 'constants/notification.constant';
+import { truncate } from 'pipes/truncate.pipe';
 
 const CREATE_POLICY_REQUEST = 'CREATE_POLICY';
 
@@ -158,7 +160,20 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
   }
 
   submitReview() {
-    this.store.dispatch(createPolicy(this.serializeFormValues(this.policyFormValue), this.targetCluster.id, CREATE_POLICY_REQUEST));
+    const formValue: PolicyPayload = this.serializeFormValues(this.policyFormValue);
+    const notification = {
+      [NOTIFICATION_TYPES.SUCCESS]: {
+        title: this.t.instant('page.policies.success.title'),
+        body: this.t.instant('page.policies.success.body', {
+          policyName: truncate(formValue.policyDefinition.name, 25)
+        })
+      }
+    };
+    const meta = {
+      requestId: CREATE_POLICY_REQUEST,
+      notification
+    };
+    this.store.dispatch(createPolicy(formValue, this.targetCluster.id, meta));
   }
 
   cancelReview() {

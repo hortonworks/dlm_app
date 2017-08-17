@@ -24,7 +24,7 @@ export class ConfirmationEffects {
     .ofType(ActionTypes.CONFIRM_NEXT_ACTION)
     .map(toPayload)
     .mergeMap(payload => {
-      this.confirmation.initActionConfirmation(payload.nextAction);
+      this.confirmation.initActionConfirmation(payload.nextAction, payload.confirmationOptions);
       return Observable.of(noop());
     });
 

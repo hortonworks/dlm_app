@@ -16,7 +16,6 @@ import {
   loadPairingsSuccess, loadPairingsFail, createPairingSuccess, createPairingFail,
   deletePairingSuccess, deletePairingFail, ActionTypes as pairingActions
 } from 'actions/pairing.action';
-import { operationComplete, operationFail } from 'actions/operation.action';
 
 @Injectable()
 export class PairingEffects {
@@ -36,12 +35,11 @@ export class PairingEffects {
     .ofType(pairingActions.CREATE_PAIRING.START)
     .map(toPayload)
     .switchMap(payload => {
-      return this.pairingService.createPairing(payload)
+      return this.pairingService.createPairing(payload.pairing)
         .map(response => {
-          response['payload'] = payload;
-          return createPairingSuccess(response);
+          return createPairingSuccess({...response, payload: payload.pairing}, payload.meta);
         })
-        .catch(err => Observable.of(createPairingFail(err)));
+        .catch(err => Observable.of(createPairingFail(err, payload.meta)));
     });
 
   @Effect()
@@ -49,15 +47,11 @@ export class PairingEffects {
     .ofType(pairingActions.DELETE_PAIRING.START)
     .map(toPayload)
     .switchMap(payload => {
-      return this.pairingService.deletePairing(payload)
-        .mergeMap(response => {
-          response['payload'] = payload;
-          return [
-            operationComplete(response),
-            deletePairingSuccess(response)
-          ];
+      return this.pairingService.deletePairing(payload.pairing)
+        .map(response => {
+          return deletePairingSuccess({...response, payload: payload.pairing}, payload.meta);
         })
-        .catch(err => Observable.from([operationFail(err.json()), deletePairingFail(err)]));
+        .catch(err => Observable.of(deletePairingFail(err, payload.meta)));
     });
 
   constructor(private actions$: Actions, private pairingService: PairingService) { }
