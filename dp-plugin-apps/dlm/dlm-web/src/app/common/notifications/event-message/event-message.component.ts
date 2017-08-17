@@ -19,13 +19,13 @@ import { JOB_EVENT } from 'constants/event.constant';
 @Component({
   selector: 'dlm-event-message',
   template: `
-    <span> 
+    <span>
       <span>{{ event.message }}</span>
       <span *ngIf="shouldShowLogsLink">
         <span>{{'common.for' | translate}}</span>
-        <span class="actionable text-primary">
-          <span (click)="goToPolicy(event)">{{policyName}}</span>
-          <i class="fa fa-file-text-o"
+        <span>
+          <dlm-event-entity-link [event]="event" (onClick)="goToPolicy($event)"></dlm-event-entity-link>
+          <i class="fa fa-file-text-o actionable text-primary"
             (click)="showEventEntityLogs(event)"
             [tooltip]="'page.notifications.view_log' | translate">
           </i>
@@ -42,10 +42,6 @@ export class EventMessageComponent {
 
   get shouldShowLogsLink(): boolean {
     return Boolean(EVENT_TYPE[this.event.eventType]);
-  }
-
-  get policyName(): string {
-    return getEventEntityName(this.event);
   }
 
   constructor(private router: Router, private logService: LogService) {

@@ -47,6 +47,7 @@ import { HelpLinkComponent } from './help-link/help-link.component';
 import { ClusterActionsComponent } from './cluster-actions/cluster-actions.component';
 import { HortonStyleModule } from 'common/horton-style.module';
 import { ConfirmationModalContainerComponent } from './confirmation-modal/confirmation-modal-container.component';
+import { EventEntityLinkComponent } from './event-entity-link/event-entity-link.component';
 
 @NgModule({
   imports: [
@@ -97,7 +98,8 @@ import { ConfirmationModalContainerComponent } from './confirmation-modal/confir
     ClusterStatusIconComponent,
     BeaconValidityComponent,
     HelpLinkComponent,
-    ConfirmationModalContainerComponent
+    ConfirmationModalContainerComponent,
+    EventEntityLinkComponent
   ],
   exports: [
     CardComponent,
@@ -131,7 +133,8 @@ import { ConfirmationModalContainerComponent } from './confirmation-modal/confir
     ClusterStatusIconComponent,
     BeaconValidityComponent,
     HelpLinkComponent,
-    ConfirmationModalContainerComponent
+    ConfirmationModalContainerComponent,
+    EventEntityLinkComponent
   ]
 })
 export class CommonComponentsModule {}
