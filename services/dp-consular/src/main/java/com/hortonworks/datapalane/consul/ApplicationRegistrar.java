@@ -17,7 +17,8 @@ public class ApplicationRegistrar {
   private Config config;
   private Optional<ConsulHook> hook;
   private InetUtils inetUtils=new InetUtils(new InetUtilsProperties());
-  private RandomGenerator randomGenerator=new RandomGenerator(10);
+
+  private String DEREGISTER_CRITICAL_SERIVE_TTL_PROPNAME="consul.service.deregister.afterMinutes";
   public ApplicationRegistrar(Config config, Optional<ConsulHook> hook) {
     this.config = config;
     this.hook = hook;
@@ -33,8 +34,9 @@ public class ApplicationRegistrar {
     int servicePort = config.getInt("consul.service.port");
     String serviceId = generateServiceId(serviceName,servicePort);
     DpService dpService = new DpService(serviceId, serviceName, seriveTags, getServiceAddress(),servicePort);
-    if (!config.getIsNull("consul.service.deregister.afterMinutes")) {
-      int deregisterServiceAfter = config.getInt("consul.service.deregister.afterMinutes");
+
+    if (config.hasPath(DEREGISTER_CRITICAL_SERIVE_TTL_PROPNAME) && !config.getIsNull(DEREGISTER_CRITICAL_SERIVE_TTL_PROPNAME)) {
+      int deregisterServiceAfter = config.getInt(DEREGISTER_CRITICAL_SERIVE_TTL_PROPNAME);
       dpService.setDeregisterServiceAfterInMinutes(deregisterServiceAfter);
     }
     ClientStart clientStartTask = new ClientStart(dpConsulClient, dpService, hook);
@@ -186,7 +188,6 @@ public class ApplicationRegistrar {
 
     @Override
     public void run() {
-      if (true)return;
       try {
         String serviceId = dpService.getServiceId();
         dpConsulClient.unRegisterService(serviceId);
