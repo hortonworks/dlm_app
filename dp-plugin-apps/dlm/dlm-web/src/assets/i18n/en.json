@@ -26,8 +26,12 @@
     "pairs": "Pairs",
     "policy": "Policy",
     "name": "Name",
+    "queue_name": "Queue Name",
+    "max_bandwidth": "Maximum Bandwidth",
     "job": "Job",
     "jobs": "Jobs",
+    "start_time": "Start Time",
+    "end_time": "End Time",
     "clusters": "Clusters",
     "cluster": "Cluster",
     "service": "Service",
@@ -36,7 +40,8 @@
     "for": "for",
     "error": "Error",
     "errors": {
-      "no_log": "Oops! Could not retrieve a log message for this event."
+      "no_log": "Oops! Could not retrieve a log message for this event.",
+      "unknown": "Something went wrong."
     },
     "time": {
       "hourly": "Hourly",
@@ -49,6 +54,7 @@
       "weeks": "Week(s)"
     },
     "frequency": {
+      "self": "Frequency",
       "yearly": {
         "plural": "Every {{num}}y",
         "singular": "Every year"
@@ -91,6 +97,59 @@
     },
     "warnings": {
       "beacon_unavailable": "Data presented may not be complete due to Beacon service outage on clusters {{clusters}}."
+    },
+    "modal": {
+      "confirmation": {
+        "title": "Confirm",
+        "body": "Are you sure?"
+      }
+    },
+    "action_notifications": {
+      "abort_job": {
+        "success": {
+          "title": "Abort Job Successful",
+          "body": "Job for policy {{policyName}} aborted successfully!"
+        },
+        "error": {
+          "title": "Abort Job Failed"
+        }
+      },
+      "rerun_job": {
+        "success": {
+          "title": "Re-run Job Successful",
+          "body": "Job for policy {{policyName}} re-ran successfully!"
+        },
+        "error": {
+          "title": "Re-run Job Failed"
+        }
+      },
+      "delete_policy": {
+        "success": {
+          "title": "Removing Policy Successful",
+          "body": "Policy {{policyName}} removed successfully!"
+        },
+        "error": {
+          "title": "Removing Policy Failed"
+        }
+      },
+      "suspend_policy": {
+        "success": {
+          "title": "Suspending Policy Successful",
+          "body": "Policy {{policyName}} suspended successfully!"
+        },
+        "error": {
+          "title": "Suspending Policy Failed"
+        }
+      },
+      "activate_policy": {
+        "success": {
+          "title": "Activating Policy Successful",
+          "body": "Policy {{policyName}} activated successfully!"
+        },
+        "error": {
+          "title": "Activating Policy Failed"
+        }
+      }
     }
   },
   "topnav": {

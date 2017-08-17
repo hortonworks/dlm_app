@@ -14,12 +14,12 @@
 </div>
 <div class="content">
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-8 col-lg-6 col-sm-12">
       <div class="review-description">
-        <p *ngFor="let detail of detailsInfo">
-          <span class="text-muted">{{detail.label}}:&nbsp;</span>
-          <span [innerHTML]="detail.value"></span>
-        </p>
+        <div *ngFor="let detail of detailsInfo" class="table-row">
+          <div class="text-muted table-cell">{{detail.label}}:&nbsp;</div>
+          <div [innerHTML]="detail.value" class="table-cell"></div>
+        </div>
       </div>
     </div>
   </div>

@@ -38,9 +38,10 @@ export const requestType = (actionName: string): RequestAction => ({
   FAILURE: type(`${actionName} ${FAILURE_MARKER}`)
 });
 
-export const isStartAction = (action: Action): boolean => action.type.endsWith(START_MARKER);
-export const isSuccessAction = (action: Action): boolean => action.type.endsWith(SUCCESS_MARKER);
-export const isFailureAction = (action: Action): boolean => action.type.endsWith(FAILURE_MARKER);
+export const isAction = (action: Action) => action && typeof action.type === 'string' && action.type in actionsCache;
+export const isStartAction = (action: Action): boolean => isAction(action) && action.type.endsWith(START_MARKER);
+export const isSuccessAction = (action: Action): boolean => isAction(action) && action.type.endsWith(SUCCESS_MARKER);
+export const isFailureAction = (action: Action): boolean => isAction(action) && action.type.endsWith(FAILURE_MARKER);
 export const isCompletedAction = (action: Action): boolean => isFailureAction(action) || isSuccessAction(action);
 export const isRequestAction = (action: Action): boolean => isCompletedAction(action) || isStartAction(action);
 export const originalActionName = (action: Action): string => {

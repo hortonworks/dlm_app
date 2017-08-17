@@ -30,3 +30,9 @@ export const NOTIFICATION_TYPE_CLASSES = {
   [NOTIFICATION_TYPES.INFO]: 'alert-info',
   [NOTIFICATION_TYPES.WARNING]: 'alert-warning'
 };
+
+
+export enum NOTIFICATION_CONTENT_TYPE {
+  INLINE,
+  MODAL_LINK
+};

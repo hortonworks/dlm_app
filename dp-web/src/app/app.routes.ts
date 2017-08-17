@@ -40,10 +40,10 @@ export const routes: Routes = [{
     path: 'assets',
     loadChildren: './modules/assets/asset.module#AssetModule',
     canActivate:[ NavigationGuard ]
-  },{
-    path: 'analytics',
-    loadChildren: './modules/analytics/analytics.module#AnalyticsModule',
-    canActivate:[ NavigationGuard ]
+  // },{
+  //   path: 'analytics',
+  //   loadChildren: './modules/analytics/analytics.module#AnalyticsModule',
+  //   canActivate:[ NavigationGuard ]
   },
   {
     path: 'unauthorized',

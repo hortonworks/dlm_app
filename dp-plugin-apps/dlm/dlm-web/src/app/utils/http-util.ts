@@ -10,6 +10,7 @@
 import { Response, RequestOptionsArgs, Headers } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { User } from 'models/user.model';
+import { TranslateService } from '@ngx-translate/core';
 
 export const toJson = (response: Response) => response.json();
 export const mapResponse = (response$: Observable<Response>) => response$.map(toJson);
@@ -24,7 +25,7 @@ export const getHeaders = (): RequestOptionsArgs => {
 };
 
 export const getError = (response) => {
-  const message = response.message.replace('Failed with ', '');
+  const message = (response.message || 'common.errors.unknown').replace('Failed with ', '');
   let error;
   try {
     error = JSON.parse(message).error;

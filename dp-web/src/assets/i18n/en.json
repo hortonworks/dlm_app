@@ -13,6 +13,7 @@
     "new": "New",
     "add": "Add",
     "edit": "Edit",
+    "update": "Update",
     "delete": "Delete",
     "addAndNew": "Add & New",
     "cancel": "Cancel",
@@ -40,9 +41,8 @@
       "rowsPerPage": "Rows per page"
     },
     "roles": {
-      "SUPERADMIN": "Admin",
-      "INFRAADMIN": "Cluster Admin",
-      "USER": "Consumer",
+      "SUPERADMIN": "Dataplane Admin",
+      "INFRAADMIN": "Infra Admin",
       "CURATOR": "Data Steward"
     },
     "signout": "Sign Out",
@@ -167,9 +167,11 @@
         "usernameorgroup": "Username/Group",
         "active": "Active",
         "inactive": "Inactive",
-        "additionalConfigs": "Additional Configs"
+        "additionalConfigs": "Additional Configs",
+        "editCluster": "Edit Cluster"
       },
       "description": {
+        "editCluster": "Please update your Ambari managed cluster (already added to Dataplane) here.",
         "addCluster": "Please add Ambari managed cluster to Dataplane. Dataplane will auto-discover cluster information such as the cluster name, active services & important metrics running.",
         "datalake": "This cluster has been identified as a Datalake since it has data management services,  {{serviceNames}} running.",
         "clusterLocation": "Geographical location of the cluster",

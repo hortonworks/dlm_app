@@ -42,6 +42,8 @@ import { EventEffects } from './effects/event.effect';
 import { HdfsListEffects } from './effects/hdfslist.effect';
 import { HiveListEffects } from './effects/hivelist.effect';
 import { LogEffects } from './effects/log.effect';
+import { ConfirmationEffects } from './effects/confirmation.effect';
+import { NotificationEffects } from './effects/notification.effect';
 
 import { FormEffects } from './effects/form.effect';
 
@@ -60,6 +62,7 @@ import { HiveService } from 'services/hive.service';
 import { NotificationService } from 'services/notification.service';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
 import { UserService } from 'services/user.service';
+import { ConfirmationService } from 'services/confirmation.service';
 
 import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
@@ -135,6 +138,8 @@ import { FrequencyPipe } from 'pipes/frequency.pipe';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 
+import { HortonStyleModule } from 'common/horton-style.module';
+
 @NgModule({
   imports: [
     MomentModule,
@@ -153,6 +158,8 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     EffectsModule.run(HdfsListEffects),
     EffectsModule.run(HiveListEffects),
     EffectsModule.run(LogEffects),
+    EffectsModule.run(ConfirmationEffects),
+    EffectsModule.run(NotificationEffects),
     CollapseModule.forRoot(),
     BsDropdownModule.forRoot(),
     TabsModule.forRoot(),
@@ -169,6 +176,7 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
 
     RouterModule.forRoot(routes),
     CommonComponentsModule,
+    HortonStyleModule,
     TranslateModule.forRoot(),
     BrowserAnimationsModule,
     SimpleNotificationsModule.forRoot(),
@@ -228,8 +236,6 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     TableFilterComponent,
     CheckboxColumnComponent,
     ActionColumnComponent,
-    ModalDialogComponent,
-    ModalDialogBodyComponent,
     NotificationsComponent,
     EventMessageComponent,
     LogModalDialogComponent,
@@ -251,6 +257,7 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
     HiveService,
     NotificationService,
     OverviewJobsExternalFiltersService,
+    ConfirmationService,
     httpServiceProvider,
     FrequencyPipe,
     UserService,
