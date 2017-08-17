@@ -39,6 +39,7 @@
     "hive": "HIVE",
     "for": "for",
     "error": "Error",
+    "empty_log": "Log is empty",
     "errors": {
       "no_log": "Oops! Could not retrieve a log message for this event.",
       "unknown": "Something went wrong."

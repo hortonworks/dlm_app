@@ -37,7 +37,7 @@ export class LogService {
     this.logMessage$ = this.entityId$.switchMap(entityId => {
       return this.store.select(getAllLogs).map(logs => {
         const filteredLogs: Log[] = logs.filter(log => log.instanceId === entityId);
-        return filteredLogs.length ? filteredLogs[0].message : '';
+        return filteredLogs.length ? filteredLogs[0].message : null;
       });
     });
     this.logMessage$.subscribe(logMessage => this.emitter.next(logMessage));
