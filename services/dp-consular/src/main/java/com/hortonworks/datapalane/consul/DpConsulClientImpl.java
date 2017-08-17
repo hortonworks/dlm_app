@@ -45,8 +45,7 @@ public class DpConsulClientImpl implements DpConsulClient {
     newCheck.setName(service.getServiceId() + "-healthCheck");
     newCheck.setHttp(String.format("http://%s:%s/health",service.getHost(),service.getPort()));
     newCheck.setInterval(service.getHealthCheckIntervalInSecs() + "s");
-    newCheck.setDeregisterCriticalServiceAfter("2m");
-   //Set a default timeout to 1s
+    newCheck.setDeregisterCriticalServiceAfter(service.getDeregisterServiceAfterInMinutes() + "m");
     newCheck.setTimeout("10s");
     Response<Void> voidResponse = consulClient.agentCheckRegister(newCheck);
     return ConsulResponse.from(voidResponse);

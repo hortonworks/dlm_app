@@ -33,7 +33,10 @@ public class ApplicationRegistrar {
     int servicePort = config.getInt("consul.service.port");
     String serviceId = generateServiceId(serviceName,servicePort);
     DpService dpService = new DpService(serviceId, serviceName, seriveTags, getServiceAddress(),servicePort);
-
+    if (!config.getIsNull("consul.service.deregister.afterMinutes")) {
+      int deregisterServiceAfter = config.getInt("consul.service.deregister.afterMinutes");
+      dpService.setDeregisterServiceAfterInMinutes(deregisterServiceAfter);
+    }
     ClientStart clientStartTask = new ClientStart(dpConsulClient, dpService, hook);
     ClientStatus clientStatusTask = new ClientStatus(dpConsulClient, dpService, hook);
     ExecutionHandler executionHandler = new ExecutionHandler(scheduledExecutorService, () -> clientStartTask, () -> clientStatusTask, config, hook);
