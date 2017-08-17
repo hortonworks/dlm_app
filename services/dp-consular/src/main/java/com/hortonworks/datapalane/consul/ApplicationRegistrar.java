@@ -31,7 +31,7 @@ public class ApplicationRegistrar {
     String serviceName = config.getString("consul.serviceName");
     List<String> seriveTags = config.getStringList("consul.service.tags");
     int servicePort = config.getInt("consul.service.port");
-    String serviceId = generateServiceId(serviceName);
+    String serviceId = generateServiceId(serviceName,servicePort);
     DpService dpService = new DpService(serviceId, serviceName, seriveTags, getServiceAddress(),servicePort);
 
     ClientStart clientStartTask = new ClientStart(dpConsulClient, dpService, hook);
@@ -45,8 +45,8 @@ public class ApplicationRegistrar {
   private String getServiceAddress() {
     return inetUtils.findFirstNonLoopbackAddress().getHostAddress();
   }
-  private String generateServiceId(String serviceName){
-    return serviceName+"_"+randomGenerator.generate();
+  private String generateServiceId(String serviceName,int servicePort){
+    return String.format("%s_%s:%d",serviceName,this.getServiceAddress(),servicePort);
   }
 
   private static class ExecutionHandler {
@@ -183,6 +183,7 @@ public class ApplicationRegistrar {
 
     @Override
     public void run() {
+      if (true)return;
       try {
         String serviceId = dpService.getServiceId();
         dpConsulClient.unRegisterService(serviceId);
