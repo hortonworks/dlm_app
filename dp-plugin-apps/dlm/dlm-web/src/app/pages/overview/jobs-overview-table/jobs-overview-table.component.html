@@ -33,19 +33,12 @@
 </ng-template>
 
 <ng-template #verbStatusCellTemplate let-job="value" let-policy="row">
-  <dlm-transferred-column
-    *ngIf="job.status === JOB_STATUS.RUNNING; else verbTpl"
-    [jobStatus]="job.status"
-    [trackingInfo]="job.trackingInfo">
-  </dlm-transferred-column>
-  <ng-template #verbTpl>
-    <span class="actionable"
-          [tooltip]="job.status === JOB_STATUS.RUNNING ? '' : ('page.notifications.view_log' | translate)"
-          (click)="showPolicyLog(policy)">
-      {{job.status}}
-      <i class="fa fa-file-text-o text-info" *ngIf="job.status !== JOB_STATUS.RUNNING"></i>
-    </span>
-  </ng-template>
+  <span class="actionable"
+        [tooltip]="job.status === JOB_STATUS.RUNNING ? '' : ('page.notifications.view_log' | translate)"
+        (click)="showPolicyLog(policy)">
+    {{job.status | jobStatusFmt}}
+    <i class="fa fa-file-text-o text-info" *ngIf="job.status !== JOB_STATUS.RUNNING"></i>
+  </span>
 </ng-template>
 
 <ng-template #policyNameCellTemplate let-row="row" let-name="value">

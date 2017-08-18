@@ -7,7 +7,7 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, EventEmitter, Output, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { POLICY_TYPES, POLICY_TYPES_LABELS } from 'constants/policy.constant';
 
 @Component({
@@ -18,7 +18,7 @@ import { POLICY_TYPES, POLICY_TYPES_LABELS } from 'constants/policy.constant';
 })
 export class PolicyServiceFilterComponent {
 
-  activeService: string[] = [];
+  activeService: string;
 
   POLICY_TYPES = POLICY_TYPES;
   POLICY_TYPES_LABELS = POLICY_TYPES_LABELS;
@@ -28,16 +28,14 @@ export class PolicyServiceFilterComponent {
   constructor (private cdRef: ChangeDetectorRef) {}
 
   filterPoliciesByService(service) {
-    const index = this.activeService.indexOf(service);
-    if (index > -1) {
-      this.activeService.splice(index, 1);
+    // Toggle the filters if one of the filters is already selected
+    if (service === this.activeService) {
+      this.activeService = null;
     } else {
-      this.activeService.push(service);
+      this.activeService = service;
     }
-    // Filter values only if any one of the values are checked
-    // Since filter by both the values and filter by none are the same
-    const filterValue = this.activeService.length === 1 ? this.activeService[0] : '';
-    this.onFilter.emit(filterValue);
     this.cdRef.detectChanges();
+    const filterValue = this.activeService ? this.activeService : '';
+    this.onFilter.emit(filterValue);
   }
 }
