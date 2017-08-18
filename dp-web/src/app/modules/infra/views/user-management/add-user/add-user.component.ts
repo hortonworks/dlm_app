@@ -31,6 +31,7 @@ export class AddUserComponent implements OnInit {
 
   errorMessages: string[] = [];
   showError = false;
+  duplicateRole: string;
 
   @ViewChild('addUserForm') addUserForm: NgForm;
   @ViewChild('editUserForm') editUserForm: NgForm;
@@ -70,8 +71,12 @@ export class AddUserComponent implements OnInit {
     });
   }
 
-  onNewUserAddition(text: string) {
-    this.users.push(text);
+  onNewUserAddition(user: string) {
+    if (this.users.find(usr => usr === user)) {
+      this.showWarning(`${this.translateService.instant('pages.infra.labels.duplicateUser')}${user}`, document.getElementById('duplicate-user-warning'));
+      return;
+    }
+    this.users.push(user);
   }
 
   onUserSearchChange(text: string) {
@@ -89,11 +94,36 @@ export class AddUserComponent implements OnInit {
   }
 
   onNewRoleAddition(tag: TaggingWidgetTagModel) {
+    if (this.roles.find(role => role.data === tag.data)) {
+      this.showWarning(`${this.translateService.instant('pages.infra.labels.duplicateRole')}${tag.display}`, document.getElementById('duplicate-role-warning'));
+      return;
+    }
     this.roles.push(tag);
   }
 
   onRolesEdit(tag: TaggingWidgetTagModel) {
+    if (this.userRoles.find(role => role.data === tag.data)) {
+      this.showWarning(`${this.translateService.instant('pages.infra.labels.duplicateRole')}${tag.display}`, document.getElementById('duplicate-role-warning'));
+      return;
+    }
     this.userRoles.push(tag);
+  }
+
+  private showWarning(message, element) {
+    element.innerHTML = message;
+    element.style.display = 'block';
+    element.style.opacity = 1;
+    setTimeout(() => {
+      let opacity = 1;
+      let fade = setInterval(() => {
+        opacity -= 0.3;
+        element.style.opacity = opacity;
+        if (opacity <= 0) {
+          clearInterval(fade);
+          element.style.display = 'none';
+        }
+      }, 100);
+    }, 1000);
   }
 
   onRoleSearchChange(text: string) {

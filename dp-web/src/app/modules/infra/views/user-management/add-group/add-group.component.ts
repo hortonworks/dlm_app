@@ -73,6 +73,10 @@ export class AddGroupComponent {//implements OnInit {
   }
 
   onNewGroupAddition(text: string) {
+    if (this.groups.find(usr => usr === text)) {
+      this.showWarning(`${this.translateService.instant('pages.infra.labels.duplicateGroup')}${text}`, document.getElementById('duplicate-group-warning'));
+      return;
+    }
     this.groups.push(text);
   }
 
@@ -92,11 +96,36 @@ export class AddGroupComponent {//implements OnInit {
   }
 
   onNewRoleAddition(tag: TaggingWidgetTagModel) {
+    if (this.roles.find(role => role.data === tag.data)) {
+      this.showWarning(`${this.translateService.instant('pages.infra.labels.duplicateRole')}${tag.display}`, document.getElementById('duplicate-role-warning'));
+      return;
+    }
     this.roles.push(tag);
   }
 
   onRolesEdit(tag: TaggingWidgetTagModel) {
+    if (this.groupRoles.find(role => role.data === tag.data)) {
+      this.showWarning(`${this.translateService.instant('pages.infra.labels.duplicateRole')}${tag.display}`, document.getElementById('duplicate-role-warning'));
+      return;
+    }
     this.groupRoles.push(tag);
+  }
+
+  private showWarning(message, element) {
+    element.innerHTML = message;
+    element.style.display = 'block';
+    element.style.opacity = 1;
+    setTimeout(() => {
+      let opacity = 1;
+      let fade = setInterval(() => {
+        opacity -= 0.3;
+        element.style.opacity = opacity;
+        if (opacity <= 0) {
+          clearInterval(fade);
+          element.style.display = 'none';
+        }
+      }, 100);
+    }, 1000);
   }
 
   onRoleSearchChange(text: string) {

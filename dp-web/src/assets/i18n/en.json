@@ -172,7 +172,10 @@
         "active": "Active",
         "inactive": "Inactive",
         "additionalConfigs": "Additional Configs",
-        "editCluster": "Edit Cluster"
+        "editCluster": "Edit Cluster",
+        "duplicateRole": "Duplicate values in Roles Input - ",
+        "duplicateUser": "Duplicate values in Users Input - ",
+        "duplicateGroup": "Duplicate values in Groups Input - "
       },
       "description": {
         "editCluster": "Please update your Ambari managed cluster (already added to Dataplane) here.",
