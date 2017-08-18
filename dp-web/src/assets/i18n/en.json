@@ -240,7 +240,7 @@
         "belongsTo": "Belongs To"
       },
       "ds-editor": {
-        "ds-description": "Organize your data-assets including Hive & Hbase tables, HDFS Files into logical groups for subsequent usage.",
+        "ds-description": "Organize your hive assets into logical groups for subsequent usage.",
         "information": "Information",
         "assets": "Assets",
         "summary": "Summary",
