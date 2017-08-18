@@ -16,6 +16,7 @@
       <div *ngIf="mode === modes.ADD">
         <div class="form-group dp-input">
           <label class="required">{{"pages.infra.labels.groupName" | translate}}</label>
+          <div id="duplicate-group-warning" class="hwx-inline-desc warning"></div>
           <tagging-widget #userTags id="group-tags" class="user-tags"
           [tags]="groups"
           [availableTags]="availableGroups"
@@ -27,6 +28,7 @@
         </div>
         <div class="form-group dp-input">
         <label class="required">{{"pages.infra.labels.roles" | translate}}</label>
+        <div id="duplicate-role-warning" class="hwx-inline-desc warning"></div>
           <tagging-widget #roleTags class="role-tags" id="role-tags"
           [tags]="roles"
           [availableTags]="availableRoles"
@@ -60,6 +62,11 @@
           </div>
         </div>
         <div class="mdl-grid mdl-grid--no-spacing padding-top15">
+          <div class="mdl-cell mdl-cell--2-col"></div>
+          <div class="mdl-layout-spacer"></div>
+          <div id="duplicate-role-warning" class="mdl-cell mdl-cell--9-col hwx-inline-desc warning"></div>
+        </div>
+        <div class="mdl-grid mdl-grid--no-spacing">
           <div class="form-group mdl-cell mdl-cell--2-col">
             <label class="required">{{"pages.infra.labels.roles" | translate}}</label>
           </div>
