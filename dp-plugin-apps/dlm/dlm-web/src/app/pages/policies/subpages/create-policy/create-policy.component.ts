@@ -27,7 +27,11 @@ const PAIR_REQUEST = '[CREATE POLICY] PAIR_REQUEST';
 @Component({
   selector: 'dp-create-policy',
   template: `
-    <dlm-page-header [title]="'page.policies.header_create'" [isFlexCenter]="true"></dlm-page-header>
+    <dlm-page-header [title]="'page.policies.header_create'"
+                     [isFlexCenter]="true"
+                     [linkText]="'page.policies.subpage.create_policy.help_text'"
+                     [linkTo]="'page.policies.subpage.create_policy.help_url'">
+    </dlm-page-header>
     <dlm-progress-container [progressState]="overallProgress$ | async">
       <div>
         <div *ngIf="(pairings$ | async)?.length > 0; else noPairs">

@@ -26,9 +26,8 @@ import { FormsModule } from '@angular/forms';
 import { NavbarService } from 'services/navbar.service';
 import { PipesModule } from 'pipes/pipes.module';
 import { CommonComponentsModule } from 'components/common-components.module';
-import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
+import { HortonStyleModule } from 'common/horton-style.module';
 import { ModalModule } from 'ng2-bootstrap';
-import { ModalDialogBodyComponent } from 'common/modal-dialog/modal-dialog-body.component';
 import { LogModalDialogComponent } from 'components/log-modal-dialog/log-modal-dialog.component';
 import { LogService } from 'services/log.service';
 import {MockBackend} from '@angular/http/testing';
@@ -51,7 +50,8 @@ describe('NotificationsPageComponent', () => {
         MomentModule,
         FormsModule,
         CommonComponentsModule,
-        PipesModule
+        PipesModule,
+        HortonStyleModule
       ],
       declarations: [
         NotificationsPageComponent,
@@ -61,8 +61,6 @@ describe('NotificationsPageComponent', () => {
         CheckboxColumnComponent,
         CheckboxComponent,
         ActionColumnComponent,
-        ModalDialogComponent,
-        ModalDialogBodyComponent,
         LogModalDialogComponent
       ],
       providers: [

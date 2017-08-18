@@ -296,19 +296,26 @@ class DataplaneService @Inject()(
     */
   def getHiveServerEndpointDetails(endpointData: ClusterServiceWithConfigs)
     : Either[Errors, ClusterServiceEndpointDetails] = {
-    val hiveServerPort: Either[Errors, String] =
-      getPropertyValue(endpointData, "hive-site", "hive.server2.thrift.port")
+    val hiveServerZkQuorum: Either[Errors, String] =
+      getPropertyValue(endpointData, "hive-site", "hive.zookeeper.quorum")
+    val hiveServerZkNameSpace: Either[Errors, String] =
+      getPropertyValue(endpointData, "hive-site", "hive.server2.zookeeper.namespace")
 
-    hiveServerPort match {
-      case Right(hiveServerPort) => {
-        val hiveServerHostName = endpointData.servicehost
-        val fullurl = s"hive2://$hiveServerHostName:$hiveServerPort"
-        Right(
-          ClusterServiceEndpointDetails(endpointData.serviceid,
-                                        endpointData.servicename,
-                                        endpointData.clusterid,
-                                        hiveServerHostName,
-                                        fullurl))
+    hiveServerZkQuorum match {
+      case Right(hiveServerZkQuorum) => {
+        hiveServerZkNameSpace match {
+          case Right(hiveServerZkNameSpace) =>  {
+            val hiveServerHostName = endpointData.servicehost
+            val fullurl = s"jdbc:hive2://$hiveServerZkQuorum/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=$hiveServerZkNameSpace"
+            Right(
+              ClusterServiceEndpointDetails(endpointData.serviceid,
+                endpointData.servicename,
+                endpointData.clusterid,
+                hiveServerHostName,
+                fullurl))
+          }
+          case Left(errors) => Left(errors)
+        }
       }
       case Left(errors) => Left(errors)
     }

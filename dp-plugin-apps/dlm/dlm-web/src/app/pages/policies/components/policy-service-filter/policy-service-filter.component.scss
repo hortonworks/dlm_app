@@ -6,17 +6,25 @@
  * reproduction, modification, redistribution, sharing, lending or other exploitation
  * of all or any part of the contents of this software is strictly prohibited.
  */
+@import '../../../../styles/mixins.scss';
+$hex-size: 20px;
 
-.btn {
-  padding: 2px 20px;
-  color: #333;
-  .hexagon {
-    display: inline-block;
-    float: left;
-  }
-  .service-name {
-    display: inline-block;
-    line-height: 28px;
-    margin-left: 8px;
+:host {
+  .btn {
+    padding: 2px 20px;
+    color: #333;
+    .hexagon {
+      @include hexagon($hex-size, transparent);
+      font-size: $hex-size / 2.5;
+      display: inline-block;
+      float: left;
+      margin: 8px 0 0 4px !important;
+    }
+    .service-name {
+      display: inline-block;
+      float: left;
+      line-height: 28px;
+      margin-left: 8px;
+    }
   }
 }

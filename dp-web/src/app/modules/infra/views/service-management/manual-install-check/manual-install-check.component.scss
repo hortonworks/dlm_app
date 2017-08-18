@@ -21,8 +21,11 @@
   }
 
   .error, .success {
+    background: $concrete;
+    padding: 10px;
     .fa {
       float: left;
+      font-size: 16px;
     }
   }
   .status-desc {
@@ -36,11 +39,11 @@
   margin-top: 0px;
 }
 
-.error {
+.error, .error-list-item {
   color: $roman-red !important;
 }
 
-.success {
+.success, .success-list-item {
   color: $forest-green-1;
 }
 

@@ -15,7 +15,14 @@
 <dlm-beacon-validity></dlm-beacon-validity>
 <div class="row">
   <div class="col-md-12">
-    <dp-map *ngIf="(clustersMapData$ | async).length" [mapSize]="mapSize" [mapData]="clustersMapData$ | async"></dp-map>
+    <dp-map *ngIf="(clustersMapData$ | async).length"
+            (clickMarker)="handleClickMarker($event)"
+            [mapSize]="mapSize"
+            [mapData]="clustersMapData$ | async">
+      <dlm-map-legend class="overview-map-legend" *ngIf="clusterLegend$ | async">
+        <dlm-cluster-legend [cluster]="clusterLegend$ | async"></dlm-cluster-legend>
+      </dlm-map-legend>
+    </dp-map>
   </div>
 </div>
 <dlm-progress-container [progressState]="overallProgress$ | async">

@@ -65,12 +65,9 @@ export class PolicyEffects {
     .ofType(policyActions.DELETE_POLICY.START)
     .map(toPayload)
     .switchMap(payload => {
-      return this.policyService.deletePolicy(payload)
-        .mergeMap(result => [
-          deletePolicySuccess(payload.id),
-          operationComplete(result)
-        ])
-        .catch(err => Observable.from([operationFail(err.json()), deletePolicyFail(err)]));
+      return this.policyService.deletePolicy(payload.policy)
+        .map(result => deletePolicySuccess(payload.policy.id, payload.meta))
+        .catch(err => Observable.of(deletePolicyFail(err, payload.meta)));
     });
 
   @Effect()
@@ -78,12 +75,9 @@ export class PolicyEffects {
     .ofType(policyActions.SUSPEND_POLICY.START)
     .map(toPayload)
     .switchMap(payload => {
-      return this.policyService.suspendPolicy(payload)
-        .mergeMap(result => [
-          suspendPolicySuccess(payload.id),
-          operationComplete(result)
-        ])
-        .catch(err => Observable.from([operationFail(err.json()), suspendPolicyFail(err)]));
+      return this.policyService.suspendPolicy(payload.policy)
+        .map(result => suspendPolicySuccess(payload.policy.id, payload.meta))
+        .catch(err => Observable.of(suspendPolicyFail(err, payload.meta)));
     });
 
   @Effect()
@@ -91,12 +85,9 @@ export class PolicyEffects {
     .ofType(policyActions.RESUME_POLICY.START)
     .map(toPayload)
     .switchMap(payload => {
-      return this.policyService.resumePolicy(payload)
-        .mergeMap(result => [
-          resumePolicySuccess(payload.id),
-          operationComplete(result)
-        ])
-        .catch(err => Observable.from([operationFail(err.json()), resumePolicyFail(err)]));
+      return this.policyService.resumePolicy(payload.policy)
+        .map(result => resumePolicySuccess(payload.policy.id, payload.meta))
+        .catch(err => Observable.of(resumePolicyFail(err, payload.meta)));
     });
 
 
@@ -109,6 +100,7 @@ export class PolicyEffects {
         .map(jobs => loadLastJobsSuccess(jobs, payload.meta))
         .catch(err => Observable.of(loadLastJobsFailure(err, payload.meta)));
     });
+
   constructor(private actions$: Actions,
               private policyService: PolicyService,
               private jobService: JobService,

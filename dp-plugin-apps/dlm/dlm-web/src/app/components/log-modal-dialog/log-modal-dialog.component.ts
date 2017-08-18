@@ -17,6 +17,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { getMergedProgress } from 'selectors/progress.selector';
 import { Observable } from 'rxjs/Observable';
 import { ProgressState } from 'models/progress-state.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'dlm-log-modal-dialog',
@@ -28,9 +29,7 @@ import { ProgressState } from 'models/progress-state.model';
     [showCancel]="false">
     <dlm-modal-dialog-body>
       <dlm-progress-container [progressState]="overallProgress$ | async">
-        <pre *ngIf="message" class="log-message">
-          {{message}}
-        </pre>
+        <pre *ngIf="message" class="log-message">{{message}}</pre>
         <div *ngIf="!message" class="alert alert-warning" role="alert">
           {{ "common.errors.no_log" | translate }}
         </div>
@@ -46,7 +45,7 @@ export class LogModalDialogComponent implements OnInit {
   private listener: Subscription;
   @ViewChild('logModalDialog') logModalDialog: ModalDialogComponent;
 
-  constructor(private logService: LogService, private store: Store<fromRoot.State>) {
+  constructor(private logService: LogService, private store: Store<fromRoot.State>, private t: TranslateService) {
     this.overallProgress$ = store.select(getMergedProgress(LOG_REQUEST));
   }
 
@@ -54,7 +53,7 @@ export class LogModalDialogComponent implements OnInit {
     // Listen for changes in the service
     this.listener = this.logService.getChangeEmitter()
       .subscribe(item => {
-        this.message = item;
+        this.message = item === '' ? this.t.instant('common.empty_log') : item;
         this.logModalDialog.show();
       });
   }

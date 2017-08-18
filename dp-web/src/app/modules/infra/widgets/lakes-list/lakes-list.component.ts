@@ -65,13 +65,17 @@ export class LakesListComponent implements OnChanges {
   }
 
   private populateHealthInfo(lakeInfo, health) {
-    lakeInfo.hdfsUsed = health.usedSize ? health.usedSize : 'NA';
-    lakeInfo.hdfsTotal = health.totalSize ? health.totalSize : 'NA';
-    lakeInfo.nodes = health.nodes ? health.nodes : 'NA';
+    lakeInfo.hdfsUsed = (health.usedSize && !this.isSyncError(health)) ? health.usedSize : 'NA';
+    lakeInfo.hdfsTotal = (health.totalSize && !this.isSyncError(health)) ? health.totalSize : 'NA';
+    lakeInfo.nodes = (health.nodes && !this.isSyncError(health)) ? health.nodes : 'NA';
     lakeInfo.status = this.getStatus(health,lakeInfo);
-    lakeInfo.startTime = health.status ? health.status.startTime : null;
-    lakeInfo.uptimeStr = health.status ? DateUtils.toReadableDate(health.status.since) : 'NA';
-    lakeInfo.uptime = health.status ? health.status.since : 'NA';
+    lakeInfo.startTime = (health.status && !this.isSyncError(health)) ? health.status.startTime : null;
+    lakeInfo.uptimeStr = (health.status && !this.isSyncError(health)) ? DateUtils.toReadableDate(health.status.since) : 'NA';
+    lakeInfo.uptime = (health.status && !this.isSyncError(health)) ? health.status.since : 'NA';
+  }
+
+  isSyncError(health){
+    return health.status.state === "SYNC_ERROR" ;
   }
 
   viewDetails(lakeId) {
@@ -81,7 +85,7 @@ export class LakesListComponent implements OnChanges {
   private getStatus(health,lakeInfo) {
     if (health && health.status && health.status.state === 'STARTED') {
       return LakeStatus.UP;
-    } else if (health && health.status && health.status.state === 'NOT STARTED') {
+    } else if (health && health.status && (health.status.state === 'NOT STARTED' || health.status.state === "SYNC_ERROR")) {
       return LakeStatus.DOWN;
     } else if(lakeInfo.isWaiting){
       return LakeStatus.WAITING;

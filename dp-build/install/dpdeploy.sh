@@ -1,13 +1,11 @@
 #!/bin/bash
 set -e
 
-source $(pwd)/config.clear.sh
 source $(pwd)/config.env.sh
 
 CERTS_DIR=`dirname $0`/certs
 KNOX_SIGNING_CERTIFICATE=knox-signing.pem
-DEFAULT_VERSION=0.0.1
-DEFAULT_TAG="latest"
+DEFAULT_VERSION=0.0.1-latest
 KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
 APP_CONTAINERS_WITHOUT_DB="dp-app dp-db-service dp-cluster-service dp-gateway"
@@ -348,7 +346,7 @@ print_version() {
     if [ -f VERSION ]; then
         cat VERSION
     else
-        echo ${DEFAULT_VERSION}-${DEFAULT_TAG}
+        echo ${DEFAULT_VERSION}
     fi
 }
 

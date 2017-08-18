@@ -7,6 +7,8 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+@import '../../../styles/variables';
+
 $legend-font-size: 12px;
 :host {
   display: flex;
@@ -17,6 +19,7 @@ $legend-font-size: 12px;
     flex-shrink: 0;
     min-height: 0;
     font-size: 16px;
+    color: $white-color;
   }
 
   .map-legend-body {
@@ -26,26 +29,19 @@ $legend-font-size: 12px;
 }
 
 dl {
-  margin-bottom: 25px;
+  margin-bottom: 15px;
 
   dt {
-    color: #67676e;
-    margin-bottom: 12px;
+    color: $white-color;
+    margin-bottom: 5px;
     text-transform: uppercase;
     font-size: $legend-font-size;
     font-weight: normal;
-    line-height: auto;
-
-  }
-
-  &.fix-alerts {
-    dt {
-      margin-bottom: 0;
-    }
+    line-height: normal;
   }
 
   dd {
-    color: #808288;
+    color: $submarine;
     font-size: $legend-font-size;
   }
 

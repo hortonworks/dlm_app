@@ -26,8 +26,12 @@
     "pairs": "Pairs",
     "policy": "Policy",
     "name": "Name",
+    "queue_name": "Queue Name",
+    "max_bandwidth": "Maximum Bandwidth",
     "job": "Job",
     "jobs": "Jobs",
+    "start_time": "Start Time",
+    "end_time": "End Time",
     "clusters": "Clusters",
     "cluster": "Cluster",
     "service": "Service",
@@ -35,8 +39,10 @@
     "hive": "HIVE",
     "for": "for",
     "error": "Error",
+    "empty_log": "Log is empty",
     "errors": {
-      "no_log": "Oops! Could not retrieve a log message for this event."
+      "no_log": "Oops! Could not retrieve a log message for this event.",
+      "unknown": "Something went wrong."
     },
     "time": {
       "hourly": "Hourly",
@@ -49,6 +55,7 @@
       "weeks": "Week(s)"
     },
     "frequency": {
+      "self": "Frequency",
       "yearly": {
         "plural": "Every {{num}}y",
         "singular": "Every year"
@@ -91,6 +98,59 @@
     },
     "warnings": {
       "beacon_unavailable": "Data presented may not be complete due to Beacon service outage on clusters {{clusters}}."
+    },
+    "modal": {
+      "confirmation": {
+        "title": "Confirm",
+        "body": "Are you sure?"
+      }
+    },
+    "action_notifications": {
+      "abort_job": {
+        "success": {
+          "title": "Abort Job Successful",
+          "body": "Job for policy {{policyName}} aborted successfully!"
+        },
+        "error": {
+          "title": "Abort Job Failed"
+        }
+      },
+      "rerun_job": {
+        "success": {
+          "title": "Re-run Job Successful",
+          "body": "Job for policy {{policyName}} re-ran successfully!"
+        },
+        "error": {
+          "title": "Re-run Job Failed"
+        }
+      },
+      "delete_policy": {
+        "success": {
+          "title": "Removing Policy Successful",
+          "body": "Policy {{policyName}} removed successfully!"
+        },
+        "error": {
+          "title": "Removing Policy Failed"
+        }
+      },
+      "suspend_policy": {
+        "success": {
+          "title": "Suspending Policy Successful",
+          "body": "Policy {{policyName}} suspended successfully!"
+        },
+        "error": {
+          "title": "Suspending Policy Failed"
+        }
+      },
+      "activate_policy": {
+        "success": {
+          "title": "Activating Policy Successful",
+          "body": "Policy {{policyName}} activated successfully!"
+        },
+        "error": {
+          "title": "Activating Policy Failed"
+        }
+      }
     }
   },
   "topnav": {
@@ -134,7 +194,8 @@
       "integerValidator": "\"{{fieldLabel}}\" should be a positive integer",
       "time_less_than_current": "Start time must be later than the current time in the selected timezone.",
       "not_directory": "\"{{fieldLabel}}\" should be a path to directory",
-      "not_exist_directory": "Either the path does not exist or you don't have permissions on the path"
+      "not_exist_directory": "Either the path does not exist or you don't have permissions on the path",
+      "namePattern": "\"Policy Name\" should contain only letters, digits, spaces, hyphens '-', and underscores '_'."
     }
   },
   "page": {
@@ -159,7 +220,7 @@
         "updates": "Issues & Updates",
         "recent": "Recent Issues",
         "list": {
-          "view_all": "view all",
+          "view_all": "View all",
           "empty_list": "No issues or updates within the selected time period.",
           "status": {
             "in_progress": "is in progress",
@@ -258,7 +319,8 @@
         "volume": "Volume",
         "location": "Location",
         "create_pair_text": "Add Pair",
-        "create_policy_text": "Add Policy"
+        "create_policy_text": "Add Policy",
+        "launch_ambari": "Launch Ambari"
       },
       "hints": {
         "header": "Clusters shown below are enabled for DLM"
@@ -274,6 +336,7 @@
       "groups": "Groups",
       "data_summary": "Data Summary",
       "help_url": "http://docs.hortonworks.com",
+      "help_text": "What are policies?",
       "no_jobs": "No jobs",
       "no_policies": "Create your first replication policy.",
       "no_pairings": "You must create a cluster pairing before you can create a replication policy.",
@@ -329,6 +392,10 @@
         }
       },
       "subpage": {
+        "create_policy": {
+          "help_url": "http://docs.hortonworks.com",
+          "help_text": "Policy properties"
+        },
         "review": {
           "error": {
             "create_policy": "Create policy failed",
@@ -342,6 +409,7 @@
       "header_note": "Note: Pairings are bi-directional",
       "create_button_text": "Add Pairing",
       "help_url": "http://docs.hortonworks.com",
+      "help_text": "What are pairings?",
       "content": {
         "header": {
           "first_cluster": "FIRST CLUSTER",

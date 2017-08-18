@@ -12,12 +12,13 @@
     <dlm-page-header
       [title]="'page.pairings.header'"
       [isFlexCenter]="true"
-      [iconLink]="'page.pairings.help_url'">
+      [linkText]="'page.pairings.help_text'"
+      [linkTo]="'page.pairings.help_url'">
     </dlm-page-header>
   </div>
   <div class="col-md-4">
     <div class="pull-right">
-      <button qe-attr="add-pairing" type="button" class="btn btn-primary" (click)="createPairingClickHandler()">{{"page.pairings.create_button_text" | translate }}
+      <button qe-attr="add-pairing" type="button" class="btn btn-secondary" (click)="createPairingClickHandler()">{{"page.pairings.create_button_text" | translate }}
       </button>
     </div>
   </div>

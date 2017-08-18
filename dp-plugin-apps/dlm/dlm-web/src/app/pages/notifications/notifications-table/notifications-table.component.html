@@ -25,9 +25,7 @@
 
 <ng-template let-event="row" #entityTemplate>
   <span *ngIf="event.eventType === 'policyinstance' || event.eventType === 'policy'">
-    <a qe-attr="go-to-policies" [routerLink]="['/policies']" [queryParams]="{'policy': getEntity(event)}">
-      <span>{{getEntity(event)}}</span>
-    </a>
+    <dlm-event-entity-link qe-attr="go-to-policies" [event]="event" (onClick)="goToPolicy($event)"></dlm-event-entity-link>
   </span>
   <span *ngIf="event.eventType !== 'policyinstance' && event.eventType !== 'policy' ">{{getEntity(event)}}</span>
 </ng-template>

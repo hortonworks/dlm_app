@@ -54,11 +54,8 @@ export class JobEffects {
     .map(toPayload)
     .switchMap(payload => {
       return this.jobService.abortJob(payload.policy)
-        .mergeMap(result => [
-          abortJobSuccess(payload),
-          operationComplete(result)
-        ])
-        .catch(err => Observable.from([operationFail(err.json()), abortJobFailure(err)]));
+        .map(result => abortJobSuccess(payload, payload.meta))
+        .catch(err => Observable.of(abortJobFailure(err, payload.meta)));
     });
 
   @Effect()
@@ -67,11 +64,8 @@ export class JobEffects {
     .map(toPayload)
     .switchMap(payload => {
       return this.jobService.rerunJob(payload.policy)
-        .mergeMap(result => [
-          rerunJobSuccess(payload),
-          operationComplete(result)
-        ])
-        .catch(err => Observable.from([operationFail(err.json()), rerunJobFailure(err)]));
+        .map(result => rerunJobSuccess(payload, payload.meta))
+        .catch(err => Observable.of(rerunJobFailure(err, payload.meta)));
     });
 
   constructor(private actions$: Actions, private jobService: JobService) {

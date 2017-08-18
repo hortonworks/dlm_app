@@ -7,19 +7,21 @@
   ~ of all or any part of the contents of this software is strictly prohibited.
   -->
 
-<div class="btn-group" role="group">
-  <button type="button" qe-attr="hdfs-filter" class="btn btn-xs btn-link" [class.active]="activeService === POLICY_TYPES.HDFS"
+<div class="btn-group" role="group" data-toggle="buttons">
+  <label qe-attr="hdfs-filter" class="btn btn-xs btn-default btn-filter"
           (click)="filterPoliciesByService(POLICY_TYPES.HDFS)">
-    <span class="hexagon hexagon-warning">
+    <input type="checkbox" autocomplete="off">
+    <span class="hexagon hexagon-warning hexagon-small">
       <i class="fa fa-file-o"></i>
     </span>
     <span class="service-name">{{POLICY_TYPES_LABELS[POLICY_TYPES.HDFS]}}</span>
-  </button>
-  <button type="button" qe-attr="hive-filter" class="btn btn-xs btn-link" [class.active]="activeService === POLICY_TYPES.HIVE"
+  </label>
+  <label qe-attr="hive-filter" class="btn btn-xs btn-default btn-filter"
           (click)="filterPoliciesByService(POLICY_TYPES.HIVE)">
-    <span class="hexagon hexagon-success">
+    <input type="checkbox" autocomplete="off">
+    <span class="hexagon hexagon-success hexagon-small">
       <i class="fa fa-database"></i>
     </span>
     <span class="service-name">{{POLICY_TYPES_LABELS[POLICY_TYPES.HIVE]}}</span>
-  </button>
+  </label>
 </div>

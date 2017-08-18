@@ -13,6 +13,7 @@
     "new": "New",
     "add": "Add",
     "edit": "Edit",
+    "update": "Update",
     "delete": "Delete",
     "addAndNew": "Add & New",
     "cancel": "Cancel",
@@ -40,10 +41,12 @@
       "rowsPerPage": "Rows per page"
     },
     "roles": {
-      "SUPERADMIN": "Admin",
-      "INFRAADMIN": "Cluster Admin",
-      "USER": "Consumer",
+      "SUPERADMIN": "Dataplane Admin",
+      "INFRAADMIN": "Infra Admin",
       "CURATOR": "Data Steward"
+    },
+    "serviceNameMappings" : {
+      "BEACON": "Data Lifecycle Manager Engine"
     },
     "signout": "Sign Out",
     "unauthorized": "Unauthorized",
@@ -116,18 +119,20 @@
         "verifySmartSenseId": "Verify SmartSense ID",
         "verified": "VERIFIED",
         "lastUpdated": "Last Updated",
+        "serviceSummary": "SERVICE STATUS SUMMARY",
         "action": "Action",
         "installationSteps": "Steps for Installation:",
         "installationLink":"Installation Steps.",
         "installationStepsDoc":"https://docs.hortonworks.com/",
-        "dependentServicesLabel":"DEPENDENT SERVICES:"
+        "dependentServicesLabel":"DEPENDENT SERVICES:",
+        "syncFailed":"Cluster Information could not be fetched"
       },
       "description": {
         "verificationWelcome": "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your SmartSense ID.",
-        "manualInstall" : "Service {{serviceName}} is not enabled on cluster {{clusterName}} as one or more of the dependent services have not been enabled. Please enable the dependent services on the cluster using the documentation link. After all the dependent services are installed on the cluster, please click on the verification check box.",
+        "manualInstall" : "Service <b>{{serviceName}}</b> is not enabled on cluster <b>{{clusterName}}</b> as one or more of the dependent services have not been enabled. Please enable the dependent services on the cluster using the documentation link. After all the dependent services are installed on the cluster, please click on the verification check box.",
         "enableError": "Service could not be enabled.",
         "verificationError": "Incorrect SmartSense ID format",
-        "installationConfirmation":"All the dependent services have been installed on cluster {{clusterName}}.",
+        "installationConfirmation":"All the dependent services have been installed on cluster <b>{{clusterName}}.</b>",
         "installationLink": "For detailed steps on the installation process, please visit ",
         "verifyingStatus": "Verifying dependent services status on the cluster...",
         "successStatus":"All the service dependencies are met. Please click Next to continue",
@@ -166,9 +171,11 @@
         "usernameorgroup": "Username/Group",
         "active": "Active",
         "inactive": "Inactive",
-        "additionalConfigs": "Additional Configs"
+        "additionalConfigs": "Additional Configs",
+        "editCluster": "Edit Cluster"
       },
       "description": {
+        "editCluster": "Please update your Ambari managed cluster (already added to Dataplane) here.",
         "addCluster": "Please add Ambari managed cluster to Dataplane. Dataplane will auto-discover cluster information such as the cluster name, active services & important metrics running.",
         "datalake": "This cluster has been identified as a Datalake since it has data management services,  {{serviceNames}} running.",
         "clusterLocation": "Geographical location of the cluster",

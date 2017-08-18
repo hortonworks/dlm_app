@@ -7,14 +7,19 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+@import '../../../styles/mixins.scss';
+$hex-size: 18px;
+
 .dlm-jobs-overview-table {
   .policy-name {
     font-size: 12px;
   }
   .hexagon {
+    @include hexagon($hex-size, transparent);
+    font-size: $hex-size / 2.5;
     display: inline-block;
     float: left;
-    margin: 2px !important;
+    margin: 4px 0 0 4px !important;
   }
   .service-name {
     display: inline-block;

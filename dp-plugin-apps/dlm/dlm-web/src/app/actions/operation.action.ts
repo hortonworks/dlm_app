@@ -11,6 +11,7 @@ import { type } from 'utils/type-action';
 import { OperationResponse } from 'models/operation-response.model';
 import { Action } from '@ngrx/store';
 import { getError } from 'utils/http-util';
+import { genId } from 'utils/string-utils';
 
 export const ActionTypes = {
   OPERATION_COMPLETE: type('OPERATION_COMPLETE'),
@@ -18,7 +19,7 @@ export const ActionTypes = {
 };
 
 export const operationComplete = (payload: OperationResponse): Action => {
-  const operation = {id: _getId(), ...payload};
+  const operation = {id: genId(), ...payload};
   return {
     type: ActionTypes.OPERATION_COMPLETE,
     payload: operation
@@ -27,13 +28,9 @@ export const operationComplete = (payload: OperationResponse): Action => {
 export const operationFail = (payload: any): Action => {
   // @todo hack to get real response
   const operation = getError(payload);
-  operation.id = _getId();
+  operation.id = genId();
   return {
     type: ActionTypes.OPERATION_FAIL,
     payload: operation
   };
 };
-
-function _getId() {
-  return String(new Date().getTime());
-}

@@ -1,6 +1,6 @@
 INSERT INTO dataplane.skus(name,description,status)
 VALUES
-('dlm','Data Lifecycle Management',1);
+('dlm','Data Lifecycle Manager',1);
 
 INSERT INTO dataplane.skus(name,description,status)
 VALUES

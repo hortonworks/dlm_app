@@ -35,6 +35,7 @@
 <ng-template #verbStatusCellTemplate let-job="value" let-policy="row">
   <dlm-transferred-column
     *ngIf="job.status === JOB_STATUS.RUNNING; else verbTpl"
+    [jobStatus]="job.status"
     [trackingInfo]="job.trackingInfo">
   </dlm-transferred-column>
   <ng-template #verbTpl>
@@ -112,21 +113,3 @@
     (handler)="handleSelectedAction($event)">
   </dlm-policy-actions>
 </ng-template>
-
-<dlm-modal-dialog
-  qe-attr="confirmation-modal"
-  [title]="'page.policies.perform_action.confirmation.title'"
-  [body]="'page.policies.perform_action.confirmation.body'"
-  [showDialog]="showActionConfirmationModal"
-  (onClose)="onCloseActionConfirmationModal()"
-  (onOk)="onActionConfirmation()">
-</dlm-modal-dialog>
-
-<dlm-modal-dialog
-  qe-attr="entity-action-result-modal"
-  [title]="lastOperationResponse.status"
-  [body]="lastOperationResponse.message"
-  [showDialog]="showOperationResponseModal"
-  [showCancel]="false"
-  (onClose)="onCloseOperationResponseModal()">
-</dlm-modal-dialog>
