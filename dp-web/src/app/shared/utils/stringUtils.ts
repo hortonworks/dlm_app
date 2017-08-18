@@ -4,15 +4,30 @@ export class StringUtils {
   };
 
   public static cleanupUri(url: string): string {
-    // http://stackoverflow.com/a/26434126/640012
-    //  create an anchor element (note: no need to append this element to the document)
     if (!url || url.length === 0) {
       return '';
     }
+    url = url.replace(/^\s+|\s+$/g, '');
     url = url.replace(/\/$/, '');
+
+    let protoHostArray = url.split("://");
+    if(protoHostArray.length < 2 || !(protoHostArray[0] === "http" || protoHostArray[0] === "https")){
+      return '';
+    }
+    let lastColIdx = protoHostArray[1].lastIndexOf(":");
+    if(lastColIdx === -1){
+      return '';
+    }
+    let urlHostInfo = protoHostArray[1].substring(0,lastColIdx);
+    let urlPortInfo = protoHostArray[1].substring((lastColIdx+1));
+
+
     let link = document.createElement('a');
-    //  set href to any path
+
     link.setAttribute('href', url);
+    if(urlHostInfo !== link.hostname || urlPortInfo !== link.port){
+      return '';
+    }
 
     const cleanedUri = `${link.protocol || 'http:'}//${link.hostname}:${link.port || '80'}`;
     // cleanup for garbage collection

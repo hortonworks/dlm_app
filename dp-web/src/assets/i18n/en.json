@@ -199,6 +199,7 @@
         "addGroupError": "Not able to save groups",
         "updateGroupError": "Not able to update group",
         "invalidRoleInput": "Invalid Entry in Roles Input",
+        "invalidAmbariUrl":"Invalid Ambari URL. Please enter a valid URL of the form http://host:port or https://host:port.",
         "invalidUserInput": "Invalid Entry in Users Input"
       }
     },
