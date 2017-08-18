@@ -55,9 +55,9 @@
                 <button [attr.id]="'dropDown_'+lakeInfo.id" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
                 <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i></button>
                 <ul mdl class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+lakeInfo.id">
-                    <li class="mdl-menu__item"><i class="fa fa-external-link"></i><a href="{{lakeInfo.ambariUrl}}" target="_blank">Go to Ambari</a></li>
+                    <li class="mdl-menu__item"><a href="{{lakeInfo.ambariUrl}}" target="_blank"><i class="fa fa-external-link"></i>Go to Ambari</a></li>
                     <li class="mdl-menu__item" (click)="refresh(lakeInfo)"><i class="fa__fa-close--icon fa fa-refresh"></i>Refresh</li>
-                    <li class="mdl-menu__item"><i class="fa__fa-close--icon fa fa-edit"></i><a [routerLink]="['/infra/edit', lakeInfo.id]">{{"common.edit" | translate}}</a></li>
+                    <li class="mdl-menu__item"><a [routerLink]="['/infra/edit', lakeInfo.id]"><i class="fa__fa-close--icon fa fa-edit"></i>{{"common.edit" | translate}}</a></li>
                 </ul>
           </td>
       </tr>
