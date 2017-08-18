@@ -18,7 +18,7 @@
       <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{dsModel.counts.filesCount}}</td>
       <td class="mdl-data-table__cell--non-numeric actions">
         <div [ngClass]="{'visibility-visible': index === hoveredIndex, 'visibility-hidden': index !== hoveredIndex}">
-          <button  id="dropDownIcon_{{ dsModel.id }}" class="mdl-button mdl-js-button mdl-button--icon"><i class="fa fa-ellipsis-h fa__fa-ellipsis-h--icon"></i></button>
+          <button  id="dropDownIcon_{{ dsModel.id }}" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon"><i class="fa fa-ellipsis-v fa__fa-ellipsis-v--icon"></i></button>
           <label class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
                   for="dropDownIcon_{{ dsModel.id }}">
               <li class="mdl-menu__item"><i class="fa__fa-edit--icon fa fa-edit"></i>{{"common.edit" | translate}}</li>

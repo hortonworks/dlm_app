@@ -88,75 +88,22 @@
   height:100%;
 }
 
-.listCont .list .listRow .nameCol.hlink {
-  color: $eastern-blue;
-  cursor: pointer;
-}
 
-.listCont .list .listRow.listHead,
-.listCont .list .listRow.listHead .nameCol{
-  text-transform: uppercase;
-  color: $dusty-gray;
-  font-size: 12px;
-}
-.listCont .list .listRow {
-  clear: both;
-  height: 45px;
-  line-height: 45px;
-  color: $dove-gray;
-  border-bottom: 1px solid $iron;
-}
-
-.listCont .list .listRow.disabled {
-  color: $iron;
-}
-.listCont .list .listRow .col {
-  width:15%;
-  margin:0px 2%;
-  overflow: hidden;
-  white-space:nowrap ;
-  text-overflow: ellipsis;
-  float: left;
-}
-.listCont .list.withDsNameCom .listRow .col{
-  width:11%;
-}
-.listCont .list .listRow .col.ownerCol {
-  width:10%;
-}
-
-.listCont .list .listRow .col.descCol {
-  width:40%;
-}
-.listCont .list.withDsNameCom .listRow .col.descCol {
-  width:34%;
-}
-
-.listCont .list .listRow .checkboxCont,
-.listCont .list.withDsNameCom .listRow .starCol {
-  width:3%;
-  margin:0px;
-  text-align: center;
-}
-.listCont .list .listRow .noRowsCol {
-  text-align: right;
-}
-
-.listCont .list .listRow .sourceCol > span {
+.listCont .sourceCol > span {
   text-transform: uppercase;
   font-size: 12px;
 }
-.listCont .list .listRow .hiveCol > span {
+.listCont .hiveCol > span {
   color:white;
   background-color: $dove-gray;
   padding:3px 8px 2px;
   border-radius: 3px;
 }
-.listCont .list .listRow.disabled .hiveCol > span {
+.listCont .disabled .hiveCol > span {
   background-color: $iron;
 }
 
-.listCont .list .listRow .filesCol > span {
+.listCont .listRow .filesCol > span {
   color:white;
   background-color: $dove-gray;
   padding:3px 8px 2px;
