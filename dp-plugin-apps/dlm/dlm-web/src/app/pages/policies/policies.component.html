@@ -8,13 +8,13 @@
   -->
 
 <div class="row">
-  <div class="col-md-3">
+  <div class="col-md-4">
     <dlm-page-header [title]="'page.policies.header'"
                      [linkText]="'page.policies.help_text'"
                      [linkTo]="'page.policies.help_url'"
                      [isFlexCenter]="true"></dlm-page-header>
   </div>
-  <div class="col-md-9 actions">
+  <div class="col-md-8 actions">
     <div class="pull-right filters-block">
 
       <div class="filter-item" *ngIf="(policies$ | async)?.length > 0">

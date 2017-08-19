@@ -1,4 +1,4 @@
-/*!
+/*
  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
  *
  * Except as expressly permitted in a written agreement between you or your company
@@ -7,31 +7,14 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-:host {
-  .filter-item {
-    margin: 2px;
-    font-size: 12px;
-    font-weight: 400;
-    display: inline-block;
-    float: right;
-  }
-  .applied-filters-wrapper {
-    max-width: 320px;
-  }
-  input {
-    width: 200px;
-  }
+import { Pipe, PipeTransform } from '@angular/core';
+import { capitalize } from 'utils/string-utils';
 
-  .label.label-default a {
-    color: #fff;
-    &:hover {
-      text-decoration: none;
-    }
-  }
-  .form-group {
-    margin-bottom: 0;
-  }
-  .form-control-feedback {
-    color: #999;
+@Pipe({name: 'jobStatusFmt'})
+export class JobStatusFmtPipe implements PipeTransform {
+  transform(status: string): string {
+    return {
+        'RUNNING': 'In Progress'
+      }[status] || capitalize(status);
   }
 }

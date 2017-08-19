@@ -14,6 +14,7 @@ import { FmtTzPipe } from './fmt-tz.pipe';
 import { FrequencyPipe } from './frequency.pipe';
 import { TruncatePipe } from './truncate.pipe';
 import { StatusFmtPipe } from './status-fmt.pipe';
+import { JobStatusFmtPipe } from './job-status-fmt.pipe';
 
 @NgModule({
   imports: [
@@ -24,14 +25,16 @@ import { StatusFmtPipe } from './status-fmt.pipe';
     FmtTzPipe,
     FrequencyPipe,
     TruncatePipe,
-    StatusFmtPipe
+    StatusFmtPipe,
+    JobStatusFmtPipe
   ],
   exports: [
     BytesSizePipe,
     FmtTzPipe,
     FrequencyPipe,
     TruncatePipe,
-    StatusFmtPipe
+    StatusFmtPipe,
+    JobStatusFmtPipe
   ]
 })
 export class PipesModule {}
