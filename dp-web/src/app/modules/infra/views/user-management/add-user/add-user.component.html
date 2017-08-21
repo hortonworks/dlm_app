@@ -15,7 +15,7 @@
     <form #addUserForm="ngForm">
       <div *ngIf="mode === modes.ADD">
         <div class="form-group dp-input">
-          <label class="required">{{"pages.infra.labels.username" | translate}}</label>
+          <label class="required">{{"pages.infra.labels.addUserNames" | translate}}</label>
           <div id="duplicate-user-warning" class="hwx-inline-desc warning"></div>
           <tagging-widget #userTags id="user-tags" class="user-tags"
             [tags]="users"
