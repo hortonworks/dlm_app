@@ -101,10 +101,10 @@ Follow these instructions for working with these tarballs.
 * Untar the tarballs. For e.g `tar -xzf dp-1.0.0.0-<buildnum>.tar.gz` and `tar -xzf dlm-1.0.0.0-<buildnum>.tar.gz`. Let us refer to the directory of install as DATAPLANE_HOME
 * cd $DATAPLANE_HOME/dp-core/bin
 * Edit the file `config.env.sh` to enable properties you want to configure. Please refer to the section 'Bootstrap Configuration' for more details.
-* Run `./dpdeploy load`. This will load all DP Core docker images which are bundled in the tarballs into the local machine's docker repo. Note that doing this for the first Dataplane installation might take a while. 
+* Run `./dpdeploy.sh load`. This will load all DP Core docker images which are bundled in the tarballs into the local machine's docker repo. Note that doing this for the first Dataplane installation might take a while. 
 * Run `./dpdeploy.sh init --all`
 * cd $DATAPLANE_HOME/dlm/bin
-* Run `./dlmdeploy load`. This will load the DLM Service docker image into the local machine's docker repo. Note that doing this for the first Dataplane installation might take a while.
+* Run `./dlmdeploy.sh load`. This will load the DLM Service docker image into the local machine's docker repo. Note that doing this for the first Dataplane installation might take a while.
 * Run `./dlmdeploy.sh init`
 * Verify the services are up using `docker ps`. There must be 8 service containers that are running.  
 
