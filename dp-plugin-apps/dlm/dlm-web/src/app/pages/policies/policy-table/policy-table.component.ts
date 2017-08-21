@@ -304,6 +304,11 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     this.selectedPolicy$.next(policy);
   }
 
+  deactivatePolicy() {
+    this.activeContentType = null;
+    this.selectedPolicy$.next(<Policy>{});
+  }
+
   toggleSelectedRow(nextPolicy, contentType) {
     const selectedPolicy = this.selectedPolicy$.getValue();
     const isContentChanged = contentType !== this.activeContentType;
