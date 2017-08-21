@@ -3,7 +3,7 @@
     <span class="hwx-title">{{"pages.services.labels.verify" | translate}}</span>
   </div>
   <div class="content-pane">
-    <div class="hwx-inline-desc">{{welcomeMessage}}</div>
+    <div class="hwx-inline-desc"[innerHTML]="'pages.services.description.verificationWelcome'| translate: descriptionParams"></div>
     <div class="spacer-15"></div>
     <div *ngIf="showError">
     <div class="error-notification-bar">

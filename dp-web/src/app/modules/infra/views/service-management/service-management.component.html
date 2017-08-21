@@ -3,6 +3,13 @@
     <div class="title-pane">
       <span class="hwx-title">{{"pages.services.labels.enabledServices" | translate}}</span>
     </div>
+    <div *ngIf="showNotification">
+      <div id="success-notification-bar" class="notification-bar">
+        <i class="fa fa-check-circle pull-left"></i>
+        <div id="success-heading" class="hwx-subtitle title">{{"pages.services.labels.serviceEnabled" | translate}}</div>
+        <div id="success-message" class="message" [innerHTML]="'pages.services.description.serviceEnabled'| translate: serviceNameParams"></div>
+      </div>
+    </div>
     <div class="services-table">
       <div *ngFor="let enabledApp of enabledAppDetails">
         <div class="row" (click)="getClusters(enabledApp)">
