@@ -125,7 +125,8 @@
         "installationLink":"Installation Steps.",
         "installationStepsDoc":"https://docs.hortonworks.com/",
         "dependentServicesLabel":"DEPENDENT SERVICES:",
-        "syncFailed":"Cluster Information could not be fetched"
+        "syncFailed":"Cluster Information could not be fetched",
+        "serviceEnabled":"Service Enabled successfully"
       },
       "description": {
         "verificationWelcome": "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your SmartSense ID.",
@@ -136,7 +137,8 @@
         "installationLink": "For detailed steps on the installation process, please visit ",
         "verifyingStatus": "Verifying dependent services status on the cluster...",
         "successStatus":"All the service dependencies are met. Please click Next to continue",
-        "errorStatus":"The following dependent service(s) information is not present on the cluster. Please install them to continue."
+        "errorStatus":"The following dependent service(s) information is not present on the cluster. Please install them to continue.",
+        "serviceEnabled": "All the authorized users of {{serviceName}} service, should re-login to be able to access the service."
       }
     },
     "infra": {
