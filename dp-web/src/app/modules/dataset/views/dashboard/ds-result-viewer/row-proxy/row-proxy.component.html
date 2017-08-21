@@ -6,7 +6,9 @@
       <th class="mdl-data-table__cell--non-numeric">{{("common.datalake" | translate).toUpperCase()}}</th>
       <th class="mdl-data-table__cell--non-numeric">{{("pages.dataset.labels.createdBy" | translate).toUpperCase()}}</th>
       <th class="mdl-data-table__cell--non-numeric">{{("pages.dataset.labels.hiveTables" | translate).toUpperCase()}}</th>
+<!--
       <th class="mdl-data-table__cell--non-numeric">{{("pages.dataset.labels.hdfsFiles" | translate).toUpperCase()}}</th>
+-->
       <th class="mdl-data-table__cell--non-numeric actions"></th>
     </tr>
   </thead>
@@ -17,8 +19,11 @@
       <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{dsModel.datalakeName}}</td>
       <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{dsModel.creatorName}}</td>
       <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{dsModel.counts.hiveCount}}</td>
+<!--
       <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{dsModel.counts.filesCount}}</td>
+-->
       <td class="mdl-data-table__cell--non-numeric actions">
+<!--
         <div [ngClass]="{'visibility-visible': index === hoveredIndex, 'visibility-hidden': index !== hoveredIndex}">
           <button  id="dropDownIcon_{{ dsModel.id }}" class="mdl-button mdl-js-button mdl-button--icon"><i class="fa fa-ellipsis-h fa__fa-ellipsis-h--icon"></i></button>
           <label class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
@@ -32,6 +37,7 @@
               </li>
           </label>
           </div>
+ -->
       </td>
     </tr>
   </tbody>
