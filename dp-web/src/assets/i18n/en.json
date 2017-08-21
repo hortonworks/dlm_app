@@ -168,7 +168,9 @@
         "addUser": "ADD USER",
         "addGroup": "ADD GROUP",
         "username": "Username",
+        "addUserNames": "Usernames",
         "groupName": "Group Name",
+        "addGroupNames": "Group Names",
         "roles": "Roles",
         "usernameorgroup": "Username/Group",
         "active": "Active",
@@ -205,7 +207,8 @@
         "updateGroupError": "Not able to update group",
         "invalidRoleInput": "Invalid Entry in Roles Input",
         "invalidAmbariUrl":"Invalid Ambari URL. Please enter a valid URL of the form http://host:port or https://host:port.",
-        "invalidUserInput": "Invalid Entry in Users Input"
+        "invalidUserInput": "Invalid Entry in Users Input",
+        "invalidGroupInput": "Invalid Entry in Groups Input"
       }
     },
     "dataset": {

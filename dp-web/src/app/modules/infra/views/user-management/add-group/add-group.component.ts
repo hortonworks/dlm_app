@@ -209,7 +209,7 @@ export class AddGroupComponent {//implements OnInit {
       valid = false;
     }
     if (!this.userTags.isValid) {
-      this.onError(this.translateService.instant('pages.infra.description.invalidUserInput'));
+      this.onError(this.translateService.instant('pages.infra.description.invalidGroupInput'));
       valid = false;
     }
     return valid;

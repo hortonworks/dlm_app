@@ -15,7 +15,7 @@
     <form #addGroupForm="ngForm">
       <div *ngIf="mode === modes.ADD">
         <div class="form-group dp-input">
-          <label class="required">{{"pages.infra.labels.groupName" | translate}}</label>
+          <label class="required">{{"pages.infra.labels.addGroupNames" | translate}}</label>
           <div id="duplicate-group-warning" class="hwx-inline-desc warning"></div>
           <tagging-widget #userTags id="group-tags" class="user-tags"
           [tags]="groups"
@@ -47,7 +47,7 @@
     <form #editGroupForm="ngForm">
       <div *ngIf="mode === modes.EDIT">
         <div class="mdl-grid mdl-grid--no-spacing padding-top15">
-          <div class="mdl-cell mdl-cell--2-col">{{"pages.infra.labels.username" | translate}}</div>
+          <div class="mdl-cell mdl-cell--2-col">{{"pages.infra.labels.groupName" | translate}}</div>
           <div class="mdl-cell mdl-cell--1-col">  &nbsp;: </div>
           <div class="mdl-cell mdl-cell--9-col">{{group? group.groupName: ''}} </div>
         </div>
