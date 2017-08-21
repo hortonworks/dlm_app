@@ -75,7 +75,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     userIdRolesMap
   }
 
-  def getUserDetail(userName:String)={
+  def getUserDetail(userName:String):Future[UserInfo]={
     for {
       (user, userRoles) <- getUserDetailInternal(userName)
       roleIdMap<-rolesUtil.getRoleIdMap
@@ -135,7 +135,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     }
   }
 
-  def insertUserWithRoles(userInfo:UserInfo,password:String)={
+  def insertUserWithRoles(userInfo:UserInfo,password:String):Future[UserInfo]={
     val user = User(username = userInfo.userName, password = password, displayname = userInfo.displayName,avatar = None,active = userInfo.active)
     rolesUtil.getRoleNameMap().flatMap{roleNameMap=>
       val query = for{
