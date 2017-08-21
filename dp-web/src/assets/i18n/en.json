@@ -209,7 +209,8 @@
         "invalidRoleInput": "Invalid Entry in Roles Input",
         "invalidAmbariUrl":"Invalid Ambari URL. Please enter a valid URL of the form http://host:port or https://host:port.",
         "invalidUserInput": "Invalid Entry in Users Input",
-        "invalidGroupInput": "Invalid Entry in Groups Input"
+        "invalidGroupInput": "Invalid Entry in Groups Input",
+        "invalidLocation" : "Not a valid location. Please select a location from dropdown."
       }
     },
     "dataset": {

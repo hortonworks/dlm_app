@@ -91,16 +91,22 @@
             <div class="form-group">
               <label class="required">{{"pages.infra.labels.clusterLocation" | translate}}</label>
               <div class="hwx-inline-desc">{{"pages.infra.description.clusterLocation" | translate}}</div>
-              <input required class="dp-input" name="location" type="text" autocomplete="off" ngui-auto-complete
-                     (keyup)="checkLocation()"
-                     [min-chars]=3
-                     [(ngModel)]="location"
-                     [source]="getLocations.bind(this)"
-                     [value-formatter]="locationFormatter"
-                     [list-formatter]="locationFormatter"
-                     [no-match-found-text]="'No locations found'"
-                     placeholder="Location"
-                     (valueChanged)="onSelectLocation(location)" [(ngModel)]="searchTerm"/>
+              <div style="display: flex;align-items: center">
+                <div [ngClass]="{'validation-error' : isLocationValid==false}">
+                  <input required class="dp-input" name="location" type="text" autocomplete="off" ngui-auto-complete
+                         (keyup)="checkLocation()"
+                         (blur)="checkLocationValidity(location)"
+                         [min-chars]=3
+                         [(ngModel)]="location"
+                         [source]="getLocations.bind(this)"
+                         [value-formatter]="locationFormatter"
+                         [list-formatter]="locationFormatter"
+                         [no-match-found-text]="'No locations found'"
+                         placeholder="Location"
+                         (valueChanged)="onSelectLocation(location)" [(ngModel)]="searchTerm"/>
+                </div>
+                <div *ngIf="isLocationValid === false" class="location-error fa fa-times">{{"pages.infra.description.invalidLocation" | translate}}</div>
+              </div>
             </div>
             <div class="form-group">
               <label class="required">{{"pages.infra.labels.dataCenter" | translate}}</label>
