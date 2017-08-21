@@ -122,4 +122,8 @@ export class ClusterListComponent implements OnInit {
   shouldShowAction(rowId) {
     return rowId in this.visibleActionMap && this.visibleActionMap[rowId];
   }
+
+  isExpandedRow(row: Cluster): boolean {
+    return this.tableComponent.expandedRows[row.id];
+  }
 }

@@ -38,7 +38,7 @@
 <ng-template let-stats="value" let-cluster="row" #usageCell>
   <div class="text-primary cell-content actionable" qe-attr="cluster-details" (click)="toggleClusterDetails(cluster)">
     <span [innerHTML]="stats.CapacityUsed | bytesSize"></span> / <span [innerHTML]="stats.CapacityTotal | bytesSize"></span>
-    <i class="fa fa-chevron-down"></i>
+    <i [ngClass]="{fa: true, 'fa-chevron-down': !isExpandedRow(cluster), 'fa-chevron-up': isExpandedRow(cluster)}"></i>
   </div>
 </ng-template>
 
