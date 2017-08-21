@@ -110,15 +110,13 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     }
   }
 
-  def updateUserAndRoles(userInfo:UserInfo, groupManaged:Boolean)={
-    for{
-      (user,userRoles)<-getUserDetailInternal(userInfo.userName)
-      userRoles<-db.run(UserRoles.filter(_.userId === user.id.get).result)
-      (toBeAddedRoleIds,toBeDeletedRoleIds)<-resolveUserRolesEntries(userInfo.roles,userRoles)
-
+  def updateUserAndRoles(userInfo:UserInfo, groupManaged:Boolean):Future[UserInfo]={
+    val queryFuture=for{
+      (user,currentRoles)<-getUserDetailInternal(userInfo.userName)
+      (toBeAddedRoleIds,toBeDeletedRoleIds)<-resolveUserRolesEntries(userInfo.roles,currentRoles)
     }yield{
-      val userRoleObjs=rolesUtil.getUserRoleObjectsforRoleIds(user.id.get,toBeAddedRoleIds)
-      val query =for{
+      val toBeAddedRoleObjs=rolesUtil.getUserRoleObjectsforRoleIds(user.id.get,toBeAddedRoleIds)
+      for{
         updateUser <- {
           Users.filter(_.username===userInfo.userName)
             .map{r=>
@@ -126,12 +124,14 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
             }
             .update(userInfo.active, Some(LocalDateTime.now()),Some(groupManaged))
         }
-        insertQuery<-UserRoles returning UserRoles ++= userRoleObjs
+        insertQuery<-UserRoles returning UserRoles ++= toBeAddedRoleObjs
         delQuery <- UserRoles.filter(_.id inSet toBeDeletedRoleIds).delete
       }yield {
         (updateUser,delQuery,insertQuery)
       }
-      db.run(query.transactionally)
+    }
+    queryFuture.flatMap{query=>
+      db.run(query.transactionally).map(res=>userInfo)
     }
   }
 
