@@ -81,7 +81,7 @@ export class ClusterAddComponent implements OnInit {
     } else if (this._clusterState.alreadyExists) {
       let reasonsTranslation = this.translateService.instant('pages.infra.description.clusterAlreadyExists');
       reasons.push(reasonsTranslation);
-    } else if(this.isInvalidAmbariUrl){
+    } else if (this.isInvalidAmbariUrl) {
       let reasonsTranslation = this.translateService.instant('pages.infra.description.invalidAmbariUrl');
       reasons.push(reasonsTranslation);
     }
@@ -90,10 +90,8 @@ export class ClusterAddComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
-      if (params.status && params.status === 'success') {
-        this.showNotification = true;
-      }
+    this.lakeService.clusterAdded$.subscribe(() => {
+      this.showNotification = true;
     });
   }
 
@@ -113,7 +111,7 @@ export class ClusterAddComponent implements OnInit {
     this._isClusterValidateSuccessful = false;
     this._clusterState = new ClusterState();
     let cleanedUri = StringUtils.cleanupUri(this.cluster.ambariurl);
-    if(!cleanedUri){
+    if (!cleanedUri) {
       this.isInvalidAmbariUrl = true;
       this._isClusterValidateInProgress = false;
       this.applyErrorClass();
@@ -146,11 +144,12 @@ export class ClusterAddComponent implements OnInit {
     );
   }
 
-  applyErrorClass(){
-    if(this.ambariInputContainer.nativeElement.className.indexOf('validation-error') === -1){
+  applyErrorClass() {
+    if (this.ambariInputContainer.nativeElement.className.indexOf('validation-error') === -1) {
       this.ambariInputContainer.nativeElement.className += ' validation-error';
     }
   }
+
   getConfigs(detailRequest: any) {
     detailRequest.url = this.cluster.ambariurl;
     detailRequest.knoxUrl = this._clusterState.knoxUrl;
@@ -248,15 +247,15 @@ export class ClusterAddComponent implements OnInit {
 
   onCreate() {
     this.showError = false;
-    if(!this.isFormValid()){
+    if (!this.isFormValid()) {
       return;
     }
     this.createCluster()
       .subscribe(
         () => {
-          this.router.navigate(['infra', {
-            status: 'success'
-          }]);
+          this.router.navigate(['infra']).then(() => {
+
+          });
         },
         error => {
           this.handleError(error);
@@ -264,11 +263,11 @@ export class ClusterAddComponent implements OnInit {
       );
   }
 
-  isFormValid(){
+  isFormValid() {
     if (!this.clusterForm.form.valid) {
       this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
       this.showError = true;
-      window.scrollTo(0,0);
+      window.scrollTo(0, 0);
       return false;
     }
     return true;
@@ -315,7 +314,7 @@ export class ClusterAddComponent implements OnInit {
 
   onCreateAndAdd() {
     this.showError = false;
-    if(!this.isFormValid()){
+    if (!this.isFormValid()) {
       return;
     }
     this.createCluster().subscribe(
@@ -323,9 +322,9 @@ export class ClusterAddComponent implements OnInit {
         this.cluster = new Cluster();
         this._isClusterValid = false;
         this._isClusterValidateSuccessful = false;
-        this.router.navigate(['infra/add', {
-          status: 'success'
-        }]);
+        this.router.navigate(['infra/add']).then(() => {
+          this.lakeService.clusterAdded.next();
+        });
       },
       error => {
         this.handleError(error);
