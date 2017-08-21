@@ -137,14 +137,14 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
           case  None=>{
             userRepo
               .insertUserWithRoles(userInfo, password)
-              .map(userInfo => success(userInfo))
+              .map(updatedUserInfo => success(updatedUserInfo))
               .recoverWith(apiError)
           }
           case Some(user)=>{
             user.groupManaged match {
               case Some(true)=> userRepo
                 .updateUserAndRoles(userInfo,false)
-                .map(userInfo => Ok)
+                .map(updatedUserInfo =>success(userInfo))
                 .recoverWith(apiError)
               case _=>{
                 Future.successful(Conflict(Json.toJson(Errors(Seq(Error("USER_ALREADY_EXISTS","User Already Exists"))))))

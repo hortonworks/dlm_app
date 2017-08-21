@@ -81,14 +81,14 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
       roleIdMap<-rolesUtil.getRoleIdMap
     }yield {
       val roles=userRoles.map{userRoleObj=>
-        val roleName:String=roleIdMap(userRoleObj._2.get.roleId.get).roleName
+        val roleName:String=roleIdMap(userRoleObj.roleId.get).roleName
         RoleType.withName(roleName)
       }
       UserInfo(id=user.id,userName=user.username,displayName = user.displayname,roles=roles,active = user.active)
     }
   }
 
-  private def getUserDetailInternal(userName:String)={
+  private def getUserDetailInternal(userName:String):Future[(User,Seq[UserRole])]={
     val query=for{
       (user, userRole) <- Users.filter(_.username===userName) joinLeft  UserRoles on (_.id === _.userId)
     }yield {
@@ -97,7 +97,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     val roleIdMap=rolesUtil.getRoleIdMap
     db.run(query.result).map { results =>
       val user:User=results.head._1
-      var roles=results.filter(res=>res._2.isDefined )
+      var roles=results.filter(res=>res._2.isDefined ).map(_._2.get)
       (user,roles)
     }
   }
