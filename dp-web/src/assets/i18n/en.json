@@ -70,7 +70,7 @@
       },
       "description": {
         "dataplane": "Welcome to Hortonworks Data Plane. To start, please configure the LDAP properties and allow dataplane authenticate against it. Optionally, you can add Dataplane Administrators. Please proceed by clicking on GET STARTED",
-        "clusterOnboard": "Welcome to Hortonworks Data Plane. To start, please add your Ambari managed clusters to Dataplane. Please proceed by clicking on GET STARTED.",
+        "clusterOnboard": "Welcome to Hortonworks Data Plane. To start, please add your Ambari managed clusters to Data Plane. You can also enable Data Plane services or provide more users or groups access to them. Please proceed by clicking on GET STARTED.",
         "setupAuth": "The first step is to help data plane connect to your LDAP by providing the LDAP configurations to Data plane.",
         "defineUsers": "Upon completing the LDAP configuration, you may add administrators to Data plane. You can add users or groups to data plane and assign or modify their roles anytime through the User Management Screen.",
         "manageUsers": "You can manage users or groups in data plane and assign or modify their roles anytime through the User Management Screen.",
