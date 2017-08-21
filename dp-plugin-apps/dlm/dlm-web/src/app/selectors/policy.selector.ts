@@ -27,8 +27,10 @@ export const getAllPoliciesWithClusters = createSelector(getAllPolicies, getAllC
   return policies.map(policy => {
     return {
       ...policy,
-      targetClusterResource: clusters.find(cluster => cluster.name === PolicyService.getClusterName(policy.targetCluster)) || {},
-      sourceClusterResource: clusters.find(cluster => cluster.name === PolicyService.getClusterName(policy.sourceCluster)) || {}
+      targetClusterResource: clusters.find(cluster =>  PolicyService
+        .makeClusterId(cluster.dataCenter, cluster.name) === policy.targetCluster) || {},
+      sourceClusterResource: clusters.find(cluster =>  PolicyService
+        .makeClusterId(cluster.dataCenter, cluster.name) === policy.sourceCluster) || {}
     };
   });
 });
