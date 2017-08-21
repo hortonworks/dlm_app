@@ -128,12 +128,11 @@ export class ClusterListComponent implements OnInit {
     return rowId in this.visibleActionMap && this.visibleActionMap[rowId];
   }
 
+  isExpandedRow(row: Cluster): boolean {
+    return this.tableComponent.expandedRows[row.id];
+  }
 
   getFileBrowserPageForRow(rowId) {
     return rowId && rowId in this.selectedFileBrowserPage ? this.selectedFileBrowserPage[rowId] : 0;
-  }
-  
-  isExpandedRow(row: Cluster): boolean {
-    return this.tableComponent.expandedRows[row.id];
   }
 }

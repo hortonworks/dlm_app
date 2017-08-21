@@ -28,7 +28,7 @@
     "policy": "Policy",
     "name": "Name",
     "queue_name": "Queue Name",
-    "max_bandwidth": "Maximum Bandwidth",
+    "max_bandwidth": "Max. Bandwidth",
     "job": "Job",
     "jobs": "Jobs",
     "start_time": "Start Time",
