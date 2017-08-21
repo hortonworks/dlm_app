@@ -75,6 +75,8 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   private selectedJobsActions = {};
   private subscriptions: Subscription[] = [];
   private visibleActionMap = {};
+  private selectedFileBrowserPage = {};
+
   showActionConfirmationModal = false;
 
   lastOperationResponse: OperationResponse = <OperationResponse>{};
@@ -380,5 +382,13 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
 
   handleOnOpenDirectory(path) {
     this.hdfsRootPath = path;
+  }
+
+  getFilesPageForRow(rowId) {
+    return rowId && rowId in this.selectedFileBrowserPage ? this.selectedFileBrowserPage[rowId] : 0;
+  }
+
+  handleFilesPageChange(page, rowId) {
+    this.selectedFileBrowserPage[rowId] = page.offset;
   }
 }
