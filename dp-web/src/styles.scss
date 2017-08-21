@@ -197,3 +197,24 @@ a:hover {
 :-ms-input-placeholder {
   color: $alto;
 }
+
+.notification-bar {
+  background-color: $alabaster;
+  //margin: 15px 24px 0;
+  padding: 15px;
+  .icon {
+    padding: 5px 5px;
+    font-size: 20px;
+  }
+  .title {
+    margin-bottom: 5px;
+  }
+}
+
+.error {
+  color: $roman-red;
+}
+
+.success {
+  color: $forest-green-1;
+}

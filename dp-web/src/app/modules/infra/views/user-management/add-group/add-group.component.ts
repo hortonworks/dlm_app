@@ -7,6 +7,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {GroupService} from '../../../../../services/group.service';
 import {Group} from '../../../../../models/group';
 import {NgForm} from '@angular/forms';
+import {Alerts} from '../../../../../shared/utils/alerts';
 
 @Component({
   selector: 'dp-add-user',
@@ -216,8 +217,9 @@ export class AddGroupComponent {//implements OnInit {
   }
 
   onError(errorMessage) {
-    this.errorMessages.push(errorMessage);
-    this.showError = true;
+    Alerts.showError("Failed", errorMessage, 'slider-container');
+    // this.errorMessages.push(errorMessage);
+    // this.showError = true;
   }
 }
 
