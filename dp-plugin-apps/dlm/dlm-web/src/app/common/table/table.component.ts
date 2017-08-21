@@ -63,6 +63,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   @Output() pageChange = new EventEmitter<{}>();
 
   @Input() showPageSizeMenu = true;
+  @Input() externalPaging = false;
   @Input() multiExpand = false;
   @Input() rowDetailHeight = 200;
   /**
@@ -84,6 +85,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   };
   @Input() sorts = [];
   @Input() offset = 0;
+  @Input() count;
 
   // hacky but seems like there is no other easy solution to set template for Row Detail
   @Input() set rowDetailTemplate(template: TemplateRef<any>) {

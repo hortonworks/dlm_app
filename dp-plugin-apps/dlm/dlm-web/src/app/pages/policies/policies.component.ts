@@ -15,7 +15,6 @@ import { Subscription } from 'rxjs/Subscription';
 import { Store } from '@ngrx/store';
 import { loadPolicies, loadLastJobs } from 'actions/policy.action';
 import { loadClusters } from 'actions/cluster.action';
-import { loadJobsForClusters } from 'actions/job.action';
 import { Policy } from 'models/policy.model';
 import { getPolicyClusterJob } from 'selectors/policy.selector';
 import { Pairing } from 'models/pairing.model';
@@ -124,7 +123,6 @@ export class PoliciesComponent implements OnInit, OnDestroy {
     const clusterSubscription = this.clusters$.subscribe(clusters => {
       const clusterIds = clusters.map(c => c.id);
       this.store.dispatch(loadPairings(PAIRINGS_REQUEST));
-      this.store.dispatch(loadJobsForClusters(clusterIds));
     });
     const lastJobsWorkaroundSubscription = this.policies$
       .map(policies => policies.filter(policy => !policy.jobs.length &&

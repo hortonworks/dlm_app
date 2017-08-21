@@ -6,7 +6,7 @@
   ~ reproduction, modification, redistribution, sharing, lending or other exploitation
   ~ of all or any part of the contents of this software is strictly prohibited.
   -->
-
+{{jobs.length}}
 <dlm-table #table
   [rowDetailHeight]="550"
   [rowDetailTemplate]="rowDetailRef"
@@ -57,7 +57,9 @@
   <dlm-policy-details
     [contentType]="activeContentType"
     [policy]="row"
-    [jobs]="filteredJobs$ | async"
+    [jobs]="jobs"
+    [jobsOffset]="jobsOffset"
+    [jobsOverallCount]="jobsOverallCount"
     [sourceCluster]="sourceCluster"
     [hdfsRootPath]="hdfsRootPath"
     [policyDatabase]="policyDatabase$ | async"

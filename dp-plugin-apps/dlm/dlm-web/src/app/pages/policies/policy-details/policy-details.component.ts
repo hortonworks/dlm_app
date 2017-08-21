@@ -37,6 +37,12 @@ export class PolicyDetailsComponent implements OnInit {
   jobs: Job[];
 
   @Input()
+  jobsOverallCount: number;
+
+  @Input()
+  jobsOffset: number;
+
+  @Input()
   contentType = PolicyContent.Jobs;
 
   @Input()

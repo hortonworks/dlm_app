@@ -29,10 +29,10 @@ import { TranslateService } from '@ngx-translate/core';
 import { TableComponent } from 'common/table/table.component';
 import { Store } from '@ngrx/store';
 import * as fromRoot from 'reducers/';
-import { getAllJobs } from 'selectors/job.selector';
+import { getJobsPage } from 'selectors/job.selector';
 import { Observable } from 'rxjs/Observable';
 import { Job } from 'models/job.model';
-import { abortJob, rerunJob, loadJobsForPolicy } from 'actions/job.action';
+import { abortJob, rerunJob, loadJobsPageForPolicy } from 'actions/job.action';
 import { deletePolicy, resumePolicy, suspendPolicy } from 'actions/policy.action';
 import { PolicyService } from 'services/policy.service';
 import { OperationResponse } from 'models/operation-response.model';
@@ -62,8 +62,6 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   columns: any[];
   tableTheme = TableTheme.Cards;
   columnMode = ColumnMode.flex;
-  jobs$: Observable<Job[]>;
-  filteredJobs$: Observable<Job[]>;
   selectedPolicy$: BehaviorSubject<Policy> = new BehaviorSubject(<Policy>{});
   policyDatabase$: Observable<HiveDatabase>;
   policyContent = PolicyContent;
@@ -75,7 +73,6 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   private selectedJobsActions = {};
   private subscriptions: Subscription[] = [];
   private visibleActionMap = {};
-  showActionConfirmationModal = false;
 
   lastOperationResponse: OperationResponse = <OperationResponse>{};
   showOperationResponseModal = false;
@@ -84,6 +81,11 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   activeContentType: PolicyContent = PolicyContent.Jobs;
   sourceCluster: number;
   hdfsRootPath: string;
+
+  jobs: Job[] = [];
+  jobsOffset: number;
+  jobsOverallCount: number;
+  jobsPolicyId: number;
 
   @ViewChild(IconColumnComponent) iconColumn: IconColumnComponent;
   @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;
@@ -119,7 +121,9 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       .filter(([_, policy]) => Boolean(
         this.activeContentType === PolicyContent.Jobs && policy && policy.id && this.tableComponent.expandedRows[policy.id]
       ))
-      .do(([_, policy]) => this.store.dispatch(loadJobsForPolicy(policy)));
+      .do(([_, policy]) => {
+        this.store.dispatch(loadJobsPageForPolicy(policy, this.selectedJobsPage[policy.id] || 0));
+      });
     this.subscriptions.push(polling$.subscribe());
   }
 
@@ -144,10 +148,17 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
               private store: Store<fromRoot.State>,
               private hiveService: HiveService,
               private logService: LogService) {
-    this.jobs$ = store.select(getAllJobs);
-    this.filteredJobs$ = Observable.combineLatest(this.jobs$, this.selectedPolicy$).map(([jobs, selectedPolicy]) => {
-      return selectedPolicy ? jobs.filter(job => job.policyId === selectedPolicy.id) : [];
-    });
+    this.subscriptions.push(store.select(getJobsPage).subscribe(jobsPage => {
+      if (this.jobsPolicyId !== jobsPage.policyId) {
+        this.jobs = [];
+      }
+      this.jobsPolicyId = jobsPage.policyId;
+      if (jobsPage.offset ! === this.jobsOffset || jobsPage.overallRecords !== this.jobsOverallCount) {
+        this.jobs = [...this.jobs, ...jobsPage.jobs];
+        this.jobsOffset = jobsPage.offset;
+        this.jobsOverallCount = jobsPage.overallRecords;
+      }
+    }));
     this.policyDatabase$ = this.selectedPolicy$
       .filter(policy => !!this.clusterByName(policy.sourceCluster))
       .mergeMap(policy => {
@@ -292,6 +303,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     this.toggleSelectedRow(policy, contentType);
     this.activatePolicy(policy, contentType);
     this.loadContentDetails(policy, contentType);
+    this.setPage({offset: 0});
     this.detailsToggle.emit({
       policy: policy.id,
       expanded: this.tableComponent.expandedRows[policy.id],
@@ -333,8 +345,13 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         this.sourceCluster = cluster.id;
         this.hdfsRootPath = policy.sourceDataset;
       }
-    } else {
-      this.store.dispatch(loadJobsForPolicy(policy));
+    }
+  }
+
+  setPage(pageInfo) {
+    const policy = this.selectedPolicy$.getValue();
+    if (policy) {
+      this.store.dispatch(loadJobsPageForPolicy(policy, pageInfo.offset));
     }
   }
 
@@ -347,6 +364,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   }
 
   handleJobsPageChange(page, rowId) {
+    this.setPage(page);
     this.selectedJobsPage[rowId] = page.offset;
   }
 

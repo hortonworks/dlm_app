@@ -23,6 +23,13 @@ export class JobService {
     return `clusters/${policy.targetClusterResource.id}/policy/${policy.name}/jobs`;
   }
 
+  private doJobsRequest(url) {
+    return mapResponse(this.http.get(url)).map(response => {
+      response.jobs = response.jobs.map(this.normalizeJob);
+      return response;
+    });
+  }
+
   normalizeJob(job): Job {
     job.isCompleted = job.status !== JOB_STATUS.RUNNING;
     try {
@@ -37,10 +44,7 @@ export class JobService {
   constructor(private http: Http) {}
 
   getJobs(): Observable<any> {
-    return mapResponse(this.http.get('jobs')).map(response => {
-      response.jobs = response.jobs.map(this.normalizeJob);
-      return response;
-    });
+    return this.doJobsRequest('jobs');
   }
 
   getJob(id: string): Observable<any> {
@@ -55,10 +59,7 @@ export class JobService {
 
   getJobsForPolicy(policy: Policy, numResults = 1000): Observable<any> {
     const url = `${this.getUrlForJobs(policy)}?numResults=${numResults}`;
-    return mapResponse(this.http.get(url)).map(response => {
-      response.jobs = response.jobs.map(this.normalizeJob);
-      return response;
-    });
+    return this.doJobsRequest(url);
   }
 
   getJobsForPolicies(policies: Policy[], numResults = 1000): Observable<any> {
@@ -66,6 +67,11 @@ export class JobService {
     return Observable.forkJoin(requests).map(responses => {
       return responses.reduce((response, combined) => ({jobs: [...combined.jobs, ...response.jobs]}), {jobs: []});
     });
+  }
+
+  getJobsForPolicyServerPaginated(policy: Policy, offset, pageSize = 10): Observable<any> {
+    const url = `${this.getUrlForJobs(policy)}?numResults=${pageSize}&offset=${offset * pageSize}&orderBy=startTime&sortOrder=DESC`;
+    return this.doJobsRequest(url);
   }
 
   abortJob(policy: Policy): Observable<any> {
