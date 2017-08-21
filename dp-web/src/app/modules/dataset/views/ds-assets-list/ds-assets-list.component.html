@@ -31,7 +31,7 @@
       <div class="list displayAtCenter"  *ngIf="resultState == resultStates.NOMORE"><span>{{"pages.dataset.asset-search.noMoreResultsMsg" | translate}}</span></div>
       <div class="list displayAtCenter"  *ngIf="resultState == resultStates.EMPTY"><span>{{"pages.dataset.asset-search.noResultsMsg" | translate}}</span></div>
       <div class="list displayAtCenter"  *ngIf="resultState == resultStates.LOADING"><span>{{"common.loading" | translate}} ...</span></div>
-      <table class="mdl-data-table mdl-js-data-table" on-mouseleave="hoveredIndex=null" #table>
+      <table class="mdl-data-table mdl-js-data-table" #table>
         <thead>
           <tr>
             <th class="mdl-data-table__cell--non-numeric">{{"pages.dataset.labels.source" | translate}}</th>
