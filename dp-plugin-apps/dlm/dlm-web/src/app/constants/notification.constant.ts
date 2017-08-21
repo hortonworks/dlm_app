@@ -7,6 +7,8 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+export const NOTIFICATION_TIMEOUT = 10000;
+
 export enum NOTIFICATION_TYPES {
   INFO,
   WARNING,

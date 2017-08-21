@@ -13,7 +13,6 @@ import { Effect, Actions, toPayload } from '@ngrx/effects';
 import { JobService } from 'services/job.service';
 import { loadJobsSuccess, loadJobsFail, abortJobSuccess, abortJobFailure, ActionTypes as jobActions } from 'actions/job.action';
 import { rerunJobSuccess, rerunJobFailure } from 'actions/job.action';
-import { operationComplete, operationFail } from 'actions/operation.action';
 
 @Injectable()
 export class JobEffects {

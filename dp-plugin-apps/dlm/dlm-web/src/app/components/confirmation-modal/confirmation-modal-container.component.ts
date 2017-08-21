@@ -18,9 +18,11 @@ import { ConfirmationService } from 'services/confirmation.service';
   template: `
   <dlm-modal-dialog
     qe-attr="confirmation-modal"
-    [title]="'page.policies.perform_action.confirmation.title'"
-    [body]="'page.policies.perform_action.confirmation.body'"
     [showDialog]="(modalState$ | async)?.isVisible"
+    [title]="(modalState$ | async)?.confirmationOptions.title"
+    [body]="(modalState$ | async)?.confirmationOptions.body"
+    [okText]="(modalState$ | async)?.confirmationOptions.confirmBtnText"
+    [cancelText]="(modalState$ | async)?.confirmationOptions.cancelBtnText"
     (onOk)="handleConfirm()">
   </dlm-modal-dialog>
   `

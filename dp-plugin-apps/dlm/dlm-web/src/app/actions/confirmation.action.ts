@@ -9,12 +9,14 @@
 
 import { Action } from '@ngrx/store';
 import { type } from 'utils/type-action';
+import { ConfirmationOptions, confirmationOptionsDefaults } from 'components/confirmation-modal';
 
 export const ActionTypes = {
   CONFIRM_NEXT_ACTION: type('CONFIRM_NEXT_ACTION')
 };
 
-export const confirmNextAction = (nextAction: Action) => ({
-  type: ActionTypes.CONFIRM_NEXT_ACTION,
-  payload: { nextAction }
-});
+export const confirmNextAction =
+  (nextAction: Action, confirmationOptions: ConfirmationOptions = confirmationOptionsDefaults) => ({
+    type: ActionTypes.CONFIRM_NEXT_ACTION,
+    payload: { nextAction, confirmationOptions }
+  });
