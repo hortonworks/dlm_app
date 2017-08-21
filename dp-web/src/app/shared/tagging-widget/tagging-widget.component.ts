@@ -40,11 +40,7 @@ export class TaggingWidget implements AfterViewInit {
   onSearchTextChange(newValue) {
     this.searchText = newValue;
     this.searchTextEmitter.emit(this.searchText);
-    if(newValue && newValue.length && this.restrictFreeText){
-      this.isValid = false;
-    }else{
-      this.isValid = true;
-    }
+    this.isValid = !(newValue && newValue.length && this.restrictFreeText);
   }
 
   emitSearchText() {
@@ -59,7 +55,7 @@ export class TaggingWidget implements AfterViewInit {
   }
 
   onKeyDown(event) {
-    if ([13, 38, 40].indexOf(event.keyCode) === -1 && this.focusStickerIndex === this.tags.length && event.target.selectionStart){
+    if ([13, 38, 40].indexOf(event.keyCode) === -1 && this.focusStickerIndex === this.tags.length && event.target.selectionStart) {
       return;
     }
     switch (event.keyCode) {
@@ -109,7 +105,10 @@ export class TaggingWidget implements AfterViewInit {
   }
 
   onClick() {
-    this.parent.nativeElement.querySelector('span.inputSpan input').focus();
+    setTimeout(() => {
+      this.parent.nativeElement.querySelector('span.inputSpan input').focus();
+    }, 300);
+
   }
 
   _manageFocus() {
@@ -134,7 +133,6 @@ export class TaggingWidget implements AfterViewInit {
 
   onInputBlur() {
     setTimeout(() => this.parent.nativeElement.classList.remove('focus'), 300);
-    // this.parent.nativeElement.classList.remove('focus')
   }
 
   focusOnSticker(i) {
