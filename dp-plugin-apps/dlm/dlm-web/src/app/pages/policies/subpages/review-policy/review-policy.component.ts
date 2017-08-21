@@ -226,7 +226,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     }
     if (policyForm.advanced.max_bandwidth) {
       details.push({name: 'max_bandwidth', label: this.t.instant('common.max_bandwidth'),
-        value: policyForm.advanced.max_bandwidth});
+        value: policyForm.advanced.max_bandwidth + ' MBps'});
     }
     this.detailsInfo = details;
   }
