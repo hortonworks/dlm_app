@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {UserService} from '../../../../../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -12,7 +12,7 @@ import {NgForm} from '@angular/forms';
   templateUrl: './add-user.component.html',
   styleUrls: ['./add-user.component.scss']
 })
-export class AddUserComponent implements OnInit {
+export class AddUserComponent implements OnInit, AfterViewInit {
   users: string[] = [];
   roles: TaggingWidgetTagModel[] = [];
   modes = Modes;
@@ -69,6 +69,15 @@ export class AddUserComponent implements OnInit {
         return new TaggingWidgetTagModel(this.translateService.instant(`common.roles.${role.roleName}`), role.roleName);
       })
     });
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      let element: any = this.mode as Modes === Modes.EDIT ?
+        document.querySelector('#role-tags').querySelector('.taggingWidget') :
+        document.querySelector('#user-tags').querySelector('.taggingWidget');
+      element.click();
+    }, 500);
   }
 
   onNewUserAddition(user: string) {

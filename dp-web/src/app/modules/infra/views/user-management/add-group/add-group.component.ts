@@ -1,4 +1,4 @@
-import {Component, HostListener, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {UserService} from '../../../../../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -9,11 +9,11 @@ import {Group} from '../../../../../models/group';
 import {NgForm} from '@angular/forms';
 
 @Component({
-  selector: 'dp-add-user',
+  selector: 'dp-add-group',
   templateUrl: './add-group.component.html',
   styleUrls: ['./add-group.component.scss']
 })
-export class AddGroupComponent {//implements OnInit {
+export class AddGroupComponent implements OnInit, AfterViewInit {
   groups: string[] = [];
   roles: TaggingWidgetTagModel[] = [];
   modes = Modes;
@@ -35,7 +35,7 @@ export class AddGroupComponent {//implements OnInit {
 
   @ViewChild('addGroupForm') addGroupForm: NgForm;
   @ViewChild('editGroupForm') editGroupForm: NgForm;
-  @ViewChild('userTags') private userTags: TaggingWidget;
+  @ViewChild('groupTags') private groupTags: TaggingWidget;
   @ViewChild('roleTags') private roleTags: TaggingWidget;
 
   constructor(private userService: UserService,
@@ -70,6 +70,15 @@ export class AddGroupComponent {//implements OnInit {
         return new TaggingWidgetTagModel(this.translateService.instant(`common.roles.${role.roleName}`), role.roleName);
       })
     });
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      let element: any = this.mode as Modes === Modes.EDIT ?
+        document.querySelector('#role-tags').querySelector('.taggingWidget') :
+        document.querySelector('#group-tags').querySelector('.taggingWidget');
+      element.click();
+    }, 500);
   }
 
   onNewGroupAddition(text: string) {
@@ -208,7 +217,7 @@ export class AddGroupComponent {//implements OnInit {
       this.onError(this.translateService.instant('pages.infra.description.invalidRoleInput'));
       valid = false;
     }
-    if (!this.userTags.isValid) {
+    if (!this.groupTags.isValid) {
       this.onError(this.translateService.instant('pages.infra.description.invalidGroupInput'));
       valid = false;
     }
