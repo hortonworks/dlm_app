@@ -2,7 +2,7 @@
 
   <div #personaNavSrc class="dp-header-logo borderBox">
     <img  *ngIf="activePersonaImageName" [attr.src]="'../../../assets/images/' + activePersonaImageName" alt="Hortonworks Dataplane"/>
-    <span class="persona-drop-down-small"></span>
+    <span class="persona-drop-down-small" *ngIf="personaTabs && personaTabs.length > 1"></span>
     <span class="persona-name">{{ activePersonaName }}</span>
   </div>
 
