@@ -28,7 +28,9 @@ export class AssetViewComponent implements OnInit {
   clusterId: string;
   guid: string;
   tableName: string;
+  databaseName: string;
   summary: AssetProperty[] = [];
+  jobId:number = null;
 
   constructor(private route: ActivatedRoute, private assetService: AssetService) {
   }
@@ -45,12 +47,22 @@ export class AssetViewComponent implements OnInit {
     });
   }
 
+  get profiledDataAvailable() {
+    let entity:any = this.assetDetails.entity;
+    return (entity.attributes.profileData && entity.attributes.profileData.attributes);
+  }
+
+  startProfiler() {
+    this.assetService.startProfiling(this.clusterId, this.databaseName, this.tableName).subscribe(res=>this.jobId = res.id);
+  }
+
   private extractSummary(entity) {
     let summary: AssetProperty[] = [];
     let qualifiedName = entity.attributes.qualifiedName;
     this.tableName = qualifiedName.slice(qualifiedName.indexOf('.') + 1, qualifiedName.indexOf('@'));
+    this.databaseName = qualifiedName.slice(0, qualifiedName.indexOf('.'));
     summary.push(new AssetProperty('Datalake', qualifiedName.slice(qualifiedName.indexOf('@') + 1, qualifiedName.length)));
-    summary.push(new AssetProperty('Database', qualifiedName.slice(0, qualifiedName.indexOf('.'))));
+    summary.push(new AssetProperty('Database', this.databaseName));
     let rowCount = 'NA';
     if (entity.attributes.profileData && entity.attributes.profileData.attributes) {
       rowCount = entity.attributes.profileData.attributes.rowCount;

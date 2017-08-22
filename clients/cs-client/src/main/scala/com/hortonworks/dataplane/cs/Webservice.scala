@@ -75,4 +75,9 @@ object Webservice {
 
   }
 
+  trait DpProfilerService extends CsClientService {
+
+    def startProfilerJob(clusterId: String, dbName: String, tableName: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
+
+  }
 }

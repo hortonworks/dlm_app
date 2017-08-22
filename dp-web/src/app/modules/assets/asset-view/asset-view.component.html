@@ -7,7 +7,10 @@
             </span>
         </div>
         <div class="mdl-cell--2-col">
+            <!-- 
             <dp-dropdown class="pull-right" [list]="['abc', 'def']"></dp-dropdown>
+             -->
+            <button *ngIf="assetDetails && !profiledDataAvailable" (click)="startProfiler()" class="mdl-button btn-hwx-default">Start Profiling</button>
         </div>
     </div>
     <div class="spacer-34"> </div>

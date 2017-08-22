@@ -21,4 +21,12 @@ export class AssetService {
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }
+
+  startProfiling(clusterId:string, dbName:string, tableName:string) : Observable<any>{
+    const uri = `/api/dpProfiler/startJob/${clusterId}/${dbName}/${tableName}`;
+    return this.http
+      .post(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
 }
