@@ -84,7 +84,10 @@ class GroupManager @Inject()(@Named("groupService") val groupService: GroupServi
         case Left(error) => errorsReceived += error
         case Right(groupInfo) => successFullyAdded += groupInfo
       }
-      Ok(Json.toJson(successFullyAdded))
+      Ok(Json.toJson(
+        Json.obj(
+          "successfullyAdded" -> successFullyAdded,
+          "errors" -> errorsReceived)))
     }
   }
 

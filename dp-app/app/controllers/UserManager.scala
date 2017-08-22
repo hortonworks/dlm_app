@@ -109,7 +109,10 @@ class UserManager @Inject()(val ldapService: LdapService,
         case Left(error) => errorsReceived += error
         case Right(userInfo) => successFullyAdded += userInfo
       }
-      Ok(Json.toJson(successFullyAdded))
+      Ok(Json.toJson(
+        Json.obj(
+        "successfullyAdded" -> successFullyAdded,
+        "errors" -> errorsReceived)))
     }
   }
   def listUsers = Action.async { req =>

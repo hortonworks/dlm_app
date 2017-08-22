@@ -26,14 +26,14 @@ export class GroupService {
       .catch(HttpUtil.handleError);
   }
 
-  addGroups(groups: string[], roles: string[]): Observable<any[]> {
+  addGroups(groups: string[], roles: string[]): Observable<any> {
     return this.http
       .post(`${this.url}/add`, {groups: groups, roles: roles}, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }
 
-  addAdminGroups(groups: string[]): Observable<any[]> {
+  addAdminGroups(groups: string[]): Observable<any> {
     return this.http
       .post(`${this.url}/admin`, {groups: groups}, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)

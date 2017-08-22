@@ -164,7 +164,7 @@ export class AddGroupComponent {//implements OnInit {
         } else {
           let failedGroups = [];
           this.groups.forEach(grp => {
-            if (!response.find(res => res.groupName === grp)) {
+            if (!response.successfullyAdded.find(res => res.groupName === grp)) {
               failedGroups.push(grp);
             }
           });

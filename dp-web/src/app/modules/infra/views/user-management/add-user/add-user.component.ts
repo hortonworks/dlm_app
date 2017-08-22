@@ -163,7 +163,7 @@ export class AddUserComponent implements OnInit {
         } else {
           let failedUsers = [];
           this.users.forEach(user => {
-            if (!response.find(res => res.userName === user)) {
+            if (!response.successfullyAdded.find(res => res.userName === user)) {
               failedUsers.push(user)
             }
           });
