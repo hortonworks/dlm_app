@@ -150,7 +150,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
       db.run(query.transactionally).map(res=>userInfo)
     }
   }
-  def insertUserWithGroups(userGroupInfo:UserGroupInfo,password:String)={
+  def insertUserWithGroups(userGroupInfo:UserGroupInfo,password:String):Future[UserGroupInfo]={
       val query = for {
         user <-{
           val user = User(username = userGroupInfo.userName, password = password, displayname = userGroupInfo.displayName,avatar = None,
@@ -172,8 +172,8 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
           active = res._1.active,groupIds=groupIds,password=Some(res._1.password))
       }
   }
-  def updateUserGroups(userName:String,groupNamesFromLdap:Seq[String]) ={
-   for{
+  def updateUserGroups(userName:String,groupNamesFromLdap:Seq[String]):Future[Boolean] ={
+   val queryFuture=for{
      user<-findByName(userName)
      allActiveGroups<-groupsRepo.getAllActiveGroups
      currentGroupsForUser<-getCurrentGroupsForUser(user.get.id.get)
@@ -201,7 +201,9 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
      }yield{
        (deleteUserGroups,inserUserGroups,updatedUserUpdatedTime)
      }
-     db.run(query.transactionally)
+   }
+   queryFuture.flatMap{query=>
+     db.run(query.transactionally).map(res=>true)
    }
   }
 
