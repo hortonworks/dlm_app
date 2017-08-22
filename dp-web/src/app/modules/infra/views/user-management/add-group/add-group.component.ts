@@ -35,7 +35,7 @@ export class AddGroupComponent implements OnInit, AfterViewInit {
 
   @ViewChild('addGroupForm') addGroupForm: NgForm;
   @ViewChild('editGroupForm') editGroupForm: NgForm;
-  @ViewChild('userTags') private userTags: TaggingWidget;
+  @ViewChild('groupTags') private groupTags: TaggingWidget;
   @ViewChild('roleTags') private roleTags: TaggingWidget;
 
   constructor(private userService: UserService,
@@ -217,7 +217,7 @@ export class AddGroupComponent implements OnInit, AfterViewInit {
       this.onError(this.translateService.instant('pages.infra.description.invalidRoleInput'));
       valid = false;
     }
-    if (!this.userTags.isValid) {
+    if (!this.groupTags.isValid) {
       this.onError(this.translateService.instant('pages.infra.description.invalidGroupInput'));
       valid = false;
     }
