@@ -168,6 +168,7 @@ export class AddGroupComponent {//implements OnInit {
               failedGroups.push(grp);
             }
           });
+          this.groupService.dataChanged.next();
           this.onError(`${this.translateService.instant('pages.infra.description.addGroupError')} - ${failedGroups.join(', ')}`);
         }
       }, error => {

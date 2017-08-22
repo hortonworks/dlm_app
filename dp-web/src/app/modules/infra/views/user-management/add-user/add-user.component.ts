@@ -167,6 +167,7 @@ export class AddUserComponent implements OnInit {
               failedUsers.push(user)
             }
           });
+          this.userService.dataChanged.next();
           this.onError(`${this.translateService.instant('pages.infra.description.addUserError')}- ${failedUsers.join(', ')}`);
         }
 

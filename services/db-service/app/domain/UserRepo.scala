@@ -183,7 +183,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
      val groupIdsInDb:Seq[Long]=currentGroupsForUser.map(_.groupId.get)
      val toBeDeletedUserGroups:Seq[UserGroup]=currentGroupsForUser.filterNot(ug=>groupIdsFromLdap.contains(ug.groupId.get))
      val toBeAddedGroupIds:Seq[Long]=groupsFromLdap.filterNot(grp=>groupIdsInDb.contains(grp.id.get)).map(_.id.get)
-     val query = for {
+     for {
        deleteUserGroups<-UserGroups.filter(_.id inSet toBeDeletedUserGroups.map(_.id.get)).delete
        inserUserGroups<-{
          val userGroups=toBeAddedGroupIds.map{id=>
