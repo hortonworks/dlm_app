@@ -31,11 +31,14 @@ export class UserAddComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
-      if (params.status && params.status === 'success') {
-        this.showNotification = true;
-      }
-    });
+    this.showNotification = true;
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      let element: any = document.querySelector('#users-tags').querySelector('.taggingWidget');
+      element.click();
+    }, 500);
   }
 
   closeNotification() {
