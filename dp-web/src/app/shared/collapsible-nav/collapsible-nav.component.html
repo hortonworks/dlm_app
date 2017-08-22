@@ -1,6 +1,6 @@
 <div #sideNav class="sidenav"  [ngClass]="{'collpased': collapseSideNav}">
 
-  <div #personaNavSrc class="dp-header-logo borderBox">
+  <div #personaNavSrc class="dp-header-logo borderBox" [ngClass]="{'dp-header-logo--active': personaTabs && personaTabs.length > 1}">
     <img  *ngIf="activePersonaImageName" [attr.src]="'../../../assets/images/' + activePersonaImageName" alt="Hortonworks Dataplane"/>
     <span class="persona-drop-down-small" *ngIf="personaTabs && personaTabs.length > 1"></span>
     <span class="persona-name">{{ activePersonaName }}</span>
