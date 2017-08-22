@@ -1,14 +1,11 @@
 package controllers
 
+import java.net.URL
 import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari.AmbariEndpoint
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  DataplaneCluster,
-  DataplaneClusterIdentifier,
-  HJwtToken
-}
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, DataplaneClusterIdentifier, HJwtToken}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.DpClusterService
 import models.{JsonResponses, WrappedErrorsException}
@@ -20,6 +17,8 @@ import services.AmbariService
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import com.hortonworks.dataplane.commons.auth.Authenticated
+
+import scala.util.{Failure, Success, Try}
 
 class DataplaneClusters @Inject()(
     @Named("dpClusterService") val dpClusterService: DpClusterService,
@@ -139,10 +138,19 @@ class DataplaneClusters @Inject()(
     * Below few lines of code, converts the url with hostname to url with host ip to give us 'ambariUrlWithIp'.
     * */
     val ambariUrl = request.getQueryString("url").get
-    val hostAddress = ambariUrl.substring(ambariUrl.lastIndexOf("/") + 1, ambariUrl.lastIndexOf(":"))
+    Try(new URL(ambariUrl)) match {
+      case Success(url) => processAmbariCheck(ambariUrl,url.getHost, token)
+      case Failure(f) => Future.successful(BadRequest(Json.obj(ambariUrl -> "Not a valid url")))
+    }
+
+  }
+
+  private def processAmbariCheck(ambariUrl: String, hostAddress: String, hJwtToken: Option[HJwtToken]): Future[Result] ={
+    implicit val token = hJwtToken
     val address = InetAddress.getByName(hostAddress)
     val hostIP = address.getHostAddress
-    val ambariUrlWithIp = ambariUrl.substring(0,ambariUrl.lastIndexOf("/")+1) + hostIP + ambariUrl.substring(ambariUrl.lastIndexOf(":"))
+    val ambariUrlWithIp = new URL(new URL(ambariUrl).getProtocol, hostIP, new URL(ambariUrl).getPort,new URL(ambariUrl).getFile).toString
+
     dpClusterService
       .retrieveByAmbariUrl(ambariUrlWithIp)
       .flatMap {
