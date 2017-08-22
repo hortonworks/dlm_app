@@ -131,10 +131,20 @@ class DataplaneClusters @Inject()(
       }
   }
 
+  import java.net.InetAddress
   def ambariCheck = authenticated.async { request =>
     implicit val token = request.token
+    /*
+    * UI will be sending url in form of 'http://host:port' .
+    * Below few lines of code, converts the url with hostname to url with host ip to give us 'ambariUrlWithIp'.
+    * */
+    val ambariUrl = request.getQueryString("url").get
+    val hostAddress = ambariUrl.substring(ambariUrl.lastIndexOf("/") + 1, ambariUrl.lastIndexOf(":"))
+    val address = InetAddress.getByName(hostAddress)
+    val hostIP = address.getHostAddress
+    val ambariUrlWithIp = ambariUrl.substring(0,ambariUrl.lastIndexOf("/")+1) + hostIP + ambariUrl.substring(ambariUrl.lastIndexOf(":"))
     dpClusterService
-      .retrieveByAmbariUrl(request.getQueryString("url").get)
+      .retrieveByAmbariUrl(ambariUrlWithIp)
       .flatMap {
         case Left(errors) =>
           Future.successful(
@@ -145,7 +155,7 @@ class DataplaneClusters @Inject()(
             Future.successful(Ok(Json.obj("alreadyExists" -> true)))
           } else {
             val res = ambariService
-              .statusCheck(AmbariEndpoint(request.getQueryString("url").get))
+              .statusCheck(AmbariEndpoint(ambariUrlWithIp))
               .map {
                 case Left(errors) =>
                   InternalServerError(
