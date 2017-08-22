@@ -23,7 +23,6 @@ import {
   deletePolicySuccess, deletePolicyFail, suspendPolicyFail, suspendPolicySuccess, resumePolicySuccess, resumePolicyFail,
   loadLastJobsSuccess, loadLastJobsFailure
 } from 'actions/policy.action';
-import { operationComplete, operationFail } from 'actions/operation.action';
 import { POLICY_FORM_ID } from 'pages/policies/components/policy-form/policy-form.component';
 import { resetFormValue } from 'actions/form.action';
 import { truncate } from 'pipes/truncate.pipe';
@@ -50,12 +49,7 @@ export class PolicyEffects {
         .mergeMap(response => [
           createPolicySuccess(response, payload.meta),
           go(['/policies']),
-          resetFormValue(POLICY_FORM_ID),
-          Observable.of(this.notificationService.create(<ToastNotification> {
-            title: this.t.instant('page.policies.success.title'),
-            body: this.t.instant('page.policies.success.body', {policyName: truncate(payload.policy.policyDefinition.name, 25)}),
-            type: NOTIFICATION_TYPES.SUCCESS
-          }))
+          resetFormValue(POLICY_FORM_ID)
         ])
         .catch(err => Observable.of(createPolicyFail(err.json(), payload.meta)));
     });

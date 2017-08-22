@@ -23,12 +23,9 @@ RUN chown -R knox /usr/hdp/current/knox-server/bin/setup-master-password.sh
 ADD knox-scripts/wait_for_keystore_file.sh /usr/hdp/current/knox-server/bin/
 RUN chown -R knox /usr/hdp/current/knox-server/bin/wait_for_keystore_file.sh
 
-ADD knox-scripts/setup_knox_sso_conf.sh /usr/hdp/current/knox-server/bin/
 RUN chmod a+w /usr/hdp/current/knox-server/conf/topologies
 RUN chmod a+w /usr/hdp/current/knox-server/conf/topologies/knoxsso.xml
 RUN rm -rf  /usr/hdp/2.6.0.3-8/knox/data/security/*
-
-ADD dp-configurator-1.0-SNAPSHOT.jar /usr/hdp/current/knox-server/lib/
 
 
 ENV HASHICORP_RELEASES=https://releases.hashicorp.com

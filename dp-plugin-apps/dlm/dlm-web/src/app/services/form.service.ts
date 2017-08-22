@@ -31,7 +31,7 @@ export class FormService {
 
   resetForm(formId: string) {
     const formNamespaceValue = this.sessionStorage.get(this.formNamespace);
-    if (formNamespaceValue[formId]) {
+    if (formNamespaceValue && formNamespaceValue[formId]) {
       delete formNamespaceValue[formId];
       this.sessionStorage.set(this.formNamespace, formNamespaceValue);
     }

@@ -10,6 +10,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { isEmpty } from 'utils/object-utils';
 import { JobTrackingInfo } from 'models/job-tracking-info.model';
+import { JOB_STATUS } from 'constants/status.constant';
 
 @Component({
   selector: 'dlm-transferred-column',
@@ -18,6 +19,7 @@ import { JobTrackingInfo } from 'models/job-tracking-info.model';
 })
 export class TransferredColumnComponent implements OnInit {
 
+  @Input() jobStatus: string;
   @Input() trackingInfo: JobTrackingInfo = <JobTrackingInfo>{};
 
   get progress() {
@@ -31,11 +33,11 @@ export class TransferredColumnComponent implements OnInit {
   }
 
   isFailed() {
-    return isEmpty(this.trackingInfo);
+    return this.jobStatus === JOB_STATUS.FAILED || isEmpty(this.trackingInfo);
   }
 
   isInProgress() {
     const { completedMapTasks, totalMapTasks } = this.trackingInfo;
-    return !this.isFailed() && completedMapTasks < totalMapTasks;
+    return this.jobStatus === JOB_STATUS.RUNNING || (!this.isFailed() && completedMapTasks < totalMapTasks);
   }
 }

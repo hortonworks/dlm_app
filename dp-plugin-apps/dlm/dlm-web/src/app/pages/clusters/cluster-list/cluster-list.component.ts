@@ -34,6 +34,7 @@ export class ClusterListComponent implements OnInit {
   columnMode = ColumnMode.flex;
   isOpen = false;
   visibleActionMap = {};
+  private selectedFileBrowserPage = {};
   clusterActions = [
     {
       label: this.t.instant('page.clusters.card.create_pair_text'),
@@ -119,7 +120,19 @@ export class ClusterListComponent implements OnInit {
     }
   }
 
+  handleFileBrowserPageChange(event, rowId) {
+    this.selectedFileBrowserPage[rowId] = event.offset;
+  }
+
   shouldShowAction(rowId) {
     return rowId in this.visibleActionMap && this.visibleActionMap[rowId];
+  }
+
+  isExpandedRow(row: Cluster): boolean {
+    return this.tableComponent.expandedRows[row.id];
+  }
+
+  getFileBrowserPageForRow(rowId) {
+    return rowId && rowId in this.selectedFileBrowserPage ? this.selectedFileBrowserPage[rowId] : 0;
   }
 }

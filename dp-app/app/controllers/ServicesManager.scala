@@ -4,7 +4,7 @@ package controllers
 import com.google.inject.Inject
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.auth.Authenticated
-import com.hortonworks.dataplane.commons.domain.Entities.{DpService, DpServiceEnableConfig, EnabledSku, Errors}
+import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.db.Webservice.SkuService
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
@@ -37,6 +37,16 @@ class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService
       }
     }
   }
+
+  def getDependentServices(skuName: String) = Action.async { request =>
+    val dependentServices = Option(configuration.underlying.getString(s"$skuName.dependent.services"))
+    if(dependentServices.isDefined){
+      Future.successful(Ok(Json.toJson(ServiceDependency(skuName, dependentServices.get.split(",")))))
+    }else{
+      Future.successful(Ok(Json.toJson(ServiceDependency(skuName, Seq()))))
+    }
+  }
+
   def verifySmartSense=Action.async(parse.json) { request =>
     val smartSenseId=request.getQueryString("smartSenseId");
     if (smartSenseId.isEmpty){

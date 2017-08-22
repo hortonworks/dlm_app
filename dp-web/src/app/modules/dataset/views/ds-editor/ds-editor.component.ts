@@ -16,6 +16,7 @@ export class DsEditor implements OnInit {
   @ViewChild("fillMandatoryMsg") fillMandatoryMsg: ElementRef;
   currentStage: number = 1;
   nextIsVisible: boolean = true;
+  saveInProgress:boolean = false;
   tags: string[] = [];
   assetSetQueryModelsForAddition: AssetSetQueryModel[] = [];
   assetSetQueryModelsForSubtraction: AssetSetQueryModel[] = [];
@@ -67,6 +68,8 @@ export class DsEditor implements OnInit {
   }
 
   actionSave() {
+    if (this.saveInProgress) return;
+    this.saveInProgress = true;
     this.richDatasetService
       .saveDataset(this.dsModel, this.assetSetQueryModelsForAddition, this.tags)
       .subscribe(obj => {this.actionCancel();})

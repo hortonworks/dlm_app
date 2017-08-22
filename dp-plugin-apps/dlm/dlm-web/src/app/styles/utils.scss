@@ -45,6 +45,14 @@
   cursor: pointer;
 }
 
+.link {
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .inline-block {
   display: inline-block;
 }
@@ -59,15 +67,6 @@
 
 .btn-default.btn-filter {
   &:hover {
-    background-color: $white-color;
-    border-color: $primary-color;
-  }
-  &.active {
-    border-color: $primary-color;
-    background-color: $white-color;
-    box-shadow: none;
-    &:hover {
-      border-color: #d8d8d8;
-    }
+    background-color: #d8d8d8;
   }
 }

@@ -75,7 +75,7 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, Valid
   @ContentChild(SelectFieldOptionDirective) optionView: SelectFieldOptionDirective;
   @HostListener('document:click', ['$event'])
   outsideClickHandler(e) {
-    if (!this.elementRef.nativeElement.contains(event.target)) {
+    if (!this.elementRef.nativeElement.contains(e.target)) {
       this.showMenu = false;
     }
   }

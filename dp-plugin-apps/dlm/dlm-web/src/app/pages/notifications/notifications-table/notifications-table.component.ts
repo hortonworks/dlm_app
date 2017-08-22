@@ -8,6 +8,7 @@
  */
 
 import { Component, OnInit, Input, ViewChild, TemplateRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { Event } from 'models/event.model';
 import { Cluster } from 'models/cluster.model';
 import { TableComponent } from 'common/table/table.component';
@@ -33,7 +34,9 @@ export class NotificationsTableComponent implements OnInit {
   @Input() events: Event[];
   @Input() clusters: Cluster[];
 
-  constructor(private t: TranslateService, private logService: LogService) {}
+  constructor(private t: TranslateService,
+              private logService: LogService,
+              private router: Router) {}
 
   private translateColumn(columnName: string): string {
     return this.t.instant(`page.notifications.table.column.${columnName}`);
@@ -83,5 +86,9 @@ export class NotificationsTableComponent implements OnInit {
     if (eventType in EntityType) {
       this.logService.showLog(EntityType[eventType], event[this.logEventTypeMap[EntityType[eventType]]]);
     }
+  }
+
+  goToPolicy(event: Event) {
+    this.router.navigate(['/policies'], {queryParams: {policy: this.getEntity(event)}});
   }
 }

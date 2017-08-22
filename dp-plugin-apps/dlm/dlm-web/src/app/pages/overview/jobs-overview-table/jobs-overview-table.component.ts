@@ -79,13 +79,13 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
     const actionName = this.selectedAction.name.toLowerCase();
     return {
       [NOTIFICATION_TYPES.SUCCESS]: {
-        title: this.t.instant(`common.action_notifications.${actionName}.success.title`),
+        title: `common.action_notifications.${actionName}.success.title`,
         body: this.t.instant(`common.action_notifications.${actionName}.success.body`, {
           policyName: this.selectedForActionRow.name
         })
       },
       [NOTIFICATION_TYPES.ERROR]: {
-        title: this.t.instant(`common.action_notifications.${actionName}.error.title`),
+        title: `common.action_notifications.${actionName}.error.title`,
         contentType: NOTIFICATION_CONTENT_TYPE.MODAL_LINK
       },
       levels: [NOTIFICATION_TYPES.SUCCESS, NOTIFICATION_TYPES.ERROR]

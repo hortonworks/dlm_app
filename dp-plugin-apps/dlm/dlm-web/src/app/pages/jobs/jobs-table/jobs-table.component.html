@@ -28,11 +28,11 @@
 
 <ng-template #statusVerbTemplate let-value="value">
   <span *ngIf="value === JOB_STATUS.IGNORED; else notIgnored" [tooltip]="'page.jobs.job_ignored' | translate">
-    {{value | statusFmt}}
+    {{value | jobStatusFmt}}
   </span>
 
   <ng-template #notIgnored>
-    {{value | statusFmt}}
+    {{value | jobStatusFmt}}
   </ng-template>
 </ng-template>
 
@@ -51,8 +51,8 @@
   <dlm-duration-column [isRunning]="isRunning(row)" [duration]="value"></dlm-duration-column>
 </ng-template>
 
-<ng-template #transferredFormattedTemplate let-value="value">
-  <dlm-transferred-column [trackingInfo]="value"></dlm-transferred-column>
+<ng-template #transferredFormattedTemplate let-value="value" let-job="row">
+  <dlm-transferred-column [trackingInfo]="value" [jobStatus]="job.status"></dlm-transferred-column>
 </ng-template>
 
 <ng-template #actionsCell let-row="row">

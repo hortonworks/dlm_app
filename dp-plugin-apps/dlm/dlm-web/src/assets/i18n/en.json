@@ -4,6 +4,7 @@
     "and": "And",
     "add": "Add",
     "back": "Back",
+    "ok": "Ok",
     "cancel": "Cancel",
     "review": "Review",
     "submit": "Submit",
@@ -27,7 +28,7 @@
     "policy": "Policy",
     "name": "Name",
     "queue_name": "Queue Name",
-    "max_bandwidth": "Maximum Bandwidth",
+    "max_bandwidth": "Max. Bandwidth",
     "job": "Job",
     "jobs": "Jobs",
     "start_time": "Start Time",
@@ -39,6 +40,7 @@
     "hive": "HIVE",
     "for": "for",
     "error": "Error",
+    "empty_log": "Log is empty",
     "errors": {
       "no_log": "Oops! Could not retrieve a log message for this event.",
       "unknown": "Something went wrong."
@@ -185,6 +187,9 @@
     "empty_selection": "No Database selected",
     "empty_tables": "No Tables found"
   },
+  "notification_body": {
+    "click_details": "Check error details"
+  },
   "forms": {
     "validation_errors": {
       "required": "\"{{fieldLabel}}\" is required",
@@ -193,7 +198,8 @@
       "integerValidator": "\"{{fieldLabel}}\" should be a positive integer",
       "time_less_than_current": "Start time must be later than the current time in the selected timezone.",
       "not_directory": "\"{{fieldLabel}}\" should be a path to directory",
-      "not_exist_directory": "Either the path does not exist or you don't have permissions on the path"
+      "not_exist_directory": "Either the path does not exist or you don't have permissions on the path",
+      "namePattern": "\"Policy Name\" should contain only letters, digits, spaces, hyphens '-', and underscores '_'."
     }
   },
   "page": {
@@ -398,6 +404,14 @@
           "error": {
             "create_policy": "Create policy failed",
             "check_error_details": "Check error details"
+          },
+          "create_policy": {
+            "notification": {
+              "success": {
+                "title": "Creating Policy Successful",
+                "body": "Policy {{policyName}} created successfully"
+              }
+            }
           }
         }
       }
@@ -422,6 +436,15 @@
           "title": "Unpair confirmation",
           "body": "Are you sure you want to unpair {{firstCluster}} and {{secondCluster}} ?",
           "primaryButton": "Unpair"
+        },
+        "notification": {
+          "success": {
+            "title": "Unpairing Clusters successful",
+            "body": "Unpairing clusters {{firstCluster}} and {{secondCluster}} completed successfully"
+          },
+          "error": {
+            "title": "Unpairing Clusters failed"
+          }
         }
       },
       "create": {
@@ -436,9 +459,14 @@
           },
           "cluster_disabled": "This cluster is already paired with the selected cluster."
         },
-        "confirmation": {
-          "title": "Pairing Successful",
-          "body": "Pairing completed successfully"
+        "notification": {
+          "success": {
+            "title": "Pairing Successful",
+            "body": "Pairing completed successfully"
+          },
+          "error": {
+            "title": "Pairing Failed"
+          }
         }
       }
     },

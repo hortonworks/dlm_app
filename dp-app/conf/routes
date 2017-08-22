@@ -8,8 +8,6 @@ GET           /health                                                controllers
 #auth calls
 POST          /auth/in                                               controllers.Authentication.signIn
 GET           /auth/userDetail                                       controllers.Authentication.userDetail
-GET           /auth/signInThrougKnox                                 controllers.Authentication.signInThrougKnox
-GET           /auth/signOutThrougKnox                                controllers.Authentication.signOutThrougKnox
 GET           /api/identity/:userId                                  controllers.Authentication.userById(userId: String)
 
 #api
@@ -125,3 +123,4 @@ GET           /api/services/byName                           controllers.Service
 GET           /api/services/enabled                          controllers.ServicesManager.getEnabledServices
 POST          /api/services/verifyCode                       controllers.ServicesManager.verifySmartSense
 POST          /api/services/enable                           controllers.ServicesManager.enableService
+GET           /api/services/:name/dependencies               controllers.ServicesManager.getDependentServices(name: String)

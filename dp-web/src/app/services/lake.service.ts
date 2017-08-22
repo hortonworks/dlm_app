@@ -6,11 +6,15 @@ import { Lake } from '../models/lake';
 import { Cluster } from '../models/cluster';
 
 import { HttpUtil } from '../shared/utils/httpUtil';
+import {Subject} from 'rxjs/Subject';
 
 
 @Injectable()
 export class LakeService {
   url = '/api/lakes';
+
+  clusterAdded = new Subject<boolean>();
+  clusterAdded$ = this.clusterAdded.asObservable();
 
   constructor(
     private http:Http

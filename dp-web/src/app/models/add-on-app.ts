@@ -35,4 +35,9 @@ export class ConfigPayload {
   smartSenseId: string;
 }
 
+export class AppDependency {
+  skuName : string;
+  dependencies : string[] = [];
+}
+
 

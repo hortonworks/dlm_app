@@ -184,12 +184,15 @@ init_knox() {
 
     docker exec -t knox ./wait_for_keystore_file.sh
     mkdir -p ${CERTS_DIR}
-    export_knox_cert ${MASTER_PASSWORD} knox > ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
-    if [ ${USE_TEST_LDAP} == "no" ]
-    then
-        docker exec -it knox ./setup_knox_sso_conf.sh
-    fi
+    sleep 5
+    export_knox_cert ${MASTER_PASSWORD} knox > ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE} || handle_knox_failure
     echo "Knox Initialized"
+}
+
+handle_knox_failure() {
+    echo "Data plane public certificate could not be generated properly."
+    echo "Please destroy Knox and re-initialize again with the commands 'dpdeploy.sh destroy knox' and 'dpdeploy init knox'."
+    exit 1
 }
 
 export_knox_cert() {
