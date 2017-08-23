@@ -450,6 +450,8 @@
       "create": {
         "header": "Create Pairing",
         "header_note": "Note: Pairings are bi-directional",
+        "help_text": "Policy Guidelines",
+        "help_url": "http://docs.hortonworks.com",
         "content": {
           "no_clusters": "No clusters are registered with Data Lifecycle Manager. Click Add>Cluster and register at least two clusters for pairing. Ensure that clusters to be used for replication jobs meet Data Lifecycle Manager configuration requirements.",
           "header": {
