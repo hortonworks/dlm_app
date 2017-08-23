@@ -17,3 +17,5 @@ export const getDatePickerDate = (date: moment.Moment): IMyDate => {
     day: date.date()
   };
 };
+
+export const getTime = (date: string): number => (new Date(date)).getTime();

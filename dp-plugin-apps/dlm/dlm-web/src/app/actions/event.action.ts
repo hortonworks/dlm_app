@@ -16,7 +16,10 @@ export const ActionTypes = {
   LOAD_NEW_EVENTS_COUNT: requestType('LOAD_NEW_EVENTS_COUNT')
 };
 
-export const loadEvents = (meta = {}): Action => ({type: ActionTypes.LOAD_EVENTS.START, payload: { meta }});
+export const loadEvents = (queryParams = {}, meta = {}): Action => ({
+  type: ActionTypes.LOAD_EVENTS.START,
+  payload: { queryParams, meta }
+});
 
 export const loadEventsSuccess = (events, meta = {}): ActionSuccess => ({
   type: ActionTypes.LOAD_EVENTS.SUCCESS,

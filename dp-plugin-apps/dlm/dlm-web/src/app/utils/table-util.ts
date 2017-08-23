@@ -8,7 +8,12 @@
  */
 
 import { JobTrackingInfo } from 'models/job-tracking-info.model';
+import { getTime } from 'utils/date-util';
 
 export const transferredBytesComparator = (trackingInfoA = <JobTrackingInfo>{}, trackingInfoB = <JobTrackingInfo>{}) => {
   return (trackingInfoA.bytesCopied || 0) - (trackingInfoB.bytesCopied || 0);
+};
+
+export const timestampComparator = (timeA: string, timeB: string) => {
+  return getTime(timeA) - getTime(timeB);
 };
