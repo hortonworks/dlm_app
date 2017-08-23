@@ -10,8 +10,9 @@
 <dlm-page-header
   [isFlexCenter]="true"
   [title]="'page.pairings.create.header'"
-  description="page.pairings.create.header_note"
-  contextMessage="Create Pairing Page">
+  [linkText]="'page.pairings.create.help_text'"
+  [linkTo]="'page.pairings.create.help_url'"
+  description="page.pairings.create.header_note">
 </dlm-page-header>
 <dlm-progress-container [progressState]="overallProgress$ | async">
 <div class="content" id="create_pairing">
