@@ -78,7 +78,7 @@
         <module>clients</module>
         <module>services</module>
         <!--<module>dp-app</module>-->
-
+        <module>dp-web</module>
     </modules>
 
 </project>
