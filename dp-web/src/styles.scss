@@ -85,7 +85,7 @@ a:hover {
 }
 
 .page-container {
-  padding: 30px 25px 20px;
+  padding: 0 25px 20px;
 }
 
 .icon-container {
@@ -179,6 +179,12 @@ a:hover {
   }
 }
 
+.hwx-title-panel {
+  margin: 18px 0;
+  & .hwx-title {
+    line-height: 34px;
+  }
+}
 
 //Lightening the Input placeholder texts
 

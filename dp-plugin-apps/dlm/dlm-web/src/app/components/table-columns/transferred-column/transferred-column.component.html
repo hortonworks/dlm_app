@@ -8,7 +8,7 @@
   -->
 
 <div>
-  <span *ngIf="!isFailed() && !isInProgress()" [innerHTML]="trackingInfo?.bytesCopied | bytesSize"></span>
+  <span *ngIf="!isInProgress()" [innerHTML]="trackingInfo?.bytesCopied | bytesSize"></span>
   <div class="progressbar-container" *ngIf="isInProgress()">
     <progressbar
       [value]="trackingInfo?.completedMapTasks"
@@ -16,5 +16,4 @@
     </progressbar>
     <span class="progress-value text-info">{{progress}} %</span>
   </div>
-  <i *ngIf="isFailed()" class="fa fa-minus"></i>
 </div>

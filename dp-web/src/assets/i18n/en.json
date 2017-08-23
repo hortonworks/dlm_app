@@ -206,10 +206,10 @@
         "updateUserError": "Not able to update user",
         "addGroupError": "Not able to save groups",
         "updateGroupError": "Not able to update group",
-        "invalidRoleInput": "Invalid Entry in Roles Input",
+        "invalidRoleInput": "Some invalid role(s) are identified in the input. Only roles selected from dropdown options are valid.",
         "invalidAmbariUrl":"Invalid Ambari URL. Please enter a valid URL of the form http://host:port or https://host:port.",
-        "invalidUserInput": "Invalid Entry in Users Input",
-        "invalidGroupInput": "Invalid Entry in Groups Input"
+        "invalidUserInput": "Some invalid user(s) are identified in the input. Only users selected from dropdown options are valid.",
+        "invalidGroupInput": "Some invalid group(s) are identified in the input. Only groups selected from dropdown options are valid."
       }
     },
     "dataset": {

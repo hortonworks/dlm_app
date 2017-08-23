@@ -11,13 +11,14 @@
   white-space: nowrap;
   padding-left: 10px;
   margin-bottom: 5px;
-  cursor: pointer;
 
+  &--active {
+    cursor: pointer;
+  }
   & > img {
     width: 25px;
     float: left;
     margin-top: 15px;
-    cursor: pointer;
   }
 
   & > span {

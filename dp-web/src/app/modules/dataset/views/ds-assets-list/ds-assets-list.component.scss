@@ -101,12 +101,37 @@
 }
 .listCont .list .listRow {
   clear: both;
-  height: 45px;
-  line-height: 45px;
+  height: 34px;
+  line-height: 33px;
   color: $dove-gray;
+  border-top: 1px solid $iron;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  border-bottom: none;
+  transition-duration: 0.28s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-property: background-color;
+}
+.listCont .list .listRow:last-child {
   border-bottom: 1px solid $iron;
 }
 
+.listCont .list .listRow:hover {
+  background-color: $data-table-hover-color;
+  border-color: $blizzard-blue;
+}
+
+.listCont .list .listRow:hover + .listRow {
+  border-top-color: $blizzard-blue;
+}
+
+.listCont .list .listRow.listHead,
+.listCont .list .listRow.listHead:hover {
+  background: transparent;
+  border-top: none;
+  border-right: none;
+  border-left: none;
+}
 .listCont .list .listRow.disabled {
   color: $iron;
 }
@@ -189,4 +214,25 @@
 .starExplanation {
   float:left;
   margin-top:-30px;
+}
+
+.search-input {
+  position: relative;
+  display: inline-block;
+  margin-right: 10px;
+  width: 250px;
+  box-sizing: border-box;
+  float: right;
+
+  input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .dp-input__icon {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: #666666;
+    font-size: 14px;
+  }
 }
