@@ -27,6 +27,9 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.hortonworks.dataplane.cs.ClusterService</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -106,7 +109,7 @@
         </dependency>
         <dependency>
             <groupId>org.scalamock</groupId>
-            <artifactId>scalamock-scalatest-support</artifactId>
+            <artifactId>scalamock-scalatest-support_2.11</artifactId>
             <version>3.5.0</version>
             <scope>test</scope>
         </dependency>
