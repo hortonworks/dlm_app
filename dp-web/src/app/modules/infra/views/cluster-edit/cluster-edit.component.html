@@ -35,8 +35,8 @@
               <div style="display: flex;align-items: center">
                 <div [ngClass]="{'validation-error' : isLocationValid==false}">
                   <input required class="dp-input" name="location" type="text" autocomplete="off" ngui-auto-complete
-                         (keyup)="checkLocation()"
-                         (blur)="checkLocationValidity(location)"
+                         (keyup)="setLocation()"
+                         (blur)="setLocationValidity(location)"
                          [min-chars]=3
                          [(ngModel)]="location"
                          [source]="getLocations.bind(this)"
@@ -46,7 +46,7 @@
                          placeholder="Location"
                          (valueChanged)="onSelectLocation(location)" [(ngModel)]="searchTerm"/>
                 </div>
-                <div *ngIf="isLocationValid === false" class="location-error fa fa-times">{{"pages.infra.description.invalidLocation" | translate}}</div>
+                <div *ngIf="isLocationValid === false" class="location-error fa fa-times-circle-o"><span class="location-error-text">{{"pages.infra.description.invalidLocation" | translate}}</span></div>
               </div>
             </div>
             <div class="form-group">

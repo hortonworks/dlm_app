@@ -132,7 +132,10 @@ input[type="text"].dp-input {
 }
 
 .location-error{
-  padding: 0 10px;
+  padding-left: 10px;
   color: $burnt-cienna-red;
   font-size: 15px;
+  .location-error-text{
+    padding-left: 5px;
+  }
 }

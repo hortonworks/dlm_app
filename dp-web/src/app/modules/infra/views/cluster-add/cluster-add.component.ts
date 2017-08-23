@@ -229,14 +229,14 @@ export class ClusterAddComponent implements OnInit {
     return this.locationService.retrieveOptions(searchTerm);
   }
 
-  checkLocation() {
+  setLocation() {
     if (this.searchTerm.length === 0) {
       this.mapData = [];
       this.cluster.location = null;
     }
   }
 
-  checkLocationValidity(location : Location){
+  setLocationValidity(location : Location){
     this.isLocationValid = true;
     if(!location || !location.id){
       this.isLocationValid = false;
@@ -256,7 +256,7 @@ export class ClusterAddComponent implements OnInit {
 
   onCreate() {
     this.showError = false;
-    if (!this.isFormValid()) {
+    if (!this.isLocationValid || !this.isFormValid()) {
       return;
     }
     this.createCluster()
@@ -273,7 +273,7 @@ export class ClusterAddComponent implements OnInit {
   }
 
   isFormValid() {
-    if (!this.clusterForm.form.valid || !this.isLocationValid) {
+    if (!this.clusterForm.form.valid) {
       this.errorMessage = this.translateService.instant('common.defaultRequiredFields');
       this.showError = true;
       window.scrollTo(0, 0);
@@ -323,7 +323,7 @@ export class ClusterAddComponent implements OnInit {
 
   onCreateAndAdd() {
     this.showError = false;
-    if (!this.isFormValid()) {
+    if (!this.isLocationValid || !this.isFormValid()) {
       return;
     }
     this.createCluster().subscribe(
