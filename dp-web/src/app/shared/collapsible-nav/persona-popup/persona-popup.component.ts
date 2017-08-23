@@ -33,6 +33,10 @@ export class PersonaPopupComponent implements OnInit {
       return;
     }
 
+    if(this.personas.filter(cPersona => cPersona.enabled).length <= 1) {
+      return;
+    }
+
     const clickedInside = this.personaNavSrc.contains(targetElement);
     if (clickedInside) {
       this.showPopup = !this.showPopup;
