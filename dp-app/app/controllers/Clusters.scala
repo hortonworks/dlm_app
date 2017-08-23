@@ -134,7 +134,7 @@ class Clusters @Inject()(
         .flatMap {
           case true =>
             clusterHealthService
-              .getClusterHealthData(clusterId)
+              .getClusterHealthData(clusterId,dpClusterId)
           case false =>
             Future.successful(Left(Errors(Seq(Error("500", "Sync failed")))))
         }
@@ -165,7 +165,7 @@ class Clusters @Inject()(
         clusterHealth.nameNodeInfo.get.CapacityTotal),
       "usedSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityUsed),
       "status" -> Json.obj(
-        "state" -> clusterHealth.nameNodeInfo.get.state,
+        "state" ->  ( if(clusterHealth.syncState.get == "SYNC_ERROR") clusterHealth.syncState.get else clusterHealth.nameNodeInfo.get.state),
         "since" -> clusterHealth.nameNodeInfo.get.StartTime
           .map(_ =>
             clusterHealth.nameNodeInfo.get.StartTime.get - System

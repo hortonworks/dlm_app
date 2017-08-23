@@ -25,3 +25,9 @@
     }
   }
 }
+
+.no-sort-cell {
+  .caret {
+    display: none !important;
+  }
+}

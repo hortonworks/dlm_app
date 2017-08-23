@@ -11,11 +11,10 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.Cookie;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Date;
 
-import static com.hortonworks.dataplane.gateway.domain.Constants.SSO_CHECK_COOKIE_NAME;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class CookieManager {
@@ -34,8 +33,7 @@ public class CookieManager {
     return getCookie(knoxSso.getSsoCookieName());
   }
   public void deleteKnoxSsoCookie(){
-   // deleteCookie(knoxSso.getSsoCookieName(), knoxSso.getCookieDomain());
-    deleteCookie(knoxSso.getSsoCookieName());
+    deleteCookie(knoxSso.getSsoCookieName(),getKnoxDomainFromUrl());
   }
 
   public Optional<String> getDataplaneJwtCookie() {
@@ -83,15 +81,14 @@ public class CookieManager {
   }
 
   private void deleteCookie(String cookieName,String domain) {
-    if (domain==null){
-      domain=requestResponseUtils.getDomainFromRequest();
-    }
     Optional<Cookie> cookieOpt = getCookie(cookieName);
     if (cookieOpt.isPresent()) {
       Cookie cookie = cookieOpt.get();
-      cookie.setDomain(domain);
+      if (domain!=null){
+        cookie.setDomain(domain);
+      }
       cookie.setPath("/");
-      deleteCookie(cookieOpt.get());
+      deleteCookie(cookie);
     }
   }
   private void deleteCookie(String cookieName){
@@ -109,4 +106,29 @@ public class CookieManager {
     ctx.getResponse().addCookie(cookie);
   }
 
+  /**
+   * copied from knox. this is how knox determines domain for a hadoop cookie.
+   */
+  private String  getKnoxDomainFromUrl(){
+    String domain=requestResponseUtils.getDomainFromRequest();
+    if (isIp(domain)) {
+      return null;
+    }
+    if (dotOccurrences(domain) < 2) {
+      return null;
+    }
+    int idx = domain.indexOf('.');
+    if (idx == -1) {
+      idx = 0;
+    }
+    return domain.substring(idx+1);
+  }
+  public int dotOccurrences(String domain) {
+    return domain.length() - domain.replace(".", "").length();
+  }
+  public boolean isIp(String domain) {
+    Pattern p = Pattern.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
+    Matcher m = p.matcher(domain);
+    return m.find();
+  }
 }

@@ -77,12 +77,12 @@ export class PolicyService {
   }
 
   suspendPolicy(payload: Policy): Observable<any> {
-    return this.http.put(`${this.getManagePolicyUrl(payload)}/suspend`, payload)
+    return this.http.put(`${this.getManagePolicyUrl(payload)}/suspend`, {})
       .map(r => r.json());
   }
 
   resumePolicy(payload: Policy): Observable<any> {
-    return this.http.put(`${this.getManagePolicyUrl(payload)}/resume`, payload)
+    return this.http.put(`${this.getManagePolicyUrl(payload)}/resume`, {})
       .map(r => r.json());
   }
 

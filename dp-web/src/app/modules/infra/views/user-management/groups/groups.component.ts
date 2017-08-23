@@ -57,10 +57,8 @@ export class GroupsComponent implements OnInit {
   }
 
   onSearch(event) {
-    if (event.keyCode === 13) {
-      this.offset = 0;
-      this.getGroups();
-    }
+    this.offset = 0;
+    this.getGroups();
   }
 
   switchView(tab) {

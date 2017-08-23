@@ -13,3 +13,10 @@ export interface Pairing {
   id: string;
   pair: Array<Cluster>;
 }
+
+export interface PairingBodyItem {
+  clusterId: number;
+  beaconUrl: string;
+};
+
+export type PairingRequestBody = PairingBodyItem[];

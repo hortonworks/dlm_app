@@ -7,11 +7,13 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import {NOTIFICATION_TYPES} from 'constants/notification.constant';
+import {NOTIFICATION_TYPES, NOTIFICATION_CONTENT_TYPE} from 'constants/notification.constant';
 
 export interface ToastNotification {
+  id?: string;
   title?: string;
   body?: string;
   type: NOTIFICATION_TYPES;
   showIcon?: boolean;
+  contentType?: NOTIFICATION_CONTENT_TYPE;
 }

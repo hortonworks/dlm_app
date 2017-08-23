@@ -8,10 +8,13 @@
   -->
 
 <div class="row">
-  <div class="col-md-3">
-    <dlm-page-header [title]="'page.policies.header'" [iconLink]="'page.policies.help_url'" [isFlexCenter]="true"></dlm-page-header>
+  <div class="col-md-4">
+    <dlm-page-header [title]="'page.policies.header'"
+                     [linkText]="'page.policies.help_text'"
+                     [linkTo]="'page.policies.help_url'"
+                     [isFlexCenter]="true"></dlm-page-header>
   </div>
-  <div class="col-md-9 actions">
+  <div class="col-md-8 actions">
     <div class="pull-right filters-block">
 
       <div class="filter-item" *ngIf="(policies$ | async)?.length > 0">
@@ -26,16 +29,19 @@
         <policy-service-filter (onFilter)="filterPoliciesByService($event)"></policy-service-filter>
       </div>
 
-      <dlm-add-entity-button
-        [canAddPolicy]="(resourceAvailability$ | async)?.canAddPolicy"
-        [canAddPairing]="(resourceAvailability$ | async)?.canAddPairing">
-      </dlm-add-entity-button>
+      <div class="pull-right">
+        <button qe-attr="add-policy" type="button"
+                class="btn btn-secondary"
+                [disabled]="!(resourceAvailability$ | async)?.canAddPolicy"
+                (click)="addPolicyClickHandler()">{{"common.add_policy" | translate }}
+        </button>
+      </div>
     </div>
   </div>
 </div>
 <dlm-progress-container [progressState]="overallProgress$ | async">
   <dlm-beacon-validity></dlm-beacon-validity>
-  <div class="row" *ngIf="!(overallProgress$ | async).inProgress">
+  <div class="row table-wrapper" *ngIf="!(overallProgress$ | async).inProgress">
     <div class="col-md-12" *ngIf="(policies$ | async)?.length > 0; else noPolicies">
       <dlm-policy-table
         [policies]="filteredPolicies$ | async"

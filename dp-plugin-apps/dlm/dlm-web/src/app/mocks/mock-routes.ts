@@ -27,6 +27,7 @@ export const routes: MockRoute[] = [
   new MockRoute('policies/:id', 'policy.json'),
   new MockRoute('clusters/:clusterId/policy/:policyName/submit', 'create_policy.json', RequestMethod.Post),
   new MockRoute('clusters/:clusterId/policy/:policyName/schedule', 'create_policy.json', RequestMethod.Put),
+  new MockRoute('clusters/:clusterId/policy/:policyName/resume', 'create_policy.json', RequestMethod.Put),
   new MockRoute('policies/:id', 'policies.json', RequestMethod.Delete),
 
   // Pairing

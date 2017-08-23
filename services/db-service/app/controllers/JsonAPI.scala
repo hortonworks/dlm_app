@@ -3,6 +3,7 @@ package controllers
 import java.sql.SQLException
 
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
+import domain.API.{EntityNotFound, UpdateError}
 import org.postgresql.util.PSQLException
 import play.api.libs.json.Json
 import play.api.libs.json.Json.JsValueWrapper
@@ -13,9 +14,10 @@ import scala.concurrent.Future
 trait JsonAPI extends Controller {
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-  val pgErrors = Map("23503" -> Conflict, "23505" -> Conflict)
+  val pgErrors = Map("23503" -> Conflict,"23514" -> BadRequest,"23505" -> Conflict,"23502" -> BadRequest,"23000"-> BadRequest)
 
   def success(data: JsValueWrapper) = Ok(Json.obj("results" -> data))
+  def entityCreated(data: JsValueWrapper) = Created(Json.obj("results" -> data))
 
   val notFound = NotFound(Json.toJson(wrapErrors("404","Not found")))
 
@@ -34,6 +36,8 @@ trait JsonAPI extends Controller {
             InternalServerError(Json.toJson(errors))
           }
       }
+    case e:EntityNotFound => Future.successful(notFound)
+    case e:UpdateError => Future.successful(NoContent)
     case e: Exception =>
       Future.successful(InternalServerError(Json.toJson(wrapErrors("500",e.getMessage))))
   }
@@ -41,5 +45,6 @@ trait JsonAPI extends Controller {
   private def wrapErrors(code: String, message: String): Errors = {
     Errors(Seq(Error(code,message)))
   }
+
 
 }

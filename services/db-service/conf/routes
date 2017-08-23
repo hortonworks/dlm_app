@@ -57,6 +57,9 @@ GET           /dp/clusters/:dpClusterId/clusters                             con
 DELETE        /dp/clusters/:dpClusterId                                      controllers.DpClusters.delete(dpClusterId:Long)
 PATCH         /dp/clusters/status                                            controllers.DpClusters.updateStatus
 
+PUT           /dp/clusters                                                   controllers.DpClusters.update
+
+
 #Clusters API
 GET           /clusters                                                      controllers.DiscoveredClusters.all(dpClusterId: Option[Long])
 POST          /clusters                                                      controllers.DiscoveredClusters.add

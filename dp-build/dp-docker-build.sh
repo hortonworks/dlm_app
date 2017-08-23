@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-RELEASE_NUMBER=0.0.1
+RELEASE_NUMBER=0.0.1-latest
 IMAGE_PREFIX="hortonworks"
 ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service dp-gateway dp-migrate"
 VENDOR_IMAGES="postgres:9.6.3-alpine consul:0.8.5"
@@ -137,7 +137,7 @@ get_version() {
         VERSION_STRING=`cat build/dp-docker/installer/VERSION`
         echo ${VERSION_STRING}
     else
-        echo ${RELEASE_NUMBER}-"latest"
+        echo ${RELEASE_NUMBER}
     fi
 }
 

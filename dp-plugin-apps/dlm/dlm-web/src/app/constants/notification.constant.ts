@@ -7,6 +7,8 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+export const NOTIFICATION_TIMEOUT = 10000;
+
 export enum NOTIFICATION_TYPES {
   INFO,
   WARNING,
@@ -29,4 +31,10 @@ export const NOTIFICATION_TYPE_CLASSES = {
   [NOTIFICATION_TYPES.ERROR]: 'alert-danger',
   [NOTIFICATION_TYPES.INFO]: 'alert-info',
   [NOTIFICATION_TYPES.WARNING]: 'alert-warning'
+};
+
+
+export enum NOTIFICATION_CONTENT_TYPE {
+  INLINE,
+  MODAL_LINK
 };

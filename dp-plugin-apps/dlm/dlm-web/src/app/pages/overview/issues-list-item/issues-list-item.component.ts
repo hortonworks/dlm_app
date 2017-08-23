@@ -18,10 +18,10 @@ import { Event } from 'models/event.model';
         <dlm-event-status [event]="event"></dlm-event-status>
       </div>
       <div class="issue-info">
-        <div class="name">
+        <div class="name first-letter-capitalize">
           <strong>{{ event.event }}</strong>
         </div>
-        <div class="description">
+        <div class="description first-letter-capitalize">
           <dlm-event-message [event]="event"></dlm-event-message>
         </div>
         <div class="text-right text-muted timestamp">

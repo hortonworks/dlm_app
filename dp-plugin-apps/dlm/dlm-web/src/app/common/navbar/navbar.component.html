@@ -38,7 +38,8 @@
           [ngClass]="{'mainmenu-li': true, 'active': false, 'has-sub-menu': hasSubMenu(item)}"
             routerLinkActive="active">
 
-          <a [routerLink]="item.linkURL" *ngIf="!hasSubMenu(item);else has_sub_menu" [attr.qe-attr]="item.qeAttr">
+          <a [routerLink]="item.linkURL" *ngIf="!hasSubMenu(item);else has_sub_menu"
+             [attr.qe-attr]="item.qeAttr" [tooltip]="isCollapsed ? item.label : ''" [tooltipPlacement]="'right'">
             <span [ngClass]="item.iconClasses"></span>
             <span class="navigation-menu-item">{{item.label}}</span>
           </a>
@@ -63,7 +64,8 @@
         </li>
         <li class="mainmenu-li">
           <!-- @todo replace with a real url -->
-          <a href="http://docs.hortonworks.com/" qe-attr="go-to-help" target="_blank" (click)="restoreActiveItems()">
+          <a href="http://docs.hortonworks.com/" qe-attr="go-to-help" target="_blank"
+             (click)="restoreActiveItems()" [tooltip]="isCollapsed ? ('sidenav.menuItem.help' | translate) : ''" [tooltipPlacement]="'right'">
             <span class="navigation-icon fa fa-info-circle"></span>
             <span class="navigation-menu-item">{{'sidenav.menuItem.help' | translate}}</span>
           </a>

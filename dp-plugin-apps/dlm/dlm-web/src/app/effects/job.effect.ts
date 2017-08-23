@@ -13,7 +13,6 @@ import { Effect, Actions, toPayload } from '@ngrx/effects';
 import { JobService } from 'services/job.service';
 import { loadJobsSuccess, loadJobsFail, abortJobSuccess, abortJobFailure, ActionTypes as jobActions } from 'actions/job.action';
 import { rerunJobSuccess, rerunJobFailure } from 'actions/job.action';
-import { operationComplete, operationFail } from 'actions/operation.action';
 
 @Injectable()
 export class JobEffects {
@@ -54,11 +53,8 @@ export class JobEffects {
     .map(toPayload)
     .switchMap(payload => {
       return this.jobService.abortJob(payload.policy)
-        .mergeMap(result => [
-          abortJobSuccess(payload),
-          operationComplete(result)
-        ])
-        .catch(err => Observable.from([operationFail(err.json()), abortJobFailure(err)]));
+        .map(result => abortJobSuccess(payload, payload.meta))
+        .catch(err => Observable.of(abortJobFailure(err, payload.meta)));
     });
 
   @Effect()
@@ -67,11 +63,8 @@ export class JobEffects {
     .map(toPayload)
     .switchMap(payload => {
       return this.jobService.rerunJob(payload.policy)
-        .mergeMap(result => [
-          rerunJobSuccess(payload),
-          operationComplete(result)
-        ])
-        .catch(err => Observable.from([operationFail(err.json()), rerunJobFailure(err)]));
+        .map(result => rerunJobSuccess(payload, payload.meta))
+        .catch(err => Observable.of(rerunJobFailure(err, payload.meta)));
     });
 
   constructor(private actions$: Actions, private jobService: JobService) {

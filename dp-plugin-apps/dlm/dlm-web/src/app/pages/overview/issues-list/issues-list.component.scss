@@ -7,13 +7,30 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+@import '../../../styles/variables';
+
 :host {
+
   &.all-visible {
-    padding-right: 15px;
     display: block;
+    background-color: $white-color;
+    height: 300px;
   }
 
-  .view-all {
-    margin: 10px;
+  .issues-list-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 270px;
+    .no-issues {
+      margin: 20px 0 0 15px;
+    }
+  }
+
+  .view-all-container {
+    margin: 0;
+    border-top: 1px solid #eee;
+    .view-all {
+      margin: 5px 15px 0 0;
+    }
   }
 }

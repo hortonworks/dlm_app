@@ -19,6 +19,8 @@
     <ds-assets-list [dsModel]="dsModel"
                     [applicableActions]="applicableListActions"
                     [queryModels]="dsAssetQueryModel"
+                    [hideTabs]=true
+                    [selectionAllowed]=false
                     (onAction)="onEdit($event)"
     ></ds-assets-list>
   </div>

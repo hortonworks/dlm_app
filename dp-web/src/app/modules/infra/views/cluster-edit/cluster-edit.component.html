@@ -1,0 +1,73 @@
+<div class="page-container">
+  <div *ngIf="showError">
+    <div id="error-notification-bar" class="error-notification-bar">
+      <i class="fa fa-times-circle pull-left"></i>
+      <i id="e" class="fa fa-remove pull-right" (click)="closeError()"></i>
+      <div id="error-header" class="text-medium">{{"common.failed" | translate}}</div>
+      <div id="error-message" class="text-small-1">{{errorMessage}} </div>
+    </div>
+  </div>
+
+  <div class="icon-container" *ngIf="lake">
+    <div class="hwx-title">{{"pages.infra.labels.editCluster" | translate}}</div>
+    <div class="hwx-desc">{{"pages.infra.description.editCluster" | translate}} </div>
+
+    <div class="spacer-15"> </div>
+
+    <form #clusterForm="ngForm">
+      <div>
+        <div class="cluster-details">
+          <div class="display-group">
+            <label>{{"pages.infra.labels.clusterName" | translate}}</label>
+            <div>{{lake.name}}</div>
+          </div>
+          <div class="display-group">
+            <label>{{"pages.infra.labels.ambariUrl" | translate}}</label>
+            <div>{{lake.ambariUrl}}</div>
+          </div>
+        </div>
+
+        <div class="mdl-grid mdl-grid--no-spacing">
+          <div class="mdl-cell mdl-cell--8-col datalake-input">
+            <div class="form-group">
+              <label class="required">{{"pages.infra.labels.clusterLocation" | translate}}</label>
+              <div class="hwx-inline-desc">{{"pages.infra.description.clusterLocation" | translate}}</div>
+              <input required class="dp-input" name="location" type="text" autocomplete="off" ngui-auto-complete
+                     (keyup)="checkLocation()"
+                     [min-chars]=3
+                     [(ngModel)]="location"
+                     [source]="getLocations.bind(this)"
+                     [value-formatter]="locationFormatter"
+                     [list-formatter]="locationFormatter"
+                     [no-match-found-text]="'No locations found'"
+                     placeholder="Location"
+                     (valueChanged)="onSelectLocation(location)" [(ngModel)]="searchTerm"/>
+            </div>
+            <div class="form-group">
+              <label class="required">{{"pages.infra.labels.dataCenter" | translate}}</label>
+              <div class="hwx-inline-desc">{{"pages.infra.description.dataCenter" | translate}}</div>
+              <input required class="dp-input" placeholder="Datacenter" name="datacenter" type="text" [(ngModel)]="lake.dcName"/>
+            </div>
+            <div class="form-group">
+              <label>{{"common.tags" | translate}} </label>
+              <div class="hwx-inline-desc">{{"pages.infra.description.tags" | translate}}</div>
+              <tagging-widget id="tags" [tags]="doGetTagsAsStringArray(lake.properties.tags)" [clearOnSearch]="true" (onNewSearch)="onNewTagAddition($event)" (onTagDelete)="onTagDelete($event)"></tagging-widget>
+            </div>
+            <div class="form-group">
+              <label>{{"common.description" | translate}}</label>
+              <div class="hwx-inline-desc">{{"pages.infra.description.description" | translate}}</div>
+              <textarea name="desc" [(ngModel)]="lake.description"></textarea>
+            </div>
+          </div>
+          <div class="mdl-cell mdl-cell--4-col">
+            <dp-map [mapData]="mapData" class="pull-right"  style="padding: 0px;margin-top:0px;margin-right: 0px" [mapSize]="1"></dp-map>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="button-container">
+      <button id="add-btn" class="mdl-button btn-hwx-primary" (click)="onUpdate($event)">{{"common.update" | translate}}</button>
+      <button id="cancel-btn" class="mdl-button btn-hwx-default" (click)="onCancel($event)">{{"common.cancel" | translate}}</button>
+    </div>
+  </div>
+</div>

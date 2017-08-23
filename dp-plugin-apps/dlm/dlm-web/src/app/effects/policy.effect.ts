@@ -23,7 +23,6 @@ import {
   deletePolicySuccess, deletePolicyFail, suspendPolicyFail, suspendPolicySuccess, resumePolicySuccess, resumePolicyFail,
   loadLastJobsSuccess, loadLastJobsFailure
 } from 'actions/policy.action';
-import { operationComplete, operationFail } from 'actions/operation.action';
 import { POLICY_FORM_ID } from 'pages/policies/components/policy-form/policy-form.component';
 import { resetFormValue } from 'actions/form.action';
 import { truncate } from 'pipes/truncate.pipe';
@@ -50,12 +49,7 @@ export class PolicyEffects {
         .mergeMap(response => [
           createPolicySuccess(response, payload.meta),
           go(['/policies']),
-          resetFormValue(POLICY_FORM_ID),
-          Observable.of(this.notificationService.create(<ToastNotification> {
-            title: this.t.instant('page.policies.success.title'),
-            body: this.t.instant('page.policies.success.body', {policyName: truncate(payload.policy.policyDefinition.name, 25)}),
-            type: NOTIFICATION_TYPES.SUCCESS
-          }))
+          resetFormValue(POLICY_FORM_ID)
         ])
         .catch(err => Observable.of(createPolicyFail(err.json(), payload.meta)));
     });
@@ -65,12 +59,9 @@ export class PolicyEffects {
     .ofType(policyActions.DELETE_POLICY.START)
     .map(toPayload)
     .switchMap(payload => {
-      return this.policyService.deletePolicy(payload)
-        .mergeMap(result => [
-          deletePolicySuccess(payload.id),
-          operationComplete(result)
-        ])
-        .catch(err => Observable.from([operationFail(err.json()), deletePolicyFail(err)]));
+      return this.policyService.deletePolicy(payload.policy)
+        .map(result => deletePolicySuccess(payload.policy.id, payload.meta))
+        .catch(err => Observable.of(deletePolicyFail(err, payload.meta)));
     });
 
   @Effect()
@@ -78,12 +69,9 @@ export class PolicyEffects {
     .ofType(policyActions.SUSPEND_POLICY.START)
     .map(toPayload)
     .switchMap(payload => {
-      return this.policyService.suspendPolicy(payload)
-        .mergeMap(result => [
-          suspendPolicySuccess(payload.id),
-          operationComplete(result)
-        ])
-        .catch(err => Observable.from([operationFail(err.json()), suspendPolicyFail(err)]));
+      return this.policyService.suspendPolicy(payload.policy)
+        .map(result => suspendPolicySuccess(payload.policy.id, payload.meta))
+        .catch(err => Observable.of(suspendPolicyFail(err, payload.meta)));
     });
 
   @Effect()
@@ -91,12 +79,9 @@ export class PolicyEffects {
     .ofType(policyActions.RESUME_POLICY.START)
     .map(toPayload)
     .switchMap(payload => {
-      return this.policyService.resumePolicy(payload)
-        .mergeMap(result => [
-          resumePolicySuccess(payload.id),
-          operationComplete(result)
-        ])
-        .catch(err => Observable.from([operationFail(err.json()), resumePolicyFail(err)]));
+      return this.policyService.resumePolicy(payload.policy)
+        .map(result => resumePolicySuccess(payload.policy.id, payload.meta))
+        .catch(err => Observable.of(resumePolicyFail(err, payload.meta)));
     });
 
 
@@ -109,6 +94,7 @@ export class PolicyEffects {
         .map(jobs => loadLastJobsSuccess(jobs, payload.meta))
         .catch(err => Observable.of(loadLastJobsFailure(err, payload.meta)));
     });
+
   constructor(private actions$: Actions,
               private policyService: PolicyService,
               private jobService: JobService,

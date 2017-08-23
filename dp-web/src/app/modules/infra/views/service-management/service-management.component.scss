@@ -69,6 +69,13 @@ table.mdl-data-table {
     background-color: $gallery !important;
     height: 42px;
   }
+  tbody tr {
+    height: 42px;
+  }
+}
+
+.status-col {
+  width: 20px;
 }
 
 .inner-list {
@@ -152,6 +159,30 @@ table.mdl-data-table {
   padding: 3px 10px;
   font-size: 12px;
   font-weight: normal;
+}
+
+.cluster-check {
+  margin: 25px 0 0;
+}
+
+
+.notification-bar {
+  padding: 15px;
+  background: $concrete;
+  height: 34px;
+  margin-bottom: 20px;
+  .fa-check-circle {
+    font-size: 20px;
+    color: $forest-green-1;
+    margin: 5px;
+  }
+  .title {
+    color: $forest-green-1;
+    margin-bottom: 5px;
+  }
+  .message {
+    font-weight: 500;
+  }
 }
 
 .hexagon {
