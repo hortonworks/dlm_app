@@ -11,6 +11,7 @@
     <properties>
         <scala.version>2.11.8</scala.version>
         <sbtVersion>0.13</sbtVersion>
+        <akka.version>2.4.11.1</akka.version>
         <atlas.version>0.8.0.2.6.2.0-195</atlas.version>
     </properties>
 
