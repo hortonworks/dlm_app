@@ -139,13 +139,13 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   freqLimit = {fieldLabel: 'Frequency'};
   directoryField = {fieldLabel: 'Folder path'};
   get datePickerOptions(): IMyOptions {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const today = new Date();
+    const yesterday = moment().subtract(1, 'day');
+    const today = moment();
     return {
       dateFormat: 'yyyy-mm-dd',
-      markCurrentDay: true,
       disableUntil: getDatePickerDate(yesterday),
+      showTodayBtn: false,
+      markCurrentDay: false,
       markDates: [{
         dates: [getDatePickerDate(today)],
         color: '#ff0000'
