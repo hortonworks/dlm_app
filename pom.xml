@@ -79,6 +79,7 @@
         <module>services</module>
         <!--<module>dp-app</module>-->
         <module>dp-web</module>
+        <module>dp-plugin-apps/dlm</module>
     </modules>
 
 </project>
