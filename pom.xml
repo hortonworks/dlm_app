@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.hortonworks.dataplane</groupId>
+    <artifactId>dataplane</artifactId>
+    <version>0.0.1</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <scala.version>2.11.8</scala.version>
+        <sbtVersion>0.13</sbtVersion>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>scala-maven-plugin</artifactId>
+                    <version>3.2.2</version>
+                    <executions>
+                        <execution>
+                          <id>eclipse-add-source</id>
+                          <goals>
+                            <goal>add-source</goal>
+                          </goals>
+                        </execution>
+                        <execution>
+                          <id>scala-compile-first</id>
+                          <goals>
+                            <goal>compile</goal>
+                          </goals>
+                        </execution>
+                        <execution>
+                          <id>scala-test-compile-first</id>
+                          <goals>
+                            <goal>testCompile</goal>
+                          </goals>
+                        </execution>
+                        <execution>
+                          <id>attach-scaladocs</id>
+                          <phase>verify</phase>
+                          <goals>
+                            <goal>doc-jar</goal>
+                          </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <scalaVersion>${scala.version}</scalaVersion>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-compiler-plugin</artifactId>
+               <configuration>
+                    <skipMain>true</skipMain> <!-- skip compile -->
+                    <skip>true</skip> <!-- skip testCompile -->
+               </configuration>
+            </plugin>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <modules>
+        <module>dp-commons</module>
+        <module>services/dp-consular</module>
+        <module>clients</module>
+    </modules>
+
+</project>
