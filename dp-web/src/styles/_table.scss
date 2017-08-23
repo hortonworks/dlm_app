@@ -74,9 +74,10 @@ table.mdl-data-table {
     font-size: 12px;
     color: $dove-gray;
     line-height: 1;
-    padding: 10px;
+    padding: 10px 10px 9px;
     border-bottom: none;
     border-color: $bon-jour;
+    height: 34px;
 
     &:first-child {
       border-left: 1px solid transparent;

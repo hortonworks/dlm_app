@@ -1,5 +1,8 @@
 @import "../../../../../styles/variables";
 
+.page-container {
+  padding-top: 35px;
+}
 .feature-intro {
   & .hwx-title {
     color: $forest-green-1;
