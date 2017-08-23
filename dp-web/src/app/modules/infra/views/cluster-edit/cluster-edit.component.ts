@@ -109,6 +109,10 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
     }
   }
 
+  resetLocationValidity(){
+    this.isLocationValid = true;
+  }
+
   onSelectLocation(location: Location) {
     if(location.id) {
       this.mapData = [];
