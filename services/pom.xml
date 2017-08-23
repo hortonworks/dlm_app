@@ -20,5 +20,6 @@
         <module>db-service</module>
         <module>cluster-service</module>
         <module>knox-agent</module>
+        <module>gateway</module>
     </modules>
 </project>

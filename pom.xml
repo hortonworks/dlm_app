@@ -77,6 +77,7 @@
         <module>dp-commons</module>
         <module>clients</module>
         <module>services</module>
+        <!--<module>dp-app</module>-->
 
     </modules>
 
