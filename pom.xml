@@ -71,8 +71,9 @@
 
     <modules>
         <module>dp-commons</module>
-        <module>services/dp-consular</module>
         <module>clients</module>
+        <module>services</module>
+
     </modules>
 
 </project>
