@@ -170,7 +170,7 @@ class DataplaneClusters @Inject()(
               }
           case Failure(f) => Future.successful(BadRequest(Json.obj("Reason" -> "Not a valid url")))
         }
-      case None => Future.successful(BadRequest("Url Not Provided"))
+      case None => Future.successful(BadRequest(Json.obj("Reason" -> "Url Not Provided")))
     }
   }
 
