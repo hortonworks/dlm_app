@@ -16,7 +16,7 @@ import {
 export class DsFullView implements OnInit {
 
   dsModel: RichDatasetModel = null;
-  applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.EDIT];
+  applicableListActions: AssetListActionsEnum[] = [];//[AssetListActionsEnum.EDIT];
   dsAssetQueryModel: AssetSetQueryModel;
 
   constructor(private richDatasetService: RichDatasetService,

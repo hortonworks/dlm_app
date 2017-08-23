@@ -60,6 +60,7 @@ class BeaconClusterServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconC
       "fsEndpoint = " + clusterDefinitionRequest.fsEndpoint +
       "\nbeaconEndpoint = " + clusterDefinitionRequest.beaconEndpoint +
       "\ndescription = " + clusterDefinitionRequest.description +
+      "\nlocal = " + clusterDefinitionRequest.local +
       (if (clusterDefinitionRequest.hsEndpoint.isDefined) "\nhsEndpoint = " + clusterDefinitionRequest.hsEndpoint.get else "")
   }
 

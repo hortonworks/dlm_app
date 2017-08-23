@@ -30,6 +30,8 @@ import { ToastNotification } from 'models/toast-notification.model';
 import { PROGRESS_STATUS } from 'constants/status.constant';
 import { ProgressState } from 'models/progress-state.model';
 import { getMergedProgress } from 'selectors/progress.selector';
+import { confirmNextAction } from 'actions/confirmation.action';
+import { ConfirmationOptions, confirmationOptionsDefaults } from 'components/confirmation-modal';
 
 const PAIR_REQUEST = '[CREATE PAIR] PAIR_REQUEST';
 const CLUSTERS_REQUEST = '[CREATE PAIR] CLUSTERS_REQUEST';
@@ -92,15 +94,8 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
       if (progress && 'state' in progress) {
         if (progress.state === PROGRESS_STATUS.SUCCESS) {
           this.router.navigate(['pairings']);
-          this.notificationsService.create(<ToastNotification>{
-            title: this.t.instant('page.pairings.create.confirmation.title'),
-            body: this.t.instant('page.pairings.create.confirmation.body'),
-            type: NOTIFICATION_TYPES.SUCCESS
-          });
         } else if (progress.state === PROGRESS_STATUS.FAILED) {
           this.isPairingProgress = false;
-          this.errorMessage = progress.response.text();
-          this.errorDialog.show();
         }
       }
     });
@@ -132,6 +127,15 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
 
   handleSubmit(createPairingForm: FormGroup) {
     this.isPairingProgress = true;
+    const notification = {
+      [NOTIFICATION_TYPES.SUCCESS]: {
+        title: 'page.pairings.create.notification.success.title',
+        body: 'page.pairings.create.notification.success.body',
+      },
+      [NOTIFICATION_TYPES.ERROR]: {
+        title: 'page.pairings.create.notification.error.title'
+      }
+    };
     const requestPayload = [
       {
         clusterId: this.selectedFirstCluster.id,
@@ -142,7 +146,7 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
         beaconUrl: PairingsComponent.getBeaconUrl(this.selectedSecondCluster)
       }
     ];
-    this.store.dispatch(createPairing(requestPayload));
+    this.store.dispatch(createPairing(requestPayload, {notification}));
   }
 
   selectFirstCluster(cluster: ClusterPairing) {

@@ -32,7 +32,7 @@ export class UserService {
 
   getPersonaMap() {
     const personaMap = new Map();
-    personaMap.set(this.ROLES.SUPERADMIN, [new Persona('Admin', [], '/infra', 'infra-logo.png')]);
+    personaMap.set(this.ROLES.SUPERADMIN, [new Persona('Dataplane Admin', [], '/infra', 'infra-logo.png')]);
     personaMap.set(this.ROLES.CURATOR, [
       new Persona('Data Steward', [], '/dataset', 'steward-logo.png', !!this.user && this.user.services.indexOf('dss') > -1, false)
     ]);

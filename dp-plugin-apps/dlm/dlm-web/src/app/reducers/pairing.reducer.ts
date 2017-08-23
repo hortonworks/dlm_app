@@ -56,7 +56,8 @@ export function reducer(state = initialState, action): State {
     }
     case fromPairing.ActionTypes.DELETE_PAIRING.SUCCESS: {
       const entities = Object.assign({}, state.entities);
-      const key = action.payload.payload[0].clusterId + '-' + action.payload.payload[1].clusterId;
+      const pairing = action.payload.response.payload;
+      const key = pairing[0].clusterId + '-' + pairing[1].clusterId;
       delete entities[key];
       return {
         entities: Object.assign({}, entities),
@@ -64,7 +65,7 @@ export function reducer(state = initialState, action): State {
       };
     }
     case fromPairing.ActionTypes.CREATE_PAIRING.FAILURE: {
-      const error = action.payload;
+      const error = action.payload.error;
       return {
         entities: Object.assign({}, state.entities),
         progress: Object.assign({}, state.progress, {

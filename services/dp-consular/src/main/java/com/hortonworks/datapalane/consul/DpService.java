@@ -10,6 +10,7 @@ public class DpService {
   private String host;
   private Integer port;
   private Integer healthCheckIntervalInSecs = 5;
+  private Integer deregisterServiceAfterInMinutes =10;
 
   public DpService(String serviceId,String serviceName,List<String> serviceTags, String host,Integer port) {
     this.serviceId = serviceId;
@@ -29,6 +30,14 @@ public class DpService {
 
   public Integer getPort() {
     return port;
+  }
+
+  public Integer getDeregisterServiceAfterInMinutes() {
+    return deregisterServiceAfterInMinutes;
+  }
+
+  public void setDeregisterServiceAfterInMinutes(Integer deregisterServiceAfterInMinutes) {
+    this.deregisterServiceAfterInMinutes = deregisterServiceAfterInMinutes;
   }
 
   @Override

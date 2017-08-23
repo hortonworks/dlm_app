@@ -31,8 +31,8 @@ export const loadPoliciesFail = (error, meta): ActionFailure => ({
   type: ActionTypes.LOAD_POLICIES.FAILURE, payload: {error, meta}
 });
 
-export const createPolicy = (policy: PolicyPayload, targetClusterId: string|number, requestId?: string): Action => ({
-  type: ActionTypes.CREATE_POLICY.START, payload: { policy, targetClusterId, meta: {requestId} }
+export const createPolicy = (policy: PolicyPayload, targetClusterId: string|number, meta = {}): Action => ({
+  type: ActionTypes.CREATE_POLICY.START, payload: { policy, targetClusterId, meta }
 });
 
 export const createPolicySuccess = (creationStatus, meta): ActionSuccess => ({

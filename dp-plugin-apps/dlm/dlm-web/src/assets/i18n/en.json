@@ -4,6 +4,7 @@
     "and": "And",
     "add": "Add",
     "back": "Back",
+    "ok": "Ok",
     "cancel": "Cancel",
     "review": "Review",
     "submit": "Submit",
@@ -27,7 +28,7 @@
     "policy": "Policy",
     "name": "Name",
     "queue_name": "Queue Name",
-    "max_bandwidth": "Maximum Bandwidth",
+    "max_bandwidth": "Max. Bandwidth",
     "job": "Job",
     "jobs": "Jobs",
     "start_time": "Start Time",
@@ -185,6 +186,9 @@
   "hive_database": {
     "empty_selection": "No Database selected",
     "empty_tables": "No Tables found"
+  },
+  "notification_body": {
+    "click_details": "Check error details"
   },
   "forms": {
     "validation_errors": {
@@ -400,6 +404,14 @@
           "error": {
             "create_policy": "Create policy failed",
             "check_error_details": "Check error details"
+          },
+          "create_policy": {
+            "notification": {
+              "success": {
+                "title": "Creating Policy Successful",
+                "body": "Policy {{policyName}} created successfully"
+              }
+            }
           }
         }
       }
@@ -424,6 +436,15 @@
           "title": "Unpair confirmation",
           "body": "Are you sure you want to unpair {{firstCluster}} and {{secondCluster}} ?",
           "primaryButton": "Unpair"
+        },
+        "notification": {
+          "success": {
+            "title": "Unpairing Clusters successful",
+            "body": "Unpairing clusters {{firstCluster}} and {{secondCluster}} completed successfully"
+          },
+          "error": {
+            "title": "Unpairing Clusters failed"
+          }
         }
       },
       "create": {
@@ -438,9 +459,14 @@
           },
           "cluster_disabled": "This cluster is already paired with the selected cluster."
         },
-        "confirmation": {
-          "title": "Pairing Successful",
-          "body": "Pairing completed successfully"
+        "notification": {
+          "success": {
+            "title": "Pairing Successful",
+            "body": "Pairing completed successfully"
+          },
+          "error": {
+            "title": "Pairing Failed"
+          }
         }
       }
     },

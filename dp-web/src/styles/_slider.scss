@@ -7,7 +7,7 @@ $dialog-1x-width: 340px;
 $dialog-2x-width: 680px;
 $dialog-4x-width: 1380px;
 
-.metron-slider-pane-details
+.dp-slider-pane-details
 {
   display: inline-block;
   float: right;
@@ -32,9 +32,9 @@ $dialog-4x-width: 1380px;
   }
 }
 
-.metron-slider-pane-editable
+.dp-slider-pane-editable
 {
-  @extend .metron-slider-pane-details;
+  @extend .dp-slider-pane-details;
 
   height: auto;
   background: $white;
@@ -113,7 +113,7 @@ $dialog-4x-width: 1380px;
 .load-right-to-left {
   @include animation("keyframe-dialog-rtl", "0.5s", "linear");
 
-  right: 0px;
+  right: 0;
   float: right;
 }
 
@@ -124,5 +124,5 @@ $dialog-4x-width: 1380px;
 
 .load-right-to-left-slider {
   @extend  .load-right-to-left;
-  @extend .metron-slider-pane-editable;
+  @extend .dp-slider-pane-editable;
 }

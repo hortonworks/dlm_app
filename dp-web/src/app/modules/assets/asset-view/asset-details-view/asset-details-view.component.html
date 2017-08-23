@@ -17,7 +17,7 @@
     </table>
   </section>
   <section *ngIf="selectedDetailsTabs === detailsTabs.TAGS">
-    <table style="width: 100%" class="mdl-data-table mdl-js-data-table">
+    <table *ngIf="assetTags.length" style="width: 100%" class="mdl-data-table mdl-js-data-table">
       <thead>
         <tr>
           <th class="mdl-data-table__cell--non-numeric">Name</th>
@@ -31,6 +31,7 @@
         </tr>
       </tbody>
     </table>
+    <div *ngIf="!assetTags.length">No tags available for asset</div>
   </section>
   <section *ngIf="selectedDetailsTabs === detailsTabs.SCHEMA">
     <table style="width: 100%" class="mdl-data-table mdl-js-data-table" >

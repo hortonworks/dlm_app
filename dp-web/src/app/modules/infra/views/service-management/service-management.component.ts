@@ -20,6 +20,10 @@ export class ServiceManagementComponent implements OnInit {
   availableServices: AddOnAppInfo[] = [];
   enabledAppDetails: EnabledAppDetails[] = [];
 
+  showNotification = false;
+
+  serviceNameParams: any;
+
   constructor(private router: Router,
               private route: ActivatedRoute,
               private addOnAppService: AddOnAppService,
@@ -36,6 +40,12 @@ export class ServiceManagementComponent implements OnInit {
       services.forEach(service => {
         this.enabledAppDetails.push(new EnabledAppDetails(service, [], false));
       });
+    });
+    this.addOnAppService.serviceEnabled$.subscribe((name) => {
+      this.serviceNameParams = {
+        serviceName: name
+      };
+      this.showNotification = true;
     });
   }
 
@@ -64,7 +74,7 @@ export class ServiceManagementComponent implements OnInit {
           enabledApp.isOpen = true;
           clusterInfo.syncInProgress = true;
           this.clusterService.syncCluster(lake.data.id).subscribe(response => {
-            if(response._body === "false"){
+            if (response._body === 'false') {
               clusterInfo.synced = false;
               clusterInfo.syncInProgress = false;
               return;
@@ -72,19 +82,19 @@ export class ServiceManagementComponent implements OnInit {
             this.lakeService.retrieve(lake.data.id.toString())
               .delay(2000)
               .repeat(15)
-              .skipWhile((lake) => lake.state !== 'SYNCED' && lake.state !=='SYNC_ERROR' && ++count < 10)
+              .skipWhile((lake) => lake.state !== 'SYNCED' && lake.state !== 'SYNC_ERROR' && ++count < 10)
               .first().subscribe(lakeUpdated => {
-                if(lakeUpdated.state === 'SYNC_ERROR'){
-                  clusterInfo.synced = false;
-                  clusterInfo.syncInProgress = false;
-                  return;
-                }
-                this.extractClusterInfo(serviceName, lake, serviceDependency.dependencies).subscribe(info => {
-                  clusterInfo.lastUpdated = DateUtils.toReadableDate(new Date().getTime() - new Date(lakeUpdated.updated).getTime());
-                  clusterInfo.syncInProgress = false;
-                  clusterInfo.synced = true;
-                  clusterInfo.dependenciesMet = info.dependenciesMet;
-                });
+              if (lakeUpdated.state === 'SYNC_ERROR') {
+                clusterInfo.synced = false;
+                clusterInfo.syncInProgress = false;
+                return;
+              }
+              this.extractClusterInfo(serviceName, lake, serviceDependency.dependencies).subscribe(info => {
+                clusterInfo.lastUpdated = DateUtils.toReadableDate(new Date().getTime() - new Date(lakeUpdated.updated).getTime());
+                clusterInfo.syncInProgress = false;
+                clusterInfo.synced = true;
+                clusterInfo.dependenciesMet = info.dependenciesMet;
+              });
             });
           });
         });

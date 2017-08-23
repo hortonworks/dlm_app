@@ -75,6 +75,8 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   private selectedJobsActions = {};
   private subscriptions: Subscription[] = [];
   private visibleActionMap = {};
+  private selectedFileBrowserPage = {};
+
   showActionConfirmationModal = false;
 
   lastOperationResponse: OperationResponse = <OperationResponse>{};
@@ -127,13 +129,13 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     const actionName = this.selectedAction.name.toLowerCase();
     return {
       [NOTIFICATION_TYPES.SUCCESS]: {
-        title: this.t.instant(`common.action_notifications.${actionName}.success.title`),
+        title: `common.action_notifications.${actionName}.success.title`,
         body: this.t.instant(`common.action_notifications.${actionName}.success.body`, {
           policyName: this.selectedForActionRow.name
         })
       },
       [NOTIFICATION_TYPES.ERROR]: {
-        title: this.t.instant(`common.action_notifications.${actionName}.error.title`),
+        title: `common.action_notifications.${actionName}.error.title`,
         contentType: NOTIFICATION_CONTENT_TYPE.MODAL_LINK
       },
       levels: [NOTIFICATION_TYPES.SUCCESS, NOTIFICATION_TYPES.ERROR]
@@ -304,6 +306,11 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     this.selectedPolicy$.next(policy);
   }
 
+  deactivatePolicy() {
+    this.activeContentType = null;
+    this.selectedPolicy$.next(<Policy>{});
+  }
+
   toggleSelectedRow(nextPolicy, contentType) {
     const selectedPolicy = this.selectedPolicy$.getValue();
     const isContentChanged = contentType !== this.activeContentType;
@@ -375,5 +382,13 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
 
   handleOnOpenDirectory(path) {
     this.hdfsRootPath = path;
+  }
+
+  getFilesPageForRow(rowId) {
+    return rowId && rowId in this.selectedFileBrowserPage ? this.selectedFileBrowserPage[rowId] : 0;
+  }
+
+  handleFilesPageChange(page, rowId) {
+    this.selectedFileBrowserPage[rowId] = page.offset;
   }
 }
