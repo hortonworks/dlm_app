@@ -1,5 +1,9 @@
 @import "../../../../../styles/variables";
 
+.page-container {
+  padding-top: 35px;
+}
+
 input[type="text"].dp-input-url {
   width: 550px;
   &:focus {

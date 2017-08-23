@@ -68,6 +68,8 @@
     [jobsSort]="getJobsSortForRow(row.id)"
     [jobsPage]="getJobsPageForRow(row.id)"
     [jobsActiveActions]="getJobsActiveActionsForRow(row.id)"
+    [fileBrowserPage]="getFilesPageForRow(row.id)"
+    (onPageChangeFiles)="handleFilesPageChange($event, row.id)"
     (onOpenDirectory)="handleOnOpenDirectory($event)"
     (onSortJobs)="handleOnSortJobs($event, row.id)"
     (onSelectActionJobs)="handleOnSelectActionJobs($event, row.id)"

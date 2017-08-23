@@ -1,3 +1,5 @@
+@import "../../../../../styles/variables";
+
 .filterCont{
 	text-align:right;
 	margin-top:-56px;
@@ -11,40 +13,7 @@
 
 .infoTable{
 	width:100%;
-	background-color:white;
-	border: 1px solid #D3D3D3;
+	background-color: $white;
+	border: 1px solid $iron;
 	padding: 10px;
-}
-
-.tableRow {
-	height:34px;
-	padding:12px 0px;
-}
-
-.tableRow.tableHeader{
-	color:#999;	
-	border-bottom: 1px solid #D0D0D0;
-}
-
-.tableRow.normalRow {
-	border-bottom: 1px solid #F0F0F0;
-	font-size:12px;
-	color:#666
-}
-
-.tableCell {
-	width:13%;
-	float:left;
-}
-
-.tableCell.eventTime {
-	width:18%;
-}
-
-select {
-  font-size: 1em;
-  height: 32px;
-  padding: 0 8px;
-  border: 1px solid rgb(221, 221, 221);
-  border-radius: 5px;
 }
