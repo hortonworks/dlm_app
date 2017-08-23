@@ -131,48 +131,47 @@ class DataplaneClusters @Inject()(
   }
 
   import java.net.InetAddress
-  def ambariCheck = authenticated.async { request =>
-    implicit val token = request.token
-    /*
-    * UI will be sending url in form of 'http://host:port' .
-    * Below few lines of code, converts the url with hostname to url with host ip to give us 'ambariUrlWithIp'.
-    * */
-    val ambariUrl = request.getQueryString("url").get
-    Try(new URL(ambariUrl)) match {
-      case Success(url) => processAmbariCheck(ambariUrl,url.getHost, token)
-      case Failure(f) => Future.successful(BadRequest(Json.obj(ambariUrl -> "Not a valid url")))
-    }
-
+  private def getAmbariUrlWithIp(url: String): Try[URL] = {
+    Try(new URL(url))
+      .map {
+        ambariUrl =>
+          val hostAddressIp = InetAddress.getByName(ambariUrl.getHost)
+          new URL(ambariUrl.getProtocol, hostAddressIp.getHostAddress, ambariUrl.getPort, ambariUrl.getFile)
+      }
   }
 
-  private def processAmbariCheck(ambariUrl: String, hostAddress: String, hJwtToken: Option[HJwtToken]): Future[Result] ={
-    implicit val token = hJwtToken
-    val address = InetAddress.getByName(hostAddress)
-    val hostIP = address.getHostAddress
-    val ambariUrlWithIp = new URL(new URL(ambariUrl).getProtocol, hostIP, new URL(ambariUrl).getPort,new URL(ambariUrl).getFile).toString
-
-    dpClusterService
-      .retrieveByAmbariUrl(ambariUrlWithIp)
-      .flatMap {
-        case Left(errors) =>
-          Future.successful(
-            InternalServerError(
-              JsonResponses.statusError(errors.firstMessage)))
-        case Right(status) =>
-          if (status) {
-            Future.successful(Ok(Json.obj("alreadyExists" -> true)))
-          } else {
-            val res = ambariService
-              .statusCheck(AmbariEndpoint(ambariUrlWithIp))
-              .map {
+  def ambariCheck = authenticated.async { request =>
+    implicit val token = request.token
+    request.getQueryString("url") match {
+      case Some(url) =>
+        getAmbariUrlWithIp(url) match {
+          case Success(url) =>
+            dpClusterService
+              .retrieveByAmbariUrl(url.toString)
+              .flatMap {
                 case Left(errors) =>
-                  InternalServerError(
-                    JsonResponses.statusError(errors.firstMessage))
-                case Right(checkResponse) => Ok(Json.toJson(checkResponse))
+                  Future.successful(
+                    InternalServerError(
+                      JsonResponses.statusError(errors.firstMessage)))
+                case Right(status) =>
+                  if (status) {
+                    Future.successful(Ok(Json.obj("alreadyExists" -> true)))
+                  } else {
+                    val res = ambariService
+                      .statusCheck(AmbariEndpoint(url.toString))
+                      .map {
+                        case Left(errors) =>
+                          InternalServerError(
+                            JsonResponses.statusError(errors.firstMessage))
+                        case Right(checkResponse) => Ok(Json.toJson(checkResponse))
+                      }
+                    res
+                  }
               }
-            res
-          }
-      }
+          case Failure(f) => Future.successful(BadRequest(Json.obj("Reason" -> "Not a valid url")))
+        }
+      case None => Future.successful(BadRequest("Url Not Provided"))
+    }
   }
 
   private def retrieveClusterById(clusterId: Long): Future[DataplaneCluster] = {
