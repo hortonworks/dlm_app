@@ -261,6 +261,16 @@
                 <span class="input-group-addon">{{'page.policies.form.fields.bandwidth_unit' | translate}}</span>
               </div>
             </dlm-form-field>
+            <div class="row">
+              <div class="col col-md-6">
+                <div *ngIf="policyForm.get('advanced').get('max_bandwidth').touched">
+                  <dlm-field-error
+                    *ngIf="policyForm.get('advanced').get('max_bandwidth').hasError('integerValidator')">
+                    {{'forms.validation_errors.integerValidator' | translate:freqLimit}}
+                  </dlm-field-error>
+                </div>
+              </div>
+            </div>
           </fieldset>
         </div>
       </div>
@@ -271,7 +281,7 @@
             <button qe-attr="policy-cancel" type="button" class="btn btn-default" (click)="cancel()">
               {{'common.cancel' | translate}}
             </button>
-            <button qe-attr="policy-submit" class="btn btn-success" type="submit">
+            <button qe-attr="policy-submit" class="btn btn-success" type="submit" [disabled]="!policyForm.valid">
               {{'common.review' | translate}}
             </button>
           </div>
