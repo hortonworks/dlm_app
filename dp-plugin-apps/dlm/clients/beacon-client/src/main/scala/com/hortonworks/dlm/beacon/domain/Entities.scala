@@ -50,7 +50,8 @@ object ResponseEntities {
                                     startTime: Option[String], endTime: String)
 
   case class BeaconEventResponse(policyId: Option[String], instanceId: Option[String], event: String, eventType: String,
-                                 policyReplType: Option[String], severity: String, timestamp: String, message: String)
+                                 policyReplType: Option[String], severity: String, syncEvent: Option[Boolean],
+                                 timestamp: String, message: String)
 
   case class BeaconLogResponse(status: String, message: String, requestId: String)
 }
