@@ -16,6 +16,10 @@ export class LakesListComponent implements OnChanges {
   lakesList: LakeInfo[] = [];
   lakesListCopy: LakeInfo[] = [];
   statusEnum = LakeStatus;
+  filterOptions: any[] = [];
+  filters = [];
+  searchText: string;
+  showFilterListing = false;
   @Input() lakes = [];
   @Input() healths = new Map();
   @Output('onRefresh') refreshEmitter: EventEmitter<number> = new EventEmitter<number>();
@@ -48,13 +52,13 @@ export class LakesListComponent implements OnChanges {
     lakeInfo.name = lake.data.name;
     lakeInfo.ambariUrl = lake.data.ambariUrl;
     lakeInfo.lakeId = lake.data.id;
-    lakeInfo.dataCenter= lake.data.dcName;
+    lakeInfo.dataCenter = lake.data.dcName;
     lakeInfo.cluster = lake.clusters && lake.clusters.length ? lake.clusters[0] : null;
     lakeInfo.services = lake.data.services ? lake.data.services : 'NA';
     lakeInfo.isWaiting = lake.data.isWaiting;
     if (health) {
       this.populateHealthInfo(lakeInfo, health);
-    }else{
+    } else {
       lakeInfo.status = lakeInfo.isWaiting ? LakeStatus.WAITING : LakeStatus.NA;
     }
     if (location) {
@@ -68,38 +72,103 @@ export class LakesListComponent implements OnChanges {
     lakeInfo.hdfsUsed = (health.usedSize && !this.isSyncError(health)) ? health.usedSize : 'NA';
     lakeInfo.hdfsTotal = (health.totalSize && !this.isSyncError(health)) ? health.totalSize : 'NA';
     lakeInfo.nodes = (health.nodes && !this.isSyncError(health)) ? health.nodes : 'NA';
-    lakeInfo.status = this.getStatus(health,lakeInfo);
+    lakeInfo.status = this.getStatus(health, lakeInfo);
     lakeInfo.startTime = (health.status && !this.isSyncError(health)) ? health.status.startTime : null;
     lakeInfo.uptimeStr = (health.status && !this.isSyncError(health)) ? DateUtils.toReadableDate(health.status.since) : 'NA';
     lakeInfo.uptime = (health.status && !this.isSyncError(health)) ? health.status.since : 'NA';
   }
 
-  isSyncError(health){
-    return health.status.state === "SYNC_ERROR" ;
+  isSyncError(health) {
+    return health.status.state === 'SYNC_ERROR';
   }
 
   viewDetails(lakeId) {
     this.router.navigate([`infra/cluster/details`, lakeId]);
   }
 
-  private getStatus(health,lakeInfo) {
+  private getStatus(health, lakeInfo) {
     if (health && health.status && health.status.state === 'STARTED') {
       return LakeStatus.UP;
-    } else if (health && health.status && (health.status.state === 'NOT STARTED' || health.status.state === "SYNC_ERROR")) {
+    } else if (health && health.status && (health.status.state === 'NOT STARTED' || health.status.state === 'SYNC_ERROR')) {
       return LakeStatus.DOWN;
-    } else if(lakeInfo.isWaiting){
+    } else if (lakeInfo.isWaiting) {
       return LakeStatus.WAITING;
     } else {
       return LakeStatus.NA;
     }
   }
 
-  filter(event) {
-    let term = event.target.value.trim();
-    let filtered = this.lakesListCopy.filter((lakeInfo) => {
-      return lakeInfo.name.indexOf(term) >= 0;
+  filter() {
+    if (!this.filters || this.filters.length === 0) {
+      this.lakesList = this.lakesListCopy.slice();
+      return;
+    }
+    let lakesMap = new Map();
+    this.filters.forEach(filter => {
+      this.lakesList.forEach(lakeInfo => {
+        if (lakeInfo[filter.key].indexOf(filter.value) >= 0) {
+          lakesMap.set(lakeInfo.id, lakeInfo);
+        }
+      });
     });
-    this.lakesList = filtered;
+    this.lakesList = Array.from(lakesMap.values());
+  }
+
+  removeFilter(filter) {
+    for (let i = 0; i < this.filters.length; i++) {
+      let filterItem = this.filters[i];
+      if (filterItem.key === filter.key && filterItem.value === filter.value) {
+        this.filters.splice(i, 1);
+        break;
+      }
+    }
+    this.filter();
+  }
+
+  addToFilter(display, key, value) {
+    this.filters.push({'key': key, 'value': value, 'display': display});
+    this.filter();
+    this.searchText = '';
+    this.showFilterListing = false;
+  }
+
+  showOptions(event) {
+    let nameMatch = [];
+    let cityMatch = [];
+    let countryMatch = [];
+    let dcMatch = [];
+    this.filterOptions = [];
+    let term = event.target.value.trim().toLowerCase();
+    if (term.length === 0) {
+      return;
+    }
+    this.lakesList.forEach((lakeInfo) => {
+      if (lakeInfo.name.toLowerCase().indexOf(term) >= 0) {
+        nameMatch.push(lakeInfo.name)
+      }
+      if (lakeInfo.city && lakeInfo.city.toLowerCase().indexOf(term) >= 0) {
+        cityMatch.push(lakeInfo.city)
+      }
+      if (lakeInfo.country && lakeInfo.country.toLowerCase().indexOf(term) >= 0) {
+        countryMatch.push(lakeInfo.country)
+      }
+      if (lakeInfo.dataCenter.toLowerCase().indexOf(term) >= 0) {
+        dcMatch.push(lakeInfo.dataCenter);
+      }
+    });
+    if (nameMatch.length > 0) {
+      this.filterOptions.push({'displayName': 'Name', 'key': 'name', values: nameMatch});
+    }
+    if (cityMatch.length > 0) {
+      this.filterOptions.push({'displayName': 'City', 'key': 'city', values: cityMatch});
+    }
+    if (countryMatch.length > 0) {
+      this.filterOptions.push({'displayName': 'Country', 'key': 'country', values: countryMatch});
+    }
+    if (dcMatch.length > 0) {
+      this.filterOptions.push({'displayName': 'Datacenter', 'key': 'dataCenter', values: dcMatch});
+    }
+    this.showFilterListing = true;
   }
 
   refresh(lakeInfo) {

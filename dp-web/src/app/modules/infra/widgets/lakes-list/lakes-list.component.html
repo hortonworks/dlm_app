@@ -2,11 +2,26 @@
   <div class="title-pane clearfix">
     <span class="hwx-title">{{"common.clusters" | translate}}</span>
     <div class="pull-right">
-        <div class="search-input">
-            <input type="text" placeholder="{{'common.search' | translate}}" name="search-input" id="search" (keyup)="filter($event)" />
-            <i class="fa fa-search dp-input__icon" aria-hidden="true"></i>
+      <ng-container *ngFor="let filter of filters">
+        <span class="mdl-chip filter-tags">
+           <span class="mdl-chip__text">
+             <span class="title">{{filter.display}}:</span>
+             <span class="value">&nbsp;{{filter.value}}</span>
+             <span class="close" (click)="removeFilter(filter)"><i class="fa fa-times"></i></span>
+           </span>
+        </span>
+      </ng-container>
+      <div class="search-input">
+          <input type="text" placeholder="{{'common.search' | translate}}" [(ngModel)]="searchText" name="search-input" id="search" (keyup)="showOptions($event)" />
+          <i class="fa fa-filter dp-input__icon" aria-hidden="true"></i>
+      </div>
+      <div *ngIf="showFilterListing" id="filter-option-list" class="option-list">
+        <div class="option-title" *ngFor="let filterOption of filterOptions">
+          {{filterOption.displayName}}
+          <div class="option-value" *ngFor="let value of filterOption.values" (click)="addToFilter(filterOption.displayName, filterOption.key, value)">{{value}}</div>
         </div>
-        <button id="add-btn" class="mdl-button btn-hwx-primary" [routerLink]="['/infra/add']"> {{"pages.infra.labels.addButton" | translate}} </button>
+      </div>
+      <button id="add-btn" class="mdl-button btn-hwx-primary" [routerLink]="['/infra/add']"> {{"pages.infra.labels.addButton" | translate}} </button>
     </div>
   </div>
   <div style="clear:both;"></div>
