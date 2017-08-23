@@ -242,6 +242,9 @@ export class ClusterAddComponent implements OnInit {
       this.isLocationValid = false;
     }
   }
+  resetLocationValidity(){
+    this.isLocationValid = true;
+  }
 
   onSelectLocation(location: Location) {
     this.mapData = [];
