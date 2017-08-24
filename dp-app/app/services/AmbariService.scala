@@ -69,4 +69,28 @@ class AmbariService @Inject()(
       }
   }
 
+  def getDataNodeHealth(clusterId: Long) = {
+    val dnHealthRequestParam = Option(
+      System.getProperty("cluster.dn.health.request.param"))
+      .getOrElse(
+        configuration.underlying.getString("cluster.dn.health.request.param"))
+    wSClient
+      .url(
+        s"$clusterService/$clusterId/ambari/cluster?request=$dnHealthRequestParam")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      )
+      .get
+      .map { response =>
+        if (response.status == 200) {
+          Right(response.json)
+        } else {
+          Left(
+            Errors(Seq(
+              Error("500", (response.json \ "error" \ "message").as[String]))))
+        }
+      }
+  }
+
 }

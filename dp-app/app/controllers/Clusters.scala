@@ -185,6 +185,17 @@ class Clusters @Inject()(
       }
   }
 
+  def getDataNodeHealth(clusterId: Long) = authenticated.async {
+    request =>
+      ambariService.getDataNodeHealth(clusterId).map {
+        case Left(errors) =>
+          InternalServerError(
+            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(datanodeHealth) =>
+          Ok(Json.toJson(datanodeHealth))
+      }
+  }
+
   private def humanizeBytes(bytes: Option[Double]): String = {
     bytes match {
       case Some(bytes) =>

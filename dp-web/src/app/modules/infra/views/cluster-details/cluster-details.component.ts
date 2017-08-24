@@ -160,15 +160,10 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       this.locationService.retrieve(lake.location).map((res) => res),
       this.clusterService.retrieveDetailedHealth(clusterId, lake.id).map((res) => res),
       this.identityService.getUserById(userId).map((res) => res),
-      this.clusterService.retrieveResourceMangerHealth(clusterId).map(res => res)
-    ).map(response => {
-      return {
-        location: response[0],
-        health: response[1],
-        user: response[2],
-        rmhealth: response[3]
-      };
-    });
+      this.clusterService.retrieveResourceMangerHealth(clusterId).map(res => res),
+      this.clusterService.retrieveDataNodeHealth(clusterId).map(res => res),
+      (location, health, user, rmhealth, dnHealth) => ({location, health, user, rmhealth, dnHealth}),
+    );
   }
 
   goToClusters() {
