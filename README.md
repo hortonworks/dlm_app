@@ -106,7 +106,34 @@ Follow these instructions for working with these tarballs.
 * cd $DATAPLANE_HOME/dlm/bin
 * Run `./dlmdeploy.sh load`. This will load the DLM Service docker image into the local machine's docker repo. Note that doing this for the first Dataplane installation might take a while.
 * Run `./dlmdeploy.sh init`
-* Verify the services are up using `docker ps`. There must be 8 service containers that are running.  
+* Verify the services are up using `docker ps`. There must be 8 service containers that are running.
+  
+### Using RPMs
+
+Dataplane can now be installed using RPMs that are produced by Hortonworks Release Engineering team. These RPMs lay down the following bits on the host machine:
+* Docker images from which containers required for Dataplane services will be created and launched.
+* Installation scripts that help the user to install and start Dataplane.
+
+Follow these instructions for working with these RPMs.
+
+* Navigate to [Hortonworks Release Engineering Portal](http://release.eng.hortonworks.com/portal/)
+* Select the product 'DP'.
+* Select the release use wish to use,for e.g. 'DP-1.0.0.0'. This should lead you to a release specific build page like [this](http://release.eng.hortonworks.com/portal/release/DP/releasedVersion/DP-1.0.0.0/1.0.0.0/)
+* Identify the build you wish to use, and select the Repo details icon (the eye shaped icon).
+* From the popup that launches, select the 'baseurl' field which will be of the form 'http://s3.amazonaws.com/dev.hortonworks.com/DP/centos6/1.x/BUILDS/1.0.0.0-`buildnum`'
+* On the machine where you would like to install Dataplane, download the repo file using wget as follows:
+   * E.g. for DP Core `wget -nv http://s3.amazonaws.com/dev.hortonworks.com/DP/centos6/1.x/BUILDS/1.0.0.0-buildnum/dpbn.repo -O /etc/yum.repos.d/dp.repo`
+* Execute the following commands to install the RPMs:
+   * E.g. for DP Core `yum install dp-core`
+   * E.g. for DLM Service `yum install dlm-app`
+* cd /usr/dp/`buildnum`/core/bin 
+* Edit the file `config.env.sh` to enable properties you want to configure. Please refer to the section 'Bootstrap Configuration' for more details.
+* Run `./dpdeploy.sh load`. This will load all DP Core docker images which are bundled in the tarballs into the local machine's docker repo. Note that doing this for the first Dataplane installation might take a while. 
+* Run `./dpdeploy.sh init --all`
+* cd /usr/dp/`buildnum`/apps/dlm/bin
+* Run `./dlmdeploy.sh load`. This will load the DLM Service docker image into the local machine's docker repo. Note that doing this for the first Dataplane installation might take a while.
+* Run `./dlmdeploy.sh init`
+* Verify the services are up using `docker ps`. There must be 8 service containers that are running.
 
 ## Bootstrap Configuration
 
