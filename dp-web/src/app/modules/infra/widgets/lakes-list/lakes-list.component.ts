@@ -101,17 +101,14 @@ export class LakesListComponent implements OnChanges {
   filter() {
     if (!this.filters || this.filters.length === 0) {
       this.lakesList = this.lakesListCopy.slice();
+      this.showFilterListing = false;
       return;
     }
-    let lakesMap = new Map();
     this.filters.forEach(filter => {
-      this.lakesList.forEach(lakeInfo => {
-        if (lakeInfo[filter.key].indexOf(filter.value) >= 0) {
-          lakesMap.set(lakeInfo.id, lakeInfo);
-        }
+      this.lakesList = this.lakesList.filter(lakeInfo => {
+        return lakeInfo[filter.key] === filter.value;
       });
     });
-    this.lakesList = Array.from(lakesMap.values());
   }
 
   removeFilter(filter) {
@@ -126,49 +123,51 @@ export class LakesListComponent implements OnChanges {
   }
 
   addToFilter(display, key, value) {
-    this.filters.push({'key': key, 'value': value, 'display': display});
+    if (!this.filters.find(filter => filter.key === key && filter.value === value)) {
+      this.filters.push({'key': key, 'value': value, 'display': display});
+    }
     this.filter();
     this.searchText = '';
     this.showFilterListing = false;
   }
 
   showOptions(event) {
-    let nameMatch = [];
-    let cityMatch = [];
-    let countryMatch = [];
-    let dcMatch = [];
     this.filterOptions = [];
+    let filterFields = [
+      {key: 'name', display: 'Name'},
+      {key: 'city', display: 'City'},
+      {key: 'country', display: 'Country'},
+      {key: 'dataCenter', display: 'Data Center'}];
+    let filterOptionsMap = new Map();
     let term = event.target.value.trim().toLowerCase();
     if (term.length === 0) {
+      this.showFilterListing = false;
       return;
     }
-    this.lakesList.forEach((lakeInfo) => {
-      if (lakeInfo.name.toLowerCase().indexOf(term) >= 0) {
-        nameMatch.push(lakeInfo.name)
-      }
-      if (lakeInfo.city && lakeInfo.city.toLowerCase().indexOf(term) >= 0) {
-        cityMatch.push(lakeInfo.city)
-      }
-      if (lakeInfo.country && lakeInfo.country.toLowerCase().indexOf(term) >= 0) {
-        countryMatch.push(lakeInfo.country)
-      }
-      if (lakeInfo.dataCenter.toLowerCase().indexOf(term) >= 0) {
-        dcMatch.push(lakeInfo.dataCenter);
+    this.lakesList.forEach(lakeInfo => {
+      filterFields.forEach(field => {
+        if (lakeInfo[field.key] && lakeInfo[field.key].toLowerCase().indexOf(term) >= 0) {
+          let values = filterOptionsMap.get(field.key);
+          if (values && values.indexOf(lakeInfo[field.key]) === -1) {
+            values.push(lakeInfo[field.key]);
+          } else if(!values) {
+            values = [lakeInfo[field.key]];
+          }
+          filterOptionsMap.set(field.key, values);
+        }
+      });
+    });
+    this.populateFilterOptions(filterFields, filterOptionsMap);
+    this.showFilterListing = true;
+  }
+
+  private populateFilterOptions(filterFields, filterOptionsMap: Map<string, Array<any>>) {
+    filterFields.forEach(filterField => {
+      let values = filterOptionsMap.get(filterField.key);
+      if (values && values.length > 0) {
+        this.filterOptions.push({'displayName': filterField.display, 'key': filterField.key, values: values});
       }
     });
-    if (nameMatch.length > 0) {
-      this.filterOptions.push({'displayName': 'Name', 'key': 'name', values: nameMatch});
-    }
-    if (cityMatch.length > 0) {
-      this.filterOptions.push({'displayName': 'City', 'key': 'city', values: cityMatch});
-    }
-    if (countryMatch.length > 0) {
-      this.filterOptions.push({'displayName': 'Country', 'key': 'country', values: countryMatch});
-    }
-    if (dcMatch.length > 0) {
-      this.filterOptions.push({'displayName': 'Datacenter', 'key': 'dataCenter', values: dcMatch});
-    }
-    this.showFilterListing = true;
   }
 
   refresh(lakeInfo) {

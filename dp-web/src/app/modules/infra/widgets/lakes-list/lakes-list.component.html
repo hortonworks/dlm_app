@@ -1,7 +1,9 @@
 <div class="content-pane">
-  <div class="title-pane clearfix">
-    <span class="hwx-title">{{"common.clusters" | translate}}</span>
-    <div class="pull-right">
+  <div class="title-pane">
+    <div class="page-title">
+      <span class="hwx-title">{{"common.clusters" | translate}}</span>
+    </div>
+    <div class="filter-labels">
       <ng-container *ngFor="let filter of filters">
         <span class="mdl-chip filter-tags">
            <span class="mdl-chip__text">
@@ -11,20 +13,20 @@
            </span>
         </span>
       </ng-container>
+    </div>
+    <div class="search">
       <div class="search-input">
-          <input type="text" placeholder="{{'common.search' | translate}}" [(ngModel)]="searchText" name="search-input" id="search" (keyup)="showOptions($event)" />
-          <i class="fa fa-filter dp-input__icon" aria-hidden="true"></i>
+       <input type="text" placeholder="{{'common.search' | translate}}" [(ngModel)]="searchText" name="search-input" id="search" (keyup)="showOptions($event)" />
+        <i class="fa fa-filter dp-input__icon" aria-hidden="true"></i>
       </div>
       <div *ngIf="showFilterListing" id="filter-option-list" class="option-list">
         <div class="option-title" *ngFor="let filterOption of filterOptions">
           {{filterOption.displayName}}
           <div class="option-value" *ngFor="let value of filterOption.values" (click)="addToFilter(filterOption.displayName, filterOption.key, value)">{{value}}</div>
         </div>
-      </div>
-      <button id="add-btn" class="mdl-button btn-hwx-primary" [routerLink]="['/infra/add']"> {{"pages.infra.labels.addButton" | translate}} </button>
     </div>
+    <button id="add-btn" class="mdl-button btn-hwx-primary" [routerLink]="['/infra/add']"> {{"pages.infra.labels.addButton" | translate}} </button></div>
   </div>
-  <div style="clear:both;"></div>
   <table class="mdl-data-table mdl-js-data-table" dp-config-table (onSort)="onSort($event)">
       <thead>
       <tr>

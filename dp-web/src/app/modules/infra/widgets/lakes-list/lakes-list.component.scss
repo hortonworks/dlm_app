@@ -4,11 +4,24 @@
   padding: 0 25px;
 }
 
-.title-pane {
+.page-title {
   padding: 18px 0px;
-  .hwx-title {
-    line-height: 34px;
-  }
+  line-height: 34px;
+}
+
+.title-pane {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-title, .search {
+  flex: 0 0 auto;
+}
+
+.filter-labels {
+  flex: 1 1 auto;
+  text-align: right;
 }
 
 .search-input {
@@ -50,9 +63,11 @@ input {
 .status-down {
   color: $roman-red;
 }
+
 .status-waiting {
   color: $forest-green-1;
 }
+
 .status-na {
   color: $shuttle-gray;
 }
@@ -122,8 +137,6 @@ input {
   margin: 0 5px
 }
 
-:host /deep/ .mdl-chip__text{
+:host /deep/ .mdl-chip__text {
   vertical-align: unset;
 }
-
-
