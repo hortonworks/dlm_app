@@ -53,12 +53,22 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>assets_jar</id>
                         <phase>package</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
                         <configuration>
                             <classifier>assets</classifier>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>sans-externalized_jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
                             <classifier>sans-externalized</classifier>
                         </configuration>
                     </execution>
