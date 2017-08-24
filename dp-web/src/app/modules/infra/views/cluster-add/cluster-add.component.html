@@ -87,38 +87,47 @@
           </div>
         </div>
         <div class="mdl-grid mdl-grid--no-spacing">
-          <div class="mdl-cell mdl-cell--8-col datalake-input">
-            <div class="form-group">
-              <label class="required">{{"pages.infra.labels.clusterLocation" | translate}}</label>
-              <div class="hwx-inline-desc">{{"pages.infra.description.clusterLocation" | translate}}</div>
-              <input required class="dp-input" name="location" type="text" autocomplete="off" ngui-auto-complete
-                     (keyup)="checkLocation()"
-                     [min-chars]=3
-                     [(ngModel)]="location"
-                     [source]="getLocations.bind(this)"
-                     [value-formatter]="locationFormatter"
-                     [list-formatter]="locationFormatter"
-                     [no-match-found-text]="'No locations found'"
-                     placeholder="Location"
-                     (valueChanged)="onSelectLocation(location)" [(ngModel)]="searchTerm"/>
-            </div>
-            <div class="form-group">
-              <label class="required">{{"pages.infra.labels.dataCenter" | translate}}</label>
-              <div class="hwx-inline-desc">{{"pages.infra.description.dataCenter" | translate}}</div>
-              <input required class="dp-input" placeholder="Datacenter" name="datacenter" type="text" [(ngModel)]="cluster.dcName"/>
-            </div>
-            <div class="form-group">
-              <label>{{"common.tags" | translate}} </label>
-              <div class="hwx-inline-desc">{{"pages.infra.description.tags" | translate}}</div>
-              <tagging-widget id="tags" [tags]="cluster.tags" [clearOnSearch]="true" (onNewSearch)="onNewTagAddition($event)"></tagging-widget>
-            </div>
-            <div class="form-group">
-              <label>{{"common.description" | translate}}</label>
-              <div class="hwx-inline-desc">{{"pages.infra.description.description" | translate}}</div>
-              <textarea name="desc" [(ngModel)]="cluster.description"></textarea>
+          <div class="mdl-cell mdl-cell--6-col">
+            <div class="datalake-input">
+              <div class="form-group">
+                <label class="required">{{"pages.infra.labels.clusterLocation" | translate}}</label>
+                <div class="hwx-inline-desc">{{"pages.infra.description.clusterLocation" | translate}}</div>
+                <div style="display: flex;align-items: center">
+                  <div [ngClass]="{'validation-error' : isLocationValid==false}">
+                    <input required class="dp-input" name="location" type="text" autocomplete="off" ngui-auto-complete
+                           (keyup)="setLocation()"
+                           (blur)="setLocationValidity(location)"
+                           (focus)="resetLocationValidity()"
+                           [min-chars]=3
+                           [(ngModel)]="location"
+                           [source]="getLocations.bind(this)"
+                           [value-formatter]="locationFormatter"
+                           [list-formatter]="locationFormatter"
+                           [no-match-found-text]="'No locations found'"
+                           placeholder="Location"
+                           (valueChanged)="onSelectLocation(location)" [(ngModel)]="searchTerm"/>
+                  </div>
+                  <div *ngIf="isLocationValid === false" class="location-error"><i class="fa fa-times-circle-o"></i><span class="location-error-text">{{"pages.infra.description.invalidLocation" | translate}}</span></div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="required">{{"pages.infra.labels.dataCenter" | translate}}</label>
+                <div class="hwx-inline-desc">{{"pages.infra.description.dataCenter" | translate}}</div>
+                <input required class="dp-input" placeholder="Datacenter" name="datacenter" type="text" [(ngModel)]="cluster.dcName"/>
+              </div>
+              <div class="form-group">
+                <label>{{"common.tags" | translate}} </label>
+                <div class="hwx-inline-desc">{{"pages.infra.description.tags" | translate}}</div>
+                <tagging-widget id="tags" [tags]="cluster.tags" [clearOnSearch]="true" (onNewSearch)="onNewTagAddition($event)"></tagging-widget>
+              </div>
+              <div class="form-group">
+                <label>{{"common.description" | translate}}</label>
+                <div class="hwx-inline-desc">{{"pages.infra.description.description" | translate}}</div>
+                <textarea name="desc" [(ngModel)]="cluster.description"></textarea>
+              </div>
             </div>
           </div>
-          <div class="mdl-cell mdl-cell--4-col">
+          <div class="mdl-cell mdl-cell--6-col">
             <dp-map [mapData]="mapData" class="pull-right"  style="padding: 0px;margin-top:0px;margin-right: 0px" [mapSize]="1"></dp-map>
           </div>
         </div>
