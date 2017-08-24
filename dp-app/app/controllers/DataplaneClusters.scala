@@ -1,14 +1,11 @@
 package controllers
 
+import java.net.URL
 import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari.AmbariEndpoint
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  DataplaneCluster,
-  DataplaneClusterIdentifier,
-  HJwtToken
-}
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, DataplaneClusterIdentifier, HJwtToken}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.DpClusterService
 import models.{JsonResponses, WrappedErrorsException}
@@ -20,6 +17,8 @@ import services.AmbariService
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import com.hortonworks.dataplane.commons.auth.Authenticated
+
+import scala.util.{Failure, Success, Try}
 
 class DataplaneClusters @Inject()(
     @Named("dpClusterService") val dpClusterService: DpClusterService,
@@ -133,27 +132,24 @@ class DataplaneClusters @Inject()(
 
   def ambariCheck = authenticated.async { request =>
     implicit val token = request.token
-    dpClusterService
-      .retrieveByAmbariUrl(request.getQueryString("url").get)
+    ambariService
+      .statusCheck(AmbariEndpoint(request.getQueryString("url").get))
       .flatMap {
         case Left(errors) =>
-          Future.successful(
-            InternalServerError(
-              JsonResponses.statusError(errors.firstMessage)))
-        case Right(status) =>
-          if (status) {
-            Future.successful(Ok(Json.obj("alreadyExists" -> true)))
-          } else {
-            val res = ambariService
-              .statusCheck(AmbariEndpoint(request.getQueryString("url").get))
-              .map {
-                case Left(errors) =>
-                  InternalServerError(
-                    JsonResponses.statusError(errors.firstMessage))
-                case Right(checkResponse) => Ok(Json.toJson(checkResponse))
+          Future.successful(InternalServerError(
+            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}")))
+        case Right(checkResponse) =>{
+          dpClusterService.checkExistenceByIp(checkResponse.ambariIpAddress).map{
+            case Left(errors) => InternalServerError(
+              JsonResponses.statusError(errors.firstMessage))
+            case Right(status) =>
+              if(status){
+                Ok(Json.obj("alreadyExists" -> true))
+              }else{
+                Ok(Json.toJson(checkResponse))
               }
-            res
           }
+        }
       }
   }
 
