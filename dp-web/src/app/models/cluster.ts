@@ -57,6 +57,8 @@ export class ClusterDetails {
  rmHeapUsed: string;
  rmHeapTotal: string;
  rmUptime: string;
+ healthyDataNodes: number;
+ unhealthyDataNodes: number;
 }
 
 

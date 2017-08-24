@@ -34,6 +34,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   cluster: any;
   clusterHealth: any;
   rmHealth: any;
+  dnHealth: any;
   clusterDetails: ClusterDetails = new ClusterDetails();
   location: Location = new Location();
   user: any;
@@ -65,6 +66,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
             this.location = clusterInfo.location;
             this.user = clusterInfo.user;
             this.rmHealth = clusterInfo.rmhealth;
+            this.dnHealth = clusterInfo.dnHealth;
             this.clusterDetails = this.getClusterDetails();
             this.processProgressbarInfo();
             Loader.hide();
@@ -151,6 +153,16 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       clusterDetails.rmHeapTotal = StringUtils.humanizeBytes(this.rmHealth.metrics.jvm.HeapMemoryMax);
       clusterDetails.rmHeapUsed = StringUtils.humanizeBytes(this.rmHealth.metrics.jvm.HeapMemoryUsed);
       clusterDetails.rmUptime = DateUtils.toReadableDate(new Date().getTime() - this.rmHealth.metrics.runtime.StartTime);
+    }
+
+    if(
+      this.dnHealth &&
+      this.dnHealth.ServiceComponentInfo &&
+      this.dnHealth.ServiceComponentInfo.started_count &&
+      this.dnHealth.ServiceComponentInfo.total_count
+    ) {
+      clusterDetails.healthyDataNodes = this.dnHealth.ServiceComponentInfo.started_count;
+      clusterDetails.unhealthyDataNodes = this.dnHealth.ServiceComponentInfo.total_count - this.dnHealth.ServiceComponentInfo.started_count;
     }
     return clusterDetails;
   }
