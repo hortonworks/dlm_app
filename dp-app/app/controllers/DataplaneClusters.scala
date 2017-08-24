@@ -130,48 +130,27 @@ class DataplaneClusters @Inject()(
       }
   }
 
-  import java.net.InetAddress
-  private def getAmbariUrlWithIp(url: String): Try[URL] = {
-    Try(new URL(url))
-      .map {
-        ambariUrl =>
-          val hostAddressIp = InetAddress.getByName(ambariUrl.getHost)
-          new URL(ambariUrl.getProtocol, hostAddressIp.getHostAddress, ambariUrl.getPort, ambariUrl.getFile)
-      }
-  }
-
   def ambariCheck = authenticated.async { request =>
     implicit val token = request.token
-    request.getQueryString("url") match {
-      case Some(url) =>
-        getAmbariUrlWithIp(url) match {
-          case Success(url) =>
-            dpClusterService
-              .retrieveByAmbariUrl(url.toString)
-              .flatMap {
-                case Left(errors) =>
-                  Future.successful(
-                    InternalServerError(
-                      JsonResponses.statusError(errors.firstMessage)))
-                case Right(status) =>
-                  if (status) {
-                    Future.successful(Ok(Json.obj("alreadyExists" -> true)))
-                  } else {
-                    val res = ambariService
-                      .statusCheck(AmbariEndpoint(url.toString))
-                      .map {
-                        case Left(errors) =>
-                          InternalServerError(
-                            JsonResponses.statusError(errors.firstMessage))
-                        case Right(checkResponse) => Ok(Json.toJson(checkResponse))
-                      }
-                    res
-                  }
+    ambariService
+      .statusCheck(AmbariEndpoint(request.getQueryString("url").get))
+      .flatMap {
+        case Left(errors) =>
+          Future.successful(InternalServerError(
+            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}")))
+        case Right(checkResponse) =>{
+          dpClusterService.checkExistenceByIp(checkResponse.ambariIpAddress).map{
+            case Left(errors) => InternalServerError(
+              JsonResponses.statusError(errors.firstMessage))
+            case Right(status) =>
+              if(status){
+                Ok(Json.obj("alreadyExists" -> true))
+              }else{
+                Ok(Json.toJson(checkResponse))
               }
-          case Failure(f) => Future.successful(BadRequest(Json.obj("Reason" -> "Not a valid url")))
+          }
         }
-      case None => Future.successful(BadRequest(Json.obj("Reason" -> "Url Not Provided")))
-    }
+      }
   }
 
   private def retrieveClusterById(clusterId: Long): Future[DataplaneCluster] = {

@@ -203,8 +203,7 @@ export class ClusterAddComponent implements OnInit {
     this.cluster.name = clusterInfo[0].clusterName;
     this.cluster.services = clusterInfo[0].services;
     // TEMP FIX : Should come from backend
-    let urlParts = this.cluster.ambariurl.split('/');
-    this.cluster.ipAddress = urlParts.length ? urlParts[2].substr(0, urlParts[2].indexOf(':')) : '';
+    this.cluster.ipAddress = this._clusterState.ambariIpAddress;
   }
 
   get showClusterDetails() {
@@ -298,6 +297,7 @@ export class ClusterAddComponent implements OnInit {
     lake.description = this.cluster.description;
     lake.dcName = this.cluster.dcName;
     lake.state = 'TO_SYNC';
+    lake.ambariIpAddress = this.cluster.ipAddress;
     if (this._clusterState.knoxDetected) {
       lake.knoxEnabled = true;
       lake.knoxUrl = this._clusterState.knoxUrl;

@@ -20,6 +20,7 @@ object Ambari {
                                  knoxDetected: Boolean,
                                  ambariApiStatus: Int = -1,
                                  knoxUrl: Option[String],
+                                 ambariIpAddress: String,
                                  ambariApiResponseBody: JsValue,
                                  requestAmbariCreds: Boolean = false,
                                  requestKnoxURL: Boolean = false)

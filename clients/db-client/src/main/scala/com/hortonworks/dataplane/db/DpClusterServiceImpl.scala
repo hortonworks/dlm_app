@@ -53,9 +53,10 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
       .get()
       .map(mapToClusterService)
   }
-  override def retrieveByAmbariUrl(
-                                    ambariUrl: String): Future[Either[Errors, Boolean]] = {
-    ws.url(s"$url/dp/clusters?ambariUrl=$ambariUrl")
+
+  override def checkExistenceByIp(
+                                    ambariIp: String): Future[Either[Errors, Boolean]] = {
+    ws.url(s"$url/dp/clusters?ambariIp=$ambariIp")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapClusterExists)
