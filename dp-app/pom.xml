@@ -5,6 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dp-app</artifactId>
+    <packaging>jar</packaging>
 
     <parent>
         <groupId>com.hortonworks.dataplane</groupId>
@@ -28,8 +29,25 @@
                 <version>1.0.0-beta4</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <routesGenerator>static</routesGenerator>
+                    <mainLang>scala</mainLang>
+                    <routesGenerator>injected</routesGenerator>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>compile_routes</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>routes-compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>dist</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>dist</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -41,6 +59,7 @@
                         </goals>
                         <configuration>
                             <classifier>assets</classifier>
+                            <classifier>sans-externalized</classifier>
                         </configuration>
                     </execution>
                 </executions>
@@ -62,6 +81,47 @@
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <!-- here the phase you need -->
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/app/controllers</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/target/routes/main/router</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <delete>
+                                    <fileset dir="${project.basedir}/target/routes/main/router" includes="*.scala" />
+                                </delete>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -81,31 +141,34 @@
             <artifactId>play-json_2.11</artifactId>
             <version>2.6.0-M3</version>
         </dependency>
-        <dependency>
-              <groupId>com.typesafe.play</groupId>
-              <artifactId>play-logback_2.11</artifactId>
-              <version>2.6.0-M3</version>
-          </dependency>
-        <dependency>
-              <groupId>com.typesafe.play</groupId>
-              <artifactId>play-cache_2.11</artifactId>
-              <version>2.6.0-M3</version>
-        </dependency>
-        <dependency>
-              <groupId>com.typesafe.play</groupId>
-              <artifactId>play-netty-server_2.11</artifactId>
-              <version>2.6.0-M3</version>
-        </dependency>
-        <dependency>
-              <groupId>com.typesafe.play</groupId>
-              <artifactId>play-iteratees_2.11</artifactId>
-              <version>2.5.13</version>
-        </dependency>
-        <dependency>
-              <groupId>com.typesafe.play</groupId>
-              <artifactId>play-server_2.11</artifactId>
-              <version>2.6.0-M3</version>
-        </dependency>
+        <!--<dependency>-->
+              <!--<groupId>com.typesafe.play</groupId>-->
+              <!--<artifactId>play-logback_2.11</artifactId>-->
+              <!--<version>2.6.0-M3</version>-->
+              <!--<scope>runtime</scope>-->
+          <!--</dependency>-->
+        <!--<dependency>-->
+              <!--<groupId>com.typesafe.play</groupId>-->
+              <!--<artifactId>play-cache_2.11</artifactId>-->
+              <!--<version>2.6.0-M3</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+              <!--<groupId>com.typesafe.play</groupId>-->
+              <!--<artifactId>play-netty-server_2.11</artifactId>-->
+              <!--<version>2.6.0-M3</version>-->
+              <!--<scope>provided</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+              <!--<groupId>com.typesafe.play</groupId>-->
+              <!--<artifactId>play-iteratees_2.11</artifactId>-->
+              <!--<version>2.5.13</version>-->
+              <!--<scope>provided</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+              <!--<groupId>com.typesafe.play</groupId>-->
+              <!--<artifactId>play-server_2.11</artifactId>-->
+              <!--<version>2.6.0-M3</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.hortonworks.dataplane</groupId>
             <artifactId>db-client</artifactId>
