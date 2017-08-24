@@ -202,9 +202,7 @@ export class ClusterAddComponent implements OnInit {
   private extractClusterInfo(clusterInfo) {
     this.cluster.name = clusterInfo[0].clusterName;
     this.cluster.services = clusterInfo[0].services;
-    // TEMP FIX : Should come from backend
-    let urlParts = this._clusterState.ambariIpAddress.split('/');
-    this.cluster.ipAddress = urlParts.length ? urlParts[2].substr(0, urlParts[2].lastIndexOf(':')) : '';
+    this.cluster.ipAddress = this._clusterState.ambariIpAddress;
   }
 
   get showClusterDetails() {
@@ -220,6 +218,10 @@ export class ClusterAddComponent implements OnInit {
     return true;
   }
 
+  getIPAddress(amabariUrl){
+    let urlParts = amabariUrl.split('/');
+    return urlParts.length ? urlParts[2].substr(0, urlParts[2].lastIndexOf(':')) : '';
+  }
   locationFormatter(location: Location): string {
     return `${location.city}${location.province ? ', ' + location.province : ''}, ${location.country}`;
   }
