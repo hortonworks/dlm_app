@@ -12,5 +12,5 @@ fi
 echo "Starting services ..."
 ls -lR ../data/security/
 ./ldap.sh start
-/usr/bin/java -Djava.library.path=/usr/hdp/2.6.0.3-8/knox/ext/native -jar /usr/hdp/2.6.0.3-8/knox/bin/gateway.jar &
+/usr/bin/java -Djava.library.path=/usr/hdp/current/knox-server/ext/native -jar /usr/hdp/current/knox-server/bin/gateway.jar &
 consul agent -join $CONSUL_HOST -config-file=/consul-config/knox-consul.config -disable-host-node-id=true
