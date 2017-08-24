@@ -8,17 +8,16 @@
   -->
 
 <div class="btn-group" role="group" data-toggle="buttons">
-  <label qe-attr="hdfs-filter" class="btn btn-xs btn-default btn-filter"
+  <label qe-attr="hdfs-filter"
+         [ngClass]="{'active': activeService === POLICY_TYPES.HDFS, 'btn btn-xs btn-default btn-filter': true}"
           (click)="filterPoliciesByService(POLICY_TYPES.HDFS)">
-    <input type="checkbox" autocomplete="off">
     <span class="hexagon hexagon-warning hexagon-small">
       <i class="fa fa-file-o"></i>
     </span>
     <span class="service-name">{{POLICY_TYPES_LABELS[POLICY_TYPES.HDFS]}}</span>
   </label>
-  <label qe-attr="hive-filter" class="btn btn-xs btn-default btn-filter"
+  <label qe-attr="hive-filter" class="btn btn-xs btn-default btn-filter" [ngClass]="{'active': activeService === POLICY_TYPES.HIVE}"
           (click)="filterPoliciesByService(POLICY_TYPES.HIVE)">
-    <input type="checkbox" autocomplete="off">
     <span class="hexagon hexagon-success hexagon-small">
       <i class="fa fa-database"></i>
     </span>

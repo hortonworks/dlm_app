@@ -70,6 +70,7 @@
       },
       "description": {
         "dataplane": "Welcome to Hortonworks Data Plane. To start, please configure the LDAP properties and allow dataplane authenticate against it. Optionally, you can add Dataplane Administrators. Please proceed by clicking on GET STARTED",
+        "clusterOnboard": "Welcome to Hortonworks Data Plane. To start, please add your Ambari managed clusters to Data Plane. You can also enable Data Plane services or provide more users or groups access to them. Please proceed by clicking on GET STARTED.",
         "setupAuth": "The first step is to help data plane connect to your LDAP by providing the LDAP configurations to Data plane.",
         "defineUsers": "Upon completing the LDAP configuration, you may add administrators to Data plane. You can add users or groups to data plane and assign or modify their roles anytime through the User Management Screen.",
         "manageUsers": "You can manage users or groups in data plane and assign or modify their roles anytime through the User Management Screen.",
@@ -125,7 +126,8 @@
         "installationLink":"Installation Steps.",
         "installationStepsDoc":"https://docs.hortonworks.com/",
         "dependentServicesLabel":"DEPENDENT SERVICES:",
-        "syncFailed":"Cluster Information could not be fetched"
+        "syncFailed":"Cluster Information could not be fetched",
+        "serviceEnabled":"Service Enabled successfully"
       },
       "description": {
         "verificationWelcome": "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your SmartSense ID.",
@@ -136,7 +138,8 @@
         "installationLink": "For detailed steps on the installation process, please visit ",
         "verifyingStatus": "Verifying dependent services status on the cluster...",
         "successStatus":"All the service dependencies are met. Please click Next to continue",
-        "errorStatus":"The following dependent service(s) information is not present on the cluster. Please install them to continue."
+        "errorStatus":"The following dependent service(s) information is not present on the cluster. Please install them to continue.",
+        "serviceEnabled": "All the authorized users of {{serviceName}} service, should re-login to be able to access the service."
       }
     },
     "infra": {
@@ -166,13 +169,18 @@
         "addUser": "ADD USER",
         "addGroup": "ADD GROUP",
         "username": "Username",
+        "addUserNames": "Usernames",
         "groupName": "Group Name",
+        "addGroupNames": "Group Names",
         "roles": "Roles",
         "usernameorgroup": "Username/Group",
         "active": "Active",
         "inactive": "Inactive",
         "additionalConfigs": "Additional Configs",
-        "editCluster": "Edit Cluster"
+        "editCluster": "Edit Cluster",
+        "duplicateRole": "Duplicate values in Roles Input - ",
+        "duplicateUser": "Duplicate values in Users Input - ",
+        "duplicateGroup": "Duplicate values in Groups Input - "
       },
       "description": {
         "editCluster": "Please update your Ambari managed cluster (already added to Dataplane) here.",
@@ -198,8 +206,10 @@
         "updateUserError": "Not able to update user",
         "addGroupError": "Not able to save groups",
         "updateGroupError": "Not able to update group",
-        "invalidRoleInput": "Invalid Entry in Roles Input",
-        "invalidUserInput": "Invalid Entry in Users Input"
+        "invalidRoleInput": "Some invalid role(s) are identified in the input. Only roles selected from dropdown options are valid.",
+        "invalidAmbariUrl":"Invalid Ambari URL. Please enter a valid URL of the form http://host:port or https://host:port.",
+        "invalidUserInput": "Some invalid user(s) are identified in the input. Only users selected from dropdown options are valid.",
+        "invalidGroupInput": "Some invalid group(s) are identified in the input. Only groups selected from dropdown options are valid."
       }
     },
     "dataset": {
@@ -240,7 +250,7 @@
         "belongsTo": "Belongs To"
       },
       "ds-editor": {
-        "ds-description": "Organize your data-assets including Hive & Hbase tables, HDFS Files into logical groups for subsequent usage.",
+        "ds-description": "Organize your hive assets into logical groups for subsequent usage.",
         "information": "Information",
         "assets": "Assets",
         "summary": "Summary",

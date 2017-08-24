@@ -17,7 +17,8 @@ public class ApplicationRegistrar {
   private Config config;
   private Optional<ConsulHook> hook;
   private InetUtils inetUtils=new InetUtils(new InetUtilsProperties());
-  private RandomGenerator randomGenerator=new RandomGenerator(10);
+
+  private String DEREGISTER_CRITICAL_SERIVE_TTL_PROPNAME="consul.service.deregister.afterMinutes";
   public ApplicationRegistrar(Config config, Optional<ConsulHook> hook) {
     this.config = config;
     this.hook = hook;
@@ -31,9 +32,13 @@ public class ApplicationRegistrar {
     String serviceName = config.getString("consul.serviceName");
     List<String> seriveTags = config.getStringList("consul.service.tags");
     int servicePort = config.getInt("consul.service.port");
-    String serviceId = generateServiceId(serviceName);
+    String serviceId = generateServiceId(serviceName,servicePort);
     DpService dpService = new DpService(serviceId, serviceName, seriveTags, getServiceAddress(),servicePort);
 
+    if (config.hasPath(DEREGISTER_CRITICAL_SERIVE_TTL_PROPNAME) && !config.getIsNull(DEREGISTER_CRITICAL_SERIVE_TTL_PROPNAME)) {
+      int deregisterServiceAfter = config.getInt(DEREGISTER_CRITICAL_SERIVE_TTL_PROPNAME);
+      dpService.setDeregisterServiceAfterInMinutes(deregisterServiceAfter);
+    }
     ClientStart clientStartTask = new ClientStart(dpConsulClient, dpService, hook);
     ClientStatus clientStatusTask = new ClientStatus(dpConsulClient, dpService, hook);
     ExecutionHandler executionHandler = new ExecutionHandler(scheduledExecutorService, () -> clientStartTask, () -> clientStatusTask, config, hook);
@@ -45,8 +50,8 @@ public class ApplicationRegistrar {
   private String getServiceAddress() {
     return inetUtils.findFirstNonLoopbackAddress().getHostAddress();
   }
-  private String generateServiceId(String serviceName){
-    return serviceName+"_"+randomGenerator.generate();
+  private String generateServiceId(String serviceName,int servicePort){
+    return String.format("%s_%s:%d",serviceName,this.getServiceAddress(),servicePort);
   }
 
   private static class ExecutionHandler {

@@ -1,20 +1,21 @@
 <div class="page-container">
-    <div class="mdl-grid mdl-grid--no-spacing ">
+    <div class="hwx-title-panel">
+      <div class="mdl-grid mdl-grid--no-spacing ">
         <div class="mdl-cell--2-col hwx-title"> {{ "pages.analytics.workspace.title" | translate }} | {{ workspacesDTOS.length }} </div>
         <div class="mdl-layout-spacer"> </div>
         <div class="actions">
-            <div class="dp-input">
-                <input type="text" placeholder="Search" name="name" id="search">
-                <i class="fa fa-search dp-input__icon" aria-hidden="true"></i>
-            </div>
+          <div class="dp-input">
+            <input type="text" placeholder="Search" name="name" id="search">
+            <i class="fa fa-search dp-input__icon" aria-hidden="true"></i>
+          </div>
 
-            <dp-tabs [tabEnum]="toggleView" [tabType]="tabType.LAYOUT" [images]="tabImages" (selected)="selectedViewType=$event"> </dp-tabs>
+          <dp-tabs [tabEnum]="toggleView" [tabType]="tabType.LAYOUT" [images]="tabImages" (selected)="selectedViewType=$event"> </dp-tabs>
 
-            <button class="mdl-button btn-hwx-primary" (click)="addWorkspace()"> {{ "pages.analytics.workspace.create-workspace" | translate }} </button>
+          <button class="mdl-button btn-hwx-primary" (click)="addWorkspace()"> {{ "pages.analytics.workspace.create-workspace" | translate }} </button>
         </div>
+      </div>
     </div>
 
-    <div class="spacer-15"> </div>
     <div class="card-container" *ngIf="selectedViewType===toggleView.GRID">
         <div class=" mdl-card" *ngFor="let workspacesDTO of workspacesDTOS" (click)="editWorkspace($event, workspacesDTO)">
             <div class="mdl-card__title">

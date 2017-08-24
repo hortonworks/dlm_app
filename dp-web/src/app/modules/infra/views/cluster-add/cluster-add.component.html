@@ -39,7 +39,7 @@
       </div>
 
 
-      <div *ngIf="_clusterState.alreadyExists && _isClusterValidateSuccessful && !_isClusterValid"
+      <div *ngIf="((_clusterState.alreadyExists && _isClusterValidateSuccessful && !_isClusterValid) || isInvalidAmbariUrl)"
            class="error-section validation-error">
         <div class="">
           <ul>

@@ -16,8 +16,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { isCompletedAction, isSuccessAction, isFailureAction } from 'utils/type-action';
 import { noop } from 'actions/app.action';
 import { NotificationService } from 'services/notification.service';
-import { NOTIFICATION_TYPES } from 'constants/notification.constant';
+import { NOTIFICATION_TYPES, NOTIFICATION_CONTENT_TYPE } from 'constants/notification.constant';
 import { getError } from 'utils/http-util';
+import { genId } from 'utils/string-utils';
 
 @Injectable()
 export class NotificationEffects {
@@ -27,19 +28,22 @@ export class NotificationEffects {
     .filter(action => isCompletedAction(action) && this.hasNotification(action))
     .switchMap(action => {
       const payload = action.payload;
+      const notification = payload.meta.notification;
       if (isSuccessAction(action) && NOTIFICATION_TYPES.SUCCESS in payload.meta.notification) {
         const options = {
-          ...payload.meta.notification[NOTIFICATION_TYPES.SUCCESS],
+          ...this.translateOptions(payload.meta.notification[NOTIFICATION_TYPES.SUCCESS]),
           type: NOTIFICATION_TYPES.SUCCESS
         };
         this.notification.create(options);
       }
       if (isFailureAction(action) && NOTIFICATION_TYPES.ERROR in payload.meta.notification) {
+        const translated = this.translateOptions(payload.meta.notification[NOTIFICATION_TYPES.ERROR]);
         const options = {
-          ...payload.meta.notification[NOTIFICATION_TYPES.ERROR],
+          ...translated,
           type: NOTIFICATION_TYPES.ERROR,
-          // todo: body content depends on layout. We need to display link which opens modal with error info
-          body: this.getErrorBody(action)
+          body: translated.body || this.getErrorBody(action),
+          contentType: notification.contentType || NOTIFICATION_CONTENT_TYPE.MODAL_LINK,
+          id: genId()
         };
         this.notification.create(options);
       }
@@ -51,9 +55,25 @@ export class NotificationEffects {
   }
 
   private getErrorBody(action: Action) {
-    const errorMessage = getError(action.payload.error);
-    return typeof errorMessage === 'string' ? this.t.instant(errorMessage) : errorMessage;
+    const err = action.payload.error;
+    let errorMessage = getError(err.json && typeof err.json === 'function' ? err.json() : err);
+    if (errorMessage.message) {
+      errorMessage = errorMessage.message;
+    }
+    return typeof errorMessage === 'string' ? this.t.instant(errorMessage) : JSON.stringify(errorMessage, null, 4);
   }
+
+  private translateOptions(options) {
+    const opts = {...options};
+    if (options.title) {
+      opts.title = this.t.instant(options.title);
+    }
+    if (options.body) {
+      opts.body = this.t.instant(options.body);
+    }
+    return opts;
+  }
+
 
   constructor(private actions$: Actions,
               private notification: NotificationService,

@@ -5,7 +5,6 @@ import javax.inject.Inject
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.DpClusterService
-import internal.KnoxSso
 import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.{JsonResponses, WrappedErrorsException}
 import play.api.libs.json.Json
@@ -18,8 +17,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class Configuration @Inject()(@Named("dpClusterService") val dpClusterService:
                               DpClusterService, authenticated:Authenticated,
                               ldapService: LdapService,
-                              appConfiguration: play.api.Configuration,
-                              knoxSso: KnoxSso)
+                              appConfiguration: play.api.Configuration)
   extends Controller {
 
 

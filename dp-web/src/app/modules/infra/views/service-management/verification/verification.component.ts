@@ -14,10 +14,10 @@ export class VerificationComponent implements OnInit {
   verificationInProgress = false;
   verified = false;
   smartSenseId: string;
-  welcomeMessage: string;
   skuName: string;
   showError = false;
   errorMessage: string;
+  descriptionParams: any;
 
   constructor(private router: Router,
               private translateService: TranslateService,
@@ -28,7 +28,9 @@ export class VerificationComponent implements OnInit {
   ngOnInit() {
     let serviceName = this.route.snapshot.params['name'];
     this.addOnAppService.getServiceByName(serviceName).subscribe(sku => {
-      this.welcomeMessage = this.translateService.instant('pages.services.description.verificationWelcome', {serviceName: sku.description});
+      this.descriptionParams = {
+        serviceName : sku.description
+      };
     });
     this.skuName = serviceName;
   }
@@ -49,7 +51,9 @@ export class VerificationComponent implements OnInit {
 
   next() {
     this.addOnAppService.enableService({smartSenseId: this.smartSenseId, skuName: this.skuName} as ConfigPayload).subscribe(() => {
-      this.router.navigate(['infra', 'services'])
+      this.router.navigate(['infra', 'services']).then(() => {
+        this.addOnAppService.serviceEnabled.next(this.descriptionParams.serviceName);
+      });
     }, (error) => {
       this.showError = true;
       this.errorMessage = this.translateService.instant('pages.services.description.enableError');

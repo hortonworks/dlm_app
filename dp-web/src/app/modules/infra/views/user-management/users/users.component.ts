@@ -58,10 +58,8 @@ export class UsersComponent implements OnInit {
   }
 
   onSearch(event) {
-    if (event.keyCode === 13) {
-      this.offset = 0;
-      this.getUsers();
-    }
+    this.offset = 0;
+    this.getUsers();
   }
 
   switchView(tab) {

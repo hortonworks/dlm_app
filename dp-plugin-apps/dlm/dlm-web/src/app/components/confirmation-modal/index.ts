@@ -7,16 +7,5 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Cluster } from './cluster.model';
-
-export interface Pairing {
-  id: string;
-  pair: Array<Cluster>;
-}
-
-export interface PairingBodyItem {
-  clusterId: number;
-  beaconUrl: string;
-};
-
-export type PairingRequestBody = PairingBodyItem[];
+export * from './confirmation-options.type';
+export * from './confirmation-modal-container.component';

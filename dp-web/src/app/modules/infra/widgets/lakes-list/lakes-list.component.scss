@@ -58,10 +58,14 @@ input {
 }
 
 .mdl-menu__item {
-  a {
+  padding: 3px 0;
+
+  a, span {
+    padding: 0 20px;
     color: $dove-gray;
     text-decoration: none;
     font-weight: normal;
+    display: block;
   }
   .fa {
     padding: 0 8px;

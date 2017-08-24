@@ -1,8 +1,8 @@
 <div #sideNav class="sidenav"  [ngClass]="{'collpased': collapseSideNav}">
 
-  <div #personaNavSrc class="dp-header-logo borderBox">
+  <div #personaNavSrc class="dp-header-logo borderBox" [ngClass]="{'dp-header-logo--active': getNumberOfActivePersonas() > 1}">
     <img  *ngIf="activePersonaImageName" [attr.src]="'../../../assets/images/' + activePersonaImageName" alt="Hortonworks Dataplane"/>
-    <span class="persona-drop-down-small"></span>
+    <span class="persona-drop-down-small" *ngIf="getNumberOfActivePersonas() > 1"></span>
     <span class="persona-name">{{ activePersonaName }}</span>
   </div>
 
