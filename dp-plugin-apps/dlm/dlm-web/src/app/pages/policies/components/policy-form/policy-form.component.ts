@@ -138,6 +138,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   freqRequired = {fieldLabel: 'Frequency'};
   freqLimit = {fieldLabel: 'Frequency'};
   directoryField = {fieldLabel: 'Folder path'};
+  maxBandwidthField = {fieldLabel: 'Maximum Bandwidth'};
   get datePickerOptions(): IMyOptions {
     const yesterday = moment().subtract(1, 'day');
     const today = moment();
@@ -382,7 +383,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     this.policyForm.patchValue({
       job: {
         endTime: {
-          time: moment(this.defaultTime).toDate()
+          time: moment(this.defaultEndTime).toDate()
         },
         startTime: {
           time: moment(this.defaultTime).toDate()
@@ -434,6 +435,10 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
             // otherwise, get next week's instance of that day
             value.job.startTime.date = moment(startDate).add(1, 'weeks').isoWeekday(dayToLook).format('YYYY-MM-DD');
           }
+        }
+        if (value.job.endTime && 'date' in value.job.endTime) {
+          const endDate = value.job.endTime.date;
+          value.job.endTime.time = moment(endDate).hours(23).minutes(59).seconds(59).toDate();
         }
       }
       const userTimezone = this.timezoneService.userTimezone;
