@@ -203,7 +203,8 @@ export class ClusterAddComponent implements OnInit {
     this.cluster.name = clusterInfo[0].clusterName;
     this.cluster.services = clusterInfo[0].services;
     // TEMP FIX : Should come from backend
-    this.cluster.ipAddress = this._clusterState.ambariIpAddress;
+    let urlParts = this._clusterState.ambariIpAddress.split('/');
+    this.cluster.ipAddress = urlParts.length ? urlParts[2].substr(0, urlParts[2].lastIndexOf(':')) : '';
   }
 
   get showClusterDetails() {
