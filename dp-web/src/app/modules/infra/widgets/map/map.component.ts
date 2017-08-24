@@ -11,18 +11,43 @@ import {GeographyService} from '../../../../services/geography.service';
 import Layer = L.Layer;
 import LayerGroup = L.LayerGroup;
 
+
+class MapVertex {
+  constructor(
+    public id: string,
+    public latitude: number,
+    public longitude: number,
+    public meta: object,
+  ) {}
+}
+
+class MapEdge {
+  constructor(
+    public id: string,
+    public sourceId: string,
+    public targetId: string,
+    public meta: object,
+  ) {}
+}
+
+class MapVertexMarker extends L.Marker {
+
+}
+
 @Component({
   selector: 'dp-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
   providers: [GeographyService]
 })
-
 export class MapComponent implements OnChanges, OnInit {
   map: L.Map;
   @ViewChild('mapcontainer') mapcontainer: ElementRef;
   @Input('mapData') mapData: MapData[] = [];
   @Input('mapSize') mapSize: MapSize = MapSize.EXTRALARGE;
+
+  vertices: MapVertex[];
+  edges: MapEdge[];
 
   markerLookup: L.LatLng[] = [];
   pathLookup = [];
@@ -57,6 +82,11 @@ export class MapComponent implements OnChanges, OnInit {
   ];
 
   constructor(private geographyService: GeographyService) {
+    this.vertices = [
+      new MapVertex('0', 12.96999454498291, 77.56001281738281, {}),
+      new MapVertex('1', 12.96999454498291, 77.56001281738281, {}),
+    ];
+    this.edges = [];
   }
 
   ngOnInit() {
@@ -93,19 +123,32 @@ export class MapComponent implements OnChanges, OnInit {
     if (!changes['mapData'] || !this.map) {
       return;
     }
+    const vertices = this.vertices;
+    const edges = this.edges;
+
+    vertices.forEach(cVertex => this.drawVertex(cVertex));
+    edges.forEach(cEdge => this.drawEdge(vertices, cEdge));
+
     this.removeExistingMarker();
-    this.mapData.forEach((data) => {
-      let start = data.start;
-      let end = data.end;
-      if (start) {
-        this.plotPoint(start);
-      }
-      if (start && end) {
-        this.plotPoint(end);
-        this.drawConnection(start, end);
-      }
-    });
     this.layerGroup = new L.LayerGroup(this.markerAndCurveLayer);
+  }
+
+  private drawVertex(vertex: MapVertex): L.CircleMarker[] {
+    const position = L.latLng(vertex.latitude, vertex.longitude);
+
+    L.circleMarker(position, {
+      radius: 5,
+      color: this.markerColorInnerBorder,
+      weight: 2,
+      fillColor: color,
+      fillOpacity: 0.8
+    })
+  }
+
+  private drawEdge(vertices: MapVertex[], edge: MapEdge) {
+    const sourceVertex = vertices.find(cVertex => cVertex.id === edge.sourceId);
+    const targetVertex = vertices.find(cVertex => cVertex.id === edge.targetId);
+    this.drawConnection(sourceVertex, targetVertex, edge.meta);
   }
 
   plotPoint(position) {
@@ -165,7 +208,9 @@ export class MapComponent implements OnChanges, OnInit {
     });
   }
 
-  drawConnection(start, end) {
+  drawConnection(sourceVertex: MapVertex, targetVertex: MapVertex, meta: object) {
+    const start = sourceVertex;
+    const end = targetVertex;
     let midPoint = {x: (start.latitude + end.latitude) / 2, y: (start.longitude + end.longitude) / 2};
     let distance = Math.sqrt(Math.pow(end.latitude - start.latitude, 2) + Math.pow(end.longitude - start.longitude, 2));
     let path = L.curve(
