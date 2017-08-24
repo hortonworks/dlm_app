@@ -36,6 +36,7 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
   lake: Lake;
   location: Location;
   isDOMReady: boolean = false;
+  isLocationValid: boolean = true;
 
   showNotification = false;
   showError = false;
@@ -94,10 +95,22 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
     return this.locationService.retrieveOptions(searchTerm);
   }
 
-  checkLocation() {
+  setLocation() {
     if (this.searchTerm.length === 0) {
       this.mapData = [];
+      this.cluster.location = null;
     }
+  }
+
+  setLocationValidity(location : Location){
+    this.isLocationValid = true;
+    if(!location || !location.id){
+      this.isLocationValid = false;
+    }
+  }
+
+  resetLocationValidity(){
+    this.isLocationValid = true;
   }
 
   onSelectLocation(location: Location) {
@@ -147,7 +160,7 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
 
   onUpdate() {
     this.showError = false;
-    if(!this.isFormValid()){
+    if(!this.isLocationValid || !this.isFormValid()){
       return;
     }
     this.lakeService.update(this.lake)

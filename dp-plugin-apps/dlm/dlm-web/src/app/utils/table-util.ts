@@ -7,13 +7,8 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { IMyDate } from 'mydatepicker';
-import * as moment from 'moment';
+import { JobTrackingInfo } from 'models/job-tracking-info.model';
 
-export const getDatePickerDate = (date: moment.Moment): IMyDate => {
-  return {
-    year: date.year(),
-    month: date.month() + 1,
-    day: date.date()
-  };
+export const transferredBytesComparator = (trackingInfoA = <JobTrackingInfo>{}, trackingInfoB = <JobTrackingInfo>{}) => {
+  return (trackingInfoA.bytesCopied || 0) - (trackingInfoB.bytesCopied || 0);
 };

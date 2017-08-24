@@ -622,7 +622,8 @@ class BeaconService @Inject()(
 
         Future.sequence(clusterIdWithBeaconUrl.map( x => beaconEventService.listEvents(x.beaconUrl, x.clusterId, queryStringPaginated))).map({
           eventListFromAllClusters => {
-            val allEvents: Seq[BeaconEventResponse] = eventListFromAllClusters.filter(_.isRight).flatMap(_.right.get)
+            val allEvents: Seq[BeaconEventResponse] = eventListFromAllClusters.filter(_.isRight).flatMap(_.right.get).
+              filter(x => x.syncEvent.isEmpty || (x.syncEvent.isDefined && !x.syncEvent.get))
             val failedResponses: Seq[BeaconApiErrors] = eventListFromAllClusters.filter(_.isLeft).map(_.left.get)
             if (failedResponses.length == clusterIdWithBeaconUrl.length) {
               p.success(Left(DlmApiErrors(failedResponses)))

@@ -19,6 +19,7 @@ import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
 import { LogService } from 'services/log.service';
 import { EntityType } from 'constants/log.constant';
 import { contains } from 'utils/array-util';
+import { transferredBytesComparator } from 'utils/table-util';
 
 @Component({
   selector: 'dp-jobs-table',
@@ -102,7 +103,8 @@ export class JobsTableComponent implements OnInit {
         cellTemplate: this.transferredFormattedTemplate,
         name: 'Transferred Bytes',
         cellClass: 'date-cell',
-        headerClass: 'date-header'
+        headerClass: 'date-header',
+        comparator: transferredBytesComparator.bind(this)
       },
       {
         prop: 'trackingInfo.filesCopied',

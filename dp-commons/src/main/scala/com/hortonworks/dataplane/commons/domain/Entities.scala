@@ -137,6 +137,7 @@ object Entities {
       dcName: String,
       description: String,
       ambariUrl: String,
+      ambariIpAddress: String,
       location: Option[Long],
       createdBy: Option[Long],
       properties: Option[JsValue],

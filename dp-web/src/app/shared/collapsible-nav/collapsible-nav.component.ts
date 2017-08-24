@@ -134,4 +134,8 @@ export class CollapsibleNavComponent implements OnInit, OnChanges {
     this.collapseSideNav = !this.collapseSideNav;
     this.collapsibleNavService.collpaseSideNav.next(this.collapseSideNav);
   }
+
+  getNumberOfActivePersonas() {
+    return this.headerData ? this.headerData.personas.filter(cPersona => cPersona.enabled).length : 0;
+  }
 }

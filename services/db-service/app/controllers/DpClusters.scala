@@ -18,9 +18,9 @@ class DpClusters @Inject()(dpClusterRepo: DpClusterRepo)(
   import domain.API._
 
   def all = Action.async { request =>
-    if(!request.getQueryString("ambariUrl").isEmpty){
-      val url = request.getQueryString("ambariUrl").get
-      dpClusterRepo.findByAmbariUrl(url).map { dlo =>
+    if(!request.getQueryString("ambariIp").isEmpty){
+      val amabariIp = request.getQueryString("ambariIp").get
+      dpClusterRepo.findByAmbariIp(amabariIp).map { dlo =>
         dlo.map { dl =>
           success(linkData(dl, makeLink(dl)))
         }
