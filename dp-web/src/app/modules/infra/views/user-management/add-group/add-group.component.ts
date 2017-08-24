@@ -158,7 +158,7 @@ export class AddGroupComponent {//implements OnInit {
         return role.data;
       });
       this.groupService.addGroups(this.groups, roles).subscribe(response => {
-        if (response.length === this.groups.length) {
+        if (response.successfullyAdded.length === this.groups.length) {
           this.groupService.dataChanged.next();
           this.router.navigate(['groups'], {relativeTo: this.route});
         } else {
