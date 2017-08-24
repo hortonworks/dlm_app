@@ -443,7 +443,6 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       }
       const userTimezone = this.timezoneService.userTimezone;
       value.userTimezone =  userTimezone ? userTimezone.label : '';
-      console.log('submit ', value);
       this.formSubmit.emit(value);
     }
     markAllTouched(this.policyForm);
