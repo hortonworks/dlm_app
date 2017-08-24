@@ -120,7 +120,7 @@ utils_add_host() {
 }
 
 add_host_entry() {
-    IS_CLUSTER_SERVICE_UP=$(docker inspect -f {{.State.Running}} $CLUSTER_SERVICE_CONTAINER) || echo "ClusterService container needs to be up for this operation."
+    IS_CLUSTER_SERVICE_UP=$(docker inspect -f {{.State.Running}} $CLUSTER_SERVICE_CONTAINER) || echo "'$CLUSTER_SERVICE_CONTAINER' container needs to be up for this operation."
     if [ "$IS_CLUSTER_SERVICE_UP" != "true" ]; then
         return -1
     else
