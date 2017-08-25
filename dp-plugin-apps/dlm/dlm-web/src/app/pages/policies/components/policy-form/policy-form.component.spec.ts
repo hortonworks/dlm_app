@@ -32,9 +32,10 @@ import {NgxDatatableModule} from '@swimlane/ngx-datatable';
 import {NavbarService} from 'services/navbar.service';
 import {MockTimeZoneService} from 'mocks/mock-timezone';
 import {TimeZoneService} from 'services/time-zone.service';
-import { PipesModule } from 'pipes/pipes.module';
-import { HdfsService } from 'services/hdfs.service';
-import { Observable } from 'rxjs/Observable';
+import {PipesModule} from 'pipes/pipes.module';
+import {HdfsService} from 'services/hdfs.service';
+import {Observable} from 'rxjs/Observable';
+import {TooltipModule} from 'ng2-bootstrap';
 
 describe('PolicyFormComponent', () => {
   let component: PolicyFormComponent;
@@ -46,6 +47,7 @@ describe('PolicyFormComponent', () => {
     };
     TestBed.configureTestingModule({
       imports: [
+        TooltipModule.forRoot(),
         TranslateModule.forRoot({
           loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
         }),

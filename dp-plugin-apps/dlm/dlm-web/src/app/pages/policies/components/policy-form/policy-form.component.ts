@@ -139,6 +139,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   freqLimit = {fieldLabel: 'Frequency'};
   directoryField = {fieldLabel: 'Folder path'};
   maxBandwidthField = {fieldLabel: 'Maximum Bandwidth'};
+  userTimezone = '';
   get datePickerOptions(): IMyOptions {
     const yesterday = moment().subtract(1, 'day');
     const today = moment();
@@ -295,8 +296,13 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     return this.policyForm.value.general.destinationCluster;
   }
 
+  getEndTime(endDate) {
+    const date = moment(endDate).toDate();
+    date.setHours(23, 59, 59);
+    return new Date(date);
+  }
+
   constructor(private formBuilder: FormBuilder,
-              private timezone: TimeZoneService,
               private store: Store<State>,
               private timezoneService: TimeZoneService,
               private t: TranslateService,
@@ -307,7 +313,9 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   // - revisit logic around observables
   // - simplify overall logic
   ngOnInit() {
-    this.userTimeZone$ = this.timezone.userTimezoneIndex$;
+    this.userTimeZone$ = this.timezoneService.userTimezoneIndex$;
+    this.userTimeZone$.subscribe((value) =>
+      this.userTimezone = this.timezoneService.userTimezone ? this.timezoneService.userTimezone.label : '');
     const loadDatabasesSubscription = this.selectedSource$
       .filter(sourceCluster => !!sourceCluster)
       .subscribe(sourceCluster => {
@@ -438,7 +446,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         }
         if (value.job.endTime && 'date' in value.job.endTime) {
           const endDate = value.job.endTime.date;
-          value.job.endTime.time = moment(endDate).hours(23).minutes(59).seconds(59).toDate();
+          value.job.endTime.time = this.getEndTime(endDate);
         }
       }
       const userTimezone = this.timezoneService.userTimezone;

@@ -62,6 +62,17 @@
   .form-footer {
     border: 0;
   }
+  .time-field, .timezone-field {
+    float: left;
+    width: 200px;
+    padding: 0 15px;
+  }
+  .timezone-field {
+    width: 300px;
+    .value {
+      padding-top: 7px;
+    }
+  }
 }
 
 fieldset {
