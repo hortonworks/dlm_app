@@ -57,8 +57,10 @@ object ResponseEntities {
 }
 
 object RequestEntities {
-  case class ClusterDefinitionRequest( fsEndpoint: String, hsEndpoint: Option[String], beaconEndpoint: String,
-                                       name: String, dataCenter: String, description: String, local: Boolean = false)
+  case class ClusterDefinitionRequest( name: String, dataCenter: String, description: String, local: Boolean = false,
+                                       beaconEndpoint: String, fsEndpoint: String, nnKerberosPrincipal: Option[String],
+                                       hsEndpoint: Option[String], hsKerberosPrincipal: Option[String])
+  
   case class PolicyDefinitionRequest( name: String, `type`: String, sourceDataset: String,
                                       sourceCluster: String, targetCluster: String, frequencyInSec: Long,
                                       startTime: Option[String], endTime: Option[String], distcpMaxMaps: Option[Long],
