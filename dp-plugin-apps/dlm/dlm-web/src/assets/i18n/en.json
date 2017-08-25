@@ -388,7 +388,9 @@
           "queue_name": "Queue Name (Optional)",
           "max_bandwidth": "Maximum Bandwidth (Optional)",
           "bandwidth_unit": "MBps",
-          "repeat": "Repeat"
+          "repeat": "Repeat",
+          "timezone": "Selected Timezone",
+          "timezone_hint": "Selected timezone can be edited from the user menu on the top"
         },
         "schedule": {
           "immediate": "One Time",
