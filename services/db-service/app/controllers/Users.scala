@@ -147,7 +147,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
                 .map(updatedUserInfo =>success(userInfo))
                 .recoverWith(apiError)
               case _=>{
-                Future.successful(Conflict(Json.toJson(Errors(Seq(Error("USER_ALREADY_EXISTS","User Already Exists"))))))
+                Future.successful(Conflict(Json.toJson(Errors(Seq(Error("USER_ALREADY_EXISTS",s"User Already Exists:${user.username}"))))))
               }
             }
            }
