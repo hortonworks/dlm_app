@@ -114,9 +114,6 @@ export class DsAssetList implements OnInit {
   }
 
   calcTableHeight() {
-    if (this.tableHeight) {
-      return this.tableHeight;
-    }
     let heightAboveTable = this.table.nativeElement.offsetTop - this.listCont.nativeElement.offsetTop;
     const paginationHeight = this.listCont.nativeElement.offsetHeight - this.table.nativeElement.offsetHeight - heightAboveTable;
     heightAboveTable = this.table.nativeElement.offsetTop - this.outerCont.nativeElement.offsetTop;

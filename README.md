@@ -77,6 +77,52 @@ So, to get a version of dataplane on a docker supported machine, do the followin
 * `cd installer`
 * Execute the usual `dpdeploy.sh` commands described above. These will pull the correspondingly tagged images from docker-hub. The first pull from the docker-hub repo might take a while, but once the layers are cached, it should be faster.
 
+## Setup (from Hortonworks Release Engineering portal)
+
+### Using tarballs
+
+Dataplane can now be installed using tarballs that are produced by Hortonworks Release Engineering team. These tarballs contain:
+* Docker images from which containers required for Dataplane services will be created and launched.
+* Installation scripts that help the user to install and start Dataplane.
+
+Follow these instructions for working with these tarballs.
+
+* Navigate to [Hortonworks Release Engineering Portal](http://release.eng.hortonworks.com/portal/)
+* Select the product 'DP'.
+* Select the release use wish to use,for e.g. 'DP-1.0.0.0'. This should lead you to a release specific build page like [this](http://release.eng.hortonworks.com/portal/release/DP/releasedVersion/DP-1.0.0.0/1.0.0.0/)
+* Identify the build you wish to use, and select the Repo details icon (the eye shaped icon).
+* From the popup that launches, select the 'baseurl' field which will be of the form 'http://s3.amazonaws.com/dev.hortonworks.com/DP/centos6/1.x/BUILDS/1.0.0.0-`buildnum`'
+* For DP Core, construct the full URL of the build by appending 'tars/dp-docker/dp-1.0.0.0-`buildnum`.tar.gz' to the baseurl. Substitute `buildnum` with the value from the baseurl.
+* For DLM Service, construct the full URL of the build by appending 'tars/dlm-docker/dlm-1.0.0.0-`buildnum`.tar.gz' to the baseurl. Substitute `buildnum` with the value from the baseurl.
+* On the machine where you would like to install Dataplane, download the tarballs using wget or curl. 
+   * E.g. for DP Core `wget http://dev.hortonworks.com.s3.amazonaws.com/DP/centos6/1.x/BUILDS/1.0.0.0-buildnum/tars/dp-docker/dp-1.0.0.0-buildnum.tar.gz`
+   * E.g. for DLM Service `wget http://dev.hortonworks.com.s3.amazonaws.com/DP/centos6/1.x/BUILDS/1.0.0.0-buildnum/tars/dlm-docker/dlm-1.0.0.0-buildnum.tar.gz`
+   * *Note:* These tarballs are fairly large in size. The DP Core tarball is around 1.1G and the DLM Service tarball is around 200M.
+* Untar the tarballs. For e.g `tar -xzf dp-1.0.0.0-<buildnum>.tar.gz` and `tar -xzf dlm-1.0.0.0-<buildnum>.tar.gz`. Let us refer to the directory of install as DATAPLANE_HOME
+* cd $DATAPLANE_HOME/dp-core/bin
+* Edit the file `config.env.sh` to enable properties you want to configure. Please refer to the section 'Bootstrap Configuration' for more details.
+* Run `./dpdeploy.sh load`. This will load all DP Core docker images which are bundled in the tarballs into the local machine's docker repo. Note that doing this for the first Dataplane installation might take a while. 
+* Run `./dpdeploy.sh init --all`
+* cd $DATAPLANE_HOME/dlm/bin
+* Run `./dlmdeploy.sh load`. This will load the DLM Service docker image into the local machine's docker repo. Note that doing this for the first Dataplane installation might take a while.
+* Run `./dlmdeploy.sh init`
+* Verify the services are up using `docker ps`. There must be 8 service containers that are running.  
+
+## Bootstrap Configuration
+
+Dataplane uses some configuration items to bootstrap itself.
+
+* Configuration Item   | Description    | Default Value    |
+* USE_EXT_DB | Set to yes for pointing to an external Postgres instance, no otherwise | no |
+* DATABASE_URI | If USE_EXT_DB is yes, this must point to the external Database URI | |
+* DATABASE_USER | If USE_EXT_DB is yes, this must point to the Dataplane Admin user name of the external Database URI | |
+* DATABASE_PASS | If USE_EXT_DB is yes, this must point to the Dataplane Admin password of the external Database URI | |
+* SEPARATE_KNOX_CONFIG | Set to true if a separate Knox instance is setup on HDP clusters for handling Dataplane traffic, false otherwise | false |
+* KNOX_CONFIG_USING_CREDS | If SEPARATE_KNOX_CONFIG is true, when a cluster is registered, we must provide additional information to discover it. This is either using Ambari credentials or explicitly specifying the URL. Set to true if you want to use Ambari credentials, false for URL | true |
+* CONSUL_HOST | Set to the IP address of the host where Dataplane containers are launched | |
+* MASTER_PASSWORD | Set to the password to be used for Knox keystore configuration. IMPORTANT: This is in clear text and should typically not be set in production environments. Instead specify the master password on command line | |
+* USE_TEST_LDAP | Specifies whether to use an external LDAP instance or connect to a test LDAP instance that comes with the Dataplane Knox container | |
+
 ## Using external database
 Only Postgresql is supported. To prepare the database, following steps need to be followed:
 1. Install `postgresql-server` via yum. `sudo yum install postgresql-server`.

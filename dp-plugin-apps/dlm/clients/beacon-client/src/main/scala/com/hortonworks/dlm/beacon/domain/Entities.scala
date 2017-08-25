@@ -50,13 +50,15 @@ object ResponseEntities {
                                     startTime: Option[String], endTime: String)
 
   case class BeaconEventResponse(policyId: Option[String], instanceId: Option[String], event: String, eventType: String,
-                                 policyReplType: Option[String], severity: String, timestamp: String, message: String)
+                                 policyReplType: Option[String], severity: String, syncEvent: Option[Boolean],
+                                 timestamp: String, message: String)
 
   case class BeaconLogResponse(status: String, message: String, requestId: String)
 }
 
 object RequestEntities {
-  case class ClusterDefinitionRequest( fsEndpoint: String, hsEndpoint: Option[String], beaconEndpoint: String, name: String, dataCenter: String, description: String)
+  case class ClusterDefinitionRequest( fsEndpoint: String, hsEndpoint: Option[String], beaconEndpoint: String,
+                                       name: String, dataCenter: String, description: String, local: Boolean = false)
   case class PolicyDefinitionRequest( name: String, `type`: String, sourceDataset: String,
                                       sourceCluster: String, targetCluster: String, frequencyInSec: Long,
                                       startTime: Option[String], endTime: Option[String], distcpMaxMaps: Option[Long],

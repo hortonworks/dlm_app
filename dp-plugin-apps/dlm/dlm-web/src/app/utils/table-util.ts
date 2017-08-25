@@ -7,16 +7,8 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Cluster } from './cluster.model';
+import { JobTrackingInfo } from 'models/job-tracking-info.model';
 
-export interface Pairing {
-  id: string;
-  pair: Array<Cluster>;
-}
-
-export interface PairingBodyItem {
-  clusterId: number;
-  beaconUrl: string;
+export const transferredBytesComparator = (trackingInfoA = <JobTrackingInfo>{}, trackingInfoB = <JobTrackingInfo>{}) => {
+  return (trackingInfoA.bytesCopied || 0) - (trackingInfoB.bytesCopied || 0);
 };
-
-export type PairingRequestBody = PairingBodyItem[];

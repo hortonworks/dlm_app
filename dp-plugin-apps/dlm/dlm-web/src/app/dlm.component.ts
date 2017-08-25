@@ -8,12 +8,16 @@
  */
 
 import { Component, OnDestroy, OnInit, ViewEncapsulation, isDevMode } from '@angular/core';
-import { MenuItem } from './common/navbar/menu-item';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { State } from 'reducers/index';
 import { TranslateService } from '@ngx-translate/core';
-import { Event } from 'models/event.model';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
+
+
+import { State } from 'reducers/index';
+import { Event } from 'models/event.model';
+import { MenuItem } from './common/navbar/menu-item';
 import { getAllEvents, getNewEventsCount } from 'selectors/event.selector';
 import { getMergedProgress, getProgressState } from 'selectors/progress.selector';
 import { initApp } from 'actions/app.action';
@@ -23,8 +27,6 @@ import { NAVIGATION } from 'constants/navigation.constant';
 import { User } from './models/user.model';
 import { SessionStorageService } from './services/session-storage.service';
 import { TimeZoneService } from './services/time-zone.service';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Subscription } from 'rxjs/Subscription';
 import { POLL_INTERVAL } from 'constants/api.constant';
 import { HeaderData, Persona } from 'models/header-data';
 import { UserService } from 'services/user.service';
@@ -53,15 +55,6 @@ export class DlmComponent implements OnDestroy, OnInit {
   onOverviewPage = false;
   subscriptions: Subscription[] = [];
   headerData: HeaderData = new HeaderData();
-
-  // Options for Toast Notification
-  notificationOptions = {
-    position: ['top', 'right'],
-    showProgressBar: false,
-    lastOnBottom: false,
-    theClass: 'toast-notification',
-    timeOut: 10000
-  };
 
   user: User = <User>{};
 

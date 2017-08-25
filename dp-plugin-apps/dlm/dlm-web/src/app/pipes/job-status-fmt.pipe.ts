@@ -7,16 +7,14 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Cluster } from './cluster.model';
+import { Pipe, PipeTransform } from '@angular/core';
+import { capitalize } from 'utils/string-utils';
 
-export interface Pairing {
-  id: string;
-  pair: Array<Cluster>;
+@Pipe({name: 'jobStatusFmt'})
+export class JobStatusFmtPipe implements PipeTransform {
+  transform(status: string): string {
+    return {
+        'RUNNING': 'In Progress'
+      }[status] || capitalize(status);
+  }
 }
-
-export interface PairingBodyItem {
-  clusterId: number;
-  beaconUrl: string;
-};
-
-export type PairingRequestBody = PairingBodyItem[];

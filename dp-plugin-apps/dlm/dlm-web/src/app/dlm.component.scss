@@ -15,6 +15,7 @@
 
 html, body {
   height: 100%;
+  min-width: 1366px;
   background-color: $body-background;
 }
 
@@ -34,7 +35,7 @@ header {
     margin-top: 12px;
     color: #666;
     line-height: 40px;
-    padding-right: 15px;
+    padding-right: 28px;
     ol.breadcrumb {
       padding-left: 30px;
     }
@@ -45,7 +46,7 @@ header {
   .navbar-right {
   }
   .navbar-user {
-    margin-right: 30px;
+    margin-right: 2px;
   }
   .notifications-group.open {
     color: $link-color;
@@ -82,4 +83,8 @@ header {
 
 .text-muted {
   color: #999 !important;
+}
+
+pre {
+  white-space: pre-wrap;
 }

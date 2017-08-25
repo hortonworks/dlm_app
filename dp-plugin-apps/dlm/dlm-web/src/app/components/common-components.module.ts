@@ -15,6 +15,7 @@ import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { TranslateModule } from '@ngx-translate/core';
 import { SelectModule } from 'ng2-select';
 import { MomentModule } from 'angular2-moment';
+import { SimpleNotificationsModule } from 'angular2-notifications';
 
 import { PipesModule } from 'pipes/pipes.module';
 import { CardComponent } from './card/card.component';
@@ -48,6 +49,7 @@ import { ClusterActionsComponent } from './cluster-actions/cluster-actions.compo
 import { HortonStyleModule } from 'common/horton-style.module';
 import { ConfirmationModalContainerComponent } from './confirmation-modal/confirmation-modal-container.component';
 import { EventEntityLinkComponent } from './event-entity-link/event-entity-link.component';
+import { NotificationsContainerComponent } from './notifications-container/notifications-container.component';
 
 @NgModule({
   imports: [
@@ -59,6 +61,7 @@ import { EventEntityLinkComponent } from './event-entity-link/event-entity-link.
     ProgressbarModule.forRoot(),
     AlertModule.forRoot(),
     ModalModule.forRoot(),
+    SimpleNotificationsModule.forRoot(),
     ChartsModule,
     TranslateModule,
     HortonStyleModule,
@@ -99,7 +102,8 @@ import { EventEntityLinkComponent } from './event-entity-link/event-entity-link.
     BeaconValidityComponent,
     HelpLinkComponent,
     ConfirmationModalContainerComponent,
-    EventEntityLinkComponent
+    EventEntityLinkComponent,
+    NotificationsContainerComponent
   ],
   exports: [
     CardComponent,
@@ -134,7 +138,8 @@ import { EventEntityLinkComponent } from './event-entity-link/event-entity-link.
     BeaconValidityComponent,
     HelpLinkComponent,
     ConfirmationModalContainerComponent,
-    EventEntityLinkComponent
+    EventEntityLinkComponent,
+    NotificationsContainerComponent
   ]
 })
 export class CommonComponentsModule {}

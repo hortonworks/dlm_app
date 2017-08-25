@@ -74,7 +74,7 @@
       </div>
       <div class="col-md-5">
         <div class="pull-right">
-          <button qe-attr="add-pairing" class="btn btn-xs btn-secondary" type="button" [disabled]="!addingPairsAvailable(clusters$ | async, pairsCount$ | async)" routerLink="/pairings/create">
+          <button qe-attr="add-pairing" class="btn btn-xs btn-secondary btn-padding" type="button" [disabled]="!addingPairsAvailable(clusters$ | async, pairsCount$ | async)" routerLink="/pairings/create">
             <span class="text-uppercase">{{'common.add_pair' | translate}}</span>
           </button>
           <button qe-attr="add-policy" class="btn btn-xs btn-secondary" type="button" [disabled]="!addingPoliciesAvailable(pairsCount$ | async)" routerLink="/policies/create">

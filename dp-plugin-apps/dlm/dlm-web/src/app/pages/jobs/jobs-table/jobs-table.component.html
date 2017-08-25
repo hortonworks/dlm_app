@@ -28,11 +28,11 @@
 
 <ng-template #statusVerbTemplate let-value="value">
   <span *ngIf="value === JOB_STATUS.IGNORED; else notIgnored" [tooltip]="'page.jobs.job_ignored' | translate">
-    {{value | statusFmt}}
+    {{value | jobStatusFmt}}
   </span>
 
   <ng-template #notIgnored>
-    {{value | statusFmt}}
+    {{value | jobStatusFmt}}
   </ng-template>
 </ng-template>
 

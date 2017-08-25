@@ -176,26 +176,28 @@ class BeaconService @Inject()(
   private def getClusterDefsToBeSubmitted(listOfClusters: List[ClusterDefinitionDetails]): Set[ClusterDefinition] = {
     val clusterNames: Seq[String] = listOfClusters.map(x => x.dpCluster.dcName + "$" + x.cluster.name)
     listOfClusters.foldLeft(Set(): Set[ClusterDefinition]) {
-      (outerAcc, next) => {
+      (outerAcc, outerNext) => {
         val accumulateClusters: Set[ClusterDefinition] = clusterNames.foldLeft(Set(): Set[ClusterDefinition]) {
           (acc, nextClusterName) => {
-            if (next.clusterDefinitions.map(_.name).contains(nextClusterName)) acc else {
+            if (outerNext.clusterDefinitions.map(_.name).contains(nextClusterName)) acc else {
               val clusterToBePairedDetails: ClusterDefinitionDetails = listOfClusters.find(x => x.dpCluster.dcName + "$" + x.dpCluster.name == nextClusterName).get
+              val local : Boolean =  (outerNext.dpCluster.dcName + "$" +  outerNext.dpCluster.name) == nextClusterName
               val nnService = clusterToBePairedDetails.nnClusterService
               val hiveServerServiceUrl = clusterToBePairedDetails.hiveServerService match {
                 case Right(hiveServerService) => Some(hiveServerService.fullURL)
                 case Left(errors) => None
               }
               val clusterDefinition: ClusterDefinition = ClusterDefinition(
-                next.pairedClusterRequest.beaconUrl,
-                next.cluster.id.get,
+                outerNext.pairedClusterRequest.beaconUrl,
+                outerNext.cluster.id.get,
                 ClusterDefinitionRequest(
                   nnService.fullURL,
                   hiveServerServiceUrl,
                   clusterToBePairedDetails.pairedClusterRequest.beaconUrl,
                   clusterToBePairedDetails.cluster.name,
                   clusterToBePairedDetails.dpCluster.dcName,
-                  clusterToBePairedDetails.dpCluster.description
+                  clusterToBePairedDetails.dpCluster.description,
+                  local
                 )
               )
               acc.+(clusterDefinition)
@@ -620,7 +622,8 @@ class BeaconService @Inject()(
 
         Future.sequence(clusterIdWithBeaconUrl.map( x => beaconEventService.listEvents(x.beaconUrl, x.clusterId, queryStringPaginated))).map({
           eventListFromAllClusters => {
-            val allEvents: Seq[BeaconEventResponse] = eventListFromAllClusters.filter(_.isRight).flatMap(_.right.get)
+            val allEvents: Seq[BeaconEventResponse] = eventListFromAllClusters.filter(_.isRight).flatMap(_.right.get).
+              filter(x => x.syncEvent.isEmpty || (x.syncEvent.isDefined && !x.syncEvent.get))
             val failedResponses: Seq[BeaconApiErrors] = eventListFromAllClusters.filter(_.isLeft).map(_.left.get)
             if (failedResponses.length == clusterIdWithBeaconUrl.length) {
               p.success(Left(DlmApiErrors(failedResponses)))

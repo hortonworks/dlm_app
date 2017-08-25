@@ -46,7 +46,7 @@ export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 export function freqValidator(frequencyMap): ValidatorFn {
   return (control: AbstractControl): ValidationErrors => {
     const parent = control.parent;
-    if (!parent) {
+    if (!parent || !isInteger(control.value)) {
       return null;
     }
     const unit = parent.controls['unit'].value;
@@ -56,14 +56,18 @@ export function freqValidator(frequencyMap): ValidatorFn {
   };
 }
 
+function isInteger(value: string): boolean {
+  const numberValue = Number(value);
+  return Number.isInteger(numberValue) && numberValue > 0;
+}
+
 export function integerValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors => {
     const {value} = control;
     if (!value) {
       return null;
     }
-    const n = Math.floor(Number(control.value));
-    return String(n) === value && n > 0 ? null : {'integerValidator': {name: control.value}};
+    return isInteger(value) ? null : {'integerValidator': {name: value}};
   };
 }
 
@@ -135,13 +139,13 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   freqLimit = {fieldLabel: 'Frequency'};
   directoryField = {fieldLabel: 'Folder path'};
   get datePickerOptions(): IMyOptions {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const today = new Date();
+    const yesterday = moment().subtract(1, 'day');
+    const today = moment();
     return {
       dateFormat: 'yyyy-mm-dd',
-      markCurrentDay: true,
       disableUntil: getDatePickerDate(yesterday),
+      showTodayBtn: false,
+      markCurrentDay: false,
       markDates: [{
         dates: [getDatePickerDate(today)],
         color: '#ff0000'
@@ -350,7 +354,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       }),
       advanced: this.formBuilder.group({
         queue_name: [''],
-        max_bandwidth: ['']
+        max_bandwidth: ['', integerValidator()]
       }),
       userTimezone: ['']
     });

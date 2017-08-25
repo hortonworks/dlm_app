@@ -4,17 +4,16 @@ import {Observable} from 'rxjs/Observable';
 
 import {HttpUtil} from '../shared/utils/httpUtil';
 import {AddOnAppInfo, AppDependency, ConfigPayload, EnabledAppInfo, SKU} from '../models/add-on-app';
+import {Subject} from 'rxjs/Subject';
 
 @Injectable()
 export class AddOnAppService {
 
   uri = '/api/services';
-
-  private dependenciesMap = new Map();
+  serviceEnabled = new Subject<string>();
+  serviceEnabled$ = this.serviceEnabled.asObservable();
 
   constructor(private http: Http) {
-    this.dependenciesMap.set('dlm', ['BEACON', 'HDFS', 'HIVE']);
-    this.dependenciesMap.set('dss', ['ATLAS', 'RANGER'])
   }
 
   getServiceDependencies(appName): Observable<AppDependency> {

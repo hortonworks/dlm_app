@@ -10,13 +10,15 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Action } from '@ngrx/store';
+import { ConfirmationOptions, confirmationOptionsDefaults } from 'components/confirmation-modal';
 
 @Injectable()
 export class ConfirmationService {
 
   state$ = new BehaviorSubject<any>({
     isVisible: false,
-    nextAction: null
+    nextAction: null,
+    confirmationOptions: confirmationOptionsDefaults
   });
 
   private updateState(newState) {
@@ -37,8 +39,8 @@ export class ConfirmationService {
     this.updateState({ isVisible: false });
   }
 
-  initActionConfirmation(action: Action) {
+  initActionConfirmation(action: Action, confirmationOptions: ConfirmationOptions) {
     this.showConfirmation();
-    this.updateState({ nextAction: action });
+    this.updateState({ nextAction: action, confirmationOptions });
   }
 }

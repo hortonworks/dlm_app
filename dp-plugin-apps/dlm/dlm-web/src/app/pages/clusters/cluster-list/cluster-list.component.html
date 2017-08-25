@@ -38,7 +38,7 @@
 <ng-template let-stats="value" let-cluster="row" #usageCell>
   <div class="text-primary cell-content actionable" qe-attr="cluster-details" (click)="toggleClusterDetails(cluster)">
     <span [innerHTML]="stats.CapacityUsed | bytesSize"></span> / <span [innerHTML]="stats.CapacityTotal | bytesSize"></span>
-    <i class="fa fa-chevron-down"></i>
+    <i [ngClass]="{fa: true, 'fa-chevron-down': !isExpandedRow(cluster), 'fa-chevron-up': isExpandedRow(cluster)}"></i>
   </div>
 </ng-template>
 
@@ -69,7 +69,12 @@
 <ng-template let-cluster="row" ngx-datatable-row-detail-template #rowDetailRef>
   <div class="row">
     <div class="col col-md-12">
-      <dlm-hdfs-browser [rootPath]="hdfsRootPath" [clusterId]="cluster.id" (openDirectory)="handleOpenDirectory($event)"></dlm-hdfs-browser>
+      <dlm-hdfs-browser
+        [rootPath]="hdfsRootPath"
+        [clusterId]="cluster.id"
+        [page]="getFileBrowserPageForRow(cluster.id)"
+        (changePage)="handleFileBrowserPageChange($event, cluster.id)"
+        (openDirectory)="handleOpenDirectory($event)"></dlm-hdfs-browser>
     </div>
   </div>
 </ng-template>

@@ -14,6 +14,9 @@ $hex-size: 18px;
   .policy-name {
     font-size: 12px;
   }
+  .ngx-datatable-wrapper {
+    margin-bottom: 20px;
+  }
   .hexagon {
     @include hexagon($hex-size, transparent);
     font-size: $hex-size / 2.5;
