@@ -11,7 +11,7 @@ import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { Policy, PolicyPayload } from 'models/policy.model';
-import { mapResponse } from 'utils/http-util';
+import { toSearchParams, mapResponse } from 'utils/http-util';
 import { JobService } from 'services/job.service';
 
 @Injectable()
@@ -46,8 +46,9 @@ export class PolicyService {
     return mapResponse(this.http.post(`clusters/${targetClusterId}/policy/${policy.policyDefinition.name}/submit`, policy));
   }
 
-  fetchPolicies(): Observable<any> {
-    return mapResponse(this.http.get('policies')).map(response => {
+  fetchPolicies(queryParams = {}): Observable<any> {
+    const search = toSearchParams(queryParams);
+    return mapResponse(this.http.get('policies', {search})).map(response => {
       response.policies.forEach(policy => {
         policy.jobs = policy.jobs.map(job => this.jobService.normalizeJob(job));
         policy = {

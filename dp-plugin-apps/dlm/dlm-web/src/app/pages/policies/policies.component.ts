@@ -30,7 +30,7 @@ import { TableFilterItem } from 'common/table/table-filter/table-filter-item.typ
 import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
 import { PolicyContent } from './policy-details/policy-content.type';
 import { isEqual } from 'utils/object-utils';
-import { POLL_INTERVAL } from 'constants/api.constant';
+import { POLL_INTERVAL, ALL_POLICIES_COUNT } from 'constants/api.constant';
 import { ProgressState } from 'models/progress-state.model';
 import { getMergedProgress } from 'selectors/progress.selector';
 
@@ -92,7 +92,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
       .filter(_ => this.policiesLoaded)
       .filter(_ => this.initialLoadingComplete)
       .do(_ => {
-        this.store.dispatch(loadPolicies());
+        this.store.dispatch(loadPolicies({numResults: ALL_POLICIES_COUNT}));
         this.policiesLoaded = false;
       });
     this.subscriptions.push(polling$.subscribe());
@@ -119,7 +119,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.store.dispatch(loadPolicies(POLICIES_REQUEST));
+    this.store.dispatch(loadPolicies({numResults: ALL_POLICIES_COUNT}, {requestId: POLICIES_REQUEST}));
     this.store.dispatch(loadClusters(CLUSTERS_REQUEST));
     const clusterSubscription = this.clusters$.subscribe(clusters => {
       const clusterIds = clusters.map(c => c.id);

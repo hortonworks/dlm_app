@@ -40,7 +40,7 @@ import { ClustersStatus, PoliciesStatus, JobsStatus } from 'models/aggregations.
 import { filterCollection, flatten, unique } from 'utils/array-util';
 import { isEqual, isEmpty } from 'utils/object-utils';
 import { getEventEntityName } from 'utils/event-utils';
-import { POLL_INTERVAL } from 'constants/api.constant';
+import { POLL_INTERVAL, ALL_POLICIES_COUNT } from 'constants/api.constant';
 import { getClustersHealth, getPoliciesHealth, getJobsHealth } from 'selectors/aggregation.selector';
 import { SUMMARY_PANELS, CLUSTERS_HEALTH_STATE, JOBS_HEALTH_STATE } from './resource-summary/';
 import { CLUSTER_STATUS, SERVICE_STATUS } from 'constants/status.constant';
@@ -177,7 +177,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
       .withLatestFrom(this.fullfilledClusters$)
       .do(([_, clusters]) => {
         [
-          loadPolicies(),
+          loadPolicies({numResults: ALL_POLICIES_COUNT}),
           loadClusters()
         ].map(action => this.store.dispatch(action));
       });
@@ -240,7 +240,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     [
-      loadPolicies(POLICIES_REQUEST),
+      loadPolicies({numResults: ALL_POLICIES_COUNT}, {requestId: POLICIES_REQUEST}),
       loadClusters(CLUSTERS_REQUEST),
       loadPairings(),
       // todo: this is workaround to get all events for recent issues.
