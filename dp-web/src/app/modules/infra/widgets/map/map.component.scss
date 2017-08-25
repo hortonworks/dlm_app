@@ -7,6 +7,11 @@
 .map-container {
     outline: none;
     margin: 0 auto;
+
+    &--EXTRALARGE {
+      height: 500px;
+      width: 59%;
+    }
 }
 
 :host /deep/ .leaflet-control {
