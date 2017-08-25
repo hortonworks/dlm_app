@@ -158,8 +158,8 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
     if(
       this.dnHealth &&
       this.dnHealth.ServiceComponentInfo &&
-      this.dnHealth.ServiceComponentInfo.started_count &&
-      this.dnHealth.ServiceComponentInfo.total_count
+      this.dnHealth.ServiceComponentInfo.started_count !== undefined &&
+      this.dnHealth.ServiceComponentInfo.total_count !== undefined
     ) {
       clusterDetails.healthyDataNodes = this.dnHealth.ServiceComponentInfo.started_count;
       clusterDetails.unhealthyDataNodes = this.dnHealth.ServiceComponentInfo.total_count - this.dnHealth.ServiceComponentInfo.started_count;
