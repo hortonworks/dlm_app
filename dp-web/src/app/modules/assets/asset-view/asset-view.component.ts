@@ -11,6 +11,10 @@ export enum TopLevelTabs {
   DETAILS, LINEAGE, POLICY, AUDIT//, REPLICATION
 }
 
+enum ProfilerStatus {
+  UNKNOWN, NOSUPPORT, NOTSTARTED, RUNNING, SUCCESS, FAILED
+}
+
 @Component({
   selector: 'dp-asset-view',
   templateUrl: './asset-view.component.html',
@@ -31,6 +35,9 @@ export class AssetViewComponent implements OnInit {
   databaseName: string;
   summary: AssetProperty[] = [];
   jobId:number = null;
+  PS = ProfilerStatus;
+  profilerStatus:ProfilerStatus = this.PS.UNKNOWN;
+  lastRunTime:string = "";
 
   constructor(private route: ActivatedRoute, private assetService: AssetService) {
   }
@@ -44,16 +51,42 @@ export class AssetViewComponent implements OnInit {
       }
       this.assetDetails = details;
       this.summary = this.extractSummary(details.entity);
+      this.getProfilingJobStatus();
     });
   }
 
-  get profiledDataAvailable() {
-    let entity:any = this.assetDetails.entity;
-    return (entity.attributes.profileData && entity.attributes.profileData.attributes);
+  get showProfilerStatus() {
+    return (this.profilerStatus != this.PS.NOSUPPORT && this.profilerStatus != this.PS.UNKNOWN);
+  }
+
+  get showLastRunTime () {
+    return (this.lastRunTime && this.showProfilerStatus && this.profilerStatus != this.PS.RUNNING);
+  }
+
+  getProfilingJobStatus () {
+    this.assetService.getProfilingStatus(this.clusterId, this.databaseName, this.tableName).subscribe(res=>{
+      this.lastRunTime = (new Date(res.time)).toLocaleString();
+      switch(res.status) {
+          case "SUCCESS" : this.profilerStatus = this.PS.SUCCESS; break;
+          case "FAILED"  : this.profilerStatus = this.PS.FAILED;  break;
+          case "STARTED" : this.profilerStatus = this.PS.RUNNING;
+                           setTimeout(()=>this.getProfilingJobStatus(), 5000);
+                           break;
+      }
+    },
+    err => 
+        ((err.status === 404) && (this.profilerStatus = this.PS.NOTSTARTED))
+      ||((err.status === 405) && (this.profilerStatus = this.PS.NOSUPPORT))  
+    );
   }
 
   startProfiler() {
-    this.assetService.startProfiling(this.clusterId, this.databaseName, this.tableName).subscribe(res=>this.jobId = res.id);
+    if (this.profilerStatus == this.PS.RUNNING) return;
+    this.profilerStatus = this.PS.RUNNING;
+    this.assetService.startProfiling(this.clusterId, this.databaseName, this.tableName).subscribe(
+      res=>(this.jobId = res.id) && this.getProfilingJobStatus(),
+      err => (err.status === 405) && (this.profilerStatus = this.PS.NOSUPPORT)
+    );
   }
 
   private extractSummary(entity) {

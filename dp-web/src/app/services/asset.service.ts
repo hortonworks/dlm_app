@@ -23,10 +23,26 @@ export class AssetService {
   }
 
   startProfiling(clusterId:string, dbName:string, tableName:string) : Observable<any>{
-    const uri = `/api/dpProfiler/startJob/${clusterId}/${dbName}/${tableName}`;
+    const uri = `/api/dpProfiler/startJob?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}`;
     return this.http
       .post(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
-      .catch(HttpUtil.handleError);
+      .catch(err => {
+        if(err.status == 404 || err.status == 405) return Observable.throw(err);
+        return HttpUtil.handleError(err)
+      });
+
   }
+  
+  getProfilingStatus(clusterId:string, dbName:string, tableName:string) : Observable<any>{
+    const uri = `/api/dpProfiler/jobStatus?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}`;
+    return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(err => {
+        if(err.status == 404 || err.status == 405) return Observable.throw(err);
+        return HttpUtil.handleError(err)
+      });
+  }
+
 }

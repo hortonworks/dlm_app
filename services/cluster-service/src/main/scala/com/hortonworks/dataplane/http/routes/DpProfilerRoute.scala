@@ -31,22 +31,57 @@ class DpProfilerRoute @Inject()(
     path ("cluster" / LongNumber / "dp-profiler" / "start-job" / Segment / Segment) { (clusterId, dbName, tableName) =>
       get {
         onComplete(postJob(clusterId, dbName, tableName)) {
-          case Success(res) => complete(success(res.json))
+          case Success(res) => res.status match {
+            case 200 => complete(success(res.json))
+            case 404 => complete(StatusCodes.NotFound, notFound)
+          }
           case Failure(th) => th match {
-            case th: ServiceNotFound => complete(StatusCodes.NotFound, errors(th))
+            case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
             case _ => complete(StatusCodes.InternalServerError, errors(th))
           }
         }
       }
     }
 
+  val jobStatus =
+    path ("cluster" / LongNumber / "dp-profiler" / "job-status" / Segment / Segment) { (clusterId, dbName, tableName) =>
+      get {
+        onComplete(getJobStatus(clusterId, dbName, tableName)) {
+          case Success(res) => res.status match {
+            case 200 => complete(success(res.json))
+            case 404 => complete(StatusCodes.NotFound, notFound)
+          }
+          case Failure(th) => th match {
+            case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
+            case _ => complete(StatusCodes.InternalServerError, errors(th))
+          }
+        }
+      }
+    }
+
+  private def getJobStatus(clusterId: Long, dbName: String, tableName: String): Future[WSResponse] = {
+
+    for {
+      config <- getConfigOrThrowException(clusterId)
+      url <- getUrlFromConfig(config)
+      baseUrls <- extractUrlsWithIp(url, clusterId)
+      urlToHit <- Future.successful(s"${baseUrls.head}/jobs/assetjob?assetId=$dbName.$tableName&profilerName=hivecolumn")
+      tmp <- Future.successful(println(urlToHit))
+      response <- ws.url(urlToHit)
+        .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+        .get()
+    } yield {
+      response
+    }
+  }
+
   private def postJob(clusterId: Long, dbName: String, tableName: String): Future[WSResponse] = {
     val postData = Json.obj(
-      "profilerName" -> "hivecolumnlive4",
+      "profilerName" -> "hivecolumn", //"hivecolumnlive4",
       "conf" -> Json.obj(),
       "assets" -> Seq(
         Json.obj(
-          "id" -> "default.abc",
+          "id" -> s"$dbName.$tableName",
           "assetType"  ->  "Hive",
           "data" -> Json.obj(
             "db" -> dbName,

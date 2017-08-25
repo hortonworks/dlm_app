@@ -73,7 +73,8 @@ GET           /api/ranger/audit/:clusterId/:dbName/:tableName        controllers
 GET           /api/ranger/policy/:clusterId/:dbName/:tableName        controllers.RangerAttributes.getPolicyDetails(clusterId: String, dbName: String, tableName: String, offset: String ?= "0", limit:String ?= "20")
 
 #DpProfiler
-POST           /api/dpProfiler/startJob/:clusterId/:dbName/:tableName controllers.DpProfilerAttributes.startProfilerJob(clusterId: String, dbName: String, tableName: String)
+POST          /api/dpProfiler/startJob                                controllers.DpProfilerAttributes.startProfilerJob(clusterId: String, dbName: String, tableName: String)
+GET           /api/dpProfiler/jobStatus                               controllers.DpProfilerAttributes.getProfilerJobStatus(clusterId: String, dbName: String, tableName: String)
 
 
 #LDAP

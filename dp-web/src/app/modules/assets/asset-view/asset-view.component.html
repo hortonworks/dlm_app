@@ -10,7 +10,11 @@
             <!-- 
             <dp-dropdown class="pull-right" [list]="['abc', 'def']"></dp-dropdown>
              -->
-            <button *ngIf="assetDetails && !profiledDataAvailable" (click)="startProfiler()" class="mdl-button btn-hwx-default">Start Profiling</button>
+            <button *ngIf="showProfilerStatus" (click)="startProfiler()" class="mdl-button btn-hwx-default">
+              <span *ngIf="profilerStatus == PS.RUNNING">Profiler Running <i class="fa fa-spinner fa-spin"></i></span>
+              <span *ngIf="profilerStatus != PS.RUNNING">Restart Profiling</span>
+            </button>
+            <div *ngIf="showLastRunTime" class="lastRunTime" >Last ran at : {{lastRunTime}}</div>
         </div>
     </div>
     <div class="spacer-34"> </div>
