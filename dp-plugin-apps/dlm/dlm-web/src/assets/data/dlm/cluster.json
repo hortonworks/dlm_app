@@ -16,13 +16,5 @@
     "latitude": -27.557600021362305,
     "longitude": -55.07683181762695
   },
-  "services": [
-    {
-      "id": 8,
-      "servicename": "BEACON",
-      "clusterid": 2,
-      "servicehost": "jaimin-beacon-5.c.pramod-thangali.internal",
-      "fullURL": "http://jaimin-beacon-5.c.pramod-thangali.internal:25968"
-    }
-  ]
+  "beaconURL": "http://jaimin-beacon-5.c.pramod-thangali.internal:25968"
 }
