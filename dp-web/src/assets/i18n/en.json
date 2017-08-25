@@ -210,7 +210,12 @@
         "invalidAmbariUrl":"Invalid Ambari URL. Please enter a valid URL of the form http://host:port or https://host:port.",
         "invalidLocation" : "Not a valid location. Please select a location from dropdown.",
         "invalidUserInput": "Some invalid user(s) are identified in the input. Only users selected from dropdown options are valid.",
-        "invalidGroupInput": "Some invalid group(s) are identified in the input. Only groups selected from dropdown options are valid."
+        "invalidGroupInput": "Some invalid group(s) are identified in the input. Only groups selected from dropdown options are valid.",
+        "backenderrors":{
+          "Url": "This is not a valid url. Please enter a valid Ambari Url",
+          "Ambari": "Unable to connect to Ambari",
+          "Network": "There was a network error when connecting to Ambari"
+        }
       }
     },
     "dataset": {
