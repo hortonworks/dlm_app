@@ -18,6 +18,7 @@ import * as moment from 'moment';
 import * as fromRoot from 'reducers/';
 import { Event } from 'models/event.model';
 import { JOB_EVENT, POLICY_EVENT } from 'constants/event.constant';
+import { loadEvents } from 'actions/event.action';
 import { ProgressState } from 'models/progress-state.model';
 import { updateProgressState } from 'actions/progress.action';
 import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
@@ -241,7 +242,11 @@ export class OverviewComponent implements OnInit, OnDestroy {
     [
       loadPolicies(POLICIES_REQUEST),
       loadClusters(CLUSTERS_REQUEST),
-      loadPairings()
+      loadPairings(),
+      // todo: this is workaround to get all events for recent issues.
+      // for recent issues we don't need events with severity INFO, but Beacon API doesn't support filtering
+      // so we need to load "all" events initialy
+      loadEvents({numResults: 1000})
     ].map(action => this.store.dispatch(action));
     const overallProgressSubscription = this.completedRequest$(this.overallProgress$)
       .take(1)

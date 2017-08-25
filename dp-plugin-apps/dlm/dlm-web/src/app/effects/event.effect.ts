@@ -23,8 +23,8 @@ export class EventEffects {
   loadEvents$: Observable<any> = this.actions$
     .ofType(eventActions.LOAD_EVENTS.START)
     .map(toPayload)
-    .switchMap(payload => {
-      return this.eventService.getEvents()
+    .mergeMap(payload => {
+      return this.eventService.getEvents(payload.queryParams)
         .map(events => loadEventsSuccess(events, payload.meta))
         .catch(err => Observable.of(loadEventsFail(err, payload.meta)));
     });
@@ -33,7 +33,7 @@ export class EventEffects {
   loadNewEventsCount$: Observable<any> = this.actions$
     .ofType(eventActions.LOAD_NEW_EVENTS_COUNT.START)
     .map(toPayload)
-    .switchMap(payload => {
+    .mergeMap(payload => {
       return this.eventService.getNewEvents()
         .map(events => loadNewEventsCountSuccess(events, payload.meta))
         .catch(err => Observable.of(loadNewEventsCountFail(err, payload.meta)));
