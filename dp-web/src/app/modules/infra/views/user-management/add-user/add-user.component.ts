@@ -166,16 +166,17 @@ export class AddUserComponent implements OnInit, AfterViewInit {
         return role.data;
       });
       this.userService.addUsers(this.users, roles).subscribe(response => {
-        if (response.length === this.users.length) {
+        if (response.successfullyAdded.length === this.users.length) {
           this.userService.dataChanged.next();
           this.router.navigate(['users'], {relativeTo: this.route});
         } else {
           let failedUsers = [];
           this.users.forEach(user => {
-            if (!response.find(res => res.userName === user)) {
+            if (!response.successfullyAdded.find(res => res.userName === user)) {
               failedUsers.push(user)
             }
           });
+          this.userService.dataChanged.next();
           this.onError(`${this.translateService.instant('pages.infra.description.addUserError')}- ${failedUsers.join(', ')}`);
         }
 

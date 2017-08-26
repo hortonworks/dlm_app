@@ -2,7 +2,7 @@ package controllers
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{Errors, GroupInfo}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, GroupInfo}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.commons.domain.RoleType
 import com.hortonworks.dataplane.db.Webservice.GroupService
@@ -78,13 +78,16 @@ class GroupManager @Inject()(@Named("groupService") val groupService: GroupServi
       groupService.addGroupWithRoles(groupInfo)
     }
     val successFullyAdded = mutable.ArrayBuffer.empty[GroupInfo]
-    val errorsReceived = mutable.ArrayBuffer.empty[Errors]
+    val errorsReceived = mutable.ArrayBuffer.empty[Error]
     Future.sequence(futures).map { respList =>
       respList.foreach {
-        case Left(error) => errorsReceived += error
+        case Left(error) => errorsReceived ++= error.errors
         case Right(groupInfo) => successFullyAdded += groupInfo
       }
-      Ok(Json.toJson(successFullyAdded))
+      Ok(Json.toJson(
+        Json.obj(
+          "successfullyAdded" -> successFullyAdded,
+          "errors" -> errorsReceived)))
     }
   }
 
