@@ -90,7 +90,16 @@ class AmbariWebServiceImpl(config: Config)(implicit ws: ClusterWsClient)
   override def requestAmbariApi(clusterId: Long, ambariUrl: String, addClusterIdToResponse: Boolean = false)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsValue]] = {
     implicit val _ = if (addClusterIdToResponse) Some(clusterId) else None
     ws.url(s"$url/$clusterId/ambari?request=$ambariUrl")
-        .withToken(token)
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToResults)
+  }
+
+  override def requestAmbariClusterApi(clusterId: Long, ambariUrl: String, addClusterIdToResponse: Boolean = false)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsValue]] = {
+    implicit val _ = if (addClusterIdToResponse) Some(clusterId) else None
+    ws.url(s"$url/$clusterId/ambari/cluster?request=$ambariUrl")
+      .withToken(token)
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToResults)
