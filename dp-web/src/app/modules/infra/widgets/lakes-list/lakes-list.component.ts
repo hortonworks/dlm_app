@@ -127,7 +127,7 @@ export class LakesListComponent implements OnChanges {
       return;
     }
     this.filters.forEach(filter => {
-      this.lakesList = this.lakesList.filter(lakeInfo => {
+      this.lakesList = this.lakesListCopy.filter(lakeInfo => {
         return lakeInfo[filter.key] === filter.value;
       });
     });
