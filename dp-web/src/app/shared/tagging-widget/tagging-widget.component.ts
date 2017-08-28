@@ -105,10 +105,7 @@ export class TaggingWidget implements AfterViewInit {
   }
 
   onClick() {
-    setTimeout(() => {
-      this.parent.nativeElement.querySelector('span.inputSpan input').focus();
-    }, 300);
-
+    this.parent.nativeElement.querySelector('span.inputSpan input').focus();
   }
 
   _manageFocus() {
@@ -132,7 +129,8 @@ export class TaggingWidget implements AfterViewInit {
   }
 
   onInputBlur() {
-    setTimeout(() => this.parent.nativeElement.classList.remove('focus'), 300);
+    //setTimeout(() => this.parent.nativeElement.classList.remove('focus'), 300);
+    this.parent.nativeElement.classList.remove('focus');
   }
 
   focusOnSticker(i) {
