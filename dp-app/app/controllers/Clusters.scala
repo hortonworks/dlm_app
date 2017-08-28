@@ -177,7 +177,7 @@ class Clusters @Inject()(
       implicit val token = request.token
       val rmRequest = configuration.getString("cluster.rm.health.request.param").get;
 
-      ambariWebService.requestAmbariApi(clusterId, rmRequest).map {
+      ambariWebService.requestAmbariClusterApi(clusterId, rmRequest).map {
         case Left(errors) =>
           InternalServerError(
             JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
@@ -192,7 +192,7 @@ class Clusters @Inject()(
       implicit val token = request.token
       val dnRequest = configuration.getString("cluster.dn.health.request.param").get;
 
-      ambariWebService.requestAmbariApi(clusterId, dnRequest).map {
+      ambariWebService.requestAmbariClusterApi(clusterId, dnRequest).map {
         case Left(errors) =>
           InternalServerError(
             JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
