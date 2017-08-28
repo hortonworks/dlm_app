@@ -7,8 +7,9 @@
 #   sleep 2
 # done
 
+echo -n "Waiting for postgres server..."
 until docker exec -t dp-database psql -U dp_admin -d dataplane -c "select 1" > /dev/null 2>&1; do
-  echo "Waiting for postgres server..."
+  echo -n "."
   sleep 1
 done
-
+echo $'\nPostgres server is ready.'
