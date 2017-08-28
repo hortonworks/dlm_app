@@ -7,11 +7,19 @@ import javax.inject.Inject
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import com.hortonworks.dataplane.commons.domain.Constants
-import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneClusterIdentifier, HJwtToken}
+import com.hortonworks.dataplane.commons.domain.Entities.{
+  DataplaneClusterIdentifier,
+  ErrorType,
+  HJwtToken
+}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.{ClusterSync, StorageInterface}
 import com.hortonworks.dataplane.http.BaseRoute
-import com.hortonworks.dataplane.knox.Knox.{ApiCall, KnoxApiRequest, KnoxConfig}
+import com.hortonworks.dataplane.knox.Knox.{
+  ApiCall,
+  KnoxApiRequest,
+  KnoxConfig
+}
 import com.hortonworks.dataplane.knox.KnoxApiExecutor
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
@@ -21,6 +29,13 @@ import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
+
+private[routes] case class ConnectionError(message: String, cause: Throwable)
+    extends Throwable(message, cause)
+private[routes] case class UrlError(cause: Throwable)
+    extends Throwable("Invalid URL", cause)
+private[routes] case class AmbariError(cause: Throwable)
+    extends Throwable("Cannot contact Ambari", cause)
 
 class StatusRoute @Inject()(val ws: WSClient,
                             storageInterface: StorageInterface,
@@ -35,11 +50,11 @@ class StatusRoute @Inject()(val ws: WSClient,
 
   val logger = Logger(classOf[StatusRoute])
 
-
   def makeAmbariApiRequest(endpoint: String,
                            ambariResponse: AmbariForbiddenResponse,
                            timeout: Int,
-                           request: HttpRequest, ip:String) = {
+                           request: HttpRequest,
+                           ip: String) = {
     // Step 3
     // check if there was a jwtProviderUrl
     ambariResponse.jwtProviderUrl
@@ -57,16 +72,20 @@ class StatusRoute @Inject()(val ws: WSClient,
 
         val expectConfigGroup =
           config.getBoolean("dp.services.knox.token.expect.separate.config")
-        val checkCredentials = config.getBoolean("dp.services.knox.token.infer.endpoint.using.credentials")
+        val checkCredentials = config.getBoolean(
+          "dp.services.knox.token.infer.endpoint.using.credentials")
 
         expectConfigGroup match {
           case true =>
-            Future.successful(AmbariCheckResponse(ambariApiCheck = false,
-              knoxDetected = true,
-              404,
-              Some(knoxUrl),
-              ip,
-              Json.obj(),if (checkCredentials) true else false,if (!checkCredentials) true else false))
+            Future.successful(
+              AmbariCheckResponse(ambariApiCheck = false,
+                                  knoxDetected = true,
+                                  404,
+                                  Some(knoxUrl),
+                                  ip,
+                                  Json.obj(),
+                                  if (checkCredentials) true else false,
+                                  if (!checkCredentials) true else false))
           case false =>
             val delegatedRequest =
               ws.url(endpoint).withRequestTimeout(timeout seconds)
@@ -153,27 +172,39 @@ class StatusRoute @Inject()(val ws: WSClient,
   def checkAmbariAvailability(
       ep: AmbariEndpoint,
       request: HttpRequest): Future[AmbariCheckResponse] = {
-    val endpoint: String = s"${ep.url}${Try(config.getString(
-      "dp.service.ambari.cluster.api.prefix")).getOrElse("/api/v1/clusters")}"
+    val endpoint = { u: String =>
+      s"${u}${Try(config.getString("dp.service.ambari.cluster.api.prefix")).getOrElse("/api/v1/clusters")}"
+    }
     val timeout =
       Try(config.getInt("dp.service.ambari.status.check.timeout.secs"))
         .getOrElse(20)
 
     //Step 1
-    val initialRequest = ws
-      .url(endpoint)
-      .withRequestTimeout(timeout seconds)
-      .get()
-      .map(mapAsUnauthenticatedResponse)
+    val initialRequest = { eps: String =>
+      ws.url(eps)
+        .withRequestTimeout(timeout seconds)
+        .get()
+        .map(mapAsUnauthenticatedResponse)
+        .recoverWith {
+          case th: Exception =>
+            Future.failed(
+              ConnectionError(s"Cannot connect to Ambari url at ${endpoint(ep.url)}",
+                              th))
+        }
+
+    }
 
     for {
-      ambariResponse <- initialRequest
-      //Step 3
       ip <- getAmbariUrl(ep.url)
-      ambariApiResponse <- makeAmbariApiRequest(endpoint,
+      ambariResponse <- initialRequest(endpoint(ep.url))
+      //Step 3
+      ambariApiResponse <- makeAmbariApiRequest(endpoint(ep.url),
                                                 ambariResponse,
                                                 timeout,
-                                                request,ip)
+                                                request,
+                                                ip).recoverWith {
+        case th: Throwable => Future.failed(AmbariError(th))
+      }
     } yield ambariApiResponse
 
   }
@@ -181,8 +212,7 @@ class StatusRoute @Inject()(val ws: WSClient,
   private def mapAsUnauthenticatedResponse(
       response: WSResponse): AmbariForbiddenResponse = {
     if (response.status != 403)
-      throw new RuntimeException(
-        s"Attempt to access unauthenticated Ambari API's did not return the expected 403 response - $response")
+      throw AmbariError(new Exception(s"Unexpected Response from Ambari, expected 403, actual ${response.status}"))
     //Step 2
     response.json.validate[AmbariForbiddenResponse].get
   }
@@ -190,17 +220,19 @@ class StatusRoute @Inject()(val ws: WSClient,
   import java.net.InetAddress
   private def getAmbariUrlWithIp(url: String): Try[URL] = {
     Try(new URL(url))
-      .map {
-        ambariUrl =>
-          val hostAddressIp = InetAddress.getByName(ambariUrl.getHost)
-          new URL(ambariUrl.getProtocol, hostAddressIp.getHostAddress, ambariUrl.getPort, ambariUrl.getFile)
+      .map { ambariUrl =>
+        val hostAddressIp = InetAddress.getByName(ambariUrl.getHost)
+        new URL(ambariUrl.getProtocol,
+                hostAddressIp.getHostAddress,
+                ambariUrl.getPort,
+                ambariUrl.getFile)
       }
   }
 
   private def getAmbariUrl(url: String) = {
     getAmbariUrlWithIp(url) match {
-      case Success(url) => Future.successful(url.toString)
-      case Failure(f) => Future.failed(new Exception("Not a valid Url"))
+      case Success(u) => Future.successful(u.toString)
+      case Failure(f) => Future.failed(UrlError(f))
     }
   }
 
@@ -213,7 +245,20 @@ class StatusRoute @Inject()(val ws: WSClient,
               case Success(res) =>
                 complete(success(res))
               case Failure(e) =>
-                complete(StatusCodes.InternalServerError, errors(e))
+                e match {
+                  case c: ConnectionError =>
+                    complete(StatusCodes.InternalServerError,
+                             errors(c, ErrorType.Network))
+                  case c: UrlError =>
+                    complete(StatusCodes.InternalServerError,
+                             errors(c, ErrorType.Url))
+                  case c: AmbariError =>
+                    complete(StatusCodes.InternalServerError,
+                             errors(c, ErrorType.Ambari))
+                  case _ =>
+                    complete(StatusCodes.InternalServerError, errors(e))
+                }
+
             }
           }
         }
@@ -232,9 +277,9 @@ class StatusRoute @Inject()(val ws: WSClient,
             val token =
               if (header.isPresent) Some(HJwtToken(header.get().value()))
               else None
-              onComplete(dpClusterSync.triggerSync(dl.id, token)){ response =>
-                complete(success(Map("status" -> 200)))
-              }
+            onComplete(dpClusterSync.triggerSync(dl.id, token)) { response =>
+              complete(success(Map("status" -> 200)))
+            }
           }
         }
       }
