@@ -306,11 +306,6 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     this.selectedPolicy$.next(policy);
   }
 
-  deactivatePolicy() {
-    this.activeContentType = null;
-    this.selectedPolicy$.next(<Policy>{});
-  }
-
   toggleSelectedRow(nextPolicy, contentType) {
     const selectedPolicy = this.selectedPolicy$.getValue();
     const isContentChanged = contentType !== this.activeContentType;
@@ -390,5 +385,9 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
 
   handleFilesPageChange(page, rowId) {
     this.selectedFileBrowserPage[rowId] = page.offset;
+  }
+
+  isPrevJobsActive(rowId) {
+    return this.tableComponent.expandedRows[rowId] && this.activeContentType === PolicyContent.Jobs;
   }
 }
