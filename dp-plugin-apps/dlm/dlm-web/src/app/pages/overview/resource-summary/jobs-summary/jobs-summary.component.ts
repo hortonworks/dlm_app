@@ -16,8 +16,7 @@ import { JOBS_HEALTH_STATE } from '../resource-summary.type';
   template: `
     <dlm-summary-panel
       [title]="'page.overview.summary_panels.title.jobs'"
-      [total]="data.total"
-      [hint]="'page.overview.summary_panels.hint.jobs'">
+      [total]="data.total">
       <div class="row">
         <dlm-summary-panel-cell
           class="col-md-4"
@@ -35,6 +34,7 @@ import { JOBS_HEALTH_STATE } from '../resource-summary.type';
           (cellClick)="selectPanelCell.emit(healthStates.LAST_FAILED)"
           [actionable]="data.lastFailed > 0"
           [label]="'page.overview.summary_panels.status.failed_last' | translate"
+          [hint]="'page.overview.summary_panels.hint.jobs.failed_last'"
           [value]="data.lastFailed">
         </dlm-summary-panel-cell>
         <dlm-summary-panel-cell
@@ -44,6 +44,7 @@ import { JOBS_HEALTH_STATE } from '../resource-summary.type';
           (cellClick)="selectPanelCell.emit(healthStates.LAST_10_FAILED)"
           [actionable]="data.last10Failed > 0"
           [label]="'page.overview.summary_panels.status.failed_last_10' | translate"
+          [hint]="'page.overview.summary_panels.hint.jobs.failed_last_ten'"
           [value]="data.last10Failed">
         </dlm-summary-panel-cell>
       </div>

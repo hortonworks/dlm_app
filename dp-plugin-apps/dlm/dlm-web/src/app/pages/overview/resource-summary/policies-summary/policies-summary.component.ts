@@ -16,8 +16,7 @@ import { POLICIES_HEALTH_STATE } from '../resource-summary.type';
   template: `
     <dlm-summary-panel
       [title]="'page.overview.summary_panels.title.policies'"
-      [total]="data.total"
-      [hint]="'page.overview.summary_panels.hint.policies'">
+      [total]="data.total">
       <div class="row">
         <dlm-summary-panel-cell
           class="col-md-4"
@@ -38,6 +37,7 @@ import { POLICIES_HEALTH_STATE } from '../resource-summary.type';
           (cellClick)="selectPanelCell.emit(healthStates.UNHEALTHY)"
           [actionable]="data.unhealthy > 0"
           [label]="'page.overview.summary_panels.status.unhealthy' | translate"
+          [hint]="'page.overview.summary_panels.hint.policies.unhealthy'"
           [value]="data.unhealthy">
         </dlm-summary-panel-cell>
       </div>
