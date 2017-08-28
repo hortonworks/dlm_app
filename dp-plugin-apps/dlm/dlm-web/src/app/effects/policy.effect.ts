@@ -13,8 +13,6 @@ import { go } from '@ngrx/router-store';
 import { Effect, Actions, toPayload } from '@ngrx/effects';
 import { PolicyService } from 'services/policy.service';
 import { JobService } from 'services/job.service';
-import { NotificationService } from 'services/notification.service';
-import { TranslateService } from '@ngx-translate/core';
 import { ToastNotification } from 'models/toast-notification.model';
 import { NOTIFICATION_TYPES } from 'constants/notification.constant';
 
@@ -35,7 +33,7 @@ export class PolicyEffects {
     .ofType(policyActions.LOAD_POLICIES.START)
     .map(toPayload)
     .switchMap(payload => {
-      return this.policyService.fetchPolicies()
+      return this.policyService.fetchPolicies(payload.queryParams)
         .map(policies => loadPoliciesSuccess(policies, payload.meta))
         .catch(err => Observable.of(loadPoliciesFail(err, payload.meta)));
     });
@@ -97,8 +95,6 @@ export class PolicyEffects {
 
   constructor(private actions$: Actions,
               private policyService: PolicyService,
-              private jobService: JobService,
-              private t: TranslateService,
-              private notificationService: NotificationService) {
+              private jobService: JobService) {
   }
 }

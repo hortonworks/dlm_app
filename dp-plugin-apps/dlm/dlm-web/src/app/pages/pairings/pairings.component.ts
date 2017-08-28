@@ -37,15 +37,7 @@ export class PairingsComponent implements OnInit {
   overallProgress$: Observable<ProgressState>;
 
   static getBeaconUrl(cluster: Cluster | ClusterPairing): string {
-    let beaconUrl = '';
-    if (cluster.services && cluster.services.length) {
-      // todo: change servicename to BEACON_SERVER once dataplane fixes the service name
-      const beaconService = cluster.services.filter(service => service.servicename === 'BEACON');
-      if (beaconService.length) {
-        beaconUrl = beaconService[0].fullURL;
-      }
-    }
-    return beaconUrl;
+    return cluster.beaconUrl;
   }
 
   constructor(

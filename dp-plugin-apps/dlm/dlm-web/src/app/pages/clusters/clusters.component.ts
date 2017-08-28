@@ -30,6 +30,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { isEqual } from 'utils/object-utils';
 import { Policy } from 'models/policy.model';
 import { CLUSTER_STATUS, SERVICE_STATUS } from 'constants/status.constant';
+import { ALL_POLICIES_COUNT } from 'constants/api.constant';
 
 const CLUSTERS_REQUEST_ID = '[CLUSTER_PAGE]CLUSTERS_REQUEST_ID';
 const POLICIES_REQUEST_ID = '[CLUSTER_PAGE]POLICIES_REQUEST_ID';
@@ -119,7 +120,7 @@ export class ClustersComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.store.dispatch(loadClusters(CLUSTERS_REQUEST_ID));
     this.store.dispatch(loadPairings(PAIRINGS_REQUEST_ID));
-    this.store.dispatch(loadPolicies(POLICIES_REQUEST_ID));
+    this.store.dispatch(loadPolicies({numResults: ALL_POLICIES_COUNT}, {requestId: POLICIES_REQUEST_ID}));
   }
 
   handleClickMarker(cluster: Cluster) {

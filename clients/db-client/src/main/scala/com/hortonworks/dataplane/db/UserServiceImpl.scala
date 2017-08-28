@@ -108,6 +108,12 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       case _ => mapErrors(res)
     }
   }
+  private def mapAddUserWithRolesResponse(res:WSResponse)={
+    res.status match {
+      case 200 =>Right((res.json \ "results").validate[UserInfo].get)
+      case _ => mapErrors(res)
+    }
+  }
 
   override def getUserRoles(userName: String): Future[Either[Errors, UserRoles]] = {
     ws.url(s"$url/users/role/$userName")
@@ -130,7 +136,8 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
     ws.url(s"$url/users/withroles")
       .withHeaders("Accept" -> "application/json")
       .post(Json.toJson(userInfo))
-      .map{res=>Right(userInfo)}
+        .map(mapAddUserWithRolesResponse)
+
   }
 
   override  def getUserDetail(userName:String): Future[Either[Errors,UserInfo]]={

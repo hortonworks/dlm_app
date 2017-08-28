@@ -13,11 +13,15 @@ import * as fromEvent from '../actions/event.action';
 
 export interface State extends BaseState<Event> {
   newEventsCount: number;
+  headId: number;
+  tailId: number;
 }
 
 export const initialState: State = {
   entities: [],
-  newEventsCount: 0
+  newEventsCount: 0,
+  headId: 0,
+  tailId: 0
 };
 
 export function reducer(state = initialState, action): State {
@@ -35,15 +39,47 @@ export function reducer(state = initialState, action): State {
 
 function loadEventsSuccess(state = initialState, action): State {
   const events = action.payload.response.events;
+  if (!events.length) {
+    return state;
+  }
+  if (state.headId === 0 && state.tailId === 0) {
+    return {
+      ...state,
+      entities: events,
+      headId: events[0].id,
+      tailId: events[events.length - 1].id
+    };
+  }
+  const { head, tail } = <{head: Event[], tail: Event[]}>events.reduce((all, event) => {
+    if (event.id < state.tailId) {
+      return {
+        ...all,
+        tail: all.tail.concat(event)
+      };
+    } else if (event.id > state.headId) {
+      return {
+        ...all,
+        head: all.head.concat(event)
+      };
+    }
+    return all;
+  }, {head: [], tail: []});
   return {
-    entities: Object.assign([], state.entities, events),
-    newEventsCount: state.newEventsCount
+    ...state,
+    entities: [
+      ...head,
+      ...state.entities,
+      ...tail
+    ],
+    headId: head.length && head[0].id || state.headId,
+    tailId: tail.length && tail[tail.length - 1].id || state.tailId
   };
 }
 
 function loadNewEventsCountSuccess(state = initialState, action): State {
   const count = action.payload.response.totalCount;
   return {
+    ...state,
     entities: state.entities,
     newEventsCount: count
   };

@@ -61,7 +61,18 @@ class BeaconClusterServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconC
       "\nbeaconEndpoint = " + clusterDefinitionRequest.beaconEndpoint +
       "\ndescription = " + clusterDefinitionRequest.description +
       "\nlocal = " + clusterDefinitionRequest.local +
-      (if (clusterDefinitionRequest.hsEndpoint.isDefined) "\nhsEndpoint = " + clusterDefinitionRequest.hsEndpoint.get else "")
+      (clusterDefinitionRequest.nnKerberosPrincipal match {
+        case Some(nnKerberosPrincipal) => "\nnnKerberosPrincipal= " + nnKerberosPrincipal
+        case None => ""
+      }) +
+      (clusterDefinitionRequest.hsEndpoint match {
+        case Some(hsEndpoint) => "\nhsEndpoint= " + hsEndpoint
+        case None => ""
+      }) +
+      (clusterDefinitionRequest.hsKerberosPrincipal match {
+        case Some(hsKerberosPrincipal) => "\nhsKerberosPrincipal= " + hsKerberosPrincipal
+        case None => ""
+      })
   }
 
 

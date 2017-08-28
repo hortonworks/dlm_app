@@ -103,13 +103,16 @@ class UserManager @Inject()(val ldapService: LdapService,
     }
     //TODO check of any alternate ways.since it is bulk the json may contain success as well as failures
     val successFullyAdded = mutable.ArrayBuffer.empty[UserInfo]
-    val errorsReceived = mutable.ArrayBuffer.empty[Errors]
+    val errorsReceived = mutable.ArrayBuffer.empty[Error]
     Future.sequence(futures).map { respList =>
       respList.foreach {
-        case Left(error) => errorsReceived += error
+        case Left(error) => errorsReceived ++= error.errors
         case Right(userInfo) => successFullyAdded += userInfo
       }
-      Ok(Json.toJson(successFullyAdded))
+      Ok(Json.toJson(
+        Json.obj(
+        "successfullyAdded" -> successFullyAdded,
+        "errors" -> errorsReceived)))
     }
   }
   def listUsers = Action.async { req =>

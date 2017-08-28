@@ -2,8 +2,9 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
-import com.hortonworks.dataplane.commons.domain.Entities.{GroupInfo}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, GroupInfo}
 import domain.{GroupsRepo, RolesUtil}
+import play.api.libs.json.Json
 import play.api.mvc.Action
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,10 +37,14 @@ class Groups @Inject()(groupsRepo: GroupsRepo, rolesUtil: RolesUtil)(
     req.body
       .validate[GroupInfo]
       .map { groupInfo =>
-        groupsRepo
-          .addGroupWithRoles(groupInfo)
-          .map(groupInfo => success(groupInfo))
-          .recoverWith(apiError)
+        groupsRepo.groupExists(groupInfo.groupName).flatMap {
+          case true=>Future.successful(Conflict(Json.toJson(Errors(Seq(Error("GROUP_ALREADY_EXISTS",s"Group Already Exists:${groupInfo.groupName}"))))))
+          case _=>{
+            groupsRepo
+              .addGroupWithRoles(groupInfo)
+              .map(groupInfo => success(groupInfo))
+          }
+       }.recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))
   }
