@@ -16,13 +16,13 @@
     </div>
     <div class="search">
       <div class="search-input">
-       <input type="text" placeholder="{{'common.search' | translate}}" [(ngModel)]="searchText" name="search-input" id="search" (keyup)="showOptions($event)" />
+       <input type="text" placeholder="{{'common.search' | translate}}" [(ngModel)]="searchText" name="search-input" id="search" (focus)="showOptions($event)" (keyup)="showOptions($event)" />
         <i class="fa fa-filter dp-input__icon" aria-hidden="true"></i>
       </div>
       <div *ngIf="showFilterListing" id="filter-option-list" class="option-list">
-        <div class="option-title" *ngFor="let filterOption of filterOptions">
-          {{filterOption.displayName}}
-          <div class="option-value" *ngFor="let value of filterOption.values" (click)="addToFilter(filterOption.displayName, filterOption.key, value)">{{value}}</div>
+        <div *ngFor="let filterOption of filterOptions">
+          <div class="option-title">{{filterOption.displayName}}</div>
+          <div class="option-value" (keyup)="handleKeyboardEvents($event, filterOption.displayName, filterOption.key, value)" *ngFor="let value of filterOption.values" tabindex="0" (click)="addToFilter(filterOption.displayName, filterOption.key, value)">{{value}}</div>
         </div>
     </div>
     <button id="add-btn" class="mdl-button btn-hwx-primary" [routerLink]="['/infra/add']"> {{"pages.infra.labels.addButton" | translate}} </button></div>

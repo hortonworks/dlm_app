@@ -107,7 +107,7 @@ input {
 
 .option-value {
   font-weight: normal;
-  padding: 5px 15px 0;
+  padding: 3px 15px;
   cursor: pointer;
 }
 
@@ -139,4 +139,13 @@ input {
 
 :host /deep/ .mdl-chip__text {
   vertical-align: unset;
+}
+
+.highlighted-filter{
+  background-color: $gallery;
+}
+
+.option-value:hover,
+.option-value:focus {
+  outline: none;
 }

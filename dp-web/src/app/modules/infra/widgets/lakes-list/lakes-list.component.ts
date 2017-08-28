@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
 import {Router} from '@angular/router';
 
 import {Sort} from '../../../../shared/utils/enums';
@@ -20,11 +20,30 @@ export class LakesListComponent implements OnChanges {
   filters = [];
   searchText: string;
   showFilterListing = false;
+  selectedFilterIndex = -1;
+  private availableFilterCount = 0;
   @Input() lakes = [];
   @Input() healths = new Map();
   @Output('onRefresh') refreshEmitter: EventEmitter<number> = new EventEmitter<number>();
 
+  static optionListClass = 'option-value';
+  static highlightClass = 'highlighted-filter';
+
+  filterFields = [
+    {key: 'name', display: 'Name'},
+    {key: 'city', display: 'City'},
+    {key: 'country', display: 'Country'},
+    {key: 'dataCenter', display: 'Data Center'}];
+
   constructor(private clusterService: ClusterService, private router: Router) {
+  }
+
+  @HostListener('document:click', ['$event', '$event.target'])
+  public onClick($event: MouseEvent, targetElement: HTMLElement): void {
+    if (targetElement.id === 'search') {
+      return;
+    }
+    this.showFilterListing = false;
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -43,6 +62,9 @@ export class LakesListComponent implements OnChanges {
       });
       this.lakesList = lakesList;
       this.lakesListCopy = lakesList;
+      if (this.filters && this.filters.length) {
+        this.filter();
+      }
     }
   }
 
@@ -109,6 +131,7 @@ export class LakesListComponent implements OnChanges {
         return lakeInfo[filter.key] === filter.value;
       });
     });
+    this.selectedFilterIndex = -1;
   }
 
   removeFilter(filter) {
@@ -131,38 +154,70 @@ export class LakesListComponent implements OnChanges {
     this.showFilterListing = false;
   }
 
-  showOptions(event) {
-    this.filterOptions = [];
-    let filterFields = [
-      {key: 'name', display: 'Name'},
-      {key: 'city', display: 'City'},
-      {key: 'country', display: 'Country'},
-      {key: 'dataCenter', display: 'Data Center'}];
-    let filterOptionsMap = new Map();
-    let term = event.target.value.trim().toLowerCase();
-    if (term.length === 0) {
-      this.showFilterListing = false;
+  handleKeyboardEvents(event, display?, key?, value?) {
+    let keyPressed = event.keyCode || event.which;
+    if (keyPressed === 40 && this.selectedFilterIndex < this.availableFilterCount - 1) {
+      ++this.selectedFilterIndex;
+      this.highlightSelected();
+      return;
+    } else if (keyPressed === 38 && this.selectedFilterIndex !== 0) {
+      --this.selectedFilterIndex;
+      this.highlightSelected();
+      return;
+    } else if (keyPressed === 13 && this.selectedFilterIndex !== -1) {
+      this.addToFilter(display, key, value);
       return;
     }
-    this.lakesList.forEach(lakeInfo => {
-      filterFields.forEach(field => {
-        if (lakeInfo[field.key] && lakeInfo[field.key].toLowerCase().indexOf(term) >= 0) {
-          let values = filterOptionsMap.get(field.key);
-          if (values && values.indexOf(lakeInfo[field.key]) === -1) {
-            values.push(lakeInfo[field.key]);
-          } else if(!values) {
-            values = [lakeInfo[field.key]];
-          }
-          filterOptionsMap.set(field.key, values);
-        }
-      });
-    });
-    this.populateFilterOptions(filterFields, filterOptionsMap);
-    this.showFilterListing = true;
   }
 
-  private populateFilterOptions(filterFields, filterOptionsMap: Map<string, Array<any>>) {
-    filterFields.forEach(filterField => {
+  private highlightSelected() {
+    let filterOptions = document.getElementsByClassName(LakesListComponent.optionListClass);
+    let highlighted = document.getElementsByClassName(LakesListComponent.highlightClass);
+    for (let i = 0; i < highlighted.length; i++) {
+      let elt = highlighted.item(i);
+      elt.className = 'option-value';
+    }
+    let highlightedOption: any = filterOptions[this.selectedFilterIndex];
+    highlightedOption.focus();
+    highlightedOption.className += ` ${LakesListComponent.highlightClass}`;
+  }
+
+  showOptions(event) {
+    let keyPressed = event.keyCode || event.which;
+    if (keyPressed === 38 || keyPressed === 40) {
+      this.handleKeyboardEvents(event);
+    } else {
+      this.filterOptions = [];
+      let filterOptionsMap = new Map();
+      let term = event.target.value.trim().toLowerCase();
+      if (term.length === 0) {
+        this.selectedFilterIndex = -1;
+        this.showFilterListing = false;
+        return;
+      }
+      this.availableFilterCount = 0;
+      this.lakesList.forEach(lakeInfo => {
+        this.filterFields.forEach(field => {
+          if (lakeInfo[field.key] && lakeInfo[field.key].toLowerCase().indexOf(term) >= 0) {
+            this.availableFilterCount++;
+            let values = filterOptionsMap.get(field.key);
+            if (values && values.indexOf(lakeInfo[field.key]) === -1) {
+              values.push(lakeInfo[field.key]);
+            } else if (!values) {
+              values = [lakeInfo[field.key]];
+            }
+            filterOptionsMap.set(field.key, values);
+          }
+        });
+      });
+      this.populateFilterOptions(filterOptionsMap);
+      this.showFilterListing = true;
+    }
+  }
+
+
+  private populateFilterOptions(filterOptionsMap: Map<string, Array<any>>) {
+    this.filterFields.forEach(filterField => {
       let values = filterOptionsMap.get(filterField.key);
       if (values && values.length > 0) {
         this.filterOptions.push({'displayName': filterField.display, 'key': filterField.key, values: values});
