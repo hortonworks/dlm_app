@@ -63,7 +63,7 @@ export class LakesListComponent implements OnChanges {
       this.lakesList = lakesList;
       this.lakesListCopy = lakesList;
       if (this.filters && this.filters.length) {
-        this.filter();
+        this.filter(true);
       }
     }
   }
@@ -120,18 +120,34 @@ export class LakesListComponent implements OnChanges {
     }
   }
 
-  filter() {
+  filter(isAddition) {
     if (!this.filters || this.filters.length === 0) {
       this.lakesList = this.lakesListCopy.slice();
       this.showFilterListing = false;
       return;
     }
+    if (isAddition) {
+      this.filterOnAddition();
+    } else {
+      this.filterOnRemoval();
+    }
+    this.selectedFilterIndex = -1;
+  }
+
+  private filterOnAddition() {
+    this.filters.forEach(filter => {
+      this.lakesList = this.lakesList.filter(lakeInfo => {
+        return lakeInfo[filter.key] === filter.value;
+      });
+    });
+  }
+
+  private filterOnRemoval() {
     this.filters.forEach(filter => {
       this.lakesList = this.lakesListCopy.filter(lakeInfo => {
         return lakeInfo[filter.key] === filter.value;
       });
     });
-    this.selectedFilterIndex = -1;
   }
 
   removeFilter(filter) {
@@ -142,14 +158,14 @@ export class LakesListComponent implements OnChanges {
         break;
       }
     }
-    this.filter();
+    this.filter(false);
   }
 
   addToFilter(display, key, value) {
     if (!this.filters.find(filter => filter.key === key && filter.value === value)) {
       this.filters.push({'key': key, 'value': value, 'display': display});
     }
-    this.filter();
+    this.filter(true);
     this.searchText = '';
     this.showFilterListing = false;
   }
