@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
 import {Router} from '@angular/router';
 
 import {Sort} from '../../../../shared/utils/enums';
@@ -16,11 +16,34 @@ export class LakesListComponent implements OnChanges {
   lakesList: LakeInfo[] = [];
   lakesListCopy: LakeInfo[] = [];
   statusEnum = LakeStatus;
+  filterOptions: any[] = [];
+  filters = [];
+  searchText: string;
+  showFilterListing = false;
+  selectedFilterIndex = -1;
+  private availableFilterCount = 0;
   @Input() lakes = [];
   @Input() healths = new Map();
   @Output('onRefresh') refreshEmitter: EventEmitter<number> = new EventEmitter<number>();
 
+  static optionListClass = 'option-value';
+  static highlightClass = 'highlighted-filter';
+
+  filterFields = [
+    {key: 'name', display: 'Name'},
+    {key: 'city', display: 'City'},
+    {key: 'country', display: 'Country'},
+    {key: 'dataCenter', display: 'Data Center'}];
+
   constructor(private clusterService: ClusterService, private router: Router) {
+  }
+
+  @HostListener('document:click', ['$event', '$event.target'])
+  public onClick($event: MouseEvent, targetElement: HTMLElement): void {
+    if (targetElement.id === 'search') {
+      return;
+    }
+    this.showFilterListing = false;
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -39,6 +62,9 @@ export class LakesListComponent implements OnChanges {
       });
       this.lakesList = lakesList;
       this.lakesListCopy = lakesList;
+      if (this.filters && this.filters.length) {
+        this.filter(true);
+      }
     }
   }
 
@@ -48,13 +74,13 @@ export class LakesListComponent implements OnChanges {
     lakeInfo.name = lake.data.name;
     lakeInfo.ambariUrl = lake.data.ambariUrl;
     lakeInfo.lakeId = lake.data.id;
-    lakeInfo.dataCenter= lake.data.dcName;
+    lakeInfo.dataCenter = lake.data.dcName;
     lakeInfo.cluster = lake.clusters && lake.clusters.length ? lake.clusters[0] : null;
     lakeInfo.services = lake.data.services ? lake.data.services : 'NA';
     lakeInfo.isWaiting = lake.data.isWaiting;
     if (health) {
       this.populateHealthInfo(lakeInfo, health);
-    }else{
+    } else {
       lakeInfo.status = lakeInfo.isWaiting ? LakeStatus.WAITING : LakeStatus.NA;
     }
     if (location) {
@@ -68,38 +94,151 @@ export class LakesListComponent implements OnChanges {
     lakeInfo.hdfsUsed = (health.usedSize && !this.isSyncError(health)) ? health.usedSize : 'NA';
     lakeInfo.hdfsTotal = (health.totalSize && !this.isSyncError(health)) ? health.totalSize : 'NA';
     lakeInfo.nodes = (health.nodes && !this.isSyncError(health)) ? health.nodes : 'NA';
-    lakeInfo.status = this.getStatus(health,lakeInfo);
+    lakeInfo.status = this.getStatus(health, lakeInfo);
     lakeInfo.startTime = (health.status && !this.isSyncError(health)) ? health.status.startTime : null;
     lakeInfo.uptimeStr = (health.status && !this.isSyncError(health)) ? DateUtils.toReadableDate(health.status.since) : 'NA';
     lakeInfo.uptime = (health.status && !this.isSyncError(health)) ? health.status.since : 'NA';
   }
 
-  isSyncError(health){
-    return health.status.state === "SYNC_ERROR" ;
+  isSyncError(health) {
+    return health.status.state === 'SYNC_ERROR';
   }
 
   viewDetails(lakeId) {
     this.router.navigate([`infra/cluster/details`, lakeId]);
   }
 
-  private getStatus(health,lakeInfo) {
+  private getStatus(health, lakeInfo) {
     if (health && health.status && health.status.state === 'STARTED') {
       return LakeStatus.UP;
-    } else if (health && health.status && (health.status.state === 'NOT STARTED' || health.status.state === "SYNC_ERROR")) {
+    } else if (health && health.status && (health.status.state === 'NOT STARTED' || health.status.state === 'SYNC_ERROR')) {
       return LakeStatus.DOWN;
-    } else if(lakeInfo.isWaiting){
+    } else if (lakeInfo.isWaiting) {
       return LakeStatus.WAITING;
     } else {
       return LakeStatus.NA;
     }
   }
 
-  filter(event) {
-    let term = event.target.value.trim();
-    let filtered = this.lakesListCopy.filter((lakeInfo) => {
-      return lakeInfo.name.indexOf(term) >= 0;
+  filter(isAddition) {
+    if (!this.filters || this.filters.length === 0) {
+      this.lakesList = this.lakesListCopy.slice();
+      this.showFilterListing = false;
+      return;
+    }
+    if (isAddition) {
+      this.filterOnAddition();
+    } else {
+      this.filterOnRemoval();
+    }
+    this.selectedFilterIndex = -1;
+  }
+
+  private filterOnAddition() {
+    this.filters.forEach(filter => {
+      this.lakesList = this.lakesList.filter(lakeInfo => {
+        return lakeInfo[filter.key] === filter.value;
+      });
     });
-    this.lakesList = filtered;
+  }
+
+  private filterOnRemoval() {
+    this.filters.forEach(filter => {
+      this.lakesList = this.lakesListCopy.filter(lakeInfo => {
+        return lakeInfo[filter.key] === filter.value;
+      });
+    });
+  }
+
+  removeFilter(filter) {
+    for (let i = 0; i < this.filters.length; i++) {
+      let filterItem = this.filters[i];
+      if (filterItem.key === filter.key && filterItem.value === filter.value) {
+        this.filters.splice(i, 1);
+        break;
+      }
+    }
+    this.filter(false);
+  }
+
+  addToFilter(display, key, value) {
+    if (!this.filters.find(filter => filter.key === key && filter.value === value)) {
+      this.filters.push({'key': key, 'value': value, 'display': display});
+    }
+    this.filter(true);
+    this.searchText = '';
+    this.showFilterListing = false;
+  }
+
+  handleKeyboardEvents(event, display?, key?, value?) {
+    let keyPressed = event.keyCode || event.which;
+    if (keyPressed === 40 && this.selectedFilterIndex < this.availableFilterCount - 1) {
+      ++this.selectedFilterIndex;
+      this.highlightSelected();
+      return;
+    } else if (keyPressed === 38 && this.selectedFilterIndex !== 0) {
+      --this.selectedFilterIndex;
+      this.highlightSelected();
+      return;
+    } else if (keyPressed === 13 && this.selectedFilterIndex !== -1) {
+      this.addToFilter(display, key, value);
+      return;
+    }
+  }
+
+  private highlightSelected() {
+    let filterOptions = document.getElementsByClassName(LakesListComponent.optionListClass);
+    let highlighted = document.getElementsByClassName(LakesListComponent.highlightClass);
+    for (let i = 0; i < highlighted.length; i++) {
+      let elt = highlighted.item(i);
+      elt.className = 'option-value';
+    }
+    let highlightedOption: any = filterOptions[this.selectedFilterIndex];
+    highlightedOption.focus();
+    highlightedOption.className += ` ${LakesListComponent.highlightClass}`;
+  }
+
+  showOptions(event) {
+    let keyPressed = event.keyCode || event.which;
+    if (keyPressed === 38 || keyPressed === 40) {
+      this.handleKeyboardEvents(event);
+    } else {
+      this.filterOptions = [];
+      let filterOptionsMap = new Map();
+      let term = event.target.value.trim().toLowerCase();
+      if (term.length === 0) {
+        this.selectedFilterIndex = -1;
+        this.showFilterListing = false;
+        return;
+      }
+      this.availableFilterCount = 0;
+      this.lakesList.forEach(lakeInfo => {
+        this.filterFields.forEach(field => {
+          if (lakeInfo[field.key] && lakeInfo[field.key].toLowerCase().indexOf(term) >= 0) {
+            this.availableFilterCount++;
+            let values = filterOptionsMap.get(field.key);
+            if (values && values.indexOf(lakeInfo[field.key]) === -1) {
+              values.push(lakeInfo[field.key]);
+            } else if (!values) {
+              values = [lakeInfo[field.key]];
+            }
+            filterOptionsMap.set(field.key, values);
+          }
+        });
+      });
+      this.populateFilterOptions(filterOptionsMap);
+      this.showFilterListing = true;
+    }
+  }
+
+
+  private populateFilterOptions(filterOptionsMap: Map<string, Array<any>>) {
+    this.filterFields.forEach(filterField => {
+      let values = filterOptionsMap.get(filterField.key);
+      if (values && values.length > 0) {
+        this.filterOptions.push({'displayName': filterField.display, 'key': filterField.key, values: values});
+      }
+    });
   }
 
   refresh(lakeInfo) {
