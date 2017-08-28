@@ -102,7 +102,7 @@ class GroupsRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     }
   }
 
-  def getGroupByName(groupName: String) = {
+  def getGroupByName(groupName: String):Future[GroupInfo] = {
     for {
       (group, groupRoles) <- getGroupDetailInternal(groupName)
       roleIdMap <- rolesUtil.getRoleIdMap
@@ -113,6 +113,9 @@ class GroupsRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
       }
       GroupInfo(id = group.id, groupName = group.groupName, displayName = group.displayName, roles = roles, active = group.active)
     }
+  }
+  def groupExists(groupName:String): Future[Boolean] ={
+    db.run(Groups.filter(_.groupName===groupName).result.headOption).map(res=>res.isDefined)
   }
   def getRolesForGroups(groupIds:Seq[Long])={
     val query=GroupsRoles.filter(_.groupId.inSet(groupIds)).to[List].result

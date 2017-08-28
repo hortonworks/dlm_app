@@ -138,6 +138,8 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   freqRequired = {fieldLabel: 'Frequency'};
   freqLimit = {fieldLabel: 'Frequency'};
   directoryField = {fieldLabel: 'Folder path'};
+  maxBandwidthField = {fieldLabel: 'Maximum Bandwidth'};
+  userTimezone = '';
   get datePickerOptions(): IMyOptions {
     const yesterday = moment().subtract(1, 'day');
     const today = moment();
@@ -294,8 +296,13 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     return this.policyForm.value.general.destinationCluster;
   }
 
+  getEndTime(endDate) {
+    const date = moment(endDate).toDate();
+    date.setHours(23, 59, 59);
+    return new Date(date);
+  }
+
   constructor(private formBuilder: FormBuilder,
-              private timezone: TimeZoneService,
               private store: Store<State>,
               private timezoneService: TimeZoneService,
               private t: TranslateService,
@@ -306,7 +313,9 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   // - revisit logic around observables
   // - simplify overall logic
   ngOnInit() {
-    this.userTimeZone$ = this.timezone.userTimezoneIndex$;
+    this.userTimeZone$ = this.timezoneService.userTimezoneIndex$;
+    this.userTimeZone$.subscribe((value) =>
+      this.userTimezone = this.timezoneService.userTimezone ? this.timezoneService.userTimezone.label : '');
     const loadDatabasesSubscription = this.selectedSource$
       .filter(sourceCluster => !!sourceCluster)
       .subscribe(sourceCluster => {
@@ -382,7 +391,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     this.policyForm.patchValue({
       job: {
         endTime: {
-          time: moment(this.defaultTime).toDate()
+          time: moment(this.defaultEndTime).toDate()
         },
         startTime: {
           time: moment(this.defaultTime).toDate()
@@ -434,6 +443,10 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
             // otherwise, get next week's instance of that day
             value.job.startTime.date = moment(startDate).add(1, 'weeks').isoWeekday(dayToLook).format('YYYY-MM-DD');
           }
+        }
+        if (value.job.endTime && 'date' in value.job.endTime) {
+          const endDate = value.job.endTime.date;
+          value.job.endTime.time = this.getEndTime(endDate);
         }
       }
       const userTimezone = this.timezoneService.userTimezone;

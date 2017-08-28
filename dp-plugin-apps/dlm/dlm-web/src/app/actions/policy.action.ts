@@ -21,7 +21,10 @@ export const ActionTypes = {
   LOAD_LAST_JOBS: requestType('LOAD_JOBS_FOR_POLICY')
 };
 
-export const loadPolicies = (requestId?): Action => ({type: ActionTypes.LOAD_POLICIES.START, payload: { meta: {requestId}}});
+export const loadPolicies = (queryParams = {}, meta = {}): Action => ({
+  type: ActionTypes.LOAD_POLICIES.START,
+  payload: {meta, queryParams}
+});
 export const loadPoliciesSuccess = (policies, meta): ActionSuccess => ({
   type: ActionTypes.LOAD_POLICIES.SUCCESS,
   payload: {response: policies, meta}

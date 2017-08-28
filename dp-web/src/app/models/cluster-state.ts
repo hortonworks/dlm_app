@@ -3,6 +3,7 @@ export class ClusterState {
   knoxDetected: boolean;
   ambariApiStatus: number;
   knoxUrl?:string;
+  ambariIpAddress:string;
   alreadyExists: boolean;
   requestAmbariCreds:boolean;
   requestKnoxURL:boolean;

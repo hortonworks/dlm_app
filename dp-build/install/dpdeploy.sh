@@ -8,7 +8,8 @@ KNOX_SIGNING_CERTIFICATE=knox-signing.pem
 DEFAULT_VERSION=0.0.1-latest
 KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
-APP_CONTAINERS_WITHOUT_DB="dp-app dp-db-service dp-cluster-service dp-gateway"
+CLUSTER_SERVICE_CONTAINER="dp-cluster-service"
+APP_CONTAINERS_WITHOUT_DB="dp-app dp-db-service $CLUSTER_SERVICE_CONTAINER dp-gateway"
 APP_CONTAINERS=$APP_CONTAINERS_WITHOUT_DB
 if [ "$USE_EXT_DB" == "no" ]; then
     APP_CONTAINERS="dp-database $APP_CONTAINERS"
@@ -106,6 +107,26 @@ reset_db() {
 
     # start flyway container and trigger migrate script
     source $(pwd)/docker-flyway.sh clean migrate
+}
+
+utils_add_host() {
+    if [ $# -ne 2 ]; then
+        echo "Invalid arguments."
+        echo "Usage: dpdeploy.sh utils add-host <ip> <host>"
+        return -1
+    else
+        add_host_entry "$@"
+    fi
+}
+
+add_host_entry() {
+    IS_CLUSTER_SERVICE_UP=$(docker inspect -f {{.State.Running}} $CLUSTER_SERVICE_CONTAINER) || echo "'$CLUSTER_SERVICE_CONTAINER' container needs to be up for this operation."
+    if [ "$IS_CLUSTER_SERVICE_UP" != "true" ]; then
+        return -1
+    else
+        docker exec -t "$CLUSTER_SERVICE_CONTAINER" /bin/bash -c "echo $1 $2 >> /etc/hosts"
+        echo "Successfully appended to '/etc/hosts'."
+    fi
 }
 
 destroy() {
@@ -362,6 +383,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
+    printf "%-${tabspace}s:%s\n" "utils add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
     printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
     printf "%-${tabspace}s:%s\n" "start knox" "Start the Knox and Consul containers"
     printf "%-${tabspace}s:%s\n" "start --all" "Start all containers"
@@ -409,6 +431,19 @@ else
             ;;
         migrate)
             reset_db
+            ;;
+        utils)
+            shift
+            case "$1" in
+                add-host)
+                    shift
+                    utils_add_host "$@"
+                    ;;
+                *)
+                    echo "Unknown option"
+                    usage
+                    ;;
+            esac
             ;;
         start)
             case "$2" in

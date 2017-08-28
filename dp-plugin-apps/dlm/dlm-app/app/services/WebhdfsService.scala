@@ -57,7 +57,7 @@ class WebhdfsService @Inject()(
                 Some(NAMENODE_ERROR_PREFIX + errors.errors.head.message))))
             }
             case Right(endpointDetails) => {
-              fileService.getFileOperationResult(endpointDetails.fullURL, path, operation).map{
+              fileService.getFileOperationResult(endpointDetails.serviceProperties("url").get, path, operation).map{
                 case Left(error) => p.success(Left(error))
                 case Right(contentSummary) => p.success(Right(contentSummary))
               }

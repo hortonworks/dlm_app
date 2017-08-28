@@ -10,16 +10,28 @@
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
+import { Event } from 'models/event.model';
+import { toSearchParams, mapResponse } from 'utils/http-util';
+import { getTime } from 'utils/date-util';
 
 @Injectable()
 export class EventService {
 
+  decorateEvent(event: Event): Event {
+    return {
+      ...event,
+      id: getTime(event.timestamp)
+    };
+  }
+
   constructor(private http: Http) { }
 
-  getEvents(): Observable<any> {
+  getEvents(queryParams = {}): Observable<any> {
     // Beacon API requires start time to give the correct response.
     // Temporarily adding start time to events
-    return this.http.get('events?start=2017-01-01T00:00:00').map(r => r.json());
+    const search = toSearchParams(queryParams);
+    return mapResponse(this.http.get('events', { search: search }))
+      .map(response => ({...response, events: response.events.map(this.decorateEvent)}));
   }
 
   getNewEvents(): Observable<any> {

@@ -35,10 +35,11 @@ class StatusRoute @Inject()(val ws: WSClient,
 
   val logger = Logger(classOf[StatusRoute])
 
+
   def makeAmbariApiRequest(endpoint: String,
                            ambariResponse: AmbariForbiddenResponse,
                            timeout: Int,
-                           request: HttpRequest) = {
+                           request: HttpRequest, ip:String) = {
     // Step 3
     // check if there was a jwtProviderUrl
     ambariResponse.jwtProviderUrl
@@ -64,6 +65,7 @@ class StatusRoute @Inject()(val ws: WSClient,
               knoxDetected = true,
               404,
               Some(knoxUrl),
+              ip,
               Json.obj(),if (checkCredentials) true else false,if (!checkCredentials) true else false))
           case false =>
             val delegatedRequest =
@@ -92,12 +94,14 @@ class StatusRoute @Inject()(val ws: WSClient,
                                       knoxDetected = true,
                                       res.status,
                                       Some(knoxUrl),
+                                      ip,
                                       res.json)
                 case _ =>
                   AmbariCheckResponse(ambariApiCheck = false,
                                       knoxDetected = true,
                                       res.status,
                                       Some(knoxUrl),
+                                      ip,
                                       res.json)
               }
             }
@@ -122,12 +126,14 @@ class StatusRoute @Inject()(val ws: WSClient,
                                   knoxDetected = false,
                                   response.status,
                                   None,
+                                  ip,
                                   response.json)
             case _ =>
               AmbariCheckResponse(ambariApiCheck = false,
                                   knoxDetected = false,
                                   response.status,
                                   None,
+                                  ip,
                                   response.json)
           }
         }
@@ -163,10 +169,11 @@ class StatusRoute @Inject()(val ws: WSClient,
     for {
       ambariResponse <- initialRequest
       //Step 3
+      ip <- getAmbariUrl(ep.url)
       ambariApiResponse <- makeAmbariApiRequest(endpoint,
                                                 ambariResponse,
                                                 timeout,
-                                                request)
+                                                request,ip)
     } yield ambariApiResponse
 
   }
@@ -178,6 +185,23 @@ class StatusRoute @Inject()(val ws: WSClient,
         s"Attempt to access unauthenticated Ambari API's did not return the expected 403 response - $response")
     //Step 2
     response.json.validate[AmbariForbiddenResponse].get
+  }
+
+  import java.net.InetAddress
+  private def getAmbariUrlWithIp(url: String): Try[URL] = {
+    Try(new URL(url))
+      .map {
+        ambariUrl =>
+          val hostAddressIp = InetAddress.getByName(ambariUrl.getHost)
+          new URL(ambariUrl.getProtocol, hostAddressIp.getHostAddress, ambariUrl.getPort, ambariUrl.getFile)
+      }
+  }
+
+  private def getAmbariUrl(url: String) = {
+    getAmbariUrlWithIp(url) match {
+      case Success(url) => Future.successful(url.toString)
+      case Failure(f) => Future.failed(new Exception("Not a valid Url"))
+    }
   }
 
   val route =
