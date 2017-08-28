@@ -89,7 +89,7 @@ migrate_schema() {
         source $(pwd)/docker-database.sh
 
         # wait for database start
-        sleep 5
+        source $(pwd)/database-check.sh
     fi
 
     # start flyway container and trigger migrate script
@@ -102,7 +102,7 @@ reset_db() {
         source $(pwd)/docker-database.sh
 
         # wait for database start
-        sleep 5
+        source $(pwd)/database-check.sh
     fi
 
     # start flyway container and trigger migrate script
