@@ -66,6 +66,7 @@
               <div class="text-small-1 margin-top-10">
                 <span *ngIf="clusterDetails && clusterDetails.status === 'STARTED'"><i class="fa fa-circle fa-circle--color-up"></i>Running</span>
                 <span *ngIf="clusterDetails && clusterDetails.status === 'NOT STARTED'"><i class="fa fa-circle fa-circle--color-down"></i>Not Running</span>
+                <span *ngIf="clusterDetails && clusterDetails.status === 'SYNC_ERROR'"><i class="fa fa-circle fa-circle--color-down"></i>Not Reachable</span>
                 <span *ngIf="!clusterDetails || !clusterDetails.status || clusterDetails.status === 'NA'"><i class="fa fa-circle fa-circle--color-na"></i>NA</span>
               </div>
             </div>
@@ -114,11 +115,11 @@
               <div #rmHeapProgress class="mdl-progress mdl-js-progress dp-progress pull-left"></div>
               <div class="progress-percent">{{rmHeapPercent}}</div>
               <div class="placeholder"></div>
-              <div class="text-small-1 margin-top-0">{{clusterDetails.rmHeapUsed}}/{{clusterDetails.rmHeapTotal}}</div>
+              <div class="text-small-1 margin-top-0">{{clusterDetails.rmHeapUsed?clusterDetails.rmHeapUsed:'NA'}}/{{clusterDetails.rmHeapTotal?clusterDetails.rmHeapTotal:'NA'}}</div>
             </div>
             <div class="mdl-cell mdl-cell--4-col">
               <div class="text-dark-small-1">ResourceManager Uptime</div>
-              <div class="text-small-1 margin-top-10">{{clusterDetails.rmUptime}}</div>
+              <div class="text-small-1 margin-top-10">{{clusterDetails.rmUptime?clusterDetails.rmUptime:'NA'}}</div>
             </div>
           </div>
         </div>
