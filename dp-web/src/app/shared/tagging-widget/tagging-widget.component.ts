@@ -27,6 +27,7 @@ export class TaggingWidget implements AfterViewInit {
   @ViewChild('parent') parent: ElementRef;
 
   isValid = true;
+  blurTimeout: any = null;
 
   focusRowIndex: number = -1;
   private focusStickerIndex: number = -1; // this.tags.length;
@@ -89,7 +90,7 @@ export class TaggingWidget implements AfterViewInit {
 
   _SetCursorAtEnd() {
     const input = this.parent.nativeElement.querySelector('span.inputSpan input');
-    input.value = input.value;
+    input.value = input.value; //Triggering model change
   }
 
   _manageSelection() {
@@ -105,7 +106,8 @@ export class TaggingWidget implements AfterViewInit {
   }
 
   onClick() {
-    setTimeout(() => this.parent.nativeElement.querySelector('span.inputSpan input').focus(), 300);
+    this.blurTimeout && clearTimeout(this.blurTimeout);
+    this.parent.nativeElement.querySelector('span.inputSpan input').focus();
   }
 
   _manageFocus() {
@@ -129,7 +131,7 @@ export class TaggingWidget implements AfterViewInit {
   }
 
   onInputBlur() {
-    setTimeout(() => this.parent.nativeElement.classList.remove('focus'), 300);
+    this.blurTimeout = setTimeout(() => this.parent.nativeElement.classList.remove('focus'), 300);
   }
 
   focusOnSticker(i) {
