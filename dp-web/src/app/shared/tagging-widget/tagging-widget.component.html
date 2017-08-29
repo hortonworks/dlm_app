@@ -4,7 +4,7 @@
     <span class="remove"  *ngIf="allowTagDismissal">&nbsp;&nbsp;<i class="fa fa-times" (click)="focusOnSticker(i);removeFocusTag();"></i></span>
   </span>
   <span class="inputSpan">
-    <input #input (focus)="onInputFocus()" (blur)="onInputBlur()" [(ngModel)]="searchText" (ngModelChange)="onSearchTextChange($event)" placeholder="{{placeHolderText}}"/>
+    <input #input (focus)="onInputFocus()" (blur)="onInputBlur()" [(ngModel)]="searchText" autocomplete="off" (ngModelChange)="onSearchTextChange($event)" placeholder="{{placeHolderText}}"/>
     <div class="dropDown" [style.left.px]="input.offsetLeft">
       <div *ngFor="let tag of availableTags;let i=index;"
            [class.focus]="i==focusRowIndex"

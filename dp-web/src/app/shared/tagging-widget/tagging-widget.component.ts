@@ -27,6 +27,7 @@ export class TaggingWidget implements AfterViewInit {
   @ViewChild('parent') parent: ElementRef;
 
   isValid = true;
+  blurTimeout: any = null;
 
   focusRowIndex: number = -1;
   private focusStickerIndex: number = -1; // this.tags.length;
@@ -40,11 +41,7 @@ export class TaggingWidget implements AfterViewInit {
   onSearchTextChange(newValue) {
     this.searchText = newValue;
     this.searchTextEmitter.emit(this.searchText);
-    if(newValue && newValue.length && this.restrictFreeText){
-      this.isValid = false;
-    }else{
-      this.isValid = true;
-    }
+    this.isValid = !(newValue && newValue.length && this.restrictFreeText);
   }
 
   emitSearchText() {
@@ -59,7 +56,7 @@ export class TaggingWidget implements AfterViewInit {
   }
 
   onKeyDown(event) {
-    if ([13, 38, 40].indexOf(event.keyCode) === -1 && this.focusStickerIndex === this.tags.length && event.target.selectionStart){
+    if ([13, 38, 40].indexOf(event.keyCode) === -1 && this.focusStickerIndex === this.tags.length && event.target.selectionStart) {
       return;
     }
     switch (event.keyCode) {
@@ -93,7 +90,7 @@ export class TaggingWidget implements AfterViewInit {
 
   _SetCursorAtEnd() {
     const input = this.parent.nativeElement.querySelector('span.inputSpan input');
-    input.value = input.value;
+    input.value = input.value; //Triggering model change
   }
 
   _manageSelection() {
@@ -109,6 +106,7 @@ export class TaggingWidget implements AfterViewInit {
   }
 
   onClick() {
+    this.blurTimeout && clearTimeout(this.blurTimeout);
     this.parent.nativeElement.querySelector('span.inputSpan input').focus();
   }
 
@@ -133,8 +131,7 @@ export class TaggingWidget implements AfterViewInit {
   }
 
   onInputBlur() {
-    setTimeout(() => this.parent.nativeElement.classList.remove('focus'), 300);
-    // this.parent.nativeElement.classList.remove('focus')
+    this.blurTimeout = setTimeout(() => this.parent.nativeElement.classList.remove('focus'), 300);
   }
 
   focusOnSticker(i) {
