@@ -92,7 +92,7 @@ export class JobsTableComponent implements OnInit {
         headerClass: 'date-header'
       },
       {
-        prop: 'trackingInfo.timeTaken',
+        prop: 'duration',
         cellTemplate: this.runTimeTemplate,
         name: 'Runtime',
         cellClass: 'date-cell',

@@ -20,7 +20,7 @@
       "user": "beacon",
       "status": "FAILED",
       "startTime": "2017-07-31T16:53:52",
-      "endTime": "2017-07-31T17:01:25",
+      "endTime": "2017-07-31T17:11:25",
       "trackingInfo": "{\"jobId\":\"job_1501190983539_0016\",\"jobType\":\"MAIN\",\"totalMapTasks\":0,\"completedMapTasks\":0,\"bytesCopied\":0,\"filesCopied\":0,\"timeTaken\":211}",
       "message": "java.io.IOException: DistCp failure: Job job_1501190983539_0016 has failed: Task failed task_1501190983539_0016_m_000000\nJob failed as tasks failed. failedMaps:1 failedReduces:0\n"
     }]
