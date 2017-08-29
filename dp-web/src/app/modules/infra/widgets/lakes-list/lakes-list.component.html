@@ -47,9 +47,6 @@
             <dp-config-sorter [type]="'duration'" [sortBy]="'uptime'"> {{"pages.infra.labels.uptime" | translate}} </dp-config-sorter>
         </th>
         <th class="mdl-data-table__cell--non-numeric">
-            <dp-config-sorter [sortBy]="'services'"> {{"common.services" | translate}} </dp-config-sorter>
-        </th>
-        <th class="mdl-data-table__cell--non-numeric">
             <dp-config-sorter [type]="'number'" [sortBy]="'hdfsUsedInBytes'"> {{"pages.infra.labels.hdfsUsed" | translate}} </dp-config-sorter>
         </th>
         <th class="mdl-data-table__cell--non-numeric actions"></th>
@@ -66,7 +63,6 @@
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.dataCenter}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.nodes}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.uptimeStr}}</td>
-          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.services}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.hdfsUsed}}/{{lakeInfo.hdfsTotal}}</td>
           <td class="mdl-data-table__cell--non-numeric actions">
                 <button [attr.id]="'dropDown_'+lakeInfo.id" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
@@ -79,7 +75,7 @@
           </td>
       </tr>
       <tr *ngIf="lakesList.length === 0">
-          <td class="mdl-typography--text-center" colspan="9" >{{"pages.infra.labels.emptySearchResult" | translate}}</td>
+          <td class="mdl-typography--text-center" colspan="8" >{{"pages.infra.labels.emptyClusters" | translate}}</td>
       </tr>
       </tbody>
   </table>

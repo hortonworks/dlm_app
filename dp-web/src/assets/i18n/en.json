@@ -165,7 +165,7 @@
         "clusterAddSuccess": "Cluster Added successfully",
         "connectionFailed": "Unable to connect, please retry",
         "clusterAddError": "Failed to Add Cluster",
-        "emptySearchResult": "There are no clusters that match your search.",
+        "emptyClusters": "No Clusters.",
         "addUser": "ADD USER",
         "addGroup": "ADD GROUP",
         "username": "Username",
