@@ -63,8 +63,7 @@
           </ng-template>
         </li>
         <li class="mainmenu-li">
-          <!-- @todo replace with a real url -->
-          <a href="http://docs.hortonworks.com/" qe-attr="go-to-help" target="_blank"
+          <a [href]="'help_url' | translate" qe-attr="go-to-help" target="_blank"
              (click)="restoreActiveItems()" [tooltip]="isCollapsed ? ('sidenav.menuItem.help' | translate) : ''" [placement]="'right'">
             <span class="navigation-icon fa fa-info-circle"></span>
             <span class="navigation-menu-item">{{'sidenav.menuItem.help' | translate}}</span>
