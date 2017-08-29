@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 private[sync] object TaskType extends Enumeration {
   type TaskType = Value
-  val HostInfo, Atlas, Ranger, Knox, NameNode, Beacon, Hdfs, Hive = Value
+  val HostInfo, Atlas, Ranger, DpProfiler, Knox, NameNode, Beacon, Hdfs, Hive = Value
 }
 
 private[sync] object TaskStatus extends Enumeration {
@@ -122,6 +122,7 @@ class ClusterSynchronizer(private val config: Config,
     map.put(TaskType.Hdfs,context.actorOf(Props(classOf[FetchHdfsTask],clusterData,config,wSClient,storageInterface,self)))
     map.put(TaskType.Hive,context.actorOf(Props(classOf[FetchHiveTask],clusterData,config,wSClient,storageInterface,self)))
     map.put(TaskType.Ranger,context.actorOf(Props(classOf[FetchRangerTask],clusterData,config,wSClient,storageInterface,self)))
+    map.put(TaskType.DpProfiler,context.actorOf(Props(classOf[FetchDpProfilerTask],clusterData,config,wSClient,storageInterface,self)))
     map.toMap
   }
 

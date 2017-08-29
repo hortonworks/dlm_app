@@ -144,7 +144,7 @@ class ClusterServices @Inject()(
       .recoverWith(apiError)
   }
 
-  def getServiceEndpoints(serviceId: Long) = Action.async {
+  def   getServiceEndpoints(serviceId: Long) = Action.async {
     cse
       .allByService(serviceId)
       .map(cs => cs match {

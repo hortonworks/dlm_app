@@ -22,6 +22,9 @@ private[dataplane] case class Atlas(properties: String)
 private[dataplane] case class Ranger(serviceHost: Seq[ServiceHost] = Seq(),
                                      props: Option[JsValue])
 
+private[dataplane] case class DpProfiler(serviceHost: Seq[ServiceHost] = Seq(),
+                                     props: Option[JsValue])
+
 private[dataplane] case class NameNode(serviceHost: Seq[ServiceHost] = Seq(),
                                        props: Option[JsValue])
 
@@ -72,6 +75,9 @@ trait AmbariInterfaceV2 {
 
   def getRanger(
       implicit hJwtToken: Option[HJwtToken]): Future[Either[Throwable, Ranger]]
+
+  def getDpProfiler(
+                 implicit hJwtToken: Option[HJwtToken]): Future[Either[Throwable, DpProfiler]]
 
   def getBeacon(implicit hJwtToken: Option[HJwtToken])
     : Future[Either[Throwable, BeaconInfo]]

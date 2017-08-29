@@ -99,6 +99,14 @@ class Module extends AbstractModule {
     new RangerServiceImpl(configuration.underlying)
   }
 
+  @Provides
+  @Singleton
+  @Named("dpProfilerService")
+  def provideDpProfilerService(implicit ws: WSClient, configuration: Configuration): com.hortonworks.dataplane.cs.Webservice.DpProfilerService = {
+    implicit val wSClient = ClusterWsClient(ws)
+    new DpProfilerServiceImpl(configuration.underlying)
+  }
+
 
   @Provides
   @Singleton

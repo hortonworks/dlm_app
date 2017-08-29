@@ -72,6 +72,11 @@ GET           /api/assets/lineage/:clusterId/:atlasGuid              controllers
 GET           /api/ranger/audit/:clusterId/:dbName/:tableName        controllers.RangerAttributes.getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String ?= "0", limit:String ?= "20", accessType:String ?="", accessResult:String ?="")
 GET           /api/ranger/policy/:clusterId/:dbName/:tableName        controllers.RangerAttributes.getPolicyDetails(clusterId: String, dbName: String, tableName: String, offset: String ?= "0", limit:String ?= "20")
 
+#DpProfiler
+POST          /api/dpProfiler/startJob                                controllers.DpProfilerAttributes.startProfilerJob(clusterId: String, dbName: String, tableName: String)
+GET           /api/dpProfiler/jobStatus                               controllers.DpProfilerAttributes.getProfilerJobStatus(clusterId: String, dbName: String, tableName: String)
+
+
 #LDAP
 POST          /api/knox/validate                                     controllers.KnoxConfig.validate
 POST          /api/knox/configure                                    controllers.KnoxConfig.configure
