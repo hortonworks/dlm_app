@@ -16,9 +16,7 @@ import scala.concurrent.Future
 class ClusterServiceImpl(config: Config)(implicit ws: WSClient)
     extends ClusterService {
 
-  private def url =
-    Option(System.getProperty("dp.services.db.service.uri"))
-      .getOrElse(config.getString("dp.services.db.service.uri"))
+  private def url = config.getString("dp.services.db.service.uri")
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 

@@ -21,10 +21,7 @@ class AmbariService @Inject()(
 
   import com.hortonworks.dataplane.commons.domain.Ambari._
 
-  private def clusterService =
-    Option(System.getProperty("dp.services.cluster.service.uri"))
-      .getOrElse(
-        configuration.underlying.getString("dp.services.cluster.service.uri"))
+  private def clusterService = configuration.underlying.getString("dp.services.cluster.service.uri")
 
   def statusCheck(ambariEndpoint: AmbariEndpoint)(implicit hJwtToken: Option[HJwtToken]): Future[Either[Errors,AmbariCheckResponse]] = {
     ambariWebService.checkAmbariStatus(ambariEndpoint)

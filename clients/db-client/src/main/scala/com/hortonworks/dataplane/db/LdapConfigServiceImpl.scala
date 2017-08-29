@@ -13,8 +13,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 @Singleton
 class LdapConfigServiceImpl(config: Config)(implicit ws: WSClient)
     extends LdapConfigService {
-  private val serviceUri=Option(System.getProperty("dp.services.db.service.uri"))
-    .getOrElse(config.getString("dp.services.db.service.uri"))
+  private val serviceUri= config.getString("dp.services.db.service.uri")
   override def create(ldapConfig: LdapConfiguration)
     : Future[Either[Errors, LdapConfiguration]] = {
     ws.url(s"$serviceUri/ldapconfig")

@@ -14,9 +14,7 @@ import scala.concurrent.Future
 class DataAssetServiceImpl(config: Config)(implicit ws: WSClient)
   extends DataAssetService {
 
-  private def url =
-    Option(System.getProperty("dp.services.db.service.uri"))
-      .getOrElse(config.getString("dp.services.db.service.uri"))
+  private def url = config.getString("dp.services.db.service.uri")
 
   override def findManagedAssets(clusterId:Long, assets: Seq[String]): Future[Either[Errors, Seq[EntityDatasetRelationship]]] = {
     ws.url(s"$url/dataassets/managedresults?clusterId=$clusterId")
