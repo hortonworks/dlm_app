@@ -28,6 +28,8 @@ GET           /api/clusters                                          controllers
 POST          /api/clusters/details                                  controllers.Clusters.getDetails
 GET           /api/clusters/:clusterId/health                        controllers.Clusters.getHealth(clusterId: Long, summary: Option[Boolean])
 GET           /api/clusters/:clusterId/rmhealth                      controllers.Clusters.getResourceManagerHealth(clusterId: Long)
+GET           /api/clusters/:clusterId/dnhealth                      controllers.Clusters.getDataNodeHealth(clusterId: Long)
+
 GET           /api/actions/clusters                                  controllers.actions.DpClusterActions.listWithClusters(type: Option[String])
 POST          /api/clusters/sync/:dpClusterId                        controllers.Clusters.syncCluster(dpClusterId: Long)
 

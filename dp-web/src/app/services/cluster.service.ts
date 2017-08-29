@@ -64,6 +64,14 @@ export class ClusterService {
       .catch(HttpUtil.handleError);
   }
 
+  retrieveDataNodeHealth(clusterId: number) : Observable<any> {
+    const uri = `${this.uri}/${clusterId}/dnhealth`;
+    return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
   getClusterInfo(clusterDetailRequest:ClusterDetailRequest) :Observable<Cluster> {
     return this.http
       .post(`api/clusters/details`,clusterDetailRequest, new RequestOptions(HttpUtil.getHeaders()))

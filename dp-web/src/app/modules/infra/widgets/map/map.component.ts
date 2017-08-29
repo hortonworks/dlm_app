@@ -87,6 +87,7 @@ export class MapComponent implements OnChanges, OnInit {
     this.map = map;
     this.map.setZoom(mapDimensions.zoom);
     this.mapcontainer.nativeElement.querySelector('.leaflet-map-pane').style.height = `${parseInt(mapDimensions.height, 10) - 20}px`;
+    this.mapcontainer.nativeElement.querySelector('.leaflet-overlay-pane').style.height = `${parseInt(mapDimensions.height, 10) - 20}px`;
   }
 
   ngOnChanges(changes: SimpleChanges) {

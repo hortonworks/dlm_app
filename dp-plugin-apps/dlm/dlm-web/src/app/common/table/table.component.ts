@@ -74,8 +74,10 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   @Input() selectionType: any;
   @Input() loadingIndicator = true;
   @Input() externalSorting = false;
+  @Input() externalPaging = false;
   @Input() scrollbarV = false;
   @Input() scrollbarH = false;
+  @Input() count = 0;
   @Input() cssClasses = {
     sortAscending: 'caret',
     sortDescending: 'caret caret-up',

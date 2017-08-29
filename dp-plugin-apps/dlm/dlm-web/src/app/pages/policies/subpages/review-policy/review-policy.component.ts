@@ -136,7 +136,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     };
   }
 
-  formatDateValue(timeField) {
+  formatDateValue(timeField, timezone = true) {
     if (!timeField.date) {
       return null;
     }
@@ -145,7 +145,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     dateTime.hours(time.getHours());
     dateTime.minutes(time.getMinutes());
     dateTime.seconds(time.getSeconds());
-    return dateTime.tz(this.timeZone.defaultServerTimezone).format();
+    return timezone ? dateTime.tz(this.timeZone.defaultServerTimezone).format() : dateTime.format();
   }
 
   formatDateDisplay(timeField, timezone) {
@@ -156,7 +156,8 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     // (UTC-07:00 PDT) America / Dawson, Ensenada, Los Angeles, Santa Isabel, Tijuana, Vancouver, Whitehorse
     // Trim it to first 15 characters to extract (UTC-07:00 PDT)
     const trimmedTimezone = timezone.substring(0, 15);
-    return `${timeField.date} ${moment(timeField.time).format('HH:mm')} ${trimmedTimezone}`;
+    const formattedDateValue = this.formatDateValue(timeField, false);
+    return `${timeField.date} ${moment(formattedDateValue).format('HH:mm')} ${trimmedTimezone}`;
   }
 
   submitReview() {

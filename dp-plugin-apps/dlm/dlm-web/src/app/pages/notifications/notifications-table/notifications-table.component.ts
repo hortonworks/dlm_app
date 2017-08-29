@@ -16,6 +16,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { LogService } from 'services/log.service';
 import { LOG_EVENT_TYPE_MAP, EntityType } from 'constants/log.constant';
 import { getEventEntityName } from 'utils/event-utils';
+import { timestampComparator } from 'utils/table-util';
 
 @Component({
   selector: 'dlm-notifications-table',
@@ -68,7 +69,8 @@ export class NotificationsTableComponent implements OnInit {
         name: this.translateColumn('log'),
         cellClass: 'text-cell',
         headerClass: 'text-header',
-        cellTemplate: this.logTemplate
+        cellTemplate: this.logTemplate,
+        sortable: false
       },
       {
         prop: 'timestamp',
@@ -76,6 +78,7 @@ export class NotificationsTableComponent implements OnInit {
         name: this.translateColumn('created'),
         cellClass: 'text-cell',
         headerClass: 'text-header',
+        comparator: timestampComparator,
         maxWidth: 200
       }
     ];
@@ -91,4 +94,5 @@ export class NotificationsTableComponent implements OnInit {
   goToPolicy(event: Event) {
     this.router.navigate(['/policies'], {queryParams: {policy: this.getEntity(event)}});
   }
+
 }

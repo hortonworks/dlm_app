@@ -19,6 +19,7 @@ import {LocationService} from '../../../../services/location.service';
 import {StringUtils} from '../../../../shared/utils/stringUtils';
 import {NgForm} from '@angular/forms';
 import {ConfigDialogComponent} from '../../widgets/config-dialog/config-dialog.component';
+import {CustomError} from "../../../../models/custom-error";
 
 @Component({
   selector: 'dp-cluster-add',
@@ -139,8 +140,9 @@ export class ClusterAddComponent implements OnInit {
           this.applyErrorClass();
         }
       },
-      () => {
-        this.onError();
+      error => {
+        let err = JSON.parse(error._body).errors[0] as CustomError;
+        this.onError(err);
       }
     );
   }
@@ -182,7 +184,7 @@ export class ClusterAddComponent implements OnInit {
         this._clusterState.knoxUrl = clusterInfo[0].knoxUrl
       }
     }, (error) => {
-      this.onError();
+      this.onError(null);
     });
   }
 
@@ -193,11 +195,15 @@ export class ClusterAddComponent implements OnInit {
 
   }
 
-  private onError() {
+  private onError(err: CustomError) {
     this._isClusterValidateSuccessful = false;
     this._isClusterValidateInProgress = false;
     this.showError = true;
-    this.errorMessage = this.translateService.instant('pages.infra.description.connectionFailed');
+    if(!err){
+      this.errorMessage = this.translateService.instant('pages.infra.description.connectionFailed');
+    }else{
+      this.errorMessage = this.translateService.instant('pages.infra.description.backenderrors.'+err.errorType);
+    }
   }
 
   private extractClusterInfo(clusterInfo) {

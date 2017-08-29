@@ -51,6 +51,8 @@ object Webservice {
 
     def requestAmbariApi(clusterId: Long, ambariUrl: String, addClusterIdToResponse: Boolean = false)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsValue]]
 
+    def requestAmbariClusterApi(clusterId: Long, ambariUrl: String, addClusterIdToResponse: Boolean = false)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsValue]]
+
     def syncAmbari(dpCluster: DataplaneClusterIdentifier)(implicit token:Option[HJwtToken]):Future[Boolean]
 
     def checkAmbariStatus(endpoint:AmbariEndpoint)(implicit token:Option[HJwtToken]):Future[Either[Errors,AmbariCheckResponse]]

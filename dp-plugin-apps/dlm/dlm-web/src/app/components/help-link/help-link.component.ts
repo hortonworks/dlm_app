@@ -37,7 +37,7 @@ import { Component, Input } from '@angular/core';
     </span>
     <ng-template #asIcon>
       <i class="text-info actionable" [ngClass]="icon" *ngIf="iconHint" [tooltip]="iconHint | translate"
-      [tooltipPlacement]="placement"></i>
+      [placement]="placement"></i>
       <span *ngIf="iconLink">
         <a [href]="iconLink" [target]="'_blank'">
           <i class="text-info" [ngClass]="icon"></i>

@@ -68,7 +68,7 @@ export class UserService {
       .catch(HttpUtil.handleError);
   }
 
-  addUsers(users: string[], roles: string[]): Observable<any[]> {
+  addUsers(users: string[], roles: string[]): Observable<any> {
     return this.http
       .post(`${this.url}/addUsersWithRoles`, {users: users, roles: roles}, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)

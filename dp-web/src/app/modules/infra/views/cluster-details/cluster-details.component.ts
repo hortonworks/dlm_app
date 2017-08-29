@@ -13,7 +13,6 @@ import {StringUtils} from '../../../../shared/utils/stringUtils';
 import {IdentityService} from '../../../../services/identity.service';
 import {DateUtils} from '../../../../shared/utils/date-utils';
 import {Loader} from '../../../../shared/utils/loader';
-import {AuthUtils} from '../../../../shared/utils/auth-utils';
 
 @Component({
   selector: 'dp-cluster-details',
@@ -35,6 +34,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   cluster: any;
   clusterHealth: any;
   rmHealth: any;
+  dnHealth: any;
   clusterDetails: ClusterDetails = new ClusterDetails();
   location: Location = new Location();
   user: any;
@@ -74,14 +74,16 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
     this.clusterDetails = new ClusterDetails();
     this.clusterDetails.tags = tags;
     this.clusterDetails.dataCenter = this.lake.dcName;
-    this.user = AuthUtils.getUser();
+    this.identityService.getUserById(this.lake.createdBy).subscribe(user => {
+      this.user = user;
+    });
   }
 
   private getClusterDetails() {
     Loader.show();
     Observable.forkJoin(
       this.clusterService.listByLakeId({lakeId: this.lake.id}),
-      this.locationService.retrieve(this.lake.location)
+      this.locationService.retrieve(this.lake.location),
     ).subscribe(responses => {
       Loader.show();
       this.location = responses[1];
@@ -103,8 +105,13 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
           this.lake = lakeUpdated;
           this.getClusterHealth(this.cluster.id, this.lake.id);
         });
+
+        this.clusterService.retrieveDataNodeHealth(this.cluster.id).subscribe(dnHealth => {
+          this.dnHealth = dnHealth;
+          this.populateDataNodeHealth();
+        });
+        this.getRMHealth(this.cluster.id);
       });
-      this.getRMHealth(this.cluster.id);
     });
   }
 
@@ -220,6 +227,19 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       this.clusterDetails.rmHeapUsed = StringUtils.humanizeBytes(this.rmHealth.metrics.jvm.HeapMemoryUsed);
       this.clusterDetails.rmUptime = DateUtils.toReadableDate(new Date().getTime() - this.rmHealth.metrics.runtime.StartTime);
     }
+  }
+
+  private populateDataNodeHealth() {
+    if (
+      this.dnHealth &&
+      this.dnHealth.ServiceComponentInfo &&
+      this.dnHealth.ServiceComponentInfo.started_count !== undefined &&
+      this.dnHealth.ServiceComponentInfo.total_count !== undefined
+    ) {
+      this.clusterDetails.healthyDataNodes = this.dnHealth.ServiceComponentInfo.started_count;
+      this.clusterDetails.unhealthyDataNodes = this.dnHealth.ServiceComponentInfo.total_count - this.dnHealth.ServiceComponentInfo.started_count;
+    }
+
   }
 
   goToClusters() {

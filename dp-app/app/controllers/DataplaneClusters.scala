@@ -136,8 +136,7 @@ class DataplaneClusters @Inject()(
       .statusCheck(AmbariEndpoint(request.getQueryString("url").get))
       .flatMap {
         case Left(errors) =>
-          Future.successful(InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}")))
+          Future.successful(InternalServerError(Json.toJson(errors)))
         case Right(checkResponse) =>{
           dpClusterService.checkExistenceByIp(checkResponse.ambariIpAddress).map{
             case Left(errors) => InternalServerError(

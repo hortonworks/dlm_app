@@ -18,6 +18,7 @@ import * as moment from 'moment';
 import * as fromRoot from 'reducers/';
 import { Event } from 'models/event.model';
 import { JOB_EVENT, POLICY_EVENT } from 'constants/event.constant';
+import { loadEvents } from 'actions/event.action';
 import { ProgressState } from 'models/progress-state.model';
 import { updateProgressState } from 'actions/progress.action';
 import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
@@ -39,7 +40,7 @@ import { ClustersStatus, PoliciesStatus, JobsStatus } from 'models/aggregations.
 import { filterCollection, flatten, unique } from 'utils/array-util';
 import { isEqual, isEmpty } from 'utils/object-utils';
 import { getEventEntityName } from 'utils/event-utils';
-import { POLL_INTERVAL } from 'constants/api.constant';
+import { POLL_INTERVAL, ALL_POLICIES_COUNT } from 'constants/api.constant';
 import { getClustersHealth, getPoliciesHealth, getJobsHealth } from 'selectors/aggregation.selector';
 import { SUMMARY_PANELS, CLUSTERS_HEALTH_STATE, JOBS_HEALTH_STATE } from './resource-summary/';
 import { CLUSTER_STATUS, SERVICE_STATUS } from 'constants/status.constant';
@@ -176,7 +177,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
       .withLatestFrom(this.fullfilledClusters$)
       .do(([_, clusters]) => {
         [
-          loadPolicies(),
+          loadPolicies({numResults: ALL_POLICIES_COUNT}),
           loadClusters()
         ].map(action => this.store.dispatch(action));
       });
@@ -239,9 +240,13 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     [
-      loadPolicies(POLICIES_REQUEST),
+      loadPolicies({numResults: ALL_POLICIES_COUNT}, {requestId: POLICIES_REQUEST}),
       loadClusters(CLUSTERS_REQUEST),
-      loadPairings()
+      loadPairings(),
+      // todo: this is workaround to get all events for recent issues.
+      // for recent issues we don't need events with severity INFO, but Beacon API doesn't support filtering
+      // so we need to load "all" events initialy
+      loadEvents({numResults: 1000})
     ].map(action => this.store.dispatch(action));
     const overallProgressSubscription = this.completedRequest$(this.overallProgress$)
       .take(1)

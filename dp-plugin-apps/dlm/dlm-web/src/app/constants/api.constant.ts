@@ -9,3 +9,6 @@
 
 export const API_PREFIX = '/dlm/api/';
 export const POLL_INTERVAL = 8000;
+// this is default value to get all policies within single request
+// todo: remove this with server side pagination
+export const ALL_POLICIES_COUNT = 200;
