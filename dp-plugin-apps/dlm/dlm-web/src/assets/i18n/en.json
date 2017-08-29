@@ -307,7 +307,8 @@
           "title": "HDFS Remaining Capacity",
           "columns": {
             "cluster_name": "Cluster",
-            "capacity": "Remaining Capacity"
+            "remaining_capacity": "Remaining Capacity",
+            "total_capacity": "Total Capacity"
           }
         },
         "unhealthy_policy": {
