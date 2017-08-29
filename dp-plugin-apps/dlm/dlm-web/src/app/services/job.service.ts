@@ -10,6 +10,8 @@
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
+import * as moment from 'moment';
+
 import { Policy } from 'models/policy.model';
 import { mapResponse } from 'utils/http-util';
 import { JOB_STATUS } from 'constants/status.constant';
@@ -24,13 +26,14 @@ export class JobService {
   }
 
   normalizeJob(job): Job {
+    const duration = moment(job.endTime).diff(moment(job.startTime));
+    job.duration = duration > 0 ? duration : -1;
     job.isCompleted = job.status !== JOB_STATUS.RUNNING;
     try {
       job.trackingInfo = <JobTrackingInfo>JSON.parse(job.trackingInfo);
     } catch (e) {
       job.trackingInfo = {};
     }
-    job.duration = job.trackingInfo.timeTaken;
     return job;
   }
 
