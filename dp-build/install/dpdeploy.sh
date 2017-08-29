@@ -9,10 +9,11 @@ DEFAULT_VERSION=0.0.1-latest
 KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
 CLUSTER_SERVICE_CONTAINER="dp-cluster-service"
+DB_CONTAINER="dp-database"
 APP_CONTAINERS_WITHOUT_DB="dp-app dp-db-service $CLUSTER_SERVICE_CONTAINER dp-gateway"
 APP_CONTAINERS=$APP_CONTAINERS_WITHOUT_DB
 if [ "$USE_EXT_DB" == "no" ]; then
-    APP_CONTAINERS="dp-database $APP_CONTAINERS"
+    APP_CONTAINERS="$DB_CONTAINER $APP_CONTAINERS"
 fi
 KNOX_CONTAINER="knox"
 CONSUL_CONTAINER="dp-consul-server"
@@ -117,6 +118,18 @@ utils_add_host() {
     else
         add_host_entry "$@"
     fi
+}
+
+utils_update_secrets() {
+    if [ "$USE_EXT_DB" == "no" ]; then
+        IS_DB_UP=$(docker inspect -f {{.State.Running}} $DB_CONTAINER) || echo "DB container is not running."
+        if [ "$IS_DB_UP" != "true" ]; then
+            echo "Ambari secrets can not be initialized with DB container down. Please run 'init db' and 'migrate' first."
+            exit -1
+        fi
+    fi
+    
+    source $(pwd)/secrets-manage.sh
 }
 
 add_host_entry() {
@@ -383,6 +396,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
+    printf "%-${tabspace}s:%s\n" "utils update-secrets" "Initialize ambari user secrets for the first time"
     printf "%-${tabspace}s:%s\n" "utils add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
     printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
     printf "%-${tabspace}s:%s\n" "start knox" "Start the Knox and Consul containers"
@@ -421,6 +435,9 @@ else
                 app)
                     init_app
                     ;;
+                secrets)
+                    init_secrets
+                    ;;
                 --all)
                     init_all
                     ;;
@@ -438,6 +455,10 @@ else
                 add-host)
                     shift
                     utils_add_host "$@"
+                    ;;
+                update-secrets)
+                    shift
+                    utils_update_secrets
                     ;;
                 *)
                     echo "Unknown option"
