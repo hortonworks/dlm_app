@@ -34,6 +34,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   cluster: any;
   clusterHealth: any;
   rmHealth: any;
+  dnHealth: any;
   clusterDetails: ClusterDetails = new ClusterDetails();
   location: Location = new Location();
   user: any;
@@ -65,6 +66,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
             this.location = clusterInfo.location;
             this.user = clusterInfo.user;
             this.rmHealth = clusterInfo.rmhealth;
+            this.dnHealth = clusterInfo.dnHealth;
             this.clusterDetails = this.getClusterDetails();
             this.processProgressbarInfo();
             Loader.hide();
@@ -152,6 +154,16 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       clusterDetails.rmHeapUsed = StringUtils.humanizeBytes(this.rmHealth.metrics.jvm.HeapMemoryUsed);
       clusterDetails.rmUptime = DateUtils.toReadableDate(new Date().getTime() - this.rmHealth.metrics.runtime.StartTime);
     }
+
+    if(
+      this.dnHealth &&
+      this.dnHealth.ServiceComponentInfo &&
+      this.dnHealth.ServiceComponentInfo.started_count !== undefined &&
+      this.dnHealth.ServiceComponentInfo.total_count !== undefined
+    ) {
+      clusterDetails.healthyDataNodes = this.dnHealth.ServiceComponentInfo.started_count;
+      clusterDetails.unhealthyDataNodes = this.dnHealth.ServiceComponentInfo.total_count - this.dnHealth.ServiceComponentInfo.started_count;
+    }
     return clusterDetails;
   }
 
@@ -160,15 +172,10 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       this.locationService.retrieve(lake.location).map((res) => res),
       this.clusterService.retrieveDetailedHealth(clusterId, lake.id).map((res) => res),
       this.identityService.getUserById(userId).map((res) => res),
-      this.clusterService.retrieveResourceMangerHealth(clusterId).map(res => res)
-    ).map(response => {
-      return {
-        location: response[0],
-        health: response[1],
-        user: response[2],
-        rmhealth: response[3]
-      };
-    });
+      this.clusterService.retrieveResourceMangerHealth(clusterId).map(res => res),
+      this.clusterService.retrieveDataNodeHealth(clusterId).map(res => res),
+      (location, health, user, rmhealth, dnHealth) => ({location, health, user, rmhealth, dnHealth}),
+    );
   }
 
   goToClusters() {
