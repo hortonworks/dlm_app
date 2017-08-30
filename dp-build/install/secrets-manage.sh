@@ -44,9 +44,9 @@ add_secret() {
 
 AMBARI_ALIAS="dp.ambari.superuser"
 if [ -z "$AMBARI_USERNAME" ] || [ -z "$AMBARI_PASSWORD" ]; then
-    echo "Please enter username of a user which has access rights on all Ambari clusters:"
+    echo "Enter an Ambari username that Dataplane will use to connect to clusters:"
     read AMBARI_USERNAME
-    echo "Please enter password for the user:"
+    echo "Enter password for the user:"
     read -s AMBARI_PASSWORD
 fi
 add_secret "$AMBARI_ALIAS" "$AMBARI_USERNAME" "$AMBARI_PASSWORD"
