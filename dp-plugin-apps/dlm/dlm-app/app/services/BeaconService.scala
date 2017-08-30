@@ -426,7 +426,7 @@ class BeaconService @Inject()(
         val beaconClusters = beaconCluster.clusters
         val allPoliciesFuture: Future[Seq[Either[BeaconApiErrors, Seq[PolicyDetailsData]]]] =
           Future.sequence(beaconClusters.map((x) => beaconPolicyService.listPolicies(
-            x.beaconUrl, x.id)))
+            x.beaconUrl, x.id, queryStringPaginated)))
 
         for {
           allPoliciesOption <- allPoliciesFuture
