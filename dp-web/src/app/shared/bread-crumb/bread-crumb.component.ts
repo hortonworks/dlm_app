@@ -43,13 +43,13 @@ export class BreadCrumbComponent {
     } else if (url.match(/analytics\/workspace\/(.*)\/assets/)) {
       let matchArray = url.match(/analytics\/workspace\/(.*)\/assets/);
       let workSpaceName = matchArray[1];
-      this.crumbNamesToURLMap['DataSet' + ' - ' + workSpaceName] = 'analytics/workspace';
+      this.crumbNamesToURLMap['Asset Collection' + ' - ' + workSpaceName] = 'analytics/workspace';
       this.crumbNamesToURLMap['Assets'] = '';
     }
   }
 
   createDataStewardCrumbs(url: string) {
-    this.crumbNamesToURLMap['DataSet'] = 'datasteward/dataset/';
+    this.crumbNamesToURLMap['Asset Collection'] = 'datasteward/dataset/';
 
     if (url.startsWith('datasteward/dataset/full-view')) {
       this.crumbNamesToURLMap['Details'] = '';
