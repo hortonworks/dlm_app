@@ -120,7 +120,27 @@ utils_add_host() {
     fi
 }
 
-utils_update_secrets() {
+add_host_entry() {
+    IS_CLUSTER_SERVICE_UP=$(docker inspect -f {{.State.Running}} $CLUSTER_SERVICE_CONTAINER) || echo "'$CLUSTER_SERVICE_CONTAINER' container needs to be up for this operation."
+    if [ "$IS_CLUSTER_SERVICE_UP" != "true" ]; then
+        return -1
+    else
+        docker exec -t "$CLUSTER_SERVICE_CONTAINER" /bin/bash -c "echo $1 $2 >> /etc/hosts"
+        echo "Successfully appended to '/etc/hosts'."
+    fi
+}
+
+utils_update_user_secret() {
+    if [ $1 -ne "ambari" ]; then
+        echo "Invalid arguments."
+        echo "Usage: dpdeploy.sh utils update-user ambari"
+        return -1
+    else
+        update_user_entry "$@"
+    fi
+}
+
+update_user_entry() {
     if [ "$USE_EXT_DB" == "no" ]; then
         IS_DB_UP=$(docker inspect -f {{.State.Running}} $DB_CONTAINER) || echo "DB container is not running."
         if [ "$IS_DB_UP" != "true" ]; then
@@ -130,16 +150,6 @@ utils_update_secrets() {
     fi
     
     source $(pwd)/secrets-manage.sh
-}
-
-add_host_entry() {
-    IS_CLUSTER_SERVICE_UP=$(docker inspect -f {{.State.Running}} $CLUSTER_SERVICE_CONTAINER) || echo "'$CLUSTER_SERVICE_CONTAINER' container needs to be up for this operation."
-    if [ "$IS_CLUSTER_SERVICE_UP" != "true" ]; then
-        return -1
-    else
-        docker exec -t "$CLUSTER_SERVICE_CONTAINER" /bin/bash -c "echo $1 $2 >> /etc/hosts"
-        echo "Successfully appended to '/etc/hosts'."
-    fi
 }
 
 destroy() {
@@ -396,7 +406,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
-    printf "%-${tabspace}s:%s\n" "utils update-secrets" "Update ambari user secrets in the database"
+    printf "%-${tabspace}s:%s\n" "utils update-user ambari" "Update ambari user secrets in the database"
     printf "%-${tabspace}s:%s\n" "utils add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
     printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
     printf "%-${tabspace}s:%s\n" "start knox" "Start the Knox and Consul containers"
@@ -435,9 +445,6 @@ else
                 app)
                     init_app
                     ;;
-                secrets)
-                    init_secrets
-                    ;;
                 --all)
                     init_all
                     ;;
@@ -456,9 +463,9 @@ else
                     shift
                     utils_add_host "$@"
                     ;;
-                update-secrets)
+                update-user)
                     shift
-                    utils_update_secrets
+                    utils_update_user_secret
                     ;;
                 *)
                     echo "Unknown option"
