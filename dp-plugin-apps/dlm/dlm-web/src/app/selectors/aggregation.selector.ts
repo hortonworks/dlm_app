@@ -38,7 +38,7 @@ export const getClustersHealth = createSelector(
     healthy,
     unhealthy,
     warning,
-    total: healthy + unhealthy + warning
+    total: healthy + unhealthy
   };
 });
 

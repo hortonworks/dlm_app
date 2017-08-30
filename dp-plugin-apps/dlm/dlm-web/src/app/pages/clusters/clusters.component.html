@@ -15,7 +15,7 @@
 <dlm-beacon-validity></dlm-beacon-validity>
 <div class="row">
   <div class="col-md-12">
-    <dp-map *ngIf="(clustersMapData$ | async).length"
+    <dp-map *ngIf="(clustersMapData$ | async)?.length"
             (clickMarker)="handleClickMarker($event)"
             [mapSize]="mapSize"
             [mapData]="clustersMapData$ | async">

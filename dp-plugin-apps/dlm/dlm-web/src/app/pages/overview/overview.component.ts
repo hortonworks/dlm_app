@@ -336,4 +336,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
   goToPolicy(event: Event) {
     this.router.navigate(['/policies'], {queryParams: {policy: getEventEntityName(event)}});
   }
+
+  getPercentageRemaining(cluster: Cluster): string {
+    return Math.floor((Number(cluster.stats.CapacityRemaining) / Number(cluster.stats.CapacityTotal)) * 100) + '%';
+  }
 }

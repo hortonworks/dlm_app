@@ -8,8 +8,8 @@
       "ambariurl": "http://104.196.80.178:8080/api/v1/clusters/c2",
       "stats": {
         "CapacityTotal": 9129444352,
-        "CapacityUsed": 564879360,
-        "CapacityRemaining": 3856367616
+        "CapacityUsed": 8399088804,
+        "CapacityRemaining": 730355548
       },
       "location": {
         "id": 3431161,
