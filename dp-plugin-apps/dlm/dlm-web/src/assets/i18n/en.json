@@ -95,7 +95,9 @@
     "status": {
       "self": "Status",
       "failed": "Failed",
-      "in_progress": "In Progress"
+      "in_progress": "In Progress",
+      "active": "Active",
+      "suspended": "Suspended"
     },
     "warnings": {
       "beacon_unavailable": "Data presented may not be complete due to Beacon service outage on clusters {{clusters}}."

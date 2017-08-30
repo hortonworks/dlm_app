@@ -80,7 +80,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
     {multiple: false, propertyName: 'targetClusterResource.name', filterTitle: 'Destination Cluster'},
     {multiple: true, propertyName: 'sourceClusterResource.dataCenter', filterTitle: 'Source Datacenter'},
     {multiple: false, propertyName: 'targetClusterResource.dataCenter', filterTitle: 'Destination Datacenter'},
-    {multiple: true, propertyName: 'status'},
+    {multiple: true, propertyName: 'displayStatus', filterTitle: 'Status'},
     {multiple: true, propertyName: 'name'}
   ];
   initialFilters: {propertyName: string, value: string []} [];
