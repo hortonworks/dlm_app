@@ -107,7 +107,7 @@ export class DlmComponent implements OnDestroy, OnInit {
       new MenuItem(
         t.instant('sidenav.menuItem.clusters'),
         './clusters',
-        'navigation-icon fa fa-globe',
+        'navigation-icon fa fa-cubes',
         'go-to-clusters'
       ),
       new MenuItem(
@@ -119,7 +119,7 @@ export class DlmComponent implements OnDestroy, OnInit {
       new MenuItem(
         t.instant('sidenav.menuItem.policies'),
         './policies',
-        'navigation-icon fa fa-th-list',
+        'navigation-icon fa fa-list-alt',
         'go-to-policies'
       )
     ];
