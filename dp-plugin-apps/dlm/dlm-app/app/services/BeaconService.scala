@@ -202,8 +202,7 @@ class BeaconService @Inject()(
                   clusterToBePairedDetails.dpCluster.description,
                   local,
                   clusterToBePairedDetails.pairedClusterRequest.beaconUrl,
-                  nnService.serviceProperties("fsEndpoint").get,
-                  nnService.serviceProperties("nnKerberosPrincipal"),
+                  nnService.serviceProperties,
                   hiveServerConfigDetails("hsEndpoint"),
                   hiveServerConfigDetails("hsKerberosPrincipal")
                 )
