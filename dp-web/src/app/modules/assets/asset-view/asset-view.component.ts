@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, RouterModule, Routes} from '@angular/router';
 
@@ -74,9 +85,9 @@ export class AssetViewComponent implements OnInit {
                            break;
       }
     },
-    err => 
+    err =>
         ((err.status === 404) && (this.profilerStatus = this.PS.NOTSTARTED))
-      ||((err.status === 405) && (this.profilerStatus = this.PS.NOSUPPORT))  
+      ||((err.status === 405) && (this.profilerStatus = this.PS.NOSUPPORT))
     );
   }
 

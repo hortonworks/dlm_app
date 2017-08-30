@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {EventEmitter}     from '@angular/core';
 
 export enum DialogType {
@@ -22,7 +33,7 @@ export class DialogBox {
                     <div class="spacer-15"> </div>
                     <div class="hwx-desc">` + message +` </div>
                     <div class="mdl-dialog__actions">
-                      <button type="button" class="mdl-button btn-hwx-primary">OK</button>` 
+                      <button type="button" class="mdl-button btn-hwx-primary">OK</button>`
                       + DialogBox.getCancelButton(type) +
                     `</div>
                 </dialog>`;
