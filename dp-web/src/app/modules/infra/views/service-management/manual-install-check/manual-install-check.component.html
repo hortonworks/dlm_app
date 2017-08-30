@@ -17,6 +17,7 @@
         <i class="fa fa-times-circle"></i>{{(("common.serviceNameMappings."+service | translate) !== "common.serviceNameMappings."+service)? ("common.serviceNameMappings."+service | translate) : service}}
       </div>
     </div>
+    <div class="hwx-desc">{{"pages.services.description.installDependentService"| translate}}</div>
     <div class="spacer-15"></div>
     <div class="hwx-subtitle">
       {{"pages.services.labels.installationSteps" | translate}}
@@ -24,8 +25,9 @@
         <a href="{{'pages.services.labels.installationStepsDoc'| translate}}">{{'pages.services.labels.installationLink'| translate}}</a>
       </div>
     </div>
+    <div class="hwx-desc">{{"pages.services.description.verifyDependency"| translate}}</div>
     <div class="spacer-15"></div>
-<input type="checkbox" class="margin-0" name="verify-services" [(ngModel)]="verificationChecked" (change)="verify()"/> <span [innerHTML]="'pages.services.description.installationConfirmation'|translate: clusterNameParams"></span>
+    <input type="checkbox" class="margin-0" name="verify-services" [(ngModel)]="verificationChecked" (change)="verify()"/> <span [innerHTML]="'pages.services.description.installationConfirmation'|translate: clusterNameParams"></span>
     <div class="status-panel">
       <div class="spacer-15"></div>
       <div *ngIf="checkInProgress" class="hwx-desc">
