@@ -131,7 +131,7 @@ add_host_entry() {
 }
 
 utils_update_user_secret() {
-    if [ $1 -ne "ambari" ]; then
+    if [ $# -ne 1 ] || [ "$1" != "ambari" ]; then
         echo "Invalid arguments."
         echo "Usage: dpdeploy.sh utils update-user ambari"
         return -1
@@ -465,7 +465,7 @@ else
                     ;;
                 update-user)
                     shift
-                    utils_update_user_secret
+                    utils_update_user_secret "$@"
                     ;;
                 *)
                     echo "Unknown option"
