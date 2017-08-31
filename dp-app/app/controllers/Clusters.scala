@@ -36,7 +36,7 @@ class Clusters @Inject()(
                           authenticated: Authenticated,
                           ambariService: AmbariService,
                           @Named("clusterAmbariService") ambariWebService: AmbariWebService,
-                          configuration: play.api.Configuration
+                          implicit val configuration: play.api.Configuration
                         ) extends Controller {
 
   def list(dpClusterId: Option[Long]) = authenticated.async {
@@ -113,7 +113,18 @@ class Clusters @Inject()(
             case Left(errors) =>
               InternalServerError(JsonResponses.statusError(
                 s"Failed with ${Json.toJson(errors)}"))
-            case Right(clusterDetails) => Ok(Json.toJson(clusterDetails))
+            case Right(clusterDetails) =>{
+              val dssServices = getModuleDependentService("dss").getOrElse("").split(",")
+              val dlmServices = getModuleDependentService("dlm").getOrElse("").split(",")
+              val allDependentServices = dssServices.union(dlmServices).distinct
+              val newClusterDetails = clusterDetails.map{ clDetails =>
+                val availableRequiredServices = allDependentServices.intersect(clDetails.services)
+                val otherServices = clDetails.services.diff(availableRequiredServices)
+                val allAvailableServices = availableRequiredServices.union(otherServices)
+                AmbariCluster(clDetails.security,clDetails.clusterName,allAvailableServices,clDetails.knoxUrl)
+              }
+              Ok(Json.toJson(newClusterDetails))
+            }
           }
 
       }

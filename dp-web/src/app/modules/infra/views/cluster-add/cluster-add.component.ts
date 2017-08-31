@@ -70,6 +70,7 @@ export class ClusterAddComponent implements OnInit {
   showError = false;
   errorMessage = '';
   isInvalidAmbariUrl = false;
+  isServiceHidden=true;
 
   constructor(private router: Router,
               private route: ActivatedRoute,
@@ -118,6 +119,7 @@ export class ClusterAddComponent implements OnInit {
 
   getClusterInfo(event) {
     this.showError = false;
+    this.isServiceHidden=true;
     this.isInvalidAmbariUrl = false;
     this.showNotification = false;
     this._isClusterValidateInProgress = true;

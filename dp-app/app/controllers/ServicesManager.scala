@@ -1,14 +1,3 @@
-/*
- *
- *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
- *  *
- *  * Except as expressly permitted in a written agreement between you or your company
- *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
- *  * reproduction, modification, redistribution, sharing, lending or other exploitation
- *  * of all or any part of the contents of this software is strictly prohibited.
- *
- */
-
 package controllers
 
 
@@ -27,8 +16,8 @@ import scala.concurrent.Future
 import scala.util.Left
 
 class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService
-                               ,authenticated: Authenticated
-                               ,private val configuration: play.api.Configuration) extends Controller{
+                                ,authenticated: Authenticated
+                                ,implicit private val configuration: play.api.Configuration) extends Controller{
 
   private val smartSenseRegex: String = configuration.underlying.getString("smartsense.regex")
 
@@ -50,7 +39,7 @@ class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService
   }
 
   def getDependentServices(skuName: String) = Action.async { request =>
-    val dependentServices = Option(configuration.underlying.getString(s"$skuName.dependent.services"))
+    val dependentServices = getModuleDependentService(skuName)
     if(dependentServices.isDefined){
       Future.successful(Ok(Json.toJson(ServiceDependency(skuName, dependentServices.get.split(",")))))
     }else{

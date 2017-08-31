@@ -157,3 +157,54 @@ input[type="text"].dp-input {
     font-size: 12px;
   }
 }
+
+.extensible-list-h {
+  display: flex;
+  -webkit-align-content: center;
+  align-content: center;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+.extensible-list-h > div.services {
+  margin-bottom: 10px;
+  min-width: 160px;
+  width: 12%;
+  opacity: 1;
+  display: inline-block;
+
+  -webkit-transition: height 0s, opacity 300ms ease-in-out;
+  -moz-transition: height 0s, opacity 300ms ease-in-out;
+  -ms-transition: height 0s, opacity 300ms ease-in-out;
+  -o-transition: height 0s, opacity 300ms ease-in-out;
+  transition: height 0s, opacity 300ms ease-in-out;
+}
+.extensible-list-h > div.services.hide {
+  min-width: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  -webkit-transition-duration: 0ms;
+  -moz-transition-duration: 0ms;
+  -ms-transition-duration: 0ms;
+  -o-transition-duration: 0ms;
+  transition-duration: 0ms;
+}
+
+.show-hide-toggle {
+  display: block;
+  width: 100%;
+  position: relative;
+  cursor: pointer;
+  color: #1491c1;
+}
+.show-hide-toggle:before {
+  font-family: fontAwesome;
+  padding-right: 5px;
+}
+
+.show-hide-toggle.more:before {
+  content: '\f103';
+}
+.show-hide-toggle.less:before {
+  content: '\f102';
+}

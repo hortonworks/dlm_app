@@ -150,6 +150,8 @@
         "nodes": "Nodes",
         "uptime": "Uptime",
         "services": "Services",
+        "allServices": "All Services",
+        "less": "Less",
         "hdfsUsed": "HDFS Used",
         "hdfsTotal": "HDFS Total",
         "addButton": "Add Cluster",

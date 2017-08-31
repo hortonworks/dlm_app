@@ -84,7 +84,11 @@
           </div>
           <div class="display-group">
             <label>{{"pages.infra.labels.services" | translate}}</label>
-            <div *ngFor="let service of cluster.services" class="services"><i class="fa fa-check-circle"></i> {{service}}</div>
+            <div class ="extensible-list-h">
+              <div *ngFor="let service of cluster.services; let idx=index" class="services" [ngClass]="{'hide' : (idx >=5 && isServiceHidden)}"><i class="fa fa-check-circle"></i> {{service}}</div>
+              <div *ngIf="isServiceHidden && cluster.services.length > 5" class="show-hide-toggle" (click)="isServiceHidden=false"> <i class="fa fa-angle-double-down"></i> {{"pages.infra.labels.allServices" | translate}}</div>
+              <div *ngIf="!isServiceHidden && cluster.services.length > 5" class="show-hide-toggle" (click)="isServiceHidden=true"> <i class="fa fa-angle-double-up"></i> {{"pages.infra.labels.less" | translate}}</div>
+            </div>
           </div>
         </div>
 
