@@ -215,6 +215,7 @@ class DataplaneService @Inject()(
     : Either[Errors, ClusterServiceEndpointDetails] = {
     val fsEndpoint: Either[Errors, String] =
       getPropertyValue(endpointData, "core-site", "fs.defaultFS")
+
     fsEndpoint match {
       case Right(fsEndpoint) => {
         val namenodeHostName = endpointData.servicehost
@@ -222,11 +223,38 @@ class DataplaneService @Inject()(
           case Left(errors) => Some("nn/_HOST@EXAMPLE.COM")
           case Right(nnKerberosPrincipal) => Some(nnKerberosPrincipal)
         }
-        
+
+        val dfsNameService: Option[String] =  convertEitherToOption(getPropertyValue(endpointData, "hdfs-site", "dfs.nameservices"))
+        val dfsInternalNameServices: Option[String] =  convertEitherToOption(getPropertyValue(endpointData, "hdfs-site", "dfs.internal.nameservices"))
+        val nnHaDynamicKeyConfigs: Map[String, Option[String]] =  dfsInternalNameServices match {
+          case Some(nameService) => {
+            val internalNameService =  nameService.split(",")(0)
+            val dfsHaNnPrefixValue = convertEitherToOption(getPropertyValue(endpointData, "hdfs-site", s"dfs.ha.namenodes.$internalNameService"))
+            dfsHaNnPrefixValue match {
+              case Some(dfsHaNnPrefixValue) => {
+                val endpointConfigs : Seq[String] = dfsHaNnPrefixValue.split(",").map((x) => s"dfs.namenode.rpc-address.$dfsInternalNameServices.$x")
+                val nnHaConfigs = endpointConfigs :+ s"dfs.client.failover.proxy.provider.$dfsInternalNameServices"
+                Map(s"dfs.ha.namenodes.$internalNameService" -> Some(dfsHaNnPrefixValue)) ++ nnHaConfigs.foldLeft(Map(): Map[String, Option[String]]) {
+                  (acc, next) => {
+                    val nextConfigValue: Option[String] = convertEitherToOption(getPropertyValue(endpointData, "hdfs-site", next))
+                    acc + (next -> nextConfigValue)
+                  }
+                }
+
+              }
+              case None => Map()
+            }
+          }
+          case None => Map()
+        }
+
+
         val hdfsServiceConfigMap : Map[String, Option[String]] = Map(
           "fsEndpoint" -> Some(fsEndpoint),
-          "nnKerberosPrincipal" -> nnKerberosPrincipal
-        )
+          "nnKerberosPrincipal" -> nnKerberosPrincipal,
+          "dfs.nameservices" ->  dfsNameService,
+          "dfs.internal.nameservices" -> dfsInternalNameServices
+        ) ++ nnHaDynamicKeyConfigs
 
         Right(
           ClusterServiceEndpointDetails(endpointData.serviceid,
@@ -236,6 +264,13 @@ class DataplaneService @Inject()(
                                         hdfsServiceConfigMap))
       }
       case Left(errors) => Left(errors)
+    }
+  }
+
+  def convertEitherToOption[T](data: Either[Errors, T]) : Option[T] = {
+    data match {
+      case Right(x) => Some(x)
+      case Left(errors) => None
     }
   }
 

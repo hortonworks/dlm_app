@@ -58,7 +58,7 @@ object ResponseEntities {
 
 object RequestEntities {
   case class ClusterDefinitionRequest( name: String, dataCenter: String, description: String, local: Boolean = false,
-                                       beaconEndpoint: String, fsEndpoint: String, nnKerberosPrincipal: Option[String],
+                                       beaconEndpoint: String, nameNodeConfigs: Map[String, Option[String]],
                                        hsEndpoint: Option[String], hsKerberosPrincipal: Option[String])
   
   case class PolicyDefinitionRequest( name: String, `type`: String, sourceDataset: String,
@@ -119,9 +119,6 @@ object JsonFormatters {
   implicit val beaconLogResponseReads = Json.reads[BeaconLogResponse]
 
   //-- RequestEntities
-
-  implicit val clusterDefinitionRequestWrites = Json.writes[ClusterDefinitionRequest]
-  implicit val clusterDefinitionRequestReads = Json.reads[ClusterDefinitionRequest]
 
   implicit val policyDefinitionRequestWrites = Json.writes[PolicyDefinitionRequest]
   implicit val policyDefinitionRequestReads = Json.reads[PolicyDefinitionRequest]
