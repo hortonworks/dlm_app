@@ -12,11 +12,13 @@
 @import './styles/variables.scss';
 @import './styles/utils.scss';
 @import './styles/bs.scss';
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700');
 
 html, body {
   height: 100%;
   min-width: 1366px;
   background-color: $body-background;
+  font-family: 'Roboto', sans-serif;
 }
 
 .caret {
@@ -83,6 +85,31 @@ header {
 
 .text-muted {
   color: #999 !important;
+}
+
+.text-bold {
+  font-weight: bold;
+}
+
+.filter-tag {
+  margin: 3px;
+  font-size: 10px;
+  display: inline-block;
+  float: right;
+  height: 24px;
+  line-height: 24px;
+  padding: 0 7px;
+  font-weight: 400;
+  &.label {
+    color: #666;
+    a {
+      color: #666;
+    }
+  }
+}
+
+.label-default {
+  background-color: #DDD;
 }
 
 pre {

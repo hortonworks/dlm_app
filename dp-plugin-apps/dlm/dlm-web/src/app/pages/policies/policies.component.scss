@@ -7,17 +7,13 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+$header-width: 320px;
+$filter-width: 210px;
+$add-button-width: 125px;
+$filter-margin: 10px;
+
 .page-header {
   border-bottom-color: transparent;
-}
-
-.filters-block {
-  display: flex;
-  align-items: center;
-
-  .filter-item {
-    margin-right: 10px;
-  }
 }
 
 .service-legend {
@@ -41,6 +37,32 @@
 }
 
 :host {
+  .filters-block {
+    display: flex;
+
+    .filter-item {
+      margin-right: $filter-margin;
+      &.filter-wrapper {
+        width: calc(100% - #{$add-button-width} - #{$filter-width} - #{$filter-margin} - #{$filter-margin})
+      }
+    }
+  }
+  .filter-buttons {
+    width: $filter-width;
+  }
+  .add-button {
+    width: $add-button-width;
+  }
+  .header {
+    float: left;
+    width: $header-width;
+    padding: 0 15px;
+  }
+  .filters {
+    float: left;
+    width: calc(100% - #{$header-width});
+    padding: 15px 15px 0 15px;
+  }
   .table-wrapper {
     margin-top: 10px;
   }
