@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package services
 
 import javax.inject.{Inject, Named}
@@ -43,30 +54,6 @@ class AmbariService @Inject()(
        Logger.error(s"Cannot sync datalake with ${dpCluster.id}")
        value
    }
-  }
-
-  def getResourceManagerHealth(clusterId: Long) = {
-    val rmHealthRequestParam = Option(
-      System.getProperty("cluster.rm.health.request.param"))
-      .getOrElse(
-        configuration.underlying.getString("cluster.rm.health.request.param"))
-    wSClient
-      .url(
-        s"$clusterService/$clusterId/ambari/cluster?request=$rmHealthRequestParam")
-      .withHeaders(
-        "Content-Type" -> "application/json",
-        "Accept" -> "application/json"
-      )
-      .get
-      .map { response =>
-        if (response.status == 200) {
-          Right(response.json)
-        } else {
-          Left(
-            Errors(Seq(
-              Error("500", (response.json \ "error" \ "message").as[String]))))
-        }
-      }
   }
 
 }

@@ -9,9 +9,9 @@
 
 import { Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter,
   HostBinding, SimpleChanges, OnDestroy, OnChanges, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef } from '@angular/core';
 import {
-  FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl, AsyncValidatorFn,
-  ValidationErrors
+  FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl, AsyncValidatorFn, ValidationErrors
 } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { go } from '@ngrx/router-store';
@@ -306,6 +306,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
               private store: Store<State>,
               private timezoneService: TimeZoneService,
               private t: TranslateService,
+              private cdRef: ChangeDetectorRef,
               private hdfs: HdfsService) { }
 
   // todo: to Denys. This method looks quite scary. Things to improve:
@@ -399,8 +400,23 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       }
     });
 
+    const directoriesChangesSubscription = this.policyForm.valueChanges
+      .map(values => values.directories)
+      .distinctUntilChanged()
+      .debounceTime(500)
+      .switchMap(value => {
+        return this.policyForm.statusChanges
+          .filter(_ => this.policyForm.get('directories').valid)
+          .map(_ => value);
+      })
+      .subscribe(path => {
+        this.hdfsRootPath = path;
+        this.cdRef.detectChanges();
+      });
+
     this.subscriptions.push(loadDatabasesSubscription);
     this.subscriptions.push(policyFormValuesSubscription);
+    this.subscriptions.push(directoriesChangesSubscription);
   }
 
   ngOnChanges(changes: SimpleChanges) {

@@ -1,4 +1,14 @@
 #!/bin/bash
+#
+# /*
+#  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+#  *
+#  * Except as expressly permitted in a written agreement between you or your company
+#  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+#  * reproduction, modification, redistribution, sharing, lending or other exploitation
+#  * of all or any part of the contents of this software is strictly prohibited.
+#  */
+#
 set -e
 
 source $(pwd)/config.env.sh
@@ -9,10 +19,11 @@ DEFAULT_VERSION=0.0.1-latest
 KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
 CLUSTER_SERVICE_CONTAINER="dp-cluster-service"
+DB_CONTAINER="dp-database"
 APP_CONTAINERS_WITHOUT_DB="dp-app dp-db-service $CLUSTER_SERVICE_CONTAINER dp-gateway"
 APP_CONTAINERS=$APP_CONTAINERS_WITHOUT_DB
 if [ "$USE_EXT_DB" == "no" ]; then
-    APP_CONTAINERS="dp-database $APP_CONTAINERS"
+    APP_CONTAINERS="$DB_CONTAINER $APP_CONTAINERS"
 fi
 KNOX_CONTAINER="knox"
 CONSUL_CONTAINER="dp-consul-server"
@@ -89,7 +100,7 @@ migrate_schema() {
         source $(pwd)/docker-database.sh
 
         # wait for database start
-        sleep 5
+        source $(pwd)/database-check.sh
     fi
 
     # start flyway container and trigger migrate script
@@ -102,7 +113,7 @@ reset_db() {
         source $(pwd)/docker-database.sh
 
         # wait for database start
-        sleep 5
+        source $(pwd)/database-check.sh
     fi
 
     # start flyway container and trigger migrate script
@@ -127,6 +138,28 @@ add_host_entry() {
         docker exec -t "$CLUSTER_SERVICE_CONTAINER" /bin/bash -c "echo $1 $2 >> /etc/hosts"
         echo "Successfully appended to '/etc/hosts'."
     fi
+}
+
+utils_update_user_secret() {
+    if [ $# -ne 1 ] || [ "$1" != "ambari" ]; then
+        echo "Invalid arguments."
+        echo "Usage: dpdeploy.sh utils update-user ambari"
+        return -1
+    else
+        update_user_entry "$@"
+    fi
+}
+
+update_user_entry() {
+    if [ "$USE_EXT_DB" == "no" ]; then
+        IS_DB_UP=$(docker inspect -f {{.State.Running}} $DB_CONTAINER) || echo "DB container is not running."
+        if [ "$IS_DB_UP" != "true" ]; then
+            echo "Ambari secrets can not be initialized with DB container down. Please run 'init db' and 'migrate' first."
+            exit -1
+        fi
+    fi
+    
+    source $(pwd)/secrets-manage.sh
 }
 
 destroy() {
@@ -383,6 +416,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
+    printf "%-${tabspace}s:%s\n" "utils update-user ambari" "Update Ambari user credentials that Dataplane will use to connect to clusters."
     printf "%-${tabspace}s:%s\n" "utils add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
     printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
     printf "%-${tabspace}s:%s\n" "start knox" "Start the Knox and Consul containers"
@@ -438,6 +472,10 @@ else
                 add-host)
                     shift
                     utils_add_host "$@"
+                    ;;
+                update-user)
+                    shift
+                    utils_update_user_secret "$@"
                     ;;
                 *)
                     echo "Unknown option"

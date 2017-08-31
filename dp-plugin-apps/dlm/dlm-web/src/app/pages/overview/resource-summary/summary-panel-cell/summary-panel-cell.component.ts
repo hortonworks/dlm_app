@@ -15,7 +15,10 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
     <div class="text-center">
       <p class="cell-label">
         <i [class]="iconClass"></i>
-        <span class="text-muted">{{label}}</span>
+        <span class="text-muted">
+          {{label}}
+          <dlm-help-link [iconHint]="hint"></dlm-help-link>
+        </span>
       </p>
       <p class="cell-value" [class.btn-link]="actionable" [class.actionable]="actionable" (click)="handleCellClick($event)">
         <span *ngIf="value > 0; else dash">{{value}}</span>
@@ -32,6 +35,7 @@ export class SummaryPanelCellComponent implements OnInit {
   @Input() label: string;
   @Input() value: number;
   @Input() iconClass: string;
+  @Input() hint = '';
   @Input() actionable = false;
   @Output() cellClick = new EventEmitter<any>();
 

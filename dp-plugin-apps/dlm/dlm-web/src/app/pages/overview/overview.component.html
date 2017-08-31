@@ -135,13 +135,19 @@
       <thead>
         <tr>
           <th>{{'page.overview.modals.hdfs_capacity.columns.cluster_name' | translate}}</th>
-          <th>{{'page.overview.modals.hdfs_capacity.columns.capacity' | translate}}</th>
+          <th>{{'page.overview.modals.hdfs_capacity.columns.total_capacity' | translate}}</th>
+          <th>{{'page.overview.modals.hdfs_capacity.columns.remaining_capacity' | translate}}</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let cluster of (lowCapacityClusters$ | async)">
           <td>{{cluster.name}}</td>
-          <td [innerHtml]="cluster.stats.CapacityRemaining | bytesSize"></td>
+          <td [innerHtml]="cluster.stats.CapacityTotal | bytesSize"></td>
+          <td>
+            <i class="fa fa-exclamation-triangle alert-warning"></i>
+            <span [innerHtml]="cluster.stats.CapacityRemaining | bytesSize"></span>
+            <span>&nbsp;( {{getPercentageRemaining(cluster)}} )</span>
+          </td>
         </tr>
       </tbody>
     </table>

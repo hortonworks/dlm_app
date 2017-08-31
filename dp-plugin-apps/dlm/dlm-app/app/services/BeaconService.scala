@@ -202,8 +202,7 @@ class BeaconService @Inject()(
                   clusterToBePairedDetails.dpCluster.description,
                   local,
                   clusterToBePairedDetails.pairedClusterRequest.beaconUrl,
-                  nnService.serviceProperties("fsEndpoint").get,
-                  nnService.serviceProperties("nnKerberosPrincipal"),
+                  nnService.serviceProperties,
                   hiveServerConfigDetails("hsEndpoint"),
                   hiveServerConfigDetails("hsKerberosPrincipal")
                 )
@@ -426,7 +425,7 @@ class BeaconService @Inject()(
         val beaconClusters = beaconCluster.clusters
         val allPoliciesFuture: Future[Seq[Either[BeaconApiErrors, Seq[PolicyDetailsData]]]] =
           Future.sequence(beaconClusters.map((x) => beaconPolicyService.listPolicies(
-            x.beaconUrl, x.id)))
+            x.beaconUrl, x.id, queryStringPaginated)))
 
         for {
           allPoliciesOption <- allPoliciesFuture

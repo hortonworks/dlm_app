@@ -1,9 +1,21 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.cs
 
 import java.net.URL
 import java.util.concurrent.{Executors, TimeUnit}
 
 import akka.actor.ActorSystem
+import akka.actor.Status.Success
 import akka.stream.ActorMaterializer
 import com.google.common.base.{Supplier, Suppliers}
 import com.google.common.cache.{Cache, CacheBuilder, CacheLoader, LoadingCache}
@@ -163,7 +175,15 @@ class ClusterDataApi @Inject()(
   }
 
   def getAtlasUrl(clusterId:Long) = {
-     clusterAtlasSupplierCache.get(clusterId).get()
+     val atlasUrl = clusterAtlasSupplierCache.get(clusterId).get()
+    // Make sure We evict on failure
+    atlasUrl.onFailure {
+      case th:Throwable =>
+        log.error("Cannot load Atlas Url",th)
+        log.info(s"Invalidating any entries for cluster id -  ${clusterId}")
+        clusterAtlasSupplierCache.invalidate(clusterId)
+    }
+    atlasUrl
   }
 
 
@@ -240,8 +260,7 @@ private sealed class AtlasURLSupplier(
       .map {
         case Right(endpoints) => endpoints
         case Left(errors) =>
-          throw new Exception(
-            s"Could not get the service Url from storage - $errors")
+          throw new Exception(errors.firstMessage)
       }
   }
 

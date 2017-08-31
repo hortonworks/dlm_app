@@ -56,25 +56,29 @@ class BeaconClusterServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconC
     }
   }
 
-  private def mapToClusterDefinitionRequest(clusterDefinitionRequest:ClusterDefinitionRequest) = {
-      "fsEndpoint = " + clusterDefinitionRequest.fsEndpoint +
-      "\nbeaconEndpoint = " + clusterDefinitionRequest.beaconEndpoint +
-      "\ndescription = " + clusterDefinitionRequest.description +
-      "\nlocal = " + clusterDefinitionRequest.local +
-      (clusterDefinitionRequest.nnKerberosPrincipal match {
-        case Some(nnKerberosPrincipal) => "\nnnKerberosPrincipal= " + nnKerberosPrincipal
-        case None => ""
-      }) +
-      (clusterDefinitionRequest.hsEndpoint match {
-        case Some(hsEndpoint) => "\nhsEndpoint= " + hsEndpoint
-        case None => ""
-      }) +
-      (clusterDefinitionRequest.hsKerberosPrincipal match {
-        case Some(hsKerberosPrincipal) => "\nhsKerberosPrincipal= " + hsKerberosPrincipal
-        case None => ""
-      })
-  }
+  private def mapToClusterDefinitionRequest(clusterDefinitionRequest:ClusterDefinitionRequest) : String = {
+    val nnConfigs = clusterDefinitionRequest.nameNodeConfigs.foldLeft("": String) {
+      (acc, next) => {
+        next._2 match {
+          case Some(value) => acc + s"${next._1} = $value\n"
+          case None =>  acc
+        }
+      }
+    }
 
+    "beaconEndpoint = " + clusterDefinitionRequest.beaconEndpoint + "\n" +
+    "description = " + clusterDefinitionRequest.description + "\n" +
+    "local = " + clusterDefinitionRequest.local + "\n" +
+    nnConfigs +
+    (clusterDefinitionRequest.hsEndpoint match {
+      case Some(hsEndpoint) => "hsEndpoint= " + hsEndpoint + "\n"
+      case None => ""
+    }) +
+    (clusterDefinitionRequest.hsKerberosPrincipal match {
+      case Some(hsKerberosPrincipal) => "hsKerberosPrincipal= " + hsKerberosPrincipal + "\n"
+      case None => ""
+    })
+  }
 
   override def listCluster(beaconEndpoint : String, clusterId: Long, clusterName: String)
                           (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconEntityResponse]] = {

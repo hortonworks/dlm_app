@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.cs
 
 import javax.inject.Named
@@ -13,7 +24,7 @@ import com.hortonworks.dataplane.cs.utils.SSLUtils.DPTrustStore
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.http.{ProxyServer, Webserver}
-import com.hortonworks.dataplane.http.routes.{AmbariRoute, AtlasRoute, RangerRoute, HdpRoute, StatusRoute}
+import com.hortonworks.dataplane.http.routes.{DpProfilerRoute, _}
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.sslconfig.akka.AkkaSSLConfig
 import com.typesafe.sslconfig.ssl.{TrustManagerConfig, TrustStoreConfig}
@@ -187,6 +198,15 @@ object AppModule extends AbstractModule {
   def provideRangerRoute(storageInterface: StorageInterface,
                          clusterComponentService: ClusterComponentService,
                          clusterHostsService: ClusterHostsService,
+                         wSClient: WSClient): DpProfilerRoute = {
+    new DpProfilerRoute(clusterComponentService, clusterHostsService, storageInterface, wSClient)
+  }
+
+  @Provides
+  @Singleton
+  def provideDpProfilerRoute(storageInterface: StorageInterface,
+                         clusterComponentService: ClusterComponentService,
+                         clusterHostsService: ClusterHostsService,
                          wSClient: WSClient): RangerRoute = {
     new RangerRoute(clusterComponentService, clusterHostsService, storageInterface, wSClient)
   }
@@ -198,6 +218,7 @@ object AppModule extends AbstractModule {
                         configuration: Config,
                         atlasRoute: AtlasRoute,
                         rangerRoute: RangerRoute,
+                        dpProfilerRoute: DpProfilerRoute,
                         statusRoute: StatusRoute,
                         ambariRoute: AmbariRoute): Webserver = {
     import akka.http.scaladsl.server.Directives._
@@ -207,6 +228,8 @@ object AppModule extends AbstractModule {
       configuration,
       rangerRoute.rangerAudit ~
       rangerRoute.rangerPolicy ~
+      dpProfilerRoute.startJob ~
+      dpProfilerRoute.jobStatus ~
       atlasRoute.hiveAttributes ~
         atlasRoute.hiveTables ~
         atlasRoute.atlasEntities ~

@@ -20,6 +20,7 @@
 <dlm-status-column [showText]="false"></dlm-status-column>
 <dlm-policy-info
   [expandedRows]="tableComponent.expandedRows"
+  [activeContent]="activeContentType"
   (nameClick)="toggleRowDetail($event, policyContent.Files)">
 </dlm-policy-info>
 
@@ -28,7 +29,7 @@
 </ng-template>
 
 <ng-template #verbStatusCellTemplate let-value="value">
-  {{value | statusFmt}}
+  {{value | translate}}
 </ng-template>
 
 <ng-template #clusterCellTemplate let-value="value">
@@ -43,7 +44,7 @@
 <ng-template #prevJobs let-row="row">
   <span class="actionable" qe-attr="policy-jobs" (click)="toggleRowDetail(row, policyContent.Jobs)">
     <dlm-prev-jobs [policy]="row"></dlm-prev-jobs>
-    <span [ngClass]="{'text-primary': true, 'fa': true, 'fa-caret-up': tableComponent?.expandedRows[row.id], 'fa-caret-down': !tableComponent?.expandedRows[row.id]}">
+    <span [ngClass]="{'text-primary': true, 'fa': true, 'fa-caret-up': isPrevJobsActive(row.id), 'fa-caret-down': !isPrevJobsActive(row.id)}">
     </span>
   </span>
 </ng-template>

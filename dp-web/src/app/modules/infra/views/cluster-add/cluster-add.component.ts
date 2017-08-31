@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Component, ElementRef, ViewChild, OnInit, HostListener} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
@@ -19,6 +30,7 @@ import {LocationService} from '../../../../services/location.service';
 import {StringUtils} from '../../../../shared/utils/stringUtils';
 import {NgForm} from '@angular/forms';
 import {ConfigDialogComponent} from '../../widgets/config-dialog/config-dialog.component';
+import {CustomError} from "../../../../models/custom-error";
 
 @Component({
   selector: 'dp-cluster-add',
@@ -139,8 +151,9 @@ export class ClusterAddComponent implements OnInit {
           this.applyErrorClass();
         }
       },
-      () => {
-        this.onError();
+      error => {
+        let err = JSON.parse(error._body).errors[0] as CustomError;
+        this.onError(err);
       }
     );
   }
@@ -182,7 +195,7 @@ export class ClusterAddComponent implements OnInit {
         this._clusterState.knoxUrl = clusterInfo[0].knoxUrl
       }
     }, (error) => {
-      this.onError();
+      this.onError(null);
     });
   }
 
@@ -193,11 +206,15 @@ export class ClusterAddComponent implements OnInit {
 
   }
 
-  private onError() {
+  private onError(err: CustomError) {
     this._isClusterValidateSuccessful = false;
     this._isClusterValidateInProgress = false;
     this.showError = true;
-    this.errorMessage = this.translateService.instant('pages.infra.description.connectionFailed');
+    if(!err){
+      this.errorMessage = this.translateService.instant('pages.infra.description.connectionFailed');
+    }else{
+      this.errorMessage = this.translateService.instant('pages.infra.description.backenderrors.'+err.errorType);
+    }
   }
 
   private extractClusterInfo(clusterInfo) {

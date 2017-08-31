@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.cs.sync
 
 import akka.actor.FSM.Failure
@@ -15,7 +26,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 private[sync] object TaskType extends Enumeration {
   type TaskType = Value
-  val HostInfo, Atlas, Ranger, Knox, NameNode, Beacon, Hdfs, Hive = Value
+  val HostInfo, Atlas, Ranger, DpProfiler, Knox, NameNode, Beacon, Hdfs, Hive = Value
 }
 
 private[sync] object TaskStatus extends Enumeration {
@@ -122,6 +133,7 @@ class ClusterSynchronizer(private val config: Config,
     map.put(TaskType.Hdfs,context.actorOf(Props(classOf[FetchHdfsTask],clusterData,config,wSClient,storageInterface,self)))
     map.put(TaskType.Hive,context.actorOf(Props(classOf[FetchHiveTask],clusterData,config,wSClient,storageInterface,self)))
     map.put(TaskType.Ranger,context.actorOf(Props(classOf[FetchRangerTask],clusterData,config,wSClient,storageInterface,self)))
+    map.put(TaskType.DpProfiler,context.actorOf(Props(classOf[FetchDpProfilerTask],clusterData,config,wSClient,storageInterface,self)))
     map.toMap
   }
 

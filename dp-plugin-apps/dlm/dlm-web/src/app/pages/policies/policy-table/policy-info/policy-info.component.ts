@@ -8,6 +8,7 @@
  */
 
 import { Component, Input, Output, ViewChild, TemplateRef, ViewEncapsulation, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { PolicyContent } from 'pages/policies/policy-details/policy-content.type';
 import { TableColumn } from 'common/table/table-column.type';
 import { Policy } from 'models/policy.model';
 
@@ -39,12 +40,13 @@ export class PolicyInfoComponent implements TableColumn {
   @ViewChild('policyInfoCell') cellRef: TemplateRef<any>;
   @Output() nameClick = new EventEmitter<any>();
   @Input() expandedRows: any = {};
+  @Input() activeContent: PolicyContent;
 
   onNameClick(row) {
     this.nameClick.emit(row);
   }
 
   isActive(policy): boolean {
-    return this.expandedRows[policy.id];
+    return this.expandedRows[policy.id] && PolicyContent.Files === this.activeContent;
   }
 }

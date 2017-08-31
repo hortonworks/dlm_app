@@ -1,3 +1,13 @@
+#
+# /*
+#  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+#  *
+#  * Except as expressly permitted in a written agreement between you or your company
+#  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+#  * reproduction, modification, redistribution, sharing, lending or other exploitation
+#  * of all or any part of the contents of this software is strictly prohibited.
+#  */
+#
 # Routes
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
@@ -28,6 +38,8 @@ GET           /api/clusters                                          controllers
 POST          /api/clusters/details                                  controllers.Clusters.getDetails
 GET           /api/clusters/:clusterId/health                        controllers.Clusters.getHealth(clusterId: Long, summary: Option[Boolean])
 GET           /api/clusters/:clusterId/rmhealth                      controllers.Clusters.getResourceManagerHealth(clusterId: Long)
+GET           /api/clusters/:clusterId/dnhealth                      controllers.Clusters.getDataNodeHealth(clusterId: Long)
+
 GET           /api/actions/clusters                                  controllers.actions.DpClusterActions.listWithClusters(type: Option[String])
 POST          /api/clusters/sync/:dpClusterId                        controllers.Clusters.syncCluster(dpClusterId: Long)
 
@@ -69,6 +81,11 @@ GET           /api/assets/lineage/:clusterId/:atlasGuid              controllers
 #Ranger
 GET           /api/ranger/audit/:clusterId/:dbName/:tableName        controllers.RangerAttributes.getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String ?= "0", limit:String ?= "20", accessType:String ?="", accessResult:String ?="")
 GET           /api/ranger/policy/:clusterId/:dbName/:tableName        controllers.RangerAttributes.getPolicyDetails(clusterId: String, dbName: String, tableName: String, offset: String ?= "0", limit:String ?= "20")
+
+#DpProfiler
+POST          /api/dpProfiler/startJob                                controllers.DpProfilerAttributes.startProfilerJob(clusterId: String, dbName: String, tableName: String)
+GET           /api/dpProfiler/jobStatus                               controllers.DpProfilerAttributes.getProfilerJobStatus(clusterId: String, dbName: String, tableName: String)
+
 
 #LDAP
 POST          /api/knox/validate                                     controllers.KnoxConfig.validate
