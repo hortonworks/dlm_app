@@ -172,7 +172,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         cellClass: 'icon-cell'
       },
       {
-        prop: 'status',
+        prop: 'displayStatus',
         cellClass: 'text-cell',
         headerClass: 'text-header',
         cellTemplate: this.verbStatusCellTemplate,

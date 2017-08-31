@@ -58,3 +58,8 @@ export const PROGRESS_STATUS = {
   SUCCESS: SUCCESS,
   FAILED: FAILED
 };
+
+export const POLICY_DISPLAY_STATUS = {
+  [POLICY_STATUS.RUNNING]: 'common.status.active',
+  [POLICY_STATUS.SUSPENDED]: 'common.status.suspended'
+};
