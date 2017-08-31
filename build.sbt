@@ -26,8 +26,5 @@ lazy val dpApp = (project in file("dp-app")).enablePlugins(PlayScala).
 lazy val clusterService = (project in file("services/cluster-service")).
   dependsOn(restMock, dpCommons,dbClient, csClient,gatewayClient,consul)
 
-lazy val gateway = (project in file("services/gateway-sc")).
-  dependsOn(consul)
-
 lazy val knoxAgent = (project in file("services/knox-agent")).
   dependsOn(consul)
