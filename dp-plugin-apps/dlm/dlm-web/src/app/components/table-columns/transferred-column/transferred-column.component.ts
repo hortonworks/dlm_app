@@ -32,7 +32,12 @@ export class TransferredColumnComponent implements OnInit {
 
   }
 
+  isFailed() {
+    return this.jobStatus === JOB_STATUS.FAILED || isEmpty(this.trackingInfo);
+  }
+
   isInProgress() {
-    return this.jobStatus === JOB_STATUS.RUNNING;
+    const { completedMapTasks, totalMapTasks } = this.trackingInfo;
+    return this.jobStatus === JOB_STATUS.RUNNING || (!this.isFailed() && completedMapTasks < totalMapTasks);
   }
 }
