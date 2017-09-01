@@ -151,9 +151,9 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       return selectedPolicy ? jobs.filter(job => job.policyId === selectedPolicy.id) : [];
     });
     this.policyDatabase$ = this.selectedPolicy$
-      .filter(policy => !!this.clusterByName(policy.sourceCluster))
+      .filter(policy => !!this.clusterByDatacenterId(policy.sourceCluster))
       .mergeMap(policy => {
-        const cluster = this.clusterByName(policy.sourceCluster);
+        const cluster = this.clusterByDatacenterId(policy.sourceCluster);
         return store.select(getDatabase(this.hiveService.makeDatabaseId(policy.sourceDataset, cluster.id)));
       });
   }
@@ -223,8 +223,13 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  clusterByName(clusterName: string): Cluster {
-    return this.clusters.find(cluster => cluster.name === clusterName);
+  /**
+   * Returns cluster instance by policy's sourceCluster or targetCluster value
+   *
+   * @param idByDatacenter {string} - cluster id in format <datacenter>$<clusterName>
+   */
+  clusterByDatacenterId(idByDatacenter: string): Cluster {
+    return this.clusters.find(cluster => cluster.idByDatacenter === idByDatacenter);
   }
 
   /**
@@ -328,7 +333,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       return;
     }
     if (contentType === PolicyContent.Files) {
-      const cluster = this.clusterByName(PolicyService.getClusterName(policy.sourceCluster));
+      const cluster = this.clusterByDatacenterId(policy.sourceCluster);
       if (policy.type === POLICY_TYPES.HIVE) {
         this.store.dispatch(loadFullDatabases(cluster.id));
       } else {
