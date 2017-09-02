@@ -267,7 +267,7 @@ export class ClusterAddComponent implements OnInit {
 
   onSelectLocation(location: Location) {
     this.mapData = [];
-    if(location && location instanceof Location) {
+    if(location && location.id) {
       let point = new Point(location.latitude, location.longitude, MapConnectionStatus.UP);
       this.mapData = [new MapData(point)];
     }
