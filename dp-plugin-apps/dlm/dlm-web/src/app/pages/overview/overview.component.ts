@@ -212,7 +212,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   private matchJobStatus(policy: Policy, jobStatusFilter) {
     switch (jobStatusFilter) {
       case JOBS_HEALTH_STATE.IN_PROGRESS:
-        return policy.lastJobResource.status === JOB_STATUS.RUNNING;
+        return policy.lastTenJobs.some(job => job.status === JOB_STATUS.RUNNING);
       case JOBS_HEALTH_STATE.LAST_FAILED:
         return policy.lastJobResource.status === JOB_STATUS.FAILED;
       case JOBS_HEALTH_STATE.LAST_10_FAILED:
