@@ -11,7 +11,6 @@ import { Component, OnInit, Input, Output, ViewChild, TemplateRef, EventEmitter 
 import { Job } from 'models/job.model';
 import { ActionItemType } from 'components';
 import { TableComponent } from 'common/table/table.component';
-import { abortJob } from 'actions/job.action';
 import { Policy } from 'models/policy.model';
 import { Store } from '@ngrx/store';
 import * as fromRoot from 'reducers/';
@@ -42,6 +41,9 @@ export class JobsTableComponent implements OnInit {
   @ViewChild('jobsTable') jobsTable: TableComponent;
 
   @Input() jobs: Job[];
+  @Input() jobsOverallCount: number;
+  @Input() jobsOffset: number;
+  @Input() loadingJobs;
   @Input() policy: Policy;
   @Input() showPageSizeMenu = true;
   @Input() selectionType = 'any';
@@ -96,7 +98,8 @@ export class JobsTableComponent implements OnInit {
         cellTemplate: this.runTimeTemplate,
         name: 'Runtime',
         cellClass: 'date-cell',
-        headerClass: 'date-header'
+        headerClass: 'date-header',
+        sortable: false
       },
       {
         prop: 'trackingInfo',
@@ -104,13 +107,15 @@ export class JobsTableComponent implements OnInit {
         name: 'Transferred Bytes',
         cellClass: 'date-cell',
         headerClass: 'date-header',
-        comparator: transferredBytesComparator.bind(this)
+        comparator: transferredBytesComparator.bind(this),
+        sortable: false
       },
       {
         prop: 'trackingInfo.filesCopied',
         name: 'Transferred Files',
         cellClass: 'date-cell',
-        headerClass: 'date-header'
+        headerClass: 'date-header',
+        sortable: false
       },
       {name: 'Actions', cellTemplate: this.actionsCellRef, sortable: false}
     ];
@@ -150,7 +155,6 @@ export class JobsTableComponent implements OnInit {
   handlePageChange(page) {
     this.onPageChange.emit(page);
   }
-
 
   isRerunDisabled(job, _): boolean {
     const lastJob = this.policy.lastJobResource;
