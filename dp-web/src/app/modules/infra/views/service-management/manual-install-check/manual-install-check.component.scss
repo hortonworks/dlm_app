@@ -36,7 +36,7 @@
 
 .failure-list {
   padding-left: 32px;
-  margin-top: 0px;
+  margin-top: 0;
 }
 
 .error, .error-list-item {
@@ -45,6 +45,15 @@
 
 .success, .success-list-item {
   color: $forest-green-1;
+}
+
+.optional {
+  color: #f0ad4e !important;
+}
+
+.warning{
+  background: $concrete;
+  padding: 0 10px 10px;
 }
 
 .margin-0 {

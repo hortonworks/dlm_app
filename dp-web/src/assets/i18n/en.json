@@ -127,7 +127,9 @@
         "installationStepsDoc":"https://docs.hortonworks.com/",
         "dependentServicesLabel":"DEPENDENT SERVICES:",
         "syncFailed":"Cluster Information could not be fetched",
-        "serviceEnabled":"Service Enabled successfully"
+        "serviceEnabled":"Service Enabled successfully",
+        "optional":"Optional",
+        "addOptionalServices":"Add Optional Services"
       },
       "description": {
         "verificationWelcome": "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your SmartSense ID.",
@@ -139,7 +141,9 @@
         "installationConfirmation":"All the dependent services have been installed on cluster <b>{{clusterName}}.</b>",
         "installationLink": "For detailed steps on the installation process, please visit ",
         "verifyingStatus": "Verifying dependent services status on the cluster...",
-        "successStatus":"All the service dependencies are met. Please click Next to continue",
+        "allDependenciesMet":"All the service dependencies are met. Please click Next to continue.",
+        "mandatoryDependenciesMet":"All the mandatory service dependencies are met.",
+        "optionalInstallation":"Optionally, you can install the following services to perform additional functions on the cluster.",
         "errorStatus":"The following dependent service(s) information is not present on the cluster. Please install them to continue.",
         "serviceEnabled": "All the authorized users of {{serviceName}} service, should re-login to be able to access the service."
       }

@@ -68,11 +68,12 @@ export class ServiceManagementComponent implements OnInit {
       let serviceDependency = responses[0];
       let lakes = responses[1];
       lakes.forEach((lake) => {
-        this.extractClusterInfo(serviceName, lake, serviceDependency.dependencies).subscribe(clusterInfo => {
+        this.extractClusterInfo(serviceName, lake, serviceDependency).subscribe(clusterInfo => {
           clusters.push(clusterInfo);
           enabledApp.clustersInfo = clusters;
           enabledApp.isOpen = true;
           clusterInfo.syncInProgress = true;
+          console.log(clusterInfo);
           this.clusterService.syncCluster(lake.data.id).subscribe(response => {
             if (response._body === 'false') {
               clusterInfo.synced = false;
@@ -89,11 +90,15 @@ export class ServiceManagementComponent implements OnInit {
                 clusterInfo.syncInProgress = false;
                 return;
               }
-              this.extractClusterInfo(serviceName, lake, serviceDependency.dependencies).subscribe(info => {
+              this.extractClusterInfo(serviceName, lake, serviceDependency).subscribe(info => {
                 clusterInfo.lastUpdated = DateUtils.toReadableDate(new Date().getTime() - new Date(lakeUpdated.updated).getTime());
                 clusterInfo.syncInProgress = false;
                 clusterInfo.synced = true;
+                clusterInfo.mandatoryDependencies = info.mandatoryDependencies;
+                clusterInfo.optionalDependencies = info.optionalDependencies;
                 clusterInfo.dependenciesMet = info.dependenciesMet;
+                clusterInfo.optionalDependenciesMet = info.optionalDependenciesMet;
+                console.log(clusterInfo);
               });
             });
           });
@@ -102,21 +107,32 @@ export class ServiceManagementComponent implements OnInit {
     });
   }
 
-  extractClusterInfo(serviceName, lake, dependencies): Observable<any> {
+  extractClusterInfo(serviceName, lake, serviceDependency): Observable<any> {
     return Observable.create(observer => {
       let services = Object.keys(lake.clusters[0].properties.desired_service_config_versions);
       this.lakeService.getDiscoveredServices(lake.data.id).subscribe(discoveredServices => {
         let dependenciesMet = true;
-        dependencies.forEach(dependency => {
+        let optionalDependenciesMet = true;
+        serviceDependency.mandatoryDependencies.forEach(dependency => {
           if (!services.find(key => key === dependency) && !discoveredServices.find(service => service.servicename === dependency)) {
             dependenciesMet = false;
           }
         });
+        if(serviceDependency.optionalDependencies){
+          serviceDependency.optionalDependencies.forEach(dependency => {
+            if (!services.find(key => key === dependency) && !discoveredServices.find(service => service.servicename === dependency)) {
+              optionalDependenciesMet = false;
+            }
+          });
+        }
         return observer.next({
           dpClusterId: lake.data.id,
           name: lake.data.name,
           lastUpdated: DateUtils.toReadableDate(new Date().getTime() - new Date(lake.data.updated).getTime()),
-          dependenciesMet: dependenciesMet
+          dependenciesMet: dependenciesMet,
+          mandatoryDependencies: serviceDependency.mandatoryDependencies,
+          optionalDependencies: serviceDependency.optionalDependencies,
+          optionalDependenciesMet: optionalDependenciesMet
         });
       }, error => {
 

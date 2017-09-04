@@ -44,8 +44,11 @@
                   </td>
                   <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{cluster.name}}</td>
                   <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">
-                    <button *ngIf="!cluster.dependenciesMet" id="enable-service-{{cluster.dpClusterId}}" class="mdl-button btn-hwx-primary enable-btn" (click)="enableServiceOnCluster(cluster.dpClusterId, enabledApp.service)"> Enable</button>
+                    <button *ngIf="!cluster.dependenciesMet" id="enable-service-{{cluster.dpClusterId}}" class="mdl-button btn-hwx-primary enable-btn" (click)="enableServiceOnCluster(cluster.dpClusterId, enabledApp.service)">{{'pages.services.labels.enable' | translate}}</button>
                     <span *ngIf="cluster.dependenciesMet">{{"pages.services.labels.enabled" | translate}}</span>
+                    <span *ngIf="cluster.dependenciesMet && cluster.optionalDependencies && cluster.optionalDependenciesMet === false">
+                      <button id="add-optional-service-{{cluster.dpClusterId}}" class="mdl-button btn-hwx-secondary additional-service-btn" (click)="enableServiceOnCluster(cluster.dpClusterId, enabledApp.service)">{{'pages.services.labels.addOptionalServices' | translate}}</button>
+                    </span>
                   </td>
                 </tr>
               </ng-container>

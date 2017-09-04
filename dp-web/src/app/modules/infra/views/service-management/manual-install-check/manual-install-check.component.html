@@ -11,10 +11,12 @@
     <div class="status-panel">
       <div class="spacer-15"></div>
       <div class="success-list-item" *ngFor="let service of successfulServices">
-        <i class="fa fa-check-circle"></i>{{(("common.serviceNameMappings."+service | translate) !== "common.serviceNameMappings."+service)? ("common.serviceNameMappings."+service | translate) : service}}
+        <i class="fa fa-check-circle"></i>{{(("common.serviceNameMappings."+service.name | translate) !== "common.serviceNameMappings."+service.name)? ("common.serviceNameMappings."+service.name | translate) : service.name}}
+        <span *ngIf="service.isOptional">({{"pages.services.labels.optional" | translate}})</span>
       </div>
-      <div class="error-list-item" *ngFor="let service of failedServices">
-        <i class="fa fa-times-circle"></i>{{(("common.serviceNameMappings."+service | translate) !== "common.serviceNameMappings."+service)? ("common.serviceNameMappings."+service | translate) : service}}
+      <div class="error-list-item" [ngClass]="{'optional' : service.isOptional}" *ngFor="let service of failedServices">
+        <i class="fa" [ngClass]="{'fa-warning' : service.isOptional, 'fa-times-circle': !service.isOptional}"></i>{{(("common.serviceNameMappings."+service.name | translate) !== "common.serviceNameMappings."+service.name)? ("common.serviceNameMappings."+service.name | translate) : service.name}}
+        <span *ngIf="service.isOptional">({{"pages.services.labels.optional" | translate}})</span>
       </div>
     </div>
     <div class="hwx-desc">{{"pages.services.description.installDependentService"| translate}}</div>
@@ -38,22 +40,39 @@
         <div class="hwx-subtitle">{{"pages.services.labels.serviceSummary" | translate}}</div>
         <div class="spacer-15"></div>
         <div class="success-list-item" *ngFor="let service of successfulServices">
-          <i class="fa fa-check-circle"></i>{{(("common.serviceNameMappings."+service | translate) !== "common.serviceNameMappings."+service)? ("common.serviceNameMappings."+service | translate) : service}}
+          <i class="fa fa-check-circle"></i>{{(("common.serviceNameMappings."+service.name | translate) !== "common.serviceNameMappings."+service.name)? ("common.serviceNameMappings."+service.name | translate) : service.name}}
+          <span *ngIf="service.isOptional">({{"pages.services.labels.optional" | translate}})</span>
         </div>
-        <div class="error-list-item" *ngFor="let service of failedServices">
-          <i class="fa fa-times-circle"></i>{{(("common.serviceNameMappings."+service | translate) !== "common.serviceNameMappings."+service)? ("common.serviceNameMappings."+service | translate) : service}}
+        <div class="error-list-item" [ngClass]="{'optional' : service.isOptional}" *ngFor="let service of failedServices">
+          <i class="fa" [ngClass]="{'fa-warning' : service.isOptional, 'fa-times-circle': !service.isOptional}"></i>{{(("common.serviceNameMappings."+service.name | translate) !== "common.serviceNameMappings."+service.name)? ("common.serviceNameMappings."+service.name | translate) : service.name}}
+          <span *ngIf="service.isOptional">({{"pages.services.labels.optional" | translate}})</span>
         </div>
         <div class="spacer-15"></div>
       </div>
-      <div *ngIf="!checkInProgress && verificationComplete && installSuccessful" class="hwx-subtitle success">
+      <div *ngIf="!checkInProgress && verificationComplete && installSuccessful && optionalServiceInstallSuccessful" class="hwx-subtitle success">
         <span><i class="fa fa-check-circle"></i> {{"pages.services.labels.verified" | translate}}</span>
-        <div class="status-desc">{{"pages.services.description.successStatus"| translate}}</div>
+        <div class="status-desc">{{"pages.services.description.allDependenciesMet"| translate}}</div>
       </div>
       <div *ngIf="verificationComplete && installSuccessful === false" class="hwx-subtitle error">
         <span><i class="fa fa-times-circle"></i> {{"common.failed" | translate}}</span>
         <div class="status-desc">{{"pages.services.description.errorStatus"| translate}}</div>
         <ul class="failure-list">
-          <li *ngFor="let service of failedServices">{{(("common.serviceNameMappings."+service | translate) !== "common.serviceNameMappings."+service)? ("common.serviceNameMappings."+service | translate) : service}}</li>
+          <li *ngFor="let service of failedServices">
+            {{(("common.serviceNameMappings."+service.name | translate) !== "common.serviceNameMappings."+service.name)? ("common.serviceNameMappings."+service.name | translate) : service.name}}
+            <span *ngIf="service.isOptional">({{"pages.services.labels.optional" | translate}})</span>
+          </li>
+        </ul>
+      </div>
+      <div *ngIf="verificationComplete && installSuccessful && !optionalServiceInstallSuccessful" class="hwx-subtitle success">
+        <span><i class="fa fa-check-circle"></i>{{"pages.services.labels.verified" | translate}}</span>
+        <div class="status-desc">{{"pages.services.description.mandatoryDependenciesMet"| translate}}</div>
+      </div>
+      <div *ngIf="verificationComplete && installSuccessful && !optionalServiceInstallSuccessful" class="hwx-subtitle warning">
+        <div class="status-desc">{{"pages.services.description.optionalInstallation"| translate}}</div>
+        <ul class="failure-list">
+          <li *ngFor="let service of failedServices">
+            <span *ngIf="service.isOptional">{{(("common.serviceNameMappings."+service.name | translate) !== "common.serviceNameMappings."+service.name)? ("common.serviceNameMappings."+service.name | translate) : service.name}}</span>
+          </li>
         </ul>
       </div>
     </div>
