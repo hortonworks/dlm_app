@@ -37,7 +37,7 @@
     "@ngrx/store": "^2.2.1",
     "@ngx-translate/core": "^6.0.1",
     "@ngx-translate/http-loader": "^0.0.3",
-    "@swimlane/ngx-datatable": "8.2.1",
+    "@swimlane/ngx-datatable": "^9.0.0",
     "angular2-moment": "^1.3.3",
     "angular2-notifications": "^0.7.4",
     "bootstrap": "^3.3.7",
