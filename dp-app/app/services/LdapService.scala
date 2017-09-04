@@ -181,7 +181,7 @@ class LdapService @Inject()(
           while (res.hasMore) {
             val sr: SearchResult = res.next()
             val ldaprs = new LdapSearchResult(
-              sr.getName.substring(userSearchAttributeName.length+1),
+              sr.getAttributes.get(userSearchAttributeName).get().toString,
               sr.getClassName,
               sr.getNameInNamespace)
             ldapSearchResults += ldaprs
