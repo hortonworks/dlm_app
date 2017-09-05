@@ -199,5 +199,6 @@ PUT          /configurations                                                cont
 
 
 #ldapconfig
-POST          /ldapconfig                                                    controllers.LdapConfig.add
+POST         /ldapconfig                                                    controllers.LdapConfig.add
 GET          /ldapconfig                                                    controllers.LdapConfig.getAll
+PUT          /ldapconfig                                                    controllers.LdapConfig.update

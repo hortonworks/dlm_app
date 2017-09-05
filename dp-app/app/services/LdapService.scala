@@ -24,7 +24,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, LdapCon
 import com.hortonworks.dataplane.commons.domain.Ldap.{LdapGroup, LdapSearchResult, LdapUser}
 import com.hortonworks.dataplane.db.Webservice.{ConfigService, LdapConfigService}
 import com.typesafe.scalalogging.Logger
-import models.{CredentialEntry, KnoxConfigInfo}
+import models.{CredentialEntry, KnoxConfigInfo, KnoxConfigUpdateInfo}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
@@ -51,7 +51,7 @@ class LdapService @Inject()(
             Future.successful(
               Left(Errors(Seq(Error("400", "invalid knox configuration")))))
           } else {
-            validateBindDn(knoxConf).flatMap {
+            validateBindDn(knoxConf.ldapUrl,knoxConf.bindDn,knoxConf.password).flatMap {
               case Left(errors) => Future.successful(Left(errors))
               case Right(isBound) => {
                 ldapKeyStore.createCredentialEntry(
@@ -61,7 +61,7 @@ class LdapService @Inject()(
                   case Right(isCreated) => {
                     val ldapConfiguration =
                       LdapConfiguration(id = knoxConf.id,
-                        ldapUrl = knoxConf.ldapUrl,
+                        ldapUrl = Some(knoxConf.ldapUrl),
                         bindDn = knoxConf.bindDn,
                         userSearchBase = knoxConf.userSearchBase,
                         userSearchAttributeName = knoxConf.userSearchAttributeName,
@@ -86,6 +86,25 @@ class LdapService @Inject()(
       }
     }
   }
+  def updateKnoxConfig(knoxConfig:KnoxConfigUpdateInfo): Future[Either[Errors, Boolean]]={
+    validateBindDn(knoxConfig.ldapUrl,knoxConfig.bindDn,knoxConfig.password).flatMap {
+      case Left(errors) =>Future.successful(Left(errors))
+      case Right(isBound) => {
+        ldapKeyStore.createCredentialEntry(
+          knoxConfig.bindDn.get,
+          knoxConfig.password.get) match {
+          case Left(errors) => Future.successful(Left(errors))
+          case Right(isCreated) => {
+            val ldapConfig=LdapConfiguration(id=Some(knoxConfig.id),ldapUrl = Some(knoxConfig.ldapUrl))
+            ldapConfigService.update(ldapConfig).map{
+              case Left(errors) => Left(errors)
+              case Right(result) => Right(result)
+            }
+          }
+        }
+      }
+    }
+  }
 
   def validate(knoxConf: KnoxConfigInfo): Either[Errors, Boolean] = {
     if (knoxConf.userSearchBase.isEmpty || knoxConf.userSearchAttributeName.isEmpty){
@@ -96,11 +115,11 @@ class LdapService @Inject()(
     }
   }
 
-  def validateBindDn(
-      knoxConf: KnoxConfigInfo): Future[Either[Errors, Boolean]] = {
-    getLdapContext(knoxConf.ldapUrl,
-                   knoxConf.bindDn.get,
-                   knoxConf.password.get)
+  def validateBindDn(ldapUrl:String,bindDn:Option[String],password:Option[String]
+      ): Future[Either[Errors, Boolean]] = {
+    getLdapContext(ldapUrl,
+                   bindDn.get,
+                   password.get)
       .map {
         case Left(errors) => Left(errors)
         case Right(dirContext) =>
@@ -144,7 +163,7 @@ class LdapService @Inject()(
           ldapKeyStore.getCredentialEntry(l.bindDn.get)
         cred match {
           case Some(cred) =>
-            getLdapContext(l.ldapUrl, l.bindDn.get, cred.password)
+            getLdapContext(l.ldapUrl.get, l.bindDn.get, cred.password)
           case None =>
             Future.successful(
               Left(Errors(Seq(Error("Exception", "no password ")))))

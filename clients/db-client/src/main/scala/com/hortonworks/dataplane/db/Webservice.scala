@@ -246,6 +246,8 @@ object Webservice {
 
     def get(): Future[Either[Errors, Seq[LdapConfiguration]]]
 
+    def update(ldapConfig: LdapConfiguration): Future[Either[Errors, Boolean]]
+
   }
 
   trait WorkspaceService extends DbClientService {

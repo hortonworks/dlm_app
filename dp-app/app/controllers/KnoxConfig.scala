@@ -15,12 +15,9 @@ import com.google.inject.Inject
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.typesafe.scalalogging.Logger
-import com.hortonworks.dataplane.commons.auth.{
-  Authenticated,
-  AuthenticatedRequest
-}
+import com.hortonworks.dataplane.commons.auth.{Authenticated, AuthenticatedRequest}
 import com.hortonworks.dataplane.db.Webservice.ConfigService
-import models.{KnoxConfigInfo, KnoxConfiguration}
+import models.{KnoxConfigInfo, KnoxConfigUpdateInfo, KnoxConfiguration}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, Controller}
 import services.{KnoxConfigurator, LdapService}
@@ -73,6 +70,18 @@ class KnoxConfig @Inject()(
         Future.successful(BadRequest)
       )
   }
+  def updateLdapConfig= authenticated.async(parse.json) { request =>
+    request.body
+      .validate[KnoxConfigUpdateInfo]
+      .map { knoxConfig =>
+        ldapService.updateKnoxConfig(knoxConfig).map{
+          case Left(errors) =>handleErrors(errors)
+          case Right(isCreated) =>Ok(Json.toJson(isCreated))
+        }
+      }.getOrElse(
+        Future.successful(BadRequest)
+      )
+  }
 
   def getLdapConfiguration = Action.async {
     ldapService.getConfiguredLdap.map {
@@ -109,7 +118,7 @@ class KnoxConfig @Inject()(
       .validate[KnoxConfigInfo]
       .map { ldapConf =>
         ldapService
-          .validateBindDn(ldapConf)
+          .validateBindDn(ldapConf.ldapUrl,ldapConf.bindDn,ldapConf.password)
           .map {
             case Left(errors) => handleErrors(errors)
             case Right(booleanRes) => Ok(Json.toJson(true))
@@ -141,7 +150,7 @@ class KnoxConfig @Inject()(
               val userDnTemplate =
                 s"${ldapConfig.userSearchAttributeName.get}={0},${ldapConfig.userSearchBase.get}"
               val knoxLdapConfig =
-                KnoxConfiguration(ldapUrl = ldapConfig.ldapUrl,
+                KnoxConfiguration(ldapUrl = ldapConfig.ldapUrl.get,
                                   bindDn = ldapConfig.bindDn,
                                   userDnTemplate = Some(userDnTemplate),
                                   domains = whiteListdomains)
