@@ -73,7 +73,6 @@ export class ServiceManagementComponent implements OnInit {
           enabledApp.clustersInfo = clusters;
           enabledApp.isOpen = true;
           clusterInfo.syncInProgress = true;
-          console.log(clusterInfo);
           this.clusterService.syncCluster(lake.data.id).subscribe(response => {
             if (response._body === 'false') {
               clusterInfo.synced = false;
@@ -98,7 +97,6 @@ export class ServiceManagementComponent implements OnInit {
                 clusterInfo.optionalDependencies = info.optionalDependencies;
                 clusterInfo.dependenciesMet = info.dependenciesMet;
                 clusterInfo.optionalDependenciesMet = info.optionalDependenciesMet;
-                console.log(clusterInfo);
               });
             });
           });
