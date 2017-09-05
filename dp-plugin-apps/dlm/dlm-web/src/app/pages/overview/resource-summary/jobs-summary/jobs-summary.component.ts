@@ -19,7 +19,7 @@ import { JOBS_HEALTH_STATE } from '../resource-summary.type';
       [total]="data.total">
       <div class="row">
         <dlm-summary-panel-cell
-          class="col-md-4"
+          class="col-xs-4"
           iconClass="fa fa-circle text-info"
           qe-attr="show-jobs-in-progress"
           (cellClick)="selectPanelCell.emit(healthStates.IN_PROGRESS)"
@@ -28,7 +28,7 @@ import { JOBS_HEALTH_STATE } from '../resource-summary.type';
           [value]="data.inProgress">
         </dlm-summary-panel-cell>
         <dlm-summary-panel-cell
-          class="col-md-4"
+          class="col-xs-4"
           iconClass="fa fa-circle text-danger"
           qe-attr="show-failed-jobs"
           (cellClick)="selectPanelCell.emit(healthStates.LAST_FAILED)"
@@ -38,7 +38,7 @@ import { JOBS_HEALTH_STATE } from '../resource-summary.type';
           [value]="data.lastFailed">
         </dlm-summary-panel-cell>
         <dlm-summary-panel-cell
-          class="col-md-4"
+          class="col-xs-4"
           iconClass="fa fa-circle text-danger"
           qe-attr="show-last-10-failed-jobs"
           (cellClick)="selectPanelCell.emit(healthStates.LAST_10_FAILED)"

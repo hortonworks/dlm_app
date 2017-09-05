@@ -19,14 +19,14 @@ import { CLUSTERS_HEALTH_STATE } from '../resource-summary.type';
       [total]="data.total">
       <div class="row">
         <dlm-summary-panel-cell
-          class="col-md-4"
+          class="col-xs-4"
           iconClass="fa fa-star text-success"
           [label]="'page.overview.summary_panels.status.healthy' | translate"
           [hint]="'page.overview.summary_panels.hint.clusters.healthy'"
           [value]="data.healthy">
         </dlm-summary-panel-cell>
         <dlm-summary-panel-cell
-          class="col-md-4"
+          class="col-xs-4"
           iconClass="fa fa-circle text-warning"
           qe-attr="show-clusters-warnings"
           (cellClick)="selectPanelCell.emit(healthStates.WARNING)"
@@ -36,7 +36,7 @@ import { CLUSTERS_HEALTH_STATE } from '../resource-summary.type';
           [value]="data.warning">
         </dlm-summary-panel-cell>
         <dlm-summary-panel-cell
-          class="col-md-4"
+          class="col-xs-4"
           iconClass="fa fa-exclamation-triangle text-danger"
           qe-attr="show-unhealthy-clusters"
           (cellClick)="selectPanelCell.emit(healthStates.UNHEALTHY)"
