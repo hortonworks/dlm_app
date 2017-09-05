@@ -22,17 +22,19 @@
 
 .title-pane {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
 }
 
 .page-title, .search {
   flex: 0 0 auto;
+  padding-top: 18px;
 }
 
 .filter-labels {
   flex: 1 1 auto;
   text-align: right;
+  padding: 18px 5px 5px;
 }
 
 .search-input {
@@ -145,7 +147,12 @@ input {
   line-height: 14px !important;
   padding: 4px 0 4px 12px;
   border-radius: 3px;
-  margin: 0 5px
+  margin: 5px;
+  align-self: flex-start;
+}
+
+:host /deep/ .mdl-chip + .mdl-chip {
+  margin-left: 5px;
 }
 
 :host /deep/ .mdl-chip__text {
