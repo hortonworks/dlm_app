@@ -55,7 +55,7 @@ class DpProfilerServiceImpl (config: Config)(implicit ws: ClusterWsClient) exten
       .map(mapResultsGeneric)
   }
 
-  override def deleteProfilerByDatasetId(clusterId: String, datasetId: Int)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]] = {
+  override def deleteProfilerByDatasetId(clusterId: String, datasetId: Long)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]] = {
     ws.url(s"$url/cluster/$clusterId/dp-profiler/profilers?datasetId=$datasetId")
       .withToken(token)
       .withHeaders("Accept" -> "application/json")

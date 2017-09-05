@@ -94,7 +94,7 @@ object Webservice {
 
     def getProfilerJobStatus(clusterId: String, dbName: String, tableName: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
 
-    def deleteProfilerByDatasetId(clusterId: String, datasetId: Int)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
+    def deleteProfilerByDatasetId(clusterId: String, datasetId: Long)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
 
   }
 }

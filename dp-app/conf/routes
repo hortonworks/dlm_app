@@ -85,6 +85,7 @@ GET           /api/ranger/policy/:clusterId/:dbName/:tableName        controller
 #DpProfiler
 POST          /api/dpProfiler/startJob                                controllers.DpProfilerAttributes.startProfilerJob(clusterId: String, dbName: String, tableName: String)
 GET           /api/dpProfiler/jobStatus                               controllers.DpProfilerAttributes.getProfilerJobStatus(clusterId: String, dbName: String, tableName: String)
+DELETE        /api/dpProfiler                                         controllers.DpProfilerAttributes.deleteProfiler(clusterId: String, datasetId: Option[String])
 
 
 #LDAP

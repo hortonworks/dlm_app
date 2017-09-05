@@ -69,4 +69,24 @@ class DpProfilerAttributes @Inject()(
     }
   }
 
+  def deleteProfiler(clusterId: String, datasetId: Option[Long]) = {
+    authenticated.async { req =>
+      Logger.info(s"Received deleteProfiler for entity $clusterId $datasetId")
+      implicit val token = req.token
+      dpProfilerService
+        .deleteProfilerByDatasetId(clusterId, datasetId.getOrElse(-1))
+        .map {
+          case Left(errors) => {
+            errors.errors.head.code match {
+              case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case "405" => MethodNotAllowed(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            }
+          }
+          case Right(attributes) => Ok(Json.toJson(attributes))
+        }
+
+    }
+  }
+
 }
