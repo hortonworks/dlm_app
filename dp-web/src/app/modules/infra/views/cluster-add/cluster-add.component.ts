@@ -116,6 +116,16 @@ export class ClusterAddComponent implements OnInit {
     this.showError = false;
   }
 
+  resetPage(){
+    this.showError = false;
+    this.isInvalidAmbariUrl = false;
+    this.showNotification = false;
+    this._isClusterValidateInProgress = false;
+    this._isClusterValidateSuccessful = false;
+    this.clusterForm.reset();
+    this.cluster = new Cluster();
+  }
+
   getClusterInfo(event) {
     this.showError = false;
     this.isInvalidAmbariUrl = false;
