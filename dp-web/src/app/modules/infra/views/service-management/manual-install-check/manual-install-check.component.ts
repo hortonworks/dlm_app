@@ -75,7 +75,13 @@ export class ManualInstallCheckComponent implements OnInit {
         this.discoveredServices = responses[3];
         this.dependentServices.forEach(dependency => {
           if (!services.find(key => key === dependency) && !this.discoveredServices.find(service => service.servicename === dependency)) {
-            this.failedServices.push({name: dependency, isOptional: !!this.optionalServices.find(key => key === dependency)});
+            let isOptional = !!this.optionalServices.find(key => key === dependency);
+            this.failedServices.push({name: dependency, isOptional: isOptional});
+            if (isOptional) {
+              this.optionalServiceInstallSuccessful = false;
+            } else {
+              this.installSuccessful = false;
+            }
           } else {
             this.successfulServices.push({name: dependency, isOptional: !!this.optionalServices.find(key => key === dependency)});
           }

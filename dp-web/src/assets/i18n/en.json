@@ -134,6 +134,7 @@
       "description": {
         "verificationWelcome": "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your SmartSense ID.",
         "manualInstall" : "Service <b>{{serviceName}}</b> is not enabled on cluster <b>{{clusterName}}</b> as one or more of the dependent services have not been enabled.",
+        "installOptionalService":"Service <b>{{serviceName}}</b> is enabled on cluster <b>{{clusterName}}</b>. However one or more of the optional services have not been enabled.",
         "installDependentService":"Please enable the dependent services on the cluster using the documentation link.",
         "verifyDependency":"After all the dependent services are installed on the cluster, please click on the verification check box.",
         "enableError": "Service could not be enabled.",

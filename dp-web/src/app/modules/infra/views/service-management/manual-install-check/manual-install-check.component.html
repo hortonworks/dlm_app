@@ -3,7 +3,8 @@
     <span class="hwx-title"> Manual Install</span>
   </div>
   <div class="page-content">
-    <div class="hwx-desc" [innerHTML]="'pages.services.description.manualInstall'| translate: descriptionParams"></div>
+    <div class="hwx-desc" *ngIf="installSuccessful === false" [innerHTML]="'pages.services.description.manualInstall'| translate: descriptionParams"></div>
+    <div class="hwx-desc" *ngIf="installSuccessful !==false && optionalServiceInstallSuccessful === false" [innerHTML]="'pages.services.description.installOptionalService'| translate: descriptionParams"></div>
     <div class="spacer-15"></div>
     <div class="hwx-subtitle">
       {{"pages.services.labels.dependentServicesLabel" | translate}}
