@@ -46,7 +46,7 @@
             <span *ngIf="_isClusterValidateInProgress"><i class="fa fa-spinner fa-spin"></i></span>
             <span *ngIf="!_isClusterValidateInProgress">{{"common.go" | translate}}</span>
           </button>
-          <button *ngIf="showClusterDetails" class="mdl-button btn-hwx-primary" type="button" (click)="resetPage()">
+          <button *ngIf="showClusterDetails" id="clear-btn" class="mdl-button btn-hwx-primary" type="button" (click)="resetPage()">
             <span>{{"common.clear" | translate}}</span>
           </button>
         </div>
