@@ -6,13 +6,8 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasEntities, Entity}
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.cs.Webservice.AtlasService
-import com.hortonworks.dataplane.db.Webservice.{
-  CategoryService,
-  DataAssetService,
-  DataSetCategoryService,
-  DataSetService
-}
+import com.hortonworks.dataplane.cs.Webservice.{AtlasService, DpProfilerService}
+import com.hortonworks.dataplane.db.Webservice.{CategoryService, DataAssetService, DataSetCategoryService, DataSetService}
 import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.JsonResponses
 import play.api.Logger
@@ -21,6 +16,7 @@ import play.api.mvc.Controller
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class DataSets @Inject()(
     @Named("dataSetService") val dataSetService: DataSetService,
@@ -28,6 +24,7 @@ class DataSets @Inject()(
     @Named("categoryService") val categoryService: CategoryService,
     @Named("dataSetCategoryService") val dataSetCategoryService: DataSetCategoryService,
     @Named("atlasService") val atlasService: AtlasService,
+    @Named("dpProfilerService") val dpProfilerService: DpProfilerService,
     authenticated: Authenticated)
     extends Controller {
 
@@ -113,11 +110,28 @@ class DataSets @Inject()(
                   case Left(errors) =>
                     InternalServerError(JsonResponses.statusError(
                       s"Failed with ${Json.toJson(errors)}"))
-                  case Right(dataSetNCategories) =>
+                  case Right(dataSetNCategories) => {
+                    val dsId = dataSetNCategories.dataset.id.get
+                    val list = assets.map {
+                      asset => ((asset.assetProperties \ "qualifiedName").as[String]).split("@").head
+                    }
+                    dpProfilerService.startAndScheduleProfilerJob(req.clusterId.toString, dsId.toString, list)
+                      .onComplete {
+                        case Success(Right(attributes))=> Logger.info(s"Started and Scheduled Profiler, 200 response, ${Json.toJson(attributes)}")
+                        case Success(Left(errors)) => {
+                          errors.errors.head.code match {
+                            case "404" => Logger.error(s"Start and Schedule Profiler Failed with 404 ${Json.toJson(errors)}")
+                            case "405" => Logger.error(s"Start and Schedule Profiler Failed with 405 ${Json.toJson(errors)}")
+                            case _ => Logger.error(s"Start and Schedule Profiler Failed with ${errors.errors.head.code} ${Json.toJson(errors)}")
+                          }
+                        }
+                        case Failure(th) => Logger.error(th.getMessage, th)
+                      }
                     Ok(
                       Json.obj("result" -> Json.toJson(dataSetNCategories),
-                               "countOfSaved" -> countOfSaved,
-                               "countOfIgnored" -> countOfIgnored))
+                        "countOfSaved" -> countOfSaved,
+                        "countOfIgnored" -> countOfIgnored))
+                  }
                 }
             case Left(errors) =>
               Future.successful(InternalServerError(JsonResponses.statusError(
