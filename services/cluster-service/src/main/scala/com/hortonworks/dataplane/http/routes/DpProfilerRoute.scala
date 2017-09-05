@@ -70,21 +70,55 @@ class DpProfilerRoute @Inject()(
       }
     }
 
-  private def getJobStatus(clusterId: Long, dbName: String, tableName: String): Future[WSResponse] = {
-
-    for {
-      config <- getConfigOrThrowException(clusterId)
-      url <- getUrlFromConfig(config)
-      baseUrls <- extractUrlsWithIp(url, clusterId)
-      urlToHit <- Future.successful(s"${baseUrls.head}/jobs/assetjob?assetId=$dbName.$tableName&profilerName=hivecolumn")
-      tmp <- Future.successful(println(urlToHit))
-      response <- ws.url(urlToHit)
-        .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
-        .get()
-    } yield {
-      response
+  val jobDelete =
+    path ("cluster" / LongNumber / "dp-profiler" / "profilers") { clusterId: Long =>
+      delete {
+        parameters('datasetId.as[Long]) { datasetId =>
+          onComplete(deleteProfilerByDatasetId(clusterId, datasetId)) {
+            case Success(res) => res.status match {
+              case 200 => complete(success(res.json))
+              case 404 => complete(StatusCodes.NotFound, notFound)
+            }
+            case Failure(th) => th match {
+              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
+              case _ => complete(StatusCodes.InternalServerError, errors(th))
+            }
+          }
+        }
+      }
     }
-  }
+
+    private def deleteProfilerByDatasetId(clusterId: Long, datasetId: Long): Future[WSResponse] = {
+
+      for {
+        config <- getConfigOrThrowException(clusterId)
+        url <- getUrlFromConfig(config)
+        baseUrls <- extractUrlsWithIp(url, clusterId)
+        urlToHit <- Future.successful(s"${baseUrls.head}/schedules/$datasetId")
+        tmp <- Future.successful(println(urlToHit))
+        response <- ws.url(urlToHit)
+          .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+          .delete()
+      } yield {
+        response
+      }
+    }
+
+    private def getJobStatus(clusterId: Long, dbName: String, tableName: String): Future[WSResponse] = {
+
+      for {
+        config <- getConfigOrThrowException(clusterId)
+        url <- getUrlFromConfig(config)
+        baseUrls <- extractUrlsWithIp(url, clusterId)
+        urlToHit <- Future.successful(s"${baseUrls.head}/jobs/assetjob?assetId=$dbName.$tableName&profilerName=hivecolumn")
+        tmp <- Future.successful(println(urlToHit))
+        response <- ws.url(urlToHit)
+          .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+          .get()
+      } yield {
+        response
+      }
+    }
 
   private def postJob(clusterId: Long, dbName: String, tableName: String): Future[WSResponse] = {
     val postData = Json.obj(
