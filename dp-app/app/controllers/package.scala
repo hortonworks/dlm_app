@@ -21,4 +21,14 @@ package object controllers {
       Option(mandatoryServices + "," + optionalServices)
     }
   }
+
+  def getMandatoryDependentServices(skuName: String)(implicit configuration: play.api.Configuration):Option[String] = {
+    val mandatoryServices = Try(configuration.underlying.getString(s"$skuName.dependent.services.mandatory")).getOrElse("")
+    Option(mandatoryServices)
+  }
+
+  def getOptionalDependentServices(skuName: String)(implicit configuration: play.api.Configuration):Option[String] = {
+    val optionalServices = Try(configuration.underlying.getString(s"$skuName.dependent.services.optional")).getOrElse("")
+    Option(optionalServices)
+  }
 }
