@@ -76,7 +76,7 @@ export class DsNavResultViewer {
   doConfirmDelete() {
     const delete$ = this.dataSetService.delete(this._datasetToDelete.id).share();
 
-    delete$.subscribe(this.getDataset);
+    delete$.subscribe(() => this.getDataset());
     delete$
       .do(() => this._deleteWasSuccessful = true)
       .delay(2000)
