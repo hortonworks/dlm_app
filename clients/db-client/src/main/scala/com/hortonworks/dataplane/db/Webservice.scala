@@ -112,7 +112,7 @@ object Webservice {
     def update(dataSetAndCatIds: DatasetAndCategoryIds)
     : Future[Either[Errors, DatasetAndCategories]]
 
-    def delete(dataSetId: String): Future[Either[Errors, Dataset]]
+    def delete(dataSetId: String): Future[Either[Errors, Long]]
   }
 
   trait CategoryService extends DbClientService {

@@ -20,9 +20,9 @@ import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.cs.Webservice.{AtlasService, DpProfilerService}
 import com.hortonworks.dataplane.db.Webservice.{CategoryService, DataAssetService, DataSetCategoryService, DataSetService}
 import com.hortonworks.dataplane.commons.auth.Authenticated
-import models.JsonResponses
+import models.{JsonResponses, WrappedErrorsException}
 import play.api.Logger
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc.Controller
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -36,6 +36,7 @@ class DataSets @Inject()(
     @Named("dataSetCategoryService") val dataSetCategoryService: DataSetCategoryService,
     @Named("atlasService") val atlasService: AtlasService,
     @Named("dpProfilerService") val dpProfilerService: DpProfilerService,
+    @Named("clusterService") val clusterService: com.hortonworks.dataplane.db.Webservice.ClusterService,
     authenticated: Authenticated)
     extends Controller {
 
@@ -239,16 +240,20 @@ class DataSets @Inject()(
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def delete(dataSetId: String) = authenticated.async {
+  def delete(dataSetId: String) = authenticated.async { req =>
+    implicit val token = req.token
     Logger.info("Received delete dataSet request")
-    dataSetService
-      .delete(dataSetId)
-      .map {
-        case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-        case Right(dataSet) => Ok(Json.toJson(dataSet))
-      }
+    (for {
+      dpClusterId <- doGetDpClusterIdOfDataset(dataSetId.toLong)
+      clusterId <- doGetClusterIdFromDpClusterId(dpClusterId.toLong)
+      deleted <- doDeleteDataset(dataSetId.toLong)
+      profilesDeleted <- doDeleteProfilers(clusterId, dataSetId.toLong)
+    }  yield {
+      Ok(Json.obj("deleted" -> deleted))
+    })
+    .recover{
+      case ex: WrappedErrorsException => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(ex.errors)}"))
+    }
   }
 
   def listAllCategories = authenticated.async {
@@ -347,6 +352,42 @@ class DataSets @Inject()(
               Right(enhanced)
           }
     }
+  }
+
+  private def doDeleteDataset(datasetId: Long): Future[Long] = {
+    dataSetService
+      .delete(datasetId.toString)
+      .flatMap {
+        case Left(errors) => Future.failed(WrappedErrorsException(errors))
+        case Right(deleted) => Future.successful(deleted)
+      }
+  }
+
+  private def doDeleteProfilers(clusterId: Long, datasetId: Long)(implicit token:Option[HJwtToken]): Future[Boolean] = {
+    dpProfilerService
+      .deleteProfilerByDatasetId(clusterId, datasetId)
+      .flatMap {
+        case Left(errors) => Future.successful(true)
+        case Right(jsObject) => Future.successful(false)
+      }
+  }
+
+  private def doGetClusterIdFromDpClusterId(dpClusterId: Long): Future[Long] = {
+    clusterService
+      .getLinkedClusters(dpClusterId)
+      .flatMap {
+        case Left(errors) => Future.failed(WrappedErrorsException(errors))
+        case Right(clusters) => Future.successful(clusters.head.id.get)
+      }
+  }
+
+  private def doGetDpClusterIdOfDataset(datasetId: Long): Future[Long] = {
+    dataSetService
+      .getRichDatasetById(datasetId)
+      .flatMap {
+        case Left(errors) => Future.failed(WrappedErrorsException(errors))
+        case Right(dataset) => Future.successful(dataset.dataset.dpClusterId)
+      }
   }
 
 }
