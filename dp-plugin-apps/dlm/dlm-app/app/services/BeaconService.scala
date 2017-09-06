@@ -14,7 +14,7 @@ import javax.inject.{Inject, Singleton}
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, HJwtToken}
 import com.hortonworks.dataplane.cs.Webservice.KnoxProxyService
-import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconApiError, BeaconApiErrors, BeaconEventResponse, BeaconLogResponse, PairedCluster, PolicyDataResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
+import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconAdminStatusDetails, BeaconAdminStatusResponse, BeaconApiError, BeaconApiErrors, BeaconEventResponse, BeaconLogResponse, PairedCluster, PolicyDataResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
 import com.hortonworks.dlm.beacon.WebService._
 import com.hortonworks.dlm.beacon.domain.RequestEntities.ClusterDefinitionRequest
 
@@ -46,9 +46,10 @@ class BeaconService @Inject()(
    @Named("beaconPolicyInstanceService") val beaconPolicyInstanceService: BeaconPolicyInstanceService,
    @Named("beaconEventService") val beaconEventService: BeaconEventService,
    @Named("beaconLogService") val beaconLogService: BeaconLogService,
-   //@Named("knoxProxyService") implicit  val knoxProxyService: KnoxProxyService,
+   @Named("beaconAdminService") val beaconAdminService: BeaconAdminService,
    val dataplaneService: DataplaneService,
-   val webhdfsService: WebhdfsService) {
+   val webhdfsService: WebhdfsService,
+   val ambariService: AmbariService) {
 
   /**
     * Get list of all paired clusters
@@ -118,18 +119,20 @@ class BeaconService @Inject()(
         clusterBFs <- dataplaneService.getNameNodeService(clusterBId)
         hiveServiceA <- dataplaneService.getHiveServerService(clusterAId)
         hiveServiceB <- dataplaneService.getHiveServerService(clusterBId)
+        rangerServiceA <- ambariService.getRangerEndpointDetails(clusterAId)
+        rangerServiceB <- ambariService.getRangerEndpointDetails(clusterBId)
         clusterDefinitionsA <- beaconPairService.listPairedClusters(clustersToBePairedSeq.head.beaconUrl, clusterAId)
         clusterDefinitionsB <- beaconPairService.listPairedClusters(clustersToBePairedSeq.tail.head.beaconUrl, clusterBId)
       } yield {
-        val futureFailedList = List(clusterA, clusterB, clusterAFs, clusterBFs, clusterDefinitionsA, clusterDefinitionsB).filter(_.isLeft)
+        val futureFailedList = List(clusterA, clusterB, clusterAFs, clusterBFs, rangerServiceA, rangerServiceB, clusterDefinitionsA, clusterDefinitionsB).filter(_.isLeft)
         if (futureFailedList.isEmpty) {
           for {
             dpClusterA <- dataplaneService.getDpCluster(clusterA.right.get.dataplaneClusterId.get)
             dpClusterB <- dataplaneService.getDpCluster(clusterB.right.get.dataplaneClusterId.get)
           } yield {
             if (!List(dpClusterA, dpClusterB).exists(_.isLeft)) {
-              val listOfClusters = ClusterDefinitionDetails(clusterA.right.get, dpClusterA.right.get, clusterAFs.right.get, hiveServiceA, clusterDefinitionsA.right.get, clustersToBePairedSeq.head) ::
-                ClusterDefinitionDetails(clusterB.right.get, dpClusterB.right.get, clusterBFs.right.get, hiveServiceB, clusterDefinitionsB.right.get, clustersToBePairedSeq.tail.head) :: Nil
+              val listOfClusters = ClusterDefinitionDetails(clusterA.right.get, dpClusterA.right.get, clusterAFs.right.get, hiveServiceA, rangerServiceA.right.get, clusterDefinitionsA.right.get, clustersToBePairedSeq.head) ::
+                ClusterDefinitionDetails(clusterB.right.get, dpClusterB.right.get, clusterBFs.right.get, hiveServiceB, rangerServiceB.right.get, clusterDefinitionsB.right.get, clustersToBePairedSeq.tail.head) :: Nil
               // Retrieve cluster definitions that is pending to be submitted to the beacon process
               val clusterDefsToBeSubmitted: Set[ClusterDefinition] = getClusterDefsToBeSubmitted(listOfClusters)
               if (clusterDefsToBeSubmitted.isEmpty) {
@@ -183,6 +186,7 @@ class BeaconService @Inject()(
               val clusterToBePairedDetails: ClusterDefinitionDetails = listOfClusters.find(x => x.dpCluster.dcName + "$" + x.dpCluster.name == nextClusterName).get
               val local : Boolean =  (outerNext.dpCluster.dcName + "$" +  outerNext.dpCluster.name) == nextClusterName
               val nnService = clusterToBePairedDetails.nnClusterService
+              val rangerService = clusterToBePairedDetails.rangerService
               val hiveServerConfigDetails: Map [String, Option[String]]= clusterToBePairedDetails.hiveServerService match {
                 case Right(hiveServerService) => {
                   Map(
@@ -203,6 +207,7 @@ class BeaconService @Inject()(
                   local,
                   clusterToBePairedDetails.pairedClusterRequest.beaconUrl,
                   nnService.serviceProperties,
+                  rangerService,
                   hiveServerConfigDetails("hsEndpoint"),
                   hiveServerConfigDetails("hsKerberosPrincipal")
                 )
@@ -651,6 +656,37 @@ class BeaconService @Inject()(
           case Left(errors) => p.success(Left(errors))
           case Right(beaconLogResponse) => p.success(Right(beaconLogResponse))
         }
+    }
+    p.future
+  }
+
+  /**
+    * Return beacon admin status for all registered beacon servers
+    * @param token  JWT token
+    * @return
+    */
+  def getAllBeaconAdminStatus() (implicit token:Option[HJwtToken]) : Future[Either[DlmApiErrors, AdminStatusResponse]] = {
+    val p: Promise[Either[DlmApiErrors, AdminStatusResponse]] = Promise()
+    dataplaneService.getBeaconClusters.map {
+      case Left(errors) => p.success(Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None,
+        Some(errors.errors.map(x => BeaconApiError(x.message)).head))))))
+      case Right(beaconCluster) => {
+        val beaconClusters = beaconCluster.clusters
+        val allBeaconAdminStatusFuture: Future[Seq[Either[BeaconApiErrors, BeaconAdminStatusDetails]]] =
+          Future.sequence(beaconClusters.map((x) => beaconAdminService.listStatus(x.beaconUrl, x.id)))
+
+        for {
+          allBeaconAdminStatusFuture <- allBeaconAdminStatusFuture
+        } yield {
+          val allBeaconAdminStatus: Seq[BeaconAdminStatusDetails] = allBeaconAdminStatusFuture.filter(_.isRight).map(x => x.right.get)
+          val failedResponses: Seq[BeaconApiErrors] = allBeaconAdminStatusFuture.filter(_.isLeft).map(_.left.get)
+          if (failedResponses.length == beaconClusters.length) {
+            p.success(Left(DlmApiErrors(failedResponses)))
+          } else {
+            p.success(Right(AdminStatusResponse(failedResponses, allBeaconAdminStatus)))
+          }
+        }
+      }
     }
     p.future
   }

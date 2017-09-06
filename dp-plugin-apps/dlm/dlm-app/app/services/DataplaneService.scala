@@ -252,8 +252,7 @@ class DataplaneService @Inject()(
         val hdfsServiceConfigMap : Map[String, Option[String]] = Map(
           "fsEndpoint" -> Some(fsEndpoint),
           "nnKerberosPrincipal" -> nnKerberosPrincipal,
-          "dfs.nameservices" ->  dfsNameService,
-          "dfs.internal.nameservices" -> dfsInternalNameServices
+          "dfs.nameservices" ->  dfsNameService
         ) ++ nnHaDynamicKeyConfigs
 
         Right(

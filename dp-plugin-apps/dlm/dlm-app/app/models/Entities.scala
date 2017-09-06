@@ -37,8 +37,10 @@ object Entities {
   case class BeaconClusters(clusters: Seq[BeaconCluster])
 
 
-  case class ClusterDefinitionDetails (cluster:Cluster, dpCluster: DataplaneCluster, nnClusterService : ClusterServiceEndpointDetails, hiveServerService : Either[Errors, ClusterServiceEndpointDetails],
-                                       clusterDefinitions: Seq[PairedCluster], pairedClusterRequest:PairClusterRequest)
+  case class ClusterDefinitionDetails (cluster:Cluster, dpCluster: DataplaneCluster, nnClusterService : ClusterServiceEndpointDetails,
+                                       hiveServerService : Either[Errors, ClusterServiceEndpointDetails],
+                                       rangerService: Option[RangerServiceDetails], clusterDefinitions: Seq[PairedCluster],
+                                       pairedClusterRequest:PairClusterRequest)
 
   // Request schema submitted to Beacon for cluster definition
   case class ClusterDefinition (beaconUrl:String, clusterId: Long, clusterDefRequest : ClusterDefinitionRequest)
@@ -65,6 +67,8 @@ object Entities {
   case class PolicyInstancesResponse(totalResults: Long, results: Long, jobs: Seq[PolicyInstanceResponse])
 
   case class EventsDetailResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), events: Seq[BeaconEventResponse])
+  
+  case class AdminStatusResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), response: Seq[BeaconAdminStatusDetails])
 
 }
 
@@ -102,6 +106,9 @@ object JsonFormatters {
 
   implicit val eventsDetailResponseReads = Json.reads[EventsDetailResponse]
   implicit val eventsDetailResponseWrites = Json.writes[EventsDetailResponse]
+
+  implicit val adminStatusResponseReads = Json.reads[AdminStatusResponse]
+  implicit val adminStatusResponseWrites = Json.writes[AdminStatusResponse]
 
 }
 

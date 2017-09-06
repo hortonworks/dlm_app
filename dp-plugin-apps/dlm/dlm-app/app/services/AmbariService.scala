@@ -15,6 +15,8 @@ import com.google.inject.name.Named
 import models.Ambari._
 import com.hortonworks.dataplane.cs.Webservice.{AmbariWebService => AmbariClientService}
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, HJwtToken}
+import com.hortonworks.dlm.beacon.domain.RequestEntities.RangerServiceDetails
+import models.Entities.ClusterServiceEndpointDetails
 import play.api.Logger
 import play.api.http.Status.BAD_GATEWAY
 import play.api.libs.json.JsValue
@@ -142,10 +144,128 @@ class AmbariService @Inject()(@Named("ambariService") val ambariService: AmbariC
     }
     p.future
   }
+
+  /**
+    * Get the active (effective) service configuration for the default group of a service
+    * @param clusterId     cluster id
+    * @param serviceName   service name
+    * @param token          JWT token
+    * @return
+    */
+  def getActiveServiceConfiguration(clusterId: Long, serviceName: String) (implicit token:Option[HJwtToken]):
+    Future[Either[Errors, Seq[ActiveServiceConfigurations]]] = {
+    val p: Promise[Either[Errors, Seq[ActiveServiceConfigurations]]] = Promise()
+    dataplaneService.getCluster(clusterId).map {
+      case Left(errors) =>  {
+        p.success(Left(errors))
+      }
+      case Right(response) =>
+        val clusterName = response.name
+        val url = AmbariService.getActiveServiceConfigurationUrl(clusterName, serviceName)
+        ambariService.requestAmbariApi(clusterId, url.encode).map {
+          case Left(errors) =>  {
+            p.success(Left(errors))
+          }
+          case Right(response) => {
+            p.success(Right(response.validate[ActiveDefaultConfiguration].get.items))
+          }
+        }
+    }
+    p.future
+  }
+
+  /**
+    * Get ranger endpoint details to be submitted as part of cluster submission to beacon
+    * @param clusterId  cluster id
+    * @param token      JWT token
+    * @return
+    */
+  def getRangerEndpointDetails(clusterId: Long) (implicit token:Option[HJwtToken]):
+    Future[Either[Errors, Option[RangerServiceDetails]]] = {
+    val p: Promise[Either[Errors, Option[RangerServiceDetails]]] = Promise()
+    val rangerConfigurations : Future[Either[Errors, Seq[ActiveServiceConfigurations]]] =
+      getActiveServiceConfiguration(clusterId, AmbariService.RANGER_SERVICE_NAME)
+
+    rangerConfigurations.map {
+      case Left(errors) =>  p.success(Left(errors))
+      case Right(response) =>
+        if (response.isEmpty) p.success(Right(None)) else {
+          val configurations : Seq[ServiceConfigurations] = response.head.configurations
+          val adminProperties : Option[ServiceConfigurations] = configurations.find(x => x.`type` == AmbariService.RANGER_ADMIN_PROPERTIES)
+          adminProperties match {
+            case None => p.success(Left(Errors(Seq(Error(BAD_GATEWAY.toString, AmbariService.adminPropertiesErrorMsg)))))
+            case Some(adminProperties) => {
+              adminProperties.properties.policymgr_external_url match {
+                case None => p.success(Left(Errors(Seq(Error(BAD_GATEWAY.toString, AmbariService.policymgrUrlErrorMsg)))))
+                case Some(policymgr_external_url) =>
+                  val clusterName = adminProperties.Config.cluster_name
+
+                  for {
+                    hdfsConfigurations <- getActiveServiceConfiguration(clusterId, AmbariService.HDFS_SERVICE_NAME)
+                    hiveConfigurations <- getActiveServiceConfiguration(clusterId, AmbariService.HIVE_SERVICE_NAME)
+                  } yield {
+                    val futureList = List(hdfsConfigurations, hiveConfigurations)
+                    if (futureList.exists(_.isLeft)){
+                      p.success(Left(Errors(Seq(Error(BAD_GATEWAY.toString, AmbariService.rangerPolicyNameErrorMsg)))))
+                    } else {
+                      val rangerHdfsSecurityConfigs : Option[ServiceConfigurations] = hdfsConfigurations.right.get.head.configurations
+                          .find(x => x.`type` == AmbariService.RANGER_HDFS_SECURITY_PROPERTIES)
+                      val rangerHDFSServiceName = rangerHdfsSecurityConfigs match {
+                        case None => s"${clusterName}_hadoop"
+                        case Some(rangerHdfsSecurityConfigs) =>
+                          rangerHdfsSecurityConfigs.properties.`ranger.plugin.hdfs.service.name` match {
+                            case None => s"${clusterName}_hadoop"
+                            case Some(rangerHDFSServiceNameValue) =>
+                              if (rangerHDFSServiceNameValue != "{{repo_name}}")
+                                rangerHDFSServiceNameValue
+                              else
+                                s"${clusterName}_hadoop"
+                          }
+                      }
+
+                      val rangerHiveServiceName : Option[String] = if (hiveConfigurations.right.get.isEmpty) None else {
+                        val rangerHiveSecurityConfigs : Option[ServiceConfigurations] = hiveConfigurations.right.get.head.configurations
+                          .find(x => x.`type` == AmbariService.RANGER_HIVE_SECURITY_PROPERTIES)
+                        rangerHiveSecurityConfigs match {
+                          case None => Some(s"${clusterName}_hive")
+                          case Some(rangerHiveSecurityConfigs) =>
+                            rangerHiveSecurityConfigs.properties.`ranger.plugin.hdfs.service.name` match {
+                              case None => Some(s"${clusterName}_hive")
+                              case Some(rangerHiveServiceNameValue) =>
+                                if (rangerHiveServiceNameValue != "{{repo_name}}")
+                                  Some(rangerHiveServiceNameValue)
+                                else
+                                  Some(s"${clusterName}_hive")
+                            }
+                        }
+                      }
+                      p.success(Right(Some(RangerServiceDetails(policymgr_external_url, rangerHDFSServiceName, rangerHiveServiceName))))
+                    }
+                  }
+
+              }
+            }
+          }
+
+        }
+    }
+    p.future
+  }
 }
 
 object AmbariService {
+  lazy val RANGER_SERVICE_NAME = "RANGER"
+  lazy val HDFS_SERVICE_NAME = "HDFS"
+  lazy val HIVE_SERVICE_NAME = "HIVE"
+  lazy val RANGER_ADMIN_PROPERTIES = "admin-properties"
+  lazy val RANGER_HDFS_SECURITY_PROPERTIES = "ranger-hdfs-security"
+  lazy val RANGER_HIVE_SECURITY_PROPERTIES = "ranger-hive-security"
+
   def getNameNodeAmbariUrl = "services/HDFS/components/NAMENODE?fields=host_components/metrics/dfs/FSNamesystem/HAState,host_components/HostRoles/host_name&minimal_response=true"
   def getActiveNameNodeErrMsg = "No active namenode found from Ambari REST APIs"
+  def getActiveServiceConfigurationUrl(clusterName: String, serviceName: String) = s"clusters/$clusterName/configurations/service_config_versions?service_name=$serviceName&is_current=true&group_name=Default"
+  def adminPropertiesErrorMsg = "admin-properties configuration type is not found for Ranger service"
+  def policymgrUrlErrorMsg = "admin-properties configuration type for Ranger service does not have policymgr_external_url property"
+  def rangerPolicyNameErrorMsg = "Error getting current HDFS/HIVE service configuration from Ambari"
 }
 
