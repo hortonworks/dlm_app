@@ -117,6 +117,7 @@ export class AssetDetailsViewComponent implements OnChanges {
     ret['type'] = this.assetDetails.referredEntities[this.colGuid].attributes.type;
     try {
       let profilerInfo = this.assetDetails.entity.attributes.profileData.attributes;
+      if(!profilerInfo.sampleTime || !profilerInfo.samplePercent) throw "sampleTime or samplePercent not available";
       let td = Math.floor((Date.now() - parseInt(profilerInfo.sampleTime))/60000); // in minutes
       let displayText = "";
       if(td/60 < 1) displayText = td + ((td == 1)?" minute ":" minutes ") + "ago";
@@ -124,7 +125,7 @@ export class AssetDetailsViewComponent implements OnChanges {
       ret['profilerInfo'] = `Profiled : ${profilerInfo.samplePercent}% rows, ${displayText}`;
 
     }
-    catch(err){console.log(err)}
+    catch(err){/*console.log(err)*/}
 
     return ret;
   }
