@@ -14,6 +14,7 @@ import {DatasetTag} from "../../../../../models/dataset-tag";
 import {ViewsEnum} from "../../../../../shared/utils/views";
 import {RichDatasetModel} from "../../../models/richDatasetModel";
 import {RichDatasetService} from "../../../services/RichDatasetService";
+import {DataSetService} from "../../../../../services/dataset.service";
 
 @Component({
   selector: "ds-nav-result-viewer",
@@ -32,7 +33,10 @@ export class DsNavResultViewer {
 
   private currentPage: number = 1;
 
-  constructor(private richDatasetService: RichDatasetService) {
+  constructor(
+    private dataSetService: DataSetService,
+    private richDatasetService: RichDatasetService,
+  ) {
   }
 
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
@@ -57,5 +61,10 @@ export class DsNavResultViewer {
     this.start = 1;
     this.limit = limit;
     this.getDataset();
+  }
+
+  onDeleteDataset(datasetId) {
+    console.log(datasetId)
+    // this.dataSetService.delete(datasetId);
   }
 }

@@ -13,11 +13,16 @@
   <div class="list">
     <div *ngIf="!datasetModels">{{"common.loading" | translate}}...</div>
     <div *ngIf="datasetModels && view === views.grid">
-      <ds-tile-proxy *ngFor="let dsMdl of datasetModels" [dsModel]="dsMdl"></ds-tile-proxy>
+      <ds-tile-proxy
+        *ngFor="let dsMdl of datasetModels"
+        [dsModel]="dsMdl"
+        (onDeleteDataset)="onDeleteDataset($event)"></ds-tile-proxy>
       <div style="clear:both"></div>
     </div>
     <div *ngIf="datasetModels && view === views.list">
-      <ds-row-proxy [datasetModels]="datasetModels"></ds-row-proxy>
+      <ds-row-proxy
+        [datasetModels]="datasetModels"
+        (onDeleteDataset)="onDeleteDataset($event)"></ds-row-proxy>
     </div>
   </div>
   <simple-pagination *ngIf="datasetModels"

@@ -47,6 +47,18 @@
           </label>
           </div>
  -->
+        <div class="dataset-item__action-wrapper">
+          <div class="dataset-item__action">
+            <button id="dropDown_{{dsModel.id}}" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
+              <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i>
+            </button>
+            <ul mdl class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_' + dsModel.id">
+              <li class="mdl-menu__item" (click)="deleteDataset(dsModel.id)">
+                <span><i class="fa__fa-close--icon fa fa-trash-o"></i>{{"common.delete" | translate}}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
       </td>
     </tr>
   </tbody>
