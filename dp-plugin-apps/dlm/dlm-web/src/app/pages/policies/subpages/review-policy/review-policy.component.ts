@@ -35,6 +35,8 @@ import { POLICY_FORM_ID } from 'pages/policies/components/policy-form/policy-for
 import { getCluster } from 'selectors/cluster.selector';
 import { TimeZoneService } from 'services/time-zone.service';
 import { PolicyService } from 'services/policy.service';
+import { NOTIFICATION_TYPES } from 'constants/notification.constant';
+import { truncate } from 'pipes/truncate.pipe';
 
 const CREATE_POLICY_REQUEST = 'CREATE_POLICY';
 
@@ -134,7 +136,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     };
   }
 
-  formatDateValue(timeField) {
+  formatDateValue(timeField, timezone = true) {
     if (!timeField.date) {
       return null;
     }
@@ -143,7 +145,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     dateTime.hours(time.getHours());
     dateTime.minutes(time.getMinutes());
     dateTime.seconds(time.getSeconds());
-    return dateTime.tz(this.timeZone.defaultServerTimezone).format();
+    return timezone ? dateTime.tz(this.timeZone.defaultServerTimezone).format() : dateTime.format();
   }
 
   formatDateDisplay(timeField, timezone) {
@@ -154,11 +156,25 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     // (UTC-07:00 PDT) America / Dawson, Ensenada, Los Angeles, Santa Isabel, Tijuana, Vancouver, Whitehorse
     // Trim it to first 15 characters to extract (UTC-07:00 PDT)
     const trimmedTimezone = timezone.substring(0, 15);
-    return `${timeField.date} ${moment(timeField.time).format('HH:mm')} ${trimmedTimezone}`;
+    const formattedDateValue = this.formatDateValue(timeField, false);
+    return `${timeField.date} ${moment(formattedDateValue).format('HH:mm')} ${trimmedTimezone}`;
   }
 
   submitReview() {
-    this.store.dispatch(createPolicy(this.serializeFormValues(this.policyFormValue), this.targetCluster.id, CREATE_POLICY_REQUEST));
+    const formValue: PolicyPayload = this.serializeFormValues(this.policyFormValue);
+    const notification = {
+      [NOTIFICATION_TYPES.SUCCESS]: {
+        title: this.t.instant('page.policies.success.title'),
+        body: this.t.instant('page.policies.success.body', {
+          policyName: truncate(formValue.policyDefinition.name, 25)
+        })
+      }
+    };
+    const meta = {
+      requestId: CREATE_POLICY_REQUEST,
+      notification
+    };
+    this.store.dispatch(createPolicy(formValue, this.targetCluster.id, meta));
   }
 
   cancelReview() {
@@ -181,11 +197,9 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     const details = [
       {name: 'name', label: this.t.instant(`${this.tDetails}.policy_name`), value: policyForm.general.name},
       {name: 'description', label: this.t.instant(`${this.tDetails}.policy_description`), value: policyForm.general.description},
-      {name: 'sourceCluster', label: this.t.instant(`${this.tDetails}.sourceCluster.self`), value: sourceCluster.name},
-      {name: 'sourceDataCenter', label: this.t.instant(`${this.tDetails}.sourceDataCenter`), value: sourceCluster.dataCenter},
-      {name: 'destinationCluster', label: this.t.instant(`${this.tDetails}.destinationCluster.self`), value: destinationCluster.name},
-      {name: 'destinationDataCenter', label: this.t.instant(`${this.tDetails}.destinationDataCenter`),
-        value: destinationCluster.dataCenter},
+      {name: 'sourceCluster', label: this.t.instant('common.source'), value: `${sourceCluster.dataCenter} / ${sourceCluster.name}`},
+      {name: 'destinationCluster', label: this.t.instant('common.destination'),
+        value: `${destinationCluster.dataCenter} / ${destinationCluster.name}`},
       {name: 'type', label: this.t.instant(`${this.tDetails}.service`), value: this.policyTypesLabels[type]}
     ];
     if (type === this.policyTypes.HDFS) {
@@ -200,20 +214,20 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
       }
       details.push({name: 'repeatMode', label: this.t.instant(`${this.tDetails}.repeat`), value});
     }
-    details.push({name: 'startTime', label: this.t.instant(`${this.tDetails}.start_time`),
+    details.push({name: 'startTime', label: this.t.instant('common.start_time'),
       value: this.formatDateDisplay(policyForm.job.startTime, timezone)});
     if (formattedEndTime) {
       details.push({
-        name: 'EndTime', label: this.t.instant(`${this.tDetails}.end_time`),
+        name: 'EndTime', label: this.t.instant('common.end_time'),
         value: formattedEndTime
       });
     }
     if (policyForm.advanced.queue_name) {
-      details.push({name: 'queue_name', label: this.t.instant(`${this.tDetails}.queue_name`), value: policyForm.advanced.queue_name});
+      details.push({name: 'queue_name', label: this.t.instant('common.queue_name'), value: policyForm.advanced.queue_name});
     }
     if (policyForm.advanced.max_bandwidth) {
-      details.push({name: 'max_bandwidth', label: this.t.instant(`${this.tDetails}.max_bandwidth`),
-        value: policyForm.advanced.max_bandwidth});
+      details.push({name: 'max_bandwidth', label: this.t.instant('common.max_bandwidth'),
+        value: policyForm.advanced.max_bandwidth + ' MBps'});
     }
     this.detailsInfo = details;
   }

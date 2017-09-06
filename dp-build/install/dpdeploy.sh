@@ -1,18 +1,29 @@
 #!/bin/bash
+#
+# /*
+#  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+#  *
+#  * Except as expressly permitted in a written agreement between you or your company
+#  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+#  * reproduction, modification, redistribution, sharing, lending or other exploitation
+#  * of all or any part of the contents of this software is strictly prohibited.
+#  */
+#
 set -e
 
 source $(pwd)/config.env.sh
 
 CERTS_DIR=`dirname $0`/certs
 KNOX_SIGNING_CERTIFICATE=knox-signing.pem
-DEFAULT_VERSION=0.0.1
-DEFAULT_TAG="latest"
+DEFAULT_VERSION=0.0.1-latest
 KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
-APP_CONTAINERS_WITHOUT_DB="dp-app dp-db-service dp-cluster-service dp-gateway"
+CLUSTER_SERVICE_CONTAINER="dp-cluster-service"
+DB_CONTAINER="dp-database"
+APP_CONTAINERS_WITHOUT_DB="dp-app dp-db-service $CLUSTER_SERVICE_CONTAINER dp-gateway"
 APP_CONTAINERS=$APP_CONTAINERS_WITHOUT_DB
 if [ "$USE_EXT_DB" == "no" ]; then
-    APP_CONTAINERS="dp-database $APP_CONTAINERS"
+    APP_CONTAINERS="$DB_CONTAINER $APP_CONTAINERS"
 fi
 KNOX_CONTAINER="knox"
 CONSUL_CONTAINER="dp-consul-server"
@@ -89,7 +100,7 @@ migrate_schema() {
         source $(pwd)/docker-database.sh
 
         # wait for database start
-        sleep 5
+        source $(pwd)/database-check.sh
     fi
 
     # start flyway container and trigger migrate script
@@ -102,11 +113,53 @@ reset_db() {
         source $(pwd)/docker-database.sh
 
         # wait for database start
-        sleep 5
+        source $(pwd)/database-check.sh
     fi
 
     # start flyway container and trigger migrate script
     source $(pwd)/docker-flyway.sh clean migrate
+}
+
+utils_add_host() {
+    if [ $# -ne 2 ]; then
+        echo "Invalid arguments."
+        echo "Usage: dpdeploy.sh utils add-host <ip> <host>"
+        return -1
+    else
+        add_host_entry "$@"
+    fi
+}
+
+add_host_entry() {
+    IS_CLUSTER_SERVICE_UP=$(docker inspect -f {{.State.Running}} $CLUSTER_SERVICE_CONTAINER) || echo "'$CLUSTER_SERVICE_CONTAINER' container needs to be up for this operation."
+    if [ "$IS_CLUSTER_SERVICE_UP" != "true" ]; then
+        return -1
+    else
+        docker exec -t "$CLUSTER_SERVICE_CONTAINER" /bin/bash -c "echo $1 $2 >> /etc/hosts"
+        echo "Successfully appended to '/etc/hosts'."
+    fi
+}
+
+utils_update_user_secret() {
+    if [ $# -ne 1 ] || [ "$1" != "ambari" ]; then
+        echo "Invalid arguments."
+        echo "Usage: dpdeploy.sh utils update-user ambari"
+        return -1
+    else
+        update_user_entry "$@"
+    fi
+}
+
+update_user_entry() {
+    if [ "$USE_EXT_DB" == "no" ]; then
+        IS_DB_UP=$(docker inspect -f {{.State.Running}} $DB_CONTAINER) || echo "DB container is not running."
+        if [ "$IS_DB_UP" != "true" ]; then
+            echo "Ambari secrets can not be initialized with DB container down. Please run 'init db' and 'migrate' first."
+            exit -1
+        fi
+    fi
+    
+    source $(pwd)/secrets-manage.sh
 }
 
 destroy() {
@@ -185,12 +238,15 @@ init_knox() {
 
     docker exec -t knox ./wait_for_keystore_file.sh
     mkdir -p ${CERTS_DIR}
-    export_knox_cert ${MASTER_PASSWORD} knox > ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
-    if [ ${USE_TEST_LDAP} == "no" ]
-    then
-        docker exec -it knox ./setup_knox_sso_conf.sh
-    fi
+    sleep 5
+    export_knox_cert ${MASTER_PASSWORD} knox > ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE} || handle_knox_failure
     echo "Knox Initialized"
+}
+
+handle_knox_failure() {
+    echo "Data plane public certificate could not be generated properly."
+    echo "Please destroy Knox and re-initialize again with the commands 'dpdeploy.sh destroy knox' and 'dpdeploy init knox'."
+    exit 1
 }
 
 export_knox_cert() {
@@ -347,7 +403,7 @@ print_version() {
     if [ -f VERSION ]; then
         cat VERSION
     else
-        echo ${DEFAULT_VERSION}-${DEFAULT_TAG}
+        echo ${DEFAULT_VERSION}
     fi
 }
 
@@ -360,6 +416,8 @@ usage() {
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
+    printf "%-${tabspace}s:%s\n" "utils update-user ambari" "Update Ambari user credentials that Dataplane will use to connect to clusters."
+    printf "%-${tabspace}s:%s\n" "utils add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
     printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
     printf "%-${tabspace}s:%s\n" "start knox" "Start the Knox and Consul containers"
     printf "%-${tabspace}s:%s\n" "start --all" "Start all containers"
@@ -407,6 +465,23 @@ else
             ;;
         migrate)
             reset_db
+            ;;
+        utils)
+            shift
+            case "$1" in
+                add-host)
+                    shift
+                    utils_add_host "$@"
+                    ;;
+                update-user)
+                    shift
+                    utils_update_user_secret "$@"
+                    ;;
+                *)
+                    echo "Unknown option"
+                    usage
+                    ;;
+            esac
             ;;
         start)
             case "$2" in

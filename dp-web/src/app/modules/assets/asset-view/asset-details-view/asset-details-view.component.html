@@ -1,3 +1,14 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <dp-tabs [tabEnum]="detailsTabs" [tabType]="tabType.BUTTON" (selected)="selectedDetailsTabs=$event"> </dp-tabs>
 <div class="details-wrapper">
   <section *ngIf="selectedDetailsTabs === detailsTabs.PROPERTIES">
@@ -17,7 +28,7 @@
     </table>
   </section>
   <section *ngIf="selectedDetailsTabs === detailsTabs.TAGS">
-    <table style="width: 100%" class="mdl-data-table mdl-js-data-table">
+    <table *ngIf="assetTags.length" style="width: 100%" class="mdl-data-table mdl-js-data-table">
       <thead>
         <tr>
           <th class="mdl-data-table__cell--non-numeric">Name</th>
@@ -31,6 +42,7 @@
         </tr>
       </tbody>
     </table>
+    <div *ngIf="!assetTags.length">No tags available for asset</div>
   </section>
   <section *ngIf="selectedDetailsTabs === detailsTabs.SCHEMA">
     <table style="width: 100%" class="mdl-data-table mdl-js-data-table" >

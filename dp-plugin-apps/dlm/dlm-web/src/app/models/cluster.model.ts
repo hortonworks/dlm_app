@@ -24,6 +24,7 @@ export interface ServiceStatus {
 export interface ClusterUI {
   healthStatus?: string;
   ambariWebUrl: string;
+  idByDatacenter: string;
 }
 
 export interface Cluster extends ClusterUI {
@@ -33,7 +34,7 @@ export interface Cluster extends ClusterUI {
   ambariurl: string;
   description: string;
   location: Location;
-  services: Array<Service>;
+  beaconUrl: string;
   stats?: ClusterStats;
   status: ServiceStatus[];
   totalHosts;

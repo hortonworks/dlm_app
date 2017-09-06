@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.datapalane.consul;
 
 import com.ecwid.consul.v1.ConsistencyMode;
@@ -45,7 +56,7 @@ public class DpConsulClientImpl implements DpConsulClient {
     newCheck.setName(service.getServiceId() + "-healthCheck");
     newCheck.setHttp(String.format("http://%s:%s/health",service.getHost(),service.getPort()));
     newCheck.setInterval(service.getHealthCheckIntervalInSecs() + "s");
-    //Set a default timeout to 1s
+    newCheck.setDeregisterCriticalServiceAfter(service.getDeregisterServiceAfterInMinutes() + "m");
     newCheck.setTimeout("10s");
     Response<Void> voidResponse = consulClient.agentCheckRegister(newCheck);
     return ConsulResponse.from(voidResponse);

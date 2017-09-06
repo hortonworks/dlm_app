@@ -34,7 +34,8 @@ import {CheckboxColumnComponent} from 'components/table-columns/checkbox-column/
 import { RouterTestingModule } from '@angular/router/testing';
 import {MockTimeZoneService} from 'mocks/mock-timezone';
 import {TimeZoneService} from 'services/time-zone.service';
-import { PipesModule } from 'pipes/pipes.module';
+import {PipesModule} from 'pipes/pipes.module';
+import {TooltipModule} from 'ng2-bootstrap';
 
 describe('CreatePolicyComponent', () => {
   let component: CreatePolicyComponent;
@@ -43,6 +44,7 @@ describe('CreatePolicyComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
+        TooltipModule.forRoot(),
         TranslateModule.forRoot({
           loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
         }),

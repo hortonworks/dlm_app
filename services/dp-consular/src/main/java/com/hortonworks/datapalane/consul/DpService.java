@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.datapalane.consul;
 
 import java.util.List;
@@ -10,6 +21,7 @@ public class DpService {
   private String host;
   private Integer port;
   private Integer healthCheckIntervalInSecs = 5;
+  private Integer deregisterServiceAfterInMinutes =10;
 
   public DpService(String serviceId,String serviceName,List<String> serviceTags, String host,Integer port) {
     this.serviceId = serviceId;
@@ -29,6 +41,14 @@ public class DpService {
 
   public Integer getPort() {
     return port;
+  }
+
+  public Integer getDeregisterServiceAfterInMinutes() {
+    return deregisterServiceAfterInMinutes;
+  }
+
+  public void setDeregisterServiceAfterInMinutes(Integer deregisterServiceAfterInMinutes) {
+    this.deregisterServiceAfterInMinutes = deregisterServiceAfterInMinutes;
   }
 
   @Override

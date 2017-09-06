@@ -16,8 +16,6 @@ import { PairingProgressCardComponent } from 'pages/pairings/components/pairing-
 import { CreatePairingCardComponent } from 'pages/pairings/components/create-pairing-card/create-pairing-card.component';
 import { MockStore } from 'mocks/mock-store';
 import { Store } from '@ngrx/store';
-import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
-import { ModalDialogBodyComponent } from 'common/modal-dialog/modal-dialog-body.component';
 import { ModalModule } from 'ng2-bootstrap';
 import { MockTranslateLoader } from 'mocks/mock-translate-loader';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -25,6 +23,7 @@ import { TooltipModule } from 'ng2-bootstrap';
 import { CommonComponentsModule } from 'components/common-components.module';
 import { NotificationService } from 'services/notification.service';
 import { PipesModule } from 'pipes/pipes.module';
+import { HortonStyleModule } from 'common/horton-style.module';
 
 describe('CreatePairingComponent', () => {
   let component: CreatePairingComponent;
@@ -41,15 +40,14 @@ describe('CreatePairingComponent', () => {
         RouterTestingModule,
         TooltipModule.forRoot(),
         CommonComponentsModule,
-        PipesModule
+        PipesModule,
+        HortonStyleModule
       ],
       declarations: [
         CreatePairingComponent,
         CreatePairingCardListComponent,
         PairingProgressCardComponent,
-        CreatePairingCardComponent,
-        ModalDialogComponent,
-        ModalDialogBodyComponent
+        CreatePairingCardComponent
       ],
       providers: [
         {

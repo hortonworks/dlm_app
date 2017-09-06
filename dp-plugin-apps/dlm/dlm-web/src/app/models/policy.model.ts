@@ -11,7 +11,17 @@ import { RequestStatus } from './request-status.model';
 import { Cluster } from './cluster.model';
 import { Job } from './job.model';
 
-export interface Policy {
+export interface PolicyUI {
+  lastJobResource?: Job;
+  jobsResource?: Job[];
+  lastTenJobs?: Job[];
+  policyStatus: RequestStatus;
+  sourceClusterResource?: Cluster;
+  targetClusterResource?: Cluster;
+  displayStatus: string;
+}
+
+export interface Policy extends PolicyUI {
   id: string; // UI specific
   name: string;
   type: string;
@@ -25,17 +35,10 @@ export interface Policy {
   endTime: string;
   frequency: number;
   tags: string[];
-  customProperties: Object;
   retry: Object;
   description: string;
   jobs: Job[];
-  // UI specific props
-  lastJobResource?: Job;
-  jobsResource?: Job[];
-  lastTenJobs?: Job[];
-  policyStatus: RequestStatus;
-  sourceClusterResource?: Cluster;
-  targetClusterResource?: Cluster;
+  customProperties?: CustomProperties;
 }
 
 export interface PolicyDefinition {
@@ -67,4 +70,17 @@ export interface PolicyForm {
   databases?: string;
   queueName?: string;
   maxBandwidth?: number;
+}
+
+export interface CustomProperties {
+  distcpMapBandwidth?: string;
+  targetSnapshotRetentionAgeLimit?: string;
+  sourceSnapshotRetentionNumber?: string;
+  distcpMaxMaps?: string;
+  preserveAcl?: string;
+  queueName?: string;
+  tdeEncryptionEnabled?: string;
+  preservePermission?: string;
+  targetSnapshotRetentionNumber?: string;
+  sourceSnapshotRetentionAgeLimit?: string;
 }

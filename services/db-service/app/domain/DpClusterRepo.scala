@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package domain
 
 import java.time.LocalDateTime
@@ -66,8 +77,8 @@ class DpClusterRepo @Inject()(
     db.run(DataplaneClusters.filter(_.id === dpClusterId).result.headOption)
   }
 
-  def findByAmbariUrl(ambariUrl: String): Future[Option[DataplaneCluster]] = {
-    db.run(DataplaneClusters.filter(_.ambariUrl === ambariUrl).result.headOption)
+  def findByAmbariIp(ambariIp: String): Future[Option[DataplaneCluster]] = {
+    db.run(DataplaneClusters.filter(_.ambariIpAddress === ambariIp).result.headOption)
   }
 
   def deleteById(dpClusterId: Long): Future[Int] = {
@@ -98,10 +109,10 @@ class DpClusterRepo @Inject()(
 
   def updateStatus(dpCluster: DataplaneCluster): Future[Int] = {
     db.run(
-        DataplaneClusters
-          .filter(_.id === dpCluster.id)
-          .map(r => (r.state, r.updated))
-          .update(dpCluster.state, Some(LocalDateTime.now())))
+      DataplaneClusters
+        .filter(_.id === dpCluster.id)
+        .map(r => (r.state, r.updated))
+        .update(dpCluster.state, Some(LocalDateTime.now())))
       .map(r => r)
   }
 
@@ -140,7 +151,7 @@ class DpClusterRepo @Inject()(
     }
 
   final class LocationsTable(tag: Tag)
-      extends Table[Location](tag, Some("dataplane"), "locations") {
+    extends Table[Location](tag, Some("dataplane"), "locations") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
     def city = column[String]("city")
@@ -158,7 +169,7 @@ class DpClusterRepo @Inject()(
   }
 
   final class DpClustersTable(tag: Tag)
-      extends Table[DataplaneCluster](tag, Some("dataplane"), "dp_clusters") {
+    extends Table[DataplaneCluster](tag, Some("dataplane"), "dp_clusters") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
     def name = column[String]("name")
@@ -168,6 +179,8 @@ class DpClusterRepo @Inject()(
     def description = column[String]("description")
 
     def ambariUrl = column[String]("ambari_url")
+
+    def ambariIpAddress = column[String]("ip_address")
 
     def locationId = column[Option[Long]]("location_id")
 
@@ -193,19 +206,27 @@ class DpClusterRepo @Inject()(
 
     def * =
       (id,
-       name,
-       dcName,
-       description,
-       ambariUrl,
-       locationId,
-       userId,
-       properties,
-       state,
-       isDataLake,
-       knoxEnabled,
-       knoxUrl,
-       created,
-       updated) <> ((DataplaneCluster.apply _).tupled, DataplaneCluster.unapply)
+        name,
+        dcName,
+        description,
+        ambariUrl,
+        ambariIpAddress,
+        locationId,
+        userId,
+        properties,
+        state,
+        isDataLake,
+        knoxEnabled,
+        knoxUrl,
+        created,
+        updated) <> ((DataplaneCluster.apply _).tupled, DataplaneCluster.unapply)
   }
 
 }
+
+
+
+
+
+
+

@@ -1,7 +1,17 @@
 #!/bin/sh
+#
+# /*
+#  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+#  *
+#  * Except as expressly permitted in a written agreement between you or your company
+#  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+#  * reproduction, modification, redistribution, sharing, lending or other exploitation
+#  * of all or any part of the contents of this software is strictly prohibited.
+#  */
+#
 set -e
 
-RELEASE_NUMBER=0.0.1
+RELEASE_NUMBER=0.0.1-latest
 IMAGE_PREFIX="hortonworks"
 ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service dp-gateway dp-migrate"
 VENDOR_IMAGES="postgres:9.6.3-alpine consul:0.8.5"
@@ -137,7 +147,7 @@ get_version() {
         VERSION_STRING=`cat build/dp-docker/installer/VERSION`
         echo ${VERSION_STRING}
     else
-        echo ${RELEASE_NUMBER}-"latest"
+        echo ${RELEASE_NUMBER}
     fi
 }
 

@@ -34,6 +34,7 @@ export class ClusterListComponent implements OnInit {
   columnMode = ColumnMode.flex;
   isOpen = false;
   visibleActionMap = {};
+  private selectedFileBrowserPage = {};
   clusterActions = [
     {
       label: this.t.instant('page.clusters.card.create_pair_text'),
@@ -68,8 +69,8 @@ export class ClusterListComponent implements OnInit {
 
   ngOnInit() {
     this.columns = [
-      {prop: 'healthStatus', name: this.t.instant('common.status.self'), cellTemplate: this.statusCellRef,
-        flexGrow: 3, cellClass: 'status'},
+      {prop: 'healthStatus', name: this.t.instant('common.status.self'), headerClass: 'status-header',
+        cellTemplate: this.statusCellRef, flexGrow: 3, cellClass: 'status'},
       {prop: 'dataCenter', name: '', cellTemplate: this.dcCellRef, flexGrow: 3},
       {name: '', cellTemplate: this.slashIconCellRef, flexGrow: 1},
       {prop: 'name', name: '', cellTemplate: this.nameCellRef, flexGrow: 4},
@@ -108,8 +109,7 @@ export class ClusterListComponent implements OnInit {
       case ACTION_TYPES.POLICY:
         return this.router.navigate(['/policies/create'], {queryParams: {'sourceClusterId': cluster.id}});
       case ACTION_TYPES.AMBARI:
-        // TODO: Call a method in cluster service to get ambari web url
-        window.open(cluster.ambariurl, '_blank');
+        window.open(cluster.ambariWebUrl, '_blank');
     }
   }
 
@@ -120,7 +120,19 @@ export class ClusterListComponent implements OnInit {
     }
   }
 
+  handleFileBrowserPageChange(event, rowId) {
+    this.selectedFileBrowserPage[rowId] = event.offset;
+  }
+
   shouldShowAction(rowId) {
     return rowId in this.visibleActionMap && this.visibleActionMap[rowId];
+  }
+
+  isExpandedRow(row: Cluster): boolean {
+    return this.tableComponent.expandedRows[row.id];
+  }
+
+  getFileBrowserPageForRow(rowId) {
+    return rowId && rowId in this.selectedFileBrowserPage ? this.selectedFileBrowserPage[rowId] : 0;
   }
 }

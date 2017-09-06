@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
+#
+# /*
+#  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+#  *
+#  * Except as expressly permitted in a written agreement between you or your company
+#  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+#  * reproduction, modification, redistribution, sharing, lending or other exploitation
+#  * of all or any part of the contents of this software is strictly prohibited.
+#  */
+#
 set -e
 
 DP_DOCKER_ROOT_FOLDER=build/dp-docker
@@ -37,17 +47,6 @@ build_dp() {
         echo "Not building DP again in Jenkins"
     fi
 
-}
-
-build_dp_configurator() {
-    if [ ${IS_JENKINS} == false ]; then
-        log "Building DP Configurator"
-        pushd ../dp-configurator
-        mvn clean package
-        popd
-    else
-        echo "Not building DP Configurator again in Jenkins"
-    fi
 }
 
 build_db_service() {
@@ -114,7 +113,6 @@ build_dp_knox() {
 	cp -R knox-scripts ${DP_DOCKER_ROOT_FOLDER}/dp-knox/
 	cp Dockerfile.knox ${DP_DOCKER_ROOT_FOLDER}/dp-knox/Dockerfile
     cp -R build/dp-docker/dp-knox-agent/dp-knox-agent/ ${DP_DOCKER_ROOT_FOLDER}/dp-knox/dp-knox-agent
-    cp ../dp-configurator/target/dp-configurator-1.0-SNAPSHOT.jar ${DP_DOCKER_ROOT_FOLDER}/dp-knox/
 }
 
 build_cluster_service() {
@@ -181,7 +179,6 @@ fi
 clean_build
 build_dp
 build_dp_gateway
-build_dp_configurator
 build_db_service
 build_dp_app
 build_dp_web

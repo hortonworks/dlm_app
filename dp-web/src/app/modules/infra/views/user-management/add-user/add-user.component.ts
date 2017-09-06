@@ -1,4 +1,15 @@
-import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
+import {AfterViewInit, Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {UserService} from '../../../../../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -12,7 +23,7 @@ import {NgForm} from '@angular/forms';
   templateUrl: './add-user.component.html',
   styleUrls: ['./add-user.component.scss']
 })
-export class AddUserComponent implements OnInit {
+export class AddUserComponent implements OnInit, AfterViewInit {
   users: string[] = [];
   roles: TaggingWidgetTagModel[] = [];
   modes = Modes;
@@ -31,6 +42,7 @@ export class AddUserComponent implements OnInit {
 
   errorMessages: string[] = [];
   showError = false;
+  duplicateRole: string;
 
   @ViewChild('addUserForm') addUserForm: NgForm;
   @ViewChild('editUserForm') editUserForm: NgForm;
@@ -70,8 +82,21 @@ export class AddUserComponent implements OnInit {
     });
   }
 
-  onNewUserAddition(text: string) {
-    this.users.push(text);
+  ngAfterViewInit() {
+    setTimeout(() => {
+      let element: any = this.mode as Modes === Modes.EDIT ?
+        document.querySelector('#role-tags').querySelector('.taggingWidget') :
+        document.querySelector('#user-tags').querySelector('.taggingWidget');
+      element.click();
+    }, 500);
+  }
+
+  onNewUserAddition(user: string) {
+    if (this.users.find(usr => usr === user)) {
+      this.showWarning(`${this.translateService.instant('pages.infra.labels.duplicateUser')}${user}`, document.getElementById('duplicate-user-warning'));
+      return;
+    }
+    this.users.push(user);
   }
 
   onUserSearchChange(text: string) {
@@ -89,11 +114,36 @@ export class AddUserComponent implements OnInit {
   }
 
   onNewRoleAddition(tag: TaggingWidgetTagModel) {
+    if (this.roles.find(role => role.data === tag.data)) {
+      this.showWarning(`${this.translateService.instant('pages.infra.labels.duplicateRole')}${tag.display}`, document.getElementById('duplicate-role-warning'));
+      return;
+    }
     this.roles.push(tag);
   }
 
   onRolesEdit(tag: TaggingWidgetTagModel) {
+    if (this.userRoles.find(role => role.data === tag.data)) {
+      this.showWarning(`${this.translateService.instant('pages.infra.labels.duplicateRole')}${tag.display}`, document.getElementById('duplicate-role-warning'));
+      return;
+    }
     this.userRoles.push(tag);
+  }
+
+  private showWarning(message, element) {
+    element.innerHTML = message;
+    element.style.display = 'block';
+    element.style.opacity = 1;
+    setTimeout(() => {
+      let opacity = 1;
+      let fade = setInterval(() => {
+        opacity -= 0.3;
+        element.style.opacity = opacity;
+        if (opacity <= 0) {
+          clearInterval(fade);
+          element.style.display = 'none';
+        }
+      }, 100);
+    }, 1000);
   }
 
   onRoleSearchChange(text: string) {
@@ -127,17 +177,18 @@ export class AddUserComponent implements OnInit {
         return role.data;
       });
       this.userService.addUsers(this.users, roles).subscribe(response => {
-        if (response.length === this.users.length) {
+        if (response.successfullyAdded.length === this.users.length) {
           this.userService.dataChanged.next();
           this.router.navigate(['users'], {relativeTo: this.route});
         } else {
           let failedUsers = [];
           this.users.forEach(user => {
-            if (!response.find(res => res.userName === user)) {
+            if (!response.successfullyAdded.find(res => res.userName === user)) {
               failedUsers.push(user)
             }
           });
-          this.onError(`${this.translateService.instant('pages.infra.description.addUserError')}- ${failedUsers.join(', ')}`);
+          this.userService.dataChanged.next();
+          this.onError(`${this.translateService.instant('pages.infra.description.addUserError')} - ${failedUsers.join(', ')}`);
         }
 
       }, error => {

@@ -8,6 +8,7 @@
  */
 
 import { Component, OnInit, Input, ViewChild, TemplateRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { Event } from 'models/event.model';
 import { Cluster } from 'models/cluster.model';
 import { TableComponent } from 'common/table/table.component';
@@ -15,6 +16,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { LogService } from 'services/log.service';
 import { LOG_EVENT_TYPE_MAP, EntityType } from 'constants/log.constant';
 import { getEventEntityName } from 'utils/event-utils';
+import { timestampComparator } from 'utils/table-util';
 
 @Component({
   selector: 'dlm-notifications-table',
@@ -33,7 +35,9 @@ export class NotificationsTableComponent implements OnInit {
   @Input() events: Event[];
   @Input() clusters: Cluster[];
 
-  constructor(private t: TranslateService, private logService: LogService) {}
+  constructor(private t: TranslateService,
+              private logService: LogService,
+              private router: Router) {}
 
   private translateColumn(columnName: string): string {
     return this.t.instant(`page.notifications.table.column.${columnName}`);
@@ -65,7 +69,8 @@ export class NotificationsTableComponent implements OnInit {
         name: this.translateColumn('log'),
         cellClass: 'text-cell',
         headerClass: 'text-header',
-        cellTemplate: this.logTemplate
+        cellTemplate: this.logTemplate,
+        sortable: false
       },
       {
         prop: 'timestamp',
@@ -73,6 +78,7 @@ export class NotificationsTableComponent implements OnInit {
         name: this.translateColumn('created'),
         cellClass: 'text-cell',
         headerClass: 'text-header',
+        comparator: timestampComparator,
         maxWidth: 200
       }
     ];
@@ -84,4 +90,9 @@ export class NotificationsTableComponent implements OnInit {
       this.logService.showLog(EntityType[eventType], event[this.logEventTypeMap[EntityType[eventType]]]);
     }
   }
+
+  goToPolicy(event: Event) {
+    this.router.navigate(['/policies'], {queryParams: {policy: this.getEntity(event)}});
+  }
+
 }

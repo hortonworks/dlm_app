@@ -10,10 +10,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BsDropdownModule, ButtonsModule, TooltipModule, CollapseModule, ProgressbarModule, AlertModule } from 'ng2-bootstrap';
+import { ModalModule } from 'ng2-bootstrap';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { TranslateModule } from '@ngx-translate/core';
 import { SelectModule } from 'ng2-select';
 import { MomentModule } from 'angular2-moment';
+import { SimpleNotificationsModule } from 'angular2-notifications';
 
 import { PipesModule } from 'pipes/pipes.module';
 import { CardComponent } from './card/card.component';
@@ -44,6 +46,10 @@ import { ClusterStatusIconComponent } from './cluster-status-icon/cluster-status
 import { BeaconValidityComponent } from './messages/beacon-validity/beacon-validity.component';
 import { HelpLinkComponent } from './help-link/help-link.component';
 import { ClusterActionsComponent } from './cluster-actions/cluster-actions.component';
+import { HortonStyleModule } from 'common/horton-style.module';
+import { ConfirmationModalContainerComponent } from './confirmation-modal/confirmation-modal-container.component';
+import { EventEntityLinkComponent } from './event-entity-link/event-entity-link.component';
+import { NotificationsContainerComponent } from './notifications-container/notifications-container.component';
 
 @NgModule({
   imports: [
@@ -54,8 +60,11 @@ import { ClusterActionsComponent } from './cluster-actions/cluster-actions.compo
     CollapseModule.forRoot(),
     ProgressbarModule.forRoot(),
     AlertModule.forRoot(),
+    ModalModule.forRoot(),
+    SimpleNotificationsModule.forRoot(),
     ChartsModule,
     TranslateModule,
+    HortonStyleModule,
     SelectModule,
     MomentModule,
     PipesModule
@@ -91,7 +100,10 @@ import { ClusterActionsComponent } from './cluster-actions/cluster-actions.compo
     MapLegendContainerComponent,
     ClusterStatusIconComponent,
     BeaconValidityComponent,
-    HelpLinkComponent
+    HelpLinkComponent,
+    ConfirmationModalContainerComponent,
+    EventEntityLinkComponent,
+    NotificationsContainerComponent
   ],
   exports: [
     CardComponent,
@@ -124,7 +136,10 @@ import { ClusterActionsComponent } from './cluster-actions/cluster-actions.compo
     MapLegendContainerComponent,
     ClusterStatusIconComponent,
     BeaconValidityComponent,
-    HelpLinkComponent
+    HelpLinkComponent,
+    ConfirmationModalContainerComponent,
+    EventEntityLinkComponent,
+    NotificationsContainerComponent
   ]
 })
 export class CommonComponentsModule {}

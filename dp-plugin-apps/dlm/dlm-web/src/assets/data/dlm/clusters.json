@@ -8,8 +8,8 @@
       "ambariurl": "http://104.196.80.178:8080/api/v1/clusters/c2",
       "stats": {
         "CapacityTotal": 9129444352,
-        "CapacityUsed": 564879360,
-        "CapacityRemaining": 3856367616
+        "CapacityUsed": 8399088804,
+        "CapacityRemaining": 730355548
       },
       "location": {
         "id": 3431161,
@@ -18,15 +18,7 @@
         "latitude": -27.557600021362305,
         "longitude": -55.07683181762695
       },
-      "services": [
-        {
-          "id": 8,
-          "servicename": "BEACON",
-          "clusterid": 2,
-          "servicehost": "jaimin-beacon-5.c.pramod-thangali.internal",
-          "fullURL": "http://jaimin-beacon-5.c.pramod-thangali.internal:25968"
-        }
-      ],
+      "beaconURL": "http://jaimin-beacon-5.c.pramod-thangali.internal:25968",
       "totalHosts": 3
     },
     {
@@ -47,15 +39,7 @@
         "latitude": 38.30039978027344,
         "longitude": -76.5074462890625
       },
-      "services": [
-        {
-          "id": 3,
-          "servicename": "BEACON",
-          "clusterid": 1,
-          "servicehost": "jaimin-beacon-3.c.pramod-thangali.internal",
-          "fullURL": "http://jaimin-beacon-3.c.pramod-thangali.internal:25968"
-        }
-      ],
+      "beaconURL": "http://jaimin-beacon-5.c.pramod-thangali.internal:25968",
       "totalHosts": 2
     },
     {
@@ -76,15 +60,7 @@
         "latitude": 50.45465850830078,
         "longitude": 30.523799896240234
       },
-      "services": [
-        {
-          "id": 3,
-          "servicename": "BEACON",
-          "clusterid": 1,
-          "servicehost": "jaimin-beacon-3.c.pramod-thangali.internal",
-          "fullURL": "http://jaimin-beacon-3.c.pramod-thangali.internal:25968"
-        }
-      ],
+      "beaconURL": "http://jaimin-beacon-5.c.pramod-thangali.internal:25968",
       "totalHosts": 5
     }
   ]

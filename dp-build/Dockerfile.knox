@@ -1,3 +1,13 @@
+#
+# /*
+#  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+#  *
+#  * Except as expressly permitted in a written agreement between you or your company
+#  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+#  * reproduction, modification, redistribution, sharing, lending or other exploitation
+#  * of all or any part of the contents of this software is strictly prohibited.
+#  */
+#
 FROM nimmis/java-centos:openjdk-8-jre
 
 COPY knox-scripts/HDP.repo /etc/yum.repos.d/
@@ -23,12 +33,9 @@ RUN chown -R knox /usr/hdp/current/knox-server/bin/setup-master-password.sh
 ADD knox-scripts/wait_for_keystore_file.sh /usr/hdp/current/knox-server/bin/
 RUN chown -R knox /usr/hdp/current/knox-server/bin/wait_for_keystore_file.sh
 
-ADD knox-scripts/setup_knox_sso_conf.sh /usr/hdp/current/knox-server/bin/
 RUN chmod a+w /usr/hdp/current/knox-server/conf/topologies
 RUN chmod a+w /usr/hdp/current/knox-server/conf/topologies/knoxsso.xml
 RUN rm -rf  /usr/hdp/2.6.0.3-8/knox/data/security/*
-
-ADD dp-configurator-1.0-SNAPSHOT.jar /usr/hdp/current/knox-server/lib/
 
 
 ENV HASHICORP_RELEASES=https://releases.hashicorp.com

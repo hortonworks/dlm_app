@@ -29,12 +29,19 @@ export class PolicyDetailsComponent implements OnInit {
   @Output() abortJobAction = new EventEmitter<any>();
   @Output() rerunJobAction = new EventEmitter<any>();
   @Output() onOpenDirectory = new EventEmitter<any>();
+  @Output() onPageChangeFiles = new EventEmitter<any>();
 
   @Input()
   policy: Policy;
 
   @Input()
   jobs: Job[];
+
+  @Input()
+  jobsOverallCount: number;
+
+  @Input()
+  jobsOffset: number;
 
   @Input()
   contentType = PolicyContent.Jobs;
@@ -52,6 +59,10 @@ export class PolicyDetailsComponent implements OnInit {
   @Input() jobsPage = 0;
 
   @Input() jobsActiveActions = {};
+
+  @Input() fileBrowserPage = 0;
+
+  @Input() loadingJobs;
 
   ngOnInit() {
 
@@ -87,5 +98,9 @@ export class PolicyDetailsComponent implements OnInit {
 
   handleOpenDirectory(event) {
     this.onOpenDirectory.emit(event);
+  }
+
+  handleOnFilePageChange(event) {
+    this.onPageChangeFiles.emit(event);
   }
 }

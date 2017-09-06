@@ -13,11 +13,13 @@
     "new": "New",
     "add": "Add",
     "edit": "Edit",
+    "update": "Update",
     "delete": "Delete",
     "addAndNew": "Add & New",
     "cancel": "Cancel",
     "back": "BACK",
     "go": "Go",
+    "clear": "Clear",
     "reset": "Reset",
     "search": "Search",
     "done": "Done",
@@ -40,10 +42,12 @@
       "rowsPerPage": "Rows per page"
     },
     "roles": {
-      "SUPERADMIN": "Admin",
-      "INFRAADMIN": "Cluster Admin",
-      "USER": "Consumer",
+      "SUPERADMIN": "Dataplane Admin",
+      "INFRAADMIN": "Infra Admin",
       "CURATOR": "Data Steward"
+    },
+    "serviceNameMappings" : {
+      "BEACON": "Data Lifecycle Manager Engine"
     },
     "signout": "Sign Out",
     "unauthorized": "Unauthorized",
@@ -67,6 +71,7 @@
       },
       "description": {
         "dataplane": "Welcome to Hortonworks Data Plane. To start, please configure the LDAP properties and allow dataplane authenticate against it. Optionally, you can add Dataplane Administrators. Please proceed by clicking on GET STARTED",
+        "clusterOnboard": "Welcome to Hortonworks Data Plane. To start, please add your Ambari managed clusters to Data Plane. You can also enable Data Plane services or provide more users or groups access to them. Please proceed by clicking on GET STARTED.",
         "setupAuth": "The first step is to help data plane connect to your LDAP by providing the LDAP configurations to Data plane.",
         "defineUsers": "Upon completing the LDAP configuration, you may add administrators to Data plane. You can add users or groups to data plane and assign or modify their roles anytime through the User Management Screen.",
         "manageUsers": "You can manage users or groups in data plane and assign or modify their roles anytime through the User Management Screen.",
@@ -116,22 +121,33 @@
         "verifySmartSenseId": "Verify SmartSense ID",
         "verified": "VERIFIED",
         "lastUpdated": "Last Updated",
+        "serviceSummary": "SERVICE STATUS SUMMARY",
         "action": "Action",
         "installationSteps": "Steps for Installation:",
         "installationLink":"Installation Steps.",
         "installationStepsDoc":"https://docs.hortonworks.com/",
-        "dependentServicesLabel":"DEPENDENT SERVICES:"
+        "dependentServicesLabel":"DEPENDENT SERVICES:",
+        "syncFailed":"Cluster Information could not be fetched",
+        "serviceEnabled":"Service Enabled successfully",
+        "optional":"Optional",
+        "addOptionalServices":"Add Optional Services"
       },
       "description": {
         "verificationWelcome": "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your SmartSense ID.",
-        "manualInstall" : "Service {{serviceName}} is not enabled on cluster {{clusterName}} as one or more of the dependent services have not been enabled. Please enable the dependent services on the cluster using the documentation link. After all the dependent services are installed on the cluster, please click on the verification check box.",
+        "manualInstall" : "Service <b>{{serviceName}}</b> is not enabled on cluster <b>{{clusterName}}</b> as one or more of the dependent services have not been enabled.",
+        "installOptionalService":"Service <b>{{serviceName}}</b> is enabled on cluster <b>{{clusterName}}</b>. However one or more of the optional services have not been enabled.",
+        "installDependentService":"Please enable the dependent services on the cluster using the documentation link.",
+        "verifyDependency":"After all the dependent services are installed on the cluster, please click on the verification check box.",
         "enableError": "Service could not be enabled.",
         "verificationError": "Incorrect SmartSense ID format",
-        "installationConfirmation":"All the dependent services have been installed on cluster {{clusterName}}.",
+        "installationConfirmation":"All the dependent services have been installed on cluster <b>{{clusterName}}.</b>",
         "installationLink": "For detailed steps on the installation process, please visit ",
         "verifyingStatus": "Verifying dependent services status on the cluster...",
-        "successStatus":"All the service dependencies are met. Please click Next to continue",
-        "errorStatus":"The following dependent service(s) information is not present on the cluster. Please install them to continue."
+        "allDependenciesMet":"All the service dependencies are met. Please click Next to continue.",
+        "mandatoryDependenciesMet":"All the mandatory service dependencies are met.",
+        "optionalInstallation":"Optionally, you can install the following services to perform additional functions on the cluster.",
+        "errorStatus":"The following dependent service(s) information is not present on the cluster. Please install them to continue.",
+        "serviceEnabled": "All the authorized users of {{serviceName}} service, should re-login to be able to access the service."
       }
     },
     "infra": {
@@ -157,18 +173,26 @@
         "clusterAddSuccess": "Cluster Added successfully",
         "connectionFailed": "Unable to connect, please retry",
         "clusterAddError": "Failed to Add Cluster",
-        "emptySearchResult": "There are no clusters that match your search.",
+        "emptyClusters": "No Clusters.",
         "addUser": "ADD USER",
         "addGroup": "ADD GROUP",
         "username": "Username",
+        "addUserNames": "Usernames",
         "groupName": "Group Name",
+        "addGroupNames": "Group Names",
         "roles": "Roles",
         "usernameorgroup": "Username/Group",
         "active": "Active",
         "inactive": "Inactive",
-        "additionalConfigs": "Additional Configs"
+        "additionalConfigs": "Additional Configs",
+        "editCluster": "Edit Cluster",
+        "duplicateRole": "Duplicate values in Roles Input - ",
+        "duplicateUser": "Duplicate values in Users Input - ",
+        "duplicateGroup": "Duplicate values in Groups Input - ",
+        "noMatch": "No Match"
       },
       "description": {
+        "editCluster": "Please update your Ambari managed cluster (already added to Dataplane) here.",
         "addCluster": "Please add Ambari managed cluster to Dataplane. Dataplane will auto-discover cluster information such as the cluster name, active services & important metrics running.",
         "datalake": "This cluster has been identified as a Datalake since it has data management services,  {{serviceNames}} running.",
         "clusterLocation": "Geographical location of the cluster",
@@ -187,12 +211,20 @@
         "additionalConfigs": "Please provide these additional configurations required by Dataplane to discover the cluster information",
         "knoxUrl": "Please enter the URL of the Knox Service on the HDP cluster which is configured to work with Data plane.",
         "ldapError": "Not able to fetch users from LDAP",
-        "addUserError": "Not able to save users",
+        "addUserError": "The following users could not be saved. Please check if they have already been added.",
         "updateUserError": "Not able to update user",
-        "addGroupError": "Not able to save groups",
+        "addGroupError": "The following groups could not be saved. Please check if they have already been added.",
         "updateGroupError": "Not able to update group",
-        "invalidRoleInput": "Invalid Entry in Roles Input",
-        "invalidUserInput": "Invalid Entry in Users Input"
+        "invalidRoleInput": "One or more roles are invalid. You must select a role from the Roles dropdown or dropdown options that appear as you type in the Roles field.",
+        "invalidAmbariUrl":"Invalid Ambari URL. Please enter a valid URL of the form http://host:port or https://host:port.",
+        "invalidLocation" : "Not a valid location. Please select a location from dropdown.",
+        "invalidUserInput": "One or more usernames are invalid. You must select a name from the dropdown options that appear as you type in the Usernames field.",
+        "invalidGroupInput": "One or more group names are invalid. You must select a name from the dropdown options that appear as you type in the Group Names field.",
+        "backenderrors":{
+          "Url": "This is not a valid Ambari URL. Please enter a valid Ambari URL.",
+          "Ambari": "There was an error fetching information from Ambari.",
+          "Network": "There was a network error when connecting to Ambari."
+        }
       }
     },
     "dataset": {
@@ -233,7 +265,7 @@
         "belongsTo": "Belongs To"
       },
       "ds-editor": {
-        "ds-description": "Organize your data-assets including Hive & Hbase tables, HDFS Files into logical groups for subsequent usage.",
+        "ds-description": "Organize your hive assets into logical groups for subsequent usage.",
         "information": "Information",
         "assets": "Assets",
         "summary": "Summary",

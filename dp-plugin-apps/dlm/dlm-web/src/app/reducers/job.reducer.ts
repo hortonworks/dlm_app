@@ -16,7 +16,14 @@ import { toEntities } from 'utils/store-util';
 export type State = BaseState<Job>;
 
 export const initialState: State = {
-  entities: {}
+  entities: {},
+  queries: {
+    lastResultIds: [],
+    overallRecords: 0,
+    offset: 0,
+    pageSize: 0,
+    policyId: null
+  }
 };
 
 export function reducer(state = initialState, action): State {
@@ -27,6 +34,8 @@ export function reducer(state = initialState, action): State {
       return loadLastJobsSuccess(state, action);
     case fromPolicy.ActionTypes.LOAD_POLICIES.SUCCESS:
       return loadPoliciesSuccess(state, action);
+    case fromJob.ActionTypes.LOAD_JOBS_PAGE_FOR_POLICY.SUCCESS:
+      return loadJobsPageSuccess(state, action);
     default:
       return state;
   }
@@ -35,13 +44,37 @@ export function reducer(state = initialState, action): State {
 function loadJobsSuccess(state = initialState, action): State {
   const jobs = action.payload.response.jobs;
   return {
-    entities: Object.assign({}, state.entities, toEntities<Job>(jobs))
+    queries: {...state.queries},
+    entities: {
+      ...state.entities,
+      ...toEntities<Job>(jobs)
+    }
   };
 }
 
 function loadLastJobsSuccess(state = initialState, action): State {
   const jobs = action.payload.response.jobs;
   return {
+    queries: {...state.queries},
+    entities: {
+      ...state.entities,
+      ...toEntities<Job>(jobs)
+    }
+  };
+}
+
+function loadJobsPageSuccess(state = initialState, action): State {
+  const jobs = action.payload.response.jobs;
+  const {payload: {meta: {pageSize, offset, policyId}}} = action;
+  const queries = {
+    overallRecords: action.payload.response.totalResults,
+    lastResultIds: jobs.map(j => j.id),
+    policyId,
+    pageSize,
+    offset
+  };
+  return {
+    queries,
     entities: {
       ...state.entities,
       ...toEntities<Job>(jobs)
@@ -53,6 +86,7 @@ function loadPoliciesSuccess(state = initialState, action): State {
   const policies = action.payload.response.policies;
   const jobs = policies.reduce((allJobs, policy) => allJobs.concat(policy.jobs), []);
   return {
+    queries: {...state.queries},
     entities: {
       ...state.entities,
       ...toEntities<Job>(jobs)

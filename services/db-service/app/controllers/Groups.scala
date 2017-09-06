@@ -1,9 +1,21 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package controllers
 
 import javax.inject.{Inject, Singleton}
 
-import com.hortonworks.dataplane.commons.domain.Entities.{GroupInfo}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, GroupInfo}
 import domain.{GroupsRepo, RolesUtil}
+import play.api.libs.json.Json
 import play.api.mvc.Action
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,10 +48,14 @@ class Groups @Inject()(groupsRepo: GroupsRepo, rolesUtil: RolesUtil)(
     req.body
       .validate[GroupInfo]
       .map { groupInfo =>
-        groupsRepo
-          .addGroupWithRoles(groupInfo)
-          .map(groupInfo => success(groupInfo))
-          .recoverWith(apiError)
+        groupsRepo.groupExists(groupInfo.groupName).flatMap {
+          case true=>Future.successful(Conflict(Json.toJson(Errors(Seq(Error("GROUP_ALREADY_EXISTS",s"Group Already Exists:${groupInfo.groupName}"))))))
+          case _=>{
+            groupsRepo
+              .addGroupWithRoles(groupInfo)
+              .map(groupInfo => success(groupInfo))
+          }
+       }.recoverWith(apiError)
       }
       .getOrElse(Future.successful(BadRequest))
   }

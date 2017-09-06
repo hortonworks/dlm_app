@@ -1,9 +1,22 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div class="tileProxy" (click)="showFullView($event)">
   <div class="header overFlowEllipsis">
     <span class="title">{{dsModel.name}}</span>
     <span class="options">
       <i *ngIf="dsModel.favourite" class="fa fa-star"></i>
-      <button id="dropDownIcon_{{ dsModel.id }}" class="mdl-button mdl-js-button mdl-button--icon"><i class="fa fa-ellipsis-v"></i></button>
+
+<!--
+      <button id="dropDownIcon_{{ dsModel.id }}" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon"><i class="fa fa-ellipsis-v"></i></button>
       <label class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
              for="dropDownIcon_{{ dsModel.id }}">
         <li class="mdl-menu__item"><i class="fa fa-edit"></i>Edit</li>
@@ -14,6 +27,7 @@
           <span *ngIf="!dsModel.favourite">{{"pages.dataset.dashboard.actions.addToFav" | translate}}</span>
         </li>
       </label>
+ -->
     </span>
   </div>
   <div class="metaInfo">
@@ -23,7 +37,9 @@
 
   <div class="footer">
     <div class="division"><span>{{("pages.dataset.labels.hive" | translate).toUpperCase()}}:</span><span>{{dsModel.counts.hiveCount}}</span></div>
+<!--
     <div class="division border-left"><span>{{("pages.dataset.labels.files" | translate).toUpperCase()}}:</span><span>{{dsModel.counts.filesCount}}</span></div>
+-->
   </div>
 </div>
 

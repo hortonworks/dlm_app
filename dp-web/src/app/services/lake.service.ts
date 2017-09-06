@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import { Injectable } from '@angular/core';
 import { Http, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
@@ -6,11 +17,15 @@ import { Lake } from '../models/lake';
 import { Cluster } from '../models/cluster';
 
 import { HttpUtil } from '../shared/utils/httpUtil';
+import {Subject} from 'rxjs/Subject';
 
 
 @Injectable()
 export class LakeService {
   url = '/api/lakes';
+
+  clusterAdded = new Subject<boolean>();
+  clusterAdded$ = this.clusterAdded.asObservable();
 
   constructor(
     private http:Http
@@ -26,6 +41,13 @@ export class LakeService {
   insert(lake: Lake): Observable<Lake> {
     return this.http
       .post(`${this.url}`, lake, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
+  update(lake: Lake): Observable<Lake> {
+    return this.http
+      .put(`${this.url}`, lake, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

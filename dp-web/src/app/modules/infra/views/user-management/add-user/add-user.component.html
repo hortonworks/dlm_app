@@ -1,3 +1,14 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div class="load-right-to-left-slider dialog1x">
   <div class="title-container">
     <div class="hwx-subtitle">
@@ -15,7 +26,8 @@
     <form #addUserForm="ngForm">
       <div *ngIf="mode === modes.ADD">
         <div class="form-group dp-input">
-          <label class="required">{{"pages.infra.labels.username" | translate}}</label>
+          <label class="required">{{"pages.infra.labels.addUserNames" | translate}}</label>
+          <div id="duplicate-user-warning" class="hwx-inline-desc warning"></div>
           <tagging-widget #userTags id="user-tags" class="user-tags"
             [tags]="users"
             [availableTags]="availableUsers"
@@ -27,6 +39,7 @@
         </div>
         <div class="form-group dp-input">
           <label class="required">{{"pages.infra.labels.roles" | translate}}</label>
+          <div id="duplicate-role-warning" class="hwx-inline-desc warning"></div>
           <tagging-widget #roleTags class="role-tags" id="role-tags"
             [tags]="roles"
             [availableTags]="availableRoles"
@@ -61,6 +74,12 @@
           </div>
         </div>
         <div class="mdl-grid mdl-grid--no-spacing padding-top15">
+          <div class="mdl-cell mdl-cell--2-col"></div>
+          <div class="mdl-layout-spacer"></div>
+          <div id="duplicate-role-warning" class="mdl-cell mdl-cell--9-col hwx-inline-desc warning"></div>
+        </div>
+
+        <div class="mdl-grid mdl-grid--no-spacing">
           <div class="form-group mdl-cell mdl-cell--2-col">
             <label class="required">{{"pages.infra.labels.roles" | translate}}</label>
           </div>

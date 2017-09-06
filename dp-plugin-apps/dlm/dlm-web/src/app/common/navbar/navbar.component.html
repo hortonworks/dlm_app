@@ -14,13 +14,13 @@
       <ul class="side-nav-header nav nav-pills nav-stacked">
         <li class="navigation-header">
           <div #personaNavSrc class="row nav-header-container">
-            <div id="header_icon" class="col-sm-3">
+            <div id="header_icon" class="col-xs-3">
               <a *ngIf="header.iconHtml != ''" class="ambari-logo">
                 <span [innerHTML]="header.iconHtml"></span>
                 <span *ngIf="isCollapsed" class="toggle-small-icon fa fa-chevron-down"></span>
               </a>
             </div>
-            <div id="header_content" class="col-sm-9">
+            <div id="header_content" class="col-xs-9">
               <div class="btn-group">
                 <div aria-haspopup="true" aria-expanded="false">
                   <span class="ambari-header" style="font-size: 15px; padding: 0">{{header.label}}</span>
@@ -38,7 +38,8 @@
           [ngClass]="{'mainmenu-li': true, 'active': false, 'has-sub-menu': hasSubMenu(item)}"
             routerLinkActive="active">
 
-          <a [routerLink]="item.linkURL" *ngIf="!hasSubMenu(item);else has_sub_menu" [attr.qe-attr]="item.qeAttr">
+          <a [routerLink]="item.linkURL" *ngIf="!hasSubMenu(item);else has_sub_menu"
+             [attr.qe-attr]="item.qeAttr" [tooltip]="isCollapsed ? item.label : ''" [placement]="'right'">
             <span [ngClass]="item.iconClasses"></span>
             <span class="navigation-menu-item">{{item.label}}</span>
           </a>
@@ -62,9 +63,9 @@
           </ng-template>
         </li>
         <li class="mainmenu-li">
-          <!-- @todo replace with a real url -->
-          <a href="http://docs.hortonworks.com/" qe-attr="go-to-help" target="_blank" (click)="restoreActiveItems()">
-            <span class="navigation-icon fa fa-info-circle"></span>
+          <a [href]="'help_url' | translate" qe-attr="go-to-help" target="_blank"
+             (click)="restoreActiveItems()" [tooltip]="isCollapsed ? ('sidenav.menuItem.help' | translate) : ''" [placement]="'right'">
+            <span class="navigation-icon fa fa-fw fa-question-circle"></span>
             <span class="navigation-menu-item">{{'sidenav.menuItem.help' | translate}}</span>
           </a>
         </li>

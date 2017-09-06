@@ -1,8 +1,19 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div #sideNav class="sidenav"  [ngClass]="{'collpased': collapseSideNav}">
 
-  <div #personaNavSrc class="dp-header-logo borderBox">
+  <div #personaNavSrc class="dp-header-logo borderBox" [ngClass]="{'dp-header-logo--active': getNumberOfActivePersonas() > 1}">
     <img  *ngIf="activePersonaImageName" [attr.src]="'../../../assets/images/' + activePersonaImageName" alt="Hortonworks Dataplane"/>
-    <span class="persona-drop-down-small"></span>
+    <span class="persona-drop-down-small" *ngIf="getNumberOfActivePersonas() > 1"></span>
     <span class="persona-name">{{ activePersonaName }}</span>
   </div>
 

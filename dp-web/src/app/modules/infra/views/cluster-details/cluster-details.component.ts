@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Component, OnInit, ElementRef, ViewChild, AfterViewInit} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
@@ -34,6 +45,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   cluster: any;
   clusterHealth: any;
   rmHealth: any;
+  dnHealth: any;
   clusterDetails: ClusterDetails = new ClusterDetails();
   location: Location = new Location();
   user: any;
@@ -46,6 +58,8 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   rmHeapPercent: string;
   hdfsPercent: string;
   heapPercent: string;
+  clusterHealthInProgress = false;
+
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.fetchClusterDetails(params['id']);
@@ -56,23 +70,88 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
     Loader.show();
     this.lakeService.retrieve(lakeId).subscribe((lake: Lake) => {
       this.lake = lake;
-      this.clusterService.listByLakeId({lakeId: this.lake.id}).subscribe(clusters => {
-        this.clusters = clusters;
-        if (this.clusters && this.clusters.length) {
-          this.cluster = clusters[0];
-          this.getClusterWithLocation(this.lake, this.cluster.id, this.cluster.userid).subscribe(clusterInfo => {
-            this.clusterHealth = clusterInfo.health;
-            this.location = clusterInfo.location;
-            this.user = clusterInfo.user;
-            this.rmHealth = clusterInfo.rmhealth;
-            this.clusterDetails = this.getClusterDetails();
-            this.processProgressbarInfo();
-            Loader.hide();
-          });
-        }
-      });
-    }, (error) =>{
+      this.populateGeneralProperties();
+      this.getClusterDetails()
+    }, error => {
       Loader.hide();
+    });
+  }
+
+  private populateGeneralProperties() {
+    let tags = '';
+    this.lake.properties.tags.forEach(tag => {
+      tags = `${tags}${tags.length ? ', ' : ''}${tag.name}`;
+    });
+    this.clusterDetails = new ClusterDetails();
+    this.clusterDetails.tags = tags;
+    this.clusterDetails.dataCenter = this.lake.dcName;
+    this.identityService.getUserById(this.lake.createdBy).subscribe(user => {
+      this.user = user;
+    });
+  }
+
+  private getClusterDetails() {
+    Loader.show();
+    Observable.forkJoin(
+      this.clusterService.listByLakeId({lakeId: this.lake.id}),
+      this.locationService.retrieve(this.lake.location),
+    ).subscribe(responses => {
+      Loader.show();
+      this.location = responses[1];
+      this.clusterDetails.location = `${this.location.city}, ${this.location.country}`;
+      this.clusters = responses[0];
+      if (this.clusters && this.clusters.length) {
+        this.cluster = this.clusters[0];
+        this.populateClusterProperties();
+      }
+      this.clusterHealthInProgress = true;
+      this.clusterService.syncCluster(this.lake.id).subscribe(res => {
+        Loader.show();
+        let count = 0;
+        this.lakeService.retrieve(this.lake.id.toString())
+          .delay(2000)
+          .repeat(15)
+          .skipWhile(lake => lake.state !== 'SYNCED' && lake.state !== 'SYNC_ERROR' && ++count < 10)
+          .first().subscribe(lakeUpdated => {
+          this.lake = lakeUpdated;
+          this.getClusterHealth(this.cluster.id, this.lake.id);
+        });
+
+        this.clusterService.retrieveDataNodeHealth(this.cluster.id).subscribe(dnHealth => {
+          this.dnHealth = dnHealth;
+          this.populateDataNodeHealth();
+        });
+        this.getRMHealth(this.cluster.id);
+      });
+    });
+  }
+
+  private getClusterHealth(clusterId, lakeId) {
+    Loader.show();
+    this.clusterService.retrieveDetailedHealth(clusterId, lakeId).subscribe(health => {
+      this.clusterHealthInProgress = false;
+      this.clusterHealth = health;
+      this.populateClusterDetails();
+      this.processHealthProgressbarInfo();
+      Loader.hide();
+    }, error => {
+      Loader.hide();
+    });
+  }
+
+  private getRMHealth(clusterId) {
+    Loader.show();
+    this.clusterService.retrieveResourceMangerHealth(clusterId).subscribe(rmHealth => {
+      this.rmHealth = rmHealth;
+      this.populateRMHealthProperties();
+      this.processRMProgressbarsInfo();
+      if (!this.clusterHealthInProgress) {
+        Loader.hide();
+      }
+    }, error => {
+      if (!this.clusterHealthInProgress) {
+        Loader.hide();
+      }
     });
   }
 
@@ -98,7 +177,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  processProgressbarInfo() {
+  private processHealthProgressbarInfo() {
     this.hdfsProgressObservable.subscribe(() => {
       let percent = this.getPercent(this.clusterHealth.nameNodeInfo.CapacityUsed, this.clusterHealth.nameNodeInfo.CapacityTotal);
       this.hdfsPercent = `${percent}%`;
@@ -109,6 +188,9 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       this.heapPercent = `${percent}%`;
       this.updateProgess(this.heapProgress, percent);
     });
+  }
+
+  private processRMProgressbarsInfo() {
     this.rmHeapProgressObservable.subscribe(() => {
       let percent = this.getPercent(this.rmHealth.metrics.jvm.HeapMemoryUsed, this.rmHealth.metrics.jvm.HeapMemoryMax);
       this.rmHeapPercent = `${percent}%`;
@@ -124,51 +206,51 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
     return ((parseInt(used) / parseInt(total)) * 100).toFixed(2);
   }
 
-  getClusterDetails() {
-    let clusterDetails: ClusterDetails = new ClusterDetails();
-    clusterDetails.status = this.clusterHealth.nameNodeInfo.state;
-    clusterDetails.hdfsUsed = StringUtils.humanizeBytes(this.clusterHealth.nameNodeInfo.CapacityUsed);
-    clusterDetails.hdfsTotal = StringUtils.humanizeBytes(this.clusterHealth.nameNodeInfo.CapacityTotal);
-    clusterDetails.securityType = this.cluster.properties['security_type'];
-    clusterDetails.noOfSerices = Object.keys(this.cluster.properties['desired_service_config_versions']).length;
-    clusterDetails.nodes = this.cluster.properties.total_hosts;
-    clusterDetails.healthyNodes = this.cluster.properties.health_report['Host/host_state/HEALTHY'];
-    clusterDetails.unhealthyNodes = this.cluster.properties.health_report['Host/host_state/UNHEALTHY'];
-    clusterDetails.heapSizeTotal = StringUtils.humanizeBytes(this.clusterHealth.nameNodeInfo.HeapMemoryMax);
-    clusterDetails.heapSizeUsed = StringUtils.humanizeBytes(this.clusterHealth.nameNodeInfo.HeapMemoryUsed);
-    clusterDetails.location = `${this.location.city}, ${this.location.country}`;
-    clusterDetails.hdpVersion = this.cluster.properties.version;
-    clusterDetails.uptime = DateUtils.toReadableDate(new Date().getTime() - this.clusterHealth.nameNodeInfo.StartTime);
-    let tags = '';
-    this.lake.properties.tags.forEach(tag => {
-      tags = `${tags}${tags.length ? ', ' : ''}${tag.name}`;
-    });
-    clusterDetails.tags = tags;
-    clusterDetails.dataCenter = this.lake.dcName;
-    if (this.rmHealth && this.rmHealth.ServiceComponentInfo && this.rmHealth.ServiceComponentInfo.rm_metrics && this.rmHealth.metrics && this.rmHealth.metrics.jvm) {
-      clusterDetails.nodeManagersActive = this.rmHealth.ServiceComponentInfo.rm_metrics.cluster.activeNMcount;
-      clusterDetails.nodeManagersInactive = this.rmHealth.ServiceComponentInfo.rm_metrics.cluster.unhealthyNMcount;
-      clusterDetails.rmHeapTotal = StringUtils.humanizeBytes(this.rmHealth.metrics.jvm.HeapMemoryMax);
-      clusterDetails.rmHeapUsed = StringUtils.humanizeBytes(this.rmHealth.metrics.jvm.HeapMemoryUsed);
-      clusterDetails.rmUptime = DateUtils.toReadableDate(new Date().getTime() - this.rmHealth.metrics.runtime.StartTime);
-    }
-    return clusterDetails;
+
+  private populateClusterProperties() {
+    this.clusterDetails.nodes = this.cluster.properties.total_hosts;
+    this.clusterDetails.healthyNodes = this.cluster.properties.health_report['Host/host_state/HEALTHY'];
+    this.clusterDetails.unhealthyNodes = this.cluster.properties.health_report['Host/host_state/UNHEALTHY'];
+    this.clusterDetails.securityType = this.cluster.properties['security_type'];
+    this.clusterDetails.hdpVersion = this.cluster.properties.version;
+    this.clusterDetails.noOfSerices = Object.keys(this.cluster.properties['desired_service_config_versions']).length;
+
   }
 
-  private getClusterWithLocation(lake, clusterId, userId) {
-    return Observable.forkJoin(
-      this.locationService.retrieve(lake.location).map((res) => res),
-      this.clusterService.retrieveDetailedHealth(clusterId, lake.id).map((res) => res),
-      this.identityService.getUserById(userId).map((res) => res),
-      this.clusterService.retrieveResourceMangerHealth(clusterId).map(res => res)
-    ).map(response => {
-      return {
-        location: response[0],
-        health: response[1],
-        user: response[2],
-        rmhealth: response[3]
-      };
-    });
+  private populateClusterDetails() {
+    if (this.lake.state === 'SYNC_ERROR') {
+      this.clusterDetails.status = this.lake.state;
+    } else {
+      this.clusterDetails.status = this.clusterHealth.nameNodeInfo.state;
+    }
+    this.clusterDetails.hdfsUsed = StringUtils.humanizeBytes(this.clusterHealth.nameNodeInfo.CapacityUsed);
+    this.clusterDetails.hdfsTotal = StringUtils.humanizeBytes(this.clusterHealth.nameNodeInfo.CapacityTotal);
+    this.clusterDetails.heapSizeTotal = StringUtils.humanizeBytes(this.clusterHealth.nameNodeInfo.HeapMemoryMax);
+    this.clusterDetails.heapSizeUsed = StringUtils.humanizeBytes(this.clusterHealth.nameNodeInfo.HeapMemoryUsed);
+    this.clusterDetails.uptime = DateUtils.toReadableDate(new Date().getTime() - this.clusterHealth.nameNodeInfo.StartTime);
+  }
+
+  private populateRMHealthProperties() {
+    if (this.rmHealth && this.rmHealth.ServiceComponentInfo && this.rmHealth.ServiceComponentInfo.rm_metrics && this.rmHealth.metrics && this.rmHealth.metrics.jvm) {
+      this.clusterDetails.nodeManagersActive = this.rmHealth.ServiceComponentInfo.rm_metrics.cluster.activeNMcount;
+      this.clusterDetails.nodeManagersInactive = this.rmHealth.ServiceComponentInfo.rm_metrics.cluster.lostNMcount;
+      this.clusterDetails.rmHeapTotal = StringUtils.humanizeBytes(this.rmHealth.metrics.jvm.HeapMemoryMax);
+      this.clusterDetails.rmHeapUsed = StringUtils.humanizeBytes(this.rmHealth.metrics.jvm.HeapMemoryUsed);
+      this.clusterDetails.rmUptime = DateUtils.toReadableDate(new Date().getTime() - this.rmHealth.metrics.runtime.StartTime);
+    }
+  }
+
+  private populateDataNodeHealth() {
+    if (
+      this.dnHealth &&
+      this.dnHealth.ServiceComponentInfo &&
+      this.dnHealth.ServiceComponentInfo.started_count !== undefined &&
+      this.dnHealth.ServiceComponentInfo.total_count !== undefined
+    ) {
+      this.clusterDetails.healthyDataNodes = this.dnHealth.ServiceComponentInfo.started_count;
+      this.clusterDetails.unhealthyDataNodes = this.dnHealth.ServiceComponentInfo.total_count - this.dnHealth.ServiceComponentInfo.started_count;
+    }
+
   }
 
   goToClusters() {

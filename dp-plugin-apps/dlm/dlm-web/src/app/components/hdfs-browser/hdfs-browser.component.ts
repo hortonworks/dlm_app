@@ -32,6 +32,7 @@ import { HdfsService } from 'services/hdfs.service';
       #hdfsFilesTable
       [columns]="columns"
       [rows]="rows$ | async"
+      [offset]="page"
       [selectionType]="selectionType"
       [scrollbarV]="scrollbarV"
       (selectRowAction)="handleSelectedAction($event)"
@@ -39,6 +40,7 @@ import { HdfsService } from 'services/hdfs.service';
       [rowHeight]="rowHeight"
       (doubleClickAction)="handleDoubleClickAction($event)"
       (sortAction)="handleSortAction($event)"
+      (pageChange)="handlePageChange($event)"
     >
     </dlm-table>
     <ng-template #nameFormattedTemplate let-value="value" let-row="row">
@@ -72,8 +74,12 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
    * @type {boolean}
    */
   @Input() selectFiles = false;
+  @Input() page = 0;
+
   @Output() select: EventEmitter<string> = new EventEmitter<string>();
   @Output() openDirectory = new EventEmitter<string>();
+  @Output() changePage = new EventEmitter<any>();
+
   @HostBinding('class') componentClass = 'dlm-hdfs-browser';
   @ViewChild('hdfsFilesTable') jobsTable: TableComponent;
   @ViewChild('sizeFormattedTemplate') sizeFormattedTemplate: TemplateRef<any>;
@@ -184,8 +190,10 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   switchDirectory(path: string) {
     this.currentDirectory$.next(path);
     this.selected = path;
+    this.page = 0;
     this.select.emit(this.selected);
     this.openDirectory.emit(this.selected);
+    this.changePage.emit({offset: this.page});
   }
 
   handleSortAction(event) {
@@ -242,5 +250,9 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
 
   writeValue(value: any) {
     this.currentDirectory$.next(value);
+  }
+
+  handlePageChange(page) {
+    this.changePage.emit(page);
   }
 }

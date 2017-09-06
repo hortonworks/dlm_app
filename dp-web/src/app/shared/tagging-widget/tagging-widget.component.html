@@ -1,10 +1,21 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div class="taggingWidget"  (click)="onClick()" (keydown)="onKeyDown($event)" #parent>
   <span *ngFor="let tag of tags;let i=index;" tabindex="0" (click)="focusOnSticker(i)"  class="tagSticker" [class.focus]="i==focusStickerIndex">
     {{tag.display || tag}}
     <span class="remove"  *ngIf="allowTagDismissal">&nbsp;&nbsp;<i class="fa fa-times" (click)="focusOnSticker(i);removeFocusTag();"></i></span>
   </span>
   <span class="inputSpan">
-    <input #input (focus)="onInputFocus()" (blur)="onInputBlur()" [(ngModel)]="searchText" (ngModelChange)="onSearchTextChange($event)" placeholder="{{placeHolderText}}"/>
+    <input #input (focus)="onInputFocus()" (blur)="onInputBlur()" [(ngModel)]="searchText" autocomplete="off" (ngModelChange)="onSearchTextChange($event)" placeholder="{{placeHolderText}}"/>
     <div class="dropDown" [style.left.px]="input.offsetLeft">
       <div *ngFor="let tag of availableTags;let i=index;"
            [class.focus]="i==focusRowIndex"

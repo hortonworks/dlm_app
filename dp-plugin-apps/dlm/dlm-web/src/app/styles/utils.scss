@@ -45,6 +45,14 @@
   cursor: pointer;
 }
 
+.link {
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .inline-block {
   display: inline-block;
 }
@@ -55,4 +63,10 @@
 
 .link {
   color: $link-color;
+}
+
+.btn-default.btn-filter {
+  &:hover {
+    background-color: #d8d8d8;
+  }
 }

@@ -16,6 +16,7 @@ export const ActionTypes = {
   LOAD_JOBS: requestType('LOAD_JOBS'),
   LOAD_JOBS_FOR_CLUSTERS: type('LOAD_JOBS_FOR_CLUSTERS'),
   LOAD_JOBS_FOR_POLICY: type('LOAD_JOBS_FOR_POLICY'),
+  LOAD_JOBS_PAGE_FOR_POLICY: requestType('LOAD_JOBS_PAGE_FOR_POLICY'),
   ABORT_JOB: requestType('ABORT_JOB'),
   RERUN_JOB: requestType('RERUN_JOB')
 };
@@ -29,16 +30,30 @@ export const loadJobsForClusters = (clusterIds: number[], requestId?): Action =>
 });
 
 export const loadJobsForPolicy = (policy: Policy): Action => ({type: ActionTypes.LOAD_JOBS_FOR_POLICY, payload: policy});
-
 export const loadJobsSuccess = (jobs, meta = {}): ActionSuccess => ({
   type: ActionTypes.LOAD_JOBS.SUCCESS, payload: {response: jobs, meta}
 });
 
-export const loadJobsFail = (error, meta = {}): ActionFailure => ({type: ActionTypes.LOAD_JOBS.FAILURE, payload: {error, meta}});
-export const abortJob = (policy: Policy): Action => ({type: ActionTypes.ABORT_JOB.START, payload: {policy}});
-export const abortJobSuccess = (response): ActionSuccess => ({type: ActionTypes.ABORT_JOB.SUCCESS, payload: {response}});
-export const abortJobFailure = (error): ActionFailure => ({type: ActionTypes.ABORT_JOB.FAILURE, payload: {error}});
+export const loadJobsPageForPolicy = (policy: Policy, offset, sortBy, pageSize = 10): Action => ({
+  type: ActionTypes.LOAD_JOBS_PAGE_FOR_POLICY.START,
+  payload: {
+    policy,
+    meta: {
+      offset, pageSize, policyId: policy.id, sortBy
+    }
+  }
+});
 
-export const rerunJob = (policy: Policy): Action => ({type: ActionTypes.RERUN_JOB.START, payload: {policy}});
-export const rerunJobSuccess = (response): ActionSuccess => ({type: ActionTypes.RERUN_JOB.SUCCESS, payload: {response}});
-export const rerunJobFailure = (error): ActionFailure => ({type: ActionTypes.RERUN_JOB.FAILURE, payload: {error}});
+export const loadJobsPageForPolicySuccess = (jobs, meta): ActionSuccess => ({
+  type: ActionTypes.LOAD_JOBS_PAGE_FOR_POLICY.SUCCESS,
+  payload: {response: jobs, meta}
+});
+
+export const loadJobsFail = (error, meta = {}): ActionFailure => ({type: ActionTypes.LOAD_JOBS.FAILURE, payload: {error, meta}});
+export const abortJob = (policy: Policy, meta = {}): Action => ({type: ActionTypes.ABORT_JOB.START, payload: {policy, meta}});
+export const abortJobSuccess = (response, meta): ActionSuccess => ({type: ActionTypes.ABORT_JOB.SUCCESS, payload: {response, meta}});
+export const abortJobFailure = (error, meta): ActionFailure => ({type: ActionTypes.ABORT_JOB.FAILURE, payload: {error, meta}});
+
+export const rerunJob = (policy: Policy, meta = {}): Action => ({type: ActionTypes.RERUN_JOB.START, payload: {policy, meta}});
+export const rerunJobSuccess = (response, meta): ActionSuccess => ({type: ActionTypes.RERUN_JOB.SUCCESS, payload: {response, meta}});
+export const rerunJobFailure = (error, meta): ActionFailure => ({type: ActionTypes.RERUN_JOB.FAILURE, payload: {error, meta}});

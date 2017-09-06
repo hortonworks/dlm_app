@@ -14,3 +14,11 @@ export const EVENT_TYPE = {
   [JOB_EVENT]: JOB_EVENT,
   [POLICY_EVENT]: POLICY_EVENT
 };
+
+export const EVENT_RESULT_TYPE = {
+  DELETED: 'deleted',
+  SUBMITTED: 'submitted',
+  SUCCEEDED: 'succeeded',
+  SYNCED: 'synced',
+  SCHEDULED: 'scheduled'
+};

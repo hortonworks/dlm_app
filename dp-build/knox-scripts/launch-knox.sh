@@ -1,4 +1,14 @@
 #!/bin/sh
+#
+# /*
+#  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+#  *
+#  * Except as expressly permitted in a written agreement between you or your company
+#  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+#  * reproduction, modification, redistribution, sharing, lending or other exploitation
+#  * of all or any part of the contents of this software is strictly prohibited.
+#  */
+#
 echo "1st step"
 if [ -z "$CONSUL_HOST" ]; then
     echo "Need to set CONSUL_HOST"
@@ -8,10 +18,6 @@ echo "second step"
 if [ ! -d ../data/security/master ]
 then
     ./setup-master-password.sh
-    if [ ${USE_TEST_LDAP} == "yes" ]
-    then
-        USE_TEST_LDAP=yes ./setup_knox_sso_conf.sh 
-    fi    
 fi    
 echo "Starting services ..."
 ls -lR ../data/security/

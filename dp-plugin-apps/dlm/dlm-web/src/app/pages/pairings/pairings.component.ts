@@ -7,7 +7,7 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { loadPairings, deletePairing } from 'actions/pairing.action';
@@ -17,14 +17,13 @@ import { Pairing } from 'models/pairing.model';
 import { Cluster } from 'models/cluster.model';
 import { Observable } from 'rxjs/Observable';
 import { getAllPairings } from 'selectors/pairing.selector';
-import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { ClusterPairing } from 'models/cluster-pairing.model';
 import { getMergedProgress } from 'selectors/progress.selector';
 import { ProgressState } from 'models/progress-state.model';
-import { OperationResponse } from 'models/operation-response.model';
-import { Subscription } from 'rxjs/Subscription';
-import { getLastOperationResponse } from '../../selectors/operation.selector';
+import { confirmNextAction } from 'actions/confirmation.action';
+import { ConfirmationOptions, confirmationOptionsDefaults } from 'components/confirmation-modal';
+import { NOTIFICATION_TYPES } from 'constants/notification.constant';
 
 const PAIRINGS_REQUEST = '[PAIRING_PAGE] PAIRINGS_REQUEST';
 
@@ -33,26 +32,12 @@ const PAIRINGS_REQUEST = '[PAIRING_PAGE] PAIRINGS_REQUEST';
   templateUrl: './pairings.component.html',
   styleUrls: ['./pairings.component.scss']
 })
-export class PairingsComponent implements OnInit, OnDestroy {
-
-  @ViewChild('confirmationModal') public confirmationModel: ModalDialogComponent;
+export class PairingsComponent implements OnInit {
   pairings$: Observable<Pairing[]>;
   overallProgress$: Observable<ProgressState>;
-  lastOperationResponse: OperationResponse = <OperationResponse>{};
-  showOperationResponseModal = false;
-  operationResponseSubscription: Subscription;
-  private unpairParams: Array<Object>;
 
   static getBeaconUrl(cluster: Cluster | ClusterPairing): string {
-    let beaconUrl = '';
-    if (cluster.services && cluster.services.length) {
-      // todo: change servicename to BEACON_SERVER once dataplane fixes the service name
-      const beaconService = cluster.services.filter(service => service.servicename === 'BEACON');
-      if (beaconService.length) {
-        beaconUrl = beaconService[0].fullURL;
-      }
-    }
-    return beaconUrl;
+    return cluster.beaconUrl;
   }
 
   constructor(
@@ -74,46 +59,35 @@ export class PairingsComponent implements OnInit, OnDestroy {
   };
 
   onUnpair(pair: Pairing) {
-    this.unpairParams = [{
-      clusterId: pair.pair[0].id,
-      beaconUrl: PairingsComponent.getBeaconUrl(pair.pair[0])
-    },
-    {
-      clusterId: pair.pair[1].id,
-      beaconUrl: PairingsComponent.getBeaconUrl(pair.pair[1])
-    }];
     const params = {
       firstCluster: pair.pair[0].name,
       secondCluster: pair.pair[1].name
     };
-    this.confirmationModel.body = this.translate.instant(
-      'page.pairings.unpair.confirmation.body', params);
-    this.confirmationModel.show();
-  }
-
-  onConfirmation() {
-    if (!this.operationResponseSubscription) {
-      this.subscribeToOperation();
-    }
-    this.store.dispatch(deletePairing(this.unpairParams));
-  }
-
-  subscribeToOperation() {
-    this.operationResponseSubscription = this.store.select(getLastOperationResponse).subscribe(op => {
-      if (op && op.status) {
-        this.showOperationResponseModal = true;
-        this.lastOperationResponse = op;
+    const notification = {
+      [NOTIFICATION_TYPES.SUCCESS]: {
+        title: 'page.pairings.unpair.notification.success.title',
+        body: this.translate.instant('page.pairings.unpair.notification.success.body', params)
+      },
+      [NOTIFICATION_TYPES.ERROR]: {
+        title: 'page.pairings.unpair.notification.error.title',
       }
-    });
-  }
-
-  onCloseOperationResponseModal() {
-    this.showOperationResponseModal = false;
-  }
-
-  ngOnDestroy() {
-    if (this.operationResponseSubscription) {
-      this.operationResponseSubscription.unsubscribe();
-    }
+    };
+    const nextAction = deletePairing([
+      {
+        clusterId: pair.pair[0].id,
+        beaconUrl: PairingsComponent.getBeaconUrl(pair.pair[0])
+      },
+      {
+        clusterId: pair.pair[1].id,
+        beaconUrl: PairingsComponent.getBeaconUrl(pair.pair[1])
+      }
+    ], { notification });
+    const confirmationOptions = <ConfirmationOptions>{
+      ...confirmationOptionsDefaults,
+      title: 'page.pairings.unpair.confirmation.title',
+      body: this.translate.instant('page.pairings.unpair.confirmation.body', params),
+      confirmBtnText: 'page.pairings.unpair.confirmation.primaryButton'
+    };
+    this.store.dispatch(confirmNextAction(nextAction, confirmationOptions));
   }
 }

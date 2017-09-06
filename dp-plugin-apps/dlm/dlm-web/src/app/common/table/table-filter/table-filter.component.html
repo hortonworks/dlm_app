@@ -8,13 +8,15 @@
   -->
 
 <div class="pull-left applied-filters-wrapper" qe-attr="applied-filters">
-  <span class="label label-default filter-item" qe-attr="applied-filter"
+  <span class="label label-default filter-tag" qe-attr="applied-filter"
         *ngFor="let filter of appliedFiltersMapped">
-    <strong>{{getFilterTitle(filter.key)}}</strong>: {{filter.value | truncate:25}}
-    <a href="javascript:void(0);" (click)="removeFilter(filter)">&times;</a>
+    <span class="title"><strong>{{getFilterTitle(filter.key)}}</strong></span>: {{filter.value | truncate:25}}
+    <a href="javascript:void(0);" (click)="removeFilter(filter)">
+      <i class="fa fa-close"></i>
+    </a>
   </span>
 </div>
-<div class="pull-right">
+<div class="pull-right filter-field">
   <div class="form-group has-feedback">
     <span class="glyphicon glyphicon-filter form-control-feedback"></span>
     <input
@@ -24,6 +26,7 @@
       typeaheadOptionField="value"
       typeaheadGroupField="filter.filterTitle"
       (typeaheadOnSelect)="addFilter($event)"
+      placeholder="Filter"
       class="form-control">
   </div>
 </div>

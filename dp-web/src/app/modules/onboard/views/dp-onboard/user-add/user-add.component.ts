@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {UserService} from '../../../../../services/user.service';
@@ -31,11 +42,14 @@ export class UserAddComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
-      if (params.status && params.status === 'success') {
-        this.showNotification = true;
-      }
-    });
+    this.showNotification = true;
+  }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      let element: any = document.querySelector('#users-tags').querySelector('.taggingWidget');
+      element.click();
+    }, 500);
   }
 
   closeNotification() {
@@ -45,9 +59,9 @@ export class UserAddComponent implements OnInit {
   save() {
     if (!this.groupsSaved && !this.usersSaved) {
       this.saveUsersAndGroups().subscribe(res => {
-        this.groupsSaved = res.groupsAddtionSuccess;
+        this.groupsSaved = res.groupsAdditionSuccess;
         this.usersSaved = res.userAdditionSuccess;
-        if (res.groupsAddtionSuccess && res.userAdditionSuccess) {
+        if (res.groupsAdditionSuccess && res.userAdditionSuccess) {
           this.authenticationService.signOut();
         }
       });
@@ -65,7 +79,7 @@ export class UserAddComponent implements OnInit {
         this.authenticationService.signOut();
       }, (error) => {
         console.error(error);
-        this.usersSaved = false;
+        this.groupsSaved = false;
       });
     }
   }
@@ -77,8 +91,8 @@ export class UserAddComponent implements OnInit {
     ).map(responses => {
       console.log(responses);
       return {
-        userAdditionSuccess: this.users.length === responses[0].length,
-        groupsAddtionSuccess: this.groups.length === responses[1].length
+        userAdditionSuccess: this.users.length === responses[0].successfullyAdded.length,
+        groupsAdditionSuccess: this.groups.length === responses[1].successfullyAdded.length
       };
     });
   }

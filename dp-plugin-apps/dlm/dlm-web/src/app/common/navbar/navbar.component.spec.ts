@@ -16,6 +16,7 @@ import { PersonaPopupComponent } from 'common/persona-popup/persona-popup.compon
 import { Persona } from 'models/header-data';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { MockTranslateLoader } from 'mocks/mock-translate-loader';
+import { TooltipModule } from 'ng2-bootstrap';
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
@@ -23,7 +24,7 @@ describe('NavbarComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule, TranslateModule.forRoot({
+      imports: [RouterTestingModule, TooltipModule.forRoot(), TranslateModule.forRoot({
         loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
       })],
       declarations: [ NavbarComponent, PersonaPopupComponent ],

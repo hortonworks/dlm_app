@@ -24,6 +24,9 @@
               [label]="'page.policies.form.fields.policy_name' | translate"
               [maxLengthValue]="64">
               <input type="text" class="form-control" qe-attr="policy-name" formField formControlName="name" />
+              <dlm-field-error *ngIf="policyForm.get('general').get('name').hasError('nameValidator')">
+                {{'forms.validation_errors.namePattern' | translate}}
+              </dlm-field-error>
             </dlm-form-field>
             <dlm-form-field
               [label]="'page.policies.form.fields.policy_description' | translate"
@@ -204,17 +207,6 @@
                         (dateChanged)="handleDateChange($event, 'startTime')">
                       </my-date-picker>
                     </div>
-                    <div class="new-row">
-                      <dlm-form-field fieldClass="col-md-12" errorClass="col-md-12">
-                        <label>{{'page.policies.form.fields.start_time' | translate}}</label>
-                        <timepicker qe-attr="policy-start-time" formField formControlName="time" [showMeridian]="false"
-                                    [showSpinners]="false"></timepicker>
-                        <dlm-field-error
-                          *ngIf="policyForm.get('job').get('startTime').get('time').hasError('lessThanCurrent')">
-                          {{'forms.validation_errors.time_less_than_current' | translate}}
-                        </dlm-field-error>
-                      </dlm-form-field>
-                    </div>
                   </div>
                 </div>
                 <div class="col-md-3" formGroupName="endTime">
@@ -231,6 +223,28 @@
                     </div>
                   </div>
                 </div>
+              </div>
+              <div class="row new-row">
+                <div class="time-field" formGroupName="startTime">
+                  <label>{{'page.policies.form.fields.start_time' | translate}}</label>
+                  <timepicker qe-attr="policy-start-time" formField formControlName="time" [showMeridian]="false"
+                              [showSpinners]="false"></timepicker>
+                </div>
+                <div class="timezone-field">
+                  <label>
+                    {{'page.policies.form.fields.timezone' | translate}}
+                    <dlm-help-link [iconHint]="'page.policies.form.fields.timezone_hint' | translate" [placement]="'right'"></dlm-help-link>
+                  </label>
+                  <div class="value" [tooltip]="userTimezone" [placement]="'bottom'">
+                    {{userTimezone | truncate:40}}
+                  </div>
+                </div>
+              </div>
+              <div class="new-row">
+                <dlm-field-error
+                  *ngIf="policyForm.get('job').get('startTime').get('time').hasError('lessThanCurrent')">
+                  {{'forms.validation_errors.time_less_than_current' | translate}}
+                </dlm-field-error>
               </div>
             </div>
           </fieldset>
@@ -258,6 +272,16 @@
                 <span class="input-group-addon">{{'page.policies.form.fields.bandwidth_unit' | translate}}</span>
               </div>
             </dlm-form-field>
+            <div class="row">
+              <div class="col col-md-6">
+                <div *ngIf="policyForm.get('advanced').get('max_bandwidth').touched">
+                  <dlm-field-error
+                    *ngIf="policyForm.get('advanced').get('max_bandwidth').hasError('integerValidator')">
+                    {{'forms.validation_errors.integerValidator' | translate:maxBandwidthField}}
+                  </dlm-field-error>
+                </div>
+              </div>
+            </div>
           </fieldset>
         </div>
       </div>
@@ -268,7 +292,7 @@
             <button qe-attr="policy-cancel" type="button" class="btn btn-default" (click)="cancel()">
               {{'common.cancel' | translate}}
             </button>
-            <button qe-attr="policy-submit" class="btn btn-success" type="submit">
+            <button qe-attr="policy-submit" class="btn btn-success" type="submit" [disabled]="!policyForm.valid">
               {{'common.review' | translate}}
             </button>
           </div>

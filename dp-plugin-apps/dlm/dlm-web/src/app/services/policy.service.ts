@@ -10,9 +10,11 @@
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
+import { TranslateService } from '@ngx-translate/core';
 import { Policy, PolicyPayload } from 'models/policy.model';
-import { mapResponse } from 'utils/http-util';
+import { toSearchParams, mapResponse } from 'utils/http-util';
 import { JobService } from 'services/job.service';
+import { POLICY_DISPLAY_STATUS } from 'constants/status.constant';
 
 @Injectable()
 export class PolicyService {
@@ -36,18 +38,20 @@ export class PolicyService {
     if (policy.endTime.indexOf('9999') === 0) {
       policy.endTime = null;
     }
+    policy.displayStatus = this.t.instant(POLICY_DISPLAY_STATUS[policy.status]);
     return policy;
   }
 
-  constructor(private http: Http, private jobService: JobService) { }
+  constructor(private http: Http, private jobService: JobService, private t: TranslateService) { }
 
   createPolicy(payload: { policy: PolicyPayload, targetClusterId: string }): Observable<any> {
     const { policy, targetClusterId } = payload;
     return mapResponse(this.http.post(`clusters/${targetClusterId}/policy/${policy.policyDefinition.name}/submit`, policy));
   }
 
-  fetchPolicies(): Observable<any> {
-    return mapResponse(this.http.get('policies')).map(response => {
+  fetchPolicies(queryParams = {}): Observable<any> {
+    const search = toSearchParams(queryParams);
+    return mapResponse(this.http.get('policies', {search})).map(response => {
       response.policies.forEach(policy => {
         policy.jobs = policy.jobs.map(job => this.jobService.normalizeJob(job));
         policy = {

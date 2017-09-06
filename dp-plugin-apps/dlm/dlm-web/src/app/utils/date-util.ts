@@ -10,10 +10,12 @@
 import { IMyDate } from 'mydatepicker';
 import * as moment from 'moment';
 
-export const getDatePickerDate = (date: Date): IMyDate => {
+export const getDatePickerDate = (date: moment.Moment): IMyDate => {
   return {
-    year: date.getFullYear(),
-    month: date.getMonth() + 1,
-    day: date.getDate()
+    year: date.year(),
+    month: date.month() + 1,
+    day: date.date()
   };
 };
+
+export const getTime = (date: string): number => (new Date(date)).getTime();

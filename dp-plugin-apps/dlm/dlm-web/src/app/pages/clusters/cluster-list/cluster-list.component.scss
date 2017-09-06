@@ -15,7 +15,10 @@
 
 .cell-content {
   font-size: 16px;
-  font-weight: 500;
+}
+
+.status-header {
+  padding-left: 35px;
 }
 
 .datatable-body-cell {
@@ -23,11 +26,9 @@
     font-size: 0.8em;
   }
   .cluster-name {
-    font-weight: 500;
     font-size: 20px;
   }
   .datacenter-name {
-    font-weight: 500;
     font-size: 16px;
   }
   &.add-actions-cell {

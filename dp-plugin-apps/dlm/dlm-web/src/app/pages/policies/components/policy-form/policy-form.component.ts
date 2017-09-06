@@ -9,9 +9,9 @@
 
 import { Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter,
   HostBinding, SimpleChanges, OnDestroy, OnChanges, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef } from '@angular/core';
 import {
-  FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl, AsyncValidatorFn,
-  ValidationErrors
+  FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl, AsyncValidatorFn, ValidationErrors
 } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { go } from '@ngrx/router-store';
@@ -46,7 +46,7 @@ export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 export function freqValidator(frequencyMap): ValidatorFn {
   return (control: AbstractControl): ValidationErrors => {
     const parent = control.parent;
-    if (!parent) {
+    if (!parent || !isInteger(control.value)) {
       return null;
     }
     const unit = parent.controls['unit'].value;
@@ -56,14 +56,31 @@ export function freqValidator(frequencyMap): ValidatorFn {
   };
 }
 
+function isInteger(value: string): boolean {
+  const numberValue = Number(value);
+  return Number.isInteger(numberValue) && numberValue > 0;
+}
+
 export function integerValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors => {
     const {value} = control;
     if (!value) {
       return null;
     }
-    const n = Math.floor(Number(control.value));
-    return String(n) === value && n > 0 ? null : {'integerValidator': {name: control.value}};
+    return isInteger(value) ? null : {'integerValidator': {name: value}};
+  };
+}
+
+export function nameValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors => {
+    const {value} = control;
+    if (!value) {
+      return null;
+    }
+    if (!value.trim() || !/^[A-Za-z0-9 _\-]*$/.test(value)) {
+      return {'nameValidator': {name: value}};
+    }
+    return null;
   };
 }
 
@@ -121,14 +138,16 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   freqRequired = {fieldLabel: 'Frequency'};
   freqLimit = {fieldLabel: 'Frequency'};
   directoryField = {fieldLabel: 'Folder path'};
+  maxBandwidthField = {fieldLabel: 'Maximum Bandwidth'};
+  userTimezone = '';
   get datePickerOptions(): IMyOptions {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const today = new Date();
+    const yesterday = moment().subtract(1, 'day');
+    const today = moment();
     return {
       dateFormat: 'yyyy-mm-dd',
-      markCurrentDay: true,
       disableUntil: getDatePickerDate(yesterday),
+      showTodayBtn: false,
+      markCurrentDay: false,
       markDates: [{
         dates: [getDatePickerDate(today)],
         color: '#ff0000'
@@ -277,11 +296,17 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     return this.policyForm.value.general.destinationCluster;
   }
 
+  getEndTime(endDate) {
+    const date = moment(endDate).toDate();
+    date.setHours(23, 59, 59);
+    return new Date(date);
+  }
+
   constructor(private formBuilder: FormBuilder,
-              private timezone: TimeZoneService,
               private store: Store<State>,
               private timezoneService: TimeZoneService,
               private t: TranslateService,
+              private cdRef: ChangeDetectorRef,
               private hdfs: HdfsService) { }
 
   // todo: to Denys. This method looks quite scary. Things to improve:
@@ -289,7 +314,9 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   // - revisit logic around observables
   // - simplify overall logic
   ngOnInit() {
-    this.userTimeZone$ = this.timezone.userTimezoneIndex$;
+    this.userTimeZone$ = this.timezoneService.userTimezoneIndex$;
+    this.userTimeZone$.subscribe((value) =>
+      this.userTimezone = this.timezoneService.userTimezone ? this.timezoneService.userTimezone.label : '');
     const loadDatabasesSubscription = this.selectedSource$
       .filter(sourceCluster => !!sourceCluster)
       .subscribe(sourceCluster => {
@@ -311,7 +338,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       .map(([searchPattern, databases]) => databases.filter(db => simpleSearch(db.name, searchPattern)));
     this.policyForm = this.formBuilder.group({
       general: this.formBuilder.group({
-        name: ['', Validators.compose([Validators.required, Validators.maxLength(64)])],
+        name: ['', Validators.compose([Validators.required, Validators.maxLength(64), nameValidator()])],
         description: ['', Validators.maxLength(512)],
         type: [this.selectedPolicyType],
         sourceCluster: ['', Validators.required],
@@ -337,7 +364,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       }),
       advanced: this.formBuilder.group({
         queue_name: [''],
-        max_bandwidth: ['']
+        max_bandwidth: ['', integerValidator()]
       }),
       userTimezone: ['']
     });
@@ -365,7 +392,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     this.policyForm.patchValue({
       job: {
         endTime: {
-          time: moment(this.defaultTime).toDate()
+          time: moment(this.defaultEndTime).toDate()
         },
         startTime: {
           time: moment(this.defaultTime).toDate()
@@ -373,8 +400,23 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       }
     });
 
+    const directoriesChangesSubscription = this.policyForm.valueChanges
+      .map(values => values.directories)
+      .distinctUntilChanged()
+      .debounceTime(500)
+      .switchMap(value => {
+        return this.policyForm.statusChanges
+          .filter(_ => this.policyForm.get('directories').valid)
+          .map(_ => value);
+      })
+      .subscribe(path => {
+        this.hdfsRootPath = path;
+        this.cdRef.detectChanges();
+      });
+
     this.subscriptions.push(loadDatabasesSubscription);
     this.subscriptions.push(policyFormValuesSubscription);
+    this.subscriptions.push(directoriesChangesSubscription);
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -417,6 +459,10 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
             // otherwise, get next week's instance of that day
             value.job.startTime.date = moment(startDate).add(1, 'weeks').isoWeekday(dayToLook).format('YYYY-MM-DD');
           }
+        }
+        if (value.job.endTime && 'date' in value.job.endTime) {
+          const endDate = value.job.endTime.date;
+          value.job.endTime.time = this.getEndTime(endDate);
         }
       }
       const userTimezone = this.timezoneService.userTimezone;

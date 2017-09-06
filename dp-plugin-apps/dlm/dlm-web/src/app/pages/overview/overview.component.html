@@ -64,17 +64,19 @@
             <dlm-help-link [iconHint]="'page.overview.hints.issues_and_updates'"></dlm-help-link>
           </span>
           <div *ngIf="jobStatusFilter$ | async" class="job-status-filter inline-block">
-            <span class="label label-default">
+            <span class="label label-default filter-tag">
               <span class="text-bold text-uppercase">{{'common.jobs' | translate}}:&nbsp;</span>
               <span>{{formatStatusFilter(jobStatusFilter$ | async)}} </span>
-              <a href="javascript:void(0);" (click)="removeJobStatusFilter()">&times;</a>
+              <a href="javascript:void(0);" (click)="removeJobStatusFilter()">
+                <i class="fa fa-close"></i>
+              </a>
             </span>
           </div>
         </div>
       </div>
       <div class="col-md-5">
         <div class="pull-right">
-          <button qe-attr="add-pairing" class="btn btn-xs btn-secondary" type="button" [disabled]="!addingPairsAvailable(clusters$ | async, pairsCount$ | async)" routerLink="/pairings/create">
+          <button qe-attr="add-pairing" class="btn btn-xs btn-secondary btn-padding" type="button" [disabled]="!addingPairsAvailable(clusters$ | async, pairsCount$ | async)" routerLink="/pairings/create">
             <span class="text-uppercase">{{'common.add_pair' | translate}}</span>
           </button>
           <button qe-attr="add-policy" class="btn btn-xs btn-secondary" type="button" [disabled]="!addingPoliciesAvailable(pairsCount$ | async)" routerLink="/policies/create">
@@ -135,13 +137,19 @@
       <thead>
         <tr>
           <th>{{'page.overview.modals.hdfs_capacity.columns.cluster_name' | translate}}</th>
-          <th>{{'page.overview.modals.hdfs_capacity.columns.capacity' | translate}}</th>
+          <th>{{'page.overview.modals.hdfs_capacity.columns.total_capacity' | translate}}</th>
+          <th>{{'page.overview.modals.hdfs_capacity.columns.remaining_capacity' | translate}}</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let cluster of (lowCapacityClusters$ | async)">
           <td>{{cluster.name}}</td>
-          <td [innerHtml]="cluster.stats.CapacityRemaining | bytesSize"></td>
+          <td [innerHtml]="cluster.stats.CapacityTotal | bytesSize"></td>
+          <td>
+            <i class="fa fa-exclamation-triangle alert-warning"></i>
+            <span [innerHtml]="cluster.stats.CapacityRemaining | bytesSize"></span>
+            <span>&nbsp;( {{getPercentageRemaining(cluster)}} )</span>
+          </td>
         </tr>
       </tbody>
     </table>

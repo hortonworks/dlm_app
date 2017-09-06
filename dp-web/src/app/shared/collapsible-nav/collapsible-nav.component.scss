@@ -1,3 +1,14 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 @import "../../../styles/variables";
 
 .dp-header-logo {
@@ -11,13 +22,14 @@
   white-space: nowrap;
   padding-left: 10px;
   margin-bottom: 5px;
-  cursor: pointer;
 
+  &--active {
+    cursor: pointer;
+  }
   & > img {
     width: 25px;
     float: left;
     margin-top: 15px;
-    cursor: pointer;
   }
 
   & > span {
@@ -28,7 +40,15 @@
 
   .persona-name {
     text-transform: uppercase;
-    font-size: 15px;
+    font-size: 14px;
+    padding: 16px 0;
+    display: block;
+    width: 152px;
+    height: 60px;
+    word-wrap: break-word;
+    white-space: normal !important;
+    line-height: 1.2;
+    margin-left: 35px;
 
     &:after {
       font-family: "FontAwesome";

@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Component, OnInit, ViewChild, ElementRef, OnChanges, Input, SimpleChanges} from '@angular/core';
 import * as L from 'leaflet';
 import 'leaflet-curve';
@@ -87,6 +98,7 @@ export class MapComponent implements OnChanges, OnInit {
     this.map = map;
     this.map.setZoom(mapDimensions.zoom);
     this.mapcontainer.nativeElement.querySelector('.leaflet-map-pane').style.height = `${parseInt(mapDimensions.height, 10) - 20}px`;
+    this.mapcontainer.nativeElement.querySelector('.leaflet-overlay-pane').style.height = `${parseInt(mapDimensions.height, 10) - 20}px`;
   }
 
   ngOnChanges(changes: SimpleChanges) {

@@ -14,12 +14,12 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {MockTranslateLoader} from '../../mocks/mock-translate-loader';
 import {PairingCardListComponent} from './components/pairing-card-list/pairing-card-list.component';
 import {PairingCardComponent} from './components/pairing-card/pairing-card.component';
-import {ModalDialogComponent} from '../../common/modal-dialog/modal-dialog.component';
 import {MockStore} from '../../mocks/mock-store';
 import {ModalModule, TooltipModule} from 'ng2-bootstrap';
 import {Store} from '@ngrx/store';
 import { CommonComponentsModule } from 'components/common-components.module';
 import { PipesModule } from 'pipes/pipes.module';
+import { HortonStyleModule } from 'common/horton-style.module';
 
 describe('PairingsComponent', () => {
   let component: PairingsComponent;
@@ -35,13 +35,13 @@ describe('PairingsComponent', () => {
         ModalModule.forRoot(),
         CommonComponentsModule,
         PipesModule,
-        TooltipModule.forRoot()
+        TooltipModule.forRoot(),
+        HortonStyleModule
       ],
       declarations: [
         PairingsComponent,
         PairingCardComponent,
-        PairingCardListComponent,
-        ModalDialogComponent
+        PairingCardListComponent
       ],
       providers: [
         {provide: Store, useClass: MockStore}

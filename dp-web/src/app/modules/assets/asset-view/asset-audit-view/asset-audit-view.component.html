@@ -1,3 +1,14 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div *ngIf="state==AWS.NOINFO" class="infoNotAvailable">Audit information is not available</div>
 <div *ngIf="state==AWS.LOADING" class="loading">Loading ...</div>
 <div *ngIf="state==AWS.LOADED" class='filterCont'>
@@ -10,31 +21,35 @@
 	<button class="mdl-button btn-hwx-default" (click)="onRefresh()"><i class="fa fa-refresh"></i></button>
 </div>
 <div *ngIf="state==AWS.LOADED" class="infoTable borderBox">
-	
-	<div class="tableRow tableHeader">
-		<div class="tableCell pId">Policy ID</div>
-		<div class="tableCell eventTime">Event Time</div>
-		<div class="tableCell user">User</div> 
-		<div class="tableCell accessType">Access Type</div>
-		<div class="tableCell result">Result</div>
-		<div class="tableCell enforcer">Access Enforcer</div>
-		<div class="tableCell ip">Client IP</div>
-	</div>
-	<div class="tableRow normalRow" *ngFor="let audit of audits">
-		<div class="tableCell pId">{{audit.policyId}}</div>
-		<div class="tableCell eventTime">{{audit.eventTime}}</div>
-		<div class="tableCell user">{{audit.requestUser}}</div> 
-		<div class="tableCell accessType">{{audit.accessType}}</div>
-		<div class="tableCell result">{{audit.accessResult}}</div>
-		<div class="tableCell enforcer">{{audit.aclEnforcer}}</div>
-		<div class="tableCell ip">{{audit.clientIP}}</div>
-	</div>
-	<simple-pagination
-      [pageSize]="pageSize"
-      [pageStartIndex]="pageStartsFrom"
-      [count]="count"
-      (onPageSizeChange)="onPageSizeChange($event)"
-      (onPageChange)="onPageChange($event)"
-    ></simple-pagination>
-
+  <table class="mdl-data-table mdl-js-data-table">
+    <thead>
+      <tr>
+        <th class="mdl-data-table__cell--non-numeric">Policy ID</th>
+        <th class="mdl-data-table__cell--non-numeric">Event Time</th>
+        <th class="mdl-data-table__cell--non-numeric">User</th>
+        <th class="mdl-data-table__cell--non-numeric">Access Type</th>
+        <th class="mdl-data-table__cell--non-numeric">Result</th>
+        <th class="mdl-data-table__cell--non-numeric">Access Enforcer</th>
+        <th class="mdl-data-table__cell--non-numeric">Client IP</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let audit of audits">
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{audit.policyId}}</td>
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{audit.eventTime}}</td>
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{audit.requestUser}}</td>
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{audit.accessType}}</td>
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{audit.accessResult}}</td>
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{audit.aclEnforcer}}</td>
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{audit.clientIP}}</td>
+      </tr>
+    </tbody>
+  </table>
+  <simple-pagination
+    [pageSize]="pageSize"
+    [pageStartIndex]="pageStartsFrom"
+    [count]="count"
+    (onPageSizeChange)="onPageSizeChange($event)"
+    (onPageChange)="onPageChange($event)"
+  ></simple-pagination>
 </div>

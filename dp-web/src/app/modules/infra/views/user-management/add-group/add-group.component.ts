@@ -1,4 +1,15 @@
-import {Component, HostListener, ViewChild} from '@angular/core';
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
+import {AfterViewInit, Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {UserService} from '../../../../../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -9,11 +20,11 @@ import {Group} from '../../../../../models/group';
 import {NgForm} from '@angular/forms';
 
 @Component({
-  selector: 'dp-add-user',
+  selector: 'dp-add-group',
   templateUrl: './add-group.component.html',
   styleUrls: ['./add-group.component.scss']
 })
-export class AddGroupComponent {//implements OnInit {
+export class AddGroupComponent implements OnInit, AfterViewInit {
   groups: string[] = [];
   roles: TaggingWidgetTagModel[] = [];
   modes = Modes;
@@ -35,7 +46,7 @@ export class AddGroupComponent {//implements OnInit {
 
   @ViewChild('addGroupForm') addGroupForm: NgForm;
   @ViewChild('editGroupForm') editGroupForm: NgForm;
-  @ViewChild('userTags') private userTags: TaggingWidget;
+  @ViewChild('groupTags') private groupTags: TaggingWidget;
   @ViewChild('roleTags') private roleTags: TaggingWidget;
 
   constructor(private userService: UserService,
@@ -72,7 +83,20 @@ export class AddGroupComponent {//implements OnInit {
     });
   }
 
+  ngAfterViewInit() {
+    setTimeout(() => {
+      let element: any = this.mode as Modes === Modes.EDIT ?
+        document.querySelector('#role-tags').querySelector('.taggingWidget') :
+        document.querySelector('#group-tags').querySelector('.taggingWidget');
+      element.click();
+    }, 500);
+  }
+
   onNewGroupAddition(text: string) {
+    if (this.groups.find(usr => usr === text)) {
+      this.showWarning(`${this.translateService.instant('pages.infra.labels.duplicateGroup')}${text}`, document.getElementById('duplicate-group-warning'));
+      return;
+    }
     this.groups.push(text);
   }
 
@@ -92,11 +116,36 @@ export class AddGroupComponent {//implements OnInit {
   }
 
   onNewRoleAddition(tag: TaggingWidgetTagModel) {
+    if (this.roles.find(role => role.data === tag.data)) {
+      this.showWarning(`${this.translateService.instant('pages.infra.labels.duplicateRole')}${tag.display}`, document.getElementById('duplicate-role-warning'));
+      return;
+    }
     this.roles.push(tag);
   }
 
   onRolesEdit(tag: TaggingWidgetTagModel) {
+    if (this.groupRoles.find(role => role.data === tag.data)) {
+      this.showWarning(`${this.translateService.instant('pages.infra.labels.duplicateRole')}${tag.display}`, document.getElementById('duplicate-role-warning'));
+      return;
+    }
     this.groupRoles.push(tag);
+  }
+
+  private showWarning(message, element) {
+    element.innerHTML = message;
+    element.style.display = 'block';
+    element.style.opacity = 1;
+    setTimeout(() => {
+      let opacity = 1;
+      let fade = setInterval(() => {
+        opacity -= 0.3;
+        element.style.opacity = opacity;
+        if (opacity <= 0) {
+          clearInterval(fade);
+          element.style.display = 'none';
+        }
+      }, 100);
+    }, 1000);
   }
 
   onRoleSearchChange(text: string) {
@@ -129,16 +178,17 @@ export class AddGroupComponent {//implements OnInit {
         return role.data;
       });
       this.groupService.addGroups(this.groups, roles).subscribe(response => {
-        if (response.length === this.groups.length) {
+        if (response.successfullyAdded.length === this.groups.length) {
           this.groupService.dataChanged.next();
           this.router.navigate(['groups'], {relativeTo: this.route});
         } else {
           let failedGroups = [];
           this.groups.forEach(grp => {
-            if (!response.find(res => res.groupName === grp)) {
+            if (!response.successfullyAdded.find(res => res.groupName === grp)) {
               failedGroups.push(grp);
             }
           });
+          this.groupService.dataChanged.next();
           this.onError(`${this.translateService.instant('pages.infra.description.addGroupError')} - ${failedGroups.join(', ')}`);
         }
       }, error => {
@@ -179,8 +229,8 @@ export class AddGroupComponent {//implements OnInit {
       this.onError(this.translateService.instant('pages.infra.description.invalidRoleInput'));
       valid = false;
     }
-    if (!this.userTags.isValid) {
-      this.onError(this.translateService.instant('pages.infra.description.invalidUserInput'));
+    if (!this.groupTags.isValid) {
+      this.onError(this.translateService.instant('pages.infra.description.invalidGroupInput'));
       valid = false;
     }
     return valid;

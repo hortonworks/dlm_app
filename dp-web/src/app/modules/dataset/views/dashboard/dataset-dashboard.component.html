@@ -1,19 +1,28 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div>
     <nav-tag-panel (updateSelection)="onTagChange($event)"
                    [dsNameSearch]="dsNameSearch"
     ></nav-tag-panel>
     <div class="result-viewer">
-        <div class="mdl-grid mdl-grid--no-spacing dataset-search">
-            <div class="dp-input mdl-cell--10-col">
-                <input type="text" placeholder="Search" [ngModel]="dsNameSearch" (change)="dsNameSearchChange($event)"/>
-            </div>
-        </div>
-
         <div class="page-container">
-            <div class="result-header">
+            <div class="hwx-title-panel result-header">
                 <div class="mdl-grid mdl-grid--no-spacing">
                     <div class="hwx-title" *ngIf="currentDsTag">{{currentDsTag.name}}</div>
                     <div class="mdl-layout-spacer"></div>
+                    <div class="search-input">
+                        <input id="search" name="search-input" type="text" placeholder="Search" [ngModel]="dsNameSearch" (change)="dsNameSearchChange($event)" />
+                        <i aria-hidden="true" class="fa fa-search dp-input__icon"></i>
+                    </div>
                     <div class="mdl-button-group">
                         <button (click)="onViewChange(views.list)" [ngClass]="{'button-color--dark-grey': currentView === views.list }" class="mdl-button">
                             <i class="fa fa-list-ul"></i>
@@ -29,8 +38,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="spacer-15"></div>
 
             <div class="result-container">
                 <ds-nav-result-viewer

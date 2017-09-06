@@ -8,16 +8,15 @@
   -->
 
 <div class="row">
-  <div class="col-md-3">
+  <div class="header">
     <dlm-page-header [title]="'page.policies.header'"
                      [linkText]="'page.policies.help_text'"
                      [linkTo]="'page.policies.help_url'"
                      [isFlexCenter]="true"></dlm-page-header>
   </div>
-  <div class="col-md-9 actions">
+  <div class="filters actions">
     <div class="pull-right filters-block">
-
-      <div class="filter-item" *ngIf="(policies$ | async)?.length > 0">
+      <div class="filter-item filter-wrapper" *ngIf="(policies$ | async)?.length > 0">
         <dlm-table-filter
           [filterBy]="filterBy"
           [initialFilters]="initialFilters"
@@ -25,11 +24,11 @@
           (onFilter)="onFilter($event)"></dlm-table-filter>
       </div>
 
-      <div class="pull-left filter-item" *ngIf="(policies$ | async)?.length > 0">
+      <div class="pull-left filter-item filter-buttons" *ngIf="(policies$ | async)?.length > 0">
         <policy-service-filter (onFilter)="filterPoliciesByService($event)"></policy-service-filter>
       </div>
 
-      <div class="pull-right">
+      <div class="pull-right add-button">
         <button qe-attr="add-policy" type="button"
                 class="btn btn-secondary"
                 [disabled]="!(resourceAvailability$ | async)?.canAddPolicy"

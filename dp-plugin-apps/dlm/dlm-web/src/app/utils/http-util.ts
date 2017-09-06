@@ -7,9 +7,10 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Response, RequestOptionsArgs, Headers } from '@angular/http';
+import { Response, RequestOptionsArgs, Headers, URLSearchParams } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { User } from 'models/user.model';
+import { TranslateService } from '@ngx-translate/core';
 
 export const toJson = (response: Response) => response.json();
 export const mapResponse = (response$: Observable<Response>) => response$.map(toJson);
@@ -24,7 +25,7 @@ export const getHeaders = (): RequestOptionsArgs => {
 };
 
 export const getError = (response) => {
-  const message = response.message.replace('Failed with ', '');
+  const message = (response.message || 'common.errors.unknown').replace('Failed with ', '');
   let error;
   try {
     error = JSON.parse(message).error;
@@ -42,4 +43,14 @@ export const getUrlDomain = (urlAddress: string): string => {
     url = `${url.protocol}//${url.host}`;
   } catch (e) {}
   return url;
+};
+
+export const toSearchParams = (queryParams = {}): URLSearchParams => {
+  const params = new URLSearchParams();
+  for (const param in queryParams) {
+    if (param && queryParams.hasOwnProperty(param)) {
+      params.set(param, queryParams[param]);
+    }
+  }
+  return params;
 };

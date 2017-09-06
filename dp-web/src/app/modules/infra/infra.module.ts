@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 
@@ -6,6 +17,7 @@ import {NguiAutoCompleteModule} from '@ngui/auto-complete';
 import {routes} from './infra.routes';
 import {LakesComponent} from './views/lakes/lakes.component';
 import {ClusterAddComponent} from './views/cluster-add/cluster-add.component';
+import {ClusterEditComponent} from './views/cluster-edit/cluster-edit.component';
 import {LakeStatsComponent} from './widgets/lake-stats/lake-stats.component';
 import {LakesListComponent} from './widgets/lakes-list/lakes-list.component';
 import {MapComponent} from './widgets/map/map.component';
@@ -44,6 +56,7 @@ import { ManualInstallCheckComponent } from './views/service-management/manual-i
   declarations: [
     LakesComponent,
     ClusterAddComponent,
+    ClusterEditComponent,
     LakeStatsComponent,
     LakesListComponent,
     ClusterDetailsComponent,

@@ -35,7 +35,6 @@ import { CheckboxComponent } from 'common/checkbox/checkbox.component';
 import { NavbarService } from 'services/navbar.service';
 import { JobsOverviewTableComponent } from './jobs-overview-table/jobs-overview-table.component';
 import { EventMessageComponent } from 'common/notifications/event-message/event-message.component';
-import { ModalDialogBodyComponent } from 'common/modal-dialog/modal-dialog-body.component';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
 import { Policy } from 'models/policy.model';
 import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
@@ -48,7 +47,7 @@ import {MockBackend} from '@angular/http/testing';
 import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions} from '@angular/http';
 import {HttpService} from 'services/http.service';
 import { OverviewModule } from './overview.module';
-import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
+import { HortonStyleModule } from 'common/horton-style.module';
 
 const jobs = [
   <Job>{status: JOB_STATUS.SUCCESS},
@@ -103,7 +102,8 @@ describe('OverviewComponent', () => {
         ReactiveFormsModule,
         CommonComponentsModule,
         PipesModule,
-        OverviewModule
+        OverviewModule,
+        HortonStyleModule
       ],
       declarations: [
         OverviewComponent,
@@ -118,9 +118,7 @@ describe('OverviewComponent', () => {
         ActionColumnComponent,
         CheckboxComponent,
         JobsOverviewTableComponent,
-        ModalDialogComponent,
         PrevJobsComponent,
-        ModalDialogBodyComponent,
         EventMessageComponent
       ],
       providers: [

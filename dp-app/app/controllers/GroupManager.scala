@@ -1,8 +1,19 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package controllers
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{Errors, GroupInfo}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, GroupInfo}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.commons.domain.RoleType
 import com.hortonworks.dataplane.db.Webservice.GroupService
@@ -78,13 +89,16 @@ class GroupManager @Inject()(@Named("groupService") val groupService: GroupServi
       groupService.addGroupWithRoles(groupInfo)
     }
     val successFullyAdded = mutable.ArrayBuffer.empty[GroupInfo]
-    val errorsReceived = mutable.ArrayBuffer.empty[Errors]
+    val errorsReceived = mutable.ArrayBuffer.empty[Error]
     Future.sequence(futures).map { respList =>
       respList.foreach {
-        case Left(error) => errorsReceived += error
+        case Left(error) => errorsReceived ++= error.errors
         case Right(groupInfo) => successFullyAdded += groupInfo
       }
-      Ok(Json.toJson(successFullyAdded))
+      Ok(Json.toJson(
+        Json.obj(
+          "successfullyAdded" -> successFullyAdded,
+          "errors" -> errorsReceived)))
     }
   }
 

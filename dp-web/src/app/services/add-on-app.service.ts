@@ -1,24 +1,40 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Injectable} from '@angular/core';
 import {Http, RequestOptions} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 
 import {HttpUtil} from '../shared/utils/httpUtil';
-import {AddOnAppInfo, ConfigPayload, EnabledAppInfo, SKU} from '../models/add-on-app';
+import {AddOnAppInfo, AppDependency, ConfigPayload, EnabledAppInfo, SKU} from '../models/add-on-app';
+import {Subject} from 'rxjs/Subject';
 
 @Injectable()
 export class AddOnAppService {
 
   uri = '/api/services';
-
-  private dependenciesMap = new Map();
+  serviceEnabled = new Subject<string>();
+  serviceEnabled$ = this.serviceEnabled.asObservable();
 
   constructor(private http: Http) {
-    this.dependenciesMap.set('dlm', ['BEACON', 'HDFS', 'HIVE']);
-    this.dependenciesMap.set('dss', ['ATLAS', 'RANGER'])
   }
 
-  getServiceDependencies(appName) {
-    return this.dependenciesMap.get(appName);
+  getServiceDependencies(appName): Observable<AppDependency> {
+    return this.http
+      .get(`${this.uri}/${appName}/dependencies`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .do(a => {
+        console.log(a);
+      })
+      .catch(HttpUtil.handleError);
   }
 
   getAllServices(): Observable<AddOnAppInfo[]> {

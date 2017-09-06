@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.cs.sync
 
 import java.util.UUID
@@ -81,6 +92,12 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
       cl <- toInsert
       result <- storageInterface.addClusters(Seq(cl))
     } yield result
+
+    clusters.onFailure{
+      case e: Throwable =>
+        logger.warn("Caught error on contacting cluster", e)
+        storageInterface.updateDpClusterStatus(dataplaneCluster.copy(state = Some("SYNC_ERROR")))
+    }
 
     addedClusters.onFailure {
       case e: Throwable => logger.warn("Caught error on adding cluster", e)

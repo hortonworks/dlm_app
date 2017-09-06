@@ -8,12 +8,16 @@
  */
 
 import { Component, OnDestroy, OnInit, ViewEncapsulation, isDevMode } from '@angular/core';
-import { MenuItem } from './common/navbar/menu-item';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { State } from 'reducers/index';
 import { TranslateService } from '@ngx-translate/core';
-import { Event } from 'models/event.model';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
+
+
+import { State } from 'reducers/index';
+import { Event } from 'models/event.model';
+import { MenuItem } from './common/navbar/menu-item';
 import { getAllEvents, getNewEventsCount } from 'selectors/event.selector';
 import { getMergedProgress, getProgressState } from 'selectors/progress.selector';
 import { initApp } from 'actions/app.action';
@@ -23,8 +27,6 @@ import { NAVIGATION } from 'constants/navigation.constant';
 import { User } from './models/user.model';
 import { SessionStorageService } from './services/session-storage.service';
 import { TimeZoneService } from './services/time-zone.service';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Subscription } from 'rxjs/Subscription';
 import { POLL_INTERVAL } from 'constants/api.constant';
 import { HeaderData, Persona } from 'models/header-data';
 import { UserService } from 'services/user.service';
@@ -43,6 +45,8 @@ const CLUSTERS_REQUEST = '[DLM_COMPONENT] CLUSTERS_REQUEST';
   encapsulation: ViewEncapsulation.None
 })
 export class DlmComponent implements OnDestroy, OnInit {
+  private lastEventTimeStamp: string;
+
   header: MenuItem;
   menuItems: MenuItem[];
   mainContentSelector = '#dlm_main_content';
@@ -54,15 +58,6 @@ export class DlmComponent implements OnDestroy, OnInit {
   subscriptions: Subscription[] = [];
   headerData: HeaderData = new HeaderData();
 
-  // Options for Toast Notification
-  notificationOptions = {
-    position: ['top', 'right'],
-    showProgressBar: false,
-    lastOnBottom: false,
-    theClass: 'toast-notification',
-    timeOut: 10000
-  };
-
   user: User = <User>{};
 
   private initPolling() {
@@ -73,8 +68,12 @@ export class DlmComponent implements OnDestroy, OnInit {
       .filter(isInProgress => !isInProgress)
       .delay(POLL_INTERVAL)
       .do(_ => {
+        const eventParams = {};
+        if (this.lastEventTimeStamp) {
+          eventParams['start_time'] = this.lastEventTimeStamp;
+        }
         this.store.dispatch(loadNewEventsCount({requestId: POLL_NEW_EVENTS_ID}));
-        this.store.dispatch(loadEvents({ requestId: POLL_EVENTS_ID}));
+        this.store.dispatch(loadEvents(eventParams, { requestId: POLL_EVENTS_ID}));
         this.store.dispatch(loadClustersStatuses(POLL_CLUSTER_STATUSES_ID));
       })
       .repeat();
@@ -102,33 +101,38 @@ export class DlmComponent implements OnDestroy, OnInit {
       new MenuItem(
         t.instant('sidenav.menuItem.overview'),
         './overview',
-        'navigation-icon fa fa-home',
+        'navigation-icon fa fa-fw fa-home',
         'go-to-overview'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.clusters'),
         './clusters',
-        'navigation-icon fa fa-globe',
+        'navigation-icon fa fa-fw fa-cubes',
         'go-to-clusters'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.pairings'),
         './pairings',
-        'navigation-icon fa fa-arrows-h',
+        'navigation-icon fa fa-fw fa-arrows-h',
         'go-to-pairings'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.policies'),
         './policies',
-        'navigation-icon fa fa-th-list',
+        'navigation-icon fa fa-fw fa-list-alt',
         'go-to-policies'
       )
     ];
-    this.events$ = store.select(getAllEvents);
+    this.events$ = store.select(getAllEvents)
+      .do((events: Event[]) => {
+        if (events.length) {
+          this.lastEventTimeStamp = events[0].timestamp;
+        }
+      });
     this.newEventsCount$ = store.select(getNewEventsCount);
     this.store.dispatch(initApp());
     this.store.dispatch(loadNewEventsCount({requestId: POLL_NEW_EVENTS_ID}));
-    this.store.dispatch(loadEvents({ requestId: POLL_EVENTS_ID}));
+    this.store.dispatch(loadEvents(null, { requestId: POLL_EVENTS_ID}));
     this.store.dispatch(loadClusters(CLUSTERS_REQUEST));
     const pathChange$ = router.events
       .filter(e => e instanceof NavigationEnd)

@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.cs
 
 import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariCheckResponse, AmbariCluster}
@@ -90,7 +101,16 @@ class AmbariWebServiceImpl(config: Config)(implicit ws: ClusterWsClient)
   override def requestAmbariApi(clusterId: Long, ambariUrl: String, addClusterIdToResponse: Boolean = false)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsValue]] = {
     implicit val _ = if (addClusterIdToResponse) Some(clusterId) else None
     ws.url(s"$url/$clusterId/ambari?request=$ambariUrl")
-        .withToken(token)
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapToResults)
+  }
+
+  override def requestAmbariClusterApi(clusterId: Long, ambariUrl: String, addClusterIdToResponse: Boolean = false)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsValue]] = {
+    implicit val _ = if (addClusterIdToResponse) Some(clusterId) else None
+    ws.url(s"$url/$clusterId/ambari/cluster?request=$ambariUrl")
+      .withToken(token)
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToResults)
