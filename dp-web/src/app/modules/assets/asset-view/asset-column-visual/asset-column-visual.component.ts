@@ -28,19 +28,19 @@ export class AssetColumnVisualComponent implements OnInit{
 	noDataAvailable : boolean = false;
 	ngOnInit () {
 		if(!this.data || !this.data.histogram && !this.data.quartiles) {
-      this.noDataAvailable = true;
+	  	  this.noDataAvailable = true;
 		  return;
-    }
+		}
 		if(this.data.quartiles)
 			this.onlyHisto = false;
-		if(this.data.cardinality < 6)
+		if(this.data.cardinality < 11)
 			this.showPi = true;
 		if(this.data.histogram) {
-      if (this.showPi)
-        this.drawPiChart();
-      else
-        this.drawHisto();
-    }
+	      if (this.showPi)
+	        this.drawPiChart();
+	      else
+	        this.drawHisto();
+	    }
 		if(!this.data.quartiles) return;
 		this.drawBoxPlot();
 	}
