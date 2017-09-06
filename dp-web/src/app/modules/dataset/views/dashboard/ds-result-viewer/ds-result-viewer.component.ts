@@ -9,7 +9,7 @@
  *
  */
 
-import {Component, Input, OnInit, SimpleChange} from "@angular/core";
+import {Component, Input, ViewChild, OnInit, SimpleChange, ElementRef} from "@angular/core";
 import {DatasetTag} from "../../../../../models/dataset-tag";
 import {ViewsEnum} from "../../../../../shared/utils/views";
 import {RichDatasetModel} from "../../../models/richDatasetModel";
@@ -26,6 +26,11 @@ export class DsNavResultViewer {
   @Input() currentDsTag: DatasetTag;
   @Input() view;
   @Input() dsNameSearch:string = "";
+  @ViewChild('dialogConfirm') dialogConfirm: ElementRef;
+
+  _datasetToDelete: RichDatasetModel;
+  _deleteWasSuccessful = false;
+
   datasetModels: RichDatasetModel[] = null;
   views = ViewsEnum;
   start: number = 1;
@@ -63,8 +68,27 @@ export class DsNavResultViewer {
     this.getDataset();
   }
 
-  onDeleteDataset(datasetId) {
-    console.log(datasetId)
-    // this.dataSetService.delete(datasetId);
+  onDeleteDataset(datasetId: number) {
+    this._datasetToDelete = this.datasetModels.find(cDataset => cDataset.id === datasetId);
+    this.dialogConfirm.nativeElement.showModal();
+  }
+
+  doConfirmDelete() {
+    const delete$ = this.dataSetService.delete(this._datasetToDelete.id).share();
+
+    delete$.subscribe(this.getDataset);
+    delete$
+      .do(() => this._deleteWasSuccessful = true)
+      .delay(2000)
+      .subscribe(() => {
+        this._datasetToDelete = null;
+        this._deleteWasSuccessful = false;
+
+        this.dialogConfirm.nativeElement.close();
+      });
+  }
+
+  doCancelDelete() {
+    this.dialogConfirm.nativeElement.close();
   }
 }
