@@ -19,32 +19,32 @@
   </div>
   <div>
     <div class="row">
-      <div class="col-md-4">
+      <div class="col-xs-4">
         <div class="row">
-          <div class="col-md-12">
+          <div class="col-xs-12">
             <h4>
               {{'page.overview.issues.recent' | translate}}
             </h4>
           </div>
         </div>
         <div class="row">
-          <div class="col-md-12">
+          <div class="col-xs-12">
             <dlm-issues-list
               [events]="events$ | async">
             </dlm-issues-list>
           </div>
         </div>
       </div>
-      <div class="col-md-8">
+      <div class="col-xs-8">
         <div class="row">
-          <div class="col-md-12">
+          <div class="col-xs-12">
             <h4>
               {{'common.clusters' | translate}}
             </h4>
           </div>
         </div>
         <div class="row">
-          <div class="col-md-12">
+          <div class="col-xs-12">
             <dp-map [sizeSettings]="mapSizeSettings" [mapData]="clustersMapData$ | async" (clickMarker)="handleClickMarker($event)" *ngIf="!(overallProgress$ | async)?.isInProgress && (clustersMapData$ | async).length">
               <dlm-map-legend class="overview-map-legend" *ngIf="clusterLegend$ | async">
                 <dlm-cluster-legend [cluster]="clusterLegend$ | async"></dlm-cluster-legend>
@@ -57,7 +57,7 @@
   </div>
   <div class="page-section">
     <div class="row">
-      <div class="col-md-7">
+      <div class="col-xs-7">
         <div class="flex-center">
           <span class="h4">
             {{'page.overview.issues.updates' | translate}}
@@ -74,7 +74,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-5">
+      <div class="col-xs-5">
         <div class="pull-right">
           <button qe-attr="add-pairing" class="btn btn-xs btn-secondary btn-padding" type="button" [disabled]="!addingPairsAvailable(clusters$ | async, pairsCount$ | async)" routerLink="/pairings/create">
             <span class="text-uppercase">{{'common.add_pair' | translate}}</span>
@@ -86,7 +86,7 @@
       </div>
     </div>
     <div class="row" *ngIf="!(overallProgress$ | async)?.isInProgress">
-      <div class="col-md-12">
+      <div class="col-xs-12">
         <dlm-jobs-overview-table [jobs]="tableData$ | async" (onShowPolicyLog)="handleOnShowPolicyLog($event)"></dlm-jobs-overview-table>
       </div>
     </div>

@@ -11,7 +11,7 @@ $panel-border-color: #f0f0f0;
 $cell-border: 1px solid #ddd;
 
 :host /deep/ .row > dlm-summary-panel-cell {
-  &.col-md-4:nth-child(2) .cell-value {
+  &.col-xs-4:nth-child(2) .cell-value {
     border-left: $cell-border;
     border-right: $cell-border;
     padding-bottom: 10px;

@@ -20,6 +20,7 @@
       "id": 2,
       "description": "secondary",
       "name": "Secondary Cluster",
+      "dataCenter": "default",
       "ambariurl": "http://localhost:8080",
       "stats": {
         "CapacityTotal": 9129444352,
@@ -50,6 +51,7 @@
       "id": 1,
       "description": "primary",
       "name": "Primary Cluster",
+      "dataCenter": "dc-Europe",
       "ambariurl": "http://localhost:8080",
       "stats": {
         "CapacityTotal": 9129444352,
