@@ -229,6 +229,10 @@ class DataSets @Inject()(
     Logger.info("Received delete dataSet request")
     dataSetService
       .delete(dataSetId)
+//    Logger.info(s"Received deleteProfiler for entity $clusterId $datasetId")
+//    implicit val token = req.token
+//    dpProfilerService
+//      .deleteProfilerByDatasetId(clusterId, datasetId.getOrElse(-1))
       .map {
         case Left(errors) =>
           InternalServerError(
