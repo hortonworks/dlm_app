@@ -9,11 +9,16 @@
 
 <dlm-table
   #jobsTable
+  [externalPaging]="true"
+  [externalSorting]="true"
+  [loadingIndicator]="loadingJobs"
   [sorts]="sorts"
-  [offset]="page"
+  [reorderable]="false"
   [showPageSizeMenu]="showPageSizeMenu"
   [columns]="columns"
   [rows]="jobs"
+  [count]="jobsOverallCount"
+  [offset]="jobsOffset"
   [selectionType]="selectionType"
   (sortAction)="handleOnSort($event)"
   (pageChange)="handlePageChange($event)"

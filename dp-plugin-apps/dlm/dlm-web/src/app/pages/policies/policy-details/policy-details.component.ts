@@ -38,6 +38,12 @@ export class PolicyDetailsComponent implements OnInit {
   jobs: Job[];
 
   @Input()
+  jobsOverallCount: number;
+
+  @Input()
+  jobsOffset: number;
+
+  @Input()
   contentType = PolicyContent.Jobs;
 
   @Input()
@@ -55,6 +61,8 @@ export class PolicyDetailsComponent implements OnInit {
   @Input() jobsActiveActions = {};
 
   @Input() fileBrowserPage = 0;
+
+  @Input() loadingJobs;
 
   ngOnInit() {
 

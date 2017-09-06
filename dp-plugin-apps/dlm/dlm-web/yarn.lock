@@ -157,9 +157,9 @@
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/@ngx-translate/http-loader/-/http-loader-0.0.3.tgz#8346c8d2d6f630254601029668f17abe2afe8a9b"
 
-"@swimlane/ngx-datatable@8.2.1":
-  version "8.2.1"
-  resolved "https://registry.yarnpkg.com/@swimlane/ngx-datatable/-/ngx-datatable-8.2.1.tgz#b310ac7522312e301dbea3be7cf2a4b9bf172818"
+"@swimlane/ngx-datatable@^9.0.0":
+  version "9.3.1"
+  resolved "https://registry.yarnpkg.com/@swimlane/ngx-datatable/-/ngx-datatable-9.3.1.tgz#a9b1307327121ddf874e75ba6bd6a6c69c9265a1"
 
 "@types/d3-tip@^3.5.3":
   version "3.5.4"

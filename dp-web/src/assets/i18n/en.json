@@ -19,6 +19,7 @@
     "cancel": "Cancel",
     "back": "BACK",
     "go": "Go",
+    "clear": "Clear",
     "reset": "Reset",
     "search": "Search",
     "done": "Done",
@@ -127,17 +128,24 @@
         "installationStepsDoc":"https://docs.hortonworks.com/",
         "dependentServicesLabel":"DEPENDENT SERVICES:",
         "syncFailed":"Cluster Information could not be fetched",
-        "serviceEnabled":"Service Enabled successfully"
+        "serviceEnabled":"Service Enabled successfully",
+        "optional":"Optional",
+        "addOptionalServices":"Add Optional Services"
       },
       "description": {
         "verificationWelcome": "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your SmartSense ID.",
-        "manualInstall" : "Service <b>{{serviceName}}</b> is not enabled on cluster <b>{{clusterName}}</b> as one or more of the dependent services have not been enabled. Please enable the dependent services on the cluster using the documentation link. After all the dependent services are installed on the cluster, please click on the verification check box.",
+        "manualInstall" : "Service <b>{{serviceName}}</b> is not enabled on cluster <b>{{clusterName}}</b> as one or more of the dependent services have not been enabled.",
+        "installOptionalService":"Service <b>{{serviceName}}</b> is enabled on cluster <b>{{clusterName}}</b>. However one or more of the optional services have not been enabled.",
+        "installDependentService":"Please enable the dependent services on the cluster using the documentation link.",
+        "verifyDependency":"After all the dependent services are installed on the cluster, please click on the verification check box.",
         "enableError": "Service could not be enabled.",
         "verificationError": "Incorrect SmartSense ID format",
         "installationConfirmation":"All the dependent services have been installed on cluster <b>{{clusterName}}.</b>",
         "installationLink": "For detailed steps on the installation process, please visit ",
         "verifyingStatus": "Verifying dependent services status on the cluster...",
-        "successStatus":"All the service dependencies are met. Please click Next to continue",
+        "allDependenciesMet":"All the service dependencies are met. Please click Next to continue.",
+        "mandatoryDependenciesMet":"All the mandatory service dependencies are met.",
+        "optionalInstallation":"Optionally, you can install the following services to perform additional functions on the cluster.",
         "errorStatus":"The following dependent service(s) information is not present on the cluster. Please install them to continue.",
         "serviceEnabled": "All the authorized users of {{serviceName}} service, should re-login to be able to access the service."
       }
@@ -182,7 +190,8 @@
         "editCluster": "Edit Cluster",
         "duplicateRole": "Duplicate values in Roles Input - ",
         "duplicateUser": "Duplicate values in Users Input - ",
-        "duplicateGroup": "Duplicate values in Groups Input - "
+        "duplicateGroup": "Duplicate values in Groups Input - ",
+        "noMatch": "No Match"
       },
       "description": {
         "editCluster": "Please update your Ambari managed cluster (already added to Dataplane) here.",

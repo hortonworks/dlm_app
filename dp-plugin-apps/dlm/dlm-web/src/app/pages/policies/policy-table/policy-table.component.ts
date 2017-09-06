@@ -29,10 +29,10 @@ import { TranslateService } from '@ngx-translate/core';
 import { TableComponent } from 'common/table/table.component';
 import { Store } from '@ngrx/store';
 import * as fromRoot from 'reducers/';
-import { getAllJobs } from 'selectors/job.selector';
+import { getJobsPage } from 'selectors/job.selector';
 import { Observable } from 'rxjs/Observable';
 import { Job } from 'models/job.model';
-import { abortJob, rerunJob, loadJobsForPolicy } from 'actions/job.action';
+import { abortJob, rerunJob, loadJobsPageForPolicy } from 'actions/job.action';
 import { deletePolicy, resumePolicy, suspendPolicy } from 'actions/policy.action';
 import { PolicyService } from 'services/policy.service';
 import { OperationResponse } from 'models/operation-response.model';
@@ -62,8 +62,6 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   columns: any[];
   tableTheme = TableTheme.Cards;
   columnMode = ColumnMode.flex;
-  jobs$: Observable<Job[]>;
-  filteredJobs$: Observable<Job[]>;
   selectedPolicy$: BehaviorSubject<Policy> = new BehaviorSubject(<Policy>{});
   policyDatabase$: Observable<HiveDatabase>;
   policyContent = PolicyContent;
@@ -86,6 +84,12 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   activeContentType: PolicyContent = PolicyContent.Jobs;
   sourceCluster: number;
   hdfsRootPath: string;
+
+  jobs: Job[] = [];
+  jobsOffset: number;
+  jobsOverallCount: number;
+  jobsPolicyId: number;
+  loadingJobs = false;
 
   @ViewChild(IconColumnComponent) iconColumn: IconColumnComponent;
   @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;
@@ -121,7 +125,9 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       .filter(([_, policy]) => Boolean(
         this.activeContentType === PolicyContent.Jobs && policy && policy.id && this.tableComponent.expandedRows[policy.id]
       ))
-      .do(([_, policy]) => this.store.dispatch(loadJobsForPolicy(policy)));
+      .do(([_, policy]) => {
+        this.store.dispatch(loadJobsPageForPolicy(policy, this.selectedJobsPage[policy.id] || 0, this.selectedJobsSort[policy.id] || []));
+      });
     this.subscriptions.push(polling$.subscribe());
   }
 
@@ -146,14 +152,20 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
               private store: Store<fromRoot.State>,
               private hiveService: HiveService,
               private logService: LogService) {
-    this.jobs$ = store.select(getAllJobs);
-    this.filteredJobs$ = Observable.combineLatest(this.jobs$, this.selectedPolicy$).map(([jobs, selectedPolicy]) => {
-      return selectedPolicy ? jobs.filter(job => job.policyId === selectedPolicy.id) : [];
-    });
+    this.subscriptions.push(store.select(getJobsPage).subscribe(jobsPage => {
+      if (this.jobsPolicyId !== jobsPage.policyId) {
+        this.jobs = [];
+      }
+      this.jobsPolicyId = jobsPage.policyId;
+      this.jobs = jobsPage.jobs;
+      this.jobsOffset = jobsPage.offset;
+      this.jobsOverallCount = jobsPage.overallRecords;
+      this.loadingJobs = false;
+    }));
     this.policyDatabase$ = this.selectedPolicy$
-      .filter(policy => !!this.clusterByName(policy.sourceCluster))
+      .filter(policy => !!this.clusterByDatacenterId(policy.sourceCluster))
       .mergeMap(policy => {
-        const cluster = this.clusterByName(policy.sourceCluster);
+        const cluster = this.clusterByDatacenterId(policy.sourceCluster);
         return store.select(getDatabase(this.hiveService.makeDatabaseId(policy.sourceDataset, cluster.id)));
       });
   }
@@ -173,6 +185,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       },
       {
         prop: 'displayStatus',
+        name: this.t.instant('common.status.self'),
         cellClass: 'text-cell',
         headerClass: 'text-header',
         cellTemplate: this.verbStatusCellTemplate,
@@ -223,8 +236,13 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  clusterByName(clusterName: string): Cluster {
-    return this.clusters.find(cluster => cluster.name === clusterName);
+  /**
+   * Returns cluster instance by policy's sourceCluster or targetCluster value
+   *
+   * @param idByDatacenter {string} - cluster id in format <datacenter>$<clusterName>
+   */
+  clusterByDatacenterId(idByDatacenter: string): Cluster {
+    return this.clusters.find(cluster => cluster.idByDatacenter === idByDatacenter);
   }
 
   /**
@@ -294,6 +312,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     this.toggleSelectedRow(policy, contentType);
     this.activatePolicy(policy, contentType);
     this.loadContentDetails(policy, contentType);
+    this.handleJobsPageChange({offset: 0}, policy.id);
     this.detailsToggle.emit({
       policy: policy.id,
       expanded: this.tableComponent.expandedRows[policy.id],
@@ -328,20 +347,27 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       return;
     }
     if (contentType === PolicyContent.Files) {
-      const cluster = this.clusterByName(PolicyService.getClusterName(policy.sourceCluster));
+      const cluster = this.clusterByDatacenterId(policy.sourceCluster);
       if (policy.type === POLICY_TYPES.HIVE) {
         this.store.dispatch(loadFullDatabases(cluster.id));
       } else {
         this.sourceCluster = cluster.id;
         this.hdfsRootPath = policy.sourceDataset;
       }
-    } else {
-      this.store.dispatch(loadJobsForPolicy(policy));
+    }
+  }
+
+  loadPageForPolicy(rowId) {
+    const policy = this.selectedPolicy$.getValue();
+    if (policy) {
+      this.loadingJobs = true;
+      this.store.dispatch(loadJobsPageForPolicy(policy, this.selectedJobsPage[rowId], this.selectedJobsSort[rowId]));
     }
   }
 
   handleOnSortJobs(sort, rowId) {
     this.selectedJobsSort[rowId] = sort.sorts;
+    this.loadPageForPolicy(rowId);
   }
 
   getJobsSortForRow(rowId) {
@@ -350,6 +376,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
 
   handleJobsPageChange(page, rowId) {
     this.selectedJobsPage[rowId] = page.offset;
+    this.loadPageForPolicy(rowId);
   }
 
   getJobsPageForRow(rowId) {

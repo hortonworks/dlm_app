@@ -47,8 +47,9 @@ export class ConfigPayload {
 }
 
 export class AppDependency {
-  skuName : string;
-  dependencies : string[] = [];
+  skuName: string;
+  mandatoryDependencies: string[] = [];
+  optionalDependencies: string[] = [];
 }
 
 

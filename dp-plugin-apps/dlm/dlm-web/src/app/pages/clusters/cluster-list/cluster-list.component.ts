@@ -69,8 +69,8 @@ export class ClusterListComponent implements OnInit {
 
   ngOnInit() {
     this.columns = [
-      {prop: 'healthStatus', name: this.t.instant('common.status.self'), cellTemplate: this.statusCellRef,
-        flexGrow: 3, cellClass: 'status'},
+      {prop: 'healthStatus', name: this.t.instant('common.status.self'), headerClass: 'status-header',
+        cellTemplate: this.statusCellRef, flexGrow: 3, cellClass: 'status'},
       {prop: 'dataCenter', name: '', cellTemplate: this.dcCellRef, flexGrow: 3},
       {name: '', cellTemplate: this.slashIconCellRef, flexGrow: 1},
       {prop: 'name', name: '', cellTemplate: this.nameCellRef, flexGrow: 4},

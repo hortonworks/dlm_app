@@ -101,25 +101,25 @@ export class DlmComponent implements OnDestroy, OnInit {
       new MenuItem(
         t.instant('sidenav.menuItem.overview'),
         './overview',
-        'navigation-icon fa fa-home',
+        'navigation-icon fa fa-fw fa-home',
         'go-to-overview'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.clusters'),
         './clusters',
-        'navigation-icon fa fa-cubes',
+        'navigation-icon fa fa-fw fa-cubes',
         'go-to-clusters'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.pairings'),
         './pairings',
-        'navigation-icon fa fa-arrows-h',
+        'navigation-icon fa fa-fw fa-arrows-h',
         'go-to-pairings'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.policies'),
         './policies',
-        'navigation-icon fa fa-list-alt',
+        'navigation-icon fa fa-fw fa-list-alt',
         'go-to-policies'
       )
     ];
