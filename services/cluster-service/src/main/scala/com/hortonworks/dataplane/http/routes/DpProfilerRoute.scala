@@ -101,7 +101,7 @@ class DpProfilerRoute @Inject()(
 
   private def postAndScheduleJob(clusterId: Long, trackId: String, list: Seq[String]): Future[WSResponse] = {
     val postData = Json.obj(
-      "profilerName" -> "hivecolumnsampled", //"hivecolumnlive4",
+      "profilerName" -> "hivecolumn", //"hivecolumnlive4",
       "conf" -> Json.obj(),
       "assets" -> list.map{ itm =>{
         var itmAr = itm.split('.')
@@ -110,7 +110,7 @@ class DpProfilerRoute @Inject()(
           "assetType"  ->  "Hive",
           "data" -> Json.obj(
             "db" -> itmAr.head,
-            "table" -> itmAr.tail
+            "table" -> itmAr.last
           )
         )
       }}
@@ -132,7 +132,7 @@ class DpProfilerRoute @Inject()(
 
   private def postJob(clusterId: Long, dbName: String, tableName: String): Future[WSResponse] = {
     val postData = Json.obj(
-      "profilerName" -> "hivecolumnsampled", //"hivecolumnlive4",
+      "profilerName" -> "hivecolumn", //"hivecolumnlive4",
       "conf" -> Json.obj(),
       "assets" -> Seq(
         Json.obj(
