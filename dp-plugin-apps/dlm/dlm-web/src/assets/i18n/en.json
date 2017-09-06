@@ -154,6 +154,9 @@
           "title": "Activating Policy Failed"
         }
       }
+    },
+    "services": {
+      "ambari_server": "Ambari Server"
     }
   },
   "topnav": {
