@@ -35,6 +35,7 @@ class DataSets @Inject()(
     @Named("dataSetCategoryService") val dataSetCategoryService: DataSetCategoryService,
     @Named("atlasService") val atlasService: AtlasService,
     @Named("dpProfilerService") val dpProfilerService: DpProfilerService,
+    @Named("clusterService") val clusterService: com.hortonworks.dataplane.db.Webservice.ClusterService,
     authenticated: Authenticated)
     extends Controller {
 
@@ -225,7 +226,8 @@ class DataSets @Inject()(
     implicit val token = req.token
     Logger.info("Received delete dataSet request")
     (for {
-      clusterId <- doGetClusterIdOfDataset(dataSetId.toLong)
+      dpClusterId <- doGetDpClusterIdOfDataset(dataSetId.toLong)
+      clusterId <- doGetClusterIdFromDpClusterId(dpClusterId.toLong)
       deleted <- doDeleteDataset(dataSetId.toLong)
       profilesDeleted <- doDeleteProfilers(clusterId, dataSetId.toLong)
     }  yield {
@@ -352,14 +354,22 @@ class DataSets @Inject()(
       }
   }
 
-  private def doGetClusterIdOfDataset(datasetId: Long): Future[Long] = {
+  private def doGetClusterIdFromDpClusterId(dpClusterId: Long): Future[Long] = {
+    clusterService
+      .getLinkedClusters(dpClusterId)
+      .flatMap {
+        case Left(errors) => Future.failed(WrappedErrorsException(errors))
+        case Right(clusters) => Future.successful(clusters.head.id.get)
+      }
+  }
+
+  private def doGetDpClusterIdOfDataset(datasetId: Long): Future[Long] = {
     dataSetService
       .getRichDatasetById(datasetId)
       .flatMap {
         case Left(errors) => Future.failed(WrappedErrorsException(errors))
-        case Right(dataset) => Future.successful(dataset.clusterId)
+        case Right(dataset) => Future.successful(dataset.dataset.dpClusterId)
       }
   }
-
 
 }

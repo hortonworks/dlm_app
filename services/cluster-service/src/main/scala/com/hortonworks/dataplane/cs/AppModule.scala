@@ -230,6 +230,7 @@ object AppModule extends AbstractModule {
       rangerRoute.rangerPolicy ~
       dpProfilerRoute.startJob ~
       dpProfilerRoute.jobStatus ~
+      dpProfilerRoute.jobDelete ~
       atlasRoute.hiveAttributes ~
         atlasRoute.hiveTables ~
         atlasRoute.atlasEntities ~
