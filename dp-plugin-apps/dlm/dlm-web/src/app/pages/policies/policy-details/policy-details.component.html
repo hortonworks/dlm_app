@@ -65,7 +65,11 @@
         [page]="fileBrowserPage"
         (changePage)="handleOnFilePageChange($event)"
         (openDirectory)="handleOpenDirectory($event)"></dlm-hdfs-browser>
-      <dlm-hive-browser *ngIf="databaseBasedPolicy()" [databases]="[policyDatabase]"></dlm-hive-browser>
+      <dlm-hive-browser
+        *ngIf="databaseBasedPolicy()"
+        [databases]="[policyDatabase]"
+        [searchPattern]="tablesSearchPattern"
+        (filterApplied)="handleFilterApplied($event)"></dlm-hive-browser>
     </div>
   </div>
 </div>

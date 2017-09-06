@@ -65,6 +65,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   selectedPolicy$: BehaviorSubject<Policy> = new BehaviorSubject(<Policy>{});
   policyDatabase$: Observable<HiveDatabase>;
   policyContent = PolicyContent;
+  tablesSearchPattern = '';
 
   private selectedAction: ActionItemType;
   private selectedForActionRow: Policy;
@@ -74,8 +75,6 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
   private visibleActionMap = {};
   private selectedFileBrowserPage = {};
-
-  showActionConfirmationModal = false;
 
   lastOperationResponse: OperationResponse = <OperationResponse>{};
   showOperationResponseModal = false;
@@ -416,5 +415,9 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
 
   isPrevJobsActive(rowId) {
     return this.tableComponent.expandedRows[rowId] && this.activeContentType === PolicyContent.Jobs;
+  }
+
+  handleTablesFilterApplied(event) {
+    this.tablesSearchPattern = event;
   }
 }

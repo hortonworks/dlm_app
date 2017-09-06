@@ -73,6 +73,8 @@
     [loadingJobs]="loadingJobs"
     [jobsActiveActions]="getJobsActiveActionsForRow(row.id)"
     [fileBrowserPage]="getFilesPageForRow(row.id)"
+    [tablesSearchPattern]="tablesSearchPattern"
+    (onTablesFilter)="handleTablesFilterApplied($event)"
     (onPageChangeFiles)="handleFilesPageChange($event, row.id)"
     (onOpenDirectory)="handleOnOpenDirectory($event)"
     (onSortJobs)="handleOnSortJobs($event, row.id)"
