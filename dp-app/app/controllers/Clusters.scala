@@ -119,7 +119,7 @@ class Clusters @Inject()(
                 case Left(errors) => InternalServerError(Json.toJson(errors))
                 case Right(skus) =>
                   val allDependentServices = skus.flatMap { sku =>
-                    getModuleDependentService(sku.name).getOrElse("").split(",")
+                    getModuleDependentServices(sku.name).getOrElse("").split(",")
                   }.distinct
                   val newClusterDetails = clusterDetails.map { clDetails =>
                     val availableRequiredServices = allDependentServices.intersect(clDetails.services)

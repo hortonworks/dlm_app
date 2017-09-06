@@ -1,3 +1,5 @@
+import scala.util.Try
+
 /*
  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
  *
@@ -8,7 +10,15 @@
  */
 
 package object controllers {
-  def getModuleDependentService(skuName: String)(implicit configuration: play.api.Configuration):Option[String] = {
-    Option(configuration.underlying.getString(s"$skuName.dependent.services"))
+  def getModuleDependentServices(skuName: String)(implicit configuration: play.api.Configuration):Option[String] = {
+    val optionalServices = Try(configuration.underlying.getString(s"$skuName.dependent.services.optional")).getOrElse("")
+    val mandatoryServices = Try(configuration.underlying.getString(s"$skuName.dependent.services.mandatory")).getOrElse("")
+    if(optionalServices.isEmpty){
+      Option(mandatoryServices)
+    }else if(mandatoryServices.isEmpty){
+      Option(optionalServices)
+    }else{
+      Option(mandatoryServices + "," + optionalServices)
+    }
   }
 }
