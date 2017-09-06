@@ -12,6 +12,7 @@
 package com.hortonworks.dataplane.http.routes
 
 import java.net.URL
+import java.time.Instant
 import javax.inject.{Inject, Singleton}
 
 import akka.http.scaladsl.model.StatusCodes
@@ -49,6 +50,29 @@ class DpProfilerRoute @Inject()(
           case Failure(th) => th match {
             case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
             case _ => complete(StatusCodes.InternalServerError, errors(th))
+          }
+        }
+      }
+    }
+
+  val startAndScheduleJob =
+    path("cluster" / LongNumber / "dp-profiler" / "start-schedule-job") { clusterId =>
+      extractRequest { request =>
+        post {
+          entity(as[JsObject]) { js =>
+            var list = (js \ "list").as[Seq[String]]
+            var trackId = (js \ "jobTrackId").as[String]
+            onComplete(postAndScheduleJob(clusterId, trackId, list)) {
+              case Success(res) => res.status match {
+                case 200 => complete(success(res.json))
+                case 404 => complete(StatusCodes.NotFound, notFound)
+                case _ => complete(res.status)
+              }
+              case Failure(th) => th match {
+                case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
+                case _ => complete(StatusCodes.InternalServerError, errors(th))
+              }
+            }
           }
         }
       }
@@ -117,6 +141,37 @@ class DpProfilerRoute @Inject()(
         response
       }
     }
+
+  private def postAndScheduleJob(clusterId: Long, trackId: String, list: Seq[String]): Future[WSResponse] = {
+    val postData = Json.obj(
+      "profilerName" -> "hivecolumn", //"hivecolumnlive4",
+      "conf" -> Json.obj(),
+      "assets" -> list.map{ itm =>{
+        var itmAr = itm.split('.')
+        Json.obj(
+          "id" -> itm,
+          "assetType"  ->  "Hive",
+          "data" -> Json.obj(
+            "db" -> itmAr.head,
+            "table" -> itmAr.last
+          )
+        )
+      }}
+    )
+    for {
+      config <- getConfigOrThrowException(clusterId)
+      url <- getUrlFromConfig(config)
+      baseUrls <- extractUrlsWithIp(url, clusterId)
+      urlToHit <- Future.successful(s"${baseUrls.head}/schedules")
+      tmp <- Future.successful(println(urlToHit))
+      response <- ws.url(urlToHit)
+        .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+        .post(Json.obj("name" -> trackId, "cronExpr" -> s"0 ${(2+(Instant.now.getEpochSecond/60)%60)%60} * * * ?", "jobTask"->postData))
+      // Add 2 to current the minute(UTC) to make sure profiling starts within 2 minutes from now.
+    } yield {
+      response
+    }
+  }
 
   private def postJob(clusterId: Long, dbName: String, tableName: String): Future[WSResponse] = {
     val postData = Json.obj(

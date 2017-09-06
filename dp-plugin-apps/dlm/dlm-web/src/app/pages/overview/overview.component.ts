@@ -227,7 +227,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
       const policiesCounter = cluster.id in policiesCount &&
         'policies' in policiesCount[cluster.id] ? policiesCount[cluster.id].policies : 0;
       // prioritize UNHEALTHY status over WARNING when display cluster dot marker
-      const healthStatus = lowCapacityClusters.some(c => c.id === cluster.id) && cluster.healthStatus !== CLUSTER_STATUS.UNHEALTHY ?
+      const healthStatus = lowCapacityClusters.some(c => c.id === cluster.id) && cluster.healthStatus === CLUSTER_STATUS.HEALTHY ?
         CLUSTER_STATUS.WARNING : cluster.healthStatus;
       const clusterData = {
         ...cluster,

@@ -27,6 +27,7 @@ import play.api.mvc.Controller
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class DataSets @Inject()(
     @Named("dataSetService") val dataSetService: DataSetService,
@@ -121,11 +122,28 @@ class DataSets @Inject()(
                   case Left(errors) =>
                     InternalServerError(JsonResponses.statusError(
                       s"Failed with ${Json.toJson(errors)}"))
-                  case Right(dataSetNCategories) =>
+                  case Right(dataSetNCategories) => {
+                    val dsId = dataSetNCategories.dataset.id.get
+                    val list = assets.map {
+                      asset => ((asset.assetProperties \ "qualifiedName").as[String]).split("@").head
+                    }
+                    dpProfilerService.startAndScheduleProfilerJob(req.clusterId.toString, dsId.toString, list)
+                      .onComplete {
+                        case Success(Right(attributes))=> Logger.info(s"Started and Scheduled Profiler, 200 response, ${Json.toJson(attributes)}")
+                        case Success(Left(errors)) => {
+                          errors.errors.head.code match {
+                            case "404" => Logger.error(s"Start and Schedule Profiler Failed with 404 ${Json.toJson(errors)}")
+                            case "405" => Logger.error(s"Start and Schedule Profiler Failed with 405 ${Json.toJson(errors)}")
+                            case _ => Logger.error(s"Start and Schedule Profiler Failed with ${errors.errors.head.code} ${Json.toJson(errors)}")
+                          }
+                        }
+                        case Failure(th) => Logger.error(th.getMessage, th)
+                      }
                     Ok(
                       Json.obj("result" -> Json.toJson(dataSetNCategories),
-                               "countOfSaved" -> countOfSaved,
-                               "countOfIgnored" -> countOfIgnored))
+                        "countOfSaved" -> countOfSaved,
+                        "countOfIgnored" -> countOfIgnored))
+                  }
                 }
             case Left(errors) =>
               Future.successful(InternalServerError(JsonResponses.statusError(
