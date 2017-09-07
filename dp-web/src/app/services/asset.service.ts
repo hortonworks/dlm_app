@@ -25,6 +25,13 @@ export class AssetService {
   constructor(private http: Http) {
   }
 
+  checkMockAuditVisualStatus(){
+    return this.http
+      .get(`${this.uri}/auditMockStatus`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
   getDetails(clusterId:string, assetId: string) : Observable<AssetDetails>{
     const uri = `${this.uri}/details/${clusterId}/${assetId}`;
     return this.http
