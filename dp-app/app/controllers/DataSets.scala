@@ -136,13 +136,7 @@ class DataSets @Inject()(
                       } yield results)
                       .onComplete {
                         case Success(Right(attributes))=> Logger.info(s"Started and Scheduled Profiler, 200 response, ${Json.toJson(attributes)}")
-                        case Success(Left(errors)) => {
-                          errors.errors.head.code match {
-                            case "404" => Logger.error(s"Start and Schedule Profiler Failed with 404 ${Json.toJson(errors)}")
-                            case "405" => Logger.error(s"Start and Schedule Profiler Failed with 405 ${Json.toJson(errors)}")
-                            case _ => Logger.error(s"Start and Schedule Profiler Failed with ${errors.errors.head.code} ${Json.toJson(errors)}")
-                          }
-                        }
+                        case Success(Left(errors)) => Logger.error(s"Start and Schedule Profiler Failed with ${errors.errors.head.code} ${Json.toJson(errors)}")
                         case Failure(th) => Logger.error(th.getMessage, th)
                       }
                     Ok(
@@ -379,11 +373,7 @@ class DataSets @Inject()(
           Future.successful(true)
         }
         case Left(errors) => {
-          errors.errors.head.code match {
-            case "404" => Logger.error(s"Delete Profiler Failed with 404 ${Json.toJson(errors)}")
-            case "405" => Logger.error(s"Delete Profiler Failed with 405 ${Json.toJson(errors)}")
-            case _ => Logger.error(s"Delete Profiler Failed with ${errors.errors.head.code} ${Json.toJson(errors)}")
-          }
+          Logger.error(s"Delete Profiler Failed with ${errors.errors.head.code} ${Json.toJson(errors)}")
           Future.successful(false)
         }
       }
