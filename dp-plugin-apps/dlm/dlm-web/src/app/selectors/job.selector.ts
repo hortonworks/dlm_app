@@ -14,3 +14,13 @@ import { sortByDateField } from 'utils/array-util';
 
 export const getEntities = createSelector(getJobs, state => state.entities);
 export const getAllJobs = createSelector(getEntities, jobs => sortByDateField(mapToList(jobs), 'startTime'));
+export const getQueriesInfo = createSelector(getJobs, state => state.queries);
+export const getJobsPage = createSelector(getEntities, getQueriesInfo, (jobs, queriesInfo) => {
+  return {
+    pageSize: queriesInfo.pageSize,
+    offset: queriesInfo.offset,
+    policyId: queriesInfo.policyId,
+    overallRecords: queriesInfo.overallRecords,
+    jobs: queriesInfo.lastResultIds.map(id => jobs[id])
+  };
+});

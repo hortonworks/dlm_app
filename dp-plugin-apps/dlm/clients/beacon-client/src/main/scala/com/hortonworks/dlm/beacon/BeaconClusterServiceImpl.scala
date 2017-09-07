@@ -66,6 +66,18 @@ class BeaconClusterServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconC
       }
     }
 
+    val rangerConfigs =  clusterDefinitionRequest.rangerService match {
+      case None => ""
+      case Some(rangerServiceDetails) => {
+        "rangerEndPoint = " + rangerServiceDetails.rangerEndPoint + "\n" +
+        "rangerHDFSServiceName = " +  rangerServiceDetails.rangerHDFSServiceName + "\n" +
+          (rangerServiceDetails.rangerHIVEServiceName match {
+            case Some(rangerHIVEServiceName) => "rangerHIVEServiceName = " + rangerHIVEServiceName + "\n"
+            case None => ""
+          })
+      }
+    }
+
     "beaconEndpoint = " + clusterDefinitionRequest.beaconEndpoint + "\n" +
     "description = " + clusterDefinitionRequest.description + "\n" +
     "local = " + clusterDefinitionRequest.local + "\n" +
@@ -77,7 +89,8 @@ class BeaconClusterServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconC
     (clusterDefinitionRequest.hsKerberosPrincipal match {
       case Some(hsKerberosPrincipal) => "hsKerberosPrincipal= " + hsKerberosPrincipal + "\n"
       case None => ""
-    })
+    }) +
+    rangerConfigs
   }
 
   override def listCluster(beaconEndpoint : String, clusterId: Long, clusterName: String)

@@ -128,5 +128,14 @@ export class AssetDetailsViewComponent implements OnChanges {
     ret['type'] = this.assetDetails.referredEntities[this.colGuid].attributes.type;
     return ret;
   }
+  getIconClass(colGuid) {
+    var ent = this.assetDetails.referredEntities[colGuid];
+    if(!ent || !ent.attributes.profileData) return null;
+    var data = ent.attributes.profileData.attributes;
+    if(!data || !data.histogram && !data.quartiles) return null;
+    if(data.cardinality < 11) return "fa fa-pie-chart pointer";
+    return "fa fa-bar-chart pointer";
+
+  }
 
 }

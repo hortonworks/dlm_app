@@ -12,6 +12,7 @@ import { Observable } from 'rxjs/Observable';
 import { Http } from '@angular/http';
 import { mapResponse, getUrlDomain } from 'utils/http-util';
 import { Cluster } from 'models/cluster.model';
+import { PolicyService } from 'services/policy.service';
 
 @Injectable()
 export class ClusterService {
@@ -19,7 +20,8 @@ export class ClusterService {
   private decorateCluster(cluster: Cluster): Cluster {
     return {
       ...cluster,
-      ambariWebUrl: getUrlDomain(cluster.ambariurl)
+      ambariWebUrl: getUrlDomain(cluster.ambariurl),
+      idByDatacenter: PolicyService.makeClusterId(cluster.dataCenter, cluster.name)
     };
   }
 

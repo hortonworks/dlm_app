@@ -11,7 +11,10 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Effect, Actions, toPayload } from '@ngrx/effects';
 import { JobService } from 'services/job.service';
-import { loadJobsSuccess, loadJobsFail, abortJobSuccess, abortJobFailure, ActionTypes as jobActions } from 'actions/job.action';
+import {
+  loadJobsSuccess, loadJobsFail, abortJobSuccess, abortJobFailure, ActionTypes as jobActions,
+  loadJobsPageForPolicySuccess
+} from 'actions/job.action';
 import { rerunJobSuccess, rerunJobFailure } from 'actions/job.action';
 
 @Injectable()
@@ -44,6 +47,17 @@ export class JobEffects {
     .switchMap(payload => {
       return this.jobService.getJobsForPolicy(payload)
         .map(jobs => loadJobsSuccess(jobs, payload.meta))
+        .catch(err => Observable.of(loadJobsFail(err, payload.meta)));
+    });
+
+  @Effect()
+  loadJobsPageForPolicy$: Observable<any> = this.actions$
+    .ofType(jobActions.LOAD_JOBS_PAGE_FOR_POLICY.START)
+    .map(toPayload)
+    .switchMap(payload => {
+      const {policy, meta} = payload;
+      return this.jobService.getJobsForPolicyServerPaginated(policy, meta.offset, meta.sortBy, meta.pageSize)
+        .map(jobs => loadJobsPageForPolicySuccess(jobs, meta))
         .catch(err => Observable.of(loadJobsFail(err, payload.meta)));
     });
 

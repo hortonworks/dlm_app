@@ -17,8 +17,8 @@ import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.db.Webservice._
 import play.api.{Configuration, Logger}
 import play.api.libs.ws.WSClient
-import com.hortonworks.dlm.beacon.{BeaconClusterServiceImpl, BeaconEventServiceImpl, BeaconLogServiceImpl, BeaconPairServiceImpl, BeaconPolicyInstanceServiceImpl, BeaconPolicyServiceImpl}
-import com.hortonworks.dlm.beacon.WebService.{BeaconClusterService, BeaconEventService, BeaconLogService, BeaconPairService, BeaconPolicyInstanceService, BeaconPolicyService}
+import com.hortonworks.dlm.beacon._
+import com.hortonworks.dlm.beacon.WebService._
 import com.hortonworks.dlm.webhdfs.WebService.FileService
 import com.hortonworks.dlm.webhdfs.FileServiceImpl
 import com.hortonworks.datapalane.consul._
@@ -119,6 +119,15 @@ class Module extends AbstractModule {
     implicit val knoxProxyWsClient = KnoxProxyWsClient(ws, configuration.underlying)
     new BeaconLogServiceImpl()
   }
+
+  @Provides
+  @Singleton
+  @Named("beaconAdminService")
+  def provideBeaconAdminService(implicit ws: WSClient,configuration: Configuration):BeaconAdminService = {
+    implicit val knoxProxyWsClient = KnoxProxyWsClient(ws, configuration.underlying)
+    new BeaconAdminServiceImpl()
+  }
+
 
 
   @Provides

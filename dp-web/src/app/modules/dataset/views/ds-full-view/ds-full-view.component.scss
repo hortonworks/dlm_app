@@ -43,3 +43,12 @@
     }
   }
 }
+.dataset-view__header {
+  display: flex;
+}
+.dataset-view__action-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 10px;
+}

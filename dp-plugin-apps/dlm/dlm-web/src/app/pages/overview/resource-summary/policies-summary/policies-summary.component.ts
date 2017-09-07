@@ -19,19 +19,19 @@ import { POLICIES_HEALTH_STATE } from '../resource-summary.type';
       [total]="data.total">
       <div class="row">
         <dlm-summary-panel-cell
-          class="col-md-4"
+          class="col-xs-4"
           iconClass="fa fa-play-circle text-success"
           [label]="'page.overview.summary_panels.status.active' | translate"
           [value]="data.active">
         </dlm-summary-panel-cell>
         <dlm-summary-panel-cell
-          class="col-md-4"
+          class="col-xs-4"
           iconClass="fa fa-times-circle"
           [label]="'page.overview.summary_panels.status.suspended' | translate"
           [value]="data.suspended">
         </dlm-summary-panel-cell>
         <dlm-summary-panel-cell
-          class="col-md-4"
+          class="col-xs-4"
           iconClass="fa fa-exclamation-triangle text-danger"
           qe-attr="show-unhealthy-policies"
           (cellClick)="selectPanelCell.emit(healthStates.UNHEALTHY)"

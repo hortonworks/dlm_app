@@ -41,3 +41,12 @@
     width: 14px;
 }
 
+.dataset-item__action-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  width:100%;
+}
+
+.dataset-item__action {
+  padding: 5px;
+}

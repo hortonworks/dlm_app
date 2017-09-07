@@ -23,3 +23,8 @@ ds-tile-proxy {
 dp-pagination{
   float: right;
 }
+
+.dataset-delete-dialog {
+  top: 50%;
+  transform: translateY(-50%);
+}

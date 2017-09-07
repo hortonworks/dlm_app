@@ -22,13 +22,15 @@ export const HIVE_BROWSER_VALUE_ACCESSOR: any = {
   encapsulation: ViewEncapsulation.None,
   providers: [HIVE_BROWSER_VALUE_ACCESSOR],
   template: `
-    <div class="row" *ngIf="!databases.length">
+    <div class="row" *ngIf="!databases?.length">
       <div class="col-md-12">
         {{'hive_database.empty_selection' | translate}}
       </div>
     </div>
     <dlm-hive-database *ngFor="let database of databases"
       (selectDatabase)="handleSelectDatabase($event)"
+      (filterApplied)="handleFilterApplied($event)"
+      [searchPattern]="searchPattern"
       [selectedDatabase]="selectedDB"
       [readonly]="readonly"
       [database]="database">
@@ -37,9 +39,11 @@ export const HIVE_BROWSER_VALUE_ACCESSOR: any = {
 })
 export class HiveBrowserComponent implements OnInit, ControlValueAccessor {
   selectedDB = '';
+  @Input() searchPattern = '';
   @Input() readonly = true;
   @Input() databases: HiveDatabase[] = [];
   @Output() selectedDatabase = new EventEmitter<string>();
+  @Output() filterApplied: EventEmitter<any> = new EventEmitter();
   @HostBinding('class') className = 'dlm-hive-browser';
 
   onChange = (_: any) => {};
@@ -70,5 +74,9 @@ export class HiveBrowserComponent implements OnInit, ControlValueAccessor {
   handleSelectDatabase(databaseName: string) {
     this.selectedDB = databaseName;
     this.onChange(databaseName);
+  }
+
+  handleFilterApplied(event) {
+    this.filterApplied.emit(event);
   }
 }
