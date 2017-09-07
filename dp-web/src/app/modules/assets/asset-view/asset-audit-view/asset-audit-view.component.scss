@@ -8,23 +8,21 @@
  *  * of all or any part of the contents of this software is strictly prohibited.
  *
  */
-
 @import "../../../../../styles/variables";
 
-.filterCont{
-	text-align:right;
-	margin-top:-56px;
-	margin-bottom:26px;
+.filterCont {
+  text-align: right;
+  margin-top: 15px;
+  margin-bottom: 26px;
 }
 
-
-.infoNotAvailable, .loading{
-	text-align : center;
+.infoNotAvailable, .loading {
+  text-align: center;
 }
 
-.infoTable{
-	width:100%;
-	background-color: $white;
-	border: 1px solid $iron;
-	padding: 10px;
+.infoTable {
+  width: 100%;
+  background-color: $white;
+  border: 1px solid $iron;
+  padding: 10px;
 }

@@ -27,6 +27,8 @@ import {LineageModule} from '../../shared/lineage/lineage.module';
 import {AssetService} from '../../services/asset.service';
 import {RangerService} from '../../services/ranger.service';
 import {PaginationModule} from "../../shared/pagination/pagination.module";
+import { AuditVisualizationComponent } from './asset-view/asset-audit-view/audit-visualization/audit-visualization.component';
+import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -36,7 +38,8 @@ import {PaginationModule} from "../../shared/pagination/pagination.module";
     DropdownModule,
     TabsModule,
     LineageModule,
-    PaginationModule
+    PaginationModule,
+    TranslateModule
   ],
   declarations: [
     AssetViewComponent,
@@ -44,7 +47,8 @@ import {PaginationModule} from "../../shared/pagination/pagination.module";
     NodeDetailsComponent,
     AssetColumnVisualComponent,
     AssetAuditView,
-    AssetPolicyView
+    AssetPolicyView,
+    AuditVisualizationComponent
   ],
   providers: [
     AssetService,
