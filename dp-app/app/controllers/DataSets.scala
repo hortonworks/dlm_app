@@ -11,7 +11,6 @@
 
 package controllers
 
-import java.text.Normalizer
 import javax.inject.Inject
 
 import com.google.inject.name.Named
@@ -23,8 +22,9 @@ import com.hortonworks.dataplane.db.Webservice._
 import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.{JsonResponses, WrappedErrorsException}
 import play.api.Logger
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.Json
 import play.api.mvc.Controller
+import services.UtilityService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -38,7 +38,7 @@ class DataSets @Inject()(
     @Named("atlasService") val atlasService: AtlasService,
     @Named("dpProfilerService") val dpProfilerService: DpProfilerService,
     @Named("clusterService") val clusterService: com.hortonworks.dataplane.db.Webservice.ClusterService,
-    @Named("configService") val configService: ConfigService,
+    val utilityService: UtilityService,
     authenticated: Authenticated)
     extends Controller {
 
@@ -131,7 +131,7 @@ class DataSets @Inject()(
                       asset => ((asset.assetProperties \ "qualifiedName").as[String]).split("@").head
                     }
                     (for {
-                      jobName <- doGenerateJobName(dsId, dsName)
+                      jobName <- utilityService.doGenerateJobName(dsId, dsName)
                       results <- dpProfilerService.startAndScheduleProfilerJob(req.clusterId.toString, jobName, list)
                       } yield results)
                       .onComplete {
@@ -247,7 +247,7 @@ class DataSets @Inject()(
       dataset <- doGetDataset(dataSetId.toLong)
       clusterId <- doGetClusterIdFromDpClusterId(dataset.dpClusterId.toLong)
       deleted <- doDeleteDataset(dataset.id.get)
-      jobName <- doGenerateJobName(dataset.id.get, dataset.name)
+      jobName <- utilityService.doGenerateJobName(dataset.id.get, dataset.name)
       _ <- doDeleteProfilers(clusterId, jobName)
     }  yield {
       Ok(Json.obj("deleted" -> deleted))
@@ -395,19 +395,6 @@ class DataSets @Inject()(
         case Left(errors) => Future.failed(WrappedErrorsException(errors))
         case Right(dataset) => Future.successful(dataset.dataset)
       }
-  }
-
-  private def doGenerateJobName(datasetId: Long, datasetName: String): Future[String] = {
-    configService.getConfig("dp.knox.whitelist")
-      .map {
-        case Some(whitelist) => s"${whitelist.configValue}_${datasetName}_${datasetId}"
-        case None => "${datasetName}_${datasetId}"
-      }
-      .map(jobName => {
-        Normalizer.normalize(jobName.toLowerCase(), Normalizer.Form.NFD)
-          .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
-          .replaceAll("[^\\p{Alnum}]+", "-")
-      })
   }
 
 }
