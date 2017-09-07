@@ -31,7 +31,7 @@ export class AssetColumnVisualComponent implements OnInit{
 	  	  this.noDataAvailable = true;
 		  return;
 		}
-		if(this.data.quartiles)
+		if(this.data.quartiles && JSON.parse(this.data.quartiles).length > 0)
 			this.onlyHisto = false;
 		if(this.data.cardinality < 11)
 			this.showPi = true;
@@ -41,7 +41,7 @@ export class AssetColumnVisualComponent implements OnInit{
 	      else
 	        this.drawHisto();
 	    }
-		if(!this.data.quartiles) return;
+		if(this.onlyHisto) return;
 		this.drawBoxPlot();
 	}
 	drawHisto () {
