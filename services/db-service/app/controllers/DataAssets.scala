@@ -35,6 +35,15 @@ class DataAssets @Inject()(dataAssetRepo: DataAssetRepo)(implicit exec: Executio
       )
   }
 
+  def loadFromGuid(guid: String) = Action.async {
+    dataAssetRepo.findByGuid(guid).map { co =>
+      co.map { c =>
+        success(linkData(c, makeLink(c)))
+      }
+        .getOrElse(NotFound)
+    }.recoverWith(apiError)
+  }
+
   def load(id:Long) = Action.async {
     dataAssetRepo.findById(id).map { co =>
       co.map { c =>

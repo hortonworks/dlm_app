@@ -49,6 +49,8 @@ export class AssetViewComponent implements OnInit {
   PS = ProfilerStatus;
   profilerStatus:ProfilerStatus = this.PS.UNKNOWN;
   lastRunTime:string = "";
+  nextRunTime:number = 0;
+  nextRunDisplay:string = "";
 
   constructor(private route: ActivatedRoute, private assetService: AssetService) {
   }
@@ -63,6 +65,19 @@ export class AssetViewComponent implements OnInit {
       this.assetDetails = details;
       this.summary = this.extractSummary(details.entity);
       this.getProfilingJobStatus();
+    });
+    this.assetService.getDetailsFromDb(this.guid).subscribe(details => {
+      this.assetService.getScheduleInfo(details.clusterId, details.datasetId).subscribe(res=>{
+        this.nextRunTime = Math.max(0,parseInt(res['nextFireTime']) - Date.now());
+        var nrtMin = Math.floor(this.nextRunTime/60000); //in minutes;
+        var nrtHour = (nrtMin > 60)?Math.floor(nrtMin/60):0;
+        this.nextRunDisplay = "Next Profiler Schedule in : " + ((nrtHour)?(nrtHour + ((nrtHour==1)?" hour":" hours")):(nrtMin + ((nrtMin==1)?" minute":" minutes")));
+        console.log(this.nextRunDisplay);
+      },
+      err =>
+          ((err.status === 404) && (console.log("404 from getScheduleInfo")))
+        ||((err.status === 405) && (console.log("405 from getScheduleInfo")))
+      );
     });
   }
 

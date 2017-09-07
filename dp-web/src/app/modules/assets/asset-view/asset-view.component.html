@@ -42,7 +42,8 @@
     <div class="spacer-15"> </div>
     <dp-tabs [tabEnum]="topLevelTabs" [tabType]="tabType.UNDERLINE" (selected)="selectedTopLevelTabs=$event"> </dp-tabs>
     <div class="spacer-15"> </div>
-    <section *ngIf="selectedTopLevelTabs === topLevelTabs.DETAILS">
+    <section *ngIf="selectedTopLevelTabs === topLevelTabs.DETAILS" style="position:relative;">
+      <div class="sticker" *ngIf="nextRunDisplay">{{nextRunDisplay}}</div>
       <dp-asset-details-view [assetDetails]="assetDetails" [clusterId]="clusterId" [guid]="guid"> </dp-asset-details-view>
     </section>
     <section *ngIf="selectedTopLevelTabs === topLevelTabs.LINEAGE">
