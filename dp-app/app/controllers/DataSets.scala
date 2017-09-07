@@ -11,6 +11,7 @@
 
 package controllers
 
+import java.text.Normalizer
 import javax.inject.Inject
 
 import com.google.inject.name.Named
@@ -18,7 +19,7 @@ import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasEntities, Entity}
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.cs.Webservice.{AtlasService, DpProfilerService}
-import com.hortonworks.dataplane.db.Webservice.{CategoryService, DataAssetService, DataSetCategoryService, DataSetService}
+import com.hortonworks.dataplane.db.Webservice._
 import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.{JsonResponses, WrappedErrorsException}
 import play.api.Logger
@@ -37,6 +38,7 @@ class DataSets @Inject()(
     @Named("atlasService") val atlasService: AtlasService,
     @Named("dpProfilerService") val dpProfilerService: DpProfilerService,
     @Named("clusterService") val clusterService: com.hortonworks.dataplane.db.Webservice.ClusterService,
+    @Named("configService") val configService: ConfigService,
     authenticated: Authenticated)
     extends Controller {
 
@@ -124,10 +126,14 @@ class DataSets @Inject()(
                       s"Failed with ${Json.toJson(errors)}"))
                   case Right(dataSetNCategories) => {
                     val dsId = dataSetNCategories.dataset.id.get
+                    val dsName = dataSetNCategories.dataset.name
                     val list = assets.map {
                       asset => ((asset.assetProperties \ "qualifiedName").as[String]).split("@").head
                     }
-                    dpProfilerService.startAndScheduleProfilerJob(req.clusterId.toString, dsId.toString, list)
+                    (for {
+                      jobName <- doGenerateJobName(dsId, dsName)
+                      results <- dpProfilerService.startAndScheduleProfilerJob(req.clusterId.toString, jobName, list)
+                      } yield results)
                       .onComplete {
                         case Success(Right(attributes))=> Logger.info(s"Started and Scheduled Profiler, 200 response, ${Json.toJson(attributes)}")
                         case Success(Left(errors)) => {
@@ -244,10 +250,11 @@ class DataSets @Inject()(
     implicit val token = req.token
     Logger.info("Received delete dataSet request")
     (for {
-      dpClusterId <- doGetDpClusterIdOfDataset(dataSetId.toLong)
-      clusterId <- doGetClusterIdFromDpClusterId(dpClusterId.toLong)
-      deleted <- doDeleteDataset(dataSetId.toLong)
-      profilesDeleted <- doDeleteProfilers(clusterId, dataSetId.toLong)
+      dataset <- doGetDataset(dataSetId.toLong)
+      clusterId <- doGetClusterIdFromDpClusterId(dataset.dpClusterId.toLong)
+      deleted <- doDeleteDataset(dataset.id.get)
+      jobName <- doGenerateJobName(dataset.id.get, dataset.name)
+      _ <- doDeleteProfilers(clusterId, jobName)
     }  yield {
       Ok(Json.obj("deleted" -> deleted))
     })
@@ -363,12 +370,22 @@ class DataSets @Inject()(
       }
   }
 
-  private def doDeleteProfilers(clusterId: Long, datasetId: Long)(implicit token:Option[HJwtToken]): Future[Boolean] = {
+  private def doDeleteProfilers(clusterId: Long, jobName: String)(implicit token:Option[HJwtToken]): Future[Boolean] = {
     dpProfilerService
-      .deleteProfilerByDatasetId(clusterId, datasetId)
+      .deleteProfilerByJobName(clusterId, jobName)
       .flatMap {
-        case Left(errors) => Future.successful(true)
-        case Right(jsObject) => Future.successful(false)
+        case Right(attributes) => {
+          Logger.info(s"Delete Profiler, 200 response, ${Json.toJson(attributes)}")
+          Future.successful(true)
+        }
+        case Left(errors) => {
+          errors.errors.head.code match {
+            case "404" => Logger.error(s"Delete Profiler Failed with 404 ${Json.toJson(errors)}")
+            case "405" => Logger.error(s"Delete Profiler Failed with 405 ${Json.toJson(errors)}")
+            case _ => Logger.error(s"Delete Profiler Failed with ${errors.errors.head.code} ${Json.toJson(errors)}")
+          }
+          Future.successful(false)
+        }
       }
   }
 
@@ -381,13 +398,26 @@ class DataSets @Inject()(
       }
   }
 
-  private def doGetDpClusterIdOfDataset(datasetId: Long): Future[Long] = {
+  private def doGetDataset(datasetId: Long): Future[Dataset] = {
     dataSetService
       .getRichDatasetById(datasetId)
       .flatMap {
         case Left(errors) => Future.failed(WrappedErrorsException(errors))
-        case Right(dataset) => Future.successful(dataset.dataset.dpClusterId)
+        case Right(dataset) => Future.successful(dataset.dataset)
       }
+  }
+
+  private def doGenerateJobName(datasetId: Long, datasetName: String): Future[String] = {
+    configService.getConfig("dp.knox.whitelist")
+      .map {
+        case Some(whitelist) => s"${whitelist.configValue}_${datasetName}_${datasetId}"
+        case None => "${datasetName}_${datasetId}"
+      }
+      .map(jobName => {
+        Normalizer.normalize(jobName.toLowerCase(), Normalizer.Form.NFD)
+          .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+          .replaceAll("[^\\p{Alnum}]+", "-")
+      })
   }
 
 }
