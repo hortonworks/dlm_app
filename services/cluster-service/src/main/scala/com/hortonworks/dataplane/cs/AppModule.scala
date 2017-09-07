@@ -232,6 +232,7 @@ object AppModule extends AbstractModule {
       dpProfilerRoute.jobStatus ~
       dpProfilerRoute.jobDelete ~
       dpProfilerRoute.startAndScheduleJob ~
+      dpProfilerRoute.scheduleInfo ~
       atlasRoute.hiveAttributes ~
         atlasRoute.hiveTables ~
         atlasRoute.atlasEntities ~

@@ -72,4 +72,11 @@ class DpProfilerServiceImpl (config: Config)(implicit ws: ClusterWsClient) exten
 
   }
 
+  override def getScheduleInfo(clusterId: String, taskName: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/schedule-info/$taskName")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapResultsGeneric)
+  }
 }

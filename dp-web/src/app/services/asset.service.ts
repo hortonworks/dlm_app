@@ -16,13 +16,21 @@ import {AssetDetails} from '../models/asset-property';
 import {AssetTag} from '../models/asset-tag';
 
 import {HttpUtil} from '../shared/utils/httpUtil';
-import {AssetSchema} from '../models/asset-schema';
+import {AssetSchema, AssetModel} from '../models/asset-schema';
 
 @Injectable()
 export class AssetService {
   uri = '/api/assets';
 
   constructor(private http: Http) {
+  }
+
+  getDetailsFromDb (guid: string) : Observable<AssetModel> {
+    const uri = `${this.uri}/byguid/${guid}`;
+    return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
   }
 
   getDetails(clusterId:string, assetId: string) : Observable<AssetDetails>{
@@ -48,6 +56,17 @@ export class AssetService {
   getProfilingStatus(clusterId:string, dbName:string, tableName:string) : Observable<any>{
     const uri = `/api/dpProfiler/jobStatus?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}`;
     return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(err => {
+        if(err.status == 404 || err.status == 405) return Observable.throw(err);
+        return HttpUtil.handleError(err)
+      });
+  }
+
+  getScheduleInfo(clusterId:number, datasetId:number) : Observable<any> {
+    const uri = `api/dpProfiler/scheduleStatus?clusterId=${clusterId}&dataSetId=${datasetId}`
+        return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(err => {

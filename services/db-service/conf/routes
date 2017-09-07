@@ -186,6 +186,7 @@ DELETE        /datasets/details/:id                                          con
 
 #Data Asset Api
 GET           /dataassets/:datasetId                                         controllers.DataAssets.allWithDatasetId(datasetId:Long, queryName: String, offset: Long, limit: Long)
+GET           /dataassets/guid/:guid                                         controllers.DataAssets.loadFromGuid(guid: String)
 POST          /dataassets                                                    controllers.DataAssets.add
 DELETE        /dataassets/:id                                                controllers.DataAssets.delete(id:Long)
 

@@ -94,6 +94,23 @@ class DpProfilerRoute @Inject()(
       }
     }
 
+  val scheduleInfo =
+    path ("cluster" / LongNumber / "dp-profiler" / "schedule-info" / Segment) { (clusterId, taskName) =>
+      get {
+        onComplete(getScheduleInfo(clusterId, taskName)) {
+          case Success(res) => res.status match {
+            case 200 => complete(success(res.json.as[Seq[JsObject]].headOption)) //TODO fix it once gaurav fixes profiler response
+            case 404 => complete(StatusCodes.NotFound, notFound)
+            case _ => complete(res.status)
+          }
+          case Failure(th) => th match {
+            case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
+            case _ => complete(StatusCodes.InternalServerError, errors(th))
+          }
+        }
+      }
+    }
+
   val jobDelete =
     path ("cluster" / LongNumber / "dp-profiler" / "profilers") { clusterId: Long =>
       delete {
@@ -123,6 +140,21 @@ class DpProfilerRoute @Inject()(
         response <- ws.url(urlToHit)
           .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
           .delete()
+      } yield {
+        response
+      }
+    }
+
+    private def getScheduleInfo(clusterId: Long, taskName: String): Future[WSResponse] = {
+
+      for {
+        config <- getConfigOrThrowException(clusterId)
+        url <- getUrlFromConfig(config)
+        baseUrls <- extractUrlsWithIp(url, clusterId)
+        urlToHit <- Future.successful(s"${baseUrls.head}/schedules/$taskName")
+        response <- ws.url(urlToHit)
+          .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+          .get()
       } yield {
         response
       }
