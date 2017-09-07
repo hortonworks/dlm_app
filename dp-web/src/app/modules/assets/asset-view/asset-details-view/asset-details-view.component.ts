@@ -126,6 +126,18 @@ export class AssetDetailsViewComponent implements OnChanges {
     ret = this.assetDetails.referredEntities[this.colGuid].attributes.profileData.attributes;
     ret['name'] = this.assetDetails.referredEntities[this.colGuid].attributes.name;
     ret['type'] = this.assetDetails.referredEntities[this.colGuid].attributes.type;
+    try {
+      let profilerInfo = this.assetDetails.entity.attributes.profileData.attributes;
+      if(!profilerInfo.sampleTime || !profilerInfo.samplePercent) throw "sampleTime or samplePercent not available";
+      let td = Math.floor((Date.now() - parseInt(profilerInfo.sampleTime))/60000); // in minutes
+      let displayText = "";
+      if(td/60 < 1) displayText = td + ((td == 1)?" minute ":" minutes ") + "ago";
+      else displayText = (td=Math.floor(td/60)) + ((td == 1)?" hour ":" hours ") + "ago";
+      ret['profilerInfo'] = `Profiled : ${profilerInfo.samplePercent}% rows, ${displayText}`;
+
+    }
+    catch(err){/*console.log(err)*/}
+
     return ret;
   }
   getIconClass(colGuid) {
