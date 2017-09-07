@@ -61,8 +61,8 @@ class DpProfilerRoute @Inject()(
         post {
           entity(as[JsObject]) { js =>
             var list = (js \ "list").as[Seq[String]]
-            var trackId = (js \ "jobTrackId").as[String]
-            onComplete(postAndScheduleJob(clusterId, trackId, list)) {
+            var jobName = (js \ "jobName").as[String]
+            onComplete(postAndScheduleJob(clusterId, jobName, list)) {
               case Success(res) => res.status match {
                 case 200 => complete(success(res.json))
                 case 404 => complete(StatusCodes.NotFound, notFound)
@@ -97,8 +97,8 @@ class DpProfilerRoute @Inject()(
   val jobDelete =
     path ("cluster" / LongNumber / "dp-profiler" / "profilers") { clusterId: Long =>
       delete {
-        parameters('datasetId.as[Long]) { datasetId =>
-          onComplete(deleteProfilerByDatasetId(clusterId, datasetId)) {
+        parameters('jobName.as[String]) { jobName =>
+          onComplete(deleteProfilerByJobName(clusterId, jobName)) {
             case Success(res) => res.status match {
               case 200 => complete(success(res.json))
               case 404 => complete(StatusCodes.NotFound, notFound)
@@ -113,13 +113,13 @@ class DpProfilerRoute @Inject()(
       }
     }
 
-    private def deleteProfilerByDatasetId(clusterId: Long, datasetId: Long): Future[WSResponse] = {
+    private def deleteProfilerByJobName(clusterId: Long, jobName: String): Future[WSResponse] = {
 
       for {
         config <- getConfigOrThrowException(clusterId)
         url <- getUrlFromConfig(config)
         baseUrls <- extractUrlsWithIp(url, clusterId)
-        urlToHit <- Future.successful(s"${baseUrls.head}/schedules/$datasetId")
+        urlToHit <- Future.successful(s"${baseUrls.head}/schedules/$jobName")
         response <- ws.url(urlToHit)
           .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
           .delete()
@@ -143,7 +143,7 @@ class DpProfilerRoute @Inject()(
       }
     }
 
-  private def postAndScheduleJob(clusterId: Long, trackId: String, list: Seq[String]): Future[WSResponse] = {
+  private def postAndScheduleJob(clusterId: Long, jobName: String, list: Seq[String]): Future[WSResponse] = {
     val postData = Json.obj(
       "profilerName" -> "hivecolumn", //"hivecolumnlive4",
       "conf" -> Json.obj(),
@@ -167,7 +167,7 @@ class DpProfilerRoute @Inject()(
       tmp <- Future.successful(println(urlToHit))
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
-        .post(Json.obj("name" -> trackId, "cronExpr" -> s"0 ${(2+(Instant.now.getEpochSecond/60)%60)%60} * * * ?", "jobTask"->postData))
+        .post(Json.obj("name" -> jobName, "cronExpr" -> s"0 ${(2+(Instant.now.getEpochSecond/60)%60)%60} * * * ?", "jobTask"->postData))
       // Add 2 to current the minute(UTC) to make sure profiling starts within 2 minutes from now.
     } yield {
       response

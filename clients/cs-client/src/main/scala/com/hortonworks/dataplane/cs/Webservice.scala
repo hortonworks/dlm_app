@@ -94,9 +94,9 @@ object Webservice {
 
     def getProfilerJobStatus(clusterId: String, dbName: String, tableName: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
 
-    def deleteProfilerByDatasetId(clusterId: Long, datasetId: Long)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
+    def deleteProfilerByJobName(clusterId: Long, jobName: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
     
-    def startAndScheduleProfilerJob(clusterId: String, dsId: String, assets: Seq[String])(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
+    def startAndScheduleProfilerJob(clusterId: String, jobName: String, assets: Seq[String])(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
 
   }
 }
