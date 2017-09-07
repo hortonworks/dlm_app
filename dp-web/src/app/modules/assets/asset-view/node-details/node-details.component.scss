@@ -16,6 +16,9 @@
 }
 .details-container{
   padding: 25px 25px;
+  height: 500px;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 .overflow-ellipsis {
   text-overflow: ellipsis;
@@ -57,3 +60,7 @@
   text-align: left
 }
 
+:host /deep/ .load-right-to-left-slider {
+  bottom: -25px;
+  top: 0;
+}
