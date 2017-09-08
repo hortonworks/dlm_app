@@ -1,29 +1,44 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div *ngIf="state==PWS.NOINFO" class="infoNotAvailable">Policy information is not available</div>
 <div *ngIf="state==PWS.LOADING" class="loading">Loading ...</div>
 <div *ngIf="state==PWS.LOADED" class="infoTable borderBox">
-	
-	<div class="tableRow tableHeader">
-		<div class="tableCell pId">Policy ID</div>
-		<div class="tableCell name">Policy Name</div>
-		<div class="tableCell status">Status</div> 
-		<div class="tableCell auditEnable">Audit Logging</div>
-		<div class="tableCell group">Group</div>
-		<div class="tableCell user">Users</div>
-	</div>
-	<div class="tableRow normalRow" *ngFor="let policy of policies">
-		<div class="tableCell pId">{{policy.id}}</div>
-		<div class="tableCell name">{{policy.name}}</div>
-		<div class="tableCell status">{{policy.isEnabled?"ENABLED":"DISABLED"}}</div> 
-		<div class="tableCell auditEnable">{{policy.isAuditEnabled?"ENABLED":"DISABLED"}}</div>
-		<div class="tableCell group">{{(policy.groups.length?policy.groups.join(", "):"--")}}</div>
-		<div class="tableCell user">{{policy.users.length?policy.users.join(", "):"--"}}</div>
-	</div>
-	<simple-pagination
-      [pageSize]="pageSize"
-      [pageStartIndex]="pageStartsFrom"
-      [count]="count"
-      (onPageSizeChange)="onPageSizeChange($event)"
-      (onPageChange)="onPageChange($event)"
-    ></simple-pagination>
-
+  <table class="mdl-data-table mdl-js-data-table">
+    <thead>
+      <tr>
+        <th class="mdl-data-table__cell--non-numeric">Policy ID</th>
+        <th class="mdl-data-table__cell--non-numeric">Policy Name</th>
+        <th class="mdl-data-table__cell--non-numeric">Status</th>
+        <th class="mdl-data-table__cell--non-numeric">Audit Logging</th>
+        <th class="mdl-data-table__cell--non-numeric">Group</th>
+        <th class="mdl-data-table__cell--non-numeric">Users</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let policy of policies">
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable" title="{{policy.id}}">{{policy.id}}</td>
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable" title="{{policy.name}}">{{policy.name}}</td>
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable" title="{{policy.isEnabled?'ENABLED':'DISABLED'}}">{{policy.isEnabled?"ENABLED":"DISABLED"}}</td>
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable" title="{{policy.isAuditEnabled?'ENABLED':'DISABLED'}}">{{policy.isAuditEnabled?"ENABLED":"DISABLED"}}</td>
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable" title="{{(policy.groups.length?policy.groups.join(', '):'--')}}">{{(policy.groups.length?policy.groups.join(", "):"--")}}</td>
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable" title="{{policy.users.length?policy.users.join(', '):'--'}}">{{policy.users.length?policy.users.join(", "):"--"}}</td>
+      </tr>
+    </tbody>
+  </table>
+  <simple-pagination
+    [pageSize]="pageSize"
+    [pageStartIndex]="pageStartsFrom"
+    [count]="count"
+    (onPageSizeChange)="onPageSizeChange($event)"
+    (onPageChange)="onPageChange($event)"
+  ></simple-pagination>
 </div>

@@ -7,7 +7,11 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-export interface Event {
+export interface EventUI {
+  id: number;
+}
+
+export interface Event extends EventUI {
   policyId: string;
   instanceId?: string;
   event: string;

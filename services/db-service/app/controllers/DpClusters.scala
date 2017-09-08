@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package controllers
 
 import javax.inject._
@@ -18,9 +29,9 @@ class DpClusters @Inject()(dpClusterRepo: DpClusterRepo)(
   import domain.API._
 
   def all = Action.async { request =>
-    if(!request.getQueryString("ambariUrl").isEmpty){
-      val url = request.getQueryString("ambariUrl").get
-      dpClusterRepo.findByAmbariUrl(url).map { dlo =>
+    if(!request.getQueryString("ambariIp").isEmpty){
+      val amabariIp = request.getQueryString("ambariIp").get
+      dpClusterRepo.findByAmbariIp(amabariIp).map { dlo =>
         dlo.map { dl =>
           success(linkData(dl, makeLink(dl)))
         }

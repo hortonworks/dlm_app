@@ -1,9 +1,21 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.commons.domain
 
 import java.time.LocalDateTime
 
 import com.hortonworks.dataplane.commons.domain.Atlas.AtlasSearchQuery
-import play.api.libs.json.{JsValue, Json, Reads, Writes}
+import org.apache.commons.lang3.exception.ExceptionUtils
+import play.api.libs.json.{JsValue, Json, Reads}
 
 /**
   * Data plane main domain entities
@@ -14,13 +26,28 @@ object Entities {
   import scala.reflect.runtime.universe._
 
   // Routine to get field names for a class
-  def fieldsNames[T: TypeTag]: Set[String] = typeOf[T].members.collect {
-    case m: MethodSymbol if m.isCaseAccessor => m.fullName
-  }.toSet
+  def fieldsNames[T: TypeTag]: Set[String] =
+    typeOf[T].members.collect {
+      case m: MethodSymbol if m.isCaseAccessor => m.fullName
+    }.toSet
+
+  object ErrorType extends Enumeration {
+    type ErrorType = Value
+    val General, Network, Database, Cluster, Ambari,Url = Value
+
+    implicit class WrappedThrowable(th: Throwable) {
+      def asError(code: String, errorType: ErrorType):Errors =
+        Errors(
+          Seq(
+            Error(code, ExceptionUtils.getStackTrace(th), errorType.toString)))
+    }
+  }
 
   case class HJwtToken(token: String)
 
-  case class Error(code: String, message: String)
+  case class Error(code: String,
+                   message: String,
+                   errorType: String = ErrorType.General.toString)
 
   case class Errors(errors: Seq[Error] = Seq()) {
     def combine(newErrors: Errors) = Errors(errors ++ newErrors.errors)
@@ -49,44 +76,39 @@ object Entities {
 
   case class GroupsList(total: Int, groups: Seq[GroupInfo])
 
-  case class UsersList( total: Int, users: Seq[UserInfo])
+  case class UsersList(total: Int, users: Seq[UserInfo])
 
   case class UserInfo(id: Option[Long] = None,
-                  userName: String,
-                  displayName: String,
-                  password: Option[String]=None,
-                  active: Option[Boolean] = Some(true),
-                  roles: Seq[RoleType.Value]=Seq()
-                  )
+                      userName: String,
+                      displayName: String,
+                      password: Option[String] = None,
+                      active: Option[Boolean] = Some(true),
+                      roles: Seq[RoleType.Value] = Seq())
 
   case class UserGroupInfo(id: Option[Long] = None,
-                  userName: String,
-                  displayName: String,
-                  password: Option[String]=None,
-                  active: Option[Boolean] = Some(true),
-                  groupIds: Seq[Long]=Seq()
-                 )
-  case class UserContext(id:Option[Long],
-                         username:String,
-                         avatar:Option[String],
+                           userName: String,
+                           displayName: String,
+                           password: Option[String] = None,
+                           active: Option[Boolean] = Some(true),
+                           groupIds: Seq[Long] = Seq())
+  case class UserContext(id: Option[Long],
+                         username: String,
+                         avatar: Option[String],
                          active: Option[Boolean] = Some(true),
-                         roles:Seq[String],
+                         roles: Seq[String],
                          services: Seq[String],
-                         display:Option[String],
-                         token:Option[String],
-                         password:Option[String],
-                         groupManaged:Option[Boolean]=Some(false),
-                         updatedAt:Option[Long])
-  case class UserLdapGroups(userName: String,
-                            ldapGroups:Seq[String]
-                           )
+                         display: Option[String],
+                         token: Option[String],
+                         password: Option[String],
+                         groupManaged: Option[Boolean] = Some(false),
+                         updatedAt: Option[Long])
+  case class UserLdapGroups(userName: String, ldapGroups: Seq[String])
 
   case class GroupInfo(id: Option[Long] = None,
-                      groupName: String,
-                      displayName: String,
-                      active: Option[Boolean] = Some(true),
-                      roles: Seq[RoleType.Value]=Seq()
-                     )
+                       groupName: String,
+                       displayName: String,
+                       active: Option[Boolean] = Some(true),
+                       roles: Seq[RoleType.Value] = Seq())
 
   case class Role(id: Option[Long] = None,
                   roleName: String,
@@ -137,6 +159,7 @@ object Entities {
       dcName: String,
       description: String,
       ambariUrl: String,
+      ambariIpAddress: String,
       location: Option[Long],
       createdBy: Option[Long],
       properties: Option[JsValue],
@@ -220,14 +243,13 @@ object Entities {
                  created: Option[LocalDateTime] = Some(LocalDateTime.now()),
                  updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
-  case class ServiceDependency(serviceName: String, dependencies: Seq[String])
+  case class ServiceDependency(serviceName: String, mandatoryDependencies: Seq[String], optionalDependencies: Seq[String])
 
-  case class DpService(skuName:String,
-                       enabled:Boolean,
+  case class DpService(skuName: String,
+                       enabled: Boolean,
                        sku: Sku,
-                       enabledSku: Option[EnabledSku]
-                      )
-  case class DpServiceEnableConfig(skuName:String,smartSenseId:String)
+                       enabledSku: Option[EnabledSku])
+  case class DpServiceEnableConfig(skuName: String, smartSenseId: String)
 
   case class ClusterHost(id: Option[Long] = None,
                          host: String,
@@ -311,16 +333,16 @@ object Entities {
                                   assetQueryModels: Seq[AtlasSearchQuery],
                                   dataAssets: Seq[DataAsset] = Nil)
   case class LdapConfiguration(
-                              id: Option[Long],
-                              ldapUrl:String,
-                              bindDn: Option[String],
-                              userSearchBase: Option[String],
-                              userSearchAttributeName:Option[String],
-                              groupSearchBase: Option[String],
-                              groupSearchAttributeName:Option[String],
-                              groupObjectClass:Option[String],
-                              groupMemberAttributeName: Option[String]
-                              )
+      id: Option[Long],
+      ldapUrl: String,
+      bindDn: Option[String],
+      userSearchBase: Option[String],
+      userSearchAttributeName: Option[String],
+      groupSearchBase: Option[String],
+      groupSearchAttributeName: Option[String],
+      groupObjectClass: Option[String],
+      groupMemberAttributeName: Option[String]
+  )
 
   case class WorkspaceDataCount(asset: Int, notebook: Int)
 
@@ -374,8 +396,10 @@ object JsonFormatters {
   implicit val locationReads = Json.reads[Location]
   implicit val dpClusterWrites = Json.writes[DataplaneCluster]
   implicit val dpClusterReads = Json.reads[DataplaneCluster]
-  implicit val dpClusterIdentifierWrites = Json.writes[DataplaneClusterIdentifier]
-  implicit val dpClusterIdentifierReads = Json.reads[DataplaneClusterIdentifier]
+  implicit val dpClusterIdentifierWrites =
+    Json.writes[DataplaneClusterIdentifier]
+  implicit val dpClusterIdentifierReads =
+    Json.reads[DataplaneClusterIdentifier]
 
   implicit val skuWrites = Json.writes[Sku]
   implicit val skuReads = Json.reads[Sku]
@@ -452,7 +476,7 @@ object JsonFormatters {
   implicit val richDatasetWrites = Json.writes[RichDataset]
 
   implicit val ldapConfigurationReads = Json.reads[LdapConfiguration]
-  implicit val ldapConfigurationWrites= Json.writes[LdapConfiguration]
+  implicit val ldapConfigurationWrites = Json.writes[LdapConfiguration]
 
   implicit val workspacesAndCountReads = Json.reads[WorkspaceDataCount]
   implicit val workspacesAndCountWrites = Json.writes[WorkspaceDataCount]
@@ -473,8 +497,7 @@ object JsonFormatters {
   implicit val userInfoWrites = Json.writes[UserInfo]
 
   implicit val usersListWrites = Json.writes[UsersList]
-  implicit  val usersListReads = Json.reads[UsersList]
-
+  implicit val usersListReads = Json.reads[UsersList]
 
   implicit val groupReads = Json.reads[Group]
   implicit val groupWrites = Json.writes[Group]
@@ -483,23 +506,22 @@ object JsonFormatters {
   implicit val groupInfoWrites = Json.writes[GroupInfo]
 
   implicit val groupsListWrites = Json.writes[GroupsList]
-  implicit  val groupsListReads = Json.reads[GroupsList]
+  implicit val groupsListReads = Json.reads[GroupsList]
 
-  implicit val userContextWrites= Json.writes[UserContext]
-  implicit val userContextReads= Json.reads[UserContext]
+  implicit val userContextWrites = Json.writes[UserContext]
+  implicit val userContextReads = Json.reads[UserContext]
 
-  implicit val userGroupInfoWrites= Json.writes[UserGroupInfo]
-  implicit val userGroupInfoReads= Json.reads[UserGroupInfo]
+  implicit val userGroupInfoWrites = Json.writes[UserGroupInfo]
+  implicit val userGroupInfoReads = Json.reads[UserGroupInfo]
 
+  implicit val userLdapGroupsWrites = Json.writes[UserLdapGroups]
+  implicit val userLdapGroupsReads = Json.reads[UserLdapGroups]
 
-  implicit val userLdapGroupsWrites= Json.writes[UserLdapGroups]
-  implicit val userLdapGroupsReads= Json.reads[UserLdapGroups]
+  implicit val dpServiceWrites = Json.writes[DpService]
+  implicit val dpServiceReads = Json.reads[DpService]
 
-  implicit val dpServiceWrites= Json.writes[DpService]
-  implicit val dpServiceReads= Json.reads[DpService]
-
-  implicit val dpServiceEnableConfigWrites= Json.writes[DpServiceEnableConfig]
-  implicit val dpServiceEnableConfigReads= Json.reads[DpServiceEnableConfig]
+  implicit val dpServiceEnableConfigWrites = Json.writes[DpServiceEnableConfig]
+  implicit val dpServiceEnableConfigReads = Json.reads[DpServiceEnableConfig]
 
   implicit val serviceDependencyWrites = Json.writes[ServiceDependency]
   implicit val serviceDependencyReads = Json.reads[ServiceDependency]

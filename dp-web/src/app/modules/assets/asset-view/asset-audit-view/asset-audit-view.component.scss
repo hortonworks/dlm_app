@@ -1,50 +1,28 @@
-.filterCont{
-	text-align:right;
-	margin-top:-56px;
-	margin-bottom:26px;
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+@import "../../../../../styles/variables";
+
+.filterCont {
+  text-align: right;
+  margin-top: 15px;
+  margin-bottom: 26px;
 }
 
-
-.infoNotAvailable, .loading{
-	text-align : center;
+.infoNotAvailable, .loading {
+  text-align: center;
 }
 
-.infoTable{
-	width:100%;
-	background-color:white;
-	border: 1px solid #D3D3D3;
-	padding: 10px;
-}
-
-.tableRow {
-	height:34px;
-	padding:12px 0px;
-}
-
-.tableRow.tableHeader{
-	color:#999;	
-	border-bottom: 1px solid #D0D0D0;
-}
-
-.tableRow.normalRow {
-	border-bottom: 1px solid #F0F0F0;
-	font-size:12px;
-	color:#666
-}
-
-.tableCell {
-	width:13%;
-	float:left;
-}
-
-.tableCell.eventTime {
-	width:18%;
-}
-
-select {
-  font-size: 1em;
-  height: 32px;
-  padding: 0 8px;
-  border: 1px solid rgb(221, 221, 221);
-  border-radius: 5px;
+.infoTable {
+  width: 100%;
+  background-color: $white;
+  border: 1px solid $iron;
+  padding: 10px;
 }

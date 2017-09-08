@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.http.routes
 
 import java.net.URL
@@ -51,8 +62,13 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
 
   private lazy val log = Logger(classOf[HdpRoute])
 
+  private lazy val evictOnFailure: String => Unit = { key: String =>
+    log.error(s"evicting K -> $key,V -> ${serviceRoutes.get(key)}")
+    serviceRoutes.invalidate(key)
+  }
+
   private lazy val serviceRoutes =
-    CacheBuilder.newBuilder().build(new KnoxGatewayCacheLoader(clusterData))
+    CacheBuilder.newBuilder().build(new KnoxGatewayCacheLoader(clusterData,evictOnFailure))
 
   private lazy val pathRegex =
     """(\/cluster\/)(\d+)(\/service\/)(\w+)\/(.*)""".r
@@ -225,13 +241,16 @@ class HdpRoute @Inject()(private val actorSystem: ActorSystem,
   }
 }
 
-class KnoxGatewayCacheLoader(private val clusterData: ClusterDataApi)(
+class KnoxGatewayCacheLoader(private val clusterData: ClusterDataApi,evict:String => Unit)(
     implicit ec: ExecutionContext)
     extends CacheLoader[String, Future[Option[URL]]] {
+
+  private lazy val log = Logger(classOf[KnoxGatewayCacheLoader])
+
   override def load(key: String): Future[Option[URL]] = {
     val long = key.toLong
 
-    for {
+    val urlOpt = for {
       knoxEnabled <- clusterData.shouldUseToken(long)
       s <- {
         if (knoxEnabled)
@@ -245,5 +264,13 @@ class KnoxGatewayCacheLoader(private val clusterData: ClusterDataApi)(
           .getOrElse(None)
       }
     } yield url
+
+    urlOpt.onFailure {
+      case e:Throwable =>
+        log.error("Cannot load knox URL", e)
+        evict(key)
+    }
+
+    urlOpt
   }
 }

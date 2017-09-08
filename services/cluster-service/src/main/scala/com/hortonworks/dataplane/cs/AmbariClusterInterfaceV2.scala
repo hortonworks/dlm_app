@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.cs
 
 import com.hortonworks.dataplane.commons.domain.Entities.{
@@ -71,6 +82,7 @@ class AmbariClusterInterfaceV2(
     logger.info("Fetching Ranger information")
 
     val hostInfoUrl = s"${cluster.clusterUrl.get}/host_components?HostRoles/component_name=RANGER_ADMIN"
+    logger.info(s"$hostInfoUrl")
     val hostInfo = getWrappedRequest(hostInfoUrl, hJwtToken)
 
     val serviceSuffix = "/configurations/service_config_versions?service_name=RANGER&is_current=true"
@@ -109,6 +121,54 @@ class AmbariClusterInterfaceV2(
     rangerInfo.map(Right(_)).recoverWith {
       case e: Exception =>
         logger.error("Cannot get Ranger info")
+        Future.successful(Left(e))
+    }
+  }
+
+  override def getDpProfiler(implicit hJwtToken: Option[HJwtToken])
+  : Future[Either[Throwable, DpProfiler]] = {
+    logger.info("Fetching DpProfiler information")
+
+    val hostInfoUrl = s"${cluster.clusterUrl.get}/host_components?HostRoles/component_name=DP_PROFILER_AGENT"
+    logger.info(s"$hostInfoUrl")
+    val hostInfo = getWrappedRequest(hostInfoUrl, hJwtToken)
+
+    val serviceSuffix = "/configurations/service_config_versions?service_name=DPPROFILER&is_current=true"
+    val request = getWrappedRequest(s"${cluster.clusterUrl.get}$serviceSuffix", hJwtToken)
+
+    val tokenAsString = hJwtToken
+      .map { t =>
+        Some(t.token)
+      }
+      .getOrElse(None)
+
+    val dpProfilerInfo =
+      for {
+        hir <- hostInfo
+        hi <- knoxApiExecutor.execute(KnoxApiRequest(hir, { r => r.get() }, tokenAsString))
+        req <- request
+        res <- knoxApiExecutor.execute(KnoxApiRequest(req, { req => req.get() }, tokenAsString))
+      } yield {
+
+        val hostItems = (hi.json \ "items").as[JsArray].validate[List[JsObject]].get
+
+        val hosts = hostItems.map { h =>
+          val host = (h \ "HostRoles" \ "host_name").validate[String]
+          host.get
+        }
+
+        val json = res.json
+        val configurations = json \ "items" \\ "configurations"
+        val configs: JsValue = configurations.head
+
+        DpProfiler(hosts.map(ServiceHost),
+          Some(Json.obj("stats" -> Json.obj(), "properties" -> configs))
+        )
+
+      }
+    dpProfilerInfo.map(Right(_)).recoverWith {
+      case e: Exception =>
+        logger.error("Cannot get DpProfiler info")
         Future.successful(Left(e))
     }
   }

@@ -44,7 +44,8 @@ export const EVENT_SEVERITY = {
 export const CLUSTER_STATUS = {
   HEALTHY: 'HEALTHY',
   UNHEALTHY: 'UNHEALTHY',
-  WARNING: 'WARNING'
+  WARNING: 'WARNING',
+  UNKNOWN: 'UNKNOWN'
 };
 
 export const SERVICE_STATUS = {
@@ -57,4 +58,9 @@ export const PROGRESS_STATUS = {
   IN_PROGRESS: IN_PROGRESS,
   SUCCESS: SUCCESS,
   FAILED: FAILED
+};
+
+export const POLICY_DISPLAY_STATUS = {
+  [POLICY_STATUS.RUNNING]: 'common.status.active',
+  [POLICY_STATUS.SUSPENDED]: 'common.status.suspended'
 };

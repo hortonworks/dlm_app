@@ -20,12 +20,12 @@ export const initialState: State = {
 };
 
 const withStatus = (state, cluster) => {
-  const status = state.entities[cluster.id] && state.entities[cluster.id].status || [];
+  const cached = state.entities[cluster.id];
+  const status = cached && cached.status || [];
+  const healthStatus = cached && cached.healthStatus || CLUSTER_STATUS.UNKNOWN;
   return {
     ...cluster,
-    healthStatus: status.some(s => s.state !== SERVICE_STATUS.STARTED) ?
-      CLUSTER_STATUS.UNHEALTHY :
-      CLUSTER_STATUS.HEALTHY,
+    healthStatus,
     status
   };
 };
@@ -57,9 +57,13 @@ export function reducer(state = initialState, action: fromCluster.Actions): Stat
       }
       const entities = Object.keys(state.entities).reduce((newEntities, clusterId) => {
         const status = clusterServices[clusterId];
-        const someServiceIsNotStarted = status && !!status.find(d => d.state !== SERVICE_STATUS.STARTED);
-        const clusterHealthStatus = someServiceIsNotStarted ? CLUSTER_STATUS.UNHEALTHY : CLUSTER_STATUS.HEALTHY;
-        newEntities[clusterId] = Object.assign({}, state.entities[clusterId], {status, healthStatus: clusterHealthStatus});
+        let clusterHealthStatus = CLUSTER_STATUS.HEALTHY;
+        if (!status) {
+          clusterHealthStatus = CLUSTER_STATUS.UNKNOWN;
+        } else if (status && !!status.some(d => d.state !== SERVICE_STATUS.STARTED)) {
+          clusterHealthStatus = CLUSTER_STATUS.UNHEALTHY;
+        }
+        newEntities[clusterId] = Object.assign({}, state.entities[clusterId], {status: status || [], healthStatus: clusterHealthStatus});
         return newEntities;
       }, {});
       return {entities};

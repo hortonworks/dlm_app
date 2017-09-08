@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package controllers
 
 import javax.inject.Inject
@@ -6,21 +17,18 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasEntities, Entity}
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.cs.Webservice.AtlasService
-import com.hortonworks.dataplane.db.Webservice.{
-  CategoryService,
-  DataAssetService,
-  DataSetCategoryService,
-  DataSetService
-}
+import com.hortonworks.dataplane.cs.Webservice.{AtlasService, DpProfilerService}
+import com.hortonworks.dataplane.db.Webservice._
 import com.hortonworks.dataplane.commons.auth.Authenticated
-import models.JsonResponses
+import models.{JsonResponses, WrappedErrorsException}
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.Controller
+import services.UtilityService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 class DataSets @Inject()(
     @Named("dataSetService") val dataSetService: DataSetService,
@@ -28,6 +36,9 @@ class DataSets @Inject()(
     @Named("categoryService") val categoryService: CategoryService,
     @Named("dataSetCategoryService") val dataSetCategoryService: DataSetCategoryService,
     @Named("atlasService") val atlasService: AtlasService,
+    @Named("dpProfilerService") val dpProfilerService: DpProfilerService,
+    @Named("clusterService") val clusterService: com.hortonworks.dataplane.db.Webservice.ClusterService,
+    val utilityService: UtilityService,
     authenticated: Authenticated)
     extends Controller {
 
@@ -113,11 +124,26 @@ class DataSets @Inject()(
                   case Left(errors) =>
                     InternalServerError(JsonResponses.statusError(
                       s"Failed with ${Json.toJson(errors)}"))
-                  case Right(dataSetNCategories) =>
+                  case Right(dataSetNCategories) => {
+                    val dsId = dataSetNCategories.dataset.id.get
+                    val dsName = dataSetNCategories.dataset.name
+                    val list = assets.map {
+                      asset => ((asset.assetProperties \ "qualifiedName").as[String]).split("@").head
+                    }
+                    (for {
+                      jobName <- utilityService.doGenerateJobName(dsId, dsName)
+                      results <- dpProfilerService.startAndScheduleProfilerJob(req.clusterId.toString, jobName, list)
+                      } yield results)
+                      .onComplete {
+                        case Success(Right(attributes))=> Logger.info(s"Started and Scheduled Profiler, 200 response, ${Json.toJson(attributes)}")
+                        case Success(Left(errors)) => Logger.error(s"Start and Schedule Profiler Failed with ${errors.errors.head.code} ${Json.toJson(errors)}")
+                        case Failure(th) => Logger.error(th.getMessage, th)
+                      }
                     Ok(
                       Json.obj("result" -> Json.toJson(dataSetNCategories),
-                               "countOfSaved" -> countOfSaved,
-                               "countOfIgnored" -> countOfIgnored))
+                        "countOfSaved" -> countOfSaved,
+                        "countOfIgnored" -> countOfIgnored))
+                  }
                 }
             case Left(errors) =>
               Future.successful(InternalServerError(JsonResponses.statusError(
@@ -214,16 +240,21 @@ class DataSets @Inject()(
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def delete(dataSetId: String) = authenticated.async {
+  def delete(dataSetId: String) = authenticated.async { req =>
+    implicit val token = req.token
     Logger.info("Received delete dataSet request")
-    dataSetService
-      .delete(dataSetId)
-      .map {
-        case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-        case Right(dataSet) => Ok(Json.toJson(dataSet))
-      }
+    (for {
+      dataset <- doGetDataset(dataSetId.toLong)
+      clusterId <- doGetClusterIdFromDpClusterId(dataset.dpClusterId.toLong)
+      deleted <- doDeleteDataset(dataset.id.get)
+      jobName <- utilityService.doGenerateJobName(dataset.id.get, dataset.name)
+      _ <- doDeleteProfilers(clusterId, jobName)
+    }  yield {
+      Ok(Json.obj("deleted" -> deleted))
+    })
+    .recover{
+      case ex: WrappedErrorsException => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(ex.errors)}"))
+    }
   }
 
   def listAllCategories = authenticated.async {
@@ -322,6 +353,48 @@ class DataSets @Inject()(
               Right(enhanced)
           }
     }
+  }
+
+  private def doDeleteDataset(datasetId: Long): Future[Long] = {
+    dataSetService
+      .delete(datasetId.toString)
+      .flatMap {
+        case Left(errors) => Future.failed(WrappedErrorsException(errors))
+        case Right(deleted) => Future.successful(deleted)
+      }
+  }
+
+  private def doDeleteProfilers(clusterId: Long, jobName: String)(implicit token:Option[HJwtToken]): Future[Boolean] = {
+    dpProfilerService
+      .deleteProfilerByJobName(clusterId, jobName)
+      .flatMap {
+        case Right(attributes) => {
+          Logger.info(s"Delete Profiler, 200 response, ${Json.toJson(attributes)}")
+          Future.successful(true)
+        }
+        case Left(errors) => {
+          Logger.error(s"Delete Profiler Failed with ${errors.errors.head.code} ${Json.toJson(errors)}")
+          Future.successful(false)
+        }
+      }
+  }
+
+  private def doGetClusterIdFromDpClusterId(dpClusterId: Long): Future[Long] = {
+    clusterService
+      .getLinkedClusters(dpClusterId)
+      .flatMap {
+        case Left(errors) => Future.failed(WrappedErrorsException(errors))
+        case Right(clusters) => Future.successful(clusters.head.id.get)
+      }
+  }
+
+  private def doGetDataset(datasetId: Long): Future[Dataset] = {
+    dataSetService
+      .getRichDatasetById(datasetId)
+      .flatMap {
+        case Left(errors) => Future.failed(WrappedErrorsException(errors))
+        case Right(dataset) => Future.successful(dataset.dataset)
+      }
   }
 
 }

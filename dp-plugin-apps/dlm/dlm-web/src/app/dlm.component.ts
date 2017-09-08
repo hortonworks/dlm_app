@@ -45,6 +45,8 @@ const CLUSTERS_REQUEST = '[DLM_COMPONENT] CLUSTERS_REQUEST';
   encapsulation: ViewEncapsulation.None
 })
 export class DlmComponent implements OnDestroy, OnInit {
+  private lastEventTimeStamp: string;
+
   header: MenuItem;
   menuItems: MenuItem[];
   mainContentSelector = '#dlm_main_content';
@@ -66,8 +68,12 @@ export class DlmComponent implements OnDestroy, OnInit {
       .filter(isInProgress => !isInProgress)
       .delay(POLL_INTERVAL)
       .do(_ => {
+        const eventParams = {};
+        if (this.lastEventTimeStamp) {
+          eventParams['start_time'] = this.lastEventTimeStamp;
+        }
         this.store.dispatch(loadNewEventsCount({requestId: POLL_NEW_EVENTS_ID}));
-        this.store.dispatch(loadEvents({ requestId: POLL_EVENTS_ID}));
+        this.store.dispatch(loadEvents(eventParams, { requestId: POLL_EVENTS_ID}));
         this.store.dispatch(loadClustersStatuses(POLL_CLUSTER_STATUSES_ID));
       })
       .repeat();
@@ -95,33 +101,38 @@ export class DlmComponent implements OnDestroy, OnInit {
       new MenuItem(
         t.instant('sidenav.menuItem.overview'),
         './overview',
-        'navigation-icon fa fa-home',
+        'navigation-icon fa fa-fw fa-home',
         'go-to-overview'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.clusters'),
         './clusters',
-        'navigation-icon fa fa-globe',
+        'navigation-icon fa fa-fw fa-cubes',
         'go-to-clusters'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.pairings'),
         './pairings',
-        'navigation-icon fa fa-arrows-h',
+        'navigation-icon fa fa-fw fa-arrows-h',
         'go-to-pairings'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.policies'),
         './policies',
-        'navigation-icon fa fa-th-list',
+        'navigation-icon fa fa-fw fa-list-alt',
         'go-to-policies'
       )
     ];
-    this.events$ = store.select(getAllEvents);
+    this.events$ = store.select(getAllEvents)
+      .do((events: Event[]) => {
+        if (events.length) {
+          this.lastEventTimeStamp = events[0].timestamp;
+        }
+      });
     this.newEventsCount$ = store.select(getNewEventsCount);
     this.store.dispatch(initApp());
     this.store.dispatch(loadNewEventsCount({requestId: POLL_NEW_EVENTS_ID}));
-    this.store.dispatch(loadEvents({ requestId: POLL_EVENTS_ID}));
+    this.store.dispatch(loadEvents(null, { requestId: POLL_EVENTS_ID}));
     this.store.dispatch(loadClusters(CLUSTERS_REQUEST));
     const pathChange$ = router.events
       .filter(e => e instanceof NavigationEnd)

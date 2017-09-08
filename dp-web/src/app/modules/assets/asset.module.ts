@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -16,6 +27,8 @@ import {LineageModule} from '../../shared/lineage/lineage.module';
 import {AssetService} from '../../services/asset.service';
 import {RangerService} from '../../services/ranger.service';
 import {PaginationModule} from "../../shared/pagination/pagination.module";
+import { AuditVisualizationComponent } from './asset-view/asset-audit-view/audit-visualization/audit-visualization.component';
+import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
   imports: [
@@ -25,7 +38,8 @@ import {PaginationModule} from "../../shared/pagination/pagination.module";
     DropdownModule,
     TabsModule,
     LineageModule,
-    PaginationModule
+    PaginationModule,
+    TranslateModule
   ],
   declarations: [
     AssetViewComponent,
@@ -33,7 +47,8 @@ import {PaginationModule} from "../../shared/pagination/pagination.module";
     NodeDetailsComponent,
     AssetColumnVisualComponent,
     AssetAuditView,
-    AssetPolicyView
+    AssetPolicyView,
+    AuditVisualizationComponent
   ],
   providers: [
     AssetService,

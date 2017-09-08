@@ -9,3 +9,5 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" % "play-ws_2.11" % "2.5.13"
 
 )
+
+libraryDependencies := libraryDependencies.value.map(_.excludeAll(ExclusionRule("com.google.code.findbugs", "annotations")))

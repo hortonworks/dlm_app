@@ -6,8 +6,7 @@
   "scripts": {
     "generate": "node migrate.js"
   },
-  "author": "Abhishek Kumar",
-  "license": "ISC",
+  "private": true,
   "dependencies": {
     "papaparse": "^4.3.5"
   }

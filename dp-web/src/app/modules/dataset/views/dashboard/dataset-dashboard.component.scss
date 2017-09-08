@@ -1,37 +1,37 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 @import "../../../../../styles/variables";
-
-.dataset-search {
-  width:100%;
-  padding-right: 15px;
-  border-top: 1px solid $mercury;
-  border-bottom: 1px solid $mercury;
-  background: $wild-sand;
-
-  input {
-    width: 100%;
-    background: transparent;
-    padding-left: 40px;
-    border:none;
-    font-size: 14px;
-  }
-
-  .mdl-button {
-    padding-right: 15px;
-  }
-
-  .dp-input {
-    &:before {
-      font-family: FontAwesome;
-      content: '\f002';
-      position: absolute;
-      top: 12px;
-      padding-left: 20px;
-    }
-  }
-}
 
 .result-viewer {
   margin-left: $side-nav-width;
+}
+
+.search-input {
+  position: relative;
+  display: inline-block;
+  margin-right: 10px;
+  width: 250px;
+  box-sizing: border-box;
+  input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .dp-input__icon {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: #666666;
+    font-size: 14px;
+  }
 }
 
 .result-header {

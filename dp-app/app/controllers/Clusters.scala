@@ -1,18 +1,25 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package controllers
 
 import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari._
-import com.hortonworks.dataplane.commons.domain.Entities.{
-Cluster,
-DataplaneClusterIdentifier,
-Error,
-Errors
-}
+import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneClusterIdentifier, Error, Errors}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.ClusterService
 import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 import models.{ClusterHealthData, JsonResponses}
 import play.api.Logger
 import play.api.mvc._
@@ -27,7 +34,9 @@ class Clusters @Inject()(
                           @Named("clusterService") val clusterService: ClusterService,
                           val clusterHealthService: ClusterHealthService,
                           authenticated: Authenticated,
-                          ambariService: AmbariService
+                          ambariService: AmbariService,
+                          @Named("clusterAmbariService") ambariWebService: AmbariWebService,
+                          configuration: play.api.Configuration
                         ) extends Controller {
 
   def list(dpClusterId: Option[Long]) = authenticated.async {
@@ -175,14 +184,33 @@ class Clusters @Inject()(
   }
 
   def getResourceManagerHealth(clusterId: Long) = authenticated.async {
-    request =>
-      ambariService.getResourceManagerHealth(clusterId).map {
+    request => {
+      implicit val token = request.token
+      val rmRequest = configuration.getString("cluster.rm.health.request.param").get;
+
+      ambariWebService.requestAmbariClusterApi(clusterId, rmRequest).map {
         case Left(errors) =>
           InternalServerError(
             JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
         case Right(resourceManagerHealth) =>
           Ok(Json.toJson(resourceManagerHealth))
       }
+    }
+  }
+
+  def getDataNodeHealth(clusterId: Long) = authenticated.async {
+    request => {
+      implicit val token = request.token
+      val dnRequest = configuration.getString("cluster.dn.health.request.param").get;
+
+      ambariWebService.requestAmbariClusterApi(clusterId, dnRequest).map {
+        case Left(errors) =>
+          InternalServerError(
+            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Right(datanodeHealth) =>
+          Ok(Json.toJson(datanodeHealth))
+      }
+    }
   }
 
   private def humanizeBytes(bytes: Option[Double]): String = {

@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package domain
 
 import java.time.LocalDateTime
@@ -102,7 +113,7 @@ class GroupsRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     }
   }
 
-  def getGroupByName(groupName: String) = {
+  def getGroupByName(groupName: String):Future[GroupInfo] = {
     for {
       (group, groupRoles) <- getGroupDetailInternal(groupName)
       roleIdMap <- rolesUtil.getRoleIdMap
@@ -113,6 +124,9 @@ class GroupsRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
       }
       GroupInfo(id = group.id, groupName = group.groupName, displayName = group.displayName, roles = roles, active = group.active)
     }
+  }
+  def groupExists(groupName:String): Future[Boolean] ={
+    db.run(Groups.filter(_.groupName===groupName).result.headOption).map(res=>res.isDefined)
   }
   def getRolesForGroups(groupIds:Seq[Long])={
     val query=GroupsRoles.filter(_.groupId.inSet(groupIds)).to[List].result

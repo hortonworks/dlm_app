@@ -1,0 +1,56 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+<div class="flex-row">
+  <div class="spacer-h"></div>
+  <div class="filter-labels">
+    <ng-container *ngFor="let filter of filters">
+    <span class="mdl-chip asset-audit-search-tag filter-tags">
+           <span class="mdl-chip__text">
+             <span class="title">{{filter.display}}:</span>
+             <span class="value">&nbsp;{{filter.value}}</span>
+             <span class="close" (click)="removeFilter(filter)"><i class="fa fa-times"></i></span>
+           </span>
+    </span>
+    </ng-container>
+  </div>
+  <div class="search-input">
+    <i class="fa fa-filter"></i>
+    <input type="text" placeholder="Search" [(ngModel)]="searchText" name="search-input" id="search" (focus)="showOptions($event)" (keyup)="showOptions($event)"/>
+    <div *ngIf="showFilterListing" id="filter-option-list" class="option-list">
+      <div class="option-value" *ngIf="filterOptions.length === 0"> {{"pages.infra.labels.noMatch" | translate}} </div>
+      <div *ngFor="let filterOption of filterOptions">
+       <div class="option-title">{{filterOption.displayName}}</div>
+       <div class="option-value" (keyup)="handleKeyboardEvents($event, filterOption.displayName, filterOption.key, value)" *ngFor="let value of filterOption.values" tabindex="0" (click)="addToFilter(filterOption.displayName, filterOption.key, value)">{{value}}</div>
+      </div>
+    </div>
+  </div>
+  <div class="duration"><span>12th June to 18th June</span><i class="fa fa-calendar"></i></div>
+</div>
+<div class="flex-row">
+  <div class="flex-75 spacer-tr-10">
+    <div class="chart-title">
+      Allowed VS Unauthorised Access
+      <span class="pull-right"><i class="fa fa-ellipsis-v"></i></span>
+    </div>
+    <div #stackedbarchart class="chart" id="allowedVsUnauthorisedAccess">
+      <svg></svg>
+    </div>
+  </div>
+  <div class="flex-25 spacer-t-10">
+    <div class="chart-title">
+      Select Vs Update
+      <span class="pull-right"><i class="fa fa-ellipsis-v"></i></span>
+    </div>
+    <div #donutchart class="chart" id="selectVsUpdate">
+      <svg></svg>
+    </div>
+  </div>
+</div>

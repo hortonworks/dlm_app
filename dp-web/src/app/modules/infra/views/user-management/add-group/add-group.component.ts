@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {AfterViewInit, Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {UserService} from '../../../../../services/user.service';
@@ -167,16 +178,17 @@ export class AddGroupComponent implements OnInit, AfterViewInit {
         return role.data;
       });
       this.groupService.addGroups(this.groups, roles).subscribe(response => {
-        if (response.length === this.groups.length) {
+        if (response.successfullyAdded.length === this.groups.length) {
           this.groupService.dataChanged.next();
           this.router.navigate(['groups'], {relativeTo: this.route});
         } else {
           let failedGroups = [];
           this.groups.forEach(grp => {
-            if (!response.find(res => res.groupName === grp)) {
+            if (!response.successfullyAdded.find(res => res.groupName === grp)) {
               failedGroups.push(grp);
             }
           });
+          this.groupService.dataChanged.next();
           this.onError(`${this.translateService.instant('pages.infra.description.addGroupError')} - ${failedGroups.join(', ')}`);
         }
       }, error => {

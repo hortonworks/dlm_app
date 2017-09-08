@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {AfterViewInit, Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {UserService} from '../../../../../services/user.service';
@@ -166,17 +177,18 @@ export class AddUserComponent implements OnInit, AfterViewInit {
         return role.data;
       });
       this.userService.addUsers(this.users, roles).subscribe(response => {
-        if (response.length === this.users.length) {
+        if (response.successfullyAdded.length === this.users.length) {
           this.userService.dataChanged.next();
           this.router.navigate(['users'], {relativeTo: this.route});
         } else {
           let failedUsers = [];
           this.users.forEach(user => {
-            if (!response.find(res => res.userName === user)) {
+            if (!response.successfullyAdded.find(res => res.userName === user)) {
               failedUsers.push(user)
             }
           });
-          this.onError(`${this.translateService.instant('pages.infra.description.addUserError')}- ${failedUsers.join(', ')}`);
+          this.userService.dataChanged.next();
+          this.onError(`${this.translateService.instant('pages.infra.description.addUserError')} - ${failedUsers.join(', ')}`);
         }
 
       }, error => {

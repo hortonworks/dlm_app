@@ -66,9 +66,10 @@ export class MockRoute {
   }
 
   toRequest(originalRequest: Request): Request {
-    const r: Request = originalRequest;
-    r.url = MOCK_FILES_PREFIX + this.jsonFile;
-    r.method = RequestMethod.Get;
-    return r;
+    return new Request({
+      ...originalRequest,
+      url: MOCK_FILES_PREFIX + this.jsonFile,
+      method: RequestMethod.Get
+    });
   }
 }

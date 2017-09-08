@@ -1,3 +1,14 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <span style="cursor: pointer"  class="text-nowrap" (click)="sort()" [ngClass]="{'mdl-data-table__header--sorted-ascending': sortAsc, 'mdl-data-table__header--sorted-descending': sortDesc}">
   <ng-content></ng-content>
   <i class="fa fa-sort" aria-hidden="true" *ngIf="!sortAsc && !sortDesc"></i>

@@ -18,6 +18,8 @@ import { getNonCompletedPolicies, getAllPolicies } from './policy.selector';
 import { getAllJobs } from './job.selector';
 import { CLUSTER_STATUS, POLICY_STATUS, JOB_STATUS } from 'constants/status.constant';
 
+const countJobsByStatus = (jobs: Job[] = [], status: string): number => jobs.filter(job => job.status === status).length;
+
 export const getClustersHealth = createSelector(
   getAllClusters, getClustersWithLowCapacity,
   (clusters: Cluster[], lowCapacityClusters: Cluster[]): ClustersStatus => {
@@ -38,7 +40,7 @@ export const getClustersHealth = createSelector(
     healthy,
     unhealthy,
     warning,
-    total: healthy + unhealthy + warning
+    total: healthy + unhealthy
   };
 });
 
@@ -72,8 +74,7 @@ export const getPoliciesHealth = createSelector(getAllPolicies, getAllClusters,
     };
   });
 
-export const getJobsHealth = createSelector(getNonCompletedPolicies, getAllJobs,
-  (policies: Policy[], jobs: Job[]): JobsStatus => {
+export const getJobsHealth = createSelector(getNonCompletedPolicies, (policies: Policy[]): JobsStatus => {
     let inProgress = 0;
     let lastFailed = 0;
     let last10Failed = 0;
@@ -83,10 +84,8 @@ export const getJobsHealth = createSelector(getNonCompletedPolicies, getAllJobs,
       if (lastJobs[0].status === JOB_STATUS.FAILED) {
         lastFailed++;
       }
-      if (lastJobs[0].status === JOB_STATUS.RUNNING) {
-        inProgress++;
-      }
-      last10Failed += lastJobs.filter(job => job.status === JOB_STATUS.FAILED).length;
+      inProgress += countJobsByStatus(lastJobs, JOB_STATUS.RUNNING);
+      last10Failed += countJobsByStatus(lastJobs, JOB_STATUS.FAILED);
     });
 
     return {

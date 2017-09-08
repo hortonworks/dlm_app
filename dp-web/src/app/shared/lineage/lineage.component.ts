@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {
   Component,
   OnChanges,
@@ -224,7 +235,7 @@ export class LineageComponent implements OnChanges, AfterViewInit {
     svgGroup.selectAll("g.nodes g.node")
       .on('click', function (d) {
         that.tooltip.hide(d);
-        that.router.navigate([{outlets: {'sidebar': ['node', d]}}], { relativeTo: that.route });
+        that.router.navigate([{outlets: {'sidebar': ['node', d]}}], { relativeTo: that.route, skipLocationChange:true});
       }).on('mouseleave', function (d) {
       that.activeNode = false;
       let nodeEL = this;

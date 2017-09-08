@@ -26,19 +26,21 @@ object Entities {
   // Response schema received from Dataplane for the DLM enabled clusters
 
   case class ClusterServiceEndpointDetails(id: Option[Long], servicename: String, clusterid: Option[Long] = None,
-                                           servicehost: String, fullURL: String)
+                                           servicehost: String, serviceProperties: Map[String, Option[String]])
 
 
   case class ClusterStats(CapacityTotal: Option[Double], CapacityUsed: Option[Double], CapacityRemaining: Option[Double])
 
   case class BeaconCluster(id: Long, name: String, dataCenter: String, description: String, ambariurl: Option[String] = None,
-                          stats: Option[ClusterStats], totalHosts: Option[Long], location: Location, services: Seq[ClusterServiceEndpointDetails] = Seq())
+                          stats: Option[ClusterStats], totalHosts: Option[Long], location: Location, beaconUrl: String)
 
   case class BeaconClusters(clusters: Seq[BeaconCluster])
 
 
-  case class ClusterDefinitionDetails (cluster:Cluster, dpCluster: DataplaneCluster, nnClusterService : ClusterServiceEndpointDetails, hiveServerService : Either[Errors, ClusterServiceEndpointDetails],
-                                       clusterDefinitions: Seq[PairedCluster], pairedClusterRequest:PairClusterRequest)
+  case class ClusterDefinitionDetails (cluster:Cluster, dpCluster: DataplaneCluster, nnClusterService : ClusterServiceEndpointDetails,
+                                       hiveServerService : Either[Errors, ClusterServiceEndpointDetails],
+                                       rangerService: Option[RangerServiceDetails], clusterDefinitions: Seq[PairedCluster],
+                                       pairedClusterRequest:PairClusterRequest)
 
   // Request schema submitted to Beacon for cluster definition
   case class ClusterDefinition (beaconUrl:String, clusterId: Long, clusterDefRequest : ClusterDefinitionRequest)
@@ -65,6 +67,8 @@ object Entities {
   case class PolicyInstancesResponse(totalResults: Long, results: Long, jobs: Seq[PolicyInstanceResponse])
 
   case class EventsDetailResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), events: Seq[BeaconEventResponse])
+  
+  case class AdminStatusResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), response: Seq[BeaconAdminStatusDetails])
 
 }
 
@@ -73,9 +77,6 @@ object JsonFormatters {
 
   implicit val dlmApiErrorsWrites = Json.writes[DlmApiErrors]
   implicit val dlmApiErrorsReads = Json.reads[DlmApiErrors]
-
-  implicit val clusterServiceEndpointDetailsWrites = Json.writes[ClusterServiceEndpointDetails]
-  implicit val clusterServiceEndpointDetailsReads = Json.reads[ClusterServiceEndpointDetails]
 
   implicit val clusterStatsWrites = Json.writes[ClusterStats]
   implicit val clusterStatsReads = Json.reads[ClusterStats]
@@ -105,6 +106,9 @@ object JsonFormatters {
 
   implicit val eventsDetailResponseReads = Json.reads[EventsDetailResponse]
   implicit val eventsDetailResponseWrites = Json.writes[EventsDetailResponse]
+
+  implicit val adminStatusResponseReads = Json.reads[AdminStatusResponse]
+  implicit val adminStatusResponseWrites = Json.writes[AdminStatusResponse]
 
 }
 

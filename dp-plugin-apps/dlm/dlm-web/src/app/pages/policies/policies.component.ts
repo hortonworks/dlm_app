@@ -15,7 +15,6 @@ import { Subscription } from 'rxjs/Subscription';
 import { Store } from '@ngrx/store';
 import { loadPolicies, loadLastJobs } from 'actions/policy.action';
 import { loadClusters } from 'actions/cluster.action';
-import { loadJobsForClusters } from 'actions/job.action';
 import { Policy } from 'models/policy.model';
 import { getPolicyClusterJob } from 'selectors/policy.selector';
 import { Pairing } from 'models/pairing.model';
@@ -30,7 +29,7 @@ import { TableFilterItem } from 'common/table/table-filter/table-filter-item.typ
 import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
 import { PolicyContent } from './policy-details/policy-content.type';
 import { isEqual } from 'utils/object-utils';
-import { POLL_INTERVAL } from 'constants/api.constant';
+import { POLL_INTERVAL, ALL_POLICIES_COUNT } from 'constants/api.constant';
 import { ProgressState } from 'models/progress-state.model';
 import { getMergedProgress } from 'selectors/progress.selector';
 
@@ -80,7 +79,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
     {multiple: false, propertyName: 'targetClusterResource.name', filterTitle: 'Destination Cluster'},
     {multiple: true, propertyName: 'sourceClusterResource.dataCenter', filterTitle: 'Source Datacenter'},
     {multiple: false, propertyName: 'targetClusterResource.dataCenter', filterTitle: 'Destination Datacenter'},
-    {multiple: true, propertyName: 'status'},
+    {multiple: true, propertyName: 'displayStatus', filterTitle: 'Status'},
     {multiple: true, propertyName: 'name'}
   ];
   initialFilters: {propertyName: string, value: string []} [];
@@ -92,7 +91,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
       .filter(_ => this.policiesLoaded)
       .filter(_ => this.initialLoadingComplete)
       .do(_ => {
-        this.store.dispatch(loadPolicies());
+        this.store.dispatch(loadPolicies({numResults: ALL_POLICIES_COUNT}));
         this.policiesLoaded = false;
       });
     this.subscriptions.push(polling$.subscribe());
@@ -119,12 +118,11 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.store.dispatch(loadPolicies(POLICIES_REQUEST));
+    this.store.dispatch(loadPolicies({numResults: ALL_POLICIES_COUNT}, {requestId: POLICIES_REQUEST}));
     this.store.dispatch(loadClusters(CLUSTERS_REQUEST));
     const clusterSubscription = this.clusters$.subscribe(clusters => {
       const clusterIds = clusters.map(c => c.id);
       this.store.dispatch(loadPairings(PAIRINGS_REQUEST));
-      this.store.dispatch(loadJobsForClusters(clusterIds));
     });
     const lastJobsWorkaroundSubscription = this.policies$
       .map(policies => policies.filter(policy => !policy.jobs.length &&

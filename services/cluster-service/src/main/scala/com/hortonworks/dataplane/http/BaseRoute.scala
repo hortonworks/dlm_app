@@ -1,9 +1,22 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.http
 
-import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, ErrorType, Errors}
 import org.apache.commons.lang.exception.ExceptionUtils
 import play.api.libs.json.Json
 import play.api.libs.json.Json.JsValueWrapper
+
+import scala.concurrent.Future
 
 
 
@@ -14,7 +27,9 @@ trait BaseRoute {
 
   def success(data: JsValueWrapper) = Json.obj("results" -> Json.obj("data" -> data))
 
-  def errors(e: Throwable) = Json.toJson(Errors(Seq(Error(e.getMessage,ExceptionUtils.getStackTrace(e)))))
+  import com.hortonworks.dataplane.commons.domain.Entities.ErrorType._
+
+  def errors(e: Throwable,errorType: ErrorType = ErrorType.General) = Json.toJson(e.asError(e.getMessage,errorType))
 
   def notFound = Json.obj("error" -> Json.obj("message" -> "Not found", "trace" -> ""))
 

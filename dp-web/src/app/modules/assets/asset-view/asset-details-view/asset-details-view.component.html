@@ -1,3 +1,14 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <dp-tabs [tabEnum]="detailsTabs" [tabType]="tabType.BUTTON" (selected)="selectedDetailsTabs=$event"> </dp-tabs>
 <div class="details-wrapper">
   <section *ngIf="selectedDetailsTabs === detailsTabs.PROPERTIES">
@@ -37,6 +48,7 @@
     <table style="width: 100%" class="mdl-data-table mdl-js-data-table" >
       <thead>
         <tr>
+          <th class="mdl-data-table__cell--non-numeric">&nbsp;</th>
           <th class="mdl-data-table__cell--non-numeric">Name</th>
           <th class="mdl-data-table__cell--non-numeric">Type</th>
           <th class="mdl-data-table__cell--non-numeric">Unique Values</th>
@@ -49,7 +61,10 @@
       </thead>
       <tbody>
         <ng-container *ngFor="let schema of assetSchemas">
-          <tr  (click)="colGuid = schema.guid">
+          <tr>
+            <td class="mdl-data-table__cell--non-numeric" (click)="colGuid = schema.guid">
+              <i [class]="getIconClass(schema.guid)"></i>
+            </td>
             <td class="mdl-data-table__cell--non-numeric">{{schema.name}}</td>
             <td class="mdl-data-table__cell--non-numeric">{{schema.type}}</td>
             <td class="mdl-data-table__cell--non-numeric">{{schema.noOfUniques}}</td>
@@ -60,7 +75,7 @@
             <td class="mdl-data-table__cell--non-numeric">{{schema.comment}}</td>
           </tr>
           <tr *ngIf="colGuid === schema.guid">
-            <td colspan="8" style="height:100px;">
+            <td colspan="10" style="height:100px;padding: 15px 0;">
               <asset-column-visual [data]="colVisualData"></asset-column-visual>
             </td>
           </tr>

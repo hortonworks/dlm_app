@@ -92,7 +92,7 @@ object WebService {
 
   trait BeaconPolicyService extends ClientService {
 
-    def listPolicies(beaconEndpoint : String, clusterId: Long)
+    def listPolicies(beaconEndpoint : String, clusterId: Long, queryString: Map[String,String])
                     (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, Seq[PoliciesDetailResponse]]]
     def listPolicy(beaconEndpoint : String, clusterId: Long, policyName : String)
                   (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PolicyDataResponse]]
@@ -131,6 +131,10 @@ object WebService {
   trait BeaconLogService extends ClientService {
     def listLog(beaconEndpoint : String, clusterId: Long, queryString: Map[String,String])
                (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconLogResponse]]
+  }
+
+  trait BeaconAdminService extends ClientService {
+    def listStatus(beaconEndpoint : String, clusterId: Long) (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconAdminStatusDetails]]
   }
 
 }

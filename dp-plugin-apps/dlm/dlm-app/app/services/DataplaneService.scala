@@ -102,11 +102,11 @@ class DataplaneService @Inject()(
               case None => None
             }
 
-            val beaconServiceDetails
-              : Either[Errors, ClusterServiceEndpointDetails] =
-              getBeaconEndpointDetails(endpointData)
-            beaconServiceDetails match {
-              case Right(beaconServiceDetails) =>
+            val beaconEndpoint
+              : Either[Errors, String] =
+              getBeaconEndpoint(endpointData)
+            beaconEndpoint match {
+              case Right(beaconEndpoint) =>
                 Right(
                   BeaconCluster(
                     cluster.id.get,
@@ -117,7 +117,7 @@ class DataplaneService @Inject()(
                     namenodeStats,
                     totalHosts,
                     location,
-                    Seq(beaconServiceDetails)
+                    beaconEndpoint
                   ))
               case Left(errors) => Left(errors)
             }
@@ -157,13 +157,13 @@ class DataplaneService @Inject()(
       .map({
         case Right(beaconClusters) => {
           val clusterIdWithBeaconUrl : Seq[Either[Errors, ClusterIdWithBeaconUrl]] = beaconClusters.map(x => {
-            val beaconServiceDetails
-              : Either[Errors, ClusterServiceEndpointDetails] =
-              getBeaconEndpointDetails(x)
+            val beaconUrl
+              : Either[Errors, String] =
+              getBeaconEndpoint(x)
 
-            beaconServiceDetails match {
-              case Right(beaconServiceDetails) =>
-                Right(ClusterIdWithBeaconUrl(beaconServiceDetails.fullURL, x.clusterid.get))
+            beaconUrl match {
+              case Right(beaconUrl) =>
+                Right(ClusterIdWithBeaconUrl(beaconUrl, x.clusterid.get))
               case Left(errors) => Left(errors)
             }
           })
@@ -187,8 +187,7 @@ class DataplaneService @Inject()(
     * @param endpointData service host and properties details
     * @return
     */
-  def getBeaconEndpointDetails(endpointData: ClusterServiceWithConfigs)
-    : Either[Errors, ClusterServiceEndpointDetails] = {
+  def getBeaconEndpoint(endpointData: ClusterServiceWithConfigs): Either[Errors, String] = {
 
     val beaconSchemePortMap = Map("http" -> "beacon_port", "https" -> "beacon_tls_enabled")
     val beaconScheme : String = getPropertyValue(endpointData, "beacon-env", "beacon_tls_enabled") match {
@@ -201,13 +200,8 @@ class DataplaneService @Inject()(
     beaconPort match {
       case Right(beaconPort) =>
         val beaconHostName = endpointData.servicehost
-        val fullurl = s"$beaconScheme://$beaconHostName:$beaconPort"
-        Right(
-          ClusterServiceEndpointDetails(endpointData.serviceid,
-                                        endpointData.servicename,
-                                        endpointData.clusterid,
-                                        beaconHostName,
-                                        fullurl))
+        val beaconEndpoint = s"$beaconScheme://$beaconHostName:$beaconPort"
+        Right(beaconEndpoint)
       case Left(errors) => Left(errors)
     }
   }
@@ -219,19 +213,63 @@ class DataplaneService @Inject()(
     */
   def getNameNodeRpcEndpointDetails(endpointData: ClusterServiceWithConfigs)
     : Either[Errors, ClusterServiceEndpointDetails] = {
-    val fullurl: Either[Errors, String] =
+    val fsEndpoint: Either[Errors, String] =
       getPropertyValue(endpointData, "core-site", "fs.defaultFS")
-    fullurl match {
-      case Right(fullurl) => {
+
+    fsEndpoint match {
+      case Right(fsEndpoint) => {
         val namenodeHostName = endpointData.servicehost
+        val nnKerberosPrincipal : Option[String] =  getPropertyValue(endpointData, "hdfs-site", "dfs.namenode.kerberos.principal") match {
+          case Left(errors) => Some("nn/_HOST@EXAMPLE.COM")
+          case Right(nnKerberosPrincipal) => Some(nnKerberosPrincipal)
+        }
+
+        val dfsNameService: Option[String] =  convertEitherToOption(getPropertyValue(endpointData, "hdfs-site", "dfs.nameservices"))
+        val dfsInternalNameServices: Option[String] =  convertEitherToOption(getPropertyValue(endpointData, "hdfs-site", "dfs.internal.nameservices"))
+        val nnHaDynamicKeyConfigs: Map[String, Option[String]] =  dfsInternalNameServices match {
+          case Some(nameService) => {
+            val internalNameService =  nameService.split(",")(0)
+            val dfsHaNnPrefixValue = convertEitherToOption(getPropertyValue(endpointData, "hdfs-site", s"dfs.ha.namenodes.$internalNameService"))
+            dfsHaNnPrefixValue match {
+              case Some(dfsHaNnPrefixValue) => {
+                val endpointConfigs : Seq[String] = dfsHaNnPrefixValue.split(",").map((x) => s"dfs.namenode.rpc-address.$dfsInternalNameServices.$x")
+                val nnHaConfigs = endpointConfigs :+ s"dfs.client.failover.proxy.provider.$dfsInternalNameServices"
+                Map(s"dfs.ha.namenodes.$internalNameService" -> Some(dfsHaNnPrefixValue)) ++ nnHaConfigs.foldLeft(Map(): Map[String, Option[String]]) {
+                  (acc, next) => {
+                    val nextConfigValue: Option[String] = convertEitherToOption(getPropertyValue(endpointData, "hdfs-site", next))
+                    acc + (next -> nextConfigValue)
+                  }
+                }
+
+              }
+              case None => Map()
+            }
+          }
+          case None => Map()
+        }
+
+
+        val hdfsServiceConfigMap : Map[String, Option[String]] = Map(
+          "fsEndpoint" -> Some(fsEndpoint),
+          "nnKerberosPrincipal" -> nnKerberosPrincipal,
+          "dfs.nameservices" ->  dfsNameService
+        ) ++ nnHaDynamicKeyConfigs
+
         Right(
           ClusterServiceEndpointDetails(endpointData.serviceid,
                                         endpointData.servicename,
                                         endpointData.clusterid,
                                         namenodeHostName,
-                                        fullurl))
+                                        hdfsServiceConfigMap))
       }
       case Left(errors) => Left(errors)
+    }
+  }
+
+  def convertEitherToOption[T](data: Either[Errors, T]) : Option[T] = {
+    data match {
+      case Right(x) => Some(x)
+      case Left(errors) => None
     }
   }
 
@@ -278,12 +316,13 @@ class DataplaneService @Inject()(
       case Right(endpoint) => {
         val namenodePort = new java.net.URI(s"$nameNodeScheme://$endpoint").getPort
         val fullurl = s"$nameNodeScheme://$namenodeHostName:$namenodePort"
+        val servicePropertiesMap = Map("url" -> Some(fullurl))
         Right(
           ClusterServiceEndpointDetails(endpointData.serviceid,
                                         endpointData.servicename,
                                         endpointData.clusterid,
                                         namenodeHostName,
-                                        fullurl))
+                                        servicePropertiesMap))
       }
       case Left(errors) => Left(errors)
     }
@@ -306,13 +345,25 @@ class DataplaneService @Inject()(
         hiveServerZkNameSpace match {
           case Right(hiveServerZkNameSpace) =>  {
             val hiveServerHostName = endpointData.servicehost
-            val fullurl = s"jdbc:hive2://$hiveServerZkQuorum/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=$hiveServerZkNameSpace"
+            val hsEndpoint = s"jdbc:hive2://$hiveServerZkQuorum/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=$hiveServerZkNameSpace"
+
+            val hsKerberosPrincipal: Option[String] =  getPropertyValue(endpointData, "hive-site", "hive.server2.authentication.kerberos.principal") match {
+              case Left(errors) => Some("hive/_HOST@EXAMPLE.COM")
+              case Right(hsKerberosPrincipal) => Some(hsKerberosPrincipal)
+            }
+
+            val hiveServiceConfigMap : Map[String, Option[String]] = Map(
+              "hsEndpoint" -> Some(hsEndpoint),
+              "hsKerberosPrincipal" -> hsKerberosPrincipal
+            )
+
             Right(
-              ClusterServiceEndpointDetails(endpointData.serviceid,
+              ClusterServiceEndpointDetails(
+                endpointData.serviceid,
                 endpointData.servicename,
                 endpointData.clusterid,
                 hiveServerHostName,
-                fullurl))
+                hiveServiceConfigMap))
           }
           case Left(errors) => Left(errors)
         }
@@ -399,10 +450,10 @@ class DataplaneService @Inject()(
     * @return
     */
   def getBeaconService(clusterId: Long)
-    : Future[Either[Errors, ClusterServiceEndpointDetails]] = {
-    getServiceEndpointDetails(clusterId,
+    : Future[Either[Errors, String]] = {
+    getServiceEndpoint(clusterId,
                               DataplaneService.BEACON_SERVER,
-                              getBeaconEndpointDetails)
+                              getBeaconEndpoint)
   }
 
   /**
@@ -449,6 +500,30 @@ class DataplaneService @Inject()(
             f(clusterServiceWithConfigs)
           serviceDetails match {
             case Right(serviceDetails) => p.success(Right(serviceDetails))
+            case Left(errors) => p.success(Left(errors))
+          }
+        }
+        case Left(errors) => p.success(Left(errors))
+      })
+    p.future
+  }
+
+  /**
+    * Get future for service details from dataplane
+    * @param clusterId cluster id
+    * @return
+    */
+  def getServiceEndpoint(clusterId: Long, serviceName: String, f: ClusterServiceWithConfigs => Either[Errors,
+                         String]): Future[Either[Errors, String]] = {
+    val p: Promise[Either[Errors, String]] = Promise()
+    clusterComponentService
+      .getEndpointsForCluster(clusterId, serviceName)
+      .map({
+        case Right(clusterServiceWithConfigs) => {
+          val serviceEndpoint: Either[Errors, String] =
+            f(clusterServiceWithConfigs)
+          serviceEndpoint match {
+            case Right(serviceEndpoint) => p.success(Right(serviceEndpoint))
             case Left(errors) => p.success(Left(errors))
           }
         }

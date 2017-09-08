@@ -1,3 +1,14 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 /* You can add global styles to this file, and also import other style files */
 @import "fonts";
 @import "styles/variables";
@@ -85,7 +96,7 @@ a:hover {
 }
 
 .page-container {
-  padding: 30px 25px 20px;
+  padding: 0 25px 20px;
 }
 
 .icon-container {
@@ -142,7 +153,7 @@ a:hover {
   background: rgba(0, 0, 0, 0.5);
   padding: 30px;
   overflow: auto;
-  z-index: 10;
+  z-index: 999;
 
   & > .opaque {
     background-color: white;
@@ -179,6 +190,12 @@ a:hover {
   }
 }
 
+.hwx-title-panel {
+  margin: 18px 0;
+  & .hwx-title {
+    line-height: 34px;
+  }
+}
 
 //Lightening the Input placeholder texts
 

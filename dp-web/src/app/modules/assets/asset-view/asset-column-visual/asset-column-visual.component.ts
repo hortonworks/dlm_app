@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Component, Input, OnInit} from '@angular/core';
 
 declare var d3: any;
@@ -17,20 +28,20 @@ export class AssetColumnVisualComponent implements OnInit{
 	noDataAvailable : boolean = false;
 	ngOnInit () {
 		if(!this.data || !this.data.histogram && !this.data.quartiles) {
-      this.noDataAvailable = true;
+	  	  this.noDataAvailable = true;
 		  return;
-    }
-		if(this.data.quartiles)
+		}
+		if(this.data.quartiles && JSON.parse(this.data.quartiles).length > 0)
 			this.onlyHisto = false;
-		if(this.data.cardinality < 6)
+		if(this.data.cardinality < 11)
 			this.showPi = true;
 		if(this.data.histogram) {
-      if (this.showPi)
-        this.drawPiChart();
-      else
-        this.drawHisto();
-    }
-		if(!this.data.quartiles) return;
+	      if (this.showPi)
+	        this.drawPiChart();
+	      else
+	        this.drawHisto();
+	    }
+		if(this.onlyHisto) return;
 		this.drawBoxPlot();
 	}
 	drawHisto () {

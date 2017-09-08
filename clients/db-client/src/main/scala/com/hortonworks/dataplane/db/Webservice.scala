@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.db
 
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData, _}
@@ -101,7 +112,7 @@ object Webservice {
     def update(dataSetAndCatIds: DatasetAndCategoryIds)
     : Future[Either[Errors, DatasetAndCategories]]
 
-    def delete(dataSetId: String): Future[Either[Errors, Dataset]]
+    def delete(dataSetId: String): Future[Either[Errors, Long]]
   }
 
   trait CategoryService extends DbClientService {
@@ -146,7 +157,7 @@ object Webservice {
 
     def retrieveServiceInfo(dpClusterId: String): Future[Either[Errors, Seq[ClusterData]]]
 
-    def retrieveByAmbariUrl(ambariUrl: String): Future[Either[Errors, Boolean]]
+    def checkExistenceByIp(ambariIp: String): Future[Either[Errors, Boolean]]
 
     def update(dpClusterId: String,
                dpCluster: DataplaneCluster): Future[Either[Errors, DataplaneCluster]]
@@ -266,6 +277,7 @@ object Webservice {
 
   trait DataAssetService extends DbClientService {
     def findManagedAssets(clusterId:Long, assets: Seq[String]): Future[Either[Errors, Seq[EntityDatasetRelationship]]]
+    def findAssetByGuid(guid: String): Future[Either[Errors, DataAsset]]
   }
   trait SkuService extends  DbClientService {
     def getAllSkus():Future[Either[Errors,Seq[Sku]]]

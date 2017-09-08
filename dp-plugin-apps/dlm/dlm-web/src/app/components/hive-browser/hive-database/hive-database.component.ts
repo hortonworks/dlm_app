@@ -32,6 +32,7 @@ import { simpleSearch } from 'utils/string-utils';
             <dlm-search-input
               class="pull-left"
               *ngIf="readonly || !hideTables"
+              [value]="searchPattern"
               (valueChange)="handleSearchChange($event)"
               ></dlm-search-input>
             <div class="col-md-1" *ngIf="!readonly">
@@ -63,14 +64,15 @@ import { simpleSearch } from 'utils/string-utils';
   styleUrls: ['./hive-database.component.scss']
 })
 export class HiveDatabaseComponent implements OnInit {
-  private searchPattern = '';
   hideTables = true;
 
+  @Input() searchPattern = '';
   @Input() selectedDatabase: string;
   @Input() database: HiveDatabase;
   @Input() readonly = true;
   @HostBinding('class') className = 'dlm-hive-database';
   @Output() selectDatabase = new EventEmitter<string>();
+  @Output() filterApplied: EventEmitter<any> = new EventEmitter();
 
   get tables() {
     if (!this.database || !this.database.tables.length) {
@@ -90,6 +92,7 @@ export class HiveDatabaseComponent implements OnInit {
 
   handleSearchChange(value) {
     this.searchPattern = value;
+    this.filterApplied.emit(value);
   }
 
   onSelectDatabase() {

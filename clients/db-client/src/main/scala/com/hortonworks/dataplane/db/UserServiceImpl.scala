@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.db
 
 import javax.inject.Singleton
@@ -108,6 +119,12 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       case _ => mapErrors(res)
     }
   }
+  private def mapAddUserWithRolesResponse(res:WSResponse)={
+    res.status match {
+      case 200 =>Right((res.json \ "results").validate[UserInfo].get)
+      case _ => mapErrors(res)
+    }
+  }
 
   override def getUserRoles(userName: String): Future[Either[Errors, UserRoles]] = {
     ws.url(s"$url/users/role/$userName")
@@ -130,7 +147,8 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
     ws.url(s"$url/users/withroles")
       .withHeaders("Accept" -> "application/json")
       .post(Json.toJson(userInfo))
-      .map{res=>Right(userInfo)}
+        .map(mapAddUserWithRolesResponse)
+
   }
 
   override  def getUserDetail(userName:String): Future[Either[Errors,UserInfo]]={

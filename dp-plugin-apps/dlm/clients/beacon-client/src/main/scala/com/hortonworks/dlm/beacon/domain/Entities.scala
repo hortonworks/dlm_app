@@ -50,13 +50,23 @@ object ResponseEntities {
                                     startTime: Option[String], endTime: String)
 
   case class BeaconEventResponse(policyId: Option[String], instanceId: Option[String], event: String, eventType: String,
-                                 policyReplType: Option[String], severity: String, timestamp: String, message: String)
+                                 policyReplType: Option[String], severity: String, syncEvent: Option[Boolean],
+                                 timestamp: String, message: String)
 
   case class BeaconLogResponse(status: String, message: String, requestId: String)
+
+  case class BeaconAdminStatusResponse(status: String, version: String, plugins: String, security: String, wireEncryption: Boolean)
+
+  case class BeaconAdminStatusDetails(clusterId: Long, beaconAdminStatus: BeaconAdminStatusResponse)
 }
 
 object RequestEntities {
-  case class ClusterDefinitionRequest( fsEndpoint: String, hsEndpoint: Option[String], beaconEndpoint: String, name: String, dataCenter: String, description: String)
+  case class RangerServiceDetails (rangerEndPoint: String, rangerHDFSServiceName: String, rangerHIVEServiceName: Option[String])
+  case class ClusterDefinitionRequest( name: String, dataCenter: String, description: String, local: Boolean = false,
+                                       beaconEndpoint: String, nameNodeConfigs: Map[String, Option[String]],
+                                       rangerService: Option[RangerServiceDetails], hsEndpoint: Option[String],
+                                       hsKerberosPrincipal: Option[String])
+  
   case class PolicyDefinitionRequest( name: String, `type`: String, sourceDataset: String,
                                       sourceCluster: String, targetCluster: String, frequencyInSec: Long,
                                       startTime: Option[String], endTime: Option[String], distcpMaxMaps: Option[Long],
@@ -114,10 +124,13 @@ object JsonFormatters {
   implicit val beaconLogResponseWrites = Json.writes[BeaconLogResponse]
   implicit val beaconLogResponseReads = Json.reads[BeaconLogResponse]
 
-  //-- RequestEntities
+  implicit val beaconAdminStatusResponseWrites = Json.writes[BeaconAdminStatusResponse]
+  implicit val beaconAdminStatusResponseReads = Json.reads[BeaconAdminStatusResponse]
 
-  implicit val clusterDefinitionRequestWrites = Json.writes[ClusterDefinitionRequest]
-  implicit val clusterDefinitionRequestReads = Json.reads[ClusterDefinitionRequest]
+  implicit val beaconAdminStatusDetailsWrites = Json.writes[BeaconAdminStatusDetails]
+  implicit val beaconAdminStatusDetailsReads = Json.reads[BeaconAdminStatusDetails]
+
+  //-- RequestEntities
 
   implicit val policyDefinitionRequestWrites = Json.writes[PolicyDefinitionRequest]
   implicit val policyDefinitionRequestReads = Json.reads[PolicyDefinitionRequest]

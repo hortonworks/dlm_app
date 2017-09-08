@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Injectable} from '@angular/core';
 import {IdentityService} from './identity.service';
 import {Persona, PersonaTabs} from '../models/header-data';
@@ -9,7 +20,7 @@ import {AuthenticationService} from './authentication.service';
 import {AuthUtils} from '../shared/utils/auth-utils';
 
 @Injectable()
-export class RbacService {
+export class RbacService {//role based access control
 
   private personaMap = new Map();
   private landingPageMap = new Map();
@@ -51,10 +62,10 @@ export class RbacService {
     personaMap.set('CURATOR', [
       new Persona('Data Steward Studio', [
         new PersonaTabs('Asset Collection', 'datasteward/dataset', 'fa-cubes', true),
-        new PersonaTabs('Unclassified', 'unclassified', 'fa-cube'),
-        new PersonaTabs('Assets', 'assets', 'fa-server'),
-        new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')
-      ], ['/onboard'], '', 'steward-logo.png', !!this.user && this.user.services.indexOf('dss') > -1)]);
+        // new PersonaTabs('Unclassified', 'unclassified', 'fa-cube'),
+        // new PersonaTabs('Assets', 'assets', 'fa-server'),
+        // new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')
+      ], ['/onboard', '/assets'], '', 'steward-logo.png', !!this.user && this.user.services.indexOf('dss') > -1)]);
     personaMap.set('INFRAADMIN', [
       new Persona('Infra Admin', [
         new PersonaTabs('Clusters', 'infra', 'fa-sitemap')
@@ -121,7 +132,7 @@ export class RbacService {
   }
 
   private isAuthorizedNonPersonaRoute(personas, route: string): boolean {
-    return !!personas.find(persona => !!persona.nonTabUrls.find(url => url === route));
+    return !!personas.find(persona => !!persona.nonTabUrls.find(url => route.startsWith(`${url}`)));
   }
 
   getPersonaDetails() {

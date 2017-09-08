@@ -9,6 +9,7 @@
 
 import { PolicyService } from './policy.service';
 import { HttpService } from './http.service';
+import { TranslateService } from '@ngx-translate/core';
 import { BaseRequestOptions, ConnectionBackend, Http, RequestMethod, RequestOptions } from '@angular/http';
 import { MockBackend } from '@angular/http/testing';
 import { ReflectiveInjector } from '@angular/core';
@@ -20,6 +21,7 @@ describe('PolicyService', () => {
     this.injector = ReflectiveInjector.resolveAndCreate([
       {provide: ConnectionBackend, useClass: MockBackend},
       {provide: RequestOptions, useClass: BaseRequestOptions},
+      {provide: TranslateService, useValue: jasmine.createSpyObj('t', ['instant'])},
       Http,
       HttpService,
       PolicyService,

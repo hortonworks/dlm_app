@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
 import {AssetOwnerModel} from "../../../../../models/assetOwnerModel";
 import {AssetOwnerService} from "../../../../../services/assetOwnerService";
@@ -67,6 +78,9 @@ export class QueryFilterTypeString extends QueryFilterObject {
     super();
   }
 }
+export class QueryFilterTypeString1 extends QueryFilterTypeString {
+  operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.NOTEQ];
+}
 
 export class QueryFilterTypeBoolean extends QueryFilterObject {
   operators: FilterOperatorEnum[] = [FOEnum.EQ, FOEnum.NOTEQ];
@@ -127,7 +141,7 @@ export class QueryFilter implements OnInit {
   ngOnInit() {
     // this.ownerService.list().subscribe(owners => this.owners = owners);
     this.assetService.getQueryAttribute(this.clusterId).subscribe(qryAtrs => {
-      qryAtrs.forEach(qryAtr=>this.availableFilters.push(
+      qryAtrs.forEach(qryAtr=>(qryAtr.name != "retention" && qryAtr.dataType != "date") && this.availableFilters.push(
         {display: qryAtr.name, dataType: qryAtr.dataType, propertyName: qryAtr.name}
       ));
     });
@@ -141,7 +155,11 @@ export class QueryFilter implements OnInit {
     const fltr = this.availableFilters[e.target.value];
     switch (fltr.dataType) {
       case "string" :
-        this.filterObject = new QueryFilterTypeString(fltr.propertyName, fltr.dataType);
+        let pn=fltr.propertyName
+        if(pn == "tableType" || pn == "owner" || pn == "viewExpandedText" || pn == "viewOriginalText" || pn == "comment")
+          this.filterObject = new QueryFilterTypeString1(fltr.propertyName, fltr.dataType);
+        else
+          this.filterObject = new QueryFilterTypeString(fltr.propertyName, fltr.dataType);
         break;
       case "boolean"  :
         this.filterObject = new QueryFilterTypeBoolean(fltr.propertyName, fltr.dataType);

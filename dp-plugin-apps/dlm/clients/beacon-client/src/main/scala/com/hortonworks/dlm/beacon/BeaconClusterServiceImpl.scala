@@ -56,13 +56,42 @@ class BeaconClusterServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconC
     }
   }
 
-  private def mapToClusterDefinitionRequest(clusterDefinitionRequest:ClusterDefinitionRequest) = {
-      "fsEndpoint = " + clusterDefinitionRequest.fsEndpoint +
-      "\nbeaconEndpoint = " + clusterDefinitionRequest.beaconEndpoint +
-      "\ndescription = " + clusterDefinitionRequest.description +
-      (if (clusterDefinitionRequest.hsEndpoint.isDefined) "\nhsEndpoint = " + clusterDefinitionRequest.hsEndpoint.get else "")
-  }
+  private def mapToClusterDefinitionRequest(clusterDefinitionRequest:ClusterDefinitionRequest) : String = {
+    val nnConfigs = clusterDefinitionRequest.nameNodeConfigs.foldLeft("": String) {
+      (acc, next) => {
+        next._2 match {
+          case Some(value) => acc + s"${next._1} = $value\n"
+          case None =>  acc
+        }
+      }
+    }
 
+    val rangerConfigs =  clusterDefinitionRequest.rangerService match {
+      case None => ""
+      case Some(rangerServiceDetails) => {
+        "rangerEndPoint = " + rangerServiceDetails.rangerEndPoint + "\n" +
+        "rangerHDFSServiceName = " +  rangerServiceDetails.rangerHDFSServiceName + "\n" +
+          (rangerServiceDetails.rangerHIVEServiceName match {
+            case Some(rangerHIVEServiceName) => "rangerHIVEServiceName = " + rangerHIVEServiceName + "\n"
+            case None => ""
+          })
+      }
+    }
+
+    "beaconEndpoint = " + clusterDefinitionRequest.beaconEndpoint + "\n" +
+    "description = " + clusterDefinitionRequest.description + "\n" +
+    "local = " + clusterDefinitionRequest.local + "\n" +
+    nnConfigs +
+    (clusterDefinitionRequest.hsEndpoint match {
+      case Some(hsEndpoint) => "hsEndpoint= " + hsEndpoint + "\n"
+      case None => ""
+    }) +
+    (clusterDefinitionRequest.hsKerberosPrincipal match {
+      case Some(hsKerberosPrincipal) => "hsKerberosPrincipal= " + hsKerberosPrincipal + "\n"
+      case None => ""
+    }) +
+    rangerConfigs
+  }
 
   override def listCluster(beaconEndpoint : String, clusterId: Long, clusterName: String)
                           (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconEntityResponse]] = {

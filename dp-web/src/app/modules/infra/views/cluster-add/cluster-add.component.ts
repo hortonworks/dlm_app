@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Component, ElementRef, ViewChild, OnInit, HostListener} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
@@ -19,6 +30,7 @@ import {LocationService} from '../../../../services/location.service';
 import {StringUtils} from '../../../../shared/utils/stringUtils';
 import {NgForm} from '@angular/forms';
 import {ConfigDialogComponent} from '../../widgets/config-dialog/config-dialog.component';
+import {CustomError} from "../../../../models/custom-error";
 
 @Component({
   selector: 'dp-cluster-add',
@@ -50,6 +62,7 @@ export class ClusterAddComponent implements OnInit {
   cluster: Cluster = new Cluster();
   searchTerm: string;
   dcName: string;
+  isLocationValid: boolean;
 
   dpRequiredServices = ['ATLAS'];
 
@@ -103,6 +116,16 @@ export class ClusterAddComponent implements OnInit {
     this.showError = false;
   }
 
+  resetPage(){
+    this.showError = false;
+    this.isInvalidAmbariUrl = false;
+    this.showNotification = false;
+    this._isClusterValidateInProgress = false;
+    this._isClusterValidateSuccessful = false;
+    this.clusterForm.reset();
+    this.cluster = new Cluster();
+  }
+
   getClusterInfo(event) {
     this.showError = false;
     this.isInvalidAmbariUrl = false;
@@ -138,8 +161,9 @@ export class ClusterAddComponent implements OnInit {
           this.applyErrorClass();
         }
       },
-      () => {
-        this.onError();
+      error => {
+        let err = JSON.parse(error._body).errors[0] as CustomError;
+        this.onError(err);
       }
     );
   }
@@ -181,7 +205,7 @@ export class ClusterAddComponent implements OnInit {
         this._clusterState.knoxUrl = clusterInfo[0].knoxUrl
       }
     }, (error) => {
-      this.onError();
+      this.onError(null);
     });
   }
 
@@ -192,19 +216,21 @@ export class ClusterAddComponent implements OnInit {
 
   }
 
-  private onError() {
+  private onError(err: CustomError) {
     this._isClusterValidateSuccessful = false;
     this._isClusterValidateInProgress = false;
     this.showError = true;
-    this.errorMessage = this.translateService.instant('pages.infra.description.connectionFailed');
+    if(!err){
+      this.errorMessage = this.translateService.instant('pages.infra.description.connectionFailed');
+    }else{
+      this.errorMessage = this.translateService.instant('pages.infra.description.backenderrors.'+err.errorType);
+    }
   }
 
   private extractClusterInfo(clusterInfo) {
     this.cluster.name = clusterInfo[0].clusterName;
     this.cluster.services = clusterInfo[0].services;
-    // TEMP FIX : Should come from backend
-    let urlParts = this.cluster.ambariurl.split('/');
-    this.cluster.ipAddress = urlParts.length ? urlParts[2].substr(0, urlParts[2].indexOf(':')) : '';
+    this.cluster.ipAddress = this._clusterState.ambariIpAddress;
   }
 
   get showClusterDetails() {
@@ -220,6 +246,10 @@ export class ClusterAddComponent implements OnInit {
     return true;
   }
 
+  getIPAddress(amabariUrl){
+    let urlParts = amabariUrl.split('/');
+    return urlParts.length ? urlParts[2].substr(0, urlParts[2].lastIndexOf(':')) : '';
+  }
   locationFormatter(location: Location): string {
     return `${location.city}${location.province ? ', ' + location.province : ''}, ${location.country}`;
   }
@@ -228,16 +258,29 @@ export class ClusterAddComponent implements OnInit {
     return this.locationService.retrieveOptions(searchTerm);
   }
 
-  checkLocation() {
+  setLocation() {
     if (this.searchTerm.length === 0) {
       this.mapData = [];
+      this.cluster.location = null;
     }
+  }
+
+  setLocationValidity(location : Location){
+    this.isLocationValid = true;
+    if(!location || !location.id){
+      this.isLocationValid = false;
+    }
+  }
+  resetLocationValidity(){
+    this.isLocationValid = true;
   }
 
   onSelectLocation(location: Location) {
     this.mapData = [];
-    let point = new Point(location.latitude, location.longitude, MapConnectionStatus.UP);
-    this.mapData = [new MapData(point)];
+    if(location && location.id) {
+      let point = new Point(location.latitude, location.longitude, MapConnectionStatus.UP);
+      this.mapData = [new MapData(point)];
+    }
     this.cluster.location = location;
   }
 
@@ -247,7 +290,7 @@ export class ClusterAddComponent implements OnInit {
 
   onCreate() {
     this.showError = false;
-    if (!this.isFormValid()) {
+    if (!this.isLocationValid || !this.isFormValid()) {
       return;
     }
     this.createCluster()
@@ -298,6 +341,7 @@ export class ClusterAddComponent implements OnInit {
     lake.description = this.cluster.description;
     lake.dcName = this.cluster.dcName;
     lake.state = 'TO_SYNC';
+    lake.ambariIpAddress = this.cluster.ipAddress;
     if (this._clusterState.knoxDetected) {
       lake.knoxEnabled = true;
       lake.knoxUrl = this._clusterState.knoxUrl;
@@ -314,7 +358,7 @@ export class ClusterAddComponent implements OnInit {
 
   onCreateAndAdd() {
     this.showError = false;
-    if (!this.isFormValid()) {
+    if (!this.isLocationValid || !this.isFormValid()) {
       return;
     }
     this.createCluster().subscribe(

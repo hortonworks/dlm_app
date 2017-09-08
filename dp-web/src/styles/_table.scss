@@ -1,3 +1,14 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 @import "variables";
 
 table.mdl-data-table {
@@ -74,9 +85,10 @@ table.mdl-data-table {
     font-size: 12px;
     color: $dove-gray;
     line-height: 1;
-    padding: 10px;
+    padding: 10px 10px 9px;
     border-bottom: none;
     border-color: $bon-jour;
+    height: 34px;
 
     &:first-child {
       border-left: 1px solid transparent;

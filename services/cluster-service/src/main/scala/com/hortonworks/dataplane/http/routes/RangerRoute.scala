@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.http.routes
 
 import java.net.URL
@@ -82,7 +93,7 @@ class RangerRoute @Inject()(
       baseUrls <- extractUrlsWithIp(url, clusterId)
       user <- storageInterface.getConfiguration("dp.ranger.user")
       pass <- storageInterface.getConfiguration("dp.ranger.password")
-      urlToHit <- Future.successful(s"${baseUrls.head}/service/assets/accessAudit?startIndex=${offset}&pageSize=${pageSize}&sortBy=eventTime&resourceType=@table&resourcePath=${dbName}%2F${tableName}&accessType=${accessType}&accessResult=${accessResult}")
+      urlToHit <- Future.successful(s"${baseUrls.head}/service/assets/accessAudit?startIndex=${offset}&pageSize=${pageSize}&sortBy=eventTime&resourcePath=${dbName}%2F${tableName}&accessType=${accessType}&accessResult=${accessResult}")
       tmp <- Future.successful(println(urlToHit))
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")

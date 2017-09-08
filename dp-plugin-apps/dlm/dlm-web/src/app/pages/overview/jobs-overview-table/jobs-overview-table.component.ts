@@ -136,7 +136,7 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
         sortable: false
       },
       {
-        prop: 'lastJobResource.trackingInfo.timeTaken',
+        prop: 'lastJobResource.duration',
         cellTemplate: this.runTimeTemplate,
         name: this.translateColumn('runtime'),
         cellClass: 'date-cell',

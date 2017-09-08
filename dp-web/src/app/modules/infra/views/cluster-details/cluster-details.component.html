@@ -1,3 +1,14 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div class="page-container">
   <div class="mdl-grid">
     <div class="mdl-cell mdl-cell--12-col">
@@ -66,6 +77,7 @@
               <div class="text-small-1 margin-top-10">
                 <span *ngIf="clusterDetails && clusterDetails.status === 'STARTED'"><i class="fa fa-circle fa-circle--color-up"></i>Running</span>
                 <span *ngIf="clusterDetails && clusterDetails.status === 'NOT STARTED'"><i class="fa fa-circle fa-circle--color-down"></i>Not Running</span>
+                <span *ngIf="clusterDetails && clusterDetails.status === 'SYNC_ERROR'"><i class="fa fa-circle fa-circle--color-down"></i>Not Reachable</span>
                 <span *ngIf="!clusterDetails || !clusterDetails.status || clusterDetails.status === 'NA'"><i class="fa fa-circle fa-circle--color-na"></i>NA</span>
               </div>
             </div>
@@ -80,10 +92,10 @@
           </div>
           <div class="mdl-grid">
             <div class="mdl-cell mdl-cell--4-col">
-              <div class="text-dark-small-1">Nodes</div>
+              <div class="text-dark-small-1">DataNodes</div>
               <div class="text-small-1 margin-top-10">
-                <span class="margin-right-10"><i class="fa fa-circle fa-circle--color-up"></i>{{clusterDetails.healthyNodes}}</span>
-                <span><i class="fa fa-circle fa-circle--color-down"></i>{{clusterDetails.unhealthyNodes}}</span>
+                <span class="margin-right-10"><i class="fa fa-circle fa-circle--color-up"></i>{{clusterDetails.healthyDataNodes}}</span>
+                <span><i class="fa fa-circle fa-circle--color-down"></i>{{clusterDetails.unhealthyDataNodes}}</span>
               </div>
             </div>
             <div class="mdl-cell mdl-cell--4-col">
@@ -114,11 +126,11 @@
               <div #rmHeapProgress class="mdl-progress mdl-js-progress dp-progress pull-left"></div>
               <div class="progress-percent">{{rmHeapPercent}}</div>
               <div class="placeholder"></div>
-              <div class="text-small-1 margin-top-0">{{clusterDetails.rmHeapUsed}}/{{clusterDetails.rmHeapTotal}}</div>
+              <div class="text-small-1 margin-top-0">{{clusterDetails.rmHeapUsed?clusterDetails.rmHeapUsed:'NA'}}/{{clusterDetails.rmHeapTotal?clusterDetails.rmHeapTotal:'NA'}}</div>
             </div>
             <div class="mdl-cell mdl-cell--4-col">
               <div class="text-dark-small-1">ResourceManager Uptime</div>
-              <div class="text-small-1 margin-top-10">{{clusterDetails.rmUptime}}</div>
+              <div class="text-small-1 margin-top-10">{{clusterDetails.rmUptime?clusterDetails.rmUptime:'NA'}}</div>
             </div>
           </div>
         </div>

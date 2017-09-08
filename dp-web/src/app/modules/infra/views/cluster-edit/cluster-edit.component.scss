@@ -1,3 +1,14 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 @import "../../../../../styles/variables";
 
 input[type="text"].dp-input-url {
@@ -129,4 +140,19 @@ input[type="text"].dp-input {
     font-weight: 500;
     color: $roman-red;
   }
+}
+.location-error{
+  padding-left: 27px;
+  color: $roman-red;
+  .fa{
+    margin-left: -17px;
+  }
+  .location-error-text{
+    padding-left: 5px;
+    font-size: 12px;
+  }
+}
+
+.page-container {
+  padding-top: 35px;
 }

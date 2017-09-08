@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Component, ElementRef, ViewChild, OnInit, AfterViewChecked, HostListener} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
@@ -36,6 +47,7 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
   lake: Lake;
   location: Location;
   isDOMReady: boolean = false;
+  isLocationValid: boolean = true;
 
   showNotification = false;
   showError = false;
@@ -94,10 +106,22 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
     return this.locationService.retrieveOptions(searchTerm);
   }
 
-  checkLocation() {
+  setLocation() {
     if (this.searchTerm.length === 0) {
       this.mapData = [];
+      this.cluster.location = null;
     }
+  }
+
+  setLocationValidity(location : Location){
+    this.isLocationValid = true;
+    if(!location || !location.id){
+      this.isLocationValid = false;
+    }
+  }
+
+  resetLocationValidity(){
+    this.isLocationValid = true;
   }
 
   onSelectLocation(location: Location) {
@@ -147,15 +171,13 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
 
   onUpdate() {
     this.showError = false;
-    if(!this.isFormValid()){
+    if(!this.isLocationValid || !this.isFormValid()){
       return;
     }
     this.lakeService.update(this.lake)
       .subscribe(
         () => {
-          this.router.navigate(['infra', {
-            status: 'success'
-          }]);
+          this.router.navigate(['infra']);
         },
         error => {
           this.handleError(error);

@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package controllers
 
 import java.time.LocalDateTime
@@ -103,13 +114,16 @@ class UserManager @Inject()(val ldapService: LdapService,
     }
     //TODO check of any alternate ways.since it is bulk the json may contain success as well as failures
     val successFullyAdded = mutable.ArrayBuffer.empty[UserInfo]
-    val errorsReceived = mutable.ArrayBuffer.empty[Errors]
+    val errorsReceived = mutable.ArrayBuffer.empty[Error]
     Future.sequence(futures).map { respList =>
       respList.foreach {
-        case Left(error) => errorsReceived += error
+        case Left(error) => errorsReceived ++= error.errors
         case Right(userInfo) => successFullyAdded += userInfo
       }
-      Ok(Json.toJson(successFullyAdded))
+      Ok(Json.toJson(
+        Json.obj(
+        "successfullyAdded" -> successFullyAdded,
+        "errors" -> errorsReceived)))
     }
   }
   def listUsers = Action.async { req =>

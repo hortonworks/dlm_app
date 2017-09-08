@@ -1,6 +1,17 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div class="container">
   <div class="" *ngIf="enabledAppDetails.length > 0">
-    <div class="title-pane">
+    <div class="hwx-title-panel">
       <span class="hwx-title">{{"pages.services.labels.enabledServices" | translate}}</span>
     </div>
     <div *ngIf="showNotification">
@@ -44,8 +55,11 @@
                   </td>
                   <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{cluster.name}}</td>
                   <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">
-                    <button *ngIf="!cluster.dependenciesMet" id="enable-service-{{cluster.dpClusterId}}" class="mdl-button btn-hwx-primary enable-btn" (click)="enableServiceOnCluster(cluster.dpClusterId, enabledApp.service)"> Enable</button>
+                    <button *ngIf="!cluster.dependenciesMet" id="enable-service-{{cluster.dpClusterId}}" class="mdl-button btn-hwx-primary enable-btn" (click)="enableServiceOnCluster(cluster.dpClusterId, enabledApp.service)">{{'pages.services.labels.enable' | translate}}</button>
                     <span *ngIf="cluster.dependenciesMet">{{"pages.services.labels.enabled" | translate}}</span>
+                    <span *ngIf="cluster.dependenciesMet && cluster.optionalDependencies && cluster.optionalDependenciesMet === false">
+                      <button id="add-optional-service-{{cluster.dpClusterId}}" class="mdl-button btn-hwx-secondary additional-service-btn" (click)="enableServiceOnCluster(cluster.dpClusterId, enabledApp.service)">{{'pages.services.labels.addOptionalServices' | translate}}</button>
+                    </span>
                   </td>
                 </tr>
               </ng-container>

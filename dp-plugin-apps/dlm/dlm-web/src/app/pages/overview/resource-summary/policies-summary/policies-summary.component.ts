@@ -16,28 +16,28 @@ import { POLICIES_HEALTH_STATE } from '../resource-summary.type';
   template: `
     <dlm-summary-panel
       [title]="'page.overview.summary_panels.title.policies'"
-      [total]="data.total"
-      [hint]="'page.overview.summary_panels.hint.policies'">
+      [total]="data.total">
       <div class="row">
         <dlm-summary-panel-cell
-          class="col-md-4"
+          class="col-xs-4"
           iconClass="fa fa-play-circle text-success"
           [label]="'page.overview.summary_panels.status.active' | translate"
           [value]="data.active">
         </dlm-summary-panel-cell>
         <dlm-summary-panel-cell
-          class="col-md-4"
+          class="col-xs-4"
           iconClass="fa fa-times-circle"
           [label]="'page.overview.summary_panels.status.suspended' | translate"
           [value]="data.suspended">
         </dlm-summary-panel-cell>
         <dlm-summary-panel-cell
-          class="col-md-4"
+          class="col-xs-4"
           iconClass="fa fa-exclamation-triangle text-danger"
           qe-attr="show-unhealthy-policies"
           (cellClick)="selectPanelCell.emit(healthStates.UNHEALTHY)"
           [actionable]="data.unhealthy > 0"
           [label]="'page.overview.summary_panels.status.unhealthy' | translate"
+          [hint]="'page.overview.summary_panels.hint.policies.unhealthy'"
           [value]="data.unhealthy">
         </dlm-summary-panel-cell>
       </div>

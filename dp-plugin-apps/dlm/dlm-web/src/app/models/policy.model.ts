@@ -11,7 +11,17 @@ import { RequestStatus } from './request-status.model';
 import { Cluster } from './cluster.model';
 import { Job } from './job.model';
 
-export interface Policy {
+export interface PolicyUI {
+  lastJobResource?: Job;
+  jobsResource?: Job[];
+  lastTenJobs?: Job[];
+  policyStatus: RequestStatus;
+  sourceClusterResource?: Cluster;
+  targetClusterResource?: Cluster;
+  displayStatus: string;
+}
+
+export interface Policy extends PolicyUI {
   id: string; // UI specific
   name: string;
   type: string;
@@ -29,13 +39,6 @@ export interface Policy {
   description: string;
   jobs: Job[];
   customProperties?: CustomProperties;
-  // UI specific props
-  lastJobResource?: Job;
-  jobsResource?: Job[];
-  lastTenJobs?: Job[];
-  policyStatus: RequestStatus;
-  sourceClusterResource?: Cluster;
-  targetClusterResource?: Cluster;
 }
 
 export interface PolicyDefinition {

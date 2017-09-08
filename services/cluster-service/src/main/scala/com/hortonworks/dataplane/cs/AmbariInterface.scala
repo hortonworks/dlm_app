@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.cs
 
 import java.net.URL
@@ -20,6 +31,9 @@ private[dataplane] case class ServiceHost(host: String)
 private[dataplane] case class Atlas(properties: String)
 
 private[dataplane] case class Ranger(serviceHost: Seq[ServiceHost] = Seq(),
+                                     props: Option[JsValue])
+
+private[dataplane] case class DpProfiler(serviceHost: Seq[ServiceHost] = Seq(),
                                      props: Option[JsValue])
 
 private[dataplane] case class NameNode(serviceHost: Seq[ServiceHost] = Seq(),
@@ -72,6 +86,9 @@ trait AmbariInterfaceV2 {
 
   def getRanger(
       implicit hJwtToken: Option[HJwtToken]): Future[Either[Throwable, Ranger]]
+
+  def getDpProfiler(
+                 implicit hJwtToken: Option[HJwtToken]): Future[Either[Throwable, DpProfiler]]
 
   def getBeacon(implicit hJwtToken: Option[HJwtToken])
     : Future[Either[Throwable, BeaconInfo]]

@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {TabStyleType} from '../../../../shared/tabs/tabs.component';
 import {AssetService} from '../../../../services/asset.service';
@@ -115,7 +126,28 @@ export class AssetDetailsViewComponent implements OnChanges {
     ret = this.assetDetails.referredEntities[this.colGuid].attributes.profileData.attributes;
     ret['name'] = this.assetDetails.referredEntities[this.colGuid].attributes.name;
     ret['type'] = this.assetDetails.referredEntities[this.colGuid].attributes.type;
+    try {
+      let profilerInfo = this.assetDetails.entity.attributes.profileData.attributes;
+      if(!profilerInfo.sampleTime || !profilerInfo.samplePercent) throw "sampleTime or samplePercent not available";
+      let td = Math.floor((Date.now() - parseInt(profilerInfo.sampleTime))/60000); // in minutes
+      let displayText = "";
+      if(td/60 < 1) displayText = td + ((td == 1)?" minute ":" minutes ") + "ago";
+      else displayText = (td=Math.floor(td/60)) + ((td == 1)?" hour ":" hours ") + "ago";
+      ret['profilerInfo'] = `Profiled : ${profilerInfo.samplePercent}% rows, ${displayText}`;
+
+    }
+    catch(err){/*console.log(err)*/}
+
     return ret;
+  }
+  getIconClass(colGuid) {
+    var ent = this.assetDetails.referredEntities[colGuid];
+    if(!ent || !ent.attributes.profileData) return null;
+    var data = ent.attributes.profileData.attributes;
+    if(!data || !data.histogram && !data.quartiles) return null;
+    if(data.cardinality < 11) return "fa fa-pie-chart pointer";
+    return "fa fa-bar-chart pointer";
+
   }
 
 }
