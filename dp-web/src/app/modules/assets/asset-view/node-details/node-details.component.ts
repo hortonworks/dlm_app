@@ -83,7 +83,7 @@ export class NodeDetailsComponent implements OnInit {
   }
 
   backToLineage() {
-    this.router.navigate(['../'], {relativeTo: this.route});
+    this.router.navigate(['../'], {relativeTo: this.route, skipLocationChange: true});
   }
 
 
