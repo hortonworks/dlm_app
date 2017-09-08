@@ -54,7 +54,8 @@ export class MapComponent implements OnChanges, OnInit {
     boxZoom: false,
     doubleClickZoom: false,
     zoomSnap: 0.1,
-    zoomAnimation: false
+    zoomAnimation: false,
+    attributionControl: false
   };
 
   markerAndCurveLayer: Layer[] = [];
