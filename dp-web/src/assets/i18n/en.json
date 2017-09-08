@@ -60,6 +60,12 @@
     "invalidUser": "You are not an authorized Data plane user. Please contact your Data plane Administrator."
   },
   "pages": {
+    "signin" :{
+      "description": {
+        "invalidCredentials":"Credentials were incorrect. Please try again.",
+        "systemError": "System Error"
+      }
+    },
     "onboard": {
       "labels": {
         "welcomeText": "Welcome to",
