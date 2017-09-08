@@ -11,6 +11,8 @@ import { RequestStatus } from './request-status.model';
 import { Cluster } from './cluster.model';
 import { Job } from './job.model';
 
+// @todo: consider moving non-required attrs like lastTenJobs, lastJobResource, policyMode
+// to separate interface according to its usage. e.g. interface for policy table content
 export interface PolicyUI {
   lastJobResource?: Job;
   jobsResource?: Job[];
@@ -19,6 +21,8 @@ export interface PolicyUI {
   sourceClusterResource?: Cluster;
   targetClusterResource?: Cluster;
   displayStatus: string;
+  accessMode?: string;
+  rangerEnabled: boolean;
 }
 
 export interface Policy extends PolicyUI {

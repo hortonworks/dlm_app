@@ -20,3 +20,4 @@ export const getProgresses = (state: State) => state.progress;
 export const getOperations = (state: State) => state.operations;
 export const getFilesList = (state: State) => state.hdfsFiles;
 export const getDatabasesList = (state: State) => state.hiveDatabases;
+export const getBeaconAdminStatuses = (state: State) => state.beaconAdminStatus;

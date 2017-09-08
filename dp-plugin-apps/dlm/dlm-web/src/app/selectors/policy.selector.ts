@@ -13,11 +13,19 @@ import { mapToList } from 'utils/store-util';
 import { PoliciesCount } from 'models/policies-count.model';
 import { Cluster } from 'models/cluster.model';
 import { Policy } from 'models/policy.model';
+import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { getAllClusters } from './cluster.selector';
 import { getAllJobs } from './job.selector';
 import { sortByDateField } from 'utils/array-util';
 import { JOB_STATUS, CLUSTER_STATUS } from 'constants/status.constant';
 import { PolicyService } from 'services/policy.service';
+import { getRangerEnabled } from 'selectors/beacon.selector';
+import { contains } from 'utils/array-util';
+import { POLICY_MODES } from 'constants/policy.constant';
+
+const isRangerActivated = (beaconStatuses: BeaconAdminStatus[], policy: Policy): boolean => {
+  return beaconStatuses.filter(s => contains([policy.targetClusterResource.id, policy.sourceClusterResource.id], s.clusterId)).length === 2;
+};
 
 export const getEntities = createSelector(getPolicies, state => state.entities);
 
@@ -79,3 +87,15 @@ export const getUnhealthyPolicies = createSelector(
       ].indexOf(CLUSTER_STATUS.UNHEALTHY) > -1
     )
 );
+
+export const getPoliciesTableData = createSelector(getPolicyClusterJob, getRangerEnabled,
+   (policies: Policy[], beaconStatuses: BeaconAdminStatus[]) => {
+     if (beaconStatuses.length) {
+       return policies.map(policy => ({
+         ...policy,
+         accessMode: isRangerActivated(beaconStatuses, policy) ? POLICY_MODES.READ_ONLY : POLICY_MODES.READ_WRITE,
+         rangerEnabled: isRangerActivated(beaconStatuses, policy)
+       }));
+     }
+     return policies;
+   });

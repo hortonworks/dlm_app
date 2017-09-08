@@ -82,3 +82,8 @@ export const POLICY_DAYS_LABELS = {
   [SATURDAY]: 'Saturday',
   [SUNDAY]: 'Sunday'
 };
+
+export enum POLICY_MODES {
+  READ_ONLY,
+  READ_WRITE
+};

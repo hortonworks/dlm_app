@@ -32,6 +32,10 @@
   {{value | translate}}
 </ng-template>
 
+<ng-template #flowStatusCell let-mode="value" let-policy="row">
+  <dlm-flow-status [mode]="mode"></dlm-flow-status>
+</ng-template>
+
 <ng-template #clusterCellTemplate let-value="value">
   <div class="cluster-name">{{value.name}}</div>
   <div class="datacenter-name">{{value.dataCenter}}</div>

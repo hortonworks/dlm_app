@@ -7,7 +7,17 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-export const SERVICES = {
-  BEACON: 'BEACON',
-  RANGER: 'RANGER'
+export interface BeaconAdminStatusUI {
+  id: number;
+};
+
+export interface BeaconAdminStatus {
+  clusterId: number;
+  beaconAdminStatus: {
+    status: string;
+    version: string;
+    plugins: string[];
+    security: string;
+    wireEncryption: boolean;
+  };
 };

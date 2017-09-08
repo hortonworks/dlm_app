@@ -366,6 +366,13 @@
           "body": "Are you sure?"
         }
       },
+      "flow_status": {
+        "source_abbrev": "S",
+        "read_write": "Read / Write",
+        "read_only": "Read Only",
+        "read_write_abbrev": "RW",
+        "read_only_abbrev": "RO"
+      },
       "success": {
         "title": "Policy Creation Successful",
         "body": "Replication policy {{policyName}} created successfully!"
