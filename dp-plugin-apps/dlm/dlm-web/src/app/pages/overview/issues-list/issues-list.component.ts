@@ -16,12 +16,12 @@ import { Event } from 'models/event.model';
     template: `
       <div class="issues-list-container">
         <div class="row" *ngIf="!events.length">
-          <div class="col-md-12">
+          <div class="col-xs-12">
             <p class="text-muted no-issues">{{'page.overview.issues.list.empty_list' | translate}}</p>
           </div>
         </div>
         <div class="row" *ngFor="let event of events | slice:0:visibleItems">
-          <div class="col-md-12">
+          <div class="col-xs-12">
             <dlm-issues-list-item
               [event]="event">
             </dlm-issues-list-item>

@@ -23,7 +23,8 @@ import { Subscription } from 'rxjs/Subscription';
 import { RadioItem } from 'common/radio-button/radio-button';
 import { State } from 'reducers/index';
 import { Pairing } from 'models/pairing.model';
-import { POLICY_TYPES, POLICY_SUBMIT_TYPES, POLICY_REPEAT_MODES, POLICY_TIME_UNITS, POLICY_DAYS } from 'constants/policy.constant';
+import { POLICY_TYPES, POLICY_SUBMIT_TYPES, POLICY_REPEAT_MODES, POLICY_TIME_UNITS,
+  POLICY_DAYS, POLICY_START} from 'constants/policy.constant';
 import { getFormValues } from 'selectors/form.selector';
 import { markAllTouched } from 'utils/form-util';
 import { getDatePickerDate } from 'utils/date-util';
@@ -126,6 +127,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   policyTimeUnits = POLICY_TIME_UNITS;
   policyDays = POLICY_DAYS;
   policySubmitTypes = POLICY_SUBMIT_TYPES;
+  policyStart = POLICY_START;
   policyForm: FormGroup;
   selectedSource$ = new BehaviorSubject(0);
   sourceDatabases$: Observable<HiveDatabase[]>;
@@ -201,6 +203,16 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       value: this.policyTimeUnits.MINUTES
     }
   ];
+  startOptions = <RadioItem[]> [
+    {
+      label: this.t.instant('page.policies.form.fields.start.schedule'),
+      value: this.policyStart.ON_SCHEDULE
+    },
+    {
+      label: this.t.instant('page.policies.form.fields.start.start_now'),
+      value: this.policyStart.START_NOW
+    }
+  ];
   dayOptions = <RadioItem[]> [
     {
       label: 'Mo',
@@ -232,6 +244,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     }
   ];
   selectedPolicyType = POLICY_TYPES.HDFS;
+  selectedStart = this.policyStart.ON_SCHEDULE;
   root = '/';
   hdfsRootPath = '/';
   selectedHdfsPath = '/';
@@ -278,6 +291,10 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
 
   get selectedDay() {
     return this.policyForm.value.job.day;
+  }
+
+  get startOption() {
+    return this.policyForm.value.job.start;
   }
 
   get repeatOption() {
@@ -347,6 +364,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       databases: ['', Validators.required],
       directories: ['', Validators.compose([Validators.required]), pathValidator(this.hdfs)],
       job: this.formBuilder.group({
+        start: this.policyStart.ON_SCHEDULE,
         repeatMode: this.policyRepeatModes.EVERY,
         frequency: ['', Validators.compose([Validators.required, freqValidator(this.frequencyMap), integerValidator()])],
         day: this.policyDays.MONDAY,
@@ -445,6 +463,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   handleSubmit({ value }) {
+    const userTimezone = this.timezoneService.userTimezone;
     if (this.policyForm.valid) {
       if (value.job.repeatMode === this.policyRepeatModes.EVERY) {
         value.job.frequencyInSec = this.frequencyMap[value.job.unit] * value.job.frequency;
@@ -465,7 +484,10 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
           value.job.endTime.time = this.getEndTime(endDate);
         }
       }
-      const userTimezone = this.timezoneService.userTimezone;
+      if (value.job.start === this.policyStart.START_NOW) {
+        value.job.startTime.date = '';
+        value.job.startTime.time = '';
+      }
       value.userTimezone =  userTimezone ? userTimezone.label : '';
       this.formSubmit.emit(value);
     }
@@ -474,6 +496,27 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
 
   handleSearchChange(value: string) {
     this.databaseSearch$.next(value);
+  }
+
+  handleStartChange(radioItem) {
+    const { value } = radioItem;
+    this.policyForm.patchValue({
+      job: {
+        start: value,
+        startTime: {
+          time: moment(this.defaultTime).toDate()
+        }
+      }
+    });
+    if (value === this.policyStart.START_NOW) {
+      const userTimezone = this.timezoneService.userTimezone;
+      const day = userTimezone ? moment().tz(userTimezone.zones[0].value).format('d') : moment().format('d');
+      this.policyForm.patchValue({
+        job: {
+          day: day
+        }
+      });
+    }
   }
 
   toggleSection(section: string) {
@@ -553,7 +596,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     const dateFieldValue = formGroup.controls.date.value;
     const timeFieldValue = timeControl.value;
     timeControl.setErrors(null);
-    if (dateFieldValue) {
+    if (dateFieldValue && this.startOption === this.policyStart.ON_SCHEDULE) {
       const mDate = moment(dateFieldValue);
       if (this.policyForm && this.policyForm.controls['job']['controls'].unit) {
         const jobControls = this.policyForm.controls['job']['controls'];

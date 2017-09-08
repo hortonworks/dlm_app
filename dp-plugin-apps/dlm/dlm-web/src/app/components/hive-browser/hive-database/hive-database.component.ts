@@ -16,7 +16,7 @@ import { simpleSearch } from 'utils/string-utils';
   encapsulation: ViewEncapsulation.None,
   template: `
     <div class="row database-header">
-      <div class="col-md-12">
+      <div class="col-xs-12">
         <div class="database-header-inner">
           <div class="pull-left" (click)="onSelectDatabase()" *ngIf="!readonly">
             <div class="database-radio actionable">
@@ -35,7 +35,7 @@ import { simpleSearch } from 'utils/string-utils';
               [value]="searchPattern"
               (valueChange)="handleSearchChange($event)"
               ></dlm-search-input>
-            <div class="col-md-1" *ngIf="!readonly">
+            <div class="col-xs-1" *ngIf="!readonly">
               <i class="fa text-primary"
                 [ngClass]="{'fa-chevron-down': hideTables, 'fa-chevron-up': !hideTables}"
                 (click)="toggleTables()"></i>
@@ -46,9 +46,9 @@ import { simpleSearch } from 'utils/string-utils';
       </div>
     </div>
     <div class="row database-tables-list" [collapse]="!readonly && hideTables">
-      <div class="col-md-12">
+      <div class="col-xs-12">
         <div class="row" *ngFor="let table of tables; let last = last">
-          <div class="col-md-12">
+          <div class="col-xs-12">
             <div [ngClass]="{'database-table': true, last: last}">
               <i class="fa fa-table"></i>
               <span>{{table?.name}}</span>

@@ -23,7 +23,7 @@ export const HIVE_BROWSER_VALUE_ACCESSOR: any = {
   providers: [HIVE_BROWSER_VALUE_ACCESSOR],
   template: `
     <div class="row" *ngIf="!databases?.length">
-      <div class="col-md-12">
+      <div class="col-xs-12">
         {{'hive_database.empty_selection' | translate}}
       </div>
     </div>
