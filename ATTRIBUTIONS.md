@@ -12,3 +12,7 @@
  * Geonames
     - License: CC 3.0
     - http://www.geonames.org/
+
+ * World as GeoJSON
+    - License: Unlicense
+    - https://github.com/johan/world.geo.json/blob/master/countries.geo.json
