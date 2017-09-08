@@ -93,7 +93,7 @@ class RangerRoute @Inject()(
       baseUrls <- extractUrlsWithIp(url, clusterId)
       user <- storageInterface.getConfiguration("dp.ranger.user")
       pass <- storageInterface.getConfiguration("dp.ranger.password")
-      urlToHit <- Future.successful(s"${baseUrls.head}/service/assets/accessAudit?startIndex=${offset}&pageSize=${pageSize}&sortBy=eventTime&resourceType=@table&resourcePath=${dbName}%2F${tableName}&accessType=${accessType}&accessResult=${accessResult}")
+      urlToHit <- Future.successful(s"${baseUrls.head}/service/assets/accessAudit?startIndex=${offset}&pageSize=${pageSize}&sortBy=eventTime&resourcePath=${dbName}%2F${tableName}&accessType=${accessType}&accessResult=${accessResult}")
       tmp <- Future.successful(println(urlToHit))
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
