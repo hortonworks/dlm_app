@@ -160,9 +160,7 @@ input[type="text"].dp-input {
 
 .extensible-list-h {
   display: flex;
-  -webkit-align-content: center;
   align-content: center;
-  -webkit-flex-wrap: wrap;
   flex-wrap: wrap;
 }
 .extensible-list-h > div.services {
@@ -172,10 +170,6 @@ input[type="text"].dp-input {
   opacity: 1;
   display: inline-block;
 
-  -webkit-transition: height 0s, opacity 300ms ease-in-out;
-  -moz-transition: height 0s, opacity 300ms ease-in-out;
-  -ms-transition: height 0s, opacity 300ms ease-in-out;
-  -o-transition: height 0s, opacity 300ms ease-in-out;
   transition: height 0s, opacity 300ms ease-in-out;
 }
 .extensible-list-h > div.services.hide {
@@ -183,10 +177,6 @@ input[type="text"].dp-input {
   width: 0;
   height: 0;
   opacity: 0;
-  -webkit-transition-duration: 0ms;
-  -moz-transition-duration: 0ms;
-  -ms-transition-duration: 0ms;
-  -o-transition-duration: 0ms;
   transition-duration: 0ms;
 }
 

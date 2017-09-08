@@ -1,5 +1,3 @@
-import scala.util.Try
-
 /*
  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
  *
@@ -8,6 +6,9 @@ import scala.util.Try
  * reproduction, modification, redistribution, sharing, lending or other exploitation
  * of all or any part of the contents of this software is strictly prohibited.
  */
+
+import scala.util.Try
+
 
 package object controllers {
   def getModuleDependentServices(skuName: String)(implicit configuration: play.api.Configuration):Option[String] = {
