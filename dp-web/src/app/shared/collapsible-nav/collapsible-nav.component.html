@@ -9,19 +9,19 @@
   ~  */
   -->
 
-<div #sideNav class="sidenav"  [ngClass]="{'collpased': collapseSideNav}">
+<div id="persona_side_nav" #sideNav class="sidenav"  [ngClass]="{'collpased': collapseSideNav}">
 
   <div #personaNavSrc class="dp-header-logo borderBox" [ngClass]="{'dp-header-logo--active': getNumberOfActivePersonas() > 1}">
     <img  *ngIf="activePersonaImageName" [attr.src]="'../../../assets/images/' + activePersonaImageName" alt="Hortonworks Dataplane"/>
-    <span class="persona-drop-down-small" *ngIf="getNumberOfActivePersonas() > 1"></span>
+    <span id="persona_drop_down" class="persona-drop-down-small" *ngIf="getNumberOfActivePersonas() > 1"></span>
     <span class="persona-name">{{ activePersonaName }}</span>
   </div>
 
-  <span class="sidenav-item" *ngFor="let tabEntry of personaTabs; let i = index" [ngClass]="{'active': activeTabName === tabEntry.tabName}" (click)="navigateToURL(tabEntry)">
+  <span class="sidenav-item" *ngFor="let tabEntry of personaTabs; let i = index" [ngClass]="{'active': activeTabName === tabEntry.tabName}" [attr.id]="'persona_side_nav_item_'+i" (click)="navigateToURL(tabEntry)">
     <i *ngIf="tabEntry.iconClassName != ''" [ngClass]="'fa ' +  tabEntry.iconClassName" aria-hidden="true"></i>  <span class="sidenav-item-name"> {{ tabEntry.tabName }} </span>
   </span>
 
-  <div class="expander" (click)="toggleNav()">
+  <div id="persona_side_nav_expander" class="expander" (click)="toggleNav()">
     <i *ngIf="!collapseSideNav" class="fa fa-angle-double-left"></i>
     <i *ngIf="collapseSideNav" class="fa fa-angle-double-right"></i>
   </div>
