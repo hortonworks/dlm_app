@@ -194,7 +194,7 @@ export class AuditVisualizationComponent implements OnInit, AfterViewInit {
 
 
   ngAfterViewInit() {
-    this.createStackedBarChart(this.test_data_per_user);
+    this.createStackedBarChart(this.test_data);
     this.createDonutChart(this.donutChartData);
   }
 
@@ -259,7 +259,7 @@ export class AuditVisualizationComponent implements OnInit, AfterViewInit {
       return d3.scale.ordinal().range(myColors);
     };
     let count = chartData[0].value + chartData[1].value;
-    count = count >= 1000 ? `${(count/1000).toFixed(1)}K` : count;
+    count = count >= 1000 ? `${(count / 1000).toFixed(1)}K` : count;
     nv.addGraph({
       generate: function () {
         let width = self.donutChart.nativeElement.width,//nv.utils.windowSize().width,
@@ -354,7 +354,7 @@ export class AuditVisualizationComponent implements OnInit, AfterViewInit {
       } else {
         this.createStackedBarChart(this.test_data_unauthorised);
       }
-    }else{
+    } else {
       this.createStackedBarChart(this.test_data);
       this.createDonutChart(this.donutChartData);
     }
@@ -396,13 +396,17 @@ export class AuditVisualizationComponent implements OnInit, AfterViewInit {
       this.availableFilterCount = 0;
       if (!this.filters.find(option => option.key === 'user')) {
         let users = this.users.filter(user => user.toLowerCase().indexOf(term) >= 0);
-        this.filterOptions.push({'displayName': 'User', 'key': 'user', values: users});
-        this.availableFilterCount += users.length
+        if (users && users.length) {
+          this.filterOptions.push({'displayName': 'User', 'key': 'user', values: users});
+          this.availableFilterCount += users.length
+        }
       }
       if (!this.filters.find(option => option.key === 'result')) {
         let result = this.result.filter(res => res.toLowerCase().indexOf(term) >= 0);
-        this.filterOptions.push({'displayName': 'Result', 'key': 'result', values: result});
-        this.availableFilterCount += result.length;
+        if (result && result.length) {
+          this.filterOptions.push({'displayName': 'Result', 'key': 'result', values: result});
+          this.availableFilterCount += result.length;
+        }
       }
 
       this.showFilterListing = true;

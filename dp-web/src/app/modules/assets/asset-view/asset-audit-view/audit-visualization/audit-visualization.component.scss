@@ -205,7 +205,7 @@
 
 }
 
-* /deep/ .mdl-chip {
+* /deep/ .asset-audit-search-tag {
   background-color: $alto-1;
   height: 14px;
   line-height: 14px !important;
@@ -215,11 +215,11 @@
   align-self: flex-start;
 }
 
-* /deep/ .mdl-chip + .mdl-chip {
+* /deep/ .asset-audit-search-tag + .asset-audit-search-tag {
   margin-left: 5px;
 }
 
-* /deep/ .mdl-chip__text {
+* /deep/ .asset-audit-search-tag > .mdl-chip__text {
   vertical-align: unset;
 }
 
