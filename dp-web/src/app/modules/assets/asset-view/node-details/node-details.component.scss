@@ -16,9 +16,10 @@
 }
 .details-container{
   padding: 25px 25px;
-  height: 500px;
   box-sizing: border-box;
   overflow-y: auto;
+  height: 480px;
+  width: 100%;
 }
 .overflow-ellipsis {
   text-overflow: ellipsis;
