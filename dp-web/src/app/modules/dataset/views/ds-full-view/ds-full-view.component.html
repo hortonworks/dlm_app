@@ -24,7 +24,7 @@
   <div class="div50Percent dataset-view__action-wrapper">
       <div class="dataset-item__action">
         <button id="dropDown_{{dsModel.id}}" class="mdl-button mdl-js-button btn-hwx-primary">
-          Actions <i class="fa fa-chevron-down fa-2"></i>
+          {{'common.actions' | translate}} <i class="fa fa-chevron-down fa-2"></i>
         </button>
         <ul mdl class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_' + dsModel.id">
           <li class="mdl-menu__item" (click)="onDeleteDataset()">
@@ -50,15 +50,17 @@
   </div>
 
   <dialog #dialogConfirm class="mdl-dialog dataset-delete-dialog">
-      <h4 class="mdl-dialog__title hwx-subtitle">Confirm Delete?</h4>
+      <h4 class="mdl-dialog__title hwx-subtitle">{{'pages.dataset.labels.confirmDelete' | translate}}</h4>
       <div class="mdl-dialog__content">
-        <p>
-          Are you sure you want to delete <strong>{{dsModel.name}}</strong>?
-        </p>
+        <p [innerHTML]="'pages.dataset.labels.messageDelete' | translate: ({'datasetName': dsModel?.name})"></p>
       </div>
       <div class="mdl-dialog__actions">
-        <button type="button" class="mdl-button btn-hwx-primary" (click)="doConfirmDelete()">Confirm</button>
-        <button type="button" class="mdl-button close btn-hwx-secondary" (click)="doCancelDelete()">Cancel</button>
+        <button type="button" class="mdl-button btn-hwx-primary" (click)="doConfirmDelete()">
+          {{'common.confirm' | translate}}
+        </button>
+        <button type="button" class="mdl-button close btn-hwx-secondary" (click)="doCancelDelete()">
+          {{'common.cancel' | translate}}
+        </button>
       </div>
     </dialog>
 
