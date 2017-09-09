@@ -29,7 +29,7 @@ export const CUSTOM_RADIO_BUTTON_CONTROL_VALUE_ACCESSOR: any = {
     <div *ngIf="type === 'buttons'" class="btn-group dlm-radio-group" data-toggle="buttons">
       <label *ngFor="let radio of items" (click)="selectValue(radio)"
       [ngClass]="{'btn': true, 'btn-default': radio.value !== selectedValue,
-      'btn-primary': radio.value === selectedValue}">
+      'btn-primary': radio.value === selectedValue, 'disabled': disabled}">
         <input type="radio" [value]="radio.value" [checked]="radio.value === selectedValue">
         {{radio.label}}
       </label>
@@ -43,6 +43,7 @@ export class RadioButtonComponent implements OnInit, ControlValueAccessor {
   @Input() items: RadioItem[] = [];
   @Input() selectedValue: string;
   @Input() type = 'radio';
+  @Input() disabled = false;
   @Output() change = new EventEmitter<RadioItem>();
   onChange = (_: any) => {};
 
@@ -61,6 +62,9 @@ export class RadioButtonComponent implements OnInit, ControlValueAccessor {
   registerOnTouched() { }
 
   selectValue(radio: RadioItem) {
+    if (this.disabled === true) {
+      return;
+    }
     this.selectedValue = radio.value;
     this.onChange(this.selectedValue);
     this.change.emit(radio);

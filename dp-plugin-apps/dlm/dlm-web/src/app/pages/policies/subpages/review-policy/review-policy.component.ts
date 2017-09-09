@@ -194,6 +194,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
     const repeatMode = policyForm.job.repeatMode;
     const timezone = policyForm.userTimezone;
     const formattedEndTime = this.formatDateDisplay(policyForm.job.endTime, timezone);
+    const formattedStartTime = this.formatDateDisplay(policyForm.job.startTime, timezone);
     const details = [
       {name: 'name', label: this.t.instant(`${this.tDetails}.policy_name`), value: policyForm.general.name},
       {name: 'description', label: this.t.instant(`${this.tDetails}.policy_description`), value: policyForm.general.description},
@@ -214,8 +215,12 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
       }
       details.push({name: 'repeatMode', label: this.t.instant(`${this.tDetails}.repeat`), value});
     }
-    details.push({name: 'startTime', label: this.t.instant('common.start_time'),
-      value: this.formatDateDisplay(policyForm.job.startTime, timezone)});
+    if (formattedStartTime) {
+      details.push({
+        name: 'startTime', label: this.t.instant('common.start_time'),
+        value: formattedStartTime
+      });
+    }
     if (formattedEndTime) {
       details.push({
         name: 'EndTime', label: this.t.instant('common.end_time'),
