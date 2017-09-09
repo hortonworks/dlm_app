@@ -18,7 +18,7 @@
 
 <ng-template #statusCell let-status="value" let-cluster="row">
   <span>
-    <dlm-cluster-status-icon [cluster]="cluster" [attr.qe-attr]="'cluster-status-icon-' + cluster.id" ></dlm-cluster-status-icon>
+    <dlm-cluster-status-icon [cluster]="cluster" [attr.qe-attr]="'cluster-status-icon-' + cluster.$$index" ></dlm-cluster-status-icon>
     <span [innerHtml]="status" [attr.qe-attr]="'cluster-status-' + cluster.$$index" ></span>
   </span>
 </ng-template>
