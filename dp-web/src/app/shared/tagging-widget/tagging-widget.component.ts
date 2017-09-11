@@ -56,7 +56,7 @@ export class TaggingWidget implements AfterViewInit {
   }
 
   emitSearchText() {
-    this.newTagEmitter.emit(this.searchText);
+    this.newTagEmitter.emit(this.searchText.trim());
   }
 
   ngAfterViewInit() {
@@ -109,8 +109,8 @@ export class TaggingWidget implements AfterViewInit {
       this.newTagEmitter.emit(this.availableTags[this.focusRowIndex]);
       this.clearOnSearch && this.onSearchTextChange('');
       this.focusStickerIndex++;
-    } else if (this.searchText && this.focusStickerIndex === this.tags.length && !this.restrictFreeText) {
-      this.newTagEmitter.emit(this.searchText);
+    } else if (this.searchText && this.searchText.trim() && this.focusStickerIndex === this.tags.length && !this.restrictFreeText) {
+      this.newTagEmitter.emit(this.searchText.trim());
       this.clearOnSearch && this.onSearchTextChange('');
       this.focusStickerIndex++;
     }
