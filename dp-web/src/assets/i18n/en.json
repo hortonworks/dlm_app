@@ -274,7 +274,8 @@
         "selectOperator": "Select Operator",
         "addAssets": "Add Assets",
         "description": "Description",
-        "belongsTo": "Belongs To"
+        "belongsTo": "Belongs To",
+        "dbName": "Database Name"
       },
       "ds-editor": {
         "ds-description": "Organize your hive assets into logical groups for subsequent usage.",
