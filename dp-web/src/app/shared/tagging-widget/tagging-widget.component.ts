@@ -143,7 +143,7 @@ export class TaggingWidget implements AfterViewInit {
 
   onInputBlur() {
     if(this.searchText && this.searchText.trim() && !this.restrictFreeText){
-      this.tags.push(this.searchText);
+      this.tags.push(this.searchText.trim());
       this.searchText = '';
     }
     this.blurTimeout = setTimeout(() => this.parent.nativeElement.classList.remove('focus'), 300);
