@@ -6,7 +6,7 @@
       "beaconAdminStatus": {
         "status": "RUNNING",
         "version": "1.0.0.2.6.0.0-SNAPSHOT",
-        "plugins": "RANGER",
+        "plugins": "NONE",
         "security": "None",
         "wireEncryption": false
       }
