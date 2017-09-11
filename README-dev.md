@@ -34,7 +34,7 @@
   * `sh runDpApp.sh` for app
   * `sh runClusterService.sh` for cluster service
 5. Start UI
-  * `yarn install --pure-lockfile`
+  * `yarn install --frozen-lockfile`
   * `yarn run dev`
 
 ## Troubleshooting
