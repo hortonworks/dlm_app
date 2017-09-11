@@ -20,7 +20,7 @@
                     <div class="hwx-title" *ngIf="currentDsTag">{{currentDsTag.name}}</div>
                     <div class="mdl-layout-spacer"></div>
                     <div class="search-input">
-                        <input id="search" name="search-input" type="text" placeholder="Search" [ngModel]="dsNameSearch" (change)="dsNameSearchChange($event)" />
+                        <input id="search" name="search-input" type="text" placeholder="Search" [ngModel]="dsNameSearch" (keyup)="dsNameSearchChange($event)" />
                         <i aria-hidden="true" class="fa fa-search dp-input__icon"></i>
                     </div>
                     <div class="mdl-button-group">
