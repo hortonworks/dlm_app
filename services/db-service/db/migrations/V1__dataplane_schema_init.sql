@@ -166,7 +166,7 @@ CREATE TABLE IF NOT EXISTS dataplane.categories (
 
 CREATE TABLE IF NOT EXISTS dataplane.datasets (
   id           BIGSERIAL PRIMARY KEY,
-  name         VARCHAR(255)                                       NOT NULL,
+  name         VARCHAR(255)                                       NOT NULL UNIQUE,
   description  TEXT,
   dp_clusterid BIGINT REFERENCES dataplane.dp_clusters (id)       NOT NULL,
   createdby    BIGINT REFERENCES dataplane.users (id)             NOT NULL,
