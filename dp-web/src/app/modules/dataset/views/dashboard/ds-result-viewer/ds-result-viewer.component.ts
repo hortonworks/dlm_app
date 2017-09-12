@@ -28,7 +28,7 @@ export class DsNavResultViewer {
   @Input() dsNameSearch:string = "";
   @ViewChild('dialogConfirm') dialogConfirm: ElementRef;
 
-  @Output() onRefreshView: EventEmitter<boolean>;
+  @Output() onViewRefresh = new EventEmitter<boolean>();
 
   _datasetToDelete: RichDatasetModel;
   _deleteWasSuccessful = false;
@@ -78,7 +78,10 @@ export class DsNavResultViewer {
   doConfirmDelete() {
     const delete$ = this.dataSetService.delete(this._datasetToDelete.id).share();
 
-    delete$.subscribe(() => this.getDataset());
+    delete$.subscribe(() => {
+      this.getDataset();
+      this.onViewRefresh.emit(true);
+    });
     delete$
       .do(() => this._deleteWasSuccessful = true)
       .delay(1000)
@@ -88,7 +91,6 @@ export class DsNavResultViewer {
 
         this.dialogConfirm.nativeElement.close();
       });
-    delete$.subscribe(() => this.onRefreshView.emit(true));
   }
 
   doCancelDelete() {

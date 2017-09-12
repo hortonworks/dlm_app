@@ -9,10 +9,11 @@
  *
  */
 
-import {Component, OnInit} from "@angular/core";
+import {Component, OnInit, ViewChild, ElementRef} from "@angular/core";
 import {Router} from "@angular/router";
 import {DatasetTag} from "../../../../models/dataset-tag";
 import {ViewsEnum} from "../../../../shared/utils/views";
+import {NavTagPanel} from "./nav-tag-panel/nav-tag-panel.component";
 
 @Component({
   selector: "dp-dataset-dashboard",
@@ -26,6 +27,8 @@ export class DatasetDashboardComponent implements OnInit {
   dsNameSearch : string = "";
   views = ViewsEnum;
   currentView: ViewsEnum;
+
+  @ViewChild('tagViewer') tagViewer: NavTagPanel;
 
   constructor(private router: Router) {
   }
@@ -50,7 +53,7 @@ export class DatasetDashboardComponent implements OnInit {
     this.dsNameSearch = event.target.value;
   }
 
-  onRefreshView(isRefreshRequested: boolean) {
-    this.dsNameSearch = this.dsNameSearch;
+  onViewRefresh() {
+    this.tagViewer && this.tagViewer.fetchList();
   }
 }

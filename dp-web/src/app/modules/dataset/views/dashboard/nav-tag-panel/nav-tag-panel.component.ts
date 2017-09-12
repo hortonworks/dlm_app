@@ -39,10 +39,13 @@ export class NavTagPanel implements OnInit {
   }
 
   fetchList() {
-    this.tagService.list(this.dsNameSearch).subscribe(tags => {
-      this.currentDsTag && (this.currentDsTag = tags.filter(tag=>tag.name==this.currentDsTag.name)[0]);
-      (this.displayTags = this.allTags = tags) && tags.length && this.onPanelRowSelectionChange(this.currentDsTag || tags[0]);
-    });
+    this.tagService
+      .list(this.dsNameSearch)
+      .map(tags => tags.filter(cTag => cTag.name === 'ALL' || cTag.count > 0))
+      .subscribe(tags => {
+          this.currentDsTag && (this.currentDsTag = tags.filter(tag=>tag.name==this.currentDsTag.name)[0]);
+          (this.displayTags = this.allTags = tags) && tags.length && this.onPanelRowSelectionChange(this.currentDsTag || tags[0]);
+        });
   }
 
   onPanelRowSelectionChange(tagObj: DatasetTag) {
