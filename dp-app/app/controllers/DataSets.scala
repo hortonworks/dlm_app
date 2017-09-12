@@ -121,9 +121,12 @@ class DataSets @Inject()(
               dataSetService
                 .create(newReq)
                 .map {
-                  case Left(errors) =>
-                    InternalServerError(JsonResponses.statusError(
-                      s"Failed with ${Json.toJson(errors)}"))
+                  case Left(errors) => {
+                    errors.firstMessage match {
+                      case "23505" => InternalServerError(JsonResponses.statusError(s"A dataset with this name already exists."))
+                      case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+                    }
+                  }
                   case Right(dataSetNCategories) => {
                     val dsId = dataSetNCategories.dataset.id.get
                     val dsName = dataSetNCategories.dataset.name
