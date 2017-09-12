@@ -158,10 +158,6 @@ class DataSets @Inject()(
         .getOrElse(Future.successful(BadRequest))
   }
 
-  private def createDatasetFromAssets = {
-
-  }
-
   def getRichDataset = authenticated.async { req =>
     dataSetService
       .listRichDataset(req.rawQueryString)
