@@ -38,7 +38,7 @@
   cursor: pointer;
 }
 
-.warning {
+.duplicate-error {
   color: $roman-red;
 }
 
@@ -185,4 +185,12 @@
     padding: 3px 10px;
     margin-left: 10px;
   }
+}
+
+.warning {
+  color: $jaffa;
+}
+
+.fa-warning {
+  margin-right: 2px;
 }
