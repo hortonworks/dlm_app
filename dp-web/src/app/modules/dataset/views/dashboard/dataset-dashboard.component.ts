@@ -49,4 +49,8 @@ export class DatasetDashboardComponent implements OnInit {
   dsNameSearchChange(event) {
     this.dsNameSearch = event.target.value;
   }
+
+  onRefreshView(isRefreshRequested: boolean) {
+    this.dsNameSearch = this.dsNameSearch;
+  }
 }

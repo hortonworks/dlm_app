@@ -9,7 +9,7 @@
  *
  */
 
-import {Component, Input, ViewChild, OnInit, SimpleChange, ElementRef} from "@angular/core";
+import {Component, Input, Output, ViewChild, OnInit, SimpleChange, ElementRef, EventEmitter} from "@angular/core";
 import {DatasetTag} from "../../../../../models/dataset-tag";
 import {ViewsEnum} from "../../../../../shared/utils/views";
 import {RichDatasetModel} from "../../../models/richDatasetModel";
@@ -27,6 +27,8 @@ export class DsNavResultViewer {
   @Input() view;
   @Input() dsNameSearch:string = "";
   @ViewChild('dialogConfirm') dialogConfirm: ElementRef;
+
+  @Output() onRefreshView: EventEmitter<boolean>;
 
   _datasetToDelete: RichDatasetModel;
   _deleteWasSuccessful = false;
@@ -86,6 +88,7 @@ export class DsNavResultViewer {
 
         this.dialogConfirm.nativeElement.close();
       });
+    delete$.subscribe(() => this.onRefreshView.emit(true));
   }
 
   doCancelDelete() {
