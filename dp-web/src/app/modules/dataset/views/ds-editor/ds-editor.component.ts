@@ -39,7 +39,6 @@ export class DsEditor implements OnInit {
               private tagService: DsTagsService,
               private router: Router,
               private activeRoute: ActivatedRoute) {
-    this.errorMessage = null;
   }
 
   ngOnInit() {
@@ -76,6 +75,9 @@ export class DsEditor implements OnInit {
 
   moveToStage(newStage: number) {
     if ((newStage < this.currentStage) && (this.currentStage = newStage)) {
+      // clear error
+      this.errorMessage = null;
+
       this.setVisibilityOfNext();
     }
   }
