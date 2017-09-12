@@ -68,6 +68,10 @@ export class AssetDetailsViewComponent implements OnChanges {
     return assetTags;
   }
 
+  setColGuid(guid) {
+    this.colGuid === guid ? this.colGuid = "" : this.colGuid = guid ;
+  }
+
   private extractSchema(referredEntities) {
     let assetSchemas: AssetSchema[] = [];
     Object.keys(referredEntities).forEach(key => {
