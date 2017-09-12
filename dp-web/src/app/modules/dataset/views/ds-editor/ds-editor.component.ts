@@ -32,12 +32,14 @@ export class DsEditor implements OnInit {
   assetSetQueryModelsForAddition: AssetSetQueryModel[] = [];
   assetSetQueryModelsForSubtraction: AssetSetQueryModel[] = [];
   private datasetId: number = null;
+  errorMessage: string;
 
   constructor(public dsModel: RichDatasetModel,
               private richDatasetService: RichDatasetService,
               private tagService: DsTagsService,
               private router: Router,
               private activeRoute: ActivatedRoute) {
+    this.errorMessage = null;
   }
 
   ngOnInit() {
@@ -83,7 +85,10 @@ export class DsEditor implements OnInit {
     this.saveInProgress = true;
     this.richDatasetService
       .saveDataset(this.dsModel, this.assetSetQueryModelsForAddition, this.tags)
-      .subscribe(obj => {this.actionCancel();})
+      .subscribe(
+        () => this.actionCancel(),
+        error => this.errorMessage = error.json().message
+      );
   }
 
   actionCancel() {

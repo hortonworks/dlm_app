@@ -27,6 +27,9 @@
                          (onDoneAction)="setVisibilityOfNext()"
       ></ds-assets-holder>
       <ds-summary-holder  *ngIf="currentStage == 3" [dsModel]="dsModel"  [tags]="tags"></ds-summary-holder>
+      <div class="error-section" *ngIf="errorMessage">
+        <strong>Unable to create dataset:</strong> {{errorMessage}}
+      </div>
       <div class="button-container">
         <button *ngIf="nextIsVisible" class="mdl-button btn-hwx-primary" (click)="actionNext()">{{"pages.dataset.ds-editor.action.next" | translate}}</button>
         <button *ngIf="currentStage == 3" class="mdl-button btn-hwx-primary" (click)="actionSave()">{{"pages.dataset.ds-editor.action.save" | translate}}</button>
