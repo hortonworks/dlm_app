@@ -28,7 +28,7 @@ import scala.util.Left
 
 class ServicesManager @Inject()(@Named("skuService") val skuService: SkuService
                                 , authenticated: Authenticated
-                                , private val configuration: play.api.Configuration) extends Controller {
+                                , implicit private val configuration: play.api.Configuration) extends Controller {
 
   private val smartSenseRegex: String = configuration.underlying.getString("smartsense.regex")
 
@@ -50,12 +50,12 @@ class ServicesManager @Inject()(@Named("skuService") val skuService: SkuService
   }
 
   def getDependentServices(skuName: String) = Action.async { request =>
-    val mandatoryDependentServices = Option(configuration.underlying.getString(s"$skuName.dependent.services.mandatory"))
+    val mandatoryDependentServices = getMandatoryDependentServices(skuName)
     val hasOptionalServices = configuration.underlying.hasPath(s"$skuName.dependent.services.optional")
     if (mandatoryDependentServices.isDefined && !hasOptionalServices) {
       Future.successful(Ok(Json.toJson(ServiceDependency(skuName, mandatoryDependentServices.get.split(","), Seq()))))
     } else if (mandatoryDependentServices.isDefined && hasOptionalServices) {
-      val optionalDependentServices = Option(configuration.underlying.getString(s"$skuName.dependent.services.optional")) //getString(s"$skuName.dependent.services.optional").)
+      val optionalDependentServices = getOptionalDependentServices(skuName)
       Future.successful(Ok(Json.toJson(ServiceDependency(skuName, mandatoryDependentServices.get.split(","), optionalDependentServices.get.split(",")))))
     } else {
       Future.successful(Ok(Json.toJson(ServiceDependency(skuName, Seq(), Seq()))))
