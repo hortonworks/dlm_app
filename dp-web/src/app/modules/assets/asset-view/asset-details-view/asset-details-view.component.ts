@@ -113,8 +113,10 @@ export class AssetDetailsViewComponent implements OnChanges {
         return;
       }
       if (key === 'partitionKeys') {
-        this.extractPartitionKeys(attributes[key]);
-        return
+        this.extractPartitionKeys(attributes[key]).subscribe(assetProperty => {
+          assetProps.push(assetProperty);
+        });
+        return;
       }
       let value = attributes[key];
       if (attributes[key] && (typeof attributes[key] === 'object' || Array.isArray(attributes[key]))) {
@@ -131,19 +133,26 @@ export class AssetDetailsViewComponent implements OnChanges {
     return assetProps;
   }
 
-  private extractPartitionKeys(value) {
-    let keyObservable = [];
-    let partitionKeys = [];
-    value.forEach(val => {
-      keyObservable.push(this.assetService.getDetails(this.clusterId, val.guid));
+  private extractPartitionKeys(value): Observable<AssetProperty> {
+    return Observable.create((observer) => {
+      let keyObservable = [];
+      let partitionKeys = [];
+      if (value && typeof value === 'object') {
+        value.forEach(val => {
+          keyObservable.push(this.assetService.getDetails(this.clusterId, val.guid));
+        });
+        Observable.forkJoin(keyObservable).subscribe((details: AssetDetails[]) => {
+          details.forEach((detail: AssetDetails) => {
+            partitionKeys.push(detail.entity.attributes.name);
+          });
+          observer.next(new AssetProperty('partitionKeys', partitionKeys.join(', ')));
+        });
+      } else {
+        observer.next(new AssetProperty('partitionKeys', value));
+      }
     });
-    Observable.forkJoin(keyObservable).subscribe((details: AssetDetails[]) => {
-      details.forEach((detail: AssetDetails) => {
-        partitionKeys.push(detail.entity.attributes.name);
-      });
-      let property = new AssetProperty('partitionKeys', partitionKeys.join(', '));
-      this.assetProperties.push(property);
-    });
+
+
   }
 
   get colVisualData() {
