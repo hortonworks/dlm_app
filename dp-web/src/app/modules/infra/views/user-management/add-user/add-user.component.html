@@ -95,7 +95,7 @@
               (textChange)="onRoleSearchChange($event)"
               (onNewSearch)="onRolesEdit($event)"></tagging-widget>
               <i id="roles-dropdown" class="fa fa-caret-down drop-down-icon" (click)="showRoleOptions()"></i>
-              <div class="hwx-inline-desc"><i class="fa fa-warning warning"></i>{{"pages.infra.description.rolesOverrideWarning" | translate}}</div>
+              <div *ngIf="!showRoles" class="hwx-inline-desc"><i class="fa fa-warning warning"></i>{{"pages.infra.description.rolesOverrideWarning" | translate}}</div>
               <div id="roles-option-list" *ngIf="showRoles" class="option-list">
                 <div *ngFor="let roleOption of allRoles" id="role-{{roleOption.data}}" (click)="onRolesEdit(roleOption)">{{roleOption.display}}</div>
               </div>
