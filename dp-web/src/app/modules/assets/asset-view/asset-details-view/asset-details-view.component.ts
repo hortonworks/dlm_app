@@ -12,11 +12,12 @@
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {TabStyleType} from '../../../../shared/tabs/tabs.component';
 import {AssetService} from '../../../../services/asset.service';
-import {AssetProperty} from '../../../../models/asset-property';
+import {AssetDetails, AssetProperty} from '../../../../models/asset-property';
 import {AssetTag} from '../../../../models/asset-tag';
 import {AssetSchema} from '../../../../models/asset-schema';
 import {DateUtils} from '../../../../shared/utils/date-utils';
 import {StringUtils} from '../../../../shared/utils/stringUtils';
+import {Observable} from 'rxjs/Observable';
 
 export enum DetailsTabs {
   PROPERTIES, TAGS, SCHEMA
@@ -61,15 +62,15 @@ export class AssetDetailsViewComponent implements OnChanges {
     classifications.forEach(classification => {
       let tag = new AssetTag();
       tag.name = classification.typeName;
-      tag.attributes = classification.attributes ? typeof classification.attributes === 'object' ?
-        StringUtils.getFlattenedObjects(classification.attributes) : classification.attributes : 'NA';
+      tag.attributes = classification.attributes ? (typeof classification.attributes === 'object' ?
+        StringUtils.getFlattenedObjects(classification.attributes) : classification.attributes) : 'NA';
       assetTags.push(tag);
     });
     return assetTags;
   }
 
   setColGuid(guid) {
-    this.colGuid === guid ? this.colGuid = "" : this.colGuid = guid ;
+    this.colGuid === guid ? this.colGuid = '' : this.colGuid = guid;
   }
 
   private extractSchema(referredEntities) {
@@ -111,8 +112,12 @@ export class AssetDetailsViewComponent implements OnChanges {
       if (key === 'columns' || key === 'sd' || key === 'parameters') {
         return;
       }
+      if (key === 'partitionKeys') {
+        this.extractPartitionKeys(attributes[key]);
+        return
+      }
       let value = attributes[key];
-      if (attributes[key] && typeof attributes[key] === 'object' || Array.isArray(attributes[key])) {
+      if (attributes[key] && (typeof attributes[key] === 'object' || Array.isArray(attributes[key]))) {
         value = StringUtils.getFlattenedObjects(value);
       }
       if (key === 'lastAccessTime' || key === 'createTime' || key === 'endTime' || key === 'startTime') {
@@ -124,6 +129,21 @@ export class AssetDetailsViewComponent implements OnChanges {
       assetProps.push(property);
     });
     return assetProps;
+  }
+
+  private extractPartitionKeys(value) {
+    let keyObservable = [];
+    let partitionKeys = [];
+    value.forEach(val => {
+      keyObservable.push(this.assetService.getDetails(this.clusterId, val.guid));
+    });
+    Observable.forkJoin(keyObservable).subscribe((details: AssetDetails[]) => {
+      details.forEach((detail: AssetDetails) => {
+        partitionKeys.push(detail.entity.attributes.name);
+      });
+      let property = new AssetProperty('partitionKeys', partitionKeys.join(', '));
+      this.assetProperties.push(property);
+    });
   }
 
   get colVisualData() {
