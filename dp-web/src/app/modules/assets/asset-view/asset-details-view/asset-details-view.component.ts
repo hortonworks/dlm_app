@@ -62,7 +62,7 @@ export class AssetDetailsViewComponent implements OnChanges {
       let tag = new AssetTag();
       tag.name = classification.typeName;
       tag.attributes = classification.attributes ? typeof classification.attributes === 'object' ?
-        StringUtils.getFlattenedObjects(classification.attributes) : classification : 'NA';
+        StringUtils.getFlattenedObjects(classification.attributes) : classification.attributes : 'NA';
       assetTags.push(tag);
     });
     return assetTags;
