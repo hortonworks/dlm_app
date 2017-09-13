@@ -10,7 +10,7 @@
 import scala.util.Try
 
 
-package object controllers  {
+package object controllers {
   val NO_CACHE_HEADER=play.api.http.HeaderNames.CACHE_CONTROL->"no-cache, no-store, max-age=0, must-revalidate"
 
   def getModuleDependentServices(skuName: String)(implicit configuration: play.api.Configuration):Option[String] = {
