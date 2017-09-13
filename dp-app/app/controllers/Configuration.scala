@@ -45,7 +45,7 @@ class Configuration @Inject()(@Named("dpClusterService") val dpClusterService:
         "authWasInitialized" -> auth,
         "rbacWasInitialized" -> rbac
       )
-    ).withHeaders(CACHE_CONTROL->"no-cache, no-store, max-age=0, must-revalidate")
+    ).withHeaders(NO_CACHE_HEADER)
   }
 
 
