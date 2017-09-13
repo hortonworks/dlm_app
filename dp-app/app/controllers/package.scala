@@ -10,7 +10,9 @@
 import scala.util.Try
 
 
-package object controllers extends  play.api.http.HeaderNames{
+package object controllers  {
+  val NO_CACHE_HEADER=play.api.http.HeaderNames.CACHE_CONTROL->"no-cache, no-store, max-age=0, must-revalidate"
+
   def getModuleDependentServices(skuName: String)(implicit configuration: play.api.Configuration):Option[String] = {
     val optionalServices = Try(configuration.underlying.getString(s"$skuName.dependent.services.optional")).getOrElse("")
     val mandatoryServices = Try(configuration.underlying.getString(s"$skuName.dependent.services.mandatory")).getOrElse("")
@@ -32,5 +34,5 @@ package object controllers extends  play.api.http.HeaderNames{
     val optionalServices = Try(configuration.underlying.getString(s"$skuName.dependent.services.optional")).getOrElse("")
     Option(optionalServices)
   }
-  def NO_CACHE_HEADER=CACHE_CONTROL->"no-cache, no-store, max-age=0, must-revalidate"
+
 }
