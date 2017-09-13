@@ -51,6 +51,7 @@ public class UserDetailFilter extends ZuulFilter {
         UserContext userContext = (UserContext) userRefObj;
         String userRefJson = objectMapper.writeValueAsString(userContext);
         ctx.setResponseBody(userRefJson);
+        ctx.getResponse().addHeader("Cache-Control","no-cache, no-store, max-age=0, must-revalidate");
         ctx.setResponseStatusCode(200);
         ctx.setSendZuulResponse(false);
         return null;
