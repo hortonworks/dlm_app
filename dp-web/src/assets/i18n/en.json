@@ -167,6 +167,8 @@
         "nodes": "Nodes",
         "uptime": "Uptime",
         "services": "Services",
+        "allServices": "All Services",
+        "less": "Less",
         "hdfsUsed": "HDFS Used",
         "hdfsTotal": "HDFS Total",
         "addButton": "Add Cluster",
@@ -233,7 +235,8 @@
           "Url": "This is not a valid Ambari URL. Please enter a valid Ambari URL.",
           "Ambari": "There was an error fetching information from Ambari.",
           "Network": "There was a network error when connecting to Ambari."
-        }
+        },
+        "rolesOverrideWarning":"This will override any roles the user acquired as part of groups"
       }
     },
     "dataset": {
@@ -252,7 +255,7 @@
         "audits": "Audits"
       },
       "labels": {
-        "confirmDelete": "Confirm delete?",
+        "confirmDelete": "Delete Confirmation",
         "messageDelete": "Are you sure you want to delete asset collection <strong>{{datasetName}}</strong>?",
         "successfullyDeleted": "<strong>{{datasetName}}</strong> was successfully deleted.",
         "newDataset": "Add Asset Collection",
@@ -274,7 +277,8 @@
         "selectOperator": "Select Operator",
         "addAssets": "Add Assets",
         "description": "Description",
-        "belongsTo": "Belongs To"
+        "belongsTo": "Belongs To",
+        "dbName": "Database Name"
       },
       "ds-editor": {
         "ds-description": "Organize your hive assets into logical groups for subsequent usage.",

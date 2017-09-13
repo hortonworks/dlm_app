@@ -41,9 +41,11 @@
   outline: none;
   font-size: 14px;
 }
-.nav-tag-panel .tag-search .fa-search{
-  margin-right: -20px;
-  cursor: pointer;
+.nav-tag-panel .tag-search{
+  .fa-search , .fa-times{
+    margin-right: -20px;
+    cursor: pointer;
+  }
 }
 .nav-tag-panel .tag-list {
   height:100%;

@@ -24,7 +24,7 @@ import { contains } from 'utils/array-util';
 import { POLICY_MODES } from 'constants/policy.constant';
 
 const isRangerActivated = (beaconStatuses: BeaconAdminStatus[], policy: Policy): boolean => {
-  return beaconStatuses.filter(s => contains([policy.targetClusterResource.id, policy.sourceClusterResource.id], s.clusterId)).length === 2;
+  return beaconStatuses.some(s => policy.targetClusterResource.id === s.clusterId);
 };
 
 export const getEntities = createSelector(getPolicies, state => state.entities);

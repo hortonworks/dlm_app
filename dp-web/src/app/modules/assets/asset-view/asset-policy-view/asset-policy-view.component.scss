@@ -20,4 +20,11 @@
 	background-color: $white;
 	border: 1px solid $iron;
 	padding: 10px;
+  table{
+    table-layout: fixed;
+  }
+  tbody tr td.wrap{
+    word-wrap: break-word;
+    white-space: normal;
+  }
 }

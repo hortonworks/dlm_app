@@ -47,10 +47,10 @@
         <p [innerHTML]="'pages.dataset.labels.messageDelete' | translate: ({'datasetName': dsModel?.name})"></p>
       </div>
       <div class="mdl-dialog__actions">
-        <button type="button" class="mdl-button btn-hwx-primary" (click)="doConfirmDelete()">
+        <button type="button" class="mdl-button btn-hwx-warning" (click)="doConfirmDelete()">
           {{'common.confirm' | translate}}
         </button>
-        <button type="button" class="mdl-button close btn-hwx-secondary" (click)="doCancelDelete()">
+        <button type="button" class="mdl-button close btn-hwx-default" (click)="doCancelDelete()">
           {{'common.cancel' | translate}}
         </button>
       </div>
