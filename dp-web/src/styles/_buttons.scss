@@ -55,6 +55,27 @@
   }
 }
 
+.mdl-color--hwx-warning {
+  line-height: 1;
+  font-size: 14px;
+  padding: 9px 20px;
+  border-radius: 2px;
+  background: $burnt-cienna-red;
+  white-space: nowrap;
+  border: 1px solid $burnt-cienna-red;
+
+  &:hover, &:active, &:focus:not(:active) {
+    background: $roman-red;
+    color: $white;
+  }
+
+  &[disabled][disabled] {
+    background: $oslo-gray;
+    color: $text-grey;
+    opacity: $disabled-opacity;
+  }
+}
+
 .mdl-color--hwx-grey {
   line-height: 1;
   font-size: 14px;
@@ -96,6 +117,11 @@
 .btn-hwx-secondary {
   @extend .mdl-color--hwx-white;
   @extend .mdl-color-text--hwx-green;
+}
+
+.btn-hwx-warning {
+  @extend .mdl-color--hwx-warning;
+  @extend .mdl-color-text--hwx-white;
 }
 
 .btn-hwx-default {

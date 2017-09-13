@@ -398,6 +398,9 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
           this.selectedHdfsPath = policyFormValues['directories'];
           this.selectedSource$.next(policyFormValues['general']['sourceCluster']);
           this.activateFieldsForType(policyFormValues['general']['type']);
+          if (Object.keys(policyFormValues['advanced']).some(k => policyFormValues['advanced'][k] !== '')) {
+            this.sectionCollapsedMap.advanced = false;
+          }
         } else if (sourceClusterId > 0) {
           this.policyForm.patchValue({
             general: {

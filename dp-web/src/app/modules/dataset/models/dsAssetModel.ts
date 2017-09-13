@@ -19,4 +19,5 @@ export class DsAssetModel {
   type: string;
   clusterId:number;
   dsName?: string;
+  dbName?: string;
 }
