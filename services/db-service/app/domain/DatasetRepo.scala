@@ -11,16 +11,19 @@
 
 package domain
 
+import java.sql.SQLException
 import java.time.LocalDateTime
 import javax.inject._
 
 import com.hortonworks.dataplane.commons.domain.Atlas.EntityDatasetRelationship
 import com.hortonworks.dataplane.commons.domain.Entities._
+import domain.API.AlreadyExistsError
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.libs.json.JsValue
 import slick.lifted.ColumnOrdered
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class DatasetRepo @Inject()(
@@ -43,11 +46,15 @@ class DatasetRepo @Inject()(
     Datasets.to[List].result
   }
 
-  def insert(dataset: Dataset): Future[Dataset] = {
-    db.run {
-      DatasetsWritable returning DatasetsWritable += dataset
+  def doSafeInsert(dataset: Dataset) = (
+    Datasets.filter(_.name === dataset.name).exists.result.flatMap { exists =>
+      if (!exists) {
+        DatasetsWritable returning DatasetsWritable += dataset
+      } else {
+        DBIO.failed(new AlreadyExistsError()) // no-op
+      }
     }
-  }
+  )
 
   def count(search:Option[String]): Future[Int] = {
     val query = search
@@ -63,8 +70,6 @@ class DatasetRepo @Inject()(
   def archiveById(datasetId: Long): Future[Int] = {
     db.run(Datasets.filter(_.id === datasetId).map(_.active).update(false))
   }
-
-  import scala.concurrent.ExecutionContext.Implicits.global
 
   def findByIdWithCategories(datasetId: Long): Future[Option[DatasetAndCategories]] = {
     val datasetQuery = Datasets.filter(_.id === datasetId)
@@ -95,7 +100,7 @@ class DatasetRepo @Inject()(
         val catNames = existingCategories.map(_.name)
         categoryRepo.Categories ++= tags.filter(t => !catNames.contains(t)).map(t => Category(None, t, t))
       }
-      savedDataset <- DatasetsWritable returning DatasetsWritable += datasetCreateRequest.dataset
+      savedDataset <- doSafeInsert(datasetCreateRequest.dataset)
       categories <- categoryRepo.Categories.filter(_.name.inSet(tags)).to[List].result
       _ <- datasetCategoryRepo.DatasetCategories ++= categories.map(c => DatasetCategory(c.id.get, savedDataset.id.get))
       _ <- dataAssetRepo.DatasetAssets ++= datasetCreateRequest.dataAssets.map(a => a.copy(datasetId = Some(savedDataset.id.get)))
@@ -206,7 +211,7 @@ class DatasetRepo @Inject()(
 
   def insertWithCategories(datasetReq: DatasetAndCategoryIds): Future[DatasetAndCategories] = {
     val query = (for {
-      dataset <- DatasetsWritable returning DatasetsWritable += datasetReq.dataset
+      dataset <- doSafeInsert(datasetReq.dataset)
       _ <- datasetCategoryRepo.DatasetCategories ++= datasetReq.categories.map(catId => DatasetCategory(catId, dataset.id.get))
       categories <- categoryRepo.Categories.filter(_.id.inSet(datasetReq.categories)).result
     } yield (DatasetAndCategories(dataset, categories))).transactionally

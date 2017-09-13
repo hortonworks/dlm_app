@@ -135,6 +135,7 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 => Right((res.json \ "results" \ "data").validate[DatasetAndCategories].get)
       case 404 => Left(Errors(Seq(Error("404", "Resource not found"))))
+      case 409 => Left(Errors(Seq(Error("409", "Conflict"))))
       case _ => mapErrors(res)
     }
   }
