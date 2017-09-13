@@ -256,7 +256,7 @@
       },
       "labels": {
         "confirmDelete": "Delete Confirmation",
-        "messageDelete": "Are you sure you want to delete dataset <strong>{{datasetName}}</strong>?",
+        "messageDelete": "Are you sure you want to delete asset collection <strong>{{datasetName}}</strong>?",
         "successfullyDeleted": "<strong>{{datasetName}}</strong> was successfully deleted.",
         "newDataset": "Add Asset Collection",
         "addFavourites": "Add to Favourites",
