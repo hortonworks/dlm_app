@@ -145,7 +145,6 @@ export class AssetColumnVisualComponent implements OnInit{
         .x(function(d) { return d.key })
 			  .y(function(d) { return d.y })
         .donutLabelsOutside(true)
-        .labelSunbeamLayout(true)
         .showTooltipPercent(true)
         .color(_this.dataVisualizationColors);
 			d3.select("#chart1 svg")
