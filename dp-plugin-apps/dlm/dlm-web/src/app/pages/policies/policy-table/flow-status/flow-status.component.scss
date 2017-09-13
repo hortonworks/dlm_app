@@ -23,6 +23,9 @@ $hex-size: 20px;
     align-items: center;
     flex-grow: 1;
     width: 90%;
+    // magic number. this makes right side hexagon shifts to left so text beyond
+    // will look aligned to center
+    padding-right: 10px;
 
     .flow-line {
       flex-grow: 1;
@@ -55,10 +58,15 @@ $hex-size: 20px;
       }
       &:not(.active) {
         @include hexagon($hex-size, transparent, 1px solid $light-grey);
-        color: $grey-color;
+        color: $link-color;
         width: 21px; // hacky but fix hexagon with border
       }
     }
+  }
+
+  .flow-desired-state {
+    // this makes text looks better
+    text-indent: 1px;
   }
 
   .flow-status-text {

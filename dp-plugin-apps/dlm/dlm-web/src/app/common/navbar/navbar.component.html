@@ -14,13 +14,13 @@
       <ul class="side-nav-header nav nav-pills nav-stacked">
         <li class="navigation-header">
           <div #personaNavSrc class="row nav-header-container">
-            <div id="header_icon" class="col-sm-3">
+            <div id="header_icon" class="col-xs-3">
               <a *ngIf="header.iconHtml != ''" class="ambari-logo">
                 <span [innerHTML]="header.iconHtml"></span>
                 <span *ngIf="isCollapsed" class="toggle-small-icon fa fa-chevron-down"></span>
               </a>
             </div>
-            <div id="header_content" class="col-sm-9">
+            <div id="header_content" class="col-xs-9">
               <div class="btn-group">
                 <div aria-haspopup="true" aria-expanded="false">
                   <span class="ambari-header" style="font-size: 15px; padding: 0">{{header.label}}</span>

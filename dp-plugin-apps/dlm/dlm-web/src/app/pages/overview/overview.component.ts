@@ -7,22 +7,18 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, OnInit, OnDestroy, ViewEncapsulation, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable, Subscription, BehaviorSubject } from 'rxjs/Rx';
 import * as moment from 'moment';
-
 import * as fromRoot from 'reducers/';
 import { Event } from 'models/event.model';
-import { JOB_EVENT, POLICY_EVENT } from 'constants/event.constant';
+import { JOB_EVENT } from 'constants/event.constant';
 import { loadEvents } from 'actions/event.action';
 import { ProgressState } from 'models/progress-state.model';
 import { updateProgressState } from 'actions/progress.action';
-import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
-import { getAllJobs } from 'selectors/job.selector';
+import { JOB_STATUS } from 'constants/status.constant';
 import {
   getPolicyClusterJob, getUnhealthyPolicies, getAllPoliciesWithClusters, getCountPoliciesForSourceClusters
 } from 'selectors/policy.selector';
@@ -35,9 +31,7 @@ import { POLICY_TYPES_LABELS } from 'constants/policy.constant';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
 import { Policy } from 'models/policy.model';
 import { Cluster } from 'models/cluster.model';
-import { Job } from 'models/job.model';
 import { ClustersStatus, PoliciesStatus, JobsStatus } from 'models/aggregations.model';
-import { filterCollection, flatten, unique } from 'utils/array-util';
 import { isEqual, isEmpty } from 'utils/object-utils';
 import { getEventEntityName } from 'utils/event-utils';
 import { POLL_INTERVAL, ALL_POLICIES_COUNT } from 'constants/api.constant';
@@ -60,11 +54,11 @@ const JOBS_REQUEST = 'JOBS_REQUEST';
 @Component({
   selector: 'dlm-overview',
   templateUrl: './overview.component.html',
-  styleUrls: ['./overview.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./overview.component.scss']
 })
 export class OverviewComponent implements OnInit, OnDestroy {
   CLUSTER_STATUS = CLUSTER_STATUS;
+  JOBS_HEALTH_STATE = JOBS_HEALTH_STATE;
   mapSizeSettings: MapSizeSettings = {
     width: '100%',
     height: '300px',
@@ -96,6 +90,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   clustersMapData$: Observable<ClusterMapData[]>;
   selectedCluster$ = new BehaviorSubject<null|Cluster>(null);
   clusterLegend$: Observable<any>;
+  @ViewChild('jobs_overview_table') jobsOverviewTable: ElementRef;
 
   jobStatusFilter$ = new BehaviorSubject('');
   areJobsLoaded = false;
@@ -172,6 +167,26 @@ export class OverviewComponent implements OnInit, OnDestroy {
     return !job.endTime ? true : new Date(job.endTime).getTime() > timestamp;
   }
 
+  /**
+   * Returns true if jobs "in progress" filter is applied
+   * @returns {boolean}
+   */
+  isInProgressFilterApplied(): boolean {
+    return this.jobStatusFilter$.getValue() === JOBS_HEALTH_STATE.IN_PROGRESS;
+  }
+
+  /**
+   * Returns true if any "failed" jobs filter is applied
+   * @returns {boolean}
+   */
+  isFailedFilterApplied(): boolean {
+    const failedFilterValues = [
+      JOBS_HEALTH_STATE.LAST_10_FAILED,
+      JOBS_HEALTH_STATE.LAST_FAILED
+    ];
+    return failedFilterValues.indexOf(this.jobStatusFilter$.getValue()) > -1;
+  }
+
   private initPolling() {
     const polling$ = Observable.interval(POLL_INTERVAL)
       .withLatestFrom(this.fullfilledClusters$)
@@ -199,6 +214,15 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
   private applyJobFilter(healthStatus) {
     this.jobStatusFilter$.next(healthStatus);
+    // Repeat fade in and fade out multiple times to achieve pulsating effect
+    const fadeAnimate = () => {
+      const $el = $($('.filter-tag')[0]);
+      for (let i = 0; i < 3; i++) {
+        $el.fadeTo(500, 0.5).fadeTo(500, 1.0);
+      }
+    };
+    // Scroll to the applied filter tags
+    $('body').animate({scrollTop: $(this.jobsOverviewTable.nativeElement).offset().top}, 700, fadeAnimate);
   }
 
   private completedRequest$(progress$: Observable<ProgressState>): Observable<boolean> {
@@ -227,7 +251,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
       const policiesCounter = cluster.id in policiesCount &&
         'policies' in policiesCount[cluster.id] ? policiesCount[cluster.id].policies : 0;
       // prioritize UNHEALTHY status over WARNING when display cluster dot marker
-      const healthStatus = lowCapacityClusters.some(c => c.id === cluster.id) && cluster.healthStatus !== CLUSTER_STATUS.UNHEALTHY ?
+      const healthStatus = lowCapacityClusters.some(c => c.id === cluster.id) && cluster.healthStatus === CLUSTER_STATUS.HEALTHY ?
         CLUSTER_STATUS.WARNING : cluster.healthStatus;
       const clusterData = {
         ...cluster,

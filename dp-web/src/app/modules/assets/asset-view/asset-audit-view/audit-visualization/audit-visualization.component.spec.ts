@@ -1,4 +1,4 @@
-/*
+/*!
  *
  *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
  *  *
@@ -8,29 +8,28 @@
  *  * of all or any part of the contents of this software is strictly prohibited.
  *
  */
-
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DashboardComponent } from './dashboard.component';
+import { AuditVisualizationComponent } from './audit-visualization.component';
 
-describe('DashboardComponent', () => {
-  let component: DashboardComponent;
-  let fixture: ComponentFixture<DashboardComponent>;
+describe('AuditVisualizationComponent', () => {
+  let component: AuditVisualizationComponent;
+  let fixture: ComponentFixture<AuditVisualizationComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ DashboardComponent ]
+      declarations: [ AuditVisualizationComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DashboardComponent);
+    fixture = TestBed.createComponent(AuditVisualizationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should be created', () => {
     expect(component).toBeTruthy();
   });
 });

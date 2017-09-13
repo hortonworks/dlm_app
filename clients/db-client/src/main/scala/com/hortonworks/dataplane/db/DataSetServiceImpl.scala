@@ -103,11 +103,11 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToDataSetAndCategories)
   }
 
-  override def delete(datasetId: String): Future[Either[Errors, Dataset]] = {
+  override def delete(datasetId: String): Future[Either[Errors, Long]] = {
     ws.url(s"$url/datasets/$datasetId")
       .withHeaders("Accept" -> "application/json")
       .delete()
-      .map(mapToDataSet)
+      .map(mapToLong)
   }
 
   private def mapToDataSets(res: WSResponse) = {
@@ -120,6 +120,13 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToDataSet(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "result" \\ "data") (0).validate[Dataset].get)
+      case _ => mapErrors(res)
+    }
+  }
+
+  private def mapToLong(res: WSResponse) = {
+    res.status match {
+      case 200 => Right((res.json \ "results").validate[Long].get)
       case _ => mapErrors(res)
     }
   }

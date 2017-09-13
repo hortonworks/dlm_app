@@ -322,7 +322,7 @@ class LdapService @Inject()(
       case e: CommunicationException=>{
         logger.error("error while getting ldapContext",e)
         Future.successful(
-          Left(Errors(Seq(Error("Communication Exception", "Could not communicate with LDAP server.Check connectivity.")))))
+          Left(Errors(Seq(Error("Communication Exception", "Could not communicate with LDAP server. Check connectivity.")))))
       }
       case e: AuthenticationException=>{
         logger.error("error while getting ldapContext",e)

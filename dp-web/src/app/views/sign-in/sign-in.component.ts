@@ -17,6 +17,7 @@ import {Subject} from 'rxjs/Rx';
 import {Credential} from '../../models/credential';
 import {AuthenticationService} from '../../services/authentication.service';
 import {ConfigurationService} from '../../services/configuration.service';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'dp-sign-in',
@@ -28,21 +29,22 @@ export class SignInComponent implements OnInit {
   _isAuthInProgress = false;
   _isAuthSuccessful = false;
   message = '';
-  landingPage:String;
+  landingPage: String;
 
-  credential:Credential = new Credential('', '');
-  authenticate:Subject<Credential>;
+  credential: Credential = new Credential('', '');
+  authenticate: Subject<Credential>;
 
-  constructor(private authenticaionService:AuthenticationService,
-              private router:Router,
-              private configService:ConfigurationService) {
+  constructor(private authenticaionService: AuthenticationService,
+              private router: Router,
+              private configService: ConfigurationService,
+              private translateService: TranslateService) {
     if (window.location.hash.length > 0 && window.location.hash === '#SESSEXPIRED') {
       this.message = 'SESSIONEXPIRED';
     }
   }
 
   ngOnInit() {
-    let currentLocation = window.location.href.split("/");
+    let currentLocation = window.location.href.split('/');
     this.landingPage = `${currentLocation[0]}//${currentLocation[2]}`;
   }
 
@@ -58,8 +60,12 @@ export class SignInComponent implements OnInit {
         this.router.navigate(['']);
       }),
       error => {
+        if (error.status === 401) {
+          this.message = this.translateService.instant("pages.signin.description.invalidCredentials");
+        }else{
+          this.message = this.translateService.instant("pages.signin.description.systemError");
+        }
         this._isAuthSuccessful = false;
-        this.message = 'Credentials were incorrect. Please try again.';
       }
     );
   }

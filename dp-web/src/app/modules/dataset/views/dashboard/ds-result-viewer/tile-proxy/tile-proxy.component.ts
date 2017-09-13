@@ -9,7 +9,7 @@
  *
  */
 
-import {Component, Input} from "@angular/core";
+import {Component, Input, Output, EventEmitter} from "@angular/core";
 import {Router} from "@angular/router";
 import {RichDatasetModel} from "../../../../models/richDatasetModel";
 
@@ -22,6 +22,7 @@ import {RichDatasetModel} from "../../../../models/richDatasetModel";
 export class DsTileProxy {
 
   @Input() dsModel: RichDatasetModel;
+  @Output() onDeleteDataset: EventEmitter<number> = new EventEmitter();
 
   constructor(private router: Router) {
   }
@@ -34,5 +35,13 @@ export class DsTileProxy {
     if ($event.target.tagName != "I") {
       this.router.navigate([`datasteward/dataset/full-view/${this.dsModel.id}`]);
     }
+  }
+
+  preventEvent($event) {
+    $event.stopPropagation();
+  }
+
+  deleteDataset(datasetId: number) {
+    this.onDeleteDataset.emit(datasetId);
   }
 }

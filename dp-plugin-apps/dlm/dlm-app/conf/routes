@@ -37,6 +37,9 @@ GET     /api/events                                               controllers.Ev
 #Logs
 GET     /api/clusters/:clusterId/logs                             controllers.Logs.retrieve(clusterId: Long)
 
+#Admin
+GET    /api/beacon/admin/status                                    controllers.Admin.listStatus
+
 #HdfsFiles
 GET     /api/clusters/:clusterId/webhdfs/file                     controllers.HdfsFiles.retrieve(clusterId: Long)
 

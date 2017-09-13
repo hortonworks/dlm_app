@@ -8,6 +8,7 @@
  */
 
 import { Component, OnInit, Input } from '@angular/core';
+import { CLUSTER_STATUS } from 'constants/status.constant';
 
 @Component({
   selector: 'dlm-cluster-legend',
@@ -18,11 +19,15 @@ import { Component, OnInit, Input } from '@angular/core';
       <div class="clearfix"></div>
     </div>
     <div class="map-legend-body">
-      <dl *ngIf="cluster?.alerts?.length">
+      <dl *ngIf="shouldShowAlertsSection">
         <dt>{{'page.overview.world_map.cluster_legend.alerts' | translate}}</dt>
         <dd *ngFor="let alert of cluster?.alerts">
           <i class="fa fa-exclamation-triangle text-danger"></i>
           {{alert.service_name}}
+        </dd>
+        <dd *ngIf="isAmbariServerStopped">
+          <i class="fa fa-exclamation-triangle text-danger"></i>
+          {{'common.services.ambari_server' | translate}}
         </dd>
       </dl>
       <dl class="fix-alerts">
@@ -44,6 +49,15 @@ import { Component, OnInit, Input } from '@angular/core';
 export class ClusterLegendComponent implements OnInit {
 
   @Input() cluster: any;
+
+  get shouldShowAlertsSection(): boolean {
+    return this.cluster && (this.cluster.alerts && this.cluster.alerts.length
+     || this.cluster.healthStatus === CLUSTER_STATUS.UNKNOWN);
+  }
+
+  get isAmbariServerStopped(): boolean {
+    return this.cluster && this.cluster.healthStatus === CLUSTER_STATUS.UNKNOWN;
+  }
 
   constructor() { }
 

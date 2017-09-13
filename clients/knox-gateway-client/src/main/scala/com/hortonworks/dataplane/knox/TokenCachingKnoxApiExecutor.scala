@@ -30,7 +30,12 @@ class TokenCachingKnoxApiExecutor(c: KnoxConfig, w: WSClient) extends KnoxApiExe
   override val config: KnoxConfig = c
   val tokenUrl = config.tokenUrl
   private val expiry = 600
-  val tokenCache = CacheBuilder.newBuilder().expireAfterWrite(expiry,TimeUnit.SECONDS).build(new TokenCacheLoader())
+
+  private lazy val evictOnFailure: String => Unit = { key: String =>
+    logger.error(s"evicting K -> $key,V -> ${tokenCache.get(key)}")
+    tokenCache.invalidate(key)
+  }
+  val tokenCache = CacheBuilder.newBuilder().expireAfterWrite(expiry,TimeUnit.SECONDS).build(new TokenCacheLoader(evictOnFailure))
 
 
   def getKnoxApiToken(token: String):Future[TokenResponse] = {
@@ -73,7 +78,7 @@ class TokenCachingKnoxApiExecutor(c: KnoxConfig, w: WSClient) extends KnoxApiExe
     } yield response
   }
 
-  class TokenCacheLoader extends CacheLoader[String,Future[TokenResponse]]{
+  class TokenCacheLoader(evict:String => Unit) extends CacheLoader[String,Future[TokenResponse]]{
     override def load(token: String): Future[TokenResponse] = {
       logger.info("Cache will load token from Knox")
       val response = wSClient
@@ -85,10 +90,18 @@ class TokenCachingKnoxApiExecutor(c: KnoxConfig, w: WSClient) extends KnoxApiExe
         }
 
        // make sure the result is available
-       for {
+       val result = for {
          res <- response
          tokenResult <- Future.successful(res)
        } yield tokenResult
+
+      result.onFailure {
+        case e:Throwable =>
+          logger.error("Cannot load knox URL", e)
+          evict(token)
+      }
+
+      result
     }
   }
 

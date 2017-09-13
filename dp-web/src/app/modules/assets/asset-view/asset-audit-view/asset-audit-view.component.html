@@ -8,7 +8,9 @@
   ~  * of all or any part of the contents of this software is strictly prohibited.
   ~  */
   -->
-
+<div *ngIf="showMockVisualization">
+  <dp-audit-visualization></dp-audit-visualization>
+</div>
 <div *ngIf="state==AWS.NOINFO" class="infoNotAvailable">Audit information is not available</div>
 <div *ngIf="state==AWS.LOADING" class="loading">Loading ...</div>
 <div *ngIf="state==AWS.LOADED" class='filterCont'>
@@ -27,6 +29,7 @@
         <th class="mdl-data-table__cell--non-numeric">Policy ID</th>
         <th class="mdl-data-table__cell--non-numeric">Event Time</th>
         <th class="mdl-data-table__cell--non-numeric">User</th>
+        <th class="mdl-data-table__cell--non-numeric">Resource Type</th>
         <th class="mdl-data-table__cell--non-numeric">Access Type</th>
         <th class="mdl-data-table__cell--non-numeric">Result</th>
         <th class="mdl-data-table__cell--non-numeric">Access Enforcer</th>
@@ -38,6 +41,7 @@
         <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{audit.policyId}}</td>
         <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{audit.eventTime}}</td>
         <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{audit.requestUser}}</td>
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{audit.resourceType}}</td>
         <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{audit.accessType}}</td>
         <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{audit.accessResult}}</td>
         <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{audit.aclEnforcer}}</td>

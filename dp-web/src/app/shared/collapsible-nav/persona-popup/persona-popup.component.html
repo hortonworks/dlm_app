@@ -9,8 +9,8 @@
   ~  */
   -->
 
-<ul #personaNav class="suit-navigation" [ngClass]="{'showPopup': showPopup}" *ngIf="personas.length > 1">
-  <li *ngFor="let persona of personas; let i = index" (click)="navigateToPersona(persona)" [ngClass]="{'disabled':!persona.enabled}">
+<ul id="personaNav" #personaNav class="suit-navigation" [ngClass]="{'showPopup': showPopup}" *ngIf="personas.length > 1">
+  <li *ngFor="let persona of personas; let i = index" (click)="navigateToPersona(persona)" [attr.id]="'persona_'+i" [ngClass]="{'disabled':!persona.enabled}">
     <ng-container *ngIf="persona.enabled">
       <div class="logo-wrapper borderBox" title="{{ persona.name }}">
         <img [attr.src]="'../../../assets/images/' + persona.imageName" alt=""/>

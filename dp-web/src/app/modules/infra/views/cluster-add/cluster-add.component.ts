@@ -70,6 +70,7 @@ export class ClusterAddComponent implements OnInit {
   showError = false;
   errorMessage = '';
   isInvalidAmbariUrl = false;
+  isServiceHidden=true;
 
   constructor(private router: Router,
               private route: ActivatedRoute,
@@ -116,8 +117,19 @@ export class ClusterAddComponent implements OnInit {
     this.showError = false;
   }
 
+  resetPage(){
+    this.showError = false;
+    this.isInvalidAmbariUrl = false;
+    this.showNotification = false;
+    this._isClusterValidateInProgress = false;
+    this._isClusterValidateSuccessful = false;
+    this.clusterForm.reset();
+    this.cluster = new Cluster();
+  }
+
   getClusterInfo(event) {
     this.showError = false;
+    this.isServiceHidden=true;
     this.isInvalidAmbariUrl = false;
     this.showNotification = false;
     this._isClusterValidateInProgress = true;
@@ -267,8 +279,10 @@ export class ClusterAddComponent implements OnInit {
 
   onSelectLocation(location: Location) {
     this.mapData = [];
-    let point = new Point(location.latitude, location.longitude, MapConnectionStatus.UP);
-    this.mapData = [new MapData(point)];
+    if(location && location.id) {
+      let point = new Point(location.latitude, location.longitude, MapConnectionStatus.UP);
+      this.mapData = [new MapData(point)];
+    }
     this.cluster.location = location;
   }
 

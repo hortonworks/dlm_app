@@ -13,11 +13,16 @@
   <div class="list">
     <div *ngIf="!datasetModels">{{"common.loading" | translate}}...</div>
     <div *ngIf="datasetModels && view === views.grid">
-      <ds-tile-proxy *ngFor="let dsMdl of datasetModels" [dsModel]="dsMdl"></ds-tile-proxy>
+      <ds-tile-proxy
+        *ngFor="let dsMdl of datasetModels"
+        [dsModel]="dsMdl"
+        (onDeleteDataset)="onDeleteDataset($event)"></ds-tile-proxy>
       <div style="clear:both"></div>
     </div>
     <div *ngIf="datasetModels && view === views.list">
-      <ds-row-proxy [datasetModels]="datasetModels"></ds-row-proxy>
+      <ds-row-proxy
+        [datasetModels]="datasetModels"
+        (onDeleteDataset)="onDeleteDataset($event)"></ds-row-proxy>
     </div>
   </div>
   <simple-pagination *ngIf="datasetModels"
@@ -27,5 +32,28 @@
                      (onPageSizeChange)="onSizeChange($event)"
                      (onPageChange)="onPageChange($event)"
   ></simple-pagination>
+
+  <dialog #dialogConfirm class="mdl-dialog dataset-delete-dialog" [hidden]="!_datasetToDelete">
+      <h4 class="mdl-dialog__title hwx-subtitle">{{'pages.dataset.labels.confirmDelete' | translate}}</h4>
+      <div class="mdl-dialog__content" *ngIf="!!_deleteWasSuccessful">
+        <p [innerHTML]="'pages.dataset.labels.successfullyDeleted' | translate: ({'datasetName': _datasetToDelete?.name})"></p>
+      </div>
+      <div class="mdl-dialog__content" *ngIf="!_deleteWasSuccessful">
+        <p [innerHTML]="'pages.dataset.labels.messageDelete' | translate: ({'datasetName': _datasetToDelete?.name})"></p>
+      </div>
+      <div class="mdl-dialog__actions" *ngIf="!_deleteWasSuccessful">
+        <button type="button" class="mdl-button btn-hwx-warning" (click)="doConfirmDelete()">
+          {{'common.confirm' | translate}}
+        </button>
+        <button type="button" class="mdl-button close btn-hwx-default" (click)="doCancelDelete()">
+            {{'common.cancel' | translate}}
+        </button>
+      </div>
+      <div class="mdl-dialog__actions" *ngIf="!!_deleteWasSuccessful">
+        <button type="button" class="mdl-button close btn-hwx-secondary" (click)="doCancelDelete()">
+            {{'common.close' | translate}}
+        </button>
+      </div>
+    </dialog>
 </div>
 

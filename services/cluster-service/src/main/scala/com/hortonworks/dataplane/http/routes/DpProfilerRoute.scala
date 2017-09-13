@@ -12,6 +12,7 @@
 package com.hortonworks.dataplane.http.routes
 
 import java.net.URL
+import java.time.Instant
 import javax.inject.{Inject, Singleton}
 
 import akka.http.scaladsl.model.StatusCodes
@@ -54,6 +55,29 @@ class DpProfilerRoute @Inject()(
       }
     }
 
+  val startAndScheduleJob =
+    path("cluster" / LongNumber / "dp-profiler" / "start-schedule-job") { clusterId =>
+      extractRequest { request =>
+        post {
+          entity(as[JsObject]) { js =>
+            var list = (js \ "list").as[Seq[String]]
+            var jobName = (js \ "jobName").as[String]
+            onComplete(postAndScheduleJob(clusterId, jobName, list)) {
+              case Success(res) => res.status match {
+                case 200 => complete(success(res.json))
+                case 404 => complete(StatusCodes.NotFound, notFound)
+                case _ => complete(res.status)
+              }
+              case Failure(th) => th match {
+                case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
+                case _ => complete(StatusCodes.InternalServerError, errors(th))
+              }
+            }
+          }
+        }
+      }
+    }
+
   val jobStatus =
     path ("cluster" / LongNumber / "dp-profiler" / "job-status" / Segment / Segment) { (clusterId, dbName, tableName) =>
       get {
@@ -70,17 +94,113 @@ class DpProfilerRoute @Inject()(
       }
     }
 
-  private def getJobStatus(clusterId: Long, dbName: String, tableName: String): Future[WSResponse] = {
+  val scheduleInfo =
+    path ("cluster" / LongNumber / "dp-profiler" / "schedule-info" / Segment) { (clusterId, taskName) =>
+      get {
+        onComplete(getScheduleInfo(clusterId, taskName)) {
+          case Success(res) => res.status match {
+            case 200 => complete(success(res.json.as[Seq[JsObject]].headOption)) //TODO fix it once gaurav fixes profiler response
+            case 404 => complete(StatusCodes.NotFound, notFound)
+            case _ => complete(res.status)
+          }
+          case Failure(th) => th match {
+            case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
+            case _ => complete(StatusCodes.InternalServerError, errors(th))
+          }
+        }
+      }
+    }
 
+  val jobDelete =
+    path ("cluster" / LongNumber / "dp-profiler" / "profilers") { clusterId: Long =>
+      delete {
+        parameters('jobName.as[String]) { jobName =>
+          onComplete(deleteProfilerByJobName(clusterId, jobName)) {
+            case Success(res) => res.status match {
+              case 200 => complete(success(res.json))
+              case 404 => complete(StatusCodes.NotFound, notFound)
+              case _ => complete(StatusCodes.InternalServerError, badRequest)
+            }
+            case Failure(th) => th match {
+              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
+              case _ => complete(StatusCodes.InternalServerError, errors(th))
+            }
+          }
+        }
+      }
+    }
+
+    private def deleteProfilerByJobName(clusterId: Long, jobName: String): Future[WSResponse] = {
+
+      for {
+        config <- getConfigOrThrowException(clusterId)
+        url <- getUrlFromConfig(config)
+        baseUrls <- extractUrlsWithIp(url, clusterId)
+        urlToHit <- Future.successful(s"${baseUrls.head}/schedules/$jobName")
+        response <- ws.url(urlToHit)
+          .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+          .delete()
+      } yield {
+        response
+      }
+    }
+
+    private def getScheduleInfo(clusterId: Long, taskName: String): Future[WSResponse] = {
+
+      for {
+        config <- getConfigOrThrowException(clusterId)
+        url <- getUrlFromConfig(config)
+        baseUrls <- extractUrlsWithIp(url, clusterId)
+        urlToHit <- Future.successful(s"${baseUrls.head}/schedules/$taskName")
+        response <- ws.url(urlToHit)
+          .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+          .get()
+      } yield {
+        response
+      }
+    }
+
+    private def getJobStatus(clusterId: Long, dbName: String, tableName: String): Future[WSResponse] = {
+
+      for {
+        config <- getConfigOrThrowException(clusterId)
+        url <- getUrlFromConfig(config)
+        baseUrls <- extractUrlsWithIp(url, clusterId)
+        urlToHit <- Future.successful(s"${baseUrls.head}/jobs/assetjob?assetId=$dbName.$tableName&profilerName=hivecolumn")
+        response <- ws.url(urlToHit)
+          .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+          .get()
+      } yield {
+        response
+      }
+    }
+
+  private def postAndScheduleJob(clusterId: Long, jobName: String, list: Seq[String]): Future[WSResponse] = {
+    val postData = Json.obj(
+      "profilerName" -> "hivecolumn", //"hivecolumnlive4",
+      "conf" -> Json.obj(),
+      "assets" -> list.map{ itm =>{
+        var itmAr = itm.split('.')
+        Json.obj(
+          "id" -> itm,
+          "assetType"  ->  "Hive",
+          "data" -> Json.obj(
+            "db" -> itmAr.head,
+            "table" -> itmAr.last
+          )
+        )
+      }}
+    )
     for {
       config <- getConfigOrThrowException(clusterId)
       url <- getUrlFromConfig(config)
       baseUrls <- extractUrlsWithIp(url, clusterId)
-      urlToHit <- Future.successful(s"${baseUrls.head}/jobs/assetjob?assetId=$dbName.$tableName&profilerName=hivecolumn")
+      urlToHit <- Future.successful(s"${baseUrls.head}/schedules")
       tmp <- Future.successful(println(urlToHit))
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
-        .get()
+        .post(Json.obj("name" -> jobName, "cronExpr" -> s"0 ${(2+(Instant.now.getEpochSecond/60)%60)%60} * * * ?", "jobTask"->postData))
+      // Add 2 to current the minute(UTC) to make sure profiling starts within 2 minutes from now.
     } yield {
       response
     }

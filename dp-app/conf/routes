@@ -74,9 +74,13 @@ GET           /api/query-attributes                                  controllers
 GET           /api/dataset-tag/list                                  controllers.DataSets.listCategoriesCount(search:Option[String])
 GET           /api/dataset-tag/:tagName                              controllers.DataSets.getCategoryCount(tagName:String)
 
+GET           /api/assets/auditMockStatus                            controllers.QueryAttributes.checkAuditMockStatus()
 GET           /api/assets/details/:clusterId/:atlasGuid              controllers.QueryAttributes.getAssetDetails(clusterId: String, atlasGuid: String)
 GET           /api/assets/typeDefs/:clusterId/:defType               controllers.QueryAttributes.getTypeDefs(clusterId: String, defType: String)
 GET           /api/assets/lineage/:clusterId/:atlasGuid              controllers.QueryAttributes.getLineage(clusterId: String, atlasGuid: String)
+
+#Asset
+GET           /api/assets/byguid/:guid                                controllers.Asset.getByGuid(guid: String)
 
 #Ranger
 GET           /api/ranger/audit/:clusterId/:dbName/:tableName        controllers.RangerAttributes.getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String ?= "0", limit:String ?= "20", accessType:String ?="", accessResult:String ?="")
@@ -85,7 +89,7 @@ GET           /api/ranger/policy/:clusterId/:dbName/:tableName        controller
 #DpProfiler
 POST          /api/dpProfiler/startJob                                controllers.DpProfilerAttributes.startProfilerJob(clusterId: String, dbName: String, tableName: String)
 GET           /api/dpProfiler/jobStatus                               controllers.DpProfilerAttributes.getProfilerJobStatus(clusterId: String, dbName: String, tableName: String)
-
+GET           /api/dpProfiler/scheduleStatus                          controllers.DpProfilerAttributes.getScheduleStatus(clusterId: String, dataSetId: String)
 
 #LDAP
 POST          /api/knox/validate                                     controllers.KnoxConfig.validate

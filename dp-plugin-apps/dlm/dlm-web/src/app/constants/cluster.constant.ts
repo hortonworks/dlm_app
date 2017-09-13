@@ -8,5 +8,6 @@
  */
 
 export const SERVICES = {
-  BEACON: 'BEACON'
+  BEACON: 'BEACON',
+  RANGER: 'RANGER'
 };

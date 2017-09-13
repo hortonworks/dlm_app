@@ -91,8 +91,8 @@ build_dp_web() {
 	log "Building dp-web"
 	pushd ../dp-web
 	if [ ${IS_JENKINS} == false ]; then
-		npm install
-		npm run build
+		yarn install
+		yarn run build
 	else
 		echo "Not running dp-web NPM again"
 	fi

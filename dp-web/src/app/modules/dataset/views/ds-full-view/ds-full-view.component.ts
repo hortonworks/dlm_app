@@ -9,10 +9,12 @@
  *
  */
 
-import {Component, OnInit} from "@angular/core";
+import {Component, OnInit, ViewChild,ElementRef} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
+import * as DialogPolyfill from 'dialog-polyfill';
 import {RichDatasetModel} from "../../models/richDatasetModel";
 import {RichDatasetService} from "../../services/RichDatasetService";
+import {DataSetService} from "../../../../services/dataset.service";
 import {
   AssetListActionsEnum,
   AssetSetQueryFilterModel,
@@ -26,11 +28,13 @@ import {
 })
 export class DsFullView implements OnInit {
 
+  @ViewChild('dialogConfirm') dialogConfirm: ElementRef;
   dsModel: RichDatasetModel = null;
   applicableListActions: AssetListActionsEnum[] = [];//[AssetListActionsEnum.EDIT];
   dsAssetQueryModel: AssetSetQueryModel;
 
   constructor(private richDatasetService: RichDatasetService,
+              private dataSetService: DataSetService,
               private router: Router,
               private activeRoute: ActivatedRoute) {
   }
@@ -49,6 +53,25 @@ export class DsFullView implements OnInit {
 
   private onEdit(action: AssetListActionsEnum) {
     this.router.navigate([`datasteward/dataset/edit/${this.dsModel.id}`]);
+  }
+
+  onDeleteDataset() {
+    DialogPolyfill.registerDialog(this.dialogConfirm.nativeElement);
+    this.dialogConfirm.nativeElement.showModal();
+  }
+
+  doConfirmDelete() {
+    const delete$ = this.dataSetService.delete(this.dsModel.id).share();
+    delete$
+      .subscribe(() => {
+        this.dialogConfirm.nativeElement.close();
+
+        this.router.navigate([`datasteward/dataset`]);
+      });
+  }
+
+  doCancelDelete() {
+    this.dialogConfirm.nativeElement.close();
   }
 
 }

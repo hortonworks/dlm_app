@@ -75,7 +75,7 @@ object TopologyGenerator {
       }
       case None => ""
     }
-    val whitelistRegex="^https?:\\/\\/("+whiteListDomains+"dataplane|localhost|127.0.0.1|0:0:0:0:0:0:0:1|::1)(:[0-9])*.*$"
+    val whitelistRegex="^https?:\\/\\/("+whiteListDomains+"localhost|127.0.0.1|0:0:0:0:0:0:0:1|::1)(:[0-9])*.*$"
     replaceParamValue(ssoServiceParams.get("knoxsso.redirect.whitelist.regex").get,
       whitelistRegex)
     val transformerFactory = TransformerFactory.newInstance

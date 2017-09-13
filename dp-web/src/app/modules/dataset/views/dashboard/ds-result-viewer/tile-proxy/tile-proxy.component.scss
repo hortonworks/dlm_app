@@ -63,12 +63,15 @@
   border-top:1px solid $iron;
   background-color: $alabaster;
   color: $dove-gray;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .tileProxy .footer .division {
   width:49%;
   height:100%;
-  float: left;
   display:table;
 }
 
@@ -81,4 +84,8 @@
 
 .tileProxy .footer .border-left {
   border-left:1px solid $iron;
+}
+
+.dataset-item__action {
+  padding: 5px;
 }

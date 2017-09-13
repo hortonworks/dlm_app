@@ -26,6 +26,7 @@ import * as fromOperation from './operation.reducer';
 import * as fromHdfs from './hdfs.reducer';
 import * as fromHive from './hive.reducer';
 import * as fromLog from './log.reducer';
+import * as fromBeaconAdminStatus from './beacon-admin-status.reducer';
 
 export interface State {
   router: RouterState;
@@ -40,6 +41,7 @@ export interface State {
   hdfsFiles: fromHdfs.State;
   hiveDatabases: fromHive.State;
   logs: fromLog.State;
+  beaconAdminStatus: fromBeaconAdminStatus.State;
 }
 
 const reducers = {
@@ -54,7 +56,8 @@ const reducers = {
   operations: fromOperation.reducer,
   hdfsFiles: fromHdfs.reducer,
   hiveDatabases: fromHive.reducer,
-  logs: fromLog.reducer
+  logs: fromLog.reducer,
+  beaconAdminStatus: fromBeaconAdminStatus.reducer
 };
 
 const devReducer: ActionReducer<State> = compose(storeLogger(), combineReducers)(reducers);

@@ -9,11 +9,13 @@
  *
  */
 
-import {Component, Input, OnInit, SimpleChange} from "@angular/core";
+import {Component, Input, ViewChild, OnInit, SimpleChange, ElementRef} from "@angular/core";
+import * as DialogPolyfill from 'dialog-polyfill';
 import {DatasetTag} from "../../../../../models/dataset-tag";
 import {ViewsEnum} from "../../../../../shared/utils/views";
 import {RichDatasetModel} from "../../../models/richDatasetModel";
 import {RichDatasetService} from "../../../services/RichDatasetService";
+import {DataSetService} from "../../../../../services/dataset.service";
 
 @Component({
   selector: "ds-nav-result-viewer",
@@ -25,6 +27,11 @@ export class DsNavResultViewer {
   @Input() currentDsTag: DatasetTag;
   @Input() view;
   @Input() dsNameSearch:string = "";
+  @ViewChild('dialogConfirm') dialogConfirm: ElementRef;
+
+  _datasetToDelete: RichDatasetModel;
+  _deleteWasSuccessful = false;
+
   datasetModels: RichDatasetModel[] = null;
   views = ViewsEnum;
   start: number = 1;
@@ -32,7 +39,10 @@ export class DsNavResultViewer {
 
   private currentPage: number = 1;
 
-  constructor(private richDatasetService: RichDatasetService) {
+  constructor(
+    private dataSetService: DataSetService,
+    private richDatasetService: RichDatasetService,
+  ) {
   }
 
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
@@ -57,5 +67,30 @@ export class DsNavResultViewer {
     this.start = 1;
     this.limit = limit;
     this.getDataset();
+  }
+
+  onDeleteDataset(datasetId: number) {
+    this._datasetToDelete = this.datasetModels.find(cDataset => cDataset.id === datasetId);
+    DialogPolyfill.registerDialog(this.dialogConfirm.nativeElement);
+    this.dialogConfirm.nativeElement.showModal();
+  }
+
+  doConfirmDelete() {
+    const delete$ = this.dataSetService.delete(this._datasetToDelete.id).share();
+
+    delete$.subscribe(() => this.getDataset());
+    delete$
+      .do(() => this._deleteWasSuccessful = true)
+      .delay(1000)
+      .subscribe(() => {
+        this._datasetToDelete = null;
+        this._deleteWasSuccessful = false;
+
+        this.dialogConfirm.nativeElement.close();
+      });
+  }
+
+  doCancelDelete() {
+    this.dialogConfirm.nativeElement.close();
   }
 }

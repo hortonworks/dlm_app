@@ -54,12 +54,18 @@ object ResponseEntities {
                                  timestamp: String, message: String)
 
   case class BeaconLogResponse(status: String, message: String, requestId: String)
+
+  case class BeaconAdminStatusResponse(status: String, version: String, plugins: String, security: String, wireEncryption: Boolean)
+
+  case class BeaconAdminStatusDetails(clusterId: Long, beaconAdminStatus: BeaconAdminStatusResponse)
 }
 
 object RequestEntities {
+  case class RangerServiceDetails (rangerEndPoint: String, rangerHDFSServiceName: String, rangerHIVEServiceName: Option[String])
   case class ClusterDefinitionRequest( name: String, dataCenter: String, description: String, local: Boolean = false,
                                        beaconEndpoint: String, nameNodeConfigs: Map[String, Option[String]],
-                                       hsEndpoint: Option[String], hsKerberosPrincipal: Option[String])
+                                       rangerService: Option[RangerServiceDetails], hsEndpoint: Option[String],
+                                       hsKerberosPrincipal: Option[String])
   
   case class PolicyDefinitionRequest( name: String, `type`: String, sourceDataset: String,
                                       sourceCluster: String, targetCluster: String, frequencyInSec: Long,
@@ -117,6 +123,12 @@ object JsonFormatters {
 
   implicit val beaconLogResponseWrites = Json.writes[BeaconLogResponse]
   implicit val beaconLogResponseReads = Json.reads[BeaconLogResponse]
+
+  implicit val beaconAdminStatusResponseWrites = Json.writes[BeaconAdminStatusResponse]
+  implicit val beaconAdminStatusResponseReads = Json.reads[BeaconAdminStatusResponse]
+
+  implicit val beaconAdminStatusDetailsWrites = Json.writes[BeaconAdminStatusDetails]
+  implicit val beaconAdminStatusDetailsReads = Json.reads[BeaconAdminStatusDetails]
 
   //-- RequestEntities
 

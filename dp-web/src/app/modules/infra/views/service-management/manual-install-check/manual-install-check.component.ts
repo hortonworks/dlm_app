@@ -18,6 +18,7 @@ import {Observable} from 'rxjs/Observable';
 import {Cluster} from '../../../../../models/cluster';
 import {SKU} from '../../../../../models/add-on-app';
 import {TranslateService} from '@ngx-translate/core';
+import {Lake} from '../../../../../models/lake';
 
 @Component({
   selector: 'dp-manual-install-check',
@@ -30,16 +31,19 @@ export class ManualInstallCheckComponent implements OnInit {
   private dpClusterId: string;
   private cluster: Cluster;
   private sku: SKU;
+  private lake: Lake;
 
   checkInProgress = false;
   verificationComplete = false;
   installSuccessful = true;
+  optionalServiceInstallSuccessful = true;
   verificationChecked = false;
   descriptionParams: any;
   clusterNameParams: any;
-  failedServices: string[] = [];
-  successfulServices: string[] = [];
+  failedServices: any[] = [];
+  successfulServices: any[] = [];
   dependentServices: string[] = [];
+  optionalServices: string[] = [];
   discoveredServices: any[] = [];
 
   constructor(private router: Router,
@@ -55,6 +59,9 @@ export class ManualInstallCheckComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.service = params['name'];
       this.dpClusterId = params['id'];
+      this.lakeService.retrieve(this.dpClusterId).subscribe(lake => {
+        this.lake = lake;
+      });
       Observable.forkJoin(
         this.clusterService.listByLakeId({lakeId: this.dpClusterId}),
         this.addOnAppService.getServiceByName(this.service),
@@ -69,15 +76,25 @@ export class ManualInstallCheckComponent implements OnInit {
         };
         this.clusterNameParams = {
           clusterName: cluster.name
-        }
+        };
         let services = Object.keys(cluster.properties.desired_service_config_versions);
-        this.dependentServices = responses[2].dependencies;
+        this.dependentServices = responses[2].mandatoryDependencies;
+        if (responses[2].optionalDependencies && responses[2].optionalDependencies.length) {
+          this.optionalServices = responses[2].optionalDependencies;
+          this.dependentServices.push(...this.optionalServices);
+        }
         this.discoveredServices = responses[3];
         this.dependentServices.forEach(dependency => {
           if (!services.find(key => key === dependency) && !this.discoveredServices.find(service => service.servicename === dependency)) {
-            this.failedServices.push(dependency);
+            let isOptional = !!this.optionalServices.find(key => key === dependency);
+            this.failedServices.push({name: dependency, isOptional: isOptional});
+            if (isOptional) {
+              this.optionalServiceInstallSuccessful = false;
+            } else {
+              this.installSuccessful = false;
+            }
           } else {
-            this.successfulServices.push(dependency);
+            this.successfulServices.push({name: dependency, isOptional: !!this.optionalServices.find(key => key === dependency)});
           }
         });
       });
@@ -114,10 +131,15 @@ export class ManualInstallCheckComponent implements OnInit {
       let installSuccessful = true;
       this.dependentServices.forEach(dependency => {
         if (!services.find(key => key === dependency) && !discoveredService.find(service => service.servicename === dependency)) {
-          this.failedServices.push(dependency);
-          installSuccessful = false;
+          let isOptional = !!this.optionalServices.find(key => key === dependency);
+          this.failedServices.push({name: dependency, isOptional: isOptional});
+          if (!isOptional) {
+            installSuccessful = false;
+          } else {
+            this.optionalServiceInstallSuccessful = false;
+          }
         } else {
-          this.successfulServices.push(dependency);
+          this.successfulServices.push({name: dependency, isOptional: !!this.optionalServices.find(key => key === dependency)});
         }
       });
       this.verificationComplete = true;

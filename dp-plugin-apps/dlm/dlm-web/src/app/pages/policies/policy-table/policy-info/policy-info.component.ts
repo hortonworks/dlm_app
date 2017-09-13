@@ -25,11 +25,11 @@ import { Policy } from 'models/policy.model';
         </p>
         <p *ngIf="row.frequency" [tooltip]=popTemplate>{{row.frequency | frequency}}</p>
       </div>
-      <template #popTemplate>
+      <ng-template #popTemplate>
         {{row.startTime | fmtTz:'MMM DD, Y HH:mm'}}
         <span *ngIf="row.startTime && row.endTime">-</span>
         <span *ngIf="row.endTime">{{row.endTime | fmtTz:'MMM DD, Y HH:mm'}}</span>
-      </template>
+      </ng-template>
     </ng-template>
   `,
   styleUrls: ['./policy-info.component.scss'],

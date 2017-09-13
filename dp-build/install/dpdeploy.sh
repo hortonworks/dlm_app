@@ -253,7 +253,7 @@ export_knox_cert() {
     MASTER_PASSWD=$1
     KNOX_CONTAINER_ID=$2
     docker exec -t ${KNOX_CONTAINER_ID} \
-        keytool -export -alias gateway-identity -storepass ${MASTER_PASSWD} -keystore /var/lib/knox/data-2.6.0.3-8/security/keystores/gateway.jks -rfc
+        keytool -export -alias gateway-identity -storepass ${MASTER_PASSWD} -keystore /usr/hdp/current/knox-server/data/security/keystores/gateway.jks -rfc
 }
 
 start_app() {

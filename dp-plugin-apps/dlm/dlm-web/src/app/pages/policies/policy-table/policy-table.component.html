@@ -25,16 +25,20 @@
 </dlm-policy-info>
 
 <ng-template #durationCell let-seconds="value" let-policy="row">
-  <dlm-duration-column [duration]="seconds"></dlm-duration-column>
+  <dlm-duration-column [duration]="seconds" [attr.qe-attr]="'policy-duration-' + policy.$$index"></dlm-duration-column>
 </ng-template>
 
-<ng-template #verbStatusCellTemplate let-value="value">
-  {{value | translate}}
+<ng-template #verbStatusCellTemplate let-value="value" let-policy="row">
+  <span [attr.qe-attr]="'policy-status-' + policy.$$index">{{value | translate}}</span>
 </ng-template>
 
-<ng-template #clusterCellTemplate let-value="value">
-  <div class="cluster-name">{{value.name}}</div>
-  <div class="datacenter-name">{{value.dataCenter}}</div>
+<ng-template #flowStatusCell let-mode="value">
+  <dlm-flow-status [mode]="mode"></dlm-flow-status>
+</ng-template>
+
+<ng-template #clusterCellTemplate let-value="value" let-policy="row">
+  <div class="cluster-name" [attr.qe-attr]="'cluster-name-' + policy.$$index">{{value.name}}</div>
+  <div class="datacenter-name" [attr.qe-attr]="'datacenter-name-' + policy.$$index">{{value.dataCenter}}</div>
 </ng-template>
 
 <ng-template #iconCellTemplate>
@@ -42,19 +46,20 @@
 </ng-template>
 
 <ng-template #prevJobs let-row="row">
-  <span class="actionable" qe-attr="policy-jobs" (click)="toggleRowDetail(row, policyContent.Jobs)">
+  <span class="actionable" [attr.qe-attr]="'policy-jobs-' + row.$$index" (click)="toggleRowDetail(row, policyContent.Jobs)">
     <dlm-prev-jobs [policy]="row"></dlm-prev-jobs>
     <span [ngClass]="{'text-primary': true, 'fa': true, 'fa-caret-up': isPrevJobsActive(row.id), 'fa-caret-down': !isPrevJobsActive(row.id)}">
     </span>
   </span>
 </ng-template>
 
-<ng-template #lastGoodCell let-time="value">
-  <span *ngIf="time; else noData" [tooltip]="time | fmtTz | amDateFormat:'YYYY-MMM-DD, HH:mm:ss'">
+<ng-template #lastGoodCell let-time="value" let-policy="row">
+  <span *ngIf="time; else noData" [attr.qe-attr]="'policy-last-good-' + policy.$$index"
+        [tooltip]="time | fmtTz | amDateFormat:'YYYY-MMM-DD, HH:mm:ss'">
     {{time | fmtTz | amTimeAgo}}
   </span>
   <ng-template #noData>
-    n/a
+    <span [attr.qe-attr]="'policy-last-good-' + policy.$$index">n/a</span>
   </ng-template>
 </ng-template>
 
@@ -73,6 +78,8 @@
     [loadingJobs]="loadingJobs"
     [jobsActiveActions]="getJobsActiveActionsForRow(row.id)"
     [fileBrowserPage]="getFilesPageForRow(row.id)"
+    [tablesSearchPattern]="tablesSearchPattern"
+    (onTablesFilter)="handleTablesFilterApplied($event)"
     (onPageChangeFiles)="handleFilesPageChange($event, row.id)"
     (onOpenDirectory)="handleOnOpenDirectory($event)"
     (onSortJobs)="handleOnSortJobs($event, row.id)"
@@ -84,12 +91,12 @@
 </ng-template>
 
 <ng-template #pathCell let-row="row" let-value="value">
-  <span [tooltip]="value">{{value}}</span>
+  <span [tooltip]="value" [attr.qe-attr]="'policy-path-' + row.$$index">{{value}}</span>
 </ng-template>
 
 <ng-template #actionsCell let-row="row">
   <dlm-policy-actions
-    qe-attr="policy-actions"
+    [attr.qe-attr]="'policy-actions-' + row.$$index"
     [rowId]="row.id"
     [policy]="row"
     [isOpen]="shouldShowAction(row.id)"
