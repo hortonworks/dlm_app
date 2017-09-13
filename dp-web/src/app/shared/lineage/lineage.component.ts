@@ -241,7 +241,7 @@ export class LineageComponent implements OnChanges, AfterViewInit {
       let nodeEL = this;
       setTimeout(function (argument) {
         if (!(that.activeTip || that.activeNode)) {
-          $(nodeEL).removeClass('active');
+          nodeEL.classList.remove('active');
           that.tooltip.hide(d);
         }
       }, 400)
