@@ -11,7 +11,6 @@
 
 package domain
 
-import java.sql.SQLException
 import java.time.LocalDateTime
 import javax.inject._
 
