@@ -57,8 +57,8 @@ class RangerServiceImpl(config: Config)(implicit ws: ClusterWsClient)
       .map(mapResultsGeneric)
   }
 
-  override def getPolicyDetailsByTagName(clusterId: String, tagName: String, offset: String, limit: String)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsObject]] = {
-    ws.url(s"$url/cluster/$clusterId/ranger/policies?limit=$limit&offset=$offset&serviceType=tag&tagName=$tagName")
+  override def getPolicyDetailsByTagName(clusterId: String, tags: String, offset: String, limit: String)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsObject]] = {
+    ws.url(s"$url/cluster/$clusterId/ranger/policies?limit=$limit&offset=$offset&serviceType=tag&tags=$tags")
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
       .get()

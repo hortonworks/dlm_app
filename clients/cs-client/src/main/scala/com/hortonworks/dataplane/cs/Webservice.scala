@@ -85,8 +85,8 @@ object Webservice {
     def getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String, limit: String, accessType:String, accessResult:String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
 
     def getPolicyDetails(clusterId: String, dbName: String, tableName: String, offset: String, limit: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
-    
-    def getPolicyDetailsByTagName(clusterId: String, tagName: String, offset: String, limit: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
+
+    def getPolicyDetailsByTagName(clusterId: String, tags: String, offset: String, limit: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
 
   }
 

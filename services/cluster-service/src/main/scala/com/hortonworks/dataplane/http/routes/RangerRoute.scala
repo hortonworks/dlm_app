@@ -55,9 +55,9 @@ class RangerRoute @Inject()(
 
   val rangerPolicy =
     path ("cluster" / LongNumber / "ranger" / "policies") { clusterId =>
-      parameters("limit".as[Int], "offset".as[Int], "serviceType".as[String], "dbName".as[String].?, "tableName".as[String].?, "tagName".as[String].?) { (limit, offset, serviceType, dbName, tableName, tagName) =>
+      parameters("limit".as[Int], "offset".as[Int], "serviceType".as[String], "dbName".as[String].?, "tableName".as[String].?, "tags".as[String].?) { (limit, offset, serviceType, dbName, tableName, tags) =>
         get {
-          onComplete(requestRangerForPolicies(clusterId, serviceType, dbName, tableName, tagName, offset, limit)) {
+          onComplete(requestRangerForPolicies(clusterId, serviceType, dbName, tableName, tags, offset, limit)) {
             case Success(json) => complete(success(json))
             case Failure(th) => th match {
               case th:ServiceNotFound => complete(StatusCodes.NotFound, errors(th))
@@ -68,26 +68,27 @@ class RangerRoute @Inject()(
       }
     }
 
-  private def requestRangerForPolicies(clusterId: Long, serviceType: String, dbName: Option[String], tableName: Option[String], tagName: Option[String], offset: Long, pageSize: Long) : Future[JsArray] = {
-    val query = getBuiltQuery(serviceType, dbName, tableName, tagName, offset, pageSize)
-    for {
-      service <- getConfigOrThrowException(clusterId)
-      url <- getRangerUrlFromConfig(service)
-      baseUrls <- extractUrlsWithIp(url, clusterId)
-      user <- storageInterface.getConfiguration("dp.ranger.user")
-      pass <- storageInterface.getConfiguration("dp.ranger.password")
-      policies <- getRangerPoliciesByServiceTypeAndQuery(baseUrls.head, user, pass, serviceType, query)
-    } yield {
-      JsArray(policies)
+  private def requestRangerForPolicies(clusterId: Long, serviceType: String, dbName: Option[String], tableName: Option[String], tags: Option[String], offset: Long, pageSize: Long) : Future[JsArray] = {
+    val queries = getBuiltQueries(serviceType, dbName, tableName, tags, offset, pageSize)
+    val futures = queries.map { cQuery =>
+      for {
+        service <- getConfigOrThrowException(clusterId)
+        url <- getRangerUrlFromConfig(service)
+        baseUrls <- extractUrlsWithIp(url, clusterId)
+        user <- storageInterface.getConfiguration("dp.ranger.user")
+        pass <- storageInterface.getConfiguration("dp.ranger.password")
+        policies <- getRangerPoliciesByServiceTypeAndQuery(baseUrls.head, user, pass, serviceType, cQuery)
+      } yield (policies)
     }
+    Future.sequence(futures).map(_.flatten).map(JsArray(_))
   }
 
-  private def getBuiltQuery(serviceType: String, dbName: Option[String], tableName: Option[String], tagName: Option[String], offset: Long, pageSize: Long): String = {
+  private def getBuiltQueries(serviceType: String, dbName: Option[String], tableName: Option[String], tags: Option[String], offset: Long, pageSize: Long): Seq[String] = {
     val query = s"startIndex=${offset}&pageSize=${pageSize}"
     serviceType match {
-      case "hive" => query + s"&resource:database=${dbName.getOrElse("")}&resource:table=${tableName.getOrElse("")}"
-      case "tag" => query + s"&resource:tag=${tagName.getOrElse("")}"
-      case _ => "todo: unknown type. exception"
+      case "hive" => Seq(query + s"&resource:database=${dbName.getOrElse("")}&resource:table=${tableName.getOrElse("")}")
+      case "tag" => tags.getOrElse("").trim.split(",").filter(cTag => !cTag.isEmpty).map(cTag => query + s"&resource:tag=${cTag.trim}")
+      case _ => Seq("todo: unknown type. exception")
     }
   }
 
