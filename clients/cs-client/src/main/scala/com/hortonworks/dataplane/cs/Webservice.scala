@@ -82,11 +82,11 @@ object Webservice {
 
   trait RangerService extends CsClientService {
 
-    def getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String, limit: String, accessType:String, accessResult:String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
+    def getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String, limit: String, accessType:String, accessResult:String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsValue]]
 
-    def getPolicyDetails(clusterId: String, dbName: String, tableName: String, offset: String, limit: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
+    def getPolicyDetails(clusterId: String, dbName: String, tableName: String, offset: String, limit: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsValue]]
 
-    def getPolicyDetailsByTagName(clusterId: String, tags: String, offset: String, limit: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]]
+    def getPolicyDetailsByTagName(clusterId: Long, tags: String, offset: Long, limit: Long)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsValue]]
 
   }
 

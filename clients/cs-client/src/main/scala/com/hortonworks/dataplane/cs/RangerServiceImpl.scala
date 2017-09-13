@@ -14,7 +14,7 @@ package com.hortonworks.dataplane.cs
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, HJwtToken}
 import com.hortonworks.dataplane.cs.Webservice.RangerService
 import com.typesafe.config.Config
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.ws.WSResponse
 
 import scala.concurrent.Future
@@ -31,9 +31,9 @@ class RangerServiceImpl(config: Config)(implicit ws: ClusterWsClient)
     Option(System.getProperty("dp.services.cluster.service.uri"))
       .getOrElse(config.getString("dp.services.cluster.service.uri"))
 
-  private def mapResultsGeneric(res: WSResponse) : Either[Errors,JsObject]= {
+  private def mapResultsGeneric(res: WSResponse) : Either[Errors,JsValue]= {
     res.status match {
-      case 200 =>  Right((res.json \ "results" \ "data").as[JsObject])
+      case 200 =>  Right((res.json \ "results" \ "data").as[JsValue])
       case 404 => Left(
         Errors(Seq(
           Error("404", (res.json \ "errors" \\ "code").head.toString()))))
@@ -41,7 +41,7 @@ class RangerServiceImpl(config: Config)(implicit ws: ClusterWsClient)
     }
   }
 
-  override def getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String, limit: String, accessType:String, accessResult:String)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsObject]] = {
+  override def getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String, limit: String, accessType:String, accessResult:String)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsValue]] = {
     ws.url(s"$url/cluster/$clusterId/ranger/audit/$dbName/$tableName?limit=$limit&offset=$offset&accessType=$accessType&accessResult=$accessResult")
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
@@ -49,7 +49,7 @@ class RangerServiceImpl(config: Config)(implicit ws: ClusterWsClient)
       .map(mapResultsGeneric)
   }
 
-  override def getPolicyDetails(clusterId: String, dbName: String, tableName: String, offset: String, limit: String)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsObject]] = {
+  override def getPolicyDetails(clusterId: String, dbName: String, tableName: String, offset: String, limit: String)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsValue]] = {
     ws.url(s"$url/cluster/$clusterId/ranger/policies?limit=$limit&offset=$offset&serviceType=hive&dbName=$dbName&tableName=$tableName")
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
@@ -57,7 +57,7 @@ class RangerServiceImpl(config: Config)(implicit ws: ClusterWsClient)
       .map(mapResultsGeneric)
   }
 
-  override def getPolicyDetailsByTagName(clusterId: String, tags: String, offset: String, limit: String)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsObject]] = {
+  override def getPolicyDetailsByTagName(clusterId: Long, tags: String, offset: Long, limit: Long)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsValue]] = {
     ws.url(s"$url/cluster/$clusterId/ranger/policies?limit=$limit&offset=$offset&serviceType=tag&tags=$tags")
       .withToken(token)
       .withHeaders("Accept" -> "application/json")
