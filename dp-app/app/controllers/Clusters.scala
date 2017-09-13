@@ -17,7 +17,7 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari._
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneClusterIdentifier, Error, Errors}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webservice.ClusterService
+import com.hortonworks.dataplane.db.Webservice.{ClusterService, SkuService}
 import com.hortonworks.dataplane.commons.auth.Authenticated
 import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 import models.{ClusterHealthData, JsonResponses}
@@ -32,11 +32,12 @@ import scala.concurrent.Future
 
 class Clusters @Inject()(
                           @Named("clusterService") val clusterService: ClusterService,
+                          @Named("skuService") val skuService:SkuService,
                           val clusterHealthService: ClusterHealthService,
                           authenticated: Authenticated,
                           ambariService: AmbariService,
                           @Named("clusterAmbariService") ambariWebService: AmbariWebService,
-                          configuration: play.api.Configuration
+                          implicit val configuration: play.api.Configuration
                         ) extends Controller {
 
   def list(dpClusterId: Option[Long]) = authenticated.async {
@@ -109,13 +110,27 @@ class Clusters @Inject()(
       .map { req =>
         ambariService
           .getClusterDetails(req)
-          .map {
+          .flatMap {
             case Left(errors) =>
-              InternalServerError(JsonResponses.statusError(
-                s"Failed with ${Json.toJson(errors)}"))
-            case Right(clusterDetails) => Ok(Json.toJson(clusterDetails))
+              Future.successful(InternalServerError(JsonResponses.statusError(
+                s"Failed with ${Json.toJson(errors)}")))
+            case Right(clusterDetails) => {
+              skuService.getAllSkus().map {
+                case Left(errors) => InternalServerError(Json.toJson(errors))
+                case Right(skus) =>
+                  val allDependentServices = skus.flatMap { sku =>
+                    getModuleDependentServices(sku.name).getOrElse("").split(",")
+                  }.distinct
+                  val newClusterDetails = clusterDetails.map { clDetails =>
+                    val availableRequiredServices = allDependentServices.intersect(clDetails.services)
+                    val otherServices = clDetails.services.diff(availableRequiredServices)
+                    val allAvailableServices = availableRequiredServices.union(otherServices)
+                    AmbariCluster(clDetails.security,clDetails.clusterName,allAvailableServices,clDetails.knoxUrl)
+                  }
+                  Ok(Json.toJson(newClusterDetails))
+              }
+            }
           }
-
       }
       .getOrElse(Future.successful(BadRequest))
 

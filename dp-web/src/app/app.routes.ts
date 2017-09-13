@@ -44,10 +44,6 @@ export const routes: Routes = [{
     loadChildren: './modules/infra/infra.module#InfraModule',
     canActivate:[ NavigationGuard]
   }, {
-    path: 'dashboard',
-    loadChildren: './modules/dashboard/dashboard.module#DashboardModule',
-    canActivate:[ NavigationGuard ]
-  },{
     path: 'assets',
     loadChildren: './modules/assets/asset.module#AssetModule',
     canActivate:[ NavigationGuard ]

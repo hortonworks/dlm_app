@@ -11,6 +11,7 @@
 
 import {Component, OnInit, ViewChild,ElementRef} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
+import * as DialogPolyfill from 'dialog-polyfill';
 import {RichDatasetModel} from "../../models/richDatasetModel";
 import {RichDatasetService} from "../../services/RichDatasetService";
 import {DataSetService} from "../../../../services/dataset.service";
@@ -55,6 +56,7 @@ export class DsFullView implements OnInit {
   }
 
   onDeleteDataset() {
+    DialogPolyfill.registerDialog(this.dialogConfirm.nativeElement);
     this.dialogConfirm.nativeElement.showModal();
   }
 
