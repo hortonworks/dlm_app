@@ -364,4 +364,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
   getPercentageRemaining(cluster: Cluster): string {
     return Math.floor((Number(cluster.stats.CapacityRemaining) / Number(cluster.stats.CapacityTotal)) * 100) + '%';
   }
+
+  handleLegendClose() {
+    this.selectedCluster$.next(null);
+  }
 }

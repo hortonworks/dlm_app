@@ -127,6 +127,10 @@ export class ClustersComponent implements OnInit, OnDestroy {
     this.selectedCluster$.next(cluster);
   }
 
+  handleLegendClose() {
+    this.selectedCluster$.next(null);
+  }
+
   ngOnDestroy() {
     this.overallProgressSubscription$.unsubscribe();
   }
