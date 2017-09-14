@@ -29,6 +29,7 @@ export class AssetTagPolicyViewComponent extends AssetPolicyView  {
     super.ngOnInit();
     if(!this.clusterId || !this.guid) return;
     this.showPagination = false;
+    this.isTagBasedPolicy = true;
     this.onReload();
   }
 

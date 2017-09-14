@@ -14,7 +14,7 @@ import {Http, RequestOptions} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 
 import {HttpUtil} from '../shared/utils/httpUtil';
-import {AuditSchema, PolicySchema} from '../models/auditSchema';
+import {AuditSchema, PolicySchema, TagPolicySchema} from '../models/auditSchema';
 
 @Injectable()
 export class RangerService {
@@ -64,11 +64,16 @@ export class RangerService {
       });
   }
   formatTagPolicyData (data:any) : PolicySchema[] {
-    let policyData:PolicySchema[] = [];
+    let policyData:TagPolicySchema[] = [];
     data.forEach(d=> {
-      d.groups = d.policyItems.length > 0 ? d.policyItems[0].groups: "";
-      d.users = d.policyItems.length > 0 ? d.policyItems[0].users: "";
-      policyData.push(d as PolicySchema)
+      d.groups = d.policyItems.length > 0 ? d.policyItems[0].groups: [];
+      d.users = d.policyItems.length > 0 ? d.policyItems[0].users: [];
+      if(d.resources && d.resources.tag && d.resources.tag.values){
+        d.tags = d.resources.tag.values;
+      }else{
+        d.tags = [];
+      }
+      policyData.push(d as TagPolicySchema)
     })
     return policyData;
   }

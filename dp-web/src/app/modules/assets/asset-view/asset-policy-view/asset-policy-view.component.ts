@@ -29,6 +29,7 @@ export class AssetPolicyView implements OnInit {
   pageStartsFrom:number = 1;
   count:number = 0;
   showPagination: boolean = true;
+  isTagBasedPolicy: boolean = false;
 
 
   ngOnInit() {}
