@@ -31,6 +31,16 @@ class FilterSpec extends FlatSpec with Matchers {
   }
 
 
+  "Filters" should "construct and lowercase a DSL query if not default" in {
+
+    val output = Filters.query(AtlasSearchQuery(
+      Seq(AtlasFilter(AtlasAttribute("owner", "string"), "equals", "Admin"))),false)
+
+    assert(output == "where owner='Admin'")
+
+  }
+
+
   it should "construct a DSL query by combining 2 filters as AND" in {
 
     val output = Filters.query(AtlasSearchQuery(

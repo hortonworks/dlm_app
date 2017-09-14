@@ -69,6 +69,10 @@ class DefaultAtlasInterface(private val clusterId: Long,
     }
   }
 
+  val lowerCaseQueries =
+    Try(config.getBoolean("dp.services.atlas.lower.case.queries"))
+      .getOrElse(false)
+
   val hiveBaseQuery =
     Try(config.getString("dp.services.atlas.hive.search.query.base"))
       .getOrElse("hive_table")
@@ -109,7 +113,8 @@ class DefaultAtlasInterface(private val clusterId: Long,
     log.info("Fetching hive tables")
     log.info(s"Search query -> $filters")
     // Get the query
-    val query = s"$hiveBaseQuery ${Filters.query(filters)}"
+
+    val query = s"$hiveBaseQuery ${Filters.query(filters,lowerCaseQueries)}"
     getApi.map { api =>
       val searchResult =
         if (filters.isPaged)
