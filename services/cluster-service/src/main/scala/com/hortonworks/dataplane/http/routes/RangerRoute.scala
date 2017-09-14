@@ -68,7 +68,15 @@ class RangerRoute @Inject()(
       }
     }
 
-  private def requestRangerForPolicies(clusterId: Long, serviceType: String, dbName: Option[String], tableName: Option[String], tags: Option[String], offset: Long, pageSize: Long) : Future[JsArray] = {
+  private def requestRangerForPolicies(clusterId: Long, serviceType: String, dbName: Option[String], tableName: Option[String], tags: Option[String], offset: Long, pageSize: Long): Future[JsValue] = {
+    serviceType match {
+      case "hive" => requestRangerForResourcePolicies(clusterId, dbName.get, tableName.get, offset, pageSize)
+      case "tag" => requestRangerForTagPolicies(clusterId, serviceType, dbName, tableName, tags, offset, pageSize)
+      case _ =>  throw UnsupportedInputException(1001, "This is not a supported Ranger service.")
+    }
+  }
+
+  private def requestRangerForTagPolicies(clusterId: Long, serviceType: String, dbName: Option[String], tableName: Option[String], tags: Option[String], offset: Long, pageSize: Long) : Future[JsArray] = {
     val queries = Try(getBuiltQueries(serviceType, dbName, tableName, tags, offset, pageSize))
     Future.fromTry(queries)
       .flatMap { queries =>
@@ -169,6 +177,22 @@ class RangerRoute @Inject()(
         case Left(errors) => throw new Exception(s"Cannot translate the hostname into an IP address $errors")
       }
 
+  }
+
+  private def requestRangerForResourcePolicies(clusterId: Long, dbName: String, tableName: String, offset: Long, pageSize: Long) : Future[JsValue] = {
+    (for {
+      service <- getConfigOrThrowException(clusterId)
+      url <- getRangerUrlFromConfig(service)
+      baseUrls <- extractUrlsWithIp(url, clusterId)
+      user <- storageInterface.getConfiguration("dp.ranger.user")
+      pass <- storageInterface.getConfiguration("dp.ranger.password")
+      urlToHit <- Future.successful(s"${baseUrls.head}/service/plugins/policies/service/1?startIndex=${offset}&pageSize=${pageSize}&resource:database=${dbName}&resource:table=${tableName}")
+      tmp <- Future.successful(println(urlToHit))
+      response <- ws.url(urlToHit)
+        .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+        .withAuth(user.get,pass.get,WSAuthScheme.BASIC)
+        .get()
+    } yield response.json)
   }
 
 }
