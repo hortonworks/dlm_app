@@ -93,6 +93,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @ViewChild(IconColumnComponent) iconColumn: IconColumnComponent;
   @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;
   @ViewChild(PolicyInfoComponent) policyInfoColumn: PolicyInfoComponent;
+  @ViewChild('flowStatusCell') flowStatusCellRef: TemplateRef<any>;
   @ViewChild('durationCell') durationCellRef: TemplateRef<any>;
   @ViewChild('lastGoodCell') lastGoodCellRef: TemplateRef<any>;
   @ViewChild('prevJobs') prevJobsRef: TemplateRef<any>;
@@ -106,9 +107,9 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
 
   @ViewChild(TableComponent) tableComponent: TableComponent;
 
-  @Input() policies: Policy[] = [];
   @Input() clusters: Cluster[] = [];
   @Input() activePolicyId = '';
+  @Input() policies: Policy[] = [];
   @Output() detailsToggle = new EventEmitter<any>();
 
   rowActions = <ActionItemType[]>[
@@ -194,16 +195,24 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         name: this.t.instant('common.name'),
         cellTemplate: this.policyInfoColumn.cellRef,
         sortable: false,
+        flexGrow: 6
+      },
+      {
+        prop: 'accessMode',
+        name: ' ',
+        cellTemplate: this.flowStatusCellRef,
+        cellClass: 'flow-status-cell',
+        sortable: false,
         flexGrow: 7
       },
-      {prop: 'sourceClusterResource', name: this.t.instant('common.source'), flexGrow: 8,
+      {prop: 'sourceClusterResource', name: this.t.instant('common.source'), flexGrow: 6,
         cellTemplate: this.clusterCellTemplateRef, comparator: this.clusterResourceComparator.bind(this)},
-      {prop: 'targetClusterResource', name: this.t.instant('common.destination'), flexGrow: 8,
+      {prop: 'targetClusterResource', name: this.t.instant('common.destination'), flexGrow: 6,
         cellTemplate: this.clusterCellTemplateRef, comparator: this.clusterResourceComparator.bind(this)},
       {prop: 'sourceDataset', name: this.t.instant('common.path'),
-        cellTemplate: this.pathCellRef, flexGrow: 10, sortable: false},
+        cellTemplate: this.pathCellRef, flexGrow: 9, sortable: false},
       {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs'),
-        sortable: false, flexGrow: 5},
+        sortable: false, flexGrow: 4},
       {prop: 'jobs.0.duration', name: this.t.instant('common.duration'),
         cellTemplate: this.durationCellRef, flexGrow: 5},
       {prop: 'lastGoodJobResource.startTime', name: 'Last Good',

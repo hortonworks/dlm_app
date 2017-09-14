@@ -26,4 +26,5 @@ docker start dp-database >> install.log 2>&1 || \
         --env "POSTGRES_PASSWORD=dp_admin" \
         --env "POSTGRES_USER=dp_admin" \
         --env "POSTGRES_DB=dataplane" \
-        postgres:9.6.3-alpine 
+        --volume postgresql-data:/var/lib/postgresql/data \
+        postgres:9.6.3-alpine

@@ -58,13 +58,13 @@
   <div class="page-section">
     <div class="row">
       <div class="col-xs-7">
-        <div class="flex-center">
+        <div class="flex-center" #jobs_overview_table>
           <span class="h4">
             {{'page.overview.issues.updates' | translate}}
             <dlm-help-link [iconHint]="'page.overview.hints.issues_and_updates'"></dlm-help-link>
           </span>
           <div *ngIf="jobStatusFilter$ | async" class="job-status-filter inline-block">
-            <span class="label label-default filter-tag">
+            <span class="label label-default filter-tag" [ngClass]="{'progress': isInProgressFilterApplied(), 'failed': isFailedFilterApplied()}">
               <span class="text-bold text-uppercase">{{'common.jobs' | translate}}:&nbsp;</span>
               <span>{{formatStatusFilter(jobStatusFilter$ | async)}} </span>
               <a href="javascript:void(0);" (click)="removeJobStatusFilter()">

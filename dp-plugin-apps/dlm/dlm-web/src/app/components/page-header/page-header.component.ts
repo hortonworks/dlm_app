@@ -16,7 +16,7 @@ import { Component, OnInit, Input, ViewEncapsulation, HostBinding } from '@angul
   template: `
     <div>
       <div class="row">
-        <div class="col-md-12">
+        <div class="col-xs-12">
           <i [class]="iconClass" *ngIf="iconClass"></i>
           <span class="page-title">
             {{title | translate}}
@@ -29,7 +29,7 @@ import { Component, OnInit, Input, ViewEncapsulation, HostBinding } from '@angul
         </div>
       </div>
       <div class="row" *ngIf="description">
-        <div class="col-md-12">
+        <div class="col-xs-12">
           <div class="page-description">{{description | translate}}</div>
         </div>
       </div>

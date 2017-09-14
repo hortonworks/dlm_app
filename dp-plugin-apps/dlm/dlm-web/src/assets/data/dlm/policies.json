@@ -33,8 +33,8 @@
     "targetDataset": "/",
     "frequency": 86400,
     "endTime": "9999-12-31T00:00:00",
-    "sourceCluster": "dc-Europe$c2",
-    "targetCluster": "dc-Europe$c1",
+    "sourceCluster": "dc-Europe$c1",
+    "targetCluster": "dc-Europe$c2",
     "jobs": [{
       "id": "/dc-Europe/c2/dc-Europe/c1/aaaaaaaaaaaaaaaaaaaaa/0/1501516834949/000000007@1",
       "policyId": "/dc-Europe/c2/dc-Europe/c1/aaaaaaaaaaaaaaaaaaaaa/0/1501516834949/000000007",

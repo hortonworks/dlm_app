@@ -26,11 +26,11 @@
     <tbody>
       <tr *ngFor="let policy of policies">
         <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable" title="{{policy.id}}">{{policy.id}}</td>
-        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable" title="{{policy.name}}">{{policy.name}}</td>
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable wrap" title="{{policy.name}}">{{policy.name}}</td>
         <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable" title="{{policy.isEnabled?'ENABLED':'DISABLED'}}">{{policy.isEnabled?"ENABLED":"DISABLED"}}</td>
         <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable" title="{{policy.isAuditEnabled?'ENABLED':'DISABLED'}}">{{policy.isAuditEnabled?"ENABLED":"DISABLED"}}</td>
-        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable" title="{{(policy.groups.length?policy.groups.join(', '):'--')}}">{{(policy.groups.length?policy.groups.join(", "):"--")}}</td>
-        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable" title="{{policy.users.length?policy.users.join(', '):'--'}}">{{policy.users.length?policy.users.join(", "):"--"}}</td>
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable wrap" title="{{(policy.groups.length?policy.groups.join(', '):'--')}}">{{(policy.groups.length?policy.groups.join(", "):"--")}}</td>
+        <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable wrap" title="{{policy.users.length?policy.users.join(', '):'--'}}">{{policy.users.length?policy.users.join(", "):"--"}}</td>
       </tr>
     </tbody>
   </table>

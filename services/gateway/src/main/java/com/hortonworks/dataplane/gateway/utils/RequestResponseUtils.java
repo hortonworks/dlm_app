@@ -58,7 +58,8 @@ public class RequestResponseUtils {
   }
 
   private String appRootUrl() {
-    return String.format("http://%s%s/", hostUtils.getRequestHost(),hostUtils.getRequestPort());
+    String proto=hostUtils.getRequestProtocol();
+    return String.format("%s://%s%s/",proto, hostUtils.getRequestHost(),hostUtils.getRequestPort());
   }
 
   public void redirectToLocalSignin() {
