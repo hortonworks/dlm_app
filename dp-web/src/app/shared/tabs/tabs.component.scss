@@ -89,3 +89,9 @@
     color: $white !important;
   }
 }
+
+@media screen and (max-width: 1024px){
+  .mdl-layout__header-row {
+    padding: 0 10px 0 0;
+  }
+}

@@ -35,6 +35,7 @@
     "d3": "~3.5.3",
     "d3-tip": "^0.7.1",
     "dagre-d3": "^0.4.17",
+    "dialog-polyfill": "^0.4.9",
     "font-awesome": "^4.7.0",
     "jquery": "^3.1.1",
     "leaflet": "^1.0.2",

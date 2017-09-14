@@ -10,6 +10,7 @@
  */
 
 import {Component, Input, Output, ViewChild, OnInit, SimpleChange, ElementRef, EventEmitter} from "@angular/core";
+import * as DialogPolyfill from 'dialog-polyfill';
 import {DatasetTag} from "../../../../../models/dataset-tag";
 import {ViewsEnum} from "../../../../../shared/utils/views";
 import {RichDatasetModel} from "../../../models/richDatasetModel";
@@ -72,6 +73,7 @@ export class DsNavResultViewer {
 
   onDeleteDataset(datasetId: number) {
     this._datasetToDelete = this.datasetModels.find(cDataset => cDataset.id === datasetId);
+    DialogPolyfill.registerDialog(this.dialogConfirm.nativeElement);
     this.dialogConfirm.nativeElement.showModal();
   }
 

@@ -56,4 +56,9 @@ export class NavTagPanel implements OnInit {
   searchTag() {
     this.displayTags = this.allTags.filter(tag => tag.name.toLowerCase().indexOf(this.tagSearchText.toLowerCase()) != -1);
   }
+
+  onClearSearch(){
+    this.tagSearchText = "";
+    this.searchTag();
+  }
 }

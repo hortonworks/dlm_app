@@ -56,4 +56,8 @@ export class DatasetDashboardComponent implements OnInit {
   onViewRefresh() {
     this.tagViewer && this.tagViewer.fetchList();
   }
+
+  clearSearch(){
+    this.dsNameSearch = '';
+  }
 }
