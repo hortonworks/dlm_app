@@ -17,7 +17,7 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.auth.Authenticated
 import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
 import com.hortonworks.dataplane.cs.Webservice.{AtlasService, RangerService}
-import models.{JsonResponses, WrappedErrorsException}
+import models.{ApplicationException, JsonResponses, UnsupportedInputException, WrappedErrorsException}
 import models.JsonFormatters._
 import play.api.Logger
 import play.api.libs.json.{JsObject, JsValue, Json}
@@ -60,14 +60,17 @@ class RangerAttributes @Inject()(
       (serviceType match {
         case "hive" => getResourceBasedPolicies(clusterId, offset, limit, dbName.getOrElse(""), tableName.getOrElse(""))
         case "tag" => getTagBasedPolicies(clusterId, offset, limit, guid.getOrElse(""))
+        case _ => Future.failed(UnsupportedInputException(100, "serviceType must be 'hive' or 'tag'"))
       })
         .map { policies => Ok(Json.toJson(policies)) }
         .recover {
-          case errors: WrappedErrorsException =>
-            errors.errors.firstMessage match {
-              case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-              case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case exception: WrappedErrorsException =>
+            exception.errors.firstMessage match {
+              case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(exception)}"))
+              case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(exception)}"))
             }
+          case exception: ApplicationException =>
+            new Status(exception.http) (exception.toJs)
         }
     }
 

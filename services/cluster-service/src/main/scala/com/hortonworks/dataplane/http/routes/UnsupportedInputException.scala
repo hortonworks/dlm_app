@@ -1,10 +1,14 @@
 package com.hortonworks.dataplane.http.routes
 
+import akka.http.scaladsl.model.StatusCode
+import akka.http.scaladsl.model.StatusCodes
+
 abstract class ClusterServiceException
   extends Exception {
 
-  def code
-  def message
+  val code: Long
+  val message: String
+  val http: StatusCode = StatusCodes.InternalServerError
 }
 
-case class UnsupportedInputException(code: Long, message: String) extends ClusterServiceException
+case class UnsupportedInputException(val code: Long, val message: String, override val http: StatusCode = StatusCodes.BadRequest) extends ClusterServiceException

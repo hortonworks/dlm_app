@@ -69,26 +69,29 @@ class RangerRoute @Inject()(
     }
 
   private def requestRangerForPolicies(clusterId: Long, serviceType: String, dbName: Option[String], tableName: Option[String], tags: Option[String], offset: Long, pageSize: Long) : Future[JsArray] = {
-    val queries = getBuiltQueries(serviceType, dbName, tableName, tags, offset, pageSize)
-    val futures = queries.map { cQuery =>
-      for {
-        service <- getConfigOrThrowException(clusterId)
-        url <- getRangerUrlFromConfig(service)
-        baseUrls <- extractUrlsWithIp(url, clusterId)
-        user <- storageInterface.getConfiguration("dp.ranger.user")
-        pass <- storageInterface.getConfiguration("dp.ranger.password")
-        policies <- Try(getRangerPoliciesByServiceTypeAndQuery(baseUrls.head, user, pass, serviceType, cQuery))
-      } yield (policies)
-    }
-    Future.sequence(futures).map(_.flatten).map(JsArray(_))
+    val queries = Try(getBuiltQueries(serviceType, dbName, tableName, tags, offset, pageSize))
+    Future.fromTry(queries)
+      .flatMap { queries =>
+        val futures = queries.map { cQuery =>
+          for {
+            service <- getConfigOrThrowException(clusterId)
+            url <- getRangerUrlFromConfig(service)
+            baseUrls <- extractUrlsWithIp(url, clusterId)
+            user <- storageInterface.getConfiguration("dp.ranger.user")
+            pass <- storageInterface.getConfiguration("dp.ranger.password")
+            policies <- getRangerPoliciesByServiceTypeAndQuery(baseUrls.head, user, pass, serviceType, cQuery)
+          } yield (policies)
+        }
+        Future.sequence(futures).map(_.flatten).map(JsArray(_))
+      }
   }
 
   private def getBuiltQueries(serviceType: String, dbName: Option[String], tableName: Option[String], tags: Option[String], offset: Long, pageSize: Long): Seq[String] = {
     val query = s"startIndex=${offset}&pageSize=${pageSize}"
     serviceType match {
-      case "hive" => Seq(query + s"&resource:database=${dbName.getOrElse("")}&resource:table=${tableName.getOrElse("")}")
-      case "tag" => tags.getOrElse("").trim.split(",").filter(cTag => !cTag.isEmpty).map(cTag => query + s"&resource:tag=${cTag.trim}")
-      case _ => throw UnsupportedInputException(1000, "This is not a supported Ranger service.")
+      case "hive" => Seq(query + s"&resource:database=${dbName.get}&resource:table=${tableName.get}")
+      case "tag" => tags.get.trim.split(",").filter(cTag => !cTag.isEmpty).map(cTag => query + s"&resource:tag=${cTag.trim}")
+      case _ => throw UnsupportedInputException(1001, "This is not a supported Ranger service.")
     }
   }
 
