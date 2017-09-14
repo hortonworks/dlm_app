@@ -77,6 +77,12 @@ read_consul_host(){
     echo "using CONSUL_HOST: ${CONSUL_HOST}"
 }
 
+generate_certs() {
+    CERTIFICATE_PASSWORD="changeit"
+
+    source $(pwd)/docker-certificates.sh
+}
+
 init_db() {
     if [ "$USE_EXT_DB" == "yes" ]; then
         echo "Dataplane is configured to use an external database in config.env.sh. Database initialization is not required and assumed to be done already."
@@ -196,6 +202,9 @@ init_app() {
     echo "Starting Cluster Service"
     source $(pwd)/docker-service-cluster.sh
 
+    if [ -z "${CERTIFICATE_PASSWORD}" ]; then
+        read_certificate_password
+    fi
     echo "Starting Application API"
     source $(pwd)/docker-app.sh
 }
@@ -203,8 +212,15 @@ init_app() {
 read_master_password() {
     echo "Enter Knox master password: "
     read -s MASTER_PASSWD
+    
+    if [ "${#MASTER_PASSWD}" -lt 6 ]; then
+        echo "Password needs to be at least 6 characters long."
+        exit 1
+    fi
+
     echo "Reenter password: "
     read -s MASTER_PASSWD_VERIFY
+    
     if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
     then
        echo "Password did not match. Reenter password:"
@@ -218,14 +234,58 @@ read_master_password() {
     MASTER_PASSWORD="$MASTER_PASSWD"
 }
 
+read_certificate_password() {
+    echo "Please enter password used for private key:"
+    read -s CERTIFICATE_PASSWORD
+}
+
 read_use_test_ldap() {
     echo "Use pre-packaged LDAP instance (suitable only for testing) [yes/no]: "
     read USE_TEST_LDAP
 }
 
+import_certs() {
+    if [ ! -e "$PUBLIC_KEY_L" ]; then
+        echo "Public key file not found at $PUBLIC_KEY_L. Please try this command again after updating config.env.sh file with correct location."
+        return -1
+    fi
+    if [ ! -e "$PRIVATE_KEY_L" ]; then
+        echo "Private key file not found at $PRIVATE_KEY_L. Please try this command again after updating config.env.sh file with correct location."
+        return -1
+    fi
+
+    rm -f $(pwd)/certs/ssl-cert.pem 2> /dev/null
+    cp "$PUBLIC_KEY_L" $(pwd)/certs/ssl-cert.pem
+    rm -f $(pwd)/certs/ssl-key.pem 2> /dev/null
+    cp "$PRIVATE_KEY_L" $(pwd)/certs/ssl-key.pem
+
+    echo "Certificates were copied successfully."
+}
+
 init_knox() {
     echo "Initializing Knox"
+
+    if [ "$USE_TLS" != "true" ]; then
+        USE_PROVIDED_CERTIFICATES="no"
+    fi
+
+    if [ "$USE_PROVIDED_CERTIFICATES" != "yes" ] && [ "$USE_PROVIDED_CERTIFICATES" != "no" ]; then
+        echo "Do you have certificate to be configured? (yes/no):"
+        read USE_PROVIDED_CERTIFICATES
+    fi
+    if [ "$USE_PROVIDED_CERTIFICATES" == "yes" ]; then
+        echo "Importing certificates..."
+        import_certs
+    else
+        echo "Generating self-signed certificates (for demo only)"
+        generate_certs
+    fi
+
     init_consul
+    
+    if [ -z "${CERTIFICATE_PASSWORD}" ]; then
+        read_certificate_password
+    fi
     if [ "$MASTER_PASSWORD" == "" ]; then
         read_master_password
     fi
@@ -235,25 +295,6 @@ init_knox() {
     
     echo "Starting Knox"
     source $(pwd)/docker-knox.sh
-
-    docker exec -t knox ./wait_for_keystore_file.sh
-    mkdir -p ${CERTS_DIR}
-    sleep 5
-    export_knox_cert ${MASTER_PASSWORD} knox > ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE} || handle_knox_failure
-    echo "Knox Initialized"
-}
-
-handle_knox_failure() {
-    echo "Data plane public certificate could not be generated properly."
-    echo "Please destroy Knox and re-initialize again with the commands 'dpdeploy.sh destroy knox' and 'dpdeploy init knox'."
-    exit 1
-}
-
-export_knox_cert() {
-    MASTER_PASSWD=$1
-    KNOX_CONTAINER_ID=$2
-    docker exec -t ${KNOX_CONTAINER_ID} \
-        keytool -export -alias gateway-identity -storepass ${MASTER_PASSWD} -keystore /usr/hdp/current/knox-server/data/security/keystores/gateway.jks -rfc
 }
 
 start_app() {
@@ -410,11 +451,12 @@ print_version() {
 usage() {
     local tabspace=20
     echo "Usage: dpdeploy.sh <command>"
-    printf "%-${tabspace}s:%s\n" "Commands" "init [db | knox | app |--all] | migrate | ps | logs [container id|name] | start [knox | --all]| stop [knox | --all] | destroy [knox | --all]"
+    printf "%-${tabspace}s:%s\n" "Commands"
     printf "%-${tabspace}s:%s\n" "init db" "Initialize postgres DB for first time"
     printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox and Consul containers"
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
+    printf "%-${tabspace}s:%s\n" "reset" "Reset database to its initial state"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
     printf "%-${tabspace}s:%s\n" "utils update-user ambari" "Update Ambari user credentials that Dataplane will use to connect to clusters."
     printf "%-${tabspace}s:%s\n" "utils add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"

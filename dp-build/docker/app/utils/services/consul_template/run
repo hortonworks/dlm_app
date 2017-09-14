@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # /*
 #  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
@@ -9,18 +9,19 @@
 #  * of all or any part of the contents of this software is strictly prohibited.
 #  */
 #
-echo "1st step"
 if [ -z "$CONSUL_HOST" ]; then
     echo "Need to set CONSUL_HOST"
     exit 1
 fi
-echo "second step"
-if [ ! -d ../data/security/master ]
-then
-    ./setup-master-password.sh
-fi    
-echo "Starting services ..."
-ls -lR ../data/security/
-./ldap.sh start
-/usr/bin/java -Djava.library.path=/usr/hdp/current/knox-server/ext/native -jar /usr/hdp/current/knox-server/bin/gateway.jar &
-consul agent -join $CONSUL_HOST -config-file=/consul-config/knox-consul.config -disable-host-node-id=true
+exec 2>&1
+if [ "$USE_TLS" == "true" ]; then
+    /usr/bin/consul-template \
+        -consul=$CONSUL_HOST:8500 \
+        -wait=5s \
+        -template="/etc/sv/consul_template/ctmpl/nginx.ssl.ctmpl.conf:/etc/sv/nginx/nginx.conf:service nginx reload"
+else
+    /usr/bin/consul-template \
+        -consul=$CONSUL_HOST:8500 \
+        -wait=5s \
+        -template="/etc/sv/consul_template/ctmpl/nginx.no-ssl.ctmpl.conf:/etc/sv/nginx/nginx.conf:service nginx reload"
+fi
