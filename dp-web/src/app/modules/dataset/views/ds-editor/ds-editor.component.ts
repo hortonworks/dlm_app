@@ -89,7 +89,10 @@ export class DsEditor implements OnInit {
       .saveDataset(this.dsModel, this.assetSetQueryModelsForAddition, this.tags)
       .subscribe(
         () => this.actionCancel(),
-        error => this.errorMessage = error.json().message
+        error => {
+          this.saveInProgress = false;
+          this.errorMessage = error.json().message
+        }
       );
   }
 
