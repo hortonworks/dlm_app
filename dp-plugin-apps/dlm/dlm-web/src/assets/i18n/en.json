@@ -386,6 +386,10 @@
           "job": "Run Job",
           "advanced": "Advanced Properties"
         },
+        "help": {
+          "snapshot_text": "Enable snapshot based replication",
+          "snapshot_url": "https://docs.hortonworks.com/HDPDocuments/DLM1/DLM-1.0.0/bk_data-management/content/create_snaphot_enabled_directories.html"
+        },
         "fields": {
           "policy_name": "Policy Name",
           "policy_description": "Description",
