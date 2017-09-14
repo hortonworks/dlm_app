@@ -29,6 +29,8 @@ import {RangerService} from '../../services/ranger.service';
 import {PaginationModule} from "../../shared/pagination/pagination.module";
 import { AuditVisualizationComponent } from './asset-view/asset-audit-view/audit-visualization/audit-visualization.component';
 import {TranslateModule} from '@ngx-translate/core';
+import { AssetTagPolicyViewComponent } from './asset-view/asset-policy-view/asset-tag-policy-view/asset-tag-policy-view.component';
+import { AssetResourcePolicyViewComponent } from './asset-view/asset-policy-view/asset-resource-policy-view/asset-resource-policy-view.component';
 
 @NgModule({
   imports: [
@@ -48,7 +50,9 @@ import {TranslateModule} from '@ngx-translate/core';
     AssetColumnVisualComponent,
     AssetAuditView,
     AssetPolicyView,
-    AuditVisualizationComponent
+    AuditVisualizationComponent,
+    AssetTagPolicyViewComponent,
+    AssetResourcePolicyViewComponent
   ],
   providers: [
     AssetService,

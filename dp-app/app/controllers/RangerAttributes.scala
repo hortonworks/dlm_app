@@ -15,18 +15,21 @@ import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.auth.Authenticated
-import com.hortonworks.dataplane.cs.Webservice.RangerService
-import models.JsonResponses
+import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
+import com.hortonworks.dataplane.cs.Webservice.{AtlasService, RangerService}
+import models.{ApplicationException, JsonResponses, UnsupportedInputException, WrappedErrorsException}
+import models.JsonFormatters._
 import play.api.Logger
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc.Controller
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-/**
-  * Created by dsingh on 7/28/17.
-  */
+import scala.concurrent.Future
+
 class RangerAttributes @Inject()(
+      @Named("atlasService")
+      val atlasService: AtlasService,
       @Named("rangerService")
       val rangerService: RangerService,
       val authenticated: Authenticated
@@ -49,21 +52,58 @@ class RangerAttributes @Inject()(
         }
     }
 
-  def getPolicyDetails(clusterId: String, dbName: String, tableName: String, offset:String, limit:String) =
+  def getPolicyDetails(clusterId: Long, offset: Long, limit: Long, serviceType: String, dbName: Option[String], tableName: Option[String], guid: Option[String]) =
     authenticated.async { req =>
       Logger.info("Received getPolicyDetails for entity")
       implicit val token = req.token
-      rangerService
-        .getPolicyDetails(clusterId, dbName, tableName, offset, limit)
-        .map {
-          case Left(errors) => {
-            errors.errors.head.code match {
-              case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-              case  _    => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+
+      (serviceType match {
+        case "hive" => getResourceBasedPolicies(clusterId, offset, limit, dbName.getOrElse(""), tableName.getOrElse(""))
+        case "tag" => getTagBasedPolicies(clusterId, offset, limit, guid.getOrElse(""))
+        case _ => Future.failed(UnsupportedInputException(100, "serviceType must be 'hive' or 'tag'"))
+      })
+        .map { policies => Ok(Json.toJson(policies)) }
+        .recover {
+          case exception: WrappedErrorsException =>
+            exception.errors.firstMessage match {
+              case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(exception)}"))
+              case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(exception)}"))
             }
-          }
-          case Right(attributes) => Ok(Json.toJson(attributes))
+          case exception: ApplicationException =>
+            new Status(exception.http) (exception.toJs)
         }
     }
+
+  private def getResourceBasedPolicies(clusterId: Long, offset: Long, limit: Long, dbName: String, tableName: String)(implicit token:Option[HJwtToken]): Future[JsValue] = {
+    rangerService
+      .getPolicyDetails(clusterId.toString, dbName, tableName, offset.toString, limit.toString)
+      .map {
+        case Left(errors) =>  throw WrappedErrorsException(errors)
+        case Right(attributes) => attributes
+      }
+  }
+
+  private def getTagBasedPolicies(clusterId: Long, offset: Long, limit: Long, guid: String)(implicit token:Option[HJwtToken]): Future[JsValue] = {
+    for {
+      tags <- getAtlasTagsByGuid(clusterId, guid)
+      policies <- getPoliciesByTags(clusterId, tags, offset, limit)
+    } yield policies
+  }
+
+  private def getAtlasTagsByGuid(clusterId: Long, guid: String)(implicit token:Option[HJwtToken]): Future[Seq[String]] = {
+    atlasService
+      .getAssetDetails(clusterId.toString, guid)
+      .map {
+        case Left(errors) => throw WrappedErrorsException(errors)
+        case Right(asset) => (asset \ "entity" \ "classifications" \\ "typeName").map(d => d.validate[String].get)
+      }
+  }
+  private def getPoliciesByTags(clusterId: Long, tags: Seq[String], offset: Long, limit: Long)(implicit token:Option[HJwtToken]): Future[JsValue] = {
+    rangerService.getPolicyDetailsByTagName(clusterId, tags.mkString(","), offset, limit)
+      .map {
+        case Left(errors) => throw WrappedErrorsException(errors)
+        case Right(policies) => policies
+      }
+  }
 
 }

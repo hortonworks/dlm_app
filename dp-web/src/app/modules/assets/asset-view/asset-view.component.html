@@ -21,7 +21,7 @@
             <!--
             <dp-dropdown class="pull-right" [list]="['abc', 'def']"></dp-dropdown>
              -->
-            <!-- 
+            <!--
             <button *ngIf="showProfilerStatus" (click)="startProfiler()" class="mdl-button btn-hwx-default">
               <span *ngIf="profilerStatus == PS.RUNNING">Profiler Running <i class="fa fa-spinner fa-spin"></i></span>
               <span *ngIf="profilerStatus != PS.RUNNING">Restart Profiling</span>
@@ -53,7 +53,10 @@
      <asset-audit-view [clusterId]="clusterId" [assetDetails]="assetDetails"> </asset-audit-view>
     </section>
     <section *ngIf="selectedTopLevelTabs === topLevelTabs.POLICY">
-     <asset-policy-view [clusterId]="clusterId" [assetDetails]="assetDetails"> </asset-policy-view>
+     <div class="hwx-title-panel hwx-title">{{'pages.dataset.labels.reourceBasedPolicy' | translate}}</div>
+     <dp-asset-resource-policy-view [clusterId]="clusterId" [assetDetails]="assetDetails"> </dp-asset-resource-policy-view>
+     <div class="hwx-title-panel hwx-title">{{'pages.dataset.labels.tagBasedPolicy' | translate}}</div>
+     <dp-asset-tag-policy-view [clusterId]="clusterId" [guid]="guid"> </dp-asset-tag-policy-view>
     </section>
 
 </div>
