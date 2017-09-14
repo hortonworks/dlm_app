@@ -42,10 +42,10 @@ class DataSets @Inject()(
     authenticated: Authenticated)
     extends Controller {
 
-  def list = authenticated.async {
+  def list(name: Option[String]) = authenticated.async {
     Logger.info("Received list dataSet request")
     dataSetService
-      .list()
+      .list(name)
       .map {
         case Left(errors) =>
           InternalServerError(

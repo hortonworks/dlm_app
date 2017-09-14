@@ -60,6 +60,10 @@ class DatasetRepo @Inject()(
     db.run(Datasets.filter(_.id === datasetId).result.headOption)
   }
 
+  def findByName(name: String): Future[List[Dataset]] = {
+    db.run(Datasets.filter(_.name === name).to[List].result)
+  }
+
   def archiveById(datasetId: Long): Future[Int] = {
     db.run(Datasets.filter(_.id === datasetId).map(_.active).update(false))
   }
