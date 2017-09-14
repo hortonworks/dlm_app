@@ -154,6 +154,11 @@ class LdapService @Inject()(
         Left(Errors(Seq(Error("409", "LDAP is not yet configured."))))))
   }
 
+  def getPassword(bindDn:String):Option[String]={
+    val cred: Option[CredentialEntry]=ldapKeyStore.getCredentialEntry(bindDn)
+    if (cred.isDefined)Some(cred.get.password) else None
+  }
+
   private def ldapSearch(
       dirContext: DirContext,
       ldapConfs: Seq[LdapConfiguration],
