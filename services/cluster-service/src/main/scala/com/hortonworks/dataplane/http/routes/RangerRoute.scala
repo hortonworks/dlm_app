@@ -23,7 +23,7 @@ import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, Cluster
 import com.hortonworks.dataplane.http.BaseRoute
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
 import com.hortonworks.dataplane.http.JsonSupport._
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
@@ -77,7 +77,7 @@ class RangerRoute @Inject()(
         baseUrls <- extractUrlsWithIp(url, clusterId)
         user <- storageInterface.getConfiguration("dp.ranger.user")
         pass <- storageInterface.getConfiguration("dp.ranger.password")
-        policies <- getRangerPoliciesByServiceTypeAndQuery(baseUrls.head, user, pass, serviceType, cQuery)
+        policies <- Try(getRangerPoliciesByServiceTypeAndQuery(baseUrls.head, user, pass, serviceType, cQuery))
       } yield (policies)
     }
     Future.sequence(futures).map(_.flatten).map(JsArray(_))
@@ -88,7 +88,7 @@ class RangerRoute @Inject()(
     serviceType match {
       case "hive" => Seq(query + s"&resource:database=${dbName.getOrElse("")}&resource:table=${tableName.getOrElse("")}")
       case "tag" => tags.getOrElse("").trim.split(",").filter(cTag => !cTag.isEmpty).map(cTag => query + s"&resource:tag=${cTag.trim}")
-      case _ => Seq("todo: unknown type. exception")
+      case _ => throw UnsupportedInputException(1000, "This is not a supported Ranger service.")
     }
   }
 
