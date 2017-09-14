@@ -28,7 +28,7 @@
       ></ds-assets-holder>
       <ds-summary-holder  *ngIf="currentStage == 3" [dsModel]="dsModel"  [tags]="tags"></ds-summary-holder>
       <div class="error-section" *ngIf="errorMessage">
-        <strong>Unable to create dataset:</strong> {{errorMessage}}
+        <strong>{{"pages.dataset.ds-editor.create-error" | translate}}</strong> {{errorMessage}}
       </div>
       <div class="button-container">
         <button *ngIf="nextIsVisible" class="mdl-button btn-hwx-primary" (click)="actionNext()">{{"pages.dataset.ds-editor.action.next" | translate}}</button>
