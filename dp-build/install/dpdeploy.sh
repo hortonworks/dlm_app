@@ -416,20 +416,9 @@ upgrade() {
     mkdir -p $(pwd)/certs
     cp -R $2/certs/* $(pwd)/certs
 
-    # destroy all but db and knox
+    # destroy all but db
     docker rm -f $APP_CONTAINERS_WITHOUT_DB || echo "App is not up."
-
-    # stop knox
-    docker stop $KNOX_CONTAINER
-
-    # destroy consul
-    destroy_consul
-
-    # bring consul back
-    init_consul
-
-    # start knox
-    docker start $KNOX_CONTAINER
+    destroy_knox || echo "Knox/Consul is not up"
 
     # migrate schema to new version
     migrate_schema
