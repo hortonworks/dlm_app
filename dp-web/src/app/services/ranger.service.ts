@@ -16,6 +16,11 @@ import {Observable} from 'rxjs/Observable';
 import {HttpUtil} from '../shared/utils/httpUtil';
 import {AuditSchema, PolicySchema, TagPolicySchema} from '../models/auditSchema';
 
+export class PolicyTypes {
+  static HIVE: string = "hive";
+  static TAG: string = "tag";
+}
+
 @Injectable()
 export class RangerService {
   uri = '/api/ranger';
@@ -26,7 +31,7 @@ export class RangerService {
   }
 
   getPolicyDetails(clusterId:string, dbName:string, tableName:string, offset:number, limit:number) : Observable<any>{
-    let serviceType = "hive";
+    let serviceType = PolicyTypes.HIVE;
     const uri = `${this.uri}/${clusterId}/policies?offset=${offset}&limit=${limit}&serviceType=${serviceType}&dbName=${dbName}&tableName=${tableName}`;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
@@ -52,7 +57,7 @@ export class RangerService {
   }
 
   getTagPolicyDetails(clusterId:string, guid: string, offset:number, limit:number) : Observable<any>{
-    let serviceType = "tag";
+    let serviceType = PolicyTypes.TAG;
     const uri = `${this.uri}/${clusterId}/policies?offset=${offset}&limit=${limit}&serviceType=${serviceType}&guid=${guid}`;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
