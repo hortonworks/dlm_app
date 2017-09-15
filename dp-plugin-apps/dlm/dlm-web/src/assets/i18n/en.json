@@ -228,6 +228,7 @@
       "issues": {
         "updates": "Issues & Updates",
         "recent": "Recent Issues",
+        "no_issues": "No issues to report",
         "list": {
           "view_all": "View all",
           "empty_list": "No issues or updates within the selected time period.",
