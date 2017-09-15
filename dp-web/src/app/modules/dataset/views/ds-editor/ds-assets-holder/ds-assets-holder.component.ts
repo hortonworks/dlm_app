@@ -34,6 +34,9 @@ export class DsAssetsHolder implements OnInit {
   showList: boolean = false;
   @Output("onDoneAction") actionEmitter: EventEmitter<AssetListActionsEnum> = new EventEmitter<AssetListActionsEnum>();
 
+  @Output('onNext') nextEE: EventEmitter<void> = new EventEmitter<void>();
+  @Output('onCancel') cancelEE: EventEmitter<void> = new EventEmitter<void>();
+
   ngOnInit() {
     this.setShowListFlag();
   }
@@ -67,5 +70,13 @@ export class DsAssetsHolder implements OnInit {
 
   actionCancel() {
     this.showPopup = false;
+  }
+
+  onNext() {
+    this.nextEE.emit();
+  }
+
+  onCancel() {
+    this.cancelEE.emit();
   }
 }

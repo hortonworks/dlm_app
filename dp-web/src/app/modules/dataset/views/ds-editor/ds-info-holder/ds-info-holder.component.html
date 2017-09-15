@@ -41,3 +41,9 @@
   ></tagging-widget>
 </div>
 
+
+<div class="button-container">
+  <button class="mdl-button btn-hwx-primary" (click)="onNext()" [disabled]="datasetName.invalid && datasetName.errors.unique">{{"pages.dataset.ds-editor.action.next" | translate}}</button>
+  <button class="mdl-button btn-hwx-default" (click)="onCancel()">{{"pages.dataset.ds-editor.action.cancel" | translate}}</button>
+</div>
+
