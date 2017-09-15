@@ -279,8 +279,8 @@
         "description": "Description",
         "belongsTo": "Belongs To",
         "dbName": "Database Name",
-        "reourceBasedPolicy": "Resource Based Policy",
-        "tagBasedPolicy": "Tag Based Policy"
+        "resourceBasedPolicies": "Resource Based Policies",
+        "tagBasedPolicies": "Tag Based Policies"
       },
       "ds-editor": {
         "ds-description": "Organize your hive assets into logical groups for subsequent usage.",
