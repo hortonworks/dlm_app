@@ -38,18 +38,20 @@
     <div class="chart-title">
       Allowed VS Unauthorised Access
     </div>
-    <div #stackedbarchart class="chart" id="allowedVsUnauthorisedAccess"  *ngIf="!barChartLoading">
+    <div #stackedbarchart class="chart" id="allowedVsUnauthorisedAccess"  *ngIf="!barChartLoading && !noDate">
       <svg></svg>
     </div>
     <div *ngIf="barChartLoading" class="loadingDiv">Loading...</div>
+    <div *ngIf="noDate" class="loadingDiv">Select Date Range.</div>
   </div>
   <div class="flex-25 spacer-t-10">
     <div class="chart-title">
-      Select Vs Update
+      Access Type
     </div>
-    <div #donutchart class="chart" id="selectVsUpdate" *ngIf="!paiChartLoading">
+    <div #donutchart class="chart" id="selectVsUpdate" *ngIf="!paiChartLoading && !noDate">
       <svg></svg>
     </div>
     <div *ngIf="paiChartLoading" class="loadingDiv">Loading...</div>
+    <div *ngIf="noDate" class="loadingDiv">Select Date Range.</div>
   </div>
 </div>

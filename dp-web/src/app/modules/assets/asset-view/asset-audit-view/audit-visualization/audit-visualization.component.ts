@@ -95,11 +95,12 @@ export class AuditVisualizationComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.onParamChange();
   }
-
+  noDate:boolean=false;
   onDateRangeChanged(model: IMyDateRangeModel){
     //this.dateModel = model;
+    this.noDate=false
     setTimeout(()=>{
-      if(!this.dateModel) this.showNoData();
+      if(!this.dateModel) this.noDate=true;
       else this.onParamChange();
     }, 100);
   }
@@ -109,12 +110,6 @@ export class AuditVisualizationComponent implements OnInit, AfterViewInit {
     this.userChangeTimer = setTimeout(()=>this.onParamChange(), 300);
   }
 
-  showNoData() {
-    let results={"allowed":[], "denied":[]}
-    this.bar_data.forEach(obj=>obj.values=results[obj.id]);
-    this.createStackedBarChart(this.bar_data);
-    this.createDonutChart([]);
-  }
   barChartLoading:boolean = false;
   paiChartLoading:boolean = false;
   onParamChange() {
