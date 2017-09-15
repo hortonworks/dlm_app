@@ -27,6 +27,7 @@
     "pairs": "Pairs",
     "policy": "Policy",
     "name": "Name",
+    "no_results": "No results found",
     "queue_name": "Queue Name",
     "max_bandwidth": "Max. Bandwidth",
     "job": "Job",

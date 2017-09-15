@@ -7,7 +7,9 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core';
+import {
+  Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild, HostListener, ElementRef
+} from '@angular/core';
 import { AppliedFilterMapped, TableFilterItem } from './table-filter-item.type';
 import { TypeaheadOption } from './typeahead-option.type';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -69,6 +71,20 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
    * @type {Array}
    */
   typeaheadOptions: TypeaheadOption[] = [];
+
+  /**
+   * True when no matching results are found
+   */
+  typeaheadNoResults = false;
+
+  @ViewChild('no_results_container') noResultsContainer: ElementRef;
+
+  @HostListener('document:click', ['$event'])
+  outsideClickHandler(e) {
+    if (this.typeaheadNoResults === true && !this.noResultsContainer.nativeElement.contains(e.target)) {
+      this.typeaheadNoResults = false;
+    }
+  }
 
   constructor() {
     this.appliedFiltersSubscription = this.appliedFilters.subscribe(appliedFilters => {
@@ -132,6 +148,7 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
       const newFilterOptions = filter.values.map(value => ({value, filter}));
       typeaheadOptions = [...typeaheadOptions, ...newFilterOptions];
     });
+    console.log(typeaheadOptions);
     return typeaheadOptions;
   }
 
@@ -179,5 +196,9 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
   getFilterTitle(key) {
     const filtered = this.filterBy.filter(filter => filter.propertyName === key);
     return filtered.length ? filtered[0].filterTitle : capitalize(key);
+  }
+
+  handleTypeaheadNoResults(e: boolean): void {
+    this.typeaheadNoResults = e;
   }
 }
