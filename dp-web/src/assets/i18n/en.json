@@ -296,6 +296,9 @@
           "addAssets": "Add Assets",
           "removeAll": "Remove All",
           "addMoreAssets": "Add More Assets"
+        },
+        "errors": {
+          "unique": "An asset collection with this name already exists. Please choose a different name."
         }
       },
       "asset-search": {
