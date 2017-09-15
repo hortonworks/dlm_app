@@ -123,7 +123,7 @@ class DataSets @Inject()(
                 .map {
                   case Left(errors) => {
                     errors.firstMessage match {
-                      case "409" => InternalServerError(JsonResponses.statusError(s"A dataset with this name already exists."))
+                      case "409" => InternalServerError(JsonResponses.statusError(s"An asset collection with this name already exists."))
                       case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
                     }
                   }
