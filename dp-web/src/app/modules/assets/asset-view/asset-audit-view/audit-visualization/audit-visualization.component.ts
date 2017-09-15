@@ -44,11 +44,11 @@ export class AuditVisualizationComponent implements OnInit, AfterViewInit {
 
   today = new Date(); 
   lastWeek = new Date(this.today.getTime() - 7*24*60*60*1000);
-  private myDateRangePickerOptions: IMyDrpOptions = {
+  myDateRangePickerOptions: IMyDrpOptions = {
     dateFormat: 'dd mmm yyyy',
     editableDateRangeField: false,
   };
-  private dateModel: Object = {
+  dateModel: Object = {
     beginDate: {year: this.lastWeek.getFullYear(), month: 1+this.lastWeek.getMonth(), day: this.lastWeek.getDate()},
     endDate: {year: this.today.getFullYear(), month: 1+this.today.getMonth(), day: this.today.getDate()}
   };
