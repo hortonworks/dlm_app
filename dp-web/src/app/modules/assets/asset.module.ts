@@ -13,6 +13,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import {FormsModule} from "@angular/forms";
+import { MyDateRangePickerModule } from 'mydaterangepicker';
 
 import { routes } from './asset.routes';
 import {AssetViewComponent} from './asset-view/asset-view.component';
@@ -41,7 +42,8 @@ import { AssetResourcePolicyViewComponent } from './asset-view/asset-policy-view
     TabsModule,
     LineageModule,
     PaginationModule,
-    TranslateModule
+    TranslateModule,
+    MyDateRangePickerModule
   ],
   declarations: [
     AssetViewComponent,

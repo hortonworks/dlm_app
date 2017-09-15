@@ -35,7 +35,9 @@ export class AssetAuditView implements OnInit {
   count = 3;
   resultOptions:string[] = ["ALL", "ALLOWED", "DENIED"];
   accessTypeOptions:string[] = ["ALL", "SELECT", "UPDATE", "CREATE", "DROP", "ALTER", "INDEX", "READ", "WRITE"];
-  showMockVisualization = false;
+  showMockVisualization = true;
+  dbName:string="";
+  assetName:string="";
 
   constructor(private rangerService: RangerService, private assetService: AssetService) {
   }
@@ -44,19 +46,19 @@ export class AssetAuditView implements OnInit {
   	console.log(this.assetDetails, this.clusterId);
   	if(!this.assetDetails) return;
   	this.onRefresh();
-    this.assetService.checkMockAuditVisualStatus().subscribe(status => {
-      console.log(status);
-      this.showMockVisualization = status.showMockVisualization;
-    });
+    // this.assetService.checkMockAuditVisualStatus().subscribe(status => {
+    //   console.log(status);
+    //   this.showMockVisualization = status.showMockVisualization;
+    // });
 
   }
   onRefresh(){
   	this.audits = [];
   	this.state = this.AWS.LOADING;
   	let qualifiedName = this.assetDetails.entity.attributes.qualifiedName;
-  	let dbName = qualifiedName.slice(0, qualifiedName.indexOf('.'));
-  	let name = this.assetDetails.entity.attributes.name;
-  	this.rangerService.getAuditDetails(this.clusterId, dbName, name, this.pageStartsFrom-1, this.pageSize, this.accessType, this.result)
+  	this.dbName = qualifiedName.slice(0, qualifiedName.indexOf('.'));
+  	this.assetName = this.assetDetails.entity.attributes.name;
+  	this.rangerService.getAuditDetails(this.clusterId, this.dbName, this.assetName, this.pageStartsFrom-1, this.pageSize, this.accessType, this.result)
   	  .subscribe(details=>{
   	  	this.count = this.rangerService.getTotalCount();
   	  	this.state = this.AWS.LOADED;
