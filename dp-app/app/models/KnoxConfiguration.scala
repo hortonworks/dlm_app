@@ -14,7 +14,11 @@ package models
 case class KnoxConfiguration(ldapUrl: String,
                              bindDn: Option[String],
                              userDnTemplate: Option[String],
-                             domains: Option[Seq[String]])
+                             domains: Option[Seq[String]],
+                             userSearchAttributeName: Option[String],
+                             userSearchBase: Option[String],
+                             password: Option[String]
+                            )
 object KnoxConfiguration {
 
   import play.api.libs.json.Json

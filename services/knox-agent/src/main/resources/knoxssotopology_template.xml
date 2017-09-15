@@ -59,7 +59,7 @@
             </param>
             <param>
                 <name>main.ldapRealm.userDnTemplate</name>
-                <value>belliraj</value>
+                <value>userDnTemplateValueHere</value>
             </param>
             <param>
                 <name>main.ldapRealm.contextFactory.url</name>
