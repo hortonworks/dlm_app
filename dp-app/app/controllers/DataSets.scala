@@ -115,7 +115,7 @@ class DataSets @Inject()(
           getAssetFromSearch(req).flatMap {
             case Right((assets, countOfSaved, countOfIgnored)) =>
               countOfSaved match {
-                case 0 => Future.successful(InternalServerError(JsonResponses.statusError("Unable to create a dataset with 0 assets.")))
+                case 0 => Future.successful(InternalServerError(JsonResponses.statusError("Unable to create an asset collection with 0 assets.")))
                 case _ => {
                   val newReq =
                     req.copy(dataset =
