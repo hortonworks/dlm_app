@@ -148,7 +148,6 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
       const newFilterOptions = filter.values.map(value => ({value, filter}));
       typeaheadOptions = [...typeaheadOptions, ...newFilterOptions];
     });
-    console.log(typeaheadOptions);
     return typeaheadOptions;
   }
 
