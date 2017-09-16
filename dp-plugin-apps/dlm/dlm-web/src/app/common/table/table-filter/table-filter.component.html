@@ -26,7 +26,13 @@
       typeaheadOptionField="value"
       typeaheadGroupField="filter.filterTitle"
       (typeaheadOnSelect)="addFilter($event)"
+      (typeaheadNoResults)="handleTypeaheadNoResults($event)"
       placeholder="Filter"
       class="form-control">
+    <div #no_results_container *ngIf="typeaheadNoResults === true" class="dropdown open no-results">
+      <ul class="dropdown-menu">
+        <li class="dropdown-header">{{'common.no_results' | translate}}</li>
+      </ul>
+    </div>
   </div>
 </div>
