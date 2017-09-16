@@ -10,6 +10,46 @@
 @import '../../styles/variables';
 :host {
   font-size: smaller;
+  .text-info {
+    animation: fadein 1s infinite;
+    -moz-animation: fadein 1s infinite; /* Firefox */
+    -webkit-animation: fadein 1s infinite; /* Safari and Chrome */
+    -o-animation: fadein 1s infinite; /* Opera */
+
+    @keyframes fadein {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+    @-moz-keyframes fadein { /* Firefox */
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+    @-webkit-keyframes fadein { /* Safari and Chrome */
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+    @-o-keyframes fadein { /* Opera */
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+  }
+
 }
 .text-success {
   color: $success-color !important;

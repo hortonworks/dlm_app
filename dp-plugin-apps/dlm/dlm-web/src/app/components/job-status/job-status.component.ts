@@ -7,7 +7,7 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { Job } from 'models/job.model';
 import { JOB_STATUS } from 'constants/status.constant';
 
@@ -16,9 +16,10 @@ import { JOB_STATUS } from 'constants/status.constant';
   templateUrl: './job-status.component.html',
   styleUrls: ['./job-status.component.scss']
 })
-export class JobStatusComponent implements OnInit {
+export class JobStatusComponent implements OnInit, AfterViewInit {
   JOB_STATUS = JOB_STATUS;
   @Input() job: Job;
+  @ViewChild('job_status') jobStatus: ElementRef;
 
   constructor() {
   }
@@ -26,4 +27,12 @@ export class JobStatusComponent implements OnInit {
   ngOnInit() {
   }
 
+  ngAfterViewInit() {
+    /*if (this.jobStatus && this.job.status === JOB_STATUS.RUNNING) {
+      const $el = $(this.jobStatus.nativeElement);
+      for (let i = 0; i < 5; i++) {
+        $el.fadeTo(500, 0.5).fadeTo(500, 1.0);
+      }
+    }*/
+  }
 }
