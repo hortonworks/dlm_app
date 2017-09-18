@@ -21,8 +21,8 @@ RUN wget ${HASHICORP_RELEASES}/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}
     unzip -d /bin consul_${CONSUL_VERSION}_linux_amd64.zip && \
     rm consul_${CONSUL_VERSION}_linux_amd64.zip
 
-COPY dp-knox-agent /usr/dp-knox-agent
-COPY knox-scripts /scripts
+COPY ./dp-knox-agent /usr/dp-knox-agent
+COPY ./utils /scripts
 
 
 EXPOSE 8300 8301 8301/udp 8302 8302/udp 8400 8500 53/udp

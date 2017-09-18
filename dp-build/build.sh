@@ -108,8 +108,9 @@ build_knox_agent() {
 
 build_dp_knox() {
 	log "Building dp-knox"
-	cp -R knox-scripts ${DP_DOCKER_ROOT_FOLDER}/dp-knox/
-	cp Dockerfile.knox ${DP_DOCKER_ROOT_FOLDER}/dp-knox/Dockerfile
+	# move docker files and utils
+	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-knox/
+	cp -R ./docker/knox/* ${DP_DOCKER_ROOT_FOLDER}/dp-knox/
     cp -R build/dp-docker/dp-knox-agent/dp-knox-agent/ ${DP_DOCKER_ROOT_FOLDER}/dp-knox/dp-knox-agent
 }
 
