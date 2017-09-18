@@ -24,7 +24,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, LdapCon
 import com.hortonworks.dataplane.commons.domain.Ldap.{LdapGroup, LdapSearchResult, LdapUser}
 import com.hortonworks.dataplane.db.Webservice.{ConfigService, LdapConfigService}
 import com.typesafe.scalalogging.Logger
-import models.{CredentialEntry, KnoxConfigInfo}
+import models.{CredentialEntry, KnoxConfigInfo, WrappedErrorsException}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
@@ -98,15 +98,16 @@ class LdapService @Inject()(
 
   def validateBindDn(
       knoxConf: KnoxConfigInfo): Future[Either[Errors, Boolean]] = {
-    getLdapContext(knoxConf.ldapUrl,
+    val context=getLdapContext(knoxConf.ldapUrl,
                    knoxConf.bindDn.get,
                    knoxConf.password.get)
-      .map {
-        case Left(errors) => Left(errors)
-        case Right(dirContext) =>
-          //TODO more ops
-          Right(true)
-      }
+    context.map{ctx=>
+      //TODO more ops
+      Right(true)
+    }.recoverWith {
+      case e: WrappedErrorsException =>
+        Future.successful(Left(e.errors))
+    }
   }
 
   def doWithEither[T, A](
@@ -136,22 +137,28 @@ class LdapService @Inject()(
     } yield search
 
   private def validateAndGetLdapContext(
-      configuredLdap: Seq[LdapConfiguration]) = {
+      configuredLdap: Seq[LdapConfiguration]):Future[Either[Errors,DirContext]] = {
     //TODO bind dn validate.
-    configuredLdap.headOption
-      .map { l =>
-        val cred: Option[CredentialEntry] =
-          ldapKeyStore.getCredentialEntry(l.bindDn.get)
+    configuredLdap.headOption match {
+      case Some(l)=>{
+        val cred: Option[CredentialEntry] = ldapKeyStore.getCredentialEntry(l.bindDn.get)
         cred match {
           case Some(cred) =>
-            getLdapContext(l.ldapUrl, l.bindDn.get, cred.password)
-          case None =>
-            Future.successful(
-              Left(Errors(Seq(Error("Exception", "no password ")))))
+            getLdapContext(l.ldapUrl, l.bindDn.get, cred.password).map{ ctx=>
+             Right(ctx)
+            }.recoverWith{
+              case e: WrappedErrorsException =>
+                Future.successful(Left(e.errors))
+            }
+          case None =>{
+            Future.successful(Left(Errors(Seq(Error("Exception", "no password ")))))
+          }
         }
       }
-      .getOrElse(Future.successful(
-        Left(Errors(Seq(Error("409", "LDAP is not yet configured."))))))
+      case None=>{
+        Future.successful(Left(Errors(Seq(Error("409", "LDAP is not yet configured.")))))
+      }
+    }
   }
 
   def getPassword(bindDn:String):Option[String]={
@@ -310,7 +317,7 @@ class LdapService @Inject()(
   private def getLdapContext(
       url: String,
       bindDn: String,
-      pass: String): Future[Either[Errors, DirContext]] = {
+      pass: String): Future[ DirContext] = {
     val env = new util.Hashtable[String, AnyRef]
     env.put(Context.INITIAL_CONTEXT_FACTORY,
             "com.sun.jndi.ldap.LdapCtxFactory")
@@ -318,27 +325,27 @@ class LdapService @Inject()(
     env.put(Context.PROVIDER_URL, url)
     env.put(Context.SECURITY_PRINCIPAL, bindDn)
     env.put(Context.SECURITY_CREDENTIALS, pass)
+    env.put("com.sun.jndi.ldap.connect.pool", "true")
     try {
       val ctx: DirContext = new InitialLdapContext(env, null)
-      Future.successful(Right(ctx))
+      Future.successful(ctx)
     } catch {
-
       case e: CommunicationException=>{
         logger.error("error while getting ldapContext",e)
-        Future.successful(
-          Left(Errors(Seq(Error("Communication Exception", "Could not communicate with LDAP server. Check connectivity.")))))
+        val errors=Errors(Seq(Error("Communication Exception", "Could not communicate with LDAP server. Check connectivity.")))
+        throw WrappedErrorsException(errors)
       }
       case e: AuthenticationException=>{
         logger.error("error while getting ldapContext",e)
-        Future.successful(
-          Left(Errors(Seq(Error("Authentication Exception", "Some credentials are incorrect for LDAP")))))
+        val errors=Errors(Seq(Error("Authentication Exception", "Some credentials are incorrect for LDAP")))
+        throw WrappedErrorsException(errors)
       }
       case e: NamingException =>{
         logger.error("error while getting ldapContext",e)
-        Future.successful(
-          Left(Errors(Seq(Error("Exception", e.getMessage)))))
+        val errors=Errors(Seq(Error("Exception", e.getMessage)))
+        throw WrappedErrorsException(errors)
       }
-
     }
   }
+
 }
