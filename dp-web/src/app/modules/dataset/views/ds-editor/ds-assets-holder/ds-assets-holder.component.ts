@@ -28,11 +28,9 @@ export class DsAssetsHolder implements OnInit {
   @Input() assetSetQueryModelsForAddition: AssetSetQueryModel[] = null;
   @Input() assetSetQueryModelsForSubtraction: AssetSetQueryModel[] = null;
   @Input() dsModel: RichDatasetModel = null;
-//  applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.ADD, AssetListActionsEnum.REMOVE];
   applicableListActions: AssetListActionsEnum[] = [AssetListActionsEnum.REMOVE];
   showPopup: boolean = false;
   showList: boolean = false;
-  @Output("onDoneAction") actionEmitter: EventEmitter<AssetListActionsEnum> = new EventEmitter<AssetListActionsEnum>();
 
   @Output('onNext') nextEE: EventEmitter<void> = new EventEmitter<void>();
   @Output('onCancel') cancelEE: EventEmitter<void> = new EventEmitter<void>();
@@ -47,7 +45,6 @@ export class DsAssetsHolder implements OnInit {
 
   actionDone(asqm: AssetSetQueryModel) {
     this.assetSetQueryModelsForAddition.push(asqm);
-    this.actionEmitter.emit();
     this.showPopup = false;
     this.setShowListFlag();
   }
@@ -65,7 +62,6 @@ export class DsAssetsHolder implements OnInit {
     this.assetSetQueryModelsForAddition.splice(0);
     this.dsModel.counts=null;
     this.setShowListFlag();
-    this.actionEmitter.emit();
   }
 
   actionCancel() {

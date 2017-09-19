@@ -31,7 +31,6 @@
         *ngIf="currentStage == 2"
         [dsModel]="dsModel"
         [assetSetQueryModelsForAddition]="assetSetQueryModelsForAddition"
-        (onDoneAction)="setVisibilityOfNext()"
         (onNext)="actionNext()"
         (onCancel)="actionCancel()"></ds-assets-holder>
 
@@ -42,6 +41,9 @@
         (onSave)="actionSave()"
         (onCancel)="actionCancel()"></ds-summary-holder>
 
+      <div class="error-section" *ngIf="errorMessage">
+        <strong>{{"pages.dataset.ds-editor.create-error" | translate}}</strong> {{errorMessage}}
+      </div>
       <div class="fillMandatoryMsg" #fillMandatoryMsg>{{"pages.dataset.ds-editor.fillMandatoryMsg" | translate}}</div>
     </div>
     <div style="clear:both;"></div>

@@ -114,40 +114,45 @@ class DataSets @Inject()(
         .map { req =>
           getAssetFromSearch(req).flatMap {
             case Right((assets, countOfSaved, countOfIgnored)) =>
-              val newReq =
-                req.copy(dataset =
-                           req.dataset.copy(createdBy = request.user.id),
-                         dataAssets = assets)
-              dataSetService
-                .create(newReq)
-                .map {
-                  case Left(errors) => {
-                    errors.firstMessage match {
-                      case "409" => InternalServerError(JsonResponses.statusError(s"An asset collection with this name already exists."))
-                      case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-                    }
-                  }
-                  case Right(dataSetNCategories) => {
-                    val dsId = dataSetNCategories.dataset.id.get
-                    val dsName = dataSetNCategories.dataset.name
-                    val list = assets.map {
-                      asset => ((asset.assetProperties \ "qualifiedName").as[String]).split("@").head
-                    }
-                    (for {
-                      jobName <- utilityService.doGenerateJobName(dsId, dsName)
-                      results <- dpProfilerService.startAndScheduleProfilerJob(req.clusterId.toString, jobName, list)
-                      } yield results)
-                      .onComplete {
-                        case Success(Right(attributes))=> Logger.info(s"Started and Scheduled Profiler, 200 response, ${Json.toJson(attributes)}")
-                        case Success(Left(errors)) => Logger.error(s"Start and Schedule Profiler Failed with ${errors.errors.head.code} ${Json.toJson(errors)}")
-                        case Failure(th) => Logger.error(th.getMessage, th)
+              countOfSaved match {
+                case 0 => Future.successful(InternalServerError(JsonResponses.statusError("Unable to create an asset collection with 0 assets.")))
+                case _ => {
+                  val newReq =
+                    req.copy(dataset =
+                      req.dataset.copy(createdBy = request.user.id),
+                      dataAssets = assets)
+                  dataSetService
+                    .create(newReq)
+                    .map {
+                      case Left(errors) =>{
+                        errors.firstMessage match {
+                          case "409" => InternalServerError(JsonResponses.statusError(s"An asset collection with this name already exists."))
+                          case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+                        }
                       }
-                    Ok(
-                      Json.obj("result" -> Json.toJson(dataSetNCategories),
-                        "countOfSaved" -> countOfSaved,
-                        "countOfIgnored" -> countOfIgnored))
-                  }
+                      case Right(dataSetNCategories) => {
+                        val dsId = dataSetNCategories.dataset.id.get
+                        val dsName = dataSetNCategories.dataset.name
+                        val list = assets.map {
+                          asset => ((asset.assetProperties \ "qualifiedName").as[String]).split("@").head
+                        }
+                        (for {
+                          jobName <- utilityService.doGenerateJobName(dsId, dsName)
+                          results <- dpProfilerService.startAndScheduleProfilerJob(req.clusterId.toString, jobName, list)
+                        } yield results)
+                          .onComplete {
+                            case Success(Right(attributes))=> Logger.info(s"Started and Scheduled Profiler, 200 response, ${Json.toJson(attributes)}")
+                            case Success(Left(errors)) => Logger.error(s"Start and Schedule Profiler Failed with ${errors.errors.head.code} ${Json.toJson(errors)}")
+                            case Failure(th) => Logger.error(th.getMessage, th)
+                          }
+                        Ok(
+                          Json.obj("result" -> Json.toJson(dataSetNCategories),
+                            "countOfSaved" -> countOfSaved,
+                            "countOfIgnored" -> countOfIgnored))
+                      }
+                    }
                 }
+              }
             case Left(errors) =>
               Future.successful(InternalServerError(JsonResponses.statusError(
                 s"Failed with ${Json.toJson(errors)}")))

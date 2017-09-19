@@ -290,6 +290,7 @@
         "fillMandatoryMsg": "Please fill mandatory fields",
         "tagDescription": "Add tags to your asset collection for context and subsequent lookup",
         "asset-description": "Add related data assets into your asset collection, by searching across this Data-Lake",
+        "create-error": "Unable to create asset collection:",
         "action": {
           "next": "Next",
           "save": "Save",
