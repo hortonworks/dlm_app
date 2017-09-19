@@ -11,6 +11,7 @@
     "status": "RUNNING",
     "startTime": "2017-07-28T16:56:00",
     "endTime": "2017-07-28T16:57:32",
+    "trackingInfo": "{\"jobId\":\"job_1501194648859_0008\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"killed\":0,\"failed\":0,\"bytesCopied\":1521597,\"filesCopied\":28,\"timeTaken\":7900}}",
     "message": "java.io.FileNotFoundException: File does not exist: hdfs://yusaku-dlm-30-b-1.c.pramod-thangali.internal:8020/hdp/apps/1.0.0.0-30/mapreduce/mapreduce.tar.gz"
   }, {
     "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001@2",
@@ -22,7 +23,6 @@
     "status": "SUCCESS",
     "startTime": "2017-07-28T17:26:00",
     "endTime": "2017-07-28T17:26:17",
-    "trackingInfo": "{\"jobId\":\"job_1501194648859_0008\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":1521597,\"filesCopied\":28,\"timeTaken\":7900}",
     "message": "SUCCESS"
   }, {
     "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001@3",
@@ -31,10 +31,10 @@
     "type": "FS",
     "executionType": "FS",
     "user": "beacon",
-    "status": "SUCCESS",
+    "status": "RUNNING",
     "startTime": "2017-07-28T17:56:00",
     "endTime": "2017-07-28T17:56:18",
-    "trackingInfo": "{\"jobId\":\"job_1501194648859_0010\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7430}",
+    "trackingInfo": "{\"jobId\":\"job_1501194648859_0010\",\"jobType\":\"MAIN\",\"progress\":{\"total\":3,\"completed\":1,\"killed\":1,\"failed\":0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7430}}",
     "message": "SUCCESS"
   }, {
     "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001@4",
@@ -46,7 +46,7 @@
     "status": "FAILED",
     "startTime": "2017-07-28T18:26:00",
     "endTime": "2017-07-28T18:27:17",
-    "trackingInfo": "{\"jobId\":\"job_1501194648859_0012\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7457}",
+    "trackingInfo": "{\"jobId\":\"job_1501194648859_0012\",\"jobType\":\"MAIN\",\"progress\":{}}",
     "message": "SUCCESS"
   }, {
     "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001@5",
@@ -58,7 +58,7 @@
     "status": "IGNORED",
     "startTime": "2017-07-28T18:56:00",
     "endTime": "2017-07-28T18:56:17",
-    "trackingInfo": "{\"jobId\":\"job_1501194648859_0014\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7616}",
+    "trackingInfo": "{\"jobId\":\"job_1501194648859_0014\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"killed\":0,\"failed\":0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7616}}",
     "message": "SUCCESS"
   }, {
     "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001@6",
@@ -70,7 +70,7 @@
     "status": "SUCCESS",
     "startTime": "2017-07-28T19:26:00",
     "endTime": "2017-07-28T19:26:16",
-    "trackingInfo": "{\"jobId\":\"job_1501194648859_0016\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7983}",
+    "trackingInfo": "{\"jobId\":\"job_1501194648859_0016\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"killed\":0,\"failed\":0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7983}}",
     "message": "SUCCESS"
   }, {
     "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001@7",
@@ -82,7 +82,7 @@
     "status": "SUCCESS",
     "startTime": "2017-07-28T19:56:00",
     "endTime": "2017-07-28T19:56:17",
-    "trackingInfo": "{\"jobId\":\"job_1501194648859_0018\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7392}",
+    "trackingInfo": "{\"jobId\":\"job_1501194648859_0018\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"killed\":0,\"failed\":0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7392}}",
     "message": "SUCCESS"
   }, {
     "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001@8",
@@ -94,7 +94,7 @@
     "status": "SUCCESS",
     "startTime": "2017-07-28T20:26:00",
     "endTime": "2017-07-28T20:56:16",
-    "trackingInfo": "{\"jobId\":\"job_1501194648859_0020\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7495}",
+    "trackingInfo": "{\"jobId\":\"job_1501194648859_0022\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"killed\":0,\"failed\":0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7712}}",
     "message": "SUCCESS"
   }, {
     "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001@9",
@@ -118,7 +118,7 @@
     "status": "SUCCESS",
     "startTime": "2017-07-28T21:26:00",
     "endTime": "2017-07-28T21:28:17",
-    "trackingInfo": "{\"jobId\":\"job_1501194648859_0024\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7342}",
+    "trackingInfo": "{\"jobId\":\"job_1501194648859_0024\",\"jobType\":\"MAIN\",\"progress\":{\"total\":1,\"completed\":1,\"killed\":0,\"failed\":0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7342}}",
     "message": "SUCCESS"
   }]
 }
