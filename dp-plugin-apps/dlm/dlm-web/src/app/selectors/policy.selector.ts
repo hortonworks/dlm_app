@@ -90,12 +90,9 @@ export const getUnhealthyPolicies = createSelector(
 
 export const getPoliciesTableData = createSelector(getPolicyClusterJob, getRangerEnabled,
    (policies: Policy[], beaconStatuses: BeaconAdminStatus[]) => {
-     if (beaconStatuses.length) {
-       return policies.map(policy => ({
-         ...policy,
-         accessMode: isRangerActivated(beaconStatuses, policy) ? POLICY_MODES.READ_ONLY : POLICY_MODES.READ_WRITE,
-         rangerEnabled: isRangerActivated(beaconStatuses, policy)
-       }));
-     }
-     return policies;
+     return policies.map(policy => ({
+       ...policy,
+       accessMode: isRangerActivated(beaconStatuses, policy) ? POLICY_MODES.READ_ONLY : POLICY_MODES.READ_WRITE,
+       rangerEnabled: isRangerActivated(beaconStatuses, policy)
+     }));
    });

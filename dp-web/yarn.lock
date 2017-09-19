@@ -1594,6 +1594,10 @@ di@^0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/di/-/di-0.0.1.tgz#806649326ceaa7caa3306d75d985ea2748ba913c"
 
+dialog-polyfill@^0.4.9:
+  version "0.4.9"
+  resolved "https://registry.yarnpkg.com/dialog-polyfill/-/dialog-polyfill-0.4.9.tgz#c690b3727c3d82e0f947bd5b910b32af8a2ef57d"
+
 diff@^2.1.1:
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/diff/-/diff-2.2.3.tgz#60eafd0d28ee906e4e8ff0a52c1229521033bf99"
@@ -3527,6 +3531,10 @@ multipipe@^0.1.2:
 mute-stream@0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
+
+mydaterangepicker@^4.1.9:
+  version "4.1.9"
+  resolved "https://registry.yarnpkg.com/mydaterangepicker/-/mydaterangepicker-4.1.9.tgz#d9a8ffc22b72a2d711976544209dcee19fb033f5"
 
 nan@^2.3.0, nan@^2.3.2:
   version "2.5.1"

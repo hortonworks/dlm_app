@@ -16,10 +16,12 @@
 
 .flex-75 {
   flex-grow: 3;
+  background-color:white;
 }
 
 .flex-25 {
   flex-grow: 1;
+  background-color:white;
 }
 
 .spacer-h {
@@ -230,6 +232,11 @@
 .option-value:hover,
 .option-value:focus {
   outline: none;
+}
+
+.loadingDiv {
+  text-align:center;
+  margin:120px 0px;
 }
 
 

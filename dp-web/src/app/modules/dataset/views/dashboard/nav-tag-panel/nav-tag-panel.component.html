@@ -12,7 +12,8 @@
 <div class="nav-tag-panel borderBox">
   <div class="tag-search">
     <input placeholder='{{"pages.dataset.dashboard.tag-nav.tagSearchPlaceHolder" | translate}}' [(ngModel)]="tagSearchText" (keyup)="searchTag()"/>
-    <i class="fa fa-search" (click)="searchTag()"></i>
+    <span *ngIf="!tagSearchText"><i class="fa fa-search" (click)="searchTag()"></i></span>
+    <span *ngIf="tagSearchText"><i class="fa fa-times" (click)="onClearSearch()"></i></span>
   </div>
   <div class="tag-list">
     <div *ngFor="let tagObj of displayTags;" class="panelRow {{currentDsTag==tagObj?'selected':''}}" (click)="onPanelRowSelectionChange(tagObj)">

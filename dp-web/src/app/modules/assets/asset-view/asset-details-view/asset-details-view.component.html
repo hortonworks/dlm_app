@@ -62,7 +62,7 @@
       <tbody>
         <ng-container *ngFor="let schema of assetSchemas">
           <tr>
-            <td class="mdl-data-table__cell--non-numeric" (click)="colGuid = schema.guid">
+            <td class="mdl-data-table__cell--non-numeric" (click)="setColGuid(schema.guid)">
               <i [class]="getIconClass(schema.guid)"></i>
             </td>
             <td class="mdl-data-table__cell--non-numeric">{{schema.name}}</td>

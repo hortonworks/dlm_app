@@ -14,7 +14,12 @@ import {Http, RequestOptions} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 
 import {HttpUtil} from '../shared/utils/httpUtil';
-import {AuditSchema, PolicySchema} from '../models/auditSchema';
+import {AuditSchema, PolicySchema, TagPolicySchema} from '../models/auditSchema';
+
+export class PolicyTypes {
+  static HIVE: string = "hive";
+  static TAG: string = "tag";
+}
 
 @Injectable()
 export class RangerService {
@@ -26,7 +31,8 @@ export class RangerService {
   }
 
   getPolicyDetails(clusterId:string, dbName:string, tableName:string, offset:number, limit:number) : Observable<any>{
-    const uri = `${this.uri}/policy/${clusterId}/${dbName}/${tableName}?offset=${offset}&limit=${limit}`;
+    let serviceType = PolicyTypes.HIVE;
+    const uri = `${this.uri}/${clusterId}/policies?offset=${offset}&limit=${limit}&serviceType=${serviceType}&dbName=${dbName}&tableName=${tableName}`;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
@@ -48,6 +54,33 @@ export class RangerService {
   }
   getTotalPolicyCount () : number {
   	return this.policyCount;
+  }
+
+  getTagPolicyDetails(clusterId:string, guid: string, offset:number, limit:number) : Observable<any>{
+    let serviceType = PolicyTypes.TAG;
+    const uri = `${this.uri}/${clusterId}/policies?offset=${offset}&limit=${limit}&serviceType=${serviceType}&guid=${guid}`;
+    return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .map((data)=> this.formatTagPolicyData(data))
+      .catch(err => {
+        if(err.status == 404) return Observable.throw(err);
+        return HttpUtil.handleError(err)
+      });
+  }
+  formatTagPolicyData (data:any) : PolicySchema[] {
+    let policyData:TagPolicySchema[] = [];
+    data.forEach(d=> {
+      d.groups = d.policyItems.length > 0 ? d.policyItems[0].groups: [];
+      d.users = d.policyItems.length > 0 ? d.policyItems[0].users: [];
+      if(d.resources && d.resources.tag && d.resources.tag.values){
+        d.tags = d.resources.tag.values;
+      }else{
+        d.tags = [];
+      }
+      policyData.push(d as TagPolicySchema)
+    })
+    return policyData;
   }
 
   getAuditDetails(clusterId:string, dbName:string, tableName:string, offset:number, limit:number, accessType:string, result:string) : Observable<any>{

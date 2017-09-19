@@ -42,10 +42,10 @@ class DataSets @Inject()(
     authenticated: Authenticated)
     extends Controller {
 
-  def list = authenticated.async {
+  def list(name: Option[String]) = authenticated.async {
     Logger.info("Received list dataSet request")
     dataSetService
-      .list()
+      .list(name)
       .map {
         case Left(errors) =>
           InternalServerError(
@@ -124,9 +124,12 @@ class DataSets @Inject()(
                   dataSetService
                     .create(newReq)
                     .map {
-                      case Left(errors) =>
-                        InternalServerError(JsonResponses.statusError(
-                          s"Failed with ${Json.toJson(errors)}"))
+                      case Left(errors) =>{
+                        errors.firstMessage match {
+                          case "409" => InternalServerError(JsonResponses.statusError(s"An asset collection with this name already exists."))
+                          case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+                        }
+                      }
                       case Right(dataSetNCategories) => {
                         val dsId = dataSetNCategories.dataset.id.get
                         val dsName = dataSetNCategories.dataset.name

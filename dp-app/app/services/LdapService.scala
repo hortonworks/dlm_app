@@ -154,6 +154,11 @@ class LdapService @Inject()(
         Left(Errors(Seq(Error("409", "LDAP is not yet configured."))))))
   }
 
+  def getPassword(bindDn:String):Option[String]={
+    val cred: Option[CredentialEntry]=ldapKeyStore.getCredentialEntry(bindDn)
+    if (cred.isDefined)Some(cred.get.password) else None
+  }
+
   private def ldapSearch(
       dirContext: DirContext,
       ldapConfs: Seq[LdapConfiguration],
@@ -181,7 +186,7 @@ class LdapService @Inject()(
           while (res.hasMore) {
             val sr: SearchResult = res.next()
             val ldaprs = new LdapSearchResult(
-              sr.getName.substring(userSearchAttributeName.length+1),
+              sr.getAttributes.get(userSearchAttributeName).get().toString,
               sr.getClassName,
               sr.getNameInNamespace)
             ldapSearchResults += ldaprs
@@ -213,7 +218,7 @@ class LdapService @Inject()(
       while (res.hasMore) {
         val sr: SearchResult = res.next()
         val ldaprs = new LdapSearchResult(
-          sr.getName.substring(groupSearchAttributeName.length+1),
+          sr.getAttributes.get(groupSearchAttributeName).get().toString,
           sr.getClassName,
           sr.getNameInNamespace)
         ldapSearchResults += ldaprs
@@ -258,12 +263,11 @@ class LdapService @Inject()(
                 val fullUserdn=userRes.nameInNameSpace
                 var groupSearchFilter=s"(&$extendedGroupSearchFilter($groupMemberAttributeName=$fullUserdn))"
                 val res: NamingEnumeration[SearchResult]=dirContext.search(groupSearchBase.get,groupSearchFilter,groupSearchControls)
-                var groupAttributeLen=ldapConfs.head.groupSearchAttributeName.get.length+1
                 val ldapGroups: ArrayBuffer[LdapGroup]=new ArrayBuffer
                 while (res.hasMore) {
                   val sr: SearchResult = res.next()
                   val ldaprs = LdapGroup(
-                    sr.getName.substring(groupAttributeLen),
+                    sr.getAttributes.get(ldapConfs.head.groupSearchAttributeName.get).get().toString,
                     sr.getClassName,
                     sr.getNameInNamespace)
                   ldapGroups += ldaprs

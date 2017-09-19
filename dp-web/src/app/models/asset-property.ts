@@ -17,6 +17,7 @@ export class AssetProperty {
 export class AssetDetails {
   referredEntities: any;
   entity: {
+    attributes: any;
     classifications: any[]
     id: string;
     typeName: string;

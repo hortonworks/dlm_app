@@ -11,7 +11,7 @@
 
 import {CommonModule} from "@angular/common";
 import {NgModule} from "@angular/core";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {NguiAutoCompleteModule} from '@ngui/auto-complete';
 import {PaginationModule} from "../../shared/pagination/pagination.module";
 import {TaggingWidgetModule} from "../../shared/tagging-widget/tagging-widget.module";
@@ -33,6 +33,7 @@ import {DsAssetList} from "./views/ds-assets-list/ds-assets-list.component";
 import {DsAssetsHolder} from "./views/ds-editor/ds-assets-holder/ds-assets-holder.component";
 import {DsEditor} from "./views/ds-editor/ds-editor.component";
 import {DsInfoHolder} from "./views/ds-editor/ds-info-holder/ds-info-holder.component";
+import {UniqueDatasetNameValidator} from "./directives/validators";
 import {DsSummaryHolder} from "./views/ds-editor/ds-summary-holder/ds-summary-holder.component";
 import {DsFullView} from "./views/ds-full-view/ds-full-view.component";
 import {TranslateModule} from "@ngx-translate/core";
@@ -54,12 +55,14 @@ import {TranslateModule} from "@ngx-translate/core";
     BasicQueryEditor,
     AdvanceQueryEditor,
     QueryFilter,
-    SearchWidget
+    SearchWidget,
+    UniqueDatasetNameValidator
   ],
   entryComponents: [QueryFilter],
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     NguiAutoCompleteModule,
     TaggingWidgetModule,
     TranslateModule,

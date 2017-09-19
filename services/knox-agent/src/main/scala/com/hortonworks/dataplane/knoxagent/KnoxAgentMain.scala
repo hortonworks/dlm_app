@@ -23,6 +23,7 @@ import play.api.libs.ws.ahc.AhcWSClient
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
 import akka.event.Logging
+import sys.process._
 
 object KnoxAgentMain {
 
@@ -33,7 +34,6 @@ object KnoxAgentMain {
   private val logger = Logging(system, "KnoxAgent")
 
   def main(args: Array[String]): Unit = {
-    logger.info("evnhome=" + sys.env.get("sso.toplology.path"))
     logger.info("knox agent main started")
     process
       .map {
@@ -87,9 +87,15 @@ object KnoxAgentMain {
               case None => config.getString("sso.toplology.path")
             }
             logger.info(s"filepath==$ssoTopologyPath")
-            val knoxSsoTopologyXml = TopologyGenerator.configure(knoxConfig)
-            writeTopologyToFile(knoxSsoTopologyXml, ssoTopologyPath)
-            Right(true)
+            val passwordUpdated=updateBindPassword(config,knoxConfig)
+            if (!passwordUpdated){
+              logger.error("updating bind password failed")
+              Right(false)
+            }else{
+              val knoxSsoTopologyXml = TopologyGenerator.configure(knoxConfig)
+              writeTopologyToFile(knoxSsoTopologyXml, ssoTopologyPath)
+              Right(true)
+            }
           } catch {
             case e: Exception =>
               logger.error(e, e.getMessage);
@@ -101,6 +107,15 @@ object KnoxAgentMain {
           Right(false)
         }
       }
+  }
+  private def updateBindPassword(config: Config,knoxConfig:KnoxConfig): Boolean ={
+    val p = Promise[Boolean]
+    val args=s" create-alias ldcSystemPassword --cluster knoxsso --value ${knoxConfig.password.get}"
+    val knoxServerPath=config.getString("knox.server.path").trim
+    val knoxClicommand=config.getString("knox.cli.cmd").trim
+    val setPassWordCmd=s"${knoxServerPath}${knoxClicommand} ${args}"
+    val result:Int = setPassWordCmd !;
+    result==0
   }
   private def getGatewayService(
       gateway: Gateway): Future[Either[Throwable, ZuulServer]] = {

@@ -8,19 +8,11 @@
  *  * of all or any part of the contents of this software is strictly prohibited.
  *
  */
+package controllers
+import com.google.inject.Inject
+import play.api.http.DefaultHttpFilters
 
-import { Component, OnInit } from '@angular/core';
+class Filters @Inject()(
+ responseHeaderFilter: ResponseHeaderFilter
 
-@Component({
-  selector: 'dp-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
-})
-export class DashboardComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit() {
-  }
-
-}
+ ) extends DefaultHttpFilters(responseHeaderFilter)
