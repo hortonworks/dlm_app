@@ -31,7 +31,6 @@
         *ngIf="currentStage == 2"
         [dsModel]="dsModel"
         [assetSetQueryModelsForAddition]="assetSetQueryModelsForAddition"
-        (onDoneAction)="setVisibilityOfNext()"
         (onNext)="actionNext()"
         (onCancel)="actionCancel()"></ds-assets-holder>
 

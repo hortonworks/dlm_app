@@ -58,10 +58,6 @@ export class DsEditor implements OnInit {
     }
   }
 
-  setVisibilityOfNext() {
-    this.nextIsVisible = (this.currentStage == 1 || this.currentStage == 2 && this.assetSetQueryModelsForAddition.length != 0);
-  }
-
   actionNext() {
     if (!this[`validateStage${this.currentStage}`]()) {
       this.fillMandatoryMsg.nativeElement.style.display="block";
@@ -70,15 +66,12 @@ export class DsEditor implements OnInit {
     }
     this.fillMandatoryMsg.nativeElement.style.display="none";
     ++this.currentStage;
-    this.setVisibilityOfNext();
   }
 
   moveToStage(newStage: number) {
     if ((newStage < this.currentStage) && (this.currentStage = newStage)) {
       // clear error
       this.errorMessage = null;
-
-      this.setVisibilityOfNext();
     }
   }
 
