@@ -327,7 +327,7 @@ class LdapService @Inject()(
       url: String,
       bindDn: String,
       pass: String): Future[ DirContext] = {
-    val env = new util.Hashtable[String, AnyRef]
+    val env = new util.Hashtable[String, String]()
     env.put(Context.INITIAL_CONTEXT_FACTORY,
             "com.sun.jndi.ldap.LdapCtxFactory")
     env.put(Context.SECURITY_AUTHENTICATION, "simple") //TODO configure for other types.
