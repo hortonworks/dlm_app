@@ -116,7 +116,6 @@ export class UserAddComponent implements OnInit {
       });
       this.onError(`${this.translateService.instant('pages.infra.description.addGroupError')} - ${failedGroups.join(', ')}`);
     }, (error) => {
-      console.error(error);
       this.onError(`${this.translateService.instant('pages.infra.description.addGroupError')}`);
       this.groupsSaved = false;
     });
