@@ -103,6 +103,7 @@ class LdapService @Inject()(
                    knoxConf.password.get)
     context.map{ctx=>
       //TODO more ops
+      ctx.close()
       Right(true)
     }.recoverWith {
       case e: WrappedErrorsException =>
@@ -131,7 +132,11 @@ class LdapService @Inject()(
       search <- doWithEither[DirContext, Seq[LdapSearchResult]](
         dirContext,
         context => {
+          try{
           ldapSearch(context, configuredLdap.right.get, userName, searchType,fuzzyMatch)
+          }finally {
+            context.close()
+          }
         })
 
     } yield search
@@ -242,7 +247,11 @@ class LdapService @Inject()(
       search <- doWithEither[DirContext, LdapUser](
         dirContext,
         context => {
-          getUserAndGroups(context, configuredLdap.right.get, userName)
+          try{
+            getUserAndGroups(context, configuredLdap.right.get, userName)
+          }finally {
+            context.close()
+          }
         })
     } yield search
 
@@ -333,17 +342,17 @@ class LdapService @Inject()(
       case e: CommunicationException=>{
         logger.error("error while getting ldapContext",e)
         val errors=Errors(Seq(Error("Communication Exception", "Could not communicate with LDAP server. Check connectivity.")))
-        throw WrappedErrorsException(errors)
+        Future.failed(WrappedErrorsException(errors))
       }
       case e: AuthenticationException=>{
         logger.error("error while getting ldapContext",e)
         val errors=Errors(Seq(Error("Authentication Exception", "Some credentials are incorrect for LDAP")))
-        throw WrappedErrorsException(errors)
+        Future.failed(WrappedErrorsException(errors))
       }
       case e: NamingException =>{
         logger.error("error while getting ldapContext",e)
         val errors=Errors(Seq(Error("Exception", e.getMessage)))
-        throw WrappedErrorsException(errors)
+        Future.failed(WrappedErrorsException(errors))
       }
     }
   }
