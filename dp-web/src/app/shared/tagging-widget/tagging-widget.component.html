@@ -21,6 +21,7 @@
            [class.focus]="i==focusRowIndex"
            (click)="focusRowIndex = i; _manageSelection();"
            class="row"  >{{tag.display || tag}}</div>
-    </div>
+      <div *ngIf="!fetchInProgress && restrictFreeText && searchText && (!availableTags || availableTags.length === 0)" class="no-match-row">{{"common.noMatch" | translate}}</div>
+  </div>
   </span>
 </div>

@@ -34,6 +34,7 @@
           [clearOnSearch]="true"
           [theme]="tagTheme.DARK"
           [restrictFreeText]="true"
+          [minChars]=3
           (textChange)="onGroupSearchChange($event)"
           (onNewSearch)="onNewGroupAddition($event)"></tagging-widget>
         </div>
@@ -46,6 +47,7 @@
           [clearOnSearch]="true"
           [theme]="tagTheme.DARK"
           [restrictFreeText]="true"
+          [minChars]=3
           (textChange)="onRoleSearchChange($event)"
           (onNewSearch)="onNewRoleAddition($event)"></tagging-widget>
           <i id="roles-dropdown" class="fa fa-caret-down drop-down-icon" (click)="showRoleOptions()"></i>
@@ -89,6 +91,7 @@
               [clearOnSearch]="true"
               [theme]="tagTheme.DARK"
               [restrictFreeText]="true"
+              [minChars]=3
               (textChange)="onRoleSearchChange($event)"
               (onNewSearch)="onRolesEdit($event)"></tagging-widget>
             <i class="fa fa-caret-down drop-down-icon" id="roles-dropdown" (click)="showRoleOptions()"></i>

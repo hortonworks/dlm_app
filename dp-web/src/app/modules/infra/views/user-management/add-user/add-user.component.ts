@@ -100,16 +100,14 @@ export class AddUserComponent implements OnInit, AfterViewInit {
   }
 
   onUserSearchChange(text: string) {
-    this.availableUsers = [];
-    if (text && text.length > 2) {
+    if (text) {
       this.userService.searchLDAPUsers(text).subscribe((ldapUsers: LDAPUser[]) => {
-        this.availableUsers = [];
-        ldapUsers.map(user => {
-          this.availableUsers.push(user.name);
-        });
+        this.availableUsers = ldapUsers.map(user => user.name);
       }, () => {
         this.onError(this.translateService.instant('pages.infra.description.ldapError'));
       });
+    } else {
+      this.availableUsers = [];
     }
   }
 
@@ -148,11 +146,12 @@ export class AddUserComponent implements OnInit, AfterViewInit {
 
   onRoleSearchChange(text: string) {
     this.showRoles = false;
-    this.availableRoles = [];
-    if (text && text.length > 2) {
+    if (text) {
       this.availableRoles = this.allRoles.filter(role => {
         return role.display.toLowerCase().startsWith(text.toLowerCase());
       });
+    } else {
+      this.availableRoles = [];
     }
   }
 

@@ -101,17 +101,15 @@ export class AddGroupComponent implements OnInit, AfterViewInit {
   }
 
   onGroupSearchChange(text: string) {
-    this.availableGroups = [];
-    if (text && text.length > 2) {
+    if (text) {
       this.userService.searchLDAPGroups(text).subscribe((ldapUsers: LDAPUser[]) => {
-        this.availableGroups = [];
-        ldapUsers.map(user => {
-          this.availableGroups.push(user.name);
-        });
+        this.availableGroups = ldapUsers.map(user => user.name);
       }, () => {
         this.showError = true;
         this.onError(this.translateService.instant('pages.infra.description.ldapError'));
       });
+    } else {
+      this.availableGroups = [];
     }
   }
 
@@ -149,11 +147,12 @@ export class AddGroupComponent implements OnInit, AfterViewInit {
   }
 
   onRoleSearchChange(text: string) {
-    this.availableRoles = [];
-    if (text && text.length > 2) {
+    if (text) {
       this.availableRoles = this.allRoles.filter(role => {
         return role.display.toLowerCase().startsWith(text.toLowerCase());
       });
+    } else {
+      this.availableRoles = [];
     }
   }
 

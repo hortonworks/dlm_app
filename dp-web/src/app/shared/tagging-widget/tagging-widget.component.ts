@@ -30,6 +30,7 @@ export class TaggingWidget implements AfterViewInit {
   @Input() placeHolderText: string = '';
   @Input() theme: TagTheme = TagTheme.LIGHT;
   @Input() restrictFreeText = false;
+  @Input() minChars = 0;
 
   @Output('textChange') searchTextEmitter = new EventEmitter<string>();
   @Output('onNewSearch') newTagEmitter = new EventEmitter<string | TaggingWidgetTagModel>();
@@ -42,15 +43,18 @@ export class TaggingWidget implements AfterViewInit {
 
   focusRowIndex: number = -1;
   private focusStickerIndex: number = -1; // this.tags.length;
+  fetchInProgress = false;
 
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
     if (changes['availableTags']) {
       this.focusRowIndex = -1;
+      this.fetchInProgress = false;
     }
   }
 
   onSearchTextChange(newValue) {
-    this.searchText = newValue;
+    this.fetchInProgress = true;
+    this.searchText = newValue.length < this.minChars ? '' : newValue;
     this.searchTextEmitter.emit(this.searchText);
     this.isValid = !(newValue && newValue.length && this.restrictFreeText);
   }
@@ -105,6 +109,13 @@ export class TaggingWidget implements AfterViewInit {
   }
 
   _manageSelection() {
+    if (this.availableTags && this.availableTags.length === 1) {
+      this.newTagEmitter.emit(this.availableTags[0]);
+      this.searchText = '';
+      this.clearOnSearch && this.onSearchTextChange('');
+      this.focusStickerIndex++;
+      return;
+    }
     if (this.focusRowIndex > -1) {
       this.newTagEmitter.emit(this.availableTags[this.focusRowIndex]);
       this.clearOnSearch && this.onSearchTextChange('');
@@ -142,7 +153,7 @@ export class TaggingWidget implements AfterViewInit {
   }
 
   onInputBlur() {
-    if(this.searchText && this.searchText.trim() && !this.restrictFreeText){
+    if (this.searchText && this.searchText.trim() && !this.restrictFreeText) {
       this.tags.push(this.searchText.trim());
       this.searchText = '';
     }

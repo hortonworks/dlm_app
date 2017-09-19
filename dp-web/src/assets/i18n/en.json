@@ -57,7 +57,8 @@
     "unauthorizedMessage": "You are not authorized to view this page.",
     "serviceDisabled": "Service Not Enabled",
     "serviceDisabledMessage": "This service has not been enabled by your Admin. Please contact your Data plane Administrator to enable it.",
-    "invalidUser": "You are not an authorized Data plane user. Please contact your Data plane Administrator."
+    "invalidUser": "You are not an authorized Data plane user. Please contact your Data plane Administrator.",
+    "noMatch": "No Match"
   },
   "pages": {
     "signin" :{
@@ -115,6 +116,10 @@
           "groups": "Groups",
           "saveAndLogin": "SAVE & LOGIN",
           "configSuccess": "LDAP ADDED SUCCESSFULLY"
+        },
+        "description" : {
+          "ldapUserFetchError": "Not able to fetch users from LDAP.",
+          "ldapGroupFetchError": "Not able to fetch groups from LDAP"
         }
       }
     },

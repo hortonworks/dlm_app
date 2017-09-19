@@ -66,9 +66,7 @@ export class LdapConfigComponent implements OnInit {
     }
     Loader.show();
     this.configurationService.configureLDAP(this.ldapProperties).subscribe(() => {
-      this.router.navigate(['onboard/adduser', {
-        status: 'success',
-      }]);
+      this.router.navigate(['onboard/adduser']);
       Loader.hide();
     }, (response) => {
       Loader.hide();
