@@ -43,9 +43,9 @@
     "type": "FS",
     "executionType": "FS",
     "user": "beacon",
-    "status": "SUCCESS",
+    "status": "FAILED",
     "startTime": "2017-07-28T18:26:00",
-    "endTime": "2017-07-28T18:26:17",
+    "endTime": "2017-07-28T18:27:17",
     "trackingInfo": "{\"jobId\":\"job_1501194648859_0012\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7457}",
     "message": "SUCCESS"
   }, {
@@ -55,7 +55,7 @@
     "type": "FS",
     "executionType": "FS",
     "user": "beacon",
-    "status": "SUCCESS",
+    "status": "IGNORED",
     "startTime": "2017-07-28T18:56:00",
     "endTime": "2017-07-28T18:56:17",
     "trackingInfo": "{\"jobId\":\"job_1501194648859_0014\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7616}",
@@ -93,7 +93,7 @@
     "user": "beacon",
     "status": "SUCCESS",
     "startTime": "2017-07-28T20:26:00",
-    "endTime": "2017-07-28T20:26:16",
+    "endTime": "2017-07-28T20:56:16",
     "trackingInfo": "{\"jobId\":\"job_1501194648859_0020\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7495}",
     "message": "SUCCESS"
   }, {
@@ -105,7 +105,7 @@
     "user": "beacon",
     "status": "SUCCESS",
     "startTime": "2017-07-28T20:56:00",
-    "endTime": "2017-07-28T20:56:18",
+    "endTime": "2017-07-28T22:06:18",
     "trackingInfo": "{\"jobId\":\"job_1501194648859_0022\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7712}",
     "message": "SUCCESS"
   }, {
@@ -117,7 +117,7 @@
     "user": "beacon",
     "status": "SUCCESS",
     "startTime": "2017-07-28T21:26:00",
-    "endTime": "2017-07-28T21:26:17",
+    "endTime": "2017-07-28T21:28:17",
     "trackingInfo": "{\"jobId\":\"job_1501194648859_0024\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7342}",
     "message": "SUCCESS"
   }]
