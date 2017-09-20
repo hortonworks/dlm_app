@@ -111,7 +111,7 @@ export class JobsTableComponent implements OnInit {
         sortable: false
       },
       {
-        prop: 'trackingInfo.filesCopied',
+        prop: 'trackingInfo.progress.filesCopied',
         name: 'Transferred Files',
         cellClass: 'date-cell',
         headerClass: 'date-header',

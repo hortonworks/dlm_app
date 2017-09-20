@@ -8,12 +8,14 @@
   -->
 
 <div>
-  <span *ngIf="!isInProgress()" [innerHTML]="trackingInfo?.bytesCopied | bytesSize"></span>
-  <div class="progressbar-container" *ngIf="isInProgress()">
+  <div class="progressbar-container" *ngIf="isInProgress(); else bytesTpl">
     <progressbar
-      [value]="trackingInfo?.completedMapTasks"
-      [max]="trackingInfo?.totalMapTasks">
+      [value]="completedCount"
+      [max]="trackingProgress?.total || 1">
     </progressbar>
     <span class="progress-value text-info">{{progress}} %</span>
   </div>
+  <ng-template #bytesTpl>
+    <span [innerHTML]="trackingProgress?.bytesCopied | bytesSize"></span>
+  </ng-template>
 </div>

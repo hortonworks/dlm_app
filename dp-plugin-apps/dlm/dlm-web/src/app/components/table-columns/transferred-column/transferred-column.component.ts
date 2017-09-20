@@ -7,37 +7,36 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
-import { isEmpty } from 'utils/object-utils';
-import { JobTrackingInfo } from 'models/job-tracking-info.model';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { JobTrackingInfo, JobTrackinfoProgress } from 'models/job-tracking-info.model';
 import { JOB_STATUS } from 'constants/status.constant';
 
 @Component({
   selector: 'dlm-transferred-column',
   templateUrl: './transferred-column.component.html',
-  styleUrls: ['./transferred-column.component.scss']
+  styleUrls: ['./transferred-column.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TransferredColumnComponent implements OnInit {
+export class TransferredColumnComponent {
 
   @Input() jobStatus: string;
   @Input() trackingInfo: JobTrackingInfo = <JobTrackingInfo>{};
 
-  get progress() {
-    return Math.round((this.trackingInfo.completedMapTasks || 0) / (this.trackingInfo.totalMapTasks || 1) * 100);
+  get trackingProgress(): JobTrackinfoProgress {
+    return this.trackingInfo && this.trackingInfo.progress || <JobTrackinfoProgress>{};
   }
 
-  constructor() { }
-
-  ngOnInit() {
-
+  get completedCount(): number {
+    const { completed, killed, failed } = this.trackingProgress;
+    const sum = (a, b) => a + (b || 0);
+    return [completed, killed, failed].reduce(sum, 0);
   }
 
-  isFailed() {
-    return this.jobStatus === JOB_STATUS.FAILED || isEmpty(this.trackingInfo);
+  get progress(): number {
+    return Math.round((this.completedCount / (this.trackingProgress.total || 1)) * 100);
   }
 
-  isInProgress() {
-    const { completedMapTasks, totalMapTasks } = this.trackingInfo;
-    return this.jobStatus === JOB_STATUS.RUNNING || (!this.isFailed() && completedMapTasks < totalMapTasks);
+  isInProgress(): boolean {
+    return this.jobStatus === JOB_STATUS.RUNNING;
   }
 }
