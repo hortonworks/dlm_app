@@ -158,6 +158,11 @@
     },
     "services": {
       "ambari_server": "Ambari Server"
+    },
+    "units": {
+      "events": "Events",
+      "files": "Files",
+      "tables": "Tables"
     }
   },
   "topnav": {
@@ -288,7 +293,7 @@
           "started": "Started",
           "ended": "Ended",
           "runtime": "Runtime",
-          "transferred": "Transferred / Files",
+          "transferred": "Transferred / Objects",
           "next_run": "Next Run",
           "action": "Action",
           "actions": "Actions",
@@ -379,6 +384,17 @@
       "success": {
         "title": "Policy Creation Successful",
         "body": "Replication policy {{policyName}} created successfully!"
+      },
+      "jobs_table": {
+        "column": {
+          "status": "Status",
+          "startTime": "Started",
+          "endTime": "Ended",
+          "duration": "Runtime",
+          "transferredBytes": "Transferred Bytes",
+          "transferredFiles": "# of Objects",
+          "actions": "Actions"
+        }
       },
       "form": {
         "selected": "Selected",
