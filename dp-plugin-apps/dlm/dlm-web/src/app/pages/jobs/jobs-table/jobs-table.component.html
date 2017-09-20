@@ -53,6 +53,7 @@
 </ng-template>
 
 <ng-template #runTimeTemplate let-value="value" let-row="row">
+  <i class="fa fa-exclamation-triangle text-warning" *ngIf="isJobRuntimeGreater(row)" [tooltip]="'page.policies.job_runtime_warn' | translate"></i>
   <dlm-duration-column [isRunning]="isRunning(row)" [duration]="value"></dlm-duration-column>
 </ng-template>
 

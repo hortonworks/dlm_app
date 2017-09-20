@@ -9,12 +9,15 @@
 
 import { Component, Input } from '@angular/core';
 import { Policy } from 'models/policy.model';
+import { JOB_STATUS } from 'constants/status.constant';
 
 @Component({
   selector: 'dlm-prev-jobs',
   templateUrl: './prev-jobs.component.html'
 })
 export class PrevJobsComponent {
-  @Input()
-  policy: Policy;
+  @Input() policy: Policy;
+  get jobs() {
+    return this.policy.jobs.filter(job => job.status !== JOB_STATUS.IGNORED).slice(0, 3);
+  }
 }
