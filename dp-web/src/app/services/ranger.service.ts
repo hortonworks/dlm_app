@@ -26,6 +26,7 @@ export class RangerService {
   uri = '/api/ranger';
   count:number=0;
   policyCount:number=0;
+  tagPolicyCount:number=0;
 
   constructor(private http: Http) {
   }
@@ -69,8 +70,9 @@ export class RangerService {
       });
   }
   formatTagPolicyData (data:any) : PolicySchema[] {
+  	this.tagPolicyCount = data.totalCount || 0;
     let policyData:TagPolicySchema[] = [];
-    data.forEach(d=> {
+    data.policies.forEach(d=> {
       d.groups = d.policyItems.length > 0 ? d.policyItems[0].groups: [];
       d.users = d.policyItems.length > 0 ? d.policyItems[0].users: [];
       if(d.resources && d.resources.tag && d.resources.tag.values){
@@ -81,6 +83,9 @@ export class RangerService {
       policyData.push(d as TagPolicySchema)
     })
     return policyData;
+  }
+  getTotalTagPolicyCount () : number {
+  	return this.tagPolicyCount;
   }
 
   getAuditDetails(clusterId:string, dbName:string, tableName:string, offset:number, limit:number, accessType:string, result:string) : Observable<any>{

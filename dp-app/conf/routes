@@ -50,7 +50,7 @@ GET           /api/datasets/categories/:search                       controllers
 POST          /api/datasets/categories                               controllers.DataSets.createCategory
 
 #DataSet
-GET           /api/datasets                                          controllers.DataSets.list
+GET           /api/datasets                                          controllers.DataSets.list(name: Option[String])
 POST          /api/datasets                                          controllers.DataSets.create
 GET           /api/datasets/:datasetId                               controllers.DataSets.retrieve(datasetId)
 DELETE        /api/datasets/:datasetId                               controllers.DataSets.delete(datasetId)

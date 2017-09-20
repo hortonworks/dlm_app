@@ -36,11 +36,11 @@
       </tr>
     </tbody>
   </table>
-  <span *ngIf="showPagination"><simple-pagination
+  <simple-pagination
     [pageSize]="pageSize"
     [pageStartIndex]="pageStartsFrom"
     [count]="count"
     (onPageSizeChange)="onPageSizeChange($event)"
     (onPageChange)="onPageChange($event)"
-  ></simple-pagination></span>
+  ></simple-pagination>
 </div>

@@ -76,8 +76,9 @@ class RangerRoute @Inject()(
     }
   }
 
-  private def requestRangerForTagPolicies(clusterId: Long, serviceType: String, dbName: Option[String], tableName: Option[String], tags: Option[String], offset: Long, pageSize: Long) : Future[JsArray] = {
-    val queries = Try(getBuiltQueries(serviceType, dbName, tableName, tags, offset, pageSize))
+  private def requestRangerForTagPolicies(clusterId: Long, serviceType: String, dbName: Option[String], tableName: Option[String], tags: Option[String], offset: Long, pageSize: Long) : Future[JsObject] = {
+    // assuming that no tag can have more than one policy
+    val queries = Try(getBuiltQueries(serviceType, dbName, tableName, tags, offset = 0, pageSize))
     Future.fromTry(queries)
       .flatMap { queries =>
         val futures = queries.map { cQuery =>
@@ -90,17 +91,22 @@ class RangerRoute @Inject()(
             policies <- getRangerPoliciesByServiceTypeAndQuery(baseUrls.head, user, pass, serviceType, cQuery)
           } yield (policies)
         }
-        Future.sequence(futures).map(_.flatten).map(JsArray(_))
+        Future.sequence(futures).map(_.flatten)
+      }
+      .map { policies =>
+        val _policies = policies.slice(offset.toInt, (offset + pageSize).toInt)
+        Json.obj(
+          "startIndex" -> offset,
+          "pageSize" -> pageSize,
+          "totalCount" -> policies.size,
+          "resultSize" -> _policies.size,
+          "policies" -> Json.toJson(_policies)
+        )
       }
   }
 
   private def getBuiltQueries(serviceType: String, dbName: Option[String], tableName: Option[String], tags: Option[String], offset: Long, pageSize: Long): Seq[String] = {
-    val query = s"startIndex=${offset}&pageSize=${pageSize}"
-    serviceType match {
-      case "hive" => Seq(query + s"&resource:database=${dbName.get}&resource:table=${tableName.get}")
-      case "tag" => tags.get.trim.split(",").filter(cTag => !cTag.isEmpty).map(cTag => query + s"&resource:tag=${cTag.trim}")
-      case _ => throw UnsupportedInputException(1001, "This is not a supported Ranger service.")
-    }
+    tags.get.trim.split(",").map(_.trim).filter(cTag => !cTag.isEmpty).sorted.map(cTag => s"startIndex=${offset}&pageSize=${pageSize}&resource:tag=${cTag}")
   }
 
   private def getRangerServicesForType(uri: String, user: Option[String], pass: Option[String], serviceType: String): Future[Seq[Long]] = {

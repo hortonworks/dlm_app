@@ -111,7 +111,7 @@ export class JobsTableComponent implements OnInit {
         sortable: false
       },
       {
-        prop: 'trackingInfo.filesCopied',
+        prop: 'trackingInfo.progress.filesCopied',
         name: 'Transferred Files',
         cellClass: 'date-cell',
         headerClass: 'date-header',
@@ -133,7 +133,7 @@ export class JobsTableComponent implements OnInit {
   }
 
   isRunning(job: Job) {
-    return job && job.duration <= 0;
+    return job && !job.isCompleted;
   }
 
   handleActionOpenChange(event: {rowId: string, isOpen: boolean}) {
@@ -159,5 +159,15 @@ export class JobsTableComponent implements OnInit {
   isRerunDisabled(job, _): boolean {
     const lastJob = this.policy.lastJobResource;
     return !lastJob || lastJob.id !== job.id || this.cannotRerun(this.policy, lastJob);
+  }
+
+  isJobRuntimeGreater(job) {
+    if (job.status === JOB_STATUS.SUCCESS || job.status === JOB_STATUS.WARNINGS) {
+      const jobRuntime = Number(job.duration);
+      const policyFrequency = Number(this.policy.frequency);
+      // job duration is in milliseconds while policy frequency is in seconds
+      return jobRuntime > 0 && policyFrequency > 0 && jobRuntime > (policyFrequency * 1000);
+    }
+    return false;
   }
 }

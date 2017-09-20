@@ -10,8 +10,10 @@
   -->
 
 <div>
-    <nav-tag-panel (updateSelection)="onTagChange($event)"
-                   [dsNameSearch]="dsNameSearch"
+    <nav-tag-panel
+      #tagViewer
+      (updateSelection)="onTagChange($event)"
+      [dsNameSearch]="dsNameSearch"
     ></nav-tag-panel>
     <div class="result-viewer">
         <div class="page-container">
@@ -45,6 +47,7 @@
                   [view]="currentView"
                   [currentDsTag]="currentDsTag"
                   [dsNameSearch]="dsNameSearch"
+                  (onViewRefresh)="onViewRefresh()"
                 ></ds-nav-result-viewer>
             </div>
         </div>

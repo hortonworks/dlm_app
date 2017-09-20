@@ -290,6 +290,7 @@
         "fillMandatoryMsg": "Please fill mandatory fields",
         "tagDescription": "Add tags to your asset collection for context and subsequent lookup",
         "asset-description": "Add related data assets into your asset collection, by searching across this Data-Lake",
+        "create-error": "Unable to create asset collection:",
         "action": {
           "next": "Next",
           "save": "Save",
@@ -298,6 +299,9 @@
           "addAssets": "Add Assets",
           "removeAll": "Remove All",
           "addMoreAssets": "Add More Assets"
+        },
+        "errors": {
+          "unique": "An asset collection with this name already exists. Please choose a different name."
         }
       },
       "asset-search": {
