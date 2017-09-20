@@ -10,7 +10,7 @@
 <span class="fa fa-circle text-ignored" *ngIf="job.status === JOB_STATUS.IGNORED; else notIgnored" [tooltip]="'page.jobs.job_ignored' | translate"></span>
 
 <ng-template #notIgnored>
-  <span #job_status class="fa fa-circle"
+  <span #job_status class="fa" [ngClass]="{'fa-circle': job.status !== JOB_STATUS.RUNNING, 'fa-circle-o': job.status === JOB_STATUS.RUNNING}"
     [class.text-danger]="job.status === JOB_STATUS.FAILED"
     [class.text-info]="job.status === JOB_STATUS.RUNNING"
     [class.text-success]="job.status === JOB_STATUS.SUCCESS">
