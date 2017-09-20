@@ -17,6 +17,8 @@ public interface Constants {
     String DP_JWT_COOKIE = "dp_jwt";
     String LOCAL_SIGNIN_PATH="/sign-in";
     boolean BEARER_TOKEN_IN_COOKIE=true;//If set to false value is taken from header
-
+    String HTTP_X_REQUESTED_WITH="X-Requested-With";
+    String XMLHttpRequestString="XMLHttpRequest";
+    String XMLHttpRequestStringLowerCase=XMLHttpRequestString.toLowerCase();
 
 }
