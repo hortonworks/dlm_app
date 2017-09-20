@@ -27,3 +27,4 @@ libraryDependencies += "com.netflix.ribbon" % "ribbon-loadbalancer" % "2.2.2"
 // https://mvnrepository.com/artifact/com.netflix.ribbon/ribbon
 libraryDependencies += "com.netflix.ribbon" % "ribbon" % "2.2.2"
 libraryDependencies += "org.springframework.cloud" % "spring-cloud-commons" % "1.2.2.RELEASE"
+libraryDependencies := libraryDependencies.value.map(_.excludeAll(ExclusionRule("com.google.code.findbugs", "annotations")))

@@ -28,4 +28,6 @@ libraryDependencies ++= {
   )
 }
 
+libraryDependencies := libraryDependencies.value.map(_.excludeAll(ExclusionRule("com.google.code.findbugs", "annotations")))
+
 routesGenerator := InjectedRoutesGenerator

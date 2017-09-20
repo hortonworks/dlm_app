@@ -16,7 +16,7 @@ import { Store } from '@ngrx/store';
 import { loadPolicies, loadLastJobs } from 'actions/policy.action';
 import { loadClusters } from 'actions/cluster.action';
 import { Policy } from 'models/policy.model';
-import { getPolicyClusterJob } from 'selectors/policy.selector';
+import { getPoliciesTableData } from 'selectors/policy.selector';
 import { Pairing } from 'models/pairing.model';
 import { PairsCountEntity } from 'models/pairs-count-entity.model';
 import { getAllPairings, getCountPairsForClusters } from 'selectors/pairing.selector';
@@ -32,11 +32,13 @@ import { isEqual } from 'utils/object-utils';
 import { POLL_INTERVAL, ALL_POLICIES_COUNT } from 'constants/api.constant';
 import { ProgressState } from 'models/progress-state.model';
 import { getMergedProgress } from 'selectors/progress.selector';
+import { loadBeaconAdminStatus } from 'actions/beacon.action';
 
 export const ALL = 'all';
 const POLICIES_REQUEST = '[POLICY_PAGE] POLICIES_REQUEST';
 const CLUSTERS_REQUEST = '[POLICY_PAGE] CLUSTERS_REQUEST';
 const PAIRINGS_REQUEST = '[POLICY_PAGE] PAIRINGS_REQUEST';
+const ADMIN_STATUS_REQUEST = '[POLICY_PAGE] ADMIN_STATUS_REQUEST';
 
 @Component({
   selector: 'dlm-policies',
@@ -98,11 +100,11 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   }
 
   constructor(private store: Store<fromRoot.State>, private route: ActivatedRoute, private router: Router) {
-    this.policies$ = this.store.select(getPolicyClusterJob).distinctUntilChanged(isEqual);
+    this.policies$ = this.store.select(getPoliciesTableData).distinctUntilChanged(isEqual);
     this.subscriptions.push(this.policies$.subscribe(_ => this.policiesLoaded = true));
     this.clusters$ = store.select(getAllClusters).distinctUntilChanged(isEqual);
     this.pairings$ = store.select(getAllPairings);
-    this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, PAIRINGS_REQUEST));
+    this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, PAIRINGS_REQUEST, ADMIN_STATUS_REQUEST));
     this.subscriptions.push(this.overallProgress$.subscribe(progress => {
       if (progress.success) {
         this.initialLoadingComplete = true;
@@ -120,6 +122,7 @@ export class PoliciesComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.store.dispatch(loadPolicies({numResults: ALL_POLICIES_COUNT}, {requestId: POLICIES_REQUEST}));
     this.store.dispatch(loadClusters(CLUSTERS_REQUEST));
+    this.store.dispatch(loadBeaconAdminStatus({requestId: ADMIN_STATUS_REQUEST}));
     const clusterSubscription = this.clusters$.subscribe(clusters => {
       const clusterIds = clusters.map(c => c.id);
       this.store.dispatch(loadPairings(PAIRINGS_REQUEST));

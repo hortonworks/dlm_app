@@ -243,7 +243,7 @@ object Entities {
                  created: Option[LocalDateTime] = Some(LocalDateTime.now()),
                  updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
-  case class ServiceDependency(serviceName: String, dependencies: Seq[String])
+  case class ServiceDependency(serviceName: String, mandatoryDependencies: Seq[String], optionalDependencies: Seq[String])
 
   case class DpService(skuName: String,
                        enabled: Boolean,

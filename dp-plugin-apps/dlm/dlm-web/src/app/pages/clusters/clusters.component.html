@@ -8,26 +8,26 @@
   -->
 
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-xs-12">
     <dlm-page-header [title]="'common.clusters'" [contextMessage]="'page.clusters.hints.header'" [isFlexCenter]="true"></dlm-page-header>
   </div>
 </div>
 <dlm-beacon-validity></dlm-beacon-validity>
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-xs-12">
     <dp-map *ngIf="(clustersMapData$ | async)?.length"
             (clickMarker)="handleClickMarker($event)"
             [mapSize]="mapSize"
             [mapData]="clustersMapData$ | async">
       <dlm-map-legend class="overview-map-legend" *ngIf="clusterLegend$ | async">
-        <dlm-cluster-legend [cluster]="clusterLegend$ | async"></dlm-cluster-legend>
+        <dlm-cluster-legend [cluster]="clusterLegend$ | async" (onClose)="handleLegendClose($event)"></dlm-cluster-legend>
       </dlm-map-legend>
     </dp-map>
   </div>
 </div>
 <dlm-progress-container [progressState]="overallProgress$ | async">
   <div class="row page-section">
-    <div class="col-md-12">
+    <div class="col-xs-12">
       <div class="pull-right">
         <dlm-add-entity-button
           [canAddPolicy]="(resourceAvailability$ | async)?.canAddPolicy"
@@ -37,7 +37,7 @@
     </div>
   </div>
   <div class="row" *ngIf="!(overallProgress$ | async)?.isInProgress">
-    <div class="col-md-12">
+    <div class="col-xs-12">
       <div *ngIf="(tableData$ | async)?.length > 0; else noClusters">
         <dlm-cluster-list [clusters]="tableData$ | async"></dlm-cluster-list>
       </div>

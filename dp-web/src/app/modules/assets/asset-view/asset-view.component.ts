@@ -49,6 +49,8 @@ export class AssetViewComponent implements OnInit {
   PS = ProfilerStatus;
   profilerStatus:ProfilerStatus = this.PS.UNKNOWN;
   lastRunTime:string = "";
+  nextRunTime:number = 0;
+  nextRunDisplay:string = "";
 
   constructor(private route: ActivatedRoute, private assetService: AssetService) {
   }
@@ -64,6 +66,26 @@ export class AssetViewComponent implements OnInit {
       this.summary = this.extractSummary(details.entity);
       this.getProfilingJobStatus();
     });
+    this.assetService.getDetailsFromDb(this.guid).subscribe(details => {
+      this.assetService.getScheduleInfo(details.clusterId, details.datasetId).subscribe(res=>{
+        this.nextRunTime = Math.max(0,parseInt(res['nextFireTime']) - Date.now());
+        this.setNextRunDisplay();
+      },
+      err =>
+          ((err.status === 404) && (console.log("404 from getScheduleInfo")))
+        ||((err.status === 405) && (console.log("405 from getScheduleInfo")))
+      );
+    });
+  }
+
+  setNextRunDisplay () {
+        if(this.profilerStatus === this.PS.RUNNING) {
+          this.nextRunDisplay = "Profiling in progress ...";
+          return;
+        }
+        var nrtMin = Math.ceil(this.nextRunTime/60000); //in minutes;
+        var nrtHour = (nrtMin > 60)?Math.floor(nrtMin/60):0;
+        this.nextRunDisplay = "Next Profiler Schedule in : " + ((nrtHour)?(nrtHour + ((nrtHour==1)?" hour":" hours")):(nrtMin + ((nrtMin==1)?" minute":" minutes")));
   }
 
   get showProfilerStatus() {
@@ -78,9 +100,11 @@ export class AssetViewComponent implements OnInit {
     this.assetService.getProfilingStatus(this.clusterId, this.databaseName, this.tableName).subscribe(res=>{
       this.lastRunTime = (new Date(res.time)).toLocaleString();
       switch(res.status) {
-          case "SUCCESS" : this.profilerStatus = this.PS.SUCCESS; break;
+          case "SUCCESS" : if(this.profilerStatus === this.PS.RUNNING) location.reload();
+                           this.profilerStatus = this.PS.SUCCESS; break;
           case "FAILED"  : this.profilerStatus = this.PS.FAILED;  break;
           case "STARTED" : this.profilerStatus = this.PS.RUNNING;
+                           this.setNextRunDisplay(); 
                            setTimeout(()=>this.getProfilingJobStatus(), 5000);
                            break;
       }

@@ -133,4 +133,8 @@ object WebService {
                (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconLogResponse]]
   }
 
+  trait BeaconAdminService extends ClientService {
+    def listStatus(beaconEndpoint : String, clusterId: Long) (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconAdminStatusDetails]]
+  }
+
 }

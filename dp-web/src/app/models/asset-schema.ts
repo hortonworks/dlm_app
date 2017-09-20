@@ -20,3 +20,13 @@ export class AssetSchema {
   comment: string;
   guid?: string;
 }
+
+export class AssetModel {
+  id: number;	
+  assetType: string;
+  assetName: string;
+  guid: string;
+  assetProperties: any;
+  clusterId: number;
+  datasetId: number;
+}	

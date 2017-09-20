@@ -1,0 +1,57 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+<div class="flex-row">
+  <div class="spacer-h"></div>
+  <div class="filter-labels">
+    <ng-container *ngFor="let filter of filters">
+    <span class="mdl-chip asset-audit-search-tag filter-tags">
+           <span class="mdl-chip__text">
+             <span class="title">{{filter.display}}:</span>
+             <span class="value">&nbsp;{{filter.value}}</span>
+             <span class="close" (click)="removeFilter(filter)"><i class="fa fa-times"></i></span>
+           </span>
+    </span>
+    </ng-container>
+  </div>
+  <div class="search-input">
+    <i *ngIf="!userName" class="fa fa-filter"></i>
+    <i *ngIf="userName" class="fa fa-close" (click)="userName=''; onUserChange();"></i>
+    <input type="text" placeholder="Filter by User" [(ngModel)]="userName" name="search-input" id="search" (keyup)="onUserChange();"/>
+  </div>
+
+  <my-date-range-picker name="mydaterange" 
+    [options]="myDateRangePickerOptions" 
+    [(ngModel)]="dateModel" 
+    (dateRangeChanged)="onDateRangeChanged($event)"
+    required></my-date-range-picker>
+</div>
+<div class="flex-row">
+  <div class="flex-75 spacer-tr-10">
+    <div class="chart-title">
+      Allowed VS Unauthorised Access
+    </div>
+    <div #stackedbarchart class="chart" id="allowedVsUnauthorisedAccess"  *ngIf="!barChartLoading && !noDate">
+      <svg></svg>
+    </div>
+    <div *ngIf="barChartLoading" class="loadingDiv">Loading...</div>
+    <div *ngIf="noDate" class="loadingDiv">Select Date Range.</div>
+  </div>
+  <div class="flex-25 spacer-t-10">
+    <div class="chart-title">
+      Access Type
+    </div>
+    <div #donutchart class="chart" id="selectVsUpdate" *ngIf="!paiChartLoading && !noDate">
+      <svg></svg>
+    </div>
+    <div *ngIf="paiChartLoading" class="loadingDiv">Loading...</div>
+    <div *ngIf="noDate" class="loadingDiv">Select Date Range.</div>
+  </div>
+</div>

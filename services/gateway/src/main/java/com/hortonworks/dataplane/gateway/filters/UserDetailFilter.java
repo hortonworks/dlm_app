@@ -49,8 +49,10 @@ public class UserDetailFilter extends ZuulFilter {
     }else{
       try {
         UserContext userContext = (UserContext) userRefObj;
+        userContext.setPassword("");
         String userRefJson = objectMapper.writeValueAsString(userContext);
         ctx.setResponseBody(userRefJson);
+        utils.addNoCacheHeaders(ctx.getResponse());
         ctx.setResponseStatusCode(200);
         ctx.setSendZuulResponse(false);
         return null;

@@ -12,7 +12,7 @@
 package com.hortonworks.dataplane.db
 
 import com.hortonworks.dataplane.commons.domain.Atlas.EntityDatasetRelationship
-import com.hortonworks.dataplane.commons.domain.Entities.Errors
+import com.hortonworks.dataplane.commons.domain.Entities.{DataAsset, Errors}
 import com.hortonworks.dataplane.db.Webservice.DataAssetService
 import com.typesafe.config.Config
 import play.api.libs.json.Json
@@ -24,6 +24,8 @@ import scala.concurrent.Future
 
 class DataAssetServiceImpl(config: Config)(implicit ws: WSClient)
   extends DataAssetService {
+
+  import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   private def url =
     Option(System.getProperty("dp.services.db.service.uri"))
@@ -37,6 +39,24 @@ class DataAssetServiceImpl(config: Config)(implicit ws: WSClient)
       )
       .post(Json.toJson(assets))
       .map(mapToEntityDatasetRelationship)
+  }
+
+  def findAssetByGuid(guid: String): Future[Either[Errors, DataAsset]] = {
+    ws.url(s"$url/dataassets/guid/$guid")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      )
+      .get()
+      .map(mapToDataAsset)
+
+  }
+
+  private def mapToDataAsset(res: WSResponse): Either[Errors, DataAsset] = {
+    res.status match {
+      case 200 => extractEntity[DataAsset](res, r => (r.json \ "results" \ "data").validate[DataAsset].get)
+      case _ => mapErrors(res)
+    }
   }
 
   private def mapToEntityDatasetRelationship(res: WSResponse): Either[Errors, Seq[EntityDatasetRelationship]] = {

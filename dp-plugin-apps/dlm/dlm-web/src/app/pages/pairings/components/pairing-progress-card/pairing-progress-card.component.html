@@ -9,15 +9,15 @@
 
 <dlm-cluster-card>
   <div class="row">
-    <div class="col-md-5 col" [tooltip]="locations[0]">
+    <div class="col-xs-5 col" [tooltip]="locations[0]">
       <div class="cluster-name">{{firstCluster.name}}</div>
       <div>{{ firstCluster.dataCenter }}</div>
     </div>
-    <div class="col-md-2 icon col">
+    <div class="col-xs-2 icon col">
       <i *ngIf="!isCompleted" class="fa fa-spin fa-spinner spinner"></i>
       <i *ngIf="isCompleted" class="glyphicon glyphicon-resize-horizontal pairing-icon"></i>
     </div>
-    <div class="col-md-5 col right" [tooltip]="locations[1]">
+    <div class="col-xs-5 col right" [tooltip]="locations[1]">
       <div class="cluster-name">{{secondCluster.name}}</div>
       <div>{{ secondCluster.dataCenter }}</div>
     </div>

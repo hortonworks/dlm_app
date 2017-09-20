@@ -12,11 +12,12 @@
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {TabStyleType} from '../../../../shared/tabs/tabs.component';
 import {AssetService} from '../../../../services/asset.service';
-import {AssetProperty} from '../../../../models/asset-property';
+import {AssetDetails, AssetProperty} from '../../../../models/asset-property';
 import {AssetTag} from '../../../../models/asset-tag';
 import {AssetSchema} from '../../../../models/asset-schema';
 import {DateUtils} from '../../../../shared/utils/date-utils';
-import {StringUtils} from "../../../../shared/utils/stringUtils";
+import {StringUtils} from '../../../../shared/utils/stringUtils';
+import {Observable} from 'rxjs/Observable';
 
 export enum DetailsTabs {
   PROPERTIES, TAGS, SCHEMA
@@ -39,7 +40,7 @@ export class AssetDetailsViewComponent implements OnChanges {
   @Input() clusterId: string;
   @Input() guid: string;
   rowCount: string = 'NA';
-  colGuid : string = "";
+  colGuid: string = '';
 
   constructor(private assetService: AssetService) {
   }
@@ -61,10 +62,15 @@ export class AssetDetailsViewComponent implements OnChanges {
     classifications.forEach(classification => {
       let tag = new AssetTag();
       tag.name = classification.typeName;
-      tag.attributes = classification.attributes ? classification.attributes : 'NA';
+      tag.attributes = classification.attributes ? (typeof classification.attributes === 'object' ?
+        StringUtils.getFlattenedObjects(classification.attributes) : classification.attributes) : 'NA';
       assetTags.push(tag);
     });
     return assetTags;
+  }
+
+  setColGuid(guid) {
+    this.colGuid === guid ? this.colGuid = '' : this.colGuid = guid;
   }
 
   private extractSchema(referredEntities) {
@@ -106,8 +112,14 @@ export class AssetDetailsViewComponent implements OnChanges {
       if (key === 'columns' || key === 'sd' || key === 'parameters') {
         return;
       }
+      if (key === 'partitionKeys') {
+        this.extractPartitionKeys(attributes[key]).subscribe(assetProperty => {
+          assetProps.push(assetProperty);
+        });
+        return;
+      }
       let value = attributes[key];
-      if (attributes[key] && typeof attributes[key] === 'object' || Array.isArray(attributes[key])) {
+      if (attributes[key] && (typeof attributes[key] === 'object' || Array.isArray(attributes[key]))) {
         value = StringUtils.getFlattenedObjects(value);
       }
       if (key === 'lastAccessTime' || key === 'createTime' || key === 'endTime' || key === 'startTime') {
@@ -120,13 +132,59 @@ export class AssetDetailsViewComponent implements OnChanges {
     });
     return assetProps;
   }
+
+  private extractPartitionKeys(value): Observable<AssetProperty> {
+    return Observable.create((observer) => {
+      let keyObservable = [];
+      let partitionKeys = [];
+      if (value && typeof value === 'object') {
+        value.forEach(val => {
+          keyObservable.push(this.assetService.getDetails(this.clusterId, val.guid));
+        });
+        Observable.forkJoin(keyObservable).subscribe((details: AssetDetails[]) => {
+          details.forEach((detail: AssetDetails) => {
+            partitionKeys.push(detail.entity.attributes.name);
+          });
+          observer.next(new AssetProperty('partitionKeys', partitionKeys.join(', ')));
+        });
+      } else {
+        observer.next(new AssetProperty('partitionKeys', value));
+      }
+    });
+
+
+  }
+
   get colVisualData() {
     var ret = {};
-    if(!this.colGuid || !this.assetDetails.referredEntities[this.colGuid].attributes.profileData) return ret;
+    if (!this.colGuid || !this.assetDetails.referredEntities[this.colGuid].attributes.profileData) return ret;
     ret = this.assetDetails.referredEntities[this.colGuid].attributes.profileData.attributes;
     ret['name'] = this.assetDetails.referredEntities[this.colGuid].attributes.name;
     ret['type'] = this.assetDetails.referredEntities[this.colGuid].attributes.type;
+    try {
+      let profilerInfo = this.assetDetails.entity.attributes.profileData.attributes;
+      if (!profilerInfo.sampleTime || !profilerInfo.samplePercent) throw 'sampleTime or samplePercent not available';
+      let td = Math.floor((Date.now() - parseInt(profilerInfo.sampleTime)) / 60000); // in minutes
+      let displayText = '';
+      if (td / 60 < 1) displayText = td + ((td == 1) ? ' minute ' : ' minutes ') + 'ago';
+      else displayText = (td = Math.floor(td / 60)) + ((td == 1) ? ' hour ' : ' hours ') + 'ago';
+      ret['profilerInfo'] = `Profiled : ${profilerInfo.samplePercent}% rows, ${displayText}`;
+
+    }
+    catch (err) {/*console.log(err)*/
+    }
+
     return ret;
+  }
+
+  getIconClass(colGuid) {
+    var ent = this.assetDetails.referredEntities[colGuid];
+    if (!ent || !ent.attributes.profileData) return null;
+    var data = ent.attributes.profileData.attributes;
+    if (!data || !data.histogram && !data.quartiles) return null;
+    if (data.cardinality < 11) return 'fa fa-pie-chart pointer';
+    return 'fa fa-bar-chart pointer';
+
   }
 
 }

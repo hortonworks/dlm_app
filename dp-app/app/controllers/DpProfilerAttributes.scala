@@ -20,12 +20,16 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.Controller
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+import com.hortonworks.dataplane.db.Webservice.DataSetService
+import services.UtilityService
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class DpProfilerAttributes @Inject()(
-      @Named("dpProfilerService")
-      val dpProfilerService: DpProfilerService,
+      @Named("dpProfilerService") val dpProfilerService: DpProfilerService,
+      @Named("dataSetService") val dataSetService: DataSetService,
+      val utilityService: UtilityService,
       val authenticated: Authenticated
 ) extends Controller {
 
@@ -68,5 +72,75 @@ class DpProfilerAttributes @Inject()(
 
     }
   }
+
+  def getScheduleStatus(clusterId: String, dataSetId: String) = {
+    authenticated.async { req =>
+      Logger.info(s"Received getScheduleStatus for entity $clusterId $dataSetId")
+      implicit val token = req.token
+      dataSetService.retrieve(dataSetId).flatMap{
+        case Left(errors) => Future.successful(InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}")))
+        case Right(datasetAndCategories) => {
+          val dataset = datasetAndCategories.dataset
+          for {
+            jobName <- utilityService.doGenerateJobName(dataset.id.get, dataset.name)
+            feu <- dpProfilerService.getScheduleInfo(clusterId, jobName)
+          } yield {
+            feu match {
+              case Left(errors) => {
+                errors.errors.head.code match {
+                  case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+                  case "405" => MethodNotAllowed(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+                  case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+                }
+              }
+              case Right(attributes) => Ok(Json.toJson(attributes))
+            }
+          }
+        }
+      }
+    }
+  }
+
+  def getAuditResults(clusterId: String, dbName: String, tableName: String, startDate: String, endDate: String, userName: String) = {
+    authenticated.async { req =>
+      Logger.info(s"Received getAuditActions for entity $clusterId $dbName $tableName")
+      implicit val token = req.token
+      dpProfilerService
+        .getAuditResults(clusterId, dbName, tableName, userName, startDate, endDate)
+        .map {
+          case Left(errors) => {
+            errors.errors.head.code match {
+              case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case "405" => MethodNotAllowed(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            }
+          }
+          case Right(attributes) => Ok(Json.toJson(attributes))
+        }
+
+    }
+  }
+
+
+  def getAuditActions(clusterId: String, dbName: String, tableName: String, startDate: String, endDate: String, userName: String) = {
+    authenticated.async { req =>
+      Logger.info(s"Received getAuditActions for entity $clusterId $dbName $tableName")
+      implicit val token = req.token
+      dpProfilerService
+        .getAuditActions(clusterId, dbName, tableName, userName, startDate, endDate)
+        .map {
+          case Left(errors) => {
+            errors.errors.head.code match {
+              case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case "405" => MethodNotAllowed(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            }
+          }
+          case Right(attributes) => Ok(Json.toJson(attributes))
+        }
+
+    }
+  }
+
 
 }

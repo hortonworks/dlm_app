@@ -30,6 +30,7 @@ export class PolicyDetailsComponent implements OnInit {
   @Output() rerunJobAction = new EventEmitter<any>();
   @Output() onOpenDirectory = new EventEmitter<any>();
   @Output() onPageChangeFiles = new EventEmitter<any>();
+  @Output() onTablesFilter = new EventEmitter<any>();
 
   @Input()
   policy: Policy;
@@ -63,6 +64,8 @@ export class PolicyDetailsComponent implements OnInit {
   @Input() fileBrowserPage = 0;
 
   @Input() loadingJobs;
+
+  @Input() tablesSearchPattern = '';
 
   ngOnInit() {
 
@@ -102,5 +105,9 @@ export class PolicyDetailsComponent implements OnInit {
 
   handleOnFilePageChange(event) {
     this.onPageChangeFiles.emit(event);
+  }
+
+  handleFilterApplied(event) {
+    this.onTablesFilter.emit(event);
   }
 }

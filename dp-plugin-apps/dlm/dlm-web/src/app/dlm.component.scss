@@ -34,7 +34,8 @@ header {
     margin-right: 0;
   }
   .navbar-nav {
-    margin-top: 12px;
+    margin: 12px 0 0 0;
+    float: left;
     color: #666;
     line-height: 40px;
     padding-right: 28px;
@@ -46,6 +47,7 @@ header {
     }
   }
   .navbar-right {
+    float: right;
   }
   .navbar-user {
     margin-right: 2px;
@@ -105,13 +107,29 @@ header {
     a {
       color: #666;
     }
+    &.failed, &.progress {
+      color: $white-color;
+      a {
+        color: #F1F1F1;
+      }
+    }
   }
 }
 
 .label-default {
   background-color: #DDD;
+  &.failed {
+    background-color: $alert-color;
+  }
+  &.progress {
+    background-color: $link-color;
+  }
 }
 
 pre {
   white-space: pre-wrap;
+}
+
+a:focus {
+  outline: none;
 }

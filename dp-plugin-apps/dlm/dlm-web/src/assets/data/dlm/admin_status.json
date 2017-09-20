@@ -1,0 +1,35 @@
+{
+  "unreachableBeacon": [],
+  "response": [
+    {
+      "clusterId": 1,
+      "beaconAdminStatus": {
+        "status": "RUNNING",
+        "version": "1.0.0.2.6.0.0-SNAPSHOT",
+        "plugins": "NONE",
+        "security": "None",
+        "wireEncryption": false
+      }
+    },
+    {
+      "clusterId": 2,
+      "beaconAdminStatus": {
+        "status": "RUNNING",
+        "version": "1.0.0.1.0.0.0-76",
+        "plugins": "RANGER,ATLAS",
+        "security": "None",
+        "wireEncryption": false
+      }
+    },
+    {
+      "clusterId": 3,
+      "beaconAdminStatus": {
+        "status": "RUNNING",
+        "version": "1.0.0.1.0.0.0-76",
+        "plugins": "None",
+        "security": "None",
+        "wireEncryption": false
+      }
+    }
+  ]
+}

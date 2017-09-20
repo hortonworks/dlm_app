@@ -14,7 +14,7 @@ package com.hortonworks.dataplane.cs
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, HJwtToken}
 import com.hortonworks.dataplane.cs.Webservice.DpProfilerService
 import com.typesafe.config.Config
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.WSResponse
 
 import scala.concurrent.Future
@@ -55,4 +55,44 @@ class DpProfilerServiceImpl (config: Config)(implicit ws: ClusterWsClient) exten
       .map(mapResultsGeneric)
   }
 
+  override def deleteProfilerByJobName(clusterId: Long, jobName: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/profilers?jobName=$jobName")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .delete()
+      .map(mapResultsGeneric)
+  }
+  
+  override def startAndScheduleProfilerJob(clusterId: String, jobName: String, assets: Seq[String])(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/start-schedule-job")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .post(Json.obj("list" -> assets, "jobName" -> jobName))
+      .map(mapResultsGeneric)
+
+  }
+
+  override def getScheduleInfo(clusterId: String, taskName: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/schedule-info/$taskName")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapResultsGeneric)
+  }
+
+  override def getAuditResults(clusterId: String, dbName: String, tableName: String, userName: String, startDate: String, endDate: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/audit-results/$dbName/$tableName/$startDate/$endDate?userName=$userName")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapResultsGeneric)
+  }
+
+  override def getAuditActions(clusterId: String, dbName: String, tableName: String, userName: String, startDate: String, endDate: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/audit-actions/$dbName/$tableName/$startDate/$endDate?userName=$userName")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapResultsGeneric)
+  }
 }

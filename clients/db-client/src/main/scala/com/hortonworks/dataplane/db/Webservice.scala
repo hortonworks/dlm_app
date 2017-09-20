@@ -92,7 +92,7 @@ object Webservice {
 
   trait DataSetService extends DbClientService {
 
-    def list(): Future[Either[Errors, Seq[Dataset]]]
+    def list(name: Option[String]): Future[Either[Errors, Seq[Dataset]]]
 
     def create(dataSetAndCatIds: DatasetAndCategoryIds)
     : Future[Either[Errors, DatasetAndCategories]]
@@ -112,7 +112,7 @@ object Webservice {
     def update(dataSetAndCatIds: DatasetAndCategoryIds)
     : Future[Either[Errors, DatasetAndCategories]]
 
-    def delete(dataSetId: String): Future[Either[Errors, Dataset]]
+    def delete(dataSetId: String): Future[Either[Errors, Long]]
   }
 
   trait CategoryService extends DbClientService {
@@ -279,6 +279,7 @@ object Webservice {
 
   trait DataAssetService extends DbClientService {
     def findManagedAssets(clusterId:Long, assets: Seq[String]): Future[Either[Errors, Seq[EntityDatasetRelationship]]]
+    def findAssetByGuid(guid: String): Future[Either[Errors, DataAsset]]
   }
   trait SkuService extends  DbClientService {
     def getAllSkus():Future[Either[Errors,Seq[Sku]]]

@@ -9,7 +9,7 @@
  *
  */
 
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input, Output, EventEmitter} from "@angular/core";
 import {Router} from "@angular/router";
 import {RichDatasetModel} from "../../../../models/richDatasetModel";
 
@@ -21,6 +21,7 @@ import {RichDatasetModel} from "../../../../models/richDatasetModel";
 export class DsRowProxy {
 
   @Input() datasetModels: RichDatasetModel[];
+  @Output() onDeleteDataset: EventEmitter<number> = new EventEmitter();
   hoveredIndex: number;
 
   constructor(private router: Router) {
@@ -28,5 +29,9 @@ export class DsRowProxy {
 
   showFullView(dsModel) {
     this.router.navigate([`datasteward/dataset/full-view/${dsModel.id}`]);
+  }
+
+  deleteDataset(datasetId: number) {
+    this.onDeleteDataset.emit(datasetId);
   }
 }

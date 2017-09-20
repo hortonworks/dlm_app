@@ -12,6 +12,7 @@ import { TableFilterComponent } from './table-filter.component';
 import { FormsModule } from '@angular/forms';
 import { TypeaheadModule } from 'ng2-bootstrap';
 import { TruncatePipe } from 'pipes/truncate.pipe';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('TableFilterComponent', () => {
   let component: TableFilterComponent;
@@ -19,7 +20,11 @@ describe('TableFilterComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [FormsModule, TypeaheadModule.forRoot()],
+      imports: [
+        TranslateModule.forRoot(),
+        FormsModule,
+        TypeaheadModule.forRoot()
+      ],
       declarations: [TableFilterComponent, TruncatePipe]
     })
       .compileComponents();

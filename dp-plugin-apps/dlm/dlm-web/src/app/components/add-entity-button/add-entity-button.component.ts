@@ -53,8 +53,8 @@ export class AddEntityButtonComponent implements OnInit, OnChanges {
 
   constructor(private t: TranslateService, private router: Router) {
     this.addOptions = [
-      { label: t.instant('common.policy'), routeTo: ['/policies/create'], disabled: !this.canAddPolicy },
-      { label: t.instant('common.pairing'), routeTo: ['/pairings/create'], disabled: !this.canAddPairing },
+      { label: t.instant('common.policy'), qeAttr: 'policy', routeTo: ['/policies/create'], disabled: !this.canAddPolicy },
+      { label: t.instant('common.pairing'), qeAttr: 'pairing', routeTo: ['/pairings/create'], disabled: !this.canAddPairing },
     ];
   }
 

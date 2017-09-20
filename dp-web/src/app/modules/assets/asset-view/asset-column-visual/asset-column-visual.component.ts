@@ -15,9 +15,9 @@ declare var d3: any;
 declare var nv: any;
 
 @Component({
-  selector: 'asset-column-visual'
-,  templateUrl: './asset-column-visual.component.html'
-,  styleUrls: ['./asset-column-visual.component.scss']
+  selector: 'asset-column-visual',
+  templateUrl: './asset-column-visual.component.html',
+  styleUrls: ['./asset-column-visual.component.scss']
 })
 
 export class AssetColumnVisualComponent implements OnInit{
@@ -26,22 +26,24 @@ export class AssetColumnVisualComponent implements OnInit{
 	onlyHisto :boolean = true;
 	showPi : boolean = false;
 	noDataAvailable : boolean = false;
+	dataVisualizationColors: string[] = ["#f44336", "#E91E63", "#9C27B0", "#673AB7", "#3F51B5", "#2196F3", "#03A9F4", "#00BCD4", "#009688", "#4CAF50", "#8BC34A", "#FFEB3B", "#FFC107", "#FF9800", "#FF5722", "#9E9E9E", "#607D8B", "#f44336", "#E91E63", "#9C27B0", "#673AB7", "#3F51B5", "#2196F3", "#03A9F4", "#00BCD4", "#009688", "#4CAF50", "#8BC34A", "#FFEB3B", "#FFC107", "#FF9800", "#FF5722", "#9E9E9E", "#607D8B", "#1976D2", "#b71c1c", "#1A237E", "#0D47A1"];
+
 	ngOnInit () {
 		if(!this.data || !this.data.histogram && !this.data.quartiles) {
-      this.noDataAvailable = true;
+	  	  this.noDataAvailable = true;
 		  return;
-    }
-		if(this.data.quartiles)
+		}
+		if(this.data.quartiles && JSON.parse(this.data.quartiles).length > 0)
 			this.onlyHisto = false;
-		if(this.data.cardinality < 6)
+		if(this.data.cardinality < 11)
 			this.showPi = true;
 		if(this.data.histogram) {
-      if (this.showPi)
-        this.drawPiChart();
-      else
-        this.drawHisto();
-    }
-		if(!this.data.quartiles) return;
+	      if (this.showPi)
+	        this.drawPiChart();
+	      else
+	        this.drawHisto();
+	    }
+		if(this.onlyHisto) return;
 		this.drawBoxPlot();
 	}
 	drawHisto () {
@@ -140,11 +142,11 @@ export class AssetColumnVisualComponent implements OnInit{
 		var _this = this;
 		nv.addGraph(function() {
       var chart = nv.models.pieChart()
-			    .x(function(d) { return d.key })
-			    .y(function(d) { return d.y })
-			    // .width(width)
-			    // .height(height)
-			    ['showTooltipPercent'](true);
+        .x(function(d) { return d.key })
+			  .y(function(d) { return d.y })
+        .donutLabelsOutside(true)
+        .showTooltipPercent(true)
+        .color(_this.dataVisualizationColors);
 			d3.select("#chart1 svg")
 				.datum(_this.getDataForPiChart())
 				.transition().duration(1200)
@@ -155,7 +157,7 @@ export class AssetColumnVisualComponent implements OnInit{
 		});
 	}
 	getDataForPiChart () {
-		return JSON.parse(this.data.histogram).map(obj=>{return {"key":(obj.bin.toFixed)?obj.bin.toFixed(2):obj.bin, "y":obj.count, "color": "#60A947"}});
+		return JSON.parse(this.data.histogram).map(obj=>{return {"key":(obj.bin.toFixed)?obj.bin.toFixed(2):obj.bin, "y":obj.count}});
 	}
 
 }

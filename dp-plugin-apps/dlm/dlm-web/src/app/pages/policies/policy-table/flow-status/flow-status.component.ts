@@ -7,31 +7,49 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, Input, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import { POLICY_MODES } from 'constants/policy.constant';
+import { TranslateService } from '@ngx-translate/core';
 
-import { TableColumn } from 'common/table/table-column.type';
-
-// todo: Active, Unavailable are mocks. Active state is also hardcoded
 @Component({
   selector: 'dlm-flow-status',
   template: `
-    <ng-template #flowStatusCell let-value="value">
-      <div class="flow-status">
-        <div class="flow-status-chart">
-          <div class="flow-current-state active">&nbsp;</div>
-          <div class="flow-line"><span class="caret"></span></div>
-          <div class="flow-desired-state">&nbsp;</div>
+    <div class="flow-status">
+      <div class="flow-status-chart">
+        <div class="flow-current-state active">
+          {{'page.policies.flow_status.source_abbrev' | translate}}
         </div>
-        <div class="flow-status-text">
-          <div class="flow-current-state">Active</div>
-          <div class="flow-desired-state">Standby</div>
+        <div class="flow-line"><span class="caret"></span></div>
+        <div ngClass="flow-desired-state">
+          {{modeAbbrev}}
         </div>
       </div>
-    </ng-template>
+      <div class="flow-status-text">
+        <div class="flow-current-state">{{'common.source' | translate}}</div>
+        <div class="flow-desired-state">{{modeTranslate}}</div>
+      </div>
+    </div>
   `,
   styleUrls: ['./flow-status.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class FlowStatusComponent implements TableColumn {
-  @ViewChild('flowStatusCell') cellRef: TemplateRef<any>;
+export class FlowStatusComponent {
+  private translateNS = 'page.policies.flow_status';
+  @Input() mode: POLICY_MODES = POLICY_MODES.READ_WRITE;
+
+  get modeTranslate(): string {
+    return this.t.instant({
+      [POLICY_MODES.READ_ONLY]: `${this.translateNS}.read_only`,
+      [POLICY_MODES.READ_WRITE]: `${this.translateNS}.read_write`,
+    }[this.mode] || ' ');
+  }
+
+  get modeAbbrev(): string {
+    return this.t.instant({
+      [POLICY_MODES.READ_ONLY]: `${this.translateNS}.read_only_abbrev`,
+      [POLICY_MODES.READ_WRITE]: `${this.translateNS}.read_write_abbrev`,
+    }[this.mode] || ' ');
+  }
+
+  constructor(private t: TranslateService) { }
 }

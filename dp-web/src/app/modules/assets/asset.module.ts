@@ -13,6 +13,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import {FormsModule} from "@angular/forms";
+import { MyDateRangePickerModule } from 'mydaterangepicker';
 
 import { routes } from './asset.routes';
 import {AssetViewComponent} from './asset-view/asset-view.component';
@@ -27,6 +28,10 @@ import {LineageModule} from '../../shared/lineage/lineage.module';
 import {AssetService} from '../../services/asset.service';
 import {RangerService} from '../../services/ranger.service';
 import {PaginationModule} from "../../shared/pagination/pagination.module";
+import { AuditVisualizationComponent } from './asset-view/asset-audit-view/audit-visualization/audit-visualization.component';
+import {TranslateModule} from '@ngx-translate/core';
+import { AssetTagPolicyViewComponent } from './asset-view/asset-policy-view/asset-tag-policy-view/asset-tag-policy-view.component';
+import { AssetResourcePolicyViewComponent } from './asset-view/asset-policy-view/asset-resource-policy-view/asset-resource-policy-view.component';
 
 @NgModule({
   imports: [
@@ -36,7 +41,9 @@ import {PaginationModule} from "../../shared/pagination/pagination.module";
     DropdownModule,
     TabsModule,
     LineageModule,
-    PaginationModule
+    PaginationModule,
+    TranslateModule,
+    MyDateRangePickerModule
   ],
   declarations: [
     AssetViewComponent,
@@ -44,7 +51,10 @@ import {PaginationModule} from "../../shared/pagination/pagination.module";
     NodeDetailsComponent,
     AssetColumnVisualComponent,
     AssetAuditView,
-    AssetPolicyView
+    AssetPolicyView,
+    AuditVisualizationComponent,
+    AssetTagPolicyViewComponent,
+    AssetResourcePolicyViewComponent
   ],
   providers: [
     AssetService,

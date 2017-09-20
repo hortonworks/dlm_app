@@ -27,6 +27,7 @@
     "pairs": "Pairs",
     "policy": "Policy",
     "name": "Name",
+    "no_results": "No results found",
     "queue_name": "Queue Name",
     "max_bandwidth": "Max. Bandwidth",
     "job": "Job",
@@ -154,6 +155,9 @@
           "title": "Activating Policy Failed"
         }
       }
+    },
+    "services": {
+      "ambari_server": "Ambari Server"
     }
   },
   "topnav": {
@@ -225,6 +229,7 @@
       "issues": {
         "updates": "Issues & Updates",
         "recent": "Recent Issues",
+        "no_issues": "No issues to report",
         "list": {
           "view_all": "View all",
           "empty_list": "No issues or updates within the selected time period.",
@@ -363,6 +368,13 @@
           "body": "Are you sure?"
         }
       },
+      "flow_status": {
+        "source_abbrev": "S",
+        "read_write": "Read / Write",
+        "read_only": "Read Only",
+        "read_write_abbrev": "RW",
+        "read_only_abbrev": "RO"
+      },
       "success": {
         "title": "Policy Creation Successful",
         "body": "Replication policy {{policyName}} created successfully!"
@@ -402,7 +414,12 @@
           "bandwidth_unit": "MBps",
           "repeat": "Repeat",
           "timezone": "Selected Timezone",
-          "timezone_hint": "Selected timezone can be edited from the user menu on the top"
+          "timezone_hint": "Selected timezone can be edited from the user menu on the top",
+          "start": {
+            "self": "Start",
+            "schedule": "On Schedule",
+            "start_now": "From Now"
+          }
         },
         "schedule": {
           "immediate": "One Time",

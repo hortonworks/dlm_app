@@ -21,11 +21,13 @@
             <!--
             <dp-dropdown class="pull-right" [list]="['abc', 'def']"></dp-dropdown>
              -->
+            <!--
             <button *ngIf="showProfilerStatus" (click)="startProfiler()" class="mdl-button btn-hwx-default">
               <span *ngIf="profilerStatus == PS.RUNNING">Profiler Running <i class="fa fa-spinner fa-spin"></i></span>
               <span *ngIf="profilerStatus != PS.RUNNING">Restart Profiling</span>
             </button>
             <div *ngIf="showLastRunTime" class="lastRunTime" >Last ran at : {{lastRunTime}}</div>
+             -->
         </div>
     </div>
     <div class="spacer-34"> </div>
@@ -40,7 +42,8 @@
     <div class="spacer-15"> </div>
     <dp-tabs [tabEnum]="topLevelTabs" [tabType]="tabType.UNDERLINE" (selected)="selectedTopLevelTabs=$event"> </dp-tabs>
     <div class="spacer-15"> </div>
-    <section *ngIf="selectedTopLevelTabs === topLevelTabs.DETAILS">
+    <section *ngIf="selectedTopLevelTabs === topLevelTabs.DETAILS" style="position:relative;">
+      <div class="sticker" *ngIf="nextRunDisplay">{{nextRunDisplay}}</div>
       <dp-asset-details-view [assetDetails]="assetDetails" [clusterId]="clusterId" [guid]="guid"> </dp-asset-details-view>
     </section>
     <section *ngIf="selectedTopLevelTabs === topLevelTabs.LINEAGE">
@@ -50,7 +53,10 @@
      <asset-audit-view [clusterId]="clusterId" [assetDetails]="assetDetails"> </asset-audit-view>
     </section>
     <section *ngIf="selectedTopLevelTabs === topLevelTabs.POLICY">
-     <asset-policy-view [clusterId]="clusterId" [assetDetails]="assetDetails"> </asset-policy-view>
+     <div class="hwx-title-panel hwx-title">{{'pages.dataset.labels.resourceBasedPolicies' | translate}}</div>
+     <dp-asset-resource-policy-view [clusterId]="clusterId" [assetDetails]="assetDetails"> </dp-asset-resource-policy-view>
+     <div class="hwx-title-panel hwx-title">{{'pages.dataset.labels.tagBasedPolicies' | translate}}</div>
+     <dp-asset-tag-policy-view [clusterId]="clusterId" [guid]="guid"> </dp-asset-tag-policy-view>
     </section>
 
 </div>

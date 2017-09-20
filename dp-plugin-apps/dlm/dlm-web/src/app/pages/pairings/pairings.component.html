@@ -8,7 +8,7 @@
   -->
 
 <div class="row flex-center">
-  <div class="col-md-8">
+  <div class="col-xs-8">
     <dlm-page-header
       [title]="'page.pairings.header'"
       [isFlexCenter]="true"
@@ -16,7 +16,7 @@
       [linkTo]="'page.pairings.help_url'">
     </dlm-page-header>
   </div>
-  <div class="col-md-4">
+  <div class="col-xs-4">
     <div class="pull-right">
       <button qe-attr="add-pairing" type="button" class="btn btn-secondary" (click)="createPairingClickHandler()">{{"page.pairings.create_button_text" | translate }}
       </button>
@@ -28,7 +28,7 @@
   <div class="content">
     <div *ngIf="(pairings$ | async)?.length > 0; else noPairs">
       <div class="row">
-        <div class="col-md-8 col-sm-11 col-lg-6">
+        <div class="col-xs-6">
           <div class="row pairings-container">
             <dlm-pairing-card-list [pairings]="pairings$ | async" (onUnpair)="onUnpair($event)"></dlm-pairing-card-list>
           </div>

@@ -39,6 +39,10 @@ textarea, select {
   outline: none;
 }
 
+select {
+  height: 34px;
+}
+
 input[type="text"]:focus,
 input[type="password"]:focus,
 input[type="email"]:focus,

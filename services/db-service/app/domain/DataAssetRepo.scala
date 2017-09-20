@@ -42,6 +42,10 @@ class DataAssetRepo @Inject()(
     db.run(DatasetAssets.filter(_.id === id).result.headOption)
   }
 
+  def findByGuid(guid: String): Future[Option[DataAsset]] = {
+    db.run(DatasetAssets.filter(_.guid === guid).result.headOption)
+  }
+
   def deleteById(id: Long): Future[Int] = {
     db.run(DatasetAssets.filter(_.id === id).delete)
   }

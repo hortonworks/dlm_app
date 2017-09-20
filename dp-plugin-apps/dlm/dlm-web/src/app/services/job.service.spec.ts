@@ -11,7 +11,7 @@ import { JobService } from './job.service';
 import { HttpService } from './http.service';
 import {
   BaseRequestOptions, ConnectionBackend, Http, RequestMethod, RequestOptions,
-  ResponseOptions
+  ResponseOptions, Response
 } from '@angular/http';
 import { MockBackend } from '@angular/http/testing';
 import { ReflectiveInjector } from '@angular/core';

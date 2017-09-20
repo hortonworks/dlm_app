@@ -27,8 +27,11 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  def all = Action.async {
-    datasetRepo.all.map(dataset => success(dataset.map(c => linkData(c, makeLink(c))))).recoverWith(apiError)
+  def all(name: Option[String]) = Action.async {
+    (name match {
+      case Some(name) => datasetRepo.findByName(name)
+      case None => datasetRepo.all
+    }).map(dataset => success(dataset.map(c => linkData(c, makeLink(c))))).recoverWith(apiError)
   }
 
   private def getPaginatedQuery(req: Request[AnyContent]): Option[PaginatedQuery] = {

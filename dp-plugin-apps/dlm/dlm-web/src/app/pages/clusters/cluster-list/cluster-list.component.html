@@ -18,8 +18,8 @@
 
 <ng-template #statusCell let-status="value" let-cluster="row">
   <span>
-    <dlm-cluster-status-icon [cluster]="cluster"></dlm-cluster-status-icon>
-    <span [innerHtml]="status"></span>
+    <dlm-cluster-status-icon [cluster]="cluster" [attr.qe-attr]="'cluster-status-icon-' + cluster.$$index" ></dlm-cluster-status-icon>
+    <span [innerHtml]="status" [attr.qe-attr]="'cluster-status-' + cluster.$$index" ></span>
   </span>
 </ng-template>
 
@@ -27,35 +27,37 @@
   <span class="slash">&#47;</span>
 </ng-template>
 
-<ng-template #nameCell let-name="value">
-  <span class="cluster-name">{{name}}</span>
+<ng-template #nameCell let-name="value" let-cluster="row">
+  <span class="cluster-name" [attr.qe-attr]="'cluster-name-' + cluster.$$index">{{name}}</span>
 </ng-template>
 
-<ng-template #dcCell let-name="value">
-  <span class="datacenter-name">{{name}}</span>
+<ng-template #dcCell let-name="value" let-cluster="row">
+  <span class="datacenter-name" [attr.qe-attr]="'datacenter-name-' + cluster.$$index" >{{name}}</span>
 </ng-template>
 
 <ng-template let-stats="value" let-cluster="row" #usageCell>
-  <div class="text-primary cell-content actionable" qe-attr="cluster-details" (click)="toggleClusterDetails(cluster)">
+  <div class="text-primary cell-content actionable" [attr.qe-attr]="'cluster-details-' + cluster.$$index" (click)="toggleClusterDetails(cluster)">
     <span [innerHTML]="stats.CapacityUsed | bytesSize"></span> / <span [innerHTML]="stats.CapacityTotal | bytesSize"></span>
     <i [ngClass]="{fa: true, 'fa-chevron-down': !isExpandedRow(cluster), 'fa-chevron-up': isExpandedRow(cluster)}"></i>
   </div>
 </ng-template>
 
-<ng-template let-value="value" #plainCell>
-  <span *ngIf="value || value === 0; else emptyValue" class="cell-content">{{value}}</span>
+<ng-template let-value="value" let-column="column" let-row="row" #plainCell>
+  <span *ngIf="value || value === 0; else emptyValue" class="cell-content" [attr.qe-attr]="column['qeAttrName'] + '-' + row.$$index">{{value}}</span>
   <ng-template #emptyValue>
-    <i class="fa fa-minus"></i>
+    <span [attr.qe-attr]="column['qeAttrName'] + '-' + row.$$index">
+      <i class="fa fa-minus"></i>
+    </span>
   </ng-template>
 </ng-template>
 
-<ng-template let-location="value" #locationCell>
-  <span>{{location.city}}, {{location.country}}</span>
+<ng-template let-location="value" let-cluster="row" #locationCell>
+  <span [attr.qe-attr]="'cluster-location-' + cluster.$$index" >{{location.city}}, {{location.country}}</span>
 </ng-template>
 
 <ng-template let-cluster="row" #addActionsCell>
   <dlm-cluster-actions
-    qe-attr="cluster-actions"
+    [attr.qe-attr]="'cluster-actions-' + cluster.$$index"
     [rowId]="cluster.id"
     [cluster]="cluster"
     [clusterActions]="clusterActions"
@@ -68,8 +70,9 @@
 
 <ng-template let-cluster="row" ngx-datatable-row-detail-template #rowDetailRef>
   <div class="row">
-    <div class="col col-md-12">
+    <div class="col col-xs-12">
       <dlm-hdfs-browser
+        [attr.qe-attr]="'cluster-actions-' + cluster.$$index"
         [rootPath]="hdfsRootPath"
         [clusterId]="cluster.id"
         [page]="getFileBrowserPageForRow(cluster.id)"

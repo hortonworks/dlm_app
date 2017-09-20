@@ -7,20 +7,26 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-.dlm-progress-container {
-  .progress-container-waiting {
-    margin-top: 20px;
+:host {
+  .dlm-progress-container {
+    .progress-container-waiting {
+      margin-top: 20px;
+    }
   }
-}
 
-.job-status-filter {
-  margin-left: 10px;
-}
+  .job-status-filter {
+    margin-left: 10px;
+  }
 
-.overview-map-legend {
-  width: 200px;
-}
+  .overview-map-legend {
+    width: 200px;
+  }
 
-.btn-padding {
-  margin-right: 15px;
+  .btn-padding {
+    margin-right: 15px;
+  }
+
+  #no_issues_warning {
+    margin-top: 10px;
+  }
 }

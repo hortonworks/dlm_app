@@ -133,7 +133,7 @@ export class JobsTableComponent implements OnInit {
   }
 
   isRunning(job: Job) {
-    return job && job.duration <= 0;
+    return job && !job.isCompleted;
   }
 
   handleActionOpenChange(event: {rowId: string, isOpen: boolean}) {

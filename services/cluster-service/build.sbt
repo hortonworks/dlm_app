@@ -27,3 +27,5 @@ libraryDependencies ++= Seq(
   "org.slf4j" % "log4j-over-slf4j" % "1.7.25",
   "org.scalatest" % "scalatest_2.11" % "3.0.1" % Test,
   "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test)
+
+libraryDependencies := libraryDependencies.value.map(_.excludeAll(ExclusionRule("com.google.code.findbugs", "annotations")))
