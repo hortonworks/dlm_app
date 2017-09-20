@@ -9,7 +9,7 @@
 
 package services
 
-import javax.inject.{Inject, Singleton}
+import com.google.inject.{Inject, Singleton}
 
 import com.google.inject.name.Named
 import models.Ambari._

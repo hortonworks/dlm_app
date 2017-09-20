@@ -16,8 +16,8 @@ import { API_PREFIX } from 'constants/api.constant';
 
 @Injectable()
 export class HttpService extends Http {
-  // prodFlag = true;
-  prodFlag = false;
+  prodFlag = true;
+  //prodFlag = false;
 
   // todo: add auth token to headers
   // todo: default error handler

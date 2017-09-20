@@ -41,7 +41,7 @@ GET     /api/clusters/:clusterId/logs                             controllers.Lo
 GET    /api/beacon/admin/status                                    controllers.Admin.listStatus
 
 #HdfsFiles
-GET     /api/clusters/:clusterId/webhdfs/file                     controllers.HdfsFiles.retrieve(clusterId: Long)
+GET     /api/clusters/:clusterId/hdfs/file                     controllers.HdfsFiles.retrieve(clusterId: Long)
 
 #HiveDatabases
 GET     /api/clusters/:clusterId/hive/databases                   controllers.HiveDatabases.retrieveDb(clusterId: Long)
