@@ -61,6 +61,13 @@
   <dlm-transferred-column [trackingInfo]="value" [jobStatus]="job.status"></dlm-transferred-column>
 </ng-template>
 
+<ng-template #transferredObjectsTemplate let-trackingInfo="value">
+  <dlm-transferred-objects
+    [amount]="trackingInfo?.progress?.filesCopied"
+    [units]="trackingInfo?.progress?.unit">
+  </dlm-transferred-objects>
+</ng-template>
+
 <ng-template #actionsCell let-row="row">
   <dlm-policy-actions
     qe-attr="job-actions"

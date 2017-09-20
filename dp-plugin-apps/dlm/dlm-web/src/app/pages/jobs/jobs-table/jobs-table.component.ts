@@ -8,6 +8,7 @@
  */
 
 import { Component, OnInit, Input, Output, ViewChild, TemplateRef, EventEmitter } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { Job } from 'models/job.model';
 import { ActionItemType } from 'components';
 import { TableComponent } from 'common/table/table.component';
@@ -36,6 +37,7 @@ export class JobsTableComponent implements OnInit {
   @ViewChild('runTimeTemplate') runTimeTemplate: TemplateRef<any>;
   @ViewChild('transferredTemplate') transferredTemplate: TemplateRef<any>;
   @ViewChild('transferredFormattedTemplate') transferredFormattedTemplate: TemplateRef<any>;
+  @ViewChild('transferredObjectsTemplate') transferredObjectsTemplate: TemplateRef<any>;
   @ViewChild('serviceTemplate') serviceTemplate: TemplateRef<any>;
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
   @ViewChild('jobsTable') jobsTable: TableComponent;
@@ -63,11 +65,16 @@ export class JobsTableComponent implements OnInit {
     {label: 'View Log', name: 'LOG'}
   ];
 
-  constructor(protected store: Store<fromRoot.State>, protected logService: LogService) {
-  }
+  constructor(protected store: Store<fromRoot.State>,
+              protected logService: LogService,
+              protected t: TranslateService) { }
 
   protected cannotRerun(policy, lastJob) {
     return !lastJob || policy.status === POLICY_STATUS.SUSPENDED || contains([JOB_STATUS.SUCCESS, JOB_STATUS.RUNNING], lastJob.status);
+  }
+
+  protected translateColumn(columnName: string): string {
+    return this.t.instant(`page.policies.jobs_table.column.${columnName}`);
   }
 
   ngOnInit() {
@@ -77,26 +84,27 @@ export class JobsTableComponent implements OnInit {
         cellTemplate: this.statusVerbTemplate,
         prop: 'status',
         cellClass: 'text-cell',
-        headerClass: 'text-header'
+        headerClass: 'text-header',
+        name: this.translateColumn('status')
       },
       {
         prop: 'startTime',
         cellTemplate: this.agoTemplate,
-        name: 'Started',
+        name: this.translateColumn('startTime'),
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
       {
         prop: 'endTime',
         cellTemplate: this.agoTemplate,
-        name: 'Ended',
+        name: this.translateColumn('endTime'),
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
       {
         prop: 'duration',
         cellTemplate: this.runTimeTemplate,
-        name: 'Runtime',
+        name: this.translateColumn('duration'),
         cellClass: 'date-cell',
         headerClass: 'date-header',
         sortable: false
@@ -104,20 +112,25 @@ export class JobsTableComponent implements OnInit {
       {
         prop: 'trackingInfo',
         cellTemplate: this.transferredFormattedTemplate,
-        name: 'Transferred Bytes',
+        name: this.translateColumn('transferredBytes'),
         cellClass: 'date-cell',
         headerClass: 'date-header',
         comparator: transferredBytesComparator.bind(this),
         sortable: false
       },
       {
-        prop: 'trackingInfo.progress.filesCopied',
-        name: 'Transferred Files',
+        prop: 'trackingInfo',
+        name: this.translateColumn('transferredFiles'),
+        cellTemplate: this.transferredObjectsTemplate,
         cellClass: 'date-cell',
         headerClass: 'date-header',
         sortable: false
       },
-      {name: 'Actions', cellTemplate: this.actionsCellRef, sortable: false}
+      {
+        name: this.translateColumn('actions'),
+        cellTemplate: this.actionsCellRef,
+        sortable: false
+      }
     ];
   }
 
