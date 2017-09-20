@@ -9,7 +9,7 @@
 
 package controllers
 
-import javax.inject.Inject
+import com.google.inject.Inject
 
 import models.JsonResponses
 import models.Entities.PolicySubmitRequest
@@ -22,7 +22,6 @@ import services.BeaconService
 import com.hortonworks.dataplane.commons.auth.Authenticated
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._
-import com.hortonworks.dlm.webhdfs.domain.JsonFormatters._
 import models.JsonFormatters._
 
 

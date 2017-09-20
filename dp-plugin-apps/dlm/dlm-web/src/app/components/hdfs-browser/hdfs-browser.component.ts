@@ -217,31 +217,9 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
     this.rows = [...parent, ...rows];
   }
 
-  convertPermissions(octal: string, type: string) {
-    let permissions = type === FILE_TYPES.DIRECTORY ? 'd' : '-';
-    this.getDigits(octal).map(digit => {
-      permissions += this.getPermissionsString(+digit);
-    });
-    return permissions;
-  }
-
-  getPermissionsString(digit: number) {
-    switch (digit) {
-      case 1: return '--x';
-      case 2: return '-w-';
-      case 3: return '-wx';
-      case 4: return 'r--';
-      case 5: return 'r-x';
-      case 6: return 'rw-';
-      case 7: return 'rwx';
-      case 0:
-      default:
-        return '---';
-    }
-  }
-
-  getDigits(numberString: string) {
-    return numberString.split('');
+  convertPermissions(permission: string, type: string) {
+    let fileType = type === FILE_TYPES.DIRECTORY ? 'd' : '-';
+    return `${fileType}${permission}`;
   }
 
   ngOnDestroy() {

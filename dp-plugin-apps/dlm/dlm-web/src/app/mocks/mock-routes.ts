@@ -42,7 +42,7 @@ export const routes: MockRoute[] = [
   new MockRoute('events', 'events.json'),
 
   // HDFS files list
-  new MockRoute('clusters/:clusterId/webhdfs/file', 'files.json'),
+  new MockRoute('clusters/:clusterId/hdfs/file', 'files.json'),
 
   // HIVE databases
   new MockRoute('clusters/:clusterId/hive/databases', 'hive_databases.json'),

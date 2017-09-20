@@ -58,6 +58,11 @@ object ResponseEntities {
   case class BeaconAdminStatusResponse(status: String, version: String, plugins: String, security: String, wireEncryption: Boolean)
 
   case class BeaconAdminStatusDetails(clusterId: Long, beaconAdminStatus: BeaconAdminStatusResponse)
+
+  case class HdfsFile(accessTime: Long, blockSize: Long, group: String, length: Long, modificationTime: Long,
+                      owner: String, pathSuffix: String, permission: String, replication: Int, `type`: String)
+
+  case class BeaconHdfsFileResponse(status: String, message: String, requestId: String, totalResults: Long, fileList: Seq[HdfsFile])
 }
 
 object RequestEntities {
@@ -129,6 +134,12 @@ object JsonFormatters {
 
   implicit val beaconAdminStatusDetailsWrites = Json.writes[BeaconAdminStatusDetails]
   implicit val beaconAdminStatusDetailsReads = Json.reads[BeaconAdminStatusDetails]
+
+  implicit val hdfsFileWrites = Json.writes[HdfsFile]
+  implicit val hdfsFileReads = Json.reads[HdfsFile]
+
+  implicit val beaconHdfsFileResponseWrites = Json.writes[BeaconHdfsFileResponse]
+  implicit val beaconHdfsFileResponseReads = Json.reads[BeaconHdfsFileResponse]
 
   //-- RequestEntities
 
