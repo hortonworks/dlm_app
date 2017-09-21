@@ -62,6 +62,13 @@ export class BasicQueryEditor implements OnInit {
     }
   }
 
+  onKeyUp(event){
+    let keyCode = event.keyCode || event.which;
+    if(keyCode === 13){
+      this.notificationEmitter.emit("");
+    }
+  }
+
   copyQryObjToWidget() {
     const enm = AssetTypeEnum, type = this.queryObj.type;
     this.typeValueIndx = (type == enm.ALL) ? 0 : ((type == enm.HIVE) ? 1 : ((type == enm.HDFS) ? 2 : 0));

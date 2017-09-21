@@ -10,10 +10,10 @@
  */
 
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import {Router} from '@angular/router';
 import {UserService} from '../../../../../services/user.service';
 import {LDAPUser} from '../../../../../models/ldap-user';
-import {TaggingWidget, TagTheme} from '../../../../../shared/tagging-widget/tagging-widget.component';
+import {TaggingWidget} from '../../../../../shared/tagging-widget/tagging-widget.component';
 import {AuthenticationService} from '../../../../../services/authentication.service';
 import {Observable} from 'rxjs/Observable';
 import {GroupService} from '../../../../../services/group.service';
@@ -31,7 +31,6 @@ export class UserAddComponent implements OnInit {
   groups: string[] = [];
   availableUsers: string[] = [];
   availableGroups: string[] = [];
-  tagThemes = TagTheme;
   groupsSaved = false;
   usersSaved = false;
 
@@ -40,6 +39,10 @@ export class UserAddComponent implements OnInit {
 
   @ViewChild('userTags') private userTags: TaggingWidget;
   @ViewChild('groupTags') private groupTags: TaggingWidget;
+
+  userSearchSubscription: any;
+  groupSearchSubscription: any;
+
 
   constructor(private router: Router,
               private userService: UserService,
@@ -154,8 +157,11 @@ export class UserAddComponent implements OnInit {
 
   onUserSearchChange(text: string) {
     this.hideError();
+    if (this.userSearchSubscription) {
+      this.userSearchSubscription.unsubscribe();
+    }
     if (text) {
-      this.userService.searchLDAPUsers(text).subscribe((ldapUsers: LDAPUser[]) => {
+      this.userSearchSubscription = this.userService.searchLDAPUsers(text).subscribe((ldapUsers: LDAPUser[]) => {
         this.availableUsers = ldapUsers.map(user => user.name);
       }, () => {
         this.onError(this.translateService.instant('pages.onboard.adduser.description.ldapUserFetchError'));
@@ -167,8 +173,11 @@ export class UserAddComponent implements OnInit {
 
   onGroupSearchChange(text: string) {
     this.hideError();
+    if (this.groupSearchSubscription) {
+      this.groupSearchSubscription.unsubscribe();
+    }
     if (text) {
-      this.userService.searchLDAPGroups(text).subscribe((ldapGroups: any[]) => {
+      this.groupSearchSubscription = this.userService.searchLDAPGroups(text).subscribe((ldapGroups: any[]) => {
         this.availableGroups = ldapGroups.map(group => group.name);
       }, () => {
         this.onError(this.translateService.instant('pages.onboard.adduser.description.ldapUserFetchError'));

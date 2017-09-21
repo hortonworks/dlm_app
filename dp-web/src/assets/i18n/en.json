@@ -58,7 +58,8 @@
     "serviceDisabled": "Service Not Enabled",
     "serviceDisabledMessage": "This service has not been enabled by your Admin. Please contact your Data plane Administrator to enable it.",
     "invalidUser": "You are not an authorized Data plane user. Please contact your Data plane Administrator.",
-    "noMatch": "No Match"
+    "noMatch": "No Match found...",
+    "searching": "Searching..."
   },
   "pages": {
     "signin" :{

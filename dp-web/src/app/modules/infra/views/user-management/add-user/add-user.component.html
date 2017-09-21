@@ -32,7 +32,6 @@
             [tags]="users"
             [availableTags]="availableUsers"
             [clearOnSearch]="true"
-            [theme]="tagTheme.DARK"
             [restrictFreeText]="true"
             [minChars]=3
             (textChange)="onUserSearchChange($event)"
@@ -46,7 +45,6 @@
             [tags]="roles"
             [availableTags]="availableRoles"
             [clearOnSearch]="true"
-            [theme]="tagTheme.DARK"
             [restrictFreeText]="true"
             [minChars]=3
             (textChange)="onRoleSearchChange($event)"
@@ -92,7 +90,6 @@
               [tags]="userRoles"
               [availableTags]="availableRoles"
               [clearOnSearch]="true"
-              [theme]="tagTheme.DARK"
               [restrictFreeText]="true"
               [minChars]=3
               (textChange)="onRoleSearchChange($event)"

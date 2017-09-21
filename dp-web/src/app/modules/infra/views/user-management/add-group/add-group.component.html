@@ -32,7 +32,6 @@
           [tags]="groups"
           [availableTags]="availableGroups"
           [clearOnSearch]="true"
-          [theme]="tagTheme.DARK"
           [restrictFreeText]="true"
           [minChars]=3
           (textChange)="onGroupSearchChange($event)"
@@ -45,7 +44,6 @@
           [tags]="roles"
           [availableTags]="availableRoles"
           [clearOnSearch]="true"
-          [theme]="tagTheme.DARK"
           [restrictFreeText]="true"
           [minChars]=3
           (textChange)="onRoleSearchChange($event)"
@@ -89,7 +87,6 @@
               [tags]="groupRoles"
               [availableTags]="availableRoles"
               [clearOnSearch]="true"
-              [theme]="tagTheme.DARK"
               [restrictFreeText]="true"
               [minChars]=3
               (textChange)="onRoleSearchChange($event)"

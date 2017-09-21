@@ -13,7 +13,7 @@ import {AfterViewInit, Component, HostListener, OnInit, ViewChild} from '@angula
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {UserService} from '../../../../../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {TaggingWidget, TaggingWidgetTagModel, TagTheme} from '../../../../../shared/tagging-widget/tagging-widget.component';
+import {TaggingWidget, TaggingWidgetTagModel} from '../../../../../shared/tagging-widget/tagging-widget.component';
 import {User} from '../../../../../models/user';
 import {TranslateService} from '@ngx-translate/core';
 import {NgForm} from '@angular/forms';
@@ -36,7 +36,6 @@ export class AddUserComponent implements OnInit, AfterViewInit {
 
   allRoles: TaggingWidgetTagModel[] = [];
 
-  tagTheme = TagTheme;
   user: User = new User('', '', '', '', [], false, '');
   userRoles: TaggingWidgetTagModel[] = [];
 
@@ -48,6 +47,8 @@ export class AddUserComponent implements OnInit, AfterViewInit {
   @ViewChild('editUserForm') editUserForm: NgForm;
   @ViewChild('userTags') private userTags: TaggingWidget;
   @ViewChild('roleTags') private roleTags: TaggingWidget;
+
+  userSearchSubscription: any;
 
   constructor(private userService: UserService,
               private router: Router,
@@ -100,8 +101,11 @@ export class AddUserComponent implements OnInit, AfterViewInit {
   }
 
   onUserSearchChange(text: string) {
+    if (this.userSearchSubscription) {
+      this.userSearchSubscription.unsubscribe();
+    }
     if (text) {
-      this.userService.searchLDAPUsers(text).subscribe((ldapUsers: LDAPUser[]) => {
+      this.userSearchSubscription = this.userService.searchLDAPUsers(text).subscribe((ldapUsers: LDAPUser[]) => {
         this.availableUsers = ldapUsers.map(user => user.name);
       }, () => {
         this.onError(this.translateService.instant('pages.infra.description.ldapError'));
