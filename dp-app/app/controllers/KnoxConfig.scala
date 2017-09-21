@@ -136,15 +136,19 @@ class KnoxConfig @Inject()(
             case None =>
               handleErrors(
                 Errors(
-                  Seq(new Error("Exception", "No ldap configuration found"))))
+                  Seq(Error("Exception", "No ldap configuration found"))))
             case Some(ldapConfig) => {
               val userDnTemplate =
                 s"${ldapConfig.userSearchAttributeName.get}={0},${ldapConfig.userSearchBase.get}"
+              val password=ldapService.getPassword(ldapConfig.bindDn.get)
               val knoxLdapConfig =
                 KnoxConfiguration(ldapUrl = ldapConfig.ldapUrl,
                                   bindDn = ldapConfig.bindDn,
                                   userDnTemplate = Some(userDnTemplate),
-                                  domains = whiteListdomains)
+                                  domains = whiteListdomains,
+                                  userSearchAttributeName = ldapConfig.userSearchAttributeName,
+                                  userSearchBase = ldapConfig.userSearchBase,
+                                  password=password)
               Ok(Json.toJson(knoxLdapConfig))
             }
           }

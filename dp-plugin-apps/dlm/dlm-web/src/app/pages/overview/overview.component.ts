@@ -38,7 +38,7 @@ import { POLL_INTERVAL, ALL_POLICIES_COUNT } from 'constants/api.constant';
 import { getClustersHealth, getPoliciesHealth, getJobsHealth } from 'selectors/aggregation.selector';
 import { SUMMARY_PANELS, CLUSTERS_HEALTH_STATE, JOBS_HEALTH_STATE } from './resource-summary/';
 import { CLUSTER_STATUS, SERVICE_STATUS } from 'constants/status.constant';
-import { MapSizeSettings, ClusterMapData, ClusterMapPoint } from 'models/map-data';
+import { MapSizeSettings, ClusterMapData, ClusterMapPoint, ClusterMapEntity } from 'models/map-data';
 import { LogService } from 'services/log.service';
 import { EntityType, LOG_EVENT_TYPE_MAP } from 'constants/log.constant';
 import { PairsCountEntity } from 'models/pairs-count-entity.model';
@@ -253,7 +253,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
       // prioritize UNHEALTHY status over WARNING when display cluster dot marker
       const healthStatus = lowCapacityClusters.some(c => c.id === cluster.id) && cluster.healthStatus === CLUSTER_STATUS.HEALTHY ?
         CLUSTER_STATUS.WARNING : cluster.healthStatus;
-      const clusterData = {
+      const clusterData = <ClusterMapEntity>{
         ...cluster,
         healthStatus,
         policiesCounter
@@ -348,8 +348,15 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.applyJobFilter('');
   }
 
-  handleClickMarker(cluster: Cluster) {
-    this.selectedCluster$.next(cluster);
+  handleClickMarker(clusters: Cluster[]): void {
+    const selectedCluster = this.selectedCluster$.getValue();
+    if (this.selectedCluster$.getValue() && clusters.some(c => c.id === selectedCluster.id)) {
+      const selectedIndex = clusters.findIndex(c => c.id === selectedCluster.id);
+      const nextCluster = selectedIndex > -1 && clusters[selectedIndex + 1] || clusters[0];
+      this.selectedCluster$.next(nextCluster);
+      return;
+    }
+    this.selectedCluster$.next(clusters[0]);
   }
 
   showEventEntityLogs(event: Event) {
@@ -363,5 +370,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
   getPercentageRemaining(cluster: Cluster): string {
     return Math.floor((Number(cluster.stats.CapacityRemaining) / Number(cluster.stats.CapacityTotal)) * 100) + '%';
+  }
+
+  handleLegendClose() {
+    this.selectedCluster$.next(null);
   }
 }

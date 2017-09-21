@@ -82,4 +82,30 @@ export class AssetService {
       });
   }
 
+  getProfilerAuditResults(clusterId:string, dbName:string, tableName:string, userName:string, dateModel:any) : Observable<any>{
+    const endDate = `${dateModel.endDate.year}-${dateModel.endDate.month}-${dateModel.endDate.day}`
+    const startDate = `${dateModel.beginDate.year}-${dateModel.beginDate.month}-${dateModel.beginDate.day}`
+    const uri = `/api/dpProfiler/auditResults?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}&startDate=${startDate}&endDate=${endDate}${userName?("&userName="+userName):""}`;
+    return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(err => {
+        if(err.status == 404 || err.status == 405) return Observable.throw(err);
+        return HttpUtil.handleError(err)
+      });
+  }
+
+  getProfilerAuditActions(clusterId:string, dbName:string, tableName:string, userName:string, dateModel:any) : Observable<any>{
+    const endDate = `${dateModel.endDate.year}-${dateModel.endDate.month}-${dateModel.endDate.day}`
+    const startDate = `${dateModel.beginDate.year}-${dateModel.beginDate.month}-${dateModel.beginDate.day}`
+    const uri = `/api/dpProfiler/auditActions?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}&startDate=${startDate}&endDate=${endDate}${userName?("&userName="+userName):""}`;
+    return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(err => {
+        if(err.status == 404 || err.status == 405) return Observable.throw(err);
+        return HttpUtil.handleError(err)
+      });
+  }
+
 }

@@ -92,7 +92,7 @@ object Webservice {
 
   trait DataSetService extends DbClientService {
 
-    def list(): Future[Either[Errors, Seq[Dataset]]]
+    def list(name: Option[String]): Future[Either[Errors, Seq[Dataset]]]
 
     def create(dataSetAndCatIds: DatasetAndCategoryIds)
     : Future[Either[Errors, DatasetAndCategories]]

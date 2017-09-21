@@ -34,7 +34,7 @@ export class JobService {
 
   normalizeJob(job): Job {
     const duration = moment(job.endTime).diff(moment(job.startTime));
-    job.duration = duration > 0 ? duration : -1;
+    job.duration = duration >= 0 ? duration : -1;
     job.isCompleted = job.status !== JOB_STATUS.RUNNING;
     try {
       job.trackingInfo = <JobTrackingInfo>JSON.parse(job.trackingInfo);

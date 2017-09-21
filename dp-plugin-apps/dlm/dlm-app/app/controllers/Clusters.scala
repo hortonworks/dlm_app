@@ -9,7 +9,7 @@
 
 package controllers
 
-import javax.inject.Inject
+import com.google.inject.Inject
 
 import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._

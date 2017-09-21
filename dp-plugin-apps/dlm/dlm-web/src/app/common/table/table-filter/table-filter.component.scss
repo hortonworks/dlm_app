@@ -33,4 +33,12 @@ $filter-width: 200px;
   .form-control-feedback {
     color: #999;
   }
+  .no-results {
+    position: absolute;
+    top: 34px;
+    display: block;
+    .dropdown-menu {
+      min-width: 200px;
+    }
+  }
 }

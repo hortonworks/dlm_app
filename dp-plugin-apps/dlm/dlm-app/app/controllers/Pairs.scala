@@ -9,7 +9,7 @@
 
 package controllers
 
-import javax.inject.Inject
+import com.google.inject.Inject
 
 
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._

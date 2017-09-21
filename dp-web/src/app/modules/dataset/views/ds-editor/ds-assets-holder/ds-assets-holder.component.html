@@ -35,3 +35,8 @@
     <asset-search [showBelongsToColumn]="true" [clusterId]="dsModel.clusterId" (doneNotification)="actionDone($event)" (cancelNotification)="actionCancel()"></asset-search>
   </div>
 </div>
+
+<div class="button-container" *ngIf="assetSetQueryModelsForAddition.length > 0">
+  <button class="mdl-button btn-hwx-primary" (click)="onNext()">{{"pages.dataset.ds-editor.action.next" | translate}}</button>
+  <button class="mdl-button btn-hwx-default" (click)="onCancel()">{{"pages.dataset.ds-editor.action.cancel" | translate}}</button>
+</div>

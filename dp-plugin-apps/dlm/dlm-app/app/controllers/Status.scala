@@ -9,9 +9,9 @@
 
 package controllers
 
-import javax.inject._
+import com.google.inject.Singleton
 
-import play.api.mvc._
+import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global

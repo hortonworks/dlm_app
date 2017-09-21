@@ -35,7 +35,6 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class FlowStatusComponent {
   private translateNS = 'page.policies.flow_status';
-  POLICY_MODES = POLICY_MODES;
   @Input() mode: POLICY_MODES = POLICY_MODES.READ_WRITE;
 
   get modeTranslate(): string {
