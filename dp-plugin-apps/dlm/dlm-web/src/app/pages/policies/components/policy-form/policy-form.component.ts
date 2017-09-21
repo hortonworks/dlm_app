@@ -99,7 +99,7 @@ export function pathValidator(hdfsService): AsyncValidatorFn {
         const clusterId = control.parent['controls']['general'].controls.sourceCluster.value;
         return hdfsService.getFilesList(clusterId, control.value).toPromise()
           .then(response => {
-            const files = response.FileStatuses.FileStatus;
+            const files = response.fileList;
             if (files.length && files[0].type === FILE_TYPES.FILE && files[0].pathSuffix === '') {
               return resolve({isFile: true});
             }
