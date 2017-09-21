@@ -1,0 +1,48 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
+@import "../../../../../../styles/variables";
+
+.no-top-bottom-space {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-top: 0 !important;
+}
+
+.no-top-bottom-space {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-top: 0 !important;
+}
+
+.summary-pane-1 ul {
+  border: none;
+}
+
+.summary-pane-1 li {
+  background-color: $white;
+}
+
+.value{
+  float: left;
+}
+
+.edit-ldap{
+  float:right;
+}
+
+.menu-icon {
+  margin: 0px 5px;
+}

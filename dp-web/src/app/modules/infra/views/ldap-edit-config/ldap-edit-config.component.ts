@@ -9,27 +9,34 @@
  *
  */
 
-import {Component} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
 
-import {ConfigurationService} from '../../../../../services/configuration.service';
-import {TranslateService} from '@ngx-translate/core';
-import {Loader} from '../../../../../shared/utils/loader';
-import {LdapConfigCommonComponent} from "../../../../../shared/ldap-config-common/ldap-config-common.component";
-
+import { Component, OnInit } from '@angular/core';
+import {LdapConfigCommonComponent} from "../../../../shared/ldap-config-common/ldap-config-common.component";
+import {ConfigurationService} from "../../../../services/configuration.service";
+import {ActivatedRoute, Router} from "@angular/router";
+import {TranslateService} from "@ngx-translate/core";
+import {Loader} from "../../../../shared/utils/loader";
+import {LDAPUpdateProperties} from "../../../../models/ldap-properties";
 
 @Component({
-  selector: 'dp-ldap-config',
-  templateUrl: '../../../../../shared/ldap-config-common/ldap-config-common.component.html',
-  styleUrls: ['../../../../../shared/ldap-config-common/ldap-config-common.component.scss']
+  selector: 'dp-ldap-edit-config',
+  templateUrl: '../../../../shared/ldap-config-common/ldap-config-common.component.html',
+  styleUrls: ['../../../../shared/ldap-config-common/ldap-config-common.component.scss']
 })
-export class LdapConfigComponent extends LdapConfigCommonComponent {
+export class LdapEditConfigComponent extends LdapConfigCommonComponent {
+
+  ldapUpdateProperties: LDAPUpdateProperties = new LDAPUpdateProperties();
 
   constructor(public configurationService: ConfigurationService,
               private router: Router,
               private route: ActivatedRoute,
               private translateService: TranslateService) {
     super(configurationService);
+  }
+
+  ngOnInit(){
+    super.ngOnInit();
+    this.isInEditMode = true;
   }
 
   save() {
@@ -40,8 +47,12 @@ export class LdapConfigComponent extends LdapConfigCommonComponent {
       return;
     }
     Loader.show();
-    this.configurationService.configureLDAP(this.ldapProperties).subscribe(() => {
-      this.router.navigate(['onboard/adduser', {
+    this.ldapUpdateProperties.id = this.ldapProperties.id;
+    this.ldapUpdateProperties.bindDn = this.ldapProperties.bindDn;
+    this.ldapUpdateProperties.ldapUrl = this.ldapProperties.ldapUrl;
+    this.ldapUpdateProperties.password = this.ldapProperties.password;
+    this.configurationService.updateLDAP(this.ldapUpdateProperties).subscribe(() => {
+      this.router.navigate(['infra/usermgmt/users', {
         status: 'success',
       }]);
       Loader.hide();
@@ -59,7 +70,7 @@ export class LdapConfigComponent extends LdapConfigCommonComponent {
   }
 
   back() {
-    this.router.navigate(['onboard/welcome']);
+    this.router.navigate(['infra/usermgmt/users']);
   }
 
 }

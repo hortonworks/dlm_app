@@ -16,16 +16,16 @@
   <ul id="errors">
     <li class="red text-small" *ngFor="let message of notificationMessages">{{message}}</li>
   </ul>
-  </div>
+</div>
 <div class="container line-height-1-5">
-  <div class="text-medium">
+  <div class="text-medium" *ngIf="!isInEditMode">
     <i class="fa fa-lock green text-large pull-left"></i>
     <div>
       <div class="text-uppercase text-xsmall">{{("common.step" | translate).toUpperCase()}} 1</div>
       <div class="">{{"pages.onboard.labels.setupAuth" | translate}}</div>
     </div>
   </div>
-  <div class="margin-top-bottom-20">
+  <div class="margin-top-bottom-20" *ngIf="!isInEditMode">
     {{"pages.onboard.description.setupAuth" | translate}}
   </div>
   <form #configForm="ngForm">
@@ -36,27 +36,27 @@
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.userSearchBase" | translate}}</label>
-      <input required name="user-search-base" type="text" [(ngModel)]="ldapProperties.userSearchBase" placeholder="e.g. ou=people,dc=hadoop,dc=apache,dc=org"/>
+      <input required name="user-search-base" type="text" [readonly]="isInEditMode" [ngStyle]="isInEditMode && {'opacity':'0.6'}" [(ngModel)]="ldapProperties.userSearchBase" placeholder="e.g. ou=people,dc=hadoop,dc=apache,dc=org"/>
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.userSearchAttributeName" | translate}}</label>
-      <input required name="user-search-attr" type="text" [(ngModel)]="ldapProperties.userSearchAttributeName" placeholder="e.g. uid"/>
+      <input required name="user-search-attr" type="text" [readonly]="isInEditMode" [ngStyle]="isInEditMode && {'opacity':'0.6'}" [(ngModel)]="ldapProperties.userSearchAttributeName" placeholder="e.g. uid"/>
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.groupSearchBase" | translate}}</label>
-      <input required name="group-search-base" type="text" [(ngModel)]="ldapProperties.groupSearchBase" placeholder="e.g. ou=groups,dc=hadoop,dc=apache,dc=org"/>
+      <input required name="group-search-base" type="text" [readonly]="isInEditMode" [ngStyle]="isInEditMode && {'opacity':'0.6'}" [(ngModel)]="ldapProperties.groupSearchBase" placeholder="e.g. ou=groups,dc=hadoop,dc=apache,dc=org"/>
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.groupSearchAttributeName" | translate}}</label>
-      <input required name="group-search-attr" type="text" [(ngModel)]="ldapProperties.groupSearchAttributeName" placeholder="e.g. cn"/>
+      <input required name="group-search-attr" type="text" [readonly]="isInEditMode" [ngStyle]="isInEditMode && {'opacity':'0.6'}" [(ngModel)]="ldapProperties.groupSearchAttributeName" placeholder="e.g. cn"/>
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.groupObjectClass" | translate}}</label>
-      <input required name="group-object-class" type="text" [(ngModel)]="ldapProperties.groupObjectClass" placeholder="e.g. groupofnames"/>
+      <input required name="group-object-class" type="text" [readonly]="isInEditMode" [ngStyle]="isInEditMode && {'opacity':'0.6'}" [(ngModel)]="ldapProperties.groupObjectClass" placeholder="e.g. groupofnames"/>
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.groupMemberAttributeName" | translate}}</label>
-      <input required name="group-member-attr-name" type="text" [(ngModel)]="ldapProperties.groupMemberAttributeName" placeholder="e.g. member"/>
+      <input required name="group-member-attr-name" type="text" [readonly]="isInEditMode" [ngStyle]="isInEditMode && {'opacity':'0.6'}" [(ngModel)]="ldapProperties.groupMemberAttributeName" placeholder="e.g. member"/>
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.adminBindDN" | translate}}</label>

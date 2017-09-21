@@ -22,6 +22,7 @@ import {GroupsComponent} from './views/user-management/groups/groups.component';
 import {ServiceManagementComponent} from './views/service-management/service-management.component';
 import {VerificationComponent} from './views/service-management/verification/verification.component';
 import {ManualInstallCheckComponent} from './views/service-management/manual-install-check/manual-install-check.component';
+import {LdapEditConfigComponent} from "./views/ldap-edit-config/ldap-edit-config.component";
 
 // export const routes:Routes = [
 //   { path: '', redirectTo: 'clusters' },
@@ -36,27 +37,29 @@ import {ManualInstallCheckComponent} from './views/service-management/manual-ins
 //   }
 // ];
 export const routes: Routes = [
-    {path: '', redirectTo: 'clusters'},
-    {path: 'clusters', component: LakesComponent},
-    {path: 'add', component: ClusterAddComponent},
-    {path: 'edit/:id', component: ClusterEditComponent},
-    {path: 'cluster/details/:id', component: ClusterDetailsComponent},
-    {path: 'services', component: ServiceManagementComponent},
-    {path: 'services/verify/:name', component: VerificationComponent},
-    {path: 'services/install', component: ManualInstallCheckComponent},
-    {path: 'usermgmt', pathMatch: 'full', redirectTo: 'usermgmt/users'},
-    {
-      path: 'usermgmt/users', component: UsersComponent,
-      children: [
-        {path: 'add', component: AddUserComponent, outlet: 'sidebar'},
-        {path: 'edit/:name', component: AddUserComponent, outlet: 'sidebar'}
-      ]
-    },
-    {
-      path: 'usermgmt/groups', component: GroupsComponent,
-      children: [
-        {path: 'add', component: AddGroupComponent, outlet: 'sidebar'},
-        {path: 'edit/:name', component: AddGroupComponent, outlet: 'sidebar'}
-      ]
-    }
-  ];
+  {path: '', redirectTo: 'clusters'},
+  {path: 'clusters', component: LakesComponent},
+  {path: 'add', component: ClusterAddComponent},
+  {path: 'edit/:id', component: ClusterEditComponent},
+  {path: 'cluster/details/:id', component: ClusterDetailsComponent},
+  {path: 'services', component: ServiceManagementComponent},
+  {path: 'services/verify/:name', component: VerificationComponent},
+  {path: 'services/install', component: ManualInstallCheckComponent},
+  {path: 'usermgmt', pathMatch: 'full', redirectTo: 'usermgmt/users'},
+  {path: 'usermgmt/editldap', component: LdapEditConfigComponent},
+  {
+    path: 'usermgmt/users', component: UsersComponent,
+    children: [
+      {path: 'add', component: AddUserComponent, outlet: 'sidebar'},
+      {path: 'edit/:name', component: AddUserComponent, outlet: 'sidebar'}
+    ]
+  },
+  {
+    path: 'usermgmt/groups', component: GroupsComponent,
+    children: [
+      {path: 'add', component: AddGroupComponent, outlet: 'sidebar'},
+      {path: 'edit/:name', component: AddGroupComponent, outlet: 'sidebar'}
+    ]
+  }
+];
+

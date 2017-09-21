@@ -96,7 +96,7 @@ class LdapService @Inject()(
           knoxConfig.password.get) match {
           case Left(errors) => Future.successful(Left(errors))
           case Right(isCreated) => {
-            val ldapConfig=LdapConfiguration(id=Some(knoxConfig.id),ldapUrl = Some(knoxConfig.ldapUrl))
+            val ldapConfig=LdapConfiguration(id=Some(knoxConfig.id),ldapUrl = Some(knoxConfig.ldapUrl),bindDn = knoxConfig.bindDn)
             ldapConfigService.update(ldapConfig).map{
               case Left(errors) => Left(errors)
               case Right(result) => Right(result)
