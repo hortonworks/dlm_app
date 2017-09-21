@@ -47,7 +47,7 @@ object ResponseEntities {
   case class PoliciesDetailResponse(policyId: String, name: String, description: Option[String], `type`: String,
                                     status: String, sourceDataset: String, targetDataset: String, frequencyInSec: Long,
                                     sourceCluster: String, targetCluster: String, instances: Seq[PolicyInstanceResponse],
-                                    startTime: Option[String], endTime: String)
+                                    startTime: Option[String], endTime: String, executionType: Option[String], customProperties: Option[Map[String, String]])
 
   case class BeaconEventResponse(policyId: Option[String], instanceId: Option[String], event: String, eventType: String,
                                  policyReplType: Option[String], severity: String, syncEvent: Option[Boolean],
