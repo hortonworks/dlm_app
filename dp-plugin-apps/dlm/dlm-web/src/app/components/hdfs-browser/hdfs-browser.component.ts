@@ -218,7 +218,7 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   convertPermissions(permission: string, type: string) {
-    let fileType = type === FILE_TYPES.DIRECTORY ? 'd' : '-';
+    const fileType = type === FILE_TYPES.DIRECTORY ? 'd' : '-';
     return `${fileType}${permission}`;
   }
 
