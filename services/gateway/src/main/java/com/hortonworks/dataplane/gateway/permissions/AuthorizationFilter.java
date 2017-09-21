@@ -1,4 +1,4 @@
-package com.hortonworks.dataplane.gateway.filters;
+package com.hortonworks.dataplane.gateway.permissions;
 
 import com.hortonworks.dataplane.gateway.domain.Constants;
 import com.hortonworks.dataplane.gateway.domain.UserContext;
@@ -39,13 +39,14 @@ public class AuthorizationFilter extends ZuulFilter {
 
   @Override
   public Object run() {
-    UserContext userContext = (UserContext) RequestContext.getCurrentContext().get(Constants.USER_CTX_KEY);
-    boolean isAuthorized = permPoliciesService.isAuthorized(getServiceId(), RequestContext.getCurrentContext().getRequest(), userContext.getRoles());
-    if (isAuthorized) {
-      return null;
-    } else {
-      return utils.sendUnauthorized();
-    }
+//    UserContext userContext = (UserContext) RequestContext.getCurrentContext().get(Constants.USER_CTX_KEY);
+////    boolean isAuthorized = permPoliciesService.isAuthorized(getServiceId(), RequestContext.getCurrentContext().getRequest(), String[]userContext.getRoles().toArray());
+//    if (isAuthorized) {
+//      return null;
+//    } else {
+//      return utils.sendUnauthorized();
+//    }
+    return null;
   }
 
   private String getServiceId() {

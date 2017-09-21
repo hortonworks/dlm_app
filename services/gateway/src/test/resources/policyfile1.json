@@ -1,0 +1,15 @@
+{
+  "routePerms":
+  [
+    {
+      "path":"/test",
+      "roles": ["admin","steward"]
+
+    },
+    {
+      "path":"/status",
+      "roles": ["admin"]
+
+    }
+  ]
+}

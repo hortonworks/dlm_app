@@ -3,6 +3,10 @@ package com.hortonworks.dataplane.gateway.permissions;
 import java.util.Arrays;
 
 public class RoutePerm {
+  /**
+   * GET/POST/PUT/DELETE/HEAD/OPTIONS
+   * Use * for all
+   */
   private String method;
   private String path;
   private String[] roles;
