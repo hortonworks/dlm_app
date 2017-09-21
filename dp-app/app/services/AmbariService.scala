@@ -22,13 +22,13 @@ import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import play.api.Logger
+import play.api.{Logger, Configuration}
 
 @Singleton
 class AmbariService @Inject()(
     @Named("clusterAmbariService") ambariWebService: AmbariWebService,
     private val wSClient: WSClient,
-    private val configuration: play.api.Configuration) {
+    private val configuration: Configuration) {
 
   import com.hortonworks.dataplane.commons.domain.Ambari._
 

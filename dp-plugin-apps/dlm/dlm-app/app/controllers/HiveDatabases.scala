@@ -11,7 +11,7 @@ package controllers
 
 import com.google.inject.Inject
 
-import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
 import models.JsonResponses
 import play.api.Logger
@@ -24,9 +24,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
-class HiveDatabases @Inject()(val ambariService: AmbariService, authenticated: Authenticated) extends Controller {
+class HiveDatabases @Inject()(val ambariService: AmbariService) extends Controller {
 
-  def retrieveDb(clusterId: Long) = authenticated.async { request =>
+  def retrieveDb(clusterId: Long) = AuthenticatedAction.async { request =>
     Logger.info("Received hive databases operation request")
     implicit val token:Option[HJwtToken] = request.token
     ambariService.getHiveDatabases(clusterId).map {
@@ -35,7 +35,7 @@ class HiveDatabases @Inject()(val ambariService: AmbariService, authenticated: A
     }
   }
 
-  def retrieveDbTables(clusterId: Long, dbName: String) = authenticated.async { request =>
+  def retrieveDbTables(clusterId: Long, dbName: String) = AuthenticatedAction.async { request =>
     Logger.info("Received hive databases operation request")
     implicit val token:Option[HJwtToken] = request.token
     ambariService.getHiveDatabaseTables(clusterId, dbName).map {

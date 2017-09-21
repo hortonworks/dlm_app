@@ -13,7 +13,7 @@ package controllers
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.{AuthenticatedAction}
 import com.hortonworks.dataplane.cs.Webservice.DpProfilerService
 import models.JsonResponses
 import play.api.Logger
@@ -29,12 +29,11 @@ import scala.concurrent.Future
 class DpProfilerAttributes @Inject()(
       @Named("dpProfilerService") val dpProfilerService: DpProfilerService,
       @Named("dataSetService") val dataSetService: DataSetService,
-      val utilityService: UtilityService,
-      val authenticated: Authenticated
+      val utilityService: UtilityService
 ) extends Controller {
 
   def startProfilerJob(clusterId: String, dbName: String, tableName: String) = {
-    authenticated.async { req =>
+    AuthenticatedAction.async { req =>
       Logger.info(s"Received startProfilerJob for entity $clusterId $dbName $tableName")
       implicit val token = req.token
       dpProfilerService
@@ -54,7 +53,7 @@ class DpProfilerAttributes @Inject()(
   }
 
   def getProfilerJobStatus(clusterId: String, dbName: String, tableName: String) = {
-    authenticated.async { req =>
+    AuthenticatedAction.async { req =>
       Logger.info(s"Received getProfilerJobStatus for entity $clusterId $dbName $tableName")
       implicit val token = req.token
       dpProfilerService
@@ -74,7 +73,7 @@ class DpProfilerAttributes @Inject()(
   }
 
   def getScheduleStatus(clusterId: String, dataSetId: String) = {
-    authenticated.async { req =>
+    AuthenticatedAction.async { req =>
       Logger.info(s"Received getScheduleStatus for entity $clusterId $dataSetId")
       implicit val token = req.token
       dataSetService.retrieve(dataSetId).flatMap{
@@ -102,7 +101,7 @@ class DpProfilerAttributes @Inject()(
   }
 
   def getAuditResults(clusterId: String, dbName: String, tableName: String, startDate: String, endDate: String, userName: String) = {
-    authenticated.async { req =>
+    AuthenticatedAction.async { req =>
       Logger.info(s"Received getAuditActions for entity $clusterId $dbName $tableName")
       implicit val token = req.token
       dpProfilerService
@@ -123,7 +122,7 @@ class DpProfilerAttributes @Inject()(
 
 
   def getAuditActions(clusterId: String, dbName: String, tableName: String, startDate: String, endDate: String, userName: String) = {
-    authenticated.async { req =>
+    AuthenticatedAction.async { req =>
       Logger.info(s"Received getAuditActions for entity $clusterId $dbName $tableName")
       implicit val token = req.token
       dpProfilerService

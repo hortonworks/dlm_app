@@ -17,7 +17,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import services.BeaconService
 
-import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._
 import models.JsonFormatters._
@@ -26,13 +26,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class Events @Inject() (
-  val beaconService: BeaconService,
-  authenticated: Authenticated
+  val beaconService: BeaconService
 ) extends Controller {
   /**
     * Get list of all events
     */
-  def list () = authenticated.async { request =>
+  def list () = AuthenticatedAction.async { request =>
     Logger.info("Received list all events request")
     implicit val token = request.token
     val queryString : Map[String,String] = request.queryString.map { case (k,v) => k -> v.mkString }

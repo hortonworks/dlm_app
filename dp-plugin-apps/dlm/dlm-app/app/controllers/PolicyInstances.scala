@@ -17,7 +17,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import services.BeaconService
 
-import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._
 import models.JsonFormatters._
@@ -26,8 +26,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class PolicyInstances @Inject() (
-  val beaconService: BeaconService,
-  authenticated: Authenticated
+  val beaconService: BeaconService
 ) extends Controller {
 
   /**
@@ -36,7 +35,7 @@ class PolicyInstances @Inject() (
     * @param policyName  name of the policy
     * @return
     */
-  def retrieve(clusterId: Long, policyName: String) = authenticated.async { request =>
+  def retrieve(clusterId: Long, policyName: String) = AuthenticatedAction.async { request =>
     Logger.info("Received retrieve policy instance request")
     implicit val token = request.token
     val queryString : Map[String,String] = request.queryString.map { case (k,v) => k -> v.mkString }
@@ -51,7 +50,7 @@ class PolicyInstances @Inject() (
     * @param clusterId  target cluster id
     * @return
     */
-  def list(clusterId: Long) = authenticated.async { request =>
+  def list(clusterId: Long) = AuthenticatedAction.async { request =>
     Logger.info("Received list all jobs on target cluster request")
     implicit val token = request.token
     val queryString : Map[String,String] = request.queryString.map { case (k,v) => k -> v.mkString }
@@ -66,7 +65,7 @@ class PolicyInstances @Inject() (
     * @param clusterId  target cluster id
     * @return
     */
-  def abort(clusterId: Long, policyName: String) = authenticated.async { request =>
+  def abort(clusterId: Long, policyName: String) = AuthenticatedAction.async { request =>
     Logger.info("Received abort jobs on target cluster request")
     implicit val token = request.token
     beaconService.abortPolicyInstancesOnCluster(clusterId, policyName).map {
@@ -80,7 +79,7 @@ class PolicyInstances @Inject() (
     * @param clusterId  target cluster id
     * @return
     */
-  def rerun(clusterId: Long, policyName: String) = authenticated.async { request =>
+  def rerun(clusterId: Long, policyName: String) = AuthenticatedAction.async { request =>
     Logger.info("Received rerun last job of the policy on target cluster request")
     implicit val token = request.token
     beaconService.rerunLastPolicyInstance(clusterId, policyName).map {
