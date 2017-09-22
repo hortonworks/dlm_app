@@ -30,8 +30,8 @@ export class LdapEditConfigComponent extends LdapConfigCommonComponent {
   constructor(public configurationService: ConfigurationService,
               private router: Router,
               private route: ActivatedRoute,
-              private translateService: TranslateService) {
-    super(configurationService);
+              public translateService: TranslateService) {
+    super(configurationService,translateService);
   }
 
   ngOnInit(){
@@ -40,13 +40,7 @@ export class LdapEditConfigComponent extends LdapConfigCommonComponent {
   }
 
   save() {
-    this.notificationMessages = [];
-    if (!this.configForm.form.valid) {
-      this.translateService.get('common.defaultRequiredFields').subscribe(msg => this.notificationMessages.push(msg));
-      this.showNotification = true;
-      return;
-    }
-    Loader.show();
+    super.save();
     this.ldapUpdateProperties.id = this.ldapProperties.id;
     this.ldapUpdateProperties.bindDn = this.ldapProperties.bindDn;
     this.ldapUpdateProperties.ldapUrl = this.ldapProperties.ldapUrl;

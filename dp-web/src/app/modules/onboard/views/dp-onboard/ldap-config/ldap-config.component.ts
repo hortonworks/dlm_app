@@ -28,18 +28,12 @@ export class LdapConfigComponent extends LdapConfigCommonComponent {
   constructor(public configurationService: ConfigurationService,
               private router: Router,
               private route: ActivatedRoute,
-              private translateService: TranslateService) {
-    super(configurationService);
+              public translateService: TranslateService) {
+    super(configurationService,translateService);
   }
 
   save() {
-    this.notificationMessages = [];
-    if (!this.configForm.form.valid) {
-      this.translateService.get('common.defaultRequiredFields').subscribe(msg => this.notificationMessages.push(msg));
-      this.showNotification = true;
-      return;
-    }
-    Loader.show();
+    super.save();
     this.configurationService.configureLDAP(this.ldapProperties).subscribe(() => {
       this.router.navigate(['onboard/adduser', {
         status: 'success',

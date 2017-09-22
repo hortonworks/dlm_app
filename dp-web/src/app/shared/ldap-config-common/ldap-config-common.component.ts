@@ -14,6 +14,7 @@ import {LDAPProperties} from "../../models/ldap-properties";
 import {NgForm} from "@angular/forms";
 import {ConfigurationService} from "../../services/configuration.service";
 import {Loader} from "../utils/loader";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'dp-ldap-config-common',
@@ -31,7 +32,7 @@ export class LdapConfigCommonComponent implements OnInit {
 
   @ViewChild('configForm') configForm: NgForm;
 
-  constructor(public configurationService: ConfigurationService) {
+  constructor(public configurationService: ConfigurationService, public translateService: TranslateService) {
   }
 
   ngOnInit() {
@@ -49,6 +50,15 @@ export class LdapConfigCommonComponent implements OnInit {
     }
   }
 
+  save(){
+    this.notificationMessages = [];
+    if (!this.configForm.form.valid) {
+      this.translateService.get('common.defaultRequiredFields').subscribe(msg => this.notificationMessages.push(msg));
+      this.showNotification = true;
+      return;
+    }
+    Loader.show();
+  }
   closeNotification() {
     this.showNotification = false;
   }
