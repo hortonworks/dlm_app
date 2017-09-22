@@ -47,8 +47,16 @@ export class RangerService {
   	this.policyCount = data.totalCount || 0;
   	let policyData:PolicySchema[] = [];
   	data.policies.forEach(d=> {
-  	  d.groups = d.policyItems[0].groups;
-  	  d.users = d.policyItems[0].users;
+      d.groups = []; d.users = [];
+      var buckets=["policyItems", "denyPolicyItems", "allowExceptions", "denyExceptions", "dataMaskPolicyItems", "rowFilterPolicyItems"];
+      buckets.forEach(bucket=>
+        d[bucket].forEach(pI=>{
+          d.groups=d.groups.concat(pI.groups);
+          d.users=d.users.concat(pI.users);
+        })
+      )
+      d.groups=d.groups.filter((x, i, a) => a.indexOf(x) == i)
+      d.users=d.users.filter((x, i, a) => a.indexOf(x) == i)      
   	  policyData.push(d as PolicySchema)
   	})
   	return policyData;
@@ -73,8 +81,16 @@ export class RangerService {
   	this.tagPolicyCount = data.totalCount || 0;
     let policyData:TagPolicySchema[] = [];
     data.policies.forEach(d=> {
-      d.groups = d.policyItems.length > 0 ? d.policyItems[0].groups: [];
-      d.users = d.policyItems.length > 0 ? d.policyItems[0].users: [];
+      d.groups = []; d.users = [];
+      var buckets=["policyItems", "denyPolicyItems", "allowExceptions", "denyExceptions", "dataMaskPolicyItems", "rowFilterPolicyItems"];
+      buckets.forEach(bucket=>
+        d[bucket].forEach(pI=>{
+          d.groups=d.groups.concat(pI.groups);
+          d.users=d.users.concat(pI.users);
+        })
+      )
+      d.groups=d.groups.filter((x, i, a) => a.indexOf(x) == i)
+      d.users=d.users.filter((x, i, a) => a.indexOf(x) == i)
       if(d.resources && d.resources.tag && d.resources.tag.values){
         d.tags = d.resources.tag.values;
       }else{
