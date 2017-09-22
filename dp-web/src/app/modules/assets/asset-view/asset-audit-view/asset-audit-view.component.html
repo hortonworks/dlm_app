@@ -8,7 +8,7 @@
   ~  * of all or any part of the contents of this software is strictly prohibited.
   ~  */
   -->
-<div *ngIf="dbName && assetName">
+<div *ngIf="dbName && assetName && state == AWS.LOADED">
   <dp-audit-visualization 
     [clusterId] = "clusterId"
     [dbName] = "dbName"

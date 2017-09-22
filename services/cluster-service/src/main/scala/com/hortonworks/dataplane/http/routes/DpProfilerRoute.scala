@@ -330,6 +330,10 @@ class DpProfilerRoute @Inject()(
       case Left(errors) =>
         throw new ServiceNotFound(
           s"Could not get the service Url from storage - $errors")
+    }.recover{
+      case e: Throwable =>
+        throw new ServiceNotFound(
+          s"Could not get the service Url from storage - ${e.getMessage}")
     }
   }
 

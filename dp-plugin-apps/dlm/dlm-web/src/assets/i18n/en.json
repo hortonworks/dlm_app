@@ -158,6 +158,11 @@
     },
     "services": {
       "ambari_server": "Ambari Server"
+    },
+    "units": {
+      "events": "Events",
+      "files": "Files",
+      "tables": "Tables"
     }
   },
   "topnav": {
@@ -204,7 +209,7 @@
       "integerValidator": "\"{{fieldLabel}}\" should be a positive integer",
       "time_less_than_current": "Start time must be later than the current time in the selected timezone.",
       "not_directory": "\"{{fieldLabel}}\" should be a path to directory",
-      "not_exist_directory": "Either the path does not exist or you don't have permissions on the path",
+      "not_exist_directory": "Specified path does not exist",
       "namePattern": "\"Policy Name\" should contain only letters, digits, spaces, hyphens '-', and underscores '_'."
     }
   },
@@ -288,7 +293,7 @@
           "started": "Started",
           "ended": "Ended",
           "runtime": "Runtime",
-          "transferred": "Transferred / Files",
+          "transferred": "Transferred / Objects",
           "next_run": "Next Run",
           "action": "Action",
           "actions": "Actions",
@@ -358,6 +363,7 @@
       "data_summary": "Data Summary",
       "help_url": "http://docs.hortonworks.com.s3.amazonaws.com/HDPDocuments/DLM1/DLM-1.0.0/bk_data-management/content/how_policies_work_dlm.html",
       "help_text": "How Policies Work",
+      "job_runtime_warn": "Job runtime exceeds policy frequency",
       "no_jobs": "No jobs",
       "no_policies": "Create your first replication policy.",
       "no_pairings": "You must create a cluster pairing before you can create a replication policy.",
@@ -378,6 +384,17 @@
       "success": {
         "title": "Policy Creation Successful",
         "body": "Replication policy {{policyName}} created successfully!"
+      },
+      "jobs_table": {
+        "column": {
+          "status": "Status",
+          "startTime": "Started",
+          "endTime": "Ended",
+          "duration": "Runtime",
+          "transferredBytes": "Transferred Bytes",
+          "transferredFiles": "# of Objects",
+          "actions": "Actions"
+        }
       },
       "form": {
         "selected": "Selected",

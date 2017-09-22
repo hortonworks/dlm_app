@@ -22,7 +22,7 @@ GET           /api/identity/:userId                                  controllers
 
 #api
 
-GET           /api/init                                              controllers.Configuration.init
+GET           /api/init                                              controllers.Config.init
 GET           /api/lakes                                             controllers.DataplaneClusters.list
 POST          /api/lakes                                             controllers.DataplaneClusters.create
 GET           /api/lakes/:lakeId                                     controllers.DataplaneClusters.retrieve(lakeId: Long)

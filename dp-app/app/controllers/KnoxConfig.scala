@@ -15,7 +15,10 @@ import com.google.inject.Inject
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.typesafe.scalalogging.Logger
-import com.hortonworks.dataplane.commons.auth.{AuthenticatedAction, AuthenticatedRequest}
+import com.hortonworks.dataplane.commons.auth.{
+  AuthenticatedAction,
+  AuthenticatedRequest
+}
 import com.hortonworks.dataplane.db.Webservice.ConfigService
 import models.{KnoxConfigInfo, KnoxConfigUpdateInfo, KnoxConfiguration}
 import play.api.libs.json.{JsValue, Json}
@@ -29,8 +32,7 @@ import com.google.inject.name.Named
 class KnoxConfig @Inject()(
     val ldapService: LdapService,
     val knoxConfigurator: KnoxConfigurator,
-    @Named("configService") configService: ConfigService,
-    authenticated: Authenticated)
+    @Named("configService") configService: ConfigService)
     extends Controller {
   val logger = Logger(classOf[KnoxConfig])
 
@@ -49,7 +51,7 @@ class KnoxConfig @Inject()(
     }
   }
 
-  def configure = authenticated.async(parse.json) { request =>
+  def configure = AuthenticatedAction.async(parse.json) { request =>
     request.body
       .validate[KnoxConfigInfo]
       .map { ldapConfigInfo: KnoxConfigInfo =>
@@ -113,7 +115,7 @@ class KnoxConfig @Inject()(
     }
   }
 
-  def validate = authenticated.async(parse.json) { request =>
+  def validate = AuthenticatedAction.async(parse.json) { request =>
     request.body
       .validate[KnoxConfigInfo]
       .map { ldapConf =>

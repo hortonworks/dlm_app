@@ -11,7 +11,8 @@
 
 <div *ngIf="state==PWS.NOINFO" class="infoNotAvailable">Policy information is not available</div>
 <div *ngIf="state==PWS.LOADING" class="loading">Loading ...</div>
-<div *ngIf="state==PWS.LOADED" class="infoTable borderBox">
+<div *ngIf="state==PWS.LOADED && policies.length === 0" class="infoNotAvailable">This asset has 0 policies associated with it.</div>
+<div *ngIf="state==PWS.LOADED && policies.length > 0" class="infoTable borderBox">
   <table class="mdl-data-table mdl-js-data-table">
     <thead>
       <tr>
@@ -36,11 +37,11 @@
       </tr>
     </tbody>
   </table>
-  <span *ngIf="showPagination"><simple-pagination
+  <simple-pagination
     [pageSize]="pageSize"
     [pageStartIndex]="pageStartsFrom"
     [count]="count"
     (onPageSizeChange)="onPageSizeChange($event)"
     (onPageChange)="onPageChange($event)"
-  ></simple-pagination></span>
+  ></simple-pagination>
 </div>

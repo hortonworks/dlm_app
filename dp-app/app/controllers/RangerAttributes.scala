@@ -14,11 +14,11 @@ package controllers
 import javax.inject.Inject
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.auth.Authenticated
 import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
 import com.hortonworks.dataplane.cs.Webservice.{AtlasService, RangerService}
 import models.{ApplicationException, JsonResponses, UnsupportedInputException, WrappedErrorsException}
 import models.JsonFormatters._
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import play.api.Logger
 import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc.Controller
@@ -31,12 +31,11 @@ class RangerAttributes @Inject()(
       @Named("atlasService")
       val atlasService: AtlasService,
       @Named("rangerService")
-      val rangerService: RangerService,
-      val authenticated: Authenticated
+      val rangerService: RangerService
 ) extends Controller {
 
   def getAuditDetails(clusterId: String, dbName: String, tableName: String, offset:String, limit:String, accessType:String, accessResult:String) =
-    authenticated.async { req =>
+    AuthenticatedAction.async { req =>
       Logger.info("Received getAuditDetails for entity")
       implicit val token = req.token
       rangerService
@@ -53,7 +52,7 @@ class RangerAttributes @Inject()(
     }
 
   def getPolicyDetails(clusterId: Long, offset: Long, limit: Long, serviceType: String, dbName: Option[String], tableName: Option[String], guid: Option[String]) =
-    authenticated.async { req =>
+    AuthenticatedAction.async { req =>
       Logger.info("Received getPolicyDetails for entity")
       implicit val token = req.token
 
