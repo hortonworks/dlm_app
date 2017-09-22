@@ -10,6 +10,31 @@
       "path":"/status",
       "roles": ["admin"]
 
+    },
+    {
+      "path":"/",
+      "roles": ["steward"]
+
+    },
+    {
+      "path":"/secret",
+      "roles": []
+
+    },
+    {
+      "path":"/secret/key",
+      "roles": []
+
+    },
+    {
+      "path":"/dss",
+      "roles": ["admin"]
+
+    },
+    {
+      "path":"/dss/Clusters/add",
+      "roles": ["admin"]
+
     }
   ]
 }
