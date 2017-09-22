@@ -29,10 +29,25 @@
     {{"pages.onboard.description.setupAuth" | translate}}
   </div>
   <form #configForm="ngForm">
-    <div class="section margin-top-bottom-20 text-bold text-medium">{{"pages.onboard.configure.labels.ldapConfiguration" | translate}}</div>
+    <div class="section margin-top-bottom-20">
+      <div class="text-bold text-medium">{{"pages.onboard.configure.labels.ldapConfiguration" | translate}}</div>
+      <div *ngIf="isInEditMode">{{"pages.onboard.description.ldapEditNote" | translate}}</div>
+    </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.url" | translate}}</label>
       <input required name="ldap-url" type="text" [(ngModel)]="ldapProperties.ldapUrl" placeholder="e.g. ldap://localhost:33389"/>
+    </div>
+    <div class="dp-input form-group">
+      <label class="required">{{"pages.onboard.configure.labels.adminBindDN" | translate}}</label>
+      <input required name="admin-bind-dn" type="text" [(ngModel)]="ldapProperties.bindDn" placeholder="e.g. uid=admin,ou=people,dc=hadoop,dc=apache,dc=org"/>
+    </div>
+    <div class="dp-input form-group">
+      <label class="required">{{"pages.onboard.configure.labels.adminPassword" | translate}}</label>
+      <input required name="admin-password" *ngIf="!showLdapPassword" [(ngModel)]="ldapProperties.password" type="password" placeholder="Administrator Password"/>
+      <input required name="admin-password-plain" *ngIf="showLdapPassword" [(ngModel)]="ldapProperties.password" type="text" placeholder="Administrator Password"/>
+      <div class="margin-top-bottom-3">
+        <input name="admin-password-toggle" type="checkbox" [(ngModel)]="showLdapPassword"/><span>{{"pages.onboard.configure.labels.showPassword" | translate}}</span>
+      </div>
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.userSearchBase" | translate}}</label>
@@ -57,18 +72,6 @@
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.groupMemberAttributeName" | translate}}</label>
       <input required name="group-member-attr-name" type="text" [readonly]="isInEditMode" [ngClass]="{'edit-mode': isInEditMode}" [(ngModel)]="ldapProperties.groupMemberAttributeName" placeholder="e.g. member"/>
-    </div>
-    <div class="dp-input form-group">
-      <label class="required">{{"pages.onboard.configure.labels.adminBindDN" | translate}}</label>
-      <input required name="admin-bind-dn" type="text" [(ngModel)]="ldapProperties.bindDn" placeholder="e.g. uid=admin,ou=people,dc=hadoop,dc=apache,dc=org"/>
-    </div>
-    <div class="dp-input form-group">
-      <label class="required">{{"pages.onboard.configure.labels.adminPassword" | translate}}</label>
-      <input required name="admin-password" *ngIf="!showLdapPassword" [(ngModel)]="ldapProperties.password" type="password" placeholder="Administrator Password"/>
-      <input required name="admin-password-plain" *ngIf="showLdapPassword" [(ngModel)]="ldapProperties.password" type="text" placeholder="Administrator Password"/>
-      <div class="margin-top-bottom-3">
-        <input name="admin-password-toggle" type="checkbox" [(ngModel)]="showLdapPassword"/><span>{{"pages.onboard.configure.labels.showPassword" | translate}}</span>
-      </div>
     </div>
     <div class="margin-top-30">
       <button id="save-btn" name="save" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"common.save" | translate}}</button>
