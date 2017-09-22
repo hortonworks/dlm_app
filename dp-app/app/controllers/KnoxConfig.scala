@@ -15,7 +15,7 @@ import com.google.inject.Inject
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.typesafe.scalalogging.Logger
-import com.hortonworks.dataplane.commons.auth.{Authenticated, AuthenticatedRequest}
+import com.hortonworks.dataplane.commons.auth.{AuthenticatedAction, AuthenticatedRequest}
 import com.hortonworks.dataplane.db.Webservice.ConfigService
 import models.{KnoxConfigInfo, KnoxConfigUpdateInfo, KnoxConfiguration}
 import play.api.libs.json.{JsValue, Json}
