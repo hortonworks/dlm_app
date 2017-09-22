@@ -72,7 +72,7 @@ class KnoxConfig @Inject()(
         Future.successful(BadRequest)
       )
   }
-  def updateLdapConfig= authenticated.async(parse.json) { request =>
+  def updateLdapConfig= AuthenticatedAction.async(parse.json) { request =>
     request.body
       .validate[KnoxConfigUpdateInfo]
       .map { knoxConfig =>
