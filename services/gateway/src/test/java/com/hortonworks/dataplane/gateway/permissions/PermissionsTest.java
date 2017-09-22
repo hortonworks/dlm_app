@@ -10,15 +10,6 @@ import static org.junit.Assert.assertTrue;
 public class PermissionsTest  {
 
   @Test
-  public void test1(){
-    PermPoliciesService permPoliciesService=new PermPoliciesService();
-    InputStream is=loadResource("policyfile1.json");
-    permPoliciesService.registerPolicy("dpapp",is);
-   // permPoliciesService.isAuthorized("GET","/api/")
-    System.out.println("hello"+is);
-  }
-
-  @Test
   public void testAllowedForPATH(){
     PermPoliciesService permPoliciesService=new PermPoliciesService();
     InputStream is=loadResource("policyfile1.json");

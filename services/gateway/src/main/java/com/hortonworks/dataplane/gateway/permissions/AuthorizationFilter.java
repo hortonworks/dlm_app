@@ -39,14 +39,14 @@ public class AuthorizationFilter extends ZuulFilter {
 
   @Override
   public Object run() {
-//    UserContext userContext = (UserContext) RequestContext.getCurrentContext().get(Constants.USER_CTX_KEY);
-////    boolean isAuthorized = permPoliciesService.isAuthorized(getServiceId(), RequestContext.getCurrentContext().getRequest(), String[]userContext.getRoles().toArray());
-//    if (isAuthorized) {
-//      return null;
-//    } else {
-//      return utils.sendUnauthorized();
-//    }
-    return null;
+    UserContext userContext = (UserContext) RequestContext.getCurrentContext().get(Constants.USER_CTX_KEY);
+    String[] rolesArr = userContext.getRoles().toArray(new String[0]);
+    boolean isAuthorized = permPoliciesService.isAuthorized(getServiceId(), RequestContext.getCurrentContext().getRequest(),rolesArr );
+    if (isAuthorized) {
+      return null;
+    } else {
+      return utils.sendUnauthorized();
+    }
   }
 
   private String getServiceId() {

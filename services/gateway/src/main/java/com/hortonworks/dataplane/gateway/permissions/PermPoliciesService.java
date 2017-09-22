@@ -4,9 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriTemplate;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,8 +21,32 @@ import java.util.*;
 
 @Service
 public class PermPoliciesService {
+  private static final Logger logger = LoggerFactory.getLogger(PermPoliciesService.class);
+
+  @Value("${permission.policies}")
+  private String permissionPolices;
+  @Autowired
+  private Environment env;
+  @Autowired
+  private ResourceLoader resourceLoader;
+
   private HashMap<String, PermPolicy> policies = new HashMap<>();
   private ObjectMapper jsonMapper = new ObjectMapper();
+
+  @PostConstruct
+  public void init() {
+    String[] apps=permissionPolices.split(",");
+    for(String app:apps){
+      String policyFile=env.getProperty(String.format("permission.policy.%s",app));
+      Resource resource = resourceLoader.getResource(String.format("classpath:%s" , policyFile));
+      try {
+        registerPolicy(app,resource.getInputStream());
+        logger.info(String.format("Registered polcify for: %s",app));
+      } catch (IOException e) {
+        logger.error("could not read policy file"+app,e);
+      }
+    }
+  }
 
   public void registerPolicy(String serviceId, InputStream policyStream) {
     try {
