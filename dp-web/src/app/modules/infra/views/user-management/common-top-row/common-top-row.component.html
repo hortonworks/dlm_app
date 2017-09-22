@@ -16,13 +16,13 @@
       <ul>
         <li>
           <div class="title">Ldap Url</div>
-          <div>
+          <div class="edit-ldap">
             <div class="value">{{ldapProperties.ldapUrl}}</div>
-            <div class="edit-ldap">
+            <div>
               <button id="ldap-actions" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon pull-right">
                 <i class="fa fa-ellipsis-v"></i></button>
               <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="ldap-actions">
-                <li class="mdl-menu__item" (click)="editLdap()"><i class="fa fa-edit menu-icon"></i>{{"common.edit" | translate}}</li>
+                <li class="mdl-menu__item"  [routerLink]="['/infra/usermgmt/editldap']"><i class="fa fa-edit menu-icon"></i>{{"common.edit" | translate}}</li>
               </ul>
             </div>
           </div>

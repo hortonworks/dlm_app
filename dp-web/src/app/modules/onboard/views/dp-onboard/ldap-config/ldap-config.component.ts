@@ -58,8 +58,4 @@ export class LdapConfigComponent extends LdapConfigCommonComponent {
     });
   }
 
-  back() {
-    this.router.navigate(['onboard/welcome']);
-  }
-
 }

@@ -19,14 +19,6 @@
   margin-top: 0 !important;
 }
 
-.no-top-bottom-space {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  padding-left: 20px;
-  padding-right: 20px;
-  margin-top: 0 !important;
-}
-
 .summary-pane-1 ul {
   border: none;
 }
@@ -36,11 +28,11 @@
 }
 
 .value{
-  float: left;
+  flex: 1;
 }
 
 .edit-ldap{
-  float:right;
+  display: flex;
 }
 
 .menu-icon {

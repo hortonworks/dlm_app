@@ -69,8 +69,4 @@ export class LdapEditConfigComponent extends LdapConfigCommonComponent {
     });
   }
 
-  back() {
-    this.router.navigate(['infra/usermgmt/users']);
-  }
-
 }

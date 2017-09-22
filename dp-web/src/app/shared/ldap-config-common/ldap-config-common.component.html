@@ -36,27 +36,27 @@
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.userSearchBase" | translate}}</label>
-      <input required name="user-search-base" type="text" [readonly]="isInEditMode" [ngStyle]="isInEditMode && {'opacity':'0.6'}" [(ngModel)]="ldapProperties.userSearchBase" placeholder="e.g. ou=people,dc=hadoop,dc=apache,dc=org"/>
+      <input required name="user-search-base" type="text" [readonly]="isInEditMode" [ngClass]="{'edit-mode': isInEditMode}" [(ngModel)]="ldapProperties.userSearchBase" placeholder="e.g. ou=people,dc=hadoop,dc=apache,dc=org"/>
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.userSearchAttributeName" | translate}}</label>
-      <input required name="user-search-attr" type="text" [readonly]="isInEditMode" [ngStyle]="isInEditMode && {'opacity':'0.6'}" [(ngModel)]="ldapProperties.userSearchAttributeName" placeholder="e.g. uid"/>
+      <input required name="user-search-attr" type="text" [readonly]="isInEditMode" [ngClass]="{'edit-mode': isInEditMode}" [(ngModel)]="ldapProperties.userSearchAttributeName" placeholder="e.g. uid"/>
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.groupSearchBase" | translate}}</label>
-      <input required name="group-search-base" type="text" [readonly]="isInEditMode" [ngStyle]="isInEditMode && {'opacity':'0.6'}" [(ngModel)]="ldapProperties.groupSearchBase" placeholder="e.g. ou=groups,dc=hadoop,dc=apache,dc=org"/>
+      <input required name="group-search-base" type="text" [readonly]="isInEditMode" [ngClass]="{'edit-mode': isInEditMode}" [(ngModel)]="ldapProperties.groupSearchBase" placeholder="e.g. ou=groups,dc=hadoop,dc=apache,dc=org"/>
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.groupSearchAttributeName" | translate}}</label>
-      <input required name="group-search-attr" type="text" [readonly]="isInEditMode" [ngStyle]="isInEditMode && {'opacity':'0.6'}" [(ngModel)]="ldapProperties.groupSearchAttributeName" placeholder="e.g. cn"/>
+      <input required name="group-search-attr" type="text" [readonly]="isInEditMode" [ngClass]="{'edit-mode': isInEditMode}" [(ngModel)]="ldapProperties.groupSearchAttributeName" placeholder="e.g. cn"/>
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.groupObjectClass" | translate}}</label>
-      <input required name="group-object-class" type="text" [readonly]="isInEditMode" [ngStyle]="isInEditMode && {'opacity':'0.6'}" [(ngModel)]="ldapProperties.groupObjectClass" placeholder="e.g. groupofnames"/>
+      <input required name="group-object-class" type="text" [readonly]="isInEditMode" [ngClass]="{'edit-mode': isInEditMode}" [(ngModel)]="ldapProperties.groupObjectClass" placeholder="e.g. groupofnames"/>
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.groupMemberAttributeName" | translate}}</label>
-      <input required name="group-member-attr-name" type="text" [readonly]="isInEditMode" [ngStyle]="isInEditMode && {'opacity':'0.6'}" [(ngModel)]="ldapProperties.groupMemberAttributeName" placeholder="e.g. member"/>
+      <input required name="group-member-attr-name" type="text" [readonly]="isInEditMode" [ngClass]="{'edit-mode': isInEditMode}" [(ngModel)]="ldapProperties.groupMemberAttributeName" placeholder="e.g. member"/>
     </div>
     <div class="dp-input form-group">
       <label class="required">{{"pages.onboard.configure.labels.adminBindDN" | translate}}</label>
@@ -72,7 +72,7 @@
     </div>
     <div class="margin-top-30">
       <button id="save-btn" name="save" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"common.save" | translate}}</button>
-      <button id="cancel-btn" name="cancel" class="mdl-button btn-hwx-default" (click)="back()">{{"common.cancel" | translate}}</button>
+      <button id="cancel-btn" name="cancel" class="mdl-button btn-hwx-default" [routerLink]="isInEditMode ? ['/infra/usermgmt/users'] : ['/onboard/welcome']">{{"common.cancel" | translate}}</button>
     </div>
   </form>
 </div>

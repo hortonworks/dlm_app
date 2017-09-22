@@ -38,8 +38,4 @@ export class CommonTopRowComponent implements OnInit {
     });
   }
 
-  editLdap(){
-    this.router.navigate(['/infra/usermgmt/editldap']);
-  }
-
 }
