@@ -347,7 +347,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
           const selectedSource = this.policyForm.value.general.sourceCluster;
           // select first database when source changed and selected database is not exist on selected cluster
           if (databases.length && !databases.some(db => db.clusterId === selectedSource && db.name === selectedDatabase)) {
-            this.policyForm.patchValue({databases: databases[0].id});
+            this.policyForm.patchValue({databases: databases[0].name});
           }
         });
       });

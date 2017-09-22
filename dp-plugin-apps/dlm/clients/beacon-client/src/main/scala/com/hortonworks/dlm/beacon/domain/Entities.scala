@@ -63,6 +63,14 @@ object ResponseEntities {
                       owner: String, pathSuffix: String, permission: String, replication: Int, `type`: String)
 
   case class BeaconHdfsFileResponse(status: String, message: String, requestId: String, totalResults: Long, fileList: Seq[HdfsFile])
+
+  case class HiveDbName(database: String)
+  
+  case class BeaconHiveDbResponse(status: String, message: String, requestId: String, totalResults: Long, dbList: Seq[HiveDbName])
+
+  case class HiveDbTables(database: String, table: Seq[String])
+
+  case class BeaconHiveDbTablesResponse(status: String, message: String, requestId: String, totalResults: Long, dbList: Seq[HiveDbTables])
 }
 
 object RequestEntities {
@@ -140,6 +148,20 @@ object JsonFormatters {
 
   implicit val beaconHdfsFileResponseWrites = Json.writes[BeaconHdfsFileResponse]
   implicit val beaconHdfsFileResponseReads = Json.reads[BeaconHdfsFileResponse]
+
+  implicit val hiveDbNameWrites = Json.writes[HiveDbName]
+  implicit val hiveDbNameReads = Json.reads[HiveDbName]
+
+  implicit val beaconHiveDbResponseWrites = Json.writes[BeaconHiveDbResponse]
+  implicit val beaconHiveDbResponseReads = Json.reads[BeaconHiveDbResponse]
+
+  implicit val hiveDbTablesWrites = Json.writes[HiveDbTables]
+  implicit val hiveDbTablesReads = Json.reads[HiveDbTables]
+
+  implicit val beaconHiveDbTablesResponseWrites = Json.writes[BeaconHiveDbTablesResponse]
+  implicit val beaconHiveDbTablesResponseReads = Json.reads[BeaconHiveDbTablesResponse]
+
+
 
   //-- RequestEntities
 

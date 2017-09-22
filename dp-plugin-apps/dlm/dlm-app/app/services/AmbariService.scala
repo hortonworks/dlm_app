@@ -34,26 +34,6 @@ class AmbariService @Inject()(@Named("ambariService") val ambariService: AmbariC
                               val dataplaneService: DataplaneService) {
 
   /**
-    * Get hive databases using auto hive20 instance
-    * @param clusterId cluster id
-    * @return
-    */
-  def getHiveDatabases(clusterId: Long)(implicit token:Option[HJwtToken]) : Future[Either[Errors, JsValue]] = {
-    val url = "/views/HIVE/versions/2.0.0/instances/AUTO_HIVE20_INSTANCE/resources/ddl/databases"
-    ambariService.requestAmbariApi(clusterId, url.encode)
-  }
-
-  /**
-    * Get all tables for hive database using auto hive20 instance REST APIs
-    * @param clusterId cluster id
-    * @return
-    */
-  def getHiveDatabaseTables(clusterId: Long, dbName: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors, JsValue]] = {
-    val url = s"/views/HIVE/versions/2.0.0/instances/AUTO_HIVE20_INSTANCE/resources/ddl/databases/$dbName/tables"
-    ambariService.requestAmbariApi(clusterId, url.encode)
-  }
-
-  /**
     * Get health status of the cluster
     * @param clusterId  cluster id
     * @param token      Jwt token

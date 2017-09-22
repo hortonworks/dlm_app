@@ -13,7 +13,7 @@ import com.google.inject.{Inject, Singleton}
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, HJwtToken}
 import com.hortonworks.dataplane.cs.Webservice.KnoxProxyService
-import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconAdminStatusDetails, BeaconAdminStatusResponse, BeaconApiError, BeaconApiErrors, BeaconEventResponse, BeaconHdfsFileResponse, BeaconLogResponse, PairedCluster, PolicyDataResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
+import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconAdminStatusDetails, BeaconAdminStatusResponse, BeaconApiError, BeaconApiErrors, BeaconEventResponse, BeaconHdfsFileResponse, BeaconHiveDbResponse, BeaconHiveDbTablesResponse, BeaconLogResponse, PairedCluster, PolicyDataResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
 import com.hortonworks.dlm.beacon.WebService._
 import com.hortonworks.dlm.beacon.domain.RequestEntities.ClusterDefinitionRequest
 
@@ -720,6 +720,43 @@ class BeaconService @Inject()(
     p.future
 
   }
+
+  /**
+    * Get list of hive databases via beacon Api
+    * @param clusterId cluster id
+    * @return
+    */
+  def getHiveDatabases(clusterId: Long)(implicit token:Option[HJwtToken]) : Future[Either[BeaconApiErrors, BeaconHiveDbResponse]] = {
+    val p: Promise[Either[BeaconApiErrors, BeaconHiveDbResponse]] = Promise()
+    dataplaneService.getBeaconService(clusterId).map {
+      case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
+      case Right(beaconUrl) =>
+        beaconBrowseService.listHiveDb(beaconUrl, clusterId).map {
+          case Left(errors) => p.success(Left(errors))
+          case Right(beaconHiveDbResponse) => p.success(Right(beaconHiveDbResponse))
+        }
+    }
+    p.future
+  }
+
+  /**
+    * Get all tables for hive database using auto hive20 instance REST APIs
+    * @param clusterId cluster id
+    * @return
+    */
+  def getHiveDatabaseTables(clusterId: Long, dbName: String)(implicit token:Option[HJwtToken]) : Future[Either[BeaconApiErrors, BeaconHiveDbTablesResponse]] = {
+    val p: Promise[Either[BeaconApiErrors, BeaconHiveDbTablesResponse]] = Promise()
+    dataplaneService.getBeaconService(clusterId).map {
+      case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
+      case Right(beaconUrl) =>
+        beaconBrowseService.listHiveDbTables(beaconUrl, clusterId, dbName).map {
+          case Left(errors) => p.success(Left(errors))
+          case Right(beaconHiveDbTableResponse) => p.success(Right(beaconHiveDbTableResponse))
+        }
+    }
+    p.future
+  }
+
 
 }
 

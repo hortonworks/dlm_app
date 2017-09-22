@@ -16,20 +16,20 @@ import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
 import models.JsonResponses
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, Controller}
-import services.AmbariService
-import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+import play.api.mvc.Controller
+import services.BeaconService
+import com.hortonworks.dlm.beacon.domain.JsonFormatters._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
-class HiveDatabases @Inject()(val ambariService: AmbariService) extends Controller {
+class HiveDatabases @Inject()(val beaconService: BeaconService) extends Controller {
 
   def retrieveDb(clusterId: Long) = AuthenticatedAction.async { request =>
     Logger.info("Received hive databases operation request")
     implicit val token:Option[HJwtToken] = request.token
-    ambariService.getHiveDatabases(clusterId).map {
+    beaconService.getHiveDatabases(clusterId).map {
       case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
       case Right(hiveDatabaseResponse) => Ok(Json.toJson(hiveDatabaseResponse))
     }
@@ -38,7 +38,7 @@ class HiveDatabases @Inject()(val ambariService: AmbariService) extends Controll
   def retrieveDbTables(clusterId: Long, dbName: String) = AuthenticatedAction.async { request =>
     Logger.info("Received hive databases operation request")
     implicit val token:Option[HJwtToken] = request.token
-    ambariService.getHiveDatabaseTables(clusterId, dbName).map {
+    beaconService.getHiveDatabaseTables(clusterId, dbName).map {
       case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
       case Right(hiveDatabaseResponse) => Ok(Json.toJson(hiveDatabaseResponse))
     }
