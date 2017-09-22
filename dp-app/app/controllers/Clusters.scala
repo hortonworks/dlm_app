@@ -124,15 +124,12 @@ class Clusters @Inject()(
                 .map {
                   case Left(errors) => InternalServerError(Json.toJson(errors))
                   case Right(skus) =>
-                    val allDependentServices = skus.map(sku => configuration.getStringSeq(s"$sku.dependent.services.mandatory").getOrElse(Nil)).distinct
+                    val allDependentServices = skus.flatMap(sku => configuration.getStringSeq(s"${sku.name}.dependent.services.mandatory").getOrElse(Nil)).distinct
                     val newClusterDetails = clusterDetails.map { clDetails =>
                       val availableRequiredServices = allDependentServices.intersect(clDetails.services)
                       val otherServices = clDetails.services.diff(availableRequiredServices)
-                      val allAvailableServices = clDetails.services
-                      AmbariCluster(clDetails.security,
-                                    clDetails.clusterName,
-                                    allAvailableServices,
-                                    clDetails.knoxUrl)
+                      val allAvailableServices = availableRequiredServices.union(otherServices)
+                      AmbariCluster(clDetails.security,clDetails.clusterName,allAvailableServices,clDetails.knoxUrl)
                     }
                     Ok(Json.toJson(newClusterDetails))
                 }
