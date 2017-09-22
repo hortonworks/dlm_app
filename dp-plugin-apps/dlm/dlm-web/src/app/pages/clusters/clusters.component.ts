@@ -58,7 +58,8 @@ export class ClustersComponent implements OnInit, OnDestroy {
     const pairsCount$: Observable<PairsCountEntity> = store.select(getCountPairsForClusters);
     const policiesCount$: Observable<PoliciesCountEntity> = store.select(getCountPoliciesForSourceClusters);
     const allResources$ = Observable.combineLatest(clusters$, pairsCount$, policiesCount$);
-    this.overallProgress$ = store.select(getMergedProgress(CLUSTERS_REQUEST_ID, POLICIES_REQUEST_ID, PAIRINGS_REQUEST_ID));
+    this.overallProgress$ = store.select(getMergedProgress(CLUSTERS_REQUEST_ID, POLICIES_REQUEST_ID, PAIRINGS_REQUEST_ID))
+      .distinctUntilChanged(isEqual);
     this.lowCapacityClusters$ = this.store.select(getClustersWithLowCapacity);
     this.policies$ = store.select(getAllPoliciesWithClusters);
     this.overallProgressSubscription$ = this.overallProgress$.distinctUntilChanged(isEqual).subscribe(progress => {
