@@ -97,15 +97,14 @@ class DefaultAtlasInterface(private val clusterId: Long,
   private lazy val includedTypes =
     config.getStringList("dp.services.atlas.hive.accepted.types").asScala.toSet
 
-  private val atlasApi =
-    new AtlasApiSupplier(clusterId, config, atlasApiData).get()
+  private val atlasApi = new AtlasApiSupplier(clusterId, config, atlasApiData)
 
   private def getApi(implicit hJwtToken: Option[HJwtToken]) = {
     import ClientExtension._
-    for {
-      a <- atlasApi
-      t <- atlasApiData.getTokenForCluster(clusterId, hJwtToken)
-      api <- Future.successful(a.api.setToken(t))
+    for{
+      a <- atlasApi.get
+      t <- atlasApiData.getTokenForCluster(clusterId,hJwtToken)
+      api <- Future.successful (a.api.setToken(t))
     } yield api
 
   }
@@ -233,25 +232,17 @@ sealed class AtlasApiSupplier(clusterId: Long,
         url <- atlasApiData.getAtlasUrl(clusterId)
         shouldUseToken <- atlasApiData.shouldUseToken(clusterId)
         client <- {
+          val array = url.map(_.toString).toArray
+          log.info(s"Atlas URL's loaded $url")
           if (shouldUseToken) {
-            log.info(
-              "The cluster is registered as Knox enabled, Basic auth will not be set up")
-            log.info(
-              "!!!Atlas will not work unless configured with Knox SSO.!!!")
+            log.info("The cluster is registered as Knox enabled, Basic auth will not be set up")
+            log.warn("!!!Atlas will not work unless configured with Knox SSO.!!!")
             // The initial value is not important as this can be updated with the real token
-            Future.successful(
-              ClientWrapper(clusterId,
-                            new AtlasClientV2(Array(url.toString),
-                                              new Cookie(Constants.HJWT, "")),
-                            true))
-
+            Future.successful(ClientWrapper(clusterId,new AtlasClientV2(array, new Cookie(Constants.HJWT,"")),true))
           } else {
             atlasApiData.getCredentials.map { c =>
-              log.info(
-                s"No Knox detected , setting up basic auth with credentials -> $c")
-              ClientWrapper(clusterId,
-                            new AtlasClientV2(Array(url.toString),
-                                              Array(c.user.get, c.pass.get)))
+              log.info(s"No Knox detected , setting up basic auth with credentials -> $c")
+              ClientWrapper(clusterId,new AtlasClientV2(url.map(_.toString).toArray, Array(c.user.get,c.pass.get)))
             }
           }
         }
