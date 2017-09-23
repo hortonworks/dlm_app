@@ -52,6 +52,6 @@
   </div>
   <div class="margin-top-30">
     <button id="save-btn" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"pages.onboard.adduser.labels.saveAndLogin" | translate}}</button>
-    <button id="back-btn" class="mdl-button btn-hwx-secondary" (click)="back()">{{"common.back" | translate}}</button>
+    <button id="back-btn" class="mdl-button btn-hwx-secondary" [routerLink]="['/onboard/identity-provider']">{{"common.back" | translate}}</button>
   </div>
 </div>
