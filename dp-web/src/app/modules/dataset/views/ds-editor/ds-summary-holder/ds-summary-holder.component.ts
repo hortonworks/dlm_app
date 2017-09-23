@@ -9,7 +9,7 @@
  *
  */
 
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input, Output, OnInit, EventEmitter} from "@angular/core";
 import {RichDatasetModel} from "../../../models/richDatasetModel";
 
 @Component({
@@ -21,4 +21,15 @@ import {RichDatasetModel} from "../../../models/richDatasetModel";
 export class DsSummaryHolder {
   @Input() dsModel: RichDatasetModel;
   @Input() tags: string[] = [];
+
+  @Output('onSave') saveEE: EventEmitter<void> = new EventEmitter<void>();
+  @Output('onCancel') cancelEE: EventEmitter<void> = new EventEmitter<void>();
+
+  onSave() {
+    this.saveEE.emit();
+  }
+
+  onCancel() {
+    this.cancelEE.emit();
+  }
 }

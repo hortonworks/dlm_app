@@ -28,7 +28,7 @@ export function reducer(state = initialState, action): State {
 }
 
 function listFilesSuccess(state = initialState, action): State {
-  const fileStatus = action.payload.response.FileStatuses.FileStatus;
+  const fileStatus = action.payload.response.fileList;
   const fileStatusEntities = fileStatus.reduce((entities: { [path: string]: ListStatus }, entity: ListStatus) => {
     return Object.assign({}, entities, {
       [entity.pathSuffix]: entity

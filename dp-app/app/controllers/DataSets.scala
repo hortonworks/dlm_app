@@ -19,12 +19,20 @@ import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.cs.Webservice.{AtlasService, DpProfilerService}
 import com.hortonworks.dataplane.db.Webservice._
-import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.{JsonResponses, WrappedErrorsException}
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.Controller
 import services.UtilityService
+import com.hortonworks.dataplane.cs.Webservice.AtlasService
+import com.hortonworks.dataplane.db.Webservice.{
+  CategoryService,
+  DataAssetService,
+  DataSetCategoryService,
+  DataSetService
+}
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
+import models.JsonResponses
+import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -38,14 +46,13 @@ class DataSets @Inject()(
     @Named("atlasService") val atlasService: AtlasService,
     @Named("dpProfilerService") val dpProfilerService: DpProfilerService,
     @Named("clusterService") val clusterService: com.hortonworks.dataplane.db.Webservice.ClusterService,
-    val utilityService: UtilityService,
-    authenticated: Authenticated)
+    val utilityService: UtilityService)
     extends Controller {
 
-  def list = authenticated.async {
+  def list(name: Option[String]) =  Action.async {
     Logger.info("Received list dataSet request")
     dataSetService
-      .list()
+      .list(name)
       .map {
         case Left(errors) =>
           InternalServerError(
@@ -54,7 +61,7 @@ class DataSets @Inject()(
       }
   }
 
-  def create = authenticated.async(parse.json) { request =>
+  def create = AuthenticatedAction.async(parse.json) { request =>
     Logger.info("Received create dataSet request")
     request.body
       .validate[DatasetAndCategoryIds]
@@ -106,7 +113,7 @@ class DataSets @Inject()(
               clusterId)
   }
 
-  def createDatasetWithAtlasSearch = authenticated.async(parse.json) {
+  def createDatasetWithAtlasSearch = AuthenticatedAction.async(parse.json) {
     request =>
       implicit val token = request.token
       request.body
@@ -114,37 +121,45 @@ class DataSets @Inject()(
         .map { req =>
           getAssetFromSearch(req).flatMap {
             case Right((assets, countOfSaved, countOfIgnored)) =>
-              val newReq =
-                req.copy(dataset =
-                           req.dataset.copy(createdBy = request.user.id),
-                         dataAssets = assets)
-              dataSetService
-                .create(newReq)
-                .map {
-                  case Left(errors) =>
-                    InternalServerError(JsonResponses.statusError(
-                      s"Failed with ${Json.toJson(errors)}"))
-                  case Right(dataSetNCategories) => {
-                    val dsId = dataSetNCategories.dataset.id.get
-                    val dsName = dataSetNCategories.dataset.name
-                    val list = assets.map {
-                      asset => ((asset.assetProperties \ "qualifiedName").as[String]).split("@").head
-                    }
-                    (for {
-                      jobName <- utilityService.doGenerateJobName(dsId, dsName)
-                      results <- dpProfilerService.startAndScheduleProfilerJob(req.clusterId.toString, jobName, list)
-                      } yield results)
-                      .onComplete {
-                        case Success(Right(attributes))=> Logger.info(s"Started and Scheduled Profiler, 200 response, ${Json.toJson(attributes)}")
-                        case Success(Left(errors)) => Logger.error(s"Start and Schedule Profiler Failed with ${errors.errors.head.code} ${Json.toJson(errors)}")
-                        case Failure(th) => Logger.error(th.getMessage, th)
+              countOfSaved match {
+                case 0 => Future.successful(InternalServerError(JsonResponses.statusError("Unable to create an asset collection with 0 assets.")))
+                case _ => {
+                  val newReq =
+                    req.copy(dataset =
+                      req.dataset.copy(createdBy = request.user.id),
+                      dataAssets = assets)
+                  dataSetService
+                    .create(newReq)
+                    .map {
+                      case Left(errors) =>{
+                        errors.firstMessage match {
+                          case "409" => InternalServerError(JsonResponses.statusError(s"An asset collection with this name already exists."))
+                          case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+                        }
                       }
-                    Ok(
-                      Json.obj("result" -> Json.toJson(dataSetNCategories),
-                        "countOfSaved" -> countOfSaved,
-                        "countOfIgnored" -> countOfIgnored))
-                  }
+                      case Right(dataSetNCategories) => {
+                        val dsId = dataSetNCategories.dataset.id.get
+                        val dsName = dataSetNCategories.dataset.name
+                        val list = assets.map {
+                          asset => ((asset.assetProperties \ "qualifiedName").as[String]).split("@").head
+                        }
+                        (for {
+                          jobName <- utilityService.doGenerateJobName(dsId, dsName)
+                          results <- dpProfilerService.startAndScheduleProfilerJob(req.clusterId.toString, jobName, list)
+                        } yield results)
+                          .onComplete {
+                            case Success(Right(attributes))=> Logger.info(s"Started and Scheduled Profiler, 200 response, ${Json.toJson(attributes)}")
+                            case Success(Left(errors)) => Logger.error(s"Start and Schedule Profiler Failed with ${errors.errors.head.code} ${Json.toJson(errors)}")
+                            case Failure(th) => Logger.error(th.getMessage, th)
+                          }
+                        Ok(
+                          Json.obj("result" -> Json.toJson(dataSetNCategories),
+                            "countOfSaved" -> countOfSaved,
+                            "countOfIgnored" -> countOfIgnored))
+                      }
+                    }
                 }
+              }
             case Left(errors) =>
               Future.successful(InternalServerError(JsonResponses.statusError(
                 s"Failed with ${Json.toJson(errors)}")))
@@ -153,7 +168,7 @@ class DataSets @Inject()(
         .getOrElse(Future.successful(BadRequest))
   }
 
-  def getRichDataset = authenticated.async { req =>
+  def getRichDataset = AuthenticatedAction.async { req =>
     dataSetService
       .listRichDataset(req.rawQueryString)
       .map {
@@ -164,7 +179,7 @@ class DataSets @Inject()(
       }
   }
 
-  def getRichDatasetByTag(tagName: String) = authenticated.async { req =>
+  def getRichDatasetByTag(tagName: String) = AuthenticatedAction.async { req =>
     val future =
       if (tagName.equalsIgnoreCase("all"))
         dataSetService.listRichDataset(req.rawQueryString)
@@ -178,7 +193,7 @@ class DataSets @Inject()(
     }
   }
 
-  def getRichDatasetById(id: Long) = authenticated.async {
+  def getRichDatasetById(id: Long) =  Action.async {
     Logger.info("Received retrieve dataSet request")
     dataSetService
       .getRichDatasetById(id)
@@ -196,7 +211,7 @@ class DataSets @Inject()(
   def getDataAssetsByDatasetId(id: Long,
                                queryName: String,
                                offset: Long,
-                               limit: Long) = authenticated.async {
+                               limit: Long) =  Action.async {
     dataSetService
       .getDataAssetByDatasetId(id, queryName, offset, limit)
       .map {
@@ -207,7 +222,7 @@ class DataSets @Inject()(
       }
   }
 
-  def retrieve(dataSetId: String) = authenticated.async {
+  def retrieve(dataSetId: String) = Action.async {
     Logger.info("Received retrieve dataSet request")
     dataSetService
       .retrieve(dataSetId)
@@ -222,7 +237,7 @@ class DataSets @Inject()(
       }
   }
 
-  def update() = authenticated.async(parse.json) { request =>
+  def update() = Action.async(parse.json) { request =>
     Logger.info("Received update dataSet request")
     request.body
       .validate[DatasetAndCategoryIds]
@@ -240,8 +255,8 @@ class DataSets @Inject()(
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def delete(dataSetId: String) = authenticated.async { req =>
-    implicit val token = req.token
+  def delete(dataSetId: String) =  AuthenticatedAction.async { request =>
+    implicit val token = request.token
     Logger.info("Received delete dataSet request")
     (for {
       dataset <- doGetDataset(dataSetId.toLong)
@@ -257,7 +272,7 @@ class DataSets @Inject()(
     }
   }
 
-  def listAllCategories = authenticated.async {
+  def listAllCategories = Action.async {
     Logger.info("Received list dataSet-categories request")
     categoryService
       .list()
@@ -270,7 +285,7 @@ class DataSets @Inject()(
   }
 
   def searchCategories(searchText: String, size: Option[Long]) =
-    authenticated.async {
+    Action.async {
       Logger.info("Received list dataSet-categories request")
       categoryService
         .search(searchText, size)
@@ -282,7 +297,7 @@ class DataSets @Inject()(
         }
     }
 
-  def createCategory = authenticated.async(parse.json) { request =>
+  def createCategory = Action.async(parse.json) { request =>
     Logger.info("Received create dataSet-category request")
     request.body
       .validate[Category]
@@ -299,8 +314,7 @@ class DataSets @Inject()(
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def listCategoriesCount(search: Option[String]) = authenticated.async {
-    request =>
+  def listCategoriesCount(search: Option[String]) =  Action.async {
       categoryService
         .listWithCount(search)
         .map {
@@ -311,7 +325,7 @@ class DataSets @Inject()(
         }
   }
 
-  def getCategoryCount(categoryId: String) = authenticated.async { request =>
+  def getCategoryCount(categoryId: String) = Action.async {
     categoryService
       .listWithCount(categoryId)
       .map {

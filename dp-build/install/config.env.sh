@@ -17,9 +17,15 @@ USE_EXT_DB="no"
 # DATABASE_PASS="dp_admin"
 
 # Uncomment and set right values for below lines to enable silent install
-#CONSUL_HOST="<host_ip_address>"
-#MASTER_PASSWORD="admin"
-#USE_TEST_LDAP="no"
+# CONSUL_HOST="<host_ip_address>"
+# MASTER_PASSWORD="changeit"
+# USE_TEST_LDAP="no"
 
 # AMBARI_USERNAME="admin"
 # AMBARI_PASSWORD="admin"
+
+# USE_TLS="true"
+# USE_PROVIDED_CERTIFICATES="yes"
+# PUBLIC_KEY_L="/absolute/path/of/public/key.pem"
+# PRIVATE_KEY_L="/absolute/path/of/private/key.pem"
+# CERTIFICATE_PASSWORD="changeit"

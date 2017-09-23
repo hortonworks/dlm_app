@@ -85,7 +85,7 @@ export class DsAssetSearch {
   _actionSearch() {
     switch (this.activeTab) {
       case this.tabEnum.NORMAL :
-        this.basicQueryEditor.searchWidget.emitSearchText();
+        this.onSimpleQueryObjUpdate(false);
         break;
       case this.tabEnum.ADVANCE:
         this.advanceQueryEditor.updateQueryModel();

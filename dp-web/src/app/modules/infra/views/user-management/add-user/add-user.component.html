@@ -32,8 +32,8 @@
             [tags]="users"
             [availableTags]="availableUsers"
             [clearOnSearch]="true"
-            [theme]="tagTheme.DARK"
             [restrictFreeText]="true"
+            [minChars]=3
             (textChange)="onUserSearchChange($event)"
             (onNewSearch)="onNewUserAddition($event)"></tagging-widget>
         </div>
@@ -45,8 +45,8 @@
             [tags]="roles"
             [availableTags]="availableRoles"
             [clearOnSearch]="true"
-            [theme]="tagTheme.DARK"
             [restrictFreeText]="true"
+            [minChars]=3
             (textChange)="onRoleSearchChange($event)"
             (onNewSearch)="onNewRoleAddition($event)"></tagging-widget>
             <i id="roles-dropdown" class="fa fa-caret-down drop-down-icon" (click)="showRoleOptions()"></i>
@@ -90,8 +90,8 @@
               [tags]="userRoles"
               [availableTags]="availableRoles"
               [clearOnSearch]="true"
-              [theme]="tagTheme.DARK"
               [restrictFreeText]="true"
+              [minChars]=3
               (textChange)="onRoleSearchChange($event)"
               (onNewSearch)="onRolesEdit($event)"></tagging-widget>
               <i id="roles-dropdown" class="fa fa-caret-down drop-down-icon" (click)="showRoleOptions()"></i>

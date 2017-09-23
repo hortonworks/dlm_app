@@ -9,12 +9,11 @@
 
 package services
 
-import javax.inject.{Inject, Singleton}
-
+import com.google.inject.{Inject, Singleton}
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, HJwtToken}
 import com.hortonworks.dataplane.cs.Webservice.KnoxProxyService
-import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconAdminStatusDetails, BeaconAdminStatusResponse, BeaconApiError, BeaconApiErrors, BeaconEventResponse, BeaconLogResponse, PairedCluster, PolicyDataResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
+import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconAdminStatusDetails, BeaconAdminStatusResponse, BeaconApiError, BeaconApiErrors, BeaconEventResponse, BeaconHdfsFileResponse, BeaconHiveDbResponse, BeaconHiveDbTablesResponse, BeaconLogResponse, PairedCluster, PolicyDataResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
 import com.hortonworks.dlm.beacon.WebService._
 import com.hortonworks.dlm.beacon.domain.RequestEntities.ClusterDefinitionRequest
 
@@ -22,7 +21,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import models.Entities.{UnpairClusterDefinition, _}
 import models.PolicyAction
 import models._
-import play.api.http.Status.INTERNAL_SERVER_ERROR
+import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR}
+import play.api.libs.json.JsValue
 
 import scala.collection.immutable.Set.Set2
 import scala.concurrent.{Future, Promise}
@@ -35,8 +35,10 @@ import scala.concurrent.{Future, Promise}
   * @param beaconPolicyInstanceService  beacon service to execute rest api on beacon policy instance resource
   * @param beaconEventService    beacon service to  get beacon events
   * @param beaconLogService      beacon service to get beacon logs
-  * @param dataplaneService      dataplane service to interact with dataplane db service
-  * @param webhdfsService        webhdfs client service
+  * @param beaconAdminService    beacon service to get beacon plugin status
+  * @param beaconBrowseService  beacon service to browse HDFS files and Hive databases
+  * @param dataplaneService     dataplane service to interact with dataplane db service
+  * @param ambariService        ambari client service
   */
 @Singleton
 class BeaconService @Inject()(
@@ -47,8 +49,8 @@ class BeaconService @Inject()(
    @Named("beaconEventService") val beaconEventService: BeaconEventService,
    @Named("beaconLogService") val beaconLogService: BeaconLogService,
    @Named("beaconAdminService") val beaconAdminService: BeaconAdminService,
+   @Named("beaconBrowseService") val beaconBrowseService: BeaconBrowseService,
    val dataplaneService: DataplaneService,
-   val webhdfsService: WebhdfsService,
    val ambariService: AmbariService) {
 
   /**
@@ -453,8 +455,8 @@ class BeaconService @Inject()(
 
           val policies : Seq[PolicyDetailsData] = getProcessedResponse(allPoliciesData, queryStringPaginated, originalPageLenth, originalOffset)
           val policiesDetails: Seq[PoliciesDetails] = policies.map(policy => {
-            PoliciesDetails(policy.policyId, policy.name, policy.description, policy.`type`, policy.status, policy.sourceDataset, policy.targetDataset,
-                            policy.frequencyInSec, policy.startTime, policy.endTime, policy.sourceCluster, policy.targetCluster, policy.instances)
+            PoliciesDetails(policy.policyId, policy.name, policy.description, policy.`type`, policy.executionType, policy.status, policy.sourceDataset, policy.targetDataset,
+                            policy.frequencyInSec, policy.startTime, policy.endTime, policy.sourceCluster, policy.targetCluster, policy.customProperties, policy.instances)
           })
 
           val failedResponses: Seq[BeaconApiErrors] = allPoliciesOption.filter(_.isLeft).map(_.left.get)
@@ -690,6 +692,72 @@ class BeaconService @Inject()(
     }
     p.future
   }
+
+  /**
+    * Get listStatus for HDFS file path found in the query
+    * @param clusterId    cluster id
+    * @param queryString  query parameters with `path` parameter
+    * @return
+    */
+  def getListHdfsFileResponse(clusterId: Long, queryString: Map[String, String])(implicit token:Option[HJwtToken]) :
+    Future[Either[BeaconApiErrors, BeaconHdfsFileResponse]] = {
+    val p: Promise[Either[BeaconApiErrors, BeaconHdfsFileResponse]] = Promise()
+    val filePath = queryString.get(BeaconService.QUERY_PARAM_FILEPATH_KEY)
+    filePath match {
+      case Some(path) => {
+        dataplaneService.getBeaconService(clusterId).map {
+          case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
+          case Right(beaconUrl) =>
+            beaconBrowseService.listHdfsFile(beaconUrl, clusterId, Map("path" -> path)).map {
+              case Left(errors) => p.success(Left(errors))
+              case Right(beaconHdfsFileResponse) => p.success(Right(beaconHdfsFileResponse))
+            }
+        }
+      }
+      case None => p.success(Left(BeaconApiErrors(BAD_REQUEST, None, Some(BeaconApiError(BeaconService.pathErrorMsg)))))
+    }
+
+    p.future
+
+  }
+
+  /**
+    * Get list of hive databases via beacon Api
+    * @param clusterId cluster id
+    * @return
+    */
+  def getHiveDatabases(clusterId: Long)(implicit token:Option[HJwtToken]) : Future[Either[BeaconApiErrors, BeaconHiveDbResponse]] = {
+    val p: Promise[Either[BeaconApiErrors, BeaconHiveDbResponse]] = Promise()
+    dataplaneService.getBeaconService(clusterId).map {
+      case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
+      case Right(beaconUrl) =>
+        beaconBrowseService.listHiveDb(beaconUrl, clusterId).map {
+          case Left(errors) => p.success(Left(errors))
+          case Right(beaconHiveDbResponse) => p.success(Right(beaconHiveDbResponse))
+        }
+    }
+    p.future
+  }
+
+  /**
+    * Get all tables for hive database using auto hive20 instance REST APIs
+    * @param clusterId cluster id
+    * @return
+    */
+  def getHiveDatabaseTables(clusterId: Long, dbName: String)(implicit token:Option[HJwtToken]) : Future[Either[BeaconApiErrors, BeaconHiveDbTablesResponse]] = {
+    val p: Promise[Either[BeaconApiErrors, BeaconHiveDbTablesResponse]] = Promise()
+    dataplaneService.getBeaconService(clusterId).map {
+      case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
+      case Right(beaconUrl) =>
+        beaconBrowseService.listHiveDbTables(beaconUrl, clusterId, dbName).map {
+          case Left(errors) => p.success(Left(errors))
+          case Right(beaconHiveDbTableResponse) => p.success(Right(beaconHiveDbTableResponse))
+        }
+    }
+    p.future
+  }
+
+
 }
 
 object BeaconService {
@@ -701,6 +769,7 @@ object BeaconService {
   lazy val API_SORTORDER_DEFAULT_VALUE = "desc"
   lazy val POLICY_SUBMIT = "SUBMIT"
   lazy val POLICY_SUBMIT_SCHEDULE = "SUBMIT_AND_SCHEDULE"
+  lazy val QUERY_PARAM_FILEPATH_KEY = "path"
 
   lazy val PAIR_CLUSTER_SIZE = 2
 
@@ -709,6 +778,7 @@ object BeaconService {
   def clusterPairPaylodError = "Request payload should be a set of two objects"
   def pairClusterError = "Error occurred while getting API response from DB service or/and Beacon service"
   def clusterDefError = "Error occurred while getting cluster definitions from Beacon service"
+  def pathErrorMsg = "List HDFS file status API expects path parameter in the query"
 
 }
 

@@ -7,15 +7,22 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CLUSTER_STATUS } from 'constants/status.constant';
 
 @Component({
   selector: 'dlm-cluster-legend',
   template: `
     <div class="map-legend-header">
-      <span>{{cluster.name}}</span>
-      <dlm-cluster-status-icon [cluster]="cluster" class="pull-right"></dlm-cluster-status-icon>
+      <div class="pull-left">
+        <dlm-cluster-status-icon class="pull-left" [cluster]="cluster"></dlm-cluster-status-icon>
+        <div class="pull-left cluster-name">{{cluster.name}}</div>
+      </div>
+      <div class="pull-right">
+        <button qe-attr="map-legend-cross" class="cross-button close" type="button" aria-label="Close" (click)="onClickClose()">
+          <span aria-hidden="true">&times;</span>
+        </button> 
+      </div>
       <div class="clearfix"></div>
     </div>
     <div class="map-legend-body">
@@ -49,6 +56,7 @@ import { CLUSTER_STATUS } from 'constants/status.constant';
 export class ClusterLegendComponent implements OnInit {
 
   @Input() cluster: any;
+  @Output() onClose: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   get shouldShowAlertsSection(): boolean {
     return this.cluster && (this.cluster.alerts && this.cluster.alerts.length
@@ -64,4 +72,7 @@ export class ClusterLegendComponent implements OnInit {
   ngOnInit() {
   }
 
+  onClickClose() {
+    this.onClose.emit(true);
+  }
 }

@@ -20,7 +20,7 @@
             [mapSize]="mapSize"
             [mapData]="clustersMapData$ | async">
       <dlm-map-legend class="overview-map-legend" *ngIf="clusterLegend$ | async">
-        <dlm-cluster-legend [cluster]="clusterLegend$ | async"></dlm-cluster-legend>
+        <dlm-cluster-legend [cluster]="clusterLegend$ | async" (onClose)="handleLegendClose($event)"></dlm-cluster-legend>
       </dlm-map-legend>
     </dp-map>
   </div>

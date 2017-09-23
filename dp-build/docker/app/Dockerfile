@@ -22,10 +22,11 @@ RUN unzip /tmp/consul-template.zip -d /usr/bin && \
 
 COPY ./dp-app /usr/dp-app
 COPY ./dp-web /usr/dp-web
-COPY ./services /etc/sv
-COPY nginx.ctmpl /etc/ctmpl
+COPY ./utils/services /etc/sv
+COPY ./utils/bootstrap.sh /bootstrap.sh
 
-RUN chmod +x /etc/sv/nginx/run && \
+RUN chmod +x /bootstrap.sh && \
+    chmod +x /etc/sv/nginx/run && \
     chmod +x /etc/sv/play/run && \
     chmod +x /usr/dp-app/bin/dp-app && \
     chmod +x /etc/sv/consul_template/run
@@ -33,6 +34,7 @@ RUN chmod +x /etc/sv/nginx/run && \
 RUN rm -rf /etc/sv/getty-5
 RUN mkdir -p /usr/dp-app/bin/logs/ && touch /usr/dp-app/bin/logs/application.log
 RUN ln -sf /dev/stdout /usr/dp-app/bin/logs/application.log
-EXPOSE 80
-EXPOSE 9000
-ENTRYPOINT ["runsvdir", "/etc/sv"]
+
+VOLUME ["/var/log/nginx"]
+EXPOSE 80 443 9000
+ENTRYPOINT ["/bootstrap.sh"]

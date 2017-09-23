@@ -11,8 +11,6 @@
 
 package controllers
 
-import java.time.LocalDateTime
-
 import com.google.inject.Inject
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities._

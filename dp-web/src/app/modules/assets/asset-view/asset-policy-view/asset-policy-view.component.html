@@ -11,12 +11,14 @@
 
 <div *ngIf="state==PWS.NOINFO" class="infoNotAvailable">Policy information is not available</div>
 <div *ngIf="state==PWS.LOADING" class="loading">Loading ...</div>
-<div *ngIf="state==PWS.LOADED" class="infoTable borderBox">
+<div *ngIf="state==PWS.LOADED && policies.length === 0" class="infoNotAvailable">This asset has 0 policies associated with it.</div>
+<div *ngIf="state==PWS.LOADED && policies.length > 0" class="infoTable borderBox">
   <table class="mdl-data-table mdl-js-data-table">
     <thead>
       <tr>
         <th class="mdl-data-table__cell--non-numeric">Policy ID</th>
         <th class="mdl-data-table__cell--non-numeric">Policy Name</th>
+        <th *ngIf="isTagBasedPolicy" class="mdl-data-table__cell--non-numeric">Tags</th>
         <th class="mdl-data-table__cell--non-numeric">Status</th>
         <th class="mdl-data-table__cell--non-numeric">Audit Logging</th>
         <th class="mdl-data-table__cell--non-numeric">Group</th>
@@ -27,6 +29,7 @@
       <tr *ngFor="let policy of policies">
         <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable" title="{{policy.id}}">{{policy.id}}</td>
         <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable wrap" title="{{policy.name}}">{{policy.name}}</td>
+        <td *ngIf="isTagBasedPolicy" class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable wrap" title="{{(policy.tags.length?policy.tags.join(', '):'--')}}">{{(policy.tags.length?policy.tags.join(', '):'--')}}</td>
         <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable" title="{{policy.isEnabled?'ENABLED':'DISABLED'}}">{{policy.isEnabled?"ENABLED":"DISABLED"}}</td>
         <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable" title="{{policy.isAuditEnabled?'ENABLED':'DISABLED'}}">{{policy.isAuditEnabled?"ENABLED":"DISABLED"}}</td>
         <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable wrap" title="{{(policy.groups.length?policy.groups.join(', '):'--')}}">{{(policy.groups.length?policy.groups.join(", "):"--")}}</td>

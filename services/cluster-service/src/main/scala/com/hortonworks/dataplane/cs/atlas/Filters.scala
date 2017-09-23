@@ -12,11 +12,13 @@
 package com.hortonworks.dataplane.cs.atlas
 
 import com.hortonworks.dataplane.commons.domain.Atlas.{
-AtlasFilter,
-AtlasSearchQuery
+  AtlasFilter,
+  AtlasSearchQuery
 }
 
 object Filters {
+
+  private type Preprocessor = (AtlasFilter) => AtlasFilter
 
   private sealed case class Query(q: String)
 
@@ -35,12 +37,16 @@ object Filters {
     new TagEqualsWithPredicate()
   )
 
-  def query(atlasFilters: AtlasSearchQuery) = {
-
+  def query(atlasFilters: AtlasSearchQuery, lowerCaseOperand: Boolean = true) = {
     val filters = atlasFilters.atlasFilters.map { af =>
       val toApply = predicates.find(p => p.isApplicable(af))
       toApply.map { ta =>
-        ta.apply(af).q
+        ta.apply(af, { f =>
+            if (lowerCaseOperand)
+              f.copy(operand = af.operand.toLowerCase)
+            else f
+          })
+          .q
       }
     }
 
@@ -49,8 +55,7 @@ object Filters {
     }.toList
 
     // create a collection of 'where and ands'
-    val fillers = "where" :: List.fill(filterList.size - 1)(
-      "and")
+    val fillers = "where" :: List.fill(filterList.size - 1)("and")
     // zip them together
     val zipped = intersperse(fillers, filterList)
     zipped.mkString(" ")
@@ -59,14 +64,18 @@ object Filters {
 
   private def intersperse[A](a: List[A], b: List[A]): List[A] = a match {
     case first :: rest => first :: intersperse(b, rest)
-    case _ => b
+    case _             => b
   }
 
   private sealed trait Predicate {
 
     def isApplicable(atlasFilter: AtlasFilter): Boolean
 
-    def apply(atlasFilter: AtlasFilter): Query
+    protected def apply(atlasFilter: AtlasFilter): Query
+
+    def apply(atlasFilter: AtlasFilter, preProcess: Preprocessor): Query = {
+      apply(preProcess(atlasFilter))
+    }
   }
 
   private class StringEqualsPredicate extends Predicate {
@@ -166,10 +175,10 @@ object Filters {
     }
 
     override def apply(atlasFilter: AtlasFilter): Query = {
-      Query(s"${atlasFilter.atlasAttribute.name} like '*${atlasFilter.operand}*'")
+      Query(
+        s"${atlasFilter.atlasAttribute.name} like '*${atlasFilter.operand}*'")
     }
   }
-
 
   private class StringStartsWithPredicate extends Predicate {
 
@@ -179,7 +188,8 @@ object Filters {
     }
 
     override def apply(atlasFilter: AtlasFilter): Query = {
-      Query(s"${atlasFilter.atlasAttribute.name} like '${atlasFilter.operand}*'")
+      Query(
+        s"${atlasFilter.atlasAttribute.name} like '${atlasFilter.operand}*'")
     }
   }
 
@@ -191,7 +201,8 @@ object Filters {
     }
 
     override def apply(atlasFilter: AtlasFilter): Query = {
-      Query(s"${atlasFilter.atlasAttribute.name} like '*${atlasFilter.operand}'")
+      Query(
+        s"${atlasFilter.atlasAttribute.name} like '*${atlasFilter.operand}'")
     }
   }
 

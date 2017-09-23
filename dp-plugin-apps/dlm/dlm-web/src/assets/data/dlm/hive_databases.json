@@ -1,12 +1,14 @@
 {
-  "databases": [
+  "status": "SUCCEEDED",
+  "message": "Success",
+  "requestId": "1267977349@qtp-1945836927-290",
+  "totalResults": 1,
+  "dbList": [
     {
-      "id": "testdb",
-      "name": "testdb"
+      "database": "testdb"
     },
     {
-      "id": "default",
-      "name": "default"
+      "database": "default"
     }
   ]
 }
