@@ -297,8 +297,14 @@ export class ClusterAddComponent implements OnInit {
     }
     this.createCluster()
       .subscribe(
-        () => this.router.navigate(['/infra']),
-        error => this.handleError(error)
+        () => {
+          this.router.navigate(['infra']).then(() => {
+
+          });
+        },
+        error => {
+          this.handleError(error);
+        }
       );
   }
 
@@ -348,6 +354,10 @@ export class ClusterAddComponent implements OnInit {
     return this.lakeService.insert(lake);
   }
 
+  onCancel() {
+    this.router.navigate(['infra']);
+  }
+
   onCreateAndAdd() {
     this.showError = false;
     if (!this.isLocationValid || !this.isFormValid()) {
@@ -358,7 +368,7 @@ export class ClusterAddComponent implements OnInit {
         this.cluster = new Cluster();
         this._isClusterValid = false;
         this._isClusterValidateSuccessful = false;
-        this.router.navigate(['/infra/clusters/add']).then(() => {
+        this.router.navigate(['infra/add']).then(() => {
           this.lakeService.clusterAdded.next();
         });
       },

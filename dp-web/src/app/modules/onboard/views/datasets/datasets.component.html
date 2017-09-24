@@ -1,0 +1,86 @@
+
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+<section style="padding: 40px;">
+  <header>
+    <div [routerLink]="['/lake-add']" class="" style="height: initial; text-transform:none; font-size: 1em; text-align: left; display: flex;padding: 10px;">
+      <div style="width: 50px;"><i class="fa fa-server" aria-hidden="true" style="font-size: 1.2em;"></i></div>
+      <div style="flex-grow: 1;">
+        <div style="text-transform: uppercase; font-size: 1.2em; font-weight: bold;">Add Dataset</div>
+        <p>desc.</p>
+      </div>
+    </div>
+  </header>
+  <div>
+    <div class="dp-input">
+      <label for="name" style="display: block;">Name</label>
+      <input class="" type="text" placeholder="Name" name="name" id="name" [(ngModel)]="dataSet.name" required/>
+    </div>
+    <br/><br/>
+    <div class="dp-input">
+      <label for="description" style="display: block;">Description</label>
+      <textarea class="" type="text" placeholder="Description" name="description" id="description" [(ngModel)]="dataSet.description" required></textarea>
+    </div>
+    <br/><br/>
+    <div class="dp-input">
+      <label style="display: block;">Categories</label>
+      <!--<select placeholder="Select Data Lake" id="categorySelector" [(ngModel)] = "dataSet.dataLakeId">-->
+        <!--<option selected>Select Category</option>-->
+        <!--<option *ngFor="let ctgry of categories" [value]="ctgry.id">{{ctgry.name}}</option>-->
+      <!--</select>-->
+      <multi-select [list]="categories" (update)="onSelectedCategoriesChange($event)"></multi-select>
+      <button *ngIf="!showCategoryEditor" type="button" class="mdl-button mdl-button--colored mdl-color--blue mdl-color-text--white mdl-js-button mdl-js-ripple-effect" (click)="showCategoryEditor=true">
+        New Category
+      </button>
+      <div class="newCategoryEditor" *ngIf="showCategoryEditor">
+        <br/><br/>
+        <div class="dp-input">
+          <label for="categoryName" style="display: block;">Category Name</label>
+          <input class="" type="text" placeholder="Name" name="name" id="categoryName" [(ngModel)]="newCategory.name" required/>
+        </div>
+        <br/><br/>
+        <div class="dp-input">
+          <label for="categoryDescription" style="display: block;">Description</label>
+          <textarea class="" type="text" placeholder="Description" name="description" id="categoryDescription" [(ngModel)]="newCategory.description" required></textarea>
+        </div>
+        <br/><br/>
+        <button type="button" class="mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect" (click)="saveCategory()">
+          Save Category
+        </button>
+        <button type="button" class="mdl-button mdl-button--colored mdl-color--blue mdl-color-text--white mdl-js-button mdl-js-ripple-effect" (click)="showCategoryEditor=false">
+          Cancel
+        </button>
+      </div>
+    </div>
+    <br/><br/>
+    <div class="dp-input">
+      <label for="dataLakeSelector" style="display: block;">Data Lake</label>
+      <select placeholder="Select Data Lake" id="dataLakeSelector" [(ngModel)] = "dataSet.datalakeId" (change)="onDataLakeIdChange()">
+        <option selected>Select data lake</option>
+        <option *ngFor="let lake of lakes" [value]="lake.id">{{lake.name}}</option>
+      </select>
+    </div>
+    <br/><br/>
+  </div>
+  <footer class="" style="">
+    <button type="button" class="mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect" (click)="onSaveNContinue()">
+      save & Continue
+    </button>
+    <button type="button" class="mdl-button mdl-button--colored mdl-color--green mdl-color-text--white mdl-js-button mdl-js-ripple-effect" (click)="onSave()">
+      save
+    </button>
+    <button type="button" class="mdl-button mdl-button--colored mdl-color--blue mdl-color-text--white mdl-js-button mdl-js-ripple-effect" (click)="onCancel()">
+      Cancel
+    </button>
+  </footer>
+
+</section>

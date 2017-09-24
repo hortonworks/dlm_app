@@ -49,7 +49,7 @@
     <div class="spacer-15"></div>
     <div class="button-container">
       <button id="next-btn" class="btn btn-hwx-primary" (click)="next()">{{"pages.services.labels.next" | translate}}</button>
-      <button id="cancel-btn" class="btn btn-hwx-default" [routerLink]="['/infra', 'services']">{{"common.cancel" | translate}}</button>
+      <button id="cancel-btn" class="btn btn-hwx-default" (click)="cancel()">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

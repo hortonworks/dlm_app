@@ -238,6 +238,10 @@ export class AddUserComponent implements OnInit, AfterViewInit {
     this.errorMessages.push(errorMessage);
     this.showError = true;
   }
+
+  back() {
+    this.router.navigate(['users'], {relativeTo: this.route});
+  }
 }
 
 export enum Modes {

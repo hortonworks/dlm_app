@@ -253,4 +253,8 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
 
   }
 
+  goToClusters() {
+    this.router.navigate(['/infra']);
+  }
+
 }

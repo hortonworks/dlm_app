@@ -56,7 +56,7 @@ export class AssetViewComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.clusterId = this.route.snapshot.params['clusterId'];
+    this.clusterId = this.route.snapshot.params['id'];
     this.guid = this.route.snapshot.params['guid'];
     this.assetService.getDetails(this.clusterId, this.guid).subscribe(details => {
       if (details.entity['typeName'] && details.entity['typeName'] !== 'hive_table') {
@@ -104,7 +104,7 @@ export class AssetViewComponent implements OnInit {
                            this.profilerStatus = this.PS.SUCCESS; break;
           case "FAILED"  : this.profilerStatus = this.PS.FAILED;  break;
           case "STARTED" : this.profilerStatus = this.PS.RUNNING;
-                           this.setNextRunDisplay();
+                           this.setNextRunDisplay(); 
                            setTimeout(()=>this.getProfilingJobStatus(), 5000);
                            break;
       }

@@ -15,11 +15,18 @@ import {AssetViewComponent} from './asset-view/asset-view.component';
 import {NodeDetailsComponent} from './asset-view/node-details/node-details.component';
 
 export const routes: Routes = [{
-  path: ':clusterId/:guid',
+  path: '',
+  component: AssetViewComponent
+}, {
+  path: 'details/:id/:guid',
   component: AssetViewComponent,
-  children: [{
-    path: 'nodes/:guidOfNode',
-    component: NodeDetailsComponent,
-    outlet: 'sidebar'
-  }]
-}];
+  children: [
+    {
+      path: 'node/:guid',
+      component: NodeDetailsComponent,
+      outlet: 'sidebar'
+
+    }
+  ]
+}
+];

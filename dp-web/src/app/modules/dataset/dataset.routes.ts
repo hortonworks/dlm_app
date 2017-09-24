@@ -24,5 +24,5 @@ export const routes: Routes = [
   { component: DsEditor, path: "dataset/edit/:id"},
   { component: DsEditor, path: "edit"},
   { component: DsAssetSearch, path: "asset-search"},
-  { component: RedirectUrlComponent, path: "dataset/assets/:clusterId/:guid", data: {find: '^/datasteward/dataset', replace: ''}},
+  { component: RedirectUrlComponent, path: "dataset/assets/details/:id/:guid", data: {find: '^/datasteward/dataset', replace: ''}},
 ];

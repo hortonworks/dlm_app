@@ -200,6 +200,10 @@ export class AddGroupComponent implements OnInit, AfterViewInit {
     }
   }
 
+  back() {
+    this.router.navigate(['groups'], {relativeTo: this.route});
+  }
+
 
   clearErrors() {
     this.showError = false;

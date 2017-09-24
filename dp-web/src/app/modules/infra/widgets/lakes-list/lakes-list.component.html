@@ -37,7 +37,7 @@
           <div class="option-value" (keyup)="handleKeyboardEvents($event, filterOption.displayName, filterOption.key, value)" *ngFor="let value of filterOption.values" tabindex="0" (click)="addToFilter(filterOption.displayName, filterOption.key, value)">{{value}}</div>
         </div>
     </div>
-    <button id="add-btn" class="mdl-button btn-hwx-primary" [routerLink]="['/infra/clusters/add']"> {{"pages.infra.labels.addButton" | translate}} </button></div>
+    <button id="add-btn" class="mdl-button btn-hwx-primary" [routerLink]="['/infra/add']"> {{"pages.infra.labels.addButton" | translate}} </button></div>
   </div>
   <table class="mdl-data-table mdl-js-data-table" dp-config-table (onSort)="onSort($event)">
       <thead>
@@ -70,7 +70,7 @@
               <span *ngIf="lakeInfo.status !== statusEnum.WAITING"><i class="fa fa-circle" aria-hidden="true"></i></span>
               <span *ngIf="lakeInfo.status === statusEnum.WAITING"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i></span>
           </td>
-          <td class="mdl-data-table__cell--non-numeric key-column mdl-data-table__cell--width15" [routerLink]="['/infra/clusters/', lakeInfo.lakeId]">{{lakeInfo.name}}</td>
+          <td class="mdl-data-table__cell--non-numeric key-column mdl-data-table__cell--width15" (click)="viewDetails(lakeInfo.lakeId)">{{lakeInfo.name}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.city}},&nbsp;{{lakeInfo.country}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.dataCenter}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.nodes}}</td>
@@ -82,7 +82,7 @@
                 <ul mdl class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+lakeInfo.id">
                     <li class="mdl-menu__item"><a href="{{lakeInfo.ambariUrl}}" target="_blank"><i class="fa fa-external-link"></i>Go to Ambari</a></li>
                     <li class="mdl-menu__item" (click)="refresh(lakeInfo)"><span><i class="fa__fa-close--icon fa fa-refresh"></i>Refresh</span></li>
-                    <li class="mdl-menu__item"><a [routerLink]="['/infra/clusters', lakeInfo.id, 'edit']"><i class="fa__fa-close--icon fa fa-edit"></i>{{"common.edit" | translate}}</a></li>
+                    <li class="mdl-menu__item"><a [routerLink]="['/infra/edit', lakeInfo.id]"><i class="fa__fa-close--icon fa fa-edit"></i>{{"common.edit" | translate}}</a></li>
                 </ul>
           </td>
       </tr>

@@ -11,18 +11,18 @@
 
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
-import {UserService} from '../../../../services/user.service';
-import {LDAPUser} from '../../../../models/ldap-user';
-import {TaggingWidget} from '../../../../shared/tagging-widget/tagging-widget.component';
-import {AuthenticationService} from '../../../../services/authentication.service';
+import {UserService} from '../../../../../services/user.service';
+import {LDAPUser} from '../../../../../models/ldap-user';
+import {TaggingWidget} from '../../../../../shared/tagging-widget/tagging-widget.component';
+import {AuthenticationService} from '../../../../../services/authentication.service';
 import {Observable} from 'rxjs/Observable';
-import {GroupService} from '../../../../services/group.service';
+import {GroupService} from '../../../../../services/group.service';
 import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'dp-user-add',
   templateUrl: './user-add.component.html',
-  styleUrls: ['./user-add.component.scss', '../dp-onboard/dp-onboard.component.scss']
+  styleUrls: ['./user-add.component.scss', '../dp-onboard.component.scss']
 })
 export class UserAddComponent implements OnInit {
 
@@ -141,6 +141,10 @@ export class UserAddComponent implements OnInit {
         this.onError(`${this.translateService.instant('pages.infra.description.addGroupError')}`);
       }
     });
+  }
+
+  back() {
+    this.router.navigate(['/onboard/configure']);
   }
 
   onNewUserAddition(text: string) {

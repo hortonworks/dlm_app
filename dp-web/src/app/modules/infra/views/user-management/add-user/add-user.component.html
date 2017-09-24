@@ -14,7 +14,7 @@
     <div class="hwx-subtitle">
       <span *ngIf="mode === modes.ADD">{{"pages.infra.labels.addUser" | translate}}</span>
       <span *ngIf="mode === modes.EDIT">{{user? user.userName: ''}}</span>
-      <i id="back" class="fa fa-remove close-icon" [routerLink]="['/infra/manage-access/users']"></i>
+      <i id="back" class="fa fa-remove close-icon" (click)="back()"></i>
     </div>
   </div>
   <div class="slider-container">
@@ -105,7 +105,7 @@
     </form>
     <div class="margin-top-20">
       <button id="save-btn" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"common.save" | translate}}</button>
-      <button id="cancel-btn" class="mdl-button btn-hwx-default" [routerLink]="['/infra/manage-access/users']">{{"common.cancel" | translate}}</button>
+      <button id="cancel-btn" class="mdl-button btn-hwx-default" (click)="back()">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

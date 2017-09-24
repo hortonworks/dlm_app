@@ -9,24 +9,18 @@
  *
  */
 
-import {Component, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'dp-dp-onboard',
-  templateUrl: './dp-onboard.component.html',
-  styleUrls: ['./dp-onboard.component.scss']
+  selector: 'dp-security',
+  templateUrl: './security.component.html',
+  styleUrls: ['./security.component.scss']
 })
-export class DpOnboardComponent implements OnInit {
+export class SecurityComponent implements OnInit {
 
-  constructor(private router: Router) {
-  }
+  constructor() { }
 
   ngOnInit() {
-  }
-
-  start() {
-    this.router.navigate(['/onboard/configure']);
   }
 
 }

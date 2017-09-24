@@ -68,7 +68,7 @@ export class BreadCrumbComponent {
       this.crumbNamesToURLMap['Edit'] = '';
     } else if (url.startsWith('datasteward/dataset/add')) {
       this.crumbNamesToURLMap['Add'] = '';
-    } else if (url.startsWith('datasteward/dataset/assets')) {
+    } else if (url.startsWith('datasteward/dataset/assets/details')) {
       this.crumbNamesToURLMap['Asset Details'] = '';
     }
   }
@@ -77,18 +77,18 @@ export class BreadCrumbComponent {
   createInfraCrumbs(url: string) {
     if (url.startsWith('infra/clusters')) {
       this.crumbNamesToURLMap['Clusters'] = '';
-    } else if (url.startsWith('infra/clusters/add')) {
+    } else if (url.startsWith('infra/add')) {
       this.crumbNamesToURLMap['Clusters'] = 'infra/clusters';
       this.crumbNamesToURLMap['Add'] = '';
-    } else if (url.startsWith('infra/clusters/') && url.endsWith('/edit')) {
+    } else if (url.startsWith('infra/edit')) {
       this.crumbNamesToURLMap['Clusters'] = 'infra/clusters';
       this.crumbNamesToURLMap['Edit'] = '';
-    } else if (url.startsWith('infra/cluster/')) {
+    } else if (url.startsWith('infra/cluster/details')) {
       this.crumbNamesToURLMap['Clusters'] = 'infra/clusters';
       this.crumbNamesToURLMap['Details'] = '';
-    } else if (url.startsWith('infra/manage-access/users')) {
+    } else if (url.startsWith('infra/usermgmt/users')) {
       this.crumbNamesToURLMap['Users'] = '';
-    } else if (url.startsWith('infra/manage-access/groups')) {
+    } else if (url.startsWith('infra/usermgmt/groups')) {
       this.crumbNamesToURLMap['Groups'] = '';
     } else if (url.startsWith('infra/services')) {
       this.crumbNamesToURLMap['Services'] = '';

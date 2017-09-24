@@ -152,4 +152,12 @@ export class ManualInstallCheckComponent implements OnInit {
 
   }
 
+  next() {
+    this.router.navigate(['/infra/services']);
+  }
+
+  cancel() {
+    this.router.navigate(['/infra/services']);
+  }
+
 }

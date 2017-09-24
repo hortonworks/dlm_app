@@ -14,7 +14,7 @@
     <div class="hwx-subtitle">
       <span *ngIf="mode === modes.ADD">{{"pages.infra.labels.addGroup" | translate}}</span>
       <span *ngIf="mode === modes.EDIT">{{group? group.groupName: ''}}</span>
-      <i class="fa fa-remove close-icon" id="back" [routerLink]="['/infra/manage-access/groups']"></i>
+      <i class="fa fa-remove close-icon" id="back" (click)="back()"></i>
     </div>
   </div>
   <div class="slider-container">
@@ -101,7 +101,7 @@
     </form>
     <div class="margin-top-20">
       <button id="save-btn" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"common.save" | translate}}</button>
-      <button id="cancel-btn" class="mdl-button btn-hwx-default" [routerLink]="['/infra/manage-access/groups']">{{"common.cancel" | translate}}</button>
+      <button id="cancel-btn" class="mdl-button btn-hwx-default" (click)="back()">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

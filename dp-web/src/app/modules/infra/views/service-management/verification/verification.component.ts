@@ -62,7 +62,7 @@ export class VerificationComponent implements OnInit {
 
   next() {
     this.addOnAppService.enableService({smartSenseId: this.smartSenseId, skuName: this.skuName} as ConfigPayload).subscribe(() => {
-      this.router.navigate(['/infra', 'services']).then(() => {
+      this.router.navigate(['infra', 'services']).then(() => {
         this.addOnAppService.serviceEnabled.next(this.descriptionParams.serviceName);
       });
     }, (error) => {
@@ -70,6 +70,10 @@ export class VerificationComponent implements OnInit {
       this.errorMessage = this.translateService.instant('pages.services.description.enableError');
       console.log(error);
     });
+  }
+
+  cancel() {
+    this.router.navigate(['infra', 'services'])
   }
 
 }
