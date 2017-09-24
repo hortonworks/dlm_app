@@ -12,7 +12,7 @@ FROM openjdk:8-jre-slim
 
 ENV HDP_VERSION=2.6.2.0-189
 RUN apt-get update && \
-    apt-get install -y gnupg wget && \
+    apt-get install -y gnupg wget procps && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B9733A7A07513CAD && \
     wget http://s3.amazonaws.com/dev.hortonworks.com/HDP/ubuntu16/2.x/BUILDS/${HDP_VERSION}/hdpbn.list -P /etc/apt/sources.list.d/ && \
     apt-get update && \
