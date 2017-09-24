@@ -8,7 +8,7 @@
 #  * of all or any part of the contents of this software is strictly prohibited.
 #  */
 #
-FROM java:openjdk-8-jre-alpine
+FROM openjdk:8-jre-alpine
 
 ENV FLYWAY_VERSION 4.2.0
 ENV FLYWAY_SQL_DIR /dbscripts
