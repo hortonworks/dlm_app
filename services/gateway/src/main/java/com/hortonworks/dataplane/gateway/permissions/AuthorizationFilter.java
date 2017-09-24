@@ -9,10 +9,11 @@ import com.netflix.zuul.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_DECORATION_FILTER_ORDER;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SERVICE_ID_KEY;
 
-//@Service
+@Service
 public class AuthorizationFilter extends ZuulFilter {
 
   @Autowired
@@ -28,7 +29,7 @@ public class AuthorizationFilter extends ZuulFilter {
 
   @Override
   public int filterOrder() {
-    return 0;
+    return PRE_DECORATION_FILTER_ORDER+2;
   }
 
   @Override
