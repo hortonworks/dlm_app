@@ -154,7 +154,7 @@
     <div class="button-container"  *ngIf="showClusterDetails">
       <button id="add-btn" class="mdl-button btn-hwx-primary" (click)="onCreate($event)">{{"common.add" | translate}}</button>
       <button id="add-and-new-btn" class="mdl-button btn-hwx-primary" (click)="onCreateAndAdd($event)">{{"common.addAndNew" | translate}}</button>
-      <button id="cancel-btn" class="mdl-button btn-hwx-default" (click)="onCancel($event)">{{"common.cancel" | translate}}</button>
+      <button id="cancel-btn" class="mdl-button btn-hwx-default" [routerLink]="['/infra']">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

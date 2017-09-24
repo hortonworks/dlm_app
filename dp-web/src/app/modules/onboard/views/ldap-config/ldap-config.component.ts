@@ -66,7 +66,7 @@ export class LdapConfigComponent implements OnInit {
     }
     Loader.show();
     this.configurationService.configureLDAP(this.ldapProperties).subscribe(() => {
-      this.router.navigate(['onboard/users-and-groups']);
+      this.router.navigate(['/onboard/users-and-groups']);
       Loader.hide();
     }, (response) => {
       Loader.hide();
@@ -82,7 +82,7 @@ export class LdapConfigComponent implements OnInit {
   }
 
   back() {
-    this.router.navigate(['onboard/welcome']);
+    this.router.navigate(['/onboard/welcome']);
   }
 
   closeNotification() {

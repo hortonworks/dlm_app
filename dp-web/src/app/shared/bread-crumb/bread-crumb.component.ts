@@ -77,18 +77,18 @@ export class BreadCrumbComponent {
   createInfraCrumbs(url: string) {
     if (url.startsWith('infra/clusters')) {
       this.crumbNamesToURLMap['Clusters'] = '';
-    } else if (url.startsWith('infra/add')) {
+    } else if (url.startsWith('infra/clusters/add')) {
       this.crumbNamesToURLMap['Clusters'] = 'infra/clusters';
       this.crumbNamesToURLMap['Add'] = '';
-    } else if (url.startsWith('infra/edit')) {
+    } else if (url.startsWith('infra/clusters/') && url.endsWith('/edit')) {
       this.crumbNamesToURLMap['Clusters'] = 'infra/clusters';
       this.crumbNamesToURLMap['Edit'] = '';
-    } else if (url.startsWith('infra/cluster/details')) {
+    } else if (url.startsWith('infra/cluster/')) {
       this.crumbNamesToURLMap['Clusters'] = 'infra/clusters';
       this.crumbNamesToURLMap['Details'] = '';
-    } else if (url.startsWith('infra/usermgmt/users')) {
+    } else if (url.startsWith('infra/manage-access/users')) {
       this.crumbNamesToURLMap['Users'] = '';
-    } else if (url.startsWith('infra/usermgmt/groups')) {
+    } else if (url.startsWith('infra/manage-access/groups')) {
       this.crumbNamesToURLMap['Groups'] = '';
     } else if (url.startsWith('infra/services')) {
       this.crumbNamesToURLMap['Services'] = '';
