@@ -7,12 +7,19 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+export interface JobTrackinfoProgress {
+  total: number;
+  completed: number;
+  failed: number;
+  killed: number;
+  filesCopied: number;
+  bytesCopied: number;
+  timeTaken: number;
+  unit: string;
+};
+
 export interface JobTrackingInfo {
   jobId: string;
-  totalMapTasks: number;
-  completedMapTasks: number;
-  numMapTasks: number;
-  bytesCopied: number;
-  filesCopied: number;
-  timeTaken: number;
+  jobType: string;
+  progress: JobTrackinfoProgress;
 }

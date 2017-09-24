@@ -39,7 +39,6 @@ add_secret() {
 
     docker run \
         --network dp \
-        --tty \
         --rm \
         --env "PGHOST=$DB_HOST" \
         --env "PGPORT=$DB_PORT" \

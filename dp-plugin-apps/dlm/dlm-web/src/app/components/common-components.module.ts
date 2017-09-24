@@ -50,6 +50,7 @@ import { HortonStyleModule } from 'common/horton-style.module';
 import { ConfirmationModalContainerComponent } from './confirmation-modal/confirmation-modal-container.component';
 import { EventEntityLinkComponent } from './event-entity-link/event-entity-link.component';
 import { NotificationsContainerComponent } from './notifications-container/notifications-container.component';
+import { TransferredObjectsComponent } from './table-columns/transferred-objects/transferred-objects.component';
 
 @NgModule({
   imports: [
@@ -103,7 +104,8 @@ import { NotificationsContainerComponent } from './notifications-container/notif
     HelpLinkComponent,
     ConfirmationModalContainerComponent,
     EventEntityLinkComponent,
-    NotificationsContainerComponent
+    NotificationsContainerComponent,
+    TransferredObjectsComponent
   ],
   exports: [
     CardComponent,
@@ -139,7 +141,8 @@ import { NotificationsContainerComponent } from './notifications-container/notif
     HelpLinkComponent,
     ConfirmationModalContainerComponent,
     EventEntityLinkComponent,
-    NotificationsContainerComponent
+    NotificationsContainerComponent,
+    TransferredObjectsComponent
   ]
 })
 export class CommonComponentsModule {}

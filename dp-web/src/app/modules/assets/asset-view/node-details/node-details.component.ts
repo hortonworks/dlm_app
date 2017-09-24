@@ -46,8 +46,8 @@ export class NodeDetailsComponent implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.fetchInProgress = true;
-      this.clusterId = this.route.parent.snapshot.params['id'];
-      this.guid = this.route.snapshot.params['guid'];
+      this.clusterId = this.route.parent.snapshot.params['clusterId'];
+      this.guid = this.route.snapshot.params['guidOfNode'];
       this.assetService.getDetails(this.clusterId, this.guid).subscribe(details => {
         this.assetDetails = details;
         this.assetProperties = this.extractAssetProperties(details.entity);

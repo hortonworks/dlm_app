@@ -87,7 +87,12 @@
   </div>
   <ng-template #transferredTpl>
     <span [innerHtml]="value.bytesCopied | bytesSize"></span>
-    <span *ngIf="value.filesCopied">/ {{value.filesCopied}}</span>
+    <span *ngIf="value.filesCopied">/
+      <dlm-transferred-objects
+        [amount]="value?.filesCopied"
+        [units]="value?.unit">
+      </dlm-transferred-objects>
+    </span>
   </ng-template>
 </ng-template>
 

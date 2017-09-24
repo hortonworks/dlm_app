@@ -18,6 +18,7 @@ import javax.naming.ldap.InitialLdapContext
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
+import play.api.Configuration
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, LdapConfiguration}
@@ -35,7 +36,7 @@ class LdapService @Inject()(
     @Named("ldapConfigService") val ldapConfigService: LdapConfigService,
     @Named("configService") val configService: ConfigService,
     private val ldapKeyStore: DpKeyStore,
-    private val configuration: play.api.Configuration) {
+    private val configuration: Configuration) {
   private val logger = Logger(classOf[LdapService])
   private val USERDN_SUBSTITUTION_TOKEN = "{0}"
 

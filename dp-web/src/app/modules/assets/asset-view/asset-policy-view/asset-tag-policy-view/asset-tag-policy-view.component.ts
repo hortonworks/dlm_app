@@ -28,7 +28,6 @@ export class AssetTagPolicyViewComponent extends AssetPolicyView  {
   ngOnInit(){
     super.ngOnInit();
     if(!this.clusterId || !this.guid) return;
-    this.showPagination = false;
     this.isTagBasedPolicy = true;
     this.onReload();
   }
@@ -37,6 +36,7 @@ export class AssetTagPolicyViewComponent extends AssetPolicyView  {
     super.onReload();
     this.rangerService.getTagPolicyDetails(this.clusterId, this.guid, this.pageStartsFrom-1, this.pageSize)
       .subscribe(details=>{
+          this.count = this.rangerService.getTotalTagPolicyCount();
           this.state = this.PWS.LOADED;
           this.policies = details;
         },

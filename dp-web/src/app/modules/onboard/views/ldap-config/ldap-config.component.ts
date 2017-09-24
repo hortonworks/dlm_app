@@ -12,18 +12,18 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 
-import {LDAPProperties} from '../../../../../models/ldap-properties';
-import {ConfigurationService} from '../../../../../services/configuration.service';
+import {LDAPProperties} from '../../../../models/ldap-properties';
+import {ConfigurationService} from '../../../../services/configuration.service';
 import {NgForm} from '@angular/forms';
-import {Alerts} from '../../../../../shared/utils/alerts';
+import {Alerts} from '../../../../shared/utils/alerts';
 import {TranslateService} from '@ngx-translate/core';
-import {Loader} from '../../../../../shared/utils/loader';
+import {Loader} from '../../../../shared/utils/loader';
 
 
 @Component({
   selector: 'dp-ldap-config',
   templateUrl: './ldap-config.component.html',
-  styleUrls: ['./ldap-config.component.scss', '../dp-onboard.component.scss']
+  styleUrls: ['./ldap-config.component.scss', '../dp-onboard/dp-onboard.component.scss']
 })
 export class LdapConfigComponent implements OnInit {
 
@@ -66,9 +66,7 @@ export class LdapConfigComponent implements OnInit {
     }
     Loader.show();
     this.configurationService.configureLDAP(this.ldapProperties).subscribe(() => {
-      this.router.navigate(['onboard/adduser', {
-        status: 'success',
-      }]);
+      this.router.navigate(['onboard/users-and-groups']);
       Loader.hide();
     }, (response) => {
       Loader.hide();

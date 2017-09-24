@@ -68,7 +68,7 @@ export class BreadCrumbComponent {
       this.crumbNamesToURLMap['Edit'] = '';
     } else if (url.startsWith('datasteward/dataset/add')) {
       this.crumbNamesToURLMap['Add'] = '';
-    } else if (url.startsWith('datasteward/dataset/assets/details')) {
+    } else if (url.startsWith('datasteward/dataset/assets')) {
       this.crumbNamesToURLMap['Asset Details'] = '';
     }
   }

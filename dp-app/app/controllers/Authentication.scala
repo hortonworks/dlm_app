@@ -17,21 +17,20 @@ import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.{Errors, User, UserRoles}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.UserService
-import com.hortonworks.dataplane.commons.auth.Authenticated
-import internal.Jwt
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import models.JsonFormats._
 import models.{Credential, JsonResponses}
 import org.mindrot.jbcrypt.BCrypt
 import play.api.libs.json.Json
 import play.api.mvc._
 import play.api.Logger
+import play.api.Configuration
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class Authentication @Inject()(@Named("userService") val userService: UserService,
-                               authenticated:Authenticated,
-                               configuration: play.api.Configuration)
+                               configuration: Configuration)
     extends Controller {
 
   def signIn = Action.async(parse.json) { request =>
@@ -51,14 +50,14 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
         BadRequest(JsonResponses.statusError("Cannot parse user request"))))
   }
 
-  def userById(userId: String) = authenticated.async {
+  def userById(userId: String) = Action.async {
     userService.loadUserById(userId).map{
       case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
       case Right(user) => Ok(Json.toJson(user))
     }
   }
 
-  def userDetail = authenticated.async { request =>
+  def userDetail = AuthenticatedAction.async { request =>
     val username = request.user.username
     for {
       userOp: Either[Errors, User] <- userService.loadUser(username)
@@ -73,8 +72,7 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
           val orElse = getRoles(rolesOp)
          Ok(Json.obj( "id" -> user.username,
            "avatar" -> user.avatar,
-           "display" -> user.displayname,
-           "token" -> Jwt.makeJWT(user))
+           "display" -> user.displayname)
          )
       }
     }
@@ -104,9 +102,7 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
               Json.obj(
                 "id" -> user.username,
                 "avatar" -> user.avatar,
-                "display" -> user.displayname,
-                "token" -> Jwt.makeJWT(user)
-
+                "display" -> user.displayname
               ))
           case false =>
             Unauthorized(

@@ -47,7 +47,7 @@ object ResponseEntities {
   case class PoliciesDetailResponse(policyId: String, name: String, description: Option[String], `type`: String,
                                     status: String, sourceDataset: String, targetDataset: String, frequencyInSec: Long,
                                     sourceCluster: String, targetCluster: String, instances: Seq[PolicyInstanceResponse],
-                                    startTime: Option[String], endTime: String)
+                                    startTime: Option[String], endTime: String, executionType: Option[String], customProperties: Option[Map[String, String]])
 
   case class BeaconEventResponse(policyId: Option[String], instanceId: Option[String], event: String, eventType: String,
                                  policyReplType: Option[String], severity: String, syncEvent: Option[Boolean],
@@ -58,6 +58,19 @@ object ResponseEntities {
   case class BeaconAdminStatusResponse(status: String, version: String, plugins: String, security: String, wireEncryption: Boolean)
 
   case class BeaconAdminStatusDetails(clusterId: Long, beaconAdminStatus: BeaconAdminStatusResponse)
+
+  case class HdfsFile(accessTime: Long, blockSize: Long, group: String, length: Long, modificationTime: Long,
+                      owner: String, pathSuffix: String, permission: String, replication: Int, `type`: String)
+
+  case class BeaconHdfsFileResponse(status: String, message: String, requestId: String, totalResults: Long, fileList: Seq[HdfsFile])
+
+  case class HiveDbName(database: String)
+  
+  case class BeaconHiveDbResponse(status: String, message: String, requestId: String, totalResults: Long, dbList: Seq[HiveDbName])
+
+  case class HiveDbTables(database: String, table: Seq[String])
+
+  case class BeaconHiveDbTablesResponse(status: String, message: String, requestId: String, totalResults: Long, dbList: Seq[HiveDbTables])
 }
 
 object RequestEntities {
@@ -129,6 +142,26 @@ object JsonFormatters {
 
   implicit val beaconAdminStatusDetailsWrites = Json.writes[BeaconAdminStatusDetails]
   implicit val beaconAdminStatusDetailsReads = Json.reads[BeaconAdminStatusDetails]
+
+  implicit val hdfsFileWrites = Json.writes[HdfsFile]
+  implicit val hdfsFileReads = Json.reads[HdfsFile]
+
+  implicit val beaconHdfsFileResponseWrites = Json.writes[BeaconHdfsFileResponse]
+  implicit val beaconHdfsFileResponseReads = Json.reads[BeaconHdfsFileResponse]
+
+  implicit val hiveDbNameWrites = Json.writes[HiveDbName]
+  implicit val hiveDbNameReads = Json.reads[HiveDbName]
+
+  implicit val beaconHiveDbResponseWrites = Json.writes[BeaconHiveDbResponse]
+  implicit val beaconHiveDbResponseReads = Json.reads[BeaconHiveDbResponse]
+
+  implicit val hiveDbTablesWrites = Json.writes[HiveDbTables]
+  implicit val hiveDbTablesReads = Json.reads[HiveDbTables]
+
+  implicit val beaconHiveDbTablesResponseWrites = Json.writes[BeaconHiveDbTablesResponse]
+  implicit val beaconHiveDbTablesResponseReads = Json.reads[BeaconHiveDbTablesResponse]
+
+
 
   //-- RequestEntities
 

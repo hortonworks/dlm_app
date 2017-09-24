@@ -13,7 +13,7 @@ import {AfterViewInit, Component, HostListener, OnInit, ViewChild} from '@angula
 import {LDAPUser} from '../../../../../models/ldap-user';
 import {UserService} from '../../../../../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {TaggingWidget, TaggingWidgetTagModel, TagTheme} from '../../../../../shared/tagging-widget/tagging-widget.component';
+import {TaggingWidget, TaggingWidgetTagModel} from '../../../../../shared/tagging-widget/tagging-widget.component';
 import {TranslateService} from '@ngx-translate/core';
 import {GroupService} from '../../../../../services/group.service';
 import {Group} from '../../../../../models/group';
@@ -37,7 +37,6 @@ export class AddGroupComponent implements OnInit, AfterViewInit {
 
   allRoles: TaggingWidgetTagModel[] = [];
 
-  tagTheme = TagTheme;
   group: Group = new Group();
   groupRoles: TaggingWidgetTagModel[] = [];
 
@@ -48,6 +47,8 @@ export class AddGroupComponent implements OnInit, AfterViewInit {
   @ViewChild('editGroupForm') editGroupForm: NgForm;
   @ViewChild('groupTags') private groupTags: TaggingWidget;
   @ViewChild('roleTags') private roleTags: TaggingWidget;
+
+  groupSearchSubscription: any;
 
   constructor(private userService: UserService,
               private groupService: GroupService,
@@ -101,17 +102,18 @@ export class AddGroupComponent implements OnInit, AfterViewInit {
   }
 
   onGroupSearchChange(text: string) {
-    this.availableGroups = [];
-    if (text && text.length > 2) {
-      this.userService.searchLDAPGroups(text).subscribe((ldapUsers: LDAPUser[]) => {
-        this.availableGroups = [];
-        ldapUsers.map(user => {
-          this.availableGroups.push(user.name);
-        });
+    if (this.groupSearchSubscription) {
+      this.groupSearchSubscription.unsubscribe();
+    }
+    if (text) {
+      this.groupSearchSubscription = this.userService.searchLDAPGroups(text).subscribe((ldapUsers: LDAPUser[]) => {
+        this.availableGroups = ldapUsers.map(user => user.name);
       }, () => {
         this.showError = true;
         this.onError(this.translateService.instant('pages.infra.description.ldapError'));
       });
+    } else {
+      this.availableGroups = [];
     }
   }
 
@@ -149,11 +151,12 @@ export class AddGroupComponent implements OnInit, AfterViewInit {
   }
 
   onRoleSearchChange(text: string) {
-    this.availableRoles = [];
-    if (text && text.length > 2) {
+    if (text) {
       this.availableRoles = this.allRoles.filter(role => {
         return role.display.toLowerCase().startsWith(text.toLowerCase());
       });
+    } else {
+      this.availableRoles = [];
     }
   }
 

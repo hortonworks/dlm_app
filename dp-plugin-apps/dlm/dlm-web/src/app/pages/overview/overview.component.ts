@@ -193,7 +193,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
       .do(([_, clusters]) => {
         [
           loadPolicies({numResults: ALL_POLICIES_COUNT}),
-          loadClusters()
+          loadClusters(),
+          loadEvents()
         ].map(action => this.store.dispatch(action));
       });
 

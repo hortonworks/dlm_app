@@ -66,10 +66,6 @@ class ClusterDataApi @Inject()(
 
   private lazy val log = Logger(classOf[ClusterDataApi])
 
-  // The time for which the URL should be cached
-  private lazy val urlCacheTime =
-    Try(config.getInt("dp.services.cluster.http.atlas.endpoint.cache.secs"))
-      .getOrElse(600)
 
   private lazy val localUser: Future[Option[String]] =
     storageInterface.getConfiguration("dp.atlas.user")
@@ -84,8 +80,7 @@ class ClusterDataApi @Inject()(
     .expireAfterAccess(cacheExpiry, TimeUnit.SECONDS)
     .build(
       new URLSupplierCacheLoader(clusterComponentService,
-                                 clusterHostsService,
-                                 urlCacheTime)).asInstanceOf[LoadingCache[Long,Supplier[Future[URL]]]]
+                                 clusterHostsService)).asInstanceOf[LoadingCache[Long,Supplier[Future[Set[URL]]]]]
 
 
   private case class CacheKey(cluster:Long,token:String)
@@ -221,11 +216,11 @@ private sealed class AtlasURLSupplier(
     clusterId: Long,
     clusterComponentService: ClusterComponentService,
     clusterHostsService: ClusterHostsService)(implicit ec: ExecutionContext)
-    extends Supplier[Future[URL]] {
+    extends Supplier[Future[Set[URL]]] {
 
   private lazy val log = Logger(classOf[AtlasURLSupplier])
 
-  def getAtlasUrlFromConfig(service: CS): Future[URL] = Future.successful {
+  def getAtlasUrlFromConfig(service: CS): Future[Set[URL]] = Future.successful {
 
     val configsAsList =
       (service.properties.get \ "properties").as[List[JsObject]]
@@ -235,10 +230,11 @@ private sealed class AtlasURLSupplier(
       throw ServiceNotFound("No properties found for Atlas")
     val properties = (atlasConfig.get \ "properties").as[JsObject]
     val apiUrl = (properties \ "atlas.rest.address").as[String]
-    new URL(apiUrl)
+    val urlList = apiUrl.split(",").map(_.trim)
+    urlList.map(new URL(_)).toSet
   }
 
-  override def get(): Future[URL] = {
+  override def get(): Future[Set[URL]] = {
 
     log.info("Fetching the Atlas URL from storage")
     val f = for {
@@ -264,38 +260,38 @@ private sealed class AtlasURLSupplier(
       }
   }
 
-  def extractUrl(service: URL, clusterId: Long): Future[URL] = {
+  def extractUrl(service: Set[URL], clusterId: Long): Future[Set[URL]] = {
 
+    val services = service.map( s =>
     clusterHostsService
-      .getHostByClusterAndName(clusterId, service.getHost)
+      .getHostByClusterAndName(clusterId, s.getHost)
       .map {
         case Right(host) =>
           new URL(
-            s"${service.getProtocol}://${host.ipaddr}:${service.getPort}")
+            s"${s.getProtocol}://${host.ipaddr}:${s.getPort}")
         case Left(errors) =>
           throw new Exception(
-            s"Cannot translate the hostname into an IP address $errors")
-      }
+            s"Cannot translate the atlas hostname ${s.getHost} into an IP address $errors")
+      })
+
+    Future.sequence(services)
   }
 
 }
 
 sealed class URLSupplierCacheLoader(
     private val clusterComponentService: ClusterComponentService,
-    private val clusterHostsService: ClusterHostsService,
-    expiry: Int)(implicit ec: ExecutionContext)
-    extends CacheLoader[Long, Supplier[Future[URL]]]() {
+    private val clusterHostsService: ClusterHostsService)(implicit ec: ExecutionContext)
+    extends CacheLoader[Long, Supplier[Future[Set[URL]]]]() {
 
   private lazy val log = Logger(classOf[URLSupplierCacheLoader])
 
-  override def load(key: Long): Supplier[Future[URL]] = {
+  override def load(key: Long): Supplier[Future[Set[URL]]] = {
     log.info(
-      s"Loading a URL supplier into cache, URL's for cluster-id:$key will be reloaded $expiry seconds after access")
-    Suppliers.memoizeWithExpiration(
+      s"Loading a URL supplier into cache, URL's for cluster-id:$key")
       new AtlasURLSupplier(key,
                            clusterComponentService,
-                           clusterHostsService),
-      expiry,
-      TimeUnit.SECONDS)
+                           clusterHostsService)
+
   }
 }

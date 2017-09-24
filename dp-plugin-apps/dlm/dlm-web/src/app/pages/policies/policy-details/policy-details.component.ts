@@ -13,6 +13,7 @@ import { Job } from 'models/job.model';
 import { PolicyContent } from './policy-content.type';
 import { POLICY_TYPES } from 'constants/policy.constant';
 import { HiveDatabase } from 'models/hive-database.model';
+import { JOB_STATUS } from 'constants/status.constant';
 
 @Component({
   selector: 'dlm-policy-details',
@@ -109,5 +110,9 @@ export class PolicyDetailsComponent implements OnInit {
 
   handleFilterApplied(event) {
     this.onTablesFilter.emit(event);
+  }
+
+  get filteredJobs() {
+    return this.jobs ? this.jobs.filter(job => job.status !== JOB_STATUS.IGNORED) : [];
   }
 }

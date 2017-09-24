@@ -76,31 +76,31 @@ class RangerRoute @Inject()(
     }
   }
 
-  private def requestRangerForTagPolicies(clusterId: Long, serviceType: String, dbName: Option[String], tableName: Option[String], tags: Option[String], offset: Long, pageSize: Long) : Future[JsArray] = {
-    val queries = Try(getBuiltQueries(serviceType, dbName, tableName, tags, offset, pageSize))
-    Future.fromTry(queries)
-      .flatMap { queries =>
-        val futures = queries.map { cQuery =>
-          for {
-            service <- getConfigOrThrowException(clusterId)
-            url <- getRangerUrlFromConfig(service)
-            baseUrls <- extractUrlsWithIp(url, clusterId)
-            user <- storageInterface.getConfiguration("dp.ranger.user")
-            pass <- storageInterface.getConfiguration("dp.ranger.password")
-            policies <- getRangerPoliciesByServiceTypeAndQuery(baseUrls.head, user, pass, serviceType, cQuery)
-          } yield (policies)
-        }
-        Future.sequence(futures).map(_.flatten).map(JsArray(_))
-      }
+  private def requestRangerForTagPolicies(clusterId: Long, serviceType: String, dbName: Option[String], tableName: Option[String], tags: Option[String], offset: Long, pageSize: Long) : Future[JsObject] = {
+    // assuming that no tag can have more than one policy
+    val queries = getBuiltQueries(serviceType, tags, offset = 0, pageSize)
+    for {
+      service <- getConfigOrThrowException(clusterId)
+      url <- getRangerUrlFromConfig(service)
+      baseUrls <- extractUrlsWithIp(url, clusterId)
+      user <- storageInterface.getConfiguration("dp.ranger.user")
+      pass <- storageInterface.getConfiguration("dp.ranger.password")
+      services <- getRangerServicesForType(baseUrls.head, user, pass, serviceType)
+      policies <-  Future.sequence(services.map(cServiceId => getRangerPoliciesByServiceIdAndQueries(baseUrls.head, user, pass, cServiceId, queries))).map(_.flatten)
+    } yield {
+      val _policies = policies.slice(offset.toInt, (offset + pageSize).toInt)
+      Json.obj(
+        "startIndex" -> offset,
+        "pageSize" -> pageSize,
+        "totalCount" -> policies.size,
+        "resultSize" -> _policies.size,
+        "policies" -> Json.toJson(_policies)
+      )
+    }
   }
 
-  private def getBuiltQueries(serviceType: String, dbName: Option[String], tableName: Option[String], tags: Option[String], offset: Long, pageSize: Long): Seq[String] = {
-    val query = s"startIndex=${offset}&pageSize=${pageSize}"
-    serviceType match {
-      case "hive" => Seq(query + s"&resource:database=${dbName.get}&resource:table=${tableName.get}")
-      case "tag" => tags.get.trim.split(",").filter(cTag => !cTag.isEmpty).map(cTag => query + s"&resource:tag=${cTag.trim}")
-      case _ => throw UnsupportedInputException(1001, "This is not a supported Ranger service.")
-    }
+  private def getBuiltQueries(serviceType: String, tags: Option[String], offset: Long, pageSize: Long): Seq[String] = {
+    tags.getOrElse("").trim.split(",").map(_.trim).filter(cTag => !cTag.isEmpty).sorted.map(cTag => s"startIndex=${offset}&pageSize=${pageSize}&resource:tag=${cTag}")
   }
 
   private def getRangerServicesForType(uri: String, user: Option[String], pass: Option[String], serviceType: String): Future[Seq[Long]] = {
@@ -121,12 +121,11 @@ class RangerRoute @Inject()(
       .map { response => (response.json \ "policies").validate[Seq[JsObject]].get }
   }
 
-  private def getRangerPoliciesByServiceTypeAndQuery(uri: String, user: Option[String], pass: Option[String], serviceType: String, query: String): Future[Seq[JsObject]] = {
-    getRangerServicesForType(uri, user, pass, serviceType)
-      .flatMap { services =>
-        val futures = services.map(cServiceId => getRangerPoliciesByServiceIdAndQuery(uri, user, pass, cServiceId, query))
-        Future.sequence(futures).map(_.flatten)
-      }
+  private def getRangerPoliciesByServiceIdAndQueries(uri: String, user: Option[String], pass: Option[String], serviceId: Long, queries: Seq[String]): Future[Seq[JsObject]] = {
+    val futures = queries
+      .map(cQuery => getRangerPoliciesByServiceIdAndQuery(uri, user, pass, serviceId, cQuery))
+
+    Future.sequence(futures).map(_.flatten)
   }
 
   private def requestRangerForAudit(clusterId: Long, dbName: String, tableName: String, offset: Long, pageSize: Long, accessType: String, accessResult:String) : Future[WSResponse] = {

@@ -9,7 +9,7 @@
  *
  */
 
-@import "../../../../../../styles/variables";
+@import "../../../../../styles/variables";
 
 .dp-input {
   margin: 15px 0px;
@@ -53,4 +53,23 @@
 
 .pointer {
   cursor: pointer;
+}
+
+.error-notification-bar {
+  padding: 15px;
+  background: $concrete;
+  height: 34px;
+  margin-bottom: 20px;
+  .fa-times-circle {
+    font-size: 24px;
+    color: $roman-red;
+  }
+  .fa-remove {
+    color: $dusty-gray;
+    cursor: pointer;
+  }
+  .text-medium {
+    font-weight: 500;
+    color: $roman-red;
+  }
 }

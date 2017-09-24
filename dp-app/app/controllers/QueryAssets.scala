@@ -23,7 +23,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.Errors
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.cs.Webservice.AtlasService
 import com.hortonworks.dataplane.db.Webservice.DataAssetService
-import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import models.JsonResponses
 import play.api.Logger
 import play.api.libs.json.Json
@@ -34,11 +34,9 @@ import scala.concurrent.Future
 
 class QueryAssets @Inject()(
     @Named("atlasService") val atlasService: AtlasService,
-    @Named("dataAssetService") val assetService: DataAssetService,
-    val authenticated: Authenticated
-) extends Controller {
+    @Named("dataAssetService") val assetService: DataAssetService) extends Controller {
 
-  def search(clusterId: String) = authenticated.async(parse.json) { request =>
+  def search(clusterId: String) = AuthenticatedAction.async(parse.json) { request =>
     Logger.info("Received get cluster atlas search request")
     implicit val token = request.token
     request.body
