@@ -17,6 +17,10 @@
       <h6>{{"common.description" | translate}}</h6>
       <p class="detail">{{policy?.description}}</p>
     </div>
+    <div class="summary-item" *ngIf="policy?.executionType">
+      <h6>{{"common.snapshot_enabled" | translate}}</h6>
+      <p class="detail">{{snapshotEnabledStatus}}</p>
+    </div>
     <div class="summary-item">
       <h6>{{"common.path" | translate}}</h6>
       <p class="detail">{{policy?.sourceDataset}}</p>

@@ -11,7 +11,7 @@ import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import { Policy } from 'models/policy.model';
 import { Job } from 'models/job.model';
 import { PolicyContent } from './policy-content.type';
-import { POLICY_TYPES } from 'constants/policy.constant';
+import { POLICY_TYPES, POLICY_EXECUTION_TYPES } from 'constants/policy.constant';
 import { HiveDatabase } from 'models/hive-database.model';
 import { JOB_STATUS } from 'constants/status.constant';
 
@@ -114,5 +114,13 @@ export class PolicyDetailsComponent implements OnInit {
 
   get filteredJobs() {
     return this.jobs ? this.jobs.filter(job => job.status !== JOB_STATUS.IGNORED) : [];
+  }
+
+  /**
+   * Returns a string 'YES' or 'NO'
+   * based on whether snapshot is enabled on the policy
+   */
+  get snapshotEnabledStatus() {
+    return (this.policy && this.policy.executionType && this.policy.executionType === POLICY_EXECUTION_TYPES.HDFS_SNAPSHOT) ? 'YES' : 'NO';
   }
 }
