@@ -8,16 +8,14 @@
  */
 
 export interface HiveTable {
-  id: string;
+  id: string;    // added on UI
   name: string;
-  databaseId: string;
   clusterId?: string; // added on UI
   databaseEntityId?: string; // added on UI
 }
 
 export interface HiveDatabase {
-  id: string;
   name: string;
   entityId?: string; // added on UI
-  tables?: HiveTable[]; // aded on UI
-};
+  tables?: HiveTable[]; // added on UI
+}

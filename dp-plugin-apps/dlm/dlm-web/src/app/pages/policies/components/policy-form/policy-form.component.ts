@@ -99,7 +99,7 @@ export function pathValidator(hdfsService): AsyncValidatorFn {
         const clusterId = control.parent['controls']['general'].controls.sourceCluster.value;
         return hdfsService.getFilesList(clusterId, control.value).toPromise()
           .then(response => {
-            const files = response.FileStatuses.FileStatus;
+            const files = response.fileList;
             if (files.length && files[0].type === FILE_TYPES.FILE && files[0].pathSuffix === '') {
               return resolve({isFile: true});
             }
@@ -347,7 +347,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
           const selectedSource = this.policyForm.value.general.sourceCluster;
           // select first database when source changed and selected database is not exist on selected cluster
           if (databases.length && !databases.some(db => db.clusterId === selectedSource && db.name === selectedDatabase)) {
-            this.policyForm.patchValue({databases: databases[0].id});
+            this.policyForm.patchValue({databases: databases[0].name});
           }
         });
       });
@@ -398,6 +398,9 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
           this.selectedHdfsPath = policyFormValues['directories'];
           this.selectedSource$.next(policyFormValues['general']['sourceCluster']);
           this.activateFieldsForType(policyFormValues['general']['type']);
+          if (Object.keys(policyFormValues['advanced']).some(k => policyFormValues['advanced'][k] !== '')) {
+            this.sectionCollapsedMap.advanced = false;
+          }
         } else if (sourceClusterId > 0) {
           this.policyForm.patchValue({
             general: {

@@ -32,6 +32,7 @@ export class DsEditor implements OnInit {
   assetSetQueryModelsForAddition: AssetSetQueryModel[] = [];
   assetSetQueryModelsForSubtraction: AssetSetQueryModel[] = [];
   private datasetId: number = null;
+  errorMessage: string;
 
   constructor(public dsModel: RichDatasetModel,
               private richDatasetService: RichDatasetService,
@@ -57,10 +58,6 @@ export class DsEditor implements OnInit {
     }
   }
 
-  setVisibilityOfNext() {
-    this.nextIsVisible = (this.currentStage == 1 || this.currentStage == 2 && this.assetSetQueryModelsForAddition.length != 0);
-  }
-
   actionNext() {
     if (!this[`validateStage${this.currentStage}`]()) {
       this.fillMandatoryMsg.nativeElement.style.display="block";
@@ -69,12 +66,12 @@ export class DsEditor implements OnInit {
     }
     this.fillMandatoryMsg.nativeElement.style.display="none";
     ++this.currentStage;
-    this.setVisibilityOfNext();
   }
 
   moveToStage(newStage: number) {
     if ((newStage < this.currentStage) && (this.currentStage = newStage)) {
-      this.setVisibilityOfNext();
+      // clear error
+      this.errorMessage = null;
     }
   }
 
@@ -83,7 +80,13 @@ export class DsEditor implements OnInit {
     this.saveInProgress = true;
     this.richDatasetService
       .saveDataset(this.dsModel, this.assetSetQueryModelsForAddition, this.tags)
-      .subscribe(obj => {this.actionCancel();})
+      .subscribe(
+        () => this.actionCancel(),
+        error => {
+          this.saveInProgress = false;
+          this.errorMessage = error.json().message
+        }
+      );
   }
 
   actionCancel() {

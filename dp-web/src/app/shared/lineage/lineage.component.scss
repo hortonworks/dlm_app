@@ -11,6 +11,10 @@
 
 @import "../../../styles/_variables.scss";
 
+.lineage-wrapper {
+  position: relative;
+  height: 508px;
+}
 .fontLoader {
   top: 50%;
   left: 50%;
@@ -22,7 +26,9 @@
   color: $color_keppel_approx;
   margin-bottom: 10px;
   border-radius: 4px;
-  padding: 5px 10px;
+  padding: 3px 5px;
+  font-size: 16px;
+  cursor: pointer;
   &:hover {
     background-color: $color_keppel_approx;
     color: $white;
@@ -159,7 +165,8 @@
   .legends {
     > i {
       > span {
-        font-family: 'Source Sans Pro';
+        font-family: 'Roboto', sans-serif;
+        font-size: inherit;
       }
     }
   }

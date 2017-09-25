@@ -9,7 +9,8 @@
  *
  */
 
-import {Component, Input, ViewChild, OnInit, SimpleChange, ElementRef} from "@angular/core";
+import {Component, Input, Output, ViewChild, OnInit, SimpleChange, ElementRef, EventEmitter} from "@angular/core";
+import * as DialogPolyfill from 'dialog-polyfill';
 import {DatasetTag} from "../../../../../models/dataset-tag";
 import {ViewsEnum} from "../../../../../shared/utils/views";
 import {RichDatasetModel} from "../../../models/richDatasetModel";
@@ -27,6 +28,8 @@ export class DsNavResultViewer {
   @Input() view;
   @Input() dsNameSearch:string = "";
   @ViewChild('dialogConfirm') dialogConfirm: ElementRef;
+
+  @Output() onViewRefresh = new EventEmitter<boolean>();
 
   _datasetToDelete: RichDatasetModel;
   _deleteWasSuccessful = false;
@@ -70,13 +73,17 @@ export class DsNavResultViewer {
 
   onDeleteDataset(datasetId: number) {
     this._datasetToDelete = this.datasetModels.find(cDataset => cDataset.id === datasetId);
+    DialogPolyfill.registerDialog(this.dialogConfirm.nativeElement);
     this.dialogConfirm.nativeElement.showModal();
   }
 
   doConfirmDelete() {
     const delete$ = this.dataSetService.delete(this._datasetToDelete.id).share();
 
-    delete$.subscribe(() => this.getDataset());
+    delete$.subscribe(() => {
+      this.getDataset();
+      this.onViewRefresh.emit(true);
+    });
     delete$
       .do(() => this._deleteWasSuccessful = true)
       .delay(1000)

@@ -14,15 +14,23 @@ package com.hortonworks.dataplane.cs.atlas
 import javax.ws.rs.core.Cookie
 
 import com.google.common.base.Supplier
-import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery, Entity}
+import com.hortonworks.dataplane.commons.domain.Atlas.{
+  AtlasAttribute,
+  AtlasEntities,
+  AtlasSearchQuery,
+  Entity
+}
 import com.hortonworks.dataplane.commons.domain.Constants
-import com.hortonworks.dataplane.commons.domain.Entities.{HJwtToken, ClusterService => CS}
+import com.hortonworks.dataplane.commons.domain.Entities.{
+  HJwtToken,
+  ClusterService => CS
+}
 import com.hortonworks.dataplane.cs.ClusterDataApi
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import org.apache.atlas.AtlasClientV2
 import org.apache.atlas.model.SearchFilter
-import org.apache.atlas.model.instance.AtlasEntityHeader
+import org.apache.atlas.model.instance.{AtlasEntity, AtlasEntityHeader}
 import org.apache.atlas.model.lineage.AtlasLineageInfo.LineageDirection
 import org.codehaus.jackson.map.ObjectMapper
 import play.api.libs.json.{JsValue, Json}
@@ -31,23 +39,28 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
-
-private [atlas] sealed case class ClientWrapper(clusterId:Long,api:AtlasClientV2,shouldUseToken:Boolean = false)
+private[atlas] sealed case class ClientWrapper(clusterId: Long,
+                                               api: AtlasClientV2,
+                                               shouldUseToken: Boolean = false)
 
 object ClientExtension {
 
   class ExtendedClient(api: AtlasClientV2) {
-    def setToken(token: Option[String]):AtlasClientV2 = token.map {t =>
-      api.setCookie(new Cookie(Constants.HJWT, t))
-      api
-    }.getOrElse{
-      // Need to clear the cookie
-      api.setCookie(new Cookie(Constants.HJWT, ""))
-      api
-    }
+    def setToken(token: Option[String]): AtlasClientV2 =
+      token
+        .map { t =>
+          api.setCookie(new Cookie(Constants.HJWT, t))
+          api
+        }
+        .getOrElse {
+          // Need to clear the cookie
+          api.setCookie(new Cookie(Constants.HJWT, ""))
+          api
+        }
   }
 
-  implicit def extendedClient(api: AtlasClientV2):ExtendedClient = new ExtendedClient(api)
+  implicit def extendedClient(api: AtlasClientV2): ExtendedClient =
+    new ExtendedClient(api)
 
 }
 
@@ -69,30 +82,35 @@ class DefaultAtlasInterface(private val clusterId: Long,
     }
   }
 
-  val hiveBaseQuery =
+  private lazy val lowerCaseQueries =
+    Try(config.getBoolean("dp.services.atlas.lower.case.queries"))
+      .getOrElse(false)
+
+  private lazy val filterDeletedEntities =
+    Try(config.getBoolean("dp.services.atlas.filter.deleted.entities"))
+      .getOrElse(true)
+
+  private lazy val hiveBaseQuery =
     Try(config.getString("dp.services.atlas.hive.search.query.base"))
       .getOrElse("hive_table")
 
-  val includedTypes =
+  private lazy val includedTypes =
     config.getStringList("dp.services.atlas.hive.accepted.types").asScala.toSet
 
-  private val atlasApi = new AtlasApiSupplier(clusterId, config, atlasApiData).get()
-
-
+  private val atlasApi = new AtlasApiSupplier(clusterId, config, atlasApiData)
 
   private def getApi(implicit hJwtToken: Option[HJwtToken]) = {
     import ClientExtension._
     for{
-      a <- atlasApi
+      a <- atlasApi.get
       t <- atlasApiData.getTokenForCluster(clusterId,hJwtToken)
       api <- Future.successful (a.api.setToken(t))
     } yield api
 
   }
 
-
-
-  override def getHiveAttributes(implicit hJwtToken: Option[HJwtToken]): Future[Seq[AtlasAttribute]] = {
+  override def getHiveAttributes(
+      implicit hJwtToken: Option[HJwtToken]): Future[Seq[AtlasAttribute]] = {
     log.info("Fetching hive attributes")
     getApi.map { api =>
       val entityDef = api.getEntityDefByName("hive_table")
@@ -104,26 +122,30 @@ class DefaultAtlasInterface(private val clusterId: Long,
     }
   }
 
-  override def findHiveTables(
-      filters: AtlasSearchQuery)(implicit hJwtToken: Option[HJwtToken]): Future[AtlasEntities] = {
+  override def findHiveTables(filters: AtlasSearchQuery)(
+      implicit hJwtToken: Option[HJwtToken]): Future[AtlasEntities] = {
     log.info("Fetching hive tables")
     log.info(s"Search query -> $filters")
     // Get the query
-    val query = s"$hiveBaseQuery ${Filters.query(filters)}"
+
+    val query = s"$hiveBaseQuery ${Filters.query(filters, lowerCaseQueries)}"
     getApi.map { api =>
       val searchResult =
         if (filters.isPaged)
           api.dslSearchWithParams(query, filters.limit.get, filters.offset.get)
         else api.dslSearch(query)
-      val entityHeaders = searchResult.getEntities
-      if (entityHeaders == null) {
-        AtlasEntities(None)
-      } else {
-        val entities = entityHeaders.asScala.map { e =>
-          createEntityRep(e)
+
+      Option(searchResult.getEntities)
+        .map { entityHeaders =>
+          val entities = if (filterDeletedEntities) {
+            entityHeaders.asScala.collect {
+              case e if e.getStatus != AtlasEntity.Status.DELETED =>
+                createEntityRep(e)
+            }
+          } else entityHeaders.asScala.map(createEntityRep)
+          AtlasEntities(Option(entities.toList))
         }
-        AtlasEntities(Option(entities.toList))
-      }
+        .getOrElse(AtlasEntities(None))
     }
 
   }
@@ -151,7 +173,8 @@ class DefaultAtlasInterface(private val clusterId: Long,
 
   private val mapper = new ObjectMapper()
 
-  override def getAtlasEntity(uuid: String)(implicit hJwtToken: Option[HJwtToken]): Future[JsValue] = {
+  override def getAtlasEntity(uuid: String)(
+      implicit hJwtToken: Option[HJwtToken]): Future[JsValue] = {
     log.info(s"Get atlas entity uuid -> $uuid")
 
     getApi.map { api =>
@@ -161,7 +184,8 @@ class DefaultAtlasInterface(private val clusterId: Long,
     }
   }
 
-  override def getAtlasEntities(uuids: Iterable[String])(implicit hJwtToken: Option[HJwtToken]): Future[JsValue] = {
+  override def getAtlasEntities(uuids: Iterable[String])(
+      implicit hJwtToken: Option[HJwtToken]): Future[JsValue] = {
     log.info(s"Get atlas entities uuids -> $uuids")
     getApi.map { api =>
       val entityWithExtInfo = api.getEntitiesByGuids(uuids.toList.asJava)
@@ -170,8 +194,8 @@ class DefaultAtlasInterface(private val clusterId: Long,
     }
   }
 
-  override def getAtlasLineage(uuid: String,
-                               depth: Option[String])(implicit hJwtToken: Option[HJwtToken]): Future[JsValue] = {
+  override def getAtlasLineage(uuid: String, depth: Option[String])(
+      implicit hJwtToken: Option[HJwtToken]): Future[JsValue] = {
     log.info(s"Get Lineage entity uuid -> $uuid depth -> $depth")
     for {
       api <- getApi
@@ -184,7 +208,8 @@ class DefaultAtlasInterface(private val clusterId: Long,
     }
   }
 
-  override def getAtlasTypeDefs(searchFilter: SearchFilter)(implicit hJwtToken: Option[HJwtToken]): Future[JsValue] = {
+  override def getAtlasTypeDefs(searchFilter: SearchFilter)(
+      implicit hJwtToken: Option[HJwtToken]): Future[JsValue] = {
     log.info(s"Getting atlas type defs")
     getApi.map { api =>
       val jsonString =
@@ -193,7 +218,6 @@ class DefaultAtlasInterface(private val clusterId: Long,
     }
   }
 }
-
 
 sealed class AtlasApiSupplier(clusterId: Long,
                               config: Config,
@@ -208,16 +232,17 @@ sealed class AtlasApiSupplier(clusterId: Long,
         url <- atlasApiData.getAtlasUrl(clusterId)
         shouldUseToken <- atlasApiData.shouldUseToken(clusterId)
         client <- {
+          val array = url.map(_.toString).toArray
+          log.info(s"Atlas URL's loaded $url")
           if (shouldUseToken) {
             log.info("The cluster is registered as Knox enabled, Basic auth will not be set up")
-            log.info("!!!Atlas will not work unless configured with Knox SSO.!!!")
+            log.warn("!!!Atlas will not work unless configured with Knox SSO.!!!")
             // The initial value is not important as this can be updated with the real token
-            Future.successful(ClientWrapper(clusterId,new AtlasClientV2(Array(url.toString), new Cookie(Constants.HJWT,"")),true))
-
+            Future.successful(ClientWrapper(clusterId,new AtlasClientV2(array, new Cookie(Constants.HJWT,"")),true))
           } else {
             atlasApiData.getCredentials.map { c =>
               log.info(s"No Knox detected , setting up basic auth with credentials -> $c")
-              ClientWrapper(clusterId,new AtlasClientV2(Array(url.toString), Array(c.user.get,c.pass.get)))
+              ClientWrapper(clusterId,new AtlasClientV2(url.map(_.toString).toArray, Array(c.user.get,c.pass.get)))
             }
           }
         }

@@ -87,7 +87,11 @@
           </div>
           <div class="display-group">
             <label>{{"pages.infra.labels.services" | translate}}</label>
-            <div *ngFor="let service of cluster.services" class="services"><i class="fa fa-check-circle"></i> {{service}}</div>
+            <div class ="extensible-list-h">
+              <div *ngFor="let service of cluster.services; let idx=index" class="services" [ngClass]="{'hide' : (idx >=5 && isServiceHidden)}"><i class="fa fa-check-circle"></i> {{service}}</div>
+              <div *ngIf="isServiceHidden && cluster.services.length > 5" class="show-hide-toggle" (click)="isServiceHidden=false" id="servicesHidden"> <i class="fa fa-angle-double-down"></i> {{"pages.infra.labels.allServices" | translate}}</div>
+              <div *ngIf="!isServiceHidden && cluster.services.length > 5" class="show-hide-toggle" (click)="isServiceHidden=true" id="servicesVisible"> <i class="fa fa-angle-double-up"></i> {{"pages.infra.labels.less" | translate}}</div>
+            </div>
           </div>
         </div>
 
@@ -132,7 +136,7 @@
               <div class="form-group">
                 <label>{{"common.tags" | translate}} </label>
                 <div class="hwx-inline-desc">{{"pages.infra.description.tags" | translate}}</div>
-                <tagging-widget id="tags" [tags]="cluster.tags" [clearOnSearch]="true" (onNewSearch)="onNewTagAddition($event)"></tagging-widget>
+                <tagging-widget [searchable]="false" id="tags" [tags]="cluster.tags" [clearOnSearch]="true" (onNewSearch)="onNewTagAddition($event)"></tagging-widget>
               </div>
               <div class="form-group">
                 <label>{{"common.description" | translate}}</label>

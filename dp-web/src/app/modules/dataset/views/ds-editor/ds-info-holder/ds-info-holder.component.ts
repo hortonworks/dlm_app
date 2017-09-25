@@ -9,7 +9,7 @@
  *
  */
 
-import {Component, Input, OnInit, SimpleChange} from "@angular/core";
+import {Component, Input, Output, OnInit, SimpleChange, EventEmitter} from "@angular/core";
 import {Lake} from "../../../../../models/lake";
 import {LakeService} from "../../../../../services/lake.service";
 import {RichDatasetModel} from "../../../models/richDatasetModel";
@@ -27,6 +27,9 @@ export class DsInfoHolder implements OnInit {
   @Input() tags: string[] = [];
   availableTags = [];
   lakes: Lake[];
+
+  @Output('onNext') nextEE: EventEmitter<void> = new EventEmitter<void>();
+  @Output('onCancel') cancelEE: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(private lakeService: LakeService,
               private tagService: DsTagsService) {
@@ -58,12 +61,12 @@ export class DsInfoHolder implements OnInit {
     this.dsModel.clusterId = (selectedLake)?selectedLake.clusterId:null;
   }
 
-}
+  onNext() {
+    this.nextEE.emit();
+  }
 
-// const tmpLakes: Lake[] = [
-//   {id: 1, name: "Lake-1", description: "Some Description", location: 0, ambariUrl: "some ambariUrl"},
-//   {id: 2, name: "Lake-2", description: "Some Description", location: 0, ambariUrl: "some ambariUrl"},
-//   {id: 3, name: "Lake-3", description: "Some Description", location: 0, ambariUrl: "some ambariUrl"},
-//   {id: 4, name: "Lake-4", description: "Some Description", location: 0, ambariUrl: "some ambariUrl"},
-//   {id: 5, name: "Lake-5", description: "Some Description", location: 0, ambariUrl: "some ambariUrl"}
-// ];
+  onCancel() {
+    this.cancelEE.emit();
+  }
+
+}

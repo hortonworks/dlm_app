@@ -13,26 +13,13 @@ package com.hortonworks.dataplane.cs
 
 import javax.inject.{Inject, Singleton}
 
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  Cluster,
-  ClusterHost,
-  ClusterServiceHost,
-  DataplaneCluster,
-  Errors,
-  ClusterService => ClusterData
-}
-import com.hortonworks.dataplane.db.Webservice.{
-  ClusterComponentService,
-  ClusterHostsService,
-  ClusterService,
-  ConfigService,
-  DpClusterService
-}
+import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, ClusterHost, ClusterServiceHost, DataplaneCluster, Errors, ClusterService => ClusterData}
+import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
+import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.Success
 
 trait StorageInterface {
 
@@ -242,3 +229,4 @@ class StorageInterfaceImpl @Inject()(
     }
   }
 }
+

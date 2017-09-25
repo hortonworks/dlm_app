@@ -20,11 +20,10 @@ import { sortByDateField } from 'utils/array-util';
 import { JOB_STATUS, CLUSTER_STATUS } from 'constants/status.constant';
 import { PolicyService } from 'services/policy.service';
 import { getRangerEnabled } from 'selectors/beacon.selector';
-import { contains } from 'utils/array-util';
 import { POLICY_MODES } from 'constants/policy.constant';
 
 const isRangerActivated = (beaconStatuses: BeaconAdminStatus[], policy: Policy): boolean => {
-  return beaconStatuses.filter(s => contains([policy.targetClusterResource.id, policy.sourceClusterResource.id], s.clusterId)).length === 2;
+  return beaconStatuses.some(s => policy.targetClusterResource.id === s.clusterId);
 };
 
 export const getEntities = createSelector(getPolicies, state => state.entities);
@@ -47,9 +46,11 @@ export const getPolicyClusterJob = createSelector(getAllPoliciesWithClusters, ge
   return policies.map(policy => {
     let policyJobs = jobs.filter(job => job.policyId === policy.id);
     policyJobs = policyJobs.length ? policyJobs : policy.jobs || [];
-    const jobsResource = sortByDateField(policyJobs, 'startTime');
+    // Filter out ignored jobs
+    policyJobs = policyJobs.length ? policyJobs.filter(job => job.status !== JOB_STATUS.IGNORED) : [];
+    const jobsResource = policyJobs.length ? sortByDateField(policyJobs, 'startTime') : [];
     const lastJobResource = jobsResource.length ? jobsResource[0] : null;
-    const lastGoodJobResource = jobsResource.length ? jobsResource.find(j => j.status === 'SUCCESS') : null;
+    const lastGoodJobResource = jobsResource.length ? jobsResource.find(j => j.status === JOB_STATUS.SUCCESS) : null;
     const lastTenJobs = jobsResource.length ? policyJobs.slice(0, 10) : [];
     return {
       ...policy,
@@ -90,12 +91,9 @@ export const getUnhealthyPolicies = createSelector(
 
 export const getPoliciesTableData = createSelector(getPolicyClusterJob, getRangerEnabled,
    (policies: Policy[], beaconStatuses: BeaconAdminStatus[]) => {
-     if (beaconStatuses.length) {
-       return policies.map(policy => ({
-         ...policy,
-         accessMode: isRangerActivated(beaconStatuses, policy) ? POLICY_MODES.READ_ONLY : POLICY_MODES.READ_WRITE,
-         rangerEnabled: isRangerActivated(beaconStatuses, policy)
-       }));
-     }
-     return policies;
+     return policies.map(policy => ({
+       ...policy,
+       accessMode: isRangerActivated(beaconStatuses, policy) ? POLICY_MODES.READ_ONLY : POLICY_MODES.READ_WRITE,
+       rangerEnabled: isRangerActivated(beaconStatuses, policy)
+     }));
    });

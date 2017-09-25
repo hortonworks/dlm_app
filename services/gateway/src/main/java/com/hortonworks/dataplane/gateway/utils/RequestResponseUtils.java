@@ -15,9 +15,13 @@ public class RequestResponseUtils {
   @Autowired
   private HostUtils hostUtils;
 
+  @Autowired
+  private Utils utils;
+
   private void redirectTo(String path) {
     RequestContext ctx = RequestContext.getCurrentContext();
     try {
+      utils.addNoCacheHeaders(ctx.getResponse());
       ctx.getResponse().sendRedirect(path);
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -58,7 +62,8 @@ public class RequestResponseUtils {
   }
 
   private String appRootUrl() {
-    return String.format("http://%s%s/", hostUtils.getRequestHost(),hostUtils.getRequestPort());
+    String proto=hostUtils.getRequestProtocol();
+    return String.format("%s://%s%s/",proto, hostUtils.getRequestHost(),hostUtils.getRequestPort());
   }
 
   public void redirectToLocalSignin() {

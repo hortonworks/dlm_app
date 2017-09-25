@@ -28,7 +28,6 @@ docker start dp-gateway >> install.log 2>&1 || \
         --network dp \
         --detach \
         --env "CONSUL_HOST=$CONSUL_HOST" \
-        --volume $(pwd)/certs:/usr/dp-app/conf/cert \
+        --volume $(pwd)/certs:/dp-shared \
         hortonworks/dp-gateway:$VERSION \
-        --server.domain=${KNOX_FQDN} \
         --knox.port=8443

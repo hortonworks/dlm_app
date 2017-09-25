@@ -79,4 +79,20 @@ class DpProfilerServiceImpl (config: Config)(implicit ws: ClusterWsClient) exten
       .get()
       .map(mapResultsGeneric)
   }
+
+  override def getAuditResults(clusterId: String, dbName: String, tableName: String, userName: String, startDate: String, endDate: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/audit-results/$dbName/$tableName/$startDate/$endDate?userName=$userName")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapResultsGeneric)
+  }
+
+  override def getAuditActions(clusterId: String, dbName: String, tableName: String, userName: String, startDate: String, endDate: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/audit-actions/$dbName/$tableName/$startDate/$endDate?userName=$userName")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapResultsGeneric)
+  }
 }

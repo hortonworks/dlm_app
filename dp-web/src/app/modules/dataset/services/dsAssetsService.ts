@@ -108,6 +108,7 @@ export class DsAssetsService {
         name: ent.assetProperties.name || "-",
         description : ent.assetProperties.description || "-",
         owner: ent.assetProperties.owner || "-",
+        dbName: ent.assetProperties.qualifiedName.split(".")[0] || "-",
         source: "hive",
         type: ent.assetType,
         clusterId: ent.clusterId
@@ -128,7 +129,8 @@ export class DsAssetsService {
         source: "hive",
         type: ent.typeName,
         clusterId: null,
-        dsName:ent.datasetName
+        dsName:ent.datasetName,
+        dbName:ent.attributes.qualifiedName.split(".")[0]
       })
     });
     return assetModelArr;

@@ -15,11 +15,11 @@ import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.cs.Webservice.AtlasService
-import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import models.JsonResponses
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.Controller
+import play.api.mvc.{Action, Controller}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.ConfigService
 
@@ -27,13 +27,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 
 class QueryAttributes @Inject()(
-                                 @Named("atlasService")
-                                 val atlasService: AtlasService,
-                                 val authenticated: Authenticated,
+                                 @Named("atlasService") val atlasService: AtlasService,
                                  @Named("configService") val configService: ConfigService
                                ) extends Controller {
 
-  def checkAuditMockStatus = authenticated.async {
+  def checkAuditMockStatus = Action.async {
     configService
       .getConfig("asset.audit.mock.show").map { config => {
       config match {
@@ -48,7 +46,7 @@ class QueryAttributes @Inject()(
     }
   }
 
-  def list(clusterId: String) = authenticated.async { req =>
+  def list(clusterId: String) = AuthenticatedAction.async { req =>
     Logger.info("Received get cluster atlas attributes request")
     implicit val token = req.token
     atlasService
@@ -62,7 +60,7 @@ class QueryAttributes @Inject()(
   }
 
   def getAssetDetails(clusterId: String, atlasGuid: String) =
-    authenticated.async { req =>
+    AuthenticatedAction.async { req =>
       Logger.info("Received get properties for entity")
       implicit val token = req.token
       atlasService
@@ -75,7 +73,7 @@ class QueryAttributes @Inject()(
         }
     }
 
-  def getLineage(clusterId: String, atlasGuid: String) = authenticated.async {
+  def getLineage(clusterId: String, atlasGuid: String) = AuthenticatedAction.async {
     request =>
       Logger.info("Received get lineage")
       implicit val token = request.token
@@ -89,7 +87,7 @@ class QueryAttributes @Inject()(
         }
   }
 
-  def getTypeDefs(clusterId: String, defType: String) = authenticated.async {
+  def getTypeDefs(clusterId: String, defType: String) = AuthenticatedAction.async {
     req =>
       Logger.info(s"Received get type def for $defType")
       implicit val token = req.token

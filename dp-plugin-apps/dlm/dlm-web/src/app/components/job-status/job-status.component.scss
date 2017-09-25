@@ -10,6 +10,9 @@
 @import '../../styles/variables';
 :host {
   font-size: smaller;
+  .text-info {
+    color: $link-color;
+  }
 }
 .text-success {
   color: $success-color !important;
