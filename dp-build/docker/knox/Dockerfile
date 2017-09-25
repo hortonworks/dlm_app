@@ -8,7 +8,7 @@
 #  * of all or any part of the contents of this software is strictly prohibited.
 #  */
 #
-FROM openjdk:8-jre-slim
+FROM openjdk:8-jre
 
 ENV HDP_VERSION=2.6.2.0-189
 RUN apt-get update && \
