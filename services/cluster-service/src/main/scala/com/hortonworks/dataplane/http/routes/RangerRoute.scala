@@ -23,8 +23,8 @@ import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, Cluster
 import com.hortonworks.dataplane.http.BaseRoute
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
-import play.api.libs.json.{JsObject, Json}
+import scala.util.{Failure, Success, Try}
+import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
 import com.hortonworks.dataplane.http.JsonSupport._
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
 
@@ -54,11 +54,11 @@ class RangerRoute @Inject()(
     }
 
   val rangerPolicy =
-    path ("cluster" / LongNumber / "ranger" / "policy" / Segment / Segment) { (clusterId, dbName, tableName) =>
-      parameters("limit".as[Int], "offset".as[Int]) { (limit, offset) =>
+    path ("cluster" / LongNumber / "ranger" / "policies") { clusterId =>
+      parameters("limit".as[Int], "offset".as[Int], "serviceType".as[String], "dbName".as[String].?, "tableName".as[String].?, "tags".as[String].?) { (limit, offset, serviceType, dbName, tableName, tags) =>
         get {
-          onComplete(requestRangerForPolicies(clusterId, dbName, tableName, offset, limit)) {
-            case Success(res) => complete(success(res.json))
+          onComplete(requestRangerForPolicies(clusterId, serviceType, dbName, tableName, tags, offset, limit)) {
+            case Success(json) => complete(success(json))
             case Failure(th) => th match {
               case th:ServiceNotFound => complete(StatusCodes.NotFound, errors(th))
               case _ => complete(StatusCodes.InternalServerError, errors(th))
@@ -68,22 +68,64 @@ class RangerRoute @Inject()(
       }
     }
 
-  private def requestRangerForPolicies(clusterId: Long, dbName: String, tableName: String, offset: Long, pageSize: Long) : Future[WSResponse] = {
+  private def requestRangerForPolicies(clusterId: Long, serviceType: String, dbName: Option[String], tableName: Option[String], tags: Option[String], offset: Long, pageSize: Long): Future[JsValue] = {
+    serviceType match {
+      case "hive" => requestRangerForResourcePolicies(clusterId, dbName.get, tableName.get, offset, pageSize)
+      case "tag" => requestRangerForTagPolicies(clusterId, serviceType, dbName, tableName, tags, offset, pageSize)
+      case _ =>  throw UnsupportedInputException(1001, "This is not a supported Ranger service.")
+    }
+  }
+
+  private def requestRangerForTagPolicies(clusterId: Long, serviceType: String, dbName: Option[String], tableName: Option[String], tags: Option[String], offset: Long, pageSize: Long) : Future[JsObject] = {
+    // assuming that no tag can have more than one policy
+    val queries = getBuiltQueries(serviceType, tags, offset = 0, pageSize)
     for {
       service <- getConfigOrThrowException(clusterId)
       url <- getRangerUrlFromConfig(service)
       baseUrls <- extractUrlsWithIp(url, clusterId)
       user <- storageInterface.getConfiguration("dp.ranger.user")
       pass <- storageInterface.getConfiguration("dp.ranger.password")
-      urlToHit <- Future.successful(s"${baseUrls.head}/service/plugins/policies/service/1?startIndex=${offset}&pageSize=${pageSize}&resource:database=${dbName}&resource:table=${tableName}")
-      tmp <- Future.successful(println(urlToHit))
-      response <- ws.url(urlToHit)
-        .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
-        .withAuth(user.get,pass.get,WSAuthScheme.BASIC)
-        .get()
+      services <- getRangerServicesForType(baseUrls.head, user, pass, serviceType)
+      policies <-  Future.sequence(services.map(cServiceId => getRangerPoliciesByServiceIdAndQueries(baseUrls.head, user, pass, cServiceId, queries))).map(_.flatten)
     } yield {
-      response
+      val _policies = policies.slice(offset.toInt, (offset + pageSize).toInt)
+      Json.obj(
+        "startIndex" -> offset,
+        "pageSize" -> pageSize,
+        "totalCount" -> policies.size,
+        "resultSize" -> _policies.size,
+        "policies" -> Json.toJson(_policies)
+      )
     }
+  }
+
+  private def getBuiltQueries(serviceType: String, tags: Option[String], offset: Long, pageSize: Long): Seq[String] = {
+    tags.getOrElse("").trim.split(",").map(_.trim).filter(cTag => !cTag.isEmpty).sorted.map(cTag => s"startIndex=${offset}&pageSize=${pageSize}&resource:tag=${cTag}")
+  }
+
+  private def getRangerServicesForType(uri: String, user: Option[String], pass: Option[String], serviceType: String): Future[Seq[Long]] = {
+    ws.url(s"${uri}/service/public/v2/api/service?serviceType=$serviceType")
+      .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+      .withAuth(user.get,pass.get, WSAuthScheme.BASIC)
+      .get()
+      .map { response =>
+        (response.json \\ "id").map { id => id.validate[Long].get }
+      }
+  }
+
+  private def getRangerPoliciesByServiceIdAndQuery(uri: String, user: Option[String], pass: Option[String], serviceId: Long, query: String): Future[Seq[JsObject]] = {
+    ws.url(s"${uri}/service/plugins/policies/service/$serviceId?$query")
+      .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+      .withAuth(user.get, pass.get, WSAuthScheme.BASIC)
+      .get()
+      .map { response => (response.json \ "policies").validate[Seq[JsObject]].get }
+  }
+
+  private def getRangerPoliciesByServiceIdAndQueries(uri: String, user: Option[String], pass: Option[String], serviceId: Long, queries: Seq[String]): Future[Seq[JsObject]] = {
+    val futures = queries
+      .map(cQuery => getRangerPoliciesByServiceIdAndQuery(uri, user, pass, serviceId, cQuery))
+
+    Future.sequence(futures).map(_.flatten)
   }
 
   private def requestRangerForAudit(clusterId: Long, dbName: String, tableName: String, offset: Long, pageSize: Long, accessType: String, accessResult:String) : Future[WSResponse] = {
@@ -134,6 +176,22 @@ class RangerRoute @Inject()(
         case Left(errors) => throw new Exception(s"Cannot translate the hostname into an IP address $errors")
       }
 
+  }
+
+  private def requestRangerForResourcePolicies(clusterId: Long, dbName: String, tableName: String, offset: Long, pageSize: Long) : Future[JsValue] = {
+    (for {
+      service <- getConfigOrThrowException(clusterId)
+      url <- getRangerUrlFromConfig(service)
+      baseUrls <- extractUrlsWithIp(url, clusterId)
+      user <- storageInterface.getConfiguration("dp.ranger.user")
+      pass <- storageInterface.getConfiguration("dp.ranger.password")
+      urlToHit <- Future.successful(s"${baseUrls.head}/service/plugins/policies/service/1?startIndex=${offset}&pageSize=${pageSize}&resource:database=${dbName}&resource:table=${tableName}")
+      tmp <- Future.successful(println(urlToHit))
+      response <- ws.url(urlToHit)
+        .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+        .withAuth(user.get,pass.get,WSAuthScheme.BASIC)
+        .get()
+    } yield response.json)
   }
 
 }

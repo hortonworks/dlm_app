@@ -57,7 +57,9 @@
     "unauthorizedMessage": "You are not authorized to view this page.",
     "serviceDisabled": "Service Not Enabled",
     "serviceDisabledMessage": "This service has not been enabled by your Admin. Please contact your Data plane Administrator to enable it.",
-    "invalidUser": "You are not an authorized Data plane user. Please contact your Data plane Administrator."
+    "invalidUser": "You are not an authorized Data plane user. Please contact your Data plane Administrator.",
+    "noMatch": "No Match found...",
+    "searching": "Searching..."
   },
   "pages": {
     "signin" :{
@@ -115,6 +117,10 @@
           "groups": "Groups",
           "saveAndLogin": "SAVE & LOGIN",
           "configSuccess": "LDAP ADDED SUCCESSFULLY"
+        },
+        "description" : {
+          "ldapUserFetchError": "Not able to fetch users from LDAP.",
+          "ldapGroupFetchError": "Not able to fetch groups from LDAP"
         }
       }
     },
@@ -256,7 +262,7 @@
       },
       "labels": {
         "confirmDelete": "Delete Confirmation",
-        "messageDelete": "Are you sure you want to delete dataset <strong>{{datasetName}}</strong>?",
+        "messageDelete": "Are you sure you want to delete asset collection <strong>{{datasetName}}</strong>?",
         "successfullyDeleted": "<strong>{{datasetName}}</strong> was successfully deleted.",
         "newDataset": "Add Asset Collection",
         "addFavourites": "Add to Favourites",
@@ -278,7 +284,9 @@
         "addAssets": "Add Assets",
         "description": "Description",
         "belongsTo": "Belongs To",
-        "dbName": "Database Name"
+        "dbName": "Database Name",
+        "resourceBasedPolicies": "Resource Based Policies",
+        "tagBasedPolicies": "Tag Based Policies"
       },
       "ds-editor": {
         "ds-description": "Organize your hive assets into logical groups for subsequent usage.",
@@ -288,6 +296,7 @@
         "fillMandatoryMsg": "Please fill mandatory fields",
         "tagDescription": "Add tags to your asset collection for context and subsequent lookup",
         "asset-description": "Add related data assets into your asset collection, by searching across this Data-Lake",
+        "create-error": "Unable to create asset collection:",
         "action": {
           "next": "Next",
           "save": "Save",
@@ -296,6 +305,9 @@
           "addAssets": "Add Assets",
           "removeAll": "Remove All",
           "addMoreAssets": "Add More Assets"
+        },
+        "errors": {
+          "unique": "An asset collection with this name already exists. Please choose a different name."
         }
       },
       "asset-search": {

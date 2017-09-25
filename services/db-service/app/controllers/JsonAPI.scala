@@ -11,10 +11,8 @@
 
 package controllers
 
-import java.sql.SQLException
-
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
-import domain.API.{EntityNotFound, UpdateError}
+import domain.API.{AlreadyExistsError, EntityNotFound, UpdateError}
 import org.postgresql.util.PSQLException
 import play.api.libs.json.Json
 import play.api.libs.json.Json.JsValueWrapper
@@ -49,6 +47,7 @@ trait JsonAPI extends Controller {
       }
     case e:EntityNotFound => Future.successful(notFound)
     case e:UpdateError => Future.successful(NoContent)
+    case e: AlreadyExistsError => Future.successful(Conflict)
     case e: Exception =>
       Future.successful(InternalServerError(Json.toJson(wrapErrors("500",e.getMessage))))
   }

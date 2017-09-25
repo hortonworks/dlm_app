@@ -9,15 +9,16 @@
  *
  */
 
-import {NgModule} from "@angular/core";
+import {NgModule} from '@angular/core';
 
-import {SharedModule} from "../shared.module";
-import {TaggingWidget} from "./tagging-widget.component";
+import {SharedModule} from '../shared.module';
+import {TaggingWidget} from './tagging-widget.component';
+import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
   declarations: [TaggingWidget],
   exports: [TaggingWidget],
-  imports: [SharedModule],
+  imports: [SharedModule, TranslateModule],
   providers: [],
 })
 export class TaggingWidgetModule {

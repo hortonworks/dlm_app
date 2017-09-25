@@ -16,17 +16,16 @@ import javax.inject.Inject
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.LocationService
-import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.JsonResponses
 import play.api.libs.json.Json
 import play.api.mvc._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class Locations @Inject()(@Named("locationService") val locationService: LocationService,authenticated:Authenticated)
+class Locations @Inject()(@Named("locationService") val locationService: LocationService)
   extends Controller {
 
-  def list(query: Option[String]) = authenticated.async {
+  def list(query: Option[String]) = Action.async {
     locationService.list(query)
       .map { locations =>
         locations match {
@@ -36,7 +35,7 @@ class Locations @Inject()(@Named("locationService") val locationService: Locatio
       }
   }
 
-  def retrieve(locationId: Long) = authenticated.async {
+  def retrieve(locationId: Long) = Action.async {
     locationService.retrieve(locationId)
       .map { location =>
         location match {

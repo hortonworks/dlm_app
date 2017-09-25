@@ -65,6 +65,7 @@
     "karma-jasmine": "^1.0.2",
     "karma-jasmine-html-reporter": "^0.2.2",
     "karma-remap-istanbul": "^0.2.1",
+    "mydaterangepicker": "^4.1.9",
     "prettier": "^1.6.1",
     "protractor": "4.0.9",
     "roboto-npm-webfont": "0.0.4",

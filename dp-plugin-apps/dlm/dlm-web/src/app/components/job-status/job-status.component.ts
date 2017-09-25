@@ -7,7 +7,7 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Job } from 'models/job.model';
 import { JOB_STATUS } from 'constants/status.constant';
 
@@ -16,14 +16,10 @@ import { JOB_STATUS } from 'constants/status.constant';
   templateUrl: './job-status.component.html',
   styleUrls: ['./job-status.component.scss']
 })
-export class JobStatusComponent implements OnInit {
+export class JobStatusComponent {
   JOB_STATUS = JOB_STATUS;
   @Input() job: Job;
 
   constructor() {
   }
-
-  ngOnInit() {
-  }
-
 }

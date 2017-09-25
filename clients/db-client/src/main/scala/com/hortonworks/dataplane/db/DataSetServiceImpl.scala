@@ -32,8 +32,12 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  override def list(): Future[Either[Errors, Seq[Dataset]]] = {
-    ws.url(s"$url/datasets")
+  override def list(name: Option[String]): Future[Either[Errors, Seq[Dataset]]] = {
+    val uri = (name match {
+      case Some(name) => s"$url/datasets?name=$name"
+      case None => s"$url/datasets"
+    })
+    ws.url(uri)
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToDataSets)
@@ -135,6 +139,7 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
     res.status match {
       case 200 => Right((res.json \ "results" \ "data").validate[DatasetAndCategories].get)
       case 404 => Left(Errors(Seq(Error("404", "Resource not found"))))
+      case 409 => Left(Errors(Seq(Error("409", "Conflict"))))
       case _ => mapErrors(res)
     }
   }

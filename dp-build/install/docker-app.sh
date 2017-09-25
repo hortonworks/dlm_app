@@ -29,7 +29,10 @@ docker start dp-app >> install.log 2>&1 || \
         --network dp \
         --detach \
         --publish 80:80 \
+        --publish 443:443 \
+        --env "CERTIFICATE_PASSWORD=$CERTIFICATE_PASSWORD" \
         --env "CONSUL_HOST=$CONSUL_HOST" \
+        --env "USE_TLS=$USE_TLS" \
         --env "DP_APP_HOME=/usr/dp-app" \
         --volume $(pwd)/certs:/usr/dp-app/conf/cert \
         hortonworks/dp-app:$VERSION

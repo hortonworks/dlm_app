@@ -10,8 +10,6 @@
 export interface ListStatus {
   accessTime?: number;
   blockSize?: number;
-  childrenNum?: number;
-  fileId?: number;
   group?: string;
   length?: number;
   modificationTime?: number;
@@ -19,6 +17,5 @@ export interface ListStatus {
   pathSuffix: string;
   permission?: string;
   replication?: number;
-  storagePolicy?: number;
   type?: string;
 }

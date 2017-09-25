@@ -56,14 +56,14 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
 
   @Output() onShowPolicyLog = new EventEmitter<any>();
 
-  constructor(private t: TranslateService,
+  constructor(protected t: TranslateService,
               protected store: Store<fromRoot.State>,
               private router: Router,
               protected logService: LogService) {
-    super(store, logService);
+    super(store, logService, t);
   }
 
-  private translateColumn(columnName: string): string {
+  protected translateColumn(columnName: string): string {
     return this.t.instant(`page.overview.table.column.${columnName}`);
   }
 
@@ -128,7 +128,8 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
       },
       {cellTemplate: this.prevJobsRef, name: this.translateColumn('last_ten_jobs'), prop: 'lastTenJobs', sortable: false},
       {
-        prop: 'lastJobResource.trackingInfo',
+        ...TableComponent.makeFixedWith(160),
+        prop: 'lastJobResource.trackingInfo.progress',
         cellTemplate: this.transferredFormattedTemplate,
         name: this.translateColumn('transferred'),
         cellClass: 'date-cell',

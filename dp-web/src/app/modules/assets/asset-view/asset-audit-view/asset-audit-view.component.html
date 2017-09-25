@@ -8,8 +8,12 @@
   ~  * of all or any part of the contents of this software is strictly prohibited.
   ~  */
   -->
-<div *ngIf="showMockVisualization">
-  <dp-audit-visualization></dp-audit-visualization>
+<div *ngIf="dbName && assetName && state == AWS.LOADED">
+  <dp-audit-visualization 
+    [clusterId] = "clusterId"
+    [dbName] = "dbName"
+    [assetName] = "assetName"
+  ></dp-audit-visualization>
 </div>
 <div *ngIf="state==AWS.NOINFO" class="infoNotAvailable">Audit information is not available</div>
 <div *ngIf="state==AWS.LOADING" class="loading">Loading ...</div>

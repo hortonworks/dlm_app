@@ -32,6 +32,8 @@ import org.asynchttpclient.DefaultAsyncHttpClientConfig
 import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcWSClient
 
+import scala.util.Try
+
 object AppModule extends AbstractModule {
 
   override def configure() = {
@@ -72,9 +74,10 @@ object AppModule extends AbstractModule {
   @Provides
   @Singleton
   def provideWsClient(implicit actorSystem: ActorSystem,
-                      materializer: ActorMaterializer): WSClient = {
+                      materializer: ActorMaterializer,configuration: Config): WSClient = {
     val config = new DefaultAsyncHttpClientConfig.Builder()
       .setAcceptAnyCertificate(true)
+      .setRequestTimeout(Try(configuration.getInt("dp.services.ws.client.requestTimeout.mins")*60*1000).getOrElse(4*60*1000))
       .build
     AhcWSClient(config)
   }
@@ -233,6 +236,8 @@ object AppModule extends AbstractModule {
       dpProfilerRoute.jobDelete ~
       dpProfilerRoute.startAndScheduleJob ~
       dpProfilerRoute.scheduleInfo ~
+      dpProfilerRoute.auditResults ~
+      dpProfilerRoute.auditActions ~
       atlasRoute.hiveAttributes ~
         atlasRoute.hiveTables ~
         atlasRoute.atlasEntities ~

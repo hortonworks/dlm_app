@@ -8,11 +8,11 @@
 
 package controllers
 
-import javax.inject.Inject
+import com.google.inject.Inject
 
 import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import models.JsonFormatters._
 import services.BeaconService
 import play.api.mvc.{Action, Controller}
@@ -24,11 +24,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class Admin @Inject()(
-  val beaconService: BeaconService,
-  authenticated: Authenticated
+  val beaconService: BeaconService
 ) extends Controller {
 
-  def listStatus() = authenticated.async { request =>
+  def listStatus() = AuthenticatedAction.async { request =>
     Logger.info("Received get beacon admin status request")
     implicit val token = request.token
     beaconService.getAllBeaconAdminStatus().map {

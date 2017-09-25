@@ -7,7 +7,11 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-$tooltip-background: #323544;
+$tooltip-background: #484848;
+$tooltip-border-color: #3f3f3f;
+$bullets-per-row: 5;
+$bullet-size: 8px;
+$bullet-margin: 2px;
 
 :host {
   display: block;
@@ -19,11 +23,46 @@ $tooltip-background: #323544;
 }
 
 :host /deep/ {
+  .leaflet-popup-scrolled {
+    border-width: 0;
+  }
+
   .leaflet-popup-content-wrapper {
     background-color: $tooltip-background;
     color: white;
-    border-radius: 4px;
-    padding: 8px 16px;
+    border-radius: 0;
+    padding: 8px 4px;
+
+    .cluster-list {
+      .cluster-list-item {
+        display: flex;
+        padding-top: 5px;
+        margin-bottom: 8px;
+
+        &:not(:first-child) {
+          border-top: 1px solid $tooltip-border-color;
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .cluster-status,
+        .cluster-description {
+          &:hover {
+            cursor: pointer;
+          }
+        }
+        
+        .cluster-status {
+          padding-left: 4px;
+        }
+        .cluster-description {
+          margin-left: 8px;
+          padding-right: 4px;
+        }
+      }
+    }
   }
 
   .leaflet-popup-content {
@@ -32,6 +71,44 @@ $tooltip-background: #323544;
 
   .leaflet-popup-tip {
     background-color: $tooltip-background;
+  }
+
+  .custom-map-marker {
+    .marker-wrapper {
+      position: relative;
+      text-align: center;
+    }
+
+    .marker-icon {
+      font-size: 40px;
+    }
+
+    .marker-counter {
+      position: absolute;
+      width: 86%;
+      background: black;
+      font-weight: 600;
+      color: white;
+      border-radius: 200%;
+      top: 4px;
+      left: 1px;
+      font-size: 14px;
+    }
+
+    .status-bullets {
+      display: flex;
+      flex-wrap: wrap;
+      position: absolute;
+      top: 0;
+      left: 22px;
+      width: ($bullet-size + $bullet-margin) * $bullets-per-row;
+
+      .status-bullet {
+        font-size: $bullet-size;
+        margin-left: $bullet-margin;
+        margin-bottom: $bullet-margin;
+      }
+    }
   }
 }
 
