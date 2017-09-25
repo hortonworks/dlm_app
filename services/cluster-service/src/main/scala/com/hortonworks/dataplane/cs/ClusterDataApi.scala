@@ -39,7 +39,7 @@ import scala.util.Try
 class ClusterDataApi @Inject()(
     private val actorSystem: ActorSystem,
     private val actorMaterializer: ActorMaterializer,
-    private val storageInterface: StorageInterface,
+    private val credentialInterface: CredentialInterface,
     private val clusterComponentService: ClusterComponentService,
     private val clusterHostsService: ClusterHostsService,
     private val dpClusterService: DpClusterService,
@@ -66,11 +66,6 @@ class ClusterDataApi @Inject()(
 
   private lazy val log = Logger(classOf[ClusterDataApi])
 
-
-  private lazy val localUser: Future[Option[String]] =
-    storageInterface.getConfiguration("dp.atlas.user")
-  private lazy val localPass: Future[Option[String]] =
-    storageInterface.getConfiguration("dp.atlas.password")
 
   log.info(s"Constructing a cache with expiry $cacheExpiry secs")
 
@@ -101,12 +96,7 @@ class ClusterDataApi @Inject()(
     new DateTime().toInstant.getMillis <= expiry
   }
 
-  def getCredentials: Future[Credentials] = {
-    for {
-      lu <- localUser
-      lp <- localPass
-    } yield Credentials(lu, lp)
-  }
+  def getCredentials: Future[Credentials] = credentialInterface.getCredential("dp.credential.atlas")
 
   def shouldUseToken(clusterId:Long):Future[Boolean] =  {
 

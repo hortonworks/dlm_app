@@ -18,7 +18,7 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import com.hortonworks.dataplane.commons.domain.Entities.ClusterService
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
-import com.hortonworks.dataplane.cs.StorageInterface
+import com.hortonworks.dataplane.cs.{CredentialInterface, StorageInterface}
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService}
 import com.hortonworks.dataplane.http.BaseRoute
 
@@ -35,6 +35,7 @@ class RangerRoute @Inject()(
       private val clusterComponentService: ClusterComponentService,
       private val clusterHostsService: ClusterHostsService,
       private val storageInterface: StorageInterface,
+      private val credentialInterface: CredentialInterface,
       private val ws: WSClient
                            ) extends BaseRoute {
   val rangerAudit =
@@ -83,10 +84,9 @@ class RangerRoute @Inject()(
       service <- getConfigOrThrowException(clusterId)
       url <- getRangerUrlFromConfig(service)
       baseUrls <- extractUrlsWithIp(url, clusterId)
-      user <- storageInterface.getConfiguration("dp.ranger.user")
-      pass <- storageInterface.getConfiguration("dp.ranger.password")
-      services <- getRangerServicesForType(baseUrls.head, user, pass, serviceType)
-      policies <-  Future.sequence(services.map(cServiceId => getRangerPoliciesByServiceIdAndQueries(baseUrls.head, user, pass, cServiceId, queries))).map(_.flatten)
+      credential <- credentialInterface.getCredential("dp.credential.ranger")
+      services <- getRangerServicesForType(baseUrls.head, credential.user, credential.pass, serviceType)
+      policies <-  Future.sequence(services.map(cServiceId => getRangerPoliciesByServiceIdAndQueries(baseUrls.head, credential.user, credential.pass, cServiceId, queries))).map(_.flatten)
     } yield {
       val _policies = policies.slice(offset.toInt, (offset + pageSize).toInt)
       Json.obj(
@@ -133,13 +133,12 @@ class RangerRoute @Inject()(
       service <- getConfigOrThrowException(clusterId)
       url <- getRangerUrlFromConfig(service)
       baseUrls <- extractUrlsWithIp(url, clusterId)
-      user <- storageInterface.getConfiguration("dp.ranger.user")
-      pass <- storageInterface.getConfiguration("dp.ranger.password")
+      credential <- credentialInterface.getCredential("dp.credential.ranger")
       urlToHit <- Future.successful(s"${baseUrls.head}/service/assets/accessAudit?startIndex=${offset}&pageSize=${pageSize}&sortBy=eventTime&resourcePath=${dbName}%2F${tableName}&accessType=${accessType}&accessResult=${accessResult}")
       tmp <- Future.successful(println(urlToHit))
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
-        .withAuth(user.get,pass.get,WSAuthScheme.BASIC)
+        .withAuth(credential.user.get,credential.pass.get,WSAuthScheme.BASIC)
         .get()
     } yield {
       response
@@ -183,13 +182,12 @@ class RangerRoute @Inject()(
       service <- getConfigOrThrowException(clusterId)
       url <- getRangerUrlFromConfig(service)
       baseUrls <- extractUrlsWithIp(url, clusterId)
-      user <- storageInterface.getConfiguration("dp.ranger.user")
-      pass <- storageInterface.getConfiguration("dp.ranger.password")
+      credential <- credentialInterface.getCredential("dp.credential.ranger")
       urlToHit <- Future.successful(s"${baseUrls.head}/service/plugins/policies/service/1?startIndex=${offset}&pageSize=${pageSize}&resource:database=${dbName}&resource:table=${tableName}")
       tmp <- Future.successful(println(urlToHit))
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
-        .withAuth(user.get,pass.get,WSAuthScheme.BASIC)
+        .withAuth(credential.user.get,credential.pass.get,WSAuthScheme.BASIC)
         .get()
     } yield response.json)
   }

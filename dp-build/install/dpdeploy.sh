@@ -14,9 +14,7 @@ set -e
 source $(pwd)/config.env.sh
 
 CERTS_DIR=`dirname $0`/certs
-KNOX_SIGNING_CERTIFICATE=knox-signing.pem
 DEFAULT_VERSION=0.0.1-latest
-KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
 CLUSTER_SERVICE_CONTAINER="dp-cluster-service"
 DB_CONTAINER="dp-database"
@@ -147,9 +145,9 @@ add_host_entry() {
 }
 
 utils_update_user_secret() {
-    if [ $# -ne 1 ] || [ "$1" != "ambari" ]; then
+    if [[ $# -ne 1  || ( "$1" != "ambari" && "$1" != "atlas" && "$1" != "ranger" ) ]]; then
         echo "Invalid arguments."
-        echo "Usage: dpdeploy.sh utils update-user ambari"
+        echo "Usage: dpdeploy.sh utils update-user [ambari | atlas | ranger]"
         return -1
     else
         update_user_entry "$@"
@@ -157,15 +155,10 @@ utils_update_user_secret() {
 }
 
 update_user_entry() {
-    if [ "$USE_EXT_DB" == "no" ]; then
-        IS_DB_UP=$(docker inspect -f {{.State.Running}} $DB_CONTAINER) || echo "DB container is not running."
-        if [ "$IS_DB_UP" != "true" ]; then
-            echo "Ambari secrets can not be initialized with DB container down. Please run 'init db' and 'migrate' first."
-            exit -1
-        fi
+    if [ "$MASTER_PASSWORD" == "" ]; then
+        read_master_password
     fi
-    
-    source $(pwd)/secrets-manage.sh
+    source $(pwd)/keystore-manage.sh "$@"
 }
 
 destroy() {
@@ -180,7 +173,6 @@ destroy_consul(){
 destroy_knox() {
     echo "Destroying Knox"
     docker rm --force $KNOX_CONTAINER
-    rm -rf ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
     destroy_consul
 }
 
@@ -353,11 +345,21 @@ load_images() {
     fi
 }
 
+init_keystore() {
+   if [ "$MASTER_PASSWORD" == "" ]; then
+       read_master_password
+   fi
+    mkdir -p $(pwd)/certs
+    source $(pwd)/keystore-initialize.sh
+}
+
 init_all() {
     init_db
     reset_db
 
     init_knox
+    
+    init_keystore
 
     init_app
 

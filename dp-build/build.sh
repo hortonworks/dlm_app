@@ -143,7 +143,6 @@ build_installer() {
     mkdir -p ${DP_DOCKER_ROOT_FOLDER}/installer/certs/
 	cp -R install/* ${DP_DOCKER_ROOT_FOLDER}/installer
 	cp dp-docker-build.sh ${DP_DOCKER_ROOT_FOLDER}/installer/
-    cp -R ../dp-app/conf/cert/dp-keystore.jck ${DP_DOCKER_ROOT_FOLDER}/installer/certs/
 	VERSION_STRING=$(get_version)
 	echo ${VERSION_STRING} > ${DP_DOCKER_ROOT_FOLDER}/installer/VERSION	
 }

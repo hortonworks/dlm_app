@@ -55,31 +55,37 @@ class LdapService @Inject()(
             validateBindDn(knoxConf).flatMap {
               case Left(errors) => Future.successful(Left(errors))
               case Right(isBound) => {
-                ldapKeyStore.createCredentialEntry(
+                val tryToWrite = ldapKeyStore.createCredentialEntry(
                   knoxConf.bindDn.get,
-                  knoxConf.password.get) match {
-                  case Left(errors) => Future.successful(Left(errors))
-                  case Right(isCreated) => {
-                    val ldapConfiguration =
-                      LdapConfiguration(id = knoxConf.id,
-                        ldapUrl = knoxConf.ldapUrl,
-                        bindDn = knoxConf.bindDn,
-                        userSearchBase = knoxConf.userSearchBase,
-                        userSearchAttributeName = knoxConf.userSearchAttributeName,
-                        groupSearchBase = knoxConf.groupSearchBase,
-                        groupSearchAttributeName = knoxConf.groupSearchAttributeName,
-                        groupObjectClass = knoxConf.groupObjectClass,
-                        groupMemberAttributeName = knoxConf.groupMemberAttributeName
-                      )
-                    ldapConfigService.create(ldapConfiguration).map {
-                      case Left(errors) => Left(errors)
-                      case Right(createdLdapConfig) => {
-                        configService.setConfig("dp.knox.whitelist",requestHost)
-                        Right(true)
-                      }
-                    }
+                  knoxConf.password.get
+                )
+                Future.fromTry(tryToWrite)
+                  .map { _ =>
+                    LdapConfiguration(id = knoxConf.id,
+                      ldapUrl = knoxConf.ldapUrl,
+                      bindDn = knoxConf.bindDn,
+                      userSearchBase = knoxConf.userSearchBase,
+                      userSearchAttributeName = knoxConf.userSearchAttributeName,
+                      groupSearchBase = knoxConf.groupSearchBase,
+                      groupSearchAttributeName = knoxConf.groupSearchAttributeName,
+                      groupObjectClass = knoxConf.groupObjectClass,
+                      groupMemberAttributeName = knoxConf.groupMemberAttributeName
+                    )
                   }
-                }
+                  .flatMap { config =>
+                    ldapConfigService
+                      .create(config)
+                      .map {
+                        case Left(errors) => Left(errors)
+                        case Right(createdLdapConfig) => {
+                          configService.setConfig("dp.knox.whitelist",requestHost)
+                          Right(true)
+                        }
+                      }
+                  }
+                  .recover {
+                    case ex: Exception => Right(false)
+                  }
               }
             }
           }
@@ -147,7 +153,7 @@ class LdapService @Inject()(
     //TODO bind dn validate.
     configuredLdap.headOption match {
       case Some(l)=>{
-        val cred: Option[CredentialEntry] = ldapKeyStore.getCredentialEntry(l.bindDn.get)
+        val cred: Option[CredentialEntry] = ldapKeyStore.getCredentialEntry(l.bindDn.get).toOption
         cred match {
           case Some(cred) =>
             getLdapContext(l.ldapUrl, l.bindDn.get, cred.password).map{ ctx=>
@@ -168,7 +174,7 @@ class LdapService @Inject()(
   }
 
   def getPassword(bindDn:String):Option[String]={
-    val cred: Option[CredentialEntry]=ldapKeyStore.getCredentialEntry(bindDn)
+    val cred: Option[CredentialEntry]=ldapKeyStore.getCredentialEntry(bindDn).toOption
     if (cred.isDefined)Some(cred.get.password) else None
   }
 
