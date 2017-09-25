@@ -17,9 +17,10 @@ import com.google.inject.Inject
 import com.hortonworks.datapalane.consul.{ConsulClientFactory, DpConsulClientImpl}
 import com.hortonworks.datapalane.consul.model.ConsulEvent
 import com.typesafe.scalalogging.Logger
+import play.api.Configuration
 
 @Singleton
-class KnoxConfigurator @Inject()(private val config: play.api.Configuration) {
+class KnoxConfigurator @Inject()(private val config: Configuration) {
   private val logger = Logger(classOf[KnoxConfigurator])
   private val dpConsulClient = ConsulClientFactory.getConsulClilent(
     config.getString("consul.host").getOrElse("localhost"),

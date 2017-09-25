@@ -22,7 +22,7 @@ import { getCountPairsForClusters } from 'selectors/pairing.selector';
 import { getAllPoliciesWithClusters, getCountPoliciesForSourceClusters } from 'selectors/policy.selector';
 import * as fromRoot from 'reducers';
 import { TranslateService } from '@ngx-translate/core';
-import { MapSize, ClusterMapData, ClusterMapPoint } from 'models/map-data';
+import { MapSize, ClusterMapData, ClusterMapPoint, ClusterMapEntity } from 'models/map-data';
 import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
 import { ProgressState } from 'models/progress-state.model';
 import { getMergedProgress } from 'selectors/progress.selector';
@@ -58,7 +58,8 @@ export class ClustersComponent implements OnInit, OnDestroy {
     const pairsCount$: Observable<PairsCountEntity> = store.select(getCountPairsForClusters);
     const policiesCount$: Observable<PoliciesCountEntity> = store.select(getCountPoliciesForSourceClusters);
     const allResources$ = Observable.combineLatest(clusters$, pairsCount$, policiesCount$);
-    this.overallProgress$ = store.select(getMergedProgress(CLUSTERS_REQUEST_ID, POLICIES_REQUEST_ID, PAIRINGS_REQUEST_ID));
+    this.overallProgress$ = store.select(getMergedProgress(CLUSTERS_REQUEST_ID, POLICIES_REQUEST_ID, PAIRINGS_REQUEST_ID))
+      .distinctUntilChanged(isEqual);
     this.lowCapacityClusters$ = this.store.select(getClustersWithLowCapacity);
     this.policies$ = store.select(getAllPoliciesWithClusters);
     this.overallProgressSubscription$ = this.overallProgress$.distinctUntilChanged(isEqual).subscribe(progress => {
@@ -108,7 +109,7 @@ export class ClustersComponent implements OnInit, OnDestroy {
       // prioritize UNHEALTHY status over WARNING when display cluster dot marker
       const healthStatus = lowCapacityClusters.some(c => c.id === cluster.id) && cluster.healthStatus !== CLUSTER_STATUS.UNHEALTHY ?
         CLUSTER_STATUS.WARNING : cluster.healthStatus;
-      const clusterData = {
+      const clusterData = <ClusterMapEntity>{
         ...cluster,
         healthStatus,
         policiesCounter
@@ -123,8 +124,19 @@ export class ClustersComponent implements OnInit, OnDestroy {
     this.store.dispatch(loadPolicies({numResults: ALL_POLICIES_COUNT}, {requestId: POLICIES_REQUEST_ID}));
   }
 
-  handleClickMarker(cluster: Cluster) {
-    this.selectedCluster$.next(cluster);
+  handleClickMarker(clusters: Cluster[]): void {
+    const selectedCluster = this.selectedCluster$.getValue();
+    if (this.selectedCluster$.getValue() && clusters.some(c => c.id === selectedCluster.id)) {
+      const selectedIndex = clusters.findIndex(c => c.id === selectedCluster.id);
+      const nextCluster = selectedIndex > -1 && clusters[selectedIndex + 1] || clusters[0];
+      this.selectedCluster$.next(nextCluster);
+      return;
+    }
+    this.selectedCluster$.next(clusters[0]);
+  }
+
+  handleLegendClose() {
+    this.selectedCluster$.next(null);
   }
 
   ngOnDestroy() {

@@ -34,3 +34,4 @@ docker start knox >> install.log 2>&1 || \
         --volume knox-config:/etc/knox/conf \
         --volume $(pwd)/certs:/dp-shared \
         hortonworks/dp-knox:$VERSION
+        

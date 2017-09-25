@@ -21,7 +21,7 @@
       "status": "FAILED",
       "startTime": "2017-07-31T16:53:52",
       "endTime": "2017-07-31T17:11:25",
-      "trackingInfo": "{\"jobId\":\"job_1501190983539_0016\",\"jobType\":\"MAIN\",\"totalMapTasks\":0,\"completedMapTasks\":0,\"bytesCopied\":0,\"filesCopied\":0,\"timeTaken\":211}",
+      "trackingInfo": "{\"jobId\":\"job_1501190983539_0016\",\"jobType\":\"MAIN\",\"progress\": {\"total\":0,\"completed\":0,\"bytesCopied\":0,\"filesCopied\":0,\"timeTaken\":211}}",
       "message": "java.io.IOException: DistCp failure: Job job_1501190983539_0016 has failed: Task failed task_1501190983539_0016_m_000000\nJob failed as tasks failed. failedMaps:1 failedReduces:0\n"
     }]
   }, {
@@ -31,7 +31,7 @@
     "status": "RUNNING",
     "sourceDataset": "/",
     "targetDataset": "/",
-    "frequency": 86400,
+    "frequency": 60,
     "endTime": "9999-12-31T00:00:00",
     "sourceCluster": "dc-Europe$c1",
     "targetCluster": "dc-Europe$c2",
@@ -45,7 +45,7 @@
       "status": "FAILED",
       "startTime": "2017-07-31T16:07:39",
       "endTime": "2017-07-31T16:15:13",
-      "trackingInfo": "{\"jobId\":\"job_1501190983539_0011\",\"jobType\":\"MAIN\",\"totalMapTasks\":0,\"completedMapTasks\":0,\"bytesCopied\":0,\"filesCopied\":0,\"timeTaken\":208}",
+      "trackingInfo": "{\"jobId\":\"job_1501194648859_0010\",\"jobType\":\"MAIN\",\"progress\":{\"total\":3,\"completed\":1,\"killed\":1,\"failed\":0,\"bytesCopied\":0,\"filesCopied\":1000,\"timeTaken\":7430,\"unit\":\"table\"}}",
       "message": "java.io.IOException: DistCp failure: Job job_1501190983539_0011 has failed: Task failed task_1501190983539_0011_m_000000\nJob failed as tasks failed. failedMaps:1 failedReduces:0\n"
     }]
   }, {
@@ -69,7 +69,7 @@
       "status": "SUCCESS",
       "startTime": "2017-07-31T16:28:38",
       "endTime": "2017-07-31T16:29:12",
-      "trackingInfo": "{\"jobId\":\"job_1501190983539_0012\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":3872393,\"filesCopied\":583,\"timeTaken\":22780}",
+      "trackingInfo": "{\"jobId\":\"job_1501190983539_0012\",\"jobType\":\"MAIN\",\"progress\": {\"total\":1,\"completed\":1,\"failed\": 0,\"killed\": 0,\"bytesCopied\":3872393,\"filesCopied\":583,\"timeTaken\":22780}}",
       "message": "SUCCESS"
     }]
   }, {
@@ -114,10 +114,10 @@
       "type": "FS",
       "executionType": "FS",
       "user": "beacon",
-      "status": "RUNNING",
+      "status": "IGNORED",
       "startTime": "2017-07-31T22:26:00",
       "endTime": "2017-07-31T22:26:18",
-      "trackingInfo": "{\"jobId\":\"job_1501194648859_0316\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7558}",
+      "trackingInfo": "{\"jobId\":\"job_1501194648859_0316\",\"jobType\":\"MAIN\",\"progress\": {\"total\":1,\"completed\":1,\"failed\": 0,\"killed\": 0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7558}}",
       "message": "SUCCESS"
     }, {
       "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001@155",
@@ -126,10 +126,10 @@
       "type": "FS",
       "executionType": "FS",
       "user": "beacon",
-      "status": "SUCCESS",
+      "status": "RUNNING",
       "startTime": "2017-07-31T21:56:00",
       "endTime": "2017-07-31T21:56:17",
-      "trackingInfo": "{\"jobId\":\"job_1501194648859_0314\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7800}",
+      "trackingInfo": "{\"jobId\":\"job_1501194648859_0314\",\"jobType\":\"MAIN\",\"progress\": {\"total\":1,\"completed\":1,\"failed\": 0,\"killed\": 0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7800}}",
       "message": "SUCCESS"
     }, {
       "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001@154",
@@ -141,7 +141,7 @@
       "status": "SUCCESS",
       "startTime": "2017-07-31T21:26:00",
       "endTime": "2017-07-31T21:26:16",
-      "trackingInfo": "{\"jobId\":\"job_1501194648859_0312\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7461}",
+      "trackingInfo": "{\"jobId\":\"job_1501194648859_0312\",\"jobType\":\"MAIN\",\"progress\": {\"total\":1,\"completed\":1,\"failed\": 0,\"killed\": 0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7461}}",
       "message": "SUCCESS"
     }]
   }, {
@@ -166,7 +166,7 @@
       "status": "SUCCESS",
       "startTime": "2017-07-31T22:18:00",
       "endTime": "2017-07-31T22:18:18",
-      "trackingInfo": "{\"jobId\":\"job_1501194648859_0315\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7364}",
+      "trackingInfo": "{\"jobId\":\"job_1501194648859_0315\",\"jobType\":\"MAIN\",\"progress\": {\"total\":1,\"completed\":1,\"failed\": 0,\"killed\": 0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7364}}",
       "message": "SUCCESS"
     }, {
       "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log/0/1501195622804/000000001@191",
@@ -178,7 +178,7 @@
       "status": "SUCCESS",
       "startTime": "2017-07-31T21:48:00",
       "endTime": "2017-07-31T21:48:19",
-      "trackingInfo": "{\"jobId\":\"job_1501194648859_0313\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7510}",
+      "trackingInfo": "{\"jobId\":\"job_1501194648859_0313\",\"jobType\":\"MAIN\",\"progress\": {\"total\":1,\"completed\":1,\"failed\": 0,\"killed\": 0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7510}}",
       "message": "SUCCESS"
     }, {
       "id": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log/0/1501195622804/000000001@190",
@@ -190,7 +190,7 @@
       "status": "SUCCESS",
       "startTime": "2017-07-31T21:18:00",
       "endTime": "2017-07-31T21:18:18",
-      "trackingInfo": "{\"jobId\":\"job_1501194648859_0311\",\"jobType\":\"MAIN\",\"totalMapTasks\":1,\"completedMapTasks\":1,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7591}",
+      "trackingInfo": "{\"jobId\":\"job_1501194648859_0311\",\"jobType\":\"MAIN\",\"progress\": {\"total\":1,\"completed\":1,\"failed\": 0,\"killed\": 0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7591}}",
       "message": "SUCCESS"
     }]
   }, {

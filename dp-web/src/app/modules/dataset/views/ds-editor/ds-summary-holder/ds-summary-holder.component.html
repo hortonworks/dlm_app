@@ -23,24 +23,10 @@
   <label>Tags</label><span class="cs-list"><span *ngFor="let tag of tags;">{{tag}}</span></span>
 </div>
 
-  <!--<br/><br/>-->
-  <!--<span class="leftCont"><b>Assets</b></span>:&nbsp;<span *ngIf="dsModel.counts">{{dsModel.counts.hiveCount + dsModel.counts.filesCount}}</span>-->
-  <!--<div class="tabCont">-->
-    <!--<div class="tab active">-->
-      <!--<div class="tabName">Total</div>-->
-      <!--<div class="tabCount">{{dsModel.counts.hiveCount + dsModel.counts.filesCount}}</div>-->
-    <!--</div>-->
-    <!--<div class="tab">-->
-      <!--<div class="tabName">Hive</div>-->
-      <!--<div class="tabCount">{{dsModel.counts.hiveCount}}</div>-->
-    <!--</div>-->
-    <!--<div class="tab">-->
-      <!--<div class="tabName">Files</div>-->
-      <!--<div class="tabCount">{{dsModel.counts.filesCount}}</div>-->
-    <!--</div>-->
-    <!--<div style="clear: both;"></div>-->
-  <!--</div>-->
-  <!--<br/>-->
+<div class="button-container">
+  <button class="mdl-button btn-hwx-primary" (click)="onSave()">{{"pages.dataset.ds-editor.action.save" | translate}}</button>
+  <button class="mdl-button btn-hwx-default" (click)="onCancel()">{{"pages.dataset.ds-editor.action.cancel" | translate}}</button>
+</div>
 
 
 

@@ -27,3 +27,7 @@ export class PolicySchema {
 	groups : string[];
 	users : string[];
 }
+
+export class TagPolicySchema extends PolicySchema{
+  tags: string[];
+}

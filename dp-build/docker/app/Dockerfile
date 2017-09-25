@@ -34,5 +34,7 @@ RUN chmod +x /bootstrap.sh && \
 RUN rm -rf /etc/sv/getty-5
 RUN mkdir -p /usr/dp-app/bin/logs/ && touch /usr/dp-app/bin/logs/application.log
 RUN ln -sf /dev/stdout /usr/dp-app/bin/logs/application.log
+
+VOLUME ["/var/log/nginx"]
 EXPOSE 80 443 9000
 ENTRYPOINT ["/bootstrap.sh"]

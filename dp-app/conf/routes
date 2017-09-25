@@ -22,7 +22,7 @@ GET           /api/identity/:userId                                  controllers
 
 #api
 
-GET           /api/init                                              controllers.Configuration.init
+GET           /api/init                                              controllers.Config.init
 GET           /api/lakes                                             controllers.DataplaneClusters.list
 POST          /api/lakes                                             controllers.DataplaneClusters.create
 GET           /api/lakes/:lakeId                                     controllers.DataplaneClusters.retrieve(lakeId: Long)
@@ -50,7 +50,7 @@ GET           /api/datasets/categories/:search                       controllers
 POST          /api/datasets/categories                               controllers.DataSets.createCategory
 
 #DataSet
-GET           /api/datasets                                          controllers.DataSets.list
+GET           /api/datasets                                          controllers.DataSets.list(name: Option[String])
 POST          /api/datasets                                          controllers.DataSets.create
 GET           /api/datasets/:datasetId                               controllers.DataSets.retrieve(datasetId)
 DELETE        /api/datasets/:datasetId                               controllers.DataSets.delete(datasetId)
@@ -84,12 +84,14 @@ GET           /api/assets/byguid/:guid                                controller
 
 #Ranger
 GET           /api/ranger/audit/:clusterId/:dbName/:tableName        controllers.RangerAttributes.getAuditDetails(clusterId: String, dbName: String, tableName: String, offset: String ?= "0", limit:String ?= "20", accessType:String ?="", accessResult:String ?="")
-GET           /api/ranger/policy/:clusterId/:dbName/:tableName        controllers.RangerAttributes.getPolicyDetails(clusterId: String, dbName: String, tableName: String, offset: String ?= "0", limit:String ?= "20")
+GET           /api/ranger/:clusterId/policies                        controllers.RangerAttributes.getPolicyDetails(clusterId: Long, offset: Long ?= 0, limit: Long ?= 20, serviceType: String, dbName: Option[String], tableName: Option[String], guid: Option[String])
 
 #DpProfiler
 POST          /api/dpProfiler/startJob                                controllers.DpProfilerAttributes.startProfilerJob(clusterId: String, dbName: String, tableName: String)
 GET           /api/dpProfiler/jobStatus                               controllers.DpProfilerAttributes.getProfilerJobStatus(clusterId: String, dbName: String, tableName: String)
 GET           /api/dpProfiler/scheduleStatus                          controllers.DpProfilerAttributes.getScheduleStatus(clusterId: String, dataSetId: String)
+GET           /api/dpProfiler/auditResults                            controllers.DpProfilerAttributes.getAuditResults(clusterId: String, dbName: String, tableName: String, startDate: String, endDate: String, userName: String ?="")
+GET           /api/dpProfiler/auditActions                            controllers.DpProfilerAttributes.getAuditActions(clusterId: String, dbName: String, tableName: String, startDate: String, endDate: String, userName: String ?="")
 
 #LDAP
 POST          /api/knox/validate                                     controllers.KnoxConfig.validate

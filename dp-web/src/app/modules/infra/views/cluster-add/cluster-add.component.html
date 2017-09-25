@@ -136,7 +136,7 @@
               <div class="form-group">
                 <label>{{"common.tags" | translate}} </label>
                 <div class="hwx-inline-desc">{{"pages.infra.description.tags" | translate}}</div>
-                <tagging-widget id="tags" [tags]="cluster.tags" [clearOnSearch]="true" (onNewSearch)="onNewTagAddition($event)"></tagging-widget>
+                <tagging-widget [searchable]="false" id="tags" [tags]="cluster.tags" [clearOnSearch]="true" (onNewSearch)="onNewTagAddition($event)"></tagging-widget>
               </div>
               <div class="form-group">
                 <label>{{"common.description" | translate}}</label>

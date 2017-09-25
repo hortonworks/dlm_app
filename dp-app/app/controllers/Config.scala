@@ -16,23 +16,24 @@ import javax.inject.Inject
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.DpClusterService
-import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import models.{JsonResponses, WrappedErrorsException}
 import play.api.libs.json.Json
 import play.api.mvc._
+import play.api.Configuration
 import services.LdapService
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class Configuration @Inject()(@Named("dpClusterService") val dpClusterService:
-                              DpClusterService, authenticated:Authenticated,
-                              ldapService: LdapService,
-                              appConfiguration: play.api.Configuration)
+class Config @Inject()(
+                               @Named("dpClusterService") val dpClusterService: DpClusterService,
+                               ldapService: LdapService,
+                               appConfiguration: Configuration)
   extends Controller {
 
 
-  def init = authenticated.async { request =>
+  def init = AuthenticatedAction.async { request =>
     for {
       user <- Future.successful(request.user)
       lake <- isDpClusterSetUp()
@@ -45,7 +46,7 @@ class Configuration @Inject()(@Named("dpClusterService") val dpClusterService:
         "authWasInitialized" -> auth,
         "rbacWasInitialized" -> rbac
       )
-    ).withHeaders(NO_CACHE_HEADER)
+    )
   }
 
 

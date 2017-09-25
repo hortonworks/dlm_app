@@ -4,8 +4,6 @@
 
 docker run \
     --rm \
-    --interactive \
-    --tty \
     --entrypoint /scripts/certs-generate.sh \
     --env "CERTIFICATE_PASSWORD=$CERTIFICATE_PASSWORD" \
     --volume $(pwd)/certs:/dp-shared \

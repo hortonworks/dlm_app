@@ -16,7 +16,7 @@ import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.typesafe.scalalogging.Logger
 import com.hortonworks.dataplane.commons.auth.{
-  Authenticated,
+  AuthenticatedAction,
   AuthenticatedRequest
 }
 import com.hortonworks.dataplane.db.Webservice.ConfigService
@@ -32,8 +32,7 @@ import com.google.inject.name.Named
 class KnoxConfig @Inject()(
     val ldapService: LdapService,
     val knoxConfigurator: KnoxConfigurator,
-    @Named("configService") configService: ConfigService,
-    authenticated: Authenticated)
+    @Named("configService") configService: ConfigService)
     extends Controller {
   val logger = Logger(classOf[KnoxConfig])
 
@@ -52,7 +51,7 @@ class KnoxConfig @Inject()(
     }
   }
 
-  def configure = authenticated.async(parse.json) { request =>
+  def configure = AuthenticatedAction.async(parse.json) { request =>
     request.body
       .validate[KnoxConfigInfo]
       .map { ldapConfigInfo: KnoxConfigInfo =>
@@ -104,7 +103,7 @@ class KnoxConfig @Inject()(
     }
   }
 
-  def validate = authenticated.async(parse.json) { request =>
+  def validate = AuthenticatedAction.async(parse.json) { request =>
     request.body
       .validate[KnoxConfigInfo]
       .map { ldapConf =>
@@ -136,15 +135,19 @@ class KnoxConfig @Inject()(
             case None =>
               handleErrors(
                 Errors(
-                  Seq(new Error("Exception", "No ldap configuration found"))))
+                  Seq(Error("Exception", "No ldap configuration found"))))
             case Some(ldapConfig) => {
               val userDnTemplate =
                 s"${ldapConfig.userSearchAttributeName.get}={0},${ldapConfig.userSearchBase.get}"
+              val password=ldapService.getPassword(ldapConfig.bindDn.get)
               val knoxLdapConfig =
                 KnoxConfiguration(ldapUrl = ldapConfig.ldapUrl,
                                   bindDn = ldapConfig.bindDn,
                                   userDnTemplate = Some(userDnTemplate),
-                                  domains = whiteListdomains)
+                                  domains = whiteListdomains,
+                                  userSearchAttributeName = ldapConfig.userSearchAttributeName,
+                                  userSearchBase = ldapConfig.userSearchBase,
+                                  password=password)
               Ok(Json.toJson(knoxLdapConfig))
             }
           }

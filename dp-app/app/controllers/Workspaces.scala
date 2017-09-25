@@ -14,24 +14,23 @@ package controllers
 import javax.inject.Inject
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{DatasetAndCategoryIds, Workspace}
+import com.hortonworks.dataplane.commons.domain.Entities.Workspace
 import com.hortonworks.dataplane.db.Webservice.WorkspaceService
-import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import models.JsonResponses
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.Controller
+import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.Future
 
-class Workspaces @Inject()(@Named("workspaceService") val workspaceService: WorkspaceService,
-                           authenticated: Authenticated)
+class Workspaces @Inject()(@Named("workspaceService") val workspaceService: WorkspaceService)
   extends Controller {
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  def list = authenticated.async {
+  def list = Action.async {
     workspaceService.list()
       .map {
         case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
@@ -39,7 +38,7 @@ class Workspaces @Inject()(@Named("workspaceService") val workspaceService: Work
       }
   }
 
-  def retrieve(name: String) = authenticated.async {
+  def retrieve(name: String) = Action.async {
     workspaceService.retrieve(name)
       .map {
         case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
@@ -47,7 +46,7 @@ class Workspaces @Inject()(@Named("workspaceService") val workspaceService: Work
       }
   }
 
-  def create = authenticated.async(parse.json) { request =>
+  def create = AuthenticatedAction.async(parse.json) { request =>
     request.body.validate[Workspace].map { workspace =>
       workspaceService.create(workspace.copy(createdBy = Some(request.user.id.get)))
         .map {
@@ -57,7 +56,7 @@ class Workspaces @Inject()(@Named("workspaceService") val workspaceService: Work
     }.getOrElse(Future.successful(BadRequest))
   }
 
-  def delete(name: String) = authenticated.async {
+  def delete(name: String) = Action.async {
     workspaceService.delete(name)
       .map {
         case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))

@@ -15,9 +15,13 @@ public class RequestResponseUtils {
   @Autowired
   private HostUtils hostUtils;
 
+  @Autowired
+  private Utils utils;
+
   private void redirectTo(String path) {
     RequestContext ctx = RequestContext.getCurrentContext();
     try {
+      utils.addNoCacheHeaders(ctx.getResponse());
       ctx.getResponse().sendRedirect(path);
     } catch (IOException e) {
       throw new RuntimeException(e);
