@@ -8,7 +8,9 @@
  *  * of all or any part of the contents of this software is strictly prohibited.
  *
  */
-import {AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+import {AfterViewInit, Input, Component, ElementRef, HostListener, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+import {AssetService} from '../../../../../services/asset.service';
+import {IMyDrpOptions, IMyDateRangeModel} from 'mydaterangepicker';
 
 declare const d3: any;
 declare const nv: any;
@@ -21,18 +23,35 @@ declare const nv: any;
 })
 export class AuditVisualizationComponent implements OnInit, AfterViewInit {
 
+  @Input() assetName;
+  @Input() dbName;
+  @Input() clusterId: string;
+  
   @ViewChild('stackedbarchart') stackedBarChart: ElementRef;
   @ViewChild('donutchart') donutChart: ElementRef;
 
   filterOptions: any[] = [];
   filters = [];
-  searchText: string;
+  userName: string;
   showFilterListing = false;
   selectedFilterIndex = -1;
   private availableFilterCount = 0;
 
-  users = ['insurance_admin', 'admin', 'customer'];
+  // users = ['insurance_admin', 'admin', 'customer'];
   result = ['Authorized', 'Unauthorized'];
+
+  userChangeTimer:any = null;  
+
+  today = new Date(); 
+  lastWeek = new Date(this.today.getTime() - 7*24*60*60*1000);
+  myDateRangePickerOptions: IMyDrpOptions = {
+    dateFormat: 'dd mmm yyyy',
+    editableDateRangeField: false,
+  };
+  dateModel: Object = {
+    beginDate: {year: this.lastWeek.getFullYear(), month: 1+this.lastWeek.getMonth(), day: this.lastWeek.getDate()},
+    endDate: {year: this.today.getFullYear(), month: 1+this.today.getMonth(), day: this.today.getDate()}
+  };
 
   @HostListener('document:click', ['$event', '$event.target'])
   public onClick($event: MouseEvent, targetElement: HTMLElement): void {
@@ -42,145 +61,20 @@ export class AuditVisualizationComponent implements OnInit, AfterViewInit {
     this.showFilterListing = false;
   }
 
-  test_data = [
+  bar_data = [
     {
+      id:'allowed',
       key: 'Allowed',
       color: '#16b273',
-      values: [
-        {x: 'Mon', y: 310},
-        {x: 'Tue', y: 500},
-        {x: 'Wed', y: 400},
-        {x: 'Thu', y: 220},
-        {x: 'Fri', y: 500},
-        {x: 'Sat', y: 80},
-        {x: 'Sun', y: 20}
-      ]
+      values: []
     },
     {
+      id:'denied',
       key: 'Unauthorised',
       color: '#f0685c',
-      values: [
-        {x: 'Mon', y: 0},
-        {x: 'Tue', y: 35},
-        {x: 'Wed', y: 40},
-        {x: 'Thu', y: 160},
-        {x: 'Fri', y: 100},
-        {x: 'Sat', y: 10},
-        {x: 'Sun', y: 0}
-      ]
+      values: []
     }
   ];
-  test_data_per_user = [
-    {
-      key: 'Allowed',
-      color: '#16b273',
-      values: [
-        {x: 'Mon', y: 10},
-        {x: 'Tue', y: 50},
-        {x: 'Wed', y: 40},
-        {x: 'Thu', y: 22},
-        {x: 'Fri', y: 50},
-        {x: 'Sat', y: 8},
-        {x: 'Sun', y: 2}
-      ]
-    },
-    {
-      key: 'Unauthorised',
-      color: '#f0685c',
-      values: [
-        {x: 'Mon', y: 0},
-        {x: 'Tue', y: 3},
-        {x: 'Wed', y: 4},
-        {x: 'Thu', y: 16},
-        {x: 'Fri', y: 10},
-        {x: 'Sat', y: 1},
-        {x: 'Sun', y: 0}
-      ]
-    }
-  ];
-  test_data_unauthorised_per_user = [
-    {
-      key: 'Unauthorised',
-      color: '#f0685c',
-      values: [
-        {x: 'Mon', y: 0},
-        {x: 'Tue', y: 3},
-        {x: 'Wed', y: 4},
-        {x: 'Thu', y: 16},
-        {x: 'Fri', y: 10},
-        {x: 'Sat', y: 1},
-        {x: 'Sun', y: 0}
-      ]
-    }
-  ];
-  test_data_authorised_per_user = [
-    {
-      key: 'Allowed',
-      color: '#16b273',
-      values: [
-        {x: 'Mon', y: 10},
-        {x: 'Tue', y: 50},
-        {x: 'Wed', y: 40},
-        {x: 'Thu', y: 22},
-        {x: 'Fri', y: 50},
-        {x: 'Sat', y: 8},
-        {x: 'Sun', y: 2}
-      ]
-    },
-  ];
-  test_data_unauthorised = [
-    {
-      key: 'Unauthorised',
-      color: '#f0685c',
-      values: [
-        {x: 'Mon', y: 0},
-        {x: 'Tue', y: 35},
-        {x: 'Wed', y: 40},
-        {x: 'Thu', y: 160},
-        {x: 'Fri', y: 100},
-        {x: 'Sat', y: 10},
-        {x: 'Sun', y: 0}
-      ]
-    }
-  ];
-  test_data_allowed = [
-    {
-      key: 'Allowed',
-      color: '#16b273',
-      values: [
-        {x: 'Mon', y: 310},
-        {x: 'Tue', y: 500},
-        {x: 'Wed', y: 400},
-        {x: 'Thu', y: 220},
-        {x: 'Fri', y: 500},
-        {x: 'Sat', y: 80},
-        {x: 'Sun', y: 20}
-      ]
-    }
-  ];
-
-  donutChartData = [
-    {
-      'label': 'Update',
-      'value': 1470
-    },
-    {
-      'label': 'Select',
-      'value': 2730
-    }
-  ];
-
-  donutChartDataPerUser = [
-    {
-      'label': 'Update',
-      'value': 47
-    },
-    {
-      'label': 'Select',
-      'value': 100
-    }
-  ];
-
 
   static optionListClass = 'option-value';
   static highlightClass = 'highlighted-filter';
@@ -189,16 +83,63 @@ export class AuditVisualizationComponent implements OnInit, AfterViewInit {
     {key: 'user', display: 'User'},
     {key: 'result', display: 'Result'}];
 
-  constructor() {
+  constructor(private assetService: AssetService) {
   }
 
 
   ngAfterViewInit() {
-    this.createStackedBarChart(this.test_data);
-    this.createDonutChart(this.donutChartData);
+//    this.createStackedBarChart(this.test_data);
+//    this.createDonutChart(this.donutChartData);
   }
 
   ngOnInit() {
+    this.onParamChange();
+  }
+  noDate:boolean=false;
+  onDateRangeChanged(model: IMyDateRangeModel){
+    //this.dateModel = model;
+    this.noDate=false
+    setTimeout(()=>{
+      if(!this.dateModel) this.noDate=true;
+      else this.onParamChange();
+    }, 100);
+  }
+
+  onUserChange () {
+    this.userChangeTimer && clearTimeout(this.userChangeTimer);
+    this.userChangeTimer = setTimeout(()=>this.onParamChange(), 300);
+  }
+
+  barChartLoading:boolean = false;
+  paiChartLoading:boolean = false;
+  onParamChange() {
+    this.barChartLoading = true;
+    this.paiChartLoading = true;
+    let results={"allowed":[], "denied":[]}
+    this.bar_data.forEach(obj=>obj.values=results[obj.id]);
+    this.assetService.getProfilerAuditResults(this.clusterId, this.dbName, this.assetName, this.userName, this.dateModel).subscribe (res=> {
+      this.barChartLoading = false;
+      res.data.forEach(itm => {
+        itm.result && results.allowed.push({"x":itm.date, "y":itm.result["1"]||0});
+        itm.result && results.denied.push({"x":itm.date, "y":itm.result["0"]||0});
+        
+      });
+      this.createStackedBarChart(this.bar_data);
+    });
+    this.assetService.getProfilerAuditActions(this.clusterId, this.dbName, this.assetName, this.userName, this.dateModel).subscribe (res=> {
+      this.paiChartLoading = false;
+      var data={}, donutData=[];
+      res.data.forEach(itm => {
+        for(var acn in itm.action) {
+          if(!data[acn]) data[acn] = 0;
+          data[acn] += itm.action[acn];
+        }
+      })
+      for (var key in data) {
+        donutData.push({"label":key, "value":data[key]});
+      }
+      this.createDonutChart(donutData);
+    });
   }
 
   createStackedBarChart(chartData) {
@@ -252,13 +193,14 @@ export class AuditVisualizationComponent implements OnInit, AfterViewInit {
     });
   }
 
-  createDonutChart(chartData) {
+  createDonutChart(chartData:any[]) {
     let self = this;
     let myColors = ['#16b273', '#128fc4'];
     d3.scale.myColors = function () {
       return d3.scale.ordinal().range(myColors);
     };
-    let count = chartData[0].value + chartData[1].value;
+    let count:any = 0;
+    chartData.forEach(obj=>count+=obj.value);
     count = count >= 1000 ? `${(count / 1000).toFixed(1)}K` : count;
     nv.addGraph({
       generate: function () {
@@ -319,97 +261,97 @@ export class AuditVisualizationComponent implements OnInit, AfterViewInit {
     highlightedOption.className += ` ${AuditVisualizationComponent.highlightClass}`;
   }
 
-  handleKeyboardEvents(event, display?, key?, value?) {
-    let keyPressed = event.keyCode || event.which;
-    if (keyPressed === 40 && this.selectedFilterIndex < this.availableFilterCount - 1) {
-      ++this.selectedFilterIndex;
-      this.highlightSelected();
-      return;
-    } else if (keyPressed === 38 && this.selectedFilterIndex !== 0) {
-      --this.selectedFilterIndex;
-      this.highlightSelected();
-      return;
-    } else if (keyPressed === 13 && this.selectedFilterIndex !== -1) {
-      this.addToFilter(display, key, value);
-      return;
-    }
-  }
+  // handleKeyboardEvents(event, display?, key?, value?) {
+  //   let keyPressed = event.keyCode || event.which;
+  //   if (keyPressed === 40 && this.selectedFilterIndex < this.availableFilterCount - 1) {
+  //     ++this.selectedFilterIndex;
+  //     this.highlightSelected();
+  //     return;
+  //   } else if (keyPressed === 38 && this.selectedFilterIndex !== 0) {
+  //     --this.selectedFilterIndex;
+  //     this.highlightSelected();
+  //     return;
+  //   } else if (keyPressed === 13 && this.selectedFilterIndex !== -1) {
+  //     // this.addToFilter(display, key, value);
+  //     return;
+  //   }
+  // }
 
-  filter() {
-    if (this.filters.length === 2) {
-      this.createStackedBarChart(this.test_data_per_user);
-      let resultFilter = this.filters.find(filter => filter.key === 'result');
-      if (resultFilter.value === 'Authorized') {
-        this.createStackedBarChart(this.test_data_authorised_per_user);
-      } else {
-        this.createStackedBarChart(this.test_data_unauthorised_per_user);
-      }
-    } else if (this.filters.length === 1 && this.filters.find(filter => filter.key === 'user')) {
-      this.createStackedBarChart(this.test_data_per_user);
-      this.createDonutChart(this.donutChartDataPerUser);
-    } else if (this.filters.length === 1 && this.filters.find(filter => filter.key === 'result')) {
-      let resultFilter = this.filters.find(filter => filter.key === 'result');
-      if (resultFilter.value === 'Authorized') {
-        this.createStackedBarChart(this.test_data_allowed);
-      } else {
-        this.createStackedBarChart(this.test_data_unauthorised);
-      }
-    } else {
-      this.createStackedBarChart(this.test_data);
-      this.createDonutChart(this.donutChartData);
-    }
-    this.selectedFilterIndex = -1;
-  }
+  // filter() {
+    // if (this.filters.length === 2) {
+    //   this.createStackedBarChart(this.test_data_per_user);
+    //   let resultFilter = this.filters.find(filter => filter.key === 'result');
+    //   if (resultFilter.value === 'Authorized') {
+    //     this.createStackedBarChart(this.test_data_authorised_per_user);
+    //   } else {
+    //     this.createStackedBarChart(this.test_data_unauthorised_per_user);
+    //   }
+    // } else if (this.filters.length === 1 && this.filters.find(filter => filter.key === 'user')) {
+    //   this.createStackedBarChart(this.test_data_per_user);
+    //   this.createDonutChart(this.donutChartDataPerUser);
+    // } else if (this.filters.length === 1 && this.filters.find(filter => filter.key === 'result')) {
+    //   let resultFilter = this.filters.find(filter => filter.key === 'result');
+    //   if (resultFilter.value === 'Authorized') {
+    //     this.createStackedBarChart(this.test_data_allowed);
+    //   } else {
+    //     this.createStackedBarChart(this.test_data_unauthorised);
+    //   }
+    // } else {
+    //   this.createStackedBarChart(this.test_data);
+    //   this.createDonutChart(this.donutChartData);
+    // }
+    // this.selectedFilterIndex = -1;
+  // }
 
-  removeFilter(filter) {
-    for (let i = 0; i < this.filters.length; i++) {
-      let filterItem = this.filters[i];
-      if (filterItem.key === filter.key && filterItem.value === filter.value) {
-        this.filters.splice(i, 1);
-        break;
-      }
-    }
-    this.filter();
-  }
+  // removeFilter(filter) {
+  //   for (let i = 0; i < this.filters.length; i++) {
+  //     let filterItem = this.filters[i];
+  //     if (filterItem.key === filter.key && filterItem.value === filter.value) {
+  //       this.filters.splice(i, 1);
+  //       break;
+  //     }
+  //   }
+  //   this.filter();
+  // }
 
-  addToFilter(display, key, value) {
-    if (!this.filters.find(filter => filter.key === key && filter.value === value)) {
-      this.filters.push({'key': key, 'value': value, 'display': display});
-    }
-    this.filter();
-    this.searchText = '';
-    this.showFilterListing = false;
-  }
+  // addToFilter(display, key, value) {
+  //   if (!this.filters.find(filter => filter.key === key && filter.value === value)) {
+  //     this.filters.push({'key': key, 'value': value, 'display': display});
+  //   }
+  //   this.filter();
+  //   this.searchText = '';
+  //   this.showFilterListing = false;
+  // }
 
-  showOptions(event) {
-    let keyPressed = event.keyCode || event.which;
-    if (keyPressed === 38 || keyPressed === 40) {
-      this.handleKeyboardEvents(event);
-    } else {
-      this.filterOptions = [];
-      let term = event.target.value.trim().toLowerCase();
-      if (term.length === 0) {
-        this.selectedFilterIndex = -1;
-        this.showFilterListing = false;
-        return;
-      }
-      this.availableFilterCount = 0;
-      if (!this.filters.find(option => option.key === 'user')) {
-        let users = this.users.filter(user => user.toLowerCase().indexOf(term) >= 0);
-        if (users && users.length) {
-          this.filterOptions.push({'displayName': 'User', 'key': 'user', values: users});
-          this.availableFilterCount += users.length
-        }
-      }
-      if (!this.filters.find(option => option.key === 'result')) {
-        let result = this.result.filter(res => res.toLowerCase().indexOf(term) >= 0);
-        if (result && result.length) {
-          this.filterOptions.push({'displayName': 'Result', 'key': 'result', values: result});
-          this.availableFilterCount += result.length;
-        }
-      }
+  // showOptions(event) {
+  //   let keyPressed = event.keyCode || event.which;
+  //   if (keyPressed === 38 || keyPressed === 40) {
+  //     this.handleKeyboardEvents(event);
+  //   } else {
+  //     this.filterOptions = [];
+  //     let term = event.target.value.trim().toLowerCase();
+  //     if (term.length === 0) {
+  //       this.selectedFilterIndex = -1;
+  //       this.showFilterListing = false;
+  //       return;
+  //     }
+  //     this.availableFilterCount = 0;
+  //     if (!this.filters.find(option => option.key === 'user')) {
+  //       let users = this.users.filter(user => user.toLowerCase().indexOf(term) >= 0);
+  //       if (users && users.length) {
+  //         this.filterOptions.push({'displayName': 'User', 'key': 'user', values: users});
+  //         this.availableFilterCount += users.length
+  //       }
+  //     }
+  //     if (!this.filters.find(option => option.key === 'result')) {
+  //       let result = this.result.filter(res => res.toLowerCase().indexOf(term) >= 0);
+  //       if (result && result.length) {
+  //         this.filterOptions.push({'displayName': 'Result', 'key': 'result', values: result});
+  //         this.availableFilterCount += result.length;
+  //       }
+  //     }
 
-      this.showFilterListing = true;
-    }
-  }
+  //     this.showFilterListing = true;
+  //   }
+  // }
 }

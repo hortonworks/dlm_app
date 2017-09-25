@@ -44,3 +44,19 @@ footer {
 .markMandatory{
   color: $burnt-sienna;
 }
+
+.dp-input-and-message-wrapper {
+  display: flex;
+  align-items: center;
+
+  .validation-error {
+    color: $roman-red;
+    border: 1px solid $roman-red;
+    outline: none;
+  }
+
+  .error-message {
+    margin-left: 15px;
+    color: $roman-red;
+  }
+}

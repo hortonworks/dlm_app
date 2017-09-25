@@ -137,4 +137,13 @@ object WebService {
     def listStatus(beaconEndpoint : String, clusterId: Long) (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconAdminStatusDetails]]
   }
 
+  trait BeaconBrowseService extends ClientService {
+    def listHdfsFile(beaconEndpoint : String, clusterId: Long, queryString: Map[String,String])
+                    (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconHdfsFileResponse]]
+    def listHiveDb(beaconEndpoint : String, clusterId: Long)
+                    (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconHiveDbResponse]]
+    def listHiveDbTables(beaconEndpoint : String, clusterId: Long, dbName: String)
+                  (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconHiveDbTablesResponse]]
+  }
+
 }

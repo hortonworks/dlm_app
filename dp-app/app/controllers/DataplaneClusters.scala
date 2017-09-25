@@ -11,7 +11,6 @@
 
 package controllers
 
-import java.net.URL
 import javax.inject.Inject
 
 import com.google.inject.name.Named
@@ -27,17 +26,14 @@ import services.AmbariService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import com.hortonworks.dataplane.commons.auth.Authenticated
-
-import scala.util.{Failure, Success, Try}
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 
 class DataplaneClusters @Inject()(
     @Named("dpClusterService") val dpClusterService: DpClusterService,
-    ambariService: AmbariService,
-    authenticated: Authenticated)
+    ambariService: AmbariService)
     extends Controller {
 
-  def list = authenticated.async {
+  def list = Action.async {
     dpClusterService
       .list()
       .map {
@@ -48,7 +44,7 @@ class DataplaneClusters @Inject()(
       }
   }
 
-  def create = authenticated.async(parse.json) { request =>
+  def create = AuthenticatedAction.async(parse.json) { request =>
     implicit val token = request.token
     Logger.info("Received create data centre request")
     request.body
@@ -80,7 +76,7 @@ class DataplaneClusters @Inject()(
 
   }
 
-  def retrieve(clusterId: Long) = authenticated.async {
+  def retrieve(clusterId: Long) = Action.async {
     Logger.info("Received retrieve data centre request")
     dpClusterService
       .retrieve(clusterId.toString)
@@ -92,7 +88,7 @@ class DataplaneClusters @Inject()(
       }
   }
 
-  def retrieveServices(clusterId: String) = authenticated.async {
+  def retrieveServices(clusterId: String) = Action.async {
     Logger.info("Received retrieve data centre request")
     dpClusterService
       .retrieveServiceInfo(clusterId)
@@ -104,7 +100,7 @@ class DataplaneClusters @Inject()(
       }
   }
 
-  def update = authenticated.async(parse.json) { request =>
+  def update = Action.async(parse.json) { request =>
     Logger.info("Received update data centre request")
     request.body
       .validate[DataplaneCluster]
@@ -129,7 +125,7 @@ class DataplaneClusters @Inject()(
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def delete(clusterId: String) = authenticated.async {
+  def delete(clusterId: String) = Action.async {
     Logger.info("Received delete data centre request")
     dpClusterService
       .delete(clusterId)
@@ -141,7 +137,7 @@ class DataplaneClusters @Inject()(
       }
   }
 
-  def ambariCheck = authenticated.async { request =>
+  def ambariCheck = AuthenticatedAction.async { request =>
     implicit val token = request.token
     ambariService
       .statusCheck(AmbariEndpoint(request.getQueryString("url").get))

@@ -13,18 +13,19 @@
   <div class="inputWidgetCont">
     <div class="searchIconCont"><i class="fa fa-search"></i></div>
     <div class="searchWidgetCont">
-      <search-widget #searchWidget
-        [allowTagDismissal]="true"
-        [tags]="filterTags"
-        [searchText]="queryObj.searchText"
-        [placeHolderText]="'Search'"
-        (onNewSearch)="onNewSearch($event)"
-        (onTagDelete)="removeFilter($event)"
-      >
-      </search-widget>
+      <!--<search-widget #searchWidget-->
+        <!--[allowTagDismissal]="true"-->
+        <!--[tags]="filterTags"-->
+        <!--[searchText]="queryObj.searchText"-->
+        <!--[placeHolderText]="'Search'"-->
+        <!--(onNewSearch)="onNewSearch($event)"-->
+        <!--(onTagDelete)="removeFilter($event)"-->
+      <!--&gt;-->
+      <!--</search-widget>-->
+      <input type="text" name="search" class="search-text" [(ngModel)]="queryObj.searchText" (keyup)="onKeyUp($event)"/>
     </div>
 <!--     <div class="showFiltersButton" (click)="toggleFilterCont()"><i class="fa fa-filter"></i>&nbsp;&nbsp;Filter&nbsp;&nbsp;<i class="fa fa-angle-down"></i></div> -->
-    <div style="clear: both"></div>
+    <div class="clearfix"></div>
   </div>
   <div *ngIf="filterStateFlag" class="filterCont">
     <div class="singleFilterCont">

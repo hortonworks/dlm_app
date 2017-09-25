@@ -89,6 +89,7 @@ import akka.pattern.pipe
 import scala.concurrent.ExecutionContext.Implicits.global
 
 private sealed class Synchronizer(val storageInterface: StorageInterface,
+                                  val credentialInterface: CredentialInterface,
                                   val wSClient: WSClient,
                                   val config: Config)
     extends Actor
@@ -101,7 +102,7 @@ private sealed class Synchronizer(val storageInterface: StorageInterface,
   override def receive = {
     case Poll() =>
       log.info("Loading credentials from configuration")
-      val creds: Future[Credentials] = loadCredentials
+      val creds: Future[Credentials] = credentialInterface.getCredential("dp.credential.ambari")
       // notify that credentials were loaded
       creds.map(CredentialsLoaded(_)).pipeTo(self)
 
@@ -161,20 +162,9 @@ private sealed class Synchronizer(val storageInterface: StorageInterface,
 
     case DpClusterAdded(dpCluster) =>
     // Perform the same steps but for a single data lake
-      val creds: Future[Credentials] = loadCredentials
+      val creds: Future[Credentials] = credentialInterface.getCredential("dp.credential.ambari")
       // notify that credentials were loaded
       creds.map(CredentialsLoaded(_,Seq(dpCluster))).pipeTo(self)
 
-  }
-
-  private def loadCredentials = {
-    val creds = for {
-      user <- storageInterface.getConfiguration("dp.ambari.superuser")
-      pass <- storageInterface.getConfiguration(
-        "dp.ambari.superuser.password")
-    } yield {
-      Credentials(user, pass)
-    }
-    creds
   }
 }

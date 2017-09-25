@@ -23,22 +23,6 @@ import scala.concurrent.Future
 class BeaconAdminServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconAdminService {
   import com.hortonworks.dlm.beacon.domain.ResponseEntities._
   import com.hortonworks.dlm.beacon.domain.JsonFormatters._
-  import com.hortonworks.dlm.beacon.domain.RequestEntities._
-
-  private def mapToPolicyStatusResponse(res: WSResponse) = {
-    res.status match {
-      case 200 =>
-        res.json.validate[BeaconAdminStatusResponse] match {
-          case JsSuccess(result, _) => Right(result)
-          case JsError(error) => {
-            val url = Some(res.asInstanceOf[AhcWSResponse].ahcResponse.getUri.toUrl)
-            Left(BeaconApiErrors(BAD_GATEWAY, url, Some(BeaconApiError(error.toString()))))
-          }
-        }
-      case _ => mapErrors(res)
-    }
-  }
-
 
   override def listStatus(beaconEndpoint : String, clusterId: Long)(implicit token:Option[HJwtToken])
     : Future[Either[BeaconApiErrors, BeaconAdminStatusDetails]] = {

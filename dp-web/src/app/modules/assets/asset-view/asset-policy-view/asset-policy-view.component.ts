@@ -10,7 +10,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {RangerService} from '../../../../services/ranger.service';
 
 export enum PolicyWidgetState {
   NOINFO, LOADING, LOADED
@@ -22,7 +21,6 @@ export enum PolicyWidgetState {
   styleUrls: ['./asset-policy-view.component.scss']
 })
 export class AssetPolicyView implements OnInit {
-  @Input() assetDetails;
   @Input() clusterId: string;
   policies:any[] = [];
   PWS = PolicyWidgetState;
@@ -30,29 +28,17 @@ export class AssetPolicyView implements OnInit {
   pageSize:number = 20;
   pageStartsFrom:number = 1;
   count:number = 0;
+  showPagination: boolean = true;
+  isTagBasedPolicy: boolean = false;
 
-  constructor(private rangerService: RangerService) {
-  }
 
-  ngOnInit() {
-  	if(!this.assetDetails) return;
-  	this.onReload();
-  }
+  ngOnInit() {}
+
   onReload(){
-  	this.policies = [];
-  	this.state = this.PWS.LOADING;
-  	let qualifiedName = this.assetDetails.entity.attributes.qualifiedName;
-  	let dbName = qualifiedName.slice(0, qualifiedName.indexOf('.'));
-  	let name = this.assetDetails.entity.attributes.name;
-  	this.rangerService.getPolicyDetails(this.clusterId, dbName, name, this.pageStartsFrom-1, this.pageSize)
-  	  .subscribe(details=>{
-  	  	this.count = this.rangerService.getTotalPolicyCount();
-  	  	this.state = this.PWS.LOADED;
-  	  	this.policies = details;
-  	  },
-  	  err => (err.status === 404) && (this.state = this.PWS.NOINFO)
-  	  );
+    this.policies = [];
+    this.state = this.PWS.LOADING;
   }
+
   setFirstPage() {
     this.pageStartsFrom = 1;
   }

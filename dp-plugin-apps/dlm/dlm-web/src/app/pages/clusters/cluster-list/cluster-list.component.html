@@ -72,7 +72,7 @@
   <div class="row">
     <div class="col col-xs-12">
       <dlm-hdfs-browser
-        [attr.qe-attr]="'cluster-actions-' + cluster.$$index"
+        [attr.qe-attr]="'cluster-actions-hdfs-browser' + cluster.$$index"
         [rootPath]="hdfsRootPath"
         [clusterId]="cluster.id"
         [page]="getFileBrowserPageForRow(cluster.id)"

@@ -7,19 +7,36 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, Input, Output, ViewEncapsulation, EventEmitter, ViewChild, HostBinding, OnInit, OnDestroy } from '@angular/core';
+import {
+    ChangeDetectorRef,
+    Component,
+    EventEmitter,
+    HostBinding,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output,
+    ViewChild,
+    ViewEncapsulation,
+} from '@angular/core';
 import { TemplateRef, SimpleChange, OnChanges } from '@angular/core';
-import { ListStatus } from 'models/list-status.model';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Store } from '@ngrx/store';
+
+import { ProgressState } from 'models/progress-state.model';
+import { ListStatus } from 'models/list-status.model';
 import { getAllFilesForClusterPath } from 'selectors/hdfs.selector';
+import { getMergedProgress } from 'selectors/progress.selector';
 import * as fromRoot from 'reducers';
 import { listFiles } from 'actions/hdfslist.action';
 import { TableComponent } from 'common/table/table.component';
 import { FILE_TYPES } from 'constants/hdfs.constant';
 import { Breadcrumb } from 'components/breadcrumb/breadcrumb.type';
 import { HdfsService } from 'services/hdfs.service';
+import { isEqual } from 'utils/object-utils';
+
+const FILES_REQUEST = '[HDFS Browser Component] FILES_REQUEST';
 
 @Component({
   selector: 'dlm-hdfs-browser',
@@ -38,6 +55,7 @@ import { HdfsService } from 'services/hdfs.service';
       (selectRowAction)="handleSelectedAction($event)"
       [externalSorting]="externalSorting"
       [rowHeight]="rowHeight"
+      [loadingIndicator]="(spinner$ | async)"
       (doubleClickAction)="handleDoubleClickAction($event)"
       (sortAction)="handleSortAction($event)"
       (pageChange)="handlePageChange($event)"
@@ -90,6 +108,7 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   breadcrumbs$: Observable<Breadcrumb[]>;
   rows$: Observable<ListStatus[]>;
   rows: ListStatus[];
+  spinner$: Observable<boolean>;
   currentDirectory$: BehaviorSubject<string>;
   columns: any = [];
   externalSorting = true;
@@ -99,19 +118,32 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   selected: string;
   fileTypes = FILE_TYPES;
 
-  constructor(private store: Store<fromRoot.State>, private hdfs: HdfsService) {
+  constructor(private store: Store<fromRoot.State>,
+              private hdfs: HdfsService,
+              private cdRef: ChangeDetectorRef) {
   }
 
   ngOnInit() {
     this.currentDirectory$ = new BehaviorSubject(this.rootPath);
-    this.rows$ = this.currentDirectory$.switchMap(path => {
-      this.store.dispatch(listFiles(this.clusterId, path, {clusterId: this.clusterId, path}));
+    const requestProgress$ = this.store.select(getMergedProgress(FILES_REQUEST))
+      // next line fixes zone.js error aroun change detection confusing
+      // check https://github.com/angular/angular/issues/17572 for more info
+      .do(_ => this.cdRef.detectChanges())
+      .distinctUntilChanged(isEqual);
+    this.rows$ = this.currentDirectory$.distinctUntilChanged().switchMap(path => {
+      this.store.dispatch(listFiles(this.clusterId, path, {clusterId: this.clusterId, path, requestId: FILES_REQUEST}));
       return this.store.select(getAllFilesForClusterPath(this.clusterId, path)).map(files => {
         const parent = path === '/' ? [] : [<ListStatus>{pathSuffix: '..', type: FILE_TYPES.DIRECTORY}];
         return [...parent, ...files];
       });
     });
     this.breadcrumbs$ = this.currentDirectory$.map(path => this.updateBreadcrumbs(path));
+    this.spinner$ = Observable.combineLatest(
+      this.rows$,
+      requestProgress$.pluck('isInProgress')
+    ).map(([rows, isInProgress]) => {
+      return isInProgress && !rows.some(r => r.pathSuffix !== '..');
+    });
     this.columns = [
       {prop: 'pathSuffix', name: 'Name', cellClass: 'text-cell', headerClass: 'text-header',
         minWidth: 150, flexGrow: 1, cellTemplate: this.nameFormattedTemplate},
@@ -129,7 +161,7 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
     if (changes['clusterId'] || changes['rootPath']) {
       if (this.currentDirectory$) {
-        this.writeValue(this.rootPath);
+        this.currentDirectory$.next(this.rootPath);
       }
     }
   }
@@ -217,39 +249,13 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
     this.rows = [...parent, ...rows];
   }
 
-  convertPermissions(octal: string, type: string) {
-    let permissions = type === FILE_TYPES.DIRECTORY ? 'd' : '-';
-    this.getDigits(octal).map(digit => {
-      permissions += this.getPermissionsString(+digit);
-    });
-    return permissions;
-  }
-
-  getPermissionsString(digit: number) {
-    switch (digit) {
-      case 1: return '--x';
-      case 2: return '-w-';
-      case 3: return '-wx';
-      case 4: return 'r--';
-      case 5: return 'r-x';
-      case 6: return 'rw-';
-      case 7: return 'rwx';
-      case 0:
-      default:
-        return '---';
-    }
-  }
-
-  getDigits(numberString: string) {
-    return numberString.split('');
+  convertPermissions(permission: string, type: string) {
+    const fileType = type === FILE_TYPES.DIRECTORY ? 'd' : '-';
+    return `${fileType}${permission}`;
   }
 
   ngOnDestroy() {
 
-  }
-
-  writeValue(value: any) {
-    this.currentDirectory$.next(value);
   }
 
   handlePageChange(page) {

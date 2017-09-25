@@ -24,5 +24,6 @@ object API {
 
   case class EntityNotFound() extends Throwable
   case class UpdateError() extends Throwable
+  case class AlreadyExistsError() extends Throwable
 
 }

@@ -12,40 +12,20 @@ FROM nimmis/java-centos:openjdk-8-jre
 
 COPY knox-scripts/HDP.repo /etc/yum.repos.d/
 
-RUN yum update -y && \
-yum install -y knox && \
-yum install -y unzip && \
-yum clean all
-
-ADD knox-scripts/launch-knox.sh /usr/hdp/current/knox-server/bin/
-RUN chown -R knox /usr/hdp/current/knox-server/bin/launch-knox.sh
-
-ADD dp-knox-agent /usr/dp-knox-agent
-RUN chmod +x /usr/dp-knox-agent/bin/knox-agent
-ADD knox-scripts/knox-consul.config /consul-config/
-RUN mkdir -p /knox/consul/data
-RUN chmod a+w /knox/consul/data
-VOLUME ["/knox/consul/data"]
-
-ADD knox-scripts/setup-master-password.sh /usr/hdp/current/knox-server/bin/
-RUN chown -R knox /usr/hdp/current/knox-server/bin/setup-master-password.sh
-
-ADD knox-scripts/wait_for_keystore_file.sh /usr/hdp/current/knox-server/bin/
-RUN chown -R knox /usr/hdp/current/knox-server/bin/wait_for_keystore_file.sh
-
-RUN chmod a+w /usr/hdp/current/knox-server/conf/topologies
-RUN chmod a+w /usr/hdp/current/knox-server/conf/topologies/knoxsso.xml
-
-
+RUN yum install -y knox unzip openssl && \
+    yum clean all
 
 ENV HASHICORP_RELEASES=https://releases.hashicorp.com
 ENV CONSUL_VERSION=0.8.5
 RUN wget ${HASHICORP_RELEASES}/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip && \
-        unzip -d /bin consul_${CONSUL_VERSION}_linux_amd64.zip
+    unzip -d /bin consul_${CONSUL_VERSION}_linux_amd64.zip && \
+    rm consul_${CONSUL_VERSION}_linux_amd64.zip
+
+COPY dp-knox-agent /usr/dp-knox-agent
+COPY knox-scripts /scripts
 
 
 EXPOSE 8300 8301 8301/udp 8302 8302/udp 8400 8500 53/udp
 ENV sso.toplology.path=/usr/hdp/current/knox-server/conf/topologies/knoxsso.xml
-USER knox
-WORKDIR /usr/hdp/current/knox-server/bin
 
+ENTRYPOINT ["bash", "/scripts/knox-start.sh"]

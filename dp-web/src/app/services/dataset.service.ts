@@ -22,9 +22,21 @@ export class DataSetService {
 
   constructor(private http:Http) {}
 
-  public list():Observable<DataSet[]> {
+  list():Observable<DataSet[]> {
     return this.http
       .get(this.url, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
+  query(
+    params: {
+      name?: string
+    }
+  ):Observable<DataSet[]> {
+    const query = Object.keys(params).reduce((accumulator, cParamKey) => `${accumulator}&${cParamKey}=${params[cParamKey]}`, '');
+    return this.http
+      .get(`${this.url}?${query}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

@@ -130,7 +130,96 @@ class DpProfilerRoute @Inject()(
       }
     }
 
-    private def deleteProfilerByJobName(clusterId: Long, jobName: String): Future[WSResponse] = {
+
+  val auditResults =
+    path ("cluster" / LongNumber / "dp-profiler" / "audit-results" / Segment / Segment / Segment / Segment) { (clusterId, dbName, tableName, startDate, endDate) =>
+      get {
+        parameters('userName.?) { userName =>
+          onComplete(getAuditResults(clusterId, dbName, tableName, userName.get, startDate, endDate)) {
+            case Success(res) => res.status match {
+              case 200 => complete(success(res.json))
+              case 404 => complete(StatusCodes.NotFound, notFound)
+            }
+            case Failure(th) => th match {
+              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
+              case _ => complete(StatusCodes.InternalServerError, errors(th))
+            }
+          }
+        }
+      }
+    }
+
+  val auditActions =
+    path ("cluster" / LongNumber / "dp-profiler" / "audit-actions" / Segment / Segment / Segment / Segment) { (clusterId, dbName, tableName, startDate, endDate) =>
+      get {
+        parameters('userName.?) { userName =>
+          onComplete(getAuditActions(clusterId, dbName, tableName, userName.get, startDate, endDate)) {
+            case Success(res) => res.status match {
+              case 200 => complete(success(res.json))
+              case 404 => complete(StatusCodes.NotFound, notFound)
+            }
+            case Failure(th) => th match {
+              case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
+              case _ => complete(StatusCodes.InternalServerError, errors(th))
+            }
+          }
+        }
+      }
+    }
+
+  private def getAuditResults(clusterId: Long, dbName: String, tableName: String, userName: String, startDate: String, endDate: String): Future[WSResponse] = {
+    val postData = Json.obj(
+      "metric" -> "hiveagg",
+      "aggType" -> "Daily",
+      "sql" -> (if(userName == "")
+                  s"SELECT date, data.`result` from hiveagg_daily where database='$dbName' and table='$tableName' and date >= cast('$startDate' as date) and date <= cast('$endDate' as date) order by date asc"
+                else
+                  s"SELECT date, `user`.`$userName`.`result` from hiveagg_daily where database='$dbName' and table='$tableName' and date >= cast('$startDate' as date) and date <= cast('$endDate' as date) order by date asc"
+        )
+    )
+
+    for {
+      config <- getConfigOrThrowException(clusterId)
+      url <- getUrlFromConfig(config)
+      baseUrls <- extractUrlsWithIp(url, clusterId)
+      urlToHit <- Future.successful(s"${baseUrls.head}/assetmetrics")
+      tmp <- Future.successful(println(urlToHit))
+      response <- ws.url(urlToHit)
+        .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+        .post(postData)
+    // Add 2 to current the minute(UTC) to make sure profiling starts within 2 minutes from now.
+    } yield {
+      response
+    }
+  }
+
+  private def getAuditActions(clusterId: Long, dbName: String, tableName: String, userName: String, startDate: String, endDate: String): Future[WSResponse] = {
+    val postData = Json.obj(
+      "metric" -> "hiveagg",
+      "aggType" -> "Daily",
+      "sql" -> (if(userName == "")
+                  s"SELECT date, data.`action` from hiveagg_daily where database='$dbName' and table='$tableName' and date >= cast('$startDate' as date) and date <= cast('$endDate' as date) order by date asc"
+              else
+                  s"SELECT date, `user`.`$userName`.`action` from hiveagg_daily where database='$dbName' and table='$tableName' and date >= cast('$startDate' as date) and date <= cast('$endDate' as date) order by date asc"
+        )
+    )
+
+    for {
+      config <- getConfigOrThrowException(clusterId)
+      url <- getUrlFromConfig(config)
+      baseUrls <- extractUrlsWithIp(url, clusterId)
+      urlToHit <- Future.successful(s"${baseUrls.head}/assetmetrics")
+      tmp <- Future.successful(println(urlToHit))
+      response <- ws.url(urlToHit)
+        .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+        .post(postData)
+    // Add 2 to current the minute(UTC) to make sure profiling starts within 2 minutes from now.
+    } yield {
+      response
+    }
+  }
+
+  private def deleteProfilerByJobName(clusterId: Long, jobName: String): Future[WSResponse] = {
 
       for {
         config <- getConfigOrThrowException(clusterId)
@@ -241,6 +330,10 @@ class DpProfilerRoute @Inject()(
       case Left(errors) =>
         throw new ServiceNotFound(
           s"Could not get the service Url from storage - $errors")
+    }.recover{
+      case e: Throwable =>
+        throw new ServiceNotFound(
+          s"Could not get the service Url from storage - ${e.getMessage}")
     }
   }
 

@@ -26,4 +26,7 @@ docker start dp-cluster-service >> install.log 2>&1 || \
         --env "CONSUL_HOST=$CONSUL_HOST" \
         --env "SEPARATE_KNOX_CONFIG=${SEPARATE_KNOX_CONFIG}" \
         --env "KNOX_CONFIG_USING_CREDS=${KNOX_CONFIG_USING_CREDS}" \
+        --env "KEYSTORE_PATH=/dp-shared/dp-keystore.jceks" \
+        --env "KEYSTORE_PASSWORD=$MASTER_PASSWORD" \
+        --volume $(pwd)/certs:/dp-shared \
         hortonworks/dp-cluster-service:$VERSION

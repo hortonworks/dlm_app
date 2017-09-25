@@ -44,4 +44,15 @@ public class HostUtils {
     }
   }
 
+  public String getRequestProtocol(){
+    RequestContext ctx = RequestContext.getCurrentContext();
+    if (isRequestFromProxy()){
+      String forwardedProto=ctx.getRequest().getHeader("X-Forwarded-Proto");
+      return forwardedProto;
+    }else{
+      String proto= ctx.getRequest().getScheme();
+      return proto;
+    }
+  }
+
 }

@@ -129,3 +129,7 @@ header {
 pre {
   white-space: pre-wrap;
 }
+
+a:focus {
+  outline: none;
+}

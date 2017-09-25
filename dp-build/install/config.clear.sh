@@ -8,9 +8,10 @@
 #  * of all or any part of the contents of this software is strictly prohibited.
 #  */
 #
-unset USE_EXT_DB
 unset SEPARATE_KNOX_CONFIG
 unset KNOX_CONFIG_USING_CREDS
+
+unset USE_EXT_DB
 unset DATABASE_URI
 unset DATABASE_USER
 unset DATABASE_PASS
@@ -18,3 +19,9 @@ unset DATABASE_PASS
 unset CONSUL_HOST
 unset MASTER_PASSWORD
 unset USE_TEST_LDAP
+
+unset USE_TLS
+unset USE_PROVIDED_CERTIFICATES
+unset PUBLIC_KEY_L
+unset PRIVATE_KEY_L
+unset CERTIFICATE_PASSWORD

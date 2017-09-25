@@ -29,7 +29,11 @@ docker start dp-app >> install.log 2>&1 || \
         --network dp \
         --detach \
         --publish 80:80 \
+        --publish 443:443 \
+        --env "CERTIFICATE_PASSWORD=$CERTIFICATE_PASSWORD" \
         --env "CONSUL_HOST=$CONSUL_HOST" \
-        --env "DP_APP_HOME=/usr/dp-app" \
-        --volume $(pwd)/certs:/usr/dp-app/conf/cert \
+        --env "KEYSTORE_PATH=/dp-shared/dp-keystore.jceks" \
+        --env "KEYSTORE_PASSWORD=$MASTER_PASSWORD" \
+        --env "USE_TLS=$USE_TLS" \
+        --volume $(pwd)/certs:/dp-shared \
         hortonworks/dp-app:$VERSION
