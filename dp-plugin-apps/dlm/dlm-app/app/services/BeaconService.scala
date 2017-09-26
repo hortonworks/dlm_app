@@ -22,7 +22,6 @@ import models.Entities.{UnpairClusterDefinition, _}
 import models.PolicyAction
 import models._
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR}
-import play.api.libs.json.JsValue
 
 import scala.collection.immutable.Set.Set2
 import scala.concurrent.{Future, Promise}
@@ -117,24 +116,25 @@ class BeaconService @Inject()(
       for {
         clusterA <- dataplaneService.getCluster(clusterAId)
         clusterB <- dataplaneService.getCluster(clusterBId)
-        clusterAFs <- dataplaneService.getNameNodeService(clusterAId)
-        clusterBFs <- dataplaneService.getNameNodeService(clusterBId)
-        hiveServiceA <- dataplaneService.getHiveServerService(clusterAId)
-        hiveServiceB <- dataplaneService.getHiveServerService(clusterBId)
+        clusterAFs <- ambariService.getHDFSConfigDetails(clusterAId)
+        clusterBFs <- ambariService.getHDFSConfigDetails(clusterBId)
+        hiveServiceA <- ambariService.getHiveConfigDetails(clusterAId)
+        hiveServiceB <- ambariService.getHiveConfigDetails(clusterBId)
         rangerServiceA <- ambariService.getRangerEndpointDetails(clusterAId)
         rangerServiceB <- ambariService.getRangerEndpointDetails(clusterBId)
         clusterDefinitionsA <- beaconPairService.listPairedClusters(clustersToBePairedSeq.head.beaconUrl, clusterAId)
         clusterDefinitionsB <- beaconPairService.listPairedClusters(clustersToBePairedSeq.tail.head.beaconUrl, clusterBId)
       } yield {
-        val futureFailedList = List(clusterA, clusterB, clusterAFs, clusterBFs, rangerServiceA, rangerServiceB, clusterDefinitionsA, clusterDefinitionsB).filter(_.isLeft)
+        val futureFailedList = List(clusterA, clusterB, clusterAFs, clusterBFs, hiveServiceA, hiveServiceB,
+          rangerServiceA, rangerServiceB, clusterDefinitionsA, clusterDefinitionsB).filter(_.isLeft)
         if (futureFailedList.isEmpty) {
           for {
             dpClusterA <- dataplaneService.getDpCluster(clusterA.right.get.dataplaneClusterId.get)
             dpClusterB <- dataplaneService.getDpCluster(clusterB.right.get.dataplaneClusterId.get)
           } yield {
             if (!List(dpClusterA, dpClusterB).exists(_.isLeft)) {
-              val listOfClusters = ClusterDefinitionDetails(clusterA.right.get, dpClusterA.right.get, clusterAFs.right.get, hiveServiceA, rangerServiceA.right.get, clusterDefinitionsA.right.get, clustersToBePairedSeq.head) ::
-                ClusterDefinitionDetails(clusterB.right.get, dpClusterB.right.get, clusterBFs.right.get, hiveServiceB, rangerServiceB.right.get, clusterDefinitionsB.right.get, clustersToBePairedSeq.tail.head) :: Nil
+              val listOfClusters = ClusterDefinitionDetails(clusterA.right.get, dpClusterA.right.get, clusterAFs.right.get, hiveServiceA.right.get, rangerServiceA.right.get, clusterDefinitionsA.right.get, clustersToBePairedSeq.head) ::
+                ClusterDefinitionDetails(clusterB.right.get, dpClusterB.right.get, clusterBFs.right.get, hiveServiceB.right.get, rangerServiceB.right.get, clusterDefinitionsB.right.get, clustersToBePairedSeq.tail.head) :: Nil
               // Retrieve cluster definitions that is pending to be submitted to the beacon process
               val clusterDefsToBeSubmitted: Set[ClusterDefinition] = getClusterDefsToBeSubmitted(listOfClusters)
               if (clusterDefsToBeSubmitted.isEmpty) {
@@ -189,15 +189,7 @@ class BeaconService @Inject()(
               val local : Boolean =  (outerNext.dpCluster.dcName + "$" +  outerNext.dpCluster.name) == nextClusterName
               val nnService = clusterToBePairedDetails.nnClusterService
               val rangerService = clusterToBePairedDetails.rangerService
-              val hiveServerConfigDetails: Map [String, Option[String]]= clusterToBePairedDetails.hiveServerService match {
-                case Right(hiveServerService) => {
-                  Map(
-                    "hsEndpoint" -> Some(hiveServerService.serviceProperties("hsEndpoint").get),
-                    "hsKerberosPrincipal" -> hiveServerService.serviceProperties("hsKerberosPrincipal")
-                  )
-                }
-                case Left(errors) => Map()
-              }
+              val hiveServerConfigDetails: Map [String, Option[String]]= clusterToBePairedDetails.hiveServerService
 
               val clusterDefinition: ClusterDefinition = ClusterDefinition(
                 outerNext.pairedClusterRequest.beaconUrl,
@@ -208,7 +200,7 @@ class BeaconService @Inject()(
                   clusterToBePairedDetails.dpCluster.description,
                   local,
                   clusterToBePairedDetails.pairedClusterRequest.beaconUrl,
-                  nnService.serviceProperties,
+                  nnService,
                   rangerService,
                   hiveServerConfigDetails("hsEndpoint"),
                   hiveServerConfigDetails("hsKerberosPrincipal")

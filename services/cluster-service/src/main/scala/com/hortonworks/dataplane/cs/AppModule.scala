@@ -124,7 +124,7 @@ object AppModule extends AbstractModule {
   @Singleton
   def provideAtlasApiData(actorSystem: ActorSystem,
                           materializer: ActorMaterializer,
-                          storageInterface: StorageInterface,
+                          credentialInterface: CredentialInterface,
                           clusterComponentService: ClusterComponentService,
                           clusterHostsService: ClusterHostsService,
                           dpClusterService: DpClusterService,
@@ -133,7 +133,7 @@ object AppModule extends AbstractModule {
                           config: Config): ClusterDataApi = {
     new ClusterDataApi(actorSystem,
                        materializer,
-                       storageInterface,
+                       credentialInterface,
                        clusterComponentService,
                        clusterHostsService,
                        dpClusterService,
@@ -145,19 +145,22 @@ object AppModule extends AbstractModule {
   @Provides
   @Singleton
   def provideAtlasRoute(config: Config,
-                        atlasApiData: ClusterDataApi): AtlasRoute = {
-    AtlasRoute(config, atlasApiData)
+                        atlasApiData: ClusterDataApi,
+                        credentialInterface: CredentialInterface): AtlasRoute = {
+    AtlasRoute(config, atlasApiData, credentialInterface)
   }
 
   @Provides
   @Singleton
   def provideStatusRoute(storageInterface: StorageInterface,
+                         credentialInterface: CredentialInterface,
                          config: Config,
                          wSClient: WSClient,
                          clusterSync: ClusterSync,
                          dpClusterSync: DpClusterSync): StatusRoute = {
     new StatusRoute(wSClient,
                     storageInterface,
+                    credentialInterface,
                     config,
                     clusterSync,
                     dpClusterSync)
@@ -166,6 +169,7 @@ object AppModule extends AbstractModule {
   @Provides
   @Singleton
   def provideAmbariRoute(storageInterface: StorageInterface,
+                         credentialInterface: CredentialInterface,
                          config: Config,
                          clusterService: ClusterService,
                          dpClusterService: DpClusterService,
@@ -173,6 +177,7 @@ object AppModule extends AbstractModule {
     new AmbariRoute(wSClient,
                     storageInterface,
                     clusterService,
+                    credentialInterface,
                     dpClusterService,
                     config)
   }
@@ -199,6 +204,7 @@ object AppModule extends AbstractModule {
   @Provides
   @Singleton
   def provideRangerRoute(storageInterface: StorageInterface,
+                         credentialInterface: CredentialInterface,
                          clusterComponentService: ClusterComponentService,
                          clusterHostsService: ClusterHostsService,
                          wSClient: WSClient): DpProfilerRoute = {
@@ -208,10 +214,11 @@ object AppModule extends AbstractModule {
   @Provides
   @Singleton
   def provideDpProfilerRoute(storageInterface: StorageInterface,
-                         clusterComponentService: ClusterComponentService,
-                         clusterHostsService: ClusterHostsService,
-                         wSClient: WSClient): RangerRoute = {
-    new RangerRoute(clusterComponentService, clusterHostsService, storageInterface, wSClient)
+                             credentialInterface: CredentialInterface,
+                             clusterComponentService: ClusterComponentService,
+                             clusterHostsService: ClusterHostsService,
+                             wSClient: WSClient): RangerRoute = {
+    new RangerRoute(clusterComponentService, clusterHostsService, storageInterface, credentialInterface, wSClient)
   }
 
   @Provides
@@ -256,16 +263,22 @@ object AppModule extends AbstractModule {
   @Provides
   @Singleton
   def provideStorageInterface(
-      dpClusterService: DpClusterService,
-      clusterService: ClusterService,
-      clusterComponentService: ClusterComponentService,
-      clusterHostsServiceImpl: ClusterHostsService,
-      configService: ConfigService): StorageInterface = {
+                               dpClusterService: DpClusterService,
+                               clusterService: ClusterService,
+                               clusterComponentService: ClusterComponentService,
+                               clusterHostsServiceImpl: ClusterHostsService,
+                               configService: ConfigService): StorageInterface = {
     new StorageInterfaceImpl(clusterService,
-                             dpClusterService,
-                             clusterComponentService,
-                             clusterHostsServiceImpl,
-                             configService)
+      dpClusterService,
+      clusterComponentService,
+      clusterHostsServiceImpl,
+      configService)
+  }
+
+  @Provides
+  @Singleton
+  def provideCredentialInterface(config: Config): CredentialInterface= {
+    new CredentialInterfaceImpl(config)
   }
 
   @Provides
@@ -282,11 +295,13 @@ object AppModule extends AbstractModule {
   def provideDpClusterSync(actorSystem: ActorSystem,
                            config: Config,
                            clusterInterface: StorageInterface,
+                           credentialInterface: CredentialInterface,
                            dpClusterService: DpClusterService,
                            wSClient: WSClient): DpClusterSync = {
     new DpClusterSync(actorSystem,
                       config,
                       clusterInterface,
+                      credentialInterface,
                       dpClusterService,
                       wSClient)
   }

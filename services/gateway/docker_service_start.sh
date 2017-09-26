@@ -18,4 +18,4 @@ java \
     -jar /usr/gateway-service/gateway-1.0.jar \
         --spring.cloud.consul.host=$CONSUL_HOST \
         --sso.enabled=true \
-        --signing.pub.key.path=/usr/dp-app/conf/cert/ssl-cert.pem "$@"
+        --signing.pub.key.path=/dp-shared/ssl-cert.pem "$@"

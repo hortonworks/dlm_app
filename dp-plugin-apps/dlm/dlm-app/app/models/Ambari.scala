@@ -20,14 +20,18 @@ object Ambari {
   case class Metrics(dfs: Dfs)
   case class HostComponent(`HostRoles`: HostRoles, metrics: Metrics)
   case class HostComponents(`ServiceComponentInfo`: JsValue, host_components: Seq[HostComponent])
-  case class Properties(policymgr_external_url: Option[String], `ranger.plugin.hdfs.service.name`: Option[String])
+  case class RangerProperties(policymgr_external_url: Option[String], `ranger.plugin.hdfs.service.name`: Option[String])
   case class ConfigKey(cluster_name: String, stack_id: String)
-  case class ServiceConfigurations(Config: ConfigKey, `type`: String, tag: String, version: Long, properties: Properties, properties_attributes: JsValue)
+  case class ServiceConfigurations(Config: ConfigKey, `type`: String, tag: String, version: Long, properties: JsValue, properties_attributes: JsValue)
   case class ActiveServiceConfigurations(href: String, cluster_name: String, configurations: Seq[ServiceConfigurations], createtime: Long,
                                         group_id: Long, group_name: String, hosts: JsValue, is_cluster_compatible: Boolean,
                                         is_current: Boolean, service_config_version: Long, service_config_version_note: String,
                                         service_name: String, stack_id: String, user: String)
   case class ActiveDefaultConfiguration(href: String, items: Seq[ActiveServiceConfigurations])
+
+  case class ServiceHostComponent(component_name: String, host_name: String, public_host_name: String)
+  case class ServiceHostRoles(HostRoles: ServiceHostComponent)
+  case class ServiceHostComponents(ServiceComponentInfo: JsValue, host_components: Seq[ServiceHostRoles])
 
   implicit val serviceComponentInfoReads = Json.reads[ServiceComponentInfo]
   implicit val serviceComponentInfoWrites = Json.writes[ServiceComponentInfo]
@@ -45,8 +49,8 @@ object Ambari {
   implicit val hostComponentsWrites = Json.writes[HostComponents]
   implicit val configKeyReads = Json.reads[ConfigKey]
   implicit val configKeyWrites = Json.writes[ConfigKey]
-  implicit val propertiesReads = Json.reads[Properties]
-  implicit val propertiesWrites = Json.writes[Properties]
+  implicit val rangerPropertiesReads = Json.reads[RangerProperties]
+  implicit val rangerPropertiesWrites = Json.writes[RangerProperties]
   implicit val serviceConfigurationsReads = Json.reads[ServiceConfigurations]
   implicit val serviceConfigurationsWrites = Json.writes[ServiceConfigurations]
   implicit val activeServiceConfigurationsReads = Json.reads[ActiveServiceConfigurations]

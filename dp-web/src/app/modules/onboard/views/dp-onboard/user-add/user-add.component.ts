@@ -9,14 +9,15 @@
  *
  */
 
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Router} from '@angular/router';
 import {UserService} from '../../../../../services/user.service';
 import {LDAPUser} from '../../../../../models/ldap-user';
-import {TagTheme} from '../../../../../shared/tagging-widget/tagging-widget.component';
+import {TaggingWidget} from '../../../../../shared/tagging-widget/tagging-widget.component';
 import {AuthenticationService} from '../../../../../services/authentication.service';
 import {Observable} from 'rxjs/Observable';
 import {GroupService} from '../../../../../services/group.service';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'dp-user-add',
@@ -30,15 +31,24 @@ export class UserAddComponent implements OnInit {
   groups: string[] = [];
   availableUsers: string[] = [];
   availableGroups: string[] = [];
-  tagThemes = TagTheme;
   groupsSaved = false;
   usersSaved = false;
 
-  constructor(private route: ActivatedRoute,
-              private router: Router,
+  errorMessage: string = '';
+  showError = false;
+
+  @ViewChild('userTags') private userTags: TaggingWidget;
+  @ViewChild('groupTags') private groupTags: TaggingWidget;
+
+  userSearchSubscription: any;
+  groupSearchSubscription: any;
+
+
+  constructor(private router: Router,
               private userService: UserService,
               private groupService: GroupService,
-              private authenticationService: AuthenticationService) {
+              private authenticationService: AuthenticationService,
+              private translateService: TranslateService) {
   }
 
   ngOnInit() {
@@ -57,43 +67,79 @@ export class UserAddComponent implements OnInit {
   }
 
   save() {
+    if (!this.userTags.isValid) {
+      this.onError(this.translateService.instant('pages.infra.description.invalidUserInput'));
+      return;
+    }
+    if (!this.groupTags.isValid) {
+      this.onError(this.translateService.instant('pages.infra.description.invalidGroupInput'));
+      return;
+    }
     if (!this.groupsSaved && !this.usersSaved) {
-      this.saveUsersAndGroups().subscribe(res => {
-        this.groupsSaved = res.groupsAdditionSuccess;
-        this.usersSaved = res.userAdditionSuccess;
-        if (res.groupsAdditionSuccess && res.userAdditionSuccess) {
-          this.authenticationService.signOut();
-        }
-      });
+      this.saveUsersAndGroups();
     } else if (!this.usersSaved && this.groupsSaved) {
-      this.userService.addAdminUsers(this.users).subscribe(response => {
+      this.saveUsers();
+    } else if (this.usersSaved && !this.groupsSaved) {
+      this.saveGroups();
+    }
+  }
+
+  saveUsers() {
+    this.userService.addAdminUsers(this.users).subscribe(response => {
+      if (response.successfullyAdded.length === this.users.length) {
         this.usersSaved = true;
         this.authenticationService.signOut();
-      }, (error) => {
-        console.error(error);
-        this.usersSaved = false;
+        return;
+      }
+      let failedUsers = [];
+      this.users.forEach(user => {
+        if (!response.successfullyAdded.find(res => res.userName === user)) {
+          failedUsers.push(user)
+        }
       });
-    } else if (this.usersSaved && !this.groupsSaved) {
-      this.groupService.addAdminGroups(this.groups).subscribe(response => {
+      this.onError(`${this.translateService.instant('pages.infra.description.addUserError')} - ${failedUsers.join(', ')}`);
+    }, (error) => {
+      this.onError(`${this.translateService.instant('pages.infra.description.addUserError')}`);
+      this.usersSaved = false;
+    });
+  }
+
+  saveGroups() {
+    this.groupService.addAdminGroups(this.groups).subscribe(response => {
+      if (response.successfullyAdded.length === this.groups.length) {
         this.groupsSaved = true;
         this.authenticationService.signOut();
-      }, (error) => {
-        console.error(error);
-        this.groupsSaved = false;
+        return;
+      }
+      let failedGroups = [];
+      this.groups.forEach(grp => {
+        if (!response.successfullyAdded.find(res => res.groupName === grp)) {
+          failedGroups.push(grp);
+        }
       });
-    }
+      this.onError(`${this.translateService.instant('pages.infra.description.addGroupError')} - ${failedGroups.join(', ')}`);
+    }, (error) => {
+      this.onError(`${this.translateService.instant('pages.infra.description.addGroupError')}`);
+      this.groupsSaved = false;
+    });
   }
 
   saveUsersAndGroups() {
     return Observable.forkJoin(
       this.userService.addAdminUsers(this.users),
       this.groupService.addAdminGroups(this.groups)
-    ).map(responses => {
-      console.log(responses);
-      return {
-        userAdditionSuccess: this.users.length === responses[0].successfullyAdded.length,
-        groupsAdditionSuccess: this.groups.length === responses[1].successfullyAdded.length
-      };
+    ).subscribe(responses => {
+      this.usersSaved = this.users.length === responses[0].successfullyAdded.length;
+      this.groupsSaved = this.groups.length === responses[1].successfullyAdded.length;
+      if (this.usersSaved && this.groupsSaved) {
+        this.authenticationService.signOut();
+      }
+      if (!this.usersSaved) {
+        this.onError(`${this.translateService.instant('pages.infra.description.addUserError')}`);
+      }
+      if (!this.groupsSaved) {
+        this.onError(`${this.translateService.instant('pages.infra.description.addGroupError')}`);
+      }
     });
   }
 
@@ -110,31 +156,44 @@ export class UserAddComponent implements OnInit {
   }
 
   onUserSearchChange(text: string) {
-    this.availableUsers = [];
-    if (text && text.length > 2) {
-      this.userService.searchLDAPUsers(text).subscribe((ldapUsers: LDAPUser[]) => {
-        this.availableUsers = [];
-        ldapUsers.map(user => {
-          this.availableUsers.push(user.name);
-        });
+    this.hideError();
+    if (this.userSearchSubscription) {
+      this.userSearchSubscription.unsubscribe();
+    }
+    if (text) {
+      this.userSearchSubscription = this.userService.searchLDAPUsers(text).subscribe((ldapUsers: LDAPUser[]) => {
+        this.availableUsers = ldapUsers.map(user => user.name);
       }, () => {
-        console.error('Error while fetching ldap users');
+        this.onError(this.translateService.instant('pages.onboard.adduser.description.ldapUserFetchError'));
       });
+    } else {
+      this.availableUsers = [];
     }
   }
 
   onGroupSearchChange(text: string) {
-    this.availableGroups = [];
-    if (text && text.length > 2) {
-      this.userService.searchLDAPGroups(text).subscribe((ldapGroups: any[]) => {
-        this.availableGroups = [];
-        ldapGroups.map(group => {
-          this.availableGroups.push(group.name);
-        });
-      }, () => {
-        console.error('Error while fetching ldap groups');
-      });
+    this.hideError();
+    if (this.groupSearchSubscription) {
+      this.groupSearchSubscription.unsubscribe();
     }
+    if (text) {
+      this.groupSearchSubscription = this.userService.searchLDAPGroups(text).subscribe((ldapGroups: any[]) => {
+        this.availableGroups = ldapGroups.map(group => group.name);
+      }, () => {
+        this.onError(this.translateService.instant('pages.onboard.adduser.description.ldapUserFetchError'));
+      });
+    } else {
+      this.availableGroups = [];
+    }
+  }
+
+  onError(errorMessage: string) {
+    this.showError = true;
+    this.errorMessage = errorMessage;
+  }
+
+  hideError() {
+    this.showError = false;
   }
 
 }

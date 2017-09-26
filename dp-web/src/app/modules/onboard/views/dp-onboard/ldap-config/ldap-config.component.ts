@@ -35,9 +35,7 @@ export class LdapConfigComponent extends LdapConfigCommonComponent {
   save() {
     super.save();
     this.configurationService.configureLDAP(this.ldapProperties).subscribe(() => {
-      this.router.navigate(['onboard/adduser', {
-        status: 'success',
-      }]);
+      this.router.navigate(['onboard/adduser']);
       Loader.hide();
     }, (response) => {
       Loader.hide();
