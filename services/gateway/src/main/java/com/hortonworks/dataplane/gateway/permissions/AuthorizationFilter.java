@@ -27,11 +27,8 @@ public class AuthorizationFilter extends ZuulFilter {
   @Autowired
   private Utils utils;
 
+  @Autowired
   private RouteLocator routeLocator;
-
-  public AuthorizationFilter(RouteLocator routeLocator){
-    this.routeLocator=routeLocator;
-  }
 
   @Override
   public String filterType() {
