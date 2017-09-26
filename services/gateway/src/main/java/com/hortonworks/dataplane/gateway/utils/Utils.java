@@ -6,6 +6,7 @@ import com.netflix.zuul.context.RequestContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,9 @@ public class Utils {
   private HashMap<String,String> loginRedirectCache=new HashMap<>();
   @Autowired
   private ProxyRequestHelper proxyRequestHelper;
+
+  @Value("${useragent_engines}")
+  private String userAgentEngines;
 
   @Autowired
   private RequestResponseUtils requestResponseUtils;
@@ -125,16 +129,13 @@ public class Utils {
   private boolean isRequestFromBrower(){
     HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
     String ua=request.getHeader(HttpHeaders.USER_AGENT).substring(0,8);
-    return  (ua.startsWith("Mozilla/")
-        || ua.startsWith("Webkit/")
-        || ua.startsWith("Opera/")
-        || ua.startsWith("Lynx/")
-        || ua.startsWith("Links ")
-        || ua.startsWith("NetSurf/")
-        || ua.startsWith("Dooble/")
-        || ua.startsWith("Dillo/")
-        );
-    //more options for browser matches are there but not required.
+    String[] userAgentsArr=userAgentEngines.split(",");
+    for(String userAgent:userAgentsArr){
+      if (ua.startsWith(userAgent)){
+        return true;
+      }
+    }
+    return false;
   }
   private boolean isAjax(){
     HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
