@@ -28,6 +28,6 @@ COPY ./utils /scripts
 COPY ./dp-knox-agent /usr/dp-knox-agent
 
 EXPOSE 8300 8301 8301/udp 8302 8302/udp 8400 8500 53/udp
-ENV sso.toplology.path=/usr/hdp/current/knox-server/conf/topologies/knoxsso.xml
+ENV KNOX_SSO_CONFIG_PATH=/usr/hdp/current/knox-server/conf/topologies/knoxsso.xml
 
 ENTRYPOINT ["bash", "/scripts/knox-start.sh"]
