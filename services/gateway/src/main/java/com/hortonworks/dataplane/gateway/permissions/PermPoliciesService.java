@@ -85,6 +85,9 @@ public class PermPoliciesService {
       }
     }
       if (bestMatch!=null){
+        if (Arrays.asList(bestMatch.getRoles()).contains("*")){
+          return  true;
+        }
         List<String> policyRoles = Arrays.asList(bestMatch.getRoles());
         Collection intersection = CollectionUtils.intersection(policyRoles, Arrays.asList(roles));
         return !intersection.isEmpty();

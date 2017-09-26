@@ -17,6 +17,11 @@
 
     },
     {
+      "path":"/health",
+      "roles": ["*"]
+
+    },
+    {
       "path":"/secret",
       "roles": []
 

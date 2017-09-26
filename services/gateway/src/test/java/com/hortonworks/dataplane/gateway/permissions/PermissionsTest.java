@@ -58,6 +58,26 @@ public class PermissionsTest  {
     assertFalse("should not be allowed",allowed);
   }
 
+  @Test
+  public void testForAny(){
+    PermPoliciesService permPoliciesService=new PermPoliciesService();
+    InputStream is=loadResource("policyfile1.json");
+    permPoliciesService.registerPolicy("dss",is);
+    boolean allowed=permPoliciesService.isAuthorized("dss","GET","/health",new String[]{});
+
+    assertTrue("should be allowed",allowed);
+  }
+
+  @Test
+  public void testAnyWithRoles(){
+    PermPoliciesService permPoliciesService=new PermPoliciesService();
+    InputStream is=loadResource("policyfile1.json");
+    permPoliciesService.registerPolicy("dss",is);
+    boolean allowed=permPoliciesService.isAuthorized("dss","GET","/health",new String[]{"steward"});
+
+    assertTrue("should be allowed",allowed);
+  }
+
 
   private InputStream loadResource(String path){
     return this.getClass().getClassLoader().getResourceAsStream(path);
