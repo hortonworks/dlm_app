@@ -10,16 +10,14 @@
 package services
 
 import com.google.inject.{Inject, Singleton}
-
 import com.google.inject.name.Named
 import models.Ambari._
 import com.hortonworks.dataplane.cs.Webservice.{AmbariWebService => AmbariClientService}
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, HJwtToken}
 import com.hortonworks.dlm.beacon.domain.RequestEntities.RangerServiceDetails
-import models.Entities.ClusterServiceEndpointDetails
 import play.api.Logger
 import play.api.http.Status.BAD_GATEWAY
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsObject, JsValue}
 import utils.StringExtensions._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -89,41 +87,6 @@ class AmbariService @Inject()(@Named("ambariService") val ambariService: AmbariC
     p.future
   }
 
-  /**
-    *
-    * @param clusterId  cluster id
-    * @param token   JWT token
-    * @return   (String, Boolean)
-    *           ._1 = active namenode
-    *           ._2 = Namenode HA enabled
-    */
-  def getActiveComponent(clusterId: Long)(implicit token:Option[HJwtToken]) : Future[Either[Errors, (String, Boolean)]] = {
-    val p: Promise[Either[Errors, (String, Boolean)]] = Promise()
-
-    dataplaneService.getCluster(clusterId).map {
-      case Left(errors) =>  p.success(Left(errors))
-      case Right(response) =>
-        val clusterName = response.name
-        val ambariApiSuffix = AmbariService.getNameNodeAmbariUrl
-        val url = s"clusters/$clusterName/$ambariApiSuffix"
-        ambariService.requestAmbariApi(clusterId, url.encode).map {
-          case Left(errors) =>  p.success(Left(errors))
-          case Right(response) => {
-            val nameNodes : Seq[HostComponent] = response.validate[HostComponents].get.host_components
-            val activeNameNode = nameNodes.find((x) => x.metrics.dfs.`FSNamesystem`.HAState == "active")
-            activeNameNode match {
-              case None => {
-                val errorMsg = AmbariService.getActiveNameNodeErrMsg
-                Logger.error(errorMsg)
-                p.success(Left(Errors(Seq(Error(BAD_GATEWAY.toString, errorMsg)))))
-              }
-              case Some(activeNameNode) => p.success(Right(activeNameNode.HostRoles.host_name, nameNodes.size > 1))
-            }
-          }
-        }
-    }
-    p.future
-  }
 
   /**
     * Get the active (effective) service configuration for the default group of a service
@@ -175,7 +138,7 @@ class AmbariService @Inject()(@Named("ambariService") val ambariService: AmbariC
           adminProperties match {
             case None => p.success(Left(Errors(Seq(Error(BAD_GATEWAY.toString, AmbariService.adminPropertiesErrorMsg)))))
             case Some(adminProperties) => {
-              adminProperties.properties.policymgr_external_url match {
+              adminProperties.properties.as[RangerProperties].policymgr_external_url match {
                 case None => p.success(Left(Errors(Seq(Error(BAD_GATEWAY.toString, AmbariService.policymgrUrlErrorMsg)))))
                 case Some(policymgr_external_url) =>
                   val clusterName = adminProperties.Config.cluster_name
@@ -193,7 +156,7 @@ class AmbariService @Inject()(@Named("ambariService") val ambariService: AmbariC
                       val rangerHDFSServiceName = rangerHdfsSecurityConfigs match {
                         case None => s"${clusterName}_hadoop"
                         case Some(rangerHdfsSecurityConfigs) =>
-                          rangerHdfsSecurityConfigs.properties.`ranger.plugin.hdfs.service.name` match {
+                          rangerHdfsSecurityConfigs.properties.as[RangerProperties].`ranger.plugin.hdfs.service.name` match {
                             case None => s"${clusterName}_hadoop"
                             case Some(rangerHDFSServiceNameValue) =>
                               if (rangerHDFSServiceNameValue != "{{repo_name}}")
@@ -209,7 +172,7 @@ class AmbariService @Inject()(@Named("ambariService") val ambariService: AmbariC
                         rangerHiveSecurityConfigs match {
                           case None => Some(s"${clusterName}_hive")
                           case Some(rangerHiveSecurityConfigs) =>
-                            rangerHiveSecurityConfigs.properties.`ranger.plugin.hdfs.service.name` match {
+                            rangerHiveSecurityConfigs.properties.as[RangerProperties].`ranger.plugin.hdfs.service.name` match {
                               case None => Some(s"${clusterName}_hive")
                               case Some(rangerHiveServiceNameValue) =>
                                 if (rangerHiveServiceNameValue != "{{repo_name}}")
@@ -231,6 +194,188 @@ class AmbariService @Inject()(@Named("ambariService") val ambariService: AmbariC
     }
     p.future
   }
+
+  /**
+    * Get HDFS config details for cluster submission to beacon
+    * @param clusterId  cluster id
+    * @return
+    */
+  def getHDFSConfigDetails(clusterId: Long) (implicit token:Option[HJwtToken]):
+  Future[Either[Errors, Map[String, Option[String]]]] = {
+    val p: Promise[Either[Errors, Map[String, Option[String]]]] = Promise()
+    getServiceConfigDetails(clusterId, AmbariService.HDFS_SERVICE_NAME).map {
+      case Left(errors) =>  p.success(Left(errors))
+      case Right(response) =>
+        response match {
+          case None => p.success(Right(Map()))
+          case Some(response) => {
+            val fsEndpoint: Either[Errors, String] =
+              getPropertyValue(response, AmbariService.HDFS_SERVICE_NAME, "core-site", "fs.defaultFS")
+            fsEndpoint match {
+              case Right(fsEndpoint) => {
+                val nnKerberosPrincipal : Option[String] =  convertEitherToOption(getPropertyValue(response,
+                  AmbariService.HDFS_SERVICE_NAME, "hdfs-site", "dfs.namenode.kerberos.principal"))
+
+                val dfsNameService: Option[String] =  convertEitherToOption(getPropertyValue(response,
+                  AmbariService.HDFS_SERVICE_NAME, "hdfs-site", "dfs.nameservices"))
+                val dfsInternalNameServices: Option[String] =  convertEitherToOption(getPropertyValue(response,
+                  AmbariService.HDFS_SERVICE_NAME, "hdfs-site", "dfs.internal.nameservices"))
+                val nnHaDynamicKeyConfigs: Map[String, Option[String]] =  dfsInternalNameServices match {
+                  case Some(nameService) => {
+                    val internalNameService =  nameService.split(",")(0)
+                    val dfsHaNnPrefixValue = convertEitherToOption(getPropertyValue(response, AmbariService.HDFS_SERVICE_NAME,
+                      "hdfs-site", s"dfs.ha.namenodes.$internalNameService"))
+                    dfsHaNnPrefixValue match {
+                      case Some(dfsHaNnPrefixValue) => {
+                        val endpointConfigs : Seq[String] = dfsHaNnPrefixValue.split(",").map((x) =>
+                          s"dfs.namenode.rpc-address.$internalNameService.$x")
+                        val nnHaConfigs = endpointConfigs :+ s"dfs.client.failover.proxy.provider.$internalNameService"
+                        Map(s"dfs.ha.namenodes.$internalNameService" -> Some(dfsHaNnPrefixValue)) ++
+                          nnHaConfigs.foldLeft(Map(): Map[String, Option[String]]) {
+                          (acc, next) => {
+                            val nextConfigValue: Option[String] = convertEitherToOption(getPropertyValue(response,
+                              AmbariService.HDFS_SERVICE_NAME, "hdfs-site", next))
+                            acc + (next -> nextConfigValue)
+                          }
+                        }
+
+                      }
+                      case None => Map()
+                    }
+                  }
+                  case None => Map()
+                }
+
+
+                val hdfsServiceConfigMap : Map[String, Option[String]] = Map(
+                  "fsEndpoint" -> Some(fsEndpoint),
+                  "nnKerberosPrincipal" -> nnKerberosPrincipal,
+                  "dfs.nameservices" ->  dfsNameService,
+                  "dfs.internal.nameservices" -> dfsInternalNameServices
+                ) ++ nnHaDynamicKeyConfigs
+
+                p.success(Right(hdfsServiceConfigMap))
+              }
+              case Left(errors) => p.success(Left(errors))
+            }
+          }
+        }
+    }
+    p.future
+  }
+
+  /**
+    * Get hive server2 config details for cluster submission to beacon
+    * @param clusterId  cluster id
+    * @return
+    */
+  def getHiveConfigDetails(clusterId: Long) (implicit token:Option[HJwtToken]):
+  Future[Either[Errors, Map[String, Option[String]]]] = {
+    val p: Promise[Either[Errors, Map[String, Option[String]]]] = Promise()
+    getServiceConfigDetails(clusterId, AmbariService.HIVE_SERVICE_NAME).map {
+      case Left(errors) =>  p.success(Left(errors))
+      case Right(response) =>
+        response match {
+          case None => p.success(Right(Map()))
+          case Some(response) => {
+            val hiveServerZkQuorum: Either[Errors, String] =
+              getPropertyValue(response, AmbariService.HIVE_SERVICE_NAME, "hive-site", "hive.zookeeper.quorum")
+            val hiveServerZkNameSpace: Either[Errors, String] =
+              getPropertyValue(response, AmbariService.HIVE_SERVICE_NAME, "hive-site", "hive.server2.zookeeper.namespace")
+
+            hiveServerZkQuorum match {
+              case Right(hiveServerZkQuorum) => {
+                hiveServerZkNameSpace match {
+                  case Right(hiveServerZkNameSpace) =>  {
+                    val hsEndpoint = s"jdbc:hive2://$hiveServerZkQuorum/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=$hiveServerZkNameSpace"
+
+                    val hsKerberosPrincipal: Option[String] =  convertEitherToOption(getPropertyValue(response,
+                      AmbariService.HIVE_SERVICE_NAME, "hive-site", "hive.server2.authentication.kerberos.principal"))
+
+                    val hiveServiceConfigMap : Map[String, Option[String]] = Map(
+                      "hsEndpoint" -> Some(hsEndpoint),
+                      "hsKerberosPrincipal" -> hsKerberosPrincipal
+                    )
+
+                    p.success(Right(hiveServiceConfigMap))
+                  }
+                  case Left(errors) => p.success(Left(errors))
+                }
+              }
+              case Left(errors) => p.success(Left(errors))
+            }
+          }
+        }
+    }
+    p.future
+  }
+
+
+  def convertEitherToOption[T](data: Either[Errors, T]) : Option[T] = {
+    data match {
+      case Right(x) => Some(x)
+      case Left(errors) => None
+    }
+  }
+
+
+  /**
+    * Get active service configuration for a service
+    * @param clusterId    cluster id
+    * @param serviceName   service name
+    * @param token    JWT token
+    * @return
+    */
+  def getServiceConfigDetails(clusterId: Long, serviceName: String) (implicit token:Option[HJwtToken]):
+  Future[Either[Errors, Option[Seq[ServiceConfigurations]]]] = {
+    val p: Promise[Either[Errors, Option[Seq[ServiceConfigurations]]]] = Promise()
+    val serviceConfigurations: Future[Either[Errors, Seq[ActiveServiceConfigurations]]] =
+      getActiveServiceConfiguration(clusterId, serviceName)
+    serviceConfigurations.map {
+      case Left(errors) =>  p.success(Left(errors))
+      case Right(response) =>
+        if (response.isEmpty) p.success(Right(None)) else {
+          val configurations : Seq[ServiceConfigurations] = response.head.configurations
+          p.success(Right(Some(configurations)))
+        }
+    }
+    p.future
+  }
+
+  /**
+    *
+    * @param serviceConfigurations  configuration blob
+    * @param serviceName   service name
+    * @param configType    config type
+    * @param configName    config property name
+    * @return
+    */
+  def getPropertyValue(serviceConfigurations: Seq[ServiceConfigurations],
+                       serviceName: String,
+                       configType: String,
+                       configName: String): Either[Errors, String] = {
+    val configTypeProperties =
+      serviceConfigurations.find(_.`type` == configType)
+    configTypeProperties match {
+      case Some(configTypeProperties) => {
+        configTypeProperties.properties.as[JsObject].value.get(configName) match {
+          case Some(configValue) => Right(configValue.as[String])
+          case None => {
+            val errorMsg =
+              s"$configName is not found in $configType for $serviceName"
+            Logger.error(errorMsg)
+            Left(Errors(Seq(Error("500", errorMsg))))
+          }
+        }
+      }
+      case None => {
+        val errorMsg = s"$configType is not associated with $serviceName"
+        Logger.error(errorMsg)
+        Left(Errors(Seq(Error("500", errorMsg))))
+      }
+    }
+
+  }
 }
 
 object AmbariService {
@@ -243,7 +388,8 @@ object AmbariService {
 
   def getNameNodeAmbariUrl = "services/HDFS/components/NAMENODE?fields=host_components/metrics/dfs/FSNamesystem/HAState,host_components/HostRoles/host_name&minimal_response=true"
   def getActiveNameNodeErrMsg = "No active namenode found from Ambari REST APIs"
-  def getActiveServiceConfigurationUrl(clusterName: String, serviceName: String) = s"clusters/$clusterName/configurations/service_config_versions?service_name=$serviceName&is_current=true&group_name=Default"
+  def getActiveServiceConfigurationUrl(clusterName: String, serviceName: String) = s"clusters/$clusterName/configurations/" +
+    s"service_config_versions?service_name=$serviceName&is_current=true&group_name=Default"
   def adminPropertiesErrorMsg = "admin-properties configuration type is not found for Ranger service"
   def policymgrUrlErrorMsg = "admin-properties configuration type for Ranger service does not have policymgr_external_url property"
   def rangerPolicyNameErrorMsg = "Error getting current HDFS/HIVE service configuration from Ambari"
