@@ -41,8 +41,11 @@ import { isEmpty } from 'utils/object-utils';
 import * as moment from 'moment';
 import { FILE_TYPES } from 'constants/hdfs.constant';
 import { HdfsService } from 'services/hdfs.service';
+import { ProgressState } from 'models/progress-state.model';
+import { getMergedProgress } from 'selectors/progress.selector';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
+const DATABASE_REQUEST = '[Policy Form] DATABASE_REQUEST';
 
 export function freqValidator(frequencyMap): ValidatorFn {
   return (control: AbstractControl): ValidationErrors => {
@@ -132,6 +135,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   selectedSource$ = new BehaviorSubject(0);
   sourceDatabases$: Observable<HiveDatabase[]>;
   databaseSearch$ = new BehaviorSubject<string>('');
+  databaseRequest$: Observable<ProgressState>;
   subscriptions: Subscription[] = [];
   policyFormValues$;
   databaseListGroup: FormGroup;
@@ -337,7 +341,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     const loadDatabasesSubscription = this.selectedSource$
       .filter(sourceCluster => !!sourceCluster)
       .subscribe(sourceCluster => {
-        this.store.dispatch(loadFullDatabases(sourceCluster));
+        this.store.dispatch(loadFullDatabases(sourceCluster, {requestId: DATABASE_REQUEST}));
       });
     const databases$ = this.selectedSource$.switchMap(sourceCluster => {
       return this.store.select(getAllDatabases)
@@ -435,6 +439,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         this.cdRef.detectChanges();
       });
 
+    this.databaseRequest$ = this.store.select(getMergedProgress(DATABASE_REQUEST));
     this.subscriptions.push(loadDatabasesSubscription);
     this.subscriptions.push(policyFormValuesSubscription);
     this.subscriptions.push(directoriesChangesSubscription);

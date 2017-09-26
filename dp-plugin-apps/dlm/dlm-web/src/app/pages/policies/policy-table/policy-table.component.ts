@@ -37,6 +37,8 @@ import { deletePolicy, resumePolicy, suspendPolicy } from 'actions/policy.action
 import { PolicyService } from 'services/policy.service';
 import { OperationResponse } from 'models/operation-response.model';
 import { getLastOperationResponse } from 'selectors/operation.selector';
+import { getMergedProgress } from 'selectors/progress.selector';
+import { ProgressState } from 'models/progress-state.model';
 import { PolicyContent } from '../policy-details/policy-content.type';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -52,6 +54,8 @@ import { ColumnMode } from '@swimlane/ngx-datatable';
 import { NOTIFICATION_TYPES, NOTIFICATION_CONTENT_TYPE } from 'constants/notification.constant';
 import { confirmNextAction } from 'actions/confirmation.action';
 
+const DATABASE_REQUEST = '[Policy Table] DATABASE_REQUEST';
+
 @Component({
   selector: 'dlm-policy-table',
   templateUrl: './policy-table.component.html',
@@ -64,6 +68,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   columnMode = ColumnMode.flex;
   selectedPolicy$: BehaviorSubject<Policy> = new BehaviorSubject(<Policy>{});
   policyDatabase$: Observable<HiveDatabase>;
+  databaseRequest$: Observable<ProgressState>;
   policyContent = PolicyContent;
   tablesSearchPattern = '';
 
@@ -87,7 +92,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   jobs: Job[] = [];
   jobsOffset: number;
   jobsOverallCount: number;
-  jobsPolicyId: number;
+  jobsPolicyId: string;
   loadingJobs = false;
 
   @ViewChild(IconColumnComponent) iconColumn: IconColumnComponent;
@@ -148,10 +153,18 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     };
   }
 
+  private resetJobsData(): void {
+    this.jobs = [];
+    this.jobsOffset = 0;
+    this.jobsOverallCount = 0;
+  }
+
   constructor(private t: TranslateService,
               private store: Store<fromRoot.State>,
               private hiveService: HiveService,
               private logService: LogService) {
+    this.databaseRequest$ = store.select(getMergedProgress(DATABASE_REQUEST))
+      .distinctUntilKeyChanged('isInProgress');
     this.subscriptions.push(store.select(getJobsPage).subscribe(jobsPage => {
       if (this.jobsPolicyId !== jobsPage.policyId) {
         this.jobs = [];
@@ -317,6 +330,9 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
    * @param {PolicyContent} contentType
    */
   toggleRowDetail(policy: Policy, contentType: PolicyContent) {
+    if (this.jobsPolicyId !== policy.id) {
+      this.resetJobsData();
+    }
     this.toggleSelectedRow(policy, contentType);
     this.activatePolicy(policy, contentType);
     this.loadContentDetails(policy, contentType);
@@ -357,7 +373,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     if (contentType === PolicyContent.Files) {
       const cluster = this.clusterByDatacenterId(policy.sourceCluster);
       if (policy.type === POLICY_TYPES.HIVE) {
-        this.store.dispatch(loadFullDatabases(cluster.id));
+        this.store.dispatch(loadFullDatabases(cluster.id, { requestId: DATABASE_REQUEST }));
       } else {
         this.sourceCluster = cluster.id;
         this.hdfsRootPath = policy.sourceDataset;
