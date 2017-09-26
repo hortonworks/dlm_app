@@ -98,6 +98,7 @@ POST          /api/knox/validate                                     controllers
 POST          /api/knox/configure                                    controllers.KnoxConfig.configure
 GET           /api/knox/configuration                                controllers.KnoxConfig.configuration
 GET           /api/knox/ldap                                         controllers.KnoxConfig.getLdapConfiguration
+POST          /api/knox/ldap                                         controllers.KnoxConfig.updateLdapConfig
 GET           /api/knox/status                                       controllers.KnoxConfig.isKnoxConfigured
 GET           /api/users/ldapsearch                                  controllers.UserManager.ldapSearch
 
