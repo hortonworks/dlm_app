@@ -1,0 +1,64 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+<div id="connectivity-container" class="connectivity-container">
+  <div>
+    <i class="fa fa-desktop connectivity-icon" aria-hidden="true"></i>
+    <span>Test LDAP</span>
+  </div>
+  <div *ngIf="enable" id="connectivity-tabs" class="tabs-container">
+    <div class="mdl-layout__header-row layout">
+      <nav class="mdl-navigation">
+        <span *ngFor="let tab of tabNames; let i = index" class="mdl-navigation__link" (click)="onTabSelect(tab)"
+        [ngClass]="{'is_active': activeTabName === tab || (activeTabName.length === 0 && i ===0)}">
+        <span> {{ tab }} </span>
+        </span>
+      </nav>
+    </div>
+    <section *ngIf="activeTabName === 'CONNECTION'">
+      <div class="connection-tab-content">
+        <div class="inline"><i class="fa fa-desktop icon"></i></div>
+        <div class="loader-container">
+          <i class="fa fa-arrow-left icon"></i>
+          <div class="inline" *ngIf="connected"><i class="fa fa-check-circle icon success"></i></div>
+          <div *ngIf="connecting"  class="horizontal-loader-4">
+            <div *ngFor="let number of [1,2,3,4]" class="h-loader loader_item_{{number}}"></div>
+          </div>
+          <div class="inline" *ngIf="connectionFailed"><i class="fa fa-times-circle icon error"></i></div>
+          <i class="fa fa-arrow-right icon"></i>
+        </div>
+        <div class="inline"><i class="fa fa-desktop icon"></i></div>
+        <div>Failed</div>
+      </div>
+    </section>
+    <section *ngIf="activeTabName === 'USER'">
+      <div class="hwx-desc">test user name</div>
+      <div class="input-group-with-icon">
+        <i class="fa fa-user"></i>
+        <input required class="dp-input-url" name="userName" type="text" [(ngModel)]="userName"/>
+          <button id="check-user-btn" class="mdl-button btn-hwx-primary" type="button" (click)="checkUser($event)">
+            <span *ngIf="userValidationInProgress"><i class="fa fa-spinner fa-spin"></i></span>
+            <span *ngIf="!userValidationInProgress">GO</span>
+          </button>
+      </div>
+    </section>
+    <section *ngIf="activeTabName === 'GROUP'">
+      <div class="hwx-desc">test group name</div>
+      <div class="input-group-with-icon">
+        <i class="fa fa-users"></i>
+        <input required class="dp-input-url" name="groupName" type="text" [(ngModel)]="groupName"/>
+        <button id="check-group-btn" class="mdl-button btn-hwx-primary" type="button" (click)="checkGroup($event)">
+          <span *ngIf="groupValidationInProgress"><i class="fa fa-spinner fa-spin"></i></span>
+          <span *ngIf="!groupValidationInProgress">GO</span>
+        </button>
+      </div>
+  </section>
+  </div>
+</div>

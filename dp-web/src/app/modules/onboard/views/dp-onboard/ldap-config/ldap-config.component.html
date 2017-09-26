@@ -70,6 +70,7 @@
         <input name="admin-password-toggle" type="checkbox" [(ngModel)]="showLdapPassword"/><span>{{"pages.onboard.configure.labels.showPassword" | translate}}</span>
       </div>
     </div>
+    <dp-ldap-connectivity-check [ldapProperties]="ldapProperties" [enable]="enableTest"></dp-ldap-connectivity-check>
     <div class="margin-top-30">
       <button id="save-btn" name="save" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"common.save" | translate}}</button>
       <button id="cancel-btn" name="cancel" class="mdl-button btn-hwx-default" (click)="back()">{{"common.cancel" | translate}}</button>

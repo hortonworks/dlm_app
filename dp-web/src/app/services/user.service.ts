@@ -27,6 +27,14 @@ export class UserService {
   constructor(private http: Http) {
   }
 
+  checkuser(): Observable<boolean> {
+    return Observable.of(Math.random() < 0.5);
+  }
+
+  checkGroup(): Observable<boolean> {
+    return Observable.of(Math.random() < 0.5);
+  }
+
   getUserDetail(): Observable<User> {
     return this.http.get('/auth/userDetail', new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
@@ -35,14 +43,14 @@ export class UserService {
 
   searchLDAPUsers(searchTerm: string): Observable<LDAPUser[]> {
     return this.http
-      .get(`${this.url}/ldapsearch?name=${searchTerm}&fuzzyMatch=true`, new RequestOptions(HttpUtil.getHeaders()))
+      .get(`${this.url}/ldapsearch?name=${searchTerm}&fuzzyMatch=false`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }
 
   searchLDAPGroups(searchTerm: string): Observable<any> {
     return this.http
-      .get(`${this.url}/ldapsearch?name=${searchTerm}&fuzzyMatch=true&searchType=group`, new RequestOptions(HttpUtil.getHeaders()))
+      .get(`${this.url}/ldapsearch?name=${searchTerm}&fuzzyMatch=false&searchType=group`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

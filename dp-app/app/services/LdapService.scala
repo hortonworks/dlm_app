@@ -40,6 +40,82 @@ class LdapService @Inject()(
   private val logger = Logger(classOf[LdapService])
   private val USERDN_SUBSTITUTION_TOKEN = "{0}"
 
+//  def validateUserOrGroup(knoxConf: KnoxConfigInfo,requestHost:String, searchText: String, searchType: String): Future[Either[Errors, Boolean]] = {
+//    if (knoxConf.bindDn.isEmpty || knoxConf.password.isEmpty) {
+//      Future.successful(
+//        Left(Errors(Seq(Error("400", "username and password mandatory")))))
+//    } else {
+//      validate(knoxConf) match {
+//        case Left(errors) => Future.successful(Left(errors))
+//        case Right(isValid) => {
+//          if (!isValid) {
+//            Future.successful(
+//              Left(Errors(Seq(Error("400", "invalid knox configuration")))))
+//          } else {
+//            validateBindDn(knoxConf).flatMap {
+//              case Left(errors) => Future.successful(Left(errors))
+//              case Right(isBound) => {
+//                ldapKeyStore.createCredentialEntry(
+//                  knoxConf.bindDn.get,
+//                  knoxConf.password.get) match {
+//                  case Left(errors) => Future.successful(Left(errors))
+//                  case Right(isCreated) => {
+//                    val ldapConfiguration =
+//                      LdapConfiguration(id = knoxConf.id,
+//                        ldapUrl = knoxConf.ldapUrl,
+//                        bindDn = knoxConf.bindDn,
+//                        userSearchBase = knoxConf.userSearchBase,
+//                        userSearchAttributeName = knoxConf.userSearchAttributeName,
+//                        groupSearchBase = knoxConf.groupSearchBase,
+//                        groupSearchAttributeName = knoxConf.groupSearchAttributeName,
+//                        groupObjectClass = knoxConf.groupObjectClass,
+//                        groupMemberAttributeName = knoxConf.groupMemberAttributeName
+//                      )
+//                    validateUser(ldapConfiguration, searchText, Some(searchType), false).map {
+//                      case Left(errors) => Left(errors)
+//                      case Right(ldapSearchResults) => {
+//                        ldapKeyStore.deleteCredentialEntry(ldapConfiguration.bindDn.get)
+//                        Right(ldapSearchResults.nonEmpty)
+//                      }
+//                    }
+//                  }
+//                }
+//              }
+//            }
+//          }
+//        }
+//      }
+//    }
+//  }
+
+//  private def validateUser(ldap: LdapConfiguration,
+//              userName: String,
+//              searchType: Option[String],
+//              fuzzyMatch: Boolean): Future[Either[Errors, Seq[LdapSearchResult]]] ={
+//   // val context = validateAndGetLdapContext(Seq(ldap))
+//    validateAndGetLdapContext(Seq(ldap)). map {
+//      case Left(errors) => errors
+//      case Right(context) => ldapSearch(context, Seq(ldap), userName, searchType,fuzzyMatch)
+//
+//    }
+//
+//  }
+//    for {
+//      configuredLdap <- ldap
+//      dirContext <- doWithEither[Seq[LdapConfiguration], DirContext](
+//        configuredLdap,
+//        validateAndGetLdapContext)
+//      search <- doWithEither[DirContext, Seq[LdapSearchResult]](
+//        dirContext,
+//        context => {
+//          try{
+//          }finally {
+//            context.close()
+//          }
+//        })
+//
+//    } yield search
+
   def configure(knoxConf: KnoxConfigInfo,requestHost:String): Future[Either[Errors, Boolean]] = {
     if (knoxConf.bindDn.isEmpty || knoxConf.password.isEmpty) {
       Future.successful(
@@ -186,7 +262,7 @@ class LdapService @Inject()(
       fuzzyMatch: Boolean): Future[Either[Errors, Seq[LdapSearchResult]]] = {
     val groupSerch=if (searchType.isDefined && searchType.get=="group")true else false
     if (groupSerch){
-      ldapGroupSearch(dirContext,ldapConfs,userName)
+      ldapGroupSearch(dirContext,ldapConfs,userName,fuzzyMatch)
     }else{
       val searchControls: SearchControls = new SearchControls()
       searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
@@ -198,7 +274,10 @@ class LdapService @Inject()(
         }else{
           val userSearchBase=ldapConfs.head.userSearchBase.get
           val userSearchAttributeName=ldapConfs.head.userSearchAttributeName.get
-          val searchParam=s"$userSearchAttributeName=$userName*"
+          val searchParam = fuzzyMatch match {
+            case true => s"$userSearchAttributeName=$userName*"
+            case false => s"$userSearchAttributeName=$userName"
+          }
           val res: NamingEnumeration[SearchResult] =
             dirContext.search(userSearchBase, searchParam, searchControls)
           val ldapSearchResults: ArrayBuffer[LdapSearchResult] = new ArrayBuffer()
@@ -222,7 +301,7 @@ class LdapService @Inject()(
   }
 
   private def ldapGroupSearch(  dirContext: DirContext,
-                                ldapConfs: Seq[LdapConfiguration],groupName:String):Future[Either[Errors, Seq[LdapSearchResult]]]={
+                                ldapConfs: Seq[LdapConfiguration],groupName:String,fuzzyMatch:Boolean):Future[Either[Errors, Seq[LdapSearchResult]]]={
     val groupSearchBase=ldapConfs.head.groupSearchBase
     if (groupSearchBase.isEmpty || ldapConfs.head.groupSearchAttributeName.isEmpty){
       Future.successful(Left(Errors(Seq(Error("Exception", "Group search base must be configured")))))
@@ -231,7 +310,10 @@ class LdapService @Inject()(
       searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE)
       val groupSearchBase=ldapConfs.head.groupSearchBase.get
       val groupSearchAttributeName=ldapConfs.head.groupSearchAttributeName.get
-      val searchParam=s"$groupSearchAttributeName=$groupName*"
+      val searchParam= fuzzyMatch match {
+        case true => s"$groupSearchAttributeName=$groupName*"
+        case false => s"$groupSearchAttributeName=$groupName"
+      }
       val res: NamingEnumeration[SearchResult]=dirContext.search(groupSearchBase,searchParam,searchControls)
       val ldapSearchResults: ArrayBuffer[LdapSearchResult] = new ArrayBuffer()
       while (res.hasMore) {

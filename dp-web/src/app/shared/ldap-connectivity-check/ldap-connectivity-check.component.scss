@@ -1,0 +1,102 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+@import "../../../styles/variables";
+
+.connectivity-container {
+  width: 400px;
+  background-color: $white;
+  padding: 10px 20px;
+}
+
+.connectivity-icon {
+  font-size: 20px;
+  margin: 10px 10px;
+}
+
+.layout {
+  width: 400px;
+  &.mdl-layout__header-row {
+    height: 34px;
+  }
+
+  .mdl-navigation {
+    height: 34px;
+  }
+
+  .mdl-navigation__link {
+    cursor: pointer;
+    line-height: 32px;
+    padding: 0 37px !important;
+    color: $dove-gray !important;
+    background: $alto;
+    border-right: 1px solid $white;
+  }
+
+  .mdl-navigation__link.is_active {
+    background: $concrete;
+    color: $dove-gray !important;
+  }
+}
+
+.connection-tab-content {
+  text-align: center;
+  display: block;
+  padding: 50px;
+}
+
+.loader-container {
+  display: inline-block;
+  padding: 0 10px;
+  line-height: 20px;
+}
+
+.inline {
+  display: inline-block;
+}
+
+.icon {
+  font-size: 20px;
+}
+
+.success {
+  color: $forest-green-1;
+}
+
+.error {
+  color: $roman-red;
+}
+
+.input-group-with-icon {
+  width: 390px;
+  .fa {
+    position: absolute;
+    left: 45px;
+    line-height: 32px;
+    font-size: 16px;
+    padding: 0 10px;
+    display: inline-block;
+  }
+
+  input[type="text"] {
+    padding-left: 30px;
+    width: 370px;
+  }
+
+  display: flex;
+  & > *:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  & > *:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}

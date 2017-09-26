@@ -28,6 +28,7 @@ import {TranslateModule} from '@ngx-translate/core';
 import {TaggingWidgetModule} from '../../shared/tagging-widget/tagging-widget.module';
 import {StatusCheckGuard} from './guards/status-check-guard';
 import {ConfigCheckGuard} from './guards/config-check-guard';
+import {LdapConnectivityCheckModule} from '../../shared/ldap-connectivity-check/ldap-connectivity-check.module';
 
 @NgModule({
   imports: [
@@ -36,7 +37,8 @@ import {ConfigCheckGuard} from './guards/config-check-guard';
     NguiAutoCompleteModule,
     RouterModule.forChild(routes),
     TaggingWidgetModule,
-    TranslateModule
+    TranslateModule,
+    LdapConnectivityCheckModule
   ],
   declarations: [
     FirstRunComponent,

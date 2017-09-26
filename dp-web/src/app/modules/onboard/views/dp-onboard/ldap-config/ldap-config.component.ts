@@ -57,6 +57,10 @@ export class LdapConfigComponent implements OnInit {
     }
   }
 
+  get enableTest(){
+    return this.configForm.form.valid;
+  }
+
   save() {
     this.notificationMessages = [];
     if (!this.configForm.form.valid) {

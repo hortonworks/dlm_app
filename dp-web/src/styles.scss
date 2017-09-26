@@ -18,6 +18,7 @@
 @import "styles/mixins";
 @import "styles/html-controls";
 @import "styles/slider";
+@import "styles/horizontal-loader";
 
 body {
   font-size: 13px;
@@ -138,6 +139,7 @@ a:hover {
 @include summary-pane("summary-pane-7", "14.2%");
 @include summary-pane("summary-pane-3", "33%");
 
+@include horizontal-loader("horizontal-loader-4", 4);
 
 .overFlowEllipsis{
   overflow: hidden;

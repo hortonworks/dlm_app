@@ -1,0 +1,120 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
+@import "../styles/variables";
+
+@mixin horizontal-loader($class-name, $count) {
+  .#{$class-name} {
+    width: #{$count * 20}px;
+    position:relative;
+    margin:auto;
+    display: inline-block;
+  }
+  .h-loader {
+   // position:absolute;
+    display: inline-block;
+    top:0;
+    background-color: $forest-green-1;
+    width:14px;
+    height:14px;
+    animation-name:bounce_fountainG;
+    -o-animation-name:bounce_fountainG;
+    -ms-animation-name:bounce_fountainG;
+    -webkit-animation-name:bounce_fountainG;
+    -moz-animation-name:bounce_fountainG;
+    animation-duration: #{$count * 0.25}s;
+    -o-animation-duration:#{$count * 0.25}s;
+    -ms-animation-duration:#{$count * 0.25}s;
+    -webkit-animation-duration:#{$count * 0.25}s;
+    -moz-animation-duration:#{$count * 0.25}s;
+    animation-iteration-count:infinite;
+    -o-animation-iteration-count:infinite;
+    -ms-animation-iteration-count:infinite;
+    -webkit-animation-iteration-count:infinite;
+    -moz-animation-iteration-count:infinite;
+    animation-direction:normal;
+    -o-animation-direction:normal;
+    -ms-animation-direction:normal;
+    -webkit-animation-direction:normal;
+    -moz-animation-direction:normal;
+    transform:scale(.5);
+    -o-transform:scale(.5);
+    -ms-transform:scale(.5);
+    -webkit-transform:scale(.5);
+    -moz-transform:scale(.5);
+    border-radius:19px;
+    -o-border-radius:19px;
+    -ms-border-radius:19px;
+    -webkit-border-radius:19px;
+    -moz-border-radius:19px;
+  }
+
+  @for $i from 1 through $count {
+    .loader_item_#{$i}{
+      left: #{$i*20}px;
+      animation-delay:#{$i*0.25}s;
+      -o-animation-delay:#{$i*0.25}s;
+      -ms-animation-delay:#{$i*0.25}s;
+      -webkit-animation-delay:#{$i*0.25}s;
+      -moz-animation-delay:#{$i*0.25}s;
+    }
+  }
+}
+
+@keyframes bounce_fountainG{
+  0%{
+    background-color:$forest-green-1;
+  }
+
+  100%{
+    background-color:rgb(255,255,255);
+  }
+}
+
+@-o-keyframes bounce_fountainG{
+  0%{
+    background-color:$forest-green-1;
+  }
+
+  100%{
+    background-color:rgb(255,255,255);
+  }
+}
+
+@-ms-keyframes bounce_fountainG{
+  0%{
+    background-color:$forest-green-1;
+  }
+
+  100%{
+    background-color:rgb(255,255,255);
+  }
+}
+
+@-webkit-keyframes bounce_fountainG{
+  0%{
+    background-color:$forest-green-1;
+  }
+
+  100%{
+    background-color:rgb(255,255,255);
+  }
+}
+
+@-moz-keyframes bounce_fountainG{
+  0%{
+    background-color:$forest-green-1;
+  }
+
+  100%{
+    background-color:rgb(255,255,255);
+  }
+}
