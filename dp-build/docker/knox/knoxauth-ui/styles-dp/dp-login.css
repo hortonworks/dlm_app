@@ -1,0 +1,205 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
+body {
+  font-size: 13px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.page-wrapper {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  position: absolute;
+  background: white;
+}
+
+.login-wrapper {
+  margin: auto;
+  width: 100%;
+}
+
+.login-wrapper .login-pane-wrapper {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  min-width: 1260px;
+}
+
+.login-wrapper .login-pane-wrapper > div {
+  height: 334px;
+  box-sizing: border-box;
+}
+
+.dp-login-img {
+  text-align: right;
+  position: relative;
+  background: #3fae2a url(../images-dp/login-bg-pattern.png);
+  padding-left: 100px;
+  padding-right: 100px;
+}
+
+.dp-login-img .hwx-logo {
+  width: 205px;
+  height: 82px;
+  display: inline-block;
+  background: url(../images-dp/login-logo.png) no-repeat;
+}
+
+.dp-login-img .dp-logo {
+  color: white;
+  display: inline-block;
+  border-left: 1px solid white;
+  margin: 82px 0px 0px 20px;
+  padding: 54px 0px 54px 20px;
+}
+
+.dp-login-img .dp-logo .text-large {
+  font-size: 42px;
+  line-height: 1;
+}
+
+.dp-login-img .dp-logo .text-small {
+  font-size: 14px;
+  line-height: 1;
+}
+
+
+.dp-login-controls {
+  background: #666666;
+  color: white;
+  flex: 1;
+}
+
+.dp-login-controls form {
+  padding: 49px 90px 0px 100px;
+}
+
+.dp-login-controls .group-title {
+  margin-bottom: 15px;
+}
+
+.dp-login-controls .group-title span {
+  margin-right: 20px;
+}
+.dp-login-controls .group-title span + a {
+  margin-left: 20px;
+}
+
+.dp-login-controls .field-group {
+  width: 300px;
+  margin: 15px 0;
+}
+
+.dp-login-controls .action-group {
+  margin-top: 40px;
+  margin-bottom: 7px;
+}
+
+.dp-login-controls a, 
+.dp-login-controls a:focus, 
+.dp-login-controls a:visited {
+  color: #2192bf;
+  text-decoration: none;
+}
+
+.dp-login-controls input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dp-login-controls label {
+  max-width: 100%;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.error-message {
+  max-width: 540px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+input[type="text"], input[type="password"], input[type="email"], input:not([type]), input[type=""], textarea, select {
+    display: inline-block;
+    padding: 9px 10px;
+    margin: 0;
+    border: 1px solid #cfd3d7;
+    border-radius: 2px;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    background: #FFFFFF;
+    color: #666666;
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 1;
+    outline: none;
+}
+
+
+.mdl-button {
+    background: transparent;
+    border: none;
+    border-radius: 2px;
+    color: rgb(0,0,0);
+    position: relative;
+    height: 34px;
+    margin: 0;
+    min-width: 64px;
+    padding: 0 16px;
+    display: inline-block;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    line-height: 1;
+    letter-spacing: 0;
+    overflow: hidden;
+    will-change: box-shadow;
+    -webkit-transition: box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    line-height: 34px;
+    vertical-align: middle;
+}
+
+.mdl-color--hwx-green, .btn-hwx-primary {
+    line-height: 1;
+    font-size: 14px;
+    padding: 9px 20px;
+    border-radius: 2px;
+    white-space: nowrap;
+    background: #3FAE2A;
+    border: 1px solid #3FAE2A;
+}
+
+.mdl-color-text--hwx-white, .btn-hwx-primary, .btn-hwx-warning {
+    color: #FFFFFF;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.dp-login-controls[_ngcontent-c4] input[_ngcontent-c4] {
+    width: 100%;
+    box-sizing: border-box;
+}
