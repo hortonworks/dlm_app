@@ -61,12 +61,6 @@ public class PermPoliciesService {
     return policies.containsKey(serviceId);
   }
 
-  public boolean isAuthorized(String serviceId, HttpServletRequest request, String[] roles) {
-    PermPolicy permPolicy = policies.get(serviceId);
-    List<RoutePerm> routePerms = permPolicy.getRoutePerms();
-    String requestPath=request.getServletPath();
-    return isAuthorized(serviceId,request.getMethod(),requestPath,roles);
-  }
 
   public boolean isAuthorized(String serviceId,String method,String inputPath,String[] roles){
     PermPolicy permPolicy = policies.get(serviceId);
@@ -82,15 +76,15 @@ public class PermPoliciesService {
 
       }
     }
-      if (bestMatch!=null){
-        if (Arrays.asList(bestMatch.getRoles()).contains("*")){
-          return  true;
-        }
-        List<String> policyRoles = Arrays.asList(bestMatch.getRoles());
-        Collection intersection = CollectionUtils.intersection(policyRoles, Arrays.asList(roles));
-        return !intersection.isEmpty();
-      }else{
-        return true;
+    if (bestMatch!=null){
+      if (Arrays.asList(bestMatch.getRoles()).contains("*")){
+        return  true;
       }
+      List<String> policyRoles = Arrays.asList(bestMatch.getRoles());
+      Collection intersection = CollectionUtils.intersection(policyRoles, Arrays.asList(roles));
+      return !intersection.isEmpty();
+    }else{
+      return true;
+    }
   }
 }
