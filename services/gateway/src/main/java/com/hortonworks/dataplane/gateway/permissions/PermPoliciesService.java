@@ -1,9 +1,7 @@
 package com.hortonworks.dataplane.gateway.permissions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +49,8 @@ public class PermPoliciesService {
   public void registerPolicy(String serviceId, InputStream policyStream) {
     try {
       PermPolicy permPolicies = jsonMapper.readValue(policyStream, PermPolicy.class);
+      List<RoutePerm> routePerms = permPolicies.getRoutePerms();
+      routePerms.sort(Comparator.comparing(RoutePerm::getPath));
       policies.put(serviceId, permPolicies);
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -70,11 +70,9 @@ public class PermPoliciesService {
 
   public boolean isAuthorized(String serviceId,String method,String inputPath,String[] roles){
     PermPolicy permPolicy = policies.get(serviceId);
-    List<RoutePerm> routePerms = permPolicy.getRoutePerms();
-    routePerms.sort(Comparator.comparing(RoutePerm::getPath));
     int longestMatch=0;
     RoutePerm bestMatch=null;
-    for(RoutePerm rPerm:routePerms) {
+    for(RoutePerm rPerm:permPolicy.getRoutePerms()) {
       if (inputPath.startsWith(rPerm.getPath())) {
         int rpermPathLength = rPerm.getPath().length();
         if (rpermPathLength > longestMatch) {
