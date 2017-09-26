@@ -198,8 +198,3 @@ input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 0s;
 }
-
-.dp-login-controls[_ngcontent-c4] input[_ngcontent-c4] {
-    width: 100%;
-    box-sizing: border-box;
-}
