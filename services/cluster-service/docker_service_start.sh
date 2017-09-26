@@ -11,4 +11,5 @@ fi
     -Ddp.services.knox.token.expect.separate.config=${SEPARATE_KNOX_CONFIG} \
     -Ddp.services.knox.token.infer.endpoint.using.credentials=${KNOX_CONFIG_USING_CREDS} \
     -Ddp.keystore.path=${KEYSTORE_PATH} \
-    -Ddp.keystore.password=${KEYSTORE_PASSWORD}
+    -Ddp.keystore.password=${KEYSTORE_PASSWORD} \
+    -Djsse.enableSNIExtension=false
