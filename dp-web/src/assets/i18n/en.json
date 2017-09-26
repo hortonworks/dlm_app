@@ -88,7 +88,8 @@
         "manageUsers": "You can manage users or groups in data plane and assign or modify their roles anytime through the User Management Screen.",
         "addCluster": "Add Ambari Managed HDP clusters to Dataplane. Dataplane will auto-discover cluster information such as the cluster name, active services & important metrics running.",
         "setService": "Set up services to enable Dataplane to manage your data",
-        "addDataset": "Create asset collection using Dataplane Steward Studio capability"
+        "addDataset": "Create asset collection using Dataplane Steward Studio capability",
+        "ldapEditNote": "Note: Values for attributes which are disabled must be valid on the LDAP instance if it is being pointed to a new URL."
       },
       "configure": {
         "labels": {
@@ -206,7 +207,8 @@
         "duplicateRole": "Duplicate values in Roles Input - ",
         "duplicateUser": "Duplicate values in Users Input - ",
         "duplicateGroup": "Duplicate values in Groups Input - ",
-        "noMatch": "No Match"
+        "noMatch": "No Match",
+        "ldapUrl": "Ldap URL"
       },
       "description": {
         "editCluster": "Please update your Ambari managed cluster (already added to Dataplane) here.",

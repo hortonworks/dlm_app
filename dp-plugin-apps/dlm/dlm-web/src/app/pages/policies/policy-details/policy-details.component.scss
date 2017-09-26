@@ -7,6 +7,9 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+$details-height: 550px;
+$details-content-height: $details-height - 35*2;
+
 :host {
   .summary {
     white-space: normal;
@@ -38,5 +41,23 @@
 
   .dlm-hive-browser {
     padding: 0;
+    height: $details-content-height;
+    overflow: auto;
+
+    &:host /deep/ {
+      .dlm-hive-database {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .database-header {
+        flex-shrink: 0;
+      }
+
+      .database-tables-list {
+        overflow: auto !important;
+      }
+    }
   }
 }

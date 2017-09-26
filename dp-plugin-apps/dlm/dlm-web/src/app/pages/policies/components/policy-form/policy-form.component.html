@@ -126,11 +126,13 @@
                   <dlm-search-input qe-attr="policy-database-search-filter" (valueChange)="handleSearchChange($event)" [value]="databaseSearch$ | async"></dlm-search-input>
                 </div>
               </div>
-              <dlm-hive-browser
-                formControlName="databases"
-                [databases]="sourceDatabases$ | async"
-                [readonly]="false"
-                ></dlm-hive-browser>
+              <dlm-progress-container [progressState]="databaseRequest$ | async">
+                <dlm-hive-browser
+                  formControlName="databases"
+                  [databases]="sourceDatabases$ | async"
+                  [readonly]="false"
+                  ></dlm-hive-browser>
+              </dlm-progress-container>
             </div>
           </fieldset>
         </div>

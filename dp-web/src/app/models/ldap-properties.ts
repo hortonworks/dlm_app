@@ -23,3 +23,10 @@ export class LDAPProperties {
   groupMemberAttributeName: string;
 
 }
+
+export class LDAPUpdateProperties {
+  id: number;
+  ldapUrl: string;
+  bindDn :string;
+  password: string;
+}

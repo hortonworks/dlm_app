@@ -13,6 +13,7 @@
   <thead>
     <tr>
       <th class="mdl-data-table__cell--non-numeric">{{("pages.dataset.labels.name" | translate).toUpperCase()}}</th>
+      <th class="mdl-data-table__cell--non-numeric">{{("pages.dataset.labels.description" | translate).toUpperCase()}}</th>
       <th class="mdl-data-table__cell--non-numeric">{{("common.datalake" | translate).toUpperCase()}}</th>
       <th class="mdl-data-table__cell--non-numeric">{{("pages.dataset.labels.createdBy" | translate).toUpperCase()}}</th>
       <th class="mdl-data-table__cell--non-numeric">{{("pages.dataset.labels.hiveTables" | translate).toUpperCase()}}</th>
@@ -24,14 +25,15 @@
   </thead>
   <tbody>
     <tr *ngFor="let dsModel of datasetModels; let index=index" on-mouseover="hoveredIndex=index">
-      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--clickable key-column" (click)="showFullView(dsModel)">{{dsModel.name}}<span *ngIf="dsModel.favourite"><i class="fa__fa-star--favourite-icon fa fa-star"></i></span></td>
-      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{dsModel.datalakeName}}</td>
-      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{dsModel.creatorName}}</td>
-      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{dsModel.counts.hiveCount}}</td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--clickable key-column wrap" (click)="showFullView(dsModel)">{{dsModel.name}}<span *ngIf="dsModel.favourite"><i class="fa__fa-star--favourite-icon fa fa-star"></i></span></td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable wrap">{{dsModel.description || "--"}}</td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable wrap">{{dsModel.datalakeName}}</td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable wrap">{{dsModel.creatorName}}</td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable wrap">{{dsModel.counts.hiveCount}}</td>
 <!--
       <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{dsModel.counts.filesCount}}</td>
 -->
-      <td class="mdl-data-table__cell--non-numeric actions">
+      <td class="mdl-data-table__cell--non-numeric actions wrap">
 <!--
         <div [ngClass]="{'visibility-visible': index === hoveredIndex, 'visibility-hidden': index !== hoveredIndex}">
           <button  id="dropDownIcon_{{ dsModel.id }}" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon"><i class="fa fa-ellipsis-v fa__fa-ellipsis-v--icon"></i></button>
