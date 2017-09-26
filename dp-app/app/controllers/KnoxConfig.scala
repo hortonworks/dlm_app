@@ -78,7 +78,10 @@ class KnoxConfig @Inject()(
       .map { knoxConfig =>
         ldapService.updateKnoxConfig(knoxConfig).map{
           case Left(errors) =>handleErrors(errors)
-          case Right(isCreated) =>Ok(Json.toJson(isCreated))
+          case Right(isCreated) =>{
+            knoxConfigurator.configure()
+            Ok(Json.toJson(isCreated))
+          }
         }
       }.getOrElse(
         Future.successful(BadRequest)
