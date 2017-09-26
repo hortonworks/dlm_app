@@ -55,7 +55,7 @@ const FILES_REQUEST = '[HDFS Browser Component] FILES_REQUEST';
       (selectRowAction)="handleSelectedAction($event)"
       [externalSorting]="externalSorting"
       [rowHeight]="rowHeight"
-      [loadingIndicator]="(requestProgress$ | async)?.isInProgress"
+      [loadingIndicator]="(spinner$ | async)"
       (doubleClickAction)="handleDoubleClickAction($event)"
       (sortAction)="handleSortAction($event)"
       (pageChange)="handlePageChange($event)"
@@ -108,7 +108,7 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   breadcrumbs$: Observable<Breadcrumb[]>;
   rows$: Observable<ListStatus[]>;
   rows: ListStatus[];
-  requestProgress$: Observable<ProgressState>;
+  spinner$: Observable<boolean>;
   currentDirectory$: BehaviorSubject<string>;
   columns: any = [];
   externalSorting = true;
@@ -125,7 +125,7 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit() {
     this.currentDirectory$ = new BehaviorSubject(this.rootPath);
-    this.requestProgress$ = this.store.select(getMergedProgress(FILES_REQUEST))
+    const requestProgress$ = this.store.select(getMergedProgress(FILES_REQUEST))
       // next line fixes zone.js error aroun change detection confusing
       // check https://github.com/angular/angular/issues/17572 for more info
       .do(_ => this.cdRef.detectChanges())
@@ -138,6 +138,12 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
       });
     });
     this.breadcrumbs$ = this.currentDirectory$.map(path => this.updateBreadcrumbs(path));
+    this.spinner$ = Observable.combineLatest(
+      this.rows$,
+      requestProgress$.pluck('isInProgress')
+    ).map(([rows, isInProgress]) => {
+      return isInProgress && !rows.some(r => r.pathSuffix !== '..');
+    });
     this.columns = [
       {prop: 'pathSuffix', name: 'Name', cellClass: 'text-cell', headerClass: 'text-header',
         minWidth: 150, flexGrow: 1, cellTemplate: this.nameFormattedTemplate},

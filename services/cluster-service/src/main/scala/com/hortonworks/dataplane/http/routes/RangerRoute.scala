@@ -134,7 +134,13 @@ class RangerRoute @Inject()(
       url <- getRangerUrlFromConfig(service)
       baseUrls <- extractUrlsWithIp(url, clusterId)
       credential <- credentialInterface.getCredential("dp.credential.ranger")
-      urlToHit <- Future.successful(s"${baseUrls.head}/service/assets/accessAudit?startIndex=${offset}&pageSize=${pageSize}&sortBy=eventTime&resourcePath=${dbName}%2F${tableName}&accessType=${accessType}&accessResult=${accessResult}")
+      urlToHit1 <-Future.successful(s"${baseUrls.head}/service/plugins/definitions?pageSource=Audit")
+      response1 <- ws.url(urlToHit1)
+        .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
+        .withAuth(credential.user.get,credential.pass.get,WSAuthScheme.BASIC)
+        .get()
+      repoType <- Future.successful(getRepoTypeFromRangerServiceDef(response1))
+      urlToHit <- Future.successful(s"${baseUrls.head}/service/assets/accessAudit?startIndex=${offset}&pageSize=${pageSize}&repoType=${repoType}&sortBy=eventTime&resourcePath=${dbName}%2F${tableName}&accessType=${accessType}&accessResult=${accessResult}")
       tmp <- Future.successful(println(urlToHit))
       response <- ws.url(urlToHit)
         .withHeaders("Accept" -> "application/json, text/javascript, */*; q=0.01")
@@ -143,6 +149,10 @@ class RangerRoute @Inject()(
     } yield {
       response
     }
+  }
+
+  private def getRepoTypeFromRangerServiceDef(fResp: WSResponse): Long = {
+    ((fResp.json \ "serviceDefs").as[Seq[JsObject]].filter(serviceDef => (serviceDef \ "name").as[String] == "hive").head \ "id").as[Long]
   }
 
   private def getConfigOrThrowException(clusterId: Long) = {

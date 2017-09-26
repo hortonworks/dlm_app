@@ -27,8 +27,18 @@ case class KnoxConfigInfo(
     allowHttpsOnly : Option[Boolean]=Some(false) /* the app has to be on https for more security*/
 )
 object KnoxConfigInfo {
-
   import play.api.libs.json.Json
   implicit val knoxConfigInfoFormat = Json.format[KnoxConfigInfo]
-
 }
+case class KnoxConfigUpdateInfo(
+  id: Long,
+  ldapUrl: String,
+  bindDn :Option[String],
+  password: Option[String]
+)
+object KnoxConfigUpdateInfo {
+  import play.api.libs.json.Json
+  implicit val knoxConfigUpdateInfoFormat = Json.format[KnoxConfigUpdateInfo]
+}
+
+

@@ -37,10 +37,9 @@ object Entities {
   case class BeaconClusters(clusters: Seq[BeaconCluster])
 
 
-  case class ClusterDefinitionDetails (cluster:Cluster, dpCluster: DataplaneCluster, nnClusterService : ClusterServiceEndpointDetails,
-                                       hiveServerService : Either[Errors, ClusterServiceEndpointDetails],
-                                       rangerService: Option[RangerServiceDetails], clusterDefinitions: Seq[PairedCluster],
-                                       pairedClusterRequest:PairClusterRequest)
+  case class ClusterDefinitionDetails (cluster:Cluster, dpCluster: DataplaneCluster, nnClusterService : Map[String, Option[String]],
+                                       hiveServerService : Map[String, Option[String]], rangerService: Option[RangerServiceDetails],
+                                       clusterDefinitions: Seq[PairedCluster], pairedClusterRequest:PairClusterRequest)
 
   // Request schema submitted to Beacon for cluster definition
   case class ClusterDefinition (beaconUrl:String, clusterId: Long, clusterDefRequest : ClusterDefinitionRequest)
