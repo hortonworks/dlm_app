@@ -117,10 +117,14 @@ export class PolicyDetailsComponent implements OnInit {
   }
 
   /**
-   * Returns a string 'YES' or 'NO'
+   * Returns a string 'Yes' or 'No' for HDFS policy
+   * and "Not Applicable" for HIVE policy
    * based on whether snapshot is enabled on the policy
    */
   get snapshotEnabledStatus() {
-    return (this.policy && this.policy.executionType && this.policy.executionType === POLICY_EXECUTION_TYPES.HDFS_SNAPSHOT) ? 'YES' : 'NO';
+    if (this.policy && this.policy.type === POLICY_TYPES.HIVE) {
+      return 'Not Applicable';
+    }
+    return (this.policy && this.policy.executionType && this.policy.executionType === POLICY_EXECUTION_TYPES.HDFS_SNAPSHOT) ? 'Yes' : 'No';
   }
 }
