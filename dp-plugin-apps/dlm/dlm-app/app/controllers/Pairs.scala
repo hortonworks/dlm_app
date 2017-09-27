@@ -14,7 +14,7 @@ import com.google.inject.Inject
 
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import services.BeaconService
 import models.JsonResponses
 import models.Entities.PairClusterRequest
@@ -22,7 +22,6 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 
-import com.hortonworks.dataplane.commons.auth.Authenticated
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._
 import models.JsonFormatters._
 
@@ -30,14 +29,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class Pairs @Inject() (
-  val beaconService: BeaconService,
-  authenticated: Authenticated
+  val beaconService: BeaconService
 ) extends Controller {
 
   /**
     * Get list of all beacon cluster pairing
     */
-  def list () = authenticated.async { request =>
+  def list () = AuthenticatedAction.async { request =>
     implicit val token = request.token
     beaconService.getAllPairedClusters().map {
       pairedClusters => pairedClusters match {
@@ -50,7 +48,7 @@ class Pairs @Inject() (
   /**
     * Pair clusters
     */
-  def create () = authenticated.async (parse.json) { request =>
+  def create () = AuthenticatedAction.async (parse.json) { request =>
     Logger.info("Received create pair request")
     request.body.validate[Set[PairClusterRequest]].map { pairClusterRequest =>
       implicit val token = request.token
@@ -65,7 +63,7 @@ class Pairs @Inject() (
   /**
     * Unpair clusters
     */
-  def unpair () = authenticated.async (parse.json) { request =>
+  def unpair () = AuthenticatedAction.async (parse.json) { request =>
     Logger.info("Received create pair request")
     request.body.validate[Set[PairClusterRequest]].map { pairClusterRequest =>
       implicit val token = request.token

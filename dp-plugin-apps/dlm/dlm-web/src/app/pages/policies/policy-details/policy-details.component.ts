@@ -8,12 +8,14 @@
  */
 
 import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
 import { Policy } from 'models/policy.model';
 import { Job } from 'models/job.model';
 import { PolicyContent } from './policy-content.type';
 import { POLICY_TYPES } from 'constants/policy.constant';
 import { HiveDatabase } from 'models/hive-database.model';
 import { JOB_STATUS } from 'constants/status.constant';
+import { ProgressState } from 'models/progress-state.model';
 
 @Component({
   selector: 'dlm-policy-details',
@@ -64,7 +66,9 @@ export class PolicyDetailsComponent implements OnInit {
 
   @Input() fileBrowserPage = 0;
 
-  @Input() loadingJobs;
+  @Input() loadingJobs: boolean;
+
+  @Input() loadingDatabases: ProgressState;
 
   @Input() tablesSearchPattern = '';
 

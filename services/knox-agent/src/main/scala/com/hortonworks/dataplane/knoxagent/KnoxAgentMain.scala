@@ -55,10 +55,7 @@ object KnoxAgentMain {
   }
   private def process: Future[Either[Throwable, Boolean]] = {
     try {
-      val config = ConfigFactory.parseResources(
-        KnoxAgentMain.getClass.getClassLoader,
-        "application.conf")
-      //TODO may be load config from command line args specs
+      val config = ConfigFactory.load()
       val gateway: Gateway = new Gateway(config, null, null)
       getGatewayService(gateway).flatMap {
         case Left(throwable) => Future.successful(Left(throwable))
@@ -82,10 +79,7 @@ object KnoxAgentMain {
         case Some(knoxConfig) => {
           try {
 
-            val ssoTopologyPath = sys.env.get("sso.toplology.path") match {
-              case Some(value) => value
-              case None => config.getString("sso.toplology.path")
-            }
+            val ssoTopologyPath = config.getString("sso.toplology.path")
             logger.info(s"filepath==$ssoTopologyPath")
             val passwordUpdated=updateBindPassword(config,knoxConfig)
             if (!passwordUpdated){

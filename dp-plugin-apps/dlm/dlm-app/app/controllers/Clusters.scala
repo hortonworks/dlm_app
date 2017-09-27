@@ -13,7 +13,7 @@ import com.google.inject.Inject
 
 import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import models.JsonFormatters._
 import services.{AmbariService, DataplaneService}
 import play.api.mvc.{Action, Controller}
@@ -25,8 +25,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class Clusters @Inject()(
   val dataplaneService: DataplaneService,
-  val ambariService: AmbariService,
-  authenticated: Authenticated
+  val ambariService: AmbariService
 ) extends Controller {
 
   /**
@@ -39,7 +38,7 @@ class Clusters @Inject()(
     }
   }
 
-  def listStatus() = authenticated.async { request =>
+  def listStatus() = AuthenticatedAction.async { request =>
     Logger.info("Received get cluster status request")
     implicit val token = request.token
     ambariService.getAllClusterHealthStatus().map {
@@ -48,7 +47,7 @@ class Clusters @Inject()(
     }
   }
 
-  def retrieveStatus(clusterId: Long) = authenticated.async { request =>
+  def retrieveStatus(clusterId: Long) = AuthenticatedAction.async { request =>
     Logger.info("Received get cluster status request")
     implicit val token = request.token
     ambariService.getClusterHealthStatus(clusterId).map {

@@ -18,6 +18,8 @@ public interface Constants {
     String LOCAL_SIGNIN_PATH="/sign-in";
     String PERMS_POLICY_ENTRY_POINT = "/policies";
     boolean BEARER_TOKEN_IN_COOKIE=true;//If set to false value is taken from header
-
+    String HTTP_X_REQUESTED_WITH="X-Requested-With";
+    String XMLHttpRequestString="XMLHttpRequest";
+    String XMLHttpRequestStringLowerCase=XMLHttpRequestString.toLowerCase();
 
 }

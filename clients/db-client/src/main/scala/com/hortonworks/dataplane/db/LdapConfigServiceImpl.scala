@@ -41,6 +41,20 @@ class LdapConfigServiceImpl(config: Config)(implicit ws: WSClient)
         }
       }
   }
+  override def update(ldapConfig: LdapConfiguration): Future[Either[Errors, Boolean]] = {
+    ws.url(s"$serviceUri/ldapconfig")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json")
+      .put(Json.toJson(ldapConfig))
+      .map { res =>
+        res.status match {
+          case 200 => Right(true)
+          case 404 => Left(Errors(Seq(Error("404", "API not found"))))
+          case _ => mapErrors(res)
+        }
+      }
+  }
   override def get(): Future[Either[Errors, Seq[LdapConfiguration]]]={
     ws.url(s"$serviceUri/ldapconfig")
       .withHeaders(

@@ -108,8 +108,9 @@ build_knox_agent() {
 
 build_dp_knox() {
 	log "Building dp-knox"
-	cp -R knox-scripts ${DP_DOCKER_ROOT_FOLDER}/dp-knox/
-	cp Dockerfile.knox ${DP_DOCKER_ROOT_FOLDER}/dp-knox/Dockerfile
+	# move docker files and utils
+	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-knox/
+	cp -R ./docker/knox/* ${DP_DOCKER_ROOT_FOLDER}/dp-knox/
     cp -R build/dp-docker/dp-knox-agent/dp-knox-agent/ ${DP_DOCKER_ROOT_FOLDER}/dp-knox/dp-knox-agent
 }
 
@@ -143,7 +144,6 @@ build_installer() {
     mkdir -p ${DP_DOCKER_ROOT_FOLDER}/installer/certs/
 	cp -R install/* ${DP_DOCKER_ROOT_FOLDER}/installer
 	cp dp-docker-build.sh ${DP_DOCKER_ROOT_FOLDER}/installer/
-    cp -R ../dp-app/conf/cert/dp-keystore.jck ${DP_DOCKER_ROOT_FOLDER}/installer/certs/
 	VERSION_STRING=$(get_version)
 	echo ${VERSION_STRING} > ${DP_DOCKER_ROOT_FOLDER}/installer/VERSION	
 }

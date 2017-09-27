@@ -57,7 +57,9 @@
     "unauthorizedMessage": "You are not authorized to view this page.",
     "serviceDisabled": "Service Not Enabled",
     "serviceDisabledMessage": "This service has not been enabled by your Admin. Please contact your Data plane Administrator to enable it.",
-    "invalidUser": "You are not an authorized Data plane user. Please contact your Data plane Administrator."
+    "invalidUser": "You are not an authorized Data plane user. Please contact your Data plane Administrator.",
+    "noMatch": "No Match found...",
+    "searching": "Searching..."
   },
   "pages": {
     "signin" :{
@@ -86,7 +88,8 @@
         "manageUsers": "You can manage users or groups in data plane and assign or modify their roles anytime through the User Management Screen.",
         "addCluster": "Add Ambari Managed HDP clusters to Dataplane. Dataplane will auto-discover cluster information such as the cluster name, active services & important metrics running.",
         "setService": "Set up services to enable Dataplane to manage your data",
-        "addDataset": "Create asset collection using Dataplane Steward Studio capability"
+        "addDataset": "Create asset collection using Dataplane Steward Studio capability",
+        "ldapEditNote": "Note: Values for attributes which are disabled must be valid on the LDAP instance if it is being pointed to a new URL."
       },
       "configure": {
         "labels": {
@@ -115,6 +118,10 @@
           "groups": "Groups",
           "saveAndLogin": "SAVE & LOGIN",
           "configSuccess": "LDAP ADDED SUCCESSFULLY"
+        },
+        "description" : {
+          "ldapUserFetchError": "Not able to fetch users from LDAP.",
+          "ldapGroupFetchError": "Not able to fetch groups from LDAP"
         }
       }
     },
@@ -200,7 +207,8 @@
         "duplicateRole": "Duplicate values in Roles Input - ",
         "duplicateUser": "Duplicate values in Users Input - ",
         "duplicateGroup": "Duplicate values in Groups Input - ",
-        "noMatch": "No Match"
+        "noMatch": "No Match",
+        "ldapUrl": "Ldap URL"
       },
       "description": {
         "editCluster": "Please update your Ambari managed cluster (already added to Dataplane) here.",

@@ -13,8 +13,6 @@ package com.hortonworks.dataplane.commons.auth
 
 import java.security.cert.X509Certificate
 
-import com.google.inject.Inject
-import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import org.apache.commons.codec.binary.Base64
@@ -25,7 +23,7 @@ import play.api.{Configuration, Logger}
 
 import scala.concurrent.Future
 
-class Authenticated extends ActionBuilder[AuthenticatedRequest] {
+object AuthenticatedAction extends ActionBuilder[AuthenticatedRequest] {
 
   val gatewayUserTokenKey = "X-DP-User-Info"
   val gatewayTokenKey = "X-DP-Token-Info"

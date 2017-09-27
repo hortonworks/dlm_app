@@ -16,11 +16,11 @@ import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.typesafe.scalalogging.Logger
 import com.hortonworks.dataplane.commons.auth.{
-  Authenticated,
+  AuthenticatedAction,
   AuthenticatedRequest
 }
 import com.hortonworks.dataplane.db.Webservice.ConfigService
-import models.{KnoxConfigInfo, KnoxConfiguration}
+import models.{KnoxConfigInfo, KnoxConfigUpdateInfo, KnoxConfiguration}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, Controller}
 import services.{KnoxConfigurator, LdapService}
@@ -32,8 +32,7 @@ import com.google.inject.name.Named
 class KnoxConfig @Inject()(
     val ldapService: LdapService,
     val knoxConfigurator: KnoxConfigurator,
-    @Named("configService") configService: ConfigService,
-    authenticated: Authenticated)
+    @Named("configService") configService: ConfigService)
     extends Controller {
   val logger = Logger(classOf[KnoxConfig])
 
@@ -52,7 +51,7 @@ class KnoxConfig @Inject()(
     }
   }
 
-  def configure = authenticated.async(parse.json) { request =>
+  def configure = AuthenticatedAction.async(parse.json) { request =>
     request.body
       .validate[KnoxConfigInfo]
       .map { ldapConfigInfo: KnoxConfigInfo =>
@@ -70,6 +69,21 @@ class KnoxConfig @Inject()(
           }
       }
       .getOrElse(
+        Future.successful(BadRequest)
+      )
+  }
+  def updateLdapConfig= AuthenticatedAction.async(parse.json) { request =>
+    request.body
+      .validate[KnoxConfigUpdateInfo]
+      .map { knoxConfig =>
+        ldapService.updateKnoxConfig(knoxConfig).map{
+          case Left(errors) =>handleErrors(errors)
+          case Right(isCreated) =>{
+            knoxConfigurator.configure()
+            Ok(Json.toJson(isCreated))
+          }
+        }
+      }.getOrElse(
         Future.successful(BadRequest)
       )
   }
@@ -104,12 +118,12 @@ class KnoxConfig @Inject()(
     }
   }
 
-  def validate = authenticated.async(parse.json) { request =>
+  def validate = AuthenticatedAction.async(parse.json) { request =>
     request.body
       .validate[KnoxConfigInfo]
       .map { ldapConf =>
         ldapService
-          .validateBindDn(ldapConf)
+          .validateBindDn(ldapConf.ldapUrl,ldapConf.bindDn,ldapConf.password)
           .map {
             case Left(errors) => handleErrors(errors)
             case Right(booleanRes) => Ok(Json.toJson(true))
@@ -142,7 +156,7 @@ class KnoxConfig @Inject()(
                 s"${ldapConfig.userSearchAttributeName.get}={0},${ldapConfig.userSearchBase.get}"
               val password=ldapService.getPassword(ldapConfig.bindDn.get)
               val knoxLdapConfig =
-                KnoxConfiguration(ldapUrl = ldapConfig.ldapUrl,
+                KnoxConfiguration(ldapUrl = ldapConfig.ldapUrl.get,
                                   bindDn = ldapConfig.bindDn,
                                   userDnTemplate = Some(userDnTemplate),
                                   domains = whiteListdomains,
