@@ -58,7 +58,7 @@ public class AuthorizationFilter extends ZuulFilter {
       if (isAuthorized) {
         return null;
       } else {
-        return utils.sendUnauthorized();
+        return utils.sendForbidden("No permission for this resource");
       }
     }else{
       logger.error(String.format("no matching route found for [$s]",ctx.getRequest().getServletPath()));
