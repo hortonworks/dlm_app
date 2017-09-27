@@ -44,12 +44,21 @@ class LdapConfigRepo @Inject()(
     }
 
   }
+  def update(ldapConfig: LdapConfiguration)(implicit ec: ExecutionContext): Future[Boolean]={
+    db.run(LdapConfigs.filter(_.id === ldapConfig.id).result).flatMap{curentConfig=>
+      val updatedConfig=curentConfig.head.copy(ldapUrl = ldapConfig.ldapUrl)
+           .copy(bindDn = ldapConfig.bindDn)
+      db.run(LdapConfigs.update(updatedConfig)).map{resp=>
+        resp>0
+      }
+    }
+  }
 
   final class LdapConfigTable(tag: Tag) extends Table[LdapConfiguration](tag, Some("dataplane"), "ldap_configs") {
 
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
-    def ldapUrl = column[String]("url")
+    def ldapUrl = column[Option[String]]("url")
 
     def bindDn = column[Option[String]]("bind_dn")
 

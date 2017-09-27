@@ -14,7 +14,7 @@ package controllers
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.db.Webservice.SkuService
 import play.api.libs.json.Json
@@ -25,10 +25,10 @@ import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
 import scala.concurrent.Future
 import scala.util.Left
+import play.api.Configuration
 
-class ServicesManager @Inject()(@Named("skuService") val skuService: SkuService
-                                , authenticated: Authenticated
-                                , implicit private val configuration: play.api.Configuration) extends Controller {
+class ServicesManager @Inject()(@Named("skuService") val skuService:SkuService
+                               ,private val configuration: Configuration) extends Controller{
 
   private val smartSenseRegex: String = configuration.underlying.getString("smartsense.regex")
 
@@ -49,17 +49,11 @@ class ServicesManager @Inject()(@Named("skuService") val skuService: SkuService
     }
   }
 
-  def getDependentServices(skuName: String) = Action.async { request =>
-    val mandatoryDependentServices = getMandatoryDependentServices(skuName)
-    val hasOptionalServices = configuration.underlying.hasPath(s"$skuName.dependent.services.optional")
-    if (mandatoryDependentServices.isDefined && !hasOptionalServices) {
-      Future.successful(Ok(Json.toJson(ServiceDependency(skuName, mandatoryDependentServices.get.split(","), Seq()))))
-    } else if (mandatoryDependentServices.isDefined && hasOptionalServices) {
-      val optionalDependentServices = getOptionalDependentServices(skuName)
-      Future.successful(Ok(Json.toJson(ServiceDependency(skuName, mandatoryDependentServices.get.split(","), optionalDependentServices.get.split(",")))))
-    } else {
-      Future.successful(Ok(Json.toJson(ServiceDependency(skuName, Seq(), Seq()))))
-    }
+  def getDependentServices(skuName: String) = Action.async {
+    val mandatoryDependentServices = configuration.getStringSeq(s"$skuName.dependent.services.mandatory").getOrElse(Nil)
+    val optionalDependentServices = configuration.getStringSeq(s"$skuName.dependent.services.optional").getOrElse(Nil)
+
+    Future.successful(Ok(Json.toJson(ServiceDependency(skuName, mandatoryDependentServices, optionalDependentServices))))
   }
 
   def verifySmartSense = Action.async(parse.json) { request =>
@@ -94,9 +88,9 @@ class ServicesManager @Inject()(@Named("skuService") val skuService: SkuService
     smartSenseId.matches(smartSenseRegex)
   }
 
-  def enableService = authenticated.async(parse.json) { request =>
-    request.body.validate[DpServiceEnableConfig].map { config =>
-      if (!verifySmartSenseCode(config.smartSenseId)) {
+  def enableService=AuthenticatedAction.async(parse.json) { request =>
+    request.body.validate[DpServiceEnableConfig].map{config=>
+      if (!verifySmartSenseCode(config.smartSenseId)){
         Future.successful(BadRequest("Invalid Smart SenseId"))
       } else {
         skuService.getSku(config.skuName).flatMap {

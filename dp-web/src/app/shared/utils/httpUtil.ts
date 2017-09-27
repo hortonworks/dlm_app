@@ -64,6 +64,9 @@ export class HttpUtil {
   public static getHeaders(): RequestOptionsArgs {
     const headers = {
       'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate',
+      'X-Requested-With' : 'XMLHttpRequest'
+
     };
     return ({
       headers: new Headers(headers)

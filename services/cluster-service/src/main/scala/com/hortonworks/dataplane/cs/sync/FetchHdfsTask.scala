@@ -14,7 +14,7 @@ package com.hortonworks.dataplane.cs.sync
 import akka.actor.ActorRef
 import com.hortonworks.dataplane.commons.domain.Entities
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterServiceData}
-import com.hortonworks.dataplane.cs.StorageInterface
+import com.hortonworks.dataplane.cs.{CredentialInterface, StorageInterface}
 import com.hortonworks.dataplane.cs.sync.TaskStatus.TaskStatus
 import com.hortonworks.dataplane.cs.sync.TaskType.TaskType
 import com.typesafe.config.Config
@@ -24,7 +24,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Try
 
-class FetchHdfsTask(cl: ClusterData, c: Config, w: WSClient, si: StorageInterface, cs: ActorRef) extends ClusterSyncTask(cl,c,w,si,cs) {
+class FetchHdfsTask(cl: ClusterData, c: Config, w: WSClient, si: StorageInterface,
+                    credentialInterface: CredentialInterface, cs: ActorRef) extends ClusterSyncTask(cl,c,w,si, credentialInterface, cs) {
 
   override val taskType: TaskType = TaskType.Hdfs
 

@@ -21,9 +21,6 @@ USE_EXT_DB="no"
 # MASTER_PASSWORD="changeit"
 # USE_TEST_LDAP="no"
 
-# AMBARI_USERNAME="admin"
-# AMBARI_PASSWORD="admin"
-
 # USE_TLS="true"
 # USE_PROVIDED_CERTIFICATES="yes"
 # PUBLIC_KEY_L="/absolute/path/of/public/key.pem"

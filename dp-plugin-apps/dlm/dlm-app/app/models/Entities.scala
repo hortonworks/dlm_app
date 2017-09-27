@@ -37,10 +37,9 @@ object Entities {
   case class BeaconClusters(clusters: Seq[BeaconCluster])
 
 
-  case class ClusterDefinitionDetails (cluster:Cluster, dpCluster: DataplaneCluster, nnClusterService : ClusterServiceEndpointDetails,
-                                       hiveServerService : Either[Errors, ClusterServiceEndpointDetails],
-                                       rangerService: Option[RangerServiceDetails], clusterDefinitions: Seq[PairedCluster],
-                                       pairedClusterRequest:PairClusterRequest)
+  case class ClusterDefinitionDetails (cluster:Cluster, dpCluster: DataplaneCluster, nnClusterService : Map[String, Option[String]],
+                                       hiveServerService : Map[String, Option[String]], rangerService: Option[RangerServiceDetails],
+                                       clusterDefinitions: Seq[PairedCluster], pairedClusterRequest:PairClusterRequest)
 
   // Request schema submitted to Beacon for cluster definition
   case class ClusterDefinition (beaconUrl:String, clusterId: Long, clusterDefRequest : ClusterDefinitionRequest)
@@ -57,8 +56,8 @@ object Entities {
   // Response schema for Pair cluster request
   case class PairedClustersResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), pairedClusters: Set[Set2[BeaconCluster]] = Set())
 
-  case class PoliciesDetails(policyId: String, name: String, description: Option[String], `type`: String, status: String, sourceDataset: String, targetDataset: String,
-                             frequency: Long, startTime: Option[String], endTime: String, sourceCluster:String, targetCluster:String, jobs: Seq[PolicyInstanceResponse])
+  case class PoliciesDetails(policyId: String, name: String, description: Option[String], `type`: String, executionType: Option[String], status: String, sourceDataset: String, targetDataset: String,
+                             frequency: Long, startTime: Option[String], endTime: String, sourceCluster:String, targetCluster:String, customProperties: Option[Map[String, String]], jobs: Seq[PolicyInstanceResponse])
 
   case class PoliciesDetailsResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), policies: Seq[PoliciesDetails])
 

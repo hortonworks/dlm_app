@@ -18,7 +18,7 @@ import akka.http.scaladsl.server.Directives.{as, entity, path, post, _}
 import com.google.inject.Inject
 import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.cs.ClusterErrors.ClusterNotFound
-import com.hortonworks.dataplane.cs.{AmbariDataplaneClusterInterface, AmbariDataplaneClusterInterfaceImpl, Credentials, StorageInterface}
+import com.hortonworks.dataplane.cs._
 import com.hortonworks.dataplane.db.Webservice.{ClusterService, DpClusterService}
 import com.hortonworks.dataplane.http.BaseRoute
 import com.hortonworks.dataplane.knox.Knox.{KnoxApiRequest, KnoxConfig}
@@ -35,6 +35,7 @@ import scala.util.{Failure, Success, Try}
 class AmbariRoute @Inject()(val ws: WSClient,
                             val storageInterface: StorageInterface,
                             val clusterService: ClusterService,
+                            val credentialInterface: CredentialInterface,
                             val dpClusterService: DpClusterService,
                             val config: Config)
     extends BaseRoute {
@@ -125,7 +126,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
 
     val finalList = for {
       dataplaneCluster <- getDpCluster(ambariDetailRequest,expectConfigGroup,checkCredentials)
-      creds <- loadCredentials
+      creds <- credentialInterface.getCredential("dp.credential.ambari")
       dli <- Future.successful(
         AmbariDataplaneClusterInterfaceImpl(dataplaneCluster,
                                             ws,
@@ -206,16 +207,6 @@ class AmbariRoute @Inject()(val ws: WSClient,
     newRequest.map(new TempDataplaneCluster(_))
   }
 
-  private def loadCredentials = {
-    val creds = for {
-      user <- storageInterface.getConfiguration("dp.ambari.superuser")
-      pass <- storageInterface.getConfiguration("dp.ambari.superuser.password")
-    } yield {
-      Credentials(user, pass)
-    }
-    creds
-  }
-
   def getClusterData(clusterId: Long) = {
     for {
       c <- clusterService.retrieve(clusterId.toString)
@@ -245,7 +236,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
       Future.successful(baseReq)
     else {
       for {
-        creds <- loadCredentials
+        creds <- credentialInterface.getCredential("dp.credential.ambari")
         req <- Future.successful(
           baseReq.withAuth(creds.user.get, creds.pass.get, WSAuthScheme.BASIC))
       } yield req

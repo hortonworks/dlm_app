@@ -9,7 +9,8 @@
  *
  */
 
-@import "../../../../../../styles/variables";
+@import "../../../styles/variables";
+
 .dp-input {
   margin: 15px 0px;
   label {
@@ -37,4 +38,57 @@
 
 .red {
   color: $roman-red;
+}
+
+.text-medium {
+  font-size: 15px;
+}
+
+.text-large {
+  font-size: 24px;
+}
+
+.text-small {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.text-xsmall{
+  font-size: 12px;
+}
+
+.margin-top-bottom-20 {
+  margin: 20px 0px;
+}
+
+.margin-top-bottom-3 {
+  margin: 3px 0px;
+}
+
+.margin-top-30 {
+  margin-top: 30px;
+}
+
+.green {
+  color: $forest-green-1;
+}
+
+div i + div {
+  margin-left: 30px;
+}
+
+.line-height-1-5 {
+  line-height: 1.5;
+}
+
+.container {
+  padding: 35px 25px;
+}
+
+.text-bold {
+  font-weight: 600;
+}
+
+.edit-mode{
+  opacity: 0.6;
 }

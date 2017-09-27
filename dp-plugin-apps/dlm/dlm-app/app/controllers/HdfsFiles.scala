@@ -10,7 +10,7 @@
 package controllers
 
 import com.google.inject.Inject
-import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import com.hortonworks.dataplane.commons.domain.Entities.{Errors, HJwtToken}
 import models.JsonResponses
 import play.api.Logger
@@ -23,8 +23,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
 
 class HdfsFiles @Inject()(
-  val beaconService: BeaconService,
-  authenticated: Authenticated
+  val beaconService: BeaconService
   ) extends Controller {
 
   /**
@@ -32,7 +31,7 @@ class HdfsFiles @Inject()(
     * @param clusterId
     * @return
     */
-  def retrieve(clusterId: Long) = authenticated.async { request =>
+  def retrieve(clusterId: Long) = AuthenticatedAction.async { request =>
     Logger.info("Received hdfs file operation request")
     implicit val token = request.token
     val queryString : Map[String,String] = request.queryString.map { case (k,v) => k -> v.mkString }
