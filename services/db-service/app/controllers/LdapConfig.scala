@@ -37,6 +37,22 @@ class LdapConfig @Inject()(ldapConfigRepo: LdapConfigRepo)(
       }
       .getOrElse(Future.successful(BadRequest))
   }
+  def update= Action.async(parse.json) {req =>
+    req.body.validate[LdapConfiguration]
+      .map{ldapConfiguration =>
+        ldapConfigRepo.update(ldapConfiguration)
+          .map{resp=>
+            if (resp){
+              success(resp)
+            }else{
+              Conflict
+            }
+          }
+      }.getOrElse{
+        Future.successful(BadRequest)
+     }
+  }
+
   def getAll = Action.async { req =>
     ldapConfigRepo.all()
       .map{res=>

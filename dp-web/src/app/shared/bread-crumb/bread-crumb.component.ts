@@ -92,6 +92,9 @@ export class BreadCrumbComponent {
       this.crumbNamesToURLMap['Groups'] = '';
     } else if (url.startsWith('infra/services')) {
       this.crumbNamesToURLMap['Services'] = '';
+    }else if (url.startsWith('infra/usermgmt/editldap')) {
+      this.crumbNamesToURLMap['Users'] = 'infra/usermgmt/users';
+      this.crumbNamesToURLMap['Ldap Edit'] = '';
     }
   }
 

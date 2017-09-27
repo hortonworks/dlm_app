@@ -6,7 +6,9 @@ import com.netflix.zuul.context.RequestContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +30,12 @@ public class Utils {
   @Autowired
   private ProxyRequestHelper proxyRequestHelper;
 
+  @Value("${useragent_engines}")
+  private String userAgentEngines;
+
+  @Autowired
+  private RequestResponseUtils requestResponseUtils;
+
   public Optional<String> getBearerTokenFromHeader() {
     HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
     String AuthHeader = request.getHeader(Constants.AUTHORIZATION_HEADER);
@@ -46,23 +54,34 @@ public class Utils {
     return sendUnauthorized(null);
   }
   public Object sendUnauthorized(String message) {
-    RequestContext ctx = RequestContext.getCurrentContext();
-    ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
-    if (message!=null){
-      ctx.setResponseBody(message);
+    if (isRequestFromBrower() && !isAjax()){
+      requestResponseUtils.redirectToLogin();
+      return null;
+    }else{
+      RequestContext ctx = RequestContext.getCurrentContext();
+      ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
+      if (message!=null){
+        ctx.setResponseBody(message);
+      }
+      ctx.setSendZuulResponse(false);
+      return null;
     }
-    ctx.setSendZuulResponse(false);
-    return null;
   }
 
   public Object sendForbidden(String message) {
-    RequestContext ctx = RequestContext.getCurrentContext();
-    ctx.setResponseStatusCode(HttpStatus.FORBIDDEN.value());
-    if (message!=null){
-      ctx.setResponseBody(message);
+    if (isRequestFromBrower() && !isAjax()){
+      //TODO redirect to forbidden page
+      requestResponseUtils.redirectToForbidden();
+      return null;
+    }else {
+      RequestContext ctx = RequestContext.getCurrentContext();
+      ctx.setResponseStatusCode(HttpStatus.FORBIDDEN.value());
+      if (message!=null){
+        ctx.setResponseBody(message);
+      }
+      ctx.setSendZuulResponse(false);
+      return null;
     }
-    ctx.setSendZuulResponse(false);
-    return null;
   }
 
 
@@ -105,8 +124,22 @@ public class Utils {
   }
 
   public void addNoCacheHeaders(HttpServletResponse response) {
-    response.addHeader("Cache-Control","no-cache, no-store, max-age=0, must-revalidate");
-    response.addHeader("Pragma","no-cache");
-    response.addHeader("Expires","0");
+    requestResponseUtils.addNoCacheHeaders(response);
+  }
+  private boolean isRequestFromBrower(){
+    HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
+    String ua=request.getHeader(HttpHeaders.USER_AGENT).substring(0,8);
+    String[] userAgentsArr=userAgentEngines.split(",");
+    for(String userAgent:userAgentsArr){
+      if (ua.startsWith(userAgent)){
+        return true;
+      }
+    }
+    return false;
+  }
+  private boolean isAjax(){
+    HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
+    String requestedWith = request.getHeader(Constants.HTTP_X_REQUESTED_WITH);
+    return requestedWith !=null && requestedWith.toLowerCase().equals(Constants.XMLHttpRequestStringLowerCase);
   }
 }
