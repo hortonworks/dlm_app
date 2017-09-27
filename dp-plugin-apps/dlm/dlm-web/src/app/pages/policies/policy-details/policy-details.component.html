@@ -10,12 +10,19 @@
 <div class="row">
   <div class="col-xs-2 summary">
     <div class="summary-item">
+      <h4 class="title">{{"page.policies.settings" | translate}}</h4>
+    </div>
+    <div class="summary-item">
       <h6>{{"common.name" | translate}}</h6>
       <p class="detail">{{policy?.name}}</p>
     </div>
     <div class="summary-item" *ngIf="policy?.description">
       <h6>{{"common.description" | translate}}</h6>
       <p class="detail">{{policy?.description}}</p>
+    </div>
+    <div class="summary-item" *ngIf="policy?.executionType">
+      <h6>{{"common.snapshot_enabled" | translate}}</h6>
+      <p class="detail">{{snapshotEnabledStatus}}</p>
     </div>
     <div class="summary-item">
       <h6>{{"common.path" | translate}}</h6>

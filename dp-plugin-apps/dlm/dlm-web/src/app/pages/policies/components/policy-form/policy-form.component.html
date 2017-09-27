@@ -44,15 +44,27 @@
                   <dlm-radio-button qe-attr="policy-type" [items]="storageTypes" formControlName="type" (change)="handlePolicyTypeChange($event)"></dlm-radio-button>
                 </div>
               </div>
+              <div class="row" *ngIf="isHDFSPolicy()">
+                <label class="col-xs-12">
+                  <dlm-help-link id="enable_snapshot" [linkTo]="'page.policies.form.help.snapshot_url' | translate"
+                               [linkText]="'page.policies.form.help.snapshot_text'"></dlm-help-link>
+                </label>
+              </div>
             </div>
-            <dlm-form-field [label]="'page.policies.form.fields.sourceCluster.self' | translate">
-              <dlm-select-field qe-attr="policy-source-cluster" formField formControlName="sourceCluster" [options]="sourceClusters" [value]="sourceCluster" (onSelect)="handleSourceClusterChange($event)">
-              </dlm-select-field>
-            </dlm-form-field>
-            <dlm-form-field [label]="'page.policies.form.fields.destinationCluster.self' | translate">
-              <dlm-select-field qe-attr="policy-destination-cluster" formField formControlName="destinationCluster" [options]="destinationClusters" [value]="destinationCluster">
-              </dlm-select-field>
-            </dlm-form-field>
+            <div class="form-group">
+              <div class="row">
+                <div class="col-xs-12">
+                  <dlm-form-field [label]="'page.policies.form.fields.sourceCluster.self' | translate">
+                    <dlm-select-field qe-attr="policy-source-cluster" formField formControlName="sourceCluster" [options]="sourceClusters" [value]="sourceCluster" (onSelect)="handleSourceClusterChange($event)">
+                    </dlm-select-field>
+                  </dlm-form-field>
+                  <dlm-form-field [label]="'page.policies.form.fields.destinationCluster.self' | translate">
+                    <dlm-select-field qe-attr="policy-destination-cluster" formField formControlName="destinationCluster" [options]="destinationClusters" [value]="destinationCluster">
+                    </dlm-select-field>
+                  </dlm-form-field>
+                </div>
+              </div>
+            </div>
           </fieldset>
         </div>
       </div>

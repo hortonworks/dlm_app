@@ -21,9 +21,14 @@ $details-content-height: $details-height - 35*2;
 
   .summary-item {
     margin-bottom: 15px;
+    .title {
+      margin-top: 0;
+      margin-bottom: 15px;
+    }
     h6 {
       text-transform: uppercase;
       margin-bottom: 7px;
+      color: #666;
     }
     .detail {
       font-size: 14px;
@@ -35,6 +40,8 @@ $details-content-height: $details-height - 35*2;
   }
 
   .dlm-hive-browser {
+    padding-top: 0;
+    padding-bottom: 0;
     height: $details-content-height;
     overflow: auto;
 
