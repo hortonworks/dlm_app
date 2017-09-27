@@ -77,6 +77,8 @@ export class JobsTableComponent implements OnInit {
     return this.t.instant(`page.policies.jobs_table.column.${columnName}`);
   }
 
+  selectCheck = () => false;
+
   ngOnInit() {
     this.columns = [
       {cellTemplate: this.statusCellTemplate, maxWidth: 25, minWidth: 25},

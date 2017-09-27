@@ -30,6 +30,7 @@ export interface Policy extends PolicyUI {
   id: string; // UI specific
   name: string;
   type: string;
+  executionType: string;
   dataset: string;
   status: string;
   sourceCluster: string;
