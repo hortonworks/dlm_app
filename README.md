@@ -143,7 +143,7 @@ The script providing deployment and admnistration of DP Core is `dpdeploy.sh`. F
 |-------------------|--------------------------------|---------------------------------------------------------------------------------------------|
 | init              | `[ --all  ]`                   | Initialize and start all containers for the first time                                      |
 | migrate           |                                | Reset database to its pristine state and run schema migrations on it                        |
-| utils update-user | `[ ambari | atlas | ranger ]`  | Update user credentials for services that Dataplane will use to connect to clusters         |
+| utils update-user | `[ ambari / atlas / ranger ]`  | Update user credentials for services that Dataplane will use to connect to clusters         |
 | utils add-host    | `<ip> <host>`                  | Append a single entry to `/etc/hosts` file of the container interacting with HDP clusters   |
 | start             | `[ --all ]`                    | Start all containers                                                                        |
 | stop              | `[ --all ]`                    | Stop all containers                                                                         |
