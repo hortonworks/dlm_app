@@ -18,6 +18,7 @@ export const mapResponse = (response$: Observable<Response>) => response$.map(to
 export const getHeaders = (): RequestOptionsArgs => {
   const headers = {
     'Content-Type': 'application/json',
+    'X-Requested-With' : 'XMLHttpRequest'
   };
   return ({
     headers: new Headers(headers)
