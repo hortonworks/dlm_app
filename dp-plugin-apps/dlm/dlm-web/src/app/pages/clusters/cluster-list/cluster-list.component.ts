@@ -10,6 +10,7 @@
 import { Component, OnInit, Input, ViewChild, TemplateRef, ViewEncapsulation, HostBinding,
   ChangeDetectorRef } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { Router } from '@angular/router';
 import { Cluster, ClusterAction } from 'models/cluster.model';
 import { TableTheme } from 'common/table/table-theme.type';
@@ -65,7 +66,10 @@ export class ClusterListComponent implements OnInit {
 
   @HostBinding('class') className = 'dlm-cluster-list';
 
-  constructor(private t: TranslateService, private cdRef: ChangeDetectorRef, private router: Router) { }
+  constructor(private t: TranslateService,
+              private cdRef: ChangeDetectorRef,
+              private bytesPipe: BytesSizePipe,
+              private router: Router) { }
 
   ngOnInit() {
     this.columns = [
@@ -130,6 +134,14 @@ export class ClusterListComponent implements OnInit {
 
   isExpandedRow(row: Cluster): boolean {
     return this.tableComponent.expandedRows[row.id];
+  }
+
+  getCapacityUsed(stats) {
+    return (stats && stats.CapacityUsed) ? this.bytesPipe.transform(stats.CapacityUsed) : this.t.instant('common.na');
+  }
+
+  getCapacityTotal(stats) {
+    return (stats && stats.CapacityTotal) ? this.bytesPipe.transform(stats.CapacityTotal) : this.t.instant('common.na');
   }
 
   getFileBrowserPageForRow(rowId) {

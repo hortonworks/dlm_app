@@ -141,6 +141,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 
 import { HortonStyleModule } from 'common/horton-style.module';
+import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 
 @NgModule({
   imports: [
@@ -255,6 +256,7 @@ import { HortonStyleModule } from 'common/horton-style.module';
     NavbarService,
     EventService,
     LogService,
+    BytesSizePipe,
     TimeZoneService,
     HdfsService,
     HiveService,

@@ -15,7 +15,7 @@
         <div [ngClass]="{'text-muted': !isSelected}">{{cluster.dataCenter}}</div>
       </div>
       <div class="col-xs-4 cluster-volume-col">
-        <div [ngClass]="{'text-muted': !isSelected, 'cluster-volume': true, 'selected': isSelected}"><span [innerHTML]="cluster.stats.CapacityRemaining | bytesSize"></span></div>
+        <div [ngClass]="{'text-muted': !isSelected, 'cluster-volume': true, 'selected': isSelected}"><span [innerHTML]="capacityRemaining"></span></div>
       </div>
     </div>
   </div>

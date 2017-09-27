@@ -15,6 +15,7 @@ import { TooltipModule } from 'ng2-bootstrap';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { MockTranslateLoader } from 'mocks/mock-translate-loader';
 import { PipesModule } from 'pipes/pipes.module';
+import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 
 describe('CreatePairingCardComponent', () => {
   let component: CreatePairingCardComponent;
@@ -28,7 +29,8 @@ describe('CreatePairingCardComponent', () => {
         }),
         PipesModule
       ],
-      declarations: [CreatePairingCardComponent, ClusterCardComponent]
+      declarations: [CreatePairingCardComponent, ClusterCardComponent],
+      providers: [BytesSizePipe]
     })
       .compileComponents();
   }));
