@@ -175,6 +175,8 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
     }
   }
 
+  @Input() selectCheck = () => true;
+
   @HostBinding('class') get className() {
     return TableThemeSettings[this.theme].className;
   };
