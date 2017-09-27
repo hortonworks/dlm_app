@@ -22,4 +22,5 @@ public interface Constants {
     String XMLHttpRequestString="XMLHttpRequest";
     String XMLHttpRequestStringLowerCase=XMLHttpRequestString.toLowerCase();
 
+    String RESPONSE_COMMITTED = "RESPONSE_COMMITTED";
 }

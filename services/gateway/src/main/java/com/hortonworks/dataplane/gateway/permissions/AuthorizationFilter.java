@@ -6,6 +6,7 @@ import com.hortonworks.dataplane.gateway.permissions.PermPoliciesService;
 import com.hortonworks.dataplane.gateway.utils.Utils;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,12 @@ public class AuthorizationFilter extends ZuulFilter {
 
   @Override
   public boolean shouldFilter() {
+    RequestContext ctx = RequestContext.getCurrentContext();
     String serviceId = getServiceId();
+    if (ctx.get(Constants.RESPONSE_COMMITTED)!=null && Boolean.TRUE.equals(ctx.get(Constants.RESPONSE_COMMITTED))){
+      logger.info("Repsonse already commited. hence ignoring Authorization filter");
+      return false;
+    }
     return permPoliciesService.hasPolicy(serviceId);
   }
 
