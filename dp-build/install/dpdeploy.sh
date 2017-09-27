@@ -442,6 +442,16 @@ upgrade() {
     echo "Upgrade complete."
 }
 
+restart_containers() {
+    # stop containers other than db, consul and knox
+    stop_app
+
+    # start containers other than db, consul and knox
+    start_app
+
+    echo "Restart done."
+}
+
 print_version() {
     if [ -f VERSION ]; then
         cat VERSION
@@ -467,6 +477,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "stop" "Stop the application docker containers"
     printf "%-${tabspace}s:%s\n" "stop knox" "Stop the Knox and Consul containers"
     printf "%-${tabspace}s:%s\n" "stop --all" "Stop all containers"
+    printf "%-${tabspace}s:%s\n" "restart" "Restart all containers other than database, Consul and Knox"
     printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
     printf "%-${tabspace}s:%s\n" "logs [container name]" "Logs of supplied container id or name"
     printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them. Needs to start from init db again"
@@ -546,7 +557,9 @@ else
                 *) stop_app
              esac
              ;;
-
+        restart)
+            restart_containers
+            ;;
         ps)
             ps
             ;;

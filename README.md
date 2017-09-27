@@ -147,6 +147,7 @@ The script providing deployment and admnistration of DP Core is `dpdeploy.sh`. F
 | utils add-host    | `<ip> <host>`                  | Append a single entry to `/etc/hosts` file of the container interacting with HDP clusters   |
 | start             | `[ --all ]`                    | Start all containers                                                                        |
 | stop              | `[ --all ]`                    | Stop all containers                                                                         |
+| restart           |                                | Restart all containers other than database, Consul and Knox                                 |
 | ps                |                                | List the status of associated docker containers                                             |
 | logs              | `<container_name>`             | Logs of supplied container id or name                                                       |
 | destroy           | `[ --all ]`                    | Kill all containers and remove them. Needs to start from init again                         |
