@@ -40,7 +40,8 @@ $details-content-height: $details-height - 35*2;
   }
 
   .dlm-hive-browser {
-    padding: 0;
+    padding-top: 0;
+    padding-bottom: 0;
     height: $details-content-height;
     overflow: auto;
 

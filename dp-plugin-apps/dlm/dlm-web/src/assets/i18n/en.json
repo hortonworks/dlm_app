@@ -43,6 +43,9 @@
     "error": "Error",
     "empty_log": "Log is empty",
     "snapshot_enabled": "Snapshot Enabled",
+    "yes": "Yes",
+    "no": "No",
+    "not_applicable": "Not Applicable",
     "errors": {
       "no_log": "Oops! Could not retrieve a log message for this event.",
       "unknown": "Something went wrong."
