@@ -16,7 +16,7 @@ public interface Constants {
     String USER_CTX_KEY = "user_ctx";
     String DP_JWT_COOKIE = "dp_jwt";
     String LOCAL_SIGNIN_PATH="/sign-in";
-    String PERMS_POLICY_ENTRY_POINT = "/perm_policies";
+    String PERMS_POLICY_ENTRY_POINT = "/policies";
     boolean BEARER_TOKEN_IN_COOKIE=true;//If set to false value is taken from header
 
 
