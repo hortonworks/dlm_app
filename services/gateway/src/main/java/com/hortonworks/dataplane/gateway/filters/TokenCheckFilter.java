@@ -85,7 +85,7 @@ public class TokenCheckFilter extends ZuulFilter {
     RequestContext ctx = RequestContext.getCurrentContext();
     String serviceId = ctx.get(SERVICE_ID_KEY).toString();
     // Check if its not a sign in call - Protect everything else
-    if (ctx.getRequest().getServletPath().endsWith(Constants.PERMS_POLICY_ENTRY_POINT)){
+    if (serviceId.equals(Constants.DPAPP) && ctx.getRequest().getServletPath().endsWith(Constants.PERMS_POLICY_ENTRY_POINT)){
       return false;
     }
     //TODO remvoe Knox config path once secret key mechanism is established.
