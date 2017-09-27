@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.hortonworks.dataplane.gateway.domain.*;
+import com.hortonworks.dataplane.gateway.permissions.PermPoliciesService;
 import com.hortonworks.dataplane.gateway.utils.Jwt;
 import com.hortonworks.dataplane.gateway.service.UserService;
 import com.hortonworks.dataplane.gateway.utils.CookieManager;
@@ -64,7 +65,6 @@ public class TokenCheckFilter extends ZuulFilter {
   @Value("${metaredirect.forsafari}")
   private Boolean useMetaRedirectForSafari;
 
-
   private ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -85,7 +85,9 @@ public class TokenCheckFilter extends ZuulFilter {
     RequestContext ctx = RequestContext.getCurrentContext();
     String serviceId = ctx.get(SERVICE_ID_KEY).toString();
     // Check if its not a sign in call - Protect everything else
-
+    if (serviceId.equals(Constants.DPAPP) && ctx.getRequest().getServletPath().endsWith(Constants.PERMS_POLICY_ENTRY_POINT)){
+      return false;
+    }
     //TODO remvoe Knox config path once secret key mechanism is established.
     return (serviceId.equals(Constants.DPAPP) || serviceId.equals(Constants.DLMAPP)) &&
       !(ctx.getRequest().getServletPath().equals(AUTH_ENTRY_POINT)
@@ -193,6 +195,9 @@ public class TokenCheckFilter extends ZuulFilter {
         return utils.sendForbidden(utils.getInactiveErrorMsg(tokenInfo.getSubject()));
       }
     }
+  }
+  private boolean isAuthorized(){
+    return false;
   }
 
   private boolean needsResyncFromLdap(Optional<UserContext> userContextFromDb) {

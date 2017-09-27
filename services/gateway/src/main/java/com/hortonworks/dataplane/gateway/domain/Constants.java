@@ -16,9 +16,11 @@ public interface Constants {
     String USER_CTX_KEY = "user_ctx";
     String DP_JWT_COOKIE = "dp_jwt";
     String LOCAL_SIGNIN_PATH="/sign-in";
+    String PERMS_POLICY_ENTRY_POINT = "/access/policies";
     boolean BEARER_TOKEN_IN_COOKIE=true;//If set to false value is taken from header
     String HTTP_X_REQUESTED_WITH="X-Requested-With";
     String XMLHttpRequestString="XMLHttpRequest";
     String XMLHttpRequestStringLowerCase=XMLHttpRequestString.toLowerCase();
 
+    String RESPONSE_COMMITTED = "RESPONSE_COMMITTED";
 }
