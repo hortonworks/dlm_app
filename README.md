@@ -143,11 +143,11 @@ The script providing deployment and admnistration of DP Core is `dpdeploy.sh`. F
 |-------------------|--------------------------------|---------------------------------------------------------------------------------------------|
 | init              | `[ --all  ]`                   | Initialize and start all containers for the first time                                      |
 | migrate           |                                | Reset database to its pristine state and run schema migrations on it                        |
-| utils update-user | `[ ambari / atlas / ranger ]`  | Update user credentials for services that Dataplane will use to connect to clusters         |
 | utils add-host    | `<ip> <host>`                  | Append a single entry to `/etc/hosts` file of the container interacting with HDP clusters   |
+| utils update-user | `[ ambari / atlas / ranger ]`  | Update user credentials for services that Dataplane will use to connect to clusters         |
+| utils reload-apps |                                | Restart all containers other than database, Consul and Knox                                 |
 | start             | `[ --all ]`                    | Start all containers                                                                        |
 | stop              | `[ --all ]`                    | Stop all containers                                                                         |
-| restart           |                                | Restart all containers other than database, Consul and Knox                                 |
 | ps                |                                | List the status of associated docker containers                                             |
 | logs              | `<container_name>`             | Logs of supplied container id or name                                                       |
 | destroy           | `[ --all ]`                    | Kill all containers and remove them. Needs to start from init again                         |
