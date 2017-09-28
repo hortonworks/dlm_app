@@ -154,7 +154,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     const job = policy.lastJobResource;
     return {
       ...policy,
-      service: job ? POLICY_TYPES_LABELS[job.executionType] : ''
+      service: job ? POLICY_TYPES_LABELS[job.type] : ''
     };
   }
 
