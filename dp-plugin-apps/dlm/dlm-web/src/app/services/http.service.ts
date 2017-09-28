@@ -12,6 +12,7 @@ import { Injectable, isDevMode } from '@angular/core';
 import { Http, Request, Response, RequestOptionsArgs, RequestOptions, XHRBackend } from '@angular/http';
 import { MockResolver } from 'mocks/mock-resolver';
 import { API_PREFIX } from 'constants/api.constant';
+import { UserService } from 'services/user.service';
 
 
 @Injectable()
@@ -19,12 +20,28 @@ export class HttpService extends Http {
   // prodFlag = true;
   prodFlag = false;
 
+  unauthorizedRedirect = '/unauthorized';
   // todo: add auth token to headers
   // todo: default error handler
   // todo: default data serializer
+
+  private catchErrors() {
+    return (response: Response) => {
+      if (response.status === 401) {
+        window.location.href = UserService.signoutURL;
+      } else if (response.status === 403) {
+        window.location.href = this.unauthorizedRedirect;
+      }
+      return Observable.throw(response);
+    };
+  }
+
   request(url: string|Request, options?: RequestOptionsArgs): Observable<Response> {
     if (!isDevMode() || this.prodFlag) {
-      return super.request(this.buildUrl(url), options);
+      if (this.prodFlag === true && isDevMode()) {
+        return super.request(this.buildUrl(url), options);
+      }
+      return super.request(this.buildUrl(url), options).catch(this.catchErrors());
     }
     let request;
     const resolver = new MockResolver();
