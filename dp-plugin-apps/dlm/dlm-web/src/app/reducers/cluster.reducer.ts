@@ -60,8 +60,12 @@ export function reducer(state = initialState, action: fromCluster.Actions): Stat
         let clusterHealthStatus = CLUSTER_STATUS.HEALTHY;
         if (!status) {
           clusterHealthStatus = CLUSTER_STATUS.UNKNOWN;
-        } else if (status && !!status.some(d => d.state !== SERVICE_STATUS.STARTED)) {
-          clusterHealthStatus = CLUSTER_STATUS.UNHEALTHY;
+        } else {
+          if (status.some(d => d.state === SERVICE_STATUS.UNKNOWN)) {
+            clusterHealthStatus = CLUSTER_STATUS.UNKNOWN;
+          } else if (!!status.some(d => d.state !== SERVICE_STATUS.STARTED)) {
+            clusterHealthStatus = CLUSTER_STATUS.UNHEALTHY;
+          }
         }
         newEntities[clusterId] = Object.assign({}, state.entities[clusterId], {status: status || [], healthStatus: clusterHealthStatus});
         return newEntities;

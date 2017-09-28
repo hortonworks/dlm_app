@@ -50,7 +50,8 @@ export const CLUSTER_STATUS = {
 
 export const SERVICE_STATUS = {
   STARTED: 'STARTED',
-  INSTALLED: 'INSTALLED'
+  INSTALLED: 'INSTALLED',
+  UNKNOWN: 'UNKNOWN'
 };
 
 export const PROGRESS_STATUS = {
