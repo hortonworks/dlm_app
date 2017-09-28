@@ -22,12 +22,9 @@ object Ambari {
   case class HostComponents(`ServiceComponentInfo`: JsValue, host_components: Seq[HostComponent])
   case class RangerProperties(policymgr_external_url: Option[String], `ranger.plugin.hdfs.service.name`: Option[String])
   case class ConfigKey(cluster_name: String, stack_id: String)
-  case class ServiceConfigurations(Config: ConfigKey, `type`: String, tag: String, version: Long, properties: JsValue, properties_attributes: JsValue)
-  case class ActiveServiceConfigurations(href: String, cluster_name: String, configurations: Seq[ServiceConfigurations], createtime: Long,
-                                        group_id: Long, group_name: String, hosts: JsValue, is_cluster_compatible: Boolean,
-                                        is_current: Boolean, service_config_version: Long, service_config_version_note: String,
-                                        service_name: String, stack_id: String, user: String)
-  case class ActiveDefaultConfiguration(href: String, items: Seq[ActiveServiceConfigurations])
+  case class ServiceConfigurations(Config: ConfigKey, `type`: String, properties: JsValue)
+  case class ActiveServiceConfigurations(configurations: Seq[ServiceConfigurations])
+  case class ActiveDefaultConfiguration(items: Seq[ActiveServiceConfigurations])
 
   case class ServiceHostComponent(component_name: String, host_name: String, public_host_name: String)
   case class ServiceHostRoles(HostRoles: ServiceHostComponent)
