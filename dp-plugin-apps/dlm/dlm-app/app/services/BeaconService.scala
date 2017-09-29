@@ -203,7 +203,7 @@ class BeaconService @Inject()(
                   nnService,
                   rangerService,
                   hiveServerConfigDetails("hsEndpoint"),
-                  hiveServerConfigDetails("hsKerberosPrincipal")
+                  hiveServerConfigDetails("hive.server2.authentication.kerberos.principal")
                 )
               )
               acc.+(clusterDefinition)

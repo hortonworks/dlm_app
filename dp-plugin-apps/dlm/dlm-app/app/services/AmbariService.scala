@@ -249,9 +249,8 @@ class AmbariService @Inject()(@Named("ambariService") val ambariService: AmbariC
 
                 val hdfsServiceConfigMap : Map[String, Option[String]] = Map(
                   "fsEndpoint" -> Some(fsEndpoint),
-                  "nnKerberosPrincipal" -> nnKerberosPrincipal,
-                  "dfs.nameservices" ->  dfsNameService,
-                  "dfs.internal.nameservices" -> dfsInternalNameServices
+                  "dfs.namenode.kerberos.principal" -> nnKerberosPrincipal,
+                  "dfs.nameservices" ->  dfsNameService
                 ) ++ nnHaDynamicKeyConfigs
 
                 p.success(Right(hdfsServiceConfigMap))
@@ -294,7 +293,7 @@ class AmbariService @Inject()(@Named("ambariService") val ambariService: AmbariC
 
                     val hiveServiceConfigMap : Map[String, Option[String]] = Map(
                       "hsEndpoint" -> Some(hsEndpoint),
-                      "hsKerberosPrincipal" -> hsKerberosPrincipal
+                      "hive.server2.authentication.kerberos.principal" -> hsKerberosPrincipal
                     )
 
                     p.success(Right(hiveServiceConfigMap))
