@@ -82,9 +82,24 @@ const FILES_REQUEST = '[HDFS Browser Component] FILES_REQUEST';
     </ng-template>
   `,
 })
-export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() clusterId: number;
-  @Input() rootPath: string;
+export class HdfsBrowserComponent implements OnInit, OnDestroy {
+  private clusterId$: BehaviorSubject<number> = new BehaviorSubject(null);
+  private currentDirectory$: BehaviorSubject<string> = new BehaviorSubject(null);
+  @Input('clusterId')
+  set clusterId(id: number) {
+    this.clusterId$.next(id);
+  }
+  get clusterId(): number {
+    return this.clusterId$.getValue();
+  }
+
+  @Input('rootPath')
+  set rootPath(path: string) {
+    this.currentDirectory$.next(path);
+  }
+  get rootPath(): string {
+    return this.currentDirectory$.getValue();
+  }
 
   /**
    * Select files won't emit value when set to `false`. Select files is turned off by default
@@ -109,7 +124,6 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   rows$: Observable<ListStatus[]>;
   rows: ListStatus[];
   spinner$: Observable<boolean>;
-  currentDirectory$: BehaviorSubject<string>;
   columns: any = [];
   externalSorting = true;
   scrollbarV = false;
@@ -117,6 +131,7 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   rowHeight = '35';
   selected: string;
   fileTypes = FILE_TYPES;
+  subscriptions = [];
 
   constructor(private store: Store<fromRoot.State>,
               private hdfs: HdfsService,
@@ -124,19 +139,24 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnInit() {
-    this.currentDirectory$ = new BehaviorSubject(this.rootPath);
     const requestProgress$ = this.store.select(getMergedProgress(FILES_REQUEST))
       // next line fixes zone.js error aroun change detection confusing
       // check https://github.com/angular/angular/issues/17572 for more info
       .do(_ => this.cdRef.detectChanges())
       .distinctUntilChanged(isEqual);
-    this.rows$ = this.currentDirectory$.distinctUntilChanged().switchMap(path => {
-      this.store.dispatch(listFiles(this.clusterId, path, {clusterId: this.clusterId, path, requestId: FILES_REQUEST}));
-      return this.store.select(getAllFilesForClusterPath(this.clusterId, path)).map(files => {
-        const parent = path === '/' ? [] : [<ListStatus>{pathSuffix: '..', type: FILE_TYPES.DIRECTORY}];
-        return [...parent, ...files];
+    const dataChanges$ = Observable.combineLatest(this.currentDirectory$, this.clusterId$);
+    const loadData$ = dataChanges$
+      .distinctUntilChanged(isEqual)
+      .subscribe(([path, clusterId]) => {
+        this.store.dispatch(listFiles(clusterId, path, { clusterId: clusterId, path, requestId: FILES_REQUEST }));
       });
-    });
+    this.rows$ = dataChanges$
+      .switchMap(([path, clusterId]) => {
+        return this.store.select(getAllFilesForClusterPath(clusterId, path)).map(files => {
+          const parent = path === '/' ? [] : [<ListStatus>{ pathSuffix: '..', type: FILE_TYPES.DIRECTORY }];
+          return [...parent, ...files];
+        });
+      });
     this.breadcrumbs$ = this.currentDirectory$.map(path => this.updateBreadcrumbs(path));
     this.spinner$ = Observable.combineLatest(
       this.rows$,
@@ -156,14 +176,7 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
       {prop: 'modificationTime', name: 'Last Modified', cellClass: 'date-cell', headerClass: 'date-header',
         cellTemplate: this.dateTemplate, maxWidth: 130}
     ];
-  }
-
-  ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
-    if (changes['clusterId'] || changes['rootPath']) {
-      if (this.currentDirectory$) {
-        this.currentDirectory$.next(this.rootPath);
-      }
-    }
+    this.subscriptions.push(loadData$);
   }
 
   handleSelectedAction(selected) {
@@ -255,7 +268,7 @@ export class HdfsBrowserComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy() {
-
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
   handlePageChange(page) {
