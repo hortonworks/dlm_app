@@ -13,7 +13,7 @@
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.5.10")
 
 // Plugin to add headers
-addSbtPlugin("de.heikoseeberger" % "sbt-header"   % "3.0.2")
+addSbtPlugin("de.heikoseeberger" % "sbt-header" % "3.0.2")
 
 // Plugin to import maven projects
 //addSbtPlugin("com.github.shivawu" % "sbt-maven-plugin" % "0.1.2")
