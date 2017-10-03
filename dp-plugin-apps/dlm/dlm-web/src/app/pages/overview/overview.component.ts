@@ -17,18 +17,16 @@ import { Event } from 'models/event.model';
 import { JOB_EVENT } from 'constants/event.constant';
 import { loadEvents } from 'actions/event.action';
 import { ProgressState } from 'models/progress-state.model';
-import { updateProgressState } from 'actions/progress.action';
 import { JOB_STATUS } from 'constants/status.constant';
 import {
   getPolicyClusterJob, getUnhealthyPolicies, getAllPoliciesWithClusters, getCountPoliciesForSourceClusters
 } from 'selectors/policy.selector';
 import { getAllClusters, getUnhealthyClusters, getClustersWithLowCapacity } from 'selectors/cluster.selector';
 import { getDisplayedEvents } from 'selectors/event.selector';
-import { loadClusters, loadClustersStatuses } from 'actions/cluster.action';
-import { loadPolicies, loadLastJobs } from 'actions/policy.action';
-import { getMergedProgress, getProgressState } from 'selectors/progress.selector';
+import { loadClusters } from 'actions/cluster.action';
+import { loadPolicies } from 'actions/policy.action';
+import { getMergedProgress } from 'selectors/progress.selector';
 import { POLICY_TYPES_LABELS } from 'constants/policy.constant';
-import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
 import { Policy } from 'models/policy.model';
 import { Cluster } from 'models/cluster.model';
 import { ClustersStatus, PoliciesStatus, JobsStatus } from 'models/aggregations.model';
@@ -80,7 +78,6 @@ export class OverviewComponent implements OnInit, OnDestroy {
   tableData$: Observable<any>;
   pairsCount$: Observable<PairsCountEntity[]>;
   subscriptions: Subscription[] = [];
-  clustersSubscription: Subscription;
   clustersSummary$: Observable<ClustersStatus>;
   policiesSummary$: Observable<PoliciesStatus>;
   jobsSummary$: Observable<JobsStatus>;
@@ -93,10 +90,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
   @ViewChild('jobs_overview_table') jobsOverviewTable: ElementRef;
 
   jobStatusFilter$ = new BehaviorSubject('');
-  areJobsLoaded = false;
 
   constructor(private store: Store<fromRoot.State>,
-              private overviewJobsExternalFiltersService: OverviewJobsExternalFiltersService,
               private logService: LogService,
               private router: Router,
               private t: TranslateService) {
@@ -104,7 +99,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.policies$ = store.select(getAllPoliciesWithClusters);
     this.clusters$ = store.select(getAllClusters);
     this.pairsCount$ = store.select(getCountPairsForClusters);
-    this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, JOBS_REQUEST));
+    this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST));
     this.fullfilledClusters$ = this.clusters$
       .filter(clusters => !!clusters.length)
       .distinctUntilChanged(null, clusters => clusters.map(cluster => cluster.id).join('@') + '_LENGTH' + clusters.length);
@@ -192,7 +187,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
       .withLatestFrom(this.fullfilledClusters$)
       .do(([_, clusters]) => {
         [
-          loadPolicies({numResults: ALL_POLICIES_COUNT}),
+          loadPolicies({numResults: ALL_POLICIES_COUNT, instanceCount: 10}),
           loadClusters(),
           loadEvents()
         ].map(action => this.store.dispatch(action));
@@ -265,36 +260,18 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     [
-      loadPolicies({numResults: ALL_POLICIES_COUNT}, {requestId: POLICIES_REQUEST}),
+      loadPolicies({numResults: ALL_POLICIES_COUNT, instanceCount: 10}, {requestId: POLICIES_REQUEST}),
       loadClusters(CLUSTERS_REQUEST),
       loadPairings(),
       // todo: this is workaround to get all events for recent issues.
       // for recent issues we don't need events with severity INFO, but Beacon API doesn't support filtering
-      // so we need to load "all" events initialy
+      // so we need to load "all" events initially
       loadEvents({numResults: 1000})
     ].map(action => this.store.dispatch(action));
     const overallProgressSubscription = this.completedRequest$(this.overallProgress$)
       .take(1)
       .do(_ => this.initPolling())
       .subscribe();
-    const clusterPoliciesCompleteSubscription = Observable.combineLatest(
-      this.completedRequest$(this.store.select(getProgressState(CLUSTERS_REQUEST))),
-      this.completedRequest$(this.store.select(getProgressState(POLICIES_REQUEST)))
-    ).switchMap(_ => this.policies$)
-      .subscribe(policies => {
-        if (this.areJobsLoaded) {
-          return;
-        }
-        if (!policies.length) {
-          this.areJobsLoaded = true;
-          this.store.dispatch(updateProgressState(JOBS_REQUEST, { isInProgress: false }));
-        } else {
-          if (policies.some(policy => !isEmpty(policy.sourceClusterResource))) {
-            this.areJobsLoaded = true;
-            this.store.dispatch(loadLastJobs({policies, numJobs: 10}, {requestId: JOBS_REQUEST}));
-          }
-        }
-    });
     this.tableData$ = Observable
       .combineLatest(this.tableResources$, this.jobStatusFilter$)
       .map(([policies, jobStatusFilter]) => policies
@@ -303,7 +280,6 @@ export class OverviewComponent implements OnInit, OnDestroy {
       .map(policy => this.mapTableData(policy)));
 
     this.subscriptions.push(overallProgressSubscription);
-    this.subscriptions.push(clusterPoliciesCompleteSubscription);
   }
 
 
