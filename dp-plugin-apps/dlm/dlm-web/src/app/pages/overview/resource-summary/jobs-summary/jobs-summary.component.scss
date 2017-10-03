@@ -7,3 +7,12 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+:host /deep/ {
+  dlm-summary-panel-cell {
+    dlm-help-link {
+      bs-tooltip-container {
+        width: 120px;
+      }
+    }
+  }
+}
