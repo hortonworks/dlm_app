@@ -193,3 +193,26 @@
 
   transition: none;
 }
+
+/* Responsive UI using media queries overwriting MDL's default media queries */
+@media (max-width: 479px) {
+  .mdl-cell--5-col {
+    width: 90%;
+  }
+  .actions {
+    width: 10%;
+    margin-right: 0;
+    position: absolute;
+    right: 0;
+    z-index: 100;
+
+    &:hover {
+      width: 60px;
+      transition: width 200ms;
+    }
+  }
+
+  .mdl-menu .popup-arrow-up {
+    right: 0;
+  }
+}
