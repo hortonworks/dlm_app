@@ -27,9 +27,11 @@ import services.AmbariService
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
+import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 
 class DataplaneClusters @Inject()(
     @Named("dpClusterService") val dpClusterService: DpClusterService,
+    @Named("clusterAmbariService") ambariWebService: AmbariWebService,
     ambariService: AmbariService)
     extends Controller {
 
@@ -174,5 +176,23 @@ class DataplaneClusters @Inject()(
           case Right(cluster) => Future.successful(cluster)
         }
   }
+
+  def getAmbariServicesInfo = AuthenticatedAction.async(parse.json) { request =>
+    implicit val token = request.token
+    request.body
+      .validate[DataplaneCluster]
+      .map { req =>
+        ambariWebService
+          .getAmbariServicesInfo(req)
+          .map {
+            case Left(errors) =>
+              InternalServerError(Json.toJson(errors))
+            case Right(servicesInfo) =>  Ok(Json.toJson(servicesInfo))
+          }
+      }
+      .getOrElse(Future.successful(BadRequest))
+
+  }
+
 
 }

@@ -29,6 +29,10 @@ sealed trait AmbariDataplaneClusterInterface {
 
   def getClusterDetails(clusterName:String)(implicit hJwtToken: Option[HJwtToken]):Future[Option[JsValue]]
 
+  def getServiceInfo(clusterName:String, serviceName:String)(implicit hJwtToken: Option[HJwtToken]):Future[Option[JsValue]]
+
+  def getServices(clusterName:String)(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]]
+
 }
 
 class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
@@ -88,6 +92,45 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
       case e: Exception =>
         logger.warn(s"Cannot get security details for cluster $clusterName",e)
         Future.successful(None)
+    }
+  }
+
+  override def getServiceInfo(clusterName: String, serviceName: String)(implicit hJwtToken: Option[HJwtToken]): Future[Option[JsValue]] = {
+    val request = ws.url(s"${dataplaneCluster.ambariUrl}$prefix/$clusterName/services/$serviceName")
+    val requestWithLocalAuth = request.withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
+    val delegatedCall: ApiCall = { req => req.get() }
+
+    val response = if (dataplaneCluster.knoxEnabled.isDefined && dataplaneCluster.knoxEnabled.get && dataplaneCluster.knoxUrl.isDefined && hJwtToken.isDefined) {
+      KnoxApiExecutor(KnoxConfig("token", dataplaneCluster.knoxUrl), ws).execute(
+        KnoxApiRequest(request, delegatedCall, Some(hJwtToken.get.token)))
+    } else requestWithLocalAuth.get()
+
+    response.map { res =>
+      (res.json \ "ServiceInfo").toOption
+    }.recoverWith {
+      case e: Exception =>
+        Future.successful(None)
+    }
+  }
+
+  override def getServices(clusterName: String)(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]] = {
+    val request = ws.url(s"${dataplaneCluster.ambariUrl}$prefix/$clusterName/services")
+    val requestWithLocalAuth = request.withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
+    val delegatedCall: ApiCall = { req => req.get() }
+
+    val response = if (dataplaneCluster.knoxEnabled.isDefined && dataplaneCluster.knoxEnabled.get && dataplaneCluster.knoxUrl.isDefined && hJwtToken.isDefined) {
+      KnoxApiExecutor(KnoxConfig("token", dataplaneCluster.knoxUrl), ws).execute(
+        KnoxApiRequest(request, delegatedCall, Some(hJwtToken.get.token)))
+    } else requestWithLocalAuth.get()
+
+    response.map { res =>
+      val items = (res.json \ "items" \\ "ServiceInfo").map(_.as[JsObject].validate[Map[String, String]].map(m => Some(m)).getOrElse(None))
+      val serviceOpts = items.map { item =>
+        item.flatMap { map =>
+          map.get("service_name")
+        }
+      }
+      serviceOpts.collect { case Some(s) => s }
     }
   }
 }

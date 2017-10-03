@@ -17,6 +17,7 @@ import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives.{as, entity, path, post, _}
 import com.google.inject.Inject
 import com.hortonworks.dataplane.commons.domain.Constants
+import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.cs.ClusterErrors.ClusterNotFound
 import com.hortonworks.dataplane.cs._
 import com.hortonworks.dataplane.db.Webservice.{ClusterService, DpClusterService}
@@ -328,6 +329,52 @@ class AmbariRoute @Inject()(val ws: WSClient,
     } yield response
   }
 
+  def mapToServiceInfo(json: Option[JsValue],
+                       srvcName: String): Future[Option[ServiceInfo]] =
+    Future.successful(
+      json
+        .map { j =>
+          val st =
+            (j \ "state").validate[String].getOrElse("NONE")
+          Some(
+            ServiceInfo(serviceName = srvcName , state = st))
+        }
+        .getOrElse(None))
+
+  def getServiceInfoSeq(services: Seq[String],dli: AmbariDataplaneClusterInterface, dataplaneCluster: DataplaneCluster)(implicit token: Option[HJwtToken]): Future[Seq[Option[ServiceInfo]]] = {
+    val list = services.map { srvc =>
+      for{
+        json <- dli.getServiceInfo(dataplaneCluster.name,srvc)
+        serviceInfo <- {
+          mapToServiceInfo(json, srvc)
+        }
+      } yield  serviceInfo
+    }
+    Future.sequence(list)
+  }
+  
+  def getAmbariServicesInfo(dataplaneCluster: DataplaneCluster,
+                            request: HttpRequest): Future[Seq[ServiceInfo]] = {
+
+    val header = request.getHeader(Constants.DPTOKEN)
+    implicit val token =
+      if (header.isPresent) Some(HJwtToken(header.get.value)) else None
+    val list = for {
+      creds <- credentialInterface.getCredential("dp.credential.ambari")
+      dli <- Future.successful(
+        AmbariDataplaneClusterInterfaceImpl(dataplaneCluster,
+          ws,
+          config,
+          creds))
+      services <- dli.getServices(dataplaneCluster.name)
+      serviceInfoSeq <- getServiceInfoSeq(services,dli,dataplaneCluster)
+    } yield  serviceInfoSeq
+
+    list.map { item =>
+      item.collect { case o if o.isDefined => o.get }
+    }
+  }
+
   val ambariClusterProxy = path(LongNumber / "ambari" / "cluster") {
     clusterId =>
       pathEnd {
@@ -390,5 +437,29 @@ class AmbariRoute @Inject()(val ws: WSClient,
       }
     }
   }
+
+  val ServiceStateRoute = path("ambari" / "servicesInfo") {
+    post {
+      extractRequest { request =>
+        entity(as[DataplaneCluster]) { dpc =>
+          val list = getAmbariServicesInfo(dpc, request)
+          onComplete(list) {
+            case Success(serviceInfoes) =>
+              serviceInfoes.size match {
+                case 0 =>
+                  complete(StatusCodes.NotFound, notFound)
+                case _ => {
+                  complete(success(serviceInfoes))
+
+                }
+              }
+            case Failure(th) =>
+              complete(StatusCodes.InternalServerError, errors(th))
+          }
+        }
+      }
+    }
+  }
+
 
 }

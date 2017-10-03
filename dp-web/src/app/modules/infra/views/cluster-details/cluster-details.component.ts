@@ -13,7 +13,7 @@ import {Component, OnInit, ElementRef, ViewChild, AfterViewInit} from '@angular/
 import {Router, ActivatedRoute} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 
-import {Cluster, ClusterDetails} from '../../../../models/cluster';
+import {Cluster, ClusterDetails, ServiceInfo} from '../../../../models/cluster';
 import {Lake} from '../../../../models/lake';
 import {Location} from '../../../../models/location';
 
@@ -42,6 +42,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
 
   lake: Lake = new Lake();
   clusters: Cluster[];
+  servicesInfo: ServiceInfo[];
   cluster: any;
   clusterHealth: any;
   rmHealth: any;
@@ -71,7 +72,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
     this.lakeService.retrieve(lakeId).subscribe((lake: Lake) => {
       this.lake = lake;
       this.populateGeneralProperties();
-      this.getClusterDetails()
+      this.getClusterDetails();
     }, error => {
       Loader.hide();
     });
@@ -114,6 +115,9 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
           .skipWhile(lake => lake.state !== 'SYNCED' && lake.state !== 'SYNC_ERROR' && ++count < 10)
           .first().subscribe(lakeUpdated => {
           this.lake = lakeUpdated;
+          this.lakeService.getServicesInfo(this.lake).subscribe(res =>{
+            this.servicesInfo = res;
+          });
           this.getClusterHealth(this.cluster.id, this.lake.id);
         });
 

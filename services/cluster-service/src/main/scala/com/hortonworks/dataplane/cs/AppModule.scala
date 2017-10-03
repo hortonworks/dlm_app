@@ -255,6 +255,7 @@ object AppModule extends AbstractModule {
         statusRoute.sync ~
         statusRoute.health ~
         ambariRoute.route ~
+        ambariRoute.ServiceStateRoute ~
         ambariRoute.ambariClusterProxy ~
         ambariRoute.ambariGenericProxy
     )

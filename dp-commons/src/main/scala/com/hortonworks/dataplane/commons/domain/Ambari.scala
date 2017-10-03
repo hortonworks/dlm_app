@@ -27,6 +27,9 @@ object Ambari {
 
   case class AmbariEndpoint(url: String)
 
+  case class ServiceInfo(serviceName: String,
+                         state: String)
+
   case class AmbariCheckResponse(ambariApiCheck: Boolean,
                                  knoxDetected: Boolean,
                                  ambariApiStatus: Int = -1,
@@ -154,6 +157,8 @@ object Ambari {
   implicit val nameNodeReads = Json.reads[NameNodeInfo]
   implicit val endPointWrites = Json.writes[AmbariEndpoint]
   implicit val endPointReads = Json.reads[AmbariEndpoint]
+  implicit val seviceInfoReads = Json.reads[ServiceInfo]
+  implicit val serviceInfoWrites = Json.writes[ServiceInfo]
   implicit val configTypeReads = Json.reads[ConfigType]
   implicit val configTypeWrites = Json.writes[ConfigType]
   implicit val configurationInfoReads = Json.reads[ConfigurationInfo]
