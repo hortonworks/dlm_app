@@ -8,8 +8,21 @@
  */
 
 import {
-  Component, Input, Output, ViewEncapsulation, ViewChild, TemplateRef, EventEmitter, HostBinding,
-  OnChanges, OnDestroy, AfterViewInit, HostListener, ChangeDetectorRef, AfterViewChecked
+    AfterViewChecked,
+    AfterViewInit,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    EventEmitter,
+    HostBinding,
+    HostListener,
+    Input,
+    OnChanges,
+    OnDestroy,
+    Output,
+    TemplateRef,
+    ViewChild,
+    ViewEncapsulation,
 } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -162,6 +175,8 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
     }
   }
 
+  @Input() selectCheck = () => true;
+
   @HostBinding('class') get className() {
     return TableThemeSettings[this.theme].className;
   };
@@ -174,7 +189,9 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
     return this._rows;
   }
 
-  constructor(private navbar: NavbarService, private cdRef: ChangeDetectorRef) {
+  constructor(private navbar: NavbarService,
+              private cdRef: ChangeDetectorRef,
+              private elementRef: ElementRef) {
     this.navbarCollapse$ = this.navbar.isCollapsed;
     this.navbarCollapseSubscription = this.navbarCollapse$
       .debounceTime(500)
@@ -182,6 +199,23 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
         this.recalculateTable();
         this.cdRef.detectChanges();
       });
+  }
+
+  /**
+   * This is the really bad but the only way to change default progress indicator
+   * ngx-datatable doesn't support custom progress indicator template
+   *
+   * @param show
+   */
+  private toggleLoadingSpinner(show: boolean): void {
+    const spinnerClass = 'fa fa-spin fa-spinner';
+    const progressSelector = 'datatable-progress .container div:eq(0)';
+    setTimeout(() => {
+      const selfEl = this.elementRef.nativeElement;
+      if (selfEl) {
+        $(selfEl).find(progressSelector).removeClass().addClass(show ? spinnerClass : '');
+      }
+    }, 200);
   }
 
   handleSelectedCell({row, column, checked}) {
@@ -251,6 +285,10 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
           }
         }
       });
+    }
+    if (changes.loadingIndicator) {
+      const loadingIndicator = changes.loadingIndicator.currentValue;
+      this.toggleLoadingSpinner(loadingIndicator);
     }
   }
 

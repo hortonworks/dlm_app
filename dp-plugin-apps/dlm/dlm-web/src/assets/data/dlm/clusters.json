@@ -69,11 +69,7 @@
       "dataCenter": "dc-UA",
       "description": "Same Location as Cluster c3",
       "ambariurl": "http://104.196.85.207:8080/api/v1/clusters/c1",
-      "stats": {
-        "CapacityTotal": 9129444352,
-        "CapacityUsed": 564883456,
-        "CapacityRemaining": 3849543680
-      },
+      "stats": {},
       "location": {
         "id": 703448,
         "country": "UA",

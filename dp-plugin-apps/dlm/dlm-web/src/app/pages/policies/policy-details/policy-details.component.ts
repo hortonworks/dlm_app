@@ -7,20 +7,23 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Policy } from 'models/policy.model';
 import { Job } from 'models/job.model';
 import { PolicyContent } from './policy-content.type';
-import { POLICY_TYPES } from 'constants/policy.constant';
+import { POLICY_TYPES, POLICY_EXECUTION_TYPES } from 'constants/policy.constant';
 import { HiveDatabase } from 'models/hive-database.model';
 import { JOB_STATUS } from 'constants/status.constant';
+import { ProgressState } from 'models/progress-state.model';
+import { TranslateService } from '@ngx-translate/core';
+
 
 @Component({
   selector: 'dlm-policy-details',
   templateUrl: './policy-details.component.html',
   styleUrls: ['./policy-details.component.scss']
 })
-export class PolicyDetailsComponent implements OnInit {
+export class PolicyDetailsComponent {
 
   policyContent = PolicyContent;
 
@@ -64,11 +67,15 @@ export class PolicyDetailsComponent implements OnInit {
 
   @Input() fileBrowserPage = 0;
 
-  @Input() loadingJobs;
+  @Input() loadingJobs: boolean;
+
+  @Input() loadingDatabases: ProgressState;
 
   @Input() tablesSearchPattern = '';
 
-  ngOnInit() {
+  constructor(
+    private t: TranslateService
+  ) {
 
   }
 
@@ -114,5 +121,18 @@ export class PolicyDetailsComponent implements OnInit {
 
   get filteredJobs() {
     return this.jobs ? this.jobs.filter(job => job.status !== JOB_STATUS.IGNORED) : [];
+  }
+
+  /**
+   * Returns a string 'Yes' or 'No' for HDFS policy
+   * and "Not Applicable" for HIVE policy
+   * based on whether snapshot is enabled on the policy
+   */
+  get snapshotEnabledStatus() {
+    if (this.policy && this.policy.type === POLICY_TYPES.HIVE) {
+      return this.t.instant('common.not_applicable');
+    }
+    return (this.policy && this.policy.executionType && this.policy.executionType === POLICY_EXECUTION_TYPES.HDFS_SNAPSHOT) ?
+      this.t.instant('common.yes') : this.t.instant('common.no');
   }
 }

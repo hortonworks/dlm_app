@@ -30,13 +30,13 @@ class AmbariClusterInterfaceV2(
     private val cluster: Cluster,
     private val dataplaneCluster: DataplaneCluster,
     private val appConfig: Config,
-    private val storageInterface: StorageInterface,
+    private val credentialInterface: CredentialInterface,
     knoxApiExecutor: KnoxApiExecutor)(implicit ws: WSClient)
     extends AmbariInterfaceV2 {
 
   val logger = Logger(classOf[AmbariClusterInterfaceV2])
 
-  lazy val credentials: Future[Credentials] = loadCredentials
+  val credentials: Future[Credentials] = credentialInterface.getCredential("dp.credential.ambari")
 
   override def getAtlas(implicit hJwtToken: Option[HJwtToken])
     : Future[Either[Throwable, Atlas]] = {
@@ -512,16 +512,6 @@ class AmbariClusterInterfaceV2(
         Future.successful(Left(e))
     }
 
-  }
-
-  private def loadCredentials = {
-    val creds = for {
-      user <- storageInterface.getConfiguration("dp.ambari.superuser")
-      pass <- storageInterface.getConfiguration("dp.ambari.superuser.password")
-    } yield {
-      Credentials(user, pass)
-    }
-    creds
   }
 
 }

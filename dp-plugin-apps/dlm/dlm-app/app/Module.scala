@@ -22,7 +22,6 @@ import com.hortonworks.dlm.beacon.WebService._
 import com.hortonworks.datapalane.consul._
 import com.hortonworks.dataplane.cs.{AmbariWebServiceImpl, ClusterWsClient, KnoxProxyWsClient}
 import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
-import com.hortonworks.dataplane.commons.auth.Authenticated
 
 
 /**
@@ -38,7 +37,6 @@ import com.hortonworks.dataplane.commons.auth.Authenticated
 class Module extends AbstractModule {
 
   def configure() = {
-    bind(classOf[Authenticated]).asEagerSingleton()
     bind(classOf[ConsulInitializer]).asEagerSingleton()
   }
 

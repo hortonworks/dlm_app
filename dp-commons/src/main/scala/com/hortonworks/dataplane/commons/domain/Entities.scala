@@ -334,14 +334,14 @@ object Entities {
                                   dataAssets: Seq[DataAsset] = Nil)
   case class LdapConfiguration(
       id: Option[Long],
-      ldapUrl: String,
-      bindDn: Option[String],
-      userSearchBase: Option[String],
-      userSearchAttributeName: Option[String],
-      groupSearchBase: Option[String],
-      groupSearchAttributeName: Option[String],
-      groupObjectClass: Option[String],
-      groupMemberAttributeName: Option[String]
+      ldapUrl: Option[String]=None,
+      bindDn: Option[String]=None,
+      userSearchBase: Option[String]=None,
+      userSearchAttributeName: Option[String]=None,
+      groupSearchBase: Option[String]=None,
+      groupSearchAttributeName: Option[String]=None,
+      groupObjectClass: Option[String]=None,
+      groupMemberAttributeName: Option[String]=None
   )
 
   case class WorkspaceDataCount(asset: Int, notebook: Int)

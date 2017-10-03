@@ -76,6 +76,7 @@
     [jobsSort]="getJobsSortForRow(row.id)"
     [jobsPage]="getJobsPageForRow(row.id)"
     [loadingJobs]="loadingJobs"
+    [loadingDatabases]="databaseRequest$ | async"
     [jobsActiveActions]="getJobsActiveActionsForRow(row.id)"
     [fileBrowserPage]="getFilesPageForRow(row.id)"
     [tablesSearchPattern]="tablesSearchPattern"

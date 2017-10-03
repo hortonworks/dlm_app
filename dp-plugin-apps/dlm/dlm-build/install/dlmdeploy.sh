@@ -58,7 +58,6 @@ init_app() {
         docker run \
             --name dlm-app \
             --network dp \
-            --publish 9011:9011 \
             --detach \
             --env CONSUL_HOST \
             --env DLM_APP_HOME="/usr/dlm-app" \

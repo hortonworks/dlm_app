@@ -21,7 +21,7 @@ import com.google.common.net.HttpHeaders
 import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneClusterIdentifier, ErrorType, HJwtToken}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
-import com.hortonworks.dataplane.cs.{ClusterSync, StorageInterface}
+import com.hortonworks.dataplane.cs.{ClusterSync, CredentialInterface, StorageInterface}
 import com.hortonworks.dataplane.http.BaseRoute
 import com.hortonworks.dataplane.knox.Knox.{ApiCall, KnoxApiRequest, KnoxConfig}
 import com.hortonworks.dataplane.knox.KnoxApiExecutor
@@ -43,6 +43,7 @@ private[routes] case class AmbariError(cause: Throwable)
 
 class StatusRoute @Inject()(val ws: WSClient,
                             storageInterface: StorageInterface,
+                            val credentialInterface: CredentialInterface,
                             val config: Config,
                             clusterSync: ClusterSync,
                             dpClusterSync: DpClusterSync)
@@ -140,12 +141,10 @@ class StatusRoute @Inject()(val ws: WSClient,
         // Fallback to local user
         // Step 4
         for {
-          user <- storageInterface.getConfiguration("dp.ambari.superuser")
-          pass <- storageInterface.getConfiguration(
-            "dp.ambari.superuser.password")
+          credential <- credentialInterface.getCredential("dp.credential.ambari")
           response <- ws
             .url(endpoint)
-            .withAuth(user.get, pass.get, WSAuthScheme.BASIC)
+            .withAuth(credential.user.get, credential.pass.get, WSAuthScheme.BASIC)
             .withRequestTimeout(timeout seconds)
             .get()
         } yield {

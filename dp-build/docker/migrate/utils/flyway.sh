@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # /*
 #  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
@@ -25,4 +25,4 @@ if [ -n "$DATABASE_PASS" ]; then
     FLYWAY_ARGS="$FLYWAY_ARGS -password=$DATABASE_PASS"
 fi
 
-flyway $FLYWAY_ARGS $@
+flyway $FLYWAY_ARGS "$@"

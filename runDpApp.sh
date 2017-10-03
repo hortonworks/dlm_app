@@ -9,4 +9,7 @@
 #  * of all or any part of the contents of this software is strictly prohibited.
 #  */
 #
-sbt ";project dpApp;run -DDP_APP_HOME=$PWD/dp-app"
+sbt \
+    -Ddp.keystore.path=$(pwd)/dp-build/shared/dp-keystore.jceks \
+    -Ddp.keystore.password=changeit \
+    ";project dpApp;run"

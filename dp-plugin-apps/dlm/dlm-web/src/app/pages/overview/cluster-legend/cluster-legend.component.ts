@@ -21,7 +21,7 @@ import { CLUSTER_STATUS } from 'constants/status.constant';
       <div class="pull-right">
         <button qe-attr="map-legend-cross" class="cross-button close" type="button" aria-label="Close" (click)="onClickClose()">
           <span aria-hidden="true">&times;</span>
-        </button> 
+        </button>
       </div>
       <div class="clearfix"></div>
     </div>
@@ -29,7 +29,7 @@ import { CLUSTER_STATUS } from 'constants/status.constant';
       <dl *ngIf="shouldShowAlertsSection">
         <dt>{{'page.overview.world_map.cluster_legend.alerts' | translate}}</dt>
         <dd *ngFor="let alert of cluster?.alerts">
-          <i class="fa fa-exclamation-triangle text-danger"></i>
+          <dlm-service-status-icon [serviceStatus]="alert"></dlm-service-status-icon>
           {{alert.service_name}}
         </dd>
         <dd *ngIf="isAmbariServerStopped">

@@ -25,7 +25,6 @@ import com.hortonworks.dataplane.db.Webservice.{
   AssetWorkspaceService,
   NotebookWorkspaceService
 }
-import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.JsonResponses
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
@@ -33,8 +32,7 @@ import play.api.mvc.{Action, Controller}
 import scala.concurrent.Future
 
 class NotebookWorkspaces @Inject()(
-    @Named("notebookWorkspaceService") val notebookWorkspaceService: NotebookWorkspaceService,
-    authenticated: Authenticated)
+    @Named("notebookWorkspaceService") val notebookWorkspaceService: NotebookWorkspaceService)
     extends Controller {
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._

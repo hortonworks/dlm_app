@@ -14,33 +14,22 @@ package controllers.actions
 import javax.inject.Inject
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  Cluster,
-  DataplaneCluster
-}
+import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneCluster}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webservice.{
-  ClusterService,
-  DpClusterService
-}
-import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.db.Webservice.{ClusterService, DpClusterService}
 import models.{JsonResponses, WrappedErrorsException}
-import models.JsonFormatters._
-import models.RequestSyntax.RegisterDpCluster
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.Controller
+import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class DpClusterActions @Inject()(
     @Named("dpClusterService") val dpClusterService: DpClusterService,
-    @Named("clusterService") val clusterService: ClusterService,
-    authenticated: Authenticated
-) extends Controller {
+    @Named("clusterService") val clusterService: ClusterService) extends Controller {
 
-  def listWithClusters(`type`: Option[String]) = authenticated.async {
+  def listWithClusters(`type`: Option[String]) = Action.async {
     Logger.info("list lakes with clusters")
 
     val typeFlag = `type`.getOrElse("all");

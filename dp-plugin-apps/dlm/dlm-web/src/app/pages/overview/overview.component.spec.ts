@@ -218,13 +218,13 @@ describe('OverviewComponent', () => {
       },
       {
         m: 'lastJobResource exists (execution type FS)',
-        policy: <Policy>{lastJobResource: {executionType: 'FS'}},
-        e: {lastJobResource: {executionType: 'FS'}, service: 'HDFS'}
+        policy: <Policy>{lastJobResource: {type: 'FS'}},
+        e: {lastJobResource: {type: 'FS'}, service: 'HDFS'}
       },
       {
         m: 'lastJobResource exists (execution type HIVE)',
-        policy: <Policy>{lastJobResource: {executionType: 'HIVE'}},
-        e: {lastJobResource: {executionType: 'HIVE'}, service: 'Hive'}
+        policy: <Policy>{lastJobResource: {type: 'HIVE'}},
+        e: {lastJobResource: {type: 'HIVE'}, service: 'Hive'}
       }
     ].forEach(test => {
       it(test.m, () => {

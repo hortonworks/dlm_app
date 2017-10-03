@@ -19,7 +19,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import services.BeaconService
 
-import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dlm.beacon.domain.JsonFormatters._
 import models.JsonFormatters._
@@ -29,15 +29,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class Policies @Inject() (
-  val beaconService: BeaconService,
-  authenticated: Authenticated
+  val beaconService: BeaconService
 ) extends Controller {
 
 
   /**
     * Get all policies across all DLM enabled clusters
     */
-  def list() = authenticated.async { request =>
+  def list() = AuthenticatedAction.async { request =>
     Logger.info("Received list all policies request")
     implicit val token = request.token
     val queryString : Map[String,String] = request.queryString.map { case (k,v) => k -> v.mkString }
@@ -54,7 +53,7 @@ class Policies @Inject() (
     * @param clusterId    cluster id
     * @param policyName   policy name
     */
-  def retrieve(clusterId: Long, policyName: String) = authenticated.async { request =>
+  def retrieve(clusterId: Long, policyName: String) = AuthenticatedAction.async { request =>
     Logger.info("Received retrieve policy request")
     implicit val token = request.token
     beaconService.getPolicy(clusterId, policyName).map {
@@ -70,7 +69,7 @@ class Policies @Inject() (
     * @param policyName   name of the policy to be submitted
     * @return
     */
-  def submit(clusterId: Long, policyName: String) = authenticated.async (parse.json) { request =>
+  def submit(clusterId: Long, policyName: String) = AuthenticatedAction.async (parse.json) { request =>
     Logger.info("Received submit policy request")
     implicit val token = request.token
     request.body.validate[PolicySubmitRequest].map { policySubmitRequest =>
@@ -87,7 +86,7 @@ class Policies @Inject() (
     * @param policyName   name of the policy to be scheduled
     * @return
     */
-  def schedule(clusterId: Long, policyName: String) = authenticated.async { request =>
+  def schedule(clusterId: Long, policyName: String) = AuthenticatedAction.async { request =>
     Logger.info("Received schedule policy request")
     implicit val token = request.token
     beaconService.updatePolicy(clusterId, policyName, SCHEDULE).map {
@@ -102,7 +101,7 @@ class Policies @Inject() (
     * @param policyName  name of the policy to be suspended
     * @return
     */
-  def suspend(clusterId: Long, policyName: String) = authenticated.async { request =>
+  def suspend(clusterId: Long, policyName: String) = AuthenticatedAction.async { request =>
     Logger.info("Received suspend policy request")
     implicit val token = request.token
     beaconService.updatePolicy(clusterId, policyName, SUSPEND).map {
@@ -117,7 +116,7 @@ class Policies @Inject() (
     * @param policyName  name of the policy to be resumed
     * @return
     */
-  def resume(clusterId: Long, policyName: String) = authenticated.async { request =>
+  def resume(clusterId: Long, policyName: String) = AuthenticatedAction.async { request =>
     Logger.info("Received resume policy request")
     implicit val token = request.token
     beaconService.updatePolicy(clusterId, policyName, RESUME).map {
@@ -132,7 +131,7 @@ class Policies @Inject() (
     * @param policyName policy name to be deleted
     * @return
     */
-  def delete(clusterId: Long, policyName: String) = authenticated.async { request =>
+  def delete(clusterId: Long, policyName: String) = AuthenticatedAction.async { request =>
     Logger.info("Received delete policy request")
     implicit val token = request.token
     beaconService.updatePolicy(clusterId, policyName, DELETE).map {

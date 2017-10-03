@@ -14,12 +14,18 @@ import { CommonModule }        from '@angular/common';
 import { FormsModule }         from '@angular/forms';
 import {DpTableDirective} from './dp-table/dp-table.directive';
 import {RedirectUrlComponent} from './redirect-url/redirect-url.component';
+import { LdapConfigCommonComponent } from './ldap-config-common/ldap-config-common.component';
+import {TranslateModule} from "@ngx-translate/core";
+import {RouterModule} from "@angular/router";
 
 @NgModule({
   imports:  [
-    CommonModule
+    CommonModule,
+    TranslateModule,
+    FormsModule,
+    RouterModule
   ],
-  declarations: [DpTableDirective, RedirectUrlComponent],
+  declarations: [DpTableDirective, RedirectUrlComponent, LdapConfigCommonComponent],
   exports:  [
     CommonModule,
     FormsModule,

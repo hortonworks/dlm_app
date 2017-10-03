@@ -38,6 +38,8 @@ import {ServiceManagementComponent} from './views/service-management/service-man
 import {VerificationComponent} from './views/service-management/verification/verification.component';
 import {TabsModule} from '../../shared/tabs/tabs.module';
 import { ManualInstallCheckComponent } from './views/service-management/manual-install-check/manual-install-check.component';
+import { LdapEditConfigComponent } from './views/ldap-edit-config/ldap-edit-config.component';
+import { CommonTopRowComponent } from './views/user-management/common-top-row/common-top-row.component';
 
 @NgModule({
   imports: [
@@ -69,8 +71,11 @@ import { ManualInstallCheckComponent } from './views/service-management/manual-i
     ConfigDialogComponent,
     ServiceManagementComponent,
     VerificationComponent,
-    ManualInstallCheckComponent
+    ManualInstallCheckComponent,
+    LdapEditConfigComponent,
+    CommonTopRowComponent
   ]
 })
 export class InfraModule {
 }
+

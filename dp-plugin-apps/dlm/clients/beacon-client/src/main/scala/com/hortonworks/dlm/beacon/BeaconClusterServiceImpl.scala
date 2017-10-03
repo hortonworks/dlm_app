@@ -87,7 +87,7 @@ class BeaconClusterServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconC
       case None => ""
     }) +
     (clusterDefinitionRequest.hsKerberosPrincipal match {
-      case Some(hsKerberosPrincipal) => "hsKerberosPrincipal= " + hsKerberosPrincipal + "\n"
+      case Some(hsKerberosPrincipal) => "hive.server2.authentication.kerberos.principal= " + hsKerberosPrincipal + "\n"
       case None => ""
     }) +
     rangerConfigs

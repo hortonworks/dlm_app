@@ -5,6 +5,7 @@ import com.netflix.zuul.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
@@ -15,14 +16,19 @@ public class RequestResponseUtils {
   @Autowired
   private HostUtils hostUtils;
 
-  @Autowired
-  private Utils utils;
+  public void addNoCacheHeaders(HttpServletResponse response) {
+    response.addHeader("Cache-Control","no-cache, no-store, max-age=0, must-revalidate");
+    response.addHeader("Pragma","no-cache");
+    response.addHeader("Expires","0");
+  }
 
   private void redirectTo(String path) {
     RequestContext ctx = RequestContext.getCurrentContext();
     try {
-      utils.addNoCacheHeaders(ctx.getResponse());
+      addNoCacheHeaders(ctx.getResponse());
       ctx.getResponse().sendRedirect(path);
+      ctx.setSendZuulResponse(false);
+      ctx.set(Constants.RESPONSE_COMMITTED,true);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -42,6 +48,9 @@ public class RequestResponseUtils {
 
   public void redirectToLogin() {
     redirectTo(getLoginUrl());
+  }
+  public void redirectToForbidden() {
+    redirectTo(getRootPath() + "unauthorized");
   }
 
   public String getLoginUrl() {

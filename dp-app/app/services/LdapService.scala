@@ -18,13 +18,14 @@ import javax.naming.ldap.InitialLdapContext
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
+import play.api.Configuration
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, LdapConfiguration}
 import com.hortonworks.dataplane.commons.domain.Ldap.{LdapGroup, LdapSearchResult, LdapUser}
 import com.hortonworks.dataplane.db.Webservice.{ConfigService, LdapConfigService}
 import com.typesafe.scalalogging.Logger
-import models.{CredentialEntry, KnoxConfigInfo, WrappedErrorsException}
+import models.{CredentialEntry, KnoxConfigInfo, KnoxConfigUpdateInfo, WrappedErrorsException}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
@@ -32,10 +33,10 @@ import scala.util.Left
 
 @Singleton
 class LdapService @Inject()(
-    @Named("ldapConfigService") val ldapConfigService: LdapConfigService,
-    @Named("configService") val configService: ConfigService,
-    private val ldapKeyStore: DpKeyStore,
-    private val configuration: play.api.Configuration) {
+                             @Named("ldapConfigService") val ldapConfigService: LdapConfigService,
+                             @Named("configService") val configService: ConfigService,
+                             private val ldapKeyStore: DpKeyStore,
+                             private val configuration: Configuration) {
   private val logger = Logger(classOf[LdapService])
   private val USERDN_SUBSTITUTION_TOKEN = "{0}"
 
@@ -51,34 +52,40 @@ class LdapService @Inject()(
             Future.successful(
               Left(Errors(Seq(Error("400", "invalid knox configuration")))))
           } else {
-            validateBindDn(knoxConf).flatMap {
+            validateBindDn(knoxConf.ldapUrl,knoxConf.bindDn,knoxConf.password).flatMap {
               case Left(errors) => Future.successful(Left(errors))
               case Right(isBound) => {
-                ldapKeyStore.createCredentialEntry(
+                val tryToWrite = ldapKeyStore.createCredentialEntry(
                   knoxConf.bindDn.get,
-                  knoxConf.password.get) match {
-                  case Left(errors) => Future.successful(Left(errors))
-                  case Right(isCreated) => {
-                    val ldapConfiguration =
-                      LdapConfiguration(id = knoxConf.id,
-                        ldapUrl = knoxConf.ldapUrl,
-                        bindDn = knoxConf.bindDn,
-                        userSearchBase = knoxConf.userSearchBase,
-                        userSearchAttributeName = knoxConf.userSearchAttributeName,
-                        groupSearchBase = knoxConf.groupSearchBase,
-                        groupSearchAttributeName = knoxConf.groupSearchAttributeName,
-                        groupObjectClass = knoxConf.groupObjectClass,
-                        groupMemberAttributeName = knoxConf.groupMemberAttributeName
-                      )
-                    ldapConfigService.create(ldapConfiguration).map {
-                      case Left(errors) => Left(errors)
-                      case Right(createdLdapConfig) => {
-                        configService.setConfig("dp.knox.whitelist",requestHost)
-                        Right(true)
-                      }
-                    }
+                  knoxConf.password.get
+                )
+                Future.fromTry(tryToWrite)
+                  .map { _ =>
+                    LdapConfiguration(id = knoxConf.id,
+                      ldapUrl = Some(knoxConf.ldapUrl),
+                      bindDn = knoxConf.bindDn,
+                      userSearchBase = knoxConf.userSearchBase,
+                      userSearchAttributeName = knoxConf.userSearchAttributeName,
+                      groupSearchBase = knoxConf.groupSearchBase,
+                      groupSearchAttributeName = knoxConf.groupSearchAttributeName,
+                      groupObjectClass = knoxConf.groupObjectClass,
+                      groupMemberAttributeName = knoxConf.groupMemberAttributeName
+                    )
                   }
-                }
+                  .flatMap { config =>
+                    ldapConfigService
+                      .create(config)
+                      .map {
+                        case Left(errors) => Left(errors)
+                        case Right(createdLdapConfig) => {
+                          configService.setConfig("dp.knox.whitelist",requestHost)
+                          Right(true)
+                        }
+                      }
+                  }
+                  .recover {
+                    case ex: Exception => Right(false)
+                  }
               }
             }
           }
@@ -86,6 +93,28 @@ class LdapService @Inject()(
       }
     }
   }
+
+  def updateKnoxConfig(knoxConfig:KnoxConfigUpdateInfo): Future[Either[Errors, Boolean]]={
+    validateBindDn(knoxConfig.ldapUrl,knoxConfig.bindDn,knoxConfig.password).flatMap {
+      case Left(errors) =>Future.successful(Left(errors))
+      case Right(isBound) => {
+        val tryToWrite = ldapKeyStore.createCredentialEntry(
+          knoxConfig.bindDn.get,
+          knoxConfig.password.get
+        )
+        Future.fromTry(tryToWrite)
+          .map { _ =>
+            LdapConfiguration(id=Some(knoxConfig.id),ldapUrl = Some(knoxConfig.ldapUrl),bindDn = knoxConfig.bindDn)
+          }.flatMap{ldapConfig=>
+          ldapConfigService.update(ldapConfig).map{
+            case Left(errors) => Left(errors)
+            case Right(result) => Right(result)
+          }
+        }
+      }
+    }
+  }
+
 
   def validate(knoxConf: KnoxConfigInfo): Either[Errors, Boolean] = {
     if (knoxConf.userSearchBase.isEmpty || knoxConf.userSearchAttributeName.isEmpty){
@@ -95,25 +124,22 @@ class LdapService @Inject()(
       Right(true)
     }
   }
-
-  def validateBindDn(
-      knoxConf: KnoxConfigInfo): Future[Either[Errors, Boolean]] = {
-    val context=getLdapContext(knoxConf.ldapUrl,
-                   knoxConf.bindDn.get,
-                   knoxConf.password.get)
-    context.map{ctx=>
-      //TODO more ops
+  def validateBindDn(ldapUrl:String,bindDn:Option[String],password:Option[String]
+                  ): Future[Either[Errors, Boolean]] = {
+    getLdapContext(ldapUrl,
+      bindDn.get,
+      password.get).map{ctx=>
       ctx.close()
       Right(true)
-    }.recoverWith {
+    }.recoverWith{
       case e: WrappedErrorsException =>
         Future.successful(Left(e.errors))
     }
   }
 
   def doWithEither[T, A](
-      either: Either[Errors, T],
-      f: T => Future[Either[Errors, A]]): Future[Either[Errors, A]] = {
+                          either: Either[Errors, T],
+                          f: T => Future[Either[Errors, A]]): Future[Either[Errors, A]] = {
     either match {
       case Left(errors) => Future.successful(Left(errors))
       case Right(t) => f(t)
@@ -121,9 +147,9 @@ class LdapService @Inject()(
   }
 
   def search(
-      userName: String,
-      searchType: Option[String],
-      fuzzyMatch: Boolean): Future[Either[Errors, Seq[LdapSearchResult]]] =
+              userName: String,
+              searchType: Option[String],
+              fuzzyMatch: Boolean): Future[Either[Errors, Seq[LdapSearchResult]]] =
     for {
       configuredLdap <- getConfiguredLdap
       dirContext <- doWithEither[Seq[LdapConfiguration], DirContext](
@@ -133,7 +159,7 @@ class LdapService @Inject()(
         dirContext,
         context => {
           try{
-          ldapSearch(context, configuredLdap.right.get, userName, searchType,fuzzyMatch)
+            ldapSearch(context, configuredLdap.right.get, userName, searchType,fuzzyMatch)
           }finally {
             context.close()
           }
@@ -142,15 +168,15 @@ class LdapService @Inject()(
     } yield search
 
   private def validateAndGetLdapContext(
-      configuredLdap: Seq[LdapConfiguration]):Future[Either[Errors,DirContext]] = {
+                                         configuredLdap: Seq[LdapConfiguration]):Future[Either[Errors,DirContext]] = {
     //TODO bind dn validate.
     configuredLdap.headOption match {
       case Some(l)=>{
-        val cred: Option[CredentialEntry] = ldapKeyStore.getCredentialEntry(l.bindDn.get)
+        val cred: Option[CredentialEntry] = ldapKeyStore.getCredentialEntry(l.bindDn.get).toOption
         cred match {
           case Some(cred) =>
-            getLdapContext(l.ldapUrl, l.bindDn.get, cred.password).map{ ctx=>
-             Right(ctx)
+            getLdapContext(l.ldapUrl.get, l.bindDn.get, cred.password).map{ ctx=>
+              Right(ctx)
             }.recoverWith{
               case e: WrappedErrorsException =>
                 Future.successful(Left(e.errors))
@@ -167,16 +193,16 @@ class LdapService @Inject()(
   }
 
   def getPassword(bindDn:String):Option[String]={
-    val cred: Option[CredentialEntry]=ldapKeyStore.getCredentialEntry(bindDn)
+    val cred: Option[CredentialEntry]=ldapKeyStore.getCredentialEntry(bindDn).toOption
     if (cred.isDefined)Some(cred.get.password) else None
   }
 
   private def ldapSearch(
-      dirContext: DirContext,
-      ldapConfs: Seq[LdapConfiguration],
-      userName: String,
-      searchType: Option[String],
-      fuzzyMatch: Boolean): Future[Either[Errors, Seq[LdapSearchResult]]] = {
+                          dirContext: DirContext,
+                          ldapConfs: Seq[LdapConfiguration],
+                          userName: String,
+                          searchType: Option[String],
+                          fuzzyMatch: Boolean): Future[Either[Errors, Seq[LdapSearchResult]]] = {
     val groupSerch=if (searchType.isDefined && searchType.get=="group")true else false
     if (groupSerch){
       ldapGroupSearch(dirContext,ldapConfs,userName)
@@ -258,7 +284,7 @@ class LdapService @Inject()(
   }
 
   private def getUserAndGroups(  dirContext: DirContext,
-                      ldapConfs: Seq[LdapConfiguration],userName:String):
+                                 ldapConfs: Seq[LdapConfiguration],userName:String):
   Future[Either[Errors, LdapUser]]={
     var ldapConf=ldapConfs.head
     validateGroupSettings(ldapConf) match {
@@ -317,19 +343,19 @@ class LdapService @Inject()(
   }
 
   def getConfiguredLdap
-    : Future[Either[Errors, Seq[LdapConfiguration]]] = {
+  : Future[Either[Errors, Seq[LdapConfiguration]]] = {
     ldapConfigService
       .get()
 
   }
 
   private def getLdapContext(
-      url: String,
-      bindDn: String,
-      pass: String): Future[ DirContext] = {
+                              url: String,
+                              bindDn: String,
+                              pass: String): Future[ DirContext] = {
     val env = new util.Hashtable[String, String]()
     env.put(Context.INITIAL_CONTEXT_FACTORY,
-            "com.sun.jndi.ldap.LdapCtxFactory")
+      "com.sun.jndi.ldap.LdapCtxFactory")
     env.put(Context.SECURITY_AUTHENTICATION, "simple") //TODO configure for other types.
     env.put(Context.PROVIDER_URL, url)
     env.put(Context.SECURITY_PRINCIPAL, bindDn)
@@ -356,5 +382,4 @@ class LdapService @Inject()(
       }
     }
   }
-
 }

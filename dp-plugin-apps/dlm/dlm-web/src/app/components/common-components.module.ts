@@ -51,6 +51,7 @@ import { ConfirmationModalContainerComponent } from './confirmation-modal/confir
 import { EventEntityLinkComponent } from './event-entity-link/event-entity-link.component';
 import { NotificationsContainerComponent } from './notifications-container/notifications-container.component';
 import { TransferredObjectsComponent } from './table-columns/transferred-objects/transferred-objects.component';
+import { ServiceStatusIconComponent } from './service-status-icon/service-status-icon.component';
 
 @NgModule({
   imports: [
@@ -105,7 +106,8 @@ import { TransferredObjectsComponent } from './table-columns/transferred-objects
     ConfirmationModalContainerComponent,
     EventEntityLinkComponent,
     NotificationsContainerComponent,
-    TransferredObjectsComponent
+    TransferredObjectsComponent,
+    ServiceStatusIconComponent
   ],
   exports: [
     CardComponent,
@@ -142,7 +144,8 @@ import { TransferredObjectsComponent } from './table-columns/transferred-objects
     ConfirmationModalContainerComponent,
     EventEntityLinkComponent,
     NotificationsContainerComponent,
-    TransferredObjectsComponent
+    TransferredObjectsComponent,
+    ServiceStatusIconComponent
   ]
 })
 export class CommonComponentsModule {}

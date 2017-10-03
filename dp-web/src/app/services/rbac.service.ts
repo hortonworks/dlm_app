@@ -54,9 +54,9 @@ export class RbacService {//role based access control
     let personaMap = new Map();
     personaMap.set('SUPERADMIN', [
       new Persona('Dataplane Admin', [
-        new PersonaTabs('Clusters', 'infra', 'fa-sitemap'),
+        new PersonaTabs('Clusters', 'infra', 'fa-cubes'),
         new PersonaTabs('Users', 'infra/usermgmt', 'fa-users'),
-        new PersonaTabs('Services', 'infra/services', 'fa-arrows-h')
+        new PersonaTabs('Services', 'infra/services', 'fa-th-large')
       ], ['/onboard', '/onboard/welcome', '/onboard/configure', '/onboard/adduser'], '', 'infra-logo.png')
     ]);
     personaMap.set('CURATOR', [

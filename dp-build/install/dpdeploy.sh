@@ -14,9 +14,7 @@ set -e
 source $(pwd)/config.env.sh
 
 CERTS_DIR=`dirname $0`/certs
-KNOX_SIGNING_CERTIFICATE=knox-signing.pem
 DEFAULT_VERSION=0.0.1-latest
-KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
 CLUSTER_SERVICE_CONTAINER="dp-cluster-service"
 DB_CONTAINER="dp-database"
@@ -147,9 +145,9 @@ add_host_entry() {
 }
 
 utils_update_user_secret() {
-    if [ $# -ne 1 ] || [ "$1" != "ambari" ]; then
+    if [[ $# -ne 1  || ( "$1" != "ambari" && "$1" != "atlas" && "$1" != "ranger" ) ]]; then
         echo "Invalid arguments."
-        echo "Usage: dpdeploy.sh utils update-user ambari"
+        echo "Usage: dpdeploy.sh utils update-user [ambari | atlas | ranger]"
         return -1
     else
         update_user_entry "$@"
@@ -157,15 +155,30 @@ utils_update_user_secret() {
 }
 
 update_user_entry() {
-    if [ "$USE_EXT_DB" == "no" ]; then
-        IS_DB_UP=$(docker inspect -f {{.State.Running}} $DB_CONTAINER) || echo "DB container is not running."
-        if [ "$IS_DB_UP" != "true" ]; then
-            echo "Ambari secrets can not be initialized with DB container down. Please run 'init db' and 'migrate' first."
-            exit -1
-        fi
+    if [ "$MASTER_PASSWORD" == "" ]; then
+        read_master_password
     fi
-    
-    source $(pwd)/secrets-manage.sh
+    source $(pwd)/keystore-manage.sh "$@"
+}
+
+utils_reload_app_containers() {
+    # stop containers other than db, consul and knox
+    docker stop $APP_CONTAINERS_WITHOUT_DB
+
+    # start containers other than db, consul and knox
+    echo "Starting Gateway"
+    source $(pwd)/docker-gateway.sh
+
+    echo "Starting DB Service"
+    source $(pwd)/docker-service-db.sh
+
+    echo "Starting Cluster Service"
+    source $(pwd)/docker-service-cluster.sh
+
+    echo "Starting Application API"
+    source $(pwd)/docker-app.sh
+
+    echo "Restart done."
 }
 
 destroy() {
@@ -180,7 +193,6 @@ destroy_consul(){
 destroy_knox() {
     echo "Destroying Knox"
     docker rm --force $KNOX_CONTAINER
-    rm -rf ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
     destroy_consul
 }
 
@@ -353,11 +365,21 @@ load_images() {
     fi
 }
 
+init_keystore() {
+   if [ "$MASTER_PASSWORD" == "" ]; then
+       read_master_password
+   fi
+    mkdir -p $(pwd)/certs
+    source $(pwd)/keystore-initialize.sh
+}
+
 init_all() {
     init_db
     reset_db
 
     init_knox
+    
+    init_keystore
 
     init_app
 
@@ -456,10 +478,10 @@ usage() {
     printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox and Consul containers"
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
-    printf "%-${tabspace}s:%s\n" "reset" "Reset database to its initial state"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
-    printf "%-${tabspace}s:%s\n" "utils update-user ambari" "Update Ambari user credentials that Dataplane will use to connect to clusters."
+    printf "%-${tabspace}s:%s\n" "utils update-user [ambari | atlas | ranger]" "Update user credentials for services that Dataplane will use to connect to clusters."
     printf "%-${tabspace}s:%s\n" "utils add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
+    printf "%-${tabspace}s:%s\n" "utils reload-apps" "Restart all containers other than database, Consul and Knox"
     printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
     printf "%-${tabspace}s:%s\n" "start knox" "Start the Knox and Consul containers"
     printf "%-${tabspace}s:%s\n" "start --all" "Start all containers"
@@ -519,6 +541,9 @@ else
                     shift
                     utils_update_user_secret "$@"
                     ;;
+                reload-apps)
+                    utils_reload_app_containers
+                    ;;
                 *)
                     echo "Unknown option"
                     usage
@@ -545,7 +570,6 @@ else
                 *) stop_app
              esac
              ;;
-
         ps)
             ps
             ;;
