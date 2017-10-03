@@ -161,6 +161,26 @@ update_user_entry() {
     source $(pwd)/keystore-manage.sh "$@"
 }
 
+utils_reload_app_containers() {
+    # stop containers other than db, consul and knox
+    docker stop $APP_CONTAINERS_WITHOUT_DB
+
+    # start containers other than db, consul and knox
+    echo "Starting Gateway"
+    source $(pwd)/docker-gateway.sh
+
+    echo "Starting DB Service"
+    source $(pwd)/docker-service-db.sh
+
+    echo "Starting Cluster Service"
+    source $(pwd)/docker-service-cluster.sh
+
+    echo "Starting Application API"
+    source $(pwd)/docker-app.sh
+
+    echo "Restart done."
+}
+
 destroy() {
     docker rm --force $APP_CONTAINERS
 }
@@ -458,10 +478,10 @@ usage() {
     printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox and Consul containers"
     printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
-    printf "%-${tabspace}s:%s\n" "reset" "Reset database to its initial state"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
     printf "%-${tabspace}s:%s\n" "utils update-user [ambari | atlas | ranger]" "Update user credentials for services that Dataplane will use to connect to clusters."
     printf "%-${tabspace}s:%s\n" "utils add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
+    printf "%-${tabspace}s:%s\n" "utils reload-apps" "Restart all containers other than database, Consul and Knox"
     printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
     printf "%-${tabspace}s:%s\n" "start knox" "Start the Knox and Consul containers"
     printf "%-${tabspace}s:%s\n" "start --all" "Start all containers"
@@ -521,6 +541,9 @@ else
                     shift
                     utils_update_user_secret "$@"
                     ;;
+                reload-apps)
+                    utils_reload_app_containers
+                    ;;
                 *)
                     echo "Unknown option"
                     usage
@@ -547,7 +570,6 @@ else
                 *) stop_app
              esac
              ;;
-
         ps)
             ps
             ;;
