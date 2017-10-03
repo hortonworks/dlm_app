@@ -30,5 +30,6 @@ COPY ./utils /scripts
 COPY ./dp-knox-agent /usr/dp-knox-agent
 COPY ./knoxauth-app /usr/hdp/current/knox-server/data/applications/knoxauth/app
 
+VOLUME ["/knox/consul/data", "/etc/knox/conf"]
 EXPOSE 8300 8301 8301/udp 8302 8302/udp 8400 8500 53/udp
 ENTRYPOINT ["bash", "/scripts/knox-start.sh"]

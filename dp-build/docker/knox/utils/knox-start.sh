@@ -42,6 +42,13 @@ openssl pkcs12 \
     -name gateway-identity \
     -passout pass:"$MASTER_PASSWORD"
 
+keytool \
+    -delete \
+    -storetype jks \
+    -storepass "$MASTER_PASSWORD" \
+    -keystore $KNOX_HOME/data/security/keystores/gateway.jks \
+    -alias gateway-identity &> /dev/null || echo -n ""
+
 echo "Generating Knox keystore"
 keytool \
     -importkeystore \
