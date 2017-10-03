@@ -17,20 +17,13 @@ import javax.inject.Inject
 
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
+import com.google.common.net.HttpHeaders
 import com.hortonworks.dataplane.commons.domain.Constants
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  DataplaneClusterIdentifier,
-  ErrorType,
-  HJwtToken
-}
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneClusterIdentifier, ErrorType, HJwtToken}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.{ClusterSync, CredentialInterface, StorageInterface}
 import com.hortonworks.dataplane.http.BaseRoute
-import com.hortonworks.dataplane.knox.Knox.{
-  ApiCall,
-  KnoxApiRequest,
-  KnoxConfig
-}
+import com.hortonworks.dataplane.knox.Knox.{ApiCall, KnoxApiRequest, KnoxConfig}
 import com.hortonworks.dataplane.knox.KnoxApiExecutor
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
@@ -61,6 +54,12 @@ class StatusRoute @Inject()(val ws: WSClient,
   import scala.concurrent.duration._
 
   val logger = Logger(classOf[StatusRoute])
+
+  private lazy val hdInsightErrorContentType = config.getString("dp.service.hdinsight.auth.challenge.contentType")
+  private lazy val hdInsightErrorWwwAuth = config.getString("dp.service.hdinsight.auth.challenge.wwwAuthenticate")
+  private lazy val hdInsightErrorStatus = config.getInt("dp.service.hdinsight.auth.status")
+  private lazy val hdInsightErrorMessage = config.getString("dp.service.hdinsight.auth.response.message")
+
 
   def makeAmbariApiRequest(endpoint: String,
                            ambariResponse: AmbariForbiddenResponse,
@@ -108,7 +107,7 @@ class StatusRoute @Inject()(val ws: WSClient,
             val tokenInfoHeader = request.getHeader(Constants.DPTOKEN)
             if (!tokenInfoHeader.isPresent) {
               logger.error(
-                "Knox was detected, but the called did not send a JWT token with the request header X-DP-Token-Info")
+                "Knox was detected, but the caller did not send a JWT token with the request header X-DP-Token-Info")
               throw new RuntimeException(
                 "Ambari was Knox protected but no jwt token was sent with the request")
             }
@@ -221,10 +220,24 @@ class StatusRoute @Inject()(val ws: WSClient,
 
   private def mapAsUnauthenticatedResponse(
       response: WSResponse): AmbariForbiddenResponse = {
-    if (response.status != 403)
-      throw AmbariError(new Exception(s"Unexpected Response from Ambari, expected 403, actual ${response.status}"))
-    //Step 2
-    response.json.validate[AmbariForbiddenResponse].get
+      response.status match {
+        case 403 => response.json.validate[AmbariForbiddenResponse].get
+        case x if x == hdInsightErrorStatus =>
+          // Check for HD insight
+          val auth = response.header(HttpHeaders.WWW_AUTHENTICATE)
+          val contentType = response.header(HttpHeaders.CONTENT_TYPE)
+          if(contentType.isDefined &&  contentType.get == hdInsightErrorContentType && auth.isDefined && auth.get == hdInsightErrorWwwAuth) {
+              AmbariForbiddenResponse(hdInsightErrorStatus,hdInsightErrorMessage,None)
+          } else {
+            throw AmbariError(new Exception(s"Received 401 from Ambari but response does not match any known cluster, tried HD insight"))
+          }
+        case _ => throw AmbariError(new Exception(s"Unexpected Response from Ambari, expected 403 or 401, actual ${response.status}"))
+
+      }
+
+
+
+
   }
 
   import java.net.InetAddress
