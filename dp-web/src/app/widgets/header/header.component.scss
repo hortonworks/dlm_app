@@ -23,14 +23,11 @@
 
 .navbar {
   @extend .borderBox;
-
   z-index: 10;
-  /*overflow: hidden;*/
   background: $white;
   height: $header-height;
   max-height: $header-height;
   line-height: $header-height;
-  overflow-x: auto;
 }
 
 .navbar a {
