@@ -29,6 +29,8 @@ import scala.concurrent.Future
 import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 
+import scala.util.Try
+
 class DataplaneClusters @Inject()(
     @Named("dpClusterService") val dpClusterService: DpClusterService,
     @Named("clusterAmbariService") ambariWebService: AmbariWebService,
@@ -179,19 +181,31 @@ class DataplaneClusters @Inject()(
 
   def getAmbariServicesInfo = AuthenticatedAction.async(parse.json) { request =>
     implicit val token = request.token
-    request.body
+    val dataplaneCluster = request.body
       .validate[DataplaneCluster]
-      .map { req =>
+    dataplaneCluster.map { req =>
         ambariWebService
           .getAmbariServicesInfo(req)
-          .map {
+          .flatMap {
             case Left(errors) =>
-              InternalServerError(Json.toJson(errors))
-            case Right(servicesInfo) =>  Ok(Json.toJson(servicesInfo))
+              Future.successful(InternalServerError(Json.toJson(errors)))
+            case Right(servicesInfo) => {
+              val dpClusterId = Try(req.id.get).getOrElse(Future.successful(BadRequest))
+              dpClusterService.retrieveServiceInfo(dpClusterId.toString)
+                .map {
+                  case Left(errors) =>
+                    InternalServerError(Json.toJson(errors))
+                  case Right(clusterServices) => {
+                    val dpServices = clusterServices.map(clusterService => clusterService.servicename)
+                    val availableDpServicesInfo = servicesInfo.filter(serviceInfo => dpServices.contains(serviceInfo.serviceName))
+                    val sortedServicesInfo = availableDpServicesInfo.union(servicesInfo).distinct
+                    Ok(Json.toJson(sortedServicesInfo))
+                  }
+                }
+            }
           }
       }
       .getOrElse(Future.successful(BadRequest))
-
   }
 
 

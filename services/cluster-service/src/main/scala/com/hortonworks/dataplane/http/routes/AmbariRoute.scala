@@ -352,7 +352,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
     }
     Future.sequence(list)
   }
-  
+
   def getAmbariServicesInfo(dataplaneCluster: DataplaneCluster,
                             request: HttpRequest): Future[Seq[ServiceInfo]] = {
 
