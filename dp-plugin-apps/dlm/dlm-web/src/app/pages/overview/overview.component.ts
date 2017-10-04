@@ -30,7 +30,7 @@ import { POLICY_TYPES_LABELS } from 'constants/policy.constant';
 import { Policy } from 'models/policy.model';
 import { Cluster } from 'models/cluster.model';
 import { ClustersStatus, PoliciesStatus, JobsStatus } from 'models/aggregations.model';
-import { isEqual, isEmpty } from 'utils/object-utils';
+import { isEqual } from 'utils/object-utils';
 import { getEventEntityName } from 'utils/event-utils';
 import { POLL_INTERVAL, ALL_POLICIES_COUNT } from 'constants/api.constant';
 import { getClustersHealth, getPoliciesHealth, getJobsHealth } from 'selectors/aggregation.selector';
@@ -47,7 +47,6 @@ import { TranslateService } from '@ngx-translate/core';
 
 const POLICIES_REQUEST = 'POLICIES_REQUEST';
 const CLUSTERS_REQUEST = 'CLUSTERS_REQUEST';
-const JOBS_REQUEST = 'JOBS_REQUEST';
 
 @Component({
   selector: 'dlm-overview',
