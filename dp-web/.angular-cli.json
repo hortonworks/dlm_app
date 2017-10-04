@@ -23,6 +23,7 @@
         "../node_modules/material-design-icons/iconfont/material-icons.css",
         "../node_modules/nvd3/build/nv.d3.css",
         "../node_modules/dialog-polyfill/dialog-polyfill.css",
+        "../node_modules/leaflet/dist/leaflet.css",
         "vendor.scss",
         "styles.scss"
       ],

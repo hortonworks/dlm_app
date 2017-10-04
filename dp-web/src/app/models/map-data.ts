@@ -15,7 +15,12 @@ export class MapData {
 }
 
 export class Point {
-  constructor(public latitude: number, public longitude: number, public status?: MapConnectionStatus) {
+  constructor(public latitude: number,
+              public longitude: number,
+              public status?: MapConnectionStatus,
+              public clusterName?: string,
+              public datacenter?: string,
+              public location?: string) {
   };
 }
 

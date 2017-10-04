@@ -8,23 +8,116 @@
  *  * of all or any part of the contents of this software is strictly prohibited.
  *
  */
-
 @import "../../../../../styles/variables";
 
-.leaflet-container{
-    background: $spindle-blue;
+$tooltip-background: #484848;
+$tooltip-divider: #2A2A2A;
+$tooltip-border-color: #3f3f3f;
+
+.leaflet-container {
+  background: $spindle-blue;
 }
 
 .map-container {
-    outline: none;
-    margin: 0 auto;
+  outline: none;
+  margin: 0 auto;
 }
 
-:host /deep/ .leaflet-control {
-  padding: 0 20px;
-  text-align: right;
-  a {
-      color: #8fbfeb;
-      text-decoration: none;
+:host /deep/ .leaflet-touch .leaflet-bar a {
+  height: 25px;
+  width: 25px;
+  line-height: 20px;
+}
+
+:host /deep/ .leaflet-bar a:first-child {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+:host /deep/ .leaflet-touch .leaflet-control-zoom-in {
+  font-size: 16px;
+}
+
+:host /deep/ .leaflet-touch .leaflet-control-zoom-out {
+  font-size: 16px;
+}
+
+:host /deep/ .leaflet-div-icon {
+  background: none !important;
+  border: none !important;
+}
+
+:host /deep/ .leaflet-tooltip {
+  border-radius: 0;
+  border-color: $tooltip-border-color;
+  background-color: $tooltip-background;
+  color: $white;
+  opacity: unset !important;
+}
+
+:host /deep/ .leaflet-tooltip-right:before {
+  border-right-color: $tooltip-background;
+}
+
+:host /deep/ .leaflet-tooltip-left:before {
+  border-left-color: $tooltip-background;
+}
+
+:host /deep/ .leaflet-tooltip-top:before {
+  border-top-color: $tooltip-background;
+}
+
+:host /deep/ .leaflet-tooltip-bottom:before {
+  border-bottom-color: $tooltip-background;
+}
+
+:host /deep/ .custom-map-marker {
+  .marker-wrapper {
+    position: relative;
+    text-align: center;
+    margin: -25px -8px;
   }
+
+  .marker-icon {
+    font-size: 30px;
+  }
+
+  .marker-counter {
+    position: absolute;
+    width: 70%;
+    background-color: $dove-gray;
+    font-weight: 600;
+    color: white;
+    border-radius: 200%;
+    top: 4px;
+    left: 2px;
+    font-size: 10px;
+  }
+}
+
+:host /deep/ .status {
+  font-size: 14px;
+  font-weight: 400;
+  .fa {
+    margin-right: 2px;
+  }
+}
+
+:host /deep/ .location {
+  padding: 0 18px;
+  font-weight: normal;
+}
+
+:host /deep/ .pop-up-container {
+  div.details-container {
+    border-top: 1px solid $tooltip-divider;
+    padding: 4px 0;
+  }
+  div.details-container:first-child {
+    border-top: none;
+  }
+}
+
+.gray {
+  background-color: $dove-gray;
 }
