@@ -89,7 +89,7 @@ build_dp_web() {
 	log "Building dp-web"
 	pushd ../dp-web
 	if [ ${IS_JENKINS} == false ]; then
-		yarn install --frozen-lockfile
+		yarn install
 		yarn run build
 	else
 		echo "Not running dp-web NPM again"
