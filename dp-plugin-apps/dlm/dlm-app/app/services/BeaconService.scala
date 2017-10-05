@@ -270,7 +270,7 @@ class BeaconService @Inject()(
             } else {
               val dpClusterARightProj = dpClusterA.right.get
               val dpClusterBRightProj = dpClusterB.right.get
-              val remoteDatacenterClusterName = dpClusterBRightProj.dcName + "$" + dpClusterBRightProj.name
+              val remoteDatacenterClusterName = dpClusterBRightProj.dcName + "$" + clusterB.right.get.name
               beaconPairService.createClusterUnpair(clustersToBeUnpairedSeq.head.beaconUrl, clusterAId, remoteDatacenterClusterName).map({
                 case Left(beaconApiErrors) => p.success(Left(beaconApiErrors))
                 case Right(clusterUnpairResponse) => {
