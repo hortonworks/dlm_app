@@ -36,4 +36,14 @@ $hex-size: 18px;
       }
     }
   }
+  .legend {
+    margin-top: -10px;
+    margin-bottom: 10px;
+    .fa {
+      font-size: 8px;
+    }
+    dlm-job-status {
+      margin-left: 30px;
+    }
+  }
 }

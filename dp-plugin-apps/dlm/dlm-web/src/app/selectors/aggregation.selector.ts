@@ -25,6 +25,7 @@ export const getClustersHealth = createSelector(
   (clusters: Cluster[], lowCapacityClusters: Cluster[]): ClustersStatus => {
   let healthy = 0;
   let unhealthy = 0;
+  let unknown = 0;
   const warning = lowCapacityClusters.length;
 
   clusters.forEach(cluster => {
@@ -34,13 +35,17 @@ export const getClustersHealth = createSelector(
     if (cluster.healthStatus === CLUSTER_STATUS.UNHEALTHY) {
       unhealthy++;
     }
+    if (cluster.healthStatus === CLUSTER_STATUS.UNKNOWN) {
+      unknown++;
+    }
   });
 
   return {
     healthy,
     unhealthy,
     warning,
-    total: healthy + unhealthy
+    unknown,
+    total: healthy + unhealthy + unknown
   };
 });
 
