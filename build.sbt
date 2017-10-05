@@ -39,3 +39,5 @@ lazy val clusterService = (project in file("services/cluster-service")).
 
 lazy val knoxAgent = (project in file("services/knox-agent")).
   dependsOn(consul)
+
+lazy val bcrypter = (project in file("tools/bcrypter"))
