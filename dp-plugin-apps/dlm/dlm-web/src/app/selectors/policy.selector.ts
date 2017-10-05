@@ -16,14 +16,24 @@ import { Policy } from 'models/policy.model';
 import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { getAllClusters } from './cluster.selector';
 import { getAllJobs } from './job.selector';
-import { sortByDateField } from 'utils/array-util';
-import { JOB_STATUS, CLUSTER_STATUS } from 'constants/status.constant';
+import { sortByDateField, contains } from 'utils/array-util';
+import { JOB_STATUS, CLUSTER_STATUS, SERVICE_STATUS } from 'constants/status.constant';
 import { PolicyService } from 'services/policy.service';
 import { getRangerEnabled } from 'selectors/beacon.selector';
-import { POLICY_MODES } from 'constants/policy.constant';
+import { POLICY_MODES, POLICY_EXECUTION_TYPES } from 'constants/policy.constant';
+import { SERVICES } from 'constants/cluster.constant';
 
 const isRangerActivated = (beaconStatuses: BeaconAdminStatus[], policy: Policy): boolean => {
   return beaconStatuses.some(s => policy.targetClusterResource.id === s.clusterId);
+};
+
+const hasStoppedServices = (cluster: Cluster, services: string[]): boolean => {
+  return cluster && cluster.status && cluster.status.some(s => contains(services, s.service_name) && s.state !== SERVICE_STATUS.STARTED);
+};
+
+const checkClusterServices = (policy: Policy, services: string[]): boolean => {
+  return hasStoppedServices(policy.targetClusterResource, services) ||
+    hasStoppedServices(policy.sourceClusterResource, services);
 };
 
 export const getEntities = createSelector(getPolicies, state => state.entities);
@@ -81,12 +91,17 @@ export const getNonCompletedPolicies = createSelector(getPolicyClusterJob, (poli
 
 export const getUnhealthyPolicies = createSelector(
   getAllPoliciesWithClusters,
-  (policies: Policy[]) => policies
-    .filter(policy => [
-        policy.targetClusterResource.healthStatus,
-        policy.sourceClusterResource.healthStatus
-      ].indexOf(CLUSTER_STATUS.UNHEALTHY) > -1
-    )
+  (policies: Policy[]) => {
+    const unhealthy = policies
+    .filter(policy => {
+      const requiredServices = [SERVICES.BEACON, SERVICES.HDFS];
+      const yarnStopped = hasStoppedServices(policy.targetClusterResource, [SERVICES.YARN]);
+      const requiredServicesStopped = checkClusterServices(policy, requiredServices);
+      const hiveStopped = policy.executionType === POLICY_EXECUTION_TYPES.HIVE && checkClusterServices(policy, [SERVICES.HIVE]);
+      return requiredServicesStopped || yarnStopped || hiveStopped;
+    });
+    return unhealthy;
+  }
 );
 
 export const getPoliciesTableData = createSelector(getPolicyClusterJob, getRangerEnabled,

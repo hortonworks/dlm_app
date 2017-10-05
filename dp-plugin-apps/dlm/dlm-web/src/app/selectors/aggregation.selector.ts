@@ -14,7 +14,7 @@ import { Policy } from 'models/policy.model';
 import { Job } from 'models/job.model';
 import { ClustersStatus, PoliciesStatus, JobsStatus } from 'models/aggregations.model';
 import { getAllClusters, getClustersWithLowCapacity } from './cluster.selector';
-import { getNonCompletedPolicies, getAllPolicies } from './policy.selector';
+import { getNonCompletedPolicies, getAllPolicies, getUnhealthyPolicies } from './policy.selector';
 import { getAllJobs } from './job.selector';
 import { CLUSTER_STATUS, POLICY_STATUS, JOB_STATUS } from 'constants/status.constant';
 
@@ -44,22 +44,12 @@ export const getClustersHealth = createSelector(
   };
 });
 
-export const getPoliciesHealth = createSelector(getAllPolicies, getAllClusters,
-  (policies: Policy[], clusters: Cluster[]): PoliciesStatus  => {
+export const getPoliciesHealth = createSelector(getAllPolicies, getUnhealthyPolicies,
+  (policies: Policy[], unhealthyPolicies: Policy[]): PoliciesStatus  => {
     let active = 0;
     let suspended = 0;
-    let unhealthy = 0;
-    const unhealthyClusters = clusters.reduce((unhealthyList, cluster) => {
-      if (cluster.healthStatus === CLUSTER_STATUS.UNHEALTHY) {
-        return unhealthyList.concat(cluster.name);
-      }
-      return unhealthyList;
-    }, []);
-
     policies.forEach(policy => {
-      if (unhealthyClusters.indexOf(policy.sourceCluster) > 0 || unhealthyClusters.indexOf(policy.targetCluster) > 0) {
-        unhealthy++;
-      } else if (policy.status === POLICY_STATUS.SUSPENDED) {
+      if (policy.status === POLICY_STATUS.SUSPENDED) {
         suspended++;
       } else if (policy.status === POLICY_STATUS.RUNNING) {
         active++;
@@ -69,8 +59,8 @@ export const getPoliciesHealth = createSelector(getAllPolicies, getAllClusters,
     return {
       active,
       suspended,
-      unhealthy,
-      total: active + suspended + unhealthy
+      unhealthy: unhealthyPolicies.length,
+      total: policies.length
     };
   });
 
