@@ -70,7 +70,7 @@ object Webservice {
 
     def getAmbariDetails(ambariDetailRequest: AmbariDetailRequest)(implicit token:Option[HJwtToken]):Future[Either[Errors,Seq[AmbariCluster]]]
 
-    def getAmbariServicesInfo(dataplaneCluster: DataplaneCluster)(implicit token:Option[HJwtToken]):Future[Either[Errors,Seq[ServiceInfo]]]
+    def getAmbariServicesInfo(dpcwServices: DpClusterWithDpServices)(implicit token:Option[HJwtToken]):Future[Either[Errors,Seq[ServiceInfo]]]
   }
 
 

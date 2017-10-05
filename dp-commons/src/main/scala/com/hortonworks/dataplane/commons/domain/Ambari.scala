@@ -28,7 +28,8 @@ object Ambari {
   case class AmbariEndpoint(url: String)
 
   case class ServiceInfo(serviceName: String,
-                         state: String)
+                         state: String,
+                         serviceVersion: String)
 
   case class AmbariCheckResponse(ambariApiCheck: Boolean,
                                  knoxDetected: Boolean,

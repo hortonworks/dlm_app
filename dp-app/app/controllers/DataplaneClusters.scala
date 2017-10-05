@@ -15,11 +15,11 @@ import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari.AmbariEndpoint
-import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, DataplaneClusterIdentifier, HJwtToken}
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, DataplaneClusterIdentifier, DpClusterWithDpServices, HJwtToken}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webservice.DpClusterService
+import com.hortonworks.dataplane.db.Webservice.{DpClusterService, SkuService}
 import models.{JsonResponses, WrappedErrorsException}
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import play.api.libs.json.Json
 import play.api.mvc._
 import services.AmbariService
@@ -34,6 +34,8 @@ import scala.util.Try
 class DataplaneClusters @Inject()(
     @Named("dpClusterService") val dpClusterService: DpClusterService,
     @Named("clusterAmbariService") ambariWebService: AmbariWebService,
+    @Named("skuService") val skuService: SkuService,
+    configuration: Configuration,
     ambariService: AmbariService)
     extends Controller {
 
@@ -184,29 +186,27 @@ class DataplaneClusters @Inject()(
     val dataplaneCluster = request.body
       .validate[DataplaneCluster]
     dataplaneCluster.map { req =>
-        ambariWebService
-          .getAmbariServicesInfo(req)
-          .flatMap {
-            case Left(errors) =>
-              Future.successful(InternalServerError(Json.toJson(errors)))
-            case Right(servicesInfo) => {
-              val dpClusterId = Try(req.id.get).getOrElse(Future.successful(BadRequest))
-              dpClusterService.retrieveServiceInfo(dpClusterId.toString)
-                .map {
-                  case Left(errors) =>
-                    InternalServerError(Json.toJson(errors))
-                  case Right(clusterServices) => {
-                    val dpServices = clusterServices.map(clusterService => clusterService.servicename)
-                    val availableDpServicesInfo = servicesInfo.filter(serviceInfo => dpServices.contains(serviceInfo.serviceName))
-                    val sortedServicesInfo = availableDpServicesInfo.union(servicesInfo).distinct
-                    Ok(Json.toJson(sortedServicesInfo))
-                  }
+      skuService.getAllSkus()
+        .flatMap {
+          case Left(errors) =>
+            Future.successful(InternalServerError(Json.toJson(errors)))
+          case Right(skus) => {
+            val mandatoryServices = skus.flatMap(sku => configuration.getStringSeq(s"${sku.name}.dependent.services.mandatory").getOrElse(Nil)).distinct
+            val optionalServices = skus.flatMap(sku => configuration.getStringSeq(s"${sku.name}.dependent.services.optional").getOrElse(Nil)).distinct
+            val allDpServices = (mandatoryServices.union(optionalServices)).distinct
+            ambariWebService
+              .getAmbariServicesInfo(DpClusterWithDpServices(dataplaneCluster = req, dpServices = allDpServices))
+              .map {
+                case Left(errors) =>
+                  InternalServerError(Json.toJson(errors))
+                case Right(servicesInfo) => {
+                  Ok(Json.toJson(servicesInfo))
                 }
-            }
+              }
           }
-      }
+        }
+    }
       .getOrElse(Future.successful(BadRequest))
   }
-
 
 }

@@ -171,6 +171,10 @@ object Entities {
       created: Option[LocalDateTime] = Some(LocalDateTime.now()),
       updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
+  case class DpClusterWithDpServices(
+      dataplaneCluster: DataplaneCluster,
+      dpServices: Seq[String])
+
   case class Category(
       id: Option[Long] = None,
       name: String,
@@ -396,6 +400,10 @@ object JsonFormatters {
   implicit val locationReads = Json.reads[Location]
   implicit val dpClusterWrites = Json.writes[DataplaneCluster]
   implicit val dpClusterReads = Json.reads[DataplaneCluster]
+
+  implicit val dpClusterWithDpServicesWrites = Json.writes[DpClusterWithDpServices]
+  implicit val dpClusterWithDpServicesReads = Json.reads[DpClusterWithDpServices]
+
   implicit val dpClusterIdentifierWrites =
     Json.writes[DataplaneClusterIdentifier]
   implicit val dpClusterIdentifierReads =

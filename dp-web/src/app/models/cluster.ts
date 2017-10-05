@@ -75,4 +75,5 @@ export class ClusterDetails {
 export class ServiceInfo {
   serviceName: string;
   state: string;
+  serviceVersion: string;
 }

@@ -17,7 +17,7 @@ import com.hortonworks.dataplane.knox.KnoxApiExecutor
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import play.api.libs.json.{JsObject, JsValue}
-import play.api.libs.ws.{WSAuthScheme, WSClient}
+import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -27,9 +27,15 @@ sealed trait AmbariDataplaneClusterInterface {
 
   def discoverClusters(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]]
 
+  def getHdpVersion(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]]
+
+  def getAmbariResponse(url: String)(implicit hJwtToken: Option[HJwtToken]): Future[WSResponse]
+
   def getClusterDetails(clusterName:String)(implicit hJwtToken: Option[HJwtToken]):Future[Option[JsValue]]
 
   def getServiceInfo(clusterName:String, serviceName:String)(implicit hJwtToken: Option[HJwtToken]):Future[Option[JsValue]]
+
+  def getServiceVersion(stack:String, stackVersion: String, serviceName:String)(implicit hJwtToken: Option[HJwtToken]):Future[String]
 
   def getServices(clusterName:String)(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]]
 
@@ -46,20 +52,17 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
   val prefix = Try(config.getString("dp.service.ambari.cluster.api.prefix"))
     .getOrElse("/api/v1/clusters")
 
+  val stackApiPrefix = Try(config.getString("dp.service.ambari.stack.api.prefix"))
+    .getOrElse("/api/v1/stacks")
+
   /** On a registered dpCluster, discover the clusters
     * and start data fetch jobs for them
     *
     * @return List of Cluster names
     */
   override def discoverClusters(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]] = {
-    val request = ws.url(s"${dataplaneCluster.ambariUrl}$prefix")
-    val requestWithLocalAuth = request.withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
-    val delegatedCall:ApiCall = {req => req.get()}
-
-    val response = if(dataplaneCluster.knoxEnabled.isDefined && dataplaneCluster.knoxEnabled.get && dataplaneCluster.knoxUrl.isDefined && hJwtToken.isDefined){
-        KnoxApiExecutor(KnoxConfig("token", dataplaneCluster.knoxUrl), ws).execute(
-          KnoxApiRequest(request, delegatedCall, Some(hJwtToken.get.token)))
-    } else requestWithLocalAuth.get()
+    val url = s"${dataplaneCluster.ambariUrl}$prefix"
+    val response = getAmbariResponse(url)
 
     response.map { res =>
       val items = (res.json \ "items" \\ "Clusters").map(_.as[JsObject].validate[Map[String, String]].map(m => Some(m)).getOrElse(None))
@@ -74,17 +77,35 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
     }
   }
 
+  override def getHdpVersion(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]] = {
+    val url = s"${dataplaneCluster.ambariUrl}$prefix"
+    val response = getAmbariResponse(url)
 
+    response.map { res =>
+      val items = (res.json \ "items" \\ "Clusters").map(_.as[JsObject].validate[Map[String, String]].map(m => Some(m)).getOrElse(None))
+      val hdpVersion = items.map { item =>
+        item.flatMap { map =>
+          map.get("version")
+        }
+      }
+      hdpVersion.collect { case Some(hdv) => hdv }
+    }
+  }
 
-  override def getClusterDetails(clusterName:String)(implicit hJwtToken: Option[HJwtToken]):Future[Option[JsValue]] = {
-    val request  = ws.url(s"${dataplaneCluster.ambariUrl}$prefix/$clusterName")
+  override def getAmbariResponse(requestUrl: String)(implicit hJwtToken: Option[HJwtToken]): Future[WSResponse] = {
+    val request = ws.url(requestUrl)
     val requestWithLocalAuth = request.withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
     val delegatedCall:ApiCall = {req => req.get()}
 
-    val response = if(dataplaneCluster.knoxEnabled.isDefined && dataplaneCluster.knoxEnabled.get && dataplaneCluster.knoxUrl.isDefined && hJwtToken.isDefined){
+    if(dataplaneCluster.knoxEnabled.isDefined && dataplaneCluster.knoxEnabled.get && dataplaneCluster.knoxUrl.isDefined && hJwtToken.isDefined){
       KnoxApiExecutor(KnoxConfig("token", dataplaneCluster.knoxUrl), ws).execute(
         KnoxApiRequest(request, delegatedCall, Some(hJwtToken.get.token)))
     } else requestWithLocalAuth.get()
+  }
+
+  override def getClusterDetails(clusterName:String)(implicit hJwtToken: Option[HJwtToken]):Future[Option[JsValue]] = {
+    val url = s"${dataplaneCluster.ambariUrl}$prefix/$clusterName"
+    val response = getAmbariResponse(url)
 
     response.map { res =>
       (res.json \ "Clusters").toOption
@@ -96,14 +117,8 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
   }
 
   override def getServiceInfo(clusterName: String, serviceName: String)(implicit hJwtToken: Option[HJwtToken]): Future[Option[JsValue]] = {
-    val request = ws.url(s"${dataplaneCluster.ambariUrl}$prefix/$clusterName/services/$serviceName")
-    val requestWithLocalAuth = request.withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
-    val delegatedCall: ApiCall = { req => req.get() }
-
-    val response = if (dataplaneCluster.knoxEnabled.isDefined && dataplaneCluster.knoxEnabled.get && dataplaneCluster.knoxUrl.isDefined && hJwtToken.isDefined) {
-      KnoxApiExecutor(KnoxConfig("token", dataplaneCluster.knoxUrl), ws).execute(
-        KnoxApiRequest(request, delegatedCall, Some(hJwtToken.get.token)))
-    } else requestWithLocalAuth.get()
+    val url = s"${dataplaneCluster.ambariUrl}$prefix/$clusterName/services/$serviceName"
+    val response = getAmbariResponse(url)
 
     response.map { res =>
       (res.json \ "ServiceInfo").toOption
@@ -114,14 +129,8 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
   }
 
   override def getServices(clusterName: String)(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]] = {
-    val request = ws.url(s"${dataplaneCluster.ambariUrl}$prefix/$clusterName/services")
-    val requestWithLocalAuth = request.withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
-    val delegatedCall: ApiCall = { req => req.get() }
-
-    val response = if (dataplaneCluster.knoxEnabled.isDefined && dataplaneCluster.knoxEnabled.get && dataplaneCluster.knoxUrl.isDefined && hJwtToken.isDefined) {
-      KnoxApiExecutor(KnoxConfig("token", dataplaneCluster.knoxUrl), ws).execute(
-        KnoxApiRequest(request, delegatedCall, Some(hJwtToken.get.token)))
-    } else requestWithLocalAuth.get()
+    val url = s"${dataplaneCluster.ambariUrl}$prefix/$clusterName/services"
+    val response = getAmbariResponse(url)
 
     response.map { res =>
       val items = (res.json \ "items" \\ "ServiceInfo").map(_.as[JsObject].validate[Map[String, String]].map(m => Some(m)).getOrElse(None))
@@ -131,6 +140,15 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
         }
       }
       serviceOpts.collect { case Some(s) => s }
+    }
+  }
+
+  override def getServiceVersion(stack: String, stackVersion: String, serviceName: String)(implicit hJwtToken: Option[HJwtToken]):Future[String]  = {
+    val url = s"${dataplaneCluster.ambariUrl}$stackApiPrefix/$stack/versions/$stackVersion/services/$serviceName"
+    val response = getAmbariResponse(url)
+
+    response.map { res =>
+      (res.json \ "StackServices" \ "service_version").validate[String].getOrElse("UNKNOWN")
     }
   }
 }
