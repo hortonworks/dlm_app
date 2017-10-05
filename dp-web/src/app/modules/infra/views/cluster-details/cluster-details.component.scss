@@ -44,6 +44,18 @@
   line-height: 15px;
 }
 
+.services {
+  margin: 7px 0 0;
+  & .fa-check-circle {
+    color: $forest-green-1;
+    margin-right: 10px;
+  }
+  & .fa-exclamation-triangle {
+    color: $burnt-cienna-red;
+    margin-right: 10px;
+  }
+}
+
 .text-small-1 {
   display: block;
   font-size: 13px;
@@ -134,5 +146,45 @@
   .fa {
     padding: 0 8px;
   }
+}
+
+.flex-display{
+  display: flex;
+}
+
+.info-container{
+  width: 75%;
+  flex: 1;
+}
+
+.info-button{
+  position: relative;
+}
+
+.services-container{
+  width: 25%;
+}
+
+.services-header-grid{
+  padding-bottom: 0px;
+  padding-top: 20px;
+}
+
+.services-body-grid{
+  padding-bottom: 0px;
+  padding-top: 0px;
+}
+
+.services-body-cell{
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.service-text{
+  margin-left:18px;
+}
+
+.dark-text{
+  font-weight: 500;
 }
 
