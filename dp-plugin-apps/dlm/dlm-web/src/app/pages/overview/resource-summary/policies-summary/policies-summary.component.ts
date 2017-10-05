@@ -20,13 +20,13 @@ import { POLICIES_HEALTH_STATE } from '../resource-summary.type';
       <div class="row">
         <dlm-summary-panel-cell
           class="col-xs-4"
-          iconClass="fa fa-play-circle text-success"
+          iconClass="fa fa-play-circle active-policies"
           [label]="'page.overview.summary_panels.status.active' | translate"
           [value]="data.active">
         </dlm-summary-panel-cell>
         <dlm-summary-panel-cell
           class="col-xs-4"
-          iconClass="fa fa-times-circle"
+          iconClass="fa fa-pause-circle suspended-policies"
           [label]="'page.overview.summary_panels.status.suspended' | translate"
           [value]="data.suspended">
         </dlm-summary-panel-cell>
