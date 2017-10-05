@@ -208,7 +208,14 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         name: this.t.instant('common.name'),
         cellTemplate: this.policyInfoColumn.cellRef,
         sortable: false,
-        flexGrow: 6
+        flexGrow: 8
+      },
+      {
+        prop: 'sourceClusterResource',
+        name: this.t.instant('common.source'),
+        cellTemplate: this.clusterCellTemplateRef,
+        comparator: this.clusterResourceComparator.bind(this),
+        flexGrow: 4
       },
       {
         prop: 'accessMode',
@@ -218,18 +225,16 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         sortable: false,
         flexGrow: 7
       },
-      {prop: 'sourceClusterResource', name: this.t.instant('common.source'), flexGrow: 6,
-        cellTemplate: this.clusterCellTemplateRef, comparator: this.clusterResourceComparator.bind(this)},
-      {prop: 'targetClusterResource', name: this.t.instant('common.destination'), flexGrow: 6,
+      {prop: 'targetClusterResource', name: this.t.instant('common.destination'), flexGrow: 8,
         cellTemplate: this.clusterCellTemplateRef, comparator: this.clusterResourceComparator.bind(this)},
       {prop: 'sourceDataset', name: this.t.instant('common.path'),
         cellTemplate: this.pathCellRef, flexGrow: 9, sortable: false},
       {cellTemplate: this.prevJobsRef, name: this.t.instant('page.jobs.prev_jobs'),
         sortable: false, flexGrow: 4},
       {prop: 'jobs.0.duration', name: this.t.instant('common.duration'),
-        cellTemplate: this.durationCellRef, flexGrow: 5},
+        cellTemplate: this.durationCellRef, flexGrow: 3},
       {prop: 'lastGoodJobResource.startTime', name: 'Last Good',
-        cellTemplate: this.lastGoodCellRef, flexGrow: 5},
+        cellTemplate: this.lastGoodCellRef, flexGrow: 3},
       {name: ' ', cellTemplate: this.actionsCellRef, flexGrow: 2, sortable: false}
     ];
     if (this.activePolicyId) {

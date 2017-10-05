@@ -16,7 +16,6 @@
 </dlm-table>
 
 <dlm-icon-column [showHexagon]="false" [showValue]="true"></dlm-icon-column>
-<dlm-status-column [showText]="false"></dlm-status-column>
 
 <ng-template #clusterNameCellRef let-name="value">
   <span [tooltip]="getDatacenterName(name)">{{getClusterName(name)}}</span>
