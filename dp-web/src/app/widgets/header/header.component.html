@@ -28,8 +28,14 @@
         <div class="header">
           <div class="hwx-title" id="user-name">{{user?.display}}</div>
         </div>
-        <div class="footer">
-          <a id="logout-btn" href="{{signoutURL}}"><button class="mdl-button btn-hwx-secondary">Logout</button></a>
+        <div class="footer" style="display:flex;">
+          <a id="logout-btn" [routerLink]="['/profile/change-password']">
+            <button class="mdl-button btn-hwx-secondary">Change password</button>
+          </a>
+          <span>&nbsp;</span>
+          <a id="logout-btn" href="{{signoutURL}}">
+            <button class="mdl-button btn-hwx-secondary">Logout</button>
+          </a>
         </div>
       </div>
     </div>

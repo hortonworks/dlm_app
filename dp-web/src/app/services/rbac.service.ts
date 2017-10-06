@@ -57,7 +57,7 @@ export class RbacService {//role based access control
         new PersonaTabs('Clusters', 'infra', 'fa-cubes'),
         new PersonaTabs('Users', 'infra/manage-access', 'fa-users'),
         new PersonaTabs('Services', 'infra/services', 'fa-th-large')
-      ], ['/onboard', '/onboard/welcome', '/onboard/identity-provider', '/onboard/users-and-groups'], '', 'infra-logo-white.png')
+      ], ['/onboard', '/onboard/welcome', '/onboard/identity-provider', '/onboard/users-and-groups', '/profile/change-password'], '', 'infra-logo-white.png')
     ]);
     personaMap.set('CURATOR', [
       new Persona('Data Steward Studio', [
