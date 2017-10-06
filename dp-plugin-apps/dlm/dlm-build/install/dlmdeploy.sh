@@ -16,7 +16,7 @@ CONSUL_CONTAINER="dp-consul-server"
 
 source_dp_config () {
     # Expected to be present in RPM deployments
-    DP_CONFIG_FILE_PATH = "/usr/dp/current/core/bin/config.env.sh"
+    DP_CONFIG_FILE_PATH="/usr/dp/current/core/bin/config.env.sh"
     if [ -f "${DP_CONFIG_FILE_PATH}" ]; then
         source "${DP_CONFIG_FILE_PATH}";
     fi

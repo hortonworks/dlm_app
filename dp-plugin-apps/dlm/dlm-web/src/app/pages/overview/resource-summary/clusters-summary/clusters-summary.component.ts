@@ -15,7 +15,7 @@ import { CLUSTERS_HEALTH_STATE } from '../resource-summary.type';
   selector: 'dlm-clusters-summary',
   template: `
     <dlm-summary-panel
-      [title]="'page.overview.summary_panels.title.clusters'"
+      [title]="'common.clusters'"
       [total]="data.total">
       <div class="row">
         <dlm-summary-panel-cell

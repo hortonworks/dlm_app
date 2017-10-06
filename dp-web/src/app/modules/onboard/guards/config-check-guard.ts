@@ -24,7 +24,7 @@ export class ConfigCheckGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot) {
     return Observable.create(observer => {
-      if (this.router.url.startsWith('/onboard/adduser') || this.router.url === '/onboard/welcome') {
+      if (this.router.url.startsWith('/onboard/users-and-groups') || this.router.url === '/onboard/welcome') {
         this.redirect(observer, true);
       } else {
         this.redirect(observer, false, '/');

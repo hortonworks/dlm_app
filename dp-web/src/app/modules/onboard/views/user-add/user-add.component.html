@@ -1,0 +1,57 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+<div class="notification-bar line-height-1-5" *ngIf="showNotification">
+  <i class="fa fa-check-circle green margin-right-10 text-medium"></i>
+  <span class="text-medium green">LDAP ADDED SUCCESSFULLY!!!</span>
+  <i class="fa fa-remove pull-right margin-all-3 pointer" (click)="closeNotification()"></i>
+</div>
+<div class="container line-height-1-5">
+  <div class="error-notification-bar" *ngIf="showError">
+    <i class="fa fa-times-circle pull-left"></i>
+    <div class="error-title">{{"common.failed" | translate}}</div>
+    <div class="error-text">{{errorMessage}}</div>
+  </div>
+  <div class="text-medium">
+    <i class="fa fa-user green text-large pull-left"></i>
+    <div>
+      <div class="text-uppercase text-xsmall">{{("common.step" | translate).toUpperCase()}} 2</div>
+      <div class="">{{"pages.onboard.labels.defineUsers" | translate}}</div>
+    </div>
+  </div>
+  <div class="margin-top-bottom-20">
+    {{"pages.onboard.description.defineUsers" | translate}}
+  </div>
+  <div class="dp-input">
+    <label class="text-medium">{{"pages.onboard.adduser.labels.users" | translate}}</label>
+    <tagging-widget #userTags id="users-tags" [tags]="users" [clearOnSearch]="true"
+    [availableTags]="availableUsers"
+    [clearOnSearch]="true"
+    (textChange)="onUserSearchChange($event)"
+    (onNewSearch)="onNewUserAddition($event)"
+    [restrictFreeText]="true"
+    [minChars]=3></tagging-widget>
+  </div>
+  <div class="dp-input">
+    <label class="text-medium">{{"pages.onboard.adduser.labels.groups" | translate}}</label>
+    <tagging-widget #groupTags id="groups-tags" [tags]="groups" [clearOnSearch]="true"
+    [availableTags]="availableGroups"
+    [clearOnSearch]="true"
+    (textChange)="onGroupSearchChange($event)"
+    (onNewSearch)="onNewGroupAddition($event)"
+    [restrictFreeText]="true"
+    [minChars]=3></tagging-widget>
+  </div>
+  <div class="margin-top-30">
+    <button id="save-login-btn" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"pages.onboard.adduser.labels.saveAndLogin" | translate}}</button>
+    <button id="back-btn" class="mdl-button btn-hwx-secondary" [routerLink]="['/onboard/identity-provider']">{{"common.back" | translate}}</button>
+  </div>
+</div>

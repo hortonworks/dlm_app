@@ -9,24 +9,15 @@
  *
  */
 
-import {Component, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'dp-dp-onboard',
   templateUrl: './dp-onboard.component.html',
   styleUrls: ['./dp-onboard.component.scss']
 })
-export class DpOnboardComponent implements OnInit {
+export class DpOnboardComponent {
 
-  constructor(private router: Router) {
-  }
-
-  ngOnInit() {
-  }
-
-  start() {
-    this.router.navigate(['/onboard/configure']);
-  }
+  constructor() {}
 
 }

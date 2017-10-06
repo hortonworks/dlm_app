@@ -9,29 +9,8 @@
 
 @import '../../../styles/variables';
 
-$status-circle-size: 12px;
-$status-circle-margin: 5px;
-
 .status {
-
-  &.status-failed:before {
-    background: $alert-color;
-  }
-
-  &.status-submitted:before {
-    background: $link-color;
-  }
-
-  &.status-running:before {
-    background: $success-color;
-  }
-
-  &:before {
-    content: '';
-    display: inline-block;
-    width: $status-circle-size;
-    height: $status-circle-size;
-    border-radius: $status-circle-size;
-    margin-right: 5px;
-  }
+  margin-right: 5px;
+  color: #666;
+  font-size: 14px;
 }

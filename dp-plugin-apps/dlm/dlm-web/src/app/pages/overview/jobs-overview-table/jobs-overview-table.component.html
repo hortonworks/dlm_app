@@ -14,9 +14,13 @@
   [rows]="jobs"
   (selectColumnAction)="handleSelectedAction($event)">
 </dlm-table>
+<div class="legend pull-right">
+  <dlm-job-status [job]="{status: 'SUCCESS'}">Success</dlm-job-status>
+  <dlm-job-status [job]="{status: 'RUNNING'}">In Progress</dlm-job-status>
+  <dlm-job-status [job]="{status: 'FAILED'}">Failed</dlm-job-status>
+</div>
 
 <dlm-icon-column [showHexagon]="false" [showValue]="true"></dlm-icon-column>
-<dlm-status-column [showText]="false"></dlm-status-column>
 
 <ng-template #clusterNameCellRef let-name="value">
   <span [tooltip]="getDatacenterName(name)">{{getClusterName(name)}}</span>

@@ -44,7 +44,7 @@ class AmbariService @Inject()(@Named("ambariService") val ambariService: AmbariC
       case Left(errors) =>  p.success(Left(errors))
       case Right(response) =>
         val clusterName = response.name
-        val url = s"clusters/$clusterName/services?ServiceInfo/service_name.in(HDFS,BEACON,KNOX)&fields=ServiceInfo/state&minimal_response=true"
+        val url = s"clusters/$clusterName/services?ServiceInfo/service_name.in(HDFS,BEACON,KNOX,HIVE,YARN)&fields=ServiceInfo/state&minimal_response=true"
         ambariService.requestAmbariApi(clusterId, url.encode).map {
         case Left(errors) =>  p.success(Left(errors))
         case Right(response) => p.success(Right(response))
@@ -67,7 +67,7 @@ class AmbariService @Inject()(@Named("ambariService") val ambariService: AmbariC
         val allClusterStatusFuture: Future[Seq[Either[Errors, JsValue]]] = Future.sequence(dataplaneClusters.map((cluster) => {
           val clusterName = cluster.name
           val clusterId = cluster.id.get
-          val url = s"clusters/$clusterName/services?ServiceInfo/service_name.in(HDFS,BEACON,KNOX,HIVE)&fields=ServiceInfo/state&minimal_response=true"
+          val url = s"clusters/$clusterName/services?ServiceInfo/service_name.in(HDFS,BEACON,KNOX,HIVE,YARN)&fields=ServiceInfo/state&minimal_response=true"
           ambariService.requestAmbariApi(clusterId, url.encode, true)
         }))
 

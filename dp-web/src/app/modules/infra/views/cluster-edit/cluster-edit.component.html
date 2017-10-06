@@ -87,7 +87,7 @@
     </form>
     <div class="button-container">
       <button id="add-btn" class="mdl-button btn-hwx-primary" (click)="onUpdate($event)">{{"common.update" | translate}}</button>
-      <button id="cancel-btn" class="mdl-button btn-hwx-default" (click)="onCancel($event)">{{"common.cancel" | translate}}</button>
+      <button id="cancel-btn" class="mdl-button btn-hwx-default" [routerLink]="['/infra']">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

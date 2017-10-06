@@ -40,8 +40,8 @@ export class LakesComponent implements OnInit {
   mapSet = new Map();
   health = new Map();
   mapSize: MapSize;
-  private SYNCED =  "SYNCED";
-  private SYNC_ERROR = "SYNC_ERROR";
+  private SYNCED = 'SYNCED';
+  private SYNC_ERROR = 'SYNC_ERROR';
   private MAXCALLS = 10;
   private DELAY_IN_MS = 2000;
 
@@ -62,9 +62,9 @@ export class LakesComponent implements OnInit {
           let locationObserver;
           lake.data.isWaiting = true;
           if (lake.data.state === this.SYNCED || lake.data.state === this.SYNC_ERROR) {
-            if(lake.data.state === this.SYNCED || (lake.data.state === this.SYNC_ERROR && lake.clusters && lake.clusters.length >0)){
+            if (lake.data.state === this.SYNCED || (lake.data.state === this.SYNC_ERROR && lake.clusters && lake.clusters.length > 0)) {
               locationObserver = this.getLocationInfoWithStatus(lake.data.location, lake.clusters[0].id, lake.data.id);
-            }else{
+            } else {
               locationObserver = this.getLocationInfo(lake.data.location);
             }
           } else {
@@ -77,23 +77,23 @@ export class LakesComponent implements OnInit {
       });
   }
 
-  updateUnSyncedLakes(unSyncedLakes){
-    unSyncedLakes.forEach((unSyncedlake) =>{
-      let count =1;
-      this.lakeService.retrieve(unSyncedlake.data.id).delay(this.DELAY_IN_MS).repeat(this.MAXCALLS).skipWhile((lake) => lake.state !== this.SYNCED && lake.state !== this.SYNC_ERROR && count++ < this.MAXCALLS).first().subscribe(lake =>{
+  updateUnSyncedLakes(unSyncedLakes) {
+    unSyncedLakes.forEach((unSyncedlake) => {
+      let count = 1;
+      this.lakeService.retrieve(unSyncedlake.data.id).delay(this.DELAY_IN_MS).repeat(this.MAXCALLS).skipWhile((lake) => lake.state !== this.SYNCED && lake.state !== this.SYNC_ERROR && count++ < this.MAXCALLS).first().subscribe(lake => {
         let locationObserver;
-        if(lake.state === this.SYNCED || lake.state === this.SYNC_ERROR){
+        if (lake.state === this.SYNCED || lake.state === this.SYNC_ERROR) {
           unSyncedlake.data = lake;
-          this.clusterService.listByLakeId({lakeId: lake.id}).subscribe(clusters=> {
+          this.clusterService.listByLakeId({lakeId: lake.id}).subscribe(clusters => {
             unSyncedlake.clusters = clusters;
-            if(clusters && clusters.length >0){
+            if (clusters && clusters.length > 0) {
               locationObserver = this.getLocationInfoWithStatus(unSyncedlake.data.location, unSyncedlake.clusters[0].id, unSyncedlake.data.id);
-            }else{
+            } else {
               locationObserver = this.getLocationInfo(unSyncedlake.data.location);
             }
             this.updateHealth(unSyncedlake, locationObserver);
           });
-        }else{
+        } else {
           locationObserver = this.getLocationInfo(unSyncedlake.data.location);
           unSyncedlake.data.isWaiting = false;
           this.updateHealth(unSyncedlake, locationObserver);
@@ -102,14 +102,14 @@ export class LakesComponent implements OnInit {
     });
   }
 
-  updateHealth(lake, locationObserver: Observable<any>){
+  updateHealth(lake, locationObserver: Observable<any>) {
     locationObserver.subscribe(locationInfo => {
-      if(lake.data.state === this.SYNCED || lake.data.state === this.SYNC_ERROR){
+      if (lake.data.state === this.SYNCED || lake.data.state === this.SYNC_ERROR) {
         lake.data.isWaiting = false;
       }
       this.health.set(lake.data.id, locationInfo);
       this.health = new Map(this.health.entries());
-      this.mapSet.set(lake.data.id, new MapData(this.extractMapPoints(locationInfo)));
+      this.mapSet.set(lake.data.id, new MapData(this.extractMapPoints(locationInfo, lake)));
       let mapPoints = [];
       this.mapSet.forEach(mapData => {
         mapPoints.push(mapData)
@@ -139,29 +139,29 @@ export class LakesComponent implements OnInit {
     });
   }
 
-  private extractMapPoints(locationInfo) {
+  private extractMapPoints(locationInfo, lake) {
     if (!locationInfo.health) {
-      return new Point(locationInfo.location.latitude, locationInfo.location.longitude, MapConnectionStatus.NA)
+      return new Point(locationInfo.location.latitude, locationInfo.location.longitude, MapConnectionStatus.NA, lake.data.name, lake.data.dcName, `${locationInfo.location.city}, ${locationInfo.location.country}`)
     } else {
       let health = locationInfo.health;
       let location = locationInfo.location;
       let status;
       if (health && health.status && health.status.state === 'STARTED') {
         status = MapConnectionStatus.UP;
-      } else if (health && health.status && health.status.state === 'NOT STARTED') {
+      } else if (health && health.status && (health.status.state === 'NOT STARTED' || health.status.state === this.SYNC_ERROR)) {
         status = MapConnectionStatus.DOWN;
       } else {
         status = MapConnectionStatus.NA;
       }
-      return new Point(location.latitude, location.longitude, status);
+      return new Point(location.latitude, location.longitude, status, lake.data.name, lake.data.dcName, `${locationInfo.location.city}, ${locationInfo.location.country}`);
     }
   }
 
-  onRefresh(lakeId){
+  onRefresh(lakeId) {
     let lakeInfo = this.lakes.find(lake => lake.data.id === lakeId);
-    if(lakeInfo.data.state === this.SYNCED){
+    if (lakeInfo.data.state === this.SYNCED) {
       this.updateHealth(lakeInfo, this.getLocationInfoWithStatus(lakeInfo.data.location, lakeInfo.clusters[0].id, lakeId));
-    }else{
+    } else {
       this.updateUnSyncedLakes([lakeInfo]);
     }
   }

@@ -9,5 +9,8 @@
 
 export const SERVICES = {
   BEACON: 'BEACON',
-  RANGER: 'RANGER'
+  RANGER: 'RANGER',
+  HIVE: 'HIVE',
+  YARN: 'YARN',
+  HDFS: 'HDFS'
 };

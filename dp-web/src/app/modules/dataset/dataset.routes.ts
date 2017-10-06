@@ -14,15 +14,53 @@ import {DatasetDashboardComponent} from "./views/dashboard/dataset-dashboard.com
 import {DsAssetSearch} from "./views/ds-asset-search/ds-asset-search.component";
 import {DsEditor} from "./views/ds-editor/ds-editor.component";
 import {DsFullView} from "./views/ds-full-view/ds-full-view.component";
-import {RedirectUrlComponent} from '../../shared/redirect-url/redirect-url.component';
+import {AssetViewComponent} from './views/asset-view/asset-view.component';
+import {NodeDetailsComponent} from './views/asset-view/node-details/node-details.component';
 
-export const routes: Routes = [
-  { path: '', redirectTo: 'dataset' },
-  { component: DatasetDashboardComponent, path: "dataset"},
-  { component: DsFullView, path: "dataset/full-view/:id"},
-  { component: DsEditor, path: "dataset/add"},
-  { component: DsEditor, path: "dataset/edit/:id"},
-  { component: DsEditor, path: "edit"},
-  { component: DsAssetSearch, path: "asset-search"},
-  { component: RedirectUrlComponent, path: "dataset/assets/details/:id/:guid", data: {find: '^/datasteward/dataset', replace: ''}},
-];
+export const routes: Routes = [{
+    path: '',
+    pathMatch: 'full',
+    redirectTo: 'collections'
+  }, {
+    path: "collections",
+    data: {
+      crumb: 'dss.collections'
+    },
+    children: [{
+      path: '',
+      pathMatch: 'full',
+      component: DatasetDashboardComponent,
+      data: {
+        crumb: undefined
+      },
+    }, {
+      path: "add",
+      component: DsEditor,
+      data: {
+        crumb: 'dss.collections.add'
+      }
+    }, {
+      path: ":id",
+      component: DsFullView,
+      data: {
+        crumb: 'dss.collections.cCollection'
+      }
+    }, {
+      path: ":id/edit",
+      component: DsEditor,
+      data: {
+        crumb: 'dss.collections.cCollection.edit'
+      }
+    }]
+  }, {
+    path: "clusters/:clusterId/assets/:guid",
+    component: AssetViewComponent,
+    data: {
+      crumb: 'dss.assets.cAsset'
+    },
+    children: [{
+      path: 'nodes/:guidOfNode',
+      component: NodeDetailsComponent,
+      outlet: 'sidebar'
+    }]
+}];

@@ -28,7 +28,7 @@ export class RbacService {//role based access control
   constructor(private configService: ConfigurationService) {
     this.landingPageMap.set('SUPERADMIN', '/infra');
     this.landingPageMap.set('SUPERADMIN_ONBOARD', '/onboard/welcome');
-    this.landingPageMap.set('CURATOR', '/datasteward/dataset');
+    this.landingPageMap.set('CURATOR', '/datasteward/collections');
     this.landingPageMap.set('INFRAADMIN', '/infra');
     this.landingPageMap.set('INFRAADMIN_ONBOARD', '/onboard');
   }
@@ -55,13 +55,13 @@ export class RbacService {//role based access control
     personaMap.set('SUPERADMIN', [
       new Persona('Dataplane Admin', [
         new PersonaTabs('Clusters', 'infra', 'fa-cubes'),
-        new PersonaTabs('Users', 'infra/usermgmt', 'fa-users'),
+        new PersonaTabs('Users', 'infra/manage-access', 'fa-users'),
         new PersonaTabs('Services', 'infra/services', 'fa-th-large')
-      ], ['/onboard', '/onboard/welcome', '/onboard/configure', '/onboard/adduser'], '', 'infra-logo-white.png')
+      ], ['/onboard', '/onboard/welcome', '/onboard/identity-provider', '/onboard/users-and-groups'], '', 'infra-logo-white.png')
     ]);
     personaMap.set('CURATOR', [
       new Persona('Data Steward Studio', [
-        new PersonaTabs('Asset Collection', 'datasteward/dataset', 'fa-cubes', true),
+        new PersonaTabs('Asset Collection', 'datasteward/collections', 'fa-cubes', true),
         // new PersonaTabs('Unclassified', 'unclassified', 'fa-cube'),
         // new PersonaTabs('Assets', 'assets', 'fa-server'),
         // new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')

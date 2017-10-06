@@ -115,10 +115,6 @@ export class LakesListComponent implements OnChanges {
     return health.status.state === 'SYNC_ERROR';
   }
 
-  viewDetails(lakeId) {
-    this.router.navigate([`infra/cluster/details`, lakeId]);
-  }
-
   private getStatus(health, lakeInfo) {
     if (health && health.status && health.status.state === 'STARTED') {
       return LakeStatus.UP;

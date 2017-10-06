@@ -32,6 +32,6 @@
     </div>
   </div>
   <div class="margin-top-30">
-    <button id="get-started-btn" class="mdl-button btn-hwx-primary" (click)="start()">{{("pages.onboard.labels.startButton" | translate).toUpperCase()}}</button>
+    <button id="get-started-btn" class="mdl-button btn-hwx-primary" [routerLink]="['/onboard/identity-provider']">{{("pages.onboard.labels.startButton" | translate).toUpperCase()}}</button>
   </div>
 </div>

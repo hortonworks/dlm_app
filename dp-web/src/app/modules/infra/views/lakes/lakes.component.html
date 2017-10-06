@@ -10,7 +10,7 @@
   -->
 
 <section class="map-wrapper">
-  <dp-map [mapSize]="mapSize" [mapData]="mapData"></dp-map>
+  <dp-map [mapSize]="mapSize" [showCount]="true" [mapData]="mapData"></dp-map>
 </section>
 <section>
   <dp-lakes-list [lakes]="lakes" [healths]="health" (onRefresh)="onRefresh($event)"></dp-lakes-list>
