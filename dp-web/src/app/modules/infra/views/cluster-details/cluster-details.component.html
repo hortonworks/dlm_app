@@ -140,16 +140,13 @@
     </div>
     <div class="mdl-cell mdl-cell--12-col no-top-bottom-space white-bg services-container">
       <div class="mdl-grid services-header-grid">
-        <div class="mdl-cell mdl-cell--6-col">
-          <label class="text-medium service-text dark-text pull-left">Service</label>
-        </div>
-        <div class="mdl-cell mdl-cell--6-col">
-          <label class="text-medium dark-text pull-left">Version</label>
+        <div class="mdl-cell mdl-cell--12-col">
+          <label class="text-medium pull-left">{{"pages.services.labels.dpServices" | translate}}</label>
         </div>
       </div>
       <div class="mdl-grid services-body-grid" *ngIf=" !servicesInfo || servicesInfo.length == 0">
         <div class="mdl-layout-spacer"></div>
-        <div class="mdl-cell mdl-cell--4-col">Loading...</div>
+        <div class="mdl-cell mdl-cell--4-col">{{"common.loading" | translate}}...</div>
         <div class="mdl-layout-spacer"></div>
       </div>
       <div *ngFor="let serviceinfo of servicesInfo" class="services">
