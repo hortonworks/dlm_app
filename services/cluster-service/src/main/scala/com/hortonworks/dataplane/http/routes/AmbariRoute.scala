@@ -447,7 +447,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
     }
   }
 
-  val ServiceStateRoute = path("ambari" / "servicesInfo") {
+  val serviceStateRoute = path("ambari" / "servicesInfo") {
     post {
       extractRequest { request =>
         entity(as[DpClusterWithDpServices]) { dcds =>
