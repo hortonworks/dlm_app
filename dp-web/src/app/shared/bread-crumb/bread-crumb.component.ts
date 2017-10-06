@@ -9,124 +9,82 @@
  *
  */
 
-import {Component, Input} from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Router, ActivatedRoute, NavigationEnd, Params, PRIMARY_OUTLET } from '@angular/router';
 
 @Component({
   selector: 'dp-bread-crumb',
   templateUrl: './bread-crumb.component.html',
   styleUrls: ['./bread-crumb.component.scss']
 })
-export class BreadCrumbComponent {
+export class BreadCrumbComponent implements OnInit, OnDestroy {
 
-  personaName = '';
-  crumbNames: string[] = [];
-  crumbNamesToURLMap: any = {};
+  breadcrumbs: IBreadcrumb[];
 
-  constructor(private router: Router) {
-    router.events.subscribe(event => {
-      let path = window.location.pathname;
-      if (event instanceof NavigationEnd && path === event.urlAfterRedirects) {
-        this.setCrumbNames(event.urlAfterRedirects);
-      }
-    });
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private router: Router
+  ) {
+    this.breadcrumbs = [];
   }
 
-  createCrumbs(crumbs: string[], url: string) {
-    console.log(url, crumbs);
-    this.crumbNamesToURLMap = {};
+  ngOnInit(): void {
+    this.router.events
+      .filter(event => event instanceof NavigationEnd)
+      .subscribe(event => {
+        const root: ActivatedRoute = this.activatedRoute.root;
+        this.breadcrumbs = this.getBreadcrumbs(root);
+      });
+  }
 
-    if (url.startsWith('datasteward')) {
-      this.createDataStewardCrumbs(url);
-    } else if (url.startsWith('infra')) {
-      this.createInfraCrumbs(url);
-    } else if (url.startsWith('analytics')) {
-      this.createAnalyticsCrumbs(url);
+  ngOnDestroy(): void {
+    // throw new Error('Method not implemented.');
+  }
+
+  private getBreadcrumbs(
+    route: ActivatedRoute,
+    url: string = '',
+    breadcrumbs: IBreadcrumb[] = []
+  ): IBreadcrumb[] {
+    const ROUTE_DATA_BREADCRUMB: string = 'crumb';
+
+    //get the child routes
+    let children: ActivatedRoute[] = route.children;
+
+    //run only for child in primary route
+    const cChild = children.find(cChild => cChild.outlet === PRIMARY_OUTLET);
+
+    //return if there are no more children in primary route
+    if (!cChild) {
+      return breadcrumbs;
     }
 
-    this.crumbNames = Object.keys(this.crumbNamesToURLMap);
-  }
-
-  createAnalyticsCrumbs(url: string) {
-
-    if (url.match(/^analytics\/workspace$/)) {
-      this.crumbNamesToURLMap['Workspace'] = 'analytics/workspace';
-    } else if (url.match(/analytics\/workspace\/(.*)\/assets/)) {
-      let matchArray = url.match(/analytics\/workspace\/(.*)\/assets/);
-      let workSpaceName = matchArray[1];
-      this.crumbNamesToURLMap['Asset Collection' + ' - ' + workSpaceName] = 'analytics/workspace';
-      this.crumbNamesToURLMap['Assets'] = '';
+    const {data, params, url: cUrl} = cChild.snapshot;
+    //verify the custom data property "breadcrumb" is specified on the route
+    if (!data.hasOwnProperty(ROUTE_DATA_BREADCRUMB) || !data[ROUTE_DATA_BREADCRUMB]) {
+      return this.getBreadcrumbs(cChild, url, breadcrumbs);
     }
+
+    //get the route's URL segment
+    let routeURL: string = cUrl.map(segment => segment.path).join("/");
+
+    //append route URL to URL
+    url += `/${routeURL}`;
+
+    //add breadcrumb
+    breadcrumbs.push({
+      label: data[ROUTE_DATA_BREADCRUMB],
+      params,
+      url
+    } as IBreadcrumb);
+
+    //recursive
+    return this.getBreadcrumbs(cChild, url, breadcrumbs);
   }
+}
 
-  createDataStewardCrumbs(url: string) {
-    this.crumbNamesToURLMap['Asset Collection'] = 'datasteward/dataset/';
-
-    if (url.startsWith('datasteward/dataset/full-view')) {
-      this.crumbNamesToURLMap['Details'] = '';
-    } else if (url.startsWith('datasteward/dataset/edit')) {
-      this.crumbNamesToURLMap['Edit'] = '';
-    } else if (url.startsWith('datasteward/dataset/add')) {
-      this.crumbNamesToURLMap['Add'] = '';
-    } else if (url.startsWith('datasteward/dataset/assets/details')) {
-      this.crumbNamesToURLMap['Asset Details'] = '';
-    }
-  }
-
-
-  createInfraCrumbs(url: string) {
-    if (url.startsWith('infra/clusters')) {
-      this.crumbNamesToURLMap['Clusters'] = '';
-    } else if (url.startsWith('infra/add')) {
-      this.crumbNamesToURLMap['Clusters'] = 'infra/clusters';
-      this.crumbNamesToURLMap['Add'] = '';
-    } else if (url.startsWith('infra/edit')) {
-      this.crumbNamesToURLMap['Clusters'] = 'infra/clusters';
-      this.crumbNamesToURLMap['Edit'] = '';
-    } else if (url.startsWith('infra/cluster/details')) {
-      this.crumbNamesToURLMap['Clusters'] = 'infra/clusters';
-      this.crumbNamesToURLMap['Details'] = '';
-    } else if (url.startsWith('infra/usermgmt/users')) {
-      this.crumbNamesToURLMap['Users'] = '';
-    } else if (url.startsWith('infra/usermgmt/groups')) {
-      this.crumbNamesToURLMap['Groups'] = '';
-    } else if (url.startsWith('infra/services')) {
-      this.crumbNamesToURLMap['Services'] = '';
-    }else if (url.startsWith('infra/usermgmt/editldap')) {
-      this.crumbNamesToURLMap['Users'] = 'infra/usermgmt/users';
-      this.crumbNamesToURLMap['Ldap Edit'] = '';
-    }
-  }
-
-  setCrumbNames(url: string) {
-    url = BreadCrumbComponent.normalizeURL(url);
-
-    this.crumbNames = [];
-    let crumbs = url.split('/');
-    this.personaName = crumbs.shift();
-    this.createCrumbs(crumbs, url);
-  }
-
-  private static normalizeURL(url:string) {
-    url = url.replace(/\/\(.*\)$/, ''); //Remove all the aux outlet routes
-    url = url.replace(/^\//, ''); // Remove leading slash '/'
-    url = url.replace(/\/$/, ''); // Remove trailing slash '/'
-    return url;
-  }
-
-  navigateToPersonaHome() {
-    let url = BreadCrumbComponent.normalizeURL(window.location.pathname);
-    url  = url.split('/')[0];
-    if (url && url.length > 0) {
-      this.router.navigate([url]);
-    }
-  }
-
-  navigateToBreadCrumb(crumbName: string) {
-    let url = this.crumbNamesToURLMap[crumbName];
-    if (url && url.length > 0) {
-      this.router.navigate([url]);
-    }
-  }
-
+interface IBreadcrumb {
+  label: string;
+  params: Params;
+  url: string;
 }

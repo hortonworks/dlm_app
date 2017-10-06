@@ -23,7 +23,7 @@ import {RouterModule} from "@angular/router";
     CommonModule,
     TranslateModule,
     FormsModule,
-    RouterModule
+    RouterModule,
   ],
   declarations: [DpTableDirective, RedirectUrlComponent, LdapConfigCommonComponent],
   exports:  [

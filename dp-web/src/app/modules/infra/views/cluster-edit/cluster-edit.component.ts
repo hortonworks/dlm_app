@@ -176,16 +176,8 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
     }
     this.lakeService.update(this.lake)
       .subscribe(
-        () => {
-          this.router.navigate(['infra']);
-        },
-        error => {
-          this.handleError(error);
-        }
+        () => this.router.navigate(['/infra']),
+        error => this.handleError(error)
       );
-  }
-
-  onCancel() {
-    this.router.navigate(['infra']);
   }
 }

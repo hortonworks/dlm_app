@@ -24,42 +24,103 @@ import {VerificationComponent} from './views/service-management/verification/ver
 import {ManualInstallCheckComponent} from './views/service-management/manual-install-check/manual-install-check.component';
 import {LdapEditConfigComponent} from "./views/ldap-edit-config/ldap-edit-config.component";
 
-// export const routes:Routes = [
-//   { path: '', redirectTo: 'clusters' },
-//   { path: 'clusters', component: LakesComponent },
-//   { path: 'add', component: ClusterAddComponent },
-//   { path: 'cluster/details/:id', component: ClusterDetailsComponent },
-//   { path: 'users', component: UserManagementComponent,
-//     children: [
-//       { path: 'add', component: AddUserComponent, outlet: 'sidebar',},
-//       { path: 'edit/:name', component: AddUserComponent, outlet: 'sidebar'}
-//     ]
-//   }
-// ];
-export const routes: Routes = [
-  {path: '', redirectTo: 'clusters'},
-  {path: 'clusters', component: LakesComponent},
-  {path: 'add', component: ClusterAddComponent},
-  {path: 'edit/:id', component: ClusterEditComponent},
-  {path: 'cluster/details/:id', component: ClusterDetailsComponent},
-  {path: 'services', component: ServiceManagementComponent},
-  {path: 'services/verify/:name', component: VerificationComponent},
-  {path: 'services/install', component: ManualInstallCheckComponent},
-  {path: 'usermgmt', pathMatch: 'full', redirectTo: 'usermgmt/users'},
-  {path: 'usermgmt/editldap', component: LdapEditConfigComponent},
-  {
-    path: 'usermgmt/users', component: UsersComponent,
-    children: [
-      {path: 'add', component: AddUserComponent, outlet: 'sidebar'},
-      {path: 'edit/:name', component: AddUserComponent, outlet: 'sidebar'}
-    ]
-  },
-  {
-    path: 'usermgmt/groups', component: GroupsComponent,
-    children: [
-      {path: 'add', component: AddGroupComponent, outlet: 'sidebar'},
-      {path: 'edit/:name', component: AddGroupComponent, outlet: 'sidebar'}
-    ]
-  }
-];
-
+export const routes: Routes = [{
+    path: '',
+    pathMatch: 'full',
+    redirectTo: 'clusters'
+  }, {
+    path: 'clusters',
+    data: {
+      crumb: 'infra.clusters'
+    },
+    children: [{
+      path: '',
+      pathMatch: 'full',
+      component: LakesComponent,
+      data: {
+        crumb: undefined
+      }
+    }, {
+      path: 'add',
+      component: ClusterAddComponent,
+      data: {
+        crumb: 'infra.clusters.add'
+      }
+    }, {
+      path: ':id',
+      component: ClusterDetailsComponent,
+      data: {
+        crumb: 'infra.clusters.cCluster'
+      }
+    }, {
+      path: ':id/edit',
+      component: ClusterEditComponent,
+      data: {
+        crumb: 'infra.clusters.cCluster.edit'
+      }
+    }]
+  }, {
+    path: 'services',
+    data: {
+      crumb: 'infra.services'
+    },
+    children: [{
+      path: '',
+      component: ServiceManagementComponent,
+      data: {
+        crumb: undefined
+      },
+    }, {
+      path: 'add',
+      component: ManualInstallCheckComponent,
+      data: {
+        crumb: 'infra.services.add'
+      }
+    }, {
+      path: ':name/verify',
+      component: VerificationComponent,
+      data: {
+        crumb: 'infra.services.cService.verify'
+      }
+    }]
+  }, {
+    path: 'manage-access',
+    pathMatch: 'full',
+    redirectTo: 'manage-access/users'
+  }, {
+    path: 'manage-access/identity-provider-edit',
+    component: LdapEditConfigComponent,
+    data: {
+      crumb: 'infra.access.identity_provider_edit'
+    },
+  },{
+    path: 'manage-access/users',
+    component: UsersComponent,
+    data: {
+      crumb: 'infra.access.users'
+    },
+    children: [{
+      path: 'add',
+      component: AddUserComponent,
+      outlet: 'sidebar'
+    }, {
+      path: ':name/edit',
+      component: AddUserComponent,
+      outlet: 'sidebar'
+    }]
+  }, {
+    path: 'manage-access/groups',
+    component: GroupsComponent,
+    data: {
+      crumb: 'infra.access.groups'
+    },
+    children: [{
+      path: 'add',
+      component: AddGroupComponent,
+      outlet: 'sidebar'
+    }, {
+      path: ':name/edit',
+      component: AddGroupComponent,
+      outlet: 'sidebar'
+    }]
+}];

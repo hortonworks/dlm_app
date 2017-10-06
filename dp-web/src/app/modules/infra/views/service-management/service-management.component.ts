@@ -151,7 +151,7 @@ export class ServiceManagementComponent implements OnInit {
   }
 
   enableServiceOnCluster(dpClusterId, service) {
-    this.router.navigate(['/infra/services/install'], {
+    this.router.navigate(['/infra/services/add'], {
       queryParams: {
         id: dpClusterId,
         name: service.skuName
@@ -161,10 +161,6 @@ export class ServiceManagementComponent implements OnInit {
 
   onSort(e) {
 
-  }
-
-  enableService(service: AddOnAppInfo) {
-    this.router.navigate(['verify', service.skuName], {relativeTo: this.route})
   }
 
 }
