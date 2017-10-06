@@ -21,7 +21,7 @@ object BCrypterMain extends LazyLogging {
 
     args.toList.length match {
       case 0 => {
-        logger.info("invalid usage")
+        logger.error("invalid usage")
         sys.exit(1)
       }
       case _ => print(BCrypt.hashpw(args(0).toString, BCrypt.gensalt()))
