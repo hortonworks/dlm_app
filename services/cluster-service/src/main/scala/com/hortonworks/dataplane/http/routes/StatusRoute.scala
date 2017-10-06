@@ -60,6 +60,8 @@ class StatusRoute @Inject()(val ws: WSClient,
   private lazy val hdInsightErrorStatus = config.getInt("dp.service.hdinsight.auth.status")
   private lazy val hdInsightErrorMessage = config.getString("dp.service.hdinsight.auth.response.message")
 
+  val tokenTopologyName = Try(config.getString("dp.services.knox.token.topology"))
+    .getOrElse("token")
 
   def makeAmbariApiRequest(endpoint: String,
                            ambariResponse: AmbariForbiddenResponse,
@@ -113,7 +115,7 @@ class StatusRoute @Inject()(val ws: WSClient,
             }
             val tokenHeader = tokenInfoHeader.get.value
             val response =
-              KnoxApiExecutor(KnoxConfig("token", Some(knoxUrl)), ws).execute(
+              KnoxApiExecutor(KnoxConfig(tokenTopologyName, Some(knoxUrl)), ws).execute(
                 KnoxApiRequest(delegatedRequest,
                                delegatedApiCall,
                                Some(tokenHeader)))
