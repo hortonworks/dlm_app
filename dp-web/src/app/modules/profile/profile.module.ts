@@ -11,6 +11,7 @@
 
 import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
+import {ReactiveFormsModule} from '@angular/forms';
 
 import {TranslateModule} from '@ngx-translate/core';
 import {SharedModule} from '../../shared/shared.module';
@@ -22,6 +23,7 @@ import {ChangePasswordComponent} from './views/change-password/change-password.c
     RouterModule.forChild(routes),
     SharedModule,
     TranslateModule,
+    ReactiveFormsModule,
   ],
 
   declarations: [
