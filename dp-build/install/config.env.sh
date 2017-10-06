@@ -26,3 +26,5 @@ USE_EXT_DB="no"
 # PUBLIC_KEY_L="/absolute/path/of/public/key.pem"
 # PRIVATE_KEY_L="/absolute/path/of/private/key.pem"
 # CERTIFICATE_PASSWORD="changeit"
+
+# USER_ADMIN_PASSWORD="admin"
