@@ -246,6 +246,26 @@ read_master_password() {
     MASTER_PASSWORD="$MASTER_PASSWD"
 }
 
+read_admin_password() {
+    echo "Enter DataPlane admin password: "
+    read -s ADMIN_PASSWD
+
+    echo "Reenter password: "
+    read -s ADMIN_PASSWD_VERIFY
+    
+    if [ "$ADMIN_PASSWD" != "$ADMIN_PASSWD_VERIFY" ];
+    then
+       echo "Password did not match. Reenter password:"
+       read -s ADMIN_PASSWD_VERIFY
+       if [ "$ADMIN_PASSWD" != "$ADMIN_PASSWD_VERIFY" ];
+       then
+        echo "Password did not match"
+        exit 1
+       fi
+    fi
+    USER_ADMIN_PASSWORD="$ADMIN_PASSWD"
+}
+
 read_certificate_password() {
     echo "Please enter password used for private key:"
     read -s CERTIFICATE_PASSWORD
@@ -373,9 +393,18 @@ init_keystore() {
     source $(pwd)/keystore-initialize.sh
 }
 
+update_admin_password() {
+    if [ -z "$USER_ADMIN_PASSWORD" ]; then
+        read_admin_password
+    fi
+    source $(pwd)/database-user-update.sh "$USER_ADMIN_PASSWORD"
+}
+
 init_all() {
     init_db
     reset_db
+
+    update_admin_password
 
     init_knox
     
