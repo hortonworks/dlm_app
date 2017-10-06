@@ -127,16 +127,27 @@ build_cluster_service() {
 
 build_migrate() {
 	log "Building dp-migrate"
+
 	# move docker files and utils
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/
 	cp -R ./docker/migrate/* ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/
+	
 	# move flyway migration scripts
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/
 	cp -R ../services/db-service/db/* ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/
+	
 	# removed unneccesary files
 	rm -rf ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/generators
 	rm ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/flyway.conf
 	rm ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/erd.png
+
+	# move bcrypt tool
+	log "Moving bcrypter"
+	rm -rf ../tools/bcrypter/build
+	mkdir ../tools/bcrypter/build
+	pushd ../tools/bcrypter
+	unpack_for_docker_deploy build/tmp_tools_bcrypter ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-migrate/bcrypter
+	popd
 }
 
 build_installer() {

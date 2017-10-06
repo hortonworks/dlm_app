@@ -11,4 +11,6 @@
 #
 set -e
 
-java -cp myjar.jar org.mindrot.jbcrypt.BCrypt
+local ADMIN_PASSWORD_HASH=`/bcrypter/bin/bcrypter "$ADMIN_PASSWORD"`
+
+psql 
