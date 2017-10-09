@@ -124,7 +124,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def update = Action.async(parse.json) { req =>
+  def update(id: String) = Action.async(parse.json) { req =>
     req.body
       .validate[User]
       .map { user =>
@@ -155,7 +155,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
       .validate[UserInfo]
       .map { userInfo =>
         val password: String =
-          BCrypt.hashpw(Random.alphanumeric.toString(), BCrypt.gensalt())
+          Random.alphanumeric.toString()
         userRepo.findByName(userInfo.userName).flatMap{
           case  None=>{
             userRepo
@@ -184,8 +184,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
         if (userGroupInfo.groupIds.isEmpty){
           Future.successful(BadRequest(Json.toJson(Errors(Seq(Error("INPUT_ERROR","Group needs to be specified"))))))
         }else{
-          val password: String =
-            BCrypt.hashpw(Random.alphanumeric.toString(), BCrypt.gensalt())
+          val password: String = Random.alphanumeric.toString()
           userRepo.insertUserWithGroups(userGroupInfo,password)
             .map(userGroupInfo => success(userGroupInfo))
             .recoverWith(apiError)
