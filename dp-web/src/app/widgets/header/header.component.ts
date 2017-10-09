@@ -23,12 +23,11 @@ import {AuthUtils} from '../../shared/utils/auth-utils';
 export class HeaderComponent {
 
   @Input() user:User;
-  signoutURL = AuthUtils.signoutURL;
 
   constructor(private router: Router) {
   }
 
   logout() {
-    this.router.navigate([this.signoutURL]);
+    this.router.navigate([AuthUtils.signoutURL]);
   }
 }

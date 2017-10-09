@@ -9,19 +9,20 @@
  *
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {Router} from '@angular/router';
 import {FormGroup, FormControl, Validators, ValidatorFn} from '@angular/forms';
 import {Observable} from 'rxjs/Rx';
 
-import {UserService} from '../../../../services/user.service';
+import {IdentityService} from '../../../../services/identity.service';
+import {AuthUtils} from '../../../../shared/utils/auth-utils';
 
 @Component({
   selector: 'dp-change-password',
   templateUrl: './change-password.component.html',
   styleUrls: ['./change-password.component.scss']
 })
-export class ChangePasswordComponent implements OnInit {
+export class ChangePasswordComponent {
 
   form: FormGroup;
 
@@ -29,9 +30,11 @@ export class ChangePasswordComponent implements OnInit {
   passwordNew: string;
   passwordNewConfirm: string;
 
+  serverError: string;
+
   constructor(
     private router: Router,
-    private userService: UserService,
+    private identityService: IdentityService,
   ) {
     this.form = new FormGroup({
         'passwordCurrent': new FormControl(this.passwordCurrent, [
@@ -44,14 +47,29 @@ export class ChangePasswordComponent implements OnInit {
           Validators.required,
         ])
       },
-      (group: FormGroup) => ({
-          isValid: group.controls['passwordNew'].value === group.controls['passwordNewConfirm'].value
-      })
+      (group: FormGroup) => {
+        if(group.controls['passwordNew'].value !== group.controls['passwordNewConfirm'].value) {
+          return ({ noMatch : true });
+        }
+        return ({});
+      }
     );
   }
 
-  ngOnInit() {
-
+  onSubmit() {
+    if(this.form.valid === false) {
+      // do nothing
+    } else {
+      this.identityService
+        .changePassword(this.passwordCurrent, this.passwordNew)
+        .subscribe(
+          () => {
+            AuthUtils.clearUser();
+            window.location.href = AuthUtils.signoutURL;
+          },
+          error => this.serverError = error
+        );
+    }
   }
 
 }
