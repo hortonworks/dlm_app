@@ -18,6 +18,7 @@ POST          /users/role                                                    con
 GET           /users/role/:username                                          controllers.Users.getRolesForUser(username)
 GET           /users/all                                                     controllers.Users.getUsers
 GET           /users/:userId                                                 controllers.Users.load(userId:Long)
+PUT           /users/:userId                                                 controllers.Users.update(userId:Long)
 
 
 GET           /groups                                                        controllers.Groups.getGroups

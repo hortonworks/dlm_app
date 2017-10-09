@@ -17,6 +17,7 @@ import javax.inject.{Inject, Singleton}
 
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.RoleType
+import domain.API.UpdateError
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 
 import scala.collection.mutable
@@ -119,6 +120,19 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     db.run {
       Users returning Users += user
     }
+  }
+
+  def update(user: User): Future[User] = {
+    db
+      .run {
+        Users
+          .filter(_.id === user.id)
+          .update(user)
+      }
+      .map {
+        case 0 => throw UpdateError()
+        case _ => user
+      }
   }
 
   def updateUserAndRoles(userInfo:UserInfo, groupManaged:Boolean):Future[UserInfo]={

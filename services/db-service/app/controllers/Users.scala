@@ -17,7 +17,6 @@ import javax.inject._
 import com.hortonworks.dataplane.commons.domain.Entities._
 import domain.API.{roles, users}
 import domain.{EnabledSkuRepo, RolesUtil, UserRepo}
-import org.mindrot.jbcrypt.BCrypt
 import play.api.libs.json.Json
 import play.api.mvc._
 
@@ -113,7 +112,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
         userRepo
           .insert(
             username = user.username,
-            password = BCrypt.hashpw(user.password, BCrypt.gensalt()),
+            password = user.password,
             displayname = user.displayname,
             avatar = user.avatar
           )
@@ -124,6 +123,19 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
       }
       .getOrElse(Future.successful(BadRequest))
   }
+
+  def update = Action.async(parse.json) { req =>
+    req.body
+      .validate[User]
+      .map { user =>
+        userRepo
+          .update(user)
+          .map { u => success(u) }
+          .recoverWith(apiError)
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
+
   def updateActiveAndRoles = Action.async(parse.json) { req =>
     req.body
       .validate[UserInfo]
