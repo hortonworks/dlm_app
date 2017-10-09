@@ -82,8 +82,10 @@ class DataplaneClusters @Inject()(
       .retrieve(clusterId.toString)
       .map {
         case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          errors.firstMessage match {
+            case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          }
         case Right(dataplaneCluster) => Ok(Json.toJson(dataplaneCluster))
       }
   }

@@ -39,6 +39,11 @@ export class HttpUtil {
       return Observable.throw(error);
     }
 
+    if (error.status === 404) {
+      window.location.href = AuthUtils.notExistsURL;
+      return Observable.throw(error);
+    }
+
     let errMsg = (error.message) ? error.message :
       error.status ? `${error.status} - ${error.statusText}` : 'Server error';
       console.error(errMsg); // log to console instead
