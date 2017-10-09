@@ -29,8 +29,6 @@ sealed trait AmbariDataplaneClusterInterface {
 
   def getHdpVersion(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]]
 
-  def getAmbariResponse(url: String)(implicit hJwtToken: Option[HJwtToken]): Future[WSResponse]
-
   def getClusterDetails(clusterName:String)(implicit hJwtToken: Option[HJwtToken]):Future[Option[JsValue]]
 
   def getServiceInfo(clusterName:String, serviceName:String)(implicit hJwtToken: Option[HJwtToken]):Future[Option[JsValue]]
@@ -92,7 +90,7 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
     }
   }
 
-  override def getAmbariResponse(requestUrl: String)(implicit hJwtToken: Option[HJwtToken]): Future[WSResponse] = {
+  def getAmbariResponse(requestUrl: String)(implicit hJwtToken: Option[HJwtToken]): Future[WSResponse] = {
     val request = ws.url(requestUrl)
     val requestWithLocalAuth = request.withAuth(credentials.user.get, credentials.pass.get, WSAuthScheme.BASIC)
     val delegatedCall:ApiCall = {req => req.get()}

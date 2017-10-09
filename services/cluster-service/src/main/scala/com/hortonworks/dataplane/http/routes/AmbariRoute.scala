@@ -463,6 +463,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
                 }
               }
             case Failure(th) =>
+              logger.error(s"Failed to get services info ",th)
               complete(StatusCodes.InternalServerError, errors(th))
           }
         }

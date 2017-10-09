@@ -109,15 +109,15 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       this.clusterService.syncCluster(this.lake.id).subscribe(res => {
         Loader.show();
         let count = 0;
+        this.lakeService.getServicesInfo(this.lake.id.toString()).subscribe(res =>{
+          this.servicesInfo = res;
+        });
         this.lakeService.retrieve(this.lake.id.toString())
           .delay(2000)
           .repeat(15)
           .skipWhile(lake => lake.state !== 'SYNCED' && lake.state !== 'SYNC_ERROR' && ++count < 10)
           .first().subscribe(lakeUpdated => {
           this.lake = lakeUpdated;
-          this.lakeService.getServicesInfo(this.lake).subscribe(res =>{
-            this.servicesInfo = res;
-          });
           this.getClusterHealth(this.cluster.id, this.lake.id);
         });
 

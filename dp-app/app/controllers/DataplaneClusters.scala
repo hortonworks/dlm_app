@@ -14,8 +14,8 @@ package controllers
 import javax.inject.Inject
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Ambari.AmbariEndpoint
-import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, DataplaneClusterIdentifier, DpClusterWithDpServices, HJwtToken}
+import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariEndpoint, ServiceInfo}
+import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.{DpClusterService, SkuService}
 import models.{JsonResponses, WrappedErrorsException}
@@ -33,7 +33,6 @@ import scala.util.Try
 
 class DataplaneClusters @Inject()(
     @Named("dpClusterService") val dpClusterService: DpClusterService,
-    @Named("clusterAmbariService") ambariWebService: AmbariWebService,
     @Named("skuService") val skuService: SkuService,
     configuration: Configuration,
     ambariService: AmbariService)
@@ -181,32 +180,51 @@ class DataplaneClusters @Inject()(
         }
   }
 
-  def getAmbariServicesInfo = AuthenticatedAction.async(parse.json) { request =>
+  def getDependentServicesDetails(clusterId: String): Action[AnyContent] = AuthenticatedAction.async { request =>
     implicit val token = request.token
-    val dataplaneCluster = request.body
-      .validate[DataplaneCluster]
-    dataplaneCluster.map { req =>
-      skuService.getAllSkus()
-        .flatMap {
-          case Left(errors) =>
-            Future.successful(InternalServerError(Json.toJson(errors)))
-          case Right(skus) => {
-            val mandatoryServices = skus.flatMap(sku => configuration.getStringSeq(s"${sku.name}.dependent.services.mandatory").getOrElse(Nil)).distinct
-            val optionalServices = skus.flatMap(sku => configuration.getStringSeq(s"${sku.name}.dependent.services.optional").getOrElse(Nil)).distinct
-            val allDpServices = (mandatoryServices.union(optionalServices)).distinct
-            ambariWebService
-              .getAmbariServicesInfo(DpClusterWithDpServices(dataplaneCluster = req, dpServices = allDpServices))
-              .map {
-                case Left(errors) =>
-                  InternalServerError(Json.toJson(errors))
-                case Right(servicesInfo) => {
-                  Ok(Json.toJson(servicesInfo))
-                }
-              }
-          }
+    dpClusterService
+      .retrieve(clusterId)
+      .flatMap {
+        case Left(errors) => {
+          Logger.error(s"Failed to get cluster details ${errors}")
+          throw WrappedErrorsException(errors)
         }
+        case Right(dataplaneCluster) => getAmbariServicesInfo(dataplaneCluster)
+      }
+      .map{ servicesInfo => Ok(Json.toJson(servicesInfo)) }
+      .recoverWith {
+        case ex: WrappedErrorsException => {
+          Logger.error(s"Failed to get services details ${ex.errors}")
+          Future.successful(InternalServerError(Json.toJson(ex.errors)))
+        }
+      }
     }
-      .getOrElse(Future.successful(BadRequest))
+
+
+  private def getAmbariServicesInfo(dpCluster: DataplaneCluster)(implicit token:Option[HJwtToken]): Future[Seq[ServiceInfo]] =  {
+    skuService.getAllSkus()
+      .map {
+        case Left(errors: Errors) =>{
+          Logger.error(s"Failed to get dp-dependent services ${errors}")
+          throw WrappedErrorsException(errors)
+        }
+        case Right(skus: Seq[Sku]) => {
+          val mandatoryServices = skus.flatMap(sku => configuration.getStringSeq(s"${sku.name}.dependent.services.mandatory").getOrElse(Nil)).distinct
+          val optionalServices = skus.flatMap(sku => configuration.getStringSeq(s"${sku.name}.dependent.services.optional").getOrElse(Nil)).distinct
+          (mandatoryServices.union(optionalServices)).distinct
+        }
+      }
+      .flatMap { services =>
+        ambariService
+          .getClusterServices(DpClusterWithDpServices(dataplaneCluster = dpCluster, dpServices = services))
+          .map {
+            case Left(errors: Errors) =>{
+              Logger.error(s"Failed to get services info ${errors}")
+              throw WrappedErrorsException(errors)
+            }
+            case Right(servicesInfo: Seq[ServiceInfo]) => servicesInfo
+          }
+      }
   }
 
 }

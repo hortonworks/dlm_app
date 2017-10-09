@@ -152,7 +152,8 @@
       <div *ngFor="let serviceinfo of servicesInfo" class="services">
         <div class="mdl-grid services-body-grid">
           <div class="mdl-cell mdl-cell--6-col services-body-cell">
-            <label class="text-small-1 pull-left"><i class="fa fa-check-circle" *ngIf="serviceinfo.state === 'STARTED'" aria-hidden="true"></i><i class="fa fa-exclamation-triangle" *ngIf="serviceinfo.state !== 'STARTED'" aria-hidden="true"></i>{{serviceinfo.serviceName}}</label>
+            <label class="text-small-1 pull-left flex-display"><i class="fa fa-check-circle" *ngIf="serviceinfo.state === 'STARTED'" aria-hidden="true"></i><i class="fa fa-exclamation-triangle" *ngIf="serviceinfo.state !== 'STARTED'" aria-hidden="true"></i>
+              {{(("common.serviceNameMappings."+serviceinfo.serviceName | translate) !== "common.serviceNameMappings."+serviceinfo.serviceName)? ("common.serviceNameMappings."+serviceinfo.serviceName | translate).toUpperCase() : serviceinfo.serviceName}}</label>
           </div>
           <div class="mdl-cell mdl-cell--6-col services-body-cell">
             <label class="text-small-1 pull-left">{{serviceinfo.serviceVersion}}</label>

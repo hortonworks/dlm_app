@@ -84,9 +84,9 @@ export class LakeService {
     .catch(HttpUtil.handleError);
   }
 
-  getServicesInfo(lake: Lake): Observable<ServiceInfo[]> {
+  getServicesInfo(lakeId: string): Observable<ServiceInfo[]> {
     return this.http
-      .post(`${this.url}/servicesInfo`, lake, new RequestOptions(HttpUtil.getHeaders()))
+      .get(`${this.url}/${lakeId}/servicesDetails`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }
