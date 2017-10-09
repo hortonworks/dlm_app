@@ -14,12 +14,15 @@ package controllers
 import javax.inject.Inject
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{Errors, User, UserRoles}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, User, UserRoles}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.UserService
 import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import models.JsonFormats._
-import models.{Credential, JsonResponses}
+import models.RequestSyntax.ChangeUserPassword
+import models.Formatters._
+import models.JsonFormatters._
+import models.{Credential, JsonResponses, WrappedErrorsException}
 import org.mindrot.jbcrypt.BCrypt
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -28,6 +31,7 @@ import play.api.Configuration
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.Try
 
 class Authentication @Inject()(@Named("userService") val userService: UserService,
                                configuration: Configuration)
@@ -78,11 +82,35 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
     }
   }
 
+  def changePassword = AuthenticatedAction.async(parse.json) { request =>
+    request.body
+      .validate[ChangeUserPassword]
+      .map { changeUserPasswordRequest =>
+        getUserByUsername(request.user.username)
+          .map( user => {
+            checkPassword(changeUserPasswordRequest.password, user.password)
+            user.copy(password = BCrypt.hashpw(changeUserPasswordRequest.nextPassword, BCrypt.gensalt()))
+          })
+          .flatMap (user => userService.updateUser(user))
+          .map {
+            case Left(errors) => {
+              Logger.error(s"user fetch issue while changing password for '${request.user.username}': {${errors}")
+              InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            }
+            case Right(user) => Ok(Json.toJson(user))
+          }
+          .recoverWith {
+            case ex: WrappedErrorsException => Future.successful(InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(ex.errors)}")))
+          }
+      }
+      .getOrElse(Future.successful(BadRequest(JsonResponses.statusError("Cannot parse user request"))))
+  }
+
   private def getRoles(roles: Either[Errors, UserRoles]) = {
     if (roles.isRight) {
       roles.right.get.roles
     } else
-      Seq[String]()
+      Nil
   }
 
   private def getResponse(password: String,
@@ -109,5 +137,22 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
               JsonResponses.statusError(s"The user cannot be verified"))
         }
     }
+  }
+
+  private def getUserByUsername(username: String): Future[User] = {
+    userService
+      .loadUser(username)
+      .map {
+        case Left(errors) => throw WrappedErrorsException(errors)
+        case Right(user) => user
+      }
+  }
+
+  private def checkPassword(password: String, hashedPassword: String): Boolean = {
+    if(BCrypt.checkpw(password, hashedPassword) == false) {
+      val errors = Errors(Seq(Error("000", "Passwords do not match")))
+      throw WrappedErrorsException(errors)
+    }
+    return true;
   }
 }

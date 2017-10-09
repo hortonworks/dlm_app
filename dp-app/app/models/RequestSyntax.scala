@@ -17,6 +17,8 @@ import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
 object RequestSyntax {
   case class RegisterDpCluster(lake: DataplaneCluster, cluster: Cluster)
+
+  case class ChangeUserPassword(password: String, nextPassword: String)
 }
 
 object Formatters {
@@ -24,4 +26,6 @@ object Formatters {
 
   implicit val registerDpClusterWrites = Json.writes[RegisterDpCluster]
   implicit val registerDpClusterReads = Json.reads[RegisterDpCluster]
+
+  implicit val changeUserPasswordFormat = Json.format[ChangeUserPassword]
 }

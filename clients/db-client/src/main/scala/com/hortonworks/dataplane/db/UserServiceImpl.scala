@@ -63,12 +63,20 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
-  private def mapToUser(res: WSResponse) = {
+  private def mapToOneUser(res: WSResponse) = {
     res.status match {
-      case 200 => Right((res.json \ "results")(0).validate[User].get)
+      case 200 => Right((res.json \ "results").validate[User].get)
       case _ => mapErrors(res)
     }
   }
+
+  private def mapToUser(res: WSResponse) = {
+    res.status match {
+      case 200 => Right((res.json \ "results").head.validate[User].get)
+      case _ => mapErrors(res)
+    }
+  }
+
   private def mapToUsers(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").validate[Seq[User]].get)
@@ -148,7 +156,7 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
     ws.url(s"$url/users/${user.id}")
       .withHeaders("Accept" -> "application/json")
       .put(Json.toJson(user))
-      .map(mapToUser)
+      .map(mapToOneUser)
   }
 
   override def addUserWithRoles(userInfo: UserInfo): Future[Either[Errors, UserInfo]] = {
