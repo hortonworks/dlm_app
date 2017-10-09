@@ -7,8 +7,8 @@
   ~ of all or any part of the contents of this software is strictly prohibited.
   -->
 
-<dlm-cluster-card [isSelected]="isSelected" [isDisabled]="cluster.disabled">
-  <div [ngClass]="{'pointer': !cluster.disabled, 'disabled': cluster.disabled, 'frozen': isFrozen}" [tooltip]="tooltip">
+<dlm-cluster-card [isSelected]="isSelected" [isDisabled]="isDisabled">
+  <div [ngClass]="{'pointer': !isDisabled, 'disabled': isDisabled, 'frozen': isFrozen}">
     <div class="row">
       <div class="col-xs-8" [tooltip]="location">
         <div [ngClass]="{'text-muted': !isSelected, 'cluster-name': true}">{{cluster.name}}</div>

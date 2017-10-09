@@ -30,9 +30,9 @@ export class CreatePairingCardListComponent implements OnInit, OnChanges, Contro
   @Input() selectedCluster: ClusterPairing;
   @Input() isFrozen = false;
   @Output() change = new EventEmitter<ClusterPairing>();
-  disabledClusters: ClusterPairing[];
+  pairedClusters: ClusterPairing[];
+  unhealthyClusters: ClusterPairing[];
   selectedClusterId: number;
-  showDivider = false;
 
   onChange = (_: any) => {};
 
@@ -42,9 +42,11 @@ export class CreatePairingCardListComponent implements OnInit, OnChanges, Contro
 
   ngOnChanges(changes: {[propertyName: string]: SimpleChange}) {
     if (changes['clusters']) {
-      this.disabledClusters = this.clusters.filter(cluster => cluster.disabled === true);
-      this.clusters = this.clusters.filter(cluster => cluster.disabled !== true);
-      this.showDivider = (this.clusters.length > 0) && (this.disabledClusters.length > 0);
+      this.pairedClusters = this.clusters.filter(cluster => cluster.disabled === true);
+      this.unhealthyClusters = this.clusters.filter(cluster => cluster.disabled !== true &&
+      (cluster.ambariUnhealthy === true || cluster.beaconUnhealthy === true));
+      this.clusters = this.clusters.filter(cluster => cluster.disabled !== true && cluster.ambariUnhealthy !== true &&
+      cluster.beaconUnhealthy !== true);
     }
     if (changes['selectedCluster']) {
       if (this.selectedCluster) {

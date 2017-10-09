@@ -476,7 +476,6 @@
     },
     "pairings": {
       "header": "Pairings",
-      "header_note": "Note: Pairings are bi-directional",
       "create_button_text": "Add Pairing",
       "help_url": "http://docs.hortonworks.com.s3.amazonaws.com/HDPDocuments/DLM1/DLM-1.0.0/bk_data-management/content/how_pairing_works.html",
       "help_text": "How Pairing Works",
@@ -517,7 +516,11 @@
             "step_two": "STEP 2: SELECT CLUSTER TO BE PAIRED",
             "in_progress": "IN PROGRESS"
           },
-          "cluster_disabled": "This cluster is already paired with the selected cluster."
+          "cluster_disabled": "The clusters that are already paired with the selected cluster",
+          "ready_clusters": "Ready Clusters",
+          "unhealthy_clusters": "Unhealthy Clusters",
+          "unhealthy_clusters_hint": "Either Beacon or Ambari service is not reachable",
+          "paired_clusters": "Paired Clusters"
         },
         "notification": {
           "success": {
