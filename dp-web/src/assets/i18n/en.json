@@ -357,7 +357,7 @@
         "confirm_new_password": "Confirm new password",
         "submit_and_logout": "Change & Logout",
         "errors": {
-          "noMatch": "The two passwords aren't the same."
+          "noMatch": "New password does not match re-entered password."
         }
       }
     },
