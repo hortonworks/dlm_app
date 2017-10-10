@@ -31,15 +31,15 @@ main() {
         DB_USER="$DATABASE_USER"		
         DB_PASS="$DATABASE_PASS"
     fi
-
+    
     docker run \
         --network dp \
         --rm \
         --entrypoint /scripts/user-update.sh \
-        --env "PGHOST=$DB_HOST" \		
-        --env "PGPORT=$DB_PORT" \		
-        --env "PGUSER=$DB_USER" \		
-        --env "PGPASSWORD=$DB_PASS" \		
+        --env "PGHOST=$DB_HOST" \
+        --env "PGPORT=$DB_PORT" \
+        --env "PGUSER=$DB_USER" \
+        --env "PGPASSWORD=$DB_PASS" \
         --env "PGDATABASE=$DB_NAME" \
         hortonworks/dp-migrate:$VERSION "$@"
 }
