@@ -22,7 +22,7 @@ export const COLUMN_WIDTH = 100;
       <span *ngIf="showText">{{value}}</span>
     </ng-template>
   `,
-  styleUrls: ['./status-column.component.scss']
+  styleUrls: ['./policy-status-column.component.scss']
 })
 export class StatusColumnComponent implements TableColumn {
   @Input()

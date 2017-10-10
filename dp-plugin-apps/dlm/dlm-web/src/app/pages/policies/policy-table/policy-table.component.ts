@@ -22,7 +22,7 @@ import { Policy } from 'models/policy.model';
 import { Cluster } from 'models/cluster.model';
 import { ActionItemType } from 'components';
 import { TableTheme } from 'common/table/table-theme.type';
-import { StatusColumnComponent } from 'components/table-columns/status-column/status-column.component';
+import { StatusColumnComponent } from '../../../components/table-columns/policy-status-column/policy-status-column.component';
 import { PolicyInfoComponent } from './policy-info/policy-info.component';
 import { IconColumnComponent } from 'components/table-columns/icon-column/icon-column.component';
 import { TranslateService } from '@ngx-translate/core';
