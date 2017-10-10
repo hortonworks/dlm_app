@@ -298,7 +298,7 @@
           "started": "Started",
           "ended": "Ended",
           "runtime": "Runtime",
-          "transferred": "Transferred / Objects",
+          "transferred": "Transferred",
           "next_run": "Next Run",
           "action": "Action",
           "actions": "Actions",

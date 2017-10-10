@@ -26,6 +26,8 @@ import { JOB_STATUS } from 'constants/status.constant';
 import { PolicyService } from 'services/policy.service';
 import { confirmNextAction } from 'actions/confirmation.action';
 import { NOTIFICATION_TYPES, NOTIFICATION_CONTENT_TYPE } from 'constants/notification.constant';
+import { JobTrackinfoProgress } from 'models/job-tracking-info.model';
+import { UNIT_LABELS } from 'constants/job.constant';
 
 @Component({
   selector: 'dlm-jobs-overview-table',
@@ -186,5 +188,13 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
 
   isRerunDisabled(policy: Policy, action): boolean {
     return this.cannotRerun(policy, policy.lastJobResource);
+  }
+
+  getTransferredTooltip(progress: JobTrackinfoProgress): string {
+    let tooltip = '';
+    if (progress.filesCopied) {
+      tooltip = `${UNIT_LABELS[progress.unit]}: ${progress.filesCopied}`;
+    }
+    return tooltip;
   }
 }
