@@ -150,7 +150,7 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
 
   private def checkPassword(password: String, hashedPassword: String): Boolean = {
     if(BCrypt.checkpw(password, hashedPassword) == false) {
-      val errors = Errors(Seq(Error("000", "Password is incorrect.")))
+      val errors = Errors(Seq(Error("418", "Current password is incorrect.")))
       throw WrappedErrorsException(errors)
     }
     return true;
