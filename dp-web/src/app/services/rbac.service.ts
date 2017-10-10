@@ -69,7 +69,7 @@ export class RbacService {//role based access control
     personaMap.set('INFRAADMIN', [
       new Persona('Infra Admin', [
         new PersonaTabs('Clusters', 'infra', 'fa-sitemap')
-      ], [], '', 'infra-logo.png'),
+      ], ['/onboard'], '', 'infra-logo.png'),
       new Persona('Data Lifecycle Manager', [], [], '/dlm', 'dlm-logo.png', !!this.user && this.user.services.indexOf('dlm') > -1)]);
     personaMap.set('INFRAADMIN_SUPERADMIN', [
       new Persona('Data Lifecycle Manager', [], [], '/dlm', 'dlm-logo.png', !!this.user && this.user.services.indexOf('dlm') > -1)
