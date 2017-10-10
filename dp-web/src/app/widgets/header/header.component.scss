@@ -173,6 +173,9 @@
     padding: 15px 15px 7px;
     line-height: 1;
     text-align: right;
+
+    display: flex;
+    justify-content: space-between;
   }
   .mdl-button {
     height: 32px;
