@@ -95,12 +95,12 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
           .map {
             case Left(errors) => {
               Logger.error(s"user fetch issue while changing password for '${request.user.username}': {${errors}")
-              InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              InternalServerError(Json.toJson(errors))
             }
             case Right(user) => Ok(Json.toJson(user))
           }
           .recoverWith {
-            case ex: WrappedErrorsException => Future.successful(InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(ex.errors)}")))
+            case ex: WrappedErrorsException => Future.successful(InternalServerError(Json.toJson(ex.errors)))
           }
       }
       .getOrElse(Future.successful(BadRequest(JsonResponses.statusError("Cannot parse user request"))))
@@ -150,7 +150,7 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
 
   private def checkPassword(password: String, hashedPassword: String): Boolean = {
     if(BCrypt.checkpw(password, hashedPassword) == false) {
-      val errors = Errors(Seq(Error("000", "Passwords do not match")))
+      val errors = Errors(Seq(Error("000", "Password is incorrect.")))
       throw WrappedErrorsException(errors)
     }
     return true;

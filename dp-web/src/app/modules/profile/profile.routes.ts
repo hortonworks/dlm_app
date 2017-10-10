@@ -14,10 +14,13 @@ import {Routes} from '@angular/router';
 import {ChangePasswordComponent} from './views/change-password/change-password.component';
 
 export const routes: Routes = [{
-    path: 'change-password',
-    pathMatch: 'full',
-    component: ChangePasswordComponent,
-    data: {
-      crumb: 'profile.password_change'
-    }
+  path: '',
+  pathMatch: 'full',
+  redirectTo: 'change-password'
+}, {
+  path: 'change-password',
+  component: ChangePasswordComponent,
+  data: {
+    crumb: 'profile.password_change'
+  }
 }];
