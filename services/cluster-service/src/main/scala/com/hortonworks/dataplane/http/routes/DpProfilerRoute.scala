@@ -139,6 +139,8 @@ class DpProfilerRoute @Inject()(
             case Success(res) => res.status match {
               case 200 => complete(success(res.json))
               case 404 => complete(StatusCodes.NotFound, notFound)
+              case 503 => complete(StatusCodes.ServiceUnavailable, serverError)
+              case _ => complete(StatusCodes.InternalServerError, serverError)
             }
             case Failure(th) => th match {
               case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))
@@ -157,6 +159,8 @@ class DpProfilerRoute @Inject()(
             case Success(res) => res.status match {
               case 200 => complete(success(res.json))
               case 404 => complete(StatusCodes.NotFound, notFound)
+              case 503 => complete(StatusCodes.ServiceUnavailable, serverError)
+              case _ => complete(StatusCodes.InternalServerError, serverError)
             }
             case Failure(th) => th match {
               case th: ServiceNotFound => complete(StatusCodes.MethodNotAllowed, errors(th))

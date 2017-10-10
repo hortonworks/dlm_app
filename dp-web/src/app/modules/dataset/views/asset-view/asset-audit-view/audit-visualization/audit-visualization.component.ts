@@ -111,35 +111,64 @@ export class AuditVisualizationComponent implements OnInit, AfterViewInit {
   }
 
   barChartLoading:boolean = false;
+  barChartLoading503:boolean = false;
   paiChartLoading:boolean = false;
+  paiChartLoading503:boolean = false;
   onParamChange() {
+    this.reloadBarChart();
+    this.reloadPiChart();
+  }
+
+  reloadBarChart () {
     this.barChartLoading = true;
-    this.paiChartLoading = true;
+    this.barChartLoading503 = false;
     let results={"allowed":[], "denied":[]}
     this.bar_data.forEach(obj=>obj.values=results[obj.id]);
-    this.assetService.getProfilerAuditResults(this.clusterId, this.dbName, this.assetName, this.userName, this.dateModel).subscribe (res=> {
-      this.barChartLoading = false;
-      res.data.forEach(itm => {
-        itm.result && results.allowed.push({"x":itm.date, "y":itm.result["1"]||0});
-        itm.result && results.denied.push({"x":itm.date, "y":itm.result["0"]||0});
-
-      });
-      this.createStackedBarChart(this.bar_data);
-    });
-    this.assetService.getProfilerAuditActions(this.clusterId, this.dbName, this.assetName, this.userName, this.dateModel).subscribe (res=> {
-      this.paiChartLoading = false;
-      var data={}, donutData=[];
-      res.data.forEach(itm => {
-        for(var acn in itm.action) {
-          if(!data[acn]) data[acn] = 0;
-          data[acn] += itm.action[acn];
+    this.assetService.getProfilerAuditResults(this.clusterId, this.dbName, this.assetName, this.userName, this.dateModel).subscribe (
+      res=> {
+        this.barChartLoading = false;
+        res.data.forEach(itm => {
+          itm.result && results.allowed.push({"x":itm.date, "y":itm.result["1"]||0});
+          itm.result && results.denied.push({"x":itm.date, "y":itm.result["0"]||0});
+          
+        });
+        this.createStackedBarChart(this.bar_data);
+      },
+      err => {
+        if(err.status === 503) {
+          this.barChartLoading = false;
+          this.barChartLoading503 = true;
+          setTimeout(() => this.reloadBarChart(), 10000);
         }
-      })
-      for (var key in data) {
-        donutData.push({"label":key, "value":data[key]});
       }
-      this.createDonutChart(donutData);
-    });
+    );
+  }
+  reloadPiChart () {
+    this.paiChartLoading = true;
+    this.paiChartLoading503 = false;
+    this.assetService.getProfilerAuditActions(this.clusterId, this.dbName, this.assetName, this.userName, this.dateModel).subscribe (
+      res=> {
+        this.paiChartLoading = false;
+        var data={}, donutData=[];
+        res.data.forEach(itm => {
+          for(var acn in itm.action) {
+            if(!data[acn]) data[acn] = 0;
+            data[acn] += itm.action[acn];
+          }
+        })
+        for (var key in data) {
+          donutData.push({"label":key, "value":data[key]});
+        }
+        this.createDonutChart(donutData);
+      },
+      err => {
+        if(err.status === 503) {
+          this.paiChartLoading = false;
+          this.paiChartLoading503 = true;
+          setTimeout(() => this.reloadPiChart(), 10000);
+        }
+      }
+    );    
   }
 
   createStackedBarChart(chartData) {

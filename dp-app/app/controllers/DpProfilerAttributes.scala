@@ -111,6 +111,7 @@ class DpProfilerAttributes @Inject()(
             errors.errors.head.code match {
               case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
               case "405" => MethodNotAllowed(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case "503" => ServiceUnavailable(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
               case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
             }
           }
@@ -132,6 +133,7 @@ class DpProfilerAttributes @Inject()(
             errors.errors.head.code match {
               case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
               case "405" => MethodNotAllowed(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case "503" => ServiceUnavailable(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
               case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
             }
           }

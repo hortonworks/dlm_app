@@ -35,4 +35,6 @@ trait BaseRoute {
 
   def badRequest = Json.obj("error" -> Json.obj("message" -> "BadRequest", "trace" -> ""))
 
+  def serverError = Json.obj("error" -> Json.obj("message" -> "ServerError", "trace" -> ""))
+
 }
