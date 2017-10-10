@@ -15,7 +15,7 @@
     <input type="radio" [value]="cluster.id" [checked]="cluster.id === selectedClusterId">
     <dlm-create-pairing-card [cluster]="cluster" [isSelected]="cluster.id === selectedClusterId" [isFrozen]="isFrozen" (click)="selectCluster(cluster)"></dlm-create-pairing-card>
   </div>
-  <div *ngIf="unhealthyClusters?.length > 0">
+  <div *ngIf="unhealthyClusters?.length > 0" class="category-title">
     <i class="fa fa-exclamation-triangle text-danger"></i>
     <span class="sub-title">
       {{"page.pairings.create.content.unhealthy_clusters" | translate}}
@@ -25,7 +25,7 @@
       <dlm-create-pairing-card [cluster]="cluster"></dlm-create-pairing-card>
     </div>
   </div>
-  <div *ngIf="pairedClusters?.length > 0">
+  <div *ngIf="pairedClusters?.length > 0" class="category-title">
     <span class="sub-title">
       {{"page.pairings.create.content.paired_clusters" | translate}}
       <dlm-help-link [iconHint]="'page.pairings.create.content.cluster_disabled'"></dlm-help-link>
