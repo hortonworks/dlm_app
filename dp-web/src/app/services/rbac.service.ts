@@ -65,7 +65,7 @@ export class RbacService {//role based access control
         // new PersonaTabs('Unclassified', 'unclassified', 'fa-cube'),
         // new PersonaTabs('Assets', 'assets', 'fa-server'),
         // new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')
-      ], ['/onboard', '/assets'], '', 'steward-logo.png', !!this.user && this.user.services.indexOf('dss') > -1)]);
+      ], ['/assets'], '', 'steward-logo.png', !!this.user && this.user.services.indexOf('dss') > -1)]);
     personaMap.set('INFRAADMIN', [
       new Persona('Infra Admin', [
         new PersonaTabs('Clusters', 'infra', 'fa-sitemap')
@@ -101,11 +101,7 @@ export class RbacService {//role based access control
           }
         });
       } else if (this.hasRole('INFRAADMIN')) {
-        if (isLakeInitialized) {
-          return this.getLandingInternal(observer, 'INFRAADMIN');
-        } else {
-          return this.getLandingInternal(observer, 'INFRAADMIN_ONBOARD');
-        }
+        return this.getLandingInternal(observer, 'INFRAADMIN');
       } else if (this.hasRole('CURATOR')) {
         return this.getLandingInternal(observer, 'CURATOR');
       }
