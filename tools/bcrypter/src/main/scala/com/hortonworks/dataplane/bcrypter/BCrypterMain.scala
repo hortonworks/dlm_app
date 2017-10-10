@@ -17,8 +17,6 @@ import com.typesafe.scalalogging.LazyLogging
 object BCrypterMain extends LazyLogging {
 
   def main(args: Array[String]): Unit = {
-    logger.info("main started")
-
     args.toList.length match {
       case 0 => {
         logger.error("invalid usage")
