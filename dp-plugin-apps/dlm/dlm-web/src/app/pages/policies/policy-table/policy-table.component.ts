@@ -53,6 +53,7 @@ import { EntityType } from 'constants/log.constant';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { NOTIFICATION_TYPES, NOTIFICATION_CONTENT_TYPE } from 'constants/notification.constant';
 import { confirmNextAction } from 'actions/confirmation.action';
+import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
 
 const DATABASE_REQUEST = '[Policy Table] DATABASE_REQUEST';
 
@@ -94,6 +95,10 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   jobsOverallCount: number;
   jobsPolicyId: string;
   loadingJobs = false;
+  tableFooterOptions = {
+    showFilterSummary: true,
+    pagerDropup: true
+  } as TableFooterOptions;
 
   @ViewChild(IconColumnComponent) iconColumn: IconColumnComponent;
   @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;

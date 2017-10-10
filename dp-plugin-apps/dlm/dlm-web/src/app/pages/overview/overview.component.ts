@@ -44,6 +44,7 @@ import { getCountPairsForClusters } from 'selectors/pairing.selector';
 import { loadPairings } from 'actions/pairing.action';
 import { AddEntityButtonComponent } from 'components/add-entity-button/add-entity-button.component';
 import { TranslateService } from '@ngx-translate/core';
+import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
 
 const POLICIES_REQUEST = 'POLICIES_REQUEST';
 const CLUSTERS_REQUEST = 'CLUSTERS_REQUEST';
@@ -65,6 +66,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
   isWarningClustersModalVisible = false;
   isUnhealthyPoliciesModalVisible = false;
 
+  jobsTableFooterOptions = {
+    showFilterSummary: true
+  } as TableFooterOptions;
   addingPairsAvailable = AddEntityButtonComponent.addingPairingsAvailable;
   addingPoliciesAvailable = AddEntityButtonComponent.addingPoliciesAvailable;
 

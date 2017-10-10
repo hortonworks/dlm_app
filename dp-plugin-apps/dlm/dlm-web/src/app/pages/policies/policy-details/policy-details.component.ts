@@ -16,6 +16,7 @@ import { HiveDatabase } from 'models/hive-database.model';
 import { JOB_STATUS } from 'constants/status.constant';
 import { ProgressState } from 'models/progress-state.model';
 import { TranslateService } from '@ngx-translate/core';
+import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
 
 
 @Component({
@@ -26,6 +27,9 @@ import { TranslateService } from '@ngx-translate/core';
 export class PolicyDetailsComponent {
 
   policyContent = PolicyContent;
+  jobsTableFooterOptions = {
+    showPageSizeMenu: false
+  } as TableFooterOptions;
 
   @Output() onSortJobs = new EventEmitter<any>();
   @Output() onPageChangeJobs = new EventEmitter<any>();

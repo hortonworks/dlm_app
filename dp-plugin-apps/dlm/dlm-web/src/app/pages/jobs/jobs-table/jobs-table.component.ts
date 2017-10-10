@@ -20,6 +20,7 @@ import { LogService } from 'services/log.service';
 import { EntityType } from 'constants/log.constant';
 import { contains } from 'utils/array-util';
 import { transferredBytesComparator } from 'utils/table-util';
+import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
 
 @Component({
   selector: 'dp-jobs-table',
@@ -47,11 +48,11 @@ export class JobsTableComponent implements OnInit {
   @Input() jobsOffset: number;
   @Input() loadingJobs;
   @Input() policy: Policy;
-  @Input() showPageSizeMenu = true;
   @Input() selectionType = 'any';
   @Input() sorts = [];
   @Input() page = 0;
   @Input() visibleActionMap = {};
+  @Input() footerOptions: TableFooterOptions;
 
   @Output() onSort = new EventEmitter<any>();
   @Output() onPageChange = new EventEmitter<any>();
