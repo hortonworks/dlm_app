@@ -39,7 +39,9 @@ public class UserService {
   public Optional<UserContext> getUserContext(String userName) {
     try {
       UserList list=userServiceInterface.getUserContext(userName);
-      return Optional.of(list.getResults());
+      UserContext uc = list.getResults();
+      uc.setDbManaged(true);
+      return Optional.of(uc);
     }catch (FeignException fe){
       if (fe.status()==404){
         return Optional.absent();
@@ -52,7 +54,9 @@ public class UserService {
 
   public UserContext syncUserFromLdapGroupsConfiguration(String subject) {
     try {
-      return ldapUserInterface.addUserFromLdapGroupsConfiguration(subject);
+      UserContext uc = ldapUserInterface.addUserFromLdapGroupsConfiguration(subject);
+      uc.setDbManaged(false);
+      return uc;
     }catch (FeignException fe){
       if (fe.status()==403){
         throw new NoAllowedGroupsException();//Usaually groups are not configured for this user.
@@ -63,7 +67,9 @@ public class UserService {
   }
   public UserContext resyncUserFromLdapGroupsConfiguration(String subject) {
     try {
-      return ldapUserInterface.resyncUserFromLdapGroupsConfiguration(subject);
+      UserContext uc = ldapUserInterface.resyncUserFromLdapGroupsConfiguration(subject);
+      uc.setDbManaged(false);
+      return uc;
     }catch (FeignException fe){
       if (fe.status()==403){
         throw new NoAllowedGroupsException();//Usaually groups are not configured for this user.

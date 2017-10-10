@@ -36,7 +36,7 @@ export class AddUserComponent implements OnInit, AfterViewInit {
 
   allRoles: TaggingWidgetTagModel[] = [];
 
-  user: User = new User('', '', '', '', [], false, '');
+  user: User = new User('', '', '', '', [], false, false, '');
   userRoles: TaggingWidgetTagModel[] = [];
 
   errorMessages: string[] = [];

@@ -29,7 +29,7 @@
           <div class="hwx-title" id="user-name">{{user?.display}}</div>
         </div>
         <div class="footer">
-          <a id="logout-btn" [routerLink]="['/profile/change-password']">
+          <a id="logout-btn" [routerLink]="['/profile/change-password']" *ngIf="user?.dbManaged">
             <button class="mdl-button btn-hwx-secondary">Change password</button>
           </a>
           <span>&nbsp;</span>
