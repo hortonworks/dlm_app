@@ -40,7 +40,7 @@ public class UserService {
     try {
       UserList list=userServiceInterface.getUserContext(userName);
       UserContext uc = list.getResults();
-      uc.setDbManaged(true);
+      uc.setDbManaged(false);
       return Optional.of(uc);
     }catch (FeignException fe){
       if (fe.status()==404){
