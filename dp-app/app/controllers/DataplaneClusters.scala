@@ -28,6 +28,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 
+import scala.util.Try
+
 class DataplaneClusters @Inject()(
     @Named("dpClusterService") val dpClusterService: DpClusterService,
     ambariService: AmbariService)
@@ -76,18 +78,22 @@ class DataplaneClusters @Inject()(
 
   }
 
-  def retrieve(clusterId: Long) = Action.async {
+  def retrieve(clusterId: String) = Action.async {
     Logger.info("Received retrieve data centre request")
-    dpClusterService
-      .retrieve(clusterId.toString)
-      .map {
-        case Left(errors) =>
-          errors.firstMessage match {
-            case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-            case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-          }
-        case Right(dataplaneCluster) => Ok(Json.toJson(dataplaneCluster))
-      }
+    if(Try(clusterId.toLong).isFailure){
+      Future.successful(NotFound)
+    }else{
+      dpClusterService
+        .retrieve(clusterId.toString)
+        .map {
+          case Left(errors) =>
+            errors.firstMessage match {
+              case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            }
+          case Right(dataplaneCluster) => Ok(Json.toJson(dataplaneCluster))
+        }
+    }
   }
 
   def retrieveServices(clusterId: String) = Action.async {

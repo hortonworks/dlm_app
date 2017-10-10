@@ -36,7 +36,7 @@ import play.api.mvc.{Action, Controller}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 class DataSets @Inject()(
     @Named("dataSetService") val dataSetService: DataSetService,
@@ -193,19 +193,23 @@ class DataSets @Inject()(
     }
   }
 
-  def getRichDatasetById(id: Long) =  Action.async {
+  def getRichDatasetById(id: String) =  Action.async {
     Logger.info("Received retrieve dataSet request")
-    dataSetService
-      .getRichDatasetById(id)
-      .map {
-        case Left(errors)
+    if(Try(id.toLong).isFailure){
+      Future.successful(NotFound)
+    }else{
+      dataSetService
+        .getRichDatasetById(id.toLong)
+        .map {
+          case Left(errors)
             if errors.errors.size > 0 && errors.errors.head.code == "404" =>
-          NotFound
-        case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-        case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
-      }
+            NotFound
+          case Left(errors) =>
+            InternalServerError(
+              JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
+        }
+    }
   }
 
   def getDataAssetsByDatasetId(id: Long,
