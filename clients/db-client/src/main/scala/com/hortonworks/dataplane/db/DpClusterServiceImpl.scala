@@ -85,11 +85,11 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
   override def delete(
-                       dpClusterId: String): Future[Either[Errors, DataplaneCluster]] = {
+                       dpClusterId: String): Future[Either[Errors, Boolean]] = {
     ws.url(s"$url/dp/clusters/$dpClusterId")
       .withHeaders("Accept" -> "application/json")
       .delete()
-      .map(mapToDpCluster)
+      .map(mapStatus)
   }
 
   private def mapToDpClusters(res: WSResponse) = {

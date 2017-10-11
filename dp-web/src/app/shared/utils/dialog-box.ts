@@ -70,4 +70,22 @@ export class DialogBox {
 
     return eventEmitter;
   }
+
+  public static showErrorMessage(message: string, dialogType = DialogType.Error): EventEmitter<boolean> {
+    message = message.replace(/\n/g, '<br>');
+    let eventEmitter = new EventEmitter<boolean>();
+    let element = DialogBox.createDialogBox(message, dialogType);
+    try {
+      let dialog: any = document.querySelector('#dialog');
+      dialog.showModal();
+
+      dialog.querySelector('.btn-hwx-primary').addEventListener('click', function (e) {
+        eventEmitter.emit(true);
+        dialog.close();
+        dialog.parentElement.removeChild(dialog);
+      });
+    } catch (e) {}
+
+    return eventEmitter;
+  }
 }

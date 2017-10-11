@@ -111,7 +111,7 @@ class DpClusters @Inject()(dpClusterRepo: DpClusterRepo)(
 
   def delete(dpClusterId: Long) = Action.async { req =>
     val future = dpClusterRepo.deleteCluster(dpClusterId)
-    future.map(i => NoContent).recoverWith(apiError)
+    future.map(i => success(true)).recoverWith(apiError)
   }
 
   def update = Action.async(parse.json) { req =>
