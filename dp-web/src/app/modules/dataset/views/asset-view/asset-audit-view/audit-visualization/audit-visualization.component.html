@@ -38,20 +38,24 @@
     <div class="chart-title">
       Allowed VS Unauthorised Access
     </div>
-    <div #stackedbarchart class="chart" id="allowedVsUnauthorisedAccess"  *ngIf="!barChartLoading && !noDate">
+    <div #stackedbarchart class="chart" id="allowedVsUnauthorisedAccess"  *ngIf="!barChartLoading && !noDate && !barChartLoading503 && !noBarData">
       <svg></svg>
     </div>
     <div *ngIf="barChartLoading" class="loadingDiv">Loading...</div>
+    <div *ngIf="barChartLoading503" class="loadingDiv">Service is temporarily unavailable, will retry in a 10 seconds...</div>
     <div *ngIf="noDate" class="loadingDiv">Select Date Range.</div>
+    <div *ngIf="noBarData" class="loadingDiv">Data not available.</div>
   </div>
   <div class="flex-25 spacer-t-10">
     <div class="chart-title">
       Access Type
     </div>
-    <div #donutchart class="chart" id="selectVsUpdate" *ngIf="!paiChartLoading && !noDate">
+    <div #donutchart class="chart" id="selectVsUpdate" *ngIf="!paiChartLoading && !noDate && !paiChartLoading503 && !noPaiData">
       <svg></svg>
     </div>
     <div *ngIf="paiChartLoading" class="loadingDiv">Loading...</div>
+    <div *ngIf="paiChartLoading503" class="loadingDiv">Service is temporarily unavailable, will retry in a 10 seconds...</div>
     <div *ngIf="noDate" class="loadingDiv">Select Date Range.</div>
+    <div *ngIf="noPaiData" class="loadingDiv">Data not available.</div>
   </div>
 </div>

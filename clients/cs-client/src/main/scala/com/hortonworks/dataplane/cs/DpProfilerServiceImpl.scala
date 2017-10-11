@@ -35,6 +35,9 @@ class DpProfilerServiceImpl (config: Config)(implicit ws: ClusterWsClient) exten
       case 405 => Left(
         Errors(Seq(
           Error("405", (res.json \ "errors" \\ "code").head.toString()))))
+      case 503 => Left(
+        Errors(Seq(
+          Error("503", (res.json \ "error" \ "message").toString()))))
       case _ => mapErrors(res)
     }
   }
