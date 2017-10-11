@@ -17,6 +17,7 @@ RUN apt-get update && \
     wget http://s3.amazonaws.com/dev.hortonworks.com/HDP/ubuntu16/2.x/BUILDS/${HDP_VERSION}/hdpbn.list -P /etc/apt/sources.list.d/ && \
     apt-get update && \
     apt-get install -y knox && \
+    apt-get remove --purge --yes gnupg && \
     apt-get clean all
 
 ENV KNOX_SSO_CONFIG_PATH=/usr/hdp/current/knox-server/conf/topologies/knoxsso.xml
