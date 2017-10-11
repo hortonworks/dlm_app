@@ -114,6 +114,8 @@ export class AuditVisualizationComponent implements OnInit, AfterViewInit {
   barChartLoading503:boolean = false;
   paiChartLoading:boolean = false;
   paiChartLoading503:boolean = false;
+  noPaiData = false;
+  noBarData = false;
   onParamChange() {
     this.reloadBarChart();
     this.reloadPiChart();
@@ -122,6 +124,7 @@ export class AuditVisualizationComponent implements OnInit, AfterViewInit {
   reloadBarChart () {
     this.barChartLoading = true;
     this.barChartLoading503 = false;
+    this.noBarData = false;
     let results={"allowed":[], "denied":[]}
     this.bar_data.forEach(obj=>obj.values=results[obj.id]);
     this.assetService.getProfilerAuditResults(this.clusterId, this.dbName, this.assetName, this.userName, this.dateModel).subscribe (
@@ -140,12 +143,17 @@ export class AuditVisualizationComponent implements OnInit, AfterViewInit {
           this.barChartLoading503 = true;
           setTimeout(() => this.reloadBarChart(), 10000);
         }
+        if(err.status === 500) {
+          this.barChartLoading = false;
+          this.noBarData = true;
+        }
       }
     );
   }
   reloadPiChart () {
     this.paiChartLoading = true;
     this.paiChartLoading503 = false;
+    this.noPaiData = false;
     this.assetService.getProfilerAuditActions(this.clusterId, this.dbName, this.assetName, this.userName, this.dateModel).subscribe (
       res=> {
         this.paiChartLoading = false;
@@ -166,6 +174,10 @@ export class AuditVisualizationComponent implements OnInit, AfterViewInit {
           this.paiChartLoading = false;
           this.paiChartLoading503 = true;
           setTimeout(() => this.reloadPiChart(), 10000);
+        }
+        if(err.status === 500) {
+          this.paiChartLoading = false;
+          this.noPaiData = true;
         }
       }
     );    
