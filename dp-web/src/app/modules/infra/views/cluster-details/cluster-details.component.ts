@@ -65,6 +65,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   clusterHealthInProgress = false;
   showError: boolean = false;
   errorMessage: string;
+  serviceLoadError: boolean = false;
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -75,6 +76,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   fetchClusterDetails(lakeId) {
     Loader.show();
     this.showError = false;
+    this.serviceLoadError = false;
     this.lakeService.retrieve(lakeId).subscribe((lake: Lake) => {
       this.lake = lake;
       this.populateGeneralProperties();
@@ -115,9 +117,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       this.clusterService.syncCluster(this.lake.id).subscribe(res => {
         Loader.show();
         let count = 0;
-        this.lakeService.getServicesInfo(this.lake.id.toString()).subscribe(res =>{
-          this.servicesInfo = res;
-        });
+        this.getServicesInfo(this.lake.id);
         this.lakeService.retrieve(this.lake.id.toString())
           .delay(2000)
           .repeat(15)
@@ -146,6 +146,16 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
 
   closeError() {
     this.showError = false;
+  }
+
+  private getServicesInfo(lakeId){
+    this.serviceLoadError = false;
+    this.lakeService.getServicesInfo(lakeId.toString()).subscribe(res =>{
+      this.servicesInfo = res;
+    }, error => {
+      this.serviceLoadError = true;
+      this.onError(error);
+    });
   }
 
   private getDataNodeHealth(clusterId) {
