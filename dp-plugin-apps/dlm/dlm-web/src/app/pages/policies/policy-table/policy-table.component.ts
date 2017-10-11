@@ -22,7 +22,7 @@ import { Policy } from 'models/policy.model';
 import { Cluster } from 'models/cluster.model';
 import { ActionItemType } from 'components';
 import { TableTheme } from 'common/table/table-theme.type';
-import { StatusColumnComponent } from 'components/table-columns/status-column/status-column.component';
+import { StatusColumnComponent } from '../../../components/table-columns/policy-status-column/policy-status-column.component';
 import { PolicyInfoComponent } from './policy-info/policy-info.component';
 import { IconColumnComponent } from 'components/table-columns/icon-column/icon-column.component';
 import { TranslateService } from '@ngx-translate/core';
@@ -53,6 +53,7 @@ import { EntityType } from 'constants/log.constant';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { NOTIFICATION_TYPES, NOTIFICATION_CONTENT_TYPE } from 'constants/notification.constant';
 import { confirmNextAction } from 'actions/confirmation.action';
+import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
 
 const DATABASE_REQUEST = '[Policy Table] DATABASE_REQUEST';
 
@@ -94,6 +95,10 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   jobsOverallCount: number;
   jobsPolicyId: string;
   loadingJobs = false;
+  tableFooterOptions = {
+    showFilterSummary: true,
+    pagerDropup: true
+  } as TableFooterOptions;
 
   @ViewChild(IconColumnComponent) iconColumn: IconColumnComponent;
   @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;

@@ -26,12 +26,12 @@ import { PairingsComponent } from '../../pairings.component';
 import { NotificationService } from 'services/notification.service';
 import { ModalDialogComponent } from 'common/modal-dialog/modal-dialog.component';
 import { NOTIFICATION_TYPES } from 'constants/notification.constant';
-import { ToastNotification } from 'models/toast-notification.model';
 import { PROGRESS_STATUS } from 'constants/status.constant';
 import { ProgressState } from 'models/progress-state.model';
 import { getMergedProgress } from 'selectors/progress.selector';
-import { confirmNextAction } from 'actions/confirmation.action';
-import { ConfirmationOptions, confirmationOptionsDefaults } from 'components/confirmation-modal';
+import { SERVICES } from 'constants/cluster.constant';
+import { SERVICE_STATUS } from 'constants/status.constant';
+import { CLUSTER_STATUS } from 'constants/status.constant';
 
 const PAIR_REQUEST = '[CREATE PAIR] PAIR_REQUEST';
 const CLUSTERS_REQUEST = '[CREATE PAIR] CLUSTERS_REQUEST';
@@ -47,7 +47,7 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
   pairings$: Observable<Pairing[]>;
   progress$: Observable<Progress>;
   overallProgress$: Observable<ProgressState>;
-  private firstSetClusters: ClusterPairing[];
+  firstSetClusters: ClusterPairing[];
   private secondSetClusters: ClusterPairing[];
   private pairings: Pairing[];
   private firstSetClustersPromise;
@@ -101,7 +101,7 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
     });
     this.firstSetClustersPromise = new Promise( (resolve, reject) => {
       this.firstSetClustersSubscription$ = this.firstSetClusters$.subscribe(clusters => {
-        this.firstSetClusters = clusters;
+        this.firstSetClusters = this.setUnhealthyStatus(clusters);
         if (clusters.length) {
           resolve(clusters);
         }
@@ -180,7 +180,21 @@ export class CreatePairingComponent implements OnInit, OnDestroy {
       this.secondSetClusters.forEach(clust => {
         clust.disabled = clusterPairIds.indexOf(clust.id) > -1;
       });
+      this.secondSetClusters = this.setUnhealthyStatus(this.secondSetClusters);
     }
+  }
+
+  /**
+   * Set beaconUnhealthy and ambariUnhealthy value on each cluster in the clusters array passed
+   * @param clusters
+   */
+  setUnhealthyStatus(clusters: ClusterPairing[]): ClusterPairing[] {
+    clusters.forEach(clust => {
+      const beaconStatus = clust.status.filter(status => status.service_name === SERVICES.BEACON);
+      clust.beaconUnhealthy = (beaconStatus.length > 0) ? beaconStatus[0].state !== SERVICE_STATUS.STARTED : false;
+      clust.ambariUnhealthy = clust.healthStatus === CLUSTER_STATUS.UNKNOWN;
+    });
+    return clusters;
   }
 
   /**

@@ -43,16 +43,16 @@ object Knox {
   }
 
   case class TokenResponse(accessToken: String,
-                           targetUrl: String,
-                           tokenType: String,
+                           targetUrl: Option[String],
+                           tokenType: Option[String],
                            expires: Long)
 
   object TokenResponse {
 
     implicit val tokenResponseReads: Reads[TokenResponse] = (
       (JsPath \ "access_token").read[String] and
-        (JsPath \ "target_url").read[String] and
-        (JsPath \ "token_type").read[String] and
+        (JsPath \ "target_url").readNullable[String] and
+        (JsPath \ "token_type").readNullable[String] and
         (JsPath \ "expires_in").read[Long]
     )(TokenResponse.apply _)
 

@@ -32,6 +32,7 @@ import { ColumnMode, DatatableComponent, DatatableRowDetailDirective } from '@sw
 import { CheckboxColumnComponent } from 'components/table-columns/checkbox-column/checkbox-column.component';
 import { ActionColumnType, ActionItemType, ActionColumnComponent } from 'components/';
 import { TableTheme, TableThemeSettings } from './table-theme.type';
+import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
 
 export const SELECTED_KEY_NAME = '__selected';
 
@@ -50,6 +51,12 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   private navbarCollapse$: Observable<boolean>;
   private navbarCollapseSubscription: Subscription;
   private currentComponentWidth;
+  private footerOptsDefault = {
+    showPageSizeMenu: true,
+    showFilterSummary: false,
+    pagerDropup: false
+  } as TableFooterOptions;
+  private footerOpts: TableFooterOptions = this.footerOptsDefault;
 
   /**
    * Map for expanded rows
@@ -100,6 +107,18 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   };
   @Input() sorts = [];
   @Input() offset = 0;
+  @Input('footerOptions')
+
+  set footerOptions(options: TableFooterOptions) {
+    this.footerOpts = {
+      ...this.footerOptsDefault,
+      ...options
+    };
+  }
+
+  get footerOptions(): TableFooterOptions {
+    return this.footerOpts;
+  }
 
   // hacky but seems like there is no other easy solution to set template for Row Detail
   @Input() set rowDetailTemplate(template: TemplateRef<any>) {

@@ -1,4 +1,4 @@
-/*!
+/*
  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
  *
  * Except as expressly permitted in a written agreement between you or your company
@@ -7,17 +7,8 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-.divider {
-  hr {
-    border-top: 1px solid #9c9c9c;
-  }
-}
-
-.sub-title {
-  color: #666;
-  font-size: 13px;
-}
-
-.category-title {
-  padding-top: 10px;
+export interface TableFooterOptions {
+  showPageSizeMenu?: boolean;
+  showFilterSummary?: boolean;
+  pageSizeDropup?: boolean;
 }

@@ -22,7 +22,7 @@ import { CardComponent } from './card/card.component';
 import { SearchInputComponent } from './search-input/search-input.component';
 import { DropdownComponent } from './dropdown/dropdown.component';
 import { ClusterCardComponent } from './cluster-card/cluster-card.component';
-import { StatusColumnComponent } from './table-columns/status-column/status-column.component';
+import { StatusColumnComponent } from './table-columns/policy-status-column/policy-status-column.component';
 import { IconColumnComponent } from './table-columns/icon-column/icon-column.component';
 import { DoughnutChartComponent } from './doughnut-chart/doughnut-chart.component';
 import { FormFieldComponent } from './forms/form-field/form-field.component';

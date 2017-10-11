@@ -26,7 +26,7 @@ POST          /api/identity/actions/change-password                  controllers
 GET           /api/init                                              controllers.Config.init
 GET           /api/lakes                                             controllers.DataplaneClusters.list
 POST          /api/lakes                                             controllers.DataplaneClusters.create
-GET           /api/lakes/:lakeId                                     controllers.DataplaneClusters.retrieve(lakeId: Long)
+GET           /api/lakes/:lakeId                                     controllers.DataplaneClusters.retrieve(lakeId: String)
 GET           /api/lakes/:lakeId/services                            controllers.DataplaneClusters.retrieveServices(lakeId)
 DELETE        /api/lakes/:lakeId                                     controllers.DataplaneClusters.delete(lakeId)
 PUT           /api/lakes                                             controllers.DataplaneClusters.update
@@ -62,7 +62,7 @@ PUT           /api/datasets                                          controllers
 POST          /api/atlas-dataset                                     controllers.DataSets.createDatasetWithAtlasSearch
 GET           /api/dataset/list                                      controllers.DataSets.getRichDataset
 GET           /api/dataset/list/tag/:tagName                         controllers.DataSets.getRichDatasetByTag(tagName : String)
-GET           /api/dataset/:id                                       controllers.DataSets.getRichDatasetById(id : Long)
+GET           /api/dataset/:id                                       controllers.DataSets.getRichDatasetById(id : String)
 
 #Dataasset
 GET           /api/dataset/:id/assets                                controllers.DataSets.getDataAssetsByDatasetId(id:Long, queryName: String, offset: Long, limit: Long)

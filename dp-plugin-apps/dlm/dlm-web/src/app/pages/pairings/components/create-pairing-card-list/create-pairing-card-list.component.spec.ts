@@ -8,11 +8,14 @@
  */
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { MockTranslateLoader } from 'mocks/mock-translate-loader';
 import { ClusterCardComponent } from 'components/cluster-card/cluster-card.component';
 import { CreatePairingCardComponent } from '../create-pairing-card/create-pairing-card.component';
 import { CreatePairingCardListComponent } from './create-pairing-card-list.component';
 import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { TooltipModule } from 'ng2-bootstrap';
+import { HelpLinkComponent } from 'components/help-link/help-link.component';
 
 describe('CreatePairingCardListComponent', () => {
   let component: CreatePairingCardListComponent;
@@ -20,11 +23,17 @@ describe('CreatePairingCardListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [TooltipModule.forRoot()],
+      imports: [
+        TranslateModule.forRoot({
+          loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
+        }),
+        TooltipModule.forRoot()
+      ],
       declarations: [
         CreatePairingCardListComponent,
         CreatePairingCardComponent,
         ClusterCardComponent,
+        HelpLinkComponent,
         BytesSizePipe
       ]
     })
