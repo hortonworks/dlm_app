@@ -378,6 +378,15 @@
         "confirmation": {
           "title": "Confirm",
           "body": "Are you sure?"
+        },
+        "suspend_policy": {
+          "body": "Are you sure you want to suspend the replication policy {{policyName}}?"
+        },
+        "activate_policy": {
+          "body": "Are you sure you want to activate the replication policy {{policyName}}?"
+        },
+        "delete_policy": {
+          "body": "Are you sure you want to delete the replication policy {{policyName}}?"
         }
       },
       "flow_status": {

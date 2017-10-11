@@ -34,7 +34,6 @@ import { Observable } from 'rxjs/Observable';
 import { Job } from 'models/job.model';
 import { abortJob, rerunJob, loadJobsPageForPolicy } from 'actions/job.action';
 import { deletePolicy, resumePolicy, suspendPolicy } from 'actions/policy.action';
-import { PolicyService } from 'services/policy.service';
 import { OperationResponse } from 'models/operation-response.model';
 import { getLastOperationResponse } from 'selectors/operation.selector';
 import { getMergedProgress } from 'selectors/progress.selector';
@@ -54,6 +53,10 @@ import { ColumnMode } from '@swimlane/ngx-datatable';
 import { NOTIFICATION_TYPES, NOTIFICATION_CONTENT_TYPE } from 'constants/notification.constant';
 import { confirmNextAction } from 'actions/confirmation.action';
 import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
+import {
+  ConfirmationOptions,
+  confirmationOptionsDefaults
+} from '../../../components/confirmation-modal/confirmation-options.type';
 
 const DATABASE_REQUEST = '[Policy Table] DATABASE_REQUEST';
 
@@ -313,8 +316,16 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         RERUN_JOB: rerunJob
       }[this.selectedAction.name];
       if (nextAction) {
+        const body = ['DELETE_POLICY', 'SUSPEND_POLICY', 'ACTIVATE_POLICY'].indexOf(this.selectedAction.name) === -1 ?
+          confirmationOptionsDefaults.body :
+          this.t.instant(`page.policies.perform_action.${this.selectedAction.name.toLowerCase()}.body`, {policyName: row.name});
         this.store.dispatch(confirmNextAction(
-          nextAction(this.selectedForActionRow, { notification: this.generateNotification()})
+          nextAction(this.selectedForActionRow, { notification: this.generateNotification()}),
+          {
+            ...confirmationOptionsDefaults,
+            body,
+            confirmBtnText: this.t.instant('common.yes')
+          } as ConfirmationOptions
         ));
       }
     }
