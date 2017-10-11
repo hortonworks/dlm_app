@@ -21,6 +21,7 @@ import {MapConnectionStatus} from '../../../../models/map-data';
 import {GeographyService} from '../../../../services/geography.service';
 import Layer = L.Layer;
 import LayerGroup = L.LayerGroup;
+import {Observable} from 'rxjs/Observable';
 
 @Component({
   selector: 'dp-map',
@@ -60,13 +61,16 @@ export class MapComponent implements OnChanges, OnInit {
   markerGroup: LayerGroup;
   pathGroup: LayerGroup;
 
+  private markerMap = new Map();
   private countMap = new Map();
+
+  boundsTimeout = null;
 
   defaultMapSizes: MapDimensions[] = [
     new MapDimensions('240px', '420px', 0.5),
     new MapDimensions('420px', '540px', 1),
     new MapDimensions('480px', '680px', 1.3),
-    new MapDimensions('500px', '59%', 1.54)
+    new MapDimensions('500px', '100%', 1.54)
   ];
 
   constructor(private geographyService: GeographyService) {
@@ -80,6 +84,9 @@ export class MapComponent implements OnChanges, OnInit {
     }
     this.geographyService.getCountries().subscribe((countries) => {
       this.drawMap(countries);
+      if (this.mapData) {
+        this.mark();
+      }
     });
   }
 
@@ -93,7 +100,7 @@ export class MapComponent implements OnChanges, OnInit {
         fillColor: this.mapColor,
         fillOpacity: 1,
         weight: 1,
-        color: this.mapColor
+        color: '#D0D3D7'
       })
     }).addTo(map);
     map.fitBounds(countriesLayer.getBounds());
@@ -101,14 +108,44 @@ export class MapComponent implements OnChanges, OnInit {
     this.map.setZoom(mapDimensions.zoom);
   }
 
+  fitBounds() {
+    if (this.markers && this.markers.length) {
+
+      if (this.markers.length === 1) {
+        let latLng = this.markers[0].getLatLng();
+        this.map.setView(latLng, 4);
+      }
+
+      this.map.fitBounds(L.featureGroup(this.markers).getBounds(), {padding: [40, 40],animate: false});
+      if (this.map.getZoom() > 5) {
+        this.map.setZoom(5, {animate: false});
+      }
+    }
+  }
+
   ngOnChanges(changes: SimpleChanges) {
     if (!changes['mapData'] || !this.map) {
       return;
     }
+    console.log(this.mapData);
+    this.mark()
+  }
+
+  mark() {
+    if (this.boundsTimeout) {
+      clearTimeout(this.boundsTimeout);
+    }
+    //this.markerMap = new Map();
+    //this.removeExistingMarker();
     this.countMap = new Map();
-    this.removeExistingMarker();
     this.mapData.forEach((data) => {
       let start = data.start;
+      // let key = `${start.latitude}-${start.longitude}`;
+      // let value = this.markerMap.get(key);
+      // if(value){
+      //   this.update(data.start, value);
+      //   //return;
+      // }
       let end = data.end;
       if (start) {
         this.plotPoint(start);
@@ -120,16 +157,24 @@ export class MapComponent implements OnChanges, OnInit {
     });
     this.markerGroup = L.layerGroup(this.markers);
     this.pathGroup = L.layerGroup(this.paths);
+    this.boundsTimeout = setTimeout(() => this.fitBounds(), 10);
+
+  }
+
+  update(point: Point, data: MarkerData) {
+    //  console.log("updating marker", data);
+    let marker = data.marker;
+    // marker.setIcon(this.getMarkerIcon(data.count, data))
   }
 
   createPopup(marker, data: MarkerData) {
     const makeList = (cluster) => `<div class="details-container">
          <div class="status"><i class="fa fa-circle" style="color:${this.getStatusColor(cluster.status)}"></i> ${cluster.datacenter} / ${cluster.name}</div> 
-         <div class="location">${data.location}</div>
+         <div class="location">${data.point.location}</div>
        </div>`;
     let html = `<div class="pop-up-container">${data.clusters.map(makeList).join('')}</div>`;
     marker.bindTooltip(html, {
-      direction: 'right',
+      direction: 'auto',
       offset: [10, 0]
     });
   }
@@ -150,26 +195,75 @@ export class MapComponent implements OnChanges, OnInit {
     let latLng = L.latLng(position.latitude, position.longitude);
     let key = `${position.latitude}-${position.longitude}`;
     let existingCount = this.countMap.get(key);
-    let count = existingCount ? existingCount.count + 1 : 1;
-    let clusterInfo = new ClusterInfo(position.clusterName, position.status, position.datacenter);
-    let clusters = existingCount ? existingCount.clusters.concat([clusterInfo]) : [clusterInfo];
-    let markerData = new MarkerData(position.location, count, clusters);
-    this.countMap.set(key, markerData);
-    let marker = this.createMarker(latLng, count);
-    if (position.datacenter && position.location) {
-      this.createPopup(marker, markerData);
+    let count = existingCount? existingCount + 1 : 1;
+    console.log(count);
+    this.countMap.set(key, count);
+    let existingMarkerData = this.markerMap.get(key);
+    if (!existingMarkerData) {
+      console.log("create marker")
+      let clusterInfo = new ClusterInfo(position.clusterName, position.status, position.datacenter);
+      let count = 1;
+      let clusters = [clusterInfo];
+      let markerData = new MarkerData(position, count, clusters);
+      let marker = this.createMarker(latLng, count, markerData);
+      this.markerMap.set(key, new MarkerData(position, count, clusters, marker));
+      if (position.datacenter && position.location) {
+        this.createPopup(marker, markerData);
+      }
+    } else {
+      let existingClusters = existingMarkerData.clusters;
+      let existingCluster = existingClusters.find(exCluster => exCluster.name === position.clusterName && exCluster.datacenter === position.datacenter)
+      if (existingCluster) {
+        this.updateStatus(existingMarkerData, position);
+      }else {
+        let clusterInfo = new ClusterInfo(position.clusterName, position.status, position.datacenter);
+        let clusters = existingMarkerData.clusters.concat([clusterInfo]);
+        this.updateCount(existingMarkerData, position);
+        // let count = existingMarkerData.count + 1;
+        // let clusterInfo = new ClusterInfo(position.clusterName, position.status, position.datacenter);
+        // let clusters = existingMarkerData.clusters.concat([clusterInfo]);
+      }
+
     }
+    // let count = existingMarkerData ? existingMarkerData.count + 1 : 1;
+    // let clusterInfo = new ClusterInfo(position.clusterName, position.status, position.datacenter);
+    // let clusters = existingMarkerData ? existingMarkerData.clusters.concat([clusterInfo]) : [clusterInfo];
+    // let markerData = new MarkerData(position, count, clusters);
+    // this.markerMap.set(key, markerData);
+    // let marker = this.createMarker(latLng);
+    // // markerData = new MarkerData(position, count, clusters, marker);
+    // if (position.datacenter && position.location) {
+    //   this.createPopup(marker, markerData);
+    // }
   }
 
-  private createMarker(latLng, count) {
+  private createMarker(latLng, count, markerData) {
     let marker = L.marker(latLng, {
-      icon: this.getMarkerIcon(count),
+      icon: this.getMarkerIcon(count, markerData),
     }).addTo(this.map);
     this.markers.push(marker);
     return marker;
   }
 
+  private updateMarker(markerData) {
+
+  }
+
+  private updateStatus(markerData, position: Point){
+    console.log("update status")
+
+  }
+
+  private updateCount(markerData, position: Point){
+    console.log("update count");
+    let marker = markerData.marker;
+    markerData.count = markerData.count + 1;
+    //marker.setIcon(this.getMarkerIcon(1, markerData));
+  }
+
   removeExistingMarker() {
+    this.markers = [];
+    this.paths = [];
     if (this.markerGroup) {
       this.markerGroup.eachLayer(layer => {
         layer.remove();
@@ -183,12 +277,23 @@ export class MapComponent implements OnChanges, OnInit {
     this.pathLookup = [];
   }
 
-  private getMarkerIcon(count: number) {
+  private getMarkerIcon(count, markerData: MarkerData) {
+    let statusCountArr = [];
+    console.log(markerData.clusters);
+    markerData.clusters.map(cluster => {
+      statusCountArr[cluster.status] = statusCountArr[cluster.status] ? statusCountArr[cluster.status] + 1 : 1;
+    });
+    const makeStatusBullets = (cluster) => `<div class="status-bullet" style="background-color: ${this.getStatusColor(cluster.status)};">${statusCountArr[cluster.status]}</div>`;
     let html = `<div class="marker-wrapper">
                 <i class="fa fa-map-marker marker-icon" ></i>
                 <span class="marker-counter">
                   ${this.showCount ? count : ''}
                 </span>
+                <span></span>
+                <div class="status-bullets">
+                   ${this.showCount ? markerData.clusters.map(makeStatusBullets).join('') : ''}
+                </div>
+                
           </div>`;
     return L.divIcon(({
       iconSize: null,
@@ -226,7 +331,7 @@ export class MapComponent implements OnChanges, OnInit {
 }
 
 export class MarkerData {
-  constructor(public location: string, public count: number, public clusters: any[]) {
+  constructor(public point: Point, public count: number, public clusters: any[], public marker?: L.Marker) {
   };
 }
 

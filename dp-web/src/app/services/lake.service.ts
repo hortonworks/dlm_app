@@ -18,6 +18,7 @@ import { Cluster } from '../models/cluster';
 
 import { HttpUtil } from '../shared/utils/httpUtil';
 import {Subject} from 'rxjs/Subject';
+import {Location} from '../models/location';
 
 
 @Injectable()
@@ -73,6 +74,17 @@ export class LakeService {
   }[]> {
     return this.http
       .get(`/api/actions/clusters?type=${type}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
+  listWithClustersAndLocation(type: string = 'all'): Observable<{
+    data: Lake,
+    location: Location,
+    clusters: Cluster[]
+  }[]> {
+    return this.http
+      .get(`/api/actions/clustersWithLocation?type=${type}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

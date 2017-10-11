@@ -13,6 +13,9 @@
 $tooltip-background: #484848;
 $tooltip-divider: #2A2A2A;
 $tooltip-border-color: #3f3f3f;
+$bullets-per-row: 5;
+$bullet-size: 14px;
+$bullet-margin: 2px;
 
 .leaflet-container {
   background: $spindle-blue;
@@ -92,6 +95,33 @@ $tooltip-border-color: #3f3f3f;
     top: 4px;
     left: 2px;
     font-size: 10px;
+  }
+
+  .status-bullets {
+    display: flex;
+    flex-wrap: wrap;
+    position: absolute;
+    top: 0;
+    left: 16px;
+    width: ($bullet-size) * $bullets-per-row;
+
+    .status-bullet {
+      display: inline-block;
+      border-radius: 50px;
+      min-height: 12px;
+      min-width: 12px;
+      line-height: 12px;
+      color: $white;
+      margin-left: -2px;
+      padding: 2px;
+      font-size: 10px;
+    }
+    .status-count {
+      font-family: Roboto;
+      margin-left: -10px;
+      color: $white;
+      font-size: 12px;
+    }
   }
 }
 

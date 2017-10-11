@@ -23,6 +23,7 @@ import {MapData} from '../../../../models/map-data';
 import {MapConnectionStatus} from '../../../../models/map-data';
 import {Point} from '../../../../models/map-data';
 import {MapSize} from '../../../../models/map-data';
+import {Location} from '../../../../models/location';
 
 @Component({
   selector: 'dp-infra-lakes',
@@ -33,6 +34,7 @@ export class LakesComponent implements OnInit {
 
   lakes: {
     data: Lake,
+    location: Location,
     clusters: Cluster[]
   }[];
 
@@ -55,48 +57,81 @@ export class LakesComponent implements OnInit {
   ngOnInit() {
     this.mapSize = MapSize.EXTRALARGE;
     let unSyncedLakes = [];
-    this.lakeService.listWithClusters()
+    this.lakeService.listWithClustersAndLocation()
       .subscribe(lakes => {
         this.lakes = lakes;
-        this.lakes.forEach((lake) => {
-          let locationObserver;
+        this.lakes.forEach(lake => {
+          let point = new MapData(new Point(lake.location.latitude, lake.location.longitude, null, lake.data.name, lake.data.dcName, `${lake.location.city}, ${lake.location.country}`));
+          this.mapSet.set(lake.data.id, point);
+        });
+        this.mapData = this.toArray(this.mapSet);
+        this.lakes.forEach(lake => {
           lake.data.isWaiting = true;
-          if (lake.data.state === this.SYNCED || lake.data.state === this.SYNC_ERROR) {
-            if (lake.data.state === this.SYNCED || (lake.data.state === this.SYNC_ERROR && lake.clusters && lake.clusters.length > 0)) {
-              locationObserver = this.getLocationInfoWithStatus(lake.data.location, lake.clusters[0].id, lake.data.id);
-            } else {
-              locationObserver = this.getLocationInfo(lake.data.location);
-            }
+          if (lake.data.state === this.SYNCED) {
+            this.getStatus(lake, lake.clusters[0].id);
           } else {
             unSyncedLakes.push(lake);
-            locationObserver = this.getLocationInfo(lake.data.location);
           }
-          this.updateHealth(lake, locationObserver);
+
         });
+
+        // this.lakes.forEach((lake) => {
+        //   let locationObserver;
+        //   lake.data.isWaiting = true;
+        //   if (lake.data.state === this.SYNCED || lake.data.state === this.SYNC_ERROR) {
+        //     if (lake.data.state === this.SYNCED || (lake.data.state === this.SYNC_ERROR && lake.clusters && lake.clusters.length > 0)) {
+        //       locationObserver = this.getLocationInfoWithStatus(lake.data.location, lake.clusters[0].id, lake.data.id);
+        //     } else {
+        //       locationObserver = this.getLocationInfo(lake.data.location);
+        //     }
+        //   } else {
+        //     unSyncedLakes.push(lake);
+        //     locationObserver = this.getLocationInfo(lake.data.location);
+        //   }
+        //   this.updateHealth(lake, locationObserver);
+        // });
         this.updateUnSyncedLakes(unSyncedLakes);
       });
+
+  }
+
+  private toArray(map) {
+    return Array.from(map, ([key, val]) => {
+      return val;
+    });
+  }
+
+  getStatus(lake, clusterId) {
+    this.clusterService.retrieveHealth(clusterId, lake.data.id).subscribe(health => {
+      let point = new MapData(new Point(lake.location.latitude, lake.location.longitude, this.extractStatus(health), lake.data.name, lake.data.dcName, `${lake.location.city}, ${lake.location.country}`));
+      this.mapSet.set(lake.data.id, point);
+      this.mapData = this.toArray(this.mapSet);
+      console.log(this.mapData);
+      this.health.set(lake.data.id, {
+        health: health
+      });
+      this.health = new Map(this.health.entries());
+    });
   }
 
   updateUnSyncedLakes(unSyncedLakes) {
     unSyncedLakes.forEach((unSyncedlake) => {
       let count = 1;
       this.lakeService.retrieve(unSyncedlake.data.id).delay(this.DELAY_IN_MS).repeat(this.MAXCALLS).skipWhile((lake) => lake.state !== this.SYNCED && lake.state !== this.SYNC_ERROR && count++ < this.MAXCALLS).first().subscribe(lake => {
-        let locationObserver;
+        //let locationObserver;
         if (lake.state === this.SYNCED || lake.state === this.SYNC_ERROR) {
           unSyncedlake.data = lake;
           this.clusterService.listByLakeId({lakeId: lake.id}).subscribe(clusters => {
             unSyncedlake.clusters = clusters;
             if (clusters && clusters.length > 0) {
-              locationObserver = this.getLocationInfoWithStatus(unSyncedlake.data.location, unSyncedlake.clusters[0].id, unSyncedlake.data.id);
-            } else {
-              locationObserver = this.getLocationInfo(unSyncedlake.data.location);
+              this.getStatus(unSyncedlake, clusters[0].id);
             }
-            this.updateHealth(unSyncedlake, locationObserver);
+            // this.updateHealth(unSyncedlake, locationObserver);
           });
         } else {
-          locationObserver = this.getLocationInfo(unSyncedlake.data.location);
+          // locationObserver = this.getLocationInfo(unSyncedlake.data.location);
           unSyncedlake.data.isWaiting = false;
-          this.updateHealth(unSyncedlake, locationObserver);
+          //this.updateHealth(unSyncedlake, locationObserver);
         }
       });
     });
@@ -155,6 +190,18 @@ export class LakesComponent implements OnInit {
       }
       return new Point(location.latitude, location.longitude, status, lake.data.name, lake.data.dcName, `${locationInfo.location.city}, ${locationInfo.location.country}`);
     }
+  }
+
+  private extractStatus(health) {
+    let status;
+    if (health && health.status && health.status.state === 'STARTED') {
+      status = MapConnectionStatus.UP;
+    } else if (health && health.status && (health.status.state === 'NOT STARTED' || health.status.state === this.SYNC_ERROR)) {
+      status = MapConnectionStatus.DOWN;
+    } else {
+      status = MapConnectionStatus.NA;
+    }
+    return status;
   }
 
   onRefresh(lakeId) {

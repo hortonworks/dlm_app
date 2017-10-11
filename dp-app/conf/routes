@@ -41,6 +41,7 @@ GET           /api/clusters/:clusterId/rmhealth                      controllers
 GET           /api/clusters/:clusterId/dnhealth                      controllers.Clusters.getDataNodeHealth(clusterId: Long)
 
 GET           /api/actions/clusters                                  controllers.actions.DpClusterActions.listWithClusters(type: Option[String])
+GET           /api/actions/clustersWithLocation                      controllers.actions.DpClusterActions.listWithClustersWithLocation(type: Option[String])
 POST          /api/clusters/sync/:dpClusterId                        controllers.Clusters.syncCluster(dpClusterId: Long)
 
 

@@ -66,9 +66,9 @@ export class LakesListComponent implements OnChanges {
       this.lakes.forEach((lake) => {
         let lakeHealthInfo = this.healths.get(lake.data.id);
         if (lakeHealthInfo) {
-          lakesList.push(this.extractLakeInfo(lake, lakeHealthInfo.health, lakeHealthInfo.location));
+          lakesList.push(this.extractLakeInfo(lake, lakeHealthInfo.health, lake.location));
         } else {
-          lakesList.push(this.extractLakeInfo(lake, null, null));
+          lakesList.push(this.extractLakeInfo(lake, null, lake.location));
         }
       });
       this.lakesList = lakesList;
