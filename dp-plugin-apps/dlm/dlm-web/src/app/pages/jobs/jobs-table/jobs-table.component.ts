@@ -140,7 +140,7 @@ export class JobsTableComponent implements OnInit {
   handleSelectedAction({row, action}) {
     switch (action.name) {
       case 'LOG':
-        return this.logService.showLog(EntityType.policyinstance, row.id, row.endTime);
+        return this.logService.showLog(EntityType.policyinstance, row.id);
       case 'ABORT':
         return row.status === JOB_STATUS.RUNNING && this.abortJobAction.emit(row);
       case 'RERUN':

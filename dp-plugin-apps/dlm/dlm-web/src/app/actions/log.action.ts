@@ -15,8 +15,8 @@ export const ActionTypes = {
   LOAD_LOGS: requestType('LOAD_LOGS')
 };
 
-export const loadLogs = (clusterId: number, instanceId: string, logType: EntityType, requestId?, timestamp = ''): Action => ({
-  type: ActionTypes.LOAD_LOGS.START, payload: { clusterId, instanceId, logType, meta: {requestId, instanceId, timestamp} }
+export const loadLogs = (clusterId: number, instanceId: string, logType: EntityType, requestId?): Action => ({
+  type: ActionTypes.LOAD_LOGS.START, payload: { clusterId, instanceId, logType, meta: {requestId, instanceId} }
 });
 
 export const loadLogsSuccess = (logs, meta = {}): ActionSuccess => ({
