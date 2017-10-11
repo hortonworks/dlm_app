@@ -306,7 +306,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     this.selectedAction = action;
     this.selectedForActionRow = row;
     if (action.name === 'LOG') {
-      this.logService.showLog(EntityType.policy, row.id);
+      this.logService.showLog(EntityType.policy, row.id, row.endTime);
     } else {
       const nextAction = {
         DELETE_POLICY: deletePolicy,

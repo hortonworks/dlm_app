@@ -313,7 +313,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   }
 
   handleOnShowPolicyLog(policy) {
-    this.logService.showLog(EntityType.policyinstance, policy.lastJobResource.id);
+    this.logService.showLog(EntityType.policyinstance, policy.lastJobResource.id, policy);
   }
 
   formatStatusFilter(jobStatusFilter) {
@@ -341,7 +341,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
   showEventEntityLogs(event: Event) {
     const entityType = JOB_EVENT === event.eventType ? EntityType.policyinstance : EntityType.policy;
-    this.logService.showLog(entityType, event[LOG_EVENT_TYPE_MAP[entityType]]);
+    this.logService.showLog(entityType, event[LOG_EVENT_TYPE_MAP[entityType]], event.timestamp);
   }
 
   goToPolicy(event: Event) {
