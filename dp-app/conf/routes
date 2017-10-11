@@ -44,6 +44,9 @@ GET           /api/clusters/:clusterId/dnhealth                      controllers
 GET           /api/actions/clusters                                  controllers.actions.DpClusterActions.listWithClusters(type: Option[String])
 POST          /api/clusters/sync/:dpClusterId                        controllers.Clusters.syncCluster(dpClusterId: Long)
 
+GET           /api/clusters/:clusterId/hosts                        controllers.Clusters.getHosts(clusterId:Long,ip:Option[String])
+
+
 
 #DTSet-Category
 GET           /api/datasets/categories                               controllers.DataSets.listAllCategories
@@ -132,6 +135,7 @@ GET           /api/workspaces                                        controllers
 GET           /api/workspaces/name/:name                             controllers.Workspaces.retrieve(name)
 POST          /api/workspaces                                        controllers.Workspaces.create
 DELETE        /api/workspaces/name/:name                             controllers.Workspaces.delete(name)
+
 
 # WorkspaceAsset Api
 POST          /api/workspaces/assets                                 controllers.AssetWorkspaces.add
