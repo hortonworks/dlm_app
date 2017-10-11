@@ -215,7 +215,8 @@
       "time_less_than_current": "Start time must be later than the current time in the selected timezone.",
       "not_directory": "\"{{fieldLabel}}\" should be a path to directory",
       "not_exist_directory": "Specified path does not exist",
-      "namePattern": "\"Policy Name\" should contain only letters, digits, spaces, hyphens '-', and underscores '_'."
+      "namePattern": "\"Policy Name\" should contain only letters, digits, spaces, hyphens '-', and underscores '_'.",
+      "invalid_date": "\"{{fieldLabel}}\" should be a valid date"
     }
   },
   "page": {

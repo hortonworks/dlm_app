@@ -230,8 +230,13 @@
                         [placeholder]="'page.policies.form.fields.date_format' | translate"
                         [options]="datePickerOptions"
                         [disabled]="startOption === policyStart.START_NOW"
+                        (inputFieldChanged)="handleDateInputChange($event, 'startTime')"
                         (dateChanged)="handleDateChange($event, 'startTime')">
                       </my-date-picker>
+                      <dlm-field-error
+                        *ngIf="policyForm.get('job').get('startTime').get('date').hasError('invalidDate')">
+                        {{'forms.validation_errors.invalid_date' | translate:startTimeDateField}}
+                      </dlm-field-error>
                     </div>
                   </div>
                 </div>
@@ -244,8 +249,13 @@
                         [selDate]="policyForm.value.job.endTime.date"
                         [placeholder]="'page.policies.form.fields.date_format' | translate"
                         (dateChanged)="handleDateChange($event, 'endTime')"
+                        (inputFieldChanged)="handleDateInputChange($event, 'endTime')"
                         [options]="datePickerOptions">
                       </my-date-picker>
+                      <dlm-field-error
+                        *ngIf="policyForm.get('job').get('endTime').get('date').hasError('invalidDate')">
+                        {{'forms.validation_errors.invalid_date' | translate:endTimeDateField}}
+                      </dlm-field-error>
                     </div>
                   </div>
                 </div>

@@ -15,7 +15,7 @@ import {
 } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { go } from '@ngrx/router-store';
-import { IMyOptions, IMyDateModel } from 'mydatepicker';
+import { IMyOptions, IMyDateModel, IMyInputFieldChanged } from 'mydatepicker';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -145,6 +145,8 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   freqLimit = {fieldLabel: 'Frequency'};
   directoryField = {fieldLabel: 'Folder path'};
   maxBandwidthField = {fieldLabel: 'Maximum Bandwidth'};
+  startTimeDateField = {fieldLabel: 'Start Date'};
+  endTimeDateField = {fieldLabel: 'End Date'};
   userTimezone = '';
   get datePickerOptions(): IMyOptions {
     const yesterday = moment().subtract(1, 'day');
@@ -544,7 +546,16 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   handleDateChange(date: IMyDateModel, dateType: string) {
-    this.policyForm.patchValue({ job: {[dateType]: { date: date.formatted }}});
+    if (date.formatted) { // valid date
+      this.policyForm.patchValue({ job: { [dateType]: { date: date.formatted } } });
+    }
+  }
+
+  handleDateInputChange(field: IMyInputFieldChanged, dateType: string): void {
+    const control: AbstractControl = this.policyForm.get('job').get(dateType).get('date');
+    control.setErrors(field.valid || field.value ===  '' ? null : {
+      invalidDate: !field.valid
+    });
   }
 
   handlePolicyTypeChange(radioItem: RadioItem) {
