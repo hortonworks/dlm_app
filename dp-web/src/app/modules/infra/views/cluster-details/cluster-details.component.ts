@@ -24,6 +24,8 @@ import {StringUtils} from '../../../../shared/utils/stringUtils';
 import {IdentityService} from '../../../../services/identity.service';
 import {DateUtils} from '../../../../shared/utils/date-utils';
 import {Loader} from '../../../../shared/utils/loader';
+import {CustomError} from "../../../../models/custom-error";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'dp-cluster-details',
@@ -37,7 +39,8 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
               private lakeService: LakeService,
               private clusterService: ClusterService,
               private locationService: LocationService,
-              private identityService: IdentityService) {
+              private identityService: IdentityService,
+              private  translateService: TranslateService) {
   }
 
   lake: Lake = new Lake();
@@ -59,6 +62,8 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   hdfsPercent: string;
   heapPercent: string;
   clusterHealthInProgress = false;
+  showError: boolean = false;
+  errorMessage: string;
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -117,12 +122,30 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
           this.getClusterHealth(this.cluster.id, this.lake.id);
         });
 
-        this.clusterService.retrieveDataNodeHealth(this.cluster.id).subscribe(dnHealth => {
-          this.dnHealth = dnHealth;
-          this.populateDataNodeHealth();
-        });
+        this.getDataNodeHealth(this.cluster.id);
         this.getRMHealth(this.cluster.id);
       });
+    });
+  }
+
+  private onError(err : CustomError){
+    if(!this.showError){
+      this.showError = true;
+      this.errorMessage = this.translateService.instant('pages.infra.description.backenderrors.'+err.errorType);
+    }
+  }
+
+  closeError() {
+    this.showError = false;
+  }
+
+  private getDataNodeHealth(clusterId) {
+    this.clusterService.retrieveDataNodeHealth(this.cluster.id).subscribe(dnHealth => {
+      this.dnHealth = dnHealth;
+      this.populateDataNodeHealth();
+    }, error => {
+      let err = JSON.parse(error._body).errors[0] as CustomError;
+      this.onError(err);
     });
   }
 
@@ -149,6 +172,8 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
         Loader.hide();
       }
     }, error => {
+      let err = JSON.parse(error._body).errors[0] as CustomError;
+      this.onError(err);
       if (!this.clusterHealthInProgress) {
         Loader.hide();
       }
