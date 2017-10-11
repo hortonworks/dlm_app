@@ -10,12 +10,14 @@
   -->
 
 <div class="page-container">
-  <div *ngIf="showError">
-    <div id="error-notification-bar" class="error-notification-bar">
-      <i class="fa fa-times-circle pull-left"></i>
-      <i id="e" class="fa fa-remove pull-right" (click)="closeError()"></i>
-      <div id="error-header" class="text-medium">{{"common.failed" | translate}}</div>
-      <div id="error-message" class="text-small-1">{{errorMessage}} </div>
+  <div *ngIf="showError" class="mdl-grid no-top-bottom-space">
+    <div class="mdl-cell mdl-cell--12-col no-top-bottom-space">
+      <div id="error-notification-bar" class="error-notification-bar">
+        <i class="fa fa-times-circle pull-left"></i>
+        <i id="e" class="fa fa-remove pull-right" (click)="closeError()"></i>
+        <div id="error-header" class="text-medium">{{"common.failed" | translate}}</div>
+        <div id="error-message" class="text-small-1">{{errorMessage}} </div>
+      </div>
     </div>
   </div>
   <div class="mdl-grid">

@@ -73,6 +73,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
 
   fetchClusterDetails(lakeId) {
     Loader.show();
+    this.showError = false;
     this.lakeService.retrieve(lakeId).subscribe((lake: Lake) => {
       this.lake = lake;
       this.populateGeneralProperties();
@@ -128,10 +129,14 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private onError(err : CustomError){
-    if(!this.showError){
-      this.showError = true;
-      this.errorMessage = this.translateService.instant('pages.infra.description.backenderrors.'+err.errorType);
+  private onError(error){
+    if(!this.showError && error._body){
+      let errsWrap = JSON.parse(error._body);
+      if(errsWrap && errsWrap.errors && errsWrap.errors.length > 0){
+        let err = errsWrap.errors[0] as CustomError;
+        this.showError = true;
+        this.errorMessage = this.translateService.instant('pages.infra.description.backenderrors.'+err.errorType);
+      }
     }
   }
 
@@ -144,8 +149,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       this.dnHealth = dnHealth;
       this.populateDataNodeHealth();
     }, error => {
-      let err = JSON.parse(error._body).errors[0] as CustomError;
-      this.onError(err);
+      this.onError(error);
     });
   }
 
@@ -172,8 +176,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
         Loader.hide();
       }
     }, error => {
-      let err = JSON.parse(error._body).errors[0] as CustomError;
-      this.onError(err);
+      this.onError(error);
       if (!this.clusterHealthInProgress) {
         Loader.hide();
       }
