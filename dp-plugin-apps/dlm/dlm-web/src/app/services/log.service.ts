@@ -19,7 +19,7 @@ import { Store } from '@ngrx/store';
 import { State } from 'reducers/index';
 import { loadLogs } from 'actions/log.action';
 import { Cluster } from 'models/cluster.model';
-import { loadClusters } from 'actions/cluster.action';
+import * as moment from 'moment';
 import { getAllClusters } from 'selectors/cluster.selector';
 
 export const LOG_REQUEST = '[LOG_SERVICE] LOG_REQUEST';
@@ -45,16 +45,19 @@ export class LogService {
     this.clusters$.subscribe(clusters => this.clusters = clusters);
   }
 
-  getLogs(clusterId: number, instanceId: string, logType: EntityType): Observable<any> {
+  getLogs(clusterId: number, instanceId: string, logType: EntityType, timestamp: string): Observable<any> {
     const filterBy = this.logEventTypeMap[logType];
-    return this.http.get(`clusters/${clusterId}/logs?filterBy=${filterBy}:${instanceId}`).map(r => r.json());
+    const date = moment(timestamp);
+    const start = date.subtract(1, 'h').toISOString();
+    const end = date.add(12, 'h').toISOString();
+    return this.http.get(`clusters/${clusterId}/logs?filterBy=${filterBy}:${instanceId}&start=${start}&end=${end}`).map(r => r.json());
   }
 
   getChangeEmitter() {
     return this.emitter;
   }
 
-  showLog(entityType: EntityType, entityId: string) {
+  showLog(entityType: EntityType, entityId: string, timestamp: string) {
     if (entityId) {
       const splits = entityId.split('/');
       if (splits.length >= 5 && splits[3] && splits[4]) {
@@ -66,7 +69,7 @@ export class LogService {
           const filteredClusters = this.clusters.filter(cluster => cluster.dataCenter === dataCenter && cluster.name === clusterName);
           if (filteredClusters.length) {
             const clusterId = filteredClusters[0].id;
-            this.store.dispatch(loadLogs(clusterId, entityId, entityType, LOG_REQUEST));
+            this.store.dispatch(loadLogs(clusterId, entityId, entityType, LOG_REQUEST, timestamp));
             this.entityId$.next(entityId);
           }
         }
