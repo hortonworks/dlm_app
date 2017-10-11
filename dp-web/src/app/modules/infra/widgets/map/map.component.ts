@@ -43,6 +43,7 @@ export class MapComponent implements OnChanges, OnInit {
   statusColorNA = '#53646A';
 
   mapColor = '#F2F7FC';
+  mapBoundary = '#D0D3D7';
 
   mapOptions = {
     scrollWheelZoom: true,
@@ -93,7 +94,7 @@ export class MapComponent implements OnChanges, OnInit {
         fillColor: this.mapColor,
         fillOpacity: 1,
         weight: 1,
-        color: this.mapColor
+        color: this.mapBoundary
       })
     }).addTo(map);
     map.fitBounds(countriesLayer.getBounds());
