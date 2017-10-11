@@ -18,6 +18,7 @@
     "edit": "Edit",
     "update": "Update",
     "delete": "Delete",
+    "refresh": "Refresh",
     "addAndNew": "Add & New",
     "cancel": "Cancel",
     "back": "BACK",
@@ -181,6 +182,7 @@
         "hdfsTotal": "HDFS Total",
         "addButton": "Add Cluster",
         "addCluster": "Add Your Cluster",
+        "goToAmbari":"Go to Ambari",
         "ambariUrl": "Ambari URL",
         "ambariUsername": "Ambari Username",
         "ambariPassword": "Ambari Password",
@@ -246,7 +248,9 @@
           "Network": "There was a network error when connecting to Ambari.",
           "General": "Data Plane Services could not connect to the Ambari cluster. Information may not be up to date."
         },
-        "rolesOverrideWarning":"This will override any roles the user acquired as part of groups"
+        "rolesOverrideWarning":"This will override any roles the user acquired as part of groups",
+        "clusterDeleteWarning":"On deleting a cluster associated data management policies or asset collections will no longer be accessible. This action cannot be undone. Please confirm if you want to go ahead.",
+        "deleteFailed": "Cluster could not be deleted"
       }
     },
     "dataset": {

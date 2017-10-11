@@ -16,6 +16,9 @@ import {Sort} from '../../../../shared/utils/enums';
 import {Cluster} from '../../../../models/cluster';
 import {ClusterService} from '../../../../services/cluster.service';
 import {DateUtils} from '../../../../shared/utils/date-utils';
+import {DialogBox} from '../../../../shared/utils/dialog-box';
+import {LakeService} from '../../../../services/lake.service';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'dp-lakes-list',
@@ -46,7 +49,7 @@ export class LakesListComponent implements OnChanges {
     {key: 'country', display: 'Country'},
     {key: 'dataCenter', display: 'Data Center'}];
 
-  constructor(private clusterService: ClusterService, private router: Router) {
+  constructor(private lakeService: LakeService, private translateService: TranslateService) {
   }
 
   @HostListener('document:click', ['$event', '$event.target'])
@@ -250,6 +253,18 @@ export class LakesListComponent implements OnChanges {
 
   refresh(lakeInfo) {
     this.refreshEmitter.emit(lakeInfo.lakeId);
+  }
+
+  deleteCluster(lakeId) {
+    DialogBox.showConfirmationMessage(this.translateService.instant('pages.infra.description.clusterDeleteWarning')).subscribe(result => {
+      if (result) {
+        this.lakeService.deleteCluster(lakeId).subscribe(() => {
+          this.lakeService.clusterDeleted.next();
+        }, () => {
+          DialogBox.showErrorMessage(this.translateService.instant('pages.infra.description.deleteFailed'));
+        })
+      }
+    });
   }
 
   onSort($event) {

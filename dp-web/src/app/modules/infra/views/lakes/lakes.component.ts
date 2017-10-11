@@ -53,7 +53,14 @@ export class LakesComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.lakeService.clusterDeleted$.subscribe(() => {
+      this.getClusters();
+    });
     this.mapSize = MapSize.EXTRALARGE;
+    this.getClusters();
+  }
+
+  getClusters(){
     let unSyncedLakes = [];
     this.lakeService.listWithClusters()
       .subscribe(lakes => {

@@ -171,7 +171,7 @@ object Webservice {
 
     def updateStatus(dpCluster: DataplaneCluster): Future[Either[Errors, Boolean]]
 
-    def delete(dpClusterId: String): Future[Either[Errors, DataplaneCluster]]
+    def delete(dpClusterId: String): Future[Either[Errors, Boolean]]
 
   }
 
