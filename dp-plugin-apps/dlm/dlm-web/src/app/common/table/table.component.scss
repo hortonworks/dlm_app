@@ -44,3 +44,7 @@
     display: none !important;
   }
 }
+
+.datatable-header-cell:not(.sortable) .datatable-header-cell-wrapper {
+  cursor: default !important;
+}
