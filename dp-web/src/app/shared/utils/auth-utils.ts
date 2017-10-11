@@ -26,6 +26,8 @@ export class AuthUtils {
 
   public static signoutURL = '/auth/signOut';
 
+  public static notExistsURL = '/not-found';
+
   public static isUserLoggedIn() {
     return !!this.getUser();
   }

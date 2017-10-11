@@ -212,9 +212,7 @@ class Clusters @Inject()(
           configuration.getString("cluster.rm.health.request.param").get;
 
         ambariWebService.requestAmbariClusterApi(clusterId, rmRequest).map {
-          case Left(errors) =>
-            InternalServerError(
-              JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Left(errors) => InternalServerError(Json.toJson(errors))
           case Right(resourceManagerHealth) =>
             Ok(Json.toJson(resourceManagerHealth))
         }
@@ -229,9 +227,7 @@ class Clusters @Inject()(
           configuration.getString("cluster.dn.health.request.param").get;
 
         ambariWebService.requestAmbariClusterApi(clusterId, dnRequest).map {
-          case Left(errors) =>
-            InternalServerError(
-              JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Left(errors) => InternalServerError(Json.toJson(errors))
           case Right(datanodeHealth) =>
             Ok(Json.toJson(datanodeHealth))
         }

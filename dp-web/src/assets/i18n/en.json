@@ -146,7 +146,8 @@
         "syncFailed":"Cluster Information could not be fetched",
         "serviceEnabled":"Service Enabled successfully",
         "optional":"Optional",
-        "addOptionalServices":"Add Optional Services"
+        "addOptionalServices":"Add Optional Services",
+        "dpServices": "DATA PLANE SERVICES"
       },
       "description": {
         "verificationWelcome": "Welcome to {{serviceName}} Enablement Wizard. Please begin with verifying your SmartSense ID.",
@@ -242,7 +243,8 @@
         "backenderrors":{
           "Url": "This is not a valid Ambari URL. Please enter a valid Ambari URL.",
           "Ambari": "There was an error fetching information from Ambari.",
-          "Network": "There was a network error when connecting to Ambari."
+          "Network": "There was a network error when connecting to Ambari.",
+          "General": "Data Plane Services could not connect to the Ambari cluster. Information may not be up to date."
         },
         "rolesOverrideWarning":"This will override any roles the user acquired as part of groups"
       }

@@ -11,8 +11,8 @@
 
 package com.hortonworks.dataplane.cs
 
-import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariCheckResponse, AmbariCluster}
-import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, HJwtToken}
+import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariCheckResponse, AmbariCluster, ServiceInfo}
+import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.{Ambari, Entities}
 import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 import com.typesafe.config.Config
@@ -69,6 +69,21 @@ class AmbariWebServiceImpl(config: Config)(implicit ws: ClusterWsClient)
           Left(
             Errors(Seq(
               Error("500", (response.json \ "error" \ "message").as[String]))))
+        }
+      }
+  }
+
+  override def getAmbariServicesInfo(dpcwServices: DpClusterWithDpServices)(implicit token: Option[Entities.HJwtToken])
+  : Future[Either[Errors, Seq[ServiceInfo]]] = {
+    ws.url(s"$url/ambari/servicesInfo")
+      .withToken(token)
+      .post(Json.toJson(dpcwServices))
+      .map { response =>
+        if (response.status == 200) {
+          val seq = response.json \ "results" \ "data"
+          Right(seq.validate[Seq[ServiceInfo]].get)
+        } else {
+          mapErrors(response)
         }
       }
   }

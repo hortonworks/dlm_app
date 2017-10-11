@@ -25,6 +25,10 @@ object Webservice {
 
     import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
+    protected  def createEmptyErrorResponse = {
+      Left(Errors(Seq(Error(code="404",message = "No response from server"))))
+    }
+    
     protected def extractEntity[T](res: WSResponse,
                                    f: WSResponse => T): Either[Errors, T] = {
       Right(f(res))

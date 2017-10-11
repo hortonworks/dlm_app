@@ -47,12 +47,12 @@
         let-curPage="curPage"
         let-offset="offset">
         <dlm-table-footer
-          [showPageSizeMenu]="showPageSizeMenu"
           [rowCount]="rowCount"
           [pageSize]="pageSize"
           [selectedCount]="selectedCount"
           [curPage]="curPage"
           [offset]="offset"
+          [options]="footerOptions"
           (changePage)="changePage($event)"
           (changePageSize)="changePageSize($event)"></dlm-table-footer>
       </ng-template>

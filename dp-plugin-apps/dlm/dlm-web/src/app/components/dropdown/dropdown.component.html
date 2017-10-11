@@ -7,7 +7,7 @@
   ~ of all or any part of the contents of this software is strictly prohibited.
   -->
 
-<div class="btn-group" dropdown [ngSwitch]="type" placement="bottom right" [attr.placement.right]="alignRight">
+<div class="btn-group" dropdown [ngSwitch]="type" [placement]="placement" [attr.placement.right]="alignRight" [dropup]="isDropup">
   <div dropdownToggle qe-attr="dropdown-toggle">
     <div #content>
       <ng-content></ng-content>

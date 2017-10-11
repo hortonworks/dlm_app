@@ -112,7 +112,7 @@ export class LakesListComponent implements OnChanges {
   }
 
   isSyncError(health) {
-    return health.status.state === 'SYNC_ERROR';
+    return (health.status && (health.status.state === 'SYNC_ERROR'));
   }
 
   private getStatus(health, lakeInfo) {

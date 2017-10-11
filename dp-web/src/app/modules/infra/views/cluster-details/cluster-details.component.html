@@ -10,6 +10,16 @@
   -->
 
 <div class="page-container">
+  <div *ngIf="showError" class="mdl-grid no-top-bottom-space">
+    <div class="mdl-cell mdl-cell--12-col no-top-bottom-space">
+      <div id="error-notification-bar" class="error-notification-bar">
+        <i class="fa fa-times-circle pull-left"></i>
+        <i id="e" class="fa fa-remove pull-right" (click)="closeError()"></i>
+        <div id="error-header" class="text-medium">{{"common.failed" | translate}}</div>
+        <div id="error-message" class="text-small-1">{{errorMessage}} </div>
+      </div>
+    </div>
+  </div>
   <div class="mdl-grid">
     <div class="mdl-cell mdl-cell--12-col">
       <button id="refresh-btn" class="mdl-button btn-hwx-default pull-right refresh-btn" (click)="fetchClusterDetails(this.lake.id)"><i class="fa fa-refresh"></i></button>
@@ -52,20 +62,22 @@
       </div>
     </div>
   </div>
-  <div class="mdl-grid no-top-bottom-space details-container">
-    <div class="mdl-cell mdl-cell--12-col no-top-bottom-space">
-      <div class="mdl-grid white-bg">
+  <div class="mdl-grid no-top-bottom-space details-container flex-display">
+    <div class="mdl-cell mdl-cell--12-col no-top-bottom-space info-container white-bg">
+      <div class="mdl-grid">
         <div class="mdl-cell mdl-cell--12-col">
           <div class="mdl-grid">
             <div class="mdl-cell mdl-cell--6-col">
               <label class="text-medium pull-left">INFORMATION</label>
             </div>
             <div class="mdl-layout-spacer"> </div>
+            <div class="info-button">
               <button id="info-actions" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon pull-right">
                 <i class="fa fa-ellipsis-v"></i></button>
               <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="info-actions">
                 <li class="mdl-menu__item"><i class="fa fa-external-link"></i><a href="{{lake.ambariUrl}}" target="_blank">Go to Ambari</a></li>
               </ul>
+            </div>
             <div class="mdl-cell mdl-cell--12-col">
               <div class="text-dark-small-1">Description</div>
               <div class="text-small-1 margin-top-10">{{lake.description}}</div>
@@ -136,5 +148,29 @@
         </div>
       </div>
     </div>
+    <div class="mdl-cell mdl-cell--12-col no-top-bottom-space white-bg services-container">
+      <div class="mdl-grid services-header-grid">
+        <div class="mdl-cell mdl-cell--12-col">
+          <label class="text-medium pull-left">{{"pages.services.labels.dpServices" | translate}}</label>
+        </div>
+      </div>
+      <div class="mdl-grid services-body-grid" *ngIf=" !servicesInfo || servicesInfo.length == 0">
+        <div class="mdl-layout-spacer"></div>
+        <div class="mdl-cell mdl-cell--4-col">{{"common.loading" | translate}}...</div>
+        <div class="mdl-layout-spacer"></div>
+      </div>
+      <div *ngFor="let serviceinfo of servicesInfo" class="services">
+        <div class="mdl-grid services-body-grid">
+          <div class="mdl-cell mdl-cell--6-col services-body-cell">
+            <label class="text-small-1 pull-left flex-display"><i class="fa fa-check-circle" *ngIf="serviceinfo.state === 'STARTED'" aria-hidden="true"></i><i class="fa fa-exclamation-triangle" *ngIf="serviceinfo.state !== 'STARTED'" aria-hidden="true"></i>
+              {{(("common.serviceNameMappings."+serviceinfo.serviceName | translate) !== "common.serviceNameMappings."+serviceinfo.serviceName)? ("common.serviceNameMappings."+serviceinfo.serviceName | translate).toUpperCase() : serviceinfo.serviceName}}</label>
+          </div>
+          <div class="mdl-cell mdl-cell--6-col services-body-cell">
+            <label class="text-small-1 pull-left">{{serviceinfo.serviceVersion}}</label>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+

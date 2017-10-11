@@ -11,7 +11,7 @@
 FROM openjdk:8-jre
 
 RUN apt-get update && \
-    apt-get install -y ntp nginx runit net-tools vim
+    apt-get install -y nginx-light runit
 
 ENV CONSUL_TEMPLATE_VERSION 0.12.1
 ADD https://releases.hashicorp.com/consul-template/${CONSUL_TEMPLATE_VERSION}/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip /tmp/consul-template.zip

@@ -41,6 +41,9 @@ class AmbariService @Inject()(
     ambariWebService.checkAmbariStatus(ambariEndpoint)
   }
 
+  def getClusterServices(dpcwServices: DpClusterWithDpServices)(implicit token:Option[HJwtToken]):Future[Either[Errors,Seq[ServiceInfo]]] = {
+    ambariWebService.getAmbariServicesInfo(dpcwServices)
+  }
   def getClusterDetails(ambariDetailRequest: AmbariDetailRequest)(implicit hJwtToken: Option[HJwtToken]) = {
     ambariWebService.getAmbariDetails(ambariDetailRequest)
   }

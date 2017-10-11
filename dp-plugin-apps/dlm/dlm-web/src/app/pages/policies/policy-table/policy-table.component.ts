@@ -22,7 +22,7 @@ import { Policy } from 'models/policy.model';
 import { Cluster } from 'models/cluster.model';
 import { ActionItemType } from 'components';
 import { TableTheme } from 'common/table/table-theme.type';
-import { StatusColumnComponent } from 'components/table-columns/status-column/status-column.component';
+import { StatusColumnComponent } from '../../../components/table-columns/policy-status-column/policy-status-column.component';
 import { PolicyInfoComponent } from './policy-info/policy-info.component';
 import { IconColumnComponent } from 'components/table-columns/icon-column/icon-column.component';
 import { TranslateService } from '@ngx-translate/core';
@@ -34,7 +34,6 @@ import { Observable } from 'rxjs/Observable';
 import { Job } from 'models/job.model';
 import { abortJob, rerunJob, loadJobsPageForPolicy } from 'actions/job.action';
 import { deletePolicy, resumePolicy, suspendPolicy } from 'actions/policy.action';
-import { PolicyService } from 'services/policy.service';
 import { OperationResponse } from 'models/operation-response.model';
 import { getLastOperationResponse } from 'selectors/operation.selector';
 import { getMergedProgress } from 'selectors/progress.selector';
@@ -53,6 +52,11 @@ import { EntityType } from 'constants/log.constant';
 import { ColumnMode } from '@swimlane/ngx-datatable';
 import { NOTIFICATION_TYPES, NOTIFICATION_CONTENT_TYPE } from 'constants/notification.constant';
 import { confirmNextAction } from 'actions/confirmation.action';
+import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
+import {
+  ConfirmationOptions,
+  confirmationOptionsDefaults
+} from '../../../components/confirmation-modal/confirmation-options.type';
 
 const DATABASE_REQUEST = '[Policy Table] DATABASE_REQUEST';
 
@@ -94,6 +98,10 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   jobsOverallCount: number;
   jobsPolicyId: string;
   loadingJobs = false;
+  tableFooterOptions = {
+    showFilterSummary: true,
+    pagerDropup: true
+  } as TableFooterOptions;
 
   @ViewChild(IconColumnComponent) iconColumn: IconColumnComponent;
   @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;
@@ -308,8 +316,16 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         RERUN_JOB: rerunJob
       }[this.selectedAction.name];
       if (nextAction) {
+        const body = ['DELETE_POLICY', 'SUSPEND_POLICY', 'ACTIVATE_POLICY'].indexOf(this.selectedAction.name) === -1 ?
+          confirmationOptionsDefaults.body :
+          this.t.instant(`page.policies.perform_action.${this.selectedAction.name.toLowerCase()}.body`, {policyName: row.name});
         this.store.dispatch(confirmNextAction(
-          nextAction(this.selectedForActionRow, { notification: this.generateNotification()})
+          nextAction(this.selectedForActionRow, { notification: this.generateNotification()}),
+          {
+            ...confirmationOptionsDefaults,
+            body,
+            confirmBtnText: this.t.instant('common.yes')
+          } as ConfirmationOptions
         ));
       }
     }

@@ -8,8 +8,10 @@
  */
 
 import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
-import {DropdownItem} from '../../../components/dropdown/dropdown-item';
 import {TranslateService} from '@ngx-translate/core';
+
+import {DropdownItem} from 'components/dropdown/dropdown-item';
+import { TableFooterOptions } from './table-footer.type';
 
 @Component({
   selector: 'dlm-table-footer',
@@ -25,7 +27,7 @@ export class TableFooterComponent {
   @Input() curPage: number;
   @Input() offset: number;
   @Input() limits: number[] = [10, 25, 50];
-  @Input() showPageSizeMenu = true;
+  @Input() options: TableFooterOptions;
   @Output() changePageSize: EventEmitter<any> = new EventEmitter();
   @Output() changePage: EventEmitter<any> = new EventEmitter();
 

@@ -13,7 +13,7 @@ import {Component, OnInit, ElementRef, ViewChild, AfterViewInit} from '@angular/
 import {Router, ActivatedRoute} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 
-import {Cluster, ClusterDetails} from '../../../../models/cluster';
+import {Cluster, ClusterDetails, ServiceInfo} from '../../../../models/cluster';
 import {Lake} from '../../../../models/lake';
 import {Location} from '../../../../models/location';
 
@@ -24,6 +24,8 @@ import {StringUtils} from '../../../../shared/utils/stringUtils';
 import {IdentityService} from '../../../../services/identity.service';
 import {DateUtils} from '../../../../shared/utils/date-utils';
 import {Loader} from '../../../../shared/utils/loader';
+import {CustomError} from "../../../../models/custom-error";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'dp-cluster-details',
@@ -37,11 +39,13 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
               private lakeService: LakeService,
               private clusterService: ClusterService,
               private locationService: LocationService,
-              private identityService: IdentityService) {
+              private identityService: IdentityService,
+              private  translateService: TranslateService) {
   }
 
   lake: Lake = new Lake();
   clusters: Cluster[];
+  servicesInfo: ServiceInfo[];
   cluster: any;
   clusterHealth: any;
   rmHealth: any;
@@ -59,6 +63,8 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
   hdfsPercent: string;
   heapPercent: string;
   clusterHealthInProgress = false;
+  showError: boolean = false;
+  errorMessage: string;
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -68,10 +74,11 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
 
   fetchClusterDetails(lakeId) {
     Loader.show();
+    this.showError = false;
     this.lakeService.retrieve(lakeId).subscribe((lake: Lake) => {
       this.lake = lake;
       this.populateGeneralProperties();
-      this.getClusterDetails()
+      this.getClusterDetails();
     }, error => {
       Loader.hide();
     });
@@ -108,6 +115,9 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       this.clusterService.syncCluster(this.lake.id).subscribe(res => {
         Loader.show();
         let count = 0;
+        this.lakeService.getServicesInfo(this.lake.id.toString()).subscribe(res =>{
+          this.servicesInfo = res;
+        });
         this.lakeService.retrieve(this.lake.id.toString())
           .delay(2000)
           .repeat(15)
@@ -117,12 +127,33 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
           this.getClusterHealth(this.cluster.id, this.lake.id);
         });
 
-        this.clusterService.retrieveDataNodeHealth(this.cluster.id).subscribe(dnHealth => {
-          this.dnHealth = dnHealth;
-          this.populateDataNodeHealth();
-        });
+        this.getDataNodeHealth(this.cluster.id);
         this.getRMHealth(this.cluster.id);
       });
+    });
+  }
+
+  private onError(error){
+    if(!this.showError && error._body){
+      let errsWrap = JSON.parse(error._body);
+      if(errsWrap && errsWrap.errors && errsWrap.errors.length > 0){
+        let err = errsWrap.errors[0] as CustomError;
+        this.showError = true;
+        this.errorMessage = this.translateService.instant('pages.infra.description.backenderrors.'+err.errorType);
+      }
+    }
+  }
+
+  closeError() {
+    this.showError = false;
+  }
+
+  private getDataNodeHealth(clusterId) {
+    this.clusterService.retrieveDataNodeHealth(this.cluster.id).subscribe(dnHealth => {
+      this.dnHealth = dnHealth;
+      this.populateDataNodeHealth();
+    }, error => {
+      this.onError(error);
     });
   }
 
@@ -149,6 +180,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
         Loader.hide();
       }
     }, error => {
+      this.onError(error);
       if (!this.clusterHealthInProgress) {
         Loader.hide();
       }

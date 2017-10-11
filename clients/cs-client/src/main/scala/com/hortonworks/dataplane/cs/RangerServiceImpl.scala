@@ -14,15 +14,12 @@ package com.hortonworks.dataplane.cs
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, HJwtToken}
 import com.hortonworks.dataplane.cs.Webservice.RangerService
 import com.typesafe.config.Config
-import play.api.libs.json.{JsObject, JsValue}
+import play.api.libs.json.JsValue
 import play.api.libs.ws.WSResponse
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-/**
-  * Created by dsingh on 7/28/17.
-  */
 
 class RangerServiceImpl(config: Config)(implicit ws: ClusterWsClient)
   extends RangerService {

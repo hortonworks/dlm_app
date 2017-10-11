@@ -12,7 +12,7 @@ export const UNIT_FILES = 'maptasks';
 export const UNIT_TABLES = 'table';
 
 export const UNIT_LABELS = {
-  [UNIT_EVENTS]: 'events',
-  [UNIT_FILES]: 'files',
-  [UNIT_TABLES]: 'tables'
+  [UNIT_EVENTS]: 'Events',
+  [UNIT_FILES]: 'Files',
+  [UNIT_TABLES]: 'Tables'
 };

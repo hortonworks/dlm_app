@@ -24,16 +24,16 @@ export class CreatePairingCardComponent implements OnInit {
   @Input() isFrozen = false;
 
   get location() {
-    return this.cluster.disabled ? '' : this.cluster.location.city + ', ' + this.cluster.location.country;
-  }
-
-  get tooltip() {
-    return this.cluster.disabled ? this.t.instant('page.pairings.create.content.cluster_disabled') : '';
+    return this.cluster.location.city + ', ' + this.cluster.location.country;
   }
 
   get capacityRemaining() {
     return (this.cluster && this.cluster.stats && this.cluster.stats.CapacityRemaining) ?
       this.bytesPipe.transform(this.cluster.stats.CapacityRemaining) : this.t.instant('common.na');
+  }
+
+  get isDisabled() {
+    return this.cluster.disabled || this.cluster.ambariUnhealthy || this.cluster.beaconUnhealthy;
   }
 
   constructor(private t: TranslateService, private bytesPipe: BytesSizePipe) { }
