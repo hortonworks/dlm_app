@@ -87,7 +87,7 @@ export class NotificationsTableComponent implements OnInit {
   showLog(event: Event) {
     const eventType = event.eventType;
     if (eventType in EntityType) {
-      this.logService.showLog(EntityType[eventType], event[this.logEventTypeMap[EntityType[eventType]]], event.timestamp);
+      this.logService.showLog(EntityType[eventType], event[this.logEventTypeMap[EntityType[eventType]]]);
     }
   }
 

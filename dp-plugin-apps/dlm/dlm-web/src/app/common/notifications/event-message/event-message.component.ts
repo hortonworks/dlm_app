@@ -49,7 +49,7 @@ export class EventMessageComponent {
 
   showEventEntityLogs(event: Event) {
     const entityType = JOB_EVENT === event.eventType ? EntityType.policyinstance : EntityType.policy;
-    this.logService.showLog(entityType, event[LOG_EVENT_TYPE_MAP[entityType]], event.timestamp);
+    this.logService.showLog(entityType, event[LOG_EVENT_TYPE_MAP[entityType]]);
   }
 
   goToPolicy(event: Event) {
