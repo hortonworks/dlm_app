@@ -46,7 +46,7 @@ export class LdapEditConfigComponent extends LdapConfigCommonComponent {
     this.ldapUpdateProperties.ldapUrl = this.ldapProperties.ldapUrl;
     this.ldapUpdateProperties.password = this.ldapProperties.password;
     this.configurationService.updateLDAP(this.ldapUpdateProperties).subscribe(() => {
-      this.router.navigate(['infra/usermgmt/users', {
+      this.router.navigate(['infra/manage-access/users', {
         status: 'success',
       }]);
       Loader.hide();

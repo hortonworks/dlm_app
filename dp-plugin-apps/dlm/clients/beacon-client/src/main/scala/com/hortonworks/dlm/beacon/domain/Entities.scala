@@ -55,7 +55,8 @@ object ResponseEntities {
 
   case class BeaconLogResponse(status: String, message: String, requestId: String)
 
-  case class BeaconAdminStatusResponse(status: String, version: String, plugins: String, security: String, wireEncryption: Boolean)
+  case class BeaconAdminStatusResponse(status: String, version: String, plugins: String, security: String,
+                                       wireEncryption: Boolean, rangerCreateDenyPolicy: String)
 
   case class BeaconAdminStatusDetails(clusterId: Long, beaconAdminStatus: BeaconAdminStatusResponse)
 

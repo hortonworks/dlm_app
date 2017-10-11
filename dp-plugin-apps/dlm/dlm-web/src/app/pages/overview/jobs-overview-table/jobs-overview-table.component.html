@@ -9,14 +9,18 @@
 
 <dlm-table
   #jobsTable
-  [showPageSizeMenu]="showPageSizeMenu"
+  [footerOptions]="footerOptions"
   [columns]="columns"
   [rows]="jobs"
   (selectColumnAction)="handleSelectedAction($event)">
 </dlm-table>
+<div class="legend pull-right">
+  <dlm-job-status [job]="{status: 'SUCCESS'}">Success</dlm-job-status>
+  <dlm-job-status [job]="{status: 'RUNNING'}">In Progress</dlm-job-status>
+  <dlm-job-status [job]="{status: 'FAILED'}">Failed</dlm-job-status>
+</div>
 
 <dlm-icon-column [showHexagon]="false" [showValue]="true"></dlm-icon-column>
-<dlm-status-column [showText]="false"></dlm-status-column>
 
 <ng-template #clusterNameCellRef let-name="value">
   <span [tooltip]="getDatacenterName(name)">{{getClusterName(name)}}</span>
@@ -82,17 +86,11 @@
 </ng-template>
 
 <ng-template #transferredFormattedTemplate let-value="value" let-policy="row">
-  <div *ngIf="policy.lastJobResource.status === JOB_STATUS.RUNNING; else transferredTpl" class="text-muted text-uppercase">
+  <div *ngIf="policy.lastJobResource.status === JOB_STATUS.RUNNING; else transferredTpl" class="text-muted">
     {{'common.status.in_progress' | translate}}
   </div>
   <ng-template #transferredTpl>
-    <span [innerHtml]="value.bytesCopied | bytesSize"></span>
-    <span *ngIf="value.filesCopied">/
-      <dlm-transferred-objects
-        [amount]="value?.filesCopied"
-        [units]="value?.unit">
-      </dlm-transferred-objects>
-    </span>
+    <span [innerHtml]="value.bytesCopied | bytesSize" [tooltip]="getTransferredTooltip(value)"></span>
   </ng-template>
 </ng-template>
 

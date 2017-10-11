@@ -65,7 +65,7 @@ export class UsersComponent implements OnInit {
   }
 
   editUser(userName) {
-    this.router.navigate([{outlets: {'sidebar': ['edit', userName]}}], {relativeTo: this.route});
+    this.router.navigate([{outlets: {'sidebar': [userName, 'edit']}}], {relativeTo: this.route});
   }
 
   onSearch(event) {
@@ -75,7 +75,7 @@ export class UsersComponent implements OnInit {
 
   switchView(tab) {
     if(tab === UserMgmtTabs.GROUPS){
-      this.router.navigate(['/infra/usermgmt/groups']);
+      this.router.navigate(['/infra/manage-access/groups']);
     }
   }
 

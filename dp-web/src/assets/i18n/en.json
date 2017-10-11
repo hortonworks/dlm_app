@@ -350,6 +350,39 @@
       "add-workspace": {
         "title": "Add Workspace"
       }
+    },
+    "not_found": {
+      "message": "This page does not exist.",
+      "link_text": "Click here to return to home page."
     }
+  },
+  "routes": {
+    "dss": "Data Steward",
+    "dss.assets.cAsset": "Asset Details",
+    "dss.collections": "Asset Collections",
+    "dss.collections.add": "Add",
+    "dss.collections.cCollection": "Details",
+    "dss.collections.cCollection.edit": "Edit",
+
+    "infra": "Admin",
+    "infra.clusters": "Clusters",
+    "infra.clusters.add": "Add",
+    "infra.clusters.cCluster": "Details",
+    "infra.clusters.cCluster.edit": "Edit",
+    "infra.services": "Services",
+    "infra.services.add": "Add",
+    "infra.services.cService.verify": "Verify",
+    "infra.access.users": "Users",
+    "infra.access.groups": "Groups",
+    "infra.access.identity_provider_edit": "Edit LDAP",
+
+    "onboard": "Onboard",
+    "onboard.welcome": "Welcome",
+    "onboard.identity_provider": "Configure LDAP",
+    "onboard.users_and_groups": "Configure Access",
+
+    "not_found": "Not Found",
+    "unauthorized": "Unauthorized",
+    "service_not_enabled": "Service not enabled"
   }
 }

@@ -8,29 +8,26 @@
  */
 
 import {
-  Component, OnInit, Output, ViewChild, TemplateRef, OnDestroy, ViewEncapsulation, EventEmitter, HostBinding
+  Component, OnInit, Output, ViewChild, TemplateRef, ViewEncapsulation, EventEmitter, HostBinding
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs/Subscription';
 
 import * as fromRoot from 'reducers/';
 import { ActionItemType } from 'components';
 import { JobsTableComponent } from 'pages/jobs/jobs-table/jobs-table.component';
 import { TableComponent } from 'common/table/table.component';
-import { getLastOperationResponse } from 'selectors/operation.selector';
-import { OperationResponse } from 'models/operation-response.model';
 import { deletePolicy, resumePolicy, suspendPolicy } from 'actions/policy.action';
 import { abortJob, rerunJob } from 'actions/job.action';
-import { StatusColumnComponent } from 'components/table-columns/status-column/status-column.component';
 import { Policy } from 'models/policy.model';
 import { LogService } from 'services/log.service';
-import { JOB_STATUS, POLICY_STATUS } from 'constants/status.constant';
+import { JOB_STATUS } from 'constants/status.constant';
 import { PolicyService } from 'services/policy.service';
 import { confirmNextAction } from 'actions/confirmation.action';
-import { contains } from 'utils/array-util';
 import { NOTIFICATION_TYPES, NOTIFICATION_CONTENT_TYPE } from 'constants/notification.constant';
+import { JobTrackinfoProgress } from 'models/job-tracking-info.model';
+import { UNIT_LABELS } from 'constants/job.constant';
 
 @Component({
   selector: 'dlm-jobs-overview-table',
@@ -48,7 +45,6 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   @ViewChild('verbStatusCellTemplate') verbStatusCellTemplate: TemplateRef<any>;
   @ViewChild('policyNameCellTemplate') policyNameCellTemplate: TemplateRef<any>;
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
-  @ViewChild(StatusColumnComponent) statusColumn: StatusColumnComponent;
   @ViewChild('prevJobs') prevJobsRef: TemplateRef<any>;
   @ViewChild('serviceNameCellTemplate') serviceNameCellRef: TemplateRef<any>;
 
@@ -192,5 +188,13 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
 
   isRerunDisabled(policy: Policy, action): boolean {
     return this.cannotRerun(policy, policy.lastJobResource);
+  }
+
+  getTransferredTooltip(progress: JobTrackinfoProgress): string {
+    let tooltip = '';
+    if (progress.filesCopied) {
+      tooltip = `${UNIT_LABELS[progress.unit]}: ${progress.filesCopied}`;
+    }
+    return tooltip;
   }
 }

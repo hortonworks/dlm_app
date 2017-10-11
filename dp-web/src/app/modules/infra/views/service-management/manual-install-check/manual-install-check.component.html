@@ -89,9 +89,15 @@
       </div>
     </div>
     <div class="button-container">
-      <button *ngIf="!verificationComplete || !installSuccessful" disabled id="next-btn" class="btn btn-hwx-primary">{{"pages.services.labels.next" | translate}}</button>
-      <button *ngIf="verificationComplete && installSuccessful" id="next-btn" class="btn btn-hwx-primary" (click)="next()">{{"pages.services.labels.next" | translate}}</button>
-      <button id="cancel-btn" class="btn btn-hwx-default" (click)="cancel()">{{"common.cancel" | translate}}</button>
+      <button
+        [disabled]="!verificationComplete || !installSuccessful"
+        id="next-btn"
+        class="btn btn-hwx-primary"
+        [routerLink]="['/infra/services']">{{"pages.services.labels.next" | translate}}</button>
+      <button
+        id="cancel-btn"
+        class="btn btn-hwx-default"
+        [routerLink]="['/infra/services']">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

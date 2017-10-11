@@ -22,7 +22,9 @@
               <button id="ldap-actions" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon pull-right">
                 <i class="fa fa-ellipsis-v"></i></button>
               <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="ldap-actions">
-                <li class="mdl-menu__item"  [routerLink]="['/infra/usermgmt/editldap']"><i class="fa fa-edit menu-icon"></i>{{"common.edit" | translate}}</li>
+                <li class="mdl-menu__item"  [routerLink]="['/infra/manage-access/identity-provider-edit']">
+                  <i class="fa fa-edit menu-icon"></i>{{"common.edit" | translate}}
+                </li>
               </ul>
             </div>
           </div>

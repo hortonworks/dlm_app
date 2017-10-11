@@ -159,13 +159,19 @@ class LdapService @Inject()(
         dirContext,
         context => {
           try{
-            ldapSearch(context, configuredLdap.right.get, userName, searchType,fuzzyMatch)
-          }finally {
-            context.close()
+            val searchResult = ldapSearch(context, configuredLdap.right.get, userName, searchType,fuzzyMatch)
+            searchResult.onComplete{ res =>
+              context.close()
+            }
+            searchResult
           }
         })
 
     } yield search
+
+  private def getUserDetailFromLdap(dirContext: DirContext, ldapConfs: Seq[LdapConfiguration], userName: String) = {
+    ldapSearch(dirContext, ldapConfs, userName, Some("user"), fuzzyMatch = false)
+  }
 
   private def validateAndGetLdapContext(
                                          configuredLdap: Seq[LdapConfiguration]):Future[Either[Errors,DirContext]] = {
@@ -273,11 +279,11 @@ class LdapService @Inject()(
       search <- doWithEither[DirContext, LdapUser](
         dirContext,
         context => {
-          try{
-            getUserAndGroups(context, configuredLdap.right.get, userName)
-          }finally {
-            context.close()
-          }
+          val groups = getUserAndGroups(context, configuredLdap.right.get, userName)
+          groups.onComplete{ res =>
+              context.close()
+            }
+          groups
         })
     } yield search
 
@@ -291,7 +297,7 @@ class LdapService @Inject()(
       case Some(errors)=>Future.successful(Left(errors))
       case _ =>{
         val groupSearchBase=ldapConf.groupSearchBase
-        search(userName,Some("user"),fuzzyMatch = false).map{
+        getUserDetailFromLdap(dirContext,ldapConfs, userName).map{
           case Left(errors)=>Left(errors)
           case Right(userSearchResults)=>{
             userSearchResults.headOption match {
@@ -304,7 +310,7 @@ class LdapService @Inject()(
                 val extendedGroupSearchFilter = s"(objectclass=$groupObjectClass)"
                 val fullUserdn=userRes.nameInNameSpace
                 var groupSearchFilter=s"(&$extendedGroupSearchFilter($groupMemberAttributeName=$fullUserdn))"
-                val res: NamingEnumeration[SearchResult]=dirContext.search(groupSearchBase.get,groupSearchFilter,groupSearchControls)
+                val res: NamingEnumeration[SearchResult]= dirContext.search(groupSearchBase.get,groupSearchFilter,groupSearchControls)
                 val ldapGroups: ArrayBuffer[LdapGroup]=new ArrayBuffer
                 while (res.hasMore) {
                   val sr: SearchResult = res.next()

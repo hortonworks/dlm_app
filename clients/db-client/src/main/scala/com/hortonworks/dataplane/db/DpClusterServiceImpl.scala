@@ -112,6 +112,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
           res,
           r =>
             (r.json \ "results" \\ "data").head.validate[DataplaneCluster].get)
+      case 404 => createEmptyErrorResponse
       case _ => mapErrors(res)
     }
   }

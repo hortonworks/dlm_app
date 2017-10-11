@@ -19,6 +19,7 @@ import { ColumnMode } from '@swimlane/ngx-datatable';
 import { CLUSTER_STATUS } from 'constants/status.constant';
 import { ROOT_PATH } from 'constants/hdfs.constant';
 import { ACTION_TYPES } from 'components/cluster-actions/cluster-actions.component';
+import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
 
 @Component({
   selector: 'dlm-cluster-list',
@@ -35,6 +36,9 @@ export class ClusterListComponent implements OnInit {
   columnMode = ColumnMode.flex;
   isOpen = false;
   visibleActionMap = {};
+  tableFooterOptions = {
+    pagerDropup: true
+  } as TableFooterOptions;
   private selectedFileBrowserPage = {};
   clusterActions = [
     {

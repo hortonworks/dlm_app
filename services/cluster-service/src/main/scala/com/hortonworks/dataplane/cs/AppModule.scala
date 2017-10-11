@@ -12,19 +12,17 @@
 package com.hortonworks.dataplane.cs
 
 import javax.inject.Named
-import javax.net.ssl.HostnameVerifier
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.{Http, HttpsConnectionContext}
 import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provider, Provides, Singleton}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
-import com.hortonworks.dataplane.cs.utils.SSLUtils
 import com.hortonworks.dataplane.cs.utils.SSLUtils.DPTrustStore
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
 import com.hortonworks.dataplane.db._
-import com.hortonworks.dataplane.http.{ProxyServer, Webserver}
 import com.hortonworks.dataplane.http.routes.{DpProfilerRoute, _}
+import com.hortonworks.dataplane.http.{ProxyServer, Webserver}
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.sslconfig.akka.AkkaSSLConfig
 import com.typesafe.sslconfig.ssl.{TrustManagerConfig, TrustStoreConfig}
@@ -50,15 +48,19 @@ object AppModule extends AbstractModule {
                        config: Config,
                        dPKeystore: DPTrustStore): HttpsConnectionContext = {
     // provides a custom ssl config with the dp keystore
-    val c  =  AkkaSSLConfig().mapSettings{
-      s =>
-        val settings = s.withDisabledKeyAlgorithms(scala.collection.immutable.Seq("RSA keySize < 1024")).withTrustManagerConfig(
+    val c = AkkaSSLConfig().mapSettings { s =>
+      val settings = s
+        .withDisabledKeyAlgorithms(
+          scala.collection.immutable.Seq("RSA keySize < 1024"))
+        .withTrustManagerConfig(
           TrustManagerConfig().withTrustStoreConfigs(
-            scala.collection.immutable.Seq(TrustStoreConfig(None, Some(dPKeystore.getKeyStoreFilePath)))))
-        if(config.getBoolean("dp.services.ssl.config.disable.hostname.verification"))
-          settings.withLoose(s.loose.withDisableHostnameVerification(true))
-        else
-          settings
+            scala.collection.immutable.Seq(
+              TrustStoreConfig(None, Some(dPKeystore.getKeyStoreFilePath)))))
+      if (config.getBoolean(
+            "dp.services.ssl.config.disable.hostname.verification"))
+        settings.withLoose(s.loose.withDisableHostnameVerification(true))
+      else
+        settings
     }
     val dpCtx = Http().createClientHttpsContext(c)
     dpCtx
@@ -74,10 +76,13 @@ object AppModule extends AbstractModule {
   @Provides
   @Singleton
   def provideWsClient(implicit actorSystem: ActorSystem,
-                      materializer: ActorMaterializer,configuration: Config): WSClient = {
+                      materializer: ActorMaterializer,
+                      configuration: Config): WSClient = {
     val config = new DefaultAsyncHttpClientConfig.Builder()
       .setAcceptAnyCertificate(true)
-      .setRequestTimeout(Try(configuration.getInt("dp.services.ws.client.requestTimeout.mins")*60*1000).getOrElse(4*60*1000))
+      .setRequestTimeout(Try(configuration.getInt(
+        "dp.services.ws.client.requestTimeout.mins") * 60 * 1000)
+        .getOrElse(4 * 60 * 1000))
       .build
     AhcWSClient(config)
   }
@@ -144,9 +149,10 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def provideAtlasRoute(config: Config,
-                        atlasApiData: ClusterDataApi,
-                        credentialInterface: CredentialInterface): AtlasRoute = {
+  def provideAtlasRoute(
+      config: Config,
+      atlasApiData: ClusterDataApi,
+      credentialInterface: CredentialInterface): AtlasRoute = {
     AtlasRoute(config, atlasApiData, credentialInterface)
   }
 
@@ -181,15 +187,21 @@ object AppModule extends AbstractModule {
                     dpClusterService,
                     config)
   }
-
-
   @Provides
   @Singleton
-  def provideHdpProxyRoute(actorSystem: ActorSystem,
-                           actorMaterializer: ActorMaterializer,
-                           clusterData: ClusterDataApi,
-                           config: Config,@Named ("connectionContext") sslContext:Provider[HttpsConnectionContext],dPKeystore: DPTrustStore): HdpRoute = {
-    new HdpRoute(actorSystem, actorMaterializer, clusterData, sslContext,config,dPKeystore)
+  def provideHdpProxyRoute(
+      actorSystem: ActorSystem,
+      actorMaterializer: ActorMaterializer,
+      clusterData: ClusterDataApi,
+      config: Config,
+      @Named("connectionContext") sslContext: Provider[HttpsConnectionContext],
+      dPKeystore: DPTrustStore): HdpRoute = {
+    new HdpRoute(actorSystem,
+                 actorMaterializer,
+                 clusterData,
+                 sslContext,
+                 config,
+                 dPKeystore)
   }
 
   @Provides
@@ -208,7 +220,10 @@ object AppModule extends AbstractModule {
                          clusterComponentService: ClusterComponentService,
                          clusterHostsService: ClusterHostsService,
                          wSClient: WSClient): DpProfilerRoute = {
-    new DpProfilerRoute(clusterComponentService, clusterHostsService, storageInterface, wSClient)
+    new DpProfilerRoute(clusterComponentService,
+                        clusterHostsService,
+                        storageInterface,
+                        wSClient)
   }
 
   @Provides
@@ -217,8 +232,18 @@ object AppModule extends AbstractModule {
                              credentialInterface: CredentialInterface,
                              clusterComponentService: ClusterComponentService,
                              clusterHostsService: ClusterHostsService,
+                             dpClusterService: DpClusterService,
+                             clusterService: ClusterService,
+                             config: Config,
                              wSClient: WSClient): RangerRoute = {
-    new RangerRoute(clusterComponentService, clusterHostsService, storageInterface, credentialInterface, wSClient)
+    new RangerRoute(clusterComponentService,
+                    clusterHostsService,
+                    storageInterface,
+                    credentialInterface,
+                    dpClusterService,
+                    clusterService,
+                    config,
+                    wSClient)
   }
 
   @Provides
@@ -237,15 +262,15 @@ object AppModule extends AbstractModule {
       materializer,
       configuration,
       rangerRoute.rangerAudit ~
-      rangerRoute.rangerPolicy ~
-      dpProfilerRoute.startJob ~
-      dpProfilerRoute.jobStatus ~
-      dpProfilerRoute.jobDelete ~
-      dpProfilerRoute.startAndScheduleJob ~
-      dpProfilerRoute.scheduleInfo ~
-      dpProfilerRoute.auditResults ~
-      dpProfilerRoute.auditActions ~
-      atlasRoute.hiveAttributes ~
+        rangerRoute.rangerPolicy ~
+        dpProfilerRoute.startJob ~
+        dpProfilerRoute.jobStatus ~
+        dpProfilerRoute.jobDelete ~
+        dpProfilerRoute.startAndScheduleJob ~
+        dpProfilerRoute.scheduleInfo ~
+        dpProfilerRoute.auditResults ~
+        dpProfilerRoute.auditActions ~
+        atlasRoute.hiveAttributes ~
         atlasRoute.hiveTables ~
         atlasRoute.atlasEntities ~
         atlasRoute.atlasEntity ~
@@ -264,21 +289,21 @@ object AppModule extends AbstractModule {
   @Provides
   @Singleton
   def provideStorageInterface(
-                               dpClusterService: DpClusterService,
-                               clusterService: ClusterService,
-                               clusterComponentService: ClusterComponentService,
-                               clusterHostsServiceImpl: ClusterHostsService,
-                               configService: ConfigService): StorageInterface = {
+      dpClusterService: DpClusterService,
+      clusterService: ClusterService,
+      clusterComponentService: ClusterComponentService,
+      clusterHostsServiceImpl: ClusterHostsService,
+      configService: ConfigService): StorageInterface = {
     new StorageInterfaceImpl(clusterService,
-      dpClusterService,
-      clusterComponentService,
-      clusterHostsServiceImpl,
-      configService)
+                             dpClusterService,
+                             clusterComponentService,
+                             clusterHostsServiceImpl,
+                             configService)
   }
 
   @Provides
   @Singleton
-  def provideCredentialInterface(config: Config): CredentialInterface= {
+  def provideCredentialInterface(config: Config): CredentialInterface = {
     new CredentialInterfaceImpl(config)
   }
 

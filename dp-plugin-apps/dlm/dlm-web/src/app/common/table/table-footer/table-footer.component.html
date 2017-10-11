@@ -9,18 +9,21 @@
 
 <div class="row row-nopad">
   <div class="col-xs-3 col-md-2 col-lg-2">
-    {{summary}}
+    <span *ngIf="options.showFilterSummary">
+      {{summary}}
+    </span>
   </div>
   <div class="col-xs-2 col-md-6 col-lg-6">
     <ng-content></ng-content>
   </div>
   <div class="col-xs-3 col-md-2 col-lg-2">
-    <div class="pull-right" *ngIf="showPageSizeMenu">
+    <div class="pull-right" *ngIf="options.showPageSizeMenu">
       {{"common.show" | translate}}:
       <dlm-dropdown
         qe-attr="change-page-size"
         class="page-size-menu"
         type="link"
+        [isDropup]="options.pagerDropup"
         [text]="pageSize"
         [items]="pageSizeOptions"
         [buttonClass]="'btn-default'"

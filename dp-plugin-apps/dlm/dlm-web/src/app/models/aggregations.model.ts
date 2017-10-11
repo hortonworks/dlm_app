@@ -10,6 +10,7 @@
 export interface ClustersStatus {
   healthy: number;
   unhealthy: number;
+  unknown: number;
   warning: number;
   total: number;
 };

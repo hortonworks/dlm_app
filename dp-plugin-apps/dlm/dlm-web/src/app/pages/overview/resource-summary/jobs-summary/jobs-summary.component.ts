@@ -20,7 +20,7 @@ import { JOBS_HEALTH_STATE } from '../resource-summary.type';
       <div class="row">
         <dlm-summary-panel-cell
           class="col-xs-4"
-          iconClass="fa fa-circle text-info"
+          iconClass="fa fa-circle-o text-info"
           qe-attr="show-jobs-in-progress"
           (cellClick)="selectPanelCell.emit(healthStates.IN_PROGRESS)"
           [actionable]="data.inProgress > 0"

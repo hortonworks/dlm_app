@@ -10,15 +10,16 @@
  */
 
 import {NgModule} from '@angular/core';
+import {RouterModule} from '@angular/router';
+import {TranslateModule} from '@ngx-translate/core';
 
 import { BreadCrumbComponent } from './bread-crumb.component';
-import {SharedModule} from '../shared.module';
-import {BreadCrumbNamePipe} from './bread-crumb-name.pipe';
+import { SharedModule } from '../shared.module';
 
 @NgModule({
-  imports: [SharedModule],
-  exports: [BreadCrumbNamePipe, BreadCrumbComponent],
-  declarations: [BreadCrumbNamePipe, BreadCrumbComponent],
+  imports: [SharedModule, RouterModule, TranslateModule],
+  exports: [BreadCrumbComponent],
+  declarations: [BreadCrumbComponent],
   providers: [],
 })
 

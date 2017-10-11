@@ -52,7 +52,7 @@ export class DsFullView implements OnInit {
   }
 
   private onEdit(action: AssetListActionsEnum) {
-    this.router.navigate([`datasteward/dataset/edit/${this.dsModel.id}`]);
+    this.router.navigate(['datasteward/collections', this.dsModel.id, 'edit']);
   }
 
   onDeleteDataset() {
@@ -66,7 +66,7 @@ export class DsFullView implements OnInit {
       .subscribe(() => {
         this.dialogConfirm.nativeElement.close();
 
-        this.router.navigate([`datasteward/dataset`]);
+        this.router.navigate([`datasteward/collections`]);
       });
   }
 

@@ -1,3 +1,5 @@
+import sbt.ExclusionRule
+
 name := """cluster-service"""
 
 version := "1.0"
@@ -28,4 +30,11 @@ libraryDependencies ++= Seq(
   "org.scalatest" % "scalatest_2.11" % "3.0.1" % Test,
   "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test)
 
-libraryDependencies := libraryDependencies.value.map(_.excludeAll(ExclusionRule("com.google.code.findbugs", "annotations")))
+libraryDependencies :=
+  libraryDependencies.value
+    .map(
+      _.excludeAll(
+        ExclusionRule("com.google.code.findbugs", "annotations"),
+        ExclusionRule("org.xerial.snappy", "snappy-java")
+      )
+    )

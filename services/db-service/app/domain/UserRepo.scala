@@ -17,6 +17,7 @@ import javax.inject.{Inject, Singleton}
 
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.RoleType
+import domain.API.EntityNotFound
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 
 import scala.collection.mutable
@@ -107,9 +108,13 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     }
     val roleIdMap=rolesUtil.getRoleIdMap
     db.run(query.result).map { results =>
-      val user:User=results.head._1
-      var roles=results.filter(res=>res._2.isDefined ).map(_._2.get)
-      (user,roles)
+      if(results.isEmpty){
+        throw new EntityNotFound
+      }else{
+        val user:User=results.head._1
+        var roles=results.filter(res=>res._2.isDefined ).map(_._2.get)
+        (user,roles)
+      }
     }
   }
 

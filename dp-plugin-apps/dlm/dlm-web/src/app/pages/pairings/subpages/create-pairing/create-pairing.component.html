@@ -11,12 +11,11 @@
   [isFlexCenter]="true"
   [title]="'page.pairings.create.header'"
   [linkText]="'page.pairings.create.help_text'"
-  [linkTo]="'page.pairings.create.help_url'"
-  description="page.pairings.create.header_note">
+  [linkTo]="'page.pairings.create.help_url'">
 </dlm-page-header>
 <dlm-progress-container [progressState]="overallProgress$ | async">
 <div class="content" id="create_pairing">
-  <div *ngIf="(firstSetClusters$ | async)?.length > 0; else noClusters">
+  <div *ngIf="firstSetClusters.length > 0; else noClusters">
     <div class="content-row header">
       <div class="col-xs-3 col-header">
         <div class="h6 border-bottom">{{ "page.pairings.create.content.header.step_one" | translate }}</div>
@@ -35,7 +34,7 @@
       <form class="basic-form" [formGroup]="createPairingForm" (ngSubmit)="handleSubmit(createPairingForm)">
         <div class="content-row">
           <div class="col-xs-3 col" qe-attr="first-cluster">
-            <dlm-create-pairing-card-list [clusters]="firstSetClusters$ | async" formControlName="firstCluster" [selectedCluster]="selectedFirstCluster" [isFrozen]="isPairingProgress" (change)="onFirstClusterChange($event)"></dlm-create-pairing-card-list>
+            <dlm-create-pairing-card-list [clusters]="firstSetClusters" formControlName="firstCluster" [selectedCluster]="selectedFirstCluster" [isFrozen]="isPairingProgress" (change)="onFirstClusterChange($event)"></dlm-create-pairing-card-list>
           </div>
           <div class="col-xs-3 col" qe-attr="second-cluster">
             <dlm-create-pairing-card-list *ngIf="selectedFirstCluster !== null" [clusters]="secondSetClusters" formControlName="secondCluster" [isFrozen]="isPairingProgress" [selectedCluster]="selectedSecondCluster" (change)="selectSecondCluster($event)"></dlm-create-pairing-card-list>

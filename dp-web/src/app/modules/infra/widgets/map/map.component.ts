@@ -9,11 +9,11 @@
  *
  */
 
-import {Component, OnInit, ViewChild, ElementRef, OnChanges, Input, SimpleChanges} from '@angular/core';
+import {Component, OnInit, ViewChild, ElementRef, OnChanges, Input, SimpleChanges, HostListener} from '@angular/core';
 import * as L from 'leaflet';
 import 'leaflet-curve';
 
-import {MapData} from '../../../../models/map-data';
+import {MapData, Point} from '../../../../models/map-data';
 import {MapDimensions} from '../../../../models/map-data';
 import {MapSize} from '../../../../models/map-data';
 import {MapConnectionStatus} from '../../../../models/map-data';
@@ -34,32 +34,34 @@ export class MapComponent implements OnChanges, OnInit {
   @ViewChild('mapcontainer') mapcontainer: ElementRef;
   @Input('mapData') mapData: MapData[] = [];
   @Input('mapSize') mapSize: MapSize = MapSize.EXTRALARGE;
+  @Input('showCount') showCount = false;
 
-  markerLookup: L.LatLng[] = [];
   pathLookup = [];
 
   statusColorUp = '#3FAE2A';
   statusColorDown = '#EF6162';
   statusColorNA = '#53646A';
 
-  markerColorOuterBorder = '#C4DCEC';
-  markerColorInnerBorder = '#FFFFFF';
-
   mapColor = '#F2F7FC';
+  mapBoundary = '#D0D3D7';
 
   mapOptions = {
-    scrollWheelZoom: false,
-    zoomControl: false,
-    dragging: false,
-    boxZoom: false,
+    scrollWheelZoom: true,
+    zoomControl: true,
+    dragging: true,
+    boxZoom: true,
     doubleClickZoom: false,
     zoomSnap: 0.1,
     zoomAnimation: false,
     attributionControl: false
   };
 
-  markerAndCurveLayer: Layer[] = [];
-  layerGroup: LayerGroup;
+  markers: L.Marker[] = [];
+  paths: Layer[] = [];
+  markerGroup: LayerGroup;
+  pathGroup: LayerGroup;
+
+  private countMap = new Map();
 
   defaultMapSizes: MapDimensions[] = [
     new MapDimensions('240px', '420px', 0.5),
@@ -92,20 +94,19 @@ export class MapComponent implements OnChanges, OnInit {
         fillColor: this.mapColor,
         fillOpacity: 1,
         weight: 1,
-        color: this.mapColor
+        color: this.mapBoundary
       })
     }).addTo(map);
     map.fitBounds(countriesLayer.getBounds());
     this.map = map;
     this.map.setZoom(mapDimensions.zoom);
-    this.mapcontainer.nativeElement.querySelector('.leaflet-map-pane').style.height = `${parseInt(mapDimensions.height, 10) - 20}px`;
-    this.mapcontainer.nativeElement.querySelector('.leaflet-overlay-pane').style.height = `${parseInt(mapDimensions.height, 10) - 20}px`;
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (!changes['mapData'] || !this.map) {
       return;
     }
+    this.countMap = new Map();
     this.removeExistingMarker();
     this.mapData.forEach((data) => {
       let start = data.start;
@@ -118,60 +119,87 @@ export class MapComponent implements OnChanges, OnInit {
         this.drawConnection(start, end);
       }
     });
-    this.layerGroup = new L.LayerGroup(this.markerAndCurveLayer);
+    this.markerGroup = L.layerGroup(this.markers);
+    this.pathGroup = L.layerGroup(this.paths);
   }
 
-  plotPoint(position) {
-    let latLng = L.latLng(position.latitude, position.longitude);
-    if (this.markerExists(latLng)) {
-      return;
-    }
-    this.markerLookup.push(latLng);
-    if (position.status === MapConnectionStatus.UP) {
-      this.createMarker(latLng, this.statusColorUp);
-    } else if (position.status === MapConnectionStatus.DOWN) {
-      this.createMarker(latLng, this.statusColorDown);
-    } else {
-      this.createMarker(latLng, this.statusColorNA);
-    }
-  }
-
-  removeExistingMarker() {
-    if (this.layerGroup) {
-      this.layerGroup.eachLayer(layer => {
-        this.map.removeLayer(layer);
-      });
-    }
-    this.markerLookup = [];
-    this.pathLookup = [];
-  }
-
-  createMarker(latLng, color) {
-    let outerMarker = L.circleMarker(latLng, {
-      radius: 14,
-      color: this.markerColorOuterBorder,
-      weight: 2,
-      fillColor: color,
-      fillOpacity: 0.25
-    }).addTo(this.map);
-    let innerMarker = L.circleMarker(latLng, {
-      radius: 5,
-      color: this.markerColorInnerBorder,
-      weight: 2,
-      fillColor: color,
-      fillOpacity: 0.8
-    }).addTo(this.map);
-    this.markerAndCurveLayer.push(outerMarker);
-    this.markerAndCurveLayer.push(innerMarker);
-  }
-
-  markerExists(latLng) {
-    return this.markerLookup.find(marker => {
-      return marker.lat === latLng.lat && marker.lng === latLng.lng;
+  createPopup(marker, data: MarkerData) {
+    const makeList = (cluster) => `<div class="details-container">
+         <div class="status"><i class="fa fa-circle" style="color:${this.getStatusColor(cluster.status)}"></i> ${cluster.datacenter} / ${cluster.name}</div> 
+         <div class="location">${data.location}</div>
+       </div>`;
+    let html = `<div class="pop-up-container">${data.clusters.map(makeList).join('')}</div>`;
+    marker.bindTooltip(html, {
+      direction: 'right',
+      offset: [10, 0]
     });
   }
 
-  pathExists(curve) {
+  private getStatusColor(status) {
+    let color;
+    if (status === MapConnectionStatus.UP) {
+      color = this.statusColorUp;
+    } else if (status === MapConnectionStatus.DOWN) {
+      color = this.statusColorDown;
+    } else {
+      color = this.statusColorNA;
+    }
+    return color;
+  }
+
+  plotPoint(position: Point) {
+    let latLng = L.latLng(position.latitude, position.longitude);
+    let key = `${position.latitude}-${position.longitude}`;
+    let existingCount = this.countMap.get(key);
+    let count = existingCount ? existingCount.count + 1 : 1;
+    let clusterInfo = new ClusterInfo(position.clusterName, position.status, position.datacenter);
+    let clusters = existingCount ? existingCount.clusters.concat([clusterInfo]) : [clusterInfo];
+    let markerData = new MarkerData(position.location, count, clusters);
+    this.countMap.set(key, markerData);
+    let marker = this.createMarker(latLng, count);
+    if (position.datacenter && position.location) {
+      this.createPopup(marker, markerData);
+    }
+  }
+
+  private createMarker(latLng, count) {
+    let marker = L.marker(latLng, {
+      icon: this.getMarkerIcon(count),
+    }).addTo(this.map);
+    this.markers.push(marker);
+    return marker;
+  }
+
+  removeExistingMarker() {
+    if (this.markerGroup) {
+      this.markerGroup.eachLayer(layer => {
+        layer.remove();
+      });
+    }
+    if (this.pathGroup) {
+      this.pathGroup.eachLayer(layer => {
+        layer.remove();
+      });
+    }
+    this.pathLookup = [];
+  }
+
+  private getMarkerIcon(count: number) {
+    let html = `<div class="marker-wrapper">
+                <i class="fa fa-map-marker marker-icon" ></i>
+                <span class="marker-counter">
+                  ${this.showCount ? count : ''}
+                </span>
+          </div>`;
+    return L.divIcon(({
+      iconSize: null,
+      iconAnchor: [0, 0],
+      className: 'custom-map-marker',
+      html: html
+    }));
+  }
+
+  private pathExists(curve) {
     return this.pathLookup.find(path => {
       return path.start.latitude === curve.start.latitude && path.start.longitude === curve.start.longitude
         && path.end.latitude === curve.end.latitude && path.end.longitude === curve.end.longitude;
@@ -194,6 +222,16 @@ export class MapComponent implements OnChanges, OnInit {
     }
     this.pathLookup.push({start: start, end: end});
     path.addTo(this.map);
-    this.markerAndCurveLayer.push(path);
+    this.paths.push(path);
+  }
+}
+
+export class MarkerData {
+  constructor(public location: string, public count: number, public clusters: any[]) {
+  };
+}
+
+export class ClusterInfo {
+  constructor(public name: string, public status: MapConnectionStatus, public datacenter: string) {
   }
 }

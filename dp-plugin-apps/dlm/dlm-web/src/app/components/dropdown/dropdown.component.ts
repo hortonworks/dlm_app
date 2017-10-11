@@ -24,7 +24,15 @@ export class DropdownComponent implements OnInit {
   @Input() type: string;
   @Input() showChevron = true;
   @Input() selectable = false;
+  @Input() isDropup = false;
   @Output() onSelectItem = new EventEmitter<DropdownItem>();
+
+  get placement(): string {
+    if (this.isDropup) {
+      return 'top right';
+    }
+    return 'bottom right';
+  }
 
   constructor() { }
 

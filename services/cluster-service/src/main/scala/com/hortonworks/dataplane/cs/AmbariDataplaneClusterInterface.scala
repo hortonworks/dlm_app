@@ -47,6 +47,9 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
 
   val logger = Logger(classOf[AmbariDataplaneClusterInterfaceImpl])
 
+  val tokenTopologyName = Try(config.getString("dp.services.knox.token.topology"))
+    .getOrElse("token")
+
   val prefix = Try(config.getString("dp.service.ambari.cluster.api.prefix"))
     .getOrElse("/api/v1/clusters")
 
@@ -59,9 +62,9 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
     * @return List of Cluster names
     */
   override def discoverClusters(implicit hJwtToken: Option[HJwtToken]): Future[Seq[String]] = {
+
     val url = s"${dataplaneCluster.ambariUrl}$prefix"
     val response = getAmbariResponse(url)
-
     response.map { res =>
       val items = (res.json \ "items" \\ "Clusters").map(_.as[JsObject].validate[Map[String, String]].map(m => Some(m)).getOrElse(None))
       // each item is a Some(cluster)
@@ -96,7 +99,7 @@ class AmbariDataplaneClusterInterfaceImpl(dataplaneCluster: DataplaneCluster,
     val delegatedCall:ApiCall = {req => req.get()}
 
     if(dataplaneCluster.knoxEnabled.isDefined && dataplaneCluster.knoxEnabled.get && dataplaneCluster.knoxUrl.isDefined && hJwtToken.isDefined){
-      KnoxApiExecutor(KnoxConfig("token", dataplaneCluster.knoxUrl), ws).execute(
+      KnoxApiExecutor(KnoxConfig(tokenTopologyName, dataplaneCluster.knoxUrl), ws).execute(
         KnoxApiRequest(request, delegatedCall, Some(hJwtToken.get.token)))
     } else requestWithLocalAuth.get()
   }

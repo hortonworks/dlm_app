@@ -37,6 +37,22 @@ import {UniqueDatasetNameValidator} from "./directives/validators";
 import {DsSummaryHolder} from "./views/ds-editor/ds-summary-holder/ds-summary-holder.component";
 import {DsFullView} from "./views/ds-full-view/ds-full-view.component";
 import {TranslateModule} from "@ngx-translate/core";
+import { MyDateRangePickerModule } from 'mydaterangepicker';
+
+import {AssetViewComponent} from './views/asset-view/asset-view.component';
+import {NodeDetailsComponent} from './views/asset-view/node-details/node-details.component';
+import {DropdownModule} from '../../shared/dropdown/dropdown.module';
+import {TabsModule} from '../../shared/tabs/tabs.module';
+import { AssetDetailsViewComponent } from './views/asset-view/asset-details-view/asset-details-view.component';
+import { AssetColumnVisualComponent } from './views/asset-view/asset-column-visual/asset-column-visual.component';
+import { AssetAuditView } from './views/asset-view/asset-audit-view/asset-audit-view.component';
+import { AssetPolicyView } from './views/asset-view/asset-policy-view/asset-policy-view.component';
+import {LineageModule} from '../../shared/lineage/lineage.module';
+import {AssetService} from '../../services/asset.service';
+import {RangerService} from '../../services/ranger.service';
+import { AuditVisualizationComponent } from './views/asset-view/asset-audit-view/audit-visualization/audit-visualization.component';
+import { AssetTagPolicyViewComponent } from './views/asset-view/asset-policy-view/asset-tag-policy-view/asset-tag-policy-view.component';
+import { AssetResourcePolicyViewComponent } from './views/asset-view/asset-policy-view/asset-resource-policy-view/asset-resource-policy-view.component';
 
 @NgModule({
   declarations: [
@@ -56,7 +72,16 @@ import {TranslateModule} from "@ngx-translate/core";
     AdvanceQueryEditor,
     QueryFilter,
     SearchWidget,
-    UniqueDatasetNameValidator
+    UniqueDatasetNameValidator,
+    AssetViewComponent,
+    AssetDetailsViewComponent,
+    NodeDetailsComponent,
+    AssetColumnVisualComponent,
+    AssetAuditView,
+    AssetPolicyView,
+    AuditVisualizationComponent,
+    AssetTagPolicyViewComponent,
+    AssetResourcePolicyViewComponent,
   ],
   entryComponents: [QueryFilter],
   imports: [
@@ -66,7 +91,11 @@ import {TranslateModule} from "@ngx-translate/core";
     NguiAutoCompleteModule,
     TaggingWidgetModule,
     TranslateModule,
-    PaginationModule
+    PaginationModule,
+    DropdownModule,
+    TabsModule,
+    LineageModule,
+    MyDateRangePickerModule,
   ],
   exports: [
     NavTagPanel,
@@ -90,7 +119,9 @@ import {TranslateModule} from "@ngx-translate/core";
     RichDatasetService,
     DsAssetsService,
     DsTagsService,
-    AssetOwnerService
+    AssetOwnerService,
+    AssetService,
+    RangerService,
   ]
 })
 export class DatasetSharedModule {

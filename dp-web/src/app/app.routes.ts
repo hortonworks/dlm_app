@@ -22,50 +22,59 @@ import {LoaderSpinComponent} from './shared/loader-spin/loader-spin.component';
 import {ServiceErrorComponent} from './shared/service-error/service-error.component';
 
 export const routes: Routes = [{
-    path: 'sign-in',
-    component: SignInComponent,
-    canActivate:[ UnsecuredRouteGuard ]
-  }, {
-    path: 'sign-out',
-    component: SignInComponent,
-    canActivate: [
-      DoCleanUpAndRedirectGuard,
-    ]
-  }, {
-    path: 'datasteward',
-    loadChildren: './modules/dataset/dataset.module#DatasetModule',
-    canActivate:[ NavigationGuard ]
-  }, {
-    path: 'onboard',
-    loadChildren: './modules/onboard/onboard.module#OnboardModule',
-    canActivate:[ NavigationGuard ]
-  }, {
-    path: 'infra',
-    loadChildren: './modules/infra/infra.module#InfraModule',
-    canActivate:[ NavigationGuard]
-  }, {
-    path: 'assets',
-    loadChildren: './modules/assets/asset.module#AssetModule',
-    canActivate:[ NavigationGuard ]
-  // },{
-  //   path: 'analytics',
-  //   loadChildren: './modules/analytics/analytics.module#AnalyticsModule',
-  //   canActivate:[ NavigationGuard ]
-  },
-  {
-    path: 'unauthorized',
-    component: AuthErrorComponent
-  }, {
-    path: 'service-notenabled',
-    component: ServiceErrorComponent
-  },{
-    path: '',
-    pathMatch: 'full',
-    component: LoaderSpinComponent,
-    canActivate: [LandingPageGuard ]
-  }, {
-    path: '**',
-    component: NotFoundRouteComponent
+  path: 'datasteward',
+  loadChildren: './modules/dataset/dataset.module#DatasetModule',
+  canActivate:[ NavigationGuard ],
+  data: {
+    crumb: 'dss'
   }
-
-];
+}, {
+  path: 'onboard',
+  loadChildren: './modules/onboard/onboard.module#OnboardModule',
+  canActivate:[ NavigationGuard ],
+  data: {
+    crumb: 'onboard'
+  }
+}, {
+  path: 'infra',
+  loadChildren: './modules/infra/infra.module#InfraModule',
+  canActivate:[ NavigationGuard],
+  data: {
+    crumb: 'infra'
+  }
+// },{
+//   path: 'analytics',
+//   loadChildren: './modules/analytics/analytics.module#AnalyticsModule',
+//   canActivate:[ NavigationGuard ]
+}, {
+  path: 'sign-in',
+  component: SignInComponent,
+  canActivate:[ UnsecuredRouteGuard ]
+}, {
+  path: 'sign-out',
+  component: SignInComponent,
+  canActivate: [ DoCleanUpAndRedirectGuard ]
+}, {
+  path: 'unauthorized',
+  component: AuthErrorComponent,
+  data: {
+    crumb: 'unauthorized'
+  }
+}, {
+  path: 'service-notenabled',
+  component: ServiceErrorComponent,
+  data: {
+    crumb: 'service_not_enabled'
+  }
+},{
+  path: '',
+  pathMatch: 'full',
+  component: LoaderSpinComponent,
+  canActivate: [ LandingPageGuard ]
+}, {
+  path: '**',
+  component: NotFoundRouteComponent,
+  data: {
+    crumb: 'not_found'
+  }
+}];

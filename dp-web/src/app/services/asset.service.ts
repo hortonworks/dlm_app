@@ -90,7 +90,7 @@ export class AssetService {
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(err => {
-        if(err.status == 404 || err.status == 405) return Observable.throw(err);
+        if(err.status == 404 || err.status == 405 || err.status == 503 || err.status == 500) return Observable.throw(err);
         return HttpUtil.handleError(err)
       });
   }
@@ -103,7 +103,7 @@ export class AssetService {
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(err => {
-        if(err.status == 404 || err.status == 405) return Observable.throw(err);
+        if(err.status == 404 || err.status == 405 || err.status == 503 || err.status == 500) return Observable.throw(err);
         return HttpUtil.handleError(err)
       });
   }

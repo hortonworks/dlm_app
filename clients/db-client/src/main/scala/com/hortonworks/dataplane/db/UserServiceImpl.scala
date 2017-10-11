@@ -52,6 +52,7 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
   private def mapToUserInfo(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").validate[UserInfo].get)
+      case 404 => createEmptyErrorResponse
       case _ => mapErrors(res)
     }
   }
