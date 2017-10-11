@@ -401,6 +401,8 @@ update_admin_password() {
 }
 
 init_all() {
+    read_admin_password
+
     init_db
     reset_db
 
