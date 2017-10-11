@@ -14,7 +14,7 @@ import { Http, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 import { Lake } from '../models/lake';
-import { Cluster } from '../models/cluster';
+import {Cluster, ServiceInfo} from '../models/cluster';
 
 import { HttpUtil } from '../shared/utils/httpUtil';
 import {Subject} from 'rxjs/Subject';
@@ -82,6 +82,13 @@ export class LakeService {
     .get(`${this.url}/ambari/status?url=${ambariUrl}`, new RequestOptions(HttpUtil.getHeaders()))
     .map(HttpUtil.extractData)
     .catch(HttpUtil.handleError);
+  }
+
+  getServicesInfo(lakeId: string): Observable<ServiceInfo[]> {
+    return this.http
+      .get(`${this.url}/${lakeId}/servicesDetails`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
   }
 
   getPairsMock(lakes, id:number) : Observable<{

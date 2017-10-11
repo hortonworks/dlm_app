@@ -14,12 +14,12 @@ package controllers
 import javax.inject.Inject
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Ambari.AmbariEndpoint
-import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, DataplaneClusterIdentifier, HJwtToken}
+import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariEndpoint, ServiceInfo}
+import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webservice.DpClusterService
+import com.hortonworks.dataplane.db.Webservice.{DpClusterService, SkuService}
 import models.{JsonResponses, WrappedErrorsException}
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import play.api.libs.json.Json
 import play.api.mvc._
 import services.AmbariService
@@ -27,11 +27,16 @@ import services.AmbariService
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
+import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
+
+import scala.util.Try
 
 import scala.util.Try
 
 class DataplaneClusters @Inject()(
     @Named("dpClusterService") val dpClusterService: DpClusterService,
+    @Named("skuService") val skuService: SkuService,
+    configuration: Configuration,
     ambariService: AmbariService)
     extends Controller {
 
@@ -181,6 +186,53 @@ class DataplaneClusters @Inject()(
           case Left(errors) => Future.failed(WrappedErrorsException(errors))
           case Right(cluster) => Future.successful(cluster)
         }
+  }
+
+  def getDependentServicesDetails(clusterId: String): Action[AnyContent] = AuthenticatedAction.async { request =>
+    implicit val token = request.token
+    dpClusterService
+      .retrieve(clusterId)
+      .flatMap {
+        case Left(errors) => {
+          Logger.error(s"Failed to get cluster details ${errors}")
+          throw WrappedErrorsException(errors)
+        }
+        case Right(dataplaneCluster) => getAmbariServicesInfo(dataplaneCluster)
+      }
+      .map{ servicesInfo => Ok(Json.toJson(servicesInfo)) }
+      .recoverWith {
+        case ex: WrappedErrorsException => {
+          Logger.error(s"Failed to get services details ${ex.errors}")
+          Future.successful(InternalServerError(Json.toJson(ex.errors)))
+        }
+      }
+    }
+
+
+  private def getAmbariServicesInfo(dpCluster: DataplaneCluster)(implicit token:Option[HJwtToken]): Future[Seq[ServiceInfo]] =  {
+    skuService.getAllSkus()
+      .map {
+        case Left(errors: Errors) =>{
+          Logger.error(s"Failed to get dp-dependent services ${errors}")
+          throw WrappedErrorsException(errors)
+        }
+        case Right(skus: Seq[Sku]) => {
+          val mandatoryServices = skus.flatMap(sku => configuration.getStringSeq(s"${sku.name}.dependent.services.mandatory").getOrElse(Nil)).distinct
+          val optionalServices = skus.flatMap(sku => configuration.getStringSeq(s"${sku.name}.dependent.services.optional").getOrElse(Nil)).distinct
+          (mandatoryServices.union(optionalServices)).distinct
+        }
+      }
+      .flatMap { services =>
+        ambariService
+          .getClusterServices(DpClusterWithDpServices(dataplaneCluster = dpCluster, dpServices = services))
+          .map {
+            case Left(errors: Errors) =>{
+              Logger.error(s"Failed to get services info ${errors}")
+              throw WrappedErrorsException(errors)
+            }
+            case Right(servicesInfo: Seq[ServiceInfo]) => servicesInfo
+          }
+      }
   }
 
 }

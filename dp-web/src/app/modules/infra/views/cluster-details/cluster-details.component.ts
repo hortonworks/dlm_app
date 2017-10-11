@@ -13,7 +13,7 @@ import {Component, OnInit, ElementRef, ViewChild, AfterViewInit} from '@angular/
 import {Router, ActivatedRoute} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 
-import {Cluster, ClusterDetails} from '../../../../models/cluster';
+import {Cluster, ClusterDetails, ServiceInfo} from '../../../../models/cluster';
 import {Lake} from '../../../../models/lake';
 import {Location} from '../../../../models/location';
 
@@ -45,6 +45,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
 
   lake: Lake = new Lake();
   clusters: Cluster[];
+  servicesInfo: ServiceInfo[];
   cluster: any;
   clusterHealth: any;
   rmHealth: any;
@@ -77,7 +78,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
     this.lakeService.retrieve(lakeId).subscribe((lake: Lake) => {
       this.lake = lake;
       this.populateGeneralProperties();
-      this.getClusterDetails()
+      this.getClusterDetails();
     }, error => {
       Loader.hide();
     });
@@ -114,6 +115,9 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       this.clusterService.syncCluster(this.lake.id).subscribe(res => {
         Loader.show();
         let count = 0;
+        this.lakeService.getServicesInfo(this.lake.id.toString()).subscribe(res =>{
+          this.servicesInfo = res;
+        });
         this.lakeService.retrieve(this.lake.id.toString())
           .delay(2000)
           .repeat(15)

@@ -72,4 +72,8 @@ export class ClusterDetails {
  unhealthyDataNodes: number;
 }
 
-
+export class ServiceInfo {
+  serviceName: string;
+  state: string;
+  serviceVersion: string;
+}
