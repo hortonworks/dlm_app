@@ -11,7 +11,7 @@
 FROM openjdk:8-jre
 
 RUN apt-get update && \
-    apt-get install -y ntp runit net-tools
+    apt-get install -y runit
 
 COPY ./dlm-app /usr/dlm-app
 COPY ./dlm-web /usr/dlm-web
