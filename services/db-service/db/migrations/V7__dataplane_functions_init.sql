@@ -61,7 +61,7 @@ BEGIN
   WHERE id = ANY (l_orphaned_catgories);
 
   -- delete data sets
-  DELETE FROM datasets
+  DELETE FROM dataplane.datasets
   WHERE id = ANY (l_dataset_ids);
 
   -- Delete mapped cluster
