@@ -119,7 +119,27 @@ class BeaconClusterServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconC
       .withAuth(user, password, WSAuthScheme.BASIC)
       .withHeaders(httpHeaders.toList: _*)
       .post(requestData)
-      .map(mapToPostActionResponse).recoverWith {
+      .map(res => {
+      val url = Some(res.asInstanceOf[AhcWSResponse].ahcResponse.getUri.toUrl)
+      res.status match {
+        case 200 =>
+          res.json.validate[PostActionResponse] match {
+            case JsSuccess(result, _) => Right(result)
+            case JsError(error) => {
+              Left(BeaconApiErrors(BAD_GATEWAY, url, Some(BeaconApiError(error.toString()))))
+            }
+          }
+        case _ => {
+          if (res.body.isEmpty)
+            Left(BeaconApiErrors(res.status, url))
+          val errMessage = s"Submitting cluster definition for ${clusterDefinitionRequest.name} (${clusterDefinitionRequest.dataCenter}) " +
+            s"to endpoint $beaconEndpoint failed:"
+          res.json.validate[BeaconApiError].map(r => {
+            Left(BeaconApiErrors(res.status,url,Some(BeaconApiError(s"$errMessage ${r.message}", r.status, r.requestId))))
+          }).getOrElse(Left(BeaconApiErrors(res.status, url)))
+        }
+      }
+    }).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
   }

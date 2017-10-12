@@ -224,10 +224,25 @@ class BeaconService @Inject()(
   private def createPair(listOfClusters: List[ClusterDefinitionDetails],
                          p: Promise[Either[BeaconApiErrors, PostActionResponse]])(implicit token:Option[HJwtToken]) = {
     val remoteCluster = listOfClusters.tail.head
-    val remoteDatacenterClusterName =  remoteCluster.dpCluster.dcName + "$" + remoteCluster.cluster.name
+    val remoteClusterDcName = remoteCluster.dpCluster.dcName
+    val remoteClusterName = remoteCluster.cluster.name
+    val remoteDatacenterClusterName =  remoteClusterDcName + "$" + remoteClusterName
     beaconPairService.createClusterPair(listOfClusters.head.pairedClusterRequest.beaconUrl, listOfClusters.head.cluster.id.get,
       remoteDatacenterClusterName).map({
-        case Left(beaconApiErrors) => p.success(Left(beaconApiErrors))
+        case Left(beaconApiErrors) => {
+          val beaconApiErrorMsg =  beaconApiErrors.error match {
+            case Some(beaconApiError) => beaconApiError.message
+            case None => ""
+          }
+          val clusterInfo =  listOfClusters.head
+          val dcName = clusterInfo.dpCluster.dcName
+          val clusterName = clusterInfo.cluster.name
+          val message =  s"Beacon API to pair clusters $clusterName ($dcName) and $remoteClusterName ($remoteClusterDcName) " +
+            s"failed: $beaconApiErrorMsg"
+
+          p.success(Left(BeaconApiErrors(beaconApiErrors.code, beaconApiErrors.beaconUrl, Some(BeaconApiError(message)),
+            beaconApiErrors.message)))
+        }
         case Right(clusterPairResponse) => p.success(Right(clusterPairResponse))
     })
   }
