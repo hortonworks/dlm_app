@@ -21,20 +21,29 @@ object MetricsReporter {
 
     val map = scala.collection.mutable.LinkedHashMap[String, Any]()
 
-    counters.foreach{ case (k:String,v:Counter) =>
-      map.put(k,v.getCount())
+    counters.foreach {
+      case (k: String, v: Counter) =>
+        map.put(k, v.getCount())
     }
 
-    timers.foreach { case (k:String,v:Timer) =>
-      map.put(k, Map("count"->v.getCount,"meanRate"-> v.getMeanRate))
+    timers.foreach {
+      case (k: String, v: Timer) =>
+        map.put(k,
+          Map("count" -> v.getCount,
+            "meanRate" -> v.getMeanRate,
+            "max" -> v.getSnapshot.getMax,
+            "min" -> v.getSnapshot.getMin,
+            "mean" -> v.getSnapshot.getMean))
     }
 
-    meters.foreach { case (k:String,v:Meter) =>
-      map.put(k,Map("count"->v.getCount,"meanRate"-> v.getMeanRate))
+    meters.foreach {
+      case (k: String, v: Meter) =>
+        map.put(k, Map("count" -> v.getCount, "meanRate" -> v.getMeanRate))
     }
 
-    gauges.foreach { case (k:String,v:Gauge[_]) =>
-      map.put(k, v.getValue)
+    gauges.foreach {
+      case (k: String, v: Gauge[_]) =>
+        map.put(k, v.getValue)
     }
 
     Json.parse(mapper.writeValueAsBytes(map.toMap))
