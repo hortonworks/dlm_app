@@ -12,30 +12,34 @@
 import {EventEmitter}     from '@angular/core';
 
 export enum DialogType {
-  Confirmation, Error
-};
+  Confirmation, Error, DeleteConfirmation
+}
+;
 
 export class DialogBox {
   private static dialogType = DialogType;
 
   private static getCancelButton(type: DialogType): string {
-    if (type === DialogType.Confirmation) {
-      return `<button type="button" class="mdl-button btn-hwx-secondary">Cancel</button>`;
+    if (type === DialogType.Confirmation || type === DialogType.DeleteConfirmation) {
+      return `<button type="button" class="mdl-button btn-hwx-default">Cancel</button>`;
     }
-
     return '';
+  }
+
+  private static getOKButton(type: DialogType): string {
+    if (type === DialogType.DeleteConfirmation) {
+      return `<button type="button" class="mdl-button btn-hwx-warning">CONFIRM</button>`;
+    }
+    return `<button type="button" class="mdl-button btn-hwx-primary">OK</button>`;
   }
 
   private static createDialogBox(message: string, type: DialogType) {
     let cancelButtonHTML = DialogBox.getCancelButton(type);
-    let html = `<dialog id="dialog" class="mdl-dialog">
-                    <div class="hwx-title">`+ DialogBox.dialogType[type] + `</div>
-                    <div class="spacer-15"> </div>
-                    <div class="hwx-desc">` + message +` </div>
+    let html = `<dialog id="dialog" class="mdl-dialog dp-dialog">
+                    <div class="mdl-dialog__title">${DialogBox.transformTitle(DialogBox.dialogType[type])}</div>
+                    <div class="mdl-dialog__content">${message}</div>
                     <div class="mdl-dialog__actions">
-                      <button type="button" class="mdl-button btn-hwx-primary">OK</button>`
-                      + DialogBox.getCancelButton(type) +
-                    `</div>
+                    ${DialogBox.getOKButton(type)}${DialogBox.getCancelButton(type)}</div>
                 </dialog>`;
 
     let element = document.createElement('div');
@@ -44,6 +48,10 @@ export class DialogBox {
     document.body.appendChild(element);
 
     return element;
+  }
+
+  private static transformTitle(text) {
+    return text.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
   }
 
   public static showConfirmationMessage(message: string, dialogType = DialogType.Confirmation): EventEmitter<boolean> {
@@ -55,18 +63,26 @@ export class DialogBox {
       let dialog: any = document.querySelector('#dialog');
       dialog.showModal();
 
-      dialog.querySelector('.btn-hwx-primary').addEventListener('click', function (e) {
-        eventEmitter.emit(true);
-        dialog.close();
-        dialog.parentElement.removeChild(dialog);
-      });
-
-      dialog.querySelector('.btn-hwx-secondary').addEventListener('click', function (e) {
+      if (dialogType === DialogType.DeleteConfirmation) {
+        dialog.querySelector('.btn-hwx-warning').addEventListener('click', function (e) {
+          eventEmitter.emit(true);
+          dialog.close();
+          dialog.parentElement.removeChild(dialog);
+        });
+      } else {
+        dialog.querySelector('.btn-hwx-primary').addEventListener('click', function (e) {
+          eventEmitter.emit(true);
+          dialog.close();
+          dialog.parentElement.removeChild(dialog);
+        });
+      }
+      dialog.querySelector('.btn-hwx-default').addEventListener('click', function (e) {
         eventEmitter.emit(false);
         dialog.close();
         dialog.parentElement.removeChild(dialog);
       });
-    } catch (e) {}
+    } catch (e) {
+    }
 
     return eventEmitter;
   }
@@ -84,7 +100,8 @@ export class DialogBox {
         dialog.close();
         dialog.parentElement.removeChild(dialog);
       });
-    } catch (e) {}
+    } catch (e) {
+    }
 
     return eventEmitter;
   }
