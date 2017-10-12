@@ -1,4 +1,4 @@
-/*!
+/*
  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
  *
  * Except as expressly permitted in a written agreement between you or your company
@@ -7,9 +7,11 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-alert {
-  p {
-    line-height: 20px;
-    margin-bottom: 0;
-  }
-}
+export interface UnreachableBeacon {
+  beaconUrl: string;
+  code: number;
+  error: {
+    message: string;
+    status: string;
+  };
+};

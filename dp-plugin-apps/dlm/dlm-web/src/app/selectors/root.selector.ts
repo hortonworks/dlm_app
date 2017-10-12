@@ -21,3 +21,4 @@ export const getOperations = (state: State) => state.operations;
 export const getFilesList = (state: State) => state.hdfsFiles;
 export const getDatabasesList = (state: State) => state.hiveDatabases;
 export const getBeaconAdminStatuses = (state: State) => state.beaconAdminStatus;
+export const getUnreachableBeacons = (state: State) => state.unreachableBeacon;

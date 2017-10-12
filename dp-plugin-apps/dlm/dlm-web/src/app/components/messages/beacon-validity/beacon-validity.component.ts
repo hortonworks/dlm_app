@@ -12,8 +12,8 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Cluster } from 'models/cluster.model';
 import * as fromRoot from 'reducers/index';
-import { getClustersWithStopppedBeacon } from 'selectors/cluster.selector';
 import { TranslateService } from '@ngx-translate/core';
+import { getUnreachableClusters } from 'selectors/unreachable-beacon.selector';
 
 interface ClusterTranslate {
   [clusters: string]: string;
@@ -25,11 +25,11 @@ interface ClusterTranslate {
   styleUrls: ['./beacon-validity.component.scss']
 })
 export class BeaconValidityComponent implements OnInit {
-  clustersList$: Observable<ClusterTranslate>;
+  unreachableClusters$: Observable<ClusterTranslate>;
 
   private formatClustersMessage = (clusters: Cluster[]): ClusterTranslate => {
     if (clusters.length) {
-      let clusterNames = clusters.map(cluster => `<strong>${cluster.name}</strong>`);
+      let clusterNames = clusters.map(cluster => `<strong>${cluster.name} (${cluster.dataCenter})</strong>`);
       if (clusterNames.length > 1) {
         clusterNames = [clusterNames.slice(0, clusterNames.length - 1).join(', ')].concat(clusterNames[clusterNames.length - 1]);
       }
@@ -39,7 +39,7 @@ export class BeaconValidityComponent implements OnInit {
   }
 
   constructor(private store: Store<fromRoot.State>, private t: TranslateService) {
-    this.clustersList$ = store.select(getClustersWithStopppedBeacon).map(this.formatClustersMessage);
+    this.unreachableClusters$ = store.select(getUnreachableClusters).map(this.formatClustersMessage);
   }
 
   ngOnInit() {
