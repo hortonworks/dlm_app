@@ -65,6 +65,8 @@ class StatusRoute @Inject()(val ws: WSClient,
   val tokenTopologyName = Try(config.getString("dp.services.knox.token.topology"))
     .getOrElse("token")
 
+  metricsRegistry.newGauge("knox.token.topology.name",{() => tokenTopologyName})
+
   def makeAmbariApiRequest(endpoint: String,
                            ambariResponse: AmbariForbiddenResponse,
                            timeout: Int,
@@ -263,15 +265,20 @@ class StatusRoute @Inject()(val ws: WSClient,
     }
   }
 
+  val ambariConnectTimer = metricsRegistry.newTimer("ambari.status.request.time")
+
   val route =
     path("ambari" / "status") {
+      val context = ambariConnectTimer.time()
       extractRequest { request =>
         post {
           entity(as[AmbariEndpoint]) { ep =>
             onComplete(checkAmbariAvailability(ep, request)) {
               case Success(res) =>
+                context.stop()
                 complete(success(res))
               case Failure(e) =>
+                context.stop()
                 e match {
                   case c: ConnectionError =>
                     complete(StatusCodes.InternalServerError,
