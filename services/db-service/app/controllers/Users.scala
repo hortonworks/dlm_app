@@ -155,7 +155,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
       .validate[UserInfo]
       .map { userInfo =>
         val password: String =
-          Random.alphanumeric.toString()
+          Random.alphanumeric.take(10).mkString
         userRepo.findByName(userInfo.userName).flatMap{
           case  None=>{
             userRepo
@@ -184,7 +184,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
         if (userGroupInfo.groupIds.isEmpty){
           Future.successful(BadRequest(Json.toJson(Errors(Seq(Error("INPUT_ERROR","Group needs to be specified"))))))
         }else{
-          val password: String = Random.alphanumeric.toString()
+          val password: String = Random.alphanumeric.take(10).mkString
           userRepo.insertUserWithGroups(userGroupInfo,password)
             .map(userGroupInfo => success(userGroupInfo))
             .recoverWith(apiError)
