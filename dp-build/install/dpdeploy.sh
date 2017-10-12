@@ -246,6 +246,12 @@ read_master_password() {
     MASTER_PASSWORD="$MASTER_PASSWD"
 }
 
+read_admin_password_safely() {
+    if [ -z "$USER_ADMIN_PASSWORD" ]; then
+        read_admin_password
+    fi
+}
+
 read_admin_password() {
     echo "Enter DataPlane admin password: "
     read -s ADMIN_PASSWD
@@ -394,14 +400,12 @@ init_keystore() {
 }
 
 update_admin_password() {
-    if [ -z "$USER_ADMIN_PASSWORD" ]; then
-        read_admin_password
-    fi
+    read_admin_password_safely
     source $(pwd)/database-user-update.sh "$USER_ADMIN_PASSWORD"
 }
 
 init_all() {
-    read_admin_password
+    read_admin_password_safely
 
     init_db
     reset_db
