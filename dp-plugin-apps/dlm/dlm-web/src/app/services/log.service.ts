@@ -23,6 +23,7 @@ import * as moment from 'moment';
 import { getAllClusters } from 'selectors/cluster.selector';
 
 export const LOG_REQUEST = '[LOG_SERVICE] LOG_REQUEST';
+export const DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
 @Injectable()
 export class LogService {
@@ -47,17 +48,21 @@ export class LogService {
 
   getLogs(clusterId: number, instanceId: string, logType: EntityType, timestamp: string): Observable<any> {
     const filterBy = this.logEventTypeMap[logType];
-    const date = moment(timestamp);
-    const start = date.subtract(1, 'h').toISOString();
-    const end = date.add(12, 'h').toISOString();
-    return this.http.get(`clusters/${clusterId}/logs?filterBy=${filterBy}:${instanceId}&start=${start}&end=${end}`).map(r => r.json());
+    let timingQp = '';
+    if (timestamp) {
+      const date = moment(timestamp);
+      const start = date.subtract(1, 'h').format(DATE_FORMAT);
+      const end = date.add(12, 'h').format(DATE_FORMAT);
+      timingQp = `start=${start}&end=${end}`;
+    }
+    return this.http.get(`clusters/${clusterId}/logs?filterBy=${filterBy}:${instanceId}&${timingQp}`).map(r => r.json());
   }
 
   getChangeEmitter() {
     return this.emitter;
   }
 
-  showLog(entityType: EntityType, entityId: string, timestamp: string) {
+  showLog(entityType: EntityType, entityId: string, timestamp = '') {
     if (entityId) {
       const splits = entityId.split('/');
       if (splits.length >= 5 && splits[3] && splits[4]) {
