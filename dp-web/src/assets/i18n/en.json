@@ -211,7 +211,8 @@
         "duplicateUser": "Duplicate values in Users Input - ",
         "duplicateGroup": "Duplicate values in Groups Input - ",
         "noMatch": "No Match",
-        "ldapUrl": "Ldap URL"
+        "ldapUrl": "Ldap URL",
+        "confirmDelete": "Delete Confirmation"
       },
       "description": {
         "editCluster": "Please update your Ambari managed cluster (already added to Dataplane) here.",

@@ -256,12 +256,19 @@ export class LakesListComponent implements OnChanges {
   }
 
   deleteCluster(lakeId) {
-    DialogBox.showConfirmationMessage(this.translateService.instant('pages.infra.description.clusterDeleteWarning'), DialogType.DeleteConfirmation).subscribe(result => {
+    DialogBox.showConfirmationMessage(this.translateService.instant('pages.infra.labels.confirmDelete'),
+      this.translateService.instant('pages.infra.description.clusterDeleteWarning'),
+      this.translateService.instant('common.confirm'), this.translateService.instant('common.cancel'),
+      DialogType.DeleteConfirmation
+    ).subscribe(result => {
       if (result) {
         this.lakeService.deleteCluster(lakeId).subscribe(() => {
           this.lakeService.clusterDeleted.next(lakeId);
         }, () => {
-          DialogBox.showErrorMessage(this.translateService.instant('pages.infra.description.deleteFailed'));
+          DialogBox.showErrorMessage(this.translateService.instant('common.failed'),
+            this.translateService.instant('pages.infra.description.deleteFailed'),
+            this.translateService.instant('pages.infra.description.deleteFailed'),
+            this.translateService.instant('common.ok'));
         })
       }
     });
