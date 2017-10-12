@@ -64,13 +64,7 @@ public class ServiceMetricsController {
     });
 
 
-    listStream.forEach(service -> {
-      service.getServiceInstance().forEach(instance -> {
-        if (!table.contains(service.getName(), instance.getName())) {
-          table.put(service.getName(), instance.getName(), buildInterface(instance.getService()));
-        }
-      });
-    });
+    listStream.forEach(service -> service.getServiceInstance().forEach(instance -> table.put(service.getName(), instance.getName(), buildInterface(instance.getService()))));
 
 
     //Finally get metrics from each service
