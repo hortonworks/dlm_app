@@ -65,7 +65,7 @@
               <div class="form-group">
                 <label class="required">{{"pages.infra.labels.dataCenter" | translate}}</label>
                 <div class="hwx-inline-desc">{{"pages.infra.description.dataCenter" | translate}}</div>
-                <input required class="dp-input" placeholder="Datacenter" name="datacenter" type="text" [(ngModel)]="lake.dcName"/>
+                <input required class="dp-input readonly-mode" placeholder="Datacenter" name="datacenter" type="text" [(ngModel)]="lake.dcName" readonly/>
               </div>
               <div class="form-group">
                 <label>{{"common.tags" | translate}} </label>
