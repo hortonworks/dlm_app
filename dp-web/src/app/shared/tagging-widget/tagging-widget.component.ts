@@ -63,7 +63,7 @@ export class TaggingWidget implements OnInit, OnChanges {
     }
     this.showOptions = false;
     if (this.searchText && this.searchText.trim() && !this.restrictFreeText) {
-      this.tags.push(this.searchText.trim());
+      this.newTagEmitter.emit(this.searchText.trim());
       this.searchText = '';
     }
   }
@@ -206,7 +206,7 @@ export class TaggingWidget implements OnInit, OnChanges {
 
   onInputBlur() {
     if (this.searchText && this.searchText.trim() && !this.restrictFreeText && !this.showOptions) {
-      this.tags.push(this.searchText.trim());
+      this.newTagEmitter.emit(this.searchText.trim());
       this.searchText = '';
     }
   }
