@@ -26,11 +26,11 @@ trait DpPgProfile extends ExPostgresProfile
   with PgLTreeSupport {
 
 
-  def pgjson = "jsonb" // jsonb support is in postgres 9.4.0 onward; for 9.3.x use "json"
+  def pgjson = "json" // jsonb support is in postgres 9.4.0 onward; for 9.3.x use "json"
 
   // Add back `capabilities.insertOrUpdate` to enable native `upsert` support; for postgres 9.5+
-  override protected def computeCapabilities: Set[Capability] =
-    super.computeCapabilities + slick.jdbc.JdbcCapabilities.insertOrUpdate
+  //  override protected def computeCapabilities: Set[Capability] =
+  //    super.computeCapabilities + slick.jdbc.JdbcCapabilities.insertOrUpdate
 
   override val api = PgAPI
 

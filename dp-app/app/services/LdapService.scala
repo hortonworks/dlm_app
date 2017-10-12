@@ -38,7 +38,6 @@ class LdapService @Inject()(
                              private val ldapKeyStore: DpKeyStore,
                              private val configuration: Configuration) {
   private val logger = Logger(classOf[LdapService])
-  private val USERDN_SUBSTITUTION_TOKEN = "{0}"
 
   def configure(knoxConf: KnoxConfigInfo,requestHost:String): Future[Either[Errors, Boolean]] = {
     if (knoxConf.bindDn.isEmpty || knoxConf.password.isEmpty) {
@@ -61,7 +60,7 @@ class LdapService @Inject()(
                 )
                 Future.fromTry(tryToWrite)
                   .map { _ =>
-                    LdapConfiguration(id = knoxConf.id,
+                    LdapConfiguration(id = None,
                       ldapUrl = Some(knoxConf.ldapUrl),
                       bindDn = knoxConf.bindDn,
                       userSearchBase = knoxConf.userSearchBase,
