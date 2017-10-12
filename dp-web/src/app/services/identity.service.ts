@@ -36,7 +36,6 @@ export class IdentityService {
         password,
         nextPassword,
       }, new RequestOptions(HttpUtil.getHeaders()))
-      .map(HttpUtil.extractData)
-      .catch(HttpUtil.handleError);
+      .map(HttpUtil.extractData);
   }
 }
