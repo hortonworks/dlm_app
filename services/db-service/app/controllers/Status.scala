@@ -13,20 +13,24 @@ package controllers
 
 import javax.inject._
 
-import com.hortonworks.dataplane.commons.domain.Entities.Category
+import com.hortonworks.dataplane.commons.metrics.{MetricsRegistry, MetricsReporter}
 import domain.CategoryRepo
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class Status @Inject()(categoryRepo: CategoryRepo)(implicit exec: ExecutionContext)
+class Status @Inject()(categoryRepo: CategoryRepo,metricsRegistry: MetricsRegistry)(implicit exec: ExecutionContext)
     extends JsonAPI {
 
   def status = Action.async {
     Future.successful(Ok)
   }
 
+  def metrics = Action.async {
+    implicit val mr:MetricsRegistry = metricsRegistry
+    Future.successful(Ok(MetricsReporter.asJson))
+  }
 
   def health = Action.async {
     Future.successful(Ok)

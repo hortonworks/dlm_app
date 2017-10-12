@@ -20,6 +20,7 @@ import akka.http.scaladsl.server.Directives._
 import com.google.common.net.HttpHeaders
 import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneClusterIdentifier, ErrorType, HJwtToken}
+import com.hortonworks.dataplane.commons.metrics.{MetricsRegistry, MetricsReporter}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.{ClusterSync, CredentialInterface, StorageInterface}
 import com.hortonworks.dataplane.http.BaseRoute
@@ -46,7 +47,8 @@ class StatusRoute @Inject()(val ws: WSClient,
                             val credentialInterface: CredentialInterface,
                             val config: Config,
                             clusterSync: ClusterSync,
-                            dpClusterSync: DpClusterSync)
+                            dpClusterSync: DpClusterSync,
+                            metricsRegistry: MetricsRegistry)
     extends BaseRoute {
 
   import com.hortonworks.dataplane.commons.domain.Ambari._
@@ -314,6 +316,16 @@ class StatusRoute @Inject()(val ws: WSClient,
     pathEndOrSingleSlash {
       get {
         complete(success(Map("status" -> 200)))
+      }
+    }
+  }
+
+
+  val metrics = path("metrics") {
+    implicit val mr:MetricsRegistry = metricsRegistry
+    pathEndOrSingleSlash {
+      get {
+        complete(MetricsReporter.asJson)
       }
     }
   }

@@ -17,6 +17,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.{Http, HttpsConnectionContext}
 import akka.stream.ActorMaterializer
 import com.google.inject.{AbstractModule, Provider, Provides, Singleton}
+import com.hortonworks.dataplane.commons.metrics.MetricsRegistry
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.utils.SSLUtils.DPTrustStore
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
@@ -38,7 +39,7 @@ object AppModule extends AbstractModule {
     bind(classOf[DPTrustStore]).asEagerSingleton()
     bind(classOf[Config]).toInstance(ConfigFactory.load())
     bind(classOf[ActorSystem]).toInstance(ActorSystem("cluster-service"))
-
+    bind(classOf[MetricsRegistry]).toInstance(MetricsRegistry("cluster-service"))
   }
 
   @Provides
@@ -163,13 +164,13 @@ object AppModule extends AbstractModule {
                          config: Config,
                          wSClient: WSClient,
                          clusterSync: ClusterSync,
-                         dpClusterSync: DpClusterSync): StatusRoute = {
+                         dpClusterSync: DpClusterSync,metricsRegistry: MetricsRegistry): StatusRoute = {
     new StatusRoute(wSClient,
                     storageInterface,
                     credentialInterface,
                     config,
                     clusterSync,
-                    dpClusterSync)
+                    dpClusterSync,metricsRegistry)
   }
 
   @Provides
@@ -279,6 +280,7 @@ object AppModule extends AbstractModule {
         statusRoute.route ~
         statusRoute.sync ~
         statusRoute.health ~
+        statusRoute.metrics ~
         ambariRoute.route ~
         ambariRoute.serviceStateRoute ~
         ambariRoute.ambariClusterProxy ~
