@@ -16,7 +16,7 @@ import {Sort} from '../../../../shared/utils/enums';
 import {Cluster} from '../../../../models/cluster';
 import {ClusterService} from '../../../../services/cluster.service';
 import {DateUtils} from '../../../../shared/utils/date-utils';
-import {DialogBox} from '../../../../shared/utils/dialog-box';
+import {DialogBox, DialogType} from '../../../../shared/utils/dialog-box';
 import {LakeService} from '../../../../services/lake.service';
 import {TranslateService} from '@ngx-translate/core';
 
@@ -256,10 +256,10 @@ export class LakesListComponent implements OnChanges {
   }
 
   deleteCluster(lakeId) {
-    DialogBox.showConfirmationMessage(this.translateService.instant('pages.infra.description.clusterDeleteWarning')).subscribe(result => {
+    DialogBox.showConfirmationMessage(this.translateService.instant('pages.infra.description.clusterDeleteWarning'), DialogType.DeleteConfirmation).subscribe(result => {
       if (result) {
         this.lakeService.deleteCluster(lakeId).subscribe(() => {
-          this.lakeService.clusterDeleted.next();
+          this.lakeService.clusterDeleted.next(lakeId);
         }, () => {
           DialogBox.showErrorMessage(this.translateService.instant('pages.infra.description.deleteFailed'));
         })
