@@ -10,17 +10,26 @@
  */
 
 import {NgModule} from '@angular/core';
-import {RouterModule} from "@angular/router";
+import {RouterModule} from '@angular/router';
+import {ReactiveFormsModule} from '@angular/forms';
 
-import {HeaderComponent}   from './header.component';
+import {TranslateModule} from '@ngx-translate/core';
 import {SharedModule} from '../../shared/shared.module';
-import {BreadCrumbModule} from '../../shared/bread-crumb/bread-crumb.module';
+import {routes} from './profile.routes';
+import {ChangePasswordComponent} from './views/change-password/change-password.component';
 
 @NgModule({
-  imports: [SharedModule, BreadCrumbModule, RouterModule],
-  exports: [HeaderComponent],
-  declarations: [HeaderComponent],
-  providers: [],
+  imports: [
+    RouterModule.forChild(routes),
+    SharedModule,
+    TranslateModule,
+    ReactiveFormsModule,
+  ],
+
+  declarations: [
+    ChangePasswordComponent,
+  ]
 })
-export class HeaderModule {
+export class ProfileModule {
 }
+

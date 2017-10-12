@@ -38,9 +38,16 @@ export const routes: Routes = [{
 }, {
   path: 'infra',
   loadChildren: './modules/infra/infra.module#InfraModule',
-  canActivate:[ NavigationGuard],
+  canActivate:[ NavigationGuard ],
   data: {
     crumb: 'infra'
+  }
+}, {
+  path: 'profile',
+  loadChildren: './modules/profile/profile.module#ProfileModule',
+  canActivate:[ NavigationGuard ],
+  data: {
+    crumb: 'profile'
   }
 // },{
 //   path: 'analytics',

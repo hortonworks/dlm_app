@@ -9,22 +9,18 @@
  *
  */
 
-export class User {
+import {Routes} from '@angular/router';
 
-  constructor(public id: string,
-              public avatar: string,
-              public display: string,
-              public token: string,
-              public roles: string[],
-              public active: boolean,
-              public dbManaged: boolean,
-              public username: string) {
+import {ChangePasswordComponent} from './views/change-password/change-password.component';
+
+export const routes: Routes = [{
+  path: '',
+  pathMatch: 'full',
+  redirectTo: 'change-password'
+}, {
+  path: 'change-password',
+  component: ChangePasswordComponent,
+  data: {
+    crumb: 'profile.password_change'
   }
-
-  public services: string[];
-}
-
-export class UserList {
-  total: number;
-  users: User[];
-}
+}];

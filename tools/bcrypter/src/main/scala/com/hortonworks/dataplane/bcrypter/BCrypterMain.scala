@@ -9,22 +9,21 @@
  *
  */
 
-export class User {
+package com.hortonworks.dataplane.bcrypter
 
-  constructor(public id: string,
-              public avatar: string,
-              public display: string,
-              public token: string,
-              public roles: string[],
-              public active: boolean,
-              public dbManaged: boolean,
-              public username: string) {
+import org.mindrot.jbcrypt.BCrypt
+import com.typesafe.scalalogging.LazyLogging
+
+object BCrypterMain extends LazyLogging {
+
+  def main(args: Array[String]): Unit = {
+    args.toList.length match {
+      case 0 => {
+        logger.error("invalid usage")
+        sys.exit(1)
+      }
+      case _ => print(BCrypt.hashpw(args(0).toString, BCrypt.gensalt()))
+    }
   }
-
-  public services: string[];
 }
 
-export class UserList {
-  total: number;
-  users: User[];
-}

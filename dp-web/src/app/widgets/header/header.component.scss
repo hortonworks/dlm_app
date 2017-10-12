@@ -31,7 +31,6 @@
 }
 
 .navbar a {
-  float: left;
   display: block;
   text-align: center;
   padding: 14px 16px;
@@ -131,8 +130,6 @@
   clip: auto!important;
 
   a {
-    float: none;
-    display: inline;
     text-align: left;
     padding: 0;
     text-decoration: none;
@@ -176,6 +173,9 @@
     padding: 15px 15px 7px;
     line-height: 1;
     text-align: right;
+
+    display: flex;
+    justify-content: space-between;
   }
   .mdl-button {
     height: 32px;
