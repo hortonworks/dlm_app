@@ -278,7 +278,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.tableData$ = Observable
       .combineLatest(this.tableResources$, this.jobStatusFilter$)
       .map(([policies, jobStatusFilter]) => policies
-      .filter(policy => policy.jobsResource.some(job => job.status !== JOB_STATUS.SUCCESS) &&
+      .filter(policy => policy.lastTenJobs.some(job => job.status !== JOB_STATUS.SUCCESS) &&
         this.matchJobStatus(policy, jobStatusFilter))
       .map(policy => this.mapTableData(policy)));
 
