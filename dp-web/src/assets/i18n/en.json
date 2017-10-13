@@ -357,6 +357,17 @@
         "title": "Add Workspace"
       }
     },
+    "profile": {
+      "change_password": {
+        "current_password": "Current password",
+        "new_password": "New password",
+        "confirm_new_password": "Confirm new password",
+        "submit_and_logout": "Change & Logout",
+        "errors": {
+          "noMatch": "New password does not match re-entered password."
+        }
+      }
+    },
     "not_found": {
       "message": "This page does not exist.",
       "link_text": "Click here to return to home page."
@@ -386,6 +397,9 @@
     "onboard.welcome": "Welcome",
     "onboard.identity_provider": "Configure LDAP",
     "onboard.users_and_groups": "Configure Access",
+
+    "profile": "Profile",
+    "profile.password_change": "Change password",
 
     "not_found": "Not Found",
     "unauthorized": "Unauthorized",

@@ -14,15 +14,16 @@ ENV FLYWAY_VERSION 4.2.0
 ENV FLYWAY_SQL_DIR /dbscripts
 
 RUN mkdir -p /opt $FLYWAY_SQL_DIR \
-    && apk --no-cache add bash wget ca-certificates openssl \
+    && apk --no-cache add bash wget ca-certificates openssl postgresql-client \
     && update-ca-certificates \
     && wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${FLYWAY_VERSION}/flyway-commandline-${FLYWAY_VERSION}.tar.gz | tar -xzf- -C /opt \
     && ln -s /opt/flyway-${FLYWAY_VERSION} /opt/flyway \
     && ln -s /opt/flyway/flyway /usr/local/bin/flyway \
     && apk del wget
 
-COPY ./utils /scripts
+COPY ./bcrypter /bcrypter
 COPY ./dbscripts /dbscripts 
+COPY ./utils /scripts
 
 ENTRYPOINT ["bash"]
 CMD ["--help"]

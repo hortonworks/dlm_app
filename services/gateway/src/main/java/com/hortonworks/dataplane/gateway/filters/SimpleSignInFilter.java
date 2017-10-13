@@ -94,6 +94,7 @@ public class SimpleSignInFilter extends ZuulFilter {
         return sendInvalidPasswordResponse();
       }
       UserContext userContext= userContextFromDb.get();
+      userContext.setDbManaged(true);
       if (!userContext.isActive()){
         return utils.sendForbidden(utils.getInactiveErrorMsg(userContext.getUsername()));
       }else {

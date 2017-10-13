@@ -7,10 +7,11 @@
   ~ of all or any part of the contents of this software is strictly prohibited.
   -->
 
-<div class="row page-section" *ngIf="(clustersList$ | async)?.clusters">
+<div class="row page-section" *ngIf="(unreachableClusters$ | async)?.clusters">
   <div class="col-xs-12">
     <alert type="warning">
-      <span [innerHtml]="'common.warnings.beacon_unavailable' | translate:(clustersList$ | async)"></span>
+      <i class="fa fa-exclamation-triangle text-warning"></i>
+      <span [innerHtml]="'common.warnings.beacon_unavailable' | translate:(unreachableClusters$ | async)"></span>
     </alert>
   </div>
 </div>

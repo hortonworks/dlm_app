@@ -36,6 +36,10 @@
             <label>{{"pages.infra.labels.ambariUrl" | translate}}</label>
             <div>{{lake.ambariUrl}}</div>
           </div>
+          <div class="display-group">
+            <label>{{"pages.infra.labels.dataCenter" | translate}}</label>
+            <div>{{lake.dcName}}</div>
+          </div>
         </div>
 
         <div class="mdl-grid mdl-grid--no-spacing">
@@ -63,14 +67,9 @@
                 </div>
               </div>
               <div class="form-group">
-                <label class="required">{{"pages.infra.labels.dataCenter" | translate}}</label>
-                <div class="hwx-inline-desc">{{"pages.infra.description.dataCenter" | translate}}</div>
-                <input required class="dp-input" placeholder="Datacenter" name="datacenter" type="text" [(ngModel)]="lake.dcName"/>
-              </div>
-              <div class="form-group">
                 <label>{{"common.tags" | translate}} </label>
                 <div class="hwx-inline-desc">{{"pages.infra.description.tags" | translate}}</div>
-                <tagging-widget id="tags" [tags]="doGetTagsAsStringArray(lake.properties.tags)" [clearOnSearch]="true" (onNewSearch)="onNewTagAddition($event)" (onTagDelete)="onTagDelete($event)"></tagging-widget>
+                <tagging-widget id="tags" [searchable]="false" [tags]="doGetTagsAsStringArray(lake.properties.tags)" [clearOnSearch]="true" (onNewSearch)="onNewTagAddition($event)" (onTagDelete)="onTagDelete($event)"></tagging-widget>
               </div>
               <div class="form-group">
                 <label>{{"common.description" | translate}}</label>

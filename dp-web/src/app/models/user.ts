@@ -17,6 +17,7 @@ export class User {
               public token: string,
               public roles: string[],
               public active: boolean,
+              public dbManaged: boolean,
               public username: string) {
   }
 

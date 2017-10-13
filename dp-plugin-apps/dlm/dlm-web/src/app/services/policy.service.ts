@@ -38,7 +38,7 @@ export class PolicyService {
     if (policy.endTime.indexOf('9999') === 0) {
       policy.endTime = null;
     }
-    policy.displayStatus = this.t.instant(POLICY_DISPLAY_STATUS[policy.status]);
+    policy.displayStatus = this.t.instant(POLICY_DISPLAY_STATUS[policy.status] || policy.status);
     return policy;
   }
 

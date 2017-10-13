@@ -30,8 +30,9 @@ public class UserContext implements Serializable {
   private String token;
   private String password;
   private boolean active;
+  private boolean dbManaged;
   private boolean groupManaged;
-  private Long updatedAt ;
+  private Long updatedAt;
 
   public UserContext() {
   }
@@ -133,6 +134,15 @@ public class UserContext implements Serializable {
 
   public void setRoles(List<String> roles) {
     this.roles = roles;
+  }
+
+  @JsonProperty
+  public boolean isDbManaged() {
+    return dbManaged;
+  }
+
+  public void setDbManaged(boolean dbManaged) {
+    this.dbManaged = dbManaged;
   }
 
 
