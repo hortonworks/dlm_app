@@ -68,6 +68,7 @@ export class LakesComponent implements OnInit {
   }
 
   getClusters() {
+    this.showError = false;
     let unSyncedLakes = [];
     this.lakeService.listWithClusters()
       .subscribe(lakes => {
