@@ -8,7 +8,7 @@
  */
 
 import {
-  Component, OnInit, Output, ViewChild, TemplateRef, ViewEncapsulation, EventEmitter, HostBinding
+  Component, OnInit, Output, ViewChild, TemplateRef, ViewEncapsulation, EventEmitter, HostBinding, Input
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
@@ -39,6 +39,8 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   private selectedAction: ActionItemType;
   private selectedForActionRow: Policy;
   JOB_STATUS = JOB_STATUS;
+
+  @Input() jobsCount = 0;
 
   @ViewChild('clusterNameCellRef') clusterNameCellRef: TemplateRef<any>;
   @ViewChild('destinationIconCell') destinationIconCellRef: TemplateRef<any>;

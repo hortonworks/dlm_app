@@ -123,6 +123,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @Input() clusters: Cluster[] = [];
   @Input() activePolicyId = '';
   @Input() policies: Policy[] = [];
+  @Input() policiesCount: 0;
   @Output() detailsToggle = new EventEmitter<any>();
 
   rowActions = <ActionItemType[]>[
