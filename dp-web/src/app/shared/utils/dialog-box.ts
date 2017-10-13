@@ -9,58 +9,51 @@
  *
  */
 
-import {EventEmitter}     from '@angular/core';
+import {EventEmitter} from '@angular/core';
+import * as DialogPolyfill from 'dialog-polyfill';
+
 
 export enum DialogType {
   Confirmation, Error, DeleteConfirmation
 }
-;
 
 export class DialogBox {
-  private static dialogType = DialogType;
 
-  private static getCancelButton(type: DialogType): string {
-    if (type === DialogType.Confirmation || type === DialogType.DeleteConfirmation) {
-      return `<button type="button" class="mdl-button btn-hwx-default">Cancel</button>`;
+  private static getCancelButton(text: String): string {
+    if (text && text.length) {
+      return `<button type="button" class="mdl-button btn-hwx-default">${text}</button>`;
     }
     return '';
   }
 
-  private static getOKButton(type: DialogType): string {
+  private static getOKButton(text: String, type: DialogType): string {
     if (type === DialogType.DeleteConfirmation) {
-      return `<button type="button" class="mdl-button btn-hwx-warning">CONFIRM</button>`;
+      return `<button type="button" class="mdl-button btn-hwx-warning">${text}</button>`;
     }
-    return `<button type="button" class="mdl-button btn-hwx-primary">OK</button>`;
+    return `<button type="button" class="mdl-button btn-hwx-primary">${text}</button>`;
   }
 
-  private static createDialogBox(message: string, type: DialogType) {
-    let cancelButtonHTML = DialogBox.getCancelButton(type);
-    let html = `<dialog id="dialog" class="mdl-dialog dp-dialog">
-                    <div class="mdl-dialog__title">${DialogBox.transformTitle(DialogBox.dialogType[type])}</div>
+  private static createDialogBox(message: string, okButtonText, cancelButtonText, title, type: DialogType) {
+    let html = `
+                    <div class="mdl-dialog__title">${title}</div>
                     <div class="mdl-dialog__content">${message}</div>
                     <div class="mdl-dialog__actions">
-                    ${DialogBox.getOKButton(type)}${DialogBox.getCancelButton(type)}</div>
-                </dialog>`;
-
-    let element = document.createElement('div');
-    element.innerHTML = html;
-
-    document.body.appendChild(element);
-
-    return element;
+                    ${DialogBox.getOKButton(okButtonText, type)}${DialogBox.getCancelButton(cancelButtonText)}</div>
+               `;
+    let dialogElement = document.createElement('dialog');
+    dialogElement.id = 'dialog';
+    dialogElement.className += 'mdl-dialog dp-dialog';
+    dialogElement.innerHTML = html;
+    DialogPolyfill.registerDialog(dialogElement);
+    document.body.appendChild(dialogElement);
+    return dialogElement;
   }
 
-  private static transformTitle(text) {
-    return text.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-  }
-
-  public static showConfirmationMessage(message: string, dialogType = DialogType.Confirmation): EventEmitter<boolean> {
+  public static showConfirmationMessage(title: string, message: string, okButtonText: string, cancelButtonText: string, dialogType = DialogType.Confirmation): EventEmitter<boolean> {
     message = message.replace(/\n/g, '<br>');
     let eventEmitter = new EventEmitter<boolean>();
-    let element = DialogBox.createDialogBox(message, dialogType);
-
+    let dialog: any = DialogBox.createDialogBox(message, okButtonText, cancelButtonText, title, dialogType);
     try {
-      let dialog: any = document.querySelector('#dialog');
       dialog.showModal();
 
       if (dialogType === DialogType.DeleteConfirmation) {
@@ -70,7 +63,7 @@ export class DialogBox {
           dialog.parentElement.removeChild(dialog);
         });
       } else {
-        dialog.querySelector('.btn-hwx-primary').addEventListener('click', function (e) {
+        dialog.querySelector('.btn-hwx-default').addEventListener('click', function (e) {
           eventEmitter.emit(true);
           dialog.close();
           dialog.parentElement.removeChild(dialog);
@@ -87,12 +80,11 @@ export class DialogBox {
     return eventEmitter;
   }
 
-  public static showErrorMessage(message: string, dialogType = DialogType.Error): EventEmitter<boolean> {
+  public static showErrorMessage(title: string, message: string, okButtonText: string, dialogType = DialogType.Error): EventEmitter<boolean> {
     message = message.replace(/\n/g, '<br>');
     let eventEmitter = new EventEmitter<boolean>();
-    let element = DialogBox.createDialogBox(message, dialogType);
+    let dialog: any = DialogBox.createDialogBox(message, okButtonText, null, title, dialogType);
     try {
-      let dialog: any = document.querySelector('#dialog');
       dialog.showModal();
 
       dialog.querySelector('.btn-hwx-primary').addEventListener('click', function (e) {
@@ -106,3 +98,4 @@ export class DialogBox {
     return eventEmitter;
   }
 }
+

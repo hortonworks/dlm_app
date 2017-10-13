@@ -44,6 +44,7 @@ export class LakesComponent implements OnInit {
   private SYNC_ERROR = 'SYNC_ERROR';
   private MAXCALLS = 10;
   private DELAY_IN_MS = 2000;
+  showError = false;
 
 
   constructor(private router: Router,
@@ -53,20 +54,21 @@ export class LakesComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.lakeService.clusterDeleteFailed$.subscribe(() => {
+      this.showError = true;
+      window.scrollTo(0, 0);
+    });
     this.lakeService.clusterDeleted$.subscribe((lakeId) => {
       this.mapSet.delete(lakeId);
-      let mapPoints = [];
-      this.mapSet.forEach(mapData => {
-        mapPoints.push(mapData)
-      });
-      this.mapData = mapPoints;
+      this.mapData = Array.from(this.mapSet.values());
       this.getClusters();
     });
     this.mapSize = MapSize.EXTRALARGE;
     this.getClusters();
   }
 
-  getClusters(){
+  getClusters() {
+    this.showError = false;
     let unSyncedLakes = [];
     this.lakeService.listWithClusters()
       .subscribe(lakes => {

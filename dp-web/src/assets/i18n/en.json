@@ -27,6 +27,7 @@
     "reset": "Reset",
     "search": "Search",
     "done": "Done",
+    "remove": "Remove",
     "removeAll": "Remove All",
     "advanced": "Advanced",
     "status": "Status",
@@ -211,7 +212,8 @@
         "duplicateUser": "Duplicate values in Users Input - ",
         "duplicateGroup": "Duplicate values in Groups Input - ",
         "noMatch": "No Match",
-        "ldapUrl": "Ldap URL"
+        "ldapUrl": "Ldap URL",
+        "confirmRemove": "Remove Confirmation"
       },
       "description": {
         "editCluster": "Please update your Ambari managed cluster (already added to Dataplane) here.",
@@ -249,7 +251,7 @@
           "General": "Data Plane Services could not connect to the Ambari cluster. Information may not be up to date."
         },
         "rolesOverrideWarning":"This will override any roles the user acquired as part of groups",
-        "clusterDeleteWarning":"Deleting a cluster causes loss of data such as associated pairings, policies and asset collections. Please delete those objects first before deleting a cluster. This action cannot be undone. Please confirm if you want to go ahead.",
+        "clusterDeleteWarning":"Removing a cluster causes loss of data such as associated pairings, policies and asset collections. Please delete those objects first before deleting a cluster. This action cannot be undone. Please confirm if you want to go ahead.",
         "deleteFailed": "Cluster could not be deleted"
       }
     },

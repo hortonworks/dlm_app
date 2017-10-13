@@ -21,7 +21,8 @@ export interface PolicyUI {
   policyStatus: RequestStatus;
   sourceClusterResource?: Cluster;
   targetClusterResource?: Cluster;
-  displayStatus: string;
+  displayStatus: string; // translated uiStatus, need to keep it here for filtering
+  uiStatus: string;
   accessMode?: POLICY_MODES;
   rangerEnabled?: boolean;
 }

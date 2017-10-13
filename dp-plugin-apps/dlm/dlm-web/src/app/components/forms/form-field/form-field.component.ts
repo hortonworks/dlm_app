@@ -23,6 +23,7 @@ export class FormFieldComponent implements OnInit {
   @ContentChild(FormFieldDirective) formField: FormFieldDirective;
   @Input() fieldClass = 'col-xs-6';
   @Input() errorClass = 'col-xs-6';
+  @Input() required = false;
   @HostBinding('class') hostClass = 'dlm-form-field';
 
   labelTranslate: object;

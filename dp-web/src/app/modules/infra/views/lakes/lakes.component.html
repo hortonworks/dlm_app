@@ -8,7 +8,14 @@
   ~  * of all or any part of the contents of this software is strictly prohibited.
   ~  */
   -->
-
+<div *ngIf="showError">
+  <div id="error-notification-bar" class="error-notification-bar">
+    <i class="fa fa-times-circle pull-left"></i>
+    <i id="e" class="fa fa-remove pull-right" (click)="closeError()"></i>
+    <div id="error-header" class="text-medium">{{"common.failed" | translate}}</div>
+    <div id="error-message" class="text-small-1">{{"pages.infra.description.deleteFailed" | translate}} </div>
+  </div>
+</div>
 <section class="map-wrapper">
   <dp-map [mapSize]="mapSize" [showCount]="true" [mapData]="mapData"></dp-map>
 </section>

@@ -30,6 +30,9 @@ export class LakeService {
   clusterDeleted = new Subject<boolean>();
   clusterDeleted$ = this.clusterDeleted.asObservable();
 
+  clusterDeleteFailed = new Subject<boolean>();
+  clusterDeleteFailed$ = this.clusterDeleted.asObservable();
+
   constructor(
     private http:Http
   ) {}

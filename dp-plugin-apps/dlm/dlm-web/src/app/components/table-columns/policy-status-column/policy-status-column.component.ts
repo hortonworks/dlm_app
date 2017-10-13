@@ -8,7 +8,7 @@
  */
 
 import { Component, ViewChild, TemplateRef, Input } from '@angular/core';
-import { RUNNING, SUSPENDED } from 'constants/status.constant';
+import { POLICY_UI_STATUS } from 'constants/status.constant';
 
 import { TableColumn } from 'common/table/table-column.type';
 
@@ -35,8 +35,9 @@ export class StatusColumnComponent implements TableColumn {
   };
   // todo: move statuses to constant enum? when all possible values will be known
   statusClassMap = {
-    [RUNNING]: 'status status-running fa fa-play-circle-o',
-    [SUSPENDED]: 'status status-suspended fa fa-pause-circle-o'
+    [POLICY_UI_STATUS.ACTIVE]: 'status status-running fa fa-play-circle-o',
+    [POLICY_UI_STATUS.SUSPENDED]: 'status status-suspended fa fa-pause-circle-o',
+    [POLICY_UI_STATUS.ENDED]: 'status status-ended fa fa-stop-circle'
   };
 
   getStatusClassNames(status: string) {
