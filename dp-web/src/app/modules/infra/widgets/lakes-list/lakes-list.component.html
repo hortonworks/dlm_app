@@ -80,7 +80,7 @@
                 <button [attr.id]="'dropDown_'+lakeInfo.id" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
                 <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i></button>
                 <ul mdl class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+lakeInfo.id">
-                    <li class="mdl-menu__item"><a href="{{lakeInfo.ambariUrl}}" target="_blank"><i class="fa fa-external-link"></i>{{"pages.infra.labels.goToAmbari" | translate}}</a></li>
+                    <li class="mdl-menu__item" (click)="goToAmbari(lakeInfo)"><i class="fa__fa-close--icon fa fa-external-link"></i>{{"pages.infra.labels.goToAmbari" | translate}}</li>
                     <li class="mdl-menu__item" (click)="refresh(lakeInfo)"><span><i class="fa__fa-close--icon fa fa-refresh"></i>{{"common.refresh" | translate}}</span></li>
                     <li class="mdl-menu__item"><a [routerLink]="['/infra/clusters', lakeInfo.id, 'edit']"><i class="fa__fa-close--icon fa fa-edit"></i>{{"common.edit" | translate}}</a></li>
                     <li class="mdl-menu__item" (click)="deleteCluster(lakeInfo.id)"><span><i class="fa__fa-close--icon fa fa-trash"></i>{{"common.delete" | translate}}</span></li>

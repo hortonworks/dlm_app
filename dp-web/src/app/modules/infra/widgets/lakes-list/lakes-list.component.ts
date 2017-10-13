@@ -49,7 +49,9 @@ export class LakesListComponent implements OnChanges {
     {key: 'country', display: 'Country'},
     {key: 'dataCenter', display: 'Data Center'}];
 
-  constructor(private lakeService: LakeService, private translateService: TranslateService) {
+  constructor(private lakeService: LakeService,
+              private translateService: TranslateService,
+              private clusterService: ClusterService) {
   }
 
   @HostListener('document:click', ['$event', '$event.target'])
@@ -87,6 +89,7 @@ export class LakesListComponent implements OnChanges {
     lakeInfo.id = lake.data.id;
     lakeInfo.name = lake.data.name;
     lakeInfo.ambariUrl = lake.data.ambariUrl;
+    lakeInfo.ambariIpAddress = lake.data.ambariIpAddress;
     lakeInfo.lakeId = lake.data.id;
     lakeInfo.dataCenter = lake.data.dcName;
     lakeInfo.cluster = lake.clusters && lake.clusters.length ? lake.clusters[0] : null;
@@ -267,6 +270,26 @@ export class LakesListComponent implements OnChanges {
     });
   }
 
+  goToAmbari(lakeInfo: LakeInfo) {
+    let parsedAmbariUrl = new URL(lakeInfo.ambariUrl);
+    let validIpAddressRegex = new RegExp('^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$');
+    if (!validIpAddressRegex.test(parsedAmbariUrl.hostname)) {
+      window.open(lakeInfo.ambariUrl, '_blank');
+      return;
+    }
+    let parsedIpAddress = new URL(lakeInfo.ambariIpAddress);
+    this.clusterService.getHostName(lakeInfo.cluster.id, parsedIpAddress.hostname).subscribe(response => {
+      if (response && response.length) {
+        let host = response[0].host;
+        window.open(`${parsedIpAddress.protocol}//${host}:${parsedIpAddress.port}`, '_blank');
+      } else {
+        window.open(lakeInfo.ambariUrl, '_blank');
+      }
+    }, () => {
+      window.open(lakeInfo.ambariUrl, '_blank');
+    });
+  }
+
   onSort($event) {
     this.lakesList.sort((obj1: any, obj2: any) => {
       try {
@@ -315,6 +338,7 @@ export class LakeInfo {
   name: string;
   lakeId: number;
   ambariUrl: string;
+  ambariIpAddress: string;
   cluster?: Cluster;
   status?: LakeStatus;
   dataCenter: string;
