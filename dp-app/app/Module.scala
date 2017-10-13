@@ -15,6 +15,7 @@ import java.util.Optional
 import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Inject, Provides, Singleton}
 import com.hortonworks.datapalane.consul._
+import com.hortonworks.dataplane.commons.metrics.MetricsRegistry
 import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.db.Webservice._
@@ -25,6 +26,7 @@ import play.api.libs.ws.WSClient
 class Module extends AbstractModule {
   def configure() = {
     bind(classOf[ConsulInitializer]).asEagerSingleton()
+    bind(classOf[MetricsRegistry]).toInstance(MetricsRegistry("dp-app"))
   }
 
 

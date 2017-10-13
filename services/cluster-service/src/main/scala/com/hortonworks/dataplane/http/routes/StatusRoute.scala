@@ -20,6 +20,7 @@ import akka.http.scaladsl.server.Directives._
 import com.google.common.net.HttpHeaders
 import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneClusterIdentifier, ErrorType, HJwtToken}
+import com.hortonworks.dataplane.commons.metrics.{MetricsRegistry, MetricsReporter}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.{ClusterSync, CredentialInterface, StorageInterface}
 import com.hortonworks.dataplane.http.BaseRoute
@@ -46,7 +47,8 @@ class StatusRoute @Inject()(val ws: WSClient,
                             val credentialInterface: CredentialInterface,
                             val config: Config,
                             clusterSync: ClusterSync,
-                            dpClusterSync: DpClusterSync)
+                            dpClusterSync: DpClusterSync,
+                            metricsRegistry: MetricsRegistry)
     extends BaseRoute {
 
   import com.hortonworks.dataplane.commons.domain.Ambari._
@@ -62,6 +64,8 @@ class StatusRoute @Inject()(val ws: WSClient,
 
   val tokenTopologyName = Try(config.getString("dp.services.knox.token.topology"))
     .getOrElse("token")
+
+  metricsRegistry.newGauge("knox.token.topology.name",{() => tokenTopologyName})
 
   def makeAmbariApiRequest(endpoint: String,
                            ambariResponse: AmbariForbiddenResponse,
@@ -261,15 +265,20 @@ class StatusRoute @Inject()(val ws: WSClient,
     }
   }
 
+  val ambariConnectTimer = metricsRegistry.newTimer("ambari.status.request.time")
+
   val route =
     path("ambari" / "status") {
+      val context = ambariConnectTimer.time()
       extractRequest { request =>
         post {
           entity(as[AmbariEndpoint]) { ep =>
             onComplete(checkAmbariAvailability(ep, request)) {
               case Success(res) =>
+                context.stop()
                 complete(success(res))
               case Failure(e) =>
+                context.stop()
                 e match {
                   case c: ConnectionError =>
                     complete(StatusCodes.InternalServerError,
@@ -314,6 +323,16 @@ class StatusRoute @Inject()(val ws: WSClient,
     pathEndOrSingleSlash {
       get {
         complete(success(Map("status" -> 200)))
+      }
+    }
+  }
+
+
+  val metrics = path("metrics") {
+    implicit val mr:MetricsRegistry = metricsRegistry
+    pathEndOrSingleSlash {
+      get {
+        complete(MetricsReporter.asJson)
       }
     }
   }
