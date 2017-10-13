@@ -42,7 +42,7 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
 
   mapData: MapData[] = [];
   cluster: Cluster = new Cluster();
-  searchTerm: string;
+  searchTerm: string = '';
   dcName: string;
   lake: Lake;
   location: Location;
@@ -65,7 +65,8 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
     const rxLake =
       this.route.params
         .map(params => params['id'])
-        .flatMap(lakeId => this.lakeService.retrieve(lakeId));
+        .flatMap(lakeId => this.lakeService.retrieve(lakeId))
+        .share();
 
     rxLake
       .subscribe(lake => this.lake = lake);
