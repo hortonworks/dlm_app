@@ -256,7 +256,7 @@ export class LakesListComponent implements OnChanges {
   }
 
   deleteCluster(lakeId) {
-    DialogBox.showConfirmationMessage(this.translateService.instant('pages.infra.labels.confirmDelete'),
+    DialogBox.showConfirmationMessage(this.translateService.instant('pages.infra.labels.confirmRemove'),
       this.translateService.instant('pages.infra.description.clusterDeleteWarning'),
       this.translateService.instant('common.confirm'), this.translateService.instant('common.cancel'),
       DialogType.DeleteConfirmation
