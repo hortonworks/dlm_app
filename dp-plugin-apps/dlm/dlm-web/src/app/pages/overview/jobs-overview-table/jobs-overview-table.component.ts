@@ -28,6 +28,7 @@ import { confirmNextAction } from 'actions/confirmation.action';
 import { NOTIFICATION_TYPES, NOTIFICATION_CONTENT_TYPE } from 'constants/notification.constant';
 import { JobTrackinfoProgress } from 'models/job-tracking-info.model';
 import { UNIT_LABELS } from 'constants/job.constant';
+import { activateDisabled, suspendDisabled } from 'utils/policy-util';
 
 @Component({
   selector: 'dlm-jobs-overview-table',
@@ -94,8 +95,8 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
       {label: actionLabel('abort_job'), name: 'ABORT_JOB', enabledFor: 'RUNNING'},
       {label: actionLabel('rerun_job'), name: 'RERUN_JOB', disableFn: this.isRerunDisabled.bind(this)},
       {label: actionLabel('delete_policy'), name: 'DELETE_POLICY', disabledFor: ''},
-      {label: actionLabel('suspend_policy'), name: 'SUSPEND_POLICY', disabledFor: 'SUSPENDED'},
-      {label: actionLabel('activate_policy'), name: 'ACTIVATE_POLICY', disabledFor: 'RUNNING'}
+      {label: actionLabel('suspend_policy'), name: 'SUSPEND_POLICY', disableFn: suspendDisabled},
+      {label: actionLabel('activate_policy'), name: 'ACTIVATE_POLICY', disableFn: activateDisabled}
     ];
     this.columns = [
       {cellTemplate: this.statusCellTemplate, maxWidth: 25, minWidth: 25},

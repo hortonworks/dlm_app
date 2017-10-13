@@ -103,7 +103,8 @@
       "failed": "Failed",
       "in_progress": "In Progress",
       "active": "Active",
-      "suspended": "Suspended"
+      "suspended": "Suspended",
+      "ended": "Ended"
     },
     "warnings": {
       "beacon_unavailable": "Data presented may not be complete due to Beacon service outage on clusters {{clusters}}."

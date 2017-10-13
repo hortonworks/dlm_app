@@ -61,7 +61,16 @@ export const PROGRESS_STATUS = {
   FAILED: FAILED
 };
 
+// a map of statuses converted from API response
+export const POLICY_UI_STATUS = {
+  ACTIVE: 'ACTIVE', // RUNNING
+  SUSPENDED: 'SUSPENDED', // SUSPENDED
+  ENDED: 'ENDED' // others e.g. SUCCEEDED, FAILED, SUCCEEDEDWITHSKIPPED, FAILEDWITHSKIPPED
+};
+
+// a map of POLICY_STATUS_UI translations used as value PolicyModel.displayStatus
 export const POLICY_DISPLAY_STATUS = {
-  [POLICY_STATUS.RUNNING]: 'common.status.active',
-  [POLICY_STATUS.SUSPENDED]: 'common.status.suspended'
+  [POLICY_UI_STATUS.ACTIVE]: 'common.status.active',
+  [POLICY_UI_STATUS.SUSPENDED]: 'common.status.suspended',
+  [POLICY_UI_STATUS.ENDED]: 'common.status.ended'
 };
