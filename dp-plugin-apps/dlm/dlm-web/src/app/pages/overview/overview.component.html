@@ -91,6 +91,7 @@
         <ng-template #jobs_table>
           <dlm-jobs-overview-table
            [jobs]="tableData$ | async"
+           [jobsCount]="(tableResources$ | async).length"
            (onShowPolicyLog)="handleOnShowPolicyLog($event)"
            [footerOptions]="jobsTableFooterOptions">
           </dlm-jobs-overview-table>

@@ -72,6 +72,11 @@ export const getPolicyClusterJob = createSelector(getAllPoliciesWithClusters, ge
   });
 });
 
+export const getPolicyClusterJobFailedLastTen = createSelector(getPolicyClusterJob, policies =>
+  policies.filter(p =>
+    p.lastTenJobs.some(j =>
+    j.status !== JOB_STATUS.SUCCESS)));
+
 export const getCountPoliciesForSourceClusters = createSelector(getAllPoliciesWithClusters, getAllClusters, (policies, clusters) => {
   return clusters.reduce((entities: { [id: number]: PoliciesCount }, entity: Cluster) => {
     return Object.assign({}, entities, {

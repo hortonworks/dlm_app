@@ -19,7 +19,7 @@ import { loadEvents } from 'actions/event.action';
 import { ProgressState } from 'models/progress-state.model';
 import { JOB_STATUS } from 'constants/status.constant';
 import {
-  getPolicyClusterJob, getUnhealthyPolicies, getAllPoliciesWithClusters, getCountPoliciesForSourceClusters
+  getPolicyClusterJobFailedLastTen, getUnhealthyPolicies, getAllPoliciesWithClusters, getCountPoliciesForSourceClusters
 } from 'selectors/policy.selector';
 import { getAllClusters, getUnhealthyClusters, getClustersWithLowCapacity } from 'selectors/cluster.selector';
 import { getDisplayedEvents } from 'selectors/event.selector';
@@ -110,7 +110,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.policiesSummary$ = store.select(getPoliciesHealth);
     this.jobsSummary$ = store.select(getJobsHealth);
 
-    this.tableResources$ = store.select(getPolicyClusterJob);
+    this.tableResources$ = store.select(getPolicyClusterJobFailedLastTen);
     this.unhealthyClusters$ = this.store.select(getUnhealthyClusters)
       .distinctUntilChanged(isEqual)
       .map(clusters => clusters.map(cluster => ({
@@ -278,8 +278,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     this.tableData$ = Observable
       .combineLatest(this.tableResources$, this.jobStatusFilter$)
       .map(([policies, jobStatusFilter]) => policies
-      .filter(policy => policy.lastTenJobs.some(job => job.status !== JOB_STATUS.SUCCESS) &&
-        this.matchJobStatus(policy, jobStatusFilter))
+      .filter(policy => this.matchJobStatus(policy, jobStatusFilter))
       .map(policy => this.mapTableData(policy)));
 
     this.subscriptions.push(overallProgressSubscription);
