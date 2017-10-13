@@ -14,6 +14,7 @@
 
 
 GET           /health                                                controllers.Status.health
+GET           /metrics                                                controllers.Status.metrics
 
 #auth calls
 POST          /auth/in                                               controllers.Authentication.signIn

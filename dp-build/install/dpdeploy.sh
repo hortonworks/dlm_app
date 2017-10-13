@@ -98,6 +98,14 @@ list_logs() {
     docker logs "$@"
 }
 
+list_metrics() {
+    echo "{\"service_metrics\": "
+    docker exec -it dp-gateway bash -c "curl http://localhost:8762/service/metrics"
+    echo ",\"gateway_metrics\": "
+    docker exec -it dp-gateway bash -c "curl http://localhost:8762/metrics"
+    echo "}"
+}
+
 migrate_schema() {
     if [ "$USE_EXT_DB" == "no" ]; then
         # start database container
@@ -514,6 +522,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "stop --all" "Stop all containers"
     printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
     printf "%-${tabspace}s:%s\n" "logs [container name]" "Logs of supplied container id or name"
+    printf "%-${tabspace}s:%s\n" "metrics" "Print metrics for containers"
     printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them. Needs to start from init db again"
     printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox and Consul containers and remove them. Needs to start from init knox again"
     printf "%-${tabspace}s:%s\n" "destroy --all" "Kill all containers and remove them. Needs to start from init again"
@@ -600,6 +609,9 @@ else
         logs)
             shift
             list_logs "$@"
+            ;;
+        metrics)
+            list_metrics
             ;;
         destroy)
             case "$2" in

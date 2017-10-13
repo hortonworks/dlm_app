@@ -13,16 +13,21 @@ package controllers
 
 import javax.inject._
 
+import com.hortonworks.dataplane.commons.metrics.{MetricsRegistry, MetricsReporter}
 import play.api.mvc._
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 @Singleton
-class Status extends Controller {
+class Status @Inject()(implicit val metricsReporter: MetricsRegistry)
+    extends Controller {
 
   def health = Action.async {
     Future.successful(Ok)
+  }
+
+  def metrics = Action.async {
+    Future.successful(Ok(MetricsReporter.asJson))
   }
 
 }

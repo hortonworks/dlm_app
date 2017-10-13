@@ -43,6 +43,8 @@ dependencyManagement {
     }
 }
 dependencies {
+    compile group: 'io.dropwizard.metrics', name: 'metrics-core', version: '3.2.5'
+    compile group: 'io.github.openfeign', name: 'feign-jackson', version: '9.4.0'
     compile 'org.mindrot:jbcrypt:0.3m'
     compile 'io.jsonwebtoken:jjwt:0.7.0'
     compile 'org.springframework.cloud:spring-cloud-starter-zuul'
