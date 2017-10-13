@@ -265,10 +265,7 @@ export class LakesListComponent implements OnChanges {
         this.lakeService.deleteCluster(lakeId).subscribe(() => {
           this.lakeService.clusterDeleted.next(lakeId);
         }, () => {
-          DialogBox.showErrorMessage(this.translateService.instant('common.failed'),
-            this.translateService.instant('pages.infra.description.deleteFailed'),
-            this.translateService.instant('pages.infra.description.deleteFailed'),
-            this.translateService.instant('common.ok'));
+          this.lakeService.clusterDeleteFailed.next();
         })
       }
     });
