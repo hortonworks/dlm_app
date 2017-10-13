@@ -267,8 +267,8 @@ export class LakesListComponent implements OnChanges {
         }, () => {
           DialogBox.showErrorMessage(this.translateService.instant('common.failed'),
             this.translateService.instant('pages.infra.description.deleteFailed'),
-            this.translateService.instant('pages.infra.description.deleteFailed'),
-            this.translateService.instant('common.ok'));
+            this.translateService.instant('common.ok'),
+            DialogType.Error);
         })
       }
     });
