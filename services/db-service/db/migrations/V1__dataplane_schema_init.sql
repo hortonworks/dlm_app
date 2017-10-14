@@ -1,5 +1,3 @@
-CREATE SCHEMA IF NOT EXISTS dataplane;
-
 CREATE TABLE IF NOT EXISTS dataplane.roles (
   id      BIGSERIAL PRIMARY KEY,
   name    VARCHAR(32) UNIQUE NOT NULL,
@@ -72,7 +70,7 @@ CREATE TABLE IF NOT EXISTS dataplane.dp_clusters (
   ip_address   VARCHAR(255) UNIQUE                        NOT NULL,
   location_id  BIGINT REFERENCES dataplane.locations (id) NOT NULL,
   created_by   BIGINT REFERENCES dataplane.users (id)     NOT NULL,
-  properties   JSONB,
+  properties   JSON,
   state        VARCHAR(32)                                NOT NULL DEFAULT 'TO_SYNC',
   created      TIMESTAMP                                           DEFAULT now(),
   updated      TIMESTAMP                                           DEFAULT now(),
@@ -94,14 +92,14 @@ CREATE TABLE IF NOT EXISTS dataplane.discovered_clusters (
   kerberos_ticket_Location TEXT,
   dp_clusterid             BIGINT REFERENCES dataplane.dp_clusters (id) UNIQUE NOT NULL, -- One cluster per DL
   user_id                  BIGINT REFERENCES dataplane.users (id)              NOT NULL, -- The user who created the cluster
-  properties               JSONB
+  properties               JSON
 );
 
 
 CREATE TABLE IF NOT EXISTS dataplane.cluster_services (
   id           BIGSERIAL PRIMARY KEY,
   service_name VARCHAR(255) NOT NULL,
-  properties   JSONB,
+  properties   JSON,
   cluster_id   BIGINT REFERENCES dataplane.discovered_clusters (id)
 );
 
@@ -145,14 +143,14 @@ CREATE TABLE IF NOT EXISTS dataplane.cluster_hosts (
   host       VARCHAR(255)                                         NOT NULL,
   ipaddr     VARCHAR(39)                                          NOT NULL,
   status     VARCHAR(32)                                          NOT NULL,
-  properties JSONB,
+  properties JSON,
   cluster_id BIGINT REFERENCES dataplane.discovered_clusters (id) NOT NULL
 );
 
 
 CREATE TABLE IF NOT EXISTS dataplane.cluster_properties (
   id         BIGSERIAL PRIMARY KEY,
-  properties JSONB,
+  properties JSON,
   cluster_id BIGINT REFERENCES dataplane.discovered_clusters (id) NOT NULL
 );
 
@@ -174,7 +172,7 @@ CREATE TABLE IF NOT EXISTS dataplane.datasets (
   lastmodified TIMESTAMP DEFAULT now()                            NOT NULL,
   active       BOOLEAN DEFAULT TRUE,
   version      SMALLINT DEFAULT 1,
-  custom_props JSONB
+  custom_props JSON
 );
 
 CREATE TABLE IF NOT EXISTS dataplane.dataset_categories (
@@ -190,7 +188,7 @@ CREATE TABLE IF NOT EXISTS dataplane.unclassified_datasets (
   createdby    BIGINT REFERENCES dataplane.users (id)             NOT NULL,
   createdon    TIMESTAMP DEFAULT now()                            NOT NULL,
   lastmodified TIMESTAMP DEFAULT now()                            NOT NULL,
-  custom_props JSONB
+  custom_props JSON
 );
 
 CREATE TABLE IF NOT EXISTS dataplane.unclassified_datasets_categories (
@@ -203,7 +201,7 @@ CREATE TABLE IF NOT EXISTS dataplane.data_asset (
   asset_type       VARCHAR(100) NOT NULL,
   asset_name       TEXT        NOT NULL,
   guid             VARCHAR(100) NOT NULL,
-  asset_properties JSONB       NOT NULL,
+  asset_properties JSON       NOT NULL,
   dataset_id       BIGINT REFERENCES dataplane.datasets (id) ON DELETE CASCADE DEFAULT NULL,
   cluster_id       BIGINT REFERENCES dataplane.discovered_clusters (id) NOT NULL
 );
@@ -211,7 +209,7 @@ CREATE TABLE IF NOT EXISTS dataplane.data_asset (
 -- Since datasets are boxes, we will need to store details
 CREATE TABLE IF NOT EXISTS dataplane.dataset_details (
   id         BIGSERIAL,
-  details    JSONB,
+  details    JSON,
   dataset_id BIGINT REFERENCES dataplane.datasets (id) ON DELETE CASCADE
 );
 
