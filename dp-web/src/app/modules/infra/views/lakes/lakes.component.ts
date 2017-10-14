@@ -119,9 +119,7 @@ export class LakesComponent implements OnInit {
 
   updateHealth(lake, locationObserver: Observable<any>) {
     locationObserver.subscribe(locationInfo => {
-      if (lake.data.state === this.SYNCED || lake.data.state === this.SYNC_ERROR) {
-        lake.data.isWaiting = false;
-      }
+      lake.data.isWaiting = false;
       this.health.set(lake.data.id, locationInfo);
       this.health = new Map(this.health.entries());
       this.mapSet.set(lake.data.id, new MapData(this.extractMapPoints(locationInfo, lake)));
@@ -130,13 +128,20 @@ export class LakesComponent implements OnInit {
         mapPoints.push(mapData)
       });
       this.mapData = mapPoints;
+    },error => {
+      lake.data.isWaiting = false;
+      this.health = new Map(this.health.entries());
     });
   }
 
   private getLocationInfoWithStatus(locationId, clusterId, lakeId): Observable<any> {
     return Observable.forkJoin(
-      this.locationService.retrieve(locationId).map((res) => res),
-      this.clusterService.retrieveHealth(clusterId, lakeId).map((res) => res)
+      this.locationService.retrieve(locationId).map((res) => res).catch(err => {
+        return Observable.of(null);
+      }),
+      this.clusterService.retrieveHealth(clusterId, lakeId).map((res) => res).catch(err => {
+        return Observable.of(null);
+      })
     ).map(response => {
       return {
         location: response[0],
@@ -155,9 +160,9 @@ export class LakesComponent implements OnInit {
   }
 
   private extractMapPoints(locationInfo, lake) {
-    if (!locationInfo.health) {
+    if (!locationInfo.health && locationInfo.location) {
       return new Point(locationInfo.location.latitude, locationInfo.location.longitude, MapConnectionStatus.NA, lake.data.name, lake.data.dcName, `${locationInfo.location.city}, ${locationInfo.location.country}`)
-    } else {
+    } else if(locationInfo.health && locationInfo.location){
       let health = locationInfo.health;
       let location = locationInfo.location;
       let status;

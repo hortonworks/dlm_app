@@ -71,7 +71,7 @@
               <span *ngIf="lakeInfo.status === statusEnum.WAITING"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i></span>
           </td>
           <td class="mdl-data-table__cell--non-numeric key-column mdl-data-table__cell--width15" [routerLink]="['/infra/clusters/', lakeInfo.lakeId]">{{lakeInfo.name}}</td>
-          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.city}},&nbsp;{{lakeInfo.country}}</td>
+          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{getLocationInfo(lakeInfo)}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.dataCenter}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.nodes}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.uptimeStr}}</td>
