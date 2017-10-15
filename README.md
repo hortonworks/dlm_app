@@ -11,7 +11,7 @@
   * `sudo yum install sbt`
 * Nodejs 6.10.0 or above. To get Nodejs on Linux, you can follow instructions here: https://nodejs.org/en/download/package-manager/#enterprise-linux-and-fedora
 * [Yarn](https://yarnpkg.com) package manager (`npm install --global yarn`)
-* docker-machine (tested with 0.7.0), docker (tested with 1.8.0), docker-compose (tested with 1.7.1)
+* docker-machine (tested with 0.7.0), docker (tested with 1.12.0)
 * Centos 7 or Mac OSX are tested platforms
 
 ## Build
