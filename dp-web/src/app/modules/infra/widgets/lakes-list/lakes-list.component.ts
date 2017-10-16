@@ -50,8 +50,7 @@ export class LakesListComponent implements OnChanges {
     {key: 'dataCenter', display: 'Data Center'}];
 
   constructor(private lakeService: LakeService,
-              private translateService: TranslateService,
-              private clusterService: ClusterService) {
+              private translateService: TranslateService) {
   }
 
   @HostListener('document:click', ['$event', '$event.target'])
@@ -282,26 +281,6 @@ export class LakesListComponent implements OnChanges {
     });
   }
 
-  goToAmbari(lakeInfo: LakeInfo) {
-    let parsedAmbariUrl = new URL(lakeInfo.ambariUrl);
-    let validIpAddressRegex = new RegExp('^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$');
-    if (!validIpAddressRegex.test(parsedAmbariUrl.hostname)) {
-      window.open(lakeInfo.ambariUrl, '_blank');
-      return;
-    }
-    let parsedIpAddress = new URL(lakeInfo.ambariIpAddress);
-    this.clusterService.getHostName(lakeInfo.cluster.id, parsedIpAddress.hostname).subscribe(response => {
-      if (response && response.length) {
-        let host = response[0].host;
-        window.open(`${parsedIpAddress.protocol}//${host}:${parsedIpAddress.port}`, '_blank');
-      } else {
-        window.open(lakeInfo.ambariUrl, '_blank');
-      }
-    }, () => {
-      window.open(lakeInfo.ambariUrl, '_blank');
-    });
-  }
-
   onSort($event) {
     this.lakesList.sort((obj1: any, obj2: any) => {
       try {
@@ -364,7 +343,6 @@ export class LakeInfo {
   uptimeStr?: string = 'NA';
   startTime?: number;
   isWaiting: boolean;
-
 
   get hdfsUsedInBytes(): number {
     return this.toBytes(this.hdfsUsed);
