@@ -148,14 +148,7 @@ export class LakesComponent implements OnInit {
         return Observable.of(null);
       }),
       this.getAmbariUrl(clusterId, ambariUrl)
-    ).map(response => {
-      return {
-        location: response[0],
-        health: response[1],
-        ambariUrl: response[2]
-      };
-
-    });
+      , (location, health, ambariUrl) => ({location, health, ambariUrl}));
   }
 
   private getAmbariUrl(clusterId, ambariUrl) {
