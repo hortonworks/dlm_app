@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
  *
  * Except as expressly permitted in a written agreement between you or your company
@@ -7,10 +7,6 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { DropdownItem } from '../../dropdown/dropdown-item';
-
-export interface ActionItemType extends DropdownItem {
-  name: string;
-  disableFor?: string;
-  disableFn?: Function;
+sup {
+  margin-left: 5px;
 }

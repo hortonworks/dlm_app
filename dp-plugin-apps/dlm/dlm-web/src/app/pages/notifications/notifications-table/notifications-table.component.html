@@ -32,4 +32,5 @@
 
 <ng-template let-event="row" #logTemplate>
   <span qe-attr="show-log" *ngIf="event.eventType === 'policyinstance' || event.eventType === 'policy'" class="text-primary actionable" (click)="showLog(event)">{{ "page.notifications.view_log" | translate }}</span>
+  <span *ngIf="event.eventType !== 'policyinstance' && event.eventType !== 'policy'">{{"common.na" | translate}}</span>
 </ng-template>

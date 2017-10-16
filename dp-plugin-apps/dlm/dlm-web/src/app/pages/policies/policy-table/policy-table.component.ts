@@ -57,6 +57,8 @@ import {
   ConfirmationOptions,
   confirmationOptionsDefaults
 } from '../../../components/confirmation-modal/confirmation-options.type';
+import { POLICY_STATUS, POLICY_UI_STATUS } from 'constants/status.constant';
+import { suspendDisabled, activateDisabled } from 'utils/policy-util';
 
 const DATABASE_REQUEST = '[Policy Table] DATABASE_REQUEST';
 
@@ -123,12 +125,13 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @Input() clusters: Cluster[] = [];
   @Input() activePolicyId = '';
   @Input() policies: Policy[] = [];
+  @Input() policiesCount: 0;
   @Output() detailsToggle = new EventEmitter<any>();
 
   rowActions = <ActionItemType[]>[
     {label: 'Delete', name: 'DELETE_POLICY', disabledFor: ''},
-    {label: 'Suspend', name: 'SUSPEND_POLICY', disabledFor: 'SUSPENDED'},
-    {label: 'Activate', name: 'ACTIVATE_POLICY', disabledFor: 'RUNNING'},
+    {label: 'Suspend', name: 'SUSPEND_POLICY', disableFn: suspendDisabled},
+    {label: 'Activate', name: 'ACTIVATE_POLICY', disableFn: activateDisabled},
     {label: 'View Log', name: 'LOG', disabledFor: ''}
   ];
 
@@ -196,7 +199,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       {name: ' ', prop: 'type', cellClass: 'icon-cell',
         cellTemplate: this.iconColumn.cellRef, sortable: false, flexGrow: 1},
       {
-        prop: 'status',
+        prop: 'uiStatus',
         name: ' ',
         cellTemplate: this.statusColumn.cellRef,
         sortable: false,

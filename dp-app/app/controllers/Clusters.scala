@@ -189,9 +189,7 @@ class Clusters @Inject()(
             Future.successful(Left(Errors(Seq(Error("500", "Sync failed")))))
         }
         .map {
-          case Left(errors) =>
-            InternalServerError(
-              JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Left(errors) => InternalServerError(Json.toJson(errors))
           case Right(clusterHealth) =>
             Ok(summary match {
               case Some(_) =>

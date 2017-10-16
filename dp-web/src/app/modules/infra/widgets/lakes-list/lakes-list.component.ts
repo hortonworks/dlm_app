@@ -133,6 +133,14 @@ export class LakesListComponent implements OnChanges {
     }
   }
 
+  private getLocationInfo(lakeInfo){
+    if(lakeInfo.city && lakeInfo.country){
+      return lakeInfo.city+", "+lakeInfo.country;
+    }else{
+      return "NA";
+    }
+  }
+
   filter(isAddition) {
     if (!this.filters || this.filters.length === 0) {
       this.lakesList = this.lakesListCopy.slice();
@@ -259,12 +267,16 @@ export class LakesListComponent implements OnChanges {
   }
 
   deleteCluster(lakeId) {
-    DialogBox.showConfirmationMessage(this.translateService.instant('pages.infra.description.clusterDeleteWarning'), DialogType.DeleteConfirmation).subscribe(result => {
+    DialogBox.showConfirmationMessage(this.translateService.instant('pages.infra.labels.confirmRemove'),
+      this.translateService.instant('pages.infra.description.clusterDeleteWarning'),
+      this.translateService.instant('common.confirm'), this.translateService.instant('common.cancel'),
+      DialogType.DeleteConfirmation
+    ).subscribe(result => {
       if (result) {
         this.lakeService.deleteCluster(lakeId).subscribe(() => {
           this.lakeService.clusterDeleted.next(lakeId);
         }, () => {
-          DialogBox.showErrorMessage(this.translateService.instant('pages.infra.description.deleteFailed'));
+          this.lakeService.clusterDeleteFailed.next();
         })
       }
     });
@@ -344,7 +356,7 @@ export class LakeInfo {
   dataCenter: string;
   city?: string;
   country?: string;
-  nodes?: number;
+  nodes?: string = 'NA';
   services?: number;
   hdfsUsed?: string = 'NA';
   hdfsTotal?: string = 'NA';
