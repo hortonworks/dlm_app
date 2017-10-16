@@ -308,6 +308,12 @@ import_certs() {
     echo "Certificates were copied successfully."
 }
 
+init_knox_and_consul() {
+    init_consul
+
+    init_knox
+}
+
 init_knox() {
     echo "Initializing Knox"
 
@@ -326,8 +332,6 @@ init_knox() {
         echo "Generating self-signed certificates (for demo only)"
         generate_certs
     fi
-
-    init_consul
     
     if [ -z "${CERTIFICATE_PASSWORD}" ]; then
         read_certificate_password
@@ -420,7 +424,7 @@ init_all() {
 
     update_admin_password
 
-    init_knox
+    init_knox_and_consul
     
     init_keystore
 
@@ -483,12 +487,15 @@ upgrade() {
 
     # destroy all but db
     docker rm -f $APP_CONTAINERS_WITHOUT_DB || echo "App is not up."
-    destroy_knox || echo "Knox/Consul is not up"
+    
+    echo "Destroying Knox"
+    docker rm -f $KNOX_CONTAINER || echo "Knox is not up"
 
     # migrate schema to new version
     migrate_schema
 
-    # init all but db and knox
+    # init all but db
+    init_knox
     init_app
 
     echo "Upgrade complete."
@@ -547,7 +554,7 @@ else
                     init_db
                     ;;
                 knox)
-                    init_knox
+                    init_knox_and_consul
                     ;;
                 app)
                     init_app
