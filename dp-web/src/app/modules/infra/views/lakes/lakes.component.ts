@@ -151,29 +151,22 @@ export class LakesComponent implements OnInit {
       , (location, health, ambariUrl) => ({location, health, ambariUrl}));
   }
 
-  private getAmbariUrl(clusterId, ambariUrl) {
+  private getAmbariUrl(clusterId, ambariUrl): Observable<string> {
     let parsedAmbariUrl = new URL(ambariUrl);
     let validIpAddressRegex = new RegExp('^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$');
-    return Observable.create(observer => {
-      if (!validIpAddressRegex.test(parsedAmbariUrl.hostname)) {
-        observer.next(ambariUrl);
-        observer.complete();
-      }
-      let parsedIpAddress = new URL(ambariUrl);
-      this.clusterService.getHostName(clusterId, parsedIpAddress.hostname).subscribe(response => {
+    if (!validIpAddressRegex.test(parsedAmbariUrl.hostname)) {
+      return Observable.of(ambariUrl);
+    }
+    let parsedIpAddress = new URL(ambariUrl);
+    return this.clusterService.getHostName(clusterId, parsedIpAddress.hostname)
+      .map(response => {
         if (response && response.length) {
           let host = response[0].host;
-          observer.next(`${parsedIpAddress.protocol}//${host}:${parsedIpAddress.port}`);
-          observer.complete();
+          return `${parsedIpAddress.protocol}//${host}:${parsedIpAddress.port}`;
         } else {
-          observer.next(ambariUrl);
-          observer.complete();
+          return ambariUrl;
         }
-      }, () => {
-        observer.next(ambariUrl);
-        observer.complete();
-      });
-    });
+      }).catch(() => Observable.of(ambariUrl));
   }
 
   private getLocationInfo(locationId) {
