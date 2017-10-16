@@ -130,6 +130,14 @@ export class LakesListComponent implements OnChanges {
     }
   }
 
+  private getLocationInfo(lakeInfo){
+    if(lakeInfo.city && lakeInfo.country){
+      return lakeInfo.city+", "+lakeInfo.country;
+    }else{
+      return "NA";
+    }
+  }
+
   filter(isAddition) {
     if (!this.filters || this.filters.length === 0) {
       this.lakesList = this.lakesListCopy.slice();
@@ -324,7 +332,7 @@ export class LakeInfo {
   dataCenter: string;
   city?: string;
   country?: string;
-  nodes?: number;
+  nodes?: string = 'NA';
   services?: number;
   hdfsUsed?: string = 'NA';
   hdfsTotal?: string = 'NA';
