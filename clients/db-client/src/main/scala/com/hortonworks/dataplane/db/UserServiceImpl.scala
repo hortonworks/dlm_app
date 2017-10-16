@@ -42,11 +42,11 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
   override def loadUserById(id: String): Future[Either[Errors, User]] = {
-    ws.url(s"$url/users?id=$id")
+    ws.url(s"$url/users/$id")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map { res =>
-        mapToUser(res)
+        mapToOneUser(res)
       }
   }
   private def mapToUserInfo(res: WSResponse) = {

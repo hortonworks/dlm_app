@@ -34,6 +34,7 @@
     "loading": "Loading",
     "name": "Name",
     "moreLink": "Learn More",
+    "information": "Information",
     "save": "SAVE",
     "failed": "Failed",
     "defaultRequiredFields": "Please fill in mandatory fields marked with '*'",
@@ -213,7 +214,17 @@
         "duplicateGroup": "Duplicate values in Groups Input - ",
         "noMatch": "No Match",
         "ldapUrl": "Ldap URL",
-        "confirmRemove": "Remove Confirmation"
+        "confirmRemove": "Remove Confirmation",
+        "hdpVersion":"HDP Version",
+        "registeredBy": "Registered By",
+        "securityType": "Security Type",
+        "noOfServices": "No of Services",
+        "dataNodes": "DataNodes",
+        "nameNodeHeapSize": "NameNode Heap Size",
+        "hdfsDiskSpace": "HDFS Disk Space",
+        "nodeManagers": "NodeManagers",
+        "resourceManagerHeapSize": "ResourceManager Heap Size",
+        "resourceManagerUptime": "ResourceManager Uptime"
       },
       "description": {
         "editCluster": "Please update your Ambari managed cluster (already added to Dataplane) here.",
