@@ -308,15 +308,7 @@ import_certs() {
     echo "Certificates were copied successfully."
 }
 
-init_knox_and_consul() {
-    init_consul
-
-    init_knox
-}
-
-init_knox() {
-    echo "Initializing Knox"
-
+init_certs() {
     if [ "$USE_TLS" != "true" ]; then
         USE_PROVIDED_CERTIFICATES="no"
     fi
@@ -332,6 +324,30 @@ init_knox() {
         echo "Generating self-signed certificates (for demo only)"
         generate_certs
     fi
+}
+
+upgrade_certs() {
+    if [ "$USE_TLS" != "true" ]; then
+        USE_PROVIDED_CERTIFICATES="no"
+    fi
+
+    if [ "$USE_PROVIDED_CERTIFICATES" == "no" ]; then
+        echo "Using previously generated self-signed certificates (for demo only)"
+        CERTIFICATE_PASSWORD="changeit"
+    fi
+
+}
+
+init_knox_and_consul() {
+    init_consul
+
+    init_certs
+
+    init_knox
+}
+
+init_knox() {
+    echo "Initializing Knox"
     
     if [ -z "${CERTIFICATE_PASSWORD}" ]; then
         read_certificate_password
@@ -475,7 +491,7 @@ upgrade() {
     fi
 
     echo "Moving configuration..."
-    mv $(pwd)/config.env.sh $(pwd)/config.env.sh.bak
+    mv $(pwd)/config.env.sh $(pwd)/config.env.sh.$(date +"%Y-%m-%d_%H-%M-%S").bak
     cp $2/config.env.sh $(pwd)/config.env.sh
     # sourcing again to overwrite values
     source $(pwd)/config.clear.sh
@@ -493,6 +509,9 @@ upgrade() {
 
     # migrate schema to new version
     migrate_schema
+
+    # upgrade certs if required
+    upgrade_certs
 
     # init all but db
     init_knox
