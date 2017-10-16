@@ -13,7 +13,6 @@ set -e
 
 source $(pwd)/config.env.sh
 
-CERTS_DIR=`dirname $0`/certs
 DEFAULT_VERSION=0.0.1-latest
 
 CLUSTER_SERVICE_CONTAINER="dp-cluster-service"
@@ -300,6 +299,7 @@ import_certs() {
         return -1
     fi
 
+    mkdir -p certs
     rm -f $(pwd)/certs/ssl-cert.pem 2> /dev/null
     cp "$PUBLIC_KEY_L" $(pwd)/certs/ssl-cert.pem
     rm -f $(pwd)/certs/ssl-key.pem 2> /dev/null
@@ -513,7 +513,9 @@ upgrade() {
     # upgrade certs if required
     upgrade_certs
 
-    # init all but db
+    # init all but db and consul
+    read_consul_host
+
     init_knox
     init_app
 
