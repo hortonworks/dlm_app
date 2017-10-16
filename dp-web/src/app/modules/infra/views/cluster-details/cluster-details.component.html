@@ -31,31 +31,31 @@
       <div class="summary-pane-7">
         <ul>
           <li>
-            <div class="title">Location</div>
+            <div class="title">{{"common.location" | translate}}</div>
             <div class="value">{{clusterDetails.location}}</div>
           </li>
           <li>
-            <div class="title">Data Center</div>
+            <div class="title">{{"pages.infra.labels.dataCenter" | translate}}</div>
             <div class="value">{{clusterDetails.dataCenter}}</div>
           </li>
           <li>
-            <div class="title">HDP Version</div>
+            <div class="title">{{"pages.infra.labels.hdpVersion" | translate}}</div>
             <div class="value">{{clusterDetails.hdpVersion}}</div>
           </li>
           <li>
-            <div class="title">Nodes</div>
+            <div class="title">{{"pages.infra.labels.nodes" | translate}}</div>
             <div class="value">{{clusterDetails.healthyNodes}}/{{clusterDetails.nodes}}</div>
           </li>
           <li>
-            <div class="title">Tags</div>
+            <div class="title">{{"common.tags" | translate}}</div>
             <div class="value">{{clusterDetails.tags}}</div>
           </li>
           <li>
-            <div class="title">Uptime</div>
+            <div class="title">{{"pages.infra.labels.uptime" | translate}}</div>
             <div class="value">{{clusterDetails.uptime}}</div>
           </li>
           <li>
-            <div class="title">Created By</div>
+            <div class="title">{{"pages.infra.labels.registeredBy" | translate}}</div>
             <div class="value">{{user? user.username: ''}}</div>
           </li>
         </ul>
@@ -68,7 +68,7 @@
         <div class="mdl-cell mdl-cell--12-col">
           <div class="mdl-grid">
             <div class="mdl-cell mdl-cell--6-col">
-              <label class="text-medium pull-left">INFORMATION</label>
+              <label class="text-medium pull-left">{{("common.information" | translate).toUpperCase()}}</label>
             </div>
             <div class="mdl-layout-spacer"> </div>
             <div class="info-button">
@@ -79,13 +79,13 @@
               </ul>
             </div>
             <div class="mdl-cell mdl-cell--12-col">
-              <div class="text-dark-small-1">Description</div>
+              <div class="text-dark-small-1">{{"common.description" | translate}}</div>
               <div class="text-small-1 margin-top-10">{{lake.description}}</div>
             </div>
           </div>
           <div class="mdl-grid">
             <div class="mdl-cell mdl-cell--4-col">
-              <div class="text-dark-small-1">Status</div>
+              <div class="text-dark-small-1">{{"common.status" | translate}}</div>
               <div class="text-small-1 margin-top-10">
                 <span *ngIf="clusterDetails && clusterDetails.status === 'STARTED'"><i class="fa fa-circle fa-circle--color-up"></i>Running</span>
                 <span *ngIf="clusterDetails && clusterDetails.status === 'NOT STARTED'"><i class="fa fa-circle fa-circle--color-down"></i>Not Running</span>
@@ -94,31 +94,31 @@
               </div>
             </div>
             <div class="mdl-cell mdl-cell--4-col">
-              <div class="text-dark-small-1">Security Type</div>
+              <div class="text-dark-small-1">{{"pages.infra.labels.securityType" | translate}}</div>
               <div class="text-small-1 margin-top-10">{{clusterDetails.securityType}}</div>
             </div>
             <div class="mdl-cell mdl-cell--4-col">
-              <div class="text-dark-small-1">No of Services</div>
+              <div class="text-dark-small-1">{{"pages.infra.labels.noOfServices" | translate}}</div>
               <div class="text-small-1 margin-top-10">{{clusterDetails.noOfSerices}}</div>
             </div>
           </div>
           <div class="mdl-grid">
             <div class="mdl-cell mdl-cell--4-col">
-              <div class="text-dark-small-1">DataNodes</div>
+              <div class="text-dark-small-1">{{"pages.infra.labels.dataNodes" | translate}}</div>
               <div class="text-small-1 margin-top-10">
                 <span class="margin-right-10"><i class="fa fa-circle fa-circle--color-up"></i>{{clusterDetails.healthyDataNodes}}</span>
                 <span><i class="fa fa-circle fa-circle--color-down"></i>{{clusterDetails.unhealthyDataNodes}}</span>
               </div>
             </div>
             <div class="mdl-cell mdl-cell--4-col">
-              <div class="text-dark-small-1">NameNode Heap Size</div>
+              <div class="text-dark-small-1">{{"pages.infra.labels.nameNodeHeapSize" | translate}}</div>
               <div #heapProgress class="mdl-progress mdl-js-progress dp-progress pull-left"></div>
               <div class="progress-percent">{{heapPercent}}</div>
               <div class="placeholder"></div>
               <div class="text-small-1 margin-top-0">{{clusterDetails.heapSizeUsed}}/{{clusterDetails.heapSizeTotal}}</div>
             </div>
             <div class="mdl-cell mdl-cell--4-col">
-              <div class="text-dark-small-1">HDFS Disk Space</div>
+              <div class="text-dark-small-1">{{"pages.infra.labels.hdfsDiskSpace" | translate}}</div>
               <div #hdfsProgress class="mdl-progress mdl-js-progress dp-progress pull-left"></div>
               <div class="progress-percent">{{hdfsPercent}}</div>
               <div class="placeholder"></div>
@@ -127,21 +127,21 @@
           </div>
           <div class="mdl-grid">
             <div class="mdl-cell mdl-cell--4-col">
-              <div class="text-dark-small-1">NodeManagers</div>
+              <div class="text-dark-small-1">{{"pages.infra.labels.nodeManagers" | translate}}</div>
               <div class="text-small-1 margin-top-10">
                 <span class="margin-right-10"><i class="fa fa-circle fa-circle--color-up"></i>{{clusterDetails.nodeManagersActive}}</span>
                 <span><i class="fa fa-circle fa-circle--color-down"></i>{{clusterDetails.nodeManagersInactive}}</span>
               </div>
             </div>
             <div class="mdl-cell mdl-cell--4-col">
-              <div class="text-dark-small-1">ResourceManager Heap Size</div>
+              <div class="text-dark-small-1">{{"pages.infra.labels.resourceManagerHeapSize" | translate}}</div>
               <div #rmHeapProgress class="mdl-progress mdl-js-progress dp-progress pull-left"></div>
               <div class="progress-percent">{{rmHeapPercent}}</div>
               <div class="placeholder"></div>
               <div class="text-small-1 margin-top-0">{{clusterDetails.rmHeapUsed?clusterDetails.rmHeapUsed:'NA'}}/{{clusterDetails.rmHeapTotal?clusterDetails.rmHeapTotal:'NA'}}</div>
             </div>
             <div class="mdl-cell mdl-cell--4-col">
-              <div class="text-dark-small-1">ResourceManager Uptime</div>
+              <div class="text-dark-small-1">{{"pages.infra.labels.resourceManagerUptime" | translate}}</div>
               <div class="text-small-1 margin-top-10">{{clusterDetails.rmUptime?clusterDetails.rmUptime:'NA'}}</div>
             </div>
           </div>
