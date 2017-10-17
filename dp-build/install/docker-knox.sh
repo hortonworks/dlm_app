@@ -32,6 +32,7 @@ docker start knox >> install.log 2>&1 || \
         --env "USE_TEST_LDAP=$USE_TEST_LDAP" \
         --env "CONSUL_HOST=$CONSUL_HOST" \
         --volume knox-config:/etc/knox/conf \
+        --volume knox-security:/usr/hdp/current/knox-server/data/security \
         --volume $(pwd)/certs:/dp-shared \
         hortonworks/dp-knox:$VERSION
         
