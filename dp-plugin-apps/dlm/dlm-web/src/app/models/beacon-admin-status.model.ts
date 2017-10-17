@@ -19,5 +19,6 @@ export interface BeaconAdminStatus {
     plugins: string[];
     security: string;
     wireEncryption: boolean;
+    rangerCreateDenyPolicy: string;
   };
 };
