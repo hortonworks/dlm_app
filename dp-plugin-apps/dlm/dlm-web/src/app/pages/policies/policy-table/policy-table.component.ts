@@ -199,15 +199,6 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       {name: ' ', prop: 'type', cellClass: 'icon-cell',
         cellTemplate: this.iconColumn.cellRef, sortable: false, flexGrow: 1},
       {
-        prop: 'uiStatus',
-        name: ' ',
-        cellTemplate: this.statusColumn.cellRef,
-        sortable: false,
-        flexGrow: 1,
-        headerClass: 'no-sort-cell',
-        cellClass: 'icon-cell'
-      },
-      {
         prop: 'displayStatus',
         name: this.t.instant('common.status.self'),
         cellClass: 'text-cell',
@@ -219,14 +210,14 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         name: this.t.instant('common.name'),
         cellTemplate: this.policyInfoColumn.cellRef,
         sortable: false,
-        flexGrow: 8
+        flexGrow: 13
       },
       {
         prop: 'sourceClusterResource',
         name: this.t.instant('common.source'),
         cellTemplate: this.clusterCellTemplateRef,
         comparator: this.clusterResourceComparator.bind(this),
-        flexGrow: 4
+        flexGrow: 6
       },
       {
         prop: 'accessMode',

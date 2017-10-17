@@ -17,16 +17,17 @@ export const COLUMN_WIDTH = 100;
 @Component({
   selector: 'dlm-policy-status-column',
   template: `
-    <ng-template #statusCell let-value="value">
-      <span [class]="getStatusClassNames(value)"></span>
-      <span *ngIf="showText">{{value}}</span>
-    </ng-template>
+    <div>
+      <span [class]="getStatusClassNames(status)"></span>
+      <span *ngIf="showText">{{status}}</span>
+    </div>
   `,
   styleUrls: ['./policy-status-column.component.scss']
 })
 export class StatusColumnComponent implements TableColumn {
   @Input()
   showText = true;
+  @Input() status: string;
   @ViewChild('statusCell') cellRef: TemplateRef<any>;
   cellSettings = {
     maxWidth: COLUMN_WIDTH,

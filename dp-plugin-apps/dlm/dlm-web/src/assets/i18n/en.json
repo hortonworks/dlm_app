@@ -104,7 +104,7 @@
       "in_progress": "In Progress",
       "active": "Active",
       "suspended": "Suspended",
-      "ended": "Ended"
+      "ended": "Expired"
     },
     "warnings": {
       "beacon_unavailable": "Data presented may not be complete due to Beacon service outage on clusters {{clusters}}."
@@ -547,7 +547,7 @@
     "jobs": {
       "header": "Jobs",
       "header_note": "",
-      "prev_jobs": "Prev Jobs",
+      "prev_jobs": "Jobs",
       "job_ignored": "Prior instance was still executing so this instance was not triggered and ignored."
     },
     "notifications": {

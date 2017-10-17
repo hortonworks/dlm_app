@@ -19,7 +19,6 @@
 </dlm-table>
 
 <dlm-icon-column></dlm-icon-column>
-<dlm-policy-status-column [showText]="false"></dlm-policy-status-column>
 <dlm-policy-info
   [expandedRows]="tableComponent.expandedRows"
   [activeContent]="activeContentType"
@@ -31,6 +30,11 @@
 </ng-template>
 
 <ng-template #verbStatusCellTemplate let-value="value" let-policy="row">
+  <dlm-policy-status-column
+    class="inline-block"
+    [showText]="false"
+    [status]="policy.uiStatus">
+  </dlm-policy-status-column>
   <span [attr.qe-attr]="'policy-status-' + policy.$$index" class="policy-status">{{value | translate}}</span>
 </ng-template>
 
