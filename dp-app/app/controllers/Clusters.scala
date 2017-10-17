@@ -259,9 +259,7 @@ class Clusters @Inject()(
 
       hostsSearchResult
         .map { hsr =>
-          if (hsr.isEmpty) {
-            NotFound(JsonResponses.statusError("No hosts for cluster"))
-          } else Ok(Json.toJson(hsr))
+          Ok(Json.toJson(hsr))
         }
         .recoverWith {
           case e: Throwable =>

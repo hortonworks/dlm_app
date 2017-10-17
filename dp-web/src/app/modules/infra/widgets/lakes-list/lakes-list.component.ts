@@ -49,7 +49,8 @@ export class LakesListComponent implements OnChanges {
     {key: 'country', display: 'Country'},
     {key: 'dataCenter', display: 'Data Center'}];
 
-  constructor(private lakeService: LakeService, private translateService: TranslateService) {
+  constructor(private lakeService: LakeService,
+              private translateService: TranslateService) {
   }
 
   @HostListener('document:click', ['$event', '$event.target'])
@@ -87,6 +88,7 @@ export class LakesListComponent implements OnChanges {
     lakeInfo.id = lake.data.id;
     lakeInfo.name = lake.data.name;
     lakeInfo.ambariUrl = lake.data.ambariUrl;
+    lakeInfo.ambariIpAddress = lake.data.ambariIpAddress;
     lakeInfo.lakeId = lake.data.id;
     lakeInfo.dataCenter = lake.data.dcName;
     lakeInfo.cluster = lake.clusters && lake.clusters.length ? lake.clusters[0] : null;
@@ -327,6 +329,7 @@ export class LakeInfo {
   name: string;
   lakeId: number;
   ambariUrl: string;
+  ambariIpAddress: string;
   cluster?: Cluster;
   status?: LakeStatus;
   dataCenter: string;
@@ -340,7 +343,6 @@ export class LakeInfo {
   uptimeStr?: string = 'NA';
   startTime?: number;
   isWaiting: boolean;
-
 
   get hdfsUsedInBytes(): number {
     return this.toBytes(this.hdfsUsed);

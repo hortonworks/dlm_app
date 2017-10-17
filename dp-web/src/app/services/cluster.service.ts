@@ -90,4 +90,12 @@ export class ClusterService {
       .catch(HttpUtil.handleError);
   }
 
+  getHostName(clusterId: number, ambariIp: string): Observable<any>{
+    const uri = `${this.uri}/${clusterId}/hosts?ip=${ambariIp}`;
+    return this.http
+      .get(uri, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
 }
