@@ -20,6 +20,7 @@ import play.api.libs.ws.WSClient
 import com.hortonworks.dlm.beacon._
 import com.hortonworks.dlm.beacon.WebService._
 import com.hortonworks.datapalane.consul._
+import com.hortonworks.dataplane.commons.metrics.MetricsRegistry
 import com.hortonworks.dataplane.cs.{AmbariWebServiceImpl, ClusterWsClient, KnoxProxyWsClient}
 import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 
@@ -38,6 +39,7 @@ class Module extends AbstractModule {
 
   def configure() = {
     bind(classOf[ConsulInitializer]).asEagerSingleton()
+    bind(classOf[MetricsRegistry]).toInstance(MetricsRegistry("dlm-app"))
   }
 
   @Provides

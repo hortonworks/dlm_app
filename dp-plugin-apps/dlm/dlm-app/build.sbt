@@ -22,6 +22,8 @@ libraryDependencies ++= Seq(
   "com.hortonworks.dataplane" %% "db-client" % "1.0",
   "com.hortonworks.dataplane" %% "cs-client" % "1.0",
   "com.hortonworks.dataplane" %% "dp-consular" % "1.0",
+  "io.dropwizard.metrics" % "metrics-jvm" % "3.2.5",
+  "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.1",
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test
 
 )
