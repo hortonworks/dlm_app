@@ -8,7 +8,8 @@
  */
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { MockTranslateLoader } from 'mocks/mock-translate-loader';
 import { NotFoundRouteComponent } from './not-found-route.component';
 
 describe('RouteNotFoundComponent', () => {
@@ -17,6 +18,9 @@ describe('RouteNotFoundComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [TranslateModule.forRoot({
+        loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
+      })],
       declarations: [ NotFoundRouteComponent ]
     })
     .compileComponents();

@@ -26,7 +26,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() menuItems: MenuItem[] = [];
   @Input() header: MenuItem;
   @Input() mainContentSelector = '#main';
-  @Input() handlePopState = true;
+  @Input() handlePopState = false;
   @Input() fitHeight = false;
   @Input() footer = 'footer';
   @Input() moveLeftContent = true;

@@ -221,6 +221,11 @@
     }
   },
   "page": {
+    "not_found": {
+      "message": "This page does not exist.",
+      "link_text": "Click here to return to home page.",
+      "breadcrumb": "Route Not Found"
+    },
     "overview": {
       "charts": {
         "clusters": "Clusters",
