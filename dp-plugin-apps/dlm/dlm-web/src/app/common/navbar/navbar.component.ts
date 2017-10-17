@@ -9,7 +9,6 @@
 
 import { Component, Input, ElementRef, OnInit, AfterViewInit, ViewChild, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { NavbarService } from 'services/navbar.service';
-import { RouterLinkActive } from '@angular/router';
 import { Persona } from 'models/header-data';
 import { MenuItem } from './menu-item';
 import { Observable } from 'rxjs/Observable';
