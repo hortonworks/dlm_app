@@ -343,22 +343,18 @@ init_knox_and_consul() {
 
     init_certs
 
-    check_envs
-
     init_knox
 }
 
-check_envs() {
+init_knox() {
+    echo "Initializing Knox"
+    
     if [ -z "${CERTIFICATE_PASSWORD}" ]; then
         read_certificate_password
     fi
     if [ "$MASTER_PASSWORD" == "" ]; then
         read_master_password
     fi
-}
-
-init_knox() {
-    echo "Initializing Knox"
     if [ "$USE_TEST_LDAP" == "" ];then
         read_use_test_ldap
     fi
@@ -505,11 +501,11 @@ upgrade() {
     mkdir -p $(pwd)/certs
     cp -R $2/certs/* $(pwd)/certs
 
-    # destroy all but db, knox and consul
+    # destroy all but db
     docker rm -f $APP_CONTAINERS_WITHOUT_DB || echo "App is not up."
     
-    # echo "Destroying Knox"
-    # docker rm -f $KNOX_CONTAINER || echo "Knox is not up"
+    echo "Destroying Knox"
+    docker rm -f $KNOX_CONTAINER || echo "Knox is not up"
 
     # migrate schema to new version
     migrate_schema
@@ -517,12 +513,10 @@ upgrade() {
     # upgrade certs if required
     upgrade_certs
 
-    # init all but db, knox and consul
+    # init all but db and consul
     read_consul_host
 
-    check_envs
-
-    # init_knox
+    init_knox
     init_app
 
     echo "Upgrade complete."
