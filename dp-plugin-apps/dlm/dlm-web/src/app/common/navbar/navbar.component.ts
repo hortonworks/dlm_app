@@ -9,6 +9,7 @@
 
 import { Component, Input, ElementRef, OnInit, AfterViewInit, ViewChild, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { NavbarService } from 'services/navbar.service';
+import { RouterLinkActive } from '@angular/router';
 import { Persona } from 'models/header-data';
 import { MenuItem } from './menu-item';
 import { Observable } from 'rxjs/Observable';
@@ -26,7 +27,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() menuItems: MenuItem[] = [];
   @Input() header: MenuItem;
   @Input() mainContentSelector = '#main';
-  @Input() handlePopState = true;
+  @Input() handlePopState = false;
   @Input() fitHeight = false;
   @Input() footer = 'footer';
   @Input() moveLeftContent = true;
