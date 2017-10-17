@@ -13,7 +13,6 @@ set -e
 
 source $(pwd)/config.env.sh
 
-CERTS_DIR=`dirname $0`/certs
 DEFAULT_VERSION=0.0.1-latest
 
 CLUSTER_SERVICE_CONTAINER="dp-cluster-service"
@@ -300,6 +299,7 @@ import_certs() {
         return -1
     fi
 
+    mkdir -p certs
     rm -f $(pwd)/certs/ssl-cert.pem 2> /dev/null
     cp "$PUBLIC_KEY_L" $(pwd)/certs/ssl-cert.pem
     rm -f $(pwd)/certs/ssl-key.pem 2> /dev/null
@@ -308,9 +308,7 @@ import_certs() {
     echo "Certificates were copied successfully."
 }
 
-init_knox() {
-    echo "Initializing Knox"
-
+init_certs() {
     if [ "$USE_TLS" != "true" ]; then
         USE_PROVIDED_CERTIFICATES="no"
     fi
@@ -326,8 +324,30 @@ init_knox() {
         echo "Generating self-signed certificates (for demo only)"
         generate_certs
     fi
+}
 
+upgrade_certs() {
+    if [ "$USE_TLS" != "true" ]; then
+        USE_PROVIDED_CERTIFICATES="no"
+    fi
+
+    if [ "$USE_PROVIDED_CERTIFICATES" == "no" ]; then
+        echo "Using previously generated self-signed certificates (for demo only)"
+        CERTIFICATE_PASSWORD="changeit"
+    fi
+
+}
+
+init_knox_and_consul() {
     init_consul
+
+    init_certs
+
+    init_knox
+}
+
+init_knox() {
+    echo "Initializing Knox"
     
     if [ -z "${CERTIFICATE_PASSWORD}" ]; then
         read_certificate_password
@@ -420,7 +440,7 @@ init_all() {
 
     update_admin_password
 
-    init_knox
+    init_knox_and_consul
     
     init_keystore
 
@@ -471,7 +491,7 @@ upgrade() {
     fi
 
     echo "Moving configuration..."
-    mv $(pwd)/config.env.sh $(pwd)/config.env.sh.bak
+    mv $(pwd)/config.env.sh $(pwd)/config.env.sh.$(date +"%Y-%m-%d_%H-%M-%S").bak
     cp $2/config.env.sh $(pwd)/config.env.sh
     # sourcing again to overwrite values
     source $(pwd)/config.clear.sh
@@ -483,12 +503,20 @@ upgrade() {
 
     # destroy all but db
     docker rm -f $APP_CONTAINERS_WITHOUT_DB || echo "App is not up."
-    destroy_knox || echo "Knox/Consul is not up"
+    
+    echo "Destroying Knox"
+    docker rm -f $KNOX_CONTAINER || echo "Knox is not up"
 
     # migrate schema to new version
     migrate_schema
 
-    # init all but db and knox
+    # upgrade certs if required
+    upgrade_certs
+
+    # init all but db and consul
+    read_consul_host
+
+    init_knox
     init_app
 
     echo "Upgrade complete."
@@ -547,7 +575,7 @@ else
                     init_db
                     ;;
                 knox)
-                    init_knox
+                    init_knox_and_consul
                     ;;
                 app)
                     init_app
