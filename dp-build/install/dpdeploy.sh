@@ -325,7 +325,7 @@ init_certs() {
     fi
 }
 
-upgrade_certs() {
+read_certs_config() {
     if [ "$USE_TLS" != "true" ]; then
         USE_PROVIDED_CERTIFICATES="no"
     fi
@@ -454,6 +454,21 @@ init_all() {
     echo "Initialization and start complete."
 }
 
+init_all_from_state() {
+    read_master_password_safely
+    read_certs_config
+
+    init_db
+
+    init_consul
+
+    init_knox
+
+    init_app
+
+    echo "Initialization and start complete."
+}
+
 start_all() {
     start_knox
 
@@ -470,12 +485,27 @@ stop_all() {
     echo "Stop complete."
 }
 
-destroy_all() {
+destroy_volumes() {
+    echo "Destroying volumes"
+    docker volume rm knox-config knox-security postgresql-data
+}
+
+destroy_all_with_state() {
     destroy
 
     destroy_knox
 
+    destroy_volumes
+
     echo "Destroy complete."
+}
+
+destroy_all_but_state() {
+    destroy
+
+    destroy_knox
+
+    echo "Stop complete."
 }
 
 upgrade() {
@@ -518,7 +548,7 @@ upgrade() {
     migrate_schema
 
     # upgrade certs if required
-    upgrade_certs
+    read_certs_config
 
     # init all but db and consul
     read_consul_host
@@ -546,12 +576,8 @@ usage() {
     printf "%-${tabspace}s:%s\n" "utils update-user [ambari | atlas | ranger]" "Update user credentials for services that Dataplane will use to connect to clusters."
     printf "%-${tabspace}s:%s\n" "utils add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
     printf "%-${tabspace}s:%s\n" "utils reload-apps" "Restart all containers other than database, Consul and Knox"
-    printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
-    printf "%-${tabspace}s:%s\n" "start knox" "Start the Knox and Consul containers"
-    printf "%-${tabspace}s:%s\n" "start --all" "Start all containers"
-    printf "%-${tabspace}s:%s\n" "stop" "Stop the application docker containers"
-    printf "%-${tabspace}s:%s\n" "stop knox" "Stop the Knox and Consul containers"
-    printf "%-${tabspace}s:%s\n" "stop --all" "Stop all containers"
+    printf "%-${tabspace}s:%s\n" "start" "Re-initialize all container while using previous data and state"
+    printf "%-${tabspace}s:%s\n" "stop" "Destroy all containers but keep data and state"
     printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
     printf "%-${tabspace}s:%s\n" "logs [container name]" "Logs of supplied container id or name"
     printf "%-${tabspace}s:%s\n" "metrics" "Print metrics for containers"
@@ -607,25 +633,11 @@ else
             esac
             ;;
         start)
-            case "$2" in
-                knox) start_knox
-                ;;
-                --all)
-                    start_all
-                    ;;
-                *) start_app
-             esac
-             ;;
+            init_all_from_state
+            ;;
         stop)
-            case "$2" in
-                knox) stop_knox
-                ;;
-                --all)
-                    stop_all
-                    ;;
-                *) stop_app
-             esac
-             ;;
+            destroy_all_but_state
+            ;;
         ps)
             ps
             ;;
@@ -640,13 +652,12 @@ else
             case "$2" in
                 knox) destroy_knox
                 ;;
-                --all)
-                    destroy_all
-                    ;;
+                --all) destroy_all_with_state
+                ;;
                 *) destroy
-                 ;;
-             esac
-             ;;
+                ;;
+            esac
+            ;;
         load)
             load_images
             ;;
