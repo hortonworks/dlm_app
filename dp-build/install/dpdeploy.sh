@@ -75,7 +75,7 @@ read_consul_host(){
 }
 
 generate_certs() {
-    CERTIFICATE_PASSWORD="changeit"
+    CERTIFICATE_PASSWORD=${MASTER_PASSWORD}
 
     source $(pwd)/docker-certificates.sh
 }
@@ -221,15 +221,12 @@ init_app() {
     echo "Starting Cluster Service"
     source $(pwd)/docker-service-cluster.sh
 
-    if [ -z "${CERTIFICATE_PASSWORD}" ]; then
-        read_certificate_password
-    fi
     echo "Starting Application API"
     source $(pwd)/docker-app.sh
 }
 
 read_master_password() {
-    echo "Enter Knox master password: "
+    echo "Enter master password for Data Plane Service: "
     read -s MASTER_PASSWD
     
     if [ "${#MASTER_PASSWD}" -lt 6 ]; then
@@ -279,8 +276,8 @@ read_admin_password() {
     USER_ADMIN_PASSWORD="$ADMIN_PASSWD"
 }
 
-read_certificate_password() {
-    echo "Please enter password used for private key:"
+read_user_supplied_certificate_password() {
+    echo "Please enter password used for supplied certificates:"
     read -s CERTIFICATE_PASSWORD
 }
 
@@ -306,6 +303,8 @@ import_certs() {
     cp "$PRIVATE_KEY_L" $(pwd)/certs/ssl-key.pem
 
     echo "Certificates were copied successfully."
+
+    read_user_supplied_certificate_password
 }
 
 init_certs() {
@@ -333,7 +332,9 @@ upgrade_certs() {
 
     if [ "$USE_PROVIDED_CERTIFICATES" == "no" ]; then
         echo "Using previously generated self-signed certificates (for demo only)"
-        CERTIFICATE_PASSWORD="changeit"
+        CERTIFICATE_PASSWORD=${MASTER_PASSWORD}
+    else
+        read_user_supplied_certificate_password
     fi
 
 }
@@ -349,9 +350,6 @@ init_knox_and_consul() {
 init_knox() {
     echo "Initializing Knox"
     
-    if [ -z "${CERTIFICATE_PASSWORD}" ]; then
-        read_certificate_password
-    fi
     if [ "$MASTER_PASSWORD" == "" ]; then
         read_master_password
     fi
@@ -427,6 +425,12 @@ init_keystore() {
     source $(pwd)/keystore-initialize.sh
 }
 
+read_master_password_safely() {
+   if [ "$MASTER_PASSWORD" == "" ]; then
+       read_master_password
+   fi
+}
+
 update_admin_password() {
     read_admin_password_safely
     source $(pwd)/database-user-update.sh "$USER_ADMIN_PASSWORD"
@@ -434,6 +438,7 @@ update_admin_password() {
 
 init_all() {
     read_admin_password_safely
+    read_master_password_safely
 
     init_db
     reset_db
@@ -490,11 +495,13 @@ upgrade() {
         exit -1
     fi
 
+    source $(pwd)/config.clear.sh
+    read_master_password_safely
+
     echo "Moving configuration..."
     mv $(pwd)/config.env.sh $(pwd)/config.env.sh.$(date +"%Y-%m-%d_%H-%M-%S").bak
     cp $2/config.env.sh $(pwd)/config.env.sh
     # sourcing again to overwrite values
-    source $(pwd)/config.clear.sh
     source $(pwd)/config.env.sh
 
     echo "Moving certs directory"
@@ -534,9 +541,6 @@ usage() {
     local tabspace=20
     echo "Usage: dpdeploy.sh <command>"
     printf "%-${tabspace}s:%s\n" "Commands"
-    printf "%-${tabspace}s:%s\n" "init db" "Initialize postgres DB for first time"
-    printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox and Consul containers"
-    printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
     printf "%-${tabspace}s:%s\n" "utils update-user [ambari | atlas | ranger]" "Update user credentials for services that Dataplane will use to connect to clusters."
@@ -571,15 +575,6 @@ else
         init)
             echo "Found $2"
             case "$2" in
-                db)
-                    init_db
-                    ;;
-                knox)
-                    init_knox_and_consul
-                    ;;
-                app)
-                    init_app
-                    ;;
                 --all)
                     init_all
                     ;;
