@@ -549,12 +549,8 @@ usage() {
     printf "%-${tabspace}s:%s\n" "utils update-user [ambari | atlas | ranger]" "Update user credentials for services that Dataplane will use to connect to clusters."
     printf "%-${tabspace}s:%s\n" "utils add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
     printf "%-${tabspace}s:%s\n" "utils reload-apps" "Restart all containers other than database, Consul and Knox"
-    printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
-    printf "%-${tabspace}s:%s\n" "start knox" "Start the Knox and Consul containers"
-    printf "%-${tabspace}s:%s\n" "start --all" "Start all containers"
-    printf "%-${tabspace}s:%s\n" "stop" "Stop the application docker containers"
-    printf "%-${tabspace}s:%s\n" "stop knox" "Stop the Knox and Consul containers"
-    printf "%-${tabspace}s:%s\n" "stop --all" "Stop all containers"
+    printf "%-${tabspace}s:%s\n" "start" "Start all containers"
+    printf "%-${tabspace}s:%s\n" "stop" "Stop all containers"
     printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
     printf "%-${tabspace}s:%s\n" "logs [container name]" "Logs of supplied container id or name"
     printf "%-${tabspace}s:%s\n" "metrics" "Print metrics for containers"
@@ -619,25 +615,11 @@ else
             esac
             ;;
         start)
-            case "$2" in
-                knox) start_knox
-                ;;
-                --all)
-                    start_all
-                    ;;
-                *) start_app
-             esac
-             ;;
+            start_app
+            ;;
         stop)
-            case "$2" in
-                knox) stop_knox
-                ;;
-                --all)
-                    stop_all
-                    ;;
-                *) stop_app
-             esac
-             ;;
+            stop_app
+            ;;
         ps)
             ps
             ;;
