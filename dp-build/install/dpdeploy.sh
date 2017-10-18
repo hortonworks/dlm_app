@@ -449,6 +449,22 @@ init_all() {
     echo "Initialization and start complete."
 }
 
+init_all_from_state() {
+    read_admin_password_safely
+
+    init_db
+
+    update_admin_password
+
+    init_knox_and_consul
+    
+    init_keystore
+
+    init_app
+
+    echo "Initialization and start complete."
+}
+
 start_all() {
     start_knox
 
@@ -470,7 +486,7 @@ destroy_volumes() {
     docker volume rm knox-config knox-security postgresql-data
 }
 
-destroy_all() {
+destroy_all_with_state() {
     destroy
 
     destroy_knox
@@ -478,6 +494,14 @@ destroy_all() {
     destroy_volumes
 
     echo "Destroy complete."
+}
+
+destroy_all_but_state() {
+    destroy
+
+    destroy_knox
+
+    echo "Stop complete."
 }
 
 upgrade() {
@@ -549,8 +573,8 @@ usage() {
     printf "%-${tabspace}s:%s\n" "utils update-user [ambari | atlas | ranger]" "Update user credentials for services that Dataplane will use to connect to clusters."
     printf "%-${tabspace}s:%s\n" "utils add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
     printf "%-${tabspace}s:%s\n" "utils reload-apps" "Restart all containers other than database, Consul and Knox"
-    printf "%-${tabspace}s:%s\n" "start" "Start all containers"
-    printf "%-${tabspace}s:%s\n" "stop" "Stop all containers"
+    printf "%-${tabspace}s:%s\n" "start" "Re-initialize all container while using previous data and state"
+    printf "%-${tabspace}s:%s\n" "stop" "Destroy all containers but keep data and state"
     printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
     printf "%-${tabspace}s:%s\n" "logs [container name]" "Logs of supplied container id or name"
     printf "%-${tabspace}s:%s\n" "metrics" "Print metrics for containers"
@@ -615,10 +639,10 @@ else
             esac
             ;;
         start)
-            start_app
+            init_all_from_state
             ;;
         stop)
-            stop_app
+            destroy_all_but_state
             ;;
         ps)
             ps
@@ -634,8 +658,7 @@ else
             case "$2" in
                 knox) destroy_knox
                 ;;
-                --all)
-                    destroy_all
+                --all) destroy_all_with_state
                 ;;
                 *) destroy
                 ;;
