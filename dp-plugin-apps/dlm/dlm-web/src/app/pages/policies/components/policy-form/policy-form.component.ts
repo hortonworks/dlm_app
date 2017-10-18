@@ -608,10 +608,13 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   validateTime = (formGroup: FormGroup) => {
-    if (!(formGroup && formGroup.controls)) {
+    if (!(formGroup && formGroup.controls && formGroup.parent)) {
       return null;
     }
-    const timeControl = formGroup.controls.time;
+    const parentControls = formGroup.parent.controls;
+    const startTimeValue = parentControls['startTime'].value.date;
+    const endTimeValue = parentControls['endTime'].value.date;
+    const timeControl = parentControls['startTime'].controls.time;
     const dateFieldValue = formGroup.controls.date.value;
     const timeFieldValue = timeControl.value;
     timeControl.setErrors(null);
@@ -633,6 +636,10 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       const dateWithTime = this.setTimeForDate(mDate.format(), timeFieldValue);
       if (dateWithTime.isBefore(moment())) {
         timeControl.setErrors({ lessThanCurrent: true });
+        return null;
+      }
+      if (startTimeValue && endTimeValue && moment(endTimeValue).isBefore(moment(startTimeValue))) {
+        timeControl.setErrors({greaterThanEndTime: true});
         return null;
       }
     }

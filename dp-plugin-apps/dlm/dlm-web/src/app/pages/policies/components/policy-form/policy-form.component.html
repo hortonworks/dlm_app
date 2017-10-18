@@ -284,6 +284,10 @@
                   *ngIf="policyForm.get('job').get('startTime').get('time').hasError('lessThanCurrent')">
                   {{'forms.validation_errors.time_less_than_current' | translate}}
                 </dlm-field-error>
+                <dlm-field-error
+                  *ngIf="policyForm.get('job').get('startTime').get('time').hasError('greaterThanEndTime')">
+                  {{'forms.validation_errors.greaterThanEndTime' | translate}}
+                </dlm-field-error>
               </div>
             </div>
           </fieldset>
