@@ -465,10 +465,17 @@ stop_all() {
     echo "Stop complete."
 }
 
+destroy_volumes() {
+    echo "Destroying volumes"
+    docker volume rm knox-config knox-security postgresql-data
+}
+
 destroy_all() {
     destroy
 
     destroy_knox
+
+    destroy_volumes
 
     echo "Destroy complete."
 }
