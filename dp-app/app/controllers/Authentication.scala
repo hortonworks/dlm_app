@@ -123,19 +123,20 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
           JsonResponses.statusError(
             s"Cannot find user for request ${Json.toJson(errors)}"))
       case Right(user) =>
-        BCrypt.checkpw(password, user.password) match {
-          case true =>
-            val orElse = getRoles(roles)
-            Ok(
-              Json.obj(
-                "id" -> user.username,
-                "avatar" -> user.avatar,
-                "display" -> user.displayname
-              ))
-          case false =>
-            Unauthorized(
-              JsonResponses.statusError(s"The user cannot be verified"))
-        }
+        Try(BCrypt.checkpw(password, user.password))
+          .getOrElse(false) match {
+            case true =>
+              val orElse = getRoles(roles)
+              Ok(
+                Json.obj(
+                  "id" -> user.username,
+                  "avatar" -> user.avatar,
+                  "display" -> user.displayname
+                ))
+            case false =>
+              Unauthorized(
+                JsonResponses.statusError(s"The user cannot be verified"))
+          }
     }
   }
 
@@ -149,7 +150,7 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
   }
 
   private def checkPassword(password: String, hashedPassword: String): Boolean = {
-    if(BCrypt.checkpw(password, hashedPassword) == false) {
+    if(!Try(BCrypt.checkpw(password, hashedPassword)).getOrElse(false)) {
       val errors = Errors(Seq(Error("418", "Current password is incorrect.")))
       throw WrappedErrorsException(errors)
     }

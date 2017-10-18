@@ -24,6 +24,8 @@ import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import feign.FeignException;
 import org.mindrot.jbcrypt.BCrypt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 
 @Service
 public class SimpleSignInFilter extends ZuulFilter {
+  private static final Logger logger = LoggerFactory.getLogger(SimpleSignInFilter.class);
 
   private static final String AUTH_ENTRY_POINT = Constants.DPAPP_BASE_PATH+"/auth/in";
 
@@ -89,7 +92,12 @@ public class SimpleSignInFilter extends ZuulFilter {
       if (!userContextFromDb.isPresent()){
         return sendNoUserResponse();
       }
-      boolean validPassword = BCrypt.checkpw(credential.getPassword(), userContextFromDb.get().getPassword());
+      boolean validPassword = false;
+      try {
+        validPassword = BCrypt.checkpw(credential.getPassword(), userContextFromDb.get().getPassword());
+      } catch (Exception ex) {
+        logger.warn("Check password failed", ex);
+      }
       if (!validPassword) {
         return sendInvalidPasswordResponse();
       }
