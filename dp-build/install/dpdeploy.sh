@@ -325,7 +325,7 @@ init_certs() {
     fi
 }
 
-upgrade_certs() {
+read_certs_config() {
     if [ "$USE_TLS" != "true" ]; then
         USE_PROVIDED_CERTIFICATES="no"
     fi
@@ -455,15 +455,14 @@ init_all() {
 }
 
 init_all_from_state() {
-    read_admin_password_safely
+    read_master_password_safely
+    read_certs_config
 
     init_db
 
-    update_admin_password
+    init_consul
 
-    init_knox_and_consul
-    
-    init_keystore
+    init_knox
 
     init_app
 
@@ -549,7 +548,7 @@ upgrade() {
     migrate_schema
 
     # upgrade certs if required
-    upgrade_certs
+    read_certs_config
 
     # init all but db and consul
     read_consul_host
