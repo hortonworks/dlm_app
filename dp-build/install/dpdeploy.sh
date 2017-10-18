@@ -654,11 +654,11 @@ else
                 ;;
                 --all)
                     destroy_all
-                    ;;
+                ;;
                 *) destroy
-                 ;;
-             esac
-             ;;
+                ;;
+            esac
+            ;;
         load)
             load_images
             ;;
