@@ -50,6 +50,7 @@ export class DsNavResultViewer {
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
     if ((changes["dsNameSearch"] && !changes["dsNameSearch"].firstChange)
       || changes["currentDsTag"] && !changes["currentDsTag"].firstChange) {
+      this.start = 1;
       this.getDataset();
     }
   }
