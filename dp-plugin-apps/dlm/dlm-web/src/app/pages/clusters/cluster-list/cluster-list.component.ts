@@ -20,6 +20,7 @@ import { CLUSTER_STATUS } from 'constants/status.constant';
 import { ROOT_PATH } from 'constants/hdfs.constant';
 import { ACTION_TYPES } from 'components/cluster-actions/cluster-actions.component';
 import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
+import { Location } from 'models/location.model';
 
 @Component({
   selector: 'dlm-cluster-list',
@@ -82,7 +83,8 @@ export class ClusterListComponent implements OnInit {
       {prop: 'dataCenter', name: '', cellTemplate: this.dcCellRef, flexGrow: 3},
       {name: '', cellTemplate: this.slashIconCellRef, flexGrow: 1},
       {prop: 'name', name: '', cellTemplate: this.nameCellRef, flexGrow: 4},
-      {prop: 'stats', name: this.t.instant('page.clusters.card.usage'), cellTemplate: this.usageCellRef, minWidth: 160, flexGrow: 5},
+      {prop: 'stats', name: this.t.instant('page.clusters.card.usage'), cellTemplate: this.usageCellRef,
+        minWidth: 160, flexGrow: 5, comparator: this.clusterUsageComparator.bind(this)},
       {prop: 'totalHosts', name: this.t.instant('page.clusters.card.nodes'),
         cellTemplate: this.plainCellRef, qeAttrName: 'total-hosts', flexGrow: 1, cellClass: 'text-cell', headerClass: 'text-header'},
       {prop: 'pairsCounter', name: this.t.instant('common.pairs'),
@@ -90,10 +92,18 @@ export class ClusterListComponent implements OnInit {
       {prop: 'policiesCounter', name: this.t.instant('common.policies'),
         cellTemplate: this.plainCellRef, qeAttrName: 'total-policies', flexGrow: 2, cellClass: 'text-cell', headerClass: 'text-header'},
       {prop: 'location', name: this.t.instant('page.clusters.card.location'),
-        cellTemplate: this.locationCellRef, flexGrow: 4},
+        cellTemplate: this.locationCellRef, comparator: this.clusterLocationComparator.bind(this), flexGrow: 4},
       {name: '', cellTemplate: this.addActionsCellRef,
         cellClass: 'add-actions-cell', flexGrow: 1}
     ];
+  }
+
+  clusterUsageComparator(stats1, stats2) {
+    return this.getCapacityUsed(stats1) > this.getCapacityUsed(stats2) ? 1 : -1;
+  }
+
+  clusterLocationComparator(location1: Location, location2: Location) {
+    return location1.city.toLowerCase() > location2.city.toLowerCase() ? 1 : -1;
   }
 
   toggleClusterDetails(clusterRow) {
