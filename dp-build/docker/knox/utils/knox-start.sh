@@ -70,4 +70,4 @@ chown -R knox $KNOX_HOME/data/
 chroot --userspec=knox / \
     java \
         -Djava.library.path=$KNOX_HOME/ext/native \
-        -jar $KNOX_HOME/bin/gateway.jar
+        -jar $KNOX_HOME/bin/gateway.jar "$@"

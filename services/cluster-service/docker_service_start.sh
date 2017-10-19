@@ -12,4 +12,5 @@ fi
     -Ddp.services.knox.token.infer.endpoint.using.credentials=${KNOX_CONFIG_USING_CREDS} \
     -Ddp.keystore.path=${KEYSTORE_PATH} \
     -Ddp.keystore.password=${KEYSTORE_PASSWORD} \
-    -Djsse.enableSNIExtension=false
+    -Djsse.enableSNIExtension=false \
+    "$@"
