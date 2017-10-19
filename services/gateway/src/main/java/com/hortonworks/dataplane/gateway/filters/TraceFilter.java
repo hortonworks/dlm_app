@@ -52,7 +52,7 @@ public class TraceFilter extends ZuulFilter {
   @Override
   public boolean shouldFilter() {
     RequestContext ctx = RequestContext.getCurrentContext();
-    return ctx.getResponseStatusCode() == 500;
+    return ctx.getResponseStatusCode() >= 500;
   }
 
   /**
