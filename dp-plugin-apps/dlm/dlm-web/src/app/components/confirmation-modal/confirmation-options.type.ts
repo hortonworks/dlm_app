@@ -18,5 +18,6 @@ export const confirmationOptionsDefaults = <ConfirmationOptions>{
   title: 'common.modal.confirmation.title',
   body: 'common.modal.confirmation.body',
   confirmBtnText: 'common.ok',
-  cancelBtnText: 'common.cancel'
+  cancelBtnText: 'common.cancel',
+  qeAttr: 'confirmation-modal'
 };

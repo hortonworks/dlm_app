@@ -17,7 +17,7 @@ import { ConfirmationService } from 'services/confirmation.service';
   selector: 'dlm-confirmation-modal-container',
   template: `
   <dlm-modal-dialog
-    qe-attr="confirmation-modal"
+    [attr.qe-attr]="(modalState$ | async)?.confirmationOptions.qeAttr || 'confirmation-modal'"
     [showDialog]="(modalState$ | async)?.isVisible"
     [title]="(modalState$ | async)?.confirmationOptions.title"
     [body]="(modalState$ | async)?.confirmationOptions.body"

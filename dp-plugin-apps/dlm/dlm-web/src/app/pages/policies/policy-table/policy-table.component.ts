@@ -129,10 +129,10 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   @Output() detailsToggle = new EventEmitter<any>();
 
   rowActions = <ActionItemType[]>[
-    {label: 'Delete', name: 'DELETE_POLICY', disabledFor: ''},
-    {label: 'Suspend', name: 'SUSPEND_POLICY', disableFn: suspendDisabled},
-    {label: 'Activate', name: 'ACTIVATE_POLICY', disableFn: activateDisabled},
-    {label: 'View Log', name: 'LOG', disabledFor: ''}
+    {label: 'Delete', name: 'DELETE_POLICY', disabledFor: '', qeAttr: 'delete-policy'},
+    {label: 'Suspend', name: 'SUSPEND_POLICY', disableFn: suspendDisabled, qeAttr: 'suspend-policy'},
+    {label: 'Activate', name: 'ACTIVATE_POLICY', disableFn: activateDisabled, qeAttr: 'activate-policy'},
+    {label: 'View Log', name: 'LOG', disabledFor: '', qeAttr: 'policy-log'}
   ];
 
   private initPolling() {
@@ -318,7 +318,8 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
           {
             ...confirmationOptionsDefaults,
             body,
-            confirmBtnText: this.t.instant('common.yes')
+            confirmBtnText: this.t.instant('common.yes'),
+            qeAttr: `confirmation-${this.selectedAction.qeAttr}`
           } as ConfirmationOptions
         ));
       }
@@ -327,13 +328,13 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
 
   abortJobAction(job) {
     const policy = this.policies.find(p => p.policyId === job.policyId);
-    const action = <ActionItemType>{name: 'ABORT_JOB'};
+    const action = <ActionItemType>{name: 'ABORT_JOB', qeAttr: 'abort-job'};
     this.handleSelectedAction({ row: policy, action });
   }
 
   rerunJobAction(job) {
     const policy = this.policies.find(p => p.policyId === job.policyId);
-    const action = <ActionItemType>{name: 'RERUN_JOB'};
+    const action = <ActionItemType>{name: 'RERUN_JOB', qeAttr: 'rerun-job'};
     this.handleSelectedAction({ row: policy, action });
   }
 

@@ -13,4 +13,5 @@ export interface ActionItemType extends DropdownItem {
   name: string;
   disableFor?: string;
   disableFn?: Function;
+  qeAttr?: string;
 }
