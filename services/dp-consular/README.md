@@ -1,4 +1,4 @@
-###Service registration and discovery
+### Service registration and discovery
 
 Data plane by design is a distributed application composed of multiple services
 which run in separate processes and may even be running as multiple instances. 
@@ -32,7 +32,7 @@ implemented by the service
 * The registrar communicates its state/status through the ```com.hortonworks.datapalane.consul.CosulHook```
 and this must be passed in to exercise any control over the registration status.
 
-####Api gateway
+#### Api gateway
 
 The API gateway used is a Zuul edge proxy which uses registers itself as ```zuul``` in consul
 
