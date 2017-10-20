@@ -235,7 +235,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         sortable: false, flexGrow: 4},
       {prop: 'jobs.0.duration', name: this.t.instant('common.duration'),
         cellTemplate: this.durationCellRef, flexGrow: 3},
-      {prop: 'lastGoodJobResource.startTime', name: 'Last Good',
+      {prop: 'lastSucceededJobTime', name: 'Last Good',
         cellTemplate: this.lastGoodCellRef, flexGrow: 3},
       {name: ' ', cellTemplate: this.actionsCellRef, flexGrow: 2, sortable: false}
     ];

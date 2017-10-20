@@ -11,7 +11,7 @@ import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { TranslateService } from '@ngx-translate/core';
-import { Policy, PolicyPayload } from 'models/policy.model';
+import {Policy, PolicyPayload, Report} from 'models/policy.model';
 import { toSearchParams, mapResponse } from 'utils/http-util';
 import { JobService } from 'services/job.service';
 import { POLICY_DISPLAY_STATUS, POLICY_STATUS, POLICY_UI_STATUS } from 'constants/status.constant';
@@ -35,10 +35,14 @@ export class PolicyService {
 
   normalizePolicy(policy): Policy {
     const uiStatus = this.getUIStatus(policy.status);
+    const lastSucceededInstance = policy.report.lastSucceededInstance;
     policy.id = policy.policyId;
     policy.endTime = policy.endTime.indexOf('9999') === 0 ? null : policy.endTime;
     policy.uiStatus = uiStatus;
     policy.displayStatus = this.getDisplayStatus(uiStatus);
+    if (lastSucceededInstance) {
+      policy.lastSucceededJobTime =  lastSucceededInstance.endTime;
+    }
     return policy;
   }
 

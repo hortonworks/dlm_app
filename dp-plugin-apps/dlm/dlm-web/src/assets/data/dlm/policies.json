@@ -24,7 +24,13 @@
       "endTime": "2017-07-31T17:11:25",
       "trackingInfo": "{\"jobId\":\"job_1501190983539_0016\",\"jobType\":\"MAIN\",\"progress\": {\"total\":0,\"completed\":0,\"bytesCopied\":0,\"filesCopied\":0,\"timeTaken\":211}}",
       "message": "java.io.IOException: DistCp failure: Job job_1501190983539_0016 has failed: Task failed task_1501190983539_0016_m_000000\nJob failed as tasks failed. failedMaps:1 failedReduces:0\n"
-    }]
+    }],
+    "report": {
+      "lastFailedInstance": {
+        "status": "FAILED",
+        "endTime": "2017-07-31T17:11:25"
+      }
+    }
   }, {
     "policyId": "/dc-Europe/c2/dc-Europe/c1/aaaaaaaaaaaaaaaaaaaaa/0/1501516834949/000000007",
     "name": "aaaaaaaaaaaaaaaaaaaaa",
@@ -49,7 +55,13 @@
       "endTime": "2017-07-31T16:15:13",
       "trackingInfo": "{\"jobId\":\"job_1501194648859_0010\",\"jobType\":\"MAIN\",\"progress\":{\"total\":3,\"completed\":1,\"killed\":1,\"failed\":0,\"bytesCopied\":0,\"filesCopied\":1000,\"timeTaken\":7430,\"unit\":\"table\"}}",
       "message": "java.io.IOException: DistCp failure: Job job_1501190983539_0011 has failed: Task failed task_1501190983539_0011_m_000000\nJob failed as tasks failed. failedMaps:1 failedReduces:0\n"
-    }]
+    }],
+    "report": {
+      "lastFailedInstance": {
+        "status": "FAILED",
+        "endTime": "2017-07-31T16:15:13"
+      }
+    }
   }, {
     "policyId": "/dc-Europe/c2/dc-Europe/c1/asd/0/1501516834949/000000008",
     "name": "asd",
@@ -74,7 +86,13 @@
       "endTime": "2017-07-31T16:29:12",
       "trackingInfo": "{\"jobId\":\"job_1501190983539_0012\",\"jobType\":\"MAIN\",\"progress\": {\"total\":1,\"completed\":1,\"failed\": 0,\"killed\": 0,\"bytesCopied\":3872393,\"filesCopied\":583,\"timeTaken\":22780}}",
       "message": "SUCCESS"
-    }]
+    }],
+    "report": {
+      "lastSucceededInstance": {
+        "status": "SUCCESS",
+        "endTime": "2017-07-31T16:29:12"
+      }
+    }
   }, {
     "policyId": "/dc-Europe/c1/dc-Europe/c2/321/0/1501370918147/000000002",
     "name": "321",
@@ -98,7 +116,13 @@
       "startTime": "2017-07-31T16:09:01",
       "endTime": "2017-07-31T16:10:32",
       "message": "org.apache.hadoop.security.AccessControlException: Permission denied: user=beacon, access=WRITE, inode=\"/ambari-server-log\":hdfs:hdfs:drwxr-xr-x\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.check(FSPermissionChecker.java:319)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.check(FSPermissionChecker.java:292)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkPermission(FSPermissionChecker.java:213)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkPermission(FSPermissionChecker.java:190)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkPermission(FSDirectory.java:1955)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkPermission(FSDirectory.java:1939)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkAncestorAccess(FSDirectory.java:1922)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirMkdirOp.mkdirs(FSDirMkdirOp.java:71)\n\tat org.apache.hadoop.hdfs.server.namenode.FSNamesystem.mkdirs(FSNamesystem.java:4150)\n\tat org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.mkdirs(NameNodeRpcServer.java:1109)\n\tat org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.mkdirs(ClientNamenodeProtocolServerSideTranslatorPB.java:633)\n\tat org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)\n\tat org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:640)\n\tat org.apache.hadoop.ipc.RPC$Server.call(RPC.java:982)\n\tat org.apache.hadoop.ipc.Server$Handler$1.run(Server.java:2351)\n\tat org.apache.hadoop.ipc.Server$Handler$1.run(Server.java:2347)\n\tat java.security.AccessController.doPrivileged(Native Method)\n\tat javax.security.auth.Subject.doAs(Subject.java:422)\n\tat org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1866)\n\tat org.apache.hadoop.ipc.Server$Handler.run(Server.java:2345)\n"
-    }]
+    }],
+    "report": {
+      "lastFailedInstance": {
+        "status": "FAILED",
+        "endTime": "2017-07-31T16:10:32"
+      }
+    }
   }, {
     "policyId": "/dc-Europe/c1/dc-Europe/c2/ambari-server-2/0/1501260883129/000000001",
     "name": "ambari-server-2",
@@ -148,7 +172,13 @@
       "endTime": "2017-07-31T21:26:16",
       "trackingInfo": "{\"jobId\":\"job_1501194648859_0312\",\"jobType\":\"MAIN\",\"progress\": {\"total\":1,\"completed\":1,\"failed\": 0,\"killed\": 0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7461}}",
       "message": "SUCCESS"
-    }]
+    }],
+    "report": {
+      "lastSucceededInstance": {
+        "status": "SUCCESS",
+        "endTime": "2017-07-31T21:26:16"
+      }
+    }
   }, {
     "policyId": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log/0/1501195622804/000000001",
     "name": "ambari-server-log",
@@ -198,7 +228,13 @@
       "endTime": "2017-07-31T21:18:18",
       "trackingInfo": "{\"jobId\":\"job_1501194648859_0311\",\"jobType\":\"MAIN\",\"progress\": {\"total\":1,\"completed\":1,\"failed\": 0,\"killed\": 0,\"bytesCopied\":0,\"filesCopied\":10,\"timeTaken\":7591}}",
       "message": "SUCCESS"
-    }]
+    }],
+    "report": {
+      "lastSucceededInstance": {
+        "status": "SUCCESS",
+        "endTime": "2017-07-31T22:18:18"
+      }
+    }
   }, {
     "policyId": "/dc-Europe/c1/dc-Europe/c2/ambari-server-log-2/0/1501370918147/000000001",
     "name": "ambari-server-log-2",
@@ -245,7 +281,13 @@
       "startTime": "2017-07-31T22:00:00",
       "endTime": "2017-07-31T22:01:30",
       "message": "org.apache.hadoop.security.AccessControlException: Permission denied: user=beacon, access=WRITE, inode=\"/ambari-server-log\":hdfs:hdfs:drwxr-xr-x\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.check(FSPermissionChecker.java:319)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.check(FSPermissionChecker.java:292)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkPermission(FSPermissionChecker.java:213)\n\tat org.apache.hadoop.hdfs.server.namenode.FSPermissionChecker.checkPermission(FSPermissionChecker.java:190)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkPermission(FSDirectory.java:1955)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkPermission(FSDirectory.java:1939)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirectory.checkAncestorAccess(FSDirectory.java:1922)\n\tat org.apache.hadoop.hdfs.server.namenode.FSDirMkdirOp.mkdirs(FSDirMkdirOp.java:71)\n\tat org.apache.hadoop.hdfs.server.namenode.FSNamesystem.mkdirs(FSNamesystem.java:4150)\n\tat org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.mkdirs(NameNodeRpcServer.java:1109)\n\tat org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolServerSideTranslatorPB.mkdirs(ClientNamenodeProtocolServerSideTranslatorPB.java:633)\n\tat org.apache.hadoop.hdfs.protocol.proto.ClientNamenodeProtocolProtos$ClientNamenodeProtocol$2.callBlockingMethod(ClientNamenodeProtocolProtos.java)\n\tat org.apache.hadoop.ipc.ProtobufRpcEngine$Server$ProtoBufRpcInvoker.call(ProtobufRpcEngine.java:640)\n\tat org.apache.hadoop.ipc.RPC$Server.call(RPC.java:982)\n\tat org.apache.hadoop.ipc.Server$Handler$1.run(Server.java:2351)\n\tat org.apache.hadoop.ipc.Server$Handler$1.run(Server.java:2347)\n\tat java.security.AccessController.doPrivileged(Native Method)\n\tat javax.security.auth.Subject.doAs(Subject.java:422)\n\tat org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1866)\n\tat org.apache.hadoop.ipc.Server$Handler.run(Server.java:2345)\n"
-    }]
+    }],
+    "report": {
+      "lastFailedInstance": {
+        "status": "FAILED",
+        "endTime": "2017-07-31T22:31:30"
+      }
+    }
   }, {
     "policyId": "/dc-Europe/c1/dc-Europe/c2/hive-1/0/1501199282746/000000001",
     "name": "hive-1",
@@ -292,6 +334,8 @@
       "startTime": "2017-07-31T20:07:00",
       "endTime": "2017-07-31T20:07:00",
       "message": "Parallel instance in execution was: null"
-    }]
+    }],
+    "report": {
+    }
   }]
 }

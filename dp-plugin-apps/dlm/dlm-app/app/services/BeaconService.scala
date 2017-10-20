@@ -462,8 +462,10 @@ class BeaconService @Inject()(
 
           val policies : Seq[PolicyDetailsData] = getProcessedResponse(allPoliciesData, queryStringPaginated, originalPageLenth, originalOffset)
           val policiesDetails: Seq[PoliciesDetails] = policies.map(policy => {
-            PoliciesDetails(policy.policyId, policy.name, policy.description, policy.`type`, policy.executionType, policy.status, policy.sourceDataset, policy.targetDataset,
-                            policy.frequencyInSec, policy.startTime, policy.endTime, policy.sourceCluster, policy.targetCluster, policy.customProperties, policy.instances)
+            PoliciesDetails(policy.policyId, policy.name, policy.description, policy.`type`, policy.executionType,
+                            policy.status, policy.sourceDataset, policy.targetDataset, policy.frequencyInSec,
+                            policy.startTime, policy.endTime, policy.sourceCluster, policy.targetCluster,
+                            policy.customProperties, policy.instances, policy.report)
           })
 
           val failedResponses: Seq[BeaconApiErrors] = allPoliciesOption.filter(_.isLeft).map(_.left.get)

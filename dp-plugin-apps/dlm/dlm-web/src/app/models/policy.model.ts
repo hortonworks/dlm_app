@@ -11,6 +11,7 @@ import { RequestStatus } from './request-status.model';
 import { Cluster } from './cluster.model';
 import { Job } from './job.model';
 import { POLICY_MODES } from 'constants/policy.constant';
+import { JOB_STATUS } from 'constants/status.constant';
 
 // @todo: consider moving non-required attrs like lastTenJobs, lastJobResource, accessMode
 // to separate interface according to its usage. e.g. interface for policy table content
@@ -25,6 +26,17 @@ export interface PolicyUI {
   uiStatus: string;
   accessMode?: POLICY_MODES;
   rangerEnabled?: boolean;
+  lastSucceededJobTime?: string;
+}
+
+export interface LastInstanceDetail {
+  status: 'SUCCESS' | 'FAILED';
+  endTime: string;
+}
+
+export interface Report {
+  lastSucceededInstance?: LastInstanceDetail;
+  lastFailedInstance?: LastInstanceDetail;
 }
 
 export interface Policy extends PolicyUI {
@@ -45,6 +57,7 @@ export interface Policy extends PolicyUI {
   retry: Object;
   description: string;
   jobs: Job[];
+  report: Report;
   customProperties?: CustomProperties;
 }
 
