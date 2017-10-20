@@ -19,10 +19,10 @@ object ResponseEntities {
 
   case class AclObject(owner:Option[String], group:Option[String], permission:Option[String])
 
-  case class BeaconEntityResponse(name: String, description: String, dataCenter: Option[String], fsEndpoint: String,
+  case class BeaconEntityResponse(name: String, version: Long, description: String, dataCenter: Option[String], fsEndpoint: String,
                                   hsEndpoint: Option[String], beaconEndpoint: String, atlasEndpoint: Option[String],
-                                  rangerEndpoint: Option[String], tags: Option[String], peers: Option[String],
-                                  customProperties: Map[String, String], acl: AclObject, entityType: String)
+                                  rangerEndpoint: Option[String], local: Boolean, tags: Option[String], peers: Option[String],
+                                  customProperties: Map[String, String], entityType: String)
 
   case class BeaconClusterStatusResponse(status:String, message: String, requestId: String)
 

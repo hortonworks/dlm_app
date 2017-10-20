@@ -10,6 +10,8 @@ GET     /metrics                                              controllers.Status
 GET     /api/clusters                                         controllers.Clusters.list
 GET     /api/clusters/status                                  controllers.Clusters.listStatus
 GET     /api/clusters/:clusterId/status                       controllers.Clusters.retrieveStatus(clusterId : Long)
+GET     /api/clusters/:clusterEndpointId/details/:clusterId   controllers.Clusters.getBeaconClusterDetails(clusterEndpointId : Long, clusterId: Long)
+
 
 #Pairs
 GET     /api/pairs                                            controllers.Pairs.list
