@@ -36,13 +36,13 @@ import { abortJob, rerunJob, loadJobsPageForPolicy } from 'actions/job.action';
 import { deletePolicy, resumePolicy, suspendPolicy } from 'actions/policy.action';
 import { OperationResponse } from 'models/operation-response.model';
 import { getLastOperationResponse } from 'selectors/operation.selector';
-import { getMergedProgress } from 'selectors/progress.selector';
+import { getMergedProgress, getAllProgressStates } from 'selectors/progress.selector';
 import { ProgressState } from 'models/progress-state.model';
 import { PolicyContent } from '../policy-details/policy-content.type';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { POLICY_TYPES } from 'constants/policy.constant';
-import { loadFullDatabases } from 'actions/hivelist.action';
+import { loadDatabases, loadTables } from 'actions/hivelist.action';
 import { HiveDatabase } from 'models/hive-database.model';
 import { getDatabase } from 'selectors/hive.selector';
 import { HiveService } from 'services/hive.service';
@@ -56,9 +56,12 @@ import { TableFooterOptions } from 'common/table/table-footer/table-footer.type'
 import {
   ConfirmationOptions,
   confirmationOptionsDefaults
-} from '../../../components/confirmation-modal/confirmation-options.type';
+} from 'components/confirmation-modal/confirmation-options.type';
 import { POLICY_STATUS, POLICY_UI_STATUS } from 'constants/status.constant';
 import { suspendDisabled, activateDisabled } from 'utils/policy-util';
+import { HiveBrowserTablesLoadingMap } from 'components/hive-browser';
+import { merge } from 'utils/object-utils';
+import { removeProgressState } from 'actions/progress.action';
 
 const DATABASE_REQUEST = '[Policy Table] DATABASE_REQUEST';
 
@@ -77,6 +80,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   databaseRequest$: Observable<ProgressState>;
   policyContent = PolicyContent;
   tablesSearchPattern = '';
+  tablesLoadingMap: HiveBrowserTablesLoadingMap = {};
 
   private selectedAction: ActionItemType;
   private selectedForActionRow: Policy;
@@ -86,6 +90,8 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
   private visibleActionMap = {};
   private selectedFileBrowserPage = {};
+  private loadedDatabaseTables = {};
+  private tableRequestPrefix = '[PolicyTableComponent] LOAD_TABLES ';
 
   lastOperationResponse: OperationResponse = <OperationResponse>{};
   showOperationResponseModal = false;
@@ -170,13 +176,55 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     this.jobsOverallCount = 0;
   }
 
+  private setupDatabase(): void {
+    this.policyDatabase$ = this.selectedPolicy$
+      .filter(policy => !!this.clusterByDatacenterId(policy.sourceCluster))
+      .switchMap(policy => {
+        const cluster = this.clusterByDatacenterId(policy.sourceCluster);
+        return this.store.select(getDatabase(this.hiveService.makeDatabaseId(policy.sourceDataset, cluster.id)));
+      });
+
+    const loadTablesData = this.policyDatabase$
+      .filter(db => !!db)
+      .distinctUntilKeyChanged('entityId')
+      .subscribe(db => {
+        if (!(db.entityId in this.tablesLoadingMap)) {
+          const id = db.entityId;
+          this.tablesLoadingMap[id] = null;
+          this.store.dispatch(loadTables({
+            clusterId: db.clusterId,
+            databaseId: db.name
+          }, {requestId: this.tableRequestPrefix + db.entityId}));
+        }
+      });
+
+    const updateTablesLoadingProgress = this.store.select(getAllProgressStates)
+      .subscribe(progressList => {
+        const updates: {[databaseId: string]: ProgressState}  = progressList
+          .reduce((all, progressState: ProgressState) => {
+            if (progressState.requestId.startsWith(this.tableRequestPrefix)) {
+              const databaseId = progressState.requestId.replace(this.tableRequestPrefix, '');
+              return {
+                ...all,
+                [databaseId]: progressState
+              };
+            }
+            return all;
+          }, {});
+        this.tablesLoadingMap = merge(this.tablesLoadingMap, updates);
+      });
+
+    this.subscriptions.push(updateTablesLoadingProgress);
+    this.subscriptions.push(loadTablesData);
+  }
+
   constructor(private t: TranslateService,
               private store: Store<fromRoot.State>,
               private hiveService: HiveService,
               private logService: LogService) {
     this.databaseRequest$ = store.select(getMergedProgress(DATABASE_REQUEST))
       .distinctUntilKeyChanged('isInProgress');
-    this.subscriptions.push(store.select(getJobsPage).subscribe(jobsPage => {
+    const updateJobsPaging = store.select(getJobsPage).subscribe(jobsPage => {
       if (this.jobsPolicyId !== jobsPage.policyId) {
         this.jobs = [];
       }
@@ -185,13 +233,8 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       this.jobsOffset = jobsPage.offset;
       this.jobsOverallCount = jobsPage.overallRecords;
       this.loadingJobs = false;
-    }));
-    this.policyDatabase$ = this.selectedPolicy$
-      .filter(policy => !!this.clusterByDatacenterId(policy.sourceCluster))
-      .mergeMap(policy => {
-        const cluster = this.clusterByDatacenterId(policy.sourceCluster);
-        return store.select(getDatabase(this.hiveService.makeDatabaseId(policy.sourceDataset, cluster.id)));
-      });
+    });
+    this.subscriptions.push(updateJobsPaging);
   }
 
   ngOnInit() {
@@ -243,6 +286,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       this.openJobsForPolicy();
     }
     this.initPolling();
+    this.setupDatabase();
   }
 
   clusterResourceComparator(cluster1: Cluster, cluster2: Cluster) {
@@ -291,6 +335,8 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
       this.operationResponseSubscription.unsubscribe();
     }
     this.subscriptions.forEach(s => s.unsubscribe());
+    const requestIds = Object.keys(this.tablesLoadingMap).map(id => this.tableRequestPrefix + id);
+    this.store.dispatch(removeProgressState(requestIds));
   }
 
   /**
@@ -389,7 +435,7 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     if (contentType === PolicyContent.Files) {
       const cluster = this.clusterByDatacenterId(policy.sourceCluster);
       if (policy.type === POLICY_TYPES.HIVE) {
-        this.store.dispatch(loadFullDatabases(cluster.id, { requestId: DATABASE_REQUEST }));
+        this.store.dispatch(loadDatabases(cluster.id, { requestId: DATABASE_REQUEST }));
       } else {
         this.sourceCluster = cluster.id;
         this.hdfsRootPath = policy.sourceDataset;

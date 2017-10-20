@@ -8,9 +8,10 @@
  */
 
 import { BaseState } from 'models/base-resource-state';
-import { HiveDatabase } from 'models/hive-database.model';
+import { HiveDatabase, HiveTable } from 'models/hive-database.model';
 import { ActionTypes } from 'actions/hivelist.action';
 import { toEntities } from 'utils/store-util';
+import { merge } from 'utils/object-utils';
 
 export type State = BaseState<HiveDatabase>;
 
@@ -23,7 +24,22 @@ export function reducer(state = initialState, action): State {
     case ActionTypes.LOAD_DATABASES.SUCCESS:
       const databases = action.payload.response;
       return {
-        entities: Object.assign({}, state.entities, toEntities<HiveDatabase>(databases, 'entityId'))
+        entities: merge({}, state.entities, toEntities<HiveDatabase>(databases, 'entityId'))
+      };
+    case ActionTypes.LOAD_TABLES.SUCCESS:
+      const tables = action.payload.response as HiveTable[];
+      if (!tables.length) {
+        return state;
+      }
+      const databaseId = tables[0].databaseEntityId;
+      return {
+        entities: {
+          ...state.entities,
+          [databaseId]: {
+            ...state.entities[databaseId],
+            tables
+          }
+        }
       };
     default:
       return state;

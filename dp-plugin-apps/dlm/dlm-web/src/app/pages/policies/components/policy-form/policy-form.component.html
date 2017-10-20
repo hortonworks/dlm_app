@@ -130,8 +130,10 @@
               <dlm-progress-container [progressState]="databaseRequest$ | async">
                 <dlm-hive-browser
                   formControlName="databases"
+                  [tablesLoadingMap]="databaseTablesLoadingMap"
                   [databases]="sourceDatabases$ | async"
                   [readonly]="false"
+                  (databaseTablesCollapsed)="onDatabaseTablesCollapsed($event)"
                   ></dlm-hive-browser>
               </dlm-progress-container>
             </div>

@@ -11,7 +11,7 @@ import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { mapResponse } from 'utils/http-util';
-import { HiveDatabase } from 'models/hive-database.model';
+import { HiveDatabase, HiveTable } from 'models/hive-database.model';
 
 @Injectable()
 export class HiveService {
@@ -24,13 +24,21 @@ export class HiveService {
     return `${databaseId}/${clusterId}`;
   }
 
-  normalizeDatabases(databases, clusterId) {
-    return databases.map(db => ({name: db.database, clusterId, entityId: this.makeDatabaseId(db.database, clusterId)}));
+  private normalizeDatabases(databases, clusterId): HiveDatabase[] {
+    return databases.map(db => ({
+      ...db,
+      name: db.database,
+      entityId: this.makeDatabaseId(db.database, clusterId),
+      clusterId
+    }) as HiveDatabase);
   }
 
-  normalizeTables(tables, databaseId, clusterId) {
-    return tables.map(tableName => ({id: this.makeDatabaseTableId(databaseId, tableName), name: tableName,
-      databaseEntitityId: this.makeDatabaseId(databaseId, clusterId)}));
+  private normalizeTables(tables, databaseId, clusterId): HiveTable[] {
+    return tables.map(tableName => ({
+      id: this.makeDatabaseTableId(databaseId, tableName),
+      name: tableName,
+      databaseEntityId: this.makeDatabaseId(databaseId, clusterId)
+    }) as HiveTable);
   }
 
   constructor(private http: Http) {}

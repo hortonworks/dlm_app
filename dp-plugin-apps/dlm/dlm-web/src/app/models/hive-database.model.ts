@@ -7,15 +7,22 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-export interface HiveTable {
-  id: string;    // added on UI
-  name: string;
-  clusterId?: string; // added on UI
-  databaseEntityId?: string; // added on UI
+export interface HiveTableUI {
+  id: string;
+  clusterId: string;
+  databaseEntityId: string;
 }
 
-export interface HiveDatabase {
+export interface HiveTable extends HiveTableUI {
   name: string;
-  entityId?: string; // added on UI
-  tables?: HiveTable[]; // added on UI
+}
+
+export interface HiveDatabaseUI {
+  entityId: string;
+  tables?: HiveTable[];
+  name: string;
+  clusterId: number;
+}
+export interface HiveDatabase extends HiveDatabaseUI {
+  database: string;
 }

@@ -83,6 +83,7 @@
     [jobsPage]="getJobsPageForRow(row.id)"
     [loadingJobs]="loadingJobs"
     [loadingDatabases]="databaseRequest$ | async"
+    [loadingTables]="tablesLoadingMap"
     [jobsActiveActions]="getJobsActiveActionsForRow(row.id)"
     [fileBrowserPage]="getFilesPageForRow(row.id)"
     [tablesSearchPattern]="tablesSearchPattern"

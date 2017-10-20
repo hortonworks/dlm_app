@@ -74,6 +74,8 @@
         (openDirectory)="handleOpenDirectory($event)"></dlm-hdfs-browser>
       <dlm-progress-container [progressState]="loadingDatabases" *ngIf="databaseBasedPolicy()">
         <dlm-hive-browser
+          *ngIf="!loadingDatabases.isInProgress"
+          [tablesLoadingMap]="loadingTables"
           [databases]="[policyDatabase]"
           [searchPattern]="tablesSearchPattern"
           (filterApplied)="handleFilterApplied($event)">
