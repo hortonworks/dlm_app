@@ -199,3 +199,10 @@
     color: $roman-red;
   }
 }
+
+.disabled, .disabled > * {
+  color: rgba(0,0,0, 0.26) !important;
+  cursor: default;
+  background-color: transparent;
+  pointer-events: none;
+}
