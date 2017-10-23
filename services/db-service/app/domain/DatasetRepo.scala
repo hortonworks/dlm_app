@@ -65,8 +65,9 @@ class DatasetRepo @Inject()(
   }
 
   def filterDatasets(m: ((DatasetsTable, userRepo.UsersTable), clusterRepo.DpClustersTable), s: String) ={
-    (m._1._1.name.toLowerCase like s"%${s.toLowerCase}%") || (m._1._1.description.toLowerCase like s"%${s.toLowerCase}%") || (m._1._2.username.toLowerCase like s"%${s.toLowerCase}%") ||
-    (m._2.name.toLowerCase like s"%${s.toLowerCase}%")
+    val searchTextLowerCase = s.toLowerCase
+    (m._1._1.name.toLowerCase like s"%${searchTextLowerCase}%") || (m._1._1.description.toLowerCase like s"%${searchTextLowerCase}%") || (m._1._2.username.toLowerCase like s"%${searchTextLowerCase}%") ||
+    (m._2.name.toLowerCase like s"%${searchTextLowerCase}%")
   }
 
   def findById(datasetId: Long): Future[Option[Dataset]] = {
