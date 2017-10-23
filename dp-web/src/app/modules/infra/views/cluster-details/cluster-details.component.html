@@ -72,7 +72,7 @@
             </div>
             <div class="mdl-layout-spacer"> </div>
             <div class="info-button">
-              <button id="info-actions" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon pull-right">
+              <button id="info-actions" [ngClass]="{'disabled': !clusterStatus || clusterStatus === 'WAITING'}" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon pull-right">
                 <i class="fa fa-ellipsis-v"></i></button>
               <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="info-actions">
                 <li class="mdl-menu__item"><i class="fa fa-external-link"></i><a href="{{lake.ambariUrl}}" target="_blank">Go to Ambari</a></li>
