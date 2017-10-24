@@ -32,10 +32,18 @@ import { ModalSize, SIZE_CLASS_MAP } from './modal-dialog.size';
             <ng-content select="dlm-modal-dialog-body"></ng-content>
           </div>
           <div class="modal-footer">
-            <button *ngIf="showCancel" class="btn btn-default" (click)="onClickCancel()">{{ cancelText | translate }}</button>
-            <button *ngIf="showIgnore" class="btn btn-warning" (click)="onClickIgnore()">{{ ignoreText | translate }}</button>
-            <button *ngIf="showDelete" class="btn btn-danger" (click)="onClickDelete()">{{ deleteText | translate }}</button>
-            <button *ngIf="showOk" class="btn btn-success" (click)="onClickOk()">{{ okText | translate }}</button>
+            <button *ngIf="showCancel" class="btn btn-default" (click)="onClickCancel()" qe-attr="modal-cancel">
+              {{ cancelText | translate }}
+            </button>
+            <button *ngIf="showIgnore" class="btn btn-warning" (click)="onClickIgnore()" qe-attr="modal-ignore">
+              {{ ignoreText | translate }}
+            </button>
+            <button *ngIf="showDelete" class="btn btn-danger" (click)="onClickDelete()" qe-attr="modal-delete">
+              {{ deleteText | translate }}
+            </button>
+            <button *ngIf="showOk" class="btn btn-success" (click)="onClickOk()" qe-attr="modal-confirm">
+              {{ okText | translate }}
+            </button>
           </div>
         </div>
       </div>

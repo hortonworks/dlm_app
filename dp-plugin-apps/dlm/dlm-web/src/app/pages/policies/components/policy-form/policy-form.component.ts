@@ -15,7 +15,7 @@ import {
 } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { go } from '@ngrx/router-store';
-import { IMyOptions, IMyDateModel } from 'mydatepicker';
+import { IMyOptions, IMyDateModel, IMyInputFieldChanged } from 'mydatepicker';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -31,18 +31,20 @@ import { getDatePickerDate } from 'utils/date-util';
 import { TranslateService } from '@ngx-translate/core';
 import { mapToList } from 'utils/store-util';
 import { simpleSearch } from 'utils/string-utils';
-import { loadFullDatabases } from 'actions/hivelist.action';
+import { loadFullDatabases, loadDatabases, loadTables } from 'actions/hivelist.action';
 import { resetFormValue } from 'actions/form.action';
 import { getAllDatabases } from 'selectors/hive.selector';
 import { HiveDatabase } from 'models/hive-database.model';
 import { SelectOption } from 'components/forms/select-field';
 import { TimeZoneService } from 'services/time-zone.service';
-import { isEmpty } from 'utils/object-utils';
+import { isEmpty, merge } from 'utils/object-utils';
 import * as moment from 'moment';
 import { FILE_TYPES } from 'constants/hdfs.constant';
 import { HdfsService } from 'services/hdfs.service';
 import { ProgressState } from 'models/progress-state.model';
-import { getMergedProgress } from 'selectors/progress.selector';
+import { getMergedProgress, getAllProgressStates } from 'selectors/progress.selector';
+import { HiveBrowserTablesLoadingMap, DatabaseTablesCollapsedEvent } from 'components/hive-browser';
+import { removeProgressState } from 'actions/progress.action';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 const DATABASE_REQUEST = '[Policy Form] DATABASE_REQUEST';
@@ -122,6 +124,9 @@ export function pathValidator(hdfsService): AsyncValidatorFn {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
+  private tableRequestPrefix = '[PolicyFormComponent] LOAD_TABLES ';
+  databaseTablesLoadingMap: HiveBrowserTablesLoadingMap = {};
+
   @Input() pairings: Pairing[] = [];
   @Input() sourceClusterId = 0;
   @Output() formSubmit = new EventEmitter<any>();
@@ -145,6 +150,8 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   freqLimit = {fieldLabel: 'Frequency'};
   directoryField = {fieldLabel: 'Folder path'};
   maxBandwidthField = {fieldLabel: 'Maximum Bandwidth'};
+  startTimeDateField = {fieldLabel: 'Start Date'};
+  endTimeDateField = {fieldLabel: 'End Date'};
   userTimezone = '';
   get datePickerOptions(): IMyOptions {
     const yesterday = moment().subtract(1, 'day');
@@ -323,6 +330,48 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     return new Date(date);
   }
 
+  private setupDatabaseUpdates() {
+    const loadDatabasesSubscription = this.selectedSource$
+      .filter(sourceCluster => !!sourceCluster)
+      .subscribe(sourceCluster => {
+        this.store.dispatch(loadDatabases(sourceCluster, {requestId: DATABASE_REQUEST}));
+      });
+    const databases$ = this.selectedSource$.switchMap(sourceCluster => {
+      return this.store.select(getAllDatabases)
+        .map(databases => databases.filter(db => db.clusterId === sourceCluster))
+        .do(databases => {
+          const selectedDatabase = this.policyForm.value.databases;
+          const selectedSource = this.policyForm.value.general.sourceCluster;
+          // select first database when source changed and selected database is not exist on selected cluster
+          if (databases.length && !databases.some(db => db.clusterId === selectedSource && db.name === selectedDatabase)) {
+            this.policyForm.patchValue({databases: databases[0].name});
+          }
+        });
+      }) as Observable<HiveDatabase[]>;
+    this.sourceDatabases$ = Observable.combineLatest(this.databaseSearch$, databases$)
+      .map(([searchPattern, databases]) => databases.filter(db => simpleSearch(db.name, searchPattern)));
+    this.databaseRequest$ = this.store.select(getMergedProgress(DATABASE_REQUEST));
+
+    const updateTablesLoadingProgress = this.store.select(getAllProgressStates)
+      .subscribe(progressList => {
+        const updates: {[databaseId: string]: ProgressState}  = progressList
+          .reduce((all, progressState: ProgressState) => {
+            if (progressState.requestId.startsWith(this.tableRequestPrefix)) {
+              const databaseId = progressState.requestId.replace(this.tableRequestPrefix, '');
+              return {
+                ...all,
+                [databaseId]: progressState
+              };
+            }
+            return all;
+          }, {});
+        this.databaseTablesLoadingMap = merge({}, this.databaseTablesLoadingMap, updates);
+      });
+
+    this.subscriptions.push(updateTablesLoadingProgress);
+    this.subscriptions.push(loadDatabasesSubscription);
+  }
+
   constructor(private formBuilder: FormBuilder,
               private store: Store<State>,
               private timezoneService: TimeZoneService,
@@ -338,25 +387,6 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     this.userTimeZone$ = this.timezoneService.userTimezoneIndex$;
     this.userTimeZone$.subscribe((value) =>
       this.userTimezone = this.timezoneService.userTimezone ? this.timezoneService.userTimezone.label : '');
-    const loadDatabasesSubscription = this.selectedSource$
-      .filter(sourceCluster => !!sourceCluster)
-      .subscribe(sourceCluster => {
-        this.store.dispatch(loadFullDatabases(sourceCluster, {requestId: DATABASE_REQUEST}));
-      });
-    const databases$ = this.selectedSource$.switchMap(sourceCluster => {
-      return this.store.select(getAllDatabases)
-        .map(databases => databases.filter(db => db.clusterId === sourceCluster))
-        .do(databases => {
-          const selectedDatabase = this.policyForm.value.databases;
-          const selectedSource = this.policyForm.value.general.sourceCluster;
-          // select first database when source changed and selected database is not exist on selected cluster
-          if (databases.length && !databases.some(db => db.clusterId === selectedSource && db.name === selectedDatabase)) {
-            this.policyForm.patchValue({databases: databases[0].name});
-          }
-        });
-      });
-    this.sourceDatabases$ = Observable.combineLatest(this.databaseSearch$, databases$)
-      .map(([searchPattern, databases]) => databases.filter(db => simpleSearch(db.name, searchPattern)));
     this.policyForm = this.formBuilder.group({
       general: this.formBuilder.group({
         name: ['', Validators.compose([Validators.required, Validators.maxLength(64), nameValidator()])],
@@ -439,8 +469,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         this.cdRef.detectChanges();
       });
 
-    this.databaseRequest$ = this.store.select(getMergedProgress(DATABASE_REQUEST));
-    this.subscriptions.push(loadDatabasesSubscription);
+    this.setupDatabaseUpdates();
     this.subscriptions.push(policyFormValuesSubscription);
     this.subscriptions.push(directoriesChangesSubscription);
   }
@@ -544,7 +573,16 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   handleDateChange(date: IMyDateModel, dateType: string) {
-    this.policyForm.patchValue({ job: {[dateType]: { date: date.formatted }}});
+    if (date.formatted) { // valid date
+      this.policyForm.patchValue({ job: { [dateType]: { date: date.formatted } } });
+    }
+  }
+
+  handleDateInputChange(field: IMyInputFieldChanged, dateType: string): void {
+    const control: AbstractControl = this.policyForm.get('job').get(dateType).get('date');
+    control.setErrors(field.valid || field.value ===  '' ? null : {
+      invalidDate: !field.valid
+    });
   }
 
   handlePolicyTypeChange(radioItem: RadioItem) {
@@ -597,10 +635,13 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   validateTime = (formGroup: FormGroup) => {
-    if (!(formGroup && formGroup.controls)) {
+    if (!(formGroup && formGroup.controls && formGroup.parent)) {
       return null;
     }
-    const timeControl = formGroup.controls.time;
+    const parentControls = formGroup.parent.controls;
+    const startTimeValue = parentControls['startTime'].value.date;
+    const endTimeValue = parentControls['endTime'].value.date;
+    const timeControl = parentControls['startTime'].controls.time;
     const dateFieldValue = formGroup.controls.date.value;
     const timeFieldValue = timeControl.value;
     timeControl.setErrors(null);
@@ -624,6 +665,10 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         timeControl.setErrors({ lessThanCurrent: true });
         return null;
       }
+      if (startTimeValue && endTimeValue && moment(endTimeValue).isBefore(moment(startTimeValue))) {
+        timeControl.setErrors({greaterThanEndTime: true});
+        return null;
+      }
     }
     return null;
   }
@@ -643,5 +688,19 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         s.unsubscribe();
       }
     });
+    const requestIds = Object.keys(this.databaseTablesLoadingMap).map(id => this.tableRequestPrefix + id);
+    this.store.dispatch(removeProgressState(requestIds));
+  }
+
+  onDatabaseTablesCollapsed(event: DatabaseTablesCollapsedEvent): void {
+    const { database, collapsed } = event;
+    const databaseId = database.entityId;
+    if (!(databaseId in this.databaseTablesLoadingMap)) {
+      this.store.dispatch(loadTables({
+        clusterId: database.clusterId,
+        databaseId: database.name
+      }, { requestId: this.tableRequestPrefix + database.entityId}));
+      this.databaseTablesLoadingMap[databaseId] = {isInProgress: true} as ProgressState;
+    }
   }
 }

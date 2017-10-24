@@ -129,11 +129,15 @@ class DefaultAtlasInterface(private val clusterId: Long,
     // Get the query
 
     val query = s"$hiveBaseQuery ${Filters.query(filters, lowerCaseQueries)}"
+    val defaultLimit = Try(config.getInt("atlas.query.records.default.limit"))
+      .getOrElse(10000)
+    val defaultOffset = Try(config.getInt("atlas.query.records.default.offset"))
+      .getOrElse(0)
     getApi.map { api =>
       val searchResult =
         if (filters.isPaged)
           api.dslSearchWithParams(query, filters.limit.get, filters.offset.get)
-        else api.dslSearch(query)
+        else api.dslSearchWithParams(query, defaultLimit, defaultOffset)
 
       Option(searchResult.getEntities)
         .map { entityHeaders =>

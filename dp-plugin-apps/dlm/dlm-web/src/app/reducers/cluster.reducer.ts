@@ -52,7 +52,8 @@ export function reducer(state = initialState, action: fromCluster.Actions): Stat
       const clusterServices = {};
       if (action.payload.response.length) {
         action.payload.response.map(cluster => {
-          clusterServices[cluster.id] = cluster.data.items.map(item => item.ServiceInfo);
+          const services = cluster.data.items || [];
+          clusterServices[cluster.id] = services.map(item => item.ServiceInfo);
         });
       }
       const entities = Object.keys(state.entities).reduce((newEntities, clusterId) => {

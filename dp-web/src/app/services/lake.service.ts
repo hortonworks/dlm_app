@@ -27,6 +27,12 @@ export class LakeService {
   clusterAdded = new Subject<boolean>();
   clusterAdded$ = this.clusterAdded.asObservable();
 
+  clusterDeleted = new Subject<boolean>();
+  clusterDeleted$ = this.clusterDeleted.asObservable();
+
+  clusterDeleteFailed = new Subject<boolean>();
+  clusterDeleteFailed$ = this.clusterDeleted.asObservable();
+
   constructor(
     private http:Http
   ) {}
@@ -55,6 +61,13 @@ export class LakeService {
   retrieve(lakeId: string): Observable<Lake> {
     return this.http
       .get(`${this.url}/${lakeId}`, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData)
+      .catch(HttpUtil.handleError);
+  }
+
+  deleteCluster(lakeId: string) : Observable<any> {
+    return this.http
+      .delete(`${this.url}/${lakeId}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

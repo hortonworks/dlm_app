@@ -57,6 +57,8 @@ object Webservice {
 
     def addUser(user: User): Future[Either[Errors, User]]
 
+    def updateUser(user: User): Future[Either[Errors, User]]
+
     def addRole(role: Role): Future[Either[Errors, Role]]
 
     def addUserRole(userRole: UserRole): Future[Either[Errors, UserRole]]
@@ -171,7 +173,7 @@ object Webservice {
 
     def updateStatus(dpCluster: DataplaneCluster): Future[Either[Errors, Boolean]]
 
-    def delete(dpClusterId: String): Future[Either[Errors, DataplaneCluster]]
+    def delete(dpClusterId: String): Future[Either[Errors, Boolean]]
 
   }
 

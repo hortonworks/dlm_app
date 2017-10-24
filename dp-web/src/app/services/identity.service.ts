@@ -29,4 +29,13 @@ export class IdentityService {
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }
+
+  changePassword(password: string, nextPassword: string): Observable<void> {
+    return this.http
+      .post(`${this.url}/actions/change-password`, {
+        password,
+        nextPassword,
+      }, new RequestOptions(HttpUtil.getHeaders()))
+      .map(HttpUtil.extractData);
+  }
 }

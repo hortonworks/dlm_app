@@ -16,6 +16,9 @@ import {Sort} from '../../../../shared/utils/enums';
 import {Cluster} from '../../../../models/cluster';
 import {ClusterService} from '../../../../services/cluster.service';
 import {DateUtils} from '../../../../shared/utils/date-utils';
+import {DialogBox, DialogType} from '../../../../shared/utils/dialog-box';
+import {LakeService} from '../../../../services/lake.service';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'dp-lakes-list',
@@ -46,7 +49,8 @@ export class LakesListComponent implements OnChanges {
     {key: 'country', display: 'Country'},
     {key: 'dataCenter', display: 'Data Center'}];
 
-  constructor(private clusterService: ClusterService, private router: Router) {
+  constructor(private lakeService: LakeService,
+              private translateService: TranslateService) {
   }
 
   @HostListener('document:click', ['$event', '$event.target'])
@@ -84,6 +88,7 @@ export class LakesListComponent implements OnChanges {
     lakeInfo.id = lake.data.id;
     lakeInfo.name = lake.data.name;
     lakeInfo.ambariUrl = lake.data.ambariUrl;
+    lakeInfo.ambariIpAddress = lake.data.ambariIpAddress;
     lakeInfo.lakeId = lake.data.id;
     lakeInfo.dataCenter = lake.data.dcName;
     lakeInfo.cluster = lake.clusters && lake.clusters.length ? lake.clusters[0] : null;
@@ -124,6 +129,14 @@ export class LakesListComponent implements OnChanges {
       return LakeStatus.WAITING;
     } else {
       return LakeStatus.NA;
+    }
+  }
+
+  private getLocationInfo(lakeInfo){
+    if(lakeInfo.city && lakeInfo.country){
+      return lakeInfo.city+", "+lakeInfo.country;
+    }else{
+      return "NA";
     }
   }
 
@@ -252,6 +265,22 @@ export class LakesListComponent implements OnChanges {
     this.refreshEmitter.emit(lakeInfo.lakeId);
   }
 
+  deleteCluster(lakeId) {
+    DialogBox.showConfirmationMessage(this.translateService.instant('pages.infra.labels.confirmRemove'),
+      this.translateService.instant('pages.infra.description.clusterDeleteWarning'),
+      this.translateService.instant('common.confirm'), this.translateService.instant('common.cancel'),
+      DialogType.DeleteConfirmation
+    ).subscribe(result => {
+      if (result) {
+        this.lakeService.deleteCluster(lakeId).subscribe(() => {
+          this.lakeService.clusterDeleted.next(lakeId);
+        }, () => {
+          this.lakeService.clusterDeleteFailed.next();
+        })
+      }
+    });
+  }
+
   onSort($event) {
     this.lakesList.sort((obj1: any, obj2: any) => {
       try {
@@ -300,12 +329,13 @@ export class LakeInfo {
   name: string;
   lakeId: number;
   ambariUrl: string;
+  ambariIpAddress: string;
   cluster?: Cluster;
   status?: LakeStatus;
   dataCenter: string;
   city?: string;
   country?: string;
-  nodes?: number;
+  nodes?: string = 'NA';
   services?: number;
   hdfsUsed?: string = 'NA';
   hdfsTotal?: string = 'NA';
@@ -313,7 +343,6 @@ export class LakeInfo {
   uptimeStr?: string = 'NA';
   startTime?: number;
   isWaiting: boolean;
-
 
   get hdfsUsedInBytes(): number {
     return this.toBytes(this.hdfsUsed);

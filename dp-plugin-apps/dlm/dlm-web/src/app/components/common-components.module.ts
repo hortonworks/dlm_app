@@ -52,6 +52,7 @@ import { EventEntityLinkComponent } from './event-entity-link/event-entity-link.
 import { NotificationsContainerComponent } from './notifications-container/notifications-container.component';
 import { TransferredObjectsComponent } from './table-columns/transferred-objects/transferred-objects.component';
 import { ServiceStatusIconComponent } from './service-status-icon/service-status-icon.component';
+import { FieldLabelComponent } from './forms/field-label/field-label.component';
 
 @NgModule({
   imports: [
@@ -107,7 +108,8 @@ import { ServiceStatusIconComponent } from './service-status-icon/service-status
     EventEntityLinkComponent,
     NotificationsContainerComponent,
     TransferredObjectsComponent,
-    ServiceStatusIconComponent
+    ServiceStatusIconComponent,
+    FieldLabelComponent
   ],
   exports: [
     CardComponent,
@@ -145,7 +147,8 @@ import { ServiceStatusIconComponent } from './service-status-icon/service-status
     EventEntityLinkComponent,
     NotificationsContainerComponent,
     TransferredObjectsComponent,
-    ServiceStatusIconComponent
+    ServiceStatusIconComponent,
+    FieldLabelComponent
   ]
 })
 export class CommonComponentsModule {}

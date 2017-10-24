@@ -17,15 +17,11 @@ import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { getAllClusters } from './cluster.selector';
 import { getAllJobs } from './job.selector';
 import { sortByDateField, contains } from 'utils/array-util';
-import { JOB_STATUS, CLUSTER_STATUS, SERVICE_STATUS } from 'constants/status.constant';
+import { JOB_STATUS, SERVICE_STATUS } from 'constants/status.constant';
 import { PolicyService } from 'services/policy.service';
-import { getRangerEnabled } from 'selectors/beacon.selector';
+import { getAllBeaconAdminStatuses } from 'selectors/beacon.selector';
 import { POLICY_MODES, POLICY_EXECUTION_TYPES } from 'constants/policy.constant';
 import { SERVICES } from 'constants/cluster.constant';
-
-const isRangerActivated = (beaconStatuses: BeaconAdminStatus[], policy: Policy): boolean => {
-  return beaconStatuses.some(s => policy.targetClusterResource.id === s.clusterId);
-};
 
 const hasStoppedServices = (cluster: Cluster, services: string[]): boolean => {
   return cluster && cluster.status && cluster.status.some(s => contains(services, s.service_name) && s.state !== SERVICE_STATUS.STARTED);
@@ -72,6 +68,11 @@ export const getPolicyClusterJob = createSelector(getAllPoliciesWithClusters, ge
   });
 });
 
+export const getPolicyClusterJobFailedLastTen = createSelector(getPolicyClusterJob, policies =>
+  policies.filter(p =>
+    p.lastTenJobs.some(j =>
+    j.status !== JOB_STATUS.SUCCESS)));
+
 export const getCountPoliciesForSourceClusters = createSelector(getAllPoliciesWithClusters, getAllClusters, (policies, clusters) => {
   return clusters.reduce((entities: { [id: number]: PoliciesCount }, entity: Cluster) => {
     return Object.assign({}, entities, {
@@ -104,11 +105,19 @@ export const getUnhealthyPolicies = createSelector(
   }
 );
 
-export const getPoliciesTableData = createSelector(getPolicyClusterJob, getRangerEnabled,
-   (policies: Policy[], beaconStatuses: BeaconAdminStatus[]) => {
-     return policies.map(policy => ({
-       ...policy,
-       accessMode: isRangerActivated(beaconStatuses, policy) ? POLICY_MODES.READ_ONLY : POLICY_MODES.READ_WRITE,
-       rangerEnabled: isRangerActivated(beaconStatuses, policy)
-     }));
-   });
+export const getPoliciesTableData = createSelector(getPolicyClusterJob, getAllBeaconAdminStatuses,
+  (policies: Policy[], beaconStatuses: BeaconAdminStatus[]) => {
+    return policies.map(policy => {
+      const clusterStatus = beaconStatuses.find(c => c.clusterId === policy.targetClusterResource.id);
+      if (!clusterStatus) {
+        return {...policy, rangerEnabled: false, accessMode: POLICY_MODES.READ_WRITE};
+      }
+      const {plugins, rangerCreateDenyPolicy} = clusterStatus.beaconAdminStatus;
+      const rangerEnabled = contains(plugins, SERVICES.RANGER);
+      return {
+        ...policy,
+        accessMode: rangerEnabled && rangerCreateDenyPolicy === 'true' ? POLICY_MODES.READ_ONLY : POLICY_MODES.READ_WRITE,
+        rangerEnabled
+      };
+    });
+  });

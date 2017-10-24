@@ -8,7 +8,7 @@
  */
 
 import {
-  Component, OnInit, Output, ViewChild, TemplateRef, ViewEncapsulation, EventEmitter, HostBinding
+  Component, OnInit, Output, ViewChild, TemplateRef, ViewEncapsulation, EventEmitter, HostBinding, Input
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
@@ -28,6 +28,8 @@ import { confirmNextAction } from 'actions/confirmation.action';
 import { NOTIFICATION_TYPES, NOTIFICATION_CONTENT_TYPE } from 'constants/notification.constant';
 import { JobTrackinfoProgress } from 'models/job-tracking-info.model';
 import { UNIT_LABELS } from 'constants/job.constant';
+import { activateDisabled, suspendDisabled } from 'utils/policy-util';
+import { confirmationOptionsDefaults, ConfirmationOptions } from 'components/confirmation-modal';
 
 @Component({
   selector: 'dlm-jobs-overview-table',
@@ -39,6 +41,8 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   private selectedAction: ActionItemType;
   private selectedForActionRow: Policy;
   JOB_STATUS = JOB_STATUS;
+
+  @Input() jobsCount = 0;
 
   @ViewChild('clusterNameCellRef') clusterNameCellRef: TemplateRef<any>;
   @ViewChild('destinationIconCell') destinationIconCellRef: TemplateRef<any>;
@@ -91,11 +95,11 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
   ngOnInit() {
     const actionLabel = name => this.t.instant(`page.overview.table.actions.${name}`);
     this.rowActions = <ActionItemType[]>[
-      {label: actionLabel('abort_job'), name: 'ABORT_JOB', enabledFor: 'RUNNING'},
-      {label: actionLabel('rerun_job'), name: 'RERUN_JOB', disableFn: this.isRerunDisabled.bind(this)},
-      {label: actionLabel('delete_policy'), name: 'DELETE_POLICY', disabledFor: ''},
-      {label: actionLabel('suspend_policy'), name: 'SUSPEND_POLICY', disabledFor: 'SUSPENDED'},
-      {label: actionLabel('activate_policy'), name: 'ACTIVATE_POLICY', disabledFor: 'RUNNING'}
+      {label: actionLabel('abort_job'), name: 'ABORT_JOB', enabledFor: 'RUNNING', qeAttr: 'abort-job'},
+      {label: actionLabel('rerun_job'), name: 'RERUN_JOB', disableFn: this.isRerunDisabled.bind(this), qeAttr: 'rerun-job'},
+      {label: actionLabel('delete_policy'), name: 'DELETE_POLICY', disabledFor: '', qeAttr: 'delete-policy'},
+      {label: actionLabel('suspend_policy'), name: 'SUSPEND_POLICY', disableFn: suspendDisabled, qeAttr: 'suspend-policy'},
+      {label: actionLabel('activate_policy'), name: 'ACTIVATE_POLICY', disableFn: activateDisabled, qeAttr: 'activate-policy'}
     ];
     this.columns = [
       {cellTemplate: this.statusCellTemplate, maxWidth: 25, minWidth: 25},
@@ -169,7 +173,11 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
     }[this.selectedAction.name];
     if (nextAction) {
       this.store.dispatch(confirmNextAction(
-        nextAction(this.selectedForActionRow, { notification: this.generateNotification()})
+        nextAction(this.selectedForActionRow, { notification: this.generateNotification() }),
+        {
+          ...confirmationOptionsDefaults,
+          qeAttr: `confirmation-${this.selectedAction.qeAttr}`
+        } as ConfirmationOptions
       ));
     }
   }

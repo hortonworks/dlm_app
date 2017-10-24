@@ -10,13 +10,14 @@
  */
 
 import {NgModule} from '@angular/core';
+import {RouterModule} from "@angular/router";
 
 import {HeaderComponent}   from './header.component';
 import {SharedModule} from '../../shared/shared.module';
 import {BreadCrumbModule} from '../../shared/bread-crumb/bread-crumb.module';
 
 @NgModule({
-  imports: [SharedModule, BreadCrumbModule],
+  imports: [SharedModule, BreadCrumbModule, RouterModule],
   exports: [HeaderComponent],
   declarations: [HeaderComponent],
   providers: [],

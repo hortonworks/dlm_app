@@ -21,7 +21,8 @@ import { TableFooterOptions } from './table-footer.type';
 })
 export class TableFooterComponent {
 
-  @Input() rowCount: number;
+  @Input() filteredRowsCount: number;
+  @Input() rowsCount: number;
   @Input() pageSize: number;
   @Input() selectedCount: number;
   @Input() curPage: number;
@@ -35,24 +36,20 @@ export class TableFooterComponent {
     return this.limits.map(limit => (<DropdownItem>{label: '' + limit, value: limit}));
   };
 
-  get visibleRows(): number {
-    return Math.min(this.rowCount - this.offset * this.pageSize, this.pageSize);
-  };
-
   get summary(): string {
-    return this.translate.instant('common.table.summary', {shown: this.visibleRows, count: this.rowCount});
+    return this.translate.instant('common.table.summary', {shown: this.filteredRowsCount, count: this.rowsCount});
   };
 
   get pagesCount(): number {
-    const pagesCount = this.rowCount / this.pageSize;
+    const pagesCount = this.filteredRowsCount / this.pageSize;
     return (0 === pagesCount % 1) ? pagesCount : (Math.floor(pagesCount) + 1);
   }
 
   get paging(): string {
-    const start = this.rowCount ? this.offset * this.pageSize + 1 : 0;
+    const start = this.filteredRowsCount ? this.offset * this.pageSize + 1 : 0;
     let end = start - 1 + this.pageSize;
-    end = Math.min(end, this.rowCount);
-    return this.translate.instant('common.table.paging', {start, end, count: this.rowCount});
+    end = Math.min(end, this.filteredRowsCount);
+    return this.translate.instant('common.table.paging', {start, end, count: this.filteredRowsCount});
   }
 
   get nextDisabled(): boolean {

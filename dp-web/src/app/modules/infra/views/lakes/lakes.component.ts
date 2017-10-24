@@ -44,6 +44,7 @@ export class LakesComponent implements OnInit {
   private SYNC_ERROR = 'SYNC_ERROR';
   private MAXCALLS = 10;
   private DELAY_IN_MS = 2000;
+  showError = false;
 
 
   constructor(private router: Router,
@@ -53,25 +54,42 @@ export class LakesComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.lakeService.clusterDeleteFailed$.subscribe(() => {
+      this.showError = true;
+      window.scrollTo(0, 0);
+    });
+    this.lakeService.clusterDeleted$.subscribe((lakeId) => {
+      this.mapSet.delete(lakeId);
+      this.mapData = Array.from(this.mapSet.values());
+      this.getClusters();
+    });
     this.mapSize = MapSize.EXTRALARGE;
+    this.getClusters();
+  }
+
+  getClusters() {
+    this.showError = false;
     let unSyncedLakes = [];
     this.lakeService.listWithClusters()
       .subscribe(lakes => {
         this.lakes = lakes;
         this.lakes.forEach((lake) => {
           let locationObserver;
+          let isWaiting: boolean;
           lake.data.isWaiting = true;
           if (lake.data.state === this.SYNCED || lake.data.state === this.SYNC_ERROR) {
+            isWaiting = false;
             if (lake.data.state === this.SYNCED || (lake.data.state === this.SYNC_ERROR && lake.clusters && lake.clusters.length > 0)) {
-              locationObserver = this.getLocationInfoWithStatus(lake.data.location, lake.clusters[0].id, lake.data.id);
+              locationObserver = this.getLocationInfoWithStatus(lake.data.location, lake.clusters[0].id, lake.data.id, lake.data.ambariUrl);
             } else {
               locationObserver = this.getLocationInfo(lake.data.location);
             }
           } else {
+            isWaiting = true;
             unSyncedLakes.push(lake);
             locationObserver = this.getLocationInfo(lake.data.location);
           }
-          this.updateHealth(lake, locationObserver);
+          this.updateHealth(lake, locationObserver, isWaiting);
         });
         this.updateUnSyncedLakes(unSyncedLakes);
       });
@@ -87,25 +105,25 @@ export class LakesComponent implements OnInit {
           this.clusterService.listByLakeId({lakeId: lake.id}).subscribe(clusters => {
             unSyncedlake.clusters = clusters;
             if (clusters && clusters.length > 0) {
-              locationObserver = this.getLocationInfoWithStatus(unSyncedlake.data.location, unSyncedlake.clusters[0].id, unSyncedlake.data.id);
+              locationObserver = this.getLocationInfoWithStatus(unSyncedlake.data.location, unSyncedlake.clusters[0].id, unSyncedlake.data.id, unSyncedlake.data.ambariUrl);
             } else {
               locationObserver = this.getLocationInfo(unSyncedlake.data.location);
             }
-            this.updateHealth(unSyncedlake, locationObserver);
+            this.updateHealth(unSyncedlake, locationObserver, false);
           });
         } else {
           locationObserver = this.getLocationInfo(unSyncedlake.data.location);
-          unSyncedlake.data.isWaiting = false;
-          this.updateHealth(unSyncedlake, locationObserver);
+          this.updateHealth(unSyncedlake, locationObserver, false);
         }
       });
     });
   }
 
-  updateHealth(lake, locationObserver: Observable<any>) {
+  updateHealth(lake, locationObserver: Observable<any>, isWaiting: boolean) {
     locationObserver.subscribe(locationInfo => {
+      lake.data.isWaiting = isWaiting;
       if (lake.data.state === this.SYNCED || lake.data.state === this.SYNC_ERROR) {
-        lake.data.isWaiting = false;
+        lake.data.ambariUrl = locationInfo.ambariUrl;
       }
       this.health.set(lake.data.id, locationInfo);
       this.health = new Map(this.health.entries());
@@ -115,20 +133,40 @@ export class LakesComponent implements OnInit {
         mapPoints.push(mapData)
       });
       this.mapData = mapPoints;
+    }, error => {
+      lake.data.isWaiting = isWaiting;
+      this.health = new Map(this.health.entries());
     });
   }
 
-  private getLocationInfoWithStatus(locationId, clusterId, lakeId): Observable<any> {
+  private getLocationInfoWithStatus(locationId, clusterId, lakeId, ambariUrl): Observable<any> {
     return Observable.forkJoin(
-      this.locationService.retrieve(locationId).map((res) => res),
-      this.clusterService.retrieveHealth(clusterId, lakeId).map((res) => res)
-    ).map(response => {
-      return {
-        location: response[0],
-        health: response[1]
-      };
+      this.locationService.retrieve(locationId).map((res) => res).catch(err => {
+        return Observable.of(null);
+      }),
+      this.clusterService.retrieveHealth(clusterId, lakeId).map((res) => res).catch(err => {
+        return Observable.of(null);
+      }),
+      this.getAmbariUrl(clusterId, ambariUrl)
+      , (location, health, ambariUrl) => ({location, health, ambariUrl}));
+  }
 
-    });
+  private getAmbariUrl(clusterId, ambariUrl): Observable<string> {
+    let parsedAmbariUrl = new URL(ambariUrl);
+    let validIpAddressRegex = new RegExp('^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$');
+    if (!validIpAddressRegex.test(parsedAmbariUrl.hostname)) {
+      return Observable.of(ambariUrl);
+    }
+    let parsedIpAddress = new URL(ambariUrl);
+    return this.clusterService.getHostName(clusterId, parsedIpAddress.hostname)
+      .map(response => {
+        if (response && response.length) {
+          let host = response[0].host;
+          return `${parsedIpAddress.protocol}//${host}:${parsedIpAddress.port}`;
+        } else {
+          return ambariUrl;
+        }
+      }).catch(() => Observable.of(ambariUrl));
   }
 
   private getLocationInfo(locationId) {
@@ -140,9 +178,9 @@ export class LakesComponent implements OnInit {
   }
 
   private extractMapPoints(locationInfo, lake) {
-    if (!locationInfo.health) {
+    if (!locationInfo.health && locationInfo.location) {
       return new Point(locationInfo.location.latitude, locationInfo.location.longitude, MapConnectionStatus.NA, lake.data.name, lake.data.dcName, `${locationInfo.location.city}, ${locationInfo.location.country}`)
-    } else {
+    } else if (locationInfo.health && locationInfo.location) {
       let health = locationInfo.health;
       let location = locationInfo.location;
       let status;
@@ -160,7 +198,7 @@ export class LakesComponent implements OnInit {
   onRefresh(lakeId) {
     let lakeInfo = this.lakes.find(lake => lake.data.id === lakeId);
     if (lakeInfo.data.state === this.SYNCED) {
-      this.updateHealth(lakeInfo, this.getLocationInfoWithStatus(lakeInfo.data.location, lakeInfo.clusters[0].id, lakeId));
+      this.updateHealth(lakeInfo, this.getLocationInfoWithStatus(lakeInfo.data.location, lakeInfo.clusters[0].id, lakeId, lakeInfo.data.ambariUrl), false);
     } else {
       this.updateUnSyncedLakes([lakeInfo]);
     }

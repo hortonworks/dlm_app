@@ -19,10 +19,10 @@ object ResponseEntities {
 
   case class AclObject(owner:Option[String], group:Option[String], permission:Option[String])
 
-  case class BeaconEntityResponse(name: String, description: String, dataCenter: Option[String], fsEndpoint: String,
+  case class BeaconEntityResponse(name: String, version: Long, description: String, dataCenter: Option[String], fsEndpoint: String,
                                   hsEndpoint: Option[String], beaconEndpoint: String, atlasEndpoint: Option[String],
-                                  rangerEndpoint: Option[String], tags: Option[String], peers: Option[String],
-                                  customProperties: Map[String, String], acl: AclObject, entityType: String)
+                                  rangerEndpoint: Option[String], local: Boolean, tags: Option[String], peers: Option[String],
+                                  customProperties: Map[String, String], entityType: String)
 
   case class BeaconClusterStatusResponse(status:String, message: String, requestId: String)
 
@@ -44,10 +44,15 @@ object ResponseEntities {
 
   case class PolicyInstancesDetails(totalResults: Long, results: Long, instance: Seq[PolicyInstanceResponse])
 
+  case class PolicyReportDetails(status: String, endTime: String)
+
+  case class PolicyReport(lastSucceededInstance: Option[PolicyReportDetails], lastFailedInstance: Option[PolicyReportDetails])
+
   case class PoliciesDetailResponse(policyId: String, name: String, description: Option[String], `type`: String,
                                     status: String, sourceDataset: String, targetDataset: String, frequencyInSec: Long,
                                     sourceCluster: String, targetCluster: String, instances: Seq[PolicyInstanceResponse],
-                                    startTime: Option[String], endTime: String, executionType: Option[String], customProperties: Option[Map[String, String]])
+                                    report: PolicyReport, startTime: Option[String], endTime: String,
+                                    executionType: Option[String], customProperties: Option[Map[String, String]])
 
   case class BeaconEventResponse(policyId: Option[String], instanceId: Option[String], event: String, eventType: String,
                                  policyReplType: Option[String], severity: String, syncEvent: Option[Boolean],
@@ -128,6 +133,12 @@ object JsonFormatters {
 
   implicit val policyInstancesDetailsWrites = Json.writes[PolicyInstancesDetails]
   implicit val policyInstancesDetailsReads = Json.reads[PolicyInstancesDetails]
+
+  implicit val policyReportDetailsWrites = Json.writes[PolicyReportDetails]
+  implicit val policyReportDetailsReads = Json.reads[PolicyReportDetails]
+
+  implicit val policyReportWrites = Json.writes[PolicyReport]
+  implicit val policyReportReads = Json.reads[PolicyReport]
 
   implicit val policiesDetailResponseWrites = Json.writes[PoliciesDetailResponse]
   implicit val policiesDetailResponseReads = Json.reads[PoliciesDetailResponse]

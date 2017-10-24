@@ -22,19 +22,12 @@ import { CLUSTER_STATUS_COLOR } from 'constants/color.constant';
 import { MapSize, MapSizeSettings, ClusterMapData, ClusterMapEntity, ClusterLocationGroups } from 'models/map-data';
 import { GeographyService } from 'services/geography.service';
 import { Cluster } from 'models/cluster.model';
-import { without, contains } from 'utils/array-util';
 import { isEmpty } from 'utils/object-utils';
 
 enum MOUSE_EVENT {
   MOUSE_OVER,
   MOUSE_OUT
 };
-
-function formatMapPopup(cluster: ClusterMapEntity, latLng: LatLng = <LatLng>{}) {
-  if (isEmpty(latLng)) {
-    return `<div>${cluster.dataCenter} / ${cluster.name}</div><div>Policies: ${cluster.policiesCounter}</div>`;
-  }
-}
 
 function getExistingMarker(collection: L.Marker[], latLng: LatLng): L.Marker {
   return collection.find(m => m.getLatLng().lat === latLng.lat && m.getLatLng().lng === latLng.lng);
@@ -64,7 +57,6 @@ export class MapComponent implements OnChanges, OnInit, OnDestroy {
   countries = [];
 
   statusColorUp = '#3FAE2A';
-  markerColorInnerBorder = '#FFFFFF';
   mapColor = '#CFCFCF';
 
   mapOptions = {
@@ -116,8 +108,8 @@ export class MapComponent implements OnChanges, OnInit, OnDestroy {
     const color = this.getStatusColor(clusters[0]);
     const makeBullet = (cluster) => `<i class="fa fa-circle status-bullet" style="color: ${this.getStatusColor(cluster)};"></i>`;
     return new L.DivIcon({
-      iconSize: null,
-      iconAnchor: [10, 0],
+      iconSize: [23, 40],
+      iconAnchor: [12, 39],
       className: 'custom-map-marker',
       html: `
         <div class="marker-wrapper">

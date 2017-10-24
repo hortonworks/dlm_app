@@ -10,7 +10,7 @@
 #
 FROM openjdk:8-jre
 
-ENV HDP_VERSION=2.6.2.0-189
+ENV HDP_VERSION=2.6.3.0-187
 RUN apt-get update && \
     apt-get install -y gnupg wget procps && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B9733A7A07513CAD && \

@@ -8,7 +8,7 @@
  */
 
 import { Component, ViewChild, TemplateRef, Input } from '@angular/core';
-import { RUNNING, SUSPENDED } from 'constants/status.constant';
+import { POLICY_UI_STATUS } from 'constants/status.constant';
 
 import { TableColumn } from 'common/table/table-column.type';
 
@@ -17,16 +17,17 @@ export const COLUMN_WIDTH = 100;
 @Component({
   selector: 'dlm-policy-status-column',
   template: `
-    <ng-template #statusCell let-value="value">
-      <span [class]="getStatusClassNames(value)"></span>
-      <span *ngIf="showText">{{value}}</span>
-    </ng-template>
+    <div>
+      <span [class]="getStatusClassNames(status)"></span>
+      <span *ngIf="showText">{{status}}</span>
+    </div>
   `,
   styleUrls: ['./policy-status-column.component.scss']
 })
 export class StatusColumnComponent implements TableColumn {
   @Input()
   showText = true;
+  @Input() status: string;
   @ViewChild('statusCell') cellRef: TemplateRef<any>;
   cellSettings = {
     maxWidth: COLUMN_WIDTH,
@@ -35,8 +36,9 @@ export class StatusColumnComponent implements TableColumn {
   };
   // todo: move statuses to constant enum? when all possible values will be known
   statusClassMap = {
-    [RUNNING]: 'status status-running fa fa-play-circle-o',
-    [SUSPENDED]: 'status status-suspended fa fa-pause-circle-o'
+    [POLICY_UI_STATUS.ACTIVE]: 'status status-running fa fa-play-circle-o',
+    [POLICY_UI_STATUS.SUSPENDED]: 'status status-suspended fa fa-pause-circle-o',
+    [POLICY_UI_STATUS.ENDED]: 'status status-ended fa fa-stop-circle'
   };
 
   getStatusClassNames(status: string) {

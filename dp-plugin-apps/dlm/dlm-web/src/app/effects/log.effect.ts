@@ -21,7 +21,7 @@ export class LogEffects {
     .ofType(logActions.LOAD_LOGS.START)
     .map(toPayload)
     .switchMap(payload => {
-      return this.logService.getLogs(payload.clusterId, payload.instanceId, payload.logType)
+      return this.logService.getLogs(payload.clusterId, payload.instanceId, payload.logType, payload.meta.timestamp)
         .map(jobs => loadLogsSuccess(jobs, payload.meta))
         .catch(err => Observable.of(loadLogsFail(err, payload.meta)));
     });

@@ -13,7 +13,6 @@ set -e
 
 source $(pwd)/config.env.sh
 
-CERTS_DIR=`dirname $0`/certs
 DEFAULT_VERSION=0.0.1-latest
 
 CLUSTER_SERVICE_CONTAINER="dp-cluster-service"
@@ -76,7 +75,7 @@ read_consul_host(){
 }
 
 generate_certs() {
-    CERTIFICATE_PASSWORD="changeit"
+    CERTIFICATE_PASSWORD=${MASTER_PASSWORD}
 
     source $(pwd)/docker-certificates.sh
 }
@@ -96,6 +95,14 @@ ps() {
 
 list_logs() {
     docker logs "$@"
+}
+
+list_metrics() {
+    echo "{\"service_metrics\": "
+    docker exec -it dp-gateway bash -c "curl http://localhost:8762/service/metrics"
+    echo ",\"gateway_metrics\": "
+    docker exec -it dp-gateway bash -c "curl http://localhost:8762/metrics"
+    echo "}"
 }
 
 migrate_schema() {
@@ -214,15 +221,12 @@ init_app() {
     echo "Starting Cluster Service"
     source $(pwd)/docker-service-cluster.sh
 
-    if [ -z "${CERTIFICATE_PASSWORD}" ]; then
-        read_certificate_password
-    fi
     echo "Starting Application API"
     source $(pwd)/docker-app.sh
 }
 
 read_master_password() {
-    echo "Enter Knox master password: "
+    echo "Enter master password for Data Plane Service: "
     read -s MASTER_PASSWD
     
     if [ "${#MASTER_PASSWD}" -lt 6 ]; then
@@ -246,8 +250,34 @@ read_master_password() {
     MASTER_PASSWORD="$MASTER_PASSWD"
 }
 
-read_certificate_password() {
-    echo "Please enter password used for private key:"
+read_admin_password_safely() {
+    if [ -z "$USER_ADMIN_PASSWORD" ]; then
+        read_admin_password
+    fi
+}
+
+read_admin_password() {
+    echo "Enter DataPlane admin password: "
+    read -s ADMIN_PASSWD
+
+    echo "Reenter password: "
+    read -s ADMIN_PASSWD_VERIFY
+    
+    if [ "$ADMIN_PASSWD" != "$ADMIN_PASSWD_VERIFY" ];
+    then
+       echo "Password did not match. Reenter password:"
+       read -s ADMIN_PASSWD_VERIFY
+       if [ "$ADMIN_PASSWD" != "$ADMIN_PASSWD_VERIFY" ];
+       then
+        echo "Password did not match"
+        exit 1
+       fi
+    fi
+    USER_ADMIN_PASSWORD="$ADMIN_PASSWD"
+}
+
+read_user_supplied_certificate_password() {
+    echo "Please enter password used for supplied certificates:"
     read -s CERTIFICATE_PASSWORD
 }
 
@@ -266,17 +296,18 @@ import_certs() {
         return -1
     fi
 
+    mkdir -p certs
     rm -f $(pwd)/certs/ssl-cert.pem 2> /dev/null
     cp "$PUBLIC_KEY_L" $(pwd)/certs/ssl-cert.pem
     rm -f $(pwd)/certs/ssl-key.pem 2> /dev/null
     cp "$PRIVATE_KEY_L" $(pwd)/certs/ssl-key.pem
 
     echo "Certificates were copied successfully."
+
+    read_user_supplied_certificate_password
 }
 
-init_knox() {
-    echo "Initializing Knox"
-
+init_certs() {
     if [ "$USE_TLS" != "true" ]; then
         USE_PROVIDED_CERTIFICATES="no"
     fi
@@ -292,12 +323,33 @@ init_knox() {
         echo "Generating self-signed certificates (for demo only)"
         generate_certs
     fi
+}
 
-    init_consul
-    
-    if [ -z "${CERTIFICATE_PASSWORD}" ]; then
-        read_certificate_password
+read_certs_config() {
+    if [ "$USE_TLS" != "true" ]; then
+        USE_PROVIDED_CERTIFICATES="no"
     fi
+
+    if [ "$USE_PROVIDED_CERTIFICATES" == "no" ]; then
+        echo "Using previously generated self-signed certificates (for demo only)"
+        CERTIFICATE_PASSWORD=${MASTER_PASSWORD}
+    else
+        read_user_supplied_certificate_password
+    fi
+
+}
+
+init_knox_and_consul() {
+    init_consul
+
+    init_certs
+
+    init_knox
+}
+
+init_knox() {
+    echo "Initializing Knox"
+    
     if [ "$MASTER_PASSWORD" == "" ]; then
         read_master_password
     fi
@@ -373,13 +425,44 @@ init_keystore() {
     source $(pwd)/keystore-initialize.sh
 }
 
+read_master_password_safely() {
+   if [ "$MASTER_PASSWORD" == "" ]; then
+       read_master_password
+   fi
+}
+
+update_admin_password() {
+    read_admin_password_safely
+    source $(pwd)/database-user-update.sh "$USER_ADMIN_PASSWORD"
+}
+
 init_all() {
+    read_admin_password_safely
+    read_master_password_safely
+
     init_db
     reset_db
 
-    init_knox
+    update_admin_password
+
+    init_knox_and_consul
     
     init_keystore
+
+    init_app
+
+    echo "Initialization and start complete."
+}
+
+init_all_from_state() {
+    read_master_password_safely
+    read_certs_config
+
+    init_db
+
+    init_consul
+
+    init_knox
 
     init_app
 
@@ -402,12 +485,27 @@ stop_all() {
     echo "Stop complete."
 }
 
-destroy_all() {
+destroy_volumes() {
+    echo "Destroying volumes"
+    docker volume rm knox-config knox-security postgresql-data
+}
+
+destroy_all_with_state() {
     destroy
 
     destroy_knox
 
+    destroy_volumes
+
     echo "Destroy complete."
+}
+
+destroy_all_but_state() {
+    destroy
+
+    destroy_knox
+
+    echo "Stop complete."
 }
 
 upgrade() {
@@ -427,11 +525,13 @@ upgrade() {
         exit -1
     fi
 
+    source $(pwd)/config.clear.sh
+    read_master_password_safely
+
     echo "Moving configuration..."
-    mv $(pwd)/config.env.sh $(pwd)/config.env.sh.bak
+    mv $(pwd)/config.env.sh $(pwd)/config.env.sh.$(date +"%Y-%m-%d_%H-%M-%S").bak
     cp $2/config.env.sh $(pwd)/config.env.sh
     # sourcing again to overwrite values
-    source $(pwd)/config.clear.sh
     source $(pwd)/config.env.sh
 
     echo "Moving certs directory"
@@ -440,12 +540,20 @@ upgrade() {
 
     # destroy all but db
     docker rm -f $APP_CONTAINERS_WITHOUT_DB || echo "App is not up."
-    destroy_knox || echo "Knox/Consul is not up"
+    
+    echo "Destroying Knox"
+    docker rm -f $KNOX_CONTAINER || echo "Knox is not up"
 
     # migrate schema to new version
     migrate_schema
 
-    # init all but db and knox
+    # upgrade certs if required
+    read_certs_config
+
+    # init all but db and consul
+    read_consul_host
+
+    init_knox
     init_app
 
     echo "Upgrade complete."
@@ -463,22 +571,16 @@ usage() {
     local tabspace=20
     echo "Usage: dpdeploy.sh <command>"
     printf "%-${tabspace}s:%s\n" "Commands"
-    printf "%-${tabspace}s:%s\n" "init db" "Initialize postgres DB for first time"
-    printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox and Consul containers"
-    printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
     printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
     printf "%-${tabspace}s:%s\n" "utils update-user [ambari | atlas | ranger]" "Update user credentials for services that Dataplane will use to connect to clusters."
     printf "%-${tabspace}s:%s\n" "utils add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
     printf "%-${tabspace}s:%s\n" "utils reload-apps" "Restart all containers other than database, Consul and Knox"
-    printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
-    printf "%-${tabspace}s:%s\n" "start knox" "Start the Knox and Consul containers"
-    printf "%-${tabspace}s:%s\n" "start --all" "Start all containers"
-    printf "%-${tabspace}s:%s\n" "stop" "Stop the application docker containers"
-    printf "%-${tabspace}s:%s\n" "stop knox" "Stop the Knox and Consul containers"
-    printf "%-${tabspace}s:%s\n" "stop --all" "Stop all containers"
+    printf "%-${tabspace}s:%s\n" "start" "Re-initialize all container while using previous data and state"
+    printf "%-${tabspace}s:%s\n" "stop" "Destroy all containers but keep data and state"
     printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
     printf "%-${tabspace}s:%s\n" "logs [container name]" "Logs of supplied container id or name"
+    printf "%-${tabspace}s:%s\n" "metrics" "Print metrics for containers"
     printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them. Needs to start from init db again"
     printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox and Consul containers and remove them. Needs to start from init knox again"
     printf "%-${tabspace}s:%s\n" "destroy --all" "Kill all containers and remove them. Needs to start from init again"
@@ -499,15 +601,6 @@ else
         init)
             echo "Found $2"
             case "$2" in
-                db)
-                    init_db
-                    ;;
-                knox)
-                    init_knox
-                    ;;
-                app)
-                    init_app
-                    ;;
                 --all)
                     init_all
                     ;;
@@ -540,25 +633,11 @@ else
             esac
             ;;
         start)
-            case "$2" in
-                knox) start_knox
-                ;;
-                --all)
-                    start_all
-                    ;;
-                *) start_app
-             esac
-             ;;
+            init_all_from_state
+            ;;
         stop)
-            case "$2" in
-                knox) stop_knox
-                ;;
-                --all)
-                    stop_all
-                    ;;
-                *) stop_app
-             esac
-             ;;
+            destroy_all_but_state
+            ;;
         ps)
             ps
             ;;
@@ -566,17 +645,19 @@ else
             shift
             list_logs "$@"
             ;;
+        metrics)
+            list_metrics
+            ;;
         destroy)
             case "$2" in
                 knox) destroy_knox
                 ;;
-                --all)
-                    destroy_all
-                    ;;
+                --all) destroy_all_with_state
+                ;;
                 *) destroy
-                 ;;
-             esac
-             ;;
+                ;;
+            esac
+            ;;
         load)
             load_images
             ;;

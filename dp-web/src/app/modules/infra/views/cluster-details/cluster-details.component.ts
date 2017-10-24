@@ -43,6 +43,7 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
               private  translateService: TranslateService) {
   }
 
+  clusterStatus:any;
   lake: Lake = new Lake();
   clusters: Cluster[];
   servicesInfo: ServiceInfo[];
@@ -123,8 +124,12 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
           .repeat(15)
           .skipWhile(lake => lake.state !== 'SYNCED' && lake.state !== 'SYNC_ERROR' && ++count < 10)
           .first().subscribe(lakeUpdated => {
-          this.lake = lakeUpdated;
-          this.getClusterHealth(this.cluster.id, this.lake.id);
+            this.getAmbariUrl(this.cluster.id, this.lake.ambariUrl).subscribe(ambariUrl =>{
+              this.lake = lakeUpdated;
+              this.clusterStatus = lakeUpdated.state;
+              this.lake.ambariUrl = ambariUrl;
+              this.getClusterHealth(this.cluster.id, this.lake.id);
+            });
         });
 
         this.getDataNodeHealth(this.cluster.id);
@@ -280,6 +285,24 @@ export class ClusterDetailsComponent implements OnInit, AfterViewInit {
       this.clusterDetails.rmHeapUsed = StringUtils.humanizeBytes(this.rmHealth.metrics.jvm.HeapMemoryUsed);
       this.clusterDetails.rmUptime = DateUtils.toReadableDate(new Date().getTime() - this.rmHealth.metrics.runtime.StartTime);
     }
+  }
+
+  private getAmbariUrl(clusterId, ambariUrl): Observable<string> {
+    let parsedAmbariUrl = new URL(ambariUrl);
+    let validIpAddressRegex = new RegExp('^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$');
+    if (!validIpAddressRegex.test(parsedAmbariUrl.hostname)) {
+      return Observable.of(ambariUrl);
+    }
+    let parsedIpAddress = new URL(ambariUrl);
+    return this.clusterService.getHostName(clusterId, parsedIpAddress.hostname)
+      .map(response => {
+        if (response && response.length) {
+          let host = response[0].host;
+          return `${parsedIpAddress.protocol}//${host}:${parsedIpAddress.port}`;
+        } else {
+          return ambariUrl;
+        }
+      }).catch(() => Observable.of(ambariUrl));
   }
 
   private populateDataNodeHealth() {

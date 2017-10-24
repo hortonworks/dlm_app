@@ -7,5 +7,6 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+export * from './hive-browser.type';
 export * from './hive-database/hive-database.component';
 export * from './hive-browser.component';

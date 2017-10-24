@@ -17,6 +17,7 @@ import { JOB_STATUS } from 'constants/status.constant';
 import { ProgressState } from 'models/progress-state.model';
 import { TranslateService } from '@ngx-translate/core';
 import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
+import { HiveBrowserTablesLoadingMap } from 'components/hive-browser';
 
 
 @Component({
@@ -74,6 +75,8 @@ export class PolicyDetailsComponent {
   @Input() loadingJobs: boolean;
 
   @Input() loadingDatabases: ProgressState;
+
+  @Input() loadingTables: HiveBrowserTablesLoadingMap;
 
   @Input() tablesSearchPattern = '';
 

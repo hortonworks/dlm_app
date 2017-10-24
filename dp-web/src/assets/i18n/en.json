@@ -18,6 +18,7 @@
     "edit": "Edit",
     "update": "Update",
     "delete": "Delete",
+    "refresh": "Refresh",
     "addAndNew": "Add & New",
     "cancel": "Cancel",
     "back": "BACK",
@@ -26,12 +27,14 @@
     "reset": "Reset",
     "search": "Search",
     "done": "Done",
+    "remove": "Remove",
     "removeAll": "Remove All",
     "advanced": "Advanced",
     "status": "Status",
     "loading": "Loading",
     "name": "Name",
     "moreLink": "Learn More",
+    "information": "Information",
     "save": "SAVE",
     "failed": "Failed",
     "defaultRequiredFields": "Please fill in mandatory fields marked with '*'",
@@ -141,7 +144,7 @@
         "action": "Action",
         "installationSteps": "Steps for Installation:",
         "installationLink":"Installation Steps.",
-        "installationStepsDoc":"https://docs.hortonworks.com/",
+        "installationStepsDoc":"http://horton.works/dps100_h0007a",
         "dependentServicesLabel":"DEPENDENT SERVICES:",
         "syncFailed":"Cluster Information could not be fetched",
         "serviceEnabled":"Service Enabled successfully",
@@ -181,6 +184,7 @@
         "hdfsTotal": "HDFS Total",
         "addButton": "Add Cluster",
         "addCluster": "Add Your Cluster",
+        "goToAmbari":"Go to Ambari",
         "ambariUrl": "Ambari URL",
         "ambariUsername": "Ambari Username",
         "ambariPassword": "Ambari Password",
@@ -209,7 +213,18 @@
         "duplicateUser": "Duplicate values in Users Input - ",
         "duplicateGroup": "Duplicate values in Groups Input - ",
         "noMatch": "No Match",
-        "ldapUrl": "Ldap URL"
+        "ldapUrl": "Ldap URL",
+        "confirmRemove": "Remove Confirmation",
+        "hdpVersion":"HDP Version",
+        "registeredBy": "Registered By",
+        "securityType": "Security Type",
+        "noOfServices": "No of Services",
+        "dataNodes": "DataNodes",
+        "nameNodeHeapSize": "NameNode Heap Size",
+        "hdfsDiskSpace": "HDFS Disk Space",
+        "nodeManagers": "NodeManagers",
+        "resourceManagerHeapSize": "ResourceManager Heap Size",
+        "resourceManagerUptime": "ResourceManager Uptime"
       },
       "description": {
         "editCluster": "Please update your Ambari managed cluster (already added to Dataplane) here.",
@@ -247,7 +262,9 @@
           "Network": "There was a network error when connecting to Ambari.",
           "General": "Data Plane Services could not connect to the Ambari cluster. Information may not be up to date."
         },
-        "rolesOverrideWarning":"This will override any roles the user acquired as part of groups"
+        "rolesOverrideWarning":"This will override any roles the user acquired as part of groups",
+        "clusterDeleteWarning":"Removing a cluster causes loss of data such as associated pairings, policies and asset collections. Please delete those objects first before deleting a cluster. This action cannot be undone. Please confirm if you want to go ahead.",
+        "deleteFailed": "Cluster could not be deleted"
       }
     },
     "dataset": {
@@ -353,6 +370,17 @@
         "title": "Add Workspace"
       }
     },
+    "profile": {
+      "change_password": {
+        "current_password": "Current password",
+        "new_password": "New password",
+        "confirm_new_password": "Confirm new password",
+        "submit_and_logout": "Change & Logout",
+        "errors": {
+          "noMatch": "New password does not match re-entered password."
+        }
+      }
+    },
     "not_found": {
       "message": "This page does not exist.",
       "link_text": "Click here to return to home page."
@@ -382,6 +410,9 @@
     "onboard.welcome": "Welcome",
     "onboard.identity_provider": "Configure LDAP",
     "onboard.users_and_groups": "Configure Access",
+
+    "profile": "Profile",
+    "profile.password_change": "Change password",
 
     "not_found": "Not Found",
     "unauthorized": "Unauthorized",

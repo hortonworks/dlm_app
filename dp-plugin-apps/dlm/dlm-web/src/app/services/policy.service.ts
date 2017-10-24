@@ -11,10 +11,10 @@ import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { TranslateService } from '@ngx-translate/core';
-import { Policy, PolicyPayload } from 'models/policy.model';
+import {Policy, PolicyPayload, Report} from 'models/policy.model';
 import { toSearchParams, mapResponse } from 'utils/http-util';
 import { JobService } from 'services/job.service';
-import { POLICY_DISPLAY_STATUS } from 'constants/status.constant';
+import { POLICY_DISPLAY_STATUS, POLICY_STATUS, POLICY_UI_STATUS } from 'constants/status.constant';
 
 @Injectable()
 export class PolicyService {
@@ -34,12 +34,28 @@ export class PolicyService {
   }
 
   normalizePolicy(policy): Policy {
+    const uiStatus = this.getUIStatus(policy.status);
+    const lastSucceededInstance = policy.report.lastSucceededInstance;
     policy.id = policy.policyId;
-    if (policy.endTime.indexOf('9999') === 0) {
-      policy.endTime = null;
+    policy.endTime = policy.endTime.indexOf('9999') === 0 ? null : policy.endTime;
+    policy.uiStatus = uiStatus;
+    policy.displayStatus = this.getDisplayStatus(uiStatus);
+    if (lastSucceededInstance) {
+      policy.lastSucceededJobTime =  lastSucceededInstance.endTime;
     }
-    policy.displayStatus = this.t.instant(POLICY_DISPLAY_STATUS[policy.status]);
     return policy;
+  }
+
+  private getUIStatus(status: string): string {
+    const statusToUIStatus = {
+      [POLICY_STATUS.RUNNING]: POLICY_UI_STATUS.ACTIVE,
+      [POLICY_STATUS.SUSPENDED]: POLICY_UI_STATUS.SUSPENDED
+    };
+    return statusToUIStatus[status] || POLICY_UI_STATUS.ENDED;
+  }
+
+  private getDisplayStatus(displayStatus: string): string {
+    return this.t.instant(POLICY_DISPLAY_STATUS[displayStatus]);
   }
 
   constructor(private http: Http, private jobService: JobService, private t: TranslateService) { }

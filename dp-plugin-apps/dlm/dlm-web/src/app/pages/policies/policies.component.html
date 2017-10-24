@@ -43,6 +43,7 @@
   <div class="row table-wrapper" *ngIf="!(overallProgress$ | async).inProgress">
     <div class="col-xs-12" *ngIf="(policies$ | async)?.length > 0; else noPolicies">
       <dlm-policy-table
+        [policiesCount]="(policies$ | async).length"
         [policies]="filteredPolicies$ | async"
         [clusters]="clusters$ | async"
         [activePolicyId]="activePolicyId"

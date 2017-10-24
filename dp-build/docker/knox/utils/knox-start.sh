@@ -25,7 +25,7 @@ consul agent \
     -config-file=/scripts/knox-consul.config \
     -disable-host-node-id=true &
         
-if [ ! -d $KNOX_HOME/data/security/master ]; then
+if [ ! -f $KNOX_HOME/data/security/master ]; then
     # if already set, do not reset
     echo "Setting up master passsword"
     $KNOX_HOME/bin/knoxcli.sh create-master --force --master $MASTER_PASSWORD
@@ -70,4 +70,4 @@ chown -R knox $KNOX_HOME/data/
 chroot --userspec=knox / \
     java \
         -Djava.library.path=$KNOX_HOME/ext/native \
-        -jar $KNOX_HOME/bin/gateway.jar
+        -jar $KNOX_HOME/bin/gateway.jar "$@"

@@ -21,6 +21,7 @@ $tooltip-border-color: #3f3f3f;
 .map-container {
   outline: none;
   margin: 0 auto;
+  z-index: 10;
 }
 
 :host /deep/ .leaflet-touch .leaflet-bar a {

@@ -11,9 +11,10 @@ package services
 
 import com.google.inject.{Inject, Singleton}
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, HJwtToken}
-import com.hortonworks.dataplane.cs.Webservice.KnoxProxyService
-import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconAdminStatusDetails, BeaconAdminStatusResponse, BeaconApiError, BeaconApiErrors, BeaconEventResponse, BeaconHdfsFileResponse, BeaconHiveDbResponse, BeaconHiveDbTablesResponse, BeaconLogResponse, PairedCluster, PolicyDataResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
+import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
+import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconAdminStatusDetails, BeaconApiError, BeaconApiErrors,
+       BeaconEntityResponse, BeaconEventResponse, BeaconHdfsFileResponse, BeaconHiveDbResponse, BeaconHiveDbTablesResponse,
+       BeaconLogResponse, PairedCluster, PolicyDataResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
 import com.hortonworks.dlm.beacon.WebService._
 import com.hortonworks.dlm.beacon.domain.RequestEntities.ClusterDefinitionRequest
 
@@ -51,6 +52,37 @@ class BeaconService @Inject()(
    @Named("beaconBrowseService") val beaconBrowseService: BeaconBrowseService,
    val dataplaneService: DataplaneService,
    val ambariService: AmbariService) {
+
+
+
+  def getClusterDetails(clusterEndpointId: Long, clusterId: Long)(implicit token:Option[HJwtToken]):
+    Future[Either[DlmApiErrors, BeaconEntityResponse]] = {
+    val p: Promise[Either[DlmApiErrors, BeaconEntityResponse]] = Promise()
+    
+    for {
+      cluster <- dataplaneService.getCluster(clusterId)
+      beaconUrl <- dataplaneService.getBeaconService(clusterEndpointId)
+    } yield {
+      if (!List(cluster, beaconUrl).exists(_.isLeft)) {
+        dataplaneService.getDpCluster(cluster.right.get.dataplaneClusterId.get) map {
+          case Left(errors) => p.success(Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None,
+            Some(errors.errors.map(x => BeaconApiError(x.message)).head))))))
+          case Right(dpCluster) => {
+            val clusterName = dpCluster.dcName + "$" + cluster.right.get.name
+            beaconClusterService.listCluster(beaconUrl.right.get, clusterEndpointId, clusterName).map({
+              case Left(errors) => p.success(Left(DlmApiErrors(Seq(errors))))
+              case Right(policyResponse) => p.success(Right(policyResponse))
+            })
+          }
+        }
+      } else {
+        p.success(Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None,
+          Some(BeaconApiError(BeaconService.clusterDefError)))))))
+      }
+    }
+
+    p.future
+  }
 
   /**
     * Get list of all paired clusters
@@ -224,10 +256,25 @@ class BeaconService @Inject()(
   private def createPair(listOfClusters: List[ClusterDefinitionDetails],
                          p: Promise[Either[BeaconApiErrors, PostActionResponse]])(implicit token:Option[HJwtToken]) = {
     val remoteCluster = listOfClusters.tail.head
-    val remoteDatacenterClusterName =  remoteCluster.dpCluster.dcName + "$" + remoteCluster.cluster.name
+    val remoteClusterDcName = remoteCluster.dpCluster.dcName
+    val remoteClusterName = remoteCluster.cluster.name
+    val remoteDatacenterClusterName =  remoteClusterDcName + "$" + remoteClusterName
     beaconPairService.createClusterPair(listOfClusters.head.pairedClusterRequest.beaconUrl, listOfClusters.head.cluster.id.get,
       remoteDatacenterClusterName).map({
-        case Left(beaconApiErrors) => p.success(Left(beaconApiErrors))
+        case Left(beaconApiErrors) => {
+          val beaconApiErrorMsg =  beaconApiErrors.error match {
+            case Some(beaconApiError) => beaconApiError.message
+            case None => ""
+          }
+          val clusterInfo =  listOfClusters.head
+          val dcName = clusterInfo.dpCluster.dcName
+          val clusterName = clusterInfo.cluster.name
+          val message =  s"Beacon API to pair clusters $clusterName ($dcName) and $remoteClusterName ($remoteClusterDcName) " +
+            s"failed: $beaconApiErrorMsg"
+
+          p.success(Left(BeaconApiErrors(beaconApiErrors.code, beaconApiErrors.beaconUrl, Some(BeaconApiError(message)),
+            beaconApiErrors.message)))
+        }
         case Right(clusterPairResponse) => p.success(Right(clusterPairResponse))
     })
   }
@@ -447,8 +494,10 @@ class BeaconService @Inject()(
 
           val policies : Seq[PolicyDetailsData] = getProcessedResponse(allPoliciesData, queryStringPaginated, originalPageLenth, originalOffset)
           val policiesDetails: Seq[PoliciesDetails] = policies.map(policy => {
-            PoliciesDetails(policy.policyId, policy.name, policy.description, policy.`type`, policy.executionType, policy.status, policy.sourceDataset, policy.targetDataset,
-                            policy.frequencyInSec, policy.startTime, policy.endTime, policy.sourceCluster, policy.targetCluster, policy.customProperties, policy.instances)
+            PoliciesDetails(policy.policyId, policy.name, policy.description, policy.`type`, policy.executionType,
+                            policy.status, policy.sourceDataset, policy.targetDataset, policy.frequencyInSec,
+                            policy.startTime, policy.endTime, policy.sourceCluster, policy.targetCluster,
+                            policy.customProperties, policy.instances, policy.report)
           })
 
           val failedResponses: Seq[BeaconApiErrors] = allPoliciesOption.filter(_.isLeft).map(_.left.get)

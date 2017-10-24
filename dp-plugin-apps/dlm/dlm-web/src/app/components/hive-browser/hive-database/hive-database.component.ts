@@ -10,6 +10,7 @@
 import { Component, OnInit, Input, Output, ViewEncapsulation, HostBinding, EventEmitter } from '@angular/core';
 import { HiveDatabase } from 'models/hive-database.model';
 import { simpleSearch } from 'utils/string-utils';
+import { ProgressState } from 'models/progress-state.model';
 
 @Component({
   selector: 'dlm-hive-database',
@@ -46,19 +47,21 @@ import { simpleSearch } from 'utils/string-utils';
       </div>
     </div>
     <div class="row database-tables-list" [collapse]="!readonly && hideTables">
-      <div class="col-xs-12">
-        <div class="row" *ngFor="let table of tables; let last = last">
-          <div class="col-xs-12">
-            <div [ngClass]="{'database-table': true, last: last}">
-              <i class="fa fa-table"></i>
-              <span>{{table?.name}}</span>
+      <dlm-progress-container [progressState]="tablesLoading">
+        <div class="col-xs-12">
+          <div class="row" *ngFor="let table of tables; let last = last">
+            <div class="col-xs-12">
+              <div [ngClass]="{'database-table': true, last: last}">
+                <i class="fa fa-table"></i>
+                <span>{{table?.name}}</span>
+              </div>
             </div>
           </div>
+          <div *ngIf="!tables.length" class="empty-tables">
+            {{'hive_database.empty_tables' | translate}}
+          </div>
         </div>
-        <div *ngIf="!tables.length" class="empty-tables">
-          {{'hive_database.empty_tables' | translate}}
-        </div>
-      </div>
+      </dlm-progress-container>
     </div>
   `,
   styleUrls: ['./hive-database.component.scss']
@@ -70,12 +73,14 @@ export class HiveDatabaseComponent implements OnInit {
   @Input() selectedDatabase: string;
   @Input() database: HiveDatabase;
   @Input() readonly = true;
+  @Input() tablesLoading: ProgressState = {isInProgress: true} as ProgressState;
   @HostBinding('class') className = 'dlm-hive-database';
   @Output() selectDatabase = new EventEmitter<string>();
   @Output() filterApplied: EventEmitter<any> = new EventEmitter();
+  @Output() tablesCollapsed: EventEmitter<boolean> = new EventEmitter();
 
   get tables() {
-    if (!this.database || !this.database.tables.length) {
+    if (!this.database || !this.database.tables) {
       return [];
     }
     return this.database.tables.filter(table => simpleSearch(table.name, this.searchPattern));
@@ -86,8 +91,9 @@ export class HiveDatabaseComponent implements OnInit {
   ngOnInit() {
   }
 
-  toggleTables() {
+  toggleTables(): void {
     this.hideTables = !this.hideTables;
+    this.tablesCollapsed.emit(this.hideTables);
   }
 
   handleSearchChange(value) {

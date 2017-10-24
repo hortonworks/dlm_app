@@ -29,6 +29,6 @@ export class HeaderComponent {
   }
 
   logout() {
-    this.router.navigate([this.signoutURL]);
+    this.router.navigate([AuthUtils.signoutURL]);
   }
 }

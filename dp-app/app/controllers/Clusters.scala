@@ -19,10 +19,15 @@ import com.hortonworks.dataplane.commons.domain.Entities.{
   Cluster,
   DataplaneClusterIdentifier,
   Error,
+  ClusterHost,
   Errors
 }
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webservice.{ClusterService, SkuService}
+import com.hortonworks.dataplane.db.Webservice.{
+  ClusterHostsService,
+  ClusterService,
+  SkuService
+}
 import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 import models.{ClusterHealthData, JsonResponses}
@@ -38,12 +43,15 @@ import scala.concurrent.Future
 
 class Clusters @Inject()(
     @Named("clusterService") val clusterService: ClusterService,
+    @Named("clusterHostsService") val clusterHostsService: ClusterHostsService,
     @Named("skuService") val skuService: SkuService,
     val clusterHealthService: ClusterHealthService,
     ambariService: AmbariService,
     @Named("clusterAmbariService") ambariWebService: AmbariWebService,
     configuration: Configuration
 ) extends Controller {
+
+
 
   def list(dpClusterId: Option[Long]) = Action.async {
     dpClusterId match {
@@ -120,16 +128,30 @@ class Clusters @Inject()(
               Future.successful(InternalServerError(JsonResponses.statusError(
                 s"Failed with ${Json.toJson(errors)}")))
             case Right(clusterDetails) => {
-              skuService.getAllSkus()
+              skuService
+                .getAllSkus()
                 .map {
                   case Left(errors) => InternalServerError(Json.toJson(errors))
                   case Right(skus) =>
-                    val allDependentServices = skus.flatMap(sku => configuration.getStringSeq(s"${sku.name}.dependent.services.mandatory").getOrElse(Nil)).distinct
+                    val allDependentServices = skus
+                      .flatMap(
+                        sku =>
+                          configuration
+                            .getStringSeq(
+                              s"${sku.name}.dependent.services.mandatory")
+                            .getOrElse(Nil))
+                      .distinct
                     val newClusterDetails = clusterDetails.map { clDetails =>
-                      val availableRequiredServices = allDependentServices.intersect(clDetails.services)
-                      val otherServices = clDetails.services.diff(availableRequiredServices)
-                      val allAvailableServices = availableRequiredServices.union(otherServices)
-                      AmbariCluster(clDetails.security,clDetails.clusterName,allAvailableServices,clDetails.knoxUrl)
+                      val availableRequiredServices =
+                        allDependentServices.intersect(clDetails.services)
+                      val otherServices =
+                        clDetails.services.diff(availableRequiredServices)
+                      val allAvailableServices =
+                        availableRequiredServices.union(otherServices)
+                      AmbariCluster(clDetails.security,
+                                    clDetails.clusterName,
+                                    allAvailableServices,
+                                    clDetails.knoxUrl)
                     }
                     Ok(Json.toJson(newClusterDetails))
                 }
@@ -167,9 +189,7 @@ class Clusters @Inject()(
             Future.successful(Left(Errors(Seq(Error("500", "Sync failed")))))
         }
         .map {
-          case Left(errors) =>
-            InternalServerError(
-              JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Left(errors) => InternalServerError(Json.toJson(errors))
           case Right(clusterHealth) =>
             Ok(summary match {
               case Some(_) =>
@@ -219,12 +239,42 @@ class Clusters @Inject()(
       }
   }
 
+  def getHosts(clusterId: Long, ip: Option[String]) = AuthenticatedAction.async {
+
+      val hostsSearchResult = for {
+        hostsResponse <- clusterHostsService.getHostsByCluster(clusterId)
+        hosts <- {
+          if (hostsResponse.isLeft)
+            Future.failed(new Exception(hostsResponse.left.get.firstMessage))
+          else
+            Future.successful(hostsResponse.right.get)
+        }
+        hostList <- if (ip.isDefined) {
+          Future.successful(hosts.filter(_.ipaddr == ip.get))
+        } else {
+          Future.successful(hosts)
+        }
+
+      } yield hostList
+
+      hostsSearchResult
+        .map { hsr =>
+          Ok(Json.toJson(hsr))
+        }
+        .recoverWith {
+          case e: Throwable =>
+            Future.successful(
+              InternalServerError(JsonResponses.statusError(e.getMessage)))
+        }
+
+    }
+
   def getDataNodeHealth(clusterId: Long) = AuthenticatedAction.async {
     request =>
       {
         implicit val token = request.token
         val dnRequest =
-          configuration.getString("cluster.dn.health.request.param").get;
+          configuration.getString("cluster.dn.health.request.param").get
 
         ambariWebService.requestAmbariClusterApi(clusterId, dnRequest).map {
           case Left(errors) => InternalServerError(Json.toJson(errors))

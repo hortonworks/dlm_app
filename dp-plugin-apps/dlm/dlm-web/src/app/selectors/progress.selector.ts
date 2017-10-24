@@ -10,8 +10,10 @@
 import { createSelector } from 'reselect';
 import { ProgressState } from 'models/progress-state.model';
 import { getProgresses } from './root.selector';
+import { mapToList } from 'utils/store-util';
 
 export const getEntities = createSelector(getProgresses, (state) => state.entities);
+export const getAllProgressStates = createSelector(getEntities, mapToList);
 export const getProgressState = (requestId: string) => createSelector(getEntities, (entities) => entities[requestId]);
 export const getMergedProgress = (...requestIds) => createSelector(getEntities, (entities): ProgressState => {
   const resultId = requestIds.join('_');

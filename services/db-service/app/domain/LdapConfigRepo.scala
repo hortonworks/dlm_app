@@ -30,20 +30,10 @@ class LdapConfigRepo @Inject()(
     LdapConfigs.to[List].result
   }
 
-  def insert(ldapConfig: LdapConfiguration)(implicit ec: ExecutionContext): Future[LdapConfiguration] = {
-    if (ldapConfig.id.isDefined) {
-      db.run {
-        (LdapConfigs returning LdapConfigs).insertOrUpdate(ldapConfig)
-      }.map { res =>
-        ldapConfig
-      }
-    } else {
-      db.run {
-        (LdapConfigs returning LdapConfigs) += ldapConfig
-      }
-    }
-
+  def insert(ldapConfig: LdapConfiguration)(implicit ec: ExecutionContext): Future[LdapConfiguration] = db.run {
+    (LdapConfigs returning LdapConfigs) += ldapConfig
   }
+
   def update(ldapConfig: LdapConfiguration)(implicit ec: ExecutionContext): Future[Boolean]={
     db.run(LdapConfigs.filter(_.id === ldapConfig.id).result).flatMap{curentConfig=>
       val updatedConfig=curentConfig.head.copy(ldapUrl = ldapConfig.ldapUrl)

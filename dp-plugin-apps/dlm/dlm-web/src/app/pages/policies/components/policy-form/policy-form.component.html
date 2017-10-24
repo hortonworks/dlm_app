@@ -22,6 +22,7 @@
           <fieldset formGroupName="general" [collapse]="sectionCollapsedMap.general">
             <dlm-form-field
               [label]="'page.policies.form.fields.policy_name' | translate"
+              [required]="true"
               [maxLengthValue]="64">
               <input type="text" class="form-control" qe-attr="policy-name" formField formControlName="name" />
               <dlm-field-error *ngIf="policyForm.get('general').get('name').hasError('nameValidator')">
@@ -54,11 +55,11 @@
             <div class="form-group">
               <div class="row">
                 <div class="col-xs-12">
-                  <dlm-form-field [label]="'page.policies.form.fields.sourceCluster.self' | translate">
+                  <dlm-form-field [label]="'page.policies.form.fields.sourceCluster.self' | translate" [required]="true">
                     <dlm-select-field qe-attr="policy-source-cluster" formField formControlName="sourceCluster" [options]="sourceClusters" [value]="sourceCluster" (onSelect)="handleSourceClusterChange($event)">
                     </dlm-select-field>
                   </dlm-form-field>
-                  <dlm-form-field [label]="'page.policies.form.fields.destinationCluster.self' | translate">
+                  <dlm-form-field [label]="'page.policies.form.fields.destinationCluster.self' | translate" [required]="true">
                     <dlm-select-field qe-attr="policy-destination-cluster" formField formControlName="destinationCluster" [options]="destinationClusters" [value]="destinationCluster">
                     </dlm-select-field>
                   </dlm-form-field>
@@ -129,8 +130,10 @@
               <dlm-progress-container [progressState]="databaseRequest$ | async">
                 <dlm-hive-browser
                   formControlName="databases"
+                  [tablesLoadingMap]="databaseTablesLoadingMap"
                   [databases]="sourceDatabases$ | async"
                   [readonly]="false"
+                  (databaseTablesCollapsed)="onDatabaseTablesCollapsed($event)"
                   ></dlm-hive-browser>
               </dlm-progress-container>
             </div>
@@ -164,7 +167,9 @@
                   </div>
                   <div class="row">
                     <div class="col col-xs-12">
-                      <label>{{'page.policies.form.fields.repeat' | translate}}</label>
+                      <dlm-field-label [required]="true">
+                        {{'page.policies.form.fields.repeat' | translate}}
+                      </dlm-field-label>
                     </div>
                   </div>
                   <div class="row">
@@ -230,8 +235,13 @@
                         [placeholder]="'page.policies.form.fields.date_format' | translate"
                         [options]="datePickerOptions"
                         [disabled]="startOption === policyStart.START_NOW"
+                        (inputFieldChanged)="handleDateInputChange($event, 'startTime')"
                         (dateChanged)="handleDateChange($event, 'startTime')">
                       </my-date-picker>
+                      <dlm-field-error
+                        *ngIf="policyForm.get('job').get('startTime').get('date').hasError('invalidDate')">
+                        {{'forms.validation_errors.invalid_date' | translate:startTimeDateField}}
+                      </dlm-field-error>
                     </div>
                   </div>
                 </div>
@@ -244,8 +254,13 @@
                         [selDate]="policyForm.value.job.endTime.date"
                         [placeholder]="'page.policies.form.fields.date_format' | translate"
                         (dateChanged)="handleDateChange($event, 'endTime')"
+                        (inputFieldChanged)="handleDateInputChange($event, 'endTime')"
                         [options]="datePickerOptions">
                       </my-date-picker>
+                      <dlm-field-error
+                        *ngIf="policyForm.get('job').get('endTime').get('date').hasError('invalidDate')">
+                        {{'forms.validation_errors.invalid_date' | translate:endTimeDateField}}
+                      </dlm-field-error>
                     </div>
                   </div>
                 </div>
@@ -270,6 +285,10 @@
                 <dlm-field-error
                   *ngIf="policyForm.get('job').get('startTime').get('time').hasError('lessThanCurrent')">
                   {{'forms.validation_errors.time_less_than_current' | translate}}
+                </dlm-field-error>
+                <dlm-field-error
+                  *ngIf="policyForm.get('job').get('startTime').get('time').hasError('greaterThanEndTime')">
+                  {{'forms.validation_errors.greaterThanEndTime' | translate}}
                 </dlm-field-error>
               </div>
             </div>

@@ -61,9 +61,9 @@ export class JobsTableComponent implements OnInit {
   @Output() rerunJobAction = new EventEmitter<any>();
 
   rowActions = <ActionItemType[]>[
-    {label: 'Abort', name: 'ABORT', enabledFor: JOB_STATUS.RUNNING},
-    {label: 'Re-run', name: 'RERUN', disableFn: this.isRerunDisabled.bind(this)},
-    {label: 'View Log', name: 'LOG'}
+    {label: 'Abort', name: 'ABORT', enabledFor: JOB_STATUS.RUNNING, qeAttr: 'abort-job'},
+    {label: 'Re-run', name: 'RERUN', disableFn: this.isRerunDisabled.bind(this), qeAttr: 'rerun-job'},
+    {label: 'View Log', name: 'LOG', qeAttr: 'job-log'}
   ];
 
   constructor(protected store: Store<fromRoot.State>,
@@ -140,7 +140,7 @@ export class JobsTableComponent implements OnInit {
   handleSelectedAction({row, action}) {
     switch (action.name) {
       case 'LOG':
-        return this.logService.showLog(EntityType.policyinstance, row.id);
+        return this.logService.showLog(EntityType.policyinstance, row.id, row.endTime);
       case 'ABORT':
         return row.status === JOB_STATUS.RUNNING && this.abortJobAction.emit(row);
       case 'RERUN':

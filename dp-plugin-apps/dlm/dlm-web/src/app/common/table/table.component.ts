@@ -99,6 +99,14 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   @Input() scrollbarH = false;
   @Input() reorderable = true;
   @Input() count = 0;
+
+  /**
+   * Rows count before any filter is applied
+   * Used for `table-footer.summary`
+   *
+   * @type {number}
+   */
+  @Input() rowsCount = 0;
   @Input() cssClasses = {
     sortAscending: 'caret',
     sortDescending: 'caret caret-up',

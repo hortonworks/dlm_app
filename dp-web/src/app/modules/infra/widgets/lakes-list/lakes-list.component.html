@@ -71,18 +71,19 @@
               <span *ngIf="lakeInfo.status === statusEnum.WAITING"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i></span>
           </td>
           <td class="mdl-data-table__cell--non-numeric key-column mdl-data-table__cell--width15" [routerLink]="['/infra/clusters/', lakeInfo.lakeId]">{{lakeInfo.name}}</td>
-          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.city}},&nbsp;{{lakeInfo.country}}</td>
+          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{getLocationInfo(lakeInfo)}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.dataCenter}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.nodes}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.uptimeStr}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.hdfsUsed}}/{{lakeInfo.hdfsTotal}}</td>
           <td class="mdl-data-table__cell--non-numeric actions">
-                <button [attr.id]="'dropDown_'+lakeInfo.id" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
+                <button [attr.id]="'dropDown_'+lakeInfo.id" [ngClass]="{'disabled':lakeInfo.status === statusEnum.WAITING}" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
                 <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i></button>
                 <ul mdl class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+lakeInfo.id">
-                    <li class="mdl-menu__item"><a href="{{lakeInfo.ambariUrl}}" target="_blank"><i class="fa fa-external-link"></i>Go to Ambari</a></li>
-                    <li class="mdl-menu__item" (click)="refresh(lakeInfo)"><span><i class="fa__fa-close--icon fa fa-refresh"></i>Refresh</span></li>
+                    <li class="mdl-menu__item" [ngClass]="{'disabled':lakeInfo.status === statusEnum.DOWN}"><a href="{{lakeInfo.ambariUrl}}" target="_blank"><i class="fa fa-external-link"></i>{{"pages.infra.labels.goToAmbari" | translate}}</a></li>
+                    <li class="mdl-menu__item" (click)="refresh(lakeInfo)"><span><i class="fa__fa-close--icon fa fa-refresh"></i>{{"common.refresh" | translate}}</span></li>
                     <li class="mdl-menu__item"><a [routerLink]="['/infra/clusters', lakeInfo.id, 'edit']"><i class="fa__fa-close--icon fa fa-edit"></i>{{"common.edit" | translate}}</a></li>
+                    <li class="mdl-menu__item" (click)="deleteCluster(lakeInfo.id)"><span><i class="fa__fa-close--icon fa fa-trash"></i>{{"common.remove" | translate}}</span></li>
                 </ul>
           </td>
       </tr>
