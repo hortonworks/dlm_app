@@ -49,7 +49,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     }
 
     val countQuery = searchTerm match {
-      case Some(searchTerm) => Users.filter(_.username like (s"%$searchTerm%")).length
+      case Some(searchTerm) => Users.filter(_.username.toLowerCase like (s"%${searchTerm.toLowerCase}%")).length
       case None =>  Users.length
     }
     for {
@@ -103,7 +103,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
 
   private def getUserDetailInternal(userName:String):Future[(User,Seq[UserRole])]={
     val query=for{
-      (user, userRole) <- Users.filter(_.username===userName) joinLeft  UserRoles on (_.id === _.userId)
+      (user, userRole) <- Users.filter(_.username.toLowerCase === userName.toLowerCase) joinLeft  UserRoles on (_.id === _.userId)
     }yield {
       (user,userRole)
     }
@@ -148,7 +148,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
       val toBeAddedRoleObjs=rolesUtil.getUserRoleObjectsforRoleIds(user.id.get,toBeAddedRoleIds)
       for{
         updateUser <- {
-          Users.filter(_.username===userInfo.userName)
+          Users.filter(_.username.toLowerCase===userInfo.userName.toLowerCase)
             .map{r=>
               (r.active,r.updated,r.groupManaged)
             }
@@ -222,7 +222,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
          UserGroups returning UserGroups ++=  userGroups
        }
        updatedUserUpdatedTime<-
-         Users.filter(_.username===userName)
+         Users.filter(_.username.toLowerCase === userName.toLowerCase)
            .map{r=>
              (r.updated)
            }
@@ -263,7 +263,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
   }
 
   def findByName(username: String):Future[Option[User]] = {
-    db.run(Users.filter(_.username === username).result.headOption)
+    db.run(Users.filter(_.username.toLowerCase === username.toLowerCase()).result.headOption)
   }
 
   def findById(userId: Long):Future[Option[User]] = {
