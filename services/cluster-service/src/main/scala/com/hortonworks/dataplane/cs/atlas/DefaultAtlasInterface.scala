@@ -129,9 +129,9 @@ class DefaultAtlasInterface(private val clusterId: Long,
     // Get the query
 
     val query = s"$hiveBaseQuery ${Filters.query(filters, lowerCaseQueries)}"
-    val defaultLimit = Try(config.getInt("records.default.limit"))
+    val defaultLimit = Try(config.getInt("atlas.query.records.default.limit"))
       .getOrElse(10000)
-    val defaultOffset = Try(config.getInt("records.default.offset"))
+    val defaultOffset = Try(config.getInt("atlas.query.records.default.offset"))
       .getOrElse(0)
     getApi.map { api =>
       val searchResult =
