@@ -263,7 +263,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
   }
 
   def findByName(username: String):Future[Option[User]] = {
-    db.run(Users.filter(_.username === username).result.headOption)
+    db.run(Users.filter(_.username.toLowerCase === username.toLowerCase()).result.headOption)
   }
 
   def findById(userId: Long):Future[Option[User]] = {
