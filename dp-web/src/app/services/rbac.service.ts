@@ -53,7 +53,7 @@ export class RbacService {//role based access control
   private getPersonaMap() {
     let personaMap = new Map();
     personaMap.set('SUPERADMIN', [
-      new Persona('Dataplane Admin', [
+      new Persona('DataPlane Admin', [
         new PersonaTabs('Clusters', 'infra', 'fa-cubes'),
         new PersonaTabs('Users', 'infra/manage-access', 'fa-users'),
         new PersonaTabs('Services', 'infra/services', 'fa-th-large')
@@ -61,7 +61,7 @@ export class RbacService {//role based access control
     ]);
     personaMap.set('CURATOR', [
       new Persona('Data Steward Studio', [
-        new PersonaTabs('Asset Collection', 'datasteward/collections', 'fa-cubes', true),
+        new PersonaTabs('Asset Collection', 'datasteward', 'fa-cubes', true),
         // new PersonaTabs('Unclassified', 'unclassified', 'fa-cube'),
         // new PersonaTabs('Assets', 'assets', 'fa-server'),
         // new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')
