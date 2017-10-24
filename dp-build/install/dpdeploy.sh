@@ -82,7 +82,7 @@ generate_certs() {
 
 init_db() {
     if [ "$USE_EXT_DB" == "yes" ]; then
-        echo "Dataplane is configured to use an external database in config.env.sh. Database initialization is not required and assumed to be done already."
+        echo "DataPlane Service is configured to use an external database in config.env.sh. Database initialization is not required and assumed to be done already."
     else
         source $(pwd)/docker-database.sh
     fi
@@ -226,7 +226,7 @@ init_app() {
 }
 
 read_master_password() {
-    echo "Enter master password for Data Plane Service: "
+    echo "Enter master password for DataPlane Service: "
     read -s MASTER_PASSWD
     
     if [ "${#MASTER_PASSWD}" -lt 6 ]; then
@@ -257,7 +257,7 @@ read_admin_password_safely() {
 }
 
 read_admin_password() {
-    echo "Enter DataPlane admin password: "
+    echo "Enter DataPlane Service admin password: "
     read -s ADMIN_PASSWD
 
     echo "Reenter password: "
@@ -573,7 +573,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "Commands"
     printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
-    printf "%-${tabspace}s:%s\n" "utils update-user [ambari | atlas | ranger]" "Update user credentials for services that Dataplane will use to connect to clusters."
+    printf "%-${tabspace}s:%s\n" "utils update-user [ambari | atlas | ranger]" "Update user credentials for services that DataPlane will use to connect to clusters."
     printf "%-${tabspace}s:%s\n" "utils add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
     printf "%-${tabspace}s:%s\n" "utils reload-apps" "Restart all containers other than database, Consul and Knox"
     printf "%-${tabspace}s:%s\n" "start" "Re-initialize all container while using previous data and state"
@@ -586,7 +586,7 @@ usage() {
     printf "%-${tabspace}s:%s\n" "destroy --all" "Kill all containers and remove them. Needs to start from init again"
     printf "%-${tabspace}s:%s\n" "load" "Load all images from lib directory into docker"
     printf "%-${tabspace}s:%s\n" "upgrade --from <old_setup_directory>" "Upgrade existing dp-core to current version"
-    printf "%-${tabspace}s:%s\n" "version" "Print the version of dataplane"
+    printf "%-${tabspace}s:%s\n" "version" "Print the version of DataPlane Service"
 }
 
 VERSION=$(print_version)
