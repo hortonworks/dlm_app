@@ -26,28 +26,32 @@ export const routes: Routes = [{
   loadChildren: './modules/dataset/dataset.module#DatasetModule',
   canActivate:[ NavigationGuard ],
   data: {
-    crumb: 'dss'
+    crumb: 'dss',
+    title: 'dss',
   }
 }, {
   path: 'onboard',
   loadChildren: './modules/onboard/onboard.module#OnboardModule',
   canActivate:[ NavigationGuard ],
   data: {
-    crumb: 'onboard'
+    crumb: 'onboard',
+    title: 'core',
   }
 }, {
   path: 'infra',
   loadChildren: './modules/infra/infra.module#InfraModule',
   canActivate:[ NavigationGuard ],
   data: {
-    crumb: 'infra'
+    crumb: 'infra',
+    title: 'core',
   }
 }, {
   path: 'profile',
   loadChildren: './modules/profile/profile.module#ProfileModule',
   canActivate:[ NavigationGuard ],
   data: {
-    crumb: 'profile'
+    crumb: 'profile',
+    title: 'core',
   }
 // },{
 //   path: 'analytics',
@@ -56,32 +60,44 @@ export const routes: Routes = [{
 }, {
   path: 'sign-in',
   component: SignInComponent,
-  canActivate:[ UnsecuredRouteGuard ]
+  canActivate:[ UnsecuredRouteGuard ],
+  data: {
+    title: 'core',
+  }
 }, {
   path: 'sign-out',
   component: SignInComponent,
-  canActivate: [ DoCleanUpAndRedirectGuard ]
+  canActivate: [ DoCleanUpAndRedirectGuard ],
+  data: {
+    title: 'core',
+  }
 }, {
   path: 'unauthorized',
   component: AuthErrorComponent,
   data: {
-    crumb: 'unauthorized'
+    crumb: 'unauthorized',
+    title: 'core',
   }
 }, {
   path: 'service-notenabled',
   component: ServiceErrorComponent,
   data: {
-    crumb: 'service_not_enabled'
+    crumb: 'service_not_enabled',
+    title: 'core',
   }
 },{
   path: '',
   pathMatch: 'full',
   component: LoaderSpinComponent,
-  canActivate: [ LandingPageGuard ]
+  canActivate: [ LandingPageGuard ],
+  data: {
+    title: 'core',
+  }
 }, {
   path: '**',
   component: NotFoundRouteComponent,
   data: {
-    crumb: 'not_found'
+    crumb: 'not_found',
+    title: 'core',
   }
 }];

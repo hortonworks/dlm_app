@@ -151,6 +151,6 @@ export class CollapsibleNavComponent implements OnInit, OnChanges {
   }
 
   get displayLogo() {
-    return this.activePersona.name === 'Dataplane Admin' ? 'dp-logo-30.png' : this.activePersonaImageName
+    return this.activePersona.name === 'DataPlane Admin' ? 'dp-logo-30.png' : this.activePersonaImageName
   }
 }
