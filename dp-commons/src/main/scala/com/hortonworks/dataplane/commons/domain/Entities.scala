@@ -129,6 +129,8 @@ object Entities {
                        userId: Option[Long],
                        groupId: Option[Long])
 
+  case class UserGroups(username: String, groups: Seq[Group])
+
   case class UserRoles(username: String, roles: Seq[String])
 
   case class GroupRoles(groupName: String, roles: Seq[String])
