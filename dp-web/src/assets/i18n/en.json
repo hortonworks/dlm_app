@@ -144,7 +144,7 @@
         "action": "Action",
         "installationSteps": "Steps for Installation:",
         "installationLink":"Installation Steps.",
-        "installationStepsDoc":"https://docs.hortonworks.com/",
+        "installationStepsDoc":"http://horton.works/dps100_h0007a",
         "dependentServicesLabel":"DEPENDENT SERVICES:",
         "syncFailed":"Cluster Information could not be fetched",
         "serviceEnabled":"Service Enabled successfully",
