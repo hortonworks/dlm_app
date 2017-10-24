@@ -110,6 +110,7 @@ export class MapComponent implements OnChanges, OnInit, OnDestroy {
     return new L.DivIcon({
       iconSize: [23, 40],
       iconAnchor: [12, 39],
+      popupAnchor: [0, -20],
       className: 'custom-map-marker',
       html: `
         <div class="marker-wrapper">
