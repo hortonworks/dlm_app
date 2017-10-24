@@ -10,6 +10,8 @@
  */
 
 import {AfterViewChecked, ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {Title} from '@angular/platform-browser';
+import {Router, ActivatedRoute, NavigationEnd} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 
 import {MdlService} from './services/mdl.service';
@@ -39,14 +41,30 @@ export class AppComponent implements OnInit, AfterViewChecked {
   showLoader: LoaderStatus;
   signOutUrl = AuthUtils.signoutURL;
 
-  constructor(private mdlService: MdlService,
+  constructor(
+              private titleService: Title,
+              private router: Router,
+              private activatedRoute: ActivatedRoute,
+              private mdlService: MdlService,
               private translateService: TranslateService,
               private collapsibleNavService: CollapsibleNavService,
               private rbacService: RbacService,
               private cdRef: ChangeDetectorRef) {
+
     translateService.setTranslation('en', require('../assets/i18n/en.json'));
     translateService.setDefaultLang('en');
     translateService.use('en');
+
+    router.events.subscribe(event => {
+      if(event instanceof NavigationEnd) {
+        var titles = this.getTitles(router.routerState, router.routerState.root);
+        if(titles.length > 0){
+          titleService.setTitle(translateService.instant(`titles.${titles[titles.length - 1]}`));
+        } else {
+          titleService.setTitle(translateService.instant('titles.core'));
+        }
+      }
+    });
   }
 
   isUserSignedIn() {
@@ -78,6 +96,7 @@ export class AppComponent implements OnInit, AfterViewChecked {
       this.showLoader = status
     });
   }
+
   ngAfterViewChecked() {
     this.cdRef.detectChanges();
   }
@@ -85,5 +104,17 @@ export class AppComponent implements OnInit, AfterViewChecked {
   setHeaderData() {
     this.headerData = new HeaderData();
     this.headerData.personas = this.rbacService.getPersonaDetails();
+  }
+
+  getTitles(state, parent) {
+    var data = [];
+    if(parent && parent.snapshot.data && parent.snapshot.data.title) {
+      data.push(parent.snapshot.data.title);
+    }
+
+    if(state && parent) {
+      data.push(...this.getTitles(state, state.firstChild(parent)));
+    }
+    return data;
   }
 }
