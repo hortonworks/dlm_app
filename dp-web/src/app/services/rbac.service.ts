@@ -61,7 +61,7 @@ export class RbacService {//role based access control
     ]);
     personaMap.set('CURATOR', [
       new Persona('Data Steward Studio', [
-        new PersonaTabs('Asset Collection', 'datasteward/collections', 'fa-cubes', true),
+        new PersonaTabs('Asset Collection', 'datasteward', 'fa-cubes', true),
         // new PersonaTabs('Unclassified', 'unclassified', 'fa-cube'),
         // new PersonaTabs('Assets', 'assets', 'fa-server'),
         // new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')
