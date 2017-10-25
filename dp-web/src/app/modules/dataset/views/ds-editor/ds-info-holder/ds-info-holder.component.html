@@ -27,7 +27,7 @@
   <label class="required">{{"common.datalake" | translate}}</label>
   <select [(ngModel)]="dsModel.datalakeId" (change)="onLakeSelectionChange()">
     <option value="0">Select Datalake</option>
-    <option *ngFor="let lake of lakes" value="{{lake.id}}">{{lake.name}}</option>
+    <option *ngFor="let lake of lakes" value="{{lake.id}}">{{lake.name}}, {{lake.dcName}}</option>
   </select>
 </div>
 <div class="form-group">
