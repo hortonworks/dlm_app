@@ -11,7 +11,6 @@
 
 package com.hortonworks.dataplane.cs.sync
 
-import akka.actor.FSM.Failure
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, ClusterServiceHost, DataplaneCluster, HJwtToken, ClusterService => ClusterServiceData}
 import com.hortonworks.dataplane.cs._
@@ -21,7 +20,7 @@ import com.typesafe.config.Config
 import play.api.libs.ws.WSClient
 
 import scala.concurrent.Future
-import scala.util.Try
+import scala.util.{Failure, Try}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 private[sync] object TaskType extends Enumeration {
