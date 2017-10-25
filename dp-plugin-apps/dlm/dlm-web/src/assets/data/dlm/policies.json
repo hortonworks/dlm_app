@@ -36,7 +36,7 @@
     "name": "aaaaaaaaaaaaaaaaaaaaa",
     "type": "FS",
     "executionType": "FS_SNAPSHOT",
-    "status": "RUNNING",
+    "status": "FAILED",
     "sourceDataset": "/",
     "targetDataset": "/",
     "frequency": 60,
