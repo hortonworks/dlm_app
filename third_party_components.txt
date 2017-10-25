@@ -1,4 +1,4 @@
-Hortonworks DataPlane Services, version 1.0
+Hortonworks DataPlane Service, version 1.0
 Portions Copyright 2016-2017 Hortonworks, Inc.  All rights reserved.
 
 This product includes code developed and licensed by third parties (“Separately Licensed Code”).  Each of the components listed below is licensed under the applicable third-party agreements, which may be open source license agreements, and is licensed separately from Hortonworks licensed software and/or services. Where the Separately Licensed Code contains dual or multiple licensing options, the most permissive license is elected.

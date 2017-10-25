@@ -1,4 +1,4 @@
-Hortonworks DataPlane Services, Version 1.0
+Hortonworks DataPlane Service, Version 1.0
 Portions Copyright 2016-2017 Hortonworks, Inc.  All rights reserved.
 
 Third Party Notices and Licenses for Operating Systems
