@@ -30,11 +30,14 @@ import { POLL_INTERVAL } from 'constants/api.constant';
 import { HeaderData } from 'models/header-data';
 import { UserService } from 'services/user.service';
 import { AuthUtils } from 'utils/auth-utils';
+import { RELOAD_TIME } from './constants/application.constant';
 
 const POLL_EVENTS_ID = '[DLM_COMPONENT] POLL_EVENT_ID';
 const POLL_NEW_EVENTS_ID = '[DLM_COMPONENT] POLL_NEW_EVENTS_ID';
 const POLL_CLUSTER_STATUSES_ID = '[DLM_COMPONENT] POLL_CLUSTER_STATUSES_ID';
 const CLUSTERS_REQUEST = '[DLM_COMPONENT] CLUSTERS_REQUEST';
+
+let reloadTimeOut;
 
 @Component({
   selector: 'dlm',
@@ -51,7 +54,6 @@ export class DlmComponent implements OnDestroy, OnInit {
   fitHeight = true;
   events$: Observable<Event[]>;
   newEventsCount$: Observable<number>;
-  onOverviewPage = false;
   subscriptions: Subscription[] = [];
   headerData: HeaderData = new HeaderData();
 
@@ -125,8 +127,9 @@ export class DlmComponent implements OnDestroy, OnInit {
     this.store.dispatch(loadClusters(CLUSTERS_REQUEST));
     const pathChange$ = router.events
       .filter(e => e instanceof NavigationEnd)
-      .do(_ => {
-        this.onOverviewPage = this.checkTopPath(route, 'overview');
+      .subscribe(_ => {
+        clearTimeout(reloadTimeOut);
+        reloadTimeOut = setTimeout(() => location.reload(), RELOAD_TIME);
       });
     const clustersRequestSubscription = this.store.select(getProgressState(CLUSTERS_REQUEST))
       .filter(progressState => !progressState.isInProgress)
@@ -134,23 +137,7 @@ export class DlmComponent implements OnDestroy, OnInit {
       .do(_ => this.store.dispatch(loadClustersStatuses(POLL_CLUSTER_STATUSES_ID)))
       .subscribe(_ => this.initPolling());
     this.subscriptions.push(clustersRequestSubscription);
-    this.subscriptions.push(pathChange$.subscribe());
-  }
-
-  private checkTopPath(route, path) {
-    const {children} = route;
-    if (!children.length) {
-      return false;
-    }
-    const {url} = children[0];
-    if (!url) {
-      return false;
-    }
-    const urlValue = url.getValue();
-    if (!urlValue.length) {
-      return false;
-    }
-    return urlValue[0].path === path;
+    this.subscriptions.push(pathChange$);
   }
 
   getUser(): User {
