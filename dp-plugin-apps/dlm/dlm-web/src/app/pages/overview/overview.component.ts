@@ -221,7 +221,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
       }
     };
     // Scroll to the applied filter tags
-    $('body').animate({scrollTop: $(this.jobsOverviewTable.nativeElement).offset().top}, 700, fadeAnimate);
+    $('html, body').animate({scrollTop: $(this.jobsOverviewTable.nativeElement).offset().top}, 700, fadeAnimate);
   }
 
   private completedRequest$(progress$: Observable<ProgressState>): Observable<boolean> {

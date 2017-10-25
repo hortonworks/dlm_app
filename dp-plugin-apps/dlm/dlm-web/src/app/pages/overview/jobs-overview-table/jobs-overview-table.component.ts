@@ -114,8 +114,7 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
         }
       },
       {prop: 'sourceCluster', name: this.translateColumn('source_cluster'), cellTemplate: this.clusterNameCellRef},
-      {...TableComponent.makeFixedWith(20), name: '',
-        cellTemplate: this.destinationIconCellRef, cellClass: 'arrow-cell'},
+      {name: '', cellTemplate: this.destinationIconCellRef, cellClass: 'arrow-cell', maxWidth: 20, minWidth: 20},
       {prop: 'targetCluster', name: this.translateColumn('destination_cluster'), cellTemplate: this.clusterNameCellRef},
       {prop: 'service', name: this.t.instant('common.service'),
         cellTemplate: this.serviceNameCellRef, cellClass: 'service-cell'},
@@ -128,13 +127,14 @@ export class JobsOverviewTableComponent extends JobsTableComponent implements On
       },
       {cellTemplate: this.prevJobsRef, name: this.translateColumn('last_ten_jobs'), prop: 'lastTenJobs', sortable: false},
       {
-        ...TableComponent.makeFixedWith(160),
         prop: 'lastJobResource.trackingInfo.progress',
         cellTemplate: this.transferredFormattedTemplate,
         name: this.translateColumn('transferred'),
         cellClass: 'date-cell',
         headerClass: 'date-header',
-        sortable: false
+        sortable: false,
+        maxWidth: 160,
+        minWidth: 160
       },
       {
         prop: 'lastJobResource.duration',
