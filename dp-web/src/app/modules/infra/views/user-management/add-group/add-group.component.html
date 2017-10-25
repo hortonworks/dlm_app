@@ -1,9 +1,20 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div class="load-right-to-left-slider dialog1x">
   <div class="title-container">
     <div class="hwx-subtitle">
       <span *ngIf="mode === modes.ADD">{{"pages.infra.labels.addGroup" | translate}}</span>
       <span *ngIf="mode === modes.EDIT">{{group? group.groupName: ''}}</span>
-      <i class="fa fa-remove close-icon" id="back" (click)="back()"></i>
+      <i class="fa fa-remove close-icon" id="back" [routerLink]="['/infra/manage-access/groups']"></i>
     </div>
   </div>
   <div class="slider-container">
@@ -21,8 +32,8 @@
           [tags]="groups"
           [availableTags]="availableGroups"
           [clearOnSearch]="true"
-          [theme]="tagTheme.DARK"
           [restrictFreeText]="true"
+          [minChars]=3
           (textChange)="onGroupSearchChange($event)"
           (onNewSearch)="onNewGroupAddition($event)"></tagging-widget>
         </div>
@@ -33,8 +44,8 @@
           [tags]="roles"
           [availableTags]="availableRoles"
           [clearOnSearch]="true"
-          [theme]="tagTheme.DARK"
           [restrictFreeText]="true"
+          [minChars]=3
           (textChange)="onRoleSearchChange($event)"
           (onNewSearch)="onNewRoleAddition($event)"></tagging-widget>
           <i id="roles-dropdown" class="fa fa-caret-down drop-down-icon" (click)="showRoleOptions()"></i>
@@ -76,8 +87,8 @@
               [tags]="groupRoles"
               [availableTags]="availableRoles"
               [clearOnSearch]="true"
-              [theme]="tagTheme.DARK"
               [restrictFreeText]="true"
+              [minChars]=3
               (textChange)="onRoleSearchChange($event)"
               (onNewSearch)="onRolesEdit($event)"></tagging-widget>
             <i class="fa fa-caret-down drop-down-icon" id="roles-dropdown" (click)="showRoleOptions()"></i>
@@ -90,7 +101,7 @@
     </form>
     <div class="margin-top-20">
       <button id="save-btn" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"common.save" | translate}}</button>
-      <button id="cancel-btn" class="mdl-button btn-hwx-default" (click)="back()">{{"common.cancel" | translate}}</button>
+      <button id="cancel-btn" class="mdl-button btn-hwx-default" [routerLink]="['/infra/manage-access/groups']">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

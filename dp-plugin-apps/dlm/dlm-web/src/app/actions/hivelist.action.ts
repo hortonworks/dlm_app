@@ -31,9 +31,9 @@ export const loadDatabasesFail = (error, meta = {}): ActionFailure => ({
   payload: { error, meta}
 });
 
-export const loadTables = (databaseId, meta = {}) => ({
+export const loadTables = ({clusterId, databaseId}, meta = {}) => ({
   type: ActionTypes.LOAD_TABLES.START,
-  payload: { databaseId, meta }
+  payload: { clusterId, databaseId, meta }
 });
 export const loadTablesSuccess = (tables: any, meta = {}): ActionSuccess => ({
   type: ActionTypes.LOAD_TABLES.SUCCESS,

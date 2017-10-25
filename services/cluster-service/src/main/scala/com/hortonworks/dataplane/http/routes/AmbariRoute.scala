@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.http.routes
 
 import java.net.URL
@@ -6,8 +17,9 @@ import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives.{as, entity, path, post, _}
 import com.google.inject.Inject
 import com.hortonworks.dataplane.commons.domain.Constants
+import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.cs.ClusterErrors.ClusterNotFound
-import com.hortonworks.dataplane.cs.{AmbariDataplaneClusterInterface, AmbariDataplaneClusterInterfaceImpl, Credentials, StorageInterface}
+import com.hortonworks.dataplane.cs._
 import com.hortonworks.dataplane.db.Webservice.{ClusterService, DpClusterService}
 import com.hortonworks.dataplane.http.BaseRoute
 import com.hortonworks.dataplane.knox.Knox.{KnoxApiRequest, KnoxConfig}
@@ -24,6 +36,7 @@ import scala.util.{Failure, Success, Try}
 class AmbariRoute @Inject()(val ws: WSClient,
                             val storageInterface: StorageInterface,
                             val clusterService: ClusterService,
+                            val credentialInterface: CredentialInterface,
                             val dpClusterService: DpClusterService,
                             val config: Config)
     extends BaseRoute {
@@ -114,7 +127,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
 
     val finalList = for {
       dataplaneCluster <- getDpCluster(ambariDetailRequest,expectConfigGroup,checkCredentials)
-      creds <- loadCredentials
+      creds <- credentialInterface.getCredential("dp.credential.ambari")
       dli <- Future.successful(
         AmbariDataplaneClusterInterfaceImpl(dataplaneCluster,
                                             ws,
@@ -195,16 +208,6 @@ class AmbariRoute @Inject()(val ws: WSClient,
     newRequest.map(new TempDataplaneCluster(_))
   }
 
-  private def loadCredentials = {
-    val creds = for {
-      user <- storageInterface.getConfiguration("dp.ambari.superuser")
-      pass <- storageInterface.getConfiguration("dp.ambari.superuser.password")
-    } yield {
-      Credentials(user, pass)
-    }
-    creds
-  }
-
   def getClusterData(clusterId: Long) = {
     for {
       c <- clusterService.retrieve(clusterId.toString)
@@ -234,7 +237,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
       Future.successful(baseReq)
     else {
       for {
-        creds <- loadCredentials
+        creds <- credentialInterface.getCredential("dp.credential.ambari")
         req <- Future.successful(
           baseReq.withAuth(creds.user.get, creds.pass.get, WSAuthScheme.BASIC))
       } yield req
@@ -326,6 +329,61 @@ class AmbariRoute @Inject()(val ws: WSClient,
     } yield response
   }
 
+  def mapToServiceInfo(json: Option[JsValue],
+                       srvcName: String, srvcVersion: String): Future[Option[ServiceInfo]] =
+    Future.successful(
+      json
+        .map { j =>
+          val st =
+            (j \ "state").validate[String].getOrElse("NONE")
+          Some(
+            ServiceInfo(serviceName = srvcName , state = st, serviceVersion = srvcVersion))
+        }
+        .getOrElse(None))
+
+  def getServiceInfoSeq(services: Seq[String],dli: AmbariDataplaneClusterInterface, dataplaneCluster: DataplaneCluster, hdpVersion: String)(implicit token: Option[HJwtToken]): Future[Seq[Option[ServiceInfo]]] = {
+    val stackNameVersionpair = hdpVersion.split("-")
+    val stackName = stackNameVersionpair(0)
+    val stackVersion = stackNameVersionpair(1)
+
+    val list = services.map { srvc =>
+      for{
+        json <- dli.getServiceInfo(dataplaneCluster.name,srvc)
+        serviceVersion <- dli.getServiceVersion(stackName,stackVersion,srvc)
+        serviceInfo <- {
+          mapToServiceInfo(json, srvc, serviceVersion)
+        }
+      } yield  serviceInfo
+    }
+    Future.sequence(list)
+  }
+
+  def getAmbariServicesInfo(dpcwServices: DpClusterWithDpServices,
+                            request: HttpRequest): Future[Seq[ServiceInfo]] = {
+
+    val header = request.getHeader(Constants.DPTOKEN)
+    val dataplaneCluster = dpcwServices.dataplaneCluster
+    val dpServices = dpcwServices.dpServices
+    implicit val token =
+      if (header.isPresent) Some(HJwtToken(header.get.value)) else None
+    val list = for {
+      creds <- credentialInterface.getCredential("dp.credential.ambari")
+      dli <- Future.successful(
+        AmbariDataplaneClusterInterfaceImpl(dpcwServices.dataplaneCluster,
+          ws,
+          config,
+          creds))
+      hdpVersion <- dli.getHdpVersion
+      services <- dli.getServices(dataplaneCluster.name)
+      availableDpServices <- Future.successful(services.intersect(dpServices))
+      serviceInfoSeq <- getServiceInfoSeq(availableDpServices,dli,dataplaneCluster,hdpVersion.head)
+    } yield  serviceInfoSeq
+
+    list.map { item =>
+      item.collect { case o if o.isDefined => o.get }
+    }
+  }
+
   val ambariClusterProxy = path(LongNumber / "ambari" / "cluster") {
     clusterId =>
       pathEnd {
@@ -388,5 +446,30 @@ class AmbariRoute @Inject()(val ws: WSClient,
       }
     }
   }
+
+  val serviceStateRoute = path("ambari" / "servicesInfo") {
+    post {
+      extractRequest { request =>
+        entity(as[DpClusterWithDpServices]) { dcds =>
+          val list = getAmbariServicesInfo(dcds, request)
+          onComplete(list) {
+            case Success(serviceInfoes) =>
+              serviceInfoes.size match {
+                case 0 =>
+                  complete(StatusCodes.NotFound, notFound)
+                case _ => {
+                  complete(success(serviceInfoes))
+
+                }
+              }
+            case Failure(th) =>
+              logger.error(s"Failed to get services info ",th)
+              complete(StatusCodes.InternalServerError, errors(th))
+          }
+        }
+      }
+    }
+  }
+
 
 }

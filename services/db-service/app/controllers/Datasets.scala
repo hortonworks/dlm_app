@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package controllers
 
 import javax.inject._
@@ -16,8 +27,11 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  def all = Action.async {
-    datasetRepo.all.map(dataset => success(dataset.map(c => linkData(c, makeLink(c))))).recoverWith(apiError)
+  def all(name: Option[String]) = Action.async {
+    (name match {
+      case Some(name) => datasetRepo.findByName(name)
+      case None => datasetRepo.all
+    }).map(dataset => success(dataset.map(c => linkData(c, makeLink(c))))).recoverWith(apiError)
   }
 
   private def getPaginatedQuery(req: Request[AnyContent]): Option[PaginatedQuery] = {

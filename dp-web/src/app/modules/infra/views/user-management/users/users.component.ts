@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {UserService} from '../../../../../services/user.service';
@@ -54,7 +65,7 @@ export class UsersComponent implements OnInit {
   }
 
   editUser(userName) {
-    this.router.navigate([{outlets: {'sidebar': ['edit', userName]}}], {relativeTo: this.route});
+    this.router.navigate([{outlets: {'sidebar': [userName, 'edit']}}], {relativeTo: this.route});
   }
 
   onSearch(event) {
@@ -64,7 +75,7 @@ export class UsersComponent implements OnInit {
 
   switchView(tab) {
     if(tab === UserMgmtTabs.GROUPS){
-      this.router.navigate(['/infra/usermgmt/groups']);
+      this.router.navigate(['/infra/manage-access/groups']);
     }
   }
 

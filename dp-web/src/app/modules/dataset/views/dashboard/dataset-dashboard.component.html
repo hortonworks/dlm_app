@@ -1,6 +1,19 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div>
-    <nav-tag-panel (updateSelection)="onTagChange($event)"
-                   [dsNameSearch]="dsNameSearch"
+    <nav-tag-panel
+      #tagViewer
+      (updateSelection)="onTagChange($event)"
+      [dsNameSearch]="dsNameSearch"
     ></nav-tag-panel>
     <div class="result-viewer">
         <div class="page-container">
@@ -9,8 +22,9 @@
                     <div class="hwx-title" *ngIf="currentDsTag">{{currentDsTag.name}}</div>
                     <div class="mdl-layout-spacer"></div>
                     <div class="search-input">
-                        <input id="search" name="search-input" type="text" placeholder="Search" [ngModel]="dsNameSearch" (change)="dsNameSearchChange($event)" />
-                        <i aria-hidden="true" class="fa fa-search dp-input__icon"></i>
+                        <input id="search" name="search-input" type="text" placeholder="Search" [ngModel]="dsNameSearch" (keyup)="dsNameSearchChange($event)" />
+                        <i *ngIf="!dsNameSearch || dsNameSearch.length === 0" aria-hidden="true" class="fa fa-search dp-input__icon"></i>
+                        <i *ngIf="dsNameSearch && dsNameSearch.length > 0" aria-hidden="true" class="fa fa-times-circle dp-input__icon" (click)="clearSearch()"></i>
                     </div>
                     <div class="mdl-button-group">
                         <button (click)="onViewChange(views.list)" [ngClass]="{'button-color--dark-grey': currentView === views.list }" class="mdl-button">
@@ -33,6 +47,7 @@
                   [view]="currentView"
                   [currentDsTag]="currentDsTag"
                   [dsNameSearch]="dsNameSearch"
+                  (onViewRefresh)="onViewRefresh()"
                 ></ds-nav-result-viewer>
             </div>
         </div>

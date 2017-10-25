@@ -23,15 +23,13 @@ import { getMergedProgress, getProgressState } from 'selectors/progress.selector
 import { initApp } from 'actions/app.action';
 import { loadClusters, loadClustersStatuses } from 'actions/cluster.action';
 import { loadEvents, loadNewEventsCount } from 'actions/event.action';
-import { NAVIGATION } from 'constants/navigation.constant';
 import { User } from './models/user.model';
 import { SessionStorageService } from './services/session-storage.service';
 import { TimeZoneService } from './services/time-zone.service';
 import { POLL_INTERVAL } from 'constants/api.constant';
-import { HeaderData, Persona } from 'models/header-data';
+import { HeaderData } from 'models/header-data';
 import { UserService } from 'services/user.service';
 import { AuthUtils } from 'utils/auth-utils';
-import { getAllClusters } from 'selectors/cluster.selector';
 
 const POLL_EVENTS_ID = '[DLM_COMPONENT] POLL_EVENT_ID';
 const POLL_NEW_EVENTS_ID = '[DLM_COMPONENT] POLL_NEW_EVENTS_ID';
@@ -53,7 +51,6 @@ export class DlmComponent implements OnDestroy, OnInit {
   fitHeight = true;
   events$: Observable<Event[]>;
   newEventsCount$: Observable<number>;
-  navigationColumns = NAVIGATION;
   onOverviewPage = false;
   subscriptions: Subscription[] = [];
   headerData: HeaderData = new HeaderData();
@@ -61,24 +58,16 @@ export class DlmComponent implements OnDestroy, OnInit {
   user: User = <User>{};
 
   private initPolling() {
-    const pollProgress$ = this.store
-      .select(getMergedProgress(POLL_EVENTS_ID, POLL_NEW_EVENTS_ID, POLL_CLUSTER_STATUSES_ID))
+    const statusProgress$ = this.store
+      .select(getMergedProgress(POLL_CLUSTER_STATUSES_ID))
       .map(r => r.isInProgress)
       .distinctUntilChanged()
       .filter(isInProgress => !isInProgress)
       .delay(POLL_INTERVAL)
-      .do(_ => {
-        const eventParams = {};
-        if (this.lastEventTimeStamp) {
-          eventParams['start_time'] = this.lastEventTimeStamp;
-        }
-        this.store.dispatch(loadNewEventsCount({requestId: POLL_NEW_EVENTS_ID}));
-        this.store.dispatch(loadEvents(eventParams, { requestId: POLL_EVENTS_ID}));
-        this.store.dispatch(loadClustersStatuses(POLL_CLUSTER_STATUSES_ID));
-      })
+      .do(_ => this.store.dispatch(loadClustersStatuses(POLL_CLUSTER_STATUSES_ID)))
       .repeat();
 
-    this.subscriptions.push(pollProgress$.subscribe());
+    this.subscriptions.push(statusProgress$.subscribe());
   }
 
   constructor(t: TranslateService,
@@ -101,25 +90,25 @@ export class DlmComponent implements OnDestroy, OnInit {
       new MenuItem(
         t.instant('sidenav.menuItem.overview'),
         './overview',
-        'navigation-icon fa fa-home',
+        'navigation-icon fa fa-fw fa-home',
         'go-to-overview'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.clusters'),
         './clusters',
-        'navigation-icon fa fa-globe',
+        'navigation-icon fa fa-fw fa-cubes',
         'go-to-clusters'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.pairings'),
         './pairings',
-        'navigation-icon fa fa-arrows-h',
+        'navigation-icon fa fa-fw fa-arrows-h',
         'go-to-pairings'
       ),
       new MenuItem(
         t.instant('sidenav.menuItem.policies'),
         './policies',
-        'navigation-icon fa fa-th-list',
+        'navigation-icon fa fa-fw fa-list-alt',
         'go-to-policies'
       )
     ];

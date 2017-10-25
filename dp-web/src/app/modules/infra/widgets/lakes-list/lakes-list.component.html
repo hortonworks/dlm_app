@@ -1,3 +1,14 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div class="content-pane">
   <div class="title-pane">
     <div class="page-title">
@@ -20,12 +31,13 @@
         <i class="fa fa-filter dp-input__icon" aria-hidden="true"></i>
       </div>
       <div *ngIf="showFilterListing" id="filter-option-list" class="option-list">
+        <div class="option-value" *ngIf="filterOptions.length === 0"> {{"pages.infra.labels.noMatch" | translate}} </div>
         <div *ngFor="let filterOption of filterOptions">
           <div class="option-title">{{filterOption.displayName}}</div>
           <div class="option-value" (keyup)="handleKeyboardEvents($event, filterOption.displayName, filterOption.key, value)" *ngFor="let value of filterOption.values" tabindex="0" (click)="addToFilter(filterOption.displayName, filterOption.key, value)">{{value}}</div>
         </div>
     </div>
-    <button id="add-btn" class="mdl-button btn-hwx-primary" [routerLink]="['/infra/add']"> {{"pages.infra.labels.addButton" | translate}} </button></div>
+    <button id="add-btn" class="mdl-button btn-hwx-primary" [routerLink]="['/infra/clusters/add']"> {{"pages.infra.labels.addButton" | translate}} </button></div>
   </div>
   <table class="mdl-data-table mdl-js-data-table" dp-config-table (onSort)="onSort($event)">
       <thead>
@@ -47,9 +59,6 @@
             <dp-config-sorter [type]="'duration'" [sortBy]="'uptime'"> {{"pages.infra.labels.uptime" | translate}} </dp-config-sorter>
         </th>
         <th class="mdl-data-table__cell--non-numeric">
-            <dp-config-sorter [sortBy]="'services'"> {{"common.services" | translate}} </dp-config-sorter>
-        </th>
-        <th class="mdl-data-table__cell--non-numeric">
             <dp-config-sorter [type]="'number'" [sortBy]="'hdfsUsedInBytes'"> {{"pages.infra.labels.hdfsUsed" | translate}} </dp-config-sorter>
         </th>
         <th class="mdl-data-table__cell--non-numeric actions"></th>
@@ -61,25 +70,25 @@
               <span *ngIf="lakeInfo.status !== statusEnum.WAITING"><i class="fa fa-circle" aria-hidden="true"></i></span>
               <span *ngIf="lakeInfo.status === statusEnum.WAITING"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i></span>
           </td>
-          <td class="mdl-data-table__cell--non-numeric key-column mdl-data-table__cell--width15" (click)="viewDetails(lakeInfo.lakeId)">{{lakeInfo.name}}</td>
-          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.city}},&nbsp;{{lakeInfo.country}}</td>
+          <td class="mdl-data-table__cell--non-numeric key-column mdl-data-table__cell--width15" [routerLink]="['/infra/clusters/', lakeInfo.lakeId]">{{lakeInfo.name}}</td>
+          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{getLocationInfo(lakeInfo)}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.dataCenter}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.nodes}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.uptimeStr}}</td>
-          <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.services}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.hdfsUsed}}/{{lakeInfo.hdfsTotal}}</td>
           <td class="mdl-data-table__cell--non-numeric actions">
-                <button [attr.id]="'dropDown_'+lakeInfo.id" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
+                <button [attr.id]="'dropDown_'+lakeInfo.id" [ngClass]="{'disabled':lakeInfo.status === statusEnum.WAITING}" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
                 <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i></button>
                 <ul mdl class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+lakeInfo.id">
-                    <li class="mdl-menu__item"><a href="{{lakeInfo.ambariUrl}}" target="_blank"><i class="fa fa-external-link"></i>Go to Ambari</a></li>
-                    <li class="mdl-menu__item" (click)="refresh(lakeInfo)"><span><i class="fa__fa-close--icon fa fa-refresh"></i>Refresh</span></li>
-                    <li class="mdl-menu__item"><a [routerLink]="['/infra/edit', lakeInfo.id]"><i class="fa__fa-close--icon fa fa-edit"></i>{{"common.edit" | translate}}</a></li>
+                    <li class="mdl-menu__item" [ngClass]="{'disabled':lakeInfo.status === statusEnum.DOWN}"><a href="{{lakeInfo.ambariUrl}}" target="_blank"><i class="fa fa-external-link"></i>{{"pages.infra.labels.goToAmbari" | translate}}</a></li>
+                    <li class="mdl-menu__item" (click)="refresh(lakeInfo)"><span><i class="fa__fa-close--icon fa fa-refresh"></i>{{"common.refresh" | translate}}</span></li>
+                    <li class="mdl-menu__item"><a [routerLink]="['/infra/clusters', lakeInfo.id, 'edit']"><i class="fa__fa-close--icon fa fa-edit"></i>{{"common.edit" | translate}}</a></li>
+                    <li class="mdl-menu__item" (click)="deleteCluster(lakeInfo.id)"><span><i class="fa__fa-close--icon fa fa-trash"></i>{{"common.remove" | translate}}</span></li>
                 </ul>
           </td>
       </tr>
       <tr *ngIf="lakesList.length === 0">
-          <td class="mdl-typography--text-center" colspan="9" >{{"pages.infra.labels.emptySearchResult" | translate}}</td>
+          <td class="mdl-typography--text-center" colspan="8" >{{"pages.infra.labels.emptyClusters" | translate}}</td>
       </tr>
       </tbody>
   </table>

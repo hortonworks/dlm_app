@@ -21,7 +21,7 @@ export const SEARCH_INPUT_CONTROL_VALUE_ACCESSOR: any = {
   styleUrls: ['./search-input.component.scss'],
   template: `
     <div class="row">
-      <div class="col-md-12">
+      <div class="col-xs-12">
         <span class="glyphicon glyphicon-search"></span>
         <input class="form-control" (keyup)="onKeyup($event)" type="search" [value]="value"/>
       </div>

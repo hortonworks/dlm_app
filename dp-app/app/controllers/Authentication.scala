@@ -1,26 +1,40 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package controllers
 
 import javax.inject.Inject
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{Errors, User, UserRoles}
+import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, User, UserRoles}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.UserService
-import com.hortonworks.dataplane.commons.auth.Authenticated
-import internal.Jwt
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import models.JsonFormats._
-import models.{Credential, JsonResponses}
+import models.RequestSyntax.ChangeUserPassword
+import models.Formatters._
+import models.JsonFormatters._
+import models.{Credential, JsonResponses, WrappedErrorsException}
 import org.mindrot.jbcrypt.BCrypt
 import play.api.libs.json.Json
 import play.api.mvc._
 import play.api.Logger
+import play.api.Configuration
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.Try
 
 class Authentication @Inject()(@Named("userService") val userService: UserService,
-                               authenticated:Authenticated,
-                               configuration: play.api.Configuration)
+                               configuration: Configuration)
     extends Controller {
 
   def signIn = Action.async(parse.json) { request =>
@@ -40,14 +54,14 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
         BadRequest(JsonResponses.statusError("Cannot parse user request"))))
   }
 
-  def userById(userId: String) = authenticated.async {
+  def userById(userId: String) = Action.async {
     userService.loadUserById(userId).map{
       case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
       case Right(user) => Ok(Json.toJson(user))
     }
   }
 
-  def userDetail = authenticated.async { request =>
+  def userDetail = AuthenticatedAction.async { request =>
     val username = request.user.username
     for {
       userOp: Either[Errors, User] <- userService.loadUser(username)
@@ -62,18 +76,41 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
           val orElse = getRoles(rolesOp)
          Ok(Json.obj( "id" -> user.username,
            "avatar" -> user.avatar,
-           "display" -> user.displayname,
-           "token" -> Jwt.makeJWT(user))
+           "display" -> user.displayname)
          )
       }
     }
+  }
+
+  def changePassword = AuthenticatedAction.async(parse.json) { request =>
+    request.body
+      .validate[ChangeUserPassword]
+      .map { changeUserPasswordRequest =>
+        getUserByUsername(request.user.username)
+          .map( user => {
+            checkPassword(changeUserPasswordRequest.password, user.password)
+            user.copy(password = BCrypt.hashpw(changeUserPasswordRequest.nextPassword, BCrypt.gensalt()))
+          })
+          .flatMap (user => userService.updateUser(user))
+          .map {
+            case Left(errors) => {
+              Logger.error(s"user fetch issue while changing password for '${request.user.username}': {${errors}")
+              InternalServerError(Json.toJson(errors))
+            }
+            case Right(user) => Ok(Json.toJson(user))
+          }
+          .recoverWith {
+            case ex: WrappedErrorsException => Future.successful(InternalServerError(Json.toJson(ex.errors)))
+          }
+      }
+      .getOrElse(Future.successful(BadRequest(JsonResponses.statusError("Cannot parse user request"))))
   }
 
   private def getRoles(roles: Either[Errors, UserRoles]) = {
     if (roles.isRight) {
       roles.right.get.roles
     } else
-      Seq[String]()
+      Nil
   }
 
   private def getResponse(password: String,
@@ -86,21 +123,37 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
           JsonResponses.statusError(
             s"Cannot find user for request ${Json.toJson(errors)}"))
       case Right(user) =>
-        BCrypt.checkpw(password, user.password) match {
-          case true =>
-            val orElse = getRoles(roles)
-            Ok(
-              Json.obj(
-                "id" -> user.username,
-                "avatar" -> user.avatar,
-                "display" -> user.displayname,
-                "token" -> Jwt.makeJWT(user)
-
-              ))
-          case false =>
-            Unauthorized(
-              JsonResponses.statusError(s"The user cannot be verified"))
-        }
+        Try(BCrypt.checkpw(password, user.password))
+          .getOrElse(false) match {
+            case true =>
+              val orElse = getRoles(roles)
+              Ok(
+                Json.obj(
+                  "id" -> user.username,
+                  "avatar" -> user.avatar,
+                  "display" -> user.displayname
+                ))
+            case false =>
+              Unauthorized(
+                JsonResponses.statusError(s"The user cannot be verified"))
+          }
     }
+  }
+
+  private def getUserByUsername(username: String): Future[User] = {
+    userService
+      .loadUser(username)
+      .map {
+        case Left(errors) => throw WrappedErrorsException(errors)
+        case Right(user) => user
+      }
+  }
+
+  private def checkPassword(password: String, hashedPassword: String): Boolean = {
+    if(!Try(BCrypt.checkpw(password, hashedPassword)).getOrElse(false)) {
+      val errors = Errors(Seq(Error("418", "Current password is incorrect.")))
+      throw WrappedErrorsException(errors)
+    }
+    return true;
   }
 }

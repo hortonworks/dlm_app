@@ -9,13 +9,13 @@
 
 import { Component, Input, Output, OnInit, ViewEncapsulation, EventEmitter,
   HostBinding, SimpleChanges, OnDestroy, OnChanges, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef } from '@angular/core';
 import {
-  FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl, AsyncValidatorFn,
-  ValidationErrors
+  FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl, AsyncValidatorFn, ValidationErrors
 } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { go } from '@ngrx/router-store';
-import { IMyOptions, IMyDateModel } from 'mydatepicker';
+import { IMyOptions, IMyDateModel, IMyInputFieldChanged } from 'mydatepicker';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -23,25 +23,31 @@ import { Subscription } from 'rxjs/Subscription';
 import { RadioItem } from 'common/radio-button/radio-button';
 import { State } from 'reducers/index';
 import { Pairing } from 'models/pairing.model';
-import { POLICY_TYPES, POLICY_SUBMIT_TYPES, POLICY_REPEAT_MODES, POLICY_TIME_UNITS, POLICY_DAYS } from 'constants/policy.constant';
+import { POLICY_TYPES, POLICY_SUBMIT_TYPES, POLICY_REPEAT_MODES, POLICY_TIME_UNITS,
+  POLICY_DAYS, POLICY_START} from 'constants/policy.constant';
 import { getFormValues } from 'selectors/form.selector';
 import { markAllTouched } from 'utils/form-util';
 import { getDatePickerDate } from 'utils/date-util';
 import { TranslateService } from '@ngx-translate/core';
 import { mapToList } from 'utils/store-util';
 import { simpleSearch } from 'utils/string-utils';
-import { loadFullDatabases } from 'actions/hivelist.action';
+import { loadFullDatabases, loadDatabases, loadTables } from 'actions/hivelist.action';
 import { resetFormValue } from 'actions/form.action';
 import { getAllDatabases } from 'selectors/hive.selector';
 import { HiveDatabase } from 'models/hive-database.model';
 import { SelectOption } from 'components/forms/select-field';
 import { TimeZoneService } from 'services/time-zone.service';
-import { isEmpty } from 'utils/object-utils';
+import { isEmpty, merge } from 'utils/object-utils';
 import * as moment from 'moment';
 import { FILE_TYPES } from 'constants/hdfs.constant';
 import { HdfsService } from 'services/hdfs.service';
+import { ProgressState } from 'models/progress-state.model';
+import { getMergedProgress, getAllProgressStates } from 'selectors/progress.selector';
+import { HiveBrowserTablesLoadingMap, DatabaseTablesCollapsedEvent } from 'components/hive-browser';
+import { removeProgressState } from 'actions/progress.action';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
+const DATABASE_REQUEST = '[Policy Form] DATABASE_REQUEST';
 
 export function freqValidator(frequencyMap): ValidatorFn {
   return (control: AbstractControl): ValidationErrors => {
@@ -98,7 +104,7 @@ export function pathValidator(hdfsService): AsyncValidatorFn {
         const clusterId = control.parent['controls']['general'].controls.sourceCluster.value;
         return hdfsService.getFilesList(clusterId, control.value).toPromise()
           .then(response => {
-            const files = response.FileStatuses.FileStatus;
+            const files = response.fileList;
             if (files.length && files[0].type === FILE_TYPES.FILE && files[0].pathSuffix === '') {
               return resolve({isFile: true});
             }
@@ -118,6 +124,9 @@ export function pathValidator(hdfsService): AsyncValidatorFn {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
+  private tableRequestPrefix = '[PolicyFormComponent] LOAD_TABLES ';
+  databaseTablesLoadingMap: HiveBrowserTablesLoadingMap = {};
+
   @Input() pairings: Pairing[] = [];
   @Input() sourceClusterId = 0;
   @Output() formSubmit = new EventEmitter<any>();
@@ -126,10 +135,12 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   policyTimeUnits = POLICY_TIME_UNITS;
   policyDays = POLICY_DAYS;
   policySubmitTypes = POLICY_SUBMIT_TYPES;
+  policyStart = POLICY_START;
   policyForm: FormGroup;
   selectedSource$ = new BehaviorSubject(0);
   sourceDatabases$: Observable<HiveDatabase[]>;
   databaseSearch$ = new BehaviorSubject<string>('');
+  databaseRequest$: Observable<ProgressState>;
   subscriptions: Subscription[] = [];
   policyFormValues$;
   databaseListGroup: FormGroup;
@@ -139,6 +150,8 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   freqLimit = {fieldLabel: 'Frequency'};
   directoryField = {fieldLabel: 'Folder path'};
   maxBandwidthField = {fieldLabel: 'Maximum Bandwidth'};
+  startTimeDateField = {fieldLabel: 'Start Date'};
+  endTimeDateField = {fieldLabel: 'End Date'};
   userTimezone = '';
   get datePickerOptions(): IMyOptions {
     const yesterday = moment().subtract(1, 'day');
@@ -201,6 +214,16 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       value: this.policyTimeUnits.MINUTES
     }
   ];
+  startOptions = <RadioItem[]> [
+    {
+      label: this.t.instant('page.policies.form.fields.start.schedule'),
+      value: this.policyStart.ON_SCHEDULE
+    },
+    {
+      label: this.t.instant('page.policies.form.fields.start.start_now'),
+      value: this.policyStart.START_NOW
+    }
+  ];
   dayOptions = <RadioItem[]> [
     {
       label: 'Mo',
@@ -232,6 +255,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     }
   ];
   selectedPolicyType = POLICY_TYPES.HDFS;
+  selectedStart = this.policyStart.ON_SCHEDULE;
   root = '/';
   hdfsRootPath = '/';
   selectedHdfsPath = '/';
@@ -280,6 +304,10 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     return this.policyForm.value.job.day;
   }
 
+  get startOption() {
+    return this.policyForm.value.job.start;
+  }
+
   get repeatOption() {
     return this.policyForm.value.job.repeatMode;
   }
@@ -302,10 +330,53 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     return new Date(date);
   }
 
+  private setupDatabaseUpdates() {
+    const loadDatabasesSubscription = this.selectedSource$
+      .filter(sourceCluster => !!sourceCluster)
+      .subscribe(sourceCluster => {
+        this.store.dispatch(loadDatabases(sourceCluster, {requestId: DATABASE_REQUEST}));
+      });
+    const databases$ = this.selectedSource$.switchMap(sourceCluster => {
+      return this.store.select(getAllDatabases)
+        .map(databases => databases.filter(db => db.clusterId === sourceCluster))
+        .do(databases => {
+          const selectedDatabase = this.policyForm.value.databases;
+          const selectedSource = this.policyForm.value.general.sourceCluster;
+          // select first database when source changed and selected database is not exist on selected cluster
+          if (databases.length && !databases.some(db => db.clusterId === selectedSource && db.name === selectedDatabase)) {
+            this.policyForm.patchValue({databases: databases[0].name});
+          }
+        });
+      }) as Observable<HiveDatabase[]>;
+    this.sourceDatabases$ = Observable.combineLatest(this.databaseSearch$, databases$)
+      .map(([searchPattern, databases]) => databases.filter(db => simpleSearch(db.name, searchPattern)));
+    this.databaseRequest$ = this.store.select(getMergedProgress(DATABASE_REQUEST));
+
+    const updateTablesLoadingProgress = this.store.select(getAllProgressStates)
+      .subscribe(progressList => {
+        const updates: {[databaseId: string]: ProgressState}  = progressList
+          .reduce((all, progressState: ProgressState) => {
+            if (progressState.requestId.startsWith(this.tableRequestPrefix)) {
+              const databaseId = progressState.requestId.replace(this.tableRequestPrefix, '');
+              return {
+                ...all,
+                [databaseId]: progressState
+              };
+            }
+            return all;
+          }, {});
+        this.databaseTablesLoadingMap = merge({}, this.databaseTablesLoadingMap, updates);
+      });
+
+    this.subscriptions.push(updateTablesLoadingProgress);
+    this.subscriptions.push(loadDatabasesSubscription);
+  }
+
   constructor(private formBuilder: FormBuilder,
               private store: Store<State>,
               private timezoneService: TimeZoneService,
               private t: TranslateService,
+              private cdRef: ChangeDetectorRef,
               private hdfs: HdfsService) { }
 
   // todo: to Denys. This method looks quite scary. Things to improve:
@@ -316,25 +387,6 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     this.userTimeZone$ = this.timezoneService.userTimezoneIndex$;
     this.userTimeZone$.subscribe((value) =>
       this.userTimezone = this.timezoneService.userTimezone ? this.timezoneService.userTimezone.label : '');
-    const loadDatabasesSubscription = this.selectedSource$
-      .filter(sourceCluster => !!sourceCluster)
-      .subscribe(sourceCluster => {
-        this.store.dispatch(loadFullDatabases(sourceCluster));
-      });
-    const databases$ = this.selectedSource$.switchMap(sourceCluster => {
-      return this.store.select(getAllDatabases)
-        .map(databases => databases.filter(db => db.clusterId === sourceCluster))
-        .do(databases => {
-          const selectedDatabase = this.policyForm.value.databases;
-          const selectedSource = this.policyForm.value.general.sourceCluster;
-          // select first database when source changed and selected database is not exist on selected cluster
-          if (databases.length && !databases.some(db => db.clusterId === selectedSource && db.name === selectedDatabase)) {
-            this.policyForm.patchValue({databases: databases[0].id});
-          }
-        });
-      });
-    this.sourceDatabases$ = Observable.combineLatest(this.databaseSearch$, databases$)
-      .map(([searchPattern, databases]) => databases.filter(db => simpleSearch(db.name, searchPattern)));
     this.policyForm = this.formBuilder.group({
       general: this.formBuilder.group({
         name: ['', Validators.compose([Validators.required, Validators.maxLength(64), nameValidator()])],
@@ -346,6 +398,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       databases: ['', Validators.required],
       directories: ['', Validators.compose([Validators.required]), pathValidator(this.hdfs)],
       job: this.formBuilder.group({
+        start: this.policyStart.ON_SCHEDULE,
         repeatMode: this.policyRepeatModes.EVERY,
         frequency: ['', Validators.compose([Validators.required, freqValidator(this.frequencyMap), integerValidator()])],
         day: this.policyDays.MONDAY,
@@ -379,6 +432,9 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
           this.selectedHdfsPath = policyFormValues['directories'];
           this.selectedSource$.next(policyFormValues['general']['sourceCluster']);
           this.activateFieldsForType(policyFormValues['general']['type']);
+          if (Object.keys(policyFormValues['advanced']).some(k => policyFormValues['advanced'][k] !== '')) {
+            this.sectionCollapsedMap.advanced = false;
+          }
         } else if (sourceClusterId > 0) {
           this.policyForm.patchValue({
             general: {
@@ -399,8 +455,23 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       }
     });
 
-    this.subscriptions.push(loadDatabasesSubscription);
+    const directoriesChangesSubscription = this.policyForm.valueChanges
+      .map(values => values.directories)
+      .distinctUntilChanged()
+      .debounceTime(500)
+      .switchMap(value => {
+        return this.policyForm.statusChanges
+          .filter(_ => this.policyForm.get('directories').valid)
+          .map(_ => value);
+      })
+      .subscribe(path => {
+        this.hdfsRootPath = path;
+        this.cdRef.detectChanges();
+      });
+
+    this.setupDatabaseUpdates();
     this.subscriptions.push(policyFormValuesSubscription);
+    this.subscriptions.push(directoriesChangesSubscription);
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -429,6 +500,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   handleSubmit({ value }) {
+    const userTimezone = this.timezoneService.userTimezone;
     if (this.policyForm.valid) {
       if (value.job.repeatMode === this.policyRepeatModes.EVERY) {
         value.job.frequencyInSec = this.frequencyMap[value.job.unit] * value.job.frequency;
@@ -449,7 +521,10 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
           value.job.endTime.time = this.getEndTime(endDate);
         }
       }
-      const userTimezone = this.timezoneService.userTimezone;
+      if (value.job.start === this.policyStart.START_NOW) {
+        value.job.startTime.date = '';
+        value.job.startTime.time = '';
+      }
       value.userTimezone =  userTimezone ? userTimezone.label : '';
       this.formSubmit.emit(value);
     }
@@ -458,6 +533,27 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
 
   handleSearchChange(value: string) {
     this.databaseSearch$.next(value);
+  }
+
+  handleStartChange(radioItem) {
+    const { value } = radioItem;
+    this.policyForm.patchValue({
+      job: {
+        start: value,
+        startTime: {
+          time: moment(this.defaultTime).toDate()
+        }
+      }
+    });
+    if (value === this.policyStart.START_NOW) {
+      const userTimezone = this.timezoneService.userTimezone;
+      const day = userTimezone ? moment().tz(userTimezone.zones[0].value).format('d') : moment().format('d');
+      this.policyForm.patchValue({
+        job: {
+          day: day
+        }
+      });
+    }
   }
 
   toggleSection(section: string) {
@@ -477,7 +573,16 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   handleDateChange(date: IMyDateModel, dateType: string) {
-    this.policyForm.patchValue({ job: {[dateType]: { date: date.formatted }}});
+    if (date.formatted) { // valid date
+      this.policyForm.patchValue({ job: { [dateType]: { date: date.formatted } } });
+    }
+  }
+
+  handleDateInputChange(field: IMyInputFieldChanged, dateType: string): void {
+    const control: AbstractControl = this.policyForm.get('job').get(dateType).get('date');
+    control.setErrors(field.valid || field.value ===  '' ? null : {
+      invalidDate: !field.valid
+    });
   }
 
   handlePolicyTypeChange(radioItem: RadioItem) {
@@ -530,14 +635,17 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   validateTime = (formGroup: FormGroup) => {
-    if (!(formGroup && formGroup.controls)) {
+    if (!(formGroup && formGroup.controls && formGroup.parent)) {
       return null;
     }
-    const timeControl = formGroup.controls.time;
+    const parentControls = formGroup.parent.controls;
+    const startTimeValue = parentControls['startTime'].value.date;
+    const endTimeValue = parentControls['endTime'].value.date;
+    const timeControl = parentControls['startTime'].controls.time;
     const dateFieldValue = formGroup.controls.date.value;
     const timeFieldValue = timeControl.value;
     timeControl.setErrors(null);
-    if (dateFieldValue) {
+    if (dateFieldValue && this.startOption === this.policyStart.ON_SCHEDULE) {
       const mDate = moment(dateFieldValue);
       if (this.policyForm && this.policyForm.controls['job']['controls'].unit) {
         const jobControls = this.policyForm.controls['job']['controls'];
@@ -555,6 +663,10 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       const dateWithTime = this.setTimeForDate(mDate.format(), timeFieldValue);
       if (dateWithTime.isBefore(moment())) {
         timeControl.setErrors({ lessThanCurrent: true });
+        return null;
+      }
+      if (startTimeValue && endTimeValue && moment(endTimeValue).isBefore(moment(startTimeValue))) {
+        timeControl.setErrors({greaterThanEndTime: true});
         return null;
       }
     }
@@ -576,5 +688,19 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         s.unsubscribe();
       }
     });
+    const requestIds = Object.keys(this.databaseTablesLoadingMap).map(id => this.tableRequestPrefix + id);
+    this.store.dispatch(removeProgressState(requestIds));
+  }
+
+  onDatabaseTablesCollapsed(event: DatabaseTablesCollapsedEvent): void {
+    const { database, collapsed } = event;
+    const databaseId = database.entityId;
+    if (!(databaseId in this.databaseTablesLoadingMap)) {
+      this.store.dispatch(loadTables({
+        clusterId: database.clusterId,
+        databaseId: database.name
+      }, { requestId: this.tableRequestPrefix + database.entityId}));
+      this.databaseTablesLoadingMap[databaseId] = {isInProgress: true} as ProgressState;
+    }
   }
 }

@@ -1,9 +1,23 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package domain
 
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, Location}
+import com.hortonworks.dataplane.commons.domain.Entities.{
+  DataplaneCluster,
+  Location
+}
 import domain.API.UpdateError
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.JsValue
@@ -25,30 +39,45 @@ class DpClusterRepo @Inject()(
   val Locations = TableQuery[LocationsTable]
   val DataplaneClusters = TableQuery[DpClustersTable]
 
-
-  def update(dl: DataplaneCluster):Future[(DataplaneCluster,Boolean)] = {
-    if(dl.id.isEmpty)
-      insert(dl).map((_,true))
+  def update(dl: DataplaneCluster): Future[(DataplaneCluster, Boolean)] = {
+    if (dl.id.isEmpty)
+      insert(dl).map((_, true))
     else {
       findById(dl.id.get).flatMap { dpc =>
         if (dpc.isDefined) {
           // Found an entity, only update applicable fields and return
           db.run(
-            DataplaneClusters.filter(_.id === dl.id)
-              .map(r => (r.dcName, r.description, r.ambariUrl, r.locationId, r.name,r.properties,r.userId,r.updated))
-              .update(dl.dcName, dl.description, dl.ambariUrl, dl.location, dl.name,dl.properties,dl.createdBy,Some(LocalDateTime.now()))
-
-          ).flatMap { v =>
-            if (v > 0) findById(dl.id.get).map(r => (r.get,false))
-            else Future.failed(UpdateError())
-          }
+              DataplaneClusters
+                .filter(_.id === dl.id)
+                .map(
+                  r =>
+                    (r.dcName,
+                     r.description,
+                     r.ambariUrl,
+                     r.locationId,
+                     r.name,
+                     r.properties,
+                     r.userId,
+                     r.updated))
+                .update(dl.dcName,
+                        dl.description,
+                        dl.ambariUrl,
+                        dl.location,
+                        dl.name,
+                        dl.properties,
+                        dl.createdBy,
+                        Some(LocalDateTime.now()))
+            )
+            .flatMap { v =>
+              if (v > 0) findById(dl.id.get).map(r => (r.get, false))
+              else Future.failed(UpdateError())
+            }
         } else {
-          insert(dl).map((_,true))
+          insert(dl).map((_, true))
         }
       }
     }
   }
-
 
   def getLocation(id: Long): Future[Option[Location]] = {
     db.run(Locations.filter(_.id === id).result.headOption)
@@ -67,11 +96,11 @@ class DpClusterRepo @Inject()(
   }
 
   def findByAmbariIp(ambariIp: String): Future[Option[DataplaneCluster]] = {
-    db.run(DataplaneClusters.filter(_.ambariIpAddress === ambariIp).result.headOption)
-  }
-
-  def deleteById(dpClusterId: Long): Future[Int] = {
-    db.run(DataplaneClusters.filter(_.id === dpClusterId).delete)
+    db.run(
+      DataplaneClusters
+        .filter(_.ambariIpAddress === ambariIp)
+        .result
+        .headOption)
   }
 
   def insert(dpCluster: DataplaneCluster): Future[DataplaneCluster] = {
@@ -98,24 +127,30 @@ class DpClusterRepo @Inject()(
 
   def updateStatus(dpCluster: DataplaneCluster): Future[Int] = {
     db.run(
-      DataplaneClusters
-        .filter(_.id === dpCluster.id)
-        .map(r => (r.state, r.updated))
-        .update(dpCluster.state, Some(LocalDateTime.now())))
+        DataplaneClusters
+          .filter(_.id === dpCluster.id)
+          .map(r => (r.state, r.updated))
+          .update(dpCluster.state, Some(LocalDateTime.now())))
       .map(r => r)
   }
 
+  def deleteCluster(clusterId: Long) =
+    db.run {
+      sql"""SELECT * FROM dataplane.dp_cluster_delete($clusterId)""".as[Int]
+    }
+
+
   private def getLocationsByQuery(query: String): Future[List[Location]] = {
-    implicit val getLocationResult = GetResult(r => Location(
-      r.nextLongOption,
-      r.nextString,
-      r.nextString,
-      r.nextString,
-      r.nextFloat,
-      r.nextFloat)
-    )
+    implicit val getLocationResult = GetResult(
+      r =>
+        Location(r.nextLongOption,
+                 r.nextString,
+                 r.nextString,
+                 r.nextString,
+                 r.nextFloat,
+                 r.nextFloat))
     db.run(
-      sql"""select  l.id, l.city, l.province, l.country, l.latitude, l.longitude
+        sql"""select  l.id, l.city, l.province, l.country, l.latitude, l.longitude
             from dataplane.locations as l
             where
               lower(l.city) || ', ' || lower(l.country) like ${query.toLowerCase} || '%'
@@ -126,21 +161,22 @@ class DpClusterRepo @Inject()(
               or
               lower(l.country) like ${query.toLowerCase} || '%'
             limit 20""".as[Location]
-    ).map(v => v.toList)
+      )
+      .map(v => v.toList)
   }
 
-  private def  getAllLocations(): Future[List[Location]] = db.run {
+  private def getAllLocations(): Future[List[Location]] = db.run {
     Locations.to[List].result
   }
 
   def getLocations(query: Option[String]): Future[List[Location]] =
     query match {
       case Some(query) => getLocationsByQuery(query)
-      case None => getAllLocations()
+      case None        => getAllLocations()
     }
 
   final class LocationsTable(tag: Tag)
-    extends Table[Location](tag, Some("dataplane"), "locations") {
+      extends Table[Location](tag, Some("dataplane"), "locations") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
     def city = column[String]("city")
@@ -158,7 +194,7 @@ class DpClusterRepo @Inject()(
   }
 
   final class DpClustersTable(tag: Tag)
-    extends Table[DataplaneCluster](tag, Some("dataplane"), "dp_clusters") {
+      extends Table[DataplaneCluster](tag, Some("dataplane"), "dp_clusters") {
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
     def name = column[String]("name")
@@ -195,27 +231,20 @@ class DpClusterRepo @Inject()(
 
     def * =
       (id,
-        name,
-        dcName,
-        description,
-        ambariUrl,
-        ambariIpAddress,
-        locationId,
-        userId,
-        properties,
-        state,
-        isDataLake,
-        knoxEnabled,
-        knoxUrl,
-        created,
-        updated) <> ((DataplaneCluster.apply _).tupled, DataplaneCluster.unapply)
+       name,
+       dcName,
+       description,
+       ambariUrl,
+       ambariIpAddress,
+       locationId,
+       userId,
+       properties,
+       state,
+       isDataLake,
+       knoxEnabled,
+       knoxUrl,
+       created,
+       updated) <> ((DataplaneCluster.apply _).tupled, DataplaneCluster.unapply)
   }
 
 }
-
-
-
-
-
-
-

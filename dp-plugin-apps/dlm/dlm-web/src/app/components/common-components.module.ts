@@ -22,7 +22,7 @@ import { CardComponent } from './card/card.component';
 import { SearchInputComponent } from './search-input/search-input.component';
 import { DropdownComponent } from './dropdown/dropdown.component';
 import { ClusterCardComponent } from './cluster-card/cluster-card.component';
-import { StatusColumnComponent } from './table-columns/status-column/status-column.component';
+import { StatusColumnComponent } from './table-columns/policy-status-column/policy-status-column.component';
 import { IconColumnComponent } from './table-columns/icon-column/icon-column.component';
 import { DoughnutChartComponent } from './doughnut-chart/doughnut-chart.component';
 import { FormFieldComponent } from './forms/form-field/form-field.component';
@@ -50,6 +50,9 @@ import { HortonStyleModule } from 'common/horton-style.module';
 import { ConfirmationModalContainerComponent } from './confirmation-modal/confirmation-modal-container.component';
 import { EventEntityLinkComponent } from './event-entity-link/event-entity-link.component';
 import { NotificationsContainerComponent } from './notifications-container/notifications-container.component';
+import { TransferredObjectsComponent } from './table-columns/transferred-objects/transferred-objects.component';
+import { ServiceStatusIconComponent } from './service-status-icon/service-status-icon.component';
+import { FieldLabelComponent } from './forms/field-label/field-label.component';
 
 @NgModule({
   imports: [
@@ -103,7 +106,10 @@ import { NotificationsContainerComponent } from './notifications-container/notif
     HelpLinkComponent,
     ConfirmationModalContainerComponent,
     EventEntityLinkComponent,
-    NotificationsContainerComponent
+    NotificationsContainerComponent,
+    TransferredObjectsComponent,
+    ServiceStatusIconComponent,
+    FieldLabelComponent
   ],
   exports: [
     CardComponent,
@@ -139,7 +145,10 @@ import { NotificationsContainerComponent } from './notifications-container/notif
     HelpLinkComponent,
     ConfirmationModalContainerComponent,
     EventEntityLinkComponent,
-    NotificationsContainerComponent
+    NotificationsContainerComponent,
+    TransferredObjectsComponent,
+    ServiceStatusIconComponent,
+    FieldLabelComponent
   ]
 })
 export class CommonComponentsModule {}

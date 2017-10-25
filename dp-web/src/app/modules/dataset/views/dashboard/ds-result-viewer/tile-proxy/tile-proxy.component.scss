@@ -1,3 +1,14 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 @import "../../../../../../../styles/variables";
 
 .tileProxy{
@@ -52,12 +63,15 @@
   border-top:1px solid $iron;
   background-color: $alabaster;
   color: $dove-gray;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .tileProxy .footer .division {
   width:49%;
   height:100%;
-  float: left;
   display:table;
 }
 
@@ -70,4 +84,8 @@
 
 .tileProxy .footer .border-left {
   border-left:1px solid $iron;
+}
+
+.dataset-item__action {
+  padding: 5px;
 }

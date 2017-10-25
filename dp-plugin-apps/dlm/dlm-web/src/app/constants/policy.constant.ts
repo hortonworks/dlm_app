@@ -10,6 +10,7 @@
 export const HDFS = 'FS';
 export const HIVE = 'HIVE';
 export const HBASE = 'HBASE';
+export const HDFS_SNAPSHOT = 'FS_SNAPSHOT';
 
 export const SCHEDULE = 'SUBMIT_AND_SCHEDULE';
 export const SUBMIT = 'SUBMIT';
@@ -22,18 +23,27 @@ export const HOURS = 'HOURS';
 export const DAYS = 'DAYS';
 export const WEEKS = 'WEEKS';
 
-export const MONDAY = 1;
-export const TUESDAY = 2;
-export const WEDNESDAY = 3;
-export const THURSDAY = 4;
-export const FRIDAY = 5;
-export const SATURDAY = 6;
-export const SUNDAY = 7;
+export const START_NOW = 'START_NOW';
+export const ON_SCHEDULE = 'ON_SCHEDULE';
+
+export const MONDAY = '1';
+export const TUESDAY = '2';
+export const WEDNESDAY = '3';
+export const THURSDAY = '4';
+export const FRIDAY = '5';
+export const SATURDAY = '6';
+export const SUNDAY = '0';
 
 export const POLICY_TYPES = {
   HDFS,
   HIVE,
   HBASE
+};
+
+export const POLICY_EXECUTION_TYPES = {
+  HDFS,
+  HDFS_SNAPSHOT,
+  HIVE
 };
 
 export const POLICY_SUBMIT_TYPES = {
@@ -81,4 +91,14 @@ export const POLICY_DAYS_LABELS = {
   [FRIDAY]: 'Friday',
   [SATURDAY]: 'Saturday',
   [SUNDAY]: 'Sunday'
+};
+
+export enum POLICY_MODES {
+  READ_ONLY,
+  READ_WRITE
+}
+
+export const POLICY_START = {
+  START_NOW,
+  ON_SCHEDULE
 };

@@ -1,9 +1,18 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package controllers
 
-import java.sql.SQLException
-
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors}
-import domain.API.{EntityNotFound, UpdateError}
+import domain.API.{AlreadyExistsError, EntityNotFound, UpdateError}
 import org.postgresql.util.PSQLException
 import play.api.libs.json.Json
 import play.api.libs.json.Json.JsValueWrapper
@@ -38,6 +47,7 @@ trait JsonAPI extends Controller {
       }
     case e:EntityNotFound => Future.successful(notFound)
     case e:UpdateError => Future.successful(NoContent)
+    case e: AlreadyExistsError => Future.successful(Conflict)
     case e: Exception =>
       Future.successful(InternalServerError(Json.toJson(wrapErrors("500",e.getMessage))))
   }

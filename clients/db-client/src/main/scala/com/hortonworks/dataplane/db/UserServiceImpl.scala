@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.db
 
 import javax.inject.Singleton
@@ -29,16 +40,17 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
   override def loadUserById(id: String): Future[Either[Errors, User]] = {
-    ws.url(s"$url/users?id=$id")
+    ws.url(s"$url/users/$id")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map { res =>
-        mapToUser(res)
+        mapToOneUser(res)
       }
   }
   private def mapToUserInfo(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").validate[UserInfo].get)
+      case 404 => createEmptyErrorResponse
       case _ => mapErrors(res)
     }
   }
@@ -50,12 +62,20 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
-  private def mapToUser(res: WSResponse) = {
+  private def mapToOneUser(res: WSResponse) = {
     res.status match {
-      case 200 => Right((res.json \ "results")(0).validate[User].get)
+      case 200 => Right((res.json \ "results").validate[User].get)
       case _ => mapErrors(res)
     }
   }
+
+  private def mapToUser(res: WSResponse) = {
+    res.status match {
+      case 200 => Right((res.json \ "results").head.validate[User].get)
+      case _ => mapErrors(res)
+    }
+  }
+
   private def mapToUsers(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results").validate[Seq[User]].get)
@@ -130,6 +150,14 @@ class UserServiceImpl(config: Config)(implicit ws: WSClient)
       .post(Json.toJson(user))
       .map(mapToUser)
   }
+
+  override def updateUser(user: User): Future[Either[Errors, User]] = {
+    ws.url(s"$url/users/${user.id}")
+      .withHeaders("Accept" -> "application/json")
+      .put(Json.toJson(user))
+      .map(mapToOneUser)
+  }
+
   override def addUserWithRoles(userInfo: UserInfo): Future[Either[Errors, UserInfo]] = {
     ws.url(s"$url/users/withroles")
       .withHeaders("Accept" -> "application/json")

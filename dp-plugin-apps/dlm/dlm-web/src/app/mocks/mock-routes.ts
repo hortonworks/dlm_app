@@ -42,7 +42,7 @@ export const routes: MockRoute[] = [
   new MockRoute('events', 'events.json'),
 
   // HDFS files list
-  new MockRoute('clusters/:clusterId/webhdfs/file', 'files.json'),
+  new MockRoute('clusters/:clusterId/hdfs/file', 'files.json'),
 
   // HIVE databases
   new MockRoute('clusters/:clusterId/hive/databases', 'hive_databases.json'),
@@ -55,5 +55,8 @@ export const routes: MockRoute[] = [
   new MockRoute('clusters/:clusterId/logs', 'event_log.json'),
 
   // User Detail
-  new MockRoute('auth/userDetail', 'user_detail.json')
+  new MockRoute('auth/userDetail', 'user_detail.json'),
+
+  // Beacon admin status
+  new MockRoute('beacon/admin/status', 'admin_status.json')
 ];

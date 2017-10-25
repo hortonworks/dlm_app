@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Injectable} from '@angular/core';
 import {IdentityService} from './identity.service';
 import {Persona, PersonaTabs} from '../models/header-data';
@@ -17,7 +28,7 @@ export class RbacService {//role based access control
   constructor(private configService: ConfigurationService) {
     this.landingPageMap.set('SUPERADMIN', '/infra');
     this.landingPageMap.set('SUPERADMIN_ONBOARD', '/onboard/welcome');
-    this.landingPageMap.set('CURATOR', '/datasteward/dataset');
+    this.landingPageMap.set('CURATOR', '/datasteward/collections');
     this.landingPageMap.set('INFRAADMIN', '/infra');
     this.landingPageMap.set('INFRAADMIN_ONBOARD', '/onboard');
   }
@@ -42,19 +53,19 @@ export class RbacService {//role based access control
   private getPersonaMap() {
     let personaMap = new Map();
     personaMap.set('SUPERADMIN', [
-      new Persona('Dataplane Admin', [
-        new PersonaTabs('Clusters', 'infra', 'fa-sitemap'),
-        new PersonaTabs('Users', 'infra/usermgmt', 'fa-users'),
-        new PersonaTabs('Services', 'infra/services', 'fa-arrows-h')
-      ], ['/onboard', '/onboard/welcome', '/onboard/configure', '/onboard/adduser'], '', 'infra-logo.png')
+      new Persona('DataPlane Admin', [
+        new PersonaTabs('Clusters', 'infra', 'fa-cubes'),
+        new PersonaTabs('Users', 'infra/manage-access', 'fa-users'),
+        new PersonaTabs('Services', 'infra/services', 'fa-th-large')
+      ], ['/onboard', '/onboard/welcome', '/onboard/identity-provider', '/onboard/users-and-groups', '/profile/change-password'], '', 'infra-logo-white.png')
     ]);
     personaMap.set('CURATOR', [
       new Persona('Data Steward Studio', [
-        new PersonaTabs('Asset Collection', 'datasteward/dataset', 'fa-cubes', true),
+        new PersonaTabs('Asset Collection', 'datasteward', 'fa-cubes', true),
         // new PersonaTabs('Unclassified', 'unclassified', 'fa-cube'),
         // new PersonaTabs('Assets', 'assets', 'fa-server'),
         // new PersonaTabs('Audits', 'audits', 'fa-sticky-note-o fa-sticky-note-search')
-      ], ['/onboard', '/assets'], '', 'steward-logo.png', !!this.user && this.user.services.indexOf('dss') > -1)]);
+      ], ['/assets'], '', 'steward-logo.png', !!this.user && this.user.services.indexOf('dss') > -1)]);
     personaMap.set('INFRAADMIN', [
       new Persona('Infra Admin', [
         new PersonaTabs('Clusters', 'infra', 'fa-sitemap')
@@ -90,11 +101,7 @@ export class RbacService {//role based access control
           }
         });
       } else if (this.hasRole('INFRAADMIN')) {
-        if (isLakeInitialized) {
-          return this.getLandingInternal(observer, 'INFRAADMIN');
-        } else {
-          return this.getLandingInternal(observer, 'INFRAADMIN_ONBOARD');
-        }
+        return this.getLandingInternal(observer, 'INFRAADMIN');
       } else if (this.hasRole('CURATOR')) {
         return this.getLandingInternal(observer, 'CURATOR');
       }

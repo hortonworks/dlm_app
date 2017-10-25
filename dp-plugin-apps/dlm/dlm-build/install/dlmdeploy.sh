@@ -14,6 +14,14 @@ set -e
 DEFAULT_VERSION=0.0.1-latest
 CONSUL_CONTAINER="dp-consul-server"
 
+source_dp_config () {
+    # Expected to be present in RPM deployments
+    DP_CONFIG_FILE_PATH="/usr/dp/current/core/bin/config.env.sh"
+    if [ -f "${DP_CONFIG_FILE_PATH}" ]; then
+        source "${DP_CONFIG_FILE_PATH}";
+    fi
+}
+
 init_network() {
     IS_NETWORK_PRESENT="false"
     docker network inspect --format "{{title .ID}}" dp >> install.log 2>&1 && IS_NETWORK_PRESENT="true"
@@ -43,24 +51,41 @@ destroy() {
     docker rm --force dlm-app
 }
 
+get_bind_address_from_consul_container() {
+    CONSUL_ID=$(docker ps --all --quiet --filter "name=$CONSUL_CONTAINER")
+    if [ -z ${CONSUL_ID} ]; then
+        return 0
+    fi
+    CONSUL_ARGS=$(docker inspect -f {{.Args}} ${CONSUL_ID})
+    for word in $CONSUL_ARGS; do
+        if [[ $word == -bind* ]]
+        then
+            BIND_ADDR=${word##*=}
+        fi
+    done
+    CONSUL_HOST=${BIND_ADDR};
+}
 
-read_consul_host() {
-    echo "Enter the Host IP Address (Consul will bind to this host):"
-    read HOST_IP;
-    export CONSUL_HOST=$HOST_IP;
+read_consul_host(){
+    if [ -z "${CONSUL_HOST}" ]; then
+        get_bind_address_from_consul_container
+    fi
+    if [ -z "${CONSUL_HOST}" ]; then
+        echo "Enter the Consul Host IP Address:"
+        read HOST_IP;
+        CONSUL_HOST=$HOST_IP;
+    fi
+    echo "using CONSUL_HOST: ${CONSUL_HOST}"
 }
 
 init_app() {
-    if [ "$CONSUL_HOST" == "" ]; then
-        read_consul_host
-    fi
+    read_consul_host
     docker start dlm-app >> install.log 2>&1 || \
         docker run \
             --name dlm-app \
             --network dp \
-            --publish 9011:9011 \
             --detach \
-            --env CONSUL_HOST \
+            --env "CONSUL_HOST=$CONSUL_HOST" \
             --env DLM_APP_HOME="/usr/dlm-app" \
             hortonworks/dlm-app:$VERSION
 }
@@ -89,20 +114,6 @@ load_image() {
 
 upgrade() {
     destroy || echo "App is not up."
-
-    # destroy consul to flush services
-    echo "Destroying Consul"
-    docker rm --force $CONSUL_CONTAINER || echo "Consul is not up."
-
-    # bring consul back up
-    echo "Initializing Consul"
-    read_consul_host
-    docker run \
-        --name $CONSUL_CONTAINER \
-        --network host \
-        --detach \
-        consul:0.8.5 \
-        agent -server -ui -bootstrap -bind=$CONSUL_HOST -client=$CONSUL_HOST
 
     # init all but db and knox
     init_app
@@ -139,6 +150,7 @@ then
     exit 0;
 else
     VERSION=$(print_version)
+    source_dp_config
     init_network
 
     case "$1" in

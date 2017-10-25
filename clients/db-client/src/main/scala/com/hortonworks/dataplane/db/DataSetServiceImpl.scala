@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.db
 
 import com.hortonworks.dataplane.commons.domain.Entities._
@@ -19,8 +30,12 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
-  override def list(): Future[Either[Errors, Seq[Dataset]]] = {
-    ws.url(s"$url/datasets")
+  override def list(name: Option[String]): Future[Either[Errors, Seq[Dataset]]] = {
+    val uri = (name match {
+      case Some(name) => s"$url/datasets?name=$name"
+      case None => s"$url/datasets"
+    })
+    ws.url(uri)
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToDataSets)
@@ -90,11 +105,11 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToDataSetAndCategories)
   }
 
-  override def delete(datasetId: String): Future[Either[Errors, Dataset]] = {
+  override def delete(datasetId: String): Future[Either[Errors, Long]] = {
     ws.url(s"$url/datasets/$datasetId")
       .withHeaders("Accept" -> "application/json")
       .delete()
-      .map(mapToDataSet)
+      .map(mapToLong)
   }
 
   private def mapToDataSets(res: WSResponse) = {
@@ -111,10 +126,18 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
     }
   }
 
+  private def mapToLong(res: WSResponse) = {
+    res.status match {
+      case 200 => Right((res.json \ "results").validate[Long].get)
+      case _ => mapErrors(res)
+    }
+  }
+
   private def mapToDataSetAndCategories(res: WSResponse) = {
     res.status match {
       case 200 => Right((res.json \ "results" \ "data").validate[DatasetAndCategories].get)
       case 404 => Left(Errors(Seq(Error("404", "Resource not found"))))
+      case 409 => Left(Errors(Seq(Error("409", "Conflict"))))
       case _ => mapErrors(res)
     }
   }

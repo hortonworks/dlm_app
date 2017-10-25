@@ -33,6 +33,9 @@
   * `sh runDbService.sh` for db service
   * `sh runDpApp.sh` for app
   * `sh runClusterService.sh` for cluster service
+
+  `dp-app` and `cluster-service` need to be supplied with keystore path and password as `dp.keystore.path` and `Ddp.keystore.password` as environment variables. This is already handled if you have been using pre-provided scripts.
+
 5. Start UI
   * `yarn install --pure-lockfile`
   * `yarn run dev`

@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.cs.sync
 
 import java.util.UUID
@@ -8,12 +19,7 @@ import akka.actor.{Actor, ActorRef, ActorSystem, PoisonPill, Props}
 import com.hortonworks.dataplane.commons.domain.Entities
 import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, HJwtToken}
 import com.hortonworks.dataplane.cs.sync.TaskStatus.TaskStatus
-import com.hortonworks.dataplane.cs.{
-  AmbariDataplaneClusterInterfaceImpl,
-  Credentials,
-  StorageInterface,
-  StorageInterfaceImpl
-}
+import com.hortonworks.dataplane.cs._
 import com.hortonworks.dataplane.db.Webservice.DpClusterService
 import com.hortonworks.dataplane.knox.Knox.KnoxConfig
 import com.hortonworks.dataplane.knox.KnoxApiExecutor
@@ -24,12 +30,12 @@ import play.api.libs.ws.WSClient
 
 import scala.concurrent.Future
 import scala.util.Try
-
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class DpClusterSync @Inject()(val actorSystem: ActorSystem,
                               val config: Config,
                               val storageInterface: StorageInterface,
+                              val credentialInterface: CredentialInterface,
                               val dpClusterService: DpClusterService,
                               val wSClient: WSClient) {
 
@@ -56,7 +62,7 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
       hJwtToken: Option[HJwtToken]): Future[Cluster] = {
     implicit val token = hJwtToken
     val clusters = for {
-      creds <- loadCredentials
+      creds <- credentialInterface.getCredential("dp.credential.ambari")
       interface <- Future.successful(
         AmbariDataplaneClusterInterfaceImpl(dataplaneCluster,
                                             wSClient,
@@ -139,6 +145,7 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
                 ClusterData(dataplaneCluster, cl),
                 wSClient,
                 storageInterface,
+                credentialInterface,
                 completionCallback))
             actorRef.set(sync)
             storageInterface.updateDpClusterStatus(dataplaneCluster.copy(state = Some("SYNC_IN_PROGRESS")))
@@ -150,16 +157,6 @@ class DpClusterSync @Inject()(val actorSystem: ActorSystem,
         }
     }
 
-  }
-
-  private def loadCredentials = {
-    val creds = for {
-      user <- storageInterface.getConfiguration("dp.ambari.superuser")
-      pass <- storageInterface.getConfiguration("dp.ambari.superuser.password")
-    } yield {
-      Credentials(user, pass)
-    }
-    creds
   }
 
 }

@@ -1,3 +1,14 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 @import "../../../../../../styles/variables";
 
 .hwx-title {
@@ -32,4 +43,20 @@ footer {
 
 .markMandatory{
   color: $burnt-sienna;
+}
+
+.dp-input-and-message-wrapper {
+  display: flex;
+  align-items: center;
+
+  .validation-error {
+    color: $roman-red;
+    border: 1px solid $roman-red;
+    outline: none;
+  }
+
+  .error-message {
+    margin-left: 15px;
+    color: $roman-red;
+  }
 }

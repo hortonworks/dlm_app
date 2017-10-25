@@ -21,8 +21,9 @@ export class FormFieldComponent implements OnInit {
   @Input() label: string;
   @Input() maxLengthValue: string|number;
   @ContentChild(FormFieldDirective) formField: FormFieldDirective;
-  @Input() fieldClass = 'col-md-6';
-  @Input() errorClass = 'col-md-6';
+  @Input() fieldClass = 'col-xs-6';
+  @Input() errorClass = 'col-xs-6';
+  @Input() required = false;
   @HostBinding('class') hostClass = 'dlm-form-field';
 
   labelTranslate: object;

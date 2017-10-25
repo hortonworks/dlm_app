@@ -1,7 +1,0 @@
-#!/bin/sh
-if [ -z "$CONSUL_HOST" ]; then
-    echo "Need to set CONSUL_HOST"
-    exit 1
-fi
-exec 2>&1
-/usr/bin/consul-template -consul=$CONSUL_HOST:8500 -wait=5s -template="/etc/ctmpl:/etc/sv/nginx/nginx.conf:service nginx reload"

@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package services
 
 import javax.inject.{Inject, Named}
@@ -11,13 +22,13 @@ import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import play.api.Logger
+import play.api.{Logger, Configuration}
 
 @Singleton
 class AmbariService @Inject()(
     @Named("clusterAmbariService") ambariWebService: AmbariWebService,
     private val wSClient: WSClient,
-    private val configuration: play.api.Configuration) {
+    private val configuration: Configuration) {
 
   import com.hortonworks.dataplane.commons.domain.Ambari._
 
@@ -27,6 +38,9 @@ class AmbariService @Inject()(
     ambariWebService.checkAmbariStatus(ambariEndpoint)
   }
 
+  def getClusterServices(dpcwServices: DpClusterWithDpServices)(implicit token:Option[HJwtToken]):Future[Either[Errors,Seq[ServiceInfo]]] = {
+    ambariWebService.getAmbariServicesInfo(dpcwServices)
+  }
   def getClusterDetails(ambariDetailRequest: AmbariDetailRequest)(implicit hJwtToken: Option[HJwtToken]) = {
     ambariWebService.getAmbariDetails(ambariDetailRequest)
   }

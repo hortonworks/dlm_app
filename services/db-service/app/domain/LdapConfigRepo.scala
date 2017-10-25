@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package domain
 
 import com.google.inject.{Inject, Singleton}
@@ -19,26 +30,25 @@ class LdapConfigRepo @Inject()(
     LdapConfigs.to[List].result
   }
 
-  def insert(ldapConfig: LdapConfiguration)(implicit ec: ExecutionContext): Future[LdapConfiguration] = {
-    if (ldapConfig.id.isDefined) {
-      db.run {
-        (LdapConfigs returning LdapConfigs).insertOrUpdate(ldapConfig)
-      }.map { res =>
-        ldapConfig
-      }
-    } else {
-      db.run {
-        (LdapConfigs returning LdapConfigs) += ldapConfig
+  def insert(ldapConfig: LdapConfiguration)(implicit ec: ExecutionContext): Future[LdapConfiguration] = db.run {
+    (LdapConfigs returning LdapConfigs) += ldapConfig
+  }
+
+  def update(ldapConfig: LdapConfiguration)(implicit ec: ExecutionContext): Future[Boolean]={
+    db.run(LdapConfigs.filter(_.id === ldapConfig.id).result).flatMap{curentConfig=>
+      val updatedConfig=curentConfig.head.copy(ldapUrl = ldapConfig.ldapUrl)
+           .copy(bindDn = ldapConfig.bindDn)
+      db.run(LdapConfigs.update(updatedConfig)).map{resp=>
+        resp>0
       }
     }
-
   }
 
   final class LdapConfigTable(tag: Tag) extends Table[LdapConfiguration](tag, Some("dataplane"), "ldap_configs") {
 
     def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
-    def ldapUrl = column[String]("url")
+    def ldapUrl = column[Option[String]]("url")
 
     def bindDn = column[Option[String]]("bind_dn")
 

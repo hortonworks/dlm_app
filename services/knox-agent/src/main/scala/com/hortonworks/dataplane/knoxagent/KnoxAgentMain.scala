@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.knoxagent
 
 import java.io.{File, FileWriter}
@@ -12,6 +23,7 @@ import play.api.libs.ws.ahc.AhcWSClient
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
 import akka.event.Logging
+import sys.process._
 
 object KnoxAgentMain {
 
@@ -22,7 +34,6 @@ object KnoxAgentMain {
   private val logger = Logging(system, "KnoxAgent")
 
   def main(args: Array[String]): Unit = {
-    logger.info("evnhome=" + sys.env.get("sso.toplology.path"))
     logger.info("knox agent main started")
     process
       .map {
@@ -44,10 +55,7 @@ object KnoxAgentMain {
   }
   private def process: Future[Either[Throwable, Boolean]] = {
     try {
-      val config = ConfigFactory.parseResources(
-        KnoxAgentMain.getClass.getClassLoader,
-        "application.conf")
-      //TODO may be load config from command line args specs
+      val config = ConfigFactory.load()
       val gateway: Gateway = new Gateway(config, null, null)
       getGatewayService(gateway).flatMap {
         case Left(throwable) => Future.successful(Left(throwable))
@@ -71,14 +79,17 @@ object KnoxAgentMain {
         case Some(knoxConfig) => {
           try {
 
-            val ssoTopologyPath = sys.env.get("sso.toplology.path") match {
-              case Some(value) => value
-              case None => config.getString("sso.toplology.path")
-            }
+            val ssoTopologyPath = config.getString("sso.toplology.path")
             logger.info(s"filepath==$ssoTopologyPath")
-            val knoxSsoTopologyXml = TopologyGenerator.configure(knoxConfig)
-            writeTopologyToFile(knoxSsoTopologyXml, ssoTopologyPath)
-            Right(true)
+            val passwordUpdated=updateBindPassword(config,knoxConfig)
+            if (!passwordUpdated){
+              logger.error("updating bind password failed")
+              Right(false)
+            }else{
+              val knoxSsoTopologyXml = TopologyGenerator.configure(knoxConfig)
+              writeTopologyToFile(knoxSsoTopologyXml, ssoTopologyPath)
+              Right(true)
+            }
           } catch {
             case e: Exception =>
               logger.error(e, e.getMessage);
@@ -90,6 +101,15 @@ object KnoxAgentMain {
           Right(false)
         }
       }
+  }
+  private def updateBindPassword(config: Config,knoxConfig:KnoxConfig): Boolean ={
+    val p = Promise[Boolean]
+    val args=s" create-alias ldcSystemPassword --cluster knoxsso --value ${knoxConfig.password.get}"
+    val knoxServerPath=config.getString("knox.server.path").trim
+    val knoxClicommand=config.getString("knox.cli.cmd").trim
+    val setPassWordCmd=s"${knoxServerPath}${knoxClicommand} ${args}"
+    val result:Int = setPassWordCmd !;
+    result==0
   }
   private def getGatewayService(
       gateway: Gateway): Future[Either[Throwable, ZuulServer]] = {

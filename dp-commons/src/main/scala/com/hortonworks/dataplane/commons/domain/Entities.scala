@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.commons.domain
 
 import java.time.LocalDateTime
@@ -118,6 +129,8 @@ object Entities {
                        userId: Option[Long],
                        groupId: Option[Long])
 
+  case class UserGroups(username: String, groups: Seq[Group])
+
   case class UserRoles(username: String, roles: Seq[String])
 
   case class GroupRoles(groupName: String, roles: Seq[String])
@@ -159,6 +172,10 @@ object Entities {
       knoxUrl: Option[String],
       created: Option[LocalDateTime] = Some(LocalDateTime.now()),
       updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+
+  case class DpClusterWithDpServices(
+      dataplaneCluster: DataplaneCluster,
+      dpServices: Seq[String])
 
   case class Category(
       id: Option[Long] = None,
@@ -232,7 +249,7 @@ object Entities {
                  created: Option[LocalDateTime] = Some(LocalDateTime.now()),
                  updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
-  case class ServiceDependency(serviceName: String, dependencies: Seq[String])
+  case class ServiceDependency(serviceName: String, mandatoryDependencies: Seq[String], optionalDependencies: Seq[String])
 
   case class DpService(skuName: String,
                        enabled: Boolean,
@@ -323,14 +340,14 @@ object Entities {
                                   dataAssets: Seq[DataAsset] = Nil)
   case class LdapConfiguration(
       id: Option[Long],
-      ldapUrl: String,
-      bindDn: Option[String],
-      userSearchBase: Option[String],
-      userSearchAttributeName: Option[String],
-      groupSearchBase: Option[String],
-      groupSearchAttributeName: Option[String],
-      groupObjectClass: Option[String],
-      groupMemberAttributeName: Option[String]
+      ldapUrl: Option[String]=None,
+      bindDn: Option[String]=None,
+      userSearchBase: Option[String]=None,
+      userSearchAttributeName: Option[String]=None,
+      groupSearchBase: Option[String]=None,
+      groupSearchAttributeName: Option[String]=None,
+      groupObjectClass: Option[String]=None,
+      groupMemberAttributeName: Option[String]=None
   )
 
   case class WorkspaceDataCount(asset: Int, notebook: Int)
@@ -385,6 +402,10 @@ object JsonFormatters {
   implicit val locationReads = Json.reads[Location]
   implicit val dpClusterWrites = Json.writes[DataplaneCluster]
   implicit val dpClusterReads = Json.reads[DataplaneCluster]
+
+  implicit val dpClusterWithDpServicesWrites = Json.writes[DpClusterWithDpServices]
+  implicit val dpClusterWithDpServicesReads = Json.reads[DpClusterWithDpServices]
+
   implicit val dpClusterIdentifierWrites =
     Json.writes[DataplaneClusterIdentifier]
   implicit val dpClusterIdentifierReads =

@@ -1,3 +1,14 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div class="container">
   <div class="" *ngIf="enabledAppDetails.length > 0">
     <div class="hwx-title-panel">
@@ -44,8 +55,11 @@
                   </td>
                   <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{cluster.name}}</td>
                   <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">
-                    <button *ngIf="!cluster.dependenciesMet" id="enable-service-{{cluster.dpClusterId}}" class="mdl-button btn-hwx-primary enable-btn" (click)="enableServiceOnCluster(cluster.dpClusterId, enabledApp.service)"> Enable</button>
+                    <button *ngIf="!cluster.dependenciesMet" id="enable-service-{{cluster.dpClusterId}}" class="mdl-button btn-hwx-primary enable-btn" (click)="enableServiceOnCluster(cluster.dpClusterId, enabledApp.service)">{{'pages.services.labels.enable' | translate}}</button>
                     <span *ngIf="cluster.dependenciesMet">{{"pages.services.labels.enabled" | translate}}</span>
+                    <span *ngIf="cluster.dependenciesMet && cluster.optionalDependencies && cluster.optionalDependenciesMet === false">
+                      <button id="add-optional-service-{{cluster.dpClusterId}}" class="mdl-button btn-hwx-secondary additional-service-btn" (click)="enableServiceOnCluster(cluster.dpClusterId, enabledApp.service)">{{'pages.services.labels.addOptionalServices' | translate}}</button>
+                    </span>
                   </td>
                 </tr>
               </ng-container>
@@ -64,7 +78,13 @@
         <div *ngFor="let service of availableServices; let i = index" class="service-item pull-left">
           <div class="logo-wrapper borderBox" title="{{ service.skuName }}">
             <img class="logo-img" [attr.src]="'../../../assets/images/' + service.skuName +'-logo-blue.png'" alt=""/>
-            <button id="enable-{{service.skuName}}-btn" type="button" class="btn-hwx-primary action-btn" (click)="enableService(service)">{{"pages.services.labels.enable" | translate}}</button>
+            <button
+              id="enable-{{service.skuName}}-btn"
+              type="button"
+              class="btn-hwx-primary action-btn"
+              [routerLink]="['/infra/services', service.skuName, 'verify']">
+              {{"pages.services.labels.enable" | translate}}
+            </button>
           </div>
           <div class="service-name hwx-desc"> {{ service.sku.description }}</div>
           <div class="version hwx-inline-desc">v1.0.0</div>

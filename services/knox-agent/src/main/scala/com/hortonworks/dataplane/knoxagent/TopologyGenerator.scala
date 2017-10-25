@@ -1,8 +1,19 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.knoxagent
 
 import java.io.StringWriter
 import javax.xml.parsers.{DocumentBuilder, DocumentBuilderFactory}
-import javax.xml.transform.TransformerFactory
+import javax.xml.transform.{OutputKeys, TransformerFactory}
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 import javax.xml.xpath.{XPath, XPathConstants, XPathFactory}
@@ -26,6 +37,16 @@ object TopologyGenerator {
     }
     None
   }
+  private def createParamElem(doc:Document,name:String,value:String): Node ={
+    val paramElem=doc.createElement("param")
+    val nameElem=doc.createElement("name")
+    nameElem.appendChild(doc.createTextNode(name))
+    paramElem.appendChild(nameElem)
+    val valueElem=doc.createElement("value")
+    valueElem.appendChild(doc.createTextNode(value))
+    paramElem.appendChild(valueElem)
+    paramElem
+  }
 
   def configure(config: KnoxConfig) = {
 
@@ -39,6 +60,15 @@ object TopologyGenerator {
                       config.ldapUrl.get)
     replaceParamValue(authParams.get("main.ldapRealm.contextFactory.url").get,
                       config.ldapUrl.get)
+
+    val gatewayProviders: NodeList = xPath.evaluate("/topology/gateway/provider", doc.getDocumentElement,XPathConstants.NODESET).asInstanceOf[NodeList]
+    val authenticationNode = findByRoleName(gatewayProviders, "authentication")
+    if (config.userSearchBase.isDefined){
+      authenticationNode.get.appendChild(createParamElem(doc,"main.ldapRealm.userSearchBase",config.userSearchBase.get))
+      authenticationNode.get.appendChild(createParamElem(doc,"main.ldapRealm.userSearchAttributeName",config.userSearchAttributeName.get))
+      authenticationNode.get.appendChild(createParamElem(doc,"main.ldapRealm.contextFactory.systemUsername",config.bindDn.get))
+      authenticationNode.get.appendChild(createParamElem(doc,"main.ldapRealm.contextFactory.systemPassword","${ALIAS=ldcSystemPassword}"))
+    }
 
     val ssoServiceParams = getKnoxSsoServiceParams(doc)
     var ttlMilliSecs = config.signedTokenTtl match {
@@ -64,11 +94,13 @@ object TopologyGenerator {
       }
       case None => ""
     }
-    val whitelistRegex="^https?:\\/\\/("+whiteListDomains+"dataplane|localhost|127.0.0.1|0:0:0:0:0:0:0:1|::1)(:[0-9])*.*$"
+    val whitelistRegex="^https?:\\/\\/("+whiteListDomains+"localhost|127.0.0.1|0:0:0:0:0:0:0:1|::1)(:[0-9])*.*$"
     replaceParamValue(ssoServiceParams.get("knoxsso.redirect.whitelist.regex").get,
       whitelistRegex)
     val transformerFactory = TransformerFactory.newInstance
     val transformer = transformerFactory.newTransformer
+    transformer.setOutputProperty(OutputKeys.INDENT, "yes")
+    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4")
     val stringWriter: StringWriter = new StringWriter()
     transformer.transform(new DOMSource(doc), new StreamResult(stringWriter))
     stringWriter.toString

@@ -1,3 +1,14 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 @import "../../../../../../styles/variables";
 
 .container {
@@ -36,7 +47,7 @@
 
 .failure-list {
   padding-left: 32px;
-  margin-top: 0px;
+  margin-top: 0;
 }
 
 .error, .error-list-item {
@@ -45,6 +56,15 @@
 
 .success, .success-list-item {
   color: $forest-green-1;
+}
+
+.optional {
+  color: $jaffa !important;
+}
+
+.warning{
+  background: $concrete;
+  padding: 0 10px 10px;
 }
 
 .margin-0 {

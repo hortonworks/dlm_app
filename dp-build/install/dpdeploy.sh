@@ -1,18 +1,26 @@
 #!/bin/bash
+#
+# /*
+#  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+#  *
+#  * Except as expressly permitted in a written agreement between you or your company
+#  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+#  * reproduction, modification, redistribution, sharing, lending or other exploitation
+#  * of all or any part of the contents of this software is strictly prohibited.
+#  */
+#
 set -e
 
 source $(pwd)/config.env.sh
 
-CERTS_DIR=`dirname $0`/certs
-KNOX_SIGNING_CERTIFICATE=knox-signing.pem
 DEFAULT_VERSION=0.0.1-latest
-KNOX_FQDN=${KNOX_FQDN:-dataplane}
 
 CLUSTER_SERVICE_CONTAINER="dp-cluster-service"
+DB_CONTAINER="dp-database"
 APP_CONTAINERS_WITHOUT_DB="dp-app dp-db-service $CLUSTER_SERVICE_CONTAINER dp-gateway"
 APP_CONTAINERS=$APP_CONTAINERS_WITHOUT_DB
 if [ "$USE_EXT_DB" == "no" ]; then
-    APP_CONTAINERS="dp-database $APP_CONTAINERS"
+    APP_CONTAINERS="$DB_CONTAINER $APP_CONTAINERS"
 fi
 KNOX_CONTAINER="knox"
 CONSUL_CONTAINER="dp-consul-server"
@@ -66,9 +74,15 @@ read_consul_host(){
     echo "using CONSUL_HOST: ${CONSUL_HOST}"
 }
 
+generate_certs() {
+    CERTIFICATE_PASSWORD=${MASTER_PASSWORD}
+
+    source $(pwd)/docker-certificates.sh
+}
+
 init_db() {
     if [ "$USE_EXT_DB" == "yes" ]; then
-        echo "Dataplane is configured to use an external database in config.env.sh. Database initialization is not required and assumed to be done already."
+        echo "DataPlane Service is configured to use an external database in config.env.sh. Database initialization is not required and assumed to be done already."
     else
         source $(pwd)/docker-database.sh
     fi
@@ -83,13 +97,21 @@ list_logs() {
     docker logs "$@"
 }
 
+list_metrics() {
+    echo "{\"service_metrics\": "
+    docker exec -it dp-gateway bash -c "curl http://localhost:8762/service/metrics"
+    echo ",\"gateway_metrics\": "
+    docker exec -it dp-gateway bash -c "curl http://localhost:8762/metrics"
+    echo "}"
+}
+
 migrate_schema() {
     if [ "$USE_EXT_DB" == "no" ]; then
         # start database container
         source $(pwd)/docker-database.sh
 
         # wait for database start
-        sleep 5
+        source $(pwd)/database-check.sh
     fi
 
     # start flyway container and trigger migrate script
@@ -102,7 +124,7 @@ reset_db() {
         source $(pwd)/docker-database.sh
 
         # wait for database start
-        sleep 5
+        source $(pwd)/database-check.sh
     fi
 
     # start flyway container and trigger migrate script
@@ -129,6 +151,43 @@ add_host_entry() {
     fi
 }
 
+utils_update_user_secret() {
+    if [[ $# -ne 1  || ( "$1" != "ambari" && "$1" != "atlas" && "$1" != "ranger" ) ]]; then
+        echo "Invalid arguments."
+        echo "Usage: dpdeploy.sh utils update-user [ambari | atlas | ranger]"
+        return -1
+    else
+        update_user_entry "$@"
+    fi
+}
+
+update_user_entry() {
+    if [ "$MASTER_PASSWORD" == "" ]; then
+        read_master_password
+    fi
+    source $(pwd)/keystore-manage.sh "$@"
+}
+
+utils_reload_app_containers() {
+    # stop containers other than db, consul and knox
+    docker stop $APP_CONTAINERS_WITHOUT_DB
+
+    # start containers other than db, consul and knox
+    echo "Starting Gateway"
+    source $(pwd)/docker-gateway.sh
+
+    echo "Starting DB Service"
+    source $(pwd)/docker-service-db.sh
+
+    echo "Starting Cluster Service"
+    source $(pwd)/docker-service-cluster.sh
+
+    echo "Starting Application API"
+    source $(pwd)/docker-app.sh
+
+    echo "Restart done."
+}
+
 destroy() {
     docker rm --force $APP_CONTAINERS
 }
@@ -141,7 +200,6 @@ destroy_consul(){
 destroy_knox() {
     echo "Destroying Knox"
     docker rm --force $KNOX_CONTAINER
-    rm -rf ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE}
     destroy_consul
 }
 
@@ -168,10 +226,17 @@ init_app() {
 }
 
 read_master_password() {
-    echo "Enter Knox master password: "
+    echo "Enter master password for DataPlane Service: "
     read -s MASTER_PASSWD
+    
+    if [ "${#MASTER_PASSWD}" -lt 6 ]; then
+        echo "Password needs to be at least 6 characters long."
+        exit 1
+    fi
+
     echo "Reenter password: "
     read -s MASTER_PASSWD_VERIFY
+    
     if [ "$MASTER_PASSWD" != "$MASTER_PASSWD_VERIFY" ];
     then
        echo "Password did not match. Reenter password:"
@@ -185,14 +250,106 @@ read_master_password() {
     MASTER_PASSWORD="$MASTER_PASSWD"
 }
 
+read_admin_password_safely() {
+    if [ -z "$USER_ADMIN_PASSWORD" ]; then
+        read_admin_password
+    fi
+}
+
+read_admin_password() {
+    echo "Enter DataPlane Service admin password: "
+    read -s ADMIN_PASSWD
+
+    echo "Reenter password: "
+    read -s ADMIN_PASSWD_VERIFY
+    
+    if [ "$ADMIN_PASSWD" != "$ADMIN_PASSWD_VERIFY" ];
+    then
+       echo "Password did not match. Reenter password:"
+       read -s ADMIN_PASSWD_VERIFY
+       if [ "$ADMIN_PASSWD" != "$ADMIN_PASSWD_VERIFY" ];
+       then
+        echo "Password did not match"
+        exit 1
+       fi
+    fi
+    USER_ADMIN_PASSWORD="$ADMIN_PASSWD"
+}
+
+read_user_supplied_certificate_password() {
+    echo "Please enter password used for supplied certificates:"
+    read -s CERTIFICATE_PASSWORD
+}
+
 read_use_test_ldap() {
     echo "Use pre-packaged LDAP instance (suitable only for testing) [yes/no]: "
     read USE_TEST_LDAP
 }
 
+import_certs() {
+    if [ ! -e "$PUBLIC_KEY_L" ]; then
+        echo "Public key file not found at $PUBLIC_KEY_L. Please try this command again after updating config.env.sh file with correct location."
+        return -1
+    fi
+    if [ ! -e "$PRIVATE_KEY_L" ]; then
+        echo "Private key file not found at $PRIVATE_KEY_L. Please try this command again after updating config.env.sh file with correct location."
+        return -1
+    fi
+
+    mkdir -p certs
+    rm -f $(pwd)/certs/ssl-cert.pem 2> /dev/null
+    cp "$PUBLIC_KEY_L" $(pwd)/certs/ssl-cert.pem
+    rm -f $(pwd)/certs/ssl-key.pem 2> /dev/null
+    cp "$PRIVATE_KEY_L" $(pwd)/certs/ssl-key.pem
+
+    echo "Certificates were copied successfully."
+
+    read_user_supplied_certificate_password
+}
+
+init_certs() {
+    if [ "$USE_TLS" != "true" ]; then
+        USE_PROVIDED_CERTIFICATES="no"
+    fi
+
+    if [ "$USE_PROVIDED_CERTIFICATES" != "yes" ] && [ "$USE_PROVIDED_CERTIFICATES" != "no" ]; then
+        echo "Do you have certificate to be configured? (yes/no):"
+        read USE_PROVIDED_CERTIFICATES
+    fi
+    if [ "$USE_PROVIDED_CERTIFICATES" == "yes" ]; then
+        echo "Importing certificates..."
+        import_certs
+    else
+        echo "Generating self-signed certificates (for demo only)"
+        generate_certs
+    fi
+}
+
+read_certs_config() {
+    if [ "$USE_TLS" != "true" ]; then
+        USE_PROVIDED_CERTIFICATES="no"
+    fi
+
+    if [ "$USE_PROVIDED_CERTIFICATES" == "no" ]; then
+        echo "Using previously generated self-signed certificates (for demo only)"
+        CERTIFICATE_PASSWORD=${MASTER_PASSWORD}
+    else
+        read_user_supplied_certificate_password
+    fi
+
+}
+
+init_knox_and_consul() {
+    init_consul
+
+    init_certs
+
+    init_knox
+}
+
 init_knox() {
     echo "Initializing Knox"
-    init_consul
+    
     if [ "$MASTER_PASSWORD" == "" ]; then
         read_master_password
     fi
@@ -202,25 +359,6 @@ init_knox() {
     
     echo "Starting Knox"
     source $(pwd)/docker-knox.sh
-
-    docker exec -t knox ./wait_for_keystore_file.sh
-    mkdir -p ${CERTS_DIR}
-    sleep 5
-    export_knox_cert ${MASTER_PASSWORD} knox > ${CERTS_DIR}/${KNOX_SIGNING_CERTIFICATE} || handle_knox_failure
-    echo "Knox Initialized"
-}
-
-handle_knox_failure() {
-    echo "Data plane public certificate could not be generated properly."
-    echo "Please destroy Knox and re-initialize again with the commands 'dpdeploy.sh destroy knox' and 'dpdeploy init knox'."
-    exit 1
-}
-
-export_knox_cert() {
-    MASTER_PASSWD=$1
-    KNOX_CONTAINER_ID=$2
-    docker exec -t ${KNOX_CONTAINER_ID} \
-        keytool -export -alias gateway-identity -storepass ${MASTER_PASSWD} -keystore /var/lib/knox/data-2.6.0.3-8/security/keystores/gateway.jks -rfc
 }
 
 start_app() {
@@ -279,9 +417,50 @@ load_images() {
     fi
 }
 
+init_keystore() {
+   if [ "$MASTER_PASSWORD" == "" ]; then
+       read_master_password
+   fi
+    mkdir -p $(pwd)/certs
+    source $(pwd)/keystore-initialize.sh
+}
+
+read_master_password_safely() {
+   if [ "$MASTER_PASSWORD" == "" ]; then
+       read_master_password
+   fi
+}
+
+update_admin_password() {
+    read_admin_password_safely
+    source $(pwd)/database-user-update.sh "$USER_ADMIN_PASSWORD"
+}
+
 init_all() {
+    read_admin_password_safely
+    read_master_password_safely
+
     init_db
     reset_db
+
+    update_admin_password
+
+    init_knox_and_consul
+    
+    init_keystore
+
+    init_app
+
+    echo "Initialization and start complete."
+}
+
+init_all_from_state() {
+    read_master_password_safely
+    read_certs_config
+
+    init_db
+
+    init_consul
 
     init_knox
 
@@ -306,12 +485,27 @@ stop_all() {
     echo "Stop complete."
 }
 
-destroy_all() {
+destroy_volumes() {
+    echo "Destroying volumes"
+    docker volume rm knox-config knox-security postgresql-data
+}
+
+destroy_all_with_state() {
     destroy
 
     destroy_knox
 
+    destroy_volumes
+
     echo "Destroy complete."
+}
+
+destroy_all_but_state() {
+    destroy
+
+    destroy_knox
+
+    echo "Stop complete."
 }
 
 upgrade() {
@@ -331,36 +525,35 @@ upgrade() {
         exit -1
     fi
 
+    source $(pwd)/config.clear.sh
+    read_master_password_safely
+
     echo "Moving configuration..."
-    mv $(pwd)/config.env.sh $(pwd)/config.env.sh.bak
+    mv $(pwd)/config.env.sh $(pwd)/config.env.sh.$(date +"%Y-%m-%d_%H-%M-%S").bak
     cp $2/config.env.sh $(pwd)/config.env.sh
     # sourcing again to overwrite values
-    source $(pwd)/config.clear.sh
     source $(pwd)/config.env.sh
 
     echo "Moving certs directory"
     mkdir -p $(pwd)/certs
     cp -R $2/certs/* $(pwd)/certs
 
-    # destroy all but db and knox
+    # destroy all but db
     docker rm -f $APP_CONTAINERS_WITHOUT_DB || echo "App is not up."
-
-    # stop knox
-    docker stop $KNOX_CONTAINER
-
-    # destroy consul
-    destroy_consul
-
-    # bring consul back
-    init_consul
-
-    # start knox
-    docker start $KNOX_CONTAINER
+    
+    echo "Destroying Knox"
+    docker rm -f $KNOX_CONTAINER || echo "Knox is not up"
 
     # migrate schema to new version
     migrate_schema
 
-    # init all but db and knox
+    # upgrade certs if required
+    read_certs_config
+
+    # init all but db and consul
+    read_consul_host
+
+    init_knox
     init_app
 
     echo "Upgrade complete."
@@ -377,27 +570,23 @@ print_version() {
 usage() {
     local tabspace=20
     echo "Usage: dpdeploy.sh <command>"
-    printf "%-${tabspace}s:%s\n" "Commands" "init [db | knox | app |--all] | migrate | ps | logs [container id|name] | start [knox | --all]| stop [knox | --all] | destroy [knox | --all]"
-    printf "%-${tabspace}s:%s\n" "init db" "Initialize postgres DB for first time"
-    printf "%-${tabspace}s:%s\n" "init knox" "Initialize the Knox and Consul containers"
-    printf "%-${tabspace}s:%s\n" "init app" "Start the application docker containers for the first time"
+    printf "%-${tabspace}s:%s\n" "Commands"
     printf "%-${tabspace}s:%s\n" "init --all" "Initialize and start all containers for the first time"
     printf "%-${tabspace}s:%s\n" "migrate" "Run schema migrations on the DB"
+    printf "%-${tabspace}s:%s\n" "utils update-user [ambari | atlas | ranger]" "Update user credentials for services that DataPlane will use to connect to clusters."
     printf "%-${tabspace}s:%s\n" "utils add-host <ip> <host>" "Append a single entry to /etc/hosts file of the container interacting with HDP clusters"
-    printf "%-${tabspace}s:%s\n" "start" "Start the  docker containers for application"
-    printf "%-${tabspace}s:%s\n" "start knox" "Start the Knox and Consul containers"
-    printf "%-${tabspace}s:%s\n" "start --all" "Start all containers"
-    printf "%-${tabspace}s:%s\n" "stop" "Stop the application docker containers"
-    printf "%-${tabspace}s:%s\n" "stop knox" "Stop the Knox and Consul containers"
-    printf "%-${tabspace}s:%s\n" "stop --all" "Stop all containers"
+    printf "%-${tabspace}s:%s\n" "utils reload-apps" "Restart all containers other than database, Consul and Knox"
+    printf "%-${tabspace}s:%s\n" "start" "Re-initialize all container while using previous data and state"
+    printf "%-${tabspace}s:%s\n" "stop" "Destroy all containers but keep data and state"
     printf "%-${tabspace}s:%s\n" "ps" "List the status of the docker containers"
     printf "%-${tabspace}s:%s\n" "logs [container name]" "Logs of supplied container id or name"
+    printf "%-${tabspace}s:%s\n" "metrics" "Print metrics for containers"
     printf "%-${tabspace}s:%s\n" "destroy" "Kill all containers and remove them. Needs to start from init db again"
     printf "%-${tabspace}s:%s\n" "destroy knox" "Kill Knox and Consul containers and remove them. Needs to start from init knox again"
     printf "%-${tabspace}s:%s\n" "destroy --all" "Kill all containers and remove them. Needs to start from init again"
     printf "%-${tabspace}s:%s\n" "load" "Load all images from lib directory into docker"
     printf "%-${tabspace}s:%s\n" "upgrade --from <old_setup_directory>" "Upgrade existing dp-core to current version"
-    printf "%-${tabspace}s:%s\n" "version" "Print the version of dataplane"
+    printf "%-${tabspace}s:%s\n" "version" "Print the version of DataPlane Service"
 }
 
 VERSION=$(print_version)
@@ -412,15 +601,6 @@ else
         init)
             echo "Found $2"
             case "$2" in
-                db)
-                    init_db
-                    ;;
-                knox)
-                    init_knox
-                    ;;
-                app)
-                    init_app
-                    ;;
                 --all)
                     init_all
                     ;;
@@ -439,6 +619,13 @@ else
                     shift
                     utils_add_host "$@"
                     ;;
+                update-user)
+                    shift
+                    utils_update_user_secret "$@"
+                    ;;
+                reload-apps)
+                    utils_reload_app_containers
+                    ;;
                 *)
                     echo "Unknown option"
                     usage
@@ -446,26 +633,11 @@ else
             esac
             ;;
         start)
-            case "$2" in
-                knox) start_knox
-                ;;
-                --all)
-                    start_all
-                    ;;
-                *) start_app
-             esac
-             ;;
+            init_all_from_state
+            ;;
         stop)
-            case "$2" in
-                knox) stop_knox
-                ;;
-                --all)
-                    stop_all
-                    ;;
-                *) stop_app
-             esac
-             ;;
-
+            destroy_all_but_state
+            ;;
         ps)
             ps
             ;;
@@ -473,17 +645,19 @@ else
             shift
             list_logs "$@"
             ;;
+        metrics)
+            list_metrics
+            ;;
         destroy)
             case "$2" in
                 knox) destroy_knox
                 ;;
-                --all)
-                    destroy_all
-                    ;;
+                --all) destroy_all_with_state
+                ;;
                 *) destroy
-                 ;;
-             esac
-             ;;
+                ;;
+            esac
+            ;;
         load)
             load_images
             ;;

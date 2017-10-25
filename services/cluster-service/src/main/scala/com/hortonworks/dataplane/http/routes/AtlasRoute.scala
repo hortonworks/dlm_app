@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.http.routes
 
 import java.util.concurrent.TimeUnit
@@ -6,10 +17,10 @@ import javax.inject.{Inject, Singleton}
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import com.google.common.base.Supplier
-import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
+import com.google.common.cache._
 import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
-import com.hortonworks.dataplane.cs.ClusterDataApi
+import com.hortonworks.dataplane.cs.{ClusterDataApi, CredentialInterface}
 import com.hortonworks.dataplane.cs.atlas.{AtlasInterface, DefaultAtlasInterface}
 import com.hortonworks.dataplane.cs.atlas.AtlasInterface
 import com.hortonworks.dataplane.http.BaseRoute
@@ -23,7 +34,7 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
 @Singleton
-class AtlasRoute @Inject()(private val config: Config,private val atlasApiData: ClusterDataApi)
+class AtlasRoute @Inject()(private val config: Config, private val atlasApiData: ClusterDataApi, private val credentialInterface: CredentialInterface)
     extends BaseRoute {
 
   import com.hortonworks.dataplane.commons.domain.Atlas._
@@ -48,7 +59,11 @@ class AtlasRoute @Inject()(private val config: Config,private val atlasApiData: 
   private val atlasInterfaceCache = CacheBuilder
     .newBuilder()
     .expireAfterAccess(atlasApiCacheTime, TimeUnit.SECONDS)
-    .build(new InterfaceCacheLoader()).asInstanceOf[LoadingCache[Long,AtlasInterface]]
+    .build(new InterfaceCacheLoader())
+    .asInstanceOf[LoadingCache[Long,AtlasInterface]]
+
+  credentialInterface
+      .onReload (classOf[AtlasRoute].getName, { _ => atlasInterfaceCache.invalidateAll() })
 
   val hiveAttributes =
     path("cluster" / LongNumber / "atlas" / "hive" / "attributes") { id =>
@@ -175,8 +190,8 @@ class AtlasRoute @Inject()(private val config: Config,private val atlasApiData: 
 
 
 object AtlasRoute {
-  def apply(config: Config,atlasApiData: ClusterDataApi): AtlasRoute =
-    new AtlasRoute(config,atlasApiData)
+  def apply(config: Config,atlasApiData: ClusterDataApi, credentialInterface: CredentialInterface): AtlasRoute =
+    new AtlasRoute(config, atlasApiData, credentialInterface)
 }
 
 private[http] class AtlasInterfaceSupplier(

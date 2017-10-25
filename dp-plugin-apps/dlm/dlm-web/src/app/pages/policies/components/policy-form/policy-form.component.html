@@ -11,7 +11,7 @@
   <form class="basic-form policy-form" [formGroup]="policyForm" (ngSubmit)="handleSubmit(policyForm)">
     <div class="container-fluid">
       <div class="row">
-        <div class="form-section col-md-12">
+        <div class="form-section col-xs-12">
           <div class="form-section-title actionable" (click)="toggleSection('general')">
             {{'page.policies.form.sections.general' | translate}}
             <div class="pull-right">
@@ -22,6 +22,7 @@
           <fieldset formGroupName="general" [collapse]="sectionCollapsedMap.general">
             <dlm-form-field
               [label]="'page.policies.form.fields.policy_name' | translate"
+              [required]="true"
               [maxLengthValue]="64">
               <input type="text" class="form-control" qe-attr="policy-name" formField formControlName="name" />
               <dlm-field-error *ngIf="policyForm.get('general').get('name').hasError('nameValidator')">
@@ -35,30 +36,42 @@
             </dlm-form-field>
             <div class="form-group">
               <div class="row">
-                <label class="col-md-6">
+                <label class="col-xs-6">
                   {{'page.policies.form.fields.service' | translate}}
                 </label>
               </div>
               <div class="row">
-                <div class="col-md-6">
+                <div class="col-xs-6">
                   <dlm-radio-button qe-attr="policy-type" [items]="storageTypes" formControlName="type" (change)="handlePolicyTypeChange($event)"></dlm-radio-button>
                 </div>
               </div>
+              <div class="row" *ngIf="isHDFSPolicy()">
+                <label class="col-xs-12">
+                  <dlm-help-link id="enable_snapshot" [linkTo]="'page.policies.form.help.snapshot_url' | translate"
+                               [linkText]="'page.policies.form.help.snapshot_text'"></dlm-help-link>
+                </label>
+              </div>
             </div>
-            <dlm-form-field [label]="'page.policies.form.fields.sourceCluster.self' | translate">
-              <dlm-select-field qe-attr="policy-source-cluster" formField formControlName="sourceCluster" [options]="sourceClusters" [value]="sourceCluster" (onSelect)="handleSourceClusterChange($event)">
-              </dlm-select-field>
-            </dlm-form-field>
-            <dlm-form-field [label]="'page.policies.form.fields.destinationCluster.self' | translate">
-              <dlm-select-field qe-attr="policy-destination-cluster" formField formControlName="destinationCluster" [options]="destinationClusters" [value]="destinationCluster">
-              </dlm-select-field>
-            </dlm-form-field>
+            <div class="form-group">
+              <div class="row">
+                <div class="col-xs-12">
+                  <dlm-form-field [label]="'page.policies.form.fields.sourceCluster.self' | translate" [required]="true">
+                    <dlm-select-field qe-attr="policy-source-cluster" formField formControlName="sourceCluster" [options]="sourceClusters" [value]="sourceCluster" (onSelect)="handleSourceClusterChange($event)">
+                    </dlm-select-field>
+                  </dlm-form-field>
+                  <dlm-form-field [label]="'page.policies.form.fields.destinationCluster.self' | translate" [required]="true">
+                    <dlm-select-field qe-attr="policy-destination-cluster" formField formControlName="destinationCluster" [options]="destinationClusters" [value]="destinationCluster">
+                    </dlm-select-field>
+                  </dlm-form-field>
+                </div>
+              </div>
+            </div>
           </fieldset>
         </div>
       </div>
 
       <div class="row" *ngIf="isHDFSPolicy() && sourceCluster">
-        <div class="form-section col-md-12">
+        <div class="form-section col-xs-12">
           <div class="form-section-title actionable" (click)="toggleSection('directories')">
             {{'page.policies.form.sections.directories' | translate}}
             <div class="pull-right">
@@ -68,7 +81,7 @@
           </div>
           <fieldset [collapse]="sectionCollapsedMap.directories">
             <div class="row">
-              <div class="col-md-12">
+              <div class="col-xs-12">
                 <dlm-form-field [label]="'page.policies.form.fields.directories' | translate">
                   <input type="text" formField class="form-control" formControlName="directories" [(ngModel)]="selectedHdfsPath"/>
                   <dlm-field-error *ngIf="policyForm.get('directories').hasError('isFile')">
@@ -92,7 +105,7 @@
       </div>
 
       <div class="row" *ngIf="isHivePolicy() && sourceCluster">
-        <div class="form-section col-md-12">
+        <div class="form-section col-xs-12">
           <div class="form-section-title actionable" (click)="toggleSection('database')">
             {{'page.policies.form.sections.database' | translate}}
             <div class="pull-right">
@@ -103,29 +116,33 @@
           <fieldset [collapse]="sectionCollapsedMap.database">
             <div class="form-group">
               <div class="row flex-center">
-                <div class="col-md-8">
+                <div class="col-xs-8">
                   <span class="text-muted">
                     <span>
                       {{'page.policies.form.selected' | translate}}: {{policyForm.value.databases}}
                     </span>
                   </span>
                 </div>
-                <div class="col-md-4">
+                <div class="col-xs-4">
                   <dlm-search-input qe-attr="policy-database-search-filter" (valueChange)="handleSearchChange($event)" [value]="databaseSearch$ | async"></dlm-search-input>
                 </div>
               </div>
-              <dlm-hive-browser
-                formControlName="databases"
-                [databases]="sourceDatabases$ | async"
-                [readonly]="false"
-                ></dlm-hive-browser>
+              <dlm-progress-container [progressState]="databaseRequest$ | async">
+                <dlm-hive-browser
+                  formControlName="databases"
+                  [tablesLoadingMap]="databaseTablesLoadingMap"
+                  [databases]="sourceDatabases$ | async"
+                  [readonly]="false"
+                  (databaseTablesCollapsed)="onDatabaseTablesCollapsed($event)"
+                  ></dlm-hive-browser>
+              </dlm-progress-container>
             </div>
           </fieldset>
         </div>
       </div>
 
       <div class="row">
-        <div class="form-section col-md-12">
+        <div class="form-section col-xs-12">
           <div class="form-section-title actionable" (click)="toggleSection('job')">
             {{'page.policies.form.sections.job' | translate}}
             <div class="pull-right">
@@ -136,41 +153,54 @@
           <fieldset [collapse]="sectionCollapsedMap.job" formGroupName="job">
             <div class="schedule-group">
               <div class="row new-row">
-                <div class="col col-md-12">
+                <div class="col col-xs-12">
                   <div class="row">
-                    <div class="col col-md-12">
-                      <label>{{'page.policies.form.fields.repeat' | translate}}</label>
+                    <div class="col-xs-12">
+                      <label>{{'page.policies.form.fields.start.self' | translate}}</label>
                     </div>
                   </div>
                   <div class="row">
-                    <div class="col col-md-2">
+                    <div class="col-xs-6">
+                      <dlm-radio-button qe-attr="policy-start-schedule" [items]="startOptions" formControlName="start" [selectedValue]="selectedStart"
+                                        (change)="handleStartChange($event)"></dlm-radio-button>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col col-xs-12">
+                      <dlm-field-label [required]="true">
+                        {{'page.policies.form.fields.repeat' | translate}}
+                      </dlm-field-label>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col col-xs-2">
                       <dlm-select-field qe-attr="policy-repeat-mode" formField formControlName="repeatMode" [options]="repeatOptions"
                                         [value]="repeatOption">
                       </dlm-select-field>
                     </div>
-                    <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-md-1"
+                    <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-xs-1"
                          [class.has-error]="policyForm.get('job').get('frequency').touched && policyForm.get('job').get('frequency').invalid">
                       <input type="text" qe-attr="policy-frequency" class="form-control" placeholder="Freq" formField formControlName="frequency"/>
                     </div>
-                    <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-md-2">
+                    <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-xs-2">
                       <dlm-select-field qe-attr="policy-unit" formField formControlName="unit" [options]="units" [value]="unit">
                       </dlm-select-field>
                     </div>
                     <div *ngIf="repeatOption === policyRepeatModes.EVERY && unit === policyTimeUnits.WEEKS"
-                         class="col col-md-7">
+                         class="col col-xs-7">
                       <div class="row">
-                        <div class="col col-md-1 text-center" style="margin-top: 10px">
+                        <div class="col col-xs-1 text-center" style="margin-top: 10px">
                           <span>&nbsp;on&nbsp;</span>
                         </div>
-                        <div class="col col-md-11">
+                        <div class="col col-xs-11">
                           <dlm-radio-button qe-attr="policy-selected-days" [items]="dayOptions" formControlName="day" [selectedValue]="selectedDay"
-                                            [type]="'buttons'" (change)="handleDayChange($event)"></dlm-radio-button>
+                                            [type]="'buttons'" [disabled]="startOption === policyStart.START_NOW" (change)="handleDayChange($event)"></dlm-radio-button>
                         </div>
                       </div>
                     </div>
                   </div>
                   <div class="row">
-                    <div class="col col-md-5 col-md-offset-2">
+                    <div class="col col-xs-5 col-xs-offset-2">
                       <div *ngIf="policyForm.get('job').get('frequency').touched">
                         <dlm-field-error
                           *ngIf="policyForm.get('job').get('frequency').hasError('required')">
@@ -194,7 +224,7 @@
                 </div>
               </div>
               <div class="row new-row">
-                <div class="col-md-3" formGroupName="startTime">
+                <div class="col-xs-3" formGroupName="startTime">
                   <div class="date-time-group">
                     <div class="date-control">
                       <label>{{'page.policies.form.fields.start_date' | translate}}</label>
@@ -204,12 +234,18 @@
                         [selDate]="policyForm.value.job.startTime.date"
                         [placeholder]="'page.policies.form.fields.date_format' | translate"
                         [options]="datePickerOptions"
+                        [disabled]="startOption === policyStart.START_NOW"
+                        (inputFieldChanged)="handleDateInputChange($event, 'startTime')"
                         (dateChanged)="handleDateChange($event, 'startTime')">
                       </my-date-picker>
+                      <dlm-field-error
+                        *ngIf="policyForm.get('job').get('startTime').get('date').hasError('invalidDate')">
+                        {{'forms.validation_errors.invalid_date' | translate:startTimeDateField}}
+                      </dlm-field-error>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-3" formGroupName="endTime">
+                <div class="col-xs-3" formGroupName="endTime">
                   <div class="date-time-group">
                     <div class="date-control">
                       <label>{{'page.policies.form.fields.end_date' | translate}}</label>
@@ -218,8 +254,13 @@
                         [selDate]="policyForm.value.job.endTime.date"
                         [placeholder]="'page.policies.form.fields.date_format' | translate"
                         (dateChanged)="handleDateChange($event, 'endTime')"
+                        (inputFieldChanged)="handleDateInputChange($event, 'endTime')"
                         [options]="datePickerOptions">
                       </my-date-picker>
+                      <dlm-field-error
+                        *ngIf="policyForm.get('job').get('endTime').get('date').hasError('invalidDate')">
+                        {{'forms.validation_errors.invalid_date' | translate:endTimeDateField}}
+                      </dlm-field-error>
                     </div>
                   </div>
                 </div>
@@ -228,7 +269,7 @@
                 <div class="time-field" formGroupName="startTime">
                   <label>{{'page.policies.form.fields.start_time' | translate}}</label>
                   <timepicker qe-attr="policy-start-time" formField formControlName="time" [showMeridian]="false"
-                              [showSpinners]="false"></timepicker>
+                              [showSpinners]="false" [readonlyInput]="startOption === policyStart.START_NOW"></timepicker>
                 </div>
                 <div class="timezone-field">
                   <label>
@@ -245,6 +286,10 @@
                   *ngIf="policyForm.get('job').get('startTime').get('time').hasError('lessThanCurrent')">
                   {{'forms.validation_errors.time_less_than_current' | translate}}
                 </dlm-field-error>
+                <dlm-field-error
+                  *ngIf="policyForm.get('job').get('startTime').get('time').hasError('greaterThanEndTime')">
+                  {{'forms.validation_errors.greaterThanEndTime' | translate}}
+                </dlm-field-error>
               </div>
             </div>
           </fieldset>
@@ -252,7 +297,7 @@
       </div>
 
       <div class="row">
-        <div class="form-section col-md-12">
+        <div class="form-section col-xs-12">
           <div class="form-section-title actionable" (click)="toggleSection('advanced')">
             {{'page.policies.form.sections.advanced' | translate}}
             <div class="pull-right">
@@ -273,7 +318,7 @@
               </div>
             </dlm-form-field>
             <div class="row">
-              <div class="col col-md-6">
+              <div class="col col-xs-6">
                 <div *ngIf="policyForm.get('advanced').get('max_bandwidth').touched">
                   <dlm-field-error
                     *ngIf="policyForm.get('advanced').get('max_bandwidth').hasError('integerValidator')">
@@ -287,7 +332,7 @@
       </div>
 
       <div class="row">
-        <div class="form-footer col-md-12">
+        <div class="form-footer col-xs-12">
           <div class="footer-controls pull-right">
             <button qe-attr="policy-cancel" type="button" class="btn btn-default" (click)="cancel()">
               {{'common.cancel' | translate}}

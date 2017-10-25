@@ -13,11 +13,24 @@ import { mapToList } from 'utils/store-util';
 import { PoliciesCount } from 'models/policies-count.model';
 import { Cluster } from 'models/cluster.model';
 import { Policy } from 'models/policy.model';
+import { BeaconAdminStatus } from 'models/beacon-admin-status.model';
 import { getAllClusters } from './cluster.selector';
 import { getAllJobs } from './job.selector';
-import { sortByDateField } from 'utils/array-util';
-import { JOB_STATUS, CLUSTER_STATUS } from 'constants/status.constant';
+import { sortByDateField, contains } from 'utils/array-util';
+import { JOB_STATUS, SERVICE_STATUS } from 'constants/status.constant';
 import { PolicyService } from 'services/policy.service';
+import { getAllBeaconAdminStatuses } from 'selectors/beacon.selector';
+import { POLICY_MODES, POLICY_EXECUTION_TYPES } from 'constants/policy.constant';
+import { SERVICES } from 'constants/cluster.constant';
+
+const hasStoppedServices = (cluster: Cluster, services: string[]): boolean => {
+  return cluster && cluster.status && cluster.status.some(s => contains(services, s.service_name) && s.state !== SERVICE_STATUS.STARTED);
+};
+
+const checkClusterServices = (policy: Policy, services: string[]): boolean => {
+  return hasStoppedServices(policy.targetClusterResource, services) ||
+    hasStoppedServices(policy.sourceClusterResource, services);
+};
 
 export const getEntities = createSelector(getPolicies, state => state.entities);
 
@@ -39,9 +52,11 @@ export const getPolicyClusterJob = createSelector(getAllPoliciesWithClusters, ge
   return policies.map(policy => {
     let policyJobs = jobs.filter(job => job.policyId === policy.id);
     policyJobs = policyJobs.length ? policyJobs : policy.jobs || [];
-    const jobsResource = sortByDateField(policyJobs, 'startTime');
+    // Filter out ignored jobs
+    policyJobs = policyJobs.length ? policyJobs.filter(job => job.status !== JOB_STATUS.IGNORED) : [];
+    const jobsResource = policyJobs.length ? sortByDateField(policyJobs, 'startTime') : [];
     const lastJobResource = jobsResource.length ? jobsResource[0] : null;
-    const lastGoodJobResource = jobsResource.length ? jobsResource.find(j => j.status === 'SUCCESS') : null;
+    const lastGoodJobResource = jobsResource.length ? jobsResource.find(j => j.status === JOB_STATUS.SUCCESS) : null;
     const lastTenJobs = jobsResource.length ? policyJobs.slice(0, 10) : [];
     return {
       ...policy,
@@ -52,6 +67,11 @@ export const getPolicyClusterJob = createSelector(getAllPoliciesWithClusters, ge
     };
   });
 });
+
+export const getPolicyClusterJobFailedLastTen = createSelector(getPolicyClusterJob, policies =>
+  policies.filter(p =>
+    p.lastTenJobs.some(j =>
+    j.status !== JOB_STATUS.SUCCESS)));
 
 export const getCountPoliciesForSourceClusters = createSelector(getAllPoliciesWithClusters, getAllClusters, (policies, clusters) => {
   return clusters.reduce((entities: { [id: number]: PoliciesCount }, entity: Cluster) => {
@@ -72,10 +92,32 @@ export const getNonCompletedPolicies = createSelector(getPolicyClusterJob, (poli
 
 export const getUnhealthyPolicies = createSelector(
   getAllPoliciesWithClusters,
-  (policies: Policy[]) => policies
-    .filter(policy => [
-        policy.targetClusterResource.healthStatus,
-        policy.sourceClusterResource.healthStatus
-      ].indexOf(CLUSTER_STATUS.UNHEALTHY) > -1
-    )
+  (policies: Policy[]) => {
+    const unhealthy = policies
+    .filter(policy => {
+      const requiredServices = [SERVICES.BEACON, SERVICES.HDFS];
+      const yarnStopped = hasStoppedServices(policy.targetClusterResource, [SERVICES.YARN]);
+      const requiredServicesStopped = checkClusterServices(policy, requiredServices);
+      const hiveStopped = policy.executionType === POLICY_EXECUTION_TYPES.HIVE && checkClusterServices(policy, [SERVICES.HIVE]);
+      return requiredServicesStopped || yarnStopped || hiveStopped;
+    });
+    return unhealthy;
+  }
 );
+
+export const getPoliciesTableData = createSelector(getPolicyClusterJob, getAllBeaconAdminStatuses,
+  (policies: Policy[], beaconStatuses: BeaconAdminStatus[]) => {
+    return policies.map(policy => {
+      const clusterStatus = beaconStatuses.find(c => c.clusterId === policy.targetClusterResource.id);
+      if (!clusterStatus) {
+        return {...policy, rangerEnabled: false, accessMode: POLICY_MODES.READ_WRITE};
+      }
+      const {plugins, rangerCreateDenyPolicy} = clusterStatus.beaconAdminStatus;
+      const rangerEnabled = contains(plugins, SERVICES.RANGER);
+      return {
+        ...policy,
+        accessMode: rangerEnabled && rangerCreateDenyPolicy === 'true' ? POLICY_MODES.READ_ONLY : POLICY_MODES.READ_WRITE,
+        rangerEnabled
+      };
+    });
+  });

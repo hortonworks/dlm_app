@@ -1,27 +1,25 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.cs
 
 import javax.inject.{Inject, Singleton}
 
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  Cluster,
-  ClusterHost,
-  ClusterServiceHost,
-  DataplaneCluster,
-  Errors,
-  ClusterService => ClusterData
-}
-import com.hortonworks.dataplane.db.Webservice.{
-  ClusterComponentService,
-  ClusterHostsService,
-  ClusterService,
-  ConfigService,
-  DpClusterService
-}
+import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, ClusterHost, ClusterServiceHost, DataplaneCluster, Errors, ClusterService => ClusterData}
+import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
+import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.Success
 
 trait StorageInterface {
 
@@ -231,3 +229,4 @@ class StorageInterfaceImpl @Inject()(
     }
   }
 }
+

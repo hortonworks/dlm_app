@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package controllers
 
 import javax.inject.Inject
@@ -14,7 +25,6 @@ import com.hortonworks.dataplane.db.Webservice.{
   AssetWorkspaceService,
   NotebookWorkspaceService
 }
-import com.hortonworks.dataplane.commons.auth.Authenticated
 import models.JsonResponses
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
@@ -22,8 +32,7 @@ import play.api.mvc.{Action, Controller}
 import scala.concurrent.Future
 
 class NotebookWorkspaces @Inject()(
-    @Named("notebookWorkspaceService") val notebookWorkspaceService: NotebookWorkspaceService,
-    authenticated: Authenticated)
+    @Named("notebookWorkspaceService") val notebookWorkspaceService: NotebookWorkspaceService)
     extends Controller {
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._

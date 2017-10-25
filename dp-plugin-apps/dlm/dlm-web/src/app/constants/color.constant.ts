@@ -7,10 +7,22 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { CLUSTER_STATUS } from './status.constant';
+import { CLUSTER_STATUS, SERVICE_STATUS } from './status.constant';
+
+export const GREEN = '#3FAE2A';
+export const RED = '#EF6162';
+export const YELLOW = '#FFD13D';
+export const ORANGE = '#E98A40';
 
 export const CLUSTER_STATUS_COLOR = {
-  [CLUSTER_STATUS.HEALTHY]: '#3FAE2A',
-  [CLUSTER_STATUS.UNHEALTHY]: '#EF6162',
-  [CLUSTER_STATUS.WARNING]: '#E98A40'
+  [CLUSTER_STATUS.HEALTHY]: GREEN,
+  [CLUSTER_STATUS.UNHEALTHY]: RED,
+  [CLUSTER_STATUS.WARNING]: ORANGE,
+  [CLUSTER_STATUS.UNKNOWN]: YELLOW
+};
+
+export const SERVICE_STATUS_COLOR = {
+  [SERVICE_STATUS.INSTALLED]: RED,
+  [SERVICE_STATUS.STARTED]: GREEN,
+  [SERVICE_STATUS.UNKNOWN]: YELLOW
 };

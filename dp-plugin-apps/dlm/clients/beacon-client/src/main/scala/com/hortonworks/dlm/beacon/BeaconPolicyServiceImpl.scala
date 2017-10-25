@@ -125,12 +125,12 @@ class BeaconPolicyServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconPo
     }
   }
 
-  override def listPolicies(beaconEndpoint : String, clusterId: Long)
+  override def listPolicies(beaconEndpoint : String, clusterId: Long, queryString: Map[String,String])
                            (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, Seq[PoliciesDetailResponse]]] = {
-    val queryString = HashMap("fields" -> "status,clusters,frequency,startTime,endTime,datasets,description,instances",
+    val finalQueryString = queryString ++ HashMap("fields" -> "status,clusters,frequency,startTime,endTime,datasets,description,executionType,customProperties,instances,report",
                               "instanceCount" -> "10")
     ws.url(s"${urlPrefix(beaconEndpoint)}/policy/list", clusterId, BEACON).withHeaders(token)
-      .withQueryString(queryString.toList: _*)
+      .withQueryString(finalQueryString.toList: _*)
       .withAuth(user, password, WSAuthScheme.BASIC)
       .get.map(mapToPoliciesDetailsResponse).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))

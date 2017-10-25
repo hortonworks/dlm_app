@@ -1,0 +1,35 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+
+<div class="mdl-grid no-top-bottom-space">
+  <div class="mdl-cell mdl-cell--12-col">
+    <div class="summary-pane-1">
+      <ul>
+        <li>
+          <div class="title">{{"pages.infra.labels.ldapUrl" | translate}}</div>
+          <div class="edit-ldap">
+            <div class="value">{{ldapProperties.ldapUrl}}</div>
+            <div>
+              <button id="ldap-actions" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon pull-right">
+                <i class="fa fa-ellipsis-v"></i></button>
+              <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="ldap-actions">
+                <li class="mdl-menu__item"  [routerLink]="['/infra/manage-access/identity-provider-edit']">
+                  <i class="fa fa-edit menu-icon"></i>{{"common.edit" | translate}}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

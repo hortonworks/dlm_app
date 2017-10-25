@@ -1,3 +1,14 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 @import "../../../styles/variables";
 
 .page-wrapper {
@@ -29,7 +40,7 @@
 .dp-login-img {
   text-align: right;
   position: relative;
-  background: #3fae2a url(../../../assets/images/login-bg-pattern.png);
+  background: #3fae2a url(../../../assets/images/hwx-bg-pattern.png);
   padding-left: 100px;
   padding-right: 100px;
 
@@ -37,7 +48,7 @@
     width: 205px;
     height: 82px;
     display: inline-block;
-    background: url(../../../assets/images/login-logo.png) no-repeat;
+    background: url(../../../assets/images/hwx-logo.png) no-repeat;
   }
 
   .dp-logo {

@@ -56,30 +56,48 @@ class BeaconClusterServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconC
     }
   }
 
-  private def mapToClusterDefinitionRequest(clusterDefinitionRequest:ClusterDefinitionRequest) = {
-      "fsEndpoint = " + clusterDefinitionRequest.fsEndpoint +
-      "\nbeaconEndpoint = " + clusterDefinitionRequest.beaconEndpoint +
-      "\ndescription = " + clusterDefinitionRequest.description +
-      "\nlocal = " + clusterDefinitionRequest.local +
-      (clusterDefinitionRequest.nnKerberosPrincipal match {
-        case Some(nnKerberosPrincipal) => "\nnnKerberosPrincipal= " + nnKerberosPrincipal
-        case None => ""
-      }) +
-      (clusterDefinitionRequest.hsEndpoint match {
-        case Some(hsEndpoint) => "\nhsEndpoint= " + hsEndpoint
-        case None => ""
-      }) +
-      (clusterDefinitionRequest.hsKerberosPrincipal match {
-        case Some(hsKerberosPrincipal) => "\nhsKerberosPrincipal= " + hsKerberosPrincipal
-        case None => ""
-      })
-  }
+  private def mapToClusterDefinitionRequest(clusterDefinitionRequest:ClusterDefinitionRequest) : String = {
+    val nnConfigs = clusterDefinitionRequest.nameNodeConfigs.foldLeft("": String) {
+      (acc, next) => {
+        next._2 match {
+          case Some(value) => acc + s"${next._1} = $value\n"
+          case None =>  acc
+        }
+      }
+    }
 
+    val rangerConfigs =  clusterDefinitionRequest.rangerService match {
+      case None => ""
+      case Some(rangerServiceDetails) => {
+        "rangerEndPoint = " + rangerServiceDetails.rangerEndPoint + "\n" +
+        "rangerHDFSServiceName = " +  rangerServiceDetails.rangerHDFSServiceName + "\n" +
+          (rangerServiceDetails.rangerHIVEServiceName match {
+            case Some(rangerHIVEServiceName) => "rangerHIVEServiceName = " + rangerHIVEServiceName + "\n"
+            case None => ""
+          })
+      }
+    }
+
+    "beaconEndpoint = " + clusterDefinitionRequest.beaconEndpoint + "\n" +
+    "description = " + clusterDefinitionRequest.description + "\n" +
+    "local = " + clusterDefinitionRequest.local + "\n" +
+    nnConfigs +
+    (clusterDefinitionRequest.hsEndpoint match {
+      case Some(hsEndpoint) => "hsEndpoint= " + hsEndpoint + "\n"
+      case None => ""
+    }) +
+    (clusterDefinitionRequest.hsKerberosPrincipal match {
+      case Some(hsKerberosPrincipal) => "hive.server2.authentication.kerberos.principal= " + hsKerberosPrincipal + "\n"
+      case None => ""
+    }) +
+    rangerConfigs
+  }
 
   override def listCluster(beaconEndpoint : String, clusterId: Long, clusterName: String)
                           (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, BeaconEntityResponse]] = {
     ws.url(s"${urlPrefix(beaconEndpoint)}/cluster/getEntity/$clusterName", clusterId, BEACON).withHeaders(token)
       .withAuth(user, password, WSAuthScheme.BASIC)
+      .withHeaders(httpHeaders.toList: _*)
       .get.map(mapToBeaconEntityResponse).recoverWith {
       case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
@@ -102,7 +120,27 @@ class BeaconClusterServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconC
       .withAuth(user, password, WSAuthScheme.BASIC)
       .withHeaders(httpHeaders.toList: _*)
       .post(requestData)
-      .map(mapToPostActionResponse).recoverWith {
+      .map(res => {
+      val url = Some(res.asInstanceOf[AhcWSResponse].ahcResponse.getUri.toUrl)
+      res.status match {
+        case 200 =>
+          res.json.validate[PostActionResponse] match {
+            case JsSuccess(result, _) => Right(result)
+            case JsError(error) => {
+              Left(BeaconApiErrors(BAD_GATEWAY, url, Some(BeaconApiError(error.toString()))))
+            }
+          }
+        case _ => {
+          if (res.body.isEmpty)
+            Left(BeaconApiErrors(res.status, url))
+          val errMessage = s"Submitting cluster definition for ${clusterDefinitionRequest.name} (${clusterDefinitionRequest.dataCenter}) " +
+            s"to endpoint $beaconEndpoint failed:"
+          res.json.validate[BeaconApiError].map(r => {
+            Left(BeaconApiErrors(res.status,url,Some(BeaconApiError(s"$errMessage ${r.message}", r.status, r.requestId))))
+          }).getOrElse(Left(BeaconApiErrors(res.status, url)))
+        }
+      }
+    }).recoverWith {
         case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
     }
   }

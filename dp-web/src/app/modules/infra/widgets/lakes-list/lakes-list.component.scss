@@ -1,3 +1,14 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 @import "../../../../../styles/variables";
 
 .content-pane {
@@ -11,17 +22,19 @@
 
 .title-pane {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
 }
 
 .page-title, .search {
   flex: 0 0 auto;
+  padding-top: 18px;
 }
 
 .filter-labels {
   flex: 1 1 auto;
   text-align: right;
+  padding: 18px 5px 5px;
 }
 
 .search-input {
@@ -134,7 +147,12 @@ input {
   line-height: 14px !important;
   padding: 4px 0 4px 12px;
   border-radius: 3px;
-  margin: 0 5px
+  margin: 5px;
+  align-self: flex-start;
+}
+
+:host /deep/ .mdl-chip + .mdl-chip {
+  margin-left: 5px;
 }
 
 :host /deep/ .mdl-chip__text {
@@ -148,4 +166,11 @@ input {
 .option-value:hover,
 .option-value:focus {
   outline: none;
+}
+
+.disabled, .disabled > * {
+  color: rgba(0,0,0, 0.26) !important;
+  cursor: default;
+  background-color: transparent;
+  pointer-events: none;
 }

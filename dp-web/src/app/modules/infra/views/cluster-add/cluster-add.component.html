@@ -1,3 +1,14 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div class="page-container">
   <div *ngIf="showNotification">
     <div id="success-notification-bar" class="notification-bar">
@@ -30,10 +41,13 @@
       <div class="form-group" #ambariInput>
         <label class="required">{{"pages.infra.labels.ambariUrl" | translate}}</label>
         <div class="input-group">
-          <input required class="dp-input-url" placeholder="eg. http://10.10.10.10:8080" name="ambari-url" type="text" [(ngModel)]="cluster.ambariurl" (keypress)="onKeyPress($event)"/>
-          <button id="go-btn" class="mdl-button btn-hwx-primary" type="button" (click)="getClusterInfo($event)">
+          <input required class="dp-input-url" placeholder="eg. http://10.10.10.10:8080" name="ambari-url" type="text" [readonly]="showClusterDetails" [ngStyle]="showClusterDetails && {'opacity':'0.6'}" [(ngModel)]="cluster.ambariurl" (keypress)="onKeyPress($event)"/>
+          <button *ngIf="!showClusterDetails" id="go-btn" class="mdl-button btn-hwx-primary" type="button" (click)="getClusterInfo($event)">
             <span *ngIf="_isClusterValidateInProgress"><i class="fa fa-spinner fa-spin"></i></span>
             <span *ngIf="!_isClusterValidateInProgress">{{"common.go" | translate}}</span>
+          </button>
+          <button *ngIf="showClusterDetails" id="clear-btn" class="mdl-button btn-hwx-primary" type="button" (click)="resetPage()">
+            <span>{{"common.clear" | translate}}</span>
           </button>
         </div>
       </div>
@@ -73,7 +87,11 @@
           </div>
           <div class="display-group">
             <label>{{"pages.infra.labels.services" | translate}}</label>
-            <div *ngFor="let service of cluster.services" class="services"><i class="fa fa-check-circle"></i> {{service}}</div>
+            <div class ="extensible-list-h">
+              <div *ngFor="let service of cluster.services; let idx=index" class="services" [ngClass]="{'hide' : (idx >=5 && isServiceHidden)}"><i class="fa fa-check-circle"></i> {{service}}</div>
+              <div *ngIf="isServiceHidden && cluster.services.length > 5" class="show-hide-toggle" (click)="isServiceHidden=false" id="servicesHidden"> <i class="fa fa-angle-double-down"></i> {{"pages.infra.labels.allServices" | translate}}</div>
+              <div *ngIf="!isServiceHidden && cluster.services.length > 5" class="show-hide-toggle" (click)="isServiceHidden=true" id="servicesVisible"> <i class="fa fa-angle-double-up"></i> {{"pages.infra.labels.less" | translate}}</div>
+            </div>
           </div>
         </div>
 
@@ -82,7 +100,6 @@
             <div class="datalake-notification">
               <div class="hwx-title">{{"common.datalake" | translate}}</div>
               <div class="hwx-desc"> {{ dLFoundMessage }}</div>
-              <div><a target="_blank" href="https://en.wikipedia.org/wiki/Data_lake">{{"common.moreLink" | translate}}</a> </div>
             </div>
           </div>
         </div>
@@ -118,7 +135,7 @@
               <div class="form-group">
                 <label>{{"common.tags" | translate}} </label>
                 <div class="hwx-inline-desc">{{"pages.infra.description.tags" | translate}}</div>
-                <tagging-widget id="tags" [tags]="cluster.tags" [clearOnSearch]="true" (onNewSearch)="onNewTagAddition($event)"></tagging-widget>
+                <tagging-widget [searchable]="false" id="tags" [tags]="cluster.tags" [clearOnSearch]="true" (onNewSearch)="onNewTagAddition($event)"></tagging-widget>
               </div>
               <div class="form-group">
                 <label>{{"common.description" | translate}}</label>
@@ -136,7 +153,7 @@
     <div class="button-container"  *ngIf="showClusterDetails">
       <button id="add-btn" class="mdl-button btn-hwx-primary" (click)="onCreate($event)">{{"common.add" | translate}}</button>
       <button id="add-and-new-btn" class="mdl-button btn-hwx-primary" (click)="onCreateAndAdd($event)">{{"common.addAndNew" | translate}}</button>
-      <button id="cancel-btn" class="mdl-button btn-hwx-default" (click)="onCancel($event)">{{"common.cancel" | translate}}</button>
+      <button id="cancel-btn" class="mdl-button btn-hwx-default" [routerLink]="['/infra']">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

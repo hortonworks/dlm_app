@@ -8,5 +8,9 @@
  */
 
 export const SERVICES = {
-  BEACON: 'BEACON'
+  BEACON: 'BEACON',
+  RANGER: 'RANGER',
+  HIVE: 'HIVE',
+  YARN: 'YARN',
+  HDFS: 'HDFS'
 };

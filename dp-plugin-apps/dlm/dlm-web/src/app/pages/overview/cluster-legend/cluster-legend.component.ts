@@ -7,22 +7,34 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { CLUSTER_STATUS } from 'constants/status.constant';
 
 @Component({
   selector: 'dlm-cluster-legend',
   template: `
     <div class="map-legend-header">
-      <span>{{cluster.name}}</span>
-      <dlm-cluster-status-icon [cluster]="cluster" class="pull-right"></dlm-cluster-status-icon>
+      <div class="pull-left">
+        <dlm-cluster-status-icon class="pull-left" [cluster]="cluster"></dlm-cluster-status-icon>
+        <div class="pull-left cluster-name">{{cluster.name}}</div>
+      </div>
+      <div class="pull-right">
+        <button qe-attr="map-legend-cross" class="cross-button close" type="button" aria-label="Close" (click)="onClickClose()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
       <div class="clearfix"></div>
     </div>
     <div class="map-legend-body">
-      <dl *ngIf="cluster?.alerts?.length">
+      <dl *ngIf="shouldShowAlertsSection">
         <dt>{{'page.overview.world_map.cluster_legend.alerts' | translate}}</dt>
         <dd *ngFor="let alert of cluster?.alerts">
-          <i class="fa fa-exclamation-triangle text-danger"></i>
+          <dlm-service-status-icon [serviceStatus]="alert"></dlm-service-status-icon>
           {{alert.service_name}}
+        </dd>
+        <dd *ngIf="isAmbariServerStopped">
+          <i class="fa fa-exclamation-triangle text-danger"></i>
+          {{'common.services.ambari_server' | translate}}
         </dd>
       </dl>
       <dl class="fix-alerts">
@@ -44,10 +56,23 @@ import { Component, OnInit, Input } from '@angular/core';
 export class ClusterLegendComponent implements OnInit {
 
   @Input() cluster: any;
+  @Output() onClose: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  get shouldShowAlertsSection(): boolean {
+    return this.cluster && (this.cluster.alerts && this.cluster.alerts.length
+     || this.cluster.healthStatus === CLUSTER_STATUS.UNKNOWN);
+  }
+
+  get isAmbariServerStopped(): boolean {
+    return this.cluster && this.cluster.healthStatus === CLUSTER_STATUS.UNKNOWN;
+  }
 
   constructor() { }
 
   ngOnInit() {
   }
 
+  onClickClose() {
+    this.onClose.emit(true);
+  }
 }

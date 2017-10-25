@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Component, ElementRef, ViewChild, OnInit, AfterViewChecked, HostListener} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
@@ -31,7 +42,7 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
 
   mapData: MapData[] = [];
   cluster: Cluster = new Cluster();
-  searchTerm: string;
+  searchTerm: string = '';
   dcName: string;
   lake: Lake;
   location: Location;
@@ -54,7 +65,8 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
     const rxLake =
       this.route.params
         .map(params => params['id'])
-        .flatMap(lakeId => this.lakeService.retrieve(lakeId));
+        .flatMap(lakeId => this.lakeService.retrieve(lakeId))
+        .share();
 
     rxLake
       .subscribe(lake => this.lake = lake);
@@ -165,18 +177,8 @@ export class ClusterEditComponent implements OnInit, AfterViewChecked {
     }
     this.lakeService.update(this.lake)
       .subscribe(
-        () => {
-          this.router.navigate(['infra', {
-            status: 'success'
-          }]);
-        },
-        error => {
-          this.handleError(error);
-        }
+        () => this.router.navigate(['/infra']),
+        error => this.handleError(error)
       );
-  }
-
-  onCancel() {
-    this.router.navigate(['infra']);
   }
 }

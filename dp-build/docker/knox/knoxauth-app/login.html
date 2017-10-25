@@ -1,0 +1,61 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>DataPlane Service - Sign In: Powered by Knox</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    
+    <link rel="shortcut icon" href="images-dp/favicon.ico">
+    <link href="styles-dp/dp-login.css" media="all" rel="stylesheet" type="text/css" >
+
+    <script src="libs/bower/jquery/js/jquery.js" ></script>
+    <script type="text/javascript" src="js/knoxauth.js"></script>
+  </head>
+  <body class="login" style=""> 
+    <div class="page-wrapper">
+        <div class="login-wrapper">
+            <div class="login-pane-wrapper">
+                <div class="dp-login-img">
+                    <div class="hwx-logo"></div>
+                    <div class="dp-logo">
+                        <div class="text-large">DataPlane Service</div>
+                        <div class="text-small">V 1.0</div>
+                    </div>
+                </div>
+                <div class="dp-login-controls">
+                  <form action="" method="post" accept-charset="utf-8">
+                        <div class="field-group">
+                            <label aria-label="Username">Username</label>
+                            <input type="text" name="username" tabindex="1" onkeypress=keypressed(event) autofocus>
+                        </div>
+                        <div class="field-group">
+                            <label aria-label="Password">Password</label>
+                            <input type="password" name="password" tabindex="2" autocomplete="off" onkeypress=keypressed(event) required>
+                        </div>
+                        <span id="errorBox" class="help-inline" style="color:white;display:none;"><span class="errorMsg"></span>
+                          <i class="icon-warning-sign" style="color:#ae2817;"></i>
+                        </span>
+                        <div class="action-group">  
+                          <button type="button" class="mdl-button btn-hwx-primary" id="signIn" tabindex="4" onkeypress="keypressed(event)" onclick="login();">
+                            <span> Login </span>
+                            <i class="fa fa-spinner fa-pulse fa-fw"></i>
+                          </button>
+                        </div>
+                  </form>
+                </div>
+            </div>
+        </div>
+    </div>
+  </body>
+</html>

@@ -20,6 +20,15 @@ object Ambari {
   case class Metrics(dfs: Dfs)
   case class HostComponent(`HostRoles`: HostRoles, metrics: Metrics)
   case class HostComponents(`ServiceComponentInfo`: JsValue, host_components: Seq[HostComponent])
+  case class RangerProperties(policymgr_external_url: Option[String], `ranger.plugin.hdfs.service.name`: Option[String])
+  case class ConfigKey(cluster_name: String, stack_id: String)
+  case class ServiceConfigurations(Config: ConfigKey, `type`: String, properties: JsValue)
+  case class ActiveServiceConfigurations(configurations: Seq[ServiceConfigurations])
+  case class ActiveDefaultConfiguration(items: Seq[ActiveServiceConfigurations])
+
+  case class ServiceHostComponent(component_name: String, host_name: String, public_host_name: String)
+  case class ServiceHostRoles(HostRoles: ServiceHostComponent)
+  case class ServiceHostComponents(ServiceComponentInfo: JsValue, host_components: Seq[ServiceHostRoles])
 
   implicit val serviceComponentInfoReads = Json.reads[ServiceComponentInfo]
   implicit val serviceComponentInfoWrites = Json.writes[ServiceComponentInfo]
@@ -35,4 +44,14 @@ object Ambari {
   implicit val hostComponentWrites = Json.writes[HostComponent]
   implicit val hostComponentsReads = Json.reads[HostComponents]
   implicit val hostComponentsWrites = Json.writes[HostComponents]
+  implicit val configKeyReads = Json.reads[ConfigKey]
+  implicit val configKeyWrites = Json.writes[ConfigKey]
+  implicit val rangerPropertiesReads = Json.reads[RangerProperties]
+  implicit val rangerPropertiesWrites = Json.writes[RangerProperties]
+  implicit val serviceConfigurationsReads = Json.reads[ServiceConfigurations]
+  implicit val serviceConfigurationsWrites = Json.writes[ServiceConfigurations]
+  implicit val activeServiceConfigurationsReads = Json.reads[ActiveServiceConfigurations]
+  implicit val activeServiceConfigurationsWrites = Json.writes[ActiveServiceConfigurations]
+  implicit val activeDefaultConfigurationReads = Json.reads[ActiveDefaultConfiguration]
+  implicit val activeDefaultConfigurationWrites = Json.writes[ActiveDefaultConfiguration]
 }

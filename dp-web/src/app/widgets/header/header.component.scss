@@ -1,3 +1,14 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 @import "../../../styles/variables";
 
 :host {
@@ -12,9 +23,7 @@
 
 .navbar {
   @extend .borderBox;
-
   z-index: 10;
-  /*overflow: hidden;*/
   background: $white;
   height: $header-height;
   max-height: $header-height;
@@ -22,7 +31,6 @@
 }
 
 .navbar a {
-  float: left;
   display: block;
   text-align: center;
   padding: 14px 16px;
@@ -122,8 +130,6 @@
   clip: auto!important;
 
   a {
-    float: none;
-    display: inline;
     text-align: left;
     padding: 0;
     text-decoration: none;
@@ -167,6 +173,9 @@
     padding: 15px 15px 7px;
     line-height: 1;
     text-align: right;
+
+    display: flex;
+    justify-content: space-between;
   }
   .mdl-button {
     height: 32px;
@@ -183,4 +192,27 @@
   border-radius: 4px;
 
   transition: none;
+}
+
+/* Responsive UI using media queries overwriting MDL's default media queries */
+@media (max-width: 479px) {
+  .mdl-cell--5-col {
+    width: 90%;
+  }
+  .actions {
+    width: 10%;
+    margin-right: 0;
+    position: absolute;
+    right: 0;
+    z-index: 100;
+
+    &:hover {
+      width: 60px;
+      transition: width 200ms;
+    }
+  }
+
+  .mdl-menu .popup-arrow-up {
+    right: 0;
+  }
 }

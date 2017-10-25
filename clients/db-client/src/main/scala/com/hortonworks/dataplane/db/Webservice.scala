@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.db
 
 import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData, _}
@@ -14,6 +25,10 @@ object Webservice {
 
     import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
+    protected  def createEmptyErrorResponse = {
+      Left(Errors(Seq(Error(code="404",message = "No response from server"))))
+    }
+    
     protected def extractEntity[T](res: WSResponse,
                                    f: WSResponse => T): Either[Errors, T] = {
       Right(f(res))
@@ -41,6 +56,8 @@ object Webservice {
     def getUserRoles(userName: String): Future[Either[Errors, UserRoles]]
 
     def addUser(user: User): Future[Either[Errors, User]]
+
+    def updateUser(user: User): Future[Either[Errors, User]]
 
     def addRole(role: Role): Future[Either[Errors, Role]]
 
@@ -81,7 +98,7 @@ object Webservice {
 
   trait DataSetService extends DbClientService {
 
-    def list(): Future[Either[Errors, Seq[Dataset]]]
+    def list(name: Option[String]): Future[Either[Errors, Seq[Dataset]]]
 
     def create(dataSetAndCatIds: DatasetAndCategoryIds)
     : Future[Either[Errors, DatasetAndCategories]]
@@ -101,7 +118,7 @@ object Webservice {
     def update(dataSetAndCatIds: DatasetAndCategoryIds)
     : Future[Either[Errors, DatasetAndCategories]]
 
-    def delete(dataSetId: String): Future[Either[Errors, Dataset]]
+    def delete(dataSetId: String): Future[Either[Errors, Long]]
   }
 
   trait CategoryService extends DbClientService {
@@ -156,7 +173,7 @@ object Webservice {
 
     def updateStatus(dpCluster: DataplaneCluster): Future[Either[Errors, Boolean]]
 
-    def delete(dpClusterId: String): Future[Either[Errors, DataplaneCluster]]
+    def delete(dpClusterId: String): Future[Either[Errors, Boolean]]
 
   }
 
@@ -235,6 +252,8 @@ object Webservice {
 
     def get(): Future[Either[Errors, Seq[LdapConfiguration]]]
 
+    def update(ldapConfig: LdapConfiguration): Future[Either[Errors, Boolean]]
+
   }
 
   trait WorkspaceService extends DbClientService {
@@ -266,6 +285,7 @@ object Webservice {
 
   trait DataAssetService extends DbClientService {
     def findManagedAssets(clusterId:Long, assets: Seq[String]): Future[Either[Errors, Seq[EntityDatasetRelationship]]]
+    def findAssetByGuid(guid: String): Future[Either[Errors, DataAsset]]
   }
   trait SkuService extends  DbClientService {
     def getAllSkus():Future[Either[Errors,Seq[Sku]]]

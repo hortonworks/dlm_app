@@ -1,7 +1,23 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div class="hwx-title">{{"pages.dataset.ds-editor.information" | translate}}</div>
 <div class="form-group">
   <label for="name" class="required">{{"common.name" | translate}}</label>
-  <input type="text" placeholder="Name" name="name" id="name" [(ngModel)]="dsModel.name" required/>
+  <div class="dp-input-and-message-wrapper">
+    <input type="text" placeholder="Name" #datasetName="ngModel" name="name" id="name" [(ngModel)]="dsModel.name" required dpUniqueDatasetName [ngClass]="{'validation-error': datasetName.invalid && datasetName.errors.unique}"/>
+    <div *ngIf="datasetName.invalid && datasetName.errors.unique" class="error-message">
+      {{"pages.dataset.ds-editor.errors.unique" | translate}}
+    </div>
+  </div>
 </div>
 <div class="form-group">
   <label for="description" class="required">{{"common.description" | translate}}</label>
@@ -23,5 +39,11 @@
                   (textChange)="onTagSearchChange($event)"
                   (onNewSearch)="onNewTagAddition($event)"
   ></tagging-widget>
+</div>
+
+
+<div class="button-container">
+  <button class="mdl-button btn-hwx-primary" (click)="onNext()" [disabled]="datasetName.invalid && datasetName.errors.unique">{{"pages.dataset.ds-editor.action.next" | translate}}</button>
+  <button class="mdl-button btn-hwx-default" (click)="onCancel()">{{"pages.dataset.ds-editor.action.cancel" | translate}}</button>
 </div>
 

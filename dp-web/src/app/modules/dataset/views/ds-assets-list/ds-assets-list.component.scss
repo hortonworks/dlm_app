@@ -1,3 +1,14 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 @import "../../../../../styles/variables";
 
 .componentCont.innerListScrollable {
@@ -136,7 +147,7 @@
   color: $iron;
 }
 .listCont .list .listRow .col {
-  width:15%;
+  width:13%;
   margin:0px 2%;
   overflow: hidden;
   white-space:nowrap ;
@@ -144,17 +155,17 @@
   float: left;
 }
 .listCont .list.withDsNameCom .listRow .col{
-  width:11%;
+  width:9%;
 }
 .listCont .list .listRow .col.ownerCol {
-  width:10%;
+  width:8%;
 }
 
 .listCont .list .listRow .col.descCol {
-  width:40%;
+  width:30%;
 }
 .listCont .list.withDsNameCom .listRow .col.descCol {
-  width:34%;
+  width:24%;
 }
 
 .listCont .list .listRow .checkboxCont,

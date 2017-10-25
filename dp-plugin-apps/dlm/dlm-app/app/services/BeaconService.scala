@@ -9,12 +9,12 @@
 
 package services
 
-import javax.inject.{Inject, Singleton}
-
+import com.google.inject.{Inject, Singleton}
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneCluster, HJwtToken}
-import com.hortonworks.dataplane.cs.Webservice.KnoxProxyService
-import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconApiError, BeaconApiErrors, BeaconEventResponse, BeaconLogResponse, PairedCluster, PolicyDataResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
+import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
+import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconAdminStatusDetails, BeaconApiError, BeaconApiErrors,
+       BeaconEntityResponse, BeaconEventResponse, BeaconHdfsFileResponse, BeaconHiveDbResponse, BeaconHiveDbTablesResponse,
+       BeaconLogResponse, PairedCluster, PolicyDataResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
 import com.hortonworks.dlm.beacon.WebService._
 import com.hortonworks.dlm.beacon.domain.RequestEntities.ClusterDefinitionRequest
 
@@ -22,7 +22,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import models.Entities.{UnpairClusterDefinition, _}
 import models.PolicyAction
 import models._
-import play.api.http.Status.INTERNAL_SERVER_ERROR
+import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR}
 
 import scala.collection.immutable.Set.Set2
 import scala.concurrent.{Future, Promise}
@@ -35,8 +35,10 @@ import scala.concurrent.{Future, Promise}
   * @param beaconPolicyInstanceService  beacon service to execute rest api on beacon policy instance resource
   * @param beaconEventService    beacon service to  get beacon events
   * @param beaconLogService      beacon service to get beacon logs
-  * @param dataplaneService      dataplane service to interact with dataplane db service
-  * @param webhdfsService        webhdfs client service
+  * @param beaconAdminService    beacon service to get beacon plugin status
+  * @param beaconBrowseService  beacon service to browse HDFS files and Hive databases
+  * @param dataplaneService     dataplane service to interact with dataplane db service
+  * @param ambariService        ambari client service
   */
 @Singleton
 class BeaconService @Inject()(
@@ -46,9 +48,41 @@ class BeaconService @Inject()(
    @Named("beaconPolicyInstanceService") val beaconPolicyInstanceService: BeaconPolicyInstanceService,
    @Named("beaconEventService") val beaconEventService: BeaconEventService,
    @Named("beaconLogService") val beaconLogService: BeaconLogService,
-   //@Named("knoxProxyService") implicit  val knoxProxyService: KnoxProxyService,
+   @Named("beaconAdminService") val beaconAdminService: BeaconAdminService,
+   @Named("beaconBrowseService") val beaconBrowseService: BeaconBrowseService,
    val dataplaneService: DataplaneService,
-   val webhdfsService: WebhdfsService) {
+   val ambariService: AmbariService) {
+
+
+
+  def getClusterDetails(clusterEndpointId: Long, clusterId: Long)(implicit token:Option[HJwtToken]):
+    Future[Either[DlmApiErrors, BeaconEntityResponse]] = {
+    val p: Promise[Either[DlmApiErrors, BeaconEntityResponse]] = Promise()
+    
+    for {
+      cluster <- dataplaneService.getCluster(clusterId)
+      beaconUrl <- dataplaneService.getBeaconService(clusterEndpointId)
+    } yield {
+      if (!List(cluster, beaconUrl).exists(_.isLeft)) {
+        dataplaneService.getDpCluster(cluster.right.get.dataplaneClusterId.get) map {
+          case Left(errors) => p.success(Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None,
+            Some(errors.errors.map(x => BeaconApiError(x.message)).head))))))
+          case Right(dpCluster) => {
+            val clusterName = dpCluster.dcName + "$" + cluster.right.get.name
+            beaconClusterService.listCluster(beaconUrl.right.get, clusterEndpointId, clusterName).map({
+              case Left(errors) => p.success(Left(DlmApiErrors(Seq(errors))))
+              case Right(policyResponse) => p.success(Right(policyResponse))
+            })
+          }
+        }
+      } else {
+        p.success(Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None,
+          Some(BeaconApiError(BeaconService.clusterDefError)))))))
+      }
+    }
+
+    p.future
+  }
 
   /**
     * Get list of all paired clusters
@@ -114,22 +148,25 @@ class BeaconService @Inject()(
       for {
         clusterA <- dataplaneService.getCluster(clusterAId)
         clusterB <- dataplaneService.getCluster(clusterBId)
-        clusterAFs <- dataplaneService.getNameNodeService(clusterAId)
-        clusterBFs <- dataplaneService.getNameNodeService(clusterBId)
-        hiveServiceA <- dataplaneService.getHiveServerService(clusterAId)
-        hiveServiceB <- dataplaneService.getHiveServerService(clusterBId)
+        clusterAFs <- ambariService.getHDFSConfigDetails(clusterAId)
+        clusterBFs <- ambariService.getHDFSConfigDetails(clusterBId)
+        hiveServiceA <- ambariService.getHiveConfigDetails(clusterAId)
+        hiveServiceB <- ambariService.getHiveConfigDetails(clusterBId)
+        rangerServiceA <- ambariService.getRangerEndpointDetails(clusterAId)
+        rangerServiceB <- ambariService.getRangerEndpointDetails(clusterBId)
         clusterDefinitionsA <- beaconPairService.listPairedClusters(clustersToBePairedSeq.head.beaconUrl, clusterAId)
         clusterDefinitionsB <- beaconPairService.listPairedClusters(clustersToBePairedSeq.tail.head.beaconUrl, clusterBId)
       } yield {
-        val futureFailedList = List(clusterA, clusterB, clusterAFs, clusterBFs, clusterDefinitionsA, clusterDefinitionsB).filter(_.isLeft)
+        val futureFailedList = List(clusterA, clusterB, clusterAFs, clusterBFs, hiveServiceA, hiveServiceB,
+          rangerServiceA, rangerServiceB, clusterDefinitionsA, clusterDefinitionsB).filter(_.isLeft)
         if (futureFailedList.isEmpty) {
           for {
             dpClusterA <- dataplaneService.getDpCluster(clusterA.right.get.dataplaneClusterId.get)
             dpClusterB <- dataplaneService.getDpCluster(clusterB.right.get.dataplaneClusterId.get)
           } yield {
             if (!List(dpClusterA, dpClusterB).exists(_.isLeft)) {
-              val listOfClusters = ClusterDefinitionDetails(clusterA.right.get, dpClusterA.right.get, clusterAFs.right.get, hiveServiceA, clusterDefinitionsA.right.get, clustersToBePairedSeq.head) ::
-                ClusterDefinitionDetails(clusterB.right.get, dpClusterB.right.get, clusterBFs.right.get, hiveServiceB, clusterDefinitionsB.right.get, clustersToBePairedSeq.tail.head) :: Nil
+              val listOfClusters = ClusterDefinitionDetails(clusterA.right.get, dpClusterA.right.get, clusterAFs.right.get, hiveServiceA.right.get, rangerServiceA.right.get, clusterDefinitionsA.right.get, clustersToBePairedSeq.head) ::
+                ClusterDefinitionDetails(clusterB.right.get, dpClusterB.right.get, clusterBFs.right.get, hiveServiceB.right.get, rangerServiceB.right.get, clusterDefinitionsB.right.get, clustersToBePairedSeq.tail.head) :: Nil
               // Retrieve cluster definitions that is pending to be submitted to the beacon process
               val clusterDefsToBeSubmitted: Set[ClusterDefinition] = getClusterDefsToBeSubmitted(listOfClusters)
               if (clusterDefsToBeSubmitted.isEmpty) {
@@ -180,18 +217,11 @@ class BeaconService @Inject()(
         val accumulateClusters: Set[ClusterDefinition] = clusterNames.foldLeft(Set(): Set[ClusterDefinition]) {
           (acc, nextClusterName) => {
             if (outerNext.clusterDefinitions.map(_.name).contains(nextClusterName)) acc else {
-              val clusterToBePairedDetails: ClusterDefinitionDetails = listOfClusters.find(x => x.dpCluster.dcName + "$" + x.dpCluster.name == nextClusterName).get
-              val local : Boolean =  (outerNext.dpCluster.dcName + "$" +  outerNext.dpCluster.name) == nextClusterName
+              val clusterToBePairedDetails: ClusterDefinitionDetails = listOfClusters.find(x => x.dpCluster.dcName + "$" + x.cluster.name == nextClusterName).get
+              val local : Boolean =  (outerNext.dpCluster.dcName + "$" +  outerNext.cluster.name) == nextClusterName
               val nnService = clusterToBePairedDetails.nnClusterService
-              val hiveServerConfigDetails: Map [String, Option[String]]= clusterToBePairedDetails.hiveServerService match {
-                case Right(hiveServerService) => {
-                  Map(
-                    "hsEndpoint" -> Some(hiveServerService.serviceProperties("hsEndpoint").get),
-                    "hsKerberosPrincipal" -> hiveServerService.serviceProperties("hsKerberosPrincipal")
-                  )
-                }
-                case Left(errors) => Map()
-              }
+              val rangerService = clusterToBePairedDetails.rangerService
+              val hiveServerConfigDetails: Map [String, Option[String]]= clusterToBePairedDetails.hiveServerService
 
               val clusterDefinition: ClusterDefinition = ClusterDefinition(
                 outerNext.pairedClusterRequest.beaconUrl,
@@ -202,10 +232,10 @@ class BeaconService @Inject()(
                   clusterToBePairedDetails.dpCluster.description,
                   local,
                   clusterToBePairedDetails.pairedClusterRequest.beaconUrl,
-                  nnService.serviceProperties("fsEndpoint").get,
-                  nnService.serviceProperties("nnKerberosPrincipal"),
+                  nnService,
+                  rangerService,
                   hiveServerConfigDetails("hsEndpoint"),
-                  hiveServerConfigDetails("hsKerberosPrincipal")
+                  hiveServerConfigDetails("hive.server2.authentication.kerberos.principal")
                 )
               )
               acc.+(clusterDefinition)
@@ -226,10 +256,25 @@ class BeaconService @Inject()(
   private def createPair(listOfClusters: List[ClusterDefinitionDetails],
                          p: Promise[Either[BeaconApiErrors, PostActionResponse]])(implicit token:Option[HJwtToken]) = {
     val remoteCluster = listOfClusters.tail.head
-    val remoteDatacenterClusterName =  remoteCluster.dpCluster.dcName + "$" + remoteCluster.cluster.name
+    val remoteClusterDcName = remoteCluster.dpCluster.dcName
+    val remoteClusterName = remoteCluster.cluster.name
+    val remoteDatacenterClusterName =  remoteClusterDcName + "$" + remoteClusterName
     beaconPairService.createClusterPair(listOfClusters.head.pairedClusterRequest.beaconUrl, listOfClusters.head.cluster.id.get,
       remoteDatacenterClusterName).map({
-        case Left(beaconApiErrors) => p.success(Left(beaconApiErrors))
+        case Left(beaconApiErrors) => {
+          val beaconApiErrorMsg =  beaconApiErrors.error match {
+            case Some(beaconApiError) => beaconApiError.message
+            case None => ""
+          }
+          val clusterInfo =  listOfClusters.head
+          val dcName = clusterInfo.dpCluster.dcName
+          val clusterName = clusterInfo.cluster.name
+          val message =  s"Beacon API to pair clusters $clusterName ($dcName) and $remoteClusterName ($remoteClusterDcName) " +
+            s"failed: $beaconApiErrorMsg"
+
+          p.success(Left(BeaconApiErrors(beaconApiErrors.code, beaconApiErrors.beaconUrl, Some(BeaconApiError(message)),
+            beaconApiErrors.message)))
+        }
         case Right(clusterPairResponse) => p.success(Right(clusterPairResponse))
     })
   }
@@ -272,7 +317,7 @@ class BeaconService @Inject()(
             } else {
               val dpClusterARightProj = dpClusterA.right.get
               val dpClusterBRightProj = dpClusterB.right.get
-              val remoteDatacenterClusterName = dpClusterBRightProj.dcName + "$" + dpClusterBRightProj.name
+              val remoteDatacenterClusterName = dpClusterBRightProj.dcName + "$" + clusterB.right.get.name
               beaconPairService.createClusterUnpair(clustersToBeUnpairedSeq.head.beaconUrl, clusterAId, remoteDatacenterClusterName).map({
                 case Left(beaconApiErrors) => p.success(Left(beaconApiErrors))
                 case Right(clusterUnpairResponse) => {
@@ -426,7 +471,7 @@ class BeaconService @Inject()(
         val beaconClusters = beaconCluster.clusters
         val allPoliciesFuture: Future[Seq[Either[BeaconApiErrors, Seq[PolicyDetailsData]]]] =
           Future.sequence(beaconClusters.map((x) => beaconPolicyService.listPolicies(
-            x.beaconUrl, x.id)))
+            x.beaconUrl, x.id, queryStringPaginated)))
 
         for {
           allPoliciesOption <- allPoliciesFuture
@@ -449,8 +494,10 @@ class BeaconService @Inject()(
 
           val policies : Seq[PolicyDetailsData] = getProcessedResponse(allPoliciesData, queryStringPaginated, originalPageLenth, originalOffset)
           val policiesDetails: Seq[PoliciesDetails] = policies.map(policy => {
-            PoliciesDetails(policy.policyId, policy.name, policy.description, policy.`type`, policy.status, policy.sourceDataset, policy.targetDataset,
-                            policy.frequencyInSec, policy.startTime, policy.endTime, policy.sourceCluster, policy.targetCluster, policy.instances)
+            PoliciesDetails(policy.policyId, policy.name, policy.description, policy.`type`, policy.executionType,
+                            policy.status, policy.sourceDataset, policy.targetDataset, policy.frequencyInSec,
+                            policy.startTime, policy.endTime, policy.sourceCluster, policy.targetCluster,
+                            policy.customProperties, policy.instances, policy.report)
           })
 
           val failedResponses: Seq[BeaconApiErrors] = allPoliciesOption.filter(_.isLeft).map(_.left.get)
@@ -655,6 +702,103 @@ class BeaconService @Inject()(
     }
     p.future
   }
+
+  /**
+    * Return beacon admin status for all registered beacon servers
+    * @param token  JWT token
+    * @return
+    */
+  def getAllBeaconAdminStatus() (implicit token:Option[HJwtToken]) : Future[Either[DlmApiErrors, AdminStatusResponse]] = {
+    val p: Promise[Either[DlmApiErrors, AdminStatusResponse]] = Promise()
+    dataplaneService.getBeaconClusters.map {
+      case Left(errors) => p.success(Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None,
+        Some(errors.errors.map(x => BeaconApiError(x.message)).head))))))
+      case Right(beaconCluster) => {
+        val beaconClusters = beaconCluster.clusters
+        val allBeaconAdminStatusFuture: Future[Seq[Either[BeaconApiErrors, BeaconAdminStatusDetails]]] =
+          Future.sequence(beaconClusters.map((x) => beaconAdminService.listStatus(x.beaconUrl, x.id)))
+
+        for {
+          allBeaconAdminStatusFuture <- allBeaconAdminStatusFuture
+        } yield {
+          val allBeaconAdminStatus: Seq[BeaconAdminStatusDetails] = allBeaconAdminStatusFuture.filter(_.isRight).map(x => x.right.get)
+          val failedResponses: Seq[BeaconApiErrors] = allBeaconAdminStatusFuture.filter(_.isLeft).map(_.left.get)
+          if (failedResponses.length == beaconClusters.length) {
+            p.success(Left(DlmApiErrors(failedResponses)))
+          } else {
+            p.success(Right(AdminStatusResponse(failedResponses, allBeaconAdminStatus)))
+          }
+        }
+      }
+    }
+    p.future
+  }
+
+  /**
+    * Get listStatus for HDFS file path found in the query
+    * @param clusterId    cluster id
+    * @param queryString  query parameters with `path` parameter
+    * @return
+    */
+  def getListHdfsFileResponse(clusterId: Long, queryString: Map[String, String])(implicit token:Option[HJwtToken]) :
+    Future[Either[BeaconApiErrors, BeaconHdfsFileResponse]] = {
+    val p: Promise[Either[BeaconApiErrors, BeaconHdfsFileResponse]] = Promise()
+    val filePath = queryString.get(BeaconService.QUERY_PARAM_FILEPATH_KEY)
+    filePath match {
+      case Some(path) => {
+        dataplaneService.getBeaconService(clusterId).map {
+          case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
+          case Right(beaconUrl) =>
+            beaconBrowseService.listHdfsFile(beaconUrl, clusterId, Map("path" -> path)).map {
+              case Left(errors) => p.success(Left(errors))
+              case Right(beaconHdfsFileResponse) => p.success(Right(beaconHdfsFileResponse))
+            }
+        }
+      }
+      case None => p.success(Left(BeaconApiErrors(BAD_REQUEST, None, Some(BeaconApiError(BeaconService.pathErrorMsg)))))
+    }
+
+    p.future
+
+  }
+
+  /**
+    * Get list of hive databases via beacon Api
+    * @param clusterId cluster id
+    * @return
+    */
+  def getHiveDatabases(clusterId: Long)(implicit token:Option[HJwtToken]) : Future[Either[BeaconApiErrors, BeaconHiveDbResponse]] = {
+    val p: Promise[Either[BeaconApiErrors, BeaconHiveDbResponse]] = Promise()
+    dataplaneService.getBeaconService(clusterId).map {
+      case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
+      case Right(beaconUrl) =>
+        beaconBrowseService.listHiveDb(beaconUrl, clusterId).map {
+          case Left(errors) => p.success(Left(errors))
+          case Right(beaconHiveDbResponse) => p.success(Right(beaconHiveDbResponse))
+        }
+    }
+    p.future
+  }
+
+  /**
+    * Get all tables for hive database using auto hive20 instance REST APIs
+    * @param clusterId cluster id
+    * @return
+    */
+  def getHiveDatabaseTables(clusterId: Long, dbName: String)(implicit token:Option[HJwtToken]) : Future[Either[BeaconApiErrors, BeaconHiveDbTablesResponse]] = {
+    val p: Promise[Either[BeaconApiErrors, BeaconHiveDbTablesResponse]] = Promise()
+    dataplaneService.getBeaconService(clusterId).map {
+      case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
+      case Right(beaconUrl) =>
+        beaconBrowseService.listHiveDbTables(beaconUrl, clusterId, dbName).map {
+          case Left(errors) => p.success(Left(errors))
+          case Right(beaconHiveDbTableResponse) => p.success(Right(beaconHiveDbTableResponse))
+        }
+    }
+    p.future
+  }
+
+
 }
 
 object BeaconService {
@@ -666,6 +810,7 @@ object BeaconService {
   lazy val API_SORTORDER_DEFAULT_VALUE = "desc"
   lazy val POLICY_SUBMIT = "SUBMIT"
   lazy val POLICY_SUBMIT_SCHEDULE = "SUBMIT_AND_SCHEDULE"
+  lazy val QUERY_PARAM_FILEPATH_KEY = "path"
 
   lazy val PAIR_CLUSTER_SIZE = 2
 
@@ -674,6 +819,7 @@ object BeaconService {
   def clusterPairPaylodError = "Request payload should be a set of two objects"
   def pairClusterError = "Error occurred while getting API response from DB service or/and Beacon service"
   def clusterDefError = "Error occurred while getting cluster definitions from Beacon service"
+  def pathErrorMsg = "List HDFS file status API expects path parameter in the query"
 
 }
 

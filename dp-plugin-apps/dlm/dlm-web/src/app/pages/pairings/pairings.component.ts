@@ -69,7 +69,7 @@ export class PairingsComponent implements OnInit {
         body: this.translate.instant('page.pairings.unpair.notification.success.body', params)
       },
       [NOTIFICATION_TYPES.ERROR]: {
-        title: 'page.pairings.unpair.error.notification.title',
+        title: 'page.pairings.unpair.notification.error.title',
       }
     };
     const nextAction = deletePairing([

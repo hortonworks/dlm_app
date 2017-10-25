@@ -1,0 +1,75 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
+@import "../../../../../styles/variables";
+
+.dp-input {
+  margin: 15px 0px;
+  label {
+    display: block;
+  }
+  textarea {
+    display: block;
+    height: 120px;
+    padding: 6px 10px;
+    width: 440px;
+    border-radius: 2px;
+    font-size: 13px;
+  }
+}
+
+:host /deep/ .taggingWidget {
+  width: 460px !important;
+  height: 120px !important;
+  padding: 0px;
+  border-radius: 0px !important;
+  input {
+    font-size: 12px !important;
+  }
+}
+
+.margin-right-10 {
+  margin-right: 10px;
+}
+
+.notification-bar {
+  padding: 5px 5px;
+  margin: 10px 10px 10px 25px;
+  border: 1px solid $moss-green;
+  background-color: $willow-brook-green;
+}
+
+.margin-all-3{
+  margin: 3px;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.error-notification-bar {
+  padding: 15px;
+  background: $concrete;
+  height: 34px;
+  margin-bottom: 20px;
+  .fa-times-circle {
+    font-size: 24px;
+    color: $roman-red;
+  }
+  .fa-remove {
+    color: $dusty-gray;
+    cursor: pointer;
+  }
+  .text-medium {
+    font-weight: 500;
+    color: $roman-red;
+  }
+}

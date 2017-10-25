@@ -1,9 +1,20 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.cs
 
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, HJwtToken}
 import com.hortonworks.dataplane.cs.Webservice.DpProfilerService
 import com.typesafe.config.Config
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.WSResponse
 
 import scala.concurrent.Future
@@ -24,6 +35,9 @@ class DpProfilerServiceImpl (config: Config)(implicit ws: ClusterWsClient) exten
       case 405 => Left(
         Errors(Seq(
           Error("405", (res.json \ "errors" \\ "code").head.toString()))))
+      case 503 => Left(
+        Errors(Seq(
+          Error("503", (res.json \ "error" \ "message").toString()))))
       case _ => mapErrors(res)
     }
   }
@@ -44,4 +58,44 @@ class DpProfilerServiceImpl (config: Config)(implicit ws: ClusterWsClient) exten
       .map(mapResultsGeneric)
   }
 
+  override def deleteProfilerByJobName(clusterId: Long, jobName: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/profilers?jobName=$jobName")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .delete()
+      .map(mapResultsGeneric)
+  }
+  
+  override def startAndScheduleProfilerJob(clusterId: String, jobName: String, assets: Seq[String])(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/start-schedule-job")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .post(Json.obj("list" -> assets, "jobName" -> jobName))
+      .map(mapResultsGeneric)
+
+  }
+
+  override def getScheduleInfo(clusterId: String, taskName: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/schedule-info/$taskName")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapResultsGeneric)
+  }
+
+  override def getAuditResults(clusterId: String, dbName: String, tableName: String, userName: String, startDate: String, endDate: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/audit-results/$dbName/$tableName/$startDate/$endDate?userName=$userName")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapResultsGeneric)
+  }
+
+  override def getAuditActions(clusterId: String, dbName: String, tableName: String, userName: String, startDate: String, endDate: String)(implicit token:Option[HJwtToken]) : Future[Either[Errors,JsObject]] = {
+    ws.url(s"$url/cluster/$clusterId/dp-profiler/audit-actions/$dbName/$tableName/$startDate/$endDate?userName=$userName")
+      .withToken(token)
+      .withHeaders("Accept" -> "application/json")
+      .get()
+      .map(mapResultsGeneric)
+  }
 }

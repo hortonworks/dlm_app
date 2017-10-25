@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChange, ViewChild} from "@angular/core";
 import {TaggingWidgetTagModel} from "../../../../../../shared/tagging-widget/tagging-widget.component";
 import {AssetTypeEnum} from "../../../ds-assets-list/ds-assets-list.component";
@@ -48,6 +59,13 @@ export class BasicQueryEditor implements OnInit {
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
     if (changes["queryObj"]) {
       this.copyQryObjToWidget();
+    }
+  }
+
+  onKeyUp(event){
+    let keyCode = event.keyCode || event.which;
+    if(keyCode === 13){
+      this.notificationEmitter.emit("");
     }
   }
 

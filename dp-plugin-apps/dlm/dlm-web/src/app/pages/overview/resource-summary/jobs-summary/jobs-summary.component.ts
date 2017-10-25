@@ -16,12 +16,11 @@ import { JOBS_HEALTH_STATE } from '../resource-summary.type';
   template: `
     <dlm-summary-panel
       [title]="'page.overview.summary_panels.title.jobs'"
-      [total]="data.total"
-      [hint]="'page.overview.summary_panels.hint.jobs'">
+      [total]="data.total">
       <div class="row">
         <dlm-summary-panel-cell
-          class="col-md-4"
-          iconClass="fa fa-circle text-info"
+          class="col-xs-4"
+          iconClass="fa fa-circle-o text-info"
           qe-attr="show-jobs-in-progress"
           (cellClick)="selectPanelCell.emit(healthStates.IN_PROGRESS)"
           [actionable]="data.inProgress > 0"
@@ -29,21 +28,23 @@ import { JOBS_HEALTH_STATE } from '../resource-summary.type';
           [value]="data.inProgress">
         </dlm-summary-panel-cell>
         <dlm-summary-panel-cell
-          class="col-md-4"
+          class="col-xs-4"
           iconClass="fa fa-circle text-danger"
           qe-attr="show-failed-jobs"
           (cellClick)="selectPanelCell.emit(healthStates.LAST_FAILED)"
           [actionable]="data.lastFailed > 0"
           [label]="'page.overview.summary_panels.status.failed_last' | translate"
+          [hint]="'page.overview.summary_panels.hint.jobs.failed_last'"
           [value]="data.lastFailed">
         </dlm-summary-panel-cell>
         <dlm-summary-panel-cell
-          class="col-md-4"
+          class="col-xs-4"
           iconClass="fa fa-circle text-danger"
           qe-attr="show-last-10-failed-jobs"
           (cellClick)="selectPanelCell.emit(healthStates.LAST_10_FAILED)"
           [actionable]="data.last10Failed > 0"
           [label]="'page.overview.summary_panels.status.failed_last_10' | translate"
+          [hint]="'page.overview.summary_panels.hint.jobs.failed_last_ten'"
           [value]="data.last10Failed">
         </dlm-summary-panel-cell>
       </div>

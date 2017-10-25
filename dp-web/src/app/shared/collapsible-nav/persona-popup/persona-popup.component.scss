@@ -1,3 +1,14 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 @import "../../../../styles/variables";
 
 .suit-navigation {
@@ -10,7 +21,7 @@
   -webkit-box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
   -moz-box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
   box-shadow: 5px 5px 10px rgba(66, 66, 66, 0.3);
-  z-index: 100;
+  z-index: 1001;
   visibility: hidden;
   width: auto;
   display: flex;
@@ -32,6 +43,7 @@
       display: inline-block;
       height: 75px;
       width: 75px;
+      line-height: 45px;
       & + div {
         text-align: center;
         font-size: 13px;

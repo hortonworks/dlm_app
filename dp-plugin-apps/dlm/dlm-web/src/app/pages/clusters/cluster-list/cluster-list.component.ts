@@ -10,6 +10,7 @@
 import { Component, OnInit, Input, ViewChild, TemplateRef, ViewEncapsulation, HostBinding,
   ChangeDetectorRef } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 import { Router } from '@angular/router';
 import { Cluster, ClusterAction } from 'models/cluster.model';
 import { TableTheme } from 'common/table/table-theme.type';
@@ -18,6 +19,8 @@ import { ColumnMode } from '@swimlane/ngx-datatable';
 import { CLUSTER_STATUS } from 'constants/status.constant';
 import { ROOT_PATH } from 'constants/hdfs.constant';
 import { ACTION_TYPES } from 'components/cluster-actions/cluster-actions.component';
+import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
+import { Location } from 'models/location.model';
 
 @Component({
   selector: 'dlm-cluster-list',
@@ -34,6 +37,9 @@ export class ClusterListComponent implements OnInit {
   columnMode = ColumnMode.flex;
   isOpen = false;
   visibleActionMap = {};
+  tableFooterOptions = {
+    pagerDropup: true
+  } as TableFooterOptions;
   private selectedFileBrowserPage = {};
   clusterActions = [
     {
@@ -65,27 +71,39 @@ export class ClusterListComponent implements OnInit {
 
   @HostBinding('class') className = 'dlm-cluster-list';
 
-  constructor(private t: TranslateService, private cdRef: ChangeDetectorRef, private router: Router) { }
+  constructor(private t: TranslateService,
+              private cdRef: ChangeDetectorRef,
+              private bytesPipe: BytesSizePipe,
+              private router: Router) { }
 
   ngOnInit() {
     this.columns = [
-      {prop: 'healthStatus', name: this.t.instant('common.status.self'), cellTemplate: this.statusCellRef,
-        flexGrow: 3, cellClass: 'status'},
+      {prop: 'healthStatus', name: this.t.instant('common.status.self'), headerClass: 'status-header',
+        cellTemplate: this.statusCellRef, flexGrow: 3, cellClass: 'status'},
       {prop: 'dataCenter', name: '', cellTemplate: this.dcCellRef, flexGrow: 3},
       {name: '', cellTemplate: this.slashIconCellRef, flexGrow: 1},
       {prop: 'name', name: '', cellTemplate: this.nameCellRef, flexGrow: 4},
-      {prop: 'stats', name: this.t.instant('page.clusters.card.usage'), cellTemplate: this.usageCellRef, minWidth: 160, flexGrow: 5},
+      {prop: 'stats', name: this.t.instant('page.clusters.card.usage'), cellTemplate: this.usageCellRef,
+        minWidth: 160, flexGrow: 5, comparator: this.clusterUsageComparator.bind(this)},
       {prop: 'totalHosts', name: this.t.instant('page.clusters.card.nodes'),
-        cellTemplate: this.plainCellRef, flexGrow: 1, cellClass: 'text-cell', headerClass: 'text-header'},
+        cellTemplate: this.plainCellRef, qeAttrName: 'total-hosts', flexGrow: 1, cellClass: 'text-cell', headerClass: 'text-header'},
       {prop: 'pairsCounter', name: this.t.instant('common.pairs'),
-        cellTemplate: this.plainCellRef, flexGrow: 1, cellClass: 'text-cell', headerClass: 'text-header'},
+        cellTemplate: this.plainCellRef, qeAttrName: 'total-pairs', flexGrow: 1, cellClass: 'text-cell', headerClass: 'text-header'},
       {prop: 'policiesCounter', name: this.t.instant('common.policies'),
-        cellTemplate: this.plainCellRef, flexGrow: 2, cellClass: 'text-cell', headerClass: 'text-header'},
+        cellTemplate: this.plainCellRef, qeAttrName: 'total-policies', flexGrow: 2, cellClass: 'text-cell', headerClass: 'text-header'},
       {prop: 'location', name: this.t.instant('page.clusters.card.location'),
-        cellTemplate: this.locationCellRef, flexGrow: 4},
+        cellTemplate: this.locationCellRef, comparator: this.clusterLocationComparator.bind(this), flexGrow: 4},
       {name: '', cellTemplate: this.addActionsCellRef,
         cellClass: 'add-actions-cell', flexGrow: 1}
     ];
+  }
+
+  clusterUsageComparator(stats1, stats2) {
+    return this.getCapacityUsed(stats1) > this.getCapacityUsed(stats2) ? 1 : -1;
+  }
+
+  clusterLocationComparator(location1: Location, location2: Location) {
+    return location1.city.toLowerCase() > location2.city.toLowerCase() ? 1 : -1;
   }
 
   toggleClusterDetails(clusterRow) {
@@ -130,6 +148,14 @@ export class ClusterListComponent implements OnInit {
 
   isExpandedRow(row: Cluster): boolean {
     return this.tableComponent.expandedRows[row.id];
+  }
+
+  getCapacityUsed(stats) {
+    return (stats && stats.CapacityUsed) ? this.bytesPipe.transform(stats.CapacityUsed) : this.t.instant('common.na');
+  }
+
+  getCapacityTotal(stats) {
+    return (stats && stats.CapacityTotal) ? this.bytesPipe.transform(stats.CapacityTotal) : this.t.instant('common.na');
   }
 
   getFileBrowserPageForRow(rowId) {

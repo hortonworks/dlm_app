@@ -7,17 +7,18 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+
 .policy-info {
   .policy-name {
     cursor: pointer;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    line-height: 27px;
   }
-}
-
-p {
-  margin-bottom: 0;
+  p {
+    margin-bottom: 0;
+  }
 }
 
 .tooltip-inner {

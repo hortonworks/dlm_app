@@ -1,4 +1,14 @@
 #!/bin/sh
+#
+# /*
+#  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+#  *
+#  * Except as expressly permitted in a written agreement between you or your company
+#  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+#  * reproduction, modification, redistribution, sharing, lending or other exploitation
+#  * of all or any part of the contents of this software is strictly prohibited.
+#  */
+#
 # version: '2'
 # services:
 #   knox:
@@ -17,8 +27,12 @@ docker start knox >> install.log 2>&1 || \
         --network dp \
         --detach \
         --publish 8443:8443 \
+        --env "CERTIFICATE_PASSWORD=$CERTIFICATE_PASSWORD" \
         --env "MASTER_PASSWORD=$MASTER_PASSWORD" \
         --env "USE_TEST_LDAP=$USE_TEST_LDAP" \
         --env "CONSUL_HOST=$CONSUL_HOST" \
-        hortonworks/dp-knox:$VERSION \
-        sh ./launch-knox.sh
+        --volume knox-config:/etc/knox/conf \
+        --volume knox-security:/usr/hdp/current/knox-server/data/security \
+        --volume $(pwd)/certs:/dp-shared \
+        hortonworks/dp-knox:$VERSION
+        

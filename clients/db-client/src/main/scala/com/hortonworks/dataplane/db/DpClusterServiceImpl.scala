@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.db
 
 import javax.inject.Singleton
@@ -72,11 +83,11 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
   }
 
   override def delete(
-                       dpClusterId: String): Future[Either[Errors, DataplaneCluster]] = {
+                       dpClusterId: String): Future[Either[Errors, Boolean]] = {
     ws.url(s"$url/dp/clusters/$dpClusterId")
       .withHeaders("Accept" -> "application/json")
       .delete()
-      .map(mapToDpCluster)
+      .map(mapStatus)
   }
 
   private def mapToDpClusters(res: WSResponse) = {
@@ -99,6 +110,7 @@ class DpClusterServiceImpl(config: Config)(implicit ws: WSClient)
           res,
           r =>
             (r.json \ "results" \\ "data").head.validate[DataplaneCluster].get)
+      case 404 => createEmptyErrorResponse
       case _ => mapErrors(res)
     }
   }

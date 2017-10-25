@@ -1,25 +1,32 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import java.util
 import java.util.Optional
 
-import akka.actor.{ActorRef, ActorSystem, Props}
 import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Inject, Provides, Singleton}
 import com.hortonworks.datapalane.consul._
+import com.hortonworks.dataplane.commons.metrics.MetricsRegistry
 import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.db.Webservice._
 import com.hortonworks.dataplane.cs._
-import com.hortonworks.dataplane.commons.auth.Authenticated
 import play.api.{Configuration, Logger}
-import play.api.inject.ApplicationLifecycle
 import play.api.libs.ws.WSClient
-
-import scala.concurrent.Future
 
 class Module extends AbstractModule {
   def configure() = {
-    bind(classOf[Authenticated]).asEagerSingleton()
     bind(classOf[ConsulInitializer]).asEagerSingleton()
+    bind(classOf[MetricsRegistry]).toInstance(MetricsRegistry("dp-app"))
   }
 
 

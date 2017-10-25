@@ -24,10 +24,27 @@
       width: 100%;
     }
   }
+
+  datatable-progress {
+    .container {
+      width: 100%;
+      text-align: center;
+    }
+    .fa {
+      margin: 10px 0;
+    }
+    .fa-spin {
+      font-size: 18px;
+    }
+  }
 }
 
 .no-sort-cell {
   .caret {
     display: none !important;
   }
+}
+
+.datatable-header-cell:not(.sortable) .datatable-header-cell-wrapper {
+  cursor: default !important;
 }

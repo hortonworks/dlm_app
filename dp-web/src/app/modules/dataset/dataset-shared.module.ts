@@ -1,6 +1,17 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {CommonModule} from "@angular/common";
 import {NgModule} from "@angular/core";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {NguiAutoCompleteModule} from '@ngui/auto-complete';
 import {PaginationModule} from "../../shared/pagination/pagination.module";
 import {TaggingWidgetModule} from "../../shared/tagging-widget/tagging-widget.module";
@@ -22,9 +33,26 @@ import {DsAssetList} from "./views/ds-assets-list/ds-assets-list.component";
 import {DsAssetsHolder} from "./views/ds-editor/ds-assets-holder/ds-assets-holder.component";
 import {DsEditor} from "./views/ds-editor/ds-editor.component";
 import {DsInfoHolder} from "./views/ds-editor/ds-info-holder/ds-info-holder.component";
+import {UniqueDatasetNameValidator} from "./directives/validators";
 import {DsSummaryHolder} from "./views/ds-editor/ds-summary-holder/ds-summary-holder.component";
 import {DsFullView} from "./views/ds-full-view/ds-full-view.component";
 import {TranslateModule} from "@ngx-translate/core";
+import { MyDateRangePickerModule } from 'mydaterangepicker';
+
+import {AssetViewComponent} from './views/asset-view/asset-view.component';
+import {NodeDetailsComponent} from './views/asset-view/node-details/node-details.component';
+import {DropdownModule} from '../../shared/dropdown/dropdown.module';
+import {TabsModule} from '../../shared/tabs/tabs.module';
+import { AssetDetailsViewComponent } from './views/asset-view/asset-details-view/asset-details-view.component';
+import { AssetColumnVisualComponent } from './views/asset-view/asset-column-visual/asset-column-visual.component';
+import { AssetAuditView } from './views/asset-view/asset-audit-view/asset-audit-view.component';
+import { AssetPolicyView } from './views/asset-view/asset-policy-view/asset-policy-view.component';
+import {LineageModule} from '../../shared/lineage/lineage.module';
+import {AssetService} from '../../services/asset.service';
+import {RangerService} from '../../services/ranger.service';
+import { AuditVisualizationComponent } from './views/asset-view/asset-audit-view/audit-visualization/audit-visualization.component';
+import { AssetTagPolicyViewComponent } from './views/asset-view/asset-policy-view/asset-tag-policy-view/asset-tag-policy-view.component';
+import { AssetResourcePolicyViewComponent } from './views/asset-view/asset-policy-view/asset-resource-policy-view/asset-resource-policy-view.component';
 
 @NgModule({
   declarations: [
@@ -43,16 +71,31 @@ import {TranslateModule} from "@ngx-translate/core";
     BasicQueryEditor,
     AdvanceQueryEditor,
     QueryFilter,
-    SearchWidget
+    SearchWidget,
+    UniqueDatasetNameValidator,
+    AssetViewComponent,
+    AssetDetailsViewComponent,
+    NodeDetailsComponent,
+    AssetColumnVisualComponent,
+    AssetAuditView,
+    AssetPolicyView,
+    AuditVisualizationComponent,
+    AssetTagPolicyViewComponent,
+    AssetResourcePolicyViewComponent,
   ],
   entryComponents: [QueryFilter],
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     NguiAutoCompleteModule,
     TaggingWidgetModule,
     TranslateModule,
-    PaginationModule
+    PaginationModule,
+    DropdownModule,
+    TabsModule,
+    LineageModule,
+    MyDateRangePickerModule,
   ],
   exports: [
     NavTagPanel,
@@ -76,7 +119,9 @@ import {TranslateModule} from "@ngx-translate/core";
     RichDatasetService,
     DsAssetsService,
     DsTagsService,
-    AssetOwnerService
+    AssetOwnerService,
+    AssetService,
+    RangerService,
   ]
 })
 export class DatasetSharedModule {

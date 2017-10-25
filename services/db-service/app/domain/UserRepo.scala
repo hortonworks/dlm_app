@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package domain
 
 import java.lang.RuntimeException
@@ -6,6 +17,8 @@ import javax.inject.{Inject, Singleton}
 
 import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.RoleType
+import domain.API.UpdateError
+import domain.API.EntityNotFound
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 
 import scala.collection.mutable
@@ -36,7 +49,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     }
 
     val countQuery = searchTerm match {
-      case Some(searchTerm) => Users.filter(_.username like (s"%$searchTerm%")).length
+      case Some(searchTerm) => Users.filter(_.username.toLowerCase like (s"%${searchTerm.toLowerCase}%")).length
       case None =>  Users.length
     }
     for {
@@ -90,15 +103,19 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
 
   private def getUserDetailInternal(userName:String):Future[(User,Seq[UserRole])]={
     val query=for{
-      (user, userRole) <- Users.filter(_.username===userName) joinLeft  UserRoles on (_.id === _.userId)
+      (user, userRole) <- Users.filter(_.username.toLowerCase === userName.toLowerCase) joinLeft  UserRoles on (_.id === _.userId)
     }yield {
       (user,userRole)
     }
     val roleIdMap=rolesUtil.getRoleIdMap
     db.run(query.result).map { results =>
-      val user:User=results.head._1
-      var roles=results.filter(res=>res._2.isDefined ).map(_._2.get)
-      (user,roles)
+      if(results.isEmpty){
+        throw new EntityNotFound
+      }else{
+        val user:User=results.head._1
+        var roles=results.filter(res=>res._2.isDefined ).map(_._2.get)
+        (user,roles)
+      }
     }
   }
 
@@ -110,6 +127,19 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
     }
   }
 
+  def update(user: User): Future[User] = {
+    db
+      .run {
+        Users
+          .filter(_.id === user.id)
+          .update(user)
+      }
+      .map {
+        case 0 => throw UpdateError()
+        case _ => user
+      }
+  }
+
   def updateUserAndRoles(userInfo:UserInfo, groupManaged:Boolean):Future[UserInfo]={
     val queryFuture=for{
       (user,currentRoles)<-getUserDetailInternal(userInfo.userName)
@@ -118,7 +148,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
       val toBeAddedRoleObjs=rolesUtil.getUserRoleObjectsforRoleIds(user.id.get,toBeAddedRoleIds)
       for{
         updateUser <- {
-          Users.filter(_.username===userInfo.userName)
+          Users.filter(_.username.toLowerCase===userInfo.userName.toLowerCase)
             .map{r=>
               (r.active,r.updated,r.groupManaged)
             }
@@ -192,7 +222,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
          UserGroups returning UserGroups ++=  userGroups
        }
        updatedUserUpdatedTime<-
-         Users.filter(_.username===userName)
+         Users.filter(_.username.toLowerCase === userName.toLowerCase)
            .map{r=>
              (r.updated)
            }
@@ -233,7 +263,7 @@ class UserRepo @Inject()(protected val dbConfigProvider: DatabaseConfigProvider,
   }
 
   def findByName(username: String):Future[Option[User]] = {
-    db.run(Users.filter(_.username === username).result.headOption)
+    db.run(Users.filter(_.username.toLowerCase === username.toLowerCase()).result.headOption)
   }
 
   def findById(userId: Long):Future[Option[User]] = {

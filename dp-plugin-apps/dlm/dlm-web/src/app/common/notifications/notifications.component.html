@@ -9,15 +9,15 @@
 
 <span class="notifications-group pull-right">
   <span class="alerts-label dropdown-toggle" data-toggle="dropdown" qe-attr="notifications-dropdown-toggler">
-    <span class="fa fa-bell"></span>
+    <span class="fa fa-fw fa-bell"></span>
     <span *ngIf="newEventsCount && newEventsCount > 0" class="numberCircle alert-crit-count">{{ newEventsCount }}</span>
   </span>
   <div id="notifications-dropdown" class="dropdown-menu row">
     <div class="popup-arrow-up"></div>
-    <div class="notifications-header col-sm-12">
+    <div class="notifications-header col-xs-12">
       <div class="notifications-title">Notifications</div>
     </div>
-    <div class="notifications-body col-sm-12" *ngIf="events?.length; else noEventsTemplate">
+    <div class="notifications-body col-xs-12" *ngIf="events?.length; else noEventsTemplate">
       <table class="alerts-table table table-hover">
         <tbody *ngIf="events?.length; else noEventsTemplate">
           <tr *ngFor="let event of events | slice:0:5">
@@ -36,13 +36,13 @@
       </table>
     </div>
     <ng-template #noEventsTemplate>
-      <div class="col-md-12">
+      <div class="col-xs-12">
         <span class="text-muted">
           {{'topnav.notifications.empty_list' | translate}}
         </span>
       </div>
     </ng-template>
-    <div class="notifications-footer col-sm-12">
+    <div class="notifications-footer col-xs-12">
       <button qe-attr="go-to-notifications" type="button" class="btn btn-primary pull-right" (click)="viewAllClickHandler()">View All</button>
     </div>
   </div>

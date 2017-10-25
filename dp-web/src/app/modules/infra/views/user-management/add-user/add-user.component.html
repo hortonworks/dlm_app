@@ -1,9 +1,20 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div class="load-right-to-left-slider dialog1x">
   <div class="title-container">
     <div class="hwx-subtitle">
       <span *ngIf="mode === modes.ADD">{{"pages.infra.labels.addUser" | translate}}</span>
       <span *ngIf="mode === modes.EDIT">{{user? user.userName: ''}}</span>
-      <i id="back" class="fa fa-remove close-icon" (click)="back()"></i>
+      <i id="back" class="fa fa-remove close-icon" [routerLink]="['/infra/manage-access/users']"></i>
     </div>
   </div>
   <div class="slider-container">
@@ -21,20 +32,21 @@
             [tags]="users"
             [availableTags]="availableUsers"
             [clearOnSearch]="true"
-            [theme]="tagTheme.DARK"
             [restrictFreeText]="true"
+            [minChars]=3
             (textChange)="onUserSearchChange($event)"
             (onNewSearch)="onNewUserAddition($event)"></tagging-widget>
         </div>
         <div class="form-group dp-input">
           <label class="required">{{"pages.infra.labels.roles" | translate}}</label>
-          <div id="duplicate-role-warning" class="hwx-inline-desc warning"></div>
+          <div class="hwx-inline-desc"><i class="fa fa-warning warning"></i>{{"pages.infra.description.rolesOverrideWarning" | translate}}</div>
+          <div id="duplicate-role-warning" class="hwx-inline-desc duplicate-error"></div>
           <tagging-widget #roleTags class="role-tags" id="role-tags"
             [tags]="roles"
             [availableTags]="availableRoles"
             [clearOnSearch]="true"
-            [theme]="tagTheme.DARK"
             [restrictFreeText]="true"
+            [minChars]=3
             (textChange)="onRoleSearchChange($event)"
             (onNewSearch)="onNewRoleAddition($event)"></tagging-widget>
             <i id="roles-dropdown" class="fa fa-caret-down drop-down-icon" (click)="showRoleOptions()"></i>
@@ -65,7 +77,7 @@
         <div class="mdl-grid mdl-grid--no-spacing padding-top15">
           <div class="mdl-cell mdl-cell--2-col"></div>
           <div class="mdl-layout-spacer"></div>
-          <div id="duplicate-role-warning" class="mdl-cell mdl-cell--9-col hwx-inline-desc warning"></div>
+          <div id="duplicate-role-warning" class="mdl-cell mdl-cell--9-col hwx-inline-desc duplicate-error"></div>
         </div>
 
         <div class="mdl-grid mdl-grid--no-spacing">
@@ -78,11 +90,12 @@
               [tags]="userRoles"
               [availableTags]="availableRoles"
               [clearOnSearch]="true"
-              [theme]="tagTheme.DARK"
               [restrictFreeText]="true"
+              [minChars]=3
               (textChange)="onRoleSearchChange($event)"
               (onNewSearch)="onRolesEdit($event)"></tagging-widget>
               <i id="roles-dropdown" class="fa fa-caret-down drop-down-icon" (click)="showRoleOptions()"></i>
+              <div *ngIf="!showRoles" class="hwx-inline-desc"><i class="fa fa-warning warning"></i>{{"pages.infra.description.rolesOverrideWarning" | translate}}</div>
               <div id="roles-option-list" *ngIf="showRoles" class="option-list">
                 <div *ngFor="let roleOption of allRoles" id="role-{{roleOption.data}}" (click)="onRolesEdit(roleOption)">{{roleOption.display}}</div>
               </div>
@@ -92,7 +105,7 @@
     </form>
     <div class="margin-top-20">
       <button id="save-btn" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"common.save" | translate}}</button>
-      <button id="cancel-btn" class="mdl-button btn-hwx-default" (click)="back()">{{"common.cancel" | translate}}</button>
+      <button id="cancel-btn" class="mdl-button btn-hwx-default" [routerLink]="['/infra/manage-access/users']">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

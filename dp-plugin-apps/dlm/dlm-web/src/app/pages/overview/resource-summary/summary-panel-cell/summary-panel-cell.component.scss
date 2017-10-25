@@ -9,6 +9,14 @@
 
 :host {
   padding: 0;
+
+  /deep/ {
+    dlm-help-link {
+      bs-tooltip-container {
+        width: 200px;
+      }
+    }
+  }
 }
 
 .cell-label {

@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.http.routes
 
 import java.lang.Exception
@@ -6,20 +17,14 @@ import javax.inject.Inject
 
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
+import com.google.common.net.HttpHeaders
 import com.hortonworks.dataplane.commons.domain.Constants
-import com.hortonworks.dataplane.commons.domain.Entities.{
-  DataplaneClusterIdentifier,
-  ErrorType,
-  HJwtToken
-}
+import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneClusterIdentifier, ErrorType, HJwtToken}
+import com.hortonworks.dataplane.commons.metrics.{MetricsRegistry, MetricsReporter}
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
-import com.hortonworks.dataplane.cs.{ClusterSync, StorageInterface}
+import com.hortonworks.dataplane.cs.{ClusterSync, CredentialInterface, StorageInterface}
 import com.hortonworks.dataplane.http.BaseRoute
-import com.hortonworks.dataplane.knox.Knox.{
-  ApiCall,
-  KnoxApiRequest,
-  KnoxConfig
-}
+import com.hortonworks.dataplane.knox.Knox.{ApiCall, KnoxApiRequest, KnoxConfig}
 import com.hortonworks.dataplane.knox.KnoxApiExecutor
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
@@ -39,9 +44,11 @@ private[routes] case class AmbariError(cause: Throwable)
 
 class StatusRoute @Inject()(val ws: WSClient,
                             storageInterface: StorageInterface,
+                            val credentialInterface: CredentialInterface,
                             val config: Config,
                             clusterSync: ClusterSync,
-                            dpClusterSync: DpClusterSync)
+                            dpClusterSync: DpClusterSync,
+                            metricsRegistry: MetricsRegistry)
     extends BaseRoute {
 
   import com.hortonworks.dataplane.commons.domain.Ambari._
@@ -49,6 +56,16 @@ class StatusRoute @Inject()(val ws: WSClient,
   import scala.concurrent.duration._
 
   val logger = Logger(classOf[StatusRoute])
+
+  private lazy val hdInsightErrorContentType = config.getString("dp.service.hdinsight.auth.challenge.contentType")
+  private lazy val hdInsightErrorWwwAuth = config.getString("dp.service.hdinsight.auth.challenge.wwwAuthenticate")
+  private lazy val hdInsightErrorStatus = config.getInt("dp.service.hdinsight.auth.status")
+  private lazy val hdInsightErrorMessage = config.getString("dp.service.hdinsight.auth.response.message")
+
+  val tokenTopologyName = Try(config.getString("dp.services.knox.token.topology"))
+    .getOrElse("token")
+
+  metricsRegistry.newGauge("knox.token.topology.name",{() => tokenTopologyName})
 
   def makeAmbariApiRequest(endpoint: String,
                            ambariResponse: AmbariForbiddenResponse,
@@ -96,13 +113,13 @@ class StatusRoute @Inject()(val ws: WSClient,
             val tokenInfoHeader = request.getHeader(Constants.DPTOKEN)
             if (!tokenInfoHeader.isPresent) {
               logger.error(
-                "Knox was detected, but the called did not send a JWT token with the request header X-DP-Token-Info")
+                "Knox was detected, but the caller did not send a JWT token with the request header X-DP-Token-Info")
               throw new RuntimeException(
                 "Ambari was Knox protected but no jwt token was sent with the request")
             }
             val tokenHeader = tokenInfoHeader.get.value
             val response =
-              KnoxApiExecutor(KnoxConfig("token", Some(knoxUrl)), ws).execute(
+              KnoxApiExecutor(KnoxConfig(tokenTopologyName, Some(knoxUrl)), ws).execute(
                 KnoxApiRequest(delegatedRequest,
                                delegatedApiCall,
                                Some(tokenHeader)))
@@ -130,12 +147,10 @@ class StatusRoute @Inject()(val ws: WSClient,
         // Fallback to local user
         // Step 4
         for {
-          user <- storageInterface.getConfiguration("dp.ambari.superuser")
-          pass <- storageInterface.getConfiguration(
-            "dp.ambari.superuser.password")
+          credential <- credentialInterface.getCredential("dp.credential.ambari")
           response <- ws
             .url(endpoint)
-            .withAuth(user.get, pass.get, WSAuthScheme.BASIC)
+            .withAuth(credential.user.get, credential.pass.get, WSAuthScheme.BASIC)
             .withRequestTimeout(timeout seconds)
             .get()
         } yield {
@@ -211,10 +226,24 @@ class StatusRoute @Inject()(val ws: WSClient,
 
   private def mapAsUnauthenticatedResponse(
       response: WSResponse): AmbariForbiddenResponse = {
-    if (response.status != 403)
-      throw AmbariError(new Exception(s"Unexpected Response from Ambari, expected 403, actual ${response.status}"))
-    //Step 2
-    response.json.validate[AmbariForbiddenResponse].get
+      response.status match {
+        case 403 => response.json.validate[AmbariForbiddenResponse].get
+        case x if x == hdInsightErrorStatus =>
+          // Check for HD insight
+          val auth = response.header(HttpHeaders.WWW_AUTHENTICATE)
+          val contentType = response.header(HttpHeaders.CONTENT_TYPE)
+          if(contentType.isDefined &&  contentType.get == hdInsightErrorContentType && auth.isDefined && auth.get == hdInsightErrorWwwAuth) {
+              AmbariForbiddenResponse(hdInsightErrorStatus,hdInsightErrorMessage,None)
+          } else {
+            throw AmbariError(new Exception(s"Received 401 from Ambari but response does not match any known cluster, tried HD insight"))
+          }
+        case _ => throw AmbariError(new Exception(s"Unexpected Response from Ambari, expected 403 or 401, actual ${response.status}"))
+
+      }
+
+
+
+
   }
 
   import java.net.InetAddress
@@ -236,15 +265,20 @@ class StatusRoute @Inject()(val ws: WSClient,
     }
   }
 
+  val ambariConnectTimer = metricsRegistry.newTimer("ambari.status.request.time")
+
   val route =
     path("ambari" / "status") {
+      val context = ambariConnectTimer.time()
       extractRequest { request =>
         post {
           entity(as[AmbariEndpoint]) { ep =>
             onComplete(checkAmbariAvailability(ep, request)) {
               case Success(res) =>
+                context.stop()
                 complete(success(res))
               case Failure(e) =>
+                context.stop()
                 e match {
                   case c: ConnectionError =>
                     complete(StatusCodes.InternalServerError,
@@ -289,6 +323,16 @@ class StatusRoute @Inject()(val ws: WSClient,
     pathEndOrSingleSlash {
       get {
         complete(success(Map("status" -> 200)))
+      }
+    }
+  }
+
+
+  val metrics = path("metrics") {
+    implicit val mr:MetricsRegistry = metricsRegistry
+    pathEndOrSingleSlash {
+      get {
+        complete(MetricsReporter.asJson)
       }
     }
   }

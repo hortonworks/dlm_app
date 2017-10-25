@@ -1,12 +1,24 @@
-import {NgModule} from "@angular/core";
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
 
-import {SharedModule} from "../shared.module";
-import {TaggingWidget} from "./tagging-widget.component";
+import {NgModule} from '@angular/core';
+
+import {SharedModule} from '../shared.module';
+import {TaggingWidget} from './tagging-widget.component';
+import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
   declarations: [TaggingWidget],
   exports: [TaggingWidget],
-  imports: [SharedModule],
+  imports: [SharedModule, TranslateModule],
   providers: [],
 })
 export class TaggingWidgetModule {

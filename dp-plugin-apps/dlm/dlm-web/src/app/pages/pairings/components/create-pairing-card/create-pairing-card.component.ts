@@ -10,6 +10,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ClusterPairing } from 'models/cluster-pairing.model';
 import { TranslateService } from '@ngx-translate/core';
+import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 
 @Component({
   selector: 'dlm-create-pairing-card',
@@ -23,14 +24,19 @@ export class CreatePairingCardComponent implements OnInit {
   @Input() isFrozen = false;
 
   get location() {
-    return this.cluster.disabled ? '' : this.cluster.location.city + ', ' + this.cluster.location.country;
+    return this.cluster.location.city + ', ' + this.cluster.location.country;
   }
 
-  get tooltip() {
-    return this.cluster.disabled ? this.t.instant('page.pairings.create.content.cluster_disabled') : '';
+  get capacityRemaining() {
+    return (this.cluster && this.cluster.stats && this.cluster.stats.CapacityRemaining) ?
+      this.bytesPipe.transform(this.cluster.stats.CapacityRemaining) : this.t.instant('common.na');
   }
 
-  constructor(private t: TranslateService) { }
+  get isDisabled() {
+    return this.cluster.disabled || this.cluster.ambariUnhealthy || this.cluster.beaconUnhealthy;
+  }
+
+  constructor(private t: TranslateService, private bytesPipe: BytesSizePipe) { }
 
   ngOnInit() {
   }

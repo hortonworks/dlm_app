@@ -92,6 +92,9 @@ export const routes: Routes = [{
     component: HelpComponent
   }, {
     path: '**',
-    component: NotFoundRouteComponent
+    component: NotFoundRouteComponent,
+    data: {
+      breadcrumb: 'page.not_found.breadcrumb'
+    }
   },
 ];

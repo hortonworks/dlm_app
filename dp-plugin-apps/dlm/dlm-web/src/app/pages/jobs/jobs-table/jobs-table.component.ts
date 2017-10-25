@@ -8,10 +8,10 @@
  */
 
 import { Component, OnInit, Input, Output, ViewChild, TemplateRef, EventEmitter } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { Job } from 'models/job.model';
 import { ActionItemType } from 'components';
 import { TableComponent } from 'common/table/table.component';
-import { abortJob } from 'actions/job.action';
 import { Policy } from 'models/policy.model';
 import { Store } from '@ngrx/store';
 import * as fromRoot from 'reducers/';
@@ -20,6 +20,7 @@ import { LogService } from 'services/log.service';
 import { EntityType } from 'constants/log.constant';
 import { contains } from 'utils/array-util';
 import { transferredBytesComparator } from 'utils/table-util';
+import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
 
 @Component({
   selector: 'dp-jobs-table',
@@ -37,17 +38,21 @@ export class JobsTableComponent implements OnInit {
   @ViewChild('runTimeTemplate') runTimeTemplate: TemplateRef<any>;
   @ViewChild('transferredTemplate') transferredTemplate: TemplateRef<any>;
   @ViewChild('transferredFormattedTemplate') transferredFormattedTemplate: TemplateRef<any>;
+  @ViewChild('transferredObjectsTemplate') transferredObjectsTemplate: TemplateRef<any>;
   @ViewChild('serviceTemplate') serviceTemplate: TemplateRef<any>;
   @ViewChild('actionsCell') actionsCellRef: TemplateRef<any>;
   @ViewChild('jobsTable') jobsTable: TableComponent;
 
   @Input() jobs: Job[];
+  @Input() jobsOverallCount: number;
+  @Input() jobsOffset: number;
+  @Input() loadingJobs;
   @Input() policy: Policy;
-  @Input() showPageSizeMenu = true;
   @Input() selectionType = 'any';
   @Input() sorts = [];
   @Input() page = 0;
   @Input() visibleActionMap = {};
+  @Input() footerOptions: TableFooterOptions;
 
   @Output() onSort = new EventEmitter<any>();
   @Output() onPageChange = new EventEmitter<any>();
@@ -56,17 +61,24 @@ export class JobsTableComponent implements OnInit {
   @Output() rerunJobAction = new EventEmitter<any>();
 
   rowActions = <ActionItemType[]>[
-    {label: 'Abort', name: 'ABORT', enabledFor: JOB_STATUS.RUNNING},
-    {label: 'Re-run', name: 'RERUN', disableFn: this.isRerunDisabled.bind(this)},
-    {label: 'View Log', name: 'LOG'}
+    {label: 'Abort', name: 'ABORT', enabledFor: JOB_STATUS.RUNNING, qeAttr: 'abort-job'},
+    {label: 'Re-run', name: 'RERUN', disableFn: this.isRerunDisabled.bind(this), qeAttr: 'rerun-job'},
+    {label: 'View Log', name: 'LOG', qeAttr: 'job-log'}
   ];
 
-  constructor(protected store: Store<fromRoot.State>, protected logService: LogService) {
-  }
+  constructor(protected store: Store<fromRoot.State>,
+              protected logService: LogService,
+              protected t: TranslateService) { }
 
   protected cannotRerun(policy, lastJob) {
     return !lastJob || policy.status === POLICY_STATUS.SUSPENDED || contains([JOB_STATUS.SUCCESS, JOB_STATUS.RUNNING], lastJob.status);
   }
+
+  protected translateColumn(columnName: string): string {
+    return this.t.instant(`page.policies.jobs_table.column.${columnName}`);
+  }
+
+  selectCheck = () => false;
 
   ngOnInit() {
     this.columns = [
@@ -75,51 +87,60 @@ export class JobsTableComponent implements OnInit {
         cellTemplate: this.statusVerbTemplate,
         prop: 'status',
         cellClass: 'text-cell',
-        headerClass: 'text-header'
+        headerClass: 'text-header',
+        name: this.translateColumn('status')
       },
       {
         prop: 'startTime',
         cellTemplate: this.agoTemplate,
-        name: 'Started',
+        name: this.translateColumn('startTime'),
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
       {
         prop: 'endTime',
         cellTemplate: this.agoTemplate,
-        name: 'Ended',
+        name: this.translateColumn('endTime'),
         cellClass: 'date-cell',
         headerClass: 'date-header'
       },
       {
-        prop: 'trackingInfo.timeTaken',
+        prop: 'duration',
         cellTemplate: this.runTimeTemplate,
-        name: 'Runtime',
+        name: this.translateColumn('duration'),
         cellClass: 'date-cell',
-        headerClass: 'date-header'
+        headerClass: 'date-header',
+        sortable: false
       },
       {
         prop: 'trackingInfo',
         cellTemplate: this.transferredFormattedTemplate,
-        name: 'Transferred Bytes',
+        name: this.translateColumn('transferredBytes'),
         cellClass: 'date-cell',
         headerClass: 'date-header',
-        comparator: transferredBytesComparator.bind(this)
+        comparator: transferredBytesComparator.bind(this),
+        sortable: false
       },
       {
-        prop: 'trackingInfo.filesCopied',
-        name: 'Transferred Files',
+        prop: 'trackingInfo',
+        name: this.translateColumn('transferredFiles'),
+        cellTemplate: this.transferredObjectsTemplate,
         cellClass: 'date-cell',
-        headerClass: 'date-header'
+        headerClass: 'date-header',
+        sortable: false
       },
-      {name: 'Actions', cellTemplate: this.actionsCellRef, sortable: false}
+      {
+        name: this.translateColumn('actions'),
+        cellTemplate: this.actionsCellRef,
+        sortable: false
+      }
     ];
   }
 
   handleSelectedAction({row, action}) {
     switch (action.name) {
       case 'LOG':
-        return this.logService.showLog(EntityType.policyinstance, row.id);
+        return this.logService.showLog(EntityType.policyinstance, row.id, row.endTime);
       case 'ABORT':
         return row.status === JOB_STATUS.RUNNING && this.abortJobAction.emit(row);
       case 'RERUN':
@@ -128,7 +149,7 @@ export class JobsTableComponent implements OnInit {
   }
 
   isRunning(job: Job) {
-    return job && job.duration <= 0;
+    return job && !job.isCompleted;
   }
 
   handleActionOpenChange(event: {rowId: string, isOpen: boolean}) {
@@ -151,9 +172,18 @@ export class JobsTableComponent implements OnInit {
     this.onPageChange.emit(page);
   }
 
-
   isRerunDisabled(job, _): boolean {
     const lastJob = this.policy.lastJobResource;
     return !lastJob || lastJob.id !== job.id || this.cannotRerun(this.policy, lastJob);
+  }
+
+  isJobRuntimeGreater(job) {
+    if (job.status === JOB_STATUS.SUCCESS || job.status === JOB_STATUS.WARNINGS) {
+      const jobRuntime = Number(job.duration);
+      const policyFrequency = Number(this.policy.frequency);
+      // job duration is in milliseconds while policy frequency is in seconds
+      return jobRuntime > 0 && policyFrequency > 0 && jobRuntime > (policyFrequency * 1000);
+    }
+    return false;
   }
 }

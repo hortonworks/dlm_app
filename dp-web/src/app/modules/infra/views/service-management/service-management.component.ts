@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AddOnAppService} from '../../../../services/add-on-app.service';
@@ -68,7 +79,7 @@ export class ServiceManagementComponent implements OnInit {
       let serviceDependency = responses[0];
       let lakes = responses[1];
       lakes.forEach((lake) => {
-        this.extractClusterInfo(serviceName, lake, serviceDependency.dependencies).subscribe(clusterInfo => {
+        this.extractClusterInfo(serviceName, lake, serviceDependency).subscribe(clusterInfo => {
           clusters.push(clusterInfo);
           enabledApp.clustersInfo = clusters;
           enabledApp.isOpen = true;
@@ -89,11 +100,14 @@ export class ServiceManagementComponent implements OnInit {
                 clusterInfo.syncInProgress = false;
                 return;
               }
-              this.extractClusterInfo(serviceName, lake, serviceDependency.dependencies).subscribe(info => {
+              this.extractClusterInfo(serviceName, lake, serviceDependency).subscribe(info => {
                 clusterInfo.lastUpdated = DateUtils.toReadableDate(new Date().getTime() - new Date(lakeUpdated.updated).getTime());
                 clusterInfo.syncInProgress = false;
                 clusterInfo.synced = true;
+                clusterInfo.mandatoryDependencies = info.mandatoryDependencies;
+                clusterInfo.optionalDependencies = info.optionalDependencies;
                 clusterInfo.dependenciesMet = info.dependenciesMet;
+                clusterInfo.optionalDependenciesMet = info.optionalDependenciesMet;
               });
             });
           });
@@ -102,21 +116,32 @@ export class ServiceManagementComponent implements OnInit {
     });
   }
 
-  extractClusterInfo(serviceName, lake, dependencies): Observable<any> {
+  extractClusterInfo(serviceName, lake, serviceDependency): Observable<any> {
     return Observable.create(observer => {
       let services = Object.keys(lake.clusters[0].properties.desired_service_config_versions);
       this.lakeService.getDiscoveredServices(lake.data.id).subscribe(discoveredServices => {
         let dependenciesMet = true;
-        dependencies.forEach(dependency => {
+        let optionalDependenciesMet = true;
+        serviceDependency.mandatoryDependencies.forEach(dependency => {
           if (!services.find(key => key === dependency) && !discoveredServices.find(service => service.servicename === dependency)) {
             dependenciesMet = false;
           }
         });
+        if(serviceDependency.optionalDependencies){
+          serviceDependency.optionalDependencies.forEach(dependency => {
+            if (!services.find(key => key === dependency) && !discoveredServices.find(service => service.servicename === dependency)) {
+              optionalDependenciesMet = false;
+            }
+          });
+        }
         return observer.next({
           dpClusterId: lake.data.id,
           name: lake.data.name,
           lastUpdated: DateUtils.toReadableDate(new Date().getTime() - new Date(lake.data.updated).getTime()),
-          dependenciesMet: dependenciesMet
+          dependenciesMet: dependenciesMet,
+          mandatoryDependencies: serviceDependency.mandatoryDependencies,
+          optionalDependencies: serviceDependency.optionalDependencies,
+          optionalDependenciesMet: optionalDependenciesMet
         });
       }, error => {
 
@@ -126,7 +151,7 @@ export class ServiceManagementComponent implements OnInit {
   }
 
   enableServiceOnCluster(dpClusterId, service) {
-    this.router.navigate(['/infra/services/install'], {
+    this.router.navigate(['/infra/services/add'], {
       queryParams: {
         id: dpClusterId,
         name: service.skuName
@@ -136,10 +161,6 @@ export class ServiceManagementComponent implements OnInit {
 
   onSort(e) {
 
-  }
-
-  enableService(service: AddOnAppInfo) {
-    this.router.navigate(['verify', service.skuName], {relativeTo: this.route})
   }
 
 }

@@ -1,3 +1,14 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 @import "../../../../../styles/_variables.scss";
 .no-top-bottom-space {
   padding-top: 0 !important;
@@ -31,6 +42,18 @@
   display: block;
   font-size: 15px;
   line-height: 15px;
+}
+
+.services {
+  margin: 7px 0 0;
+  & .fa-check-circle {
+    color: $forest-green-1;
+    margin-right: 10px;
+  }
+  & .fa-exclamation-triangle {
+    color: $burnt-cienna-red;
+    margin-right: 10px;
+  }
 }
 
 .text-small-1 {
@@ -125,3 +148,61 @@
   }
 }
 
+.flex-display{
+  display: flex;
+}
+
+.info-container{
+  width: 75%;
+  flex: 1;
+}
+
+.info-button{
+  position: relative;
+}
+
+.services-container{
+  width: 25%;
+  padding-left: 12px;
+}
+
+.services-header-grid{
+  padding-bottom: 0px;
+  padding-top: 24px;
+}
+
+.services-body-grid{
+  padding-bottom: 0px;
+  padding-top: 0px;
+}
+
+.services-body-cell{
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.error-notification-bar {
+  padding: 15px;
+  background: $concrete;
+  height: 34px;
+  margin-bottom: 20px;
+  .fa-times-circle {
+    font-size: 24px;
+    color: $roman-red;
+  }
+  .fa-remove {
+    color: $dusty-gray;
+    cursor: pointer;
+  }
+  .text-medium {
+    font-weight: 500;
+    color: $roman-red;
+  }
+}
+
+.disabled, .disabled > * {
+  color: rgba(0,0,0, 0.26) !important;
+  cursor: default;
+  background-color: transparent;
+  pointer-events: none;
+}

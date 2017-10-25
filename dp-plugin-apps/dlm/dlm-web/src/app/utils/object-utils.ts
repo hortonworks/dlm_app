@@ -8,6 +8,7 @@
  */
 
 import * as _isEqual from 'lodash.isequal';
+import * as _merge from 'lodash.merge';
 
 export const toKeyValueArray = (obj: string) => {
   let result = [];
@@ -55,3 +56,5 @@ export const multiLevelResolve = (obj, path) => {
   }
   return current;
 };
+
+export const merge = _merge;

@@ -1,3 +1,13 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
 package com.hortonworks.dataplane.gateway.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,7 +39,9 @@ public class UserService {
   public Optional<UserContext> getUserContext(String userName) {
     try {
       UserList list=userServiceInterface.getUserContext(userName);
-      return Optional.of(list.getResults());
+      UserContext uc = list.getResults();
+      uc.setDbManaged(false);
+      return Optional.of(uc);
     }catch (FeignException fe){
       if (fe.status()==404){
         return Optional.absent();
@@ -42,7 +54,9 @@ public class UserService {
 
   public UserContext syncUserFromLdapGroupsConfiguration(String subject) {
     try {
-      return ldapUserInterface.addUserFromLdapGroupsConfiguration(subject);
+      UserContext uc = ldapUserInterface.addUserFromLdapGroupsConfiguration(subject);
+      uc.setDbManaged(false);
+      return uc;
     }catch (FeignException fe){
       if (fe.status()==403){
         throw new NoAllowedGroupsException();//Usaually groups are not configured for this user.
@@ -53,7 +67,9 @@ public class UserService {
   }
   public UserContext resyncUserFromLdapGroupsConfiguration(String subject) {
     try {
-      return ldapUserInterface.resyncUserFromLdapGroupsConfiguration(subject);
+      UserContext uc = ldapUserInterface.resyncUserFromLdapGroupsConfiguration(subject);
+      uc.setDbManaged(false);
+      return uc;
     }catch (FeignException fe){
       if (fe.status()==403){
         throw new NoAllowedGroupsException();//Usaually groups are not configured for this user.

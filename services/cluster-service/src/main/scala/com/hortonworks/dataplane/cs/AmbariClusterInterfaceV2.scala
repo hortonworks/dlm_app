@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.cs
 
 import com.hortonworks.dataplane.commons.domain.Entities.{
@@ -19,13 +30,13 @@ class AmbariClusterInterfaceV2(
     private val cluster: Cluster,
     private val dataplaneCluster: DataplaneCluster,
     private val appConfig: Config,
-    private val storageInterface: StorageInterface,
+    private val credentialInterface: CredentialInterface,
     knoxApiExecutor: KnoxApiExecutor)(implicit ws: WSClient)
     extends AmbariInterfaceV2 {
 
   val logger = Logger(classOf[AmbariClusterInterfaceV2])
 
-  lazy val credentials: Future[Credentials] = loadCredentials
+  val credentials: Future[Credentials] = credentialInterface.getCredential("dp.credential.ambari")
 
   override def getAtlas(implicit hJwtToken: Option[HJwtToken])
     : Future[Either[Throwable, Atlas]] = {
@@ -501,16 +512,6 @@ class AmbariClusterInterfaceV2(
         Future.successful(Left(e))
     }
 
-  }
-
-  private def loadCredentials = {
-    val creds = for {
-      user <- storageInterface.getConfiguration("dp.ambari.superuser")
-      pass <- storageInterface.getConfiguration("dp.ambari.superuser.password")
-    } yield {
-      Credentials(user, pass)
-    }
-    creds
   }
 
 }

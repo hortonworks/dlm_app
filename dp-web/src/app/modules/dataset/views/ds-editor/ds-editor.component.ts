@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {ActivatedRoute, Router} from "@angular/router";
 import {RichDatasetModel} from "../../models/richDatasetModel";
@@ -21,6 +32,7 @@ export class DsEditor implements OnInit {
   assetSetQueryModelsForAddition: AssetSetQueryModel[] = [];
   assetSetQueryModelsForSubtraction: AssetSetQueryModel[] = [];
   private datasetId: number = null;
+  errorMessage: string;
 
   constructor(public dsModel: RichDatasetModel,
               private richDatasetService: RichDatasetService,
@@ -32,7 +44,7 @@ export class DsEditor implements OnInit {
   ngOnInit() {
     this.activeRoute.params.subscribe(params => this.datasetId = +params["id"]);
     if (isNaN(this.datasetId)) {
-      this.router.navigate(["datasteward/dataset/add"]);
+      this.router.navigate(["datasteward/collections/add"]);
     }
     else {
       this.assetSetQueryModelsForAddition.push(
@@ -46,10 +58,6 @@ export class DsEditor implements OnInit {
     }
   }
 
-  setVisibilityOfNext() {
-    this.nextIsVisible = (this.currentStage == 1 || this.currentStage == 2 && this.assetSetQueryModelsForAddition.length != 0);
-  }
-
   actionNext() {
     if (!this[`validateStage${this.currentStage}`]()) {
       this.fillMandatoryMsg.nativeElement.style.display="block";
@@ -58,12 +66,12 @@ export class DsEditor implements OnInit {
     }
     this.fillMandatoryMsg.nativeElement.style.display="none";
     ++this.currentStage;
-    this.setVisibilityOfNext();
   }
 
   moveToStage(newStage: number) {
     if ((newStage < this.currentStage) && (this.currentStage = newStage)) {
-      this.setVisibilityOfNext();
+      // clear error
+      this.errorMessage = null;
     }
   }
 
@@ -72,11 +80,17 @@ export class DsEditor implements OnInit {
     this.saveInProgress = true;
     this.richDatasetService
       .saveDataset(this.dsModel, this.assetSetQueryModelsForAddition, this.tags)
-      .subscribe(obj => {this.actionCancel();})
+      .subscribe(
+        () => this.actionCancel(),
+        error => {
+          this.saveInProgress = false;
+          this.errorMessage = error.json().message
+        }
+      );
   }
 
   actionCancel() {
-    this.router.navigate(["datasteward/dataset"]);
+    this.router.navigate(["datasteward/collections"]);
   }
 
   validateStage1() {

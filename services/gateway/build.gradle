@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 buildscript {
     ext {
         springBootVersion = '1.5.2.RELEASE'
@@ -32,10 +43,13 @@ dependencyManagement {
     }
 }
 dependencies {
+    compile group: 'io.dropwizard.metrics', name: 'metrics-core', version: '3.2.5'
+    compile group: 'io.github.openfeign', name: 'feign-jackson', version: '9.4.0'
     compile 'org.mindrot:jbcrypt:0.3m'
     compile 'io.jsonwebtoken:jjwt:0.7.0'
     compile 'org.springframework.cloud:spring-cloud-starter-zuul'
     compile 'org.springframework.cloud:spring-cloud-starter-consul-discovery'
     compile 'org.springframework.cloud:spring-cloud-starter-ribbon'
     compile 'org.springframework.cloud:spring-cloud-starter-feign'
+    testCompile 'junit:junit:4.12'
 }

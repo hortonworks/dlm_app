@@ -25,6 +25,10 @@ export class Point {
   ) { }
 }
 
+export interface ClusterMapEntity extends Cluster {
+  policiesCounter: number;
+}
+
 export interface ClusterMapData {
   start: ClusterMapPoint;
   end?: ClusterMapPoint;
@@ -32,8 +36,15 @@ export interface ClusterMapData {
 }
 
 export interface ClusterMapPoint {
-  cluster: Cluster;
+  cluster: ClusterMapEntity;
   status?: MapConnectionStatus;
+}
+
+export interface ClusterLocationGroups {
+  groups: {
+    [groupId: string]: ClusterMapEntity[]
+  };
+  connections: [ClusterMapEntity, ClusterMapEntity][];
 }
 
 export enum MapConnectionStatus {

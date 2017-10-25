@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.db
 import javax.inject.Singleton
 
@@ -24,6 +35,20 @@ class LdapConfigServiceImpl(config: Config)(implicit ws: WSClient)
       .map { res =>
         res.status match {
           case 200 => Right((res.json \ "results").validate[LdapConfiguration].get)
+          case 404 => Left(Errors(Seq(Error("404", "API not found"))))
+          case _ => mapErrors(res)
+        }
+      }
+  }
+  override def update(ldapConfig: LdapConfiguration): Future[Either[Errors, Boolean]] = {
+    ws.url(s"$serviceUri/ldapconfig")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json")
+      .put(Json.toJson(ldapConfig))
+      .map { res =>
+        res.status match {
+          case 200 => Right(true)
           case 404 => Left(Errors(Seq(Error("404", "API not found"))))
           case _ => mapErrors(res)
         }

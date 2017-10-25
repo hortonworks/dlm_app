@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Component, ElementRef, ViewChild, OnInit, HostListener} from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
@@ -59,6 +70,7 @@ export class ClusterAddComponent implements OnInit {
   showError = false;
   errorMessage = '';
   isInvalidAmbariUrl = false;
+  isServiceHidden=true;
 
   constructor(private router: Router,
               private route: ActivatedRoute,
@@ -105,8 +117,19 @@ export class ClusterAddComponent implements OnInit {
     this.showError = false;
   }
 
+  resetPage(){
+    this.showError = false;
+    this.isInvalidAmbariUrl = false;
+    this.showNotification = false;
+    this._isClusterValidateInProgress = false;
+    this._isClusterValidateSuccessful = false;
+    this.clusterForm.reset();
+    this.cluster = new Cluster();
+  }
+
   getClusterInfo(event) {
     this.showError = false;
+    this.isServiceHidden=true;
     this.isInvalidAmbariUrl = false;
     this.showNotification = false;
     this._isClusterValidateInProgress = true;
@@ -256,8 +279,10 @@ export class ClusterAddComponent implements OnInit {
 
   onSelectLocation(location: Location) {
     this.mapData = [];
-    let point = new Point(location.latitude, location.longitude, MapConnectionStatus.UP);
-    this.mapData = [new MapData(point)];
+    if(location && location.id) {
+      let point = new Point(location.latitude, location.longitude, MapConnectionStatus.UP);
+      this.mapData = [new MapData(point)];
+    }
     this.cluster.location = location;
   }
 
@@ -272,14 +297,8 @@ export class ClusterAddComponent implements OnInit {
     }
     this.createCluster()
       .subscribe(
-        () => {
-          this.router.navigate(['infra']).then(() => {
-
-          });
-        },
-        error => {
-          this.handleError(error);
-        }
+        () => this.router.navigate(['/infra']),
+        error => this.handleError(error)
       );
   }
 
@@ -329,10 +348,6 @@ export class ClusterAddComponent implements OnInit {
     return this.lakeService.insert(lake);
   }
 
-  onCancel() {
-    this.router.navigate(['infra']);
-  }
-
   onCreateAndAdd() {
     this.showError = false;
     if (!this.isLocationValid || !this.isFormValid()) {
@@ -343,7 +358,7 @@ export class ClusterAddComponent implements OnInit {
         this.cluster = new Cluster();
         this._isClusterValid = false;
         this._isClusterValidateSuccessful = false;
-        this.router.navigate(['infra/add']).then(() => {
+        this.router.navigate(['/infra/clusters/add']).then(() => {
           this.lakeService.clusterAdded.next();
         });
       },

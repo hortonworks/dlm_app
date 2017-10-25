@@ -7,25 +7,24 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
+$filter-width: 200px;
+
 :host {
-  .filter-item {
-    margin: 2px;
-    font-size: 12px;
-    font-weight: 400;
-    display: inline-block;
-    float: right;
-  }
   .applied-filters-wrapper {
-    max-width: 320px;
+    width: calc(100% - #{$filter-width});
+  }
+  .filter-field {
+    width: $filter-width;
   }
   input {
-    width: 200px;
+    width: $filter-width;
   }
 
-  .label.label-default a {
-    color: #fff;
-    &:hover {
-      text-decoration: none;
+  .label.label-default {
+    a {
+      &:hover {
+        text-decoration: none;
+      }
     }
   }
   .form-group {
@@ -33,5 +32,13 @@
   }
   .form-control-feedback {
     color: #999;
+  }
+  .no-results {
+    position: absolute;
+    top: 34px;
+    display: block;
+    .dropdown-menu {
+      min-width: 200px;
+    }
   }
 }

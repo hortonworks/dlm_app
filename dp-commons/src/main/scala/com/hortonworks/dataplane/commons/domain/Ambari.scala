@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.commons.domain
 
 import play.api.libs.json.{JsValue, Json}
@@ -15,6 +26,10 @@ object Ambari {
                            knoxUrl:Option[String])
 
   case class AmbariEndpoint(url: String)
+
+  case class ServiceInfo(serviceName: String,
+                         state: String,
+                         serviceVersion: String)
 
   case class AmbariCheckResponse(ambariApiCheck: Boolean,
                                  knoxDetected: Boolean,
@@ -143,6 +158,8 @@ object Ambari {
   implicit val nameNodeReads = Json.reads[NameNodeInfo]
   implicit val endPointWrites = Json.writes[AmbariEndpoint]
   implicit val endPointReads = Json.reads[AmbariEndpoint]
+  implicit val seviceInfoReads = Json.reads[ServiceInfo]
+  implicit val serviceInfoWrites = Json.writes[ServiceInfo]
   implicit val configTypeReads = Json.reads[ConfigType]
   implicit val configTypeWrites = Json.writes[ConfigType]
   implicit val configurationInfoReads = Json.reads[ConfigurationInfo]

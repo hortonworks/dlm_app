@@ -1,9 +1,20 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 @import "../../../../../../styles/variables";
 
 .nav-tag-panel{
   height:100%;
   bottom: 0;
-  color: white;
+  color: $white;
   position: fixed;
   color: $dusty-gray;
   background-color: $alabaster;
@@ -11,36 +22,38 @@
   height: calc(100% - #{$layout-header-desktop-row-height});
   overflow-y: hidden;
   border-right: 1px solid $mercury;
+
+  & .tag-search {
+    position: relative;
+    height: 36px;
+    line-height: 19px;
+    border-top: 1px solid $concrete;
+    border-bottom: 1px solid $concrete;
+
+    & input {
+      width: 100%;
+      height: 100%;
+      border: none;
+      padding-left: 15px;
+      padding-right: 35px;
+    }
+
+    & .fa-search,
+    & .fa-times {
+      position: absolute;
+      top: 11px;
+      right: 15px;
+    }
+  }
+
+  & .tag-list {
+    height: 100%;
+    overflow-y: auto;
+  }
 }
 
-.nav-tag-panel .tag-search {
-  padding: 7px 30px 7px 15px;
-  font-size: 14px;
-  height: 36px;
-  line-height: 19px;
-  border-top: 1px solid $concrete;
-  border-bottom: 1px solid $concrete;
-}
-.nav-tag-panel .tag-search input {
-  width: 100%;
-  height:100%;
-  float: left;
-  border-width: 0px;
-  background-color: transparent;
-  outline: none;
-  font-size: 14px;
-}
-.nav-tag-panel .tag-search .fa-search{
-  margin-right: -20px;
-  cursor: pointer;
-}
-.nav-tag-panel .tag-list {
-  height:100%;
-  overflow-y: auto;
-}
-
-.panelRow{
-  padding: 8px 20px;
+.panelRow {
+  padding: 8px 15px;
   font-size: 15px;
   font-weight: 300;
   cursor: pointer;
@@ -50,22 +63,22 @@
     background-color: $bright-gray;
     color: $fruit-salad;
   }
-}
 
-.panelRow .displaycount {
-  float: right;
-}
+  .displaycount {
+    float: right;
+  }
 
-.panelRow.selected{
-  background-color: $white;
-  color: $mine-shaft;
+  &.selected{
+    background-color: $white;
+    color: $mine-shaft;
 
-  &:before {
-    font-family: FontAwesome;
-    content: '\f0da';
-    color: $fruit-salad;
-    position: absolute;
-    left: 1px;
-    font-size: 16px;
+    &:before {
+      font-family: FontAwesome;
+      content: '\f0da';
+      color: $fruit-salad;
+      position: absolute;
+      left: 1px;
+      font-size: 16px;
+    }
   }
 }

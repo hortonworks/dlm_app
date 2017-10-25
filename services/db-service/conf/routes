@@ -5,6 +5,7 @@
 #Users API
 
 GET           /health                                                        controllers.Status.health
+GET           /metrics                                                       controllers.Status.metrics
 
 GET           /users/detail/:username                                        controllers.Users.getUserDetail(username:String)
 GET           /users                                                         controllers.Users.all(username: Option[String])
@@ -18,6 +19,7 @@ POST          /users/role                                                    con
 GET           /users/role/:username                                          controllers.Users.getRolesForUser(username)
 GET           /users/all                                                     controllers.Users.getUsers
 GET           /users/:userId                                                 controllers.Users.load(userId:Long)
+PUT           /users/:userId                                                 controllers.Users.update(userId: String)
 
 
 GET           /groups                                                        controllers.Groups.getGroups
@@ -144,7 +146,7 @@ GET           /clusters/:clusterId/properties/:propertiesId                  con
 DELETE        /clusters/:clusterId/properties/:propertiesId                  controllers.ClusterProps.delete(clusterId: Long, propertiesId:Long)
 
 #Dataset API
-GET           /datasets                                                      controllers.Datasets.all
+GET           /datasets                                                      controllers.Datasets.all(name: Option[String])
 POST          /datasets                                                      controllers.Datasets.add
 POST          /datasetswithassets                                            controllers.Datasets.addWithAsset
 PUT           /datasets                                                      controllers.Datasets.update
@@ -186,6 +188,7 @@ DELETE        /datasets/details/:id                                          con
 
 #Data Asset Api
 GET           /dataassets/:datasetId                                         controllers.DataAssets.allWithDatasetId(datasetId:Long, queryName: String, offset: Long, limit: Long)
+GET           /dataassets/guid/:guid                                         controllers.DataAssets.loadFromGuid(guid: String)
 POST          /dataassets                                                    controllers.DataAssets.add
 DELETE        /dataassets/:id                                                controllers.DataAssets.delete(id:Long)
 
@@ -199,5 +202,6 @@ PUT          /configurations                                                cont
 
 
 #ldapconfig
-POST          /ldapconfig                                                    controllers.LdapConfig.add
+POST         /ldapconfig                                                    controllers.LdapConfig.add
 GET          /ldapconfig                                                    controllers.LdapConfig.getAll
+PUT          /ldapconfig                                                    controllers.LdapConfig.update

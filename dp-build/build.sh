@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
+#
+# /*
+#  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+#  *
+#  * Except as expressly permitted in a written agreement between you or your company
+#  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+#  * reproduction, modification, redistribution, sharing, lending or other exploitation
+#  * of all or any part of the contents of this software is strictly prohibited.
+#  */
+#
 set -e
 
 DP_DOCKER_ROOT_FOLDER=build/dp-docker
@@ -71,9 +81,7 @@ build_dp_app() {
 	log "Building dp-app"
 	pushd ../dp-app
 	unpack_for_docker_deploy ../dp-build/build/tmp_dp-app ../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-app/dp-app
-	cp -R ../dp-build/services ../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-app/
-	cp ../dp-build/Dockerfile ../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-app/
-	cp ../dp-build/nginx.ctmpl ../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-app/
+	cp -R ../dp-build/docker/app/* ../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-app/
 	popd
 }
 
@@ -81,8 +89,8 @@ build_dp_web() {
 	log "Building dp-web"
 	pushd ../dp-web
 	if [ ${IS_JENKINS} == false ]; then
-		npm install
-		npm run build
+		yarn install
+		yarn run build
 	else
 		echo "Not running dp-web NPM again"
 	fi
@@ -100,8 +108,9 @@ build_knox_agent() {
 
 build_dp_knox() {
 	log "Building dp-knox"
-	cp -R knox-scripts ${DP_DOCKER_ROOT_FOLDER}/dp-knox/
-	cp Dockerfile.knox ${DP_DOCKER_ROOT_FOLDER}/dp-knox/Dockerfile
+	# move docker files and utils
+	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-knox/
+	cp -R ./docker/knox/* ${DP_DOCKER_ROOT_FOLDER}/dp-knox/
     cp -R build/dp-docker/dp-knox-agent/dp-knox-agent/ ${DP_DOCKER_ROOT_FOLDER}/dp-knox/dp-knox-agent
 }
 
@@ -118,16 +127,27 @@ build_cluster_service() {
 
 build_migrate() {
 	log "Building dp-migrate"
+
 	# move docker files and utils
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/
 	cp -R ./docker/migrate/* ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/
+	
 	# move flyway migration scripts
 	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/
 	cp -R ../services/db-service/db/* ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/
+	
 	# removed unneccesary files
 	rm -rf ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/generators
 	rm ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/flyway.conf
 	rm ${DP_DOCKER_ROOT_FOLDER}/dp-migrate/dbscripts/erd.png
+
+	# move bcrypt tool
+	log "Moving bcrypter"
+	rm -rf ../tools/bcrypter/build
+	mkdir ../tools/bcrypter/build
+	pushd ../tools/bcrypter
+	unpack_for_docker_deploy build/tmp_tools_bcrypter ../../dp-build/${DP_DOCKER_ROOT_FOLDER}/dp-migrate/bcrypter
+	popd
 }
 
 build_installer() {
@@ -135,7 +155,6 @@ build_installer() {
     mkdir -p ${DP_DOCKER_ROOT_FOLDER}/installer/certs/
 	cp -R install/* ${DP_DOCKER_ROOT_FOLDER}/installer
 	cp dp-docker-build.sh ${DP_DOCKER_ROOT_FOLDER}/installer/
-    cp ../dp-app/conf/cert/dp-keystore.jck ${DP_DOCKER_ROOT_FOLDER}/installer/certs/
 	VERSION_STRING=$(get_version)
 	echo ${VERSION_STRING} > ${DP_DOCKER_ROOT_FOLDER}/installer/VERSION	
 }

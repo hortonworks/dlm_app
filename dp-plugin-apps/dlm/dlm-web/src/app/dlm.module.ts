@@ -44,6 +44,7 @@ import { HiveListEffects } from './effects/hivelist.effect';
 import { LogEffects } from './effects/log.effect';
 import { ConfirmationEffects } from './effects/confirmation.effect';
 import { NotificationEffects } from './effects/notification.effect';
+import { BeaconEffects } from './effects/beacon.effect';
 
 import { FormEffects } from './effects/form.effect';
 
@@ -63,6 +64,7 @@ import { NotificationService } from 'services/notification.service';
 import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-external-filters.service';
 import { UserService } from 'services/user.service';
 import { ConfirmationService } from 'services/confirmation.service';
+import { BeaconService } from 'services/beacon.service';
 
 import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
@@ -139,6 +141,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SimpleNotificationsModule } from 'angular2-notifications';
 
 import { HortonStyleModule } from 'common/horton-style.module';
+import { BytesSizePipe } from 'pipes/bytes-size.pipe';
 
 @NgModule({
   imports: [
@@ -160,6 +163,7 @@ import { HortonStyleModule } from 'common/horton-style.module';
     EffectsModule.run(LogEffects),
     EffectsModule.run(ConfirmationEffects),
     EffectsModule.run(NotificationEffects),
+    EffectsModule.run(BeaconEffects),
     CollapseModule.forRoot(),
     BsDropdownModule.forRoot(),
     TabsModule.forRoot(),
@@ -252,6 +256,7 @@ import { HortonStyleModule } from 'common/horton-style.module';
     NavbarService,
     EventService,
     LogService,
+    BytesSizePipe,
     TimeZoneService,
     HdfsService,
     HiveService,
@@ -261,6 +266,7 @@ import { HortonStyleModule } from 'common/horton-style.module';
     httpServiceProvider,
     FrequencyPipe,
     UserService,
+    BeaconService,
     AppConfig,
     {
       provide: APP_INITIALIZER,

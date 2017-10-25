@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package controllers
 
 import java.time.{ZoneId, ZonedDateTime}
@@ -6,7 +17,6 @@ import javax.inject._
 import com.hortonworks.dataplane.commons.domain.Entities._
 import domain.API.{roles, users}
 import domain.{EnabledSkuRepo, RolesUtil, UserRepo}
-import org.mindrot.jbcrypt.BCrypt
 import play.api.libs.json.Json
 import play.api.mvc._
 
@@ -102,7 +112,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
         userRepo
           .insert(
             username = user.username,
-            password = BCrypt.hashpw(user.password, BCrypt.gensalt()),
+            password = user.password,
             displayname = user.displayname,
             avatar = user.avatar
           )
@@ -113,6 +123,19 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
       }
       .getOrElse(Future.successful(BadRequest))
   }
+
+  def update(id: String) = Action.async(parse.json) { req =>
+    req.body
+      .validate[User]
+      .map { user =>
+        userRepo
+          .update(user)
+          .map { u => success(u) }
+          .recoverWith(apiError)
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
+
   def updateActiveAndRoles = Action.async(parse.json) { req =>
     req.body
       .validate[UserInfo]
@@ -132,7 +155,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
       .validate[UserInfo]
       .map { userInfo =>
         val password: String =
-          BCrypt.hashpw(Random.alphanumeric.toString(), BCrypt.gensalt())
+          Random.alphanumeric.take(10).mkString
         userRepo.findByName(userInfo.userName).flatMap{
           case  None=>{
             userRepo
@@ -161,8 +184,7 @@ class Users @Inject()(userRepo: UserRepo, rolesUtil: RolesUtil,enabledSkuRepo: E
         if (userGroupInfo.groupIds.isEmpty){
           Future.successful(BadRequest(Json.toJson(Errors(Seq(Error("INPUT_ERROR","Group needs to be specified"))))))
         }else{
-          val password: String =
-            BCrypt.hashpw(Random.alphanumeric.toString(), BCrypt.gensalt())
+          val password: String = Random.alphanumeric.take(10).mkString
           userRepo.insertUserWithGroups(userGroupInfo,password)
             .map(userGroupInfo => success(userGroupInfo))
             .recoverWith(apiError)

@@ -1,6 +1,6 @@
 [
   {
-    "id":63,
+    "id":1,
     "data":{
       "items":[
         {
@@ -25,7 +25,32 @@
     }
   },
   {
-    "id":64,
+    "id":2,
+    "data":{
+      "items":[
+        {
+          "ServiceInfo":{
+            "service_name":"BEACON",
+            "state":"STARTED"
+          }
+        },
+        {
+          "ServiceInfo":{
+            "service_name":"HDFS",
+            "state":"STARTED"
+          }
+        },
+        {
+          "ServiceInfo":{
+            "service_name":"HIVE",
+            "state":"STARTED"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id":3,
     "data":{
       "items":[
         {

@@ -8,19 +8,22 @@
   -->
 
 <div class="row row-nopad">
-  <div class="col-sm-3 col-md-2 col-lg-2">
-    {{summary}}
+  <div class="col-xs-3 col-md-2 col-lg-2">
+    <span *ngIf="options.showFilterSummary">
+      {{summary}}
+    </span>
   </div>
-  <div class="col-sm-2 col-md-6 col-lg-6">
+  <div class="col-xs-2 col-md-5 col-lg-5">
     <ng-content></ng-content>
   </div>
-  <div class="col-sm-3 col-md-2 col-lg-2">
-    <div class="pull-right" *ngIf="showPageSizeMenu">
+  <div class="col-xs-3 col-md-2 col-lg-2">
+    <div class="pull-right" *ngIf="options.showPageSizeMenu">
       {{"common.show" | translate}}:
       <dlm-dropdown
         qe-attr="change-page-size"
         class="page-size-menu"
         type="link"
+        [isDropup]="options.pagerDropup"
         [text]="pageSize"
         [items]="pageSizeOptions"
         [buttonClass]="'btn-default'"
@@ -29,12 +32,12 @@
         (onSelectItem)="handleChangeLimit($event)"></dlm-dropdown>
     </div>
   </div>
-  <div class="col-sm-2 col-md-1 col-lg-1">
+  <div class="col-xs-2 col-md-2 col-lg-2">
     <div class="pull-right">
       {{paging}}
     </div>
   </div>
-  <div class="col-sm-2 col-md-1 col-lg-1">
+  <div class="col-xs-2 col-md-1 col-lg-1">
     <div class="pull-right">
       <button qe-attr="prev-page" class="btn btn-link" (click)="handleGoToPrev()" [disabled]="prevDisabled">
         <span class="fa fa-arrow-left" aria-hidden="true"></span>

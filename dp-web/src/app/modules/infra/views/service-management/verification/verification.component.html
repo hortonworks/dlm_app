@@ -1,3 +1,14 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div>
   <div class="title-pane">
     <span class="hwx-title">{{"pages.services.labels.verify" | translate}}</span>
@@ -38,7 +49,7 @@
     <div class="spacer-15"></div>
     <div class="button-container">
       <button id="next-btn" class="btn btn-hwx-primary" (click)="next()">{{"pages.services.labels.next" | translate}}</button>
-      <button id="cancel-btn" class="btn btn-hwx-default" (click)="cancel()">{{"common.cancel" | translate}}</button>
+      <button id="cancel-btn" class="btn btn-hwx-default" [routerLink]="['/infra', 'services']">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

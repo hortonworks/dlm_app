@@ -1,3 +1,14 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div class="container line-height-1-5">
   <div class="text-medium line-height-1">{{"pages.onboard.labels.welcomeText" | translate}}</div>
   <div class="text-xlarge green">{{"pages.onboard.labels.hwxDataplane" | translate}}</div>
@@ -21,6 +32,6 @@
     </div>
   </div>
   <div class="margin-top-30">
-    <button id="get-started-btn" class="mdl-button btn-hwx-primary" (click)="start()">{{("pages.onboard.labels.startButton" | translate).toUpperCase()}}</button>
+    <button id="get-started-btn" class="mdl-button btn-hwx-primary" [routerLink]="['/onboard/identity-provider']">{{("pages.onboard.labels.startButton" | translate).toUpperCase()}}</button>
   </div>
 </div>

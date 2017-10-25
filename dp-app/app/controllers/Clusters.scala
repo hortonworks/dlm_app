@@ -1,18 +1,40 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package controllers
 
 import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Ambari._
-import com.hortonworks.dataplane.commons.domain.Entities.{Cluster, DataplaneClusterIdentifier, Error, Errors}
+import com.hortonworks.dataplane.commons.domain.Entities.{
+  Cluster,
+  DataplaneClusterIdentifier,
+  Error,
+  ClusterHost,
+  Errors
+}
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webservice.ClusterService
-import com.hortonworks.dataplane.commons.auth.Authenticated
+import com.hortonworks.dataplane.db.Webservice.{
+  ClusterHostsService,
+  ClusterService,
+  SkuService
+}
+import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
 import models.{ClusterHealthData, JsonResponses}
 import play.api.Logger
 import play.api.mvc._
 import play.api.libs.json.Json
+import play.api.Configuration
 import services.ClusterHealthService
 import services.AmbariService
 
@@ -20,18 +42,21 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class Clusters @Inject()(
-                          @Named("clusterService") val clusterService: ClusterService,
-                          val clusterHealthService: ClusterHealthService,
-                          authenticated: Authenticated,
-                          ambariService: AmbariService,
-                          @Named("clusterAmbariService") ambariWebService: AmbariWebService,
-                          configuration: play.api.Configuration
-                        ) extends Controller {
+    @Named("clusterService") val clusterService: ClusterService,
+    @Named("clusterHostsService") val clusterHostsService: ClusterHostsService,
+    @Named("skuService") val skuService: SkuService,
+    val clusterHealthService: ClusterHealthService,
+    ambariService: AmbariService,
+    @Named("clusterAmbariService") ambariWebService: AmbariWebService,
+    configuration: Configuration
+) extends Controller {
 
-  def list(dpClusterId: Option[Long]) = authenticated.async {
+
+
+  def list(dpClusterId: Option[Long]) = Action.async {
     dpClusterId match {
       case Some(clusterId) => listByDpClusterId(clusterId)
-      case None => listAll()
+      case None            => listAll()
     }
   }
 
@@ -57,7 +82,7 @@ class Clusters @Inject()(
       }
   }
 
-  def create = authenticated.async(parse.json) { request =>
+  def create = AuthenticatedAction.async(parse.json) { request =>
     Logger.info("Received create cluster request")
     request.body
       .validate[Cluster]
@@ -74,11 +99,11 @@ class Clusters @Inject()(
       .getOrElse(Future.successful(BadRequest))
   }
 
-  def update = authenticated.async(parse.json) { req =>
+  def update = Action.async(parse.json) { req =>
     Future.successful(Ok(JsonResponses.statusOk))
   }
 
-  def get(clusterId: String) = authenticated.async {
+  def get(clusterId: String) = Action.async {
     Logger.info("Received get cluster request")
 
     clusterService
@@ -91,26 +116,53 @@ class Clusters @Inject()(
       }
   }
 
-  def getDetails = authenticated.async(parse.json) { request =>
+  def getDetails = AuthenticatedAction.async(parse.json) { request =>
     implicit val token = request.token
     request.body
       .validate[AmbariDetailRequest]
       .map { req =>
         ambariService
           .getClusterDetails(req)
-          .map {
+          .flatMap {
             case Left(errors) =>
-              InternalServerError(JsonResponses.statusError(
-                s"Failed with ${Json.toJson(errors)}"))
-            case Right(clusterDetails) => Ok(Json.toJson(clusterDetails))
+              Future.successful(InternalServerError(JsonResponses.statusError(
+                s"Failed with ${Json.toJson(errors)}")))
+            case Right(clusterDetails) => {
+              skuService
+                .getAllSkus()
+                .map {
+                  case Left(errors) => InternalServerError(Json.toJson(errors))
+                  case Right(skus) =>
+                    val allDependentServices = skus
+                      .flatMap(
+                        sku =>
+                          configuration
+                            .getStringSeq(
+                              s"${sku.name}.dependent.services.mandatory")
+                            .getOrElse(Nil))
+                      .distinct
+                    val newClusterDetails = clusterDetails.map { clDetails =>
+                      val availableRequiredServices =
+                        allDependentServices.intersect(clDetails.services)
+                      val otherServices =
+                        clDetails.services.diff(availableRequiredServices)
+                      val allAvailableServices =
+                        availableRequiredServices.union(otherServices)
+                      AmbariCluster(clDetails.security,
+                                    clDetails.clusterName,
+                                    allAvailableServices,
+                                    clDetails.knoxUrl)
+                    }
+                    Ok(Json.toJson(newClusterDetails))
+                }
+            }
           }
-
       }
       .getOrElse(Future.successful(BadRequest))
 
   }
 
-  def syncCluster(dpClusterId: Long) = authenticated.async { request =>
+  def syncCluster(dpClusterId: Long) = AuthenticatedAction.async { request =>
     implicit val token = request.token
     ambariService.syncCluster(DataplaneClusterIdentifier(dpClusterId)).map {
       case true =>
@@ -123,7 +175,7 @@ class Clusters @Inject()(
   import models.ClusterHealthData._
 
   def getHealth(clusterId: Long, summary: Option[Boolean]) =
-    authenticated.async { request =>
+    AuthenticatedAction.async { request =>
       Logger.info("Received get cluster health request")
       implicit val token = request.token
       val dpClusterId = request.getQueryString("dpClusterId").get
@@ -132,14 +184,12 @@ class Clusters @Inject()(
         .flatMap {
           case true =>
             clusterHealthService
-              .getClusterHealthData(clusterId,dpClusterId)
+              .getClusterHealthData(clusterId, dpClusterId)
           case false =>
             Future.successful(Left(Errors(Seq(Error("500", "Sync failed")))))
         }
         .map {
-          case Left(errors) =>
-            InternalServerError(
-              JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Left(errors) => InternalServerError(Json.toJson(errors))
           case Right(clusterHealth) =>
             Ok(summary match {
               case Some(_) =>
@@ -163,7 +213,9 @@ class Clusters @Inject()(
         clusterHealth.nameNodeInfo.get.CapacityTotal),
       "usedSize" -> humanizeBytes(clusterHealth.nameNodeInfo.get.CapacityUsed),
       "status" -> Json.obj(
-        "state" ->  ( if(clusterHealth.syncState.get == "SYNC_ERROR") clusterHealth.syncState.get else clusterHealth.nameNodeInfo.get.state),
+        "state" -> (if (clusterHealth.syncState.get == "SYNC_ERROR")
+                      clusterHealth.syncState.get
+                    else clusterHealth.nameNodeInfo.get.state),
         "since" -> clusterHealth.nameNodeInfo.get.StartTime
           .map(_ =>
             clusterHealth.nameNodeInfo.get.StartTime.get - System
@@ -172,34 +224,64 @@ class Clusters @Inject()(
     )
   }
 
-  def getResourceManagerHealth(clusterId: Long) = authenticated.async {
-    request => {
-      implicit val token = request.token
-      val rmRequest = configuration.getString("cluster.rm.health.request.param").get;
+  def getResourceManagerHealth(clusterId: Long) = AuthenticatedAction.async {
+    request =>
+      {
+        implicit val token = request.token
+        val rmRequest =
+          configuration.getString("cluster.rm.health.request.param").get;
 
-      ambariWebService.requestAmbariClusterApi(clusterId, rmRequest).map {
-        case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-        case Right(resourceManagerHealth) =>
-          Ok(Json.toJson(resourceManagerHealth))
+        ambariWebService.requestAmbariClusterApi(clusterId, rmRequest).map {
+          case Left(errors) => InternalServerError(Json.toJson(errors))
+          case Right(resourceManagerHealth) =>
+            Ok(Json.toJson(resourceManagerHealth))
+        }
       }
-    }
   }
 
-  def getDataNodeHealth(clusterId: Long) = authenticated.async {
-    request => {
-      implicit val token = request.token
-      val dnRequest = configuration.getString("cluster.dn.health.request.param").get;
+  def getHosts(clusterId: Long, ip: Option[String]) = AuthenticatedAction.async {
 
-      ambariWebService.requestAmbariClusterApi(clusterId, dnRequest).map {
-        case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-        case Right(datanodeHealth) =>
-          Ok(Json.toJson(datanodeHealth))
-      }
+      val hostsSearchResult = for {
+        hostsResponse <- clusterHostsService.getHostsByCluster(clusterId)
+        hosts <- {
+          if (hostsResponse.isLeft)
+            Future.failed(new Exception(hostsResponse.left.get.firstMessage))
+          else
+            Future.successful(hostsResponse.right.get)
+        }
+        hostList <- if (ip.isDefined) {
+          Future.successful(hosts.filter(_.ipaddr == ip.get))
+        } else {
+          Future.successful(hosts)
+        }
+
+      } yield hostList
+
+      hostsSearchResult
+        .map { hsr =>
+          Ok(Json.toJson(hsr))
+        }
+        .recoverWith {
+          case e: Throwable =>
+            Future.successful(
+              InternalServerError(JsonResponses.statusError(e.getMessage)))
+        }
+
     }
+
+  def getDataNodeHealth(clusterId: Long) = AuthenticatedAction.async {
+    request =>
+      {
+        implicit val token = request.token
+        val dnRequest =
+          configuration.getString("cluster.dn.health.request.param").get
+
+        ambariWebService.requestAmbariClusterApi(clusterId, dnRequest).map {
+          case Left(errors) => InternalServerError(Json.toJson(errors))
+          case Right(datanodeHealth) =>
+            Ok(Json.toJson(datanodeHealth))
+        }
+      }
   }
 
   private def humanizeBytes(bytes: Option[Double]): String = {
@@ -208,14 +290,14 @@ class Clusters @Inject()(
         if (bytes == 0) return "0 Bytes"
         val k = 1024
         val sizes = Array("Bytes ",
-          "KB ",
-          "MB ",
-          "GB ",
-          "TB ",
-          "PB ",
-          "EB ",
-          "ZB ",
-          "YB ")
+                          "KB ",
+                          "MB ",
+                          "GB ",
+                          "TB ",
+                          "PB ",
+                          "EB ",
+                          "ZB ",
+                          "YB ")
         val i = Math.floor(Math.log(bytes) / Math.log(k)).toInt
 
         Math.round(bytes / Math.pow(k, i)) + " " + sizes(i)

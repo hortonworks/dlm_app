@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package domain
 
 import com.github.tminglei.slickpg._
@@ -15,11 +26,11 @@ trait DpPgProfile extends ExPostgresProfile
   with PgLTreeSupport {
 
 
-  def pgjson = "jsonb" // jsonb support is in postgres 9.4.0 onward; for 9.3.x use "json"
+  def pgjson = "json" // jsonb support is in postgres 9.4.0 onward; for 9.3.x use "json"
 
   // Add back `capabilities.insertOrUpdate` to enable native `upsert` support; for postgres 9.5+
-  override protected def computeCapabilities: Set[Capability] =
-    super.computeCapabilities + slick.jdbc.JdbcCapabilities.insertOrUpdate
+  //  override protected def computeCapabilities: Set[Capability] =
+  //    super.computeCapabilities + slick.jdbc.JdbcCapabilities.insertOrUpdate
 
   override val api = PgAPI
 

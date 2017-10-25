@@ -15,6 +15,7 @@ import {
   isSuccessAction, isStartAction, isFailureAction, isRequestAction, isCompletedAction, originalActionName
 } from 'utils/type-action';
 import { ActionTypes } from 'actions/progress.action';
+import { omit } from 'utils/object-utils';
 
 export type State = BaseState<ProgressState>;
 
@@ -81,6 +82,13 @@ export function reducer(state = initialState, action: Action): State {
             ...progressEntity,
             ...progressState
           }
+        }
+      };
+    }
+    case ActionTypes.REMOVE_PROGRESS_STATE: {
+      return {
+        entities: {
+          ...omit(state.entities, ...action.payload.requestIds)
         }
       };
     }

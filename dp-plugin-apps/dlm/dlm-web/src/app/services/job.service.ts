@@ -10,6 +10,8 @@
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
+import * as moment from 'moment';
+
 import { Policy } from 'models/policy.model';
 import { mapResponse } from 'utils/http-util';
 import { JOB_STATUS } from 'constants/status.constant';
@@ -23,24 +25,29 @@ export class JobService {
     return `clusters/${policy.targetClusterResource.id}/policy/${policy.name}/jobs`;
   }
 
+  private doJobsRequest(url) {
+    return mapResponse(this.http.get(url)).map(response => {
+      response.jobs = response.jobs.map(this.normalizeJob);
+      return response;
+    });
+  }
+
   normalizeJob(job): Job {
+    const duration = moment(job.endTime).diff(moment(job.startTime));
+    job.duration = duration >= 0 ? duration : -1;
     job.isCompleted = job.status !== JOB_STATUS.RUNNING;
     try {
       job.trackingInfo = <JobTrackingInfo>JSON.parse(job.trackingInfo);
     } catch (e) {
       job.trackingInfo = {};
     }
-    job.duration = job.trackingInfo.timeTaken;
     return job;
   }
 
   constructor(private http: Http) {}
 
   getJobs(): Observable<any> {
-    return mapResponse(this.http.get('jobs')).map(response => {
-      response.jobs = response.jobs.map(this.normalizeJob);
-      return response;
-    });
+    return this.doJobsRequest('jobs');
   }
 
   getJob(id: string): Observable<any> {
@@ -55,10 +62,7 @@ export class JobService {
 
   getJobsForPolicy(policy: Policy, numResults = 1000): Observable<any> {
     const url = `${this.getUrlForJobs(policy)}?numResults=${numResults}`;
-    return mapResponse(this.http.get(url)).map(response => {
-      response.jobs = response.jobs.map(this.normalizeJob);
-      return response;
-    });
+    return this.doJobsRequest(url);
   }
 
   getJobsForPolicies(policies: Policy[], numResults = 1000): Observable<any> {
@@ -66,6 +70,14 @@ export class JobService {
     return Observable.forkJoin(requests).map(responses => {
       return responses.reduce((response, combined) => ({jobs: [...combined.jobs, ...response.jobs]}), {jobs: []});
     });
+  }
+
+  getJobsForPolicyServerPaginated(policy: Policy, offset, sortBy = [], pageSize = 10): Observable<any> {
+    const orderBy = sortBy[0] ? sortBy[0].prop : 'startTime';
+    const sortOrder = sortBy[0] ? sortBy[0].dir.toUpperCase() : 'DESC';
+    const qp = `numResults=${pageSize}&offset=${offset * pageSize}&orderBy=${orderBy}&sortOrder=${sortOrder}`;
+    const url = `${this.getUrlForJobs(policy)}?${qp}`;
+    return this.doJobsRequest(url);
   }
 
   abortJob(policy: Policy): Observable<any> {

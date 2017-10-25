@@ -1,3 +1,14 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 /* You can add global styles to this file, and also import other style files */
 @import "fonts";
 @import "styles/variables";
@@ -7,6 +18,7 @@
 @import "styles/mixins";
 @import "styles/html-controls";
 @import "styles/slider";
+@import "styles/dialog";
 
 body {
   font-size: 13px;
@@ -14,6 +26,7 @@ body {
   background: $gallery;
   color: $dove-gray;
   line-height: 1;
+  min-width: 1366px;
 }
 
 .dp-view-pane {
@@ -125,6 +138,7 @@ a:hover {
 @include summary-pane("summary-pane-6", "16.7%");
 @include summary-pane("summary-pane-7", "14.2%");
 @include summary-pane("summary-pane-3", "33%");
+@include summary-pane("summary-pane-1", "100%");
 
 
 .overFlowEllipsis{
@@ -142,7 +156,7 @@ a:hover {
   background: rgba(0, 0, 0, 0.5);
   padding: 30px;
   overflow: auto;
-  z-index: 10;
+  z-index: 999;
 
   & > .opaque {
     background-color: white;
@@ -189,17 +203,17 @@ a:hover {
 //Lightening the Input placeholder texts
 
 ::-webkit-input-placeholder {
-  color: $alto;
+  color: $dusty-gray;
 }
 
 :-moz-placeholder { /* Firefox 18- */
-  color: $alto;
+  color: $dusty-gray;
 }
 
 ::-moz-placeholder {  /* Firefox 19+ */
-  color: $alto;
+  color: $dusty-gray;
 }
 
 :-ms-input-placeholder {
-  color: $alto;
+  color: $dusty-gray;
 }

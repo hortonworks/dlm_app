@@ -27,6 +27,7 @@
     "pairs": "Pairs",
     "policy": "Policy",
     "name": "Name",
+    "no_results": "No results found",
     "queue_name": "Queue Name",
     "max_bandwidth": "Max. Bandwidth",
     "job": "Job",
@@ -41,6 +42,11 @@
     "for": "for",
     "error": "Error",
     "empty_log": "Log is empty",
+    "na": "NA",
+    "snapshot_enabled": "Snapshot Enabled",
+    "yes": "Yes",
+    "no": "No",
+    "not_applicable": "Not Applicable",
     "errors": {
       "no_log": "Oops! Could not retrieve a log message for this event.",
       "unknown": "Something went wrong."
@@ -95,7 +101,10 @@
     "status": {
       "self": "Status",
       "failed": "Failed",
-      "in_progress": "In Progress"
+      "in_progress": "In Progress",
+      "active": "Active",
+      "suspended": "Suspended",
+      "ended": "Expired"
     },
     "warnings": {
       "beacon_unavailable": "Data presented may not be complete due to Beacon service outage on clusters {{clusters}}."
@@ -152,6 +161,14 @@
           "title": "Activating Policy Failed"
         }
       }
+    },
+    "services": {
+      "ambari_server": "Ambari Server"
+    },
+    "units": {
+      "events": "Events",
+      "files": "Files",
+      "tables": "Tables"
     }
   },
   "topnav": {
@@ -197,12 +214,19 @@
       "freqValidator": "\"{{fieldLabel}}\" is too big",
       "integerValidator": "\"{{fieldLabel}}\" should be a positive integer",
       "time_less_than_current": "Start time must be later than the current time in the selected timezone.",
+      "greaterThanEndTime": "End time must be later than start time.",
       "not_directory": "\"{{fieldLabel}}\" should be a path to directory",
-      "not_exist_directory": "Either the path does not exist or you don't have permissions on the path",
-      "namePattern": "\"Policy Name\" should contain only letters, digits, spaces, hyphens '-', and underscores '_'."
+      "not_exist_directory": "Specified path does not exist",
+      "namePattern": "\"Policy Name\" should contain only letters, digits, spaces, hyphens '-', and underscores '_'.",
+      "invalid_date": "\"{{fieldLabel}}\" should be a valid date"
     }
   },
   "page": {
+    "not_found": {
+      "message": "This page does not exist.",
+      "link_text": "Click here to return to home page.",
+      "breadcrumb": "Route Not Found"
+    },
     "overview": {
       "charts": {
         "clusters": "Clusters",
@@ -223,6 +247,7 @@
       "issues": {
         "updates": "Issues & Updates",
         "recent": "Recent Issues",
+        "no_issues": "No issues to report",
         "list": {
           "view_all": "View all",
           "empty_list": "No issues or updates within the selected time period.",
@@ -251,9 +276,18 @@
           "warning": "Warning"
         },
         "hint": {
-          "clusters": "Clusters Hint",
-          "policies": "Policies Hint",
-          "jobs": "Jobs Hint"
+          "clusters": {
+            "healthy": "Clusters ready for replication. All core services are running.",
+            "warning": "Clusters with remaining capacity of less than 10%.",
+            "unhealthy": "Clusters for which one or more core services are not running.  Policies set up on these clusters are likely to fail unless the services are brought back up before the next scheduled job."
+          },
+          "policies": {
+            "unhealthy": "Policies on unhealthy clusters.  These policies are likely to fail unless the clusters are brought back to the healthy state before the next scheduled job."
+          },
+          "jobs": {
+            "failed_last": "Policies for which the last job failed.",
+            "failed_last_ten": "Policies for which one or more jobs failed out of the last 10 jobs."
+          }
         }
       },
       "world_map": {
@@ -272,7 +306,7 @@
           "started": "Started",
           "ended": "Ended",
           "runtime": "Runtime",
-          "transferred": "Transferred / Files",
+          "transferred": "Transferred",
           "next_run": "Next Run",
           "action": "Action",
           "actions": "Actions",
@@ -298,7 +332,8 @@
           "title": "HDFS Remaining Capacity",
           "columns": {
             "cluster_name": "Cluster",
-            "capacity": "Remaining Capacity"
+            "remaining_capacity": "Remaining Capacity",
+            "total_capacity": "Total Capacity"
           }
         },
         "unhealthy_policy": {
@@ -338,9 +373,11 @@
       "create_button_text": "Add Policy",
       "tags": "Tags",
       "groups": "Groups",
+      "settings": "Policy Settings",
       "data_summary": "Data Summary",
-      "help_url": "http://docs.hortonworks.com",
-      "help_text": "What are policies?",
+      "help_url": "http://horton.works/dlm100_h0004a",
+      "help_text": "How Policies Work",
+      "job_runtime_warn": "Job runtime exceeds policy frequency",
       "no_jobs": "No jobs",
       "no_policies": "Create your first replication policy.",
       "no_pairings": "You must create a cluster pairing before you can create a replication policy.",
@@ -349,11 +386,38 @@
         "confirmation": {
           "title": "Confirm",
           "body": "Are you sure?"
+        },
+        "suspend_policy": {
+          "body": "Are you sure you want to suspend the replication policy {{policyName}}?"
+        },
+        "activate_policy": {
+          "body": "Are you sure you want to activate the replication policy {{policyName}}?"
+        },
+        "delete_policy": {
+          "body": "Are you sure you want to delete the replication policy {{policyName}}?"
         }
+      },
+      "flow_status": {
+        "source_abbrev": "S",
+        "read_write": "Read / Write",
+        "read_only": "Read Only",
+        "read_write_abbrev": "RW",
+        "read_only_abbrev": "RO"
       },
       "success": {
         "title": "Policy Creation Successful",
         "body": "Replication policy {{policyName}} created successfully!"
+      },
+      "jobs_table": {
+        "column": {
+          "status": "Status",
+          "startTime": "Started",
+          "endTime": "Ended",
+          "duration": "Runtime",
+          "transferredBytes": "Transferred Bytes",
+          "transferredFiles": "# of Objects",
+          "actions": "Actions"
+        }
       },
       "form": {
         "selected": "Selected",
@@ -363,6 +427,10 @@
           "directories": "Select a Folder",
           "job": "Run Job",
           "advanced": "Advanced Properties"
+        },
+        "help": {
+          "snapshot_text": "Enable snapshot based replication",
+          "snapshot_url": "http://horton.works/dlm100_h0006a"
         },
         "fields": {
           "policy_name": "Policy Name",
@@ -390,7 +458,12 @@
           "bandwidth_unit": "MBps",
           "repeat": "Repeat",
           "timezone": "Selected Timezone",
-          "timezone_hint": "Selected timezone can be edited from the user menu on the top"
+          "timezone_hint": "Selected timezone can be edited from the user menu on the top",
+          "start": {
+            "self": "Start",
+            "schedule": "On Schedule",
+            "start_now": "From Now"
+          }
         },
         "schedule": {
           "immediate": "One Time",
@@ -399,8 +472,8 @@
       },
       "subpage": {
         "create_policy": {
-          "help_url": "http://docs.hortonworks.com",
-          "help_text": "Policy properties"
+          "help_url": "http://horton.works/dlm100_h0005a",
+          "help_text": "Policy Guidelines"
         },
         "review": {
           "error": {
@@ -420,10 +493,9 @@
     },
     "pairings": {
       "header": "Pairings",
-      "header_note": "Note: Pairings are bi-directional",
       "create_button_text": "Add Pairing",
-      "help_url": "http://docs.hortonworks.com",
-      "help_text": "What are pairings?",
+      "help_url": "http://horton.works/dlm100_h0002a",
+      "help_text": "How Pairing Works",
       "content": {
         "header": {
           "first_cluster": "FIRST CLUSTER",
@@ -452,16 +524,20 @@
       "create": {
         "header": "Create Pairing",
         "header_note": "Note: Pairings are bi-directional",
-        "help_text": "Policy Guidelines",
-        "help_url": "http://docs.hortonworks.com",
+        "help_text": "Pairing Guidelines",
+        "help_url": "http://horton.works/dlm100_h0003a",
         "content": {
           "no_clusters": "No clusters are registered with Data Lifecycle Manager. Click Add>Cluster and register at least two clusters for pairing. Ensure that clusters to be used for replication jobs meet Data Lifecycle Manager configuration requirements.",
           "header": {
             "step_one": "STEP 1: SELECT CLUSTER",
-            "step_two": "STEP 2: SELECT CLUSTER TO BE PAIRED",
+            "step_two": "STEP 2: SELECT CLUSTER TO PAIR WITH",
             "in_progress": "IN PROGRESS"
           },
-          "cluster_disabled": "This cluster is already paired with the selected cluster."
+          "cluster_disabled": "The clusters that are already paired with the selected cluster",
+          "ready_clusters": "Ready Clusters",
+          "unhealthy_clusters": "Unhealthy Clusters",
+          "unhealthy_clusters_hint": "Either Beacon or Ambari service is not reachable",
+          "paired_clusters": "Paired Clusters"
         },
         "notification": {
           "success": {
@@ -477,7 +553,7 @@
     "jobs": {
       "header": "Jobs",
       "header_note": "",
-      "prev_jobs": "Prev Jobs",
+      "prev_jobs": "Jobs",
       "job_ignored": "Prior instance was still executing so this instance was not triggered and ignored."
     },
     "notifications": {
@@ -493,5 +569,6 @@
       },
       "view_log": "View Log"
     }
-  }
+  },
+  "help_url": "http://horton.works/dlm100_h0001a"
 }

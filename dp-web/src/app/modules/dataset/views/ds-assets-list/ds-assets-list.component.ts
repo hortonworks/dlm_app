@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChange, ViewChild} from "@angular/core";
 import {DsAssetModel} from "../../models/dsAssetModel";
 import {RichDatasetModel} from "../../models/richDatasetModel";
@@ -183,9 +194,9 @@ export class DsAssetList implements OnInit {
   onAssetClick(id:any, clusterId:number) {
     // console.log(id, clusterId);
     if(this.allowAssetNavigation && clusterId) {
-      this.router.navigate([`datasteward/dataset/assets/details/${clusterId}/${id}`]);
+      this.router.navigate([`datasteward/clusters/${clusterId}/assets/${id}`]);
     }
-  }  
+  }
 
   get showStarMessage() {
     return this.dsAssets.filter(ass=>ass.dsName).length;

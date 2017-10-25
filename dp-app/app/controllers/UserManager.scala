@@ -1,6 +1,15 @@
-package controllers
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
 
-import java.time.LocalDateTime
+package controllers
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
@@ -31,6 +40,8 @@ class UserManager @Inject()(val ldapService: LdapService,
       BadRequest(Json.toJson(errors))
     else if (errors.errors.exists(_.code == "403"))
       Forbidden(Json.toJson(errors))
+    else if (errors.errors.exists(_.code == "404"))
+      NotFound(Json.toJson(errors))
     else if (errors.errors.exists(_.code == "409"))
       Conflict(Json.toJson(errors))
     else
@@ -195,8 +206,8 @@ class UserManager @Inject()(val ldapService: LdapService,
       val userName=userNameOpt.get
       getMatchingGroupsFromLdapAndDb(userName).flatMap{
         case Left(errors)=>Future.successful(handleErrors(errors))
-        case Right(ldapGroups)=>{
-          val userLdapGroups=UserLdapGroups(userName ,ldapGroups = ldapGroups.map(_.groupName))
+        case Right(userGroups)=>{
+          val userLdapGroups=UserLdapGroups(userGroups.username ,ldapGroups = userGroups.groups.map(_.groupName))
           userService.updateUserWithGroups(userLdapGroups).map{
             case Left(errors)=>handleErrors(errors)
             case Right(userCtx)=>Ok(Json.toJson(userCtx))
@@ -209,12 +220,12 @@ class UserManager @Inject()(val ldapService: LdapService,
   private def createUserWithLdapGroups(userName: String):Future[Either[Errors,UserGroupInfo]] = {
     getMatchingGroupsFromLdapAndDb(userName).flatMap{
       case Left(errors)=>Future.successful(Left(errors))
-      case Right(groups)=>{
-        if (groups.length<1){
+      case Right(userGroups)=>{
+        if (userGroups.groups.length<1){
           Future.successful(Left(Errors(Seq(Error("403","NO_ALLOWED_GROUPS:The user doesnt have valid groups configured")))))
         }else{
-          val groupIds=groups.map(grp=>grp.id.get)
-          val userGroupInfo=UserGroupInfo(id=None,userName=userName,displayName=userName,groupIds = groupIds )
+          val groupIds=userGroups.groups.map(grp=>grp.id.get)
+          val userGroupInfo=UserGroupInfo(id=None,userName=userGroups.username,displayName=userGroups.username,groupIds = groupIds )
           userService.addUserWithGroups(userGroupInfo).map {
             case Left(errors)=>Left(errors)
             case Right(userGroupInfo)=>Right(userGroupInfo)
@@ -224,7 +235,7 @@ class UserManager @Inject()(val ldapService: LdapService,
     }
   }
 
-  private def getMatchingGroupsFromLdapAndDb(userName: String):Future[Either[Errors,Seq[Entities.Group]]] = {
+  private def getMatchingGroupsFromLdapAndDb(userName: String):Future[Either[Errors, Entities.UserGroups]] = {
     for {
       ldapUser <- ldapService.getUserGroups(userName)
       dbGroups <- groupService.getAllActiveGroups()
@@ -236,8 +247,8 @@ class UserManager @Inject()(val ldapService: LdapService,
           dbGroups match {
             case Left(errors) => Left(errors)
             case Right(dbGrps) => {
-              val filteredGroups=dbGrps.filter(res => ldapGroupNames.contains(res.groupName))
-              Right(filteredGroups)
+              val filteredGroups = dbGrps.filter(res => ldapGroupNames.contains(res.groupName))
+              Right(UserGroups(ldpUsr.name, filteredGroups))
             }
           }
         }

@@ -11,7 +11,7 @@
   * `sudo yum install sbt`
 * Nodejs 6.10.0 or above. To get Nodejs on Linux, you can follow instructions here: https://nodejs.org/en/download/package-manager/#enterprise-linux-and-fedora
 * [Yarn](https://yarnpkg.com) package manager (`npm install --global yarn`)
-* docker-machine (tested with 0.7.0), docker (tested with 1.8.0), docker-compose (tested with 1.7.1)
+* docker-machine (tested with 0.7.0), docker (tested with 1.12.0)
 * Centos 7 or Mac OSX are tested platforms
 
 ## Build
@@ -135,20 +135,46 @@ Follow these instructions for working with these RPMs.
 * Run `./dlmdeploy.sh init`
 * Verify the services are up using `docker ps`. There must be 8 service containers that are running.
 
+## CLI Reference
+
+The script providing deployment and admnistration of DP Core is `dpdeploy.sh`. Following are the actions supported by it:
+
+| Command           | Options                        | Default Value                                                                               |
+|-------------------|--------------------------------|---------------------------------------------------------------------------------------------|
+| init              | `[ --all  ]`                   | Initialize and start all containers for the first time                                      |
+| migrate           |                                | Reset database to its pristine state and run schema migrations on it                        |
+| utils add-host    | `<ip> <host>`                  | Append a single entry to `/etc/hosts` file of the container interacting with HDP clusters   |
+| utils update-user | `[ ambari / atlas / ranger ]`  | Update user credentials for services that Dataplane will use to connect to clusters         |
+| utils reload-apps |                                | Restart all containers other than database, Consul and Knox                                 |
+| start             | `[ --all ]`                    | Start all containers                                                                        |
+| stop              | `[ --all ]`                    | Stop all containers                                                                         |
+| ps                |                                | List the status of associated docker containers                                             |
+| logs              | `<container_name>`             | Logs of supplied container id or name                                                       |
+| destroy           | `[ --all ]`                    | Kill all containers and remove them. Needs to start from init again                         |
+| load              |                                | Load all images from `../lib` directory into docker daemon                                  |
+| upgrade           | `--from <old_setup_directory>` | Upgrade existing `dp-core` to current version                                               |
+| version           |                                | Print the version of dataplane                                                              |
+
 ## Bootstrap Configuration
 
 Dataplane uses some configuration items to bootstrap itself.
 
-* Configuration Item   | Description    | Default Value    |
-* USE_EXT_DB | Set to yes for pointing to an external Postgres instance, no otherwise | no |
-* DATABASE_URI | If USE_EXT_DB is yes, this must point to the external Database URI | |
-* DATABASE_USER | If USE_EXT_DB is yes, this must point to the Dataplane Admin user name of the external Database URI | |
-* DATABASE_PASS | If USE_EXT_DB is yes, this must point to the Dataplane Admin password of the external Database URI | |
-* SEPARATE_KNOX_CONFIG | Set to true if a separate Knox instance is setup on HDP clusters for handling Dataplane traffic, false otherwise | false |
-* KNOX_CONFIG_USING_CREDS | If SEPARATE_KNOX_CONFIG is true, when a cluster is registered, we must provide additional information to discover it. This is either using Ambari credentials or explicitly specifying the URL. Set to true if you want to use Ambari credentials, false for URL | true |
-* CONSUL_HOST | Set to the IP address of the host where Dataplane containers are launched | |
-* MASTER_PASSWORD | Set to the password to be used for Knox keystore configuration. IMPORTANT: This is in clear text and should typically not be set in production environments. Instead specify the master password on command line | |
-* USE_TEST_LDAP | Specifies whether to use an external LDAP instance or connect to a test LDAP instance that comes with the Dataplane Knox container | |
+| Configuration Item         | Description    | Default Value    |
+|----------------------------|----------------|------------------|
+| `USE_EXT_DB`               | Set to `yes` for pointing to an external Postgres instance, no otherwise | `no` |
+| `DATABASE_URI`             | If `USE_EXT_DB` is `yes`, this must point to the external Database URI | |
+| `DATABASE_USER`            | If `USE_EXT_DB` is `yes`, this must point to the Dataplane Admin user name of the external Database URI | |
+| `DATABASE_PASS`            | If `USE_EXT_DB` is `yes`, this must point to the Dataplane Admin password of the external Database URI | |
+| `SEPARATE_KNOX_CONFIG`     | Set to `true` if a separate Knox instance is setup on HDP clusters for handling Dataplane traffic, false otherwise | `false` |
+| `KNOX_CONFIG_USING_CREDS`  | If `SEPARATE_KNOX_CONFIG` is `true`, when a cluster is registered, we must provide additional information to discover it. This is either using Ambari credentials or explicitly specifying the URL. Set to `true` if you want to use Ambari credentials, `false` for URL | `true` |
+| `CONSUL_HOST`              | Set to the IP address of the host where Dataplane containers are launched | |
+| `MASTER_PASSWORD`          | Set to the password to be used for Knox keystore configuration.  **IMPORTANT: This is in clear text and should typically not be set in production environments. Instead  specify it when prompted on command line.** | |
+| `USE_TEST_LDAP`            | Specifies whether to use an external LDAP instance or connect to a test LDAP instance that comes with the Dataplane Knox container | |
+| `USE_TLS`                  | Set to `true` to enable TLS / HTTPS | |
+| `USE_PROVIDED_CERTIFICATES`| Set to `yes` if you have public-private key-pair already generated/issued. Setting to `no` automatically generates a key-pair for you. | |
+| `PUBLIC_KEY_L`             | If `USE_PROVIDED_CERTIFICATES` is `yes`, this must point to the absolute path of public key file | |
+| `PRIVATE_KEY_L`            | If `USE_PROVIDED_CERTIFICATES` is `yes`, this must point to the absolute path of encrypted private key file | |
+| `CERTIFICATE_PASSWORD`     | If `USE_PROVIDED_CERTIFICATES` is `yes`, this should be the password required to decrypt the private key file.  **IMPORTANT: This is in clear text and should typically not to be set in production environments. Instead specify it when prompted on command line.** | |
 
 ## Using external database
 Only Postgresql is supported. To prepare the database, following steps need to be followed:

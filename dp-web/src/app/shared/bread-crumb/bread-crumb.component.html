@@ -1,7 +1,17 @@
-<div class="breadcrumb">
-    <span class="mdl-navigation__link home" (click)="navigateToPersonaHome()">{{personaName | breadCrumbName}}</span>
-    <span class="mdl-navigation__link" *ngFor="let crumbName of crumbNames" (click)="navigateToBreadCrumb(crumbName)">
-        <span class="slash"> / </span>
-        {{ crumbName | breadCrumbName }}
-    </span>
-</div>
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
+<ol class="breadcrumb">
+  <li *ngFor="let breadcrumb of breadcrumbs; let isLast = last;" [class.active]="isLast">
+    <a *ngIf="!isLast" [routerLink]="[breadcrumb.url, breadcrumb.params]">{{'routes.' + breadcrumb.label | translate}}</a>
+    <span *ngIf="isLast">{{'routes.' + breadcrumb.label | translate}}</span>
+  </li>
+</ol>

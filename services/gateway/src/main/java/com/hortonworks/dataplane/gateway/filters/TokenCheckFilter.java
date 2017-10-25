@@ -1,3 +1,13 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
 package com.hortonworks.dataplane.gateway.filters;
 
 
@@ -5,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.hortonworks.dataplane.gateway.domain.*;
+import com.hortonworks.dataplane.gateway.permissions.PermPoliciesService;
 import com.hortonworks.dataplane.gateway.utils.Jwt;
 import com.hortonworks.dataplane.gateway.service.UserService;
 import com.hortonworks.dataplane.gateway.utils.CookieManager;
@@ -64,7 +75,6 @@ public class TokenCheckFilter extends ZuulFilter {
   @Value("${metaredirect.forsafari}")
   private Boolean useMetaRedirectForSafari;
 
-
   private ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -85,16 +95,16 @@ public class TokenCheckFilter extends ZuulFilter {
     RequestContext ctx = RequestContext.getCurrentContext();
     String serviceId = ctx.get(SERVICE_ID_KEY).toString();
     // Check if its not a sign in call - Protect everything else
-
+    if (serviceId.equals(Constants.DPAPP) && ctx.getRequest().getServletPath().endsWith(Constants.PERMS_POLICY_ENTRY_POINT)){
+      return false;
+    }
     //TODO remvoe Knox config path once secret key mechanism is established.
     return (serviceId.equals(Constants.DPAPP) || serviceId.equals(Constants.DLMAPP)) &&
       !(ctx.getRequest().getServletPath().equals(AUTH_ENTRY_POINT)
       || ctx.getRequest().getServletPath().equals(KNOX_CONFIG_PATH)
 
       );
-
   }
-
   @Override
   public Object run() {
     if (isSsoLoginPath()) {
@@ -106,7 +116,12 @@ public class TokenCheckFilter extends ZuulFilter {
       Optional<String> bearerToken=BEARER_TOKEN_IN_COOKIE?cookieManager.getDataplaneJwtCookie():utils.getBearerTokenFromHeader();
       if (bearerToken.isPresent()) {
         utils.deleteAuthorizationHeaderToUpstream();
-        return authorizeThroughDPToken(bearerToken);
+        Optional<UserContext> userContextOptional = getUserContextFromDPJwt(bearerToken);
+        if (!userContextOptional.isPresent()){
+          return authorizeThroughSsoToken();
+        }else{
+          return authorizeThroughDPToken(bearerToken);
+        }
       } else if (knoxSso.isSsoConfigured()) {
         return authorizeThroughSsoToken();
       } else {  //TODO validate knox sso.
@@ -191,6 +206,9 @@ public class TokenCheckFilter extends ZuulFilter {
       }
     }
   }
+  private boolean isAuthorized(){
+    return false;
+  }
 
   private boolean needsResyncFromLdap(Optional<UserContext> userContextFromDb) {
     //60000 is 1 minutes TODO get from conf.
@@ -243,34 +261,38 @@ public class TokenCheckFilter extends ZuulFilter {
   }
 
   private Object authorizeThroughDPToken(Optional<String> bearerToken) {
-    try {
-      Optional<UserContext> userContextOptional = jwt.parseJWT(bearerToken.get());
-      if (!userContextOptional.isPresent()) {
-        cookieManager.deleteDataplaneJwtCookie();//TODO check for safari.
-        return handleUnAuthorized("DP_JWT_COOKIE has expired or not valid");
-      } else {
-        UserContext userContext = userContextOptional.get();
-        if (userContext.isActive()){
-          if (servicesConfigUtil.isRouteAllowed(userContext.getServices())){
-            setUpstreamUserContext(userContext);
-            setUpstreamKnoxTokenContext();
-            RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, userContext);
-            return null;
-          }else{
-            requestResponseUtils.redirectToServiceError();
-            RequestContext.getCurrentContext().setSendZuulResponse(false);//TODO move to redirection after thorough testing
-            return null;
-          }
+    Optional<UserContext> userContextOptional = getUserContextFromDPJwt(bearerToken);
+    if (!userContextOptional.isPresent()) {
+      cookieManager.deleteDataplaneJwtCookie();//TODO check for safari.
+      return handleUnAuthorized("DP_JWT_COOKIE has expired or not valid");
+    } else {
+      UserContext userContext = userContextOptional.get();
+      if (userContext.isActive()){
+        if (servicesConfigUtil.isRouteAllowed(userContext.getServices())){
+          setUpstreamUserContext(userContext);
+          setUpstreamKnoxTokenContext();
+          RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, userContext);
+          return null;
         }else{
-          return utils.sendForbidden(utils.getInactiveErrorMsg(userContext.getUsername()));
+          requestResponseUtils.redirectToServiceError();
+          RequestContext.getCurrentContext().setSendZuulResponse(false);//TODO move to redirection after thorough testing
+          return null;
         }
+      }else{
+        return utils.sendForbidden(utils.getInactiveErrorMsg(userContext.getUsername()));
       }
+    }
+  }
+
+  private Optional<UserContext> getUserContextFromDPJwt(Optional<String> bearerToken) {
+    try {
+      return jwt.parseJWT(bearerToken.get());
     } catch (JwtException e) {
-      logger.error("Exception", e);
-      return utils.sendForbidden("validation  issue");
+      logger.error("Jwt Exception", e);
+      return Optional.absent();
     } catch (IOException e) {
       logger.error("Exception", e);
-      return utils.sendUnauthorized();
+      return Optional.absent();
     }
   }
 

@@ -8,8 +8,21 @@
  */
 
 import {
-  Component, Input, Output, ViewEncapsulation, ViewChild, TemplateRef, EventEmitter, HostBinding,
-  OnChanges, OnDestroy, AfterViewInit, HostListener, ChangeDetectorRef, AfterViewChecked
+    AfterViewChecked,
+    AfterViewInit,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    EventEmitter,
+    HostBinding,
+    HostListener,
+    Input,
+    OnChanges,
+    OnDestroy,
+    Output,
+    TemplateRef,
+    ViewChild,
+    ViewEncapsulation,
 } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -19,6 +32,7 @@ import { ColumnMode, DatatableComponent, DatatableRowDetailDirective } from '@sw
 import { CheckboxColumnComponent } from 'components/table-columns/checkbox-column/checkbox-column.component';
 import { ActionColumnType, ActionItemType, ActionColumnComponent } from 'components/';
 import { TableTheme, TableThemeSettings } from './table-theme.type';
+import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
 
 export const SELECTED_KEY_NAME = '__selected';
 
@@ -37,6 +51,12 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   private navbarCollapse$: Observable<boolean>;
   private navbarCollapseSubscription: Subscription;
   private currentComponentWidth;
+  private footerOptsDefault = {
+    showPageSizeMenu: true,
+    showFilterSummary: false,
+    pagerDropup: false
+  } as TableFooterOptions;
+  private footerOpts: TableFooterOptions = this.footerOptsDefault;
 
   /**
    * Map for expanded rows
@@ -77,7 +97,16 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   @Input() externalPaging = false;
   @Input() scrollbarV = false;
   @Input() scrollbarH = false;
+  @Input() reorderable = true;
   @Input() count = 0;
+
+  /**
+   * Rows count before any filter is applied
+   * Used for `table-footer.summary`
+   *
+   * @type {number}
+   */
+  @Input() rowsCount = 0;
   @Input() cssClasses = {
     sortAscending: 'caret',
     sortDescending: 'caret caret-up',
@@ -86,6 +115,18 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   };
   @Input() sorts = [];
   @Input() offset = 0;
+  @Input('footerOptions')
+
+  set footerOptions(options: TableFooterOptions) {
+    this.footerOpts = {
+      ...this.footerOptsDefault,
+      ...options
+    };
+  }
+
+  get footerOptions(): TableFooterOptions {
+    return this.footerOpts;
+  }
 
   // hacky but seems like there is no other easy solution to set template for Row Detail
   @Input() set rowDetailTemplate(template: TemplateRef<any>) {
@@ -161,6 +202,8 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
     }
   }
 
+  @Input() selectCheck = () => true;
+
   @HostBinding('class') get className() {
     return TableThemeSettings[this.theme].className;
   };
@@ -173,7 +216,9 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
     return this._rows;
   }
 
-  constructor(private navbar: NavbarService, private cdRef: ChangeDetectorRef) {
+  constructor(private navbar: NavbarService,
+              private cdRef: ChangeDetectorRef,
+              private elementRef: ElementRef) {
     this.navbarCollapse$ = this.navbar.isCollapsed;
     this.navbarCollapseSubscription = this.navbarCollapse$
       .debounceTime(500)
@@ -181,6 +226,23 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
         this.recalculateTable();
         this.cdRef.detectChanges();
       });
+  }
+
+  /**
+   * This is the really bad but the only way to change default progress indicator
+   * ngx-datatable doesn't support custom progress indicator template
+   *
+   * @param show
+   */
+  private toggleLoadingSpinner(show: boolean): void {
+    const spinnerClass = 'fa fa-spin fa-spinner';
+    const progressSelector = 'datatable-progress .container div:eq(0)';
+    setTimeout(() => {
+      const selfEl = this.elementRef.nativeElement;
+      if (selfEl) {
+        $(selfEl).find(progressSelector).removeClass().addClass(show ? spinnerClass : '');
+      }
+    }, 200);
   }
 
   handleSelectedCell({row, column, checked}) {
@@ -250,6 +312,10 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
           }
         }
       });
+    }
+    if (changes.loadingIndicator) {
+      const loadingIndicator = changes.loadingIndicator.currentValue;
+      this.toggleLoadingSpinner(loadingIndicator);
     }
   }
 

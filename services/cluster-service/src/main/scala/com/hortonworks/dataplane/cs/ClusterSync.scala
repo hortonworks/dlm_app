@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 package com.hortonworks.dataplane.cs
 
 import java.util.concurrent.atomic.AtomicBoolean
@@ -78,6 +89,7 @@ import akka.pattern.pipe
 import scala.concurrent.ExecutionContext.Implicits.global
 
 private sealed class Synchronizer(val storageInterface: StorageInterface,
+                                  val credentialInterface: CredentialInterface,
                                   val wSClient: WSClient,
                                   val config: Config)
     extends Actor
@@ -90,7 +102,7 @@ private sealed class Synchronizer(val storageInterface: StorageInterface,
   override def receive = {
     case Poll() =>
       log.info("Loading credentials from configuration")
-      val creds: Future[Credentials] = loadCredentials
+      val creds: Future[Credentials] = credentialInterface.getCredential("dp.credential.ambari")
       // notify that credentials were loaded
       creds.map(CredentialsLoaded(_)).pipeTo(self)
 
@@ -150,20 +162,9 @@ private sealed class Synchronizer(val storageInterface: StorageInterface,
 
     case DpClusterAdded(dpCluster) =>
     // Perform the same steps but for a single data lake
-      val creds: Future[Credentials] = loadCredentials
+      val creds: Future[Credentials] = credentialInterface.getCredential("dp.credential.ambari")
       // notify that credentials were loaded
       creds.map(CredentialsLoaded(_,Seq(dpCluster))).pipeTo(self)
 
-  }
-
-  private def loadCredentials = {
-    val creds = for {
-      user <- storageInterface.getConfiguration("dp.ambari.superuser")
-      pass <- storageInterface.getConfiguration(
-        "dp.ambari.superuser.password")
-    } yield {
-      Credentials(user, pass)
-    }
-    creds
   }
 }

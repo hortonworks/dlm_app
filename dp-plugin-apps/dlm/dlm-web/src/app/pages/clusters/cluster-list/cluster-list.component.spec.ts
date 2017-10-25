@@ -47,7 +47,8 @@ xdescribe('ClusterListComponent', () => {
         HdfsBrowserComponent
       ],
       providers: [
-        NavbarService
+        NavbarService,
+        BytesSizePipe
       ]
     })
       .compileComponents();

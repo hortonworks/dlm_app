@@ -26,8 +26,10 @@
     [loadingIndicator]="loadingIndicator"
     [externalSorting]="externalSorting"
     [externalPaging]="externalPaging"
+    [selectCheck]="selectCheck"
     [scrollbarV]="scrollbarV"
     [scrollbarH]="scrollbarH"
+    [reorderable]="reorderable"
     (select)="onSelectAction($event)"
     (activate)="onActivate($event)"
     (page)="onPage($event)"
@@ -45,12 +47,13 @@
         let-curPage="curPage"
         let-offset="offset">
         <dlm-table-footer
-          [showPageSizeMenu]="showPageSizeMenu"
-          [rowCount]="rowCount"
+          [rowsCount]="rowsCount"
+          [filteredRowsCount]="rowCount"
           [pageSize]="pageSize"
           [selectedCount]="selectedCount"
           [curPage]="curPage"
           [offset]="offset"
+          [options]="footerOptions"
           (changePage)="changePage($event)"
           (changePageSize)="changePageSize($event)"></dlm-table-footer>
       </ng-template>

@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 
@@ -27,6 +38,8 @@ import {ServiceManagementComponent} from './views/service-management/service-man
 import {VerificationComponent} from './views/service-management/verification/verification.component';
 import {TabsModule} from '../../shared/tabs/tabs.module';
 import { ManualInstallCheckComponent } from './views/service-management/manual-install-check/manual-install-check.component';
+import { LdapEditConfigComponent } from './views/ldap-edit-config/ldap-edit-config.component';
+import { CommonTopRowComponent } from './views/user-management/common-top-row/common-top-row.component';
 
 @NgModule({
   imports: [
@@ -58,8 +71,11 @@ import { ManualInstallCheckComponent } from './views/service-management/manual-i
     ConfigDialogComponent,
     ServiceManagementComponent,
     VerificationComponent,
-    ManualInstallCheckComponent
+    ManualInstallCheckComponent,
+    LdapEditConfigComponent,
+    CommonTopRowComponent
   ]
 })
 export class InfraModule {
 }
+

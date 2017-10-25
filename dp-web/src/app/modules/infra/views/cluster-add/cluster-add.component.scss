@@ -1,3 +1,14 @@
+/*!
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 @import "../../../../../styles/variables";
 
 .page-container {
@@ -146,3 +157,38 @@ input[type="text"].dp-input {
     font-size: 12px;
   }
 }
+
+.extensible-list-h {
+  display: flex;
+  align-content: center;
+  flex-wrap: wrap;
+}
+.extensible-list-h > div.services {
+  margin-bottom: 10px;
+  min-width: 160px;
+  width: 12%;
+  opacity: 1;
+  display: inline-block;
+
+  transition: height 0s, opacity 300ms ease-in-out;
+}
+.extensible-list-h > div.services.hide {
+  min-width: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  transition-duration: 0ms;
+}
+
+.show-hide-toggle {
+  display: block;
+  width: 100%;
+  position: relative;
+  cursor: pointer;
+  color: #1491c1;
+}
+.show-hide-toggle:before {
+  font-family: fontAwesome;
+  padding-right: 5px;
+}
+

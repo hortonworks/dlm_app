@@ -1,3 +1,14 @@
+<!--
+  ~ /*
+  ~  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+  ~  *
+  ~  * Except as expressly permitted in a written agreement between you or your company
+  ~  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+  ~  * reproduction, modification, redistribution, sharing, lending or other exploitation
+  ~  * of all or any part of the contents of this software is strictly prohibited.
+  ~  */
+  -->
+
 <div class="componentCont borderBox" #outerCont >
   <div *ngIf="!hideTabs" class="tabCont">
     <div *ngIf="dsModel.counts" class="tab firstTab {{(typeFilter == tab.ALL)?'active':''}}" (click)="typeFilter = tab.ALL;setFirstPage();fetchAssets()">
@@ -35,6 +46,7 @@
           <div class="col starCol" *ngIf="showBelongsToColumn">&nbsp;</div>
           <div class="col sourceCol">{{"pages.dataset.labels.source" | translate}}</div>
           <div class="col nameCol">{{"pages.dataset.labels.name" | translate}}</div>
+          <div class="col dbNameCol">{{"pages.dataset.labels.dbName" | translate}}</div>
           <div class="col descCol">{{"pages.dataset.labels.description" | translate}}</div>
           <div class="col ownerCol">{{"pages.dataset.labels.owner" | translate}}</div>
           <div class="col dsNameCol" *ngIf="showBelongsToColumn">{{"pages.dataset.labels.belongsTo" | translate}}</div>
@@ -53,6 +65,7 @@
               <span><i class="fa {{(asset.source.toUpperCase() == 'HIVE')?'fa-table':'fa-file-o'}}"></i>&nbsp;&nbsp;{{asset.source}}</span>
             </div>
             <div class="col nameCol" [class.hlink]="allowAssetNavigation" (click)="onAssetClick(asset.id, asset.clusterId)" title="{{asset.name}}">{{asset.name}}</div>
+            <div class="col dbNameCol">{{asset.dbName}}</div>
             <div class="col descCol" title="{{asset.description}}">{{asset.description}}</div>
             <div class="col ownerCol" title="{{asset.owner}}">{{asset.owner}}</div>
             <div class="col dsNameCol" *ngIf="showBelongsToColumn">{{asset.dsName || "-"}}</div>

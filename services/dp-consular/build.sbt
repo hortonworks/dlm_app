@@ -1,3 +1,14 @@
+/*
+ *
+ *  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
+ *  *
+ *  * Except as expressly permitted in a written agreement between you or your company
+ *  * and Hortonworks, Inc. or an authorized affiliate or partner thereof, any use,
+ *  * reproduction, modification, redistribution, sharing, lending or other exploitation
+ *  * of all or any part of the contents of this software is strictly prohibited.
+ *
+ */
+
 name := """dp-consular"""
 
 
@@ -16,3 +27,4 @@ libraryDependencies += "com.netflix.ribbon" % "ribbon-loadbalancer" % "2.2.2"
 // https://mvnrepository.com/artifact/com.netflix.ribbon/ribbon
 libraryDependencies += "com.netflix.ribbon" % "ribbon" % "2.2.2"
 libraryDependencies += "org.springframework.cloud" % "spring-cloud-commons" % "1.2.2.RELEASE"
+libraryDependencies := libraryDependencies.value.map(_.excludeAll(ExclusionRule("com.google.code.findbugs", "annotations")))
