@@ -150,10 +150,20 @@ build_migrate() {
 	popd
 }
 
+build_legalese() {
+	log "Collecting legalese"
+	mkdir -p ${DP_DOCKER_ROOT_FOLDER}/legalese
+	cp ../COPYRIGHT ${DP_DOCKER_ROOT_FOLDER}/legalese/
+	cp ../third_party_components.txt ${DP_DOCKER_ROOT_FOLDER}/legalese/
+	cp ../third_party_operating_system_components.txt ${DP_DOCKER_ROOT_FOLDER}/legalese/
+}
+
 build_installer() {
 	log "Building installer"
     mkdir -p ${DP_DOCKER_ROOT_FOLDER}/installer/certs/
 	cp -R install/* ${DP_DOCKER_ROOT_FOLDER}/installer
+	cp -R ${DP_DOCKER_ROOT_FOLDER}/legalese ${DP_DOCKER_ROOT_FOLDER}/installer/
+	cp dp-docker-build.sh ${DP_DOCKER_ROOT_FOLDER}/installer/
 	cp dp-docker-build.sh ${DP_DOCKER_ROOT_FOLDER}/installer/
 	VERSION_STRING=$(get_version)
 	echo ${VERSION_STRING} > ${DP_DOCKER_ROOT_FOLDER}/installer/VERSION	
@@ -195,6 +205,7 @@ build_knox_agent
 build_dp_knox
 build_cluster_service
 build_migrate
+build_legalese
 build_installer
 zip_dp_binaries
 log "All done"
