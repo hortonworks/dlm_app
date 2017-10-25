@@ -37,9 +37,12 @@
 </ng-template>
 
 <ng-template let-stats="value" let-cluster="row" #usageCell>
-  <div class="text-primary cell-content actionable" [attr.qe-attr]="'cluster-details-' + cluster.$$index" (click)="toggleClusterDetails(cluster)">
+  <div class="cell-content"
+       [ngClass]="setStatsClass(cluster)"
+       [tooltip]="getStatsTooltip(cluster)"
+       [attr.qe-attr]="'cluster-details-' + cluster.$$index" (click)="toggleClusterDetails(cluster)">
     <span [innerHTML]="getCapacityUsed(stats)"></span> / <span [innerHTML]="getCapacityTotal(stats)"></span>
-    <i [ngClass]="{fa: true, 'fa-chevron-down': !isExpandedRow(cluster), 'fa-chevron-up': isExpandedRow(cluster)}"></i>
+    <i *ngIf="!isHDFSDisabled(cluster)" [ngClass]="{fa: true, 'fa-chevron-down': !isExpandedRow(cluster), 'fa-chevron-up': isExpandedRow(cluster)}"></i>
   </div>
 </ng-template>
 

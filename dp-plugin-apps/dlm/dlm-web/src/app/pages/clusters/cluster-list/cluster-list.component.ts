@@ -107,9 +107,11 @@ export class ClusterListComponent implements OnInit {
   }
 
   toggleClusterDetails(clusterRow) {
-    this.toggleClusterContent(clusterRow);
-    this.tableComponent.toggleRowDetail(clusterRow);
-    this.cdRef.detectChanges();
+    if (!this.isHDFSDisabled(clusterRow)) {
+      this.toggleClusterContent(clusterRow);
+      this.tableComponent.toggleRowDetail(clusterRow);
+      this.cdRef.detectChanges();
+    }
   }
 
   private toggleClusterContent(clusterRow) {
@@ -148,6 +150,24 @@ export class ClusterListComponent implements OnInit {
 
   isExpandedRow(row: Cluster): boolean {
     return this.tableComponent.expandedRows[row.id];
+  }
+
+  isHDFSDisabled(cluster): boolean {
+    return Number(cluster.pairsCounter) === 0;
+  }
+
+  getStatsTooltip(cluster): string {
+    return this.isHDFSDisabled(cluster) ? this.t.instant('page.clusters.hints.stats') : '';
+  }
+
+  setStatsClass(cluster) {
+    const isHdfsDisabled = this.isHDFSDisabled(cluster);
+    return {
+      disabled: isHdfsDisabled,
+      'text-primary': !isHdfsDisabled,
+      actionable: !isHdfsDisabled,
+      'text-muted': isHdfsDisabled
+    };
   }
 
   getCapacityUsed(stats) {
