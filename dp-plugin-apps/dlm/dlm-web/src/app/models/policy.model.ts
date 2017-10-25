@@ -11,7 +11,6 @@ import { RequestStatus } from './request-status.model';
 import { Cluster } from './cluster.model';
 import { Job } from './job.model';
 import { POLICY_MODES } from 'constants/policy.constant';
-import { JOB_STATUS } from 'constants/status.constant';
 
 // @todo: consider moving non-required attrs like lastTenJobs, lastJobResource, accessMode
 // to separate interface according to its usage. e.g. interface for policy table content

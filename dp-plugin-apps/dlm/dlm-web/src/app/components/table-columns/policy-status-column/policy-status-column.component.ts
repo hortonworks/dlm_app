@@ -18,7 +18,6 @@ export const COLUMN_WIDTH = 100;
   selector: 'dlm-policy-status-column',
   template: `
     <div>
-      <span [class]="getStatusClassNames(status)"></span>
       <span *ngIf="showText">{{status}}</span>
     </div>
   `,
