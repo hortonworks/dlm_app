@@ -11,21 +11,21 @@
 FROM openjdk:8-jre
 
 ENV HDP_VERSION=2.6.3.0-187
+ENV CONSUL_VERSION=0.8.5
+ENV KNOX_SSO_CONFIG_PATH=/usr/hdp/current/knox-server/conf/topologies/knoxsso.xml
+
 RUN apt-get update && \
     apt-get install -y gnupg wget procps && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B9733A7A07513CAD && \
     wget http://s3.amazonaws.com/dev.hortonworks.com/HDP/ubuntu16/2.x/BUILDS/${HDP_VERSION}/hdpbn.list -P /etc/apt/sources.list.d/ && \
     apt-get update && \
     apt-get install -y knox && \
-    apt-get remove --purge --yes gnupg && \
+    wget https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip && \
+    unzip -d /bin consul_${CONSUL_VERSION}_linux_amd64.zip && \
+    rm consul_${CONSUL_VERSION}_linux_amd64.zip && \
+    apt-get remove --purge --yes gnupg wget && \
     apt-get clean all
 
-ENV KNOX_SSO_CONFIG_PATH=/usr/hdp/current/knox-server/conf/topologies/knoxsso.xml
-
-ENV CONSUL_VERSION=0.8.5
-RUN wget https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip && \
-    unzip -d /bin consul_${CONSUL_VERSION}_linux_amd64.zip && \
-    rm consul_${CONSUL_VERSION}_linux_amd64.zip
 
 COPY ./utils /scripts
 COPY ./dp-knox-agent /usr/dp-knox-agent
