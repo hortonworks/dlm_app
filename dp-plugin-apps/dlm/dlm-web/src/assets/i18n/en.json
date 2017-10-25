@@ -362,7 +362,8 @@
         "launch_ambari": "Launch Ambari"
       },
       "hints": {
-        "header": "Clusters shown below are enabled for DLM"
+        "header": "Clusters shown below are enabled for DLM",
+        "stats": "Once this cluster is paired, you will be able to browse HDFS from here"
       }
     },
     "policies": {

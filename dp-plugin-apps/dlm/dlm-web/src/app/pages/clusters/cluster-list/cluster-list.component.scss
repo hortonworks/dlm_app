@@ -31,6 +31,9 @@
   .datacenter-name {
     font-size: 16px;
   }
+  .disabled {
+    cursor: not-allowed;
+  }
   &.add-actions-cell {
     justify-content: flex-end !important;
   }
