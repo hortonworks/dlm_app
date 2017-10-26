@@ -64,7 +64,9 @@
 
 <ng-template #transferredObjectsTemplate let-trackingInfo="value">
   <dlm-transferred-objects
-    [amount]="trackingInfo?.progress?.filesCopied"
+    [executionType]="policy.executionType"
+    [filesCopied]="trackingInfo?.progress?.filesCopied"
+    [completed]="trackingInfo?.progress?.completed"
     [units]="trackingInfo?.progress?.unit">
   </dlm-transferred-objects>
 </ng-template>

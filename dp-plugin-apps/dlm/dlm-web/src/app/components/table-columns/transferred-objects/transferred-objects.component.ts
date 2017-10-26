@@ -8,7 +8,8 @@
  */
 
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { UNIT_LABELS } from 'constants/job.constant';
+import {UNIT_EVENTS, UNIT_LABELS, UNIT_TABLES} from 'constants/job.constant';
+import {POLICY_EXECUTION_TYPES} from 'constants/policy.constant';
 
 @Component({
   selector: 'dlm-transferred-objects',
@@ -24,12 +25,23 @@ import { UNIT_LABELS } from 'constants/job.constant';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransferredObjectsComponent {
-  @Input() amount: number;
+  @Input() executionType: string;
+  @Input() completed: number;
+  @Input() filesCopied: number;
   @Input() units: string;
 
   get formattedUnits(): string {
-    return UNIT_LABELS[this.units] || ' ';
+    if (this.executionType === POLICY_EXECUTION_TYPES.HIVE && this.units === UNIT_EVENTS) {
+      return UNIT_LABELS[UNIT_TABLES]
+    } else {
+      return UNIT_LABELS[this.units] || ' ';
+    }
   }
+
+  get amount(): number {
+    return this.executionType === POLICY_EXECUTION_TYPES.HIVE ? this.completed : this.filesCopied;
+  }
+
 
   get isEmptyData(): boolean {
     return this.amount === null;
