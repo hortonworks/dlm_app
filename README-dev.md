@@ -44,4 +44,3 @@
 
 1. Zuul forward errors in response instead of proper response from targeted systems
   * Check in Consul console if all systems are up and registered.
-
