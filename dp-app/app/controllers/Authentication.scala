@@ -97,7 +97,7 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
               Logger.error(s"user fetch issue while changing password for '${request.user.username}': {${errors}")
               InternalServerError(Json.toJson(errors))
             }
-            case Right(user) => Ok(Json.toJson(user))
+            case Right(user) => Ok(Json.toJson(user)).withHeaders(("X-Invalidate-Token", "true"))
           }
           .recoverWith {
             case ex: WrappedErrorsException => Future.successful(InternalServerError(Json.toJson(ex.errors)))

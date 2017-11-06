@@ -364,6 +364,7 @@ object Entities {
                                    assetQueryModels: Seq[AtlasSearchQuery],
                                    dataAssets: Seq[DataAsset] = Nil)
 
+  case class BlacklistedToken(id: Option[Long], token: String, expiry: LocalDateTime)
 }
 
 object JsonFormatters {
@@ -535,5 +536,7 @@ object JsonFormatters {
 
   implicit val serviceDependencyWrites = Json.writes[ServiceDependency]
   implicit val serviceDependencyReads = Json.reads[ServiceDependency]
+
+  implicit val blacklistedTokenFormats = Json.format[BlacklistedToken]
 
 }

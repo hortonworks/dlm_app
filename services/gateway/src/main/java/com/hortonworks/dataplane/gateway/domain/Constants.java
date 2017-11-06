@@ -21,6 +21,7 @@ public interface Constants {
 
     String LOGOUT_PATH =DPAPP_BASE_PATH+"/auth/signOut";
     String LOGIN_PATH="/login";
+    String CHANGE_PASSWORD_ROUTE = "/identity/actions/change-password";
     String LOGIN_ENTRY_POINT = DPAPP_BASE_PATH+LOGIN_PATH;
     String AUTHORIZATION_HEADER = "Authorization";
     String USER_CTX_KEY = "user_ctx";

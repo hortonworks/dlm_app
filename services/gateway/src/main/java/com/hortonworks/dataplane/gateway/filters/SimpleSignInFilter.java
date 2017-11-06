@@ -67,7 +67,7 @@ public class SimpleSignInFilter extends ZuulFilter {
 
   @Override
   public int filterOrder() {
-    return PRE_DECORATION_FILTER_ORDER + 2;
+    return PRE_DECORATION_FILTER_ORDER + 10;
   }
 
 

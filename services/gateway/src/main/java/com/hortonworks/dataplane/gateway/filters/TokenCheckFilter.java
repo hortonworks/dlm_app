@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.hortonworks.dataplane.gateway.domain.*;
 import com.hortonworks.dataplane.gateway.permissions.PermPoliciesService;
+import com.hortonworks.dataplane.gateway.service.BlacklistedTokenService;
 import com.hortonworks.dataplane.gateway.utils.Jwt;
 import com.hortonworks.dataplane.gateway.service.UserService;
 import com.hortonworks.dataplane.gateway.utils.CookieManager;
@@ -55,6 +56,9 @@ public class TokenCheckFilter extends ZuulFilter {
   private UserService userService;
 
   @Autowired
+  private BlacklistedTokenService tokenService;
+
+  @Autowired
   private KnoxSso knoxSso;
 
   @Autowired
@@ -86,7 +90,7 @@ public class TokenCheckFilter extends ZuulFilter {
 
   @Override
   public int filterOrder() {
-    return PRE_DECORATION_FILTER_ORDER + 1;
+    return PRE_DECORATION_FILTER_ORDER + 5;
   }
 
 
@@ -113,7 +117,7 @@ public class TokenCheckFilter extends ZuulFilter {
     } else if (isLogoutPath()) {
       return doLogout();
     } else {
-      Optional<String> bearerToken=BEARER_TOKEN_IN_COOKIE?cookieManager.getDataplaneJwtCookie():utils.getBearerTokenFromHeader();
+      Optional<String> bearerToken = BEARER_TOKEN_IN_COOKIE ? cookieManager.getDataplaneJwtCookie() : utils.getBearerTokenFromHeader();
       if (bearerToken.isPresent()) {
         utils.deleteAuthorizationHeaderToUpstream();
         Optional<UserContext> userContextOptional = getUserContextFromDPJwt(bearerToken);
@@ -267,19 +271,21 @@ public class TokenCheckFilter extends ZuulFilter {
       return handleUnAuthorized("DP_JWT_COOKIE has expired or not valid");
     } else {
       UserContext userContext = userContextOptional.get();
-      if (userContext.isActive()){
+      if (!userContext.isActive()) {
+        return utils.sendForbidden(utils.getInactiveErrorMsg(userContext.getUsername()));
+      } else if(userContext.isDbManaged() && tokenService.isBlacklisted(bearerToken.get())) {
+        return utils.sendForbidden(utils.getInvalidatedTokenErrorMsg());
+      } else {
         if (servicesConfigUtil.isRouteAllowed(userContext.getServices())){
           setUpstreamUserContext(userContext);
           setUpstreamKnoxTokenContext();
           RequestContext.getCurrentContext().set(Constants.USER_CTX_KEY, userContext);
           return null;
-        }else{
+        } else {
           requestResponseUtils.redirectToServiceError();
           RequestContext.getCurrentContext().setSendZuulResponse(false);//TODO move to redirection after thorough testing
           return null;
         }
-      }else{
-        return utils.sendForbidden(utils.getInactiveErrorMsg(userContext.getUsername()));
       }
     }
   }

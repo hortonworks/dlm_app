@@ -40,7 +40,7 @@ public class UserDetailFilter extends ZuulFilter {
 
   @Override
   public int filterOrder() {
-    return PRE_DECORATION_FILTER_ORDER + 4;
+    return PRE_DECORATION_FILTER_ORDER + 20;
   }
 
   @Override

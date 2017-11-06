@@ -205,3 +205,7 @@ PUT          /configurations                                                cont
 POST         /ldapconfig                                                    controllers.LdapConfig.add
 GET          /ldapconfig                                                    controllers.LdapConfig.getAll
 PUT          /ldapconfig                                                    controllers.LdapConfig.update
+
+# blacklisted tokens
+GET          /blacklisted-tokens                                            controllers.BlacklistedTokens.findByToken(token: String)
+POST         /blacklisted-tokens                                            controllers.BlacklistedTokens.insert

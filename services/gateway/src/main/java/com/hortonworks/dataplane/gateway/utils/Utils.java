@@ -12,6 +12,7 @@ package com.hortonworks.dataplane.gateway.utils;
 
 import com.google.common.base.Optional;
 import com.hortonworks.dataplane.gateway.domain.Constants;
+import com.netflix.util.Pair;
 import com.netflix.zuul.context.RequestContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +29,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SERVICE_ID_KEY;
 
@@ -58,6 +61,22 @@ public class Utils {
 
   public void deleteAuthorizationHeaderToUpstream(){
     proxyRequestHelper.addIgnoredHeaders(Constants.AUTHORIZATION_HEADER);
+  }
+
+  public void removeResposeHeader(String headerKey){
+    RequestContext context = RequestContext.getCurrentContext();
+    List<Pair<String, String>> filteredResponseHeaders = new ArrayList<>();
+
+    List<Pair<String, String>> zuulResponseHeaders = context.getZuulResponseHeaders();
+    if (zuulResponseHeaders != null) {
+      for (Pair<String, String> it : zuulResponseHeaders) {
+        if (!it.first().equalsIgnoreCase(headerKey)) {
+          Pair<String, String> pair = new Pair<>(it.first(), it.second());
+          filteredResponseHeaders.add(pair);
+        }
+      }
+    }
+    context.put("zuulResponseHeaders", filteredResponseHeaders);
   }
 
   public Object sendUnauthorized() {
@@ -104,13 +123,16 @@ public class Utils {
     return ctx.getRequest().getServletPath().equals(path);
   }
   public String getInactiveErrorMsg(String subject){
-    return String.format("{\"code\": \"USER_INACTIVATED\", \"message\":  User %s is marked inactive}",subject);
+    return String.format("{\"code\": \"USER_INACTIVATED\", \"message\":  \"User %s is marked inactive\"}",subject);
+  }
+  public String getInvalidatedTokenErrorMsg(){
+    return "{\"code\": \"TOKEN_INVALIDATED\", \"message\":  \"Token is blacklisted. Please get a new token\"}";
   }
   public String getUserNotFoundErrorMsg(String subject){
-    return String.format("{\"code\": \"USER_NOT_FOUND\", \"message\":  User %s not found in the system}",subject);
+    return String.format("{\"code\": \"USER_NOT_FOUND\", \"message\":  \"User %s not found in the system\"}",subject);
   }
   public String getGroupNotFoundErrorMsg(String subject){
-    return String.format("{\"code\": \"USER_NOT_FOUND\", \"message\":  User %s not found in the system.Group not configured.}",subject);
+    return String.format("{\"code\": \"USER_NOT_FOUND\", \"message\":  \"User %s not found in the system.Group not configured.\"}",subject);
   }
   public String getLoginRedirectPage(String url){
     String html=loginRedirectCache.computeIfAbsent(url,urlInp-> getLoginRedirectHtml(urlInp));

@@ -261,3 +261,9 @@ CREATE TABLE IF NOT EXISTS dataplane.user_groups (
   created      TIMESTAMP DEFAULT now(),
   updated      TIMESTAMP DEFAULT now()
 );
+
+CREATE TABLE IF NOT EXISTS dataplane.blacklisted_tokens (
+  id          BIGSERIAL PRIMARY KEY,
+  token       TEXT                   NOT NULL UNIQUE,
+  expiry      TIMESTAMP              NOT NULL
+);
