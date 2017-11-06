@@ -29,14 +29,10 @@ object SSLUtils {
   class DPTrustStore @Inject()(private val config: Config) {
 
     // get the users home dir
-    val baseDir = Try(config.getString("dp.services.keystore.base.path"))
-      .getOrElse(System.getProperty("user.home"))
-    val keystoreDir = Try(config.getString("dp.services.keystore.path"))
-      .getOrElse(".dp_keystore")
-    val keystoreName = Try(config.getString("dp.services.keystore.name"))
-      .getOrElse("dp_certs_store")
-    val keystorePass =
-      Try(config.getString("dp.services.keystore.pass")).getOrElse("changeit")
+    val baseDir = config.getString("dp.services.keystore.base.path")
+    val keystoreDir = config.getString("dp.services.keystore.path")
+    val keystoreName = config.getString("dp.services.keystore.name")
+    val keystorePass = config.getString("dp.services.keystore.pass")
     private val dir = new File(s"$baseDir/$keystoreDir")
 
     private lazy val log = Logger(classOf[DPTrustStore])

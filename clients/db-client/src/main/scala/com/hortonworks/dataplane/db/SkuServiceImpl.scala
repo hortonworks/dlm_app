@@ -26,9 +26,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class SkuServiceImpl(config: Config)(implicit ws: WSClient)
     extends SkuService {
-  private def url =
-    Option(System.getProperty("dp.services.db.service.uri"))
-      .getOrElse(config.getString("dp.services.db.service.uri"))
+  private def url = config.getString("dp.services.db.service.uri")
 
   override def getAllSkus(): Future[Either[Errors, Seq[Sku]]] = {
     ws.url(s"$url/skus")

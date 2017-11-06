@@ -26,9 +26,7 @@ import scala.concurrent.Future
 class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
   extends DataSetService {
 
-  private def url =
-    Option(System.getProperty("dp.services.db.service.uri"))
-      .getOrElse(config.getString("dp.services.db.service.uri"))
+  private def url = config.getString("dp.services.db.service.uri")
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 

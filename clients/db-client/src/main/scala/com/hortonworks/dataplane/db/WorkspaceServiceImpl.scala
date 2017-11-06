@@ -24,9 +24,7 @@ class WorkspaceServiceImpl(config: Config)(implicit ws: WSClient)
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  private def url =
-    Option(System.getProperty("dp.services.db.service.uri"))
-      .getOrElse(config.getString("dp.services.db.service.uri"))
+  private def url = config.getString("dp.services.db.service.uri")
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 

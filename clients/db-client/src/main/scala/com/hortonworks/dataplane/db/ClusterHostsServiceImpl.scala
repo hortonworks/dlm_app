@@ -31,9 +31,7 @@ import scala.concurrent.Future
 class ClusterHostsServiceImpl(config: Config)(implicit ws: WSClient)
     extends ClusterHostsService {
 
-  private def url =
-    Option(System.getProperty("dp.services.db.service.uri"))
-      .getOrElse(config.getString("dp.services.db.service.uri"))
+  private def url = config.getString("dp.services.db.service.uri")
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   override def createOrUpdate(host: ClusterHost): Future[Option[Errors]] = {

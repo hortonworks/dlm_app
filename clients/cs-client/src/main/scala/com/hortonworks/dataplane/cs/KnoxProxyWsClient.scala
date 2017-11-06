@@ -35,9 +35,7 @@ case class KnoxProxyWsRequest(private val request: WSRequest, private val fallba
 }
 
 case class KnoxProxyWsClient(wrappedClient: WSClient, config: Config) {
-  private def proxyUrl =
-    Option(System.getProperty("dp.services.proxy.service.uri"))
-      .getOrElse(config.getString("dp.services.proxy.service.uri"))
+  private def proxyUrl = config.getString("dp.services.proxy.service.uri")
 
   def url(urlString: String, clusterId: Long, serviceName:String): KnoxProxyWsRequest = {
     val url = new URL(urlString)

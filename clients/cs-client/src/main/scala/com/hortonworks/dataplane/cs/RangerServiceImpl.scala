@@ -24,9 +24,7 @@ import scala.concurrent.Future
 class RangerServiceImpl(config: Config)(implicit ws: ClusterWsClient)
   extends RangerService {
 
-  private def url =
-    Option(System.getProperty("dp.services.cluster.service.uri"))
-      .getOrElse(config.getString("dp.services.cluster.service.uri"))
+  private def url = config.getString("dp.services.cluster.service.uri")
 
   private def mapResultsGeneric(res: WSResponse) : Either[Errors,JsValue]= {
     res.status match {

@@ -61,9 +61,7 @@ class GroupServiceImpl(config: Config)(implicit ws: WSClient) extends GroupServi
       }
   }
 
-  private def url =
-    Option(System.getProperty("dp.services.db.service.uri"))
-      .getOrElse(config.getString("dp.services.db.service.uri"))
+  private def url = config.getString("dp.services.db.service.uri")
 
   private def mapToGroupInfo(res: WSResponse) = {
     res.status match {
