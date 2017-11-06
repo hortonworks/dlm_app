@@ -16,7 +16,8 @@
     "lint": "tslint \"src/**/*.ts\"",
     "test": "ng test",
     "pree2e": "webdriver-manager update",
-    "e2e": "protractor"
+    "e2e": "protractor",
+    "report:licenses": "nlf"
   },
   "dependencies": {
     "@angular/common": "^4.0.0",
@@ -68,6 +69,7 @@
     "karma-jasmine-html-reporter": "^0.2.2",
     "karma-remap-istanbul": "^0.2.1",
     "mydaterangepicker": "^4.1.9",
+    "nlf": "^2.0.0",
     "prettier": "^1.6.1",
     "protractor": "4.0.9",
     "roboto-npm-webfont": "0.0.4",

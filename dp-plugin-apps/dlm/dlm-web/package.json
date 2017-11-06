@@ -18,7 +18,8 @@
     "e2e": "protractor",
     "e2edebug": "protractor debug protractor.conf.js --elementExplorer",
     "dev:hmr": "ng serve --hmr -e=dev-hmr --host 0.0.0.0 --proxy-config proxy.conf.dev.json",
-    "alltests": "npm run build && npm run lint && npm run test"
+    "alltests": "npm run build && npm run lint && npm run test",
+    "report:licenses": "nlf"
   },
   "dependencies": {
     "@angular/animations": "4.1.3",
@@ -89,6 +90,7 @@
     "karma-jasmine-html-reporter": "^0.2.2",
     "karma-phantomjs-launcher": "^1.0.4",
     "karma-remap-istanbul": "^0.2.1",
+    "nlf": "^2.0.0",
     "protractor": "5.1.1",
     "ts-node": "2.0.0",
     "tslint": "4.5.0",

@@ -26,6 +26,11 @@
 If your goal is to build and package the core dataplane project for distribution, trigger `./dp-docker-build.sh package` without any additional arguments. This would generate a tar with name `dp-core` labelled with correct version.
 This tarball includes deployment scripts and relevant docker images.
 
+## Generating license reports
+* For `sbt` projects, we have added `sbt-license-report` plugin for both core and dlm. It can be triggered from sbt console by using: `dumpLicenseReport ` from relevant module. The report can be found at `target/license-reports` in the individual project's working directory.
+* For `nodejs`/`yarn` projects, we have added `nlf` as a dev dependency. It can be triggered using `yarn run report:licenses`. The report is displayed on console.
+* We have added `gradle-license-report` for gateway. It can be triggered using `gradle generateLicenseReport`. The report can be found at `build/reports/dependency-license` in the project's working directory.
+
 
 ## Setup (from source)
 
@@ -146,8 +151,8 @@ The script providing deployment and admnistration of DP Core is `dpdeploy.sh`. F
 | utils add-host    | `<ip> <host>`                  | Append a single entry to `/etc/hosts` file of the container interacting with HDP clusters   |
 | utils update-user | `[ ambari / atlas / ranger ]`  | Update user credentials for services that Dataplane will use to connect to clusters         |
 | utils reload-apps |                                | Restart all containers other than database, Consul and Knox                                 |
-| start             | `[ --all ]`                    | Start all containers                                                                        |
-| stop              | `[ --all ]`                    | Stop all containers                                                                         |
+| start             |                                | Start all containers                                                                        |
+| stop              |                                | Stop all containers                                                                         |
 | ps                |                                | List the status of associated docker containers                                             |
 | logs              | `<container_name>`             | Logs of supplied container id or name                                                       |
 | destroy           | `[ --all ]`                    | Kill all containers and remove them. Needs to start from init again                         |
