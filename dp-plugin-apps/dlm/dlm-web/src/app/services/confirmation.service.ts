@@ -10,7 +10,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Action } from '@ngrx/store';
-import { ConfirmationOptions, confirmationOptionsDefaults } from 'components/confirmation-modal';
+import { confirmationOptionsDefaults, ConfirmationOptions } from 'components/confirmation-modal/confirmation-options.type';
 
 @Injectable()
 export class ConfirmationService {
