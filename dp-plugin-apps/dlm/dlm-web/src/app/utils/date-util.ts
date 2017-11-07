@@ -8,7 +8,7 @@
  */
 
 import { IMyDate } from 'mydatepicker';
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 
 export const getDatePickerDate = (date: moment.Moment): IMyDate => {
   return {
