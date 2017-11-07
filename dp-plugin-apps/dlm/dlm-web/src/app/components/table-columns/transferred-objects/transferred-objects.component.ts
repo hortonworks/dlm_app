@@ -32,7 +32,7 @@ export class TransferredObjectsComponent {
 
   get formattedUnits(): string {
     if (this.executionType === POLICY_EXECUTION_TYPES.HIVE && this.units === UNIT_EVENTS) {
-      return UNIT_LABELS[UNIT_TABLES]
+      return UNIT_LABELS[UNIT_TABLES];
     } else {
       return UNIT_LABELS[this.units] || ' ';
     }
