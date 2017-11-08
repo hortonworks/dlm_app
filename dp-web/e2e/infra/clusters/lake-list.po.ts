@@ -43,6 +43,5 @@ export class LakeListPage {
     await this.bDropDownEn.click();
     await browser.driver.sleep(1000);
   }
-
-  async
+  
 }
