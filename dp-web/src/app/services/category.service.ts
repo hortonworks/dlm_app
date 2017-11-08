@@ -17,7 +17,7 @@ import {Category} from '../models/category';
 
 @Injectable()
 export class CategoryService {
-  url = '/api/datasets/categories';
+  url = 'api/datasets/categories';
 
   constructor(private http:Http) {}
 

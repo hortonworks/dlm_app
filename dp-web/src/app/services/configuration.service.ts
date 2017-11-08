@@ -20,8 +20,8 @@ import {LDAPProperties, LDAPUpdateProperties} from '../models/ldap-properties';
 
 @Injectable()
 export class ConfigurationService {
-  uri = '/api/init';
-  knowConfigUri = '/api/knox';
+  uri = 'api/init';
+  knowConfigUri = 'api/knox';
 
   constructor(private http:Http) { }
 

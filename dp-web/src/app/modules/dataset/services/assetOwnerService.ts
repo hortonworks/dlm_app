@@ -16,7 +16,7 @@ import {AssetOwnerModel} from "../models/assetOwnerModel";
 
 @Injectable()
 export class AssetOwnerService {
-  url = "/api/owner";
+  url = "api/owner";
 
   constructor(private http: Http) {
   }

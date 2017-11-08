@@ -17,7 +17,7 @@ import {HttpUtil} from '../shared/utils/httpUtil';
 
 @Injectable()
 export class LocationService {
-  url = '/api/locations';
+  url = 'api/locations';
 
   constructor(private http:Http) {}
 

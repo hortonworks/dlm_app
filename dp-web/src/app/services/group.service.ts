@@ -19,7 +19,7 @@ import {Group, GroupList} from '../models/group';
 @Injectable()
 export class GroupService {
 
-  url = '/api/groups';
+  url = 'api/groups';
   dataChanged = new Subject<boolean>();
   dataChanged$ = this.dataChanged.asObservable();
 

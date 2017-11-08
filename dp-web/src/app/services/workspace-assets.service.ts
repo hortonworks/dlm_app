@@ -20,8 +20,8 @@ import {WorkspaceAsset} from '../models/workspace-assets';
 
 @Injectable()
 export class WorkspaceAssetsService {
-  private postURL = '/api/workspaces/assets';
-  private getURL = '/api/workspaces/:id/assets';
+  private postURL = 'api/workspaces/assets';
+  private getURL = 'api/workspaces/:id/assets';
 
   defaultHeaders = {'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest'};
 

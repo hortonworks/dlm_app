@@ -20,7 +20,7 @@ import {HttpUtil} from '../shared/utils/httpUtil';
 
 @Injectable()
 export class AtlasService {
-  uri = '/api/assets';
+  uri = 'api/assets';
 
   constructor(private http: Http) { }
 

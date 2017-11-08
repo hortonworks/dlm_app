@@ -20,8 +20,8 @@ import off = L.DomEvent.off;
 
 @Injectable()
 export class DsAssetsService {
-  url1 = "/api/query-assets";
-  url2 = "/api/query-attributes";
+  url1 = "api/query-assets";
+  url2 = "api/query-attributes";
 
   constructor(private http: Http) {
   }
@@ -89,7 +89,7 @@ export class DsAssetsService {
   }
 
   tagsQuery(clusterId: number): Observable<string[]> {
-    const uri = `/api/assets/typeDefs/${clusterId}/classification`;
+    const uri = `api/assets/typeDefs/${clusterId}/classification`;
 
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))

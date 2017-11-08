@@ -20,7 +20,7 @@ import {AssetSchema, AssetModel} from '../models/asset-schema';
 
 @Injectable()
 export class AssetService {
-  uri = '/api/assets';
+  uri = 'api/assets';
 
   constructor(private http: Http) {
   }
@@ -49,7 +49,7 @@ export class AssetService {
   }
 
   startProfiling(clusterId:string, dbName:string, tableName:string) : Observable<any>{
-    const uri = `/api/dpProfiler/startJob?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}`;
+    const uri = `api/dpProfiler/startJob?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}`;
     return this.http
       .post(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
@@ -61,7 +61,7 @@ export class AssetService {
   }
 
   getProfilingStatus(clusterId:string, dbName:string, tableName:string) : Observable<any>{
-    const uri = `/api/dpProfiler/jobStatus?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}`;
+    const uri = `api/dpProfiler/jobStatus?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}`;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
@@ -85,7 +85,7 @@ export class AssetService {
   getProfilerAuditResults(clusterId:string, dbName:string, tableName:string, userName:string, dateModel:any) : Observable<any>{
     const endDate = `${dateModel.endDate.year}-${dateModel.endDate.month}-${dateModel.endDate.day}`
     const startDate = `${dateModel.beginDate.year}-${dateModel.beginDate.month}-${dateModel.beginDate.day}`
-    const uri = `/api/dpProfiler/auditResults?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}&startDate=${startDate}&endDate=${endDate}${userName?("&userName="+userName):""}`;
+    const uri = `api/dpProfiler/auditResults?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}&startDate=${startDate}&endDate=${endDate}${userName?("&userName="+userName):""}`;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
@@ -98,7 +98,7 @@ export class AssetService {
   getProfilerAuditActions(clusterId:string, dbName:string, tableName:string, userName:string, dateModel:any) : Observable<any>{
     const endDate = `${dateModel.endDate.year}-${dateModel.endDate.month}-${dateModel.endDate.day}`
     const startDate = `${dateModel.beginDate.year}-${dateModel.beginDate.month}-${dateModel.beginDate.day}`
-    const uri = `/api/dpProfiler/auditActions?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}&startDate=${startDate}&endDate=${endDate}${userName?("&userName="+userName):""}`;
+    const uri = `api/dpProfiler/auditActions?clusterId=${clusterId}&dbName=${dbName}&tableName=${tableName}&startDate=${startDate}&endDate=${endDate}${userName?("&userName="+userName):""}`;
     return this.http
       .get(uri, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
