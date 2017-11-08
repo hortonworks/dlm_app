@@ -9,7 +9,7 @@
   ~  */
   -->
 
-<div class="load-right-to-left-slider dialog1x">
+<div data-se="groups__slider-add-group" class="load-right-to-left-slider dialog1x">
   <div class="title-container">
     <div class="hwx-subtitle">
       <span *ngIf="mode === modes.ADD">{{"pages.infra.labels.addGroup" | translate}}</span>
@@ -18,7 +18,7 @@
     </div>
   </div>
   <div class="slider-container">
-    <div class="error-notification-bar" *ngIf="showError">
+    <div data-se="groups__add-group__error" class="error-notification-bar" *ngIf="showError">
       <i class="fa fa-times-circle pull-left"></i>
       <div class="error-title">{{"common.failed" | translate}}</div>
       <div *ngFor="let msg of errorMessages" class="error-text">{{msg}}</div>
@@ -28,7 +28,7 @@
         <div class="form-group dp-input">
           <label class="required">{{"pages.infra.labels.addGroupNames" | translate}}</label>
           <div id="duplicate-group-warning" class="hwx-inline-desc warning"></div>
-          <tagging-widget #groupTags id="group-tags" class="user-tags"
+          <tagging-widget data-se="groups__add-group__groups-input"  #groupTags id="group-tags" class="user-tags"
           [tags]="groups"
           [availableTags]="availableGroups"
           [clearOnSearch]="true"
@@ -40,7 +40,7 @@
         <div class="form-group dp-input">
         <label class="required">{{"pages.infra.labels.roles" | translate}}</label>
         <div id="duplicate-role-warning" class="hwx-inline-desc warning"></div>
-          <tagging-widget #roleTags class="role-tags" id="role-tags"
+          <tagging-widget data-se="groups__add-group__roles-input" #roleTags class="role-tags" id="role-tags"
           [tags]="roles"
           [availableTags]="availableRoles"
           [clearOnSearch]="true"
@@ -100,8 +100,8 @@
       </div>
     </form>
     <div class="margin-top-20">
-      <button id="save-btn" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"common.save" | translate}}</button>
-      <button id="cancel-btn" class="mdl-button btn-hwx-default" [routerLink]="['/infra/manage-access/groups']">{{"common.cancel" | translate}}</button>
+      <button id="save-btn" data-se="groups__add-group__save" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"common.save" | translate}}</button>
+      <button id="cancel-btn" data-se="groups__add-group__cancel" class="mdl-button btn-hwx-default" [routerLink]="['/infra/manage-access/groups']">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

@@ -13,23 +13,54 @@
 // https://github.com/angular/protractor/blob/master/lib/config.ts
 
 /*global jasmine */
-var SpecReporter = require('jasmine-spec-reporter');
+const SpecReporter = require('jasmine-spec-reporter');
+const shell = require('shelljs');
 
 exports.config = {
   allScriptsTimeout: 11000,
   specs: [
-    './e2e/**/*.e2e-spec.ts'
+    './e2e/sign-in.e2e-spec.ts',
+    './e2e/onboard-welcome.e2e-spec.ts',
+    './e2e/identity-provider.e2e-spec.ts',
+    // './e2e/users-and-groups.e2e-spec.ts',
+    './e2e/knox-sign-in.e2e-spec.ts',
+    './e2e/onboard-welcome-after-idp.e2e-spec.ts',
+    './e2e/identity.e2e-spec.ts',
+    './e2e/infra/user-mgmt/users-list.e2e-spec.ts',
+    './e2e/infra/user-mgmt/groups-list.e2e-spec.ts',
+    './e2e/infra/clusters/cluster-add.e2e-spec.ts',
+    './e2e/infra/services/service-enablement.e2e-spec.ts',
+    './e2e/infra/services/service-verification.e2e-spec.ts',
   ],
-  capabilities: {
-    'browserName': 'chrome'
-  },
+  multiCapabilities: [{
+  //   'browserName': 'firefox',
+  //   'moz:firefoxOptions': {
+  //     'args': [
+  //       '--headless',
+  //     ],
+  //   },
+  // }, {
+    'browserName': 'chrome',
+    'chromeOptions': {
+      'args': [
+        // '--headless',
+        '--disable-extensions',
+        '--disable-web-security',
+        '--disk-cache-size=1',
+        '--media-cache-size=1',
+        '--start-maximized',
+        '--disable-gpu',
+      ],
+    },
+  }],
   directConnect: true,
-  baseUrl: 'http://localhost:4200/sign-in',
+  baseUrl: 'http://localhost:4200',
+  // baseUrl: 'https://dataplane',
   framework: 'jasmine',
   jasmineNodeOpts: {
     showColors: true,
     defaultTimeoutInterval: 30000,
-    print: function() {}
+    print: function() {},
   },
   useAllAngular2AppRoots: true,
   rootElement: 'data-plane',
@@ -39,6 +70,13 @@ exports.config = {
     });
   },
   onPrepare() {
-    jasmine.getEnv().addReporter(new SpecReporter());
-  }
+    jasmine.getEnv().addReporter(new SpecReporter({ displayStacktrace: 'specs' }));
+
+    // cleanup db
+    shell.pushd('../services/db-service/db');
+    shell.exec('flyway clean migrate');
+    shell.popd();
+  },
+	// Turn off control flow (https://github.com/angular/protractor/tree/master/exampleTypescript/asyncAwait)
+  SELENIUM_PROMISE_MANAGER: false,
 };

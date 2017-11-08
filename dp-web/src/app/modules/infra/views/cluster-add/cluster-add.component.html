@@ -15,7 +15,7 @@
       <i class="fa fa-check-circle pull-left"></i>
       <i id="success-close" class="fa fa-remove pull-right" (click)="closeNotification()"></i>
       <div id="success-heading" class="text-medium">{{"pages.infra.labels.clusterAddSuccess" | translate}}</div>
-      <div id="success-message" class="text-small-1">{{"pages.infra.description.clusterAddSuccess" | translate}} </div>
+      <div id="success-message" class="text-small-1" data-se="cluster_add__addSuccess">{{"pages.infra.description.clusterAddSuccess" | translate}} </div>
     </div>
   </div>
   <div *ngIf="showError">
@@ -23,7 +23,7 @@
       <i class="fa fa-times-circle pull-left"></i>
       <i id="e" class="fa fa-remove pull-right" (click)="closeError()"></i>
       <div id="error-header" class="text-medium">{{"common.failed" | translate}}</div>
-      <div id="error-message" class="text-small-1">{{errorMessage}} </div>
+      <div id="error-message" class="text-small-1" data-se="cluster_add__addError">{{errorMessage}} </div>
     </div>
   </div>
 
@@ -41,12 +41,12 @@
       <div class="form-group" #ambariInput>
         <label class="required">{{"pages.infra.labels.ambariUrl" | translate}}</label>
         <div class="input-group">
-          <input required class="dp-input-url" placeholder="eg. http://10.10.10.10:8080" name="ambari-url" type="text" [readonly]="showClusterDetails" [ngStyle]="showClusterDetails && {'opacity':'0.6'}" [(ngModel)]="cluster.ambariurl" (keypress)="onKeyPress($event)"/>
-          <button *ngIf="!showClusterDetails" id="go-btn" class="mdl-button btn-hwx-primary" type="button" (click)="getClusterInfo($event)">
+          <input data-se="cluster_add__ambariUrlInput" required class="dp-input-url" placeholder="eg. http://10.10.10.10:8080" name="ambari-url" type="text" [readonly]="showClusterDetails" [ngStyle]="showClusterDetails && {'opacity':'0.6'}" [(ngModel)]="cluster.ambariurl" (keypress)="onKeyPress($event)"/>
+          <button *ngIf="!showClusterDetails" id="go-btn" class="mdl-button btn-hwx-primary" type="button" (click)="getClusterInfo($event)" data-se="cluster_add__goButton">
             <span *ngIf="_isClusterValidateInProgress"><i class="fa fa-spinner fa-spin"></i></span>
             <span *ngIf="!_isClusterValidateInProgress">{{"common.go" | translate}}</span>
           </button>
-          <button *ngIf="showClusterDetails" id="clear-btn" class="mdl-button btn-hwx-primary" type="button" (click)="resetPage()">
+          <button *ngIf="showClusterDetails" id="clear-btn" class="mdl-button btn-hwx-primary" type="button" (click)="resetPage()" data-se="cluster_add__clearButton">
             <span>{{"common.clear" | translate}}</span>
           </button>
         </div>
@@ -57,7 +57,7 @@
            class="error-section validation-error">
         <div class="">
           <ul>
-            <li *ngFor="let reason of reasons">{{reason}}</li>
+            <li *ngFor="let reason of reasons" data-se="cluster_add__failReasons">{{reason}}</li>
           </ul>
         </div>
       </div>
@@ -111,7 +111,7 @@
                 <div class="hwx-inline-desc">{{"pages.infra.description.clusterLocation" | translate}}</div>
                 <div style="display: flex;align-items: center">
                   <div [ngClass]="{'validation-error' : isLocationValid==false}">
-                    <input required class="dp-input" name="location" type="text" autocomplete="off" ngui-auto-complete
+                    <input required class="dp-input" name="location" type="text" autocomplete="off" data-se="cluster_add__location" ngui-auto-complete
                            (keyup)="setLocation()"
                            (blur)="setLocationValidity(location)"
                            (focus)="resetLocationValidity()"
@@ -130,7 +130,7 @@
               <div class="form-group">
                 <label class="required">{{"pages.infra.labels.dataCenter" | translate}}</label>
                 <div class="hwx-inline-desc">{{"pages.infra.description.dataCenter" | translate}}</div>
-                <input required class="dp-input" placeholder="Datacenter" name="datacenter" type="text" [(ngModel)]="cluster.dcName"/>
+                <input data-se="cluster_add__dataCenter" required class="dp-input" placeholder="Datacenter" name="datacenter" type="text" [(ngModel)]="cluster.dcName"/>
               </div>
               <div class="form-group">
                 <label>{{"common.tags" | translate}} </label>
@@ -140,7 +140,7 @@
               <div class="form-group">
                 <label>{{"common.description" | translate}}</label>
                 <div class="hwx-inline-desc">{{"pages.infra.description.description" | translate}}</div>
-                <textarea name="desc" [(ngModel)]="cluster.description"></textarea>
+                <textarea name="desc" [(ngModel)]="cluster.description" data-se="clsuter_add__description"></textarea>
               </div>
             </div>
           </div>
@@ -151,9 +151,9 @@
       </div>
     </form>
     <div class="button-container"  *ngIf="showClusterDetails">
-      <button id="add-btn" class="mdl-button btn-hwx-primary" (click)="onCreate($event)">{{"common.add" | translate}}</button>
-      <button id="add-and-new-btn" class="mdl-button btn-hwx-primary" (click)="onCreateAndAdd($event)">{{"common.addAndNew" | translate}}</button>
-      <button id="cancel-btn" class="mdl-button btn-hwx-default" [routerLink]="['/infra']">{{"common.cancel" | translate}}</button>
+      <button id="add-btn" class="mdl-button btn-hwx-primary" (click)="onCreate($event)" data-se="cluster_add__addClusterButton">{{"common.add" | translate}}</button>
+      <button id="add-and-new-btn" class="mdl-button btn-hwx-primary" (click)="onCreateAndAdd($event)" data-se="cluster_add__addAndNewClusterButton">{{"common.addAndNew" | translate}}</button>
+      <button id="cancel-btn" class="mdl-button btn-hwx-default" [routerLink]="['/infra']" data-se="cluster_add__cancelButton">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

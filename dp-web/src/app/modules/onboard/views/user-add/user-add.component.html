@@ -9,13 +9,14 @@
   ~  */
   -->
 
-<div class="notification-bar line-height-1-5" *ngIf="showNotification">
+<div class="notification-bar line-height-1-5" *ngIf="showNotification"
+  data-se="onboard__ung__notifications">
   <i class="fa fa-check-circle green margin-right-10 text-medium"></i>
   <span class="text-medium green">LDAP ADDED SUCCESSFULLY!!!</span>
   <i class="fa fa-remove pull-right margin-all-3 pointer" (click)="closeNotification()"></i>
 </div>
 <div class="container line-height-1-5">
-  <div class="error-notification-bar" *ngIf="showError">
+  <div class="error-notification-bar" *ngIf="showError" data-se="onboard__ung__errors">
     <i class="fa fa-times-circle pull-left"></i>
     <div class="error-title">{{"common.failed" | translate}}</div>
     <div class="error-text">{{errorMessage}}</div>
@@ -51,7 +52,9 @@
     [minChars]=3></tagging-widget>
   </div>
   <div class="margin-top-30">
-    <button id="save-login-btn" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"pages.onboard.adduser.labels.saveAndLogin" | translate}}</button>
-    <button id="back-btn" class="mdl-button btn-hwx-secondary" [routerLink]="['/onboard/identity-provider']">{{"common.back" | translate}}</button>
+    <button id="save-login-btn" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()"
+      data-se="onboard__ung__save_n_logout">{{"pages.onboard.adduser.labels.saveAndLogin" | translate}}</button>
+    <button id="back-btn" class="mdl-button btn-hwx-secondary" [routerLink]="['/onboard/identity-provider']"
+      data-se="onboard__ung__back">{{"common.back" | translate}}</button>
   </div>
 </div>

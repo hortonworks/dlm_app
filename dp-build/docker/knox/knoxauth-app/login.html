@@ -37,17 +37,18 @@
                   <form action="" method="post" accept-charset="utf-8">
                         <div class="field-group">
                             <label aria-label="Username">Username</label>
-                            <input type="text" name="username" tabindex="1" onkeypress=keypressed(event) autofocus>
+                            <input type="text" name="username" tabindex="1" onkeypress=keypressed(event) autofocus data-se="knox__username">
                         </div>
                         <div class="field-group">
                             <label aria-label="Password">Password</label>
-                            <input type="password" name="password" tabindex="2" autocomplete="off" onkeypress=keypressed(event) required>
+                            <input type="password" name="password" tabindex="2" autocomplete="off" onkeypress=keypressed(event) required data-se="knox__password">
                         </div>
-                        <span id="errorBox" class="help-inline" style="color:white;display:none;"><span class="errorMsg"></span>
+                        <span id="errorBox" class="help-inline" style="color:white;display:none;" data-se="knox__error">
+                          <span class="errorMsg"></span>
                           <i class="icon-warning-sign" style="color:#ae2817;"></i>
                         </span>
                         <div class="action-group">  
-                          <button type="button" class="mdl-button btn-hwx-primary" id="signIn" tabindex="4" onkeypress="keypressed(event)" onclick="login();">
+                          <button type="button" class="mdl-button btn-hwx-primary" id="signIn" tabindex="4" onkeypress="keypressed(event)" onclick="login();" data-se="knox__sign_in">
                             <span> Login </span>
                             <i class="fa fa-spinner fa-pulse fa-fw"></i>
                           </button>

@@ -11,7 +11,7 @@
 
 <div class="content-pane">
   <div class="title-pane">
-    <div class="page-title">
+    <div class="page-title" data-se="cluster_add__title">
       <span class="hwx-title">{{"common.clusters" | translate}}</span>
     </div>
     <div class="filter-labels">
@@ -37,7 +37,7 @@
           <div class="option-value" (keyup)="handleKeyboardEvents($event, filterOption.displayName, filterOption.key, value)" *ngFor="let value of filterOption.values" tabindex="0" (click)="addToFilter(filterOption.displayName, filterOption.key, value)">{{value}}</div>
         </div>
     </div>
-    <button id="add-btn" class="mdl-button btn-hwx-primary" [routerLink]="['/infra/clusters/add']"> {{"pages.infra.labels.addButton" | translate}} </button></div>
+    <button id="add-btn" class="mdl-button btn-hwx-primary" [routerLink]="['/infra/clusters/add']" data-se="cluster_add__addButton"> {{"pages.infra.labels.addButton" | translate}} </button></div>
   </div>
   <table class="mdl-data-table mdl-js-data-table" dp-config-table (onSort)="onSort($event)">
       <thead>

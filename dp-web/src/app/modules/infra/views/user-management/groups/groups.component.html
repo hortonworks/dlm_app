@@ -14,7 +14,7 @@
 <div class="container">
   <div class="action-bar mdl-grid mdl-grid--no-spacing">
     <div class="mdl-cell mdl-cell--2-col">
-      <dp-tabs [tabEnum]="tabs" [tabType]="tabType.UNDERLINE" [activeTabName]="tabs[tabs.GROUPS]" (selected)="switchView($event)"> </dp-tabs>
+      <dp-tabs data-se="groups__user-group-tab" [tabEnum]="tabs" [tabType]="tabType.UNDERLINE" [activeTabName]="tabs[tabs.GROUPS]" (selected)="switchView($event)"> </dp-tabs>
     </div>
     <div class="mdl-layout-spacer"></div>
     <div class="padding-top-10">
@@ -23,12 +23,12 @@
         (keyup)="onSearch($event)"/>
         <i aria-hidden="true" class="fa fa-search dp-input__icon"></i>
       </div>
-      <button id="add-group" class="mdl-button btn-hwx-primary" (click)="addGroup()"> {{"pages.infra.labels.addGroup" | translate}}</button>
+      <button id="add-group" data-se="groups__addGroupButton"  class="mdl-button btn-hwx-primary" (click)="addGroup()"> {{"pages.infra.labels.addGroup" | translate}}</button>
     </div>
   </div>
   <div style="clear: both"></div>
   <div class="table-container">
-    <table class="mdl-data-table mdl-js-data-table" dp-config-table>
+    <table data-se="groups__groups-table" class="mdl-data-table mdl-js-data-table" dp-config-table>
       <thead>
       <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.groupName" | translate}}</th>
       <th class="mdl-data-table__cell--non-numeric">{{"pages.infra.labels.roles" | translate}}</th>
@@ -36,15 +36,15 @@
       <th class="mdl-data-table__cell--non-numeric"></th>
       </thead>
       <tbody>
-        <tr *ngFor="let group of groups">
-          <td class="mdl-data-table__cell--non-numeric key-column" [attr.id]="'edit_'+group.id" (click)="editGroup(group.groupName)">{{group.groupName}}</td>
+        <tr data-se-group="groups__groups-list" *ngFor="let group of groups">
+          <td class="mdl-data-table__cell--non-numeric key-column" data-se="groups__groups-list__groupname" [attr.id]="'edit_'+group.id" (click)="editGroup(group.groupName)">{{group.groupName}}</td>
           <td class="mdl-data-table__cell--non-numeric">{{rolesMap.get(group.id)}}</td>
           <td class="mdl-data-table__cell--non-numeric">{{group.active? 'Active' : 'Inactive'}}</td>
           <td>
-            <button [attr.id]="'dropDown_'+group.id" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
+            <button data-se="groups__groups-list__row-menu" [attr.id]="'dropDown_'+group.id" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
               <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i></button>
             <ul mdl class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+group.id">
-              <li [attr.id]="'edit_'+group.id+'_li'" class="mdl-menu__item" (click)="editGroup(group.groupName)"><i class="fa fa-edit menu-icon"></i>{{"common.edit" | translate}}</li>
+              <li data-se-group="groups__groups-list__row-menu-items" [attr.id]="'edit_'+group.id+'_li'" class="mdl-menu__item" (click)="editGroup(group.groupName)"><i class="fa fa-edit menu-icon"></i>{{"common.edit" | translate}}</li>
             </ul>
           </td>
         </tr>

@@ -15,7 +15,7 @@
       <div class="logo-wrapper borderBox" title="{{ persona.name }}">
         <img [attr.src]="'../../../assets/images/' + persona.imageName" alt=""/>
       </div>
-      <div [ngClass]="{'active': activePersona === persona.name}">{{ persona.name }}</div>
+      <div data-se-group="collapsibleNav__dropDown-personaName" [ngClass]="{'active': activePersona === persona.name}">{{ persona.name }}</div>
     </ng-container>
   </li>
 </ul>

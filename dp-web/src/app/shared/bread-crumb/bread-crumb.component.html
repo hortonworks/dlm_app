@@ -10,7 +10,7 @@
   -->
 
 <ol class="breadcrumb">
-  <li *ngFor="let breadcrumb of breadcrumbs; let isLast = last;" [class.active]="isLast">
+  <li *ngFor="let breadcrumb of breadcrumbs; let isLast = last;" [class.active]="isLast" [attr.data-se-value]="breadcrumb.label" data-se-group="breadcrumb__crumbs">
     <a *ngIf="!isLast" [routerLink]="[breadcrumb.url, breadcrumb.params]">{{'routes.' + breadcrumb.label | translate}}</a>
     <span *ngIf="isLast">{{'routes.' + breadcrumb.label | translate}}</span>
   </li>

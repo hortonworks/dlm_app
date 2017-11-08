@@ -11,12 +11,21 @@
 
 <div class="nav-tag-panel borderBox">
   <div class="tag-search">
-    <input placeholder='{{"pages.dataset.dashboard.tag-nav.tagSearchPlaceHolder" | translate}}' [(ngModel)]="tagSearchText" (keyup)="searchTag()"/>
+    <input
+      placeholder='{{"pages.dataset.dashboard.tag-nav.tagSearchPlaceHolder" | translate}}'
+      [(ngModel)]="tagSearchText"
+      (keyup)="searchTag()"
+      data-se="collection_tags__filter"/>
     <span *ngIf="!tagSearchText"><i class="fa fa-search" (click)="searchTag()"></i></span>
     <span *ngIf="tagSearchText"><i class="fa fa-times" (click)="onClearSearch()"></i></span>
   </div>
   <div class="tag-list">
-    <div *ngFor="let tagObj of displayTags;" class="panelRow {{currentDsTag==tagObj?'selected':''}}" (click)="onPanelRowSelectionChange(tagObj)">
+    <div
+      *ngFor="let tagObj of displayTags;"
+      class="panelRow {{currentDsTag==tagObj?'selected':''}}"
+      (click)="onPanelRowSelectionChange(tagObj)"
+      [attr.data-se]="'collection_tags__tag_' + tagObj.name"
+      data-se-group="collection_tags">
       <span class="displayName">{{tagObj.name}}</span>
       <span class="displaycount">{{tagObj.count}}</span>
     </div>

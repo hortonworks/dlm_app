@@ -23,17 +23,18 @@
                 <form (submit)="onSubmit($event)" #loginForm="ngForm">
                     <div class="field-group">
                         <label aria-label="Username">Username</label>
-                        <input type="text" name="username" [(ngModel)]="credential.username" required>
+                        <input type="text" name="username" [(ngModel)]="credential.username" required data-se="sign_in__username">
                     </div>
                     <div class="field-group">
                         <label aria-label="Password">Password</label>
-                        <input type="password" name="password" [(ngModel)]="credential.password" required>
+                        <input type="password" name="password" [(ngModel)]="credential.password" required data-se="sign_in__password">
                     </div>
                     <div class="error-message"
-                         *ngIf="_isAuthInProgress === false && _isAuthSuccessful === false && message">{{message}}
+                         *ngIf="_isAuthInProgress === false && _isAuthSuccessful === false && message"
+                         data-se="sign_in__message">{{message}}
                     </div>
                     <div class="action-group">
-                        <button class="mdl-button btn-hwx-primary" [disabled]="_isAuthInProgress">
+                        <button class="mdl-button btn-hwx-primary" [disabled]="_isAuthInProgress" data-se="sign_in__submit">
                             <span *ngIf="!_isAuthInProgress"> Login </span>
                             <i *ngIf="_isAuthInProgress" class="fa fa-spinner fa-pulse fa-fw"></i>
                         </button>

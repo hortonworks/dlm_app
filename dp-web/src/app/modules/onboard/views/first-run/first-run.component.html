@@ -17,21 +17,21 @@
     <div class="hwx-desc">{{"pages.onboard.description.clusterOnboard" | translate}}</div>
 
     <ul class="intro-list">
-      <li>
+      <li data-se="onboard__after_idp__cluster_add">
         <i class="fa fa-server pull-left"></i>
         <div>
           <div class="hwx-subtitle">{{"pages.onboard.labels.addCluster" | translate}}</div>
           <div class="hwx-desc">{{"pages.onboard.description.addCluster" | translate}}</div>
         </div>
       </li>
-      <li>
+      <li data-se="onboard__after_idp__users">
         <i class="fa fa-users pull-left"></i>
         <div>
           <div class="hwx-subtitle">{{"pages.onboard.labels.manageUsers" | translate}}</div>
           <div class="hwx-desc">{{"pages.onboard.description.manageUsers" | translate}}</div>
         </div>
       </li>
-      <li>
+      <li data-se="onboard__after_idp__services">
         <i class="fa fa-cogs pull-left"></i>
         <div>
           <div class="hwx-subtitle">{{"pages.onboard.labels.setService" | translate}}</div>
@@ -41,7 +41,7 @@
     </ul>
 
     <div class="button-container">
-      <a id="get-started-link" [routerLink]="['/infra/clusters/add']"><button id="start-btn" class="mdl-button btn-hwx-primary">{{"pages.onboard.labels.startButton" | translate}}</button></a>
+      <a id="get-started-link" [routerLink]="['/infra/clusters/add']"><button id="start-btn" class="mdl-button btn-hwx-primary" data-se="onboard__after_idp__start">{{"pages.onboard.labels.startButton" | translate}}</button></a>
     </div>
   </section>
 </div>

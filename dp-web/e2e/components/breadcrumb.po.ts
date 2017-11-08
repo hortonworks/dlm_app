@@ -9,10 +9,10 @@
  *
  */
 
-import { browser, protractor } from 'protractor';
+import { $$ } from 'protractor';
+import { helper } from '../utils/helpers';
 
-export function waitForElementVisibility (_element ) {
-    var EC = protractor.ExpectedConditions;
-    return browser.wait(EC.visibilityOf(_element));
+export class BreadcrumbComponent {
+    public crumbs = $$('[data-se-group="breadcrumb__crumbs"]');
+
 }
-

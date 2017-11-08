@@ -9,7 +9,7 @@
   ~  */
   -->
 
-<div class="load-right-to-left-slider dialog1x">
+<div data-se="users__slider-add-user" class="load-right-to-left-slider dialog1x">
   <div class="title-container">
     <div class="hwx-subtitle">
       <span *ngIf="mode === modes.ADD">{{"pages.infra.labels.addUser" | translate}}</span>
@@ -18,7 +18,7 @@
     </div>
   </div>
   <div class="slider-container">
-    <div class="error-notification-bar" *ngIf="showError">
+    <div data-se="users__add-user__error" class="error-notification-bar" *ngIf="showError">
       <i class="fa fa-times-circle pull-left"></i>
       <div class="error-title">{{"common.failed" | translate}}</div>
       <div *ngFor="let msg of errorMessages" class="error-text">{{msg}}</div>
@@ -28,7 +28,7 @@
         <div class="form-group dp-input">
           <label class="required">{{"pages.infra.labels.addUserNames" | translate}}</label>
           <div id="duplicate-user-warning" class="hwx-inline-desc warning"></div>
-          <tagging-widget #userTags id="user-tags" class="user-tags"
+          <tagging-widget data-se="users__add-user__users-input" #userTags id="user-tags" class="user-tags"
             [tags]="users"
             [availableTags]="availableUsers"
             [clearOnSearch]="true"
@@ -41,7 +41,7 @@
           <label class="required">{{"pages.infra.labels.roles" | translate}}</label>
           <div class="hwx-inline-desc"><i class="fa fa-warning warning"></i>{{"pages.infra.description.rolesOverrideWarning" | translate}}</div>
           <div id="duplicate-role-warning" class="hwx-inline-desc duplicate-error"></div>
-          <tagging-widget #roleTags class="role-tags" id="role-tags"
+          <tagging-widget data-se="users__add-user__roles-input" #roleTags class="role-tags" id="role-tags"
             [tags]="roles"
             [availableTags]="availableRoles"
             [clearOnSearch]="true"
@@ -54,7 +54,6 @@
               <div *ngFor="let roleOption of allRoles" id="role-{{roleOption.data}}" (click)="onNewRoleAddition(roleOption)">{{roleOption.display}}</div>
             </div>
         </div>
-
       </div>
     </form>
     <form #editUserForm="ngForm">
@@ -104,8 +103,8 @@
       </div>
     </form>
     <div class="margin-top-20">
-      <button id="save-btn" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"common.save" | translate}}</button>
-      <button id="cancel-btn" class="mdl-button btn-hwx-default" [routerLink]="['/infra/manage-access/users']">{{"common.cancel" | translate}}</button>
+      <button id="save-btn" data-se="users__add-user__save" class="mdl-button btn-hwx-primary margin-right-10" (click)="save()">{{"common.save" | translate}}</button>
+      <button id="cancel-btn" data-se="users__add-user__cancel" class="mdl-button btn-hwx-default" [routerLink]="['/infra/manage-access/users']">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

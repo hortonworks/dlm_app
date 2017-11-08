@@ -14,10 +14,10 @@
     <span class="hwx-title">{{"pages.services.labels.verify" | translate}}</span>
   </div>
   <div class="content-pane">
-    <div class="hwx-inline-desc"[innerHTML]="'pages.services.description.verificationWelcome'| translate: descriptionParams"></div>
+    <div class="hwx-inline-desc" [innerHTML]="'pages.services.description.verificationWelcome'| translate: descriptionParams"></div>
     <div class="spacer-15"></div>
     <div *ngIf="showError">
-    <div class="error-notification-bar">
+    <div data-se="services__verification-error-notification" class="error-notification-bar">
       <i class="fa fa-times-circle pull-left"></i>
       <div class="hwx-desc">{{"common.failed" | translate}}</div>
       <div class="hwx-desc">{{errorMessage}} </div>
@@ -30,26 +30,26 @@
         <label class="required">{{"pages.services.labels.smartSenseId" | translate}}</label>
         <div class="mdl-grid mdl-grid--no-spacing">
           <div class="input-group">
-            <input required class="dp-input" name="smartsense-id" type="text" [(ngModel)]="smartSenseId"/>
+            <input data-se="services__verification-smart-sense-id" required class="dp-input" name="smartsense-id" type="text" [(ngModel)]="smartSenseId"/>
             <div *ngIf="isInvalid" class="validation-error"><i class="fa fa-times"></i></div>
           </div>
           <div class="padding-left-12">
-            <button id="verify-btn" *ngIf="!verified" type="button" (click)="verifySmartSenseId()" class="btn btn-hwx-primary width-90">
+            <button id="verify-btn" data-se="services__verification-verify-button" *ngIf="!verified" type="button" (click)="verifySmartSenseId()" class="btn btn-hwx-primary width-90">
               <span *ngIf="verificationInProgress"><i class="fa fa-spinner fa-spin"></i></span>
               <span *ngIf="!verificationInProgress">{{"pages.services.labels.verify" | translate}}</span>
             </button>
-            <button *ngIf="verified" type="button" class="btn btn-hwx-secondary">
+            <button data-se="services__verification-verified-button" *ngIf="verified" type="button" class="btn btn-hwx-secondary verified-button">
               <span>{{"pages.services.labels.verified" | translate}}</span>
             </button>
           </div>
         </div>
-        <div class="error-message" *ngIf="isInvalid">{{"pages.services.description.verificationError" | translate}}</div>
+        <div class="error-message" data-se="services__verification-incorrect-smart-sense-id" *ngIf="isInvalid">{{"pages.services.description.verificationError" | translate}}</div>
       </div>
     </form>
     <div class="spacer-15"></div>
     <div class="button-container">
-      <button id="next-btn" class="btn btn-hwx-primary" (click)="next()">{{"pages.services.labels.next" | translate}}</button>
-      <button id="cancel-btn" class="btn btn-hwx-default" [routerLink]="['/infra', 'services']">{{"common.cancel" | translate}}</button>
+      <button id="next-btn" data-se="services__verification-next-button" class="btn btn-hwx-primary" (click)="next()">{{"pages.services.labels.next" | translate}}</button>
+      <button id="cancel-btn" data-se="services__verification-cancel-button" class="btn btn-hwx-default" [routerLink]="['/infra', 'services']">{{"common.cancel" | translate}}</button>
     </div>
   </div>
 </div>

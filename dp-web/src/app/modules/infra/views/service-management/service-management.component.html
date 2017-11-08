@@ -15,24 +15,24 @@
       <span class="hwx-title">{{"pages.services.labels.enabledServices" | translate}}</span>
     </div>
     <div *ngIf="showNotification">
-      <div id="success-notification-bar" class="notification-bar">
+      <div data-se="services__notificatiob-bar" id="success-notification-bar" class="notification-bar">
         <i class="fa fa-check-circle pull-left"></i>
         <div id="success-heading" class="hwx-subtitle title">{{"pages.services.labels.serviceEnabled" | translate}}</div>
         <div id="success-message" class="message" [innerHTML]="'pages.services.description.serviceEnabled'| translate: serviceNameParams"></div>
       </div>
     </div>
     <div class="services-table">
-      <div *ngFor="let enabledApp of enabledAppDetails">
+      <div data-se-group="services__enabledServices" *ngFor="let enabledApp of enabledAppDetails">
         <div class="row" (click)="getClusters(enabledApp)">
           <span class="logo"><img class="logo-img" [attr.src]="'../../../assets/images/' + + enabledApp.service.skuName +'-logo-blue.png'" alt=""/></span>
-          <span class="hwx-subtitle name">{{ enabledApp.service.sku.description }}</span>
+          <span class="hwx-subtitle name" data-se="services__enabledServices-serviceName">{{ enabledApp.service.sku.description }}</span>
           <span class="divider hwx-inline-desc"> | </span>
           <span class="hwx-inline-desc">{{"pages.services.labels.smartSenseId" | translate}} - </span>
           <span class="hwx-desc smart-sense">{{enabledApp.service.enabledSku.smartSenseId}}</span>
-          <span class="hwx-desc action pull-right"><i class="fa fa-chevron-down"></i></span>
+          <span class="hwx-desc action pull-right" data-se="services__enabledServices_showClustersButton"><i class="fa fa-chevron-down"></i></span>
           <span *ngIf="enabledApp.isOpen" (click)="getClusters(enabledApp)" class="hwx-desc action pull-right"><i class="fa fa-refresh"></i></span>
         </div>
-        <div *ngIf="enabledApp.isOpen" class="inner-list">
+        <div *ngIf="enabledApp.isOpen" data-se-group="services__enabledServices-clusterList" class="inner-list">
           <div class="pull-right">
             <input type="checkbox" class="cluster-check" name="show-all-clusters" [(ngModel)]="enabledApp.showAll"/> Show All Clusters
           </div>
@@ -75,11 +75,12 @@
     </div>
     <div class="content-pane">
       <div class="services-list">
-        <div *ngFor="let service of availableServices; let i = index" class="service-item pull-left">
+        <div data-se-group="services__availableServices" *ngFor="let service of availableServices; let i = index" class="service-item pull-left">
           <div class="logo-wrapper borderBox" title="{{ service.skuName }}">
             <img class="logo-img" [attr.src]="'../../../assets/images/' + service.skuName +'-logo-blue.png'" alt=""/>
             <button
               id="enable-{{service.skuName}}-btn"
+              data-se="services__availableServices-enable-button"
               type="button"
               class="btn-hwx-primary action-btn"
               [routerLink]="['/infra/services', service.skuName, 'verify']">

@@ -9,23 +9,24 @@
   ~  */
   -->
 
-<div class="taggingWidget"  (click)="onClick()" (keyup)="onKeyUp($event)" #parent>
-  <span *ngFor="let tag of tags;let i=index;" tabindex="0" (click)="focusOnSticker(i)"  class="tagSticker" [class.focus]="i==focusStickerIndex">
+<div data-se="common__tagging-widget" class="taggingWidget"  (click)="onClick()" (keyup)="onKeyUp($event)" #parent>
+  <span data-se-group="common__tagging-widget__tags" *ngFor="let tag of tags;let i=index;" tabindex="0" (click)="focusOnSticker(i)"  class="tagSticker" [class.focus]="i==focusStickerIndex">
     {{tag.display || tag}}
     <span class="remove"  *ngIf="allowTagDismissal">&nbsp;&nbsp;<i class="fa fa-times" (click)="focusOnSticker(i);removeFocusTag();"></i></span>
   </span>
   <span class="inputSpan">
-    <input #input (focus)="onInputFocus()" (blur)="onInputBlur()" [(ngModel)]="searchText" autocomplete="off" (ngModelChange)="onSearchTextChange($event)" [ngClass]="{'no-match-error':noMatchError}"  placeholder="{{placeHolderText}}"/>
-    <div *ngIf="showOptions" class="dropDown" [style.left.px]="input.offsetLeft">
-      <div *ngFor="let tag of availableTags;let i=index;"
+    <input #input (focus)="onInputFocus()" (blur)="onInputBlur()" [(ngModel)]="searchText" autocomplete="off" (ngModelChange)="onSearchTextChange($event)" [ngClass]="{'no-match-error':noMatchError}"  placeholder="{{placeHolderText}}" data-se="common__taggingWidget__tagInput"/>
+    <div data-se="common__tagging-widget__tags-container" *ngIf="showOptions" class="dropDown" [style.left.px]="input.offsetLeft">
+      <div data-se-group="common__tagging-widget__tag-options" *ngFor="let tag of availableTags;let i=index;"
            [class.focus]="i==focusRowIndex" tabindex="0"
+           [attr.data-se]="'common__tagging-widget__tag-option'+_i"
            (click)="focusRowIndex = i; _manageSelection();"
            class="row"  >{{tag.display || tag}}</div>
     </div>
-    <div [style.left.px]="input.offsetLeft" *ngIf="noMatchError" class="dropDown">
+    <div data-se="common__tagging-widget__no-match" [style.left.px]="input.offsetLeft" *ngIf="noMatchError" class="dropDown">
       <div class="row no-match-error"><i class="fa fa-ban"></i>&nbsp; {{"common.noMatch" | translate}}</div>
     </div>
-    <div [style.left.px]="input.offsetLeft" *ngIf="searchable && searchText && searchText.length >= minChars && fetchInProgress" class="dropDown">
+    <div data-se="common__tagging-widget__loading" [style.left.px]="input.offsetLeft" *ngIf="searchable && searchText && searchText.length >= minChars && fetchInProgress" class="dropDown">
       <div class="row"><i class="fa fa-spin fa-spinner"></i>&nbsp; {{"common.searching" | translate}}</div>
     </div>
   </span>
