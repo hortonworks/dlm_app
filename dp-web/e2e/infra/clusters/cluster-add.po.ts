@@ -15,7 +15,7 @@ import { helper } from '../../utils/helpers';
 export class ClusterAddPage {
   public url = '';
 
-  public cTitle = $('[data-se="cluster_add__title"');
+  public cTitle = $('[data-se="cluster_add__title"]');
   public bAddButton = $('[data-se="cluster_add__addButton"]');
   public bGoButton = $('[data-se="cluster_add__goButton"]');
   public tErrorMessage = $('[data-se="cluster_add__failReasons"]');
