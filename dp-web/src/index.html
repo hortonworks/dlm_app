@@ -19,11 +19,8 @@
   <link rel="icon" type="image/x-icon" href="favicon.png">
 
   <title>Data Plane</title>
-  <!--# if expr="$base_href = ''" -->
-    <!-- first base href is taken if multiple instances are available  -->
-    <base href="/">
-  <!--# endif -->
-  <base href="<!--# echo var="base_href" -->">
+  <!--#include file="assets/ssi/base-href.tmpl.html" -->
+  <base href="/">
   <style>
     .loader {
       border: 4px solid #666666;

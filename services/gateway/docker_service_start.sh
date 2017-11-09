@@ -16,6 +16,7 @@ fi
 
 java \
     -jar /usr/gateway-service/gateway-1.0.jar \
-        --spring.cloud.consul.host=$CONSUL_HOST \
+        --dps.root.path="$ROOT_PATH" \
+        --spring.cloud.consul.host="$CONSUL_HOST" \
         --sso.enabled=true \
         --signing.pub.key.path=/dp-shared/ssl-cert.pem "$@"
