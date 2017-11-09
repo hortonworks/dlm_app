@@ -77,13 +77,14 @@
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.uptimeStr}}</td>
           <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable">{{lakeInfo.hdfsUsed}}/{{lakeInfo.hdfsTotal}}</td>
           <td class="mdl-data-table__cell--non-numeric actions">
-                <button [attr.id]="'dropDown_'+lakeInfo.id" [ngClass]="{'disabled':lakeInfo.status === statusEnum.WAITING}" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
+                <button [attr.id]="'dropDown_'+lakeInfo.id" [ngClass]="{'disabled':lakeInfo.status === statusEnum.WAITING}" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon"
+                        [attr.data-se]="(lakeInfo.status !== statusEnum.WAITING) && 'lake_list__dropDownEn_'+lakeInfo.ambariIpAddress || 'lake_list__dropDown_'+lakeInfo.ambariIpAddress" [attr.data-se-value]="lakeInfo.uptime">
                 <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i></button>
                 <ul mdl class="mdl-menu mdl-menu--top-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_'+lakeInfo.id">
-                    <li class="mdl-menu__item" [ngClass]="{'disabled':lakeInfo.status === statusEnum.DOWN}"><a href="{{lakeInfo.ambariUrl}}" target="_blank"><i class="fa fa-external-link"></i>{{"pages.infra.labels.goToAmbari" | translate}}</a></li>
-                    <li class="mdl-menu__item" (click)="refresh(lakeInfo)"><span><i class="fa__fa-close--icon fa fa-refresh"></i>{{"common.refresh" | translate}}</span></li>
-                    <li class="mdl-menu__item"><a [routerLink]="['/infra/clusters', lakeInfo.id, 'edit']"><i class="fa__fa-close--icon fa fa-edit"></i>{{"common.edit" | translate}}</a></li>
-                    <li class="mdl-menu__item" (click)="deleteCluster(lakeInfo.id)"><span><i class="fa__fa-close--icon fa fa-trash"></i>{{"common.remove" | translate}}</span></li>
+                    <li class="mdl-menu__item" [ngClass]="{'disabled':lakeInfo.status === statusEnum.DOWN}"><a href="{{lakeInfo.ambariUrl}}" target="_blank" [attr.data-se]="'lake_list__goTo_'+lakeInfo.ambariIpAddress"><i class="fa fa-external-link"></i>{{"pages.infra.labels.goToAmbari" | translate}}</a></li>
+                    <li class="mdl-menu__item" (click)="refresh(lakeInfo)" [attr.data-se]="'lake_list__refresh_'+lakeInfo.ambariIpAddress"><span><i class="fa__fa-close--icon fa fa-refresh"></i>{{"common.refresh" | translate}}</span></li>
+                    <li class="mdl-menu__item"><a [routerLink]="['/infra/clusters', lakeInfo.id, 'edit']" [attr.data-se]="'lake_list__edit_'+lakeInfo.ambariIpAddress"><i class="fa__fa-close--icon fa fa-edit"></i>{{"common.edit" | translate}}</a></li>
+                    <li class="mdl-menu__item" (click)="deleteCluster(lakeInfo.id)" [attr.data-se]="'lake_list__remove_'+lakeInfo.ambariIpAddress"><span><i class="fa__fa-close--icon fa fa-trash"></i>{{"common.remove" | translate}}</span></li>
                 </ul>
           </td>
       </tr>

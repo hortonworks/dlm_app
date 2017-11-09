@@ -21,14 +21,14 @@ export class DialogBox {
 
   private static getCancelButton(text: String): string {
     if (text && text.length) {
-      return `<button type="button" class="mdl-button btn-hwx-default">${text}</button>`;
+      return `<button type="button" class="mdl-button btn-hwx-default" data-se="common_util__cancelButton">${text}</button>`;
     }
     return '';
   }
 
   private static getOKButton(text: String, type: DialogType): string {
     if (type === DialogType.DeleteConfirmation) {
-      return `<button type="button" class="mdl-button btn-hwx-warning">${text}</button>`;
+      return `<button type="button" class="mdl-button btn-hwx-warning" data-se="common_util__warningDeleteButton">${text}</button>`;
     }
     return `<button type="button" class="mdl-button btn-hwx-primary">${text}</button>`;
   }
