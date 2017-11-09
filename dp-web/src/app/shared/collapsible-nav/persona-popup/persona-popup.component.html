@@ -13,7 +13,7 @@
   <li *ngFor="let persona of personas; let i = index" (click)="navigateToPersona(persona)" [attr.id]="'persona_'+i" [ngClass]="{'disabled':!persona.enabled}">
     <ng-container *ngIf="persona.enabled">
       <div class="logo-wrapper borderBox" title="{{ persona.name }}">
-        <img [attr.src]="'../../../assets/images/' + persona.imageName" alt=""/>
+        <img [attr.src]="'assets/images/' + persona.imageName" alt=""/>
       </div>
       <div data-se-group="collapsibleNav__dropDown-personaName" [ngClass]="{'active': activePersona === persona.name}">{{ persona.name }}</div>
     </ng-container>

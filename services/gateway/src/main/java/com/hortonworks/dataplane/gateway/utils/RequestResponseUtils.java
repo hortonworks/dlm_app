@@ -13,6 +13,7 @@ package com.hortonworks.dataplane.gateway.utils;
 import com.hortonworks.dataplane.gateway.domain.Constants;
 import com.netflix.zuul.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +27,9 @@ public class RequestResponseUtils {
 
   @Autowired
   private HostUtils hostUtils;
+
+  @Value("${dps.root.path}")
+  private String dpsRootPath;
 
   public void addNoCacheHeaders(HttpServletResponse response) {
     response.addHeader("Cache-Control","no-cache, no-store, max-age=0, must-revalidate");
@@ -49,7 +53,7 @@ public class RequestResponseUtils {
     if (hostUtils.isRequestFromProxy()) {
       return appRootUrl();
     } else {
-      return "/";
+      return this.dpsRootPath;
     }
   }
 
@@ -83,7 +87,7 @@ public class RequestResponseUtils {
 
   private String appRootUrl() {
     String proto=hostUtils.getRequestProtocol();
-    return String.format("%s://%s%s/",proto, hostUtils.getRequestHost(),hostUtils.getRequestPort());
+    return String.format("%s://%s%s%s",proto, hostUtils.getRequestHost(),hostUtils.getRequestPort(),this.dpsRootPath);
   }
 
   public void redirectToLocalSignin() {
