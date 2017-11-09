@@ -28,3 +28,5 @@ KNOX_CONFIG_USING_CREDS=true
 # Uncomment and set right values for below lines to enable silent install
 CONSUL_HOST="dp-consul-server"
 # USE_TEST_LDAP="yes"
+
+ROOT_PATH="/"
