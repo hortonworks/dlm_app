@@ -32,7 +32,7 @@ docker start dp-app >> install.log 2>&1 || \
         --publish 443:443 \
         --env "CERTIFICATE_PASSWORD=$CERTIFICATE_PASSWORD" \
         --env "CONSUL_HOST=$CONSUL_HOST" \
-        --env "BZ_ORG_PATH=/" \
+        --env "ROOT_PATH=/" \
         --env "KEYSTORE_PATH=/dp-shared/dp-keystore.jceks" \
         --env "KEYSTORE_PASSWORD=$MASTER_PASSWORD" \
         --env "USE_TLS=$USE_TLS" \
