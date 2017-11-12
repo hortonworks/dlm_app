@@ -11,10 +11,14 @@
 
 package com.hortonworks.dataplane.commons.metrics
 
+import java.io.StringWriter
+
 import com.codahale.metrics._
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import io.prometheus.client.CollectorRegistry
+import io.prometheus.client.exporter.common.TextFormat
 import play.api.libs.json.{JsValue, Json}
 
 import scala.collection.JavaConverters._
@@ -23,6 +27,10 @@ object MetricsReporter {
 
   val mapper = new ObjectMapper with ScalaObjectMapper
   mapper.registerModule(DefaultScalaModule)
+
+  val prometheusNameParam = "name[]"
+  val prometheus = "prometheus"
+  val exportParam = "exporter"
 
   def asJson(implicit mr: MetricsRegistry): JsValue = {
     val counters = mr.registry.getCounters.asScala
@@ -60,5 +68,13 @@ object MetricsReporter {
     Json.parse(mapper.writeValueAsBytes(map.toMap))
 
   }
+
+
+  def asPrometheusTextExport(params:java.util.Set[String])(implicit mr: MetricsRegistry):String = {
+    val writer = new StringWriter()
+    TextFormat.write004(writer, CollectorRegistry.defaultRegistry.filteredMetricFamilySamples(params))
+    writer.toString
+  }
+
 
 }

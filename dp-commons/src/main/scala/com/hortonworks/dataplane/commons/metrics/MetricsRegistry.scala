@@ -13,12 +13,16 @@ package com.hortonworks.dataplane.commons.metrics
 
 import com.codahale.metrics.MetricRegistry.MetricSupplier
 import com.codahale.metrics.{Gauge, JmxReporter, MetricRegistry}
+import io.prometheus.client.CollectorRegistry
+import io.prometheus.client.dropwizard.DropwizardExports
 
 import scala.collection.JavaConverters._
 
 class MetricsRegistry(private val name:String) {
 
   private[metrics] val registry =  new MetricRegistry()
+
+  CollectorRegistry.defaultRegistry.register(new DropwizardExports(registry))
 
   private val gc = s"$name.gc"
 
