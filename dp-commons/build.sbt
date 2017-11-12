@@ -19,5 +19,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" % "play-ws_2.11" % "2.5.13",
   "com.typesafe.play" % "play-json_2.11" % "2.6.0-M3",
   "io.dropwizard.metrics" % "metrics-jvm" % "3.2.5",
+  "io.prometheus" % "simpleclient_common" % "0.1.0",
+  "io.prometheus" % "simpleclient_dropwizard" % "0.1.0",
   "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.9.1",
   "org.scalatest" %% "scalatest" % "2.2.4" % "test")
