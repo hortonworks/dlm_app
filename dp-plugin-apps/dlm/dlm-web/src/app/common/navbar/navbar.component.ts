@@ -78,7 +78,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    $(this.navbar).navigationBar(this.options);
+    $(this.navbar)['navigationBar'](this.options);
     this.personaNavSrcNativeElement = this.personaNavSrc.nativeElement;
   }
 

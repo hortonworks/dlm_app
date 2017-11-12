@@ -38,7 +38,7 @@ import { HiveDatabase } from 'models/hive-database.model';
 import { SelectOption } from 'components/forms/select-field';
 import { TimeZoneService } from 'services/time-zone.service';
 import { isEmpty, merge } from 'utils/object-utils';
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 import { FILE_TYPES } from 'constants/hdfs.constant';
 import { HdfsService } from 'services/hdfs.service';
 import { ProgressState } from 'models/progress-state.model';

@@ -13,7 +13,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { TranslateService } from '@ngx-translate/core';
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 
 import { createPolicy } from 'actions/policy.action';
 import { State } from 'reducers';

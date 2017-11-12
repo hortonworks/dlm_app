@@ -30,18 +30,9 @@ const withStatus = (state, cluster) => {
   };
 };
 
-export function reducer(state = initialState, action: fromCluster.Actions): State {
+export function reducer(state = initialState, action): State {
   switch (action.type) {
     // TODO: figure out better way to link `status` object to `cluster` since they are recieved from different requests
-    case fromCluster.ActionTypes.LOAD_CLUSTER.SUCCESS: {
-      const cluster = withStatus(state, action.payload);
-      return {
-        entities: {
-          ...state.entities,
-          [cluster.id]: cluster
-        }
-      };
-    }
     case fromCluster.ActionTypes.LOAD_CLUSTERS.SUCCESS: {
       const clusters = action.payload.response.clusters.map(cluster => withStatus(state, cluster));
       return {

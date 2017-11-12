@@ -17,8 +17,6 @@ import { ClusterService } from 'services/cluster.service';
 import {
   loadClustersSuccess,
   loadClustersFailure,
-  LoadClusterSuccess,
-  LoadClusterFailure,
   loadClustersStatusesSuccess,
   loadClustersStatusesFailure,
   ActionTypes
@@ -35,14 +33,6 @@ export class ClusterEffects {
       return this.clusterService.fetchClusters()
         .map(clusters => loadClustersSuccess(clusters, payload.meta))
         .catch(err => Observable.of(loadClustersFailure(err, payload.meta)));
-    });
-
-  @Effect() loadCluster$: Observable<any> = this.actions$
-    .ofType(ActionTypes.LOAD_CLUSTER.START)
-    .switchMap(action => {
-      return this.clusterService.fetchCluster(action.entityId)
-        .map(cluster => new LoadClusterSuccess(cluster))
-        .catch(err => Observable.of(new LoadClusterFailure(err)));
     });
 
   @Effect()
