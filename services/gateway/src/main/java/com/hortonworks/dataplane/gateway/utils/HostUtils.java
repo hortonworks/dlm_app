@@ -23,22 +23,24 @@ public class HostUtils {
   @Value("${dps.root.path}")
   private String dpsRootPath;
 
-  public boolean isRequestFromProxy() {
-    //currently check ngnix.
+  public boolean isRequestFromKubeProxy() {
     RequestContext ctx = RequestContext.getCurrentContext();
     String realHost = ctx.getRequest().getHeader("X-Forwarded-Host");
+    return realHost != null;
+  }
+
+  public boolean isRequestFromProxy() {
+    RequestContext ctx = RequestContext.getCurrentContext();
     String dpRealHost = ctx.getRequest().getHeader("X-DP-Forwarded-Host");
-    return (realHost != null || dpRealHost != null);
+    return dpRealHost != null;
   }
 
   public String getRequestHost() {
     RequestContext ctx = RequestContext.getCurrentContext();
-    String realHost = ctx.getRequest().getHeader("X-Forwarded-Host");
-    String dpHost = ctx.getRequest().getHeader("X-DP-Forwarded-Host");
-    if (realHost != null) {
-      return realHost;
-    } else if (dpHost != null) {
-      return dpHost;
+    if (isRequestFromKubeProxy()) {
+      return ctx.getRequest().getHeader("X-Forwarded-Host");
+    } else if (isRequestFromProxy()) {
+      return ctx.getRequest().getHeader("X-DP-Forwarded-Host");
     } else {
       String requestURLStr = ctx.getRequest().getRequestURL().toString();
       try {
@@ -52,12 +54,10 @@ public class HostUtils {
 
   public String getRequestProtocol(){
     RequestContext ctx = RequestContext.getCurrentContext();
-    String forwardedProto=ctx.getRequest().getHeader("X-Forwarded-Proto");
-    String dpForwardedProto = ctx.getRequest().getHeader("X-DP-Forwarded-Proto");
-    if(forwardedProto != null) {
-      return forwardedProto;
-    } else if(dpForwardedProto != null) {
-      return dpForwardedProto;
+    if (isRequestFromKubeProxy()) {
+      return "https";
+    } else if (isRequestFromProxy()) {
+      return ctx.getRequest().getHeader("X-DP-Forwarded-Proto");
     } else{
       String proto= ctx.getRequest().getScheme();
       return proto;
@@ -69,7 +69,7 @@ public class HostUtils {
   }
 
   public String getRootPath() {
-    if (isRequestFromProxy()) {
+    if (isRequestFromKubeProxy() || isRequestFromProxy()) {
       return getAppRootUrl();
     } else {
       return this.dpsRootPath;
