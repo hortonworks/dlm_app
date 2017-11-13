@@ -18,8 +18,7 @@
 docker start dp-consul-server >> install.log 2>&1 || \
     docker run \
         --name dp-consul-server \
-        --network dp \
+        --network host \
         --detach \
-        --publish 8500:8500 \
         consul:0.8.5 \
-        agent -server -ui -bootstrap -bind=0.0.0.0 -client=0.0.0.0 -data-dir=/consul/data -disable-host-node-id
+        agent -server -ui -bootstrap -bind=$CONSUL_HOST -client=$CONSUL_HOST

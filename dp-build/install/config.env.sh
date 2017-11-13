@@ -26,5 +26,5 @@ SEPARATE_KNOX_CONFIG=false
 KNOX_CONFIG_USING_CREDS=true
 
 # Uncomment and set right values for below lines to enable silent install
-CONSUL_HOST="dp-consul-server"
+# CONSUL_HOST="<host_ip_address>"
 # USE_TEST_LDAP="yes"
