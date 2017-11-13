@@ -28,9 +28,6 @@ public class RequestResponseUtils {
   @Autowired
   private HostUtils hostUtils;
 
-  @Value("${dps.root.path}")
-  private String dpsRootPath;
-
   public void addNoCacheHeaders(HttpServletResponse response) {
     response.addHeader("Cache-Control","no-cache, no-store, max-age=0, must-revalidate");
     response.addHeader("Pragma","no-cache");
@@ -49,50 +46,38 @@ public class RequestResponseUtils {
     }
   }
 
-  private String getRootPath() {
-    if (hostUtils.isRequestFromProxy()) {
-      return appRootUrl();
-    } else {
-      return this.dpsRootPath;
-    }
-  }
-
   public void redirectToRoot() {
-    redirectTo(getRootPath());
+    redirectTo(hostUtils.getRootPath());
   }
 
   public void redirectToLogin() {
     redirectTo(getLoginUrl());
   }
   public void redirectToForbidden() {
-    redirectTo(getRootPath() + "unauthorized");
+    redirectTo(hostUtils.getRootPath() + "unauthorized");
   }
 
   public String getLoginUrl() {
-    return getRootPath() + "login";
+    return hostUtils.getRootPath() + "login";
   }
 
   public void redirectToServiceError(){
-    redirectTo(getRootPath() + "service-notenabled");
+    redirectTo(hostUtils.getRootPath() + "service-notenabled");
   }
 
   public void redirectToKnoxLogin() {
     RequestContext ctx = RequestContext.getCurrentContext();
     String redirectTo = ctx.getRequest().getParameter("landingUrl");
     if (redirectTo == null) {
-      redirectTo = appRootUrl();
+      redirectTo = hostUtils.getAppRootUrl();
     }
     redirectTo(knoxSso.getLoginUrl(redirectTo));
   }
 
-  private String appRootUrl() {
-    String proto=hostUtils.getRequestProtocol();
-    return String.format("%s://%s%s%s",proto, hostUtils.getRequestHost(),hostUtils.getRequestPort(),this.dpsRootPath);
-  }
 
   public void redirectToLocalSignin() {
     if (hostUtils.isRequestFromProxy()) {
-      redirectTo(getRootPath() + Constants.LOCAL_SIGNIN_PATH);
+      redirectTo(hostUtils.getRootPath() + Constants.LOCAL_SIGNIN_PATH);
     } else {
       redirectTo(Constants.LOCAL_SIGNIN_PATH);
     }

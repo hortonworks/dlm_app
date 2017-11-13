@@ -11,6 +11,7 @@
 package com.hortonworks.dataplane.gateway.utils;
 
 import com.netflix.zuul.context.RequestContext;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
@@ -18,11 +19,26 @@ import java.net.URISyntaxException;
 
 @Component
 public class HostUtils {
+
+  @Value("${dps.root.path}")
+  private String dpsRootPath;
+
+  public boolean isRequestFromProxy() {
+    //currently check ngnix.
+    RequestContext ctx = RequestContext.getCurrentContext();
+    String realHost = ctx.getRequest().getHeader("X-Forwarded-Host");
+    String dpRealHost = ctx.getRequest().getHeader("X-DP-Forwarded-Host");
+    return (realHost != null || dpRealHost != null);
+  }
+
   public String getRequestHost() {
     RequestContext ctx = RequestContext.getCurrentContext();
     String realHost = ctx.getRequest().getHeader("X-Forwarded-Host");
+    String dpHost = ctx.getRequest().getHeader("X-DP-Forwarded-Host");
     if (realHost != null) {
       return realHost;
+    } else if (dpHost != null) {
+      return dpHost;
     } else {
       String requestURLStr = ctx.getRequest().getRequestURL().toString();
       try {
@@ -33,35 +49,30 @@ public class HostUtils {
       }
     }
   }
-  public boolean isRequestFromProxy() {
-    //currently check ngnix.
-    RequestContext ctx = RequestContext.getCurrentContext();
-    String realHost = ctx.getRequest().getHeader("X-Forwarded-Host");
-    return realHost != null;
-  }
-  public String getRequestPort(){
-    RequestContext ctx = RequestContext.getCurrentContext();
-    if (isRequestFromProxy()){
-      String forwardedPort=ctx.getRequest().getHeader("X-Forwarded-Port");
-      if (forwardedPort==null || forwardedPort.equals("80")){
-        return "";
-      }else{
-        return ":"+forwardedPort;
-      }
-    }else{
-      int serverPort = ctx.getRequest().getServerPort();
-      return ":"+String.valueOf(serverPort==80?"":serverPort);
-    }
-  }
 
   public String getRequestProtocol(){
     RequestContext ctx = RequestContext.getCurrentContext();
-    if (isRequestFromProxy()){
-      String forwardedProto=ctx.getRequest().getHeader("X-Forwarded-Proto");
+    String forwardedProto=ctx.getRequest().getHeader("X-Forwarded-Proto");
+    String dpForwardedProto = ctx.getRequest().getHeader("X-DP-Forwarded-Proto");
+    if(forwardedProto != null) {
       return forwardedProto;
-    }else{
+    } else if(dpForwardedProto != null) {
+      return dpForwardedProto;
+    } else{
       String proto= ctx.getRequest().getScheme();
       return proto;
+    }
+  }
+
+  public String getAppRootUrl() {
+    return String.format("%s://%s%s", getRequestProtocol(), getRequestHost(), dpsRootPath);
+  }
+
+  public String getRootPath() {
+    if (isRequestFromProxy()) {
+      return getAppRootUrl();
+    } else {
+      return this.dpsRootPath;
     }
   }
 
