@@ -28,7 +28,6 @@ docker start dp-gateway >> install.log 2>&1 || \
         --network dp \
         --detach \
         --env "CONSUL_HOST=$CONSUL_HOST" \
-        --env "ROOT_PATH=$ROOT_PATH" \
         --volume $(pwd)/certs:/dp-shared \
         hortonworks/dp-gateway:$VERSION \
         --knox.port=8443
