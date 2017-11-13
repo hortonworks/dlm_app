@@ -26,7 +26,6 @@ docker start knox >> install.log 2>&1 || \
         --name knox \
         --network dp \
         --detach \
-        --publish 8443:8443 \
         --env "CERTIFICATE_PASSWORD=$CERTIFICATE_PASSWORD" \
         --env "MASTER_PASSWORD=$MASTER_PASSWORD" \
         --env "USE_TEST_LDAP=$USE_TEST_LDAP" \
