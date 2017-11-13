@@ -45,9 +45,10 @@ class KnoxConfig @Inject()(
 
   def getRequestHost(request: AuthenticatedRequest[JsValue]) = {
     //TODO test with different proxies.
-    request.headers.get("X-Forwarded-Host") match {
-      case Some(host) => host.split(",")(0)
-      case None => request.host
+    (request.headers.get("X-Forwarded-Host"), request.headers.get("X-DP-Forwarded-Host")) match {
+      case (Some(host), _) => host.split(",")(0)
+      case (_, Some(host)) => host.split(",")(0)
+      case (None, None) => request.host
     }
   }
 
