@@ -33,7 +33,7 @@ export const clusterAddData = {
 };
 
 export const lakeList = {
-  ambariUrl1: "http://172.27.18.11:8080",  //this should be IP (not host name) and make sure this IP is valid
+  ambariUrl1: "http://172.27.31.132:8080",  //this should be IP (not host name) and make sure this IP is valid
   ambariUrl2: "http://172.27.32.8:8080" //this should be IP (not host name) and make sure this IP is valid
 };
 
