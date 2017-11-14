@@ -251,7 +251,7 @@
         "addGroupError": "The following groups could not be saved. Please check if they have already been added.",
         "updateGroupError": "Not able to update group",
         "invalidRoleInput": "One or more roles are invalid. You must select a role from the Roles dropdown or dropdown options that appear as you type in the Roles field.",
-        "invalidAmbariUrl":"Invalid Ambari URL. Please enter a valid URL of the form http://host:port or https://host:port or http://host/pathname or https://host/pathname.",
+        "invalidAmbariUrl":"Invalid Ambari URL. Please enter a valid URL of the form http[s]://hostname[:port][/path].",
         "invalidLocation" : "Not a valid location. Please select a location from dropdown.",
         "invalidUserInput": "One or more usernames are invalid. You must select a name from the dropdown options that appear as you type in the Usernames field.",
         "invalidGroupInput": "One or more group names are invalid. You must select a name from the dropdown options that appear as you type in the Group Names field.",

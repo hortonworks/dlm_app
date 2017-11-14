@@ -26,7 +26,7 @@ export const clusterAddData = {
   locationPre: "cala",
   description: "desc1",
   addSuccessUrl: "/infra/clusters",
-  inValidAmbariMsg: "Invalid Ambari URL. Please enter a valid URL of the form http://host:port or https://host:port or http://host/pathname or https://host/pathname.",
+  inValidAmbariMsg: "Invalid Ambari URL. Please enter a valid URL of the form http[s]://hostname[:port][/path].",
   ambariNetworkError: "There was a network error when connecting to Ambari.",
   fillAllMandatoryFieldsMsg: "Please fill in mandatory fields marked with '*'",
   addSuccessMsg: "Your cluster has been added to DataPlane.",
