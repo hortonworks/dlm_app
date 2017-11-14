@@ -40,9 +40,6 @@ export class StringUtils {
 
     let port = (!link.port ? '': ":"+link.port);
     let pathname = (link.pathname === "/") ? '':link.pathname;
-    // if(!port && !pathname){  //this may be needed , discuss
-    //   return '';
-    // }
 
     const cleanedUri = `${link.protocol || 'http:'}//${link.hostname + port + pathname}`;
     // cleanup for garbage collection

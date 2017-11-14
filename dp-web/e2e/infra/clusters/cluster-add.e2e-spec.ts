@@ -48,6 +48,13 @@ describe('cluster-add page', function() {
         expect(await page.bClearButton.isDisplayed()).toBeTruthy();
     });
 
+    it('Test for proxy url: should be valid ambari url', async () => {
+      await page.inputAmbariUrl(clusterAddData.ambariUrlProxy); //make sure this ambari address is valid and NOT already added
+      await page.clickGo();
+
+      expect(await page.tErrorMessage.isPresent()).toBeFalsy();
+    });
+
     it('should give add error (network error)', async () => {
       await page.inputAmbariUrl(clusterAddData.notReachablrAmbari); // make sure this IP is NOT reachable
       await page.clickGo();

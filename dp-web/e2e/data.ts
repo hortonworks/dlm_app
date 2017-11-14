@@ -18,6 +18,7 @@ export const clusterAddData = {
   ambariUrl1: "http://172.27.32.8:8080",  //make sure this IP is valid and NOT already added
   ambariUrl2: "http://172.27.18.11:8080", //make sure this IP is valid and NOT already added
   notReachablrAmbari: "http://172.27.32.9:8080",  // make sure this IP is NOT reachable
+  ambariUrlProxy: "https://40.118.130.196/ambari", // make sure this is valid ambari address and is not already added. If knox is installed then please follow pre-addition steps of adding public key.
   dataCenter1: "dc999999990",
   dataCenter2: "dc999999991",
   tagSingle: "tag1",
@@ -25,7 +26,7 @@ export const clusterAddData = {
   locationPre: "cala",
   description: "desc1",
   addSuccessUrl: "/infra/clusters",
-  inValidAmbariMsg: "Invalid Ambari URL. Please enter a valid URL of the form http://host:port or https://host:port.",
+  inValidAmbariMsg: "Invalid Ambari URL. Please enter a valid URL of the form http://host:port or https://host:port or http://host/pathname or https://host/pathname.",
   ambariNetworkError: "There was a network error when connecting to Ambari.",
   fillAllMandatoryFieldsMsg: "Please fill in mandatory fields marked with '*'",
   addSuccessMsg: "Your cluster has been added to DataPlane.",
