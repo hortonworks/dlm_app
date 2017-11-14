@@ -28,7 +28,9 @@ class AmbariWebServiceImpl(config: Config)(implicit ws: ClusterWsClient)
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
   import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariResponseWithDpClusterId, ambariResponseWithDpClusterIdReads, ambariResponseWithDpClusterIdWrites}
 
-  private def url = config.getString("dp.services.cluster.service.uri")
+  private def url =
+    Option(System.getProperty("dp.services.cluster.service.uri"))
+      .getOrElse(config.getString("dp.services.cluster.service.uri"))
 
   private def mapResponse(res: WSResponse) = {
     res.status match {

@@ -26,7 +26,9 @@ import scala.concurrent.Future
 class DataSetCategoryServiceImpl  (config: Config)(implicit ws: WSClient)
   extends DataSetCategoryService{
 
-  private def url = config.getString("dp.services.db.service.uri")
+  private def url =
+    Option(System.getProperty("dp.services.db.service.uri"))
+      .getOrElse(config.getString("dp.services.db.service.uri"))
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 
   override def getListWithDataSetId(dataSetId: String): Future[Either[Errors, Seq[DatasetCategory]]] = {
