@@ -24,6 +24,7 @@ if [ "$USE_EXT_DB" == "no" ]; then
 fi
 KNOX_CONTAINER="knox"
 CONSUL_CONTAINER="dp-consul-server"
+CONSUL_HOST="$CONSUL_CONTAINER"
 
 init_network() {
     IS_NETWORK_PRESENT="false"
