@@ -20,6 +20,7 @@ source_dp_config () {
     if [ -f "${DP_CONFIG_FILE_PATH}" ]; then
         source "${DP_CONFIG_FILE_PATH}";
     fi
+    CONSUL_HOST="$CONSUL_CONTAINER"
 }
 
 init_network() {
@@ -51,35 +52,7 @@ destroy() {
     docker rm --force dlm-app
 }
 
-get_bind_address_from_consul_container() {
-    CONSUL_ID=$(docker ps --all --quiet --filter "name=$CONSUL_CONTAINER")
-    if [ -z ${CONSUL_ID} ]; then
-        return 0
-    fi
-    CONSUL_ARGS=$(docker inspect -f {{.Args}} ${CONSUL_ID})
-    for word in $CONSUL_ARGS; do
-        if [[ $word == -bind* ]]
-        then
-            BIND_ADDR=${word##*=}
-        fi
-    done
-    CONSUL_HOST=${BIND_ADDR};
-}
-
-read_consul_host(){
-    if [ -z "${CONSUL_HOST}" ]; then
-        get_bind_address_from_consul_container
-    fi
-    if [ -z "${CONSUL_HOST}" ]; then
-        echo "Enter the Consul Host IP Address:"
-        read HOST_IP;
-        CONSUL_HOST=$HOST_IP;
-    fi
-    echo "using CONSUL_HOST: ${CONSUL_HOST}"
-}
-
 init_app() {
-    read_consul_host
     docker start dlm-app >> install.log 2>&1 || \
         docker run \
             --name dlm-app \
