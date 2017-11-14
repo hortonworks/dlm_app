@@ -25,22 +25,23 @@ export class StringUtils {
     if(protoHostArray.length < 2 || !(protoHostArray[0] === "http" || protoHostArray[0] === "https")){
       return '';
     }
-    let lastColIdx = protoHostArray[1].lastIndexOf(":");
-    if(lastColIdx === -1){
-      return '';
-    }
-    let urlHostInfo = protoHostArray[1].substring(0,lastColIdx);
-    let urlPortInfo = protoHostArray[1].substring((lastColIdx+1));
-
 
     let link = document.createElement('a');
-
     link.setAttribute('href', url);
-    if(urlHostInfo !== link.hostname || urlPortInfo !== link.port){
+
+    let urlHostInfo = protoHostArray[1].split("/")[0];
+    if(!!link.port){ // !! => spaces
+      urlHostInfo = protoHostArray[1].split(":")[0];
+    }
+
+    if(urlHostInfo !== link.hostname){
       return '';
     }
 
-    const cleanedUri = `${link.protocol || 'http:'}//${link.hostname}:${link.port || '80'}`;
+    let port = (!link.port ? '': ":"+link.port);
+    let pathname = (link.pathname === "/") ? '':link.pathname;
+
+    const cleanedUri = `${link.protocol || 'http:'}//${link.hostname + port + pathname}`;
     // cleanup for garbage collection
     // prevent leaks
     link = null;
