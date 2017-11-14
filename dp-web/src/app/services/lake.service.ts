@@ -22,7 +22,7 @@ import {Subject} from 'rxjs/Subject';
 
 @Injectable()
 export class LakeService {
-  url = '/api/lakes';
+  url = 'api/lakes';
 
   clusterAdded = new Subject<boolean>();
   clusterAdded$ = this.clusterAdded.asObservable();
@@ -85,7 +85,7 @@ export class LakeService {
     clusters: Cluster[]
   }[]> {
     return this.http
-      .get(`/api/actions/clusters?type=${type}`, new RequestOptions(HttpUtil.getHeaders()))
+      .get(`api/actions/clusters?type=${type}`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

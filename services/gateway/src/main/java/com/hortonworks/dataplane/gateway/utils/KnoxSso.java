@@ -56,28 +56,23 @@ public class KnoxSso {
   @Value("${knox.url.discover.fromrequest}")
   private Boolean knoxUrlDiscoverFromRequest;
 
-  @Value("${knox.port}")
-  private String knoxPort;
+  @Value("${knox.route}")
+  private String knoxRoute;
 
   @Value("${server.domain}")
   private String serverDomain;
+
+  @Value("${dps.root.path}")
+  private String dpsRootPath;
 
   @Autowired
   private HostUtils hostUtils;
 
   public String getKnoxUrl() {
     if (knoxUrlDiscoverFromRequest){
-      return String.format("https://%s%s",hostUtils.getRequestHost(),getKnoxPort());
+      return String.format("https://%s%s%s", hostUtils.getRequestHost(), dpsRootPath, knoxRoute);
     }else {
-      return String.format("https://%s%s",serverDomain,getKnoxPort());
-    }
-  }
-
-  public String getKnoxPort() {
-    if (StringUtils.isEmpty(this.knoxPort) || this.knoxPort.trim().equals("443")){
-      return "";
-    }else{
-      return ":"+this.knoxPort;
+      return String.format("https://%s%s%s", serverDomain, dpsRootPath, knoxRoute);
     }
   }
 

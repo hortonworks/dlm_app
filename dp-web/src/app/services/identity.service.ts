@@ -18,7 +18,7 @@ import {HttpUtil} from '../shared/utils/httpUtil';
 @Injectable()
 export class IdentityService {
 
-  url = '/api/identity';
+  url = 'api/identity';
 
   constructor(private http: Http) {
   }

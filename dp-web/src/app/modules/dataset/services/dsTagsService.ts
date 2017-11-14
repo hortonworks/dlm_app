@@ -16,7 +16,7 @@ import {HttpUtil} from "../../../shared/utils/httpUtil";
 
 @Injectable()
 export class DsTagsService {
-  url = "/api/datasets/categories/";
+  url = "api/datasets/categories/";
 
   constructor(private http: Http) {
   }

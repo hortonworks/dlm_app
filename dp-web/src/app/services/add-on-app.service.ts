@@ -20,7 +20,7 @@ import {Subject} from 'rxjs/Subject';
 @Injectable()
 export class AddOnAppService {
 
-  uri = '/api/services';
+  uri = 'api/services';
   serviceEnabled = new Subject<string>();
   serviceEnabled$ = this.serviceEnabled.asObservable();
 

@@ -18,7 +18,7 @@ import {HttpUtil} from '../shared/utils/httpUtil';
 
 @Injectable()
 export class ClusterService {
-  uri = '/api/clusters';
+  uri = 'api/clusters';
 
   constructor(private http:Http) { }
 

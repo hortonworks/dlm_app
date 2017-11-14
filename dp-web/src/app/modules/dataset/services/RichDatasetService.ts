@@ -19,9 +19,9 @@ import {DataSetAndCategories} from "../../../models/data-set";
 import {HttpUtil} from "../../../shared/utils/httpUtil";
 @Injectable()
 export class RichDatasetService {
-  url1 = "/api/dataset/list/tag";
-  url2 = "/api/dataset";
-  url3 = "/api/atlas-dataset";
+  url1 = "api/dataset/list/tag";
+  url2 = "api/dataset";
+  url3 = "api/atlas-dataset";
 
   constructor(private http: Http) {
   }

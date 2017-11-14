@@ -21,12 +21,12 @@ export class AuthUtils {
 
   public static get signinURL() {
     let currentLocation = window.location.href.split('/');
-    return `/login?landingPage=${currentLocation[0]}//${currentLocation[2]}`
+    return `login?landingPage=${currentLocation[0]}//${currentLocation[2]}`
   }
 
-  public static signoutURL = '/auth/signOut';
+  public static signoutURL = 'auth/signOut';
 
-  public static notExistsURL = '/not-found';
+  public static notExistsURL = 'not-found';
 
   public static isUserLoggedIn() {
     return !!this.getUser();

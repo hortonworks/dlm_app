@@ -23,7 +23,7 @@ export class PolicyTypes {
 
 @Injectable()
 export class RangerService {
-  uri = '/api/ranger';
+  uri = 'api/ranger';
   count:number=0;
   policyCount:number=0;
   tagPolicyCount:number=0;

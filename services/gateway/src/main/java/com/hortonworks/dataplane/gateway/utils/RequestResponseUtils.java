@@ -13,6 +13,7 @@ package com.hortonworks.dataplane.gateway.utils;
 import com.hortonworks.dataplane.gateway.domain.Constants;
 import com.netflix.zuul.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletResponse;
@@ -45,50 +46,38 @@ public class RequestResponseUtils {
     }
   }
 
-  private String getRootPath() {
-    if (hostUtils.isRequestFromProxy()) {
-      return appRootUrl();
-    } else {
-      return "/";
-    }
-  }
-
   public void redirectToRoot() {
-    redirectTo(getRootPath());
+    redirectTo(hostUtils.getRootPath());
   }
 
   public void redirectToLogin() {
     redirectTo(getLoginUrl());
   }
   public void redirectToForbidden() {
-    redirectTo(getRootPath() + "unauthorized");
+    redirectTo(hostUtils.getRootPath() + "unauthorized");
   }
 
   public String getLoginUrl() {
-    return getRootPath() + "login";
+    return hostUtils.getRootPath() + "login";
   }
 
   public void redirectToServiceError(){
-    redirectTo(getRootPath() + "service-notenabled");
+    redirectTo(hostUtils.getRootPath() + "service-notenabled");
   }
 
   public void redirectToKnoxLogin() {
     RequestContext ctx = RequestContext.getCurrentContext();
     String redirectTo = ctx.getRequest().getParameter("landingUrl");
     if (redirectTo == null) {
-      redirectTo = appRootUrl();
+      redirectTo = hostUtils.getAppRootUrl();
     }
     redirectTo(knoxSso.getLoginUrl(redirectTo));
   }
 
-  private String appRootUrl() {
-    String proto=hostUtils.getRequestProtocol();
-    return String.format("%s://%s%s/",proto, hostUtils.getRequestHost(),hostUtils.getRequestPort());
-  }
 
   public void redirectToLocalSignin() {
     if (hostUtils.isRequestFromProxy()) {
-      redirectTo(getRootPath() + Constants.LOCAL_SIGNIN_PATH);
+      redirectTo(hostUtils.getRootPath() + Constants.LOCAL_SIGNIN_PATH);
     } else {
       redirectTo(Constants.LOCAL_SIGNIN_PATH);
     }

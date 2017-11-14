@@ -18,7 +18,7 @@ import {DataSetAndCategories, DataSetAndCategoryIds, DataSet} from '../models/da
 
 @Injectable()
 export class DataSetService {
-  url = '/api/datasets';
+  url = 'api/datasets';
 
   constructor(private http:Http) {}
 

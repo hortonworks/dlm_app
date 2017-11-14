@@ -20,7 +20,7 @@ import {WorkspaceDTO} from '../models/workspace-dto';
 
 @Injectable()
 export class WorkspaceService {
-  private url = '/api/workspaces';
+  private url = 'api/workspaces';
   defaultHeaders = {'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest'};
 
   dataChanged = new Subject<boolean>();

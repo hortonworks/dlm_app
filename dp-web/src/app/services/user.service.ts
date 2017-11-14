@@ -20,7 +20,7 @@ import {Subject} from 'rxjs/Subject';
 @Injectable()
 export class UserService {
 
-  url = '/api/users';
+  url = 'api/users';
   dataChanged = new Subject<boolean>();
   dataChanged$ = this.dataChanged.asObservable();
 
@@ -28,7 +28,7 @@ export class UserService {
   }
 
   getUserDetail(): Observable<User> {
-    return this.http.get('/auth/userDetail', new RequestOptions(HttpUtil.getHeaders()))
+    return this.http.get('auth/userDetail', new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError)
   }
@@ -74,7 +74,7 @@ export class UserService {
 
   getAllRoles(): Observable<any[]> {
     return this.http
-      .get(`/api/roles`, new RequestOptions(HttpUtil.getHeaders()))
+      .get(`api/roles`, new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError);
   }

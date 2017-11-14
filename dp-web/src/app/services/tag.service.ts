@@ -17,7 +17,7 @@ import {DatasetTag} from "../models/dataset-tag";
 
 @Injectable()
 export class DatasetTagService {
-  url = '/api/dataset-tag/list';
+  url = 'api/dataset-tag/list';
 
   constructor(private http: Http) {
   }
