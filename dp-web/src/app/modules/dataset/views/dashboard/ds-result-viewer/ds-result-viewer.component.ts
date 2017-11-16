@@ -87,7 +87,7 @@ export class DsNavResultViewer {
     });
     delete$
       .do(() => this._deleteWasSuccessful = true)
-      .delay(1000)
+      .delay(500)
       .subscribe(() => {
         this._datasetToDelete = null;
         this._deleteWasSuccessful = false;

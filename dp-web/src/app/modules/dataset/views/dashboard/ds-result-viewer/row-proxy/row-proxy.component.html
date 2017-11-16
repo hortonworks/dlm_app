@@ -25,7 +25,7 @@
   </thead>
   <tbody>
     <tr *ngFor="let dsModel of datasetModels; let index=index" on-mouseover="hoveredIndex=index">
-      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--clickable key-column wrap" (click)="showFullView(dsModel)">{{dsModel.name}}<span *ngIf="dsModel.favourite"><i class="fa__fa-star--favourite-icon fa fa-star"></i></span></td>
+      <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--clickable key-column wrap" (click)="showFullView(dsModel)"><span data-se="dashboard_collection_list_itm_name">{{dsModel.name}}</span><span *ngIf="dsModel.favourite"><i class="fa__fa-star--favourite-icon fa fa-star"></i></span></td>
       <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable wrap">{{dsModel.description || "--"}}</td>
       <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable wrap">{{dsModel.datalakeName}}</td>
       <td class="mdl-data-table__cell--non-numeric mdl-data-table__cell--non-clickable wrap">{{dsModel.creatorName}}</td>
@@ -51,11 +51,11 @@
  -->
         <div class="dataset-item__action-wrapper">
           <div class="dataset-item__action">
-            <button id="dropDown_{{dsModel.id}}" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon">
+            <button id="dropDown_{{dsModel.id}}" class="mdl-button mdl-js-button mdl-button--icon hwx-button-icon" data-se="dashboard_collection_actions">
               <i class="fa fa-ellipsis-v fa__fa-ellipsis-h--icon"></i>
             </button>
             <ul mdl class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" [attr.for]="'dropDown_' + dsModel.id">
-              <li class="mdl-menu__item" (click)="deleteDataset(dsModel.id)">
+              <li class="mdl-menu__item" (click)="deleteDataset(dsModel.id)" data-se="dashboard_collection_action_delete">
                 <span>
                   <i class="fa__fa-close--icon fa fa-trash-o"></i>
                   {{"common.delete" | translate}}

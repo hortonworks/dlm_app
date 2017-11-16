@@ -1,4 +1,4 @@
-import {browser, $$, ElementFinder} from 'protractor';
+import {browser, $$, ElementFinder, ElementArrayFinder} from 'protractor';
 import * as shell from 'shelljs';
 import { db } from '../data';
 
@@ -28,6 +28,25 @@ async function waitForElement(element: ElementFinder, timeout: number = TIMEOUT)
       return false;
     }
 	}, timeout, `Wait for ${element.locator()} timed out.`);
+}
+
+async function waitForElements(elm: ElementArrayFinder, timeout: number = TIMEOUT) {
+  return browser.wait(async function () {
+    const isPresent = await elm.isPresent()
+    if (isPresent) {
+      // let dispElmPresent = null;
+      // elm.each((element, indx)=>{
+      //   if (dispElmPresent) return;
+      //   dispElmPresent = element.isDisplayed();
+      //   console.log("######",dispElmPresent, '#####');
+      // })
+      // return (dispElmPresent)?true:false;
+      return true;
+    }
+    else {
+      return false;
+    }
+  }, timeout, `Wait for ${elm.locator()} timed out.`);
 }
 
 async function waitForUrl(url: string, timeout: number = TIMEOUT){
@@ -78,6 +97,7 @@ export const helper = {
   safeGet,
   maximizeWindow,
   waitForElement,
+  waitForElements,
   cleanup,
   dbReset,
   suspend,

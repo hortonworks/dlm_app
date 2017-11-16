@@ -13,7 +13,7 @@
 <div class="form-group">
   <label for="name" class="required">{{"common.name" | translate}}</label>
   <div class="dp-input-and-message-wrapper">
-    <input type="text" placeholder="Name" #datasetName="ngModel" name="name" id="name" [(ngModel)]="dsModel.name" required dpUniqueDatasetName [ngClass]="{'validation-error': datasetName.invalid && datasetName.errors.unique}"/>
+    <input type="text" placeholder="Name" #datasetName="ngModel" name="name" id="name" [(ngModel)]="dsModel.name" required dpUniqueDatasetName [ngClass]="{'validation-error': datasetName.invalid && datasetName.errors.unique}" data-se="ds_editor_info_name"/>
     <div *ngIf="datasetName.invalid && datasetName.errors.unique" class="error-message">
       {{"pages.dataset.ds-editor.errors.unique" | translate}}
     </div>
@@ -21,13 +21,13 @@
 </div>
 <div class="form-group">
   <label for="description" class="required">{{"common.description" | translate}}</label>
-  <textarea type="text" placeholder="Description" name="description" id="description" [(ngModel)]="dsModel.description" required></textarea>
+  <textarea type="text" placeholder="Description" name="description" id="description" [(ngModel)]="dsModel.description" required data-se="ds_editor_info_description"></textarea>
 </div>
 <div class="form-group">
   <label class="required">{{"common.datalake" | translate}}</label>
-  <select [(ngModel)]="dsModel.datalakeId" (change)="onLakeSelectionChange()">
+  <select [(ngModel)]="dsModel.datalakeId" (change)="onLakeSelectionChange()" data-se="ds_editor_info_lake">
     <option value="0">Select Datalake</option>
-    <option *ngFor="let lake of lakes" value="{{lake.id}}">{{lake.name}}, {{lake.dcName}}</option>
+    <option *ngFor="let lake of lakes; let i=index" value="{{lake.id}}" [attr.data-se]="'ds_editor_lake_optn_'+(1+i)">{{lake.name}}, {{lake.dcName}}</option>
   </select>
 </div>
 <div class="form-group">
@@ -43,7 +43,7 @@
 
 
 <div class="button-container">
-  <button class="mdl-button btn-hwx-primary" (click)="onNext()" [disabled]="datasetName.invalid && datasetName.errors.unique">{{"pages.dataset.ds-editor.action.next" | translate}}</button>
-  <button class="mdl-button btn-hwx-default" (click)="onCancel()">{{"pages.dataset.ds-editor.action.cancel" | translate}}</button>
+  <button class="mdl-button btn-hwx-primary" (click)="onNext()" [disabled]="datasetName.invalid && datasetName.errors.unique" data-se="ds_editor_info_next">{{"pages.dataset.ds-editor.action.next" | translate}}</button>
+  <button class="mdl-button btn-hwx-default" (click)="onCancel()" data-se="ds_editor_info_cancle">{{"pages.dataset.ds-editor.action.cancel" | translate}}</button>
 </div>
 
