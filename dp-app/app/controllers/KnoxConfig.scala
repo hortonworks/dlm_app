@@ -138,6 +138,7 @@ class KnoxConfig @Inject()(
     for {
       ldapConfig <- ldapService.getConfiguredLdap
       whitelists <- configService.getConfig("dp.knox.whitelist")
+      signedTokenTtl <- configService.getConfig("dp.session.timeout.minutes")
     } yield {
       ldapConfig match {
         case Left(errors) => handleErrors(errors)
@@ -152,6 +153,7 @@ class KnoxConfig @Inject()(
                 Errors(
                   Seq(Error("Exception", "No ldap configuration found"))))
             case Some(ldapConfig) => {
+
               val userDnTemplate =
                 s"${ldapConfig.userSearchAttributeName.get}={0},${ldapConfig.userSearchBase.get}"
               val password=ldapService.getPassword(ldapConfig.bindDn.get)
@@ -162,7 +164,11 @@ class KnoxConfig @Inject()(
                                   domains = whiteListdomains,
                                   userSearchAttributeName = ldapConfig.userSearchAttributeName,
                                   userSearchBase = ldapConfig.userSearchBase,
-                                  password=password)
+                                  password=password,
+                  signedTokenTtl= signedTokenTtl match {
+                    case Some(ttl) => Option(ttl.configValue.toLong)
+                    case None => None
+                  })
               Ok(Json.toJson(knoxLdapConfig))
             }
           }

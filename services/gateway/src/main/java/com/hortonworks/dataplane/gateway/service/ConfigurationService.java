@@ -23,13 +23,29 @@ public class ConfigurationService {
   @Autowired
   private ConfigurationServiceInterface configurationServiceInterface;
 
+  private static final String DP_SESSION_TIMEOUT_KEY = "dp.session.timeout.minutes";
+
   public boolean isLdapConfigured() {
     try {
       KnoxConfigurationResponse knoxStatus = configurationServiceInterface.getKnoxStatus();
       return knoxStatus.getConfigured();
-    }catch (FeignException e){
-      logger.error("error while calling configuration service",e);
+    } catch (FeignException e) {
+      logger.error("error while calling configuration service", e);
       throw new RuntimeException(e);//TODO should we just sned false?
+    }
+  }
+
+
+  public Long getJwtTokenValidity() {
+    try {
+      String validityStr = configurationServiceInterface.getTokenValidity(DP_SESSION_TIMEOUT_KEY);
+      if (validityStr.isEmpty()) {
+        return -1L;
+      }
+      return Long.parseLong(validityStr);
+    } catch (FeignException e) {
+      logger.error("error while calling configuration service", e);
+      throw new RuntimeException(e);
     }
   }
 }
