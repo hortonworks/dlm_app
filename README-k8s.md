@@ -72,6 +72,14 @@ kubectl create secret generic "dp-knox-secret-$ORG" \
     --namespace=dataplane
 ```
 
+### TLS for Ingress
+```
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /tmp/tls.key -out /tmp/tls.crt -subj "/CN=*.tmpdpstrialdev.io"
+kubectl create secret tls "dp-ingress-key-$ORG" --key /tmp/tls.key --cert /tmp/tls.crt
+rm /tmp/tls.key /tmp/tls.crt
+
+```
+
 ## Install
 
 In the following command, you can replace `latest` with the release of Dataplane you wish to use, eg. 1.1.0.0-12
