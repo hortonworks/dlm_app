@@ -23,6 +23,9 @@ import org.w3c.dom.{Document, Element, Node, NodeList}
 import scala.collection.mutable
 
 object TopologyGenerator {
+
+  val defaultKnoxTokenTTLMinutes = 120;
+
   val xPath: XPath = XPathFactory.newInstance().newXPath()
   private def findByRoleName(nodeList: NodeList,
                              roleName: String): Option[Node] = {
@@ -73,7 +76,7 @@ object TopologyGenerator {
     val ssoServiceParams = getKnoxSsoServiceParams(doc)
     var ttlMilliSecs = config.signedTokenTtl match {
       case Some(ttlInMinutes) => ttlInMinutes * 60000
-      case None => -1
+      case None => defaultKnoxTokenTTLMinutes * 60000
     }
     replaceParamValue(ssoServiceParams.get("knoxsso.token.ttl").get,
                       ttlMilliSecs.toString)

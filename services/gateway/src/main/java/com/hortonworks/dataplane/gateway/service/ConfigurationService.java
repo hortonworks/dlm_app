@@ -15,13 +15,18 @@ import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ConfigurationService {
   private static final Logger logger = LoggerFactory.getLogger(ConfigurationService.class);
+
   @Autowired
   private ConfigurationServiceInterface configurationServiceInterface;
+
+  @Value("${jwt.validity.minutes}")
+  private Long defaultJwtValidity;
 
   private static final String DP_SESSION_TIMEOUT_KEY = "dp.session.timeout.minutes";
 
@@ -39,8 +44,8 @@ public class ConfigurationService {
   public Long getJwtTokenValidity() {
     try {
       String validityStr = configurationServiceInterface.getTokenValidity(DP_SESSION_TIMEOUT_KEY);
-      if (validityStr.isEmpty()) {
-        return -1L;
+      if (null == validityStr || validityStr.isEmpty()) {
+        return defaultJwtValidity;
       }
       return Long.parseLong(validityStr);
     } catch (FeignException e) {
