@@ -255,6 +255,7 @@
         "invalidLocation" : "Not a valid location. Please select a location from dropdown.",
         "invalidUserInput": "One or more usernames are invalid. You must select a name from the dropdown options that appear as you type in the Usernames field.",
         "invalidGroupInput": "One or more group names are invalid. You must select a name from the dropdown options that appear as you type in the Group Names field.",
+        "loadServiceError": "Could not fetch Data Plane Services information from Ambari",
         "backenderrors":{
           "Url": "This is not a valid Ambari URL. Please enter a valid Ambari URL.",
           "Ambari": "There was an error fetching information from Ambari.",

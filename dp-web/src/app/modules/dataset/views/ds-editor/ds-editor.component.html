@@ -15,7 +15,7 @@
 
   <div class="ds-editor-cont">
     <div class="nav-panel" [attr.stage]="currentStage">
-      <div class="nav-stage stage_1" [class.done]="1 < currentStage" (click)="moveToStage(1)"><div class="circle">1</div><i class="fa fa-check-circle"></i><span>{{"pages.dataset.ds-editor.information" | translate}}</span><i class="fa fa-caret-left pull-right"></i></div>
+      <div class="nav-stage stage_1" [class.done]="1 < currentStage" (click)="moveToStage(1)" data-se="create_collection_nav_stage1"><div class="circle">1</div><i class="fa fa-check-circle"></i><span>{{"pages.dataset.ds-editor.information" | translate}}</span><i class="fa fa-caret-left pull-right"></i></div>
       <div class="nav-stage stage_2" [class.done]="2 < currentStage" (click)="moveToStage(2)"><div class="circle">2</div><i class="fa fa-check-circle"></i><span>{{"pages.dataset.ds-editor.assets" | translate}}</span><i class="fa fa-caret-left pull-right"></i></div>
       <div class="nav-stage stage_3" [class.done]="3 < currentStage" (click)="moveToStage(3)"><div class="circle">3</div><i class="fa fa-check-circle"></i><span>{{"pages.dataset.ds-editor.summary" | translate}}</span><i class="fa fa-caret-left pull-right"></i></div>
     </div>

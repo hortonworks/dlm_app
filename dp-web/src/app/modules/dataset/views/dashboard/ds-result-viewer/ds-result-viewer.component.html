@@ -39,13 +39,13 @@
         <p [innerHTML]="'pages.dataset.labels.successfullyDeleted' | translate: ({'datasetName': _datasetToDelete?.name})"></p>
       </div>
       <div class="mdl-dialog__content" *ngIf="!_deleteWasSuccessful">
-        <p [innerHTML]="'pages.dataset.labels.messageDelete' | translate: ({'datasetName': _datasetToDelete?.name})"></p>
+        <p [innerHTML]="'pages.dataset.labels.messageDelete' | translate: ({'datasetName': '<span>'+_datasetToDelete?.name+'</span>'})" data-se="delete_collection_confirmation_msg"></p>
       </div>
       <div class="mdl-dialog__actions" *ngIf="!_deleteWasSuccessful">
-        <button type="button" class="mdl-button btn-hwx-warning" (click)="doConfirmDelete()">
+        <button type="button" class="mdl-button btn-hwx-warning" (click)="doConfirmDelete()" data-se="delete_collection_confirm">
           {{'common.confirm' | translate}}
         </button>
-        <button type="button" class="mdl-button close btn-hwx-default" (click)="doCancelDelete()">
+        <button type="button" class="mdl-button close btn-hwx-default" (click)="doCancelDelete()" data-se="delete_collection_confirmation_cancel">
             {{'common.cancel' | translate}}
         </button>
       </div>

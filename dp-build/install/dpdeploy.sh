@@ -42,37 +42,9 @@ init_network() {
     fi
 }
 
-get_bind_address_from_consul_container() {
-    CONSUL_ID=$(docker ps --all --quiet --filter "name=$CONSUL_CONTAINER")
-    if [ -z ${CONSUL_ID} ]; then
-        return 0
-    fi
-    CONSUL_ARGS=$(docker inspect -f {{.Args}} ${CONSUL_ID})
-    for word in $CONSUL_ARGS; do
-        if [[ $word == -bind* ]]
-        then
-            BIND_ADDR=${word##*=}
-        fi
-    done
-    CONSUL_HOST=${BIND_ADDR};
-}
-
 init_consul(){
     echo "Initializing Consul"
-    read_consul_host
     source $(pwd)/docker-consul.sh
-}
-
-read_consul_host(){
-    if [ -z "${CONSUL_HOST}" ]; then
-        get_bind_address_from_consul_container
-    fi
-    if [ -z "${CONSUL_HOST}" ]; then
-        echo "Enter the Host IP Address (Consul will bind to this host):"
-        read HOST_IP;
-        CONSUL_HOST=$HOST_IP;
-    fi
-    echo "using CONSUL_HOST: ${CONSUL_HOST}"
 }
 
 generate_certs() {
@@ -206,7 +178,6 @@ destroy_knox() {
 
 init_app() {
     echo "Initializing app"
-    read_consul_host
 
     if [ "$USE_EXT_DB" == "no" ]; then
         echo "Starting Database (Postgres)"
@@ -552,8 +523,6 @@ upgrade() {
     read_certs_config
 
     # init all but db and consul
-    read_consul_host
-
     init_knox
     init_app
 

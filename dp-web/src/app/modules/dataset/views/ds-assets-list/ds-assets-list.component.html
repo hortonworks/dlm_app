@@ -64,7 +64,7 @@
             <div class="col sourceCol {{(asset.source.toUpperCase() == 'HIVE')?'hiveCol':'filesCol'}}">
               <span><i class="fa {{(asset.source.toUpperCase() == 'HIVE')?'fa-table':'fa-file-o'}}"></i>&nbsp;&nbsp;{{asset.source}}</span>
             </div>
-            <div class="col nameCol" [class.hlink]="allowAssetNavigation" (click)="onAssetClick(asset.id, asset.clusterId)" title="{{asset.name}}">{{asset.name}}</div>
+            <div class="col nameCol" [class.hlink]="allowAssetNavigation" (click)="onAssetClick(asset.id, asset.clusterId)" title="{{asset.name}}" [attr.data-se]="asset.dsName?null:'ds_asset_list_itm_selectable'">{{asset.name}}</div>
             <div class="col dbNameCol">{{asset.dbName}}</div>
             <div class="col descCol" title="{{asset.description}}">{{asset.description}}</div>
             <div class="col ownerCol" title="{{asset.owner}}">{{asset.owner}}</div>
@@ -72,7 +72,7 @@
           </div>
         </div>
       </div>
-      <simple-pagination
+      <simple-pagination data-se="asset_list_pagination"
         [pageSize]="pageSize"
         [pageStartIndex]="pageStartIndex"
         [count]="assetsCount"
