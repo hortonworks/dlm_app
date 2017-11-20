@@ -200,6 +200,10 @@
   }
 }
 
+.load-service-error{
+  color:$roman-red
+}
+
 .disabled, .disabled > * {
   color: rgba(0,0,0, 0.26) !important;
   cursor: default;
