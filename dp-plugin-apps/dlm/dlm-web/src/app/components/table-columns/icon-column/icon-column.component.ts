@@ -13,6 +13,7 @@ import { TableColumn } from 'common/table/table-column.type';
 export const HIVE = 'HIVE';
 export const HDFS = 'HDFS';
 export const FS = 'FS';
+export const FS_SNAPSHOT = 'FS_SNAPSHOT';
 export const ICON_SIZE = 24;
 
 @Component({
@@ -49,6 +50,7 @@ export class IconColumnComponent implements TableColumn {
     const iconSourceMap = {
       [HIVE]: 'fa fa-database',
       [HDFS]: 'fa fa-file-o',
+      [FS_SNAPSHOT]: 'fa fa-file-o',
       [FS]: 'fa fa-file-o'
     };
     return iconSourceMap[sourceType];
@@ -61,6 +63,7 @@ export class IconColumnComponent implements TableColumn {
   getTextClassName(sourceType) {
     const map = {
       [HIVE]: 'text-success',
+      [FS_SNAPSHOT]: 'text-warning',
       [HDFS]: 'text-warning',
       [FS]: 'text-warning'
     };
@@ -71,6 +74,7 @@ export class IconColumnComponent implements TableColumn {
     const hexagonSourceMap = {
       [HIVE]: 'hexagon-success',
       [HDFS]: 'hexagon-warning',
+      [FS_SNAPSHOT]: 'hexagon-warning',
       [FS]: 'hexagon-warning'
     };
     return `hexagon ${hexagonSourceMap[sourceType]}`;

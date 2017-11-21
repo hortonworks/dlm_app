@@ -131,15 +131,18 @@ export class PolicyDetailsComponent {
   }
 
   /**
-   * Returns a string 'Yes' or 'No' for HDFS policy
-   * and "Not Applicable" for HIVE policy
+   * Returns a string 'Disabled' or 'Enabled' for HDFS policy
    * based on whether snapshot is enabled on the policy
+   * Returns empty string for HIVE policy
    */
   get snapshotEnabledStatus() {
-    if (this.policy && this.policy.type === POLICY_TYPES.HIVE) {
-      return this.t.instant('common.not_applicable');
+    if (!this.policy) {
+      return '';
     }
-    return (this.policy && this.policy.executionType && this.policy.executionType === POLICY_EXECUTION_TYPES.HDFS_SNAPSHOT) ?
-      this.t.instant('common.yes') : this.t.instant('common.no');
+    if (this.policy.type === POLICY_TYPES.HIVE) {
+      return '';
+    }
+    return (this.policy.executionType && this.policy.executionType === POLICY_EXECUTION_TYPES.HDFS_SNAPSHOT) ?
+      this.t.instant('common.enabled') : this.t.instant('common.disabled');
   }
 }
