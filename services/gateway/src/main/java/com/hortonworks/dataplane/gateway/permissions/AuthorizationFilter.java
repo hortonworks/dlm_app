@@ -12,11 +12,9 @@ package com.hortonworks.dataplane.gateway.permissions;
 
 import com.hortonworks.dataplane.gateway.domain.Constants;
 import com.hortonworks.dataplane.gateway.domain.UserContext;
-import com.hortonworks.dataplane.gateway.permissions.PermPoliciesService;
 import com.hortonworks.dataplane.gateway.utils.Utils;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +53,7 @@ public class AuthorizationFilter extends ZuulFilter {
   public boolean shouldFilter() {
     RequestContext ctx = RequestContext.getCurrentContext();
     String serviceId = getServiceId();
-    if (ctx.get(Constants.RESPONSE_COMMITTED)!=null && Boolean.TRUE.equals(ctx.get(Constants.RESPONSE_COMMITTED))){
+    if (ctx.get(Constants.ABORT_FILTER_CHAIN)!=null && Boolean.TRUE.equals(ctx.get(Constants.ABORT_FILTER_CHAIN))){
       logger.info("Repsonse already commited. hence ignoring Authorization filter");
       return false;
     }
