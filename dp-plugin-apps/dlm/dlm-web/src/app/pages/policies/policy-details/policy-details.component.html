@@ -20,8 +20,8 @@
       <h6>{{"common.description" | translate}}</h6>
       <p class="detail">{{policy?.description}}</p>
     </div>
-    <div class="summary-item" *ngIf="policy?.executionType">
-      <h6>{{"common.snapshot_enabled" | translate}}</h6>
+    <div class="summary-item" *ngIf="policy?.executionType && !databaseBasedPolicy()">
+      <h6>{{"common.snapshot" | translate}}</h6>
       <p class="detail">{{snapshotEnabledStatus}}</p>
     </div>
     <div class="summary-item">
