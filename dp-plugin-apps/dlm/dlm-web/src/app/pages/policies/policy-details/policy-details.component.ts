@@ -136,10 +136,7 @@ export class PolicyDetailsComponent {
    * Returns empty string for HIVE policy
    */
   get snapshotEnabledStatus() {
-    if (!this.policy) {
-      return '';
-    }
-    if (this.policy.type === POLICY_TYPES.HIVE) {
+    if (!this.policy || this.policy.type === POLICY_TYPES.HIVE) {
       return '';
     }
     return (this.policy.executionType && this.policy.executionType === POLICY_EXECUTION_TYPES.HDFS_SNAPSHOT) ?
