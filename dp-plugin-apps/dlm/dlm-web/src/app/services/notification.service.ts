@@ -55,7 +55,7 @@ export class NotificationService {
             <h4>` + title + `</h4>
             <p>` + this.makeNotificationBody(id, body, contentType) + `</p>
           </div>
-          <div class="col-xs-1">
+          <div class="col-xs-2">
             <i class="fa fa-close fa-stack-1x"></i>
           </div>
         </div>
