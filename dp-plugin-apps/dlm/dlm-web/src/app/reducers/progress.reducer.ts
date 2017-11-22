@@ -38,7 +38,8 @@ export const updateLoadingProgress = (request: ProgressState, action): ProgressS
       ...request,
       isInProgress: true,
       success: false,
-      error: false
+      error: false,
+      response: null
     };
   }
   if (isSuccessAction(action)) {
@@ -46,7 +47,8 @@ export const updateLoadingProgress = (request: ProgressState, action): ProgressS
       ...request,
       isInProgress: false,
       success: true,
-      error: false
+      error: false,
+      response: action.payload.response && JSON.parse(JSON.stringify(action.payload.response))
     };
   }
   if (isFailureAction(action)) {
@@ -55,7 +57,8 @@ export const updateLoadingProgress = (request: ProgressState, action): ProgressS
       isInProgress: false,
       success: false,
       error: true,
-      errorMessage: action.payload.error
+      errorMessage: action.payload.error,
+      response: null
     };
   }
   return request;

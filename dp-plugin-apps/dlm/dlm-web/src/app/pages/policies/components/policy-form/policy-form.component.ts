@@ -42,9 +42,10 @@ import * as moment from 'moment-timezone';
 import { FILE_TYPES } from 'constants/hdfs.constant';
 import { HdfsService } from 'services/hdfs.service';
 import { ProgressState } from 'models/progress-state.model';
-import { getMergedProgress, getAllProgressStates } from 'selectors/progress.selector';
+import { getMergedProgress, getAllProgressStates, getProgressState } from 'selectors/progress.selector';
 import { HiveBrowserTablesLoadingMap, DatabaseTablesCollapsedEvent } from 'components/hive-browser';
 import { removeProgressState } from 'actions/progress.action';
+import { FILES_REQUEST } from 'components/hdfs-browser/hdfs-browser.component';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 const DATABASE_REQUEST = '[Policy Form] DATABASE_REQUEST';
@@ -87,32 +88,6 @@ export function nameValidator(): ValidatorFn {
       return {'nameValidator': {name: value}};
     }
     return null;
-  };
-}
-
-export function pathValidator(hdfsService): AsyncValidatorFn {
-  let validationRequestTimeout;
-  return (control: AbstractControl): Promise<ValidationErrors> => {
-    if (validationRequestTimeout) {
-      clearTimeout(validationRequestTimeout);
-    }
-    return new Promise((resolve, reject) => {
-      validationRequestTimeout = setTimeout(() => {
-        if (!control.value) {
-          return resolve(null);
-        }
-        const clusterId = control.parent['controls']['general'].controls.sourceCluster.value;
-        return hdfsService.getFilesList(clusterId, control.value).toPromise()
-          .then(response => {
-            const files = response.fileList;
-            if (files.length && files[0].type === FILE_TYPES.FILE && files[0].pathSuffix === '') {
-              return resolve({isFile: true});
-            }
-            return resolve(null);
-          })
-          .catch(_ => resolve({notExist: true}));
-      }, 500);
-    });
   };
 }
 
@@ -330,7 +305,43 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     return new Date(date);
   }
 
-  private setupDatabaseUpdates() {
+  private initForm(): FormGroup {
+    return this.formBuilder.group({
+      general: this.formBuilder.group({
+        name: ['', Validators.compose([Validators.required, Validators.maxLength(64), nameValidator()])],
+        description: ['', Validators.maxLength(512)],
+        type: [this.selectedPolicyType],
+        sourceCluster: ['', Validators.required],
+        destinationCluster: ['', Validators.required]
+      }),
+      databases: ['', Validators.required],
+      directories: ['', Validators.compose([Validators.required])],
+      job: this.formBuilder.group({
+        start: this.policyStart.ON_SCHEDULE,
+        repeatMode: this.policyRepeatModes.EVERY,
+        frequency: ['', Validators.compose([Validators.required, freqValidator(this.frequencyMap), integerValidator()])],
+        day: this.policyDays.MONDAY,
+        frequencyInSec: 0,
+        unit: this.policyTimeUnits.DAYS,
+        schedule: this.policySubmitTypes.SCHEDULE,
+        endTime: this.formBuilder.group({
+          date: [''],
+          time: [this.defaultEndTime]
+        }, { validator: this.validateTime }),
+        startTime: this.formBuilder.group({
+          date: [''],
+          time: [this.defaultTime]
+        }, { validator: this.validateTime })
+      }),
+      advanced: this.formBuilder.group({
+        queue_name: [''],
+        max_bandwidth: ['', integerValidator()]
+      }),
+      userTimezone: ['']
+    });
+  }
+
+  private setupDatabaseChanges(policyForm: FormGroup): void {
     const loadDatabasesSubscription = this.selectedSource$
       .filter(sourceCluster => !!sourceCluster)
       .subscribe(sourceCluster => {
@@ -340,11 +351,11 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       return this.store.select(getAllDatabases)
         .map(databases => databases.filter(db => db.clusterId === sourceCluster))
         .do(databases => {
-          const selectedDatabase = this.policyForm.value.databases;
-          const selectedSource = this.policyForm.value.general.sourceCluster;
+          const selectedDatabase = policyForm.value.databases;
+          const selectedSource = policyForm.value.general.sourceCluster;
           // select first database when source changed and selected database is not exist on selected cluster
           if (databases.length && !databases.some(db => db.clusterId === selectedSource && db.name === selectedDatabase)) {
-            this.policyForm.patchValue({databases: databases[0].name});
+            policyForm.patchValue({databases: databases[0].name});
           }
         });
       }) as Observable<HiveDatabase[]>;
@@ -372,63 +383,15 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     this.subscriptions.push(loadDatabasesSubscription);
   }
 
-  constructor(private formBuilder: FormBuilder,
-              private store: Store<State>,
-              private timezoneService: TimeZoneService,
-              private t: TranslateService,
-              private cdRef: ChangeDetectorRef,
-              private hdfs: HdfsService) { }
-
-  // todo: to Denys. This method looks quite scary. Things to improve:
-  // - split code into self-descriptive methods
-  // - revisit logic around observables
-  // - simplify overall logic
-  ngOnInit() {
-    this.userTimeZone$ = this.timezoneService.userTimezoneIndex$;
-    this.userTimeZone$.subscribe((value) =>
-      this.userTimezone = this.timezoneService.userTimezone ? this.timezoneService.userTimezone.label : '');
-    this.policyForm = this.formBuilder.group({
-      general: this.formBuilder.group({
-        name: ['', Validators.compose([Validators.required, Validators.maxLength(64), nameValidator()])],
-        description: ['', Validators.maxLength(512)],
-        type: [this.selectedPolicyType],
-        sourceCluster: ['', Validators.required],
-        destinationCluster: ['', Validators.required]
-      }),
-      databases: ['', Validators.required],
-      directories: ['', Validators.compose([Validators.required]), pathValidator(this.hdfs)],
-      job: this.formBuilder.group({
-        start: this.policyStart.ON_SCHEDULE,
-        repeatMode: this.policyRepeatModes.EVERY,
-        frequency: ['', Validators.compose([Validators.required, freqValidator(this.frequencyMap), integerValidator()])],
-        day: this.policyDays.MONDAY,
-        frequencyInSec: 0,
-        unit: this.policyTimeUnits.DAYS,
-        schedule: this.policySubmitTypes.SCHEDULE,
-        endTime: this.formBuilder.group({
-          date: [''],
-          time: [this.defaultEndTime]
-        }, { validator: this.validateTime }),
-        startTime: this.formBuilder.group({
-          date: [''],
-          time: [this.defaultTime]
-        }, { validator: this.validateTime })
-      }),
-      advanced: this.formBuilder.group({
-        queue_name: [''],
-        max_bandwidth: ['', integerValidator()]
-      }),
-      userTimezone: ['']
-    });
-    const jobControls = this.policyForm.controls['job']['controls'];
-    this.subscriptions.push(jobControls['unit'].valueChanges.subscribe(() => jobControls['frequency'].updateValueAndValidity()));
-    this.activateFieldsForType(this.selectedPolicyType);
+  private setupFormChanges(policyForm: FormGroup): void {
+    // stored policy form values
     this.policyFormValues$ = this.store.select(getFormValues(POLICY_FORM_ID));
-    const policyFormValuesSubscription = Observable
+    const updateFormValues = Observable
       .combineLatest(this.policyFormValues$, this._pairings$, this._sourceClusterId$)
       .subscribe(([policyFormValues, pairings, sourceClusterId]) => {
-        if (!isEmpty(policyFormValues) && (!sourceClusterId || sourceClusterId === 0)) {
-          this.policyForm.patchValue(policyFormValues);
+        const needRestoreForm = !isEmpty(policyFormValues) && (!sourceClusterId || sourceClusterId === 0);
+        if (needRestoreForm) {
+          policyForm.patchValue(policyFormValues);
           this.selectedHdfsPath = policyFormValues['directories'];
           this.selectedSource$.next(policyFormValues['general']['sourceCluster']);
           this.activateFieldsForType(policyFormValues['general']['type']);
@@ -436,7 +399,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
             this.sectionCollapsedMap.advanced = false;
           }
         } else if (sourceClusterId > 0) {
-          this.policyForm.patchValue({
+          policyForm.patchValue({
             general: {
               sourceCluster: sourceClusterId
             }
@@ -444,7 +407,11 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
           this.selectedSource$.next(sourceClusterId);
         }
       });
-    this.policyForm.patchValue({
+    this.subscriptions.push(updateFormValues);
+  }
+
+  private presetJobTime(policyForm) {
+    policyForm.patchValue({
       job: {
         endTime: {
           time: moment(this.defaultEndTime).toDate()
@@ -454,24 +421,78 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         }
       }
     });
+  }
 
-    const directoriesChangesSubscription = this.policyForm.valueChanges
+  private setDirectoriesPending(policyForm: FormGroup, pending = true): void {
+    policyForm.get('directories').setErrors(pending ? { pending: true } : null);
+  }
+
+  private setupJobControlsChanges(policyForm: FormGroup): void {
+    const jobControls = policyForm.controls['job']['controls'];
+    const validateFrequency = jobControls['unit'].valueChanges.subscribe(() => jobControls['frequency'].updateValueAndValidity());
+    this.subscriptions.push(validateFrequency);
+  }
+
+  private setupDirectoryChanges(policyForm: FormGroup) {
+    const directoryFieldChange$: Observable<string> = policyForm.valueChanges
       .map(values => values.directories)
       .distinctUntilChanged()
       .debounceTime(500)
-      .switchMap(value => {
-        return this.policyForm.statusChanges
-          .filter(_ => this.policyForm.get('directories').valid)
-          .map(_ => value);
-      })
-      .subscribe(path => {
+      .do(path => {
         this.hdfsRootPath = path;
+        this.setDirectoriesPending(policyForm);
         this.cdRef.detectChanges();
       });
 
-    this.setupDatabaseUpdates();
-    this.subscriptions.push(policyFormValuesSubscription);
-    this.subscriptions.push(directoriesChangesSubscription);
+    const directoryRequestStatus$ = this.store.select(getProgressState(FILES_REQUEST))
+      .distinctUntilKeyChanged('isInProgress')
+      .filter((progressState: ProgressState) => {
+        return progressState.isInProgress === false;
+      });
+    // this is the easiest way to get validation works for this field
+    const validateDirectories = directoryFieldChange$
+      .switchMap(() => directoryRequestStatus$)
+      .subscribe((progressState: ProgressState) => {
+        const directoriesField = policyForm.get('directories');
+        this.setDirectoriesPending(policyForm, false);
+        if (progressState.error) {
+          directoriesField.setErrors({ notExist: true });
+        } else {
+          const files = progressState.response.fileList;
+          const [tail] = this.hdfsRootPath.split('/').slice(-1);
+          const isFile = files.length === 1 && files[0].type === FILE_TYPES.FILE &&
+            tail === files[0].pathSuffix;
+          if (isFile) {
+            directoriesField.setErrors({ isFile: true });
+          }
+        }
+      });
+    this.subscriptions.push(validateDirectories);
+  }
+
+  private setupTimeZoneChanges(): void {
+    this.userTimeZone$ = this.timezoneService.userTimezoneIndex$;
+    const updateUserTimezone = this.userTimeZone$.subscribe((value) =>
+      this.userTimezone = this.timezoneService.userTimezone ? this.timezoneService.userTimezone.label : '');
+    this.subscriptions.push(updateUserTimezone);
+  }
+
+  constructor(private formBuilder: FormBuilder,
+              private store: Store<State>,
+              private timezoneService: TimeZoneService,
+              private t: TranslateService,
+              private cdRef: ChangeDetectorRef,
+              private hdfs: HdfsService) { }
+
+  ngOnInit() {
+    this.policyForm = this.initForm();
+    this.setupJobControlsChanges(this.policyForm);
+    this.activateFieldsForType(this.selectedPolicyType);
+    this.setupFormChanges(this.policyForm);
+    this.presetJobTime(this.policyForm);
+    this.setupDirectoryChanges(this.policyForm);
+    this.setupDatabaseChanges(this.policyForm);
+    this.setupTimeZoneChanges();
   }
 
   ngOnChanges(changes: SimpleChanges) {

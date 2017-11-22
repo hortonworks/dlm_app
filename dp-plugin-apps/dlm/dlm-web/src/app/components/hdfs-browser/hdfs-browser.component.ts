@@ -36,7 +36,9 @@ import { Breadcrumb } from 'components/breadcrumb/breadcrumb.type';
 import { HdfsService } from 'services/hdfs.service';
 import { isEqual } from 'utils/object-utils';
 
-const FILES_REQUEST = '[HDFS Browser Component] FILES_REQUEST';
+// TODO: this not scale well e.g. several components on the page
+// skip this for a while, since we don't have such case for now
+export const FILES_REQUEST = '[HDFS Browser Component] FILES_REQUEST';
 
 @Component({
   selector: 'dlm-hdfs-browser',
