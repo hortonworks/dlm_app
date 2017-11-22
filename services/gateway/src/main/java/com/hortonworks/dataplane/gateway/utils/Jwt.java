@@ -16,12 +16,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.hortonworks.dataplane.gateway.domain.UserContext;
+import com.hortonworks.dataplane.gateway.service.ConfigurationService;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.security.Key;
 import java.util.Date;
@@ -31,15 +32,15 @@ import java.util.Map;
 public class Jwt {
   private static final Logger logger = LoggerFactory.getLogger(Jwt.class);
   public static final String USER_CLAIM = "user";
-  
+
   private ObjectMapper objectMapper = new ObjectMapper();
   private static SignatureAlgorithm sa = SignatureAlgorithm.RS256;
   private static String issuer = "data_plane";
 
   private static int MINUTE = 60 * 1000;
 
-  @Value("${jwt.validity.minutes}")
-  private Long jwtValidity;
+  @Autowired
+  private ConfigurationService configurationService;
 
   @Autowired
   private GatewayKeystore gatewayKeystore;
@@ -49,13 +50,13 @@ public class Jwt {
     Date now = new Date(timeMillis);
     Map<String, Object> claims = Maps.newHashMap();
     claims.put(USER_CLAIM, objectMapper.writeValueAsString(userContext));
-
+    Long jwtValidity = this.configurationService.getJwtTokenValidity();
     JwtBuilder builder = Jwts.builder()
       .setIssuedAt(now)
       .setIssuer(issuer)
       .setSubject(userContext.getUsername())
       .setClaims(claims)
-      .setExpiration(new Date(now.getTime() + jwtValidity *MINUTE))
+      .setExpiration(new Date(now.getTime() + jwtValidity * MINUTE))
       .signWith(sa, getSigningKey());
 
     return builder.compact();
@@ -72,14 +73,14 @@ public class Jwt {
       if (expiration.before(new Date())) {
         logger.debug("Token expired: " + claims.get("user"));
         return Optional.absent();
-      }else{
+      } else {
         String userJsonString = claims.get(USER_CLAIM).toString();
         UserContext userContext = objectMapper.readValue(userJsonString, UserContext.class);
         userContext.setToken(jwt);
         return Optional.fromNullable(userContext);
       }
-    }catch (ExpiredJwtException ex){
-      logger.error("token expired",ex);
+    } catch (ExpiredJwtException ex) {
+      logger.error("token expired", ex);
       return Optional.absent();
     }
   }
@@ -87,6 +88,7 @@ public class Jwt {
   private Key getSigningKey() {
     return gatewayKeystore.getPrivate();
   }
+
   private Key getVerifyingKey() {
     return gatewayKeystore.getPublic();
   }

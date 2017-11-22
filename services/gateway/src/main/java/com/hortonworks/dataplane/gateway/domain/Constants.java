@@ -33,5 +33,5 @@ public interface Constants {
     String XMLHttpRequestString="XMLHttpRequest";
     String XMLHttpRequestStringLowerCase=XMLHttpRequestString.toLowerCase();
 
-    String RESPONSE_COMMITTED = "RESPONSE_COMMITTED";
+    String ABORT_FILTER_CHAIN = "ABORT_FILTER_CHAIN";
 }

@@ -17,7 +17,8 @@ case class KnoxConfiguration(ldapUrl: String,
                              domains: Option[Seq[String]],
                              userSearchAttributeName: Option[String],
                              userSearchBase: Option[String],
-                             password: Option[String]
+                             password: Option[String],
+                             signedTokenTtl: Option[Long] = None
                             )
 object KnoxConfiguration {
 

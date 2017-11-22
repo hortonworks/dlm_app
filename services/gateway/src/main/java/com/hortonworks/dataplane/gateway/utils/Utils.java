@@ -92,6 +92,7 @@ public class Utils {
       if (message!=null){
         ctx.setResponseBody(message);
       }
+      ctx.set(Constants.ABORT_FILTER_CHAIN,true);
       ctx.setSendZuulResponse(false);
       return null;
     }
@@ -108,6 +109,7 @@ public class Utils {
       if (message!=null){
         ctx.setResponseBody(message);
       }
+      ctx.set(Constants.ABORT_FILTER_CHAIN,true);
       ctx.setSendZuulResponse(false);
       return null;
     }

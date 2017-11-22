@@ -40,7 +40,7 @@ public class RequestResponseUtils {
       addNoCacheHeaders(ctx.getResponse());
       ctx.getResponse().sendRedirect(path);
       ctx.setSendZuulResponse(false);
-      ctx.set(Constants.RESPONSE_COMMITTED,true);
+      ctx.set(Constants.ABORT_FILTER_CHAIN,true);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

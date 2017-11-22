@@ -14,7 +14,9 @@
 
 
 GET           /health                                                controllers.Status.health
-GET           /metrics                                                controllers.Status.metrics
+GET           /metrics                                               controllers.Status.metrics
+
+GET           /api/config/:key                                       controllers.Config.getConfig(key: String)
 
 #auth calls
 POST          /auth/in                                               controllers.Authentication.signIn

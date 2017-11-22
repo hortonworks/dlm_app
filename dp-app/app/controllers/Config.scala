@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
-import com.hortonworks.dataplane.db.Webservice.DpClusterService
+import com.hortonworks.dataplane.db.Webservice.{ConfigService, DpClusterService}
 import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
 import models.{JsonResponses, WrappedErrorsException}
 import play.api.libs.json.Json
@@ -27,9 +27,10 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class Config @Inject()(
-                               @Named("dpClusterService") val dpClusterService: DpClusterService,
-                               ldapService: LdapService,
-                               appConfiguration: Configuration)
+                        @Named("dpClusterService") val dpClusterService: DpClusterService,
+                        ldapService: LdapService,
+                        appConfiguration: Configuration,
+                        @Named("configService") val configService: ConfigService)
   extends Controller {
 
 
@@ -50,7 +51,7 @@ class Config @Inject()(
   }
 
 
-//  code to check if at least one lake has been setup
+  //  code to check if at least one lake has been setup
   private def isDpClusterSetUp(): Future[Boolean] = {
     dpClusterService.list()
       .flatMap {
@@ -59,10 +60,21 @@ class Config @Inject()(
       }
   }
 
-//  stub to check ldap setup later
+  //  stub to check ldap setup later
   private def isAuthSetup(): Future[Boolean] = Future.successful(true)
 
-//  stub to check rbac setup later
+  //  stub to check rbac setup later
   private def isRBACSetup(): Future[Boolean] = Future.successful(false)
+
+  def getConfig(key: String) = Action.async {
+    configService
+      .getConfig(key).map { configuration => {
+      configuration match {
+        case None => Ok("")
+        case Some(config) => Ok(config.configValue)
+      }
+    }
+    }
+  }
 
 }

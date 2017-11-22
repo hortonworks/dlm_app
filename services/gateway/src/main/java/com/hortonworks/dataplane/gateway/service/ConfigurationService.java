@@ -15,21 +15,42 @@ import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ConfigurationService {
   private static final Logger logger = LoggerFactory.getLogger(ConfigurationService.class);
+
   @Autowired
   private ConfigurationServiceInterface configurationServiceInterface;
+
+  @Value("${jwt.validity.minutes}")
+  private Long defaultJwtValidity;
+
+  private static final String DP_SESSION_TIMEOUT_KEY = "dp.session.timeout.minutes";
 
   public boolean isLdapConfigured() {
     try {
       KnoxConfigurationResponse knoxStatus = configurationServiceInterface.getKnoxStatus();
       return knoxStatus.getConfigured();
-    }catch (FeignException e){
-      logger.error("error while calling configuration service",e);
+    } catch (FeignException e) {
+      logger.error("error while calling configuration service", e);
       throw new RuntimeException(e);//TODO should we just sned false?
+    }
+  }
+
+
+  public Long getJwtTokenValidity() {
+    try {
+      String validityStr = configurationServiceInterface.getTokenValidity(DP_SESSION_TIMEOUT_KEY);
+      if (null == validityStr || validityStr.isEmpty()) {
+        return defaultJwtValidity;
+      }
+      return Long.parseLong(validityStr);
+    } catch (FeignException e) {
+      logger.error("error while calling configuration service", e);
+      throw new RuntimeException(e);
     }
   }
 }

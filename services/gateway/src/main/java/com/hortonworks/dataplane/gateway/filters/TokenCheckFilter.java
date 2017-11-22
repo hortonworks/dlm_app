@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
 import java.io.IOException;
+import java.util.Date;
 
 import static com.hortonworks.dataplane.gateway.domain.Constants.*;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
@@ -231,7 +232,7 @@ public class TokenCheckFilter extends ZuulFilter {
     try {
       String jwtToken = jwt.makeJWT(userContext);
       userContext.setToken(jwtToken);
-      cookieManager.addDataplaneJwtCookie(jwtToken,tokenInfo.getExpiryTime());
+      cookieManager.addDataplaneJwtCookie(jwtToken,Optional.<Date>absent());
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
