@@ -34,6 +34,7 @@ import {MockBackend} from '@angular/http/testing';
 import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions} from '@angular/http';
 import {HttpService} from 'services/http.service';
 import { CommonComponentsModule } from 'components/common-components.module';
+import { NotificationService } from 'services/notification.service';
 
 describe('JobsComponent', () => {
   let component: JobsComponent;
@@ -72,6 +73,10 @@ describe('JobsComponent', () => {
         Http,
         HttpService,
         NavbarService,
+        {
+          provide: NotificationService,
+          useValue: jasmine.createSpyObj('notificationService', ['create'])
+        },
         LogService
       ]
     })

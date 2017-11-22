@@ -14,16 +14,28 @@ import { Subject } from 'rxjs/Subject';
 import { EntityType, LOG_EVENT_TYPE_MAP } from 'constants/log.constant';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Log } from 'models/log.model';
-import { getAllLogs } from 'selectors/log.selector';
+import { getAllLogs, getLogByInstanceId } from 'selectors/log.selector';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers/index';
 import { loadLogs } from 'actions/log.action';
 import { Cluster } from 'models/cluster.model';
 import * as moment from 'moment';
 import { getAllClusters } from 'selectors/cluster.selector';
+import { parsePolicyId } from 'utils/policy-util';
+import { NotificationService } from 'services/notification.service';
+import { ToastNotification } from 'models/toast-notification.model';
+import { NOTIFICATION_TYPES } from 'constants/notification.constant';
+import { TranslateService } from '@ngx-translate/core';
 
 export const LOG_REQUEST = '[LOG_SERVICE] LOG_REQUEST';
 export const DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+
+export interface LogMetaInfo {
+  entityId: string;
+  entityType: EntityType;
+  clusterId: number;
+  timestamp: string;
+};
 
 @Injectable()
 export class LogService {
@@ -33,13 +45,16 @@ export class LogService {
   private logMessage$: Observable<string>;
   clusters$: Observable<Cluster[]>;
   clusters: Cluster[];
-  entityId$: BehaviorSubject<string> = new BehaviorSubject(<string>{});
-  constructor(private http: Http,  private store: Store<State>) {
-    this.logMessage$ = this.entityId$.switchMap(entityId => {
-      return this.store.select(getAllLogs).map(logs => {
-        const filteredLogs: Log[] = logs.filter(log => log.instanceId === entityId);
-        return filteredLogs.length ? filteredLogs[0].message : null;
-      });
+  logMetaInfo$: BehaviorSubject<LogMetaInfo> = new BehaviorSubject(<LogMetaInfo>{});
+  constructor(
+    private http: Http,
+    private store: Store<State>,
+    private notificationService: NotificationService,
+    private t: TranslateService
+  ) {
+    this.logMessage$ = this.logMetaInfo$.switchMap(entity => {
+      return this.store.select(getLogByInstanceId(entity.entityId))
+        .map((log = {} as Log) => log.message || '');
     });
     this.logMessage$.subscribe(logMessage => this.emitter.next(logMessage));
     this.clusters$ = store.select(getAllClusters);
@@ -62,23 +77,33 @@ export class LogService {
     return this.emitter;
   }
 
-  showLog(entityType: EntityType, entityId: string, timestamp = '') {
-    if (entityId) {
+  showLog(entityType: EntityType, entityId: string, timestamp = ''): void {
+    const parsed = parsePolicyId(entityId);
+
+    if (parsed) {
       const splits = entityId.split('/');
-      if (splits.length >= 5 && splits[3] && splits[4]) {
-        // Extract target cluster name and data center name from policy id or instance id in format
-        // "policyId": "/beaconsource/beaconsource/beacontarget/beacontarget/hdfsdr/0/1494924228843/000000002"
-        const dataCenter = splits[3];
-        const clusterName = splits[4];
-        if (this.clusters) {
-          const filteredClusters = this.clusters.filter(cluster => cluster.dataCenter === dataCenter && cluster.name === clusterName);
-          if (filteredClusters.length) {
-            const clusterId = filteredClusters[0].id;
-            this.store.dispatch(loadLogs(clusterId, entityId, entityType, LOG_REQUEST, timestamp));
-            this.entityId$.next(entityId);
-          }
+      const dataCenter = parsed.dataCenter;
+      const clusterName = parsed.clusterName;
+      if (this.clusters) {
+        const cluster = this.clusters.find(c => c.dataCenter === dataCenter && c.name === clusterName);
+        if (cluster) {
+          const clusterId = cluster.id;
+          this.store.dispatch(loadLogs(clusterId, entityId, entityType, LOG_REQUEST, timestamp));
+          this.logMetaInfo$.next({
+            entityId,
+            entityType,
+            clusterId,
+            timestamp
+          } as LogMetaInfo);
+          return;
         }
       }
     }
+
+    this.notificationService.create({
+      type: NOTIFICATION_TYPES.ERROR,
+      title: this.t.instant('common.action_notifications.view_log.error.title'),
+      body: this.t.instant('common.action_notifications.view_log.error.body')
+    } as ToastNotification);
   }
 }

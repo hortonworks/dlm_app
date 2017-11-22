@@ -10,5 +10,8 @@
 import { createSelector } from 'reselect';
 import { getLogs } from './root.selector';
 import { mapToList } from '../utils/store-util';
+import { Log } from 'models/log.model';
 
-export const getAllLogs = createSelector(getLogs, state => mapToList(state.entities));
+export const getAllLogs = createSelector(getLogs, state => mapToList(state.entities) as Log[]);
+export const getLogByInstanceId = (instanceId: string) =>
+  createSelector(getAllLogs, (logs: Log[]) => logs.find(log => log.instanceId === instanceId) as Log);

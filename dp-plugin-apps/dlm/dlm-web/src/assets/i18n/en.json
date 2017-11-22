@@ -163,6 +163,12 @@
         "error": {
           "title": "Activating Policy Failed"
         }
+      },
+      "view_log": {
+        "error": {
+          "title": "View Log Failed",
+          "body": "Cannot retrieve logs for selected entity."
+        }
       }
     },
     "services": {

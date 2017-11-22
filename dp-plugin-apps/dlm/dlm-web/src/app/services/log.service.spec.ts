@@ -15,6 +15,8 @@ import { ReflectiveInjector } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { MockStore } from 'mocks/mock-store';
 import { EntityType } from 'constants/log.constant';
+import { TranslateService } from '@ngx-translate/core';
+import { NotificationService } from 'services/notification.service';
 
 describe('LogService', () => {
   beforeEach(() => {
@@ -22,8 +24,16 @@ describe('LogService', () => {
       {provide: ConnectionBackend, useClass: MockBackend},
       {provide: RequestOptions, useClass: BaseRequestOptions},
       {provide: Store, useClass: MockStore},
+      {
+        provide: NotificationService,
+        useValue: jasmine.createSpyObj('notificationService', ['create'])
+      },
       Http,
       HttpService,
+      {
+        provide: TranslateService,
+        useValue: jasmine.createSpyObj('t', ['instant'])
+      },
       LogService
     ]);
 

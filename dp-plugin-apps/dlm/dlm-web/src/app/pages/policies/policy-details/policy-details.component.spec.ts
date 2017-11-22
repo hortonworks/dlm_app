@@ -34,6 +34,7 @@ import { LogService } from 'services/log.service';
 import {MockBackend} from '@angular/http/testing';
 import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions} from '@angular/http';
 import {HttpService} from 'services/http.service';
+import { NotificationService } from 'services/notification.service';
 
 describe('PolicyDetailsComponent', () => {
   let component: PolicyDetailsComponent;
@@ -67,6 +68,10 @@ describe('PolicyDetailsComponent', () => {
         Http,
         HttpService,
         NavbarService,
+        {
+          provide: NotificationService,
+          useValue: jasmine.createSpyObj('notificationService', ['create'])
+        },
         LogService,
         {provide: Store, useClass: MockStore}
       ]

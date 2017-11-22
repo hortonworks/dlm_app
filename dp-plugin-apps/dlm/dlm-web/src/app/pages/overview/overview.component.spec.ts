@@ -48,6 +48,7 @@ import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions} from '@angu
 import {HttpService} from 'services/http.service';
 import { OverviewModule } from './overview.module';
 import { HortonStyleModule } from 'common/horton-style.module';
+import { NotificationService } from 'services/notification.service';
 
 const jobs = [
   <Job>{status: JOB_STATUS.SUCCESS},
@@ -122,18 +123,22 @@ describe('OverviewComponent', () => {
         EventMessageComponent
       ],
       providers: [
-        {provide: Store, useClass: MockStore},
+        { provide: Store, useClass: MockStore },
         {
           provide: OverviewJobsExternalFiltersService, useValue: {
-          filters$: new BehaviorSubject({})
-        }
+            filters$: new BehaviorSubject({})
+          }
         },
-        {provide: ConnectionBackend, useClass: MockBackend},
-        {provide: RequestOptions, useClass: BaseRequestOptions},
-        {provide: Http, useClass: HttpService},
+        { provide: ConnectionBackend, useClass: MockBackend },
+        { provide: RequestOptions, useClass: BaseRequestOptions },
+        { provide: Http, useClass: HttpService },
         Http,
         HttpService,
         NavbarService,
+        {
+          provide: NotificationService,
+          useValue: jasmine.createSpyObj('notificationService', ['create'])
+        },
         LogService
       ]
     })

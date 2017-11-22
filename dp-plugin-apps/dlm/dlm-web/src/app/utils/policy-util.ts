@@ -13,3 +13,41 @@ import { POLICY_UI_STATUS, POLICY_STATUS } from 'constants/status.constant';
 export const isEnded = (policy: Policy) => policy.uiStatus === POLICY_UI_STATUS.ENDED;
 export const activateDisabled = (policy: Policy) => policy.status === POLICY_STATUS.RUNNING || isEnded(policy);
 export const suspendDisabled = (policy: Policy) => policy.status === POLICY_STATUS.SUSPENDED || isEnded(policy);
+
+export interface ParsedPolicyId {
+  policyName: string;
+  timeStamp: number;
+  policyBeaconId: string;
+  jobId: string;
+  clusterName: string;
+  dataCenter: string;
+}
+
+// "policyId": "/beaconsource/beaconsource/beacontarget/beacontarget/hdfsdr/0/1494924228843/000000002"
+export const parsePolicyId = (policyId: string): ParsedPolicyId => {
+  if (!policyId) {
+    return null;
+  }
+  const splits = policyId.split('/');
+  if (splits.length <= 5) {
+    return null;
+  }
+  const policyName = splits[5];
+  const timeStamp = parseInt(splits[7], 10);
+  const idSplits = (splits[9] || '').split('@');
+  const dataCenter = splits[3];
+  const clusterName = splits[4];
+  const policyBeaconId = idSplits.length ? idSplits[0] : null;
+  // jobId segment may not be present, it can be absent when we look to policy log
+  // and will be there in case when we look to job log
+  const jobId = idSplits.length ? idSplits[0] || null : null;
+  return {
+    policyName,
+    timeStamp,
+    policyBeaconId,
+    jobId,
+    clusterName,
+    dataCenter
+  };
+};
+

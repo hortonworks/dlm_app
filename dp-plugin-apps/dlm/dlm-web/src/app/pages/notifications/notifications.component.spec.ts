@@ -33,6 +33,7 @@ import { LogService } from 'services/log.service';
 import {MockBackend} from '@angular/http/testing';
 import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions} from '@angular/http';
 import {HttpService} from 'services/http.service';
+import { NotificationService } from 'services/notification.service';
 
 describe('NotificationsPageComponent', () => {
   let component: NotificationsPageComponent;
@@ -71,6 +72,10 @@ describe('NotificationsPageComponent', () => {
         Http,
         HttpService,
         NavbarService,
+        {
+          provide: NotificationService,
+          useValue: jasmine.createSpyObj('notificationService', ['create'])
+        },
         LogService
       ]
     })
