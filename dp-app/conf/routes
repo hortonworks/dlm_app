@@ -19,8 +19,7 @@ GET           /metrics                                               controllers
 GET           /api/config/:key                                       controllers.Config.getConfig(key: String)
 
 #auth calls
-POST          /auth/in                                               controllers.Authentication.signIn
-GET           /auth/userDetail                                       controllers.Authentication.userDetail
+GET           /api/identity                                          controllers.Authentication.userDetail
 GET           /api/identity/:userId                                  controllers.Authentication.userById(userId: String)
 POST          /api/identity/actions/change-password                  controllers.Authentication.changePassword
 

@@ -12,11 +12,6 @@
 
     },
     {
-      "path":"/auth/userDetail",
-      "roles": ["*"]
-
-    },
-    {
       "path":"/api/identity",
       "roles": ["*"]
 

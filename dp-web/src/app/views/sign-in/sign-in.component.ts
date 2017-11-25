@@ -11,7 +11,7 @@
 
 import {Component, OnInit} from '@angular/core';
 
-import {Router} from '@angular/router';
+import {Router, ActivatedRoute, Params} from '@angular/router';
 import {Subject} from 'rxjs/Rx';
 
 import {Credential} from '../../models/credential';
@@ -33,9 +33,11 @@ export class SignInComponent implements OnInit {
 
   credential: Credential = new Credential('', '');
   authenticate: Subject<Credential>;
+  originalUrl = '/';
 
   constructor(private authenticaionService: AuthenticationService,
               private router: Router,
+              private activatedRoute: ActivatedRoute,
               private configService: ConfigurationService,
               private translateService: TranslateService) {
     if (window.location.hash.length > 0 && window.location.hash === '#SESSEXPIRED') {
@@ -46,6 +48,13 @@ export class SignInComponent implements OnInit {
   ngOnInit() {
     let currentLocation = window.location.href.split('/');
     this.landingPage = `${currentLocation[0]}//${currentLocation[2]}`;
+
+    this.activatedRoute
+      .queryParams
+      .subscribe((params: Params) => {
+        const originalUrl = params['originalUrl'] ? params['originalUrl'] : `${window.location.protocol}//${window.location.host}/`;
+        this.originalUrl = originalUrl.substring(`${window.location.protocol}//${window.location.host}`.length);
+      });
   }
 
   onSubmit(event) {
@@ -57,7 +66,7 @@ export class SignInComponent implements OnInit {
       }).subscribe(
       (() => {
         this._isAuthSuccessful = true;
-        this.router.navigate(['']);
+        this.router.navigate([this.originalUrl]);
       }),
       error => {
         if (error.status === 401) {

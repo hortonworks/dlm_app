@@ -13,6 +13,7 @@ import {Component, Input} from '@angular/core';
 import { Router } from '@angular/router';
 
 import {User} from '../../models/user';
+import {AuthenticationService} from '../../services/authentication.service';
 import {AuthUtils} from '../../shared/utils/auth-utils';
 
 @Component({
@@ -23,12 +24,12 @@ import {AuthUtils} from '../../shared/utils/auth-utils';
 export class HeaderComponent {
 
   @Input() user:User;
-  signoutURL = AuthUtils.signoutURL;
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private authenticationService: AuthenticationService) {
   }
 
   logout() {
-    this.router.navigate([AuthUtils.signoutURL]);
+    this.authenticationService
+      .signOutAndRedirect();
   }
 }

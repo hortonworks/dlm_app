@@ -55,7 +55,7 @@ export const routes: MockRoute[] = [
   new MockRoute('clusters/:clusterId/logs', 'event_log.json'),
 
   // User Detail
-  new MockRoute('auth/userDetail', 'user_detail.json'),
+  new MockRoute('api/identity', 'user_detail.json'),
 
   // Beacon admin status
   new MockRoute('beacon/admin/status', 'admin_status.json')

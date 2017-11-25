@@ -14,13 +14,8 @@ if [ -z "$CONSUL_HOST" ]; then
     exit 1
 fi
 
-if [ -z "$ROOT_PATH" ]; then
-    export ROOT_PATH="/"
-fi
-
 java \
     -jar /usr/gateway-service/gateway-1.0.jar \
-        --dps.root.path="$ROOT_PATH" \
         --spring.cloud.consul.host="$CONSUL_HOST" \
         --sso.enabled=true \
         --signing.pub.key.path=/dp-shared/ssl-cert.pem "$@"

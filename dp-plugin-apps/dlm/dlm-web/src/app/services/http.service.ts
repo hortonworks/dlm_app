@@ -28,7 +28,11 @@ export class HttpService extends Http {
   private catchErrors() {
     return (response: Response) => {
       if (response.status === 401) {
-        window.location.href = UserService.signoutURL;
+        const challengeAt = response.headers.get(UserService.HEADER_CHALLENGE_HREF);
+        const redirectTo = `${window.location.protocol}//${window.location.host}/${challengeAt}`;
+        if(window.location.href.startsWith(redirectTo) === false) {
+          window.location.href = `${redirectTo}?originalUrl=${window.location.href}`;
+        }
       } else if (response.status === 403) {
         window.location.href = this.unauthorizedRedirect;
       }

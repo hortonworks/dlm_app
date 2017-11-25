@@ -11,9 +11,10 @@
 
 import {Injectable} from '@angular/core';
 import {Http, RequestOptions} from '@angular/http';
+import {Router} from '@angular/router';
 import {Observable} from 'rxjs/Rx';
 
-import {HttpUtil} from '../shared/utils/httpUtil';
+import {HttpUtil, HEADER_CHALLENGE_HREF} from '../shared/utils/httpUtil';
 
 import {Credential} from '../models/credential';
 import {User} from '../models/user';
@@ -24,7 +25,7 @@ export class AuthenticationService {
 
   private URI: string = 'auth';
 
-  constructor(private http: Http) {
+  constructor(private http: Http, private router: Router) {
   }
 
   isAuthenticated(): Observable<boolean> {
@@ -47,8 +48,21 @@ export class AuthenticationService {
       });
   }
 
-  signOut() {
-    window.location.href = AuthUtils.signoutURL;
-    return Observable.of(true);
+  signOut(): Observable<string> {
+    return this.http
+      .get(`${this.URI}/out`)
+      .map(response => {
+        const header = response.headers.get(HEADER_CHALLENGE_HREF);
+        return typeof header === 'string' ? header : null;
+      });
+  }
+
+  signOutAndRedirect() {
+    this.signOut()
+      .subscribe(challengeAt => {
+        AuthUtils.clearUser();
+        const redirectTo = `${window.location.protocol}//${window.location.host}/${challengeAt}`;
+        window.location.href = `${redirectTo}?originalUrl=${window.location.protocol}//${window.location.host}/`;
+      });
   }
 }

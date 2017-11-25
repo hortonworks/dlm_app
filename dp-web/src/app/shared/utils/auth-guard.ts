@@ -57,10 +57,13 @@ export class UnsecuredRouteGuard implements CanActivate {
 
 @Injectable()
 export class DoCleanUpAndRedirectGuard implements CanActivate {
-  constructor(private authenticationService: AuthenticationService) {
+  constructor(private authenticationService: AuthenticationService, private router: Router) {
   }
 
   canActivate() {
-    return this.authenticationService.signOut();
+    this.authenticationService
+      .signOutAndRedirect();
+
+    return false;
   }
 }

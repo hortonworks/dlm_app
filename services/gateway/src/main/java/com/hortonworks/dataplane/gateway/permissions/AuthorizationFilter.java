@@ -12,7 +12,7 @@ package com.hortonworks.dataplane.gateway.permissions;
 
 import com.hortonworks.dataplane.gateway.domain.Constants;
 import com.hortonworks.dataplane.gateway.domain.UserContext;
-import com.hortonworks.dataplane.gateway.utils.Utils;
+import com.hortonworks.dataplane.gateway.exceptions.GatewayException;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import org.slf4j.Logger;
@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_DECORATION_FILTER_ORDER;
@@ -32,9 +33,6 @@ public class AuthorizationFilter extends ZuulFilter {
 
   @Autowired
   private PermPoliciesService permPoliciesService;
-
-  @Autowired
-  private Utils utils;
 
   @Autowired
   private RouteLocator routeLocator;
@@ -72,7 +70,7 @@ public class AuthorizationFilter extends ZuulFilter {
       if (isAuthorized) {
         return null;
       } else {
-        return utils.sendForbidden("No permission for this resource");
+        throw new GatewayException(HttpStatus.FORBIDDEN, "User is not authorized to access this resource.");
       }
     }else{
       logger.error(String.format("no matching route found for [$s]",ctx.getRequest().getServletPath()));

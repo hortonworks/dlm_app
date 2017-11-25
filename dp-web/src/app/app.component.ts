@@ -21,6 +21,7 @@ import {HeaderData} from './models/header-data';
 import {CollapsibleNavService} from './services/collapsible-nav.service';
 import {Loader, LoaderStatus} from './shared/utils/loader';
 import {RbacService} from './services/rbac.service';
+import {AuthenticationService} from './services/authentication.service';
 import {AuthUtils} from './shared/utils/auth-utils';
 
 export enum ViewPaneState {
@@ -39,7 +40,6 @@ export class AppComponent implements OnInit, AfterViewChecked {
   viewPaneState = ViewPaneState.MAXIMISE;
   headerData: HeaderData = new HeaderData();
   showLoader: LoaderStatus;
-  signOutUrl = AuthUtils.signoutURL;
 
   constructor(
               private titleService: Title,
@@ -49,7 +49,9 @@ export class AppComponent implements OnInit, AfterViewChecked {
               private translateService: TranslateService,
               private collapsibleNavService: CollapsibleNavService,
               private rbacService: RbacService,
-              private cdRef: ChangeDetectorRef) {
+              private cdRef: ChangeDetectorRef,
+              private authenticationService: AuthenticationService
+            ) {
 
     translateService.setTranslation('en', require('../assets/i18n/en.json'));
     translateService.setDefaultLang('en');
@@ -116,5 +118,10 @@ export class AppComponent implements OnInit, AfterViewChecked {
       data.push(...this.getTitles(state, state.firstChild(parent)));
     }
     return data;
+  }
+
+  doSignOut() {
+    this.authenticationService
+      .signOutAndRedirect();
   }
 }

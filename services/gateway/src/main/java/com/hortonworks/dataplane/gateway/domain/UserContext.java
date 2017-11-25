@@ -13,7 +13,6 @@ package com.hortonworks.dataplane.gateway.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.joda.time.LocalDateTime;
 
 import java.io.Serializable;
 
@@ -27,7 +26,6 @@ public class UserContext implements Serializable {
   private List<String> roles;
   private List<String> services;
   private String display;
-  private String token;
   private String password;
   private boolean active;
   private boolean dbManaged;
@@ -71,15 +69,6 @@ public class UserContext implements Serializable {
 
   public void setDisplay(String display) {
     this.display = display;
-  }
-
-  @JsonProperty
-  public String getToken() {
-    return token;
-  }
-
-  public void setToken(String token) {
-    this.token = token;
   }
 
   @JsonProperty

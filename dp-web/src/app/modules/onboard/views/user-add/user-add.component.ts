@@ -88,7 +88,8 @@ export class UserAddComponent implements OnInit {
     this.userService.addAdminUsers(this.users).subscribe(response => {
       if (response.successfullyAdded.length === this.users.length) {
         this.usersSaved = true;
-        this.authenticationService.signOut();
+        this.authenticationService
+          .signOutAndRedirect();
         return;
       }
       let failedUsers = [];
@@ -108,7 +109,8 @@ export class UserAddComponent implements OnInit {
     this.groupService.addAdminGroups(this.groups).subscribe(response => {
       if (response.successfullyAdded.length === this.groups.length) {
         this.groupsSaved = true;
-        this.authenticationService.signOut();
+        this.authenticationService
+          .signOutAndRedirect();
         return;
       }
       let failedGroups = [];
@@ -132,7 +134,8 @@ export class UserAddComponent implements OnInit {
       this.usersSaved = this.users.length === responses[0].successfullyAdded.length;
       this.groupsSaved = this.groups.length === responses[1].successfullyAdded.length;
       if (this.usersSaved && this.groupsSaved) {
-        this.authenticationService.signOut();
+        this.authenticationService
+          .signOutAndRedirect();
       }
       if (!this.usersSaved) {
         this.onError(`${this.translateService.instant('pages.infra.description.addUserError')}`);

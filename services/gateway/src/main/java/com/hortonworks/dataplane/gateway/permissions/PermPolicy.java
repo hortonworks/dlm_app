@@ -10,8 +10,6 @@
  */
 package com.hortonworks.dataplane.gateway.permissions;
 
-import org.springframework.cloud.netflix.zuul.filters.Route;
-
 import java.util.ArrayList;
 import java.util.List;
 

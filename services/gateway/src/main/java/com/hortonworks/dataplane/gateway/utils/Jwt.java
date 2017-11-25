@@ -13,14 +13,15 @@ package com.hortonworks.dataplane.gateway.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.hortonworks.dataplane.gateway.domain.UserContext;
+import com.hortonworks.dataplane.gateway.exceptions.GatewayException;
 import com.hortonworks.dataplane.gateway.service.ConfigurationService;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -45,11 +46,16 @@ public class Jwt {
   @Autowired
   private GatewayKeystore gatewayKeystore;
 
-  public String makeJWT(UserContext userContext) throws JsonProcessingException {
+  public String makeJWT(UserContext userContext) throws GatewayException {
     long timeMillis = System.currentTimeMillis();
     Date now = new Date(timeMillis);
     Map<String, Object> claims = Maps.newHashMap();
-    claims.put(USER_CLAIM, objectMapper.writeValueAsString(userContext));
+    try {
+      claims.put(USER_CLAIM, objectMapper.writeValueAsString(userContext));
+    } catch (JsonProcessingException ex) {
+      throw new GatewayException(ex, HttpStatus.INTERNAL_SERVER_ERROR, "Unable to serialize user context.");
+    }
+
     Long jwtValidity = this.configurationService.getJwtTokenValidity();
     JwtBuilder builder = Jwts.builder()
       .setIssuedAt(now)
@@ -63,26 +69,53 @@ public class Jwt {
 
   }
 
-
-  public Optional<UserContext> parseJWT(String jwt) throws IOException {
+  private Claims parseAndGetClaims(String jwt)
+      throws GatewayException {
     try {
       Claims claims = Jwts.parser()
         .setSigningKey(getVerifyingKey())
-        .parseClaimsJws(jwt).getBody();
-      Date expiration = claims.getExpiration();
-      if (expiration.before(new Date())) {
-        logger.debug("Token expired: " + claims.get("user"));
-        return Optional.absent();
-      } else {
-        String userJsonString = claims.get(USER_CLAIM).toString();
-        UserContext userContext = objectMapper.readValue(userJsonString, UserContext.class);
-        userContext.setToken(jwt);
-        return Optional.fromNullable(userContext);
-      }
+        .parseClaimsJws(jwt)
+        .getBody();
+
+      // Date expiration = claims.getExpiration();
+      // if (expiration.before(new Date())) {
+      //   logger.debug("Token expired: " + claims.get("user"));
+      //   throw gateway exception
+      // }
+
+      return claims;
+
     } catch (ExpiredJwtException ex) {
       logger.error("token expired", ex);
-      return Optional.absent();
+      throw new GatewayException(HttpStatus.UNAUTHORIZED, "Token has expired.");
+    } catch (JwtException e) {
+      logger.error("Jwt Exception", e);
+      throw new GatewayException(HttpStatus.UNAUTHORIZED, "Token was invalid.");
     }
+  }
+
+  public UserContext parseJWT(String jwt)
+    throws GatewayException {
+
+    try {
+      Claims claims = parseAndGetClaims(jwt);
+
+      String userJsonString = claims.get(USER_CLAIM).toString();
+      UserContext userContext = objectMapper.readValue(userJsonString, UserContext.class);
+
+      return userContext;
+
+    } catch (IOException e) {
+      logger.error("Exception", e);
+      throw new GatewayException(HttpStatus.UNAUTHORIZED, "Token was invalid.");
+    }
+  }
+
+  public Date getExpiration(String jwt)
+    throws GatewayException {
+
+    Claims claims = parseAndGetClaims(jwt);
+    return claims.getExpiration();
   }
 
   private Key getSigningKey() {

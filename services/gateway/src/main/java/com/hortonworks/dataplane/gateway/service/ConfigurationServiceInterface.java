@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.util.Optional;
-
-@FeignClient("dpapp")
+@FeignClient("core")
 public interface ConfigurationServiceInterface {
 
   @RequestMapping(method = RequestMethod.GET, value = "/api/knox/status")

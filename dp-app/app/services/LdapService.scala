@@ -157,13 +157,11 @@ class LdapService @Inject()(
       search <- doWithEither[DirContext, Seq[LdapSearchResult]](
         dirContext,
         context => {
-          try{
-            val searchResult = ldapSearch(context, configuredLdap.right.get, userName, searchType,fuzzyMatch)
-            searchResult.onComplete{ res =>
-              context.close()
-            }
-            searchResult
+          val searchResult = ldapSearch(context, configuredLdap.right.get, userName, searchType,fuzzyMatch)
+          searchResult.onComplete{ res =>
+            context.close()
           }
+          searchResult
         })
 
     } yield search
@@ -347,12 +345,7 @@ class LdapService @Inject()(
     }
   }
 
-  def getConfiguredLdap
-  : Future[Either[Errors, Seq[LdapConfiguration]]] = {
-    ldapConfigService
-      .get()
-
-  }
+  def getConfiguredLdap: Future[Either[Errors, Seq[LdapConfiguration]]] = ldapConfigService.get()
 
   private def getLdapContext(
                               url: String,

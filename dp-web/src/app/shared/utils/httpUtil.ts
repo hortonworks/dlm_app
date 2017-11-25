@@ -15,13 +15,16 @@ import {Headers} from '@angular/http';
 import {Alerts} from './alerts';
 import {AuthUtils} from './auth-utils';
 import {Router} from '@angular/router';
+
+export const HEADER_CHALLENGE_HREF = 'X-Authenticate-Href';
+
 export class HttpUtil {
-  static router: Router;
 
   public static extractString(res: Response): string {
     let text: string = res.text();
     return text || '';
   }
+
 
   public static extractData(res: Response): any {
     let body = res.json();
@@ -30,7 +33,11 @@ export class HttpUtil {
 
   public static handleError(error: any) {
     if (error.status === 401) {
-      window.location.href = AuthUtils.signoutURL;
+      const challengeAt = error.headers.get(HEADER_CHALLENGE_HREF);
+      const redirectTo = `${window.location.protocol}//${window.location.host}/${challengeAt}`;
+      if(window.location.href.startsWith(`${window.location.protocol}//${window.location.host}/sign-in`) === false) {
+        window.location.href = `${redirectTo}?originalUrl=${window.location.href}`;
+      }
       return Observable.throw(error);
     }
 

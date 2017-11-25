@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient("dpdb")
+@FeignClient("db")
 public interface BlacklistedTokenServiceInterface {
   @RequestMapping(method = RequestMethod.GET, value = "/blacklisted-tokens")
   BlacklistedToken getToken(@RequestParam("token") String token);

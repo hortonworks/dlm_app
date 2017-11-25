@@ -14,7 +14,7 @@ set -e
 RELEASE_NUMBER=0.0.1-latest
 IMAGE_PREFIX="hortonworks"
 ALL_IMAGES="dp-knox dp-db-service dp-app dp-cluster-service dp-gateway dp-migrate"
-VENDOR_IMAGES="postgres:9.6.3-alpine consul:0.8.5"
+VENDOR_IMAGES="postgres:9.6.3-alpine consul:1.0.1"
 ALL_IMAGES_OPT="all"
 
 build_knox() {

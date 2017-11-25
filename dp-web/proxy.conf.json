@@ -1,14 +1,14 @@
 {
   "/api": {
-    "target": "http://localhost:8762/api/app",
+    "target": "http://localhost:8762/api/core",
     "secure": false
   },
   "/auth": {
-    "target": "http://localhost:8762/api/app",
+    "target": "http://localhost:8762",
     "secure": false
   },
-  "/login" : {
-    "target": "http://localhost:8762/api/app",
+  "/knox": {
+    "target": "https://localhost:8443",
     "secure": false
   }
 }

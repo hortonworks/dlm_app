@@ -44,10 +44,9 @@ class KnoxConfig @Inject()(
   }
 
   def getRequestHost(request: AuthenticatedRequest[JsValue]) = {
-    (request.headers.get("X-Forwarded-Host"), request.headers.get("X-DP-Forwarded-Host")) match {
-      case (Some(host), _) => host.split(",")(0)
-      case (None, Some(host)) => host.split(",")(0)
-      case (None, None) => request.host
+    request.headers.get("X-Forwarded-Host") match {
+      case Some(host) => host.split(",")(0)
+      case None => request.host.split(",")(0)
     }
   }
 
@@ -104,16 +103,8 @@ class KnoxConfig @Inject()(
       case Left(errors) => handleErrors(errors)
       case Right(ldapConfigs) =>
         ldapConfigs.length match {
-          case 0 =>
-            Ok(
-              Json.obj(
-                "configured" -> false
-              ))
-          case _ =>
-            Ok(
-              Json.obj(
-                "configured" -> true
-              ))
+          case 0 => Ok(Json.obj("configured" -> false))
+          case _ => Ok(Json.obj("configured" -> true))
         }
     }
   }

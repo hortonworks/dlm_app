@@ -12,14 +12,18 @@ package com.hortonworks.dataplane.gateway.filters;
 
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
+import org.apache.commons.collections.EnumerationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.function.Consumer;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
 import static org.springframework.util.ReflectionUtils.rethrowRuntimeException;
@@ -64,7 +68,10 @@ public class TraceFilter extends ZuulFilter {
   public Object run() {
     log.info("Logging API response");
     RequestContext ctx = RequestContext.getCurrentContext();
-    log.warn("Request path :" + ctx.getRequest().getServletPath());
+    HttpServletRequest request = ctx.getRequest();
+    Enumeration<String> headerNames = request.getHeaderNames();
+    EnumerationUtils.toList(headerNames).stream().forEach((Consumer<String>) s -> log.warn("Header "+ s + ":"+ request.getHeader(s)));
+    log.warn("Request path :" + request.getServletPath());
     try {
       InputStream stream = ctx.getResponseDataStream();
       byte[] body = null;

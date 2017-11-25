@@ -19,7 +19,9 @@ import {ROLES} from 'constants/user.constant';
 @Injectable()
 export class UserService {
 
-  static signoutURL = '/auth/signOut';
+  static HEADER_CHALLENGE_HREF = 'X-Authenticate-Href';
+  static signoutURL = '/auth/out';
+
   private personaMap = new Map();
   private ROLES = ROLES;
 
@@ -51,15 +53,20 @@ export class UserService {
     const urlPrefix = this.getUrlPrefix();
     // Do not make a request in Dev mode
     if (!isDevMode()) {
-      return mapResponse(this.http.get(urlPrefix + '/auth/userDetail', new RequestOptions(getHeaders())));
+      return mapResponse(this.http.get(urlPrefix + '/api/identity', new RequestOptions(getHeaders())));
     }
     // Get mock response
-    return mapResponse(this.http.get('auth/userDetail'));
+    return mapResponse(this.http.get('api/identity'));
   }
 
   logoutUser() {
     // Access Dataplane API directly to log the user out
-    window.location.pathname = UserService.signoutURL;
+    return this.http
+      .get(UserService.signoutURL)
+      .map(response => {
+        const challengeAt = response.headers.get(UserService.HEADER_CHALLENGE_HREF);
+        window.location.href = `${window.location.protocol}//${window.location.host}/${challengeAt}?originalUrl=${window.location.href}`;
+      });
   }
 
   /**

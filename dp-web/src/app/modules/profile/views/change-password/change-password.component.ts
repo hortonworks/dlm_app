@@ -15,7 +15,7 @@ import {FormGroup, FormControl, Validators, ValidatorFn} from '@angular/forms';
 import {Observable} from 'rxjs/Rx';
 
 import {IdentityService} from '../../../../services/identity.service';
-import {AuthUtils} from '../../../../shared/utils/auth-utils';
+import {AuthenticationService} from '../../../../services/authentication.service';
 
 @Component({
   selector: 'dp-change-password',
@@ -35,6 +35,7 @@ export class ChangePasswordComponent {
   constructor(
     private router: Router,
     private identityService: IdentityService,
+    private authenticationService: AuthenticationService
   ) {
     this.form = new FormGroup({
         'passwordCurrent': new FormControl(this.passwordCurrent, [
@@ -63,8 +64,8 @@ export class ChangePasswordComponent {
         .changePassword(this.passwordCurrent, this.passwordNew)
         .subscribe(
           () => {
-            AuthUtils.clearUser();
-            window.location.href = AuthUtils.signoutURL;
+            this.authenticationService
+              .signOutAndRedirect();
           },
           error => {
             if (error._body) {

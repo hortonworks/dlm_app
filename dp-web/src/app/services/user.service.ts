@@ -28,7 +28,7 @@ export class UserService {
   }
 
   getUserDetail(): Observable<User> {
-    return this.http.get('auth/userDetail', new RequestOptions(HttpUtil.getHeaders()))
+    return this.http.get('api/identity', new RequestOptions(HttpUtil.getHeaders()))
       .map(HttpUtil.extractData)
       .catch(HttpUtil.handleError)
   }

@@ -36,7 +36,7 @@ public class ConfigurationService {
       return knoxStatus.getConfigured();
     } catch (FeignException e) {
       logger.error("error while calling configuration service", e);
-      throw new RuntimeException(e);//TODO should we just sned false?
+      throw new RuntimeException(e);//TODO should we just send false?
     }
   }
 

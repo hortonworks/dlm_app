@@ -91,17 +91,20 @@ object Entities {
                            password: Option[String] = None,
                            active: Option[Boolean] = Some(true),
                            groupIds: Seq[Long] = Seq())
+
   case class UserContext(id: Option[Long],
                          username: String,
                          avatar: Option[String],
-                         active: Option[Boolean] = Some(true),
                          roles: Seq[String],
                          services: Seq[String],
                          display: Option[String],
                          token: Option[String],
                          password: Option[String],
+                         active: Option[Boolean] = Some(true),
+                         dbManaged: Option[Boolean] = Some(true),
                          groupManaged: Option[Boolean] = Some(false),
                          updatedAt: Option[Long])
+
   case class UserLdapGroups(userName: String, ldapGroups: Seq[String])
 
   case class GroupInfo(id: Option[Long] = None,

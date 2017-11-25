@@ -61,16 +61,16 @@ export function HttpLoaderFactory(http: Http) {
 
 export function init_app(userService: UserService) {
   return () => new Promise((resolve, reject) => {
-    userService.getUserDetail().subscribe(user => {
-      if (Object.keys(user).length) {
-        AuthUtils.setUser(user);
-      }
-      resolve(true)
-    }, (error) => {
-      console.error(error);
-      resolve(false)
-    })
-  })
+    userService.getUserDetail()
+      .subscribe(user => {
+        if (Object.keys(user).length) {
+          AuthUtils.setUser(user);
+        }
+        resolve(true)
+      }, (error) => {
+        resolve(false)
+      });
+  });
 }
 
 @NgModule({

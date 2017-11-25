@@ -10,14 +10,7 @@
  */
 package com.hortonworks.dataplane.gateway.service;
 
-import com.hortonworks.dataplane.gateway.domain.UserList;
 import feign.RequestLine;
-import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
-import java.util.Map;
 
 
 public interface MetricInterface {

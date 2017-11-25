@@ -14,7 +14,7 @@ package controllers
 import javax.inject.Inject
 
 import com.google.inject.name.Named
-import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, User, UserRoles}
+import com.hortonworks.dataplane.commons.domain.Entities._
 import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 import com.hortonworks.dataplane.db.Webservice.UserService
 import com.hortonworks.dataplane.commons.auth.AuthenticatedAction
@@ -23,8 +23,9 @@ import models.RequestSyntax.ChangeUserPassword
 import models.Formatters._
 import models.JsonFormatters._
 import models.{Credential, JsonResponses, WrappedErrorsException}
+import org.apache.commons.codec.binary.Base64
 import org.mindrot.jbcrypt.BCrypt
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc._
 import play.api.Logger
 import play.api.Configuration
@@ -36,6 +37,8 @@ import scala.util.Try
 class Authentication @Inject()(@Named("userService") val userService: UserService,
                                configuration: Configuration)
     extends Controller {
+
+  val HEADER_FOR_GATEWAY_USER_CTX = "X-DP-User-Info"
 
   def signIn = Action.async(parse.json) { request =>
     request.body
@@ -62,24 +65,20 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
   }
 
   def userDetail = AuthenticatedAction.async { request =>
-    val username = request.user.username
-    for {
-      userOp: Either[Errors, User] <- userService.loadUser(username)
-      rolesOp: Either[Errors, UserRoles] <- userService.getUserRoles(username)
-    } yield {
-      userOp match {
-        case Left(errors) =>{
-          Logger.error(s"user fetch issue while retrieving details for '${username}': {${errors}")
-          Ok(Json.obj("user"->"error"))
-        }
-        case Right(user) =>
-          val orElse = getRoles(rolesOp)
-         Ok(Json.obj( "id" -> user.username,
-           "avatar" -> user.avatar,
-           "display" -> user.displayname)
-         )
+    request.headers
+      .get(HEADER_FOR_GATEWAY_USER_CTX)
+      .map { egt =>
+        val encodedGatewayToken: String = egt
+        val userJsonString: String = new String(Base64.decodeBase64(encodedGatewayToken))
+        Json.parse(userJsonString)
+          .validate[UserContext] match {
+            case JsSuccess(userContext, _) => Future.successful(Ok(Json.toJson(userContext)))
+            case JsError(error) =>
+              Logger.error(s"Error while parsing Gateway token. $error")
+              Future.successful(Unauthorized)
+            }
       }
-    }
+      .getOrElse(Future.successful(Unauthorized))
   }
 
   def changePassword = AuthenticatedAction.async(parse.json) { request =>

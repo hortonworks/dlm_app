@@ -12,17 +12,18 @@
 import {Injectable} from '@angular/core';
 import {CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router} from '@angular/router';
 import {RbacService} from '../../services/rbac.service';
+import {AuthenticationService} from '../../services/authentication.service';
 import {AuthUtils} from './auth-utils';
 
 @Injectable()
 export class NavigationGuard implements CanActivate {
-  constructor(private router: Router, private rbacService: RbacService) {
+  constructor(private router: Router, private rbacService: RbacService, private authenticationService: AuthenticationService) {
   }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     if (!AuthUtils.isUserLoggedIn()) {
-      AuthUtils.clearUser();
-      window.location.href = AuthUtils.signoutURL;
+      this.authenticationService
+        .signOutAndRedirect();
       return false;
     }
     if (!this.rbacService.isAuthorized(state.url)) {

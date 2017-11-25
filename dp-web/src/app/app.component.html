@@ -19,7 +19,7 @@
       <i class="fa fa-times-circle pull-left"></i>
       <div class="text-medium">{{"common.unauthorized" | translate}}</div>
       <div class="text-small-1 inline">{{"common.invalidUser" | translate}}</div>
-      <div class="text-small-1 inline pull-right"><a href="{{signOutUrl}}">{{"common.signout" | translate}}</a></div>
+      <div class="text-small-1 inline pull-right"><a (click)="doSignOut()">{{"common.signout" | translate}}</a></div>
     </div>
     <dp-loader *ngIf="showLoader"></dp-loader>
     <router-outlet></router-outlet>
