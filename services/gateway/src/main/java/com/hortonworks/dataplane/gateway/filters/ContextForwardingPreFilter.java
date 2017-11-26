@@ -26,9 +26,6 @@ public class ContextForwardingPreFilter extends ZuulFilter {
   @Autowired
   private ProxyRequestHelper proxyRequestHelper;
 
-  @Autowired
-  private CookieUtils cookieUtils;
-
   private ObjectMapper objectMapper = new ObjectMapper();
 
   @Override
