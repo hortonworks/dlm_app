@@ -9,6 +9,7 @@
   },
   "/knox": {
     "target": "https://localhost:8443",
-    "secure": false
+    "secure": false,
+    "pathRewrite": {"^/knox" : ""}
   }
 }
