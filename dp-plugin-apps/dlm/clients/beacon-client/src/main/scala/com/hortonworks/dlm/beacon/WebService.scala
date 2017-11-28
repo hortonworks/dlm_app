@@ -100,10 +100,6 @@ object WebService {
                         (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PolicyStatusResponse]]
     def submitAndSchedulePolicy(beaconEndpoint : String, clusterId: Long, policyName : String, policyDefinitionRequest : PolicyDefinitionRequest)
                                (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
-    def submitPolicy(beaconEndpoint : String, clusterId: Long, policyName : String, policyDefinitionRequest : PolicyDefinitionRequest)
-                    (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
-    def schedulePolicy(beaconEndpoint : String, clusterId: Long, policyName : String)
-                      (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
     def suspendPolicy(beaconEndpoint : String, clusterId: Long, policyName : String)
                      (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]]
     def resumePolicy(beaconEndpoint : String, clusterId: Long, policyName : String)

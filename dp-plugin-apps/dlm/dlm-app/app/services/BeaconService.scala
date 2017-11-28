@@ -546,22 +546,11 @@ class BeaconService @Inject()(
     dataplaneService.getBeaconService(clusterId).map {
       case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
       case Right(beaconUrl) => {
-        val policyResponseFuture: Option[() => Future[Either[BeaconApiErrors, PostActionResponse]]] = Map(
-          BeaconService.POLICY_SUBMIT -> { () => beaconPolicyService.submitPolicy(beaconUrl, clusterId, policyName, policySubmitRequest.policyDefinition) },
-          BeaconService.POLICY_SUBMIT_SCHEDULE -> { () => beaconPolicyService.submitAndSchedulePolicy(beaconUrl, clusterId, policyName, policySubmitRequest.policyDefinition) }
-        ).get(policySubmitRequest.submitType)
+        val policyResponseFuture: Future[Either[BeaconApiErrors, PostActionResponse]] = beaconPolicyService.submitAndSchedulePolicy(beaconUrl, clusterId, policyName, policySubmitRequest.policyDefinition)
 
-        policyResponseFuture match {
-          case Some(policyFuture) => {
-            policyFuture().map {
-              case Left(errors) => p.success(Left(errors))
-              case Right(createPolicyResponse) => p.success(Right(createPolicyResponse))
-            }
-          }
-          case None => {
-            val errorMsg: String =  BeaconService.submitTypeError(policySubmitRequest.submitType)
-            p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(BeaconApiError(errorMsg)))))
-          }
+        policyResponseFuture.map {
+          case Left(errors) => p.success(Left(errors))
+          case Right(createPolicyResponse) => p.success(Right(createPolicyResponse))
         }
       }
     }
@@ -583,7 +572,6 @@ class BeaconService @Inject()(
       case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
       case Right(beaconUrl) => {
         val policyActionResponseFuture: Future[Either[BeaconApiErrors, PostActionResponse]] = policyAction match {
-          case SCHEDULE => beaconPolicyService.schedulePolicy(beaconUrl, clusterId, policyName)
           case SUSPEND => beaconPolicyService.suspendPolicy(beaconUrl, clusterId, policyName)
           case RESUME => beaconPolicyService.resumePolicy(beaconUrl, clusterId, policyName)
           case DELETE => beaconPolicyService.deletePolicy(beaconUrl, clusterId, policyName)

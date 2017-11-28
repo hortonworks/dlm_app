@@ -76,7 +76,6 @@ export interface PolicyDefinition {
 
 export interface PolicyPayload {
   policyDefinition: PolicyDefinition;
-  submitType: string;
 }
 
 export interface PolicyForm {

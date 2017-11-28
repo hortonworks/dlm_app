@@ -131,8 +131,7 @@ export class ReviewPolicyComponent implements OnInit, OnDestroy {
       queueName: values.advanced.queue_name
     });
     return {
-      policyDefinition,
-      submitType: values.job.schedule
+      policyDefinition
     };
   }
 

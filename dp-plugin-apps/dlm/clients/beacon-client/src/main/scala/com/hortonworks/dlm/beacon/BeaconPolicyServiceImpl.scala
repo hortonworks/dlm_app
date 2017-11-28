@@ -149,30 +149,6 @@ class BeaconPolicyServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconPo
     }
   }
 
-  override def submitPolicy(beaconEndpoint : String, clusterId: Long, policyName : String, policyDefinitionRequest : PolicyDefinitionRequest)
-                           (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]] = {
-    val requestData:String =  mapToPolicyDefinitionRequest(policyDefinitionRequest)
-    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/submit/$policyName", clusterId, BEACON).withHeaders(token)
-      .withAuth(user, password, WSAuthScheme.BASIC)
-      .withHeaders(httpHeaders.toList: _*)
-      .post(requestData)
-      .map(mapToPostActionResponse).recoverWith {
-        case jsonException: JsonException => Future.successful(Left(BeaconApiErrors(BAD_GATEWAY, Some(beaconEndpoint), Some(BeaconApiError(jsonException.getMessage)))))
-        case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
-    }
-  }
-
-  override def schedulePolicy(beaconEndpoint : String, clusterId: Long, policyName : String)
-                             (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]] = {
-    ws.url(s"${urlPrefix(beaconEndpoint)}/policy/schedule/$policyName", clusterId, BEACON).withHeaders(token)
-      .withAuth(user, password, WSAuthScheme.BASIC)
-      .withHeaders(httpHeaders.toList: _*)
-      .post(Results.EmptyContent())
-      .map(mapToPostActionResponse).recoverWith {
-        case e: Exception => Future.successful(Left(BeaconApiErrors(SERVICE_UNAVAILABLE, Some(beaconEndpoint), Some(BeaconApiError(e.getMessage)))))
-    }
-  }
-
   override def suspendPolicy(beaconEndpoint : String, clusterId: Long, policyName : String)
                             (implicit token:Option[HJwtToken]): Future[Either[BeaconApiErrors, PostActionResponse]] = {
     ws.url(s"${urlPrefix(beaconEndpoint)}/policy/suspend/$policyName", clusterId, BEACON).withHeaders(token)

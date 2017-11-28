@@ -12,9 +12,6 @@ export const HIVE = 'HIVE';
 export const HBASE = 'HBASE';
 export const HDFS_SNAPSHOT = 'FS_SNAPSHOT';
 
-export const SCHEDULE = 'SUBMIT_AND_SCHEDULE';
-export const SUBMIT = 'SUBMIT';
-
 export const EVERY = 'EVERY';
 export const NEVER = 'NEVER';
 
@@ -44,11 +41,6 @@ export const POLICY_EXECUTION_TYPES = {
   HDFS,
   HDFS_SNAPSHOT,
   HIVE
-};
-
-export const POLICY_SUBMIT_TYPES = {
-  SCHEDULE,
-  SUBMIT
 };
 
 export const POLICY_DAYS = {

@@ -23,7 +23,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { RadioItem } from 'common/radio-button/radio-button';
 import { State } from 'reducers/index';
 import { Pairing } from 'models/pairing.model';
-import { POLICY_TYPES, POLICY_SUBMIT_TYPES, POLICY_REPEAT_MODES, POLICY_TIME_UNITS,
+import { POLICY_TYPES, POLICY_REPEAT_MODES, POLICY_TIME_UNITS,
   POLICY_DAYS, POLICY_START} from 'constants/policy.constant';
 import { getFormValues } from 'selectors/form.selector';
 import { markAllTouched } from 'utils/form-util';
@@ -109,7 +109,6 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   policyRepeatModes = POLICY_REPEAT_MODES;
   policyTimeUnits = POLICY_TIME_UNITS;
   policyDays = POLICY_DAYS;
-  policySubmitTypes = POLICY_SUBMIT_TYPES;
   policyStart = POLICY_START;
   policyForm: FormGroup;
   selectedSource$ = new BehaviorSubject(0);
@@ -323,7 +322,6 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
         day: this.policyDays.MONDAY,
         frequencyInSec: 0,
         unit: this.policyTimeUnits.DAYS,
-        schedule: this.policySubmitTypes.SCHEDULE,
         endTime: this.formBuilder.group({
           date: [''],
           time: [this.defaultEndTime]

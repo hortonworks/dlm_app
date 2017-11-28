@@ -30,7 +30,7 @@ export class HttpService extends Http {
       if (response.status === 401) {
         const challengeAt = response.headers.get(UserService.HEADER_CHALLENGE_HREF);
         const redirectTo = `${window.location.protocol}//${window.location.host}/${challengeAt}`;
-        if(window.location.href.startsWith(redirectTo) === false) {
+        if (window.location.href.startsWith(redirectTo) === false) {
           window.location.href = `${redirectTo}?originalUrl=${window.location.href}`;
         }
       } else if (response.status === 403) {

@@ -22,7 +22,6 @@ POST    /api/unpair                                           controllers.Pairs.
 GET     /api/policies                                         controllers.Policies.list
 GET     /api/clusters/:clusterId/policy/:name                 controllers.Policies.retrieve(clusterId : Long, name : String)
 POST    /api/clusters/:clusterId/policy/:name/submit          controllers.Policies.submit(clusterId: Long, name: String)
-PUT     /api/clusters/:clusterId/policy/:name/schedule        controllers.Policies.schedule(clusterId: Long, name: String)
 PUT     /api/clusters/:clusterId/policy/:name/suspend         controllers.Policies.suspend(clusterId: Long, name: String)
 PUT     /api/clusters/:clusterId/policy/:name/resume          controllers.Policies.resume(clusterId: Long, name: String)
 DELETE  /api/clusters/:clusterId/policy/:name                 controllers.Policies.delete(clusterId: Long, name: String)

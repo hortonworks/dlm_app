@@ -55,8 +55,7 @@ describe('PolicyService', () => {
   describe('#createPolicy', () => {
     beforeEach(() => {
       this.policy = <PolicyPayload>{
-        policyDefinition: {},
-        submitType: 'SUBMIT'
+        policyDefinition: {}
       };
       this.policyService.createPolicy({policy: this.policy, sourceClusterId: 'clusterId'});
     });

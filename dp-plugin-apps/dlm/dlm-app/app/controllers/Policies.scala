@@ -13,7 +13,7 @@ import com.google.inject.Inject
 
 import models.JsonResponses
 import models.Entities.PolicySubmitRequest
-import models.{SCHEDULE,SUSPEND,RESUME,DELETE}
+import models.{SUSPEND,RESUME,DELETE}
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
@@ -78,21 +78,6 @@ class Policies @Inject() (
         case Right(postSuccessResponse) => Ok(Json.toJson(postSuccessResponse))
       }
     }.getOrElse(Future.successful(BadRequest))
-  }
-
-  /**
-    * Schedule policy
-    * @param clusterId    cluster id of the target cluster
-    * @param policyName   name of the policy to be scheduled
-    * @return
-    */
-  def schedule(clusterId: Long, policyName: String) = AuthenticatedAction.async { request =>
-    Logger.info("Received schedule policy request")
-    implicit val token = request.token
-    beaconService.updatePolicy(clusterId, policyName, SCHEDULE).map {
-      case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-      case Right(postSuccessResponse) => Ok(Json.toJson(postSuccessResponse))
-    }
   }
 
   /**
