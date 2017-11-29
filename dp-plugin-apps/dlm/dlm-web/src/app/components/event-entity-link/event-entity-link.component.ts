@@ -26,7 +26,7 @@ export class EventEntityLinkComponent implements OnInit {
   @Input() event: Event;
 
   get isActive(): boolean {
-    return !(this.event.eventType === POLICY_EVENT && this.event.event === EVENT_RESULT_TYPE.DELETED);
+    return !(this.event.eventType === POLICY_EVENT && this.event.event === EVENT_RESULT_TYPE.DELETED) && this.event.policyExists;
   }
 
   get policyName(): string {

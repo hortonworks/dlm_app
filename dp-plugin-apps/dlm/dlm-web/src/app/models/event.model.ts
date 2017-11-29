@@ -20,4 +20,5 @@ export interface Event extends EventUI {
   timestamp: string;
   message: string;
   severity: string;
+  policyExists?: boolean;
 }

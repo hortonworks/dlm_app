@@ -18,7 +18,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { State } from 'reducers/index';
 import { Event } from 'models/event.model';
 import { MenuItem } from './common/navbar/menu-item';
-import { getAllEvents, getNewEventsCount } from 'selectors/event.selector';
+import { getAllEventsWithPoliciesFlag, getNewEventsCount } from 'selectors/event.selector';
 import { getMergedProgress, getProgressState } from 'selectors/progress.selector';
 import { initApp } from 'actions/app.action';
 import { loadClusters, loadClustersStatuses } from 'actions/cluster.action';
@@ -114,7 +114,7 @@ export class DlmComponent implements OnDestroy, OnInit {
         'go-to-policies'
       )
     ];
-    this.events$ = store.select(getAllEvents)
+    this.events$ = store.select(getAllEventsWithPoliciesFlag)
       .do((events: Event[]) => {
         if (events.length) {
           this.lastEventTimeStamp = events[0].timestamp;
