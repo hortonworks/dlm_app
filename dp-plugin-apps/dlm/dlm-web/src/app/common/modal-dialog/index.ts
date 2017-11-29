@@ -10,3 +10,4 @@
 export * from './modal-dialog-body.component';
 export * from './modal-dialog.component';
 export * from './modal-dialog.size';
+export * from './modal-dialog-header-block.component';

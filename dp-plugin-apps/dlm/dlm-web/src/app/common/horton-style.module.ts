@@ -10,7 +10,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModalModule } from 'ng2-bootstrap';
-import { ModalDialogBodyComponent, ModalDialogComponent } from './modal-dialog/';
+import { ModalDialogBodyComponent, ModalDialogComponent, ModalDialogHeaderBlockComponent } from './modal-dialog/';
 import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
@@ -21,11 +21,13 @@ import { TranslateModule } from '@ngx-translate/core';
   ],
   declarations: [
     ModalDialogComponent,
-    ModalDialogBodyComponent
+    ModalDialogBodyComponent,
+    ModalDialogHeaderBlockComponent
   ],
   exports: [
     ModalDialogComponent,
-    ModalDialogBodyComponent
+    ModalDialogBodyComponent,
+    ModalDialogHeaderBlockComponent
   ]
 })
 export class HortonStyleModule {}

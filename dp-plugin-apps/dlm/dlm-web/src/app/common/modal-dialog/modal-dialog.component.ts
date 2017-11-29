@@ -23,15 +23,18 @@ import { ModalSize, SIZE_CLASS_MAP } from './modal-dialog.size';
         <div class="modal-content">
           <div class="modal-header">
             <h4 class="modal-title pull-left">{{ title | translate }}</h4>
-            <button type="button" class="close pull-right" data-dismiss="modal" (click)="hide()">
-              <span aria-hidden="true">&times;</span>
-            </button>
+            <div class="pull-right">
+              <ng-content select="dlm-modal-dialog-header-block"></ng-content>
+              <button type="button" class="close pull-right" data-dismiss="modal" (click)="hide()">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
           </div>
           <div class="modal-body">
             {{ body | translate}}
             <ng-content select="dlm-modal-dialog-body"></ng-content>
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer" *ngIf="showFooter">
             <button *ngIf="showCancel" class="btn btn-default" (click)="onClickCancel()" qe-attr="modal-cancel">
               {{ cancelText | translate }}
             </button>
@@ -69,6 +72,7 @@ export class ModalDialogComponent implements OnInit, OnChanges {
   @Input() showDelete = false;
   @Input() showDialog = false;
   @Input() modalSize = this.size.SMALL;
+  @Input() showFooter = true;
   @Output() onOk = new EventEmitter<boolean>();
   @Output() onDelete = new EventEmitter<boolean>();
   @Output() onIgnore = new EventEmitter<boolean>();

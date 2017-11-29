@@ -11,6 +11,9 @@ import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { Subject } from 'rxjs/Subject';
+import * as moment from 'moment';
+import { saveAs } from 'file-saver';
+
 import { EntityType, LOG_EVENT_TYPE_MAP } from 'constants/log.constant';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Log } from 'models/log.model';
@@ -19,7 +22,6 @@ import { Store } from '@ngrx/store';
 import { State } from 'reducers/index';
 import { loadLogs } from 'actions/log.action';
 import { Cluster } from 'models/cluster.model';
-import * as moment from 'moment';
 import { getAllClusters } from 'selectors/cluster.selector';
 import { parsePolicyId } from 'utils/policy-util';
 import { NotificationService } from 'services/notification.service';
@@ -39,13 +41,22 @@ export interface LogMetaInfo {
 
 @Injectable()
 export class LogService {
-
-  logEventTypeMap = LOG_EVENT_TYPE_MAP;
   private emitter: Subject<string> = new Subject<string>();
   private logMessage$: Observable<string>;
+
+  logEventTypeMap = LOG_EVENT_TYPE_MAP;
   clusters$: Observable<Cluster[]>;
   clusters: Cluster[];
   logMetaInfo$: BehaviorSubject<LogMetaInfo> = new BehaviorSubject(<LogMetaInfo>{});
+
+  private generateFileName(log: LogMetaInfo): string {
+    const parsed = parsePolicyId(this.logMetaInfo$.getValue().entityId);
+    if (parsed) {
+      return `${parsed.policyName}${parsed.jobId ? '_' + parsed.jobId : ''}_${parsed.timeStamp}.txt`;
+    }
+    return `log_${log.clusterId}_${log.timestamp || Date.now()}.txt`;
+  }
+
   constructor(
     private http: Http,
     private store: Store<State>,
@@ -105,5 +116,10 @@ export class LogService {
       title: this.t.instant('common.action_notifications.view_log.error.title'),
       body: this.t.instant('common.action_notifications.view_log.error.body')
     } as ToastNotification);
+  }
+
+  downloadLog(log: LogMetaInfo, message: string): void {
+    const blob = new Blob([message], { type: 'text/plain;charset=utf-8' });
+    saveAs(blob, this.generateFileName(log));
   }
 }

@@ -30,6 +30,7 @@ import { reducer } from './reducers';
 import { RouterModule } from '@angular/router';
 
 import { MyDatePickerModule } from 'mydatepicker';
+import { ClipboardModule } from 'ngx-clipboard';
 
 import { AppConfig, appConfigFactory } from './app.config';
 import { EffectsModule } from '@ngrx/effects';
@@ -177,6 +178,7 @@ import { BytesSizePipe } from 'pipes/bytes-size.pipe';
     ReactiveFormsModule,
     SelectModule,
     MyDatePickerModule,
+    ClipboardModule,
 
     RouterModule.forRoot(routes),
     CommonComponentsModule,

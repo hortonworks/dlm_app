@@ -50,4 +50,3 @@ export const parsePolicyId = (policyId: string): ParsedPolicyId => {
     dataCenter
   };
 };
-

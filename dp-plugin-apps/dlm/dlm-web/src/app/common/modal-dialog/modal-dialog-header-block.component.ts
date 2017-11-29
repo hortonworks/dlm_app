@@ -1,4 +1,4 @@
-/*!
+/*
  * Copyright  (c) 2016-2017, Hortonworks Inc.  All rights reserved.
  *
  * Except as expressly permitted in a written agreement between you or your company
@@ -7,13 +7,15 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-.log-message {
-  font-size: 11px;
-  max-height: 400px;
-}
+import { Component, OnInit } from '@angular/core';
 
-dlm-modal-dialog-header-block {
-  position: relative;
-  top: -8px;
-  margin-right: 10px;
+@Component({
+  selector: 'dlm-modal-dialog-header-block',
+  template: '<ng-content></ng-content>'
+})
+
+export class ModalDialogHeaderBlockComponent implements OnInit {
+  constructor() { }
+
+  ngOnInit() { }
 }

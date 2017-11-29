@@ -27,13 +27,14 @@ import { NavbarService } from 'services/navbar.service';
 import { PipesModule } from 'pipes/pipes.module';
 import { CommonComponentsModule } from 'components/common-components.module';
 import { HortonStyleModule } from 'common/horton-style.module';
-import { ModalModule } from 'ng2-bootstrap';
+import { ModalModule, TooltipModule } from 'ng2-bootstrap';
 import { LogModalDialogComponent } from 'components/log-modal-dialog/log-modal-dialog.component';
 import { LogService } from 'services/log.service';
 import {MockBackend} from '@angular/http/testing';
 import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions} from '@angular/http';
 import {HttpService} from 'services/http.service';
 import { NotificationService } from 'services/notification.service';
+import { ClipboardModule } from 'ngx-clipboard';
 
 describe('NotificationsPageComponent', () => {
   let component: NotificationsPageComponent;
@@ -52,7 +53,9 @@ describe('NotificationsPageComponent', () => {
         FormsModule,
         CommonComponentsModule,
         PipesModule,
-        HortonStyleModule
+        HortonStyleModule,
+        TooltipModule.forRoot(),
+        ClipboardModule
       ],
       declarations: [
         NotificationsPageComponent,
