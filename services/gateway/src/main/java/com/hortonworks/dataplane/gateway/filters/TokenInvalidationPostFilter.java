@@ -56,15 +56,13 @@ public class TokenInvalidationPostFilter extends ZuulFilter {
     RequestContext context = RequestContext.getCurrentContext();
     String serviceId = context.get(SERVICE_ID_KEY).toString();
     // Check if it is a change password call
-    boolean isInvalidationRequired =
-      context.getOriginResponseHeaders()
-        .stream()
-        .filter(header -> header.first().equalsIgnoreCase(DP_INVALIDATION_HEADER_KEY))
-        .findAny()
-        .orElse(new Pair<String, String>(DP_INVALIDATION_HEADER_KEY, "false"))
-        .second()
-        .equalsIgnoreCase(Boolean.TRUE.toString());
-    return isInvalidationRequired;
+    return context.getOriginResponseHeaders()
+      .stream()
+      .filter(header -> header.first().equalsIgnoreCase(DP_INVALIDATION_HEADER_KEY))
+      .findAny()
+      .orElse(new Pair<>(DP_INVALIDATION_HEADER_KEY, "false"))
+      .second()
+      .equalsIgnoreCase(Boolean.TRUE.toString());
   }
 
   @Override

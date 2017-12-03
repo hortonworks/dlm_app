@@ -13,6 +13,7 @@ package com.hortonworks.dataplane.gateway.domain;
 public interface Constants {
   String DPAPP = "core";
   String DLMAPP = "dlm";
+  String CLOUDBREAK = "cb";
 
   String DP_USER_INFO_HEADER_KEY = "X-DP-User-Info";
   String DP_TOKEN_INFO_HEADER_KEY = "X-DP-Token-Info";
@@ -25,7 +26,7 @@ public interface Constants {
 
   String DP_JWT_COOKIE = "dp_jwt";
 
-  String DPAPP_BASE_PATH="/api/core";
+  String DPAPP_BASE_PATH="/service/core";
   String KNOX_CONFIG_PATH = DPAPP_BASE_PATH + "/api/knox/configuration";
   String PERMS_POLICY_ENTRY_POINT = DPAPP_BASE_PATH + "/access/policies";
 
