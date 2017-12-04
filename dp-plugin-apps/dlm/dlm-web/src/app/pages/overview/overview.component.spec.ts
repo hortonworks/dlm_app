@@ -14,7 +14,7 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { TooltipModule, ModalModule, ProgressbarModule } from 'ng2-bootstrap';
+import { TypeaheadModule, TooltipModule, ModalModule, ProgressbarModule } from 'ng2-bootstrap';
 import { RouterTestingModule } from '@angular/router/testing';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as moment from 'moment';
@@ -49,6 +49,7 @@ import {HttpService} from 'services/http.service';
 import { OverviewModule } from './overview.module';
 import { HortonStyleModule } from 'common/horton-style.module';
 import { NotificationService } from 'services/notification.service';
+import { TableFilterComponent } from 'common/table/table-filter/table-filter.component';
 
 const jobs = [
   <Job>{status: JOB_STATUS.SUCCESS},
@@ -92,6 +93,7 @@ describe('OverviewComponent', () => {
         RouterTestingModule,
         ModalModule.forRoot(),
         ProgressbarModule.forRoot(),
+        TypeaheadModule.forRoot(),
         TooltipModule,
         TranslateModule.forRoot({
           loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
@@ -115,6 +117,7 @@ describe('OverviewComponent', () => {
         TableComponent,
         JobTransferredGraphComponent,
         TableFooterComponent,
+        TableFilterComponent,
         CheckboxColumnComponent,
         ActionColumnComponent,
         CheckboxComponent,

@@ -33,6 +33,8 @@ export class PolicyDetailsComponent {
   } as TableFooterOptions;
 
   @Output() onSortJobs = new EventEmitter<any>();
+  @Output() onFilterJobs = new EventEmitter<any>();
+  @Output() onInput = new EventEmitter<any>();
   @Output() onPageChangeJobs = new EventEmitter<any>();
   @Output() onSelectActionJobs = new EventEmitter<any>();
   @Output() abortJobAction = new EventEmitter<any>();
@@ -66,7 +68,11 @@ export class PolicyDetailsComponent {
 
   @Input() jobsSort = [];
 
+  @Input() jobsFilters = [];
+
   @Input() jobsPage = 0;
+
+  @Input() jobsInput = '';
 
   @Input() jobsActiveActions = {};
 
@@ -96,6 +102,14 @@ export class PolicyDetailsComponent {
 
   handleOnSort(sorts) {
     this.onSortJobs.emit(sorts);
+  }
+
+  handleOnFilter(filters) {
+    this.onFilterJobs.emit(filters);
+  }
+
+  handleOnInput(input) {
+    this.onInput.emit(input);
   }
 
   handleOnPageChange(page) {

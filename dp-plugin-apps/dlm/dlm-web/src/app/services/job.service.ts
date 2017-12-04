@@ -72,10 +72,18 @@ export class JobService {
     });
   }
 
-  getJobsForPolicyServerPaginated(policy: Policy, offset, sortBy = [], pageSize = 10): Observable<any> {
+  getJobsForPolicyServerPaginated(policy: Policy, offset, sortBy = [], pageSize = 10, filters: any = []): Observable<any> {
     const orderBy = sortBy[0] ? sortBy[0].prop : 'startTime';
     const sortOrder = sortBy[0] ? sortBy[0].dir.toUpperCase() : 'DESC';
-    const qp = `numResults=${pageSize}&offset=${offset * pageSize}&orderBy=${orderBy}&sortOrder=${sortOrder}`;
+    const filterBy = filters.filter(f => !Array.isArray(f.value) && f.value || Array.isArray(f.value) && f.value.length).map(f => {
+      const prop = f.propertyName;
+      const value = Array.isArray(f.value) ? f.value.join('|') : f.value;
+      return `${prop}:${value}`;
+    }).join(',');
+    let qp = `numResults=${pageSize}&offset=${offset * pageSize}&orderBy=${orderBy}&sortOrder=${sortOrder}`;
+    if (filterBy) {
+      qp += `&filterBy=${filterBy}`;
+    }
     const url = `${this.getUrlForJobs(policy)}?${qp}`;
     return this.doJobsRequest(url);
   }

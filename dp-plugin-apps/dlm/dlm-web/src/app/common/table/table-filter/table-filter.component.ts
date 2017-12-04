@@ -14,9 +14,9 @@ import { AppliedFilterMapped, TableFilterItem } from './table-filter-item.type';
 import { TypeaheadOption } from './typeahead-option.type';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
-import { toKeyValueArray } from 'utils/object-utils';
 import { capitalize } from 'utils/string-utils';
-import { multiLevelResolve } from 'utils/object-utils';
+import { toKeyValueArray, multiLevelResolve } from 'utils/object-utils';
+import { TypeaheadDirective } from 'ng2-bootstrap';
 
 @Component({
   selector: 'dlm-table-filter',
@@ -24,6 +24,16 @@ import { multiLevelResolve } from 'utils/object-utils';
   styleUrls: ['./table-filter.component.scss']
 })
 export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
+
+  /**
+   * @type {string}
+   */
+  @Input() initialInputValue = '';
+
+  /**
+   * @type {boolean}
+   */
+  @Input() restoreState = false;
 
   /**
    * Data shown in the table
@@ -38,6 +48,12 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
   @Input() filterBy: TableFilterItem[];
 
   /**
+   * Determines if `applyInitialFilters` should be called on `initialFilters` updates
+   * @type {boolean}
+   */
+  @Input() ignoreInitialFiltersUpdate = false;
+
+  /**
    * List of filters to applied by default while initializing
    */
   @Input() initialFilters: {propertyName: string, value: string []} [] = [];
@@ -48,6 +64,12 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
    * @type {EventEmitter}
    */
   @Output() onFilter: EventEmitter<any> = new EventEmitter();
+
+  /**
+   * Fires when user types something in the input-field
+   * @type {EventEmitter}
+   */
+  @Output() onInput: EventEmitter<any> = new EventEmitter();
 
   /**
    * value bound to the input-element
@@ -79,6 +101,9 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
 
   @ViewChild('no_results_container') noResultsContainer: ElementRef;
 
+  @ViewChild(TypeaheadDirective) typeaheadInput: TypeaheadDirective;
+  @ViewChild('typeaheadInput') typeaheadInputDom: ElementRef;
+
   @HostListener('document:click', ['$event'])
   outsideClickHandler(e) {
     if (this.typeaheadNoResults === true && !this.noResultsContainer.nativeElement.contains(e.target)) {
@@ -94,6 +119,11 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit() {
     this.applyInitialFilters();
+    if (this.restoreState && this.initialInputValue) {
+      this.filter = this.initialInputValue;
+      $(this.typeaheadInputDom.nativeElement).focus();
+      this.typeaheadInput.onChange({target: {value: this.initialInputValue}});
+    }
   }
 
   applyInitialFilters() {
@@ -113,7 +143,7 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnChanges(changes) {
     this.typeaheadOptions = this.prepareTypeaheadOptions();
-    if (changes['initialFilters']) {
+    if (changes['initialFilters'] && !this.ignoreInitialFiltersUpdate) {
       this.applyInitialFilters();
     }
   }
@@ -172,6 +202,7 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
     this.onFilter.emit(appliedFilters);
     // left input empty
     this.filter = '';
+    this.onInput.emit('');
   }
 
   /**
@@ -199,5 +230,9 @@ export class TableFilterComponent implements OnInit, OnChanges, OnDestroy {
 
   handleTypeaheadNoResults(e: boolean): void {
     this.typeaheadNoResults = e;
+  }
+
+  onKey(): void {
+    this.onInput.emit(this.filter);
   }
 }

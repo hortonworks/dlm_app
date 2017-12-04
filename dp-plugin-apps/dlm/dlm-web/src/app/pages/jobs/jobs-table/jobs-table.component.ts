@@ -21,6 +21,7 @@ import { EntityType } from 'constants/log.constant';
 import { contains } from 'utils/array-util';
 import { transferredBytesComparator } from 'utils/table-util';
 import { TableFooterOptions } from 'common/table/table-footer/table-footer.type';
+import { TableFilterItem } from 'common/table/table-filter/table-filter-item.type';
 
 @Component({
   selector: 'dp-jobs-table',
@@ -46,15 +47,19 @@ export class JobsTableComponent implements OnInit {
   @Input() jobs: Job[];
   @Input() jobsOverallCount: number;
   @Input() jobsOffset: number;
+  @Input() jobsInput = '';
   @Input() loadingJobs;
   @Input() policy: Policy;
   @Input() selectionType = 'any';
   @Input() sorts = [];
   @Input() page = 0;
+  @Input() filters = [];
   @Input() visibleActionMap = {};
   @Input() footerOptions: TableFooterOptions;
 
   @Output() onSort = new EventEmitter<any>();
+  @Output() onFilter = new EventEmitter<any>();
+  @Output() onInput = new EventEmitter<any>();
   @Output() onPageChange = new EventEmitter<any>();
   @Output() onSelectAction = new EventEmitter<any>();
   @Output() abortJobAction = new EventEmitter<any>();
@@ -64,6 +69,10 @@ export class JobsTableComponent implements OnInit {
     {label: 'Abort', name: 'ABORT', enabledFor: JOB_STATUS.RUNNING, qeAttr: 'abort-job'},
     {label: 'Re-run', name: 'RERUN', disableFn: this.isRerunDisabled.bind(this), qeAttr: 'rerun-job'},
     {label: 'View Log', name: 'LOG', qeAttr: 'job-log'}
+  ];
+
+  filterBy: TableFilterItem[] = [
+    {multiple: true, propertyName: 'status', values: Object.keys(JOB_STATUS).map(k => JOB_STATUS[k])}
   ];
 
   constructor(protected store: Store<fromRoot.State>,
@@ -166,6 +175,14 @@ export class JobsTableComponent implements OnInit {
 
   handleOnSort(sorts) {
     this.onSort.emit(sorts);
+  }
+
+  handleOnFilter(filters) {
+    this.onFilter.emit(filters);
+  }
+
+  handleOnInput(filter) {
+    this.onInput.emit(filter);
   }
 
   handlePageChange(page) {

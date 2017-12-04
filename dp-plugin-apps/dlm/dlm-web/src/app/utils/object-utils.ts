@@ -9,6 +9,7 @@
 
 import * as _isEqual from 'lodash.isequal';
 import * as _merge from 'lodash.merge';
+import * as _cloneDeep from 'lodash.clonedeep';
 
 export const toKeyValueArray = (obj: string) => {
   let result = [];
@@ -37,6 +38,8 @@ export const omitEmpty = (obj) => Object.keys(obj).reduce((result, key) => {
 export const isEmpty = (obj) => Object.keys(obj).length === 0;
 
 export const isEqual = _isEqual;
+
+export const cloneDeep = _cloneDeep;
 
 /**
 * Resolve and return value of an object for multi-level dynamic key

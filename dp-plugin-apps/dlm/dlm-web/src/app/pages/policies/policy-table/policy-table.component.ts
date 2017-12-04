@@ -60,7 +60,7 @@ import {
 import { POLICY_STATUS, POLICY_UI_STATUS } from 'constants/status.constant';
 import { suspendDisabled, activateDisabled } from 'utils/policy-util';
 import { HiveBrowserTablesLoadingMap } from 'components/hive-browser';
-import { merge } from 'utils/object-utils';
+import { isEqual, merge, cloneDeep } from 'utils/object-utils';
 import { removeProgressState } from 'actions/progress.action';
 
 const DATABASE_REQUEST = '[Policy Table] DATABASE_REQUEST';
@@ -85,7 +85,13 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
   private selectedAction: ActionItemType;
   private selectedForActionRow: Policy;
   private selectedJobsSort = {};
+  private selectedJobsSort$: BehaviorSubject<any> = new BehaviorSubject({});
   private selectedJobsPage = {};
+  private selectedJobsPage$: BehaviorSubject<any> = new BehaviorSubject(0);
+  private selectedJobsFilters = {};
+  private selectedJobsFilters$: BehaviorSubject<any> = new BehaviorSubject([]);
+  private selectedJobsInput = {};
+  private selectedJobsInput$: BehaviorSubject<any> = new BehaviorSubject('');
   private selectedJobsActions = {};
   private subscriptions: Subscription[] = [];
   private visibleActionMap = {};
@@ -148,7 +154,12 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
         this.activeContentType === PolicyContent.Jobs && policy && policy.id && this.tableComponent.expandedRows[policy.id]
       ))
       .do(([_, policy]) => {
-        this.store.dispatch(loadJobsPageForPolicy(policy, this.selectedJobsPage[policy.id] || 0, this.selectedJobsSort[policy.id] || []));
+        this.store.dispatch(loadJobsPageForPolicy(
+          policy,
+          this.selectedJobsPage[policy.id] || 0,
+          this.selectedJobsSort[policy.id] || [],
+          10,
+          this.selectedJobsFilters[policy.id] || []));
       });
     this.subscriptions.push(polling$.subscribe());
   }
@@ -287,10 +298,23 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     }
     this.initPolling();
     this.setupDatabase();
+    this.initJobsLoading();
   }
 
   clusterResourceComparator(cluster1: Cluster, cluster2: Cluster) {
     return cluster1.name.toLowerCase() > cluster2.name.toLowerCase() ? 1 : -1;
+  }
+
+  initJobsLoading() {
+    this.subscriptions.push(
+      Observable.combineLatest(this.selectedJobsFilters$, this.selectedJobsPage$, this.selectedJobsSort$, this.selectedPolicy$)
+      .distinctUntilChanged(isEqual)
+      .subscribe(([filters, page, sorts, policy]) => {
+        if (policy.id) {
+          this.loadingJobs = true;
+          this.store.dispatch(loadJobsPageForPolicy(policy, page, sorts, 10, filters));
+        }
+      }));
   }
 
   openJobsForPolicy() {
@@ -443,26 +467,33 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadPageForPolicy(rowId) {
-    const policy = this.selectedPolicy$.getValue();
-    if (policy) {
-      this.loadingJobs = true;
-      this.store.dispatch(loadJobsPageForPolicy(policy, this.selectedJobsPage[rowId], this.selectedJobsSort[rowId]));
-    }
-  }
-
   handleOnSortJobs(sort, rowId) {
     this.selectedJobsSort[rowId] = sort.sorts;
-    this.loadPageForPolicy(rowId);
+    this.selectedJobsSort$.next(sort.sorts);
+  }
+
+  handleOnFilterJobs(filters, rowId) {
+    const f = Object.keys(filters).map(propertyName => ({propertyName, value: filters[propertyName].slice()}));
+    this.selectedJobsFilters[rowId] = cloneDeep(f);
+    this.selectedJobsFilters$.next(cloneDeep(f));
+  }
+
+  handleOnInput(filter, rowId) {
+    this.selectedJobsInput[rowId] = filter;
+    this.selectedJobsInput$.next(filter);
   }
 
   getJobsSortForRow(rowId) {
     return rowId && rowId in this.selectedJobsSort ? this.selectedJobsSort[rowId] : [];
   }
 
+  getJobsFiltersForRow(rowId) {
+    return rowId && rowId in this.selectedJobsFilters ? this.selectedJobsFilters[rowId] : [];
+  }
+
   handleJobsPageChange(page, rowId) {
     this.selectedJobsPage[rowId] = page.offset;
-    this.loadPageForPolicy(rowId);
+    this.selectedJobsPage$.next(page.offset);
   }
 
   getJobsPageForRow(rowId) {
@@ -494,6 +525,10 @@ export class PolicyTableComponent implements OnInit, OnDestroy {
 
   getFilesPageForRow(rowId) {
     return rowId && rowId in this.selectedFileBrowserPage ? this.selectedFileBrowserPage[rowId] : 0;
+  }
+
+  getJobsInputForRow(rowId) {
+    return rowId && rowId in this.selectedJobsInput ? this.selectedJobsInput[rowId] : '';
   }
 
   handleFilesPageChange(page, rowId) {
