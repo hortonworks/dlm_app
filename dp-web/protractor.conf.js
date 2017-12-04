@@ -31,11 +31,10 @@ exports.config = {
     './e2e/infra/clusters/cluster-add.e2e-spec.ts',
     './e2e/infra/services/service-enablement.e2e-spec.ts',
     './e2e/infra/services/service-verification.e2e-spec.ts',
-    './e2e/infra/clusters/lake-list.e2e-spec.ts'
+    './e2e/infra/clusters/lake-list.e2e-spec.ts',
     './e2e/dss/dashboard-spec.ts',
     './e2e/dss/createCollection-spec.ts',
-    './e2e/dss/dashboard-with-collections-spec.ts'
-
+    './e2e/dss/dashboard-with-collections-spec.ts',
   ],
   multiCapabilities: [{
   //   'browserName': 'firefox',
@@ -74,7 +73,7 @@ exports.config = {
       project: 'e2e'
     });
   },
-  
+
   onPrepare: function () {
     jasmine.getEnv().addReporter(new SpecReporter({ displayStacktrace: 'specs' }));
 
