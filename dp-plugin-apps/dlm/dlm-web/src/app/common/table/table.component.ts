@@ -99,6 +99,7 @@ export class TableComponent implements OnChanges, AfterViewChecked, OnDestroy, A
   @Input() scrollbarH = false;
   @Input() reorderable = true;
   @Input() count = 0;
+  @Input() showExtraNav = false;
 
   /**
    * Rows count before any filter is applied

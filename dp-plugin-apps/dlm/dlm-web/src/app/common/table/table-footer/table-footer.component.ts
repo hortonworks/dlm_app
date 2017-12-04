@@ -28,6 +28,7 @@ export class TableFooterComponent {
   @Input() curPage: number;
   @Input() offset: number;
   @Input() limits: number[] = [10, 25, 50];
+  @Input() showExtraNav = false;
   @Input() options: TableFooterOptions;
   @Output() changePageSize: EventEmitter<any> = new EventEmitter();
   @Output() changePage: EventEmitter<any> = new EventEmitter();
@@ -63,17 +64,46 @@ export class TableFooterComponent {
   constructor(private translate: TranslateService) {
   }
 
+  get pageButtons(): number[] {
+    if (!this.showExtraNav) {
+      return [];
+    }
+    const current = this.curPage;
+    const all = this.pagesCount;
+    const numbers = [];
+    for (let i = Math.max(1, current - 5); i < current; i++) {
+      numbers.push(i);
+    }
+    numbers.push(current);
+    for (let i = current + 1; i < Math.min(current + 5, all); i++) {
+      numbers.push(i);
+    }
+    return numbers;
+  }
+
   handleChangeLimit({value}) {
     this.changePageSize.emit(value);
-    this.changePage.emit(1);
+    this.goToPage(1);
   }
 
   handleGoToNext() {
-    this.changePage.emit(this.curPage + 1);
+    this.goToPage(this.curPage + 1);
   }
 
   handleGoToPrev() {
-    this.changePage.emit(this.curPage - 1);
+    this.goToPage(this.curPage - 1);
+  }
+
+  handleGoToFirst() {
+    this.goToPage(1);
+  }
+
+  handleGoToLast() {
+    this.goToPage(this.pagesCount);
+  }
+
+  goToPage(pageNumber) {
+    this.changePage.emit(pageNumber);
   }
 
 }
