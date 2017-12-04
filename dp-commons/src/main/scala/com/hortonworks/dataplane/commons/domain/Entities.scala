@@ -33,14 +33,15 @@ object Entities {
 
   object ErrorType extends Enumeration {
     type ErrorType = Value
-    val General, Network, Database, Cluster, Ambari,Url = Value
+    val General, Network, Database, Cluster, Ambari, Url = Value
 
     implicit class WrappedThrowable(th: Throwable) {
-      def asError(code: String, errorType: ErrorType):Errors =
+      def asError(code: String, errorType: ErrorType): Errors =
         Errors(
           Seq(
             Error(code, ExceptionUtils.getStackTrace(th), errorType.toString)))
     }
+
   }
 
   case class HJwtToken(token: String)
@@ -51,6 +52,7 @@ object Entities {
 
   case class Errors(errors: Seq[Error] = Seq()) {
     def combine(newErrors: Errors) = Errors(errors ++ newErrors.errors)
+
     def firstMessage = errors.headOption.map(_.code).getOrElse("Unknown Error")
   }
 
@@ -119,15 +121,16 @@ object Entities {
                   updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
   case class Permission(
-      id: Option[Long] = None,
-      permission: String,
-      roleId: Option[Long],
-      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+                         id: Option[Long] = None,
+                         permission: String,
+                         roleId: Option[Long],
+                         created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                         updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
   case class UserRole(id: Option[Long] = None,
                       userId: Option[Long],
                       roleId: Option[Long])
+
   case class UserGroup(id: Option[Long] = None,
                        userId: Option[Long],
                        groupId: Option[Long])
@@ -148,102 +151,102 @@ object Entities {
 
   //Data lake
   case class Location(
-      id: Option[Long] = None,
-      city: String,
-      province: String,
-      country: String,
-      latitude: Float,
-      longitude: Float
-  )
+                       id: Option[Long] = None,
+                       city: String,
+                       province: String,
+                       country: String,
+                       latitude: Float,
+                       longitude: Float
+                     )
 
   case class DataplaneClusterIdentifier(id: Long)
 
   case class DataplaneCluster(
-      id: Option[Long] = None,
-      name: String,
-      dcName: String,
-      description: String,
-      ambariUrl: String,
-      ambariIpAddress: String,
-      location: Option[Long],
-      createdBy: Option[Long],
-      properties: Option[JsValue],
-      // state should be used to figure out the status of the cluster
-      state: Option[String] = Some("TO_SYNC"),
-      isDatalake: Option[Boolean] = Some(false),
-      knoxEnabled: Option[Boolean] = Some(false),
-      knoxUrl: Option[String],
-      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+                               id: Option[Long] = None,
+                               name: String,
+                               dcName: String,
+                               description: String,
+                               ambariUrl: String,
+                               ambariIpAddress: String,
+                               location: Option[Long],
+                               createdBy: Option[Long],
+                               properties: Option[JsValue],
+                               // state should be used to figure out the status of the cluster
+                               state: Option[String] = Some("TO_SYNC"),
+                               isDatalake: Option[Boolean] = Some(false),
+                               knoxEnabled: Option[Boolean] = Some(false),
+                               knoxUrl: Option[String],
+                               created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                               updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
   case class DpClusterWithDpServices(
-      dataplaneCluster: DataplaneCluster,
-      dpServices: Seq[String])
+                                      dataplaneCluster: DataplaneCluster,
+                                      dpServices: Seq[String])
 
   case class Category(
-      id: Option[Long] = None,
-      name: String,
-      description: String,
-      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      updated: Option[LocalDateTime] = Some(LocalDateTime.now())
-  )
+                       id: Option[Long] = None,
+                       name: String,
+                       description: String,
+                       created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                       updated: Option[LocalDateTime] = Some(LocalDateTime.now())
+                     )
 
   case class Cluster(
-      id: Option[Long] = None,
-      name: String,
-      clusterUrl: Option[String] = None,
-      secured: Option[Boolean] = Some(false),
-      kerberosuser: Option[String] = None,
-      kerberosticketLocation: Option[String] = None,
-      dataplaneClusterId: Option[Long] = None,
-      userid: Option[Long] = None,
-      properties: Option[JsValue] = None
-  )
+                      id: Option[Long] = None,
+                      name: String,
+                      clusterUrl: Option[String] = None,
+                      secured: Option[Boolean] = Some(false),
+                      kerberosuser: Option[String] = None,
+                      kerberosticketLocation: Option[String] = None,
+                      dataplaneClusterId: Option[Long] = None,
+                      userid: Option[Long] = None,
+                      properties: Option[JsValue] = None
+                    )
 
   case class ClusterService(
-      id: Option[Long] = None,
-      servicename: String,
-      properties: Option[JsValue] = None,
-      clusterId: Option[Long] = None
-  )
+                             id: Option[Long] = None,
+                             servicename: String,
+                             properties: Option[JsValue] = None,
+                             clusterId: Option[Long] = None
+                           )
 
   case class ClusterServiceHost(
-      id: Option[Long] = None,
-      host: String,
-      serviceid: Option[Long] = None
-  )
+                                 id: Option[Long] = None,
+                                 host: String,
+                                 serviceid: Option[Long] = None
+                               )
 
   case class Workspace(
-      id: Option[Long] = None,
-      name: String,
-      source: Long,
-      description: String,
-      createdBy: Option[Long],
-      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      updated: Option[LocalDateTime] = Some(LocalDateTime.now())
-  )
+                        id: Option[Long] = None,
+                        name: String,
+                        source: Long,
+                        description: String,
+                        createdBy: Option[Long],
+                        created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                        updated: Option[LocalDateTime] = Some(LocalDateTime.now())
+                      )
 
   case class AssetWorkspace(
-      assetType: String,
-      assetId: Long,
-      workspaceId: Long
-  )
+                             assetType: String,
+                             assetId: Long,
+                             workspaceId: Long
+                           )
 
   case class NotebookWorkspace(
-      notebookId: String,
-      name: String,
-      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      workspaceId: Long
-  )
+                                notebookId: String,
+                                name: String,
+                                created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                                workspaceId: Long
+                              )
 
   case class EnabledSku(
-      skuId: Long,
-      enabledBy: Long,
-      enabledOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      smartSenseId: String,
-      subscriptionId: String,
-      created: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
+                         skuId: Long,
+                         enabledBy: Long,
+                         enabledOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                         smartSenseId: String,
+                         subscriptionId: String,
+                         created: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                         updated: Option[LocalDateTime] = Some(LocalDateTime.now()))
 
   case class Sku(id: Option[Long] = None,
                  name: String,
@@ -258,6 +261,7 @@ object Entities {
                        enabled: Boolean,
                        sku: Sku,
                        enabledSku: Option[EnabledSku])
+
   case class DpServiceEnableConfig(skuName: String, smartSenseId: String)
 
   case class ClusterHost(id: Option[Long] = None,
@@ -285,14 +289,14 @@ object Entities {
   case class DatasetCategory(categoryId: Long, datasetId: Long)
 
   case class UnclassifiedDataset(
-      id: Option[Long],
-      name: String,
-      description: Option[String],
-      dpClusterId: Long,
-      createdBy: Long,
-      createdOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      lastModified: Option[LocalDateTime] = Some(LocalDateTime.now()),
-      customProps: Option[JsValue] = None)
+                                  id: Option[Long],
+                                  name: String,
+                                  description: Option[String],
+                                  dpClusterId: Long,
+                                  createdBy: Long,
+                                  createdOn: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                                  lastModified: Option[LocalDateTime] = Some(LocalDateTime.now()),
+                                  customProps: Option[JsValue] = None)
 
   case class UnclassifiedDatasetCategory(categoryId: Long,
                                          unclassifiedDatasetId: Long)
@@ -341,26 +345,27 @@ object Entities {
                                   tags: Seq[String],
                                   assetQueryModels: Seq[AtlasSearchQuery],
                                   dataAssets: Seq[DataAsset] = Nil)
+
   case class LdapConfiguration(
-      id: Option[Long],
-      ldapUrl: Option[String]=None,
-      bindDn: Option[String]=None,
-      userSearchBase: Option[String]=None,
-      userSearchAttributeName: Option[String]=None,
-      groupSearchBase: Option[String]=None,
-      groupSearchAttributeName: Option[String]=None,
-      groupObjectClass: Option[String]=None,
-      groupMemberAttributeName: Option[String]=None
-  )
+                                id: Option[Long],
+                                ldapUrl: Option[String] = None,
+                                bindDn: Option[String] = None,
+                                userSearchBase: Option[String] = None,
+                                userSearchAttributeName: Option[String] = None,
+                                groupSearchBase: Option[String] = None,
+                                groupSearchAttributeName: Option[String] = None,
+                                groupObjectClass: Option[String] = None,
+                                groupMemberAttributeName: Option[String] = None
+                              )
 
   case class WorkspaceDataCount(asset: Int, notebook: Int)
 
   case class WorkspaceDetails(
-      workspace: Workspace,
-      username: String,
-      clustername: String,
-      counts: Option[WorkspaceDataCount]
-  )
+                               workspace: Workspace,
+                               username: String,
+                               clustername: String,
+                               counts: Option[WorkspaceDataCount]
+                             )
 
   case class AssetWorkspaceRequest(workspaceId: Long,
                                    clusterId: Long,
@@ -368,6 +373,7 @@ object Entities {
                                    dataAssets: Seq[DataAsset] = Nil)
 
   case class BlacklistedToken(id: Option[Long], token: String, expiry: LocalDateTime)
+
 }
 
 object JsonFormatters {
@@ -375,171 +381,70 @@ object JsonFormatters {
   import com.hortonworks.dataplane.commons.domain.Entities._
 
   val defaultJson = Json.using[Json.WithDefaultValues]
-
-  implicit val errorWrites = Json.writes[Error]
-  implicit val errorReads = Json.reads[Error]
-
-  implicit val errorsWrites = Json.writes[Errors]
-  implicit val errorsReads = Json.reads[Errors]
-
-  implicit val userWrites = Json.writes[User]
-  implicit val userReads = Json.reads[User]
-
-  implicit val roleWrites = Json.writes[Role]
-  implicit val roleReads = Json.reads[Role]
-
-  implicit val userRoleWrites = Json.writes[UserRole]
-  implicit val userRoleReads = Json.reads[UserRole]
-
-  implicit val userRolesWrites = Json.writes[UserRoles]
-  implicit val userRolesReads = Json.reads[UserRoles]
-  implicit val rolePermissionWrites = Json.writes[RolePermission]
-  implicit val userPermissionWrites = Json.writes[UserPermission]
-
-  implicit val permissionWrites = Json.writes[Permission]
-  implicit val permissionReads = Json.reads[Permission]
-
-  implicit val categoryWrites = Json.writes[Category]
-  implicit val categoryReads = Json.reads[Category]
-
-  implicit val locationWrites = Json.writes[Location]
-  implicit val locationReads = Json.reads[Location]
-  implicit val dpClusterWrites = Json.writes[DataplaneCluster]
-  implicit val dpClusterReads = Json.reads[DataplaneCluster]
-
-  implicit val dpClusterWithDpServicesWrites = Json.writes[DpClusterWithDpServices]
-  implicit val dpClusterWithDpServicesReads = Json.reads[DpClusterWithDpServices]
-
-  implicit val dpClusterIdentifierWrites =
-    Json.writes[DataplaneClusterIdentifier]
-  implicit val dpClusterIdentifierReads =
-    Json.reads[DataplaneClusterIdentifier]
-
-  implicit val skuWrites = Json.writes[Sku]
-  implicit val skuReads = Json.reads[Sku]
-  implicit val enabledSkuWrites = Json.writes[EnabledSku]
-  implicit val enabledSkuReads = Json.reads[EnabledSku]
-
-  implicit val clusterWrites = Json.writes[Cluster]
-  implicit val clusterReads = Json.reads[Cluster]
-
-  implicit val clusterServiceWrites = Json.writes[ClusterService]
-  implicit val clusterServiceReads = Json.reads[ClusterService]
-
-  implicit val hostWrites = Json.writes[ClusterServiceHost]
-  implicit val hostReads = Json.reads[ClusterServiceHost]
-
-  implicit val workspaceWrites = Json.writes[Workspace]
-  implicit val workspaceReads = Json.reads[Workspace]
-
-  implicit val assetWorkspaceWrites = Json.writes[AssetWorkspace]
-  implicit val assetWorkspaceReads = Json.reads[AssetWorkspace]
-
-  implicit val clusterHostWrites = Json.writes[ClusterHost]
-  implicit val clusterHostReads = Json.reads[ClusterHost]
-
-  implicit val clusterPropertiesWrites = Json.writes[ClusterProperties]
-  implicit val clusterPropertiesReads = Json.reads[ClusterProperties]
-
+  implicit val errorFormat = Json.format[Error]
+  implicit val errorsFormat = Json.format[Errors]
+  implicit val userFormat = Json.format[User]
+  implicit val roleFormat = Json.format[Role]
+  implicit val userRoleFormat = Json.format[UserRole]
+  implicit val userRolesFormat = Json.format[UserRoles]
+  implicit val rolePermissionWrites = Json.format[RolePermission]
+  implicit val userPermissionWrites = Json.format[UserPermission]
+  implicit val permissionFormat = Json.format[Permission]
+  implicit val categoryFormat = Json.format[Category]
+  implicit val locationFormat = Json.format[Location]
+  implicit val dpClusterFormat = Json.format[DataplaneCluster]
+  implicit val dpClusterWithDpServicesFormat = Json.format[DpClusterWithDpServices]
+  implicit val dpClusterIdentifierFormat =
+    Json.format[DataplaneClusterIdentifier]
+  implicit val skuFormat = Json.format[Sku]
+  implicit val enabledSkuFormat = Json.format[EnabledSku]
+  implicit val clusterFormat = Json.format[Cluster]
+  implicit val clusterServiceFormat = Json.format[ClusterService]
+  implicit val hostFormat = Json.format[ClusterServiceHost]
+  implicit val workspaceFormat = Json.format[Workspace]
+  implicit val assetWorkspaceFormat = Json.format[AssetWorkspace]
+  implicit val clusterHostFormat = Json.format[ClusterHost]
+  implicit val clusterPropertiesFormat = Json.format[ClusterProperties]
   implicit val datasetWrites = Json.writes[Dataset]
   implicit val datasetReads = defaultJson.reads[Dataset]
-
-  implicit val datasetCategoryWrites = Json.writes[DatasetCategory]
-  implicit val datasetCategoryReads = Json.reads[DatasetCategory]
-
-  implicit val unclassifiedDatasetWrites = Json.writes[UnclassifiedDataset]
-  implicit val unclassifiedDatasetReads = Json.reads[UnclassifiedDataset]
-
-  implicit val unclassifiedDatasetCategoryWrites =
-    Json.writes[UnclassifiedDatasetCategory]
-  implicit val unclassifiedDatasetCategoryReads =
-    Json.reads[UnclassifiedDatasetCategory]
-
-  implicit val dataAssetWrites = Json.writes[DataAsset]
-  implicit val dataAssetReads = Json.reads[DataAsset]
-
-  implicit val datasetDetailsWrites = Json.writes[DatasetDetails]
-  implicit val datasetDetailsReads = Json.reads[DatasetDetails]
-
-  // classes as data conatiner for Rest Api
-  implicit val categoriesCountReads = Json.reads[CategoryCount]
-  implicit val categoriesCountWrites = Json.writes[CategoryCount]
-
-  implicit val dataAssetCountReads = Json.reads[DataAssetCount]
-  implicit val dataAssetCountWrites = Json.writes[DataAssetCount]
-
-  implicit val datasetResponseReads = Json.reads[DatasetAndCategories]
-  implicit val datasetResponseWrites = Json.writes[DatasetAndCategories]
-
-  implicit val datasetRequestReads = Json.reads[DatasetAndCategoryIds]
-  implicit val datasetRequestWrites = Json.writes[DatasetAndCategoryIds]
-
-  implicit val configReads = Json.reads[DpConfig]
-  implicit val configWrites = Json.writes[DpConfig]
-
-  implicit val categoriesCountAndTotalReads =
-    Json.reads[CategoriesCountAndTotal]
-  implicit val categoriesCountAndTotalWrites =
-    Json.writes[CategoriesCountAndTotal]
-
+  implicit val datasetCategoryFormat = Json.format[DatasetCategory]
+  implicit val unclassifiedDatasetFormat = Json.format[UnclassifiedDataset]
+  implicit val unclassifiedDatasetCategoryFormat =
+    Json.format[UnclassifiedDatasetCategory]
+  implicit val dataAssetFormat = Json.format[DataAsset]
+  implicit val datasetDetailsFormat = Json.format[DatasetDetails]
+  implicit val categoriesCountFormat = Json.format[CategoryCount]
+  implicit val dataAssetCountFormat = Json.format[DataAssetCount]
+  implicit val datasetResponseFormat = Json.format[DatasetAndCategories]
+  implicit val datasetRequestFormat = Json.format[DatasetAndCategoryIds]
+  implicit val configFormat = Json.format[DpConfig]
+  implicit val categoriesCountAndTotalFormat =
+    Json.format[CategoriesCountAndTotal]
   implicit val datasetCreateRequestReads =
     defaultJson.reads[DatasetCreateRequest]
   implicit val datasetCreateRequestWrites = Json.writes[DatasetCreateRequest]
-
   implicit val richDatasetReads = defaultJson.reads[RichDataset]
   implicit val richDatasetWrites = Json.writes[RichDataset]
-
-  implicit val ldapConfigurationReads = Json.reads[LdapConfiguration]
-  implicit val ldapConfigurationWrites = Json.writes[LdapConfiguration]
-
-  implicit val workspacesAndCountReads = Json.reads[WorkspaceDataCount]
-  implicit val workspacesAndCountWrites = Json.writes[WorkspaceDataCount]
-
-  implicit val workspaceDetailsReads = Json.reads[WorkspaceDetails]
-  implicit val workspaceDetailsWrites = Json.writes[WorkspaceDetails]
-
+  implicit val ldapConfigurationFormat = Json.format[LdapConfiguration]
+  implicit val workspacesAndCountFormat = Json.format[WorkspaceDataCount]
+  implicit val workspaceDetailsFormat = Json.format[WorkspaceDetails]
   implicit val assetWorkspaceRequestReads =
     defaultJson.reads[AssetWorkspaceRequest]
   implicit val assetWorkspaceRequestWrites = Json.writes[AssetWorkspaceRequest]
-
   implicit val notebookWorkspaceReads = defaultJson.reads[NotebookWorkspace]
   implicit val notebookWorkspaceWrites = Json.writes[NotebookWorkspace]
-
   implicit val roleTypeReads = Reads.enumNameReads(RoleType)
-
-  implicit val userInfoReads = Json.reads[UserInfo]
-  implicit val userInfoWrites = Json.writes[UserInfo]
-
-  implicit val usersListWrites = Json.writes[UsersList]
-  implicit val usersListReads = Json.reads[UsersList]
-
-  implicit val groupReads = Json.reads[Group]
-  implicit val groupWrites = Json.writes[Group]
-
-  implicit val groupInfoReads = Json.reads[GroupInfo]
-  implicit val groupInfoWrites = Json.writes[GroupInfo]
-
-  implicit val groupsListWrites = Json.writes[GroupsList]
-  implicit val groupsListReads = Json.reads[GroupsList]
-
-  implicit val userContextWrites = Json.writes[UserContext]
-  implicit val userContextReads = Json.reads[UserContext]
-
-  implicit val userGroupInfoWrites = Json.writes[UserGroupInfo]
-  implicit val userGroupInfoReads = Json.reads[UserGroupInfo]
-
-  implicit val userLdapGroupsWrites = Json.writes[UserLdapGroups]
-  implicit val userLdapGroupsReads = Json.reads[UserLdapGroups]
-
-  implicit val dpServiceWrites = Json.writes[DpService]
-  implicit val dpServiceReads = Json.reads[DpService]
-
-  implicit val dpServiceEnableConfigWrites = Json.writes[DpServiceEnableConfig]
-  implicit val dpServiceEnableConfigReads = Json.reads[DpServiceEnableConfig]
-
-  implicit val serviceDependencyWrites = Json.writes[ServiceDependency]
-  implicit val serviceDependencyReads = Json.reads[ServiceDependency]
-
+  implicit val userInfoFormat = Json.format[UserInfo]
+  implicit val usersListFormat = Json.format[UsersList]
+  implicit val groupFormat = Json.format[Group]
+  implicit val groupInfoFormat = Json.format[GroupInfo]
+  implicit val groupsListFormat = Json.format[GroupsList]
+  implicit val userContextFormat = Json.format[UserContext]
+  implicit val userGroupInfoFormat = Json.format[UserGroupInfo]
+  implicit val userLdapGroupsFormat = Json.format[UserLdapGroups]
+  implicit val dpServiceFormat = Json.format[DpService]
+  implicit val dpServiceEnableConfigFormat = Json.format[DpServiceEnableConfig]
+  implicit val serviceDependencyFormat = Json.format[ServiceDependency]
   implicit val blacklistedTokenFormats = Json.format[BlacklistedToken]
 
 }

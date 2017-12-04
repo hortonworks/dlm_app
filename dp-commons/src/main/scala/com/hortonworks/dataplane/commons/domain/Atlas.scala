@@ -69,25 +69,12 @@ object Atlas {
       limit.isDefined && offset.isDefined && offset.get >= 0 && limit.get > 0
   }
 
-  implicit val atlasAttributeReads = Json.reads[AtlasAttribute]
-  implicit val atlasAttributeWrites = Json.writes[AtlasAttribute]
-
-  implicit val atlasFilterReads = Json.reads[AtlasFilter]
-  implicit val atlasFilterWrites = Json.writes[AtlasFilter]
-
-  implicit val atlasFiltersReads = Json.reads[AtlasSearchQuery]
-  implicit val atlasFiltersWrites = Json.writes[AtlasSearchQuery]
-
-  implicit val entityReads = Json.reads[Entity]
-  implicit val entityWrites = Json.writes[Entity]
-
-  implicit val entityDatasetRelationshipReads = Json.reads[EntityDatasetRelationship]
-  implicit val entityDatasetRelationshipWrites = Json.writes[EntityDatasetRelationship]
-
-  implicit val atlasEntitiesReads = Json.reads[AtlasEntities]
-  implicit val atlasEntitiesWrites = Json.writes[AtlasEntities]
-
-  implicit val assetPropertiesReads = Json.reads[AssetProperties]
-  implicit val assetPropertiesWrites = Json.writes[AssetProperties]
+  implicit val atlasAttributeFormat = Json.format[AtlasAttribute]
+  implicit val atlasFilterFormat = Json.format[AtlasFilter]
+  implicit val atlasFiltersFormat = Json.format[AtlasSearchQuery]
+  implicit val entityFormat = Json.format[Entity]
+  implicit val entityDatasetRelationshipFormat = Json.format[EntityDatasetRelationship]
+  implicit val atlasEntitiesFormat = Json.format[AtlasEntities]
+  implicit val assetPropertiesFormat = Json.format[AssetProperties]
 
 }
