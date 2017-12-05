@@ -13,7 +13,7 @@ package com.hortonworks.dataplane.gateway.domain;
 public interface Constants {
   String DPAPP = "core";
   String DLMAPP = "dlm";
-  String CLOUDBREAK = "cb";
+  String CLOUDBREAK = "cloudbreak";
 
   String DP_USER_INFO_HEADER_KEY = "X-DP-User-Info";
   String DP_TOKEN_INFO_HEADER_KEY = "X-DP-Token-Info";
