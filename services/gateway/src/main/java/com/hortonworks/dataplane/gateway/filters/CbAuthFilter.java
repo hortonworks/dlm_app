@@ -41,6 +41,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 public class CbAuthFilter extends ZuulFilter {
 
   public static final String DEFAULT_TLD = ".com";
+  public static final String STATIC_ASSETS_SSI_BASE_HREF_TMPL_HTML = "/service/cloudbreak/static/assets/ssi/base-href.tmpl.html";
 
   @Override
   public String filterType() {
@@ -68,20 +69,25 @@ public class CbAuthFilter extends ZuulFilter {
   @Override
   public Object run() {
     RequestContext context = RequestContext.getCurrentContext();
-    UserContext userContext = (UserContext) context.get(Constants.USER_CTX_KEY);
-    // Get the forwarded header
-    Optional<String> host = Optional.ofNullable(context.getRequest().getHeader("X-Forwarded-Host"));
-    ifNull(userContext).throwError(new GatewayException(HttpStatus.FORBIDDEN, "User does not have access to "+ CLOUDBREAK));
-    ifFalse(host.isPresent()).throwError(new GatewayException(HttpStatus.INTERNAL_SERVER_ERROR, "No host header to be forwarded"));
-    CloudbreakContext cloudbreakContext = CloudbreakContext.from(userContext);
-    // Create an email from domain and username
-    String email = cloudbreakContext.getUsername() + "@" + "dataplane.com";
-    cloudbreakContext.setSecret(config.getString("dp.gateway.services.cloudbreak.key"));
-    cloudbreakContext.setEmail(email);
-    cloudbreakContext.setDomain(host.get());
-    String jwt = this.jwt.makeJWT(cloudbreakContext);
-    context.addZuulRequestHeader(Constants.AUTHORIZATION_HEADER,"Bearer "+ jwt);
-    context.addZuulRequestHeader("Authorization","Bearer "+ jwt);
+    if(context.getRequest().getRequestURI().equals(STATIC_ASSETS_SSI_BASE_HREF_TMPL_HTML)){
+      // write the required template in the response
+      context.setResponseBody("<base href='/cloudbreak/'>");
+    } else {
+      UserContext userContext = (UserContext) context.get(Constants.USER_CTX_KEY);
+      // Get the forwarded header
+      Optional<String> host = Optional.ofNullable(context.getRequest().getHeader("X-Forwarded-Host"));
+      ifNull(userContext).throwError(new GatewayException(HttpStatus.FORBIDDEN, "User does not have access to " + CLOUDBREAK));
+      ifFalse(host.isPresent()).throwError(new GatewayException(HttpStatus.INTERNAL_SERVER_ERROR, "No host header to be forwarded"));
+      CloudbreakContext cloudbreakContext = CloudbreakContext.from(userContext);
+      // Create an email from domain and username
+      String email = cloudbreakContext.getUsername() + "@" + "dataplane.com";
+      cloudbreakContext.setSecret(config.getString("dp.gateway.services.cloudbreak.key"));
+      cloudbreakContext.setEmail(email);
+      cloudbreakContext.setDomain(host.get());
+      String jwt = this.jwt.makeJWT(cloudbreakContext);
+      context.addZuulRequestHeader(Constants.AUTHORIZATION_HEADER, "Bearer " + jwt);
+      context.addZuulRequestHeader("Authorization", "Bearer " + jwt);
+    }
     return null;
   }
 
