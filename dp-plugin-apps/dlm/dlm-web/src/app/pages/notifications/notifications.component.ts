@@ -13,14 +13,19 @@ import { Event } from 'models/event.model';
 import { Cluster } from 'models/cluster.model';
 import { getAllDisplayedEvents } from 'selectors/event.selector';
 import { getAllClusters } from 'selectors/cluster.selector';
+import { getAllPolicies } from 'selectors/policy.selector';
 import { Store } from '@ngrx/store';
 import { State } from 'reducers/index';
 import { loadEvents } from 'actions/event.action';
 import { loadClusters } from 'actions/cluster.action';
 import { ProgressState } from 'models/progress-state.model';
 import { getMergedProgress } from 'selectors/progress.selector';
+import { Policy } from 'models/policy.model';
+import { loadPolicies } from 'actions/policy.action';
+import { ALL_POLICIES_COUNT } from 'constants/api.constant';
 
 const CLUSTERS_REQUEST = '[NOTIFICATION_PAGE] CLUSTERS_REQUEST';
+const POLICIES_REQUEST = '[NOTIFICATION_PAGE] POLICIES_REQUEST';
 const EVENTS_REQUEST = '[NOTIFICATION_PAGE] EVENTS_REQUEST';
 
 @Component({
@@ -32,14 +37,17 @@ export class NotificationsPageComponent {
 
   events$: Observable<Event[]>;
   clusters$: Observable<Cluster[]>;
+  policies$: Observable<Policy[]>;
   overallProgress$: Observable<ProgressState>;
 
   constructor(private store: Store<State>) {
     this.events$ = store.select(getAllDisplayedEvents);
     this.clusters$ = store.select(getAllClusters);
-    this.overallProgress$ = store.select(getMergedProgress(CLUSTERS_REQUEST, EVENTS_REQUEST));
+    this.policies$ = store.select(getAllPolicies);
+    this.overallProgress$ = store.select(getMergedProgress(POLICIES_REQUEST, CLUSTERS_REQUEST, EVENTS_REQUEST));
     this.store.dispatch(loadEvents({numResults: 1000}, {requestId: EVENTS_REQUEST}));
     this.store.dispatch(loadClusters(CLUSTERS_REQUEST));
+    this.store.dispatch(loadPolicies({numResults: ALL_POLICIES_COUNT, instanceCount: 10}, {requestId: POLICIES_REQUEST}));
   }
 
 }

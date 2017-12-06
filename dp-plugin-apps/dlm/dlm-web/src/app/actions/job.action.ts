@@ -34,12 +34,12 @@ export const loadJobsSuccess = (jobs, meta = {}): ActionSuccess => ({
   type: ActionTypes.LOAD_JOBS.SUCCESS, payload: {response: jobs, meta}
 });
 
-export const loadJobsPageForPolicy = (policy: Policy, offset, sortBy, pageSize = 10): Action => ({
+export const loadJobsPageForPolicy = (policy: Policy, offset, sortBy, pageSize = 10, filters = []): Action => ({
   type: ActionTypes.LOAD_JOBS_PAGE_FOR_POLICY.START,
   payload: {
     policy,
     meta: {
-      offset, pageSize, policyId: policy.id, sortBy
+      offset, pageSize, policyId: policy.id, sortBy, filters
     }
   }
 });

@@ -7,6 +7,18 @@
   ~ of all or any part of the contents of this software is strictly prohibited.
   -->
 
+<div class="row filter-wrapper">
+  <div class="col-md-12">
+    <dlm-table-filter
+      [filterBy]="filterBy"
+      [initialFilters]="filters"
+      [restoreState]="true"
+      [initialInputValue]="jobsInput"
+      [ignoreInitialFiltersUpdate]="true"
+      (onFilter)="handleOnFilter($event)"
+      (onInput)="handleOnInput($event)"></dlm-table-filter>
+  </div>
+</div>
 <dlm-table
   #jobsTable
   [externalPaging]="true"

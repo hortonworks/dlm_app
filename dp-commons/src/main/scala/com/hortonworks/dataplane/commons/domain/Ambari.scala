@@ -23,7 +23,7 @@ object Ambari {
   case class AmbariCluster(security: String = "NONE",
                            clusterName: String,
                            services: Seq[String],
-                           knoxUrl:Option[String])
+                           knoxUrl: Option[String])
 
   case class AmbariEndpoint(url: String)
 
@@ -47,7 +47,8 @@ object Ambari {
                                  ambariPass: Option[String],
                                  knoxTopology: Option[String]) {
 
-    def hasCredentials =  ambariUser.isDefined && ambariPass.isDefined && knoxTopology.isEmpty
+    def hasCredentials = ambariUser.isDefined && ambariPass.isDefined && knoxTopology.isEmpty
+
     def hasTopology = knoxTopology.isDefined && ambariUser.isEmpty && ambariPass.isEmpty
 
   }
@@ -57,132 +58,112 @@ object Ambari {
                                      jwtProviderUrl: Option[String])
 
   case class DiskInfo(
-      available: Option[String],
-      device: Option[String],
-      used: Option[String],
-      percent: Option[String],
-      size: Option[String],
-      `type`: Option[String],
-      mountpoint: Option[String]
-  )
+                       available: Option[String],
+                       device: Option[String],
+                       used: Option[String],
+                       percent: Option[String],
+                       size: Option[String],
+                       `type`: Option[String],
+                       mountpoint: Option[String]
+                     )
 
   case class ClusterHost(
-      cluster_name: String,
-      cpu_count: Option[Double],
-      disk_info: Option[List[DiskInfo]],
-      host_health_report: Option[String],
-      host_name: Option[String],
-      host_state: Option[String],
-      host_status: Option[String],
-      ip: Option[String],
-      last_heartbeat_time: Option[Double],
-      last_registration_time: Option[Double],
-      maintenance_state: Option[String],
-      os_arch: Option[String],
-      os_family: Option[String],
-      os_type: Option[String],
-      ph_cpu_count: Option[Double],
-      public_host_name: Option[String],
-      rack_info: Option[String],
-      recovery_summary: Option[String],
-      total_mem: Option[Double]
-  )
+                          cluster_name: String,
+                          cpu_count: Option[Double],
+                          disk_info: Option[List[DiskInfo]],
+                          host_health_report: Option[String],
+                          host_name: Option[String],
+                          host_state: Option[String],
+                          host_status: Option[String],
+                          ip: Option[String],
+                          last_heartbeat_time: Option[Double],
+                          last_registration_time: Option[Double],
+                          maintenance_state: Option[String],
+                          os_arch: Option[String],
+                          os_family: Option[String],
+                          os_type: Option[String],
+                          ph_cpu_count: Option[Double],
+                          public_host_name: Option[String],
+                          rack_info: Option[String],
+                          recovery_summary: Option[String],
+                          total_mem: Option[Double]
+                        )
 
   case class NameNodeInfo(
-      CapacityRemaining: Option[Double],
-      CapacityTotal: Option[Double],
-      CapacityUsed: Option[Double],
-      DeadNodes: Option[String],
-      DecomNodes: Option[String],
-      HeapMemoryMax: Option[Double],
-      HeapMemoryUsed: Option[Double],
-      LiveNodes: Option[String],
-      NonDfsUsedSpace: Option[Double],
-      NonHeapMemoryMax: Option[Double],
-      NonHeapMemoryUsed: Option[Double],
-      PercentRemaining: Option[Double],
-      PercentUsed: Option[Double],
-      Safemode: Option[String],
-      StartTime: Option[Double],
-      TotalFiles: Option[Double],
-      display_name: Option[String],
-      service_name: Option[String],
-      state: Option[String]
-  )
+                           CapacityRemaining: Option[Double],
+                           CapacityTotal: Option[Double],
+                           CapacityUsed: Option[Double],
+                           DeadNodes: Option[String],
+                           DecomNodes: Option[String],
+                           HeapMemoryMax: Option[Double],
+                           HeapMemoryUsed: Option[Double],
+                           LiveNodes: Option[String],
+                           NonDfsUsedSpace: Option[Double],
+                           NonHeapMemoryMax: Option[Double],
+                           NonHeapMemoryUsed: Option[Double],
+                           PercentRemaining: Option[Double],
+                           PercentUsed: Option[Double],
+                           Safemode: Option[String],
+                           StartTime: Option[Double],
+                           TotalFiles: Option[Double],
+                           display_name: Option[String],
+                           service_name: Option[String],
+                           state: Option[String]
+                         )
 
   case class ClusterServiceWithConfigs(
-      serviceid: Option[Long],
-      servicename: String,
-      clusterid: Option[Long] = None,
-      servicehost: String,
-      configProperties: Option[ConfigurationInfo] = None
-  )
+                                        serviceid: Option[Long],
+                                        servicename: String,
+                                        clusterid: Option[Long] = None,
+                                        servicehost: String,
+                                        configProperties: Option[ConfigurationInfo] = None
+                                      )
 
   case class ConfigurationInfo(
-      stats: JsValue,
-      properties: Seq[ConfigType]
-  )
+                                stats: JsValue,
+                                properties: Seq[ConfigType]
+                              )
 
   case class ConfigType(
-      tag: String,
-      `type`: String,
-      Config: JsValue,
-      version: Long,
-      properties: Map[String, String],
-      properties_attributes: JsValue
-  )
+                         tag: String,
+                         `type`: String,
+                         Config: JsValue,
+                         version: Long,
+                         properties: Map[String, String],
+                         properties_attributes: JsValue
+                       )
 
   case class ClusterProperties(
-      version: String,
-      cluster_id: Long,
-      total_hosts: Long,
-      cluster_name: String,
-      health_report: JsValue,
-      security_type: String,
-      desired_configs: JsValue,
-      provisioning_state: String,
-      credential_store_properties: JsValue,
-      desired_service_config_versions: JsValue
-  )
+                                version: String,
+                                cluster_id: Long,
+                                total_hosts: Long,
+                                cluster_name: String,
+                                health_report: JsValue,
+                                security_type: String,
+                                desired_configs: JsValue,
+                                provisioning_state: String,
+                                credential_store_properties: JsValue,
+                                desired_service_config_versions: JsValue
+                              )
 
   case class AmbariResponseWithDpClusterId(
-      id: Long,
-      data: JsValue
-  )
+                                            id: Long,
+                                            data: JsValue
+                                          )
 
-  implicit val diskInfoReads = Json.reads[DiskInfo]
-  implicit val diskInfoWrites = Json.writes[DiskInfo]
-  implicit val clusterHealthWrites = Json.writes[ClusterHost]
-  implicit val clusterHealthReads = Json.reads[ClusterHost]
-  implicit val nameNodeWrites = Json.writes[NameNodeInfo]
-  implicit val nameNodeReads = Json.reads[NameNodeInfo]
-  implicit val endPointWrites = Json.writes[AmbariEndpoint]
-  implicit val endPointReads = Json.reads[AmbariEndpoint]
-  implicit val seviceInfoReads = Json.reads[ServiceInfo]
-  implicit val serviceInfoWrites = Json.writes[ServiceInfo]
-  implicit val configTypeReads = Json.reads[ConfigType]
-  implicit val configTypeWrites = Json.writes[ConfigType]
-  implicit val configurationInfoReads = Json.reads[ConfigurationInfo]
-  implicit val configurationInfoWrites = Json.writes[ConfigurationInfo]
-  implicit val serviceWithEndpointWrites =
-    Json.writes[ClusterServiceWithConfigs]
-  implicit val serviceWithEndpointReads = Json.reads[ClusterServiceWithConfigs]
-  implicit val ambariClusterReads = Json.reads[AmbariCluster]
-  implicit val ambariClusterWrites = Json.writes[AmbariCluster]
-  implicit val ambariCheckResponseWrites = Json.writes[AmbariCheckResponse]
-  implicit val ambariCheckResponseReads = Json.reads[AmbariCheckResponse]
-  implicit val ambariDetailRequestWrites = Json.writes[AmbariDetailRequest]
-  implicit val ambariDetailRequestReads = Json.reads[AmbariDetailRequest]
-
-  implicit val ambariForbiddenWrites = Json.writes[AmbariForbiddenResponse]
-  implicit val ambariForbiddenWritesReads = Json.reads[AmbariForbiddenResponse]
-
-  implicit val clusterPropertiesReads = Json.reads[ClusterProperties]
-  implicit val clusterPropertiesWrites = Json.writes[ClusterProperties]
-
-  implicit val ambariResponseWithDpClusterIdReads =
-    Json.reads[AmbariResponseWithDpClusterId]
-  implicit val ambariResponseWithDpClusterIdWrites =
-    Json.writes[AmbariResponseWithDpClusterId]
-
+  implicit val diskInfoFormat = Json.format[DiskInfo]
+  implicit val clusterHealthFormat = Json.format[ClusterHost]
+  implicit val nameNodeFormat = Json.format[NameNodeInfo]
+  implicit val endPointFormat = Json.format[AmbariEndpoint]
+  implicit val seviceInfoFormat = Json.format[ServiceInfo]
+  implicit val configTypeFormat = Json.format[ConfigType]
+  implicit val configurationInfoFormat = Json.format[ConfigurationInfo]
+  implicit val serviceWithEndpointFormat = Json.format[ClusterServiceWithConfigs]
+  implicit val ambariClusterFormat = Json.format[AmbariCluster]
+  implicit val ambariCheckResponseFormat = Json.format[AmbariCheckResponse]
+  implicit val ambariDetailRequestFormat = Json.format[AmbariDetailRequest]
+  implicit val ambariForbiddenWritesFormat = Json.format[AmbariForbiddenResponse]
+  implicit val clusterPropertiesFormat = Json.format[ClusterProperties]
+  implicit val ambariResponseWithDpClusterIdFormat =
+    Json.format[AmbariResponseWithDpClusterId]
 }

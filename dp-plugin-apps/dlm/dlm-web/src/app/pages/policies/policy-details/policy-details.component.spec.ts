@@ -9,7 +9,7 @@
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ChartsModule } from 'ng2-charts/ng2-charts';
-import { TooltipModule, ProgressbarModule } from 'ng2-bootstrap';
+import { TypeaheadModule, TooltipModule, ProgressbarModule } from 'ng2-bootstrap';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { CommonComponentsModule } from 'components/common-components.module';
@@ -35,6 +35,7 @@ import {MockBackend} from '@angular/http/testing';
 import {BaseRequestOptions, ConnectionBackend, Http, RequestOptions} from '@angular/http';
 import {HttpService} from 'services/http.service';
 import { NotificationService } from 'services/notification.service';
+import { TableFilterComponent } from 'common/table/table-filter/table-filter.component';
 
 describe('PolicyDetailsComponent', () => {
   let component: PolicyDetailsComponent;
@@ -47,7 +48,7 @@ describe('PolicyDetailsComponent', () => {
           loader: {provide: TranslateLoader, useClass: MockTranslateLoader}
         }),
         ChartsModule, NgxDatatableModule, CommonComponentsModule, FormsModule, MomentModule, TooltipModule.forRoot(),
-        ProgressbarModule.forRoot(),
+        ProgressbarModule.forRoot(), TypeaheadModule.forRoot(),
         PipesModule
       ],
       declarations: [
@@ -57,6 +58,7 @@ describe('PolicyDetailsComponent', () => {
         CheckboxComponent,
         TableComponent,
         TableFooterComponent,
+        TableFilterComponent,
         JobsTableComponent,
         JobTransferredGraphComponent,
         HdfsBrowserComponent

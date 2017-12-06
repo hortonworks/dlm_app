@@ -8,7 +8,7 @@
   -->
 
 <dlm-table #table
-  [rowDetailHeight]="550"
+  [rowDetailHeight]="600"
   [rowDetailTemplate]="rowDetailRef"
   [theme]="tableTheme"
   [columns]="columns"
@@ -81,6 +81,8 @@
     [policyDatabase]="policyDatabase$ | async"
     [jobsSort]="getJobsSortForRow(row.id)"
     [jobsPage]="getJobsPageForRow(row.id)"
+    [jobsFilters]="getJobsFiltersForRow(row.id)"
+    [jobsInput]="getJobsInputForRow(row.id)"
     [loadingJobs]="loadingJobs"
     [loadingDatabases]="databaseRequest$ | async"
     [loadingTables]="tablesLoadingMap"
@@ -91,6 +93,8 @@
     (onPageChangeFiles)="handleFilesPageChange($event, row.id)"
     (onOpenDirectory)="handleOnOpenDirectory($event)"
     (onSortJobs)="handleOnSortJobs($event, row.id)"
+    (onFilterJobs)="handleOnFilterJobs($event, row.id)"
+    (onInput)="handleOnInput($event, row.id)"
     (onSelectActionJobs)="handleOnSelectActionJobs($event, row.id)"
     (onPageChangeJobs)="handleJobsPageChange($event, row.id)"
     (abortJobAction)="abortJobAction($event)"

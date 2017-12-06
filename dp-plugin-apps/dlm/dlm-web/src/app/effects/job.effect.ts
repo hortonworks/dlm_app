@@ -56,7 +56,7 @@ export class JobEffects {
     .map(toPayload)
     .switchMap(payload => {
       const {policy, meta} = payload;
-      return this.jobService.getJobsForPolicyServerPaginated(policy, meta.offset, meta.sortBy, meta.pageSize)
+      return this.jobService.getJobsForPolicyServerPaginated(policy, meta.offset, meta.sortBy, meta.pageSize, meta.filters)
         .map(jobs => loadJobsPageForPolicySuccess(jobs, meta))
         .catch(err => Observable.of(loadJobsFail(err, payload.meta)));
     });

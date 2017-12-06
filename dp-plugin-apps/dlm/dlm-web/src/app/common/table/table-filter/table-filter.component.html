@@ -20,11 +20,13 @@
   <div class="form-group has-feedback">
     <span class="glyphicon glyphicon-filter form-control-feedback"></span>
     <input
+      #typeaheadInput
       qe-attr="table-filter-input"
       [(ngModel)]="filter"
       [typeahead]="typeaheadOptions"
       typeaheadOptionField="value"
       typeaheadGroupField="filter.filterTitle"
+      (keyup)="onKey()"
       (typeaheadOnSelect)="addFilter($event)"
       (typeaheadNoResults)="handleTypeaheadNoResults($event)"
       placeholder="Filter"
