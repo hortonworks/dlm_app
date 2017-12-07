@@ -195,18 +195,18 @@ if [ "$1" == "Jenkins" ]; then
 else
 	echo "Running regular build, IS_JENKINS=${IS_JENKINS}"
 fi
-clean_build
-build_dp
+#clean_build
+#build_dp
 build_dp_gateway
-build_db_service
-build_dp_app
-build_dp_web
-build_knox_agent
-build_dp_knox
-build_cluster_service
-build_migrate
-build_legalese
-build_installer
-zip_dp_binaries
+#build_db_service
+#build_dp_app
+#build_dp_web
+#build_knox_agent
+#build_dp_knox
+#build_cluster_service
+#build_migrate
+#build_legalese
+#build_installer
+#zip_dp_binaries
 log "All done"
 

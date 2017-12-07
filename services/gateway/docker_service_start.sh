@@ -14,7 +14,7 @@ if [ -z "$CONSUL_HOST" ]; then
     exit 1
 fi
 
-java \
+java "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005" \
     -jar /usr/gateway-service/gateway-1.0.jar \
         --spring.cloud.consul.host="$CONSUL_HOST" \
         --sso.enabled=true \
