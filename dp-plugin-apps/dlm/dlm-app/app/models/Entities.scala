@@ -72,6 +72,8 @@ object Entities {
   
   case class AdminStatusResponse(unreachableBeacon: Seq[BeaconApiErrors] = Seq(), response: Seq[BeaconAdminStatusDetails])
 
+  case class YarnQueueDefinition(name: String, children: Seq[YarnQueueDefinition], path: String)
+  case class YarnQueuesResponse(items: Seq[YarnQueueDefinition])
 }
 
 object JsonFormatters {
@@ -111,6 +113,12 @@ object JsonFormatters {
 
   implicit val adminStatusResponseReads = Json.reads[AdminStatusResponse]
   implicit val adminStatusResponseWrites = Json.writes[AdminStatusResponse]
+
+  implicit val yarnQueueDefinitionReads = Json.reads[YarnQueueDefinition]
+  implicit val yarnQueueDefinitionWrites = Json.writes[YarnQueueDefinition]
+
+  implicit val yarnQueuesResponseReads = Json.reads[YarnQueuesResponse]
+  implicit val yarnQueuesResponseWrites = Json.writes[YarnQueuesResponse]
 
 }
 

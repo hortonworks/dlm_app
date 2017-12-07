@@ -28,6 +28,7 @@ import * as fromHive from './hive.reducer';
 import * as fromLog from './log.reducer';
 import * as fromBeaconAdminStatus from './beacon-admin-status.reducer';
 import * as fromUnreachableBeacon from './unreachable-beacon.reducer';
+import * as fromYarnQueues from './yarn-queues.reducer';
 
 export interface State {
   router: RouterState;
@@ -44,6 +45,7 @@ export interface State {
   logs: fromLog.State;
   beaconAdminStatus: fromBeaconAdminStatus.State;
   unreachableBeacon: fromUnreachableBeacon.State;
+  yarnQueues: fromYarnQueues.State;
 }
 
 const reducers = {
@@ -60,7 +62,8 @@ const reducers = {
   hiveDatabases: fromHive.reducer,
   logs: fromLog.reducer,
   beaconAdminStatus: fromBeaconAdminStatus.reducer,
-  unreachableBeacon: fromUnreachableBeacon.reducer
+  unreachableBeacon: fromUnreachableBeacon.reducer,
+  yarnQueues: fromYarnQueues.reducer
 };
 
 const devReducer: ActionReducer<State> = compose(storeLogger(), combineReducers)(reducers);

@@ -36,6 +36,7 @@ class Pairs @Inject() (
     * Get list of all beacon cluster pairing
     */
   def list () = AuthenticatedAction.async { request =>
+    Logger.info("Received list all pairings request")
     implicit val token = request.token
     beaconService.getAllPairedClusters().map {
       pairedClusters => pairedClusters match {
