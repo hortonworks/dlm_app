@@ -84,7 +84,7 @@ public class CbAuthFilter extends ZuulFilter {
       ifFalse(host.isPresent()).throwError(new GatewayException(HttpStatus.INTERNAL_SERVER_ERROR, "No host header to be forwarded"));
       CloudbreakContext cloudbreakContext = CloudbreakContext.from(userContext);
       // Create an email from domain and username
-      String email = cloudbreakContext.getUsername() + "@" + "dataplane.com";
+      String email = cloudbreakContext.getUsername() + "@" + host.get();
       cloudbreakContext.setSecret(config.getString("dp.gateway.services.cloudbreak.key"));
       cloudbreakContext.setEmail(email);
       cloudbreakContext.setDomain(host.get());
@@ -95,14 +95,6 @@ public class CbAuthFilter extends ZuulFilter {
       }
     }
     return null;
-  }
-
-
-  private String extractDomain(HttpServletRequest req) {
-    String d = InternetDomainName.from(req.getServerName()).topPrivateDomain().toString();
-    String sd = req.getServerName().replaceAll(d, "");
-    sd = sd.substring(0, sd.length() - 1);
-    return sd + DEFAULT_TLD;
   }
 
 
