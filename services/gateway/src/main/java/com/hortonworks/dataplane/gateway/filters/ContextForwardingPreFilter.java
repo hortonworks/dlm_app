@@ -84,7 +84,7 @@ public class ContextForwardingPreFilter extends ZuulFilter {
       response.addHeader("Pragma","no-cache");
       response.addHeader("Expires","0");
 
-      proxyRequestHelper.addIgnoredHeaders(Constants.AUTHORIZATION_HEADER);
+//      proxyRequestHelper.addIgnoredHeaders(Constants.AUTHORIZATION_HEADER);
 
     } catch (JsonProcessingException ex) {
       throw new GatewayException(HttpStatus.BAD_REQUEST, "Unable to serialize user context to JSON.");

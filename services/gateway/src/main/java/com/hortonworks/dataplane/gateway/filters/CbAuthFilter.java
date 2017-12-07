@@ -24,6 +24,8 @@ import com.hortonworks.dataplane.gateway.utils.Jwt;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.typesafe.config.Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -41,7 +43,9 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 public class CbAuthFilter extends ZuulFilter {
 
   public static final String DEFAULT_TLD = ".com";
+  public static final String API_PATH = "/service/cloudbreak/cloudbreak";
   public static final String STATIC_ASSETS_SSI_BASE_HREF_TMPL_HTML = "/service/cloudbreak/static/assets/ssi/base-href.tmpl.html";
+  private static Logger log = LoggerFactory.getLogger(CbAuthFilter.class);
 
   @Override
   public String filterType() {
@@ -69,7 +73,7 @@ public class CbAuthFilter extends ZuulFilter {
   @Override
   public Object run() {
     RequestContext context = RequestContext.getCurrentContext();
-    if(context.getRequest().getRequestURI().equals(STATIC_ASSETS_SSI_BASE_HREF_TMPL_HTML)){
+    if (context.getRequest().getRequestURI().equals(STATIC_ASSETS_SSI_BASE_HREF_TMPL_HTML)) {
       // write the required template in the response
       context.setResponseBody("<base href='/cloudbreak/'>");
     } else {
@@ -85,8 +89,10 @@ public class CbAuthFilter extends ZuulFilter {
       cloudbreakContext.setEmail(email);
       cloudbreakContext.setDomain(host.get());
       String jwt = this.jwt.makeJWT(cloudbreakContext);
-      context.addZuulRequestHeader(Constants.AUTHORIZATION_HEADER, "Bearer " + jwt);
-      context.addZuulRequestHeader("Authorization", "Bearer " + jwt);
+      log.info("Sending cloudbreak request to " + context.getRequest().getRequestURI());
+      if (!context.getRequest().getRequestURI().startsWith(API_PATH)) {
+        context.addZuulRequestHeader(Constants.AUTHORIZATION_HEADER, "Bearer " + jwt);
+      }
     }
     return null;
   }
