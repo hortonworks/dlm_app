@@ -1,6 +1,6 @@
 {
   "/dlm/api/": {
-    "target": "http://localhost:8762/api/dlm",
+    "target": "http://localhost:8762/service/dlm",
     "secure": false,
     "pathRewrite": {
       "^/dlm": ""

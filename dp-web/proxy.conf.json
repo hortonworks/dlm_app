@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://localhost:8762/api/core",
+    "target": "http://localhost:8762/service/core",
     "secure": false
   },
   "/auth": {
