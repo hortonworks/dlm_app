@@ -3,17 +3,16 @@
 ## Functionality
 01. [x] POST /auth/in with correct request body should set a cookie and return UserContext
 02. [x] GET /auth/out should log users out and delete dp_jwt and hadoop-jwt cookies
-03. [x] RejectNonApiRequestPreFilter - all requests to urls other than /api should be blocked
-04. [-] BasicAuthPreFilter - read basic auth and set usercontext
-05. [x] TokenAuthPreFilter - check dp_jwt cookie or bearer token and set usercontext
-06. [x] TokenInvalidationCheckPreFilter - check if dp_jwt cookie has already been invalidated
-07. [x] KnoxAuthAndSyncPreFilter - check knox cookie and set usercontext
-08. [x] AuthorizationPreFilter - send 401 if usercontext is unavailable
-09. [x] ContextForwardingPreFilter - read and set knox token and usercontext in upstream header 
-10. [x] TokenInvalidationPostFilter - blacklist a token returned from dp-app
-11. [x] SetCookiePostFilter - set cookie if not already available
-12. [x] TraceFilter - do trace
-13. [x] SendGatewayErrorFilter - return friendly errors for GatewayException
+03. [-] BasicAuthPreFilter - read basic auth and set usercontext
+04. [x] TokenAuthPreFilter - check dp_jwt cookie or bearer token and set usercontext
+05. [x] TokenInvalidationCheckPreFilter - check if dp_jwt cookie has already been invalidated
+06. [x] KnoxAuthAndSyncPreFilter - check knox cookie and set usercontext
+07. [x] AuthorizationPreFilter - send 401 if usercontext is unavailable
+08. [x] ContextForwardingPreFilter - read and set knox token and usercontext in upstream header 
+09. [x] TokenInvalidationPostFilter - blacklist a token returned from dp-app
+10. [x] SetCookiePostFilter - set cookie if not already available
+11. [x] TraceFilter - do trace
+12. [x] SendGatewayErrorFilter - return friendly errors for GatewayException
 
 ## Tests
 01. Setup Knox and nginx
