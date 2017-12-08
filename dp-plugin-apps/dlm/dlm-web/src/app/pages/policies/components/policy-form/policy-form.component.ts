@@ -48,7 +48,8 @@ import { removeProgressState } from 'actions/progress.action';
 import { FILES_REQUEST } from 'components/hdfs-browser/hdfs-browser.component';
 import { loadYarnQueues } from 'actions/yarnqueues.action';
 import { YarnQueue } from 'models/yarnqueues.model';
-import { getYarnQueuesForCluster } from 'selectors/yarn.selector';
+import { getYarnQueueEntities } from 'selectors/yarn.selector';
+import { isEqual } from 'utils/object-utils';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 const DATABASE_REQUEST = '[Policy Form] DATABASE_REQUEST';
@@ -502,13 +503,13 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
       return all.concat(listItem);
     };
 
-    const updateQueueList = valueChange$.switchMap(clusterId => {
-      if (clusterId) {
-        return this.store.select(getYarnQueuesForCluster(clusterId));
-      }
-      return Observable.of([]);
-    }).subscribe(yarnQueues => {
-      if (yarnQueues) {
+    const clusterQueues$ = Observable.combineLatest(valueChange$, this.store.select(getYarnQueueEntities))
+      .map(([clusterId, entities]) => {
+        return entities[clusterId];
+      })
+      .distinctUntilChanged(isEqual);
+    const updateQueueList = clusterQueues$.subscribe(yarnQueues => {
+      if (yarnQueues && yarnQueues.length) {
         this.yarnQueueList = yarnQueues[0].children ? yarnQueues.reduce(createQueueList, []) :
           [makeQueueItem(yarnQueues[0].path)];
         if (skipFieldChange) {
