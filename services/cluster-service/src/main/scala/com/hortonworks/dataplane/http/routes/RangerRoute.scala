@@ -16,11 +16,21 @@ import javax.inject.Inject
 
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
+import com.google.common.annotations.VisibleForTesting
 import com.hortonworks.dataplane.commons.domain.Entities.ClusterService
 import com.hortonworks.dataplane.commons.domain.{Constants, Entities}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
-import com.hortonworks.dataplane.cs.{CredentialInterface, StorageInterface}
-import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, DpClusterService, ClusterService => CS}
+import com.hortonworks.dataplane.cs.{
+  ClusterDataApi,
+  CredentialInterface,
+  StorageInterface
+}
+import com.hortonworks.dataplane.db.Webservice.{
+  ClusterComponentService,
+  ClusterHostsService,
+  DpClusterService,
+  ClusterService => CS
+}
 import com.hortonworks.dataplane.http.BaseRoute
 import com.hortonworks.dataplane.http.JsonSupport._
 import com.hortonworks.dataplane.knox.Knox.{KnoxApiRequest, KnoxConfig}
@@ -40,6 +50,7 @@ class RangerRoute @Inject()(
     private val credentialInterface: CredentialInterface,
     private val dpClusterService: DpClusterService,
     private val cs: CS,
+    private val clusterDataApi: ClusterDataApi,
     private val config: Config,
     private val ws: WSClient
 ) extends BaseRoute {
@@ -327,18 +338,20 @@ class RangerRoute @Inject()(
       }, tokenAsString))
 
       repoType <- Future.successful(getRepoTypeFromRangerServiceDef(response1))
-      wsRequest2 <- Future.successful(ws
-        .url(
-          getUrl(dbName,
-                 tableName,
-                 offset,
-                 pageSize,
-                 accessType,
-                 accessResult,
-                 baseUrls,
-                 repoType))
-        .withHeaders(defaultHeaders)
-        .withAuth(credential.user.get, credential.pass.get, WSAuthScheme.BASIC))
+      wsRequest2 <- Future.successful(
+        ws.url(
+            getUrl(dbName,
+                   tableName,
+                   offset,
+                   pageSize,
+                   accessType,
+                   accessResult,
+                   baseUrls,
+                   repoType))
+          .withHeaders(defaultHeaders)
+          .withAuth(credential.user.get,
+                    credential.pass.get,
+                    WSAuthScheme.BASIC))
       response <- executor.execute(KnoxApiRequest(wsRequest2, { r =>
         r.get()
       }, tokenAsString))
@@ -397,17 +410,25 @@ class RangerRoute @Inject()(
       new URL(apiUrl)
     }
 
+  @VisibleForTesting
   def extractUrlsWithIp(urlObj: URL, clusterId: Long): Future[Seq[String]] = {
-
-    clusterHostsService
-      .getHostByClusterAndName(clusterId, urlObj.getHost)
-      .map {
-        case Right(host) =>
-          Seq(s"${urlObj.getProtocol}://${host.ipaddr}:${urlObj.getPort}")
-        case Left(errors) =>
-          throw new Exception(
-            s"Cannot translate the hostname into an IP address $errors")
+    if (Try(config.getBoolean("dp.service.ambari.single.node.cluster"))
+          .getOrElse(false)) {
+      clusterDataApi.getAmbariUrl(clusterId).map { ambari =>
+        Seq(
+          s"${urlObj.getProtocol}://${new URL(ambari).getHost}:${urlObj.getPort}")
       }
+    } else {
+      clusterHostsService
+        .getHostByClusterAndName(clusterId, urlObj.getHost)
+        .map {
+          case Right(host) =>
+            Seq(s"${urlObj.getProtocol}://${host.ipaddr}:${urlObj.getPort}")
+          case Left(errors) =>
+            throw new Exception(
+              s"Cannot translate the hostname into an IP address $errors")
+        }
+    }
 
   }
 

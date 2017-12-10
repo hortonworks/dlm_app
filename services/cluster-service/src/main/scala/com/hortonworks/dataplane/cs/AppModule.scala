@@ -216,11 +216,11 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def provideRangerRoute(storageInterface: StorageInterface,
-                         credentialInterface: CredentialInterface,
-                         clusterComponentService: ClusterComponentService,
-                         clusterHostsService: ClusterHostsService,
-                         wSClient: WSClient): DpProfilerRoute = {
+  def provideDpProfileRoute(storageInterface: StorageInterface,
+                            credentialInterface: CredentialInterface,
+                            clusterComponentService: ClusterComponentService,
+                            clusterHostsService: ClusterHostsService,
+                            wSClient: WSClient): DpProfilerRoute = {
     new DpProfilerRoute(clusterComponentService,
                         clusterHostsService,
                         storageInterface,
@@ -229,20 +229,22 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def provideDpProfilerRoute(storageInterface: StorageInterface,
-                             credentialInterface: CredentialInterface,
-                             clusterComponentService: ClusterComponentService,
-                             clusterHostsService: ClusterHostsService,
-                             dpClusterService: DpClusterService,
-                             clusterService: ClusterService,
-                             config: Config,
-                             wSClient: WSClient): RangerRoute = {
+  def provideRangerRoute(storageInterface: StorageInterface,
+                         credentialInterface: CredentialInterface,
+                         clusterComponentService: ClusterComponentService,
+                         clusterHostsService: ClusterHostsService,
+                         dpClusterService: DpClusterService,
+                         clusterService: ClusterService,
+                         clusterDataApi: ClusterDataApi,
+                         config: Config,
+                         wSClient: WSClient): RangerRoute = {
     new RangerRoute(clusterComponentService,
                     clusterHostsService,
                     storageInterface,
                     credentialInterface,
                     dpClusterService,
                     clusterService,
+                    clusterDataApi,
                     config,
                     wSClient)
   }

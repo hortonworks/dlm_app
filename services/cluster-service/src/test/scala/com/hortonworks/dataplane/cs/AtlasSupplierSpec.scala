@@ -29,10 +29,10 @@ class AtlasSupplierSpec extends AsyncFlatSpec with AsyncMockFactory {
   "Supplier" should "Construct valid single node Atlas Urls" in {
     val supplier = new AtlasApiSupplier(1, config, clusterDataApi)
     (config.getBoolean _).expects("dp.service.ambari.single.node.cluster").returning(true)
+    (clusterDataApi.getAmbariUrl _).expects(1).returning(Future.successful("http://10.0.0.0:8080"))
     (clusterDataApi.getAtlasUrl _).expects(1).returning(Future.successful(Set(new URL("http://abc.com:21000"))))
     (clusterDataApi.getCredentials _).expects().returning(Future.successful(Credentials(Some("admin"),Some("admin"))))
     (clusterDataApi.shouldUseToken _).expects(1).returning(Future.successful(false))
-    (clusterDataApi.getAmbariUrl _).expects(1).returning(Future.successful("http://10.0.0.0:8080"))
     supplier.get().map { x =>
       assert(!x.shouldUseToken)
     }
