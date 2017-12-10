@@ -20,7 +20,13 @@ import com.google.inject.{AbstractModule, Provider, Provides, Singleton}
 import com.hortonworks.dataplane.commons.metrics.MetricsRegistry
 import com.hortonworks.dataplane.cs.sync.DpClusterSync
 import com.hortonworks.dataplane.cs.utils.SSLUtils.DPTrustStore
-import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService, ClusterService, ConfigService, DpClusterService}
+import com.hortonworks.dataplane.db.Webservice.{
+  ClusterComponentService,
+  ClusterHostsService,
+  ClusterService,
+  ConfigService,
+  DpClusterService
+}
 import com.hortonworks.dataplane.db._
 import com.hortonworks.dataplane.http.routes.{DpProfilerRoute, _}
 import com.hortonworks.dataplane.http.{ProxyServer, Webserver}
@@ -39,7 +45,8 @@ object AppModule extends AbstractModule {
     bind(classOf[DPTrustStore]).asEagerSingleton()
     bind(classOf[Config]).toInstance(ConfigFactory.load())
     bind(classOf[ActorSystem]).toInstance(ActorSystem("cluster-service"))
-    bind(classOf[MetricsRegistry]).toInstance(MetricsRegistry("cluster-service"))
+    bind(classOf[MetricsRegistry])
+      .toInstance(MetricsRegistry("cluster-service"))
   }
 
   @Provides
@@ -54,9 +61,8 @@ object AppModule extends AbstractModule {
         .withDisabledKeyAlgorithms(
           scala.collection.immutable.Seq("RSA keySize < 1024"))
         .withTrustManagerConfig(
-          TrustManagerConfig().withTrustStoreConfigs(
-            scala.collection.immutable.Seq(
-              TrustStoreConfig(None, Some(dPKeystore.getKeyStoreFilePath)))))
+          TrustManagerConfig().withTrustStoreConfigs(scala.collection.immutable
+            .Seq(TrustStoreConfig(None, Some(dPKeystore.getKeyStoreFilePath)))))
       if (config.getBoolean(
             "dp.services.ssl.config.disable.hostname.verification"))
         settings.withLoose(s.loose.withDisableHostnameVerification(true))
@@ -120,9 +126,8 @@ object AppModule extends AbstractModule {
 
   @Provides
   @Singleton
-  def provideClusterHostsService(
-      implicit ws: WSClient,
-      configuration: Config): ClusterHostsService = {
+  def provideClusterHostsService(implicit ws: WSClient,
+                                 configuration: Config): ClusterHostsService = {
     new ClusterHostsServiceImpl(configuration)
   }
 
@@ -164,13 +169,15 @@ object AppModule extends AbstractModule {
                          config: Config,
                          wSClient: WSClient,
                          clusterSync: ClusterSync,
-                         dpClusterSync: DpClusterSync,metricsRegistry: MetricsRegistry): StatusRoute = {
+                         dpClusterSync: DpClusterSync,
+                         metricsRegistry: MetricsRegistry): StatusRoute = {
     new StatusRoute(wSClient,
                     storageInterface,
                     credentialInterface,
                     config,
                     clusterSync,
-                    dpClusterSync,metricsRegistry)
+                    dpClusterSync,
+                    metricsRegistry)
   }
 
   @Provides
@@ -220,10 +227,14 @@ object AppModule extends AbstractModule {
                             credentialInterface: CredentialInterface,
                             clusterComponentService: ClusterComponentService,
                             clusterHostsService: ClusterHostsService,
+                            clusterDataApi: ClusterDataApi,
+                            config: Config,
                             wSClient: WSClient): DpProfilerRoute = {
     new DpProfilerRoute(clusterComponentService,
                         clusterHostsService,
                         storageInterface,
+                        clusterDataApi,
+                        config,
                         wSClient)
   }
 
