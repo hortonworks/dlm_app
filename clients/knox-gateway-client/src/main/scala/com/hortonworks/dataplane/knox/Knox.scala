@@ -39,7 +39,7 @@ object Knox {
                         knoxCookieTokenName: String = "hadoop-jwt") {
 
     def tokenUrl =
-      s"${knoxUrl.get}/gateway/$tokenTopologyName/knoxtoken/api/v1/token"
+      s"${knoxUrl.get}/$tokenTopologyName/knoxtoken/api/v1/token"
   }
 
   case class TokenResponse(accessToken: String,
