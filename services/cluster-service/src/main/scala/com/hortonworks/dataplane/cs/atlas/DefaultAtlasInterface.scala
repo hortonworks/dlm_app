@@ -11,6 +11,7 @@
 
 package com.hortonworks.dataplane.cs.atlas
 
+import java.net.URL
 import javax.ws.rs.core.Cookie
 
 import com.google.common.base.Supplier
@@ -101,10 +102,10 @@ class DefaultAtlasInterface(private val clusterId: Long,
 
   private def getApi(implicit hJwtToken: Option[HJwtToken]) = {
     import ClientExtension._
-    for{
+    for {
       a <- atlasApi.get
-      t <- atlasApiData.getTokenForCluster(clusterId,hJwtToken)
-      api <- Future.successful (a.api.setToken(t))
+      t <- atlasApiData.getTokenForCluster(clusterId, hJwtToken)
+      api <- Future.successful(a.api.setToken(t))
     } yield api
 
   }
@@ -225,7 +226,7 @@ class DefaultAtlasInterface(private val clusterId: Long,
 
 sealed class AtlasApiSupplier(clusterId: Long,
                               config: Config,
-                              atlasApiData: ClusterDataApi)
+                              clusterDataApi: ClusterDataApi)
     extends Supplier[Future[ClientWrapper]] {
   private val log = Logger(classOf[AtlasApiSupplier])
 
@@ -233,20 +234,43 @@ sealed class AtlasApiSupplier(clusterId: Long,
     log.info("Loading Atlas client from Supplier")
     for {
       f <- for {
-        url <- atlasApiData.getAtlasUrl(clusterId)
-        shouldUseToken <- atlasApiData.shouldUseToken(clusterId)
+        url <- clusterDataApi.getAtlasUrl(clusterId)
+        shouldUseToken <- clusterDataApi.shouldUseToken(clusterId)
+        array <- {
+          val arr = url.map(_.toString).toArray
+          if (Try(config.getBoolean("dp.service.ambari.single.node.cluster"))
+                .getOrElse(false)) {
+            clusterDataApi.getAmbariUrl(clusterId).map { ambariUrl =>
+              arr.map { h =>
+                val oldUrl = new URL(h)
+                new URL(oldUrl.getProtocol,
+                        new URL(ambariUrl).getHost,
+                        oldUrl.getPort,
+                        oldUrl.getFile).toString
+              }
+            }
+          } else Future.successful(arr)
+        }
         client <- {
-          val array = url.map(_.toString).toArray
           log.info(s"Atlas URL's loaded $url")
           if (shouldUseToken) {
-            log.info("The cluster is registered as Knox enabled, Basic auth will not be set up")
-            log.warn("!!!Atlas will not work unless configured with Knox SSO.!!!")
+            log.info(
+              "The cluster is registered as Knox enabled, Basic auth will not be set up")
+            log.warn(
+              "!!!Atlas will not work unless configured with Knox SSO.!!!")
             // The initial value is not important as this can be updated with the real token
-            Future.successful(ClientWrapper(clusterId,new AtlasClientV2(array, new Cookie(Constants.HJWT,"")),true))
+            Future.successful(
+              ClientWrapper(
+                clusterId,
+                new AtlasClientV2(array, new Cookie(Constants.HJWT, "")),
+                shouldUseToken = true))
           } else {
-            atlasApiData.getCredentials.map { c =>
-              log.info(s"No Knox detected , setting up basic auth with credentials -> $c")
-              ClientWrapper(clusterId,new AtlasClientV2(url.map(_.toString).toArray, Array(c.user.get,c.pass.get)))
+            clusterDataApi.getCredentials.map { c =>
+              log.info(
+                s"No Knox detected , setting up basic auth with credentials -> $c")
+              ClientWrapper(
+                clusterId,
+                new AtlasClientV2(array, Array(c.user.get, c.pass.get)))
             }
           }
         }
