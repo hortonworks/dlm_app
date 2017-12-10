@@ -20,11 +20,8 @@ import play.api.libs.ws.WSResponse
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class DpProfilerServiceImpl (config: Config)(implicit ws: ClusterWsClient) extends DpProfilerService{
+class DpProfilerServiceImpl (val config: Config)(implicit ws: ClusterWsClient) extends DpProfilerService{
 
-  private def url =
-    Option(System.getProperty("dp.services.cluster.service.uri"))
-      .getOrElse(config.getString("dp.services.cluster.service.uri"))
 
   private def mapResultsGeneric(res: WSResponse) : Either[Errors,JsObject]= {
     res.status match {

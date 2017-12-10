@@ -31,24 +31,31 @@ import models.Entities.{
   ClusterStats
 }
 import play.api.Logger
+import utils.EndpointService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
 
 /**
   * `DataplaneService` class interacts with dataplane webservice
-  * @param clusterService   db service to communicate with dataplane cluster endpoint
-  * @param clusterComponentService  db service to communicate with dataplane cluster component service endpoint
+  *
+  * @param clusterService          db service to communicate with dataplane cluster endpoint
+  * @param clusterComponentService db service to communicate with dataplane cluster component service endpoint
   */
 @Singleton
 class DataplaneService @Inject()(
+    val eps: EndpointService,
     @Named("clusterService") val clusterService: ClusterService,
     @Named("clusterComponentService") val clusterComponentService: ClusterComponentService,
     @Named("dpClusterService") val dpClusterService: DpClusterService,
     @Named("locationService") val locationService: LocationService) {
 
+  private type ConfigToUrl = ClusterServiceWithConfigs => Future[Either[Errors, String]]
+
+
   /**
     * Get details of the clusters that has Beacon server installed
+    *
     * @return [[models.Entities.BeaconCluster]]
     */
   def getBeaconClusters: Future[Either[Errors, BeaconClusters]] = {
@@ -117,9 +124,9 @@ class DataplaneService @Inject()(
               case None => None
             }
 
-            val beaconEndpoint: Either[Errors, String] =
-              getBeaconEndpoint(endpointData)
-            beaconEndpoint match {
+            val beaconEndpoint: Future[Either[Errors, String]] =
+              eps.getBeaconEndpoint(endpointData)
+            beaconEndpoint map {
               case Right(be) =>
                 Right(
                   newBeaconCluster(cluster,
@@ -131,11 +138,15 @@ class DataplaneService @Inject()(
               case Left(errors) => Left(errors)
             }
           })
-        if (!allBeaconClusters.exists(_.isLeft)) {
-          p.success(Right(BeaconClusters(allBeaconClusters.map(_.right.get))))
-        } else {
-          val errors: Errors = allBeaconClusters.find(_.isLeft).get.left.get
-          p.trySuccess(Left(errors))
+
+        val beaconClusterList = Future.sequence(allBeaconClusters)
+        beaconClusterList.map { bc =>
+          if (!bc.exists(_.isLeft)) {
+            p.success(Right(BeaconClusters(bc.map(_.right.get))))
+          } else {
+            val errors: Errors = bc.find(_.isLeft).get.left.get
+            p.trySuccess(Left(errors))
+          }
         }
       }
 
@@ -149,6 +160,7 @@ class DataplaneService @Inject()(
       case e: Exception =>
         p.trySuccess(Left(Errors(Seq(Error("500", e.getMessage)))))
     }
+
     p.future
   }
 
@@ -178,108 +190,39 @@ class DataplaneService @Inject()(
     */
   def getClusterIdWithBeaconUrls
     : Future[Either[Errors, Seq[ClusterIdWithBeaconUrl]]] = {
-    val p: Promise[Either[Errors, Seq[ClusterIdWithBeaconUrl]]] = Promise()
 
     clusterComponentService
       .getAllServiceEndpoints(DataplaneService.BEACON_SERVER)
-      .map({
+      .flatMap({
         case Right(beaconClusters) =>
-          val clusterIdWithBeaconUrl
-            : Seq[Either[Errors, ClusterIdWithBeaconUrl]] =
-            beaconClusters.map(x => {
-              val beaconUrl: Either[Errors, String] =
-                getBeaconEndpoint(x)
-
-              beaconUrl match {
+          val clusterIdWithBeaconUrl : Future[Seq[Either[Errors, ClusterIdWithBeaconUrl]]] = {
+            val seq = beaconClusters.map(x => {
+              eps.getBeaconEndpoint(x) map {
                 case Right(bu) =>
                   Right(ClusterIdWithBeaconUrl(bu, x.clusterid.get))
                 case Left(errors) => Left(errors)
               }
             })
-
-          if (!clusterIdWithBeaconUrl.exists(_.isLeft)) {
-            p.success(Right(clusterIdWithBeaconUrl.map(_.right.get)))
-          } else {
-            val errors: Errors =
-              clusterIdWithBeaconUrl.find(_.isLeft).get.left.get
-            p.trySuccess(Left(errors))
+          Future.sequence(seq)
           }
-        case Left(errors) => p.success(Left(errors))
+
+          clusterIdWithBeaconUrl.map { v =>
+            if (!v.exists(_.isLeft)) {
+              Right(v.map(_.right.get))
+            } else {
+              val errors: Errors =
+                v.find(_.isLeft).get.left.get
+              Left(errors)
+            }
+          }
+        case Left(errors) => Future.successful(Left(errors))
       })
 
-    p.future
-  }
-
-  /**
-    * Get beacon server endpoint
-    * @param endpointData service host and properties details
-    * @return
-    */
-  def getBeaconEndpoint(
-      endpointData: ClusterServiceWithConfigs): Either[Errors, String] = {
-
-    val beaconSchemePortMap =
-      Map("http" -> "beacon_port", "https" -> "beacon_tls_enabled")
-    val beaconScheme: String =
-      getPropertyValue(endpointData, "beacon-env", "beacon_tls_enabled") match {
-        case Right(bs) => if (bs == "true") "https" else "http"
-        case Left(_)   => "http"
-      }
-
-    val beaconPort = getPropertyValue(endpointData,
-                                      "beacon-env",
-                                      beaconSchemePortMap(beaconScheme))
-
-    beaconPort match {
-      case Right(bp) =>
-        val beaconHostName = endpointData.servicehost
-        val beaconEndpoint = s"$beaconScheme://$beaconHostName:$bp"
-        Right(beaconEndpoint)
-      case Left(errors) => Left(errors)
-    }
-  }
-
-  /**
-    *
-    * @param endpointData  configuration blob
-    * @param configType    config type
-    * @param configName    config property name
-    * @return
-    */
-  def getPropertyValue(endpointData: ClusterServiceWithConfigs,
-                       configType: String,
-                       configName: String): Either[Errors, String] = {
-    val serviceName = endpointData.servicename
-    val configProperties: Option[ConfigurationInfo] =
-      endpointData.configProperties
-    configProperties match {
-      case Some(configTypes) =>
-        val configProperties =
-          configTypes.properties.find(_.`type` == configType)
-        configProperties match {
-          case Some(cp) =>
-            cp.properties.get(configName) match {
-              case Some(configValue) => Right(configValue)
-              case None =>
-                val errorMsg =
-                  s"$configName is not found in $configType for $serviceName"
-                Logger.error(errorMsg)
-                Left(Errors(Seq(Error("500", errorMsg))))
-            }
-          case None =>
-            val errorMsg = s"$configType is not associated with $serviceName"
-            Logger.error(errorMsg)
-            Left(Errors(Seq(Error("500", errorMsg))))
-        }
-      case None =>
-        val errorMsg = s"configuration blob is not available for $serviceName"
-        Logger.error(errorMsg)
-        Left(Errors(Seq(Error("500", errorMsg))))
-    }
   }
 
   /**
     * Get future for cluster details from datapane db client
+    *
     * @param clusterId cluster id
     * @return
     */
@@ -289,6 +232,7 @@ class DataplaneService @Inject()(
 
   /**
     * Get future for cluster details from datapane db client
+    *
     * @param clusterId cluster id
     * @return
     */
@@ -299,6 +243,7 @@ class DataplaneService @Inject()(
 
   /**
     * Get future for cluster details from datapane db client
+    *
     * @return
     */
   def getAllClusters: Future[Either[Errors, Seq[Cluster]]] = {
@@ -306,39 +251,39 @@ class DataplaneService @Inject()(
   }
 
   /**
-    *  Get future for service details from dataplane db client
+    * Get future for service details from dataplane db client
+    *
     * @param clusterId cluster id
     * @return
     */
   def getBeaconService(clusterId: Long): Future[Either[Errors, String]] = {
     getServiceEndpoint(clusterId,
                        DataplaneService.BEACON_SERVER,
-                       getBeaconEndpoint)
+                       eps.getBeaconEndpoint)
   }
 
   /**
     * Get future for service details from dataplane
+    *
     * @param clusterId cluster id
     * @return
     */
-  def getServiceEndpoint(clusterId: Long,
-                         serviceName: String,
-                         f: ClusterServiceWithConfigs => Either[Errors, String])
+  def getServiceEndpoint(
+      clusterId: Long,
+      serviceName: String,
+      f: ConfigToUrl)
     : Future[Either[Errors, String]] = {
-    val p: Promise[Either[Errors, String]] = Promise()
     clusterComponentService
       .getEndpointsForCluster(clusterId, serviceName)
-      .map({
+      .flatMap({
         case Right(clusterServiceWithConfigs) =>
-          val serviceEndpoint: Either[Errors, String] =
-            f(clusterServiceWithConfigs)
-          serviceEndpoint match {
-            case Right(se)    => p.success(Right(se))
-            case Left(errors) => p.success(Left(errors))
+          val serviceEndpoint = f(clusterServiceWithConfigs)
+          serviceEndpoint map {
+            case Right(se)    => Right(se)
+            case Left(errors) => Left(errors)
           }
-        case Left(errors) => p.success(Left(errors))
+        case Left(errors) => Future.successful(Left(errors))
       })
-    p.future
   }
 
   def getServiceConfigs(clusterId: Long, serviceName: String)

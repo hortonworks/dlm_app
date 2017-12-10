@@ -166,20 +166,18 @@ class BeaconService @Inject()(
               val clusterDefsToBeSubmitted: Set[ClusterDefinition] = getClusterDefsToBeSubmitted(listOfClusters)
               if (clusterDefsToBeSubmitted.isEmpty) {
                 createPair(listOfClusters, p)
-              } else {
-                Future.sequence(clusterDefsToBeSubmitted.toSeq.map((x) => {
-                  val dataCenterClusterName =  x.clusterDefRequest.dataCenter + "$" + x.clusterDefRequest.name
-                  beaconClusterService.createClusterDefinition(x.beaconUrl, x.clusterId, dataCenterClusterName, x.clusterDefRequest)
-                })).map({
-                  x => {
-                    if (!x.exists(_.isLeft)) {
-                      createPair(listOfClusters, p)
-                    } else {
-                      p.success(Left(x.find(_.isLeft).get.left.get))
-                    }
+              } else Future.sequence(clusterDefsToBeSubmitted.toSeq.map((x) => {
+                val dataCenterClusterName =  x.clusterDefRequest.dataCenter + "$" + x.clusterDefRequest.name
+                beaconClusterService.createClusterDefinition(x.beaconUrl, x.clusterId, dataCenterClusterName, x.clusterDefRequest)
+              })).map({
+                x => {
+                  if (!x.exists(_.isLeft)) {
+                    createPair(listOfClusters, p)
+                  } else {
+                    p.success(Left(x.find(_.isLeft).get.left.get))
                   }
-                })
-              }
+                }
+              })
             } else {
               failedCallBack(p)
             }
