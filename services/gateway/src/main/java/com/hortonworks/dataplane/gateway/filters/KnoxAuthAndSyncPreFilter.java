@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013-2015 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.hortonworks.dataplane.gateway.filters;
 
 import com.google.common.base.Optional;
@@ -73,7 +88,7 @@ public class KnoxAuthAndSyncPreFilter extends ZuulFilter {
 
 
   private UserContext buildSyncedUserContextFromKnoxToken(String token) throws GatewayException {
-    UserContext userContext = null;
+    UserContext userContext;
     TokenInfo tokenInfo = knox.validateJwt(token);
 
     if (!tokenInfo.isValid()) {
@@ -88,7 +103,7 @@ public class KnoxAuthAndSyncPreFilter extends ZuulFilter {
         if (userContext == null) {
           throw new GatewayException(HttpStatus.FORBIDDEN, "User does not have access to DPS.");
         }
-      } catch (NoAllowedGroupsException nge){
+      } catch (NoAllowedGroupsException nge) {
         throw new GatewayException(HttpStatus.FORBIDDEN, "User does not have access to DPS. No groups have been configured.");
       }
 
@@ -103,7 +118,7 @@ public class KnoxAuthAndSyncPreFilter extends ZuulFilter {
       if (needsResyncFromLdap(userContext)) {
         logger.info(String.format("resyncing from ldap for user [%s]", tokenInfo.getSubject()));
         userContext = userService.resyncUserFromLdapGroupsConfiguration(tokenInfo.getSubject());
-        if(userContext == null) {
+        if (userContext == null) {
           throw new GatewayException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to resync user with LDAP.");
         }
         logger.info(("resync complete"));

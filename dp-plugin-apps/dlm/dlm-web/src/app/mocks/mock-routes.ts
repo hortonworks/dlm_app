@@ -58,5 +58,8 @@ export const routes: MockRoute[] = [
   new MockRoute('api/identity', 'user_detail.json'),
 
   // Beacon admin status
-  new MockRoute('beacon/admin/status', 'admin_status.json')
+  new MockRoute('beacon/admin/status', 'admin_status.json'),
+
+  // Yarn queues
+  new MockRoute('clusters/:clusterId/yarn/queues', 'yarn_queues.json')
 ];

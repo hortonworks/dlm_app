@@ -46,6 +46,10 @@ import { getMergedProgress, getAllProgressStates, getProgressState } from 'selec
 import { HiveBrowserTablesLoadingMap, DatabaseTablesCollapsedEvent } from 'components/hive-browser';
 import { removeProgressState } from 'actions/progress.action';
 import { FILES_REQUEST } from 'components/hdfs-browser/hdfs-browser.component';
+import { loadYarnQueues } from 'actions/yarnqueues.action';
+import { YarnQueue } from 'models/yarnqueues.model';
+import { getYarnQueueEntities } from 'selectors/yarn.selector';
+import { isEqual } from 'utils/object-utils';
 
 export const POLICY_FORM_ID = 'POLICY_FORM_ID';
 const DATABASE_REQUEST = '[Policy Form] DATABASE_REQUEST';
@@ -100,7 +104,9 @@ export function nameValidator(): ValidatorFn {
 })
 export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
   private tableRequestPrefix = '[PolicyFormComponent] LOAD_TABLES ';
+  private formRestored = false;
   databaseTablesLoadingMap: HiveBrowserTablesLoadingMap = {};
+  yarnQueueList: any[] = [];
 
   @Input() pairings: Pairing[] = [];
   @Input() sourceClusterId = 0;
@@ -396,6 +402,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
           if (Object.keys(policyFormValues['advanced']).some(k => policyFormValues['advanced'][k] !== '')) {
             this.sectionCollapsedMap.advanced = false;
           }
+          this.formRestored = true;
         } else if (sourceClusterId > 0) {
           policyForm.patchValue({
             general: {
@@ -475,6 +482,52 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     this.subscriptions.push(updateUserTimezone);
   }
 
+  private setupDestinationChanges(policyForm: FormGroup): void {
+    let skipFieldChange = this.formRestored;
+    const valueChange$: Observable<number> = policyForm.valueChanges
+      .pluck('general', 'destinationCluster')
+      .distinctUntilChanged();
+    const loadQueues = valueChange$
+      .subscribe(clusterId => {
+        if (clusterId) {
+          this.store.dispatch(loadYarnQueues(clusterId));
+        }
+      });
+
+    const makeQueueItem = (path: String): SelectOption => ({label: path, value: path});
+    const createQueueList = (all, queue) => {
+      const listItem = queue.path === 'root' ? [] : makeQueueItem(queue.path.replace(/^root\./, ''));
+      if (queue.children.length) {
+        return queue.children.reduce(createQueueList, all.concat(listItem));
+      }
+      return all.concat(listItem);
+    };
+
+    const clusterQueues$ = Observable.combineLatest(valueChange$, this.store.select(getYarnQueueEntities))
+      .map(([clusterId, entities]) => {
+        return entities[clusterId];
+      })
+      .distinctUntilChanged(isEqual);
+    const updateQueueList = clusterQueues$.subscribe(yarnQueues => {
+      if (yarnQueues && yarnQueues.length) {
+        this.yarnQueueList = yarnQueues[0].children ? yarnQueues.reduce(createQueueList, []) :
+          [makeQueueItem(yarnQueues[0].path)];
+        if (skipFieldChange) {
+          skipFieldChange = false;
+          return;
+        }
+        policyForm.patchValue({
+          advanced: {
+            queue_name: this.yarnQueueList[0].value
+          }
+        });
+        this.cdRef.markForCheck();
+      }
+    });
+    this.subscriptions.push(loadQueues);
+    this.subscriptions.push(updateQueueList);
+  }
+
   constructor(private formBuilder: FormBuilder,
               private store: Store<State>,
               private timezoneService: TimeZoneService,
@@ -490,6 +543,7 @@ export class PolicyFormComponent implements OnInit, OnDestroy, OnChanges {
     this.presetJobTime(this.policyForm);
     this.setupDirectoryChanges(this.policyForm);
     this.setupDatabaseChanges(this.policyForm);
+    this.setupDestinationChanges(this.policyForm);
     this.setupTimeZoneChanges();
   }
 

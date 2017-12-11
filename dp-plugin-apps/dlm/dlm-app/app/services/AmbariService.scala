@@ -15,6 +15,8 @@ import models.Ambari._
 import com.hortonworks.dataplane.cs.Webservice.{AmbariWebService => AmbariClientService}
 import com.hortonworks.dataplane.commons.domain.Entities.{Error, Errors, HJwtToken}
 import com.hortonworks.dlm.beacon.domain.RequestEntities.RangerServiceDetails
+import models.Ambari
+import models.Entities.{YarnQueueDefinition, YarnQueuesResponse}
 import play.api.Logger
 import play.api.http.Status.BAD_GATEWAY
 import play.api.libs.json.{JsObject, JsValue}
@@ -309,6 +311,60 @@ class AmbariService @Inject()(@Named("ambariService") val ambariService: AmbariC
     p.future
   }
 
+  def getCapacitySchedulerConfigs(clusterId: Long) (implicit token: Option[HJwtToken]): Future[Either[Errors, Ambari.ServiceConfigurations]] = {
+    val p: Promise[Either[Errors, Ambari.ServiceConfigurations]] = Promise()
+    val configError = Errors(Seq(Error("500", "no configs")))
+
+    getServiceConfigDetails(clusterId, AmbariService.YARN_SERVICE_NAME).map {
+      case Left(errors) => p.success(Left(errors))
+      case Right(response) =>
+        response match {
+          case None => p.success(Left(configError))
+          case Some(response) =>
+            val capacitySchedulerProps = response.find(_.`type` == AmbariService.YARN_CAPACITY_SCHEDULER_PROPERTIES)
+            capacitySchedulerProps match {
+              case None => p.success(Left(configError))
+              case Some(configs) => p.success(Right(configs))
+            }
+        }
+    }
+    p.future
+  }
+
+  private def buildQueues(path: String, queues: Map[String, String]): YarnQueueDefinition = {
+    val name = path.split("\\.").lastOption.get
+    queues.get(path) match {
+      case None => new YarnQueueDefinition(name, Seq(), path)
+      case Some(children) =>
+        val childrenQueues: Seq[YarnQueueDefinition] = children.split(",")
+          .map(n => buildQueues(s"${path}.${n}", queues))
+        new YarnQueueDefinition(name, childrenQueues, path)
+    }
+  }
+
+  private def extractYarnQueues(configs: Ambari.ServiceConfigurations): Seq[YarnQueueDefinition] = {
+    val queuePattern = "yarn.scheduler.capacity.(.+).queues$$".r
+    val queueConfigs = configs.properties.as[Map[String, String]].foldLeft(Map[String,String]()) { case (acc, (k: String, v: String)) =>
+      k match {
+        case queuePattern(name) => acc ++ Map(name->v)
+        case _ => acc
+      }
+    }
+    Seq(buildQueues("root", queueConfigs))
+  }
+
+  def getYarnQueues(clusterId: Long)(implicit token: Option[HJwtToken]): Future[Either[Errors, YarnQueuesResponse]] = {
+    val p: Promise[Either[Errors, YarnQueuesResponse]] = Promise()
+
+    getCapacitySchedulerConfigs(clusterId).map {
+      case Left(errors) => p.success(Left(errors))
+      case Right(capacitySchedulerConfigs) =>
+        val extracted = extractYarnQueues(capacitySchedulerConfigs)
+        p.success(Right(new YarnQueuesResponse(extracted)))
+    }
+    p.future
+  }
+
 
   def convertEitherToOption[T](data: Either[Errors, T]) : Option[T] = {
     data match {
@@ -381,9 +437,11 @@ object AmbariService {
   lazy val RANGER_SERVICE_NAME = "RANGER"
   lazy val HDFS_SERVICE_NAME = "HDFS"
   lazy val HIVE_SERVICE_NAME = "HIVE"
+  lazy val YARN_SERVICE_NAME = "YARN"
   lazy val RANGER_ADMIN_PROPERTIES = "admin-properties"
   lazy val RANGER_HDFS_SECURITY_PROPERTIES = "ranger-hdfs-security"
   lazy val RANGER_HIVE_SECURITY_PROPERTIES = "ranger-hive-security"
+  lazy val YARN_CAPACITY_SCHEDULER_PROPERTIES = "capacity-scheduler"
 
   def getNameNodeAmbariUrl = "services/HDFS/components/NAMENODE?fields=host_components/metrics/dfs/FSNamesystem/HAState,host_components/HostRoles/host_name&minimal_response=true"
   def getActiveNameNodeErrMsg = "No active namenode found from Ambari REST APIs"

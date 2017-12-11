@@ -12,9 +12,7 @@ package services
 import com.google.inject.{Inject, Singleton}
 import com.google.inject.name.Named
 import com.hortonworks.dataplane.commons.domain.Entities.HJwtToken
-import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconAdminStatusDetails, BeaconApiError, BeaconApiErrors,
-       BeaconEntityResponse, BeaconEventResponse, BeaconHdfsFileResponse, BeaconHiveDbResponse, BeaconHiveDbTablesResponse,
-       BeaconLogResponse, PairedCluster, PolicyDataResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
+import com.hortonworks.dlm.beacon.domain.ResponseEntities.{BeaconAdminStatusDetails, BeaconApiError, BeaconApiErrors, BeaconEntityResponse, BeaconEventResponse, BeaconHdfsFileResponse, BeaconHiveDbResponse, BeaconHiveDbTablesResponse, BeaconLogResponse, PairedCluster, PolicyDataResponse, PostActionResponse, PoliciesDetailResponse => PolicyDetailsData}
 import com.hortonworks.dlm.beacon.WebService._
 import com.hortonworks.dlm.beacon.domain.RequestEntities.ClusterDefinitionRequest
 

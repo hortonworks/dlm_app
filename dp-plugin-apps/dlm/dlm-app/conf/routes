@@ -49,6 +49,10 @@ GET     /api/clusters/:clusterId/hdfs/file                     controllers.HdfsF
 GET     /api/clusters/:clusterId/hive/databases                   controllers.HiveDatabases.retrieveDb(clusterId: Long)
 GET     /api/clusters/:clusterId/hive/database/:dbName/tables     controllers.HiveDatabases.retrieveDbTables(clusterId: Long, dbName: String)
 
+#YarnQueues
+
+GET     /api/clusters/:clusterId/yarn/queues                      controllers.YarnQueues.retrieve(clusterId: Long)
+
 
 # Due to the regex involved, Following should be always placed at the end of the file
 # static resources

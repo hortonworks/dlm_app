@@ -308,7 +308,8 @@
           <fieldset [collapse]="sectionCollapsedMap.advanced" formGroupName="advanced">
             <dlm-form-field
               [label]="'page.policies.form.fields.queue_name' | translate">
-              <input type="text" class="form-control" formField formControlName="queue_name"/>
+              <dlm-select-field qe-attr="yarn-queue-name" formField formControlName="queue_name" [options]="yarnQueueList">
+              </dlm-select-field>
             </dlm-form-field>
             <dlm-form-field
               [label]="'page.policies.form.fields.max_bandwidth' | translate">

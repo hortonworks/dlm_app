@@ -70,7 +70,11 @@ public class TraceFilter extends ZuulFilter {
     RequestContext ctx = RequestContext.getCurrentContext();
     HttpServletRequest request = ctx.getRequest();
     Enumeration<String> headerNames = request.getHeaderNames();
-    EnumerationUtils.toList(headerNames).stream().forEach((Consumer<String>) s -> log.warn("Header "+ s + ":"+ request.getHeader(s)));
+    log.info("Logging Request headers");
+    EnumerationUtils.toList(headerNames).stream().forEach((Consumer<String>) s -> log.warn("Header "+ s + "->"+ request.getHeader(s)));
+    log.info("Logging Zuul request headers");
+    ctx.getZuulRequestHeaders().forEach((s, s2) -> log.warn(s +"->"+ s2));
+
     log.warn("Request path :" + request.getServletPath());
     try {
       InputStream stream = ctx.getResponseDataStream();

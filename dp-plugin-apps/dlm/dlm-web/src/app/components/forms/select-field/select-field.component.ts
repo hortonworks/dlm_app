@@ -10,7 +10,7 @@
 import { Component, OnInit, Input, Output, ViewEncapsulation, forwardRef, ChangeDetectionStrategy,
   EventEmitter, ContentChild, OnChanges, SimpleChanges, HostListener, ElementRef
 } from '@angular/core';
-import { NG_VALUE_ACCESSOR, ControlValueAccessor, NG_VALIDATORS, Validator, FormControl } from '@angular/forms';
+import { NG_VALUE_ACCESSOR, ControlValueAccessor, FormControl } from '@angular/forms';
 import { SelectOption } from './select-option.type';
 import { SelectFieldOptionDirective } from './select-field-option.directive';
 import { SelectFieldValueDirective } from './select-field-value.directive';
@@ -20,17 +20,12 @@ export const CUSTOM_SELECT_CONTROL_VALUE_ACCESSOR: any = {
   useExisting: forwardRef(() => SelectFieldComponent),
   multi: true
 };
-export const CUSTOM_SELECT_CONTROL_VALUE_VALIDATOR: any = {
-  provide: NG_VALIDATORS,
-  useExisting: forwardRef(() => SelectFieldComponent),
-  multi: true
-};
 // TODO: Multiselect??
 @Component({
   selector: 'dlm-select-field',
   styleUrls: ['./select-field.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  providers: [CUSTOM_SELECT_CONTROL_VALUE_ACCESSOR, CUSTOM_SELECT_CONTROL_VALUE_VALIDATOR],
+  providers: [CUSTOM_SELECT_CONTROL_VALUE_ACCESSOR],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="select-field-container">
@@ -61,7 +56,7 @@ export const CUSTOM_SELECT_CONTROL_VALUE_VALIDATOR: any = {
     </div>
   `
 })
-export class SelectFieldComponent implements OnInit, ControlValueAccessor, Validator, OnChanges {
+export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnChanges {
   private defaultValue: SelectOption = {
     label: 'None',
     value: null
@@ -112,13 +107,6 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, Valid
     this.onChange(value);
     this.onSelect.emit(this.selectedOption);
     this.toggleMenu();
-  }
-
-  validate(control: FormControl) {
-    if (!this.value) {
-      return { required: true };
-    }
-    return null;
   }
 
   toggleMenu() {

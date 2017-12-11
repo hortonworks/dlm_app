@@ -46,6 +46,7 @@ import { LogEffects } from './effects/log.effect';
 import { ConfirmationEffects } from './effects/confirmation.effect';
 import { NotificationEffects } from './effects/notification.effect';
 import { BeaconEffects } from './effects/beacon.effect';
+import { YarnEffects } from './effects/yarn.effect';
 
 import { FormEffects } from './effects/form.effect';
 
@@ -66,6 +67,7 @@ import { OverviewJobsExternalFiltersService } from 'services/overview-jobs-exter
 import { UserService } from 'services/user.service';
 import { ConfirmationService } from 'services/confirmation.service';
 import { BeaconService } from 'services/beacon.service';
+import { YarnService } from 'services/yarn.service';
 
 import { MainComponent } from './pages/main/main.component';
 import { DlmComponent } from './dlm.component';
@@ -165,6 +167,7 @@ import { BytesSizePipe } from 'pipes/bytes-size.pipe';
     EffectsModule.run(ConfirmationEffects),
     EffectsModule.run(NotificationEffects),
     EffectsModule.run(BeaconEffects),
+    EffectsModule.run(YarnEffects),
     CollapseModule.forRoot(),
     BsDropdownModule.forRoot(),
     TabsModule.forRoot(),
@@ -269,6 +272,7 @@ import { BytesSizePipe } from 'pipes/bytes-size.pipe';
     FrequencyPipe,
     UserService,
     BeaconService,
+    YarnService,
     AppConfig,
     {
       provide: APP_INITIALIZER,
