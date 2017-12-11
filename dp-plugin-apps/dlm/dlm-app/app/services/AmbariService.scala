@@ -241,7 +241,9 @@ class AmbariService @Inject()(
 
                       ep.transformRangerData(RangerServiceDetails(policyManagerExternalUrl,
                         rangerHDFSServiceName,
-                        rangerHiveServiceName),1).map(Right(_))
+                        rangerHiveServiceName),1).map {
+                          result => p.success(Right(Some(result)))
+                        }
                     }
                   }
 
@@ -336,7 +338,9 @@ class AmbariService @Inject()(
                   "dfs.nameservices" -> dfsNameService
                 ) ++ nnHaDynamicKeyConfigs
 
-                ep.transFormHdfsData(hdfsServiceConfigMap, clusterId).map(Right(_))
+                ep.transFormHdfsData(hdfsServiceConfigMap, clusterId).map {
+                  result => p.success(Right(result))
+                }
               case Left(errors) => p.success(Left(errors))
             }
         }
