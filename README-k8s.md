@@ -8,6 +8,7 @@ DOCKER_EMAIL
 ORG="acme"
 ```
 -------------------------------------------------
+If you are using provided dev-container, skip to [Install](#Install)
 
 ## Pre-requisites
 You need the following dependencies installed for a local setup.
@@ -49,35 +50,6 @@ kubectl create secret docker-registry docker-hub-private-registry-secret \
 kubectl patch serviceaccount default \
     -p '{"imagePullSecrets": [{"name": "docker-hub-private-registry-secret"}]}' \
     --namespace=dataplane
-```
-
-## Create Secrets
-### Database
-```
-POSTGRES_USER="dp-admin"
-POSTGRES_PASSWORD=`openssl rand -base64 32`
-kubectl create secret generic "dp-database-secret-$ORG" \
-    --from-literal="POSTGRES_USER=$POSTGRES_USER" \
-    --from-literal="POSTGRES_PASSWORD=$POSTGRES_PASSWORD" \
-    --namespace=dataplane
-```
-
-### Knox
-```
-KNOX_MASTER_PASSWORD=`openssl rand -base64 32`
-CERTIFICATE_PASSWORD=`openssl rand -base64 32`
-kubectl create secret generic "dp-knox-secret-$ORG" \
-    --from-literal="KNOX_MASTER_PASSWORD=$KNOX_MASTER_PASSWORD" \
-    --from-literal="CERTIFICATE_PASSWORD=$CERTIFICATE_PASSWORD" \
-    --namespace=dataplane
-```
-
-### TLS for Ingress
-```
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /tmp/tls.key -out /tmp/tls.crt -subj "/CN=*.tmpdpstrialdev.io"
-kubectl create secret tls "dp-ingress-key-$ORG" --key /tmp/tls.key --cert /tmp/tls.crt
-rm /tmp/tls.key /tmp/tls.crt
-
 ```
 
 ## Install

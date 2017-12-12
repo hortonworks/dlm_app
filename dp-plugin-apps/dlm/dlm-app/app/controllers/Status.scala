@@ -9,8 +9,9 @@
 
 package controllers
 
-import com.google.inject.{Inject, Singleton}
+import java.util.Collections
 
+import com.google.inject.{Inject, Singleton}
 import com.hortonworks.dataplane.commons.metrics.{MetricsRegistry, MetricsReporter}
 import play.api.mvc.{Action, Controller}
 
@@ -23,9 +24,20 @@ class Status @Inject()(metricsRegistry: MetricsRegistry) extends Controller {
     Future.successful(Ok)
   }
 
-  def metrics = Action.async {
-    implicit val mr:MetricsRegistry = metricsRegistry
-    Future.successful(Ok(MetricsReporter.asJson))
+  def status = Action.async {
+    Future.successful(Ok)
+  }
+
+  import scala.collection.JavaConverters._
+
+  def metrics = Action.async { req =>
+    implicit val mr: MetricsRegistry = metricsRegistry
+    val params = req.queryString.get(MetricsReporter.prometheusNameParam).map(_.toSet.asJava).getOrElse(Collections.emptySet())
+    val exported = req.queryString.get(MetricsReporter.exportParam).getOrElse(Seq())
+    if (!exported.isEmpty && exported.head == MetricsReporter.prometheus) {
+      Future.successful(Ok(MetricsReporter.asPrometheusTextExport(params)))
+    } else
+      Future.successful(Ok(MetricsReporter.asJson))
   }
 
 }
