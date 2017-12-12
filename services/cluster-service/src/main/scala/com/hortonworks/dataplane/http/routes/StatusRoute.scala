@@ -13,6 +13,7 @@ package com.hortonworks.dataplane.http.routes
 
 import java.lang.Exception
 import java.net.{URI, URL}
+import java.util.Collections
 import javax.inject.Inject
 
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
@@ -327,12 +328,28 @@ class StatusRoute @Inject()(val ws: WSClient,
     }
   }
 
+  val status = path("status") {
+    pathEndOrSingleSlash {
+      get {
+        complete(success(Map("status" -> 200)))
+      }
+    }
+  }
+
+  import scala.collection.JavaConverters._
 
   val metrics = path("metrics") {
     implicit val mr:MetricsRegistry = metricsRegistry
     pathEndOrSingleSlash {
-      get {
-        complete(MetricsReporter.asJson)
+      parameterMultiMap { params =>
+          get {
+            val paramsSet = params.get(MetricsReporter.prometheusNameParam).map(_.toSet.asJava).getOrElse(Collections.emptySet())
+            val exported = params.get(MetricsReporter.exportParam).getOrElse(Seq())
+            if (!exported.isEmpty && exported.head == MetricsReporter.prometheus) {
+              complete(MetricsReporter.asPrometheusTextExport(paramsSet))
+            } else
+              complete(MetricsReporter.asJson)
+          }
       }
     }
   }
