@@ -19,14 +19,15 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import com.hortonworks.dataplane.commons.domain.Ambari.{ClusterServiceWithConfigs, ConfigType}
 import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
-import com.hortonworks.dataplane.cs.StorageInterface
+import com.hortonworks.dataplane.cs.{ClusterDataApi, StorageInterface}
 import com.hortonworks.dataplane.db.Webservice.{ClusterComponentService, ClusterHostsService}
 import com.hortonworks.dataplane.http.BaseRoute
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 import play.api.libs.json.{JsObject, Json}
 import com.hortonworks.dataplane.http.JsonSupport._
+import com.typesafe.config.Config
 import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -36,6 +37,8 @@ class DpProfilerRoute @Inject()(
                              private val clusterComponentService: ClusterComponentService,
                              private val clusterHostsService: ClusterHostsService,
                              private val storageInterface: StorageInterface,
+                             private val clusterDataApi: ClusterDataApi,
+                             private val config:Config,
                              private val ws: WSClient
                            ) extends BaseRoute {
 
@@ -332,11 +335,11 @@ class DpProfilerRoute @Inject()(
     clusterComponentService.getEndpointsForCluster(clusterId, "DPPROFILER").map {
       case Right(endpoints) => endpoints
       case Left(errors) =>
-        throw new ServiceNotFound(
+        throw ServiceNotFound(
           s"Could not get the service Url from storage - $errors")
     }.recover{
       case e: Throwable =>
-        throw new ServiceNotFound(
+        throw ServiceNotFound(
           s"Could not get the service Url from storage - ${e.getMessage}")
     }
   }
@@ -349,17 +352,25 @@ class DpProfilerRoute @Inject()(
     if (profilerConfig.isEmpty)
       throw ServiceNotFound("No properties found for DpProfiler")
     val properties = profilerConfig.get.properties
-    val port = properties.get("dpprofiler.http.port").get
+    val port = properties("dpprofiler.http.port")
     new URL(s"http://$host:$port")
   }
 
   def extractUrlsWithIp(urlObj: URL, clusterId: Long): Future[Seq[String]] = {
-    println(urlObj.getHost)
-    clusterHostsService.getHostByClusterAndName(clusterId, urlObj.getHost)
-      .map {
-        case Right(host) => Seq(s"${urlObj.getProtocol}://${host.ipaddr}:${urlObj.getPort}")
-        case Left(errors) => throw new Exception(s"Cannot translate the hostname into an IP address $errors")
+    if (Try(config.getBoolean("dp.service.ambari.single.node.cluster"))
+      .getOrElse(false)) {
+      clusterDataApi.getAmbariUrl(clusterId).map { ambari =>
+        Seq(
+          s"${urlObj.getProtocol}://${new URL(ambari).getHost}:${urlObj.getPort}")
       }
+    } else {
+
+      clusterHostsService.getHostByClusterAndName(clusterId, urlObj.getHost)
+        .map {
+          case Right(host) => Seq(s"${urlObj.getProtocol}://${host.ipaddr}:${urlObj.getPort}")
+          case Left(errors) => throw new Exception(s"Cannot translate the hostname into an IP address $errors")
+        }
+    }
   }
 
 }

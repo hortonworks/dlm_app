@@ -23,6 +23,7 @@ import com.hortonworks.datapalane.consul._
 import com.hortonworks.dataplane.commons.metrics.MetricsRegistry
 import com.hortonworks.dataplane.cs.{AmbariWebServiceImpl, ClusterWsClient, KnoxProxyWsClient}
 import com.hortonworks.dataplane.cs.Webservice.AmbariWebService
+import utils.EndpointService
 
 
 /**
@@ -39,6 +40,7 @@ class Module extends AbstractModule {
 
   def configure() = {
     bind(classOf[ConsulInitializer]).asEagerSingleton()
+
     bind(classOf[MetricsRegistry]).toInstance(MetricsRegistry("dlm-app"))
   }
 

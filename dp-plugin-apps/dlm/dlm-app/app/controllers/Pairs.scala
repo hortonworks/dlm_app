@@ -39,10 +39,8 @@ class Pairs @Inject() (
     Logger.info("Received list all pairings request")
     implicit val token = request.token
     beaconService.getAllPairedClusters().map {
-      pairedClusters => pairedClusters match {
-        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-        case Right(pairedClusters) => Ok(Json.toJson(pairedClusters))
-      }
+      case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+      case Right(pairedClusters) => Ok(Json.toJson(pairedClusters))
     }
   }
 

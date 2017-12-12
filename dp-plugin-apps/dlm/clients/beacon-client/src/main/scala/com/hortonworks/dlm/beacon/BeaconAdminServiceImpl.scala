@@ -33,10 +33,9 @@ class BeaconAdminServiceImpl()(implicit ws: KnoxProxyWsClient) extends BeaconAdm
         case 200 =>
           res.json.validate[BeaconAdminStatusResponse] match {
             case JsSuccess(result, _) => Right(BeaconAdminStatusDetails(clusterId,result))
-            case JsError(error) => {
+            case JsError(error) =>
               val url = Some(res.asInstanceOf[AhcWSResponse].ahcResponse.getUri.toUrl)
               Left(BeaconApiErrors(BAD_GATEWAY, url, Some(BeaconApiError(error.toString()))))
-            }
           }
         case _ => mapErrors(res)
       }

@@ -72,7 +72,7 @@ class AtlasRoute @Inject()(private val config: Config, private val atlasApiData:
           implicit val token = extractToken(request)
           val attributes = atlasInterfaceCache.get(id).getHiveAttributes
           onComplete(attributes) {
-            case Success(attributes) => complete(success(attributes))
+            case Success(att) => complete(success(att))
             case Failure(th) =>
               complete(StatusCodes.InternalServerError, errors(th))
           }

@@ -11,20 +11,25 @@
 
 package com.hortonworks.dataplane.cs
 
-import com.hortonworks.dataplane.commons.domain.Entities._
-import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariCheckResponse, AmbariCluster, AmbariDetailRequest, AmbariEndpoint, ClusterServiceWithConfigs, ServiceInfo}
-import com.hortonworks.dataplane.commons.domain.Atlas.{AssetProperties, AtlasAttribute, AtlasEntities, AtlasSearchQuery}
-import play.api.libs.json.{JsObject, JsResult, JsValue, Json}
+import com.hortonworks.dataplane.commons.domain.Ambari.{AmbariCheckResponse, AmbariCluster, AmbariDetailRequest, AmbariEndpoint, ServiceInfo}
+import com.hortonworks.dataplane.commons.domain.Atlas.{AtlasAttribute, AtlasEntities, AtlasSearchQuery}
+import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData, _}
+import com.typesafe.config.Config
+import play.api.libs.json.{JsObject, JsResult, JsValue}
 import play.api.libs.ws.{WSRequest, WSResponse}
-import com.hortonworks.dataplane.commons.domain.Entities.{ClusterService => ClusterData}
 
 import scala.concurrent.Future
 
 object Webservice {
 
   trait CsClientService {
+    val config:Config
 
     import com.hortonworks.dataplane.commons.domain.JsonFormatters._
+
+    protected def url =
+      Option(System.getProperty("dp.services.cluster.service.uri"))
+        .getOrElse(config.getString("dp.services.cluster.service.uri"))
 
     protected def extractEntity[T](res: WSResponse,
                                    f: WSResponse => T): Either[Errors, T] = {
@@ -59,6 +64,8 @@ object Webservice {
 
 
   trait AmbariWebService extends CsClientService {
+
+    def isSingleNode:Future[Boolean]
 
     def requestAmbariApi(clusterId: Long, ambariUrl: String, addClusterIdToResponse: Boolean = false)(implicit token:Option[HJwtToken]): Future[Either[Errors, JsValue]]
 

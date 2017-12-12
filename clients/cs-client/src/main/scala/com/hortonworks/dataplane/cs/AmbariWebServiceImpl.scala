@@ -22,15 +22,12 @@ import play.api.libs.ws.WSResponse
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AmbariWebServiceImpl(config: Config)(implicit ws: ClusterWsClient)
+class AmbariWebServiceImpl(val config: Config)(implicit ws: ClusterWsClient)
     extends AmbariWebService {
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
   import com.hortonworks.dataplane.commons.domain.Ambari._
 
-  private def url =
-    Option(System.getProperty("dp.services.cluster.service.uri"))
-      .getOrElse(config.getString("dp.services.cluster.service.uri"))
 
   private def mapResponse(res: WSResponse) = {
     res.status match {
@@ -100,14 +97,12 @@ class AmbariWebServiceImpl(config: Config)(implicit ws: ClusterWsClient)
 
   private def mapToResults(res: WSResponse)(implicit clusterId: Option[Long])  = {
     res.status match {
-      case 200 => {
+      case 200 =>
         clusterId match {
           case None => Right(res.json)
-          case Some(value) => {
+          case Some(value) =>
             Right(Json.toJson(AmbariResponseWithDpClusterId(value,res.json)))
-          }
         }
-      }
       case _ => mapErrors(res)
     }
   }
@@ -129,5 +124,17 @@ class AmbariWebServiceImpl(config: Config)(implicit ws: ClusterWsClient)
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToResults)
+  }
+
+  override def isSingleNode = ws.url(s"$url/ambari/config?key=dp.service.ambari.single.node.cluster&boolean=true")
+    .withToken(None)
+    .get().map( res => {
+     res.status match {
+       case 204 => true
+       case _ => false
+     }
+  }).recoverWith {
+    case e:Throwable =>
+      Future.successful(false)
   }
 }

@@ -200,9 +200,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
     val newRequest = if(ambariDetailRequest.knoxDetected && expectConfigGroup ){
       if(!checkCredentials)
         Future.successful(ambariDetailRequest.copy(knoxUrl = Some(ambariDetailRequest.knoxTopology.get)))
-      else{
-        getTargetUrl(ambariDetailRequest).map(url => ambariDetailRequest.copy(knoxUrl = Some(url)))
-      }
+      else getTargetUrl(ambariDetailRequest).map(url => ambariDetailRequest.copy(knoxUrl = Some(url)))
     } else Future.successful(ambariDetailRequest)
 
     newRequest.map(new TempDataplaneCluster(_))
@@ -410,7 +408,7 @@ class AmbariRoute @Inject()(val ws: WSClient,
     pathEnd {
       extractRequest { request =>
         parameters("request") { req =>
-          val ambariResponse = issueAmbariCall(clusterId, request, req, false)
+          val ambariResponse = issueAmbariCall(clusterId, request, req, clusterCall = false)
           onComplete(ambariResponse) {
             case Success(res) =>
               complete(res)
@@ -447,6 +445,20 @@ class AmbariRoute @Inject()(val ws: WSClient,
     }
   }
 
+  val configRoute = path("ambari" / "config") {
+    get {
+      parameters('key,"boolean".?){ (key,dt) =>
+        dt match {
+          case Some("true") => if(config.getBoolean(key)) {
+            complete(StatusCodes.NoContent)
+          } else complete(StatusCodes.NotFound,notFound)
+          case _ => complete(success(config.getString(key)))
+        }
+      }
+    }
+  }
+
+
   val serviceStateRoute = path("ambari" / "servicesInfo") {
     post {
       extractRequest { request =>
@@ -457,10 +469,8 @@ class AmbariRoute @Inject()(val ws: WSClient,
               serviceInfoes.size match {
                 case 0 =>
                   complete(StatusCodes.NotFound, notFound)
-                case _ => {
+                case _ =>
                   complete(success(serviceInfoes))
-
-                }
               }
             case Failure(th) =>
               logger.error(s"Failed to get services info ",th)

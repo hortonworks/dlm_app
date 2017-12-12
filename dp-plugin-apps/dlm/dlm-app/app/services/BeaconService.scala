@@ -65,13 +65,12 @@ class BeaconService @Inject()(
         dataplaneService.getDpCluster(cluster.right.get.dataplaneClusterId.get) map {
           case Left(errors) => p.success(Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None,
             Some(errors.errors.map(x => BeaconApiError(x.message)).head))))))
-          case Right(dpCluster) => {
+          case Right(dpCluster) =>
             val clusterName = dpCluster.dcName + "$" + cluster.right.get.name
             beaconClusterService.listCluster(beaconUrl.right.get, clusterEndpointId, clusterName).map({
               case Left(errors) => p.success(Left(DlmApiErrors(Seq(errors))))
               case Right(policyResponse) => p.success(Right(policyResponse))
             })
-          }
         }
       } else {
         p.success(Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None,
@@ -90,10 +89,9 @@ class BeaconService @Inject()(
   def getAllPairedClusters()(implicit token:Option[HJwtToken]): Future[Either[DlmApiErrors, PairedClustersResponse]] = {
     val p: Promise[Either[DlmApiErrors, PairedClustersResponse]] = Promise()
     dataplaneService.getBeaconClusters.map{
-      case Left(errors) => {
+      case Left(errors) =>
         p.success(Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))))
-      }
-      case Right(beaconCluster) => {
+      case Right(beaconCluster) =>
         val beaconClusters = beaconCluster.clusters
         val allPairedClusterFuture: Future[Seq[Either[BeaconApiErrors, Seq[PairedCluster]]]] =
           Future.sequence(beaconClusters.map((x) => beaconPairService.listPairedClusters(
@@ -122,7 +120,6 @@ class BeaconService @Inject()(
           }
 
         }
-      }
     }
     p.future
   }
@@ -169,20 +166,18 @@ class BeaconService @Inject()(
               val clusterDefsToBeSubmitted: Set[ClusterDefinition] = getClusterDefsToBeSubmitted(listOfClusters)
               if (clusterDefsToBeSubmitted.isEmpty) {
                 createPair(listOfClusters, p)
-              } else {
-                Future.sequence(clusterDefsToBeSubmitted.toSeq.map((x) => {
-                  val dataCenterClusterName =  x.clusterDefRequest.dataCenter + "$" + x.clusterDefRequest.name
-                  beaconClusterService.createClusterDefinition(x.beaconUrl, x.clusterId, dataCenterClusterName, x.clusterDefRequest)
-                })).map({
-                  x => {
-                    if (!x.exists(_.isLeft)) {
-                      createPair(listOfClusters, p)
-                    } else {
-                      p.success(Left(x.find(_.isLeft).get.left.get))
-                    }
+              } else Future.sequence(clusterDefsToBeSubmitted.toSeq.map((x) => {
+                val dataCenterClusterName =  x.clusterDefRequest.dataCenter + "$" + x.clusterDefRequest.name
+                beaconClusterService.createClusterDefinition(x.beaconUrl, x.clusterId, dataCenterClusterName, x.clusterDefRequest)
+              })).map({
+                x => {
+                  if (!x.exists(_.isLeft)) {
+                    createPair(listOfClusters, p)
+                  } else {
+                    p.success(Left(x.find(_.isLeft).get.left.get))
                   }
-                })
-              }
+                }
+              })
             } else {
               failedCallBack(p)
             }
@@ -259,7 +254,7 @@ class BeaconService @Inject()(
     val remoteDatacenterClusterName =  remoteClusterDcName + "$" + remoteClusterName
     beaconPairService.createClusterPair(listOfClusters.head.pairedClusterRequest.beaconUrl, listOfClusters.head.cluster.id.get,
       remoteDatacenterClusterName).map({
-        case Left(beaconApiErrors) => {
+        case Left(beaconApiErrors) =>
           val beaconApiErrorMsg =  beaconApiErrors.error match {
             case Some(beaconApiError) => beaconApiError.message
             case None => ""
@@ -272,7 +267,6 @@ class BeaconService @Inject()(
 
           p.success(Left(BeaconApiErrors(beaconApiErrors.code, beaconApiErrors.beaconUrl, Some(BeaconApiError(message)),
             beaconApiErrors.message)))
-        }
         case Right(clusterPairResponse) => p.success(Right(clusterPairResponse))
     })
   }
@@ -318,7 +312,7 @@ class BeaconService @Inject()(
               val remoteDatacenterClusterName = dpClusterBRightProj.dcName + "$" + clusterB.right.get.name
               beaconPairService.createClusterUnpair(clustersToBeUnpairedSeq.head.beaconUrl, clusterAId, remoteDatacenterClusterName).map({
                 case Left(beaconApiErrors) => p.success(Left(beaconApiErrors))
-                case Right(clusterUnpairResponse) => {
+                case Right(clusterUnpairResponse) =>
                   for {
                     clusterDefinitionsA <- beaconPairService.listPairedClusters(clusterABeaconUrl, clusterAId)
                     clusterDefinitionsB <- beaconPairService.listPairedClusters(clusterBBeaconUrl, clusterBId)
@@ -331,11 +325,10 @@ class BeaconService @Inject()(
                         UnpairClusterDefinition(dpClusterBRightProj, clusterBBeaconUrl, clusterBId, clusterDefinitionsB.right.get) :: Nil
                       removeClusterDefinitions(unpairClusterDefinitions, clusterUnpairResponse).map({
                         case Left(beaconApiErrors) => p.success(Left(beaconApiErrors))
-                        case Right(clusterUnpairResponse) => p.success(Right(clusterUnpairResponse))
+                        case Right(cur) => p.success(Right(cur))
                       })
                     }
                   }
-                }
               })
             }
           }
@@ -435,18 +428,17 @@ class BeaconService @Inject()(
 
     orderBy match {
       case None => resources
-      case Some(orderBy) => {
-        val field = resources.head.getClass.getDeclaredField(orderBy)
+      case Some(ob) =>
+        val field = resources.head.getClass.getDeclaredField(ob)
         field.setAccessible(true)
         sortOrder match {
           case None => resources.sortWith(field.get(_).asInstanceOf[String] < field.get(_).asInstanceOf[String])
-          case Some(sortOrder) => if (sortOrder == DESCEND.name) {
+          case Some(so) => if (so == DESCEND.name) {
             resources.sortWith(field.get(_).asInstanceOf[String] > field.get(_).asInstanceOf[String])
           } else {
             resources.sortWith(field.get(_).asInstanceOf[String] < field.get(_).asInstanceOf[String])
           }
         }
-      }
     }
   }
 
@@ -461,7 +453,7 @@ class BeaconService @Inject()(
     dataplaneService.getBeaconClusters.map {
       case Left(errors) => p.success(Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None,
                                      Some(errors.errors.map(x => BeaconApiError(x.message)).head))))))
-      case Right(beaconCluster) => {
+      case Right(beaconCluster) =>
         val originalPageLenth : Option[String] = queryString.get(BeaconService.API_PAGE_SIZE_KEY)
         val originalOffset : Int = queryString.getOrElse(BeaconService.API_OFFSET_KEY, BeaconService.API_OFFSET_DEFAULT_VALUE).toInt
         val queryStringPaginated = getQueryStringForResources(queryString, originalPageLenth, originalOffset)
@@ -505,7 +497,6 @@ class BeaconService @Inject()(
             p.success(Right(PoliciesDetailsResponse(failedResponses, policiesDetails)))
           }
         }
-      }
     }
     p.future
   }
@@ -522,12 +513,11 @@ class BeaconService @Inject()(
     val p: Promise[Either[BeaconApiErrors, PolicyDataResponse]] = Promise()
     dataplaneService.getBeaconService(clusterId).map {
       case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
-      case Right(beaconUrl) => {
+      case Right(beaconUrl) =>
         beaconPolicyService.listPolicy(beaconUrl, clusterId, policyName).map({
           case Left(errors) => p.success(Left(errors))
           case Right(policyResponse) => p.success(Right(policyResponse))
         })
-      }
     }
     p.future
   }
@@ -543,14 +533,13 @@ class BeaconService @Inject()(
     val p: Promise[Either[BeaconApiErrors, PostActionResponse]] = Promise()
     dataplaneService.getBeaconService(clusterId).map {
       case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
-      case Right(beaconUrl) => {
+      case Right(beaconUrl) =>
         val policyResponseFuture: Future[Either[BeaconApiErrors, PostActionResponse]] = beaconPolicyService.submitAndSchedulePolicy(beaconUrl, clusterId, policyName, policySubmitRequest.policyDefinition)
 
         policyResponseFuture.map {
           case Left(errors) => p.success(Left(errors))
           case Right(createPolicyResponse) => p.success(Right(createPolicyResponse))
         }
-      }
     }
     p.future
   }
@@ -568,7 +557,7 @@ class BeaconService @Inject()(
     val p: Promise[Either[BeaconApiErrors, PostActionResponse]] = Promise()
     dataplaneService.getBeaconService(clusterId).map {
       case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
-      case Right(beaconUrl) => {
+      case Right(beaconUrl) =>
         val policyActionResponseFuture: Future[Either[BeaconApiErrors, PostActionResponse]] = policyAction match {
           case SUSPEND => beaconPolicyService.suspendPolicy(beaconUrl, clusterId, policyName)
           case RESUME => beaconPolicyService.resumePolicy(beaconUrl, clusterId, policyName)
@@ -579,7 +568,6 @@ class BeaconService @Inject()(
           case Left(errors) => p.success(Left(errors))
           case Right(policyActionResponse) => p.success(Right(policyActionResponse))
         }
-      }
     }
     p.future
   }
@@ -699,7 +687,7 @@ class BeaconService @Inject()(
     dataplaneService.getBeaconClusters.map {
       case Left(errors) => p.success(Left(DlmApiErrors(Seq(BeaconApiErrors(INTERNAL_SERVER_ERROR, None,
         Some(errors.errors.map(x => BeaconApiError(x.message)).head))))))
-      case Right(beaconCluster) => {
+      case Right(beaconCluster) =>
         val beaconClusters = beaconCluster.clusters
         val allBeaconAdminStatusFuture: Future[Seq[Either[BeaconApiErrors, BeaconAdminStatusDetails]]] =
           Future.sequence(beaconClusters.map((x) => beaconAdminService.listStatus(x.beaconUrl, x.id)))
@@ -715,7 +703,6 @@ class BeaconService @Inject()(
             p.success(Right(AdminStatusResponse(failedResponses, allBeaconAdminStatus)))
           }
         }
-      }
     }
     p.future
   }
@@ -731,7 +718,7 @@ class BeaconService @Inject()(
     val p: Promise[Either[BeaconApiErrors, BeaconHdfsFileResponse]] = Promise()
     val filePath = queryString.get(BeaconService.QUERY_PARAM_FILEPATH_KEY)
     filePath match {
-      case Some(path) => {
+      case Some(path) =>
         dataplaneService.getBeaconService(clusterId).map {
           case Left(errors) => p.success(Left(BeaconApiErrors(INTERNAL_SERVER_ERROR, None, Some(errors.errors.map(x => BeaconApiError(x.message)).head))))
           case Right(beaconUrl) =>
@@ -740,7 +727,6 @@ class BeaconService @Inject()(
               case Right(beaconHdfsFileResponse) => p.success(Right(beaconHdfsFileResponse))
             }
         }
-      }
       case None => p.success(Left(BeaconApiErrors(BAD_REQUEST, None, Some(BeaconApiError(BeaconService.pathErrorMsg)))))
     }
 

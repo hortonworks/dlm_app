@@ -109,7 +109,6 @@ class ClusterDataApi @Inject()(
 
   }
 
-
   def getTokenForCluster(
       clusterId: Long,
       inputToken: Option[HJwtToken]): Future[Option[String]] = {
@@ -196,6 +195,14 @@ class ClusterDataApi @Inject()(
   }
 
 
+  def getAmbariUrl(clusterId:Long):Future[String] = {
+    for {
+      cl <- clusterService.retrieve(clusterId.toString)
+      c <- Future.successful(cl.right.get)
+      dpce <- dpClusterService.retrieve(c.dataplaneClusterId.get.toString)
+      dpc <- Future.successful(dpce.right.get)
+    } yield dpc.ambariUrl
+  }
 
 }
 

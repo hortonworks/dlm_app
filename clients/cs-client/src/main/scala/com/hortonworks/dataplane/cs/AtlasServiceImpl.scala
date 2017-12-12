@@ -21,12 +21,8 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AtlasServiceImpl(config: Config)(implicit ws: ClusterWsClient)
+class AtlasServiceImpl(val config: Config)(implicit ws: ClusterWsClient)
     extends AtlasService {
-
-  private def url =
-    Option(System.getProperty("dp.services.cluster.service.uri"))
-      .getOrElse(config.getString("dp.services.cluster.service.uri"))
 
   import com.hortonworks.dataplane.commons.domain.JsonFormatters._
 

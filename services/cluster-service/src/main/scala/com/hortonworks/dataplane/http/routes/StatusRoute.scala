@@ -18,6 +18,7 @@ import javax.inject.Inject
 
 import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.server.Directives._
+import com.google.common.annotations.VisibleForTesting
 import com.google.common.net.HttpHeaders
 import com.hortonworks.dataplane.commons.domain.Constants
 import com.hortonworks.dataplane.commons.domain.Entities.{DataplaneClusterIdentifier, ErrorType, HJwtToken}
@@ -58,15 +59,31 @@ class StatusRoute @Inject()(val ws: WSClient,
 
   val logger = Logger(classOf[StatusRoute])
 
-  private lazy val hdInsightErrorContentType = config.getString("dp.service.hdinsight.auth.challenge.contentType")
-  private lazy val hdInsightErrorWwwAuth = config.getString("dp.service.hdinsight.auth.challenge.wwwAuthenticate")
-  private lazy val hdInsightErrorStatus = config.getInt("dp.service.hdinsight.auth.status")
-  private lazy val hdInsightErrorMessage = config.getString("dp.service.hdinsight.auth.response.message")
+  private lazy val hdInsightErrorContentType =
+    config.getString("dp.service.hdinsight.auth.challenge.contentType")
+  private lazy val hdInsightErrorWwwAuth =
+    config.getString("dp.service.hdinsight.auth.challenge.wwwAuthenticate")
+  private lazy val hdInsightErrorStatus =
+    config.getInt("dp.service.hdinsight.auth.status")
+  private lazy val hdInsightErrorMessage =
+    config.getString("dp.service.hdinsight.auth.response.message")
 
-  val tokenTopologyName = Try(config.getString("dp.services.knox.token.topology"))
-    .getOrElse("token")
+  val tokenTopologyName =
+    Try(config.getString("dp.services.knox.token.topology"))
+      .getOrElse("token")
 
-  metricsRegistry.newGauge("knox.token.topology.name",{() => tokenTopologyName})
+  // If Ambari indicates a JWT URL and cluster service is configured to pick up
+  // expect a separate config group then return with a response which allows
+  // the FE to ask the user for her/his Ambari credentials/Knox URL
+  // Return again with the username/password to complete the flow
+
+  lazy val expectConfigGroup =
+    config.getBoolean("dp.services.knox.token.expect.separate.config")
+  lazy val checkCredentials =
+    config.getBoolean("dp.services.knox.token.infer.endpoint.using.credentials")
+
+  lazy val inferGateway = Try(
+    config.getBoolean("dp.services.knox.infer.gateway.name")).getOrElse(false)
 
   def makeAmbariApiRequest(endpoint: String,
                            ambariResponse: AmbariForbiddenResponse,
@@ -79,19 +96,10 @@ class StatusRoute @Inject()(val ws: WSClient,
       .map { providerUrl =>
         logger.info("Ambari expects a jwt token")
         //Extract the SSO URL hostname
-        val uri = new URL(providerUrl)
-        val knoxUrl = s"${uri.getProtocol}://${uri.getHost}:${uri.getPort}"
+        val providerAsUrl = new URL(providerUrl)
+        val knoxUrl = getKnoxUrl(providerAsUrl)
+
         logger.info(s"Knox detected at $knoxUrl")
-
-        // If Ambari indicates a JWT URL and cluster service is configured to pick up
-        // expect a separate config group then return with a response which allows
-        // the FE to ask the user for her/his Ambari credentials/Knox URL
-        // Return again with the username/password to complete the flow
-
-        val expectConfigGroup =
-          config.getBoolean("dp.services.knox.token.expect.separate.config")
-        val checkCredentials = config.getBoolean(
-          "dp.services.knox.token.infer.endpoint.using.credentials")
 
         expectConfigGroup match {
           case true =>
@@ -120,10 +128,11 @@ class StatusRoute @Inject()(val ws: WSClient,
             }
             val tokenHeader = tokenInfoHeader.get.value
             val response =
-              KnoxApiExecutor(KnoxConfig(tokenTopologyName, Some(knoxUrl)), ws).execute(
-                KnoxApiRequest(delegatedRequest,
-                               delegatedApiCall,
-                               Some(tokenHeader)))
+              KnoxApiExecutor(KnoxConfig(tokenTopologyName, Some(knoxUrl)), ws)
+                .execute(
+                  KnoxApiRequest(delegatedRequest,
+                                 delegatedApiCall,
+                                 Some(tokenHeader)))
             response.map { res =>
               res.status match {
                 case 200 =>
@@ -148,10 +157,13 @@ class StatusRoute @Inject()(val ws: WSClient,
         // Fallback to local user
         // Step 4
         for {
-          credential <- credentialInterface.getCredential("dp.credential.ambari")
+          credential <- credentialInterface.getCredential(
+            "dp.credential.ambari")
           response <- ws
             .url(endpoint)
-            .withAuth(credential.user.get, credential.pass.get, WSAuthScheme.BASIC)
+            .withAuth(credential.user.get,
+                      credential.pass.get,
+                      WSAuthScheme.BASIC)
             .withRequestTimeout(timeout seconds)
             .get()
         } yield {
@@ -175,6 +187,22 @@ class StatusRoute @Inject()(val ws: WSClient,
       }
   }
 
+  @VisibleForTesting
+  def getKnoxUrl(uri: URL) = {
+    if (inferGateway) {
+      Try {
+        val firstPart = {
+          val parts = uri.getPath.split("/").filterNot(_.trim.isEmpty)
+          parts(0)
+        }
+        s"${uri.getProtocol}://${uri.getHost}:${uri.getPort}/$firstPart"
+      }.getOrElse(
+        s"${uri.getProtocol}://${uri.getHost}:${uri.getPort}/gateway")
+    } else {
+      s"${uri.getProtocol}://${uri.getHost}:${uri.getPort}/gateway"
+    }
+  }
+
   /**
     * A routine to check ambari availability
     * Step 1 - Make a call without any Authentication
@@ -189,7 +217,7 @@ class StatusRoute @Inject()(val ws: WSClient,
       ep: AmbariEndpoint,
       request: HttpRequest): Future[AmbariCheckResponse] = {
     val endpoint = { u: String =>
-      s"${u}${Try(config.getString("dp.service.ambari.cluster.api.prefix")).getOrElse("/api/v1/clusters")}"
+      s"$u${Try(config.getString("dp.service.ambari.cluster.api.prefix")).getOrElse("/api/v1/clusters")}"
     }
     val timeout =
       Try(config.getInt("dp.service.ambari.status.check.timeout.secs"))
@@ -204,8 +232,9 @@ class StatusRoute @Inject()(val ws: WSClient,
         .recoverWith {
           case th: Exception =>
             Future.failed(
-              ConnectionError(s"Cannot connect to Ambari url at ${endpoint(ep.url)}",
-                              th))
+              ConnectionError(
+                s"Cannot connect to Ambari url at ${endpoint(ep.url)}",
+                th))
         }
 
     }
@@ -227,23 +256,25 @@ class StatusRoute @Inject()(val ws: WSClient,
 
   private def mapAsUnauthenticatedResponse(
       response: WSResponse): AmbariForbiddenResponse = {
-      response.status match {
-        case 403 => response.json.validate[AmbariForbiddenResponse].get
-        case x if x == hdInsightErrorStatus =>
-          // Check for HD insight
-          val auth = response.header(HttpHeaders.WWW_AUTHENTICATE)
-          val contentType = response.header(HttpHeaders.CONTENT_TYPE)
-          if(contentType.isDefined &&  contentType.get == hdInsightErrorContentType && auth.isDefined && auth.get == hdInsightErrorWwwAuth) {
-              AmbariForbiddenResponse(hdInsightErrorStatus,hdInsightErrorMessage,None)
-          } else {
-            throw AmbariError(new Exception(s"Received 401 from Ambari but response does not match any known cluster, tried HD insight"))
-          }
-        case _ => throw AmbariError(new Exception(s"Unexpected Response from Ambari, expected 403 or 401, actual ${response.status}"))
+    response.status match {
+      case 403                            => response.json.validate[AmbariForbiddenResponse].get
+      case x if x == hdInsightErrorStatus =>
+        // Check for HD insight
+        val auth = response.header(HttpHeaders.WWW_AUTHENTICATE)
+        val contentType = response.header(HttpHeaders.CONTENT_TYPE)
+        if (contentType.isDefined && contentType.get == hdInsightErrorContentType && auth.isDefined && auth.get == hdInsightErrorWwwAuth) {
+          AmbariForbiddenResponse(hdInsightErrorStatus,
+                                  hdInsightErrorMessage,
+                                  None)
+        } else {
+          throw AmbariError(new Exception(
+            s"Received 401 from Ambari but response does not match any known cluster, tried HD insight"))
+        }
+      case _ =>
+        throw AmbariError(new Exception(
+          s"Unexpected Response from Ambari, expected 403 or 401, actual ${response.status}"))
 
-      }
-
-
-
+    }
 
   }
 
@@ -266,7 +297,8 @@ class StatusRoute @Inject()(val ws: WSClient,
     }
   }
 
-  val ambariConnectTimer = metricsRegistry.newTimer("ambari.status.request.time")
+  lazy val ambariConnectTimer =
+    metricsRegistry.newTimer("ambari.status.request.time")
 
   val route =
     path("ambari" / "status") {
@@ -336,10 +368,10 @@ class StatusRoute @Inject()(val ws: WSClient,
     }
   }
 
-  import scala.collection.JavaConverters._
+import scala.collection.JavaConverters._
 
   val metrics = path("metrics") {
-    implicit val mr:MetricsRegistry = metricsRegistry
+    implicit val mr: MetricsRegistry = metricsRegistry
     pathEndOrSingleSlash {
       parameterMultiMap { params =>
           get {
