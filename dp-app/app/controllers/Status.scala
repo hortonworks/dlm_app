@@ -11,6 +11,7 @@
 
 package controllers
 
+import java.util.Collections
 import javax.inject._
 
 import com.hortonworks.dataplane.commons.metrics.{MetricsRegistry, MetricsReporter}
@@ -19,15 +20,27 @@ import play.api.mvc._
 import scala.concurrent.Future
 
 @Singleton
-class Status @Inject()(implicit val metricsReporter: MetricsRegistry)
+class Status @Inject()(metricsRegistry: MetricsRegistry)
     extends Controller {
 
   def health = Action.async {
     Future.successful(Ok)
   }
 
-  def metrics = Action.async {
-    Future.successful(Ok(MetricsReporter.asJson))
+  def status = Action.async {
+    Future.successful(Ok)
+  }
+
+  import scala.collection.JavaConverters._
+
+  def metrics = Action.async { req =>
+    implicit val mr: MetricsRegistry = metricsRegistry
+    val params = req.queryString.get(MetricsReporter.prometheusNameParam).map(_.toSet.asJava).getOrElse(Collections.emptySet())
+    val exported = req.queryString.get(MetricsReporter.exportParam).getOrElse(Seq())
+    if (!exported.isEmpty && exported.head == MetricsReporter.prometheus) {
+      Future.successful(Ok(MetricsReporter.asPrometheusTextExport(params)))
+    } else
+      Future.successful(Ok(MetricsReporter.asJson))
   }
 
 }
