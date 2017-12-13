@@ -61,6 +61,7 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnCha
     label: 'None',
     value: null
   };
+  focused = false;
   showMenu = false;
   selectedOption: SelectOption;
   @Input() value: any;
@@ -79,19 +80,71 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnCha
 
   constructor(private elementRef: ElementRef) { }
 
+  @HostListener('focusin', ['$event.target'])
+  focusIn(e) {
+    this.focused = true;
+  }
+  @HostListener('focusout', ['$event.target'])
+  focusOut(e) {
+    this.focused = false;
+    this.showMenu = false;
+  }
+  @HostListener('document:keydown', ['$event'])
+  keyEvent(event: KeyboardEvent) {
+    if (!this.focused) {
+      return;
+    }
+    if (event.keyCode === 38) {
+      this.selectPrev();
+    }
+
+    if (event.keyCode === 40) {
+      this.selectNext();
+    }
+    if (event.keyCode === 38 || event.keyCode === 40) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    }
+  }
+
+  selectNext() {
+    let index = 0;
+    if (this.selectedOption) {
+      if (this.options[this.options.length - 1] !== this.selectedOption) {
+        index = this.options.indexOf(this.selectedOption) + 1;
+      }
+    }
+    this.selectOption(this.options[index].value);
+  }
+
+  selectPrev() {
+    let index = this.options.length - 1;
+    if (this.selectedOption) {
+      if (this.options[0] !== this.selectedOption) {
+        index = this.options.indexOf(this.selectedOption) - 1;
+      }
+    }
+    this.selectOption(this.options[index].value);
+  }
+
   ngOnInit() {
+  }
+
+  findOptionByValue(value) {
+    return this.options.find(option => '' + option.value === '' + value);
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (this.options) {
-      this.selectedOption = this.options.find(option => '' + option.value === '' + this.value) || this.defaultValue;
+      this.selectedOption = this.findOptionByValue(this.value) || this.defaultValue;
     }
   }
 
   writeValue(value: any) {
     this.value = value;
     if (this.options) {
-      this.selectedOption = this.options.find(option => '' + option.value === '' + this.value) || this.defaultValue;
+      this.selectedOption = this.findOptionByValue(this.value) || this.defaultValue;
     }
   }
 

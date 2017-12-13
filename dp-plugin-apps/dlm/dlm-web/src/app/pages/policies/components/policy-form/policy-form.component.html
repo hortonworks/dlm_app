@@ -175,15 +175,15 @@
                   <div class="row">
                     <div class="col col-xs-2">
                       <dlm-select-field qe-attr="policy-repeat-mode" formField formControlName="repeatMode" [options]="repeatOptions"
-                                        [value]="repeatOption">
+                                        [value]="repeatOption" tabindex="0">
                       </dlm-select-field>
                     </div>
                     <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-xs-1"
                          [class.has-error]="policyForm.get('job').get('frequency').touched && policyForm.get('job').get('frequency').invalid">
-                      <input type="text" qe-attr="policy-frequency" class="form-control" placeholder="Freq" formField formControlName="frequency"/>
+                      <input type="text" qe-attr="policy-frequency" class="form-control" placeholder="Freq" formField formControlName="frequency" tabindex="0"/>
                     </div>
                     <div *ngIf="repeatOption === policyRepeatModes.EVERY" class="col col-xs-2">
-                      <dlm-select-field qe-attr="policy-unit" formField formControlName="unit" [options]="units" [value]="unit">
+                      <dlm-select-field qe-attr="policy-unit" formField formControlName="unit" [options]="units" [value]="unit" tabindex="0">
                       </dlm-select-field>
                     </div>
                     <div *ngIf="repeatOption === policyRepeatModes.EVERY && unit === policyTimeUnits.WEEKS"
