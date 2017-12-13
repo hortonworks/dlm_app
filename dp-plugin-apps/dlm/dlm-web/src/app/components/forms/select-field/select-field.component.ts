@@ -7,8 +7,9 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, OnInit, Input, Output, ViewEncapsulation, forwardRef, ChangeDetectionStrategy,
-  EventEmitter, ContentChild, OnChanges, SimpleChanges, HostListener, ElementRef
+import {
+  Component, OnInit, Input, Output, ViewEncapsulation, forwardRef, ChangeDetectionStrategy,
+  EventEmitter, ContentChild, OnChanges, SimpleChanges, HostListener, ElementRef, HostBinding
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor, FormControl } from '@angular/forms';
 import { SelectOption } from './select-option.type';
@@ -69,6 +70,7 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnCha
   @Output() onSelect = new EventEmitter<SelectOption>();
   @ContentChild(SelectFieldValueDirective) valueView: SelectFieldValueDirective;
   @ContentChild(SelectFieldOptionDirective) optionView: SelectFieldOptionDirective;
+  @HostBinding() tabindex = 0;
   @HostListener('document:click', ['$event'])
   outsideClickHandler(e) {
     if (!this.elementRef.nativeElement.contains(e.target)) {
@@ -101,7 +103,11 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnCha
     if (event.keyCode === 40) {
       this.selectNext();
     }
+    if (event.keyCode === 32) {
+      this.showMenu = true;
+    }
     if (event.keyCode === 38 || event.keyCode === 40) {
+      this.showMenu = true;
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation();
