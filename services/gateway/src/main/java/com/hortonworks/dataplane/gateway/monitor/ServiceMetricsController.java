@@ -11,10 +11,8 @@
 package com.hortonworks.dataplane.gateway.monitor;
 
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.collect.Table;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.*;
 import com.hortonworks.dataplane.gateway.service.MetricInterface;
 import feign.Feign;
 import feign.jackson.JacksonDecoder;
@@ -27,10 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,7 +34,7 @@ import java.util.stream.Stream;
 @RequestMapping("/service")
 public class ServiceMetricsController {
 
-  private static final HashSet<String> METERED_SERVICES = Sets.newHashSet("dpdb", "clusters", "dpapp", "dlmapp");
+  private static final Map<String,String> METERED_SERVICES = ImmutableMap.of("db","db-service", "clusters","cluster-service", "core", "core","dlm","dlm");
   private static Logger log = LoggerFactory.getLogger(ServiceMetricsController.class);
 
 
@@ -54,9 +49,9 @@ public class ServiceMetricsController {
 
   @RequestMapping("/metrics")
   public Object run() {
-    Table<String, String, MetricInterface> table = HashBasedTable.create();
+    Table<String, String, String> table = HashBasedTable.create();
     List<String> services = client.getServices();
-    Stream<Service> listStream = services.stream().filter(s -> METERED_SERVICES.contains(s)).map(s -> {
+    Stream<Service> listStream = services.stream().filter(s -> METERED_SERVICES.keySet().contains(s)).map(s -> {
 
       List<org.springframework.cloud.client.ServiceInstance> instances = client.getInstances(s);
       List<ServiceInstance> urlList = instances.stream().map(serviceInstance -> {
@@ -74,20 +69,25 @@ public class ServiceMetricsController {
     });
 
 
-    listStream.forEach(service -> service.getServiceInstance().forEach(instance -> table.put(service.getName(), instance.getName(), buildInterface(instance.getService()))));
+    listStream.forEach(service -> {
+      service.getServiceInstance().forEach(instance -> {
+        table.put(METERED_SERVICES.get(service.getName()), instance.getName(), instance.getService().toString());
+      });
+    });
 
 
-    //Finally get metrics from each service
-    Map<String, Object> map = Maps.newHashMap();
+    //Finally get info from each service
+    HashSet<ServiceEndpoint> sepSet = Sets.newHashSet();
     table.cellSet().forEach(cell -> {
       try {
-        map.put(cell.getRowKey() + ":" + cell.getColumnKey(), cell.getValue().getMetrics());
+        ServiceEndpoint sep = new ServiceEndpoint(cell.getRowKey(),cell.getColumnKey(),cell.getValue()+"/metrics");
+        sepSet.add(sep);
       } catch (Throwable th) {
-        log.error("Cannot get metric for service " + cell.getRowKey() + ":" + cell.getColumnKey());
+        log.error("Cannot get endpoint info for service " + cell.getRowKey() + ":" + cell.getColumnKey());
       }
     });
 
-    return map;
+    return sepSet;
   }
 
   private static class Service {
@@ -127,5 +127,43 @@ public class ServiceMetricsController {
     }
   }
 
+  private class ServiceEndpoint{
+    private String service;
+    private String instance;
+
+    @JsonProperty("metrics_url")
+    private String metricsUrl;
+
+    public String getMetricsUrl() {
+      return metricsUrl;
+    }
+
+    public void setMetricsUrl(String metricsUrl) {
+      this.metricsUrl = metricsUrl;
+    }
+
+    public String getService() {
+      return service;
+    }
+
+    public void setService(String service) {
+      this.service = service;
+    }
+
+    public String getInstance() {
+      return instance;
+    }
+
+    public void setInstance(String instance) {
+      this.instance = instance;
+    }
+
+    public ServiceEndpoint(String service, String instance, String metricsUrl){
+      this.service = service;
+      this.instance = instance;
+      this.metricsUrl = metricsUrl;
+    }
+
+  }
 
 }
