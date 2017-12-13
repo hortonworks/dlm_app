@@ -103,10 +103,7 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnCha
     if (event.keyCode === 40) {
       this.selectNext();
     }
-    if (event.keyCode === 32) {
-      this.showMenu = true;
-    }
-    if (event.keyCode === 38 || event.keyCode === 40) {
+    if (event.keyCode === 38 || event.keyCode === 40 || event.keyCode === 32) {
       this.showMenu = true;
       event.preventDefault();
       event.stopPropagation();
