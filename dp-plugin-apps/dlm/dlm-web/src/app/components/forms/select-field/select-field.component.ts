@@ -7,8 +7,9 @@
  * of all or any part of the contents of this software is strictly prohibited.
  */
 
-import { Component, OnInit, Input, Output, ViewEncapsulation, forwardRef, ChangeDetectionStrategy,
-  EventEmitter, ContentChild, OnChanges, SimpleChanges, HostListener, ElementRef
+import {
+  Component, OnInit, Input, Output, ViewEncapsulation, forwardRef, ChangeDetectionStrategy,
+  EventEmitter, ContentChild, OnChanges, SimpleChanges, HostListener, ElementRef, HostBinding
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor, FormControl } from '@angular/forms';
 import { SelectOption } from './select-option.type';
@@ -61,6 +62,7 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnCha
     label: 'None',
     value: null
   };
+  focused = false;
   showMenu = false;
   selectedOption: SelectOption;
   @Input() value: any;
@@ -68,6 +70,7 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnCha
   @Output() onSelect = new EventEmitter<SelectOption>();
   @ContentChild(SelectFieldValueDirective) valueView: SelectFieldValueDirective;
   @ContentChild(SelectFieldOptionDirective) optionView: SelectFieldOptionDirective;
+  @HostBinding() tabindex = 0;
   @HostListener('document:click', ['$event'])
   outsideClickHandler(e) {
     if (!this.elementRef.nativeElement.contains(e.target)) {
@@ -79,19 +82,73 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnCha
 
   constructor(private elementRef: ElementRef) { }
 
+  @HostListener('focusin', ['$event.target'])
+  focusIn(e) {
+    this.focused = true;
+  }
+  @HostListener('focusout', ['$event.target'])
+  focusOut(e) {
+    this.focused = false;
+    this.showMenu = false;
+  }
+  @HostListener('document:keydown', ['$event'])
+  keyEvent(event: KeyboardEvent) {
+    if (!this.focused) {
+      return;
+    }
+    if (event.keyCode === 38) { // arrow up
+      this.selectPrev();
+    }
+
+    if (event.keyCode === 40) { // arrow down
+      this.selectNext();
+    }
+    // arrow up, arrow down or space
+    if (event.keyCode === 38 || event.keyCode === 40 || event.keyCode === 32) {
+      this.showMenu = true;
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    }
+  }
+
+  selectNext() {
+    let index = 0;
+    if (this.selectedOption) {
+      if (this.options[this.options.length - 1] !== this.selectedOption) {
+        index = this.options.indexOf(this.selectedOption) + 1;
+      }
+    }
+    this.selectOption(this.options[index].value);
+  }
+
+  selectPrev() {
+    let index = this.options.length - 1;
+    if (this.selectedOption) {
+      if (this.options[0] !== this.selectedOption) {
+        index = this.options.indexOf(this.selectedOption) - 1;
+      }
+    }
+    this.selectOption(this.options[index].value);
+  }
+
   ngOnInit() {
+  }
+
+  findOptionByValue(value) {
+    return this.options.find(option => '' + option.value === '' + value);
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (this.options) {
-      this.selectedOption = this.options.find(option => '' + option.value === '' + this.value) || this.defaultValue;
+      this.selectedOption = this.findOptionByValue(this.value) || this.defaultValue;
     }
   }
 
   writeValue(value: any) {
     this.value = value;
     if (this.options) {
-      this.selectedOption = this.options.find(option => '' + option.value === '' + this.value) || this.defaultValue;
+      this.selectedOption = this.findOptionByValue(this.value) || this.defaultValue;
     }
   }
 
