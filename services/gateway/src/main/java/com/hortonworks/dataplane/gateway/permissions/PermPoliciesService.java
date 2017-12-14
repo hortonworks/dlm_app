@@ -48,7 +48,7 @@ public class PermPoliciesService {
       Resource resource = resourceLoader.getResource(String.format("classpath:%s" , policyFile));
       try {
         registerPolicy(app,resource.getInputStream());
-        logger.info(String.format("Registered polcify for: %s",app));
+        logger.info(String.format("Registered policy for: %s",app));
       } catch (IOException e) {
         logger.error("could not read policy file"+app,e);
       }
