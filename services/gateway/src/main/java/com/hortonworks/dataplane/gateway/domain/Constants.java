@@ -14,6 +14,7 @@ public interface Constants {
   String DPAPP = "core";
   String DLMAPP = "dlm";
   String CLOUDBREAK = "cloudbreak";
+  String HDP_PROXY = "hdp_proxy";
 
   String DP_USER_INFO_HEADER_KEY = "X-DP-User-Info";
   String DP_TOKEN_INFO_HEADER_KEY = "X-DP-Token-Info";

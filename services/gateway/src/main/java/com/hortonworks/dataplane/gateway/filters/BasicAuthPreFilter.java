@@ -26,12 +26,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.nio.charset.Charset;
 import java.util.Base64;
 
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_DECORATION_FILTER_ORDER;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
 
 
 @Service
@@ -50,9 +48,13 @@ public class BasicAuthPreFilter extends ZuulFilter {
     return PRE_DECORATION_FILTER_ORDER + 2;
   }
 
+
   @Override
   public boolean shouldFilter() {
     RequestContext context = RequestContext.getCurrentContext();
+    String serviceId = context.get(SERVICE_ID_KEY).toString();
+    if(serviceId.equals(Constants.HDP_PROXY))
+      return false;
     HttpServletRequest request = context.getRequest();
     String authHeader = request.getHeader(Constants.AUTHORIZATION_HEADER);
     return context.get(Constants.USER_CTX_KEY) == null && (authHeader != null && authHeader.startsWith(Constants.AUTH_HEADER_PRE_BASIC));
