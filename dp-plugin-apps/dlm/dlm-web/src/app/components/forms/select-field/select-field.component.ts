@@ -96,13 +96,14 @@ export class SelectFieldComponent implements OnInit, ControlValueAccessor, OnCha
     if (!this.focused) {
       return;
     }
-    if (event.keyCode === 38) {
+    if (event.keyCode === 38) { // arrow up
       this.selectPrev();
     }
 
-    if (event.keyCode === 40) {
+    if (event.keyCode === 40) { // arrow down
       this.selectNext();
     }
+    // arrow up, arrow down or space
     if (event.keyCode === 38 || event.keyCode === 40 || event.keyCode === 32) {
       this.showMenu = true;
       event.preventDefault();
