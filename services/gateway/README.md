@@ -7,12 +7,13 @@
 04. [x] TokenAuthPreFilter - check dp_jwt cookie or bearer token and set usercontext
 05. [x] TokenInvalidationCheckPreFilter - check if dp_jwt cookie has already been invalidated
 06. [x] KnoxAuthAndSyncPreFilter - check knox cookie and set usercontext
-07. [x] AuthorizationPreFilter - send 401 if usercontext is unavailable
-08. [x] ContextForwardingPreFilter - read and set knox token and usercontext in upstream header 
-09. [x] TokenInvalidationPostFilter - blacklist a token returned from dp-app
-10. [x] SetCookiePostFilter - set cookie if not already available
-11. [x] TraceFilter - do trace
-12. [x] SendGatewayErrorFilter - return friendly errors for GatewayException
+07. [-] KnoxEnsureAuthPreFilter - verify knox token if user is authenticated via a non-db user
+08. [x] AuthorizationPreFilter - send 401 if usercontext is unavailable
+09. [x] ContextForwardingPreFilter - read and set knox token and usercontext in upstream header 
+10. [x] TokenInvalidationPostFilter - blacklist a token returned from dp-app
+11. [x] SetCookiePostFilter - set cookie if not already available
+12. [x] TraceFilter - do trace
+13. [x] SendGatewayErrorFilter - return friendly errors for GatewayException
 
 ## Tests
 01. Setup Knox and nginx
