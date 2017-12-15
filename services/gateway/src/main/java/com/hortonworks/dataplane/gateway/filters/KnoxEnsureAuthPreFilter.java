@@ -65,6 +65,7 @@ public class KnoxEnsureAuthPreFilter extends ZuulFilter {
     TokenInfo tokenInfo = knox.validateJwt(token);
 
     if (!tokenInfo.isValid()) {
+      context.set(Constants.USER_CTX_KEY, null);
       throw new GatewayException(HttpStatus.UNAUTHORIZED, "Knox token is invalid.");
     }
 
