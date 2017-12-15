@@ -21,7 +21,7 @@ class MetricsRegistry(private val name:String) {
 
   private[metrics] val registry =  new MetricRegistry()
 
-  CollectorRegistry.defaultRegistry.register(new CustomDropWizards(registry))
+  CollectorRegistry.defaultRegistry.register(new CustomDropWizardCollector(registry))
 
   private val gc = s"$name.gc"
 

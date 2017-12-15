@@ -19,10 +19,10 @@ import io.prometheus.client.dropwizard.DropwizardExports
   * Collect Dropwizard metrics from a MetricRegistry.
   */
 
-class CustomDropWizards(val registry: MetricRegistry) extends io.prometheus.client.Collector with io.prometheus.client.Collector.Describable {
+class CustomDropWizardCollector(val registry: MetricRegistry) extends io.prometheus.client.Collector with io.prometheus.client.Collector.Describable {
 
   private val LOGGER = Logger.getLogger(classOf[DropwizardExports].getName)
-  private val CLIENT = "client" // shall we take this, too, as env variable ?
+  private val CLIENT = Option(System.getenv("DP_METRICS_CLIENT_LABEL")).getOrElse("client")
   private val CLIENT_NAME = Option(System.getenv("DP_METRICS_CLIENT_ID")).getOrElse("defaultClientId")
 
   private val LABEL_NAMES_LIST = Collections.unmodifiableList(Collections.singletonList(CLIENT))
@@ -46,7 +46,7 @@ class CustomDropWizards(val registry: MetricRegistry) extends io.prometheus.clie
     else getGaugeMetricSample(0,name,dropwizardName,gauge)
     else {
       LOGGER.log(Level.FINE, String.format("Invalid type for Gauge %s: %s", name, obj.getClass.getName))
-      new util.ArrayList[Collector.MetricFamilySamples]
+      new util.ArrayList[Collector.MetricFamilySamples]()
     }
   }
 
