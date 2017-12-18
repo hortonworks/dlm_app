@@ -61,9 +61,10 @@ export class UserService {
 
   logoutUser() {
     // Access Dataplane API directly to log the user out
+    const urlPrefix = this.getUrlPrefix();
     return this.http
-      .get(UserService.signoutURL)
-      .map(response => {
+      .get(urlPrefix + UserService.signoutURL)
+      .subscribe(response => {
         const challengeAt = response.headers.get(UserService.HEADER_CHALLENGE_HREF);
         window.location.href = `${window.location.protocol}//${window.location.host}/${challengeAt}?originalUrl=${window.location.href}`;
       });
