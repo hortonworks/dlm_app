@@ -29,7 +29,7 @@ class Locations @Inject()(@Named("locationService") val locationService: Locatio
     locationService.list(query)
       .map { locations =>
         locations match {
-          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Left(errors) => InternalServerError(Json.toJson(errors))
           case Right(locations) => Ok(Json.toJson(locations))
         }
       }
@@ -39,7 +39,7 @@ class Locations @Inject()(@Named("locationService") val locationService: Locatio
     locationService.retrieve(locationId)
       .map { location =>
         location match {
-          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Left(errors) => InternalServerError(Json.toJson(errors))
           case Right(location) => Ok(Json.toJson(location))
         }
       }

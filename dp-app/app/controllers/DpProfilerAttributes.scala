@@ -41,9 +41,9 @@ class DpProfilerAttributes @Inject()(
         .map {
           case Left(errors) => {
             errors.errors.head.code match {
-              case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-              case "405" => MethodNotAllowed(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-              case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case "404" => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case "405" => MethodNotAllowed(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case _ => InternalServerError(Json.toJson(errors))
             }
           }
           case Right(attributes) => Accepted(Json.toJson(attributes))
@@ -61,9 +61,9 @@ class DpProfilerAttributes @Inject()(
         .map {
           case Left(errors) => {
             errors.errors.head.code match {
-              case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-              case "405" => MethodNotAllowed(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-              case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case "404" => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case "405" => MethodNotAllowed(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case _ => InternalServerError(Json.toJson(errors))
             }
           }
           case Right(attributes) => Ok(Json.toJson(attributes))
@@ -77,7 +77,7 @@ class DpProfilerAttributes @Inject()(
       Logger.info(s"Received getScheduleStatus for entity $clusterId $dataSetId")
       implicit val token = req.token
       dataSetService.retrieve(dataSetId).flatMap{
-        case Left(errors) => Future.successful(InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}")))
+        case Left(errors) => Future.successful(InternalServerError(Json.toJson(errors)))
         case Right(datasetAndCategories) => {
           val dataset = datasetAndCategories.dataset
           for {
@@ -87,9 +87,9 @@ class DpProfilerAttributes @Inject()(
             feu match {
               case Left(errors) => {
                 errors.errors.head.code match {
-                  case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-                  case "405" => MethodNotAllowed(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-                  case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+                  case "404" => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+                  case "405" => MethodNotAllowed(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+                  case _ => InternalServerError(Json.toJson(errors))
                 }
               }
               case Right(attributes) => Ok(Json.toJson(attributes))
@@ -109,10 +109,10 @@ class DpProfilerAttributes @Inject()(
         .map {
           case Left(errors) => {
             errors.errors.head.code match {
-              case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-              case "405" => MethodNotAllowed(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-              case "503" => ServiceUnavailable(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-              case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case "404" => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case "405" => MethodNotAllowed(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case "503" => ServiceUnavailable(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case _ => InternalServerError(Json.toJson(errors))
             }
           }
           case Right(attributes) => Ok(Json.toJson(attributes))
@@ -131,10 +131,10 @@ class DpProfilerAttributes @Inject()(
         .map {
           case Left(errors) => {
             errors.errors.head.code match {
-              case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-              case "405" => MethodNotAllowed(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-              case "503" => ServiceUnavailable(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-              case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case "404" => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case "405" => MethodNotAllowed(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case "503" => ServiceUnavailable(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case _ => InternalServerError(Json.toJson(errors))
             }
           }
           case Right(attributes) => Ok(Json.toJson(attributes))

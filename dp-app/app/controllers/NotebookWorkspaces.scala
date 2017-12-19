@@ -44,8 +44,7 @@ class NotebookWorkspaces @Inject()(
       .list(workspaceId)
       .map {
         case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          InternalServerError(Json.toJson(errors))
         case Right(assets) => Ok(Json.toJson(assets))
       }
   }
@@ -58,8 +57,7 @@ class NotebookWorkspaces @Inject()(
           .create(notebook)
           .map {
             case Left(errors) =>
-              InternalServerError(JsonResponses.statusError(
-                s"Failed with ${Json.toJson(errors)}"))
+              InternalServerError(Json.toJson(errors))
             case Right(assets) => Ok(Json.toJson(assets))
           }
       }
@@ -71,8 +69,7 @@ class NotebookWorkspaces @Inject()(
       .delete(notebookId)
       .map {
         case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          InternalServerError(Json.toJson(errors))
         case Right(i) => Ok(Json.obj("deleted" -> i))
       }
   }

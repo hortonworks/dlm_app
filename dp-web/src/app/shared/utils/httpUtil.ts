@@ -15,6 +15,7 @@ import {Headers} from '@angular/http';
 import {Alerts} from './alerts';
 import {AuthUtils} from './auth-utils';
 import {Router} from '@angular/router';
+import {CustomError} from "../../models/custom-error";
 
 export const HEADER_CHALLENGE_HREF = 'X-Authenticate-Href';
 
@@ -57,20 +58,35 @@ export class HttpUtil {
     let message;
     if (error._body) {
       let errorJSON = JSON.parse(error._body);
-      if(Array.isArray(errorJSON.errors) && errorJSON.errors[0] && errorJSON.errors[0].code && errorJSON.errors[0].errorType){
-        message = errorJSON.errors.filter(err => {return (err.code && err.errorType)}).map(err => {return err.code}).join(', ');
+      if(Array.isArray(errorJSON.errors) && errorJSON.errors[0] && errorJSON.errors[0].code && errorJSON.errors[0].message && errorJSON.errors[0].errorType){
+        message = errorJSON.errors.filter(err => {return (err.code && err.message && err.errorType)}).map(err => {return HttpUtil.processErrorMessage(err)}).join(', ');
       }else if(Array.isArray(errorJSON)){
-        message = errorJSON.map(err => {return err.message}).join(', ')
+        message = errorJSON.map(err => {return HttpUtil.truncateErrorMessage(err.message)}).join(', ')
       }else if(errorJSON.message){
-        message = errorJSON.message
+        message = HttpUtil.truncateErrorMessage(errorJSON.message)
       }else if (errorJSON.errors){
-        message = errorJSON.errors.map(err => {return err.message}).join(', ')
+        message = errorJSON.errors.map(err => {return HttpUtil.truncateErrorMessage(err.message)}).join(', ')
       }else {
         message = 'Error Occured while processing';
       }
       Alerts.showErrorMessage(message);
     }
     return Observable.throw(error);
+  }
+
+  private static processErrorMessage(error:CustomError){
+    if(error.code.length > 16){
+      return error.code;
+    }
+    let errorMsg = error.code+"\n"+error.message;
+    return HttpUtil.truncateErrorMessage(errorMsg);
+  }
+
+  private static truncateErrorMessage(errorMessage: String){
+    if(errorMessage.length < 256){
+      return errorMessage;
+    }
+    return errorMessage.substring(0,256);
   }
 
   public static getHeaders(): RequestOptionsArgs {

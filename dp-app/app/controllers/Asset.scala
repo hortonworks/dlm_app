@@ -22,8 +22,7 @@ class Asset @Inject()(
           .findAssetByGuid(guid)
           .map {
             case Left(errors) =>
-              InternalServerError(
-                JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              InternalServerError(Json.toJson(errors))
             case Right(dataSets) => Ok(Json.toJson(dataSets))
           }
       }

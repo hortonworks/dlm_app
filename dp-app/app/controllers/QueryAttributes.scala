@@ -53,8 +53,7 @@ class QueryAttributes @Inject()(
       .listQueryAttributes(clusterId)
       .map {
         case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          InternalServerError(Json.toJson(errors))
         case Right(attributes) => Ok(Json.toJson(attributes))
       }
   }
@@ -67,8 +66,7 @@ class QueryAttributes @Inject()(
         .getAssetDetails(clusterId, atlasGuid)
         .map {
           case Left(errors) =>
-            InternalServerError(
-              JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            InternalServerError(Json.toJson(errors))
           case Right(attributes) => Ok(Json.toJson(attributes))
         }
     }
@@ -81,8 +79,7 @@ class QueryAttributes @Inject()(
         .getLineage(clusterId, atlasGuid, request.getQueryString("depth"))
         .map {
           case Left(errors) =>
-            InternalServerError(
-              JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            InternalServerError(Json.toJson(errors))
           case Right(lineage) => Ok(Json.toJson(lineage))
         }
   }
@@ -95,8 +92,7 @@ class QueryAttributes @Inject()(
         .getTypeDefs(clusterId, defType)
         .map {
           case Left(errors) =>
-            InternalServerError(
-              JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            InternalServerError(Json.toJson(errors))
           case Right(typeDefs) => Ok(Json.toJson(typeDefs))
         }
   }

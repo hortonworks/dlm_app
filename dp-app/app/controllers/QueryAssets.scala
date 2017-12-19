@@ -51,8 +51,7 @@ class QueryAssets @Inject()(
         future
           .map {
             case Left(errors) =>
-              InternalServerError(JsonResponses.statusError(
-                s"Failed with ${Json.toJson(errors)}"))
+              InternalServerError(Json.toJson(errors))
             case Right(enhanced) => Ok(Json.toJson(enhanced))
           }
       }
