@@ -43,8 +43,8 @@ class RangerAttributes @Inject()(
         .map {
           case Left(errors) => {
             errors.errors.head.code match {
-              case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-              case  _    => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case "404" => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case  _    => InternalServerError(Json.toJson(errors))
             }
           }
           case Right(attributes) => Ok(Json.toJson(attributes))
@@ -65,8 +65,8 @@ class RangerAttributes @Inject()(
         .recover {
           case exception: WrappedErrorsException =>
             exception.errors.firstMessage match {
-              case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(exception)}"))
-              case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(exception)}"))
+              case "404" => NotFound(JsonResponses.statusError(s"${Json.toJson(exception)}"))
+              case _ => InternalServerError(JsonResponses.statusError(s"${Json.toJson(exception)}"))
             }
           case exception: ApplicationException =>
             new Status(exception.http) (exception.toJs)

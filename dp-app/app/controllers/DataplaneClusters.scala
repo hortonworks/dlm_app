@@ -45,8 +45,7 @@ class DataplaneClusters @Inject()(
       .list()
       .map {
         case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          InternalServerError(Json.toJson(errors))
         case Right(dataplaneClusters) => Ok(Json.toJson(dataplaneClusters))
       }
   }
@@ -64,8 +63,7 @@ class DataplaneClusters @Inject()(
               ambariUrl = dataplaneCluster.ambariUrl.replaceFirst("/$", "")))
           .map {
             case Left(errors) =>
-              InternalServerError(JsonResponses.statusError(
-                s"Failed with ${Json.toJson(errors)}"))
+              InternalServerError(Json.toJson(errors))
             case Right(dpCluster) =>
               syncCluster(DataplaneClusterIdentifier(dpCluster.id.get))
               Ok(Json.toJson(dpCluster))
@@ -93,8 +91,8 @@ class DataplaneClusters @Inject()(
         .map {
           case Left(errors) =>
             errors.firstMessage match {
-              case "404" => NotFound(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
-              case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case "404" => NotFound(JsonResponses.statusError(s"${Json.toJson(errors)}"))
+              case _ => InternalServerError(Json.toJson(errors))
             }
           case Right(dataplaneCluster) => Ok(Json.toJson(dataplaneCluster))
         }
@@ -107,8 +105,7 @@ class DataplaneClusters @Inject()(
       .retrieveServiceInfo(clusterId)
       .map {
         case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          InternalServerError(Json.toJson(errors))
         case Right(clusterServices) => Ok(Json.toJson(clusterServices))
       }
   }
@@ -132,7 +129,7 @@ class DataplaneClusters @Inject()(
           Ok(Json.toJson(updated))
         })
         .recover{
-          case ex: WrappedErrorsException => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(ex.errors)}"))
+          case ex: WrappedErrorsException => InternalServerError(Json.toJson(ex.errors))
         }
       }
       .getOrElse(Future.successful(BadRequest))
@@ -144,8 +141,7 @@ class DataplaneClusters @Inject()(
       .delete(clusterId)
       .map {
         case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          InternalServerError(Json.toJson(errors))
         case Right(dataplaneCluster) => Ok(Json.toJson(dataplaneCluster))
       }
   }

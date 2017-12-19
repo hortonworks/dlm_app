@@ -59,7 +59,7 @@ class Authentication @Inject()(@Named("userService") val userService: UserServic
 
   def userById(userId: String) = Action.async {
     userService.loadUserById(userId).map{
-      case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+      case Left(errors) => InternalServerError(Json.toJson(errors))
       case Right(user) => Ok(Json.toJson(user))
     }
   }

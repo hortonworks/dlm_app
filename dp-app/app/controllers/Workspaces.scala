@@ -33,7 +33,7 @@ class Workspaces @Inject()(@Named("workspaceService") val workspaceService: Work
   def list = Action.async {
     workspaceService.list()
       .map {
-        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Left(errors) => InternalServerError(Json.toJson(errors))
         case Right(workspaces) => Ok(Json.toJson(workspaces))
       }
   }
@@ -41,7 +41,7 @@ class Workspaces @Inject()(@Named("workspaceService") val workspaceService: Work
   def retrieve(name: String) = Action.async {
     workspaceService.retrieve(name)
       .map {
-        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Left(errors) => InternalServerError(Json.toJson(errors))
         case Right(workspaces) => Ok(Json.toJson(workspaces))
       }
   }
@@ -50,7 +50,7 @@ class Workspaces @Inject()(@Named("workspaceService") val workspaceService: Work
     request.body.validate[Workspace].map { workspace =>
       workspaceService.create(workspace.copy(createdBy = Some(request.user.id.get)))
         .map {
-          case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          case Left(errors) => InternalServerError(Json.toJson(errors))
           case Right(workspace) => Ok(Json.toJson(workspace))
         }
     }.getOrElse(Future.successful(BadRequest))
@@ -59,7 +59,7 @@ class Workspaces @Inject()(@Named("workspaceService") val workspaceService: Work
   def delete(name: String) = Action.async {
     workspaceService.delete(name)
       .map {
-        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Left(errors) => InternalServerError(Json.toJson(errors))
         case Right(i) => Ok(Json.obj("deleted" -> i))
       }
   }

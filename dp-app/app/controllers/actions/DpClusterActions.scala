@@ -61,9 +61,7 @@ class DpClusterActions @Inject()(
       })
       .recover {
         case WrappedErrorsException(ex) =>
-          InternalServerError(
-            JsonResponses.statusError(
-              s"Failed with ${Json.toJson(ex.errors)}"))
+          InternalServerError(Json.toJson(ex.errors))
       }
   }
 

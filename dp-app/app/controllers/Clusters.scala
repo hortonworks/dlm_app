@@ -65,8 +65,7 @@ class Clusters @Inject()(
       .getLinkedClusters(dpClusterId)
       .map {
         case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          InternalServerError(Json.toJson(errors))
         case Right(clusters) => Ok(Json.toJson(clusters))
       }
   }
@@ -76,8 +75,7 @@ class Clusters @Inject()(
       .list()
       .map {
         case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          InternalServerError(Json.toJson(errors))
         case Right(clusters) => Ok(Json.toJson(clusters))
       }
   }
@@ -91,8 +89,7 @@ class Clusters @Inject()(
           .create(cluster.copy(userid = request.user.id))
           .map {
             case Left(errors) =>
-              InternalServerError(JsonResponses.statusError(
-                s"Failed with ${Json.toJson(errors)}"))
+              InternalServerError(Json.toJson(errors))
             case Right(cluster) => Ok(Json.toJson(cluster))
           }
       }
@@ -110,8 +107,7 @@ class Clusters @Inject()(
       .retrieve(clusterId)
       .map {
         case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          InternalServerError(Json.toJson(errors))
         case Right(cluster) => Ok(Json.toJson(cluster))
       }
   }
@@ -125,8 +121,7 @@ class Clusters @Inject()(
           .getClusterDetails(req)
           .flatMap {
             case Left(errors) =>
-              Future.successful(InternalServerError(JsonResponses.statusError(
-                s"Failed with ${Json.toJson(errors)}")))
+              Future.successful(InternalServerError(Json.toJson(errors)))
             case Right(clusterDetails) => {
               skuService
                 .getAllSkus()

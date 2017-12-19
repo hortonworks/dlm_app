@@ -55,8 +55,7 @@ class DataSets @Inject()(
       .list(name)
       .map {
         case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          InternalServerError(Json.toJson(errors))
         case Right(dataSets) => Ok(Json.toJson(dataSets))
       }
   }
@@ -71,8 +70,7 @@ class DataSets @Inject()(
             dataset = dSetNCtgryIds.dataset.copy(createdBy = request.user.id)))
           .map {
             case Left(errors) =>
-              InternalServerError(JsonResponses.statusError(
-                s"Failed with ${Json.toJson(errors)}"))
+              InternalServerError(Json.toJson(errors))
             case Right(dataSetNCategories) =>
               Ok(Json.toJson(dataSetNCategories))
           }
@@ -134,7 +132,7 @@ class DataSets @Inject()(
                       case Left(errors) =>{
                         errors.firstMessage match {
                           case "409" => InternalServerError(JsonResponses.statusError(s"An asset collection with this name already exists."))
-                          case _ => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+                          case _ => InternalServerError(Json.toJson(errors))
                         }
                       }
                       case Right(dataSetNCategories) => {
@@ -161,8 +159,7 @@ class DataSets @Inject()(
                 }
               }
             case Left(errors) =>
-              Future.successful(InternalServerError(JsonResponses.statusError(
-                s"Failed with ${Json.toJson(errors)}")))
+              Future.successful(InternalServerError(Json.toJson(errors)))
           }
         }
         .getOrElse(Future.successful(BadRequest))
@@ -173,8 +170,7 @@ class DataSets @Inject()(
       .listRichDataset(req.rawQueryString)
       .map {
         case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          InternalServerError(Json.toJson(errors))
         case Right(dataSets) => Ok(Json.toJson(dataSets))
       }
   }
@@ -187,8 +183,7 @@ class DataSets @Inject()(
 
     future.map {
       case Left(errors) =>
-        InternalServerError(
-          JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        InternalServerError(Json.toJson(errors))
       case Right(dataSets) => Ok(Json.toJson(dataSets))
     }
   }
@@ -205,8 +200,7 @@ class DataSets @Inject()(
             if errors.errors.size > 0 && errors.errors.head.code == "404" =>
             NotFound
           case Left(errors) =>
-            InternalServerError(
-              JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            InternalServerError(Json.toJson(errors))
           case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
         }
     }
@@ -220,8 +214,7 @@ class DataSets @Inject()(
       .getDataAssetByDatasetId(id, queryName, offset, limit)
       .map {
         case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          InternalServerError(Json.toJson(errors))
         case Right(dataSets) => Ok(Json.toJson(dataSets))
       }
   }
@@ -235,8 +228,7 @@ class DataSets @Inject()(
             if errors.errors.size > 0 && errors.errors.head.code == "404" =>
           NotFound
         case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          InternalServerError(Json.toJson(errors))
         case Right(dataSetNCategories) => Ok(Json.toJson(dataSetNCategories))
       }
   }
@@ -250,8 +242,7 @@ class DataSets @Inject()(
           .update(dSetNCtgryIds)
           .map {
             case Left(errors) =>
-              InternalServerError(JsonResponses.statusError(
-                s"Failed with ${Json.toJson(errors)}"))
+              InternalServerError(Json.toJson(errors))
             case Right(dataSetNCategories) =>
               Ok(Json.toJson(dataSetNCategories))
           }
@@ -272,7 +263,7 @@ class DataSets @Inject()(
       Ok(Json.obj("deleted" -> deleted))
     })
     .recover{
-      case ex: WrappedErrorsException => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(ex.errors)}"))
+      case ex: WrappedErrorsException => InternalServerError(Json.toJson(ex.errors))
     }
   }
 
@@ -282,8 +273,7 @@ class DataSets @Inject()(
       .list()
       .map {
         case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          InternalServerError(Json.toJson(errors))
         case Right(categories) => Ok(Json.toJson(categories))
       }
   }
@@ -295,8 +285,7 @@ class DataSets @Inject()(
         .search(searchText, size)
         .map {
           case Left(errors) =>
-            InternalServerError(
-              JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            InternalServerError(Json.toJson(errors))
           case Right(categories) => Ok(Json.toJson(categories))
         }
     }
@@ -310,8 +299,7 @@ class DataSets @Inject()(
           .create(category)
           .map {
             case Left(errors) =>
-              InternalServerError(JsonResponses.statusError(
-                s"Failed with ${Json.toJson(errors)}"))
+              InternalServerError(Json.toJson(errors))
             case Right(category) => Ok(Json.toJson(category))
           }
       }
@@ -323,8 +311,7 @@ class DataSets @Inject()(
         .listWithCount(search)
         .map {
           case Left(errors) =>
-            InternalServerError(
-              JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+            InternalServerError(Json.toJson(errors))
           case Right(categories) => Ok(Json.toJson(categories))
         }
   }
@@ -334,8 +321,7 @@ class DataSets @Inject()(
       .listWithCount(categoryId)
       .map {
         case Left(errors) =>
-          InternalServerError(
-            JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+          InternalServerError(Json.toJson(errors))
         case Right(categoryCount) => Ok(Json.toJson(categoryCount))
       }
   }

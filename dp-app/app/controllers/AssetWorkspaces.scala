@@ -47,7 +47,7 @@ class AssetWorkspaces @Inject()(@Named("assetWorkspaceService") val assetWorkspa
   def getAssets(workspaceId: Long) = Action.async {
     assetWorkspaceService.list(workspaceId)
       .map {
-        case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+        case Left(errors) => InternalServerError(Json.toJson(errors))
         case Right(assets) => Ok(Json.toJson(assets))
       }
   }
@@ -60,11 +60,11 @@ class AssetWorkspaces @Inject()(@Named("assetWorkspaceService") val assetWorkspa
           val newReq = req.copy(dataAssets = assets)
           assetWorkspaceService.create(newReq)
             .map {
-              case Left(errors) => InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}"))
+              case Left(errors) => InternalServerError(Json.toJson(errors))
               case Right(assets) => Ok(Json.toJson(assets))
             }
         case Left(errors) =>
-          Future.successful(InternalServerError(JsonResponses.statusError(s"Failed with ${Json.toJson(errors)}")))
+          Future.successful(InternalServerError(Json.toJson(errors)))
       }
     }.getOrElse(Future.successful(BadRequest))
   }
