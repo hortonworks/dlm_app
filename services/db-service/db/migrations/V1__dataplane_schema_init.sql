@@ -172,6 +172,7 @@ CREATE TABLE IF NOT EXISTS dataplane.datasets (
   lastmodified TIMESTAMP DEFAULT now()                            NOT NULL,
   active       BOOLEAN DEFAULT TRUE,
   version      SMALLINT DEFAULT 1,
+  sharedstatus SMALLINT DEFAULT 1,  -- enum 1 - Public, 2 - Private ...
   custom_props JSON
 );
 

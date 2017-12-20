@@ -200,19 +200,19 @@ class DatasetRepo @Inject()(
     }
   }
 
-  def getRichDataset(searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[RichDataset]] = {
-    getRichDataset(Datasets, paginatedQuery, searchText)
+  def getRichDataset(searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None, userId:Long): Future[Seq[RichDataset]] = {
+    getRichDataset(Datasets.filter(m =>(m.createdBy === userId) || (m.sharedStatus === 1)), paginatedQuery, searchText)
   }
 
-  def getRichDatasetById(id: Long): Future[Option[RichDataset]] = {
-    getRichDataset(Datasets.filter(_.id === id), None, None).map(_.headOption)
+  def getRichDatasetById(id: Long,userId:Long): Future[Option[RichDataset]] = {
+    getRichDataset(Datasets.filter(m => (m.id === id && m.createdBy === userId) || (m.id === id && m.sharedStatus === 1)), None, None).map(_.headOption)
   }
 
-  def getRichDatasetByTag(tagName: String, searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None): Future[Seq[RichDataset]] = {
+  def getRichDatasetByTag(tagName: String, searchText: Option[String], paginatedQuery: Option[PaginatedQuery] = None,userId:Long): Future[Seq[RichDataset]] = {
     val query = categoryRepo.Categories.filter(_.name === tagName)
       .join(datasetCategoryRepo.DatasetCategories).on(_.id === _.categoryId)
       .join(Datasets).on(_._2.datasetId === _.id)
-      .map(_._2)
+      .map(_._2).filter(m=>(m.createdBy === userId) || (m.sharedStatus === 1))
     getRichDataset(query, paginatedQuery, searchText)
   }
 
@@ -306,6 +306,8 @@ class DatasetRepo @Inject()(
 
     def version = column[Int]("version")
 
+    def sharedStatus = column[Int]("sharedstatus")
+
     def customprops = column[Option[JsValue]]("custom_props")
 
     val select = Map("id" -> this.id, "name" -> this.name)
@@ -320,9 +322,11 @@ class DatasetRepo @Inject()(
         lastmodified,
         active,
         version,
+        sharedStatus,
         customprops
       ) <> ((Dataset.apply _).tupled, Dataset.unapply)
 
   }
 
 }
+

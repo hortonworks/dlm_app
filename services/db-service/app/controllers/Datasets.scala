@@ -48,19 +48,19 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
   }
 
   def allRichDataset = Action.async { req =>
-    datasetRepo.getRichDataset(req.getQueryString("search"), getPaginatedQuery(req))
+    datasetRepo.getRichDataset(req.getQueryString("search"), getPaginatedQuery(req),req.getQueryString("userId").get.toLong)
       .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
       .recoverWith(apiError)
   }
 
   def richDatasetByTag(tagName: String) = Action.async { req =>
-    datasetRepo.getRichDatasetByTag(tagName, req.getQueryString("search"), getPaginatedQuery(req))
+    datasetRepo.getRichDatasetByTag(tagName, req.getQueryString("search"), getPaginatedQuery(req),req.getQueryString("userId").get.toLong)
       .map(dc => success(dc.map(c => linkData(c, makeLink(c.dataset)))))
       .recoverWith(apiError)
   }
 
-  def richDatasetById(id: Long) = Action.async {
-    datasetRepo.getRichDatasetById(id).map { co =>
+  def richDatasetById(id: Long) = Action.async { req=>
+    datasetRepo.getRichDatasetById(id,req.getQueryString("userId").get.toLong).map { co =>
       co.map { c =>
         success(linkData(c, makeLink(c.dataset)))
       }

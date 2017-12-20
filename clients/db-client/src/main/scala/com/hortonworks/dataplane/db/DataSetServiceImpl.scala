@@ -60,22 +60,22 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToDataSetAndCategories)
   }
 
-  def listRichDataset(queryString: String): Future[Either[Errors, Seq[RichDataset]]] = {
-    ws.url(s"$url/richdatasets?$queryString")
+  def listRichDataset(queryString: String, userId:Long): Future[Either[Errors, Seq[RichDataset]]] = {
+    ws.url(s"$url/richdatasets?$queryString&userId=$userId")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToRichDatasets)
   }
 
-  def getRichDatasetById(id: Long): Future[Either[Errors, RichDataset]] = {
-    ws.url(s"$url/richdatasets/$id")
+  def getRichDatasetById(id: Long,userId:Long): Future[Either[Errors, RichDataset]] = {
+    ws.url(s"$url/richdatasets/$id?userId=$userId")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToRichDataset)
   }
 
-  def listRichDatasetByTag(tagName: String, queryString: String): Future[Either[Errors, Seq[RichDataset]]] = {
-    ws.url(s"$url/richdatasets/tags/$tagName?$queryString")
+  def listRichDatasetByTag(tagName: String, queryString: String,userId:Long): Future[Either[Errors, Seq[RichDataset]]] = {
+    ws.url(s"$url/richdatasets/tags/$tagName?$queryString&userId=$userId")
       .withHeaders("Accept" -> "application/json")
       .get()
       .map(mapToRichDatasets)

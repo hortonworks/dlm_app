@@ -280,6 +280,7 @@ object Entities {
                      lastModified: LocalDateTime = LocalDateTime.now(),
                      active: Boolean = true,
                      version: Int = 1,
+                     sharedStatus: Int = 1,
                      customProps: Option[JsValue] = None)
 
   case class DatasetCategory(categoryId: Long, datasetId: Long)

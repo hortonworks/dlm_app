@@ -167,7 +167,7 @@ class DataSets @Inject()(
 
   def getRichDataset = AuthenticatedAction.async { req =>
     dataSetService
-      .listRichDataset(req.rawQueryString)
+      .listRichDataset(req.rawQueryString,req.user.id.get)
       .map {
         case Left(errors) =>
           InternalServerError(Json.toJson(errors))
@@ -178,8 +178,8 @@ class DataSets @Inject()(
   def getRichDatasetByTag(tagName: String) = AuthenticatedAction.async { req =>
     val future =
       if (tagName.equalsIgnoreCase("all"))
-        dataSetService.listRichDataset(req.rawQueryString)
-      else dataSetService.listRichDatasetByTag(tagName, req.rawQueryString)
+        dataSetService.listRichDataset(req.rawQueryString,req.user.id.get)
+      else dataSetService.listRichDatasetByTag(tagName, req.rawQueryString,req.user.id.get)
 
     future.map {
       case Left(errors) =>
@@ -188,13 +188,13 @@ class DataSets @Inject()(
     }
   }
 
-  def getRichDatasetById(id: String) =  Action.async {
+  def getRichDatasetById(id: String) =  AuthenticatedAction.async { req =>
     Logger.info("Received retrieve dataSet request")
     if(Try(id.toLong).isFailure){
       Future.successful(NotFound)
     }else{
       dataSetService
-        .getRichDatasetById(id.toLong)
+        .getRichDatasetById(id.toLong,req.user.id.get)
         .map {
           case Left(errors)
             if errors.errors.size > 0 && errors.errors.head.code == "404" =>
@@ -254,7 +254,7 @@ class DataSets @Inject()(
     implicit val token = request.token
     Logger.info("Received delete dataSet request")
     (for {
-      dataset <- doGetDataset(dataSetId.toLong)
+      dataset <- doGetDataset(dataSetId.toLong,request.user.id.get)
       clusterId <- doGetClusterIdFromDpClusterId(dataset.dpClusterId.toLong)
       deleted <- doDeleteDataset(dataset.id.get)
       jobName <- utilityService.doGenerateJobName(dataset.id.get, dataset.name)
@@ -392,9 +392,9 @@ class DataSets @Inject()(
       }
   }
 
-  private def doGetDataset(datasetId: Long): Future[Dataset] = {
+  private def doGetDataset(datasetId: Long,userId: Long): Future[Dataset] = {
     dataSetService
-      .getRichDatasetById(datasetId)
+      .getRichDatasetById(datasetId,userId)
       .flatMap {
         case Left(errors) => Future.failed(WrappedErrorsException(errors))
         case Right(dataset) => Future.successful(dataset.dataset)
