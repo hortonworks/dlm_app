@@ -23,6 +23,7 @@ import com.hortonworks.dataplane.commons.service.api.ServiceNotFound
 import com.hortonworks.dataplane.cs.{
   ClusterDataApi,
   CredentialInterface,
+  Credentials,
   StorageInterface
 }
 import com.hortonworks.dataplane.db.Webservice.{
@@ -34,10 +35,14 @@ import com.hortonworks.dataplane.db.Webservice.{
 import com.hortonworks.dataplane.http.BaseRoute
 import com.hortonworks.dataplane.http.JsonSupport._
 import com.hortonworks.dataplane.knox.Knox.{KnoxApiRequest, KnoxConfig}
-import com.hortonworks.dataplane.knox.KnoxApiExecutor
+import com.hortonworks.dataplane.knox.{
+  KnoxApiExecutor,
+  TokenDisabledKnoxApiExecutor
+}
 import com.typesafe.config.Config
+import com.typesafe.scalalogging.Logger
 import play.api.libs.json.{JsObject, JsValue, Json}
-import play.api.libs.ws.{WSAuthScheme, WSClient, WSResponse}
+import play.api.libs.ws.{WSAuthScheme, WSClient, WSRequest, WSResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -54,6 +59,8 @@ class RangerRoute @Inject()(
     private val config: Config,
     private val ws: WSClient
 ) extends BaseRoute {
+
+  val logger = Logger(classOf[RangerRoute])
 
   private val defaultHeaders = "Accept" -> "application/json, text/javascript, */*; q=0.01"
 
@@ -178,8 +185,7 @@ class RangerRoute @Inject()(
       baseUrls <- extractUrlsWithIp(url, clusterId)
       credential <- credentialInterface.getCredential("dp.credential.ranger")
       services <- getRangerServicesForType(baseUrls.head,
-                                           credential.user,
-                                           credential.pass,
+                                           credential,
                                            serviceType,
                                            executor,
                                            token)
@@ -188,8 +194,7 @@ class RangerRoute @Inject()(
           services.map(
             cServiceId =>
               getRangerPoliciesByServiceIdAndQueries(baseUrls.head,
-                                                     credential.user,
-                                                     credential.pass,
+                                                     credential,
                                                      cServiceId,
                                                      queries,
                                                      executor,
@@ -219,21 +224,18 @@ class RangerRoute @Inject()(
       .filter(cTag => !cTag.isEmpty)
       .sorted
       .map(cTag =>
-        s"startIndex=${offset}&pageSize=${pageSize}&resource:tag=${cTag}")
+        s"startIndex=$offset&pageSize=$pageSize&resource:tag=$cTag")
   }
 
   private def getRangerServicesForType(
       uri: String,
-      user: Option[String],
-      pass: Option[String],
+      credentials: Credentials,
       serviceType: String,
       knoxApiExecutor: KnoxApiExecutor,
       token: Option[String]): Future[Seq[Long]] = {
-    val req = ws
-      .url(s"$uri/service/public/v2/api/service?serviceType=$serviceType")
-      .withHeaders(defaultHeaders)
-      .withAuth(user.get, pass.get, WSAuthScheme.BASIC)
 
+    val req =
+      getServiceTypeRequest(uri, credentials, serviceType, knoxApiExecutor)
     knoxApiExecutor
       .execute(KnoxApiRequest(req, { r =>
         r.get()
@@ -245,18 +247,26 @@ class RangerRoute @Inject()(
       }
   }
 
+  private def getServiceTypeRequest(uri: String,
+                                    credentials: Credentials,
+                                    serviceType: String,
+                                    executor: KnoxApiExecutor) = {
+    val req = ws
+      .url(s"$uri/service/public/v2/api/service?serviceType=$serviceType")
+      .withHeaders(defaultHeaders)
+    setAuth(credentials, executor, req)
+  }
+
   private def getRangerPoliciesByServiceIdAndQuery(
       uri: String,
-      user: Option[String],
-      pass: Option[String],
+      credentials: Credentials,
       serviceId: Long,
       query: String,
       knoxApiExecutor: KnoxApiExecutor,
       token: Option[String]): Future[Seq[JsObject]] = {
-    val req = ws
-      .url(s"$uri/service/plugins/policies/service/$serviceId?$query")
-      .withHeaders(defaultHeaders)
-      .withAuth(user.get, pass.get, WSAuthScheme.BASIC)
+
+    val req =
+      getPolicyRequest(uri, credentials, serviceId, query, knoxApiExecutor)
 
     knoxApiExecutor
       .execute(KnoxApiRequest(req, { r =>
@@ -267,10 +277,20 @@ class RangerRoute @Inject()(
       }
   }
 
+  private def getPolicyRequest(uri: String,
+                               credentials: Credentials,
+                               serviceId: Long,
+                               query: String,
+                               executor: KnoxApiExecutor) = {
+    val req = ws
+      .url(s"$uri/service/plugins/policies/service/$serviceId?$query")
+      .withHeaders(defaultHeaders)
+    setAuth(credentials, executor, req)
+  }
+
   private def getRangerPoliciesByServiceIdAndQueries(
       uri: String,
-      user: Option[String],
-      pass: Option[String],
+      credentials: Credentials,
       serviceId: Long,
       queries: Seq[String],
       knoxApiExecutor: KnoxApiExecutor,
@@ -279,8 +299,7 @@ class RangerRoute @Inject()(
       .map(
         cQuery =>
           getRangerPoliciesByServiceIdAndQuery(uri,
-                                               user,
-                                               pass,
+                                               credentials,
                                                serviceId,
                                                cQuery,
                                                knoxApiExecutor,
@@ -328,35 +347,40 @@ class RangerRoute @Inject()(
       credential <- credentialInterface.getCredential("dp.credential.ranger")
       urlToHit1 <- Future.successful(
         s"${baseUrls.head}/service/plugins/definitions?pageSource=Audit")
-      wsRequest <- Future.successful(ws
-        .url(urlToHit1)
-        .withHeaders(defaultHeaders)
-        .withAuth(credential.user.get, credential.pass.get, WSAuthScheme.BASIC))
+      wsRequest <- getDefinitionsRequest(credential, urlToHit1, executor)
       tokenAsString <- getTokenAsOptionalString(request)
       response1 <- executor.execute(KnoxApiRequest(wsRequest, { r =>
         r.get()
       }, tokenAsString))
 
       repoType <- Future.successful(getRepoTypeFromRangerServiceDef(response1))
-      wsRequest2 <- Future.successful(
-        ws.url(
-            getUrl(dbName,
-                   tableName,
-                   offset,
-                   pageSize,
-                   accessType,
-                   accessResult,
-                   baseUrls,
-                   repoType))
-          .withHeaders(defaultHeaders)
-          .withAuth(credential.user.get,
-                    credential.pass.get,
-                    WSAuthScheme.BASIC))
+      wsRequest2 <- getDefinitionsRequest(credential,
+                                          getUrl(dbName,
+                                                 tableName,
+                                                 offset,
+                                                 pageSize,
+                                                 accessType,
+                                                 accessResult,
+                                                 baseUrls,
+                                                 repoType),
+                                          executor)
       response <- executor.execute(KnoxApiRequest(wsRequest2, { r =>
         r.get()
       }, tokenAsString))
     } yield {
       response
+    }
+  }
+
+  private def getDefinitionsRequest(
+      credential: Credentials,
+      url: String,
+      executor: KnoxApiExecutor): Future[WSRequest] = {
+    Future.successful {
+      val req = ws
+        .url(url)
+        .withHeaders(defaultHeaders)
+      setAuth(credential, executor, req)
     }
   }
 
@@ -392,7 +416,7 @@ class RangerRoute @Inject()(
     clusterComponentService.getServiceByName(clusterId, "RANGER").map {
       case Right(endpoints) => endpoints
       case Left(errors) =>
-        throw new ServiceNotFound(
+        throw ServiceNotFound(
           s"Could not get the service Url from storage - $errors")
     }
   }
@@ -446,15 +470,45 @@ class RangerRoute @Inject()(
       url <- getRangerUrlFromConfig(service)
       baseUrls <- extractUrlsWithIp(url, clusterId)
       credential <- credentialInterface.getCredential("dp.credential.ranger")
-      wsRequest <- Future.successful(ws
-        .url(
-          s"${baseUrls.head}/service/plugins/policies/service/1?startIndex=$offset&pageSize=$pageSize&resource:database=$dbName&resource:table=$tableName")
-        .withHeaders(defaultHeaders)
-        .withAuth(credential.user.get, credential.pass.get, WSAuthScheme.BASIC))
+      wsRequest <- createPolicyRequest(dbName,
+                                       tableName,
+                                       offset,
+                                       pageSize,
+                                       baseUrls,
+                                       credential,
+                                       executor)
       response <- executor.execute(KnoxApiRequest(wsRequest, { r =>
         r.get()
       }, token))
     } yield response.json
   }
 
+  private def createPolicyRequest(dbName: String,
+                                  tableName: String,
+                                  offset: Long,
+                                  pageSize: Long,
+                                  baseUrls: Seq[String],
+                                  credential: Credentials,
+                                  executor: KnoxApiExecutor) = {
+    Future.successful {
+      val request = ws
+        .url(
+          s"${baseUrls.head}/service/plugins/policies/service/1?startIndex=$offset&pageSize=$pageSize&resource:database=$dbName&resource:table=$tableName")
+        .withHeaders(defaultHeaders)
+      setAuth(credential, executor, request)
+    }
+  }
+
+  private def setAuth(credential: Credentials,
+                                  executor: KnoxApiExecutor,
+                                  request: WSRequest) = {
+    executor match {
+      case e: TokenDisabledKnoxApiExecutor =>
+        logger.debug(s"Executor was ${e.getClass} adding Auth header")
+        request.withAuth(credential.user.get,
+                         credential.pass.get,
+                         WSAuthScheme.BASIC)
+      case _ => request
+    }
+  }
 }
