@@ -107,6 +107,16 @@ class DataSetServiceImpl(config: Config)(implicit ws: WSClient)
       .map(mapToDataSetAndCategories)
   }
 
+  override def updateDSetSharedStatus(dataset: Dataset): Future[Either[Errors, Seq[Dataset]]] = {
+    ws.url(s"$url/datasetsSStatus")
+      .withHeaders(
+        "Content-Type" -> "application/json",
+        "Accept" -> "application/json"
+      )
+      .patch(Json.toJson(dataset))
+      .map(mapToDataSets)
+  }
+
   override def delete(datasetId: String): Future[Either[Errors, Long]] = {
     ws.url(s"$url/datasets/$datasetId")
       .withHeaders("Accept" -> "application/json")

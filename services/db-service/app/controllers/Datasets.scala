@@ -87,6 +87,19 @@ class Datasets @Inject()(datasetRepo: DatasetRepo)(implicit exec: ExecutionConte
     future.map(i => success(i)).recoverWith(apiError)
   }
 
+  def updateSharedStatus = Action.async(parse.json) { req =>
+    req.body
+      .validate[Dataset]
+      .map { ds =>
+        datasetRepo.updateSharedStatus(ds).map{ ds =>
+          ds.map { d =>
+            success(linkData(d, makeLink(d)))
+          }
+            .getOrElse(NotFound)
+        }.recoverWith(apiError)
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
 
   def add = Action.async(parse.json) { req =>
     req.body

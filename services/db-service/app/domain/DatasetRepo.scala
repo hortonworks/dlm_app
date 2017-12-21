@@ -238,6 +238,15 @@ class DatasetRepo @Inject()(
     db.run(query)
   }
 
+  def updateSharedStatus(dataset: Dataset) = {
+    val query = ( for {
+      _ <- Datasets.filter(_.id === dataset.id).update(dataset)
+      dataset <- Datasets.filter(_.id === dataset.id).result.headOption
+    } yield(dataset)).transactionally
+
+    db.run(query)
+  }
+
   def getCategoriesCount(searchText: Option[String]): Future[List[CategoryCount]] = {
     val countQuery = datasetCategoryRepo.DatasetCategories.groupBy(_.categoryId).map {
       case (catId, results) => (catId -> results.length)

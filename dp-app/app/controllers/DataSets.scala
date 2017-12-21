@@ -165,6 +165,7 @@ class DataSets @Inject()(
         .getOrElse(Future.successful(BadRequest))
   }
 
+
   def getRichDataset = AuthenticatedAction.async { req =>
     dataSetService
       .listRichDataset(req.rawQueryString,req.user.id.get)
@@ -245,6 +246,23 @@ class DataSets @Inject()(
               InternalServerError(Json.toJson(errors))
             case Right(dataSetNCategories) =>
               Ok(Json.toJson(dataSetNCategories))
+          }
+      }
+      .getOrElse(Future.successful(BadRequest))
+  }
+
+  def updateDSetSharedStatus() = Action.async(parse.json) { request =>
+    Logger.info("Received update dataSet shredStatus request")
+    request.body
+      .validate[Dataset]
+      .map { dataset =>
+        dataSetService
+          .updateDSetSharedStatus(dataset)
+          .map {
+            case Left(errors) =>
+              InternalServerError(Json.toJson(errors))
+            case Right(dataset) =>
+              Ok(Json.toJson(dataset))
           }
       }
       .getOrElse(Future.successful(BadRequest))

@@ -62,6 +62,7 @@ POST          /api/datasets                                          controllers
 GET           /api/datasets/:datasetId                               controllers.DataSets.retrieve(datasetId)
 DELETE        /api/datasets/:datasetId                               controllers.DataSets.delete(datasetId)
 PUT           /api/datasets                                          controllers.DataSets.update()
+PATCH         /api/datasetsSStatus                                   controllers.DataSets.updateDSetSharedStatus
 #GET         /api/datasets/:name                    controllers.DataSets.getByname(name,host,datacenter)
 
 # Dataset new
