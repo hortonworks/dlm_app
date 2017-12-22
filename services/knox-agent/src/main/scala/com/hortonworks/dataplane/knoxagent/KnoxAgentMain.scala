@@ -55,15 +55,14 @@ object KnoxAgentMain {
   }
   private def process: Future[Either[Throwable, Boolean]] = {
     try {
-      val config = ConfigFactory.load()
+      val config = agentConfig
       val gateway: Gateway = new Gateway(config, null, null)
       getGatewayService(gateway).flatMap {
         case Left(throwable) => Future.successful(Left(throwable))
-        case Right(gatewayService) => {
+        case Right(gatewayService) =>
           val gatewayUrl =
             s"http://${gatewayService.getIp}:${gatewayService.getPort}"
           processConfiguration(gatewayUrl, config)
-        }
       }
     } catch {
       case e: Exception =>
